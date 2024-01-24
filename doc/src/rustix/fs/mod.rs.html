@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/dwq9ypb5hjza74k25zjh8fz7iianxycz-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustix-0.38.8/src/fs/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/lgm49i312vhpr4q3c6lvnxlr4shfhvfv-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustix-0.38.28/src/fs/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -129,6 +129,18 @@
 <a href="#129" id="129">129</a>
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Filesystem operations.
 
 </span><span class="kw">mod </span>abs;
@@ -140,7 +152,7 @@
 <span class="attr">#[cfg(not(any(target_os = <span class="string">&quot;espidf&quot;</span>, target_os = <span class="string">&quot;redox&quot;</span>)))]
 #[cfg(not(target_os = <span class="string">&quot;haiku&quot;</span>))] </span><span class="comment">// Haiku needs &lt;https://github.com/rust-lang/rust/pull/112371&gt;
 </span><span class="kw">mod </span>cwd;
-<span class="attr">#[cfg(not(any(target_os = <span class="string">&quot;espidf&quot;</span>, target_os = <span class="string">&quot;redox&quot;</span>)))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;alloc&quot;</span>, not(any(target_os = <span class="string">&quot;espidf&quot;</span>, target_os = <span class="string">&quot;redox&quot;</span>))))]
 </span><span class="kw">mod </span>dir;
 <span class="attr">#[cfg(not(any(
     apple,
@@ -150,6 +162,7 @@
     target_os = <span class="string">&quot;espidf&quot;</span>,
     target_os = <span class="string">&quot;haiku&quot;</span>,
     target_os = <span class="string">&quot;redox&quot;</span>,
+    target_os = <span class="string">&quot;vita&quot;</span>,
 )))]
 </span><span class="kw">mod </span>fadvise;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>fcntl;
@@ -158,17 +171,17 @@
 <span class="attr">#[cfg(apple)]
 </span><span class="kw">mod </span>fcopyfile;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>fd;
-<span class="kw">mod </span>file_type;
-<span class="attr">#[cfg(apple)]
+<span class="attr">#[cfg(all(apple, feature = <span class="string">&quot;alloc&quot;</span>))]
 </span><span class="kw">mod </span>getpath;
 <span class="attr">#[cfg(not(target_os = <span class="string">&quot;wasi&quot;</span>))] </span><span class="comment">// WASI doesn&#39;t have get[gpu]id.
 </span><span class="kw">mod </span>id;
-<span class="attr">#[cfg(not(target_os = <span class="string">&quot;wasi&quot;</span>))]
+<span class="attr">#[cfg(linux_kernel)]
 </span><span class="kw">mod </span>ioctl;
 <span class="attr">#[cfg(not(any(
     target_os = <span class="string">&quot;espidf&quot;</span>,
     target_os = <span class="string">&quot;haiku&quot;</span>,
     target_os = <span class="string">&quot;redox&quot;</span>,
+    target_os = <span class="string">&quot;vita&quot;</span>,
     target_os = <span class="string">&quot;wasi&quot;
 </span>)))]
 </span><span class="kw">mod </span>makedev;
@@ -186,7 +199,12 @@
 </span><span class="kw">mod </span>sendfile;
 <span class="attr">#[cfg(linux_kernel)]
 </span><span class="kw">mod </span>statx;
-<span class="attr">#[cfg(not(any(target_os = <span class="string">&quot;espidf&quot;</span>, target_os = <span class="string">&quot;redox&quot;</span>, target_os = <span class="string">&quot;wasi&quot;</span>)))]
+<span class="attr">#[cfg(not(any(
+    target_os = <span class="string">&quot;espidf&quot;</span>,
+    target_os = <span class="string">&quot;redox&quot;</span>,
+    target_os = <span class="string">&quot;vita&quot;</span>,
+    target_os = <span class="string">&quot;wasi&quot;
+</span>)))]
 </span><span class="kw">mod </span>sync;
 <span class="attr">#[cfg(any(apple, linux_kernel))]
 </span><span class="kw">mod </span>xattr;
@@ -202,7 +220,7 @@
 <span class="attr">#[cfg(not(any(target_os = <span class="string">&quot;espidf&quot;</span>, target_os = <span class="string">&quot;redox&quot;</span>)))]
 #[cfg(not(target_os = <span class="string">&quot;haiku&quot;</span>))] </span><span class="comment">// Haiku needs &lt;https://github.com/rust-lang/rust/pull/112371&gt;
 </span><span class="kw">pub use </span>cwd::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(not(any(target_os = <span class="string">&quot;espidf&quot;</span>, target_os = <span class="string">&quot;redox&quot;</span>)))]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;alloc&quot;</span>, not(any(target_os = <span class="string">&quot;espidf&quot;</span>, target_os = <span class="string">&quot;redox&quot;</span>))))]
 </span><span class="kw">pub use </span>dir::{Dir, DirEntry};
 <span class="attr">#[cfg(not(any(
     apple,
@@ -212,30 +230,31 @@
     target_os = <span class="string">&quot;espidf&quot;</span>,
     target_os = <span class="string">&quot;haiku&quot;</span>,
     target_os = <span class="string">&quot;redox&quot;</span>,
+    target_os = <span class="string">&quot;vita&quot;</span>,
 )))]
-</span><span class="kw">pub use </span>fadvise::{fadvise, Advice};
+</span><span class="kw">pub use </span>fadvise::fadvise;
 <span class="kw">pub use </span>fcntl::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(apple)]
 </span><span class="kw">pub use </span>fcntl_apple::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(apple)]
 </span><span class="kw">pub use </span>fcopyfile::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>fd::<span class="kw-2">*</span>;
-<span class="kw">pub use </span>file_type::FileType;
-<span class="attr">#[cfg(apple)]
+<span class="attr">#[cfg(all(apple, feature = <span class="string">&quot;alloc&quot;</span>))]
 </span><span class="kw">pub use </span>getpath::getpath;
 <span class="attr">#[cfg(not(target_os = <span class="string">&quot;wasi&quot;</span>))]
 </span><span class="kw">pub use </span>id::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(not(target_os = <span class="string">&quot;wasi&quot;</span>))]
+<span class="attr">#[cfg(linux_kernel)]
 </span><span class="kw">pub use </span>ioctl::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(not(any(
     target_os = <span class="string">&quot;espidf&quot;</span>,
     target_os = <span class="string">&quot;haiku&quot;</span>,
     target_os = <span class="string">&quot;redox&quot;</span>,
+    target_os = <span class="string">&quot;vita&quot;</span>,
     target_os = <span class="string">&quot;wasi&quot;
 </span>)))]
 </span><span class="kw">pub use </span>makedev::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(any(linux_kernel, target_os = <span class="string">&quot;freebsd&quot;</span>))]
-</span><span class="kw">pub use </span>memfd_create::{memfd_create, MemfdFlags};
+</span><span class="kw">pub use </span>memfd_create::memfd_create;
 <span class="attr">#[cfg(linux_kernel)]
 #[cfg(feature = <span class="string">&quot;fs&quot;</span>)]
 </span><span class="kw">pub use </span>mount::<span class="kw-2">*</span>;
@@ -247,8 +266,13 @@
 <span class="attr">#[cfg(target_os = <span class="string">&quot;linux&quot;</span>)]
 </span><span class="kw">pub use </span>sendfile::sendfile;
 <span class="attr">#[cfg(linux_kernel)]
-</span><span class="kw">pub use </span>statx::{statx, Statx, StatxFlags, StatxTimestamp};
-<span class="attr">#[cfg(not(any(target_os = <span class="string">&quot;espidf&quot;</span>, target_os = <span class="string">&quot;redox&quot;</span>, target_os = <span class="string">&quot;wasi&quot;</span>)))]
+</span><span class="kw">pub use </span>statx::statx;
+<span class="attr">#[cfg(not(any(
+    target_os = <span class="string">&quot;espidf&quot;</span>,
+    target_os = <span class="string">&quot;redox&quot;</span>,
+    target_os = <span class="string">&quot;vita&quot;</span>,
+    target_os = <span class="string">&quot;wasi&quot;
+</span>)))]
 </span><span class="kw">pub use </span>sync::sync;
 <span class="attr">#[cfg(any(apple, linux_kernel))]
 </span><span class="kw">pub use </span>xattr::<span class="kw-2">*</span>;

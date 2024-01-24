@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/dwq9ypb5hjza74k25zjh8fz7iianxycz-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustix-0.38.8/src/termios/types.rs`."><title>types.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/lgm49i312vhpr4q3c6lvnxlr4shfhvfv-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustix-0.38.28/src/termios/types.rs`."><title>types.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1422,6 +1422,32 @@
 <a href="#1422" id="1422">1422</a>
 <a href="#1423" id="1423">1423</a>
 <a href="#1424" id="1424">1424</a>
+<a href="#1425" id="1425">1425</a>
+<a href="#1426" id="1426">1426</a>
+<a href="#1427" id="1427">1427</a>
+<a href="#1428" id="1428">1428</a>
+<a href="#1429" id="1429">1429</a>
+<a href="#1430" id="1430">1430</a>
+<a href="#1431" id="1431">1431</a>
+<a href="#1432" id="1432">1432</a>
+<a href="#1433" id="1433">1433</a>
+<a href="#1434" id="1434">1434</a>
+<a href="#1435" id="1435">1435</a>
+<a href="#1436" id="1436">1436</a>
+<a href="#1437" id="1437">1437</a>
+<a href="#1438" id="1438">1438</a>
+<a href="#1439" id="1439">1439</a>
+<a href="#1440" id="1440">1440</a>
+<a href="#1441" id="1441">1441</a>
+<a href="#1442" id="1442">1442</a>
+<a href="#1443" id="1443">1443</a>
+<a href="#1444" id="1444">1444</a>
+<a href="#1445" id="1445">1445</a>
+<a href="#1446" id="1446">1446</a>
+<a href="#1447" id="1447">1447</a>
+<a href="#1448" id="1448">1448</a>
+<a href="#1449" id="1449">1449</a>
+<a href="#1450" id="1450">1450</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::backend::c;
 <span class="kw">use crate</span>::{backend, io};
 <span class="kw">use </span>bitflags::bitflags;
@@ -1509,7 +1535,7 @@
 
     <span class="doccomment">/// Return the input communication speed.
     ///
-    /// Unlike the `c_ispeed` field in GLIBC and others, this returns the
+    /// Unlike the `c_ispeed` field in glibc and others, this returns the
     /// integer value of the speed, rather than the `B*` encoded constant
     /// value.
     </span><span class="attr">#[doc(alias = <span class="string">&quot;c_ispeed&quot;</span>)]
@@ -1545,7 +1571,7 @@
 
     <span class="doccomment">/// Return the output communication speed.
     ///
-    /// Unlike the `c_ospeed` field in GLIBC and others, this returns the
+    /// Unlike the `c_ospeed` field in glibc and others, this returns the
     /// arbitrary integer value of the speed, rather than the `B*` encoded
     /// constant value.
     </span><span class="attr">#[inline]
@@ -1578,7 +1604,7 @@
 
     <span class="doccomment">/// Set the input and output communication speeds.
     ///
-    /// Unlike the `c_ispeed` and `c_ospeed` fields in GLIBC and others, this
+    /// Unlike the `c_ispeed` and `c_ospeed` fields in glibc and others, this
     /// takes the arbitrary integer value of the speed, rather than the `B*`
     /// encoded constant value. Not all implementations support all integer
     /// values; use the constants in the [`speed`] module for likely-supported
@@ -1596,7 +1622,7 @@
 
     <span class="doccomment">/// Set the input communication speed.
     ///
-    /// Unlike the `c_ispeed` field in GLIBC and others, this takes the
+    /// Unlike the `c_ispeed` field in glibc and others, this takes the
     /// arbitrary integer value of the speed, rather than the `B*` encoded
     /// constant value. Not all implementations support all integer values; use
     /// the constants in the [`speed`] module for known-supported speeds.
@@ -1614,7 +1640,7 @@
 
     <span class="doccomment">/// Set the output communication speed.
     ///
-    /// Unlike the `c_ospeed` field in GLIBC and others, this takes the
+    /// Unlike the `c_ospeed` field in glibc and others, this takes the
     /// arbitrary integer value of the speed, rather than the `B*` encoded
     /// constant value. Not all implementations support all integer values; use
     /// the constants in the [`speed`] module for known-supported speeds.
@@ -1713,9 +1739,13 @@
             target_os = <span class="string">&quot;aix&quot;</span>,
             target_os = <span class="string">&quot;emscripten&quot;</span>,
             target_os = <span class="string">&quot;haiku&quot;</span>,
+            target_os = <span class="string">&quot;hurd&quot;</span>,
             target_os = <span class="string">&quot;redox&quot;</span>,
         )))]
         </span><span class="kw">const </span>IUTF8 = c::IUTF8;
+
+        <span class="doccomment">/// &lt;https://docs.rs/bitflags/*/bitflags/#externally-defined-flags&gt;
+        </span><span class="kw">const _ </span>= !<span class="number">0</span>;
     }
 }
 
@@ -1928,6 +1958,9 @@
             target_os = <span class="string">&quot;redox&quot;</span>,
         )))]
         </span><span class="kw">const </span>VT1 = c::VT1;
+
+        <span class="doccomment">/// &lt;https://docs.rs/bitflags/*/bitflags/#externally-defined-flags&gt;
+        </span><span class="kw">const _ </span>= !<span class="number">0</span>;
     }
 }
 
@@ -1984,10 +2017,14 @@
             target_os = <span class="string">&quot;aix&quot;</span>,
             target_os = <span class="string">&quot;emscripten&quot;</span>,
             target_os = <span class="string">&quot;haiku&quot;</span>,
+            target_os = <span class="string">&quot;hurd&quot;</span>,
             target_os = <span class="string">&quot;nto&quot;</span>,
             target_os = <span class="string">&quot;redox&quot;</span>,
         )))]
         </span><span class="kw">const </span>CMSPAR = c::CMSPAR;
+
+        <span class="doccomment">/// &lt;https://docs.rs/bitflags/*/bitflags/#externally-defined-flags&gt;
+        </span><span class="kw">const _ </span>= !<span class="number">0</span>;
     }
 }
 
@@ -2051,6 +2088,9 @@
 
         <span class="doccomment">/// `IEXTEN`
         </span><span class="kw">const </span>IEXTEN = c::IEXTEN;
+
+        <span class="doccomment">/// &lt;https://docs.rs/bitflags/*/bitflags/#externally-defined-flags&gt;
+        </span><span class="kw">const _ </span>= !<span class="number">0</span>;
     }
 }
 
@@ -2218,7 +2258,18 @@
 
     <span class="doccomment">/// Translate from a `c::speed_t` code to an arbitrary integer speed value
     /// `u32`.
-    </span><span class="attr">#[cfg(not(any(linux_kernel, bsd)))]
+    ///
+    /// On BSD platforms, integer speed values are already the same as their
+    /// encoded values, and on Linux platforms, we use `TCGETS2`/`TCSETS2`
+    /// and the `c_ispeed`/`c_ospeed`` fields, except that on Linux on
+    /// PowerPC on QEMU, `TCGETS2`/`TCSETS2` don&#39;t set `c_ispeed`/`c_ospeed`.
+    </span><span class="attr">#[cfg(not(any(
+        bsd,
+        all(
+            linux_kernel,
+            not(any(target_arch = <span class="string">&quot;powerpc&quot;</span>, target_arch = <span class="string">&quot;powerpc64&quot;</span>))
+        )
+    )))]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>decode(encoded_speed: c::speed_t) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
         <span class="kw">match </span>encoded_speed {
             c::B0 =&gt; <span class="prelude-val">Some</span>(<span class="number">0</span>),
@@ -2543,6 +2594,7 @@
         solarish,
         target_os = <span class="string">&quot;aix&quot;</span>,
         target_os = <span class="string">&quot;haiku&quot;</span>,
+        target_os = <span class="string">&quot;hurd&quot;</span>,
         target_os = <span class="string">&quot;nto&quot;</span>,
     )))]
     </span><span class="kw">pub const </span>VSWTC: <span class="self">Self </span>= <span class="self">Self</span>(c::VSWTC <span class="kw">as </span>usize);
@@ -2675,8 +2727,8 @@
         <span class="macro">check_renamed_struct_renamed_field!</span>(Termios, termios, local_modes, c_lflag);
         <span class="macro">check_renamed_struct_renamed_field!</span>(Termios, termios, special_codes, c_cc);
 
-        <span class="comment">// On everything except PowerPC, `termios` matches `termios2` except for
-        // the addition of `c_ispeed` and `c_ospeed`.
+        <span class="comment">// On everything except PowerPC, `termios` matches `termios2` except
+        // for the addition of `c_ispeed` and `c_ospeed`.
         </span><span class="attr">#[cfg(not(any(target_arch = <span class="string">&quot;powerpc&quot;</span>, target_arch = <span class="string">&quot;powerpc64&quot;</span>)))]
         </span><span class="macro">const_assert_eq!</span>(
             <span class="macro">memoffset::offset_of!</span>(Termios, input_speed),

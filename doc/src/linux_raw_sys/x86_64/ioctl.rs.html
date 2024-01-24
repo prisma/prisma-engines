@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/dwq9ypb5hjza74k25zjh8fz7iianxycz-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/linux-raw-sys-0.4.5/src/x86_64/ioctl.rs`."><title>ioctl.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="linux_raw_sys" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/lgm49i312vhpr4q3c6lvnxlr4shfhvfv-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/linux-raw-sys-0.4.13/src/x86_64/ioctl.rs`."><title>ioctl.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="linux_raw_sys" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1591,6 +1591,19 @@
 <a href="#1591" id="1591">1591</a>
 <a href="#1592" id="1592">1592</a>
 <a href="#1593" id="1593">1593</a>
+<a href="#1594" id="1594">1594</a>
+<a href="#1595" id="1595">1595</a>
+<a href="#1596" id="1596">1596</a>
+<a href="#1597" id="1597">1597</a>
+<a href="#1598" id="1598">1598</a>
+<a href="#1599" id="1599">1599</a>
+<a href="#1600" id="1600">1600</a>
+<a href="#1601" id="1601">1601</a>
+<a href="#1602" id="1602">1602</a>
+<a href="#1603" id="1603">1603</a>
+<a href="#1604" id="1604">1604</a>
+<a href="#1605" id="1605">1605</a>
+<a href="#1606" id="1606">1606</a>
 </pre></div><pre class="rust"><code><span class="comment">/* automatically generated by rust-bindgen 0.66.1 */
 
 </span><span class="kw">pub const </span>FIONREAD: u32 = <span class="number">21531</span>;
@@ -1697,6 +1710,22 @@
 <span class="kw">pub const </span>BLKSECDISCARD: u32 = <span class="number">4733</span>;
 <span class="kw">pub const </span>BLKROTATIONAL: u32 = <span class="number">4734</span>;
 <span class="kw">pub const </span>BLKZEROOUT: u32 = <span class="number">4735</span>;
+<span class="kw">pub const </span>FIEMAP_MAX_OFFSET: i32 = -<span class="number">1</span>;
+<span class="kw">pub const </span>FIEMAP_FLAG_SYNC: u32 = <span class="number">1</span>;
+<span class="kw">pub const </span>FIEMAP_FLAG_XATTR: u32 = <span class="number">2</span>;
+<span class="kw">pub const </span>FIEMAP_FLAG_CACHE: u32 = <span class="number">4</span>;
+<span class="kw">pub const </span>FIEMAP_FLAGS_COMPAT: u32 = <span class="number">3</span>;
+<span class="kw">pub const </span>FIEMAP_EXTENT_LAST: u32 = <span class="number">1</span>;
+<span class="kw">pub const </span>FIEMAP_EXTENT_UNKNOWN: u32 = <span class="number">2</span>;
+<span class="kw">pub const </span>FIEMAP_EXTENT_DELALLOC: u32 = <span class="number">4</span>;
+<span class="kw">pub const </span>FIEMAP_EXTENT_ENCODED: u32 = <span class="number">8</span>;
+<span class="kw">pub const </span>FIEMAP_EXTENT_DATA_ENCRYPTED: u32 = <span class="number">128</span>;
+<span class="kw">pub const </span>FIEMAP_EXTENT_NOT_ALIGNED: u32 = <span class="number">256</span>;
+<span class="kw">pub const </span>FIEMAP_EXTENT_DATA_INLINE: u32 = <span class="number">512</span>;
+<span class="kw">pub const </span>FIEMAP_EXTENT_DATA_TAIL: u32 = <span class="number">1024</span>;
+<span class="kw">pub const </span>FIEMAP_EXTENT_UNWRITTEN: u32 = <span class="number">2048</span>;
+<span class="kw">pub const </span>FIEMAP_EXTENT_MERGED: u32 = <span class="number">4096</span>;
+<span class="kw">pub const </span>FIEMAP_EXTENT_SHARED: u32 = <span class="number">8192</span>;
 <span class="kw">pub const </span>UFFDIO_REGISTER: u32 = <span class="number">3223366144</span>;
 <span class="kw">pub const </span>UFFDIO_UNREGISTER: u32 = <span class="number">2148575745</span>;
 <span class="kw">pub const </span>UFFDIO_WAKE: u32 = <span class="number">2148575746</span>;
@@ -2611,7 +2640,6 @@
 <span class="kw">pub const </span>VIDIOC_G_DV_TIMINGS: u32 = <span class="number">3229898328</span>;
 <span class="kw">pub const </span>TUNSETIFINDEX: u32 = <span class="number">1074025690</span>;
 <span class="kw">pub const </span>CCISS_SETINTINFO: u32 = <span class="number">1074283011</span>;
-<span class="kw">pub const </span>CM_IOSDBGLVL: u32 = <span class="number">1074291706</span>;
 <span class="kw">pub const </span>RTC_VL_CLR: u32 = <span class="number">28692</span>;
 <span class="kw">pub const </span>VIDIOC_REQBUFS: u32 = <span class="number">3222558216</span>;
 <span class="kw">pub const </span>USBDEVFS_REAPURBNDELAY32: u32 = <span class="number">1074025741</span>;
@@ -2741,7 +2769,6 @@
 <span class="kw">pub const </span>VFIO_SET_IOMMU: u32 = <span class="number">15206</span>;
 <span class="kw">pub const </span>VIDIOC_S_MODULATOR: u32 = <span class="number">1078220343</span>;
 <span class="kw">pub const </span>TUNGETFILTER: u32 = <span class="number">2148553947</span>;
-<span class="kw">pub const </span>MEYEIOC_SYNC: u32 = <span class="number">3221518019</span>;
 <span class="kw">pub const </span>CCISS_SETNODENAME: u32 = <span class="number">1074807301</span>;
 <span class="kw">pub const </span>FBIO_GETCONTROL2: u32 = <span class="number">2148025993</span>;
 <span class="kw">pub const </span>TUNSETDEBUG: u32 = <span class="number">1074025673</span>;
@@ -3022,7 +3049,6 @@
 <span class="kw">pub const </span>VIDIOC_STREAMOFF: u32 = <span class="number">1074026003</span>;
 <span class="kw">pub const </span>VDUSE_DESTROY_DEV: u32 = <span class="number">1090552067</span>;
 <span class="kw">pub const </span>FDGETFDCSTAT: u32 = <span class="number">2150105621</span>;
-<span class="kw">pub const </span>CM_IOCGATR: u32 = <span class="number">3221775105</span>;
 <span class="kw">pub const </span>VIDIOC_S_PRIORITY: u32 = <span class="number">1074026052</span>;
 <span class="kw">pub const </span>SNAPSHOT_FREEZE: u32 = <span class="number">13057</span>;
 <span class="kw">pub const </span>VIDIOC_ENUMINPUT: u32 = <span class="number">3226490394</span>;

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/dwq9ypb5hjza74k25zjh8fz7iianxycz-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustix-0.38.8/src/backend/linux_raw/termios/syscalls.rs`."><title>syscalls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="rustix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/lgm49i312vhpr4q3c6lvnxlr4shfhvfv-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustix-0.38.28/src/backend/linux_raw/termios/syscalls.rs`."><title>syscalls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="rustix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -287,32 +287,71 @@
 <a href="#287" id="287">287</a>
 <a href="#288" id="288">288</a>
 <a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! linux_raw syscalls supporting `rustix::termios`.
 //!
 //! # Safety
 //!
 //! See the `rustix::backend` module documentation for details.
-</span><span class="attr">#![allow(unsafe_code)]
-#![allow(clippy::undocumented_unsafe_blocks)]
+</span><span class="attr">#![allow(unsafe_code, clippy::undocumented_unsafe_blocks)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::backend::c;
 <span class="kw">use </span><span class="kw">crate</span>::backend::conv::{by_ref, c_uint, ret};
 <span class="kw">use </span><span class="kw">crate</span>::fd::BorrowedFd;
 <span class="kw">use </span><span class="kw">crate</span>::io;
 <span class="kw">use </span><span class="kw">crate</span>::pid::Pid;
-<span class="attr">#[cfg(feature = <span class="string">&quot;procfs&quot;</span>)]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;procfs&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::procfs;
 <span class="kw">use </span><span class="kw">crate</span>::termios::{
     Action, ControlModes, InputModes, LocalModes, OptionalActions, OutputModes, QueueSelector,
     SpecialCodeIndex, Termios, Winsize,
 };
-<span class="attr">#[cfg(feature = <span class="string">&quot;procfs&quot;</span>)]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;procfs&quot;</span>))]
 </span><span class="kw">use crate</span>::{ffi::CStr, fs::FileType, path::DecInt};
 <span class="kw">use </span>core::mem::MaybeUninit;
 <span class="kw">use </span>linux_raw_sys::general::IBSHIFT;
 <span class="kw">use </span>linux_raw_sys::ioctl::{
-    TCFLSH, TCSBRK, TCXONC, TIOCEXCL, TIOCGPGRP, TIOCGSID, TIOCGWINSZ, TIOCNXCL, TIOCSPGRP,
-    TIOCSWINSZ,
+    TCFLSH, TCSBRK, TCXONC, TIOCGPGRP, TIOCGSID, TIOCGWINSZ, TIOCSPGRP, TIOCSWINSZ,
 };
 
 <span class="attr">#[inline]
@@ -328,8 +367,46 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tcgetattr(fd: BorrowedFd&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; io::Result&lt;Termios&gt; {
     <span class="kw">unsafe </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>result = MaybeUninit::&lt;Termios&gt;::uninit();
+
+        <span class="comment">// QEMU&#39;s `TCGETS2` doesn&#39;t currently set `input_speed` or
+        // `output_speed` on PowerPC, so zero out the fields ourselves.
+        </span><span class="attr">#[cfg(any(target_arch = <span class="string">&quot;powerpc&quot;</span>, target_arch = <span class="string">&quot;powerpc64&quot;</span>))]
+        </span>{
+            result.write(core::mem::zeroed());
+        }
+
         ret(<span class="macro">syscall!</span>(__NR_ioctl, fd, c_uint(c::TCGETS2), <span class="kw-2">&amp;mut </span>result))<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(result.assume_init())
+
+        <span class="kw">let </span>result = result.assume_init();
+
+        <span class="comment">// QEMU&#39;s `TCGETS2` doesn&#39;t currently set `input_speed` or
+        // `output_speed` on PowerPC, so set them manually if we can.
+        </span><span class="attr">#[cfg(any(target_arch = <span class="string">&quot;powerpc&quot;</span>, target_arch = <span class="string">&quot;powerpc64&quot;</span>))]
+        </span><span class="kw">let </span>result = {
+            <span class="kw">use </span><span class="kw">crate</span>::termios::speed;
+            <span class="kw">let </span><span class="kw-2">mut </span>result = result;
+            <span class="kw">if </span>result.output_speed == <span class="number">0 </span>&amp;&amp; (result.control_modes.bits() &amp; c::CBAUD) != c::BOTHER {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(output_speed) = speed::decode(result.control_modes.bits() &amp; c::CBAUD) {
+                    result.output_speed = output_speed;
+                }
+            }
+            <span class="kw">if </span>result.input_speed == <span class="number">0
+                </span>&amp;&amp; ((result.control_modes.bits() &amp; c::CIBAUD) &gt;&gt; c::IBSHIFT) != c::BOTHER
+            {
+                <span class="comment">// For input speeds, `B0` is special-cased to mean the input
+                // speed is the same as the output speed.
+                </span><span class="kw">if </span>((result.control_modes.bits() &amp; c::CIBAUD) &gt;&gt; c::IBSHIFT) == c::B0 {
+                    result.input_speed = result.output_speed;
+                } <span class="kw">else if let </span><span class="prelude-val">Some</span>(input_speed) =
+                    speed::decode((result.control_modes.bits() &amp; c::CIBAUD) &gt;&gt; c::IBSHIFT)
+                {
+                    result.input_speed = input_speed;
+                }
+            }
+            result
+        };
+
+        <span class="prelude-val">Ok</span>(result)
     }
 }
 
@@ -339,13 +416,21 @@
         <span class="kw">let </span><span class="kw-2">mut </span>result = MaybeUninit::&lt;c::pid_t&gt;::uninit();
         ret(<span class="macro">syscall!</span>(__NR_ioctl, fd, c_uint(TIOCGPGRP), <span class="kw-2">&amp;mut </span>result))<span class="question-mark">?</span>;
         <span class="kw">let </span>pid = result.assume_init();
+
+        <span class="comment">// This doesn&#39;t appear to be documented, but it appears `tcsetpgrp` can
+        // succceed and set the pid to 0 if we pass it a pseudo-terminal device
+        // fd. For now, fail with `OPNOTSUPP`.
+        </span><span class="kw">if </span>pid == <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(io::Errno::OPNOTSUPP);
+        }
+
         <span class="prelude-val">Ok</span>(Pid::from_raw_unchecked(pid))
     }
 }
 
 <span class="attr">#[inline]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tcsetattr(
-    fd: BorrowedFd,
+    fd: BorrowedFd&lt;<span class="lifetime">&#39;_</span>&gt;,
     optional_actions: OptionalActions,
     termios: <span class="kw-2">&amp;</span>Termios,
 ) -&gt; io::Result&lt;()&gt; {
@@ -373,17 +458,17 @@
 }
 
 <span class="attr">#[inline]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tcsendbreak(fd: BorrowedFd) -&gt; io::Result&lt;()&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tcsendbreak(fd: BorrowedFd&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; io::Result&lt;()&gt; {
     <span class="kw">unsafe </span>{ ret(<span class="macro">syscall_readonly!</span>(__NR_ioctl, fd, c_uint(TCSBRK), c_uint(<span class="number">0</span>))) }
 }
 
 <span class="attr">#[inline]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tcdrain(fd: BorrowedFd) -&gt; io::Result&lt;()&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tcdrain(fd: BorrowedFd&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; io::Result&lt;()&gt; {
     <span class="kw">unsafe </span>{ ret(<span class="macro">syscall_readonly!</span>(__NR_ioctl, fd, c_uint(TCSBRK), c_uint(<span class="number">1</span>))) }
 }
 
 <span class="attr">#[inline]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tcflush(fd: BorrowedFd, queue_selector: QueueSelector) -&gt; io::Result&lt;()&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tcflush(fd: BorrowedFd&lt;<span class="lifetime">&#39;_</span>&gt;, queue_selector: QueueSelector) -&gt; io::Result&lt;()&gt; {
     <span class="kw">unsafe </span>{
         ret(<span class="macro">syscall_readonly!</span>(
             __NR_ioctl,
@@ -395,7 +480,7 @@
 }
 
 <span class="attr">#[inline]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tcflow(fd: BorrowedFd, action: Action) -&gt; io::Result&lt;()&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tcflow(fd: BorrowedFd&lt;<span class="lifetime">&#39;_</span>&gt;, action: Action) -&gt; io::Result&lt;()&gt; {
     <span class="kw">unsafe </span>{
         ret(<span class="macro">syscall_readonly!</span>(
             __NR_ioctl,
@@ -407,7 +492,7 @@
 }
 
 <span class="attr">#[inline]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tcgetsid(fd: BorrowedFd) -&gt; io::Result&lt;Pid&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tcgetsid(fd: BorrowedFd&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; io::Result&lt;Pid&gt; {
     <span class="kw">unsafe </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>result = MaybeUninit::&lt;c::pid_t&gt;::uninit();
         ret(<span class="macro">syscall!</span>(__NR_ioctl, fd, c_uint(TIOCGSID), <span class="kw-2">&amp;mut </span>result))<span class="question-mark">?</span>;
@@ -417,9 +502,9 @@
 }
 
 <span class="attr">#[inline]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tcsetwinsize(fd: BorrowedFd, winsize: Winsize) -&gt; io::Result&lt;()&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tcsetwinsize(fd: BorrowedFd&lt;<span class="lifetime">&#39;_</span>&gt;, winsize: Winsize) -&gt; io::Result&lt;()&gt; {
     <span class="kw">unsafe </span>{
-        ret(<span class="macro">syscall!</span>(
+        ret(<span class="macro">syscall_readonly!</span>(
             __NR_ioctl,
             fd,
             c_uint(TIOCSWINSZ),
@@ -430,17 +515,15 @@
 
 <span class="attr">#[inline]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tcsetpgrp(fd: BorrowedFd&lt;<span class="lifetime">&#39;_</span>&gt;, pid: Pid) -&gt; io::Result&lt;()&gt; {
-    <span class="kw">unsafe </span>{ ret(<span class="macro">syscall!</span>(__NR_ioctl, fd, c_uint(TIOCSPGRP), pid)) }
-}
-
-<span class="attr">#[inline]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>ioctl_tiocexcl(fd: BorrowedFd&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; io::Result&lt;()&gt; {
-    <span class="kw">unsafe </span>{ ret(<span class="macro">syscall_readonly!</span>(__NR_ioctl, fd, c_uint(TIOCEXCL))) }
-}
-
-<span class="attr">#[inline]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>ioctl_tiocnxcl(fd: BorrowedFd&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; io::Result&lt;()&gt; {
-    <span class="kw">unsafe </span>{ ret(<span class="macro">syscall_readonly!</span>(__NR_ioctl, fd, c_uint(TIOCNXCL))) }
+    <span class="kw">let </span>raw_pid: c::c_int = pid.as_raw_nonzero().get();
+    <span class="kw">unsafe </span>{
+        ret(<span class="macro">syscall_readonly!</span>(
+            __NR_ioctl,
+            fd,
+            c_uint(TIOCSPGRP),
+            by_ref(<span class="kw-2">&amp;</span>raw_pid)
+        ))
+    }
 }
 
 <span class="doccomment">/// A wrapper around a conceptual `cfsetspeed` which handles an arbitrary
@@ -529,8 +612,7 @@
     </span>tcgetwinsize(fd).is_ok()
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;procfs&quot;</span>)]
-#[allow(unsafe_code)]
+<span class="attr">#[cfg(all(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;procfs&quot;</span>))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>ttyname(fd: BorrowedFd&lt;<span class="lifetime">&#39;_</span>&gt;, buf: <span class="kw-2">&amp;mut </span>[MaybeUninit&lt;u8&gt;]) -&gt; io::Result&lt;usize&gt; {
     <span class="kw">let </span>fd_stat = <span class="kw">crate</span>::backend::fs::syscalls::fstat(fd)<span class="question-mark">?</span>;
 
@@ -542,7 +624,7 @@
     <span class="comment">// Check that `fd` is really a tty.
     </span>tcgetwinsize(fd)<span class="question-mark">?</span>;
 
-    <span class="comment">// Get a fd to &#39;/proc/self/fd&#39;.
+    <span class="comment">// Get a fd to &quot;/proc/self/fd&quot;.
     </span><span class="kw">let </span>proc_self_fd = procfs::proc_self_fd()<span class="question-mark">?</span>;
 
     <span class="comment">// Gather the ttyname by reading the &quot;fd&quot; file inside `proc_self_fd`.

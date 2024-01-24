@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/dwq9ypb5hjza74k25zjh8fz7iianxycz-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustix-0.38.8/src/backend/linux_raw/mount/types.rs`."><title>types.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="rustix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/lgm49i312vhpr4q3c6lvnxlr4shfhvfv-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rustix-0.38.28/src/backend/linux_raw/mount/types.rs`."><title>types.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="rustix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -301,6 +301,35 @@
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::backend::c;
 <span class="kw">use </span>bitflags::bitflags;
 
@@ -359,6 +388,9 @@
 
         <span class="doccomment">/// `MS_NOSYMFOLLOW`
         </span><span class="kw">const </span>NOSYMFOLLOW = linux_raw_sys::general::MS_NOSYMFOLLOW;
+
+        <span class="doccomment">/// &lt;https://docs.rs/bitflags/*/bitflags/#externally-defined-flags&gt;
+        </span><span class="kw">const _ </span>= !<span class="number">0</span>;
     }
 }
 
@@ -377,6 +409,9 @@
         </span><span class="kw">const </span>EXPIRE = linux_raw_sys::general::MNT_EXPIRE;
         <span class="doccomment">/// `UMOUNT_NOFOLLOW`
         </span><span class="kw">const </span>NOFOLLOW = linux_raw_sys::general::UMOUNT_NOFOLLOW;
+
+        <span class="doccomment">/// &lt;https://docs.rs/bitflags/*/bitflags/#externally-defined-flags&gt;
+        </span><span class="kw">const _ </span>= !<span class="number">0</span>;
     }
 }
 
@@ -388,9 +423,11 @@
     </span><span class="attr">#[repr(transparent)]
     #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
     </span><span class="kw">pub struct </span>FsOpenFlags: c::c_uint {
-
         <span class="doccomment">/// `FSOPEN_CLOEXEC`
         </span><span class="kw">const </span>FSOPEN_CLOEXEC = linux_raw_sys::general::FSOPEN_CLOEXEC;
+
+        <span class="doccomment">/// &lt;https://docs.rs/bitflags/*/bitflags/#externally-defined-flags&gt;
+        </span><span class="kw">const _ </span>= !<span class="number">0</span>;
     }
 }
 
@@ -404,6 +441,9 @@
     </span><span class="kw">pub struct </span>FsMountFlags: c::c_uint {
         <span class="doccomment">/// `FSMOUNT_CLOEXEC`
         </span><span class="kw">const </span>FSMOUNT_CLOEXEC = linux_raw_sys::general::FSMOUNT_CLOEXEC;
+
+        <span class="doccomment">/// &lt;https://docs.rs/bitflags/*/bitflags/#externally-defined-flags&gt;
+        </span><span class="kw">const _ </span>= !<span class="number">0</span>;
     }
 }
 
@@ -480,6 +520,9 @@
 
         <span class="doccomment">/// `MOUNT_ATTR__ATIME_FLAGS`
         </span><span class="kw">const </span>MOUNT_ATTR_SIZE_VER0 = linux_raw_sys::general::MOUNT_ATTR_SIZE_VER0;
+
+        <span class="doccomment">/// &lt;https://docs.rs/bitflags/*/bitflags/#externally-defined-flags&gt;
+        </span><span class="kw">const _ </span>= !<span class="number">0</span>;
     }
 }
 
@@ -512,12 +555,15 @@
         <span class="doccomment">/// `MOVE_MOUNT__MASK`
         </span><span class="kw">const </span>MOVE_MOUNT_SET_GROUP = linux_raw_sys::general::MOVE_MOUNT_SET_GROUP;
 
-        <span class="comment">// TODO: add when linux 6.5 is released
+        <span class="comment">// TODO: add when Linux 6.5 is released
         // /// `MOVE_MOUNT_BENEATH`
         // const MOVE_MOUNT_BENEATH = linux_raw_sys::general::MOVE_MOUNT_BENEATH;
 
         </span><span class="doccomment">/// `MOVE_MOUNT__MASK`
         </span><span class="kw">const </span>MOVE_MOUNT__MASK = linux_raw_sys::general::MOVE_MOUNT__MASK;
+
+        <span class="doccomment">/// &lt;https://docs.rs/bitflags/*/bitflags/#externally-defined-flags&gt;
+        </span><span class="kw">const _ </span>= !<span class="number">0</span>;
     }
 }
 
@@ -546,6 +592,9 @@
 
         <span class="doccomment">/// `AT_SYMLINK_NOFOLLOW`
         </span><span class="kw">const </span>AT_SYMLINK_NOFOLLOW = linux_raw_sys::general::AT_SYMLINK_NOFOLLOW;
+
+        <span class="doccomment">/// &lt;https://docs.rs/bitflags/*/bitflags/#externally-defined-flags&gt;
+        </span><span class="kw">const _ </span>= !<span class="number">0</span>;
     }
 }
 
@@ -568,13 +617,16 @@
 
         <span class="doccomment">/// `FSPICK_EMPTY_PATH`
         </span><span class="kw">const </span>FSPICK_EMPTY_PATH = linux_raw_sys::general::FSPICK_EMPTY_PATH;
+
+        <span class="doccomment">/// &lt;https://docs.rs/bitflags/*/bitflags/#externally-defined-flags&gt;
+        </span><span class="kw">const _ </span>= !<span class="number">0</span>;
     }
 }
 
 <span class="macro">bitflags! </span>{
-    <span class="doccomment">/// `MS_*` constants for use with [`change_mount`].
+    <span class="doccomment">/// `MS_*` constants for use with [`mount_change`].
     ///
-    /// [`change_mount`]: crate::mount::change_mount
+    /// [`mount_change`]: crate::mount::mount_change
     </span><span class="attr">#[repr(transparent)]
     #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
     </span><span class="kw">pub struct </span>MountPropagationFlags: c::c_uint {
@@ -590,6 +642,9 @@
         </span><span class="kw">const </span>UNBINDABLE = linux_raw_sys::general::MS_UNBINDABLE;
         <span class="doccomment">/// `MS_REC`
         </span><span class="kw">const </span>REC = linux_raw_sys::general::MS_REC;
+
+        <span class="doccomment">/// &lt;https://docs.rs/bitflags/*/bitflags/#externally-defined-flags&gt;
+        </span><span class="kw">const _ </span>= !<span class="number">0</span>;
     }
 }
 
@@ -599,6 +654,9 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>InternalMountFlags: c::c_uint {
         <span class="kw">const </span>REMOUNT = linux_raw_sys::general::MS_REMOUNT;
         <span class="kw">const </span>MOVE = linux_raw_sys::general::MS_MOVE;
+
+        <span class="doccomment">/// &lt;https://docs.rs/bitflags/*/bitflags/#externally-defined-flags&gt;
+        </span><span class="kw">const _ </span>= !<span class="number">0</span>;
     }
 }
 
