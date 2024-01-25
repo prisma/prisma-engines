@@ -21,6 +21,7 @@ in
       wasm-bindgen-cli
       wasm-pack
       binaryen
+      rustup
     ];
 
     inputsFrom = [ self'.packages.prisma-engines ];

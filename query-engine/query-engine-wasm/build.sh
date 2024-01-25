@@ -7,7 +7,7 @@ OUT_TARGET="bundler"
 OUT_NPM_NAME="@prisma/query-engine-wasm"
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 REPO_ROOT="$CURRENT_DIR/../.."
-OUT_FOLDER="$CURRENT_DIR/pkg"
+OUT_FOLDER="${OUT_FOLDER:-$CURRENT_DIR/pkg}"
 OUT_JSON="${OUT_FOLDER}/package.json"
 
 if [[ -z "${WASM_BUILD_PROFILE:-}" ]]; then
@@ -21,33 +21,25 @@ fi
 
 echo "Using build profile: \"${WASM_BUILD_PROFILE}\"" 
 
-
+if ! command -v wasm-pack &> /dev/null
+then
+    echo "wasm-pack could not be found, installing now..."
+    curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+fi
 
 echo "ℹ️  Configuring rust toolchain to use nightly and rust-src component"
-rustup component add rust-src --toolchain nightly
-rustup override set nightly
+rustup default nightly-2024-01-25 
+rustup target add wasm32-unknown-unknown
+rustup component add rust-src rust-std --target wasm32-unknown-unknown
 
-# cargo pass
-echo "🌀  Compiling query-engine-wasm using cargo..."
-cd "$CURRENT_DIR" && CARGO_PROFILE_RELEASE_OPT_LEVEL="z" cargo +nightly build -Z build-std=panic_abort,std --lib --release --target wasm32-unknown-unknown
-echo "Moving query-engine-wasm to pkg folder..."
-
-# wasm-bindgen pass
-mkdir -p "$OUT_FOLDER"
-echo "🌀  Generating bindings..."
-# Check if wasm-pack is installed
-if ! command -v wasm-bindgen &> /dev/null
-then
-    echo "⚠️ wasm-bindgen could not be found, installing now..."
-    cargo install -f wasm-bindgen-cli
-fi
-wasm-bindgen "$REPO_ROOT/target/wasm32-unknown-unknown/release/query_engine_wasm.wasm" --out-dir "$OUT_FOLDER" --typescript --target bundler --out-name query_engine
-echo "ℹ️  Bindings can be found at $OUT_FOLDER..."
-ls -al $OUT_FOLDER
+# export RUSTFLAGS="-Zlocation-detail=none"
+CARGO_UNSTABLE_FLAGS="-Zbuild-std=std,panic_abort -Zbuild-std-features=panic_immediate_abort"
+echo "Building query-engine-wasm using $WASM_BUILD_PROFILE profile"
+CARGO_PROFILE_RELEASE_OPT_LEVEL="z" wasm-pack build "--$WASM_BUILD_PROFILE" --target $OUT_TARGET --out-name query_engine  . $CARGO_UNSTABLE_FLAGS
 
 # wasm-opt pass
 WASM_OPT_ARGS=(
-    "-Os"                                 # execute size-focused optimization passes
+    "-Os"                                 # execute size-focused optimization passes (-Oz actually increases size by 1KB)
     "--vacuum"                            # removes obviously unneeded code
     "--duplicate-function-elimination"    # removes duplicate functions 
     "--duplicate-import-elimination"      # removes duplicate imports
@@ -93,7 +85,6 @@ else
 fi
 
 sleep 1
-
 # Mark the package as a ES module, set the entry point to the query_engine.js file, mark the package as public
 printf '%s\n' "$(jq '. + {"type": "module"} + {"main": "./query_engine.js"} + {"private": false}' $OUT_JSON)" > $OUT_JSON
 

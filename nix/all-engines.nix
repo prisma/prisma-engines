@@ -25,7 +25,7 @@ in
     inherit src;
 
     buildInputs = [ pkgs.openssl.out ];
-    nativeBuildInputs = with pkgs; [
+    nativeBuildInputs = with pkgs; [      
       rustToolchain
       git # for our build scripts that bake in the git hash
       protobuf # for tonic
@@ -115,26 +115,14 @@ in
     })
     { profile = "release"; };
 
-
-
-  packages.query-engine-wasm = lib.makeOverridable
-    ({ profile }: stdenv.mkDerivation {
-      name = "query-engine-wasm";
-      inherit src;
-      inherit (self'.packages.prisma-engines) buildInputs configurePhase dontStrip;
-
-      nativeBuildInputs = self'.packages.prisma-engines.nativeBuildInputs ++ (with pkgs; [wasm-pack wasm-bindgen-cli jq binaryen]);
-
-      buildPhase = ''
-        cd query-engine/query-engine-wasm
-        HOME=$(mktemp -dt wasm-pack-home-XXXX) WASM_BUILD_PROFILE=${profile} bash ./build.sh
+  packages.build-engine-wasm = pkgs.writeShellApplication { 
+    name = "build-engine-wasm";
+      runtimeInputs = with pkgs; [ git rustup wasm-pack wasm-bindgen-cli binaryen];
+      text = ''      
+      cd query-engine/query-engine-wasm        
+      WASM_BUILD_PROFILE=release bash ./build.sh
       '';
-
-      installPhase = ''
-      cp -r pkg $out
-      '';
-    })
-    { profile = "release"; };
+  };
 
   packages.query-engine-wasm-gz = lib.makeOverridable
     ({ profile }: stdenv.mkDerivation {
@@ -142,7 +130,9 @@ in
       inherit src;
 
       buildPhase = ''
-      gzip -cn ${self'.packages.query-engine-wasm}/query_engine_bg.wasm > query_engine_bg.wasm.gz
+      # export OUT_FOLDER=$(mktemp -dt wasm-engine-output)
+      ${self'.packages.build-engine-wasm}/bin/build-engine-wasm
+      gzip -cn ./query-engine/query-engine-wasm/pkg/query_engine_bg.wasm > query_engine_bg.wasm.gz
       '';
 
       installPhase = ''
@@ -156,15 +146,17 @@ in
     pkgs.writeShellApplication {
       name = "export-query-engine-wasm";
       runtimeInputs = with pkgs; [ jq ];
-      text = ''
-        set -euxo pipefail
-
+      text = ''      
+        echo "$1"
+        echo "$2"
         OUTDIR="$1"
         OUTVERSION="$2"
         mkdir -p "$OUTDIR"
-        cp -r --no-target-directory ${self'.packages.query-engine-wasm} "$OUTDIR"
+        ${self'.packages.build-engine-wasm}/bin/build-engine-wasm        
         chmod -R +rw "$OUTDIR"
-        jq --arg new_version "$OUTVERSION" '.version = $new_version' "${self'.packages.query-engine-wasm}/package.json"  > "$OUTDIR/package.json"
+        cat ./query-engine/query-engine-wasm/pkg/package.json
+        echo "$OUTDIR/package.json"
+        jq --arg new_version "$OUTVERSION" '.version = $new_version' ./query-engine/query-engine-wasm/pkg/package.json > "$OUTDIR/package.json"
       '';
     };
 }
