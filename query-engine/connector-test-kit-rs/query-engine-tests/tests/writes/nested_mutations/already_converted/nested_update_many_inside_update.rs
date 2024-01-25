@@ -59,7 +59,7 @@ mod um_inside_update {
     #[relation_link_test(
         on_parent = "ToMany",
         on_child = "ToOneReq",
-        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js", "planetscale.js.wasm"))
+        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
     )]
     async fn pm_c1_req_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
@@ -98,7 +98,7 @@ mod um_inside_update {
     #[relation_link_test(
         on_parent = "ToMany",
         on_child = "ToOneOpt",
-        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js", "planetscale.js.wasm"))
+        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
     )]
     async fn pm_c1_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
@@ -137,7 +137,7 @@ mod um_inside_update {
     #[relation_link_test(
         on_parent = "ToMany",
         on_child = "ToMany",
-        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js", "planetscale.js.wasm"))
+        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
     )]
     async fn pm_cm_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
@@ -176,7 +176,7 @@ mod um_inside_update {
     #[relation_link_test(
         on_parent = "ToMany",
         on_child = "ToOneReq",
-        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js", "planetscale.js.wasm"))
+        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
     )]
     async fn pm_c1_req_many_ums(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
@@ -221,7 +221,7 @@ mod um_inside_update {
     #[relation_link_test(
         on_parent = "ToMany",
         on_child = "ToOneReq",
-        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js", "planetscale.js.wasm"))
+        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
     )]
     async fn pm_c1_req_empty_filter(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
@@ -262,7 +262,7 @@ mod um_inside_update {
     #[relation_link_test(
         on_parent = "ToMany",
         on_child = "ToOneReq",
-        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js", "planetscale.js.wasm"))
+        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
     )]
     async fn pm_c1_req_noop_no_hit(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
@@ -309,7 +309,7 @@ mod um_inside_update {
     #[relation_link_test(
         on_parent = "ToMany",
         on_child = "ToOneReq",
-        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js", "planetscale.js.wasm"))
+        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
     )]
     async fn pm_c1_req_many_filters(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
