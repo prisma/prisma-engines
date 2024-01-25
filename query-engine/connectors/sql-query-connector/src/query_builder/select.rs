@@ -1,4 +1,4 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, collections::BTreeMap};
 use tracing::Span;
 
 use crate::{
@@ -214,6 +214,7 @@ trait SelectBuilderExt<'a> {
         ctx: &Context<'_>,
     ) -> Select<'a>;
     fn with_selection(self, selected_fields: &FieldSelection, table_alias: Alias, ctx: &Context<'_>) -> Select<'a>;
+    fn with_virtuals_from_selection(self, selected_fields: &FieldSelection) -> Select<'a>;
     fn with_columns(self, columns: ColumnIterator) -> Select<'a>;
 }
 
@@ -311,6 +312,13 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
                 }
                 _ => acc,
             })
+            .with_virtuals_from_selection(selected_fields)
+    }
+
+    fn with_virtuals_from_selection(self, selected_fields: &FieldSelection) -> Select<'a> {
+        build_virtual_selection(selected_fields)
+            .into_iter()
+            .fold(self, |select, (alias, expr)| select.value(expr.alias(alias)))
     }
 
     fn with_columns(self, columns: ColumnIterator) -> Select<'a> {
@@ -409,4 +417,35 @@ fn json_agg() -> Function<'static> {
         Expression::from("[]".raw()),
     ])
     .alias(JSON_AGG_IDENT)
+}
+
+fn build_virtual_selection(selected_fields: &FieldSelection) -> Vec<(&'static str, Expression<'static>)> {
+    let mut selected_objects = BTreeMap::new();
+
+    for (i, vs) in selected_fields.virtuals().enumerate() {
+        match vs {
+            VirtualSelection::RelationCount(rf, _) => {
+                let (object_name, field_name) = vs.serialized_name();
+
+                let coalesce_args: Vec<Expression<'static>> = vec![
+                    Column::from((relation_count_alias_name(i, rf), vs.db_alias())).into(),
+                    0.raw().into(),
+                ];
+
+                selected_objects
+                    .entry(object_name)
+                    .or_insert(Vec::new())
+                    .push((field_name.to_owned().into(), coalesce(coalesce_args).into()));
+            }
+        }
+    }
+
+    selected_objects
+        .into_iter()
+        .map(|(name, fields)| (name, json_build_object(fields).into()))
+        .collect()
+}
+
+fn relation_count_alias_name(vs_index: usize, rf: &RelationField) -> String {
+    format!("aggr_count_{}_{}_{}", vs_index, rf.model().name(), rf.name())
 }
