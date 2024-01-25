@@ -264,7 +264,7 @@ pub(crate) fn get_relation_load_strategy(
         && cursor.is_none()
         && distinct.is_none()
         && !nested_queries.iter().any(|q| match q {
-            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct() || q.has_virtual_selections(),
+            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct(),
             _ => false,
         })
         && requested_strategy != Some(RelationLoadStrategy::Query)

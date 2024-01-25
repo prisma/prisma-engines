@@ -243,10 +243,6 @@ impl RelatedRecordsQuery {
     pub fn has_distinct(&self) -> bool {
         self.args.distinct.is_some() || self.nested.iter().any(|q| q.has_distinct())
     }
-
-    pub fn has_virtual_selections(&self) -> bool {
-        self.selected_fields.has_virtual_fields() || self.nested.iter().any(|q| q.has_virtual_selections())
-    }
 }
 
 #[derive(Debug, Clone)]
