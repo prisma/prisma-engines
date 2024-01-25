@@ -3,10 +3,12 @@
 set -euo pipefail
 
 OUT_VERSION="${1:-}"
-OUT_FOLDER="pkg"
-OUT_JSON="${OUT_FOLDER}/package.json"
 OUT_TARGET="bundler"
 OUT_NPM_NAME="@prisma/query-engine-wasm"
+CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+REPO_ROOT="$CURRENT_DIR/../.."
+OUT_FOLDER="$CURRENT_DIR/pkg"
+OUT_JSON="${OUT_FOLDER}/package.json"
 
 if [[ -z "${WASM_BUILD_PROFILE:-}" ]]; then
     # use `wasm-pack build --release` by default on CI only
@@ -19,16 +21,31 @@ fi
 
 echo "Using build profile: \"${WASM_BUILD_PROFILE}\"" 
 
+
+
+echo "ℹ️  Configuring rust toolchain to use nightly and rust-src component"
+rustup component add rust-src --toolchain nightly
+rustup override set nightly
+
+# cargo pass
+echo "🌀  Compiling query-engine-wasm using cargo..."
+cd "$CURRENT_DIR" && CARGO_PROFILE_RELEASE_OPT_LEVEL="z" cargo +nightly build -Z build-std=panic_abort,std --lib --release --target wasm32-unknown-unknown
+echo "Moving query-engine-wasm to pkg folder..."
+
+# wasm-bindgen pass
+mkdir -p "$OUT_FOLDER"
+echo "🌀  Generating bindings..."
 # Check if wasm-pack is installed
-if ! command -v wasm-pack &> /dev/null
+if ! command -v wasm-bindgen &> /dev/null
 then
-    echo "wasm-pack could not be found, installing now..."
-    curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+    echo "⚠️ wasm-bindgen could not be found, installing now..."
+    cargo install -f wasm-bindgen-cli
 fi
+wasm-bindgen "$REPO_ROOT/target/wasm32-unknown-unknown/release/query_engine_wasm.wasm" --out-dir "$OUT_FOLDER" --typescript --target bundler --out-name query_engine
+echo "ℹ️  Bindings can be found at $OUT_FOLDER..."
+ls -al $OUT_FOLDER
 
-echo "Building query-engine-wasm using $WASM_BUILD_PROFILE profile"
-CARGO_PROFILE_RELEASE_OPT_LEVEL="z" wasm-pack build "--$WASM_BUILD_PROFILE" --target $OUT_TARGET --out-name query_engine
-
+# wasm-opt pass
 WASM_OPT_ARGS=(
     "-Os"                                 # execute size-focused optimization passes
     "--vacuum"                            # removes obviously unneeded code
@@ -38,13 +55,14 @@ WASM_OPT_ARGS=(
     "--dae-optimizing"                    # removes arguments to calls in an lto-like manner
     "--remove-unused-names"               # removes names from location that are never branched to
     "--rse"                               # removes redundant local.sets
-    "--gsi"                               # global struct inference, to optimize constant values
-    "--gufa-optimizing"                   # optimize the entire program using type monomorphization
+    "--gsi"                               # global struct inference, to optimize constant values    
     "--strip-dwarf"                       # removes DWARF debug information
     "--strip-producers"                   # removes the "producers" section
     "--strip-target-features"             # removes the "target_features" section
 )
 
+echo "🗜️  Optimizing with wasm-opt with $WASM_BUILD_PROFILE profile..."
+echo "ℹ️  before: $(du -h "${OUT_FOLDER}/query_engine_bg.wasm")"
 case "$WASM_BUILD_PROFILE" in
     release)
         # In release mode, we want to strip the debug symbols.
@@ -65,6 +83,7 @@ case "$WASM_BUILD_PROFILE" in
         echo "Skipping wasm-opt."
         ;;
 esac
+echo "ℹ️  after: $(du -h "${OUT_FOLDER}/query_engine_bg.wasm")"
 
 # Convert the `.wasm` file to its human-friendly `.wat` representation for debugging purposes, if `wasm2wat` is installed
 if ! command -v wasm2wat &> /dev/null; then
