@@ -15,7 +15,7 @@ use query_core::{
 };
 use query_engine_metrics::MetricRegistry;
 use request_handlers::{
-    BatchTransactionOption, ConnectorMode, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
+    BatchTransactionOption, ConnectorKind, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
     RequestBody, RequestHandler,
 };
 use serde_json::json;
@@ -107,6 +107,10 @@ impl Runner {
         self.query_schema.internal_data_model.schema.db.source()
     }
 
+    pub fn max_bind_values(&self) -> Option<usize> {
+        self.connector_version().max_bind_values()
+    }
+
     pub async fn load(
         datamodel: String,
         db_schemas: &[&str],
@@ -119,17 +123,18 @@ impl Runner {
 
         let protocol = EngineProtocol::from(&ENGINE_PROTOCOL.to_string());
         let schema = psl::parse_schema(&datamodel).unwrap();
-        let data_source = schema.configuration.datasources.first().unwrap();
-        let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
+        let datasource = schema.configuration.datasources.first().unwrap();
+        let url = datasource.load_url(|key| env::var(key).ok()).unwrap();
 
         let executor = match crate::CONFIG.external_test_executor() {
             Some(_) => RunnerExecutor::new_external(&url, &datamodel).await?,
             None => RunnerExecutor::Builtin(
                 request_handlers::load_executor(
-                    ConnectorMode::Rust,
-                    data_source,
+                    ConnectorKind::Rust {
+                        url: url.to_owned(),
+                        datasource,
+                    },
                     schema.configuration.preview_features(),
-                    &url,
                 )
                 .await?,
             ),
@@ -179,7 +184,7 @@ impl Runner {
             },
         };
 
-        tracing::debug!("Querying: {}", query.clone().green());
+        tracing::info!("Querying: {}", query);
 
         let handler = RequestHandler::new(&**executor, &self.query_schema, self.protocol);
 
@@ -313,7 +318,7 @@ impl Runner {
                 };
                 let json_query = JsonBody::Batch(JsonBatchQuery { batch, transaction });
                 let response_str: String = executor_process_request(
-                        "query", 
+                        "query",
                         json!({ "query": json_query, "schemaId": schema_id, "txId": self.current_tx_id.as_ref().map(ToString::to_string) })
                     ).await?;
 
@@ -479,5 +484,9 @@ impl Runner {
 
     pub fn protocol(&self) -> EngineProtocol {
         self.protocol
+    }
+
+    pub fn is_external_executor(&self) -> bool {
+        matches!(self.executor, RunnerExecutor::External(_))
     }
 }

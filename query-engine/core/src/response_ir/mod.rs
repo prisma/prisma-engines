@@ -18,7 +18,7 @@ pub(crate) use ir_serializer::*;
 
 use crate::ArgumentValue;
 use indexmap::IndexMap;
-use prisma_models::PrismaValue;
+use query_structure::PrismaValue;
 use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
 use std::{collections::HashMap, fmt, sync::Arc};
 
@@ -122,6 +122,16 @@ impl Item {
         match self {
             Self::Map(m) => Some(m),
             Self::Ref(r) => r.as_map(),
+            _ => None,
+        }
+    }
+
+    /// Returns a mutable reference to the underlying map, if the element is a map and the map is
+    /// owned. Unlike [`Item::as_map`], it doesn't allow obtaining a reference to a shared map
+    /// referenced via [`ItemRef`].
+    pub fn as_map_mut(&mut self) -> Option<&mut Map> {
+        match self {
+            Self::Map(m) => Some(m),
             _ => None,
         }
     }

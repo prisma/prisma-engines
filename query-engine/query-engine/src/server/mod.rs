@@ -63,7 +63,7 @@ pub(crate) async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result
     let mut res = match (req.method(), req.uri().path()) {
         (&Method::POST, "/") => request_handler(cx, req).await?,
         (&Method::GET, "/") if cx.enabled_features.contains(Feature::Playground) => playground_handler(),
-        (&Method::GET, "/status") => build_json_response(StatusCode::OK, r#"{"status":"ok"}"#),
+        (&Method::GET, "/status") => build_json_response(StatusCode::OK, &json!({"status": "ok"})),
 
         (&Method::GET, "/sdl") => {
             let schema = render_graphql_schema(cx.query_schema());
@@ -189,7 +189,7 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
             }
             Err(e) => {
                 let ufe: user_facing_errors::Error = request_handlers::HandlerError::query_conversion(format!(
-                    "Error parsing {:?} query. {}",
+                    "Error parsing {:?} query. Ensure that engine protocol of the client and the engine matches. {}",
                     cx.engine_protocol(),
                     e
                 ))

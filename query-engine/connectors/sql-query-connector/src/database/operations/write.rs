@@ -8,18 +8,38 @@ use crate::{
 };
 use connector_interface::*;
 use itertools::Itertools;
-use prisma_models::*;
 use quaint::{
     error::ErrorKind,
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
 };
+use query_structure::*;
+use std::borrow::Cow;
 use std::{
     collections::{HashMap, HashSet},
     ops::Deref,
     usize,
 };
-use tracing::log::trace;
 use user_facing_errors::query_engine::DatabaseConstraint;
+
+#[cfg(target_arch = "wasm32")]
+macro_rules! trace {
+    (target: $target:expr, $($arg:tt)+) => {{
+        // No-op in WebAssembly
+    }};
+    ($($arg:tt)+) => {{
+        // No-op in WebAssembly
+    }};
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+macro_rules! trace {
+    (target: $target:expr, $($arg:tt)+) => {
+        tracing::log::trace!(target: $target, $($arg)+);
+    };
+    ($($arg:tt)+) => {
+        tracing::log::trace!($($arg)+);
+    };
+}
 
 async fn generate_id(
     conn: &dyn Queryable,
@@ -154,7 +174,7 @@ pub(crate) async fn create_record(
 
         // All values provided in the write args
         (Some(identifier), _, _) if !identifier.misses_autogen_value() => {
-            let field_names = identifier.db_names().map(ToOwned::to_owned).collect();
+            let field_names = identifier.db_names().map(Cow::into_owned).collect();
             let record = Record::from(identifier);
 
             Ok(SingleRecord { record, field_names })
@@ -164,7 +184,7 @@ pub(crate) async fn create_record(
         (Some(mut identifier), _, Some(num)) if identifier.misses_autogen_value() => {
             identifier.add_autogen_value(num as i64);
 
-            let field_names = identifier.db_names().map(ToOwned::to_owned).collect();
+            let field_names = identifier.db_names().map(Cow::into_owned).collect();
             let record = Record::from(identifier);
 
             Ok(SingleRecord { record, field_names })
@@ -254,7 +274,7 @@ async fn create_many_nonempty(
         vec![args]
     };
 
-    let partitioned_batches = if let Some(max_rows) = ctx.max_rows {
+    let partitioned_batches = if let Some(max_rows) = ctx.max_insert_rows {
         let capacity = batches.len();
         batches
             .into_iter()
@@ -362,23 +382,59 @@ pub(crate) async fn delete_records(
     ctx: &Context<'_>,
 ) -> crate::Result<usize> {
     let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.clone().filter, ctx);
-    let ids = conn.filter_selectors(model, record_filter, ctx).await?;
-    let ids: Vec<&SelectionResult> = ids.iter().collect();
-    let count = ids.len();
 
-    if count == 0 {
-        return Ok(count);
-    }
+    // If we have selectors, then we must chunk the mutation into multiple if necessary and add the ids to the filter.
+    let row_count = if record_filter.has_selectors() {
+        let ids: Vec<_> = record_filter.selectors.as_ref().unwrap().iter().collect();
+        let mut row_count = 0;
 
-    let mut row_count = 0;
-    for delete in write::delete_many(model, ids.as_slice(), filter_condition, ctx) {
-        row_count += conn.execute(delete).await?;
-    }
+        for delete in write::delete_many_from_ids_and_filter(model, ids.as_slice(), filter_condition, ctx) {
+            row_count += conn.execute(delete).await?;
+        }
 
-    match usize::try_from(row_count) {
-        Ok(row_count) => Ok(row_count),
-        Err(_) => Ok(count),
-    }
+        row_count
+    } else {
+        conn.execute(write::delete_many_from_filter(model, filter_condition, ctx))
+            .await?
+    };
+
+    Ok(row_count as usize)
+}
+
+pub(crate) async fn delete_record(
+    conn: &dyn Queryable,
+    model: &Model,
+    record_filter: RecordFilter,
+    selected_fields: FieldSelection,
+    ctx: &Context<'_>,
+) -> crate::Result<SingleRecord> {
+    // We explicitly checked in the query builder that there are no nested mutation
+    // in combination with this operation.
+    debug_assert!(!record_filter.has_selectors());
+
+    let filter = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter, ctx);
+    let selected_fields: ModelProjection = selected_fields.into();
+
+    let result_set = conn
+        .query(write::delete_returning(model, filter, &selected_fields, ctx))
+        .await?;
+
+    let mut result_iter = result_set.into_iter();
+    let result_row = result_iter.next().ok_or(SqlError::RecordDoesNotExist {
+        cause: "Record to delete does not exist.".to_owned(),
+    })?;
+    debug_assert!(result_iter.next().is_none(), "Filter returned more than one row. This is a bug because we must always require `id` in filters for `deleteOne` mutations");
+
+    let field_db_names: Vec<_> = selected_fields.db_names().collect();
+    let types_and_arities = selected_fields.type_identifiers_with_arities();
+    let meta = column_metadata::create(&field_db_names, &types_and_arities);
+    let sql_row = result_row.to_sql_row(&meta)?;
+
+    let record = Record::from(sql_row);
+    Ok(SingleRecord {
+        record,
+        field_names: field_db_names,
+    })
 }
 
 /// Connect relations defined in `child_ids` to a parent defined in `parent_id`.

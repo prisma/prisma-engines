@@ -1,6 +1,13 @@
 use query_engine_tests::test_suite;
 
-#[test_suite(schema(generic))]
+#[test_suite(
+    schema(generic),
+    exclude(
+        Vitess("planetscale.js", "planetscale.js.wasm"),
+        Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"),
+        Sqlite("libsql.js", "libsql.js.wasm")
+    )
+)]
 mod metrics {
     use query_engine_metrics::{
         PRISMA_CLIENT_QUERIES_ACTIVE, PRISMA_CLIENT_QUERIES_TOTAL, PRISMA_DATASOURCE_QUERIES_TOTAL,
@@ -9,7 +16,7 @@ mod metrics {
     use query_engine_tests::*;
     use serde_json::Value;
 
-    #[connector_test(exclude(Js))]
+    #[connector_test]
     async fn metrics_are_recorded(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#),
@@ -27,7 +34,7 @@ mod metrics {
         let total_operations = get_counter(&json, PRISMA_CLIENT_QUERIES_TOTAL);
 
         match runner.connector_version() {
-            Sqlite => assert_eq!(total_queries, 9),
+            Sqlite(_) => assert_eq!(total_queries, 2),
             SqlServer(_) => assert_eq!(total_queries, 17),
             MongoDb(_) => assert_eq!(total_queries, 5),
             CockroachDb(_) => (), // not deterministic
@@ -40,7 +47,7 @@ mod metrics {
         Ok(())
     }
 
-    #[connector_test(exclude(Js))]
+    #[connector_test]
     async fn metrics_tx_do_not_go_negative(mut runner: Runner) -> TestResult<()> {
         let tx_id = runner.start_tx(5000, 5000, None).await?;
         runner.set_active_tx(tx_id.clone());

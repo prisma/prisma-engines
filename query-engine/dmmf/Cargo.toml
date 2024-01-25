@@ -10,7 +10,7 @@ serde.workspace = true
 serde_json.workspace = true
 schema = { path = "../schema" }
 indexmap = { version = "1.7", features = ["serde-1"] }
-prisma-models = { path = "../prisma-models" }
+query-structure = { path = "../query-structure", features = ["default_generators"] }
 
 [dev-dependencies]
 expect-test = "1.2.2"
@@ -19,4 +19,4 @@ pretty_assertions = "1"
 flate2 = "1.0"
 similar = { version = "2.2.1", features=["text", "inline", "bytes"] }
 colored = "2.0.0"
-itertools = "0.10.5"
+itertools.workspace = true

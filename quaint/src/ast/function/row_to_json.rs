@@ -2,7 +2,6 @@ use super::Function;
 use crate::ast::Table;
 
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]
 #[cfg(feature = "postgresql")]
 /// A representation of the `ROW_TO_JSON` function in the database.
 /// Only for `Postgresql`
@@ -31,15 +30,14 @@ pub struct RowToJson<'a> {
 /// let result = conn.select(select).await?;
 ///
 /// assert_eq!(
-///     Value::Json(Some(serde_json::json!({
+///     Value::json(serde_json::json!({
 ///         "toto": "hello_world"
-///     }))),
+///     })),
 ///     result.into_single().unwrap()[0]
 /// );
 /// # Ok(())
 /// # }
 /// ```
-#[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]
 #[cfg(feature = "postgresql")]
 pub fn row_to_json<'a, T>(expr: T, pretty_print: bool) -> Function<'a>
 where

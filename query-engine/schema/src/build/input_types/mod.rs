@@ -2,9 +2,8 @@ pub(crate) mod fields;
 pub(crate) mod objects;
 
 use super::*;
-use crate::*;
 use fields::*;
-use prisma_models::ScalarFieldRef;
+use query_structure::ScalarFieldRef;
 
 fn map_scalar_input_type_for_field<'a>(ctx: &'a QuerySchema, field: &ScalarFieldRef) -> InputType<'a> {
     map_scalar_input_type(ctx, field.type_identifier(), field.is_list())

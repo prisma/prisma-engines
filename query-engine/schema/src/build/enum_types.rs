@@ -1,7 +1,7 @@
 use super::*;
 use crate::EnumType;
-use constants::{filters, itx, json_null, ordering};
-use prisma_models::prelude::ParentContainer;
+use constants::{filters, itx, json_null, load_strategy, ordering};
+use query_structure::prelude::ParentContainer;
 
 pub(crate) fn sort_order_enum() -> EnumType {
     let ident = Identifier::new_prisma(IdentifierType::SortOrder);
@@ -106,6 +106,22 @@ pub fn itx_isolation_levels(ctx: &'_ QuerySchema) -> Option<EnumType> {
     if values.is_empty() {
         return None;
     }
+
+    Some(EnumType::string(ident, values))
+}
+
+pub(crate) fn relation_load_strategy(ctx: &QuerySchema) -> Option<EnumType> {
+    if !ctx.has_feature(psl::PreviewFeature::RelationJoins) {
+        return None;
+    }
+
+    let ident = Identifier::new_prisma(IdentifierType::RelationLoadStrategy);
+
+    let values = if ctx.has_capability(ConnectorCapability::LateralJoin) {
+        vec![load_strategy::QUERY.to_owned(), load_strategy::JOIN.to_owned()]
+    } else {
+        vec![load_strategy::QUERY.to_owned()]
+    };
 
     Some(EnumType::string(ident, values))
 }

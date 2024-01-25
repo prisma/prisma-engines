@@ -1,16 +1,17 @@
-use crate::{
-    conversion,
-    proxy::{CommonProxy, DriverProxy, Query},
-};
+use crate::proxy::{CommonProxy, DriverProxy};
+use crate::types::{AdapterFlavour, Query};
+use crate::JsObject;
+
+use super::conversion;
+use crate::send_future::UnsafeFuture;
 use async_trait::async_trait;
-use napi::JsObject;
-use psl::datamodel_connector::Flavour;
+use futures::Future;
+use quaint::connector::{ExternalConnectionInfo, ExternalConnector};
 use quaint::{
     connector::{metrics, IsolationLevel, Transaction},
     error::{Error, ErrorKind},
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
-    Value,
 };
 use tracing::{info_span, Instrument};
 
@@ -26,60 +27,75 @@ use tracing::{info_span, Instrument};
 /// Transforming a `JSResultSet` (what client connectors implemented in javascript provide)
 /// into a `quaint::connector::result_set::ResultSet`. A quaint `ResultSet` is basically a vector
 /// of `quaint::Value` but said type is a tagged enum, with non-unit variants that cannot be converted to javascript as is.
-///
 pub(crate) struct JsBaseQueryable {
     pub(crate) proxy: CommonProxy,
-    pub flavour: Flavour,
+    pub provider: AdapterFlavour,
 }
 
 impl JsBaseQueryable {
     pub(crate) fn new(proxy: CommonProxy) -> Self {
-        let flavour: Flavour = proxy.flavour.to_owned().parse().unwrap();
-        Self { proxy, flavour }
+        let provider: AdapterFlavour = proxy.provider.parse().unwrap();
+        Self { proxy, provider }
     }
 
-    /// visit a query according to the flavour of the JS connector
-    pub fn visit_query<'a>(&self, q: QuaintQuery<'a>) -> quaint::Result<(String, Vec<Value<'a>>)> {
-        match self.flavour {
-            Flavour::Mysql => visitor::Mysql::build(q),
-            Flavour::Postgres => visitor::Postgres::build(q),
-            Flavour::Sqlite => visitor::Sqlite::build(q),
-            _ => unimplemented!("Unsupported flavour for JS connector {:?}", self.flavour),
+    /// visit a quaint query AST according to the provider of the JS connector
+    fn visit_quaint_query<'a>(&self, q: QuaintQuery<'a>) -> quaint::Result<(String, Vec<quaint::Value<'a>>)> {
+        match self.provider {
+            AdapterFlavour::Mysql => visitor::Mysql::build(q),
+            AdapterFlavour::Postgres => visitor::Postgres::build(q),
+            AdapterFlavour::Sqlite => visitor::Sqlite::build(q),
         }
+    }
+
+    async fn build_query(&self, sql: &str, values: &[quaint::Value<'_>]) -> quaint::Result<Query> {
+        let sql: String = sql.to_string();
+
+        let converter = match self.provider {
+            AdapterFlavour::Postgres => conversion::postgres::value_to_js_arg,
+            AdapterFlavour::Sqlite => conversion::sqlite::value_to_js_arg,
+            AdapterFlavour::Mysql => conversion::mysql::value_to_js_arg,
+        };
+
+        let args = values
+            .iter()
+            .map(converter)
+            .collect::<serde_json::Result<Vec<conversion::JSArg>>>()?;
+
+        Ok(Query { sql, args })
     }
 }
 
 #[async_trait]
 impl QuaintQueryable for JsBaseQueryable {
     async fn query(&self, q: QuaintQuery<'_>) -> quaint::Result<ResultSet> {
-        let (sql, params) = self.visit_query(q)?;
+        let (sql, params) = self.visit_quaint_query(q)?;
         self.query_raw(&sql, &params).await
     }
 
-    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
+    async fn query_raw(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<ResultSet> {
         metrics::query("js.query_raw", sql, params, move || async move {
             self.do_query_raw(sql, params).await
         })
         .await
     }
 
-    async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
+    async fn query_raw_typed(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<ResultSet> {
         self.query_raw(sql, params).await
     }
 
     async fn execute(&self, q: QuaintQuery<'_>) -> quaint::Result<u64> {
-        let (sql, params) = self.visit_query(q)?;
+        let (sql, params) = self.visit_quaint_query(q)?;
         self.execute_raw(&sql, &params).await
     }
 
-    async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
+    async fn execute_raw(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<u64> {
         metrics::query("js.execute_raw", sql, params, move || async move {
             self.do_execute_raw(sql, params).await
         })
         .await
     }
 
-    async fn execute_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
+    async fn execute_raw_typed(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<u64> {
         self.execute_raw(sql, params).await
     }
 
@@ -109,7 +125,7 @@ impl QuaintQueryable for JsBaseQueryable {
             return Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build());
         }
 
-        if self.flavour == Flavour::Sqlite {
+        if self.provider == AdapterFlavour::Sqlite {
             return match isolation_level {
                 IsolationLevel::Serializable => Ok(()),
                 _ => Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build()),
@@ -121,10 +137,9 @@ impl QuaintQueryable for JsBaseQueryable {
     }
 
     fn requires_isolation_first(&self) -> bool {
-        match self.flavour {
-            Flavour::Mysql => true,
-            Flavour::Postgres | Flavour::Sqlite => false,
-            _ => unreachable!(),
+        match self.provider {
+            AdapterFlavour::Mysql => true,
+            AdapterFlavour::Postgres | AdapterFlavour::Sqlite => false,
         }
     }
 }
@@ -134,16 +149,10 @@ impl JsBaseQueryable {
         format!(r#"-- Implicit "{}" query via underlying driver"#, stmt)
     }
 
-    async fn build_query(sql: &str, values: &[quaint::Value<'_>]) -> quaint::Result<Query> {
-        let sql: String = sql.to_string();
-        let args = conversion::conv_params(values)?;
-        Ok(Query { sql, args })
-    }
-
-    async fn do_query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
+    async fn do_query_raw_inner(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<ResultSet> {
         let len = params.len();
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
-        let query = Self::build_query(sql, params).instrument(serialization_span).await?;
+        let query = self.build_query(sql, params).instrument(serialization_span).await?;
 
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
         let result_set = self.proxy.query_raw(query).instrument(sql_span).await?;
@@ -154,15 +163,31 @@ impl JsBaseQueryable {
         result_set.try_into()
     }
 
-    async fn do_execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
+    fn do_query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [quaint::Value<'a>],
+    ) -> UnsafeFuture<impl Future<Output = quaint::Result<ResultSet>> + 'a> {
+        UnsafeFuture(self.do_query_raw_inner(sql, params))
+    }
+
+    async fn do_execute_raw_inner(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<u64> {
         let len = params.len();
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
-        let query = Self::build_query(sql, params).instrument(serialization_span).await?;
+        let query = self.build_query(sql, params).instrument(serialization_span).await?;
 
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
         let affected_rows = self.proxy.execute_raw(query).instrument(sql_span).await?;
 
         Ok(affected_rows as u64)
+    }
+
+    fn do_execute_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [quaint::Value<'a>],
+    ) -> UnsafeFuture<impl Future<Output = quaint::Result<u64>> + 'a> {
+        UnsafeFuture(self.do_execute_raw_inner(sql, params))
     }
 }
 
@@ -197,16 +222,24 @@ impl std::fmt::Debug for JsQueryable {
 }
 
 #[async_trait]
+impl ExternalConnector for JsQueryable {
+    async fn get_connection_info(&self) -> quaint::Result<ExternalConnectionInfo> {
+        let conn_info = self.driver_proxy.get_connection_info().await?;
+        Ok(conn_info.into_external_connection_info(&self.inner.provider))
+    }
+}
+
+#[async_trait]
 impl QuaintQueryable for JsQueryable {
     async fn query(&self, q: QuaintQuery<'_>) -> quaint::Result<ResultSet> {
         self.inner.query(q).await
     }
 
-    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
+    async fn query_raw(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<ResultSet> {
         self.inner.query_raw(sql, params).await
     }
 
-    async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
+    async fn query_raw_typed(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<ResultSet> {
         self.inner.query_raw_typed(sql, params).await
     }
 
@@ -214,11 +247,11 @@ impl QuaintQueryable for JsQueryable {
         self.inner.execute(q).await
     }
 
-    async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
+    async fn execute_raw(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<u64> {
         self.inner.execute_raw(sql, params).await
     }
 
-    async fn execute_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
+    async fn execute_raw_typed(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<u64> {
         self.inner.execute_raw_typed(sql, params).await
     }
 
@@ -281,7 +314,7 @@ impl TransactionCapable for JsQueryable {
     }
 }
 
-pub fn from_napi(driver: JsObject) -> JsQueryable {
+pub fn from_js(driver: JsObject) -> JsQueryable {
     let common = CommonProxy::new(&driver).unwrap();
     let driver_proxy = DriverProxy::new(&driver).unwrap();
 

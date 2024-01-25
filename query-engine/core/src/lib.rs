@@ -11,13 +11,14 @@ pub mod query_graph_builder;
 pub mod response_ir;
 pub mod telemetry;
 
+pub use self::telemetry::*;
 pub use self::{
     error::{CoreError, FieldConversionError},
     executor::{QueryExecutor, TransactionOptions},
     interactive_transactions::{ExtendedTransactionUserFacingError, TransactionError, TxId},
     query_document::*,
-    telemetry::*,
 };
+
 pub use connector::{
     error::{ConnectorError, ErrorKind as ConnectorErrorKind},
     Connector,

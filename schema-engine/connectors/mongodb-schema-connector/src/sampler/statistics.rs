@@ -530,7 +530,7 @@ impl<'a> Statistics<'a> {
                         sampler.types.insert(FieldType::Document(type_name.clone()), 1);
 
                         let key = Name::CompositeType(type_name);
-                        self.models.entry(key).or_insert_with(Default::default);
+                        self.models.entry(key).or_default();
 
                         sampler
                     } else {

@@ -21,41 +21,55 @@ members = [
   "query-engine/dmmf",
   "query-engine/driver-adapters",
   "query-engine/metrics",
-  "query-engine/prisma-models",
+  "query-engine/query-structure",
   "query-engine/query-engine",
   "query-engine/query-engine-node-api",
+  "query-engine/query-engine-wasm",
   "query-engine/request-handlers",
   "query-engine/schema",
   "libs/*",
   "prisma-fmt",
   "prisma-schema-wasm",
   "psl/*",
-]
-
-# All path dependencies residing in the workspace directory automatically become members.
-# The following shouldn't be considered members but embedded dependencies.
-exclude = [
   "quaint",
-  "quaint/test-macros",
-  "quaint/test-setup"
 ]
 
 [workspace.dependencies]
 psl = { path = "./psl/psl" }
 serde_json = { version = "1", features = ["float_roundtrip", "preserve_order"] }
 serde = { version = "1", features = ["derive"] }
-tokio = { version = "1.25", features = ["rt-multi-thread", "macros", "sync", "io-std", "io-util", "parking_lot", "time"] }
+tokio = { version = "1.25", features = [
+  "rt-multi-thread",
+  "macros",
+  "sync",
+  "io-std",
+  "io-util",
+  "parking_lot",
+  "time",
+] }
 user-facing-errors = { path = "./libs/user-facing-errors" }
 uuid = { version = "1", features = ["serde"] }
 indoc = "2.0.1"
+itertools = "0.12"
 connection-string = "0.2"
-napi = { version = "2.12.4", default-features = false, features = ["napi8", "tokio_rt", "serde-json"] }
-napi-derive = "2.12.4"
+napi = { version = "2.14.2", default-features = false, features = [
+  "napi8",
+  "tokio_rt",
+  "serde-json",
+] }
+napi-derive = "2.14.6"
+js-sys = { version = "0.3" }
+serde_repr = { version = "0.1.17" }
+serde-wasm-bindgen = { version = "0.5" }
+tsify = { version = "0.4.5" }
+wasm-bindgen = { version = "0.2.89" }
+wasm-bindgen-futures = { version = "0.4" }
+wasm-rs-dbg = { version = "0.1.2" }
+wasm-bindgen-test = { version = "0.3.0" }
 
 [workspace.dependencies.quaint]
 path = "quaint"
 features = [
-  "bigdecimal",
   "expose-drivers",
   "fmt-sql",
   "mssql",
@@ -63,7 +77,7 @@ features = [
   "pooled",
   "postgresql",
   "sqlite",
-  "uuid",
+  "native",
 ]
 
 [profile.dev.package.backtrace]
@@ -78,7 +92,7 @@ strip = "symbols"
 [profile.release]
 lto = "fat"
 codegen-units = 1
-opt-level = 's' # Optimize for size.
+opt-level = 's'   # Optimize for size.
 
 [profile.profiling]
 inherits = "release"

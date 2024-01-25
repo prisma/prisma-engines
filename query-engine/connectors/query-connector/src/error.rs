@@ -1,6 +1,6 @@
-use crate::filter::Filter;
 use itertools::Itertools;
-use prisma_models::prelude::DomainError;
+use query_structure::prelude::DomainError;
+use query_structure::Filter;
 use std::fmt::Display;
 use thiserror::Error;
 use user_facing_errors::{query_engine::DatabaseConstraint, KnownError};
@@ -116,6 +116,9 @@ impl ConnectorError {
             ErrorKind::ExternalError(id) => Some(user_facing_errors::KnownError::new(
                 user_facing_errors::query_engine::ExternalError { id: id.to_owned() },
             )),
+            ErrorKind::RecordDoesNotExist { cause } => Some(KnownError::new(
+                user_facing_errors::query_engine::RecordRequiredButNotFound { cause: cause.clone() },
+            )),
             _ => None,
         };
 
@@ -146,8 +149,8 @@ pub enum ErrorKind {
     #[error("Foreign key constraint failed")]
     ForeignKeyConstraintViolation { constraint: DatabaseConstraint },
 
-    #[error("Record does not exist.")]
-    RecordDoesNotExist,
+    #[error("Record does not exist: {cause}")]
+    RecordDoesNotExist { cause: String },
 
     #[error("Column '{}' does not exist.", column)]
     ColumnDoesNotExist { column: String },
@@ -272,6 +275,9 @@ pub enum ErrorKind {
 
     #[error("External connector error")]
     ExternalError(i32),
+
+    #[error("Invalid driver adapter: {0}")]
+    InvalidDriverAdapter(String),
 }
 
 impl From<DomainError> for ConnectorError {

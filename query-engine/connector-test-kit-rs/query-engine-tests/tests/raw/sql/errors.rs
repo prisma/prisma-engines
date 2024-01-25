@@ -34,8 +34,12 @@ mod raw_errors {
         Ok(())
     }
 
-    #[connector_test(schema(common_nullable_types))]
-    async fn list_param_for_scalar_column_should_not_panic(runner: Runner) -> TestResult<()> {
+    #[connector_test(
+        schema(common_nullable_types),
+        only(Postgres),
+        exclude(Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"))
+    )]
+    async fn list_param_for_scalar_column_should_not_panic_quaint(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
             fmt_execute_raw(
@@ -44,6 +48,21 @@ mod raw_errors {
             ),
             2010,
             r#"column "id" is of type integer but expression is of type bigint[]"#
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(common_nullable_types), only(Postgres("neon.js"), Postgres("pg.js")))]
+    async fn list_param_for_scalar_column_should_not_panic_pg_js(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            runner,
+            fmt_execute_raw(
+                r#"INSERT INTO "TestModel" ("id") VALUES ($1);"#,
+                vec![RawParam::array(vec![1])],
+            ),
+            2010,
+            r#"invalid input syntax for type integer"#
         );
 
         Ok(())

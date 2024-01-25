@@ -1,8 +1,9 @@
 use crate::CoreError;
 use connector::Transaction;
+use crosstarget_utils::time::ElapsedTimeCounter;
 use serde::Deserialize;
 use std::fmt::Display;
-use tokio::time::{Duration, Instant};
+use tokio::time::Duration;
 
 mod actor_manager;
 mod actors;
@@ -104,7 +105,7 @@ impl<'a> CachedTx<'a> {
         }
     }
 
-    pub(crate) fn to_closed(&self, start_time: Instant, timeout: Duration) -> Option<ClosedTx> {
+    pub(crate) fn to_closed(&self, start_time: ElapsedTimeCounter, timeout: Duration) -> Option<ClosedTx> {
         match self {
             CachedTx::Open(_) => None,
             CachedTx::Committed => Some(ClosedTx::Committed),
@@ -117,5 +118,8 @@ impl<'a> CachedTx<'a> {
 pub(crate) enum ClosedTx {
     Committed,
     RolledBack,
-    Expired { start_time: Instant, timeout: Duration },
+    Expired {
+        start_time: ElapsedTimeCounter,
+        timeout: Duration,
+    },
 }

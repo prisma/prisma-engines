@@ -1,9 +1,5 @@
 use crate::{ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
-use connector::{
-    ConditionListValue, ConditionValue, Filter, JsonCompare, JsonFilterPath, JsonTargetType, ScalarCompare,
-    ScalarListCompare,
-};
-use prisma_models::{prelude::ParentContainer, Field, PrismaValue, ScalarFieldRef, TypeIdentifier};
+use query_structure::{prelude::ParentContainer, *};
 use schema::constants::{aggregations, filters, json_null};
 use std::convert::TryInto;
 

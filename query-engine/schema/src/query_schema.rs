@@ -1,9 +1,9 @@
 use crate::{IdentifierType, ObjectType, OutputField};
-use prisma_models::{ast, InternalDataModel};
 use psl::{
     datamodel_connector::{Connector, ConnectorCapabilities, ConnectorCapability, RelationMode},
     PreviewFeature, PreviewFeatures,
 };
+use query_structure::{ast, InternalDataModel};
 use std::{collections::HashMap, fmt};
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
@@ -96,7 +96,7 @@ impl QuerySchema {
                 || self.has_capability(ConnectorCapability::FullTextSearchWithIndex))
     }
 
-    pub(crate) fn has_feature(&self, feature: PreviewFeature) -> bool {
+    pub fn has_feature(&self, feature: PreviewFeature) -> bool {
         self.preview_features.contains(feature)
     }
 

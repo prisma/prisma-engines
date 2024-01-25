@@ -10,10 +10,32 @@ use std::fmt::{self, Write};
 ///
 /// The returned parameter values implement the `ToSql` trait from rusqlite and
 /// can be used directly with the database.
-#[cfg_attr(feature = "docs", doc(cfg(feature = "sqlite")))]
 pub struct Sqlite<'a> {
     query: String,
     parameters: Vec<Value<'a>>,
+}
+
+impl<'a> Sqlite<'a> {
+    fn returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
+        if let Some(returning) = returning {
+            if !returning.is_empty() {
+                let values_len = returning.len();
+                self.write(" RETURNING ")?;
+
+                for (i, column) in returning.into_iter().enumerate() {
+                    // Workaround for SQLite parsing bug
+                    // https://sqlite.org/forum/info/6c141f151fa5c444db257eb4d95c302b70bfe5515901cf987e83ed8ebd434c49?t=h
+                    self.surround_with_backticks(&column.name)?;
+                    self.write(" AS ")?;
+                    self.surround_with_backticks(&column.name)?;
+                    if i < (values_len - 1) {
+                        self.write(", ")?;
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
 }
 
 impl<'a> Sqlite<'a> {
@@ -74,27 +96,27 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     }
 
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
-        let res = match value {
-            Value::Int32(i) => i.map(|i| self.write(i)),
-            Value::Int64(i) => i.map(|i| self.write(i)),
-            Value::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
-            Value::Enum(e) => e.map(|e| self.write(e)),
-            Value::Bytes(b) => b.map(|b| self.write(format!("x'{}'", hex::encode(b)))),
-            Value::Boolean(b) => b.map(|b| self.write(b)),
-            Value::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
-            Value::Float(d) => d.map(|f| match f {
+        let res = match &value.typed {
+            ValueType::Int32(i) => i.map(|i| self.write(i)),
+            ValueType::Int64(i) => i.map(|i| self.write(i)),
+            ValueType::Text(t) => t.as_ref().map(|t| self.write(format!("'{t}'"))),
+            ValueType::Enum(e, _) => e.as_ref().map(|e| self.write(e)),
+            ValueType::Bytes(b) => b.as_ref().map(|b| self.write(format!("x'{}'", hex::encode(b)))),
+            ValueType::Boolean(b) => b.map(|b| self.write(b)),
+            ValueType::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
+            ValueType::Float(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f32::INFINITY => self.write("'Infinity'"),
                 f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            Value::Double(d) => d.map(|f| match f {
+            ValueType::Double(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f64::INFINITY => self.write("'Infinity'"),
                 f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            Value::Array(_) => {
+            ValueType::Array(_) | ValueType::EnumArray(_, _) => {
                 let msg = "Arrays are not supported in SQLite.";
                 let kind = ErrorKind::conversion(msg);
 
@@ -104,21 +126,20 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
                 return Err(builder.build());
             }
 
-            Value::Json(j) => match j {
+            ValueType::Json(j) => match j {
                 Some(ref j) => {
                     let s = serde_json::to_string(j)?;
                     Some(self.write(format!("'{s}'")))
                 }
                 None => None,
             },
-            #[cfg(feature = "bigdecimal")]
-            Value::Numeric(r) => r.map(|r| self.write(r)),
-            #[cfg(feature = "uuid")]
-            Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
-            Value::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
-            Value::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
-            Value::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
-            Value::Xml(cow) => cow.map(|cow| self.write(format!("'{cow}'"))),
+
+            ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
+            ValueType::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
+            ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
+            ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
+            ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
+            ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
         };
 
         match res {
@@ -200,22 +221,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             self.visit_upsert(update)?;
         }
 
-        if let Some(returning) = insert.returning {
-            if !returning.is_empty() {
-                let values_len = returning.len();
-                self.write(" RETURNING ")?;
-
-                for (i, column) in returning.into_iter().enumerate() {
-                    //yay https://sqlite.org/forum/info/6c141f151fa5c444db257eb4d95c302b70bfe5515901cf987e83ed8ebd434c49?t=h
-                    self.surround_with_backticks(&column.name)?;
-                    self.write(" AS ")?;
-                    self.surround_with_backticks(&column.name)?;
-                    if i < (values_len - 1) {
-                        self.write(", ")?;
-                    }
-                }
-            }
-        }
+        self.returning(insert.returning)?;
 
         if let Some(comment) = insert.comment {
             self.write("; ")?;
@@ -331,6 +337,16 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         unimplemented!("JSON filtering is not yet supported on SQLite")
     }
 
+    #[cfg(feature = "postgresql")]
+    fn visit_json_array_agg(&mut self, _array_agg: JsonArrayAgg<'a>) -> visitor::Result {
+        unimplemented!("JSON_AGG is not yet supported on SQLite")
+    }
+
+    #[cfg(feature = "postgresql")]
+    fn visit_json_build_object(&mut self, _build_obj: JsonBuildObject<'a>) -> visitor::Result {
+        unimplemented!("JSON_BUILD_OBJECT is not yet supported on SQLite")
+    }
+
     fn visit_ordering(&mut self, ordering: Ordering<'a>) -> visitor::Result {
         let len = ordering.0.len();
 
@@ -384,6 +400,60 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 
         Ok(())
     }
+
+    fn visit_delete(&mut self, delete: Delete<'a>) -> visitor::Result {
+        self.write("DELETE FROM ")?;
+        self.visit_table(delete.table, true)?;
+
+        if let Some(conditions) = delete.conditions {
+            self.write(" WHERE ")?;
+            self.visit_conditions(conditions)?;
+        }
+
+        self.returning(delete.returning)?;
+
+        if let Some(comment) = delete.comment {
+            self.write(" ")?;
+            self.visit_comment(comment)?;
+        }
+
+        Ok(())
+    }
+
+    fn visit_update(&mut self, update: Update<'a>) -> visitor::Result {
+        self.write("UPDATE ")?;
+        self.visit_table(update.table, true)?;
+
+        {
+            self.write(" SET ")?;
+            let pairs = update.columns.into_iter().zip(update.values);
+            let len = pairs.len();
+
+            for (i, (key, value)) in pairs.enumerate() {
+                self.visit_column(key)?;
+                self.write(" = ")?;
+                self.visit_expression(value)?;
+
+                if i < (len - 1) {
+                    self.write(", ")?;
+                }
+            }
+        }
+
+        if let Some(conditions) = update.conditions {
+            self.write(" WHERE ")?;
+            self.visit_conditions(conditions)?;
+        }
+
+        self.returning(update.returning)?;
+
+        if let Some(comment) = update.comment {
+            self.write(" ")?;
+            self.visit_comment(comment)?;
+        }
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -432,11 +502,11 @@ mod tests {
     #[test]
     fn test_aliased_null() {
         let expected_sql = "SELECT ? AS `test`";
-        let query = Select::default().value(val!(Value::Text(None)).alias("test"));
+        let query = Select::default().value(val!(Value::null_text()).alias("test"));
         let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![Value::Text(None)], params);
+        assert_eq!(vec![Value::null_text()], params);
     }
 
     #[test]
@@ -861,7 +931,7 @@ mod tests {
 
     #[test]
     fn test_raw_null() {
-        let (sql, params) = Sqlite::build(Select::default().value(Value::Text(None).raw())).unwrap();
+        let (sql, params) = Sqlite::build(Select::default().value(Value::null_text().raw())).unwrap();
         assert_eq!("SELECT null", sql);
         assert!(params.is_empty());
     }
@@ -921,7 +991,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "uuid")]
     fn test_raw_uuid() {
         let uuid = uuid::Uuid::new_v4();
         let (sql, params) = Sqlite::build(Select::default().value(uuid.raw())).unwrap();

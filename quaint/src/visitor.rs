@@ -139,6 +139,12 @@ pub trait Visitor<'a> {
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> Result;
 
+    #[cfg(feature = "postgresql")]
+    fn visit_json_array_agg(&mut self, array_agg: JsonArrayAgg<'a>) -> Result;
+
+    #[cfg(feature = "postgresql")]
+    fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> Result;
+
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_text_search(&mut self, text_search: TextSearch<'a>) -> Result;
 
@@ -148,10 +154,38 @@ pub trait Visitor<'a> {
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_text_search_relevance(&mut self, text_search_relevance: TextSearchRelevance<'a>) -> Result;
 
+    fn visit_parameterized_enum(&mut self, variant: EnumVariant<'a>, name: Option<EnumName<'a>>) -> Result {
+        match name {
+            Some(name) => self.add_parameter(Value::enum_variant_with_name(variant, name)),
+            None => self.add_parameter(Value::enum_variant(variant)),
+        }
+        self.parameter_substitution()?;
+
+        Ok(())
+    }
+
+    fn visit_parameterized_enum_array(&mut self, variants: Vec<EnumVariant<'a>>, name: Option<EnumName<'a>>) -> Result {
+        let enum_variants: Vec<_> = variants
+            .into_iter()
+            .map(|variant| variant.into_enum(name.clone()))
+            .collect();
+
+        self.add_parameter(Value::array(enum_variants));
+        self.parameter_substitution()?;
+
+        Ok(())
+    }
+
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: Value<'a>) -> Result {
-        self.add_parameter(value);
-        self.parameter_substitution()
+        match value.typed {
+            ValueType::Enum(Some(variant), name) => self.visit_parameterized_enum(variant, name),
+            ValueType::EnumArray(Some(variants), name) => self.visit_parameterized_enum_array(variants, name),
+            _ => {
+                self.add_parameter(value);
+                self.parameter_substitution()
+            }
+        }
     }
 
     /// The join statements in the query
@@ -160,18 +194,38 @@ pub trait Visitor<'a> {
             match j {
                 Join::Inner(data) => {
                     self.write(" INNER JOIN ")?;
+
+                    if data.lateral {
+                        self.write("LATERAL ")?;
+                    }
+
                     self.visit_join_data(data)?;
                 }
                 Join::Left(data) => {
                     self.write(" LEFT JOIN ")?;
+
+                    if data.lateral {
+                        self.write("LATERAL ")?;
+                    }
+
                     self.visit_join_data(data)?;
                 }
                 Join::Right(data) => {
                     self.write(" RIGHT JOIN ")?;
+
+                    if data.lateral {
+                        self.write("LATERAL ")?;
+                    }
+
                     self.visit_join_data(data)?;
                 }
                 Join::Full(data) => {
                     self.write(" FULL JOIN ")?;
+
+                    if data.lateral {
+                        self.write("LATERAL ")?;
+                    }
+
                     self.visit_join_data(data)?;
                 }
             }
@@ -206,9 +260,15 @@ pub trait Visitor<'a> {
 
         self.write("SELECT ")?;
 
-        if select.distinct {
-            self.write("DISTINCT ")?;
-        }
+        if let Some(distinct) = select.distinct {
+            match distinct {
+                DistinctType::Default => self.write("DISTINCT ")?,
+                DistinctType::OnClause(columns) => {
+                    self.write("DISTINCT ON ")?;
+                    self.surround_with("(", ") ", |ref mut s| s.visit_columns(columns))?;
+                }
+            }
+        };
 
         if !select.tables.is_empty() {
             if select.columns.is_empty() {
@@ -976,6 +1036,20 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
+    fn visit_min(&mut self, min: Minimum<'a>) -> Result {
+        self.write("MIN")?;
+        self.surround_with("(", ")", |ref mut s| s.visit_column(min.column))?;
+
+        Ok(())
+    }
+
+    fn visit_max(&mut self, max: Maximum<'a>) -> Result {
+        self.write("MAX")?;
+        self.surround_with("(", ")", |ref mut s| s.visit_column(max.column))?;
+
+        Ok(())
+    }
+
     fn visit_function(&mut self, fun: Function<'a>) -> Result {
         match fun.typ_ {
             FunctionType::RowNumber(fun_rownum) => {
@@ -1018,12 +1092,10 @@ pub trait Visitor<'a> {
                 self.surround_with("(", ")", |ref mut s| s.visit_expression(*upper.expression))?;
             }
             FunctionType::Minimum(min) => {
-                self.write("MIN")?;
-                self.surround_with("(", ")", |ref mut s| s.visit_column(min.column))?;
+                self.visit_min(min)?;
             }
             FunctionType::Maximum(max) => {
-                self.write("MAX")?;
-                self.surround_with("(", ")", |ref mut s| s.visit_column(max.column))?;
+                self.visit_max(max)?;
             }
             FunctionType::Coalesce(coalesce) => {
                 self.write("COALESCE")?;
@@ -1065,6 +1137,14 @@ pub trait Visitor<'a> {
             FunctionType::Uuid => self.write("uuid()")?,
             FunctionType::Concat(concat) => {
                 self.visit_concat(concat)?;
+            }
+            #[cfg(feature = "postgresql")]
+            FunctionType::JsonArrayAgg(array_agg) => {
+                self.visit_json_array_agg(array_agg)?;
+            }
+            #[cfg(feature = "postgresql")]
+            FunctionType::JsonBuildObject(build_obj) => {
+                self.visit_json_build_object(build_obj)?;
             }
         };
 

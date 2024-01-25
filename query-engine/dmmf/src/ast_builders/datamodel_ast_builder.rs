@@ -2,11 +2,11 @@ use crate::serialization_ast::datamodel_ast::{
     Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex,
 };
 use bigdecimal::ToPrimitive;
-use prisma_models::{dml_default_kind, encode_bytes, DefaultKind, FieldArity, PrismaValue};
 use psl::{
     parser_database::{walkers, ScalarFieldType},
     schema_ast::ast::WithDocumentation,
 };
+use query_structure::{dml_default_kind, encode_bytes, DefaultKind, FieldArity, PrismaValue};
 
 pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
     let mut datamodel = Datamodel {
@@ -133,17 +133,15 @@ fn model_to_dmmf(model: walkers::ModelWalker<'_>) -> Model {
         primary_key,
         unique_fields: model
             .indexes()
-            .filter_map(|i| {
-                (i.is_unique() && !i.is_defined_on_field()).then(|| i.fields().map(|f| f.name().to_owned()).collect())
-            })
+            .filter(|&i| i.is_unique() && !i.is_defined_on_field())
+            .map(|i| i.fields().map(|f| f.name().to_owned()).collect())
             .collect(),
         unique_indexes: model
             .indexes()
-            .filter_map(|i| {
-                (i.is_unique() && !i.is_defined_on_field()).then(|| UniqueIndex {
-                    name: i.name().map(ToOwned::to_owned),
-                    fields: i.fields().map(|f| f.name().to_owned()).collect(),
-                })
+            .filter(|&i| i.is_unique() && !i.is_defined_on_field())
+            .map(|i| UniqueIndex {
+                name: i.name().map(ToOwned::to_owned),
+                fields: i.fields().map(|f| f.name().to_owned()).collect(),
             })
             .collect(),
     }

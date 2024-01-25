@@ -592,7 +592,7 @@ where
 
                     let version =
                         schema_exists_result
-                          .get(0)
+                          .first()
                           .and_then(|row| row.at(1).and_then(|ver_str| row.at(2).map(|ver_num| (ver_str, ver_num))))
                           .and_then(|(ver_str,ver_num)| ver_str.to_string().and_then(|version| ver_num.as_integer().map(|version_number| (version, version_number))));
 
@@ -625,7 +625,7 @@ where
                     }
 
                     if let Some(true) = schema_exists_result
-                        .get(0)
+                        .first()
                         .and_then(|row| row.at(0).and_then(|value| value.as_bool()))
                     {
                         return Ok((circumstances, connection))

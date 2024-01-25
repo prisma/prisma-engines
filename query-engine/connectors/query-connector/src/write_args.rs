@@ -1,10 +1,8 @@
-use crate::{
-    error::{ConnectorError, ErrorKind},
-    Filter,
-};
+use crate::error::{ConnectorError, ErrorKind};
 use indexmap::{map::Keys, IndexMap};
-use prisma_models::{
-    CompositeFieldRef, Field, Model, ModelProjection, PrismaValue, ScalarFieldRef, SelectedField, SelectionResult,
+use query_structure::{
+    CompositeFieldRef, Field, Filter, Model, ModelProjection, PrismaValue, ScalarFieldRef, SelectedField,
+    SelectionResult,
 };
 use std::{borrow::Borrow, convert::TryInto, ops::Deref};
 
@@ -329,6 +327,8 @@ impl From<(&SelectedField, PrismaValue)> for WriteOperation {
         match selection {
             SelectedField::Scalar(sf) => (sf, pv).into(),
             SelectedField::Composite(cs) => (&cs.field, pv).into(),
+            SelectedField::Relation(_) => todo!(),
+            SelectedField::Virtual(_) => todo!(),
         }
     }
 }
@@ -463,7 +463,7 @@ pub fn merge_write_args(loaded_ids: Vec<SelectionResult>, incoming_args: WriteAr
         .pairs
         .iter()
         .enumerate()
-        .filter_map(|(i, (selection, _))| incoming_args.get_field_value(selection.db_name()).map(|val| (i, val)))
+        .filter_map(|(i, (selection, _))| incoming_args.get_field_value(&selection.db_name()).map(|val| (i, val)))
         .collect();
 
     loaded_ids

@@ -1,4 +1,4 @@
-use test_setup::Tags;
+use quaint_test_setup::Tags;
 
 #[cfg(feature = "mssql")]
 pub mod mssql;

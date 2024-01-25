@@ -136,7 +136,7 @@ pub(super) fn add_schema_to_schemas(
 
     let edit = match datasource.schemas_span {
         Some(span) => {
-            let formatted_attribute = format!(r#", "{}""#, model.schema_name().unwrap());
+            let formatted_attribute = format!(r#"", "{}""#, model.schema_name().unwrap());
             super::create_text_edit(
                 schema,
                 formatted_attribute,
