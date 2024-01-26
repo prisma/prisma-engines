@@ -422,13 +422,13 @@ fn json_agg() -> Function<'static> {
 fn build_virtual_selection(selected_fields: &FieldSelection) -> Vec<(&'static str, Expression<'static>)> {
     let mut selected_objects = BTreeMap::new();
 
-    for (i, vs) in selected_fields.virtuals().enumerate() {
+    for vs in selected_fields.virtuals() {
         match vs {
             VirtualSelection::RelationCount(rf, _) => {
                 let (object_name, field_name) = vs.serialized_name();
 
                 let coalesce_args: Vec<Expression<'static>> = vec![
-                    Column::from((relation_count_alias_name(i, rf), vs.db_alias())).into(),
+                    Column::from((relation_count_alias_name(rf), vs.db_alias())).into(),
                     0.raw().into(),
                 ];
 
@@ -446,6 +446,6 @@ fn build_virtual_selection(selected_fields: &FieldSelection) -> Vec<(&'static st
         .collect()
 }
 
-fn relation_count_alias_name(vs_index: usize, rf: &RelationField) -> String {
-    format!("aggr_count_{}_{}_{}", vs_index, rf.model().name(), rf.name())
+fn relation_count_alias_name(rf: &RelationField) -> String {
+    format!("aggr_count_{}_{}", rf.model().name(), rf.name())
 }
