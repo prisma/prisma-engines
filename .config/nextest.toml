@@ -38,7 +38,7 @@ threads-required = 1
 # failed and retried tests.
 #
 # Can be overridden through the `--status-level` flag.
-status-level = "all"
+status-level = "pass"
 
 # Similar to status-level, show these test statuses at the end of the run.
 final-status-level = "flaky"
