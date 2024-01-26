@@ -44,10 +44,7 @@ impl FieldSelection {
     }
 
     pub fn virtuals(&self) -> impl Iterator<Item = &VirtualSelection> {
-        self.selections().filter_map(|field| match field {
-            SelectedField::Virtual(ref vs) => Some(vs),
-            _ => None,
-        })
+        self.selections().filter_map(SelectedField::as_virtual)
     }
 
     pub fn virtuals_owned(&self) -> Vec<VirtualSelection> {
@@ -326,6 +323,13 @@ impl SelectedField {
     pub fn as_composite(&self) -> Option<&CompositeSelection> {
         match self {
             SelectedField::Composite(ref cs) => Some(cs),
+            _ => None,
+        }
+    }
+
+    pub fn as_virtual(&self) -> Option<&VirtualSelection> {
+        match self {
+            SelectedField::Virtual(vs) => Some(vs),
             _ => None,
         }
     }

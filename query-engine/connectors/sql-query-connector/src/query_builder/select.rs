@@ -316,7 +316,7 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
     }
 
     fn with_virtuals_from_selection(self, selected_fields: &FieldSelection) -> Select<'a> {
-        build_virtual_selection(selected_fields)
+        build_virtual_selection(selected_fields.virtuals())
             .into_iter()
             .fold(self, |select, (alias, expr)| select.value(expr.alias(alias)))
     }
@@ -348,6 +348,9 @@ fn build_json_obj_fn(rs: &RelationSelection, ctx: &Context<'_>, root_alias: Alia
             }
             _ => None,
         })
+        .chain(build_virtual_selection(
+            rs.selections.iter().filter_map(SelectedField::as_virtual),
+        ))
         .collect();
 
     json_build_object(build_obj_params)
@@ -419,10 +422,12 @@ fn json_agg() -> Function<'static> {
     .alias(JSON_AGG_IDENT)
 }
 
-fn build_virtual_selection(selected_fields: &FieldSelection) -> Vec<(&'static str, Expression<'static>)> {
+fn build_virtual_selection<'a>(
+    virtual_fields: impl Iterator<Item = &'a VirtualSelection>,
+) -> Vec<(Cow<'static, str>, Expression<'static>)> {
     let mut selected_objects = BTreeMap::new();
 
-    for vs in selected_fields.virtuals() {
+    for vs in virtual_fields {
         match vs {
             VirtualSelection::RelationCount(rf, _) => {
                 let (object_name, field_name) = vs.serialized_name();
@@ -442,7 +447,7 @@ fn build_virtual_selection(selected_fields: &FieldSelection) -> Vec<(&'static st
 
     selected_objects
         .into_iter()
-        .map(|(name, fields)| (name, json_build_object(fields).into()))
+        .map(|(name, fields)| (name.into(), json_build_object(fields).into()))
         .collect()
 }
 
