@@ -73,19 +73,6 @@ impl ReadQuery {
             ReadQuery::AggregateRecordsQuery(_) => false,
         }
     }
-
-    pub(crate) fn has_virtual_selections(&self) -> bool {
-        fn has_virtuals(selection: &FieldSelection, nested: &[ReadQuery]) -> bool {
-            selection.has_virtual_fields() || nested.iter().any(|q| q.has_virtual_selections())
-        }
-
-        match self {
-            ReadQuery::RecordQuery(q) => has_virtuals(&q.selected_fields, &q.nested),
-            ReadQuery::ManyRecordsQuery(q) => has_virtuals(&q.selected_fields, &q.nested),
-            ReadQuery::RelatedRecordsQuery(q) => has_virtuals(&q.selected_fields, &q.nested),
-            ReadQuery::AggregateRecordsQuery(_) => false,
-        }
-    }
 }
 
 impl FilteredQuery for ReadQuery {
