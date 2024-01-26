@@ -209,6 +209,33 @@
 <a href="#209" id="209">209</a>
 <a href="#210" id="210">210</a>
 <a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! All the quaint-wrangling for the postgres connector should happen here.
 
 </span><span class="kw">use </span>enumflags2::BitFlags;
@@ -240,17 +267,44 @@
 
         <span class="kw">let </span>version = quaint.version().<span class="kw">await</span>.map_err(quaint_err(<span class="kw-2">&amp;</span>url))<span class="question-mark">?</span>;
 
-        <span class="kw">if </span>version.map(|v| v.starts_with(<span class="string">&quot;CockroachDB CCL v22.2&quot;</span>)).unwrap_or(<span class="bool-val">false</span>) {
-            <span class="comment">// first config issue: https://github.com/prisma/prisma/issues/16909
-            // second config value: Currently at least version 22.2.5, enums are
-            // not case-sensitive without this.
-            </span>quaint
-                .raw_cmd(<span class="macro">indoc! </span>{<span class="string">r#&quot;
-                    SET enable_implicit_transaction_for_batch_statements=false;
-                    SET use_declarative_schema_changer=off
-                &quot;#</span>})
-                .<span class="kw">await
-                </span>.map_err(quaint_err(<span class="kw-2">&amp;</span>url))<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(version) = version {
+            <span class="kw">let </span>cockroach_version_prefix = <span class="string">&quot;CockroachDB CCL v&quot;</span>;
+
+            <span class="kw">let </span>semver: <span class="prelude-ty">Option</span>&lt;(u8, u8)&gt; = version.strip_prefix(cockroach_version_prefix).and_then(|v| {
+                <span class="kw">let </span>semver_unparsed: String = v.chars().take_while(|<span class="kw-2">&amp;</span>c| c.is_ascii_digit() || c == <span class="string">&#39;.&#39;</span>).collect();
+
+                <span class="comment">// we only consider the major and minor version, as the patch version is not interesting for us
+                </span>semver_unparsed.split_once(<span class="string">&#39;.&#39;</span>).and_then(|(major, minor_and_patch)| {
+                    <span class="kw">let </span>major = major.parse::&lt;u8&gt;().ok();
+
+                    <span class="kw">let </span>minor = minor_and_patch
+                        .chars()
+                        .take_while(|<span class="kw-2">&amp;</span>c| c != <span class="string">&#39;.&#39;</span>)
+                        .collect::&lt;String&gt;()
+                        .parse::&lt;u8&gt;()
+                        .ok();
+
+                    major.zip(minor)
+                })
+            });
+
+            <span class="kw">match </span>semver {
+                <span class="prelude-val">Some</span>((major, minor)) <span class="kw">if </span>(major == <span class="number">22 </span>&amp;&amp; minor &gt;= <span class="number">2</span>) || major &gt;= <span class="number">23 </span>=&gt; {
+                    <span class="comment">// we&#39;re on 22.2+ or 23+
+                    //
+                    // first config issue: https://github.com/prisma/prisma/issues/16909
+                    // second config value: Currently at least version 22.2.5, enums are
+                    // not case-sensitive without this.
+                    </span>quaint
+                        .raw_cmd(<span class="macro">indoc! </span>{<span class="string">r#&quot;
+                            SET enable_implicit_transaction_for_batch_statements=false;
+                            SET use_declarative_schema_changer=off
+                        &quot;#</span>})
+                        .<span class="kw">await
+                        </span>.map_err(quaint_err(<span class="kw-2">&amp;</span>url))<span class="question-mark">?</span>;
+                }
+                <span class="prelude-val">None </span>| <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; (),
+            };
         }
 
         <span class="prelude-val">Ok</span>(Connection(quaint))
