@@ -451,6 +451,72 @@ fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_fails(_api
     expected_error.assert_eq(&err);
 }
 
+// This test follows https://github.com/prisma/prisma-engines/pull/4632.
+#[test_connector(tags(CockroachDb))]
+fn decimal_to_boolean_migrations_work(api: TestApi) {
+    let dir = api.create_migrations_directory();
+
+    let dm1 = r#"
+        datasource db {
+            provider = "cockroachdb"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model Cat {
+            id  BigInt @id @default(autoincrement())
+            tag Decimal
+        }
+    "#;
+
+    api.create_migration("create-cats-decimal", &dm1, &dir)
+        .send_sync()
+        .assert_migration_directories_count(1)
+        .assert_migration("create-cats-decimal", move |migration| {
+            let expected_script = expect![[r#"
+                -- CreateTable
+                CREATE TABLE "Cat" (
+                    "id" INT8 NOT NULL DEFAULT unique_rowid(),
+                    "tag" DECIMAL(65,30) NOT NULL,
+
+                    CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
+                );
+            "#]];
+
+            migration.expect_contents(expected_script)
+        });
+
+    let dm2 = r#"
+        datasource db {
+            provider = "cockroachdb"
+            url = env("TEST_DATABASE_URL")
+        }
+        
+        model Cat {
+            id  BigInt @id @default(autoincrement())
+            tag Boolean
+        }
+    "#;
+
+    api.create_migration("migrate-cats-boolean", &dm2, &dir)
+        .send_sync()
+        .assert_migration_directories_count(2)
+        .assert_migration("migrate-cats-boolean", move |migration| {
+            let expected_script = expect![[r#"
+                /*
+                  Warnings:
+
+                  - Changed the type of `tag` on the `Cat` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.
+
+                */
+                -- AlterTable
+                ALTER TABLE "Cat" DROP COLUMN "tag";
+                ALTER TABLE "Cat" ADD COLUMN     "tag" BOOL NOT NULL;
+            "#]];
+
+            migration.expect_contents(expected_script)
+        });
+}
+
 #[test_connector(tags(CockroachDb))]
 fn int_to_string_conversions_work(api: TestApi) {
     let dm1 = r#"
