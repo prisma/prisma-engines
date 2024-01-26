@@ -94,7 +94,7 @@ mod json {
 
                 insta::assert_snapshot!(
                   res,
-                  @r###"{"data":{"findManyTestModel":[{"json":null},{"json":null}]}}"###
+                  @r###"{"data":{"findManyTestModel":[{"json":null},{"json":"null"}]}}"###
                 );
             }
             query_engine_tests::EngineProtocol::Json => {
