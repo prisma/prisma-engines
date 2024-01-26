@@ -44,7 +44,11 @@ impl SelectBuilder {
             .add_trace_id(ctx.trace_id);
 
         // Adds joins for relations
-        self.with_related_queries(select, selected_fields.relations(), table_alias, ctx)
+        let select = self.with_related_queries(select, selected_fields.relations(), table_alias, ctx);
+
+        // Adds joins for relation aggregations. Other potential future kinds of virtual fields
+        // might or might not require joins and might be processed differently.
+        self.with_relation_aggregation_queries(select, selected_fields.virtuals(), table_alias, ctx)
     }
 
     fn with_related_queries<'a, 'b>(
@@ -106,6 +110,9 @@ impl SelectBuilder {
 
         // LEFT JOIN LATERAL () AS <inner_alias> ON TRUE
         let inner = self.with_related_queries(inner, rs.relations(), root_alias, ctx);
+
+        // LEFT JOIN LATERAL ( <relation aggregation query> ) ON TRUE
+        let inner = self.with_relation_aggregation_queries(inner, rs.virtuals(), root_alias, ctx);
 
         let linking_fields = rs.field.related_field().linking_fields();
 
@@ -199,6 +206,46 @@ impl SelectBuilder {
             .alias(m2m_join_alias_name(&rf))
             .on(ConditionTree::single(true.raw()))
             .lateral()
+    }
+
+    fn with_relation_aggregation_queries<'a, 'b>(
+        &mut self,
+        select: Select<'a>,
+        selections: impl Iterator<Item = &'b VirtualSelection>,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a> {
+        selections.fold(select, |acc, vs| {
+            self.with_relation_aggregation_query(acc, vs, parent_alias, ctx)
+        })
+    }
+
+    fn with_relation_aggregation_query<'a>(
+        &mut self,
+        select: Select<'a>,
+        vs: &VirtualSelection,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a> {
+        match vs {
+            VirtualSelection::RelationCount(rf, filter) => {
+                let table_alias = relation_count_alias_name(rf);
+                let table =
+                    Table::from(self.build_relation_count_query(rf, filter, parent_alias, ctx)).alias(table_alias);
+
+                select.left_join_lateral(table.on(ConditionTree::single(true.raw())))
+            }
+        }
+    }
+
+    fn build_relation_count_query<'a>(
+        &mut self,
+        rf: &RelationField,
+        filter: &Option<Filter>,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a> {
+        todo!()
     }
 }
 
@@ -348,9 +395,7 @@ fn build_json_obj_fn(rs: &RelationSelection, ctx: &Context<'_>, root_alias: Alia
             }
             _ => None,
         })
-        .chain(build_virtual_selection(
-            rs.selections.iter().filter_map(SelectedField::as_virtual),
-        ))
+        .chain(build_virtual_selection(rs.virtuals()))
         .collect();
 
     json_build_object(build_obj_params)

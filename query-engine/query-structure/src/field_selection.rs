@@ -242,6 +242,10 @@ impl RelationSelection {
         })
     }
 
+    pub fn virtuals(&self) -> impl Iterator<Item = &VirtualSelection> {
+        self.selections.iter().filter_map(SelectedField::as_virtual)
+    }
+
     pub fn related_model(&self) -> Model {
         self.field.related_model()
     }
