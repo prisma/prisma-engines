@@ -230,8 +230,8 @@ impl SelectBuilder {
         match vs {
             VirtualSelection::RelationCount(rf, filter) => {
                 let table_alias = relation_count_alias_name(rf);
-                let table =
-                    Table::from(self.build_relation_count_query(rf, filter, parent_alias, ctx)).alias(table_alias);
+                let table = Table::from(self.build_relation_count_query(vs.db_alias(), rf, filter, parent_alias, ctx))
+                    .alias(table_alias);
 
                 select.left_join_lateral(table.on(ConditionTree::single(true.raw())))
             }
@@ -240,12 +240,25 @@ impl SelectBuilder {
 
     fn build_relation_count_query<'a>(
         &mut self,
+        selection_name: impl Into<Cow<'static, str>>,
         rf: &RelationField,
         filter: &Option<Filter>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        todo!()
+        let related_table_alias = self.next_alias();
+
+        let related_table = rf
+            .related_model()
+            .as_table(ctx)
+            .alias(related_table_alias.to_table_string());
+
+        let select = Select::from_table(related_table)
+            .value(count(asterisk()).alias(selection_name))
+            .with_join_conditions(rf, parent_alias, related_table_alias, ctx)
+            .with_filters(filter.clone(), Some(related_table_alias), ctx);
+
+        select
     }
 }
 
