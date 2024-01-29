@@ -1177,3 +1177,7 @@ date_time,branch,commit,file,size_bytes
 2024-01-29T13:47:55+00:00,main,dbcc905f0ab8f338d47bd9fe6323baffd45ed506,libquery_engine.node,16287000
 2024-01-29T13:47:55+00:00,main,dbcc905f0ab8f338d47bd9fe6323baffd45ed506,query_engine_bg.wasm.gz,929071
 2024-01-29T13:47:55+00:00,main,dbcc905f0ab8f338d47bd9fe6323baffd45ed506,query_engine_bg.wasm,2443472
+2024-01-29T15:26:59+00:00,main,23fdc5965b1e05fc54e5f26ed3de66776b93de64,query-engine,18522000
+2024-01-29T15:26:59+00:00,main,23fdc5965b1e05fc54e5f26ed3de66776b93de64,libquery_engine.node,16287000
+2024-01-29T15:26:59+00:00,main,23fdc5965b1e05fc54e5f26ed3de66776b93de64,query_engine_bg.wasm.gz,929073
+2024-01-29T15:26:59+00:00,main,23fdc5965b1e05fc54e5f26ed3de66776b93de64,query_engine_bg.wasm,2443472
