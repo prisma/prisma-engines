@@ -7,7 +7,7 @@ use crate::{
 };
 use connector::AggregationResult;
 use indexmap::IndexMap;
-use query_structure::{CompositeFieldRef, Field, PrismaValue, SelectionResult, VirtualSelection};
+use query_structure::{CompositeFieldRef, Field, Model, PrismaValue, SelectionResult, VirtualSelection};
 use schema::{
     constants::{aggregations::*, output_fields::*},
     *,
@@ -335,31 +335,10 @@ fn serialize_objects_with_relation(
 ) -> crate::Result<UncheckedItemsWithParents> {
     let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.records.records.len());
 
-    let model = result.model;
-    let db_field_names = result.records.field_names;
     let nested = result.nested;
 
-    let fields: Vec<_> = db_field_names
-        .iter()
-        .map(|name| {
-            model
-                .fields()
-                .all()
-                .find(|field| field.db_name() == name)
-                .and_then(|field| {
-                    typ.find_field(field.name())
-                        .map(|out_field| SerializedFieldWithRelations::Model(field, out_field))
-                })
-                .unwrap_or_else(|| {
-                    let matching_virtuals = result
-                        .virtuals
-                        .iter()
-                        .filter(|vs| vs.serialized_name().0 == name)
-                        .collect();
-                    SerializedFieldWithRelations::VirtualsGroup(name.as_str(), matching_virtuals)
-                })
-        })
-        .collect();
+    let fields =
+        collect_serialized_fields_with_relations(typ, &result.model, &result.virtuals, &result.records.field_names);
 
     // Hack: we convert it to a hashset to support contains with &str as input
     // because Vec<String>::contains(&str) doesn't work and we don't want to allocate a string record value
@@ -444,28 +423,8 @@ fn serialize_relation_selection(
 
     // TODO: better handle errors
     let mut value_obj: HashMap<String, PrismaValue> = HashMap::from_iter(value.into_object().unwrap());
-    let db_field_names = &rrs.fields;
-    let fields: Vec<_> = db_field_names
-        .iter()
-        .map(|name| {
-            rrs.model
-                .fields()
-                .all()
-                .find(|field| field.name() == name)
-                .and_then(|field| {
-                    typ.find_field(field.name())
-                        .map(|out_field| SerializedFieldWithRelations::Model(field, out_field))
-                })
-                .unwrap_or_else(|| {
-                    let matching_virtuals = rrs
-                        .virtuals
-                        .iter()
-                        .filter(|vs| vs.serialized_name().0 == name)
-                        .collect();
-                    SerializedFieldWithRelations::VirtualsGroup(name.as_str(), matching_virtuals)
-                })
-        })
-        .collect();
+
+    let fields = collect_serialized_fields_with_relations(typ, &rrs.model, &rrs.virtuals, &rrs.fields);
 
     for field in fields {
         let value = value_obj.remove(field.db_name()).unwrap();
@@ -508,6 +467,32 @@ fn serialize_relation_selection(
     }
 
     Ok(Item::Map(map))
+}
+
+fn collect_serialized_fields_with_relations<'a, 'b>(
+    object_type: &'a ObjectType<'b>,
+    model: &Model,
+    virtuals: &'a [VirtualSelection],
+    db_field_names: &'a [String],
+) -> Vec<SerializedFieldWithRelations<'a, 'b>> {
+    db_field_names
+        .iter()
+        .map(|name| {
+            model
+                .fields()
+                .all()
+                .find(|field| field.db_name() == name)
+                .and_then(|field| {
+                    object_type
+                        .find_field(field.name())
+                        .map(|out_field| SerializedFieldWithRelations::Model(field, out_field))
+                })
+                .unwrap_or_else(|| {
+                    let matching_virtuals = virtuals.iter().filter(|vs| vs.serialized_name().0 == name).collect();
+                    SerializedFieldWithRelations::VirtualsGroup(name.as_str(), matching_virtuals)
+                })
+        })
+        .collect()
 }
 
 fn serialize_virtuals_group(obj_value: PrismaValue, virtuals: &[&VirtualSelection]) -> crate::Result<Item> {
