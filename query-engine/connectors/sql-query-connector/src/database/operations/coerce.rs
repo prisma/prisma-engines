@@ -57,7 +57,7 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
                 .map(|value| coerce_json_relation_to_pv(value, rs));
 
             // TODO(HACK): We probably want to update the sql builder instead to not aggregate to-one relations as array
-            // If the arary is empty, it means there's no relations, so we coerce it to
+            // If the array is empty, it means there's no relations, so we coerce it to
             if let Some(val) = coerced {
                 val
             } else {
