@@ -28,7 +28,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 /// The main query engine used by JS
 #[wasm_bindgen]
 pub struct QueryEngine {
-    inner: RwLock<Inner>,
+    inner: RwLock<String>,
     adapter: Arc<dyn ExternalConnector>,
     logger: Logger,
 }
@@ -50,25 +50,13 @@ impl QueryEngine {
             log_queries,
         } = options;
 
-        // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
-        let connector_registry: ConnectorRegistry<'_> = &[POSTGRES, MYSQL, SQLITE];
-        let schema = psl::parse_without_validation(datamodel.into(), connector_registry);
-
         let js_queryable = Arc::new(driver_adapters::from_js(adapter));
-
-        // We skip telemetry to avoid runtime panics.
-        let engine_protocol = EngineProtocol::Json;
-
-        let builder = EngineBuilder {
-            schema: Arc::new(schema),
-            engine_protocol,
-        };
 
         let log_level = log_level.parse::<LevelFilter>().unwrap_or(Level::INFO.into());
         let logger = Logger::new(log_queries, log_level, log_callback);
 
         Ok(Self {
-            inner: RwLock::new(Inner::Builder(builder)),
+            inner: RwLock::new(datamodel),
             adapter: js_queryable,
             logger,
         })
