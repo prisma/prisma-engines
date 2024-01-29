@@ -234,7 +234,7 @@ fn build_conversion_error_with_reason(sf: &ScalarField, from: &str, to: &str, re
     let field_name = sf.name();
 
     build_generic_conversion_error(format!(
-        "Unexpected conversion failure for field {container_name}.{field_name} from {from} to {to}. Reason: ${reason}"
+        "Unexpected conversion failure for field {container_name}.{field_name} from {from} to {to}. Reason: {reason}"
     ))
 }
 
