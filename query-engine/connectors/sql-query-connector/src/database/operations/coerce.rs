@@ -69,15 +69,19 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
             let related_model = rs.field.related_model();
 
             for (key, value) in obj {
-                match related_model.fields().all().find(|f| f.db_name() == key).unwrap() {
-                    Field::Scalar(sf) => {
+                match related_model.fields().all().find(|f| f.db_name() == key) {
+                    Some(Field::Scalar(sf)) => {
                         map.push((key, coerce_json_scalar_to_pv(value, &sf)?));
                     }
-                    Field::Relation(rf) => {
+                    Some(Field::Relation(rf)) => {
                         // TODO: optimize this
                         if let Some(nested_selection) = relations.iter().find(|rs| rs.field == rf) {
                             map.push((key, coerce_json_relation_to_pv(value, nested_selection)?));
                         }
+                    }
+                    None => {
+                        let coerced_value = coerce_json_virtual_field_to_pv(&key, value)?;
+                        map.push((key, coerced_value));
                     }
                     _ => (),
                 }
@@ -191,27 +195,51 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
     }
 }
 
+fn coerce_json_virtual_field_to_pv(key: &str, value: serde_json::Value) -> crate::Result<PrismaValue> {
+    match value {
+        serde_json::Value::Object(obj) => {
+            let values: crate::Result<Vec<_>> = obj
+                .into_iter()
+                .map(|(key, value)| coerce_json_virtual_field_to_pv(&key, value).map(|value| (key, value)))
+                .collect();
+            Ok(PrismaValue::Object(values?))
+        }
+
+        serde_json::Value::Number(num) => num
+            .as_i64()
+            .ok_or_else(|| {
+                build_generic_conversion_error(format!(
+                    "Unexpected numeric value {num} for virtual field '{key}': only integers are supported"
+                ))
+            })
+            .map(PrismaValue::Int),
+
+        _ => Err(build_generic_conversion_error(format!(
+            "Field '{key}' is not a model field and doesn't have a supported type for a virtual field"
+        ))),
+    }
+}
+
 fn build_conversion_error(sf: &ScalarField, from: &str, to: &str) -> SqlError {
     let container_name = sf.container().name();
     let field_name = sf.name();
 
-    let error = io::Error::new(
-        io::ErrorKind::InvalidData,
-        format!("Unexpected conversion failure for field {container_name}.{field_name} from {from} to {to}."),
-    );
-
-    SqlError::ConversionError(error.into())
+    build_generic_conversion_error(format!(
+        "Unexpected conversion failure for field {container_name}.{field_name} from {from} to {to}."
+    ))
 }
 
 fn build_conversion_error_with_reason(sf: &ScalarField, from: &str, to: &str, reason: &str) -> SqlError {
     let container_name = sf.container().name();
     let field_name = sf.name();
 
-    let error = io::Error::new(
-        io::ErrorKind::InvalidData,
-        format!("Unexpected conversion failure for field {container_name}.{field_name} from {from} to {to}. Reason: ${reason}"),
-    );
+    build_generic_conversion_error(format!(
+        "Unexpected conversion failure for field {container_name}.{field_name} from {from} to {to}. Reason: ${reason}"
+    ))
+}
 
+fn build_generic_conversion_error(message: String) -> SqlError {
+    let error = io::Error::new(io::ErrorKind::InvalidData, message);
     SqlError::ConversionError(error.into())
 }
 
