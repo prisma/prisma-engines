@@ -77,85 +77,13 @@ impl QueryEngine {
     /// Connect to the database, allow queries to be run.
     #[wasm_bindgen]
     pub async fn connect(&self, trace: String) -> Result<(), wasm_bindgen::JsError> {
-        let dispatcher = self.logger.dispatcher();
-
-        async {
-            let span = tracing::info_span!("prisma:engine:connect");
-            let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
-
-            let mut inner = self.inner.write().await;
-            let builder = inner.as_builder()?;
-
-            let preview_features = builder.schema.configuration.preview_features();
-            let arced_schema = Arc::clone(&builder.schema);
-
-            let engine = async move {
-                let executor = load_executor(
-                    ConnectorKind::Js {
-                        adapter: Arc::clone(&self.adapter),
-                        _phantom: PhantomData,
-                    },
-                    preview_features,
-                )
-                .await?;
-                let connector = executor.primary_connector();
-
-                let conn_span = tracing::info_span!(
-                    "prisma:engine:connection",
-                    user_facing = true,
-                    "db.type" = connector.name(),
-                );
-
-                connector.get_connection().instrument(conn_span).await?;
-
-                let query_schema_span = tracing::info_span!("prisma:engine:schema");
-                let query_schema = query_schema_span.in_scope(|| schema::build(arced_schema, true));
-
-                Ok(ConnectedEngine {
-                    schema: builder.schema.clone(),
-                    query_schema: Arc::new(query_schema),
-                    executor,
-                    engine_protocol: builder.engine_protocol,
-                }) as crate::Result<ConnectedEngine>
-            }
-            .instrument(span)
-            .await?;
-
-            *inner = Inner::Connected(engine);
-
-            Ok(())
-        }
-        .with_subscriber(dispatcher)
-        .await
+        todo!();
     }
 
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
     #[wasm_bindgen]
     pub async fn disconnect(&self, trace: String) -> Result<(), wasm_bindgen::JsError> {
-        let dispatcher = self.logger.dispatcher();
-
-        async {
-            let span = tracing::info_span!("prisma:engine:disconnect");
-            let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
-
-            async {
-                let mut inner = self.inner.write().await;
-                let engine = inner.as_engine()?;
-
-                let builder = EngineBuilder {
-                    schema: engine.schema.clone(),
-                    engine_protocol: engine.engine_protocol(),
-                };
-
-                *inner = Inner::Builder(builder);
-
-                Ok(())
-            }
-            .instrument(span)
-            .await
-        }
-        .with_subscriber(dispatcher)
-        .await
+        todo!();
     }
 
     /// If connected, sends a query to the core and returns the response.
@@ -166,100 +94,29 @@ impl QueryEngine {
         trace: String,
         tx_id: Option<String>,
     ) -> Result<String, wasm_bindgen::JsError> {
-        let dispatcher = self.logger.dispatcher();
-
-        async {
-            let inner = self.inner.read().await;
-            let engine = inner.as_engine()?;
-
-            let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
-
-            async move {
-                let span = if tx_id.is_none() {
-                    tracing::info_span!("prisma:engine", user_facing = true)
-                } else {
-                    Span::none()
-                };
-
-                let trace_id = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
-
-                let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
-                let response = handler
-                    .handle(query, tx_id.map(TxId::from), trace_id)
-                    .instrument(span)
-                    .await;
-
-                Ok(serde_json::to_string(&response)?)
-            }
-            .await
-        }
-        .with_subscriber(dispatcher)
-        .await
+        todo!();
     }
 
     /// If connected, attempts to start a transaction in the core and returns its ID.
     #[wasm_bindgen(js_name = startTransaction)]
     pub async fn start_transaction(&self, input: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
-        let inner = self.inner.read().await;
-        let engine = inner.as_engine()?;
-        let dispatcher = self.logger.dispatcher();
-
-        async move {
-            let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
-
-            let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
-            match engine
-                .executor()
-                .start_tx(engine.query_schema().clone(), engine.engine_protocol(), tx_opts)
-                .instrument(span)
-                .await
-            {
-                Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
-                Err(err) => Ok(map_known_error(err)?),
-            }
-        }
-        .with_subscriber(dispatcher)
-        .await
+        todo!();
     }
 
     /// If connected, attempts to commit a transaction with id `tx_id` in the core.
     #[wasm_bindgen(js_name = commitTransaction)]
     pub async fn commit_transaction(&self, tx_id: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
-        let inner = self.inner.read().await;
-        let engine = inner.as_engine()?;
-
-        let dispatcher = self.logger.dispatcher();
-
-        async move {
-            match engine.executor().commit_tx(TxId::from(tx_id)).await {
-                Ok(_) => Ok("{}".to_string()),
-                Err(err) => Ok(map_known_error(err)?),
-            }
-        }
-        .with_subscriber(dispatcher)
-        .await
+        todo!();
     }
 
     /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
     #[wasm_bindgen(js_name = rollbackTransaction)]
     pub async fn rollback_transaction(&self, tx_id: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
-        let inner = self.inner.read().await;
-        let engine = inner.as_engine()?;
-
-        let dispatcher = self.logger.dispatcher();
-
-        async move {
-            match engine.executor().rollback_tx(TxId::from(tx_id)).await {
-                Ok(_) => Ok("{}".to_string()),
-                Err(err) => Ok(map_known_error(err)?),
-            }
-        }
-        .with_subscriber(dispatcher)
-        .await
+        todo!();
     }
 
     #[wasm_bindgen]
     pub async fn metrics(&self, json_options: String) -> Result<(), wasm_bindgen::JsError> {
-        Err(ApiError::configuration("Metrics is not enabled in Wasm.").into())
+        todo!();
     }
 }
