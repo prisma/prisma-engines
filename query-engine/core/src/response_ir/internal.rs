@@ -499,7 +499,7 @@ fn serialize_virtuals_group(obj_value: PrismaValue, virtuals: &[&VirtualSelectio
     let mut db_object: HashMap<String, PrismaValue> = HashMap::from_iter(obj_value.into_object().unwrap());
     let mut out_object = Map::new();
 
-    // We have to re-collect the object according to selection even if the query
+    // We have to reorder the object fields according to selection even if the query
     // builder respects the initial order because JSONB does not preserve order.
     for vs in virtuals {
         let (group_name, nested_name) = vs.serialized_name();
