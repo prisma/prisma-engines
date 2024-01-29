@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/f182b1vlxsfiaqd016xm56vz11ln6r1k-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/versions-6.1.0/src/parsers.rs`."><title>parsers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="versions" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<a href="#2" id="2">2</a>
+<a href="#3" id="3">3</a>
+<a href="#4" id="4">4</a>
+<a href="#5" id="5">5</a>
+<a href="#6" id="6">6</a>
+<a href="#7" id="7">7</a>
+<a href="#8" id="8">8</a>
+<a href="#9" id="9">9</a>
+<a href="#10" id="10">10</a>
+<a href="#11" id="11">11</a>
+<a href="#12" id="12">12</a>
+<a href="#13" id="13">13</a>
+<a href="#14" id="14">14</a>
+<a href="#15" id="15">15</a>
+<a href="#16" id="16">16</a>
+<a href="#17" id="17">17</a>
+<a href="#18" id="18">18</a>
+<a href="#19" id="19">19</a>
+<a href="#20" id="20">20</a>
+<a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
+<a href="#40" id="40">40</a>
+<a href="#41" id="41">41</a>
+<a href="#42" id="42">42</a>
+<a href="#43" id="43">43</a>
+<a href="#44" id="44">44</a>
+<a href="#45" id="45">45</a>
+<a href="#46" id="46">46</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! Reusable parsers for the `versions` library.
+
+</span><span class="kw">use </span>nom::branch::alt;
+<span class="kw">use </span>nom::bytes::complete::{tag, take_while1};
+<span class="kw">use </span>nom::character::complete::{char, digit1};
+<span class="kw">use </span>nom::combinator::{map, map_res};
+<span class="kw">use </span>nom::IResult;
+
+<span class="doccomment">/// Parse an unsigned integer.
+///
+/// Should yield either a zero on its own, or some other multi-digit number.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>unsigned(i: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, u32&gt; {
+    map_res(alt((tag(<span class="string">&quot;0&quot;</span>), digit1)), |s: <span class="kw-2">&amp;</span>str| s.parse::&lt;u32&gt;())(i)
+}
+
+<span class="attr">#[test]
+</span><span class="kw">fn </span>unsigned_test() {
+    <span class="macro">assert!</span>(unsigned(<span class="string">&quot;0&quot;</span>).is_ok());
+    <span class="macro">assert!</span>(unsigned(<span class="string">&quot;123&quot;</span>).is_ok());
+
+    <span class="kw">match </span>unsigned(<span class="string">&quot;06&quot;</span>) {
+        <span class="prelude-val">Ok</span>((<span class="string">&quot;6&quot;</span>, <span class="number">0</span>)) =&gt; {}
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Parsed 06, but gave wrong output&quot;</span>),
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Couldn&#39;t parse 06&quot;</span>),
+    }
+}
+
+<span class="doccomment">/// Some alphanumeric combination, possibly punctuated by `-` characters.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>hyphenated_alphanums(i: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str&gt; {
+    take_while1(|c: char| c.is_ascii_alphanumeric() || c == <span class="string">&#39;-&#39;</span>)(i)
+}
+
+<span class="doccomment">/// Some alphanumeric combination.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>alphanums(i: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str&gt; {
+    take_while1(|c: char| c.is_ascii_alphanumeric())(i)
+}
+
+<span class="doccomment">/// Parse metadata. As of SemVer 2.0, this can contain alphanumeric characters
+/// as well as hyphens.
+</span><span class="kw">pub fn </span>meta(i: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, String&gt; {
+    <span class="kw">let </span>(i, <span class="kw">_</span>) = char(<span class="string">&#39;+&#39;</span>)(i)<span class="question-mark">?</span>;
+    map(
+        take_while1(|c: char| c.is_ascii_alphanumeric() || c == <span class="string">&#39;-&#39; </span>|| c == <span class="string">&#39;.&#39;</span>),
+        |s: <span class="kw-2">&amp;</span>str| s.to_owned(),
+    )(i)
+}
+</code></pre></div></section></main></body></html>

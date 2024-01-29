@@ -378,6 +378,7 @@ var srcIndex = JSON.parse('{\
 "utf8parse":["",[],["lib.rs","types.rs"]],\
 "uuid":["",[["external",[],["serde_support.rs"]]],["builder.rs","error.rs","external.rs","fmt.rs","lib.rs","macros.rs","parser.rs","rng.rs","timestamp.rs","v4.rs"]],\
 "vec_map":["",[],["lib.rs"]],\
+"versions":["",[],["lib.rs","parsers.rs"]],\
 "void":["",[],["lib.rs"]],\
 "vte":["",[],["definitions.rs","lib.rs","params.rs","table.rs"]],\
 "vte_generate_state_changes":["",[],["lib.rs"]],\

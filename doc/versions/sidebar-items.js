@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Chunk","Error","MChunk","Op","Sep","Versioning"],"struct":["Chunks","Mess","Release","Requirement","SemVer","Version"]};

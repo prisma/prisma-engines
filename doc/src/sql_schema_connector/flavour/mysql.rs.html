@@ -591,6 +591,15 @@
 <a href="#591" id="591">591</a>
 <a href="#592" id="592">592</a>
 <a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>connection;
 <span class="kw">mod </span>shadow_db;
 
@@ -608,6 +617,7 @@
 <span class="kw">use </span>sql_schema_describer::SqlSchema;
 <span class="kw">use </span>std::future;
 <span class="kw">use </span>url::Url;
+<span class="kw">use </span>versions::Versioning;
 
 <span class="kw">const </span>ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(<span class="number">10</span>);
 <span class="kw">static </span>QUALIFIED_NAME_RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">r&quot;`[^ ]+`\.`[^ ]+`&quot;</span>).unwrap());
@@ -1023,6 +1033,7 @@
     IsMysql57,
     IsMariadb,
     IsVitess,
+    CheckConstraints,
 }
 
 <span class="kw">fn </span>check_datamodel_for_mysql_5_6(datamodel: <span class="kw-2">&amp;</span>ValidatedSchema, errors: <span class="kw-2">&amp;mut </span>Vec&lt;String&gt;) {
@@ -1126,6 +1137,9 @@
                         <span class="kw">let </span><span class="kw-2">mut </span>circumstances = BitFlags::&lt;Circumstances&gt;::default();
 
                         <span class="kw">if let </span><span class="prelude-val">Some</span>((version, global_version)) = versions {
+                            <span class="kw">let </span>semver = Versioning::new(<span class="kw-2">&amp;</span>global_version).unwrap_or_default();
+                            <span class="kw">let </span>min_check_constraints_semver = Versioning::new(<span class="string">&quot;8.0.16&quot;</span>).unwrap();
+
                             <span class="kw">if </span>version.contains(<span class="string">&quot;vitess&quot;</span>) || version.contains(<span class="string">&quot;Vitess&quot;</span>) {
                                 circumstances |= Circumstances::IsVitess;
                             }
@@ -1140,6 +1154,10 @@
 
                             <span class="kw">if </span>global_version.contains(<span class="string">&quot;MariaDB&quot;</span>) {
                                 circumstances |= Circumstances::IsMariadb;
+                            }
+
+                            <span class="kw">if </span>semver &gt;= min_check_constraints_semver {
+                                circumstances |= Circumstances::CheckConstraints;
                             }
                         }
 
