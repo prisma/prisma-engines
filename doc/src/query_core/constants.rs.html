@@ -24,6 +24,7 @@
 <a href="#24" id="24">24</a>
 <a href="#25" id="25">25</a>
 <a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>custom_types {
     <span class="kw">use </span>query_structure::PrismaValue;
 
@@ -37,6 +38,7 @@
     <span class="kw">pub const </span>JSON: <span class="kw-2">&amp;</span>str = <span class="string">&quot;Json&quot;</span>;
     <span class="kw">pub const </span>ENUM: <span class="kw-2">&amp;</span>str = <span class="string">&quot;Enum&quot;</span>;
     <span class="kw">pub const </span>FIELD_REF: <span class="kw-2">&amp;</span>str = <span class="string">&quot;FieldRef&quot;</span>;
+    <span class="kw">pub const </span>RAW: <span class="kw-2">&amp;</span>str = <span class="string">&quot;Raw&quot;</span>;
 
     <span class="kw">pub fn </span>make_object(typ: <span class="kw-2">&amp;</span>str, value: PrismaValue) -&gt; PrismaValue {
         PrismaValue::Object(<span class="macro">vec!</span>[make_type_pair(typ), make_value_pair(value)])

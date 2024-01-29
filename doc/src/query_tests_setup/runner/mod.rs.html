@@ -490,6 +490,7 @@
 <a href="#490" id="490">490</a>
 <a href="#491" id="491">491</a>
 <a href="#492" id="492">492</a>
+<a href="#493" id="493">493</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>json_adapter;
 
 <span class="kw">pub use </span>json_adapter::<span class="kw-2">*</span>;
@@ -720,13 +721,14 @@
         <span class="macro">tracing::debug!</span>(<span class="string">&quot;Querying: {}&quot;</span>, query.clone().green());
 
         <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, query.bright_green());
+        <span class="kw">let </span>query: serde_json::Value = serde_json::from_str(<span class="kw-2">&amp;</span>query).unwrap();
 
         <span class="kw">let </span>executor = <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.executor {
             RunnerExecutor::Builtin(e) =&gt; e,
-            RunnerExecutor::External(<span class="kw">_</span>) =&gt; {
+            RunnerExecutor::External(schema_id) =&gt; {
                 <span class="kw">let </span>response_str: String = executor_process_request(
                     <span class="string">&quot;query&quot;</span>,
-                    <span class="macro">json!</span>({ <span class="string">&quot;query&quot;</span>: query, <span class="string">&quot;txId&quot;</span>: <span class="self">self</span>.current_tx_id.as_ref().map(ToString::to_string) }),
+                    <span class="macro">json!</span>({ <span class="string">&quot;query&quot;</span>: query, <span class="string">&quot;schemaId&quot;</span>: schema_id, <span class="string">&quot;txId&quot;</span>: <span class="self">self</span>.current_tx_id.as_ref().map(ToString::to_string) }),
                 )
                 .<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="kw">let </span>response: QueryResult = serde_json::from_str(<span class="kw-2">&amp;</span>response_str).unwrap();
@@ -736,7 +738,7 @@
 
         <span class="kw">let </span>handler = RequestHandler::new(<span class="kw-2">&amp;**</span>executor, <span class="kw-2">&amp;</span><span class="self">self</span>.query_schema, EngineProtocol::Json);
 
-        <span class="kw">let </span>serialized_query: JsonSingleQuery = serde_json::from_str(<span class="kw-2">&amp;</span>query).unwrap();
+        <span class="kw">let </span>serialized_query: JsonSingleQuery = serde_json::from_value(query).unwrap();
         <span class="kw">let </span>request_body = RequestBody::Json(JsonBody::Single(serialized_query));
 
         <span class="kw">let </span>result: QueryResult = handler

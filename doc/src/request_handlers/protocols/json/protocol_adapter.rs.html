@@ -1871,6 +1871,11 @@
 <a href="#1871" id="1871">1871</a>
 <a href="#1872" id="1872">1872</a>
 <a href="#1873" id="1873">1873</a>
+<a href="#1874" id="1874">1874</a>
+<a href="#1875" id="1875">1875</a>
+<a href="#1876" id="1876">1876</a>
+<a href="#1877" id="1877">1877</a>
+<a href="#1878" id="1878">1878</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{FieldQuery, HandlerError, JsonSingleQuery, SelectionSet};
 <span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive};
 <span class="kw">use </span>indexmap::IndexMap;
@@ -2071,6 +2076,11 @@
                     BigDecimal::from_str(value)
                         .map(ArgumentValue::float)
                         .map_err(|<span class="kw">_</span>| build_err())
+                }
+
+                <span class="prelude-val">Some</span>(custom_types::RAW) =&gt; {
+                    <span class="kw">let </span>value = obj.get(custom_types::VALUE).ok_or_else(build_err)<span class="question-mark">?</span>;
+                    <span class="prelude-val">Ok</span>(ArgumentValue::raw(value.clone()))
                 }
                 <span class="prelude-val">Some</span>(custom_types::BYTES) =&gt; {
                     <span class="kw">let </span>value = obj

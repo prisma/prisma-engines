@@ -503,7 +503,7 @@
                     <span class="prelude-val">None </span>=&gt; InferredType::Unknown,
                 }
             }
-            ArgumentValue::FieldRef(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
+            ArgumentValue::FieldRef(<span class="kw">_</span>) | ArgumentValue::Raw(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 

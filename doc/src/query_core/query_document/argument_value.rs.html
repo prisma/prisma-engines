@@ -94,6 +94,12 @@
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>bigdecimal::BigDecimal;
 <span class="kw">use </span>chrono::{DateTime, FixedOffset};
 <span class="kw">use </span>indexmap::IndexMap;
@@ -110,6 +116,7 @@
     Scalar(PrismaValue),
     Object(ArgumentValueObject),
     List(Vec&lt;ArgumentValue&gt;),
+    Raw(serde_json::Value),
     FieldRef(ArgumentValueObject),
 }
 
@@ -142,6 +149,10 @@
         <span class="self">Self</span>::Scalar(PrismaValue::Json(str))
     }
 
+    <span class="kw">pub fn </span>raw(value: serde_json::Value) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Raw(value)
+    }
+
     <span class="kw">pub fn </span>bytes(bytes: Vec&lt;u8&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::Scalar(PrismaValue::Bytes(bytes))
     }
@@ -172,6 +183,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>should_be_parsed_as_json(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">match </span><span class="self">self </span>{
             ArgumentValue::Object(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            ArgumentValue::Raw(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
             ArgumentValue::List(l) =&gt; l.iter().all(|v| v.should_be_parsed_as_json()),
             ArgumentValue::Scalar(pv) =&gt; !<span class="macro">matches!</span>(pv, PrismaValue::Enum(<span class="kw">_</span>) | PrismaValue::Json(<span class="kw">_</span>)),
             ArgumentValue::FieldRef(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,

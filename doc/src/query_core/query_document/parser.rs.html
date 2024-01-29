@@ -951,6 +951,7 @@
 <a href="#951" id="951">951</a>
 <a href="#952" id="952">952</a>
 <a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{executor::get_engine_protocol, schema::<span class="kw-2">*</span>};
 <span class="kw">use </span>bigdecimal::{BigDecimal, ToPrimitive};
@@ -1824,6 +1825,7 @@
                 <span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, itertools::join(v.iter().map(argument_value_to_type_name), <span class="string">&quot;, &quot;</span>))
             }
             ArgumentValue::FieldRef(<span class="kw">_</span>) =&gt; <span class="string">&quot;FieldRef&quot;</span>.to_string(),
+            ArgumentValue::Raw(<span class="kw">_</span>) =&gt; <span class="string">&quot;JSON&quot;</span>.to_string(),
         }
     }
 
