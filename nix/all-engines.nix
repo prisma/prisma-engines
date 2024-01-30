@@ -118,7 +118,7 @@ in
   packages.build-engine-wasm = pkgs.writeShellApplication { 
     name = "build-engine-wasm";
       runtimeInputs = with pkgs; [ git rustup wasm-pack wasm-bindgen-cli binaryen];
-      text = ''      
+      text = ''            
       cd query-engine/query-engine-wasm        
       WASM_BUILD_PROFILE=release bash ./build.sh
       '';
@@ -130,7 +130,7 @@ in
       inherit src;
 
       buildPhase = ''
-      # export OUT_FOLDER=$(mktemp -dt wasm-engine-output)
+      export HOME=$(mktemp -dt wasm-engine-home)
       ${self'.packages.build-engine-wasm}/bin/build-engine-wasm
       gzip -ckn ./query-engine/query-engine-wasm/pkg/query_engine_bg.wasm > query_engine_bg.wasm.gz
       '';
