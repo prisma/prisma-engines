@@ -38,6 +38,7 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
     match value {
         // Some versions of MySQL return null when offsetting by more than the number of rows available.
         serde_json::Value::Null if rs.field.is_list() => Ok(PrismaValue::List(vec![])),
+        serde_json::Value::Null if rs.field.is_optional() => Ok(PrismaValue::Null),
         // one-to-many
         serde_json::Value::Array(values) if rs.field.is_list() => {
             let iter = values.into_iter().filter_map(|value| {
@@ -238,5 +239,6 @@ fn build_conversion_error_with_reason(sf: &ScalarField, from: &str, to: &str, re
 }
 
 fn parse_decimal(str: &str) -> std::result::Result<BigDecimal, ParseBigDecimalError> {
+    let t = "t";
     BigDecimal::from_str(str).map(|bd| bd.normalized())
 }

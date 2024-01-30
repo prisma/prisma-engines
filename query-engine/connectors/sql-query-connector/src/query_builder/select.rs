@@ -34,18 +34,24 @@ impl SelectBuilder {
     ) -> Select<'static> {
         let table_alias = self.next_alias();
         let table = args.model().as_table(ctx).alias(table_alias.to_table_string());
+        let is_mysql = is_mysql(&args);
 
         // SELECT ... FROM Table "t1"
         let select = Select::from_table(table)
-            .with_selection(selected_fields, table_alias, ctx)
             .with_ordering(&args, Some(table_alias.to_table_string()), ctx)
             .with_pagination(args.take_abs(), args.skip)
             .with_filters(args.filter, Some(table_alias), ctx)
             .append_trace(&Span::current())
             .add_trace_id(ctx.trace_id);
 
+        let select = self.with_selection(select, selected_fields, table_alias, ctx);
+
         // Adds joins for relations
-        self.with_related_queries(select, selected_fields.relations(), table_alias, ctx)
+        if !is_mysql {
+            self.with_related_queries(select, selected_fields.relations(), table_alias, ctx)
+        } else {
+            select
+        }
     }
 
     fn with_related_queries<'a, 'b>(
@@ -65,22 +71,72 @@ impl SelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        if rs.field.relation().is_many_to_many() {
-            // m2m relations need to left join on the relation table first
-            let m2m_join = self.build_m2m_join(rs, parent_alias, ctx);
+        match is_mysql(&rs.args) {
+            true => {
+                if rs.field.relation().is_many_to_many() {
+                    let m2m_select = self.build_m2m_join_mysql(rs, parent_alias, ctx);
 
-            select.left_join(m2m_join)
-        } else {
-            let join_table_alias = join_alias_name(&rs.field);
-            let join_table =
-                Table::from(self.build_related_query_select(rs, parent_alias, ctx)).alias(join_table_alias);
+                    select.value(Expression::from(m2m_select).alias(rs.field.name().to_owned()))
+                } else {
+                    let join_table = Expression::from(self.build_related_query_select(rs, parent_alias, ctx))
+                        .alias(rs.field.name().to_owned());
 
-            // LEFT JOIN LATERAL ( <join_table> ) AS <relation name> ON TRUE
-            select.left_join(join_table.on(ConditionTree::single(true.raw())).lateral())
+                    // correlated subquery
+                    select.value(join_table)
+                }
+            }
+            false => {
+                if rs.field.relation().is_many_to_many() {
+                    // m2m relations need to left join on the relation table first
+                    let m2m_join = self.build_m2m_join(rs, parent_alias, ctx);
+
+                    select.left_join(m2m_join)
+                } else {
+                    let join_table_alias = join_alias_name(&rs.field);
+                    let join_table =
+                        Table::from(self.build_related_query_select(rs, parent_alias, ctx)).alias(join_table_alias);
+
+                    // LEFT JOIN LATERAL ( <join_table> ) AS <relation name> ON TRUE
+                    select.left_join(join_table.on(ConditionTree::single(true.raw())).lateral())
+                }
+            }
         }
     }
 
     fn build_related_query_select(
+        &mut self,
+        rs: &RelationSelection,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'static> {
+        match rs.field.is_list() {
+            true => self.build_related_query_select_2many(rs, parent_alias, ctx),
+            false => self.build_related_query_select_one2one(rs, parent_alias, ctx),
+        }
+    }
+
+    fn build_related_query_select_one2one(
+        &mut self,
+        rs: &RelationSelection,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'static> {
+        let rf = &rs.field;
+        let child_table_alias = self.next_alias();
+
+        Select::from_table(
+            rs.field
+                .related_field()
+                .as_table(ctx)
+                .alias(child_table_alias.to_table_string()),
+        )
+        .with_join_conditions(rf, parent_alias, child_table_alias, ctx)
+        .with_filters(rs.args.filter.clone(), Some(child_table_alias), ctx)
+        .value(self.build_json_obj_fn(rs, ctx, child_table_alias))
+        .limit(1)
+    }
+
+    fn build_related_query_select_2many(
         &mut self,
         rs: &RelationSelection,
         parent_alias: Alias,
@@ -103,7 +159,7 @@ impl SelectBuilder {
 
         // SELECT JSON_BUILD_OBJECT() FROM ( <root> )
         let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()))
-            .value(build_json_obj_fn(rs, ctx, root_alias).alias(JSON_AGG_IDENT));
+            .value(self.build_json_obj_fn(rs, ctx, root_alias).alias(JSON_AGG_IDENT));
 
         // LEFT JOIN LATERAL () AS <inner_alias> ON TRUE
         let inner = self.with_related_queries(inner, rs.relations(), root_alias, ctx);
@@ -134,7 +190,7 @@ impl SelectBuilder {
 
             let inner = inner.with_columns(inner_selection.into()).comment("inner select");
 
-            let take = match is_mysql(rs) {
+            let take = match is_mysql(&rs.args) {
                 // On MySQL, using LIMIT makes the ordering of the JSON_AGG working. Beware, this is undocumented behavior.
                 true => rs.args.take_abs().or(Some(i64::MAX)),
                 false => rs.args.take_abs(),
@@ -188,11 +244,6 @@ impl SelectBuilder {
             .lateral();
 
         let child_table = rf.as_table(ctx).alias(m2m_table_alias.to_table_string());
-        let take = match is_mysql(rs) {
-            // On MySQL, using LIMIT makes the ordering of the JSON_AGG working. Beware, this is undocumented behavior.
-            true => rs.args.take_abs().or(Some(i64::MAX)),
-            false => rs.args.take_abs(),
-        };
 
         let inner = Select::from_table(child_table)
             .value(Column::from((m2m_join_alias.to_table_string(), JSON_AGG_IDENT)))
@@ -200,7 +251,7 @@ impl SelectBuilder {
             .and_where(join_conditions) // adds join condition to the child table
             .with_ordering(&rs.args, Some(m2m_join_alias.to_table_string()), ctx) // adds ordering stmts
             .with_filters(rs.args.filter.clone(), Some(m2m_join_alias), ctx) // adds query filters // TODO: avoid clone filter
-            .with_pagination(take, rs.args.skip)
+            .with_pagination(rs.args.take_abs(), rs.args.skip)
             .comment("inner"); // adds pagination
 
         let outer = Select::from_table(Table::from(inner).alias(outer_alias.to_table_string()))
@@ -211,6 +262,150 @@ impl SelectBuilder {
             .alias(m2m_join_alias_name(&rf))
             .on(ConditionTree::single(true.raw()))
             .lateral()
+    }
+
+    fn build_m2m_join_mysql<'a>(
+        &mut self,
+        rs: &RelationSelection,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a> {
+        let rf = rs.field.clone();
+        let m2m_table_alias = self.next_alias();
+        let m2m_join_alias = self.next_alias();
+        let root_alias = self.next_alias();
+        let outer_alias = self.next_alias();
+
+        let m2m_table_to_child_conditions = {
+            let left_columns = rf.m2m_columns(ctx);
+            let right_columns = ModelProjection::from(rf.related_model().primary_identifier()).as_columns(ctx);
+
+            left_columns
+                .into_iter()
+                .zip(right_columns)
+                .fold(None::<ConditionTree>, |acc, (a, b)| {
+                    let a = a.table(m2m_table_alias.to_table_string());
+                    // let b = b.table(m2m_join_alias.to_table_string());
+                    let condition = a.equals(b);
+
+                    match acc {
+                        Some(acc) => Some(acc.and(condition)),
+                        None => Some(condition.into()),
+                    }
+                })
+                .unwrap()
+        };
+        let parent_to_m2m_table_conditions = {
+            let left_columns = rf.related_field().m2m_columns(ctx);
+            let right_columns = ModelProjection::from(rf.model().primary_identifier()).as_columns(ctx);
+
+            left_columns
+                .into_iter()
+                .zip(right_columns)
+                .fold(None::<ConditionTree>, |acc, (a, b)| {
+                    let a = a.table(m2m_table_alias.to_table_string());
+                    let b = b.table(parent_alias.to_table_string());
+                    let condition = a.equals(b);
+
+                    match acc {
+                        Some(acc) => Some(acc.and(condition)),
+                        None => Some(condition.into()),
+                    }
+                })
+                .unwrap()
+        };
+
+        let m2m_join_data = rf.related_model().as_table(ctx).on(m2m_table_to_child_conditions);
+
+        let m2m_table = rf.as_table(ctx).alias(m2m_table_alias.to_table_string());
+
+        let root = Select::from_table(m2m_table)
+            .inner_join(m2m_join_data)
+            .value(rf.related_model().as_table(ctx).asterisk())
+            .with_ordering(&rs.args, None, ctx) // adds ordering stmts
+            // Keep join conditions _before_ user filters to ensure index is used first
+            .and_where(parent_to_m2m_table_conditions) // adds join condition to the child table
+            .with_filters(rs.args.filter.clone(), None, ctx) // adds query filters
+            .comment("root");
+
+        // On MySQL, using LIMIT makes the ordering of the JSON_AGG working. Beware, this is undocumented behavior.
+        let take = match rs.args.order_by.is_empty() {
+            true => rs.args.take_abs(),
+            false => rs.args.take_abs().or(Some(i64::MAX)),
+        };
+
+        let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()))
+            .value(self.build_json_obj_fn(rs, ctx, root_alias).alias(JSON_AGG_IDENT))
+            .with_pagination(take, rs.args.skip)
+            .comment("inner"); // adds pagination
+
+        Select::from_table(Table::from(inner).alias(outer_alias.to_table_string()))
+            .value(json_agg())
+            .comment("outer")
+    }
+
+    fn build_json_obj_fn(
+        &mut self,
+        rs: &RelationSelection,
+        ctx: &Context<'_>,
+        parent_alias: Alias,
+    ) -> Function<'static> {
+        let build_obj_params = rs
+            .selections
+            .iter()
+            .filter_map(|f| match f {
+                SelectedField::Scalar(sf) => Some((
+                    Cow::from(sf.db_name().to_owned()),
+                    Expression::from(sf.as_column(ctx).table(parent_alias.to_table_string())),
+                )),
+                SelectedField::Relation(rs) if !is_mysql(&rs.args) => {
+                    let table_name = match rs.field.relation().is_many_to_many() {
+                        true => m2m_join_alias_name(&rs.field),
+                        false => join_alias_name(&rs.field),
+                    };
+
+                    Some((
+                        Cow::from(rs.field.name().to_owned()),
+                        Expression::from(Column::from((table_name, JSON_AGG_IDENT))),
+                    ))
+                }
+                SelectedField::Relation(rs) => Some((
+                    Cow::from(rs.field.name().to_owned()),
+                    Expression::from(self.with_related_query(Select::default(), rs, parent_alias, ctx)),
+                )),
+                _ => None,
+            })
+            .collect();
+
+        json_build_object(build_obj_params)
+    }
+
+    fn with_selection<'a>(
+        &mut self,
+        select: Select<'a>,
+        selected_fields: &FieldSelection,
+        table_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a> {
+        selected_fields
+            .selections()
+            .fold(select, |acc, selection| match selection {
+                SelectedField::Scalar(sf) => acc.column(
+                    sf.as_column(ctx)
+                        .table(table_alias.to_table_string())
+                        .set_is_selected(true),
+                ),
+                SelectedField::Relation(rs) if !is_mysql(&rs.args) => {
+                    let table_name = match rs.field.relation().is_many_to_many() {
+                        true => m2m_join_alias_name(&rs.field),
+                        false => join_alias_name(&rs.field),
+                    };
+
+                    acc.value(Column::from((table_name, JSON_AGG_IDENT)).alias(rs.field.name().to_owned()))
+                }
+                SelectedField::Relation(rs) => self.with_related_query(acc, rs, table_alias, ctx),
+                _ => acc,
+            })
     }
 }
 
@@ -225,7 +420,7 @@ trait SelectBuilderExt<'a> {
         child_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a>;
-    fn with_selection(self, selected_fields: &FieldSelection, table_alias: Alias, ctx: &Context<'_>) -> Select<'a>;
+    // fn with_selection(self, selected_fields: &FieldSelection, table_alias: Alias, ctx: &Context<'_>) -> Select<'a>;
     fn with_columns(self, columns: ColumnIterator) -> Select<'a>;
 }
 
@@ -304,57 +499,9 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
         self.and_where(conditions)
     }
 
-    fn with_selection(self, selected_fields: &FieldSelection, table_alias: Alias, ctx: &Context<'_>) -> Select<'a> {
-        selected_fields
-            .selections()
-            .fold(self, |acc, selection| match selection {
-                SelectedField::Scalar(sf) => acc.column(
-                    sf.as_column(ctx)
-                        .table(table_alias.to_table_string())
-                        .set_is_selected(true),
-                ),
-                SelectedField::Relation(rs) => {
-                    let table_name = match rs.field.relation().is_many_to_many() {
-                        true => m2m_join_alias_name(&rs.field),
-                        false => join_alias_name(&rs.field),
-                    };
-
-                    acc.value(Column::from((table_name, JSON_AGG_IDENT)).alias(rs.field.name().to_owned()))
-                }
-                _ => acc,
-            })
-    }
-
     fn with_columns(self, columns: ColumnIterator) -> Select<'a> {
         columns.into_iter().fold(self, |select, col| select.column(col))
     }
-}
-
-fn build_json_obj_fn(rs: &RelationSelection, ctx: &Context<'_>, root_alias: Alias) -> Function<'static> {
-    let build_obj_params = rs
-        .selections
-        .iter()
-        .filter_map(|f| match f {
-            SelectedField::Scalar(sf) => Some((
-                Cow::from(sf.db_name().to_owned()),
-                Expression::from(sf.as_column(ctx).table(root_alias.to_table_string())),
-            )),
-            SelectedField::Relation(rs) => {
-                let table_name = match rs.field.relation().is_many_to_many() {
-                    true => m2m_join_alias_name(&rs.field),
-                    false => join_alias_name(&rs.field),
-                };
-
-                Some((
-                    Cow::from(rs.field.name().to_owned()),
-                    Expression::from(Column::from((table_name, JSON_AGG_IDENT))),
-                ))
-            }
-            _ => None,
-        })
-        .collect();
-
-    json_build_object(build_obj_params)
 }
 
 fn order_by_selection(rs: &RelationSelection) -> FieldSelection {
@@ -416,11 +563,12 @@ fn m2m_join_alias_name(rf: &RelationField) -> String {
 }
 
 fn json_agg() -> Function<'static> {
-    coalesce(vec![
-        json_array_agg(Column::from(JSON_AGG_IDENT)).into(),
-        Expression::from(Value::json(empty_json_array()).raw()),
-    ])
-    .alias(JSON_AGG_IDENT)
+    json_array_agg(Column::from(JSON_AGG_IDENT)).into()
+    // coalesce(vec![
+    //     json_array_agg(Column::from(JSON_AGG_IDENT)).into(),
+    //     Expression::from(Value::json(empty_json_array()).raw()),
+    // ])
+    // .alias(JSON_AGG_IDENT)
 }
 
 #[inline]
@@ -430,6 +578,7 @@ fn empty_json_array() -> serde_json::Value {
 
 // TODO: Hack to get around the fact that we don't have a way to know if we're on mysql or not
 // TODO: Remove this once we have a proper way to know the connector type
-fn is_mysql(rs: &RelationSelection) -> bool {
-    rs.args.model().dm.schema.connector.flavour() == Flavour::Mysql
+fn is_mysql(args: &QueryArguments) -> bool {
+    args.model().dm.schema.connector.flavour() == Flavour::Mysql
+        || args.model().dm.schema.connector.flavour() == Flavour::Sqlite
 }

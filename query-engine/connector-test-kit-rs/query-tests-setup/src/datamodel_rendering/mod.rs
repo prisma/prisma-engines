@@ -91,15 +91,8 @@ fn process_template(template: String, renderer: Box<dyn DatamodelRenderer>) -> S
     })
 }
 
-fn render_preview_features(excluded_features: &[&str], version: &ConnectorVersion) -> String {
+fn render_preview_features(excluded_features: &[&str], _version: &ConnectorVersion) -> String {
     let mut excluded_features: Vec<_> = excluded_features.iter().map(|f| format!(r#""{f}""#)).collect();
-
-    // TODO: Remove this once we are able to have version speficic preview features.
-    if version.is_vitess()
-        || (version.is_mysql() && !matches!(version, ConnectorVersion::MySql(Some(MySqlVersion::V8))))
-    {
-        excluded_features.push(format!(r#""{}""#, PreviewFeature::RelationJoins));
-    }
 
     ALL_PREVIEW_FEATURES
         .active_features()

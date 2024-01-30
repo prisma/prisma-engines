@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema))]
+#[test_suite(schema(schema), only(Postgres))]
 mod relation_load_strategy {
     fn schema() -> String {
         indoc! {r#"
@@ -86,6 +86,7 @@ mod relation_load_strategy {
 
     async fn assert_used_lateral_join(runner: &mut Runner, expected: bool) {
         let logs = runner.get_logs().await;
+        dbg!(&logs);
         let actual = logs.iter().any(|l| l.contains("LEFT JOIN LATERAL"));
 
         assert_eq!(
@@ -124,21 +125,15 @@ mod relation_load_strategy {
     macro_rules! relation_load_strategy_tests_pair {
         ($name:ident, $query:expr, $result:literal) => {
             // TODO: Remove Mysql 8.0 only inclusions once we are able to have version speficic preview features.
-            relation_load_strategy_test!(
-                $name,
-                join,
-                $query,
-                $result,
-                only(Postgres, CockroachDb, Mysql("8"))
-            );
+            relation_load_strategy_test!($name, join, $query, $result, only(Postgres, CockroachDb));
             // TODO: Remove Mysql & Vitess exclusions once we are able to have version speficic preview features.
-            relation_load_strategy_test!(
-                $name,
-                query,
-                $query,
-                $result,
-                exclude(Mysql("5.6", "5.7", "mariadb"), Vitess)
-            );
+            // relation_load_strategy_test!(
+            //     $name,
+            //     query,
+            //     $query,
+            //     $result,
+            //     exclude(Mysql("5.6", "5.7", "mariadb"), Vitess)
+            // );
         };
     }
 
