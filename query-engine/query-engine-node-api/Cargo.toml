@@ -11,7 +11,10 @@ name = "query_engine"
 [features]
 default = ["driver-adapters"]
 vendored-openssl = ["sql-connector/vendored-openssl"]
-driver-adapters = ["request-handlers/driver-adapters", "sql-connector/driver-adapters"]
+driver-adapters = [
+    "request-handlers/driver-adapters",
+    "sql-connector/driver-adapters",
+]
 
 [dependencies]
 anyhow = "1"
@@ -24,12 +27,16 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 psl.workspace = true
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
 query-structure = { path = "../query-structure" }
-driver-adapters = { path = "../driver-adapters" }
+driver-adapters = { path = "../driver-adapters", features = [
+    "postgresql",
+    "sqlite",
+    "mysql",
+] }
 napi.workspace = true
 napi-derive.workspace = true
 
 thiserror = "1"
-connection-string.workspace = true 
+connection-string.workspace = true
 url = "2"
 serde_json.workspace = true
 serde.workspace = true
@@ -38,12 +45,12 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3" }
 tracing-futures = "0.2"
 tracing-opentelemetry = "0.17.3"
-opentelemetry = { version = "0.17"}
+opentelemetry = { version = "0.17" }
 
 quaint.workspace = true
 tokio.workspace = true
 futures = "0.3"
-query-engine-metrics = {path = "../metrics"}
+query-engine-metrics = { path = "../metrics" }
 
 [build-dependencies]
 napi-build = "1"

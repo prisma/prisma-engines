@@ -46,8 +46,12 @@
       ${self'.packages.update-engine-size}/bin/update-engine-size             \
           ${self'.packages.query-engine-bin-and-lib}/bin/query-engine         \
           ${self'.packages.query-engine-bin-and-lib}/lib/libquery_engine.node \
-          ${self'.packages.query-engine-wasm-gz}/query_engine_bg.wasm.gz      \
-          ${self'.packages.query-engine-wasm-gz}/query_engine_bg.wasm
+          ${self'.packages.query-engine-wasm-gz}/postgresql.wasm.gz           \
+          ${self'.packages.query-engine-wasm-gz}/postgresql.wasm              \
+          ${self'.packages.query-engine-wasm-gz}/mysql.wasm.gz                \
+          ${self'.packages.query-engine-wasm-gz}/mysql.wasm                   \
+          ${self'.packages.query-engine-wasm-gz}/sqlite.wasm.gz               \
+          ${self'.packages.query-engine-wasm-gz}/sqlite.wasm
 
       git add "$CSV_PATH"
       git commit --quiet -m "update engines size for $CURRENT_COMMIT_SHORT"

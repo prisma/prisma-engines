@@ -117,7 +117,7 @@ in
 
   packages.build-engine-wasm = pkgs.writeShellApplication { 
     name = "build-engine-wasm";
-      runtimeInputs = with pkgs; [ git rustup wasm-pack wasm-bindgen-cli binaryen jq iconv];
+      runtimeInputs = with pkgs; [ git rustup wasm-bindgen-cli binaryen jq iconv ];
       text = ''            
       cd query-engine/query-engine-wasm        
       WASM_BUILD_PROFILE=release ./build.sh "$1" "$2"
@@ -128,19 +128,26 @@ in
     ({ profile }: stdenv.mkDerivation {
       name = "query-engine-wasm-gz";
       inherit src;
+      buildInputs = with pkgs; [ iconv ];
 
       buildPhase = ''
       export HOME=$(mktemp -dt wasm-engine-home-XXXX)
       
       OUT_FOLDER=$(mktemp -dt wasm-engine-out-XXXX)
       ${self'.packages.build-engine-wasm}/bin/build-engine-wasm "0.0.0" "$OUT_FOLDER" 
-      gzip -ckn "$OUT_FOLDER/query_engine_bg.wasm" > query_engine_bg.wasm.gz
+
+      for provider in "postgresql" "mysql" "sqlite"; do
+        gzip -ckn "$OUT_FOLDER/$provider/query_engine_bg.wasm" > "$provider.wasm.gz"
+      done
       '';
 
       installPhase = ''
+      set +x
       mkdir -p $out
-      cp "$OUT_FOLDER/query_engine_bg.wasm" $out/
-      cp query_engine_bg.wasm.gz $out/
+      for provider in "postgresql" "mysql" "sqlite"; do
+        cp "$OUT_FOLDER/$provider/query_engine_bg.wasm" "$out/$provider.wasm"
+        cp "$provider.wasm.gz" "$out/"
+      done
       '';
     })
     { profile = "release"; };
