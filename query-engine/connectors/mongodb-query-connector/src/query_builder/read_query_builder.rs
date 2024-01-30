@@ -10,14 +10,14 @@ use crate::{
     root_queries::observing,
     vacuum_cursor, BsonTransform, IntoBson,
 };
-use connector_interface::{AggregationSelection, RelAggregationSelection};
+use connector_interface::AggregationSelection;
 use itertools::Itertools;
 use mongodb::{
     bson::{doc, Document},
     options::AggregateOptions,
     ClientSession, Collection,
 };
-use query_structure::{FieldSelection, Filter, Model, QueryArguments, ScalarFieldRef};
+use query_structure::{FieldSelection, Filter, Model, QueryArguments, ScalarFieldRef, VirtualSelection};
 use std::convert::TryFrom;
 
 // Mongo Driver broke usage of the simple API, can't be used by us anymore.
@@ -355,13 +355,13 @@ impl MongoReadQueryBuilder {
     }
 
     /// Adds the necessary joins and the associated selections to the projection
-    pub fn with_aggregation_selections(
+    pub fn with_virtual_fields<'a>(
         mut self,
-        aggregation_selections: &[RelAggregationSelection],
+        virtual_selections: impl Iterator<Item = &'a VirtualSelection>,
     ) -> crate::Result<Self> {
-        for aggr in aggregation_selections {
+        for aggr in virtual_selections {
             let join = match aggr {
-                RelAggregationSelection::Count(rf, filter) => {
+                VirtualSelection::RelationCount(rf, filter) => {
                     let filter = filter
                         .as_ref()
                         .map(|f| MongoFilterVisitor::new(FilterPrefix::default(), false).visit(f.clone()))

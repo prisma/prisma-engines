@@ -24,6 +24,7 @@ impl IntoBson for (&SelectedField, PrismaValue) {
             SelectedField::Scalar(sf) => (sf, value).into_bson(),
             SelectedField::Composite(_) => todo!(), // [Composites] todo
             SelectedField::Relation(_) => unreachable!(),
+            SelectedField::Virtual(_) => unreachable!(),
         }
     }
 }

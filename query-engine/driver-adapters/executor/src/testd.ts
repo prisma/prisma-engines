@@ -21,7 +21,6 @@ import { Client as PlanetscaleClient } from '@planetscale/database'
 import { PrismaPlanetScale } from '@prisma/adapter-planetscale'
 
 
-
 import {bindAdapter, DriverAdapter, ErrorCapturingDriverAdapter} from "@prisma/driver-adapter-utils";
 import { webcrypto } from 'node:crypto';
 
@@ -70,7 +69,7 @@ async function main(): Promise<void> {
                 debug("[nodejs] Error from request handler: ", err)
                 respondErr(request.id, {
                     code: 1,
-                    message: err.toString(),
+                    message: err.stack ?? err.toString(),
                 })
             }
         } catch (err) {
@@ -291,7 +290,6 @@ async function planetscaleAdapter(url: string): Promise<DriverAdapter> {
     if (proxyUrl == '') {
         throw new Error("DRIVER_ADAPTER_CONFIG is not defined or empty, but its required for planetscale adapter.");
     }
-
 
     const client = new PlanetscaleClient({
         // preserving path name so proxy url would look like real DB url

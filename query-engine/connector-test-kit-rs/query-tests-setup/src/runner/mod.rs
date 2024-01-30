@@ -107,6 +107,10 @@ impl Runner {
         self.query_schema.internal_data_model.schema.db.source()
     }
 
+    pub fn max_bind_values(&self) -> Option<usize> {
+        self.connector_version().max_bind_values()
+    }
+
     pub async fn load(
         datamodel: String,
         db_schemas: &[&str],
@@ -224,13 +228,14 @@ impl Runner {
         tracing::debug!("Querying: {}", query.clone().green());
 
         println!("{}", query.bright_green());
+        let query: serde_json::Value = serde_json::from_str(&query).unwrap();
 
         let executor = match &self.executor {
             RunnerExecutor::Builtin(e) => e,
-            RunnerExecutor::External(_) => {
+            RunnerExecutor::External(schema_id) => {
                 let response_str: String = executor_process_request(
                     "query",
-                    json!({ "query": query, "txId": self.current_tx_id.as_ref().map(ToString::to_string) }),
+                    json!({ "query": query, "schemaId": schema_id, "txId": self.current_tx_id.as_ref().map(ToString::to_string) }),
                 )
                 .await?;
                 let response: QueryResult = serde_json::from_str(&response_str).unwrap();
@@ -240,7 +245,7 @@ impl Runner {
 
         let handler = RequestHandler::new(&**executor, &self.query_schema, EngineProtocol::Json);
 
-        let serialized_query: JsonSingleQuery = serde_json::from_str(&query).unwrap();
+        let serialized_query: JsonSingleQuery = serde_json::from_value(query).unwrap();
         let request_body = RequestBody::Json(JsonBody::Single(serialized_query));
 
         let result: QueryResult = handler

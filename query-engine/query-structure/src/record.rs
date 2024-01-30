@@ -49,7 +49,7 @@ impl ManyRecords {
     pub fn empty(selected_fields: &FieldSelection) -> Self {
         Self {
             records: Vec::new(),
-            field_names: selected_fields.prisma_names().collect(),
+            field_names: selected_fields.db_names().collect(),
         }
     }
 
@@ -172,7 +172,7 @@ impl Record {
         let pairs: Vec<_> = extraction_selection
             .selections()
             .map(|selection| {
-                self.get_field_value(field_names, selection.db_name())
+                self.get_field_value(field_names, &selection.db_name())
                     .and_then(|val| Ok((selection.clone(), selection.coerce_value(val.clone())?)))
             })
             .collect::<crate::Result<Vec<_>>>()?;

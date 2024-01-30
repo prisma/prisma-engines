@@ -1,6 +1,4 @@
-#!/bin/bash
-
-
+#!/bin/bash 
 # Call this script as `./build.sh <npm_version>`
 set -euo pipefail
 
@@ -29,7 +27,7 @@ then
 fi
 
 echo "Building query-engine-wasm using $WASM_BUILD_PROFILE profile"
-wasm-pack build "--$WASM_BUILD_PROFILE" --target $OUT_TARGET --out-name query_engine
+CARGO_PROFILE_RELEASE_OPT_LEVEL="z" wasm-pack build "--$WASM_BUILD_PROFILE" --target $OUT_TARGET --out-name query_engine
 
 WASM_OPT_ARGS=(
     "-Os"                                 # execute size-focused optimization passes
