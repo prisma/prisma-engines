@@ -30,10 +30,10 @@ jobs:
       - name: Build and measure PR branch
         id: measure
         run: |
-          nix build -L .#query-engine-wasm .#query-engine-wasm-gz
+          nix build -L .#query-engine-wasm-gz
 
           echo "size=$(wc --bytes < ./result/query_engine_bg.wasm)" >> $GITHUB_OUTPUT
-          echo "size_gz=$(wc --bytes < ./result-1/query_engine_bg.wasm.gz)" >> $GITHUB_OUTPUT
+          echo "size_gz=$(wc --bytes < ./result/query_engine_bg.wasm.gz)" >> $GITHUB_OUTPUT
 
   base-wasm-size:
     name: calculate module size (main)
@@ -52,10 +52,10 @@ jobs:
       - name: Build and measure base branch
         id: measure
         run: |
-          nix build -L .#query-engine-wasm .#query-engine-wasm-gz
+          nix build -L .#query-engine-wasm-gz
 
           echo "size=$(wc --bytes < ./result/query_engine_bg.wasm)" >> $GITHUB_OUTPUT
-          echo "size_gz=$(wc --bytes < ./result-1/query_engine_bg.wasm.gz)" >> $GITHUB_OUTPUT
+          echo "size_gz=$(wc --bytes < ./result/query_engine_bg.wasm.gz)" >> $GITHUB_OUTPUT
 
   report-diff:
     name: report module size

@@ -132,11 +132,12 @@ in
       buildPhase = ''
       # export OUT_FOLDER=$(mktemp -dt wasm-engine-output)
       ${self'.packages.build-engine-wasm}/bin/build-engine-wasm
-      gzip -cn ./query-engine/query-engine-wasm/pkg/query_engine_bg.wasm > query_engine_bg.wasm.gz
+      gzip -ckn ./query-engine/query-engine-wasm/pkg/query_engine_bg.wasm > query_engine_bg.wasm.gz
       '';
 
       installPhase = ''
       mkdir -p $out
+      cp ./query-engine/query-engine-wasm/pkg/query_engine_bg.wasm $out/
       cp query_engine_bg.wasm.gz $out/
       '';
     })
