@@ -25,7 +25,7 @@ in
     inherit src;
 
     buildInputs = [ pkgs.openssl.out ];
-    nativeBuildInputs = with pkgs; [      
+    nativeBuildInputs = with pkgs; [
       rustToolchain
       git # for our build scripts that bake in the git hash
       protobuf # for tonic
@@ -146,16 +146,12 @@ in
     pkgs.writeShellApplication {
       name = "export-query-engine-wasm";
       runtimeInputs = with pkgs; [ jq ];
-      text = ''      
-        echo "$1"
-        echo "$2"
+      text = ''
         OUTDIR="$1"
         OUTVERSION="$2"
         mkdir -p "$OUTDIR"
         ${self'.packages.build-engine-wasm}/bin/build-engine-wasm        
-        chmod -R +rw "$OUTDIR"
-        cat ./query-engine/query-engine-wasm/pkg/package.json
-        echo "$OUTDIR/package.json"
+        chmod -R +rw "$OUTDIR"        
         jq --arg new_version "$OUTVERSION" '.version = $new_version' ./query-engine/query-engine-wasm/pkg/package.json > "$OUTDIR/package.json"
       '';
     };

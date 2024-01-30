@@ -54,7 +54,8 @@ WASM_OPT_ARGS=(
 )
 
 echo "🗜️  Optimizing with wasm-opt with $WASM_BUILD_PROFILE profile..."
-echo "ℹ️  before: $(du -h "${OUT_FOLDER}/query_engine_bg.wasm")"
+echo "ℹ️  before raw: $(du -h "${OUT_FOLDER}/query_engine_bg.wasm")"
+echo "ℹ️  before zip: $(gzip -c "${OUT_FOLDER}/query_engine_bg.wasm" | wc -c) bytes"
 case "$WASM_BUILD_PROFILE" in
     release)
         # In release mode, we want to strip the debug symbols.
@@ -75,7 +76,8 @@ case "$WASM_BUILD_PROFILE" in
         echo "Skipping wasm-opt."
         ;;
 esac
-echo "ℹ️  after: $(du -h "${OUT_FOLDER}/query_engine_bg.wasm")"
+echo "ℹ️  after raw: $(du -h "${OUT_FOLDER}/query_engine_bg.wasm")"
+echo "ℹ️  after zip: $(gzip -c "${OUT_FOLDER}/query_engine_bg.wasm" | wc -c) bytes"
 
 # Convert the `.wasm` file to its human-friendly `.wat` representation for debugging purposes, if `wasm2wat` is installed
 if ! command -v wasm2wat &> /dev/null; then
