@@ -3,10 +3,10 @@
 set -euo pipefail
 
 OUT_VERSION="${1:-}"
-OUT_TARGET="bundler"
 OUT_NPM_NAME="@prisma/query-engine-wasm"
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 OUT_FOLDER="${OUT_FOLDER:-$CURRENT_DIR/pkg}"
+OUT_TARGET="bundler"
 OUT_JSON="${OUT_FOLDER}/package.json"
 
 if [[ -z "${WASM_BUILD_PROFILE:-}" ]]; then
@@ -29,11 +29,11 @@ fi
 echo "ℹ️  Configuring rust toolchain to use nightly and rust-src component"
 rustup default nightly-2024-01-25 
 rustup target add wasm32-unknown-unknown
-rustup component add rust-src rust-std --target wasm32-unknown-unknown
+rustup component add rust-src --target wasm32-unknown-unknown
 
 # export RUSTFLAGS="-Zlocation-detail=none"
 echo "Building query-engine-wasm using $WASM_BUILD_PROFILE profile"
-CARGO_PROFILE_RELEASE_OPT_LEVEL="z" wasm-pack build "--$WASM_BUILD_PROFILE" --target "$OUT_TARGET" --out-name query_engine  . \
+CARGO_PROFILE_RELEASE_OPT_LEVEL="z" wasm-pack build "--$WASM_BUILD_PROFILE" --target "$OUT_TARGET" --out-dir "$OUT_FOLDER" --out-name query_engine . \
 -Zbuild-std=std,panic_abort -Zbuild-std-features=panic_immediate_abort
 
 # wasm-opt pass
