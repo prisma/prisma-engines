@@ -130,8 +130,8 @@ in
       inherit src;
 
       buildPhase = ''
-      export HOME=$(mktemp -dt wasm-engine-home)
-      export OUT_FOLDER=$(mktemp -dt wasm-engine-out)
+      export HOME=$(mktemp -dt wasm-engine-home-XXXX)
+      export OUT_FOLDER=$(mktemp -dt wasm-engine-out-XXXX)
       ${self'.packages.build-engine-wasm}/bin/build-engine-wasm
       gzip -ckn ./query-engine/query-engine-wasm/pkg/query_engine_bg.wasm > query_engine_bg.wasm.gz
       '';
