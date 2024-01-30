@@ -7,7 +7,7 @@ edition = "2021"
 query-structure = { path = "../query-structure" }
 query-core = { path = "../core" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
-quaint = { path = "../../quaint" }
+quaint = { path = "../../quaint", default-features = false }
 psl.workspace = true
 dmmf_crate = { path = "../dmmf", package = "dmmf" }
 itertools.workspace = true

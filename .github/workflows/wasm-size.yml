@@ -1,14 +1,15 @@
 name: "QE: WASM size"
 on:
-  pull_request:
-    paths-ignore:
-      - ".github/**"
-      - "!.github/workflows/wasm-size.yml"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
-      - "renovate.json"
+  workflow_dispatch:
+  # pull_request:
+  #   paths-ignore:
+  #     - ".github/**"
+  #     - "!.github/workflows/wasm-size.yml"
+  #     - ".buildkite/**"
+  #     - "*.md"
+  #     - "LICENSE"
+  #     - "CODEOWNERS"
+  #     - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

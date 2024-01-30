@@ -4,7 +4,11 @@ name = "sql-query-connector"
 version = "0.1.0"
 
 [features]
+default = ["postgresql", "sqlite", "mysql"]
 vendored-openssl = ["quaint/vendored-openssl"]
+postgresql = ["quaint/postgresql"]
+sqlite = ["quaint/sqlite"]
+mysql = ["quaint/mysql"]
 
 # Enable Driver Adapters
 driver-adapters = []
@@ -18,7 +22,7 @@ futures = "0.3"
 itertools.workspace = true
 once_cell = "1.3"
 rand = "0.7"
-serde_json = {version = "1.0", features = ["float_roundtrip"]}
+serde_json = { version = "1.0", features = ["float_roundtrip"] }
 thiserror = "1.0"
 tokio = { version = "1.0", features = ["macros", "time"] }
 tracing = "0.1"
@@ -32,7 +36,7 @@ cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" 
 quaint.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-quaint = { path = "../../../quaint" }
+quaint = { path = "../../../quaint", default-features = false }
 
 [dependencies.connector-interface]
 package = "query-connector"
