@@ -36,6 +36,7 @@ pub(crate) async fn get_single_record_joins(
     let field_names: Vec<_> = selected_fields.db_names_grouping_virtuals().collect();
     let idents = selected_fields.type_identifiers_with_arities_grouping_virtuals();
     let rs_indexes = get_relation_selection_indexes(selected_fields.relations().collect(), &field_names);
+    let vs_indexes = get_virtual_selection_indexes(selected_fields.virtuals().collect(), &field_names);
 
     let query = query_builder::select::SelectBuilder::default().build(
         QueryArguments::from((model.clone(), filter.clone())),
@@ -46,7 +47,7 @@ pub(crate) async fn get_single_record_joins(
     let mut record = execute_find_one(conn, query, &idents, &field_names, ctx).await?;
 
     if let Some(record) = record.as_mut() {
-        coerce_record_with_json_relation(record, rs_indexes)?;
+        coerce_record_with_json_relation(record, &rs_indexes, &vs_indexes)?;
     };
 
     Ok(record.map(|record| SingleRecord { record, field_names }))
@@ -129,6 +130,7 @@ pub(crate) async fn get_many_records_joins(
     let idents = selected_fields.type_identifiers_with_arities_grouping_virtuals();
     let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
     let rs_indexes = get_relation_selection_indexes(selected_fields.relations().collect(), &field_names);
+    let vs_indexes = get_virtual_selection_indexes(selected_fields.virtuals().collect(), &field_names);
 
     let mut records = ManyRecords::new(field_names.clone());
 
@@ -151,7 +153,7 @@ pub(crate) async fn get_many_records_joins(
         let mut record = Record::from(item);
 
         // Coerces json values to prisma values
-        coerce_record_with_json_relation(&mut record, rs_indexes.clone())?;
+        coerce_record_with_json_relation(&mut record, &rs_indexes, &vs_indexes)?;
 
         records.push(record)
     }
@@ -398,15 +400,39 @@ async fn group_by_aggregate(
 /// Find the indexes of the relation records to traverse a set of records faster when coercing JSON values
 fn get_relation_selection_indexes<'a>(
     selections: Vec<&'a RelationSelection>,
-    field_names: &[String],
+    field_names: &'a [String],
 ) -> Vec<(usize, &'a RelationSelection)> {
-    let mut output: Vec<(usize, &RelationSelection)> = Vec::new();
+    get_selection_indexes(selections, field_names, |rs| rs.field.name(), |idx, rs, _| (idx, rs))
+}
 
-    for (idx, field_name) in field_names.iter().enumerate() {
-        if let Some(rs) = selections.iter().find(|rq| rq.field.name() == *field_name) {
-            output.push((idx, rs));
-        }
-    }
+/// Finds the indexes of the virtual selections to traverse a set of records faster when coercing
+/// JSON values.
+fn get_virtual_selection_indexes<'a>(
+    selections: Vec<&'a VirtualSelection>,
+    field_names: &'a [String],
+) -> Vec<(usize, &'a str)> {
+    get_selection_indexes(
+        selections,
+        field_names,
+        |vs| vs.serialized_name().0,
+        |idx, _, name| (idx, name),
+    )
+}
 
-    output
+fn get_selection_indexes<'a, T, R>(
+    selections: Vec<&'a T>,
+    field_names: &'a [String],
+    selection_name: fn(&T) -> &str,
+    map_result: fn(usize, &'a T, &'a str) -> R,
+) -> Vec<R> {
+    field_names
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, field_name)| {
+            selections
+                .iter()
+                .find(|selection| selection_name(selection) == field_name)
+                .map(|selection| map_result(idx, selection, field_name))
+        })
+        .collect()
 }
