@@ -2,6 +2,8 @@
 # Call this script as `./build.sh <npm_version>`
 set -euo pipefail
 
+rustup default stable
+
 OUT_VERSION="${1:-}"
 OUT_NPM_NAME="@prisma/query-engine-wasm"
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
