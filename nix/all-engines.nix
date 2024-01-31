@@ -153,8 +153,9 @@ in
         OUTVERSION="$2"
         mkdir -p "$OUTDIR"
         ${self'.packages.build-engine-wasm}/bin/build-engine-wasm        
-        chmod -R +rw "$OUTDIR"        
-        jq --arg new_version "$OUTVERSION" '.version = $new_version' ./query-engine/query-engine-wasm/pkg/package.json > "$OUTDIR/package.json"
+        chmod -R +rw "$OUTDIR"
+        mv "$OUTDIR/package.json" "$OUTDIR/package.json.bak"         
+        jq --arg new_version "$OUTVERSION" '.version = $new_version' "$OUTDIR/package.json.bak" > "$OUTDIR/package.json"        
       '';
     };
 }
