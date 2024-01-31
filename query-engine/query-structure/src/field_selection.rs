@@ -75,9 +75,24 @@ impl FieldSelection {
     }
 
     /// Returns all database (e.g. column or document field) names of contained fields.
-    /// Does _not_ recurse into composite selections and only iterates level fields.
+    /// Does _not_ recurse into composite selections and only iterates top level fields.
+    /// Returns db aliases for virtual fields grouped into objects in the query separately,
+    /// representing results of queries that do not load relations using JOINs.
     pub fn db_names(&self) -> impl Iterator<Item = String> + '_ {
         self.selections.iter().map(|f| f.db_name().into_owned())
+    }
+
+    /// Returns all database (e.g. column or document field) names of contained fields.
+    /// Does _not_ recurse into composite selections and only iterates top level fields.
+    /// Also does not recurse into the grouped containers for virtual fields, like `_count`,
+    /// representing results of queries that use JSON objects to represent joined relations
+    /// and relation aggregations.
+    pub fn db_names_grouping_virtuals(&self) -> impl Iterator<Item = String> + '_ {
+        self.selections
+            .iter()
+            .map(|f| f.db_name_grouping_virtuals())
+            .unique()
+            .map(Cow::into_owned)
     }
 
     /// Checked if a field of prisma name `name` is present in this `FieldSelection`.
@@ -179,14 +194,23 @@ impl FieldSelection {
         *self = this.merge(other);
     }
 
+    /// Returns type identifiers and arities, treating all virtual fields as separate fields.
     pub fn type_identifiers_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
         self.selections()
-            .filter_map(|selection| match selection {
-                SelectedField::Scalar(sf) => Some(sf.type_identifier_with_arity()),
-                SelectedField::Relation(rf) if rf.field.is_list() => Some((TypeIdentifier::Json, FieldArity::Required)),
-                SelectedField::Relation(rf) => Some((TypeIdentifier::Json, rf.field.arity())),
-                SelectedField::Composite(_) => None,
-                SelectedField::Virtual(vs) => Some(vs.type_identifier_with_arity()),
+            .filter_map(SelectedField::type_identifier_with_arity)
+            .collect()
+    }
+
+    /// Returns type identifiers and arities, grouping the virtual fields so that the type
+    /// identifier and arity is returned for the whole object containing multiple virtual fields
+    /// and not each of those fields separately. This represents the selection in joined queries
+    /// that use JSON objects for relations and relation aggregations.
+    pub fn type_identifiers_with_arities_grouping_virtuals(&self) -> Vec<(TypeIdentifier, FieldArity)> {
+        self.selections()
+            .unique_by(|vs| vs.db_name_grouping_virtuals())
+            .filter_map(|vs| match vs {
+                SelectedField::Virtual(_) => Some((TypeIdentifier::Json, FieldArity::Required)),
+                _ => vs.type_identifier_with_arity(),
             })
             .collect()
     }
@@ -321,6 +345,23 @@ impl SelectedField {
             SelectedField::Composite(cs) => cs.field.db_name().into(),
             SelectedField::Relation(rs) => rs.field.name().into(),
             SelectedField::Virtual(vs) => vs.db_alias().into(),
+        }
+    }
+
+    pub fn db_name_grouping_virtuals(&self) -> Cow<'_, str> {
+        match self {
+            SelectedField::Virtual(vs) => vs.serialized_name().0.into(),
+            _ => self.db_name(),
+        }
+    }
+
+    pub fn type_identifier_with_arity(&self) -> Option<(TypeIdentifier, FieldArity)> {
+        match self {
+            SelectedField::Scalar(sf) => Some(sf.type_identifier_with_arity()),
+            SelectedField::Relation(rf) if rf.field.is_list() => Some((TypeIdentifier::Json, FieldArity::Required)),
+            SelectedField::Relation(rf) => Some((TypeIdentifier::Json, rf.field.arity())),
+            SelectedField::Composite(_) => None,
+            SelectedField::Virtual(vs) => Some(vs.type_identifier_with_arity()),
         }
     }
 

@@ -33,8 +33,8 @@ pub(crate) async fn get_single_record_joins(
     selected_fields: &FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SingleRecord>> {
-    let field_names: Vec<_> = selected_fields.db_names().collect();
-    let idents = selected_fields.type_identifiers_with_arities();
+    let field_names: Vec<_> = selected_fields.db_names_grouping_virtuals().collect();
+    let idents = selected_fields.type_identifiers_with_arities_grouping_virtuals();
     let rs_indexes = get_relation_selection_indexes(selected_fields.relations().collect(), &field_names);
 
     let query = query_builder::select::SelectBuilder::default().build(
@@ -125,8 +125,8 @@ pub(crate) async fn get_many_records_joins(
     selected_fields: &FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
-    let field_names: Vec<_> = selected_fields.db_names().collect();
-    let idents = selected_fields.type_identifiers_with_arities();
+    let field_names: Vec<_> = selected_fields.db_names_grouping_virtuals().collect();
+    let idents = selected_fields.type_identifiers_with_arities_grouping_virtuals();
     let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
     let rs_indexes = get_relation_selection_indexes(selected_fields.relations().collect(), &field_names);
 
