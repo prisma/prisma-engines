@@ -38,12 +38,21 @@ then
     curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 fi
 
+echo "ℹ️  Configuring rust toolchain to use nightly and rust-src component"
+rustup default nightly-2024-01-25 
+rustup target add wasm32-unknown-unknown
+rustup component add rust-src --target wasm32-unknown-unknown
+
+# export RUSTFLAGS="-Zlocation-detail=none"
 echo "Building query-engine-wasm using $WASM_BUILD_PROFILE profile"
-CARGO_PROFILE_RELEASE_OPT_LEVEL="z" wasm-pack build "--$WASM_BUILD_PROFILE" --target $OUT_TARGET --out-dir "$OUT_FOLDER" --out-name query_engine
+
+echo "OUT_FOLDER: $OUT_FOLDER"
+CARGO_PROFILE_RELEASE_OPT_LEVEL="z" wasm-pack build "--$WASM_BUILD_PROFILE" --target "$OUT_TARGET" --out-dir "$OUT_FOLDER" --out-name query_engine . \
+-Zbuild-std=std,panic_abort -Zbuild-std-features=panic_immediate_abort
 
 # wasm-opt pass
 WASM_OPT_ARGS=(
-    "-Os"                                 # execute size-focused optimization passes
+    "-Os"                                 # execute size-focused optimization passes (-Oz actually increases size by 1KB)
     "--vacuum"                            # removes obviously unneeded code
     "--duplicate-function-elimination"    # removes duplicate functions 
     "--duplicate-import-elimination"      # removes duplicate imports
