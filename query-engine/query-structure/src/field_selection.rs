@@ -339,6 +339,9 @@ impl SelectedField {
         }
     }
 
+    /// Returns the name of the field in the database (if applicable) or other kind of name that is
+    /// used in the queries for this field. For virtual fields, this returns the alias used in the
+    /// queries that do not group them into objects.
     pub fn db_name(&self) -> Cow<'_, str> {
         match self {
             SelectedField::Scalar(sf) => sf.db_name().into(),
@@ -348,6 +351,14 @@ impl SelectedField {
         }
     }
 
+    /// Returns the name of the field in the database (if applicable) or other kind of name that is
+    /// used in the queries for this field. For virtual fields that are wrapped inside an object in
+    /// Prisma queries, this returns the name of the surrounding object and not the field itself,
+    /// so this method can return identical values for multiple fields in the [`FieldSelection`].
+    /// This is used in queries with relation JOINs which use JSON objects to represent both
+    /// relations and relation aggregations. For those queries, the result of this method
+    /// corresponds to the top-level name of the value in the selection which is a JSON object
+    /// where this field can be found in.
     pub fn db_name_grouping_virtuals(&self) -> Cow<'_, str> {
         match self {
             SelectedField::Virtual(vs) => vs.serialized_name().0.into(),
