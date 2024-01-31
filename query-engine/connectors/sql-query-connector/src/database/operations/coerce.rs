@@ -5,28 +5,26 @@ use std::{io, str::FromStr};
 
 use crate::{query_arguments_ext::QueryArgumentsExt, SqlError};
 
+pub(crate) enum IndexedSelection<'a> {
+    Relation(&'a RelationSelection),
+    Virtual(&'a str),
+}
+
 /// Coerces relations resolved as JSON to PrismaValues.
 /// Note: Some in-memory processing is baked into this function too for performance reasons.
 pub(crate) fn coerce_record_with_json_relation(
     record: &mut Record,
-    rs_indexes: &[(usize, &RelationSelection)],
-    vs_indexes: &[(usize, &str)],
+    indexes: &[(usize, IndexedSelection<'_>)],
 ) -> crate::Result<()> {
-    for &(val_idx, rs) in rs_indexes {
-        let val = record.values.get_mut(val_idx).unwrap();
+    for (val_idx, kind) in indexes {
+        let val = record.values.get_mut(*val_idx).unwrap();
         // TODO(perf): Find ways to avoid serializing and deserializing multiple times.
         let json_val: serde_json::Value = serde_json::from_str(val.as_json().unwrap()).unwrap();
 
-        *val = coerce_json_relation_to_pv(json_val, rs)?;
-    }
-
-    // TODO: merge rs_indexes and vs_indexes and have a single loop
-    for &(val_idx, obj_name) in vs_indexes {
-        let val = record.values.get_mut(val_idx).unwrap();
-        // TODO(perf): Find ways to avoid serializing and deserializing multiple times.
-        let json_val: serde_json::Value = serde_json::from_str(val.as_json().unwrap()).unwrap();
-
-        *val = coerce_json_virtual_field_to_pv(obj_name, json_val)?;
+        *val = match kind {
+            IndexedSelection::Relation(rs) => coerce_json_relation_to_pv(json_val, rs)?,
+            IndexedSelection::Virtual(name) => coerce_json_virtual_field_to_pv(name, json_val)?,
+        };
     }
 
     Ok(())
