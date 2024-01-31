@@ -82,11 +82,11 @@ impl FieldSelection {
         self.selections.iter().map(|f| f.db_name().into_owned())
     }
 
-    /// Returns all database (e.g. column or document field) names of contained fields.
-    /// Does _not_ recurse into composite selections and only iterates top level fields.
-    /// Also does not recurse into the grouped containers for virtual fields, like `_count`,
-    /// representing results of queries that use JSON objects to represent joined relations
-    /// and relation aggregations.
+    /// Returns all database (e.g. column or document field) names of contained fields. Does not
+    /// recurse into composite selections and only iterates top level fields. Also does not recurse
+    /// into the grouped containers for virtual fields, like `_count`. The names returned by this
+    /// method correspond to the results of queries that use JSON objects to represent joined
+    /// relations and relation aggregations.
     pub fn db_names_grouping_virtuals(&self) -> impl Iterator<Item = String> + '_ {
         self.selections
             .iter()
