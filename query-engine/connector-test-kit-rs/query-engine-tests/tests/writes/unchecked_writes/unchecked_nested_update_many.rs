@@ -47,7 +47,7 @@ mod unchecked_nested_um {
     }
 
     // "Unchecked nested many updates" should "allow writing non-parent inlined relation scalars"
-    #[connector_test(schema(schema_1))]
+    #[connector_test(schema(schema_1), exclude(Vitess("planetscale.js")))]
     async fn allow_write_non_prent_inline_rel_sclrs(runner: Runner) -> TestResult<()> {
         // Setup
         // B1 -> A1 -> C1

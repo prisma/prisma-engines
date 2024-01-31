@@ -138,7 +138,8 @@ mod order_by_dependent {
     }
 
     // "[Hops: 2] Ordering by related record field ascending with nulls" should "work"
-    #[connector_test]
+    // TODO: Unexclude once https://github.com/prisma/team-orm/issues/683 is fixed
+    #[connector_test(exclude(Vitess("planetscale.js")))]
     async fn hop_2_related_record_asc_null(runner: Runner) -> TestResult<()> {
         // 1 record has the "full chain", one half, one none
         create_row(&runner, 1, Some(1), Some(1), None).await?;

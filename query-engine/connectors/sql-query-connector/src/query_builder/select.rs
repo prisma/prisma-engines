@@ -272,7 +272,6 @@ impl SelectBuilder {
     ) -> Select<'a> {
         let rf = rs.field.clone();
         let m2m_table_alias = self.next_alias();
-        let m2m_join_alias = self.next_alias();
         let root_alias = self.next_alias();
         let outer_alias = self.next_alias();
 
@@ -563,12 +562,11 @@ fn m2m_join_alias_name(rf: &RelationField) -> String {
 }
 
 fn json_agg() -> Function<'static> {
-    json_array_agg(Column::from(JSON_AGG_IDENT)).into()
-    // coalesce(vec![
-    //     json_array_agg(Column::from(JSON_AGG_IDENT)).into(),
-    //     Expression::from(Value::json(empty_json_array()).raw()),
-    // ])
-    // .alias(JSON_AGG_IDENT)
+    coalesce(vec![
+        json_array_agg(Column::from(JSON_AGG_IDENT)).into(),
+        Expression::from(Value::json(empty_json_array()).raw()),
+    ])
+    .alias(JSON_AGG_IDENT)
 }
 
 #[inline]

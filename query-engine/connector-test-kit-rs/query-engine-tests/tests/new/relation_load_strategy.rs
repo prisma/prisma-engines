@@ -86,7 +86,6 @@ mod relation_load_strategy {
 
     async fn assert_used_lateral_join(runner: &mut Runner, expected: bool) {
         let logs = runner.get_logs().await;
-        dbg!(&logs);
         let actual = logs.iter().any(|l| l.contains("LEFT JOIN LATERAL"));
 
         assert_eq!(

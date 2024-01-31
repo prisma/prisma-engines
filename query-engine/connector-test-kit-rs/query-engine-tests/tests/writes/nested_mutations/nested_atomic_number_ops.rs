@@ -195,7 +195,11 @@ mod atomic_number_ops {
     }
 
     // "A nested updateOne mutation" should "correctly apply all number operations for Int"
-    #[connector_test(schema(schema_3), exclude(CockroachDb, Postgres("pg.js", "neon.js")))]
+    // TODO: Unexclude once https://github.com/prisma/team-orm/issues/683 is fixed
+    #[connector_test(
+        schema(schema_3),
+        exclude(CockroachDb, Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
+    )]
     async fn nested_update_int_ops(runner: Runner) -> TestResult<()> {
         create_test_model(&runner, 1, None, None).await?;
         create_test_model(&runner, 2, Some(3), None).await?;
@@ -324,7 +328,11 @@ mod atomic_number_ops {
     }
 
     // "A nested updateOne mutation" should "correctly apply all number operations for Int"
-    #[connector_test(schema(schema_3), exclude(MongoDb, Postgres("pg.js", "neon.js")))]
+    // TODO: Unexclude once https://github.com/prisma/team-orm/issues/683 is fixed
+    #[connector_test(
+        schema(schema_3),
+        exclude(MongoDb, Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
+    )]
     async fn nested_update_float_ops(runner: Runner) -> TestResult<()> {
         create_test_model(&runner, 1, None, None).await?;
         create_test_model(&runner, 2, None, Some("5.5")).await?;

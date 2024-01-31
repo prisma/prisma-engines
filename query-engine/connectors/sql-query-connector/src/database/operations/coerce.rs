@@ -239,6 +239,5 @@ fn build_conversion_error_with_reason(sf: &ScalarField, from: &str, to: &str, re
 }
 
 fn parse_decimal(str: &str) -> std::result::Result<BigDecimal, ParseBigDecimalError> {
-    let t = "t";
     BigDecimal::from_str(str).map(|bd| bd.normalized())
 }
