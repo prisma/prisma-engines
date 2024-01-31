@@ -37,7 +37,7 @@ pub(crate) async fn get_single_record_joins(
     let idents = selected_fields.type_identifiers_with_arities();
     let rs_indexes = get_relation_selection_indexes(selected_fields.relations().collect(), &field_names);
 
-    let query = query_builder::select::SelectBuilder::default().build(
+    let query = query_builder::select::SelectBuilder::build(
         QueryArguments::from((model.clone(), filter.clone())),
         selected_fields,
         ctx,
@@ -145,7 +145,7 @@ pub(crate) async fn get_many_records_joins(
         _ => (),
     };
 
-    let query = query_builder::select::SelectBuilder::default().build(query_arguments.clone(), selected_fields, ctx);
+    let query = query_builder::select::SelectBuilder::build(query_arguments.clone(), selected_fields, ctx);
 
     for item in conn.filter(query.into(), meta.as_slice(), ctx).await?.into_iter() {
         let mut record = Record::from(item);
