@@ -52,6 +52,21 @@ impl Connection {
             describer_circumstances |= describer::Circumstances::MySql57;
         }
 
+        if circumstances.contains(super::Circumstances::CheckConstraints)
+            && !describer_circumstances.intersects(
+                describer::Circumstances::MySql56
+                    | describer::Circumstances::MySql57
+                    | describer::Circumstances::MariaDb,
+            )
+        {
+            // MySQL 8.0.16 and above supports check constraints.
+            // MySQL 5.6 and 5.7 do not have a CHECK_CONSTRAINTS table we can query.
+            // MariaDB, although it supports check constraints, adds them unexpectedly.
+            // E.g., MariaDB 10 adds the `json_valid(\`Priv\`)` check constraint on every JSON column;
+            // this creates a noisy, unexpected diff when comparing the introspected schema with the prisma schema.
+            describer_circumstances |= describer::Circumstances::CheckConstraints;
+        }
+
         let mut schema = sql_schema_describer::mysql::SqlSchemaDescriber::new(&self.0, describer_circumstances)
             .describe(&[params.url.dbname()])
             .await
