@@ -8,9 +8,12 @@ CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 REPO_ROOT="$( cd "$( dirname "$CURRENT_DIR/../../../" )" >/dev/null 2>&1 && pwd )"
 
 OUT_VERSION="${1:-"0.0.0"}"
-# Out folder is relative to the repo root, defaults to `query-engine/query-engine-wasm/pkg`
 OUT_FOLDER="${2:-"query-engine/query-engine-wasm/pkg"}"
-OUT_FOLDER="${REPO_ROOT}/${OUT_FOLDER}"
+# if it's a relative path, let it be relative to the repo root
+if [[ "$OUT_FOLDER" != /* ]]; then
+    OUT_FOLDER="$REPO_ROOT/$OUT_FOLDER"
+fi
+
 echo "ℹ️  target version: $OUT_VERSION"
 echo "ℹ️  out folder: $OUT_FOLDER"
 

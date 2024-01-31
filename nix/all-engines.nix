@@ -117,7 +117,7 @@ in
 
   packages.build-engine-wasm = pkgs.writeShellApplication { 
     name = "build-engine-wasm";
-      runtimeInputs = with pkgs; [ git rustup wasm-pack wasm-bindgen-cli binaryen jq];
+      runtimeInputs = with pkgs; [ git rustup wasm-pack wasm-bindgen-cli binaryen jq iconv];
       text = ''            
       cd query-engine/query-engine-wasm        
       WASM_BUILD_PROFILE=release ./build.sh "$1" "$2"
