@@ -4,10 +4,17 @@ set -euo pipefail
 
 rustup default stable
 
-OUT_VERSION="${1:-}"
-OUT_NPM_NAME="@prisma/query-engine-wasm"
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-OUT_FOLDER="${OUT_FOLDER:-$CURRENT_DIR/pkg}"
+REPO_ROOT="$( cd "$( dirname "$CURRENT_DIR/../../../" )" >/dev/null 2>&1 && pwd )"
+
+OUT_VERSION="${1:-"0.0.0"}"
+# Out folder is relative to the repo root, defaults to `query-engine/query-engine-wasm/pkg`
+OUT_FOLDER="${2:-"query-engine/query-engine-wasm/pkg"}"
+OUT_FOLDER="${REPO_ROOT}/${OUT_FOLDER}"
+echo "ℹ️  target version: $OUT_VERSION"
+echo "ℹ️  out folder: $OUT_FOLDER"
+
+OUT_NPM_NAME="@prisma/query-engine-wasm"
 OUT_TARGET="bundler"
 OUT_JSON="${OUT_FOLDER}/package.json"
 

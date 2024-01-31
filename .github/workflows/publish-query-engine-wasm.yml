@@ -33,7 +33,7 @@ jobs:
       - uses: cachix/install-nix-action@v24
 
       - name: Build @prisma/query-engine-wasm
-        run: nix run .#export-query-engine-wasm package ${{ github.event.inputs.packageVersion }}
+        run: nix run .#export-query-engine-wasm "${{ github.event.inputs.packageVersion }}" package
 
       - name: Install Node.js
         uses: actions/setup-node@v4

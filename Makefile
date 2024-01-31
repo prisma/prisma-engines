@@ -333,9 +333,9 @@ build-qe-wasm:
 ifdef NIX
 	@echo "Building wasm engine on nix"
 	rm -rf query-engine/query-engine-wasm/pkg
-	nix run .#export-query-engine-wasm query-engine/query-engine-wasm/pkg 0.0.0
+	nix run .#export-query-engine-wasm 0.0.0 query-engine/query-engine-wasm/pkg
 else
-	cd query-engine/query-engine-wasm && ./build.sh
+	cd query-engine/query-engine-wasm && ./build.sh 0.0.0 query-engine/query-engine-wasm/pkg
 endif
 
 measure-qe-wasm: build-qe-wasm	
