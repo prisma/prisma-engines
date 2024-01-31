@@ -15,6 +15,7 @@ use schema_connector::{
 use sql_schema_describer::SqlSchema;
 use std::future;
 use url::Url;
+use versions::Versioning;
 
 const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
 static QUALIFIED_NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"`[^ ]+`\.`[^ ]+`").unwrap());
@@ -430,6 +431,7 @@ pub(crate) enum Circumstances {
     IsMysql57,
     IsMariadb,
     IsVitess,
+    CheckConstraints,
 }
 
 fn check_datamodel_for_mysql_5_6(datamodel: &ValidatedSchema, errors: &mut Vec<String>) {
@@ -533,6 +535,9 @@ where
                         let mut circumstances = BitFlags::<Circumstances>::default();
 
                         if let Some((version, global_version)) = versions {
+                            let semver = Versioning::new(&global_version).unwrap_or_default();
+                            let min_check_constraints_semver = Versioning::new("8.0.16").unwrap();
+
                             if version.contains("vitess") || version.contains("Vitess") {
                                 circumstances |= Circumstances::IsVitess;
                             }
@@ -547,6 +552,10 @@ where
 
                             if global_version.contains("MariaDB") {
                                 circumstances |= Circumstances::IsMariadb;
+                            }
+
+                            if semver >= min_check_constraints_semver {
+                                circumstances |= Circumstances::CheckConstraints;
                             }
                         }
 
