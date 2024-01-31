@@ -51,7 +51,8 @@ WASM_OPT_ARGS=(
     "--dae-optimizing"                    # removes arguments to calls in an lto-like manner
     "--remove-unused-names"               # removes names from location that are never branched to
     "--rse"                               # removes redundant local.sets
-    "--gsi"                               # global struct inference, to optimize constant values    
+    "--gsi"                               # global struct inference, to optimize constant values
+    "--gufa-optimizing"                   # optimize the entire program using type monomorphization
     "--strip-dwarf"                       # removes DWARF debug information
     "--strip-producers"                   # removes the "producers" section
     "--strip-target-features"             # removes the "target_features" section
