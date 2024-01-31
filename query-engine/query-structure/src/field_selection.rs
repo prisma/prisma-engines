@@ -208,10 +208,7 @@ impl FieldSelection {
     pub fn type_identifiers_with_arities_grouping_virtuals(&self) -> Vec<(TypeIdentifier, FieldArity)> {
         self.selections()
             .unique_by(|vs| vs.db_name_grouping_virtuals())
-            .filter_map(|vs| match vs {
-                SelectedField::Virtual(_) => Some((TypeIdentifier::Json, FieldArity::Required)),
-                _ => vs.type_identifier_with_arity(),
-            })
+            .filter_map(|vs| vs.type_identifier_with_arity())
             .collect()
     }
 
@@ -357,8 +354,8 @@ impl SelectedField {
     /// so this method can return identical values for multiple fields in the [`FieldSelection`].
     /// This is used in queries with relation JOINs which use JSON objects to represent both
     /// relations and relation aggregations. For those queries, the result of this method
-    /// corresponds to the top-level name of the value in the selection which is a JSON object
-    /// where this field can be found in.
+    /// corresponds to the top-level name of the value which is a JSON object that contains this
+    /// field inside.
     pub fn db_name_grouping_virtuals(&self) -> Cow<'_, str> {
         match self {
             SelectedField::Virtual(vs) => vs.serialized_name().0.into(),
@@ -366,6 +363,8 @@ impl SelectedField {
         }
     }
 
+    /// Returns the type identifier and arity of this field, unless it is a composite field, in
+    /// which case [`None`] is returned.
     pub fn type_identifier_with_arity(&self) -> Option<(TypeIdentifier, FieldArity)> {
         match self {
             SelectedField::Scalar(sf) => Some(sf.type_identifier_with_arity()),
@@ -373,6 +372,22 @@ impl SelectedField {
             SelectedField::Relation(rf) => Some((TypeIdentifier::Json, rf.field.arity())),
             SelectedField::Composite(_) => None,
             SelectedField::Virtual(vs) => Some(vs.type_identifier_with_arity()),
+        }
+    }
+
+    /// Returns the type identifier and arity of this field, unless it is a composite field, in
+    /// which case [`None`] is returned.
+    ///
+    /// In the case of virtual fields that are wrapped into objects in Prisma queries
+    /// (specifically, relation aggregations), the returned information refers not to the current
+    /// field itself but to the whole object that contains this field. This is used by the queries
+    /// with relation JOINs because they use JSON objects to reprsent both relations and relation
+    /// aggregations, so individual virtual fields that correspond to those relation aggregations
+    /// don't exist as separate values in the result of the query.
+    pub fn type_identifier_with_arity_grouping_virtuals(&self) -> Option<(TypeIdentifier, FieldArity)> {
+        match self {
+            SelectedField::Virtual(_) => Some((TypeIdentifier::Json, FieldArity::Required)),
+            _ => self.type_identifier_with_arity(),
         }
     }
 
