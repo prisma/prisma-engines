@@ -35,6 +35,7 @@ pub(crate) async fn get_single_record_joins(
 ) -> crate::Result<Option<SingleRecord>> {
     let field_names: Vec<_> = selected_fields.db_names_grouping_virtuals().collect();
     let idents = selected_fields.type_identifiers_with_arities_grouping_virtuals();
+
     let indexes = get_selection_indexes(
         selected_fields.relations().collect(),
         selected_fields.virtuals().collect(),
@@ -132,6 +133,7 @@ pub(crate) async fn get_many_records_joins(
     let field_names: Vec<_> = selected_fields.db_names_grouping_virtuals().collect();
     let idents = selected_fields.type_identifiers_with_arities_grouping_virtuals();
     let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
+
     let indexes = get_selection_indexes(
         selected_fields.relations().collect(),
         selected_fields.virtuals().collect(),
