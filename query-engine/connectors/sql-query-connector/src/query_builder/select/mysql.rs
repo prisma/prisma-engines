@@ -7,7 +7,6 @@ use crate::{
 
 use quaint::ast::*;
 use query_structure::*;
-use std::borrow::Cow;
 
 #[derive(Debug, Default)]
 pub(crate) struct MysqlSelectBuilder {
@@ -21,27 +20,25 @@ impl JoinSelectBuilder for MysqlSelectBuilder {
         self.with_selection(select, selected_fields, alias, ctx)
     }
 
-    fn with_selection<'a>(
+    fn build_selection<'a>(
         &mut self,
         select: Select<'a>,
-        selected_fields: &FieldSelection,
-        table_alias: Alias,
+        field: &SelectedField,
+        parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        selected_fields
-            .selections()
-            .fold(select, |acc, selection| match selection {
-                SelectedField::Scalar(sf) => acc.column(
-                    sf.as_column(ctx)
-                        .table(table_alias.to_table_string())
-                        .set_is_selected(true),
-                ),
-                SelectedField::Relation(rs) => self.with_relation(acc, rs, table_alias, ctx),
-                _ => acc,
-            })
+        match field {
+            SelectedField::Scalar(sf) => select.column(
+                sf.as_column(ctx)
+                    .table(parent_alias.to_table_string())
+                    .set_is_selected(true),
+            ),
+            SelectedField::Relation(rs) => self.with_relation(select, rs, parent_alias, ctx),
+            _ => select,
+        }
     }
 
-    fn with_to_one_relation<'a>(
+    fn build_to_one_relation<'a>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
@@ -53,7 +50,7 @@ impl JoinSelectBuilder for MysqlSelectBuilder {
         select.value(Expression::from(subselect).alias(rs.field.name().to_owned()))
     }
 
-    fn with_to_many_relation<'a>(
+    fn build_to_many_relation<'a>(
         &mut self,
         select: Select<'a>,
         rs: &query_structure::prelude::RelationSelection,
@@ -67,7 +64,7 @@ impl JoinSelectBuilder for MysqlSelectBuilder {
         select.value(join_table)
     }
 
-    fn with_many_to_many_relation<'a>(
+    fn build_many_to_many_relation<'a>(
         &mut self,
         select: Select<'a>,
         rs: &query_structure::prelude::RelationSelection,
@@ -79,29 +76,23 @@ impl JoinSelectBuilder for MysqlSelectBuilder {
         select.value(Expression::from(m2m_select).alias(rs.field.name().to_owned()))
     }
 
-    fn build_json_obj_fn(
+    fn build_json_obj_selection(
         &mut self,
-        rs: &RelationSelection,
-        ctx: &Context<'_>,
+        field: &SelectedField,
         parent_alias: Alias,
-    ) -> Expression<'static> {
-        let build_obj_params = rs
-            .selections
-            .iter()
-            .filter_map(|f| match f {
-                SelectedField::Scalar(sf) => Some((
-                    Cow::from(sf.db_name().to_owned()),
-                    Expression::from(sf.as_column(ctx).table(parent_alias.to_table_string())),
-                )),
-                SelectedField::Relation(rs) => Some((
-                    Cow::from(rs.field.name().to_owned()),
-                    Expression::from(self.with_relation(Select::default(), rs, parent_alias, ctx)),
-                )),
-                _ => None,
-            })
-            .collect();
-
-        json_build_object(build_obj_params).into()
+        ctx: &Context<'_>,
+    ) -> Option<(String, Expression<'static>)> {
+        match field {
+            SelectedField::Scalar(sf) => Some((
+                sf.db_name().to_owned(),
+                Expression::from(sf.as_column(ctx).table(parent_alias.to_table_string())),
+            )),
+            SelectedField::Relation(rs) => Some((
+                rs.field.name().to_owned(),
+                Expression::from(self.with_relation(Select::default(), rs, parent_alias, ctx)),
+            )),
+            _ => None,
+        }
     }
 
     fn next_alias(&mut self) -> Alias {
@@ -111,81 +102,6 @@ impl JoinSelectBuilder for MysqlSelectBuilder {
 }
 
 impl MysqlSelectBuilder {
-    fn build_to_many_select(
-        &mut self,
-        rs: &RelationSelection,
-        parent_alias: Alias,
-        ctx: &Context<'_>,
-    ) -> Select<'static> {
-        let inner_root_table_alias = self.next_alias();
-        let root_alias = self.next_alias();
-        let inner_alias = self.next_alias();
-        let middle_alias = self.next_alias();
-
-        let related_table = rs
-            .related_model()
-            .as_table(ctx)
-            .alias(inner_root_table_alias.to_table_string());
-
-        // SELECT * FROM "Table" as <table_alias> WHERE parent.id = child.parent_id
-        let root = Select::from_table(related_table)
-            .with_join_conditions(&rs.field, parent_alias, inner_root_table_alias, ctx)
-            .comment("root select");
-
-        // SELECT JSON_BUILD_OBJECT() FROM ( <root> )
-        let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()))
-            .value(self.build_json_obj_fn(rs, ctx, root_alias).alias(JSON_AGG_IDENT));
-
-        // LEFT JOIN LATERAL () AS <inner_alias> ON TRUE
-        let inner = self.with_relations(inner, rs.relations(), root_alias, ctx);
-
-        let linking_fields = rs.field.related_field().linking_fields();
-
-        if rs.field.relation().is_many_to_many() {
-            let selection: Vec<Column<'_>> =
-                FieldSelection::union(vec![order_by_selection(rs), linking_fields, filtering_selection(rs)])
-                    .into_projection()
-                    .as_columns(ctx)
-                    .map(|c| c.table(root_alias.to_table_string()))
-                    .collect();
-
-            // SELECT <foreign_keys>, <orderby columns>
-            inner.with_columns(selection.into())
-        } else {
-            // select ordering, filtering & join fields from child selections to order, filter & join them on the outer query
-            let inner_selection: Vec<Column<'_>> = FieldSelection::union(vec![
-                order_by_selection(rs),
-                filtering_selection(rs),
-                relation_selection(rs),
-            ])
-            .into_projection()
-            .as_columns(ctx)
-            .map(|c| c.table(root_alias.to_table_string()))
-            .collect();
-
-            let inner = inner.with_columns(inner_selection.into()).comment("inner select");
-
-            // On MySQL, using LIMIT makes the ordering of the JSON_AGG working. Beware, this is undocumented behavior.
-            let take = rs.args.take_abs().or(Some(i64::MAX));
-
-            let middle = Select::from_table(Table::from(inner).alias(inner_alias.to_table_string()))
-                // SELECT <inner_alias>.<JSON_ADD_IDENT>
-                .column(Column::from((inner_alias.to_table_string(), JSON_AGG_IDENT)))
-                // ORDER BY ...
-                .with_ordering(&rs.args, Some(inner_alias.to_table_string()), ctx)
-                // WHERE ...
-                .with_filters(rs.args.filter.clone(), Some(inner_alias), ctx)
-                // LIMIT $1 OFFSET $2
-                .with_pagination(take, rs.args.skip)
-                .comment("middle select");
-
-            // SELECT COALESCE(JSON_AGG(<inner_alias>), '[]') AS <inner_alias> FROM ( <middle> ) as <inner_alias_2>
-            Select::from_table(Table::from(middle).alias(middle_alias.to_table_string()))
-                .value(json_agg())
-                .comment("outer select")
-        }
-    }
-
     fn build_m2m_select<'a>(&mut self, rs: &RelationSelection, parent_alias: Alias, ctx: &Context<'_>) -> Select<'a> {
         let rf = rs.field.clone();
         let m2m_table_alias = self.next_alias();
@@ -218,7 +134,7 @@ impl MysqlSelectBuilder {
         };
 
         let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()))
-            .value(self.build_json_obj_fn(rs, ctx, root_alias).alias(JSON_AGG_IDENT))
+            .value(self.build_json_obj_fn(rs, root_alias, ctx).alias(JSON_AGG_IDENT))
             .with_pagination(take, rs.args.skip)
             .comment("inner"); // adds pagination
 

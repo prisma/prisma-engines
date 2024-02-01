@@ -1,6 +1,8 @@
 mod mysql;
 mod postgres;
 
+use std::borrow::Cow;
+
 use psl::datamodel_connector::Flavour;
 use tracing::Span;
 
@@ -24,7 +26,7 @@ pub struct SelectBuilder {}
 
 impl SelectBuilder {
     pub fn build(args: QueryArguments, selected_fields: &FieldSelection, ctx: &Context<'_>) -> Select<'static> {
-        match args.model().dm.schema.connector.flavour() {
+        match connector_flavour(&args) {
             Flavour::Mysql => MysqlSelectBuilder::default().build(args, selected_fields, ctx),
             Flavour::Postgres | Flavour::Cockroach => {
                 PostgresSelectBuilder::default().build(args, selected_fields, ctx)
@@ -36,55 +38,54 @@ impl SelectBuilder {
 
 pub(crate) trait JoinSelectBuilder {
     fn build(&mut self, args: QueryArguments, selected_fields: &FieldSelection, ctx: &Context<'_>) -> Select<'static>;
+    fn build_to_one_relation<'a>(
+        &mut self,
+        select: Select<'a>,
+        rs: &RelationSelection,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a>;
+    fn build_to_many_relation<'a>(
+        &mut self,
+        select: Select<'a>,
+        rs: &RelationSelection,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a>;
+    fn build_many_to_many_relation<'a>(
+        &mut self,
+        select: Select<'a>,
+        rs: &RelationSelection,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a>;
+    fn build_selection<'a>(
+        &mut self,
+        select: Select<'a>,
+        field: &SelectedField,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a>;
+    fn build_json_obj_selection(
+        &mut self,
+        field: &SelectedField,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Option<(String, Expression<'static>)>;
+    fn next_alias(&mut self) -> Alias;
+
     fn with_selection<'a>(
         &mut self,
         select: Select<'a>,
         selected_fields: &FieldSelection,
-        table_alias: Alias,
-        ctx: &Context<'_>,
-    ) -> Select<'a>;
-    fn with_to_one_relation<'a>(
-        &mut self,
-        select: Select<'a>,
-        rs: &RelationSelection,
-        parent_alias: Alias,
-        ctx: &Context<'_>,
-    ) -> Select<'a>;
-    fn with_to_many_relation<'a>(
-        &mut self,
-        select: Select<'a>,
-        rs: &RelationSelection,
-        parent_alias: Alias,
-        ctx: &Context<'_>,
-    ) -> Select<'a>;
-    fn with_many_to_many_relation<'a>(
-        &mut self,
-        select: Select<'a>,
-        rs: &RelationSelection,
-        parent_alias: Alias,
-        ctx: &Context<'_>,
-    ) -> Select<'a>;
-    fn build_json_obj_fn(
-        &mut self,
-        rs: &RelationSelection,
-        ctx: &Context<'_>,
-        parent_alias: Alias,
-    ) -> Expression<'static>;
-    fn next_alias(&mut self) -> Alias;
-
-    fn with_relation<'a>(
-        &mut self,
-        select: Select<'a>,
-        rs: &RelationSelection,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        match (rs.field.is_list(), rs.field.relation().is_many_to_many()) {
-            (true, true) => self.with_many_to_many_relation(select, rs, parent_alias, ctx),
-            (true, false) => self.with_to_many_relation(select, rs, parent_alias, ctx),
-            (false, _) => self.with_to_one_relation(select, rs, parent_alias, ctx),
-        }
+        selected_fields.selections().fold(select, |acc, selection| {
+            self.build_selection(acc, selection, parent_alias, ctx)
+        })
     }
+
     fn build_to_one_select(
         &mut self,
         rs: &RelationSelection,
@@ -99,7 +100,7 @@ pub(crate) trait JoinSelectBuilder {
             .related_field()
             .as_table(ctx)
             .alias(child_table_alias.to_table_string());
-        let json_expr = self.build_json_obj_fn(rs, ctx, child_table_alias);
+        let json_expr = self.build_json_obj_fn(rs, child_table_alias, ctx);
 
         let select = Select::from_table(table)
             .with_join_conditions(rf, parent_alias, child_table_alias, ctx)
@@ -108,6 +109,118 @@ pub(crate) trait JoinSelectBuilder {
             .limit(1);
 
         (select, child_table_alias)
+    }
+
+    fn build_to_many_select(
+        &mut self,
+        rs: &RelationSelection,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'static> {
+        let inner_root_table_alias = self.next_alias();
+        let root_alias = self.next_alias();
+        let inner_alias = self.next_alias();
+        let middle_alias = self.next_alias();
+
+        let related_table = rs
+            .related_model()
+            .as_table(ctx)
+            .alias(inner_root_table_alias.to_table_string());
+
+        // SELECT * FROM "Table" as <table_alias> WHERE parent.id = child.parent_id
+        let root = Select::from_table(related_table)
+            .with_join_conditions(&rs.field, parent_alias, inner_root_table_alias, ctx)
+            .comment("root select");
+
+        // SELECT JSON_BUILD_OBJECT() FROM ( <root> )
+        let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()))
+            .value(self.build_json_obj_fn(rs, root_alias, ctx).alias(JSON_AGG_IDENT));
+
+        // LEFT JOIN LATERAL () AS <inner_alias> ON TRUE
+        let inner = self.with_relations(inner, rs.relations(), root_alias, ctx);
+
+        let linking_fields = rs.field.related_field().linking_fields();
+
+        if rs.field.relation().is_many_to_many() {
+            let selection: Vec<Column<'_>> =
+                FieldSelection::union(vec![order_by_selection(rs), linking_fields, filtering_selection(rs)])
+                    .into_projection()
+                    .as_columns(ctx)
+                    .map(|c| c.table(root_alias.to_table_string()))
+                    .collect();
+
+            // SELECT <foreign_keys>, <orderby columns>
+            inner.with_columns(selection.into())
+        } else {
+            // select ordering, filtering & join fields from child selections to order, filter & join them on the outer query
+            let inner_selection: Vec<Column<'_>> = FieldSelection::union(vec![
+                order_by_selection(rs),
+                filtering_selection(rs),
+                relation_selection(rs),
+            ])
+            .into_projection()
+            .as_columns(ctx)
+            .map(|c| c.table(root_alias.to_table_string()))
+            .collect();
+
+            let inner = inner.with_columns(inner_selection.into()).comment("inner select");
+
+            let middle_take = match connector_flavour(&rs.args) {
+                // On MySQL, using LIMIT makes the ordering of the JSON_AGG working. Beware, this is undocumented behavior.
+                // Note: Ideally, this should live in the MySQL select builder, but it's currently the only implementation difference
+                // between MySQL and Postgres, so we keep it here for now to avoid code duplication.
+                Flavour::Mysql => rs.args.take_abs().or(Some(i64::MAX)),
+                _ => rs.args.take_abs(),
+            };
+
+            let middle = Select::from_table(Table::from(inner).alias(inner_alias.to_table_string()))
+                // SELECT <inner_alias>.<JSON_ADD_IDENT>
+                .column(Column::from((inner_alias.to_table_string(), JSON_AGG_IDENT)))
+                // ORDER BY ...
+                .with_ordering(&rs.args, Some(inner_alias.to_table_string()), ctx)
+                // WHERE ...
+                .with_filters(rs.args.filter.clone(), Some(inner_alias), ctx)
+                // LIMIT $1 OFFSET $2
+                .with_pagination(middle_take, rs.args.skip)
+                .comment("middle select");
+
+            // SELECT COALESCE(JSON_AGG(<inner_alias>), '[]') AS <inner_alias> FROM ( <middle> ) as <inner_alias_2>
+            Select::from_table(Table::from(middle).alias(middle_alias.to_table_string()))
+                .value(json_agg())
+                .comment("outer select")
+        }
+    }
+
+    fn build_json_obj_fn(
+        &mut self,
+        rs: &RelationSelection,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Expression<'static> {
+        let build_obj_params = rs
+            .selections
+            .iter()
+            .filter_map(|f| {
+                self.build_json_obj_selection(f, parent_alias, ctx)
+                    .map(|(name, expr)| (Cow::from(name), expr))
+            })
+            .collect();
+
+        json_build_object(build_obj_params).into()
+    }
+
+    fn with_relation<'a>(
+        &mut self,
+        select: Select<'a>,
+        rs: &RelationSelection,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a> {
+        match (rs.field.is_list(), rs.field.relation().is_many_to_many()) {
+            (true, true) => self.build_many_to_many_relation(select, rs, parent_alias, ctx),
+            (true, false) => self.build_to_many_relation(select, rs, parent_alias, ctx),
+            (false, _) => self.build_to_one_relation(select, rs, parent_alias, ctx),
+        }
     }
 
     fn with_relations<'a, 'b>(
@@ -362,4 +475,8 @@ fn json_agg() -> Function<'static> {
 #[inline]
 fn empty_json_array() -> serde_json::Value {
     serde_json::Value::Array(Vec::new())
+}
+
+fn connector_flavour(args: &QueryArguments) -> Flavour {
+    args.model().dm.schema.connector.flavour()
 }
