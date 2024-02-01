@@ -7,7 +7,6 @@ use crate::{
 
 use quaint::ast::*;
 use query_structure::*;
-use std::borrow::Cow;
 
 #[derive(Debug, Default)]
 pub(crate) struct PostgresSelectBuilder {
@@ -24,34 +23,32 @@ impl JoinSelectBuilder for PostgresSelectBuilder {
         self.with_relations(select, selected_fields.relations(), parent_alias, ctx)
     }
 
-    fn with_selection<'a>(
+    fn build_selection<'a>(
         &mut self,
         select: Select<'a>,
-        selected_fields: &FieldSelection,
-        table_alias: Alias,
+        field: &SelectedField,
+        parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        selected_fields
-            .selections()
-            .fold(select, |acc, selection| match selection {
-                SelectedField::Scalar(sf) => acc.column(
-                    sf.as_column(ctx)
-                        .table(table_alias.to_table_string())
-                        .set_is_selected(true),
-                ),
-                SelectedField::Relation(rs) => {
-                    let table_name = match rs.field.relation().is_many_to_many() {
-                        true => m2m_join_alias_name(&rs.field),
-                        false => join_alias_name(&rs.field),
-                    };
+        match field {
+            SelectedField::Scalar(sf) => select.column(
+                sf.as_column(ctx)
+                    .table(parent_alias.to_table_string())
+                    .set_is_selected(true),
+            ),
+            SelectedField::Relation(rs) => {
+                let table_name = match rs.field.relation().is_many_to_many() {
+                    true => m2m_join_alias_name(&rs.field),
+                    false => join_alias_name(&rs.field),
+                };
 
-                    acc.value(Column::from((table_name, JSON_AGG_IDENT)).alias(rs.field.name().to_owned()))
-                }
-                _ => acc,
-            })
+                select.value(Column::from((table_name, JSON_AGG_IDENT)).alias(rs.field.name().to_owned()))
+            }
+            _ => select,
+        }
     }
 
-    fn with_to_one_relation<'a>(
+    fn build_to_one_relation<'a>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
@@ -67,7 +64,7 @@ impl JoinSelectBuilder for PostgresSelectBuilder {
         select.left_join(join_table.on(ConditionTree::single(true.raw())).lateral())
     }
 
-    fn with_to_many_relation<'a>(
+    fn build_to_many_relation<'a>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
@@ -81,7 +78,7 @@ impl JoinSelectBuilder for PostgresSelectBuilder {
         select.left_join(join_table.on(ConditionTree::single(true.raw())).lateral())
     }
 
-    fn with_many_to_many_relation<'a>(
+    fn build_many_to_many_relation<'a>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
@@ -94,36 +91,30 @@ impl JoinSelectBuilder for PostgresSelectBuilder {
         select.left_join(m2m_join)
     }
 
-    fn build_json_obj_fn(
+    fn build_json_obj_selection(
         &mut self,
-        rs: &RelationSelection,
-        ctx: &Context<'_>,
+        field: &SelectedField,
         parent_alias: Alias,
-    ) -> Expression<'static> {
-        let build_obj_params = rs
-            .selections
-            .iter()
-            .filter_map(|f| match f {
-                SelectedField::Scalar(sf) => Some((
-                    Cow::from(sf.db_name().to_owned()),
-                    Expression::from(sf.as_column(ctx).table(parent_alias.to_table_string())),
-                )),
-                SelectedField::Relation(rs) => {
-                    let table_name = match rs.field.relation().is_many_to_many() {
-                        true => m2m_join_alias_name(&rs.field),
-                        false => join_alias_name(&rs.field),
-                    };
+        ctx: &Context<'_>,
+    ) -> Option<(String, Expression<'static>)> {
+        match field {
+            SelectedField::Scalar(sf) => Some((
+                sf.db_name().to_owned(),
+                Expression::from(sf.as_column(ctx).table(parent_alias.to_table_string())),
+            )),
+            SelectedField::Relation(rs) => {
+                let table_name = match rs.field.relation().is_many_to_many() {
+                    true => m2m_join_alias_name(&rs.field),
+                    false => join_alias_name(&rs.field),
+                };
 
-                    Some((
-                        Cow::from(rs.field.name().to_owned()),
-                        Expression::from(Column::from((table_name, JSON_AGG_IDENT))),
-                    ))
-                }
-                _ => None,
-            })
-            .collect();
-
-        json_build_object(build_obj_params).into()
+                Some((
+                    rs.field.name().to_owned(),
+                    Expression::from(Column::from((table_name, JSON_AGG_IDENT))),
+                ))
+            }
+            _ => None,
+        }
     }
 
     fn next_alias(&mut self) -> Alias {
@@ -156,7 +147,7 @@ impl PostgresSelectBuilder {
 
         // SELECT JSON_BUILD_OBJECT() FROM ( <root> )
         let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()))
-            .value(self.build_json_obj_fn(rs, ctx, root_alias).alias(JSON_AGG_IDENT));
+            .value(self.build_json_obj_fn(rs, root_alias, ctx).alias(JSON_AGG_IDENT));
 
         // LEFT JOIN LATERAL () AS <inner_alias> ON TRUE
         let inner = self.with_relations(inner, rs.relations(), root_alias, ctx);

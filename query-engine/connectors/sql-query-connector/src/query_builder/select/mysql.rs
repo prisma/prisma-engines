@@ -79,6 +79,7 @@ impl JoinSelectBuilder for MysqlSelectBuilder {
     fn build_json_obj_selection(
         &mut self,
         field: &SelectedField,
+
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Option<(String, Expression<'static>)> {
