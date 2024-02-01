@@ -167,8 +167,7 @@ impl SelectBuilder {
         let left_columns = rf.related_field().m2m_columns(ctx);
         let right_columns = ModelProjection::from(rf.model().primary_identifier()).as_columns(ctx);
 
-        let join_conditions =
-            build_join_conditions(left_columns.into_iter(), right_columns, m2m_table_alias, parent_alias);
+        let join_conditions = build_join_conditions(left_columns.into(), right_columns, m2m_table_alias, parent_alias);
 
         let m2m_join_data = Table::from(self.build_related_query_select(rs, m2m_table_alias, ctx))
             .alias(m2m_join_alias.to_table_string())
@@ -283,9 +282,9 @@ impl SelectBuilder {
             .on(m2m_join_conditions);
 
         let aggregation_join_conditions = {
-            let left_columns = rf.related_field().m2m_columns(ctx).into_iter();
+            let left_columns = rf.related_field().m2m_columns(ctx);
             let right_columns = ModelProjection::from(rf.model().primary_identifier()).as_columns(ctx);
-            build_join_conditions(left_columns, right_columns, m2m_table_alias, parent_alias)
+            build_join_conditions(left_columns.into(), right_columns, m2m_table_alias, parent_alias)
         };
 
         let select = Select::from_table(related_table)
@@ -411,8 +410,8 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
 }
 
 fn build_join_conditions(
-    left_columns: impl Iterator<Item = Column<'static>>,
-    right_columns: impl Iterator<Item = Column<'static>>,
+    left_columns: ColumnIterator,
+    right_columns: ColumnIterator,
     left_alias: Alias,
     right_alias: Alias,
 ) -> ConditionTree<'static> {
