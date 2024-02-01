@@ -418,8 +418,7 @@ fn get_selection_indexes<'a>(
         .filter_map(|(idx, field_name)| {
             relations
                 .iter()
-                .find(|rs| rs.field.name() == field_name)
-                .map(|rs| IndexedSelection::Relation(rs))
+                .find_map(|rs| (rs.field.name() == field_name).then_some(IndexedSelection::Relation(rs)))
                 .or_else(|| {
                     virtuals.iter().find_map(|vs| {
                         let obj_name = vs.serialized_name().0;
