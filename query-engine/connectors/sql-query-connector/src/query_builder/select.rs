@@ -167,20 +167,8 @@ impl SelectBuilder {
         let left_columns = rf.related_field().m2m_columns(ctx);
         let right_columns = ModelProjection::from(rf.model().primary_identifier()).as_columns(ctx);
 
-        let join_conditions = left_columns
-            .into_iter()
-            .zip(right_columns)
-            .fold(None::<ConditionTree>, |acc, (a, b)| {
-                let a = a.table(m2m_table_alias.to_table_string());
-                let b = b.table(parent_alias.to_table_string());
-                let condition = a.equals(b);
-
-                match acc {
-                    Some(acc) => Some(acc.and(condition)),
-                    None => Some(condition.into()),
-                }
-            })
-            .unwrap();
+        let join_conditions =
+            build_join_conditions(left_columns.into_iter(), right_columns, m2m_table_alias, parent_alias);
 
         let m2m_join_data = Table::from(self.build_related_query_select(rs, m2m_table_alias, ctx))
             .alias(m2m_join_alias.to_table_string())
@@ -283,41 +271,10 @@ impl SelectBuilder {
             .as_table(ctx)
             .alias(related_table_alias.to_table_string());
 
-        let left_columns = rf.related_field().m2m_columns(ctx);
-        let right_columns = ModelProjection::from(rf.model().primary_identifier()).as_columns(ctx);
-
-        let join_conditions = left_columns
-            .into_iter()
-            .zip(right_columns)
-            .fold(None::<ConditionTree>, |acc, (a, b)| {
-                let a = a.table(m2m_table_alias.to_table_string());
-                let b = b.table(parent_alias.to_table_string());
-                let condition = a.equals(b);
-
-                match acc {
-                    Some(acc) => Some(acc.and(condition)),
-                    None => Some(condition.into()),
-                }
-            })
-            .unwrap();
-
         let m2m_join_conditions = {
-            let join_columns = rf.join_columns(ctx);
-            let related_join_columns = ModelProjection::from(rf.related_field().linking_fields()).as_columns(ctx);
-
-            join_columns
-                .zip(related_join_columns)
-                .fold(None::<ConditionTree>, |acc, (a, b)| {
-                    let a = a.table(m2m_table_alias.to_table_string());
-                    let b = b.table(related_table_alias.to_table_string());
-                    let condition = a.equals(b);
-
-                    match acc {
-                        Some(acc) => Some(acc.and(condition)),
-                        None => Some(condition.into()),
-                    }
-                })
-                .unwrap()
+            let left_columns = rf.join_columns(ctx);
+            let right_columns = ModelProjection::from(rf.related_field().linking_fields()).as_columns(ctx);
+            build_join_conditions(left_columns, right_columns, m2m_table_alias, related_table_alias)
         };
 
         let m2m_join_data = rf
@@ -325,11 +282,16 @@ impl SelectBuilder {
             .alias(m2m_table_alias.to_table_string())
             .on(m2m_join_conditions);
 
+        let aggregation_join_conditions = {
+            let left_columns = rf.related_field().m2m_columns(ctx).into_iter();
+            let right_columns = ModelProjection::from(rf.model().primary_identifier()).as_columns(ctx);
+            build_join_conditions(left_columns, right_columns, m2m_table_alias, parent_alias)
+        };
+
         let select = Select::from_table(related_table)
             .value(count(asterisk()).alias(selection_name))
             .left_join(m2m_join_data)
-            // .with_join_conditions(rf, parent_alias, related_table_alias, ctx)
-            .and_where(join_conditions)
+            .and_where(aggregation_join_conditions)
             .with_filters(filter.clone(), Some(related_table_alias), ctx);
 
         select
@@ -409,21 +371,9 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
         let join_columns = rf.join_columns(ctx);
         let related_join_columns = ModelProjection::from(rf.related_field().linking_fields()).as_columns(ctx);
 
+        let conditions = build_join_conditions(join_columns, related_join_columns, parent_alias, child_alias);
+
         // WHERE Parent.id = Child.id
-        let conditions = join_columns
-            .zip(related_join_columns)
-            .fold(None::<ConditionTree>, |acc, (a, b)| {
-                let a = a.table(parent_alias.to_table_string());
-                let b = b.table(child_alias.to_table_string());
-                let condition = a.equals(b);
-
-                match acc {
-                    Some(acc) => Some(acc.and(condition)),
-                    None => Some(condition.into()),
-                }
-            })
-            .unwrap();
-
         self.and_where(conditions)
     }
 
@@ -458,6 +408,27 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
     fn with_columns(self, columns: ColumnIterator) -> Select<'a> {
         columns.into_iter().fold(self, |select, col| select.column(col))
     }
+}
+
+fn build_join_conditions(
+    left_columns: impl Iterator<Item = Column<'static>>,
+    right_columns: impl Iterator<Item = Column<'static>>,
+    left_alias: Alias,
+    right_alias: Alias,
+) -> ConditionTree<'static> {
+    left_columns
+        .zip(right_columns)
+        .fold(None::<ConditionTree>, |acc, (a, b)| {
+            let a = a.table(left_alias.to_table_string());
+            let b = b.table(right_alias.to_table_string());
+            let condition = a.equals(b);
+
+            match acc {
+                Some(acc) => Some(acc.and(condition)),
+                None => Some(condition.into()),
+            }
+        })
+        .unwrap()
 }
 
 fn build_json_obj_fn(rs: &RelationSelection, ctx: &Context<'_>, root_alias: Alias) -> Function<'static> {
