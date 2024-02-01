@@ -167,7 +167,8 @@ impl SelectBuilder {
         let left_columns = rf.related_field().m2m_columns(ctx);
         let right_columns = ModelProjection::from(rf.model().primary_identifier()).as_columns(ctx);
 
-        let join_conditions = build_join_conditions(left_columns.into(), right_columns, m2m_table_alias, parent_alias);
+        let join_conditions =
+            build_join_conditions((left_columns.into(), m2m_table_alias), (right_columns, parent_alias));
 
         let m2m_join_data = Table::from(self.build_related_query_select(rs, m2m_table_alias, ctx))
             .alias(m2m_join_alias.to_table_string())
@@ -273,7 +274,7 @@ impl SelectBuilder {
         let m2m_join_conditions = {
             let left_columns = rf.join_columns(ctx);
             let right_columns = ModelProjection::from(rf.related_field().linking_fields()).as_columns(ctx);
-            build_join_conditions(left_columns, right_columns, m2m_table_alias, related_table_alias)
+            build_join_conditions((left_columns, m2m_table_alias), (right_columns, related_table_alias))
         };
 
         let m2m_join_data = rf
@@ -284,7 +285,7 @@ impl SelectBuilder {
         let aggregation_join_conditions = {
             let left_columns = rf.related_field().m2m_columns(ctx);
             let right_columns = ModelProjection::from(rf.model().primary_identifier()).as_columns(ctx);
-            build_join_conditions(left_columns.into(), right_columns, m2m_table_alias, parent_alias)
+            build_join_conditions((left_columns.into(), m2m_table_alias), (right_columns, parent_alias))
         };
 
         let select = Select::from_table(related_table)
@@ -370,7 +371,7 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
         let join_columns = rf.join_columns(ctx);
         let related_join_columns = ModelProjection::from(rf.related_field().linking_fields()).as_columns(ctx);
 
-        let conditions = build_join_conditions(join_columns, related_join_columns, parent_alias, child_alias);
+        let conditions = build_join_conditions((join_columns, parent_alias), (related_join_columns, child_alias));
 
         // WHERE Parent.id = Child.id
         self.and_where(conditions)
@@ -410,10 +411,8 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
 }
 
 fn build_join_conditions(
-    left_columns: ColumnIterator,
-    right_columns: ColumnIterator,
-    left_alias: Alias,
-    right_alias: Alias,
+    (left_columns, left_alias): (ColumnIterator, Alias),
+    (right_columns, right_alias): (ColumnIterator, Alias),
 ) -> ConditionTree<'static> {
     left_columns
         .zip(right_columns)
