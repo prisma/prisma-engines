@@ -1,15 +1,14 @@
 name: "QE: WASM size"
 on:
-  workflow_dispatch:
-  # pull_request:
-  #   paths-ignore:
-  #     - ".github/**"
-  #     - "!.github/workflows/wasm-size.yml"
-  #     - ".buildkite/**"
-  #     - "*.md"
-  #     - "LICENSE"
-  #     - "CODEOWNERS"
-  #     - "renovate.json"
+  pull_request:
+    paths-ignore:
+      - ".github/**"
+      - "!.github/workflows/wasm-size.yml"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,11 +16,15 @@ concurrency:
 
 jobs:
   pr-wasm-size:
-    name: calculate module size (pr)
+    name: calculate module sizes (pr)
     runs-on: ubuntu-latest
     outputs:
-      size: ${{ steps.measure.outputs.size }}
-      size_gz: ${{ steps.measure.outputs.size_gz }}
+      postgresql_size: ${{ steps.measure.outputs.postgresql_size }}
+      postgresql_size_gz: ${{ steps.measure.outputs.postgresql_size_gz }}
+      mysql_size: ${{ steps.measure.outputs.mysql_size }}
+      mysql_size_gz: ${{ steps.measure.outputs.mysql_size_gz }}
+      sqlite_size: ${{ steps.measure.outputs.sqlite_size }}
+      sqlite_size_gz: ${{ steps.measure.outputs.sqlite_size_gz }}
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
@@ -37,15 +40,22 @@ jobs:
         run: |
           nix build -L .#query-engine-wasm-gz
 
-          echo "size=$(wc --bytes < ./result/query_engine_bg.wasm)" >> $GITHUB_OUTPUT
-          echo "size_gz=$(wc --bytes < ./result/query_engine_bg.wasm.gz)" >> $GITHUB_OUTPUT
+          for provider in "postgresql" "mysql" "sqlite"; do
+            echo "${provider}_size=$(wc --bytes < ./result/query-engine-$provider.wasm)" >> $GITHUB_OUTPUT
+            echo "${provider}_size_gz=$(wc --bytes < ./result/query-engine-$provider.wasm.gz)" >> $GITHUB_OUTPUT
+          done
+
 
   base-wasm-size:
-    name: calculate module size (main)
+    name: calculate module sizes (base branch)
     runs-on: ubuntu-latest
     outputs:
-      size: ${{ steps.measure.outputs.size }}
-      size_gz: ${{ steps.measure.outputs.size_gz }}
+      postgresql_size: ${{ steps.measure.outputs.postgresql_size }}
+      postgresql_size_gz: ${{ steps.measure.outputs.postgresql_size_gz }}
+      mysql_size: ${{ steps.measure.outputs.mysql_size }}
+      mysql_size_gz: ${{ steps.measure.outputs.mysql_size_gz }}
+      sqlite_size: ${{ steps.measure.outputs.sqlite_size }}
+      sqlite_size_gz: ${{ steps.measure.outputs.sqlite_size_gz }}
     steps:
       - name: Checkout base branch
         uses: actions/checkout@v4
@@ -62,8 +72,10 @@ jobs:
         run: |
           nix build -L .#query-engine-wasm-gz
 
-          echo "size=$(wc --bytes < ./result/query_engine_bg.wasm)" >> $GITHUB_OUTPUT
-          echo "size_gz=$(wc --bytes < ./result/query_engine_bg.wasm.gz)" >> $GITHUB_OUTPUT
+          for provider in "postgresql" "mysql" "sqlite"; do
+            echo "${provider}_size=$(wc --bytes < ./result/query-engine-$provider.wasm)" >> $GITHUB_OUTPUT
+            echo "${provider}_size_gz=$(wc --bytes < ./result/query-engine-$provider.wasm.gz)" >> $GITHUB_OUTPUT
+          done
 
   report-diff:
     name: report module size
@@ -76,22 +88,30 @@ jobs:
       - name: Compute difference
         id: compute
         run: |
-          base=$(echo "${{ needs.base-wasm-size.outputs.size }}" | numfmt --format '%.3f' --to=iec-i --suffix=B)
-          base_gz=$(echo "${{ needs.base-wasm-size.outputs.size_gz }}" | numfmt --format '%.3f' --to=iec-i --suffix=B)
-          pr=$(echo "${{ needs.pr-wasm-size.outputs.size }}" | numfmt --format '%.3f' --to=iec-i  --suffix=B)
-          pr_gz=$(echo "${{ needs.pr-wasm-size.outputs.size_gz }}" | numfmt --format '%.3f' --to=iec-i --suffix=B)
 
-          diff=$(echo "$((${{ needs.pr-wasm-size.outputs.size }} - ${{ needs.base-wasm-size.outputs.size }}))" | numfmt --format '%.3f' --to=iec-i --suffix=B)
-          diff_gz=$(echo "$((${{ needs.pr-wasm-size.outputs.size_gz }} - ${{ needs.base-wasm-size.outputs.size_gz }}))" | numfmt --format '%.3f' --to=iec-i --suffix=B)
+          fmt() {
+            numfmt --format '%.3f' --to=iec-i --suffix=B "$1"
+          }
 
-          echo "base=$base" >> $GITHUB_OUTPUT
-          echo "base_gz=$base_gz" >> $GITHUB_OUTPUT
+          compute_diff() {
+            local provider="$1"
+            local base="$2"
+            local pr="$3"
+            local diff=$(fmt "$(($pr - $base))")
 
-          echo "pr=$pr" >> $GITHUB_OUTPUT
-          echo "pr_gz=$pr_gz" >> $GITHUB_OUTPUT
+            echo "${provider}_base=$(fmt "$base")" >> $GITHUB_OUTPUT
+            echo "${provider}_pr=$(fmt "$pr")" >> $GITHUB_OUTPUT
+            echo "${provider}_diff=$diff" >> $GITHUB_OUTPUT
+          }
 
-          echo "diff=$diff" >> $GITHUB_OUTPUT
-          echo "diff_gz=$diff_gz" >> $GITHUB_OUTPUT
+          compute_diff "postgresql" "${{ needs.base-wasm-size.outputs.postgresql_size }}" "${{ needs.pr-wasm-size.outputs.postgresql_size }}"
+          compute_diff "postgresql_gz" "${{ needs.base-wasm-size.outputs.postgresql_size_gz }}" "${{ needs.pr-wasm-size.outputs.postgresql_size_gz }}"
+
+          compute_diff "mysql" "${{ needs.base-wasm-size.outputs.mysql_size }}" "${{ needs.pr-wasm-size.outputs.mysql_size }}"
+          compute_diff "mysql_gz" "${{ needs.base-wasm-size.outputs.mysql_size_gz }}" "${{ needs.pr-wasm-size.outputs.mysql_size_gz }}"
+
+          compute_diff "sqlite" "${{ needs.base-wasm-size.outputs.sqlite_size }}" "${{ needs.pr-wasm-size.outputs.sqlite_size }}"
+          compute_diff "sqlite_gz" "${{ needs.base-wasm-size.outputs.sqlite_size_gz }}" "${{ needs.pr-wasm-size.outputs.sqlite_size_gz }}"
 
       - name: Find past report comment
         uses: peter-evans/find-comment@v2
@@ -109,8 +129,12 @@ jobs:
             <!-- wasm-size -->
             ### WASM Size
 
-            |Engine        | This PR                           | Base branch                          | Diff
-            |--------------|-----------------------------------|--------------------------------------|------------------------------------
-            | WASM         | ${{ steps.compute.outputs.pr}}    |  ${{ steps.compute.outputs.base}}    | ${{ steps.compute.outputs.diff}}
-            | WASM (gzip)  | ${{ steps.compute.outputs.pr_gz}} |  ${{ steps.compute.outputs.base_gz}} | ${{ steps.compute.outputs.diff_gz}}
+            |Engine            | This PR                                      | Base branch                                      | Diff
+            |------------------|----------------------------------------------|--------------------------------------------------|-----------------------------------------------
+            | Postgres         | ${{ steps.compute.outputs.postgresql_pr}}    |  ${{ steps.compute.outputs.postgresql_base }}    | ${{ steps.compute.outputs.postgresql_diff}}
+            | Postgres (gzip)  | ${{ steps.compute.outputs.postgresql_gz_pr}} |  ${{ steps.compute.outputs.postgresql_gz_base }} | ${{ steps.compute.outputs.postgresql_gz_diff}}
+            | Mysql            | ${{ steps.compute.outputs.mysql_pr}}         |  ${{ steps.compute.outputs.mysql_base}}          | ${{ steps.compute.outputs.mysql_diff}}
+            | Mysql (gzip)     | ${{ steps.compute.outputs.mysql_gz_pr}}      |  ${{ steps.compute.outputs.mysql_gz_base}}       | ${{ steps.compute.outputs.mysql_gz_diff}}
+            | Sqlite           | ${{ steps.compute.outputs.sqlite_pr}}        |  ${{ steps.compute.outputs.sqlite_base}}         | ${{ steps.compute.outputs.sqlite_diff}}
+            | Sqlite (gzip)    | ${{ steps.compute.outputs.sqlite_gz_pr}}     |  ${{ steps.compute.outputs.sqlite_gz_base }}     | ${{ steps.compute.outputs.sqlite_gz_diff}}
           edit-mode: replace
