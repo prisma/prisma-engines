@@ -62,21 +62,6 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
 
             Ok(PrismaValue::List(iter.collect::<crate::Result<Vec<_>>>()?))
         }
-        // to-one
-        serde_json::Value::Array(values) => {
-            let coerced = values
-                .into_iter()
-                .next()
-                .map(|value| coerce_json_relation_to_pv(value, rs));
-
-            // TODO(HACK): We probably want to update the sql builder instead to not aggregate to-one relations as array
-            // If the arary is empty, it means there's no relations, so we coerce it to
-            if let Some(val) = coerced {
-                val
-            } else {
-                Ok(PrismaValue::Null)
-            }
-        }
         serde_json::Value::Object(obj) => {
             let mut map: Vec<(String, PrismaValue)> = Vec::with_capacity(obj.len());
             let related_model = rs.field.related_model();
