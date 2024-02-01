@@ -48,7 +48,7 @@ mod unchecked_nested_um {
 
     // "Unchecked nested many updates" should "allow writing non-parent inlined relation scalars"
     // TODO: Unexclude once https://github.com/prisma/team-orm/issues/683 is fixed
-    #[connector_test(schema(schema_1), exclude(Vitess("planetscale.js"), Postgres("pg.js")))]
+    #[connector_test(schema(schema_1), exclude(Vitess("planetscale.js"), Postgres("pg.js", "neon.js")))]
     async fn allow_write_non_prent_inline_rel_sclrs(runner: Runner) -> TestResult<()> {
         // Setup
         // B1 -> A1 -> C1
