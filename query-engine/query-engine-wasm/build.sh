@@ -47,7 +47,7 @@ rustup component add rust-src --target wasm32-unknown-unknown
 echo "Building query-engine-wasm using $WASM_BUILD_PROFILE profile"
 export RUSTFLAGS="-Zlocation-detail=none"
 CARGO_PROFILE_RELEASE_OPT_LEVEL="z" wasm-pack build "--$WASM_BUILD_PROFILE" --target "$OUT_TARGET" --out-dir "$OUT_FOLDER" --out-name query_engine . \
--Zbuild-std=std,panic_abort -Zbuild-std-features=panic_immediate_abort
+    -Zbuild-std=std,panic_abort -Zbuild-std-features=panic_immediate_abort
 
 # wasm-opt pass
 WASM_OPT_ARGS=(
