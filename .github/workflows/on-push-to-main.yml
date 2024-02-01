@@ -19,6 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v24
         with:
+          # we need internet access for the moment
           extra_nix_config: |
             sandbox = false
 
