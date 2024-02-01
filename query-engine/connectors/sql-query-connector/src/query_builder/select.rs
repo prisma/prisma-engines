@@ -230,8 +230,14 @@ impl SelectBuilder {
         match vs {
             VirtualSelection::RelationCount(rf, filter) => {
                 let table_alias = relation_count_alias_name(rf);
-                let table = Table::from(self.build_relation_count_query(vs.db_alias(), rf, filter, parent_alias, ctx))
-                    .alias(table_alias);
+
+                let relation_count_select = if rf.relation().is_many_to_many() {
+                    self.build_relation_count_query_m2m(vs.db_alias(), rf, filter, parent_alias, ctx)
+                } else {
+                    self.build_relation_count_query(vs.db_alias(), rf, filter, parent_alias, ctx)
+                };
+
+                let table = Table::from(relation_count_select).alias(table_alias);
 
                 select.left_join_lateral(table.on(ConditionTree::single(true.raw())))
             }
@@ -256,6 +262,74 @@ impl SelectBuilder {
         let select = Select::from_table(related_table)
             .value(count(asterisk()).alias(selection_name))
             .with_join_conditions(rf, parent_alias, related_table_alias, ctx)
+            .with_filters(filter.clone(), Some(related_table_alias), ctx);
+
+        select
+    }
+
+    fn build_relation_count_query_m2m<'a>(
+        &mut self,
+        selection_name: impl Into<Cow<'static, str>>,
+        rf: &RelationField,
+        filter: &Option<Filter>,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a> {
+        let related_table_alias = self.next_alias();
+        let m2m_table_alias = self.next_alias();
+
+        let related_table = rf
+            .related_model()
+            .as_table(ctx)
+            .alias(related_table_alias.to_table_string());
+
+        let left_columns = rf.related_field().m2m_columns(ctx);
+        let right_columns = ModelProjection::from(rf.model().primary_identifier()).as_columns(ctx);
+
+        let join_conditions = left_columns
+            .into_iter()
+            .zip(right_columns)
+            .fold(None::<ConditionTree>, |acc, (a, b)| {
+                let a = a.table(m2m_table_alias.to_table_string());
+                let b = b.table(parent_alias.to_table_string());
+                let condition = a.equals(b);
+
+                match acc {
+                    Some(acc) => Some(acc.and(condition)),
+                    None => Some(condition.into()),
+                }
+            })
+            .unwrap();
+
+        let m2m_join_conditions = {
+            let join_columns = rf.join_columns(ctx);
+            let related_join_columns = ModelProjection::from(rf.related_field().linking_fields()).as_columns(ctx);
+
+            join_columns
+                .zip(related_join_columns)
+                .fold(None::<ConditionTree>, |acc, (a, b)| {
+                    let a = a.table(m2m_table_alias.to_table_string());
+                    let b = b.table(related_table_alias.to_table_string());
+                    let condition = a.equals(b);
+
+                    match acc {
+                        Some(acc) => Some(acc.and(condition)),
+                        None => Some(condition.into()),
+                    }
+                })
+                .unwrap()
+        };
+
+        let m2m_join_data = rf
+            .as_table(ctx)
+            .alias(m2m_table_alias.to_table_string())
+            .on(m2m_join_conditions);
+
+        let select = Select::from_table(related_table)
+            .value(count(asterisk()).alias(selection_name))
+            .left_join(m2m_join_data)
+            // .with_join_conditions(rf, parent_alias, related_table_alias, ctx)
+            .and_where(join_conditions)
             .with_filters(filter.clone(), Some(related_table_alias), ctx);
 
         select
