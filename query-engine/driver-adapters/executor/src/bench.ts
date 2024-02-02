@@ -41,10 +41,17 @@ async function main(): Promise<void> {
   const withErrorCapturing = bindAdapter(pg);
 
   // We build two decorators for recording and replaying db queries.
-  const { recorder, replayer } = recording(withErrorCapturing);
+  const { recorder, replayer, recordings } = recording(withErrorCapturing);
 
   // We exercise the queries recording them
   await recordQueries(recorder, datamodel, prismaQueries);
+
+  // Dump recordings if requested
+  if (process.env.BENCH_RECORDINGS_FILE != null) {
+    const recordingsJson = JSON.stringify(recordings.data(), null, 2);
+    await fs.writeFile(process.env.BENCH_RECORDINGS_FILE, recordingsJson);
+    debug(`Recordings written to ${process.env.BENCH_RECORDINGS_FILE}`);
+  }
 
   // Then we benchmark the execution of the queries but instead of hitting the DB
   // we fetch results from the recordings, thus isolating the performance
@@ -57,7 +64,7 @@ async function recordQueries(
   datamodel: string,
   prismaQueries: any
 ): Promise<void> {
-  const qe = await initQeWasmBaseLine(adapter, datamodel);
+  const qe = await initQeWasmCurrent(adapter, datamodel);
   await qe.connect("");
 
   try {
@@ -66,7 +73,7 @@ async function recordQueries(
       const res = await qe.query(JSON.stringify(query), "", undefined);
 
       const errors = JSON.parse(res).errors;
-      if (errors != null && errors.length > 0) {
+      if (errors != null) {
         throw new Error(
           `Query failed for ${description}: ${JSON.stringify(res)}`
         );

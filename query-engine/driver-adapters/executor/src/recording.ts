@@ -13,6 +13,7 @@ export function recording(adapter: DriverAdapter) {
   return {
     recorder: recorder(adapter, recordings),
     replayer: replayer(adapter, recordings),
+    recordings: recordings,
   };
 }
 
@@ -31,9 +32,7 @@ function recorder(adapter: DriverAdapter, recordings: Recordings) {
       return result;
     },
     executeRaw: async (params) => {
-      const result = await adapter.executeRaw(params);
-      recordings.addCommandResults(params, result);
-      return result;
+      throw new Error("Not implemented");
     },
   };
 }
@@ -70,6 +69,16 @@ function createInMemoryRecordings() {
   };
 
   return {
+    data: (): Map<string, ResultSet> => {
+      const map = new Map();
+      for (const [key, value] of queryResults.entries()) {
+        value.map((resultSet) => {
+          map[key] = resultSet;
+        });
+      }
+      return map;
+    },
+
     addQueryResults: (params: Query, result: Result<ResultSet>) => {
       const key = queryToKey(params);
       queryResults.set(key, result);
