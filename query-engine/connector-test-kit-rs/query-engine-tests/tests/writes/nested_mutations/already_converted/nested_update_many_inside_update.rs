@@ -55,12 +55,7 @@ mod um_inside_update {
     }
 
     // "a PM to C1! relation" should "work"
-    // TODO: fix https://github.com/prisma/team-orm/issues/683 and then unexclude DAs
-    #[relation_link_test(
-        on_parent = "ToMany",
-        on_child = "ToOneReq",
-        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
-    )]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_c1_req_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
 
@@ -94,12 +89,7 @@ mod um_inside_update {
     }
 
     // "a PM to C1  relation " should "work"
-    // TODO: fix https://github.com/prisma/team-orm/issues/683 and then unexclude DAs
-    #[relation_link_test(
-        on_parent = "ToMany",
-        on_child = "ToOneOpt",
-        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
-    )]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
     async fn pm_c1_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
 
@@ -133,12 +123,7 @@ mod um_inside_update {
     }
 
     // "a PM to CM  relation " should "work"
-    // TODO: fix https://github.com/prisma/team-orm/issues/683 and then unexclude DAs
-    #[relation_link_test(
-        on_parent = "ToMany",
-        on_child = "ToMany",
-        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
-    )]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
     async fn pm_cm_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
 
@@ -172,12 +157,7 @@ mod um_inside_update {
     }
 
     // "a PM to C1!  relation " should "work with several updateManys"
-    // TODO: fix https://github.com/prisma/team-orm/issues/683 and then unexclude DAs
-    #[relation_link_test(
-        on_parent = "ToMany",
-        on_child = "ToOneReq",
-        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
-    )]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_c1_req_many_ums(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
 
@@ -217,12 +197,7 @@ mod um_inside_update {
     }
 
     // "a PM to C1!  relation " should "work with empty Filter"
-    // TODO: fix https://github.com/prisma/team-orm/issues/683 and then unexclude DAs
-    #[relation_link_test(
-        on_parent = "ToMany",
-        on_child = "ToOneReq",
-        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
-    )]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_c1_req_empty_filter(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
 
@@ -258,12 +233,7 @@ mod um_inside_update {
     }
 
     // "a PM to C1!  relation " should "not change anything when there is no hit"
-    // TODO: fix https://github.com/prisma/team-orm/issues/683 and then unexclude DAs
-    #[relation_link_test(
-        on_parent = "ToMany",
-        on_child = "ToOneReq",
-        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
-    )]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_c1_req_noop_no_hit(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
 
@@ -305,12 +275,7 @@ mod um_inside_update {
     // optional ordering
 
     // "a PM to C1!  relation " should "work when multiple filters hit"
-    // TODO: fix https://github.com/prisma/team-orm/issues/683 and then unexclude DAs
-    #[relation_link_test(
-        on_parent = "ToMany",
-        on_child = "ToOneReq",
-        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
-    )]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneReq")]
     async fn pm_c1_req_many_filters(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = setup_data(runner, t).await?;
 

@@ -195,11 +195,7 @@ mod atomic_number_ops {
     }
 
     // "A nested updateOne mutation" should "correctly apply all number operations for Int"
-    // TODO: Unexclude once https://github.com/prisma/team-orm/issues/683 is fixed
-    #[connector_test(
-        schema(schema_3),
-        exclude(CockroachDb, Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
-    )]
+    #[connector_test(schema(schema_3), exclude(CockroachDb))]
     async fn nested_update_int_ops(runner: Runner) -> TestResult<()> {
         create_test_model(&runner, 1, None, None).await?;
         create_test_model(&runner, 2, Some(3), None).await?;

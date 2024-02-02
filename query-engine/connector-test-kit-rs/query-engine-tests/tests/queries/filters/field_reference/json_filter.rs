@@ -18,17 +18,7 @@ mod json_filter {
     }
 
     // Note: testing the absence of "JSON-null stripping" in Napi.rs Driver Adapters requires patching napi.rs.
-    // Please see: https://github.com/prisma/team-orm/issues/683#issuecomment-1898305228.
-    #[connector_test(
-        schema(schema),
-        exclude(
-            Postgres("pg.js"),
-            Postgres("neon.js"),
-            Sqlite("libsql.js"),
-            Vitess("planetscale.js"),
-            MySQL(5.6)
-        )
-    )]
+    #[connector_test(schema(schema), exclude(MySQL(5.6)))]
     async fn does_not_strip_nulls_in_json(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,

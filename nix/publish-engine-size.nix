@@ -47,7 +47,7 @@
           ${self'.packages.query-engine-bin-and-lib}/bin/query-engine         \
           ${self'.packages.query-engine-bin-and-lib}/lib/libquery_engine.node \
           ${self'.packages.query-engine-wasm-gz}/query_engine_bg.wasm.gz      \
-          ${self'.packages.query-engine-wasm}/query_engine_bg.wasm  
+          ${self'.packages.query-engine-wasm-gz}/query_engine_bg.wasm
 
       git add "$CSV_PATH"
       git commit --quiet -m "update engines size for $CURRENT_COMMIT_SHORT"
