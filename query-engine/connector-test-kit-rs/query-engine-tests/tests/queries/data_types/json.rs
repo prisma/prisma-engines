@@ -216,6 +216,49 @@ mod json {
         Ok(())
     }
 
+    fn schema_json_list() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+                #id(id, Int, @id)
+
+                child Child?
+            }
+            
+            model Child {
+                #id(id, Int, @id)
+                json_list Json[]
+
+                testId Int? @unique
+                test   TestModel? @relation(fields: [testId], references: [id])
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_json_list), capabilities(Json), exclude(Mysql(5.6)))]
+    async fn json_list(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{ id: 1, child: { create: { id: 1, json_list: ["1", "2"] } } }"#,
+        )
+        .await?;
+        create_row(&runner, r#"{ id: 2, child: { create: { id: 2, json_list: ["{}"] } } }"#).await?;
+        create_row(
+            &runner,
+            r#"{ id: 3, child: { create: { id: 3, json_list: ["\"hello\"", "\"world\""] } } }"#,
+        )
+        .await?;
+        create_row(&runner, r#"{ id: 4, child: { create: { id: 4 } } }"#).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyTestModel { child { json_list } } }"#),
+          @r###"{"data":{"findManyTestModel":[{"child":{"json_list":["1","2"]}},{"child":{"json_list":["{}"]}},{"child":{"json_list":["\"hello\"","\"world\""]}},{"child":{"json_list":[]}}]}}"###
+        );
+
+        Ok(())
+    }
+
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, json: "{}" }"#).await?;
         create_row(runner, r#"{ id: 2, json: "{\"a\":\"b\"}" }"#).await?;
