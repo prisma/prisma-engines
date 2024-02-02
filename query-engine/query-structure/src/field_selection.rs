@@ -68,10 +68,21 @@ impl FieldSelection {
         FieldSelection::new(non_virtuals.into_iter().chain(virtuals).collect())
     }
 
+    /// Returns the selections, grouping the virtual fields that are wrapped into objects in the
+    /// query (like `_count`) and returning only the first virtual field in each of those groups.
+    /// This is useful when we want to treat the group as a whole but we don't need the information
+    /// about every field in the group and can infer the necessary information (like the group
+    /// name) from any of those fields. This method is used by
+    /// [`FieldSelection::db_names_grouping_virtuals`] and
+    /// [`FieldSelection::type_identifiers_with_arities_grouping_virtuals`].
+    fn selections_with_virtual_group_heads(&self) -> impl Iterator<Item = &SelectedField> {
+        self.selections().unique_by(|f| f.db_name_grouping_virtuals())
+    }
+
     /// Returns all Prisma (e.g. schema model field) names of contained fields.
     /// Does _not_ recurse into composite selections and only iterates top level fields.
     pub fn prisma_names(&self) -> impl Iterator<Item = String> + '_ {
-        self.selections.iter().map(|f| f.prisma_name().into_owned())
+        self.selections().map(|f| f.prisma_name().into_owned())
     }
 
     /// Returns all database (e.g. column or document field) names of contained fields.
@@ -79,7 +90,7 @@ impl FieldSelection {
     /// Returns db aliases for virtual fields grouped into objects in the query separately,
     /// representing results of queries that do not load relations using JOINs.
     pub fn db_names(&self) -> impl Iterator<Item = String> + '_ {
-        self.selections.iter().map(|f| f.db_name().into_owned())
+        self.selections().map(|f| f.db_name().into_owned())
     }
 
     /// Returns all database (e.g. column or document field) names of contained fields. Does not
@@ -88,10 +99,8 @@ impl FieldSelection {
     /// method correspond to the results of queries that use JSON objects to represent joined
     /// relations and relation aggregations.
     pub fn db_names_grouping_virtuals(&self) -> impl Iterator<Item = String> + '_ {
-        self.selections
-            .iter()
+        self.selections_with_virtual_group_heads()
             .map(|f| f.db_name_grouping_virtuals())
-            .unique()
             .map(Cow::into_owned)
     }
 
@@ -206,9 +215,8 @@ impl FieldSelection {
     /// and not each of those fields separately. This represents the selection in joined queries
     /// that use JSON objects for relations and relation aggregations.
     pub fn type_identifiers_with_arities_grouping_virtuals(&self) -> Vec<(TypeIdentifier, FieldArity)> {
-        self.selections()
-            .unique_by(|vs| vs.db_name_grouping_virtuals())
-            .filter_map(|vs| vs.type_identifier_with_arity())
+        self.selections_with_virtual_group_heads()
+            .filter_map(|vs| vs.type_identifier_with_arity_grouping_virtuals())
             .collect()
     }
 
