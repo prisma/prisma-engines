@@ -64,23 +64,36 @@ async function recordQueries(
   datamodel: string,
   prismaQueries: any
 ): Promise<void> {
-  const qe = await initQeWasmCurrent(adapter, datamodel);
-  await qe.connect("");
+  // Different engines might have made different SQL queries to complete the same Prisma Query,
+  // so we record the results of all engines and assert that they are the same.
+  const napi = await initQeNapiCurrent(adapter, datamodel);
+  await napi.connect("");
+  const wasmCurrent = await initQeWasmCurrent(adapter, datamodel);
+  await wasmCurrent.connect("");
+  const wasmBaseline = await initQeWasmBaseLine(adapter, datamodel);
+  await wasmBaseline.connect("");
+  const wasmLatest = await initQeWasmLatest(adapter, datamodel);
+  await wasmLatest.connect("");
 
   try {
-    for (const prismaQuery of prismaQueries) {
-      const { description, query } = prismaQuery;
-      const res = await qe.query(JSON.stringify(query), "", undefined);
+    for (const qe of [napi, wasmCurrent, wasmBaseline, wasmLatest]) {
+      for (const prismaQuery of prismaQueries) {
+        const { description, query } = prismaQuery;
+        const res = await qe.query(JSON.stringify(query), "", undefined);
 
-      const errors = JSON.parse(res).errors;
-      if (errors != null) {
-        throw new Error(
-          `Query failed for ${description}: ${JSON.stringify(res)}`
-        );
+        const errors = JSON.parse(res).errors;
+        if (errors != null) {
+          throw new Error(
+            `Query failed for ${description}: ${JSON.stringify(res)}`
+          );
+        }
       }
     }
   } finally {
-    await qe.disconnect("");
+    await napi.disconnect("");
+    await wasmCurrent.disconnect("");
+    await wasmBaseline.disconnect("");
+    await wasmLatest.disconnect("");
   }
 }
 
