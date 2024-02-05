@@ -16,7 +16,10 @@ mod casts {
     // args: [ 42.51 ]
     // }
     //
-    // Bails with: ERROR: invalid input syntax for type integer: "42.51"
+    // Bails with: ERROR: invalid input syntax for type integer: "42.51".
+    // It fails in the following cases:
+    // - RawParam::from(42.51)
+    // - RawParam::decimal("42.51")
     //
     #[connector_test(only(Postgres), exclude(Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm")))]
     async fn query_numeric_casts(runner: Runner) -> TestResult<()> {

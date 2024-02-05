@@ -47,7 +47,11 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     NamedForeignKeys |
     AdvancedJsonNullability |
     IndexColumnLengthPrefixing |
+
+    // why is this here, considering that using multiple schemas in MySQL leads to the
+    // "multiSchema migrations and introspection are not implemented on MySQL yet" error?
     MultiSchema |
+
     FullTextIndex |
     FullTextSearchWithIndex |
     MultipleFullTextAttributesPerModel |

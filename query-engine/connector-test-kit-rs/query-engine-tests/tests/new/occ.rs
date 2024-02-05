@@ -112,6 +112,10 @@ mod occ {
         assert_eq!(booked_user_id, found_booked_user_id);
     }
 
+    // On PlanetScale:
+    //   assertion `left == right` failed
+    //   left: 6
+    //   right: 1
     #[connector_test(
         schema(occ_simple),
         exclude(MongoDB, CockroachDb, Vitess("planetscale.js", "planetscale.js.wasm"))

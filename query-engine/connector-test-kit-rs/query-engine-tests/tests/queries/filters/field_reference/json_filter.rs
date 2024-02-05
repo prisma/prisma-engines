@@ -147,7 +147,7 @@ mod json_filter {
         Ok(())
     }
 
-    #[connector_test(schema(schema), exclude(MySQL(5.6), Vitess("planetscale.js", "planetscale.js.wasm")))]
+    #[connector_test(schema(schema), exclude(MySQL(5.6), Vitess("planetscale.js")))]
     async fn string_comparison_filters(runner: Runner) -> TestResult<()> {
         test_string_data(&runner).await?;
 
@@ -484,7 +484,7 @@ mod json_filter {
     fn json_path(runner: &Runner) -> &'static str {
         match runner.connector_version() {
             ConnectorVersion::Postgres(_) | ConnectorVersion::CockroachDb(_) => r#"path: ["a", "b"]"#,
-            ConnectorVersion::MySql(_) => r#"path: "$.a.b""#,
+            ConnectorVersion::MySql(_) | ConnectorVersion::Vitess(_) => r#"path: "$.a.b""#,
             x => unreachable!("JSON filtering is not supported on {:?}", x),
         }
     }
