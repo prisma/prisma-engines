@@ -65,7 +65,7 @@ async function recordQueries(
   prismaQueries: any
 ): Promise<void> {
   // Different engines might have made different SQL queries to complete the same Prisma Query,
-  // so we record the results of all engines and assert that they are the same.
+  // so we record the results of all engines for the benchmarking phase.
   const napi = await initQeNapiCurrent(adapter, datamodel);
   await napi.connect("");
   const wasmCurrent = await initQeWasmCurrent(adapter, datamodel);
@@ -80,6 +80,7 @@ async function recordQueries(
       for (const prismaQuery of prismaQueries) {
         const { description, query } = prismaQuery;
         const res = await qe.query(JSON.stringify(query), "", undefined);
+        console.log(res[9]);
 
         const errors = JSON.parse(res).errors;
         if (errors != null) {
