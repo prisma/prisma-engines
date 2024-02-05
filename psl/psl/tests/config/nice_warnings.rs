@@ -10,9 +10,9 @@ fn nice_warning_for_deprecated_generator_preview_feature() {
     }
     "#;
 
-    let res = psl::parse_configuration(schema).unwrap();
+    let (_, warnings) = psl::parse_configuration(schema).unwrap();
 
-    res.warnings.assert_is(DatamodelWarning::new_feature_deprecated(
+    warnings.assert_is(DatamodelWarning::new_feature_deprecated(
         "middlewares",
         Span::new(88, 103),
     ));

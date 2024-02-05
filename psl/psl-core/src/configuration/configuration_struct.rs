@@ -10,7 +10,6 @@ use enumflags2::BitFlags;
 pub struct Configuration {
     pub generators: Vec<Generator>,
     pub datasources: Vec<Datasource>,
-    pub warnings: Vec<diagnostics::DatamodelWarning>,
 }
 
 impl Configuration {

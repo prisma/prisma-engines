@@ -170,7 +170,10 @@ impl PrismaOpt {
         Ok(schema)
     }
 
-    pub(crate) fn configuration(&self, ignore_env_errors: bool) -> PrismaResult<psl::Configuration> {
+    pub(crate) fn configuration(
+        &self,
+        ignore_env_errors: bool,
+    ) -> PrismaResult<(psl::Configuration, Vec<psl::diagnostics::DatamodelWarning>)> {
         let datamodel_str = self.datamodel_str()?;
 
         let datasource_url_overrides: Vec<(String, String)> = if let Some(ref json) = self.overwrite_datasources {
@@ -181,14 +184,14 @@ impl PrismaOpt {
         };
 
         psl::parse_configuration(datamodel_str)
-            .and_then(|mut config| {
+            .and_then(|(mut config, warnings)| {
                 config.resolve_datasource_urls_query_engine(
                     &datasource_url_overrides,
                     |key| env::var(key).ok(),
                     ignore_env_errors,
                 )?;
 
-                Ok(config)
+                Ok((config, warnings))
             })
             .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
     }

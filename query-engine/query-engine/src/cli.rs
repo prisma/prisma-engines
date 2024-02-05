@@ -21,7 +21,7 @@ pub struct DmmfRequest {
 }
 
 pub struct GetConfigRequest {
-    config: psl::Configuration,
+    config: (psl::Configuration, Vec<psl::diagnostics::DatamodelWarning>),
     ignore_env_var_errors: bool,
 }
 
@@ -98,11 +98,11 @@ impl CliCommand {
     }
 
     fn get_config(mut req: GetConfigRequest) -> PrismaResult<()> {
-        let config = &mut req.config;
+        let (config, warnings) = &mut req.config;
 
         config.resolve_datasource_urls_query_engine(&[], |key| env::var(key).ok(), req.ignore_env_var_errors)?;
 
-        let json = psl::get_config::config_to_mcf_json_value(config);
+        let json = psl::get_config::config_to_mcf_json_value((config, warnings));
         let serialized = serde_json::to_string(&json)?;
 
         println!("{serialized}");

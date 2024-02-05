@@ -98,7 +98,7 @@ fn connector_for_connection_string(
 
 /// Same as schema_to_connector, but it will only read the provider, not the connector params.
 fn schema_to_connector_unchecked(schema: &str) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
-    let config = psl::parse_configuration(schema)
+    let (config, _) = psl::parse_configuration(schema)
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", schema)))?;
 
     let preview_features = config.preview_features();
@@ -179,7 +179,7 @@ pub fn schema_api(
 }
 
 fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFlags<PreviewFeature>, Option<String>)> {
-    let config = psl::parse_configuration(datamodel)
+    let (config, _) = psl::parse_configuration(datamodel)
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
     let preview_features = config.preview_features();

@@ -102,7 +102,7 @@ fn must_error_for_empty_urls() {
         }
     "#};
 
-    let config = parse_config(dml).unwrap();
+    let (config, _) = parse_config(dml).unwrap();
 
     let error = config.datasources[0]
         .load_url(load_env_var)
@@ -155,7 +155,7 @@ fn must_error_for_empty_urls_derived_load_env_vars() {
         }
     "#};
 
-    let config = parse_config(dml).unwrap();
+    let (config, _) = parse_config(dml).unwrap();
 
     let error = config.datasources[0]
         .load_url(load_env_var)
@@ -184,7 +184,7 @@ fn must_error_if_prisma_protocol_is_used_for_mysql() {
         }
     "#};
 
-    let config = parse_config(dml).unwrap();
+    let (config, _) = parse_config(dml).unwrap();
 
     let error = config.datasources[0]
         .load_url(load_env_var)
@@ -218,7 +218,7 @@ fn must_error_if_wrong_protocol_is_used_for_mysql() {
         }
     "#};
 
-    let config = parse_config(dml).unwrap();
+    let (config, _) = parse_config(dml).unwrap();
 
     let error = config.datasources[0]
         .load_url(load_env_var)
@@ -247,7 +247,7 @@ fn must_error_if_wrong_protocol_is_used_for_mysql_shadow_database_url() {
         }
     "#};
 
-    let config = parse_config(dml).unwrap();
+    let (config, _) = parse_config(dml).unwrap();
 
     let error = config.datasources[0]
         .load_shadow_database_url()
@@ -310,7 +310,7 @@ fn must_error_if_wrong_protocol_is_used_for_postgresql() {
         }
     "#};
 
-    let config = parse_config(dml).unwrap();
+    let (config, _) = parse_config(dml).unwrap();
 
     let error = config.datasources[0]
         .load_url(load_env_var)
@@ -339,7 +339,7 @@ fn must_error_if_wrong_protocol_is_used_for_postgresql_shadow_database_url() {
         }
     "#};
 
-    let config = parse_config(dml).unwrap();
+    let (config, _) = parse_config(dml).unwrap();
 
     let error = config.datasources[0]
         .load_shadow_database_url()
@@ -367,7 +367,7 @@ fn must_error_if_wrong_protocol_is_used_for_sqlite() {
         }
     "#};
 
-    let config = parse_config(dml).unwrap();
+    let (config, _) = parse_config(dml).unwrap();
 
     let error = config.datasources[0]
         .load_url(load_env_var)
@@ -464,7 +464,7 @@ fn must_error_if_env_var_is_missing() {
         }
     "#};
 
-    let config = parse_config(dml).unwrap();
+    let (config, _) = parse_config(dml).unwrap();
 
     let error = config.datasources[0]
         .load_url(load_env_var)
@@ -660,7 +660,7 @@ fn fail_when_no_source_is_declared() {
     let invalid_datamodel: &str = r#"        "#;
 
     let error = psl::parse_configuration(invalid_datamodel)
-        .and_then(|res| res.validate_that_one_datasource_is_provided())
+        .and_then(|(config, _)| config.validate_that_one_datasource_is_provided())
         .map_err(|e| e.to_pretty_string("schema.prisma", invalid_datamodel))
         .unwrap_err();
 
@@ -747,7 +747,7 @@ fn must_error_for_empty_direct_urls() {
         }
     "#};
 
-    let config = parse_config(dml).unwrap();
+    let (config, _) = parse_config(dml).unwrap();
 
     let error = config.datasources[0]
         .load_direct_url(load_env_var)
@@ -777,7 +777,7 @@ fn must_error_for_empty_env_direct_urls() {
         }
     "#};
 
-    let config = parse_config(dml).unwrap();
+    let (config, _) = parse_config(dml).unwrap();
 
     let error = config.datasources[0]
         .load_direct_url(load_env_var)
@@ -806,7 +806,7 @@ fn must_error_for_missing_env_direct_urls() {
         }
     "#};
 
-    let config = parse_config(dml).unwrap();
+    let (config, _) = parse_config(dml).unwrap();
 
     let error = config.datasources[0]
         .load_direct_url(load_env_var)
@@ -837,7 +837,7 @@ fn directurl_should_work_with_proxy_url() {
 
     std::env::set_var("DATABASE_URL_0001", "postgres://hostfoo");
 
-    let config = parse_config(dml).unwrap();
+    let (config, _) = parse_config(dml).unwrap();
 
     let result = config.datasources[0]
         .load_direct_url(load_env_var)
@@ -865,7 +865,7 @@ fn load_url_should_not_work_with_proxy_url() {
     std::env::set_var("DATABASE_URL_0002", "prisma://hostbar");
     std::env::set_var("DIRECT_URL_0002", "postgres://hostfoo");
 
-    let config = parse_config(dml).unwrap();
+    let (config, _) = parse_config(dml).unwrap();
 
     let error = config.datasources[0]
         .load_url(load_env_var)
@@ -907,7 +907,7 @@ fn load_url_no_validation_should_work_with_proxy_url() {
     std::env::set_var("DATABASE_URL_0003", "prisma://hostbar");
     std::env::set_var("DIRECT_URL_0003", "postgres://hostfoo");
 
-    let config = parse_config(dml).unwrap();
+    let (config, _) = parse_config(dml).unwrap();
 
     let result = config.datasources[0]
         .load_url_no_validation(load_env_var)
@@ -936,7 +936,7 @@ fn directurl_should_not_use_prisma_scheme_when_using_env_vars() {
         }
     "#};
 
-    let config = parse_config(dml).unwrap();
+    let (config, _) = parse_config(dml).unwrap();
 
     let error = config.datasources[0]
         .load_direct_url(load_env_var)
@@ -971,7 +971,7 @@ fn directurl_should_not_use_prisma_scheme() {
 
     std::env::set_var("DATABASE_URL_0005", "prisma://hostbar");
 
-    let config = parse_config(dml).unwrap();
+    let (config, _) = parse_config(dml).unwrap();
 
     let error = config.datasources[0]
         .load_direct_url(load_env_var)

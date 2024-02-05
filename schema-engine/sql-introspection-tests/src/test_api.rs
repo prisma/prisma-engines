@@ -330,7 +330,8 @@ impl TestApi {
     }
 
     pub fn configuration(&self) -> Configuration {
-        psl::parse_configuration(&self.pure_config()).unwrap()
+        let (config, _) = psl::parse_configuration(&self.pure_config()).unwrap();
+        config
     }
 
     pub async fn expect_datamodel(&mut self, expectation: &expect_test::Expect) {

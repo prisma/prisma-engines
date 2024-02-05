@@ -56,7 +56,7 @@ fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConf
         }
     };
 
-    let mut config = psl::parse_configuration(&params.prisma_schema).map_err(wrap_get_config_err)?;
+    let (mut config, warnings) = psl::parse_configuration(&params.prisma_schema).map_err(wrap_get_config_err)?;
 
     if !params.ignore_env_var_errors {
         let overrides: Vec<(_, _)> = params.datasource_overrides.into_iter().collect();
@@ -65,7 +65,7 @@ fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConf
             .map_err(wrap_get_config_err)?;
     }
 
-    Ok(psl::get_config(&config))
+    Ok(psl::get_config((&config, &warnings)))
 }
 
 #[cfg(test)]

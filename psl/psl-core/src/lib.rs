@@ -28,7 +28,7 @@ pub use schema_ast;
 pub use set_config_dir::set_config_dir;
 
 use self::validate::{datasource_loader, generator_loader};
-use diagnostics::Diagnostics;
+use diagnostics::{DatamodelWarning, Diagnostics};
 use parser_database::{ast, ParserDatabase, SourceFile};
 
 /// The collection of all available connectors.
@@ -58,7 +58,7 @@ impl ValidatedSchema {
 pub fn validate(file: SourceFile, connectors: ConnectorRegistry<'_>) -> (ValidatedSchema, Diagnostics) {
     let mut diagnostics = Diagnostics::new();
     let db = ParserDatabase::new(file, &mut diagnostics);
-    let configuration = validate_configuration(db.ast(), &mut diagnostics, connectors);
+    let (configuration, _) = validate_configuration(db.ast(), &mut diagnostics, connectors);
     let datasources = &configuration.datasources;
     let out = validate::validate(db, datasources, configuration.preview_features(), diagnostics);
 
@@ -79,7 +79,7 @@ pub fn validate(file: SourceFile, connectors: ConnectorRegistry<'_>) -> (Validat
 pub fn parse_without_validation(file: SourceFile, connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
     let mut diagnostics = Diagnostics::new();
     let db = ParserDatabase::new(file, &mut diagnostics);
-    let configuration = validate_configuration(db.ast(), &mut diagnostics, connectors);
+    let (configuration, _) = validate_configuration(db.ast(), &mut diagnostics, connectors);
     let datasources = &configuration.datasources;
     let out = validate::parse_without_validation(db, datasources);
 
@@ -95,7 +95,7 @@ pub fn parse_without_validation(file: SourceFile, connectors: ConnectorRegistry<
 pub fn parse_configuration(
     schema: &str,
     connectors: ConnectorRegistry<'_>,
-) -> Result<Configuration, diagnostics::Diagnostics> {
+) -> Result<(Configuration, Vec<DatamodelWarning>), diagnostics::Diagnostics> {
     let mut diagnostics = Diagnostics::default();
     let ast = schema_ast::parse_schema(schema, &mut diagnostics);
     let out = validate_configuration(&ast, &mut diagnostics, connectors);
@@ -106,14 +106,16 @@ fn validate_configuration(
     schema_ast: &ast::SchemaAst,
     diagnostics: &mut Diagnostics,
     connectors: ConnectorRegistry<'_>,
-) -> Configuration {
+) -> (Configuration, Vec<DatamodelWarning>) {
     let generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics);
-
     let datasources = datasource_loader::load_datasources_from_ast(schema_ast, diagnostics, connectors);
+    let warnings = diagnostics.warnings().to_owned();
 
-    Configuration {
-        generators,
-        datasources,
-        warnings: diagnostics.warnings().to_owned(),
-    }
+    (
+        Configuration {
+            generators,
+            datasources,
+        },
+        warnings,
+    )
 }

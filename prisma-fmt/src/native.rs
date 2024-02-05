@@ -1,7 +1,7 @@
 use psl::datamodel_connector::NativeTypeConstructor;
 
 pub(crate) fn run(schema: &str) -> String {
-    let validated_configuration = match psl::parse_configuration(schema) {
+    let (validated_configuration, _) = match psl::parse_configuration(schema) {
         Ok(validated_configuration) => validated_configuration,
         Err(_) => return "[]".to_owned(),
     };

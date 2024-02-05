@@ -2,6 +2,7 @@
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 
 pub use psl_core::builtin_connectors;
+use psl_core::diagnostics::DatamodelWarning;
 pub use psl_core::{
     datamodel_connector,
     diagnostics::{self, Diagnostics},
@@ -32,7 +33,7 @@ pub mod get_config {
 
 /// Parses and validate a schema, but skip analyzing everything except datasource and generator
 /// blocks.
-pub fn parse_configuration(schema: &str) -> Result<Configuration, Diagnostics> {
+pub fn parse_configuration(schema: &str) -> Result<(Configuration, Vec<DatamodelWarning>), Diagnostics> {
     psl_core::parse_configuration(schema, builtin_connectors::BUILTIN_CONNECTORS)
 }
 

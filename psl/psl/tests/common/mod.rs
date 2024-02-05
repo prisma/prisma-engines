@@ -19,14 +19,14 @@ pub(crate) fn parse_schema(datamodel_string: &str) -> psl::ValidatedSchema {
     psl::parse_schema(datamodel_string).unwrap()
 }
 
-pub(crate) fn parse_config(schema: &str) -> Result<Configuration, String> {
+pub(crate) fn parse_config(schema: &str) -> Result<(Configuration, Vec<psl::diagnostics::DatamodelWarning>), String> {
     psl::parse_configuration(schema).map_err(|err| err.to_pretty_string("schema.prisma", schema))
 }
 
 #[track_caller]
 pub(crate) fn parse_configuration(datamodel_string: &str) -> Configuration {
     match psl::parse_configuration(datamodel_string) {
-        Ok(c) => c,
+        Ok((c, _)) => c,
         Err(errs) => {
             panic!(
                 "Configuration parsing failed\n\n{}",

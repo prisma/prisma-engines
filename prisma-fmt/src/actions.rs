@@ -2,7 +2,7 @@ pub(crate) fn run(schema: &str) -> String {
     let datamodel_result = psl::parse_configuration(schema);
 
     match datamodel_result {
-        Ok(validated_configuration) => {
+        Ok((validated_configuration, _)) => {
             if validated_configuration.datasources.len() != 1 {
                 "[]".to_string()
             } else if let Some(datasource) = validated_configuration.datasources.first() {

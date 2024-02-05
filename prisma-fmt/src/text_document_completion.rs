@@ -32,7 +32,7 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
             return empty_completion_list();
         };
 
-    let config = parse_configuration(source_file.as_str()).ok();
+    let config = parse_configuration(source_file.as_str()).ok().map(|(config, _)| config);
 
     let mut list = CompletionList {
         is_incomplete: false,

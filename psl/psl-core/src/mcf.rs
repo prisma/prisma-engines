@@ -6,7 +6,9 @@ pub use source::*;
 
 use serde::Serialize;
 
-pub fn config_to_mcf_json_value(mcf: &crate::Configuration) -> serde_json::Value {
+pub fn config_to_mcf_json_value(
+    mcf: (&crate::Configuration, &Vec<diagnostics::DatamodelWarning>),
+) -> serde_json::Value {
     serde_json::to_value(&model_to_serializable(mcf)).expect("Failed to render JSON.")
 }
 
@@ -18,10 +20,11 @@ pub struct SerializeableMcf {
     warnings: Vec<String>,
 }
 
-fn model_to_serializable(config: &crate::Configuration) -> SerializeableMcf {
+fn model_to_serializable(mcf: (&crate::Configuration, &Vec<diagnostics::DatamodelWarning>)) -> SerializeableMcf {
+    let (config, warnings) = mcf;
     SerializeableMcf {
         generators: generator::generators_to_json_value(&config.generators),
         datasources: source::render_sources_to_json_value(&config.datasources),
-        warnings: config.warnings.iter().map(|f| f.message().to_owned()).collect(),
+        warnings: warnings.iter().map(|f| f.message().to_owned()).collect(),
     }
 }

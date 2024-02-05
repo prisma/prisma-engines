@@ -439,7 +439,8 @@ fn mongo_uses_prisma_relation_mode_by_default() {
         }
     "#};
 
-    assert_eq!(Some(RelationMode::Prisma), parse_config(dml).unwrap().relation_mode());
+    let (config, _) = parse_config(dml).unwrap();
+    assert_eq!(Some(RelationMode::Prisma), config.relation_mode());
 }
 
 #[test]
@@ -463,10 +464,8 @@ fn sql_databases_use_foreign_keys_relation_mode_by_default() {
             }}
         "#, db = db};
 
-        assert_eq!(
-            Some(RelationMode::ForeignKeys),
-            parse_config(&dml).unwrap().relation_mode()
-        );
+        let (config, _) = parse_config(&dml).unwrap();
+        assert_eq!(Some(RelationMode::ForeignKeys), config.relation_mode());
     }
 }
 
