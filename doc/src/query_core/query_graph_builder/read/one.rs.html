@@ -65,12 +65,6 @@
 <a href="#65" id="65">65</a>
 <a href="#66" id="66">66</a>
 <a href="#67" id="67">67</a>
-<a href="#68" id="68">68</a>
-<a href="#69" id="69">69</a>
-<a href="#70" id="70">70</a>
-<a href="#71" id="71">71</a>
-<a href="#72" id="72">72</a>
-<a href="#73" id="73">73</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{utils::get_relation_load_strategy, <span class="kw-2">*</span>};
 <span class="kw">use crate</span>::{query_document::<span class="kw-2">*</span>, QueryOption, QueryOptions, ReadQuery, RecordQuery};
 <span class="kw">use </span>query_structure::Model;
@@ -123,14 +117,8 @@
     <span class="kw">let </span>nested = utils::collect_nested_queries(nested_fields, <span class="kw-2">&amp;</span>model, query_schema)<span class="question-mark">?</span>;
     <span class="kw">let </span>selected_fields = utils::merge_relation_selections(selected_fields, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>nested);
 
-    <span class="kw">let </span>relation_load_strategy = get_relation_load_strategy(
-        requested_rel_load_strategy,
-        <span class="prelude-val">None</span>,
-        <span class="prelude-val">None</span>,
-        <span class="kw-2">&amp;</span>nested,
-        <span class="kw-2">&amp;</span>selected_fields,
-        query_schema,
-    );
+    <span class="kw">let </span>relation_load_strategy =
+        get_relation_load_strategy(requested_rel_load_strategy, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>nested, query_schema);
 
     <span class="prelude-val">Ok</span>(ReadQuery::RecordQuery(RecordQuery {
         name,

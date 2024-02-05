@@ -85,6 +85,13 @@
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>connector::AggregationRow;
 <span class="kw">use </span>query_structure::{ManyRecords, Model, SelectionResult, VirtualSelection};
 
@@ -107,6 +114,11 @@
     <span class="doccomment">/// Holds an ordered list of selected field names for each contained record.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) fields: Vec&lt;String&gt;,
 
+    <span class="doccomment">/// Holds the list of virtual selections included in the query result.
+    /// TODO: in the future it should be covered by [`RecordSelection::fields`] by storing ordered
+    /// `Vec&lt;SelectedField&gt;` or `FieldSelection` instead of `Vec&lt;String&gt;`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) virtuals: Vec&lt;VirtualSelection&gt;,
+
     <span class="doccomment">/// Selection results
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) records: ManyRecords,
 
@@ -128,6 +140,8 @@
     </span><span class="kw">pub </span>name: String,
     <span class="doccomment">/// Holds an ordered list of selected field names for each contained record.
     </span><span class="kw">pub </span>fields: Vec&lt;String&gt;,
+    <span class="doccomment">/// Holds the list of virtual selections included in the query result.
+    </span><span class="kw">pub </span>virtuals: Vec&lt;VirtualSelection&gt;,
     <span class="doccomment">/// The model of the contained records.
     </span><span class="kw">pub </span>model: Model,
     <span class="doccomment">/// Nested relation selections

@@ -57,7 +57,6 @@
 <a href="#57" id="57">57</a>
 <a href="#58" id="58">58</a>
 <a href="#59" id="59">59</a>
-<a href="#60" id="60">60</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{utils::get_relation_load_strategy, <span class="kw-2">*</span>};
 <span class="kw">use crate</span>::{query_document::ParsedField, ManyRecordsQuery, QueryOption, QueryOptions, ReadQuery};
 <span class="kw">use </span>query_structure::Model;
@@ -102,7 +101,6 @@
         args.cursor.as_ref(),
         args.distinct.as_ref(),
         <span class="kw-2">&amp;</span>nested,
-        <span class="kw-2">&amp;</span>selected_fields,
         query_schema,
     );
 

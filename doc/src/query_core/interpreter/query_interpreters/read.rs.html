@@ -301,6 +301,9 @@
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{inmemory_record_processor::InMemoryRecordProcessor, <span class="kw-2">*</span>};
 <span class="kw">use crate</span>::{interpreter::InterpretationResult, query_ast::<span class="kw-2">*</span>, result_ast::<span class="kw-2">*</span>};
 <span class="kw">use </span>connector::{error::ConnectorError, ConnectionLike};
@@ -367,6 +370,7 @@
                     name: query.name,
                     model,
                     fields: query.selection_order,
+                    virtuals: query.selected_fields.virtuals_owned(),
                     records,
                     nested: build_relation_record_selection(query.selected_fields.relations()),
                 }
@@ -475,6 +479,7 @@
             <span class="prelude-val">Ok</span>(RecordSelectionWithRelations {
                 name: query.name,
                 fields: query.selection_order,
+                virtuals: query.selected_fields.virtuals_owned(),
                 records: result,
                 nested: build_relation_record_selection(query.selected_fields.relations()),
                 model: query.model,
@@ -493,6 +498,7 @@
         .map(|rq| RelationRecordSelection {
             name: rq.field.name().to_owned(),
             fields: rq.result_fields.clone(),
+            virtuals: rq.virtuals().cloned().collect(),
             model: rq.field.related_model(),
             nested: build_relation_record_selection(rq.relations()),
         })
