@@ -38,7 +38,6 @@ pub struct ValidatedSchema {
     pub configuration: Configuration,
     pub db: parser_database::ParserDatabase,
     pub connector: &'static dyn datamodel_connector::Connector,
-    pub diagnostics: Diagnostics,
     relation_mode: datamodel_connector::RelationMode,
 }
 
@@ -56,20 +55,22 @@ impl ValidatedSchema {
 
 /// The most general API for dealing with Prisma schemas. It accumulates what analysis and
 /// validation information it can, and returns it along with any error and warning diagnostics.
-pub fn validate(file: SourceFile, connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
+pub fn validate(file: SourceFile, connectors: ConnectorRegistry<'_>) -> (ValidatedSchema, Diagnostics) {
     let mut diagnostics = Diagnostics::new();
     let db = ParserDatabase::new(file, &mut diagnostics);
     let configuration = validate_configuration(db.ast(), &mut diagnostics, connectors);
     let datasources = &configuration.datasources;
     let out = validate::validate(db, datasources, configuration.preview_features(), diagnostics);
 
-    ValidatedSchema {
-        diagnostics: out.diagnostics,
-        configuration,
-        connector: out.connector,
-        db: out.db,
-        relation_mode: out.relation_mode,
-    }
+    (
+        ValidatedSchema {
+            configuration,
+            connector: out.connector,
+            db: out.db,
+            relation_mode: out.relation_mode,
+        },
+        out.diagnostics,
+    )
 }
 
 /// Retrieves a Prisma schema without validating it.
@@ -83,7 +84,6 @@ pub fn parse_without_validation(file: SourceFile, connectors: ConnectorRegistry<
     let out = validate::parse_without_validation(db, datasources);
 
     ValidatedSchema {
-        diagnostics,
         configuration,
         connector: out.connector,
         db: out.db,

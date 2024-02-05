@@ -25,8 +25,7 @@ pub(crate) fn validate(params: &str) -> Result<(), String> {
 }
 
 pub fn run(input_schema: &str, no_color: bool) -> Result<(), String> {
-    let validate_schema = psl::validate(input_schema.into());
-    let diagnostics = &validate_schema.diagnostics;
+    let (_, diagnostics) = psl::validate(input_schema.into());
 
     if !diagnostics.has_errors() {
         return Ok(());

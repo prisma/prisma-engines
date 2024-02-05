@@ -96,7 +96,7 @@ impl QueryEngine {
         let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
 
-        let mut schema = psl::validate(datamodel.into());
+        let (mut schema, mut diagnostics) = psl::validate(datamodel.into());
         let config = &mut schema.configuration;
         let preview_features = config.preview_features();
 
@@ -123,8 +123,7 @@ impl QueryEngine {
 
         let connector_mode = connector_mode;
 
-        schema
-            .diagnostics
+        diagnostics
             .to_result()
             .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
 

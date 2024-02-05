@@ -205,9 +205,9 @@ source .test_database_urls/mysql_5_6
 
     let config = format!("{datasource}\n\n{generator}");
 
-    let psl = psl::validate(config.into());
+    let (previous_schema, _) = psl::validate(config.into());
 
-    let ctx = IntrospectionContext::new(psl, CompositeTypeDepth::Infinite, namespaces.clone());
+    let ctx = IntrospectionContext::new(previous_schema, CompositeTypeDepth::Infinite, namespaces.clone());
 
     let introspected = tok(api.introspect(&ctx))
         .unwrap_or_else(|err| panic!("{}", err))

@@ -155,21 +155,21 @@ impl TestApi {
     }
 
     pub async fn introspect(&mut self) -> Result<String> {
-        let previous_schema = psl::validate(self.pure_config().into());
+        let (previous_schema, _) = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, true).await?;
 
         Ok(introspection_result.data_model)
     }
 
     pub async fn introspect_views(&mut self) -> Result<Option<Vec<ViewDefinition>>> {
-        let previous_schema = psl::validate(self.pure_config().into());
+        let (previous_schema, _) = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, true).await?;
 
         Ok(introspection_result.views)
     }
 
     pub async fn introspect_dml(&mut self) -> Result<String> {
-        let previous_schema = psl::validate(self.pure_config().into());
+        let (previous_schema, _) = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, false).await?;
 
         Ok(introspection_result.data_model)
@@ -245,7 +245,7 @@ impl TestApi {
     }
 
     pub async fn introspection_warnings(&mut self) -> Result<String> {
-        let previous_schema = psl::validate(self.pure_config().into());
+        let (previous_schema, _) = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, false).await?;
 
         let warnings = introspection_result.warnings.unwrap_or_default();
@@ -366,7 +366,7 @@ impl TestApi {
     }
 
     pub async fn expect_warnings(&mut self, expectation: &expect_test::Expect) {
-        let previous_schema = psl::validate(self.pure_config().into());
+        let (previous_schema, _) = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, true).await.unwrap();
 
         let warnings = introspection_result.warnings.unwrap_or_default();
@@ -375,7 +375,7 @@ impl TestApi {
     }
 
     pub async fn expect_no_warnings(&mut self) {
-        let previous_schema = psl::validate(self.pure_config().into());
+        let (previous_schema, _) = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, true).await.unwrap();
 
         dbg!(&introspection_result.warnings);

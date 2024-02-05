@@ -105,7 +105,7 @@ fn namespaces_and_preview_features_from_diff_targets(
                     )
                 })?;
 
-                let validated_schema = psl::validate(schema_str.into());
+                let (validated_schema, _) = psl::validate(schema_str.into());
                 for (namespace, _span) in validated_schema
                     .configuration
                     .datasources

@@ -9,8 +9,7 @@ pub struct MiniError {
 }
 
 pub(crate) fn run(schema: &str) -> String {
-    let schema = psl::validate(schema.into());
-    let diagnostics = &schema.diagnostics;
+    let (_, diagnostics) = psl::validate(schema.into());
 
     let mut mini_errors: Vec<MiniError> = diagnostics
         .errors()

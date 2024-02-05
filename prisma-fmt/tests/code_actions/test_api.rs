@@ -8,9 +8,9 @@ const SCENARIOS_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/code_ac
 static UPDATE_EXPECT: Lazy<bool> = Lazy::new(|| std::env::var("UPDATE_EXPECT").is_ok());
 
 fn parse_schema_diagnostics(file: impl Into<SourceFile>) -> Option<Vec<Diagnostic>> {
-    let schema = psl::validate(file.into());
+    let (schema, diagnostics) = psl::validate(file.into());
 
-    match (schema.diagnostics.warnings(), schema.diagnostics.errors()) {
+    match (diagnostics.warnings(), diagnostics.errors()) {
         ([], []) => None,
         (warnings, errors) => {
             let mut diagnostics = Vec::new();

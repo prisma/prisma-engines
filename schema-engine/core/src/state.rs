@@ -43,7 +43,7 @@ type ErasedConnectorRequest = Box<
 impl EngineState {
     pub(crate) fn new(initial_datamodel: Option<String>, host: Option<Arc<dyn ConnectorHost>>) -> Self {
         EngineState {
-            initial_datamodel: initial_datamodel.map(|s| psl::validate(s.into())),
+            initial_datamodel: initial_datamodel.map(|s| psl::validate(s.into()).0),
             host: host.unwrap_or_else(|| Arc::new(schema_connector::EmptyHost)),
             connectors: Default::default(),
         }
@@ -326,7 +326,7 @@ impl GenericApi for EngineState {
         let composite_type_depth = From::from(params.composite_type_depth);
 
         let ctx = if params.force {
-            let previous_schema = psl::validate(source_file);
+            let (previous_schema, _) = psl::validate(source_file);
             schema_connector::IntrospectionContext::new_config_only(
                 previous_schema,
                 composite_type_depth,

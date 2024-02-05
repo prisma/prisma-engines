@@ -38,9 +38,8 @@ pub fn parse_configuration(schema: &str) -> Result<Configuration, Diagnostics> {
 
 /// Parse and analyze a Prisma schema.
 pub fn parse_schema(file: impl Into<SourceFile>) -> Result<ValidatedSchema, String> {
-    let mut schema = validate(file.into());
-    schema
-        .diagnostics
+    let (schema, mut diagnostics) = validate(file.into());
+    diagnostics
         .to_result()
         .map_err(|err| err.to_pretty_string("schema.prisma", schema.db.source()))?;
     Ok(schema)
@@ -48,7 +47,7 @@ pub fn parse_schema(file: impl Into<SourceFile>) -> Result<ValidatedSchema, Stri
 
 /// The most general API for dealing with Prisma schemas. It accumulates what analysis and
 /// validation information it can, and returns it along with any error and warning diagnostics.
-pub fn validate(file: SourceFile) -> ValidatedSchema {
+pub fn validate(file: SourceFile) -> (ValidatedSchema, Diagnostics) {
     psl_core::validate(file, builtin_connectors::BUILTIN_CONNECTORS)
 }
 

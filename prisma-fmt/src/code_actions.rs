@@ -25,7 +25,7 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
 
     let file = SourceFile::new_allocated(Arc::from(schema.into_boxed_str()));
 
-    let validated_schema = psl::validate(file);
+    let (validated_schema, _) = psl::validate(file);
 
     let config = &validated_schema.configuration;
 

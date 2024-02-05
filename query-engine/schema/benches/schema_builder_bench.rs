@@ -12,7 +12,7 @@ fn criterion_benchmark(c: &mut Criterion) {
             b.iter(|| black_box(psl::validate(source_file.clone())))
         });
 
-        let validated_schema = std::sync::Arc::new(psl::validate(source_file));
+        let validated_schema = std::sync::Arc::new(psl::validate(source_file).0);
 
         c.bench_function(&format!("schema_builder::build ({name})"), |b| {
             b.iter(|| black_box(schema::build(validated_schema.clone(), true)));
