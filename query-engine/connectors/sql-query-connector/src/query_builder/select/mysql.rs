@@ -8,12 +8,24 @@ use crate::{
 use quaint::ast::*;
 use query_structure::*;
 
+/// MySQL-specific select builder. Relations are handled using correlated sub-queries.
 #[derive(Debug, Default)]
 pub(crate) struct MysqlSelectBuilder {
     alias: Alias,
 }
 
 impl JoinSelectBuilder for MysqlSelectBuilder {
+    /// Builds a SELECT statement for the given query arguments and selected fields.
+    ///
+    /// ```sql
+    /// SELECT
+    ///   id,
+    ///   name,
+    ///   (
+    ///     SELECT JSON_OBJECT(<...>) FROM "Post" WHERE "Post"."authorId" = "User"."id
+    ///   ) as `post`
+    /// FROM "User"
+    /// ```
     fn build(&mut self, args: QueryArguments, selected_fields: &FieldSelection, ctx: &Context<'_>) -> Select<'static> {
         let (select, alias) = self.build_default_select(&args, ctx);
 

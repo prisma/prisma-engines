@@ -8,12 +8,24 @@ use crate::{
 use quaint::ast::*;
 use query_structure::*;
 
+/// Postgres-specific select builder. Relations are handled using LATERAL JOINs.
 #[derive(Debug, Default)]
 pub(crate) struct PostgresSelectBuilder {
     alias: Alias,
 }
 
 impl JoinSelectBuilder for PostgresSelectBuilder {
+    /// Builds a SELECT statement for the given query arguments and selected fields.
+    ///
+    /// ```sql
+    /// SELECT
+    ///   id,
+    ///   name
+    /// FROM "User"
+    /// LEFT JOIN LATERAL (
+    ///   SELECT JSON_OBJECT(<...>) FROM "Post" WHERE "Post"."authorId" = "User"."id
+    /// ) as "post" ON TRUE
+    /// ```
     fn build(&mut self, args: QueryArguments, selected_fields: &FieldSelection, ctx: &Context<'_>) -> Select<'static> {
         let (select, parent_alias) = self.build_default_select(&args, ctx);
         let select = self.with_selection(select, selected_fields, parent_alias, ctx);
@@ -85,7 +97,6 @@ impl JoinSelectBuilder for PostgresSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        // m2m relations need to left join on the relation table first
         let m2m_join = self.build_m2m_join(rs, parent_alias, ctx);
 
         select.left_join(m2m_join)
@@ -102,11 +113,6 @@ impl JoinSelectBuilder for PostgresSelectBuilder {
         let table = Table::from(relation_count_select).alias(relation_count_alias_name(vs.relation_field()));
 
         select.left_join_lateral(table.on(ConditionTree::single(true.raw())))
-    }
-
-    fn next_alias(&mut self) -> Alias {
-        self.alias = self.alias.inc(AliasMode::Table);
-        self.alias
     }
 
     fn build_json_obj_fn(
@@ -155,6 +161,11 @@ impl JoinSelectBuilder for PostgresSelectBuilder {
             Expression::from(0.raw()),
         ])
         .into()
+    }
+
+    fn next_alias(&mut self) -> Alias {
+        self.alias = self.alias.inc(AliasMode::Table);
+        self.alias
     }
 }
 
