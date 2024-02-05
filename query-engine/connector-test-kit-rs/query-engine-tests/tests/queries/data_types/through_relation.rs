@@ -276,7 +276,7 @@ mod scalar_relations {
 
     async fn create_common_children(runner: &Runner) -> TestResult<()> {
         create_child(
-            &runner,
+            runner,
             r#"{
           childId: 1,
           string: "abc",
@@ -291,7 +291,7 @@ mod scalar_relations {
         .await?;
 
         create_child(
-            &runner,
+            runner,
             r#"{
           childId: 2,
           string: "def",
@@ -306,7 +306,7 @@ mod scalar_relations {
         .await?;
 
         create_parent(
-            &runner,
+            runner,
             r#"{ id: 1, children: { connect: [{ childId: 1 }, { childId: 2 }] } }"#,
         )
         .await?;

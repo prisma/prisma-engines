@@ -468,7 +468,7 @@ fn decimal_to_boolean_migrations_work(api: TestApi) {
         }
     "#;
 
-    api.create_migration("create-cats-decimal", &dm1, &dir)
+    api.create_migration("create-cats-decimal", dm1, &dir)
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("create-cats-decimal", move |migration| {
@@ -497,7 +497,7 @@ fn decimal_to_boolean_migrations_work(api: TestApi) {
         }
     "#;
 
-    api.create_migration("migrate-cats-boolean", &dm2, &dir)
+    api.create_migration("migrate-cats-boolean", dm2, &dir)
         .send_sync()
         .assert_migration_directories_count(2)
         .assert_migration("migrate-cats-boolean", move |migration| {
