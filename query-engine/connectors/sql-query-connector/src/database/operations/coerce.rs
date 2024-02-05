@@ -5,28 +5,46 @@ use std::{io, str::FromStr};
 
 use crate::{query_arguments_ext::QueryArgumentsExt, SqlError};
 
+pub(crate) enum IndexedSelection<'a> {
+    Relation(&'a RelationSelection),
+    Virtual(&'a str),
+}
+
 /// Coerces relations resolved as JSON to PrismaValues.
 /// Note: Some in-memory processing is baked into this function too for performance reasons.
 pub(crate) fn coerce_record_with_json_relation(
     record: &mut Record,
-    rs_indexes: Vec<(usize, &RelationSelection)>,
+    indexes: &[(usize, IndexedSelection<'_>)],
 ) -> crate::Result<()> {
-    for (val_idx, rs) in rs_indexes {
-        let val = record.values.get_mut(val_idx).unwrap();
-        match val {
-            PrismaValue::Null if rs.field.is_list() => {
-                *val = PrismaValue::List(vec![]);
+    for (val_idx, kind) in indexes {
+        let val = record.values.get_mut(*val_idx).unwrap();
+
+        match kind {
+            IndexedSelection::Relation(rs) => {
+                match val {
+                    PrismaValue::Null if rs.field.is_list() => {
+                        *val = PrismaValue::List(vec![]);
+                    }
+                    PrismaValue::Null if rs.field.is_optional() => {
+                        continue;
+                    }
+                    val => {
+                        // TODO(perf): Find ways to avoid serializing and deserializing multiple times.
+                        let json_val: serde_json::Value = serde_json::from_str(val.as_json().unwrap()).unwrap();
+
+                        *val = match kind {
+                            IndexedSelection::Relation(rs) => coerce_json_relation_to_pv(json_val, rs)?,
+                            IndexedSelection::Virtual(name) => coerce_json_virtual_field_to_pv(name, json_val)?,
+                        };
+                    }
+                }
             }
-            PrismaValue::Null if rs.field.is_optional() => {
-                continue;
-            }
-            val => {
-                // TODO(perf): Find ways to avoid serializing and deserializing multiple times.
+            IndexedSelection::Virtual(name) => {
                 let json_val: serde_json::Value = serde_json::from_str(val.as_json().unwrap()).unwrap();
 
-                *val = coerce_json_relation_to_pv(json_val, rs)?;
+                *val = coerce_json_virtual_field_to_pv(name, json_val)?
             }
-        }
+        };
     }
 
     Ok(())
@@ -67,15 +85,19 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
             let related_model = rs.field.related_model();
 
             for (key, value) in obj {
-                match related_model.fields().all().find(|f| f.db_name() == key).unwrap() {
-                    Field::Scalar(sf) => {
+                match related_model.fields().all().find(|f| f.db_name() == key) {
+                    Some(Field::Scalar(sf)) => {
                         map.push((key, coerce_json_scalar_to_pv(value, &sf)?));
                     }
-                    Field::Relation(rf) => {
+                    Some(Field::Relation(rf)) => {
                         // TODO: optimize this
                         if let Some(nested_selection) = relations.iter().find(|rs| rs.field == rf) {
                             map.push((key, coerce_json_relation_to_pv(value, nested_selection)?));
                         }
+                    }
+                    None => {
+                        let coerced_value = coerce_json_virtual_field_to_pv(&key, value)?;
+                        map.push((key, coerced_value));
                     }
                     _ => (),
                 }
@@ -199,27 +221,51 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
     }
 }
 
+fn coerce_json_virtual_field_to_pv(key: &str, value: serde_json::Value) -> crate::Result<PrismaValue> {
+    match value {
+        serde_json::Value::Object(obj) => {
+            let values: crate::Result<Vec<_>> = obj
+                .into_iter()
+                .map(|(key, value)| coerce_json_virtual_field_to_pv(&key, value).map(|value| (key, value)))
+                .collect();
+            Ok(PrismaValue::Object(values?))
+        }
+
+        serde_json::Value::Number(num) => num
+            .as_i64()
+            .ok_or_else(|| {
+                build_generic_conversion_error(format!(
+                    "Unexpected numeric value {num} for virtual field '{key}': only integers are supported"
+                ))
+            })
+            .map(PrismaValue::Int),
+
+        _ => Err(build_generic_conversion_error(format!(
+            "Field '{key}' is not a model field and doesn't have a supported type for a virtual field"
+        ))),
+    }
+}
+
 fn build_conversion_error(sf: &ScalarField, from: &str, to: &str) -> SqlError {
     let container_name = sf.container().name();
     let field_name = sf.name();
 
-    let error = io::Error::new(
-        io::ErrorKind::InvalidData,
-        format!("Unexpected conversion failure for field {container_name}.{field_name} from {from} to {to}."),
-    );
-
-    SqlError::ConversionError(error.into())
+    build_generic_conversion_error(format!(
+        "Unexpected conversion failure for field {container_name}.{field_name} from {from} to {to}."
+    ))
 }
 
 fn build_conversion_error_with_reason(sf: &ScalarField, from: &str, to: &str, reason: &str) -> SqlError {
     let container_name = sf.container().name();
     let field_name = sf.name();
 
-    let error = io::Error::new(
-        io::ErrorKind::InvalidData,
-        format!("Unexpected conversion failure for field {container_name}.{field_name} from {from} to {to}. Reason: ${reason}"),
-    );
+    build_generic_conversion_error(format!(
+        "Unexpected conversion failure for field {container_name}.{field_name} from {from} to {to}. Reason: {reason}"
+    ))
+}
 
+fn build_generic_conversion_error(message: String) -> SqlError {
+    let error = io::Error::new(io::ErrorKind::InvalidData, message);
     SqlError::ConversionError(error.into())
 }
 

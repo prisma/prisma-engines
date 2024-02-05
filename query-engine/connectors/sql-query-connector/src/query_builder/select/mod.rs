@@ -21,7 +21,7 @@ use self::{mysql::MysqlSelectBuilder, postgres::PostgresSelectBuilder};
 
 pub(crate) const JSON_AGG_IDENT: &str = "__prisma_data__";
 
-pub struct SelectBuilder {}
+pub(crate) struct SelectBuilder {}
 
 impl SelectBuilder {
     pub fn build(args: QueryArguments, selected_fields: &FieldSelection, ctx: &Context<'_>) -> Select<'static> {
@@ -88,9 +88,12 @@ pub(crate) trait JoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        selected_fields.selections().fold(select, |acc, selection| {
-            self.build_selection(acc, selection, parent_alias, ctx)
-        })
+        selected_fields
+            .selections()
+            .fold(select, |acc, selection| {
+                self.build_selection(acc, selection, parent_alias, ctx)
+            })
+            .with_virtuals_from_selection(selected_fields)
     }
 
     /// Builds the core select for a 1-1 relation.
@@ -115,6 +118,8 @@ pub(crate) trait JoinSelectBuilder {
             .with_filters(rs.args.filter.clone(), Some(child_table_alias), ctx)
             .value(selection_modifier(json_expr))
             .limit(1);
+
+        let select = self.with_relation_aggregation_queries(select, rs.virtuals(), child_table_alias, ctx);
 
         (select, child_table_alias)
     }
@@ -146,6 +151,9 @@ pub(crate) trait JoinSelectBuilder {
 
         // LEFT JOIN LATERAL () AS <inner_alias> ON TRUE
         let inner = self.with_relations(inner, rs.relations(), root_alias, ctx);
+
+        // LEFT JOIN LATERAL ( <relation aggregation query> ) ON TRUE
+        let inner = self.with_relation_aggregation_queries(inner, rs.virtuals(), root_alias, ctx);
 
         let linking_fields = rs.field.related_field().linking_fields();
 
@@ -212,6 +220,7 @@ pub(crate) trait JoinSelectBuilder {
                 self.build_json_obj_selection(f, parent_alias, ctx)
                     .map(|(name, expr)| (Cow::from(name), expr))
             })
+            .chain(build_virtual_selection(rs.virtuals()))
             .collect();
 
         json_build_object(build_obj_params).into()
@@ -255,6 +264,113 @@ pub(crate) trait JoinSelectBuilder {
 
         (select, table_alias)
     }
+
+    fn with_relation_aggregation_queries<'a, 'b>(
+        &mut self,
+        select: Select<'a>,
+        selections: impl Iterator<Item = &'b VirtualSelection>,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a> {
+        selections.fold(select, |acc, vs| {
+            self.with_relation_aggregation_query(acc, vs, parent_alias, ctx)
+        })
+    }
+
+    fn with_relation_aggregation_query<'a>(
+        &mut self,
+        select: Select<'a>,
+        vs: &VirtualSelection,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a> {
+        match vs {
+            VirtualSelection::RelationCount(rf, filter) => {
+                let table_alias = relation_count_alias_name(rf);
+
+                let relation_count_select = if rf.relation().is_many_to_many() {
+                    self.build_relation_count_query_m2m(vs.db_alias(), rf, filter, parent_alias, ctx)
+                } else {
+                    self.build_relation_count_query(vs.db_alias(), rf, filter, parent_alias, ctx)
+                };
+
+                let table = Table::from(relation_count_select).alias(table_alias);
+
+                select.left_join_lateral(table.on(ConditionTree::single(true.raw())))
+            }
+        }
+    }
+
+    fn build_relation_count_query<'a>(
+        &mut self,
+        selection_name: impl Into<Cow<'static, str>>,
+        rf: &RelationField,
+        filter: &Option<Filter>,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a> {
+        let related_table_alias = self.next_alias();
+
+        let related_table = rf
+            .related_model()
+            .as_table(ctx)
+            .alias(related_table_alias.to_table_string());
+
+        let select = Select::from_table(related_table)
+            .value(count(asterisk()).alias(selection_name))
+            .with_join_conditions(rf, parent_alias, related_table_alias, ctx)
+            .with_filters(filter.clone(), Some(related_table_alias), ctx);
+
+        select
+    }
+
+    fn build_relation_count_query_m2m<'a>(
+        &mut self,
+        selection_name: impl Into<Cow<'static, str>>,
+        rf: &RelationField,
+        filter: &Option<Filter>,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a> {
+        let related_table_alias = self.next_alias();
+        let m2m_table_alias = self.next_alias();
+
+        let related_table = rf
+            .related_model()
+            .as_table(ctx)
+            .alias(related_table_alias.to_table_string());
+
+        let m2m_join_conditions = {
+            let left_columns = rf.join_columns(ctx);
+            let right_columns = ModelProjection::from(rf.related_field().linking_fields()).as_columns(ctx);
+            build_join_conditions(
+                (left_columns, Some(m2m_table_alias)),
+                (right_columns, Some(related_table_alias)),
+            )
+        };
+
+        let m2m_join_data = rf
+            .as_table(ctx)
+            .alias(m2m_table_alias.to_table_string())
+            .on(m2m_join_conditions);
+
+        let aggregation_join_conditions = {
+            let left_columns = rf.related_field().m2m_columns(ctx);
+            let right_columns = ModelProjection::from(rf.model().primary_identifier()).as_columns(ctx);
+            build_join_conditions(
+                (left_columns.into(), Some(m2m_table_alias)),
+                (right_columns, Some(parent_alias)),
+            )
+        };
+
+        let select = Select::from_table(related_table)
+            .value(count(asterisk()).alias(selection_name))
+            .left_join(m2m_join_data)
+            .and_where(aggregation_join_conditions)
+            .with_filters(filter.clone(), Some(related_table_alias), ctx);
+
+        select
+    }
 }
 
 pub(crate) trait SelectBuilderExt<'a> {
@@ -275,6 +391,7 @@ pub(crate) trait SelectBuilderExt<'a> {
         right_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a>;
+    fn with_virtuals_from_selection(self, selected_fields: &FieldSelection) -> Select<'a>;
     fn with_columns(self, columns: ColumnIterator) -> Select<'a>;
 }
 
@@ -343,6 +460,12 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
         ctx: &Context<'_>,
     ) -> Select<'a> {
         self.and_where(rf.m2m_join_conditions(Some(left_alias), Some(right_alias), ctx))
+    }
+
+    fn with_virtuals_from_selection(self, selected_fields: &FieldSelection) -> Select<'a> {
+        build_virtual_selection(selected_fields.virtuals())
+            .into_iter()
+            .fold(self, |select, (alias, expr)| select.value(expr.alias(alias)))
     }
 
     fn with_columns(self, columns: ColumnIterator) -> Select<'a> {
@@ -487,4 +610,37 @@ fn empty_json_array() -> serde_json::Value {
 
 fn connector_flavour(args: &QueryArguments) -> Flavour {
     args.model().dm.schema.connector.flavour()
+}
+
+fn build_virtual_selection<'a>(
+    virtual_fields: impl Iterator<Item = &'a VirtualSelection>,
+) -> Vec<(Cow<'static, str>, Expression<'static>)> {
+    let mut selected_objects = std::collections::BTreeMap::new();
+
+    for vs in virtual_fields {
+        match vs {
+            VirtualSelection::RelationCount(rf, _) => {
+                let (object_name, field_name) = vs.serialized_name();
+
+                let coalesce_args: Vec<Expression<'static>> = vec![
+                    Column::from((relation_count_alias_name(rf), vs.db_alias())).into(),
+                    0.raw().into(),
+                ];
+
+                selected_objects
+                    .entry(object_name)
+                    .or_insert(Vec::new())
+                    .push((field_name.to_owned().into(), coalesce(coalesce_args).into()));
+            }
+        }
+    }
+
+    selected_objects
+        .into_iter()
+        .map(|(name, fields)| (name.into(), json_build_object(fields).into()))
+        .collect()
+}
+
+fn relation_count_alias_name(rf: &RelationField) -> String {
+    format!("aggr_count_{}_{}", rf.model().name(), rf.name())
 }
