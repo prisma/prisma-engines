@@ -226,7 +226,13 @@ mod distinct {
             indoc!(
                 r#"{
                     findManyUser(
-                        orderBy: { _relevance: { fields: ["first_name"], search: "developer", sort: desc } }
+                        orderBy: {
+                            _relevance: {
+                                fields: ["first_name"],
+                                search: "developer",
+                                sort: desc 
+                            }
+                        }
                         distinct: [first_name]
                     )
                     { id, first_name, last_name }
@@ -302,18 +308,21 @@ mod distinct {
         // 4 => ["1"]
         // 3 => []
         // 5 => ["2", "3"]
-        match_connector_result!(
-            &runner,
-            indoc!("{
-                findManyUser(distinct: [first_name, last_name])
+        insta::assert_snapshot!(
+            run_query!(
+                &runner,
+                indoc!(
+                    "{
+                findManyUser(distinct: [first_name, last_name], orderBy: {first_name: asc})
                 {
                     id
                     posts(distinct: [title], orderBy: { id: asc }) {
                         title
                     }
-                }}"),
-            Postgres(_) => r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###,
-            _ => r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":3,"posts":[]},{"id":4,"posts":[{"title":"1"}]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###
+                }}"
+                )
+            ),
+            @r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###
         );
 
         Ok(())
