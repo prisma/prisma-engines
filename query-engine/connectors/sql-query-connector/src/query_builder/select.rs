@@ -1,4 +1,4 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, collections::BTreeMap};
 use tracing::Span;
 
 use crate::{
@@ -44,7 +44,11 @@ impl SelectBuilder {
             .add_trace_id(ctx.trace_id);
 
         // Adds joins for relations
-        self.with_related_queries(select, selected_fields.relations(), table_alias, ctx)
+        let select = self.with_related_queries(select, selected_fields.relations(), table_alias, ctx);
+
+        // Adds joins for relation aggregations. Other potential future kinds of virtual fields
+        // might or might not require joins and might be processed differently.
+        self.with_relation_aggregation_queries(select, selected_fields.virtuals(), table_alias, ctx)
     }
 
     fn with_related_queries<'a, 'b>(
@@ -107,6 +111,9 @@ impl SelectBuilder {
         // LEFT JOIN LATERAL () AS <inner_alias> ON TRUE
         let inner = self.with_related_queries(inner, rs.relations(), root_alias, ctx);
 
+        // LEFT JOIN LATERAL ( <relation aggregation query> ) ON TRUE
+        let inner = self.with_relation_aggregation_queries(inner, rs.virtuals(), root_alias, ctx);
+
         let linking_fields = rs.field.related_field().linking_fields();
 
         if rs.field.relation().is_many_to_many() {
@@ -160,20 +167,8 @@ impl SelectBuilder {
         let left_columns = rf.related_field().m2m_columns(ctx);
         let right_columns = ModelProjection::from(rf.model().primary_identifier()).as_columns(ctx);
 
-        let join_conditions = left_columns
-            .into_iter()
-            .zip(right_columns)
-            .fold(None::<ConditionTree>, |acc, (a, b)| {
-                let a = a.table(m2m_table_alias.to_table_string());
-                let b = b.table(parent_alias.to_table_string());
-                let condition = a.equals(b);
-
-                match acc {
-                    Some(acc) => Some(acc.and(condition)),
-                    None => Some(condition.into()),
-                }
-            })
-            .unwrap();
+        let join_conditions =
+            build_join_conditions((left_columns.into(), m2m_table_alias), (right_columns, parent_alias));
 
         let m2m_join_data = Table::from(self.build_related_query_select(rs, m2m_table_alias, ctx))
             .alias(m2m_join_alias.to_table_string())
@@ -200,6 +195,107 @@ impl SelectBuilder {
             .on(ConditionTree::single(true.raw()))
             .lateral()
     }
+
+    fn with_relation_aggregation_queries<'a, 'b>(
+        &mut self,
+        select: Select<'a>,
+        selections: impl Iterator<Item = &'b VirtualSelection>,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a> {
+        selections.fold(select, |acc, vs| {
+            self.with_relation_aggregation_query(acc, vs, parent_alias, ctx)
+        })
+    }
+
+    fn with_relation_aggregation_query<'a>(
+        &mut self,
+        select: Select<'a>,
+        vs: &VirtualSelection,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a> {
+        match vs {
+            VirtualSelection::RelationCount(rf, filter) => {
+                let table_alias = relation_count_alias_name(rf);
+
+                let relation_count_select = if rf.relation().is_many_to_many() {
+                    self.build_relation_count_query_m2m(vs.db_alias(), rf, filter, parent_alias, ctx)
+                } else {
+                    self.build_relation_count_query(vs.db_alias(), rf, filter, parent_alias, ctx)
+                };
+
+                let table = Table::from(relation_count_select).alias(table_alias);
+
+                select.left_join_lateral(table.on(ConditionTree::single(true.raw())))
+            }
+        }
+    }
+
+    fn build_relation_count_query<'a>(
+        &mut self,
+        selection_name: impl Into<Cow<'static, str>>,
+        rf: &RelationField,
+        filter: &Option<Filter>,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a> {
+        let related_table_alias = self.next_alias();
+
+        let related_table = rf
+            .related_model()
+            .as_table(ctx)
+            .alias(related_table_alias.to_table_string());
+
+        let select = Select::from_table(related_table)
+            .value(count(asterisk()).alias(selection_name))
+            .with_join_conditions(rf, parent_alias, related_table_alias, ctx)
+            .with_filters(filter.clone(), Some(related_table_alias), ctx);
+
+        select
+    }
+
+    fn build_relation_count_query_m2m<'a>(
+        &mut self,
+        selection_name: impl Into<Cow<'static, str>>,
+        rf: &RelationField,
+        filter: &Option<Filter>,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a> {
+        let related_table_alias = self.next_alias();
+        let m2m_table_alias = self.next_alias();
+
+        let related_table = rf
+            .related_model()
+            .as_table(ctx)
+            .alias(related_table_alias.to_table_string());
+
+        let m2m_join_conditions = {
+            let left_columns = rf.join_columns(ctx);
+            let right_columns = ModelProjection::from(rf.related_field().linking_fields()).as_columns(ctx);
+            build_join_conditions((left_columns, m2m_table_alias), (right_columns, related_table_alias))
+        };
+
+        let m2m_join_data = rf
+            .as_table(ctx)
+            .alias(m2m_table_alias.to_table_string())
+            .on(m2m_join_conditions);
+
+        let aggregation_join_conditions = {
+            let left_columns = rf.related_field().m2m_columns(ctx);
+            let right_columns = ModelProjection::from(rf.model().primary_identifier()).as_columns(ctx);
+            build_join_conditions((left_columns.into(), m2m_table_alias), (right_columns, parent_alias))
+        };
+
+        let select = Select::from_table(related_table)
+            .value(count(asterisk()).alias(selection_name))
+            .left_join(m2m_join_data)
+            .and_where(aggregation_join_conditions)
+            .with_filters(filter.clone(), Some(related_table_alias), ctx);
+
+        select
+    }
 }
 
 trait SelectBuilderExt<'a> {
@@ -214,6 +310,7 @@ trait SelectBuilderExt<'a> {
         ctx: &Context<'_>,
     ) -> Select<'a>;
     fn with_selection(self, selected_fields: &FieldSelection, table_alias: Alias, ctx: &Context<'_>) -> Select<'a>;
+    fn with_virtuals_from_selection(self, selected_fields: &FieldSelection) -> Select<'a>;
     fn with_columns(self, columns: ColumnIterator) -> Select<'a>;
 }
 
@@ -274,21 +371,9 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
         let join_columns = rf.join_columns(ctx);
         let related_join_columns = ModelProjection::from(rf.related_field().linking_fields()).as_columns(ctx);
 
+        let conditions = build_join_conditions((join_columns, parent_alias), (related_join_columns, child_alias));
+
         // WHERE Parent.id = Child.id
-        let conditions = join_columns
-            .zip(related_join_columns)
-            .fold(None::<ConditionTree>, |acc, (a, b)| {
-                let a = a.table(parent_alias.to_table_string());
-                let b = b.table(child_alias.to_table_string());
-                let condition = a.equals(b);
-
-                match acc {
-                    Some(acc) => Some(acc.and(condition)),
-                    None => Some(condition.into()),
-                }
-            })
-            .unwrap();
-
         self.and_where(conditions)
     }
 
@@ -311,11 +396,37 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
                 }
                 _ => acc,
             })
+            .with_virtuals_from_selection(selected_fields)
+    }
+
+    fn with_virtuals_from_selection(self, selected_fields: &FieldSelection) -> Select<'a> {
+        build_virtual_selection(selected_fields.virtuals())
+            .into_iter()
+            .fold(self, |select, (alias, expr)| select.value(expr.alias(alias)))
     }
 
     fn with_columns(self, columns: ColumnIterator) -> Select<'a> {
         columns.into_iter().fold(self, |select, col| select.column(col))
     }
+}
+
+fn build_join_conditions(
+    (left_columns, left_alias): (ColumnIterator, Alias),
+    (right_columns, right_alias): (ColumnIterator, Alias),
+) -> ConditionTree<'static> {
+    left_columns
+        .zip(right_columns)
+        .fold(None::<ConditionTree>, |acc, (a, b)| {
+            let a = a.table(left_alias.to_table_string());
+            let b = b.table(right_alias.to_table_string());
+            let condition = a.equals(b);
+
+            match acc {
+                Some(acc) => Some(acc.and(condition)),
+                None => Some(condition.into()),
+            }
+        })
+        .unwrap()
 }
 
 fn build_json_obj_fn(rs: &RelationSelection, ctx: &Context<'_>, root_alias: Alias) -> Function<'static> {
@@ -340,6 +451,7 @@ fn build_json_obj_fn(rs: &RelationSelection, ctx: &Context<'_>, root_alias: Alia
             }
             _ => None,
         })
+        .chain(build_virtual_selection(rs.virtuals()))
         .collect();
 
     json_build_object(build_obj_params)
@@ -409,4 +521,37 @@ fn json_agg() -> Function<'static> {
         Expression::from("[]".raw()),
     ])
     .alias(JSON_AGG_IDENT)
+}
+
+fn build_virtual_selection<'a>(
+    virtual_fields: impl Iterator<Item = &'a VirtualSelection>,
+) -> Vec<(Cow<'static, str>, Expression<'static>)> {
+    let mut selected_objects = BTreeMap::new();
+
+    for vs in virtual_fields {
+        match vs {
+            VirtualSelection::RelationCount(rf, _) => {
+                let (object_name, field_name) = vs.serialized_name();
+
+                let coalesce_args: Vec<Expression<'static>> = vec![
+                    Column::from((relation_count_alias_name(rf), vs.db_alias())).into(),
+                    0.raw().into(),
+                ];
+
+                selected_objects
+                    .entry(object_name)
+                    .or_insert(Vec::new())
+                    .push((field_name.to_owned().into(), coalesce(coalesce_args).into()));
+            }
+        }
+    }
+
+    selected_objects
+        .into_iter()
+        .map(|(name, fields)| (name.into(), json_build_object(fields).into()))
+        .collect()
+}
+
+fn relation_count_alias_name(rf: &RelationField) -> String {
+    format!("aggr_count_{}_{}", rf.model().name(), rf.name())
 }

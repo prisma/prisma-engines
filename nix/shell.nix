@@ -14,13 +14,14 @@ in
       nodejs_20.pkgs.typescript-language-server
       nodejs_20.pkgs.pnpm
 
+      binaryen
       cargo-insta
       cargo-nextest
       jq
       graphviz
+      wabt
       wasm-bindgen-cli
       wasm-pack
-      binaryen
     ];
 
     inputsFrom = [ self'.packages.prisma-engines ];
