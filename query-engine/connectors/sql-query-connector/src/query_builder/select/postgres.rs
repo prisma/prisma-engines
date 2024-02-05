@@ -13,15 +13,13 @@ pub(crate) struct PostgresSelectBuilder {
     alias: Alias,
 }
 
-impl PostgresSelectBuilder {}
-
 impl JoinSelectBuilder for PostgresSelectBuilder {
     fn build(&mut self, args: QueryArguments, selected_fields: &FieldSelection, ctx: &Context<'_>) -> Select<'static> {
         let (select, parent_alias) = self.build_default_select(&args, ctx);
         let select = self.with_selection(select, selected_fields, parent_alias, ctx);
         let select = self.with_relations(select, selected_fields.relations(), parent_alias, ctx);
 
-        self.with_relation_aggregation_queries(select, selected_fields.virtuals(), parent_alias, ctx)
+        self.with_virtual_selections(select, selected_fields.virtuals(), parent_alias, ctx)
     }
 
     fn build_selection<'a>(
@@ -59,6 +57,7 @@ impl JoinSelectBuilder for PostgresSelectBuilder {
         let (subselect, child_alias) =
             self.build_to_one_select(rs, parent_alias, |expr: Expression<'_>| expr.alias(JSON_AGG_IDENT), ctx);
         let subselect = self.with_relations(subselect, rs.relations(), child_alias, ctx);
+        let subselect = self.with_virtual_selections(subselect, rs.virtuals(), child_alias, ctx);
 
         let join_table = Table::from(subselect).alias(join_alias_name(&rs.field));
         // LEFT JOIN LATERAL ( <join_table> ) AS <relation name> ON TRUE
@@ -92,7 +91,7 @@ impl JoinSelectBuilder for PostgresSelectBuilder {
         select.left_join(m2m_join)
     }
 
-    fn add_virtual_relation<'a>(
+    fn add_virtual_selection<'a>(
         &mut self,
         select: Select<'a>,
         vs: &VirtualSelection,

@@ -74,7 +74,7 @@ impl JoinSelectBuilder for MysqlSelectBuilder {
         select.value(Expression::from(subselect).alias(rs.field.name().to_owned()))
     }
 
-    fn add_virtual_relation<'a>(
+    fn add_virtual_selection<'a>(
         &mut self,
         select: Select<'a>,
         vs: &VirtualSelection,

@@ -63,7 +63,7 @@ pub(crate) trait JoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a>;
-    fn add_virtual_relation<'a>(
+    fn add_virtual_selection<'a>(
         &mut self,
         select: Select<'a>,
         vs: &VirtualSelection,
@@ -165,7 +165,7 @@ pub(crate) trait JoinSelectBuilder {
         let inner = self.with_relations(inner, rs.relations(), root_alias, ctx);
 
         // LEFT JOIN LATERAL ( <relation aggregation query> ) ON TRUE
-        let inner = self.with_relation_aggregation_queries(inner, rs.virtuals(), root_alias, ctx);
+        let inner = self.with_virtual_selections(inner, rs.virtuals(), root_alias, ctx);
 
         let linking_fields = rs.field.related_field().linking_fields();
 
@@ -258,14 +258,14 @@ pub(crate) trait JoinSelectBuilder {
         (select, table_alias)
     }
 
-    fn with_relation_aggregation_queries<'a, 'b>(
+    fn with_virtual_selections<'a, 'b>(
         &mut self,
         select: Select<'a>,
         selections: impl Iterator<Item = &'b VirtualSelection>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        selections.fold(select, |acc, vs| self.add_virtual_relation(acc, vs, parent_alias, ctx))
+        selections.fold(select, |acc, vs| self.add_virtual_selection(acc, vs, parent_alias, ctx))
     }
 
     fn build_virtual_select(
@@ -468,12 +468,6 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
     ) -> Select<'a> {
         self.and_where(rf.m2m_join_conditions(Some(left_alias), Some(right_alias), ctx))
     }
-
-    // fn with_virtuals_from_selection(self, selected_fields: &FieldSelection) -> Select<'a> {
-    //     build_virtual_selection(selected_fields.virtuals())
-    //         .into_iter()
-    //         .fold(self, |select, (alias, expr)| select.value(expr.alias(alias)))
-    // }
 
     fn with_columns(self, columns: ColumnIterator) -> Select<'a> {
         columns.into_iter().fold(self, |select, col| select.column(col))
