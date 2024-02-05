@@ -39,3 +39,33 @@ pub fn posts_categories() -> String {
 
     schema.to_owned()
 }
+
+pub fn posts_on_categories() -> String {
+    let schema = indoc! {
+        r#"
+        model Post {
+            #id(id, Int, @id)
+            title  String
+            categories CategoriesOnPosts[]
+          }
+          
+          model Category {
+            #id(id, Int, @id)
+            name  String
+            posts CategoriesOnPosts[]
+          }
+          
+          model CategoriesOnPosts {
+            post       Post     @relation(fields: [postId], references: [id])
+            postId     Int 
+            category   Category @relation(fields: [categoryId], references: [id])
+            categoryId Int 
+            tmp Int?
+          
+            @@id([postId, categoryId])
+          }
+        "#
+    };
+
+    schema.to_owned()
+}

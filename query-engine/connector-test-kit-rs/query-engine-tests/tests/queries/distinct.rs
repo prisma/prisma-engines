@@ -386,6 +386,146 @@ mod distinct {
         Ok(())
     }
 
+    #[connector_test(schema(posts_categories))]
+    async fn m2m_implicit(runner: Runner) -> TestResult<()> {
+        m2m_implicit_test_data(&runner).await?;
+
+        insta::assert_snapshot!(run_query!(
+                &runner,
+                indoc!(r#"{
+                    findManyPost(
+                        distinct: [title], orderBy: {title: asc})
+                        {
+                            id, title
+                            categories(distinct: [name], orderBy: { name: asc })
+                            { id, name }
+                        }
+                }"#
+            )),
+            @r###"{"data":{"findManyPost":[{"id":1,"title":"P1","categories":[{"id":1,"name":"C1"},{"id":2,"name":"C2"},{"id":4,"name":"C3"}]},{"id":2,"title":"P2","categories":[{"id":5,"name":"C3"}]}]}}"###
+        );
+
+        Ok(())
+    }
+
+    async fn m2m_implicit_test_data(runner: &Runner) -> TestResult<()> {
+        runner
+            .query(
+                r#"mutation {
+                    createManyCategory(
+                        data: [
+                            { id: 1, name: "C1" },
+                            { id: 2, name: "C2" },
+                            { id: 3, name: "C2" },
+                            { id: 4, name: "C3" },
+                            { id: 5, name: "C3" },
+                            { id: 6, name: "C3" }
+                        ]
+                    )
+                    { count }
+                }
+            "#,
+            )
+            .await?
+            .assert_success();
+
+        runner
+            .query(
+                r#"mutation { createOnePost(
+                    data: {
+                        id: 1, title: "P1", categories: {
+                            connect: [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 6 }]
+                        }
+                    })
+                    { id }
+                }"#,
+            )
+            .await?
+            .assert_success();
+
+        runner
+            .query(
+                r#"mutation { createOnePost(
+                    data: {
+                        id: 2, title: "P2", categories: {
+                            connect: [{ id: 5 }, { id: 6 }]
+                        }
+                    })
+                    { id }
+                }"#,
+            )
+            .await?
+            .assert_success();
+
+        Ok(())
+    }
+
+    #[connector_test(schema(posts_on_categories))]
+    async fn m2m_explicit(runner: Runner) -> TestResult<()> {
+        m2m_explicit_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"
+            query {
+                findManyCategoriesOnPosts(
+                    orderBy: [{ postId: asc }, { categoryId: asc }],
+                    where: {postId: {gt: 0}}
+                )
+                { category { name }, post { title } }
+            }"#),
+          @r###""###
+        );
+
+        Ok(())
+    }
+
+    async fn m2m_explicit_test_data(runner: &Runner) -> TestResult<()> {
+        runner
+            .query(
+                r#"mutation {
+                    createManyPost(data: [
+                        { id: 1, title: "p1" },
+                        { id: 2, title: "p2" }
+                    ])
+                    { count }
+                }"#,
+            )
+            .await?
+            .assert_success();
+
+        runner
+            .query(
+                r#"mutation {
+                    createManyCategory(data: [
+                        { id: 1, name: "c1" },
+                        { id: 2, name: "c2" },
+                        { id: 3, name: "c3" }
+                    ])
+                    { count }
+                }"#,
+            )
+            .await?
+            .assert_success();
+
+        runner
+            .query(
+                r#"mutation {
+                    createManyCategoriesOnPosts(data: [
+                        { postId: 1, categoryId: 1 },
+                        { postId: 1, categoryId: 2 },
+                        { postId: 1, categoryId: 3 },
+                        { postId: 2, categoryId: 2 },
+                        { postId: 2, categoryId: 3 },
+                    ])
+                    { count }
+                }"#,
+            )
+            .await?
+            .assert_success();
+
+        Ok(())
+    }
+
     /// Dataset:
     /// User (id) => Posts (titles, id asc)
     /// 1 => ["3", "1", "1", "2", "1"]
