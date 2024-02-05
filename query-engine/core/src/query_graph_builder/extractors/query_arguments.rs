@@ -348,16 +348,18 @@ fn finalize_arguments(mut args: QueryArguments, model: &Model, relation: Option<
         args.order_by.extend(order_bys);
     }
 
-    let distinct = if let Some(distinct) = args.distinct {
-        if let Some(relation) = relation {
-            let relation = relation.related_field().linking_fields();
+    let distinct = match (args.requires_inmemory_distinct(), args.distinct) {
+        (false, Some(distinct)) => {
+            if let Some(relation) = relation {
+                let relation = relation.related_field().linking_fields();
 
-            Some(distinct.merge(relation))
-        } else {
-            Some(distinct)
+                Some(distinct.merge(relation))
+            } else {
+                Some(distinct)
+            }
         }
-    } else {
-        None
+        (false, None) => None,
+        (true, distinct) => distinct,
     };
 
     QueryArguments { distinct, ..args }
