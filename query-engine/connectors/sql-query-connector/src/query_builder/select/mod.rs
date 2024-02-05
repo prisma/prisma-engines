@@ -63,6 +63,13 @@ pub(crate) trait JoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a>;
+    fn add_virtual_relation<'a>(
+        &mut self,
+        select: Select<'a>,
+        vs: &VirtualSelection,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Select<'a>;
     /// Build the top-level selection set
     fn build_selection<'a>(
         &mut self,
@@ -71,13 +78,18 @@ pub(crate) trait JoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a>;
-    /// Build the selection set for the `JSON_OBJECT` function.
-    fn build_json_obj_selection(
+    fn build_json_obj_fn(
         &mut self,
-        field: &SelectedField,
+        rs: &RelationSelection,
         parent_alias: Alias,
         ctx: &Context<'_>,
-    ) -> Option<(String, Expression<'static>)>;
+    ) -> Expression<'static>;
+    fn build_virtual_expr(
+        &mut self,
+        vs: &VirtualSelection,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Expression<'static>;
     /// Get the next alias for a table.
     fn next_alias(&mut self) -> Alias;
 
@@ -88,12 +100,13 @@ pub(crate) trait JoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        selected_fields
-            .selections()
-            .fold(select, |acc, selection| {
-                self.build_selection(acc, selection, parent_alias, ctx)
-            })
-            .with_virtuals_from_selection(selected_fields)
+        let select = selected_fields.selections().fold(select, |acc, selection| {
+            self.build_selection(acc, selection, parent_alias, ctx)
+        });
+
+        self.build_json_obj_virtual_selection(selected_fields.virtuals(), parent_alias, ctx)
+            .into_iter()
+            .fold(select, |acc, (alias, expr)| acc.value(expr.alias(alias)))
     }
 
     /// Builds the core select for a 1-1 relation.
@@ -119,11 +132,10 @@ pub(crate) trait JoinSelectBuilder {
             .value(selection_modifier(json_expr))
             .limit(1);
 
-        let select = self.with_relation_aggregation_queries(select, rs.virtuals(), child_table_alias, ctx);
-
         (select, child_table_alias)
     }
 
+    /// Builds the core select for a 1-m relation.
     fn build_to_many_select(
         &mut self,
         rs: &RelationSelection,
@@ -207,25 +219,6 @@ pub(crate) trait JoinSelectBuilder {
         }
     }
 
-    fn build_json_obj_fn(
-        &mut self,
-        rs: &RelationSelection,
-        parent_alias: Alias,
-        ctx: &Context<'_>,
-    ) -> Expression<'static> {
-        let build_obj_params = rs
-            .selections
-            .iter()
-            .filter_map(|f| {
-                self.build_json_obj_selection(f, parent_alias, ctx)
-                    .map(|(name, expr)| (Cow::from(name), expr))
-            })
-            .chain(build_virtual_selection(rs.virtuals()))
-            .collect();
-
-        json_build_object(build_obj_params).into()
-    }
-
     fn with_relation<'a>(
         &mut self,
         select: Select<'a>,
@@ -272,33 +265,48 @@ pub(crate) trait JoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        selections.fold(select, |acc, vs| {
-            self.with_relation_aggregation_query(acc, vs, parent_alias, ctx)
-        })
+        selections.fold(select, |acc, vs| self.add_virtual_relation(acc, vs, parent_alias, ctx))
     }
 
-    fn with_relation_aggregation_query<'a>(
+    fn build_virtual_select(
         &mut self,
-        select: Select<'a>,
         vs: &VirtualSelection,
         parent_alias: Alias,
         ctx: &Context<'_>,
-    ) -> Select<'a> {
+    ) -> Select<'static> {
         match vs {
             VirtualSelection::RelationCount(rf, filter) => {
-                let table_alias = relation_count_alias_name(rf);
-
-                let relation_count_select = if rf.relation().is_many_to_many() {
+                if rf.relation().is_many_to_many() {
                     self.build_relation_count_query_m2m(vs.db_alias(), rf, filter, parent_alias, ctx)
                 } else {
                     self.build_relation_count_query(vs.db_alias(), rf, filter, parent_alias, ctx)
-                };
-
-                let table = Table::from(relation_count_select).alias(table_alias);
-
-                select.left_join_lateral(table.on(ConditionTree::single(true.raw())))
+                }
             }
         }
+    }
+
+    fn build_json_obj_virtual_selection<'a>(
+        &mut self,
+        virtual_fields: impl Iterator<Item = &'a VirtualSelection>,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Vec<(Cow<'static, str>, Expression<'static>)> {
+        let mut selected_objects = std::collections::BTreeMap::new();
+
+        for vs in virtual_fields {
+            let (object_name, field_name) = vs.serialized_name();
+            let virtual_expr = self.build_virtual_expr(vs, parent_alias, ctx);
+
+            selected_objects
+                .entry(object_name)
+                .or_insert(Vec::new())
+                .push((field_name.to_owned().into(), virtual_expr.into()));
+        }
+
+        selected_objects
+            .into_iter()
+            .map(|(name, fields)| (name.into(), json_build_object(fields).into()))
+            .collect()
     }
 
     fn build_relation_count_query<'a>(
@@ -391,7 +399,6 @@ pub(crate) trait SelectBuilderExt<'a> {
         right_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a>;
-    fn with_virtuals_from_selection(self, selected_fields: &FieldSelection) -> Select<'a>;
     fn with_columns(self, columns: ColumnIterator) -> Select<'a>;
 }
 
@@ -462,14 +469,55 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
         self.and_where(rf.m2m_join_conditions(Some(left_alias), Some(right_alias), ctx))
     }
 
-    fn with_virtuals_from_selection(self, selected_fields: &FieldSelection) -> Select<'a> {
-        build_virtual_selection(selected_fields.virtuals())
-            .into_iter()
-            .fold(self, |select, (alias, expr)| select.value(expr.alias(alias)))
-    }
+    // fn with_virtuals_from_selection(self, selected_fields: &FieldSelection) -> Select<'a> {
+    //     build_virtual_selection(selected_fields.virtuals())
+    //         .into_iter()
+    //         .fold(self, |select, (alias, expr)| select.value(expr.alias(alias)))
+    // }
 
     fn with_columns(self, columns: ColumnIterator) -> Select<'a> {
         columns.into_iter().fold(self, |select, col| select.column(col))
+    }
+}
+
+pub(crate) trait JoinConditionExt {
+    fn join_conditions(
+        &self,
+        left_alias: Option<Alias>,
+        right_alias: Option<Alias>,
+        ctx: &Context<'_>,
+    ) -> ConditionTree<'static>;
+    fn m2m_join_conditions(
+        &self,
+        left_alias: Option<Alias>,
+        right_alias: Option<Alias>,
+        ctx: &Context<'_>,
+    ) -> ConditionTree<'static>;
+}
+
+impl JoinConditionExt for RelationField {
+    fn join_conditions(
+        &self,
+        left_alias: Option<Alias>,
+        right_alias: Option<Alias>,
+        ctx: &Context<'_>,
+    ) -> ConditionTree<'static> {
+        let left_columns = self.join_columns(ctx);
+        let right_columns = ModelProjection::from(self.related_field().linking_fields()).as_columns(ctx);
+
+        build_join_conditions((left_columns, left_alias), (right_columns, right_alias))
+    }
+
+    fn m2m_join_conditions(
+        &self,
+        left_alias: Option<Alias>,
+        right_alias: Option<Alias>,
+        ctx: &Context<'_>,
+    ) -> ConditionTree<'static> {
+        let left_columns = self.m2m_columns(ctx);
+        let right_columns = ModelProjection::from(self.related_model().primary_identifier()).as_columns(ctx);
+
+        build_join_conditions((left_columns.into(), left_alias), (right_columns, right_alias))
     }
 }
 
@@ -554,47 +602,6 @@ fn build_join_conditions(
         .unwrap()
 }
 
-pub(crate) trait JoinConditionExt {
-    fn join_conditions(
-        &self,
-        left_alias: Option<Alias>,
-        right_alias: Option<Alias>,
-        ctx: &Context<'_>,
-    ) -> ConditionTree<'static>;
-    fn m2m_join_conditions(
-        &self,
-        left_alias: Option<Alias>,
-        right_alias: Option<Alias>,
-        ctx: &Context<'_>,
-    ) -> ConditionTree<'static>;
-}
-
-impl JoinConditionExt for RelationField {
-    fn join_conditions(
-        &self,
-        left_alias: Option<Alias>,
-        right_alias: Option<Alias>,
-        ctx: &Context<'_>,
-    ) -> ConditionTree<'static> {
-        let left_columns = self.join_columns(ctx);
-        let right_columns = ModelProjection::from(self.related_field().linking_fields()).as_columns(ctx);
-
-        build_join_conditions((left_columns, left_alias), (right_columns, right_alias))
-    }
-
-    fn m2m_join_conditions(
-        &self,
-        left_alias: Option<Alias>,
-        right_alias: Option<Alias>,
-        ctx: &Context<'_>,
-    ) -> ConditionTree<'static> {
-        let left_columns = self.m2m_columns(ctx);
-        let right_columns = ModelProjection::from(self.related_model().primary_identifier()).as_columns(ctx);
-
-        build_join_conditions((left_columns.into(), left_alias), (right_columns, right_alias))
-    }
-}
-
 fn json_agg() -> Function<'static> {
     coalesce(vec![
         json_array_agg(Column::from(JSON_AGG_IDENT)).into(),
@@ -610,35 +617,6 @@ fn empty_json_array() -> serde_json::Value {
 
 fn connector_flavour(args: &QueryArguments) -> Flavour {
     args.model().dm.schema.connector.flavour()
-}
-
-fn build_virtual_selection<'a>(
-    virtual_fields: impl Iterator<Item = &'a VirtualSelection>,
-) -> Vec<(Cow<'static, str>, Expression<'static>)> {
-    let mut selected_objects = std::collections::BTreeMap::new();
-
-    for vs in virtual_fields {
-        match vs {
-            VirtualSelection::RelationCount(rf, _) => {
-                let (object_name, field_name) = vs.serialized_name();
-
-                let coalesce_args: Vec<Expression<'static>> = vec![
-                    Column::from((relation_count_alias_name(rf), vs.db_alias())).into(),
-                    0.raw().into(),
-                ];
-
-                selected_objects
-                    .entry(object_name)
-                    .or_insert(Vec::new())
-                    .push((field_name.to_owned().into(), coalesce(coalesce_args).into()));
-            }
-        }
-    }
-
-    selected_objects
-        .into_iter()
-        .map(|(name, fields)| (name.into(), json_build_object(fields).into()))
-        .collect()
 }
 
 fn relation_count_alias_name(rf: &RelationField) -> String {

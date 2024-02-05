@@ -92,35 +92,70 @@ impl JoinSelectBuilder for PostgresSelectBuilder {
         select.left_join(m2m_join)
     }
 
-    fn build_json_obj_selection(
+    fn add_virtual_relation<'a>(
         &mut self,
-        field: &SelectedField,
+        select: Select<'a>,
+        vs: &VirtualSelection,
         parent_alias: Alias,
         ctx: &Context<'_>,
-    ) -> Option<(String, Expression<'static>)> {
-        match field {
-            SelectedField::Scalar(sf) => Some((
-                sf.db_name().to_owned(),
-                Expression::from(sf.as_column(ctx).table(parent_alias.to_table_string())),
-            )),
-            SelectedField::Relation(rs) => {
-                let table_name = match rs.field.relation().is_many_to_many() {
-                    true => m2m_join_alias_name(&rs.field),
-                    false => join_alias_name(&rs.field),
-                };
+    ) -> Select<'a> {
+        let relation_count_select = self.build_virtual_select(vs, parent_alias, ctx);
+        let table = Table::from(relation_count_select).alias(relation_count_alias_name(vs.relation_field()));
 
-                Some((
-                    rs.field.name().to_owned(),
-                    Expression::from(Column::from((table_name, JSON_AGG_IDENT))),
-                ))
-            }
-            _ => None,
-        }
+        select.left_join_lateral(table.on(ConditionTree::single(true.raw())))
     }
 
     fn next_alias(&mut self) -> Alias {
         self.alias = self.alias.inc(AliasMode::Table);
         self.alias
+    }
+
+    fn build_json_obj_fn(
+        &mut self,
+        rs: &RelationSelection,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Expression<'static> {
+        let build_obj_params = rs
+            .selections
+            .iter()
+            .filter_map(|field| match field {
+                SelectedField::Scalar(sf) => Some((
+                    Cow::from(sf.db_name().to_owned()),
+                    Expression::from(sf.as_column(ctx).table(parent_alias.to_table_string())),
+                )),
+                SelectedField::Relation(rs) => {
+                    let table_name = match rs.field.relation().is_many_to_many() {
+                        true => m2m_join_alias_name(&rs.field),
+                        false => join_alias_name(&rs.field),
+                    };
+
+                    Some((
+                        Cow::from(rs.field.name().to_owned()),
+                        Expression::from(Column::from((table_name, JSON_AGG_IDENT))),
+                    ))
+                }
+                _ => None,
+            })
+            .chain(self.build_json_obj_virtual_selection(rs.virtuals(), parent_alias, ctx))
+            .collect();
+
+        json_build_object(build_obj_params).into()
+    }
+
+    fn build_virtual_expr(
+        &mut self,
+        vs: &VirtualSelection,
+        _parent_alias: Alias,
+        _ctx: &Context<'_>,
+    ) -> Expression<'static> {
+        let rf = vs.relation_field();
+
+        coalesce([
+            Expression::from(Column::from((relation_count_alias_name(rf), vs.db_alias()))),
+            Expression::from(0.raw()),
+        ])
+        .into()
     }
 }
 

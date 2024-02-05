@@ -53,46 +53,78 @@ impl JoinSelectBuilder for MysqlSelectBuilder {
     fn add_to_many_relation<'a>(
         &mut self,
         select: Select<'a>,
-        rs: &query_structure::prelude::RelationSelection,
+        rs: &RelationSelection,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        let join_table =
-            Expression::from(self.build_to_many_select(rs, parent_alias, ctx)).alias(rs.field.name().to_owned());
+        let subselect = self.build_to_many_select(rs, parent_alias, ctx);
 
-        select.value(join_table)
+        select.value(Expression::from(subselect).alias(rs.field.name().to_owned()))
     }
 
     fn add_many_to_many_relation<'a>(
         &mut self,
         select: Select<'a>,
-        rs: &query_structure::prelude::RelationSelection,
+        rs: &RelationSelection,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        let m2m_select = self.build_m2m_select(rs, parent_alias, ctx);
+        let subselect = self.build_m2m_select(rs, parent_alias, ctx);
 
-        select.value(Expression::from(m2m_select).alias(rs.field.name().to_owned()))
+        select.value(Expression::from(subselect).alias(rs.field.name().to_owned()))
     }
 
-    fn build_json_obj_selection(
+    fn add_virtual_relation<'a>(
         &mut self,
-        field: &SelectedField,
-
+        select: Select<'a>,
+        vs: &VirtualSelection,
         parent_alias: Alias,
         ctx: &Context<'_>,
-    ) -> Option<(String, Expression<'static>)> {
-        match field {
-            SelectedField::Scalar(sf) => Some((
-                sf.db_name().to_owned(),
-                Expression::from(sf.as_column(ctx).table(parent_alias.to_table_string())),
-            )),
-            SelectedField::Relation(rs) => Some((
-                rs.field.name().to_owned(),
-                Expression::from(self.with_relation(Select::default(), rs, parent_alias, ctx)),
-            )),
-            _ => None,
-        }
+    ) -> Select<'a> {
+        let virtual_select = self.build_virtual_select(vs, parent_alias, ctx);
+        let alias = relation_count_alias_name(vs.relation_field());
+
+        select.value(Expression::from(virtual_select).alias(alias))
+    }
+
+    fn build_json_obj_fn(
+        &mut self,
+        rs: &RelationSelection,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Expression<'static> {
+        let virtuals = self.build_json_obj_virtual_selection(rs.virtuals(), parent_alias, ctx);
+        let build_obj_params = rs
+            .selections
+            .iter()
+            .filter_map(|field| match field {
+                SelectedField::Scalar(sf) => Some((
+                    Cow::from(sf.db_name().to_owned()),
+                    Expression::from(sf.as_column(ctx).table(parent_alias.to_table_string())),
+                )),
+                SelectedField::Relation(rs) => Some((
+                    Cow::from(rs.field.name().to_owned()),
+                    Expression::from(self.with_relation(Select::default(), rs, parent_alias, ctx)),
+                )),
+                _ => None,
+            })
+            .chain(virtuals)
+            .collect();
+
+        json_build_object(build_obj_params).into()
+    }
+
+    fn build_virtual_expr(
+        &mut self,
+        vs: &VirtualSelection,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> Expression<'static> {
+        coalesce([
+            Expression::from(self.build_virtual_select(vs, parent_alias, ctx)),
+            Expression::from(0.raw()),
+        ])
+        .into()
     }
 
     fn next_alias(&mut self) -> Alias {
