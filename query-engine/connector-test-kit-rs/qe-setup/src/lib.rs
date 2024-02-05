@@ -17,7 +17,7 @@ use schema_core::schema_connector::{ConnectorResult, DiffTarget, SchemaConnector
 use std::env;
 
 fn parse_configuration(datamodel: &str) -> ConnectorResult<(Datasource, String, BitFlags<psl::PreviewFeature>)> {
-    let config = psl::parse_configuration(datamodel)
+    let (config, _) = psl::parse_configuration(datamodel)
         .map_err(|err| ConnectorError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
     let url = config.datasources[0]
