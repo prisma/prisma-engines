@@ -38,7 +38,7 @@ impl JoinSelectBuilder for MysqlSelectBuilder {
         }
     }
 
-    fn build_to_one_relation<'a>(
+    fn add_to_one_relation<'a>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
@@ -50,7 +50,7 @@ impl JoinSelectBuilder for MysqlSelectBuilder {
         select.value(Expression::from(subselect).alias(rs.field.name().to_owned()))
     }
 
-    fn build_to_many_relation<'a>(
+    fn add_to_many_relation<'a>(
         &mut self,
         select: Select<'a>,
         rs: &query_structure::prelude::RelationSelection,
@@ -60,11 +60,10 @@ impl JoinSelectBuilder for MysqlSelectBuilder {
         let join_table =
             Expression::from(self.build_to_many_select(rs, parent_alias, ctx)).alias(rs.field.name().to_owned());
 
-        // correlated subquery
         select.value(join_table)
     }
 
-    fn build_many_to_many_relation<'a>(
+    fn add_many_to_many_relation<'a>(
         &mut self,
         select: Select<'a>,
         rs: &query_structure::prelude::RelationSelection,

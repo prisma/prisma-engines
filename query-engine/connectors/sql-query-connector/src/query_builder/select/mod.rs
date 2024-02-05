@@ -21,7 +21,6 @@ use self::{mysql::MysqlSelectBuilder, postgres::PostgresSelectBuilder};
 
 pub(crate) const JSON_AGG_IDENT: &str = "__prisma_data__";
 
-#[derive(Debug)]
 pub struct SelectBuilder {}
 
 impl SelectBuilder {
@@ -37,28 +36,34 @@ impl SelectBuilder {
 }
 
 pub(crate) trait JoinSelectBuilder {
+    /// Build the select query for the given query arguments and selected fields.
+    /// This is the entry point for building a select query. `build_default_select` can be used to get a default select query.
     fn build(&mut self, args: QueryArguments, selected_fields: &FieldSelection, ctx: &Context<'_>) -> Select<'static>;
-    fn build_to_one_relation<'a>(
+    /// Adds to `select` the SQL statements to fetch a 1-1 relation.
+    fn add_to_one_relation<'a>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a>;
-    fn build_to_many_relation<'a>(
+    /// Adds to `select` the SQL statements to fetch a 1-m relation.
+    fn add_to_many_relation<'a>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a>;
-    fn build_many_to_many_relation<'a>(
+    /// Adds to `select` the SQL statements to fetch a m-n relation.
+    fn add_many_to_many_relation<'a>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a>;
+    /// Build the top-level selection set
     fn build_selection<'a>(
         &mut self,
         select: Select<'a>,
@@ -66,12 +71,14 @@ pub(crate) trait JoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a>;
+    /// Build the selection set for the `JSON_OBJECT` function.
     fn build_json_obj_selection(
         &mut self,
         field: &SelectedField,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Option<(String, Expression<'static>)>;
+    /// Get the next alias for a table.
     fn next_alias(&mut self) -> Alias;
 
     fn with_selection<'a>(
@@ -86,6 +93,7 @@ pub(crate) trait JoinSelectBuilder {
         })
     }
 
+    /// Builds the core select for a 1-1 relation.
     fn build_to_one_select(
         &mut self,
         rs: &RelationSelection,
@@ -217,9 +225,9 @@ pub(crate) trait JoinSelectBuilder {
         ctx: &Context<'_>,
     ) -> Select<'a> {
         match (rs.field.is_list(), rs.field.relation().is_many_to_many()) {
-            (true, true) => self.build_many_to_many_relation(select, rs, parent_alias, ctx),
-            (true, false) => self.build_to_many_relation(select, rs, parent_alias, ctx),
-            (false, _) => self.build_to_one_relation(select, rs, parent_alias, ctx),
+            (true, true) => self.add_many_to_many_relation(select, rs, parent_alias, ctx),
+            (true, false) => self.add_to_many_relation(select, rs, parent_alias, ctx),
+            (false, _) => self.add_to_one_relation(select, rs, parent_alias, ctx),
         }
     }
 

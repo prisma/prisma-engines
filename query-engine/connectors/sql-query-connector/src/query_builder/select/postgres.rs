@@ -48,7 +48,7 @@ impl JoinSelectBuilder for PostgresSelectBuilder {
         }
     }
 
-    fn build_to_one_relation<'a>(
+    fn add_to_one_relation<'a>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
@@ -64,7 +64,7 @@ impl JoinSelectBuilder for PostgresSelectBuilder {
         select.left_join(join_table.on(ConditionTree::single(true.raw())).lateral())
     }
 
-    fn build_to_many_relation<'a>(
+    fn add_to_many_relation<'a>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
@@ -78,7 +78,7 @@ impl JoinSelectBuilder for PostgresSelectBuilder {
         select.left_join(join_table.on(ConditionTree::single(true.raw())).lateral())
     }
 
-    fn build_many_to_many_relation<'a>(
+    fn add_many_to_many_relation<'a>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
