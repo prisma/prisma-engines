@@ -51,11 +51,10 @@ async fn introspect_set_default_should_warn(api: &mut TestApi) -> TestResult {
     "#]];
 
     expected_schema.assert_eq(&api.introspect().await?);
-    let schema = psl::parse_schema(expected_schema.data())?;
+    let (schema, mut diagnostics) = psl::validate(expected_schema.data().into());
+    diagnostics.to_result().unwrap();
 
-    let warning_messages = schema
-        .diagnostics
-        .warnings_to_pretty_string("schema.prisma", schema.db.source());
+    let warning_messages = diagnostics.warnings_to_pretty_string("schema.prisma", schema.db.source());
 
     let expected_validation = expect![[r#"
         [1;93mwarning[0m: [1mMySQL does not actually support the `SetDefault` referential action, so using it may result in unexpected errors. Read more at https://pris.ly/d/mysql-set-default [0m
