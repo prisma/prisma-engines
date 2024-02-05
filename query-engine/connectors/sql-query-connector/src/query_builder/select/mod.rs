@@ -300,7 +300,7 @@ pub(crate) trait JoinSelectBuilder {
             selected_objects
                 .entry(object_name)
                 .or_insert(Vec::new())
-                .push((field_name.to_owned().into(), virtual_expr.into()));
+                .push((field_name.to_owned().into(), virtual_expr));
         }
 
         selected_objects

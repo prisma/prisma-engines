@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), only(Postgres))]
+#[test_suite(schema(schema))]
 mod relation_load_strategy {
     fn schema() -> String {
         indoc! {r#"
@@ -130,7 +130,7 @@ mod relation_load_strategy {
                 join,
                 $query,
                 $result,
-                only(Postgres, CockroachDb, Mysql(8), Vitess)
+                only(Postgres, CockroachDb, Mysql(8))
             );
             // TODO: Remove Mysql & Vitess exclusions once we are able to have version speficic preview features.
             relation_load_strategy_test!(
