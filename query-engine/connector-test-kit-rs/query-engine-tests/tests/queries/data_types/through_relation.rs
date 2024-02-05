@@ -31,14 +31,8 @@ mod scalar_relations {
         schema.to_owned()
     }
 
-    // TODO: fix https://github.com/prisma/team-orm/issues/684, https://github.com/prisma/team-orm/issues/687  and unexclude DAs
-    #[connector_test(
-        schema(schema_common),
-        exclude(
-            Postgres("pg.js", "neon.js", "pg.js.wasm", "neon.js.wasm"),
-            Vitess("planetscale.js", "planetscale.js.wasm")
-        )
-    )]
+    // TODO: fix https://github.com/prisma/team-orm/issues/684 and unexclude DAs
+    #[connector_test(schema(schema_common), exclude(Postgres("neon.js", "pg.js.wasm", "neon.js.wasm")))]
     async fn common_types(runner: Runner) -> TestResult<()> {
         create_common_children(&runner).await?;
 
