@@ -269,7 +269,6 @@ pub(crate) fn get_relation_load_strategy(
             ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct() || q.has_virtual_selections(),
             _ => false,
         })
-        // && supports_m2m_ordering
         && requested_strategy != Some(RelationLoadStrategy::Query)
     {
         RelationLoadStrategy::Join
