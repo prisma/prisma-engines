@@ -70,11 +70,13 @@ use names::Names;
 ///   Currently only index name collisions.
 pub struct ParserDatabase {
     ast: ast::SchemaAst,
-    file: schema_ast::SourceFile,
     interner: interner::StringInterner,
     names: Names,
     types: Types,
     relations: Relations,
+
+    // Note: not used by any `query-engine`
+    file: schema_ast::SourceFile,
 }
 
 impl ParserDatabase {

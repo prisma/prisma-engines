@@ -34,10 +34,31 @@ use parser_database::{ast, ParserDatabase, SourceFile};
 /// The collection of all available connectors.
 pub type ConnectorRegistry<'a> = &'a [&'static dyn datamodel_connector::Connector];
 
+// `libquery` needs to:
+// - read the `preview_features` bitflags
+// - read the `relation_mode` enum
+// - read the active `connector`
+// - read the `db` parser database (which is the most problematic so far)
 pub struct ValidatedSchema {
+    // `libquery` uses `configuration` to:
+    // - read the `preview_features` bitflags
     pub configuration: Configuration,
+
+    // `libquery` uses `db` to:
+    // - build the query schema lazily (by `walk`-ing the `db`)
+    // - read models, finding them by name
+    // - read model counts
     pub db: parser_database::ParserDatabase,
+
+    // `libquery` uses `connector` to:
+    // - read the `capabilities` bitflags
+    // - parse native types
+    // - check support for referential actions
+    // - read the `provider` string
     pub connector: &'static dyn datamodel_connector::Connector,
+
+    // `libquery` uses `connector` to:
+    // - customize the behavior of referential actions
     relation_mode: datamodel_connector::RelationMode,
 }
 
