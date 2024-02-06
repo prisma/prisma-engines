@@ -168,8 +168,7 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         _ctx: &Context<'_>,
     ) -> Expression<'static> {
         let virtual_selection_alias = self
-            .visited_virtuals
-            .get(vs)
+            .visited_virtual_selection(vs)
             .expect("All virtual fields must be visited before calling build_virtual_expr");
 
         coalesce([
@@ -184,8 +183,8 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         self.alias
     }
 
-    fn visited_virtuals(&self) -> &HashMap<VirtualSelection, Alias> {
-        &self.visited_virtuals
+    fn visited_virtual_selection(&self, vs: &VirtualSelection) -> Option<Alias> {
+        self.visited_virtuals.get(vs).copied()
     }
 }
 
