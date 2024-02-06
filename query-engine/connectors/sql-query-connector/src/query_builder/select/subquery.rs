@@ -1,37 +1,36 @@
 use super::*;
+
 use crate::{
     context::Context,
     filter::alias::{Alias, AliasMode},
-    model_extensions::AsColumn,
+    model_extensions::*,
 };
 
 use quaint::ast::*;
 use query_structure::*;
 
-/// Relations are resolved using LATERAL JOINs.
+/// Select builder for joined queries. Relations are resolved using correlated sub-queries.
 #[derive(Debug, Default)]
-pub(crate) struct LateralJoinSelectBuilder {
+pub(crate) struct SubqueriesSelectBuilder {
     alias: Alias,
 }
 
-impl JoinSelectBuilder for LateralJoinSelectBuilder {
+impl JoinSelectBuilder for SubqueriesSelectBuilder {
     /// Builds a SELECT statement for the given query arguments and selected fields.
     ///
     /// ```sql
     /// SELECT
     ///   id,
-    ///   name
+    ///   name,
+    ///   (
+    ///     SELECT JSON_OBJECT(<...>) FROM "Post" WHERE "Post"."authorId" = "User"."id
+    ///   ) as `post`
     /// FROM "User"
-    /// LEFT JOIN LATERAL (
-    ///   SELECT JSON_OBJECT(<...>) FROM "Post" WHERE "Post"."authorId" = "User"."id
-    /// ) as "post" ON TRUE
     /// ```
     fn build(&mut self, args: QueryArguments, selected_fields: &FieldSelection, ctx: &Context<'_>) -> Select<'static> {
-        let (select, parent_alias) = self.build_default_select(&args, ctx);
-        let select = self.with_selection(select, selected_fields, parent_alias, ctx);
-        let select = self.with_relations(select, selected_fields.relations(), parent_alias, ctx);
+        let (select, alias) = self.build_default_select(&args, ctx);
 
-        self.with_virtual_selections(select, selected_fields.virtuals(), parent_alias, ctx)
+        self.with_selection(select, selected_fields, alias, ctx)
     }
 
     fn build_selection<'a>(
@@ -47,14 +46,7 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
                     .table(parent_alias.to_table_string())
                     .set_is_selected(true),
             ),
-            SelectedField::Relation(rs) => {
-                let table_name = match rs.field.relation().is_many_to_many() {
-                    true => m2m_join_alias_name(&rs.field),
-                    false => join_alias_name(&rs.field),
-                };
-
-                select.value(Column::from((table_name, JSON_AGG_IDENT)).alias(rs.field.name().to_owned()))
-            }
+            SelectedField::Relation(rs) => self.with_relation(select, rs, parent_alias, ctx),
             _ => select,
         }
     }
@@ -66,14 +58,9 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        let (subselect, child_alias) =
-            self.build_to_one_select(rs, parent_alias, |expr: Expression<'_>| expr.alias(JSON_AGG_IDENT), ctx);
-        let subselect = self.with_relations(subselect, rs.relations(), child_alias, ctx);
-        let subselect = self.with_virtual_selections(subselect, rs.virtuals(), child_alias, ctx);
+        let (subselect, _) = self.build_to_one_select(rs, parent_alias, |x| x, ctx);
 
-        let join_table = Table::from(subselect).alias(join_alias_name(&rs.field));
-        // LEFT JOIN LATERAL ( <join_table> ) AS <relation name> ON TRUE
-        select.left_join(join_table.on(ConditionTree::single(true.raw())).lateral())
+        select.value(Expression::from(subselect).alias(rs.field.name().to_owned()))
     }
 
     fn add_to_many_relation<'a>(
@@ -83,11 +70,9 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        let join_table_alias = join_alias_name(&rs.field);
-        let join_table = Table::from(self.build_to_many_select(rs, parent_alias, ctx)).alias(join_table_alias);
+        let subselect = self.build_to_many_select(rs, parent_alias, ctx);
 
-        // LEFT JOIN LATERAL ( <join_table> ) AS <relation name> ON TRUE
-        select.left_join(join_table.on(ConditionTree::single(true.raw())).lateral())
+        select.value(Expression::from(subselect).alias(rs.field.name().to_owned()))
     }
 
     fn add_many_to_many_relation<'a>(
@@ -97,9 +82,9 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        let m2m_join = self.build_m2m_join(rs, parent_alias, ctx);
+        let subselect = self.build_m2m_select(rs, parent_alias, ctx);
 
-        select.left_join(m2m_join)
+        select.value(Expression::from(subselect).alias(rs.field.name().to_owned()))
     }
 
     fn add_virtual_selection<'a>(
@@ -109,10 +94,10 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        let relation_count_select = self.build_virtual_select(vs, parent_alias, ctx);
-        let table = Table::from(relation_count_select).alias(relation_count_alias_name(vs.relation_field()));
+        let virtual_select = self.build_virtual_select(vs, parent_alias, ctx);
+        let alias = relation_count_alias_name(vs.relation_field());
 
-        select.left_join_lateral(table.on(ConditionTree::single(true.raw())))
+        select.value(Expression::from(virtual_select).alias(alias))
     }
 
     fn build_json_obj_fn(
@@ -121,6 +106,7 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Expression<'static> {
+        let virtuals = self.build_json_obj_virtual_selection(rs.virtuals(), parent_alias, ctx);
         let build_obj_params = rs
             .selections
             .iter()
@@ -129,20 +115,13 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
                     Cow::from(sf.db_name().to_owned()),
                     Expression::from(sf.as_column(ctx).table(parent_alias.to_table_string())),
                 )),
-                SelectedField::Relation(rs) => {
-                    let table_name = match rs.field.relation().is_many_to_many() {
-                        true => m2m_join_alias_name(&rs.field),
-                        false => join_alias_name(&rs.field),
-                    };
-
-                    Some((
-                        Cow::from(rs.field.name().to_owned()),
-                        Expression::from(Column::from((table_name, JSON_AGG_IDENT))),
-                    ))
-                }
+                SelectedField::Relation(rs) => Some((
+                    Cow::from(rs.field.name().to_owned()),
+                    Expression::from(self.with_relation(Select::default(), rs, parent_alias, ctx)),
+                )),
                 _ => None,
             })
-            .chain(self.build_json_obj_virtual_selection(rs.virtuals(), parent_alias, ctx))
+            .chain(virtuals)
             .collect();
 
         json_build_object(build_obj_params).into()
@@ -151,13 +130,11 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
     fn build_virtual_expr(
         &mut self,
         vs: &VirtualSelection,
-        _parent_alias: Alias,
-        _ctx: &Context<'_>,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
     ) -> Expression<'static> {
-        let rf = vs.relation_field();
-
         coalesce([
-            Expression::from(Column::from((relation_count_alias_name(rf), vs.db_alias()))),
+            Expression::from(self.build_virtual_select(vs, parent_alias, ctx)),
             Expression::from(0.raw()),
         ])
         .into()
@@ -169,36 +146,45 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
     }
 }
 
-impl LateralJoinSelectBuilder {
-    fn build_m2m_join<'a>(&mut self, rs: &RelationSelection, parent_alias: Alias, ctx: &Context<'_>) -> JoinData<'a> {
+impl SubqueriesSelectBuilder {
+    fn build_m2m_select<'a>(&mut self, rs: &RelationSelection, parent_alias: Alias, ctx: &Context<'_>) -> Select<'a> {
         let rf = rs.field.clone();
         let m2m_table_alias = self.next_alias();
-        let m2m_join_alias = self.next_alias();
+        let root_alias = self.next_alias();
         let outer_alias = self.next_alias();
 
-        let m2m_join_data = Table::from(self.build_to_many_select(rs, m2m_table_alias, ctx))
-            .alias(m2m_join_alias.to_table_string())
-            .on(ConditionTree::single(true.raw()))
-            .lateral();
+        let m2m_join_data =
+            rf.related_model()
+                .as_table(ctx)
+                .on(rf.m2m_join_conditions(Some(m2m_table_alias), None, ctx));
 
-        let child_table = rf.as_table(ctx).alias(m2m_table_alias.to_table_string());
+        let m2m_table = rf.as_table(ctx).alias(m2m_table_alias.to_table_string());
 
-        let inner = Select::from_table(child_table)
-            .value(Column::from((m2m_join_alias.to_table_string(), JSON_AGG_IDENT)))
-            .left_join(m2m_join_data) // join m2m table
-            .with_m2m_join_conditions(&rf.related_field(), m2m_table_alias, parent_alias, ctx) // adds join condition to the child table
-            .with_filters(rs.args.filter.clone(), Some(m2m_join_alias), ctx) // adds query filters // TODO: avoid clone filter
-            .with_ordering(&rs.args, Some(m2m_join_alias.to_table_string()), ctx) // adds ordering stmts
-            .with_pagination(rs.args.take_abs(), rs.args.skip)
+        let root = Select::from_table(m2m_table)
+            .inner_join(m2m_join_data)
+            .value(rf.related_model().as_table(ctx).asterisk())
+            .with_ordering(&rs.args, None, ctx) // adds ordering stmts
+            // Keep join conditions _before_ user filters to ensure index is used first
+            .and_where(
+                rf.related_field()
+                    .m2m_join_conditions(Some(m2m_table_alias), Some(parent_alias), ctx),
+            ) // adds join condition to the child table
+            .with_filters(rs.args.filter.clone(), None, ctx) // adds query filters
+            .comment("root");
+
+        // On MySQL, using LIMIT makes the ordering of the JSON_AGG working. Beware, this is undocumented behavior.
+        let take = match rs.args.order_by.is_empty() {
+            true => rs.args.take_abs(),
+            false => rs.args.take_abs().or(Some(i64::MAX)),
+        };
+
+        let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()))
+            .value(self.build_json_obj_fn(rs, root_alias, ctx).alias(JSON_AGG_IDENT))
+            .with_pagination(take, rs.args.skip)
             .comment("inner"); // adds pagination
 
-        let outer = Select::from_table(Table::from(inner).alias(outer_alias.to_table_string()))
+        Select::from_table(Table::from(inner).alias(outer_alias.to_table_string()))
             .value(json_agg())
-            .comment("outer");
-
-        Table::from(outer)
-            .alias(m2m_join_alias_name(&rf))
-            .on(ConditionTree::single(true.raw()))
-            .lateral()
+            .comment("outer")
     }
 }

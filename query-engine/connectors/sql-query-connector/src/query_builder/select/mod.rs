@@ -2,9 +2,11 @@ mod lateral;
 mod subquery;
 
 use std::borrow::Cow;
+use tracing::Span;
 
 use psl::datamodel_connector::{ConnectorCapability, Flavour};
-use tracing::Span;
+use quaint::prelude::*;
+use query_structure::*;
 
 use crate::{
     context::Context,
@@ -14,10 +16,7 @@ use crate::{
     sql_trace::SqlTraceComment,
 };
 
-use quaint::prelude::*;
-use query_structure::*;
-
-use self::{lateral::SubqueriesSelectBuilder, subquery::LateralJoinSelectBuilder};
+use self::{lateral::LateralJoinSelectBuilder, subquery::SubqueriesSelectBuilder};
 
 pub(crate) const JSON_AGG_IDENT: &str = "__prisma_data__";
 
@@ -158,11 +157,7 @@ pub(crate) trait JoinSelectBuilder {
         // SELECT JSON_BUILD_OBJECT() FROM ( <root> )
         let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()))
             .value(self.build_json_obj_fn(rs, root_alias, ctx).alias(JSON_AGG_IDENT));
-
-        // LEFT JOIN LATERAL () AS <inner_alias> ON TRUE
         let inner = self.with_relations(inner, rs.relations(), root_alias, ctx);
-
-        // LEFT JOIN LATERAL ( <relation aggregation query> ) ON TRUE
         let inner = self.with_virtual_selections(inner, rs.virtuals(), root_alias, ctx);
 
         let linking_fields = rs.field.related_field().linking_fields();
