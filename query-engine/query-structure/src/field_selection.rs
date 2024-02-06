@@ -326,6 +326,12 @@ impl VirtualSelection {
             Self::RelationCount(_, _) => (TypeIdentifier::Int, FieldArity::Required),
         }
     }
+
+    pub fn relation_field(&self) -> &RelationField {
+        match self {
+            VirtualSelection::RelationCount(rf, _) => rf,
+        }
+    }
 }
 
 impl Display for VirtualSelection {

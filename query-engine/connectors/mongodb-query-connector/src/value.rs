@@ -152,7 +152,7 @@ impl IntoBson for (&MongoDbType, PrismaValue) {
 
             // Double
             (MongoDbType::Double, PrismaValue::Int(i)) => Bson::Double(i as f64),
-            (MongoDbType::Double, PrismaValue::Float(f)) => Bson::Double(f.to_f64().convert(expl::MONGO_DOUBLE)?),
+            (MongoDbType::Double, PrismaValue::Float(f)) => bigdecimal_to_bson_double(f)?,
             (MongoDbType::Double, PrismaValue::BigInt(b)) => Bson::Double(b.to_f64().convert(expl::MONGO_DOUBLE)?),
 
             // Int
@@ -188,6 +188,15 @@ impl IntoBson for (&MongoDbType, PrismaValue) {
                 time: dt.timestamp() as u32,
                 increment: 0,
             }),
+
+            (MongoDbType::Json, PrismaValue::Json(json)) => {
+                let val: Value = serde_json::from_str(&json)?;
+
+                Bson::try_from(val).map_err(|_| MongoError::ConversionError {
+                    from: "Stringified JSON".to_owned(),
+                    to: "Mongo BSON (extJSON)".to_owned(),
+                })?
+            }
 
             // Unhandled conversions
             (mdb_type, p_val) => {
@@ -231,15 +240,7 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
             (TypeIdentifier::BigInt, PrismaValue::Float(dec)) => Bson::Int64(dec.to_i64().convert(expl::MONGO_I64)?),
 
             // Float
-            (TypeIdentifier::Float, PrismaValue::Float(dec)) => {
-                // We don't have native support for float numbers (yet)
-                // so we need to do this, see https://docs.rs/bigdecimal/latest/bigdecimal/index.html
-                let dec_str = dec.to_string();
-                let f64_val = dec_str.parse::<f64>().ok();
-                let converted = f64_val.convert(expl::MONGO_DOUBLE)?;
-
-                Bson::Double(converted)
-            }
+            (TypeIdentifier::Float, PrismaValue::Float(dec)) => bigdecimal_to_bson_double(dec)?,
             (TypeIdentifier::Float, PrismaValue::Int(i)) => Bson::Double(i.to_f64().convert(expl::MONGO_DOUBLE)?),
             (TypeIdentifier::Float, PrismaValue::BigInt(i)) => Bson::Double(i.to_f64().convert(expl::MONGO_DOUBLE)?),
 
@@ -472,6 +473,14 @@ fn format_opt<T: Display>(opt: Option<T>) -> String {
         Some(t) => format!("{t}"),
         None => "None".to_owned(),
     }
+}
+
+fn bigdecimal_to_bson_double(dec: BigDecimal) -> crate::Result<Bson> {
+    let dec_str = dec.to_string();
+    let f64_val = dec_str.parse::<f64>().ok();
+    let converted = f64_val.convert(expl::MONGO_DOUBLE)?;
+
+    Ok(Bson::Double(converted))
 }
 
 /// Explanation constants for conversion errors.
