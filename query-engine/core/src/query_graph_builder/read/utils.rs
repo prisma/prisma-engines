@@ -1,6 +1,5 @@
 use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
-use psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
 use query_structure::{prelude::*, RelationLoadStrategy};
 use schema::{
     constants::{aggregations::*, args},
@@ -72,8 +71,7 @@ fn pairs_to_selections<T>(
 where
     T: Into<ParentContainer>,
 {
-    let should_collect_relation_selection = query_schema.has_capability(ConnectorCapability::LateralJoin)
-        && query_schema.has_feature(PreviewFeature::RelationJoins);
+    let should_collect_relation_selection = query_schema.can_resolve_relation_with_joins();
 
     let parent = parent.into();
 
@@ -259,8 +257,7 @@ pub(crate) fn get_relation_load_strategy(
     nested_queries: &[ReadQuery],
     query_schema: &QuerySchema,
 ) -> RelationLoadStrategy {
-    if query_schema.has_feature(PreviewFeature::RelationJoins)
-        && query_schema.has_capability(ConnectorCapability::LateralJoin)
+    if query_schema.can_resolve_relation_with_joins()
         && cursor.is_none()
         && distinct.is_none()
         && !nested_queries.iter().any(|q| match q {

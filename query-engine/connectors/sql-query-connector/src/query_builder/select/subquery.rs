@@ -8,13 +8,13 @@ use crate::{
 use quaint::ast::*;
 use query_structure::*;
 
-/// Postgres-specific select builder. Relations are handled using LATERAL JOINs.
+/// Relations are resolved using LATERAL JOINs.
 #[derive(Debug, Default)]
-pub(crate) struct PostgresSelectBuilder {
+pub(crate) struct LateralJoinSelectBuilder {
     alias: Alias,
 }
 
-impl JoinSelectBuilder for PostgresSelectBuilder {
+impl JoinSelectBuilder for LateralJoinSelectBuilder {
     /// Builds a SELECT statement for the given query arguments and selected fields.
     ///
     /// ```sql
@@ -169,7 +169,7 @@ impl JoinSelectBuilder for PostgresSelectBuilder {
     }
 }
 
-impl PostgresSelectBuilder {
+impl LateralJoinSelectBuilder {
     fn build_m2m_join<'a>(&mut self, rs: &RelationSelection, parent_alias: Alias, ctx: &Context<'_>) -> JoinData<'a> {
         let rf = rs.field.clone();
         let m2m_table_alias = self.next_alias();

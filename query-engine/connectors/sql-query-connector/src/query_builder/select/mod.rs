@@ -1,9 +1,9 @@
-mod mysql;
-mod postgres;
+mod lateral;
+mod subquery;
 
 use std::borrow::Cow;
 
-use psl::datamodel_connector::Flavour;
+use psl::datamodel_connector::{ConnectorCapability, Flavour};
 use tracing::Span;
 
 use crate::{
@@ -17,20 +17,18 @@ use crate::{
 use quaint::prelude::*;
 use query_structure::*;
 
-use self::{mysql::MysqlSelectBuilder, postgres::PostgresSelectBuilder};
+use self::{lateral::SubqueriesSelectBuilder, subquery::LateralJoinSelectBuilder};
 
 pub(crate) const JSON_AGG_IDENT: &str = "__prisma_data__";
 
-pub(crate) struct SelectBuilder {}
+pub(crate) struct SelectBuilder;
 
 impl SelectBuilder {
     pub fn build(args: QueryArguments, selected_fields: &FieldSelection, ctx: &Context<'_>) -> Select<'static> {
-        match connector_flavour(&args) {
-            Flavour::Mysql => MysqlSelectBuilder::default().build(args, selected_fields, ctx),
-            Flavour::Postgres | Flavour::Cockroach => {
-                PostgresSelectBuilder::default().build(args, selected_fields, ctx)
-            }
-            _ => unreachable!("Connector does not support joined selects."),
+        if supports_lateral_join(&args) {
+            LateralJoinSelectBuilder::default().build(args, selected_fields, ctx)
+        } else {
+            SubqueriesSelectBuilder::default().build(args, selected_fields, ctx)
         }
     }
 }
@@ -611,6 +609,14 @@ fn empty_json_array() -> serde_json::Value {
 
 fn connector_flavour(args: &QueryArguments) -> Flavour {
     args.model().dm.schema.connector.flavour()
+}
+
+fn supports_lateral_join(args: &QueryArguments) -> bool {
+    args.model()
+        .dm
+        .schema
+        .connector
+        .has_capability(ConnectorCapability::LateralJoin)
 }
 
 fn relation_count_alias_name(rf: &RelationField) -> String {

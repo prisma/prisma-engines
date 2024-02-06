@@ -108,6 +108,7 @@ capabilities!(
     DeleteReturning,                        // Connector supports deleting records and returning them in one operation.
     SupportsFiltersOnRelationsWithoutJoins, // Connector supports rendering filters on relation fields without joins.
     LateralJoin,                            // Connector supports lateral joins to resolve relations.
+    CorrelatedSubqueries,                   // Connector supports correlated subqueries to resolve relations.
 );
 
 /// Contains all capabilities that the connector is able to serve.

@@ -8,13 +8,13 @@ use crate::{
 use quaint::ast::*;
 use query_structure::*;
 
-/// MySQL-specific select builder. Relations are handled using correlated sub-queries.
+/// Relations are handled using correlated sub-queries.
 #[derive(Debug, Default)]
-pub(crate) struct MysqlSelectBuilder {
+pub(crate) struct SubqueriesSelectBuilder {
     alias: Alias,
 }
 
-impl JoinSelectBuilder for MysqlSelectBuilder {
+impl JoinSelectBuilder for SubqueriesSelectBuilder {
     /// Builds a SELECT statement for the given query arguments and selected fields.
     ///
     /// ```sql
@@ -145,7 +145,7 @@ impl JoinSelectBuilder for MysqlSelectBuilder {
     }
 }
 
-impl MysqlSelectBuilder {
+impl SubqueriesSelectBuilder {
     fn build_m2m_select<'a>(&mut self, rs: &RelationSelection, parent_alias: Alias, ctx: &Context<'_>) -> Select<'a> {
         let rf = rs.field.clone();
         let m2m_table_alias = self.next_alias();

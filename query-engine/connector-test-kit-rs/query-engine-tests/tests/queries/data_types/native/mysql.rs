@@ -158,7 +158,7 @@ mod string {
         schema.to_owned()
     }
 
-    // "Postgres native string types" should "work"
+    // "Mysql native string types" should "work"
     #[connector_test(schema(schema_string))]
     async fn native_string(runner: Runner) -> TestResult<()> {
         create_row(

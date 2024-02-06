@@ -32,10 +32,7 @@ pub(crate) fn coerce_record_with_json_relation(
                         // TODO(perf): Find ways to avoid serializing and deserializing multiple times.
                         let json_val: serde_json::Value = serde_json::from_str(val.as_json().unwrap()).unwrap();
 
-                        *val = match kind {
-                            IndexedSelection::Relation(rs) => coerce_json_relation_to_pv(json_val, rs)?,
-                            IndexedSelection::Virtual(name) => coerce_json_virtual_field_to_pv(name, json_val)?,
-                        };
+                        *val = coerce_json_relation_to_pv(json_val, rs)?;
                     }
                 }
             }
