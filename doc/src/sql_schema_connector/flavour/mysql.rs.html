@@ -1056,44 +1056,6 @@
         });
 }
 
-<span class="attr">#[cfg(test)]
-</span><span class="kw">mod </span>tests {
-    <span class="kw">use super</span>::<span class="kw-2">*</span>;
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>debug_impl_does_not_leak_connection_info() {
-        <span class="kw">let </span>url = <span class="string">&quot;mysql://myname:mypassword@myserver:8765/mydbname&quot;</span>;
-
-        <span class="kw">let </span><span class="kw-2">mut </span>flavour = MysqlFlavour::default();
-        <span class="kw">let </span>params = ConnectorParams {
-            connection_string: url.to_owned(),
-            preview_features: Default::default(),
-            shadow_database_connection_string: <span class="prelude-val">None</span>,
-        };
-        flavour.set_params(params).unwrap();
-        <span class="kw">let </span>debugged = <span class="macro">format!</span>(<span class="string">&quot;{flavour:?}&quot;</span>);
-
-        <span class="kw">let </span>words = <span class="kw-2">&amp;</span>[<span class="string">&quot;myname&quot;</span>, <span class="string">&quot;mypassword&quot;</span>, <span class="string">&quot;myserver&quot;</span>, <span class="string">&quot;8765&quot;</span>, <span class="string">&quot;mydbname&quot;</span>];
-
-        <span class="kw">for </span>word <span class="kw">in </span>words {
-            <span class="macro">assert!</span>(!debugged.contains(word));
-        }
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>qualified_name_re_matches_as_expected() {
-        <span class="kw">let </span>should_match = <span class="string">r#&quot;ALTER TABLE `mydb`.`cat` DROP PRIMARY KEY&quot;#</span>;
-        <span class="kw">let </span>should_not_match = <span class="string">r#&quot;ALTER TABLE `cat` ADD FOREIGN KEY (`ab`, cd`) REFERENCES `dog`(`id`)&quot;#</span>;
-
-        <span class="macro">assert!</span>(
-            QUALIFIED_NAME_RE.is_match_at(should_match, <span class="number">12</span>),
-            <span class="string">&quot;captures: {:?}&quot;</span>,
-            QUALIFIED_NAME_RE.captures(should_match)
-        );
-        <span class="macro">assert!</span>(!QUALIFIED_NAME_RE.is_match(should_not_match));
-    }
-}
-
 <span class="kw">fn </span>with_connection&lt;<span class="lifetime">&#39;a</span>, O, F, C&gt;(state: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>State, f: C) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;O&gt;&gt;
 <span class="kw">where
     </span>O: <span class="lifetime">&#39;a</span>,
@@ -1201,5 +1163,43 @@
 <span class="doccomment">/// This bit of logic was given to us by a PlanetScale engineer.
 </span><span class="kw">fn </span>is_planetscale(connection_string: <span class="kw-2">&amp;</span>str) -&gt; bool {
     connection_string.contains(<span class="string">&quot;.psdb.cloud&quot;</span>)
+}
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>debug_impl_does_not_leak_connection_info() {
+        <span class="kw">let </span>url = <span class="string">&quot;mysql://myname:mypassword@myserver:8765/mydbname&quot;</span>;
+
+        <span class="kw">let </span><span class="kw-2">mut </span>flavour = MysqlFlavour::default();
+        <span class="kw">let </span>params = ConnectorParams {
+            connection_string: url.to_owned(),
+            preview_features: Default::default(),
+            shadow_database_connection_string: <span class="prelude-val">None</span>,
+        };
+        flavour.set_params(params).unwrap();
+        <span class="kw">let </span>debugged = <span class="macro">format!</span>(<span class="string">&quot;{flavour:?}&quot;</span>);
+
+        <span class="kw">let </span>words = <span class="kw-2">&amp;</span>[<span class="string">&quot;myname&quot;</span>, <span class="string">&quot;mypassword&quot;</span>, <span class="string">&quot;myserver&quot;</span>, <span class="string">&quot;8765&quot;</span>, <span class="string">&quot;mydbname&quot;</span>];
+
+        <span class="kw">for </span>word <span class="kw">in </span>words {
+            <span class="macro">assert!</span>(!debugged.contains(word));
+        }
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>qualified_name_re_matches_as_expected() {
+        <span class="kw">let </span>should_match = <span class="string">r#&quot;ALTER TABLE `mydb`.`cat` DROP PRIMARY KEY&quot;#</span>;
+        <span class="kw">let </span>should_not_match = <span class="string">r#&quot;ALTER TABLE `cat` ADD FOREIGN KEY (`ab`, cd`) REFERENCES `dog`(`id`)&quot;#</span>;
+
+        <span class="macro">assert!</span>(
+            QUALIFIED_NAME_RE.is_match_at(should_match, <span class="number">12</span>),
+            <span class="string">&quot;captures: {:?}&quot;</span>,
+            QUALIFIED_NAME_RE.captures(should_match)
+        );
+        <span class="macro">assert!</span>(!QUALIFIED_NAME_RE.is_match(should_not_match));
+    }
 }
 </code></pre></div></section></main></body></html>
