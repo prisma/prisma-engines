@@ -6,7 +6,7 @@ pub use native_types::{MsSqlType, MsSqlTypeParameter};
 use crate::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
-        NativeTypeInstance, RelationMode,
+        NativeTypeInstance, RelationMode, ValidatedConnector,
     },
     diagnostics::{Diagnostics, Span},
     parser_database::{self, ast, ParserDatabase, ReferentialAction, ScalarType},
@@ -54,6 +54,37 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     SupportsFiltersOnRelationsWithoutJoins
     // InsertReturning | DeleteReturning - unimplemented.
 });
+
+pub(crate) struct MsSqlDatamodelValidatedConnector;
+
+impl ValidatedConnector for MsSqlDatamodelValidatedConnector {
+    fn provider_name(&self) -> &'static str {
+        "sqlserver"
+    }
+
+    fn name(&self) -> &str {
+        "SQL Server"
+    }
+
+    fn capabilities(&self) -> ConnectorCapabilities {
+        CAPABILITIES
+    }
+
+    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+        native_type.downcast_ref::<MsSqlType>().to_parts()
+    }
+
+    fn parse_native_type(
+        &self,
+        name: &str,
+        args: &[String],
+        span: Span,
+        diagnostics: &mut Diagnostics,
+    ) -> Option<NativeTypeInstance> {
+        let native_type = MsSqlType::from_parts(name, args, span, diagnostics)?;
+        Some(NativeTypeInstance::new::<MsSqlType>(native_type))
+    }
+}
 
 pub(crate) struct MsSqlDatamodelConnector;
 

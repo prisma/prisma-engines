@@ -34,6 +34,9 @@ use parser_database::{ast, ParserDatabase, SourceFile};
 /// The collection of all available connectors.
 pub type ConnectorRegistry<'a> = &'a [&'static dyn datamodel_connector::Connector];
 
+/// The collection of all available validated connectors.
+pub type ValidatedConnectorRegistry<'a> = &'a [&'static dyn datamodel_connector::ValidatedConnector];
+
 pub struct ValidatedSchema {
     pub configuration: Configuration,
     pub db: parser_database::ParserDatabase,

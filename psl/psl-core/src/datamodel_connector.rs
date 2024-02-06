@@ -37,6 +37,74 @@ use std::{borrow::Cow, collections::HashMap, str::FromStr};
 
 pub const EXTENSIONS_KEY: &str = "extensions";
 
+pub trait ValidatedConnector: Send + Sync {
+    /// The name of the provider, for string comparisons determining which connector we are on.
+    fn provider_name(&self) -> &'static str;
+
+    /// Must return true whenever the passed in provider name is a match.
+    fn is_provider(&self, name: &str) -> bool {
+        name == self.provider_name()
+    }
+
+    /// The name of the connector. Can be used in error messages.
+    fn name(&self) -> &str;
+
+    /// The static list of capabilities for the connector.
+    fn capabilities(&self) -> ConnectorCapabilities;
+
+    /// Does the connector have this capability?
+    fn has_capability(&self, capability: ConnectorCapability) -> bool {
+        self.capabilities().contains(capability)
+    }
+
+    /// This is used by the query engine schema builder.
+    ///
+    /// For a given scalar type + native type combination, this method should return the name to be
+    /// given to the filter input objects for the type. The significance of that name is that the
+    /// resulting input objects will be cached by name, so for a given filter input object name,
+    /// the filters should always be identical.
+    fn scalar_filter_name(&self, scalar_type_name: String, _native_type_name: Option<&str>) -> Cow<'_, str> {
+        Cow::Owned(scalar_type_name)
+    }
+
+    /// This is used by the query engine schema builder. It is only called for filters of String
+    /// fields and aggregates.
+    ///
+    /// For a given filter input object type name returned by `scalar_filter_name`, it should
+    /// return the string operations to be made available in the Client API.
+    ///
+    /// Implementations of this method _must_ always associate the same filters to the same input
+    /// object type name. This is because the filter types are cached by name, so if different
+    /// calls to the method return different filters, only the first return value will be used.
+    fn string_filters(&self, input_object_name: &str) -> BitFlags<StringFilter> {
+        match input_object_name {
+            "String" => BitFlags::all(), // all the filters are available by default
+            _ => panic!("Unexpected scalar input object name for string filters: `{input_object_name}`"),
+        }
+    }
+
+    /// Debug/error representation of a native type.
+    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>);
+
+    /// This function is used during Schema parsing to calculate the concrete native type.
+    /// It is also used by the Query Engine to parse the native type of a field.
+    fn parse_native_type(
+        &self,
+        name: &str,
+        args: &[String],
+        span: Span,
+        diagnostics: &mut Diagnostics,
+    ) -> Option<NativeTypeInstance>;
+
+    fn parse_json_datetime(
+        &self,
+        _str: &str,
+        _nt: Option<NativeTypeInstance>,
+    ) -> chrono::ParseResult<DateTime<FixedOffset>> {
+        unreachable!("This method is only implemented on connectors with lateral join support.")
+    }
+}
+
 /// The datamodel connector API.
 pub trait Connector: Send + Sync {
     /// The name of the provider, for string comparisons determining which connector we are on.
@@ -121,6 +189,7 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::NamedDefaultValues)
     }
 
+    /// Note: this is not used in any `query-engine`.
     fn supports_referential_action(&self, relation_mode: &RelationMode, action: ReferentialAction) -> bool {
         match relation_mode {
             RelationMode::ForeignKeys => self.referential_actions().contains(action),
