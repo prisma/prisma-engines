@@ -1,7 +1,7 @@
 mod lateral;
 mod subquery;
 
-use std::borrow::Cow;
+use std::{borrow::Cow, collections::HashMap};
 use tracing::Span;
 
 use psl::datamodel_connector::{ConnectorCapability, Flavour};
@@ -89,6 +89,11 @@ pub(crate) trait JoinSelectBuilder {
     ) -> Expression<'static>;
     /// Get the next alias for a table.
     fn next_alias(&mut self) -> Alias;
+    /// Returns a hash map of virtual selections that have already been added to the query, storing
+    /// the table aliases where the corresponding value can be taken from.
+    /// TODO: hash map should be an implementation detail of a specific builder, replace with
+    /// a method to get an alias by virtual selection: fn(&VirtualSelection) -> Option<Alias>
+    fn visited_virtuals(&self) -> &HashMap<VirtualSelection, Alias>;
 
     fn with_selection<'a>(
         &mut self,
@@ -112,6 +117,7 @@ pub(crate) trait JoinSelectBuilder {
         rs: &RelationSelection,
         parent_alias: Alias,
         selection_modifier: impl FnOnce(Expression<'static>) -> Expression<'static>,
+        with_relations_and_virtuals: bool,
         ctx: &Context<'_>,
     ) -> (Select<'static>, Alias) {
         let rf = &rs.field;
@@ -121,13 +127,21 @@ pub(crate) trait JoinSelectBuilder {
             .related_field()
             .as_table(ctx)
             .alias(child_table_alias.to_table_string());
-        let json_expr = self.build_json_obj_fn(rs, child_table_alias, ctx);
 
-        let select = Select::from_table(table)
+        let mut select = Select::from_table(table)
             .with_join_conditions(rf, parent_alias, child_table_alias, ctx)
             .with_filters(rs.args.filter.clone(), Some(child_table_alias), ctx)
-            .value(selection_modifier(json_expr))
             .limit(1);
+
+        // TODO: at this point this method should just be implemented twice separately
+        if with_relations_and_virtuals {
+            select = self.with_relations(select, rs.relations(), child_table_alias, ctx);
+            select = self.with_virtual_selections(select, rs.virtuals(), child_table_alias, ctx);
+        }
+
+        let json_expr = self.build_json_obj_fn(rs, child_table_alias, ctx);
+
+        select = select.value(selection_modifier(json_expr));
 
         (select, child_table_alias)
     }
@@ -155,10 +169,13 @@ pub(crate) trait JoinSelectBuilder {
             .comment("root select");
 
         // SELECT JSON_BUILD_OBJECT() FROM ( <root> )
-        let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()))
-            .value(self.build_json_obj_fn(rs, root_alias, ctx).alias(JSON_AGG_IDENT));
+        let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()));
         let inner = self.with_relations(inner, rs.relations(), root_alias, ctx);
         let inner = self.with_virtual_selections(inner, rs.virtuals(), root_alias, ctx);
+
+        // Build the JSON object utilizing the information we collected in `with_relations` and
+        // `with_virtual_selections`.
+        let inner = inner.value(self.build_json_obj_fn(rs, root_alias, ctx).alias(JSON_AGG_IDENT));
 
         let linking_fields = rs.field.related_field().linking_fields();
 
@@ -258,7 +275,13 @@ pub(crate) trait JoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        selections.fold(select, |acc, vs| self.add_virtual_selection(acc, vs, parent_alias, ctx))
+        selections.fold(select, |acc, vs| {
+            if self.visited_virtuals().contains_key(vs) {
+                acc
+            } else {
+                self.add_virtual_selection(acc, vs, parent_alias, ctx)
+            }
+        })
     }
 
     fn build_virtual_select(

@@ -336,7 +336,11 @@ impl VirtualSelection {
 
 impl Display for VirtualSelection {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.db_alias())
+        let model = self.relation_field().model();
+        let model_name = model.name();
+        let (obj, field) = self.serialized_name();
+
+        write!(f, "{model_name}.{obj}.{field}")
     }
 }
 

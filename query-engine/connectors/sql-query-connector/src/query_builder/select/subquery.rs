@@ -6,6 +6,8 @@ use crate::{
     model_extensions::*,
 };
 
+use std::collections::HashMap;
+
 use quaint::ast::*;
 use query_structure::*;
 
@@ -13,6 +15,7 @@ use query_structure::*;
 #[derive(Debug, Default)]
 pub(crate) struct SubqueriesSelectBuilder {
     alias: Alias,
+    visited_virtuals: HashMap<VirtualSelection, Alias>,
 }
 
 impl JoinSelectBuilder for SubqueriesSelectBuilder {
@@ -58,7 +61,7 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        let (subselect, _) = self.build_to_one_select(rs, parent_alias, |x| x, ctx);
+        let (subselect, _) = self.build_to_one_select(rs, parent_alias, |x| x, false, ctx);
 
         select.value(Expression::from(subselect).alias(rs.field.name().to_owned()))
     }
@@ -143,6 +146,10 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
     fn next_alias(&mut self) -> Alias {
         self.alias = self.alias.inc(AliasMode::Table);
         self.alias
+    }
+
+    fn visited_virtuals(&self) -> &HashMap<VirtualSelection, Alias> {
+        &self.visited_virtuals
     }
 }
 
