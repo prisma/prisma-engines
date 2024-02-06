@@ -454,44 +454,6 @@ fn check_datamodel_for_mysql_5_6(datamodel: &ValidatedSchema, errors: &mut Vec<S
         });
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn debug_impl_does_not_leak_connection_info() {
-        let url = "mysql://myname:mypassword@myserver:8765/mydbname";
-
-        let mut flavour = MysqlFlavour::default();
-        let params = ConnectorParams {
-            connection_string: url.to_owned(),
-            preview_features: Default::default(),
-            shadow_database_connection_string: None,
-        };
-        flavour.set_params(params).unwrap();
-        let debugged = format!("{flavour:?}");
-
-        let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];
-
-        for word in words {
-            assert!(!debugged.contains(word));
-        }
-    }
-
-    #[test]
-    fn qualified_name_re_matches_as_expected() {
-        let should_match = r#"ALTER TABLE `mydb`.`cat` DROP PRIMARY KEY"#;
-        let should_not_match = r#"ALTER TABLE `cat` ADD FOREIGN KEY (`ab`, cd`) REFERENCES `dog`(`id`)"#;
-
-        assert!(
-            QUALIFIED_NAME_RE.is_match_at(should_match, 12),
-            "captures: {:?}",
-            QUALIFIED_NAME_RE.captures(should_match)
-        );
-        assert!(!QUALIFIED_NAME_RE.is_match(should_not_match));
-    }
-}
-
 fn with_connection<'a, O, F, C>(state: &'a mut State, f: C) -> BoxFuture<'a, ConnectorResult<O>>
 where
     O: 'a,
@@ -599,4 +561,42 @@ fn scan_migration_script_impl(script: &str) {
 /// This bit of logic was given to us by a PlanetScale engineer.
 fn is_planetscale(connection_string: &str) -> bool {
     connection_string.contains(".psdb.cloud")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn debug_impl_does_not_leak_connection_info() {
+        let url = "mysql://myname:mypassword@myserver:8765/mydbname";
+
+        let mut flavour = MysqlFlavour::default();
+        let params = ConnectorParams {
+            connection_string: url.to_owned(),
+            preview_features: Default::default(),
+            shadow_database_connection_string: None,
+        };
+        flavour.set_params(params).unwrap();
+        let debugged = format!("{flavour:?}");
+
+        let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];
+
+        for word in words {
+            assert!(!debugged.contains(word));
+        }
+    }
+
+    #[test]
+    fn qualified_name_re_matches_as_expected() {
+        let should_match = r#"ALTER TABLE `mydb`.`cat` DROP PRIMARY KEY"#;
+        let should_not_match = r#"ALTER TABLE `cat` ADD FOREIGN KEY (`ab`, cd`) REFERENCES `dog`(`id`)"#;
+
+        assert!(
+            QUALIFIED_NAME_RE.is_match_at(should_match, 12),
+            "captures: {:?}",
+            QUALIFIED_NAME_RE.captures(should_match)
+        );
+        assert!(!QUALIFIED_NAME_RE.is_match(should_not_match));
+    }
 }
