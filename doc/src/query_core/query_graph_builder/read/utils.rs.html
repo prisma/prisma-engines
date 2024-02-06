@@ -271,12 +271,8 @@
 <a href="#271" id="271">271</a>
 <a href="#272" id="272">272</a>
 <a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
-<span class="kw">use </span>psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
 <span class="kw">use </span>query_structure::{prelude::<span class="kw-2">*</span>, RelationLoadStrategy};
 <span class="kw">use </span>schema::{
     constants::{aggregations::<span class="kw-2">*</span>, args},
@@ -348,8 +344,7 @@
 <span class="kw">where
     </span>T: Into&lt;ParentContainer&gt;,
 {
-    <span class="kw">let </span>should_collect_relation_selection = query_schema.has_capability(ConnectorCapability::LateralJoin)
-        &amp;&amp; query_schema.has_feature(PreviewFeature::RelationJoins);
+    <span class="kw">let </span>should_collect_relation_selection = query_schema.can_resolve_relation_with_joins();
 
     <span class="kw">let </span>parent = parent.into();
 
@@ -535,8 +530,7 @@
     nested_queries: <span class="kw-2">&amp;</span>[ReadQuery],
     query_schema: <span class="kw-2">&amp;</span>QuerySchema,
 ) -&gt; RelationLoadStrategy {
-    <span class="kw">if </span>query_schema.has_feature(PreviewFeature::RelationJoins)
-        &amp;&amp; query_schema.has_capability(ConnectorCapability::LateralJoin)
+    <span class="kw">if </span>query_schema.can_resolve_relation_with_joins()
         &amp;&amp; cursor.is_none()
         &amp;&amp; distinct.is_none()
         &amp;&amp; !nested_queries.iter().any(|q| <span class="kw">match </span>q {

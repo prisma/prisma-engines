@@ -473,7 +473,7 @@
         <span class="kw-2">&amp;</span>field_names,
     );
 
-    <span class="kw">let </span>query = query_builder::select::SelectBuilder::default().build(
+    <span class="kw">let </span>query = query_builder::select::SelectBuilder::build(
         QueryArguments::from((model.clone(), filter.clone())),
         selected_fields,
         ctx,
@@ -586,7 +586,7 @@
         <span class="kw">_ </span>=&gt; (),
     };
 
-    <span class="kw">let </span>query = query_builder::select::SelectBuilder::default().build(query_arguments.clone(), selected_fields, ctx);
+    <span class="kw">let </span>query = query_builder::select::SelectBuilder::build(query_arguments.clone(), selected_fields, ctx);
 
     <span class="kw">for </span>item <span class="kw">in </span>conn.filter(query.into(), meta.as_slice(), ctx).<span class="kw">await</span><span class="question-mark">?</span>.into_iter() {
         <span class="kw">let </span><span class="kw-2">mut </span>record = Record::from(item);

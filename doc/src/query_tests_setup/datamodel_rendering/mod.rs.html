@@ -100,17 +100,26 @@
 <a href="#100" id="100">100</a>
 <a href="#101" id="101">101</a>
 <a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>mongodb_renderer;
 <span class="kw">mod </span>sql_renderer;
 
 <span class="kw">pub use </span>mongodb_renderer::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>sql_renderer::<span class="kw-2">*</span>;
 
-<span class="kw">use crate</span>::{connection_string, templating, DatamodelFragment, IdFragment, M2mFragment, CONFIG};
+<span class="kw">use crate</span>::{
+    connection_string, templating, ConnectorVersion, DatamodelFragment, IdFragment, M2mFragment, MySqlVersion, CONFIG,
+};
 <span class="kw">use </span>indoc::indoc;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>once_cell::sync::Lazy;
-<span class="kw">use </span>psl::ALL_PREVIEW_FEATURES;
+<span class="kw">use </span>psl::{PreviewFeature, ALL_PREVIEW_FEATURES};
 <span class="kw">use </span>regex::Regex;
 
 <span class="doccomment">/// Test configuration, loaded once at runtime.
@@ -139,7 +148,7 @@
     isolation_level: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
 ) -&gt; String {
     <span class="kw">let </span>(tag, version) = CONFIG.test_connector().unwrap();
-    <span class="kw">let </span>preview_features = render_preview_features(excluded_features);
+    <span class="kw">let </span>preview_features = render_preview_features(excluded_features, <span class="kw-2">&amp;</span>version);
 
     <span class="kw">let </span>is_multi_schema = !db_schemas.is_empty();
 
@@ -191,8 +200,13 @@
     })
 }
 
-<span class="kw">fn </span>render_preview_features(excluded_features: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; String {
-    <span class="kw">let </span>excluded_features: Vec&lt;<span class="kw">_</span>&gt; = excluded_features.iter().map(|f| <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{f}&quot;&quot;#</span>)).collect();
+<span class="kw">fn </span>render_preview_features(excluded_features: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str], version: <span class="kw-2">&amp;</span>ConnectorVersion) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>excluded_features: Vec&lt;<span class="kw">_</span>&gt; = excluded_features.iter().map(|f| <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{f}&quot;&quot;#</span>)).collect();
+
+    <span class="comment">// TODO: Remove this once we are able to have version speficic preview features.
+    </span><span class="kw">if </span>version.is_mysql() &amp;&amp; !<span class="macro">matches!</span>(version, ConnectorVersion::MySql(<span class="prelude-val">Some</span>(MySqlVersion::V8))) {
+        excluded_features.push(<span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, PreviewFeature::RelationJoins));
+    }
 
     ALL_PREVIEW_FEATURES
         .active_features()

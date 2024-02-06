@@ -486,6 +486,15 @@
 <a href="#486" id="486">486</a>
 <a href="#487" id="487">487</a>
 <a href="#488" id="488">488</a>
+<a href="#489" id="489">489</a>
+<a href="#490" id="490">490</a>
+<a href="#491" id="491">491</a>
+<a href="#492" id="492">492</a>
+<a href="#493" id="493">493</a>
+<a href="#494" id="494">494</a>
+<a href="#495" id="495">495</a>
+<a href="#496" id="496">496</a>
+<a href="#497" id="497">497</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     filter::FilterPrefix,
     output_meta::{CompositeOutputMeta, OutputMeta, ScalarOutputMeta},
@@ -640,7 +649,7 @@
 
             <span class="comment">// Double
             </span>(MongoDbType::Double, PrismaValue::Int(i)) =&gt; Bson::Double(i <span class="kw">as </span>f64),
-            (MongoDbType::Double, PrismaValue::Float(f)) =&gt; Bson::Double(f.to_f64().convert(expl::MONGO_DOUBLE)<span class="question-mark">?</span>),
+            (MongoDbType::Double, PrismaValue::Float(f)) =&gt; bigdecimal_to_bson_double(f)<span class="question-mark">?</span>,
             (MongoDbType::Double, PrismaValue::BigInt(b)) =&gt; Bson::Double(b.to_f64().convert(expl::MONGO_DOUBLE)<span class="question-mark">?</span>),
 
             <span class="comment">// Int
@@ -676,6 +685,15 @@
                 </span>time: dt.timestamp() <span class="kw">as </span>u32,
                 increment: <span class="number">0</span>,
             }),
+
+            (MongoDbType::Json, PrismaValue::Json(json)) =&gt; {
+                <span class="kw">let </span>val: Value = serde_json::from_str(<span class="kw-2">&amp;</span>json)<span class="question-mark">?</span>;
+
+                Bson::try_from(val).map_err(|<span class="kw">_</span>| MongoError::ConversionError {
+                    from: <span class="string">&quot;Stringified JSON&quot;</span>.to_owned(),
+                    to: <span class="string">&quot;Mongo BSON (extJSON)&quot;</span>.to_owned(),
+                })<span class="question-mark">?
+            </span>}
 
             <span class="comment">// Unhandled conversions
             </span>(mdb_type, p_val) =&gt; {
@@ -719,15 +737,7 @@
             (TypeIdentifier::BigInt, PrismaValue::Float(dec)) =&gt; Bson::Int64(dec.to_i64().convert(expl::MONGO_I64)<span class="question-mark">?</span>),
 
             <span class="comment">// Float
-            </span>(TypeIdentifier::Float, PrismaValue::Float(dec)) =&gt; {
-                <span class="comment">// We don&#39;t have native support for float numbers (yet)
-                // so we need to do this, see https://docs.rs/bigdecimal/latest/bigdecimal/index.html
-                </span><span class="kw">let </span>dec_str = dec.to_string();
-                <span class="kw">let </span>f64_val = dec_str.parse::&lt;f64&gt;().ok();
-                <span class="kw">let </span>converted = f64_val.convert(expl::MONGO_DOUBLE)<span class="question-mark">?</span>;
-
-                Bson::Double(converted)
-            }
+            </span>(TypeIdentifier::Float, PrismaValue::Float(dec)) =&gt; bigdecimal_to_bson_double(dec)<span class="question-mark">?</span>,
             (TypeIdentifier::Float, PrismaValue::Int(i)) =&gt; Bson::Double(i.to_f64().convert(expl::MONGO_DOUBLE)<span class="question-mark">?</span>),
             (TypeIdentifier::Float, PrismaValue::BigInt(i)) =&gt; Bson::Double(i.to_f64().convert(expl::MONGO_DOUBLE)<span class="question-mark">?</span>),
 
@@ -960,6 +970,14 @@
         <span class="prelude-val">Some</span>(t) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{t}&quot;</span>),
         <span class="prelude-val">None </span>=&gt; <span class="string">&quot;None&quot;</span>.to_owned(),
     }
+}
+
+<span class="kw">fn </span>bigdecimal_to_bson_double(dec: BigDecimal) -&gt; <span class="kw">crate</span>::Result&lt;Bson&gt; {
+    <span class="kw">let </span>dec_str = dec.to_string();
+    <span class="kw">let </span>f64_val = dec_str.parse::&lt;f64&gt;().ok();
+    <span class="kw">let </span>converted = f64_val.convert(expl::MONGO_DOUBLE)<span class="question-mark">?</span>;
+
+    <span class="prelude-val">Ok</span>(Bson::Double(converted))
 }
 
 <span class="doccomment">/// Explanation constants for conversion errors.

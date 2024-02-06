@@ -278,6 +278,20 @@
 <a href="#278" id="278">278</a>
 <a href="#279" id="279">279</a>
 <a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{ast, parent_container::ParentContainer, prelude::<span class="kw-2">*</span>, DefaultKind, NativeTypeInstance, ValueGenerator};
 <span class="kw">use </span>chrono::{DateTime, FixedOffset};
 <span class="kw">use </span>psl::{
@@ -435,15 +449,22 @@
     }
 
     <span class="kw">pub fn </span>native_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt; {
-        <span class="kw">let </span>(<span class="kw">_</span>, name, args, span) = <span class="kw">match </span><span class="self">self</span>.id {
-            ScalarFieldId::InModel(id) =&gt; <span class="self">self</span>.dm.walk(id).raw_native_type(),
-            ScalarFieldId::InCompositeType(id) =&gt; <span class="self">self</span>.dm.walk(id).raw_native_type(),
-        }<span class="question-mark">?</span>;
         <span class="kw">let </span>connector = <span class="self">self</span>.dm.schema.connector;
 
-        <span class="kw">let </span>nt = connector
-            .parse_native_type(name, args, span, <span class="kw-2">&amp;mut </span>Default::default())
-            .unwrap();
+        <span class="kw">let </span>raw_nt = <span class="kw">match </span><span class="self">self</span>.id {
+            ScalarFieldId::InModel(id) =&gt; <span class="self">self</span>.dm.walk(id).raw_native_type(),
+            ScalarFieldId::InCompositeType(id) =&gt; <span class="self">self</span>.dm.walk(id).raw_native_type(),
+        };
+
+        <span class="kw">let </span>psl_nt = raw_nt
+            .and_then(|(<span class="kw">_</span>, name, args, span)| connector.parse_native_type(name, args, span, <span class="kw-2">&amp;mut </span>Default::default()));
+
+        <span class="kw">let </span>scalar_type = <span class="kw">match </span><span class="self">self</span>.id {
+            ScalarFieldId::InModel(id) =&gt; <span class="self">self</span>.dm.walk(id).scalar_type(),
+            ScalarFieldId::InCompositeType(id) =&gt; <span class="self">self</span>.dm.walk(id).scalar_type(),
+        };
+
+        <span class="kw">let </span>nt = psl_nt.or_else(|| scalar_type.and_then(|st| connector.default_native_type_for_scalar_type(<span class="kw-2">&amp;</span>st)))<span class="question-mark">?</span>;
 
         <span class="prelude-val">Some</span>(NativeTypeInstance {
             native_type: nt,
@@ -456,6 +477,13 @@
         <span class="kw">let </span>connector = <span class="self">self</span>.dm.schema.connector;
 
         connector.parse_json_datetime(value, nt)
+    }
+
+    <span class="kw">pub fn </span>parse_json_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>str) -&gt; PrismaValueResult&lt;Vec&lt;u8&gt;&gt; {
+        <span class="kw">let </span>nt = <span class="self">self</span>.native_type().map(|nt| nt.native_type);
+        <span class="kw">let </span>connector = <span class="self">self</span>.dm.schema.connector;
+
+        connector.parse_json_bytes(value, nt)
     }
 
     <span class="kw">pub fn </span>is_autoincrement(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {

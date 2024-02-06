@@ -716,6 +716,20 @@
 <a href="#716" id="716">716</a>
 <a href="#717" id="717">717</a>
 <a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>datasource;
 <span class="kw">mod </span>native_types;
 <span class="kw">mod </span>validations;
@@ -786,9 +800,9 @@
     UpdateReturning |
     RowIn |
     DistinctOn |
-    LateralJoin |
     DeleteReturning |
-    SupportsFiltersOnRelationsWithoutJoins
+    SupportsFiltersOnRelationsWithoutJoins |
+    LateralJoin
 });
 
 <span class="kw">pub struct </span>PostgresDatamodelConnector;
@@ -1049,7 +1063,7 @@
         }
     }
 
-    <span class="kw">fn </span>default_native_type_for_scalar_type(<span class="kw-2">&amp;</span><span class="self">self</span>, scalar_type: <span class="kw-2">&amp;</span>ScalarType) -&gt; NativeTypeInstance {
+    <span class="kw">fn </span>default_native_type_for_scalar_type(<span class="kw-2">&amp;</span><span class="self">self</span>, scalar_type: <span class="kw-2">&amp;</span>ScalarType) -&gt; <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt; {
         <span class="kw">let </span>native_type = SCALAR_TYPE_DEFAULTS
             .iter()
             .find(|(st, <span class="kw">_</span>)| st == scalar_type)
@@ -1057,7 +1071,7 @@
             .ok_or_else(|| <span class="macro">format!</span>(<span class="string">&quot;Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS&quot;</span>))
             .unwrap();
 
-        NativeTypeInstance::new::&lt;PostgresType&gt;(<span class="kw-2">*</span>native_type)
+        <span class="prelude-val">Some</span>(NativeTypeInstance::new::&lt;PostgresType&gt;(<span class="kw-2">*</span>native_type))
     }
 
     <span class="kw">fn </span>native_type_is_default_for_scalar_type(
@@ -1298,17 +1312,31 @@
 
         <span class="kw">match </span>native_type {
             <span class="prelude-val">Some</span>(pt) =&gt; <span class="kw">match </span>pt {
-                Timestamptz(<span class="kw">_</span>) =&gt; <span class="kw">super</span>::utils::parse_timestamptz(str),
-                Timestamp(<span class="kw">_</span>) =&gt; <span class="kw">super</span>::utils::parse_timestamp(str),
-                Date =&gt; <span class="kw">super</span>::utils::parse_date(str),
-                Time(<span class="kw">_</span>) =&gt; <span class="kw">super</span>::utils::parse_time(str),
-                Timetz(<span class="kw">_</span>) =&gt; <span class="kw">super</span>::utils::parse_timetz(str),
+                Timestamptz(<span class="kw">_</span>) =&gt; <span class="kw">super</span>::utils::postgres::parse_timestamptz(str),
+                Timestamp(<span class="kw">_</span>) =&gt; <span class="kw">super</span>::utils::postgres::parse_timestamp(str),
+                Date =&gt; <span class="kw">super</span>::utils::common::parse_date(str),
+                Time(<span class="kw">_</span>) =&gt; <span class="kw">super</span>::utils::common::parse_time(str),
+                Timetz(<span class="kw">_</span>) =&gt; <span class="kw">super</span>::utils::postgres::parse_timetz(str),
                 <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
             },
-            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.parse_json_datetime(
-                str,
-                <span class="prelude-val">Some</span>(<span class="self">self</span>.default_native_type_for_scalar_type(<span class="kw-2">&amp;</span>ScalarType::DateTime)),
-            ),
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.parse_json_datetime(str, <span class="self">self</span>.default_native_type_for_scalar_type(<span class="kw-2">&amp;</span>ScalarType::DateTime)),
+        }
+    }
+
+    <span class="kw">fn </span>parse_json_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>, str: <span class="kw-2">&amp;</span>str, nt: <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt;) -&gt; prisma_value::PrismaValueResult&lt;Vec&lt;u8&gt;&gt; {
+        <span class="kw">let </span>native_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PostgresType&gt; = nt.as_ref().map(|nt| nt.downcast_ref());
+
+        <span class="kw">match </span>native_type {
+            <span class="prelude-val">Some</span>(ct) =&gt; <span class="kw">match </span>ct {
+                PostgresType::ByteA =&gt; {
+                    <span class="kw">super</span>::utils::postgres::parse_bytes(str).map_err(|<span class="kw">_</span>| prisma_value::ConversionFailure {
+                        from: <span class="string">&quot;hex&quot;</span>.into(),
+                        to: <span class="string">&quot;bytes&quot;</span>.into(),
+                    })
+                }
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
+            },
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.parse_json_bytes(str, <span class="self">self</span>.default_native_type_for_scalar_type(<span class="kw-2">&amp;</span>ScalarType::Bytes)),
         }
     }
 }

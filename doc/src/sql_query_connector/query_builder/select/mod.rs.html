@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/query_builder/select.rs`."><title>select.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="sql_query_connector" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/query_builder/select/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="sql_query_connector" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -555,92 +555,204 @@
 <a href="#555" id="555">555</a>
 <a href="#556" id="556">556</a>
 <a href="#557" id="557">557</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::{borrow::Cow, collections::BTreeMap};
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
+<a href="#579" id="579">579</a>
+<a href="#580" id="580">580</a>
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+<a href="#583" id="583">583</a>
+<a href="#584" id="584">584</a>
+<a href="#585" id="585">585</a>
+<a href="#586" id="586">586</a>
+<a href="#587" id="587">587</a>
+<a href="#588" id="588">588</a>
+<a href="#589" id="589">589</a>
+<a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+</pre></div><pre class="rust"><code><span class="kw">mod </span>lateral;
+<span class="kw">mod </span>subquery;
+
+<span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>tracing::Span;
+
+<span class="kw">use </span>psl::datamodel_connector::{ConnectorCapability, Flavour};
+<span class="kw">use </span>quaint::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>query_structure::<span class="kw-2">*</span>;
 
 <span class="kw">use crate</span>::{
     context::Context,
-    filter::alias::{Alias, AliasMode},
-    model_extensions::{AsColumn, AsColumns, AsTable, ColumnIterator, RelationFieldExt},
+    filter::alias::Alias,
+    model_extensions::{AsColumns, AsTable, ColumnIterator, RelationFieldExt},
     ordering::OrderByBuilder,
     sql_trace::SqlTraceComment,
 };
 
-<span class="kw">use </span>quaint::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span>query_structure::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="self">self</span>::{lateral::LateralJoinSelectBuilder, subquery::SubqueriesSelectBuilder};
 
-<span class="kw">pub const </span>JSON_AGG_IDENT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;__prisma_data__&quot;</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>JSON_AGG_IDENT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;__prisma_data__&quot;</span>;
 
-<span class="attr">#[derive(Debug, Default)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>SelectBuilder {
-    alias: Alias,
-}
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>SelectBuilder;
 
 <span class="kw">impl </span>SelectBuilder {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>next_alias(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Alias {
-        <span class="self">self</span>.alias = <span class="self">self</span>.alias.inc(AliasMode::Table);
-        <span class="self">self</span>.alias
+    <span class="kw">pub fn </span>build(args: QueryArguments, selected_fields: <span class="kw-2">&amp;</span>FieldSelection, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Select&lt;<span class="lifetime">&#39;static</span>&gt; {
+        <span class="kw">if </span>supports_lateral_join(<span class="kw-2">&amp;</span>args) {
+            LateralJoinSelectBuilder::default().build(args, selected_fields, ctx)
+        } <span class="kw">else </span>{
+            SubqueriesSelectBuilder::default().build(args, selected_fields, ctx)
+        }
     }
+}
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        args: QueryArguments,
-        selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
-        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
-    ) -&gt; Select&lt;<span class="lifetime">&#39;static</span>&gt; {
-        <span class="kw">let </span>table_alias = <span class="self">self</span>.next_alias();
-        <span class="kw">let </span>table = args.model().as_table(ctx).alias(table_alias.to_table_string());
-
-        <span class="comment">// SELECT ... FROM Table &quot;t1&quot;
-        </span><span class="kw">let </span>select = Select::from_table(table)
-            .with_selection(selected_fields, table_alias, ctx)
-            .with_ordering(<span class="kw-2">&amp;</span>args, <span class="prelude-val">Some</span>(table_alias.to_table_string()), ctx)
-            .with_pagination(args.take_abs(), args.skip)
-            .with_filters(args.filter, <span class="prelude-val">Some</span>(table_alias), ctx)
-            .append_trace(<span class="kw-2">&amp;</span>Span::current())
-            .add_trace_id(ctx.trace_id);
-
-        <span class="comment">// Adds joins for relations
-        </span><span class="kw">let </span>select = <span class="self">self</span>.with_related_queries(select, selected_fields.relations(), table_alias, ctx);
-
-        <span class="comment">// Adds joins for relation aggregations. Other potential future kinds of virtual fields
-        // might or might not require joins and might be processed differently.
-        </span><span class="self">self</span>.with_relation_aggregation_queries(select, selected_fields.virtuals(), table_alias, ctx)
-    }
-
-    <span class="kw">fn </span>with_related_queries&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        input: Select&lt;<span class="lifetime">&#39;a</span>&gt;,
-        relation_selections: <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>RelationSelection&gt;,
-        parent_alias: Alias,
-        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
-    ) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt; {
-        relation_selections.fold(input, |acc, rs| <span class="self">self</span>.with_related_query(acc, rs, parent_alias, ctx))
-    }
-
-    <span class="kw">fn </span>with_related_query&lt;<span class="lifetime">&#39;a</span>&gt;(
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>JoinSelectBuilder {
+    <span class="doccomment">/// Build the select query for the given query arguments and selected fields.
+    /// This is the entry point for building a select query. `build_default_select` can be used to get a default select query.
+    </span><span class="kw">fn </span>build(<span class="kw-2">&amp;mut </span><span class="self">self</span>, args: QueryArguments, selected_fields: <span class="kw-2">&amp;</span>FieldSelection, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Select&lt;<span class="lifetime">&#39;static</span>&gt;;
+    <span class="doccomment">/// Adds to `select` the SQL statements to fetch a 1-1 relation.
+    </span><span class="kw">fn </span>add_to_one_relation&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         select: Select&lt;<span class="lifetime">&#39;a</span>&gt;,
         rs: <span class="kw-2">&amp;</span>RelationSelection,
         parent_alias: Alias,
         ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="doccomment">/// Adds to `select` the SQL statements to fetch a 1-m relation.
+    </span><span class="kw">fn </span>add_to_many_relation&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        select: Select&lt;<span class="lifetime">&#39;a</span>&gt;,
+        rs: <span class="kw-2">&amp;</span>RelationSelection,
+        parent_alias: Alias,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="doccomment">/// Adds to `select` the SQL statements to fetch a m-n relation.
+    </span><span class="kw">fn </span>add_many_to_many_relation&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        select: Select&lt;<span class="lifetime">&#39;a</span>&gt;,
+        rs: <span class="kw-2">&amp;</span>RelationSelection,
+        parent_alias: Alias,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">fn </span>add_virtual_selection&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        select: Select&lt;<span class="lifetime">&#39;a</span>&gt;,
+        vs: <span class="kw-2">&amp;</span>VirtualSelection,
+        parent_alias: Alias,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="doccomment">/// Build the top-level selection set
+    </span><span class="kw">fn </span>build_selection&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        select: Select&lt;<span class="lifetime">&#39;a</span>&gt;,
+        field: <span class="kw-2">&amp;</span>SelectedField,
+        parent_alias: Alias,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">fn </span>build_json_obj_fn(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        rs: <span class="kw-2">&amp;</span>RelationSelection,
+        parent_alias: Alias,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Expression&lt;<span class="lifetime">&#39;static</span>&gt;;
+    <span class="kw">fn </span>build_virtual_expr(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        vs: <span class="kw-2">&amp;</span>VirtualSelection,
+        parent_alias: Alias,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Expression&lt;<span class="lifetime">&#39;static</span>&gt;;
+    <span class="doccomment">/// Get the next alias for a table.
+    </span><span class="kw">fn </span>next_alias(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Alias;
+
+    <span class="kw">fn </span>with_selection&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        select: Select&lt;<span class="lifetime">&#39;a</span>&gt;,
+        selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
+        parent_alias: Alias,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt; {
-        <span class="kw">if </span>rs.field.relation().is_many_to_many() {
-            <span class="comment">// m2m relations need to left join on the relation table first
-            </span><span class="kw">let </span>m2m_join = <span class="self">self</span>.build_m2m_join(rs, parent_alias, ctx);
+        <span class="kw">let </span>select = selected_fields.selections().fold(select, |acc, selection| {
+            <span class="self">self</span>.build_selection(acc, selection, parent_alias, ctx)
+        });
 
-            select.left_join(m2m_join)
-        } <span class="kw">else </span>{
-            <span class="kw">let </span>join_table_alias = join_alias_name(<span class="kw-2">&amp;</span>rs.field);
-            <span class="kw">let </span>join_table =
-                Table::from(<span class="self">self</span>.build_related_query_select(rs, parent_alias, ctx)).alias(join_table_alias);
-
-            <span class="comment">// LEFT JOIN LATERAL ( &lt;join_table&gt; ) AS &lt;relation name&gt; ON TRUE
-            </span>select.left_join(join_table.on(ConditionTree::single(<span class="bool-val">true</span>.raw())).lateral())
-        }
+        <span class="self">self</span>.build_json_obj_virtual_selection(selected_fields.virtuals(), parent_alias, ctx)
+            .into_iter()
+            .fold(select, |acc, (alias, expr)| acc.value(expr.alias(alias)))
     }
 
-    <span class="kw">fn </span>build_related_query_select(
+    <span class="doccomment">/// Builds the core select for a 1-1 relation.
+    </span><span class="kw">fn </span>build_to_one_select(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        rs: <span class="kw-2">&amp;</span>RelationSelection,
+        parent_alias: Alias,
+        selection_modifier: <span class="kw">impl </span>FnOnce(Expression&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; Expression&lt;<span class="lifetime">&#39;static</span>&gt;,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Alias) {
+        <span class="kw">let </span>rf = <span class="kw-2">&amp;</span>rs.field;
+        <span class="kw">let </span>child_table_alias = <span class="self">self</span>.next_alias();
+        <span class="kw">let </span>table = rs
+            .field
+            .related_field()
+            .as_table(ctx)
+            .alias(child_table_alias.to_table_string());
+        <span class="kw">let </span>json_expr = <span class="self">self</span>.build_json_obj_fn(rs, child_table_alias, ctx);
+
+        <span class="kw">let </span>select = Select::from_table(table)
+            .with_join_conditions(rf, parent_alias, child_table_alias, ctx)
+            .with_filters(rs.args.filter.clone(), <span class="prelude-val">Some</span>(child_table_alias), ctx)
+            .value(selection_modifier(json_expr))
+            .limit(<span class="number">1</span>);
+
+        (select, child_table_alias)
+    }
+
+    <span class="doccomment">/// Builds the core select for a 1-m relation.
+    </span><span class="kw">fn </span>build_to_many_select(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         rs: <span class="kw-2">&amp;</span>RelationSelection,
         parent_alias: Alias,
@@ -663,13 +775,9 @@
 
         <span class="comment">// SELECT JSON_BUILD_OBJECT() FROM ( &lt;root&gt; )
         </span><span class="kw">let </span>inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()))
-            .value(build_json_obj_fn(rs, ctx, root_alias).alias(JSON_AGG_IDENT));
-
-        <span class="comment">// LEFT JOIN LATERAL () AS &lt;inner_alias&gt; ON TRUE
-        </span><span class="kw">let </span>inner = <span class="self">self</span>.with_related_queries(inner, rs.relations(), root_alias, ctx);
-
-        <span class="comment">// LEFT JOIN LATERAL ( &lt;relation aggregation query&gt; ) ON TRUE
-        </span><span class="kw">let </span>inner = <span class="self">self</span>.with_relation_aggregation_queries(inner, rs.virtuals(), root_alias, ctx);
+            .value(<span class="self">self</span>.build_json_obj_fn(rs, root_alias, ctx).alias(JSON_AGG_IDENT));
+        <span class="kw">let </span>inner = <span class="self">self</span>.with_relations(inner, rs.relations(), root_alias, ctx);
+        <span class="kw">let </span>inner = <span class="self">self</span>.with_virtual_selections(inner, rs.virtuals(), root_alias, ctx);
 
         <span class="kw">let </span>linking_fields = rs.field.related_field().linking_fields();
 
@@ -697,6 +805,14 @@
 
             <span class="kw">let </span>inner = inner.with_columns(inner_selection.into()).comment(<span class="string">&quot;inner select&quot;</span>);
 
+            <span class="kw">let </span>middle_take = <span class="kw">match </span>connector_flavour(<span class="kw-2">&amp;</span>rs.args) {
+                <span class="comment">// On MySQL, using LIMIT makes the ordering of the JSON_AGG working. Beware, this is undocumented behavior.
+                // Note: Ideally, this should live in the MySQL select builder, but it&#39;s currently the only implementation difference
+                // between MySQL and Postgres, so we keep it here for now to avoid code duplication.
+                </span>Flavour::Mysql <span class="kw">if </span>!rs.args.order_by.is_empty() =&gt; rs.args.take_abs().or(<span class="prelude-val">Some</span>(i64::MAX)),
+                <span class="kw">_ </span>=&gt; rs.args.take_abs(),
+            };
+
             <span class="kw">let </span>middle = Select::from_table(Table::from(inner).alias(inner_alias.to_table_string()))
                 <span class="comment">// SELECT &lt;inner_alias&gt;.&lt;JSON_ADD_IDENT&gt;
                 </span>.column(Column::from((inner_alias.to_table_string(), JSON_AGG_IDENT)))
@@ -705,7 +821,7 @@
                 <span class="comment">// WHERE ...
                 </span>.with_filters(rs.args.filter.clone(), <span class="prelude-val">Some</span>(inner_alias), ctx)
                 <span class="comment">// LIMIT $1 OFFSET $2
-                </span>.with_pagination(rs.args.take_abs(), rs.args.skip)
+                </span>.with_pagination(middle_take, rs.args.skip)
                 .comment(<span class="string">&quot;middle select&quot;</span>);
 
             <span class="comment">// SELECT COALESCE(JSON_AGG(&lt;inner_alias&gt;), &#39;[]&#39;) AS &lt;inner_alias&gt; FROM ( &lt;middle&gt; ) as &lt;inner_alias_2&gt;
@@ -715,78 +831,94 @@
         }
     }
 
-    <span class="kw">fn </span>build_m2m_join&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rs: <span class="kw-2">&amp;</span>RelationSelection, parent_alias: Alias, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; JoinData&lt;<span class="lifetime">&#39;a</span>&gt; {
-        <span class="kw">let </span>rf = rs.field.clone();
-        <span class="kw">let </span>m2m_table_alias = <span class="self">self</span>.next_alias();
-        <span class="kw">let </span>m2m_join_alias = <span class="self">self</span>.next_alias();
-        <span class="kw">let </span>outer_alias = <span class="self">self</span>.next_alias();
-
-        <span class="kw">let </span>left_columns = rf.related_field().m2m_columns(ctx);
-        <span class="kw">let </span>right_columns = ModelProjection::from(rf.model().primary_identifier()).as_columns(ctx);
-
-        <span class="kw">let </span>join_conditions =
-            build_join_conditions((left_columns.into(), m2m_table_alias), (right_columns, parent_alias));
-
-        <span class="kw">let </span>m2m_join_data = Table::from(<span class="self">self</span>.build_related_query_select(rs, m2m_table_alias, ctx))
-            .alias(m2m_join_alias.to_table_string())
-            .on(ConditionTree::single(<span class="bool-val">true</span>.raw()))
-            .lateral();
-
-        <span class="kw">let </span>child_table = rf.as_table(ctx).alias(m2m_table_alias.to_table_string());
-
-        <span class="kw">let </span>inner = Select::from_table(child_table)
-            .value(Column::from((m2m_join_alias.to_table_string(), JSON_AGG_IDENT)))
-            .left_join(m2m_join_data) <span class="comment">// join m2m table
-            </span>.and_where(join_conditions) <span class="comment">// adds join condition to the child table
-            </span>.with_ordering(<span class="kw-2">&amp;</span>rs.args, <span class="prelude-val">Some</span>(m2m_join_alias.to_table_string()), ctx) <span class="comment">// adds ordering stmts
-            </span>.with_filters(rs.args.filter.clone(), <span class="prelude-val">Some</span>(m2m_join_alias), ctx) <span class="comment">// adds query filters // TODO: avoid clone filter
-            </span>.with_pagination(rs.args.take_abs(), rs.args.skip)
-            .comment(<span class="string">&quot;inner&quot;</span>); <span class="comment">// adds pagination
-
-        </span><span class="kw">let </span>outer = Select::from_table(Table::from(inner).alias(outer_alias.to_table_string()))
-            .value(json_agg())
-            .comment(<span class="string">&quot;outer&quot;</span>);
-
-        Table::from(outer)
-            .alias(m2m_join_alias_name(<span class="kw-2">&amp;</span>rf))
-            .on(ConditionTree::single(<span class="bool-val">true</span>.raw()))
-            .lateral()
+    <span class="kw">fn </span>with_relation&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        select: Select&lt;<span class="lifetime">&#39;a</span>&gt;,
+        rs: <span class="kw-2">&amp;</span>RelationSelection,
+        parent_alias: Alias,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">match </span>(rs.field.is_list(), rs.field.relation().is_many_to_many()) {
+            (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; <span class="self">self</span>.add_many_to_many_relation(select, rs, parent_alias, ctx),
+            (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; <span class="self">self</span>.add_to_many_relation(select, rs, parent_alias, ctx),
+            (<span class="bool-val">false</span>, <span class="kw">_</span>) =&gt; <span class="self">self</span>.add_to_one_relation(select, rs, parent_alias, ctx),
+        }
     }
 
-    <span class="kw">fn </span>with_relation_aggregation_queries&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
+    <span class="kw">fn </span>with_relations&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        input: Select&lt;<span class="lifetime">&#39;a</span>&gt;,
+        relation_selections: <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>RelationSelection&gt;,
+        parent_alias: Alias,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt; {
+        relation_selections.fold(input, |acc, rs| <span class="self">self</span>.with_relation(acc, rs, parent_alias, ctx))
+    }
+
+    <span class="kw">fn </span>build_default_select(<span class="kw-2">&amp;mut </span><span class="self">self</span>, args: <span class="kw-2">&amp;</span>QueryArguments, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Alias) {
+        <span class="kw">let </span>table_alias = <span class="self">self</span>.next_alias();
+        <span class="kw">let </span>table = args.model().as_table(ctx).alias(table_alias.to_table_string());
+
+        <span class="comment">// SELECT ... FROM Table &quot;t1&quot;
+        </span><span class="kw">let </span>select = Select::from_table(table)
+            .with_ordering(args, <span class="prelude-val">Some</span>(table_alias.to_table_string()), ctx)
+            .with_filters(args.filter.clone(), <span class="prelude-val">Some</span>(table_alias), ctx)
+            .with_pagination(args.take_abs(), args.skip)
+            .append_trace(<span class="kw-2">&amp;</span>Span::current())
+            .add_trace_id(ctx.trace_id);
+
+        (select, table_alias)
+    }
+
+    <span class="kw">fn </span>with_virtual_selections&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         select: Select&lt;<span class="lifetime">&#39;a</span>&gt;,
         selections: <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>VirtualSelection&gt;,
         parent_alias: Alias,
         ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt; {
-        selections.fold(select, |acc, vs| {
-            <span class="self">self</span>.with_relation_aggregation_query(acc, vs, parent_alias, ctx)
-        })
+        selections.fold(select, |acc, vs| <span class="self">self</span>.add_virtual_selection(acc, vs, parent_alias, ctx))
     }
 
-    <span class="kw">fn </span>with_relation_aggregation_query&lt;<span class="lifetime">&#39;a</span>&gt;(
+    <span class="kw">fn </span>build_virtual_select(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        select: Select&lt;<span class="lifetime">&#39;a</span>&gt;,
         vs: <span class="kw-2">&amp;</span>VirtualSelection,
         parent_alias: Alias,
         ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
-    ) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt; {
+    ) -&gt; Select&lt;<span class="lifetime">&#39;static</span>&gt; {
         <span class="kw">match </span>vs {
             VirtualSelection::RelationCount(rf, filter) =&gt; {
-                <span class="kw">let </span>table_alias = relation_count_alias_name(rf);
-
-                <span class="kw">let </span>relation_count_select = <span class="kw">if </span>rf.relation().is_many_to_many() {
+                <span class="kw">if </span>rf.relation().is_many_to_many() {
                     <span class="self">self</span>.build_relation_count_query_m2m(vs.db_alias(), rf, filter, parent_alias, ctx)
                 } <span class="kw">else </span>{
                     <span class="self">self</span>.build_relation_count_query(vs.db_alias(), rf, filter, parent_alias, ctx)
-                };
-
-                <span class="kw">let </span>table = Table::from(relation_count_select).alias(table_alias);
-
-                select.left_join_lateral(table.on(ConditionTree::single(<span class="bool-val">true</span>.raw())))
+                }
             }
         }
+    }
+
+    <span class="kw">fn </span>build_json_obj_virtual_selection&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        virtual_fields: <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>VirtualSelection&gt;,
+        parent_alias: Alias,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Vec&lt;(Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;, Expression&lt;<span class="lifetime">&#39;static</span>&gt;)&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>selected_objects = std::collections::BTreeMap::new();
+
+        <span class="kw">for </span>vs <span class="kw">in </span>virtual_fields {
+            <span class="kw">let </span>(object_name, field_name) = vs.serialized_name();
+            <span class="kw">let </span>virtual_expr = <span class="self">self</span>.build_virtual_expr(vs, parent_alias, ctx);
+
+            selected_objects
+                .entry(object_name)
+                .or_insert(Vec::new())
+                .push((field_name.to_owned().into(), virtual_expr));
+        }
+
+        selected_objects
+            .into_iter()
+            .map(|(name, fields)| (name.into(), json_build_object(fields).into()))
+            .collect()
     }
 
     <span class="kw">fn </span>build_relation_count_query&lt;<span class="lifetime">&#39;a</span>&gt;(
@@ -831,7 +963,10 @@
         <span class="kw">let </span>m2m_join_conditions = {
             <span class="kw">let </span>left_columns = rf.join_columns(ctx);
             <span class="kw">let </span>right_columns = ModelProjection::from(rf.related_field().linking_fields()).as_columns(ctx);
-            build_join_conditions((left_columns, m2m_table_alias), (right_columns, related_table_alias))
+            build_join_conditions(
+                (left_columns, <span class="prelude-val">Some</span>(m2m_table_alias)),
+                (right_columns, <span class="prelude-val">Some</span>(related_table_alias)),
+            )
         };
 
         <span class="kw">let </span>m2m_join_data = rf
@@ -842,7 +977,10 @@
         <span class="kw">let </span>aggregation_join_conditions = {
             <span class="kw">let </span>left_columns = rf.related_field().m2m_columns(ctx);
             <span class="kw">let </span>right_columns = ModelProjection::from(rf.model().primary_identifier()).as_columns(ctx);
-            build_join_conditions((left_columns.into(), m2m_table_alias), (right_columns, parent_alias))
+            build_join_conditions(
+                (left_columns.into(), <span class="prelude-val">Some</span>(m2m_table_alias)),
+                (right_columns, <span class="prelude-val">Some</span>(parent_alias)),
+            )
         };
 
         <span class="kw">let </span>select = Select::from_table(related_table)
@@ -855,19 +993,24 @@
     }
 }
 
-<span class="kw">trait </span>SelectBuilderExt&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>SelectBuilderExt&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn </span>with_filters(<span class="self">self</span>, filter: <span class="prelude-ty">Option</span>&lt;Filter&gt;, parent_alias: <span class="prelude-ty">Option</span>&lt;Alias&gt;, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt;;
     <span class="kw">fn </span>with_pagination(<span class="self">self</span>, take: <span class="prelude-ty">Option</span>&lt;i64&gt;, skip: <span class="prelude-ty">Option</span>&lt;i64&gt;) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt;;
     <span class="kw">fn </span>with_ordering(<span class="self">self</span>, args: <span class="kw-2">&amp;</span>QueryArguments, parent_alias: <span class="prelude-ty">Option</span>&lt;String&gt;, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt;;
     <span class="kw">fn </span>with_join_conditions(
         <span class="self">self</span>,
         rf: <span class="kw-2">&amp;</span>RelationField,
-        parent_alias: Alias,
-        child_alias: Alias,
+        left_alias: Alias,
+        right_alias: Alias,
         ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt;;
-    <span class="kw">fn </span>with_selection(<span class="self">self</span>, selected_fields: <span class="kw-2">&amp;</span>FieldSelection, table_alias: Alias, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt;;
-    <span class="kw">fn </span>with_virtuals_from_selection(<span class="self">self</span>, selected_fields: <span class="kw-2">&amp;</span>FieldSelection) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">fn </span>with_m2m_join_conditions(
+        <span class="self">self</span>,
+        rf: <span class="kw-2">&amp;</span>RelationField,
+        left_alias: Alias,
+        right_alias: Alias,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt;;
     <span class="kw">fn </span>with_columns(<span class="self">self</span>, columns: ColumnIterator) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt;;
 }
 
@@ -921,45 +1064,21 @@
     <span class="kw">fn </span>with_join_conditions(
         <span class="self">self</span>,
         rf: <span class="kw-2">&amp;</span>RelationField,
-        parent_alias: Alias,
-        child_alias: Alias,
+        left_alias: Alias,
+        right_alias: Alias,
         ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt; {
-        <span class="kw">let </span>join_columns = rf.join_columns(ctx);
-        <span class="kw">let </span>related_join_columns = ModelProjection::from(rf.related_field().linking_fields()).as_columns(ctx);
-
-        <span class="kw">let </span>conditions = build_join_conditions((join_columns, parent_alias), (related_join_columns, child_alias));
-
-        <span class="comment">// WHERE Parent.id = Child.id
-        </span><span class="self">self</span>.and_where(conditions)
+        <span class="self">self</span>.and_where(rf.join_conditions(<span class="prelude-val">Some</span>(left_alias), <span class="prelude-val">Some</span>(right_alias), ctx))
     }
 
-    <span class="kw">fn </span>with_selection(<span class="self">self</span>, selected_fields: <span class="kw-2">&amp;</span>FieldSelection, table_alias: Alias, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt; {
-        selected_fields
-            .selections()
-            .fold(<span class="self">self</span>, |acc, selection| <span class="kw">match </span>selection {
-                SelectedField::Scalar(sf) =&gt; acc.column(
-                    sf.as_column(ctx)
-                        .table(table_alias.to_table_string())
-                        .set_is_selected(<span class="bool-val">true</span>),
-                ),
-                SelectedField::Relation(rs) =&gt; {
-                    <span class="kw">let </span>table_name = <span class="kw">match </span>rs.field.relation().is_many_to_many() {
-                        <span class="bool-val">true </span>=&gt; m2m_join_alias_name(<span class="kw-2">&amp;</span>rs.field),
-                        <span class="bool-val">false </span>=&gt; join_alias_name(<span class="kw-2">&amp;</span>rs.field),
-                    };
-
-                    acc.value(Column::from((table_name, JSON_AGG_IDENT)).alias(rs.field.name().to_owned()))
-                }
-                <span class="kw">_ </span>=&gt; acc,
-            })
-            .with_virtuals_from_selection(selected_fields)
-    }
-
-    <span class="kw">fn </span>with_virtuals_from_selection(<span class="self">self</span>, selected_fields: <span class="kw-2">&amp;</span>FieldSelection) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt; {
-        build_virtual_selection(selected_fields.virtuals())
-            .into_iter()
-            .fold(<span class="self">self</span>, |select, (alias, expr)| select.value(expr.alias(alias)))
+    <span class="kw">fn </span>with_m2m_join_conditions(
+        <span class="self">self</span>,
+        rf: <span class="kw-2">&amp;</span>RelationField,
+        left_alias: Alias,
+        right_alias: Alias,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">self</span>.and_where(rf.m2m_join_conditions(<span class="prelude-val">Some</span>(left_alias), <span class="prelude-val">Some</span>(right_alias), ctx))
     }
 
     <span class="kw">fn </span>with_columns(<span class="self">self</span>, columns: ColumnIterator) -&gt; Select&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -967,51 +1086,45 @@
     }
 }
 
-<span class="kw">fn </span>build_join_conditions(
-    (left_columns, left_alias): (ColumnIterator, Alias),
-    (right_columns, right_alias): (ColumnIterator, Alias),
-) -&gt; ConditionTree&lt;<span class="lifetime">&#39;static</span>&gt; {
-    left_columns
-        .zip(right_columns)
-        .fold(<span class="prelude-val">None</span>::&lt;ConditionTree&gt;, |acc, (a, b)| {
-            <span class="kw">let </span>a = a.table(left_alias.to_table_string());
-            <span class="kw">let </span>b = b.table(right_alias.to_table_string());
-            <span class="kw">let </span>condition = a.equals(b);
-
-            <span class="kw">match </span>acc {
-                <span class="prelude-val">Some</span>(acc) =&gt; <span class="prelude-val">Some</span>(acc.and(condition)),
-                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(condition.into()),
-            }
-        })
-        .unwrap()
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>JoinConditionExt {
+    <span class="kw">fn </span>join_conditions(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        left_alias: <span class="prelude-ty">Option</span>&lt;Alias&gt;,
+        right_alias: <span class="prelude-ty">Option</span>&lt;Alias&gt;,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; ConditionTree&lt;<span class="lifetime">&#39;static</span>&gt;;
+    <span class="kw">fn </span>m2m_join_conditions(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        left_alias: <span class="prelude-ty">Option</span>&lt;Alias&gt;,
+        right_alias: <span class="prelude-ty">Option</span>&lt;Alias&gt;,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; ConditionTree&lt;<span class="lifetime">&#39;static</span>&gt;;
 }
 
-<span class="kw">fn </span>build_json_obj_fn(rs: <span class="kw-2">&amp;</span>RelationSelection, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;, root_alias: Alias) -&gt; Function&lt;<span class="lifetime">&#39;static</span>&gt; {
-    <span class="kw">let </span>build_obj_params = rs
-        .selections
-        .iter()
-        .filter_map(|f| <span class="kw">match </span>f {
-            SelectedField::Scalar(sf) =&gt; <span class="prelude-val">Some</span>((
-                Cow::from(sf.db_name().to_owned()),
-                Expression::from(sf.as_column(ctx).table(root_alias.to_table_string())),
-            )),
-            SelectedField::Relation(rs) =&gt; {
-                <span class="kw">let </span>table_name = <span class="kw">match </span>rs.field.relation().is_many_to_many() {
-                    <span class="bool-val">true </span>=&gt; m2m_join_alias_name(<span class="kw-2">&amp;</span>rs.field),
-                    <span class="bool-val">false </span>=&gt; join_alias_name(<span class="kw-2">&amp;</span>rs.field),
-                };
+<span class="kw">impl </span>JoinConditionExt <span class="kw">for </span>RelationField {
+    <span class="kw">fn </span>join_conditions(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        left_alias: <span class="prelude-ty">Option</span>&lt;Alias&gt;,
+        right_alias: <span class="prelude-ty">Option</span>&lt;Alias&gt;,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; ConditionTree&lt;<span class="lifetime">&#39;static</span>&gt; {
+        <span class="kw">let </span>left_columns = <span class="self">self</span>.join_columns(ctx);
+        <span class="kw">let </span>right_columns = ModelProjection::from(<span class="self">self</span>.related_field().linking_fields()).as_columns(ctx);
 
-                <span class="prelude-val">Some</span>((
-                    Cow::from(rs.field.name().to_owned()),
-                    Expression::from(Column::from((table_name, JSON_AGG_IDENT))),
-                ))
-            }
-            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-        })
-        .chain(build_virtual_selection(rs.virtuals()))
-        .collect();
+        build_join_conditions((left_columns, left_alias), (right_columns, right_alias))
+    }
 
-    json_build_object(build_obj_params)
+    <span class="kw">fn </span>m2m_join_conditions(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        left_alias: <span class="prelude-ty">Option</span>&lt;Alias&gt;,
+        right_alias: <span class="prelude-ty">Option</span>&lt;Alias&gt;,
+        ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; ConditionTree&lt;<span class="lifetime">&#39;static</span>&gt; {
+        <span class="kw">let </span>left_columns = <span class="self">self</span>.m2m_columns(ctx);
+        <span class="kw">let </span>right_columns = ModelProjection::from(<span class="self">self</span>.related_model().primary_identifier()).as_columns(ctx);
+
+        build_join_conditions((left_columns.into(), left_alias), (right_columns, right_alias))
+    }
 }
 
 <span class="kw">fn </span>order_by_selection(rs: <span class="kw-2">&amp;</span>RelationSelection) -&gt; FieldSelection {
@@ -1072,41 +1185,52 @@
     <span class="macro">format!</span>(<span class="string">&quot;{}_{}_m2m&quot;</span>, rf.model().name(), rf.name())
 }
 
+<span class="kw">fn </span>build_join_conditions(
+    left: (ColumnIterator, <span class="prelude-ty">Option</span>&lt;Alias&gt;),
+    right: (ColumnIterator, <span class="prelude-ty">Option</span>&lt;Alias&gt;),
+) -&gt; ConditionTree&lt;<span class="lifetime">&#39;static</span>&gt; {
+    <span class="kw">let </span>(left_columns, left_alias) = left;
+    <span class="kw">let </span>(right_columns, right_alias) = right;
+
+    left_columns
+        .into_iter()
+        .zip(right_columns)
+        .fold(<span class="prelude-val">None</span>::&lt;ConditionTree&gt;, |acc, (a, b)| {
+            <span class="kw">let </span>a = a.opt_table(left_alias.map(|left| left.to_table_string()));
+            <span class="kw">let </span>b = b.opt_table(right_alias.map(|right| right.to_table_string()));
+            <span class="kw">let </span>condition = a.equals(b);
+
+            <span class="kw">match </span>acc {
+                <span class="prelude-val">Some</span>(acc) =&gt; <span class="prelude-val">Some</span>(acc.and(condition)),
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(condition.into()),
+            }
+        })
+        .unwrap()
+}
+
 <span class="kw">fn </span>json_agg() -&gt; Function&lt;<span class="lifetime">&#39;static</span>&gt; {
     coalesce(<span class="macro">vec!</span>[
         json_array_agg(Column::from(JSON_AGG_IDENT)).into(),
-        Expression::from(<span class="string">&quot;[]&quot;</span>.raw()),
+        Expression::from(Value::json(empty_json_array()).raw()),
     ])
     .alias(JSON_AGG_IDENT)
 }
 
-<span class="kw">fn </span>build_virtual_selection&lt;<span class="lifetime">&#39;a</span>&gt;(
-    virtual_fields: <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>VirtualSelection&gt;,
-) -&gt; Vec&lt;(Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;, Expression&lt;<span class="lifetime">&#39;static</span>&gt;)&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>selected_objects = BTreeMap::new();
+<span class="attr">#[inline]
+</span><span class="kw">fn </span>empty_json_array() -&gt; serde_json::Value {
+    serde_json::Value::Array(Vec::new())
+}
 
-    <span class="kw">for </span>vs <span class="kw">in </span>virtual_fields {
-        <span class="kw">match </span>vs {
-            VirtualSelection::RelationCount(rf, <span class="kw">_</span>) =&gt; {
-                <span class="kw">let </span>(object_name, field_name) = vs.serialized_name();
+<span class="kw">fn </span>connector_flavour(args: <span class="kw-2">&amp;</span>QueryArguments) -&gt; Flavour {
+    args.model().dm.schema.connector.flavour()
+}
 
-                <span class="kw">let </span>coalesce_args: Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt; = <span class="macro">vec!</span>[
-                    Column::from((relation_count_alias_name(rf), vs.db_alias())).into(),
-                    <span class="number">0</span>.raw().into(),
-                ];
-
-                selected_objects
-                    .entry(object_name)
-                    .or_insert(Vec::new())
-                    .push((field_name.to_owned().into(), coalesce(coalesce_args).into()));
-            }
-        }
-    }
-
-    selected_objects
-        .into_iter()
-        .map(|(name, fields)| (name.into(), json_build_object(fields).into()))
-        .collect()
+<span class="kw">fn </span>supports_lateral_join(args: <span class="kw-2">&amp;</span>QueryArguments) -&gt; bool {
+    args.model()
+        .dm
+        .schema
+        .connector
+        .has_capability(ConnectorCapability::LateralJoin)
 }
 
 <span class="kw">fn </span>relation_count_alias_name(rf: <span class="kw-2">&amp;</span>RelationField) -&gt; String {

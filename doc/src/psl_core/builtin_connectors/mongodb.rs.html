@@ -152,6 +152,7 @@
 <a href="#152" id="152">152</a>
 <a href="#153" id="153">153</a>
 <a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>mongodb_types;
 <span class="kw">mod </span>validations;
 
@@ -247,9 +248,10 @@
         mongodb_types::CONSTRUCTORS
     }
 
-    <span class="kw">fn </span>default_native_type_for_scalar_type(<span class="kw-2">&amp;</span><span class="self">self</span>, scalar_type: <span class="kw-2">&amp;</span>ScalarType) -&gt; NativeTypeInstance {
+    <span class="kw">fn </span>default_native_type_for_scalar_type(<span class="kw-2">&amp;</span><span class="self">self</span>, scalar_type: <span class="kw-2">&amp;</span>ScalarType) -&gt; <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt; {
         <span class="kw">let </span>native_type = default_for(scalar_type);
-        NativeTypeInstance::new::&lt;MongoDbType&gt;(<span class="kw-2">*</span>native_type)
+
+        <span class="prelude-val">Some</span>(NativeTypeInstance::new::&lt;MongoDbType&gt;(<span class="kw-2">*</span>native_type))
     }
 
     <span class="kw">fn </span>native_type_is_default_for_scalar_type(
