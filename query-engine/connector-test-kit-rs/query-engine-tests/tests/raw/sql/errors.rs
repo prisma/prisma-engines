@@ -34,6 +34,8 @@ mod raw_errors {
         Ok(())
     }
 
+    // On driver-adapters, this fails with:
+    // Raw query failed. Code: `22P02`. Message: `ERROR: invalid input syntax for type integer: \\\"{\\\"1\\\"}\\\"`
     #[connector_test(
         schema(common_nullable_types),
         only(Postgres),
