@@ -7,7 +7,7 @@ pub use native_types::PostgresType;
 use crate::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
-        NativeTypeInstance, RelationMode, StringFilter,
+        NativeTypeInstance, RelationMode, StringFilter, ValidatedConnector,
     },
     diagnostics::Diagnostics,
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
@@ -72,6 +72,41 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     DeleteReturning |
     SupportsFiltersOnRelationsWithoutJoins
 });
+
+pub struct PostgresDatamodelValidatedConnector;
+
+impl ValidatedConnector for PostgresDatamodelValidatedConnector {
+    fn provider_name(&self) -> &'static str {
+        "postgresql"
+    }
+
+    fn is_provider(&self, name: &str) -> bool {
+        ["postgresql", "postgres"].contains(&name)
+    }
+
+    fn name(&self) -> &str {
+        "Postgres"
+    }
+
+    fn capabilities(&self) -> ConnectorCapabilities {
+        CAPABILITIES
+    }
+
+    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+        native_type.downcast_ref::<PostgresType>().to_parts()
+    }
+
+    fn parse_native_type(
+        &self,
+        name: &str,
+        args: &[String],
+        span: diagnostics::Span,
+        diagnostics: &mut Diagnostics,
+    ) -> Option<NativeTypeInstance> {
+        let native_type = PostgresType::from_parts(name, args, span, diagnostics)?;
+        Some(NativeTypeInstance::new::<PostgresType>(native_type))
+    }
+}
 
 pub struct PostgresDatamodelConnector;
 

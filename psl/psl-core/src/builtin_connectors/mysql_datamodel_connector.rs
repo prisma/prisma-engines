@@ -7,7 +7,7 @@ use super::completions;
 use crate::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
-        NativeTypeInstance, RelationMode,
+        NativeTypeInstance, RelationMode, ValidatedConnector,
     },
     diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{walkers, ReferentialAction, ScalarType},
@@ -64,6 +64,41 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
 });
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];
+
+pub struct MysqlDatamodelValidatedConnector;
+
+impl ValidatedConnector for MysqlDatamodelValidatedConnector {
+    fn provider_name(&self) -> &'static str {
+        "mysql"
+    }
+
+    fn is_provider(&self, name: &str) -> bool {
+        name == "mysql"
+    }
+
+    fn name(&self) -> &str {
+        "MySQL"
+    }
+
+    fn capabilities(&self) -> ConnectorCapabilities {
+        CAPABILITIES
+    }
+
+    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+        native_type.downcast_ref::<MySqlType>().to_parts()
+    }
+
+    fn parse_native_type(
+        &self,
+        name: &str,
+        args: &[String],
+        span: Span,
+        diagnostics: &mut Diagnostics,
+    ) -> Option<NativeTypeInstance> {
+        let native_type = MySqlType::from_parts(name, args, span, diagnostics)?;
+        Some(NativeTypeInstance::new::<MySqlType>(native_type))
+    }
+}
 
 pub struct MySqlDatamodelConnector;
 

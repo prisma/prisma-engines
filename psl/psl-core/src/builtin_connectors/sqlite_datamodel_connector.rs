@@ -1,7 +1,7 @@
 use crate::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
-        NativeTypeInstance,
+        NativeTypeInstance, ValidatedConnector,
     },
     diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{ReferentialAction, ScalarType},
@@ -30,6 +30,40 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     UpdateReturning |
     SupportsFiltersOnRelationsWithoutJoins
 });
+
+pub(crate) struct SqliteDatamodelValidatedConnector;
+
+impl ValidatedConnector for SqliteDatamodelValidatedConnector {
+    fn provider_name(&self) -> &'static str {
+        "sqlite"
+    }
+
+    fn name(&self) -> &str {
+        "sqlite"
+    }
+
+    fn capabilities(&self) -> ConnectorCapabilities {
+        CAPABILITIES
+    }
+
+    fn native_type_to_parts(&self, _native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+        unreachable!()
+    }
+
+    fn parse_native_type(
+        &self,
+        _name: &str,
+        _args: &[String],
+        span: Span,
+        diagnostics: &mut Diagnostics,
+    ) -> Option<NativeTypeInstance> {
+        diagnostics.push_error(DatamodelError::new_native_types_not_supported(
+            self.name().to_owned(),
+            span,
+        ));
+        None
+    }
+}
 
 pub struct SqliteDatamodelConnector;
 
