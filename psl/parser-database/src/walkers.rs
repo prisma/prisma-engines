@@ -41,6 +41,7 @@ impl<'db, I> Walker<'db, I> {
     }
 }
 
+// warning: function cannot return without recursing
 impl<'db, I> PartialEq for Walker<'db, I>
 where
     I: PartialEq,

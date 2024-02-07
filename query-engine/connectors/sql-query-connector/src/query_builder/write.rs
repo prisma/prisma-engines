@@ -75,11 +75,7 @@ pub(crate) fn create_records_nonempty(
         })
         .collect();
 
-    let columns = affected_fields
-        .iter()
-        .map(Clone::clone)
-        .collect::<Vec<_>>()
-        .as_columns(ctx);
+    let columns = affected_fields.iter().cloned().collect::<Vec<_>>().as_columns(ctx);
     let insert = Insert::multi_into(model.as_table(ctx), columns);
     let insert = values.into_iter().fold(insert, |stmt, values| stmt.values(values));
     let insert: Insert = insert.into();
