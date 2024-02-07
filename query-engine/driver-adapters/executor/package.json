@@ -12,7 +12,9 @@
   },
   "tsup": {
     "external": [
-      "../../../query-engine-wasm/pkg/query_engine_bg.js"
+      "../../../query-engine-wasm/pkg/postgresql/query_engine_bg.js",
+      "../../../query-engine-wasm/pkg/mysql/query_engine_bg.js",
+      "../../../query-engine-wasm/pkg/sqlite/query_engine_bg.js"
     ]
   },
   "keywords": [],

@@ -16,8 +16,11 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 #[cfg_attr(target_arch = "wasm32", derive(Deserialize))]
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub enum AdapterFlavour {
+    #[cfg(feature = "mysql")]
     Mysql,
+    #[cfg(feature = "postgresql")]
     Postgres,
+    #[cfg(feature = "sqlite")]
     Sqlite,
 }
 
@@ -26,8 +29,11 @@ impl FromStr for AdapterFlavour {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            #[cfg(feature = "postgresql")]
             "postgres" => Ok(Self::Postgres),
+            #[cfg(feature = "mysql")]
             "mysql" => Ok(Self::Mysql),
+            #[cfg(feature = "sqlite")]
             "sqlite" => Ok(Self::Sqlite),
             _ => Err(format!("Unsupported adapter flavour: {:?}", s)),
         }
@@ -37,8 +43,11 @@ impl FromStr for AdapterFlavour {
 impl From<AdapterFlavour> for SqlFamily {
     fn from(value: AdapterFlavour) -> Self {
         match value {
+            #[cfg(feature = "mysql")]
             AdapterFlavour::Mysql => SqlFamily::Mysql,
+            #[cfg(feature = "postgresql")]
             AdapterFlavour::Postgres => SqlFamily::Postgres,
+            #[cfg(feature = "sqlite")]
             AdapterFlavour::Sqlite => SqlFamily::Sqlite,
         }
     }
@@ -67,8 +76,11 @@ impl JsConnectionInfo {
 
     fn default_schema_name(&self, provider: &AdapterFlavour) -> &str {
         match provider {
+            #[cfg(feature = "mysql")]
             AdapterFlavour::Mysql => quaint::connector::DEFAULT_MYSQL_DB,
+            #[cfg(feature = "postgresql")]
             AdapterFlavour::Postgres => quaint::connector::DEFAULT_POSTGRES_SCHEMA,
+            #[cfg(feature = "sqlite")]
             AdapterFlavour::Sqlite => quaint::connector::DEFAULT_SQLITE_DATABASE,
         }
     }
