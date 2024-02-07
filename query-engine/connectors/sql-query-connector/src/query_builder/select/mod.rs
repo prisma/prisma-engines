@@ -114,12 +114,12 @@ pub(crate) trait JoinSelectBuilder {
     }
 
     /// Builds the core select for a 1-1 relation.
+    /// Note: it does not add the JSON object selection because there are additional steps to
+    /// perform before that depending on the `JoinSelectBuilder` implementation.
     fn build_to_one_select(
         &mut self,
         rs: &RelationSelection,
         parent_alias: Alias,
-        selection_modifier: impl FnOnce(Expression<'static>) -> Expression<'static>,
-        with_relations_and_virtuals: bool,
         ctx: &Context<'_>,
     ) -> (Select<'static>, Alias) {
         let rf = &rs.field;
@@ -130,20 +130,10 @@ pub(crate) trait JoinSelectBuilder {
             .as_table(ctx)
             .alias(child_table_alias.to_table_string());
 
-        let mut select = Select::from_table(table)
+        let select = Select::from_table(table)
             .with_join_conditions(rf, parent_alias, child_table_alias, ctx)
             .with_filters(rs.args.filter.clone(), Some(child_table_alias), ctx)
             .limit(1);
-
-        // TODO: at this point this method should just be implemented twice separately
-        if with_relations_and_virtuals {
-            select = self.with_relations(select, rs.relations(), rs.virtuals(), child_table_alias, ctx);
-            select = self.with_virtual_selections(select, rs.virtuals(), child_table_alias, ctx);
-        }
-
-        let json_expr = self.build_json_obj_fn(rs, child_table_alias, ctx);
-
-        select = select.value(selection_modifier(json_expr));
 
         (select, child_table_alias)
     }

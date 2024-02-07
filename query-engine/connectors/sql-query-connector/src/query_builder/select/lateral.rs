@@ -78,15 +78,17 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        let (subselect, _) = self.build_to_one_select(
-            rs,
-            parent_alias,
-            |expr: Expression<'_>| expr.alias(JSON_AGG_IDENT),
-            true,
-            ctx,
-        );
+        let (subselect, child_alias) = self.build_to_one_select(rs, parent_alias, ctx);
+
+        let subselect = self.with_relations(subselect, rs.relations(), rs.virtuals(), child_alias, ctx);
+        let subselect = self.with_virtual_selections(subselect, rs.virtuals(), child_alias, ctx);
+
+        // Build the JSON object using the information we collected before in `with_relations` and
+        // `with_virtual_selections`.
+        let subselect = subselect.value(self.build_json_obj_fn(rs, child_alias, ctx).alias(JSON_AGG_IDENT));
 
         let join_table = Table::from(subselect).alias(join_alias_name(&rs.field));
+
         // LEFT JOIN LATERAL ( <join_table> ) AS <relation name> ON TRUE
         select.left_join(join_table.on(ConditionTree::single(true.raw())).lateral())
     }

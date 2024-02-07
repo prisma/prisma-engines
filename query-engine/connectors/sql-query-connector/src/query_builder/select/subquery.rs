@@ -61,7 +61,8 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        let (subselect, _) = self.build_to_one_select(rs, parent_alias, |x| x, false, ctx);
+        let (subselect, child_alias) = self.build_to_one_select(rs, parent_alias, ctx);
+        let subselect = subselect.value(self.build_json_obj_fn(rs, child_alias, ctx));
 
         select.value(Expression::from(subselect).alias(rs.field.name().to_owned()))
     }
