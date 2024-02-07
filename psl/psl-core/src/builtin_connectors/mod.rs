@@ -15,22 +15,7 @@ mod postgres_datamodel_connector;
 mod sqlite_datamodel_connector;
 mod utils;
 
-use crate::{
-    datamodel_connector::{Connector, ValidatedConnector},
-    ConnectorRegistry,
-};
-
-pub const POSTGRES_VALIDATED: &'static dyn ValidatedConnector =
-    &postgres_datamodel_connector::PostgresDatamodelValidatedConnector;
-// pub const COCKROACH: &'static dyn ValidatedConnector =
-//     &cockroach_datamodel_connector::CockroachDatamodelValidatedConnector;
-pub const MYSQL_VALIDATED: &'static dyn ValidatedConnector =
-    &mysql_datamodel_connector::MySqlDatamodelValidatedConnector;
-pub const SQLITE_VALIDATED: &'static dyn ValidatedConnector =
-    &sqlite_datamodel_connector::SqliteDatamodelValidatedConnector;
-pub const MSSQL_VALIDATED: &'static dyn ValidatedConnector =
-    &mssql_datamodel_connector::MsSqlDatamodelValidatedConnector;
-// pub const MONGODB: &'static dyn ValidatedConnector = &mongodb::MongoDbDatamodelConnector;
+use crate::{datamodel_connector::Connector, ConnectorRegistry};
 
 pub const POSTGRES: &'static dyn Connector = &postgres_datamodel_connector::PostgresDatamodelConnector;
 pub const COCKROACH: &'static dyn Connector = &cockroach_datamodel_connector::CockroachDatamodelConnector;

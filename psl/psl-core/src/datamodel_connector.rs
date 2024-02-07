@@ -57,6 +57,26 @@ pub trait ValidatedConnector: Send + Sync {
         self.capabilities().contains(capability)
     }
 
+    /// The referential actions supported by the connector.
+    fn referential_actions(&self) -> BitFlags<ReferentialAction>;
+
+    /// The referential actions supported when using relationMode = "prisma" by the connector.
+    /// There are in fact scenarios in which the set of emulated referential actions supported may change
+    /// depending on the connector. For example, Postgres' NoAction mode behaves similarly to Restrict
+    /// (raising an error if any referencing rows still exist when the constraint is checked), but with
+    /// a subtle twist we decided not to emulate: NO ACTION allows the check to be deferred until later
+    /// in the transaction, whereas RESTRICT does not.
+    fn emulated_referential_actions(&self) -> BitFlags<ReferentialAction> {
+        RelationMode::allowed_emulated_referential_actions_default()
+    }
+
+    fn supports_referential_action(&self, relation_mode: &RelationMode, action: ReferentialAction) -> bool {
+        match relation_mode {
+            RelationMode::ForeignKeys => self.referential_actions().contains(action),
+            RelationMode::Prisma => self.emulated_referential_actions().contains(action),
+        }
+    }
+
     /// This is used by the query engine schema builder.
     ///
     /// For a given scalar type + native type combination, this method should return the name to be
@@ -106,33 +126,13 @@ pub trait ValidatedConnector: Send + Sync {
 }
 
 /// The datamodel connector API.
-pub trait Connector: Send + Sync {
-    /// The name of the provider, for string comparisons determining which connector we are on.
-    fn provider_name(&self) -> &'static str;
-
-    /// Must return true whenever the passed in provider name is a match.
-    /// For `driver-adapters`, this is only used to tell Postgres and CockroachDB apart.
-    fn is_provider(&self, name: &str) -> bool {
-        name == self.provider_name()
-    }
-
+pub trait Connector: Send + Sync + ValidatedConnector {
     /// The database flavour, divergences in database backends capabilities might consider
     /// us to use a different flavour, like in the case of CockroachDB. However other databases
     /// are less divergent as to consider sharing a flavour with others, like Planetscale and MySQL
     /// or Neon and Postgres, which respectively have the Mysql and Postgres flavours.
     /// Note: this is not used in any `query-engine`.
     fn flavour(&self) -> Flavour;
-
-    /// The name of the connector. Can be used in error messages.
-    fn name(&self) -> &str;
-
-    /// The static list of capabilities for the connector.
-    fn capabilities(&self) -> ConnectorCapabilities;
-
-    /// Does the connector have this capability?
-    fn has_capability(&self, capability: ConnectorCapability) -> bool {
-        self.capabilities().contains(capability)
-    }
 
     /// The maximum length of constraint names in bytes. Connectors without a
     /// limit should return usize::MAX.
@@ -154,21 +154,6 @@ pub trait Connector: Send + Sync {
     /// Note: this is not used in any `query-engine`.
     fn default_relation_mode(&self) -> RelationMode {
         RelationMode::ForeignKeys
-    }
-
-    /// The referential actions supported by the connector.
-    /// Note: this is not used in any `query-engine`.
-    fn referential_actions(&self) -> BitFlags<ReferentialAction>;
-
-    /// The referential actions supported when using relationMode = "prisma" by the connector.
-    /// There are in fact scenarios in which the set of emulated referential actions supported may change
-    /// depending on the connector. For example, Postgres' NoAction mode behaves similarly to Restrict
-    /// (raising an error if any referencing rows still exist when the constraint is checked), but with
-    /// a subtle twist we decided not to emulate: NO ACTION allows the check to be deferred until later
-    /// in the transaction, whereas RESTRICT does not.
-    /// Note: this is not used in any `query-engine`.
-    fn emulated_referential_actions(&self) -> BitFlags<ReferentialAction> {
-        RelationMode::allowed_emulated_referential_actions_default()
     }
 
     /// Most SQL databases reject table definitions with a SET NULL referential action referencing a non-nullable field,
@@ -199,40 +184,6 @@ pub trait Connector: Send + Sync {
     /// Note: this is not used in any `query-engine`.
     fn supports_named_default_values(&self) -> bool {
         self.has_capability(ConnectorCapability::NamedDefaultValues)
-    }
-
-    /// Note: this is not used in any `query-engine`.
-    fn supports_referential_action(&self, relation_mode: &RelationMode, action: ReferentialAction) -> bool {
-        match relation_mode {
-            RelationMode::ForeignKeys => self.referential_actions().contains(action),
-            RelationMode::Prisma => self.emulated_referential_actions().contains(action),
-        }
-    }
-
-    /// This is used by the query engine schema builder.
-    ///
-    /// For a given scalar type + native type combination, this method should return the name to be
-    /// given to the filter input objects for the type. The significance of that name is that the
-    /// resulting input objects will be cached by name, so for a given filter input object name,
-    /// the filters should always be identical.
-    fn scalar_filter_name(&self, scalar_type_name: String, _native_type_name: Option<&str>) -> Cow<'_, str> {
-        Cow::Owned(scalar_type_name)
-    }
-
-    /// This is used by the query engine schema builder. It is only called for filters of String
-    /// fields and aggregates.
-    ///
-    /// For a given filter input object type name returned by `scalar_filter_name`, it should
-    /// return the string operations to be made available in the Client API.
-    ///
-    /// Implementations of this method _must_ always associate the same filters to the same input
-    /// object type name. This is because the filter types are cached by name, so if different
-    /// calls to the method return different filters, only the first return value will be used.
-    fn string_filters(&self, input_object_name: &str) -> BitFlags<StringFilter> {
-        match input_object_name {
-            "String" => BitFlags::all(), // all the filters are available by default
-            _ => panic!("Unexpected scalar input object name for string filters: `{input_object_name}`"),
-        }
     }
 
     /// Validate that the arguments passed to a native type attribute are valid.
@@ -296,25 +247,12 @@ pub trait Connector: Send + Sync {
         scalar_type: &ScalarType,
     ) -> bool;
 
-    /// Debug/error representation of a native type.
-    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>);
-
     /// Note: this is not used in any `query-engine`.
     fn find_native_type_constructor(&self, name: &str) -> Option<&NativeTypeConstructor> {
         self.available_native_type_constructors()
             .iter()
             .find(|constructor| constructor.name == name)
     }
-
-    /// This function is used during Schema parsing to calculate the concrete native type.
-    /// It is also used by the Query Engine to parse the native type of a field.
-    fn parse_native_type(
-        &self,
-        name: &str,
-        args: &[String],
-        span: Span,
-        diagnostics: &mut Diagnostics,
-    ) -> Option<NativeTypeInstance>;
 
     /// Note: this is not used in any `query-engine`.
     fn supports_scalar_lists(&self) -> bool {
@@ -426,14 +364,6 @@ pub trait Connector: Send + Sync {
         _diagnostics: &mut Diagnostics,
     ) -> DatasourceConnectorData {
         Default::default()
-    }
-
-    fn parse_json_datetime(
-        &self,
-        _str: &str,
-        _nt: Option<NativeTypeInstance>,
-    ) -> chrono::ParseResult<DateTime<FixedOffset>> {
-        unreachable!("This method is only implemented on connectors with lateral join support.")
     }
 }
 

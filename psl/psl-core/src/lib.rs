@@ -1,5 +1,6 @@
 #![doc = include_str!("../README.md")]
 #![deny(rust_2018_idioms, unsafe_code)]
+#![feature(trait_upcasting)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
 pub mod builtin_connectors;
@@ -87,6 +88,23 @@ impl From<ValidatedSchema> for SerdeValidatedSchema {
             relation_mode: schema.relation_mode,
             provider: schema.connector.provider_name().to_owned(),
         }
+    }
+}
+
+impl From<ValidatedSchema> for ValidatedSchemaForQE {
+    fn from(schema: ValidatedSchema) -> Self {
+        Self {
+            db: schema.db,
+            preview_features: schema.configuration.preview_features(),
+            relation_mode: schema.relation_mode,
+            connector: schema.connector,
+        }
+    }
+}
+
+impl std::fmt::Debug for ValidatedSchemaForQE {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("<Prisma schema>")
     }
 }
 

@@ -55,9 +55,9 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     // InsertReturning | DeleteReturning - unimplemented.
 });
 
-pub(crate) struct MsSqlDatamodelValidatedConnector;
+pub(crate) struct MsSqlDatamodelConnector;
 
-impl ValidatedConnector for MsSqlDatamodelValidatedConnector {
+impl ValidatedConnector for MsSqlDatamodelConnector {
     fn provider_name(&self) -> &'static str {
         "sqlserver"
     }
@@ -68,6 +68,12 @@ impl ValidatedConnector for MsSqlDatamodelValidatedConnector {
 
     fn capabilities(&self) -> ConnectorCapabilities {
         CAPABILITIES
+    }
+
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        use ReferentialAction::*;
+
+        NoAction | Cascade | SetNull | SetDefault
     }
 
     fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
@@ -85,8 +91,6 @@ impl ValidatedConnector for MsSqlDatamodelValidatedConnector {
         Some(NativeTypeInstance::new::<MsSqlType>(native_type))
     }
 }
-
-pub(crate) struct MsSqlDatamodelConnector;
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MsSqlType)] = &[
     (ScalarType::Int, MsSqlType::Int),
@@ -107,26 +111,8 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MsSqlType)] = &[
 ];
 
 impl Connector for MsSqlDatamodelConnector {
-    fn provider_name(&self) -> &'static str {
-        "sqlserver"
-    }
-
-    fn name(&self) -> &str {
-        "SQL Server"
-    }
-
-    fn capabilities(&self) -> ConnectorCapabilities {
-        CAPABILITIES
-    }
-
     fn max_identifier_length(&self) -> usize {
         128
-    }
-
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
-        use ReferentialAction::*;
-
-        NoAction | Cascade | SetNull | SetDefault
     }
 
     fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
@@ -258,21 +244,6 @@ impl Connector for MsSqlDatamodelConnector {
 
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
         native_types::CONSTRUCTORS
-    }
-
-    fn parse_native_type(
-        &self,
-        name: &str,
-        args: &[String],
-        span: Span,
-        diagnostics: &mut Diagnostics,
-    ) -> Option<NativeTypeInstance> {
-        let native_type = MsSqlType::from_parts(name, args, span, diagnostics)?;
-        Some(NativeTypeInstance::new::<MsSqlType>(native_type))
-    }
-
-    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
-        native_type.downcast_ref::<MsSqlType>().to_parts()
     }
 
     fn validate_url(&self, url: &str) -> Result<(), String> {

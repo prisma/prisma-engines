@@ -1,6 +1,6 @@
 use crate::{IdentifierType, ObjectType, OutputField};
 use psl::{
-    datamodel_connector::{Connector, ConnectorCapabilities, ConnectorCapability, RelationMode},
+    datamodel_connector::{ConnectorCapabilities, ConnectorCapability, RelationMode, ValidatedConnector},
     PreviewFeature, PreviewFeatures,
 };
 use query_structure::{ast, InternalDataModel};
@@ -24,7 +24,7 @@ pub struct QuerySchema {
     pub internal_data_model: InternalDataModel,
 
     pub(crate) enable_raw_queries: bool,
-    pub(crate) connector: &'static dyn Connector,
+    pub(crate) connector: &'static dyn ValidatedConnector,
 
     /// Indexes query and mutation fields by their own query info for easier access.
     query_info_map: HashMap<(Operation, QueryInfo), usize>,
@@ -41,7 +41,7 @@ pub struct QuerySchema {
 impl QuerySchema {
     pub(crate) fn new(
         enable_raw_queries: bool,
-        connector: &'static dyn Connector,
+        connector: &'static dyn ValidatedConnector,
         preview_features: PreviewFeatures,
         internal_data_model: InternalDataModel,
     ) -> Self {

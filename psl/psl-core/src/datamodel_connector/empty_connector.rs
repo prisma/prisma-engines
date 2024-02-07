@@ -6,17 +6,13 @@ use enumflags2::BitFlags;
 /// be used as a default when no datasource is defined.
 pub struct EmptyDatamodelConnector;
 
-impl Connector for EmptyDatamodelConnector {
+impl ValidatedConnector for EmptyDatamodelConnector {
     fn provider_name(&self) -> &'static str {
         "empty"
     }
 
     fn name(&self) -> &str {
         std::any::type_name::<EmptyDatamodelConnector>()
-    }
-
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
-        BitFlags::all()
     }
 
     fn capabilities(&self) -> ConnectorCapabilities {
@@ -29,6 +25,27 @@ impl Connector for EmptyDatamodelConnector {
         })
     }
 
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        BitFlags::all()
+    }
+
+    fn native_type_to_parts(&self, _native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+        unreachable!("EmptyDatamodelConnector::native_type_to_string()")
+    }
+
+    fn parse_native_type(
+        &self,
+        name: &str,
+        _: &[String],
+        span: Span,
+        diagnostics: &mut Diagnostics,
+    ) -> Option<NativeTypeInstance> {
+        diagnostics.push_error(DatamodelError::new_native_type_parser_error(name, span));
+        None
+    }
+}
+
+impl Connector for EmptyDatamodelConnector {
     fn max_identifier_length(&self) -> usize {
         usize::MAX
     }
@@ -51,21 +68,6 @@ impl Connector for EmptyDatamodelConnector {
         _scalar_type: &ScalarType,
     ) -> bool {
         false
-    }
-
-    fn native_type_to_parts(&self, _native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
-        unreachable!("EmptyDatamodelConnector::native_type_to_string()")
-    }
-
-    fn parse_native_type(
-        &self,
-        name: &str,
-        _: &[String],
-        span: Span,
-        diagnostics: &mut Diagnostics,
-    ) -> Option<NativeTypeInstance> {
-        diagnostics.push_error(DatamodelError::new_native_type_parser_error(name, span));
-        None
     }
 
     fn validate_url(&self, _url: &str) -> Result<(), String> {

@@ -31,9 +31,9 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     SupportsFiltersOnRelationsWithoutJoins
 });
 
-pub(crate) struct SqliteDatamodelValidatedConnector;
+pub struct SqliteDatamodelConnector;
 
-impl ValidatedConnector for SqliteDatamodelValidatedConnector {
+impl ValidatedConnector for SqliteDatamodelConnector {
     fn provider_name(&self) -> &'static str {
         "sqlite"
     }
@@ -44,6 +44,18 @@ impl ValidatedConnector for SqliteDatamodelValidatedConnector {
 
     fn capabilities(&self) -> ConnectorCapabilities {
         CAPABILITIES
+    }
+
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        use ReferentialAction::*;
+
+        SetNull | SetDefault | Cascade | Restrict | NoAction
+    }
+
+    fn emulated_referential_actions(&self) -> BitFlags<ReferentialAction> {
+        use ReferentialAction::*;
+
+        Restrict | SetNull | Cascade
     }
 
     fn native_type_to_parts(&self, _native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
@@ -65,35 +77,9 @@ impl ValidatedConnector for SqliteDatamodelValidatedConnector {
     }
 }
 
-pub struct SqliteDatamodelConnector;
-
 impl Connector for SqliteDatamodelConnector {
-    fn provider_name(&self) -> &'static str {
-        "sqlite"
-    }
-
-    fn name(&self) -> &str {
-        "sqlite"
-    }
-
-    fn capabilities(&self) -> ConnectorCapabilities {
-        CAPABILITIES
-    }
-
     fn max_identifier_length(&self) -> usize {
         10000
-    }
-
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
-        use ReferentialAction::*;
-
-        SetNull | SetDefault | Cascade | Restrict | NoAction
-    }
-
-    fn emulated_referential_actions(&self) -> BitFlags<ReferentialAction> {
-        use ReferentialAction::*;
-
-        Restrict | SetNull | Cascade
     }
 
     fn scalar_type_for_native_type(&self, _native_type: &NativeTypeInstance) -> ScalarType {
@@ -112,30 +98,12 @@ impl Connector for SqliteDatamodelConnector {
         false
     }
 
-    fn native_type_to_parts(&self, _native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
-        unreachable!()
-    }
-
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
         CONSTRAINT_SCOPES
     }
 
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
         NATIVE_TYPE_CONSTRUCTORS
-    }
-
-    fn parse_native_type(
-        &self,
-        _name: &str,
-        _args: &[String],
-        span: Span,
-        diagnostics: &mut Diagnostics,
-    ) -> Option<NativeTypeInstance> {
-        diagnostics.push_error(DatamodelError::new_native_types_not_supported(
-            self.name().to_owned(),
-            span,
-        ));
-        None
     }
 
     fn validate_url(&self, url: &str) -> Result<(), String> {

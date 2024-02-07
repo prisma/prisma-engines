@@ -7,16 +7,15 @@ pub use native_types::PostgresType;
 use crate::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
-        NativeTypeInstance, RelationMode, StringFilter, ValidatedConnector,
+        NativeTypeInstance, RelationMode, ValidatedConnector,
     },
     diagnostics::Diagnostics,
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
     Configuration, Datasource, DatasourceConnectorData, PreviewFeature,
 };
-use chrono::*;
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
-use std::{borrow::Cow, collections::HashMap};
+use std::collections::HashMap;
 use PostgresType::*;
 
 use super::completions;
@@ -73,9 +72,9 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     SupportsFiltersOnRelationsWithoutJoins
 });
 
-pub struct PostgresDatamodelValidatedConnector;
+pub struct PostgresDatamodelConnector;
 
-impl ValidatedConnector for PostgresDatamodelValidatedConnector {
+impl ValidatedConnector for PostgresDatamodelConnector {
     fn provider_name(&self) -> &'static str {
         "postgresql"
     }
@@ -90,6 +89,18 @@ impl ValidatedConnector for PostgresDatamodelValidatedConnector {
 
     fn capabilities(&self) -> ConnectorCapabilities {
         CAPABILITIES
+    }
+
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        use ReferentialAction::*;
+
+        NoAction | Restrict | Cascade | SetNull | SetDefault
+    }
+
+    fn emulated_referential_actions(&self) -> BitFlags<ReferentialAction> {
+        use ReferentialAction::*;
+
+        Restrict | SetNull | Cascade
     }
 
     fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
@@ -107,8 +118,6 @@ impl ValidatedConnector for PostgresDatamodelValidatedConnector {
         Some(NativeTypeInstance::new::<PostgresType>(native_type))
     }
 }
-
-pub struct PostgresDatamodelConnector;
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
     (ScalarType::Int, PostgresType::Integer),
@@ -283,39 +292,11 @@ impl PostgresExtensions {
 }
 
 impl Connector for PostgresDatamodelConnector {
-    fn is_provider(&self, name: &str) -> bool {
-        ["postgresql", "postgres"].contains(&name)
-    }
-
-    fn provider_name(&self) -> &'static str {
-        "postgresql"
-    }
-
-    fn name(&self) -> &str {
-        "Postgres"
-    }
-
-    fn capabilities(&self) -> ConnectorCapabilities {
-        CAPABILITIES
-    }
-
     /// The maximum length of postgres identifiers, in bytes.
     ///
     /// Reference: <https://www.postgresql.org/docs/12/limits.html>
     fn max_identifier_length(&self) -> usize {
         63
-    }
-
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
-        use ReferentialAction::*;
-
-        NoAction | Restrict | Cascade | SetNull | SetDefault
-    }
-
-    fn emulated_referential_actions(&self) -> BitFlags<ReferentialAction> {
-        use ReferentialAction::*;
-
-        Restrict | SetNull | Cascade
     }
 
     /// Postgres accepts table definitions with a SET NULL referential action referencing a non-nullable field,
@@ -457,35 +438,6 @@ impl Connector for PostgresDatamodelConnector {
             | IndexAlgorithm::Brin
     }
 
-    fn parse_native_type(
-        &self,
-        name: &str,
-        args: &[String],
-        span: ast::Span,
-        diagnostics: &mut Diagnostics,
-    ) -> Option<NativeTypeInstance> {
-        let native_type = PostgresType::from_parts(name, args, span, diagnostics)?;
-        Some(NativeTypeInstance::new::<PostgresType>(native_type))
-    }
-
-    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
-        native_type.downcast_ref::<PostgresType>().to_parts()
-    }
-
-    fn scalar_filter_name(&self, scalar_type_name: String, native_type_name: Option<&str>) -> Cow<'_, str> {
-        match native_type_name {
-            Some(name) if name.eq_ignore_ascii_case("uuid") => "Uuid".into(),
-            _ => scalar_type_name.into(),
-        }
-    }
-
-    fn string_filters(&self, input_object_name: &str) -> BitFlags<StringFilter> {
-        match input_object_name {
-            "Uuid" => BitFlags::empty(),
-            _ => BitFlags::all(),
-        }
-    }
-
     fn validate_url(&self, url: &str) -> Result<(), String> {
         if !url.starts_with("postgres://") && !url.starts_with("postgresql://") {
             return Err("must start with the protocol `postgresql://` or `postgres://`.".to_owned());
@@ -604,29 +556,6 @@ impl Connector for PostgresDatamodelConnector {
 
     fn flavour(&self) -> Flavour {
         Flavour::Postgres
-    }
-
-    fn parse_json_datetime(
-        &self,
-        str: &str,
-        nt: Option<NativeTypeInstance>,
-    ) -> chrono::ParseResult<chrono::DateTime<FixedOffset>> {
-        let native_type: Option<&PostgresType> = nt.as_ref().map(|nt| nt.downcast_ref());
-
-        match native_type {
-            Some(pt) => match pt {
-                Timestamptz(_) => super::utils::parse_timestamptz(str),
-                Timestamp(_) => super::utils::parse_timestamp(str),
-                Date => super::utils::parse_date(str),
-                Time(_) => super::utils::parse_time(str),
-                Timetz(_) => super::utils::parse_timetz(str),
-                _ => unreachable!(),
-            },
-            None => self.parse_json_datetime(
-                str,
-                Some(self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
-            ),
-        }
     }
 }
 

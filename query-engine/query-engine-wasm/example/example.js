@@ -20,9 +20,10 @@ async function main() {
   console.log('buildTimeInfo', getBuildTimeInfo())
 
   const datamodel = await readFile('prisma/schema.prisma', 'utf8')
+  const schemaAsBinary = new Uint8Array(await readFile('prisma/schema.bin'))
 
   const options = {
-    datamodel,
+    datamodel, // this is ignored
     logLevel: 'info',
     logQueries: true,
     datasourceOverrides: {},
@@ -32,7 +33,7 @@ async function main() {
   }
   const callback = () => { console.log('log-callback') }
 
-  const queryEngine = new QueryEngine(options, callback, driverAdapter)
+  const queryEngine = new QueryEngine(options, callback, driverAdapter, schemaAsBinary)
   
   await queryEngine.connect('trace')
 
