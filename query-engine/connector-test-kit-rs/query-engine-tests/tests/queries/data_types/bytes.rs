@@ -12,9 +12,9 @@ mod bytes {
                     #id(id, Int, @id)
             
                     children Child[]
-                    }
-                    
-                    model Child {
+                }
+                
+                model Child {
                     #id(childId, Int, @id)
             
                     parentId Int?
