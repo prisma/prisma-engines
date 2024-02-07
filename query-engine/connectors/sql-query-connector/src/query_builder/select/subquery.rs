@@ -15,7 +15,7 @@ use query_structure::*;
 #[derive(Debug, Default)]
 pub(crate) struct SubqueriesSelectBuilder {
     alias: Alias,
-    visited_virtuals: HashMap<VirtualSelection, Alias>,
+    visited_virtuals: HashMap<VirtualSelection, String>,
 }
 
 impl JoinSelectBuilder for SubqueriesSelectBuilder {
@@ -49,7 +49,7 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
                     .table(parent_alias.to_table_string())
                     .set_is_selected(true),
             ),
-            SelectedField::Relation(rs) => self.with_relation(select, rs, parent_alias, ctx),
+            SelectedField::Relation(rs) => self.with_relation(select, rs, Vec::new().iter(), parent_alias, ctx),
             _ => select,
         }
     }
@@ -66,10 +66,11 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
         select.value(Expression::from(subselect).alias(rs.field.name().to_owned()))
     }
 
-    fn add_to_many_relation<'a>(
+    fn add_to_many_relation<'a, 'b>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
+        _parent_virtuals: impl Iterator<Item = &'b VirtualSelection>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
@@ -120,7 +121,7 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
                 )),
                 SelectedField::Relation(rs) => Some((
                     Cow::from(rs.field.name().to_owned()),
-                    Expression::from(self.with_relation(Select::default(), rs, parent_alias, ctx)),
+                    Expression::from(self.with_relation(Select::default(), rs, Vec::new().iter(), parent_alias, ctx)),
                 )),
                 _ => None,
             })
@@ -148,7 +149,7 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
         self.alias
     }
 
-    fn visited_virtuals(&self) -> &HashMap<VirtualSelection, Alias> {
+    fn visited_virtuals(&self) -> &HashMap<VirtualSelection, String> {
         &self.visited_virtuals
     }
 }

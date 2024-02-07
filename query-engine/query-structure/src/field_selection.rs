@@ -332,6 +332,12 @@ impl VirtualSelection {
             VirtualSelection::RelationCount(rf, _) => rf,
         }
     }
+
+    pub fn filter(&self) -> Option<&Filter> {
+        match self {
+            VirtualSelection::RelationCount(_, filter) => filter.as_ref(),
+        }
+    }
 }
 
 impl Display for VirtualSelection {

@@ -15,7 +15,7 @@ use query_structure::*;
 #[derive(Debug, Default)]
 pub(crate) struct LateralJoinSelectBuilder {
     alias: Alias,
-    visited_virtuals: HashMap<VirtualSelection, Alias>,
+    visited_virtuals: HashMap<VirtualSelection, String>,
 }
 
 impl JoinSelectBuilder for LateralJoinSelectBuilder {
@@ -32,7 +32,13 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
     /// ```
     fn build(&mut self, args: QueryArguments, selected_fields: &FieldSelection, ctx: &Context<'_>) -> Select<'static> {
         let (select, parent_alias) = self.build_default_select(&args, ctx);
-        let select = self.with_relations(select, selected_fields.relations(), parent_alias, ctx);
+        let select = self.with_relations(
+            select,
+            selected_fields.relations(),
+            selected_fields.virtuals(),
+            parent_alias,
+            ctx,
+        );
         let select = self.with_virtual_selections(select, selected_fields.virtuals(), parent_alias, ctx);
 
         // Build selection as the last step utilizing the information we collected in
@@ -85,15 +91,24 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         select.left_join(join_table.on(ConditionTree::single(true.raw())).lateral())
     }
 
-    fn add_to_many_relation<'a>(
+    fn add_to_many_relation<'a, 'b>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
+        parent_virtuals: impl Iterator<Item = &'b VirtualSelection>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
         let join_table_alias = join_alias_name(&rs.field);
-        let join_table = Table::from(self.build_to_many_select(rs, parent_alias, ctx)).alias(join_table_alias);
+        let mut to_many_select = self.build_to_many_select(rs, parent_alias, ctx);
+
+        if let Some(vs) = self.find_compatible_virtual_for_relation(rs, parent_virtuals) {
+            // TODO: avoid cloning vs
+            self.visited_virtuals.insert(vs.clone(), join_table_alias.clone());
+            to_many_select = to_many_select.value(build_inline_virtual_selection(vs));
+        }
+
+        let join_table = Table::from(to_many_select).alias(join_table_alias);
 
         // LEFT JOIN LATERAL ( <join_table> ) AS <relation name> ON TRUE
         select.left_join(join_table.on(ConditionTree::single(true.raw())).lateral())
@@ -123,7 +138,7 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         let table = Table::from(relation_count_select).alias(alias.to_table_string());
 
         // TODO: avoid cloning, consider using references as keys
-        self.visited_virtuals.insert(vs.clone(), alias);
+        self.visited_virtuals.insert(vs.clone(), alias.to_table_string());
 
         select.left_join_lateral(table.on(ConditionTree::single(true.raw())))
     }
@@ -169,11 +184,11 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
     ) -> Expression<'static> {
         let virtual_selection_alias = self
             .visited_virtuals
-            .get(vs)
+            .remove(vs)
             .expect("All virtual fields must be visited before calling build_virtual_expr");
 
         coalesce([
-            Expression::from(Column::from((virtual_selection_alias.to_table_string(), vs.db_alias()))),
+            Expression::from(Column::from((virtual_selection_alias, vs.db_alias()))),
             Expression::from(0.raw()),
         ])
         .into()
@@ -184,7 +199,7 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         self.alias
     }
 
-    fn visited_virtuals(&self) -> &HashMap<VirtualSelection, Alias> {
+    fn visited_virtuals(&self) -> &HashMap<VirtualSelection, String> {
         &self.visited_virtuals
     }
 }
@@ -221,5 +236,16 @@ impl LateralJoinSelectBuilder {
             .alias(m2m_join_alias_name(&rf))
             .on(ConditionTree::single(true.raw()))
             .lateral()
+    }
+}
+
+fn build_inline_virtual_selection<'a>(vs: &VirtualSelection) -> Expression<'a> {
+    match vs {
+        VirtualSelection::RelationCount(..) => coalesce([
+            Expression::from(count(Column::from(JSON_AGG_IDENT))),
+            Expression::from(0.raw()),
+        ])
+        .alias(vs.db_alias())
+        .into(),
     }
 }
