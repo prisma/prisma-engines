@@ -41,11 +41,11 @@ impl<'db, I> Walker<'db, I> {
     }
 }
 
-// warning: function cannot return without recursing
 impl<'db, I> PartialEq for Walker<'db, I>
 where
     I: PartialEq,
 {
+    #[allow(clippy::unconditional_recursion)]
     fn eq(&self, other: &Self) -> bool {
         self.id.eq(&other.id)
     }
