@@ -33,6 +33,7 @@ pub fn nested_create(
             create::create_many_records_and_return_ids(graph, query_schema, child_model.clone(), data_maps)?;
 
         if relation.is_one_to_many() {
+            // TODO laplab: does not work for deeper nesting for some reason.
             handle_one_to_many_bulk(graph, parent_node, parent_relation_field, create_many_node)?;
         } else {
             // TODO laplab:
