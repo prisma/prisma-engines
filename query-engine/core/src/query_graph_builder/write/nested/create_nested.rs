@@ -5,6 +5,7 @@ use crate::{
     write::write_args_parser::WriteArgsParser,
     ParsedInputList, ParsedInputValue,
 };
+use psl::datamodel_connector::ConnectorCapability;
 use query_structure::{Filter, IntoFilter, Model, RelationFieldRef};
 use schema::constants::args;
 use std::convert::TryInto;
@@ -22,18 +23,104 @@ pub fn nested_create(
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
-    // Build all create nodes upfront.
-    let creates: Vec<NodeRef> = utils::coerce_vec(value)
-        .into_iter()
-        .map(|value| create::create_record_node(graph, query_schema, child_model.clone(), value.try_into()?))
-        .collect::<QueryGraphBuilderResult<Vec<NodeRef>>>()?;
+    if query_schema.has_capability(ConnectorCapability::CreateMany)
+        && query_schema.has_capability(ConnectorCapability::InsertReturning)
+    {
+        // If connector supports creating records in bulk AND returning fields of created records,
+        // we can create all related records in a single query.
+        let data_maps = utils::coerce_vec(value);
+        let create_many_node =
+            create::create_many_records_and_return_ids(graph, query_schema, child_model.clone(), data_maps)?;
 
-    if relation.is_many_to_many() {
-        handle_many_to_many(graph, parent_node, parent_relation_field, creates)?;
-    } else if relation.is_one_to_many() {
-        handle_one_to_many(graph, parent_node, parent_relation_field, creates)?;
+        if relation.is_one_to_many() {
+            handle_one_to_many_bulk(graph, parent_node, parent_relation_field, create_many_node)?;
+        } else {
+            // TODO laplab:
+            todo!()
+        }
     } else {
-        handle_one_to_one(graph, parent_node, parent_relation_field, creates)?;
+        // Build all create nodes upfront.
+        let creates: Vec<NodeRef> = utils::coerce_vec(value)
+            .into_iter()
+            .map(|value| create::create_record_node(graph, query_schema, child_model.clone(), value.try_into()?))
+            .collect::<QueryGraphBuilderResult<Vec<NodeRef>>>()?;
+
+        if relation.is_many_to_many() {
+            handle_many_to_many(graph, parent_node, parent_relation_field, creates)?;
+        } else if relation.is_one_to_many() {
+            handle_one_to_many(graph, parent_node, parent_relation_field, creates)?;
+        } else {
+            handle_one_to_one(graph, parent_node, parent_relation_field, creates)?;
+        }
+    }
+
+    Ok(())
+}
+
+// TODO laplab: comment.
+fn handle_one_to_many_bulk(
+    graph: &mut QueryGraph,
+    parent_node: NodeRef,
+    parent_relation_field: &RelationFieldRef,
+    child_node: NodeRef,
+) -> QueryGraphBuilderResult<()> {
+    if parent_relation_field.is_inlined_on_enclosing_model() {
+        // Parent and create nodes need to be swapped. Since child IDs are inlined on parent side,
+        // we need to create child first, take its ID and only then create parent node with it.
+        graph.mark_nodes(&parent_node, &child_node);
+
+        let parent_link = parent_relation_field.linking_fields();
+        let child_link = parent_relation_field.related_field().linking_fields();
+
+        let relation_name = parent_relation_field.relation().name();
+        let parent_model_name = parent_relation_field.model().name().to_owned();
+        let child_model_name = parent_relation_field.related_model().name().to_owned();
+
+        // We extract the child linking fields in the edge, because after the swap, the child is the new parent.
+        graph.create_edge(
+            &parent_node,
+            &child_node,
+            QueryGraphDependency::ProjectedDataDependency(child_link, Box::new(move |mut parent_node, mut child_links| {
+                let child_link = match child_links.pop() {
+                    Some(link) => Ok(link),
+                    None => Err(QueryGraphBuilderError::RecordNotFound(format!(
+                        "No '{child_model_name}' record (needed to inline the relation on '{parent_model_name}' record) was found for a nested create on one-to-many relation '{relation_name}'."
+                    ))),
+                }?;
+
+                if let Node::Query(Query::Write(ref mut wq)) = parent_node {
+                    wq.inject_result_into_args(parent_link.assimilate(child_link)?);
+                }
+
+                Ok(parent_node)
+            })),
+        )?;
+    } else {
+        // TODO laplab: this is almost identical to the one above.
+        let parent_link = parent_relation_field.linking_fields();
+        let child_link = parent_relation_field.related_field().linking_fields();
+
+        let relation_name = parent_relation_field.relation().name().to_owned();
+        let parent_model_name = parent_relation_field.model().name().to_owned();
+        let child_model_name = parent_relation_field.related_model().name().to_owned();
+
+        graph.create_edge(
+            &parent_node,
+            &child_node,
+            QueryGraphDependency::ProjectedDataDependency(parent_link, Box::new(move |mut create_node, mut parent_links| {
+                let parent_link = match parent_links.pop() {
+                    Some(link) => Ok(link),
+                    None => Err(QueryGraphBuilderError::RecordNotFound(format!(
+                        "No '{parent_model_name}' record (needed to inline the relation on '{child_model_name}' record) was found for a nested create on one-to-many relation '{relation_name}'."
+                    ))),
+                }?;
+
+                if let Node::Query(Query::Write(ref mut wq)) = create_node {
+                    wq.inject_result_into_args(child_link.assimilate(parent_link)?);
+                }
+
+                Ok(create_node)
+            })))?;
     }
 
     Ok(())
@@ -447,6 +534,7 @@ pub fn nested_create_many(
         model: child_model.clone(),
         args,
         skip_duplicates,
+        selected_fields: None,
     };
 
     let create_node = graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));

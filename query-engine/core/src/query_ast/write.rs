@@ -25,24 +25,26 @@ impl WriteQuery {
     pub fn inject_result_into_args(&mut self, result: SelectionResult) {
         let model = self.model();
 
-        let args = match self {
-            Self::CreateRecord(ref mut x) => &mut x.args,
-            Self::UpdateRecord(ref mut x) => match x {
-                UpdateRecord::WithSelection(u) => &mut u.args,
-                UpdateRecord::WithoutSelection(u) => &mut u.args,
-            },
-            Self::UpdateManyRecords(x) => &mut x.args,
-            _ => return,
+        let inject = |args: &mut WriteArgs| {
+            for (selected_field, value) in result.pairs() {
+                args.insert(
+                    DatasourceFieldName(selected_field.db_name().into_owned()),
+                    (selected_field, value.clone()),
+                )
+            }
+            args.update_datetimes(&model);
         };
 
-        for (selected_field, value) in result {
-            args.insert(
-                DatasourceFieldName(selected_field.db_name().into_owned()),
-                (&selected_field, value),
-            )
-        }
-
-        args.update_datetimes(&model);
+        match self {
+            Self::CreateRecord(ref mut x) => inject(&mut x.args),
+            Self::CreateManyRecords(ref mut x) => x.args.iter_mut().map(inject).collect(),
+            Self::UpdateRecord(ref mut x) => match x {
+                UpdateRecord::WithSelection(u) => inject(&mut u.args),
+                UpdateRecord::WithoutSelection(u) => inject(&mut u.args),
+            },
+            Self::UpdateManyRecords(x) => inject(&mut x.args),
+            _ => (),
+        };
     }
 
     pub fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
@@ -250,6 +252,15 @@ pub struct CreateManyRecords {
     pub model: Model,
     pub args: Vec<WriteArgs>,
     pub skip_duplicates: bool,
+    /// Fields of created records that client has requested to return.
+    /// `None` if the connector does not support returning the created rows.
+    pub selected_fields: Option<CreateManyRecordsFields>,
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateManyRecordsFields {
+    pub selected_fields: FieldSelection,
+    pub selection_order: Vec<String>,
 }
 
 impl CreateManyRecords {

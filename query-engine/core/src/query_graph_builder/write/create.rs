@@ -2,7 +2,7 @@ use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, ParsedField, ParsedInputList, ParsedInputMap,
+    ArgumentListLookup, ParsedField, ParsedInputList, ParsedInputMap, ParsedInputValue,
 };
 use psl::datamodel_connector::ConnectorCapability;
 use query_structure::{IntoFilter, Model};
@@ -96,10 +96,49 @@ pub(crate) fn create_many_records(
         model,
         args,
         skip_duplicates,
+        selected_fields: None,
     };
 
     graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));
     Ok(())
+}
+
+// TODO laplab: write comment.
+pub(crate) fn create_many_records_and_return_ids(
+    graph: &mut QueryGraph,
+    query_schema: &QuerySchema,
+    model: Model,
+    data_maps: Vec<ParsedInputValue<'_>>,
+) -> QueryGraphBuilderResult<NodeRef> {
+    let mut args = vec![];
+    let mut nested_fields = vec![];
+    for data_map in data_maps {
+        let parser = WriteArgsParser::from(&model, data_map.try_into()?)?;
+        args.push(parser.args);
+        nested_fields.push(parser.nested);
+    }
+
+    let selected_fields = model.primary_identifier();
+    let selection_order = selected_fields.db_names().collect();
+
+    let query = CreateManyRecords {
+        model,
+        args,
+        skip_duplicates: false,
+        selected_fields: Some(CreateManyRecordsFields {
+            selected_fields,
+            selection_order,
+        }),
+    };
+    let create_many_node = graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));
+
+    for fields in nested_fields {
+        for (relation_field, data_map) in fields {
+            nested::connect_nested_query(graph, query_schema, create_many_node, relation_field, data_map)?;
+        }
+    }
+
+    Ok(create_many_node)
 }
 
 pub fn create_record_node(

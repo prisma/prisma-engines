@@ -53,6 +53,10 @@ impl SelectionResult {
         self.pairs.iter().map(|p| p.1.clone())
     }
 
+    pub fn pairs(&self) -> impl Iterator<Item = &(SelectedField, PrismaValue)> + '_ {
+        self.pairs.iter()
+    }
+
     pub fn len(&self) -> usize {
         self.pairs.len()
     }
