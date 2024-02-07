@@ -1,6 +1,6 @@
 use crate::InternalDataModel;
 use std::sync::Arc;
 
-pub fn convert(schema: Arc<psl::ValidatedSchema>) -> InternalDataModel {
+pub fn convert(schema: Arc<psl::ValidatedSchemaForQE>) -> InternalDataModel {
     InternalDataModel { schema }
 }

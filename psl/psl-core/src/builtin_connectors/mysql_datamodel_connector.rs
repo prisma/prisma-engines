@@ -72,9 +72,9 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];
 
-pub struct MySqlDatamodelValidatedConnector;
+pub struct MySqlDatamodelConnector;
 
-impl ValidatedConnector for MySqlDatamodelValidatedConnector {
+impl ValidatedConnector for MySqlDatamodelConnector {
     fn provider_name(&self) -> &'static str {
         "mysql"
     }
@@ -87,8 +87,29 @@ impl ValidatedConnector for MySqlDatamodelValidatedConnector {
         "MySQL"
     }
 
+    fn flavour(&self) -> Flavour {
+        Flavour::Mysql
+    }
+
     fn capabilities(&self) -> ConnectorCapabilities {
         CAPABILITIES
+    }
+
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        use ReferentialAction::*;
+
+        Restrict | Cascade | SetNull | NoAction | SetDefault
+    }
+
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
+        let native_type = SCALAR_TYPE_DEFAULTS
+            .iter()
+            .find(|(st, _)| st == scalar_type)
+            .map(|(_, native_type)| native_type)
+            .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
+            .unwrap();
+
+        Some(NativeTypeInstance::new::<MySqlType>(*native_type))
     }
 
     fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
@@ -105,9 +126,31 @@ impl ValidatedConnector for MySqlDatamodelValidatedConnector {
         let native_type = MySqlType::from_parts(name, args, span, diagnostics)?;
         Some(NativeTypeInstance::new::<MySqlType>(native_type))
     }
-}
 
-pub struct MySqlDatamodelConnector;
+    fn parse_json_datetime(
+        &self,
+        str: &str,
+        nt: Option<NativeTypeInstance>,
+    ) -> chrono::ParseResult<chrono::DateTime<FixedOffset>> {
+        let native_type: Option<&MySqlType> = nt.as_ref().map(|nt| nt.downcast_ref());
+
+        match native_type {
+            Some(pt) => match pt {
+                Date => super::utils::common::parse_date(str),
+                Time(_) => super::utils::common::parse_time(str),
+                DateTime(_) => super::utils::mysql::parse_datetime(str),
+                Timestamp(_) => super::utils::mysql::parse_timestamp(str),
+                _ => unreachable!(),
+            },
+            None => self.parse_json_datetime(str, self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
+        }
+    }
+
+    // On MySQL, bytes are encoded as base64 in the database directly.
+    fn parse_json_bytes(&self, str: &str, _nt: Option<NativeTypeInstance>) -> PrismaValueResult<Vec<u8>> {
+        decode_bytes(str)
+    }
+}
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
     (ScalarType::Int, MySqlType::Int),
@@ -122,30 +165,8 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
 ];
 
 impl Connector for MySqlDatamodelConnector {
-    fn provider_name(&self) -> &'static str {
-        "mysql"
-    }
-
-    fn name(&self) -> &str {
-        "MySQL"
-    }
-
-    fn is_provider(&self, name: &str) -> bool {
-        name == "mysql"
-    }
-
-    fn capabilities(&self) -> ConnectorCapabilities {
-        CAPABILITIES
-    }
-
     fn max_identifier_length(&self) -> usize {
         64
-    }
-
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
-        use ReferentialAction::*;
-
-        Restrict | Cascade | SetNull | NoAction | SetDefault
     }
 
     fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
@@ -196,17 +217,6 @@ impl Connector for MySqlDatamodelConnector {
             UnsignedMediumInt => ScalarType::Int,
             UnsignedBigInt => ScalarType::BigInt,
         }
-    }
-
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
-        let native_type = SCALAR_TYPE_DEFAULTS
-            .iter()
-            .find(|(st, _)| st == scalar_type)
-            .map(|(_, native_type)| native_type)
-            .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
-            .unwrap();
-
-        Some(NativeTypeInstance::new::<MySqlType>(*native_type))
     }
 
     fn native_type_is_default_for_scalar_type(
@@ -290,21 +300,6 @@ impl Connector for MySqlDatamodelConnector {
         native_types::CONSTRUCTORS
     }
 
-    fn parse_native_type(
-        &self,
-        name: &str,
-        args: &[String],
-        span: Span,
-        diagnostics: &mut Diagnostics,
-    ) -> Option<NativeTypeInstance> {
-        let native_type = MySqlType::from_parts(name, args, span, diagnostics)?;
-        Some(NativeTypeInstance::new::<MySqlType>(native_type))
-    }
-
-    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
-        native_type.downcast_ref::<MySqlType>().to_parts()
-    }
-
     fn validate_url(&self, url: &str) -> Result<(), String> {
         if !url.starts_with("mysql") {
             return Err("must start with the protocol `mysql://`.".to_owned());
@@ -322,33 +317,5 @@ impl Connector for MySqlDatamodelConnector {
         if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
             completions::schemas_completion(completion_list);
         }
-    }
-
-    fn flavour(&self) -> Flavour {
-        Flavour::Mysql
-    }
-
-    fn parse_json_datetime(
-        &self,
-        str: &str,
-        nt: Option<NativeTypeInstance>,
-    ) -> chrono::ParseResult<chrono::DateTime<FixedOffset>> {
-        let native_type: Option<&MySqlType> = nt.as_ref().map(|nt| nt.downcast_ref());
-
-        match native_type {
-            Some(pt) => match pt {
-                Date => super::utils::common::parse_date(str),
-                Time(_) => super::utils::common::parse_time(str),
-                DateTime(_) => super::utils::mysql::parse_datetime(str),
-                Timestamp(_) => super::utils::mysql::parse_timestamp(str),
-                _ => unreachable!(),
-            },
-            None => self.parse_json_datetime(str, self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
-        }
-    }
-
-    // On MySQL, bytes are encoded as base64 in the database directly.
-    fn parse_json_bytes(&self, str: &str, _nt: Option<NativeTypeInstance>) -> PrismaValueResult<Vec<u8>> {
-        decode_bytes(str)
     }
 }

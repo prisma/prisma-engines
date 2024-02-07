@@ -1,6 +1,7 @@
 //! The SQL migration connector.
 
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
+#![feature(trait_upcasting)]
 
 mod apply_migration;
 mod database_schema;

@@ -1,14 +1,14 @@
-use psl::datamodel_connector::{Connector, NativeTypeInstance as PslNativeTypeInstance};
+use psl::datamodel_connector::{NativeTypeInstance as PslNativeTypeInstance, ValidatedConnector};
 
 /// Represents an instance of a native type declared in the Prisma schema.
 #[derive(Clone)]
 pub struct NativeTypeInstance {
     pub native_type: PslNativeTypeInstance,
-    pub connector: &'static dyn Connector,
+    pub connector: &'static dyn ValidatedConnector,
 }
 
 impl NativeTypeInstance {
-    pub fn new(native_type: PslNativeTypeInstance, connector: &'static dyn Connector) -> Self {
+    pub fn new(native_type: PslNativeTypeInstance, connector: &'static dyn ValidatedConnector) -> Self {
         NativeTypeInstance { native_type, connector }
     }
 

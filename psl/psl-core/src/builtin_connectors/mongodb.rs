@@ -6,7 +6,7 @@ pub use mongodb_types::MongoDbType;
 use crate::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
-        NativeTypeInstance, RelationMode,
+        NativeTypeInstance, RelationMode, ValidatedConnector,
     },
     diagnostics::{Diagnostics, Span},
     parser_database::{walkers::*, ReferentialAction, ScalarType},
@@ -36,7 +36,7 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
 
 pub(crate) struct MongoDbDatamodelConnector;
 
-impl Connector for MongoDbDatamodelConnector {
+impl ValidatedConnector for MongoDbDatamodelConnector {
     fn provider_name(&self) -> &'static str {
         "mongodb"
     }
@@ -45,20 +45,47 @@ impl Connector for MongoDbDatamodelConnector {
         "MongoDB"
     }
 
+    fn flavour(&self) -> Flavour {
+        Flavour::Mongo
+    }
+
     fn capabilities(&self) -> ConnectorCapabilities {
         CAPABILITIES
     }
 
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        BitFlags::empty()
+    }
+
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
+        let native_type = default_for(scalar_type);
+
+        Some(NativeTypeInstance::new::<MongoDbType>(*native_type))
+    }
+
+    fn parse_native_type(
+        &self,
+        name: &str,
+        args: &[String],
+        span: Span,
+        diagnostics: &mut Diagnostics,
+    ) -> Option<NativeTypeInstance> {
+        let native_type = MongoDbType::from_parts(name, args, span, diagnostics)?;
+        Some(NativeTypeInstance::new::<MongoDbType>(native_type))
+    }
+
+    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+        native_type.downcast_ref::<MongoDbType>().to_parts()
+    }
+}
+
+impl Connector for MongoDbDatamodelConnector {
     fn max_identifier_length(&self) -> usize {
         127
     }
 
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
         &[ConstraintScope::ModelKeyIndex]
-    }
-
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
-        BitFlags::empty()
     }
 
     fn validate_model(&self, model: ModelWalker<'_>, _: RelationMode, errors: &mut Diagnostics) {
@@ -93,12 +120,6 @@ impl Connector for MongoDbDatamodelConnector {
         mongodb_types::CONSTRUCTORS
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
-        let native_type = default_for(scalar_type);
-
-        Some(NativeTypeInstance::new::<MongoDbType>(*native_type))
-    }
-
     fn native_type_is_default_for_scalar_type(
         &self,
         native_type: &NativeTypeInstance,
@@ -107,21 +128,6 @@ impl Connector for MongoDbDatamodelConnector {
         let default_native_type = default_for(scalar_type);
         let native_type: &MongoDbType = native_type.downcast_ref();
         native_type == default_native_type
-    }
-
-    fn parse_native_type(
-        &self,
-        name: &str,
-        args: &[String],
-        span: Span,
-        diagnostics: &mut Diagnostics,
-    ) -> Option<NativeTypeInstance> {
-        let native_type = MongoDbType::from_parts(name, args, span, diagnostics)?;
-        Some(NativeTypeInstance::new::<MongoDbType>(native_type))
-    }
-
-    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
-        native_type.downcast_ref::<MongoDbType>().to_parts()
     }
 
     fn scalar_type_for_native_type(&self, _native_type: &NativeTypeInstance) -> ScalarType {
@@ -147,9 +153,5 @@ impl Connector for MongoDbDatamodelConnector {
     /// Avoid checking whether the fields appearing in a `@relation` attribute are included in an index.
     fn should_suggest_missing_referencing_fields_indexes(&self) -> bool {
         false
-    }
-
-    fn flavour(&self) -> Flavour {
-        Flavour::Mongo
     }
 }

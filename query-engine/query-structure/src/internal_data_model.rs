@@ -6,7 +6,7 @@ pub(crate) type InternalDataModelRef = InternalDataModel;
 
 #[derive(Debug, Clone)]
 pub struct InternalDataModel {
-    pub schema: Arc<psl::ValidatedSchema>,
+    pub schema: Arc<psl::ValidatedSchemaForQE>,
 }
 
 impl InternalDataModel {

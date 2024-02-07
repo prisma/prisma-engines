@@ -18,7 +18,7 @@ pub enum Field {
 }
 
 impl Field {
-    pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchema) -> &'a str {
+    pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchemaForQE) -> &'a str {
         match self {
             Field::Relation(rf) => schema.db.walk(rf.id).name(),
             Field::Scalar(sf) => sf.borrowed_name(schema),
@@ -159,7 +159,7 @@ impl TypeIdentifier {
         )
     }
 
-    pub fn type_name(&self, schema: &psl::ValidatedSchema) -> Cow<'static, str> {
+    pub fn type_name(&self, schema: &psl::ValidatedSchemaForQE) -> Cow<'static, str> {
         match self {
             TypeIdentifier::String => "String".into(),
             TypeIdentifier::Int => "Int".into(),

@@ -6,7 +6,7 @@ pub use native_types::CockroachType;
 use crate::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
-        NativeTypeInstance, RelationMode, StringFilter,
+        NativeTypeInstance, RelationMode, StringFilter, ValidatedConnector,
     },
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
@@ -79,7 +79,7 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
 
 pub(crate) struct CockroachDatamodelConnector;
 
-impl Connector for CockroachDatamodelConnector {
+impl ValidatedConnector for CockroachDatamodelConnector {
     fn provider_name(&self) -> &'static str {
         "cockroachdb"
     }
@@ -88,21 +88,104 @@ impl Connector for CockroachDatamodelConnector {
         "CockroachDB"
     }
 
-    fn capabilities(&self) -> ConnectorCapabilities {
-        CAPABILITIES
+    fn flavour(&self) -> Flavour {
+        Flavour::Cockroach
     }
 
-    /// The maximum length of postgres identifiers, in bytes.
-    ///
-    /// Reference: <https://www.postgresql.org/docs/12/limits.html>
-    fn max_identifier_length(&self) -> usize {
-        63
+    fn capabilities(&self) -> ConnectorCapabilities {
+        CAPABILITIES
     }
 
     fn referential_actions(&self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
         NoAction | Restrict | Cascade | SetNull | SetDefault
+    }
+
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
+        let native_type = SCALAR_TYPE_DEFAULTS
+            .iter()
+            .find(|(st, _)| st == scalar_type)
+            .map(|(_, native_type)| native_type)
+            .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
+            .unwrap();
+
+        Some(NativeTypeInstance::new::<CockroachType>(*native_type))
+    }
+
+    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+        native_type.downcast_ref::<CockroachType>().to_parts()
+    }
+
+    fn parse_native_type(
+        &self,
+        name: &str,
+        args: &[String],
+        span: ast::Span,
+        diagnostics: &mut Diagnostics,
+    ) -> Option<NativeTypeInstance> {
+        let native_type = CockroachType::from_parts(name, args, span, diagnostics)?;
+        Some(NativeTypeInstance::new::<CockroachType>(native_type))
+    }
+
+    fn scalar_filter_name(&self, scalar_type_name: String, native_type_name: Option<&str>) -> Cow<'_, str> {
+        match native_type_name {
+            Some(name) if name.eq_ignore_ascii_case("uuid") => "Uuid".into(),
+            _ => scalar_type_name.into(),
+        }
+    }
+
+    fn string_filters(&self, input_object_name: &str) -> BitFlags<StringFilter> {
+        match input_object_name {
+            "Uuid" => BitFlags::empty(),
+            _ => BitFlags::all(),
+        }
+    }
+
+    fn parse_json_datetime(
+        &self,
+        str: &str,
+        nt: Option<NativeTypeInstance>,
+    ) -> chrono::ParseResult<chrono::DateTime<FixedOffset>> {
+        let native_type: Option<&CockroachType> = nt.as_ref().map(|nt| nt.downcast_ref());
+
+        match native_type {
+            Some(ct) => match ct {
+                CockroachType::Timestamptz(_) => super::utils::postgres::parse_timestamptz(str),
+                CockroachType::Timestamp(_) => super::utils::postgres::parse_timestamp(str),
+                CockroachType::Date => super::utils::common::parse_date(str),
+                CockroachType::Time(_) => super::utils::common::parse_time(str),
+                CockroachType::Timetz(_) => super::utils::postgres::parse_timetz(str),
+                _ => unreachable!(),
+            },
+            None => self.parse_json_datetime(str, self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
+        }
+    }
+
+    fn parse_json_bytes(&self, str: &str, nt: Option<NativeTypeInstance>) -> prisma_value::PrismaValueResult<Vec<u8>> {
+        let native_type: Option<&CockroachType> = nt.as_ref().map(|nt| nt.downcast_ref());
+
+        match native_type {
+            Some(ct) => match ct {
+                CockroachType::Bytes => {
+                    super::utils::postgres::parse_bytes(str).map_err(|_| prisma_value::ConversionFailure {
+                        from: "hex".into(),
+                        to: "bytes".into(),
+                    })
+                }
+                _ => unreachable!(),
+            },
+            None => self.parse_json_bytes(str, self.default_native_type_for_scalar_type(&ScalarType::Bytes)),
+        }
+    }
+}
+
+impl Connector for CockroachDatamodelConnector {
+    /// The maximum length of postgres identifiers, in bytes.
+    ///
+    /// Reference: <https://www.postgresql.org/docs/12/limits.html>
+    fn max_identifier_length(&self) -> usize {
+        63
     }
 
     fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
@@ -143,17 +226,6 @@ impl Connector for CockroachDatamodelConnector {
         }
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
-        let native_type = SCALAR_TYPE_DEFAULTS
-            .iter()
-            .find(|(st, _)| st == scalar_type)
-            .map(|(_, native_type)| native_type)
-            .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
-            .unwrap();
-
-        Some(NativeTypeInstance::new::<CockroachType>(*native_type))
-    }
-
     fn native_type_is_default_for_scalar_type(
         &self,
         native_type: &NativeTypeInstance,
@@ -164,10 +236,6 @@ impl Connector for CockroachDatamodelConnector {
         SCALAR_TYPE_DEFAULTS
             .iter()
             .any(|(st, nt)| scalar_type == st && native_type == nt)
-    }
-
-    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
-        native_type.downcast_ref::<CockroachType>().to_parts()
     }
 
     fn validate_native_type_arguments(
@@ -241,31 +309,6 @@ impl Connector for CockroachDatamodelConnector {
         BitFlags::empty() | IndexAlgorithm::BTree | IndexAlgorithm::Gin
     }
 
-    fn parse_native_type(
-        &self,
-        name: &str,
-        args: &[String],
-        span: ast::Span,
-        diagnostics: &mut Diagnostics,
-    ) -> Option<NativeTypeInstance> {
-        let native_type = CockroachType::from_parts(name, args, span, diagnostics)?;
-        Some(NativeTypeInstance::new::<CockroachType>(native_type))
-    }
-
-    fn scalar_filter_name(&self, scalar_type_name: String, native_type_name: Option<&str>) -> Cow<'_, str> {
-        match native_type_name {
-            Some(name) if name.eq_ignore_ascii_case("uuid") => "Uuid".into(),
-            _ => scalar_type_name.into(),
-        }
-    }
-
-    fn string_filters(&self, input_object_name: &str) -> BitFlags<StringFilter> {
-        match input_object_name {
-            "Uuid" => BitFlags::empty(),
-            _ => BitFlags::all(),
-        }
-    }
-
     fn validate_url(&self, url: &str) -> Result<(), String> {
         if !url.starts_with("postgres://") && !url.starts_with("postgresql://") {
             return Err("must start with the protocol `postgresql://` or `postgres://`.".to_owned());
@@ -304,47 +347,6 @@ impl Connector for CockroachDatamodelConnector {
 
         if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
             completions::schemas_completion(completion_list);
-        }
-    }
-
-    fn flavour(&self) -> Flavour {
-        Flavour::Cockroach
-    }
-
-    fn parse_json_datetime(
-        &self,
-        str: &str,
-        nt: Option<NativeTypeInstance>,
-    ) -> chrono::ParseResult<chrono::DateTime<FixedOffset>> {
-        let native_type: Option<&CockroachType> = nt.as_ref().map(|nt| nt.downcast_ref());
-
-        match native_type {
-            Some(ct) => match ct {
-                CockroachType::Timestamptz(_) => super::utils::postgres::parse_timestamptz(str),
-                CockroachType::Timestamp(_) => super::utils::postgres::parse_timestamp(str),
-                CockroachType::Date => super::utils::common::parse_date(str),
-                CockroachType::Time(_) => super::utils::common::parse_time(str),
-                CockroachType::Timetz(_) => super::utils::postgres::parse_timetz(str),
-                _ => unreachable!(),
-            },
-            None => self.parse_json_datetime(str, self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
-        }
-    }
-
-    fn parse_json_bytes(&self, str: &str, nt: Option<NativeTypeInstance>) -> prisma_value::PrismaValueResult<Vec<u8>> {
-        let native_type: Option<&CockroachType> = nt.as_ref().map(|nt| nt.downcast_ref());
-
-        match native_type {
-            Some(ct) => match ct {
-                CockroachType::Bytes => {
-                    super::utils::postgres::parse_bytes(str).map_err(|_| prisma_value::ConversionFailure {
-                        from: "hex".into(),
-                        to: "bytes".into(),
-                    })
-                }
-                _ => unreachable!(),
-            },
-            None => self.parse_json_bytes(str, self.default_native_type_for_scalar_type(&ScalarType::Bytes)),
         }
     }
 }

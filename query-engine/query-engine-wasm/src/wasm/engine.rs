@@ -7,7 +7,7 @@ use crate::{
 };
 use driver_adapters::JsObject;
 use js_sys::Function as JsFunction;
-use psl::ConnectorRegistry;
+use psl::ValidatedConnectorRegistry;
 use quaint::connector::ExternalConnector;
 use query_core::{
     protocol::EngineProtocol,
@@ -24,7 +24,7 @@ use tracing::{field, instrument::WithSubscriber, Instrument, Level, Span};
 use tracing_subscriber::filter::LevelFilter;
 use wasm_bindgen::prelude::wasm_bindgen;
 
-const CONNECTOR_REGISTRY: ConnectorRegistry<'_> = &[
+const CONNECTOR_REGISTRY: ValidatedConnectorRegistry<'_> = &[
     #[cfg(feature = "postgresql")]
     psl::builtin_connectors::POSTGRES,
     #[cfg(feature = "mysql")]
@@ -49,17 +49,18 @@ impl QueryEngine {
         options: ConstructorOptions,
         callback: JsFunction,
         adapter: JsObject,
+        schema_as_binary: &[u8],
     ) -> Result<QueryEngine, wasm_bindgen::JsError> {
         let log_callback = LogCallback(callback);
 
         let ConstructorOptions {
-            datamodel,
-            log_level,
-            log_queries,
+            log_level, log_queries, ..
         } = options;
 
-        // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
-        let schema = psl::parse_without_validation(datamodel.into(), CONNECTOR_REGISTRY);
+        // We assume the given schema has already been validated by `prisma generate`.
+        let connector_registry: ValidatedConnectorRegistry<'_> = &CONNECTOR_REGISTRY;
+        let schema = psl::deserialize_from_bytes(schema_as_binary, &connector_registry)
+            .map_err(|err| ApiError::configuration(err.to_string()))?;
 
         let js_queryable = Arc::new(driver_adapters::from_js(adapter));
 
@@ -93,7 +94,7 @@ impl QueryEngine {
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
 
-            let preview_features = builder.schema.configuration.preview_features();
+            let preview_features = builder.schema.preview_features();
             let arced_schema = Arc::clone(&builder.schema);
 
             let engine = async move {

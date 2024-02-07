@@ -6,7 +6,7 @@ use enumflags2::BitFlags;
 /// be used as a default when no datasource is defined.
 pub struct EmptyDatamodelConnector;
 
-impl Connector for EmptyDatamodelConnector {
+impl ValidatedConnector for EmptyDatamodelConnector {
     fn provider_name(&self) -> &'static str {
         "empty"
     }
@@ -15,8 +15,8 @@ impl Connector for EmptyDatamodelConnector {
         std::any::type_name::<EmptyDatamodelConnector>()
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
-        BitFlags::all()
+    fn flavour(&self) -> Flavour {
+        unreachable!()
     }
 
     fn capabilities(&self) -> ConnectorCapabilities {
@@ -29,28 +29,12 @@ impl Connector for EmptyDatamodelConnector {
         })
     }
 
-    fn max_identifier_length(&self) -> usize {
-        usize::MAX
-    }
-
-    fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
-        &[]
-    }
-
-    fn scalar_type_for_native_type(&self, _native_type: &NativeTypeInstance) -> ScalarType {
-        ScalarType::String
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        BitFlags::all()
     }
 
     fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
         None
-    }
-
-    fn native_type_is_default_for_scalar_type(
-        &self,
-        _native_type: &NativeTypeInstance,
-        _scalar_type: &ScalarType,
-    ) -> bool {
-        false
     }
 
     fn native_type_to_parts(&self, _native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
@@ -67,13 +51,31 @@ impl Connector for EmptyDatamodelConnector {
         diagnostics.push_error(DatamodelError::new_native_type_parser_error(name, span));
         None
     }
+}
+
+impl Connector for EmptyDatamodelConnector {
+    fn max_identifier_length(&self) -> usize {
+        usize::MAX
+    }
+
+    fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
+        &[]
+    }
+
+    fn scalar_type_for_native_type(&self, _native_type: &NativeTypeInstance) -> ScalarType {
+        ScalarType::String
+    }
+
+    fn native_type_is_default_for_scalar_type(
+        &self,
+        _native_type: &NativeTypeInstance,
+        _scalar_type: &ScalarType,
+    ) -> bool {
+        false
+    }
 
     fn validate_url(&self, _url: &str) -> Result<(), String> {
         Ok(())
-    }
-
-    fn flavour(&self) -> Flavour {
-        unreachable!()
     }
 }
 

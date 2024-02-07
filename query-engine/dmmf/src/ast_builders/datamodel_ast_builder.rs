@@ -8,7 +8,7 @@ use psl::{
 };
 use query_structure::{dml_default_kind, encode_bytes, DefaultKind, FieldArity, PrismaValue};
 
-pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
+pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchemaForQE) -> Datamodel {
     let mut datamodel = Datamodel {
         models: Vec::with_capacity(schema.db.models_count()),
         enums: Vec::with_capacity(schema.db.enums_count()),
@@ -292,7 +292,7 @@ mod tests {
 
     fn render_to_dmmf(schema: &str) -> String {
         let schema = psl::parse_schema(schema).unwrap();
-        let dmmf = schema_to_dmmf(&schema);
+        let dmmf = schema_to_dmmf(&schema.into());
         serde_json::to_string_pretty(&dmmf).expect("Failed to render JSON")
     }
 

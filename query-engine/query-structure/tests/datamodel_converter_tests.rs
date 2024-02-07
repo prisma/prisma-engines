@@ -1,5 +1,6 @@
 #![allow(non_snake_case)]
 
+use psl::ValidatedSchemaForQE;
 use query_structure::*;
 use std::sync::Arc;
 
@@ -420,7 +421,7 @@ fn duplicate_relation_name() {
 
 fn convert(datamodel: &str) -> InternalDataModel {
     let schema = psl::parse_schema(datamodel).unwrap();
-    query_structure::convert(Arc::new(schema))
+    query_structure::convert(Arc::new(schema.into()))
 }
 
 trait DatamodelAssertions {

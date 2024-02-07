@@ -1,3 +1,5 @@
+#![feature(trait_upcasting)]
+
 #[cfg(not(target_arch = "wasm32"))]
 mod arch {
     // This crate only works in a Wasm environment.

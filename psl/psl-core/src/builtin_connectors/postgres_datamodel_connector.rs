@@ -7,16 +7,15 @@ pub use native_types::PostgresType;
 use crate::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
-        NativeTypeInstance, RelationMode, StringFilter, ValidatedConnector,
+        NativeTypeInstance, RelationMode, ValidatedConnector,
     },
     diagnostics::Diagnostics,
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
     Configuration, Datasource, DatasourceConnectorData, PreviewFeature,
 };
-use chrono::*;
 use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
-use std::{borrow::Cow, collections::HashMap};
+use std::collections::HashMap;
 use PostgresType::*;
 
 use super::completions;
@@ -73,9 +72,9 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     LateralJoin
 });
 
-pub struct PostgresDatamodelValidatedConnector;
+pub struct PostgresDatamodelConnector;
 
-impl ValidatedConnector for PostgresDatamodelValidatedConnector {
+impl ValidatedConnector for PostgresDatamodelConnector {
     fn provider_name(&self) -> &'static str {
         "postgresql"
     }
@@ -88,8 +87,35 @@ impl ValidatedConnector for PostgresDatamodelValidatedConnector {
         "Postgres"
     }
 
+    fn flavour(&self) -> Flavour {
+        Flavour::Postgres
+    }
+
     fn capabilities(&self) -> ConnectorCapabilities {
         CAPABILITIES
+    }
+
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        use ReferentialAction::*;
+
+        NoAction | Restrict | Cascade | SetNull | SetDefault
+    }
+
+    fn emulated_referential_actions(&self) -> BitFlags<ReferentialAction> {
+        use ReferentialAction::*;
+
+        Restrict | SetNull | Cascade
+    }
+
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
+        let native_type = SCALAR_TYPE_DEFAULTS
+            .iter()
+            .find(|(st, _)| st == scalar_type)
+            .map(|(_, native_type)| native_type)
+            .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
+            .unwrap();
+
+        Some(NativeTypeInstance::new::<PostgresType>(*native_type))
     }
 
     fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
@@ -106,9 +132,44 @@ impl ValidatedConnector for PostgresDatamodelValidatedConnector {
         let native_type = PostgresType::from_parts(name, args, span, diagnostics)?;
         Some(NativeTypeInstance::new::<PostgresType>(native_type))
     }
-}
 
-pub struct PostgresDatamodelConnector;
+    fn parse_json_datetime(
+        &self,
+        str: &str,
+        nt: Option<NativeTypeInstance>,
+    ) -> chrono::ParseResult<chrono::DateTime<chrono::FixedOffset>> {
+        let native_type: Option<&PostgresType> = nt.as_ref().map(|nt| nt.downcast_ref());
+
+        match native_type {
+            Some(pt) => match pt {
+                Timestamptz(_) => super::utils::postgres::parse_timestamptz(str),
+                Timestamp(_) => super::utils::postgres::parse_timestamp(str),
+                Date => super::utils::common::parse_date(str),
+                Time(_) => super::utils::common::parse_time(str),
+                Timetz(_) => super::utils::postgres::parse_timetz(str),
+                _ => unreachable!(),
+            },
+            None => self.parse_json_datetime(str, self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
+        }
+    }
+
+    fn parse_json_bytes(&self, str: &str, nt: Option<NativeTypeInstance>) -> prisma_value::PrismaValueResult<Vec<u8>> {
+        let native_type: Option<&PostgresType> = nt.as_ref().map(|nt| nt.downcast_ref());
+
+        match native_type {
+            Some(ct) => match ct {
+                PostgresType::ByteA => {
+                    super::utils::postgres::parse_bytes(str).map_err(|_| prisma_value::ConversionFailure {
+                        from: "hex".into(),
+                        to: "bytes".into(),
+                    })
+                }
+                _ => unreachable!(),
+            },
+            None => self.parse_json_bytes(str, self.default_native_type_for_scalar_type(&ScalarType::Bytes)),
+        }
+    }
+}
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
     (ScalarType::Int, PostgresType::Integer),
@@ -283,39 +344,11 @@ impl PostgresExtensions {
 }
 
 impl Connector for PostgresDatamodelConnector {
-    fn is_provider(&self, name: &str) -> bool {
-        ["postgresql", "postgres"].contains(&name)
-    }
-
-    fn provider_name(&self) -> &'static str {
-        "postgresql"
-    }
-
-    fn name(&self) -> &str {
-        "Postgres"
-    }
-
-    fn capabilities(&self) -> ConnectorCapabilities {
-        CAPABILITIES
-    }
-
     /// The maximum length of postgres identifiers, in bytes.
     ///
     /// Reference: <https://www.postgresql.org/docs/12/limits.html>
     fn max_identifier_length(&self) -> usize {
         63
-    }
-
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
-        use ReferentialAction::*;
-
-        NoAction | Restrict | Cascade | SetNull | SetDefault
-    }
-
-    fn emulated_referential_actions(&self) -> BitFlags<ReferentialAction> {
-        use ReferentialAction::*;
-
-        Restrict | SetNull | Cascade
     }
 
     /// Postgres accepts table definitions with a SET NULL referential action referencing a non-nullable field,
@@ -364,17 +397,6 @@ impl Connector for PostgresDatamodelConnector {
             // Bytes
             ByteA => ScalarType::Bytes,
         }
-    }
-
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
-        let native_type = SCALAR_TYPE_DEFAULTS
-            .iter()
-            .find(|(st, _)| st == scalar_type)
-            .map(|(_, native_type)| native_type)
-            .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
-            .unwrap();
-
-        Some(NativeTypeInstance::new::<PostgresType>(*native_type))
     }
 
     fn native_type_is_default_for_scalar_type(
@@ -455,35 +477,6 @@ impl Connector for PostgresDatamodelConnector {
             | IndexAlgorithm::Gin
             | IndexAlgorithm::SpGist
             | IndexAlgorithm::Brin
-    }
-
-    fn parse_native_type(
-        &self,
-        name: &str,
-        args: &[String],
-        span: ast::Span,
-        diagnostics: &mut Diagnostics,
-    ) -> Option<NativeTypeInstance> {
-        let native_type = PostgresType::from_parts(name, args, span, diagnostics)?;
-        Some(NativeTypeInstance::new::<PostgresType>(native_type))
-    }
-
-    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
-        native_type.downcast_ref::<PostgresType>().to_parts()
-    }
-
-    fn scalar_filter_name(&self, scalar_type_name: String, native_type_name: Option<&str>) -> Cow<'_, str> {
-        match native_type_name {
-            Some(name) if name.eq_ignore_ascii_case("uuid") => "Uuid".into(),
-            _ => scalar_type_name.into(),
-        }
-    }
-
-    fn string_filters(&self, input_object_name: &str) -> BitFlags<StringFilter> {
-        match input_object_name {
-            "Uuid" => BitFlags::empty(),
-            _ => BitFlags::all(),
-        }
     }
 
     fn validate_url(&self, url: &str) -> Result<(), String> {
@@ -600,47 +593,6 @@ impl Connector for PostgresDatamodelConnector {
         let properties = PostgresDatasourceProperties { extensions };
 
         DatasourceConnectorData::new(Box::new(properties))
-    }
-
-    fn flavour(&self) -> Flavour {
-        Flavour::Postgres
-    }
-
-    fn parse_json_datetime(
-        &self,
-        str: &str,
-        nt: Option<NativeTypeInstance>,
-    ) -> chrono::ParseResult<chrono::DateTime<FixedOffset>> {
-        let native_type: Option<&PostgresType> = nt.as_ref().map(|nt| nt.downcast_ref());
-
-        match native_type {
-            Some(pt) => match pt {
-                Timestamptz(_) => super::utils::postgres::parse_timestamptz(str),
-                Timestamp(_) => super::utils::postgres::parse_timestamp(str),
-                Date => super::utils::common::parse_date(str),
-                Time(_) => super::utils::common::parse_time(str),
-                Timetz(_) => super::utils::postgres::parse_timetz(str),
-                _ => unreachable!(),
-            },
-            None => self.parse_json_datetime(str, self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
-        }
-    }
-
-    fn parse_json_bytes(&self, str: &str, nt: Option<NativeTypeInstance>) -> prisma_value::PrismaValueResult<Vec<u8>> {
-        let native_type: Option<&PostgresType> = nt.as_ref().map(|nt| nt.downcast_ref());
-
-        match native_type {
-            Some(ct) => match ct {
-                PostgresType::ByteA => {
-                    super::utils::postgres::parse_bytes(str).map_err(|_| prisma_value::ConversionFailure {
-                        from: "hex".into(),
-                        to: "bytes".into(),
-                    })
-                }
-                _ => unreachable!(),
-            },
-            None => self.parse_json_bytes(str, self.default_native_type_for_scalar_type(&ScalarType::Bytes)),
-        }
     }
 }
 
