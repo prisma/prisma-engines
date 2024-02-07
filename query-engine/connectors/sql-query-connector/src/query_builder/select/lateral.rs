@@ -241,11 +241,6 @@ impl LateralJoinSelectBuilder {
 
 fn build_inline_virtual_selection<'a>(vs: &VirtualSelection) -> Expression<'a> {
     match vs {
-        VirtualSelection::RelationCount(..) => coalesce([
-            Expression::from(count(Column::from(JSON_AGG_IDENT))),
-            Expression::from(0.raw()),
-        ])
-        .alias(vs.db_alias())
-        .into(),
+        VirtualSelection::RelationCount(..) => count(Column::from(JSON_AGG_IDENT)).alias(vs.db_alias()).into(),
     }
 }
