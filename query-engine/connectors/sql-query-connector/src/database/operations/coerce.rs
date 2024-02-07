@@ -18,12 +18,29 @@ pub(crate) fn coerce_record_with_json_relation(
 ) -> crate::Result<()> {
     for (val_idx, kind) in indexes {
         let val = record.values.get_mut(*val_idx).unwrap();
-        // TODO(perf): Find ways to avoid serializing and deserializing multiple times.
-        let json_val: serde_json::Value = serde_json::from_str(val.as_json().unwrap()).unwrap();
 
-        *val = match kind {
-            IndexedSelection::Relation(rs) => coerce_json_relation_to_pv(json_val, rs)?,
-            IndexedSelection::Virtual(name) => coerce_json_virtual_field_to_pv(name, json_val)?,
+        match kind {
+            IndexedSelection::Relation(rs) => {
+                match val {
+                    PrismaValue::Null if rs.field.is_list() => {
+                        *val = PrismaValue::List(vec![]);
+                    }
+                    PrismaValue::Null if rs.field.is_optional() => {
+                        continue;
+                    }
+                    val => {
+                        // TODO(perf): Find ways to avoid serializing and deserializing multiple times.
+                        let json_val: serde_json::Value = serde_json::from_str(val.as_json().unwrap()).unwrap();
+
+                        *val = coerce_json_relation_to_pv(json_val, rs)?;
+                    }
+                }
+            }
+            IndexedSelection::Virtual(name) => {
+                let json_val: serde_json::Value = serde_json::from_str(val.as_json().unwrap()).unwrap();
+
+                *val = coerce_json_virtual_field_to_pv(name, json_val)?
+            }
         };
     }
 
@@ -34,6 +51,9 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
     let relations = rs.relations().collect_vec();
 
     match value {
+        // Some versions of MySQL return null when offsetting by more than the number of rows available.
+        serde_json::Value::Null if rs.field.is_list() => Ok(PrismaValue::List(vec![])),
+        serde_json::Value::Null if rs.field.is_optional() => Ok(PrismaValue::Null),
         // one-to-many
         serde_json::Value::Array(values) if rs.field.is_list() => {
             let iter = values.into_iter().filter_map(|value| {
@@ -56,21 +76,6 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
             };
 
             Ok(PrismaValue::List(iter.collect::<crate::Result<Vec<_>>>()?))
-        }
-        // to-one
-        serde_json::Value::Array(values) => {
-            let coerced = values
-                .into_iter()
-                .next()
-                .map(|value| coerce_json_relation_to_pv(value, rs));
-
-            // TODO(HACK): We probably want to update the sql builder instead to not aggregate to-one relations as array
-            // If the array is empty, it means there's no relations, so we coerce it to
-            if let Some(val) = coerced {
-                val
-            } else {
-                Ok(PrismaValue::Null)
-            }
         }
         serde_json::Value::Object(obj) => {
             let mut map: Vec<(String, PrismaValue)> = Vec::with_capacity(obj.len());
@@ -133,6 +138,17 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
 
                 Ok(PrismaValue::Float(bd))
             }
+            TypeIdentifier::Boolean => {
+                let err =
+                    || build_conversion_error(sf, &format!("Number({n})"), &format!("{:?}", sf.type_identifier()));
+                let i = n.as_i64().ok_or_else(err)?;
+
+                match i {
+                    0 => Ok(PrismaValue::Boolean(false)),
+                    1 => Ok(PrismaValue::Boolean(true)),
+                    _ => Err(err()),
+                }
+            }
             _ => Err(build_conversion_error(
                 sf,
                 &format!("Number({n})"),
@@ -154,7 +170,7 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
 
                 Ok(PrismaValue::DateTime(res))
             }
-            TypeIdentifier::Decimal => {
+            TypeIdentifier::Decimal | TypeIdentifier::Float => {
                 let res = parse_decimal(&s).map_err(|err| {
                     build_conversion_error_with_reason(
                         sf,
@@ -175,8 +191,7 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
                 )
             })?)),
             TypeIdentifier::Bytes => {
-                // We skip the first two characters because there's the \x prefix.
-                let bytes = hex::decode(&s[2..]).map_err(|err| {
+                let bytes = sf.parse_json_bytes(&s).map_err(|err| {
                     build_conversion_error_with_reason(
                         sf,
                         &format!("String({s})"),

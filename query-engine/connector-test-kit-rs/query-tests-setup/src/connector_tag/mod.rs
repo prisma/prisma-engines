@@ -326,6 +326,11 @@ impl ConnectorVersion {
                 | Self::Sqlite(Some(SqliteVersion::LibsqlJsWasm))
         )
     }
+
+    /// Returns `true` if the connector version is [`MySql`].
+    pub(crate) fn is_mysql(&self) -> bool {
+        matches!(self, Self::MySql(..))
+    }
 }
 
 impl fmt::Display for ConnectorVersion {
@@ -378,12 +383,12 @@ pub(crate) fn should_run(
 
     let exclusions = exclude
         .iter()
-        .filter_map(|c| ConnectorVersion::try_from(*c).ok())
+        .map(|c| ConnectorVersion::try_from(*c).unwrap())
         .collect::<Vec<_>>();
 
     let inclusions = only
         .iter()
-        .filter_map(|c| ConnectorVersion::try_from(*c).ok())
+        .map(|c| ConnectorVersion::try_from(*c).unwrap())
         .collect::<Vec<_>>();
 
     for exclusion in exclusions.iter() {

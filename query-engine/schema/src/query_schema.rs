@@ -96,6 +96,12 @@ impl QuerySchema {
                 || self.has_capability(ConnectorCapability::FullTextSearchWithIndex))
     }
 
+    pub fn can_resolve_relation_with_joins(&self) -> bool {
+        self.has_feature(PreviewFeature::RelationJoins)
+            && (self.has_capability(ConnectorCapability::LateralJoin)
+                || self.has_capability(ConnectorCapability::CorrelatedSubqueries))
+    }
+
     pub fn has_feature(&self, feature: PreviewFeature) -> bool {
         self.preview_features.contains(feature)
     }

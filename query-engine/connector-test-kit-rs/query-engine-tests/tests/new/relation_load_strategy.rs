@@ -86,7 +86,9 @@ mod relation_load_strategy {
 
     async fn assert_used_lateral_join(runner: &mut Runner, expected: bool) {
         let logs = runner.get_logs().await;
-        let actual = logs.iter().any(|l| l.contains("LEFT JOIN LATERAL"));
+        let actual = logs
+            .iter()
+            .any(|l| l.contains("LEFT JOIN LATERAL") || (l.contains("JSON_ARRAYAGG") && l.contains("JSON_OBJECT")));
 
         assert_eq!(
             actual, expected,
@@ -123,8 +125,21 @@ mod relation_load_strategy {
 
     macro_rules! relation_load_strategy_tests_pair {
         ($name:ident, $query:expr, $result:literal) => {
-            relation_load_strategy_test!($name, join, $query, $result, only(Postgres, CockroachDb));
-            relation_load_strategy_test!($name, query, $query, $result);
+            relation_load_strategy_test!(
+                $name,
+                join,
+                $query,
+                $result,
+                only(Postgres, CockroachDb, Mysql(8))
+            );
+            // TODO: Remove Mysql & Vitess exclusions once we are able to have version speficic preview features.
+            relation_load_strategy_test!(
+                $name,
+                query,
+                $query,
+                $result,
+                exclude(Mysql("5.6", "5.7", "mariadb"))
+            );
         };
     }
 
