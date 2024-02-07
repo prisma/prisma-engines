@@ -19,7 +19,7 @@ import prismaQueries from "../bench/queries.json";
 import { run, bench, group, baseline } from "mitata";
 
 import { QueryEngine as WasmBaseline } from "query-engine-wasm-baseline";
-import { QueryEngine as WasmLatest } from "query-engine-wasm-latest";
+import { QueryEngine as WasmLatest } from "query-engine-wasm-latest/postgresql/query_engine";
 
 if (!global.crypto) {
   (global as any).crypto = webcrypto;

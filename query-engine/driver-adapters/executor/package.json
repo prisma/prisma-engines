@@ -25,7 +25,7 @@
     "@libsql/client": "0.3.6",
     "@neondatabase/serverless": "0.7.2",
     "@planetscale/database": "1.15.0",
-    "query-engine-wasm-latest": "npm:@prisma/query-engine-wasm@5.10.0-8.092a72727fdea55b88bdb6f7f5fc480326b237ac",
+    "query-engine-wasm-latest": "npm:@prisma/query-engine-wasm@latest",
     "query-engine-wasm-baseline": "npm:@prisma/query-engine-wasm@0.0.19",
     "@prisma/adapter-libsql": "workspace:*",
     "@prisma/adapter-neon": "workspace:*",
