@@ -323,6 +323,17 @@
 <a href="#323" id="323">323</a>
 <a href="#324" id="324">324</a>
 <a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::proxy::{CommonProxy, DriverProxy};
 <span class="kw">use </span><span class="kw">crate</span>::types::{AdapterFlavour, Query};
 <span class="kw">use </span><span class="kw">crate</span>::JsObject;
@@ -366,9 +377,12 @@
     <span class="doccomment">/// visit a quaint query AST according to the provider of the JS connector
     </span><span class="kw">fn </span>visit_quaint_query&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, q: QuaintQuery&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; quaint::Result&lt;(String, Vec&lt;quaint::Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;)&gt; {
         <span class="kw">match </span><span class="self">self</span>.provider {
-            AdapterFlavour::Mysql =&gt; visitor::Mysql::build(q),
-            AdapterFlavour::Postgres =&gt; visitor::Postgres::build(q),
-            AdapterFlavour::Sqlite =&gt; visitor::Sqlite::build(q),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+            </span>AdapterFlavour::Mysql =&gt; visitor::Mysql::build(q),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+            </span>AdapterFlavour::Postgres =&gt; visitor::Postgres::build(q),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+            </span>AdapterFlavour::Sqlite =&gt; visitor::Sqlite::build(q),
         }
     }
 
@@ -376,9 +390,12 @@
         <span class="kw">let </span>sql: String = sql.to_string();
 
         <span class="kw">let </span>converter = <span class="kw">match </span><span class="self">self</span>.provider {
-            AdapterFlavour::Postgres =&gt; conversion::postgres::value_to_js_arg,
-            AdapterFlavour::Sqlite =&gt; conversion::sqlite::value_to_js_arg,
-            AdapterFlavour::Mysql =&gt; conversion::mysql::value_to_js_arg,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+            </span>AdapterFlavour::Postgres =&gt; conversion::postgres::value_to_js_arg,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+            </span>AdapterFlavour::Sqlite =&gt; conversion::sqlite::value_to_js_arg,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+            </span>AdapterFlavour::Mysql =&gt; conversion::mysql::value_to_js_arg,
         };
 
         <span class="kw">let </span>args = values
@@ -450,7 +467,8 @@
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::builder(ErrorKind::invalid_isolation_level(<span class="kw-2">&amp;</span>isolation_level)).build());
         }
 
-        <span class="kw">if </span><span class="self">self</span>.provider == AdapterFlavour::Sqlite {
+        <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+        </span><span class="kw">if </span><span class="self">self</span>.provider == AdapterFlavour::Sqlite {
             <span class="kw">return match </span>isolation_level {
                 IsolationLevel::Serializable =&gt; <span class="prelude-val">Ok</span>(()),
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::builder(ErrorKind::invalid_isolation_level(<span class="kw-2">&amp;</span>isolation_level)).build()),
@@ -463,8 +481,12 @@
 
     <span class="kw">fn </span>requires_isolation_first(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">match </span><span class="self">self</span>.provider {
-            AdapterFlavour::Mysql =&gt; <span class="bool-val">true</span>,
-            AdapterFlavour::Postgres | AdapterFlavour::Sqlite =&gt; <span class="bool-val">false</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+            </span>AdapterFlavour::Mysql =&gt; <span class="bool-val">true</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+            </span>AdapterFlavour::Postgres =&gt; <span class="bool-val">false</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+            </span>AdapterFlavour::Sqlite =&gt; <span class="bool-val">false</span>,
         }
     }
 }

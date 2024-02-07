@@ -146,6 +146,9 @@
 <a href="#146" id="146">146</a>
 <a href="#147" id="147">147</a>
 <a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Query Engine Driver Adapters
 //! This crate is responsible for defining a `quaint::Connector` implementation that uses functions
 //! exposed by client connectors via either `napi-rs` (on native targets) or `wasm_bindgen` / `js_sys` (on Wasm targets).
@@ -182,9 +185,12 @@
                 .build()
             }
             DriverAdapterError::GenericJs { id } =&gt; QuaintError::external_error(id),
-            DriverAdapterError::Postgres(e) =&gt; e.into(),
-            DriverAdapterError::Mysql(e) =&gt; e.into(),
-            DriverAdapterError::Sqlite(e) =&gt; e.into(),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+            </span>DriverAdapterError::Postgres(e) =&gt; e.into(),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+            </span>DriverAdapterError::Mysql(e) =&gt; e.into(),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+            </span>DriverAdapterError::Sqlite(e) =&gt; e.into(),
             <span class="comment">// in future, more error types would be added and we&#39;ll need to convert them to proper QuaintErrors here
         </span>}
     }

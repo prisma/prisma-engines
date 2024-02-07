@@ -212,7 +212,7 @@
 <span class="kw">pub use </span>row_number::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
 </span><span class="kw">pub use </span>row_to_json::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+<span class="attr">#[cfg(any(feature = <span class="string">&quot;mysql&quot;</span>, feature = <span class="string">&quot;postgresql&quot;</span>))]
 </span><span class="kw">pub use </span>search::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>sum::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>upper::<span class="kw-2">*</span>;
