@@ -1,7 +1,7 @@
 use super::{Span, WithSpan};
 
 /// An identifier.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Identifier {
     /// The identifier contents.
     pub name: String,

@@ -65,9 +65,9 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];
 
-pub struct MysqlDatamodelValidatedConnector;
+pub struct MySqlDatamodelValidatedConnector;
 
-impl ValidatedConnector for MysqlDatamodelValidatedConnector {
+impl ValidatedConnector for MySqlDatamodelValidatedConnector {
     fn provider_name(&self) -> &'static str {
         "mysql"
     }

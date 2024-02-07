@@ -3,7 +3,7 @@ use std::ops::Index;
 
 /// An attribute (following `@` or `@@``) on a model, model field, enum, enum value or composite
 /// type field.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Attribute {
     /// The name of the attribute:
     ///
@@ -46,7 +46,7 @@ impl WithSpan for Attribute {
 }
 
 /// A node containing attributes.
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, serde::Serialize, serde::Deserialize)]
 pub enum AttributeContainer {
     Model(super::ModelId),
     ModelField(super::ModelId, super::FieldId),
@@ -86,7 +86,7 @@ impl From<(super::EnumId, u32)> for AttributeContainer {
 }
 
 /// An attribute (@ or @@) node in the AST.
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AttributeId(AttributeContainer, u32);
 
 impl AttributeId {

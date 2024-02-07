@@ -19,7 +19,7 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 pub(super) struct Types {
     pub(super) composite_type_fields: BTreeMap<(ast::CompositeTypeId, ast::FieldId), CompositeTypeField>,
     scalar_fields: Vec<ScalarField>,
@@ -143,7 +143,7 @@ impl std::ops::IndexMut<ScalarFieldId> for Types {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub(super) struct CompositeTypeField {
     pub(super) r#type: ScalarFieldType,
     pub(super) mapped_name: Option<StringId>,
@@ -162,7 +162,7 @@ enum FieldType {
     Scalar(ScalarFieldType),
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct UnsupportedType {
     name: StringId,
 }
@@ -174,7 +174,7 @@ impl UnsupportedType {
 }
 
 /// The type of a scalar field, parsed and categorized.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum ScalarFieldType {
     /// A composite type
     CompositeType(ast::CompositeTypeId),
@@ -257,14 +257,14 @@ impl ScalarFieldType {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub(crate) struct DefaultAttribute {
     pub(crate) mapped_name: Option<StringId>,
     pub(crate) argument_idx: usize,
     pub(crate) default_attribute: ast::AttributeId,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub(crate) struct ScalarField {
     pub(crate) model_id: ast::ModelId,
     pub(crate) field_id: ast::FieldId,
@@ -282,7 +282,7 @@ pub(crate) struct ScalarField {
     pub(crate) native_type: Option<(StringId, StringId, Vec<String>, ast::Span)>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub(crate) struct RelationField {
     pub(crate) model_id: ast::ModelId,
     pub(crate) field_id: ast::FieldId,
@@ -320,7 +320,7 @@ impl RelationField {
 }
 
 /// Information gathered from validating attributes on a model.
-#[derive(Default, Debug)]
+#[derive(Default, Debug, serde::Serialize, serde::Deserialize)]
 pub(crate) struct ModelAttributes {
     /// @(@)id
     pub(super) primary_key: Option<IdAttribute>,
@@ -345,7 +345,7 @@ pub(crate) struct ModelAttributes {
 /// ```
 #[bitflags]
 #[repr(u8)]
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum IndexAlgorithm {
     /// Binary tree index (the default in most databases)
     BTree,
@@ -451,7 +451,7 @@ impl Default for IndexAlgorithm {
 }
 
 /// The different types of indexes supported in the Prisma Schema Language.
-#[derive(Debug, Default, Clone, Copy, PartialEq)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum IndexType {
     /// @@index
     #[default]
@@ -462,7 +462,7 @@ pub enum IndexType {
     Fulltext,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 pub(crate) struct IndexAttribute {
     pub(crate) r#type: IndexType,
     pub(crate) fields: Vec<FieldWithArgs>,
@@ -487,7 +487,7 @@ impl IndexAttribute {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub(crate) struct IdAttribute {
     pub(crate) fields: Vec<FieldWithArgs>,
     pub(super) source_field: Option<ast::FieldId>,
@@ -512,7 +512,7 @@ pub(crate) struct IdAttribute {
 ///   //       ^this thing here, path separated with `.`
 /// }
 /// ```
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct IndexFieldPath {
     /// The field in the model that starts the path to the final field included
     /// in the index. The type of this field has to be a composite type.
@@ -609,7 +609,7 @@ impl IndexFieldPath {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct FieldWithArgs {
     pub(crate) path: IndexFieldPath,
     pub(crate) sort_order: Option<SortOrder>,
@@ -617,7 +617,7 @@ pub struct FieldWithArgs {
     pub(crate) operator_class: Option<OperatorClassStore>,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 pub(super) struct EnumAttributes {
     pub(super) mapped_name: Option<StringId>,
     /// @map on enum values.
@@ -717,7 +717,7 @@ fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<Fie
 
 /// Defines operators captured by the index. Used with PostgreSQL
 /// GiST/SP-GiST/GIN/BRIN indices.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum OperatorClass {
     /// An operator class for `Gist` index and `inet` type.
     ///
@@ -1351,7 +1351,7 @@ impl fmt::Display for OperatorClass {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
 pub(crate) struct OperatorClassStore {
     pub(crate) inner: Either<OperatorClass, StringId>,
 }
@@ -1373,7 +1373,7 @@ impl OperatorClassStore {
 }
 
 /// The sort order of an index.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum SortOrder {
     /// ASCending
     Asc,
@@ -1388,7 +1388,7 @@ impl Default for SortOrder {
 }
 
 /// Prisma's builtin scalar types.
-#[derive(Debug, Copy, Clone, PartialEq, Hash, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Hash, Eq, serde::Serialize, serde::Deserialize)]
 #[allow(missing_docs)]
 pub enum ScalarType {
     Int,
@@ -1440,9 +1440,9 @@ impl ScalarType {
 }
 
 /// An opaque identifier for a model relation field in a schema.
-#[derive(Copy, Clone, PartialEq, Debug, Hash, Eq, PartialOrd, Ord)]
+#[derive(Copy, Clone, PartialEq, Debug, Hash, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub struct RelationFieldId(u32);
 
 /// An opaque identifier for a model scalar field in a schema.
-#[derive(Copy, Clone, PartialEq, Debug, Eq, Hash)]
+#[derive(Copy, Clone, PartialEq, Debug, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub struct ScalarFieldId(u32);

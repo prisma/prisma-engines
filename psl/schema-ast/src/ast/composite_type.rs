@@ -7,7 +7,7 @@ use super::{WithDocumentation, WithIdentifier};
 ///
 /// A composite type has no definition in the database schema, and is completely
 /// a Prisma concept. It gives type-safety to dynamic data such as JSON.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CompositeType {
     /// The name of the type.
     ///
@@ -56,7 +56,7 @@ impl CompositeType {
 
 /// An opaque identifier for a type definition in a schema AST. Use the
 /// `schema[type_id]` syntax to resolve the id to an `ast::CompositeType`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, serde::Serialize, serde::Deserialize)]
 pub struct CompositeTypeId(pub(super) u32);
 
 impl std::ops::Index<CompositeTypeId> for SchemaAst {

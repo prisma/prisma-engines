@@ -5,7 +5,7 @@ use std::fmt;
 /// Defines the part of the stack where referential actions are handled.
 #[bitflags]
 #[repr(u8)]
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum RelationMode {
     /// Enforced in the database. Needs support from the underlying database
     /// server.

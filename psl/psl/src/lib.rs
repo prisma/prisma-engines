@@ -5,6 +5,7 @@ pub use psl_core::builtin_connectors;
 use psl_core::diagnostics::DatamodelWarning;
 pub use psl_core::{
     datamodel_connector,
+    deserialize_from_bytes,
     diagnostics::{self, Diagnostics},
     is_reserved_type_name,
     mcf::config_to_mcf_json_value as get_config,
@@ -12,6 +13,7 @@ pub use psl_core::{
     parser_database::{self, SourceFile},
     reformat,
     schema_ast,
+    serialize_to_bytes,
     set_config_dir,
     Configuration,
     ConnectorRegistry,
@@ -21,8 +23,11 @@ pub use psl_core::{
     GeneratorConfigValue,
     PreviewFeature,
     PreviewFeatures,
+    SerdeValidatedSchema,
     StringFromEnvVar,
+    ValidatedConnectorRegistry,
     ValidatedSchema,
+    ValidatedSchemaForQE,
     ALL_PREVIEW_FEATURES,
 };
 

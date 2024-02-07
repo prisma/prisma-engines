@@ -22,7 +22,7 @@ pub(super) fn infer_relations(ctx: &mut Context<'_>) {
 }
 
 /// Identifier for a single relation in a Prisma schema.
-#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq, serde::Serialize, serde::Deserialize)]
 pub struct RelationId(u32);
 
 impl RelationId {
@@ -31,7 +31,7 @@ impl RelationId {
 }
 
 /// Identifier for a single implicit many-to-many relation in a Prisma schema.
-#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ManyToManyRelationId(pub(crate) RelationId);
 
 /// Storage for the relations in a schema.
@@ -50,7 +50,7 @@ pub struct ManyToManyRelationId(pub(crate) RelationId);
 ///   SQL database, model A would correspond to the table with the foreign
 ///   key constraint, while model B would correspond to the table referenced
 ///   by the foreign key.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 pub(crate) struct Relations {
     /// Storage. Private. Do not use directly.
     relations_storage: Vec<Relation>,
@@ -132,20 +132,20 @@ impl Relations {
     }
 }
 
-#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
+#[derive(PartialOrd, Ord, PartialEq, Eq, Debug, serde::Serialize, serde::Deserialize)]
 pub(super) enum OneToManyRelationFields {
     Forward(RelationFieldId),
     Back(RelationFieldId),
     Both(RelationFieldId, RelationFieldId),
 }
 
-#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
+#[derive(PartialOrd, Ord, PartialEq, Eq, Debug, serde::Serialize, serde::Deserialize)]
 pub(super) enum OneToOneRelationFields {
     Forward(RelationFieldId),
     Both(RelationFieldId, RelationFieldId),
 }
 
-#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
+#[derive(PartialOrd, Ord, PartialEq, Eq, Debug, serde::Serialize, serde::Deserialize)]
 pub(super) enum RelationAttributes {
     ImplicitManyToMany {
         field_a: RelationFieldId,
@@ -175,7 +175,7 @@ impl RelationAttributes {
     }
 }
 
-#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
+#[derive(PartialOrd, Ord, PartialEq, Eq, Debug, serde::Serialize, serde::Deserialize)]
 pub(crate) struct Relation {
     /// The `name` argument in `@relation`.
     pub(super) relation_name: Option<StringId>,
@@ -427,7 +427,7 @@ pub(super) fn ingest_relation<'db>(evidence: RelationEvidence<'db>, relations: &
 /// ```
 #[repr(u8)]
 #[bitflags]
-#[derive(Debug, Copy, PartialEq, Clone)]
+#[derive(Debug, Copy, PartialEq, Clone, serde::Serialize, serde::Deserialize)]
 pub enum ReferentialAction {
     /// Deletes record if dependent record is deleted. Updates relation scalar
     /// fields if referenced scalar fields of the dependent record are updated.
