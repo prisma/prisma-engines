@@ -646,7 +646,3 @@ fn supports_lateral_join(args: &QueryArguments) -> bool {
         .connector
         .has_capability(ConnectorCapability::LateralJoin)
 }
-
-fn relation_count_alias_name(rf: &RelationField) -> String {
-    format!("aggr_count_{}_{}", rf.model().name(), rf.name())
-}
