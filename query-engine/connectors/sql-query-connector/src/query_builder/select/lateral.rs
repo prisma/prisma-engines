@@ -15,6 +15,12 @@ use query_structure::*;
 #[derive(Debug, Default)]
 pub(crate) struct LateralJoinSelectBuilder {
     alias: Alias,
+
+    // TODO: consider using references to `VirtualSelection` as keys to avoid cloning. This would
+    // have an effect on a big chunk of API of `JoinSelectBuilder` as we will need to prove that
+    // the builder itself does not outlive the `FieldSelection` passed as the parameter of `build`
+    // method, and introduce relationships between the lifetime of `self` and parameters of various
+    // methods.
     visited_virtuals: HashMap<VirtualSelection, String>,
 }
 
@@ -105,7 +111,6 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         let mut to_many_select = self.build_to_many_select(rs, parent_alias, ctx);
 
         if let Some(vs) = self.find_compatible_virtual_for_relation(rs, parent_virtuals) {
-            // TODO: avoid cloning vs
             self.visited_virtuals.insert(vs.clone(), join_table_alias.clone());
             to_many_select = to_many_select.value(build_inline_virtual_selection(vs));
         }
@@ -140,7 +145,6 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         let relation_count_select = self.build_virtual_select(vs, parent_alias, ctx);
         let table = Table::from(relation_count_select).alias(alias.to_table_string());
 
-        // TODO: avoid cloning, consider using references as keys
         self.visited_virtuals.insert(vs.clone(), alias.to_table_string());
 
         select.left_join_lateral(table.on(ConditionTree::single(true.raw())))
