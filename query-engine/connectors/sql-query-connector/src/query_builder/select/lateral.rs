@@ -202,8 +202,8 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         self.alias
     }
 
-    fn visited_virtuals(&self) -> &HashMap<VirtualSelection, String> {
-        &self.visited_virtuals
+    fn already_processed_virtual(&self, vs: &VirtualSelection) -> bool {
+        self.visited_virtuals.contains_key(vs)
     }
 }
 

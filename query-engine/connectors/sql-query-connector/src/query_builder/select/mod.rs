@@ -1,7 +1,7 @@
 mod lateral;
 mod subquery;
 
-use std::{borrow::Cow, collections::HashMap};
+use std::borrow::Cow;
 use tracing::Span;
 
 use psl::datamodel_connector::{ConnectorCapability, Flavour};
@@ -91,11 +91,8 @@ pub(crate) trait JoinSelectBuilder {
     ) -> Expression<'static>;
     /// Get the next alias for a table.
     fn next_alias(&mut self) -> Alias;
-    /// Returns a hash map of virtual selections that have already been added to the query, storing
-    /// the table aliases where the corresponding value can be taken from.
-    /// TODO: hash map should be an implementation detail of a specific builder, replace with
-    /// a method to get an alias by virtual selection: fn(&VirtualSelection) -> Option<String>
-    fn visited_virtuals(&self) -> &HashMap<VirtualSelection, String>;
+    /// Checks if a virtual selection has already been added to the query at an earlier stage.
+    fn already_processed_virtual(&self, vs: &VirtualSelection) -> bool;
 
     fn with_selection<'a>(
         &mut self,
@@ -274,7 +271,7 @@ pub(crate) trait JoinSelectBuilder {
         ctx: &Context<'_>,
     ) -> Select<'a> {
         selections.fold(select, |acc, vs| {
-            if self.visited_virtuals().contains_key(vs) {
+            if self.already_processed_virtual(vs) {
                 acc
             } else {
                 self.add_virtual_selection(acc, vs, parent_alias, ctx)
