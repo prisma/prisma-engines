@@ -206,7 +206,7 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         self.alias
     }
 
-    fn already_processed_virtual(&self, vs: &VirtualSelection) -> bool {
+    fn was_virtual_processed_in_relation(&self, vs: &VirtualSelection) -> bool {
         self.visited_virtuals.contains_key(vs)
     }
 }

@@ -148,7 +148,7 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
         self.alias
     }
 
-    fn already_processed_virtual(&self, _vs: &VirtualSelection) -> bool {
+    fn was_virtual_processed_in_relation(&self, _vs: &VirtualSelection) -> bool {
         false
     }
 }

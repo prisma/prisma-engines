@@ -91,8 +91,9 @@ pub(crate) trait JoinSelectBuilder {
     ) -> Expression<'static>;
     /// Get the next alias for a table.
     fn next_alias(&mut self) -> Alias;
-    /// Checks if a virtual selection has already been added to the query at an earlier stage.
-    fn already_processed_virtual(&self, vs: &VirtualSelection) -> bool;
+    /// Checks if a virtual selection has already been added to the query at an earlier stage
+    /// as a part of a relation query for a matching relation field.
+    fn was_virtual_processed_in_relation(&self, vs: &VirtualSelection) -> bool;
 
     fn with_selection<'a>(
         &mut self,
@@ -271,7 +272,7 @@ pub(crate) trait JoinSelectBuilder {
         ctx: &Context<'_>,
     ) -> Select<'a> {
         selections.fold(select, |acc, vs| {
-            if self.already_processed_virtual(vs) {
+            if self.was_virtual_processed_in_relation(vs) {
                 acc
             } else {
                 self.add_virtual_selection(acc, vs, parent_alias, ctx)
