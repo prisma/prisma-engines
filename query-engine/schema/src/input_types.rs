@@ -16,7 +16,7 @@ pub struct InputObjectType<'a> {
 }
 
 impl PartialEq for InputObjectType<'_> {
-    #[allow(clippy::unconditional_recursion)]
+    #[allow(unconditional_recursion)]
     fn eq(&self, other: &Self) -> bool {
         self.identifier.eq(&other.identifier)
     }

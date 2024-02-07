@@ -45,7 +45,7 @@ impl<'db, I> PartialEq for Walker<'db, I>
 where
     I: PartialEq,
 {
-    #[allow(clippy::unconditional_recursion)]
+    #[allow(unconditional_recursion)]
     fn eq(&self, other: &Self) -> bool {
         self.id.eq(&other.id)
     }
