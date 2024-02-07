@@ -46,8 +46,8 @@
       ${self'.packages.update-engine-size}/bin/update-engine-size             \
           ${self'.packages.query-engine-bin-and-lib}/bin/query-engine         \
           ${self'.packages.query-engine-bin-and-lib}/lib/libquery_engine.node \
-          ${self'.packages.query-engine-wasm-gz}/query-engine-postgres.wasm.gz           \
-          ${self'.packages.query-engine-wasm-gz}/query-engine-postgres.wasm              \
+          ${self'.packages.query-engine-wasm-gz}/query-engine-postgresql.wasm.gz           \
+          ${self'.packages.query-engine-wasm-gz}/query-engine-postgresql.wasm              \
           ${self'.packages.query-engine-wasm-gz}/query-engine-mysql.wasm.gz                \
           ${self'.packages.query-engine-wasm-gz}/query-engine-mysql.wasm                   \
           ${self'.packages.query-engine-wasm-gz}/query-engine-sqlite.wasm.gz               \
