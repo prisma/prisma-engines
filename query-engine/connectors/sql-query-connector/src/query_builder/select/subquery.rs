@@ -79,10 +79,11 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
         select.value(Expression::from(subselect).alias(rs.field.name().to_owned()))
     }
 
-    fn add_many_to_many_relation<'a>(
+    fn add_many_to_many_relation<'a, 'b>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
+        _parent_virtuals: impl Iterator<Item = &'b VirtualSelection>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {

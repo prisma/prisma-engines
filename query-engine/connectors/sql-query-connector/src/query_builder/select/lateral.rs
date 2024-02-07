@@ -114,14 +114,15 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         select.left_join(join_table.on(ConditionTree::single(true.raw())).lateral())
     }
 
-    fn add_many_to_many_relation<'a>(
+    fn add_many_to_many_relation<'a, 'b>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
+        parent_virtuals: impl Iterator<Item = &'b VirtualSelection>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        let m2m_join = self.build_m2m_join(rs, parent_alias, ctx);
+        let m2m_join = self.build_m2m_join(rs, parent_virtuals, parent_alias, ctx);
 
         select.left_join(m2m_join)
     }
@@ -205,11 +206,18 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
 }
 
 impl LateralJoinSelectBuilder {
-    fn build_m2m_join<'a>(&mut self, rs: &RelationSelection, parent_alias: Alias, ctx: &Context<'_>) -> JoinData<'a> {
+    fn build_m2m_join<'a, 'b>(
+        &mut self,
+        rs: &RelationSelection,
+        parent_virtuals: impl Iterator<Item = &'b VirtualSelection>,
+        parent_alias: Alias,
+        ctx: &Context<'_>,
+    ) -> JoinData<'a> {
         let rf = rs.field.clone();
         let m2m_table_alias = self.next_alias();
         let m2m_join_alias = self.next_alias();
         let outer_alias = self.next_alias();
+        let json_data_alias = m2m_join_alias_name(&rf);
 
         let m2m_join_data = Table::from(self.build_to_many_select(rs, m2m_table_alias, ctx))
             .alias(m2m_join_alias.to_table_string())
@@ -228,12 +236,17 @@ impl LateralJoinSelectBuilder {
             .with_pagination(rs.args.take_abs(), rs.args.skip)
             .comment("inner"); // adds pagination
 
-        let outer = Select::from_table(Table::from(inner).alias(outer_alias.to_table_string()))
+        let mut outer = Select::from_table(Table::from(inner).alias(outer_alias.to_table_string()))
             .value(json_agg())
             .comment("outer");
 
+        if let Some(vs) = self.find_compatible_virtual_for_relation(rs, parent_virtuals) {
+            self.visited_virtuals.insert(vs.clone(), json_data_alias.clone());
+            outer = outer.value(build_inline_virtual_selection(vs));
+        }
+
         Table::from(outer)
-            .alias(m2m_join_alias_name(&rf))
+            .alias(json_data_alias)
             .on(ConditionTree::single(true.raw()))
             .lateral()
     }

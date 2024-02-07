@@ -54,10 +54,11 @@ pub(crate) trait JoinSelectBuilder {
         ctx: &Context<'_>,
     ) -> Select<'a>;
     /// Adds to `select` the SQL statements to fetch a m-n relation.
-    fn add_many_to_many_relation<'a>(
+    fn add_many_to_many_relation<'a, 'b>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
+        parent_virtuals: impl Iterator<Item = &'b VirtualSelection>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a>;
@@ -239,7 +240,7 @@ pub(crate) trait JoinSelectBuilder {
         ctx: &Context<'_>,
     ) -> Select<'a> {
         match (rs.field.is_list(), rs.field.relation().is_many_to_many()) {
-            (true, true) => self.add_many_to_many_relation(select, rs, parent_alias, ctx),
+            (true, true) => self.add_many_to_many_relation(select, rs, parent_virtuals, parent_alias, ctx),
             (true, false) => self.add_to_many_relation(select, rs, parent_virtuals, parent_alias, ctx),
             (false, _) => self.add_to_one_relation(select, rs, parent_alias, ctx),
         }
