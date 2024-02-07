@@ -136,17 +136,17 @@ in
       OUT_FOLDER=$(mktemp -dt wasm-engine-out-XXXX)
       ${self'.packages.build-engine-wasm}/bin/build-engine-wasm "0.0.0" "$OUT_FOLDER" 
 
-      for provider in "postgresql" "mysql" "sqlite"; do
-        gzip -ckn "$OUT_FOLDER/$provider/query_engine_bg.wasm" > "$provider.wasm.gz"
+      for provider in "postgres" "mysql" "sqlite"; do
+        gzip -ckn "$OUT_FOLDER/$provider/query_engine_bg.wasm" > "query-engine-$provider.wasm.gz"
       done
       '';
 
       installPhase = ''
       set +x
       mkdir -p $out
-      for provider in "postgresql" "mysql" "sqlite"; do
-        cp "$OUT_FOLDER/$provider/query_engine_bg.wasm" "$out/$provider.wasm"
-        cp "$provider.wasm.gz" "$out/"
+      for provider in "postgres" "mysql" "sqlite"; do
+        cp "$OUT_FOLDER/$provider/query_engine_bg.wasm" "$out/query-engine-$provider.wasm"
+        cp "query-engine-$provider.wasm.gz" "$out/"
       done
       '';
     })
