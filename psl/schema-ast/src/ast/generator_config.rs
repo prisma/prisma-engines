@@ -2,7 +2,7 @@ use super::{Comment, Identifier, Span, WithDocumentation, WithIdentifier, WithSp
 use crate::ast::config::ConfigBlockProperty;
 
 /// A Generator block declaration.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct GeneratorConfig {
     /// Name of this generator.
     pub name: Identifier,

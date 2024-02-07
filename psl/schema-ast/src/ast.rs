@@ -45,7 +45,7 @@ pub use traits::{WithAttributes, WithDocumentation, WithIdentifier, WithName, Wi
 /// annotated with its location in the text representation.
 /// Basically, the AST is an object oriented representation of the datamodel's text.
 /// Schema = Datamodel + Generators + Datasources
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct SchemaAst {
     /// All models, enums, composite types, datasources, generators and type aliases.
     pub tops: Vec<Top>,
@@ -73,7 +73,7 @@ impl SchemaAst {
 
 /// An opaque identifier for a model in a schema AST. Use the
 /// `schema[model_id]` syntax to resolve the id to an `ast::Model`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, serde::Serialize, serde::Deserialize)]
 pub struct ModelId(u32);
 
 impl ModelId {
@@ -92,7 +92,7 @@ impl std::ops::Index<ModelId> for SchemaAst {
 }
 
 /// An opaque identifier for an enum in a schema AST.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, serde::Serialize, serde::Deserialize)]
 pub struct EnumId(u32);
 
 impl std::ops::Index<EnumId> for SchemaAst {
@@ -104,11 +104,11 @@ impl std::ops::Index<EnumId> for SchemaAst {
 }
 
 /// An opaque identifier for a generator block in a schema AST.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, serde::Serialize, serde::Deserialize)]
 pub struct GeneratorId(u32);
 
 /// An opaque identifier for a datasource block in a schema AST.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, serde::Serialize, serde::Deserialize)]
 pub struct SourceId(u32);
 
 impl std::ops::Index<SourceId> for SchemaAst {
@@ -121,7 +121,7 @@ impl std::ops::Index<SourceId> for SchemaAst {
 
 /// An identifier for a top-level item in a schema AST. Use the `schema[top_id]`
 /// syntax to resolve the id to an `ast::Top`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, serde::Serialize, serde::Deserialize)]
 pub enum TopId {
     /// A composite type
     CompositeType(CompositeTypeId),

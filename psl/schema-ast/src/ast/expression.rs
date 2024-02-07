@@ -2,7 +2,7 @@ use crate::ast::{self, Span};
 use std::fmt;
 
 /// Represents arbitrary, even nested, expressions.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub enum Expression {
     /// Any numeric value e.g. floats or ints.
     NumericValue(String, Span),
