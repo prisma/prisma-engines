@@ -128,7 +128,7 @@ impl FilterVisitor {
             .field
             .dm
             .schema
-            .connector
+            .connector()
             .capabilities()
             .contains(ConnectorCapability::RowIn);
         let has_compound_fields = filter.field.linking_fields().into_inner().len() > 1;

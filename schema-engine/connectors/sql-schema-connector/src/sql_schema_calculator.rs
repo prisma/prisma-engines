@@ -10,7 +10,7 @@ use psl::{
         walkers::{ModelWalker, ScalarFieldWalker},
         ReferentialAction, ScalarFieldType, ScalarType, SortOrder,
     },
-    ValidatedSchema,
+    ValidSchema, ValidatedSchema,
 };
 use sql_schema_describer::{self as sql, PrismaValue};
 use std::collections::HashMap;

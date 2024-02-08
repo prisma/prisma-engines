@@ -20,7 +20,7 @@ impl<I: Eq> Eq for Zipper<I> {}
 
 impl<I: Copy> Zipper<I> {
     pub fn walker(&self) -> Walker<'_, I> {
-        self.dm.schema.db.walk(self.id)
+        self.dm.schema.db().walk(self.id)
     }
 }
 

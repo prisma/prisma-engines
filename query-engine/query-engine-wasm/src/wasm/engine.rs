@@ -7,7 +7,7 @@ use crate::{
 };
 use driver_adapters::JsObject;
 use js_sys::Function as JsFunction;
-use psl::ValidatedConnectorRegistry;
+use psl::{ValidSchema, ValidatedConnectorRegistry};
 use quaint::connector::ExternalConnector;
 use query_core::{
     protocol::EngineProtocol,

@@ -70,10 +70,10 @@ impl ScalarField {
         }
     }
 
-    pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchemaForQE) -> &'a str {
+    pub fn borrowed_name<'a>(&self, schema: &'a dyn psl::ValidSchema) -> &'a str {
         match self.id {
-            ScalarFieldId::InModel(id) => schema.db.walk(id).name(),
-            ScalarFieldId::InCompositeType(id) => schema.db.walk(id).name(),
+            ScalarFieldId::InModel(id) => schema.db().walk(id).name(),
+            ScalarFieldId::InCompositeType(id) => schema.db().walk(id).name(),
         }
     }
 
@@ -155,7 +155,7 @@ impl ScalarField {
     }
 
     pub fn native_type(&self) -> Option<NativeTypeInstance> {
-        let connector = self.dm.schema.connector;
+        let connector = self.dm.schema.connector();
 
         let raw_nt = match self.id {
             ScalarFieldId::InModel(id) => self.dm.walk(id).raw_native_type(),
@@ -180,14 +180,14 @@ impl ScalarField {
 
     pub fn parse_json_datetime(&self, value: &str) -> chrono::ParseResult<DateTime<FixedOffset>> {
         let nt = self.native_type().map(|nt| nt.native_type);
-        let connector = self.dm.schema.connector;
+        let connector = self.dm.schema.connector();
 
         connector.parse_json_datetime(value, nt)
     }
 
     pub fn parse_json_bytes(&self, value: &str) -> PrismaValueResult<Vec<u8>> {
         let nt = self.native_type().map(|nt| nt.native_type);
-        let connector = self.dm.schema.connector;
+        let connector = self.dm.schema.connector();
 
         connector.parse_json_bytes(value, nt)
     }

@@ -18,9 +18,9 @@ pub enum Field {
 }
 
 impl Field {
-    pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchemaForQE) -> &'a str {
+    pub fn borrowed_name<'a>(&self, schema: &'a dyn psl::ValidSchema) -> &'a str {
         match self {
-            Field::Relation(rf) => schema.db.walk(rf.id).name(),
+            Field::Relation(rf) => schema.db().walk(rf.id).name(),
             Field::Scalar(sf) => sf.borrowed_name(schema),
             Field::Composite(cf) => cf.borrowed_name(schema),
         }
@@ -159,7 +159,7 @@ impl TypeIdentifier {
         )
     }
 
-    pub fn type_name(&self, schema: &psl::ValidatedSchemaForQE) -> Cow<'static, str> {
+    pub fn type_name(&self, schema: &dyn psl::ValidSchema) -> Cow<'static, str> {
         match self {
             TypeIdentifier::String => "String".into(),
             TypeIdentifier::Int => "Int".into(),
@@ -168,7 +168,7 @@ impl TypeIdentifier {
             TypeIdentifier::Decimal => "Decimal".into(),
             TypeIdentifier::Boolean => "Bool".into(),
             TypeIdentifier::Enum(enum_id) => {
-                let enum_name = schema.db.walk(*enum_id).name();
+                let enum_name = schema.db().walk(*enum_id).name();
                 format!("Enum{enum_name}").into()
             }
             TypeIdentifier::UUID => "UUID".into(),

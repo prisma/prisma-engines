@@ -12,6 +12,12 @@ use std::{
 #[cfg(target_arch = "wasm32")]
 use tsify::Tsify;
 
+// This seems slightly better than a runtime downcast in the Query Engine's constructors...
+#[cfg(not(target_arch = "wasm32"))]
+type PslSchema = psl::ValidatedSchema;
+#[cfg(target_arch = "wasm32")]
+type PslSchema = psl::ValidatedSchemaForQE;
+
 /// The state of the engine.
 pub enum Inner {
     /// Not connected, holding all data to form a connection.
@@ -47,7 +53,7 @@ pub struct EngineBuilderNative {
 
 /// Everything needed to connect to the database and have the core running.
 pub struct EngineBuilder {
-    pub schema: Arc<psl::ValidatedSchemaForQE>,
+    pub schema: Arc<PslSchema>,
     pub engine_protocol: EngineProtocol,
 
     #[cfg(not(target_arch = "wasm32"))]
@@ -63,7 +69,7 @@ pub struct ConnectedEngineNative {
 
 /// Internal structure for querying and reconnecting with the engine.
 pub struct ConnectedEngine {
-    pub schema: Arc<psl::ValidatedSchemaForQE>,
+    pub schema: Arc<PslSchema>,
     pub query_schema: Arc<QuerySchema>,
     pub executor: crate::Executor,
     pub engine_protocol: EngineProtocol,

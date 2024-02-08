@@ -65,7 +65,15 @@ impl SerdeValidatedSchema {
     }
 }
 
+pub trait ValidSchema: Sync + Send + 'static {
+    fn db(&self) -> &parser_database::ParserDatabase;
+    fn preview_features(&self) -> enumflags2::BitFlags<PreviewFeature>;
+    fn relation_mode(&self) -> datamodel_connector::RelationMode;
+    fn connector(&self) -> &'static dyn datamodel_connector::ValidatedConnector;
+}
+
 /// `SchemaForQE` is the `query-engine`-specific specific variant of `ValidatedSchema`.
+/// More specifically, it's for the size-optimized `query-engine-wasm`.
 pub struct ValidatedSchemaForQE {
     pub db: parser_database::ParserDatabase,
     pub preview_features: enumflags2::BitFlags<PreviewFeature>,
@@ -73,13 +81,39 @@ pub struct ValidatedSchemaForQE {
     pub connector: &'static dyn datamodel_connector::ValidatedConnector,
 }
 
-impl ValidatedSchemaForQE {
-    pub fn preview_features(&self) -> enumflags2::BitFlags<PreviewFeature> {
+impl ValidSchema for ValidatedSchemaForQE {
+    fn db(&self) -> &parser_database::ParserDatabase {
+        &self.db
+    }
+
+    fn preview_features(&self) -> enumflags2::BitFlags<PreviewFeature> {
         self.preview_features
     }
 
-    pub fn relation_mode(&self) -> datamodel_connector::RelationMode {
+    fn relation_mode(&self) -> datamodel_connector::RelationMode {
         self.relation_mode
+    }
+
+    fn connector(&self) -> &'static dyn datamodel_connector::ValidatedConnector {
+        self.connector
+    }
+}
+
+impl ValidSchema for std::sync::Arc<dyn ValidSchema + 'static> {
+    fn db(&self) -> &ParserDatabase {
+        (**self).db()
+    }
+
+    fn preview_features(&self) -> enumflags2::BitFlags<PreviewFeature> {
+        (**self).preview_features()
+    }
+
+    fn relation_mode(&self) -> datamodel_connector::RelationMode {
+        (**self).relation_mode()
+    }
+
+    fn connector(&self) -> &'static dyn datamodel_connector::ValidatedConnector {
+        (**self).connector()
     }
 }
 
@@ -119,15 +153,27 @@ pub struct ValidatedSchema {
     relation_mode: datamodel_connector::RelationMode,
 }
 
-impl std::fmt::Debug for ValidatedSchema {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("<Prisma schema>")
+impl ValidSchema for ValidatedSchema {
+    fn db(&self) -> &parser_database::ParserDatabase {
+        &self.db
+    }
+
+    fn preview_features(&self) -> enumflags2::BitFlags<PreviewFeature> {
+        self.configuration.preview_features()
+    }
+
+    fn relation_mode(&self) -> datamodel_connector::RelationMode {
+        self.relation_mode
+    }
+
+    fn connector(&self) -> &'static dyn datamodel_connector::ValidatedConnector {
+        self.connector
     }
 }
 
-impl ValidatedSchema {
-    pub fn relation_mode(&self) -> datamodel_connector::RelationMode {
-        self.relation_mode
+impl std::fmt::Debug for ValidatedSchema {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("<Prisma schema>")
     }
 }
 

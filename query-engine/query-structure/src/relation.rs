@@ -57,7 +57,7 @@ impl Relation {
                     .relation_fields()
                     .next()
                     .unwrap()
-                    .default_on_delete_action(self.dm.schema.relation_mode(), self.dm.schema.connector)
+                    .default_on_delete_action(self.dm.schema.relation_mode(), self.dm.schema.connector())
             })
     }
 

@@ -18,17 +18,17 @@ use crate::*;
 use psl::{datamodel_connector::ConnectorCapability, PreviewFeatures};
 use query_structure::{ast, Field as ModelField, Model, RelationFieldRef, TypeIdentifier};
 
-pub fn build(schema: Arc<psl::ValidatedSchemaForQE>, enable_raw_queries: bool) -> QuerySchema {
+pub fn build(schema: Arc<dyn psl::ValidSchema>, enable_raw_queries: bool) -> QuerySchema {
     let preview_features = schema.preview_features();
     build_with_features(schema, preview_features, enable_raw_queries)
 }
 
 pub fn build_with_features(
-    schema: Arc<psl::ValidatedSchemaForQE>,
+    schema: Arc<dyn psl::ValidSchema>,
     preview_features: PreviewFeatures,
     enable_raw_queries: bool,
 ) -> QuerySchema {
-    let connector = schema.connector;
+    let connector = schema.connector();
     let internal_data_model = query_structure::convert(schema);
     QuerySchema::new(enable_raw_queries, connector, preview_features, internal_data_model)
 }

@@ -132,7 +132,7 @@ impl QuerySchema {
         tag: QueryTag,
     ) -> Option<OutputField<'_>> {
         let model = model_name
-            .and_then(|name| self.internal_data_model.schema.db.find_model(name))
+            .and_then(|name| self.internal_data_model.schema.db().find_model(name))
             .map(|m| m.id);
         let query_info = QueryInfo { model, tag };
 
@@ -147,7 +147,7 @@ impl QuerySchema {
         tag: QueryTag,
     ) -> Option<OutputField<'_>> {
         let model = model_name
-            .and_then(|name| self.internal_data_model.schema.db.find_model(name))
+            .and_then(|name| self.internal_data_model.schema.db().find_model(name))
             .map(|m| m.id);
         let query_info = QueryInfo { model, tag };
 

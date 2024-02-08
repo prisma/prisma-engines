@@ -24,6 +24,7 @@ pub use psl_core::{
     PreviewFeatures,
     SerdeValidatedSchema,
     StringFromEnvVar,
+    ValidSchema,
     ValidatedConnectorRegistry,
     ValidatedSchema,
     ValidatedSchemaForQE,
