@@ -151,12 +151,6 @@ impl std::fmt::Debug for ValidatedSchema {
     }
 }
 
-impl ValidatedSchema {
-    pub fn relation_mode(&self) -> datamodel_connector::RelationMode {
-        self.relation_mode
-    }
-}
-
 /// The most general API for dealing with Prisma schemas. It accumulates what analysis and
 /// validation information it can, and returns it along with any error and warning diagnostics.
 pub fn validate(file: SourceFile, connectors: ConnectorRegistry<'_>) -> ValidatedSchema {

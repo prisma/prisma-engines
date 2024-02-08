@@ -15,9 +15,10 @@ pub fn dmmf_json_from_schema(schema: &str) -> String {
     serde_json::to_string(&dmmf).unwrap()
 }
 
+#[cfg_attr(not(target_arch = "wasm32"), allow(clippy::useless_conversion))]
 pub fn dmmf_from_schema(schema: &str) -> DataModelMetaFormat {
     let schema = psl::parse_schema(schema).unwrap();
-    from_precomputed_parts(&schema::build(Arc::new(schema), true))
+    from_precomputed_parts(&schema::build(Arc::new(schema.into()), true))
 }
 
 pub fn from_precomputed_parts(query_schema: &QuerySchema) -> DataModelMetaFormat {

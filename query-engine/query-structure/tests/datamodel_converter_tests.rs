@@ -1,6 +1,5 @@
 #![allow(non_snake_case)]
 
-use psl::ValidatedSchemaForQE;
 use query_structure::*;
 use std::sync::Arc;
 

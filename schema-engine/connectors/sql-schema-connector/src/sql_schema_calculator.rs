@@ -10,12 +10,12 @@ use psl::{
         walkers::{ModelWalker, ScalarFieldWalker},
         ReferentialAction, ScalarFieldType, ScalarType, SortOrder,
     },
-    ValidatedSchema,
+    ValidSchema,
 };
 use sql_schema_describer::{self as sql, PrismaValue};
 use std::collections::HashMap;
 
-pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn SqlFlavour) -> SqlDatabaseSchema {
+pub(crate) fn calculate_sql_schema(datamodel: &psl::ValidatedSchema, flavour: &dyn SqlFlavour) -> SqlDatabaseSchema {
     let mut schema = SqlDatabaseSchema::default();
 
     let mut context = Context {
@@ -578,7 +578,7 @@ fn column_arity(arity: ast::FieldArity) -> sql::ColumnArity {
 }
 
 pub(crate) struct Context<'a> {
-    datamodel: &'a ValidatedSchema,
+    datamodel: &'a psl::ValidatedSchema,
     schema: &'a mut SqlDatabaseSchema,
     flavour: &'a dyn SqlFlavour,
     schemas: HashMap<&'a str, sql::NamespaceId>,
