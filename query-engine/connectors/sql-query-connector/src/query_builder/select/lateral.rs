@@ -11,17 +11,26 @@ use std::collections::HashMap;
 use quaint::ast::*;
 use query_structure::*;
 
+/// Represents a projection of a virtual field that is cheap to clone and compare but still has
+/// enough information to determine whether it refers to the same field.
+#[derive(PartialEq, Eq, Hash, Debug)]
+enum VirtualSelectionKey {
+    RelationCount(RelationField),
+}
+
+impl From<&VirtualSelection> for VirtualSelectionKey {
+    fn from(vs: &VirtualSelection) -> Self {
+        match vs {
+            VirtualSelection::RelationCount(rf, _) => Self::RelationCount(rf.clone()),
+        }
+    }
+}
+
 /// Select builder for joined queries. Relations are resolved using LATERAL JOINs.
 #[derive(Debug, Default)]
 pub(crate) struct LateralJoinSelectBuilder {
     alias: Alias,
-
-    // TODO: consider using references to `VirtualSelection` as keys to avoid cloning. This would
-    // have an effect on a big chunk of API of `JoinSelectBuilder` as we will need to prove that
-    // the builder itself does not outlive the `FieldSelection` passed as the parameter of `build`
-    // method, and introduce relationships between the lifetime of `self` and parameters of various
-    // methods.
-    visited_virtuals: HashMap<VirtualSelection, String>,
+    visited_virtuals: HashMap<VirtualSelectionKey, String>,
 }
 
 impl JoinSelectBuilder for LateralJoinSelectBuilder {
@@ -111,7 +120,7 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         let mut to_many_select = self.build_to_many_select(rs, parent_alias, ctx);
 
         if let Some(vs) = self.find_compatible_virtual_for_relation(rs, parent_virtuals) {
-            self.visited_virtuals.insert(vs.clone(), join_table_alias.clone());
+            self.visited_virtuals.insert(vs.into(), join_table_alias.clone());
             to_many_select = to_many_select.value(build_inline_virtual_selection(vs));
         }
 
@@ -145,7 +154,7 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         let relation_count_select = self.build_virtual_select(vs, parent_alias, ctx);
         let table = Table::from(relation_count_select).alias(alias.to_table_string());
 
-        self.visited_virtuals.insert(vs.clone(), alias.to_table_string());
+        self.visited_virtuals.insert(vs.into(), alias.to_table_string());
 
         select.left_join_lateral(table.on(ConditionTree::single(true.raw())))
     }
@@ -191,7 +200,7 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
     ) -> Expression<'static> {
         let virtual_selection_alias = self
             .visited_virtuals
-            .remove(vs)
+            .remove(&vs.into())
             .expect("All virtual fields must be visited before calling build_virtual_expr");
 
         coalesce([
@@ -207,7 +216,7 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
     }
 
     fn was_virtual_processed_in_relation(&self, vs: &VirtualSelection) -> bool {
-        self.visited_virtuals.contains_key(vs)
+        self.visited_virtuals.contains_key(&vs.into())
     }
 }
 
@@ -247,7 +256,7 @@ impl LateralJoinSelectBuilder {
             .comment("outer");
 
         if let Some(vs) = self.find_compatible_virtual_for_relation(rs, parent_virtuals) {
-            self.visited_virtuals.insert(vs.clone(), json_data_alias.clone());
+            self.visited_virtuals.insert(vs.into(), json_data_alias.clone());
             outer = outer.value(build_inline_virtual_selection(vs));
         }
 
