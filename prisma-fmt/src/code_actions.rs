@@ -12,7 +12,7 @@ use psl::{
         SourceFile,
     },
     schema_ast::ast::{Attribute, IndentationType, NewlineType, WithSpan},
-    PreviewFeature,
+    PreviewFeature, ValidSchema,
 };
 use std::{collections::HashMap, sync::Arc};
 
