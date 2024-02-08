@@ -67,7 +67,7 @@ fn drop_db_when_thread_exits(admin_url: Url, db_name: &str) {
     }
 
     thread_local! {
-        static NOTIFIER: RefCell<Option<Notifier>> = RefCell::new(None);
+        static NOTIFIER: RefCell<Option<Notifier>> = const { RefCell::new(None) };
     }
 
     NOTIFIER.with(move |cell| {

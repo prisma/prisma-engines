@@ -30,7 +30,7 @@ mod bytes {
 
         async fn create_common_children(runner: &Runner) -> TestResult<()> {
             create_child(
-                &runner,
+                runner,
                 r#"{
                     childId: 1,
                     bytes: "AQID",
@@ -39,7 +39,7 @@ mod bytes {
             .await?;
 
             create_child(
-                &runner,
+                runner,
                 r#"{
                     childId: 2,
                     bytes: "FDSF"
@@ -48,7 +48,7 @@ mod bytes {
             .await?;
 
             create_parent(
-                &runner,
+                runner,
                 r#"{ id: 1, children: { connect: [{ childId: 1 }, { childId: 2 }] } }"#,
             )
             .await?;
