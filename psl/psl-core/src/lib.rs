@@ -1,6 +1,5 @@
 #![doc = include_str!("../README.md")]
 #![deny(rust_2018_idioms, unsafe_code)]
-#![feature(trait_upcasting)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
 pub mod builtin_connectors;
@@ -136,7 +135,7 @@ impl From<ValidatedSchema> for ValidatedSchemaForQE {
             db: schema.db,
             preview_features: schema.configuration.preview_features(),
             relation_mode: schema.relation_mode,
-            connector: schema.connector,
+            connector: schema.connector.as_validated_connector(),
         }
     }
 }
@@ -169,7 +168,7 @@ impl ValidSchema for ValidatedSchema {
     }
 
     fn connector(&self) -> &'static dyn datamodel_connector::ValidatedConnector {
-        self.connector
+        self.connector.as_validated_connector()
     }
 }
 

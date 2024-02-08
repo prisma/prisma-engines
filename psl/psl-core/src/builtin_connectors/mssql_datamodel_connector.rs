@@ -126,6 +126,10 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MsSqlType)] = &[
 ];
 
 impl Connector for MsSqlDatamodelConnector {
+    fn as_validated_connector(&self) -> &dyn ValidatedConnector {
+        self
+    }
+
     fn max_identifier_length(&self) -> usize {
         128
     }

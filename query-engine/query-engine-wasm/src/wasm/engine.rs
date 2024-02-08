@@ -24,15 +24,6 @@ use tracing::{field, instrument::WithSubscriber, Instrument, Level, Span};
 use tracing_subscriber::filter::LevelFilter;
 use wasm_bindgen::prelude::wasm_bindgen;
 
-const CONNECTOR_REGISTRY: ValidatedConnectorRegistry<'_> = &[
-    #[cfg(feature = "postgresql")]
-    psl::builtin_connectors::POSTGRES,
-    #[cfg(feature = "mysql")]
-    psl::builtin_connectors::MYSQL,
-    #[cfg(feature = "sqlite")]
-    psl::builtin_connectors::SQLITE,
-];
-
 /// The main query engine used by JS
 #[wasm_bindgen]
 pub struct QueryEngine {
@@ -57,8 +48,16 @@ impl QueryEngine {
             log_level, log_queries, ..
         } = options;
 
+        let connector_registry: ValidatedConnectorRegistry<'_> = &[
+            #[cfg(feature = "postgresql")]
+            psl::builtin_connectors::POSTGRES.as_validated_connector(),
+            #[cfg(feature = "mysql")]
+            psl::builtin_connectors::MYSQL.as_validated_connector(),
+            #[cfg(feature = "sqlite")]
+            psl::builtin_connectors::SQLITE.as_validated_connector(),
+        ];
+
         // We assume the given schema has already been validated by `prisma generate`.
-        let connector_registry: ValidatedConnectorRegistry<'_> = &CONNECTOR_REGISTRY;
         let schema = psl::deserialize_from_bytes(schema_as_binary, &connector_registry)
             .map_err(|err| ApiError::configuration(err.to_string()))?;
 

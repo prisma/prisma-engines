@@ -80,6 +80,10 @@ impl ValidatedConnector for MongoDbDatamodelConnector {
 }
 
 impl Connector for MongoDbDatamodelConnector {
+    fn as_validated_connector(&self) -> &dyn ValidatedConnector {
+        self
+    }
+
     fn max_identifier_length(&self) -> usize {
         127
     }

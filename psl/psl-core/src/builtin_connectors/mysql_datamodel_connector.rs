@@ -165,6 +165,10 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
 ];
 
 impl Connector for MySqlDatamodelConnector {
+    fn as_validated_connector(&self) -> &dyn ValidatedConnector {
+        self
+    }
+
     fn max_identifier_length(&self) -> usize {
         64
     }

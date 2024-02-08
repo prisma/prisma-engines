@@ -86,6 +86,10 @@ impl ValidatedConnector for SqliteDatamodelConnector {
 }
 
 impl Connector for SqliteDatamodelConnector {
+    fn as_validated_connector(&self) -> &dyn ValidatedConnector {
+        self
+    }
+
     fn max_identifier_length(&self) -> usize {
         10000
     }

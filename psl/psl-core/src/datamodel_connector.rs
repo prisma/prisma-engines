@@ -145,6 +145,10 @@ pub trait ValidatedConnector: Send + Sync {
 
 /// The datamodel connector API.
 pub trait Connector: Send + Sync + ValidatedConnector {
+    // TODO: remove this method once the "trait_upcasting" feature is stable.
+    // See: https://github.com/rust-lang/rust/issues/65991
+    fn as_validated_connector(&self) -> &dyn ValidatedConnector;
+
     /// The maximum length of constraint names in bytes. Connectors without a
     /// limit should return usize::MAX.
     fn max_identifier_length(&self) -> usize;

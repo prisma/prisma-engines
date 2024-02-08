@@ -54,6 +54,10 @@ impl ValidatedConnector for EmptyDatamodelConnector {
 }
 
 impl Connector for EmptyDatamodelConnector {
+    fn as_validated_connector(&self) -> &dyn ValidatedConnector {
+        self
+    }
+
     fn max_identifier_length(&self) -> usize {
         usize::MAX
     }

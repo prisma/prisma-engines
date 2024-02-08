@@ -181,6 +181,10 @@ impl ValidatedConnector for CockroachDatamodelConnector {
 }
 
 impl Connector for CockroachDatamodelConnector {
+    fn as_validated_connector(&self) -> &dyn ValidatedConnector {
+        self
+    }
+
     /// The maximum length of postgres identifiers, in bytes.
     ///
     /// Reference: <https://www.postgresql.org/docs/12/limits.html>
