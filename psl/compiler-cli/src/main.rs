@@ -1,5 +1,3 @@
-#![feature(trait_upcasting)]
-
 use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
@@ -56,7 +54,8 @@ fn main() -> std::io::Result<()> {
 
             let schema_as_binary = std::fs::read(file)?;
 
-            let connector_registry: psl::ValidatedConnectorRegistry<'_> = &[POSTGRES, MYSQL, SQLITE];
+            let connector_registry: psl::ValidatedConnectorRegistry<'_> =
+                &[POSTGRES, MYSQL, SQLITE].map(|c| c.as_validated_connector());
 
             let schema_qe = psl::deserialize_from_bytes(schema_as_binary.as_slice(), &connector_registry)
                 .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
