@@ -62,6 +62,12 @@ pub fn format(schema: &str, params: &str) -> String {
     psl::reformat(schema, params.options.tab_size as usize).unwrap_or_else(|| schema.to_owned())
 }
 
+/// Serialize a Prisma schema into a binary format.
+pub fn serialize_to_bytes(file: psl::SourceFile) -> Result<Vec<u8>, String> {
+    let connectors = psl::builtin_connectors::BUILTIN_CONNECTORS;
+    psl::serialize_to_bytes(file, connectors)
+}
+
 pub fn lint(schema: String) -> String {
     lint::run(&schema)
 }
