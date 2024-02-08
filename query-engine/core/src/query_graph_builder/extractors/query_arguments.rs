@@ -358,8 +358,7 @@ fn finalize_arguments(mut args: QueryArguments, model: &Model, relation: Option<
                 Some(distinct)
             }
         }
-        (false, None) => None,
-        (true, distinct) => distinct,
+        (_, distinct) => distinct,
     };
 
     QueryArguments { distinct, ..args }
