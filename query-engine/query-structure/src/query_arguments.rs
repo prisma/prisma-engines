@@ -51,6 +51,7 @@ impl std::fmt::Debug for QueryArguments {
             .field("distinct", &self.distinct)
             .field("ignore_skip", &self.ignore_skip)
             .field("ignore_take", &self.ignore_take)
+            .field("relation_load_strategy", &self.relation_load_strategy)
             .finish()
     }
 }
