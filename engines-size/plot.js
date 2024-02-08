@@ -11,38 +11,42 @@ const data = d3.csvParse(
   })
 );
 
+const minDate = d3.min(data, d => d.date_time)
+const maxDate = d3.max(data, d => d.date_time)
+
 document.querySelector("#plot").append(
   createPlot({
     data,
     yDomainFromZero: true,
+    legend: true
   })
 );
 
-document.querySelector("#plot-lib").append(
-  createPlot({
-    data: data.filter(({ file }) => file === "libquery_engine.node"),
-  })
-);
+const dataByFile = {}
+for (const row of data) {
+  const file = row.file
+  dataByFile[file] ??= []
+  dataByFile[file].push(row)
+}
 
-document.querySelector("#plot-bin").append(
-  createPlot({
-    data: data.filter(({ file }) => file === "query-engine"),
-  })
-);
+const filePlots = document.querySelector('#file-plots')
 
-document.querySelector("#plot-wasm").append(
-  createPlot({
-    data: data.filter(({ file }) => file === "query_engine_bg.wasm"),
-  })
-);
+for (const file of Object.keys(dataByFile)) {
+  const figure = document.createElement('figure')
+  const caption = document.createElement('figcaption')
+  caption.textContent = file
+  figure.appendChild(caption)
 
-document.querySelector("#plot-wasm-gz").append(
-  createPlot({
-    data: data.filter(({ file }) => file === "query_engine_bg.wasm.gz"),
-  })
-);
+  const plot = document.createElement('div')
+  plot.classList.add('plot')
 
-function createPlot({ data, yDomainFromZero = false }) {
+  plot.appendChild(createPlot({ data: dataByFile[file] }))
+  figure.appendChild(plot)
+
+  filePlots.appendChild(figure)
+}
+
+function createPlot({ data, yDomainFromZero = false, legend = false }) {
   const yDomain = [
     yDomainFromZero ? 0 : d3.min(data, (d) => d.size_bytes),
     d3.max(data, (d) => d.size_bytes),
@@ -55,6 +59,7 @@ function createPlot({ data, yDomainFromZero = false }) {
     marginLeft: 80,
     marginRight: 170,
     x: {
+      domain: [minDate, maxDate],
       grid: true,
     },
     y: {
@@ -62,24 +67,20 @@ function createPlot({ data, yDomainFromZero = false }) {
       grid: true,
       tickFormat: (tick) => formatMB(tick, digitsAfterComma),
     },
+
+    color: {
+      legend
+    },
     marks: [
       Plot.line(data, {
         x: "date_time",
         y: "size_bytes",
         stroke: "file",
       }),
-      Plot.text(
-        data,
-        Plot.selectLast({
-          x: "date_time",
-          y: "size_bytes",
-          z: "file",
-          fill: "file",
-          text: (d) => `${d.file} (${formatMB(d.size_bytes)})`,
-          textAnchor: "start",
-          dx: 2,
-        })
-      ),
+      Plot.tip(data, Plot.pointerX({
+        x: "date_time",
+        y: "size_bytes",
+      }))
     ],
   });
 }

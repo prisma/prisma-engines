@@ -21,7 +21,18 @@
         font-size: 28px;
       }
 
-      h2 {
+      figure {
+        margin: 0;
+        padding-bottom: 40px;
+      }
+
+      figure:nth-child(2n) {
+        background-color: #F3F3F3;
+      }
+
+      figcaption {
+        font-size: 24px;
+        font-weight: bold;
         text-align: center;
       }
 
@@ -54,20 +65,14 @@
       <h1>Query Engine size (Linux, glibc)</h1>
     </header>
 
-    <h2>Comparative</h2>
-    <div class="plot" id="plot"></div>
 
-    <h2>libquery_engine.node</h2>
-    <div class="plot" id="plot-lib"></div>
 
-    <h2>query_engine_bg.wasm</h2>
-    <div class="plot" id="plot-wasm"></div>
-
-    <h2>query_engine_bg.wasm.gz</h2>
-    <div class="plot" id="plot-wasm-gz"></div>
-
-    <h2>query-engine</h2>
-    <div class="plot" id="plot-bin"></div>
+    <section id="file-plots">
+      <figure>
+        <figcaption>Comparative</figcaption>
+        <div class="plot" id="plot"></div>
+      </figure>
+    </section>
 
     <h2>Raw data</h2>
     <div id="grid" class="ag-theme-alpine"></div>
