@@ -275,6 +275,7 @@
 <a href="#275" id="275">275</a>
 <a href="#276" id="276">276</a>
 <a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
 
 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
@@ -328,6 +329,7 @@
             .field(<span class="string">&quot;distinct&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.distinct)
             .field(<span class="string">&quot;ignore_skip&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.ignore_skip)
             .field(<span class="string">&quot;ignore_take&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.ignore_take)
+            .field(<span class="string">&quot;relation_load_strategy&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.relation_load_strategy)
             .finish()
     }
 }
