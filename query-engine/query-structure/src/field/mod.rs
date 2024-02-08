@@ -7,6 +7,7 @@ pub use relation::*;
 pub use scalar::*;
 
 use crate::{ast, parent_container::ParentContainer, Model};
+use crosstarget_utils::psl::ValidatedSchema;
 use psl::parser_database::{walkers, ScalarType};
 use std::{borrow::Cow, hash::Hash};
 
@@ -18,7 +19,7 @@ pub enum Field {
 }
 
 impl Field {
-    pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchemaForQE) -> &'a str {
+    pub fn borrowed_name<'a>(&self, schema: &'a ValidatedSchema) -> &'a str {
         match self {
             Field::Relation(rf) => schema.db.walk(rf.id).name(),
             Field::Scalar(sf) => sf.borrowed_name(schema),
@@ -159,7 +160,7 @@ impl TypeIdentifier {
         )
     }
 
-    pub fn type_name(&self, schema: &psl::ValidatedSchemaForQE) -> Cow<'static, str> {
+    pub fn type_name(&self, schema: &ValidatedSchema) -> Cow<'static, str> {
         match self {
             TypeIdentifier::String => "String".into(),
             TypeIdentifier::Int => "Int".into(),

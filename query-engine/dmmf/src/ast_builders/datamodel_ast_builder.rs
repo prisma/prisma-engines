@@ -2,13 +2,14 @@ use crate::serialization_ast::datamodel_ast::{
     Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex,
 };
 use bigdecimal::ToPrimitive;
+use crosstarget_utils::psl::ValidatedSchema;
 use psl::{
     parser_database::{walkers, ScalarFieldType},
     schema_ast::ast::WithDocumentation,
 };
 use query_structure::{dml_default_kind, encode_bytes, DefaultKind, FieldArity, PrismaValue};
 
-pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchemaForQE) -> Datamodel {
+pub(crate) fn schema_to_dmmf(schema: &ValidatedSchema) -> Datamodel {
     let mut datamodel = Datamodel {
         models: Vec::with_capacity(schema.db.models_count()),
         enums: Vec::with_capacity(schema.db.enums_count()),
@@ -292,7 +293,7 @@ mod tests {
 
     fn render_to_dmmf(schema: &str) -> String {
         let schema = psl::parse_schema(schema).unwrap();
-        let dmmf = schema_to_dmmf(&schema.into());
+        let dmmf = schema_to_dmmf(&schema);
         serde_json::to_string_pretty(&dmmf).expect("Failed to render JSON")
     }
 

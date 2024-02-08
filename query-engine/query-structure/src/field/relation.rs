@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use crosstarget_utils::psl::ValidatedSchema;
 use psl::parser_database::{
     ast::FieldArity,
     walkers::{self, RelationFieldId},
@@ -9,7 +10,7 @@ pub type RelationField = crate::Zipper<RelationFieldId>;
 pub type RelationFieldRef = RelationField;
 
 impl RelationField {
-    pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchemaForQE) -> &'a str {
+    pub fn borrowed_name<'a>(&self, schema: &'a ValidatedSchema) -> &'a str {
         schema.db.walk(self.id).name()
     }
 

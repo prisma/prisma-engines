@@ -1,7 +1,7 @@
 use crate::{IdentifierType, ObjectType, OutputField};
 use psl::{
     datamodel_connector::{ConnectorCapabilities, ConnectorCapability, RelationMode, ValidatedConnector},
-    PreviewFeature, PreviewFeatures, ValidSchema,
+    PreviewFeature, PreviewFeatures,
 };
 use query_structure::{ast, InternalDataModel};
 use std::{collections::HashMap, fmt};

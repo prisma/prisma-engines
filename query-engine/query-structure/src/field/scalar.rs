@@ -1,8 +1,10 @@
 use crate::{ast, parent_container::ParentContainer, prelude::*, DefaultKind, NativeTypeInstance, ValueGenerator};
 use chrono::{DateTime, FixedOffset};
+use crosstarget_utils::psl::ValidatedSchema;
 use psl::{
     parser_database::{walkers, ScalarFieldType, ScalarType},
     schema_ast::ast::FieldArity,
+    ValidSchema,
 };
 use std::fmt::{Debug, Display};
 
@@ -70,7 +72,7 @@ impl ScalarField {
         }
     }
 
-    pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchemaForQE) -> &'a str {
+    pub fn borrowed_name<'a>(&self, schema: &'a ValidatedSchema) -> &'a str {
         match self.id {
             ScalarFieldId::InModel(id) => schema.db.walk(id).name(),
             ScalarFieldId::InCompositeType(id) => schema.db.walk(id).name(),
@@ -155,7 +157,7 @@ impl ScalarField {
     }
 
     pub fn native_type(&self) -> Option<NativeTypeInstance> {
-        let connector = self.dm.schema.connector;
+        let connector = self.dm.schema.connector();
 
         let raw_nt = match self.id {
             ScalarFieldId::InModel(id) => self.dm.walk(id).raw_native_type(),

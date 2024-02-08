@@ -17,7 +17,7 @@ pub fn dmmf_json_from_schema(schema: &str) -> String {
 
 pub fn dmmf_from_schema(schema: &str) -> DataModelMetaFormat {
     let schema = psl::parse_schema(schema).unwrap();
-    from_precomputed_parts(&schema::build(Arc::new(schema.into()), true))
+    from_precomputed_parts(&schema::build(Arc::new(schema), true))
 }
 
 pub fn from_precomputed_parts(query_schema: &QuerySchema) -> DataModelMetaFormat {

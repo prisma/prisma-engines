@@ -104,7 +104,7 @@ impl Runner {
     }
 
     pub fn prisma_dml(&self) -> &str {
-        self.query_schema.internal_data_model.schema.db().source()
+        self.query_schema.internal_data_model.schema.db.source()
     }
 
     pub fn max_bind_values(&self) -> Option<usize> {

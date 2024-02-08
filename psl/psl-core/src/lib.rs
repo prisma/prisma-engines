@@ -67,6 +67,7 @@ impl SerdeValidatedSchema {
 pub trait ValidSchema: Sync + Send + 'static {
     fn preview_features(&self) -> enumflags2::BitFlags<PreviewFeature>;
     fn relation_mode(&self) -> datamodel_connector::RelationMode;
+    fn connector(&self) -> &'static dyn datamodel_connector::ValidatedConnector;
 }
 
 /// `SchemaForQE` is the `query-engine`-specific specific variant of `ValidatedSchema`.
@@ -87,6 +88,10 @@ impl ValidSchema for ValidatedSchemaForQE {
 
     fn relation_mode(&self) -> datamodel_connector::RelationMode {
         self.relation_mode
+    }
+
+    fn connector(&self) -> &'static dyn datamodel_connector::ValidatedConnector {
+        self.connector
     }
 }
 
@@ -133,6 +138,10 @@ impl ValidSchema for ValidatedSchema {
 
     fn relation_mode(&self) -> datamodel_connector::RelationMode {
         self.relation_mode
+    }
+
+    fn connector(&self) -> &'static dyn datamodel_connector::ValidatedConnector {
+        self.connector.as_validated_connector()
     }
 }
 

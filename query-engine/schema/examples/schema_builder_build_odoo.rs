@@ -4,7 +4,7 @@ fn main() {
     let validated_schema = psl::validate(source_file);
 
     let now = std::time::Instant::now();
-    let _ = schema::build(std::sync::Arc::new(validated_schema.into()), true);
+    let _ = schema::build(std::sync::Arc::new(validated_schema), true);
     let elapsed = now.elapsed();
 
     println!("Elapsed: {:.2?}", elapsed);

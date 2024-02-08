@@ -421,7 +421,7 @@ fn duplicate_relation_name() {
 
 fn convert(datamodel: &str) -> InternalDataModel {
     let schema = psl::parse_schema(datamodel).unwrap();
-    query_structure::convert(Arc::new(schema.into()))
+    query_structure::convert(Arc::new(schema))
 }
 
 trait DatamodelAssertions {

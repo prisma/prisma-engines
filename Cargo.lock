@@ -1204,6 +1204,7 @@ version = "0.1.0"
 dependencies = [
  "bigdecimal",
  "colored",
+ "crosstarget-utils",
  "expect-test",
  "flate2",
  "indexmap 1.9.3",
