@@ -73,7 +73,13 @@ impl WriteQuery {
 
         match self {
             Self::CreateRecord(cr) => Some(cr.selected_fields.clone()),
-            Self::CreateManyRecords(_) => None,
+            Self::CreateManyRecords(CreateManyRecords {
+                selected_fields: Some(selected_fields),
+                ..
+            }) => Some(selected_fields.fields.clone()),
+            Self::CreateManyRecords(CreateManyRecords {
+                selected_fields: None, ..
+            }) => None,
             Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => Some(ur.selected_fields.clone()),
             Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => returns_id,
             Self::DeleteRecord(DeleteRecord {
