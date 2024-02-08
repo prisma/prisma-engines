@@ -4,7 +4,10 @@ mod subquery;
 use std::borrow::Cow;
 use tracing::Span;
 
-use psl::datamodel_connector::{ConnectorCapability, Flavour};
+use psl::{
+    datamodel_connector::{ConnectorCapability, Flavour},
+    has_capability,
+};
 use quaint::prelude::*;
 use query_structure::*;
 
@@ -699,9 +702,5 @@ fn connector_flavour(args: &QueryArguments) -> Flavour {
 }
 
 fn supports_lateral_join(args: &QueryArguments) -> bool {
-    args.model()
-        .dm
-        .schema
-        .connector
-        .has_capability(ConnectorCapability::LateralJoin)
+    has_capability(args.model().dm.schema.connector, ConnectorCapability::LateralJoin)
 }

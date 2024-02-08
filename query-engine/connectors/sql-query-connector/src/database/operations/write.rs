@@ -95,7 +95,7 @@ pub(crate) async fn create_record(
 ) -> crate::Result<SingleRecord> {
     let id_field: FieldSelection = model.primary_identifier();
 
-    let returned_id = if *sql_family == SqlFamily::Mysql {
+    let returned_id = if sql_family.is_mysql() {
         generate_id(conn, &id_field, &args, ctx)
             .await?
             .or_else(|| args.as_selection_result(ModelProjection::from(id_field)))
@@ -104,7 +104,7 @@ pub(crate) async fn create_record(
     };
 
     let args = match returned_id {
-        Some(ref pk) if *sql_family == SqlFamily::Mysql => {
+        Some(ref pk) if sql_family.is_mysql() => {
             for (field, value) in pk.pairs.iter() {
                 let field = DatasourceFieldName(field.db_name().into());
                 let value = WriteOperation::scalar_set(value.clone());

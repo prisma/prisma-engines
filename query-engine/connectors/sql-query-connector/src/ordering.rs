@@ -1,5 +1,6 @@
 use crate::{join_utils::*, model_extensions::*, query_arguments_ext::QueryArgumentsExt, Context};
 use itertools::Itertools;
+use psl::can_have_capability;
 use quaint::ast::*;
 use query_structure::*;
 
@@ -24,6 +25,7 @@ pub(crate) struct OrderByBuilder {
 }
 
 impl OrderByBuilder {
+    #[cfg(feature = "relation_joins")]
     pub(crate) fn with_parent_alias(mut self, alias: Option<String>) -> Self {
         self.parent_alias = alias;
         self
@@ -44,7 +46,12 @@ impl OrderByBuilder {
                     self.build_order_aggr_scalar(order_by, needs_reversed_order, ctx)
                 }
                 OrderBy::ToManyAggregation(order_by) => self.build_order_aggr_rel(order_by, needs_reversed_order, ctx),
-                OrderBy::Relevance(order_by) => self.build_order_relevance(order_by, needs_reversed_order, ctx),
+                OrderBy::Relevance(order_by) => {
+                    if !can_have_capability(psl::datamodel_connector::ConnectorCapability::FullTextSearch) {
+                        unreachable!()
+                    }
+                    self.build_order_relevance(order_by, needs_reversed_order, ctx)
+                }
             })
             .collect_vec()
     }

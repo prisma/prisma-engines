@@ -4,7 +4,7 @@ name = "schema-core"
 version = "0.1.0"
 
 [dependencies]
-psl.workspace = true
+psl = { workspace = true, features = ["all"] }
 schema-connector = { path = "../connectors/schema-connector" }
 mongodb-schema-connector = { path = "../connectors/mongodb-schema-connector" }
 sql-schema-connector = { path = "../connectors/sql-schema-connector" }

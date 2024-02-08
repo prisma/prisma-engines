@@ -3,6 +3,7 @@
 
 pub use psl_core::builtin_connectors;
 pub use psl_core::{
+    builtin_connectors::{can_have_capability, can_support_relation_load_strategy, has_capability},
     datamodel_connector,
     diagnostics::{self, Diagnostics},
     is_reserved_type_name,

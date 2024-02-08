@@ -258,7 +258,7 @@ impl<'a> Insert<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(any(feature = "postgresql", feature = "mssql", feature = "sqlite"))]
+    #[cfg(any(feature = "postgresql", feature = "mssql", feature = "sqlite", feature = "mysql"))]
     pub fn returning<K, I>(mut self, columns: I) -> Self
     where
         K: Into<Column<'a>>,

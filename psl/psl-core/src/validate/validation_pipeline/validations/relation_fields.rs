@@ -1,7 +1,7 @@
 use super::{database_name::validate_db_name, names::Names};
 use crate::{
     ast::{self, WithName, WithSpan},
-    datamodel_connector::RelationMode,
+    datamodel_connector::{ConnectorCapability, RelationMode},
     diagnostics::DatamodelError,
     validate::validation_pipeline::context::Context,
 };
@@ -230,7 +230,7 @@ pub(super) fn map(field: RelationFieldWalker<'_>, ctx: &mut Context<'_>) {
         return;
     }
 
-    if !ctx.connector.supports_named_foreign_keys() {
+    if !ctx.has_capability(ConnectorCapability::NamedForeignKeys) {
         let span = field
             .ast_field()
             .span_for_attribute("relation")

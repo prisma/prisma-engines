@@ -1,4 +1,4 @@
-use psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
+use psl::{datamodel_connector::ConnectorCapability, has_capability, PreviewFeature};
 
 use crate::*;
 
@@ -118,11 +118,7 @@ impl QueryArguments {
     }
 
     fn connector_supports_distinct_on(&self) -> bool {
-        self.model()
-            .dm
-            .schema
-            .connector
-            .has_capability(ConnectorCapability::DistinctOn)
+        has_capability(self.model().dm.schema.connector, ConnectorCapability::DistinctOn)
     }
 
     /// An unstable cursor is a cursor that is used in conjunction with an unstable (non-unique) combination of orderBys.

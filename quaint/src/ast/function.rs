@@ -5,24 +5,18 @@ mod concat;
 mod count;
 mod json_array_agg;
 mod json_build_obj;
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
 mod json_extract;
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
 mod json_extract_array;
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
 mod json_unquote;
 mod lower;
 mod maximum;
 mod minimum;
 mod row_number;
-#[cfg(feature = "postgresql")]
 mod row_to_json;
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
 mod search;
 mod sum;
 mod upper;
 
-#[cfg(feature = "mysql")]
 mod uuid;
 
 pub use aggregate_to_string::*;
@@ -32,24 +26,18 @@ pub use concat::*;
 pub use count::*;
 pub use json_array_agg::*;
 pub use json_build_obj::*;
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
 pub use json_extract::*;
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
 pub(crate) use json_extract_array::*;
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
 pub use json_unquote::*;
 pub use lower::*;
 pub use maximum::*;
 pub use minimum::*;
 pub use row_number::*;
-#[cfg(feature = "postgresql")]
 pub use row_to_json::*;
-#[cfg(any(feature = "mysql", feature = "postgresql"))]
 pub use search::*;
 pub use sum::*;
 pub use upper::*;
 
-#[cfg(feature = "mysql")]
 pub use self::uuid::*;
 
 use super::{Aliasable, Expression};
@@ -65,13 +53,9 @@ pub struct Function<'a> {
 impl<'a> Function<'a> {
     pub fn returns_json(&self) -> bool {
         match self.typ_ {
-            #[cfg(feature = "postgresql")]
             FunctionType::RowToJson(_) => true,
-            #[cfg(feature = "mysql")]
             FunctionType::JsonExtract(_) => true,
-            #[cfg(any(feature = "postgresql", feature = "mysql"))]
             FunctionType::JsonExtractLastArrayElem(_) => true,
-            #[cfg(any(feature = "postgresql", feature = "mysql"))]
             FunctionType::JsonExtractFirstArrayElem(_) => true,
             _ => false,
         }
@@ -81,7 +65,6 @@ impl<'a> Function<'a> {
 /// A database function type
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) enum FunctionType<'a> {
-    #[cfg(feature = "postgresql")]
     RowToJson(RowToJson<'a>),
     RowNumber(RowNumber<'a>),
     Count(Count<'a>),
@@ -94,27 +77,16 @@ pub(crate) enum FunctionType<'a> {
     Maximum(Maximum<'a>),
     Coalesce(Coalesce<'a>),
     Concat(Concat<'a>),
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     JsonExtract(JsonExtract<'a>),
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     JsonExtractLastArrayElem(JsonExtractLastArrayElem<'a>),
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     JsonExtractFirstArrayElem(JsonExtractFirstArrayElem<'a>),
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     JsonUnquote(JsonUnquote<'a>),
-    #[cfg(feature = "postgresql")]
     JsonArrayAgg(JsonArrayAgg<'a>),
-    #[cfg(feature = "postgresql")]
     JsonBuildObject(JsonBuildObject<'a>),
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     TextSearch(TextSearch<'a>),
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     TextSearchRelevance(TextSearchRelevance<'a>),
-    #[cfg(feature = "mysql")]
     UuidToBin,
-    #[cfg(feature = "mysql")]
     UuidToBinSwapped,
-    #[cfg(feature = "mysql")]
     Uuid,
 }
 
@@ -130,26 +102,23 @@ impl<'a> Aliasable<'a> for Function<'a> {
     }
 }
 
-#[cfg(feature = "postgresql")]
 function!(RowToJson);
 
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
 function!(JsonExtract);
 
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
 function!(JsonExtractLastArrayElem);
 
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
 function!(JsonExtractFirstArrayElem);
 
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
 function!(JsonUnquote);
 
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
 function!(TextSearch);
 
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
 function!(TextSearchRelevance);
+
+function!(JsonArrayAgg);
+
+function!(JsonBuildObject);
 
 function!(
     RowNumber,
@@ -162,7 +131,5 @@ function!(
     Minimum,
     Maximum,
     Coalesce,
-    Concat,
-    JsonArrayAgg,
-    JsonBuildObject
+    Concat
 );

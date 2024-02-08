@@ -1,4 +1,5 @@
 pub(crate) mod read;
+#[cfg(feature = "relation_joins")]
 pub(crate) mod select;
 pub(crate) mod write;
 
