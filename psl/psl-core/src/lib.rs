@@ -74,6 +74,8 @@ pub trait ValidSchema: Sync + Send + 'static {
 
 /// `SchemaForQE` is the `query-engine`-specific specific variant of `ValidatedSchema`.
 /// More specifically, it's for the size-optimized `query-engine-wasm`.
+/// Using `ValidatedConnector` rather than `Connector` results in 14+ fewer KB
+/// in `query-engine-wasm`, after gzip.
 pub struct ValidatedSchemaForQE {
     pub db: parser_database::ParserDatabase,
     pub preview_features: enumflags2::BitFlags<PreviewFeature>,
