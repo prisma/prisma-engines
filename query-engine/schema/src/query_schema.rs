@@ -1,6 +1,6 @@
 use crate::{IdentifierType, ObjectType, OutputField};
 use psl::{
-    datamodel_connector::{Connector, ConnectorCapabilities, ConnectorCapability, RelationMode},
+    datamodel_connector::{Connector, ConnectorCapabilities, ConnectorCapability, JoinStrategySupport, RelationMode},
     PreviewFeature, PreviewFeatures,
 };
 use query_structure::{ast, InternalDataModel};
@@ -36,6 +36,12 @@ pub struct QuerySchema {
 
     /// Relation mode in the datasource.
     relation_mode: RelationMode,
+
+    /// Whether the database supports `RelationLoadStrategy::Join`.
+    /// By the time the `QuerySchema`` is created, we don't have all the evidence yet to determine
+    /// whether the database supports the join strategy (eg: database version).
+    // Hack: Ideally, this shoud be known statically and live in the PSL connector entirely.
+    join_strategy_support: JoinStrategySupport,
 }
 
 impl QuerySchema {
@@ -57,6 +63,11 @@ impl QuerySchema {
             relation_mode,
             mutation_fields: Default::default(),
             query_fields: Default::default(),
+            join_strategy_support: if preview_features.contains(PreviewFeature::RelationJoins) {
+                connector.runtime_join_strategy_support()
+            } else {
+                JoinStrategySupport::No
+            },
         };
 
         query_schema.query_fields = crate::build::query_type::query_fields(&query_schema);
@@ -96,10 +107,31 @@ impl QuerySchema {
                 || self.has_capability(ConnectorCapability::FullTextSearchWithIndex))
     }
 
+    /// Returns whether the loaded connector supports the join strategy.
     pub fn can_resolve_relation_with_joins(&self) -> bool {
-        self.has_feature(PreviewFeature::RelationJoins)
-            && (self.has_capability(ConnectorCapability::LateralJoin)
-                || self.has_capability(ConnectorCapability::CorrelatedSubqueries))
+        !matches!(self.join_strategy_support, JoinStrategySupport::No)
+    }
+
+    /// Returns whether the database version of the loaded connector supports the join strategy.
+    pub fn join_strategy_support(&self) -> JoinStrategySupport {
+        self.join_strategy_support
+    }
+
+    /// Augments the join strategy support with the runtime database version knowledge.
+    /// This is specifically designed for the MySQL connector, which does not support the join strategy for versions < 8.0.14 and MariaDB.
+    pub fn with_db_version_supports_join_strategy(self, db_version_supports_joins_strategy: bool) -> Self {
+        let augmented_support = match self.join_strategy_support {
+            JoinStrategySupport::UnknownYet => match db_version_supports_joins_strategy {
+                true => JoinStrategySupport::Yes,
+                false => JoinStrategySupport::UnsupportedDbVersion,
+            },
+            x => x,
+        };
+
+        Self {
+            join_strategy_support: augmented_support,
+            ..self
+        }
     }
 
     pub fn has_feature(&self, feature: PreviewFeature) -> bool {

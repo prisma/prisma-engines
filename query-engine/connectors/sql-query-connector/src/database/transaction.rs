@@ -56,6 +56,10 @@ impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
         .await
     }
 
+    async fn version(&self) -> Option<String> {
+        self.connection_info.version().map(|v| v.to_string())
+    }
+
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {
         self
     }

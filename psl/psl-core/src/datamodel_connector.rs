@@ -329,6 +329,20 @@ pub trait Connector: Send + Sync {
     ) -> prisma_value::PrismaValueResult<Vec<u8>> {
         unreachable!("This method is only implemented on connectors with lateral join support.")
     }
+
+    fn static_join_strategy_support(&self) -> bool {
+        self.has_capability(ConnectorCapability::LateralJoin)
+            || self.has_capability(ConnectorCapability::CorrelatedSubqueries)
+    }
+
+    /// Returns whether the connector supports the `RelationLoadStrategy::Join`.
+    /// On some connectors, this might return `UnknownYet`.
+    fn runtime_join_strategy_support(&self) -> JoinStrategySupport {
+        match self.static_join_strategy_support() {
+            true => JoinStrategySupport::Yes,
+            false => JoinStrategySupport::No,
+        }
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -405,4 +419,20 @@ impl ConstraintScope {
             )),
         }
     }
+}
+
+/// Describes whether a connector supports relation join strategy.
+#[derive(Debug, Copy, Clone)]
+pub enum JoinStrategySupport {
+    /// The connector supports it.
+    Yes,
+    /// The connector supports it but the specific database version does not.
+    /// This state can only be known at runtime by checking the actual database version.
+    UnsupportedDbVersion,
+    /// The connector does not support it.
+    No,
+    /// The connector may or may not support it. Additional runtime informations are required to determine the support.
+    /// This state is used when the connector does not have a static capability to determine the support.
+    /// For example, the MySQL connector supports relation join strategy, but only for versions >= 8.0.14.
+    UnknownYet,
 }

@@ -29,3 +29,12 @@ pub enum NativeConnectionInfo {
     #[cfg(feature = "sqlite")]
     InMemorySqlite { db_name: String },
 }
+
+impl NativeConnectionInfo {
+    pub fn set_version(&mut self, version: Option<String>) {
+        #[cfg(feature = "mysql")]
+        if let NativeConnectionInfo::Mysql(c) = self {
+            c.set_version(version);
+        }
+    }
+}

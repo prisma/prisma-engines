@@ -255,6 +255,26 @@ impl ConnectionInfo {
             ConnectionInfo::External(_) => "external".into(),
         }
     }
+
+    #[allow(unused_variables)]
+    pub fn set_version(&mut self, version: Option<String>) {
+        match self {
+            #[cfg(not(target_arch = "wasm32"))]
+            ConnectionInfo::Native(native) => native.set_version(version),
+            ConnectionInfo::External(_) => (),
+        }
+    }
+
+    pub fn version(&self) -> Option<&str> {
+        match self {
+            #[cfg(not(target_arch = "wasm32"))]
+            ConnectionInfo::Native(nt) => match nt {
+                NativeConnectionInfo::Mysql(m) => m.version(),
+                _ => None,
+            },
+            ConnectionInfo::External(_) => None,
+        }
+    }
 }
 
 /// One of the supported SQL variants.

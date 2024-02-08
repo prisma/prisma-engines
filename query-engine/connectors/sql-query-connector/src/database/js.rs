@@ -41,7 +41,7 @@ impl Js {
 impl Connector for Js {
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(&self.connection_info, async move {
-            let sql_conn = SqlConnection::new(self.connector.clone(), &self.connection_info, self.features);
+            let sql_conn = SqlConnection::new(self.connector.clone(), self.connection_info.clone(), self.features);
             Ok(Box::new(sql_conn) as Box<dyn Connection + Send + Sync + 'static>)
         })
         .await
