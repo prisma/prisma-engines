@@ -90,7 +90,7 @@ jobs:
         run: |
 
           fmt() {
-            numfmt --format '%.3f' --to=iec-i --suffix=B "$1"
+            echo "$1" | numfmt --format '%.3f' --to=iec-i --suffix=B
           }
 
           compute_diff() {
