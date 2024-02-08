@@ -336,6 +336,124 @@ mod many_count_rel {
         Ok(())
     }
 
+    #[connector_test(schema(schema_nested))]
+    async fn nested_count_same_field_on_many_levels(runner: Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            r#"
+            mutation {
+              createOneUser(
+                data: {
+                  id: 1,
+                  name: "Author",
+                  posts: {
+                    create: [
+                      {
+                        id: 1,
+                        title: "good post",
+                        comments: {
+                          create: [
+                            { id: 1, body: "insightful!" },
+                            { id: 2, body: "deep lore uncovered" }
+                          ]
+                        }
+                      },
+                      {
+                        id: 2,
+                        title: "boring post"
+                      }
+                    ]
+                  }
+                }
+              ) {
+                id
+              }
+            }
+            "#
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                r#"
+                query {
+                  findManyPost {
+                    comments {
+                      post {
+                        _count { comments }
+                      }
+                    }
+                    _count { comments }
+                  }
+                }
+                "#
+            ),
+            @r###"{"data":{"findManyPost":[{"comments":[{"post":{"_count":{"comments":2}}},{"post":{"_count":{"comments":2}}}],"_count":{"comments":2}},{"comments":[],"_count":{"comments":0}}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                r#"
+                query {
+                  findManyPost {
+                    comments {
+                      post {
+                        comments { id }
+                        _count { comments }
+                      }
+                    }
+                    _count { comments }
+                  }
+                }
+                "#
+            ),
+            @r###"{"data":{"findManyPost":[{"comments":[{"post":{"comments":[{"id":1},{"id":2}],"_count":{"comments":2}}},{"post":{"comments":[{"id":1},{"id":2}],"_count":{"comments":2}}}],"_count":{"comments":2}},{"comments":[],"_count":{"comments":0}}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                r#"
+                query {
+                  findManyPost {
+                    comments {
+                      post {
+                        comments(where: { id: 1 }) { id }
+                        _count { comments }
+                      }
+                    }
+                    _count { comments }
+                  }
+                }
+                "#
+            ),
+            @r###"{"data":{"findManyPost":[{"comments":[{"post":{"comments":[{"id":1}],"_count":{"comments":2}}},{"post":{"comments":[{"id":1}],"_count":{"comments":2}}}],"_count":{"comments":2}},{"comments":[],"_count":{"comments":0}}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                r#"
+                query {
+                  findManyPost {
+                    comments(where: { id: 1}) {
+                      post {
+                        comments { id }
+                        _count { comments }
+                      }
+                    }
+                    _count { comments }
+                  }
+                }
+                "#
+            ),
+            @r###"{"data":{"findManyPost":[{"comments":[{"post":{"comments":[{"id":1},{"id":2}],"_count":{"comments":2}}}],"_count":{"comments":2}},{"comments":[],"_count":{"comments":0}}]}}"###
+        );
+
+        Ok(())
+    }
+
     fn m_n_self_rel() -> String {
         let schema = indoc! {
             r#"model User {
