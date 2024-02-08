@@ -397,7 +397,7 @@ pub(crate) trait JoinSelectBuilder {
         rs: &RelationSelection,
         mut parent_virtuals: impl Iterator<Item = &'a VirtualSelection>,
     ) -> Option<&'a VirtualSelection> {
-        if rs.args.take.is_some() || rs.args.cursor.is_some() {
+        if rs.args.take.is_some() || rs.args.skip.is_some() || rs.args.cursor.is_some() || rs.args.distinct.is_some() {
             return None;
         }
 
