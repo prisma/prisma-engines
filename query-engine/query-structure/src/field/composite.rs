@@ -15,10 +15,10 @@ pub type CompositeField = crate::Zipper<CompositeFieldId>;
 pub type CompositeFieldRef = CompositeField;
 
 impl CompositeField {
-    pub fn borrowed_name<'a>(&self, schema: &'a dyn psl::ValidSchema) -> &'a str {
+    pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchemaForQE) -> &'a str {
         match self.id {
-            CompositeFieldId::InModel(sfid) => schema.db().walk(sfid).name(),
-            CompositeFieldId::InCompositeType(id) => schema.db().walk(id).name(),
+            CompositeFieldId::InModel(sfid) => schema.db.walk(sfid).name(),
+            CompositeFieldId::InCompositeType(id) => schema.db.walk(id).name(),
         }
     }
 

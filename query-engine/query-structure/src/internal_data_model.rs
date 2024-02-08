@@ -1,40 +1,35 @@
 use crate::{prelude::*, CompositeType, InternalEnum};
+use crosstarget_utils::psl::ValidatedSchema;
 use psl::schema_ast::ast;
 use std::sync::Arc;
 
 pub(crate) type InternalDataModelRef = InternalDataModel;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct InternalDataModel {
-    pub schema: Arc<dyn psl::ValidSchema>,
-}
-
-impl std::fmt::Debug for InternalDataModel {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("InternalDataModel {}").finish()
-    }
+    pub schema: Arc<ValidatedSchema>,
 }
 
 impl InternalDataModel {
     pub fn models(&self) -> impl Iterator<Item = Model> + '_ {
         self.schema
-            .db()
+            .db
             .walk_models()
-            .chain(self.schema.db().walk_views())
+            .chain(self.schema.db.walk_views())
             .filter(|model| !model.is_ignored())
             .map(|model| self.clone().zip(model.id))
     }
 
     pub fn composite_types(&self) -> impl Iterator<Item = CompositeType> + '_ {
         self.schema
-            .db()
+            .db
             .walk_composite_types()
             .map(move |ct| self.clone().zip(ct.id))
     }
 
     pub fn relations(&self) -> impl Iterator<Item = Relation> + Clone + '_ {
         self.schema
-            .db()
+            .db
             .walk_relations()
             .filter(|relation| !relation.is_ignored())
             .map(|relation| self.clone().zip(relation.id))
@@ -42,7 +37,7 @@ impl InternalDataModel {
 
     pub fn find_enum(&self, name: &str) -> crate::Result<InternalEnum> {
         self.schema
-            .db()
+            .db
             .find_enum(name)
             .map(|enum_walker| self.clone().zip(enum_walker.id))
             .ok_or_else(|| DomainError::EnumNotFound { name: name.to_string() })
@@ -50,9 +45,9 @@ impl InternalDataModel {
 
     pub fn find_model(&self, name: &str) -> crate::Result<Model> {
         self.schema
-            .db()
+            .db
             .walk_models()
-            .chain(self.schema.db().walk_views())
+            .chain(self.schema.db.walk_views())
             .find(|model| model.name() == name)
             .map(|m| self.clone().zip(m.id))
             .ok_or_else(|| DomainError::ModelNotFound { name: name.to_string() })
@@ -76,7 +71,7 @@ impl InternalDataModel {
     }
 
     pub fn walk<I>(&self, id: I) -> psl::parser_database::walkers::Walker<I> {
-        self.schema.db().walk(id)
+        self.schema.db.walk(id)
     }
 
     pub fn zip<I>(self, id: I) -> crate::Zipper<I> {

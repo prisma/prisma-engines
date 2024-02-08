@@ -967,6 +967,7 @@ dependencies = [
  "futures",
  "js-sys",
  "pin-project",
+ "psl",
  "tokio",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -3914,6 +3915,7 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "connection-string",
+ "crosstarget-utils",
  "napi",
  "opentelemetry",
  "psl",
@@ -4054,6 +4056,7 @@ version = "0.0.0"
 dependencies = [
  "bigdecimal",
  "chrono",
+ "crosstarget-utils",
  "cuid",
  "getrandom 0.2.11",
  "itertools 0.12.0",
@@ -4672,6 +4675,7 @@ name = "schema"
 version = "0.1.0"
 dependencies = [
  "codspeed-criterion-compat",
+ "crosstarget-utils",
  "once_cell",
  "psl",
  "query-structure",

@@ -1,6 +1,7 @@
 use psl::{
     datamodel_connector::walker_ext_traits::*,
     parser_database::{walkers, ReferentialAction, RelationId},
+    ValidSchema,
 };
 
 pub type Relation = crate::Zipper<RelationId>;
@@ -57,7 +58,7 @@ impl Relation {
                     .relation_fields()
                     .next()
                     .unwrap()
-                    .default_on_delete_action(self.dm.schema.relation_mode(), self.dm.schema.connector())
+                    .default_on_delete_action(self.dm.schema.relation_mode(), self.dm.schema.connector)
             })
     }
 

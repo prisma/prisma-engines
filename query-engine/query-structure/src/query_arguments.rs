@@ -1,4 +1,4 @@
-use psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
+use psl::{datamodel_connector::ConnectorCapability, PreviewFeature, ValidSchema};
 
 use crate::*;
 
@@ -105,7 +105,7 @@ impl QueryArguments {
             .model()
             .dm
             .schema
-            .connector()
+            .connector
             .has_capability(ConnectorCapability::DistinctOn);
 
         has_distinct_feature && connector_can_distinct_in_db && self.order_by.is_empty()

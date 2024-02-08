@@ -10,6 +10,7 @@ thiserror = "1"
 url = "2"
 query-connector = { path = "../../query-engine/connectors/query-connector" }
 query-core = { path = "../../query-engine/core" }
+crosstarget-utils = { path = "../crosstarget-utils" }
 user-facing-errors = { path = "../user-facing-errors" }
 serde_json.workspace = true
 serde.workspace = true
