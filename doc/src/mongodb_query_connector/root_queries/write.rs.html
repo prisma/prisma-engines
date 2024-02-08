@@ -629,7 +629,7 @@
         .non_relational()
         .iter()
         .filter(|field| args.has_arg_for(field.db_name()))
-        .map(Clone::clone)
+        .cloned()
         .collect();
 
     <span class="kw">let </span><span class="kw-2">mut </span>doc = Document::new();

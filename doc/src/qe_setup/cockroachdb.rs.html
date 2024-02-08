@@ -143,7 +143,7 @@
     }
 
     <span class="macro">thread_local! </span>{
-        <span class="kw">static </span>NOTIFIER: RefCell&lt;<span class="prelude-ty">Option</span>&lt;Notifier&gt;&gt; = RefCell::new(<span class="prelude-val">None</span>);
+        <span class="kw">static </span>NOTIFIER: RefCell&lt;<span class="prelude-ty">Option</span>&lt;Notifier&gt;&gt; = <span class="kw">const </span>{ RefCell::new(<span class="prelude-val">None</span>) };
     }
 
     NOTIFIER.with(<span class="kw">move </span>|cell| {
