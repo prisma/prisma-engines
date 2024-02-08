@@ -208,7 +208,7 @@ pub fn serialize_to_bytes(file: SourceFile, connectors: ConnectorRegistry<'_>) -
 
     let serde_schema = SerdeValidatedSchema::from(validated_schema);
 
-    postcard::to_allocvec(&serde_schema).map_err(|e| format!("[serialize]: {}", e.to_string()))
+    postcard::to_allocvec(&serde_schema).map_err(|e| format!("[serialize]: {}", e))
 }
 
 pub fn deserialize_from_bytes(
@@ -216,7 +216,7 @@ pub fn deserialize_from_bytes(
     connectors: &ValidatedConnectorRegistry<'_>,
 ) -> Result<ValidatedSchemaForQE, String> {
     let serde_schema: SerdeValidatedSchema =
-        postcard::from_bytes(schema_as_binary).map_err(|e| format!("[deserialize] {}", e.to_string()))?;
+        postcard::from_bytes(schema_as_binary).map_err(|e| format!("[deserialize] {}", e))?;
 
     Ok(serde_schema.into_schema_for_qe(connectors))
 }

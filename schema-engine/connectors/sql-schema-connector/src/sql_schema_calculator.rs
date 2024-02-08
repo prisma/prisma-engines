@@ -143,7 +143,7 @@ fn push_inline_relations(ctx: &mut Context<'_>) {
         let on_delete_action = relation_field.explicit_on_delete().unwrap_or_else(|| {
             relation_field.default_on_delete_action(
                 ctx.datamodel.configuration.relation_mode().unwrap_or_default(),
-                ctx.flavour.datamodel_connector(),
+                ctx.flavour.datamodel_connector().as_validated_connector(),
             )
         });
         let on_update_action = relation_field
