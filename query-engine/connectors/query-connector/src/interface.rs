@@ -262,21 +262,20 @@ pub trait WriteOperations {
         trace_id: Option<String>,
     ) -> crate::Result<usize>;
 
-    // TODO laplab
     /// Inserts many records at once into the database and returns their
     /// selected fields.
     /// This method should not be used if the connector does not support
     /// returning created rows.
     /// TODO laplab: I do not like these semantics, but we do not have a way
     /// to re-check capabilities inside this method, unfortunately.
-    // async fn create_records_returning(
-    //     &mut self,
-    //     model: &Model,
-    //     args: Vec<WriteArgs>,
-    //     skip_duplicates: bool,
-    //     selected_fields: FieldSelection,
-    //     trace_id: Option<String>,
-    // ) -> crate::Result<ManyRecords>;
+    async fn create_records_returning(
+        &mut self,
+        model: &Model,
+        args: Vec<WriteArgs>,
+        skip_duplicates: bool,
+        selected_fields: FieldSelection,
+        trace_id: Option<String>,
+    ) -> crate::Result<ManyRecords>;
 
     /// Update records in the `Model` with the given `WriteArgs` filtered by the
     /// `Filter`.

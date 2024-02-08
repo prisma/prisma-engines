@@ -31,31 +31,48 @@ pub fn nested_create(
             Ok((parser.args, parser.nested))
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
+    let child_records_count = data_maps.len();
 
-    let has_capabilities = query_schema.has_capability(ConnectorCapability::CreateMany)
-        && query_schema.has_capability(ConnectorCapability::InsertReturning);
-    let is_one_to_many_in_child = relation.is_one_to_many() && parent_relation_field.relation_is_inlined_in_child();
+    // TODO laplab: comment this.
+    let has_create_many = query_schema.has_capability(ConnectorCapability::CreateMany);
+    let has_returning = query_schema.has_capability(ConnectorCapability::InsertReturning);
+    let is_one_to_many_in_child =
+        relation.is_one_to_many() && parent_relation_field.relation_is_inlined_in_child() && has_create_many;
+    let is_many_to_many = relation.is_many_to_many() && has_create_many && has_returning;
     let has_nested = data_maps.iter().any(|(_args, nested)| !nested.is_empty());
-    let should_use_bulk_create = data_maps.len() > 1
-        && has_capabilities
-        && !has_nested
-        && (is_one_to_many_in_child || relation.is_many_to_many());
+    let should_use_bulk_create = child_records_count > 1 && !has_nested && (is_one_to_many_in_child || is_many_to_many);
 
     if should_use_bulk_create {
         // Create all child records in a single query.
+        let selected_fields = if relation.is_many_to_many() {
+            let selected_fields = child_model.primary_identifier();
+            let selection_order = selected_fields.db_names().collect();
+            Some(CreateManyRecordsFields {
+                fields: selected_fields,
+                order: selection_order,
+            })
+        } else {
+            None
+        };
         let query = CreateManyRecords {
+            name: String::new(), // This node will not be serialized so we don't need a name.
             model: child_model.clone(),
             args: data_maps.into_iter().map(|(args, _nested)| args).collect(),
             skip_duplicates: false,
-            selected_fields: None,
+            selected_fields,
         };
         let create_many_node = graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));
 
         if relation.is_one_to_many() {
             handle_one_to_many_bulk(graph, parent_node, parent_relation_field, create_many_node)?;
         } else {
-            // TODO laplab:
-            todo!()
+            handle_many_to_many_bulk(
+                graph,
+                parent_node,
+                parent_relation_field,
+                create_many_node,
+                child_records_count,
+            )?;
         }
     } else {
         // Create each child record separately.
@@ -85,39 +102,6 @@ fn handle_one_to_many_bulk(
     parent_relation_field: &RelationFieldRef,
     child_node: NodeRef,
 ) -> QueryGraphBuilderResult<()> {
-    // if parent_relation_field.is_inlined_on_enclosing_model() {
-    //     // Parent and create nodes need to be swapped. Since child IDs are inlined on parent side,
-    //     // we need to create child first, take its ID and only then create parent node with it.
-    //     graph.mark_nodes(&parent_node, &child_node);
-
-    //     let parent_link = parent_relation_field.linking_fields();
-    //     let child_link = parent_relation_field.related_field().linking_fields();
-
-    //     let relation_name = parent_relation_field.relation().name();
-    //     let parent_model_name = parent_relation_field.model().name().to_owned();
-    //     let child_model_name = parent_relation_field.related_model().name().to_owned();
-
-    //     // We extract the child linking fields in the edge, because after the swap, the child is the new parent.
-    //     graph.create_edge(
-    //         &parent_node,
-    //         &child_node,
-    //         QueryGraphDependency::ProjectedDataDependency(child_link, Box::new(move |mut parent_node, mut child_links| {
-    //             let child_link = match child_links.pop() {
-    //                 Some(link) => Ok(link),
-    //                 None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-    //                     "No '{child_model_name}' record (needed to inline the relation on '{parent_model_name}' record) was found for a nested create on one-to-many relation '{relation_name}'."
-    //                 ))),
-    //             }?;
-
-    //             if let Node::Query(Query::Write(ref mut wq)) = parent_node {
-    //                 wq.inject_result_into_args(parent_link.assimilate(child_link)?);
-    //             }
-
-    //             Ok(parent_node)
-    //         })),
-    //     )?;
-    // } else {
-    // TODO laplab: this is almost identical to the one above.
     let parent_link = parent_relation_field.linking_fields();
     let child_link = parent_relation_field.related_field().linking_fields();
 
@@ -142,8 +126,26 @@ fn handle_one_to_many_bulk(
 
             Ok(create_node)
         })))?;
-    // }
 
+    Ok(())
+}
+
+// TODO laplab: comment.
+fn handle_many_to_many_bulk(
+    graph: &mut QueryGraph,
+    parent_node: NodeRef,
+    parent_relation_field: &RelationFieldRef,
+    child_node: NodeRef,
+    expected_connects: usize,
+) -> QueryGraphBuilderResult<()> {
+    graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
+    connect::connect_records_node(
+        graph,
+        &parent_node,
+        &child_node,
+        parent_relation_field,
+        expected_connects,
+    )?;
     Ok(())
 }
 
@@ -552,6 +554,7 @@ pub fn nested_create_many(
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
     let query = CreateManyRecords {
+        name: String::new(), // This node will not be serialized so we don't need a name.
         model: child_model.clone(),
         args,
         skip_duplicates,

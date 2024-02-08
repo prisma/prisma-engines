@@ -8,6 +8,7 @@ use crate::{
 };
 use connector_interface::*;
 use itertools::Itertools;
+use quaint::ast::Insert;
 use quaint::{
     error::ErrorKind,
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
@@ -194,45 +195,98 @@ pub(crate) async fn create_record(
     }
 }
 
-pub(crate) async fn create_records(
-    conn: &dyn Queryable,
-    model: &Model,
-    args: Vec<WriteArgs>,
-    skip_duplicates: bool,
-    ctx: &Context<'_>,
-) -> crate::Result<usize> {
-    if args.is_empty() {
-        return Ok(0);
-    }
-
-    // Compute the set of fields affected by the createMany.
+/// Returns a set of fields that are used in the arguments for the create operation.
+fn collect_affected_fields(args: &Vec<WriteArgs>, model: &Model) -> HashSet<ScalarFieldRef> {
     let mut fields = HashSet::new();
     args.iter().for_each(|arg| fields.extend(arg.keys()));
 
-    #[allow(clippy::mutable_key_type)]
-    let affected_fields: HashSet<ScalarFieldRef> = fields
+    fields
         .into_iter()
         .map(|dsfn| model.fields().scalar().find(|sf| sf.db_name() == dsfn.deref()).unwrap())
-        .collect();
+        .collect()
+}
+
+/// Generates a list of insert statements to execute. If `selected_fields` is set, insert statements
+/// will return the specified columns of inserted rows.
+fn generate_insert_statements(
+    model: &Model,
+    args: Vec<WriteArgs>,
+    skip_duplicates: bool,
+    selected_fields: Option<&ModelProjection>,
+    ctx: &Context<'_>,
+) -> Vec<Insert<'static>> {
+    let affected_fields = collect_affected_fields(&args, model);
 
     if affected_fields.is_empty() {
-        // If no fields are to be inserted (everything is DEFAULT) we need to fall back to inserting default rows `args.len()` times.
-        create_many_empty(conn, model, args.len(), skip_duplicates, ctx).await
+        args.into_iter()
+            .map(|_| write::create_records_empty(model, skip_duplicates, selected_fields, ctx))
+            .collect()
     } else {
-        create_many_nonempty(conn, model, args, skip_duplicates, affected_fields, ctx).await
+        let partitioned_batches = partition_into_batches(args, ctx);
+        trace!("Total of {} batches to be executed.", partitioned_batches.len());
+        trace!(
+            "Batch sizes: {:?}",
+            partitioned_batches.iter().map(|b| b.len()).collect_vec()
+        );
+
+        partitioned_batches
+            .into_iter()
+            .map(|batch| {
+                write::create_records_nonempty(model, batch, skip_duplicates, &affected_fields, selected_fields, ctx)
+            })
+            .collect()
     }
 }
 
-/// Standard create many records, requires `affected_fields` to be non-empty.
-#[allow(clippy::mutable_key_type)]
-async fn create_many_nonempty(
+/// Inserts records specified as a list of `WriteArgs`. Returns number of inserted records.
+pub(crate) async fn create_records_count(
     conn: &dyn Queryable,
     model: &Model,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
-    affected_fields: HashSet<ScalarFieldRef>,
     ctx: &Context<'_>,
 ) -> crate::Result<usize> {
+    // TODO laplab: use `FuturesUnordered`.
+    let inserts = generate_insert_statements(model, args, skip_duplicates, None, ctx);
+    let mut count = 0;
+    for insert in inserts {
+        count += conn.execute(insert.into()).await?;
+    }
+
+    Ok(count as usize)
+}
+
+/// Inserts records specified as a list of `WriteArgs`. Returns values of fields specified in
+/// `selected_fields` for all inserted rows.
+pub(crate) async fn create_records_returning(
+    conn: &dyn Queryable,
+    model: &Model,
+    args: Vec<WriteArgs>,
+    skip_duplicates: bool,
+    selected_fields: FieldSelection,
+    ctx: &Context<'_>,
+) -> crate::Result<ManyRecords> {
+    // TODO laplab: use `FuturesUnordered`.
+    let field_names: Vec<String> = selected_fields.db_names().collect();
+    let idents = selected_fields.type_identifiers_with_arities();
+    let meta = column_metadata::create(&field_names, &idents);
+    let mut records = ManyRecords::new(field_names.clone());
+    let inserts = generate_insert_statements(model, args, skip_duplicates, Some(&selected_fields.into()), ctx);
+    for insert in inserts {
+        let result_set = conn.query(insert.into()).await?;
+        for result_row in result_set {
+            let sql_row = result_row.to_sql_row(&meta)?;
+            let record = Record::from(sql_row);
+            records.push(record);
+        }
+    }
+
+    Ok(records)
+}
+
+/// Partitions data into batches, respecting `max_bind_values` and `max_insert_rows` settings from
+/// the `Context`.
+fn partition_into_batches(args: Vec<WriteArgs>, ctx: &Context<'_>) -> Vec<Vec<WriteArgs>> {
     let batches = if let Some(max_params) = ctx.max_bind_values {
         // We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.
         // -> Horizontal partitioning by row number, vertical by number of args.
@@ -297,37 +351,7 @@ async fn create_many_nonempty(
         batches
     };
 
-    trace!("Total of {} batches to be executed.", partitioned_batches.len());
-    trace!(
-        "Batch sizes: {:?}",
-        partitioned_batches.iter().map(|b| b.len()).collect_vec()
-    );
-
-    let mut count = 0;
-    for batch in partitioned_batches {
-        let stmt = write::create_records_nonempty(model, batch, skip_duplicates, &affected_fields, ctx);
-        count += conn.execute(stmt.into()).await?;
-    }
-
-    Ok(count as usize)
-}
-
-/// Creates many empty (all default values) rows.
-async fn create_many_empty(
-    conn: &dyn Queryable,
-    model: &Model,
-    num_records: usize,
-    skip_duplicates: bool,
-    ctx: &Context<'_>,
-) -> crate::Result<usize> {
-    let stmt = write::create_records_empty(model, skip_duplicates, ctx);
-    let mut count = 0;
-
-    for _ in 0..num_records {
-        count += conn.execute(stmt.clone().into()).await?;
-    }
-
-    Ok(count as usize)
+    partitioned_batches
 }
 
 /// Update one record in a database defined in `conn` and the records

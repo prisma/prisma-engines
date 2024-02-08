@@ -97,7 +97,13 @@ impl WriteQuery {
             Self::CreateRecord(cr) => cr.selected_fields.merge_in_place(fields),
             Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => ur.selected_fields.merge_in_place(fields),
             Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => (),
-            Self::CreateManyRecords(_) => (),
+            Self::CreateManyRecords(CreateManyRecords {
+                selected_fields: Some(selected_fields),
+                ..
+            }) => selected_fields.fields.merge_in_place(fields),
+            Self::CreateManyRecords(CreateManyRecords {
+                selected_fields: None, ..
+            }) => (),
             Self::DeleteRecord(DeleteRecord {
                 selected_fields: Some(selected_fields),
                 ..
@@ -215,7 +221,11 @@ impl ToGraphviz for WriteQuery {
     fn to_graphviz(&self) -> String {
         match self {
             Self::CreateRecord(q) => format!("CreateRecord(model: {}, args: {:?})", q.model.name(), q.args),
-            Self::CreateManyRecords(q) => format!("CreateManyRecord(model: {})", q.model.name()),
+            Self::CreateManyRecords(q) => format!(
+                "CreateManyRecord(model: {}, selected_fields: {:?})",
+                q.model.name(),
+                q.selected_fields
+            ),
             Self::UpdateRecord(q) => format!(
                 "UpdateRecord(model: {}, selection: {:?})",
                 q.model().name(),
@@ -249,6 +259,7 @@ pub struct CreateRecord {
 
 #[derive(Debug, Clone)]
 pub struct CreateManyRecords {
+    pub name: String,
     pub model: Model,
     pub args: Vec<WriteArgs>,
     pub skip_duplicates: bool,
@@ -259,8 +270,8 @@ pub struct CreateManyRecords {
 
 #[derive(Debug, Clone)]
 pub struct CreateManyRecordsFields {
-    pub selected_fields: FieldSelection,
-    pub selection_order: Vec<String>,
+    pub fields: FieldSelection,
+    pub order: Vec<String>,
 }
 
 impl CreateManyRecords {

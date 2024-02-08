@@ -79,6 +79,17 @@ impl WriteOperations for MongoDbConnection {
         .await
     }
 
+    async fn create_records_returning(
+        &mut self,
+        _model: &Model,
+        _args: Vec<WriteArgs>,
+        _skip_duplicates: bool,
+        _selected_fields: FieldSelection,
+        _trace_id: Option<String>,
+    ) -> connector_interface::Result<ManyRecords> {
+        unimplemented!()
+    }
+
     async fn update_records(
         &mut self,
         model: &Model,
