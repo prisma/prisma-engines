@@ -7,9 +7,11 @@ runs:
       shell: bash
       run: rustup default stable
 
-    - name: Install wasm-bindgen, wasm-opt and wasm-pack
+    - uses: cargo-bins/cargo-binstall@main
+
+    - name: Install wasm-bindgen, wasm-opt
       shell: bash
-      run: cargo install wasm-bindgen-cli wasm-opt wasm-pack
+      run: cargo binstall -y wasm-bindgen-cli wasm-opt
 
     - name: Install bc
       shell: bash
