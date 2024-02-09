@@ -414,27 +414,38 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             JsonPath::Array(json_path) => {
                 self.write("(")?;
                 self.visit_expression(*json_extract.column)?;
-
+                let json_path_len = json_path.len();
                 if json_extract.extract_as_string {
-                    self.write("#>>")?;
+                    if json_path_len > 1 {
+                        self.write("#>>")?;
+                    } else {
+                        // If the path is single item, accesing it this way is faster and can benefit from indices usage
+                        self.write("->>")?;
+                    }
                 } else {
                     self.write("#>")?;
                 }
 
-                // We use the `ARRAY[]::text[]` notation to better handle escaped character
-                // The text protocol used when sending prepared statement doesn't seem to work well with escaped characters
-                // when using the '{a, b, c}' string array notation.
-                self.surround_with("ARRAY[", "]::text[]", |s| {
-                    let len = json_path.len();
-                    for (index, path) in json_path.into_iter().enumerate() {
-                        s.visit_parameterized(Value::text(path))?;
-                        if index < len - 1 {
-                            s.write(", ")?;
+                if json_path_len > 1 { 
+                    // We use the `ARRAY[]::text[]` notation to better handle escaped character
+                    // The text protocol used when sending prepared statement doesn't seem to work well with escaped characters
+                    // when using the '{a, b, c}' string array notation.
+                    self.surround_with("ARRAY[", "]::text[]", |s| {
+                        let len = json_path.len();
+                        for (index, path) in json_path.into_iter().enumerate() {
+                            s.visit_parameterized(Value::text(path))?;
+                            if index < len - 1 {
+                                s.write(", ")?;
+                            }
                         }
-                    }
-                    Ok(())
-                })?;
-
+                        Ok(())
+                    })?;
+                } else {
+                    match json_path.into_iter().next() {
+                        Some(path) => { self.visit_parameterized(Value::text(path))?; },
+                        None => {},
+                    };
+                }
                 self.write(")")?;
 
                 if !json_extract.extract_as_string {
