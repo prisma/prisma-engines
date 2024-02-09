@@ -12,7 +12,7 @@ tokio = { workspace = true, optional = true }
 tracing = "0.1"
 tracing-error = "0.2"
 tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
-url = "2.1.1"
+url.workspace = true
 quaint = { workspace = true, optional = true }
 
 [features]

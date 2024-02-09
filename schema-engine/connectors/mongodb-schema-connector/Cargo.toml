@@ -26,6 +26,6 @@ indoc.workspace = true
 serde.workspace = true
 dissimilar = "1.0.3"
 once_cell = "1.8.0"
-url = "2"
+url.workspace = true
 expect-test = "1"
 names = { version = "0.12", default-features = false }

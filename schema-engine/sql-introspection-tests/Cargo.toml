@@ -20,7 +20,7 @@ tokio.workspace = true
 tracing = "0.1"
 indoc.workspace = true
 expect-test = "1.1.0"
-url = "2"
+url.workspace = true
 quaint.workspace = true
 
 [dependencies.barrel]

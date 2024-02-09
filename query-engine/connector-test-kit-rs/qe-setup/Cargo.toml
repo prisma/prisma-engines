@@ -14,5 +14,5 @@ enumflags2.workspace = true
 
 connection-string = "*"
 mongodb = "2.8.0"
-url = "2"
+url.workspace = true
 once_cell = "1.17.0"

@@ -37,7 +37,7 @@ napi-derive.workspace = true
 
 thiserror = "1"
 connection-string.workspace = true
-url = "2"
+url.workspace = true
 serde_json.workspace = true
 serde.workspace = true
 

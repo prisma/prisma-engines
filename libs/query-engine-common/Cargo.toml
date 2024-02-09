@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 thiserror = "1"
-url = "2"
+url.workspace = true
 query-connector = { path = "../../query-engine/connectors/query-connector" }
 query-core = { path = "../../query-engine/core" }
 user-facing-errors = { path = "../user-facing-errors" }

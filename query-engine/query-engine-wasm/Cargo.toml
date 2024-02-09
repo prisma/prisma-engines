@@ -41,7 +41,7 @@ wasm-bindgen-futures.workspace = true
 wasm-rs-dbg.workspace = true
 
 thiserror = "1"
-url = "2"
+url.workspace = true
 serde.workspace = true
 tokio = { version = "1.25", features = ["macros", "sync", "io-util", "time"] }
 futures = "0.3"
