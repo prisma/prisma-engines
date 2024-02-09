@@ -20,6 +20,20 @@ PROFILE ?= dev
 
 default: build
 
+##################
+# clean wrappers #
+##################
+
+clean-qe-wasm:
+	@echo "Cleaning query-engine/query-engine-wasm/pkg" && \
+	cd query-engine/query-engine-wasm/pkg && find . ! -name '.' ! -name '..' ! -name 'README.md' -exec rm -rf {} +
+
+clean-cargo:
+	@echo "Cleaning cargo" && \
+	cargo clean
+
+clean: clean-qe-wasm clean-cargo
+
 ###################
 # script wrappers #
 ###################
