@@ -97,7 +97,7 @@ jobs:
             echo "DRIVER_ADAPTERS_BRANCH=$branch" >> "$GITHUB_ENV"
           fi
 
-      - uses: cachix/install-nix-action@v24
+      - uses: ./.github/workflows/include/rust-wasm-setup
       - uses: taiki-e/install-action@nextest
 
       - run: make ${{ matrix.adapter.setup_task }}

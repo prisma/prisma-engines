@@ -29,8 +29,7 @@ jobs:
       - name: Checkout PR branch
         uses: actions/checkout@v4
 
-      - name: Setup rust for wasm
-        uses: ./.github/workflows/include/rust-wasm-setup
+      - uses: ./.github/workflows/include/rust-wasm-setup
 
       - name: Build and measure PR branch
         id: measure

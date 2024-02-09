@@ -1,8 +1,12 @@
-name: Rust Wasm Setup
+name: Rust + WASM common deps
 
 runs:
   using: "composite"
   steps:
+    - name: Set default toolchain
+      shell: bash
+      run: rustup default stable
+
     - name: Install wasm-bindgen, wasmp-opt and wasm-pack
       shell: bash
       run: cargo install wasm-bindgen-cli wasm-opt wasm-pack
