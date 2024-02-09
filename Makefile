@@ -20,9 +20,9 @@ PROFILE ?= dev
 
 default: build
 
-##################
-# clean wrappers #
-##################
+###############
+# clean tasks #
+###############
 
 clean-qe-wasm:
 	@echo "Cleaning query-engine/query-engine-wasm/pkg" && \
@@ -61,7 +61,7 @@ build-qe-wasm:
 	cd query-engine/query-engine-wasm && \
 	./build.sh $(QE_WASM_VERSION) query-engine/query-engine-wasm/pkg
 
-build-qe-wasm-gz: #build-qe-wasm
+build-qe-wasm-gz: build-qe-wasm
 	@cd query-engine/query-engine-wasm/pkg && \
     for provider in postgresql mysql sqlite; do \
         tar -zcvf $$provider.gz $$provider; \
