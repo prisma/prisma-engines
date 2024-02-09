@@ -18,7 +18,12 @@ impl ToNapiValue for JSArg {
         match value {
             JSArg::Value(v) => ToNapiValue::to_napi_value(env, v),
             JSArg::Buffer(bytes) => {
-                ToNapiValue::to_napi_value(env, napi::Env::from_raw(env).create_buffer_with_data(bytes)?.into_raw())
+                let env = napi::Env::from_raw(env);
+                let length = bytes.len();
+                let buffer = env.create_arraybuffer_with_data(bytes)?.into_raw();
+                let byte_array = buffer.into_typedarray(napi::TypedArrayType::Uint8, length, 0)?;
+
+                ToNapiValue::to_napi_value(env.raw(), byte_array)
             }
             // While arrays are encodable as JSON generally, their element might not be, or may be
             // represented in a different way than we need. We use this custom logic for all arrays
