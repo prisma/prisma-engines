@@ -48,7 +48,6 @@ jobs:
 
       - name: Publish @prisma/prisma-schema-wasm
         run: |
-          # Update version in package.json and return directory for later usage
           npm publish target/prisma-schema-wasm --access public --tag ${{ github.event.inputs.npmDistTag }}
       #
       # Failure handlers
