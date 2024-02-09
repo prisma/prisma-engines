@@ -12,7 +12,7 @@ vendored-openssl = ["sql-connector/vendored-openssl"]
 [dependencies]
 tokio.workspace = true
 anyhow = "1.0"
-async-trait = "0.1"
+async-trait.workspace = true
 base64 = "0.13"
 connection-string.workspace = true
 connector = { path = "../connectors/query-connector", package = "query-connector" }

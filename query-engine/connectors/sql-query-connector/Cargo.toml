@@ -16,7 +16,7 @@ driver-adapters = []
 [dependencies]
 psl.workspace = true
 anyhow = "1.0"
-async-trait = "0.1"
+async-trait.workspace = true
 bigdecimal = "0.3"
 futures = "0.3"
 itertools.workspace = true

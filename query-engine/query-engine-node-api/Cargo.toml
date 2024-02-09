@@ -18,7 +18,7 @@ driver-adapters = [
 
 [dependencies]
 anyhow = "1"
-async-trait = "0.1"
+async-trait.workspace = true
 query-core = { path = "../core", features = ["metrics"] }
 request-handlers = { path = "../request-handlers" }
 query-connector = { path = "../connectors/query-connector" }

@@ -18,7 +18,7 @@ mysql = ["driver-adapters/mysql", "sql-connector/mysql"]
 query-connector = { path = "../connectors/query-connector" }
 query-engine-common = { path = "../../libs/query-engine-common" }
 anyhow = "1"
-async-trait = "0.1"
+async-trait.workspace = true
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 psl.workspace = true
 query-structure = { path = "../query-structure" }
