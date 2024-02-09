@@ -4,7 +4,7 @@
 use super::pipeline::QueryPipeline;
 use crate::{
     executor::request_context, protocol::EngineProtocol, CoreError, IrSerializer, Operation, QueryGraph,
-    QueryGraphBuilder, QueryInterpreter, ResponseData, ToGraphviz,
+    QueryGraphBuilder, QueryInterpreter, ResponseData,
 };
 use connector::{Connection, ConnectionLike, Connector};
 use crosstarget_utils::time::ElapsedTimeCounter;

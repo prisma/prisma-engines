@@ -83,7 +83,7 @@ pub(crate) fn create_records_nonempty(
     let mut insert = insert.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
 
     if let Some(selected_fields) = selected_fields {
-        insert = insert.returning(projection_into_columns(&selected_fields, ctx));
+        insert = insert.returning(projection_into_columns(selected_fields, ctx));
     }
 
     if skip_duplicates {
@@ -104,7 +104,7 @@ pub(crate) fn create_records_empty(
     let mut insert = insert.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
 
     if let Some(selected_fields) = selected_fields {
-        insert = insert.returning(projection_into_columns(&selected_fields, ctx));
+        insert = insert.returning(projection_into_columns(selected_fields, ctx));
     }
 
     if skip_duplicates {

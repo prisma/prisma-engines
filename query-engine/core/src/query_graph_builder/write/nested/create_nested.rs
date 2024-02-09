@@ -26,7 +26,7 @@ pub fn nested_create(
     let data_maps = utils::coerce_vec(value)
         .into_iter()
         .map(|value| {
-            let mut parser = WriteArgsParser::from(&child_model, value.try_into()?)?;
+            let mut parser = WriteArgsParser::from(child_model, value.try_into()?)?;
             parser.args.add_datetimes(child_model);
             Ok((parser.args, parser.nested))
         })

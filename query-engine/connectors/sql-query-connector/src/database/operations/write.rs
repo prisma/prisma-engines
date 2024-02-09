@@ -196,7 +196,7 @@ pub(crate) async fn create_record(
 }
 
 /// Returns a set of fields that are used in the arguments for the create operation.
-fn collect_affected_fields(args: &Vec<WriteArgs>, model: &Model) -> HashSet<ScalarFieldRef> {
+fn collect_affected_fields(args: &[WriteArgs], model: &Model) -> HashSet<ScalarFieldRef> {
     let mut fields = HashSet::new();
     args.iter().for_each(|arg| fields.extend(arg.keys()));
 
@@ -326,7 +326,7 @@ fn partition_into_batches(args: Vec<WriteArgs>, ctx: &Context<'_>) -> Vec<Vec<Wr
         vec![args]
     };
 
-    let partitioned_batches = if let Some(max_rows) = ctx.max_insert_rows {
+    if let Some(max_rows) = ctx.max_insert_rows {
         let capacity = batches.len();
         batches
             .into_iter()
@@ -347,9 +347,7 @@ fn partition_into_batches(args: Vec<WriteArgs>, ctx: &Context<'_>) -> Vec<Vec<Wr
             })
     } else {
         batches
-    };
-
-    partitioned_batches
+    }
 }
 
 /// Update one record in a database defined in `conn` and the records

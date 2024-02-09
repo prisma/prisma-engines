@@ -2,7 +2,7 @@ use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, ParsedField, ParsedInputList, ParsedInputMap, ParsedInputValue,
+    ArgumentListLookup, ParsedField, ParsedInputList, ParsedInputMap,
 };
 use connector::WriteArgs;
 use psl::{datamodel_connector::ConnectorCapability, parser_database::RelationFieldId};
