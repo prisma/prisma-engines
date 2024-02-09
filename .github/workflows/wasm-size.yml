@@ -41,7 +41,7 @@ jobs:
       - name: Build and measure PR branch
         id: measure
         run: |
-          export WASM_SIZE_OUTPUT=$GITHUB_OUTPUT
+          export ENGINE_SIZE_OUTPUT=$GITHUB_OUTPUT
           make measure-qe-wasm
 
   base-wasm-size:
@@ -72,7 +72,7 @@ jobs:
       - name: Build and measure base branch
         id: measure
         run: |
-          export WASM_SIZE_OUTPUT=$GITHUB_OUTPUT
+          export ENGINE_SIZE_OUTPUT=$GITHUB_OUTPUT
           make measure-qe-wasm
 
   report-diff:
