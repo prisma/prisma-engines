@@ -3,9 +3,9 @@ name: Rust Wasm Setup
 runs:
   using: "composite"
   steps:
-    - name: Install wasm-bindgen-cli
+    - name: Install wasm-bindgen, wasmp-opt and wasm-pack
       shell: bash
-      run: cargo install wasm-bindgen-cli
+      run: cargo install wasm-bindgen-cli wasm-opt wasm-pack
 
     - name: Install bc
       shell: bash
