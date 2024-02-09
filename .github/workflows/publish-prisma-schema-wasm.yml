@@ -34,6 +34,7 @@ jobs:
           ref: ${{ github.event.inputs.enginesHash }}
 
       - uses: ./.github/workflows/include/rust-wasm-setup
+      - run: rustup target add wasm32-unknown-unknown
 
       - name: Build
         run: make build-schema-wasm PROFILE=release SCHEMA_WASM_VERSION=${{ github.event.inputs.enginesWrapperVersion }}
