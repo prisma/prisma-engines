@@ -4,6 +4,7 @@ SCHEMA_EXAMPLES_PATH = ./query-engine/example_schemas
 DEV_SCHEMA_FILE = dev_datamodel.prisma
 DRIVER_ADAPTERS_BRANCH ?= main
 WASM_SIZE_OUTPUT ?= /dev/stdout
+QE_WASM_VERSION ?= 0.0.0
 
 LIBRARY_EXT := $(shell                            \
     case "$$(uname -s)" in                        \
@@ -41,7 +42,7 @@ build-qe-napi:
 
 build-qe-wasm:
 	cd query-engine/query-engine-wasm && \
-	./build.sh 0.0.0 query-engine/query-engine-wasm/pkg
+	./build.sh $(QE_WASM_VERSION) query-engine/query-engine-wasm/pkg
 
 build-qe-wasm-gz: build-qe-wasm
 	@cd query-engine/query-engine-wasm/pkg && \
