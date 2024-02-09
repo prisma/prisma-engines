@@ -343,10 +343,7 @@ measure-qe-wasm: build-qe-wasm
 	gzip -k -c query_engine_bg.wasm | wc -c | awk '{$$1/=(1024*1024); printf "Current wasm query-engine size compressed: %.3fMB\n", $$1}'
 
 build-driver-adapters-kit: build-driver-adapters
-# doing pnpm i twice in here
-# once, because we need dev dependencies to build adapters
-# second time, because we don't want dev dependencies of prisma/prisma to mess with executor
-	cd query-engine/driver-adapters && pnpm i && pnpm build && pnpm i --prod --force
+	cd query-engine/driver-adapters && pnpm i
 
 build-driver-adapters: ensure-prisma-present
 	@echo "Building driver adapters..."
