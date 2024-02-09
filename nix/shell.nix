@@ -7,8 +7,7 @@ in
 {
   devShells.default = pkgs.mkShell {
     packages = with pkgs; [
-      # devToolchain
-      rustup
+      devToolchain
       llvmPackages_latest.bintools
 
       nodejs_20
