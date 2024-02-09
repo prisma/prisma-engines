@@ -5,7 +5,7 @@ inputs:
     description: "Rust toolchain version"
     required: true
     type: string
-    default: "nightly"
+    default: "nightly-2024-01-25"
 
 runs:
   using: "composite"
