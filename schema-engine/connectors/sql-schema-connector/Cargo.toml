@@ -26,7 +26,7 @@ connection-string.workspace = true
 enumflags2 = "0.7.7"
 once_cell = "1.3"
 regex = "1"
-serde_json = { version = "1.0" }
+serde_json.workspace = true
 tracing = "0.1"
 tracing-futures = "0.2"
 url = "2.1.1"

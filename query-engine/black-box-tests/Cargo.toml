@@ -8,7 +8,7 @@ query-engine-tests = { path = "../connector-test-kit-rs/query-engine-tests" }
 query-tests-setup = { path = "../connector-test-kit-rs/query-tests-setup" }
 reqwest = "0.11"
 anyhow = "1.0"
-serde_json = "1.0"
+serde_json.workspace = true
 indoc.workspace = true
 tokio.workspace = true
 user-facing-errors.workspace = true
