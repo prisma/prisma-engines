@@ -14,8 +14,6 @@ runs:
       uses: dtolnay/rust-toolchain@nightly
       with:
         toolchain: ${{ inputs.toolchain }}
-        targets: "wasm32-unknown-unknown"
-        components: "rust-std"
 
     - name: Install wasm-bindgen-cli
       shell: bash
