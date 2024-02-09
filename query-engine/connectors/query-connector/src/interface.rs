@@ -266,8 +266,6 @@ pub trait WriteOperations {
     /// selected fields.
     /// This method should not be used if the connector does not support
     /// returning created rows.
-    /// TODO laplab: I do not like these semantics, but we do not have a way
-    /// to re-check capabilities inside this method, unfortunately.
     async fn create_records_returning(
         &mut self,
         model: &Model,

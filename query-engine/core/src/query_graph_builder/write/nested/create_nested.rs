@@ -33,14 +33,29 @@ pub fn nested_create(
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
     let child_records_count = data_maps.len();
 
-    // TODO laplab: comment this.
+    // In some limited cases, we create related records in bulk. The conditions are:
+    // 1. Connector must support creating records in bulk
+    // 2. The number of child records should be greater than one. Technically, there is nothing
+    //    preventing us from using bulk creation for that case, it just does not make a lot of sense
+    // 3. None of the children have any nested create operations. The main reason for this
+    //    limitation is that we do not have any ordering guarantees on records returned from the
+    //    database after their creation. To put it simply, `INSERT ... RETURNING *` can and will
+    //    return records in random order, at least on Postgres. This means that if have 10 children
+    //    records of model X, each of which has 10 children records of model Y, we won't be able to
+    //    associate created records from model X with their children from model Y.
+    // 4. Relation is not 1-1. Again, no technical limitations here, but we know that there can only
+    //    ever be a single related record, so we do not support it in bulk operations due to (2).
+    // 5. If relation is 1-many, it must be inlined in children. Otherwise, we once again have only
+    //    one possible related record, see (2).
+    // 6. If relation is many-many, connector needs to support `RETURNING` or something similar,
+    //    because we need to know the ids of created children records.
     let has_create_many = query_schema.has_capability(ConnectorCapability::CreateMany);
     let has_returning = query_schema.has_capability(ConnectorCapability::InsertReturning);
-    let is_one_to_many_in_child =
-        relation.is_one_to_many() && parent_relation_field.relation_is_inlined_in_child() && has_create_many;
-    let is_many_to_many = relation.is_many_to_many() && has_create_many && has_returning;
+    let is_one_to_many_in_child = relation.is_one_to_many() && parent_relation_field.relation_is_inlined_in_child();
+    let is_many_to_many = relation.is_many_to_many() && has_returning;
     let has_nested = data_maps.iter().any(|(_args, nested)| !nested.is_empty());
-    let should_use_bulk_create = child_records_count > 1 && !has_nested && (is_one_to_many_in_child || is_many_to_many);
+    let should_use_bulk_create =
+        has_create_many && child_records_count > 1 && !has_nested && (is_one_to_many_in_child || is_many_to_many);
 
     if should_use_bulk_create {
         // Create all child records in a single query.
@@ -95,7 +110,13 @@ pub fn nested_create(
     Ok(())
 }
 
-// TODO laplab: comment.
+/// Handles one-to-many nested bulk create.
+///
+/// This function only considers the case where relation is inlined in child.
+/// `parent_node` produces single ID of "one" side of the relation.
+/// `child_node` creates records for the "many" side of the relation, using ID from `parent_node`.
+///
+/// Resulting graph consists of just `parent_node` and `child_node` connected with an edge.
 fn handle_one_to_many_bulk(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
@@ -130,7 +151,14 @@ fn handle_one_to_many_bulk(
     Ok(())
 }
 
-// TODO laplab: comment.
+/// Handles many-to-many nested bulk create.
+///
+/// `parent_node` produces single ID of one side of the many-to-many relation.
+/// `child_node` produces multiple IDs of another side of many-to-many relation.
+/// Since these two nodes do not depend on each other in any way, we do no need to connect them with
+/// an edge.
+///
+/// Please refer to the `connect::connect_records_node` documentation for the resulting graph shape.
 fn handle_many_to_many_bulk(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
@@ -138,7 +166,6 @@ fn handle_many_to_many_bulk(
     child_node: NodeRef,
     expected_connects: usize,
 ) -> QueryGraphBuilderResult<()> {
-    graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
     connect::connect_records_node(
         graph,
         &parent_node,

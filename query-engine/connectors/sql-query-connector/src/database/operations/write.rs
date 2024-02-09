@@ -246,7 +246,6 @@ pub(crate) async fn create_records_count(
     skip_duplicates: bool,
     ctx: &Context<'_>,
 ) -> crate::Result<usize> {
-    // TODO laplab: use `FuturesUnordered`.
     let inserts = generate_insert_statements(model, args, skip_duplicates, None, ctx);
     let mut count = 0;
     for insert in inserts {
@@ -266,7 +265,6 @@ pub(crate) async fn create_records_returning(
     selected_fields: FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
-    // TODO laplab: use `FuturesUnordered`.
     let field_names: Vec<String> = selected_fields.db_names().collect();
     let idents = selected_fields.type_identifiers_with_arities();
     let meta = column_metadata::create(&field_names, &idents);

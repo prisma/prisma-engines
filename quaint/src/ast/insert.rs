@@ -330,17 +330,6 @@ impl<'a> MultiRowInsert<'a> {
         self
     }
 
-    // TODO laplab: comment.
-    #[cfg(any(feature = "postgresql", feature = "mssql", feature = "sqlite"))]
-    pub fn returning<K, I>(mut self, columns: I) -> Self
-    where
-        K: Into<Column<'a>>,
-        I: IntoIterator<Item = K>,
-    {
-        self.returning = Some(columns.into_iter().map(|k| k.into()).collect());
-        self
-    }
-
     /// Convert into a common `Insert` statement.
     pub fn build(self) -> Insert<'a> {
         Insert::from(self)

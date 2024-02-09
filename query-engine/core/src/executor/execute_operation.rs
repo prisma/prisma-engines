@@ -292,12 +292,6 @@ async fn execute_on<'a>(
 fn build_graph(query_schema: &QuerySchema, operation: Operation) -> crate::Result<(QueryGraph, IrSerializer<'_>)> {
     let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
 
-    // TODO laplab: Remove.
-    static COUNTER: std::sync::Mutex<u32> = std::sync::Mutex::new(0);
-    *COUNTER.lock().unwrap() += 1;
-    let current = *COUNTER.lock().unwrap();
-    std::fs::write(format!("graph{}.graphviz", current), query_graph.to_graphviz()).unwrap();
-
     Ok((query_graph, serializer))
 }
 
