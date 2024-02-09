@@ -1,3 +1,5 @@
+REPO_ROOT := $(shell git rev-parse --show-toplevel)
+
 CONFIG_PATH = ./query-engine/connector-test-kit-rs/test-configs
 CONFIG_FILE = .test_config
 SCHEMA_EXAMPLES_PATH = ./query-engine/example_schemas
@@ -5,6 +7,7 @@ DEV_SCHEMA_FILE = dev_datamodel.prisma
 DRIVER_ADAPTERS_BRANCH ?= main
 ENGINE_SIZE_OUTPUT ?= /dev/stdout
 QE_WASM_VERSION ?= 0.0.0
+SCHEMA_WASM_VERSION ?= 0.0.0
 
 LIBRARY_EXT := $(shell                            \
     case "$$(uname -s)" in                        \
@@ -52,8 +55,13 @@ build-qe-wasm-gz: build-qe-wasm
 	tar -zcvf all_providers.gz query_engine* package.json; \
 
 build-schema-wasm:
+	@echo "🛠️  Building the Rust crate"
 	cargo build --profile $(PROFILE) --target=wasm32-unknown-unknown -p prisma-schema-build
-	WASM_BUILD_PROFILE=$(PROFILE) out="target/prisma-schema-wasm" prisma-schema-wasm/scripts/install.sh
+
+	@echo "📦 Creating the npm package"
+	WASM_BUILD_PROFILE=$(PROFILE) \
+	out="$(REPO_ROOT)/target/prisma-schema-wasm" \
+	"$(REPO_ROOT)/prisma-schema-wasm/scripts/install.sh"
 
 # Emulate pedantic CI compilation.
 pedantic:
@@ -93,6 +101,11 @@ test-qe-verbose-st:
 test-qe-black-box: build-qe
 	cargo test --package black-box-tests -- --test-threads 1
 
+check-schema-wasm-package: build-schema-wasm
+	PRISMA_SCHEMA_WASM="$(REPO_ROOT)/target/prisma-schema-wasm" \
+	out=$(shell mktemp -d) \
+	NODE=$(shell which node) \
+	"$(REPO_ROOT)/prisma-schema-wasm/scripts/check.sh"
 
 ###########################
 # Database setup commands #
