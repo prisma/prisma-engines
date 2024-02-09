@@ -48,7 +48,8 @@ build-qe-wasm-gz: build-qe-wasm
 	@cd query-engine/query-engine-wasm/pkg && \
     for provider in postgresql mysql sqlite; do \
         tar -zcvf $$provider.gz $$provider; \
-    done
+    done; \
+	tar -zcvf all_providers.gz query_engine* package.json; \
 
 build-schema-wasm:
 	cargo build --profile $(PROFILE) --target=wasm32-unknown-unknown -p prisma-schema-build
@@ -347,7 +348,10 @@ measure-qe-wasm: build-qe-wasm-gz
 		provider_size_bytes=$$(cat $$provider/* | wc -c); \
 		echo "$${provider}_size=$$(bc -e "scale=0; $$provider_size_bytes / 1024")" >> $(WASM_SIZE_OUTPUT); \
 		echo "$${provider}_size_gz=$$(du -k $$provider.gz | cut -f1)" >> $(WASM_SIZE_OUTPUT); \
-	done
+	done; \
+	all_providers_size_bytes=$$(cat query_engine* | wc -c); \
+	echo "all_providers_size=$$(bc -e "scale=0; $$all_providers_size_bytes / 1024")" >> $(WASM_SIZE_OUTPUT); \
+	echo "all_providers_size_gz=$$(du -k all_providers.gz | cut -f1)" >> $(WASM_SIZE_OUTPUT);
 
 build-driver-adapters-kit: build-driver-adapters
 	cd query-engine/driver-adapters && pnpm i && pnpm build
