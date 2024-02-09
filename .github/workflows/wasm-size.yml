@@ -42,7 +42,7 @@ jobs:
         id: measure
         run: |
           export WASM_SIZE_OUTPUT=$GITHUB_OUTPUT
-          make measure-wasm-size
+          make measure-qe-wasm
 
   base-wasm-size:
     name: calculate module sizes (base branch)
@@ -73,7 +73,7 @@ jobs:
         id: measure
         run: |
           export WASM_SIZE_OUTPUT=$GITHUB_OUTPUT
-          make measure-wasm-size
+          make measure-qe-wasm
 
   report-diff:
     name: report module size
