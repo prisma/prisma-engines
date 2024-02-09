@@ -50,6 +50,10 @@ build-qe-wasm-gz: build-qe-wasm
         tar -zcvf $$provider.gz $$provider; \
     done
 
+build-schema-wasm:
+	cargo build --profile $(PROFILE) --target=wasm32-unknown-unknown -p prisma-schema-build
+	WASM_BUILD_PROFILE=$(PROFILE) out="target/prisma-schema-wasm" prisma-schema-wasm/scripts/install.sh
+
 # Emulate pedantic CI compilation.
 pedantic:
 	RUSTFLAGS="-D warnings" cargo fmt -- --check && RUSTFLAGS="-D warnings" cargo clippy --all-targets
