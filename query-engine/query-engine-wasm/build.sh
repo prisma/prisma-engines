@@ -44,7 +44,7 @@ fi
 if [ "$WASM_BUILD_PROFILE" = "dev" ]; then
     WASM_TARGET_SUBDIR="debug"
 else
-    WASM_TARGET_SUBDIR="release"
+    WASM_TARGET_SUBDIR="$WASM_BUILD_PROFILE"
 fi
 
 echo "Using build profile: \"${WASM_BUILD_PROFILE}\"" 
