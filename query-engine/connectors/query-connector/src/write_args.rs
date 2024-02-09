@@ -376,7 +376,7 @@ impl WriteArgs {
     }
 
     pub fn take_field_value(&mut self, field: &str) -> Option<WriteOperation> {
-        self.args.remove(field)
+        self.args.swap_remove(field)
     }
 
     pub fn keys(&self) -> Keys<DatasourceFieldName, WriteOperation> {

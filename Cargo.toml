@@ -50,6 +50,7 @@ tokio = { version = "1.25", features = [
 user-facing-errors = { path = "./libs/user-facing-errors" }
 uuid = { version = "1", features = ["serde"] }
 indoc = "2.0.1"
+indexmap = { version = "2.2.2", features = ["serde"] }
 itertools = "0.12"
 connection-string = "0.2"
 napi = { version = "2.15.1", default-features = false, features = [
