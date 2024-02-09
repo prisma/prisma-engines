@@ -60,6 +60,7 @@ build-schema-wasm:
 
 	@echo "📦 Creating the npm package"
 	WASM_BUILD_PROFILE=$(PROFILE) \
+	NPM_PACKAGE_VERSION=$(SCHEMA_WASM_VERSION) \
 	out="$(REPO_ROOT)/target/prisma-schema-wasm" \
 	"$(REPO_ROOT)/prisma-schema-wasm/scripts/install.sh"
 
