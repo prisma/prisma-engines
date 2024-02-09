@@ -29,5 +29,5 @@ tempfile = "3.1.0"
 tokio.workspace = true
 tracing = "0.1"
 tracing-futures = "0.2"
-url = "2.1.1"
+url.workspace = true
 quaint.workspace = true

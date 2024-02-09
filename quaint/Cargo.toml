@@ -74,7 +74,7 @@ thiserror = "1.0"
 num_cpus = "1.12"
 metrics = "0.18"
 futures = "0.3"
-url = "2.1"
+url.workspace = true
 hex = "0.4"
 itertools.workspace = true
 

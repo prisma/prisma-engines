@@ -19,7 +19,7 @@ indexmap.workspace = true
 bigdecimal = "0.3"
 thiserror = "1"
 tracing = "0.1"
-url = "2"
+url.workspace = true
 connection-string.workspace = true
 once_cell = "1.15"
 

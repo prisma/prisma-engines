@@ -27,7 +27,7 @@ serde_json.workspace = true
 sql-connector = { path = "../connectors/sql-query-connector", optional = true, package = "sql-query-connector" }
 structopt = "0.3"
 thiserror = "1.0"
-url = "2.1"
+url.workspace = true
 hyper = { version = "0.14", features = ["server", "http1", "http2", "runtime"] }
 tracing = "0.1"
 tracing-opentelemetry = "0.17.3"
