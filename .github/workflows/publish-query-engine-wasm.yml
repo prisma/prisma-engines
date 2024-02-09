@@ -31,7 +31,7 @@ jobs:
           ref: ${{ github.event.inputs.enginesHash }}
 
       - name: Setup rust for wasm
-        uses: ./.github/workflows/include/rust-wasm-setup.yml
+        uses: ./.github/workflows/include/rust-wasm-setup
 
       - name: Build @prisma/query-engine-wasm
         run: make build-qe-wasm
