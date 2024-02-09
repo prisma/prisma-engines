@@ -16,7 +16,7 @@ async-trait = "0.1"
 base64 = "0.13"
 connection-string.workspace = true
 connector = { path = "../connectors/query-connector", package = "query-connector" }
-enumflags2 = { version = "0.7"}
+enumflags2.workspace = true
 psl.workspace = true
 graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
 mongodb-connector = { path = "../connectors/mongodb-query-connector", optional = true, package = "mongodb-query-connector" }

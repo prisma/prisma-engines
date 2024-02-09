@@ -13,6 +13,6 @@ indoc.workspace = true
 tokio.workspace = true
 user-facing-errors.workspace = true
 insta = "1.7.1"
-enumflags2 = "0.7"
+enumflags2.workspace = true
 query-engine-metrics = {path = "../metrics"}
 regex = "1.9.3"

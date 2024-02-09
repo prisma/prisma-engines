@@ -9,7 +9,7 @@ psl.workspace = true
 
 async-trait = "0.1.17"
 bigdecimal = "0.3"
-enumflags2 = { version = "0.7", features = ["serde"] }
+enumflags2.workspace = true
 indexmap.workspace = true
 indoc.workspace = true
 once_cell = "1.3"
