@@ -18,7 +18,9 @@ runs:
         components: "rust-std"
 
     - name: Install wasm-bindgen-cli
+      shell: bash
       run: cargo install wasm-bindgen-cli
 
     - name: Install bc
+      shell: bash
       run: sudo apt update && sudo apt-get install -y bc
