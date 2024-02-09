@@ -51,6 +51,9 @@ fi
 echo "Using build profile: \"${WASM_BUILD_PROFILE}\"" 
 
 echo "ℹ️  Configuring rust toolchain to use nightly and rust-src component"
+rustup default nightly-2024-01-25 
+rustup target add wasm32-unknown-unknown
+rustup component add rust-src --target wasm32-unknown-unknown
 export RUSTFLAGS="-Zlocation-detail=none"
 CARGO_TARGET_DIR=$(cargo metadata --format-version 1 | jq -r .target_directory)
 
