@@ -1,20 +1,8 @@
 name: Rust Wasm Setup
 
-inputs:
-  toolchain:
-    description: "Rust toolchain version"
-    required: true
-    type: string
-    default: "nightly-2024-01-25"
-
 runs:
   using: "composite"
   steps:
-    - name: Setup Rust toolchain
-      uses: dtolnay/rust-toolchain@nightly
-      with:
-        toolchain: ${{ inputs.toolchain }}
-
     - name: Install wasm-bindgen-cli
       shell: bash
       run: cargo install wasm-bindgen-cli
