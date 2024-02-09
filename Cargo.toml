@@ -49,7 +49,7 @@ tokio = { version = "1.25", features = [
   "parking_lot",
   "time",
 ] }
-chrono = { version = "0.4", features = ["serde"] }
+chrono = { version = "0.4", default-features = false, features = ["serde"]}
 user-facing-errors = { path = "./libs/user-facing-errors" }
 uuid = { version = "1", features = ["serde", "v4"] }
 indoc = "2.0.1"

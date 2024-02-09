@@ -208,7 +208,7 @@ pub fn js_value_to_quaint(
         ColumnType::DateTime => match json_value {
             // TODO: change parsing order to prefer RFC3339
             serde_json::Value::String(s) => quaint::chrono::NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S%.f")
-                .map(|dt| DateTime::from_utc(dt, Utc))
+                .map(|dt| DateTime::from_naive_utc_and_offset(dt, Utc))
                 .or_else(|_| DateTime::parse_from_rfc3339(&s).map(DateTime::<Utc>::from))
                 .map(QuaintValue::datetime)
                 .map_err(|_| conversion_error!("expected a datetime string in column '{column_name}', found {s}")),
@@ -590,7 +590,7 @@ mod proxy_test {
             .unwrap()
             .and_hms_milli_opt(23, 59, 59, 415)
             .unwrap();
-        let datetime = DateTime::from_utc(datetime, Utc);
+        let datetime = DateTime::from_naive_utc_and_offset(datetime, Utc);
         assert_eq!(quaint_value, QuaintValue::datetime(datetime));
 
         let s = "2023-01-01 23:59:59.123456";
@@ -601,7 +601,7 @@ mod proxy_test {
             .unwrap()
             .and_hms_micro_opt(23, 59, 59, 123_456)
             .unwrap();
-        let datetime = DateTime::from_utc(datetime, Utc);
+        let datetime = DateTime::from_naive_utc_and_offset(datetime, Utc);
         assert_eq!(quaint_value, QuaintValue::datetime(datetime));
 
         let s = "2023-01-01 23:59:59";
@@ -612,7 +612,7 @@ mod proxy_test {
             .unwrap()
             .and_hms_milli_opt(23, 59, 59, 0)
             .unwrap();
-        let datetime = DateTime::from_utc(datetime, Utc);
+        let datetime = DateTime::from_naive_utc_and_offset(datetime, Utc);
         assert_eq!(quaint_value, QuaintValue::datetime(datetime));
     }
 

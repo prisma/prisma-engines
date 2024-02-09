@@ -283,7 +283,7 @@ impl TakeRow for my::Row {
                     let date = NaiveDate::from_ymd_opt(year.into(), month.into(), day.into()).unwrap();
                     let dt = NaiveDateTime::new(date, time);
 
-                    Value::datetime(DateTime::<Utc>::from_utc(dt, Utc))
+                    Value::datetime(DateTime::<Utc>::from_naive_utc_and_offset(dt, Utc))
                 }
                 my::Value::Time(is_neg, days, hours, minutes, seconds, micros) => {
                     if is_neg {
