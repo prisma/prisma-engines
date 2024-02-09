@@ -53,14 +53,7 @@ jobs:
         # with:
         #   ref: ${{ github.event.pull_request.base.sha }}
 
-      - uses: dtolnay/rust-toolchain@nightly
-        with:
-          toolchain: nightly-2024-01-25
-          targets: wasm32-unknown-unknown
-          components: rust-src
-
-      - name: Install bc
-        run: sudo apt update && sudo apt-get install -y bc
+      - uses: ./.github/workflows/include/rust-wasm-setup
 
       - name: Build and measure base branch
         id: measure

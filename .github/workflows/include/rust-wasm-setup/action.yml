@@ -7,7 +7,7 @@ runs:
       shell: bash
       run: rustup default stable
 
-    - name: Install wasm-bindgen, wasmp-opt and wasm-pack
+    - name: Install wasm-bindgen, wasm-opt and wasm-pack
       shell: bash
       run: cargo install wasm-bindgen-cli wasm-opt wasm-pack
 
