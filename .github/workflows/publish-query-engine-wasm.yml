@@ -30,11 +30,8 @@ jobs:
         with:
           ref: ${{ github.event.inputs.enginesHash }}
 
-      - uses: dtolnay/rust-toolchain@nightly
-        with:
-          toolchain: nightly-2024-01-25
-          targets: wasm32-unknown-unknown
-          components: rust-src
+      - name: Setup rust for wasm
+        uses: ./.github/workflows/include/rust-wasm-setup.yml
 
       - name: Build @prisma/query-engine-wasm
         run: make build-qe-wasm

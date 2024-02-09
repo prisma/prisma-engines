@@ -29,14 +29,8 @@ jobs:
       - name: Checkout PR branch
         uses: actions/checkout@v4
 
-      - uses: dtolnay/rust-toolchain@nightly
-        with:
-          toolchain: nightly-2024-01-25
-          targets: wasm32-unknown-unknown
-          components: rust-src
-
-      - name: Install bc
-        run: sudo apt update && sudo apt-get install -y bc
+      - name: Setup rust for wasm
+        uses: ./.github/workflows/include/rust-wasm-setup.yml
 
       - name: Build and measure PR branch
         id: measure
