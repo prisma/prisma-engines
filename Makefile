@@ -340,8 +340,8 @@ measure-qe-wasm: build-qe-wasm-gz
 	@cd query-engine/query-engine-wasm/pkg; \
 	for provider in postgresql mysql sqlite; do \
 		provider_size_bytes=$$(cat $$provider/* | wc -c); \
-		echo "$${provider}_size=$$(bc -e "scale=0; $$provider_size_bytes / 1024")" > $(WASM_SIZE_OUTPUT); \
-		echo "$${provider}_size_gz=$$(du -k $$provider.gz | cut -f1)" > $(WASM_SIZE_OUTPUT); \
+		echo "$${provider}_size=$$(bc -e "scale=0; $$provider_size_bytes / 1024")" >> $(WASM_SIZE_OUTPUT); \
+		echo "$${provider}_size_gz=$$(du -k $$provider.gz | cut -f1)" >> $(WASM_SIZE_OUTPUT); \
 	done
 
 build-driver-adapters-kit: build-driver-adapters

@@ -22,6 +22,15 @@ jobs:
       - name: Checkout PR branch
         uses: actions/checkout@v4
 
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          toolchain: nightly-2024-01-25
+          targets: wasm32-unknown-unknown
+          components: rust-src
+
+      - name: Install bc
+        run: sudo apt update && sudo apt-get install -y bc
+
       - name: "Setup Node.js"
         uses: actions/setup-node@v4
 
@@ -29,9 +38,6 @@ jobs:
         uses: pnpm/action-setup@v2
         with:
           version: 8
-
-      - name: Install bc
-        run: sudo apt update && sudo apt-get install -y bc
 
       - name: "Login to Docker Hub"
         uses: docker/login-action@v3
@@ -43,8 +49,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - uses: cachix/install-nix-action@v24
 
       - name: Setup benchmark
         run: make setup-pg-bench
