@@ -7,7 +7,7 @@ version = "0.1.0"
 prisma-value = { path = "../../libs/prisma-value" }
 psl.workspace = true
 
-async-trait = "0.1.17"
+async-trait.workspace = true
 bigdecimal = "0.3"
 indexmap = { version = "1.9.1", default_features = false }
 enumflags2.workspace = true

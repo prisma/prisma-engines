@@ -12,7 +12,7 @@ quaint.workspace = true
 tokio.workspace = true
 serde.workspace = true
 indoc.workspace = true
-uuid = { workspace = true, features = ["v4"] }
+uuid.workspace = true
 
 prisma-value = { path = "../../../libs/prisma-value" }
 schema-connector = { path = "../schema-connector" }
