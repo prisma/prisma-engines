@@ -11,7 +11,7 @@ datamodel-renderer = { path = "../../datamodel-renderer" }
 schema-connector = { path = "../schema-connector" }
 user-facing-errors = { path = "../../../libs/user-facing-errors" }
 
-enumflags2 = "0.7"
+enumflags2.workspace = true
 futures = "0.3"
 mongodb = "2.8.0"
 serde_json.workspace = true
