@@ -10,7 +10,7 @@ graphql-protocol = []
 [dependencies]
 async-trait.workspace = true
 bigdecimal = "0.3"
-chrono = "0.4"
+chrono.workspace = true
 connection-string.workspace = true
 connector = { path = "../connectors/query-connector", package = "query-connector" }
 crossbeam-channel = "0.5.6"
