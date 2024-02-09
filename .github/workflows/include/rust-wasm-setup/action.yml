@@ -1,37 +1,24 @@
 name: Rust Wasm Setup
 
-on:
-  workflow_call:
-    inputs:
-      toolchain:
-        description: "Rust toolchain version"
-        required: true
-        type: string
-        default: "nightly"
-      targets:
-        description: "Compilation targets"
-        required: true
-        type: string
-        default: "wasm32-unknown-unknown"
-      components:
-        description: "Rust components to install"
-        required: true
-        type: string
-        default: "rust-std rustc"
+inputs:
+  toolchain:
+    description: "Rust toolchain version"
+    required: true
+    type: string
+    default: "nightly"
 
-jobs:
-  setup-rust:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          toolchain: ${{ inputs.toolchain }}
-          targets: ${{ inputs.targets }}
-          components: ${{ inputs.components }}
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Rust toolchain
+      uses: dtolnay/rust-toolchain@nightly
+      with:
+        toolchain: ${{ inputs.toolchain }}
+        targets: "wasm32-unknown-unknown"
+        components: "rust-std"
 
-      - name: Install wasm-bindgen-cli
-        run: cargo install wasm-bindgen-cli
+    - name: Install wasm-bindgen-cli
+      run: cargo install wasm-bindgen-cli
 
-      - name: Install bc
-        run: sudo apt update && sudo apt-get install -y bc
+    - name: Install bc
+      run: sudo apt update && sudo apt-get install -y bc
