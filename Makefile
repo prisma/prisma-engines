@@ -55,10 +55,10 @@ build-qe-wasm-gz: build-qe-wasm
 	tar -zcvf all_providers.gz query_engine* package.json; \
 
 build-schema-wasm:
-	@echo "🛠️  Building the Rust crate"
+	@printf '%s\n' "🛠️  Building the Rust crate"
 	cargo build --profile $(PROFILE) --target=wasm32-unknown-unknown -p prisma-schema-build
 
-	@echo "📦 Creating the npm package"
+	@printf '\n%s\n' "📦 Creating the npm package"
 	WASM_BUILD_PROFILE=$(PROFILE) \
 	NPM_PACKAGE_VERSION=$(SCHEMA_WASM_VERSION) \
 	out="$(REPO_ROOT)/target/prisma-schema-wasm" \
