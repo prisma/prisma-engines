@@ -14,7 +14,7 @@ test-setup = { path = "../../libs/test-setup" }
 prisma-value = { path = "../../libs/prisma-value" }
 
 bigdecimal = "0.3"
-chrono = "0.4.15"
+chrono.workspace = true
 colored = "2"
 connection-string.workspace = true
 enumflags2.workspace = true

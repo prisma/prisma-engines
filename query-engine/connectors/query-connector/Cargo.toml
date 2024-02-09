@@ -6,7 +6,7 @@ version = "0.1.0"
 [dependencies]
 anyhow = "1.0"
 async-trait.workspace = true
-chrono = {version = "0.4", features = ["serde"]}
+chrono.workspace = true
 futures = "0.3"
 itertools.workspace = true
 query-structure = {path = "../../query-structure"}
