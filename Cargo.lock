@@ -30,14 +30,15 @@ dependencies = [
 
 [[package]]
 name = "ahash"
-version = "0.8.3"
+version = "0.8.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c99f64d1e06488f620f932677e24bc6e2897582980441ae90a671415bd7ec2f"
+checksum = "77c3a9648d43b9cd48db467b3f87fdd6e146bcc88ab0180006cef2179fe11d01"
 dependencies = [
  "cfg-if",
  "getrandom 0.2.11",
  "once_cell",
  "version_check",
+ "zerocopy",
 ]
 
 [[package]]
@@ -403,7 +404,7 @@ version = "2.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "88c18b51216e1f74b9d769cead6ace2f82b965b807e3d73330aabe9faec31c84"
 dependencies = [
- "ahash 0.8.3",
+ "ahash 0.8.7",
  "base64 0.13.1",
  "bitvec",
  "chrono",
@@ -966,7 +967,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6943ae99c34386c84a470c499d3414f66502a41340aa895406e0d2e4a207b91d"
 dependencies = [
  "cfg-if",
- "hashbrown 0.14.0",
+ "hashbrown 0.14.3",
  "lock_api",
  "once_cell",
  "parking_lot_core 0.9.8",
@@ -1069,7 +1070,7 @@ dependencies = [
  "colored",
  "expect-test",
  "flate2",
- "indexmap 1.9.3",
+ "indexmap 2.2.2",
  "indoc 2.0.3",
  "itertools 0.12.0",
  "pretty_assertions",
@@ -1592,7 +1593,7 @@ dependencies = [
  "futures-sink",
  "futures-util",
  "http",
- "indexmap 2.0.0",
+ "indexmap 2.2.2",
  "slab",
  "tokio",
  "tokio-util 0.7.8",
@@ -1629,16 +1630,16 @@ version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "43a3c133739dddd0d2990f9a4bdf8eb4b21ef50e4851ca85ab661199821d510e"
 dependencies = [
- "ahash 0.8.3",
+ "ahash 0.8.7",
 ]
 
 [[package]]
 name = "hashbrown"
-version = "0.14.0"
+version = "0.14.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c6201b9ff9fd90a5a3bac2e56a830d0caa509576f0e503818ee82c181b3437a"
+checksum = "290f1a1d9242c78d09ce40a5e87e7554ee637af1351968159f4952f028f75604"
 dependencies = [
- "ahash 0.8.3",
+ "ahash 0.8.7",
  "allocator-api2",
 ]
 
@@ -1648,7 +1649,7 @@ version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "312f66718a2d7789ffef4f4b7b213138ed9f1eb3aa1d0d82fc99f88fb3ffd26f"
 dependencies = [
- "hashbrown 0.14.0",
+ "hashbrown 0.14.3",
 ]
 
 [[package]]
@@ -1857,17 +1858,17 @@ checksum = "bd070e393353796e801d209ad339e89596eb4c8d430d18ede6a1cced8fafbd99"
 dependencies = [
  "autocfg",
  "hashbrown 0.12.3",
- "serde",
 ]
 
 [[package]]
 name = "indexmap"
-version = "2.0.0"
+version = "2.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d5477fe2230a79769d8dc68e0eabf5437907c0457a5614a9e8dddb67f65eb65d"
+checksum = "824b2ae422412366ba479e8111fd301f7b5faece8149317bb81925979a53f520"
 dependencies = [
  "equivalent",
- "hashbrown 0.14.0",
+ "hashbrown 0.14.3",
+ "serde",
 ]
 
 [[package]]
@@ -2486,7 +2487,7 @@ dependencies = [
  "cuid",
  "derive_more",
  "futures",
- "indexmap 1.9.3",
+ "indexmap 2.2.2",
  "itertools 0.12.0",
  "mongodb",
  "mongodb-client",
@@ -3068,7 +3069,7 @@ dependencies = [
  "diagnostics",
  "either",
  "enumflags2",
- "indexmap 1.9.3",
+ "indexmap 2.2.2",
  "rustc-hash",
  "schema-ast",
 ]
@@ -3644,7 +3645,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "futures",
- "indexmap 1.9.3",
+ "indexmap 2.2.2",
  "itertools 0.12.0",
  "prisma-value",
  "query-structure",
@@ -3668,7 +3669,7 @@ dependencies = [
  "cuid",
  "enumflags2",
  "futures",
- "indexmap 1.9.3",
+ "indexmap 2.2.2",
  "itertools 0.12.0",
  "lru 0.7.8",
  "once_cell",
@@ -3900,7 +3901,7 @@ dependencies = [
  "colored",
  "enumflags2",
  "hyper",
- "indexmap 1.9.3",
+ "indexmap 2.2.2",
  "indoc 2.0.3",
  "insta",
  "itertools 0.12.0",
@@ -4191,7 +4192,7 @@ dependencies = [
  "dmmf",
  "futures",
  "graphql-parser",
- "indexmap 1.9.3",
+ "indexmap 2.2.2",
  "insta",
  "itertools 0.12.0",
  "mongodb-query-connector",
@@ -4704,7 +4705,7 @@ version = "1.0.104"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "076066c5f1078eac5b722a31827a8832fe108bed65dfa75e233c89f8206e976c"
 dependencies = [
- "indexmap 2.0.0",
+ "indexmap 2.2.2",
  "itoa",
  "ryu",
  "serde",
@@ -5067,7 +5068,7 @@ dependencies = [
  "either",
  "enumflags2",
  "expect-test",
- "indexmap 1.9.3",
+ "indexmap 2.2.2",
  "indoc 2.0.3",
  "once_cell",
  "pretty_assertions",
@@ -6522,3 +6523,23 @@ name = "yansi"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "09041cd90cf85f7f8b2df60c646f853b7f535ce68f85244eb6731cf89fa498ec"
+
+[[package]]
+name = "zerocopy"
+version = "0.7.32"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "74d4d3961e53fa4c9a25a8637fc2bfaf2595b3d3ae34875568a5cf64787716be"
+dependencies = [
+ "zerocopy-derive",
+]
+
+[[package]]
+name = "zerocopy-derive"
+version = "0.7.32"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ce1b18ccd8e73a9321186f97e46f9f04b778851177567b1975109d26a08d2a6"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.48",
+]

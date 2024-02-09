@@ -20,7 +20,7 @@ tokio.workspace = true
 tracing = "0.1"
 tracing-futures = "0.2"
 uuid.workspace = true
-indexmap = "1.7"
+indexmap.workspace = true
 query-engine-metrics = { path = "../../metrics" }
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
 derive_more = "0.99.17"
