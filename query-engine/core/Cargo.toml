@@ -6,6 +6,7 @@ version = "0.1.0"
 [features]
 metrics = ["query-engine-metrics"]
 graphql-protocol = []
+debug-graphviz = []
 
 [dependencies]
 async-trait.workspace = true

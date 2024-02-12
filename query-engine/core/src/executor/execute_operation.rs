@@ -292,6 +292,16 @@ async fn execute_on<'a>(
 fn build_graph(query_schema: &QuerySchema, operation: Operation) -> crate::Result<(QueryGraph, IrSerializer<'_>)> {
     let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
 
+    #[cfg(all(feature = "debug-graphviz", not(target_arch = "wasm32")))]
+    {
+        use crate::ToGraphviz;
+        use std::sync::atomic::{AtomicU32, Ordering};
+
+        static COUNTER: AtomicU32 = AtomicU32::new(0);
+        let current = COUNTER.fetch_add(1, Ordering::Relaxed);
+        std::fs::write(format!("graph{}.graphviz", current), query_graph.to_graphviz()).unwrap();
+    }
+
     Ok((query_graph, serializer))
 }
 
