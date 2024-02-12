@@ -194,6 +194,9 @@ pub(crate) fn connection_string(
                 Some(CockroachDbVersion::V231) if is_ci => {
                     format!("postgresql://prisma@test-db-cockroachdb-23-1:26260/{database}?schema={database}")
                 }
+                Some(CockroachDbVersion::V232) if is_ci => {
+                    format!("postgresql://prisma@test-db-cockroachdb-23-2:26261/{database}?schema={database}")
+                }
                 Some(CockroachDbVersion::V221) => {
                     format!("postgresql://prisma@127.0.0.1:26257/{database}?schema={database}")
                 }
@@ -202,6 +205,9 @@ pub(crate) fn connection_string(
                 }
                 Some(CockroachDbVersion::V231) => {
                     format!("postgresql://prisma@127.0.0.1:26260/{database}?schema={database}")
+                }
+                Some(CockroachDbVersion::V231) => {
+                    format!("postgresql://prisma@127.0.0.1:26261/{database}?schema={database}")
                 }
 
                 None => unreachable!("A versioned connector must have a concrete version to run."),
