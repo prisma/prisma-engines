@@ -243,6 +243,6 @@ jobs:
           sudo sc start MySQL
 
       - name: Run tests
-        run: cargo test -p sql-migration-tests -- --nocapture
+        run: cargo nextest run -p sql-migration-tests
         env:
           TEST_DATABASE_URL: ${{ matrix.db.url }}
