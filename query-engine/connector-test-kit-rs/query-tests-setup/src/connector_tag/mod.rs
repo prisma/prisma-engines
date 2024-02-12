@@ -206,7 +206,7 @@ pub(crate) fn connection_string(
                 Some(CockroachDbVersion::V231) => {
                     format!("postgresql://prisma@127.0.0.1:26260/{database}?schema={database}")
                 }
-                Some(CockroachDbVersion::V231) => {
+                Some(CockroachDbVersion::V232) => {
                     format!("postgresql://prisma@127.0.0.1:26261/{database}?schema={database}")
                 }
 
