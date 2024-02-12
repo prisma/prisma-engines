@@ -199,6 +199,11 @@ impl<'a> JsonProtocolAdapter<'a> {
                         .map(ArgumentValue::float)
                         .map_err(|_| build_err())
                 }
+
+                Some(custom_types::RAW) => {
+                    let value = obj.get(custom_types::VALUE).ok_or_else(build_err)?;
+                    Ok(ArgumentValue::raw(value.clone()))
+                }
                 Some(custom_types::BYTES) => {
                     let value = obj
                         .get(custom_types::VALUE)

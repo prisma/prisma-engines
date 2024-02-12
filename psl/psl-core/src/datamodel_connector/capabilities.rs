@@ -103,11 +103,12 @@ capabilities!(
     NativeUpsert,
     InsertReturning,
     UpdateReturning,
-    RowIn,      // Connector supports (a, b) IN (c, d) expression.
-    DistinctOn, // Connector supports DB-level distinct (e.g. postgres)
-    LateralJoin,
-    DeleteReturning, // Connector supports deleting records and returning them in one operation.
+    RowIn,                                  // Connector supports (a, b) IN (c, d) expression.
+    DistinctOn,                             // Connector supports DB-level distinct (e.g. postgres)
+    DeleteReturning,                        // Connector supports deleting records and returning them in one operation.
     SupportsFiltersOnRelationsWithoutJoins, // Connector supports rendering filters on relation fields without joins.
+    LateralJoin,                            // Connector supports lateral joins to resolve relations.
+    CorrelatedSubqueries,                   // Connector supports correlated subqueries to resolve relations.
 );
 
 /// Contains all capabilities that the connector is able to serve.

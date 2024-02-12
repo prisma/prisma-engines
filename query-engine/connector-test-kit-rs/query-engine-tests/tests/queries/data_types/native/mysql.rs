@@ -1,7 +1,7 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(only(Postgres, CockroachDb))]
+#[test_suite(only(Mysql("8")))]
 mod datetime {
     fn schema_date() -> String {
         let schema = indoc! {
@@ -18,12 +18,11 @@ mod datetime {
                 date_2     DateTime @test.Date
                 time       DateTime @test.Time(3)
                 time_2     DateTime @test.Time(3)
-                time_tz    DateTime @test.Timetz(3)
-                time_tz_2  DateTime @test.Timetz(3)
                 ts         DateTime @test.Timestamp(3)
                 ts_2       DateTime @test.Timestamp(3)
-                ts_tz      DateTime @test.Timestamptz(3)
-                ts_tz_2    DateTime @test.Timestamptz(3)
+                dt         DateTime @test.DateTime(3)
+                dt_2       DateTime @test.DateTime(3)
+                year       Int      @test.Year
 
                 parent Parent?
             }"#
@@ -44,20 +43,19 @@ mod datetime {
                 date_2: "2016-09-24T00:00:00.000+03:00"
                 time: "1111-11-11T13:02:20.321Z"
                 time_2: "1111-11-11T13:02:20.321+03:00"
-                time_tz: "1111-11-11T13:02:20.321Z"
-                time_tz_2: "1111-11-11T13:02:20.321+03:00"
                 ts: "2016-09-24T14:01:30.213Z"
                 ts_2: "2016-09-24T14:01:30.213+03:00"
-                ts_tz: "2016-09-24T14:01:30.213Z"
-                ts_tz_2: "2016-09-24T14:01:30.213+03:00"
+                dt: "2016-09-24T14:01:30.213Z"
+                dt_2: "2016-09-24T14:01:30.213+03:00",
+                year: 2023
             }}
         }"#,
         )
         .await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyParent { id child { date date_2 time time_2 time_tz time_tz_2 ts ts_2 ts_tz ts_tz_2 } } }"#),
-          @r###"{"data":{"findManyParent":[{"id":1,"child":{"date":"2016-09-24T00:00:00.000Z","date_2":"2016-09-23T00:00:00.000Z","time":"1970-01-01T13:02:20.321Z","time_2":"1970-01-01T10:02:20.321Z","time_tz":"1970-01-01T13:02:20.321Z","time_tz_2":"1970-01-01T10:02:20.321Z","ts":"2016-09-24T14:01:30.213Z","ts_2":"2016-09-24T11:01:30.213Z","ts_tz":"2016-09-24T14:01:30.213Z","ts_tz_2":"2016-09-24T11:01:30.213Z"}}]}}"###
+          run_query!(runner, r#"{ findManyParent { id child { date date_2 time time_2 ts ts_2 dt dt_2 year } } }"#),
+          @r###"{"data":{"findManyParent":[{"id":1,"child":{"date":"2016-09-24T00:00:00.000Z","date_2":"2016-09-23T00:00:00.000Z","time":"1970-01-01T13:02:20.321Z","time_2":"1970-01-01T10:02:20.321Z","ts":"2016-09-24T14:01:30.213Z","ts_2":"2016-09-24T11:01:30.213Z","dt":"2016-09-24T14:01:30.213Z","dt_2":"2016-09-24T11:01:30.213Z","year":2023}}]}}"###
         );
 
         Ok(())
@@ -72,7 +70,7 @@ mod datetime {
     }
 }
 
-#[test_suite(only(Postgres))]
+#[test_suite(only(Mysql("8")))]
 mod decimal {
     fn schema_decimal() -> String {
         let schema = indoc! {
@@ -87,10 +85,9 @@ mod decimal {
             model Child {
               #id(id, Int, @id)
 
-              float    Float   @test.Real
-              dfloat   Float   @test.DoublePrecision
+              float    Float   @test.Float
+              dfloat   Float   @test.Double
               decFloat Decimal @test.Decimal(2, 1)
-              money    Decimal @test.Money
 
               parent Parent?
             }"#
@@ -108,18 +105,17 @@ mod decimal {
             id: 1,
             child: { create: {
                 id: 1,
-                float: 1.1,
-                dfloat: 2.2,
-                decFloat: 3.1234,
-                money: 3.51,
+                float: 1.1
+                dfloat: 2.2
+                decFloat: 3.1234
             }}
         }"#,
         )
         .await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findManyParent { id child { float dfloat decFloat money } } }"#),
-          @r###"{"data":{"findManyParent":[{"id":1,"child":{"float":1.1,"dfloat":2.2,"decFloat":"3.1","money":"3.51"}}]}}"###
+          run_query!(&runner, r#"{ findManyParent { id child { float dfloat decFloat } } }"#),
+          @r###"{"data":{"findManyParent":[{"id":1,"child":{"float":1.1,"dfloat":2.2,"decFloat":"3.1"}}]}}"###
         );
 
         Ok(())
@@ -134,7 +130,7 @@ mod decimal {
     }
 }
 
-#[test_suite(only(Postgres))]
+#[test_suite(only(Mysql("8")))]
 mod string {
     fn schema_string() -> String {
         let schema = indoc! {
@@ -150,11 +146,10 @@ mod string {
               #id(id, Int, @id)
               char  String @test.Char(10)
               vChar String @test.VarChar(11)
+              tText String @test.TinyText
               text  String @test.Text
-              bit   String @test.Bit(4)
-              vBit  String @test.VarBit(5)
-              uuid  String @test.Uuid
-              ip    String @test.Inet
+              mText String @test.MediumText
+              ltext String @test.LongText
 
               parent Parent?
             }"#
@@ -163,7 +158,7 @@ mod string {
         schema.to_owned()
     }
 
-    // "Postgres native string types" should "work"
+    // "Mysql native string types" should "work"
     #[connector_test(schema(schema_string))]
     async fn native_string(runner: Runner) -> TestResult<()> {
         create_row(
@@ -174,11 +169,10 @@ mod string {
                 id: 1,
                 char: "1234567890"
                 vChar: "12345678910"
+                tText: "tiny text"
                 text: "text"
-                bit: "1010"
-                vBit: "00110"
-                uuid: "123e4567-e89b-12d3-a456-426614174000"
-                ip: "127.0.0.1"
+                mText: "medium text"
+                ltext: "long text"
             }}
           }"#,
         )
@@ -190,14 +184,13 @@ mod string {
             child {
               char
               vChar
+              tText
               text
-              bit
-              vBit
-              uuid
-              ip
+              mText
+              ltext
             }
         }}"#),
-          @r###"{"data":{"findManyParent":[{"id":1,"child":{"char":"1234567890","vChar":"12345678910","text":"text","bit":"1010","vBit":"00110","uuid":"123e4567-e89b-12d3-a456-426614174000","ip":"127.0.0.1"}}]}}"###
+          @r###"{"data":{"findManyParent":[{"id":1,"child":{"char":"1234567890","vChar":"12345678910","tText":"tiny text","text":"text","mText":"medium text","ltext":"long text"}}]}}"###
         );
 
         Ok(())
@@ -212,39 +205,27 @@ mod string {
     }
 }
 
-#[test_suite(
-    schema(schema),
-    only(Postgres(
-        "9",
-        "10",
-        "11",
-        "12",
-        "13",
-        "14",
-        "15",
-        "pg.js",
-        "pg.js.wasm",
-        "neon.js",
-        "neon.js.wasm"
-    ))
-)]
-mod others {
-    fn schema_other_types() -> String {
+#[test_suite(only(MySql("8")))]
+mod bytes {
+    fn schema_bytes() -> String {
         let schema = indoc! {
             r#"
             model Parent {
-              #id(id, Int, @id)
+                #id(id, Int, @id)
 
-              childId Int? @unique
-              child Child? @relation(fields: [childId], references: [id])
+                childId Int? @unique
+                child Child? @relation(fields: [childId], references: [id])
             }
 
             model Child {
               #id(id, Int, @id)
-              bool  Boolean @test.Boolean
-              byteA Bytes   @test.ByteA
-              json  Json    @test.Json
-              jsonb Json    @test.JsonB
+              bit   Bytes @test.Bit(8)
+              bin   Bytes @test.Binary(4)
+              vBin  Bytes @test.VarBinary(5)
+              blob  Bytes @test.Blob
+              tBlob Bytes @test.TinyBlob
+              mBlob Bytes @test.MediumBlob
+              lBlob Bytes @test.LongBlob
 
               parent Parent?
             }"#
@@ -253,74 +234,41 @@ mod others {
         schema.to_owned()
     }
 
-    // "Other Postgres native types" should "work"
-    #[connector_test(schema(schema_other_types))]
-    async fn native_other_types(runner: Runner) -> TestResult<()> {
+    // "Mysql native bytes types" should "work"
+    #[connector_test(schema(schema_bytes))]
+    async fn native_bytes(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,
             r#"{
             id: 1,
-            child: {
-                create: {
-                    id: 1,
-                    bool: true
-                    byteA: "dGVzdA=="
-                    json: "{}"
-                    jsonb: "{\"a\": \"b\"}"
-                }
-            }
+            child: { create: {
+                id: 1,
+                bit: "dA=="
+                bin: "dGVzdA=="
+                vBin: "dGVzdA=="
+                blob: "dGVzdA=="
+                tBlob: "dGVzdA=="
+                mBlob: "dGVzdA=="
+                lBlob: "dGVzdA=="
+            }}
           }"#,
         )
         .await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findManyParent { id child { id bool byteA json jsonb } } }"#),
-          @r###"{"data":{"findManyParent":[{"id":1,"child":{"id":1,"bool":true,"byteA":"dGVzdA==","json":"{}","jsonb":"{\"a\":\"b\"}"}}]}}"###
-        );
-
-        Ok(())
-    }
-
-    fn schema_xml() -> String {
-        let schema = indoc! {
-            r#"
-            model Parent {
-              #id(id, Int, @id)
-
-              childId Int? @unique
-              child Child? @relation(fields: [childId], references: [id])
+          run_query!(&runner, r#"{ findManyParent {
+            id
+            child {
+              bit
+              bin
+              vBin
+              blob
+              tBlob
+              mBlob
+              lBlob
             }
-
-            model Child {
-              #id(id, Int, @id)
-              xml String @test.Xml
-
-              parent Parent?
-            }"#
-        };
-
-        schema.to_owned()
-    }
-
-    #[connector_test(schema(schema_xml), only(Postgres))]
-    async fn native_xml(runner: Runner) -> TestResult<()> {
-        create_row(
-            &runner,
-            r#"{
-            id: 1,
-            child: {
-                create: {
-                    id: 1,
-                    xml: "<salad>wurst</salad>"
-                }
-            }
-        }"#,
-        )
-        .await?;
-
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findManyParent { id child { xml } } }"#),
-          @r###"{"data":{"findManyParent":[{"id":1,"child":{"xml":"<salad>wurst</salad>"}}]}}"###
+        }}"#),
+          @r###"{"data":{"findManyParent":[{"id":1,"child":{"bit":"dA==","bin":"dGVzdA==","vBin":"dGVzdA==","blob":"dGVzdA==","tBlob":"dGVzdA==","mBlob":"dGVzdA==","lBlob":"dGVzdA=="}}]}}"###
         );
 
         Ok(())

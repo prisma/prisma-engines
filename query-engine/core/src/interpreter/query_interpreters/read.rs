@@ -64,6 +64,7 @@ fn read_one(
                     name: query.name,
                     model,
                     fields: query.selection_order,
+                    virtuals: query.selected_fields.virtuals_owned(),
                     records,
                     nested: build_relation_record_selection(query.selected_fields.relations()),
                 }
@@ -172,6 +173,7 @@ fn read_many_by_joins(
             Ok(RecordSelectionWithRelations {
                 name: query.name,
                 fields: query.selection_order,
+                virtuals: query.selected_fields.virtuals_owned(),
                 records: result,
                 nested: build_relation_record_selection(query.selected_fields.relations()),
                 model: query.model,
@@ -190,6 +192,7 @@ fn build_relation_record_selection<'a>(
         .map(|rq| RelationRecordSelection {
             name: rq.field.name().to_owned(),
             fields: rq.result_fields.clone(),
+            virtuals: rq.virtuals().cloned().collect(),
             model: rq.field.related_model(),
             nested: build_relation_record_selection(rq.relations()),
         })

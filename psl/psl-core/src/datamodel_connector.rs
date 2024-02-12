@@ -195,7 +195,7 @@ pub trait Connector: Send + Sync {
 
     /// On each connector, each built-in Prisma scalar type (`Boolean`,
     /// `String`, `Float`, etc.) has a corresponding native type.
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> NativeTypeInstance;
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance>;
 
     /// Same mapping as `default_native_type_for_scalar_type()`, but in the opposite direction.
     fn native_type_is_default_for_scalar_type(
@@ -319,6 +319,14 @@ pub trait Connector: Send + Sync {
         _str: &str,
         _nt: Option<NativeTypeInstance>,
     ) -> chrono::ParseResult<DateTime<FixedOffset>> {
+        unreachable!("This method is only implemented on connectors with lateral join support.")
+    }
+
+    fn parse_json_bytes(
+        &self,
+        _str: &str,
+        _nt: Option<NativeTypeInstance>,
+    ) -> prisma_value::PrismaValueResult<Vec<u8>> {
         unreachable!("This method is only implemented on connectors with lateral join support.")
     }
 }

@@ -46,7 +46,7 @@ fn set_panic_hook(log_format: LogFormat) {
             let payload = info
                 .payload()
                 .downcast_ref::<String>()
-                .map(Clone::clone)
+                .cloned()
                 .unwrap_or_else(|| info.payload().downcast_ref::<&str>().unwrap().to_string());
 
             match info.location() {

@@ -69,7 +69,7 @@ async function main(): Promise<void> {
                 debug("[nodejs] Error from request handler: ", err)
                 respondErr(request.id, {
                     code: 1,
-                    message: err.toString(),
+                    message: err.stack ?? err.toString(),
                 })
             }
         } catch (err) {

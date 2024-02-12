@@ -7,7 +7,6 @@ use crate::{
 };
 use driver_adapters::JsObject;
 use js_sys::Function as JsFunction;
-use psl::builtin_connectors::{MYSQL, POSTGRES, SQLITE};
 use psl::ConnectorRegistry;
 use quaint::connector::ExternalConnector;
 use query_core::{
@@ -24,6 +23,15 @@ use tokio::sync::RwLock;
 use tracing::{field, instrument::WithSubscriber, Instrument, Level, Span};
 use tracing_subscriber::filter::LevelFilter;
 use wasm_bindgen::prelude::wasm_bindgen;
+
+const CONNECTOR_REGISTRY: ConnectorRegistry<'_> = &[
+    #[cfg(feature = "postgresql")]
+    psl::builtin_connectors::POSTGRES,
+    #[cfg(feature = "mysql")]
+    psl::builtin_connectors::MYSQL,
+    #[cfg(feature = "sqlite")]
+    psl::builtin_connectors::SQLITE,
+];
 
 /// The main query engine used by JS
 #[wasm_bindgen]
@@ -51,8 +59,7 @@ impl QueryEngine {
         } = options;
 
         // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
-        let connector_registry: ConnectorRegistry<'_> = &[POSTGRES, MYSQL, SQLITE];
-        let schema = psl::parse_without_validation(datamodel.into(), connector_registry);
+        let schema = psl::parse_without_validation(datamodel.into(), CONNECTOR_REGISTRY);
 
         let js_queryable = Arc::new(driver_adapters::from_js(adapter));
 

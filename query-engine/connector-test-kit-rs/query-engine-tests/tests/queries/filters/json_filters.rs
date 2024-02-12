@@ -27,7 +27,7 @@ mod json_filters {
         schema.to_owned()
     }
 
-    #[connector_test(exclude(MySQL(5.6), Vitess("planetscale.js", "planetscale.js.wasm")))]
+    #[connector_test(exclude(MySQL(5.6)))]
     async fn no_path_without_filter(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -941,7 +941,7 @@ mod json_filters {
     fn json_path(runner: &Runner) -> &'static str {
         match runner.connector_version() {
             ConnectorVersion::Postgres(_) | ConnectorVersion::CockroachDb(_) => r#"path: ["a", "b"]"#,
-            ConnectorVersion::MySql(_) => r#"path: "$.a.b""#,
+            ConnectorVersion::MySql(_) | ConnectorVersion::Vitess(_) => r#"path: "$.a.b""#,
             x => unreachable!("JSON filtering is not supported on {:?}", x),
         }
     }
