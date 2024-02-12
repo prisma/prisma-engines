@@ -155,8 +155,6 @@ fn handle_one_to_many_bulk(
 ///
 /// `parent_node` produces single ID of one side of the many-to-many relation.
 /// `child_node` produces multiple IDs of another side of many-to-many relation.
-/// Since these two nodes do not depend on each other in any way, we do no need to connect them with
-/// an edge.
 ///
 /// Please refer to the `connect::connect_records_node` documentation for the resulting graph shape.
 fn handle_many_to_many_bulk(
@@ -166,6 +164,7 @@ fn handle_many_to_many_bulk(
     child_node: NodeRef,
     expected_connects: usize,
 ) -> QueryGraphBuilderResult<()> {
+    graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
     connect::connect_records_node(
         graph,
         &parent_node,
