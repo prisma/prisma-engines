@@ -48,10 +48,11 @@ else
     WASM_TARGET_SUBDIR="$WASM_BUILD_PROFILE"
 fi
 
-build() {    
+build() {
     local CONNECTOR="$1"
-    local CARGO_TARGET_DIR=$(cargo metadata --format-version 1 | jq -r .target_directory)
-    echo "🔨 Building $CONNECTOR"
+    local CARGO_TARGET_DIR
+    CARGO_TARGET_DIR=$(cargo metadata --format-version 1 | jq -r .target_directory)
+    echo "🔨 Building $CONNECTOR"    
     RUSTFLAGS="-Zlocation-detail=none" CARGO_PROFILE_RELEASE_OPT_LEVEL="z" cargo build \
         -p query-engine-wasm \
         --profile "$WASM_BUILD_PROFILE" \
