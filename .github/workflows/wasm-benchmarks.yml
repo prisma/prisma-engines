@@ -47,7 +47,6 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       
       - name: Extract Branch Name
-        id: extract-branch
         run: |
           branch="$(git show -s --format=%s | grep -o "DRIVER_ADAPTERS_BRANCH=[^ ]*" | cut -f2 -d=)"
           if [ -n "$branch" ]; then
