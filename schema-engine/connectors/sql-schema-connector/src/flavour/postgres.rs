@@ -468,14 +468,14 @@ impl SqlFlavour for PostgresFlavour {
                         shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await;
 
                     if is_postgres {
-                        // When drop database is routed through pgbouncer, the database may still be used in a pooled connection.
-                        // In this case, given that we (as a user) know the database will not be used any more, we can drop
-                        // the database with force. Note that `with (force)` is added in Postgres 13, and therefore we need to
+                        // When drop database is routed through pgbouncer, the database may still be used in other pooled connections.
+                        // In this case, given that we (as a user) know the database will not be used any more, we can forcefully drop
+                        // the database. Note that `with (force)` is added in Postgres 13, and therefore we will need to
                         // fallback to the normal drop if it errors with syntax error.
                         //
                         // TL;DR,
                         // 1. pg >= 13 -> it works.
-                        // 2. pg < 13 with pgbouncer mode enabled -> syntax error on WITH (FORCE), and then fail with db in use.
+                        // 2. pg < 13 -> syntax error on WITH (FORCE), and then fail with db in use.
                         let drop_database = format!("DROP DATABASE IF EXISTS \"{shadow_database_name}\" WITH (FORCE)");
                         if let Err(err) = main_connection.raw_cmd(&drop_database, &params.url).await {
                             if let Some(msg) = err.message() {
