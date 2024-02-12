@@ -98,6 +98,10 @@ impl PostgresFlavour {
                 .unwrap_or(false)
     }
 
+    pub(crate) fn is_postgres(&self) -> bool {
+        self.provider == PostgresProvider::PostgreSql && !self.is_cockroachdb()
+    }
+
     pub(crate) fn schema_name(&self) -> &str {
         self.state.params().map(|p| p.url.schema()).unwrap_or("public")
     }
@@ -430,6 +434,7 @@ impl SqlFlavour for PostgresFlavour {
                 shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await
             }),
             None => {
+                let is_postgres = self.is_postgres();
                 with_connection(self, move |params, _circumstances, main_connection| async move {
                     let shadow_database_name = crate::new_shadow_database_name();
 
@@ -462,8 +467,33 @@ impl SqlFlavour for PostgresFlavour {
                     let ret =
                         shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await;
 
-                    let drop_database = format!("DROP DATABASE IF EXISTS \"{shadow_database_name}\"");
-                    main_connection.raw_cmd(&drop_database, &params.url).await?;
+                    if is_postgres {
+                        // When drop database is routed through pgbouncer, the database may still be used in a pooled connection.
+                        // In this case, given that we (as a user) know the database will not be used any more, we can drop
+                        // the database with force. Note that `with (force)` is added in Postgres 13, and therefore we need to
+                        // fallback to the normal drop if it errors with syntax error.
+                        //
+                        // TL;DR,
+                        // 1. pg >= 13 -> it works.
+                        // 2. pg < 13 with pgbouncer mode enabled -> syntax error on WITH (FORCE), and then fail with db in use.
+                        let drop_database = format!("DROP DATABASE IF EXISTS \"{shadow_database_name}\" WITH (FORCE)");
+                        if let Err(err) = main_connection.raw_cmd(&drop_database, &params.url).await {
+                            if let Some(msg) = err.message() {
+                                if msg.contains("syntax error") {
+                                    let drop_database_alt =
+                                        format!("DROP DATABASE IF EXISTS \"{shadow_database_name}\"");
+                                    main_connection.raw_cmd(&drop_database_alt, &params.url).await?;
+                                } else {
+                                    return Err(err);
+                                }
+                            } else {
+                                return Err(err);
+                            }
+                        }
+                    } else {
+                        let drop_database = format!("DROP DATABASE IF EXISTS \"{shadow_database_name}\"");
+                        main_connection.raw_cmd(&drop_database, &params.url).await?;
+                    }
 
                     ret
                 })
