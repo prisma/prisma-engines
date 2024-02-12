@@ -47,8 +47,8 @@ jobs:
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
       - name: Publish @prisma/prisma-schema-wasm
-        run: |
-          npm publish target/prisma-schema-wasm --access public --tag ${{ github.event.inputs.npmDistTag }}
+        run: npm publish --access public --tag ${{ github.event.inputs.npmDistTag }}
+        working-directory: target/prisma-schema-wasm
       #
       # Failure handlers
       #
