@@ -30,16 +30,8 @@
       systems = import systems;
       perSystem = { config, system, pkgs, craneLib, ... }: {
         config._module.args.flakeInputs = inputs;
-        imports = [
-          ./nix/all-engines.nix
+        imports = [          
           ./nix/args.nix
-          ./nix/cargo-doc.nix
-          ./nix/cli-shell.nix
-          ./nix/cli-prisma.nix
-          ./nix/dev-vm.nix
-          ./nix/memory-profiling.nix
-          ./nix/prisma-schema-wasm.nix
-          ./nix/publish-engine-size.nix
           ./nix/shell.nix
         ];
       };
