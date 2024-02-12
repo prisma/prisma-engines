@@ -114,7 +114,7 @@ version = ">1.4.0"
 [dependencies.mysql_async]
 git = "https://github.com/prisma/mysql_async"
 optional = true
-branch = "vendored-openssl"
+branch = "test/dbg-handshake-version"
 
 [dependencies.rusqlite]
 version = "0.29"

@@ -266,12 +266,25 @@ impl Queryable for Mysql {
     }
 
     async fn version(&self) -> crate::Result<Option<String>> {
+        let query = r#"SELECT @@GLOBAL.version version"#;
+        let rows = timeout::socket(self.socket_timeout, self.query_raw(query, &[])).await?;
+
+        let selected_version = rows
+            .first()
+            .and_then(|row| row.get("version").and_then(|version| version.typed.to_string()));
+
+        dbg!(&selected_version);
+
         let guard = self.conn.lock().await;
         let (major, minor, patch) = guard.server_version();
         let flavour = if guard.is_mariadb() { "MariaDB" } else { "MySQL" };
         drop(guard);
 
-        Ok(Some(format!("{major}.{minor}.{patch}/{flavour}")))
+        let connection_version = format!("{major}.{minor}.{patch}-{flavour}");
+
+        dbg!(&connection_version);
+
+        Ok(Some(connection_version))
     }
 
     fn is_healthy(&self) -> bool {

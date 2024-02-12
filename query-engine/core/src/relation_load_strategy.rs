@@ -43,7 +43,7 @@ impl TryFrom<Option<&str>> for DatabaseVersion {
                     }))
                 };
 
-                let mut iter = version.split('/');
+                let mut iter = version.split('-');
 
                 let version = iter.next().ok_or_else(|| build_err("Missing version"))?;
                 let is_mariadb = iter.next().map(|s| s.contains("MariaDB")).unwrap_or(false);
