@@ -28,7 +28,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
 
       - run: |
-          cargo test --workspace \
+          cargo test --workspace --all-features \
                 --exclude=quaint \
                 --exclude=query-engine \
                 --exclude=query-engine-node-api \

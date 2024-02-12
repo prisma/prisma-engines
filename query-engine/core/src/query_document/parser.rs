@@ -871,6 +871,7 @@ pub(crate) mod conversions {
                 format!("({})", itertools::join(v.iter().map(argument_value_to_type_name), ", "))
             }
             ArgumentValue::FieldRef(_) => "FieldRef".to_string(),
+            ArgumentValue::Raw(_) => "JSON".to_string(),
         }
     }
 

@@ -5,11 +5,7 @@ use query_engine_tests::*;
 mod null_list {
     use query_engine_tests::{fmt_query_raw, run_query, run_query_pretty};
 
-    #[connector_test(
-        schema(common_list_types),
-        only(Postgres),
-        exclude(Postgres("pg.js.wasm", "neon.js.wasm"),)
-    )]
+    #[connector_test(schema(common_list_types), only(Postgres))]
     async fn null_scalar_lists(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,

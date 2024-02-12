@@ -29,7 +29,7 @@ mod basic {
         schema.to_owned()
     }
 
-    #[connector_test(exclude(Postgres("pg.js.wasm", "neon.js.wasm")))]
+    #[connector_test]
     async fn basic_write(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {

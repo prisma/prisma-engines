@@ -117,7 +117,7 @@ pub(crate) fn relation_load_strategy(ctx: &QuerySchema) -> Option<EnumType> {
 
     let ident = Identifier::new_prisma(IdentifierType::RelationLoadStrategy);
 
-    let values = if ctx.has_capability(ConnectorCapability::LateralJoin) {
+    let values = if ctx.can_resolve_relation_with_joins() {
         vec![load_strategy::QUERY.to_owned(), load_strategy::JOIN.to_owned()]
     } else {
         vec![load_strategy::QUERY.to_owned()]

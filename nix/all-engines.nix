@@ -115,39 +115,39 @@ in
     })
     { profile = "release"; };
 
-
-
-  packages.query-engine-wasm = lib.makeOverridable
-    ({ profile }: stdenv.mkDerivation {
-      name = "query-engine-wasm";
-      inherit src;
-      inherit (self'.packages.prisma-engines) buildInputs configurePhase dontStrip;
-
-      nativeBuildInputs = self'.packages.prisma-engines.nativeBuildInputs ++ (with pkgs; [wasm-pack wasm-bindgen-cli jq binaryen]);
-
-      buildPhase = ''
-        cd query-engine/query-engine-wasm
-        HOME=$(mktemp -dt wasm-pack-home-XXXX) WASM_BUILD_PROFILE=${profile} bash ./build.sh
+  packages.build-engine-wasm = pkgs.writeShellApplication { 
+    name = "build-engine-wasm";
+      runtimeInputs = with pkgs; [ git rustup wasm-bindgen-cli binaryen jq iconv ];
+      text = ''            
+      cd query-engine/query-engine-wasm        
+      WASM_BUILD_PROFILE=release ./build.sh "$1" "$2"
       '';
-
-      installPhase = ''
-      cp -r pkg $out
-      '';
-    })
-    { profile = "release"; };
+  };
 
   packages.query-engine-wasm-gz = lib.makeOverridable
     ({ profile }: stdenv.mkDerivation {
       name = "query-engine-wasm-gz";
       inherit src;
+      buildInputs = with pkgs; [ iconv ];
 
       buildPhase = ''
-      gzip -cn ${self'.packages.query-engine-wasm}/query_engine_bg.wasm > query_engine_bg.wasm.gz
+      export HOME=$(mktemp -dt wasm-engine-home-XXXX)
+      
+      OUT_FOLDER=$(mktemp -dt wasm-engine-out-XXXX)
+      ${self'.packages.build-engine-wasm}/bin/build-engine-wasm "0.0.0" "$OUT_FOLDER" 
+
+      for provider in "postgresql" "mysql" "sqlite"; do
+        gzip -ckn "$OUT_FOLDER/$provider/query_engine_bg.wasm" > "query-engine-$provider.wasm.gz"
+      done
       '';
 
       installPhase = ''
+      set +x
       mkdir -p $out
-      cp query_engine_bg.wasm.gz $out/
+      for provider in "postgresql" "mysql" "sqlite"; do
+        cp "$OUT_FOLDER/$provider/query_engine_bg.wasm" "$out/query-engine-$provider.wasm"
+        cp "query-engine-$provider.wasm.gz" "$out/"
+      done
       '';
     })
     { profile = "release"; };
@@ -156,15 +156,15 @@ in
     pkgs.writeShellApplication {
       name = "export-query-engine-wasm";
       runtimeInputs = with pkgs; [ jq ];
-      text = ''
-        set -euxo pipefail
+      text = ''              
+        OUT_VERSION="$1"
+        OUT_FOLDER="$2"
 
-        OUTDIR="$1"
-        OUTVERSION="$2"
-        mkdir -p "$OUTDIR"
-        cp -r --no-target-directory ${self'.packages.query-engine-wasm} "$OUTDIR"
-        chmod -R +rw "$OUTDIR"
-        jq --arg new_version "$OUTVERSION" '.version = $new_version' "${self'.packages.query-engine-wasm}/package.json"  > "$OUTDIR/package.json"
+        mkdir -p "$OUT_FOLDER"
+        ${self'.packages.build-engine-wasm}/bin/build-engine-wasm "$OUT_VERSION" "$OUT_FOLDER"
+        chmod -R +rw "$OUT_FOLDER"
+        mv "$OUT_FOLDER/package.json" "$OUT_FOLDER/package.json.bak"         
+        jq --arg new_version "$OUT_VERSION" '.version = $new_version' "$OUT_FOLDER/package.json.bak" > "$OUT_FOLDER/package.json"        
       '';
     };
 }

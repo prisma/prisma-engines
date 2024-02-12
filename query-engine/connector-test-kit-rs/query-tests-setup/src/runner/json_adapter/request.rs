@@ -228,7 +228,7 @@ impl<'a, 'b> FieldTypeInferrer<'a, 'b> {
                     None => InferredType::Unknown,
                 }
             }
-            ArgumentValue::FieldRef(_) => unreachable!(),
+            ArgumentValue::FieldRef(_) | ArgumentValue::Raw(_) => unreachable!(),
         }
     }
 

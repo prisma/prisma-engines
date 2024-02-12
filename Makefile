@@ -3,7 +3,10 @@ CONFIG_FILE = .test_config
 SCHEMA_EXAMPLES_PATH = ./query-engine/example_schemas
 DEV_SCHEMA_FILE = dev_datamodel.prisma
 DRIVER_ADAPTERS_BRANCH ?= main
-NIX := $(shell command -v nix 2> /dev/null)
+
+ifndef DISABLE_NIX
+NIX := $(shell type nix 2> /dev/null)
+endif
 
 LIBRARY_EXT := $(shell                            \
     case "$$(uname -s)" in                        \
@@ -330,10 +333,14 @@ build-qe-wasm:
 ifdef NIX
 	@echo "Building wasm engine on nix"
 	rm -rf query-engine/query-engine-wasm/pkg
-	nix run .#export-query-engine-wasm query-engine/query-engine-wasm/pkg 0.0.0
+	nix run .#export-query-engine-wasm 0.0.0 query-engine/query-engine-wasm/pkg
 else
-	cd query-engine/query-engine-wasm && ./build.sh
+	cd query-engine/query-engine-wasm && ./build.sh 0.0.0 query-engine/query-engine-wasm/pkg
 endif
+
+measure-qe-wasm: build-qe-wasm	
+	@cd query-engine/query-engine-wasm/pkg; \
+	gzip -k -c query_engine_bg.wasm | wc -c | awk '{$$1/=(1024*1024); printf "Current wasm query-engine size compressed: %.3fMB\n", $$1}'
 
 build-driver-adapters-kit: build-driver-adapters
 	cd query-engine/driver-adapters && pnpm i && pnpm build
@@ -360,7 +367,10 @@ validate:
 	cargo run --bin test-cli -- validate-datamodel dev_datamodel.prisma
 
 qe:
-	cargo run --bin query-engine -- --enable-playground --enable-raw-queries --enable-metrics --enable-open-telemetry --enable-telemetry-in-response
+	cargo run --bin query-engine -- --engine-protocol json --enable-raw-queries --enable-metrics --enable-open-telemetry --enable-telemetry-in-response
+
+qe-graphql:
+	cargo run --bin query-engine -- --engine-protocol graphql --enable-playground --enable-raw-queries --enable-metrics --enable-open-telemetry --enable-telemetry-in-response
 
 qe-dmmf:
 	cargo run --bin query-engine -- cli dmmf > dmmf.json

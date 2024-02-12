@@ -37,7 +37,7 @@ impl WriteQuery {
 
         for (selected_field, value) in result {
             args.insert(
-                DatasourceFieldName(selected_field.db_name().to_owned()),
+                DatasourceFieldName(selected_field.db_name().into_owned()),
                 (&selected_field, value),
             )
         }
@@ -257,7 +257,7 @@ impl CreateManyRecords {
         for (selected_field, value) in result {
             for args in self.args.iter_mut() {
                 args.insert(
-                    DatasourceFieldName(selected_field.db_name().to_owned()),
+                    DatasourceFieldName(selected_field.db_name().into_owned()),
                     (&selected_field, value.clone()),
                 )
             }

@@ -2,6 +2,10 @@ use query_engine_tests::*;
 
 #[test_suite(schema(generic))]
 mod raw_params {
+    // Note: the "too many bind variables" error is tokio-postgres specific.
+    // On other drivers, an error is triggered when `n` is double than 32768.
+    // `Message: `ERROR: bind message supplies 0 parameters, but prepared statement requires 65536.`
+    // with "error_code": "P2010"
     #[connector_test(
         only(Postgres),
         exclude(

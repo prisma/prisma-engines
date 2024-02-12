@@ -52,12 +52,12 @@ uuid = { version = "1", features = ["serde"] }
 indoc = "2.0.1"
 itertools = "0.12"
 connection-string = "0.2"
-napi = { version = "2.12.4", default-features = false, features = [
+napi = { version = "2.15.1", default-features = false, features = [
   "napi8",
   "tokio_rt",
   "serde-json",
 ] }
-napi-derive = "2.12.4"
+napi-derive = "2.15.0"
 js-sys = { version = "0.3" }
 serde_repr = { version = "0.1.17" }
 serde-wasm-bindgen = { version = "0.5" }

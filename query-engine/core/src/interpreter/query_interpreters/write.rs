@@ -48,10 +48,10 @@ async fn create_one(
     Ok(QueryResult::RecordSelection(Some(Box::new(RecordSelection {
         name: q.name,
         fields: q.selection_order,
-        aggregation_rows: None,
         model: q.model,
-        scalars: res.into(),
+        records: res.into(),
         nested: vec![],
+        virtual_fields: vec![],
     }))))
 }
 
@@ -86,10 +86,10 @@ async fn update_one(
                 .map(|res| RecordSelection {
                     name: q.name,
                     fields: q.selection_order,
-                    scalars: res.into(),
+                    records: res.into(),
                     nested: vec![],
                     model: q.model,
-                    aggregation_rows: None,
+                    virtual_fields: vec![],
                 })
                 .map(Box::new);
 
@@ -115,10 +115,10 @@ async fn native_upsert(
     Ok(RecordSelection {
         name: query.name().to_string(),
         fields: query.selection_order().to_owned(),
-        scalars: scalars.into(),
+        records: scalars.into(),
         nested: Vec::new(),
         model: query.model().clone(),
-        aggregation_rows: None,
+        virtual_fields: vec![],
     }
     .into())
 }
@@ -144,10 +144,10 @@ async fn delete_one(
         let selection = RecordSelection {
             name: q.name,
             fields: selected_fields.order,
-            scalars: record.into(),
+            records: record.into(),
             nested: vec![],
             model: q.model,
-            aggregation_rows: None,
+            virtual_fields: vec![],
         };
 
         Ok(QueryResult::RecordSelection(Some(Box::new(selection))))

@@ -44,7 +44,7 @@ pub use minimum::*;
 pub use row_number::*;
 #[cfg(feature = "postgresql")]
 pub use row_to_json::*;
-#[cfg(feature = "mysql")]
+#[cfg(any(feature = "mysql", feature = "postgresql"))]
 pub use search::*;
 pub use sum::*;
 pub use upper::*;

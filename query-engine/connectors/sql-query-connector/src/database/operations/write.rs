@@ -13,6 +13,7 @@ use quaint::{
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
 };
 use query_structure::*;
+use std::borrow::Cow;
 use std::{
     collections::{HashMap, HashSet},
     ops::Deref,
@@ -173,7 +174,7 @@ pub(crate) async fn create_record(
 
         // All values provided in the write args
         (Some(identifier), _, _) if !identifier.misses_autogen_value() => {
-            let field_names = identifier.db_names().map(ToOwned::to_owned).collect();
+            let field_names = identifier.db_names().map(Cow::into_owned).collect();
             let record = Record::from(identifier);
 
             Ok(SingleRecord { record, field_names })
@@ -183,7 +184,7 @@ pub(crate) async fn create_record(
         (Some(mut identifier), _, Some(num)) if identifier.misses_autogen_value() => {
             identifier.add_autogen_value(num as i64);
 
-            let field_names = identifier.db_names().map(ToOwned::to_owned).collect();
+            let field_names = identifier.db_names().map(Cow::into_owned).collect();
             let record = Record::from(identifier);
 
             Ok(SingleRecord { record, field_names })
@@ -273,7 +274,7 @@ async fn create_many_nonempty(
         vec![args]
     };
 
-    let partitioned_batches = if let Some(max_rows) = ctx.max_rows {
+    let partitioned_batches = if let Some(max_rows) = ctx.max_insert_rows {
         let capacity = batches.len();
         batches
             .into_iter()

@@ -90,6 +90,36 @@ impl<'a> Mysql<'a> {
 
         Ok(())
     }
+
+    fn visit_json_build_obj_expr(&mut self, expr: Expression<'a>) -> crate::Result<()> {
+        match expr.kind() {
+            // Convert bytes data to base64
+            ExpressionKind::Column(col) => match (col.type_family.as_ref(), col.native_type.as_deref()) {
+                (
+                    Some(TypeFamily::Text(_)),
+                    Some("LONGBLOB") | Some("BLOB") | Some("MEDIUMBLOB") | Some("SMALLBLOB") | Some("TINYBLOB")
+                    | Some("VARBINARY") | Some("BINARY") | Some("BIT"),
+                ) => {
+                    self.write("to_base64")?;
+                    self.surround_with("(", ")", |s| s.visit_expression(expr))?;
+
+                    Ok(())
+                }
+                // Convert floats to string to avoid losing precision
+                (_, Some("FLOAT")) => {
+                    self.write("CONVERT")?;
+                    self.surround_with("(", ")", |s| {
+                        s.visit_expression(expr)?;
+                        s.write(", ")?;
+                        s.write("CHAR")
+                    })?;
+                    Ok(())
+                }
+                _ => self.visit_expression(expr),
+            },
+            _ => self.visit_expression(expr),
+        }
+    }
 }
 
 impl<'a> Visitor<'a> for Mysql<'a> {
@@ -562,14 +592,34 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(feature = "postgresql")]
-    fn visit_json_array_agg(&mut self, _array_agg: JsonArrayAgg<'a>) -> visitor::Result {
-        unimplemented!("JSON_ARRAYAGG is not yet supported on MySQL")
+    #[cfg(feature = "mysql")]
+    fn visit_json_array_agg(&mut self, array_agg: JsonArrayAgg<'a>) -> visitor::Result {
+        self.write("JSON_ARRAYAGG")?;
+        self.surround_with("(", ")", |s| s.visit_expression(*array_agg.expr))?;
+
+        Ok(())
     }
 
-    #[cfg(feature = "postgresql")]
-    fn visit_json_build_object(&mut self, _build_obj: JsonBuildObject<'a>) -> visitor::Result {
-        unimplemented!("JSON_OBJECT is not yet supported on MySQL")
+    #[cfg(feature = "mysql")]
+    fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> visitor::Result {
+        let len = build_obj.exprs.len();
+
+        self.write("JSON_OBJECT")?;
+        self.surround_with("(", ")", |s| {
+            for (i, (name, expr)) in build_obj.exprs.into_iter().enumerate() {
+                s.visit_raw_value(Value::text(name))?;
+                s.write(", ")?;
+                s.visit_json_build_obj_expr(expr)?;
+
+                if i < (len - 1) {
+                    s.write(", ")?;
+                }
+            }
+
+            Ok(())
+        })?;
+
+        Ok(())
     }
 
     fn visit_ordering(&mut self, ordering: Ordering<'a>) -> visitor::Result {

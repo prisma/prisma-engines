@@ -68,9 +68,9 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     UpdateReturning |
     RowIn |
     DistinctOn |
-    LateralJoin |
     DeleteReturning |
-    SupportsFiltersOnRelationsWithoutJoins
+    SupportsFiltersOnRelationsWithoutJoins |
+    LateralJoin
 });
 
 pub struct PostgresDatamodelConnector;
@@ -331,7 +331,7 @@ impl Connector for PostgresDatamodelConnector {
         }
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> NativeTypeInstance {
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()
             .find(|(st, _)| st == scalar_type)
@@ -339,7 +339,7 @@ impl Connector for PostgresDatamodelConnector {
             .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
             .unwrap();
 
-        NativeTypeInstance::new::<PostgresType>(*native_type)
+        Some(NativeTypeInstance::new::<PostgresType>(*native_type))
     }
 
     fn native_type_is_default_for_scalar_type(
@@ -580,17 +580,31 @@ impl Connector for PostgresDatamodelConnector {
 
         match native_type {
             Some(pt) => match pt {
-                Timestamptz(_) => super::utils::parse_timestamptz(str),
-                Timestamp(_) => super::utils::parse_timestamp(str),
-                Date => super::utils::parse_date(str),
-                Time(_) => super::utils::parse_time(str),
-                Timetz(_) => super::utils::parse_timetz(str),
+                Timestamptz(_) => super::utils::postgres::parse_timestamptz(str),
+                Timestamp(_) => super::utils::postgres::parse_timestamp(str),
+                Date => super::utils::common::parse_date(str),
+                Time(_) => super::utils::common::parse_time(str),
+                Timetz(_) => super::utils::postgres::parse_timetz(str),
                 _ => unreachable!(),
             },
-            None => self.parse_json_datetime(
-                str,
-                Some(self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
-            ),
+            None => self.parse_json_datetime(str, self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
+        }
+    }
+
+    fn parse_json_bytes(&self, str: &str, nt: Option<NativeTypeInstance>) -> prisma_value::PrismaValueResult<Vec<u8>> {
+        let native_type: Option<&PostgresType> = nt.as_ref().map(|nt| nt.downcast_ref());
+
+        match native_type {
+            Some(ct) => match ct {
+                PostgresType::ByteA => {
+                    super::utils::postgres::parse_bytes(str).map_err(|_| prisma_value::ConversionFailure {
+                        from: "hex".into(),
+                        to: "bytes".into(),
+                    })
+                }
+                _ => unreachable!(),
+            },
+            None => self.parse_json_bytes(str, self.default_native_type_for_scalar_type(&ScalarType::Bytes)),
         }
     }
 }

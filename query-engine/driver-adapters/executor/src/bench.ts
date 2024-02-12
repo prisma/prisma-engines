@@ -19,9 +19,15 @@ import prismaQueries from "../bench/queries.json";
 import { run, bench, group, baseline } from "mitata";
 
 import { QueryEngine as WasmBaseline } from "query-engine-wasm-baseline";
-import { QueryEngine as WasmLatest } from "query-engine-wasm-latest";
 
-(global as any).crypto = webcrypto;
+// `query-engine-wasm-latest` refers to the latest published version of the Wasm Query Engine,
+// rather than the latest locally built one. We're pulling in the Postgres Query Engine
+// because benchmarks are only run against a Postgres database.
+import { QueryEngine as WasmLatest } from "query-engine-wasm-latest/postgresql/query_engine.js";
+
+if (!global.crypto) {
+  (global as any).crypto = webcrypto;
+}
 
 async function main(): Promise<void> {
   // read the prisma schema from stdin
@@ -211,6 +217,7 @@ function initQeWasmBaseLine(
   return new WasmBaseline(qe.queryEngineOptions(datamodel), debug, adapter);
 }
 
-const err = (...args: any[]) => console.error("[nodejs] ERROR:", ...args);
-
-main().catch(err);
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

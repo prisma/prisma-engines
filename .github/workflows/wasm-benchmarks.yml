@@ -24,13 +24,14 @@ jobs:
 
       - name: "Setup Node.js"
         uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node_version }}
 
       - name: "Setup pnpm"
         uses: pnpm/action-setup@v2
         with:
           version: 8
+
+      - name: Install bc
+        run: sudo apt update && sudo apt-get install -y bc
 
       - name: "Login to Docker Hub"
         uses: docker/login-action@v3
@@ -51,25 +52,67 @@ jobs:
       - name: Run benchmarks
         id: bench
         run: |
-          make run-bench | tee results.txt
+          make run-bench | tee results.txt          
 
-          regressed=$(grep "slower than Web Assembly: Latest" results.txt | cut -f1 -d'x' | awk '$1 > 1.02' | wc -l )
-          if [ "$regressed" -gt 0 ]; then
-              summary="🚨 WASM query-engine: $regressed benchmark(s) have regressed at least 2%"
+          # Extract the values from the benchmark output
+          regressed_values=$(grep "slower than Web Assembly: Latest" results.txt | cut -f1 -d'x')          
+          improved_values=$(grep "faster than Web Assembly: Latest" results.txt | cut -f1 -d'x')          
+
+          # Initialize sum variable and count
+          total_sum=0
+          total_count=0
+
+          # Add the inverted regressed values to the sum
+          for value in $regressed_values; do
+              inverted=$(echo "scale=4; 1/$value" | bc)
+              echo "Regressed value: $inverted"
+              total_sum=$(echo "$total_sum + $inverted" | bc)
+              total_count=$((total_count + 1))
+          done
+
+          # Add the improved values to the sum
+          for value in $improved_values; do
+              echo "Improved value: $value"
+              total_sum=$(echo "$total_sum + $value" | bc)
+              total_count=$((total_count + 1))
+          done
+
+          if [ $total_count -eq 0 ]; then
+              echo "💥 something was wrong running the benchmarks"              
+              exit 1
+          fi
+
+          mean=$(echo "scale=4; $total_sum / $total_count" | bc)
+
+          echo "Extracted $total_count values from the benchmark output"
+          echo "Total sum: $total_sum"
+          echo "Total count: $total_count"
+          echo "Mean: $mean"
+
+          # Report improvement or worsening. Fails if >= 1.5% worsening.          
+          if (( $(echo "$mean < 0.985" | bc -l) )); then
+              percent=$(echo "scale=4; ((1 / $mean) - 1) * 100" | bc)
+              summary="❌ WASM query-engine performance will worsen by $(printf %.2f "$percent")%"
               status=failed
+          elif (( $(echo "$mean > 1.015" | bc -l) )); then
+              percent=$(echo "scale=4; ($mean - 1) * 100" | bc)
+              summary="🚀 WASM query-engine performance will improve by $(printf %.2f "$percent")%"
+              status=passed
           else
-              summary="✅ WASM query-engine: no benchmarks have regressed"
+              delta=$(echo "scale=3; (1 / $mean)" | bc)
+              summary="✅ WASM query-engine performance won't change substantially ($(printf %.3f "$delta")x)"
               status=passed
           fi
 
           echo "summary=$summary" >> "$GITHUB_OUTPUT"
           echo "status=$status" >> "$GITHUB_OUTPUT"
+
+          # Save the output to a file so we can use it in the comment
           {
             echo 'bench_output<<EOF'
             cat results.txt
             echo EOF
           } >> "$GITHUB_OUTPUT"
-
       - name: Find past report comment
         uses: peter-evans/find-comment@v2
         id: findReportComment

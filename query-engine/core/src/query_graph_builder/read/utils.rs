@@ -1,7 +1,5 @@
 use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
-use connector::RelAggregationSelection;
-use psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
 use query_structure::{prelude::*, RelationLoadStrategy};
 use schema::{
     constants::{aggregations::*, args},
@@ -73,37 +71,49 @@ fn pairs_to_selections<T>(
 where
     T: Into<ParentContainer>,
 {
-    let should_collect_relation_selection = query_schema.has_capability(ConnectorCapability::LateralJoin)
-        && query_schema.has_feature(PreviewFeature::RelationJoins);
+    let should_collect_relation_selection = query_schema.can_resolve_relation_with_joins();
 
     let parent = parent.into();
 
-    let selected_fields = pairs
-        .iter()
-        .filter_map(|pair| {
-            parent
-                .find_field(&pair.parsed_field.name)
-                .map(|field| (pair.parsed_field.clone(), field))
-        })
-        .flat_map(|field| match field {
-            (pf, Field::Relation(rf)) => {
-                let mut fields: Vec<QueryGraphBuilderResult<SelectedField>> = rf
-                    .scalar_fields()
-                    .into_iter()
-                    .map(SelectedField::from)
-                    .map(Ok)
-                    .collect();
+    let mut selected_fields = Vec::new();
+
+    for pair in pairs {
+        let field = parent.find_field(&pair.parsed_field.name);
+
+        match (pair.parsed_field.clone(), field) {
+            (pf, Some(Field::Relation(rf))) => {
+                let fields = rf.scalar_fields().into_iter().map(SelectedField::from);
+
+                selected_fields.extend(fields);
 
                 if should_collect_relation_selection {
-                    fields.push(extract_relation_selection(pf, rf, query_schema));
+                    selected_fields.push(extract_relation_selection(pf, rf, query_schema)?);
                 }
-
-                fields
             }
-            (_, Field::Scalar(sf)) => vec![Ok(sf.into())],
-            (pf, Field::Composite(cf)) => vec![extract_composite_selection(pf, cf, query_schema)],
-        })
-        .collect::<Result<Vec<_>, _>>()?;
+
+            (_, Some(Field::Scalar(sf))) => {
+                selected_fields.push(sf.into());
+            }
+
+            (pf, Some(Field::Composite(cf))) => {
+                selected_fields.push(extract_composite_selection(pf, cf, query_schema)?);
+            }
+
+            (pf, None) if pf.name == UNDERSCORE_COUNT => match parent {
+                ParentContainer::Model(ref model) => {
+                    selected_fields.extend(extract_relation_count_selections(pf, model)?);
+                }
+                ParentContainer::CompositeType(_) => {
+                    unreachable!("Unexpected relation aggregation selection inside a composite type query")
+                }
+            },
+
+            (pf, None) => unreachable!(
+                "Field '{}' does not exist on enclosing type and is not a known virtual field",
+                pf.name
+            ),
+        }
+    }
 
     Ok(selected_fields)
 }
@@ -142,6 +152,35 @@ fn extract_relation_selection(
         result_fields: collect_selection_order(&object.fields),
         selections: pairs_to_selections(related_model, &object.fields, query_schema)?,
     }))
+}
+
+fn extract_relation_count_selections(
+    pf: ParsedField<'_>,
+    model: &Model,
+) -> QueryGraphBuilderResult<Vec<SelectedField>> {
+    let object = pf
+        .nested_fields
+        .expect("Invalid query shape: relation aggregation virtual field selected without relations to aggregate.");
+
+    object
+        .fields
+        .into_iter()
+        .map(|mut nested_pair| -> QueryGraphBuilderResult<_> {
+            let rf = model
+                .fields()
+                .find_from_relation_fields(&nested_pair.parsed_field.name)
+                .expect("Selected relation in relation aggregation virtual field must exist on the model");
+
+            let filter = nested_pair
+                .parsed_field
+                .arguments
+                .lookup(args::WHERE)
+                .map(|where_arg| extract_filter(where_arg.value.try_into()?, rf.related_model()))
+                .transpose()?;
+
+            Ok(SelectedField::Virtual(VirtualSelection::RelationCount(rf, filter)))
+        })
+        .collect()
 }
 
 pub(crate) fn collect_nested_queries(
@@ -211,52 +250,18 @@ pub fn merge_cursor_fields(selected_fields: FieldSelection, cursor: &Option<Sele
     }
 }
 
-pub fn collect_relation_aggr_selections(
-    from: Vec<FieldPair<'_>>,
-    model: &Model,
-) -> QueryGraphBuilderResult<Vec<RelAggregationSelection>> {
-    let mut selections = vec![];
-
-    for pair in from {
-        match pair.parsed_field.name.as_str() {
-            UNDERSCORE_COUNT => {
-                let nested_fields = pair.parsed_field.nested_fields.unwrap();
-
-                for mut nested_pair in nested_fields.fields {
-                    let rf = model
-                        .fields()
-                        .find_from_relation_fields(&nested_pair.parsed_field.name)
-                        .unwrap();
-                    let filter = match nested_pair.parsed_field.arguments.lookup(args::WHERE) {
-                        Some(where_arg) => Some(extract_filter(where_arg.value.try_into()?, rf.related_model())?),
-                        _ => None,
-                    };
-
-                    selections.push(RelAggregationSelection::Count(rf, filter));
-                }
-            }
-            field_name => panic!("Unknown field name \"{field_name}\" for a relation aggregation"),
-        }
-    }
-
-    Ok(selections)
-}
-
 pub(crate) fn get_relation_load_strategy(
     requested_strategy: Option<RelationLoadStrategy>,
     cursor: Option<&SelectionResult>,
     distinct: Option<&FieldSelection>,
     nested_queries: &[ReadQuery],
-    aggregation_selections: &[RelAggregationSelection],
     query_schema: &QuerySchema,
 ) -> RelationLoadStrategy {
-    if query_schema.has_feature(PreviewFeature::RelationJoins)
-        && query_schema.has_capability(ConnectorCapability::LateralJoin)
+    if query_schema.can_resolve_relation_with_joins()
         && cursor.is_none()
         && distinct.is_none()
-        && aggregation_selections.is_empty()
         && !nested_queries.iter().any(|q| match q {
-            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct() || q.has_aggregation_selections(),
+            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct(),
             _ => false,
         })
         && requested_strategy != Some(RelationLoadStrategy::Query)

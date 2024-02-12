@@ -465,7 +465,7 @@ fn push_column_for_builtin_scalar_type(
 
     let native_type = field
         .native_type_instance(connector)
-        .unwrap_or_else(|| connector.default_native_type_for_scalar_type(&scalar_type));
+        .or_else(|| connector.default_native_type_for_scalar_type(&scalar_type));
 
     enum ColumnDefault {
         Available(sql::DefaultValue),
@@ -521,7 +521,7 @@ fn push_column_for_builtin_scalar_type(
             family,
             full_data_type: String::new(),
             arity: column_arity(field.ast_field().arity),
-            native_type: Some(native_type),
+            native_type,
         },
         auto_increment: field.is_autoincrement() || ctx.flavour.field_is_implicit_autoincrement_primary_key(field),
         description: None,

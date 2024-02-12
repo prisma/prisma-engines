@@ -35,7 +35,8 @@ export async function initQueryEngine(
   const options = queryEngineOptions(datamodel);
 
   if (engineType === "Wasm") {
-    const { WasmQueryEngine } = await import("./wasm");
+    const { getEngineForProvider } = await import("./wasm");
+    const WasmQueryEngine = await getEngineForProvider(adapter.provider)
     return new WasmQueryEngine(options, logCallback, adapter);
   } else {
     const { QueryEngine } = loadNapiEngine();

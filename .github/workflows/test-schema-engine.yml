@@ -5,8 +5,8 @@ on:
       - main
   pull_request:
     paths-ignore:
-      - "!.github/workflows/test-schema-engine.yml"
       - ".github/**"
+      - "!.github/workflows/test-schema-engine.yml"
       - ".buildkite/**"
       - "*.md"
       - "LICENSE"
@@ -64,6 +64,8 @@ jobs:
             url: "sqlserver://localhost:1434;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
           - name: mssql_2019
             url: "sqlserver://localhost:1433;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
+          - name: mssql_2022
+            url: "sqlserver://localhost:1435;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
           - name: mysql_5_6
             url: "mysql://root:prisma@localhost:3309"
           - name: mysql_5_7
@@ -139,7 +141,6 @@ jobs:
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
-          RUST_LOG: debug
 
       - run: cargo nextest run -p schema-engine-cli
         if: ${{ !matrix.database.single_threaded }}
