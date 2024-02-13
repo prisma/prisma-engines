@@ -3,16 +3,7 @@ use crate::conversion::JSArg;
 use super::to_js::{serde_serialize, ToJsValue};
 use crate::types::Query;
 use js_sys::{Array, JsString, Object, Reflect, Uint8Array};
-use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
-
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(extends = Object)]
-    pub type Buffer;
-
-    #[wasm_bindgen(static_method_of = Buffer)]
-    pub fn from(array: &Uint8Array) -> Buffer;
-}
+use wasm_bindgen::JsValue;
 
 impl ToJsValue for Query {
     fn to_js_value(&self) -> Result<wasm_bindgen::prelude::JsValue, wasm_bindgen::prelude::JsValue> {
@@ -36,7 +27,7 @@ impl ToJsValue for JSArg {
             JSArg::Value(value) => serde_serialize(value),
             JSArg::Buffer(buf) => {
                 let array = Uint8Array::from(buf.as_slice());
-                Ok(Buffer::from(&array).into())
+                Ok(array.into())
             }
             JSArg::Array(value) => {
                 let array = Array::new();
