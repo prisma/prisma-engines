@@ -1,6 +1,6 @@
 [
   {
-    "description": "movies.findMany() (all - 25000)",
+    "description": "movies.findMany() (all - ~50K)",
     "query": {
       "action": "findMany",
       "modelName": "Movie",
@@ -59,7 +59,12 @@
           "cast": true
         },
         "selection": {
-          "$scalars": true
+          "$scalars": true,
+          "cast": {
+            "selection": {
+              "$scalars": true
+            }
+          }
         }
       }
     }
@@ -82,7 +87,12 @@
           "cast": true
         },
         "selection": {
-          "$scalars": true
+          "$scalars": true,
+          "cast": {
+            "selection": {
+              "$scalars": true
+            }
+          }
         }
       }
     }
@@ -104,7 +114,16 @@
           }
         },
         "selection": {
-          "$scalars": true
+          "$scalars": true,
+          "cast": {
+            "selection": {
+              "person": {
+                "selection": {
+                  "$scalars": true
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -131,7 +150,16 @@
           }
         },
         "selection": {
-          "$scalars": true
+          "$scalars": true,
+          "cast": {
+            "selection": {
+              "person": {
+                "selection": {
+                  "$scalars": true
+                }
+              }
+            }
+          }
         }
       }
     }
