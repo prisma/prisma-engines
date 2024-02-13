@@ -25,13 +25,13 @@ pub async fn load(
     features: PreviewFeatures,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync + 'static>> {
     match connector_kind {
-        ConnectorKind::Js { adapter, _phantom } => {
-            #[cfg(not(feature = "driver-adapters"))]
+        #[cfg(not(feature = "driver-adapters"))]
+        ConnectorKind::Js { .. } => {
             panic!("Driver adapters are not enabled, but connector mode is set to JS");
-
-            #[cfg(feature = "driver-adapters")]
-            driver_adapter(adapter, features).await
         }
+
+        #[cfg(feature = "driver-adapters")]
+        ConnectorKind::Js { adapter, _phantom } => driver_adapter(adapter, features).await,
 
         #[cfg(feature = "native")]
         ConnectorKind::Rust { url, datasource } => {
