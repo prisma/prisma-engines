@@ -68,6 +68,10 @@ impl FieldSelection {
         FieldSelection::new(non_virtuals.into_iter().chain(virtuals).collect())
     }
 
+    pub fn to_virtuals_last(&self) -> Self {
+        self.clone().into_virtuals_last()
+    }
+
     /// Returns the selections, grouping the virtual fields that are wrapped into objects in the
     /// query (like `_count`) and returning only the first virtual field in each of those groups.
     /// This is useful when we want to treat the group as a whole but we don't need the information
