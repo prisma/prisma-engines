@@ -30,9 +30,10 @@
       systems = import systems;
       perSystem = { config, system, pkgs, craneLib, ... }: {
         config._module.args.flakeInputs = inputs;
-        imports = [          
+        imports = [
           ./nix/args.nix
           ./nix/shell.nix
+          ./nix/publish-engine-size.nix
         ];
       };
     };
