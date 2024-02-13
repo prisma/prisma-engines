@@ -40,7 +40,6 @@ if [[ -z "${WASM_BUILD_PROFILE:-}" ]]; then
         WASM_BUILD_PROFILE="release"
     fi
 fi
-echo "Using build profile: \"${WASM_BUILD_PROFILE}\"" 
 
 if [ "$WASM_BUILD_PROFILE" = "dev" ]; then
     WASM_TARGET_SUBDIR="debug"
@@ -48,7 +47,15 @@ else
     WASM_TARGET_SUBDIR="$WASM_BUILD_PROFILE"
 fi
 
+
+
 build() {
+    echo "ℹ️  Configuring rust toolchain to use nightly and rust-src component"
+    rustup default nightly-2024-01-25
+    rustup target add wasm32-unknown-unknown
+    rustup component add rust-std --target wasm32-unknown-unknown
+    rustup component add rust-src --target wasm32-unknown-unknown
+
     local CONNECTOR="$1"
     local CARGO_TARGET_DIR
     CARGO_TARGET_DIR=$(cargo metadata --format-version 1 | jq -r .target_directory)
