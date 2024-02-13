@@ -337,5 +337,7 @@ pub struct ExternalError {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2037", message = "Too many database connections opened")]
-pub struct TooManyConnections;
+#[user_facing(code = "P2037", message = "Too many database connections opened: {message}")]
+pub struct TooManyConnections {
+    pub message: String,
+}

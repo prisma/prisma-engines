@@ -120,8 +120,10 @@ impl ConnectorError {
                 user_facing_errors::query_engine::RecordRequiredButNotFound { cause: cause.clone() },
             )),
 
-            ErrorKind::TooManyConnections => Some(user_facing_errors::KnownError::new(
-                user_facing_errors::query_engine::TooManyConnections,
+            ErrorKind::TooManyConnections(e) => Some(user_facing_errors::KnownError::new(
+                user_facing_errors::query_engine::TooManyConnections {
+                    message: format!("{}", e),
+                },
             )),
             _ => None,
         };
@@ -283,8 +285,8 @@ pub enum ErrorKind {
     #[error("Invalid driver adapter: {0}")]
     InvalidDriverAdapter(String),
 
-    #[error("Too many DB connections opened")]
-    TooManyConnections,
+    #[error("Too many DB connections opened: {}", _0)]
+    TooManyConnections(Box<dyn std::error::Error + Send + Sync>),
 }
 
 impl From<DomainError> for ConnectorError {

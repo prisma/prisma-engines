@@ -232,7 +232,7 @@ impl From<MysqlError> for Error {
                 builder.build()
             }
             1040 | 1203 => {
-                let mut builder = Error::builder(ErrorKind::TooManyConnections);
+                let mut builder = Error::builder(ErrorKind::TooManyConnections(error.clone().into()));
                 builder.set_original_code(format!("{code}"));
                 builder.set_original_message(error.message);
                 builder.build()

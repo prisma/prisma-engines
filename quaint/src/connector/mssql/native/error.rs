@@ -235,7 +235,7 @@ impl From<tiberius::error::Error> for Error {
                 builder.build()
             }
             tiberius::error::Error::Server(e) if e.code() == 5828 => {
-                let mut builder = Error::builder(ErrorKind::TooManyConnections);
+                let mut builder = Error::builder(ErrorKind::TooManyConnections(e.clone().into()));
                 builder.set_original_code(format!("{}", e.code()));
                 builder.set_original_message(e.message().to_string());
 
