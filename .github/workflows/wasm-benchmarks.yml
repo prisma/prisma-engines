@@ -122,7 +122,7 @@ jobs:
 
       - name: Create or update report
         uses: peter-evans/create-or-update-comment@v3
-        # Only run on main repo
+        # Only run on our repository
         # It avoids an expected failure on forks
         if: github.repository == 'prisma/prisma-engines'
         with:
