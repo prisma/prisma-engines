@@ -68,6 +68,10 @@ impl FieldSelection {
         FieldSelection::new(non_virtuals.into_iter().chain(virtuals).collect())
     }
 
+    pub fn to_virtuals_last(&self) -> Self {
+        self.clone().into_virtuals_last()
+    }
+
     /// Returns the selections, grouping the virtual fields that are wrapped into objects in the
     /// query (like `_count`) and returning only the first virtual field in each of those groups.
     /// This is useful when we want to treat the group as a whole but we don't need the information
@@ -332,11 +336,21 @@ impl VirtualSelection {
             VirtualSelection::RelationCount(rf, _) => rf,
         }
     }
+
+    pub fn filter(&self) -> Option<&Filter> {
+        match self {
+            VirtualSelection::RelationCount(_, filter) => filter.as_ref(),
+        }
+    }
 }
 
 impl Display for VirtualSelection {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.db_alias())
+        let model = self.relation_field().model();
+        let model_name = model.name();
+        let (obj, field) = self.serialized_name();
+
+        write!(f, "{model_name}.{obj}.{field}")
     }
 }
 

@@ -46,7 +46,7 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
                     .table(parent_alias.to_table_string())
                     .set_is_selected(true),
             ),
-            SelectedField::Relation(rs) => self.with_relation(select, rs, parent_alias, ctx),
+            SelectedField::Relation(rs) => self.with_relation(select, rs, Vec::new().iter(), parent_alias, ctx),
             _ => select,
         }
     }
@@ -58,15 +58,17 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        let (subselect, _) = self.build_to_one_select(rs, parent_alias, |x| x, ctx);
+        let (subselect, child_alias) = self.build_to_one_select(rs, parent_alias, ctx);
+        let subselect = subselect.value(self.build_json_obj_fn(rs, child_alias, ctx));
 
         select.value(Expression::from(subselect).alias(rs.field.name().to_owned()))
     }
 
-    fn add_to_many_relation<'a>(
+    fn add_to_many_relation<'a, 'b>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
+        _parent_virtuals: impl Iterator<Item = &'b VirtualSelection>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
@@ -75,10 +77,11 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
         select.value(Expression::from(subselect).alias(rs.field.name().to_owned()))
     }
 
-    fn add_many_to_many_relation<'a>(
+    fn add_many_to_many_relation<'a, 'b>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
+        _parent_virtuals: impl Iterator<Item = &'b VirtualSelection>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
@@ -117,7 +120,7 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
                 )),
                 SelectedField::Relation(rs) => Some((
                     Cow::from(rs.field.name().to_owned()),
-                    Expression::from(self.with_relation(Select::default(), rs, parent_alias, ctx)),
+                    Expression::from(self.with_relation(Select::default(), rs, Vec::new().iter(), parent_alias, ctx)),
                 )),
                 _ => None,
             })
@@ -143,6 +146,10 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
     fn next_alias(&mut self) -> Alias {
         self.alias = self.alias.inc(AliasMode::Table);
         self.alias
+    }
+
+    fn was_virtual_processed_in_relation(&self, _vs: &VirtualSelection) -> bool {
+        false
     }
 }
 
@@ -187,4 +194,8 @@ impl SubqueriesSelectBuilder {
             .value(json_agg())
             .comment("outer")
     }
+}
+
+fn relation_count_alias_name(rf: &RelationField) -> String {
+    format!("aggr_count_{}_{}", rf.model().name(), rf.name())
 }

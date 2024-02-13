@@ -21,6 +21,10 @@ jobs:
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: ./.github/workflows/include/rust-wasm-setup
 
       - name: "Setup Node.js"
         uses: actions/setup-node@v4
@@ -29,9 +33,6 @@ jobs:
         uses: pnpm/action-setup@v2
         with:
           version: 8
-
-      - name: Install bc
-        run: sudo apt update && sudo apt-get install -y bc
 
       - name: "Login to Docker Hub"
         uses: docker/login-action@v3
@@ -43,8 +44,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - uses: cachix/install-nix-action@v24
+      
+      - name: Extract Branch Name
+        run: |
+          branch="$(git show -s --format=%s | grep -o "DRIVER_ADAPTERS_BRANCH=[^ ]*" | cut -f2 -d=)"
+          if [ -n "$branch" ]; then
+            echo "Using $branch branch of driver adapters"
+            echo "DRIVER_ADAPTERS_BRANCH=$branch" >> "$GITHUB_ENV"
+          fi
 
       - name: Setup benchmark
         run: make setup-pg-bench
@@ -122,6 +129,9 @@ jobs:
 
       - name: Create or update report
         uses: peter-evans/create-or-update-comment@v3
+        # Only run on our repository
+        # It avoids an expected failure on forks
+        if: github.repository == 'prisma/prisma-engines'
         with:
           comment-id: ${{ steps.findReportComment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}

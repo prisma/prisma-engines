@@ -29,22 +29,13 @@ jobs:
       - name: Checkout PR branch
         uses: actions/checkout@v4
 
-      - uses: cachix/install-nix-action@v24
-        with:
-          # we need internet access for the moment
-          extra_nix_config: |
-            sandbox = false
+      - uses: ./.github/workflows/include/rust-wasm-setup
 
       - name: Build and measure PR branch
         id: measure
         run: |
-          nix build -L .#query-engine-wasm-gz
-
-          for provider in "postgresql" "mysql" "sqlite"; do
-            echo "${provider}_size=$(wc --bytes < ./result/query-engine-$provider.wasm)" >> $GITHUB_OUTPUT
-            echo "${provider}_size_gz=$(wc --bytes < ./result/query-engine-$provider.wasm.gz)" >> $GITHUB_OUTPUT
-          done
-
+          export ENGINE_SIZE_OUTPUT=$GITHUB_OUTPUT
+          make measure-qe-wasm
 
   base-wasm-size:
     name: calculate module sizes (base branch)
@@ -59,23 +50,16 @@ jobs:
     steps:
       - name: Checkout base branch
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.base.sha }}
+        # with:
+        #   ref: ${{ github.event.pull_request.base.sha }}
 
-      - uses: cachix/install-nix-action@v24
-        with:
-          extra_nix_config: |
-            sandbox = false
+      - uses: ./.github/workflows/include/rust-wasm-setup
 
       - name: Build and measure base branch
         id: measure
         run: |
-          nix build -L .#query-engine-wasm-gz
-
-          for provider in "postgresql" "mysql" "sqlite"; do
-            echo "${provider}_size=$(wc --bytes < ./result/query-engine-$provider.wasm)" >> $GITHUB_OUTPUT
-            echo "${provider}_size_gz=$(wc --bytes < ./result/query-engine-$provider.wasm.gz)" >> $GITHUB_OUTPUT
-          done
+          export ENGINE_SIZE_OUTPUT=$GITHUB_OUTPUT
+          make measure-qe-wasm
 
   report-diff:
     name: report module size
@@ -122,6 +106,9 @@ jobs:
 
       - name: Create or update report
         uses: peter-evans/create-or-update-comment@v3
+        # Only run on our repository
+        # It avoids an expected failure on forks
+        if: github.repository == 'prisma/prisma-engines'
         with:
           comment-id: ${{ steps.findReportComment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
