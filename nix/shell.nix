@@ -1,13 +1,12 @@
-{ self', pkgs, rustToolchain, ... }:
+{ self', pkgs, ... }:
 
 let
-  devToolchain = rustToolchain.override { extensions = [ "rust-analyzer" "rust-src" ]; };
   nodejs = pkgs.nodejs_latest;
 in
 {
   devShells.default = pkgs.mkShell {
     packages = with pkgs; [
-      devToolchain
+      rustup
       llvmPackages_latest.bintools
 
       nodejs_20
@@ -21,7 +20,6 @@ in
       graphviz
       wabt
       wasm-bindgen-cli
-      wasm-pack
     ];
 
     inputsFrom = [ self'.packages.prisma-engines ];
