@@ -332,11 +332,21 @@ impl VirtualSelection {
             VirtualSelection::RelationCount(rf, _) => rf,
         }
     }
+
+    pub fn filter(&self) -> Option<&Filter> {
+        match self {
+            VirtualSelection::RelationCount(_, filter) => filter.as_ref(),
+        }
+    }
 }
 
 impl Display for VirtualSelection {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.db_alias())
+        let model = self.relation_field().model();
+        let model_name = model.name();
+        let (obj, field) = self.serialized_name();
+
+        write!(f, "{model_name}.{obj}.{field}")
     }
 }
 
