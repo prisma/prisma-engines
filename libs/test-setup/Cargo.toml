@@ -9,7 +9,7 @@ dissimilar = "1.0.3"
 enumflags2.workspace = true
 once_cell = "1.3.1"
 tokio = { workspace = true, optional = true }
-tracing = "0.1"
+tracing.workspace = true
 tracing-error = "0.2"
 tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
 url.workspace = true

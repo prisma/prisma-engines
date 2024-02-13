@@ -10,7 +10,7 @@ serde_json.workspace = true
 query-test-macros = { path = "../query-test-macros" }
 query-tests-setup = { path = "../query-tests-setup" }
 indoc.workspace = true
-tracing = "0.1"
+tracing.workspace = true
 tracing-futures = "0.2"
 colored = "2"
 chrono.workspace = true

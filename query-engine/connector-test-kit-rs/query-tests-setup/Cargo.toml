@@ -21,7 +21,7 @@ nom = "7.1"
 itertools.workspace = true
 regex = "1"
 serde.workspace = true
-tracing = "0.1"
+tracing.workspace = true
 tracing-futures = "0.2"
 tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
 tracing-error = "0.2"

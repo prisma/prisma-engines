@@ -15,7 +15,7 @@ structopt = "0.3.8"
 serde_json.workspace = true
 serde.workspace = true
 tokio.workspace = true
-tracing = "0.1"
+tracing.workspace = true
 tracing-error = "0.2"
 tracing-subscriber = { version = "0.3", features = [ "fmt", "json", "time", "env-filter" ] }
 

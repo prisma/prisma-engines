@@ -67,7 +67,7 @@ fmt-sql = ["sqlformat"]
 [dependencies]
 connection-string = "0.2"
 percent-encoding = "2"
-tracing = "0.1"
+tracing.workspace = true
 tracing-core = "0.1"
 async-trait.workspace = true
 thiserror = "1.0"
