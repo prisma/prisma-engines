@@ -50,8 +50,8 @@ jobs:
     steps:
       - name: Checkout base branch
         uses: actions/checkout@v4
-        # with:
-        #   ref: ${{ github.event.pull_request.base.sha }}
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
 
       - uses: ./.github/workflows/include/rust-wasm-setup
 
