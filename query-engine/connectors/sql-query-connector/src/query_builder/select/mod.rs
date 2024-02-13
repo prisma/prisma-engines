@@ -45,18 +45,20 @@ pub(crate) trait JoinSelectBuilder {
         ctx: &Context<'_>,
     ) -> Select<'a>;
     /// Adds to `select` the SQL statements to fetch a 1-m relation.
-    fn add_to_many_relation<'a>(
+    fn add_to_many_relation<'a, 'b>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
+        parent_virtuals: impl Iterator<Item = &'b VirtualSelection>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a>;
     /// Adds to `select` the SQL statements to fetch a m-n relation.
-    fn add_many_to_many_relation<'a>(
+    fn add_many_to_many_relation<'a, 'b>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
+        parent_virtuals: impl Iterator<Item = &'b VirtualSelection>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a>;
@@ -89,6 +91,9 @@ pub(crate) trait JoinSelectBuilder {
     ) -> Expression<'static>;
     /// Get the next alias for a table.
     fn next_alias(&mut self) -> Alias;
+    /// Checks if a virtual selection has already been added to the query at an earlier stage
+    /// as a part of a relation query for a matching relation field.
+    fn was_virtual_processed_in_relation(&self, vs: &VirtualSelection) -> bool;
 
     fn with_selection<'a>(
         &mut self,
@@ -107,11 +112,12 @@ pub(crate) trait JoinSelectBuilder {
     }
 
     /// Builds the core select for a 1-1 relation.
+    /// Note: it does not add the JSON object selection because there are additional steps to
+    /// perform before that depending on the `JoinSelectBuilder` implementation.
     fn build_to_one_select(
         &mut self,
         rs: &RelationSelection,
         parent_alias: Alias,
-        selection_modifier: impl FnOnce(Expression<'static>) -> Expression<'static>,
         ctx: &Context<'_>,
     ) -> (Select<'static>, Alias) {
         let rf = &rs.field;
@@ -121,12 +127,10 @@ pub(crate) trait JoinSelectBuilder {
             .related_field()
             .as_table(ctx)
             .alias(child_table_alias.to_table_string());
-        let json_expr = self.build_json_obj_fn(rs, child_table_alias, ctx);
 
         let select = Select::from_table(table)
             .with_join_conditions(rf, parent_alias, child_table_alias, ctx)
             .with_filters(rs.args.filter.clone(), Some(child_table_alias), ctx)
-            .value(selection_modifier(json_expr))
             .limit(1);
 
         (select, child_table_alias)
@@ -155,10 +159,13 @@ pub(crate) trait JoinSelectBuilder {
             .comment("root select");
 
         // SELECT JSON_BUILD_OBJECT() FROM ( <root> )
-        let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()))
-            .value(self.build_json_obj_fn(rs, root_alias, ctx).alias(JSON_AGG_IDENT));
-        let inner = self.with_relations(inner, rs.relations(), root_alias, ctx);
+        let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()));
+        let inner = self.with_relations(inner, rs.relations(), rs.virtuals(), root_alias, ctx);
         let inner = self.with_virtual_selections(inner, rs.virtuals(), root_alias, ctx);
+
+        // Build the JSON object utilizing the information we collected in `with_relations` and
+        // `with_virtual_selections`.
+        let inner = inner.value(self.build_json_obj_fn(rs, root_alias, ctx).alias(JSON_AGG_IDENT));
 
         let linking_fields = rs.field.related_field().linking_fields();
 
@@ -212,16 +219,17 @@ pub(crate) trait JoinSelectBuilder {
         }
     }
 
-    fn with_relation<'a>(
+    fn with_relation<'a, 'b>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
+        parent_virtuals: impl Iterator<Item = &'b VirtualSelection>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
         match (rs.field.is_list(), rs.field.relation().is_many_to_many()) {
-            (true, true) => self.add_many_to_many_relation(select, rs, parent_alias, ctx),
-            (true, false) => self.add_to_many_relation(select, rs, parent_alias, ctx),
+            (true, true) => self.add_many_to_many_relation(select, rs, parent_virtuals, parent_alias, ctx),
+            (true, false) => self.add_to_many_relation(select, rs, parent_virtuals, parent_alias, ctx),
             (false, _) => self.add_to_one_relation(select, rs, parent_alias, ctx),
         }
     }
@@ -230,10 +238,15 @@ pub(crate) trait JoinSelectBuilder {
         &mut self,
         input: Select<'a>,
         relation_selections: impl Iterator<Item = &'b RelationSelection>,
+        virtual_selections: impl Iterator<Item = &'b VirtualSelection>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        relation_selections.fold(input, |acc, rs| self.with_relation(acc, rs, parent_alias, ctx))
+        let virtual_selections = virtual_selections.collect::<Vec<_>>();
+
+        relation_selections.fold(input, |acc, rs| {
+            self.with_relation(acc, rs, virtual_selections.iter().copied(), parent_alias, ctx)
+        })
     }
 
     fn build_default_select(&mut self, args: &QueryArguments, ctx: &Context<'_>) -> (Select<'static>, Alias) {
@@ -258,7 +271,13 @@ pub(crate) trait JoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        selections.fold(select, |acc, vs| self.add_virtual_selection(acc, vs, parent_alias, ctx))
+        selections.fold(select, |acc, vs| {
+            if self.was_virtual_processed_in_relation(vs) {
+                acc
+            } else {
+                self.add_virtual_selection(acc, vs, parent_alias, ctx)
+            }
+        })
     }
 
     fn build_virtual_select(
@@ -371,6 +390,18 @@ pub(crate) trait JoinSelectBuilder {
             .with_filters(filter.clone(), Some(related_table_alias), ctx);
 
         select
+    }
+
+    fn find_compatible_virtual_for_relation<'a>(
+        &self,
+        rs: &RelationSelection,
+        mut parent_virtuals: impl Iterator<Item = &'a VirtualSelection>,
+    ) -> Option<&'a VirtualSelection> {
+        if rs.args.take.is_some() || rs.args.skip.is_some() || rs.args.cursor.is_some() || rs.args.distinct.is_some() {
+            return None;
+        }
+
+        parent_virtuals.find(|vs| *vs.relation_field() == rs.field && vs.filter() == rs.args.filter.as_ref())
     }
 }
 
@@ -612,8 +643,4 @@ fn supports_lateral_join(args: &QueryArguments) -> bool {
         .schema
         .connector
         .has_capability(ConnectorCapability::LateralJoin)
-}
-
-fn relation_count_alias_name(rf: &RelationField) -> String {
-    format!("aggr_count_{}_{}", rf.model().name(), rf.name())
 }

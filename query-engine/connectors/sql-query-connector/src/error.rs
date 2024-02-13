@@ -200,6 +200,9 @@ pub enum SqlError {
 
     #[error("External connector error")]
     ExternalError(i32),
+
+    #[error("Too many DB connections opened")]
+    TooManyConnections(Box<dyn std::error::Error + Send + Sync>),
 }
 
 impl SqlError {
@@ -282,6 +285,7 @@ impl SqlError {
             SqlError::MissingFullTextSearchIndex => ConnectorError::from_kind(ErrorKind::MissingFullTextSearchIndex),
             SqlError::InvalidIsolationLevel(msg) => ConnectorError::from_kind(ErrorKind::InternalConversionError(msg)),
             SqlError::ExternalError(error_id) => ConnectorError::from_kind(ErrorKind::ExternalError(error_id)),
+            SqlError::TooManyConnections(e) => ConnectorError::from_kind(ErrorKind::TooManyConnections(e)),
         }
     }
 }
@@ -336,6 +340,7 @@ impl From<quaint::error::Error> for SqlError {
             QuaintKind::TransactionWriteConflict => Self::TransactionWriteConflict,
             QuaintKind::RollbackWithoutBegin => Self::RollbackWithoutBegin,
             QuaintKind::ExternalError(error_id) => Self::ExternalError(error_id),
+            QuaintKind::TooManyConnections(e) => Self::TooManyConnections(e),
             e @ QuaintKind::UnsupportedColumnType { .. } => SqlError::ConversionError(e.into()),
             e @ QuaintKind::TransactionAlreadyClosed(_) => SqlError::TransactionAlreadyClosed(format!("{e}")),
             e @ QuaintKind::IncorrectNumberOfParameters { .. } => SqlError::QueryError(e.into()),

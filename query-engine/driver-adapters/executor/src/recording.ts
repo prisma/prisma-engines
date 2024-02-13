@@ -13,6 +13,7 @@ export function recording(adapter: DriverAdapter) {
   return {
     recorder: recorder(adapter, recordings),
     replayer: replayer(adapter, recordings),
+    recordings: recordings,
   };
 }
 
@@ -31,9 +32,7 @@ function recorder(adapter: DriverAdapter, recordings: Recordings) {
       return result;
     },
     executeRaw: async (params) => {
-      const result = await adapter.executeRaw(params);
-      recordings.addCommandResults(params, result);
-      return result;
+      throw new Error("Not implemented");
     },
   };
 }
@@ -61,18 +60,25 @@ function createInMemoryRecordings() {
   const queryResults: Map<string, Result<ResultSet>> = new Map();
   const commandResults: Map<string, Result<number>> = new Map();
 
-  // Recording is currently only used in benchmarks. Before we used to serialize the whole query
-  // (sql + args) but since bigints are not serialized by JSON.stringify, and we didn’t really need
-  // (sql + args) but since bigints are not serialized by JSON.stringify, and we didn't really need
-  // args for benchmarks, we just serialize the sql part.
-  //
-  // If this ever changes (we reuse query recording in tests) we need to make sure to serialize the
-  // args as well.
   const queryToKey = (params: Query) => {
-    return JSON.stringify(params.sql);
+    var sql = params.sql;
+    params.args.forEach((arg: any, i) => {
+      sql = sql.replace("$" + (i + 1), arg.toString());
+    });
+    return sql;
   };
 
   return {
+    data: (): Map<string, ResultSet> => {
+      const map = new Map();
+      for (const [key, value] of queryResults.entries()) {
+        value.map((resultSet) => {
+          map[key] = resultSet;
+        });
+      }
+      return map;
+    },
+
     addQueryResults: (params: Query, result: Result<ResultSet>) => {
       const key = queryToKey(params);
       queryResults.set(key, result);
