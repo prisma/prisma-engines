@@ -64,7 +64,7 @@ build-qe-wasm:
 build-qe-wasm-gz: build-qe-wasm
 	@cd query-engine/query-engine-wasm/pkg && \
     for provider in postgresql mysql sqlite; do \
-        tar -I 'gzip -n' --mtime='1970-01-01 00:00:00' --sort=name -cvf $$provider.gz $$provider; \
+        tar -I 'gzip -n' --mtime='1970-01-01 00:00:00Z' --sort=name --format=ustar -cvf $$provider.gz $$provider; \
     done;
 
 build-schema-wasm:
