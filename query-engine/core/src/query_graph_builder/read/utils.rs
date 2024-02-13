@@ -253,15 +253,13 @@ pub fn merge_cursor_fields(selected_fields: FieldSelection, cursor: &Option<Sele
 pub(crate) fn get_relation_load_strategy(
     requested_strategy: Option<RelationLoadStrategy>,
     cursor: Option<&SelectionResult>,
-    distinct: Option<&FieldSelection>,
     nested_queries: &[ReadQuery],
     query_schema: &QuerySchema,
 ) -> RelationLoadStrategy {
     if query_schema.can_resolve_relation_with_joins()
         && cursor.is_none()
-        && distinct.is_none()
         && !nested_queries.iter().any(|q| match q {
-            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct(),
+            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor(),
             _ => false,
         })
         && requested_strategy != Some(RelationLoadStrategy::Query)

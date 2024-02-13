@@ -227,6 +227,7 @@ impl RelatedRecordsQuery {
         self.args.cursor.is_some() || self.nested.iter().any(|q| q.has_cursor())
     }
 
+    // TODO: might need to be removed afterwards
     pub fn has_distinct(&self) -> bool {
         self.args.distinct.is_some() || self.nested.iter().any(|q| q.has_distinct())
     }
