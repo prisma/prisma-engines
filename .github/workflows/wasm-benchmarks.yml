@@ -129,9 +129,9 @@ jobs:
 
       - name: Create or update report
         uses: peter-evans/create-or-update-comment@v3
-        # Only run on our repository
+        # Only run on branches from our repository
         # It avoids an expected failure on forks
-        if: github.repository == 'prisma/prisma-engines'
+        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
         with:
           comment-id: ${{ steps.findReportComment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
