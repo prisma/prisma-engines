@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 
 import * as qe from "./qe";
 
-import pgDriver from "pg";
+import { pg } from "@prisma/bundled-js-drivers";
 import * as prismaPg from "@prisma/adapter-pg";
 import { bindAdapter, DriverAdapter } from "@prisma/driver-adapter-utils";
 
@@ -176,7 +176,7 @@ async function pgAdapter(url: string): Promise<DriverAdapter> {
   if (schemaName != null) {
     args.options = `--search_path="${schemaName}"`;
   }
-  const pool = new pgDriver.Pool(args);
+  const pool = new pg.Pool(args);
 
   return new prismaPg.PrismaPg(pool, {
     schema: schemaName,
