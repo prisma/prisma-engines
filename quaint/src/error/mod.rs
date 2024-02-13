@@ -148,6 +148,9 @@ pub enum ErrorKind {
     #[error("Error querying the database: {}", _0)]
     QueryError(Box<dyn std::error::Error + Send + Sync + 'static>),
 
+    #[error("Too many DB connections opened")]
+    TooManyConnections,
+
     #[error("Invalid input provided to query: {}", _0)]
     QueryInvalidInput(String),
 

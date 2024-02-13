@@ -335,3 +335,7 @@ pub struct ExternalError {
     /// id of the error in external system, which would allow to retrieve it later
     pub id: i32,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2037", message = "Too many DB connections opened")]
+pub struct TooManyConnections;

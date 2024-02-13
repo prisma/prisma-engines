@@ -119,6 +119,10 @@ impl ConnectorError {
             ErrorKind::RecordDoesNotExist { cause } => Some(KnownError::new(
                 user_facing_errors::query_engine::RecordRequiredButNotFound { cause: cause.clone() },
             )),
+
+            ErrorKind::TooManyConnections => Some(user_facing_errors::KnownError::new(
+                user_facing_errors::query_engine::TooManyConnections,
+            )),
             _ => None,
         };
 
@@ -278,6 +282,9 @@ pub enum ErrorKind {
 
     #[error("Invalid driver adapter: {0}")]
     InvalidDriverAdapter(String),
+
+    #[error("Too many DB connections opened")]
+    TooManyConnections,
 }
 
 impl From<DomainError> for ConnectorError {

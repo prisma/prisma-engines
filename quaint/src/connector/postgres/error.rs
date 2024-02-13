@@ -218,6 +218,14 @@ impl From<PostgresError> for Error {
                 builder.build()
             }
 
+            "53300" => {
+                let kind = ErrorKind::TooManyConnections;
+                let mut builder = Error::builder(kind);
+                builder.set_original_code(value.code);
+                builder.set_original_message(value.message);
+                builder.build()
+            }
+
             _ => {
                 let code = value.code.to_owned();
                 let message = value.to_string();
