@@ -3,12 +3,12 @@ on:
   pull_request:
     paths-ignore:
       - ".github/**"
-      - "!.github/workflows/wasm-size.yml"
       - ".buildkite/**"
       - "*.md"
       - "LICENSE"
       - "CODEOWNERS"
       - "renovate.json"
+      - "!.github/workflows/wasm-size.yml"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
