@@ -48,18 +48,10 @@ jobs:
       sqlite_size: ${{ steps.measure.outputs.sqlite_size }}
       sqlite_size_gz: ${{ steps.measure.outputs.sqlite_size_gz }}
     steps:
-      # remove before merging
-      - name: 'tmp: Checkout PR branch'
-        uses: actions/checkout@v4
-      - run: cp Makefile /tmp/prisma-engines-Makefile
-
       - name: Checkout base branch
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.base.sha }}
-
-      # remove before merging
-      - run: mv /tmp/prisma-engines-Makefile Makefile
 
       - uses: ./.github/workflows/include/rust-wasm-setup
 
