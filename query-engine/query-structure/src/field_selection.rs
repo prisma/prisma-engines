@@ -23,6 +23,10 @@ impl FieldSelection {
         self.selections
     }
 
+    pub fn len(&self) -> usize {
+        self.selections.len()
+    }
+
     /// Returns `true` if self contains (at least) all fields specified in `other`. `false` otherwise.
     /// Recurses into composite selections and ensures that composite selections are supersets as well.
     pub fn is_superset_of(&self, other: &Self) -> bool {
@@ -41,6 +45,10 @@ impl FieldSelection {
 
     pub fn selections(&self) -> impl Iterator<Item = &SelectedField> + '_ {
         self.selections.iter()
+    }
+
+    pub fn scalars(&self) -> impl Iterator<Item = &ScalarFieldRef> + '_ {
+        self.selections().filter_map(SelectedField::as_scalar)
     }
 
     pub fn virtuals(&self) -> impl Iterator<Item = &VirtualSelection> {
@@ -416,6 +424,13 @@ impl SelectedField {
         match self {
             SelectedField::Virtual(_) => Some((TypeIdentifier::Json, FieldArity::Required)),
             _ => self.type_identifier_with_arity(),
+        }
+    }
+
+    pub fn as_scalar(&self) -> Option<&ScalarFieldRef> {
+        match self {
+            SelectedField::Scalar(sf) => Some(sf),
+            _ => None,
         }
     }
 

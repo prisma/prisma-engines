@@ -22,7 +22,7 @@ pub struct QueryArguments {
     pub skip: Option<i64>,
     pub filter: Option<Filter>,
     pub order_by: Vec<OrderBy>,
-    pub distinct: Option<FieldSelection>,
+    pub distinct: Option<FieldSelection>, // TODO: should we make it `Vec<ScalarFieldRef>`?
     pub ignore_skip: bool,
     pub ignore_take: bool,
     pub relation_load_strategy: Option<RelationLoadStrategy>,
@@ -102,14 +102,24 @@ impl QueryArguments {
             .preview_features()
             .contains(PreviewFeature::NativeDistinct);
 
-        let connector_can_distinct_in_db = self
-            .model()
+        has_distinct_feature && self.connector_supports_distinct_on() && self.order_by.is_empty()
+    }
+
+    pub fn can_distinct_in_db_with_joins(&self) -> bool {
+        self.connector_supports_distinct_on()
+            && self
+                .distinct
+                .as_ref()
+                .map(|distinct| native_distinct_compatible_with_order_by(distinct, &self.order_by))
+                .unwrap_or(true)
+    }
+
+    fn connector_supports_distinct_on(&self) -> bool {
+        self.model()
             .dm
             .schema
             .connector
-            .has_capability(ConnectorCapability::DistinctOn);
-
-        has_distinct_feature && connector_can_distinct_in_db && self.order_by.is_empty()
+            .has_capability(ConnectorCapability::DistinctOn)
     }
 
     /// An unstable cursor is a cursor that is used in conjunction with an unstable (non-unique) combination of orderBys.
