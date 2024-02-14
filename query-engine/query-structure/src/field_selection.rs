@@ -80,7 +80,7 @@ impl FieldSelection {
     /// [`FieldSelection::db_names_grouping_virtuals`] and
     /// [`FieldSelection::type_identifiers_with_arities_grouping_virtuals`].
     fn selections_with_virtual_group_heads(&self) -> impl Iterator<Item = &SelectedField> {
-        self.selections().unique_by(|f| f.db_name_grouping_virtuals())
+        self.selections().unique_by(|f| f.prisma_name_grouping_virtuals())
     }
 
     /// Returns all Prisma (e.g. schema model field) names of contained fields.
@@ -102,9 +102,9 @@ impl FieldSelection {
     /// into the grouped containers for virtual fields, like `_count`. The names returned by this
     /// method correspond to the results of queries that use JSON objects to represent joined
     /// relations and relation aggregations.
-    pub fn db_names_grouping_virtuals(&self) -> impl Iterator<Item = String> + '_ {
+    pub fn prisma_names_grouping_virtuals(&self) -> impl Iterator<Item = String> + '_ {
         self.selections_with_virtual_group_heads()
-            .map(|f| f.db_name_grouping_virtuals())
+            .map(|f| f.prisma_name_grouping_virtuals())
             .map(Cow::into_owned)
     }
 
@@ -384,10 +384,10 @@ impl SelectedField {
     /// relations and relation aggregations. For those queries, the result of this method
     /// corresponds to the top-level name of the value which is a JSON object that contains this
     /// field inside.
-    pub fn db_name_grouping_virtuals(&self) -> Cow<'_, str> {
+    pub fn prisma_name_grouping_virtuals(&self) -> Cow<'_, str> {
         match self {
             SelectedField::Virtual(vs) => vs.serialized_name().0.into(),
-            _ => self.db_name(),
+            _ => self.prisma_name(),
         }
     }
 

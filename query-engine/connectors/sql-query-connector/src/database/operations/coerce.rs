@@ -82,7 +82,7 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
             let related_model = rs.field.related_model();
 
             for (key, value) in obj {
-                match related_model.fields().all().find(|f| f.db_name() == key) {
+                match related_model.fields().all().find(|f| f.name() == key) {
                     Some(Field::Scalar(sf)) => {
                         map.push((key, coerce_json_scalar_to_pv(value, &sf)?));
                     }

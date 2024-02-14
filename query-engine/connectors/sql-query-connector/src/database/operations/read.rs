@@ -34,7 +34,7 @@ pub(crate) async fn get_single_record_joins(
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SingleRecord>> {
     let selected_fields = selected_fields.to_virtuals_last();
-    let field_names: Vec<_> = selected_fields.db_names_grouping_virtuals().collect();
+    let field_names: Vec<_> = selected_fields.prisma_names_grouping_virtuals().collect();
     let idents = selected_fields.type_identifiers_with_arities_grouping_virtuals();
 
     let indexes = get_selection_indexes(
@@ -132,7 +132,7 @@ pub(crate) async fn get_many_records_joins(
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
     let selected_fields = selected_fields.to_virtuals_last();
-    let field_names: Vec<_> = selected_fields.db_names_grouping_virtuals().collect();
+    let field_names: Vec<_> = selected_fields.prisma_names_grouping_virtuals().collect();
     let idents = selected_fields.type_identifiers_with_arities_grouping_virtuals();
     let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
 
