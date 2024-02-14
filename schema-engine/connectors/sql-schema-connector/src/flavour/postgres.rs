@@ -462,7 +462,7 @@ impl SqlFlavour for PostgresFlavour {
                     let ret =
                         shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await;
 
-                    let drop_database = format!("DROP DATABASE IF EXISTS \"{shadow_database_name}\"");
+                    let drop_database = format!("DROP DATABASE IF EXISTS \"{shadow_database_name}\" WITH (FORCE)");
                     main_connection.raw_cmd(&drop_database, &params.url).await?;
 
                     ret
