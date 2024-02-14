@@ -545,13 +545,33 @@ fn order_by_selection(rs: &RelationSelection) -> FieldSelection {
         .order_by
         .iter()
         .flat_map(|order_by| match order_by {
-            OrderBy::Scalar(x) if x.path.is_empty() => vec![x.field.clone()],
+            OrderBy::Scalar(x) => {
+                // If the path is empty, the order by is done on the field itself in the outer select.
+                if x.path.is_empty() {
+                    vec![x.field.clone()]
+                // If there are relations to traverse, select the linking fields of the first hop so that the outer select can perform a join to traverse the first relation.
+                // This is necessary because the order by is done on a different join. The following hops are handled by the order by builder.
+                } else {
+                    first_hop_linking_fields(&x.path)
+                }
+            }
             OrderBy::Relevance(x) => x.fields.clone(),
-            _ => Vec::new(),
+            // Select the linking fields of the first hop so that the outer select can perform a join to traverse the relation.
+            // This is necessary because the order by is done on a different join. The following hops are handled by the order by builder.
+            OrderBy::ToManyAggregation(x) => first_hop_linking_fields(x.intermediary_hops()),
+            OrderBy::ScalarAggregation(x) => vec![x.field.clone()],
         })
         .collect();
 
     FieldSelection::from(selection)
+}
+
+/// Returns the linking fields of the first hop in an order by path.
+fn first_hop_linking_fields(hops: &[OrderByHop]) -> Vec<ScalarFieldRef> {
+    hops.first()
+        .and_then(|hop| hop.as_relation_hop())
+        .map(|rf| rf.linking_fields().as_scalar_fields().unwrap())
+        .unwrap_or_default()
 }
 
 fn relation_selection(rs: &RelationSelection) -> FieldSelection {
