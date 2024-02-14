@@ -6,10 +6,7 @@ mod bigint_filter {
     use super::setup;
     use query_engine_tests::run_query;
 
-    #[connector_test(
-        schema(setup::common_types),
-        exclude(Sqlite("libsql.js.wasm"), Vitess("planetscale.js.wasm"))
-    )]
+    #[connector_test(schema(setup::common_types))]
     async fn basic_where(runner: Runner) -> TestResult<()> {
         setup::test_data_common_types(&runner).await?;
 
@@ -31,10 +28,7 @@ mod bigint_filter {
         Ok(())
     }
 
-    #[connector_test(
-        schema(setup::common_types),
-        exclude(Sqlite("libsql.js.wasm"), Vitess("planetscale.js.wasm"))
-    )]
+    #[connector_test(schema(setup::common_types))]
     async fn numeric_comparison_filters(runner: Runner) -> TestResult<()> {
         setup::test_data_common_types(&runner).await?;
 
