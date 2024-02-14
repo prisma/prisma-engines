@@ -2,7 +2,7 @@ use super::{Expression, Identifier, Span, WithSpan};
 use std::fmt::{Display, Formatter};
 
 /// A list of arguments inside parentheses.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct ArgumentsList {
     /// The arguments themselves.
     ///
@@ -34,7 +34,7 @@ impl ArgumentsList {
 }
 
 /// An argument, either for attributes or for function call expressions.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Argument {
     /// The argument name, if applicable.
     ///
@@ -84,7 +84,7 @@ impl WithSpan for Argument {
 ///
 /// This is of course invalid, but we parse it in order to provide better diagnostics and
 /// for autocompletion.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct EmptyArgument {
     pub name: Identifier,
 }

@@ -34,6 +34,118 @@ use parser_database::{ast, ParserDatabase, SourceFile};
 /// The collection of all available connectors.
 pub type ConnectorRegistry<'a> = &'a [&'static dyn datamodel_connector::Connector];
 
+/// The collection of all available validated connectors.
+pub type ValidatedConnectorRegistry<'a> = &'a [&'static dyn datamodel_connector::ValidatedConnector];
+
+/// `SerdeValidatedSchema` serves as a temporary serde-compatible representation of
+/// `ValidatedSchema` and `ValidatedSchemaForQE`.
+/// In fact, it doesn't hold any references to non-serializable values, like `&'static dyn Connector`.
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct SerdeValidatedSchema {
+    pub db: parser_database::ParserDatabase,
+    pub preview_features: enumflags2::BitFlags<PreviewFeature>,
+    pub relation_mode: datamodel_connector::RelationMode,
+    pub provider: String,
+}
+
+impl SerdeValidatedSchema {
+    pub fn into_schema_for_qe(self, connectors: &ValidatedConnectorRegistry<'_>) -> ValidatedSchemaForQE {
+        let active_connector = connectors
+            .iter()
+            .find(|c| c.is_provider(self.provider.as_str()))
+            .unwrap();
+
+        ValidatedSchemaForQE {
+            db: self.db,
+            preview_features: self.preview_features,
+            relation_mode: self.relation_mode,
+            connector: *active_connector,
+        }
+    }
+}
+
+pub trait ValidSchema: Sync + Send + 'static {
+    fn db(&self) -> &parser_database::ParserDatabase;
+    fn preview_features(&self) -> enumflags2::BitFlags<PreviewFeature>;
+    fn relation_mode(&self) -> datamodel_connector::RelationMode;
+    fn connector(&self) -> &'static dyn datamodel_connector::ValidatedConnector;
+}
+
+/// `SchemaForQE` is the `query-engine`-specific specific variant of `ValidatedSchema`.
+/// More specifically, it's for the size-optimized `query-engine-wasm`.
+/// Using `ValidatedConnector` rather than `Connector` results in 14+ fewer KB
+/// in `query-engine-wasm`, after gzip.
+pub struct ValidatedSchemaForQE {
+    pub db: parser_database::ParserDatabase,
+    pub preview_features: enumflags2::BitFlags<PreviewFeature>,
+    pub relation_mode: datamodel_connector::RelationMode,
+    pub connector: &'static dyn datamodel_connector::ValidatedConnector,
+}
+
+impl ValidSchema for ValidatedSchemaForQE {
+    fn db(&self) -> &parser_database::ParserDatabase {
+        &self.db
+    }
+
+    fn preview_features(&self) -> enumflags2::BitFlags<PreviewFeature> {
+        self.preview_features
+    }
+
+    fn relation_mode(&self) -> datamodel_connector::RelationMode {
+        self.relation_mode
+    }
+
+    fn connector(&self) -> &'static dyn datamodel_connector::ValidatedConnector {
+        self.connector
+    }
+}
+
+impl ValidSchema for std::sync::Arc<dyn ValidSchema + 'static> {
+    fn db(&self) -> &ParserDatabase {
+        (**self).db()
+    }
+
+    fn preview_features(&self) -> enumflags2::BitFlags<PreviewFeature> {
+        (**self).preview_features()
+    }
+
+    fn relation_mode(&self) -> datamodel_connector::RelationMode {
+        (**self).relation_mode()
+    }
+
+    fn connector(&self) -> &'static dyn datamodel_connector::ValidatedConnector {
+        (**self).connector()
+    }
+}
+
+impl From<ValidatedSchema> for SerdeValidatedSchema {
+    fn from(schema: ValidatedSchema) -> Self {
+        Self {
+            db: schema.db,
+            preview_features: schema.configuration.preview_features(),
+            relation_mode: schema.relation_mode,
+            provider: schema.connector.provider_name().to_owned(),
+        }
+    }
+}
+
+impl From<ValidatedSchema> for ValidatedSchemaForQE {
+    fn from(schema: ValidatedSchema) -> Self {
+        Self {
+            db: schema.db,
+            preview_features: schema.configuration.preview_features(),
+            relation_mode: schema.relation_mode,
+            connector: schema.connector.as_validated_connector(),
+        }
+    }
+}
+
+impl std::fmt::Debug for ValidatedSchemaForQE {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("<Prisma schema>")
+    }
+}
+
 pub struct ValidatedSchema {
     pub configuration: Configuration,
     pub db: parser_database::ParserDatabase,
@@ -42,15 +154,27 @@ pub struct ValidatedSchema {
     relation_mode: datamodel_connector::RelationMode,
 }
 
-impl std::fmt::Debug for ValidatedSchema {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("<Prisma schema>")
+impl ValidSchema for ValidatedSchema {
+    fn db(&self) -> &parser_database::ParserDatabase {
+        &self.db
+    }
+
+    fn preview_features(&self) -> enumflags2::BitFlags<PreviewFeature> {
+        self.configuration.preview_features()
+    }
+
+    fn relation_mode(&self) -> datamodel_connector::RelationMode {
+        self.relation_mode
+    }
+
+    fn connector(&self) -> &'static dyn datamodel_connector::ValidatedConnector {
+        self.connector.as_validated_connector()
     }
 }
 
-impl ValidatedSchema {
-    pub fn relation_mode(&self) -> datamodel_connector::RelationMode {
-        self.relation_mode
+impl std::fmt::Debug for ValidatedSchema {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("<Prisma schema>")
     }
 }
 
@@ -72,9 +196,35 @@ pub fn validate(file: SourceFile, connectors: ConnectorRegistry<'_>) -> Validate
     }
 }
 
+/// Given a textual `.prisma` file, it:
+/// - parses it
+/// - validates it
+pub fn serialize_to_bytes(file: SourceFile, connectors: ConnectorRegistry<'_>) -> Result<Vec<u8>, String> {
+    let mut validated_schema = validate(file, connectors);
+
+    if let Err(err) = validated_schema.diagnostics.to_result() {
+        return Err(err.to_pretty_string("schema.prisma", validated_schema.db.source()));
+    }
+
+    let serde_schema = SerdeValidatedSchema::from(validated_schema);
+
+    postcard::to_allocvec(&serde_schema).map_err(|e| format!("[serialize]: {}", e))
+}
+
+pub fn deserialize_from_bytes(
+    schema_as_binary: &[u8],
+    connectors: &ValidatedConnectorRegistry<'_>,
+) -> Result<ValidatedSchemaForQE, String> {
+    let serde_schema: SerdeValidatedSchema =
+        postcard::from_bytes(schema_as_binary).map_err(|e| format!("[deserialize] {}", e))?;
+
+    Ok(serde_schema.into_schema_for_qe(connectors))
+}
+
 /// Retrieves a Prisma schema without validating it.
 /// You should only use this method when actually validating the schema is too expensive
 /// computationally or in terms of bundle size (e.g., for `query-engine-wasm`).
+/// Note: this should be deprecated by this PR.
 pub fn parse_without_validation(file: SourceFile, connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
     let mut diagnostics = Diagnostics::new();
     let db = ParserDatabase::new(file, &mut diagnostics);

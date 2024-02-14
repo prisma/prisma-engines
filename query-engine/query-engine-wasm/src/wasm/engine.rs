@@ -7,7 +7,7 @@ use crate::{
 };
 use driver_adapters::JsObject;
 use js_sys::Function as JsFunction;
-use psl::ConnectorRegistry;
+use psl::{ValidSchema, ValidatedConnectorRegistry};
 use quaint::connector::ExternalConnector;
 use query_core::{
     protocol::EngineProtocol,
@@ -23,15 +23,6 @@ use tokio::sync::RwLock;
 use tracing::{field, instrument::WithSubscriber, Instrument, Level, Span};
 use tracing_subscriber::filter::LevelFilter;
 use wasm_bindgen::prelude::wasm_bindgen;
-
-const CONNECTOR_REGISTRY: ConnectorRegistry<'_> = &[
-    #[cfg(feature = "postgresql")]
-    psl::builtin_connectors::POSTGRES,
-    #[cfg(feature = "mysql")]
-    psl::builtin_connectors::MYSQL,
-    #[cfg(feature = "sqlite")]
-    psl::builtin_connectors::SQLITE,
-];
 
 /// The main query engine used by JS
 #[wasm_bindgen]
@@ -49,17 +40,26 @@ impl QueryEngine {
         options: ConstructorOptions,
         callback: JsFunction,
         adapter: JsObject,
+        schema_as_binary: &[u8],
     ) -> Result<QueryEngine, wasm_bindgen::JsError> {
         let log_callback = LogCallback(callback);
 
         let ConstructorOptions {
-            datamodel,
-            log_level,
-            log_queries,
+            log_level, log_queries, ..
         } = options;
 
-        // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
-        let schema = psl::parse_without_validation(datamodel.into(), CONNECTOR_REGISTRY);
+        let connector_registry: ValidatedConnectorRegistry<'_> = &[
+            #[cfg(feature = "postgresql")]
+            psl::builtin_connectors::POSTGRES.as_validated_connector(),
+            #[cfg(feature = "mysql")]
+            psl::builtin_connectors::MYSQL.as_validated_connector(),
+            #[cfg(feature = "sqlite")]
+            psl::builtin_connectors::SQLITE.as_validated_connector(),
+        ];
+
+        // We assume the given schema has already been validated by `prisma generate`.
+        let schema = psl::deserialize_from_bytes(schema_as_binary, &connector_registry)
+            .map_err(|err| ApiError::configuration(err.to_string()))?;
 
         let js_queryable = Arc::new(driver_adapters::from_js(adapter));
 
@@ -93,7 +93,7 @@ impl QueryEngine {
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
 
-            let preview_features = builder.schema.configuration.preview_features();
+            let preview_features = builder.schema.preview_features();
             let arced_schema = Arc::clone(&builder.schema);
 
             let engine = async move {

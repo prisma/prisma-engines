@@ -8,27 +8,27 @@ use psl::{
 };
 use query_structure::{dml_default_kind, encode_bytes, DefaultKind, FieldArity, PrismaValue};
 
-pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
+pub(crate) fn schema_to_dmmf(schema: &dyn psl::ValidSchema) -> Datamodel {
     let mut datamodel = Datamodel {
-        models: Vec::with_capacity(schema.db.models_count()),
-        enums: Vec::with_capacity(schema.db.enums_count()),
+        models: Vec::with_capacity(schema.db().models_count()),
+        enums: Vec::with_capacity(schema.db().enums_count()),
         types: Vec::new(),
     };
 
-    for enum_model in schema.db.walk_enums() {
+    for enum_model in schema.db().walk_enums() {
         datamodel.enums.push(enum_to_dmmf(enum_model));
     }
 
     for model in schema
-        .db
+        .db()
         .walk_models()
         .filter(|model| !model.is_ignored())
-        .chain(schema.db.walk_views().filter(|view| !view.is_ignored()))
+        .chain(schema.db().walk_views().filter(|view| !view.is_ignored()))
     {
         datamodel.models.push(model_to_dmmf(model));
     }
 
-    for ct in schema.db.walk_composite_types() {
+    for ct in schema.db().walk_composite_types() {
         datamodel.types.push(composite_type_to_dmmf(ct))
     }
 

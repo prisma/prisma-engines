@@ -4,6 +4,7 @@ mod serialization_ast;
 #[cfg(test)]
 mod tests;
 
+use psl::ValidatedSchemaForQE;
 pub use serialization_ast::DataModelMetaFormat;
 
 use ast_builders::schema_to_dmmf;
@@ -16,8 +17,9 @@ pub fn dmmf_json_from_schema(schema: &str) -> String {
 }
 
 pub fn dmmf_from_schema(schema: &str) -> DataModelMetaFormat {
-    let schema = Arc::new(psl::parse_schema(schema).unwrap());
-    from_precomputed_parts(&schema::build(schema, true))
+    let schema = psl::parse_schema(schema).unwrap();
+    let schema_for_qe = ValidatedSchemaForQE::from(schema);
+    from_precomputed_parts(&schema::build(Arc::new(schema_for_qe), true))
 }
 
 pub fn from_precomputed_parts(query_schema: &QuerySchema) -> DataModelMetaFormat {

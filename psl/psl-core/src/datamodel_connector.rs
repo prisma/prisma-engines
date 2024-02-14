@@ -37,8 +37,7 @@ use std::{borrow::Cow, collections::HashMap, str::FromStr};
 
 pub const EXTENSIONS_KEY: &str = "extensions";
 
-/// The datamodel connector API.
-pub trait Connector: Send + Sync {
+pub trait ValidatedConnector: Send + Sync {
     /// The name of the provider, for string comparisons determining which connector we are on.
     fn provider_name(&self) -> &'static str;
 
@@ -47,14 +46,14 @@ pub trait Connector: Send + Sync {
         name == self.provider_name()
     }
 
+    /// The name of the connector. Can be used in error messages.
+    fn name(&self) -> &str;
+
     /// The database flavour, divergences in database backends capabilities might consider
     /// us to use a different flavour, like in the case of CockroachDB. However other databases
     /// are less divergent as to consider sharing a flavour with others, like Planetscale and MySQL
     /// or Neon and Postgres, which respectively have the Mysql and Postgres flavours.
     fn flavour(&self) -> Flavour;
-
-    /// The name of the connector. Can be used in error messages.
-    fn name(&self) -> &str;
 
     /// The static list of capabilities for the connector.
     fn capabilities(&self) -> ConnectorCapabilities;
@@ -62,25 +61,6 @@ pub trait Connector: Send + Sync {
     /// Does the connector have this capability?
     fn has_capability(&self, capability: ConnectorCapability) -> bool {
         self.capabilities().contains(capability)
-    }
-
-    /// The maximum length of constraint names in bytes. Connectors without a
-    /// limit should return usize::MAX.
-    fn max_identifier_length(&self) -> usize;
-
-    // Relation mode
-
-    /// The relation modes that can be set through the relationMode datasource
-    /// argument.
-    fn allowed_relation_mode_settings(&self) -> BitFlags<RelationMode> {
-        use RelationMode::*;
-
-        ForeignKeys | Prisma
-    }
-
-    /// The default relation mode to assume for this connector.
-    fn default_relation_mode(&self) -> RelationMode {
-        RelationMode::ForeignKeys
     }
 
     /// The referential actions supported by the connector.
@@ -96,37 +76,16 @@ pub trait Connector: Send + Sync {
         RelationMode::allowed_emulated_referential_actions_default()
     }
 
-    /// Most SQL databases reject table definitions with a SET NULL referential action referencing a non-nullable field,
-    /// but that's not true for all of them.
-    /// This was introduced because Postgres accepts data definition language statements with the SET NULL
-    /// referential action referencing non-nullable fields, although this would lead to a runtime error once
-    /// the action is actually triggered.
-    fn allows_set_null_referential_action_on_non_nullable_fields(&self, _relation_mode: RelationMode) -> bool {
-        false
-    }
-
-    fn supports_composite_types(&self) -> bool {
-        self.has_capability(ConnectorCapability::CompositeTypes)
-    }
-
-    fn supports_named_primary_keys(&self) -> bool {
-        self.has_capability(ConnectorCapability::NamedPrimaryKeys)
-    }
-
-    fn supports_named_foreign_keys(&self) -> bool {
-        self.has_capability(ConnectorCapability::NamedForeignKeys)
-    }
-
-    fn supports_named_default_values(&self) -> bool {
-        self.has_capability(ConnectorCapability::NamedDefaultValues)
-    }
-
     fn supports_referential_action(&self, relation_mode: &RelationMode, action: ReferentialAction) -> bool {
         match relation_mode {
             RelationMode::ForeignKeys => self.referential_actions().contains(action),
             RelationMode::Prisma => self.emulated_referential_actions().contains(action),
         }
     }
+
+    /// On each connector, each built-in Prisma scalar type (`Boolean`,
+    /// `String`, `Float`, etc.) has a corresponding native type.
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance>;
 
     /// This is used by the query engine schema builder.
     ///
@@ -152,6 +111,86 @@ pub trait Connector: Send + Sync {
             "String" => BitFlags::all(), // all the filters are available by default
             _ => panic!("Unexpected scalar input object name for string filters: `{input_object_name}`"),
         }
+    }
+
+    /// Debug/error representation of a native type.
+    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>);
+
+    /// This function is used during Schema parsing to calculate the concrete native type.
+    /// It is also used by the Query Engine to parse the native type of a field.
+    fn parse_native_type(
+        &self,
+        name: &str,
+        args: &[String],
+        span: Span,
+        diagnostics: &mut Diagnostics,
+    ) -> Option<NativeTypeInstance>;
+
+    fn parse_json_datetime(
+        &self,
+        _str: &str,
+        _nt: Option<NativeTypeInstance>,
+    ) -> chrono::ParseResult<DateTime<FixedOffset>> {
+        unreachable!("This method is only implemented on connectors with lateral join support.")
+    }
+
+    fn parse_json_bytes(
+        &self,
+        _str: &str,
+        _nt: Option<NativeTypeInstance>,
+    ) -> prisma_value::PrismaValueResult<Vec<u8>> {
+        unreachable!("This method is only implemented on connectors with lateral join support.")
+    }
+}
+
+/// The datamodel connector API.
+pub trait Connector: Send + Sync + ValidatedConnector {
+    // TODO: remove this method once the "trait_upcasting" feature is stable.
+    // See: https://github.com/rust-lang/rust/issues/65991
+    fn as_validated_connector(&self) -> &dyn ValidatedConnector;
+
+    /// The maximum length of constraint names in bytes. Connectors without a
+    /// limit should return usize::MAX.
+    fn max_identifier_length(&self) -> usize;
+
+    // Relation mode
+
+    /// The relation modes that can be set through the relationMode datasource
+    /// argument.
+    fn allowed_relation_mode_settings(&self) -> BitFlags<RelationMode> {
+        use RelationMode::*;
+
+        ForeignKeys | Prisma
+    }
+
+    /// The default relation mode to assume for this connector.
+    fn default_relation_mode(&self) -> RelationMode {
+        RelationMode::ForeignKeys
+    }
+
+    /// Most SQL databases reject table definitions with a SET NULL referential action referencing a non-nullable field,
+    /// but that's not true for all of them.
+    /// This was introduced because Postgres accepts data definition language statements with the SET NULL
+    /// referential action referencing non-nullable fields, although this would lead to a runtime error once
+    /// the action is actually triggered.
+    fn allows_set_null_referential_action_on_non_nullable_fields(&self, _relation_mode: RelationMode) -> bool {
+        false
+    }
+
+    fn supports_composite_types(&self) -> bool {
+        self.has_capability(ConnectorCapability::CompositeTypes)
+    }
+
+    fn supports_named_primary_keys(&self) -> bool {
+        self.has_capability(ConnectorCapability::NamedPrimaryKeys)
+    }
+
+    fn supports_named_foreign_keys(&self) -> bool {
+        self.has_capability(ConnectorCapability::NamedForeignKeys)
+    }
+
+    fn supports_named_default_values(&self) -> bool {
+        self.has_capability(ConnectorCapability::NamedDefaultValues)
     }
 
     /// Validate that the arguments passed to a native type attribute are valid.
@@ -193,10 +232,6 @@ pub trait Connector: Send + Sync {
     /// Returns the default scalar type for the given native type
     fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType;
 
-    /// On each connector, each built-in Prisma scalar type (`Boolean`,
-    /// `String`, `Float`, etc.) has a corresponding native type.
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance>;
-
     /// Same mapping as `default_native_type_for_scalar_type()`, but in the opposite direction.
     fn native_type_is_default_for_scalar_type(
         &self,
@@ -204,23 +239,11 @@ pub trait Connector: Send + Sync {
         scalar_type: &ScalarType,
     ) -> bool;
 
-    /// Debug/error representation of a native type.
-    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>);
-
     fn find_native_type_constructor(&self, name: &str) -> Option<&NativeTypeConstructor> {
         self.available_native_type_constructors()
             .iter()
             .find(|constructor| constructor.name == name)
     }
-
-    /// This function is used during Schema parsing to calculate the concrete native type.
-    fn parse_native_type(
-        &self,
-        name: &str,
-        args: &[String],
-        span: Span,
-        diagnostics: &mut Diagnostics,
-    ) -> Option<NativeTypeInstance>;
 
     fn supports_scalar_lists(&self) -> bool {
         self.has_capability(ConnectorCapability::ScalarLists)
@@ -312,22 +335,6 @@ pub trait Connector: Send + Sync {
         _diagnostics: &mut Diagnostics,
     ) -> DatasourceConnectorData {
         Default::default()
-    }
-
-    fn parse_json_datetime(
-        &self,
-        _str: &str,
-        _nt: Option<NativeTypeInstance>,
-    ) -> chrono::ParseResult<DateTime<FixedOffset>> {
-        unreachable!("This method is only implemented on connectors with lateral join support.")
-    }
-
-    fn parse_json_bytes(
-        &self,
-        _str: &str,
-        _nt: Option<NativeTypeInstance>,
-    ) -> prisma_value::PrismaValueResult<Vec<u8>> {
-        unreachable!("This method is only implemented on connectors with lateral join support.")
     }
 }
 

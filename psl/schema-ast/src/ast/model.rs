@@ -2,7 +2,7 @@ use super::{Attribute, Comment, Field, Identifier, Span, WithAttributes, WithDoc
 
 /// An opaque identifier for a field in an AST model. Use the
 /// `model[field_id]` syntax to resolve the id to an `ast::Field`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, serde::Serialize, serde::Deserialize)]
 pub struct FieldId(pub(super) u32);
 
 impl FieldId {
@@ -21,7 +21,7 @@ impl std::ops::Index<FieldId> for Model {
 }
 
 /// A model declaration.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Model {
     /// The name of the model.
     ///

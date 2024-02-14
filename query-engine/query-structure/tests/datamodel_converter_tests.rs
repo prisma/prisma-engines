@@ -6,7 +6,7 @@ use std::sync::Arc;
 #[test]
 fn an_empty_datamodel_must_work() {
     let datamodel = convert("");
-    assert_eq!(datamodel.schema.db.enums_count(), 0);
+    assert_eq!(datamodel.schema.db().enums_count(), 0);
     assert_eq!(datamodel.models().count(), 0);
     assert_eq!(datamodel.relations().count(), 0);
 }

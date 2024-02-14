@@ -11,7 +11,7 @@ use reserved_model_names::{validate_enum_name, validate_model_name};
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 
 /// Resolved names for use in the validation process.
-#[derive(Default)]
+#[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 pub(super) struct Names {
     /// Models, enums, composite types and type aliases
     pub(super) tops: HashMap<StringId, TopId>,

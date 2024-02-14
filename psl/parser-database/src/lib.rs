@@ -68,19 +68,25 @@ use names::Names;
 ///   fields.
 /// - Global validations are then performed on the mostly validated schema.
 ///   Currently only index name collisions.
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct ParserDatabase {
     ast: ast::SchemaAst,
-    file: schema_ast::SourceFile,
     interner: interner::StringInterner,
     names: Names,
     types: Types,
     relations: Relations,
+
+    // Note: not used by any `query-engine`
+    #[serde(skip)]
+    file: Option<schema_ast::SourceFile>,
 }
 
 impl ParserDatabase {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
     pub fn new(file: schema_ast::SourceFile, diagnostics: &mut Diagnostics) -> Self {
         let ast = schema_ast::parse_schema(file.as_str(), diagnostics);
+
+        let file = Some(file);
 
         let mut interner = Default::default();
         let mut names = Default::default();
@@ -157,7 +163,7 @@ impl ParserDatabase {
 
     /// The source file contents.
     pub fn source(&self) -> &str {
-        self.file.as_str()
+        self.file.as_ref().unwrap().as_str()
     }
 }
 

@@ -6,7 +6,7 @@ pub use native_types::{MsSqlType, MsSqlTypeParameter};
 use crate::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
-        NativeTypeInstance, RelationMode,
+        NativeTypeInstance, RelationMode, ValidatedConnector,
     },
     diagnostics::{Diagnostics, Span},
     parser_database::{self, ast, ParserDatabase, ReferentialAction, ScalarType},
@@ -57,6 +57,56 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
 
 pub(crate) struct MsSqlDatamodelConnector;
 
+impl ValidatedConnector for MsSqlDatamodelConnector {
+    fn provider_name(&self) -> &'static str {
+        "sqlserver"
+    }
+
+    fn name(&self) -> &str {
+        "SQL Server"
+    }
+
+    fn flavour(&self) -> Flavour {
+        Flavour::Sqlserver
+    }
+
+    fn capabilities(&self) -> ConnectorCapabilities {
+        CAPABILITIES
+    }
+
+    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+        use ReferentialAction::*;
+
+        NoAction | Cascade | SetNull | SetDefault
+    }
+
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
+        let nt = SCALAR_TYPE_DEFAULTS
+            .iter()
+            .find(|(st, _)| st == scalar_type)
+            .map(|(_, native_type)| native_type)
+            .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
+            .unwrap();
+
+        Some(NativeTypeInstance::new::<MsSqlType>(*nt))
+    }
+
+    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+        native_type.downcast_ref::<MsSqlType>().to_parts()
+    }
+
+    fn parse_native_type(
+        &self,
+        name: &str,
+        args: &[String],
+        span: Span,
+        diagnostics: &mut Diagnostics,
+    ) -> Option<NativeTypeInstance> {
+        let native_type = MsSqlType::from_parts(name, args, span, diagnostics)?;
+        Some(NativeTypeInstance::new::<MsSqlType>(native_type))
+    }
+}
+
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MsSqlType)] = &[
     (ScalarType::Int, MsSqlType::Int),
     (ScalarType::BigInt, MsSqlType::BigInt),
@@ -76,26 +126,12 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MsSqlType)] = &[
 ];
 
 impl Connector for MsSqlDatamodelConnector {
-    fn provider_name(&self) -> &'static str {
-        "sqlserver"
-    }
-
-    fn name(&self) -> &str {
-        "SQL Server"
-    }
-
-    fn capabilities(&self) -> ConnectorCapabilities {
-        CAPABILITIES
+    fn as_validated_connector(&self) -> &dyn ValidatedConnector {
+        self
     }
 
     fn max_identifier_length(&self) -> usize {
         128
-    }
-
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
-        use ReferentialAction::*;
-
-        NoAction | Cascade | SetNull | SetDefault
     }
 
     fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
@@ -139,17 +175,6 @@ impl Connector for MsSqlDatamodelConnector {
             Image => ScalarType::Bytes,
             Bit => ScalarType::Bytes,
         }
-    }
-
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
-        let nt = SCALAR_TYPE_DEFAULTS
-            .iter()
-            .find(|(st, _)| st == scalar_type)
-            .map(|(_, native_type)| native_type)
-            .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
-            .unwrap();
-
-        Some(NativeTypeInstance::new::<MsSqlType>(*nt))
     }
 
     fn native_type_is_default_for_scalar_type(
@@ -230,21 +255,6 @@ impl Connector for MsSqlDatamodelConnector {
         native_types::CONSTRUCTORS
     }
 
-    fn parse_native_type(
-        &self,
-        name: &str,
-        args: &[String],
-        span: Span,
-        diagnostics: &mut Diagnostics,
-    ) -> Option<NativeTypeInstance> {
-        let native_type = MsSqlType::from_parts(name, args, span, diagnostics)?;
-        Some(NativeTypeInstance::new::<MsSqlType>(native_type))
-    }
-
-    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
-        native_type.downcast_ref::<MsSqlType>().to_parts()
-    }
-
     fn validate_url(&self, url: &str) -> Result<(), String> {
         if !url.starts_with("sqlserver") {
             return Err("must start with the protocol `sqlserver://`.".to_string());
@@ -281,10 +291,6 @@ impl Connector for MsSqlDatamodelConnector {
         if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
             completions::schemas_completion(completion_list);
         }
-    }
-
-    fn flavour(&self) -> Flavour {
-        Flavour::Sqlserver
     }
 }
 

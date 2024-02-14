@@ -634,13 +634,13 @@ fn empty_json_array() -> serde_json::Value {
 }
 
 fn connector_flavour(args: &QueryArguments) -> Flavour {
-    args.model().dm.schema.connector.flavour()
+    args.model().dm.schema.connector().flavour()
 }
 
 fn supports_lateral_join(args: &QueryArguments) -> bool {
     args.model()
         .dm
         .schema
-        .connector
+        .connector()
         .has_capability(ConnectorCapability::LateralJoin)
 }

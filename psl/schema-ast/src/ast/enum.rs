@@ -25,7 +25,7 @@ impl std::ops::Index<EnumValueId> for Enum {
 /// PostgreSQL stores enums in a schema, while in MySQL the information is in
 /// the table definition. On MongoDB the enumerations are handled in the Query
 /// Engine.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Enum {
     /// The name of the enum.
     ///
@@ -108,7 +108,7 @@ impl WithDocumentation for Enum {
 }
 
 /// An enum value definition.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct EnumValue {
     /// The name of the enum value as it will be exposed by the api.
     pub name: Identifier,
