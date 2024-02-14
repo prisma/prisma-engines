@@ -18,7 +18,7 @@ driver-adapters = [
 
 [dependencies]
 anyhow = "1"
-async-trait = "0.1"
+async-trait.workspace = true
 query-core = { path = "../core", features = ["metrics"] }
 request-handlers = { path = "../request-handlers" }
 query-connector = { path = "../connectors/query-connector" }
@@ -37,11 +37,11 @@ napi-derive.workspace = true
 
 thiserror = "1"
 connection-string.workspace = true
-url = "2"
+url.workspace = true
 serde_json.workspace = true
 serde.workspace = true
 
-tracing = "0.1"
+tracing.workspace = true
 tracing-subscriber = { version = "0.3" }
 tracing-futures = "0.2"
 tracing-opentelemetry = "0.17.3"

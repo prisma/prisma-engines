@@ -18,7 +18,7 @@ mysql = ["driver-adapters/mysql", "sql-connector/mysql"]
 query-connector = { path = "../connectors/query-connector" }
 query-engine-common = { path = "../../libs/query-engine-common" }
 anyhow = "1"
-async-trait = "0.1"
+async-trait.workspace = true
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 psl.workspace = true
 query-structure = { path = "../query-structure" }
@@ -41,12 +41,12 @@ wasm-bindgen-futures.workspace = true
 wasm-rs-dbg.workspace = true
 
 thiserror = "1"
-url = "2"
+url.workspace = true
 serde.workspace = true
 tokio = { version = "1.25", features = ["macros", "sync", "io-util", "time"] }
 futures = "0.3"
 
-tracing = "0.1"
+tracing.workspace = true
 tracing-subscriber = { version = "0.3" }
 tracing-futures = "0.2"
 tracing-opentelemetry = "0.17.3"

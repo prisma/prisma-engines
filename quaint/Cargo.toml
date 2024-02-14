@@ -67,29 +67,29 @@ fmt-sql = ["sqlformat"]
 [dependencies]
 connection-string = "0.2"
 percent-encoding = "2"
-tracing = "0.1"
+tracing.workspace = true
 tracing-core = "0.1"
-async-trait = "0.1"
+async-trait.workspace = true
 thiserror = "1.0"
 num_cpus = "1.12"
 metrics = "0.18"
 futures = "0.3"
-url = "2.1"
+url.workspace = true
 hex = "0.4"
 itertools.workspace = true
 
 either = { version = "1.6" }
 base64 = { version = "0.12.3" }
-chrono = { version = "0.4", default-features = false, features = ["serde"] }
+chrono.workspace = true
 lru-cache = { version = "0.1", optional = true }
-serde_json = { version = "1.0.48", features = ["float_roundtrip"] }
+serde_json.workspace = true
 native-tls = { version = "0.2", optional = true }
 bit-vec = { version = "0.6.1", optional = true }
 bytes = { version = "1.0", optional = true }
 mobc = { version = "0.8", optional = true }
 serde = { version = "1.0", optional = true }
 sqlformat = { version = "0.2.3", optional = true }
-uuid = { version = "1", features = ["v4"] }
+uuid.workspace = true
 crosstarget-utils = { path = "../libs/crosstarget-utils" }
 
 [dev-dependencies]
