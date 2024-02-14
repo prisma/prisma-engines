@@ -4,10 +4,7 @@ use query_engine_tests::*;
 // On PlanetScale (wasm), this fails with:
 // "TypeError: The encoded data was not valid for encoding utf-8"
 // at "TextDecoder.decode"
-#[test_suite(
-    schema(schemas::common_nullable_types),
-    exclude(Sqlite("libsql.js.wasm"), Vitess("planetscale.js.wasm"))
-)]
+#[test_suite(schema(schemas::common_nullable_types), exclude(Vitess("planetscale.js.wasm")))]
 mod bytes_filter_spec {
     use query_engine_tests::run_query;
 
