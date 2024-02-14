@@ -193,7 +193,6 @@ impl Queryable for Mysql {
     }
 
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
-        println!("mysql.query_raw: sql: {}, params: {:?}", sql, params);
         metrics::query("mysql.query_raw", sql, params, move || async move {
             self.prepared(sql, |stmt| async move {
                 let mut conn = self.conn.lock().await;
