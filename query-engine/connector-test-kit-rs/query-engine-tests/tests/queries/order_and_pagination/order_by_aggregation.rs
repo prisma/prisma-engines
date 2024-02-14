@@ -839,13 +839,13 @@ mod order_by_aggr {
     fn nested_one2m_schema() -> String {
         let schema = indoc! {
             r#"model A {
-              #id(id, Int, @id, @default(autoincrement()))
+              #id(id, Int, @id)
             
               bs B[]
             }
             
             model B {
-              #id(id, Int, @id, @default(autoincrement()))
+              #id(id, Int, @id)
             
               A   A?   @relation(fields: [aId], references: [id])
               aId Int?
@@ -855,7 +855,7 @@ mod order_by_aggr {
             }
             
             model C {
-              #id(id, Int, @id, @default(autoincrement()))
+              #id(id, Int, @id)
               B    B[]
             
               dId Int?
@@ -863,14 +863,14 @@ mod order_by_aggr {
             }
             
             model D {
-              #id(id, Int, @id, @default(autoincrement()))
+              #id(id, Int, @id)
               C    C[]
             
               es E[]
             }
             
             model E {
-              #id(id, Int, @id, @default(autoincrement()))
+              #id(id, Int, @id)
             
               dId Int?
               D   D?   @relation(fields: [dId], references: [id])
@@ -889,32 +889,37 @@ mod order_by_aggr {
         run_query!(
             &runner,
             r#"mutation {
-          createOneA(
-            data: {
-              bs: {
-                create: [
-                  {
-                    c: {
-                      create: {
-                        d: { create: { es: { create: [{}] } } }
+            createOneA(
+              data: {
+                id: 1,
+                bs: {
+                  create: [
+                    {
+                      id: 1,
+                      c: {
+                        create: {
+                          id: 1,
+                          d: { create: { id: 1, es: { create: [{ id: 1 }] } } }
+                        }
                       }
                     }
-                  }
-                  {
-                    c: {
-                      create: {
-                        d: { create: { es: { create: [{}, {}] } } }
+                    {
+                      id: 2,
+                      c: {
+                        create: {
+                          id: 2,
+                          d: { create: { id: 2, es: { create: [{ id: 2 }, { id: 3 }] } } }
+                        }
                       }
                     }
-                  }
-                ]
+                  ]
+                }
               }
+            ) {
+              id
             }
-          ) {
-            id
           }
-        }
-        "#
+          "#
         );
 
         insta::assert_snapshot!(
@@ -933,7 +938,7 @@ mod order_by_aggr {
               }
             }
           }"#),
-          @r###"{"data":{"findManyA":[{"id":1,"bs":[{"id":2,"c":{"d":{"es":[{"id":3}]}}},{"id":1,"c":{"d":{"es":[{"id":1},{"id":2}]}}}]}]}}"###
+          @r###"{"data":{"findManyA":[{"id":1,"bs":[{"id":1,"c":{"d":{"es":[{"id":1}]}}},{"id":2,"c":{"d":{"es":[{"id":2},{"id":3}]}}}]}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -952,7 +957,7 @@ mod order_by_aggr {
               }
             }
           }"#),
-          @r###"{"data":{"findManyA":[{"id":1,"bs":[{"id":1,"c":{"d":{"es":[{"id":1},{"id":2}]}}},{"id":2,"c":{"d":{"es":[{"id":3}]}}}]}]}}"###
+          @r###"{"data":{"findManyA":[{"id":1,"bs":[{"id":2,"c":{"d":{"es":[{"id":2},{"id":3}]}}},{"id":1,"c":{"d":{"es":[{"id":1}]}}}]}]}}"###
         );
 
         insta::assert_snapshot!(
@@ -995,13 +1000,13 @@ mod order_by_aggr {
     fn nested_m2m_schema() -> String {
         let schema = indoc! {
             r#"model A {
-            #id(id, Int, @id, @default(autoincrement()))
+            #id(id, Int, @id)
           
             #m2m(bs, B[], id, Int)
           }
           
           model B {
-            #id(id, Int, @id, @default(autoincrement()))
+            #id(id, Int, @id)
           
             #m2m(as, A[], id, Int)
             
@@ -1010,7 +1015,7 @@ mod order_by_aggr {
           }
           
           model C {
-            #id(id, Int, @id, @default(autoincrement()))
+            #id(id, Int, @id)
             B    B[]
           
             dId Int?
@@ -1018,7 +1023,7 @@ mod order_by_aggr {
           }
           
           model D {
-            #id(id, Int, @id, @default(autoincrement()))
+            #id(id, Int, @id)
             C    C[]
           
             es E[]
@@ -1026,14 +1031,14 @@ mod order_by_aggr {
           }
           
           model E {
-            #id(id, Int, @id, @default(autoincrement()))
+            #id(id, Int, @id)
           
             dId Int?
             D   D?   @relation(fields: [dId], references: [id])
           }
 
           model F {
-            #id(id, Int, @id, @default(autoincrement()))
+            #id(id, Int, @id)
 
             #m2m(ds, D[], id, Int)
           }
@@ -1054,25 +1059,36 @@ mod order_by_aggr {
             r#"mutation {
         createOneA(
           data: {
+            id: 1,
             bs: {
               create: [
                 {
+                  id: 1,
                   c: {
                     create: {
-                      d: { create: {
-                        es: { create: [{}] },
-                        fs: { create: [{}] }
-                      }}
+                      id: 1,
+                      d: {
+                        create: {
+                          id: 1,
+                          es: { create: [{ id: 1 }] },
+                          fs: { create: [{ id: 1 }] }
+                        }
+                      }
                     }
                   }
                 }
                 {
+                  id: 2,
                   c: {
                     create: {
-                      d: { create: {
-                        es: { create: [{}, {}] }
-                        fs: { create: [{}, {}] }
-                      }}
+                      id: 2,
+                      d: {
+                        create: {
+                          id: 2,
+                          es: { create: [{ id: 2 }, { id: 3 }] }
+                          fs: { create: [{ id: 2 }, { id: 3 }] }
+                        }
+                      }
                     }
                   }
                 }
@@ -1103,7 +1119,7 @@ mod order_by_aggr {
             }
           }
         }"#),
-          @r###"{"data":{"findManyA":[{"id":1,"bs":[{"id":2,"c":{"d":{"es":[{"id":3}]}}},{"id":1,"c":{"d":{"es":[{"id":1},{"id":2}]}}}]}]}}"###
+          @r###"{"data":{"findManyA":[{"id":1,"bs":[{"id":1,"c":{"d":{"es":[{"id":1}]}}},{"id":2,"c":{"d":{"es":[{"id":2},{"id":3}]}}}]}]}}"###
         );
 
         // count desc on 1-m
@@ -1123,7 +1139,7 @@ mod order_by_aggr {
             }
           }
         }"#),
-          @r###"{"data":{"findManyA":[{"id":1,"bs":[{"id":1,"c":{"d":{"es":[{"id":1},{"id":2}]}}},{"id":2,"c":{"d":{"es":[{"id":3}]}}}]}]}}"###
+          @r###"{"data":{"findManyA":[{"id":1,"bs":[{"id":2,"c":{"d":{"es":[{"id":2},{"id":3}]}}},{"id":1,"c":{"d":{"es":[{"id":1}]}}}]}]}}"###
         );
 
         // count asc on m-n
@@ -1143,7 +1159,7 @@ mod order_by_aggr {
             }
           }
         }"#),
-          @r###"{"data":{"findManyA":[{"id":1,"bs":[{"id":2,"c":{"d":{"fs":[{"id":3}]}}},{"id":1,"c":{"d":{"fs":[{"id":1},{"id":2}]}}}]}]}}"###
+          @r###"{"data":{"findManyA":[{"id":1,"bs":[{"id":1,"c":{"d":{"fs":[{"id":1}]}}},{"id":2,"c":{"d":{"fs":[{"id":2},{"id":3}]}}}]}]}}"###
         );
 
         // count desc on m-n
@@ -1163,7 +1179,7 @@ mod order_by_aggr {
             }
           }
         }"#),
-          @r###"{"data":{"findManyA":[{"id":1,"bs":[{"id":1,"c":{"d":{"fs":[{"id":1},{"id":2}]}}},{"id":2,"c":{"d":{"fs":[{"id":3}]}}}]}]}}"###
+          @r###"{"data":{"findManyA":[{"id":1,"bs":[{"id":2,"c":{"d":{"fs":[{"id":2},{"id":3}]}}},{"id":1,"c":{"d":{"fs":[{"id":1}]}}}]}]}}"###
         );
 
         insta::assert_snapshot!(
