@@ -4,8 +4,9 @@ use crate::{FieldSelection, OrderBy};
 ///
 /// If order by is present, distinct fields must match leftmost order by fields in the query. The
 /// order of the distinct fields does not necessarily have to be the same as the order of the
-/// corresponding fields in the leftmost subset of `order_by` but all distinct fields must come
-/// before non-distinct fields in the order by clause.
+/// corresponding fields in the leftmost subset of `order_by` but the distinct fields must come
+/// before non-distinct fields in the order by clause. Order by clause may contain only a subset of
+/// the distinct fields if no other fields are being used for ordering.
 ///
 /// If there's no order by, then DISTINCT ON is allowed for any fields.
 pub fn native_distinct_compatible_with_order_by(
@@ -23,12 +24,14 @@ pub fn native_distinct_compatible_with_order_by(
     let count_leftmost_matching = order_by_fields
         .iter()
         .take_while(|order_by| match order_by {
-            OrderBy::Scalar(scalar) => distinct_fields.scalars().any(|sf| *sf == scalar.field),
+            OrderBy::Scalar(scalar) if scalar.path.is_empty() => {
+                distinct_fields.scalars().any(|sf| *sf == scalar.field)
+            }
             _ => false,
         })
         .count();
 
-    count_leftmost_matching == distinct_fields.as_ref().len()
+    count_leftmost_matching == usize::min(distinct_fields.as_ref().len(), order_by_fields.len())
 }
 
 #[cfg(test)]
@@ -174,11 +177,31 @@ mod tests {
         }
 
         #[test]
-        fn incompatible_few_fields() {
+        fn partial_order_first() {
             let fields = TestFields::new();
 
             let distinct = FieldSelection::from([fields.a.clone(), fields.b.clone()]);
             let order_by = [OrderBy::from(fields.a)];
+
+            assert!(native_distinct_compatible_with_order_by(Some(&distinct), &order_by));
+        }
+
+        #[test]
+        fn partial_order_second() {
+            let fields = TestFields::new();
+
+            let distinct = FieldSelection::from([fields.a.clone(), fields.b.clone()]);
+            let order_by = [OrderBy::from(fields.b)];
+
+            assert!(native_distinct_compatible_with_order_by(Some(&distinct), &order_by));
+        }
+
+        #[test]
+        fn incompatible_partial_order() {
+            let fields = TestFields::new();
+
+            let distinct = FieldSelection::from([fields.a.clone(), fields.b.clone()]);
+            let order_by = [OrderBy::from(fields.c)];
 
             assert!(!native_distinct_compatible_with_order_by(Some(&distinct), &order_by));
         }
