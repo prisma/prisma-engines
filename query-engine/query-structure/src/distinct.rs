@@ -30,3 +30,157 @@ pub fn native_distinct_compatible_with_order_by(
 
     count_leftmost_matching == distinct_fields.as_ref().len()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use std::sync::Arc;
+
+    use crate::{native_distinct_compatible_with_order_by, ScalarFieldRef};
+
+    struct TestFields {
+        a: ScalarFieldRef,
+        b: ScalarFieldRef,
+        c: ScalarFieldRef,
+    }
+
+    impl TestFields {
+        fn new() -> Self {
+            let schema_str = r#"
+                datasource db {
+                    provider = "postgresql"
+                    url = "postgres://stub"
+                }
+
+                model Test {
+                    id Int @id
+                    a  Int
+                    b  Int
+                    c  Int
+                }
+            "#;
+
+            let psl_schema = psl::validate(schema_str.into());
+            let internal_datamodel = crate::InternalDataModel {
+                schema: Arc::new(psl_schema),
+            };
+
+            let model = internal_datamodel.find_model("Test").unwrap();
+            let fields = model.fields();
+
+            TestFields {
+                a: fields.find_from_scalar("a").unwrap(),
+                b: fields.find_from_scalar("b").unwrap(),
+                c: fields.find_from_scalar("c").unwrap(),
+            }
+        }
+    }
+
+    mod native_distinct_compatible_with_order_by {
+        use super::*;
+
+        #[test]
+        fn empty_order_by() {
+            let fields = TestFields::new();
+
+            let distinct = FieldSelection::from([fields.a]);
+            let order_by = [];
+
+            assert!(native_distinct_compatible_with_order_by(Some(&distinct), &order_by));
+        }
+
+        #[test]
+        fn empty_distinct() {
+            let fields = TestFields::new();
+
+            let distinct = FieldSelection::from([]);
+            let order_by = [OrderBy::from(fields.a)];
+
+            assert!(native_distinct_compatible_with_order_by(Some(&distinct), &order_by));
+            assert!(native_distinct_compatible_with_order_by(None, &order_by));
+        }
+
+        #[test]
+        fn exact_match() {
+            let fields = TestFields::new();
+
+            let distinct = FieldSelection::from([fields.a.clone()]);
+            let order_by = [OrderBy::from(fields.a)];
+
+            assert!(native_distinct_compatible_with_order_by(Some(&distinct), &order_by));
+        }
+
+        #[test]
+        fn exact_match_mixed_order() {
+            let fields = TestFields::new();
+
+            let distinct = FieldSelection::from([fields.a.clone(), fields.b.clone()]);
+            let order_by = [OrderBy::from(fields.b), OrderBy::from(fields.a)];
+
+            assert!(native_distinct_compatible_with_order_by(Some(&distinct), &order_by));
+        }
+
+        #[test]
+        fn left_subset() {
+            let fields = TestFields::new();
+
+            let distinct = FieldSelection::from([fields.a.clone()]);
+            let order_by = [OrderBy::from(fields.a), OrderBy::from(fields.b)];
+
+            assert!(native_distinct_compatible_with_order_by(Some(&distinct), &order_by));
+        }
+
+        #[test]
+        fn left_subset_mixed_order() {
+            let fields = TestFields::new();
+
+            let distinct = FieldSelection::from([fields.a.clone(), fields.b.clone()]);
+            let order_by = [
+                OrderBy::from(fields.b),
+                OrderBy::from(fields.a),
+                OrderBy::from(fields.c),
+            ];
+
+            assert!(native_distinct_compatible_with_order_by(Some(&distinct), &order_by));
+        }
+
+        #[test]
+        fn incompatible_left_field() {
+            let fields = TestFields::new();
+
+            let distinct = FieldSelection::from([fields.a.clone(), fields.b.clone()]);
+            let order_by = [
+                OrderBy::from(fields.c),
+                OrderBy::from(fields.a),
+                OrderBy::from(fields.b),
+            ];
+
+            assert!(!native_distinct_compatible_with_order_by(Some(&distinct), &order_by));
+        }
+
+        #[test]
+        fn incompatible_field_in_between() {
+            let fields = TestFields::new();
+
+            let distinct = FieldSelection::from([fields.a.clone(), fields.b.clone()]);
+            let order_by = [
+                OrderBy::from(fields.a),
+                OrderBy::from(fields.c),
+                OrderBy::from(fields.b),
+            ];
+
+            assert!(!native_distinct_compatible_with_order_by(Some(&distinct), &order_by));
+        }
+
+        #[test]
+        fn incompatible_few_fields() {
+            let fields = TestFields::new();
+
+            let distinct = FieldSelection::from([fields.a.clone(), fields.b.clone()]);
+            let order_by = [OrderBy::from(fields.a)];
+
+            assert!(!native_distinct_compatible_with_order_by(Some(&distinct), &order_by));
+        }
+    }
+}

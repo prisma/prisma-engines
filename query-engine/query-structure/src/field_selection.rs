@@ -531,8 +531,8 @@ impl CompositeSelection {
     }
 }
 
-impl From<Vec<ScalarFieldRef>> for FieldSelection {
-    fn from(fields: Vec<ScalarFieldRef>) -> Self {
+impl<T: IntoIterator<Item = ScalarFieldRef>> From<T> for FieldSelection {
+    fn from(fields: T) -> Self {
         Self {
             selections: fields.into_iter().map(Into::into).collect(),
         }
