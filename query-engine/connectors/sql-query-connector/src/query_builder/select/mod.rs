@@ -490,10 +490,6 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
         let Some(ref distinct) = args.distinct else { return self };
 
         let distinct_fields = distinct
-            // TODO: do we want to use the existing `as_scalar_fields` here? It has slightly
-            // different semantics (enforces all fields must be scalars) and requires an
-            // allocation. The new `scalars` method is cheaper and has semantics equivalent to
-            // `ModelProjection::from` which the old query builder uses for distinct fields.
             .scalars()
             .map(|sf| Expression::from(Column::from((table_alias.to_table_string(), sf.db_name().to_owned()))))
             .collect();
