@@ -263,15 +263,13 @@ pub(crate) fn get_relation_load_strategy(
         return RelationLoadStrategy::Query;
     }
 
-    let can_distinct_in_db = query_schema.has_capability(ConnectorCapability::DistinctOn)
+    let can_distinct_in_db_with_joins = query_schema.has_capability(ConnectorCapability::DistinctOn)
         && native_distinct_compatible_with_order_by(distinct, order_by);
 
     if cursor.is_none()
-        && (distinct.is_none() || can_distinct_in_db)
+        && (distinct.is_none() || can_distinct_in_db_with_joins)
         && !nested_queries.iter().any(|q| match q {
-            ReadQuery::RelatedRecordsQuery(q) => {
-                q.has_cursor() || q.requires_inmemory_distinct_with_joins()
-            }
+            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.requires_inmemory_distinct_with_joins(),
             _ => false,
         })
     {
