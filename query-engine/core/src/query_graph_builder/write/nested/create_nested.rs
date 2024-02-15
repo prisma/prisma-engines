@@ -589,37 +589,6 @@ pub fn nested_create_many(
 
     let create_node = graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));
 
-    // We know that the id must be inlined on the child, so we need the parent link to inline it.
-    let linking_fields = parent_relation_field.linking_fields();
-    let child_linking_fields = parent_relation_field.related_field().linking_fields();
-
-    let relation_name = parent_relation_field.relation().name();
-    let parent_model_name = parent_relation_field.model().name().to_owned();
-    let child_model_name = child_model.name().to_owned();
-
-    graph.create_edge(
-        &parent_node,
-        &create_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            linking_fields,
-            Box::new(move |mut create_many_node, mut parent_links| {
-                // There can only be one parent.
-                let parent_link = match parent_links.pop() {
-                    Some(p) => Ok(p),
-                    None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{parent_model_name}' record (needed to inline the relation on '{child_model_name}' record) was found for a nested createMany on relation '{relation_name}'."
-                    ))),
-                }?;
-
-                // Inject the parent id into all nested records.
-                if let Node::Query(Query::Write(WriteQuery::CreateManyRecords(ref mut cmr))) = create_many_node {
-                    cmr.inject_result_into_all(child_linking_fields.assimilate(parent_link)?);
-                }
-
-                Ok(create_many_node)
-            }),
-        ),
-    )?;
-
-    Ok(())
+    // Currently, `createMany` is only supported for 1-many relations. This is checked during parsing.
+    handle_one_to_many_bulk(graph, parent_node, parent_relation_field, create_node)
 }

@@ -280,19 +280,6 @@ pub struct CreateManyRecordsFields {
     pub order: Vec<String>,
 }
 
-impl CreateManyRecords {
-    pub fn inject_result_into_all(&mut self, result: SelectionResult) {
-        for (selected_field, value) in result {
-            for args in self.args.iter_mut() {
-                args.insert(
-                    DatasourceFieldName(selected_field.db_name().into_owned()),
-                    (&selected_field, value.clone()),
-                )
-            }
-        }
-    }
-}
-
 #[derive(Debug, Clone)]
 #[allow(clippy::enum_variant_names)]
 pub enum UpdateRecord {
