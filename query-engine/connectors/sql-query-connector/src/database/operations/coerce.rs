@@ -75,6 +75,48 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
                 false => Either::Right(iter),
             };
 
+            let iter = if rs.args.requires_inmemory_distinct_with_joins() {
+                Either::Left(iter.unique_by(|maybe_value| {
+                    // Mapping errors to a unit type here does not discard the error information
+                    // from the final iterator because the result that we return from this closure
+                    // is only a key for comparing the elements, we do not map the elements
+                    // themselves here. We can't use the original errors in keys because `SqlError`
+                    // is not Eq + Hash. The consequence is that only the first error will be kept,
+                    // but the same thing will happen when collecting the iterator to
+                    // `Result<Vec<_>>` anyway. This also means we have to way to introduce a new
+                    // error and return it out of `unique_by`, so we have to panic if an element is
+                    // not an object, but this is fine because we know we already mapped the
+                    // elements using `coerce_json_relation_to_pv` above, so they must be objects.
+                    // We also panic if we can't find the distinct field in the result set, which
+                    // is less desirable but also exactly what the in-memory record processor for
+                    // the old query strategy does.
+                    maybe_value.as_ref().map_err(|_| ()).map(|value| {
+                        let object = value
+                            .clone()
+                            .into_object()
+                            .expect("Expected coerced_json_relation_to_pv to return list of objects");
+                        rs.args
+                            .distinct
+                            .as_ref()
+                            .map(|distinct| {
+                                distinct
+                                    .scalars()
+                                    .map(|sf| {
+                                        object
+                                            .iter()
+                                            // TODO: Use name instead of db_name after https://github.com/prisma/prisma-engines/pull/4732 is merged
+                                            .find_map(|(key, value)| (key == sf.db_name()).then_some(value))
+                                            .expect("Distinct field must be present in the result")
+                                    })
+                                    .collect::<Vec<_>>()
+                            })
+                            .unwrap_or_default();
+                    })
+                }))
+            } else {
+                Either::Right(iter)
+            };
+
             Ok(PrismaValue::List(iter.collect::<crate::Result<Vec<_>>>()?))
         }
         serde_json::Value::Object(obj) => {
