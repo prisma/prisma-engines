@@ -8,6 +8,7 @@ use crate::{
 
 use connector_interface::*;
 use futures::stream::{FuturesUnordered, StreamExt};
+use itertools::Itertools;
 use quaint::ast::*;
 use query_structure::*;
 
@@ -180,6 +181,20 @@ async fn get_many_records_joins(
     // Reverses order when using negative take
     if query_arguments.needs_reversed_order() {
         records.reverse();
+    }
+
+    // Apply in-memory distinct if it wasn't applied on the database level.
+    if query_arguments.requires_inmemory_distinct_with_joins() {
+        let Some(distinct) = query_arguments.distinct.as_ref() else {
+            return Ok(records);
+        };
+
+        records.records = records
+            .records
+            .into_iter()
+            // TODO: we will need a different method once https://github.com/prisma/prisma-engines/pull/4732 lands.
+            .unique_by(|record| record.extract_selection_result(&records.field_names, distinct).unwrap())
+            .collect();
     }
 
     Ok(records)
