@@ -1,6 +1,7 @@
 use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
-use query_structure::{prelude::*, RelationLoadStrategy};
+use psl::datamodel_connector::ConnectorCapability;
+use query_structure::{native_distinct_compatible_with_order_by, prelude::*, RelationLoadStrategy};
 use schema::{
     constants::{aggregations::*, args},
     QuerySchema,
@@ -254,14 +255,23 @@ pub(crate) fn get_relation_load_strategy(
     requested_strategy: Option<RelationLoadStrategy>,
     cursor: Option<&SelectionResult>,
     distinct: Option<&FieldSelection>,
+    order_by: &[OrderBy],
     nested_queries: &[ReadQuery],
     query_schema: &QuerySchema,
 ) -> RelationLoadStrategy {
-    if query_schema.can_resolve_relation_with_joins()
-        && cursor.is_none()
-        && distinct.is_none()
+    if requested_strategy == Some(RelationLoadStrategy::Query) || !query_schema.can_resolve_relation_with_joins() {
+        return RelationLoadStrategy::Query;
+    }
+
+    let can_distinct_in_db = query_schema.has_capability(ConnectorCapability::DistinctOn)
+        && native_distinct_compatible_with_order_by(distinct, order_by);
+
+    if cursor.is_none()
+        && (distinct.is_none() || can_distinct_in_db)
         && !nested_queries.iter().any(|q| match q {
-            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct(),
+            ReadQuery::RelatedRecordsQuery(q) => {
+                q.has_cursor() || (q.has_distinct() && !q.args.can_distinct_in_db_with_joins())
+            }
             _ => false,
         })
         && requested_strategy != Some(RelationLoadStrategy::Query)

@@ -107,11 +107,7 @@ impl QueryArguments {
 
     pub fn can_distinct_in_db_with_joins(&self) -> bool {
         self.connector_supports_distinct_on()
-            && self
-                .distinct
-                .as_ref()
-                .map(|distinct| native_distinct_compatible_with_order_by(distinct, &self.order_by))
-                .unwrap_or(true)
+            && native_distinct_compatible_with_order_by(self.distinct.as_ref(), &self.order_by)
     }
 
     fn connector_supports_distinct_on(&self) -> bool {

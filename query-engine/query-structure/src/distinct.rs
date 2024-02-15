@@ -8,10 +8,17 @@ use crate::{FieldSelection, OrderBy};
 /// before non-distinct fields in the order by clause.
 ///
 /// If there's no order by, then DISTINCT ON is allowed for any fields.
-pub fn native_distinct_compatible_with_order_by(distinct_fields: &FieldSelection, order_by_fields: &[OrderBy]) -> bool {
+pub fn native_distinct_compatible_with_order_by(
+    distinct_fields: Option<&FieldSelection>,
+    order_by_fields: &[OrderBy],
+) -> bool {
     if order_by_fields.is_empty() {
         return true;
     }
+
+    let Some(distinct_fields) = distinct_fields else {
+        return true;
+    };
 
     let count_leftmost_matching = order_by_fields
         .iter()

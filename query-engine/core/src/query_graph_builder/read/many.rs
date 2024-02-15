@@ -41,6 +41,7 @@ fn find_many_with_options(
         args.relation_load_strategy,
         args.cursor.as_ref(),
         args.distinct.as_ref(),
+        &args.order_by,
         &nested,
         query_schema,
     );
