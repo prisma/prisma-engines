@@ -123,7 +123,7 @@ mod update_many {
     }
 
     // "An updateMany mutation" should "correctly apply all number operations for Int"
-    #[connector_test(exclude(Vitess("planetscale.js.wasm"), CockroachDb))]
+    #[connector_test(exclude(Vitess("planetscale.js", "planetscale.js.wasm"), CockroachDb))]
     async fn apply_number_ops_for_int(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
         create_row(&runner, r#"{ id: 2, optStr: "str2", optInt: 2 }"#).await?;
