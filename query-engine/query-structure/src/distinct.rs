@@ -21,7 +21,7 @@ pub fn native_distinct_compatible_with_order_by(distinct_fields: &FieldSelection
         })
         .count();
 
-    count_leftmost_matching == distinct_fields.len()
+    count_leftmost_matching == distinct_fields.as_ref().len()
 }
 
 #[cfg(test)]

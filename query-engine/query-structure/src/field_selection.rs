@@ -23,10 +23,6 @@ impl FieldSelection {
         self.selections
     }
 
-    pub fn len(&self) -> usize {
-        self.selections.len()
-    }
-
     /// Returns `true` if self contains (at least) all fields specified in `other`. `false` otherwise.
     /// Recurses into composite selections and ensures that composite selections are supersets as well.
     pub fn is_superset_of(&self, other: &Self) -> bool {
@@ -246,6 +242,12 @@ impl FieldSelection {
     pub fn has_virtual_fields(&self) -> bool {
         self.selections()
             .any(|field| matches!(field, SelectedField::Virtual(_)))
+    }
+}
+
+impl AsRef<[SelectedField]> for FieldSelection {
+    fn as_ref(&self) -> &[SelectedField] {
+        &self.selections
     }
 }
 
