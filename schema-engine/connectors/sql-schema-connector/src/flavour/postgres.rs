@@ -468,28 +468,7 @@ impl SqlFlavour for PostgresFlavour {
                         shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await;
 
                     if is_postgres {
-                        // When drop database is routed through pgbouncer, the database may still be used in other pooled connections.
-                        // In this case, given that we (as a user) know the database will not be used any more, we can forcefully drop
-                        // the database. Note that `with (force)` is added in Postgres 13, and therefore we will need to
-                        // fallback to the normal drop if it errors with syntax error.
-                        //
-                        // TL;DR,
-                        // 1. pg >= 13 -> it works.
-                        // 2. pg < 13 -> syntax error on WITH (FORCE), and then fail with db in use.
-                        let drop_database = format!("DROP DATABASE IF EXISTS \"{shadow_database_name}\" WITH (FORCE)");
-                        if let Err(err) = main_connection.raw_cmd(&drop_database, &params.url).await {
-                            if let Some(msg) = err.message() {
-                                if msg.contains("syntax error") {
-                                    let drop_database_alt =
-                                        format!("DROP DATABASE IF EXISTS \"{shadow_database_name}\"");
-                                    main_connection.raw_cmd(&drop_database_alt, &params.url).await?;
-                                } else {
-                                    return Err(err);
-                                }
-                            } else {
-                                return Err(err);
-                            }
-                        }
+                        drop_db_try_force(main_connection, &params.url, &shadow_database_name).await?;
                     } else {
                         let drop_database = format!("DROP DATABASE IF EXISTS \"{shadow_database_name}\"");
                         main_connection.raw_cmd(&drop_database, &params.url).await?;
@@ -510,6 +489,33 @@ impl SqlFlavour for PostgresFlavour {
     fn search_path(&self) -> &str {
         self.schema_name()
     }
+}
+
+/// Drop a database using `WITH (FORCE)` syntax.
+///
+/// When drop database is routed through pgbouncer, the database may still be used in other pooled connections.
+/// In this case, given that we (as a user) know the database will not be used any more, we can forcefully drop
+/// the database. Note that `with (force)` is added in Postgres 13, and therefore we will need to
+/// fallback to the normal drop if it errors with syntax error.
+///
+/// TL;DR,
+/// 1. pg >= 13 -> it works.
+/// 2. pg < 13 -> syntax error on WITH (FORCE), and then fail with db in use if pgbouncer is used.
+async fn drop_db_try_force(conn: &mut Connection, url: &PostgresUrl, database_name: &str) -> ConnectorResult<()> {
+    let drop_database = format!("DROP DATABASE IF EXISTS \"{database_name}\" WITH (FORCE)");
+    if let Err(err) = conn.raw_cmd(&drop_database, url).await {
+        if let Some(msg) = err.message() {
+            if msg.contains("syntax error") {
+                let drop_database_alt = format!("DROP DATABASE IF EXISTS \"{database_name}\"");
+                conn.raw_cmd(&drop_database_alt, url).await?;
+            } else {
+                return Err(err);
+            }
+        } else {
+            return Err(err);
+        }
+    }
+    Ok(())
 }
 
 fn strip_schema_param_from_url(url: &mut Url) {
