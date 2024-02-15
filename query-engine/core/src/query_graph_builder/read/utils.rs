@@ -274,7 +274,6 @@ pub(crate) fn get_relation_load_strategy(
             }
             _ => false,
         })
-        && requested_strategy != Some(RelationLoadStrategy::Query)
     {
         RelationLoadStrategy::Join
     } else {
