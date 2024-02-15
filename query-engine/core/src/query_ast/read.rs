@@ -65,11 +65,11 @@ impl ReadQuery {
         }
     }
 
-    pub(crate) fn requires_inmemory_processing_for_distinct_with_joins(&self) -> bool {
+    pub(crate) fn requires_inmemory_distinct_with_joins(&self) -> bool {
         match self {
             ReadQuery::RecordQuery(_) => false,
-            ReadQuery::ManyRecordsQuery(q) => q.requires_inmemory_processing_for_distinct_with_joins(),
-            ReadQuery::RelatedRecordsQuery(q) => q.requires_inmemory_processing_for_distinct_with_joins(),
+            ReadQuery::ManyRecordsQuery(q) => q.requires_inmemory_distinct_with_joins(),
+            ReadQuery::RelatedRecordsQuery(q) => q.requires_inmemory_distinct_with_joins(),
             ReadQuery::AggregateRecordsQuery(_) => false,
         }
     }
@@ -208,12 +208,9 @@ pub struct ManyRecordsQuery {
 }
 
 impl ManyRecordsQuery {
-    pub fn requires_inmemory_processing_for_distinct_with_joins(&self) -> bool {
-        self.args.distinct.is_some() && !self.args.can_distinct_in_db_with_joins()
-            || self
-                .nested
-                .iter()
-                .any(|q| q.requires_inmemory_processing_for_distinct_with_joins())
+    pub fn requires_inmemory_distinct_with_joins(&self) -> bool {
+        self.args.requires_inmemory_distinct_with_joins()
+            || self.nested.iter().any(|q| q.requires_inmemory_distinct_with_joins())
     }
 }
 
@@ -237,12 +234,9 @@ impl RelatedRecordsQuery {
         self.args.cursor.is_some() || self.nested.iter().any(|q| q.has_cursor())
     }
 
-    pub fn requires_inmemory_processing_for_distinct_with_joins(&self) -> bool {
-        self.args.distinct.is_some() && !self.args.can_distinct_in_db_with_joins()
-            || self
-                .nested
-                .iter()
-                .any(|q| q.requires_inmemory_processing_for_distinct_with_joins())
+    pub fn requires_inmemory_distinct_with_joins(&self) -> bool {
+        self.args.requires_inmemory_distinct_with_joins()
+            || self.nested.iter().any(|q| q.requires_inmemory_distinct_with_joins())
     }
 }
 

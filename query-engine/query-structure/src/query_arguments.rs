@@ -93,6 +93,10 @@ impl QueryArguments {
         self.distinct.is_some() && !self.can_distinct_in_db()
     }
 
+    pub fn requires_inmemory_distinct_with_joins(&self) -> bool {
+        self.distinct.is_some() && !self.can_distinct_in_db_with_joins()
+    }
+
     fn can_distinct_in_db(&self) -> bool {
         let has_distinct_feature = self
             .model()

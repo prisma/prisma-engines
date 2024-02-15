@@ -270,7 +270,7 @@ pub(crate) fn get_relation_load_strategy(
         && (distinct.is_none() || can_distinct_in_db)
         && !nested_queries.iter().any(|q| match q {
             ReadQuery::RelatedRecordsQuery(q) => {
-                q.has_cursor() || q.requires_inmemory_processing_for_distinct_with_joins()
+                q.has_cursor() || q.requires_inmemory_distinct_with_joins()
             }
             _ => false,
         })
