@@ -22,7 +22,7 @@ pub struct QueryArguments {
     pub skip: Option<i64>,
     pub filter: Option<Filter>,
     pub order_by: Vec<OrderBy>,
-    pub distinct: Option<FieldSelection>, // TODO: should we make it `Vec<ScalarFieldRef>`?
+    pub distinct: Option<FieldSelection>,
     pub ignore_skip: bool,
     pub ignore_take: bool,
     pub relation_load_strategy: Option<RelationLoadStrategy>,
