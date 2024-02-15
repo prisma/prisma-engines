@@ -44,7 +44,7 @@ mod transactional {
         Ok(())
     }
 
-    #[connector_test(exclude(Vitess("planetscale.js", "planetscale.js.wasm")))]
+    #[connector_test]
     async fn one_success_one_fail(runner: Runner) -> TestResult<()> {
         let queries = vec![
             r#"mutation { createOneModelA(data: { id: 1 }) { id }}"#.to_string(),
@@ -77,7 +77,7 @@ mod transactional {
         Ok(())
     }
 
-    #[connector_test(exclude(Vitess("planetscale.js", "planetscale.js.wasm")))]
+    #[connector_test]
     async fn one_query(runner: Runner) -> TestResult<()> {
         // Existing ModelA in the DB will prevent the nested ModelA creation in the batch.
         insta::assert_snapshot!(
@@ -104,6 +104,8 @@ mod transactional {
         Ok(())
     }
 
+    // On PlanetScale, this fails with:
+    // "Error in connector: Error querying the database: Server error: `ERROR 25001 (1568): Transaction characteristics can't be changed while a transaction is in progress'""
     #[connector_test(exclude(MongoDb, Vitess("planetscale.js", "planetscale.js.wasm")))]
     async fn valid_isolation_level(runner: Runner) -> TestResult<()> {
         let queries = vec![r#"mutation { createOneModelB(data: { id: 1 }) { id }}"#.to_string()];

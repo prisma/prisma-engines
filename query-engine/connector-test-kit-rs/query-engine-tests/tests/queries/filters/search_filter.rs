@@ -229,9 +229,7 @@ mod search_filter_with_index {
         super::ensure_filter_tree_shake_works(runner).await
     }
 
-    // This test correctly fails on PlanetScale, but its message is not the same as the one in the test:
-    // "DatabaseError: Can't find FULLTEXT index matching the column list (errno 1191) (sqlstate HY000)"
-    #[connector_test(exclude(Vitess("planetscale.js", "planetscale.js.wasm")))]
+    #[connector_test(exclude(Vitess("planetscale.js.wasm")))]
     async fn throws_error_on_missing_index(runner: Runner) -> TestResult<()> {
         super::create_test_data(&runner).await?;
 
