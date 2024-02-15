@@ -30,10 +30,3 @@ pub fn native_distinct_compatible_with_order_by(
 
     count_leftmost_matching == distinct_fields.as_ref().len()
 }
-
-#[cfg(test)]
-mod tests {
-    // TODO: figure out how to write unit tests here
-    #[test]
-    fn empty_order_by() {}
-}
