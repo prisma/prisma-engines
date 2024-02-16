@@ -8,6 +8,7 @@ pub mod executor;
 pub mod protocol;
 pub mod query_document;
 pub mod query_graph_builder;
+pub mod relation_load_strategy;
 pub mod response_ir;
 pub mod telemetry;
 

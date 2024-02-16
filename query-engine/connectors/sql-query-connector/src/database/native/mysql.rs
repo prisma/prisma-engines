@@ -6,6 +6,7 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
+use quaint::connector::Queryable;
 use quaint::{pooled::Quaint, prelude::ConnectionInfo};
 use std::time::Duration;
 
@@ -69,7 +70,12 @@ impl Connector for Mysql {
             let runtime_conn = self.pool.check_out().await?;
 
             // Note: `runtime_conn` must be `Sized`, as that's required by `TransactionCapable`
-            let sql_conn = SqlConnection::new(runtime_conn, &self.connection_info, self.features);
+            let mut conn_info = self.connection_info.clone();
+            let db_version = runtime_conn.version().await.unwrap();
+            // MySQL has its version grabbed at connection time. We know it's infaillible.
+            conn_info.set_version(db_version);
+
+            let sql_conn = SqlConnection::new(runtime_conn, conn_info, self.features);
 
             Ok(Box::new(sql_conn) as Box<dyn Connection + Send + Sync + 'static>)
         })

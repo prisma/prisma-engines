@@ -32,7 +32,7 @@ mod relation_load_strategy {
         .to_owned()
     }
 
-    async fn seed(runner: &mut Runner) -> TestResult<()> {
+    async fn seed(runner: &Runner) -> TestResult<()> {
         run_query!(
             runner,
             r#"
@@ -123,27 +123,43 @@ mod relation_load_strategy {
         };
     }
 
-    macro_rules! relation_load_strategy_tests_pair {
+    macro_rules! relation_load_strategy_tests {
         ($name:ident, $query:expr, $result:literal) => {
-            relation_load_strategy_test!(
-                $name,
-                join,
-                $query,
-                $result,
-                only(Postgres, CockroachDb, Mysql(8))
-            );
-            // TODO: Remove Mysql & Vitess exclusions once we are able to have version speficic preview features.
-            relation_load_strategy_test!(
-                $name,
-                query,
-                $query,
-                $result,
-                exclude(Mysql("5.6", "5.7", "mariadb"))
-            );
+            paste::paste! {
+                relation_load_strategy_test!(
+                    [<$name _lateral>],
+                    join,
+                    $query,
+                    $result,
+                    capabilities(LateralJoin)
+                );
+                relation_load_strategy_test!(
+                    [<$name _subquery>],
+                    join,
+                    $query,
+                    $result,
+                    capabilities(CorrelatedSubqueries),
+                    exclude(Mysql("5.6", "5.7", "mariadb"))
+                );
+                relation_load_strategy_test!(
+                    [<$name _lateral>],
+                    query,
+                    $query,
+                    $result,
+                    capabilities(LateralJoin)
+                );
+                relation_load_strategy_test!(
+                    [<$name _subquery>],
+                    query,
+                    $query,
+                    $result,
+                    capabilities(CorrelatedSubqueries)
+                );
+            }
         };
     }
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         find_many,
         r#"
         query {
@@ -162,7 +178,7 @@ mod relation_load_strategy {
         r#"{"data":{"findManyUser":[{"login":"author","posts":[{"title":"first post","comments":[{"author":{"login":"commenter"},"body":"a comment"}]}]},{"login":"commenter","posts":[]}]}}"#
     );
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         find_first,
         r#"
         query {
@@ -186,7 +202,7 @@ mod relation_load_strategy {
         r#"{"data":{"findFirstUser":{"login":"author","posts":[{"title":"first post","comments":[{"author":{"login":"commenter"},"body":"a comment"}]}]}}}"#
     );
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         find_first_or_throw,
         r#"
         query {
@@ -210,7 +226,7 @@ mod relation_load_strategy {
         r#"{"data":{"findFirstUserOrThrow":{"login":"author","posts":[{"title":"first post","comments":[{"author":{"login":"commenter"},"body":"a comment"}]}]}}}"#
     );
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         find_unique,
         r#"
         query {
@@ -234,7 +250,7 @@ mod relation_load_strategy {
         r#"{"data":{"findUniqueUser":{"login":"author","posts":[{"title":"first post","comments":[{"author":{"login":"commenter"},"body":"a comment"}]}]}}}"#
     );
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         find_unique_or_throw,
         r#"
         query {
@@ -258,7 +274,7 @@ mod relation_load_strategy {
         r#"{"data":{"findUniqueUserOrThrow":{"login":"author","posts":[{"title":"first post","comments":[{"author":{"login":"commenter"},"body":"a comment"}]}]}}}"#
     );
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         create,
         r#"
         mutation {
@@ -289,7 +305,7 @@ mod relation_load_strategy {
         r#"{"data":{"createOneUser":{"login":"reader","comments":[{"post":{"title":"first post"},"body":"most insightful indeed!"}]}}}"#
     );
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         update,
         r#"
         mutation {
@@ -313,7 +329,7 @@ mod relation_load_strategy {
         r#"{"data":{"updateOneUser":{"login":"distinguished author","posts":[{"title":"first post","comments":[{"body":"a comment"}]}]}}}"#
     );
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         delete,
         r#"
         mutation {
@@ -334,7 +350,7 @@ mod relation_load_strategy {
         r#"{"data":{"deleteOneUser":{"login":"author","posts":[{"title":"first post","comments":[{"body":"a comment"}]}]}}}"#
     );
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         upsert,
         r#"
         mutation {
@@ -450,4 +466,25 @@ mod relation_load_strategy {
         }
         "#
     );
+
+    #[connector_test(schema(schema), only(Mysql(5.6, 5.7, "mariadb")))]
+    async fn unsupported_join_strategy(runner: Runner) -> TestResult<()> {
+        seed(&runner).await?;
+
+        assert_error!(
+            &runner,
+            r#"{ findManyUser(relationLoadStrategy: join) { id } }"#,
+            2019,
+            "`relationLoadStrategy: join` is not available for MySQL < 8.0.14 and MariaDB."
+        );
+
+        assert_error!(
+            &runner,
+            r#"{ findFirstUser(relationLoadStrategy: join) { id } }"#,
+            2019,
+            "`relationLoadStrategy: join` is not available for MySQL < 8.0.14 and MariaDB."
+        );
+
+        Ok(())
+    }
 }

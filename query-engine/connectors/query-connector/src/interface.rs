@@ -24,6 +24,8 @@ pub trait Connection: ConnectionLike {
         isolation_level: Option<String>,
     ) -> crate::Result<Box<dyn Transaction + 'a>>;
 
+    async fn version(&self) -> Option<String>;
+
     /// Explicit upcast.
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike;
 }
@@ -32,6 +34,8 @@ pub trait Connection: ConnectionLike {
 pub trait Transaction: ConnectionLike {
     async fn commit(&mut self) -> crate::Result<()>;
     async fn rollback(&mut self) -> crate::Result<()>;
+
+    async fn version(&self) -> Option<String>;
 
     /// Explicit upcast of self reference. Rusts current vtable layout doesn't allow for an upcast if
     /// `trait A`, `trait B: A`, so that `Box<dyn B> as Box<dyn A>` works. This is a simple, explicit workaround.

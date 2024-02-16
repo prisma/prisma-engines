@@ -287,7 +287,13 @@ dev-mysql8: start-mysql_8
 start-mysql_mariadb:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans mariadb-10-0
 
+start-mysql_mariadb_11:
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans mariadb-11-0
+
 dev-mariadb: start-mysql_mariadb
+	cp $(CONFIG_PATH)/mariadb $(CONFIG_FILE)
+
+dev-mariadb11: start-mysql_mariadb_11
 	cp $(CONFIG_PATH)/mariadb $(CONFIG_FILE)
 
 start-mssql_2019:

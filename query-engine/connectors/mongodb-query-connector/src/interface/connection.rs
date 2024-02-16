@@ -40,6 +40,10 @@ impl Connection for MongoDbConnection {
         Ok(tx as Box<dyn Transaction>)
     }
 
+    async fn version(&self) -> Option<String> {
+        None
+    }
+
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {
         self
     }

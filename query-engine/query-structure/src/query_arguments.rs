@@ -33,6 +33,7 @@ pub enum RelationLoadStrategy {
     Join,
     Query,
 }
+
 impl RelationLoadStrategy {
     pub fn is_query(&self) -> bool {
         matches!(self, RelationLoadStrategy::Query)
