@@ -43,12 +43,31 @@ impl FieldSelection {
         self.selections.iter()
     }
 
+    pub fn grouped_selections(&self) -> impl Iterator<Item = GroupedSelectedField<'_>> {
+        self.selections.iter().to_grouped_virtuals()
+    }
+
+    pub fn grouped_prisma_names(&self) -> Vec<String> {
+        self.grouped_selections().map(|f| f.prisma_name().to_owned()).collect()
+    }
+
     pub fn scalars(&self) -> impl Iterator<Item = &ScalarFieldRef> + '_ {
         self.selections().filter_map(SelectedField::as_scalar)
     }
 
     pub fn virtuals(&self) -> impl Iterator<Item = &VirtualSelection> {
         self.selections().filter_map(SelectedField::as_virtual)
+    }
+
+    pub fn grouped_virtuals(&self) -> impl Iterator<Item = GroupedVirtualSelection<'_>> {
+        self.grouped_selections().filter_map(GroupedSelectedField::into_virtual)
+    }
+
+    pub fn extract_from_grouped<'a>(&'a self, field_names: &[String]) -> Vec<GroupedSelectedField<'a>> {
+        field_names
+            .iter()
+            .filter_map(move |name| self.grouped_selections().find(|field| field.prisma_name() == name))
+            .collect()
     }
 
     pub fn virtuals_owned(&self) -> Vec<VirtualSelection> {
@@ -212,17 +231,7 @@ impl FieldSelection {
     /// Returns type identifiers and arities, treating all virtual fields as separate fields.
     pub fn type_identifiers_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
         self.selections()
-            .filter_map(SelectedField::type_identifier_with_arity)
-            .collect()
-    }
-
-    /// Returns type identifiers and arities, grouping the virtual fields so that the type
-    /// identifier and arity is returned for the whole object containing multiple virtual fields
-    /// and not each of those fields separately. This represents the selection in joined queries
-    /// that use JSON objects for relations and relation aggregations.
-    pub fn type_identifiers_with_arities_grouping_virtuals(&self) -> Vec<(TypeIdentifier, FieldArity)> {
-        self.selections_with_virtual_group_heads()
-            .filter_map(|vs| vs.type_identifier_with_arity_grouping_virtuals())
+            .map(SelectedField::type_identifier_with_arity)
             .collect()
     }
 
@@ -258,7 +267,7 @@ pub enum SelectedField {
     Virtual(VirtualSelection),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct RelationSelection {
     pub field: RelationField,
     pub args: QueryArguments,
@@ -266,6 +275,89 @@ pub struct RelationSelection {
     pub result_fields: Vec<String>,
     // Fields that will be queried by the connectors
     pub selections: Vec<SelectedField>,
+}
+
+impl RelationSelection {
+    pub fn new(
+        field: RelationField,
+        args: QueryArguments,
+        result_fields: Vec<String>,
+        selections: Vec<SelectedField>,
+    ) -> Self {
+        Self {
+            field,
+            args,
+            result_fields,
+            selections,
+        }
+    }
+
+    pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
+        if self.field.is_list() {
+            (TypeIdentifier::Json, FieldArity::Required)
+        } else {
+            (TypeIdentifier::Json, self.field.arity())
+        }
+    }
+}
+
+impl std::fmt::Debug for RelationSelection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("RelationSelection")
+            .field("field", &self.field)
+            .field("selections", &self.selections)
+            .finish()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GroupedSelectedField<'a> {
+    Scalar(&'a ScalarFieldRef),
+    Relation(&'a RelationSelection),
+    Virtual(GroupedVirtualSelection<'a>),
+}
+
+impl<'a> GroupedSelectedField<'a> {
+    pub fn prisma_name(&self) -> &'a str {
+        match self {
+            GroupedSelectedField::Scalar(sf) => sf.name(),
+            GroupedSelectedField::Relation(rf) => rf.field.name(),
+            GroupedSelectedField::Virtual(vs) => vs.serialized_name().0,
+        }
+    }
+
+    pub fn type_identifier_with_arity_for_json(&self) -> (TypeIdentifier, FieldArity) {
+        match self {
+            GroupedSelectedField::Scalar(sf) => sf.type_identifier_with_arity(),
+            GroupedSelectedField::Relation(rs) => rs.type_identifier_with_arity(),
+            GroupedSelectedField::Virtual(vs) => vs.type_identifier_with_arity_for_json(),
+        }
+    }
+
+    pub fn into_virtual(self) -> Option<GroupedVirtualSelection<'a>> {
+        if let Self::Virtual(v) = self {
+            Some(v)
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GroupedVirtualSelection<'a> {
+    RelationCounts(Vec<&'a RelationCountSelection>),
+}
+
+impl<'a> GroupedVirtualSelection<'a> {
+    pub fn serialized_name(&self) -> (&'static str, &str) {
+        match self {
+            Self::RelationCounts(x) => x[0].serialized_name(),
+        }
+    }
+
+    pub fn type_identifier_with_arity_for_json(&self) -> (TypeIdentifier, FieldArity) {
+        (TypeIdentifier::Json, FieldArity::Required)
+    }
 }
 
 impl RelationSelection {
@@ -287,6 +379,22 @@ impl RelationSelection {
         self.selections.iter().filter_map(SelectedField::as_virtual)
     }
 
+    pub fn virtuals_grouped(&self) -> impl Iterator<Item = GroupedVirtualSelection<'_>> {
+        self.selections
+            .iter()
+            .to_grouped_virtuals()
+            .filter_map(GroupedSelectedField::into_virtual)
+    }
+
+    pub fn grouped_selections(&self) -> impl Iterator<Item = GroupedSelectedField<'_>> {
+        self.selections.iter().to_grouped_virtuals()
+    }
+
+    pub fn grouped_fields_to_serialize(&self) -> impl Iterator<Item = GroupedSelectedField<'_>> {
+        self.grouped_selections()
+            .filter(|field| self.result_fields.iter().any(|name| name == field.prisma_name()))
+    }
+
     pub fn related_model(&self) -> Model {
         self.field.related_model()
     }
@@ -294,13 +402,53 @@ impl RelationSelection {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VirtualSelection {
-    RelationCount(RelationFieldRef, Option<Filter>),
+    RelationCount(RelationCountSelection),
+}
+
+#[derive(Clone, PartialEq, Eq, Hash)]
+pub struct RelationCountSelection {
+    field: RelationFieldRef,
+    filter: Option<Filter>,
+}
+
+impl std::fmt::Debug for RelationCountSelection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("RelationCountSelection")
+            .field("field", &self.field)
+            .finish()
+    }
+}
+
+impl RelationCountSelection {
+    pub fn new(field: RelationFieldRef, filter: Option<Filter>) -> Self {
+        Self { field, filter }
+    }
+
+    pub fn db_alias(&self) -> String {
+        format!("_aggr_count_{}", self.field.name())
+    }
+
+    pub fn serialized_name(&self) -> (&'static str, &str) {
+        ("_count", self.field.name())
+    }
+
+    pub fn model(&self) -> Model {
+        self.field.model()
+    }
+
+    pub fn field(&self) -> &RelationFieldRef {
+        &self.field
+    }
+
+    pub fn filter(&self) -> Option<&Filter> {
+        self.filter.as_ref()
+    }
 }
 
 impl VirtualSelection {
     pub fn db_alias(&self) -> String {
         match self {
-            Self::RelationCount(rf, _) => format!("_aggr_count_{}", rf.name()),
+            Self::RelationCount(x) => x.db_alias(),
         }
     }
 
@@ -308,19 +456,19 @@ impl VirtualSelection {
         match self {
             // TODO: we can't use UNDERSCORE_COUNT here because it would require a circular
             // dependency between `schema` and `query-structure` crates.
-            Self::RelationCount(rf, _) => ("_count", rf.name()),
+            Self::RelationCount(x) => x.serialized_name(),
         }
     }
 
     pub fn model(&self) -> Model {
         match self {
-            Self::RelationCount(rf, _) => rf.model(),
+            Self::RelationCount(x) => x.model(),
         }
     }
 
     pub fn coerce_value(&self, value: PrismaValue) -> crate::Result<PrismaValue> {
         match self {
-            Self::RelationCount(_, _) => match value {
+            Self::RelationCount(_) => match value {
                 PrismaValue::Null => Ok(PrismaValue::Int(0)),
                 _ => value.coerce(TypeIdentifier::Int),
             },
@@ -329,25 +477,37 @@ impl VirtualSelection {
 
     pub fn field(&self) -> Field {
         match self {
-            Self::RelationCount(rf, _) => rf.clone().into(),
+            Self::RelationCount(x) => x.field.clone().into(),
         }
     }
 
     pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
         match self {
-            Self::RelationCount(_, _) => (TypeIdentifier::Int, FieldArity::Required),
+            Self::RelationCount(_) => (TypeIdentifier::Int, FieldArity::Required),
+        }
+    }
+
+    pub fn type_identifier_with_arity_for_json(&self) -> (TypeIdentifier, FieldArity) {
+        match self {
+            Self::RelationCount(_) => (TypeIdentifier::Json, FieldArity::Required),
         }
     }
 
     pub fn relation_field(&self) -> &RelationField {
         match self {
-            VirtualSelection::RelationCount(rf, _) => rf,
+            VirtualSelection::RelationCount(x) => &x.field,
         }
     }
 
     pub fn filter(&self) -> Option<&Filter> {
         match self {
-            VirtualSelection::RelationCount(_, filter) => filter.as_ref(),
+            VirtualSelection::RelationCount(x) => x.filter.as_ref(),
+        }
+    }
+
+    pub fn as_relation_count(&self) -> Option<&RelationCountSelection> {
+        match self {
+            Self::RelationCount(v) => Some(v),
         }
     }
 }
@@ -399,31 +559,27 @@ impl SelectedField {
         }
     }
 
-    /// Returns the type identifier and arity of this field, unless it is a composite field, in
-    /// which case [`None`] is returned.
-    pub fn type_identifier_with_arity(&self) -> Option<(TypeIdentifier, FieldArity)> {
+    /// Returns the type identifier and arity of this field.
+    pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
         match self {
-            SelectedField::Scalar(sf) => Some(sf.type_identifier_with_arity()),
-            SelectedField::Relation(rf) if rf.field.is_list() => Some((TypeIdentifier::Json, FieldArity::Required)),
-            SelectedField::Relation(rf) => Some((TypeIdentifier::Json, rf.field.arity())),
-            SelectedField::Composite(_) => None,
-            SelectedField::Virtual(vs) => Some(vs.type_identifier_with_arity()),
+            SelectedField::Scalar(sf) => sf.type_identifier_with_arity(),
+            SelectedField::Relation(rs) => rs.type_identifier_with_arity(),
+            SelectedField::Virtual(vs) => vs.type_identifier_with_arity(),
+            SelectedField::Composite(_) => unreachable!(),
         }
     }
 
-    /// Returns the type identifier and arity of this field, unless it is a composite field, in
-    /// which case [`None`] is returned.
+    /// Returns the type identifier and arity of this field when it is queries as JSON object.
     ///
     /// In the case of virtual fields that are wrapped into objects in Prisma queries
     /// (specifically, relation aggregations), the returned information refers not to the current
     /// field itself but to the whole object that contains this field. This is used by the queries
     /// with relation JOINs because they use JSON objects to reprsent both relations and relation
-    /// aggregations, so individual virtual fields that correspond to those relation aggregations
-    /// don't exist as separate values in the result of the query.
-    pub fn type_identifier_with_arity_grouping_virtuals(&self) -> Option<(TypeIdentifier, FieldArity)> {
+    /// aggregations, so individual virtual fields that correspond to those relation aggreg
+    pub fn type_identifier_with_arity_for_json(&self) -> (TypeIdentifier, FieldArity) {
         match self {
-            SelectedField::Virtual(_) => Some((TypeIdentifier::Json, FieldArity::Required)),
-            _ => self.type_identifier_with_arity(),
+            SelectedField::Virtual(vs) => vs.type_identifier_with_arity_for_json(),
+            x => x.type_identifier_with_arity(),
         }
     }
 
@@ -470,6 +626,11 @@ impl SelectedField {
     /// Returns `true` if the selected field is [`Scalar`].
     pub fn is_scalar(&self) -> bool {
         matches!(self, Self::Scalar(..))
+    }
+
+    /// Returns `true` if the selected field is [`Virtual`].
+    pub fn is_virtual(&self) -> bool {
+        matches!(self, Self::Virtual(..))
     }
 }
 
@@ -595,5 +756,71 @@ impl IntoIterator for FieldSelection {
 
     fn into_iter(self) -> Self::IntoIter {
         self.selections.into_iter()
+    }
+}
+
+pub struct GroupedSelectionIterator<'a, I>
+where
+    I: Iterator<Item = &'a SelectedField>,
+{
+    inner: std::iter::Peekable<I>,
+}
+
+impl<'a, I> GroupedSelectionIterator<'a, I>
+where
+    I: Iterator<Item = &'a SelectedField>,
+{
+    fn new(inner: std::iter::Peekable<I>) -> Self {
+        GroupedSelectionIterator { inner }
+    }
+}
+
+impl<'a, I> Iterator for GroupedSelectionIterator<'a, I>
+where
+    I: Iterator<Item = &'a SelectedField>,
+{
+    type Item = GroupedSelectedField<'a>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.inner.next() {
+            Some(SelectedField::Scalar(scalar_field_ref)) => Some(GroupedSelectedField::Scalar(scalar_field_ref)),
+            Some(SelectedField::Relation(relation_selection)) => {
+                Some(GroupedSelectedField::Relation(relation_selection))
+            }
+            Some(SelectedField::Virtual(vs)) => {
+                let group_iter = self.inner.peeking_take_while(|field| field.is_virtual());
+
+                let virtual_group = match vs {
+                    VirtualSelection::RelationCount(x) => GroupedVirtualSelection::RelationCounts(
+                        std::iter::once(x)
+                            .chain(
+                                group_iter
+                                    .filter_map(|sf| sf.as_virtual().and_then(VirtualSelection::as_relation_count)),
+                            )
+                            .collect(),
+                    ),
+                };
+
+                Some(GroupedSelectedField::Virtual(virtual_group))
+            }
+            _ => None,
+        }
+    }
+}
+
+trait ToGrouped<'a, I>
+where
+    I: Iterator<Item = &'a SelectedField>,
+{
+    /// TODO: document fn
+    fn to_grouped_virtuals(self) -> GroupedSelectionIterator<'a, I>;
+}
+
+impl<'a, I> ToGrouped<'a, I> for I
+where
+    I: Iterator<Item = &'a SelectedField>,
+{
+    fn to_grouped_virtuals(self) -> GroupedSelectionIterator<'a, I> {
+        GroupedSelectionIterator::new(self.peekable())
     }
 }

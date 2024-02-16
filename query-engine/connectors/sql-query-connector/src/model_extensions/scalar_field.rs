@@ -50,7 +50,7 @@ impl ScalarFieldExt for ScalarField {
             (PrismaValue::BigInt(i), _) => i.into(),
             (PrismaValue::Uuid(u), _) => u.to_string().into(),
             (PrismaValue::List(l), _) => Value::array(l.into_iter().map(|x| self.value(x, ctx))),
-            (PrismaValue::Json(s), _) => Value::json(serde_json::from_str::<serde_json::Value>(&s).unwrap()),
+            (PrismaValue::Json(s), _) => Value::json(s.try_as_value().unwrap().into_owned()),
             (PrismaValue::Bytes(b), _) => Value::bytes(b),
             (PrismaValue::Object(_), _) => unimplemented!(),
             (PrismaValue::Null, ident) => match ident {
@@ -120,7 +120,7 @@ pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
         PrismaValue::BigInt(i) => i.into(),
         PrismaValue::Uuid(u) => u.to_string().into(),
         PrismaValue::List(l) => Value::array(l.into_iter().map(convert_lossy)),
-        PrismaValue::Json(s) => Value::json(serde_json::from_str(&s).unwrap()),
+        PrismaValue::Json(s) => Value::json(s.try_as_value().unwrap().into_owned()),
         PrismaValue::Bytes(b) => Value::bytes(b),
         PrismaValue::Null => Value::null_int32(), // Can't tell which type the null is supposed to be.
         PrismaValue::Object(_) => unimplemented!(),

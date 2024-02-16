@@ -62,9 +62,7 @@ pub fn to_prisma_value<'a, T: Into<ValueType<'a>>>(qv: T) -> crate::Result<Prism
         }
         ValueType::EnumArray(None, _) => PrismaValue::Null,
 
-        ValueType::Json(val) => val
-            .map(|val| PrismaValue::Json(val.to_string()))
-            .unwrap_or(PrismaValue::Null),
+        ValueType::Json(val) => val.map(PrismaValue::new_json).unwrap_or(PrismaValue::Null),
 
         ValueType::Uuid(uuid) => uuid.map(PrismaValue::Uuid).unwrap_or(PrismaValue::Null),
 

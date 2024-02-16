@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider = "postgres"
+  url      = "postgresql://postgres:prisma@localhost:5434/postgres?schema=a_repro_22596&sslmode=disable"
+}
+
+model Product {
+  id           Int           @id @default(autoincrement())
+  enabled      Boolean       @default(true)
+  productDatas ProductData[]
+}
+
+model ProductData {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  image      String
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  Int      @map("product_id")
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int      @map("category_id")
+
+  @@index([productId], name: "product_id")
+}
+
+model Category {
+  id            Int            @id @default(autoincrement())
+  enabled       Boolean        @default(true)
+  categoryDatas CategoryData[]
+  productsDatas ProductData[]
+}
+
+model CategoryData {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int      @map("category_id")
+
+  @@index([categoryId])
+}

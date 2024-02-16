@@ -120,8 +120,7 @@ impl QueryRawConversionExtension for &PrismaValue {
     fn try_as_bson(&self, arg_name: &str) -> crate::Result<Bson> {
         match self {
             PrismaValue::Json(json) => {
-                let json: serde_json::Value = serde_json::from_str(json.as_str())?;
-                let bson = Bson::try_from(json)?;
+                let bson = Bson::try_from(json.try_as_value()?.into_owned())?;
 
                 Ok(bson)
             }

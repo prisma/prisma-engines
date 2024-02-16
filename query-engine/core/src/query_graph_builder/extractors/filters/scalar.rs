@@ -569,15 +569,15 @@ where
         ConditionValue::Value(value) => match value {
             PrismaValue::Enum(e) => match e.as_str() {
                 json_null::DB_NULL => filter_fn(PrismaValue::Null.into(), json_path),
-                json_null::JSON_NULL => filter_fn(PrismaValue::Json("null".to_owned()).into(), json_path),
+                json_null::JSON_NULL => filter_fn(PrismaValue::new_json("null").into(), json_path),
 
                 json_null::ANY_NULL if reverse => Filter::And(vec![
-                    filter_fn(PrismaValue::Json("null".to_owned()).into(), json_path.clone()),
+                    filter_fn(PrismaValue::new_json("null").into(), json_path.clone()),
                     filter_fn(PrismaValue::Null.into(), json_path),
                 ]),
 
                 json_null::ANY_NULL => Filter::Or(vec![
-                    filter_fn(PrismaValue::Json("null".to_owned()).into(), json_path.clone()),
+                    filter_fn(PrismaValue::new_json("null").into(), json_path.clone()),
                     filter_fn(PrismaValue::Null.into(), json_path),
                 ]),
 
@@ -613,7 +613,7 @@ fn parse_json_path(input: ParsedInputValue<'_>) -> QueryGraphBuilderResult<JsonF
 
 fn coerce_json_null(value: ConditionValue) -> ConditionValue {
     match value {
-        ConditionValue::Value(PrismaValue::Null) => ConditionValue::value(PrismaValue::Json("null".to_owned())),
+        ConditionValue::Value(PrismaValue::Null) => ConditionValue::value(PrismaValue::new_json("null")),
         _ => value,
     }
 }

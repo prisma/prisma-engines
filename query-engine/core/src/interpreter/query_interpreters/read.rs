@@ -63,11 +63,9 @@ fn read_one(
 
                 Ok(RecordSelectionWithRelations {
                     name: query.name,
-                    model,
-                    fields: query.selection_order,
-                    virtuals: query.selected_fields.virtuals_owned(),
+                    fields: query.selected_fields.into_virtuals_last(),
+                    selection_order: query.selection_order,
                     records,
-                    nested: build_relation_record_selection(query.selected_fields.relations()),
                 }
                 .into())
             }
@@ -176,31 +174,15 @@ fn read_many_by_joins(
         } else {
             Ok(RecordSelectionWithRelations {
                 name: query.name,
-                fields: query.selection_order,
-                virtuals: query.selected_fields.virtuals_owned(),
+                fields: query.selected_fields.into_virtuals_last(),
+                selection_order: query.selection_order,
                 records: result,
-                nested: build_relation_record_selection(query.selected_fields.relations()),
-                model: query.model,
             }
             .into())
         }
     };
 
     fut.boxed()
-}
-
-fn build_relation_record_selection<'a>(
-    selections: impl Iterator<Item = &'a RelationSelection>,
-) -> Vec<RelationRecordSelection> {
-    selections
-        .map(|rq| RelationRecordSelection {
-            name: rq.field.name().to_owned(),
-            fields: rq.result_fields.clone(),
-            virtuals: rq.virtuals().cloned().collect(),
-            model: rq.field.related_model(),
-            nested: build_relation_record_selection(rq.relations()),
-        })
-        .collect()
 }
 
 /// Queries related records for a set of parent IDs.

@@ -1,13 +1,17 @@
 use super::*;
+
+use self::json_ext::{JsonValue, JsonValueExt};
 use crate::{
-    constants::custom_types,
-    protocol::EngineProtocol,
-    result_ast::{RecordSelectionWithRelations, RelationRecordSelection},
-    CoreError, QueryResult, RecordAggregations, RecordSelection,
+    constants::custom_types, protocol::EngineProtocol, result_ast::RecordSelectionWithRelations, CoreError,
+    QueryResult, RecordAggregations, RecordSelection,
 };
+
 use connector::AggregationResult;
 use indexmap::IndexMap;
-use query_structure::{CompositeFieldRef, Field, Model, PrismaValue, SelectionResult, VirtualSelection};
+use query_structure::{
+    CompositeFieldRef, Field, GroupedSelectedField, PrismaValue, RelationSelection, SelectionResult, TypeIdentifier,
+    VirtualSelection,
+};
 use schema::{
     constants::{aggregations::*, output_fields::*},
     *,
@@ -44,6 +48,7 @@ pub(crate) fn serialize_internal(
     is_list: bool,
     query_schema: &QuerySchema,
 ) -> crate::Result<CheckedItemsWithParents> {
+    // dbg!(&result);
     match result {
         QueryResult::RecordSelection(Some(rs)) => {
             serialize_record_selection(*rs, field, field.field_type(), is_list, query_schema)
@@ -307,35 +312,13 @@ fn finalize_objects(
     }
 }
 
-enum SerializedFieldWithRelations<'a, 'b> {
-    Model(Field, &'a OutputField<'b>),
-    VirtualsGroup(&'a str, Vec<&'a VirtualSelection>),
-}
-
-impl<'a, 'b> SerializedFieldWithRelations<'a, 'b> {
-    fn name(&self) -> &str {
-        match self {
-            Self::Model(f, _) => f.name(),
-            Self::VirtualsGroup(name, _) => name,
-        }
-    }
-}
-
-// TODO: Handle errors properly
 fn serialize_objects_with_relation(
     result: RecordSelectionWithRelations,
     typ: &ObjectType<'_>,
 ) -> crate::Result<UncheckedItemsWithParents> {
     let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.records.records.len());
 
-    let nested = result.nested;
-
-    let fields =
-        collect_serialized_fields_with_relations(typ, &result.model, &result.virtuals, &result.records.field_names);
-
-    // Hack: we convert it to a hashset to support contains with &str as input
-    // because Vec<String>::contains(&str) doesn't work and we don't want to allocate a string record value
-    let selected_db_field_names: HashSet<String> = result.fields.clone().into_iter().collect();
+    let result_fields: HashSet<String> = result.selection_order.clone().into_iter().collect();
 
     for record in result.records.records.into_iter() {
         if !object_mapping.contains_key(&record.parent_id) {
@@ -345,168 +328,86 @@ fn serialize_objects_with_relation(
         let values = record.values;
         let mut object = HashMap::with_capacity(values.len());
 
-        for (val, field) in values.into_iter().zip(fields.iter()) {
-            // Skip fields that aren't part of the selection set
-            if !selected_db_field_names.contains(field.name()) {
+        for (val, field) in values.into_iter().zip(result.fields.grouped_selections()) {
+            if !result_fields.contains(field.prisma_name()) {
                 continue;
             }
 
             match field {
-                SerializedFieldWithRelations::Model(Field::Scalar(_), out_field)
-                    if !out_field.field_type().is_object() =>
-                {
-                    object.insert(field.name().to_owned(), serialize_scalar(out_field, val)?);
+                GroupedSelectedField::Scalar(sf) => {
+                    let out_field = typ.find_field(sf.name()).unwrap();
+
+                    object.insert(sf.name().to_owned(), serialize_scalar(out_field, val)?);
                 }
 
-                SerializedFieldWithRelations::Model(Field::Relation(_), out_field)
-                    if out_field.field_type().is_list() =>
-                {
-                    let inner_typ = out_field.field_type.as_object_type().unwrap();
-                    let rrs = nested.iter().find(|rrs| rrs.name == field.name()).unwrap();
+                GroupedSelectedField::Relation(rs) if rs.field.is_list() => {
+                    let mut values = val.into_json().unwrap().try_into_value().unwrap().into_list().unwrap();
 
-                    let items = val
-                        .into_list()
-                        .unwrap()
-                        .into_iter()
-                        .map(|value| serialize_relation_selection(rrs, value, inner_typ))
-                        .collect::<crate::Result<Vec<_>>>()?;
+                    for val in values.iter_mut() {
+                        serialize_relation_selection(rs, val)?;
+                    }
 
-                    object.insert(field.name().to_owned(), Item::list(items));
+                    object.insert(rs.field.name().to_owned(), Item::Json(serde_json::Value::Array(values)));
                 }
 
-                SerializedFieldWithRelations::Model(Field::Relation(_), out_field) => {
-                    let inner_typ = out_field.field_type.as_object_type().unwrap();
-                    let rrs = nested.iter().find(|rrs| rrs.name == field.name()).unwrap();
+                GroupedSelectedField::Relation(rs) => {
+                    if val.is_null() {
+                        object.insert(rs.field.name().to_owned(), Item::Json(serde_json::Value::Null));
+                    } else {
+                        let mut val = val.into_json().unwrap().try_into_value().unwrap();
 
-                    object.insert(
-                        field.name().to_owned(),
-                        serialize_relation_selection(rrs, val, inner_typ)?,
-                    );
+                        serialize_relation_selection(rs, &mut val)?;
+
+                        object.insert(rs.field.name().to_owned(), Item::Json(val));
+                    }
                 }
 
-                SerializedFieldWithRelations::VirtualsGroup(group_name, virtuals) => {
-                    object.insert(group_name.to_string(), serialize_virtuals_group(val, virtuals)?);
+                GroupedSelectedField::Virtual(out_field) => {
+                    object.insert(out_field.serialized_name().0.to_owned(), Item::Value(val));
                 }
-
-                _ => panic!("unexpected field"),
             }
         }
 
-        let map = reorder_object_with_selection_order(&result.fields, object);
+        // TODO: Remove this once we don't mess up virtuals ordering in the query builder.
+        let map = reorder_object_with_selection_order(&result.selection_order, object);
 
-        let result = Item::Map(map);
-
-        object_mapping.get_mut(&record.parent_id).unwrap().push(result);
+        object_mapping.get_mut(&record.parent_id).unwrap().push(Item::Map(map));
     }
 
     Ok(object_mapping)
 }
 
-fn serialize_relation_selection(
-    rrs: &RelationRecordSelection,
-    value: PrismaValue,
-    // parent_id: Option<SelectionResult>,
-    typ: &ObjectType<'_>,
-) -> crate::Result<Item> {
+fn serialize_relation_selection(rs: &RelationSelection, value: &mut serde_json::Value) -> crate::Result<()> {
     if value.is_null() {
-        return Ok(Item::Value(PrismaValue::Null));
+        return Ok(());
     }
 
-    let mut map = Map::new();
+    let value_obj = value.as_object_mut().unwrap();
 
-    // TODO: better handle errors
-    let mut value_obj: HashMap<String, PrismaValue> = HashMap::from_iter(value.into_object().unwrap());
-
-    let fields = collect_serialized_fields_with_relations(typ, &rrs.model, &rrs.virtuals, &rrs.fields);
-
-    for field in fields {
-        let value = value_obj.remove(field.name()).unwrap();
+    for field in rs.grouped_fields_to_serialize() {
+        let value = value_obj.get_mut(field.prisma_name()).unwrap();
 
         match field {
-            SerializedFieldWithRelations::Model(Field::Scalar(_), out_field) if !out_field.field_type().is_object() => {
-                map.insert(field.name().to_owned(), serialize_scalar(out_field, value)?);
+            GroupedSelectedField::Scalar(sf) => {
+                *value = discriminate_json_value(value.clone(), sf.type_identifier());
             }
 
-            SerializedFieldWithRelations::Model(Field::Relation(_), out_field) if out_field.field_type().is_list() => {
-                let inner_typ = out_field.field_type.as_object_type().unwrap();
-                let inner_rrs = rrs.nested.iter().find(|rrs| rrs.name == field.name()).unwrap();
+            GroupedSelectedField::Relation(rs) if rs.field.is_list() => {
+                let values = value.as_list_mut().unwrap();
 
-                let items = value
-                    .into_list()
-                    .unwrap()
-                    .into_iter()
-                    .map(|value| serialize_relation_selection(inner_rrs, value, inner_typ))
-                    .collect::<crate::Result<Vec<_>>>()?;
-
-                map.insert(field.name().to_owned(), Item::list(items));
+                for value in values {
+                    serialize_relation_selection(rs, value)?;
+                }
             }
 
-            SerializedFieldWithRelations::Model(Field::Relation(_), out_field) => {
-                let inner_typ = out_field.field_type.as_object_type().unwrap();
-                let inner_rrs = rrs.nested.iter().find(|rrs| rrs.name == field.name()).unwrap();
+            GroupedSelectedField::Relation(rs) => serialize_relation_selection(rs, value)?,
 
-                map.insert(
-                    field.name().to_owned(),
-                    serialize_relation_selection(inner_rrs, value, inner_typ)?,
-                );
-            }
-
-            SerializedFieldWithRelations::VirtualsGroup(group_name, virtuals) => {
-                map.insert(group_name.to_string(), serialize_virtuals_group(value, &virtuals)?);
-            }
-
-            _ => (),
+            // Nested virtual fields are already handled by the connector.
+            GroupedSelectedField::Virtual(_) => (),
         }
     }
 
-    Ok(Item::Map(map))
-}
-
-fn collect_serialized_fields_with_relations<'a, 'b>(
-    object_type: &'a ObjectType<'b>,
-    model: &Model,
-    virtuals: &'a [VirtualSelection],
-    db_field_names: &'a [String],
-) -> Vec<SerializedFieldWithRelations<'a, 'b>> {
-    db_field_names
-        .iter()
-        .map(|name| {
-            model
-                .fields()
-                .all()
-                .find(|field| field.name() == name)
-                .and_then(|field| {
-                    object_type
-                        .find_field(field.name())
-                        .map(|out_field| SerializedFieldWithRelations::Model(field, out_field))
-                })
-                .unwrap_or_else(|| {
-                    let matching_virtuals = virtuals.iter().filter(|vs| vs.serialized_name().0 == name).collect();
-                    SerializedFieldWithRelations::VirtualsGroup(name.as_str(), matching_virtuals)
-                })
-        })
-        .collect()
-}
-
-fn serialize_virtuals_group(obj_value: PrismaValue, virtuals: &[&VirtualSelection]) -> crate::Result<Item> {
-    let mut db_object: HashMap<String, PrismaValue> = HashMap::from_iter(obj_value.into_object().unwrap());
-    let mut out_object = Map::new();
-
-    // We have to reorder the object fields according to selection even if the query
-    // builder respects the initial order because JSONB does not preserve order.
-    for vs in virtuals {
-        let (group_name, nested_name) = vs.serialized_name();
-
-        let value = db_object.remove(nested_name).ok_or_else(|| {
-            CoreError::SerializationError(format!(
-                "Expected virtual field {nested_name} not found in {group_name} object"
-            ))
-        })?;
-
-        out_object.insert(nested_name.into(), Item::Value(vs.coerce_value(value)?));
-    }
-
-    Ok(Item::Map(out_object))
+    Ok(())
 }
 
 enum SerializedField<'a, 'b> {
@@ -871,6 +772,21 @@ fn convert_prisma_value_json_protocol(
     };
 
     Ok(item_value)
+}
+
+fn discriminate_json_value(value: JsonValue, typ: TypeIdentifier) -> JsonValue {
+    if crate::executor::get_engine_protocol().is_graphql() {
+        return value;
+    }
+
+    match (typ, value) {
+        (TypeIdentifier::Json, x) => custom_types::make_json_object(custom_types::JSON, x),
+        (TypeIdentifier::DateTime, x) => custom_types::make_json_object(custom_types::DATETIME, x),
+        (TypeIdentifier::Decimal, x) => custom_types::make_json_object(custom_types::DECIMAL, x),
+        (TypeIdentifier::BigInt, x) => custom_types::make_json_object(custom_types::BIGINT, x),
+        (TypeIdentifier::Bytes, x) => custom_types::make_json_object(custom_types::BYTES, x),
+        (_, x) => x,
+    }
 }
 
 fn convert_enum(value: PrismaValue, dbt: &DatabaseEnumType) -> crate::Result<Item> {

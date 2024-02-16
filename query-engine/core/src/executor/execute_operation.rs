@@ -89,7 +89,9 @@ pub async fn execute_single_self_contained<C: Connector + Send + Sync>(
         user_facing = true,
         "db.type" = connector.name()
     );
+    let now = std::time::Instant::now();
     let conn = connector.get_connection().instrument(conn_span).await?;
+    println!("get connection: {:.2?}", now.elapsed());
 
     execute_self_contained(
         conn,

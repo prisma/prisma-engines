@@ -65,15 +65,15 @@ fn defaults_match(cols: MigrationPair<TableColumnWalker<'_>>, flavour: &dyn SqlF
         (
             Some(DefaultKind::Value(PrismaValue::Json(prev_json))),
             Some(DefaultKind::Value(PrismaValue::Json(next_json))),
-        )
-        | (
-            Some(DefaultKind::Value(PrismaValue::String(prev_json))),
-            Some(DefaultKind::Value(PrismaValue::Json(next_json))),
-        )
-        | (
+        ) => json_defaults_match(&prev_json.as_str(), &next_json.as_str()) && names_match,
+        (
             Some(DefaultKind::Value(PrismaValue::Json(prev_json))),
             Some(DefaultKind::Value(PrismaValue::String(next_json))),
-        ) => json_defaults_match(prev_json, next_json) && names_match,
+        ) => json_defaults_match(&prev_json.as_str(), next_json) && names_match,
+        (
+            Some(DefaultKind::Value(PrismaValue::String(prev_json))),
+            Some(DefaultKind::Value(PrismaValue::Json(next_json))),
+        ) => json_defaults_match(prev_json, &next_json.as_str()) && names_match,
 
         // Avoid naive string comparisons for datetime defaults.
         (Some(DefaultKind::Value(PrismaValue::DateTime(_))), Some(_))
@@ -130,7 +130,7 @@ fn list_defaults_match(prev: &[PrismaValue], next: &[PrismaValue], flavour: &dyn
         .all(|(prev_value, next_value)| match (prev_value, next_value) {
             (PrismaValue::String(string_val), PrismaValue::Json(json_val))
             | (PrismaValue::Json(json_val), PrismaValue::String(string_val)) => {
-                json_defaults_match(string_val, json_val)
+                json_defaults_match(string_val, &json_val.as_str())
             }
 
             (PrismaValue::DateTime(_), _) | (_, PrismaValue::DateTime(_)) => true,

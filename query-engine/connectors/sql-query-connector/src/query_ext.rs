@@ -19,12 +19,7 @@ use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 #[async_trait]
 impl<Q: Queryable + ?Sized> QueryExt for Q {
-    async fn filter(
-        &self,
-        q: Query<'_>,
-        idents: &[ColumnMetadata<'_>],
-        ctx: &Context<'_>,
-    ) -> crate::Result<Vec<SqlRow>> {
+    async fn filter(&self, q: Query<'_>, idents: &[ColumnMetadata], ctx: &Context<'_>) -> crate::Result<Vec<SqlRow>> {
         let span = info_span!("filter read query");
 
         let otel_ctx = span.context();
@@ -40,13 +35,18 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
             (q, _) => q,
         };
 
+        let now = std::time::Instant::now();
         let result_set = self.query(q).instrument(span).await?;
+        println!("query: {:.2?}", now.elapsed());
 
-        let mut sql_rows = Vec::new();
+        let mut sql_rows = Vec::with_capacity(result_set.len());
 
+        let now = std::time::Instant::now();
         for row in result_set {
             sql_rows.push(row.to_sql_row(idents)?);
         }
+
+        println!("to_row: {:.2?}", now.elapsed());
 
         Ok(sql_rows)
     }
@@ -98,7 +98,7 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         Ok(changes as usize)
     }
 
-    async fn find(&self, q: Select<'_>, meta: &[ColumnMetadata<'_>], ctx: &Context<'_>) -> crate::Result<SqlRow> {
+    async fn find(&self, q: Select<'_>, meta: &[ColumnMetadata], ctx: &Context<'_>) -> crate::Result<SqlRow> {
         self.filter(q.limit(1).into(), meta, ctx)
             .await?
             .into_iter()
@@ -178,12 +178,7 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
 #[async_trait]
 pub(crate) trait QueryExt {
     /// Filter and map the resulting types with the given identifiers.
-    async fn filter(
-        &self,
-        q: Query<'_>,
-        idents: &[ColumnMetadata<'_>],
-        ctx: &Context<'_>,
-    ) -> crate::Result<Vec<SqlRow>>;
+    async fn filter(&self, q: Query<'_>, idents: &[ColumnMetadata], ctx: &Context<'_>) -> crate::Result<Vec<SqlRow>>;
 
     /// Execute a singular SQL query in the database, returning an arbitrary
     /// JSON `Value` as a result.
@@ -201,7 +196,7 @@ pub(crate) trait QueryExt {
     ) -> std::result::Result<usize, crate::error::RawError>;
 
     /// Select one row from the database.
-    async fn find(&self, q: Select<'_>, meta: &[ColumnMetadata<'_>], ctx: &Context<'_>) -> crate::Result<SqlRow>;
+    async fn find(&self, q: Select<'_>, meta: &[ColumnMetadata], ctx: &Context<'_>) -> crate::Result<SqlRow>;
 
     /// Process the record filter and either return directly with precomputed values,
     /// or fetch IDs from the database.

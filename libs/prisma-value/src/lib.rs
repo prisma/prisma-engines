@@ -7,6 +7,7 @@ use chrono::prelude::*;
 use serde::de::Unexpected;
 use serde::ser::SerializeMap;
 use serde::{ser::Serializer, Deserialize, Deserializer, Serialize};
+use std::borrow::Cow;
 use std::{convert::TryFrom, fmt, str::FromStr};
 use uuid::Uuid;
 
@@ -23,7 +24,7 @@ pub enum PrismaValue {
     Int(i64),
     Uuid(Uuid),
     List(PrismaListValue),
-    Json(String),
+    Json(PrismaValueJson),
 
     /// A collections of key-value pairs constituting an object.
     #[serde(serialize_with = "serialize_object")]
@@ -45,6 +46,93 @@ pub enum PrismaValue {
     Bytes(Vec<u8>),
 }
 
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum PrismaValueJson {
+    Serialized(String),
+    Deserialized(Box<serde_json::Value>),
+}
+
+impl std::fmt::Display for PrismaValueJson {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            PrismaValueJson::Serialized(s) => write!(f, "{}", s),
+            PrismaValueJson::Deserialized(v) => write!(f, "{}", v),
+        }
+    }
+}
+
+impl PrismaValueJson {
+    pub fn as_str(&self) -> Cow<'_, str> {
+        match self {
+            PrismaValueJson::Serialized(s) => Cow::Borrowed(s),
+            PrismaValueJson::Deserialized(v) => Cow::Owned(v.to_string()),
+        }
+    }
+
+    pub fn try_as_value(&self) -> serde_json::Result<Cow<'_, serde_json::Value>> {
+        match self {
+            PrismaValueJson::Serialized(s) => serde_json::from_str(s).map(Cow::Owned),
+            PrismaValueJson::Deserialized(v) => Ok(Cow::Borrowed(v)),
+        }
+    }
+
+    pub fn try_into_value(self) -> serde_json::Result<serde_json::Value> {
+        match self {
+            PrismaValueJson::Serialized(s) => serde_json::from_str(&s),
+            PrismaValueJson::Deserialized(v) => Ok(*v),
+        }
+    }
+}
+
+impl From<String> for PrismaValueJson {
+    fn from(value: String) -> Self {
+        PrismaValueJson::Serialized(value)
+    }
+}
+
+impl From<&String> for PrismaValueJson {
+    fn from(value: &String) -> Self {
+        PrismaValueJson::Serialized(value.to_owned())
+    }
+}
+
+impl From<&str> for PrismaValueJson {
+    fn from(value: &str) -> Self {
+        PrismaValueJson::Serialized(value.to_owned())
+    }
+}
+
+impl From<Cow<'_, str>> for PrismaValueJson {
+    fn from(value: Cow<'_, str>) -> Self {
+        PrismaValueJson::Serialized(value.into_owned())
+    }
+}
+
+impl From<serde_json::Value> for PrismaValueJson {
+    fn from(value: serde_json::Value) -> Self {
+        PrismaValueJson::Deserialized(Box::new(value))
+    }
+}
+
+impl PartialOrd for PrismaValueJson {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for PrismaValueJson {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.as_str().cmp(&other.as_str())
+    }
+}
+
+impl std::hash::Hash for PrismaValueJson {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.as_str().hash(state)
+    }
+}
+
 /// Stringify a date to the following format
 /// 1999-05-01T00:00:00.000Z
 pub fn stringify_datetime(datetime: &DateTime<FixedOffset>) -> String {
@@ -59,6 +147,10 @@ pub fn stringify_datetime(datetime: &DateTime<FixedOffset>) -> String {
 /// then returns a new DateTime with a parsed FixedOffset.
 pub fn parse_datetime(datetime: &str) -> chrono::ParseResult<DateTime<FixedOffset>> {
     DateTime::parse_from_rfc3339(datetime)
+}
+
+pub fn stringify_decimal(decimal: &BigDecimal) -> f64 {
+    decimal.to_string().parse::<f64>().unwrap()
 }
 
 pub fn encode_bytes(bytes: &[u8]) -> String {
@@ -132,7 +224,7 @@ impl TryFrom<serde_json::Value> for PrismaValue {
                     decode_bytes(value).map(PrismaValue::Bytes)
                 }
 
-                _ => Ok(PrismaValue::Json(serde_json::to_string(&obj).unwrap())),
+                _ => Ok(PrismaValue::new_json(serde_json::Value::Object(obj))),
             },
         }
     }
@@ -170,7 +262,7 @@ fn serialize_decimal<S>(decimal: &BigDecimal, serializer: S) -> Result<S::Ok, S:
 where
     S: Serializer,
 {
-    decimal.to_string().parse::<f64>().unwrap().serialize(serializer)
+    stringify_decimal(decimal).serialize(serializer)
 }
 
 fn deserialize_decimal<'de, D>(deserializer: D) -> Result<BigDecimal, D::Error>
@@ -276,6 +368,13 @@ impl PrismaValue {
         }
     }
 
+    pub fn into_json(self) -> Option<PrismaValueJson> {
+        match self {
+            PrismaValue::Json(j) => Some(j),
+            _ => None,
+        }
+    }
+
     pub fn into_list(self) -> Option<PrismaListValue> {
         match self {
             PrismaValue::List(l) => Some(l),
@@ -298,18 +397,14 @@ impl PrismaValue {
         PrismaValue::DateTime(parse_datetime(datetime).unwrap())
     }
 
+    pub fn new_json(json: impl Into<PrismaValueJson>) -> PrismaValue {
+        PrismaValue::Json(json.into())
+    }
+
     pub fn as_boolean(&self) -> Option<&bool> {
         match self {
             PrismaValue::Boolean(bool) => Some(bool),
             _ => None,
-        }
-    }
-
-    pub fn as_json(&self) -> Option<&String> {
-        if let Self::Json(v) = self {
-            Some(v)
-        } else {
-            None
         }
     }
 }

@@ -11,7 +11,6 @@ use psl::builtin_connectors::MongoDbType;
 use query_structure::{
     CompositeFieldRef, Field, PrismaValue, RelationFieldRef, ScalarFieldRef, SelectedField, TypeIdentifier,
 };
-use serde_json::Value;
 use std::{convert::TryFrom, fmt::Display};
 
 /// Transforms a `PrismaValue` of a specific selected field into the BSON mapping as prescribed by
@@ -190,7 +189,7 @@ impl IntoBson for (&MongoDbType, PrismaValue) {
             }),
 
             (MongoDbType::Json, PrismaValue::Json(json)) => {
-                let val: Value = serde_json::from_str(&json)?;
+                let val = json.try_as_value()?.into_owned();
 
                 Bson::try_from(val).map_err(|_| MongoError::ConversionError {
                     from: "Stringified JSON".to_owned(),
@@ -259,7 +258,8 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
 
             // Json
             (TypeIdentifier::Json, PrismaValue::Json(json)) => {
-                let val: Value = serde_json::from_str(&json)?;
+                let val = json.try_as_value()?.into_owned();
+
                 Bson::try_from(val).map_err(|_| MongoError::ConversionError {
                     from: "Stringified JSON".to_owned(),
                     to: "Mongo BSON (extJSON)".to_owned(),
@@ -375,7 +375,7 @@ fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<Prism
         (TypeIdentifier::Bytes, Bson::ObjectId(oid)) => PrismaValue::Bytes(oid.bytes().to_vec()),
 
         // Json
-        (TypeIdentifier::Json, bson) => PrismaValue::Json(serde_json::to_string(&bson.into_relaxed_extjson())?),
+        (TypeIdentifier::Json, bson) => PrismaValue::new_json(bson.into_relaxed_extjson()),
 
         (ident, bson) => {
             return Err(MongoError::ConversionError {

@@ -819,9 +819,11 @@ fn render_default<'a>(default: &'a DefaultValue, full_data_type: &str) -> Cow<'a
         match value {
             PrismaValue::String(val) | PrismaValue::Enum(val) => format!("'{}'", escape_string_literal(val)).into(),
             PrismaValue::Json(json_value) => {
+                let json_value = json_value.as_str();
+
                 let mut out = String::with_capacity(json_value.len() + 2);
                 out.push('\'');
-                out.push_str(&escape_string_literal(json_value));
+                out.push_str(&escape_string_literal(&json_value));
                 out.push('\'');
                 Cow::Owned(out)
             }
