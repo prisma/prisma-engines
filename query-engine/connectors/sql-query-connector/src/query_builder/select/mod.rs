@@ -11,7 +11,7 @@ use query_structure::*;
 use crate::{
     context::Context,
     filter::alias::Alias,
-    model_extensions::{AsColumns, AsTable, ColumnIterator, RelationFieldExt},
+    model_extensions::{AsColumn, AsColumns, AsTable, ColumnIterator, RelationFieldExt},
     ordering::OrderByBuilder,
     sql_trace::SqlTraceComment,
 };
@@ -569,13 +569,33 @@ fn order_by_selection(rs: &RelationSelection) -> FieldSelection {
         .order_by
         .iter()
         .flat_map(|order_by| match order_by {
-            OrderBy::Scalar(x) if x.path.is_empty() => vec![x.field.clone()],
+            OrderBy::Scalar(x) => {
+                // If the path is empty, the order by is done on the field itself in the outer select.
+                if x.path.is_empty() {
+                    vec![x.field.clone()]
+                // If there are relations to traverse, select the linking fields of the first hop so that the outer select can perform a join to traverse the first relation.
+                // This is necessary because the order by is done on a different join. The following hops are handled by the order by builder.
+                } else {
+                    first_hop_linking_fields(&x.path)
+                }
+            }
             OrderBy::Relevance(x) => x.fields.clone(),
-            _ => Vec::new(),
+            // Select the linking fields of the first hop so that the outer select can perform a join to traverse the relation.
+            // This is necessary because the order by is done on a different join. The following hops are handled by the order by builder.
+            OrderBy::ToManyAggregation(x) => first_hop_linking_fields(x.intermediary_hops()),
+            OrderBy::ScalarAggregation(x) => vec![x.field.clone()],
         })
         .collect();
 
     FieldSelection::from(selection)
+}
+
+/// Returns the linking fields of the first hop in an order by path.
+fn first_hop_linking_fields(hops: &[OrderByHop]) -> Vec<ScalarFieldRef> {
+    hops.first()
+        .and_then(|hop| hop.as_relation_hop())
+        .map(|rf| rf.linking_fields().as_scalar_fields().unwrap())
+        .unwrap_or_default()
 }
 
 fn relation_selection(rs: &RelationSelection) -> FieldSelection {
@@ -654,6 +674,19 @@ fn json_agg() -> Function<'static> {
         Expression::from(Value::json(empty_json_array()).raw()),
     ])
     .alias(JSON_AGG_IDENT)
+}
+
+pub(crate) fn aliased_scalar_column(sf: &ScalarField, parent_alias: Alias, ctx: &Context<'_>) -> Column<'static> {
+    let col = sf
+        .as_column(ctx)
+        .table(parent_alias.to_table_string())
+        .set_is_selected(true);
+
+    if sf.name() != sf.db_name() {
+        col.alias(sf.name().to_owned())
+    } else {
+        col
+    }
 }
 
 #[inline]

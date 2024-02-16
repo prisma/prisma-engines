@@ -26,9 +26,7 @@ impl<C> SqlConnection<C>
 where
     C: TransactionCapable + Send + Sync + 'static,
 {
-    pub fn new(inner: C, connection_info: &ConnectionInfo, features: psl::PreviewFeatures) -> Self {
-        let connection_info = connection_info.clone();
-
+    pub fn new(inner: C, connection_info: ConnectionInfo, features: psl::PreviewFeatures) -> Self {
         Self {
             inner,
             connection_info,
@@ -69,6 +67,10 @@ where
             Ok(Box::new(SqlConnectorTransaction::new(tx, connection_info, features)) as Box<dyn Transaction>)
         })
         .await
+    }
+
+    async fn version(&self) -> Option<String> {
+        self.connection_info.version().map(|v| v.to_string())
     }
 
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {

@@ -1,6 +1,6 @@
 use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
-use psl::datamodel_connector::ConnectorCapability;
+use psl::datamodel_connector::{ConnectorCapability, JoinStrategySupport};
 use query_structure::{native_distinct_compatible_with_order_by, prelude::*, RelationLoadStrategy};
 use schema::{
     constants::{aggregations::*, args},
@@ -258,23 +258,51 @@ pub(crate) fn get_relation_load_strategy(
     order_by: &[OrderBy],
     nested_queries: &[ReadQuery],
     query_schema: &QuerySchema,
-) -> RelationLoadStrategy {
-    if requested_strategy == Some(RelationLoadStrategy::Query) || !query_schema.can_resolve_relation_with_joins() {
-        return RelationLoadStrategy::Query;
+) -> QueryGraphBuilderResult<RelationLoadStrategy> {
+    match query_schema.join_strategy_support() {
+        // Connector and database version supports the `Join` strategy...
+        JoinStrategySupport::Yes => match requested_strategy {
+            // But incoming query cannot be resolved with joins.
+            _ if !query_can_be_resolved_with_joins(query_schema, cursor, distinct, order_by, nested_queries) => {
+                // So we fallback to the `Query` one.
+                Ok(RelationLoadStrategy::Query)
+            }
+            // But requested strategy is `Query`.
+            Some(RelationLoadStrategy::Query) => Ok(RelationLoadStrategy::Query),
+            // And requested strategy is `Join` or there's none selected, in which case the default is still `Join`.
+            Some(RelationLoadStrategy::Join) | None => Ok(RelationLoadStrategy::Join),
+        },
+        // Connector supports `Join` strategy but database version does not...
+        JoinStrategySupport::UnsupportedDbVersion => match requested_strategy {
+            // So we error out if the requested strategy is `Join`.
+            Some(RelationLoadStrategy::Join) => Err(QueryGraphBuilderError::InputError(
+                "`relationLoadStrategy: join` is not available for MySQL < 8.0.14 and MariaDB.".into(),
+            )),
+            // Otherwise we fallback to the `Query` one. (This makes the default relation load strategy `Query` for database versions that do not support joins.)
+            Some(RelationLoadStrategy::Query) | None => Ok(RelationLoadStrategy::Query),
+        },
+        // Connectors does not support the join strategy so we always fallback to the `Query` one.
+        JoinStrategySupport::No => Ok(RelationLoadStrategy::Query),
+        JoinStrategySupport::UnknownYet => {
+            unreachable!("Connector should have resolved the join strategy support by now.")
+        }
     }
+}
 
+fn query_can_be_resolved_with_joins(
+    query_schema: &QuerySchema,
+    cursor: Option<&SelectionResult>,
+    distinct: Option<&FieldSelection>,
+    order_by: &[OrderBy],
+    nested_queries: &[ReadQuery],
+) -> bool {
     let can_distinct_in_db_with_joins = query_schema.has_capability(ConnectorCapability::DistinctOn)
         && native_distinct_compatible_with_order_by(distinct, order_by);
 
-    if cursor.is_none()
+    cursor.is_none()
         && (distinct.is_none() || can_distinct_in_db_with_joins)
         && !nested_queries.iter().any(|q| match q {
             ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.requires_inmemory_distinct_with_joins(),
             _ => false,
         })
-    {
-        RelationLoadStrategy::Join
-    } else {
-        RelationLoadStrategy::Query
-    }
 }

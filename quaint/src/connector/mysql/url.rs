@@ -13,6 +13,7 @@ use url::{Host, Url};
 #[derive(Debug, Clone)]
 pub struct MysqlUrl {
     url: Url,
+    version: Option<String>,
     pub(crate) query_params: MysqlUrlQueryParams,
 }
 
@@ -22,7 +23,15 @@ impl MysqlUrl {
     pub fn new(url: Url) -> Result<Self, Error> {
         let query_params = Self::parse_query_params(&url)?;
 
-        Ok(Self { url, query_params })
+        Ok(Self {
+            url,
+            query_params,
+            version: None,
+        })
+    }
+
+    pub fn set_version(&mut self, version: Option<String>) {
+        self.version = version;
     }
 
     /// The bare `Url` to the database.
@@ -297,6 +306,10 @@ impl MysqlUrl {
     #[cfg(feature = "pooled")]
     pub(crate) fn connection_limit(&self) -> Option<usize> {
         self.query_params.connection_limit
+    }
+
+    pub fn version(&self) -> Option<&str> {
+        self.version.as_deref()
     }
 }
 

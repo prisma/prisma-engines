@@ -20,6 +20,7 @@ use query_structure::{ast, Field as ModelField, Model, RelationFieldRef, TypeIde
 
 pub fn build(schema: Arc<psl::ValidatedSchema>, enable_raw_queries: bool) -> QuerySchema {
     let preview_features = schema.configuration.preview_features();
+
     build_with_features(schema, preview_features, enable_raw_queries)
 }
 
@@ -30,5 +31,6 @@ pub fn build_with_features(
 ) -> QuerySchema {
     let connector = schema.connector;
     let internal_data_model = query_structure::convert(schema);
+
     QuerySchema::new(enable_raw_queries, connector, preview_features, internal_data_model)
 }

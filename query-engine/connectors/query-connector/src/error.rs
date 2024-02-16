@@ -287,6 +287,9 @@ pub enum ErrorKind {
 
     #[error("Too many DB connections opened: {}", _0)]
     TooManyConnections(Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("Failed to parse database version: {}. Reason: {}", version, reason)]
+    UnexpectedDatabaseVersion { version: String, reason: String },
 }
 
 impl From<DomainError> for ConnectorError {

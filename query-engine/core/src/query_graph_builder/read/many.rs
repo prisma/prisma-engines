@@ -44,7 +44,7 @@ fn find_many_with_options(
         &args.order_by,
         &nested,
         query_schema,
-    );
+    )?;
 
     Ok(ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
         name,

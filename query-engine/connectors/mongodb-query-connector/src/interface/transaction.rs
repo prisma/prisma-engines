@@ -60,6 +60,10 @@ impl<'conn> Transaction for MongoDbTransaction<'conn> {
         Ok(())
     }
 
+    async fn version(&self) -> Option<String> {
+        None
+    }
+
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {
         self
     }
