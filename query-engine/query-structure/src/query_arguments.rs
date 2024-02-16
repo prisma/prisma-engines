@@ -109,6 +109,8 @@ impl QueryArguments {
         has_distinct_feature && self.connector_supports_distinct_on() && self.order_by.is_empty()
     }
 
+    // TODO: separation between `can_distinct_in_db` and `can_distinct_in_db_with_joins` shouldn't
+    // be necessary once nativeDistinct is GA.
     pub fn can_distinct_in_db_with_joins(&self) -> bool {
         self.connector_supports_distinct_on()
             && native_distinct_compatible_with_order_by(self.distinct.as_ref(), &self.order_by)
