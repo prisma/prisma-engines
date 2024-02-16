@@ -192,8 +192,11 @@ async fn get_many_records_joins(
         records.records = records
             .records
             .into_iter()
-            // TODO: we will need a different method once https://github.com/prisma/prisma-engines/pull/4732 lands.
-            .unique_by(|record| record.extract_selection_result(&records.field_names, distinct).unwrap())
+            .unique_by(|record| {
+                record
+                    .extract_selection_result_from_prisma_name(&records.field_names, distinct)
+                    .unwrap()
+            })
             .collect();
     }
 
