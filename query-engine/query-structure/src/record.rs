@@ -99,6 +99,17 @@ impl ManyRecords {
             .collect()
     }
 
+    /// Builds `SelectionResults` from this `ManyRecords` based on the given FieldSelection.
+    pub fn extract_selection_results_from_prisma_name(
+        &self,
+        selections: &FieldSelection,
+    ) -> crate::Result<Vec<SelectionResult>> {
+        self.records
+            .iter()
+            .map(|record| record.extract_selection_result_from_prisma_name(&self.field_names, selections))
+            .collect()
+    }
+
     /// Maps into a Vector of (field_name, value) tuples
     pub fn as_pairs(&self) -> Vec<Vec<(String, PrismaValue)>> {
         self.records
@@ -173,6 +184,22 @@ impl Record {
             .selections()
             .map(|selection| {
                 self.get_field_value(field_names, &selection.db_name())
+                    .and_then(|val| Ok((selection.clone(), selection.coerce_value(val.clone())?)))
+            })
+            .collect::<crate::Result<Vec<_>>>()?;
+
+        Ok(SelectionResult::new(pairs))
+    }
+
+    pub fn extract_selection_result_from_prisma_name(
+        &self,
+        field_names: &[String],
+        extraction_selection: &FieldSelection,
+    ) -> crate::Result<SelectionResult> {
+        let pairs: Vec<_> = extraction_selection
+            .selections()
+            .map(|selection| {
+                self.get_field_value(field_names, &selection.prisma_name())
                     .and_then(|val| Ok((selection.clone(), selection.coerce_value(val.clone())?)))
             })
             .collect::<crate::Result<Vec<_>>>()?;
