@@ -146,17 +146,15 @@ impl OrderByBuilder {
         order_by: &OrderByToManyAggregation,
         ctx: &Context<'_>,
     ) -> (Vec<AliasedJoin>, Column<'static>) {
-        let (last_hop, rest_hops) = order_by
-            .path
-            .split_last()
-            .expect("An order by relation aggregation has to have at least one hop");
+        let intermediary_hops = order_by.intermediary_hops();
+        let aggregation_hop = order_by.aggregation_hop();
 
         // Unwraps are safe because the SQL connector doesn't yet support any other type of orderBy hop but the relation hop.
         let mut joins: Vec<AliasedJoin> = vec![];
 
         let parent_alias = self.parent_alias.clone();
 
-        for (i, hop) in rest_hops.iter().enumerate() {
+        for (i, hop) in intermediary_hops.iter().enumerate() {
             let previous_join = if i > 0 { joins.get(i - 1) } else { None };
 
             let previous_alias = previous_join.map(|j| j.alias.as_str()).or(parent_alias.as_deref());
@@ -174,7 +172,7 @@ impl OrderByBuilder {
 
         // We perform the aggregation on the last join
         let last_aggr_join = compute_aggr_join(
-            last_hop.as_relation_hop().unwrap(),
+            aggregation_hop.as_relation_hop().unwrap(),
             aggregation_type,
             None,
             ORDER_AGGREGATOR_ALIAS,

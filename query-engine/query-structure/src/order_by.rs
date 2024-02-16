@@ -179,6 +179,23 @@ pub struct OrderByToManyAggregation {
     pub sort_aggregation: SortAggregation,
 }
 
+impl OrderByToManyAggregation {
+    pub fn intermediary_hops(&self) -> &[OrderByHop] {
+        let (_, rest) = self
+            .path
+            .split_last()
+            .expect("An order by relation aggregation has to have at least one hop");
+
+        rest
+    }
+
+    pub fn aggregation_hop(&self) -> &OrderByHop {
+        self.path
+            .last()
+            .expect("An order by relation aggregation has to have at least one hop")
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OrderByRelevance {
     pub fields: Vec<ScalarFieldRef>,
