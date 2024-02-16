@@ -149,7 +149,7 @@ fn extract_relation_selection(
 
     Ok(SelectedField::Relation(RelationSelection {
         field: rf,
-        args: extract_query_args(pf.arguments, &related_model)?,
+        args: extract_query_args(pf.arguments, &related_model, None)?,
         result_fields: collect_selection_order(&object.fields),
         selections: pairs_to_selections(related_model, &object.fields, query_schema)?,
     }))

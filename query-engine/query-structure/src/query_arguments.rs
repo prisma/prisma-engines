@@ -110,7 +110,34 @@ impl QueryArguments {
             .connector
             .has_capability(ConnectorCapability::DistinctOn);
 
-        has_distinct_feature && connector_can_distinct_in_db && self.order_by.is_empty()
+        has_distinct_feature && connector_can_distinct_in_db && self.can_orderby_with_in_db_distinct()
+    }
+
+    fn can_orderby_with_in_db_distinct(&self) -> bool {
+        match &self.distinct {
+            Some(distinct) => {
+                let dist_len = distinct.as_fields().len();
+
+                if self.order_by.len() <= dist_len {
+                    Self::ord_matches_distinct(&self.order_by, distinct)
+                } else {
+                    let initial_order = &self.order_by[0..dist_len];
+
+                    Self::ord_matches_distinct(initial_order, distinct)
+                }
+            }
+            None => unreachable!(),
+        }
+    }
+
+    fn ord_matches_distinct(order_by: &[OrderBy], distinct: &FieldSelection) -> bool {
+        order_by.iter().all(|ord| {
+            if let Some(field) = ord.field() {
+                distinct.contains(field.name())
+            } else {
+                false
+            }
+        })
     }
 
     /// An unstable cursor is a cursor that is used in conjunction with an unstable (non-unique) combination of orderBys.

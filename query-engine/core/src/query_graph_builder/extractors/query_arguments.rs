@@ -3,6 +3,7 @@ use crate::{
     query_document::{ParsedArgument, ParsedInputMap},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
+
 use query_structure::{prelude::*, QueryArguments};
 use schema::constants::{aggregations, args, ordering};
 use std::convert::TryInto;
@@ -13,6 +14,7 @@ use std::convert::TryInto;
 pub fn extract_query_args(
     arguments: Vec<ParsedArgument<'_>>,
     model: &Model,
+    relation_field: Option<RelationField>,
 ) -> QueryGraphBuilderResult<QueryArguments> {
     let query_args = arguments.into_iter().try_fold(
         QueryArguments::new(model.clone()),
@@ -64,7 +66,7 @@ pub fn extract_query_args(
         },
     )?;
 
-    Ok(finalize_arguments(query_args, model))
+    Ok(finalize_arguments(query_args, model, relation_field))
 }
 
 /// Extracts order by conditions in order of appearance.
@@ -332,7 +334,7 @@ fn extract_compound_cursor_field(
 }
 
 /// Runs final transformations on the QueryArguments.
-fn finalize_arguments(mut args: QueryArguments, model: &Model) -> QueryArguments {
+fn finalize_arguments(mut args: QueryArguments, model: &Model, relation: Option<RelationField>) -> QueryArguments {
     // Check if the query requires an implicit ordering added to the arguments.
     // An implicit ordering is convenient for deterministic results for take and skip, for cursor it's _required_
     // as a cursor needs a direction to page. We simply take the primary identifier as a default order-by.
@@ -351,5 +353,18 @@ fn finalize_arguments(mut args: QueryArguments, model: &Model) -> QueryArguments
         args.order_by.extend(order_bys);
     }
 
-    args
+    let distinct = match (args.requires_inmemory_distinct(), args.distinct) {
+        (false, Some(distinct)) => {
+            if let Some(relation) = relation {
+                let relation = relation.related_field().linking_fields();
+
+                Some(distinct.merge(relation))
+            } else {
+                Some(distinct)
+            }
+        }
+        (_, distinct) => distinct,
+    };
+
+    QueryArguments { distinct, ..args }
 }

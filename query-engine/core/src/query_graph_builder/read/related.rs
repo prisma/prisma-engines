@@ -9,7 +9,7 @@ pub(crate) fn find_related(
     model: Model,
     query_schema: &QuerySchema,
 ) -> QueryGraphBuilderResult<ReadQuery> {
-    let args = extractors::extract_query_args(field.arguments, &model)?;
+    let args = extractors::extract_query_args(field.arguments, &model, Some(parent.clone()))?;
     let name = field.name;
     let alias = field.alias;
     let sub_selections = field.nested_fields.unwrap().fields;

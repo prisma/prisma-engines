@@ -96,6 +96,157 @@ mod distinct {
         Ok(())
     }
 
+    // region: orderBy
+    #[connector_test]
+    async fn with_orderby_basic(runner: Runner) -> TestResult<()> {
+        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
+        test_user(
+            &runner,
+            r#"{ id: 2, first_name: "Hans", last_name: "Wurst", email: "2" }"#,
+        )
+        .await?;
+        test_user(&runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
+
+        insta::assert_snapshot!(run_query!(
+                &runner,
+                indoc!("{
+                    findManyUser(
+                        orderBy: { first_name: desc },
+                        distinct: [first_name, last_name])
+                        { id, first_name, last_name }
+                    }")
+            ),
+            @r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn with_orderby_non_matching(runner: Runner) -> TestResult<()> {
+        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
+        test_user(
+            &runner,
+            r#"{ id: 2, first_name: "Hans", last_name: "Wurst", email: "2" }"#,
+        )
+        .await?;
+        test_user(&runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
+
+        insta::assert_snapshot!(run_query!(
+                &runner,
+                indoc!("{
+                    findManyUser(
+                        orderBy: { id: desc },
+                        distinct: [first_name, last_name])
+                        { id, first_name, last_name }
+                    }")
+            ),
+            @r###"{"data":{"findManyUser":[{"id":3,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn with_orderby_leftmost_non_matching(runner: Runner) -> TestResult<()> {
+        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
+        test_user(
+            &runner,
+            r#"{ id: 2, first_name: "Hans", last_name: "Wurst", email: "2" }"#,
+        )
+        .await?;
+        test_user(&runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
+
+        insta::assert_snapshot!(run_query!(
+                &runner,
+                indoc!("{
+                    findManyUser(
+                        orderBy: [{ first_name: desc }, { id: desc }, { last_name: desc }],
+                        distinct: [first_name, last_name])
+                        { id, first_name, last_name }
+                    }")
+            ),
+            @r###"{"data":{"findManyUser":[{"id":3,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn with_orderby_similar(runner: Runner) -> TestResult<()> {
+        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
+        test_user(
+            &runner,
+            r#"{ id: 2, first_name: "Hans", last_name: "Wurst", email: "2" }"#,
+        )
+        .await?;
+        test_user(&runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
+
+        insta::assert_snapshot!(run_query!(
+                &runner,
+                indoc!("{
+                    findManyUser(
+                        orderBy: [{ first_name: desc }, { last_name: desc }, { id: desc }],
+                        distinct: [first_name, last_name])
+                        { id, first_name, last_name }
+                    }")
+            ),
+            @r###"{"data":{"findManyUser":[{"id":3,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(capabilities(FullTextSearchWithoutIndex))]
+    async fn with_orderby_non_scalar(runner: Runner) -> TestResult<()> {
+        test_user(
+            &runner,
+            r#"{
+                id: 1,
+                first_name: "Joe",
+                last_name: "Doe",
+                email: "1"
+            }"#,
+        )
+        .await?;
+
+        test_user(
+            &runner,
+            r#"{
+                id: 2,
+                first_name: "Bro",
+                last_name: "Doe",
+                email: "2"
+            }"#,
+        )
+        .await?;
+
+        match_connector_result!(
+            &runner,
+            indoc!(
+                r#"{
+                    findManyUser(
+                        orderBy: {
+                            _relevance: {
+                                fields: ["first_name"],
+                                search: "developer",
+                                sort: desc 
+                            }
+                        }
+                        distinct: [first_name]
+                    )
+                    { id, first_name, last_name }
+                }"#
+            ),
+            Postgres(_) => r#"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Bro","last_name":"Doe"}]}}"#,
+            _ => ""
+        );
+
+        Ok(())
+    }
+
+    // endregion
+
     #[connector_test]
     async fn with_skip_basic(runner: Runner) -> TestResult<()> {
         test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
@@ -147,34 +298,9 @@ mod distinct {
         Ok(())
     }
 
-    #[connector_test]
-    async fn with_skip_orderby_nondistinct(runner: Runner) -> TestResult<()> {
-        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
-        test_user(
-            &runner,
-            r#"{ id: 2, first_name: "Hans", last_name: "Wurst", email: "2" }"#,
-        )
-        .await?;
-        test_user(&runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
-
-        insta::assert_snapshot!(run_query!(
-                &runner,
-                indoc!("{
-                    findManyUser(
-                        orderBy: { id: desc },
-                        distinct: [first_name, last_name])
-                        { id, first_name, last_name }
-                    }")
-            ),
-            @r###"{"data":{"findManyUser":[{"id":3,"first_name":"Joe","last_name":"Doe"},{"id":2,"first_name":"Hans","last_name":"Wurst"}]}}"###
-        );
-
-        Ok(())
-    }
-
     /// Mut return only distinct records for top record, and only for those the distinct relation records.
     #[connector_test]
-    async fn nested_distinct(runner: Runner) -> TestResult<()> {
+    async fn nested_distinct_id(runner: Runner) -> TestResult<()> {
         nested_dataset(&runner).await?;
 
         // Returns Users 1, 3, 4, 5 top
@@ -182,18 +308,50 @@ mod distinct {
         // 4 => ["1"]
         // 3 => []
         // 5 => ["2", "3"]
-        match_connector_result!(
-            &runner,
-            indoc!("{
-                findManyUser(distinct: [first_name, last_name])
+        insta::assert_snapshot!(
+            run_query!(
+                &runner,
+                indoc!(
+                    "{
+                findManyUser(distinct: [first_name, last_name], orderBy: {first_name: asc})
                 {
                     id
                     posts(distinct: [title], orderBy: { id: asc }) {
                         title
                     }
-                }}"),
-            Postgres(_) => r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###,
-            _ => r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":3,"posts":[]},{"id":4,"posts":[{"title":"1"}]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###
+                }}"
+                )
+            ),
+            @r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn nested_distinct_title(runner: Runner) -> TestResult<()> {
+        nested_dataset(&runner).await?;
+
+        // Returns Users 1, 3, 4, 5 top
+        // 1 => ["3", "1", "2"]
+        // 4 => ["1"]
+        // 3 => []
+        // 5 => ["2", "3"]
+
+        insta::assert_snapshot!(run_query!(
+                &runner,
+                indoc!(
+                    "{
+                findManyUser(
+                    distinct: [first_name, last_name], orderBy: {first_name: asc})
+                    {
+                        id, first_name
+                        posts(distinct: [title], orderBy: { title: asc })
+                        { title }
+                    }
+                }")
+            ),
+            @r###"{"data":{"findManyUser":[{"id":1,"first_name":"Joe","posts":[{"title":"1"},{"title":"2"},{"title":"3"}]},{"id":4,"first_name":"Papa","posts":[{"title":"1"}]},{"id":3,"first_name":"Rocky","posts":[]},{"id":5,"first_name":"Troll","posts":[{"title":"2"},{"title":"3"}]}]}}"###
         );
 
         Ok(())
@@ -224,6 +382,146 @@ mod distinct {
             ),
             @r###"{"data":{"findManyUser":[{"id":5,"posts":[{"title":"2"},{"title":"3"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":2,"posts":[{"title":"2"},{"title":"1"}]}]}}"###
         );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(posts_categories))]
+    async fn m2m_implicit(runner: Runner) -> TestResult<()> {
+        m2m_implicit_test_data(&runner).await?;
+
+        insta::assert_snapshot!(run_query!(
+                &runner,
+                indoc!(r#"{
+                    findManyPost(
+                        distinct: [title], orderBy: {title: asc})
+                        {
+                            id, title
+                            categories(distinct: [name], orderBy: { name: asc })
+                            { id, name }
+                        }
+                }"#
+            )),
+            @r###"{"data":{"findManyPost":[{"id":1,"title":"P1","categories":[{"id":1,"name":"C1"},{"id":2,"name":"C2"},{"id":4,"name":"C3"}]},{"id":2,"title":"P2","categories":[{"id":5,"name":"C3"}]}]}}"###
+        );
+
+        Ok(())
+    }
+
+    async fn m2m_implicit_test_data(runner: &Runner) -> TestResult<()> {
+        runner
+            .query(
+                r#"mutation {
+                    createManyCategory(
+                        data: [
+                            { id: 1, name: "C1" },
+                            { id: 2, name: "C2" },
+                            { id: 3, name: "C2" },
+                            { id: 4, name: "C3" },
+                            { id: 5, name: "C3" },
+                            { id: 6, name: "C3" }
+                        ]
+                    )
+                    { count }
+                }
+            "#,
+            )
+            .await?
+            .assert_success();
+
+        runner
+            .query(
+                r#"mutation { createOnePost(
+                    data: {
+                        id: 1, title: "P1", categories: {
+                            connect: [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 6 }]
+                        }
+                    })
+                    { id }
+                }"#,
+            )
+            .await?
+            .assert_success();
+
+        runner
+            .query(
+                r#"mutation { createOnePost(
+                    data: {
+                        id: 2, title: "P2", categories: {
+                            connect: [{ id: 5 }, { id: 6 }]
+                        }
+                    })
+                    { id }
+                }"#,
+            )
+            .await?
+            .assert_success();
+
+        Ok(())
+    }
+
+    #[connector_test(schema(posts_on_categories))]
+    async fn m2m_explicit(runner: Runner) -> TestResult<()> {
+        m2m_explicit_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"
+            query {
+                findManyCategoriesOnPosts(
+                    orderBy: [{ postId: asc }, { categoryId: asc }],
+                    where: {postId: {gt: 0}}
+                )
+                { category { name }, post { title } }
+            }"#),
+          @r###""###
+        );
+
+        Ok(())
+    }
+
+    async fn m2m_explicit_test_data(runner: &Runner) -> TestResult<()> {
+        runner
+            .query(
+                r#"mutation {
+                    createManyPost(data: [
+                        { id: 1, title: "p1" },
+                        { id: 2, title: "p2" }
+                    ])
+                    { count }
+                }"#,
+            )
+            .await?
+            .assert_success();
+
+        runner
+            .query(
+                r#"mutation {
+                    createManyCategory(data: [
+                        { id: 1, name: "c1" },
+                        { id: 2, name: "c2" },
+                        { id: 3, name: "c3" }
+                    ])
+                    { count }
+                }"#,
+            )
+            .await?
+            .assert_success();
+
+        runner
+            .query(
+                r#"mutation {
+                    createManyCategoriesOnPosts(data: [
+                        { postId: 1, categoryId: 1 },
+                        { postId: 1, categoryId: 2 },
+                        { postId: 1, categoryId: 3 },
+                        { postId: 2, categoryId: 2 },
+                        { postId: 2, categoryId: 3 },
+                    ])
+                    { count }
+                }"#,
+            )
+            .await?
+            .assert_success();
 
         Ok(())
     }
