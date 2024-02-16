@@ -11,7 +11,7 @@ use query_structure::*;
 use crate::{
     context::Context,
     filter::alias::Alias,
-    model_extensions::{AsColumns, AsTable, ColumnIterator, RelationFieldExt},
+    model_extensions::{AsColumn, AsColumns, AsTable, ColumnIterator, RelationFieldExt},
     ordering::OrderByBuilder,
     sql_trace::SqlTraceComment,
 };
@@ -626,6 +626,19 @@ fn json_agg() -> Function<'static> {
         Expression::from(Value::json(empty_json_array()).raw()),
     ])
     .alias(JSON_AGG_IDENT)
+}
+
+pub(crate) fn aliased_scalar_column(sf: &ScalarField, parent_alias: Alias, ctx: &Context<'_>) -> Column<'static> {
+    let col = sf
+        .as_column(ctx)
+        .table(parent_alias.to_table_string())
+        .set_is_selected(true);
+
+    if sf.name() != sf.db_name() {
+        col.alias(sf.name().to_owned())
+    } else {
+        col
+    }
 }
 
 #[inline]

@@ -319,13 +319,6 @@ impl<'a, 'b> SerializedFieldWithRelations<'a, 'b> {
             Self::VirtualsGroup(name, _) => name,
         }
     }
-
-    fn db_name(&self) -> &str {
-        match self {
-            Self::Model(f, _) => f.db_name(),
-            Self::VirtualsGroup(name, _) => name,
-        }
-    }
 }
 
 // TODO: Handle errors properly
@@ -427,7 +420,7 @@ fn serialize_relation_selection(
     let fields = collect_serialized_fields_with_relations(typ, &rrs.model, &rrs.virtuals, &rrs.fields);
 
     for field in fields {
-        let value = value_obj.remove(field.db_name()).unwrap();
+        let value = value_obj.remove(field.name()).unwrap();
 
         match field {
             SerializedFieldWithRelations::Model(Field::Scalar(_), out_field) if !out_field.field_type().is_object() => {
@@ -481,7 +474,7 @@ fn collect_serialized_fields_with_relations<'a, 'b>(
             model
                 .fields()
                 .all()
-                .find(|field| field.db_name() == name)
+                .find(|field| field.name() == name)
                 .and_then(|field| {
                     object_type
                         .find_field(field.name())
