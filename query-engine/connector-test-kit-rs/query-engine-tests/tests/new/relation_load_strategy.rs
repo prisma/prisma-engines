@@ -123,7 +123,7 @@ mod relation_load_strategy {
         };
     }
 
-    macro_rules! relation_load_strategy_tests_pair {
+    macro_rules! relation_load_strategy_tests {
         ($name:ident, $query:expr, $result:literal) => {
             paste::paste! {
                 relation_load_strategy_test!(
@@ -159,7 +159,7 @@ mod relation_load_strategy {
         };
     }
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         find_many,
         r#"
         query {
@@ -178,7 +178,7 @@ mod relation_load_strategy {
         r#"{"data":{"findManyUser":[{"login":"author","posts":[{"title":"first post","comments":[{"author":{"login":"commenter"},"body":"a comment"}]}]},{"login":"commenter","posts":[]}]}}"#
     );
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         find_first,
         r#"
         query {
@@ -202,7 +202,7 @@ mod relation_load_strategy {
         r#"{"data":{"findFirstUser":{"login":"author","posts":[{"title":"first post","comments":[{"author":{"login":"commenter"},"body":"a comment"}]}]}}}"#
     );
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         find_first_or_throw,
         r#"
         query {
@@ -226,7 +226,7 @@ mod relation_load_strategy {
         r#"{"data":{"findFirstUserOrThrow":{"login":"author","posts":[{"title":"first post","comments":[{"author":{"login":"commenter"},"body":"a comment"}]}]}}}"#
     );
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         find_unique,
         r#"
         query {
@@ -250,7 +250,7 @@ mod relation_load_strategy {
         r#"{"data":{"findUniqueUser":{"login":"author","posts":[{"title":"first post","comments":[{"author":{"login":"commenter"},"body":"a comment"}]}]}}}"#
     );
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         find_unique_or_throw,
         r#"
         query {
@@ -274,7 +274,7 @@ mod relation_load_strategy {
         r#"{"data":{"findUniqueUserOrThrow":{"login":"author","posts":[{"title":"first post","comments":[{"author":{"login":"commenter"},"body":"a comment"}]}]}}}"#
     );
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         create,
         r#"
         mutation {
@@ -305,7 +305,7 @@ mod relation_load_strategy {
         r#"{"data":{"createOneUser":{"login":"reader","comments":[{"post":{"title":"first post"},"body":"most insightful indeed!"}]}}}"#
     );
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         update,
         r#"
         mutation {
@@ -329,7 +329,7 @@ mod relation_load_strategy {
         r#"{"data":{"updateOneUser":{"login":"distinguished author","posts":[{"title":"first post","comments":[{"body":"a comment"}]}]}}}"#
     );
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         delete,
         r#"
         mutation {
@@ -350,7 +350,7 @@ mod relation_load_strategy {
         r#"{"data":{"deleteOneUser":{"login":"author","posts":[{"title":"first post","comments":[{"body":"a comment"}]}]}}}"#
     );
 
-    relation_load_strategy_tests_pair!(
+    relation_load_strategy_tests!(
         upsert,
         r#"
         mutation {
