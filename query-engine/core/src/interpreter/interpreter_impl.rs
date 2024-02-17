@@ -67,7 +67,7 @@ impl ExpressionResult {
                 // We always select IDs, the unwraps are safe.
                 QueryResult::RecordSelection(Some(rs)) => Some(
                     rs.records
-                        .extract_selection_results(field_selection)
+                        .extract_selection_results_from_db_name(field_selection)
                         .expect("Expected record selection to contain required model ID fields.")
                         .into_iter()
                         .collect(),
