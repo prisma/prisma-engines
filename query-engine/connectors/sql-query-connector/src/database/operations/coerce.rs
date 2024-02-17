@@ -84,7 +84,7 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
                         // themselves here. We can't use the original errors in keys because `SqlError`
                         // is not Eq + Hash. The consequence is that only the first error will be kept,
                         // but the same thing will happen when collecting the iterator to
-                        // `Result<Vec<_>>` anyway. This also means we have to way to introduce a new
+                        // `Result<Vec<_>>` anyway. This also means we have no way to introduce a new
                         // error and return it out of `unique_by`, so we have to panic if an element is
                         // not an object, but this is fine because we know we already mapped the
                         // elements using `coerce_json_relation_to_pv` above, so they must be objects.
