@@ -97,7 +97,7 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
                                 .into_object()
                                 .expect("Expected coerced_json_relation_to_pv to return list of objects");
 
-                            let (field_names, values): (Vec<_>, Vec<_>) = object.into_iter().unzip();
+                            let (field_names, values): (Vec<_>, _) = object.into_iter().unzip();
 
                             Record::new(values)
                                 .extract_selection_result_from_prisma_name(&field_names, distinct)
