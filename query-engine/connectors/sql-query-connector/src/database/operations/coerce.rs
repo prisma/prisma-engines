@@ -78,19 +78,20 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
             let iter = match rs.args.distinct.as_ref() {
                 Some(distinct) if rs.args.requires_inmemory_distinct_with_joins() => {
                     Either::Left(iter.unique_by(|maybe_value| {
-                        // Mapping errors to a unit type here does not discard the error information
-                        // from the final iterator because the result that we return from this closure
-                        // is only a key for comparing the elements, we do not map the elements
-                        // themselves here. We can't use the original errors in keys because `SqlError`
-                        // is not Eq + Hash. The consequence is that only the first error will be kept,
-                        // but the same thing will happen when collecting the iterator to
-                        // `Result<Vec<_>>` anyway. This also means we have no way to introduce a new
-                        // error and return it out of `unique_by`, so we have to panic if an element is
-                        // not an object, but this is fine because we know we already mapped the
-                        // elements using `coerce_json_relation_to_pv` above, so they must be objects.
-                        // We also panic if the result set is malformed and we can't find the distinct
-                        // fields in it, which is less desirable but also exactly what the in-memory
-                        // record processor for the old query strategy does.
+                        // Mapping errors to a unit type here does not discard the error
+                        // information from the final iterator because the result that we return
+                        // from this closure is only a key for comparing the elements, we do not
+                        // map the elements themselves here. We can't use the original errors in
+                        // keys because `SqlError` is not Eq + Hash. The consequence is that only
+                        // the first error will be kept, but the same thing will happen when
+                        // collecting the iterator to `Result<Vec<_>>` anyway. This also means we
+                        // have no easy way to introduce a new error and return it out of
+                        // `unique_by`, so we have to panic if an element is not an object, but
+                        // this is fine because we know we already mapped the elements using
+                        // `coerce_json_relation_to_pv` above, so they must be objects. We also
+                        // panic if the result set is malformed and we can't find the distinct
+                        // fields in it, which is less desirable but also exactly what the
+                        // in-memory record processor for the old query strategy does.
                         maybe_value.as_ref().map_err(|_| ()).map(|value| {
                             let object = value
                                 .clone()
