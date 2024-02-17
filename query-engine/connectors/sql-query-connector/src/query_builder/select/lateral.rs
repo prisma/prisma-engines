@@ -243,6 +243,7 @@ impl LateralJoinSelectBuilder {
             .with_m2m_join_conditions(&rf.related_field(), m2m_table_alias, parent_alias, ctx) // adds join condition to the child table
             // TODO: avoid clone filter
             .with_filters(rs.args.filter.clone(), Some(m2m_join_alias), ctx) // adds query filters
+            .with_distinct(&rs.args, m2m_join_alias)
             .with_ordering(&rs.args, Some(m2m_join_alias.to_table_string()), ctx) // adds ordering stmts
             .with_pagination(rs.args.take_abs(), rs.args.skip)
             .comment("inner"); // adds pagination

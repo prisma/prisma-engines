@@ -43,6 +43,10 @@ impl FieldSelection {
         self.selections.iter()
     }
 
+    pub fn scalars(&self) -> impl Iterator<Item = &ScalarFieldRef> + '_ {
+        self.selections().filter_map(SelectedField::as_scalar)
+    }
+
     pub fn virtuals(&self) -> impl Iterator<Item = &VirtualSelection> {
         self.selections().filter_map(SelectedField::as_virtual)
     }
@@ -239,6 +243,12 @@ impl FieldSelection {
     }
 }
 
+impl AsRef<[SelectedField]> for FieldSelection {
+    fn as_ref(&self) -> &[SelectedField] {
+        &self.selections
+    }
+}
+
 /// A selected field. Can be contained on a model or composite type.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SelectedField {
@@ -417,6 +427,13 @@ impl SelectedField {
         }
     }
 
+    pub fn as_scalar(&self) -> Option<&ScalarFieldRef> {
+        match self {
+            SelectedField::Scalar(sf) => Some(sf),
+            _ => None,
+        }
+    }
+
     pub fn as_composite(&self) -> Option<&CompositeSelection> {
         match self {
             SelectedField::Composite(ref cs) => Some(cs),
@@ -512,8 +529,8 @@ impl CompositeSelection {
     }
 }
 
-impl From<Vec<ScalarFieldRef>> for FieldSelection {
-    fn from(fields: Vec<ScalarFieldRef>) -> Self {
+impl<T: IntoIterator<Item = ScalarFieldRef>> From<T> for FieldSelection {
+    fn from(fields: T) -> Self {
         Self {
             selections: fields.into_iter().map(Into::into).collect(),
         }

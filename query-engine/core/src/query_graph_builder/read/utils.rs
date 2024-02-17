@@ -1,7 +1,7 @@
 use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
-use psl::datamodel_connector::JoinStrategySupport;
-use query_structure::{prelude::*, RelationLoadStrategy};
+use psl::datamodel_connector::{ConnectorCapability, JoinStrategySupport};
+use query_structure::{native_distinct_compatible_with_order_by, prelude::*, RelationLoadStrategy};
 use schema::{
     constants::{aggregations::*, args},
     QuerySchema,
@@ -255,6 +255,7 @@ pub(crate) fn get_relation_load_strategy(
     requested_strategy: Option<RelationLoadStrategy>,
     cursor: Option<&SelectionResult>,
     distinct: Option<&FieldSelection>,
+    order_by: &[OrderBy],
     nested_queries: &[ReadQuery],
     query_schema: &QuerySchema,
 ) -> QueryGraphBuilderResult<RelationLoadStrategy> {
@@ -262,7 +263,7 @@ pub(crate) fn get_relation_load_strategy(
         // Connector and database version supports the `Join` strategy...
         JoinStrategySupport::Yes => match requested_strategy {
             // But incoming query cannot be resolved with joins.
-            _ if !query_can_be_resolved_with_joins(cursor, distinct, nested_queries) => {
+            _ if !query_can_be_resolved_with_joins(query_schema, cursor, distinct, order_by, nested_queries) => {
                 // So we fallback to the `Query` one.
                 Ok(RelationLoadStrategy::Query)
             }
@@ -289,14 +290,19 @@ pub(crate) fn get_relation_load_strategy(
 }
 
 fn query_can_be_resolved_with_joins(
+    query_schema: &QuerySchema,
     cursor: Option<&SelectionResult>,
     distinct: Option<&FieldSelection>,
+    order_by: &[OrderBy],
     nested_queries: &[ReadQuery],
 ) -> bool {
+    let can_distinct_in_db_with_joins = query_schema.has_capability(ConnectorCapability::DistinctOn)
+        && native_distinct_compatible_with_order_by(distinct, order_by);
+
     cursor.is_none()
-        && distinct.is_none()
+        && (distinct.is_none() || can_distinct_in_db_with_joins)
         && !nested_queries.iter().any(|q| match q {
-            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct(),
+            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.requires_inmemory_distinct_with_joins(),
             _ => false,
         })
 }
