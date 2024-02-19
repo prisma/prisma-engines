@@ -182,7 +182,7 @@ impl Record {
     /// Extracts a `SelectionResult` from this `Record`.
     /// `field_names`: Database names of the fields contained in this `Record`.
     /// `selected_fields`: The selection to extract.
-    #[inline]
+    // #[inline]
     pub fn extract_selection_result_from_db_name(
         &self,
         field_names: &[String],
@@ -193,7 +193,7 @@ impl Record {
 
     /// Extracts a `SelectionResult` from this `Record` using Prisma field names rather than
     /// database names.
-    #[inline]
+    // #[inline]
     pub fn extract_selection_result_from_prisma_name(
         &self,
         field_names: &[String],
