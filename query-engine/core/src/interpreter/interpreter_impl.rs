@@ -74,7 +74,7 @@ impl ExpressionResult {
                 ),
                 QueryResult::RecordSelectionWithRelations(rsr) => Some(
                     rsr.records
-                        .extract_selection_results(field_selection)
+                        .extract_selection_results_from_prisma_name(field_selection)
                         .expect("Expected record selection to contain required model ID fields.")
                         .into_iter()
                         .collect(),

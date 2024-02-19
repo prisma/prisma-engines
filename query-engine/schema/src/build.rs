@@ -31,5 +31,6 @@ pub fn build_with_features(
 ) -> QuerySchema {
     let connector = schema.connector();
     let internal_data_model = query_structure::convert(schema);
+
     QuerySchema::new(enable_raw_queries, connector, preview_features, internal_data_model)
 }

@@ -1,4 +1,4 @@
-use js_sys::{Date, Function, Promise};
+use js_sys::{Date, Function, Promise, Reflect};
 use std::future::Future;
 use std::time::Duration;
 use wasm_bindgen::prelude::*;
@@ -8,10 +8,7 @@ use crate::common::TimeoutError;
 
 #[wasm_bindgen]
 extern "C" {
-
     type Performance;
-    #[wasm_bindgen(js_name = "performance")]
-    static PERFORMANCE: Option<Performance>;
 
     #[wasm_bindgen(method)]
     fn now(this: &Performance) -> f64;
@@ -53,5 +50,16 @@ where
 }
 
 fn now() -> f64 {
-    PERFORMANCE.as_ref().map(|p| p.now()).unwrap_or_else(Date::now)
+    let global = js_sys::global();
+    Reflect::get(&global, &"performance".into())
+        .ok()
+        .and_then(|value| {
+            if value.is_undefined() {
+                None
+            } else {
+                Some(Performance::from(value))
+            }
+        })
+        .map(|p| p.now())
+        .unwrap_or_else(Date::now)
 }

@@ -8,8 +8,8 @@ use prisma_value::{decode_bytes, PrismaValueResult};
 use super::completions;
 use crate::{
     datamodel_connector::{
-        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
-        NativeTypeInstance, RelationMode, ValidatedConnector,
+        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, JoinStrategySupport,
+        NativeTypeConstructor, NativeTypeInstance, RelationMode, ValidatedConnector,
     },
     diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{walkers, ReferentialAction, ScalarType},
@@ -149,6 +149,15 @@ impl ValidatedConnector for MySqlDatamodelConnector {
     // On MySQL, bytes are encoded as base64 in the database directly.
     fn parse_json_bytes(&self, str: &str, _nt: Option<NativeTypeInstance>) -> PrismaValueResult<Vec<u8>> {
         decode_bytes(str)
+    }
+
+    fn runtime_join_strategy_support(&self) -> JoinStrategySupport {
+        match self.static_join_strategy_support() {
+            // Prior to MySQL 8.0.14 and for MariaDB, a derived table cannot contain outer references.
+            // Source: https://dev.mysql.com/doc/refman/8.0/en/derived-tables.html.
+            true => JoinStrategySupport::UnknownYet,
+            false => JoinStrategySupport::No,
+        }
     }
 }
 

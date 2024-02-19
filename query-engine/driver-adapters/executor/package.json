@@ -22,9 +22,6 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "dependencies": {
-    "@libsql/client": "0.3.6",
-    "@neondatabase/serverless": "0.7.2",
-    "@planetscale/database": "1.15.0",
     "query-engine-wasm-latest": "npm:@prisma/query-engine-wasm@latest",
     "query-engine-wasm-baseline": "npm:@prisma/query-engine-wasm@0.0.19",
     "@prisma/adapter-libsql": "workspace:*",
@@ -32,9 +29,8 @@
     "@prisma/adapter-pg": "workspace:*",
     "@prisma/adapter-planetscale": "workspace:*",
     "@prisma/driver-adapter-utils": "workspace:*",
-    "@types/pg": "8.10.9",
+    "@prisma/bundled-js-drivers": "workspace:*",
     "mitata": "^0.1.6",
-    "pg": "8.11.3",
     "undici": "6.0.1",
     "ws": "8.14.2"
   },

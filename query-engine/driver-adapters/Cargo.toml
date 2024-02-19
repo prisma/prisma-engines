@@ -9,14 +9,14 @@ sqlite = ["quaint/sqlite"]
 postgresql = ["quaint/postgresql"]
 
 [dependencies]
-async-trait = "0.1"
+async-trait.workspace = true
 once_cell = "1.15"
 serde.workspace = true
 serde_json.workspace = true
-tracing = "0.1"
+tracing.workspace = true
 tracing-core = "0.1"
 metrics = "0.18"
-uuid = { version = "1", features = ["v4"] }
+uuid.workspace = true
 pin-project = "1"
 serde_repr.workspace = true
 

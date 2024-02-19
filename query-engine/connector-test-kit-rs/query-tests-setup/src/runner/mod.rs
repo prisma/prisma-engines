@@ -10,6 +10,7 @@ use crate::{
 use colored::Colorize;
 use query_core::{
     protocol::EngineProtocol,
+    relation_load_strategy,
     schema::{self, QuerySchemaRef},
     QueryExecutor, TransactionOptions, TxId,
 };
@@ -126,25 +127,34 @@ impl Runner {
         let datasource = schema.configuration.datasources.first().unwrap();
         let url = datasource.load_url(|key| env::var(key).ok()).unwrap();
 
-        let executor = match crate::CONFIG.external_test_executor() {
-            Some(_) => RunnerExecutor::new_external(&url, &datamodel).await?,
-            None => RunnerExecutor::Builtin(
-                request_handlers::load_executor(
+        let (executor, db_version) = match crate::CONFIG.external_test_executor() {
+            Some(_) => (RunnerExecutor::new_external(&url, &datamodel).await?, None),
+            None => {
+                let executor = request_handlers::load_executor(
                     ConnectorKind::Rust {
                         url: url.to_owned(),
                         datasource,
                     },
                     schema.configuration.preview_features(),
                 )
-                .await?,
-            ),
+                .await?;
+
+                let connector = executor.primary_connector();
+                let conn = connector.get_connection().await.unwrap();
+                let database_version = conn.version().await;
+
+                (RunnerExecutor::Builtin(executor), database_version)
+            }
         };
-        let query_schema: QuerySchemaRef = Arc::new(schema::build(Arc::new(schema), true));
+
+        let query_schema = schema::build(Arc::new(schema), true).with_db_version_supports_join_strategy(
+            relation_load_strategy::db_version_supports_joins_strategy(db_version)?,
+        );
 
         Ok(Self {
             version: connector_version,
             executor,
-            query_schema,
+            query_schema: Arc::new(query_schema),
             connector_tag,
             connection_url: url,
             current_tx_id: None,

@@ -11,7 +11,7 @@ use query_structure::*;
 use crate::{
     context::Context,
     filter::alias::Alias,
-    model_extensions::{AsColumns, AsTable, ColumnIterator, RelationFieldExt},
+    model_extensions::{AsColumn, AsColumns, AsTable, ColumnIterator, RelationFieldExt},
     ordering::OrderByBuilder,
     sql_trace::SqlTraceComment,
 };
@@ -45,18 +45,20 @@ pub(crate) trait JoinSelectBuilder {
         ctx: &Context<'_>,
     ) -> Select<'a>;
     /// Adds to `select` the SQL statements to fetch a 1-m relation.
-    fn add_to_many_relation<'a>(
+    fn add_to_many_relation<'a, 'b>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
+        parent_virtuals: impl Iterator<Item = &'b VirtualSelection>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a>;
     /// Adds to `select` the SQL statements to fetch a m-n relation.
-    fn add_many_to_many_relation<'a>(
+    fn add_many_to_many_relation<'a, 'b>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
+        parent_virtuals: impl Iterator<Item = &'b VirtualSelection>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a>;
@@ -89,6 +91,9 @@ pub(crate) trait JoinSelectBuilder {
     ) -> Expression<'static>;
     /// Get the next alias for a table.
     fn next_alias(&mut self) -> Alias;
+    /// Checks if a virtual selection has already been added to the query at an earlier stage
+    /// as a part of a relation query for a matching relation field.
+    fn was_virtual_processed_in_relation(&self, vs: &VirtualSelection) -> bool;
 
     fn with_selection<'a>(
         &mut self,
@@ -107,11 +112,12 @@ pub(crate) trait JoinSelectBuilder {
     }
 
     /// Builds the core select for a 1-1 relation.
+    /// Note: it does not add the JSON object selection because there are additional steps to
+    /// perform before that depending on the `JoinSelectBuilder` implementation.
     fn build_to_one_select(
         &mut self,
         rs: &RelationSelection,
         parent_alias: Alias,
-        selection_modifier: impl FnOnce(Expression<'static>) -> Expression<'static>,
         ctx: &Context<'_>,
     ) -> (Select<'static>, Alias) {
         let rf = &rs.field;
@@ -121,12 +127,10 @@ pub(crate) trait JoinSelectBuilder {
             .related_field()
             .as_table(ctx)
             .alias(child_table_alias.to_table_string());
-        let json_expr = self.build_json_obj_fn(rs, child_table_alias, ctx);
 
         let select = Select::from_table(table)
             .with_join_conditions(rf, parent_alias, child_table_alias, ctx)
             .with_filters(rs.args.filter.clone(), Some(child_table_alias), ctx)
-            .value(selection_modifier(json_expr))
             .limit(1);
 
         (select, child_table_alias)
@@ -155,27 +159,36 @@ pub(crate) trait JoinSelectBuilder {
             .comment("root select");
 
         // SELECT JSON_BUILD_OBJECT() FROM ( <root> )
-        let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()))
-            .value(self.build_json_obj_fn(rs, root_alias, ctx).alias(JSON_AGG_IDENT));
-        let inner = self.with_relations(inner, rs.relations(), root_alias, ctx);
+        let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()));
+        let inner = self.with_relations(inner, rs.relations(), rs.virtuals(), root_alias, ctx);
         let inner = self.with_virtual_selections(inner, rs.virtuals(), root_alias, ctx);
+
+        // Build the JSON object utilizing the information we collected in `with_relations` and
+        // `with_virtual_selections`.
+        let inner = inner.value(self.build_json_obj_fn(rs, root_alias, ctx).alias(JSON_AGG_IDENT));
 
         let linking_fields = rs.field.related_field().linking_fields();
 
         if rs.field.relation().is_many_to_many() {
-            let selection: Vec<Column<'_>> =
-                FieldSelection::union(vec![order_by_selection(rs), linking_fields, filtering_selection(rs)])
-                    .into_projection()
-                    .as_columns(ctx)
-                    .map(|c| c.table(root_alias.to_table_string()))
-                    .collect();
+            let selection: Vec<Column<'_>> = FieldSelection::union(vec![
+                order_by_selection(rs),
+                distinct_selection(rs),
+                linking_fields,
+                filtering_selection(rs),
+            ])
+            .into_projection()
+            .as_columns(ctx)
+            .map(|c| c.table(root_alias.to_table_string()))
+            .collect();
 
             // SELECT <foreign_keys>, <orderby columns>
             inner.with_columns(selection.into())
         } else {
-            // select ordering, filtering & join fields from child selections to order, filter & join them on the outer query
+            // select ordering, distinct, filtering & join fields from child selections to order,
+            // filter & join them on the outer query
             let inner_selection: Vec<Column<'_>> = FieldSelection::union(vec![
                 order_by_selection(rs),
+                distinct_selection(rs),
                 filtering_selection(rs),
                 relation_selection(rs),
             ])
@@ -197,6 +210,8 @@ pub(crate) trait JoinSelectBuilder {
             let middle = Select::from_table(Table::from(inner).alias(inner_alias.to_table_string()))
                 // SELECT <inner_alias>.<JSON_ADD_IDENT>
                 .column(Column::from((inner_alias.to_table_string(), JSON_AGG_IDENT)))
+                // DISTINCT ON
+                .with_distinct(&rs.args, inner_alias)
                 // ORDER BY ...
                 .with_ordering(&rs.args, Some(inner_alias.to_table_string()), ctx)
                 // WHERE ...
@@ -212,16 +227,17 @@ pub(crate) trait JoinSelectBuilder {
         }
     }
 
-    fn with_relation<'a>(
+    fn with_relation<'a, 'b>(
         &mut self,
         select: Select<'a>,
         rs: &RelationSelection,
+        parent_virtuals: impl Iterator<Item = &'b VirtualSelection>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
         match (rs.field.is_list(), rs.field.relation().is_many_to_many()) {
-            (true, true) => self.add_many_to_many_relation(select, rs, parent_alias, ctx),
-            (true, false) => self.add_to_many_relation(select, rs, parent_alias, ctx),
+            (true, true) => self.add_many_to_many_relation(select, rs, parent_virtuals, parent_alias, ctx),
+            (true, false) => self.add_to_many_relation(select, rs, parent_virtuals, parent_alias, ctx),
             (false, _) => self.add_to_one_relation(select, rs, parent_alias, ctx),
         }
     }
@@ -230,10 +246,15 @@ pub(crate) trait JoinSelectBuilder {
         &mut self,
         input: Select<'a>,
         relation_selections: impl Iterator<Item = &'b RelationSelection>,
+        virtual_selections: impl Iterator<Item = &'b VirtualSelection>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        relation_selections.fold(input, |acc, rs| self.with_relation(acc, rs, parent_alias, ctx))
+        let virtual_selections = virtual_selections.collect::<Vec<_>>();
+
+        relation_selections.fold(input, |acc, rs| {
+            self.with_relation(acc, rs, virtual_selections.iter().copied(), parent_alias, ctx)
+        })
     }
 
     fn build_default_select(&mut self, args: &QueryArguments, ctx: &Context<'_>) -> (Select<'static>, Alias) {
@@ -242,11 +263,11 @@ pub(crate) trait JoinSelectBuilder {
 
         // SELECT ... FROM Table "t1"
         let select = Select::from_table(table)
+            .with_distinct(args, table_alias)
             .with_ordering(args, Some(table_alias.to_table_string()), ctx)
             .with_filters(args.filter.clone(), Some(table_alias), ctx)
             .with_pagination(args.take_abs(), args.skip)
-            .append_trace(&Span::current())
-            .add_trace_id(ctx.trace_id);
+            .append_trace(&Span::current());
 
         (select, table_alias)
     }
@@ -258,7 +279,13 @@ pub(crate) trait JoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        selections.fold(select, |acc, vs| self.add_virtual_selection(acc, vs, parent_alias, ctx))
+        selections.fold(select, |acc, vs| {
+            if self.was_virtual_processed_in_relation(vs) {
+                acc
+            } else {
+                self.add_virtual_selection(acc, vs, parent_alias, ctx)
+            }
+        })
     }
 
     fn build_virtual_select(
@@ -372,12 +399,25 @@ pub(crate) trait JoinSelectBuilder {
 
         select
     }
+
+    fn find_compatible_virtual_for_relation<'a>(
+        &self,
+        rs: &RelationSelection,
+        mut parent_virtuals: impl Iterator<Item = &'a VirtualSelection>,
+    ) -> Option<&'a VirtualSelection> {
+        if rs.args.take.is_some() || rs.args.skip.is_some() || rs.args.cursor.is_some() || rs.args.distinct.is_some() {
+            return None;
+        }
+
+        parent_virtuals.find(|vs| *vs.relation_field() == rs.field && vs.filter() == rs.args.filter.as_ref())
+    }
 }
 
 pub(crate) trait SelectBuilderExt<'a> {
     fn with_filters(self, filter: Option<Filter>, parent_alias: Option<Alias>, ctx: &Context<'_>) -> Select<'a>;
     fn with_pagination(self, take: Option<i64>, skip: Option<i64>) -> Select<'a>;
     fn with_ordering(self, args: &QueryArguments, parent_alias: Option<String>, ctx: &Context<'_>) -> Select<'a>;
+    fn with_distinct(self, args: &QueryArguments, table_alias: Alias) -> Select<'a>;
     fn with_join_conditions(
         self,
         rf: &RelationField,
@@ -440,6 +480,21 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
         order_by_definitions
             .iter()
             .fold(select, |acc, o| acc.order_by(o.order_definition.clone()))
+    }
+
+    fn with_distinct(self, args: &QueryArguments, table_alias: Alias) -> Select<'a> {
+        if !args.can_distinct_in_db_with_joins() {
+            return self;
+        }
+
+        let Some(ref distinct) = args.distinct else { return self };
+
+        let distinct_fields = distinct
+            .scalars()
+            .map(|sf| Expression::from(Column::from((table_alias.to_table_string(), sf.db_name().to_owned()))))
+            .collect();
+
+        self.distinct_on(distinct_fields)
     }
 
     fn with_join_conditions(
@@ -514,13 +569,33 @@ fn order_by_selection(rs: &RelationSelection) -> FieldSelection {
         .order_by
         .iter()
         .flat_map(|order_by| match order_by {
-            OrderBy::Scalar(x) if x.path.is_empty() => vec![x.field.clone()],
+            OrderBy::Scalar(x) => {
+                // If the path is empty, the order by is done on the field itself in the outer select.
+                if x.path.is_empty() {
+                    vec![x.field.clone()]
+                // If there are relations to traverse, select the linking fields of the first hop so that the outer select can perform a join to traverse the first relation.
+                // This is necessary because the order by is done on a different join. The following hops are handled by the order by builder.
+                } else {
+                    first_hop_linking_fields(&x.path)
+                }
+            }
             OrderBy::Relevance(x) => x.fields.clone(),
-            _ => Vec::new(),
+            // Select the linking fields of the first hop so that the outer select can perform a join to traverse the relation.
+            // This is necessary because the order by is done on a different join. The following hops are handled by the order by builder.
+            OrderBy::ToManyAggregation(x) => first_hop_linking_fields(x.intermediary_hops()),
+            OrderBy::ScalarAggregation(x) => vec![x.field.clone()],
         })
         .collect();
 
     FieldSelection::from(selection)
+}
+
+/// Returns the linking fields of the first hop in an order by path.
+fn first_hop_linking_fields(hops: &[OrderByHop]) -> Vec<ScalarFieldRef> {
+    hops.first()
+        .and_then(|hop| hop.as_relation_hop())
+        .map(|rf| rf.linking_fields().as_scalar_fields().unwrap())
+        .unwrap_or_default()
 }
 
 fn relation_selection(rs: &RelationSelection) -> FieldSelection {
@@ -535,6 +610,10 @@ fn filtering_selection(rs: &RelationSelection) -> FieldSelection {
     } else {
         FieldSelection::default()
     }
+}
+
+fn distinct_selection(rs: &RelationSelection) -> FieldSelection {
+    rs.args.distinct.as_ref().cloned().unwrap_or_default()
 }
 
 fn extract_filter_scalars(f: &Filter) -> Vec<ScalarFieldRef> {
@@ -597,6 +676,19 @@ fn json_agg() -> Function<'static> {
     .alias(JSON_AGG_IDENT)
 }
 
+pub(crate) fn aliased_scalar_column(sf: &ScalarField, parent_alias: Alias, ctx: &Context<'_>) -> Column<'static> {
+    let col = sf
+        .as_column(ctx)
+        .table(parent_alias.to_table_string())
+        .set_is_selected(true);
+
+    if sf.name() != sf.db_name() {
+        col.alias(sf.name().to_owned())
+    } else {
+        col
+    }
+}
+
 #[inline]
 fn empty_json_array() -> serde_json::Value {
     serde_json::Value::Array(Vec::new())
@@ -612,8 +704,4 @@ fn supports_lateral_join(args: &QueryArguments) -> bool {
         .schema
         .connector
         .has_capability(ConnectorCapability::LateralJoin)
-}
-
-fn relation_count_alias_name(rf: &RelationField) -> String {
-    format!("aggr_count_{}_{}", rf.model().name(), rf.name())
 }

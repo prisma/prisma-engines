@@ -111,7 +111,7 @@ pub fn itx_isolation_levels(ctx: &'_ QuerySchema) -> Option<EnumType> {
 }
 
 pub(crate) fn relation_load_strategy(ctx: &QuerySchema) -> Option<EnumType> {
-    if !ctx.has_feature(psl::PreviewFeature::RelationJoins) {
+    if !ctx.can_resolve_relation_with_joins() {
         return None;
     }
 

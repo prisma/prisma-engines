@@ -11,6 +11,7 @@ use psl::{ValidSchema, ValidatedConnectorRegistry};
 use quaint::connector::ExternalConnector;
 use query_core::{
     protocol::EngineProtocol,
+    relation_load_strategy,
     schema::{self},
     telemetry, TransactionOptions, TxId,
 };
@@ -113,10 +114,16 @@ impl QueryEngine {
                     "db.type" = connector.name(),
                 );
 
-                connector.get_connection().instrument(conn_span).await?;
+                let conn = connector.get_connection().instrument(conn_span).await?;
+                let db_version = conn.version().await;
 
                 let query_schema_span = tracing::info_span!("prisma:engine:schema");
-                let query_schema = query_schema_span.in_scope(|| schema::build(arced_schema, true));
+
+                let query_schema = query_schema_span
+                    .in_scope(|| schema::build(arced_schema, true))
+                    .with_db_version_supports_join_strategy(
+                        relation_load_strategy::db_version_supports_joins_strategy(db_version)?,
+                    );
 
                 Ok(ConnectedEngine {
                     schema: builder.schema.clone(),

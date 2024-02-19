@@ -1,12 +1,13 @@
+REPO_ROOT := $(shell git rev-parse --show-toplevel)
+
 CONFIG_PATH = ./query-engine/connector-test-kit-rs/test-configs
 CONFIG_FILE = .test_config
 SCHEMA_EXAMPLES_PATH = ./query-engine/example_schemas
 DEV_SCHEMA_FILE = dev_datamodel.prisma
 DRIVER_ADAPTERS_BRANCH ?= main
-
-ifndef DISABLE_NIX
-NIX := $(shell type nix 2> /dev/null)
-endif
+ENGINE_SIZE_OUTPUT ?= /dev/stdout
+QE_WASM_VERSION ?= 0.0.0
+SCHEMA_WASM_VERSION ?= 0.0.0
 
 LIBRARY_EXT := $(shell                            \
     case "$$(uname -s)" in                        \
@@ -18,6 +19,20 @@ LIBRARY_EXT := $(shell                            \
 PROFILE ?= dev
 
 default: build
+
+###############
+# clean tasks #
+###############
+
+clean-qe-wasm:
+	@echo "Cleaning query-engine/query-engine-wasm/pkg" && \
+	cd query-engine/query-engine-wasm/pkg && find . ! -name '.' ! -name '..' ! -name 'README.md' -exec rm -rf {} +
+
+clean-cargo:
+	@echo "Cleaning cargo" && \
+	cargo clean
+
+clean: clean-qe-wasm clean-cargo
 
 ###################
 # script wrappers #
@@ -38,6 +53,29 @@ build:
 
 build-qe:
 	cargo build --package query-engine
+
+build-qe-napi:
+	cargo build --package query-engine-node-api --profile $(PROFILE)
+
+build-qe-wasm:
+	cd query-engine/query-engine-wasm && \
+	./build.sh $(QE_WASM_VERSION) query-engine/query-engine-wasm/pkg
+
+build-qe-wasm-gz: build-qe-wasm
+	@cd query-engine/query-engine-wasm/pkg && \
+    for provider in postgresql mysql sqlite; do \
+        gzip -knc $$provider/query_engine_bg.wasm > $$provider.gz; \
+    done;
+
+build-schema-wasm:
+	@printf '%s\n' "🛠️  Building the Rust crate"
+	cargo build --profile $(PROFILE) --target=wasm32-unknown-unknown -p prisma-schema-build
+
+	@printf '\n%s\n' "📦 Creating the npm package"
+	WASM_BUILD_PROFILE=$(PROFILE) \
+	NPM_PACKAGE_VERSION=$(SCHEMA_WASM_VERSION) \
+	out="$(REPO_ROOT)/target/prisma-schema-wasm" \
+	./prisma-schema-wasm/scripts/install.sh
 
 # Emulate pedantic CI compilation.
 pedantic:
@@ -77,6 +115,11 @@ test-qe-verbose-st:
 test-qe-black-box: build-qe
 	cargo test --package black-box-tests -- --test-threads 1
 
+check-schema-wasm-package: build-schema-wasm
+	PRISMA_SCHEMA_WASM="$(REPO_ROOT)/target/prisma-schema-wasm" \
+	out=$(shell mktemp -d) \
+	NODE=$(shell which node) \
+	./prisma-schema-wasm/scripts/check.sh
 
 ###########################
 # Database setup commands #
@@ -244,7 +287,13 @@ dev-mysql8: start-mysql_8
 start-mysql_mariadb:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans mariadb-10-0
 
+start-mysql_mariadb_11:
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans mariadb-11-0
+
 dev-mariadb: start-mysql_mariadb
+	cp $(CONFIG_PATH)/mariadb $(CONFIG_FILE)
+
+dev-mariadb11: start-mysql_mariadb_11
 	cp $(CONFIG_PATH)/mariadb $(CONFIG_FILE)
 
 start-mssql_2019:
@@ -326,21 +375,12 @@ test-driver-adapter-planetscale-wasm: test-planetscale-wasm
 # Local dev commands #
 ######################
 
-build-qe-napi:
-	cargo build --package query-engine-node-api --profile $(PROFILE)
-
-build-qe-wasm:
-ifdef NIX
-	@echo "Building wasm engine on nix"
-	rm -rf query-engine/query-engine-wasm/pkg
-	nix run .#export-query-engine-wasm 0.0.0 query-engine/query-engine-wasm/pkg
-else
-	cd query-engine/query-engine-wasm && ./build.sh 0.0.0 query-engine/query-engine-wasm/pkg
-endif
-
-measure-qe-wasm: build-qe-wasm	
+measure-qe-wasm: build-qe-wasm-gz	
 	@cd query-engine/query-engine-wasm/pkg; \
-	gzip -k -c query_engine_bg.wasm | wc -c | awk '{$$1/=(1024*1024); printf "Current wasm query-engine size compressed: %.3fMB\n", $$1}'
+	for provider in postgresql mysql sqlite; do \
+		echo "$${provider}_size=$$(cat $$provider/query_engine_bg.wasm | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
+		echo "$${provider}_size_gz=$$(cat $$provider.gz | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
+	done;
 
 build-driver-adapters-kit: build-driver-adapters
 	cd query-engine/driver-adapters && pnpm i && pnpm build

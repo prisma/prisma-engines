@@ -27,8 +27,5 @@ jobs:
           git config user.email "prismabots@gmail.com"
           git config user.name "prisma-bot"
 
-      - name: Generate cargo docs for the workspace to gh-pages branch
-        run: nix run .#publish-cargo-docs
-
       - name: Publish engines size to gh-pages branch
         run: nix run .#publish-engine-size

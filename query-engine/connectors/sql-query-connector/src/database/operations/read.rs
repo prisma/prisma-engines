@@ -33,7 +33,8 @@ pub(crate) async fn get_single_record_joins(
     selected_fields: &FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SingleRecord>> {
-    let field_names: Vec<_> = selected_fields.db_names_grouping_virtuals().collect();
+    let selected_fields = selected_fields.to_virtuals_last();
+    let field_names: Vec<_> = selected_fields.prisma_names_grouping_virtuals().collect();
     let idents = selected_fields.type_identifiers_with_arities_grouping_virtuals();
 
     let indexes = get_selection_indexes(
@@ -44,7 +45,7 @@ pub(crate) async fn get_single_record_joins(
 
     let query = query_builder::select::SelectBuilder::build(
         QueryArguments::from((model.clone(), filter.clone())),
-        selected_fields,
+        &selected_fields,
         ctx,
     );
 
@@ -130,7 +131,8 @@ pub(crate) async fn get_many_records_joins(
     selected_fields: &FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
-    let field_names: Vec<_> = selected_fields.db_names_grouping_virtuals().collect();
+    let selected_fields = selected_fields.to_virtuals_last();
+    let field_names: Vec<_> = selected_fields.prisma_names_grouping_virtuals().collect();
     let idents = selected_fields.type_identifiers_with_arities_grouping_virtuals();
     let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
 
@@ -155,7 +157,7 @@ pub(crate) async fn get_many_records_joins(
         _ => (),
     };
 
-    let query = query_builder::select::SelectBuilder::build(query_arguments.clone(), selected_fields, ctx);
+    let query = query_builder::select::SelectBuilder::build(query_arguments.clone(), &selected_fields, ctx);
 
     for item in conn.filter(query.into(), meta.as_slice(), ctx).await?.into_iter() {
         let mut record = Record::from(item);

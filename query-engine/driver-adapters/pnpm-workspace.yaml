@@ -5,4 +5,5 @@ packages:
   - '../../../prisma/packages/adapter-planetscale'
   - '../../../prisma/packages/driver-adapter-utils'
   - '../../../prisma/packages/debug'
+  - '../../../prisma/packages/bundled-js-drivers'
   - './executor'

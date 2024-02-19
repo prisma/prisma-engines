@@ -34,7 +34,6 @@ echo "ℹ️  target version: $OUT_VERSION"
 echo "ℹ️  out folder: $OUT_FOLDER"
 
 if [[ -z "${WASM_BUILD_PROFILE:-}" ]]; then
-    # use `wasm-pack build --release` by default on CI only
     if [[ -z "${BUILDKITE:-}" ]] && [[ -z "${GITHUB_ACTIONS:-}" ]]; then
         WASM_BUILD_PROFILE="dev"
     else
@@ -45,22 +44,23 @@ fi
 if [ "$WASM_BUILD_PROFILE" = "dev" ]; then
     WASM_TARGET_SUBDIR="debug"
 else
-    WASM_TARGET_SUBDIR="release"
+    WASM_TARGET_SUBDIR="$WASM_BUILD_PROFILE"
 fi
 
-echo "Using build profile: \"${WASM_BUILD_PROFILE}\"" 
 
-echo "ℹ️  Configuring rust toolchain to use nightly and rust-src component"
-rustup default nightly-2024-01-25 
-rustup target add wasm32-unknown-unknown
-rustup component add rust-src --target wasm32-unknown-unknown
-export RUSTFLAGS="-Zlocation-detail=none"
-CARGO_TARGET_DIR=$(cargo metadata --format-version 1 | jq -r .target_directory)
 
 build() {
+    echo "ℹ️  Configuring rust toolchain to use nightly and rust-src component"
+    rustup default nightly-2024-01-25
+    rustup target add wasm32-unknown-unknown
+    rustup component add rust-std --target wasm32-unknown-unknown
+    rustup component add rust-src --target wasm32-unknown-unknown
+
     local CONNECTOR="$1"
-    echo "🔨 Building $CONNECTOR"
-    CARGO_PROFILE_RELEASE_OPT_LEVEL="z" cargo build \
+    local CARGO_TARGET_DIR
+    CARGO_TARGET_DIR=$(cargo metadata --format-version 1 | jq -r .target_directory)
+    echo "🔨 Building $CONNECTOR"    
+    RUSTFLAGS="-Zlocation-detail=none" CARGO_PROFILE_RELEASE_OPT_LEVEL="z" cargo build \
         -p query-engine-wasm \
         --profile "$WASM_BUILD_PROFILE" \
         --features "$CONNECTOR" \
