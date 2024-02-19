@@ -218,7 +218,7 @@ impl QueryArguments {
     }
 
     pub fn take_abs(&self) -> Option<i64> {
-        self.take.map(|t| if t < 0 { -t } else { t })
+        self.take.map(|t| t.abs())
     }
 
     pub fn has_unbatchable_ordering(&self) -> bool {
