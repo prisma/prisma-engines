@@ -95,32 +95,25 @@ impl ManyRecords {
 
     /// Builds `SelectionResult`s from this `ManyRecords` based on the given `FieldSelection`
     /// using the database field names.
-    #[inline]
     pub fn extract_selection_results_from_db_name(
         &self,
         selections: &FieldSelection,
     ) -> crate::Result<Vec<SelectionResult>> {
-        self.extract_selection_results(selections, Record::extract_selection_result_from_db_name)
+        self.records
+            .iter()
+            .map(|record| record.extract_selection_result_from_db_name(&self.field_names, selections))
+            .collect()
     }
 
     /// Builds `SelectionResult`s from this `ManyRecords` based on the given `FieldSelection`
     /// using the Prisma field names.
-    #[inline]
     pub fn extract_selection_results_from_prisma_name(
         &self,
         selections: &FieldSelection,
     ) -> crate::Result<Vec<SelectionResult>> {
-        self.extract_selection_results(selections, Record::extract_selection_result_from_prisma_name)
-    }
-
-    fn extract_selection_results(
-        &self,
-        selections: &FieldSelection,
-        extract_result: impl Fn(&Record, &[String], &FieldSelection) -> crate::Result<SelectionResult>,
-    ) -> crate::Result<Vec<SelectionResult>> {
         self.records
             .iter()
-            .map(|record| extract_result(record, &self.field_names, selections))
+            .map(|record| record.extract_selection_result_from_prisma_name(&self.field_names, selections))
             .collect()
     }
 
