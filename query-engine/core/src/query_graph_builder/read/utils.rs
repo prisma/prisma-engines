@@ -1,5 +1,6 @@
 use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
+use once_cell::sync::Lazy;
 use psl::datamodel_connector::{ConnectorCapability, JoinStrategySupport};
 use query_structure::{native_distinct_compatible_with_order_by, prelude::*, RelationLoadStrategy};
 use schema::{
@@ -259,6 +260,13 @@ pub(crate) fn get_relation_load_strategy(
     nested_queries: &[ReadQuery],
     query_schema: &QuerySchema,
 ) -> QueryGraphBuilderResult<RelationLoadStrategy> {
+    static RELATION_LOAD_STRATEGY: Lazy<Result<RelationLoadStrategy, DomainError>> =
+        Lazy::new(|| std::env::var("RELATION_LOAD_STRATEGY").unwrap().as_str().try_into());
+
+    if RELATION_LOAD_STRATEGY.is_ok() {
+        return Ok(*RELATION_LOAD_STRATEGY.as_ref().unwrap());
+    }
+
     match query_schema.join_strategy_support() {
         // Connector and database version supports the `Join` strategy...
         JoinStrategySupport::Yes => match requested_strategy {
