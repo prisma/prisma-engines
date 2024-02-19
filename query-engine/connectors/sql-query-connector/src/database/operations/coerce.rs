@@ -109,6 +109,18 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
                 _ => Either::Right(iter),
             };
 
+            // TODO: ignore_skip and ignore_take aren't populated right now, and we might also want
+            // a different abstraction
+            let iter = match rs.args.skip {
+                Some(skip) if rs.args.ignore_skip => Either::Left(iter.skip(skip as usize)),
+                _ => Either::Right(iter),
+            };
+
+            let iter = match rs.args.take_abs() {
+                Some(take) if rs.args.ignore_take => Either::Left(iter.take(take as usize)),
+                _ => Either::Right(iter),
+            };
+
             Ok(PrismaValue::List(iter.collect::<crate::Result<Vec<_>>>()?))
         }
         serde_json::Value::Object(obj) => {
