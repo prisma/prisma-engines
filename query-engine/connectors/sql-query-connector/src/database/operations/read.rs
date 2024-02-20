@@ -1,4 +1,7 @@
-use super::coerce::{coerce_record_with_json_relation, IndexedSelection};
+mod coerce;
+mod process;
+
+use self::coerce::{coerce_record_with_json_relation, IndexedSelection};
 use crate::{
     column_metadata,
     model_extensions::*,
