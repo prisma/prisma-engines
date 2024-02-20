@@ -105,7 +105,7 @@ impl InMemoryRecordProcessor {
                         .into_iter()
                         .unique_by(|record| {
                             record
-                                .extract_selection_result(field_names, &distinct_selection)
+                                .extract_selection_result_from_db_name(field_names, &distinct_selection)
                                 .unwrap()
                         })
                         .collect();
@@ -119,7 +119,7 @@ impl InMemoryRecordProcessor {
                 .into_iter()
                 .unique_by(|record| {
                     record
-                        .extract_selection_result(field_names, &distinct_selection)
+                        .extract_selection_result_from_db_name(field_names, &distinct_selection)
                         .unwrap()
                 })
                 .collect()
@@ -144,7 +144,9 @@ impl InMemoryRecordProcessor {
             let mut cursor_seen = false;
 
             many_records.records.retain(|record| {
-                let cursor_comparator = record.extract_selection_result(field_names, &cursor_selection).unwrap();
+                let cursor_comparator = record
+                    .extract_selection_result_from_db_name(field_names, &cursor_selection)
+                    .unwrap();
                 let record_values: Vec<_> = cursor_comparator.values().collect();
 
                 // Reset, new parent
