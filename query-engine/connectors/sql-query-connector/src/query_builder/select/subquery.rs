@@ -176,14 +176,11 @@ impl SubqueriesSelectBuilder {
             .comment("root");
 
         // On MySQL, using LIMIT makes the ordering of the JSON_AGG working. Beware, this is undocumented behavior.
-        let take = match rs.args.order_by.is_empty() {
-            true => rs.args.take_abs(),
-            false => rs.args.take_abs().or(Some(i64::MAX)),
-        };
+        let override_empty_take = (!rs.args.order_by.is_empty()).then_some(i64::MAX);
 
         let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()))
             .value(self.build_json_obj_fn(rs, root_alias, ctx).alias(JSON_AGG_IDENT))
-            .with_pagination(take, rs.args.skip)
+            .with_pagination(&rs.args, override_empty_take)
             .comment("inner"); // adds pagination
 
         Select::from_table(Table::from(inner).alias(outer_alias.to_table_string()))
