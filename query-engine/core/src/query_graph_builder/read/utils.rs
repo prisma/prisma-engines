@@ -260,12 +260,11 @@ pub(crate) fn get_relation_load_strategy(
     nested_queries: &[ReadQuery],
     query_schema: &QuerySchema,
 ) -> QueryGraphBuilderResult<RelationLoadStrategy> {
-    static RELATION_LOAD_STRATEGY: Lazy<Result<RelationLoadStrategy, DomainError>> =
-        Lazy::new(|| std::env::var("RELATION_LOAD_STRATEGY").unwrap().as_str().try_into());
-
-    if RELATION_LOAD_STRATEGY.is_ok() {
-        return Ok(*RELATION_LOAD_STRATEGY.as_ref().unwrap());
-    }
+    static RELATION_LOAD_STRATEGY: Lazy<Option<RelationLoadStrategy>> = Lazy::new(|| {
+        std::env::var("RELATION_LOAD_STRATEGY")
+            .map(|e| e.as_str().try_into().unwrap())
+            .ok()
+    });
 
     match query_schema.join_strategy_support() {
         // Connector and database version supports the `Join` strategy...
@@ -278,7 +277,11 @@ pub(crate) fn get_relation_load_strategy(
             // But requested strategy is `Query`.
             Some(RelationLoadStrategy::Query) => Ok(RelationLoadStrategy::Query),
             // And requested strategy is `Join` or there's none selected, in which case the default is still `Join`.
-            Some(RelationLoadStrategy::Join) | None => Ok(RelationLoadStrategy::Join),
+            Some(RelationLoadStrategy::Join) => Ok(RelationLoadStrategy::Join),
+            None => match *RELATION_LOAD_STRATEGY {
+                Some(rls) => Ok(rls),
+                None => Ok(RelationLoadStrategy::Join),
+            },
         },
         // Connector supports `Join` strategy but database version does not...
         JoinStrategySupport::UnsupportedDbVersion => match requested_strategy {
