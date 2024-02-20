@@ -199,12 +199,12 @@ pub(crate) trait JoinSelectBuilder {
 
             let inner = inner.with_columns(inner_selection.into()).comment("inner select");
 
-            let middle_take = match connector_flavour(&rs.args) {
+            let override_empty_middle_take = match connector_flavour(&rs.args) {
                 // On MySQL, using LIMIT makes the ordering of the JSON_AGG working. Beware, this is undocumented behavior.
                 // Note: Ideally, this should live in the MySQL select builder, but it's currently the only implementation difference
                 // between MySQL and Postgres, so we keep it here for now to avoid code duplication.
-                Flavour::Mysql if !rs.args.order_by.is_empty() => rs.args.take_abs().or(Some(i64::MAX)),
-                _ => rs.args.take_abs(),
+                Flavour::Mysql if !rs.args.order_by.is_empty() => Some(i64::MAX),
+                _ => None,
             };
 
             let middle = Select::from_table(Table::from(inner).alias(inner_alias.to_table_string()))
@@ -217,7 +217,7 @@ pub(crate) trait JoinSelectBuilder {
                 // WHERE ...
                 .with_filters(rs.args.filter.clone(), Some(inner_alias), ctx)
                 // LIMIT $1 OFFSET $2
-                .with_pagination(middle_take, rs.args.skip)
+                .with_pagination(&rs.args, override_empty_middle_take)
                 .comment("middle select");
 
             // SELECT COALESCE(JSON_AGG(<inner_alias>), '[]') AS <inner_alias> FROM ( <middle> ) as <inner_alias_2>
@@ -266,7 +266,7 @@ pub(crate) trait JoinSelectBuilder {
             .with_distinct(args, table_alias)
             .with_ordering(args, Some(table_alias.to_table_string()), ctx)
             .with_filters(args.filter.clone(), Some(table_alias), ctx)
-            .with_pagination(args.take_abs(), args.skip)
+            .with_pagination(args, None)
             .append_trace(&Span::current());
 
         (select, table_alias)
@@ -415,7 +415,7 @@ pub(crate) trait JoinSelectBuilder {
 
 pub(crate) trait SelectBuilderExt<'a> {
     fn with_filters(self, filter: Option<Filter>, parent_alias: Option<Alias>, ctx: &Context<'_>) -> Select<'a>;
-    fn with_pagination(self, take: Option<i64>, skip: Option<i64>) -> Select<'a>;
+    fn with_pagination(self, args: &QueryArguments, override_empty_take: Option<i64>) -> Select<'a>;
     fn with_ordering(self, args: &QueryArguments, parent_alias: Option<String>, ctx: &Context<'_>) -> Select<'a>;
     fn with_distinct(self, args: &QueryArguments, table_alias: Alias) -> Select<'a>;
     fn with_join_conditions(
@@ -453,7 +453,18 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
         }
     }
 
-    fn with_pagination(self, take: Option<i64>, skip: Option<i64>) -> Select<'a> {
+    fn with_pagination(self, args: &QueryArguments, override_empty_take: Option<i64>) -> Select<'a> {
+        let take = match args.take_abs() {
+            Some(_) if args.requires_inmemory_pagination_with_joins() => override_empty_take,
+            Some(take) => Some(take),
+            None => override_empty_take,
+        };
+
+        let skip = match args.requires_inmemory_pagination_with_joins() {
+            true => None,
+            false => args.skip,
+        };
+
         let select = match take {
             Some(take) => self.limit(take as usize),
             None => self,
