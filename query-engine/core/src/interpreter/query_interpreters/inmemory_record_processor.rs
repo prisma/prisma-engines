@@ -34,10 +34,6 @@ impl InMemoryRecordProcessor {
         processor
     }
 
-    fn take_abs(&self) -> Option<i64> {
-        self.take.map(|t| if t < 0 { -t } else { t })
-    }
-
     /// Checks whether or not we need to take records going backwards in the record list,
     /// which requires reversing the list of records at some point.
     fn needs_reversed_order(&self) -> bool {
