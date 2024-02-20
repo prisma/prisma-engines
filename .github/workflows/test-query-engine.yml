@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   rust-query-engine-tests:
-    name: "${{ matrix.database.name }} - ${{ matrix.engine_protocol }} ${{ matrix.partition }}"
+    name: "${{ matrix.database.name }} - ${{ matrix.engine_protocol }} ${{ matrix.relation_load_strategy }} ${{ matrix.partition }}"
 
     strategy:
       fail-fast: false
