@@ -1,9 +1,11 @@
 use bigdecimal::{BigDecimal, FromPrimitive, ParseBigDecimalError};
-use itertools::{Either, Itertools};
+use itertools::Itertools;
 use query_structure::*;
-use std::{io, str::FromStr};
+use std::{borrow::Cow, io, str::FromStr};
 
-use crate::{query_arguments_ext::QueryArgumentsExt, SqlError};
+use crate::SqlError;
+
+use super::process::InMemoryProcessorForJoins;
 
 pub(crate) enum IndexedSelection<'a> {
     Relation(&'a RelationSelection),
@@ -69,57 +71,18 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
                 }
             });
 
-            // Reverses order when using negative take.
-            let iter = match rs.args.needs_reversed_order() {
-                true => Either::Left(iter.rev()),
-                false => Either::Right(iter),
-            };
+            let iter = InMemoryProcessorForJoins::new(&rs.args, iter).process(|maybe_value| {
+                maybe_value.as_ref().ok().map(|value| {
+                    let object = value
+                        .clone()
+                        .into_object()
+                        .expect("Expected coerced_json_relation_to_pv to return list of objects");
 
-            let iter = match rs.args.distinct.as_ref() {
-                Some(distinct) if rs.args.requires_inmemory_distinct_with_joins() => {
-                    Either::Left(iter.unique_by(|maybe_value| {
-                        // Mapping errors to a unit type here does not discard the error
-                        // information from the final iterator because the result that we return
-                        // from this closure is only a key for comparing the elements, we do not
-                        // map the elements themselves here. We can't use the original errors in
-                        // keys because `SqlError` is not Eq + Hash. The consequence is that only
-                        // the first error will be kept, but the same thing will happen when
-                        // collecting the iterator to `Result<Vec<_>>` anyway. This also means we
-                        // have no easy way to introduce a new error and return it out of
-                        // `unique_by`, so we have to panic if an element is not an object, but
-                        // this is fine because we know we already mapped the elements using
-                        // `coerce_json_relation_to_pv` above, so they must be objects. We also
-                        // panic if the result set is malformed and we can't find the distinct
-                        // fields in it, which is less desirable but also exactly what the
-                        // in-memory record processor for the old query strategy does.
-                        maybe_value.as_ref().map_err(|_| ()).map(|value| {
-                            let object = value
-                                .clone()
-                                .into_object()
-                                .expect("Expected coerced_json_relation_to_pv to return list of objects");
+                    let (field_names, values) = object.into_iter().unzip();
 
-                            let (field_names, values): (Vec<_>, _) = object.into_iter().unzip();
-
-                            Record::new(values)
-                                .extract_selection_result_from_prisma_name(&field_names, distinct)
-                                .unwrap()
-                        })
-                    }))
-                }
-                _ => Either::Right(iter),
-            };
-
-            // TODO: ignore_skip and ignore_take aren't populated right now, and we might also want
-            // a different abstraction
-            let iter = match rs.args.skip {
-                Some(skip) if rs.args.ignore_skip => Either::Left(iter.skip(skip as usize)),
-                _ => Either::Right(iter),
-            };
-
-            let iter = match rs.args.take_abs() {
-                Some(take) if rs.args.ignore_take => Either::Left(iter.take(take as usize)),
-                _ => Either::Right(iter),
-            };
+                    (Cow::Owned(Record::new(values)), Cow::Owned(field_names))
+                })
+            });
 
             Ok(PrismaValue::List(iter.collect::<crate::Result<Vec<_>>>()?))
         }
