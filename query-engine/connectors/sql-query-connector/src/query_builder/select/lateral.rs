@@ -161,9 +161,7 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Expression<'static> {
-        let build_obj_params = rs
-            .selections
-            .iter()
+        let build_obj_params = json_obj_selections(rs)
             .filter_map(|field| match field {
                 SelectedField::Scalar(sf) => Some((
                     Cow::from(sf.name().to_owned()),

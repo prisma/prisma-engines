@@ -228,6 +228,25 @@ mod distinct {
         Ok(())
     }
 
+    /// Tests nested distinct with non-matching orderBy and selection that doesn't include the
+    /// distinct fields.
+    #[connector_test]
+    async fn nested_distinct_not_in_selection(runner: Runner) -> TestResult<()> {
+        nested_dataset(&runner).await?;
+
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"{
+                findManyUser {
+                    id
+                    posts(distinct: title, orderBy: { id: desc }) { id }
+                }
+            }"#),
+            @r###"{"data":{"findManyUser":[{"id":1,"posts":[{"id":5},{"id":4},{"id":1}]},{"id":2,"posts":[{"id":7},{"id":6}]},{"id":3,"posts":[]},{"id":4,"posts":[{"id":9}]},{"id":5,"posts":[{"id":12},{"id":11}]}]}}"###
+        );
+
+        Ok(())
+    }
+
     /// Dataset:
     /// User (id) => Posts (titles, id asc)
     /// 1 => ["3", "1", "1", "2", "1"]
