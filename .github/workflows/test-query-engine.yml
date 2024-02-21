@@ -76,7 +76,7 @@ jobs:
       TEST_CONNECTOR: ${{ matrix.database.connector }}
       TEST_CONNECTOR_VERSION: ${{ matrix.database.version }}
       PRISMA_ENGINE_PROTOCOL: ${{ matrix.engine_protocol }}
-      RELATION_LOAD_STRATEGY: ${{ matrix.relation_load_strategy }}
+      PRISMA_RELATION_LOAD_STRATEGY: ${{ matrix.relation_load_strategy }}
 
     runs-on: ubuntu-latest
     steps:

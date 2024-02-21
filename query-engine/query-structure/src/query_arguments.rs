@@ -44,6 +44,7 @@ impl TryFrom<&str> for RelationLoadStrategy {
     type Error = crate::error::DomainError;
 
     fn try_from(value: &str) -> crate::Result<Self> {
+        // todo(team-orm#947) We ideally use the `load_strategy` enum defined in schema/constants, but first we need to extract the `schema-constants` crate.
         match value {
             "join" => Ok(RelationLoadStrategy::Join),
             "query" => Ok(RelationLoadStrategy::Query),
