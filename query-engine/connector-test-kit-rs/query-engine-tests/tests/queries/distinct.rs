@@ -236,7 +236,7 @@ mod distinct {
 
         insta::assert_snapshot!(
             run_query!(&runner, r#"{
-                findManyUser {
+                findManyUser(orderBy: { id: asc }) {
                     id
                     posts(distinct: title, orderBy: { id: desc }) { id }
                 }
