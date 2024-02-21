@@ -63,8 +63,8 @@ jobs:
         relation_load_strategy: [join, query]
         partition: ["1/4", "2/4", "3/4", "4/4"]
         exclude:
-          - relation_load_strategy: "join"
-           database: ["mongodb_4_2"]
+          - relation_load_strategy: join
+            database: { "connector": "mongodb" }
 
     env:
       LOG_LEVEL: "info"
