@@ -1,6 +1,7 @@
 mod lateral;
 mod subquery;
 
+use itertools::Either;
 use std::borrow::Cow;
 use tracing::Span;
 
@@ -625,6 +626,15 @@ fn filtering_selection(rs: &RelationSelection) -> FieldSelection {
 
 fn distinct_selection(rs: &RelationSelection) -> FieldSelection {
     rs.args.distinct.as_ref().cloned().unwrap_or_default()
+}
+
+fn json_obj_selections(rs: &RelationSelection) -> impl Iterator<Item = &SelectedField> + '_ {
+    match rs.args.distinct.as_ref() {
+        Some(distinct) if rs.args.requires_inmemory_distinct_with_joins() => {
+            Either::Left(rs.selections.iter().chain(distinct.selections()))
+        }
+        _ => Either::Right(rs.selections.iter()),
+    }
 }
 
 fn extract_filter_scalars(f: &Filter) -> Vec<ScalarFieldRef> {
