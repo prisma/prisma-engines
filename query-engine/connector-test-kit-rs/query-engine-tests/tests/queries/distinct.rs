@@ -179,8 +179,8 @@ mod distinct {
 
         // Returns Users 1, 3, 4, 5 top
         // 1 => ["3", "1", "2"]
-        // 4 => ["1"]
         // 3 => []
+        // 4 => ["1"]
         // 5 => ["2", "3"]
         insta::assert_snapshot!(run_query!(
             &runner,
@@ -206,7 +206,7 @@ mod distinct {
         nested_dataset(&runner).await?;
 
         // Returns Users 1, 3, 4, 5 top
-        // 1 => ["3", "1", "2"]
+        // 1 => ["1", "2", "3"]
         // 4 => ["1"]
         // 3 => []
         // 5 => ["2", "3"]
