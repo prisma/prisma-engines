@@ -64,7 +64,12 @@ jobs:
         partition: ["1/4", "2/4", "3/4", "4/4"]
         exclude:
           - relation_load_strategy: join
-            database: { "connector": "mongodb" }
+            database:
+              [
+                { "connector": "mongodb" },
+                { "connector": "sqlite" },
+                { "connector": "mssql_2022" },
+              ]
 
     env:
       LOG_LEVEL: "info"
