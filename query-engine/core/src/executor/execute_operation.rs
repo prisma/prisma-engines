@@ -292,28 +292,6 @@ async fn execute_on<'a>(
 fn build_graph(query_schema: &QuerySchema, operation: Operation) -> crate::Result<(QueryGraph, IrSerializer<'_>)> {
     let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
 
-    #[cfg(all(feature = "debug-graphviz", not(target_arch = "wasm32")))]
-    {
-        use crate::ToGraphviz;
-        use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
-
-        const FOLDER_NAME: &str = ".query_graphs";
-        static INITIALISED: AtomicBool = AtomicBool::new(false);
-        if !INITIALISED.fetch_or(true, Ordering::Relaxed) {
-            // We do not check for errors here because the directory might not exist.
-            let _ = std::fs::remove_dir_all(FOLDER_NAME);
-            std::fs::create_dir(FOLDER_NAME).expect("Failed to create directory to store query graphs");
-        }
-
-        static COUNTER: AtomicU32 = AtomicU32::new(1);
-        let current = COUNTER.fetch_add(1, Ordering::Relaxed);
-        std::fs::write(
-            format!("{}/{}_{}.graphviz", FOLDER_NAME, current, serializer.key),
-            query_graph.to_graphviz(),
-        )
-        .unwrap();
-    }
-
     Ok((query_graph, serializer))
 }
 

@@ -1,7 +1,23 @@
-use std::fmt;
+use std::{
+    fmt,
+    sync::atomic::{AtomicU32, Ordering},
+};
+
+use chrono::Local;
+use once_cell::sync::Lazy;
 
 use super::*;
 use crate::{query_document::*, query_graph::*, schema::*, IrSerializer};
+
+static PRISMA_DOT_PATH: Lazy<Option<String>> = Lazy::new(|| {
+    if !matches!(std::env::var("PRISMA_RENDER_DOT_FILE").as_deref(), Ok("true") | Ok("1")) {
+        return None;
+    }
+    let time = Local::now().format("%Y-%m-%d %H:%M:%S");
+    let path = format!(".query_graphs/{time}");
+    std::fs::create_dir_all(&path).expect("Could not create directory to store query graphs");
+    Some(path)
+});
 
 pub struct QueryGraphBuilder<'a> {
     query_schema: &'a QuerySchema,
@@ -51,6 +67,18 @@ impl<'a> QueryGraphBuilder<'a> {
 
         if field_pair.schema_field.query_info().is_some() {
             let graph = self.dispatch_build(field_pair)?;
+
+            // Used to debug generated graph.
+            if let Some(path) = &*PRISMA_DOT_PATH {
+                static COUNTER: AtomicU32 = AtomicU32::new(1);
+                let current = COUNTER.fetch_add(1, Ordering::Relaxed);
+                std::fs::write(
+                    format!("{}/{}_{}.graphviz", path, current, serializer.key),
+                    graph.to_graphviz(),
+                )
+                .unwrap();
+            }
+
             Ok((graph, serializer))
         } else {
             Err(QueryGraphBuilderError::SchemaError(format!(

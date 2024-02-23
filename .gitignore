@@ -58,5 +58,4 @@ package-lock.json
 *.wat
 
 # Folder with GraphViz representation of query graphs.
-# Produced when "debug-graphviz" feature is enabled.
 .query_graphs
