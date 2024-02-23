@@ -20,6 +20,10 @@ import { PrismaPlanetScale } from '@prisma/adapter-planetscale'
 
 import {bindAdapter, DriverAdapter, ErrorCapturingDriverAdapter} from "@prisma/driver-adapter-utils";
 import { webcrypto } from 'node:crypto';
+import { D1Database } from '@cloudflare/workers-types'
+import { PrismaD1 } from '@prisma/adapter-d1'
+import path from 'node:path'
+import { getPlatformProxy } from 'wrangler'
 
 if (!global.crypto) {
   global.crypto = webcrypto as Crypto
@@ -32,6 +36,7 @@ const SUPPORTED_ADAPTERS: Record<string, (_ : string) => Promise<DriverAdapter>>
         "neon:ws" : neonWsAdapter,
         "libsql": libsqlAdapter,
         "planetscale": planetscaleAdapter,
+        "d1": d1Adapter,
     };
 
 // conditional debug logging based on LOG_LEVEL env var
@@ -296,6 +301,16 @@ async function planetscaleAdapter(url: string): Promise<DriverAdapter> {
     })
 
     return new PrismaPlanetScale(client)
+}
+
+async function d1Adapter(url: string): Promise<DriverAdapter> {
+  const { env, dispose } = await getPlatformProxy({
+    configPath: path.join(__dirname, "./wrangler.toml"),
+  });
+
+  const client = new PrismaD1(env!.MY_DATABASE as D1Database)
+
+  return client;
 }
 
 function copyPathName(fromUrl: string, toUrl: string) {
