@@ -41,6 +41,8 @@ jobs:
             setup_task: "dev-neon-wasm"
           - name: "libsql (wasm)"
             setup_task: "dev-libsql-wasm"
+          - name: "d1 (wasm)"
+            setup_task: "dev-d1-wasm"
         node_version: ["18"]
         partition: ["1/4", "2/4", "3/4", "4/4"]
     env:

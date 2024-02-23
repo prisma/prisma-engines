@@ -149,6 +149,12 @@ dev-libsql-wasm: build-qe-wasm build-driver-adapters-kit
 test-libsql-wasm: dev-libsql-wasm test-qe-st
 test-driver-adapter-libsql-wasm: test-libsql-wasm
 
+dev-d1-wasm: build-qe-wasm build-driver-adapters-kit
+	cp $(CONFIG_PATH)/libsql-wasm $(CONFIG_FILE)
+
+test-d1-wasm: dev-d1-wasm test-qe-st
+test-driver-adapter-d1-wasm: test-d1-wasm
+
 start-postgres9:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres9
 
