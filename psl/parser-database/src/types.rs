@@ -650,21 +650,30 @@ fn visit_model<'db>(model_id: ast::ModelId, ast_model: &'db ast::Model, ctx: &mu
             }
             Err(supported) => {
                 let top_names: Vec<_> = ctx.ast.iter_tops().map(|(_, top)| &top.identifier().name).collect();
-                
+
                 match top_names.iter().find(|&name| name.to_lowercase() == supported) {
                     Some(ignore_case_match) => {
-                        ctx.push_error(DatamodelError::new_type_for_case_not_found_error(supported, ignore_case_match.as_str(), ast_field.field_type.span()));
+                        ctx.push_error(DatamodelError::new_type_for_case_not_found_error(
+                            supported,
+                            ignore_case_match.as_str(),
+                            ast_field.field_type.span(),
+                        ));
                     }
-                    None => {
-                        match ScalarType::try_from_str(supported, true) {
-                            Some(ignore_case_match) => {
-                                ctx.push_error(DatamodelError::new_type_for_case_not_found_error(supported, ignore_case_match.as_str(), ast_field.field_type.span()));
-                            }
-                            None => {
-                                ctx.push_error(DatamodelError::new_type_not_found_error(supported,ast_field.field_type.span()));
-                            }
+                    None => match ScalarType::try_from_str(supported, true) {
+                        Some(ignore_case_match) => {
+                            ctx.push_error(DatamodelError::new_type_for_case_not_found_error(
+                                supported,
+                                ignore_case_match.as_str(),
+                                ast_field.field_type.span(),
+                            ));
                         }
-                    }
+                        None => {
+                            ctx.push_error(DatamodelError::new_type_not_found_error(
+                                supported,
+                                ast_field.field_type.span(),
+                            ));
+                        }
+                    },
                 }
             }
         }
@@ -1463,7 +1472,7 @@ impl ScalarType {
                 "Bytes" => Some(ScalarType::Bytes),
                 "Decimal" => Some(ScalarType::Decimal),
                 _ => None,
-            }
+            },
         }
     }
 }
