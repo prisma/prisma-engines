@@ -1,7 +1,7 @@
 use query_engine_tests::test_suite;
 use std::borrow::Cow;
 
-#[test_suite(schema(generic))]
+#[test_suite(schema(generic), exclude(Vitess("planetscale.js"), Sqlite("cfd1")))]
 mod interactive_tx {
     use query_engine_tests::*;
     use tokio::time;
