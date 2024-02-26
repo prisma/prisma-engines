@@ -46,6 +46,7 @@ pub(crate) fn create_records_nonempty(
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
     affected_fields: &HashSet<ScalarFieldRef>,
+    selected_fields: Option<&ModelProjection>,
     ctx: &Context<'_>,
 ) -> Insert<'static> {
     // We need to bring all write args into a uniform shape.
@@ -79,25 +80,38 @@ pub(crate) fn create_records_nonempty(
     let insert = Insert::multi_into(model.as_table(ctx), columns);
     let insert = values.into_iter().fold(insert, |stmt, values| stmt.values(values));
     let insert: Insert = insert.into();
-    let insert = insert.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
+    let mut insert = insert.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
+
+    if let Some(selected_fields) = selected_fields {
+        insert = insert.returning(projection_into_columns(selected_fields, ctx));
+    }
 
     if skip_duplicates {
-        insert.on_conflict(OnConflict::DoNothing)
-    } else {
-        insert
+        insert = insert.on_conflict(OnConflict::DoNothing)
     }
+
+    insert
 }
 
 /// `INSERT` empty records statement.
-pub(crate) fn create_records_empty(model: &Model, skip_duplicates: bool, ctx: &Context<'_>) -> Insert<'static> {
+pub(crate) fn create_records_empty(
+    model: &Model,
+    skip_duplicates: bool,
+    selected_fields: Option<&ModelProjection>,
+    ctx: &Context<'_>,
+) -> Insert<'static> {
     let insert: Insert<'static> = Insert::single_into(model.as_table(ctx)).into();
-    let insert = insert.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
+    let mut insert = insert.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
+
+    if let Some(selected_fields) = selected_fields {
+        insert = insert.returning(projection_into_columns(selected_fields, ctx));
+    }
 
     if skip_duplicates {
-        insert.on_conflict(OnConflict::DoNothing)
-    } else {
-        insert
+        insert = insert.on_conflict(OnConflict::DoNothing);
     }
+
+    insert
 }
 
 pub(crate) fn build_update_and_set_query(
@@ -186,16 +200,23 @@ pub(crate) fn chunk_update_with_ids(
     Ok(query)
 }
 
+/// Converts a list of selected fields into an iterator of table columns.
+fn projection_into_columns(
+    selected_fields: &ModelProjection,
+    ctx: &Context<'_>,
+) -> impl Iterator<Item = Column<'static>> {
+    selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true))
+}
+
 pub(crate) fn delete_returning(
     model: &Model,
     filter: ConditionTree<'static>,
     selected_fields: &ModelProjection,
     ctx: &Context<'_>,
 ) -> Query<'static> {
-    let selected_columns = selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true));
     Delete::from_table(model.as_table(ctx))
         .so_that(filter)
-        .returning(selected_columns)
+        .returning(projection_into_columns(selected_fields, ctx))
         .append_trace(&Span::current())
         .add_trace_id(ctx.trace_id)
         .into()

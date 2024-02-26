@@ -60,9 +60,25 @@ async fn create_many(
     q: CreateManyRecords,
     trace_id: Option<String>,
 ) -> InterpretationResult<QueryResult> {
-    let affected_records = tx.create_records(&q.model, q.args, q.skip_duplicates, trace_id).await?;
+    if let Some(selected_fields) = q.selected_fields {
+        let records = tx
+            .create_records_returning(&q.model, q.args, q.skip_duplicates, selected_fields.fields, trace_id)
+            .await?;
 
-    Ok(QueryResult::Count(affected_records))
+        let selection = RecordSelection {
+            name: q.name,
+            fields: selected_fields.order,
+            records,
+            nested: vec![],
+            model: q.model,
+            virtual_fields: vec![],
+        };
+
+        Ok(QueryResult::RecordSelection(Some(Box::new(selection))))
+    } else {
+        let affected_records = tx.create_records(&q.model, q.args, q.skip_duplicates, trace_id).await?;
+        Ok(QueryResult::Count(affected_records))
+    }
 }
 
 async fn update_one(
