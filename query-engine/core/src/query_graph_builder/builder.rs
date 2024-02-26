@@ -10,11 +10,19 @@ use super::*;
 use crate::{query_document::*, query_graph::*, schema::*, IrSerializer};
 
 static PRISMA_DOT_PATH: Lazy<Option<String>> = Lazy::new(|| {
+    // Query graphs are saved only if `PRISMA_RENDER_DOT_FILE` env variable is set.
     if !matches!(std::env::var("PRISMA_RENDER_DOT_FILE").as_deref(), Ok("true") | Ok("1")) {
         return None;
     }
+    // If `WORKSPACE_ROOT` env variable is defined, we save query graphs there. This ensures that
+    // there is a single central place to store query graphs, no matter which target is running.
+    // If this env variable is not defined, we save query graphs in the current directory.
+    let base_path = std::env::var("WORKSPACE_ROOT")
+        .ok()
+        .filter(|path| !path.is_empty())
+        .unwrap_or(".".into());
     let time = Local::now().format("%Y-%m-%d %H:%M:%S");
-    let path = format!(".query_graphs/{time}");
+    let path = format!("{base_path}/.query_graphs/{time}");
     std::fs::create_dir_all(&path).expect("Could not create directory to store query graphs");
     Some(path)
 });
