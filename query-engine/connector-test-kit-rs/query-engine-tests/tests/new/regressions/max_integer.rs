@@ -188,7 +188,8 @@ mod max_integer {
     }
 
     // Info: `driver-adapters` are currently excluded because they yield a different error message,
-    // coming straight from the database.
+    // coming straight from the database. This is because these "Unable to fit integer value" errors
+    // are only thrown by the native quaint driver, not the underlying database driver.
     #[connector_test(
         schema(overflow_pg),
         only(Postgres),
