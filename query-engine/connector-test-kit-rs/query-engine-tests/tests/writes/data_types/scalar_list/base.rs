@@ -252,7 +252,7 @@ mod basic_types {
         Ok(())
     }
 
-    // "Skipped for CockroachDB as enum array concatenation is not supported (https://github.com/cockroachdb/cockroach/issues/71388).
+    // Skipped for CockroachDB as enum array concatenation is not supported (https://github.com/cockroachdb/cockroach/issues/71388).
     #[connector_test(exclude(CockroachDb))]
     async fn update_mut_push_empty_enum_array(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1 }"#).await?;
