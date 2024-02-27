@@ -7,7 +7,7 @@ mod scalar;
 use super::utils;
 use crate::{
     query_document::{ParsedInputMap, ParsedInputValue},
-    QueryGraphBuilderError, QueryGraphBuilderResult,
+    CompileContext, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use filter_fold::*;
 use filter_grouping::*;
@@ -17,7 +17,11 @@ use schema::constants::filters;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto, str::FromStr};
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
-pub fn extract_unique_filter(value_map: ParsedInputMap<'_>, model: &Model) -> QueryGraphBuilderResult<Filter> {
+pub fn extract_unique_filter(
+    value_map: ParsedInputMap<'_>,
+    model: &Model,
+    ctx: Option<&mut CompileContext>,
+) -> QueryGraphBuilderResult<Filter> {
     let tag = value_map.tag.clone();
     // Partition the input into a map containing only the unique fields and one containing all the other filters
     // so that we can parse them separately and ensure we AND both filters
@@ -33,7 +37,7 @@ pub fn extract_unique_filter(value_map: ParsedInputMap<'_>, model: &Model) -> Qu
     unique_map.set_tag(tag.clone());
     rest_map.set_tag(tag);
 
-    let unique_filters = internal_extract_unique_filter(unique_map, model)?;
+    let unique_filters = internal_extract_unique_filter(unique_map, model, ctx)?;
     let rest_filters = extract_filter(rest_map, model)?;
 
     Ok(Filter::and(vec![unique_filters, rest_filters]))
@@ -41,7 +45,11 @@ pub fn extract_unique_filter(value_map: ParsedInputMap<'_>, model: &Model) -> Qu
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
 /// The input map must only contain unique & compound unique fields.
-fn internal_extract_unique_filter(value_map: ParsedInputMap<'_>, model: &Model) -> QueryGraphBuilderResult<Filter> {
+fn internal_extract_unique_filter(
+    value_map: ParsedInputMap<'_>,
+    model: &Model,
+    mut ctx: Option<&mut CompileContext>,
+) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
         .map(|(field_name, value): (Cow<'_, str>, ParsedInputValue<'_>)| {
@@ -49,8 +57,13 @@ fn internal_extract_unique_filter(value_map: ParsedInputMap<'_>, model: &Model) 
             match model.fields().find_from_scalar(&field_name) {
                 Ok(field) => {
                     let value: PrismaValue = value.try_into()?;
+                    // TODO laplab: here we assume that there is always only one filter per field.
+                    if let Some(ctx) = &mut ctx {
+                        ctx.fields.insert(SelectedField::Scalar(field.clone()), value.clone());
+                    }
                     Ok(field.equals(value))
                 }
+                // TODO laplab: insert compound fields into compile context.
                 Err(_) => utils::resolve_compound_field(&field_name, model)
                     .ok_or_else(|| {
                         QueryGraphBuilderError::AssertionError(format!(

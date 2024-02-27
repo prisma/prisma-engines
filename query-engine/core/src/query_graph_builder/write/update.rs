@@ -1,3 +1,5 @@
+use self::nested::assumes_parent_exists;
+
 use super::*;
 use crate::query_graph_builder::write::write_args_parser::*;
 use crate::{
@@ -17,9 +19,18 @@ pub(crate) fn update_record(
     model: Model,
     mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
+    let mut ctx = CompileContext::default();
+
     // "where"
     let where_arg: ParsedInputMap<'_> = field.arguments.lookup(args::WHERE).unwrap().value.try_into()?;
-    let filter = extract_unique_filter(where_arg, &model)?;
+    // TODO laplab:
+    // Here we rely on the fact that `id` is always required for updates of a single record. Also,
+    // this only works for models where id is a single field (defined with `@id`, not `@@id`).
+    // Also, probably does not work for composite ids because they can be nested. Yay?
+    let is_lookup_by_id = where_arg.len() == 1;
+    let filter = extract_unique_filter(where_arg, &model, Some(&mut ctx))?;
+
+    println!("laplab: context: {ctx:?}");
 
     // "data"
     let data_argument = field.arguments.lookup(args::DATA).unwrap();
@@ -34,6 +45,8 @@ pub(crate) fn update_record(
         model.clone(),
         data_map,
         Some(&field),
+        is_lookup_by_id,
+        Some(&ctx),
     )?;
 
     if query_schema.relation_mode().is_prisma() {
@@ -177,17 +190,27 @@ pub fn update_record_node<T: Clone>(
     model: Model,
     data_map: ParsedInputMap<'_>,
     field: Option<&ParsedField<'_>>,
+    is_lookup_by_id: bool,
+    mut ctx: Option<&CompileContext>,
 ) -> QueryGraphBuilderResult<NodeRef>
 where
     T: Into<Filter>,
 {
     let update_args = WriteArgsParser::from(&model, data_map)?;
     let mut args = update_args.args;
-
     args.update_datetimes(&model);
+
+    let not_updating_current_model = args.is_empty();
+    let assumes_exists = update_args
+        .nested
+        .iter()
+        .any(|(_relation_field, data_map)| assumes_parent_exists(data_map));
+    let can_skip_update = is_lookup_by_id && not_updating_current_model && !assumes_exists;
+    println!("laplab: can skip update: {can_skip_update}");
 
     let filter: Filter = filter.into();
 
+    // TODO laplab: do not generate update node at all if we can skip the update.
     // If the connector can use `RETURNING`, always use it as it may:
     // 1. Save a SELECT statement
     // 2. Avoid from computing the ids in memory if they are updated. See `update_one_without_selection` function.
@@ -236,8 +259,13 @@ where
 
     let update_node = graph.create_node(update_parent);
 
+    // If we cannot skip update, never pass a context to nested operations.
+    if !can_skip_update {
+        ctx = None;
+    }
+
     for (relation_field, data_map) in update_args.nested {
-        nested::connect_nested_query(graph, query_schema, update_node, relation_field, data_map)?;
+        nested::connect_nested_query(graph, query_schema, update_node, relation_field, data_map, ctx)?;
     }
 
     Ok(update_node)
@@ -272,7 +300,7 @@ where
     let update_many_node = graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(update_many)));
 
     for (relation_field, data_map) in update_args.nested {
-        nested::connect_nested_query(graph, query_schema, update_many_node, relation_field, data_map)?;
+        nested::connect_nested_query(graph, query_schema, update_many_node, relation_field, data_map, None)?;
     }
 
     Ok(update_many_node)

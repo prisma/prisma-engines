@@ -35,7 +35,7 @@ pub fn nested_delete(
             .into_iter()
             .map(|value: ParsedInputValue<'_>| {
                 let value: ParsedInputMap<'_> = value.try_into()?;
-                extract_unique_filter(value, child_model)
+                extract_unique_filter(value, child_model, None)
             })
             .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
 
@@ -48,7 +48,7 @@ pub fn nested_delete(
 
         let delete_many_node = graph.create_node(Query::Write(delete_many));
         let find_child_records_node =
-            utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, or_filter)?;
+            utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, or_filter, None)?;
 
         let dependencies =
             utils::insert_emulated_on_delete(graph, query_schema, child_model, &find_child_records_node)?;
@@ -93,8 +93,13 @@ pub fn nested_delete(
                 _ => Filter::empty(),
             };
 
-            let find_child_records_node =
-                utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter.clone())?;
+            let find_child_records_node = utils::insert_find_children_by_parent_node(
+                graph,
+                parent_node,
+                parent_relation_field,
+                filter.clone(),
+                None,
+            )?;
 
             let delete_record_node = graph.create_node(Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
                 name: String::new(),
@@ -152,7 +157,7 @@ pub fn nested_delete_many(
         let filter = extract_filter(as_map, child_model)?;
 
         let find_child_records_node =
-            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
+            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone(), None)?;
 
         let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
             model: child_model.clone(),

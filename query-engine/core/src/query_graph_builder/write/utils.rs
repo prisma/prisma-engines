@@ -1,7 +1,7 @@
 use crate::{
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
-    Computation, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
+    CompileContext, Computation, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{DatasourceFieldName, RecordFilter, WriteArgs, WriteOperation};
 use indexmap::IndexMap;
@@ -86,16 +86,36 @@ fn get_selected_fields(model: &Model, selection: FieldSelection) -> FieldSelecti
 /// - `parent_node` needs to return a blog ID during execution.
 /// - `parent_relation_field` is the field on the `Blog` model, e.g. `posts`.
 /// - `filter` narrows down posts, e.g. posts where their titles start with a given string.
+/// TODO laplab: comment for the new argument.
 pub(crate) fn insert_find_children_by_parent_node<T>(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
     filter: T,
+    ctx: Option<&CompileContext>,
 ) -> QueryGraphBuilderResult<NodeRef>
 where
     T: Into<Filter>,
 {
     let parent_model_id = parent_relation_field.model().primary_identifier();
+    let parent_results = if let Some(ctx) = ctx {
+        // TODO laplab: looks terrible.
+        let mut id_iter = parent_model_id.selections();
+        let id_field = id_iter.next().expect("there must be at least one id field");
+        if id_iter.next().is_some() {
+            panic!("composite ids are not implemented");
+        }
+
+        if let Some(value) = ctx.fields.get(id_field) {
+            Some(vec![SelectionResult::new(vec![(id_field.clone(), value.clone())])])
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+    println!("laplab: parent_results: {parent_results:?}");
+
     let parent_linking_fields = parent_relation_field.linking_fields();
     let selection = parent_model_id.merge(parent_linking_fields);
     let child_model = parent_relation_field.related_model();
@@ -105,31 +125,36 @@ where
         parent_relation_field.related_field().linking_fields(),
     );
 
+    let parent_results_derived_from_ctx = parent_results.is_some();
     let read_children_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
         name: "find_children_by_parent".to_owned(),
         alias: None,
         parent_field: parent_relation_field.clone(),
-        parent_results: None,
+        parent_results,
         args: (child_model, filter).into(),
         selected_fields,
         nested: vec![],
         selection_order: vec![],
     })));
 
-    graph.create_edge(
-        parent_node,
-        &read_children_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            selection,
-            Box::new(|mut read_children_node, selections| {
-                if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = read_children_node {
-                    rq.parent_results = Some(selections);
-                };
+    if parent_results_derived_from_ctx {
+        graph.create_edge(parent_node, &read_children_node, QueryGraphDependency::ExecutionOrder)?;
+    } else {
+        graph.create_edge(
+            parent_node,
+            &read_children_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                selection,
+                Box::new(|mut read_children_node, selections| {
+                    if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = read_children_node {
+                        rq.parent_results = Some(selections);
+                    };
 
-                Ok(read_children_node)
-            }),
-        ),
-    )?;
+                    Ok(read_children_node)
+                }),
+            ),
+        )?;
+    }
 
     Ok(read_children_node)
 }
@@ -171,7 +196,7 @@ pub fn insert_1to1_idempotent_connect_checks(
         ),
     )?;
     let read_old_child_node =
-        insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
+        insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty(), None)?;
 
     graph.create_edge(
         &read_old_child_node,
@@ -281,7 +306,7 @@ pub fn insert_existing_1to1_related_model_checks(
 
     // Note: Also creates the edge between `parent` and the new node.
     let read_existing_children =
-        insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
+        insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty(), None)?;
 
     let update_existing_child = update_records_node_placeholder(graph, Filter::empty(), child_model);
     let if_node = graph.create_node(Flow::default_if());
@@ -449,7 +474,8 @@ pub fn emulate_on_delete_restrict(
     let noop_node = graph.create_node(Node::Empty);
     let relation_field = relation_field.related_field();
     let child_model_identifier = relation_field.related_model().primary_identifier();
-    let read_node = insert_find_children_by_parent_node(graph, node_providing_ids, &relation_field, Filter::empty())?;
+    let read_node =
+        insert_find_children_by_parent_node(graph, node_providing_ids, &relation_field, Filter::empty(), None)?;
 
     graph.create_edge(
         &read_node,
@@ -514,7 +540,7 @@ pub fn emulate_on_delete_cascade(
 
     // Records that need to be deleted for the cascade.
     let dependent_records_node =
-        insert_find_children_by_parent_node(graph, node_providing_ids, &parent_relation_field, Filter::empty())?;
+        insert_find_children_by_parent_node(graph, node_providing_ids, &parent_relation_field, Filter::empty(), None)?;
 
     let delete_query = WriteQuery::DeleteManyRecords(DeleteManyRecords {
         model: dependent_model.clone(),
@@ -607,7 +633,7 @@ pub fn emulate_on_delete_set_null(
 
     // Records that need to be updated for the cascade.
     let dependent_records_node =
-        insert_find_children_by_parent_node(graph, node_providing_ids, &parent_relation_field, Filter::empty())?;
+        insert_find_children_by_parent_node(graph, node_providing_ids, &parent_relation_field, Filter::empty(), None)?;
 
     let set_null_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
         model: dependent_model.clone(),
@@ -757,7 +783,7 @@ pub fn emulate_on_update_set_null(
 
     // Records that need to be updated for the cascade.
     let dependent_records_node =
-        insert_find_children_by_parent_node(graph, parent_node, &parent_relation_field, Filter::empty())?;
+        insert_find_children_by_parent_node(graph, parent_node, &parent_relation_field, Filter::empty(), None)?;
 
     let set_null_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
         model: dependent_model.clone(),
@@ -828,7 +854,7 @@ pub fn emulate_on_update_restrict(
     let noop_node = graph.create_node(Node::Empty);
     let relation_field = relation_field.related_field();
     let child_model_identifier = relation_field.related_model().primary_identifier();
-    let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, Filter::empty())?;
+    let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, Filter::empty(), None)?;
 
     let linking_fields = relation_field.linking_fields();
 
@@ -1077,7 +1103,7 @@ pub fn emulate_on_update_cascade(
 
     // Records that need to be updated for the cascade.
     let dependent_records_node =
-        insert_find_children_by_parent_node(graph, parent_node, &parent_relation_field, Filter::empty())?;
+        insert_find_children_by_parent_node(graph, parent_node, &parent_relation_field, Filter::empty(), None)?;
 
     let update_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
         model: dependent_model.clone(),

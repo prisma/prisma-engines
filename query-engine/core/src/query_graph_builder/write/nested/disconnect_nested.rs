@@ -26,7 +26,7 @@ pub fn nested_disconnect(
             .into_iter()
             .map(|value: ParsedInputValue<'_>| {
                 let value: ParsedInputMap<'_> = value.try_into()?;
-                extract_unique_filter(value, child_model)
+                extract_unique_filter(value, child_model, None)
             })
             .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
             .into_iter()
@@ -56,7 +56,7 @@ pub fn nested_disconnect(
                     .into_iter()
                     .map(|value: ParsedInputValue<'_>| {
                         let value: ParsedInputMap<'_> = value.try_into()?;
-                        extract_unique_filter(value, child_model)
+                        extract_unique_filter(value, child_model, None)
                     })
                     .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
                     .into_iter()
@@ -111,7 +111,7 @@ fn handle_many_to_many(
     }
 
     let find_child_records_node =
-        utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter)?;
+        utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter, None)?;
 
     disconnect::disconnect_records_node(graph, parent_node, &find_child_records_node, parent_relation_field)?;
     Ok(())
@@ -153,7 +153,7 @@ fn handle_one_to_x(
 ) -> QueryGraphBuilderResult<()> {
     // Fetches the children to be disconnected.
     let find_child_records_node =
-        utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter.clone())?;
+        utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter.clone(), None)?;
 
     let child_relation_field = parent_relation_field.related_field();
 

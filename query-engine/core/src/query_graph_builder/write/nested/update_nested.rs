@@ -43,6 +43,7 @@ pub fn nested_update(
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue<'_>,
     child_model: &Model,
+    ctx: Option<&CompileContext>,
 ) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
         let (data, filter) = if parent_relation_field.is_list() {
@@ -52,7 +53,7 @@ pub fn nested_update(
             let mut map: ParsedInputMap<'_> = value.try_into()?;
             let where_arg: ParsedInputMap<'_> = map.swap_remove(args::WHERE).unwrap().try_into()?;
 
-            let filter = extract_unique_filter(where_arg, child_model)?;
+            let filter = extract_unique_filter(where_arg, child_model, None)?;
             let data_value = map.swap_remove(args::DATA).unwrap();
 
             (data_value, filter)
@@ -85,9 +86,20 @@ pub fn nested_update(
         }
 
         let find_child_records_node =
-            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
+            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone(), ctx)?;
 
-        let update_node = update::update_record_node(graph, query_schema, filter, child_model.clone(), data_map, None)?;
+        // TODO laplab: right now we are focusing on optimising top-level operations, so we pass
+        // defaults to the last 2 arguments.
+        let update_node = update::update_record_node(
+            graph,
+            query_schema,
+            filter,
+            child_model.clone(),
+            data_map,
+            None,
+            false,
+            None,
+        )?;
         let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
         let relation_name = parent_relation_field.relation().name().to_owned();
@@ -140,7 +152,7 @@ pub fn nested_update_many(
         let filter = extract_filter(where_map, child_model)?;
 
         let find_child_records_node =
-            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter)?;
+            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter, None)?;
 
         let update_many_node =
             update::update_many_record_node(graph, query_schema, Filter::empty(), child_model.clone(), data_map)?;

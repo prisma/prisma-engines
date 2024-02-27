@@ -30,14 +30,16 @@ pub fn connect_nested_query(
     parent: NodeRef,
     parent_relation_field: RelationFieldRef,
     data_map: ParsedInputMap<'_>,
+    ctx: Option<&CompileContext>,
 ) -> QueryGraphBuilderResult<()> {
     let child_model = parent_relation_field.related_model();
 
+    // TODO laplab: assert that `parent_results` is `None` in all other cases?
     for (field_name, value) in data_map {
         match field_name.as_ref() {
             operations::CREATE => nested_create(graph, query_schema,parent, &parent_relation_field, value, &child_model)?,
             operations::CREATE_MANY => nested_create_many(graph, parent, &parent_relation_field, value, &child_model)?,
-            operations::UPDATE => nested_update(graph, query_schema, &parent, &parent_relation_field, value, &child_model)?,
+            operations::UPDATE => nested_update(graph, query_schema, &parent, &parent_relation_field, value, &child_model, ctx)?,
             operations::UPSERT => nested_upsert(graph, query_schema, parent, &parent_relation_field, value)?,
             operations::DELETE => nested_delete(graph, query_schema, &parent, &parent_relation_field, value, &child_model)?,
             operations::CONNECT => nested_connect(graph, parent, &parent_relation_field, value, &child_model)?,
@@ -51,4 +53,27 @@ pub fn connect_nested_query(
     }
 
     Ok(())
+}
+
+// TODO laplab: comment
+pub fn assumes_parent_exists(data_map: &ParsedInputMap<'_>) -> bool {
+    for (field_name, _value) in data_map.iter() {
+        let assumes = match field_name.as_ref() {
+            operations::CREATE
+            | operations::CREATE_MANY
+            | operations::UPSERT
+            | operations::CONNECT
+            | operations::DISCONNECT
+            | operations::SET
+            | operations::CONNECT_OR_CREATE
+            | operations::UPDATE_MANY
+            | operations::DELETE_MANY => true,
+            operations::UPDATE | operations::DELETE => false,
+            _ => panic!("Unhandled nested operation: {field_name}"),
+        };
+        if assumes {
+            return true;
+        }
+    }
+    false
 }

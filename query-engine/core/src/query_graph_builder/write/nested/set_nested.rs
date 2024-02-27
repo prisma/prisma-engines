@@ -23,7 +23,7 @@ pub fn nested_set(
         .into_iter()
         .map(|value: ParsedInputValue<'_>| {
             let value: ParsedInputMap<'_> = value.try_into()?;
-            extract_unique_filter(value, child_model)
+            extract_unique_filter(value, child_model, None)
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
         .into_iter()
@@ -90,7 +90,7 @@ fn handle_many_to_many(
     let child_model = parent_relation_field.related_model();
     let child_model_identifier = child_model.primary_identifier();
     let read_old_node =
-        utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
+        utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty(), None)?;
 
     let disconnect = WriteQuery::DisconnectRecords(DisconnectRecords {
         parent_id: None,
@@ -216,7 +216,7 @@ fn handle_one_to_many(
 
     let child_model = parent_relation_field.related_model();
     let read_old_node =
-        utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
+        utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty(), None)?;
 
     let read_new_query = utils::read_ids_infallible(child_model.clone(), child_model_identifier.clone(), filter);
     let read_new_node = graph.create_node(read_new_query);

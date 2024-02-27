@@ -26,7 +26,7 @@ pub fn nested_connect(
         .into_iter()
         .map(|value: ParsedInputValue<'_>| {
             let value: ParsedInputMap<'_> = value.try_into()?;
-            extract_unique_filter(value, child_model)
+            extract_unique_filter(value, child_model, None)
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
         .into_iter()

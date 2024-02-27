@@ -31,7 +31,7 @@ fn find_unique_with_options(
     let filter = match field.arguments.lookup(args::WHERE) {
         Some(where_arg) => {
             let arg: ParsedInputMap<'_> = where_arg.value.try_into()?;
-            Some(extractors::extract_unique_filter(arg, &model)?)
+            Some(extractors::extract_unique_filter(arg, &model, None)?)
         }
         None => None,
     };

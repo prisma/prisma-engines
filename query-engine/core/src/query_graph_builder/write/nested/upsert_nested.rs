@@ -117,7 +117,7 @@ pub fn nested_upsert(
             (Some(where_input), true) => {
                 let where_input: ParsedInputMap<'_> = where_input.try_into()?;
 
-                extract_unique_filter(where_input, &child_model)?
+                extract_unique_filter(where_input, &child_model, None)?
             }
             // That filter is required. This should be caught by the schema validation.
             (None, true) => unreachable!("where argument is missing"),
@@ -131,8 +131,13 @@ pub fn nested_upsert(
             (None, false) => Filter::empty(),
         };
 
-        let read_children_node =
-            utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter.clone())?;
+        let read_children_node = utils::insert_find_children_by_parent_node(
+            graph,
+            &parent_node,
+            parent_relation_field,
+            filter.clone(),
+            None,
+        )?;
 
         let if_node = graph.create_node(Flow::default_if());
         let create_node =
@@ -143,6 +148,8 @@ pub fn nested_upsert(
             filter.clone(),
             child_model.clone(),
             update_input.try_into()?,
+            None,
+            false,
             None,
         )?;
 

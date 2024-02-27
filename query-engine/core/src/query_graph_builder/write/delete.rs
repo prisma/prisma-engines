@@ -17,7 +17,7 @@ pub(crate) fn delete_record(
     mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     let where_arg = field.arguments.lookup(args::WHERE).unwrap();
-    let filter = extract_unique_filter(where_arg.value.try_into()?, &model)?;
+    let filter = extract_unique_filter(where_arg.value.try_into()?, &model, None)?;
 
     if can_use_atomic_delete(query_schema, &field, &filter) {
         // Database supports returning the deleted row, so just the delete node will suffice.

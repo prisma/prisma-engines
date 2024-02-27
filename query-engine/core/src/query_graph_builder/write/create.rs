@@ -138,7 +138,7 @@ pub(crate) fn create_record_node_from_args(
     let create_node = graph.create_node(Query::Write(WriteQuery::CreateRecord(cr)));
 
     for (relation_field, data_map) in nested {
-        nested::connect_nested_query(graph, query_schema, create_node, relation_field, data_map)?;
+        nested::connect_nested_query(graph, query_schema, create_node, relation_field, data_map, None)?;
     }
 
     Ok(create_node)
@@ -202,7 +202,7 @@ fn atomic_create_record_node(
     let create_node = graph.create_node(Query::Write(WriteQuery::CreateRecord(cr)));
 
     for (relation_field, data_map) in create_args.nested {
-        nested::connect_nested_query(graph, query_schema, create_node, relation_field, data_map)?;
+        nested::connect_nested_query(graph, query_schema, create_node, relation_field, data_map, None)?;
     }
 
     Ok(create_node)

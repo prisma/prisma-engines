@@ -69,7 +69,7 @@ pub(crate) fn upsert_record(
         query_schema,
     );
 
-    let filter = extract_unique_filter(where_argument, &model)?;
+    let filter = extract_unique_filter(where_argument, &model, None)?;
     let read_query = read::find_unique(field.clone(), model.clone(), query_schema)?;
 
     if can_use_native_upsert {
@@ -109,6 +109,8 @@ pub(crate) fn upsert_record(
         model.clone(),
         update_argument,
         Some(&field),
+        false,
+        None,
     )?;
 
     let read_node_create = graph.create_node(Query::Read(read_query.clone()));

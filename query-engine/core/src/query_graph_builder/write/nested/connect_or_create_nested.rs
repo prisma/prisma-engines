@@ -104,7 +104,7 @@ fn handle_many_to_many(
         let create_arg = value.swap_remove(args::CREATE).unwrap();
         let create_map: ParsedInputMap<'_> = create_arg.try_into()?;
 
-        let filter = extract_unique_filter(where_map, child_model)?;
+        let filter = extract_unique_filter(where_map, child_model, None)?;
         let read_node = graph.create_node(utils::read_ids_infallible(
             child_model.clone(),
             child_model.primary_identifier(),
@@ -191,7 +191,7 @@ fn handle_one_to_one(
     let create_arg = value.swap_remove(args::CREATE).unwrap();
     let create_data: ParsedInputMap<'_> = create_arg.try_into()?;
 
-    let filter = extract_unique_filter(where_map, child_model)?;
+    let filter = extract_unique_filter(where_map, child_model, None)?;
 
     if parent_relation_field.is_inlined_on_enclosing_model() {
         one_to_one_inlined_parent(
@@ -265,7 +265,7 @@ fn one_to_many_inlined_child(
         let create_arg = value.swap_remove(args::CREATE).unwrap();
         let create_map: ParsedInputMap<'_> = create_arg.try_into()?;
 
-        let filter = extract_unique_filter(where_map, child_model)?;
+        let filter = extract_unique_filter(where_map, child_model, None)?;
         let read_node = graph.create_node(utils::read_ids_infallible(
             child_model.clone(),
             child_link.clone(),
@@ -404,7 +404,7 @@ fn one_to_many_inlined_parent(
     let create_arg = value.swap_remove(args::CREATE).unwrap();
     let create_map: ParsedInputMap<'_> = create_arg.try_into()?;
 
-    let filter = extract_unique_filter(where_map, child_model)?;
+    let filter = extract_unique_filter(where_map, child_model, None)?;
     let read_node = graph.create_node(utils::read_ids_infallible(
         child_model.clone(),
         child_link.clone(),
@@ -902,8 +902,13 @@ fn one_to_one_inlined_child(
         // Edge: If node -> update new child node
         graph.create_edge(&if_node, &update_new_child_node, QueryGraphDependency::Then)?;
     } else {
-        let read_old_child_node =
-            utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, Filter::empty())?;
+        let read_old_child_node = utils::insert_find_children_by_parent_node(
+            graph,
+            &parent_node,
+            parent_relation_field,
+            Filter::empty(),
+            None,
+        )?;
 
         // Edge: If node -> read old child node
         graph.create_edge(&if_node, &read_old_child_node, QueryGraphDependency::Then)?;
