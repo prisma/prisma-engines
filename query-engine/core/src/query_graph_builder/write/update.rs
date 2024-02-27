@@ -8,7 +8,7 @@ use crate::{
     ArgumentListLookup, ParsedField, ParsedInputMap,
 };
 use psl::datamodel_connector::ConnectorCapability;
-use query_structure::{Filter, IntoFilter, Model};
+use query_structure::{Filter, IntoFilter, Model, SelectionResult};
 use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 
@@ -101,32 +101,57 @@ pub(crate) fn update_record(
     } else {
         graph.flag_transactional();
 
+        let model_id = model.primary_identifier();
+        // TODO laplab: looks terrible.
+        let mut id_iter = model_id.selections();
+        let id_field = id_iter.next().expect("there must be at least one id field");
+        if id_iter.next().is_some() {
+            panic!("composite ids are not implemented");
+        }
+        let derived_filter = if let Some(value) = ctx.fields.get(id_field) {
+            Some(SelectionResult::new(vec![(id_field.clone(), value.clone())]).filter())
+        } else {
+            None
+        };
+
         let read_query = read::find_unique(field, model.clone(), query_schema)?;
         let read_node = graph.create_node(Query::Read(read_query));
 
+        if let Some(derived_filter) = derived_filter {
+            if let Node::Query(Query::Read(ReadQuery::RecordQuery(rq))) =
+                graph.node_content_mut(&read_node).expect("just added")
+            {
+                rq.add_filter(derived_filter);
+            } else {
+                panic!("`read::find_unique` did not return a `RecordQuery`")
+            }
+
+            graph.create_edge(&update_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
+        } else {
+            graph.create_edge(
+                &update_node,
+                &read_node,
+                QueryGraphDependency::ProjectedDataDependency(
+                    model.primary_identifier(),
+                    Box::new(move |mut read_node, mut parent_ids| {
+                        let parent_id = match parent_ids.pop() {
+                            Some(pid) => Ok(pid),
+                            None => Err(QueryGraphBuilderError::RecordNotFound(
+                                "Record to update not found.".to_string(),
+                            )),
+                        }?;
+
+                        if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = read_node {
+                            rq.add_filter(parent_id.filter());
+                        };
+
+                        Ok(read_node)
+                    }),
+                ),
+            )?;
+        }
+
         graph.add_result_node(&read_node);
-
-        graph.create_edge(
-            &update_node,
-            &read_node,
-            QueryGraphDependency::ProjectedDataDependency(
-                model.primary_identifier(),
-                Box::new(move |mut read_node, mut parent_ids| {
-                    let parent_id = match parent_ids.pop() {
-                        Some(pid) => Ok(pid),
-                        None => Err(QueryGraphBuilderError::RecordNotFound(
-                            "Record to update not found.".to_string(),
-                        )),
-                    }?;
-
-                    if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = read_node {
-                        rq.add_filter(parent_id.filter());
-                    };
-
-                    Ok(read_node)
-                }),
-            ),
-        )?;
     }
 
     Ok(())
