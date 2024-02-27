@@ -239,14 +239,16 @@ where
     // If the connector can use `RETURNING`, always use it as it may:
     // 1. Save a SELECT statement
     // 2. Avoid from computing the ids in memory if they are updated. See `update_one_without_selection` function.
-    let update_parent = if query_schema.has_capability(ConnectorCapability::UpdateReturning) {
+    let update_node = if can_skip_update {
+        graph.create_node(Node::Empty)
+    } else if query_schema.has_capability(ConnectorCapability::UpdateReturning) {
         // If there's a selected field, fulfill the scalar selection set.
         if let Some(field) = field.cloned() {
             let nested_fields = field.nested_fields.unwrap().fields;
             let selection_order: Vec<String> = read::utils::collect_selection_order(&nested_fields);
             let selected_fields = read::utils::collect_selected_scalars(&nested_fields, &model);
 
-            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
+            graph.create_node(Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
                 UpdateRecordWithSelection {
                     name: field.name,
                     model: model.clone(),
@@ -255,13 +257,13 @@ where
                     selected_fields,
                     selection_order,
                 },
-            )))
+            ))))
         // Otherwise, fallback to the primary identifier, that will be used to fulfill other nested operations requirements
         } else {
             let selected_fields = model.primary_identifier();
             let selection_order = selected_fields.db_names().collect();
 
-            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
+            graph.create_node(Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
                 UpdateRecordWithSelection {
                     name: String::new(), // This node will not be serialized so we don't need a name.
                     model: model.clone(),
@@ -270,21 +272,18 @@ where
                     selected_fields,
                     selection_order,
                 },
-            )))
+            ))))
         }
     } else {
-        Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithoutSelection(
+        graph.create_node(Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithoutSelection(
             UpdateRecordWithoutSelection {
                 model: model.clone(),
                 record_filter: filter.into(),
                 args,
             },
-        )))
+        ))))
     };
 
-    let update_node = graph.create_node(update_parent);
-
-    // If we cannot skip update, never pass a context to nested operations.
     if !can_skip_update {
         ctx = None;
     }
