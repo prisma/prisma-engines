@@ -26,6 +26,7 @@ pub struct MultiRowInsert<'a> {
     pub(crate) table: Option<Table<'a>>,
     pub(crate) columns: Vec<Column<'a>>,
     pub(crate) values: Vec<Row<'a>>,
+    pub(crate) returning: Option<Vec<Column<'a>>>,
 }
 
 /// `INSERT` conflict resolution strategies.
@@ -186,6 +187,7 @@ impl<'a> Insert<'a> {
             table: Some(table.into()),
             columns: columns.into_iter().map(|c| c.into()).collect(),
             values: Vec::new(),
+            returning: None,
         }
     }
 
@@ -198,6 +200,7 @@ impl<'a> Insert<'a> {
             table: None,
             columns: columns.into_iter().map(|c| c.into()).collect(),
             values: Vec::new(),
+            returning: None,
         }
     }
 

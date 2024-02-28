@@ -51,7 +51,7 @@ fn find_unique_with_options(
     let selected_fields = utils::merge_relation_selections(selected_fields, None, &nested);
 
     let relation_load_strategy =
-        get_relation_load_strategy(requested_rel_load_strategy, None, None, &nested, query_schema);
+        get_relation_load_strategy(requested_rel_load_strategy, None, None, &[], &nested, query_schema)?;
 
     Ok(ReadQuery::RecordQuery(RecordQuery {
         name,

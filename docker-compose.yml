@@ -294,6 +294,19 @@ services:
       - databases
     tmpfs: /var/lib/mariadb
 
+  mariadb-11-0:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: prisma
+      MYSQL_DATABASE: prisma
+    ports:
+      - '3308:3306'
+    networks:
+      - databases
+    tmpfs: /var/lib/mariadb
+
   vitess-test-8_0:
     image: vitess/vttestserver:mysql80@sha256:53a2d2f58ecf8e6cf984c725612f7651c4fc7ac9bc7d198dbd9964d50e28b9a2
     restart: unless-stopped

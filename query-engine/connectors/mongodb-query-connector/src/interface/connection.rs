@@ -40,6 +40,10 @@ impl Connection for MongoDbConnection {
         Ok(tx as Box<dyn Transaction>)
     }
 
+    async fn version(&self) -> Option<String> {
+        None
+    }
+
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {
         self
     }
@@ -73,6 +77,17 @@ impl WriteOperations for MongoDbConnection {
             skip_duplicates,
         ))
         .await
+    }
+
+    async fn create_records_returning(
+        &mut self,
+        _model: &Model,
+        _args: Vec<WriteArgs>,
+        _skip_duplicates: bool,
+        _selected_fields: FieldSelection,
+        _trace_id: Option<String>,
+    ) -> connector_interface::Result<ManyRecords> {
+        unimplemented!()
     }
 
     async fn update_records(

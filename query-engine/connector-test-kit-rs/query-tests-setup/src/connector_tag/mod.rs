@@ -327,11 +327,6 @@ impl ConnectorVersion {
                 | Self::Sqlite(Some(SqliteVersion::LibsqlJsWasm))
         )
     }
-
-    /// Returns `true` if the connector version is [`MySql`].
-    pub(crate) fn is_mysql(&self) -> bool {
-        matches!(self, Self::MySql(..))
-    }
 }
 
 impl fmt::Display for ConnectorVersion {

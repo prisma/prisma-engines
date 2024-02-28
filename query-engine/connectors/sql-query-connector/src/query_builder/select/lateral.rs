@@ -69,11 +69,7 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         ctx: &Context<'_>,
     ) -> Select<'a> {
         match field {
-            SelectedField::Scalar(sf) => select.column(
-                sf.as_column(ctx)
-                    .table(parent_alias.to_table_string())
-                    .set_is_selected(true),
-            ),
+            SelectedField::Scalar(sf) => select.column(aliased_scalar_column(sf, parent_alias, ctx)),
             SelectedField::Relation(rs) => {
                 let table_name = match rs.field.relation().is_many_to_many() {
                     true => m2m_join_alias_name(&rs.field),
@@ -170,7 +166,7 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
             .iter()
             .filter_map(|field| match field {
                 SelectedField::Scalar(sf) => Some((
-                    Cow::from(sf.db_name().to_owned()),
+                    Cow::from(sf.name().to_owned()),
                     Expression::from(sf.as_column(ctx).table(parent_alias.to_table_string())),
                 )),
                 SelectedField::Relation(rs) => {
@@ -247,6 +243,7 @@ impl LateralJoinSelectBuilder {
             .with_m2m_join_conditions(&rf.related_field(), m2m_table_alias, parent_alias, ctx) // adds join condition to the child table
             // TODO: avoid clone filter
             .with_filters(rs.args.filter.clone(), Some(m2m_join_alias), ctx) // adds query filters
+            .with_distinct(&rs.args, m2m_join_alias)
             .with_ordering(&rs.args, Some(m2m_join_alias.to_table_string()), ctx) // adds ordering stmts
             .with_pagination(rs.args.take_abs(), rs.args.skip)
             .comment("inner"); // adds pagination

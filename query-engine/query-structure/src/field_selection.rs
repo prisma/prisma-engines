@@ -43,6 +43,10 @@ impl FieldSelection {
         self.selections.iter()
     }
 
+    pub fn scalars(&self) -> impl Iterator<Item = &ScalarFieldRef> + '_ {
+        self.selections().filter_map(SelectedField::as_scalar)
+    }
+
     pub fn virtuals(&self) -> impl Iterator<Item = &VirtualSelection> {
         self.selections().filter_map(SelectedField::as_virtual)
     }
@@ -80,7 +84,7 @@ impl FieldSelection {
     /// [`FieldSelection::db_names_grouping_virtuals`] and
     /// [`FieldSelection::type_identifiers_with_arities_grouping_virtuals`].
     fn selections_with_virtual_group_heads(&self) -> impl Iterator<Item = &SelectedField> {
-        self.selections().unique_by(|f| f.db_name_grouping_virtuals())
+        self.selections().unique_by(|f| f.prisma_name_grouping_virtuals())
     }
 
     /// Returns all Prisma (e.g. schema model field) names of contained fields.
@@ -102,9 +106,9 @@ impl FieldSelection {
     /// into the grouped containers for virtual fields, like `_count`. The names returned by this
     /// method correspond to the results of queries that use JSON objects to represent joined
     /// relations and relation aggregations.
-    pub fn db_names_grouping_virtuals(&self) -> impl Iterator<Item = String> + '_ {
+    pub fn prisma_names_grouping_virtuals(&self) -> impl Iterator<Item = String> + '_ {
         self.selections_with_virtual_group_heads()
-            .map(|f| f.db_name_grouping_virtuals())
+            .map(|f| f.prisma_name_grouping_virtuals())
             .map(Cow::into_owned)
     }
 
@@ -135,9 +139,7 @@ impl FieldSelection {
             .selections()
             .filter_map(|selection| match selection {
                 SelectedField::Scalar(sf) => Some(sf.clone()),
-                SelectedField::Composite(_) => None,
-                SelectedField::Relation(_) => None,
-                SelectedField::Virtual(_) => None,
+                _ => None,
             })
             .collect::<Vec<_>>();
 
@@ -238,6 +240,12 @@ impl FieldSelection {
     pub fn has_virtual_fields(&self) -> bool {
         self.selections()
             .any(|field| matches!(field, SelectedField::Virtual(_)))
+    }
+}
+
+impl AsRef<[SelectedField]> for FieldSelection {
+    fn as_ref(&self) -> &[SelectedField] {
+        &self.selections
     }
 }
 
@@ -384,10 +392,10 @@ impl SelectedField {
     /// relations and relation aggregations. For those queries, the result of this method
     /// corresponds to the top-level name of the value which is a JSON object that contains this
     /// field inside.
-    pub fn db_name_grouping_virtuals(&self) -> Cow<'_, str> {
+    pub fn prisma_name_grouping_virtuals(&self) -> Cow<'_, str> {
         match self {
             SelectedField::Virtual(vs) => vs.serialized_name().0.into(),
-            _ => self.db_name(),
+            _ => self.prisma_name(),
         }
     }
 
@@ -416,6 +424,13 @@ impl SelectedField {
         match self {
             SelectedField::Virtual(_) => Some((TypeIdentifier::Json, FieldArity::Required)),
             _ => self.type_identifier_with_arity(),
+        }
+    }
+
+    pub fn as_scalar(&self) -> Option<&ScalarFieldRef> {
+        match self {
+            SelectedField::Scalar(sf) => Some(sf),
+            _ => None,
         }
     }
 
@@ -514,8 +529,8 @@ impl CompositeSelection {
     }
 }
 
-impl From<Vec<ScalarFieldRef>> for FieldSelection {
-    fn from(fields: Vec<ScalarFieldRef>) -> Self {
+impl<T: IntoIterator<Item = ScalarFieldRef>> From<T> for FieldSelection {
+    fn from(fields: T) -> Self {
         Self {
             selections: fields.into_iter().map(Into::into).collect(),
         }
