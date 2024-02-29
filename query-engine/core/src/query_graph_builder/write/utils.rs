@@ -86,7 +86,7 @@ fn get_selected_fields(model: &Model, selection: FieldSelection) -> FieldSelecti
 /// - `parent_node` needs to return a blog ID during execution.
 /// - `parent_relation_field` is the field on the `Blog` model, e.g. `posts`.
 /// - `filter` narrows down posts, e.g. posts where their titles start with a given string.
-/// TODO laplab: comment for the new argument.
+/// - `ctx` compile context for the query.
 pub(crate) fn insert_find_children_by_parent_node<T>(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
@@ -98,25 +98,10 @@ where
     T: Into<Filter>,
 {
     let parent_model_id = parent_relation_field.model().primary_identifier();
-    let parent_results = if let Some(ctx) = ctx {
-        // TODO laplab: looks terrible.
-        let mut id_iter = parent_model_id.selections();
-        let id_field = id_iter.next().expect("there must be at least one id field");
-        if id_iter.next().is_some() {
-            panic!("composite ids are not implemented");
-        }
-
-        if let Some(value) = ctx.fields.get(id_field) {
-            Some(vec![SelectionResult::new(vec![(id_field.clone(), value.clone())])])
-        } else {
-            None
-        }
-    } else {
-        None
-    };
-    println!("laplab: parent_results: {parent_results:?}");
-
     let parent_linking_fields = parent_relation_field.linking_fields();
+    let parent_results = ctx
+        .and_then(|ctx| ctx.lookup(parent_linking_fields.clone()))
+        .map(|result| vec![result]);
     let selection = parent_model_id.merge(parent_linking_fields);
     let child_model = parent_relation_field.related_model();
 

@@ -149,7 +149,6 @@ pub fn nested_upsert(
             child_model.clone(),
             update_input.try_into()?,
             None,
-            false,
             None,
         )?;
 

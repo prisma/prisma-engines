@@ -88,18 +88,9 @@ pub fn nested_update(
         let find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone(), ctx)?;
 
-        // TODO laplab: right now we are focusing on optimising top-level operations, so we pass
-        // defaults to the last 2 arguments.
-        let update_node = update::update_record_node(
-            graph,
-            query_schema,
-            filter,
-            child_model.clone(),
-            data_map,
-            None,
-            false,
-            None,
-        )?;
+        // TODO laplab: test deeply nested operations.
+        let update_node =
+            update::update_record_node(graph, query_schema, filter, child_model.clone(), data_map, None, None)?;
         let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
         let relation_name = parent_relation_field.relation().name().to_owned();

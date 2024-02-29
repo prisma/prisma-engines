@@ -8,7 +8,7 @@ use crate::{
     ArgumentListLookup, ParsedField, ParsedInputMap,
 };
 use psl::datamodel_connector::ConnectorCapability;
-use query_structure::{Filter, IntoFilter, Model, SelectionResult};
+use query_structure::{Filter, IntoFilter, Model};
 use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 
@@ -23,14 +23,7 @@ pub(crate) fn update_record(
 
     // "where"
     let where_arg: ParsedInputMap<'_> = field.arguments.lookup(args::WHERE).unwrap().value.try_into()?;
-    // TODO laplab:
-    // Here we rely on the fact that `id` is always required for updates of a single record. Also,
-    // this only works for models where id is a single field (defined with `@id`, not `@@id`).
-    // Also, probably does not work for composite ids because they can be nested. Yay?
-    let is_lookup_by_id = where_arg.len() == 1;
     let filter = extract_unique_filter(where_arg, &model, Some(&mut ctx))?;
-
-    println!("laplab: context: {ctx:?}");
 
     // "data"
     let data_argument = field.arguments.lookup(args::DATA).unwrap();
@@ -45,7 +38,6 @@ pub(crate) fn update_record(
         model.clone(),
         data_map,
         Some(&field),
-        is_lookup_by_id,
         Some(&ctx),
     )?;
 
@@ -101,54 +93,46 @@ pub(crate) fn update_record(
     } else {
         graph.flag_transactional();
 
-        let model_id = model.primary_identifier();
-        // TODO laplab: looks terrible.
-        let mut id_iter = model_id.selections();
-        let id_field = id_iter.next().expect("there must be at least one id field");
-        if id_iter.next().is_some() {
-            panic!("composite ids are not implemented");
-        }
-        let derived_filter = if let Some(value) = ctx.fields.get(id_field) {
-            Some(SelectionResult::new(vec![(id_field.clone(), value.clone())]).filter())
-        } else {
-            None
-        };
-
         let read_query = read::find_unique(field, model.clone(), query_schema)?;
         let read_node = graph.create_node(Query::Read(read_query));
 
-        if let Some(derived_filter) = derived_filter {
-            if let Node::Query(Query::Read(ReadQuery::RecordQuery(rq))) =
-                graph.node_content_mut(&read_node).expect("just added")
-            {
-                rq.add_filter(derived_filter);
-            } else {
-                panic!("`read::find_unique` did not return a `RecordQuery`")
+        // Attempt to construct filter from compile context. If we do not have enough data, fall
+        // back to resolving the filter in runtime.
+        match ctx.lookup(model.primary_identifier()).map(|result| result.filter()) {
+            Some(derived_filter) => {
+                if let Node::Query(Query::Read(ReadQuery::RecordQuery(rq))) =
+                    graph.node_content_mut(&read_node).expect("just added")
+                {
+                    rq.add_filter(derived_filter);
+                } else {
+                    panic!("`read::find_unique` did not return a `RecordQuery`");
+                }
+
+                graph.create_edge(&update_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
             }
+            None => {
+                graph.create_edge(
+                    &update_node,
+                    &read_node,
+                    QueryGraphDependency::ProjectedDataDependency(
+                        model.primary_identifier(),
+                        Box::new(move |mut read_node, mut parent_ids| {
+                            let parent_id = match parent_ids.pop() {
+                                Some(pid) => Ok(pid),
+                                None => Err(QueryGraphBuilderError::RecordNotFound(
+                                    "Record to update not found.".to_string(),
+                                )),
+                            }?;
 
-            graph.create_edge(&update_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
-        } else {
-            graph.create_edge(
-                &update_node,
-                &read_node,
-                QueryGraphDependency::ProjectedDataDependency(
-                    model.primary_identifier(),
-                    Box::new(move |mut read_node, mut parent_ids| {
-                        let parent_id = match parent_ids.pop() {
-                            Some(pid) => Ok(pid),
-                            None => Err(QueryGraphBuilderError::RecordNotFound(
-                                "Record to update not found.".to_string(),
-                            )),
-                        }?;
+                            if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = read_node {
+                                rq.add_filter(parent_id.filter());
+                            };
 
-                        if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = read_node {
-                            rq.add_filter(parent_id.filter());
-                        };
-
-                        Ok(read_node)
-                    }),
-                ),
-            )?;
+                            Ok(read_node)
+                        }),
+                    ),
+                )?;
+            }
         }
 
         graph.add_result_node(&read_node);
@@ -215,27 +199,58 @@ pub fn update_record_node<T: Clone>(
     model: Model,
     data_map: ParsedInputMap<'_>,
     field: Option<&ParsedField<'_>>,
-    is_lookup_by_id: bool,
     mut ctx: Option<&CompileContext>,
 ) -> QueryGraphBuilderResult<NodeRef>
 where
     T: Into<Filter>,
 {
+    // We need to check that all fields required by the nested operations are in the context.
+    // Otherwise, we cannot do anything.
+    // By "required" I mean linking fields.
     let update_args = WriteArgsParser::from(&model, data_map)?;
     let mut args = update_args.args;
     args.update_datetimes(&model);
 
-    let not_updating_current_model = args.is_empty();
-    let assumes_exists = update_args
-        .nested
-        .iter()
-        .any(|(_relation_field, data_map)| assumes_parent_exists(data_map));
-    let can_skip_update = is_lookup_by_id && not_updating_current_model && !assumes_exists;
-    println!("laplab: can skip update: {can_skip_update}");
+    // In some cases, we can skip the update node altogether if enough information was
+    // provided in the filters for the query.
+    let can_skip_update = 'b: {
+        // If update operation updates any fields of the current model, we cannot skip it.
+        if !args.is_empty() {
+            break 'b false;
+        }
+
+        // If no context was passed, we cannot extract any values during graph building.
+        let ctx = match ctx {
+            Some(ctx) => ctx,
+            None => break 'b false,
+        };
+
+        // While the primary identifier is not always required for the nested operations, it
+        // can be required by the separate operation that reads the update record from the
+        // database.
+        if !ctx.contains(&model.primary_identifier()) {
+            break 'b false;
+        }
+
+        for (relation_field, data_map) in &update_args.nested {
+            // If nested operation assumes that the parent exists, it means that it relies
+            // on the update operation to check that. Thus, we cannot skip it.
+            if assumes_parent_exists(data_map) {
+                break 'b false;
+            }
+
+            // If context does not have values for the linking fields of nested operation,
+            // we need to fetch them from the database.
+            if !ctx.contains(&relation_field.linking_fields()) {
+                break 'b false;
+            }
+        }
+
+        true
+    };
 
     let filter: Filter = filter.into();
 
-    // TODO laplab: do not generate update node at all if we can skip the update.
     // If the connector can use `RETURNING`, always use it as it may:
     // 1. Save a SELECT statement
     // 2. Avoid from computing the ids in memory if they are updated. See `update_one_without_selection` function.

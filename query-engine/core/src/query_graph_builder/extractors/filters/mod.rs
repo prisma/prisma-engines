@@ -20,7 +20,7 @@ use std::{borrow::Cow, collections::HashMap, convert::TryInto, str::FromStr};
 pub fn extract_unique_filter(
     value_map: ParsedInputMap<'_>,
     model: &Model,
-    ctx: Option<&mut CompileContext>,
+    mut ctx: Option<&mut CompileContext>,
 ) -> QueryGraphBuilderResult<Filter> {
     let tag = value_map.tag.clone();
     // Partition the input into a map containing only the unique fields and one containing all the other filters
@@ -37,7 +37,7 @@ pub fn extract_unique_filter(
     unique_map.set_tag(tag.clone());
     rest_map.set_tag(tag);
 
-    let unique_filters = internal_extract_unique_filter(unique_map, model, ctx)?;
+    let unique_filters = internal_extract_unique_filter(unique_map, model, &mut ctx)?;
     let rest_filters = extract_filter(rest_map, model)?;
 
     Ok(Filter::and(vec![unique_filters, rest_filters]))
@@ -48,7 +48,7 @@ pub fn extract_unique_filter(
 fn internal_extract_unique_filter(
     value_map: ParsedInputMap<'_>,
     model: &Model,
-    mut ctx: Option<&mut CompileContext>,
+    ctx: &mut Option<&mut CompileContext>,
 ) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
@@ -57,13 +57,13 @@ fn internal_extract_unique_filter(
             match model.fields().find_from_scalar(&field_name) {
                 Ok(field) => {
                     let value: PrismaValue = value.try_into()?;
-                    // TODO laplab: here we assume that there is always only one filter per field.
-                    if let Some(ctx) = &mut ctx {
-                        ctx.fields.insert(SelectedField::Scalar(field.clone()), value.clone());
+                    // TODO laplab: check that we do not allow ORs and ANDs in this context to
+                    // ensure that only one value corresponds to the field.
+                    if let Some(ctx) = ctx {
+                        ctx.insert(SelectedField::Scalar(field.clone()), value.clone());
                     }
                     Ok(field.equals(value))
                 }
-                // TODO laplab: insert compound fields into compile context.
                 Err(_) => utils::resolve_compound_field(&field_name, model)
                     .ok_or_else(|| {
                         QueryGraphBuilderError::AssertionError(format!(
@@ -72,7 +72,7 @@ fn internal_extract_unique_filter(
                             model.name()
                         ))
                     })
-                    .and_then(|fields| handle_compound_field(fields, value)),
+                    .and_then(|fields| handle_compound_field(fields, value, ctx)),
             }
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
@@ -80,14 +80,21 @@ fn internal_extract_unique_filter(
     Ok(Filter::and(filters))
 }
 
-fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue<'_>) -> QueryGraphBuilderResult<Filter> {
+fn handle_compound_field(
+    fields: Vec<ScalarFieldRef>,
+    value: ParsedInputValue<'_>,
+    ctx: &mut Option<&mut CompileContext>,
+) -> QueryGraphBuilderResult<Filter> {
     let mut input_map: ParsedInputMap<'_> = value.try_into()?;
 
     let filters: Vec<Filter> = fields
         .into_iter()
-        .map(|sf| {
-            let pv: PrismaValue = input_map.swap_remove(sf.name()).unwrap().try_into()?;
-            Ok(sf.equals(pv))
+        .map(|field| {
+            let value: PrismaValue = input_map.swap_remove(field.name()).unwrap().try_into()?;
+            if let Some(ctx) = ctx {
+                ctx.insert(SelectedField::Scalar(field.clone()), value.clone());
+            }
+            Ok(field.equals(value))
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 

@@ -109,7 +109,6 @@ pub(crate) fn upsert_record(
         model.clone(),
         update_argument,
         Some(&field),
-        false,
         None,
     )?;
 

@@ -34,7 +34,6 @@ pub fn connect_nested_query(
 ) -> QueryGraphBuilderResult<()> {
     let child_model = parent_relation_field.related_model();
 
-    // TODO laplab: assert that `parent_results` is `None` in all other cases?
     for (field_name, value) in data_map {
         match field_name.as_ref() {
             operations::CREATE => nested_create(graph, query_schema,parent, &parent_relation_field, value, &child_model)?,
