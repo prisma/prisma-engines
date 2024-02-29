@@ -42,6 +42,7 @@ native = [
     "mongodb",
     "sql",
     "graphql-protocol",
+    "psl/all",
     "sql-query-connector/native_all",
     "query-core/metrics",
 ]
