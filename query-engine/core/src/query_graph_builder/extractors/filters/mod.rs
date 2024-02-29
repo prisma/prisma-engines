@@ -14,14 +14,33 @@ use filter_grouping::*;
 use indexmap::IndexMap;
 use query_structure::{prelude::ParentContainer, *};
 use schema::constants::filters;
-use std::{borrow::Cow, collections::HashMap, convert::TryInto, str::FromStr};
+use std::{
+    borrow::Cow,
+    collections::{HashMap, HashSet},
+    convert::TryInto,
+    str::FromStr,
+};
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
 pub fn extract_unique_filter(
     value_map: ParsedInputMap<'_>,
     model: &Model,
-    mut ctx: Option<&mut CompileContext>,
+    ctx: Option<&mut CompileContext>,
 ) -> QueryGraphBuilderResult<Filter> {
+    extract_unique_filter_info(value_map, model, ctx).map(|info| info.filter)
+}
+
+pub struct FilterInfo {
+    pub has_non_unique_filters: bool,
+    pub unique_fields: HashSet<SelectedField>,
+    pub filter: Filter,
+}
+
+pub fn extract_unique_filter_info(
+    value_map: ParsedInputMap<'_>,
+    model: &Model,
+    mut ctx: Option<&mut CompileContext>,
+) -> QueryGraphBuilderResult<FilterInfo> {
     let tag = value_map.tag.clone();
     // Partition the input into a map containing only the unique fields and one containing all the other filters
     // so that we can parse them separately and ensure we AND both filters
@@ -37,10 +56,15 @@ pub fn extract_unique_filter(
     unique_map.set_tag(tag.clone());
     rest_map.set_tag(tag);
 
-    let unique_filters = internal_extract_unique_filter(unique_map, model, &mut ctx)?;
+    let mut unique_fields = HashSet::new();
+    let unique_filters = internal_extract_unique_filter(unique_map, model, &mut ctx, &mut unique_fields)?;
     let rest_filters = extract_filter(rest_map, model)?;
 
-    Ok(Filter::and(vec![unique_filters, rest_filters]))
+    Ok(FilterInfo {
+        has_non_unique_filters: !rest_filters.is_empty(),
+        unique_fields,
+        filter: Filter::and(vec![unique_filters, rest_filters]),
+    })
 }
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
@@ -49,6 +73,7 @@ fn internal_extract_unique_filter(
     value_map: ParsedInputMap<'_>,
     model: &Model,
     ctx: &mut Option<&mut CompileContext>,
+    unique_fields: &mut HashSet<SelectedField>,
 ) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
@@ -57,11 +82,11 @@ fn internal_extract_unique_filter(
             match model.fields().find_from_scalar(&field_name) {
                 Ok(field) => {
                     let value: PrismaValue = value.try_into()?;
-                    // TODO laplab: check that we do not allow ORs and ANDs in this context to
-                    // ensure that only one value corresponds to the field.
+                    let selected_field = SelectedField::Scalar(field.clone());
                     if let Some(ctx) = ctx {
-                        ctx.insert(SelectedField::Scalar(field.clone()), value.clone());
+                        ctx.insert(selected_field.clone(), value.clone());
                     }
+                    unique_fields.insert(selected_field);
                     Ok(field.equals(value))
                 }
                 Err(_) => utils::resolve_compound_field(&field_name, model)
@@ -72,7 +97,7 @@ fn internal_extract_unique_filter(
                             model.name()
                         ))
                     })
-                    .and_then(|fields| handle_compound_field(fields, value, ctx)),
+                    .and_then(|fields| handle_compound_field(fields, value, ctx, unique_fields)),
             }
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
@@ -84,6 +109,7 @@ fn handle_compound_field(
     fields: Vec<ScalarFieldRef>,
     value: ParsedInputValue<'_>,
     ctx: &mut Option<&mut CompileContext>,
+    unique_fields: &mut HashSet<SelectedField>,
 ) -> QueryGraphBuilderResult<Filter> {
     let mut input_map: ParsedInputMap<'_> = value.try_into()?;
 
@@ -91,9 +117,11 @@ fn handle_compound_field(
         .into_iter()
         .map(|field| {
             let value: PrismaValue = input_map.swap_remove(field.name()).unwrap().try_into()?;
+            let selected_field = SelectedField::Scalar(field.clone());
             if let Some(ctx) = ctx {
-                ctx.insert(SelectedField::Scalar(field.clone()), value.clone());
+                ctx.insert(selected_field.clone(), value.clone());
             }
+            unique_fields.insert(selected_field);
             Ok(field.equals(value))
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;

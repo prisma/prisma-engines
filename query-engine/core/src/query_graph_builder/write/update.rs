@@ -10,6 +10,7 @@ use crate::{
 use psl::datamodel_connector::ConnectorCapability;
 use query_structure::{Filter, IntoFilter, Model};
 use schema::{constants::args, QuerySchema};
+use std::collections::HashSet;
 use std::convert::TryInto;
 
 /// Creates an update record query and adds it to the query graph, together with it's nested queries and companion read query.
@@ -23,7 +24,11 @@ pub(crate) fn update_record(
 
     // "where"
     let where_arg: ParsedInputMap<'_> = field.arguments.lookup(args::WHERE).unwrap().value.try_into()?;
-    let filter = extract_unique_filter(where_arg, &model, Some(&mut ctx))?;
+    let FilterInfo {
+        has_non_unique_filters,
+        unique_fields,
+        filter,
+    } = extract_unique_filter_info(where_arg, &model, Some(&mut ctx))?;
 
     // "data"
     let data_argument = field.arguments.lookup(args::DATA).unwrap();
@@ -39,6 +44,8 @@ pub(crate) fn update_record(
         data_map,
         Some(&field),
         Some(&ctx),
+        unique_fields,
+        has_non_unique_filters,
     )?;
 
     if query_schema.relation_mode().is_prisma() {
@@ -96,43 +103,47 @@ pub(crate) fn update_record(
         let read_query = read::find_unique(field, model.clone(), query_schema)?;
         let read_node = graph.create_node(Query::Read(read_query));
 
-        // Attempt to construct filter from compile context. If we do not have enough data, fall
-        // back to resolving the filter in runtime.
-        match ctx.lookup(model.primary_identifier()).map(|result| result.filter()) {
-            Some(derived_filter) => {
-                if let Node::Query(Query::Read(ReadQuery::RecordQuery(rq))) =
-                    graph.node_content_mut(&read_node).expect("just added")
-                {
-                    rq.add_filter(derived_filter);
-                } else {
-                    panic!("`read::find_unique` did not return a `RecordQuery`");
-                }
+        let update_was_optimized_away = matches!(
+            graph.node_content(&update_node).expect("update node must exist"),
+            Node::Empty
+        );
 
-                graph.create_edge(&update_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
+        if update_was_optimized_away {
+            let derived_filter = ctx
+                .lookup(model.primary_identifier())
+                .expect("update can only be optimized away if primary identifier is in context")
+                .filter();
+            if let Node::Query(Query::Read(ReadQuery::RecordQuery(rq))) =
+                graph.node_content_mut(&read_node).expect("just added")
+            {
+                rq.add_filter(derived_filter);
+            } else {
+                panic!("`read::find_unique` did not return a `RecordQuery`");
             }
-            None => {
-                graph.create_edge(
-                    &update_node,
-                    &read_node,
-                    QueryGraphDependency::ProjectedDataDependency(
-                        model.primary_identifier(),
-                        Box::new(move |mut read_node, mut parent_ids| {
-                            let parent_id = match parent_ids.pop() {
-                                Some(pid) => Ok(pid),
-                                None => Err(QueryGraphBuilderError::RecordNotFound(
-                                    "Record to update not found.".to_string(),
-                                )),
-                            }?;
 
-                            if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = read_node {
-                                rq.add_filter(parent_id.filter());
-                            };
+            graph.create_edge(&update_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
+        } else {
+            graph.create_edge(
+                &update_node,
+                &read_node,
+                QueryGraphDependency::ProjectedDataDependency(
+                    model.primary_identifier(),
+                    Box::new(move |mut read_node, mut parent_ids| {
+                        let parent_id = match parent_ids.pop() {
+                            Some(pid) => Ok(pid),
+                            None => Err(QueryGraphBuilderError::RecordNotFound(
+                                "Record to update not found.".to_string(),
+                            )),
+                        }?;
 
-                            Ok(read_node)
-                        }),
-                    ),
-                )?;
-            }
+                        if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = read_node {
+                            rq.add_filter(parent_id.filter());
+                        };
+
+                        Ok(read_node)
+                    }),
+                ),
+            )?;
         }
 
         graph.add_result_node(&read_node);
@@ -200,6 +211,8 @@ pub fn update_record_node<T: Clone>(
     data_map: ParsedInputMap<'_>,
     field: Option<&ParsedField<'_>>,
     mut ctx: Option<&CompileContext>,
+    mut unique_fields: HashSet<SelectedField>,
+    has_non_unique_filters: bool,
 ) -> QueryGraphBuilderResult<NodeRef>
 where
     T: Into<Filter>,
@@ -214,6 +227,12 @@ where
     // In some cases, we can skip the update node altogether if enough information was
     // provided in the filters for the query.
     let can_skip_update = 'b: {
+        // If update has some non-unique filters, nested operations will not be able to check for
+        // the record existence on their own. We need an explicit query to the database.
+        if has_non_unique_filters {
+            break 'b false;
+        }
+
         // If update operation updates any fields of the current model, we cannot skip it.
         if !args.is_empty() {
             break 'b false;
@@ -241,9 +260,20 @@ where
 
             // If context does not have values for the linking fields of nested operation,
             // we need to fetch them from the database.
-            if !ctx.contains(&relation_field.linking_fields()) {
+            let linking_fields = relation_field.linking_fields();
+            if !ctx.contains(&linking_fields) {
                 break 'b false;
             }
+
+            for field in linking_fields {
+                unique_fields.remove(&field);
+            }
+        }
+
+        // If some of the unique fields in the filter are not linking fields for nested operations,
+        // we will need an explicit query to the database to check for record's existence.
+        if !unique_fields.is_empty() {
+            break 'b false;
         }
 
         true

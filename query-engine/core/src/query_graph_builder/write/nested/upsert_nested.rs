@@ -150,6 +150,8 @@ pub fn nested_upsert(
             update_input.try_into()?,
             None,
             None,
+            Default::default(),
+            false,
         )?;
 
         graph.create_edge(

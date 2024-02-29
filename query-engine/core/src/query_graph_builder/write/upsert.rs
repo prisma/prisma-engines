@@ -110,6 +110,8 @@ pub(crate) fn upsert_record(
         update_argument,
         Some(&field),
         None,
+        Default::default(),
+        false,
     )?;
 
     let read_node_create = graph.create_node(Query::Read(read_query.clone()));
