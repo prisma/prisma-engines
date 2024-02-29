@@ -19,7 +19,7 @@ serde.workspace = true
 tracing.workspace = true
 tracing-error = "0.2"
 tracing-futures = "0.2"
-quaint = { workspace = true, features = ["native"] }
+quaint = { workspace = true, features = ["native", "pooled", "expose-drivers"] }
 
 [dev-dependencies]
 expect-test = "1.2.2"
