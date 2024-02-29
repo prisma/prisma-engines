@@ -1,4 +1,3 @@
-// #[cfg(any(feature = "postgresql", feature = "mysql"))]
 use super::compare::{JsonCompare, JsonType};
 use crate::ast::*;
 use query::SelectQuery;

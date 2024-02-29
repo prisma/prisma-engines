@@ -105,9 +105,13 @@ optimize() {
 }
 
 report_size() {
-    local CONNECTOR="$1"
-    local GZ_SIZE=$(gzip -c "${OUT_FOLDER}/$CONNECTOR/query_engine_bg.wasm" | wc -c)
-    local FORMATTED_GZ_SIZE=$(echo "$GZ_SIZE"|numfmt --format '%.3f' --to=iec-i --suffix=B)
+    local CONNECTOR
+    local GZ_SIZE
+    local FORMATTED_GZ_SIZE
+
+    CONNECTOR="$1"
+    GZ_SIZE=$(gzip -c "${OUT_FOLDER}/$CONNECTOR/query_engine_bg.wasm" | wc -c)
+    FORMATTED_GZ_SIZE=$(echo "$GZ_SIZE"|numfmt --format '%.3f' --to=iec-i --suffix=B)
 
     echo "$CONNECTOR:"
     echo "ℹ️  raw: $(du -h "${OUT_FOLDER}/$CONNECTOR/query_engine_bg.wasm")"

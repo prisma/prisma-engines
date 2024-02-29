@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 psl.workspace = true
-quaint.workspace = true
+quaint = { workspace = true, features = ["native"] }
 serde.workspace = true
 serde_json.workspace = true
 user-facing-errors = { path = "../../../libs/user-facing-errors" }

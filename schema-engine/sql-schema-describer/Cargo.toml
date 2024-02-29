@@ -5,8 +5,9 @@ version = "0.1.0"
 
 [dependencies]
 prisma-value = { path = "../../libs/prisma-value" }
-psl.workspace = true
+psl = { workspace = true, features = ["all"] }
 
+either = "1.8.0"
 async-trait.workspace = true
 bigdecimal = "0.3"
 enumflags2.workspace = true
@@ -18,8 +19,7 @@ serde.workspace = true
 tracing.workspace = true
 tracing-error = "0.2"
 tracing-futures = "0.2"
-quaint.workspace = true
-either = "1.8.0"
+quaint = { workspace = true, features = ["native"] }
 
 [dev-dependencies]
 expect-test = "1.2.2"

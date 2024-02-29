@@ -52,13 +52,13 @@ pub struct Function<'a> {
 
 impl<'a> Function<'a> {
     pub fn returns_json(&self) -> bool {
-        match self.typ_ {
-            FunctionType::RowToJson(_) => true,
-            FunctionType::JsonExtract(_) => true,
-            FunctionType::JsonExtractLastArrayElem(_) => true,
-            FunctionType::JsonExtractFirstArrayElem(_) => true,
-            _ => false,
-        }
+        matches!(
+            self.typ_,
+            FunctionType::RowToJson(_)
+                | FunctionType::JsonExtract(_)
+                | FunctionType::JsonExtractLastArrayElem(_)
+                | FunctionType::JsonExtractFirstArrayElem(_)
+        )
     }
 }
 
