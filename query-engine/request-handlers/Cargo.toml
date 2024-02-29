@@ -32,7 +32,7 @@ schema = { path = "../schema" }
 codspeed-criterion-compat = "1.1.0"
 
 [features]
-mongodb = ["mongodb-query-connector"]
+mongodb = ["mongodb-query-connector", "psl/mongodb"]
 sql = ["sql-query-connector"]
 postgresql = ["sql", "sql-query-connector/postgresql", "psl/postgresql"]
 mysql = ["sql", "sql-query-connector/mysql", "psl/mysql"]
