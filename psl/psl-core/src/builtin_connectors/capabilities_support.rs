@@ -64,6 +64,22 @@ pub const fn can_have_capability(cap: ConnectorCapability) -> bool {
     can_have_capability_impl(cap)
 }
 
+/// Marks the code as reachable only by the connectors,
+/// having the specific capability.
+/// Optimizer usually can optimize the code away if none of the connectors
+/// current build supports the capability.
+///
+/// If we are within a single connector build that has no such capability,
+/// and the code marked with this macro is reached, it will panic.
+#[macro_export]
+macro_rules! reachable_only_with_capability {
+    ($cap: expr) => {
+        if !$crate::builtin_connectors::can_have_capability($cap) {
+            core::unreachable!()
+        }
+    };
+}
+
 #[inline(always)]
 #[allow(dead_code)] // not used if more than one connector is built
 const fn check_comptime_capability(capabilities: ConnectorCapabilities, cap: ConnectorCapability) -> bool {

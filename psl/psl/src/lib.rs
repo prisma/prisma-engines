@@ -10,6 +10,7 @@ pub use psl_core::{
     mcf::config_to_mcf_json_value as get_config,
     mcf::{generators_to_json, render_sources_to_json}, // for tests
     parser_database::{self, SourceFile},
+    reachable_only_with_capability,
     reformat,
     schema_ast,
     set_config_dir,

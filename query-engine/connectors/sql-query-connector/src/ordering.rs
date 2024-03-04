@@ -1,6 +1,6 @@
 use crate::{join_utils::*, model_extensions::*, query_arguments_ext::QueryArgumentsExt, Context};
 use itertools::Itertools;
-use psl::can_have_capability;
+use psl::{datamodel_connector::ConnectorCapability, reachable_only_with_capability};
 use quaint::ast::*;
 use query_structure::*;
 
@@ -47,9 +47,7 @@ impl OrderByBuilder {
                 }
                 OrderBy::ToManyAggregation(order_by) => self.build_order_aggr_rel(order_by, needs_reversed_order, ctx),
                 OrderBy::Relevance(order_by) => {
-                    if !can_have_capability(psl::datamodel_connector::ConnectorCapability::FullTextSearch) {
-                        unreachable!()
-                    }
+                    reachable_only_with_capability!(ConnectorCapability::FullTextSearch);
                     self.build_order_relevance(order_by, needs_reversed_order, ctx)
                 }
             })
