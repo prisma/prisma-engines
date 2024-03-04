@@ -4,7 +4,7 @@ pub mod completions;
 
 #[cfg(feature = "cockroachdb")]
 pub use cockroach_datamodel_connector::CockroachType;
-#[cfg(feature = "cockroachdb")]
+#[cfg(feature = "mongodb")]
 pub use mongodb::MongoDbType;
 #[cfg(feature = "mssql")]
 pub use mssql_datamodel_connector::{MsSqlType, MsSqlTypeParameter};

@@ -8,7 +8,12 @@ vendored-openssl = ["quaint/vendored-openssl"]
 
 [dependencies]
 psl.workspace = true
-quaint = { workspace = true, features = ["native", "expose-drivers", "pooled"] }
+quaint = { workspace = true, features = [
+    "native",
+    "expose-drivers",
+    "pooled",
+    "fmt-sql",
+] }
 tokio.workspace = true
 serde.workspace = true
 indoc.workspace = true

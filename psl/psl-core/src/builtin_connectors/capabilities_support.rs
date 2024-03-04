@@ -2,6 +2,7 @@ use crate::datamodel_connector::{Connector, ConnectorCapabilities, ConnectorCapa
 use cfg_if::cfg_if;
 
 cfg_if! {
+    // if built only for mysql
     if #[cfg(all(feature="mysql", not(any(feature = "postgresql", feature="sqlite", feature = "cockroachdb", feature="mssql", feature="mongodb"))))] {
         #[inline(always)]
         const fn can_have_capability_impl(capability: ConnectorCapability) -> bool {
@@ -11,6 +12,7 @@ cfg_if! {
         pub fn has_capability(_: &dyn Connector, capability: ConnectorCapability) -> bool {
             can_have_capability_impl(capability)
         }
+    // if built only for sqlite
     } else if #[cfg(all(feature="sqlite", not(any(feature = "postgresql", feature="mysql", feature = "cockroachdb", feature="mssql", feature="mongodb"))))] {
         #[inline(always)]
         const fn can_have_capability_impl(capability: ConnectorCapability) -> bool {
@@ -21,6 +23,7 @@ cfg_if! {
         pub fn has_capability(_: &dyn Connector, capability: ConnectorCapability) -> bool {
             can_have_capability_impl(capability)
         }
+    // if built only for postgresql
     } else if #[cfg(all(feature="postgresql", not(any(feature = "sqlite", feature="mysql", feature = "cockroachdb", feature="mssql", feature="mongodb"))))] {
         #[inline(always)]
         const fn can_have_capability_impl(capability: ConnectorCapability) -> bool {
@@ -31,6 +34,7 @@ cfg_if! {
         pub fn has_capability(_: &dyn Connector, capability: ConnectorCapability) -> bool {
             can_have_capability_impl(capability)
         }
+    // any other build configuration
     } else {
         #[inline(always)]
         const fn can_have_capability_impl(_: ConnectorCapability) -> bool {
@@ -44,7 +48,7 @@ cfg_if! {
     }
 }
 
-/// Helper function for determining if engine, compiled with the current settings
+/// Helper function for determining if engine, compiled with the current settings,
 /// can potentially have provided capability on. Useful for single-connector builds and can
 /// be used to exclude certain code that we know for sure can't be executed for current connector.
 /// Has no effect on multi-connector builds
