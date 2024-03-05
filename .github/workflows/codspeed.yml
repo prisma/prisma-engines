@@ -28,7 +28,7 @@ jobs:
         run: cargo install cargo-codspeed
 
       - name: "Build the benchmark targets: schema"
-        run: cargo codspeed build -p schema
+        run: cargo codspeed build -p schema --all-features
 
       - name: "Build the benchmark targets: request-handlers"
         run: cargo codspeed build -p request-handlers --features native
