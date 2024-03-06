@@ -76,11 +76,15 @@ impl MongoFilterVisitor {
 
             Filter::Not(filters) if self.invert() => {
                 self.flip_invert();
-                self.visit_boolean_operator("$or", filters, false)?
+                let result = self.visit_boolean_operator("$or", filters, false)?;
+                self.flip_invert();
+                result
             }
             Filter::Not(filters) => {
                 self.flip_invert();
-                self.visit_boolean_operator("$and", filters, true)?
+                let result = self.visit_boolean_operator("$and", filters, true)?;
+                self.flip_invert();
+                result
             }
             Filter::Scalar(sf) => self.visit_scalar_filter(sf)?,
             Filter::Empty => MongoFilter::Scalar(doc! {}),
