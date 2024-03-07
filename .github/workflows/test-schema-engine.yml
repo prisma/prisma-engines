@@ -224,7 +224,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: taiki-e/install-action@nextest
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
