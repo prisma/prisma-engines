@@ -9,14 +9,14 @@ dependencies:
     specifier: 0.4.3
     version: 0.4.3
   '@prisma/adapter-libsql':
-    specifier: 5.8.0-dev.24
-    version: 5.8.0-dev.24(@libsql/client@0.4.3)
+    specifier: 5.8.1
+    version: 5.8.1(@libsql/client@0.4.3)
   '@prisma/client':
     specifier: 5.8.0-dev.24
     version: 5.8.0-dev.24(prisma@5.8.0-dev.24)
   '@prisma/driver-adapter-utils':
-    specifier: 5.8.0-dev.24
-    version: 5.8.0-dev.24
+    specifier: 5.8.1
+    version: 5.8.1
   prisma:
     specifier: 5.8.0-dev.24
     version: 5.8.0-dev.24
@@ -137,13 +137,13 @@ packages:
     dev: false
     optional: true
 
-  /@prisma/adapter-libsql@5.8.0-dev.24(@libsql/client@0.4.3):
-    resolution: {integrity: sha512-QilsHGrKl157IG21QtXvGYk7AW1m0Pcf6isBATExHhVLTE7MnN7her93f+HezG7v/lF/wqnyhk0ZuPZONyWryA==}
+  /@prisma/adapter-libsql@5.8.1(@libsql/client@0.4.3):
+    resolution: {integrity: sha512-Q4CSj159idDC06dLGixq9f6bMVB45LBOQ5PeRIqiXT551dOnuA/h1SwfgpG51hKe5tX/W8gT250XdVuwN7eRQw==}
     peerDependencies:
       '@libsql/client': ^0.3.5
     dependencies:
       '@libsql/client': 0.4.3
-      '@prisma/driver-adapter-utils': 5.8.0-dev.24
+      '@prisma/driver-adapter-utils': 5.8.1
       async-mutex: 0.4.0
     transitivePeerDependencies:
       - supports-color
@@ -166,8 +166,8 @@ packages:
     resolution: {integrity: sha512-W+4q24HgAD5mNbrFkyz02GAIH9RHCLcXaF6bwMPapCUECopmleLQV4bW9oEDAH1sDrmESnKEge+gSpXWkHKfjw==}
     dev: false
 
-  /@prisma/driver-adapter-utils@5.8.0-dev.24:
-    resolution: {integrity: sha512-8JP85cE452Nyjl6sxk5c4azh+k7SLca+cmKy2O8DB4DOpijmI6p1TyKyH/c/DiUHPmMikJS2f5/DNxHUcKe4AQ==}
+  /@prisma/driver-adapter-utils@5.8.1:
+    resolution: {integrity: sha512-svZPPpNtmVkuQxIMFbMMs1IeihvVZoHfJs/WAxSIPoH8xun5gwoMPxBqCwYzFPM150vU19K/FYvvkDrAfpwelQ==}
     dependencies:
       debug: 4.3.4
     transitivePeerDependencies:
