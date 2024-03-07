@@ -42,7 +42,7 @@ jobs:
         working-directory: ./quaint
 
       - name: Sleep for 20s
-        uses: juliangruber/sleep-action@v1
+        uses: juliangruber/sleep-action@v2
         with:
           time: 20s
 
