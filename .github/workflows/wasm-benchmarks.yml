@@ -128,7 +128,7 @@ jobs:
           body-includes: "<!-- wasm-engine-perf -->"
 
       - name: Create or update report
-        uses: peter-evans/create-or-update-comment@v3
+        uses: peter-evans/create-or-update-comment@v4
         # Only run on branches from our repository
         # It avoids an expected failure on forks
         if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
