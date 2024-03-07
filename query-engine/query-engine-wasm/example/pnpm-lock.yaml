@@ -9,14 +9,14 @@ dependencies:
     specifier: 0.4.3
     version: 0.4.3
   '@prisma/adapter-libsql':
-    specifier: 5.8.0-dev.24
-    version: 5.8.0-dev.24(@libsql/client@0.4.3)
+    specifier: 5.10.2
+    version: 5.10.2(@libsql/client@0.4.3)
   '@prisma/client':
     specifier: 5.8.0-dev.24
     version: 5.8.0-dev.24(prisma@5.8.0-dev.24)
   '@prisma/driver-adapter-utils':
-    specifier: 5.8.0-dev.24
-    version: 5.8.0-dev.24
+    specifier: 5.10.2
+    version: 5.10.2
   prisma:
     specifier: 5.8.0-dev.24
     version: 5.8.0-dev.24
@@ -137,16 +137,14 @@ packages:
     dev: false
     optional: true
 
-  /@prisma/adapter-libsql@5.8.0-dev.24(@libsql/client@0.4.3):
-    resolution: {integrity: sha512-QilsHGrKl157IG21QtXvGYk7AW1m0Pcf6isBATExHhVLTE7MnN7her93f+HezG7v/lF/wqnyhk0ZuPZONyWryA==}
+  /@prisma/adapter-libsql@5.10.2(@libsql/client@0.4.3):
+    resolution: {integrity: sha512-XRaSK8IhmodBK3FAvlw0blwUVlIH9sEvUvJvHtGXKoMJDG9zb5HS/NkAqPVG7/8oqUZInZmdNlUXb/RGiROiFg==}
     peerDependencies:
-      '@libsql/client': ^0.3.5
+      '@libsql/client': ^0.3.5 || ^0.4.0
     dependencies:
       '@libsql/client': 0.4.3
-      '@prisma/driver-adapter-utils': 5.8.0-dev.24
-      async-mutex: 0.4.0
-    transitivePeerDependencies:
-      - supports-color
+      '@prisma/driver-adapter-utils': 5.10.2
+      async-mutex: 0.4.1
     dev: false
 
   /@prisma/client@5.8.0-dev.24(prisma@5.8.0-dev.24):
@@ -162,16 +160,18 @@ packages:
       prisma: 5.8.0-dev.24
     dev: false
 
+  /@prisma/debug@5.10.2:
+    resolution: {integrity: sha512-bkBOmH9dpEBbMKFJj8V+Zp8IZHIBjy3fSyhLhxj4FmKGb/UBSt9doyfA6k1UeUREsMJft7xgPYBbHSOYBr8XCA==}
+    dev: false
+
   /@prisma/debug@5.8.0-dev.24:
     resolution: {integrity: sha512-W+4q24HgAD5mNbrFkyz02GAIH9RHCLcXaF6bwMPapCUECopmleLQV4bW9oEDAH1sDrmESnKEge+gSpXWkHKfjw==}
     dev: false
 
-  /@prisma/driver-adapter-utils@5.8.0-dev.24:
-    resolution: {integrity: sha512-8JP85cE452Nyjl6sxk5c4azh+k7SLca+cmKy2O8DB4DOpijmI6p1TyKyH/c/DiUHPmMikJS2f5/DNxHUcKe4AQ==}
+  /@prisma/driver-adapter-utils@5.10.2:
+    resolution: {integrity: sha512-Qou/js8VJSmaWiGX5EVXGF83fMZltFnuzkKFOocpDvcI3f5G9WTPf61TKflzs3ZOYe1weRgM9hUk9UR7lgGEwg==}
     dependencies:
-      debug: 4.3.4
-    transitivePeerDependencies:
-      - supports-color
+      '@prisma/debug': 5.10.2
     dev: false
 
   /@prisma/engines-version@5.8.0-12.762b2b2e1b7f5bce1218201614a21e1a3251c84a:
@@ -221,8 +221,8 @@ packages:
       '@types/node': 20.9.4
     dev: false
 
-  /async-mutex@0.4.0:
-    resolution: {integrity: sha512-eJFZ1YhRR8UN8eBLoNzcDPcy/jqjsg6I1AP+KvWQX80BqOSW1oJPJXDylPUEeMr2ZQvHgnQ//Lp6f3RQ1zI7HA==}
+  /async-mutex@0.4.1:
+    resolution: {integrity: sha512-WfoBo4E/TbCX1G95XTjbWTE3X2XLG0m1Xbv2cwOtuPdyH9CZvnaA5nCt1ucjaKEgW2A5IF71hxrRhr83Je5xjA==}
     dependencies:
       tslib: 2.6.2
     dev: false
@@ -241,18 +241,6 @@ packages:
   /data-uri-to-buffer@4.0.1:
     resolution: {integrity: sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==}
     engines: {node: '>= 12'}
-    dev: false
-
-  /debug@4.3.4:
-    resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
-    engines: {node: '>=6.0'}
-    peerDependencies:
-      supports-color: '*'
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
-    dependencies:
-      ms: 2.1.2
     dev: false
 
   /delayed-stream@1.0.0:
@@ -324,10 +312,6 @@ packages:
     engines: {node: '>= 0.6'}
     dependencies:
       mime-db: 1.52.0
-    dev: false
-
-  /ms@2.1.2:
-    resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
     dev: false
 
   /node-domexception@1.0.0:
