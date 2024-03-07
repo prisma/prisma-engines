@@ -31,7 +31,7 @@
     "@prisma/driver-adapter-utils": "workspace:*",
     "@prisma/bundled-js-drivers": "workspace:*",
     "mitata": "^0.1.6",
-    "undici": "6.6.1",
+    "undici": "6.6.2",
     "ws": "8.14.2"
   },
   "devDependencies": {
