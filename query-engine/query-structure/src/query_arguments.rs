@@ -40,6 +40,22 @@ impl RelationLoadStrategy {
     }
 }
 
+impl TryFrom<&str> for RelationLoadStrategy {
+    type Error = crate::error::DomainError;
+
+    fn try_from(value: &str) -> crate::Result<Self> {
+        // todo(team-orm#947) We ideally use the `load_strategy` enum defined in schema/constants, but first we need to extract the `schema-constants` crate.
+        match value {
+            "join" => Ok(RelationLoadStrategy::Join),
+            "query" => Ok(RelationLoadStrategy::Query),
+            _ => Err(DomainError::ConversionFailure(
+                value.to_owned(),
+                "RelationLoadStrategy".to_owned(),
+            )),
+        }
+    }
+}
+
 impl std::fmt::Debug for QueryArguments {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("QueryArguments")

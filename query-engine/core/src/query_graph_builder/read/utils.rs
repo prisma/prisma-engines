@@ -1,5 +1,6 @@
 use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
+use once_cell::sync::Lazy;
 use psl::datamodel_connector::{ConnectorCapability, JoinStrategySupport};
 use query_structure::{native_distinct_compatible_with_order_by, prelude::*, RelationLoadStrategy};
 use schema::{
@@ -259,6 +260,12 @@ pub(crate) fn get_relation_load_strategy(
     nested_queries: &[ReadQuery],
     query_schema: &QuerySchema,
 ) -> QueryGraphBuilderResult<RelationLoadStrategy> {
+    static DEFAULT_RELATION_LOAD_STRATEGY: Lazy<Option<RelationLoadStrategy>> = Lazy::new(|| {
+        std::env::var("PRISMA_RELATION_LOAD_STRATEGY")
+            .map(|e| e.as_str().try_into().unwrap())
+            .ok()
+    });
+
     match query_schema.join_strategy_support() {
         // Connector and database version supports the `Join` strategy...
         JoinStrategySupport::Yes => match requested_strategy {
@@ -269,8 +276,13 @@ pub(crate) fn get_relation_load_strategy(
             }
             // But requested strategy is `Query`.
             Some(RelationLoadStrategy::Query) => Ok(RelationLoadStrategy::Query),
-            // And requested strategy is `Join` or there's none selected, in which case the default is still `Join`.
-            Some(RelationLoadStrategy::Join) | None => Ok(RelationLoadStrategy::Join),
+            // Or requested strategy is `Join`.
+            Some(RelationLoadStrategy::Join) => Ok(RelationLoadStrategy::Join),
+            // or there's none selected, in which case we check for an envar else `Join`.
+            None => match *DEFAULT_RELATION_LOAD_STRATEGY {
+                Some(rls) => Ok(rls),
+                None => Ok(RelationLoadStrategy::Join),
+            },
         },
         // Connector supports `Join` strategy but database version does not...
         JoinStrategySupport::UnsupportedDbVersion => match requested_strategy {
