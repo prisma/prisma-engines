@@ -22,7 +22,7 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "dependencies": {
-    "@cloudflare/workers-types": "4.20240208.0",
+    "@cloudflare/workers-types": "4.20240222.0",
     "@prisma/adapter-d1": "workspace:*",
     "@prisma/adapter-libsql": "workspace:*",
     "@prisma/adapter-neon": "workspace:*",

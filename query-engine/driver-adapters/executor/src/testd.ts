@@ -308,7 +308,7 @@ async function d1Adapter(url: string): Promise<DriverAdapter> {
     configPath: path.join(__dirname, "./wrangler.toml"),
   });
 
-  const client = new PrismaD1(env!.MY_DATABASE as D1Database)
+  const client = new PrismaD1(env.MY_DATABASE as D1Database)
 
   return client;
 }
