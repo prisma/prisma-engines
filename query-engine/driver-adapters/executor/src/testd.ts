@@ -24,6 +24,7 @@ import { D1Database } from '@cloudflare/workers-types'
 import { PrismaD1 } from '@prisma/adapter-d1'
 import path from 'node:path'
 import { getPlatformProxy } from 'wrangler'
+import { fileURLToPath } from 'node:url'
 
 if (!global.crypto) {
   global.crypto = webcrypto as Crypto
@@ -304,11 +305,13 @@ async function planetscaleAdapter(url: string): Promise<DriverAdapter> {
 }
 
 async function d1Adapter(url: string): Promise<DriverAdapter> {
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  
   const { env, dispose } = await getPlatformProxy({
-    configPath: path.join(__dirname, "./wrangler.toml"),
+    configPath: path.join(__dirname, "../wrangler.toml"),
   });
 
-  const client = new PrismaD1(env.MY_DATABASE as D1Database)
+  const client = new PrismaD1(env.MY_DATABASE as D1Database);
 
   return client;
 }
