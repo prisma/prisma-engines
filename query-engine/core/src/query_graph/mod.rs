@@ -7,8 +7,8 @@ pub(crate) use error::*;
 use psl::datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
 
 use crate::{
-    interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, QueryOptions,
-    ReadQuery,
+    interpreter::ExpressionResult, FilteredNestedMutation, FilteredQuery, ManyRecordsQuery, Query,
+    QueryGraphBuilderError, QueryGraphBuilderResult, QueryOptions, ReadQuery, WriteQuery,
 };
 use guard::*;
 use itertools::Itertools;
@@ -244,10 +244,138 @@ impl QueryGraph {
             self.normalize_data_dependencies(capabilities)?;
             self.insert_reloads()?;
             self.normalize_if_nodes()?;
+
+            let mut changed = true;
+            let mut index = 1;
+            loop {
+                println!("------------ Optimisation iteration {index} ----------");
+                changed &= self.merge_read_update()?;
+
+                if !changed {
+                    break;
+                }
+                index += 1;
+            }
+            println!("-------------- Finished optimisation, total {index} passes -----------");
+
             self.finalized = true;
         }
 
         Ok(())
+    }
+
+    fn merge_read_update(&mut self) -> QueryGraphResult<bool> {
+        let mut changed = false;
+
+        let mut nodes_to_remove = vec![];
+        for parent_node_ref in self.graph.node_indices().map(|node_ix| NodeRef { node_ix }) {
+            // TODO laplab: Meh?
+            let (parent_model, parent_filter, parent_selectors) = {
+                let parent_node = self.node_content(&parent_node_ref).unwrap();
+
+                if let Node::Query(Query::Read(ReadQuery::RecordQuery(query))) = parent_node {
+                    println!("laplab: record query: {query:?}");
+                }
+
+                let parent_query = if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(query))) = parent_node
+                {
+                    println!("laplab: related records query: {query:?}");
+                    query
+                } else {
+                    continue;
+                };
+
+                (
+                    parent_query.parent_field.related_model(),
+                    parent_query.args.filter.clone(),
+                    parent_query.parent_results.clone(),
+                )
+            };
+
+            let child_node_ref = {
+                let mut edges = self.outgoing_edges(&parent_node_ref);
+                if edges.len() == 1 {
+                    let edge = edges.remove(0);
+                    self.edge_target(&edge)
+                } else {
+                    continue;
+                }
+            };
+            let child_node = self
+                .node_content_mut(&child_node_ref)
+                .expect("target of edge must exist");
+
+            let child_query = if let Node::Query(Query::Write(WriteQuery::UpdateRecord(query))) = child_node {
+                query
+            } else {
+                continue;
+            };
+            let child_model = child_query.model();
+
+            if child_model != &parent_model {
+                continue;
+            }
+
+            // At this point, we know that the optimisation is possible, we just need to apply it.
+            // 1. Merge filters of two nodes.
+            if let Some(filter) = parent_filter {
+                child_query.add_filter(filter);
+            }
+            println!("laplab: merged filter: {:?}", child_query.get_filter());
+            if let Some(selectors) = parent_selectors {
+                child_query.set_selectors(selectors);
+            }
+
+            // 2. Update all edges going into the `RelatedRecordsQuery` node.
+            for edge_ref in self.incoming_edges(&parent_node_ref) {
+                let source_node_ref = self.edge_source(&edge_ref);
+
+                let new_edge = match self.remove_edge(edge_ref).unwrap() {
+                    edge @ QueryGraphDependency::Else
+                    | edge @ QueryGraphDependency::Then
+                    | edge @ QueryGraphDependency::ExecutionOrder => edge,
+                    // TODO laplab: here we assume that lambdas only ever update the `parent_selection` field.
+                    QueryGraphDependency::DataDependency(_) => todo!(),
+                    QueryGraphDependency::ProjectedDataDependency(selection, _) => {
+                        QueryGraphDependency::ProjectedDataDependency(
+                            selection,
+                            Box::new(move |mut update_node, mut child_ids| {
+                                let child_id = match child_ids.pop() {
+                                    Some(pid) => Ok(pid),
+                                    None => Err(QueryGraphBuilderError::RecordNotFound(format!(
+                                        // TODO laplab: useful error message.
+                                        "Bazinga!"
+                                    ))),
+                                }?;
+
+                                if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
+                                    ur.set_selectors(vec![child_id]);
+                                }
+
+                                Ok(update_node)
+                            }),
+                        )
+                    }
+                };
+
+                // Note that the new edge goes into the `UpdateRecord` node, not into the `RelatedRecordsQuery` node.
+                self.create_edge(&source_node_ref, &child_node_ref, new_edge)?;
+            }
+
+            // 3. Remove parent from the graph.
+            // We do not remove the node right away because this operation invalidates ALL node
+            // references. This includes references returned by the iterator this loop goes through.
+            nodes_to_remove.push(parent_node_ref);
+
+            changed = true;
+        }
+
+        for node in nodes_to_remove {
+            // The edge between the parent and the child is removed automatically.
+            self.remove_node(node).unwrap();
+        }
+
+        Ok(changed)
     }
 
     pub fn result_nodes(&self) -> Vec<NodeRef> {
@@ -391,6 +519,25 @@ impl QueryGraph {
     /// This operation is destructive on the underlying graph and invalidates references.
     pub(crate) fn remove_edge(&mut self, edge: EdgeRef) -> Option<QueryGraphDependency> {
         self.graph.remove_edge(edge.edge_ix).unwrap().into_inner()
+    }
+
+    fn remove_node(&mut self, node: NodeRef) -> Option<Node> {
+        // TODO laplab: Is this an implementation detail of petgraph? Absolutely it is.
+        // Do we have another way to do that? No, we do not.
+        let last_node_idx_before: NodeIndex = ((self.graph.node_count() - 1) as u32).into();
+        let last_node_idx_after = node.node_ix;
+        let removed_node = self.graph.remove_node(node.node_ix).unwrap().into_inner();
+
+        let last_node_position = self
+            .result_nodes
+            .iter()
+            .position(|node_idx| *node_idx == last_node_idx_before);
+        if let Some(last_node_position) = last_node_position {
+            self.result_nodes.swap_remove(last_node_position);
+            self.result_nodes.push(last_node_idx_after);
+        }
+
+        removed_node
     }
 
     /// Checks if `child` is a direct child of `parent`.

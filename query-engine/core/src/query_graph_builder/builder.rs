@@ -131,6 +131,8 @@ impl<'a> QueryGraphBuilder<'a> {
         graph.finalize(self.query_schema.capabilities())?;
         trace!("{}", graph);
 
+        println!("laplab: query graph {:?}", graph);
+
         Ok(graph)
     }
 
