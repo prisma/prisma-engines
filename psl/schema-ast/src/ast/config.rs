@@ -8,7 +8,7 @@ use crate::ast::{Expression, Identifier, Span, WithSpan};
 ///     ^^^^^^^^^^^^^^^^
 /// }
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ConfigBlockProperty {
     /// The property name.
     ///

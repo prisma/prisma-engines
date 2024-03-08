@@ -7,6 +7,7 @@ version = "0.0.0"
 psl.workspace = true
 itertools.workspace = true
 prisma-value = { path = "../../libs/prisma-value" }
+crosstarget-utils = { path = "../../libs/crosstarget-utils" }
 bigdecimal = "0.3"
 thiserror = "1.0"
 

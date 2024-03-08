@@ -1,4 +1,4 @@
-use psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
+use psl::{datamodel_connector::ConnectorCapability, PreviewFeature, ValidSchema};
 
 use crate::*;
 
@@ -119,7 +119,6 @@ impl QueryArguments {
             .model()
             .dm
             .schema
-            .configuration
             .preview_features()
             .contains(PreviewFeature::NativeDistinct);
 

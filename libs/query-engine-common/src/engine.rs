@@ -1,6 +1,7 @@
 #![allow(unused_imports)]
 
 use crate::error::ApiError;
+use crosstarget_utils::psl::ValidatedSchema;
 use query_core::{protocol::EngineProtocol, schema::QuerySchema, QueryExecutor};
 use serde::Deserialize;
 use std::{
@@ -47,7 +48,7 @@ pub struct EngineBuilderNative {
 
 /// Everything needed to connect to the database and have the core running.
 pub struct EngineBuilder {
-    pub schema: Arc<psl::ValidatedSchema>,
+    pub schema: Arc<ValidatedSchema>,
     pub engine_protocol: EngineProtocol,
 
     #[cfg(not(target_arch = "wasm32"))]
@@ -63,7 +64,7 @@ pub struct ConnectedEngineNative {
 
 /// Internal structure for querying and reconnecting with the engine.
 pub struct ConnectedEngine {
-    pub schema: Arc<psl::ValidatedSchema>,
+    pub schema: Arc<ValidatedSchema>,
     pub query_schema: Arc<QuerySchema>,
     pub executor: crate::Executor,
     pub engine_protocol: EngineProtocol,

@@ -6,10 +6,10 @@
 
 use indexmap::IndexSet;
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Hash, serde::Serialize, serde::Deserialize)]
 pub(crate) struct StringId(usize);
 
-#[derive(Default)]
+#[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 pub(crate) struct StringInterner {
     map: IndexSet<String>,
 }

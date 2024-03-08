@@ -1,5 +1,6 @@
 use crate::datamodel_connector::{
     constraint_names::ConstraintNames, Connector, NativeTypeInstance, ReferentialAction, RelationMode,
+    ValidatedConnector,
 };
 use parser_database::{
     ast::{self, WithSpan},
@@ -144,11 +145,19 @@ impl ScalarFieldWalkerExt for IndexFieldWalker<'_> {
 }
 
 pub trait RelationFieldWalkerExt {
-    fn default_on_delete_action(self, relation_mode: RelationMode, connector: &dyn Connector) -> ReferentialAction;
+    fn default_on_delete_action(
+        self,
+        relation_mode: RelationMode,
+        connector: &dyn ValidatedConnector,
+    ) -> ReferentialAction;
 }
 
 impl RelationFieldWalkerExt for RelationFieldWalker<'_> {
-    fn default_on_delete_action(self, relation_mode: RelationMode, connector: &dyn Connector) -> ReferentialAction {
+    fn default_on_delete_action(
+        self,
+        relation_mode: RelationMode,
+        connector: &dyn ValidatedConnector,
+    ) -> ReferentialAction {
         match self.referential_arity() {
             ast::FieldArity::Required
                 if connector.supports_referential_action(&relation_mode, ReferentialAction::Restrict) =>

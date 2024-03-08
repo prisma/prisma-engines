@@ -1,4 +1,5 @@
 use crate::{prelude::*, CompositeType, InternalEnum};
+use crosstarget_utils::psl::ValidatedSchema;
 use psl::schema_ast::ast;
 use std::sync::Arc;
 
@@ -6,7 +7,7 @@ pub(crate) type InternalDataModelRef = InternalDataModel;
 
 #[derive(Debug, Clone)]
 pub struct InternalDataModel {
-    pub schema: Arc<psl::ValidatedSchema>,
+    pub schema: Arc<ValidatedSchema>,
 }
 
 impl InternalDataModel {

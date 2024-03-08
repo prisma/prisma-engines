@@ -10,12 +10,12 @@ use psl::{
         walkers::{ModelWalker, ScalarFieldWalker},
         ReferentialAction, ScalarFieldType, ScalarType, SortOrder,
     },
-    ValidatedSchema,
+    ValidSchema,
 };
 use sql_schema_describer::{self as sql, PrismaValue};
 use std::collections::HashMap;
 
-pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn SqlFlavour) -> SqlDatabaseSchema {
+pub(crate) fn calculate_sql_schema(datamodel: &psl::ValidatedSchema, flavour: &dyn SqlFlavour) -> SqlDatabaseSchema {
     let mut schema = SqlDatabaseSchema::default();
 
     let mut context = Context {
@@ -143,7 +143,7 @@ fn push_inline_relations(ctx: &mut Context<'_>) {
         let on_delete_action = relation_field.explicit_on_delete().unwrap_or_else(|| {
             relation_field.default_on_delete_action(
                 ctx.datamodel.configuration.relation_mode().unwrap_or_default(),
-                ctx.flavour.datamodel_connector(),
+                ctx.flavour.datamodel_connector().as_validated_connector(),
             )
         });
         let on_update_action = relation_field
@@ -578,7 +578,7 @@ fn column_arity(arity: ast::FieldArity) -> sql::ColumnArity {
 }
 
 pub(crate) struct Context<'a> {
-    datamodel: &'a ValidatedSchema,
+    datamodel: &'a psl::ValidatedSchema,
     schema: &'a mut SqlDatabaseSchema,
     flavour: &'a dyn SqlFlavour,
     schemas: HashMap<&'a str, sql::NamespaceId>,
