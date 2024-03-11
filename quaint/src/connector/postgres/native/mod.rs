@@ -360,12 +360,17 @@ impl_default_TransactionCapable!(PostgreSql);
 #[async_trait]
 impl Queryable for PostgreSql {
     async fn query(&self, q: Query<'_>) -> crate::Result<ResultSet> {
+        println!("laplab: before");
         let (sql, params) = visitor::Postgres::build(q)?;
+        println!("laplab: after {sql}");
 
-        self.query_raw(sql.as_str(), &params[..]).await
+        let result = self.query_raw(sql.as_str(), &params[..]).await;
+        println!("laplab: queryable result: {result:?}");
+        result
     }
 
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
+        println!("laplab: query {sql}");
         self.check_bind_variables_len(params)?;
 
         metrics::query("postgres.query_raw", sql, params, move || async move {
@@ -396,6 +401,7 @@ impl Queryable for PostgreSql {
     }
 
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
+        println!("laplab: query {sql}");
         self.check_bind_variables_len(params)?;
 
         metrics::query("postgres.query_raw", sql, params, move || async move {

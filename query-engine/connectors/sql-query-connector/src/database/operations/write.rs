@@ -362,7 +362,9 @@ pub(crate) async fn update_record(
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SingleRecord>> {
     if let Some(selected_fields) = selected_fields {
-        update_one_with_selection(conn, model, record_filter, args, selected_fields, ctx).await
+        let result = update_one_with_selection(conn, model, record_filter, args, selected_fields, ctx).await;
+        println!("laplab: update result: {result:?}");
+        result
     } else {
         update_one_without_selection(conn, model, record_filter, args, ctx).await
     }

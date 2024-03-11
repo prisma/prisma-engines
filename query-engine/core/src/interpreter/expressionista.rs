@@ -4,6 +4,7 @@ use super::{
 use crate::{query_graph::*, Query};
 use std::{collections::VecDeque, convert::TryInto};
 
+// TODO laplab: what's with the name?
 pub(crate) struct Expressionista;
 
 /// Helper accumulator struct.
@@ -16,12 +17,15 @@ struct IfNodeAcc {
 
 impl Expressionista {
     pub fn translate(mut graph: QueryGraph) -> InterpretationResult<Expression> {
-        graph
+        let expr = graph
             .root_nodes()
             .into_iter()
             .map(|root_node| Self::build_expression(&mut graph, &root_node, vec![]))
             .collect::<InterpretationResult<Vec<Expression>>>()
-            .map(|res| Expression::Sequence { seq: res })
+            .map(|res| Expression::Sequence { seq: res });
+
+        println!("laplab: final expression {expr:#?}");
+        expr
     }
 
     fn build_expression(
@@ -61,6 +65,7 @@ impl Expressionista {
         });
 
         let expr = Self::transform_node(graph, parent_edges, node, into_expr)?;
+        println!("laplab: transformed: {expr:?}");
 
         if child_expressions.is_empty() {
             Ok(expr)
@@ -74,6 +79,8 @@ impl Expressionista {
                     binding_name: node_binding_name.clone(),
                 });
             }
+
+            println!("laplab: is result = {is_result} child expressions = {child_expressions:?}");
 
             Ok(Expression::Let {
                 bindings: vec![Binding {
@@ -103,6 +110,7 @@ impl Expressionista {
             .collect();
 
         // Start removing the highest indices first to not invalidate subsequent removals.
+        // TODO laplab: why we sort it?
         result_positions.sort_unstable();
         result_positions.reverse();
 
@@ -123,7 +131,9 @@ impl Expressionista {
 
         // Fold result scopes into one expression.
         if !result_subgraphs.is_empty() {
+            println!("laplab: we have result nodes!");
             let result_exp = Self::fold_result_scopes(graph, result_subgraphs)?;
+            println!("laplab: result node expr, {result_exp:?}");
             expressions.push(result_exp);
         }
 

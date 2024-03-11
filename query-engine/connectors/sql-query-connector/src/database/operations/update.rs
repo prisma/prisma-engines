@@ -38,7 +38,9 @@ pub(crate) async fn update_one_with_selection(
     let idents = selected_fields.type_identifiers_with_arities();
     let meta = column_metadata::create(&field_names, &idents);
 
-    let result_row = conn.query(update.into()).await?.into_iter().next();
+    let query = update.into();
+    println!("laplab: update query {query:?}");
+    let result_row = conn.query(query).await?.into_iter().next();
     let record = result_row
         .map(|row| process_result_row(row, &meta, &selected_fields))
         .transpose()?

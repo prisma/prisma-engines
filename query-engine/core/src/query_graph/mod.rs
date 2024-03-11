@@ -270,7 +270,7 @@ impl QueryGraph {
         let mut nodes_to_remove = vec![];
         for parent_node_ref in self.graph.node_indices().map(|node_ix| NodeRef { node_ix }) {
             // TODO laplab: Meh?
-            let (parent_model, parent_filter, parent_selectors) = {
+            let (parent_model, parent_linking_fields, parent_filter, parent_selectors) = {
                 let parent_node = self.node_content(&parent_node_ref).unwrap();
 
                 if let Node::Query(Query::Read(ReadQuery::RecordQuery(query))) = parent_node {
@@ -287,6 +287,7 @@ impl QueryGraph {
 
                 (
                     parent_query.parent_field.related_model(),
+                    parent_query.parent_field.related_field().linking_fields(),
                     parent_query.args.filter.clone(),
                     parent_query.parent_results.clone(),
                 )
@@ -337,6 +338,8 @@ impl QueryGraph {
                     // TODO laplab: here we assume that lambdas only ever update the `parent_selection` field.
                     QueryGraphDependency::DataDependency(_) => todo!(),
                     QueryGraphDependency::ProjectedDataDependency(selection, _) => {
+                        let parent_linking_fields = parent_linking_fields.clone();
+
                         QueryGraphDependency::ProjectedDataDependency(
                             selection,
                             Box::new(move |mut update_node, mut child_ids| {
@@ -347,6 +350,10 @@ impl QueryGraph {
                                         "Bazinga!"
                                     ))),
                                 }?;
+
+                                println!("laplab: child ids before assimilate: {child_id:?}");
+                                let child_id = parent_linking_fields.assimilate(child_id)?;
+                                println!("laplab: child ids after assimilate: {child_id:?}");
 
                                 if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
                                     ur.set_selectors(vec![child_id]);

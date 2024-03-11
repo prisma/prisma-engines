@@ -182,22 +182,32 @@ impl<'conn> QueryInterpreter<'conn> {
     ) -> BoxFuture<'_, InterpretationResult<ExpressionResult>> {
         match exp {
             Expression::Func { func } => {
+                self.log_line(level, || "func() = {");
                 let expr = func(env.clone());
 
-                Box::pin(async move { self.interpret(expr?, env, level, trace_id).await })
+                Box::pin(async move {
+                    let result = self.interpret(expr?, env, level + 1, trace_id).await;
+                    self.log_line(level, || "}");
+                    result
+                })
             }
 
             Expression::Sequence { seq } if seq.is_empty() => Box::pin(async { Ok(ExpressionResult::Empty) }),
 
             Expression::Sequence { seq } => {
                 Box::pin(async move {
-                    self.log_line(level, || "SEQ");
+                    self.log_line(level, || "[");
 
                     let mut results = Vec::with_capacity(seq.len());
 
                     for expr in seq {
-                        results.push(self.interpret(expr, env.clone(), level + 1, trace_id.clone()).await?);
+                        let result = self.interpret(expr, env.clone(), level + 1, trace_id.clone()).await;
+                        println!("laplab: sequence element returned {result:?}");
+                        results.push(result?);
+                        self.log_line(level + 1, || ",");
                     }
+
+                    self.log_line(level, || "]");
 
                     // Last result gets returned
                     Ok(results.pop().unwrap())
@@ -210,16 +220,20 @@ impl<'conn> QueryInterpreter<'conn> {
             } => {
                 Box::pin(async move {
                     let mut inner_env = env.clone();
-                    self.log_line(level, || "LET");
+                    self.log_line(level, || "let");
 
                     for binding in bindings {
-                        self.log_line(level + 1, || format!("bind {} ", &binding.name));
+                        self.log_line(level + 1, || format!("{} = {{", &binding.name));
 
                         let result = self
                             .interpret(binding.expr, env.clone(), level + 2, trace_id.clone())
                             .await?;
                         inner_env.insert(binding.name, result);
+
+                        self.log_line(level + 1, || format!("}},"));
                     }
+
+                    self.log_line(level, || "in");
 
                     // the unwrapping improves the readability of the log significantly
                     let next_expression = if expressions.len() == 1 {
@@ -235,7 +249,7 @@ impl<'conn> QueryInterpreter<'conn> {
             Expression::Query { query } => Box::pin(async move {
                 match *query {
                     Query::Read(read) => {
-                        self.log_line(level, || format!("READ {read}"));
+                        self.log_line(level, || format!("readExecute {read}"));
                         let span = info_span!("prisma:engine:read-execute");
                         Ok(read::execute(self.conn, read, None, trace_id)
                             .instrument(span)
@@ -244,7 +258,7 @@ impl<'conn> QueryInterpreter<'conn> {
                     }
 
                     Query::Write(write) => {
-                        self.log_line(level, || format!("WRITE {write}"));
+                        self.log_line(level, || format!("writeExecute {write}"));
                         let span = info_span!("prisma:engine:write-execute");
                         Ok(write::execute(self.conn, write, trace_id)
                             .instrument(span)
@@ -255,12 +269,12 @@ impl<'conn> QueryInterpreter<'conn> {
             }),
 
             Expression::Get { binding_name } => Box::pin(async move {
-                self.log_line(level, || format!("GET {binding_name}"));
+                self.log_line(level, || format!("getBinding {binding_name}"));
                 env.clone().remove(&binding_name)
             }),
 
             Expression::GetFirstNonEmpty { binding_names } => Box::pin(async move {
-                self.log_line(level, || format!("GET FIRST NON EMPTY {binding_names:?}"));
+                self.log_line(level, || format!("getFirstNonEmptyBinding {binding_names:?}"));
 
                 Ok(binding_names
                     .into_iter()
@@ -276,7 +290,7 @@ impl<'conn> QueryInterpreter<'conn> {
                 then,
                 else_: elze,
             } => Box::pin(async move {
-                self.log_line(level, || "IF");
+                self.log_line(level, || "if");
 
                 if func() {
                     self.interpret(Expression::Sequence { seq: then }, env, level + 1, trace_id)
@@ -288,7 +302,7 @@ impl<'conn> QueryInterpreter<'conn> {
             }),
 
             Expression::Return { result } => Box::pin(async move {
-                self.log_line(level, || "RETURN");
+                self.log_line(level, || "return");
                 Ok(*result)
             }),
         }
@@ -297,7 +311,7 @@ impl<'conn> QueryInterpreter<'conn> {
     pub(crate) fn log_output(&self) -> String {
         let mut output = String::with_capacity(self.log.len() * 30);
 
-        for s in self.log.iter().rev() {
+        for s in self.log.iter() {
             output.push_str(s)
         }
 
