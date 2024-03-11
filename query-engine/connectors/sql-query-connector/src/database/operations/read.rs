@@ -1,3 +1,8 @@
+#[cfg(feature = "relation_joins")]
+mod coerce;
+#[cfg(feature = "relation_joins")]
+mod process;
+
 use crate::{
     column_metadata,
     model_extensions::*,
@@ -36,7 +41,8 @@ async fn get_single_record_joins(
     selected_fields: &FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SingleRecord>> {
-    use super::coerce::coerce_record_with_json_relation;
+    use coerce::coerce_record_with_json_relation;
+
     let selected_fields = selected_fields.to_virtuals_last();
     let field_names: Vec<_> = selected_fields.prisma_names_grouping_virtuals().collect();
     let idents = selected_fields.type_identifiers_with_arities_grouping_virtuals();
@@ -139,7 +145,10 @@ async fn get_many_records_joins(
     selected_fields: &FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
-    use super::coerce::coerce_record_with_json_relation;
+    use coerce::coerce_record_with_json_relation;
+    use process::InMemoryProcessorForJoins;
+    use std::borrow::Cow;
+
     let selected_fields = selected_fields.to_virtuals_last();
     let field_names: Vec<_> = selected_fields.prisma_names_grouping_virtuals().collect();
     let idents = selected_fields.type_identifiers_with_arities_grouping_virtuals();
@@ -424,8 +433,9 @@ fn get_selection_indexes<'a>(
     relations: Vec<&'a RelationSelection>,
     virtuals: Vec<&'a VirtualSelection>,
     field_names: &'a [String],
-) -> Vec<(usize, super::coerce::IndexedSelection<'a>)> {
-    use super::coerce::IndexedSelection;
+) -> Vec<(usize, coerce::IndexedSelection<'a>)> {
+    use coerce::IndexedSelection;
+
     field_names
         .iter()
         .enumerate()

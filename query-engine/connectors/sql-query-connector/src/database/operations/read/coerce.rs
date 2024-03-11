@@ -5,8 +5,6 @@ use std::{borrow::Cow, io, str::FromStr};
 
 use crate::SqlError;
 
-use super::process::InMemoryProcessorForJoins;
-
 pub(crate) enum IndexedSelection<'a> {
     Relation(&'a RelationSelection),
     Virtual(&'a str),
@@ -50,6 +48,8 @@ pub(crate) fn coerce_record_with_json_relation(
 }
 
 fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) -> crate::Result<PrismaValue> {
+    use super::process::InMemoryProcessorForJoins;
+
     let relations = rs.relations().collect_vec();
 
     match value {
