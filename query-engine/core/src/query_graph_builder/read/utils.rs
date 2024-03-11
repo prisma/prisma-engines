@@ -1,8 +1,8 @@
 use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
 use once_cell::sync::Lazy;
-use psl::datamodel_connector::{ConnectorCapability, JoinStrategySupport};
-use query_structure::{native_distinct_compatible_with_order_by, prelude::*, RelationLoadStrategy};
+use psl::datamodel_connector::JoinStrategySupport;
+use query_structure::{prelude::*, RelationLoadStrategy};
 use schema::{
     constants::{aggregations::*, args},
     QuerySchema,
