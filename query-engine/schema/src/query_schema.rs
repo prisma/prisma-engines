@@ -1,7 +1,8 @@
 use crate::{IdentifierType, ObjectType, OutputField};
 use psl::{
+    can_support_relation_load_strategy,
     datamodel_connector::{Connector, ConnectorCapabilities, ConnectorCapability, JoinStrategySupport, RelationMode},
-    PreviewFeature, PreviewFeatures,
+    has_capability, PreviewFeature, PreviewFeatures,
 };
 use query_structure::{ast, InternalDataModel};
 use std::{collections::HashMap, fmt};
@@ -63,7 +64,9 @@ impl QuerySchema {
             relation_mode,
             mutation_fields: Default::default(),
             query_fields: Default::default(),
-            join_strategy_support: if preview_features.contains(PreviewFeature::RelationJoins) {
+            join_strategy_support: if preview_features.contains(PreviewFeature::RelationJoins)
+                && can_support_relation_load_strategy()
+            {
                 connector.runtime_join_strategy_support()
             } else {
                 JoinStrategySupport::No
@@ -98,22 +101,23 @@ impl QuerySchema {
     }
 
     pub(crate) fn supports_any(&self, capabilities: &[ConnectorCapability]) -> bool {
-        capabilities.iter().any(|c| self.connector.has_capability(*c))
+        capabilities.iter().any(|c| has_capability(self.connector, *c))
     }
 
     pub(crate) fn can_full_text_search(&self) -> bool {
-        self.has_feature(PreviewFeature::FullTextSearch)
-            && (self.has_capability(ConnectorCapability::FullTextSearchWithoutIndex)
-                || self.has_capability(ConnectorCapability::FullTextSearchWithIndex))
+        self.has_feature(PreviewFeature::FullTextSearch) && self.has_capability(ConnectorCapability::FullTextSearch)
     }
 
     /// Returns whether the loaded connector supports the join strategy.
     pub fn can_resolve_relation_with_joins(&self) -> bool {
-        !matches!(self.join_strategy_support, JoinStrategySupport::No)
+        !matches!(self.join_strategy_support(), JoinStrategySupport::No)
     }
 
     /// Returns whether the database version of the loaded connector supports the join strategy.
     pub fn join_strategy_support(&self) -> JoinStrategySupport {
+        if !can_support_relation_load_strategy() {
+            return JoinStrategySupport::No;
+        }
         self.join_strategy_support
     }
 
@@ -139,7 +143,7 @@ impl QuerySchema {
     }
 
     pub fn has_capability(&self, capability: ConnectorCapability) -> bool {
-        self.connector.has_capability(capability)
+        has_capability(self.connector, capability)
     }
 
     pub fn capabilities(&self) -> ConnectorCapabilities {

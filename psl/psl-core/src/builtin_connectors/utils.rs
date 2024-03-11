@@ -1,3 +1,4 @@
+#[cfg(any(feature = "postgresql", feature = "mysql"))]
 pub(crate) mod common {
     use chrono::*;
 
@@ -25,6 +26,7 @@ pub(crate) mod common {
     }
 }
 
+#[cfg(feature = "postgresql")]
 pub(crate) mod postgres {
     use chrono::*;
 
@@ -50,6 +52,7 @@ pub(crate) mod postgres {
     }
 }
 
+#[cfg(feature = "mysql")]
 pub(crate) mod mysql {
     use chrono::*;
 

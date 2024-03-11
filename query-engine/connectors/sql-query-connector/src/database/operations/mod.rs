@@ -1,3 +1,4 @@
+#[cfg(feature = "relation_joins")]
 pub mod coerce;
 pub mod read;
 pub(crate) mod update;

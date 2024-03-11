@@ -1,5 +1,5 @@
 use super::default_value;
-use crate::validate::validation_pipeline::context::Context;
+use crate::{datamodel_connector::ConnectorCapability, validate::validation_pipeline::context::Context};
 use diagnostics::DatamodelError;
 use parser_database::{
     ast::{self, WithSpan},
@@ -79,7 +79,7 @@ pub(super) fn detect_composite_cycles(ctx: &mut Context<'_>) {
 
 /// Does the connector support composite types.
 pub(crate) fn composite_types_support(composite_type: CompositeTypeWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx.connector.supports_composite_types() {
+    if ctx.has_capability(ConnectorCapability::CompositeTypes) {
         return;
     }
 

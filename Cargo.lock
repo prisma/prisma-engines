@@ -3486,6 +3486,7 @@ name = "psl-core"
 version = "0.1.0"
 dependencies = [
  "bigdecimal",
+ "cfg-if",
  "chrono",
  "connection-string",
  "diagnostics",

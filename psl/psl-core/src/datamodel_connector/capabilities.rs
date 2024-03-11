@@ -86,6 +86,7 @@ capabilities!(
     AnyId, // Any (or combination of) uniques and not only id fields can constitute an id for a model.
     SqlQueryRaw,
     MongoDbQueryRaw,
+    FullTextSearch,
     FullTextSearchWithoutIndex,
     FullTextSearchWithIndex,
     AdvancedJsonNullability,    // Connector distinguishes between their null type and JSON null.

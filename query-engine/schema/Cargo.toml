@@ -15,3 +15,6 @@ codspeed-criterion-compat = "1.1.0"
 [[bench]]
 name = "schema_builder_bench"
 harness = false
+
+[features]
+all_connectors = ["psl/all"]

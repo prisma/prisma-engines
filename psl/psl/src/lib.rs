@@ -3,12 +3,14 @@
 
 pub use psl_core::builtin_connectors;
 pub use psl_core::{
+    builtin_connectors::{can_have_capability, can_support_relation_load_strategy, has_capability},
     datamodel_connector,
     diagnostics::{self, Diagnostics},
     is_reserved_type_name,
     mcf::config_to_mcf_json_value as get_config,
     mcf::{generators_to_json, render_sources_to_json}, // for tests
     parser_database::{self, SourceFile},
+    reachable_only_with_capability,
     reformat,
     schema_ast,
     set_config_dir,

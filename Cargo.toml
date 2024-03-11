@@ -76,16 +76,6 @@ url = { version = "2.5.0" }
 
 [workspace.dependencies.quaint]
 path = "quaint"
-features = [
-  "expose-drivers",
-  "fmt-sql",
-  "mssql",
-  "mysql",
-  "pooled",
-  "postgresql",
-  "sqlite",
-  "native",
-]
 
 [profile.dev.package.backtrace]
 opt-level = 3
