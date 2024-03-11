@@ -179,21 +179,51 @@ mod distinct {
 
         // Returns Users 1, 3, 4, 5 top
         // 1 => ["3", "1", "2"]
-        // 4 => ["1"]
         // 3 => []
+        // 4 => ["1"]
         // 5 => ["2", "3"]
-        match_connector_result!(
+        insta::assert_snapshot!(run_query!(
             &runner,
             indoc!("{
-                findManyUser(distinct: [first_name, last_name])
-                {
+                findManyUser(
+                    distinct: [first_name, last_name],
+                    orderBy: { id: asc }
+                ) {
                     id
                     posts(distinct: [title], orderBy: { id: asc }) {
                         title
                     }
-                }}"),
-            Postgres(_) => r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###,
-            _ => r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":3,"posts":[]},{"id":4,"posts":[{"title":"1"}]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###
+                }}")
+            ),
+            @r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"3"},{"title":"1"},{"title":"2"}]},{"id":3,"posts":[]},{"id":4,"posts":[{"title":"1"}]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn nested_distinct_order_by_field(runner: Runner) -> TestResult<()> {
+        nested_dataset(&runner).await?;
+
+        // Returns Users 1, 3, 4, 5 top
+        // 1 => ["1", "2", "3"]
+        // 4 => ["1"]
+        // 3 => []
+        // 5 => ["2", "3"]
+        insta::assert_snapshot!(run_query!(
+            &runner,
+            indoc!("{
+                findManyUser(
+                    distinct: [first_name, last_name],
+                    orderBy: [{ first_name: asc }, { last_name: asc }]
+                ) {
+                    id
+                    posts(distinct: [title], orderBy: { title: asc }) {
+                        title
+                    }
+                }}")
+            ),
+            @r###"{"data":{"findManyUser":[{"id":1,"posts":[{"title":"1"},{"title":"2"},{"title":"3"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":5,"posts":[{"title":"2"},{"title":"3"}]}]}}"###
         );
 
         Ok(())
@@ -223,6 +253,25 @@ mod distinct {
                   }"}
             ),
             @r###"{"data":{"findManyUser":[{"id":5,"posts":[{"title":"2"},{"title":"3"}]},{"id":4,"posts":[{"title":"1"}]},{"id":3,"posts":[]},{"id":2,"posts":[{"title":"2"},{"title":"1"}]}]}}"###
+        );
+
+        Ok(())
+    }
+
+    /// Tests nested distinct with non-matching orderBy and selection that doesn't include the
+    /// distinct fields.
+    #[connector_test]
+    async fn nested_distinct_not_in_selection(runner: Runner) -> TestResult<()> {
+        nested_dataset(&runner).await?;
+
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"{
+                findManyUser(orderBy: { id: asc }) {
+                    id
+                    posts(distinct: title, orderBy: { id: desc }) { id }
+                }
+            }"#),
+            @r###"{"data":{"findManyUser":[{"id":1,"posts":[{"id":5},{"id":4},{"id":1}]},{"id":2,"posts":[{"id":7},{"id":6}]},{"id":3,"posts":[]},{"id":4,"posts":[{"id":9}]},{"id":5,"posts":[{"id":12},{"id":11}]}]}}"###
         );
 
         Ok(())
