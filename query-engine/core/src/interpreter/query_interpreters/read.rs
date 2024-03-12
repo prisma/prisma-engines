@@ -2,6 +2,7 @@ use super::{inmemory_record_processor::InMemoryRecordProcessor, *};
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
 use connector::{error::ConnectorError, ConnectionLike};
 use futures::future::{BoxFuture, FutureExt};
+use psl::can_support_relation_load_strategy;
 use query_structure::{ManyRecords, RelationLoadStrategy, RelationSelection};
 use user_facing_errors::KnownError;
 
@@ -156,6 +157,9 @@ fn read_many_by_joins(
     query: ManyRecordsQuery,
     trace_id: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
+    if !can_support_relation_load_strategy() {
+        unreachable!()
+    }
     let fut = async move {
         let result = tx
             .get_many_records(

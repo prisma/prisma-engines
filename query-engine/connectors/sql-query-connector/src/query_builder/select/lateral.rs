@@ -161,9 +161,7 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Expression<'static> {
-        let build_obj_params = rs
-            .selections
-            .iter()
+        let build_obj_params = json_obj_selections(rs)
             .filter_map(|field| match field {
                 SelectedField::Scalar(sf) => Some((
                     Cow::from(sf.name().to_owned()),
@@ -245,7 +243,7 @@ impl LateralJoinSelectBuilder {
             .with_filters(rs.args.filter.clone(), Some(m2m_join_alias), ctx) // adds query filters
             .with_distinct(&rs.args, m2m_join_alias)
             .with_ordering(&rs.args, Some(m2m_join_alias.to_table_string()), ctx) // adds ordering stmts
-            .with_pagination(rs.args.take_abs(), rs.args.skip)
+            .with_pagination(&rs.args, None)
             .comment("inner"); // adds pagination
 
         let mut outer = Select::from_table(Table::from(inner).alias(outer_alias.to_table_string()))

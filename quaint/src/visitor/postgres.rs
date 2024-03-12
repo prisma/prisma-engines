@@ -409,7 +409,6 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> visitor::Result {
         match json_extract.path {
-            #[cfg(feature = "mysql")]
             JsonPath::String(_) => panic!("JSON path string notation is not supported for Postgres"),
             JsonPath::Array(json_path) => {
                 self.write("(")?;

@@ -20,12 +20,14 @@ driver-adapters = [
 anyhow = "1"
 async-trait.workspace = true
 query-core = { path = "../core", features = ["metrics"] }
-request-handlers = { path = "../request-handlers" }
+request-handlers = { path = "../request-handlers", features = ["native"] }
 query-connector = { path = "../connectors/query-connector" }
 query-engine-common = { path = "../../libs/query-engine-common" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
-psl.workspace = true
-sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
+psl = { workspace = true, features = ["all"] }
+sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector", features = [
+    "native_all",
+] }
 query-structure = { path = "../query-structure" }
 driver-adapters = { path = "../driver-adapters", features = [
     "postgresql",

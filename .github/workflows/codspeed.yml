@@ -28,10 +28,10 @@ jobs:
         run: cargo install cargo-codspeed
 
       - name: "Build the benchmark targets: schema"
-        run: cargo codspeed build -p schema
+        run: cargo codspeed build -p schema --features all_connectors
 
       - name: "Build the benchmark targets: request-handlers"
-        run: cargo codspeed build -p request-handlers
+        run: cargo codspeed build -p request-handlers --features native
 
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@v2
