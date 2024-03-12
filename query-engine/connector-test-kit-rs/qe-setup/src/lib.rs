@@ -50,6 +50,7 @@ pub async fn setup(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<
             let mut connector = sql_schema_connector::SqlSchemaConnector::new_mysql();
             diff_and_apply(prisma_schema, url, &mut connector).await
         }
+        // TODO: For D1, we need to use D1 API to execute the DDL statements to setup the database.
         provider if SQLITE.is_provider(provider) => {
             std::fs::remove_file(source.url.as_literal().unwrap().trim_start_matches("file:")).ok();
             let mut connector = sql_schema_connector::SqlSchemaConnector::new_sqlite();
@@ -101,5 +102,7 @@ async fn diff_and_apply(schema: &str, url: String, connector: &mut dyn SchemaCon
         .await?;
     let migration = connector.diff(from, to);
     let script = connector.render_script(&migration, &Default::default()).unwrap();
+
+    // TODO: For D1, we need to use D1 API to execute the DDL statements to setup the database.
     connector.db_execute(script).await
 }

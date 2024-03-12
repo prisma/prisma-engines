@@ -120,6 +120,7 @@ impl Runner {
         metrics: MetricRegistry,
         log_capture: TestLogCapture,
     ) -> TestResult<Self> {
+        // TODO: For D1, we need to use D1 API to execute the DDL statements to setup the database.
         qe_setup::setup(&datamodel, db_schemas).await?;
 
         let protocol = EngineProtocol::from(&ENGINE_PROTOCOL.to_string());
