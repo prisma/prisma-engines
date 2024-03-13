@@ -774,6 +774,7 @@ fn convert_prisma_value_json_protocol(
 }
 
 fn discriminate_json_value(value: JsonValue, typ: TypeIdentifier) -> JsonValue {
+    #[cfg(feature = "graphql-protocol")]
     if crate::executor::get_engine_protocol().is_graphql() {
         return value;
     }
