@@ -1,7 +1,7 @@
 #[cfg(feature = "relation_joins")]
-mod coerce;
+pub(crate) mod coerce;
 #[cfg(feature = "relation_joins")]
-mod process;
+pub(crate) mod process;
 
 use crate::{
     column_metadata,
@@ -41,8 +41,6 @@ async fn get_single_record_joins(
     selected_fields: &FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SingleRecord>> {
-    use coerce::coerce_record_with_json_relation;
-
     let selected_fields = selected_fields.to_virtuals_last();
     let field_names: Vec<_> = selected_fields.grouped_prisma_names();
     let meta = column_metadata::create_from_selection_for_json(&selected_fields, &field_names);
@@ -131,13 +129,11 @@ async fn get_many_records_joins(
     selected_fields: &FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
-    use coerce::coerce_record_with_json_relation;
     use std::borrow::Cow;
 
     let selected_fields = selected_fields.to_virtuals_last();
     let field_names: Vec<_> = selected_fields.grouped_prisma_names();
     let meta = column_metadata::create_from_selection_for_json(&selected_fields, &field_names);
-    // dbg!(&meta);
 
     let mut records = ManyRecords::new(field_names.clone());
 

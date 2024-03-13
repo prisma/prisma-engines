@@ -3,9 +3,7 @@ use query_structure::*;
 use serde_json::Number;
 use std::{io, str::FromStr};
 
-use crate::SqlError;
-
-use super::process::InMemoryProcessorForJoins;
+use crate::{query_arguments_ext::QueryArgumentsExt, SqlError};
 
 pub(crate) fn coerce_json_relation_to_pv(
     mut value: serde_json::Value,

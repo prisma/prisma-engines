@@ -1,10 +1,4 @@
-use crate::{
-    column_metadata::ColumnMetadata,
-    database::operations::coerce::{coerce_json_relation_to_pv, reorder_virtuals_group},
-    error::SqlError,
-    value::to_prisma_value,
-    MetadataFieldKind,
-};
+use crate::{column_metadata::ColumnMetadata, error::SqlError, value::to_prisma_value, MetadataFieldKind};
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
@@ -170,7 +164,10 @@ fn row_value_to_prisma_value(p_value: Value, meta: &ColumnMetadata<'_>) -> Resul
             },
             MetadataFieldKind::Relation(rs) => match p_value.typed {
                 value if value.is_null() => PrismaValue::Null,
+                #[cfg(feature = "relation_joins")]
                 ValueType::Json(Some(json)) => {
+                    use crate::database::operations::read::coerce::coerce_json_relation_to_pv;
+
                     let json = coerce_json_relation_to_pv(json, rs)?;
 
                     PrismaValue::new_json(json)
@@ -178,7 +175,12 @@ fn row_value_to_prisma_value(p_value: Value, meta: &ColumnMetadata<'_>) -> Resul
                 _ => return Err(create_error(&p_value)),
             },
             MetadataFieldKind::Virtual(vs) => match p_value.typed {
-                ValueType::Json(Some(json)) => PrismaValue::new_json(reorder_virtuals_group(json, vs)),
+                #[cfg(feature = "relation_joins")]
+                ValueType::Json(Some(json)) => {
+                    use crate::database::operations::read::coerce::reorder_virtuals_group;
+
+                    PrismaValue::new_json(reorder_virtuals_group(json, vs))
+                }
                 _ => return Err(create_error(&p_value)),
             },
         },

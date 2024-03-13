@@ -3,7 +3,7 @@ use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
 use connector::{error::ConnectorError, ConnectionLike};
 use futures::future::{BoxFuture, FutureExt};
 use psl::can_support_relation_load_strategy;
-use query_structure::{ManyRecords, RelationLoadStrategy, RelationSelection};
+use query_structure::{ManyRecords, RelationLoadStrategy};
 use user_facing_errors::KnownError;
 
 pub(crate) fn execute<'conn>(
