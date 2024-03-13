@@ -23,7 +23,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "query-engine-wasm-latest": "npm:@prisma/query-engine-wasm@latest",
-    "query-engine-wasm-baseline": "npm:@prisma/query-engine-wasm@0.6.1",
+    "query-engine-wasm-baseline": "npm:@prisma/query-engine-wasm@0.0.19",
     "@prisma/adapter-libsql": "workspace:*",
     "@prisma/adapter-neon": "workspace:*",
     "@prisma/adapter-pg": "workspace:*",
