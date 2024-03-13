@@ -3,7 +3,9 @@ use query_structure::*;
 use serde_json::Number;
 use std::{io, str::FromStr};
 
-use crate::{query_arguments_ext::QueryArgumentsExt, SqlError};
+use crate::SqlError;
+
+use super::process::InMemoryProcessorForJoins;
 
 pub(crate) fn coerce_json_relation_to_pv(
     mut value: serde_json::Value,
@@ -22,6 +24,8 @@ fn internal_coerce_json_relation_to_pv(value: &mut serde_json::Value, rs: &Relat
         serde_json::Value::Array(values) if rs.field.is_list() => {
             let mut ids_to_remove = vec![];
 
+            InMemoryProcessorForJoins::new(&rs.args).process_json_values(values);
+
             for (i, val) in values.iter_mut().enumerate() {
                 if val.is_null() && rs.field.relation().is_many_to_many() {
                     ids_to_remove.push(i);
@@ -32,10 +36,6 @@ fn internal_coerce_json_relation_to_pv(value: &mut serde_json::Value, rs: &Relat
 
             for id in ids_to_remove {
                 values.remove(id);
-            }
-
-            if rs.args.needs_reversed_order() {
-                values.reverse();
             }
         }
         serde_json::Value::Object(obj) => {

@@ -48,7 +48,6 @@ pub(crate) fn serialize_internal(
     is_list: bool,
     query_schema: &QuerySchema,
 ) -> crate::Result<CheckedItemsWithParents> {
-    // dbg!(&result);
     match result {
         QueryResult::RecordSelection(Some(rs)) => {
             serialize_record_selection(*rs, field, field.field_type(), is_list, query_schema)

@@ -129,8 +129,6 @@ async fn get_many_records_joins(
     selected_fields: &FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
-    use std::borrow::Cow;
-
     let selected_fields = selected_fields.to_virtuals_last();
     let field_names: Vec<_> = selected_fields.grouped_prisma_names();
     let meta = column_metadata::create_from_selection_for_json(&selected_fields, &field_names);
@@ -157,9 +155,7 @@ async fn get_many_records_joins(
     }
 
     if query_arguments.needs_inmemory_processing_with_joins() {
-        records.records = process::InMemoryProcessorForJoins::new(&query_arguments, records.records)
-            .process(|record| Some((Cow::Borrowed(record), Cow::Borrowed(&records.field_names))))
-            .collect();
+        process::InMemoryProcessorForJoins::new(&query_arguments).process_records(&mut records);
     }
 
     Ok(records)
