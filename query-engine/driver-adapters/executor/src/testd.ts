@@ -1,32 +1,23 @@
-import * as qe from './qe'
 import * as readline from 'node:readline'
-import * as jsonRpc from './jsonRpc'
-
-// pg dependencies
-import * as prismaPg from '@prisma/adapter-pg'
-
-// neon dependencies
 import { fetch } from 'undici'
 import { WebSocket } from 'ws'
-import { pg, neon, planetScale, libSql } from '@prisma/bundled-js-drivers'
+import * as S from '@effect/schema/Schema'
+import * as prismaPg from '@prisma/adapter-pg'
 import * as prismaNeon from '@prisma/adapter-neon'
-
-// libsql dependencies
 import { PrismaLibSQL } from '@prisma/adapter-libsql'
-
-// planetscale dependencies
 import { PrismaPlanetScale } from '@prisma/adapter-planetscale'
+import {bindAdapter, DriverAdapter, ErrorCapturingDriverAdapter} from '@prisma/driver-adapter-utils'
+import { pg, neon, planetScale, libSql } from '@prisma/bundled-js-drivers'
+import { webcrypto } from 'node:crypto'
 
-
-import {bindAdapter, DriverAdapter, ErrorCapturingDriverAdapter} from "@prisma/driver-adapter-utils";
-import { webcrypto } from 'node:crypto';
+import { jsonRpc, DriverAdapterTag, Env } from './types'
+import * as qe from './qe'
 
 if (!global.crypto) {
   global.crypto = webcrypto as Crypto
 }
 
-
-const SUPPORTED_ADAPTERS: Record<string, (_ : string) => Promise<DriverAdapter>>
+const SUPPORTED_ADAPTERS: Record<DriverAdapterTag, (_ : string) => Promise<DriverAdapter>>
     = {
         "pg": pgAdapter,
         "neon:ws" : neonWsAdapter,
@@ -49,6 +40,9 @@ const debug = (() => {
 const err = (...args: any[]) => console.error('[nodejs] ERROR:', ...args);
 
 async function main(): Promise<void> {
+    const env = S.decodeUnknownSync(Env)(process.env)
+    console.log('[env]', env)
+
     const iface = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
@@ -57,10 +51,11 @@ async function main(): Promise<void> {
 
     iface.on('line', async (line) => {
         try {
-            const request: jsonRpc.Request = JSON.parse(line); // todo: validate
+            const request = S.decodeSync(jsonRpc.RequestFromString)(line)
             debug(`Got a request: ${line}`)
+
             try {
-                const response = await handleRequest(request.method, request.params)
+                const response = await handleRequest(request, env)
                 respondOk(request.id, response)
             } catch (err) {
                 debug("[nodejs] Error from request handler: ", err)
@@ -70,7 +65,8 @@ async function main(): Promise<void> {
                 })
             }
         } catch (err) {
-            debug("Received non-json line: ", line);
+            console.error("Received non-json line: ", line);
+            console.error(err)
         }
 
     });
@@ -82,23 +78,18 @@ const state: Record<number, {
     logs: string[]
 }> = {}
 
-async function handleRequest(method: string, params: unknown): Promise<unknown> {
+async function handleRequest({ method, params }: jsonRpc.Request, env: Env): Promise<unknown> {
     switch (method) {
         case 'initializeSchema': {
-            interface InitializeSchemaParams {
-                schema: string
-                schemaId: string
-                url: string,
-            }
-
-            const castParams = params as InitializeSchemaParams;
+            const { url, schema, schemaId } = params
             const logs = [] as string[]
-            const [engine, adapter] = await initQe(castParams.url, castParams.schema, (log) => {
-                logs.push(log)
-            });
-            await engine.connect("")
 
-            state[castParams.schemaId] = {
+            const logCallback = (log) => { logs.push(log) }
+
+            const { engine, adapter } = await initQe({ env, url, schema, logCallback })
+            await engine.connect('')
+
+            state[schemaId] = {
                 engine,
                 adapter,
                 logs
@@ -106,22 +97,16 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             return null
         }
         case 'query': {
-            interface QueryPayload {
-                query: string
-                schemaId: number
-                txId?: string
-            }
-
             debug("Got `query`", params)
-            const castParams = params as QueryPayload;
-            const engine = state[castParams.schemaId].engine
-            const result = await engine.query(JSON.stringify(castParams.query), "", castParams.txId)
+            const { query, schemaId, txId } = params
+            const engine = state[schemaId].engine
+            const result = await engine.query(JSON.stringify(query), "", txId)
 
             const parsedResult = JSON.parse(result)
             if (parsedResult.errors) {
                 const error = parsedResult.errors[0]?.user_facing_error
                 if (error.error_code === 'P2036') {
-                    const jsError = state[castParams.schemaId].adapter.errorRegistry.consumeError(error.meta.id)
+                    const jsError = state[schemaId].adapter.errorRegistry.consumeError(error.meta.id)
                     if (!jsError) {
                         err(`Something went wrong. Engine reported external error with id ${error.meta.id}, but it was not registered.`)
                     } else {
@@ -137,59 +122,36 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
         }
 
         case 'startTx': {
-            interface StartTxPayload {
-                schemaId: number,
-                options: unknown
-            }
-
             debug("Got `startTx", params)
-            const {schemaId, options} = params as StartTxPayload
+            const { schemaId, options } = params
             const result = await state[schemaId].engine.startTransaction(JSON.stringify(options), "")
             return JSON.parse(result)
         }
 
         case 'commitTx': {
-            interface CommitTxPayload {
-                schemaId: number,
-                txId: string,
-            }
-
             debug("Got `commitTx", params)
-            const {schemaId, txId} = params as CommitTxPayload
+            const { schemaId, txId } = params
             const result = await state[schemaId].engine.commitTransaction(txId, '{}')
             return JSON.parse(result)
         }
 
         case 'rollbackTx': {
-            interface RollbackTxPayload {
-                schemaId: number,
-                txId: string,
-            }
-
             debug("Got `rollbackTx", params)
-            const {schemaId, txId} = params as RollbackTxPayload
+            const { schemaId, txId } = params
             const result = await state[schemaId].engine.rollbackTransaction(txId, '{}')
             return JSON.parse(result)
         }
         case 'teardown': {
-            interface TeardownPayload {
-                schemaId: number
-            }
-
             debug("Got `teardown", params)
-            const castParams = params as TeardownPayload;
-            await state[castParams.schemaId].engine.disconnect("")
-            delete state[castParams.schemaId]
+            const { schemaId } = params
+            await state[schemaId].engine.disconnect("")
+            delete state[schemaId]
 
             return {}
         }
         case 'getLogs': {
-            interface GetLogsPayload {
-                schemaId: number
-            }
-
-            const castParams = params as GetLogsPayload
-            return state[castParams.schemaId].logs
+            const { schemaId } = params
+            return state[schemaId].logs
         }
         default: {
             throw new Error(`Unknown method: \`${method}\``)
@@ -216,12 +178,28 @@ function respondOk(requestId: number, payload: unknown) {
     console.log(JSON.stringify(msg))
 }
 
-async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<[qe.QueryEngine, ErrorCapturingDriverAdapter]> {
-    const engineType = process.env.EXTERNAL_TEST_EXECUTOR === "Wasm" ? "Wasm" : "Napi";
+type InitQueryEngineParams = {
+    env: Env,
+    url: string,
+    schema: string,
+    logCallback: qe.QueryLogCallback
+}
+
+async function initQe({
+    env,
+    url,
+    schema,
+    logCallback
+}: InitQueryEngineParams) {
+    const engineType = env.EXTERNAL_TEST_EXECUTOR ?? 'Napi'
     const adapter = await adapterFromEnv(url) as DriverAdapter
     const errorCapturingAdapter = bindAdapter(adapter)
-    const engineInstance = await qe.initQueryEngine(engineType, errorCapturingAdapter, prismaSchema, logCallback, debug)
-    return [engineInstance, errorCapturingAdapter];
+    const engineInstance = await qe.initQueryEngine(engineType, errorCapturingAdapter, schema, logCallback, debug)
+    
+    return {
+        engine: engineInstance,
+        adapter: errorCapturingAdapter,
+    }
 }
 
 async function adapterFromEnv(url: string): Promise<DriverAdapter> {
@@ -257,7 +235,6 @@ async function pgAdapter(url: string): Promise<DriverAdapter> {
     return new prismaPg.PrismaPg(pool, {
         schema: schemaName
     })
-
 }
 
 async function neonWsAdapter(url: string): Promise<DriverAdapter> {
