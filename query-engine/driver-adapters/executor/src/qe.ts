@@ -2,9 +2,7 @@ import type { DriverAdapter } from "@prisma/driver-adapter-utils";
 import * as napi from "./engines/Library";
 import * as os from "node:os";
 import * as path from "node:path";
-import { fileURLToPath } from "node:url";
-
-const dirname = path.dirname(fileURLToPath(import.meta.url));
+import { __dirname } from './utils'
 
 export interface QueryEngine {
   connect(trace: string): Promise<void>;
@@ -65,7 +63,7 @@ function loadNapiEngine(): napi.Library {
       : "debug";
 
   const libQueryEnginePath = path.resolve(
-    dirname,
+    __dirname,
     `../../../../target/${target}/libquery_engine.${libExt}`
   );
 

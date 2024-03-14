@@ -3,9 +3,7 @@ import * as wasmMysql from '../../../query-engine-wasm/pkg/mysql/query_engine_bg
 import * as wasmSqlite from '../../../query-engine-wasm/pkg/sqlite/query_engine_bg.js'
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const dirname = path.dirname(fileURLToPath(import.meta.url))
+import { __dirname } from './utils'
 
 const wasm = {
     postgres: wasmPostgres,
@@ -23,7 +21,7 @@ export async function getEngineForProvider(provider: EngineName) {
     const engine = wasm[provider]
     if (!initializedModules.has(provider)) {
         const subDir = provider === 'postgres' ? 'postgresql' : provider
-        const bytes = await fs.readFile(path.resolve(dirname, '..', '..', '..', 'query-engine-wasm', 'pkg', subDir, 'query_engine_bg.wasm'))
+        const bytes = await fs.readFile(path.resolve(__dirname, '..', '..', '..', 'query-engine-wasm', 'pkg', subDir, 'query_engine_bg.wasm'))
         console.error(bytes)
         const module = new WebAssembly.Module(bytes) 
         const instance = new WebAssembly.Instance(module, { './query_engine_bg.js': engine })
