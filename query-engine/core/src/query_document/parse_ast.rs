@@ -2,7 +2,7 @@
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
 use crate::QueryParserResult;
 use indexmap::IndexMap;
-use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
+use query_structure::{OrderBy, PrismaValue, ScalarFieldRef};
 use schema::ObjectTag;
 use std::{
     borrow::Cow,
@@ -106,6 +106,18 @@ impl<'a> ParsedField<'a> {
 
     pub(crate) fn update_arg(&mut self) -> QueryParserResult<Option<ParsedInputMap<'a>>> {
         self.look_arg("update")
+    }
+
+    pub(crate) fn has_nested_selection(&self) -> bool {
+        self.nested_fields
+            .as_ref()
+            .map(|nested_field| {
+                nested_field
+                    .fields
+                    .iter()
+                    .any(|field| field.parsed_field.nested_fields.is_some())
+            })
+            .unwrap_or(false)
     }
 
     fn look_arg(&mut self, arg_name: &str) -> QueryParserResult<Option<ParsedInputMap<'a>>> {

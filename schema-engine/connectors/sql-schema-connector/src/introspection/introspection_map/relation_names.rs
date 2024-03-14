@@ -2,7 +2,7 @@
 //! introspected schema with as much clarity and as little ambiguity as possible.
 
 use crate::introspection::{
-    datamodel_calculator::DatamodelCalculatorContext, introspection_helpers::is_prisma_join_table,
+    datamodel_calculator::DatamodelCalculatorContext, introspection_helpers::is_prisma_m_to_n_relation,
 };
 use sql_schema_describer as sql;
 use std::{
@@ -74,7 +74,7 @@ pub(super) fn introspect<'a>(ctx: &DatamodelCalculatorContext<'a>, map: &mut sup
     let ambiguous_relations = find_ambiguous_relations(ctx);
 
     for table in ctx.sql_schema.table_walkers() {
-        if is_prisma_join_table(table) {
+        if is_prisma_m_to_n_relation(table) {
             let name = prisma_m2m_relation_name(table, &ambiguous_relations, ctx);
             names.m2m_relation_names.insert(table.id, name);
         } else {
@@ -175,7 +175,7 @@ fn find_ambiguous_relations(ctx: &DatamodelCalculatorContext<'_>) -> HashSet<[sq
     let mut ambiguous_relations = HashSet::new();
 
     for table in ctx.sql_schema.table_walkers() {
-        if is_prisma_join_table(table) {
+        if is_prisma_m_to_n_relation(table) {
             m2m_relation_ambiguousness(table, &mut ambiguous_relations)
         } else {
             for fk in table.foreign_keys() {
@@ -205,7 +205,7 @@ fn m2m_relation_ambiguousness(table: sql::TableWalker<'_>, ambiguous_relations: 
     }
 
     // Check for conflicts with another m2m relation.
-    for other_m2m in table.schema.table_walkers().filter(|t| is_prisma_join_table(*t)) {
+    for other_m2m in table.schema.table_walkers().filter(|t| is_prisma_m_to_n_relation(*t)) {
         if other_m2m.id != table.id && table_ids_for_m2m_relation_table(other_m2m) == tables {
             ambiguous_relations.insert(tables);
         }

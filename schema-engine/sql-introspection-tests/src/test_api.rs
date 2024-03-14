@@ -6,7 +6,6 @@ use schema_connector::CompositeTypeDepth;
 use schema_connector::ConnectorResult;
 use schema_connector::IntrospectionContext;
 use schema_connector::IntrospectionResult;
-use schema_connector::Version;
 use schema_connector::ViewDefinition;
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
@@ -74,19 +73,30 @@ impl TestApi {
             me.set_params(params).unwrap();
 
             (Quaint::new(&cs).await.unwrap(), cs, me)
-        } else if tags.contains(Tags::Postgres) {
+        } else if tags.contains(Tags::Postgres) && !tags.contains(Tags::CockroachDb) {
             let (_, q, cs) = args.create_postgres_database().await;
-            if tags.contains(Tags::CockroachDb) {
-                q.raw_cmd(
-                    r#"
-                    SET default_int_size = 4;
-                    "#,
-                )
-                .await
-                .unwrap();
-            }
-
             let mut me = SqlSchemaConnector::new_postgres();
+
+            let params = ConnectorParams {
+                connection_string: cs.to_owned(),
+                preview_features,
+                shadow_database_connection_string: None,
+            };
+            me.set_params(params).unwrap();
+
+            (q, cs, me)
+        } else if tags.contains(Tags::CockroachDb) {
+            let (_, q, cs) = args.create_postgres_database().await;
+
+            q.raw_cmd(
+                r#"
+                SET default_int_size = 4;
+                "#,
+            )
+            .await
+            .unwrap();
+
+            let mut me = SqlSchemaConnector::new_cockroach();
 
             let params = ConnectorParams {
                 connection_string: cs.to_owned(),
@@ -232,13 +242,6 @@ impl TestApi {
         let warnings = introspection_result.warnings.unwrap_or_default();
 
         Ok(warnings)
-    }
-
-    pub async fn introspect_version(&mut self) -> Result<Version> {
-        let previous_schema = psl::validate(self.pure_config().into());
-        let introspection_result = self.test_introspect_internal(previous_schema, false).await?;
-
-        Ok(introspection_result.version)
     }
 
     pub async fn introspection_warnings(&mut self) -> Result<String> {

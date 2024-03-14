@@ -1,7 +1,7 @@
 use super::*;
 use fmt::Debug;
 use once_cell::sync::Lazy;
-use prisma_models::ast::ModelId;
+use query_structure::ast::ModelId;
 use std::{borrow::Cow, fmt};
 
 #[derive(Debug, Clone)]
@@ -198,8 +198,8 @@ impl<'a> OutputField<'a> {
         &self.name
     }
 
-    pub fn arguments(&self) -> impl Iterator<Item = &InputField<'a>> + '_ {
-        self.arguments.as_ref().into_iter().flat_map(|args| args.iter())
+    pub fn arguments(&self) -> &[InputField<'a>] {
+        self.arguments.as_ref().map(|f| (**f).as_slice()).unwrap_or(&[])
     }
 
     pub(crate) fn nullable(mut self) -> Self {

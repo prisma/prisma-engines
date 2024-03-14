@@ -17,7 +17,7 @@ use connect_or_create_nested::*;
 use create_nested::*;
 use delete_nested::*;
 use disconnect_nested::*;
-use prisma_models::RelationFieldRef;
+use query_structure::RelationFieldRef;
 use schema::{constants::operations, QuerySchema};
 use set_nested::*;
 use update_nested::*;

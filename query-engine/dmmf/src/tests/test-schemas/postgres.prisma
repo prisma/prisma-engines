@@ -1,0 +1,30 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../node_modules/.prisma/client"
+  previewFeatures = []
+}
+
+datasource db {
+  provider = "postgres"
+  url      = "file:dev.db"
+}
+
+/// User model comment
+model User {
+  id    String  @id @default(uuid())
+  email String  @unique
+  age   Int
+  /// name comment
+  name  String?
+  role Role
+}
+
+/// Role enum comment
+enum Role {
+  /// user comment
+  USER
+  READER
+  /// admin comment
+  ADMIN
+}
+

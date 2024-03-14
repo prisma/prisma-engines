@@ -11,7 +11,6 @@ WITH rawindex AS (
     FROM pg_index -- https://www.postgresql.org/docs/current/catalog-pg-index.html
     WHERE
         indpred IS NULL -- filter out partial indexes
-        AND array_position(indkey::int2[], 0::int2) IS NULL -- filter out expression indexes
         AND NOT indisexclusion -- filter out exclusion constraints
 )
 SELECT
@@ -40,7 +39,7 @@ FROM
     INNER JOIN pg_class AS tableinfo ON tableinfo.oid = rawindex.indrelid
     INNER JOIN pg_class AS indexinfo ON indexinfo.oid = rawindex.indexrelid
     INNER JOIN pg_namespace AS schemainfo ON schemainfo.oid = tableinfo.relnamespace
-    INNER JOIN pg_attribute AS columninfo
+    LEFT JOIN pg_attribute AS columninfo
         ON columninfo.attrelid = tableinfo.oid AND columninfo.attnum = rawindex.indkeyid
     INNER JOIN pg_am AS indexaccess ON indexaccess.oid = indexinfo.relam
     LEFT JOIN pg_opclass AS opclass -- left join because crdb has no opclasses

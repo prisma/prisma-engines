@@ -451,7 +451,7 @@ fn init_logger() {
         .with_writer(std::io::stderr)
         .finish()
         .with(ErrorLayer::default())
-        .with(schema_core::TimingsLayer::default());
+        .with(schema_core::TimingsLayer);
 
     tracing::subscriber::set_global_default(subscriber)
         .map_err(|err| eprintln!("Error initializing the global logger: {err}"))

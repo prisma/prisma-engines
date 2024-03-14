@@ -2,16 +2,12 @@ use super::*;
 use constants::filters;
 
 pub(crate) trait WithFieldRefInputExt<'a> {
-    fn with_field_ref_input(self, ctx: &'a QuerySchema) -> Vec<InputType<'a>>;
+    fn with_field_ref_input(self) -> Vec<InputType<'a>>;
 }
 
 impl<'a> WithFieldRefInputExt<'a> for InputType<'a> {
-    fn with_field_ref_input(self, ctx: &'a QuerySchema) -> Vec<InputType<'a>> {
-        let mut field_types = vec![self.clone()];
-
-        if ctx.has_feature(PreviewFeature::FieldReference) {
-            field_types.push(InputType::object(field_ref_input_object_type(self)));
-        }
+    fn with_field_ref_input(self) -> Vec<InputType<'a>> {
+        let field_types = vec![self.clone(), InputType::object(field_ref_input_object_type(self))];
 
         field_types
     }
@@ -21,7 +17,12 @@ fn field_ref_input_object_type(allow_type: InputType<'_>) -> InputObjectType<'_>
     let ident = Identifier::new_prisma(field_ref_input_type_name(&allow_type));
     let mut object = init_input_object_type(ident);
     object.set_tag(ObjectTag::FieldRefType(Box::new(allow_type)));
-    object.set_fields(|| vec![input_field(filters::UNDERSCORE_REF, vec![InputType::string()], None)]);
+    object.set_fields(|| {
+        vec![
+            input_field(filters::UNDERSCORE_REF, vec![InputType::string()], None),
+            input_field(filters::UNDERSCORE_CONTAINER, vec![InputType::string()], None),
+        ]
+    });
     object
 }
 

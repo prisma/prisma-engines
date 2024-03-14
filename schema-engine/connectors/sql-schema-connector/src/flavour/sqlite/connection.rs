@@ -77,12 +77,15 @@ pub(super) fn generic_apply_migration_script(
     tracing::debug!(query_type = "raw_cmd", sql = script);
     let conn = conn.0.lock().unwrap();
     conn.execute_batch(script).map_err(|sqlite_error: rusqlite::Error| {
-        let database_error_code =
-            if let rusqlite::Error::SqliteFailure(rusqlite::ffi::Error { code: _, extended_code }, _) = sqlite_error {
-                extended_code.to_string()
-            } else {
-                "none".to_owned()
-            };
+        let database_error_code = match sqlite_error {
+            rusqlite::Error::SqliteFailure(rusqlite::ffi::Error { extended_code, .. }, _)
+            | rusqlite::Error::SqlInputError {
+                error: rusqlite::ffi::Error { extended_code, .. },
+                ..
+            } => extended_code.to_string(),
+            _ => "none".to_owned(),
+        };
+
         ConnectorError::user_facing(ApplyMigrationError {
             migration_name: migration_name.to_owned(),
             database_error_code,

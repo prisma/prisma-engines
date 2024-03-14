@@ -9,6 +9,7 @@ pub struct Update<'a> {
     pub(crate) values: Vec<Expression<'a>>,
     pub(crate) conditions: Option<ConditionTree<'a>>,
     pub(crate) comment: Option<Cow<'a, str>>,
+    pub(crate) returning: Option<Vec<Column<'a>>>,
 }
 
 impl<'a> From<Update<'a>> for Query<'a> {
@@ -29,6 +30,7 @@ impl<'a> Update<'a> {
             values: Vec::new(),
             conditions: None,
             comment: None,
+            returning: None,
         }
     }
 
@@ -131,6 +133,29 @@ impl<'a> Update<'a> {
         T: Into<ConditionTree<'a>>,
     {
         self.conditions = Some(conditions.into());
+        self
+    }
+
+    /// Sets the returned columns.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Postgres}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let update = Update::table("users").set("foo", 10);
+    /// let update = update.returning(vec!["id"]);
+    /// let (sql, _) = Postgres::build(update)?;
+    ///
+    /// assert_eq!("UPDATE \"users\" SET \"foo\" = $1 RETURNING \"id\"", sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(any(feature = "postgresql", feature = "sqlite", feature = "mysql"))]
+    pub fn returning<K, I>(mut self, columns: I) -> Self
+    where
+        K: Into<Column<'a>>,
+        I: IntoIterator<Item = K>,
+    {
+        self.returning = Some(columns.into_iter().map(|k| k.into()).collect());
         self
     }
 }

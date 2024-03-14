@@ -1,5 +1,4 @@
 use crate::{error::PrismaError, PrismaResult};
-use psl::{PreviewFeature, PreviewFeatures};
 use query_core::protocol::EngineProtocol;
 use serde::Deserialize;
 use std::{env, ffi::OsStr, fs::File, io::Read};
@@ -208,9 +207,8 @@ impl PrismaOpt {
         std::env::var("LOG_QUERIES").map(|_| true).unwrap_or(self.log_queries)
     }
 
-    /// The EngineProtocol to use for communication, it will be [EngineProtocol::Json] in case
-    /// the [PreviewFeature::JsonProtocol] flag is set to "json". Otherwise it will be
-    /// [EngineProtocol::Graphql]
+    /// The EngineProtocol to use for communication, it will be [EngineProtocol::Json] by
+    /// default
     ///
     /// This protocol will determine how the body of an HTTP request made by the client is processed.
     /// [request_handlers::JsonBody] and [request_handlers::GraphqlBody] are in charge
@@ -222,13 +220,16 @@ impl PrismaOpt {
     /// for submitting the query, this is due to the fact that DMMF is no longer used by the client
     /// to understand which types certain values are. See [query_core::QueryDocumentParser]
     ///
-    pub(crate) fn engine_protocol(&self, preview_features: PreviewFeatures) -> EngineProtocol {
+    pub(crate) fn engine_protocol(&self) -> EngineProtocol {
         self.engine_protocol
             .as_ref()
             .map(EngineProtocol::from)
-            .unwrap_or_else(|| match preview_features.contains(PreviewFeature::JsonProtocol) {
-                true => EngineProtocol::Json,
-                false => EngineProtocol::Graphql,
+            .unwrap_or_else(|| {
+                if self.enable_playground {
+                    EngineProtocol::Graphql
+                } else {
+                    EngineProtocol::Json
+                }
             })
     }
 }

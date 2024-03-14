@@ -1,6 +1,6 @@
-//! A container to manage 0 or more migration connectors, based on request contents.
+//! A container to manage 0 or more schema connectors, based on request contents.
 //!
-//! Why this rather than using connectors directly? We must be able to use the migration engine
+//! Why this rather than using connectors directly? We must be able to use the schema engine
 //! without a valid schema or database connection for commands like createDatabase and diff.
 
 use crate::{api::GenericApi, commands, json_rpc::types::*, CoreError, CoreResult};
@@ -11,7 +11,7 @@ use std::{collections::HashMap, future::Future, path::Path, pin::Pin, sync::Arc}
 use tokio::sync::{mpsc, Mutex};
 use tracing_futures::Instrument;
 
-/// The container for the state of the migration engine. It can contain one or more connectors
+/// The container for the state of the schema engine. It can contain one or more connectors
 /// corresponding to a database to be reached or that we are already connected to.
 ///
 /// The general mechanism is that we match a single url or prisma schema to a single connector in
@@ -83,7 +83,7 @@ impl EngineState {
                 response_sender
                     .send(output)
                     .map_err(|_| ())
-                    .expect("failed to send back response in migration-engine state");
+                    .expect("failed to send back response in schema-engine state");
             })
         });
 
@@ -121,7 +121,7 @@ impl EngineState {
                 response_sender
                     .send(output)
                     .map_err(|_| ())
-                    .expect("failed to send back response in migration-engine state");
+                    .expect("failed to send back response in schema-engine state");
             })
         });
 
@@ -183,9 +183,13 @@ impl EngineState {
 
 #[async_trait::async_trait]
 impl GenericApi for EngineState {
-    async fn version(&self) -> CoreResult<String> {
-        self.with_default_connector(Box::new(|connector| connector.version()))
-            .await
+    async fn version(&self, params: Option<GetDatabaseVersionInput>) -> CoreResult<String> {
+        let f: ConnectorRequest<String> = Box::new(|connector| connector.version());
+
+        match params {
+            Some(params) => self.with_connector_from_datasource_param(&params.datasource, f).await,
+            None => self.with_default_connector(f).await,
+        }
     }
 
     async fn apply_migrations(&self, input: ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput> {
@@ -241,10 +245,7 @@ impl GenericApi for EngineState {
                 std::path::Path::new(file_path)
                     .parent()
                     .map(|config_dir| {
-                        datasource
-                            .active_connector
-                            .set_config_dir(config_dir, &url)
-                            .into_owned()
+                        psl::set_config_dir(datasource.active_connector.flavour(), config_dir, &url).into_owned()
                     })
                     .unwrap_or(url)
             }
@@ -370,7 +371,6 @@ impl GenericApi for EngineState {
 
                         Ok(IntrospectResult {
                             datamodel: result.data_model,
-                            version: format!("{:?}", result.version),
                             views,
                             warnings: result.warnings,
                         })

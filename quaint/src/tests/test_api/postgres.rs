@@ -2,8 +2,8 @@ use super::TestApi;
 use crate::{connector::Queryable, single::Quaint};
 use names::Generator;
 use once_cell::sync::Lazy;
+use quaint_test_setup::Tags;
 use std::env;
-use test_setup::Tags;
 
 pub static CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_PSQL").expect("TEST_PSQL env var"));
 pub static CRDB_CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_CRDB").expect("TEST_CRDB env var"));
@@ -108,7 +108,7 @@ impl<'a> TestApi for PostgreSql<'a> {
         self.names.next().unwrap().replace('-', "")
     }
 
-    fn connector_tag(&self) -> test_setup::Tags {
+    fn connector_tag(&self) -> quaint_test_setup::Tags {
         Tags::POSTGRES
     }
 }

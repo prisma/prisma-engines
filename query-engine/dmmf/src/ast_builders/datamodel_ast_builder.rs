@@ -2,11 +2,11 @@ use crate::serialization_ast::datamodel_ast::{
     Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex,
 };
 use bigdecimal::ToPrimitive;
-use prisma_models::{dml_default_kind, encode_bytes, DefaultKind, FieldArity, PrismaValue};
 use psl::{
     parser_database::{walkers, ScalarFieldType},
     schema_ast::ast::WithDocumentation,
 };
+use query_structure::{dml_default_kind, encode_bytes, DefaultKind, FieldArity, PrismaValue};
 
 pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
     let mut datamodel = Datamodel {
@@ -23,7 +23,7 @@ pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
         .db
         .walk_models()
         .filter(|model| !model.is_ignored())
-        .chain(schema.db.walk_views())
+        .chain(schema.db.walk_views().filter(|view| !view.is_ignored()))
     {
         datamodel.models.push(model_to_dmmf(model));
     }
@@ -54,6 +54,7 @@ fn enum_value_to_dmmf(en: walkers::EnumValueWalker<'_>) -> EnumValue {
     EnumValue {
         name: en.name().to_owned(),
         db_name: en.mapped_name().map(ToOwned::to_owned),
+        documentation: en.documentation().map(ToOwned::to_owned),
     }
 }
 
@@ -67,7 +68,7 @@ fn composite_type_to_dmmf(ct: walkers::CompositeTypeWalker<'_>) -> Model {
             .map(composite_type_field_to_dmmf)
             .collect(),
         is_generated: None,
-        documentation: None,
+        documentation: ct.ast_composite_type().documentation().map(ToOwned::to_owned),
         primary_key: None,
         unique_fields: Vec::new(),
         unique_indexes: Vec::new(),
@@ -105,7 +106,7 @@ fn composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker<'_>) ->
         },
         is_generated: None,
         is_updated_at: None,
-        documentation: None,
+        documentation: field.documentation().map(ToOwned::to_owned),
     }
 }
 
@@ -132,17 +133,15 @@ fn model_to_dmmf(model: walkers::ModelWalker<'_>) -> Model {
         primary_key,
         unique_fields: model
             .indexes()
-            .filter_map(|i| {
-                (i.is_unique() && !i.is_defined_on_field()).then(|| i.fields().map(|f| f.name().to_owned()).collect())
-            })
+            .filter(|&i| i.is_unique() && !i.is_defined_on_field())
+            .map(|i| i.fields().map(|f| f.name().to_owned()).collect())
             .collect(),
         unique_indexes: model
             .indexes()
-            .filter_map(|i| {
-                (i.is_unique() && !i.is_defined_on_field()).then(|| UniqueIndex {
-                    name: i.name().map(ToOwned::to_owned),
-                    fields: i.fields().map(|f| f.name().to_owned()).collect(),
-                })
+            .filter(|&i| i.is_unique() && !i.is_defined_on_field())
+            .map(|i| UniqueIndex {
+                name: i.name().map(ToOwned::to_owned),
+                fields: i.fields().map(|f| f.name().to_owned()).collect(),
             })
             .collect(),
     }

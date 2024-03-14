@@ -23,7 +23,7 @@ pub(super) fn schema_is_defined_in_the_datasource(r#enum: EnumWalker<'_>, ctx: &
         return;
     }
 
-    if !ctx.connector.has_capability(ConnectorCapability::MultiSchema) {
+    if !ctx.has_capability(ConnectorCapability::MultiSchema) {
         return;
     }
 
@@ -52,7 +52,7 @@ pub(super) fn schema_attribute_supported_in_connector(r#enum: EnumWalker<'_>, ct
         return;
     }
 
-    if ctx.connector.has_capability(ConnectorCapability::MultiSchema) {
+    if ctx.has_capability(ConnectorCapability::MultiSchema) {
         return;
     }
 
@@ -72,7 +72,7 @@ pub(super) fn schema_attribute_missing(r#enum: EnumWalker<'_>, ctx: &mut Context
         return;
     }
 
-    if !ctx.connector.has_capability(ConnectorCapability::MultiSchema) {
+    if !ctx.has_capability(ConnectorCapability::MultiSchema) {
         return;
     }
 
@@ -113,7 +113,7 @@ pub(super) fn multischema_feature_flag_needed(r#enum: EnumWalker<'_>, ctx: &mut 
 }
 
 pub(crate) fn connector_supports_enums(r#enum: EnumWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx.connector.supports_enums() {
+    if ctx.has_capability(ConnectorCapability::Enums) {
         return;
     }
 

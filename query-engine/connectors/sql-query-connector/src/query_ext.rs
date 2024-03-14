@@ -1,15 +1,16 @@
+use crate::filter::FilterBuilder;
 use crate::{
     column_metadata, error::*, model_extensions::*, sql_trace::trace_parent_to_string, sql_trace::SqlTraceComment,
-    value_ext::IntoTypedJsonExtension, AliasedCondition, ColumnMetadata, Context, SqlRow, ToSqlRow,
+    value_ext::IntoTypedJsonExtension, ColumnMetadata, Context, SqlRow, ToSqlRow,
 };
 use async_trait::async_trait;
-use connector_interface::{filter::Filter, RecordFilter};
+use connector_interface::RecordFilter;
 use futures::future::FutureExt;
 use itertools::Itertools;
 use opentelemetry::trace::TraceContextExt;
 use opentelemetry::trace::TraceFlags;
-use prisma_models::*;
 use quaint::{ast::*, connector::Queryable};
+use query_structure::*;
 use serde_json::{Map, Value};
 use std::{collections::HashMap, panic::AssertUnwindSafe};
 use tracing::{info_span, Span};
@@ -102,7 +103,9 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
             .await?
             .into_iter()
             .next()
-            .ok_or(SqlError::RecordDoesNotExist)
+            .ok_or(SqlError::RecordDoesNotExist {
+                cause: "Filter returned no results".to_owned(),
+            })
     }
 
     async fn filter_selectors(
@@ -126,12 +129,13 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
     ) -> crate::Result<Vec<SelectionResult>> {
         let model_id: ModelProjection = model.primary_identifier().into();
         let id_cols: Vec<Column<'static>> = model_id.as_columns(ctx).collect();
+        let condition = FilterBuilder::without_top_level_joins().visit_filter(filter, ctx);
 
         let select = Select::from_table(model.as_table(ctx))
             .columns(id_cols)
             .append_trace(&Span::current())
             .add_trace_id(ctx.trace_id)
-            .so_that(filter.aliased_condition_from(None, false, ctx));
+            .so_that(condition);
 
         self.select_ids(select, model_id, ctx).await
     }

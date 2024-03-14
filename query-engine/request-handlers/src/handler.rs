@@ -2,7 +2,6 @@ use super::GQLResponse;
 use crate::{GQLError, PrismaResponse, RequestBody};
 use futures::FutureExt;
 use indexmap::IndexMap;
-use prisma_models::{parse_datetime, stringify_datetime, PrismaValue};
 use query_core::{
     constants::custom_types,
     protocol::EngineProtocol,
@@ -11,6 +10,7 @@ use query_core::{
     ArgumentValue, ArgumentValueObject, BatchDocument, BatchDocumentTransaction, CompactedDocument, Operation,
     QueryDocument, QueryExecutor, TxId,
 };
+use query_structure::{parse_datetime, stringify_datetime, PrismaValue};
 use std::{collections::HashMap, fmt, panic::AssertUnwindSafe};
 
 type ArgsToResult = (HashMap<String, ArgumentValue>, IndexMap<String, Item>);
@@ -236,6 +236,7 @@ impl<'a> RequestHandler<'a> {
     /// - DateTime/String: User-input: DateTime / Response: String
     /// - Int/BigInt: User-input: Int / Response: BigInt
     /// - (JSON protocol only) Custom types (eg: { "$type": "BigInt", value: "1" }): User-input: Scalar / Response: Object
+    /// - (JSON protocol only) String/Enum: User-input: String / Response: Enum
     /// This should likely _not_ be used outside of this specific context.
     fn compare_values(left: &ArgumentValue, right: &ArgumentValue) -> bool {
         match (left, right) {
@@ -248,6 +249,10 @@ impl<'a> RequestHandler<'a> {
             (ArgumentValue::Scalar(PrismaValue::Int(i1)), ArgumentValue::Scalar(PrismaValue::BigInt(i2)))
             | (ArgumentValue::Scalar(PrismaValue::BigInt(i2)), ArgumentValue::Scalar(PrismaValue::Int(i1))) => {
                 *i1 == *i2
+            }
+            (ArgumentValue::Scalar(PrismaValue::Enum(s1)), ArgumentValue::Scalar(PrismaValue::String(s2)))
+            | (ArgumentValue::Scalar(PrismaValue::String(s1)), ArgumentValue::Scalar(PrismaValue::Enum(s2))) => {
+                *s1 == *s2
             }
             (ArgumentValue::Object(t1), t2) | (t2, ArgumentValue::Object(t1)) => match Self::unwrap_value(t1) {
                 Some(t1) => Self::compare_values(t1, t2),

@@ -34,18 +34,10 @@ pub(crate) fn unchecked_update_many_input_type(
     model: Model,
     parent_field: Option<RelationFieldRef>,
 ) -> InputObjectType<'_> {
-    // TODO: This leads to conflicting type names.
-    // TODO: See https://github.com/prisma/prisma/issues/18534 for further details.
-    let name = match &parent_field {
-        Some(pf) => format!(
-            "{}UncheckedUpdateManyWithout{}Input",
-            model.name(),
-            capitalize(pf.name())
-        ),
-        _ => format!("{}UncheckedUpdateManyInput", model.name()),
-    };
-
-    let ident = Identifier::new_prisma(name);
+    let ident = Identifier::new_prisma(IdentifierType::UncheckedUpdateManyInput(
+        model.clone(),
+        parent_field.clone().map(|pf| pf.related_field()),
+    ));
 
     let mut input_object = init_input_object_type(ident);
     input_object.set_fields(move || {

@@ -1,6 +1,6 @@
 use crate::{model_extensions::AsColumns, Context};
-use prisma_models::Model;
 use quaint::ast::{Column, Table};
+use query_structure::Model;
 
 pub(crate) fn db_name_with_schema(model: &Model, ctx: &Context<'_>) -> Table<'static> {
     let schema_prefix = model
@@ -32,7 +32,7 @@ impl AsTable for Model {
         self.unique_indexes().fold(table, |table, index| {
             let fields: Vec<_> = index
                 .fields()
-                .map(|f| prisma_models::ScalarFieldRef::from((self.dm.clone(), f)))
+                .map(|f| query_structure::ScalarFieldRef::from((self.dm.clone(), f)))
                 .collect();
             let index: Vec<Column<'static>> = fields.as_columns(ctx).collect();
             table.add_unique_index(index)

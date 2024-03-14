@@ -24,7 +24,7 @@ impl<'a> GqlFieldRenderer<'a> {
     }
 
     fn render_output_field(&self, field: &OutputField<'a>, ctx: &mut RenderContext) -> String {
-        let rendered_args = self.render_arguments(field.arguments(), ctx);
+        let rendered_args = self.render_arguments(field.arguments().iter(), ctx);
         let rendered_args = if rendered_args.is_empty() {
             "".into()
         } else if rendered_args.len() > 1 {

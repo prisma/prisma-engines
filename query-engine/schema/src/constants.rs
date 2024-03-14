@@ -1,6 +1,7 @@
 pub mod args {
     pub const WHERE: &str = "where";
     pub const DATA: &str = "data";
+    pub const RELATION_LOAD_STRATEGY: &str = "relationLoadStrategy";
 
     // upsert args
     pub const CREATE: &str = "create";
@@ -63,6 +64,7 @@ pub mod filters {
     pub const SEARCH: &str = "search";
     pub const IS_SET: &str = "isSet";
     pub const UNDERSCORE_REF: &str = "_ref";
+    pub const UNDERSCORE_CONTAINER: &str = "_container";
 
     // legacy filter
     pub const NOT_IN: &str = "notIn";
@@ -165,3 +167,8 @@ pub mod itx {
 }
 
 pub mod deprecation {}
+
+pub mod load_strategy {
+    pub const JOIN: &str = "join";
+    pub const QUERY: &str = "query";
+}

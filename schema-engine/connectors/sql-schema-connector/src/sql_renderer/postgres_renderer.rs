@@ -310,7 +310,7 @@ impl SqlRenderer for PostgresFlavour {
 
         if self.is_cockroachdb() {
             let mut out = Vec::with_capacity(before_statements.len() + after_statements.len() + lines.len());
-            out.extend(before_statements.into_iter());
+            out.extend(before_statements);
             for line in lines {
                 out.push(format!(
                     "ALTER TABLE {} {}",
@@ -318,7 +318,7 @@ impl SqlRenderer for PostgresFlavour {
                     line
                 ))
             }
-            out.extend(after_statements.into_iter());
+            out.extend(after_statements);
             out
         } else {
             let alter_table = format!(
@@ -330,7 +330,7 @@ impl SqlRenderer for PostgresFlavour {
             before_statements
                 .into_iter()
                 .chain(std::iter::once(alter_table))
-                .chain(after_statements.into_iter())
+                .chain(after_statements)
                 .collect()
         }
     }

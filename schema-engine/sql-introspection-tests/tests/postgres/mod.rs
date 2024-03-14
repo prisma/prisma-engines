@@ -90,6 +90,7 @@ async fn pg_xml_indexes_are_skipped(api: &mut TestApi) -> TestResult {
     api.database().raw_cmd(&create_primary).await?;
 
     let dm = indoc! {r#"
+        /// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
         model xml_test {
           id   Int @id @default(autoincrement())
           data String? @db.Xml

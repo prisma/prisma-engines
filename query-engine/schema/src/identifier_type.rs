@@ -1,5 +1,5 @@
 use crate::{capitalize, constants::ordering, scalar_filter_name};
-use prisma_models::{ast::FieldArity, prelude::*, *};
+use query_structure::{ast::FieldArity, prelude::*, *};
 
 /// Enum used to represent unique schema type names.
 /// It helps deferring the allocation + formatting of strings
@@ -12,6 +12,7 @@ pub enum IdentifierType {
     Mutation,
     CheckedCreateInput(Model, Option<RelationField>),
     CheckedUpdateManyInput(Model),
+    UncheckedUpdateManyInput(Model, Option<RelationField>),
     CheckedUpdateOneInput(Model, Option<RelationField>),
     CompositeCreateEnvelopeInput(CompositeType, FieldArity),
     CompositeCreateInput(CompositeType),
@@ -33,6 +34,7 @@ pub enum IdentifierType {
     OrderByRelevanceInput(ParentContainer),
     OrderByToManyAggregateInput(ParentContainer),
     RelationCreateInput(RelationField, RelationField, bool),
+    RelationLoadStrategy,
     RelationUpdateInput(RelationField, RelationField, bool),
     ScalarFieldEnum(Model),
     ScalarFilterInput(Model, bool),
@@ -41,7 +43,7 @@ pub enum IdentifierType {
     ToManyCompositeFilterInput(CompositeType),
     ToManyRelationFilterInput(Model),
     ToOneCompositeFilterInput(CompositeType, FieldArity),
-    ToOneRelationFilterInput(Model),
+    ToOneRelationFilterInput(Model, FieldArity),
     TransactionIsolationLevel,
     UncheckedCreateInput(Model, Option<RelationField>),
     UncheckedUpdateOneInput(Model, Option<RelationField>),
@@ -180,8 +182,10 @@ impl std::fmt::Display for IdentifierType {
             IdentifierType::ToManyRelationFilterInput(related_model) => {
                 write!(f, "{}ListRelationFilter", capitalize(related_model.name()))
             }
-            IdentifierType::ToOneRelationFilterInput(related_model) => {
-                write!(f, "{}RelationFilter", capitalize(related_model.name()))
+            IdentifierType::ToOneRelationFilterInput(related_model, arity) => {
+                let nullable = if arity.is_optional() { "Nullable" } else { "" };
+
+                write!(f, "{}{}RelationFilter", capitalize(related_model.name()), nullable)
             }
             IdentifierType::ToOneCompositeFilterInput(ct, arity) => {
                 let nullable = if arity.is_optional() { "Nullable" } else { "" };
@@ -292,6 +296,16 @@ impl std::fmt::Display for IdentifierType {
                 Some(ref rf) => write!(f, "{}CreateMany{}Input", model.name(), capitalize(rf.name())),
                 _ => write!(f, "{}CreateManyInput", model.name()),
             },
+            IdentifierType::UncheckedUpdateManyInput(model, related_field) => match related_field {
+                Some(rf) => write!(
+                    f,
+                    "{}UncheckedUpdateManyWithout{}Input",
+                    model.name(),
+                    capitalize(rf.name())
+                ),
+                _ => write!(f, "{}UncheckedUpdateManyInput", model.name()),
+            },
+            IdentifierType::RelationLoadStrategy => write!(f, "RelationLoadStrategy"),
         }
     }
 }

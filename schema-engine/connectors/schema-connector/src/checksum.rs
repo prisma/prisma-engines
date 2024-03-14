@@ -23,7 +23,7 @@ pub(crate) fn script_matches_checksum(script: &str, checksum: &str) -> bool {
         .chain(once_with(|| compute_checksum(&script.replace('\n', "\r\n"))));
 
     script_checksums.any(|script_checksum| {
-        // Due to an omission in a previous version of the migration engine,
+        // Due to an omission in a previous version of the schema engine,
         // some migrations tables will have old migrations with checksum strings
         // that have not been zero-padded.
         //
@@ -75,7 +75,7 @@ impl FormatChecksum for [u8; 32] {
         checksum_string
     }
 
-    // Due to an omission in a previous version of the migration engine,
+    // Due to an omission in a previous version of the schema engine,
     // some migrations tables will have old migrations with checksum strings
     // that have not been zero-padded.
     //

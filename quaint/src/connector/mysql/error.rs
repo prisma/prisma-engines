@@ -1,22 +1,30 @@
 use crate::error::{DatabaseConstraint, Error, ErrorKind};
-use mysql_async as my;
+use thiserror::Error;
 
-impl From<my::Error> for Error {
-    fn from(e: my::Error) -> Error {
-        use my::ServerError;
+// This is a partial copy of the `mysql_async::Error` using only the enum variant used by Prisma.
+// This avoids pulling in `mysql_async`, which would break Wasm compilation.
+#[derive(Debug, Error)]
+enum MysqlAsyncError {
+    #[error("Server error: `{}'", _0)]
+    Server(#[source] MysqlError),
+}
 
-        match e {
-            my::Error::Io(my::IoError::Tls(err)) => Error::builder(ErrorKind::TlsError {
-                message: err.to_string(),
-            })
-            .build(),
-            my::Error::Io(my::IoError::Io(err)) if err.kind() == std::io::ErrorKind::UnexpectedEof => {
-                Error::builder(ErrorKind::ConnectionClosed).build()
-            }
-            my::Error::Io(io_error) => Error::builder(ErrorKind::ConnectionError(io_error.into())).build(),
-            my::Error::Driver(e) => Error::builder(ErrorKind::QueryError(e.into())).build(),
-            my::Error::Server(ServerError { ref message, code, .. }) if code == 1062 => {
-                let constraint = message
+/// This type represents MySql server error.
+#[derive(Debug, Error, Clone, Eq, PartialEq)]
+#[error("ERROR {} ({}): {}", state, code, message)]
+pub struct MysqlError {
+    pub code: u16,
+    pub message: String,
+    pub state: String,
+}
+
+impl From<MysqlError> for Error {
+    fn from(error: MysqlError) -> Self {
+        let code = error.code;
+        match code {
+            1062 => {
+                let constraint = error
+                    .message
                     .split_whitespace()
                     .last()
                     .and_then(|s| s.split('\'').nth(1))
@@ -29,12 +37,13 @@ impl From<my::Error> for Error {
                 let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{code}"));
-                builder.set_original_message(message);
+                builder.set_original_message(error.message);
 
                 builder.build()
             }
-            my::Error::Server(ServerError { ref message, code, .. }) if code == 1451 || code == 1452 => {
-                let constraint = message
+            1451 | 1452 => {
+                let constraint = error
+                    .message
                     .split_whitespace()
                     .nth(17)
                     .and_then(|s| s.split('`').nth(1))
@@ -45,12 +54,13 @@ impl From<my::Error> for Error {
                 let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{code}"));
-                builder.set_original_message(message);
+                builder.set_original_message(error.message);
 
                 builder.build()
             }
-            my::Error::Server(ServerError { ref message, code, .. }) if code == 1263 => {
-                let constraint = message
+            1263 => {
+                let constraint = error
+                    .message
                     .split_whitespace()
                     .last()
                     .and_then(|s| s.split('\'').nth(1))
@@ -62,22 +72,23 @@ impl From<my::Error> for Error {
                 let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{code}"));
-                builder.set_original_message(message);
+                builder.set_original_message(error.message);
 
                 builder.build()
             }
-            my::Error::Server(ServerError { ref message, code, .. }) if code == 1264 => {
+            1264 => {
                 let mut builder = Error::builder(ErrorKind::ValueOutOfRange {
-                    message: message.clone(),
+                    message: error.message.clone(),
                 });
 
                 builder.set_original_code(code.to_string());
-                builder.set_original_message(message);
+                builder.set_original_message(error.message);
 
                 builder.build()
             }
-            my::Error::Server(ServerError { ref message, code, .. }) if code == 1364 || code == 1048 => {
-                let constraint = message
+            1364 | 1048 => {
+                let constraint = error
+                    .message
                     .split_whitespace()
                     .nth(1)
                     .and_then(|s| s.split('\'').nth(1))
@@ -88,12 +99,13 @@ impl From<my::Error> for Error {
                 let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{code}"));
-                builder.set_original_message(message);
+                builder.set_original_message(error.message);
 
                 builder.build()
             }
-            my::Error::Server(ServerError { ref message, code, .. }) if code == 1049 => {
-                let db_name = message
+            1049 => {
+                let db_name = error
+                    .message
                     .split_whitespace()
                     .last()
                     .and_then(|s| s.split('\'').nth(1))
@@ -103,12 +115,13 @@ impl From<my::Error> for Error {
                 let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{code}"));
-                builder.set_original_message(message);
+                builder.set_original_message(error.message);
 
                 builder.build()
             }
-            my::Error::Server(ServerError { ref message, code, .. }) if code == 1007 => {
-                let db_name = message
+            1007 => {
+                let db_name = error
+                    .message
                     .split_whitespace()
                     .nth(3)
                     .and_then(|s| s.split('\'').nth(1))
@@ -118,12 +131,13 @@ impl From<my::Error> for Error {
                 let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{code}"));
-                builder.set_original_message(message);
+                builder.set_original_message(error.message);
 
                 builder.build()
             }
-            my::Error::Server(ServerError { ref message, code, .. }) if code == 1044 => {
-                let db_name = message
+            1044 => {
+                let db_name = error
+                    .message
                     .split_whitespace()
                     .last()
                     .and_then(|s| s.split('\'').nth(1))
@@ -133,12 +147,13 @@ impl From<my::Error> for Error {
                 let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{code}"));
-                builder.set_original_message(message);
+                builder.set_original_message(error.message);
 
                 builder.build()
             }
-            my::Error::Server(ServerError { ref message, code, .. }) if code == 1045 => {
-                let user = message
+            1045 => {
+                let user = error
+                    .message
                     .split_whitespace()
                     .nth(4)
                     .and_then(|s| s.split('@').next())
@@ -149,12 +164,13 @@ impl From<my::Error> for Error {
                 let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{code}"));
-                builder.set_original_message(message);
+                builder.set_original_message(error.message);
 
                 builder.build()
             }
-            my::Error::Server(ServerError { ref message, code, .. }) if code == 1146 => {
-                let table = message
+            1146 => {
+                let table = error
+                    .message
                     .split_whitespace()
                     .nth(1)
                     .and_then(|s| s.split('\'').nth(1))
@@ -165,12 +181,13 @@ impl From<my::Error> for Error {
                 let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{code}"));
-                builder.set_original_message(message);
+                builder.set_original_message(error.message);
 
                 builder.build()
             }
-            my::Error::Server(ServerError { ref message, code, .. }) if code == 1054 => {
-                let column = message
+            1054 => {
+                let column = error
+                    .message
                     .split_whitespace()
                     .nth(2)
                     .and_then(|s| s.split('\'').nth(1))
@@ -179,69 +196,63 @@ impl From<my::Error> for Error {
                 let mut builder = Error::builder(ErrorKind::ColumnNotFound { column });
 
                 builder.set_original_code(format!("{code}"));
-                builder.set_original_message(message);
+                builder.set_original_message(error.message);
 
                 builder.build()
             }
-            my::Error::Server(ServerError {
-                ref message,
-                code,
-                state: _,
-            }) if code == 1406 => {
-                let column = message.split_whitespace().flat_map(|s| s.split('\'')).nth(6).into();
+            1406 => {
+                let column = error
+                    .message
+                    .split_whitespace()
+                    .flat_map(|s| s.split('\''))
+                    .nth(6)
+                    .into();
 
                 let kind = ErrorKind::LengthMismatch { column };
                 let mut builder = Error::builder(kind);
 
                 builder.set_original_code(code.to_string());
-                builder.set_original_message(message);
+                builder.set_original_message(error.message);
 
                 builder.build()
             }
-            my::Error::Server(ServerError {
-                ref message,
-                code,
-                state: _,
-            }) if code == 1191 => {
+            1191 => {
                 let kind = ErrorKind::MissingFullTextSearchIndex;
                 let mut builder = Error::builder(kind);
 
                 builder.set_original_code(code.to_string());
-                builder.set_original_message(message);
+                builder.set_original_message(error.message);
 
                 builder.build()
             }
-            my::Error::Server(ServerError {
-                ref message,
-                code,
-                state: _,
-            }) if code == 1213 => {
+            1213 => {
                 let mut builder = Error::builder(ErrorKind::TransactionWriteConflict);
                 builder.set_original_code(format!("{code}"));
-                builder.set_original_message(message);
+                builder.set_original_message(error.message);
                 builder.build()
             }
-            my::Error::Server(ServerError {
-                ref message,
-                code,
-                ref state,
-            }) => {
+            1040 | 1203 => {
+                let mut builder = Error::builder(ErrorKind::TooManyConnections(error.clone().into()));
+                builder.set_original_code(format!("{code}"));
+                builder.set_original_message(error.message);
+                builder.build()
+            }
+            _ => {
                 let kind = ErrorKind::QueryError(
-                    my::Error::Server(ServerError {
-                        message: message.clone(),
+                    MysqlAsyncError::Server(MysqlError {
+                        message: error.message.clone(),
                         code,
-                        state: state.clone(),
+                        state: error.state.clone(),
                     })
                     .into(),
                 );
 
                 let mut builder = Error::builder(kind);
                 builder.set_original_code(format!("{code}"));
-                builder.set_original_message(message);
+                builder.set_original_message(error.message);
 
                 builder.build()
             }
-            e => Error::builder(ErrorKind::QueryError(e.into())).build(),
         }
     }
 }

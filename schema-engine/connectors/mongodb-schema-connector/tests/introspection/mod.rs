@@ -6,3 +6,4 @@ mod index;
 mod model_renames;
 mod remapping_names;
 mod types;
+mod views;

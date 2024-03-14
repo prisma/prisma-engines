@@ -113,7 +113,7 @@ impl<'a> Field<'a> {
     /// ```
     pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {
         match self.documentation.as_mut() {
-            Some(docs) => docs.push(documentation),
+            Some(docs) => docs.push(documentation.into()),
             None => self.documentation = Some(Documentation(documentation.into())),
         }
     }

@@ -6,7 +6,7 @@ use super::{
 use crate::{Query, QueryResult};
 use connector::ConnectionLike;
 use futures::future::BoxFuture;
-use prisma_models::prelude::*;
+use query_structure::prelude::*;
 use std::{collections::HashMap, fmt};
 use tracing::Instrument;
 
@@ -65,13 +65,21 @@ impl ExpressionResult {
                 },
 
                 // We always select IDs, the unwraps are safe.
-                QueryResult::RecordSelection(rs) => Some(
-                    rs.scalars
-                        .extract_selection_results(field_selection)
+                QueryResult::RecordSelection(Some(rs)) => Some(
+                    rs.records
+                        .extract_selection_results_from_db_name(field_selection)
                         .expect("Expected record selection to contain required model ID fields.")
                         .into_iter()
                         .collect(),
                 ),
+                QueryResult::RecordSelectionWithRelations(rsr) => Some(
+                    rsr.records
+                        .extract_selection_results_from_prisma_name(field_selection)
+                        .expect("Expected record selection to contain required model ID fields.")
+                        .into_iter()
+                        .collect(),
+                ),
+                QueryResult::RecordSelection(None) => Some(vec![]),
 
                 _ => None,
             },

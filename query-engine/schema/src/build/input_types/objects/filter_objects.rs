@@ -1,6 +1,6 @@
 use super::*;
 use constants::filters;
-use prisma_models::{prelude::ParentContainer, CompositeFieldRef};
+use query_structure::{prelude::ParentContainer, CompositeFieldRef};
 
 pub(crate) fn scalar_filter_object_type(
     ctx: &'_ QuerySchema,
@@ -82,29 +82,25 @@ pub(crate) fn where_unique_object_type(ctx: &'_ QuerySchema, model: Model) -> In
     let mut input_object = init_input_object_type(ident);
     input_object.set_tag(ObjectTag::WhereInputType(ParentContainer::Model(model.clone())));
 
-    if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
-        // Concatenated list of uniques/@@unique/@@id fields on which the input type constraints should be applied (that at least one of them is set).
-        let constrained_fields: Vec<_> = {
-            let walker = ctx.internal_data_model.walk(model.id);
+    // Concatenated list of uniques/@@unique/@@id fields on which the input type constraints should be applied (that at least one of them is set).
+    let constrained_fields: Vec<_> = {
+        let walker = ctx.internal_data_model.walk(model.id);
 
-            walker
-                .primary_key()
-                .map(compound_id_field_name)
-                .into_iter()
-                .chain(
-                    walker
-                        .indexes()
-                        .filter(|idx| idx.is_unique())
-                        .map(compound_index_field_name),
-                )
-                .collect()
-        };
+        walker
+            .primary_key()
+            .map(compound_id_field_name)
+            .into_iter()
+            .chain(
+                walker
+                    .indexes()
+                    .filter(|idx| idx.is_unique())
+                    .map(compound_index_field_name),
+            )
+            .collect()
+    };
 
-        input_object.require_at_least_one_field();
-        input_object.apply_constraints_on_fields(constrained_fields);
-    } else {
-        input_object.require_exactly_one_field();
-    }
+    input_object.require_at_least_one_field();
+    input_object.apply_constraints_on_fields(constrained_fields);
 
     input_object.set_fields(move || {
         // Split unique & ID fields vs all the other fields
@@ -117,6 +113,7 @@ pub(crate) fn where_unique_object_type(ctx: &'_ QuerySchema, model: Model) -> In
             .indexes()
             .filter(|idx| idx.is_unique())
             .filter(|index| index.fields().len() > 1)
+            .filter(|index| !index.fields().any(|f| f.is_unsupported()))
             .map(|index| {
                 let fields = index
                     .fields()
@@ -134,6 +131,7 @@ pub(crate) fn where_unique_object_type(ctx: &'_ QuerySchema, model: Model) -> In
             .walk(model.id)
             .primary_key()
             .filter(|pk| pk.fields().len() > 1)
+            .filter(|pk| !pk.fields().any(|f| f.is_unsupported()))
             .map(|pk| {
                 let name = compound_id_field_name(pk);
                 let fields = model.fields().id_fields().unwrap().collect();
@@ -183,14 +181,12 @@ pub(crate) fn where_unique_object_type(ctx: &'_ QuerySchema, model: Model) -> In
         );
         fields.extend(compound_id_field);
 
-        if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
-            fields.extend(boolean_operators.into_iter());
-            fields.extend(
-                rest_fields
-                    .into_iter()
-                    .map(|f| input_fields::filter_input_field(ctx, f, false)),
-            );
-        }
+        fields.extend(boolean_operators);
+        fields.extend(
+            rest_fields
+                .into_iter()
+                .map(|f| input_fields::filter_input_field(ctx, f, false)),
+        );
 
         assert!(!fields.is_empty(), "where objects cannot be empty");
 
@@ -248,15 +244,13 @@ pub(crate) fn composite_equality_object(ctx: &'_ QuerySchema, cf: CompositeField
             }
 
             ModelField::Composite(cf) => {
-                let types = if cf.is_list() {
-                    // The object (aka shorthand) syntax is only supported because the client used to expose all
-                    // list input types as T | T[]. Consider removing it one day.
-                    list_union_type(InputType::object(composite_equality_object(ctx, cf.clone())), true)
+                let field_type = if cf.is_list() {
+                    InputType::list(InputType::object(composite_equality_object(ctx, cf.clone())))
                 } else {
-                    vec![InputType::object(composite_equality_object(ctx, cf.clone()))]
+                    InputType::object(composite_equality_object(ctx, cf.clone()))
                 };
 
-                input_field(cf.name().to_owned(), types, None)
+                simple_input_field(cf.name().to_owned(), field_type, None)
                     .optional_if(!cf.is_required())
                     .nullable_if(!cf.is_required() && !cf.is_list())
             }

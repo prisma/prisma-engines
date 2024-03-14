@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use super::*;
 use constants::{aggregations, ordering};
 use output_types::aggregation;
-use prisma_models::prelude::ParentContainer;
+use query_structure::prelude::ParentContainer;
 
 #[derive(Debug, Default, Clone, Copy)]
 pub(crate) struct OrderByOptions {
@@ -132,11 +132,7 @@ fn orderby_field_mapper<'a>(
         ModelField::Scalar(sf) => {
             let mut types = vec![InputType::Enum(sort_order_enum())];
 
-            if ctx.has_feature(PreviewFeature::OrderByNulls)
-                && ctx.has_capability(ConnectorCapability::OrderByNullsFirstLast)
-                && !sf.is_required()
-                && !sf.is_list()
-            {
+            if ctx.has_capability(ConnectorCapability::OrderByNullsFirstLast) && !sf.is_required() && !sf.is_list() {
                 types.push(InputType::object(sort_nulls_object_type()));
             }
 

@@ -60,7 +60,36 @@ impl<'a> Table<'a> {
     /// Add unique index definition.
     pub fn add_unique_index(mut self, i: impl Into<IndexDefinition<'a>>) -> Self {
         let definition = i.into();
-        self.index_definitions.push(definition.set_table(self.clone()));
+
+        // FIXME: the whole circular dependency (Table -> IndexDefinition -> Column), and cloning
+        // of tables inside each column.
+        //
+        // We can't clone `self` here, as that would lead to cycles. The following happened:
+        // `add_unique_index()` clones the table, including all previous index definitions, and
+        // adds the cloned table to the new index definition. On models with multiple unique
+        // indexes/criterias (including PKs), we repeatedly called `add_unique_index()`. Each time,
+        // we clone one more index, that itself contains copies of all previous indexes. Each
+        // column in each of these previous indexes contains a partial copy of the `Table` with
+        // the indexes on the table at the point of the `add_unique_index()` call that created that
+        // copy.
+        //
+        // If we make the simplifying assumption that all the indexes have a single column, one
+        // call to `add_unique_index()` would cause `(index_definitions.len() + 1)!` clones and
+        // allocations of `Table`s with `IndexDefinition` arrays. That quickly leads to exhausting
+        // available memory. With multiple columns per index, that adds a factor to each step in
+        // the factorial.
+        //
+        // For symptoms of the previous naive clone, see
+        // https://github.com/prisma/prisma/issues/20799 and the corresponding regression test in
+        // connector-test-kit.
+        let table = Table {
+            typ: self.typ.clone(),
+            alias: self.alias.clone(),
+            database: self.database.clone(),
+            index_definitions: Vec::new(),
+        };
+
+        self.index_definitions.push(definition.set_table(table));
         self
     }
 
@@ -173,6 +202,15 @@ impl<'a> Table<'a> {
         }
 
         self
+    }
+
+    pub fn left_join_lateral<J>(self, join: J) -> Self
+    where
+        J: Into<JoinData<'a>>,
+    {
+        let join_data: JoinData = join.into();
+
+        self.left_join(join_data.lateral())
     }
 
     /// Adds an `INNER JOIN` clause to the query, specifically for that table.
@@ -314,6 +352,20 @@ impl<'a> Table<'a> {
         }
 
         self
+    }
+
+    pub fn join<J>(self, join: J) -> Self
+    where
+        J: Into<Join<'a>>,
+    {
+        let join: Join = join.into();
+
+        match join {
+            Join::Inner(x) => self.inner_join(x),
+            Join::Left(x) => self.left_join(x),
+            Join::Right(x) => self.right_join(x),
+            Join::Full(x) => self.full_join(x),
+        }
     }
 }
 

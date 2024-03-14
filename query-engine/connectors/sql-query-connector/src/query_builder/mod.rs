@@ -1,15 +1,19 @@
 pub(crate) mod read;
+#[cfg(feature = "relation_joins")]
+pub(crate) mod select;
 pub(crate) mod write;
 
+use crate::context::Context;
 use crate::model_extensions::SelectionResultExt;
-use prisma_models::SelectionResult;
 use quaint::ast::{Column, Comparable, ConditionTree, Query, Row, Values};
+use query_structure::SelectionResult;
 
 const PARAMETER_LIMIT: usize = 2000;
 
 pub(super) fn chunked_conditions<F, Q>(
     columns: &[Column<'static>],
     records: &[&SelectionResult],
+    ctx: &Context<'_>,
     f: F,
 ) -> Vec<Query<'static>>
 where
@@ -19,20 +23,21 @@ where
     records
         .chunks(PARAMETER_LIMIT)
         .map(|chunk| {
-            let tree = conditions(columns, chunk.iter().copied());
+            let tree = in_conditions(columns, chunk.iter().copied(), ctx);
             f(tree).into()
         })
         .collect()
 }
 
-pub(super) fn conditions<'a>(
+pub(super) fn in_conditions<'a>(
     columns: &'a [Column<'static>],
     results: impl IntoIterator<Item = &'a SelectionResult>,
+    ctx: &Context<'_>,
 ) -> ConditionTree<'static> {
     let mut values = Values::empty();
 
     for result in results.into_iter() {
-        let vals: Vec<_> = result.db_values();
+        let vals: Vec<_> = result.db_values(ctx);
         values.push(vals)
     }
 

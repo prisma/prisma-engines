@@ -1,13 +1,18 @@
 use crate::{model_extensions::*, sql_trace::SqlTraceComment, Context};
 use connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
-use prisma_models::*;
 use quaint::ast::*;
+use query_structure::*;
 use std::{collections::HashSet, convert::TryInto};
 use tracing::Span;
 
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
-pub(crate) fn create_record(model: &Model, mut args: WriteArgs, ctx: &Context<'_>) -> Insert<'static> {
+pub(crate) fn create_record(
+    model: &Model,
+    mut args: WriteArgs,
+    selected_fields: &ModelProjection,
+    ctx: &Context<'_>,
+) -> Insert<'static> {
     let fields: Vec<_> = model
         .fields()
         .scalar()
@@ -23,11 +28,11 @@ pub(crate) fn create_record(model: &Model, mut args: WriteArgs, ctx: &Context<'_
                 .try_into()
                 .expect("Create calls can only use PrismaValue write expressions (right now).");
 
-            insert.value(db_name.to_owned(), field.value(value))
+            insert.value(db_name.to_owned(), field.value(value, ctx))
         });
 
     Insert::from(insert)
-        .returning(ModelProjection::from(model.primary_identifier()).as_columns(ctx))
+        .returning(selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true)))
         .append_trace(&Span::current())
         .add_trace_id(ctx.trace_id)
 }
@@ -41,6 +46,7 @@ pub(crate) fn create_records_nonempty(
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
     affected_fields: &HashSet<ScalarFieldRef>,
+    selected_fields: Option<&ModelProjection>,
     ctx: &Context<'_>,
 ) -> Insert<'static> {
     // We need to bring all write args into a uniform shape.
@@ -59,7 +65,7 @@ pub(crate) fn create_records_nonempty(
                             .try_into()
                             .expect("Create calls can only use PrismaValue write expressions (right now).");
 
-                        row.push(field.value(value).into());
+                        row.push(field.value(value, ctx).into());
                     }
 
                     None => row.push(default_value()),
@@ -70,36 +76,50 @@ pub(crate) fn create_records_nonempty(
         })
         .collect();
 
-    let columns = affected_fields
-        .iter()
-        .map(Clone::clone)
-        .collect::<Vec<_>>()
-        .as_columns(ctx);
+    let columns = affected_fields.iter().cloned().collect::<Vec<_>>().as_columns(ctx);
     let insert = Insert::multi_into(model.as_table(ctx), columns);
     let insert = values.into_iter().fold(insert, |stmt, values| stmt.values(values));
     let insert: Insert = insert.into();
-    let insert = insert.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
+    let mut insert = insert.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
+
+    if let Some(selected_fields) = selected_fields {
+        insert = insert.returning(projection_into_columns(selected_fields, ctx));
+    }
 
     if skip_duplicates {
-        insert.on_conflict(OnConflict::DoNothing)
-    } else {
-        insert
+        insert = insert.on_conflict(OnConflict::DoNothing)
     }
+
+    insert
 }
 
 /// `INSERT` empty records statement.
-pub(crate) fn create_records_empty(model: &Model, skip_duplicates: bool, ctx: &Context<'_>) -> Insert<'static> {
+pub(crate) fn create_records_empty(
+    model: &Model,
+    skip_duplicates: bool,
+    selected_fields: Option<&ModelProjection>,
+    ctx: &Context<'_>,
+) -> Insert<'static> {
     let insert: Insert<'static> = Insert::single_into(model.as_table(ctx)).into();
-    let insert = insert.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
+    let mut insert = insert.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
+
+    if let Some(selected_fields) = selected_fields {
+        insert = insert.returning(projection_into_columns(selected_fields, ctx));
+    }
 
     if skip_duplicates {
-        insert.on_conflict(OnConflict::DoNothing)
-    } else {
-        insert
+        insert = insert.on_conflict(OnConflict::DoNothing);
     }
+
+    insert
 }
 
-pub(crate) fn build_update_and_set_query(model: &Model, args: WriteArgs, ctx: &Context<'_>) -> Update<'static> {
+pub(crate) fn build_update_and_set_query(
+    model: &Model,
+    args: WriteArgs,
+    selected_fields: Option<&ModelProjection>,
+    ctx: &Context<'_>,
+) -> Update<'static> {
     let scalar_fields = model.fields().scalar();
     let table = model.as_table(ctx);
     let query = args
@@ -114,12 +134,12 @@ pub(crate) fn build_update_and_set_query(model: &Model, args: WriteArgs, ctx: &C
 
             let value: Expression = match val.try_into_scalar().unwrap() {
                 ScalarWriteOperation::Field(_) => unimplemented!(),
-                ScalarWriteOperation::Set(rhs) => field.value(rhs).into(),
+                ScalarWriteOperation::Set(rhs) => field.value(rhs, ctx).into(),
                 ScalarWriteOperation::Add(rhs) if field.is_list() => {
                     let e: Expression = Column::from((table.clone(), name.clone())).into();
                     let vals: Vec<_> = match rhs {
-                        PrismaValue::List(vals) => vals.into_iter().map(|val| field.value(val)).collect(),
-                        _ => vec![field.value(rhs)],
+                        PrismaValue::List(vals) => vals.into_iter().map(|val| field.value(val, ctx)).collect(),
+                        _ => vec![field.value(rhs, ctx)],
                     };
 
                     // Postgres only
@@ -127,22 +147,22 @@ pub(crate) fn build_update_and_set_query(model: &Model, args: WriteArgs, ctx: &C
                 }
                 ScalarWriteOperation::Add(rhs) => {
                     let e: Expression<'_> = Column::from((table.clone(), name.clone())).into();
-                    e + field.value(rhs).into()
+                    e + field.value(rhs, ctx).into()
                 }
 
                 ScalarWriteOperation::Substract(rhs) => {
                     let e: Expression<'_> = Column::from((table.clone(), name.clone())).into();
-                    e - field.value(rhs).into()
+                    e - field.value(rhs, ctx).into()
                 }
 
                 ScalarWriteOperation::Multiply(rhs) => {
                     let e: Expression<'_> = Column::from((table.clone(), name.clone())).into();
-                    e * field.value(rhs).into()
+                    e * field.value(rhs, ctx).into()
                 }
 
                 ScalarWriteOperation::Divide(rhs) => {
                     let e: Expression<'_> = Column::from((table.clone(), name.clone())).into();
-                    e / field.value(rhs).into()
+                    e / field.value(rhs, ctx).into()
                 }
 
                 ScalarWriteOperation::Unset(_) => unreachable!("Unset is not supported on SQL connectors"),
@@ -151,7 +171,15 @@ pub(crate) fn build_update_and_set_query(model: &Model, args: WriteArgs, ctx: &C
             acc.set(name, value)
         });
 
-    query.append_trace(&Span::current()).add_trace_id(ctx.trace_id)
+    let query = query.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
+
+    let query = if let Some(selected_fields) = selected_fields {
+        query.returning(selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true)))
+    } else {
+        query
+    };
+
+    query
 }
 
 pub(crate) fn chunk_update_with_ids(
@@ -165,14 +193,48 @@ pub(crate) fn chunk_update_with_ids(
         .as_columns(ctx)
         .collect();
 
-    let query = super::chunked_conditions(&columns, ids, |conditions| {
+    let query = super::chunked_conditions(&columns, ids, ctx, |conditions| {
         update.clone().so_that(conditions.and(filter_condition.clone()))
     });
 
     Ok(query)
 }
 
-pub(crate) fn delete_many(
+/// Converts a list of selected fields into an iterator of table columns.
+fn projection_into_columns(
+    selected_fields: &ModelProjection,
+    ctx: &Context<'_>,
+) -> impl Iterator<Item = Column<'static>> {
+    selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true))
+}
+
+pub(crate) fn delete_returning(
+    model: &Model,
+    filter: ConditionTree<'static>,
+    selected_fields: &ModelProjection,
+    ctx: &Context<'_>,
+) -> Query<'static> {
+    Delete::from_table(model.as_table(ctx))
+        .so_that(filter)
+        .returning(projection_into_columns(selected_fields, ctx))
+        .append_trace(&Span::current())
+        .add_trace_id(ctx.trace_id)
+        .into()
+}
+
+pub(crate) fn delete_many_from_filter(
+    model: &Model,
+    filter_condition: ConditionTree<'static>,
+    ctx: &Context<'_>,
+) -> Query<'static> {
+    Delete::from_table(model.as_table(ctx))
+        .so_that(filter_condition)
+        .append_trace(&Span::current())
+        .add_trace_id(ctx.trace_id)
+        .into()
+}
+
+pub(crate) fn delete_many_from_ids_and_filter(
     model: &Model,
     ids: &[&SelectionResult],
     filter_condition: ConditionTree<'static>,
@@ -182,11 +244,8 @@ pub(crate) fn delete_many(
         .as_columns(ctx)
         .collect();
 
-    super::chunked_conditions(&columns, ids, |conditions| {
-        Delete::from_table(model.as_table(ctx))
-            .so_that(conditions.and(filter_condition.clone()))
-            .append_trace(&Span::current())
-            .add_trace_id(ctx.trace_id)
+    super::chunked_conditions(&columns, ids, ctx, |conditions| {
+        delete_many_from_filter(model, conditions.and(filter_condition.clone()), ctx)
     })
 }
 
@@ -205,9 +264,9 @@ pub(crate) fn create_relation_table_records(
     let insert = Insert::multi_into(relation.as_table(ctx), columns);
 
     let insert: MultiRowInsert = child_ids.iter().fold(insert, |insert, child_id| {
-        let mut values: Vec<_> = parent_id.db_values();
+        let mut values: Vec<_> = parent_id.db_values(ctx);
 
-        values.extend(child_id.db_values());
+        values.extend(child_id.db_values(ctx));
         insert.values(values)
     });
 
@@ -226,14 +285,14 @@ pub(crate) fn delete_relation_table_records(
     let mut parent_columns: Vec<_> = parent_field.related_field().m2m_columns(ctx);
     let child_columns: Vec<_> = parent_field.m2m_columns(ctx);
 
-    let parent_id_values = parent_id.db_values();
+    let parent_id_values = parent_id.db_values(ctx);
     let parent_id_criteria = if parent_columns.len() > 1 {
         Row::from(parent_columns).equals(parent_id_values)
     } else {
         parent_columns.pop().unwrap().equals(parent_id_values)
     };
 
-    let child_id_criteria = super::conditions(&child_columns, child_ids);
+    let child_id_criteria = super::in_conditions(&child_columns, child_ids, ctx);
 
     Delete::from_table(relation.as_table(ctx))
         .so_that(parent_id_criteria.and(child_id_criteria))

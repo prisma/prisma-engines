@@ -1,7 +1,7 @@
 use super::{database_name::validate_db_name, names::Names};
 use crate::{
     ast::{self, WithName, WithSpan},
-    datamodel_connector::RelationMode,
+    datamodel_connector::{ConnectorCapability, RelationMode},
     diagnostics::DatamodelError,
     validate::validation_pipeline::context::Context,
 };
@@ -230,7 +230,7 @@ pub(super) fn map(field: RelationFieldWalker<'_>, ctx: &mut Context<'_>) {
         return;
     }
 
-    if !ctx.connector.supports_named_foreign_keys() {
+    if !ctx.has_capability(ConnectorCapability::NamedForeignKeys) {
         let span = field
             .ast_field()
             .span_for_attribute("relation")
@@ -307,17 +307,17 @@ mod tests {
     use super::is_leftwise_included_it;
     #[test]
     fn test_is_left_wise_included() {
-        let item = vec![1, 2];
-        let group = vec![1, 2, 3, 4];
+        let item = [1, 2];
+        let group = [1, 2, 3, 4];
         assert!(is_leftwise_included_it(item.iter(), group.iter()));
-        let item = vec![1, 2, 3, 4];
-        let group = vec![1, 2, 3, 4];
+        let item = [1, 2, 3, 4];
+        let group = [1, 2, 3, 4];
         assert!(is_leftwise_included_it(item.iter(), group.iter()));
-        let item = vec![1, 2, 3, 4];
-        let group = vec![1, 2];
+        let item = [1, 2, 3, 4];
+        let group = [1, 2];
         assert!(!is_leftwise_included_it(item.iter(), group.iter()));
-        let item = vec![2, 3];
-        let group = vec![1, 2, 3, 4];
+        let item = [2, 3];
+        let group = [1, 2, 3, 4];
         assert!(!is_leftwise_included_it(item.iter(), group.iter()));
     }
 }

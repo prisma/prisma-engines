@@ -97,9 +97,9 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
     };
 
     let host = Arc::new(sql_migration_tests::test_api::TestConnectorHost::default());
-    let migration_engine = schema_core::schema_api(None, Some(host.clone())).unwrap();
+    let schema_engine = schema_core::schema_api(None, Some(host.clone())).unwrap();
 
-    tok(migration_engine.diff(schema_core::json_rpc::types::DiffParams {
+    tok(schema_engine.diff(schema_core::json_rpc::types::DiffParams {
         exit_code: None,
         script: true,
         shadow_database_url: None,
@@ -112,19 +112,17 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
 
     let migration: String = host.printed_messages.lock().unwrap()[0].clone();
 
-    tok(
-        migration_engine.db_execute(schema_core::json_rpc::types::DbExecuteParams {
-            datasource_type: schema_core::json_rpc::types::DbExecuteDatasourceType::Url(
-                schema_core::json_rpc::types::UrlContainer {
-                    url: connection_string.clone(),
-                },
-            ),
-            script: migration.clone(),
-        }),
-    )
+    tok(schema_engine.db_execute(schema_core::json_rpc::types::DbExecuteParams {
+        datasource_type: schema_core::json_rpc::types::DbExecuteDatasourceType::Url(
+            schema_core::json_rpc::types::UrlContainer {
+                url: connection_string.clone(),
+            },
+        ),
+        script: migration.clone(),
+    }))
     .unwrap(); // check that it runs
 
-    let second_migration_result = tok(migration_engine.diff(schema_core::json_rpc::types::DiffParams {
+    let second_migration_result = tok(schema_engine.diff(schema_core::json_rpc::types::DiffParams {
         exit_code: Some(true),
         script: true,
         shadow_database_url: None,

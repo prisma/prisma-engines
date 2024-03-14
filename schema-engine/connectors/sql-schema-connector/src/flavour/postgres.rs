@@ -33,18 +33,25 @@ struct Params {
     url: PostgresUrl,
 }
 
+/// The specific provider that was requested by the user.
+#[derive(Clone, Copy, PartialEq)]
+pub(crate) enum PostgresProvider {
+    /// Used when `provider = "postgresql"` was specified in the schema.
+    PostgreSql,
+    /// Used when `provider = "cockroachdb"` was specified in the schema.
+    CockroachDb,
+    /// Used when there is no schema but only the connection string to the database.
+    Unspecified,
+}
+
 pub(crate) struct PostgresFlavour {
     state: State,
-    /// Should only be set in the constructor.
-    is_cockroach: bool,
+    provider: PostgresProvider,
 }
 
 impl Default for PostgresFlavour {
     fn default() -> Self {
-        PostgresFlavour {
-            state: State::Initial,
-            is_cockroach: false,
-        }
+        PostgresFlavour::new_unspecified()
     }
 }
 
@@ -55,10 +62,24 @@ impl std::fmt::Debug for PostgresFlavour {
 }
 
 impl PostgresFlavour {
+    pub(crate) fn new_postgres() -> Self {
+        PostgresFlavour {
+            state: State::Initial,
+            provider: PostgresProvider::PostgreSql,
+        }
+    }
+
     pub(crate) fn new_cockroach() -> Self {
         PostgresFlavour {
             state: State::Initial,
-            is_cockroach: true,
+            provider: PostgresProvider::CockroachDb,
+        }
+    }
+
+    pub(crate) fn new_unspecified() -> Self {
+        PostgresFlavour {
+            state: State::Initial,
+            provider: PostgresProvider::Unspecified,
         }
     }
 
@@ -70,11 +91,15 @@ impl PostgresFlavour {
     }
 
     pub(crate) fn is_cockroachdb(&self) -> bool {
-        self.is_cockroach
+        self.provider == PostgresProvider::CockroachDb
             || self
                 .circumstances()
                 .map(|c| c.contains(Circumstances::IsCockroachDb))
                 .unwrap_or(false)
+    }
+
+    pub(crate) fn is_postgres(&self) -> bool {
+        self.provider == PostgresProvider::PostgreSql && !self.is_cockroachdb()
     }
 
     pub(crate) fn schema_name(&self) -> &str {
@@ -115,10 +140,9 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     fn connector_type(&self) -> &'static str {
-        if self.is_cockroach {
-            "cockroachdb"
-        } else {
-            "postgresql"
+        match self.provider {
+            PostgresProvider::PostgreSql | PostgresProvider::Unspecified => "postgresql",
+            PostgresProvider::CockroachDb => "cockroachdb",
         }
     }
 
@@ -410,6 +434,7 @@ impl SqlFlavour for PostgresFlavour {
                 shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await
             }),
             None => {
+                let is_postgres = self.is_postgres();
                 with_connection(self, move |params, _circumstances, main_connection| async move {
                     let shadow_database_name = crate::new_shadow_database_name();
 
@@ -442,8 +467,12 @@ impl SqlFlavour for PostgresFlavour {
                     let ret =
                         shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await;
 
-                    let drop_database = format!("DROP DATABASE IF EXISTS \"{shadow_database_name}\"");
-                    main_connection.raw_cmd(&drop_database, &params.url).await?;
+                    if is_postgres {
+                        drop_db_try_force(main_connection, &params.url, &shadow_database_name).await?;
+                    } else {
+                        let drop_database = format!("DROP DATABASE IF EXISTS \"{shadow_database_name}\"");
+                        main_connection.raw_cmd(&drop_database, &params.url).await?;
+                    }
 
                     ret
                 })
@@ -460,6 +489,33 @@ impl SqlFlavour for PostgresFlavour {
     fn search_path(&self) -> &str {
         self.schema_name()
     }
+}
+
+/// Drop a database using `WITH (FORCE)` syntax.
+///
+/// When drop database is routed through pgbouncer, the database may still be used in other pooled connections.
+/// In this case, given that we (as a user) know the database will not be used any more, we can forcefully drop
+/// the database. Note that `with (force)` is added in Postgres 13, and therefore we will need to
+/// fallback to the normal drop if it errors with syntax error.
+///
+/// TL;DR,
+/// 1. pg >= 13 -> it works.
+/// 2. pg < 13 -> syntax error on WITH (FORCE), and then fail with db in use if pgbouncer is used.
+async fn drop_db_try_force(conn: &mut Connection, url: &PostgresUrl, database_name: &str) -> ConnectorResult<()> {
+    let drop_database = format!("DROP DATABASE IF EXISTS \"{database_name}\" WITH (FORCE)");
+    if let Err(err) = conn.raw_cmd(&drop_database, url).await {
+        if let Some(msg) = err.message() {
+            if msg.contains("syntax error") {
+                let drop_database_alt = format!("DROP DATABASE IF EXISTS \"{database_name}\"");
+                conn.raw_cmd(&drop_database_alt, url).await?;
+            } else {
+                return Err(err);
+            }
+        } else {
+            return Err(err);
+        }
+    }
+    Ok(())
 }
 
 fn strip_schema_param_from_url(url: &mut Url) {
@@ -517,7 +573,6 @@ pub(crate) enum Circumstances {
     CanPartitionTables,
 }
 
-#[allow(clippy::needless_collect)] // clippy is wrong
 fn disable_postgres_statement_cache(url: &mut Url) -> ConnectorResult<()> {
     let params: Vec<(String, String)> = url.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();
 
@@ -553,9 +608,9 @@ where
         };
 
         let mut circumstances = BitFlags::<Circumstances>::default();
-        let provider_is_cockroachdb = flavour.is_cockroach;
+        let provider = flavour.provider;
 
-        if provider_is_cockroachdb {
+        if provider == PostgresProvider::CockroachDb {
             circumstances |= Circumstances::IsCockroachDb;
         }
 
@@ -573,7 +628,7 @@ where
 
                     let version =
                         schema_exists_result
-                          .get(0)
+                          .first()
                           .and_then(|row| row.at(1).and_then(|ver_str| row.at(2).map(|ver_num| (ver_str, ver_num))))
                           .and_then(|(ver_str,ver_num)| ver_str.to_string().and_then(|version| ver_num.as_integer().map(|version_number| (version, version_number))));
 
@@ -581,18 +636,19 @@ where
                         Some((version, version_num)) => {
                             let db_is_cockroach = version.contains("CockroachDB");
 
-                            // We will want to validate this in the future: https://github.com/prisma/prisma/issues/13222
-                            // if db_is_cockroach && !provider_is_cockroachdb  {
-                            //     let msg = "You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.";
+                            if db_is_cockroach && provider == PostgresProvider::PostgreSql  {
+                                let msg = "You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.";
 
-                            //     return Err(ConnectorError::from_msg(msg.to_owned()));
-                            // }
+                                return Err(ConnectorError::from_msg(msg.to_owned()));
+                            }
 
-                            if !db_is_cockroach && provider_is_cockroachdb {
+                            if !db_is_cockroach && provider == PostgresProvider::CockroachDb {
                                 let msg = "You are trying to connect to a PostgreSQL database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.";
 
                                 return Err(ConnectorError::from_msg(msg.to_owned()));
-                            } else if db_is_cockroach {
+                            }
+
+                            if db_is_cockroach {
                                 circumstances |= Circumstances::IsCockroachDb;
                                 connection.raw_cmd(COCKROACHDB_PRELUDE, &params.url).await?;
                             } else if version_num >= 100000 {
@@ -605,7 +661,7 @@ where
                     }
 
                     if let Some(true) = schema_exists_result
-                        .get(0)
+                        .first()
                         .and_then(|row| row.at(0).and_then(|value| value.as_bool()))
                     {
                         return Ok((circumstances, connection))

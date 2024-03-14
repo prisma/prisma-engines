@@ -164,7 +164,7 @@ impl<'db> RelationFieldWalker<'db> {
 }
 
 /// The relation name.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialOrd)]
 pub enum RelationName<'db> {
     /// A relation name specified in the AST.
     Explicit(&'db str),
@@ -184,17 +184,6 @@ impl<'db> PartialEq for RelationName<'db> {
 }
 
 impl<'db> Eq for RelationName<'db> {}
-
-impl<'db> PartialOrd for RelationName<'db> {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        match (self, other) {
-            (Self::Explicit(l0), Self::Explicit(r0)) => l0.partial_cmp(r0),
-            (Self::Generated(l0), Self::Generated(r0)) => l0.partial_cmp(r0),
-            (Self::Explicit(l0), Self::Generated(r0)) => l0.partial_cmp(&r0.as_str()),
-            (Self::Generated(l0), Self::Explicit(r0)) => l0.as_str().partial_cmp(*r0),
-        }
-    }
-}
 
 impl<'db> Ord for RelationName<'db> {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {

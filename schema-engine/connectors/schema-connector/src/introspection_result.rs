@@ -20,8 +20,6 @@ pub struct IntrospectionResult {
     pub is_empty: bool,
     /// Introspection warnings
     pub warnings: Option<String>,
-    /// Inferred Prisma version
-    pub version: Version,
     /// The database view definitions. None if preview feature
     /// is not enabled.
     pub views: Option<Vec<ViewDefinition>>,
@@ -34,28 +32,6 @@ pub struct IntrospectionResultOutput {
     pub datamodel: String,
     /// warnings
     pub warnings: Option<String>,
-    /// version
-    pub version: Version,
     /// views
     pub views: Option<Vec<ViewDefinition>>,
-}
-
-/// The inferred Prisma version.
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
-pub enum Version {
-    /// Not a Prisma database.
-    NonPrisma,
-    /// Maybe a Prisma 1.0 database.
-    Prisma1,
-    /// Maybe a Prisma 1.1 database.
-    Prisma11,
-    /// Maybe a Prisma 2 database.
-    Prisma2,
-}
-
-impl Version {
-    /// Is the database a Prisma 1.0 or 1.1 database.
-    pub fn is_prisma1(self) -> bool {
-        matches!(self, Self::Prisma1 | Self::Prisma11)
-    }
 }

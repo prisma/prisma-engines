@@ -1,7 +1,6 @@
-use crate::TestResult;
+use crate::{TestError, TestResult};
 use indexmap::IndexMap;
 use itertools::Itertools;
-use prisma_models::PrismaValue;
 use query_core::{
     constants::custom_types,
     schema::{
@@ -10,6 +9,7 @@ use query_core::{
     },
     ArgumentValue, ArgumentValueObject, Selection,
 };
+use query_structure::PrismaValue;
 use request_handlers::{Action, FieldQuery, GraphQLProtocolAdapter, JsonSingleQuery, SelectionSet, SelectionSetValue};
 use serde_json::{json, Value as JsonValue};
 
@@ -18,38 +18,41 @@ pub struct JsonRequest;
 impl JsonRequest {
     /// Translates a GraphQL query to a JSON query. This is used to keep the same test-suite running on both protocols.
     pub fn from_graphql(gql: &str, query_schema: &QuerySchema) -> TestResult<JsonSingleQuery> {
-        let operation = GraphQLProtocolAdapter::convert_query_to_operation(gql, None).unwrap();
-        let operation_name = operation.name();
-        let schema_field = query_schema
-            .find_query_field(operation_name)
-            .unwrap_or_else(|| query_schema.find_mutation_field(operation_name).unwrap());
-        let model_name = schema_field
-            .model()
-            .map(|m| query_schema.internal_data_model.walk(m).name().to_owned());
-        let query_tag = schema_field.query_tag().unwrap().to_owned();
-        let selection = operation.into_selection();
+        match GraphQLProtocolAdapter::convert_query_to_operation(gql, None) {
+            Ok(operation) => {
+                let operation_name = operation.name();
+                let schema_field = query_schema
+                    .find_query_field(operation_name)
+                    .unwrap_or_else(|| query_schema.find_mutation_field(operation_name).unwrap());
+                let model_name = schema_field
+                    .model()
+                    .map(|m| query_schema.internal_data_model.walk(m).name().to_owned());
+                let query_tag = schema_field.query_tag().unwrap().to_owned();
+                let selection = operation.into_selection();
 
-        let output = JsonSingleQuery {
-            model_name,
-            action: Action::new(query_tag),
-            query: graphql_selection_to_json_field_query(selection, &schema_field),
-        };
+                let output = JsonSingleQuery {
+                    model_name,
+                    action: Action::new(query_tag),
+                    query: graphql_selection_to_json_field_query(selection, &schema_field),
+                };
 
-        Ok(output)
+                Ok(output)
+            }
+            Err(err) => Err(TestError::RequestHandlerError(err)),
+        }
     }
 }
 
 fn graphql_selection_to_json_field_query(mut selection: Selection, schema_field: &OutputField<'_>) -> FieldQuery {
-    let args = schema_field.arguments().collect::<Vec<_>>();
     FieldQuery {
-        arguments: graphql_args_to_json_args(&mut selection, args.as_slice()),
+        arguments: graphql_args_to_json_args(&mut selection, schema_field.arguments()),
         selection: graphql_selection_to_json_selection(selection, schema_field),
     }
 }
 
 fn graphql_args_to_json_args(
     selection: &mut Selection,
-    args_fields: &[&InputField<'_>],
+    args_fields: &[InputField<'_>],
 ) -> Option<IndexMap<String, JsonValue>> {
     if selection.arguments().is_empty() {
         return None;
@@ -59,11 +62,8 @@ fn graphql_args_to_json_args(
 
     for (arg_name, arg_value) in selection.arguments().iter().cloned() {
         let arg_field = args_fields.iter().find(|arg_field| arg_field.name == arg_name);
-
-        let inferrer = FieldTypeInferrer::from_field(arg_field.copied()).infer(&arg_value);
-
+        let inferrer = FieldTypeInferrer::from_field(arg_field).infer(&arg_value);
         let json = arg_value_to_json(arg_value, inferrer);
-
         args.insert(arg_name, json);
     }
 
@@ -201,7 +201,9 @@ impl<'a, 'b> FieldTypeInferrer<'a, 'b> {
 
         match value {
             ArgumentValue::Object(obj) => {
-                let is_field_ref_obj = obj.contains_key(constants::filters::UNDERSCORE_REF) && obj.len() == 1;
+                let is_field_ref_obj = obj.contains_key(constants::filters::UNDERSCORE_REF)
+                    && obj.contains_key(constants::filters::UNDERSCORE_CONTAINER)
+                    && obj.len() == 2;
                 let schema_objects = self.get_object_types();
 
                 match schema_objects {
@@ -226,7 +228,7 @@ impl<'a, 'b> FieldTypeInferrer<'a, 'b> {
                     None => InferredType::Unknown,
                 }
             }
-            ArgumentValue::FieldRef(_) => unreachable!(),
+            ArgumentValue::FieldRef(_) | ArgumentValue::Raw(_) => unreachable!(),
         }
     }
 

@@ -354,7 +354,7 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
                 t if t.contains(Tags::Mysql) => "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'^.^)_n\' at line 1",
                 t if t.contains(Tags::Mssql) => "Incorrect syntax near \'^\'.",
                 t if t.contains(Tags::Postgres) => "ERROR: syntax error at or near \"^\"",
-                t if t.contains(Tags::Sqlite) => "unrecognized token: \"^\"",
+                t if t.contains(Tags::Sqlite) => "unrecognized token: \"^\" in \n\nSELECT (^.^)_n;\n at offset 10",
                 _ => todo!(),
             },
         );
@@ -406,11 +406,7 @@ fn migrations_should_not_reapply_modified_migrations(api: TestApi) {
 
     api.apply_migrations(&migrations_directory).send_sync();
 
-    let mut file = std::fs::OpenOptions::new()
-        .append(true)
-        .write(true)
-        .open(initial_path)
-        .unwrap();
+    let mut file = std::fs::OpenOptions::new().append(true).open(initial_path).unwrap();
     file.write_all(b"-- this is just a harmless comment\nSELECT 1;")
         .unwrap();
 

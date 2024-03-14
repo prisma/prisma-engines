@@ -2,11 +2,10 @@ use super::*;
 use crate::bigdecimal::BigDecimal;
 use std::str::FromStr;
 
-#[cfg(feature = "bigdecimal")]
 test_type!(numeric(
     mssql,
     "numeric(10,2)",
-    Value::Numeric(None),
+    Value::null_numeric(),
     Value::numeric(BigDecimal::from_str("3.14")?)
 ));
 
@@ -148,21 +147,21 @@ test_type!(numeric_38_6(
 test_type!(money(
     mssql,
     "money",
-    (Value::Numeric(None), Value::Double(None)),
+    (Value::null_numeric(), Value::null_double()),
     (Value::numeric(BigDecimal::from_str("3.14")?), Value::double(3.14))
 ));
 
 test_type!(smallmoney(
     mssql,
     "smallmoney",
-    (Value::Numeric(None), Value::Double(None)),
+    (Value::null_numeric(), Value::null_double()),
     (Value::numeric(BigDecimal::from_str("3.14")?), Value::double(3.14))
 ));
 
 test_type!(float_24(
     mssql,
     "float(24)",
-    (Value::Numeric(None), Value::Float(None)),
+    (Value::null_numeric(), Value::null_float()),
     (
         Value::numeric(BigDecimal::from_str("1.123456")?),
         Value::float(1.123456)
@@ -172,7 +171,7 @@ test_type!(float_24(
 test_type!(real(
     mssql,
     "real",
-    (Value::Numeric(None), Value::Float(None)),
+    (Value::null_numeric(), Value::null_float()),
     (
         Value::numeric(BigDecimal::from_str("1.123456")?),
         Value::float(1.123456)
@@ -182,7 +181,7 @@ test_type!(real(
 test_type!(float_53(
     mssql,
     "float(53)",
-    (Value::Numeric(None), Value::Double(None)),
+    (Value::null_numeric(), Value::null_double()),
     (
         Value::numeric(BigDecimal::from_str("1.123456789012345")?),
         Value::double(1.123456789012345)

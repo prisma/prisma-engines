@@ -67,7 +67,7 @@ fn populate_top_level_names<'a>(
 ) {
     for table in sql_schema
         .table_walkers()
-        .filter(|t| !helpers::is_prisma_join_table(*t))
+        .filter(|t| !helpers::is_prisma_m_to_n_relation(*t))
     {
         let name = map
             .existing_models
@@ -118,7 +118,7 @@ fn populate_top_level_names<'a>(
 fn position_inline_relation_fields(sql_schema: &sql::SqlSchema, map: &mut IntrospectionMap<'_>) {
     for table in sql_schema
         .table_walkers()
-        .filter(|t| !helpers::is_prisma_join_table(*t))
+        .filter(|t| !helpers::is_prisma_m_to_n_relation(*t))
     {
         for fk in table.foreign_keys() {
             map.inline_relation_positions
@@ -134,7 +134,10 @@ fn position_inline_relation_fields(sql_schema: &sql::SqlSchema, map: &mut Intros
 /// join table) are sorted in a specific way. We handle the sorting
 /// here.
 fn position_m2m_relation_fields(sql_schema: &sql::SqlSchema, map: &mut IntrospectionMap<'_>) {
-    for table in sql_schema.table_walkers().filter(|t| helpers::is_prisma_join_table(*t)) {
+    for table in sql_schema
+        .table_walkers()
+        .filter(|t| helpers::is_prisma_m_to_n_relation(*t))
+    {
         let mut fks = table.foreign_keys();
 
         if let (Some(first_fk), Some(second_fk)) = (fks.next(), fks.next()) {
@@ -314,7 +317,7 @@ fn match_existing_m2m_relations(
 ) {
     map.existing_m2m_relations = sql_schema
         .table_walkers()
-        .filter(|t| helpers::is_prisma_join_table(*t))
+        .filter(|t| helpers::is_prisma_m_to_n_relation(*t))
         .filter_map(|table| {
             prisma_schema
                 .db

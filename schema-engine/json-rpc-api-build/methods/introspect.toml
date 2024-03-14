@@ -30,9 +30,6 @@ shape = "string"
 shape = "string"
 isNullable = true
 
-[recordShapes.introspectResult.fields.version]
-shape = "string"
-
 [recordShapes.introspectResult.fields.views]
 shape = "introspectionView"
 isNullable = true

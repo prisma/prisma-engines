@@ -4,7 +4,7 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use core::fmt;
 use indexmap::{IndexMap, IndexSet};
-use prisma_models::{DefaultKind, PrismaValue, ValueGeneratorFn};
+use query_structure::{DefaultKind, PrismaValue, ValueGeneratorFn};
 use std::{borrow::Cow, convert::TryFrom, rc::Rc, str::FromStr};
 use user_facing_errors::query_engine::validation::ValidationError;
 use uuid::Uuid;
@@ -152,25 +152,21 @@ impl QueryDocumentParser {
         given_arguments: &[(String, ArgumentValue)],
         query_schema: &'a QuerySchema,
     ) -> QueryParserResult<Vec<ParsedArgument<'a>>> {
-        let arguments: IndexMap<String, InputField<'_>> = schema_field
-            .arguments()
-            .map(|arg| (arg.name.clone().into_owned(), arg.clone()))
-            .collect();
-
         for (name, _) in given_arguments {
-            if !arguments.contains_key(name) {
+            if !schema_field.arguments().iter().any(|arg| arg.name == name.as_str()) {
                 let argument_path = argument_path.add(name.clone());
                 return Err(ValidationError::unknown_argument(
                     selection_path.segments(),
                     argument_path.segments(),
-                    conversions::schema_arguments_to_argument_description_vec(schema_field.arguments().cloned()),
+                    conversions::schema_arguments_to_argument_description_vec(schema_field.arguments().iter().cloned()),
                 ));
             }
         }
 
         // Check remaining arguments
-        arguments
-            .values()
+        schema_field
+            .arguments()
+            .iter()
             .filter_map(|input_field| {
                 // Match schema argument field to an argument field in the incoming document.
                 let selection_arg: Option<(String, ArgumentValue)> = given_arguments
@@ -189,7 +185,7 @@ impl QueryDocumentParser {
                             selection_path.clone(),
                             argument_path,
                             value,
-                            input_field.field_types().to_owned(),
+                            input_field.field_types(),
                             query_schema,
                         )
                         .map(|value| ParsedArgument {
@@ -217,7 +213,7 @@ impl QueryDocumentParser {
         selection_path: Path,
         argument_path: Path,
         value: ArgumentValue,
-        possible_input_types: Vec<InputType<'a>>,
+        possible_input_types: &[InputType<'a>],
         query_schema: &'a QuerySchema,
     ) -> QueryParserResult<ParsedInputValue<'a>> {
         let mut failures = Vec::new();
@@ -280,18 +276,18 @@ impl QueryDocumentParser {
                     ))),
                     // Scalar handling
                     (pv, InputType::Scalar(st)) => try_this!(self
-                        .parse_scalar(&selection_path, &argument_path, pv, st, &value)
+                        .parse_scalar(&selection_path, &argument_path, pv, *st, &value)
                         .map(ParsedInputValue::Single)),
 
                     // Enum handling
                     (pv @ PrismaValue::Enum(_), InputType::Enum(et)) => {
-                        try_this!(self.parse_enum(&selection_path, &argument_path, pv, &et))
+                        try_this!(self.parse_enum(&selection_path, &argument_path, pv, et))
                     }
                     (pv @ PrismaValue::String(_), InputType::Enum(et)) => {
-                        try_this!(self.parse_enum(&selection_path, &argument_path, pv, &et))
+                        try_this!(self.parse_enum(&selection_path, &argument_path, pv, et))
                     }
                     (pv @ PrismaValue::Boolean(_), InputType::Enum(et)) => {
-                        try_this!(self.parse_enum(&selection_path, &argument_path, pv, &et))
+                        try_this!(self.parse_enum(&selection_path, &argument_path, pv, et))
                     }
                     // Invalid combinations
                     (_, input_type) => try_this!(Err(ValidationError::invalid_argument_type(
@@ -299,7 +295,7 @@ impl QueryDocumentParser {
                         argument_path.segments(),
                         conversions::input_type_to_argument_description(
                             argument_path.last().unwrap_or_default(),
-                            &input_type,
+                            input_type,
                         ),
                         conversions::argument_value_to_type_name(&value),
                     ))),
@@ -307,7 +303,7 @@ impl QueryDocumentParser {
 
                 // List handling.
                 (ArgumentValue::List(values), InputType::List(l)) => try_this!(self
-                    .parse_list(&selection_path, &argument_path, values.clone(), *l, query_schema)
+                    .parse_list(&selection_path, &argument_path, values.clone(), l, query_schema)
                     .map(ParsedInputValue::List)),
 
                 // Object handling
@@ -316,7 +312,7 @@ impl QueryDocumentParser {
                         selection_path.clone(),
                         argument_path.clone(),
                         o.clone(),
-                        &obj,
+                        obj,
                         query_schema,
                     )
                     .map(ParsedInputValue::Map)),
@@ -327,7 +323,7 @@ impl QueryDocumentParser {
                     argument_path.segments(),
                     conversions::input_type_to_argument_description(
                         argument_path.last().unwrap_or_default(),
-                        &input_type,
+                        input_type,
                     ),
                     conversions::argument_value_to_type_name(&value),
                 ))),
@@ -342,7 +338,6 @@ impl QueryDocumentParser {
     }
 
     /// Attempts to parse given query value into a concrete PrismaValue based on given scalar type.
-    #[allow(clippy::too_many_arguments)]
     fn parse_scalar(
         &self,
         selection_path: &Path,
@@ -419,7 +414,7 @@ impl QueryDocumentParser {
         argument_path: &Path,
         s: &str,
     ) -> QueryParserResult<DateTime<FixedOffset>> {
-        prisma_models::parse_datetime(s).map_err(|err| {
+        query_structure::parse_datetime(s).map_err(|err| {
             ValidationError::invalid_argument_value(
                 selection_path.segments(),
                 argument_path.segments(),
@@ -431,15 +426,17 @@ impl QueryDocumentParser {
     }
 
     fn parse_bytes(&self, selection_path: &Path, argument_path: &Path, s: String) -> QueryParserResult<PrismaValue> {
-        prisma_models::decode_bytes(&s).map(PrismaValue::Bytes).map_err(|err| {
-            ValidationError::invalid_argument_value(
-                selection_path.segments(),
-                argument_path.segments(),
-                s.to_string(),
-                "base64 String",
-                Some(Box::new(err)),
-            )
-        })
+        query_structure::decode_bytes(&s)
+            .map(PrismaValue::Bytes)
+            .map_err(|err| {
+                ValidationError::invalid_argument_value(
+                    selection_path.segments(),
+                    argument_path.segments(),
+                    s.to_string(),
+                    "base64 String",
+                    Some(Box::new(err)),
+                )
+            })
     }
 
     fn parse_decimal(
@@ -569,7 +566,7 @@ impl QueryDocumentParser {
         selection_path: &Path,
         argument_path: &Path,
         values: Vec<ArgumentValue>,
-        value_type: InputType<'a>,
+        value_type: &InputType<'a>,
         query_schema: &'a QuerySchema,
     ) -> QueryParserResult<Vec<ParsedInputValue<'a>>> {
         values
@@ -579,7 +576,7 @@ impl QueryDocumentParser {
                     selection_path.clone(),
                     argument_path.clone(),
                     val,
-                    vec![value_type.clone()],
+                    &[value_type.clone()],
                     query_schema,
                 )
             })
@@ -672,7 +669,7 @@ impl QueryDocumentParser {
                             selection_path.clone(),
                             argument_path,
                             default_pv.into(),
-                            field.field_types().to_owned(),
+                            field.field_types(),
                             query_schema,
                         ) {
                             Ok(value) => Some(Ok((field.name.clone(), value))),
@@ -712,7 +709,7 @@ impl QueryDocumentParser {
                     selection_path.clone(),
                     argument_path,
                     value,
-                    field.field_types().to_owned(),
+                    field.field_types(),
                     query_schema,
                 )?;
 
@@ -720,7 +717,7 @@ impl QueryDocumentParser {
             })
             .collect::<QueryParserResult<ParsedInputMap<'a>>>()?;
 
-        map.extend(defaults.into_iter());
+        map.extend(defaults);
 
         // Ensure the constraints are upheld. If any `fields` are specified, then the constraints should be upheld against those only.
         // If no `fields` are specified, then the constraints should be upheld against all fields of the object.
@@ -787,7 +784,7 @@ pub(crate) mod conversions {
         schema::{InputType, OutputType},
         ArgumentValue,
     };
-    use prisma_models::PrismaValue;
+    use query_structure::PrismaValue;
     use schema::InnerOutputType;
     use user_facing_errors::query_engine::validation::{self, InputTypeDescription};
 
@@ -874,6 +871,7 @@ pub(crate) mod conversions {
                 format!("({})", itertools::join(v.iter().map(argument_value_to_type_name), ", "))
             }
             ArgumentValue::FieldRef(_) => "FieldRef".to_string(),
+            ArgumentValue::Raw(_) => "JSON".to_string(),
         }
     }
 

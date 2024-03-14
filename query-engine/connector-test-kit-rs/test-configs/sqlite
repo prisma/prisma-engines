@@ -1,2 +1,4 @@
 {
-    "connector": "sqlite"}
+    "connector": "sqlite",
+    "version": "3"
+}

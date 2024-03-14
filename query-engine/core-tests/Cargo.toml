@@ -9,7 +9,7 @@ edition = "2021"
 dissimilar = "1.0.4"
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 request-handlers = { path = "../request-handlers" }
-query-core = { path = "../core" }
+query-core = { path = "../core", features = ["metrics"] }
 schema = { path = "../schema" }
 psl.workspace = true
 serde_json.workspace = true

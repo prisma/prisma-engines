@@ -12,12 +12,12 @@ use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Tags, 
 use url::Url;
 use user_facing_errors::{common::DatabaseDoesNotExist, UserFacingError};
 
-fn migration_engine_bin_path() -> &'static str {
-    env!("CARGO_BIN_EXE_migration-engine")
+fn schema_engine_bin_path() -> &'static str {
+    env!("CARGO_BIN_EXE_schema-engine")
 }
 
 fn run(args: &[&str]) -> Output {
-    Command::new(migration_engine_bin_path())
+    Command::new(schema_engine_bin_path())
         .arg("cli")
         .args(args)
         .env("RUST_LOG", "INFO")
@@ -184,6 +184,17 @@ fn test_create_database_mssql(api: TestApi) {
 }
 
 #[test_connector(tags(Sqlite))]
+fn test_sqlite_url(api: TestApi) {
+    let base_dir = tempfile::tempdir().unwrap();
+    let sqlite_path = base_dir.path().join("test.db");
+    let url = format!("{}", sqlite_path.to_string_lossy());
+    let output = api.run(&["--datasource", &url, "can-connect-to-database"]);
+    assert!(!output.status.success());
+    let message = String::from_utf8(output.stderr).unwrap();
+    assert!(message.contains("The provided database string is invalid. The scheme is not recognized in database URL."));
+}
+
+#[test_connector(tags(Sqlite))]
 fn test_create_sqlite_database(api: TestApi) {
     let base_dir = tempfile::tempdir().unwrap();
 
@@ -298,7 +309,7 @@ fn tls_errors_must_be_mapped_in_the_cli(api: TestApi) {
 }
 
 #[test_connector(tags(Postgres))]
-fn basic_jsonrpc_roundtrip_works(_api: TestApi) {
+fn basic_jsonrpc_roundtrip_works_with_no_params(_api: TestApi) {
     let tmpdir = tempfile::tempdir().unwrap();
     let tmpfile = tmpdir.path().join("datamodel");
 
@@ -312,7 +323,7 @@ fn basic_jsonrpc_roundtrip_works(_api: TestApi) {
     fs::create_dir_all(&tmpdir).unwrap();
     fs::write(&tmpfile, datamodel).unwrap();
 
-    let mut command = Command::new(migration_engine_bin_path());
+    let mut command = Command::new(schema_engine_bin_path());
     command.arg("--datamodel").arg(&tmpfile).env("RUST_LOG", "info");
 
     with_child_process(command, |process| {
@@ -322,7 +333,7 @@ fn basic_jsonrpc_roundtrip_works(_api: TestApi) {
         for _ in 0..2 {
             writeln!(
                 stdin,
-                r#"{{ "jsonrpc": "2.0", "method": "getDatabaseVersion", "params": {{ }}, "id": 1 }}"#,
+                r#"{{ "jsonrpc": "2.0", "method": "getDatabaseVersion", "id": 1 }}"#,
             )
             .unwrap();
 
@@ -330,6 +341,49 @@ fn basic_jsonrpc_roundtrip_works(_api: TestApi) {
             stdout.read_line(&mut response).unwrap();
 
             assert!(response.contains("PostgreSQL") || response.contains("CockroachDB"));
+        }
+    });
+}
+
+#[test_connector(tags(Postgres))]
+fn basic_jsonrpc_roundtrip_works_with_params(_api: TestApi) {
+    let tmpdir = tempfile::tempdir().unwrap();
+    let tmpfile = tmpdir.path().join("datamodel");
+
+    let datamodel = r#"
+        datasource db {
+            provider = "postgres"
+            url = env("TEST_DATABASE_URL")
+        }
+    "#;
+
+    fs::create_dir_all(&tmpdir).unwrap();
+    fs::write(&tmpfile, datamodel).unwrap();
+
+    let command = Command::new(schema_engine_bin_path());
+
+    let path = tmpfile.to_str().unwrap();
+    let schema_path_params = format!(r#"{{ "datasource": {{ "tag": "SchemaPath", "path": "{path}" }} }}"#);
+
+    let url = std::env::var("TEST_DATABASE_URL").unwrap();
+    let connection_string_params = format!(r#"{{ "datasource": {{ "tag": "ConnectionString", "url": "{url}" }} }}"#);
+
+    with_child_process(command, |process| {
+        let stdin = process.stdin.as_mut().unwrap();
+        let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+        for _ in 0..2 {
+            for params in [&schema_path_params, &connection_string_params] {
+                let params_template =
+                    format!(r#"{{ "jsonrpc": "2.0", "method": "getDatabaseVersion", "params": {params}, "id": 1 }}"#);
+
+                writeln!(stdin, "{}", &params_template).unwrap();
+
+                let mut response = String::new();
+                stdout.read_line(&mut response).unwrap();
+
+                assert!(response.contains("PostgreSQL") || response.contains("CockroachDB"));
+            }
         }
     });
 }
@@ -347,7 +401,7 @@ fn introspect_sqlite_empty_database() {
 
     fs::File::create(tmpdir.path().join("dev.db")).unwrap();
 
-    let mut command = Command::new(migration_engine_bin_path());
+    let mut command = Command::new(schema_engine_bin_path());
     command.env(
         "TEST_DATABASE_URL",
         format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
@@ -374,7 +428,7 @@ fn introspect_sqlite_empty_database() {
         let mut response = String::new();
         stdout.read_line(&mut response).unwrap();
 
-        assert!(response.starts_with(r##"{"jsonrpc":"2.0","error":{"code":4466,"message":"An error happened. Check the data field for details.","data":{"is_panic":false,"message":"The introspected database was empty.","meta":null,"error_code":"P4001"}},"id":1}"##));
+        assert!(response.starts_with(r#"{"jsonrpc":"2.0","error":{"code":4466,"message":"An error happened. Check the data field for details.","data":{"is_panic":false,"message":"The introspected database was empty.","meta":null,"error_code":"P4001"}},"id":1}"#));
     })
 }
 
@@ -394,7 +448,7 @@ fn introspect_sqlite_invalid_empty_database() {
 
     fs::File::create(tmpdir.path().join("dev.db")).unwrap();
 
-    let mut command = Command::new(migration_engine_bin_path());
+    let mut command = Command::new(schema_engine_bin_path());
     command.env(
         "TEST_DATABASE_URL",
         format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
@@ -449,7 +503,7 @@ fn execute_postgres(api: TestApi) {
     let schema_path = tmpdir.path().join("prisma.schema");
     fs::write(&schema_path, schema).unwrap();
 
-    let command = Command::new(migration_engine_bin_path());
+    let command = Command::new(schema_engine_bin_path());
 
     with_child_process(command, |process| {
         let stdin = process.stdin.as_mut().unwrap();
@@ -512,7 +566,7 @@ fn introspect_postgres(api: TestApi) {
     let schema_path = tmpdir.path().join("prisma.schema");
     fs::write(&schema_path, schema).unwrap();
 
-    let command = Command::new(migration_engine_bin_path());
+    let command = Command::new(schema_engine_bin_path());
 
     with_child_process(command, |process| {
         let stdin = process.stdin.as_mut().unwrap();
@@ -577,7 +631,7 @@ fn introspect_postgres(api: TestApi) {
         stdout.read_line(&mut response).unwrap();
 
         let expected = expect![[r#"
-            {"jsonrpc":"2.0","result":{"datamodel":"generator js {\n  provider        = \"prisma-client-js\"\n  previewFeatures = [\"views\"]\n}\n\ndatasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n\nmodel A {\n  id   Int     @id @default(autoincrement())\n  data String?\n}\n\n/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.\nview B {\n  col Int?\n\n  @@ignore\n}\n","version":"NonPrisma","views":[{"definition":"SELECT\n  1 AS col;","name":"B","schema":"public"}],"warnings":"*** WARNING ***\n\nThe following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers\n  - \"B\"\n"},"id":1}
+            {"jsonrpc":"2.0","result":{"datamodel":"generator js {\n  provider        = \"prisma-client-js\"\n  previewFeatures = [\"views\"]\n}\n\ndatasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n\nmodel A {\n  id   Int     @id @default(autoincrement())\n  data String?\n}\n\n/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.\nview B {\n  col Int?\n\n  @@ignore\n}\n","views":[{"definition":"SELECT\n  1 AS col;","name":"B","schema":"public"}],"warnings":"*** WARNING ***\n\nThe following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers\n  - \"B\"\n"},"id":1}
         "#]];
 
         expected.assert_eq(&response);
@@ -599,7 +653,7 @@ fn introspect_e2e() {
     "#;
     fs::File::create(tmpdir.path().join("dev.db")).unwrap();
 
-    let mut command = Command::new(migration_engine_bin_path());
+    let mut command = Command::new(schema_engine_bin_path());
 
     command.env(
         "TEST_DATABASE_URL",
@@ -629,6 +683,6 @@ fn introspect_e2e() {
 
         dbg!("response: {:?}", &response);
 
-        assert!(response.starts_with(r##"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n","version":"NonPrisma","warnings":[]},"##));
+        assert!(response.starts_with(r#"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n","warnings":[]},"#));
     });
 }

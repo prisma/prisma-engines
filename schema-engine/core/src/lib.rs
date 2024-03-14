@@ -21,7 +21,10 @@ pub use schema_connector;
 
 use enumflags2::BitFlags;
 use mongodb_schema_connector::MongoDbSchemaConnector;
-use psl::{builtin_connectors::*, parser_database::SourceFile, Datasource, PreviewFeature, ValidatedSchema};
+use psl::{
+    builtin_connectors::*, datamodel_connector::Flavour, parser_database::SourceFile, Datasource, PreviewFeature,
+    ValidatedSchema,
+};
 use schema_connector::ConnectorParams;
 use sql_schema_connector::SqlSchemaConnector;
 use std::{env, path::Path};
@@ -43,7 +46,7 @@ fn connector_for_connection_string(
                 preview_features,
                 shadow_database_connection_string,
             };
-            let mut connector = SqlSchemaConnector::new_postgres();
+            let mut connector = SqlSchemaConnector::new_postgres_like();
             connector.set_params(params)?;
             Ok(Box::new(connector))
         }
@@ -86,9 +89,7 @@ fn connector_for_connection_string(
             let connector = MongoDbSchemaConnector::new(params);
             Ok(Box::new(connector))
         }
-        Some(other) => Err(CoreError::url_parse_error(format!(
-            "`{other}` is not a known connection URL scheme. Prisma cannot determine the connector."
-        ))),
+        Some(_other) => Err(CoreError::url_parse_error("The scheme is not recognized")),
         None => Err(CoreError::user_facing(InvalidConnectionString {
             details: String::new(),
         })),
@@ -128,7 +129,7 @@ fn schema_to_connector(
     let (source, url, preview_features, shadow_database_url) = parse_configuration(schema)?;
 
     let url = config_dir
-        .map(|config_dir| source.active_connector.set_config_dir(config_dir, &url).into_owned())
+        .map(|config_dir| psl::set_config_dir(source.active_connector.flavour(), config_dir, &url).into_owned())
         .unwrap_or(url);
 
     let params = ConnectorParams {
@@ -143,21 +144,23 @@ fn schema_to_connector(
 }
 
 fn connector_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
-    match provider {
-        p if POSTGRES.is_provider(p) => Ok(Box::new(SqlSchemaConnector::new_postgres())),
-        p if COCKROACH.is_provider(p) => Ok(Box::new(SqlSchemaConnector::new_cockroach())),
-        p if MYSQL.is_provider(p) => Ok(Box::new(SqlSchemaConnector::new_mysql())),
-        p if SQLITE.is_provider(p) => Ok(Box::new(SqlSchemaConnector::new_sqlite())),
-        p if MSSQL.is_provider(p) => Ok(Box::new(SqlSchemaConnector::new_mssql())),
-        // TODO: adopt a state machine pattern in the mongo connector too
-        p if MONGODB.is_provider(p) => Ok(Box::new(MongoDbSchemaConnector::new(ConnectorParams {
-            connection_string: String::new(),
-            preview_features: Default::default(),
-            shadow_database_connection_string: None,
-        }))),
-        provider => Err(CoreError::from_msg(format!(
+    if let Some(connector) = BUILTIN_CONNECTORS.iter().find(|c| c.is_provider(provider)) {
+        match connector.flavour() {
+            Flavour::Cockroach => Ok(Box::new(SqlSchemaConnector::new_cockroach())),
+            Flavour::Mongo => Ok(Box::new(MongoDbSchemaConnector::new(ConnectorParams {
+                connection_string: String::new(),
+                preview_features: Default::default(),
+                shadow_database_connection_string: None,
+            }))),
+            Flavour::Sqlserver => Ok(Box::new(SqlSchemaConnector::new_mssql())),
+            Flavour::Mysql => Ok(Box::new(SqlSchemaConnector::new_mysql())),
+            Flavour::Postgres => Ok(Box::new(SqlSchemaConnector::new_postgres())),
+            Flavour::Sqlite => Ok(Box::new(SqlSchemaConnector::new_sqlite())),
+        }
+    } else {
+        Err(CoreError::from_msg(format!(
             "`{provider}` is not a supported connector."
-        ))),
+        )))
     }
 }
 

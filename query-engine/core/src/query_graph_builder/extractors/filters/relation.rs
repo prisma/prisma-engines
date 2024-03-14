@@ -1,7 +1,6 @@
 use super::extract_filter;
 use crate::{ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
-use connector::{Filter, RelationCompare};
-use prisma_models::RelationFieldRef;
+use query_structure::*;
 use schema::constants::filters;
 use std::convert::TryInto;
 

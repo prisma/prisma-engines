@@ -52,14 +52,11 @@ fn nested_upsert_nonlist_input_object(
         let update_types =
             update_one_objects::update_one_input_types(ctx, related_model.clone(), Some(parent_field.clone()));
 
-        let mut fields = vec![
+        let fields = vec![
             input_field(args::UPDATE, update_types, None),
             input_field(args::CREATE, create_types.clone(), None),
+            where_argument(ctx, &related_model),
         ];
-
-        if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
-            fields.push(where_argument(ctx, &related_model));
-        }
 
         fields
     }))

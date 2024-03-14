@@ -16,6 +16,7 @@ pub use text::Text;
 
 use crate::{datamodel::IndexOps, Cow};
 use base64::display::Base64Display;
+use psl::GeneratorConfigValue;
 use std::fmt;
 
 /// A PSL value representation.
@@ -102,6 +103,33 @@ impl<'a> From<Function<'a>> for Value<'a> {
 impl<'a> From<Env<'a>> for Value<'a> {
     fn from(t: Env<'a>) -> Self {
         Self::Env(t)
+    }
+}
+
+impl<'a> From<&'a str> for Value<'a> {
+    fn from(s: &'a str) -> Self {
+        Self::Text(Text(Cow::from(s)))
+    }
+}
+
+impl<'a> From<Vec<Value<'a>>> for Value<'a> {
+    fn from(vec: Vec<Value<'a>>) -> Self {
+        Self::Array(vec.into())
+    }
+}
+
+impl<'a> From<&'a GeneratorConfigValue> for Value<'a> {
+    fn from(value: &'a GeneratorConfigValue) -> Self {
+        match value {
+            GeneratorConfigValue::String(s) => s.as_str().into(),
+            GeneratorConfigValue::Array(elements) => elements.iter().map(From::from).collect(),
+        }
+    }
+}
+
+impl<'a> FromIterator<Value<'a>> for Value<'a> {
+    fn from_iter<T: IntoIterator<Item = Value<'a>>>(iter: T) -> Self {
+        Self::Array(Array::from(iter.into_iter().collect::<Vec<_>>()))
     }
 }
 

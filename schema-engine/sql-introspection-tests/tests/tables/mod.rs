@@ -12,14 +12,14 @@ use sql_introspection_tests::test_api::*;
 
 #[test_connector(tags(Mysql57))]
 async fn nul_default_bytes(api: &mut TestApi) -> TestResult {
-    let create_table = indoc! {r#"
+    let create_table = indoc! {r"
         CREATE TABLE nul_default_bytes
         (
             id  INT                  NOT NULL
                 PRIMARY KEY,
             val BINARY(5) DEFAULT '\0\0\0\0\0' NOT NULL
         )
-    "#};
+    "};
 
     api.database().raw_cmd(create_table).await?;
 
@@ -185,12 +185,12 @@ async fn a_table_with_unique_index(api: &mut TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = indoc! {r##"
+    let dm = indoc! {r#"
         model Blog {
             id       Int @id @default(autoincrement())
             authorId Int @unique(map: "test")
         }
-    "##};
+    "#};
 
     let result = api.introspect().await?;
     api.assert_eq_datamodels(dm, &result);
@@ -212,14 +212,14 @@ async fn a_table_with_multi_column_unique_index(api: &mut TestApi) -> TestResult
         })
         .await?;
 
-    let dm = indoc! {r##"
+    let dm = indoc! {r#"
         model User {
             id      Int @id @default(autoincrement())
             firstname Int
             lastname Int
             @@unique([firstname, lastname], map: "test")
         }
-    "##};
+    "#};
 
     let result = api.introspect().await?;
     api.assert_eq_datamodels(dm, &result);
@@ -314,13 +314,13 @@ async fn a_table_with_a_non_unique_index(api: &mut TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = indoc! {r##"
+    let dm = indoc! {r#"
         model User {
             a       Int
             id      Int @id @default(autoincrement())
             @@index([a], map: "test")
         }
-    "##};
+    "#};
 
     let result = api.introspect().await?;
     api.assert_eq_datamodels(dm, &result);
@@ -343,14 +343,14 @@ async fn a_table_with_a_multi_column_non_unique_index(api: &mut TestApi) -> Test
         })
         .await?;
 
-    let dm = indoc! { r##"
+    let dm = indoc! { r#"
         model User {
             a  Int
             b  Int
             id Int @id @default(autoincrement())
             @@index([a,b], map: "test")
         }
-    "##};
+    "#};
 
     let result = api.introspect().await?;
     api.assert_eq_datamodels(dm, &result);
@@ -461,7 +461,7 @@ async fn default_values(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres14, Postgres15))]
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres14, Postgres15, Postgres16))]
 async fn pg_default_value_as_dbgenerated(api: &mut TestApi) -> TestResult {
     let sequence = "CREATE SEQUENCE test_seq START 1".to_string();
     api.database().execute_raw(&sequence, &[]).await?;
@@ -640,7 +640,7 @@ async fn different_default_values_should_work(api: &mut TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = indoc! {r##"
+    let dm = indoc! {r#"
         model Blog {
           id                     Int     @id @default(autoincrement())
           text                   String? @default("one") @db.Text
@@ -650,7 +650,7 @@ async fn different_default_values_should_work(api: &mut TestApi) -> TestResult {
           tinytext_float         String  @default(dbgenerated("(1.0)")) @db.TinyText
           tinytext_short         String  @default(dbgenerated("(1)")) @db.TinyText
         }
-    "##};
+    "#};
 
     let result = api.introspect().await?;
     api.assert_eq_datamodels(dm, &result);
@@ -782,11 +782,11 @@ async fn unique_and_index_on_same_field_works_mysql(api: &mut TestApi) -> TestRe
 
     api.raw_cmd(setup).await;
 
-    let dm = indoc! {r##"
+    let dm = indoc! {r#"
         model users {
           id BigInt @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
         }
-    "##};
+    "#};
 
     let result = api.introspect().await?;
     api.assert_eq_datamodels(dm, &result);
@@ -805,11 +805,11 @@ async fn unique_and_index_on_same_field_works_mariadb(api: &mut TestApi) -> Test
 
     api.raw_cmd(setup).await;
 
-    let dm = indoc! {r##"
+    let dm = indoc! {r#"
         model users {
           id Int @id @unique(map: "really_must_be_different")
         }
-    "##};
+    "#};
 
     let result = api.introspect().await?;
     api.assert_eq_datamodels(dm, &result);

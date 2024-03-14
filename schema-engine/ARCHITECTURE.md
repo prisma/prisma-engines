@@ -1,20 +1,20 @@
-# Prisma Migrate Architecture
+# Prisma Schema Architecture
 
 ## Concepts
 
 ### Core / Connector
 
-Migrate exposes the same API on all supported databases. That API is defined by
-the `migration-core` crate in the `migration-engine/core` directory. The core
+Schema Engine exposes the same API on all supported databases. That API is defined by
+the `schema-core` crate in the `schema-engine/core` directory. The core
 itself is a thin layer that orchestrates functionality provided by connectors —
 with one connector per supported database. The API they implement is defined in
-the `migration-connector` crate. Most of the logic of the migration engine
+the `schema-connector` crate. Most of the logic of the schema engine
 lives in the connectors. Currently, we only have built-in connectors that live
 in this repository.
 
 ### Diffing and migrations
 
-Migrate has two main blocks of functionality:
+Schema engine has two main blocks of functionality:
 
 1. At its core, it is a traditional migrations system like ActiveRecord
    migrations or Flyway. You can create migration files, and it will apply
@@ -24,7 +24,7 @@ Migrate has two main blocks of functionality:
    and generate migrations based on its understanding: your Prisma is in state
    A, but your database is in state B; Migrate can generate a migration from B
    to A (this is part of `migrate dev`). Generating a migration between two
-   schemas is called **diffing** in the Migration Engine.
+   schemas is called **diffing** in the Schema Engine.
 
 ## Implementation
 
@@ -356,9 +356,9 @@ to be a best-of-both-worlds solution.
   schema changes you wanted. It's easier to adjust something that is mostly
   there, than remembering how to write the whole thing. We expect users to
   tinker with the migrations.
-- Not only do you get the generated SQL script, but the migration engine does
-  know what changes are potentially destructive or impossible, or things that
-  could go wrong with large amounts of data, and it can document that in the
+- Not only do you get the generated SQL script, but the schema engine does know
+  what changes are potentially destructive or impossible, or things that could
+  go wrong with large amounts of data, and it can document that in the
   migration script directly for you to review and make decisions about.
 - The tool acknowledges it won't be able to declaratively handle everything. If
   you want to tweak row-level security policies in your migration scripts, you
@@ -398,9 +398,9 @@ you could break your existing migrations without editing them by just changing
 that option. An option to generate (or not) a `BEGIN;` and a `COMMIT;` for new
 migrations would be conceivable.
 
-The migration engine should blissfully ignore that problem when actually
-applying migrations (we want that code to stay as simple as possible because
-it's critical).
+The schema engine should blissfully ignore that problem when actually applying
+migrations (we want that code to stay as simple as possible because it's
+critical).
 
 For reproducibility, we always want to run exactly the same migration in dev
 and production, in the same way. "Why would we have a failing migration on

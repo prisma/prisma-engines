@@ -1,0 +1,12 @@
+[package]
+name = "prisma-schema-build"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wasm-bindgen.workspace = true
+wasm-logger = { version = "0.2.0", optional = true }
+prisma-fmt = { path = "../prisma-fmt" }

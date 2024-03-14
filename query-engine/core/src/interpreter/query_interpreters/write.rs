@@ -43,9 +43,16 @@ async fn create_one(
     q: CreateRecord,
     trace_id: Option<String>,
 ) -> InterpretationResult<QueryResult> {
-    let res = tx.create_record(&q.model, q.args, trace_id).await?;
+    let res = tx.create_record(&q.model, q.args, q.selected_fields, trace_id).await?;
 
-    Ok(QueryResult::Id(Some(res)))
+    Ok(QueryResult::RecordSelection(Some(Box::new(RecordSelection {
+        name: q.name,
+        fields: q.selection_order,
+        model: q.model,
+        records: res.into(),
+        nested: vec![],
+        virtual_fields: vec![],
+    }))))
 }
 
 async fn create_many(
@@ -53,9 +60,25 @@ async fn create_many(
     q: CreateManyRecords,
     trace_id: Option<String>,
 ) -> InterpretationResult<QueryResult> {
-    let affected_records = tx.create_records(&q.model, q.args, q.skip_duplicates, trace_id).await?;
+    if let Some(selected_fields) = q.selected_fields {
+        let records = tx
+            .create_records_returning(&q.model, q.args, q.skip_duplicates, selected_fields.fields, trace_id)
+            .await?;
 
-    Ok(QueryResult::Count(affected_records))
+        let selection = RecordSelection {
+            name: q.name,
+            fields: selected_fields.order,
+            records,
+            nested: vec![],
+            model: q.model,
+            virtual_fields: vec![],
+        };
+
+        Ok(QueryResult::RecordSelection(Some(Box::new(selection))))
+    } else {
+        let affected_records = tx.create_records(&q.model, q.args, q.skip_duplicates, trace_id).await?;
+        Ok(QueryResult::Count(affected_records))
+    }
 }
 
 async fn update_one(
@@ -63,9 +86,39 @@ async fn update_one(
     q: UpdateRecord,
     trace_id: Option<String>,
 ) -> InterpretationResult<QueryResult> {
-    let res = tx.update_record(&q.model, q.record_filter, q.args, trace_id).await?;
+    let res = tx
+        .update_record(
+            q.model(),
+            q.record_filter().clone(),
+            q.args().clone(),
+            q.selected_fields(),
+            trace_id,
+        )
+        .await?;
 
-    Ok(QueryResult::Id(res))
+    match q {
+        UpdateRecord::WithSelection(q) => {
+            let res = res
+                .map(|res| RecordSelection {
+                    name: q.name,
+                    fields: q.selection_order,
+                    records: res.into(),
+                    nested: vec![],
+                    model: q.model,
+                    virtual_fields: vec![],
+                })
+                .map(Box::new);
+
+            Ok(QueryResult::RecordSelection(res))
+        }
+        UpdateRecord::WithoutSelection(_) => {
+            let res = res
+                .map(|record| record.extract_selection_result(&q.model().primary_identifier()))
+                .transpose()?;
+
+            Ok(QueryResult::Id(res))
+        }
+    }
 }
 
 async fn native_upsert(
@@ -78,10 +131,10 @@ async fn native_upsert(
     Ok(RecordSelection {
         name: query.name().to_string(),
         fields: query.selection_order().to_owned(),
-        scalars: scalars.into(),
+        records: scalars.into(),
         nested: Vec::new(),
         model: query.model().clone(),
-        aggregation_rows: None,
+        virtual_fields: vec![],
     }
     .into())
 }
@@ -100,9 +153,24 @@ async fn delete_one(
         )),
     }?;
 
-    let res = tx.delete_records(&q.model, filter, trace_id).await?;
+    if let Some(selected_fields) = q.selected_fields {
+        let record = tx
+            .delete_record(&q.model, filter, selected_fields.fields, trace_id)
+            .await?;
+        let selection = RecordSelection {
+            name: q.name,
+            fields: selected_fields.order,
+            records: record.into(),
+            nested: vec![],
+            model: q.model,
+            virtual_fields: vec![],
+        };
 
-    Ok(QueryResult::Count(res))
+        Ok(QueryResult::RecordSelection(Some(Box::new(selection))))
+    } else {
+        let result = tx.delete_records(&q.model, filter, trace_id).await?;
+        Ok(QueryResult::Count(result))
+    }
 }
 
 async fn update_many(

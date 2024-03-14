@@ -1,6 +1,13 @@
 use query_engine_tests::test_suite;
 
-#[test_suite(schema(generic))]
+#[test_suite(
+    schema(generic),
+    exclude(
+        Vitess("planetscale.js", "planetscale.js.wasm"),
+        Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"),
+        Sqlite("libsql.js", "libsql.js.wasm")
+    )
+)]
 mod metrics {
     use query_engine_metrics::{
         PRISMA_CLIENT_QUERIES_ACTIVE, PRISMA_CLIENT_QUERIES_TOTAL, PRISMA_DATASOURCE_QUERIES_TOTAL,
@@ -27,13 +34,13 @@ mod metrics {
         let total_operations = get_counter(&json, PRISMA_CLIENT_QUERIES_TOTAL);
 
         match runner.connector_version() {
-            Sqlite => assert_eq!(total_queries, 9),
+            Sqlite(_) => assert_eq!(total_queries, 2),
             SqlServer(_) => assert_eq!(total_queries, 17),
             MongoDb(_) => assert_eq!(total_queries, 5),
-            CockroachDb => (), // not deterministic
+            CockroachDb(_) => (), // not deterministic
             MySql(_) => assert_eq!(total_queries, 12),
             Vitess(_) => assert_eq!(total_queries, 11),
-            Postgres(_) => assert_eq!(total_queries, 14),
+            Postgres(_) => assert_eq!(total_queries, 7),
         }
 
         assert_eq!(total_operations, 2);

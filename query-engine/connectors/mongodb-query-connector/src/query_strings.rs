@@ -5,6 +5,7 @@
 //! There is a struct for each different type of query to generate. Each of them implement the
 //! QueryStringBuilder trait, which is dynamically dispatched to a specific query string builder by
 //! `root_queries::observing`
+use derive_more::Constructor;
 use mongodb::bson::{Bson, Document};
 use std::fmt::Write;
 
@@ -12,32 +13,73 @@ pub(crate) trait QueryString: Sync + Send {
     fn build(&self) -> String {
         let mut buffer = String::new();
 
-        write!(&mut buffer, "db.{}.{}(", self.collection(), self.query_type()).unwrap();
+        if let Some(coll_name) = self.collection() {
+            write!(&mut buffer, "db.{}.{}(", coll_name, self.query_type()).unwrap();
+        } else {
+            write!(&mut buffer, "db.{}(", self.query_type()).unwrap();
+        }
         self.write_query(&mut buffer);
         write!(&mut buffer, ")").unwrap();
 
         buffer
     }
 
-    fn collection(&self) -> &str;
+    fn collection(&self) -> Option<&str>;
     fn query_type(&self) -> &str;
     fn write_query(&self, buffer: &mut String);
 }
 
+#[derive(Constructor)]
+pub(crate) struct RunCommand<'a> {
+    cmd: &'a Document,
+}
+
+impl QueryString for RunCommand<'_> {
+    fn collection(&self) -> Option<&str> {
+        None
+    }
+
+    fn query_type(&self) -> &str {
+        "runCommand"
+    }
+
+    fn write_query(&self, buffer: &mut String) {
+        fmt_doc(buffer, self.cmd, 1).unwrap();
+    }
+}
+
+#[derive(Constructor)]
+pub(crate) struct Find<'a> {
+    filter: &'a Document,
+    projection: &'a Document,
+    coll_name: &'a str,
+}
+
+impl QueryString for Find<'_> {
+    fn collection(&self) -> Option<&str> {
+        Some(self.coll_name)
+    }
+
+    fn query_type(&self) -> &str {
+        "find"
+    }
+
+    fn write_query(&self, buffer: &mut String) {
+        fmt_doc(buffer, self.filter, 1).unwrap();
+        write!(buffer, ", ").unwrap();
+        fmt_doc(buffer, self.projection, 1).unwrap();
+    }
+}
+
+#[derive(Constructor)]
 pub(crate) struct Aggregate<'a> {
     stages: &'a [Document],
     coll_name: &'a str,
 }
 
-impl Aggregate<'_> {
-    pub(crate) fn new<'a>(stages: &'a [Document], coll_name: &'a str) -> Aggregate<'a> {
-        Aggregate { stages, coll_name }
-    }
-}
-
 impl QueryString for Aggregate<'_> {
-    fn collection(&self) -> &str {
-        self.coll_name
+    fn collection(&self) -> Option<&str> {
+        Some(self.coll_name)
     }
 
     fn query_type(&self) -> &str {
@@ -51,20 +93,15 @@ impl QueryString for Aggregate<'_> {
     }
 }
 
+#[derive(Constructor)]
 pub(crate) struct InsertOne<'a> {
     doc: &'a Document,
     coll_name: &'a str,
 }
 
-impl InsertOne<'_> {
-    pub(crate) fn new<'a>(doc: &'a Document, coll_name: &'a str) -> InsertOne<'a> {
-        InsertOne { doc, coll_name }
-    }
-}
-
 impl QueryString for InsertOne<'_> {
-    fn collection(&self) -> &str {
-        self.coll_name
+    fn collection(&self) -> Option<&str> {
+        Some(self.coll_name)
     }
 
     fn query_type(&self) -> &str {
@@ -76,25 +113,16 @@ impl QueryString for InsertOne<'_> {
     }
 }
 
+#[derive(Constructor)]
 pub(crate) struct UpdateMany<'a> {
     filter: &'a Document,
     update_docs: &'a [Document],
     coll_name: &'a str,
 }
 
-impl UpdateMany<'_> {
-    pub(crate) fn new<'a>(filter: &'a Document, update_docs: &'a [Document], coll_name: &'a str) -> UpdateMany<'a> {
-        UpdateMany {
-            filter,
-            update_docs,
-            coll_name,
-        }
-    }
-}
-
 impl QueryString for UpdateMany<'_> {
-    fn collection(&self) -> &str {
-        self.coll_name
+    fn collection(&self) -> Option<&str> {
+        Some(self.coll_name)
     }
 
     fn query_type(&self) -> &str {
@@ -127,25 +155,39 @@ impl QueryString for UpdateMany<'_> {
     }
 }
 
+#[derive(Constructor)]
+pub(crate) struct DeleteOne<'a> {
+    filter: &'a Document,
+    coll_name: &'a str,
+}
+
+impl QueryString for DeleteOne<'_> {
+    fn collection(&self) -> Option<&str> {
+        Some(self.coll_name)
+    }
+
+    fn query_type(&self) -> &str {
+        "findAndModify"
+    }
+
+    fn write_query(&self, buffer: &mut String) {
+        writeln!(buffer, "{{ query: ").unwrap();
+        fmt_doc(buffer, self.filter, 1).unwrap();
+
+        writeln!(buffer, ", remove: true, new: true }}").unwrap();
+    }
+}
+
+#[derive(Constructor)]
 pub(crate) struct UpdateOne<'a> {
     filter: &'a Document,
     update_doc: &'a Document,
     coll_name: &'a str,
 }
 
-impl UpdateOne<'_> {
-    pub(crate) fn new<'a>(filter: &'a Document, update_doc: &'a Document, coll_name: &'a str) -> UpdateOne<'a> {
-        UpdateOne {
-            filter,
-            update_doc,
-            coll_name,
-        }
-    }
-}
-
 impl QueryString for UpdateOne<'_> {
-    fn collection(&self) -> &str {
-        self.coll_name
+    fn collection(&self) -> Option<&str> {
+        Some(self.coll_name)
     }
 
     fn query_type(&self) -> &str {
@@ -156,7 +198,7 @@ impl QueryString for UpdateOne<'_> {
         fmt_doc(buffer, self.filter, 1).unwrap();
 
         if cfg!(debug_assertions) {
-            writeln!(buffer, ", ").unwrap();
+            writeln!(buffer, ",").unwrap();
         } else {
             write!(buffer, ", ").unwrap();
         }
@@ -165,20 +207,15 @@ impl QueryString for UpdateOne<'_> {
     }
 }
 
+#[derive(Constructor)]
 pub(crate) struct DeleteMany<'a> {
     filter: &'a Document,
     coll_name: &'a str,
 }
 
-impl DeleteMany<'_> {
-    pub(crate) fn new<'a>(filter: &'a Document, coll_name: &'a str) -> DeleteMany<'a> {
-        DeleteMany { filter, coll_name }
-    }
-}
-
 impl QueryString for DeleteMany<'_> {
-    fn collection(&self) -> &str {
-        self.coll_name
+    fn collection(&self) -> Option<&str> {
+        Some(self.coll_name)
     }
 
     fn query_type(&self) -> &str {
@@ -190,25 +227,16 @@ impl QueryString for DeleteMany<'_> {
     }
 }
 
+#[derive(Constructor)]
 pub(crate) struct InsertMany<'a> {
     insert_docs: &'a [Document],
     coll_name: &'a str,
     ordered: bool,
 }
 
-impl InsertMany<'_> {
-    pub(crate) fn new<'a>(insert_docs: &'a [Document], ordered: bool, coll_name: &'a str) -> InsertMany<'a> {
-        InsertMany {
-            insert_docs,
-            coll_name,
-            ordered,
-        }
-    }
-}
-
 impl QueryString for InsertMany<'_> {
-    fn collection(&self) -> &str {
-        self.coll_name
+    fn collection(&self) -> Option<&str> {
+        Some(self.coll_name)
     }
 
     fn query_type(&self) -> &str {
@@ -300,6 +328,7 @@ fn fmt_val(buffer: &mut String, val: &Bson, depth: usize) -> std::fmt::Result {
 mod tests {
     use super::*;
     use bson::doc;
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn test_aggregate() {
@@ -414,7 +443,7 @@ db.collection.updateMany({
             query.trim(),
             r#"db.collection.updateOne({
     name: "Jane",
-}, 
+},
 {
     $set: {
         position: {
@@ -448,7 +477,7 @@ db.collection.deleteMany({
             doc! { "name": "Jane", "position": {"department": "engineering", "title": "principal"}  },
             doc! { "name": "John", "position": {"department": "product", "title": "senior manager"}  },
         ];
-        let insert = InsertMany::new(&docs, true, "collection");
+        let insert = InsertMany::new(&docs, "collection", true);
         let query = insert.build();
         assert_eq!(
             query.trim(),
@@ -468,6 +497,43 @@ db.collection.insertMany([{
     },
 }],{ "ordered": true })"#
                 .trim()
+        );
+    }
+
+    #[test]
+    fn test_find() {
+        let filter = doc! {
+            "department": "product",
+            "title": "senior manager",
+        };
+        let project = doc! {
+            "department": 1,
+        };
+        let find = Find::new(&filter, &project, "collection");
+        let query = find.build();
+        assert_eq!(
+            query.trim(),
+            r#"db.collection.find({
+    department: "product",
+    title: "senior manager",
+}, {
+    department: 1,
+})"#
+        );
+    }
+
+    #[test]
+    fn test_run_command() {
+        let cmd = doc! {
+            "hello": 1,
+        };
+        let run_command = RunCommand::new(&cmd);
+        let query = run_command.build();
+        assert_eq!(
+            query.trim(),
+            r#"db.runCommand({
+    hello: 1,
+})"#
         );
     }
 }

@@ -33,7 +33,7 @@ mod having_filter {
         match_connector_result!(
           &runner,
           r#"query { groupByTestModel(by: [string, string2], having: {
-              string: { equals: { _ref: "string2" } }
+              string: { equals: { _ref: "string2", _container: "TestModel" } }
             }) {
               string
               string2
@@ -48,7 +48,7 @@ mod having_filter {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"query { groupByTestModel(by: [string, int], having: {
-              string: { _count: { equals: { _ref: "int" } } }
+              string: { _count: { equals: { _ref: "int", _container: "TestModel" } } }
             }) {
               string
               int
@@ -61,7 +61,7 @@ mod having_filter {
         match_connector_result!(
           &runner,
           r#"query { groupByTestModel(by: [string, int, int2], having: {
-              int: { _max: { equals: { _ref: "int2" } } }
+              int: { _max: { equals: { _ref: "int2", _container: "TestModel" } } }
             }) {
               string
               int2

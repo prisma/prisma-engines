@@ -1,4 +1,4 @@
-use crate::datamodel_connector::*;
+pub(crate) use crate::datamodel_connector::*;
 use diagnostics::{DatamodelError, Span};
 use enumflags2::BitFlags;
 
@@ -41,8 +41,8 @@ impl Connector for EmptyDatamodelConnector {
         ScalarType::String
     }
 
-    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType) -> NativeTypeInstance {
-        unreachable!()
+    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
+        None
     }
 
     fn native_type_is_default_for_scalar_type(
@@ -70,6 +70,10 @@ impl Connector for EmptyDatamodelConnector {
 
     fn validate_url(&self, _url: &str) -> Result<(), String> {
         Ok(())
+    }
+
+    fn flavour(&self) -> Flavour {
+        unreachable!()
     }
 }
 

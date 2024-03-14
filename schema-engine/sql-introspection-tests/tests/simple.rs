@@ -203,11 +203,11 @@ source .test_database_urls/mysql_5_6
         )
     };
 
-    let config = dbg!(format!("{datasource}\n\n{generator}"));
+    let config = format!("{datasource}\n\n{generator}");
 
     let psl = psl::validate(config.into());
 
-    let ctx = IntrospectionContext::new(psl, CompositeTypeDepth::Infinite, namespaces);
+    let ctx = IntrospectionContext::new(psl, CompositeTypeDepth::Infinite, namespaces.clone());
 
     let introspected = tok(api.introspect(&ctx))
         .unwrap_or_else(|err| panic!("{}", err))
@@ -225,7 +225,27 @@ source .test_database_urls/mysql_5_6
         .trim_end_matches("*/\n");
 
     if last_comment == introspected {
-        return; // success!
+        let introspected_schema = match psl::parse_schema(&introspected) {
+            Ok(s) => s,
+            Err(_err) => {
+                eprintln!("The introspected schema is invalid.");
+                return; // success! (?)
+            }
+        };
+
+        let re_introspected = {
+            let ctx = IntrospectionContext::new(introspected_schema, CompositeTypeDepth::Infinite, namespaces);
+
+            tok(api.introspect(&ctx))
+                .unwrap_or_else(|err| panic!("{}", err))
+                .data_model
+        };
+
+        if introspected == re_introspected {
+            return; // success!
+        }
+
+        test_setup::panic_with_diff(&introspected, &re_introspected)
     }
 
     if std::env::var("UPDATE_EXPECT").is_ok() {
