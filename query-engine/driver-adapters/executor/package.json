@@ -8,8 +8,7 @@
   "description": "",
   "private": true,
   "scripts": {
-    "build": "tsup ./src/testd.ts ./src/bench.ts --format esm --dts",
-    "dev": "node --import tsx ./src/testd.ts"
+    "build": "tsup ./src/testd.ts ./src/bench.ts --format esm --dts"
   },
   "tsup": {
     "external": [
@@ -33,6 +32,7 @@
     "mitata": "0.1.11",
     "query-engine-wasm-baseline": "npm:@prisma/query-engine-wasm@0.0.19",
     "query-engine-wasm-latest": "npm:@prisma/query-engine-wasm@latest",
+    "ts-pattern": "^5.0.8",
     "undici": "6.7.0",
     "ws": "8.16.0"
   },
