@@ -137,11 +137,9 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
                 build_conversion_error(sf, &format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
             })?)),
             TypeIdentifier::Float | TypeIdentifier::Decimal => {
-                let bd = BigDecimal::from_str(&n.to_string())
-                    .map(|bd| bd.normalized())
-                    .map_err(|_| {
-                        build_conversion_error(sf, &format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
-                    })?;
+                let bd = parse_decimal(&n.to_string()).map_err(|_| {
+                    build_conversion_error(sf, &format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
+                })?;
 
                 Ok(PrismaValue::Float(bd))
             }
