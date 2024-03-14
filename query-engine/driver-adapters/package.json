@@ -9,7 +9,7 @@
   },
   "license": "Apache-2.0",
   "scripts": {
-    "build": "pnpm -r run build",
+    "build": "pnpm -r --parallel dev",
     "lint": "pnpm -r run lint",
     "clean": "git clean -dXf -e !query-engine/driver-adapters"
   },
