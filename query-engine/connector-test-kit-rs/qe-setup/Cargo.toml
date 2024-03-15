@@ -11,6 +11,8 @@ schema-core = { path = "../../../schema-engine/core" }
 sql-schema-connector = { path = "../../../schema-engine/connectors/sql-schema-connector" }
 test-setup = { path = "../../../libs/test-setup" }
 enumflags2.workspace = true
+serde.workspace = true
+serde_json.workspace = true
 
 connection-string = "*"
 mongodb = "2.8.0"

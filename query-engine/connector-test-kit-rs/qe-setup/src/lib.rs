@@ -3,6 +3,7 @@
 #![allow(clippy::await_holding_lock)]
 
 mod cockroachdb;
+pub mod driver_adapters;
 mod mongodb;
 mod mssql;
 mod mysql;
