@@ -13,7 +13,7 @@ pub mod commands;
 mod api;
 mod core_error;
 mod rpc;
-pub mod state;
+mod state;
 mod timings;
 
 pub use self::{api::GenericApi, core_error::*, rpc::rpc_api, timings::TimingsLayer};
