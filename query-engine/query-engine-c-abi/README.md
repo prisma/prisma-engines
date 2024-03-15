@@ -1,4 +1,4 @@
-# Query Engine C (compatible) ABI
+# UNSTABLE/EXPERIMENTAL Query Engine C (compatible) ABI
 
 This version of the query engine exposes the Rust engine via C callable functions. There are subtle differences to this implementation compared to the node and wasm versions. Although it is usable by any language that can operate with the C ABI, it is oriented to having prisma running on react-native so the build scripts are oriented to that goal.
 
@@ -7,8 +7,9 @@ This version of the query engine exposes the Rust engine via C callable function
 You need to have Xcode, Java, Android's NDK (you can/should install it via Android Studio), Cmake installed on your machine to compile the engine. The make file contains the main entry points for building the different architectures and platforms. You also need to install the target Rust architectures. You can find the exact [process described here](https://ospfranco.com/post/2023/08/11/react-native,-rust-step-by-step-integration-guide/).
 
 - `make ios` → Builds the iOS libraries in release mode
-- `make sim` → Builds the simulator arch only for rapid development
+- `make sim` → Builds the simulator arch only in debug, much faster, meant for rapid development
 - `make android` → Builds all the android archs
+- `make all` → Builds all the archs
 
 Once the libraries have been built there are a couple of extra scripts (`copy-ios.sh` and `copy-android.sh`) that move the results of the compilation into a sibling of the parent folder (`react-native-prisma`), which is where they will be packaged and published to npm.
 
@@ -49,3 +50,7 @@ While `block_on` might not be the most efficient way to achieve things, it keeps
 The query engine (to be exact, different database connectors) depends on OpenSSL, however, the Rust crate tries to compile the latest version which [currently has a problem with Android armv7 architectures](https://github.com/openssl/openssl/pull/22181). In order to get around this, we have to download OpenSSL, patch it, compile and link it manually. The download, patching and compiling is scripted via the `build-openssl.sh` script. You need to have the Android NDK installed and the `ANDROID_NDK_ROOT` variable set in your environment before running this script. You can find more info on the script itself. The libraries will be outputed in the `libs` folder with the specific structure the Rust compilation needs to finish linking OpenSSL in the main query engine compilation. The crate `openssl` then uses the compiled version by detecting the `OPENSSL_DIR` flag which is set in the `build-android-target.sh` script.
 
 Once the issues upstream are merged we can get rid of this custom compilation step.
+
+## Tests
+
+The tests for React Native are dependant on JSI, meaning they cannot be run outside a device/simulator. The example app contains an HTTP server and the test setup has been reworked to send the requests via HTTP. The usual steps to running the tests are needed but you also need to be running the app and replace the IP address that appears on the screen in the `executor/rn.ts` file.
