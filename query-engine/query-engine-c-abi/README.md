@@ -4,7 +4,7 @@ This version of the query engine exposes the Rust engine via C callable function
 
 ## Setup
 
-You need to have XCode, Java, Androids NDK (you can/should install it via Android Studio), Cmake installed on your machine to compile the engine. The make file contains the main entry points for building the different architectures and platforms. You also need to install the target Rust architectures. You can find the exact [process described here](https://ospfranco.com/post/2023/08/11/react-native,-rust-step-by-step-integration-guide/).
+You need to have Xcode, Java, Android's NDK (you can/should install it via Android Studio), Cmake installed on your machine to compile the engine. The make file contains the main entry points for building the different architectures and platforms. You also need to install the target Rust architectures. You can find the exact [process described here](https://ospfranco.com/post/2023/08/11/react-native,-rust-step-by-step-integration-guide/).
 
 - `make ios` → Builds the iOS libraries in release mode
 - `make sim` → Builds the simulator arch only for rapid development
