@@ -29,7 +29,7 @@ export const Env = S.extend(
     EnvPlanetScale,
     EnvNeonWS,
     S.struct({
-      DRIVER_ADAPTER: S.literal('pg', 'libsql'),
+      DRIVER_ADAPTER: S.literal('pg', 'libsql', 'd1'),
     }),
   ),
   S.struct({

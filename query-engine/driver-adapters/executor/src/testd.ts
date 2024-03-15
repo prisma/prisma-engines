@@ -11,6 +11,7 @@ import { PgManager } from './driver-adapters-manager/pg'
 import { NeonWsManager } from './driver-adapters-manager/neon.ws'
 import { LibSQLManager } from './driver-adapters-manager/libsql'
 import { PlanetScaleManager } from './driver-adapters-manager/planetscale'
+import { D1Manager } from './driver-adapters-manager/d1'
 
 if (!global.crypto) {
   global.crypto = webcrypto as Crypto
@@ -24,6 +25,7 @@ async function initialiseDriverAdapterManager(env: Env): Promise<DriverAdaptersM
       .with({ DRIVER_ADAPTER: 'neon:ws' }, async (env) => await NeonWsManager.setup(env))
       .with({ DRIVER_ADAPTER: 'libsql' }, async (env) => await LibSQLManager.setup(env))
       .with({ DRIVER_ADAPTER: 'planetscale' }, async (env) => await PlanetScaleManager.setup(env))
+      .with({ DRIVER_ADAPTER: 'd1' }, async (env) => await D1Manager.setup(env))
       .exhaustive()
 }
 
