@@ -30,12 +30,12 @@
     "@prisma/adapter-planetscale": "workspace:*",
     "@prisma/driver-adapter-utils": "workspace:*",
     "@prisma/bundled-js-drivers": "workspace:*",
-    "mitata": "^0.1.6",
-    "undici": "6.6.2",
-    "ws": "8.14.2"
+    "mitata": "0.1.11",
+     "undici": "6.7.0",
+     "ws": "8.16.0"
   },
   "devDependencies": {
-    "@types/node": "20.10.8",
+    "@types/node": "20.11.24",
     "tsup": "8.0.2",
     "typescript": "5.3.3"
   }

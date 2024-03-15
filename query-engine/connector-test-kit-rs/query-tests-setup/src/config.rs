@@ -164,10 +164,9 @@ impl TestConfig {
 
     fn from_file() -> Option<Self> {
         let current_dir = env::current_dir().ok();
-        let result = current_dir
+        current_dir
             .and_then(|path| Self::try_path(config_path(path)))
-            .or_else(|| Self::workspace_root().and_then(|path| Self::try_path(config_path(path))));
-        result
+            .or_else(|| Self::workspace_root().and_then(|path| Self::try_path(config_path(path))))
     }
 
     fn try_path(path: PathBuf) -> Option<Self> {

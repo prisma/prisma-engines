@@ -113,8 +113,8 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
                 txId?: string
             }
 
-            debug("🔷 Test query params")
-            debug('\x1b[36m', JSON.stringify(params, null, 2), '\x1b[0m');
+            // debug("🔷 Test query params")
+            // debug('\x1b[36m', JSON.stringify(params, null, 2), '\x1b[0m');
             const castParams = params as QueryPayload;
             const engine = state[castParams.schemaId].engine
             const result = await engine.query(JSON.stringify(castParams.query), "", castParams.txId)
@@ -132,7 +132,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
                 }
             }
 
-            debug("🟢 Engine response: ", result)
+            // debug("🟢 Engine response: ", result)
             // returning unparsed string: otherwise, some information gots lost during this round-trip. 
             // In particular, floating point without decimal part turn into integers
             return result
