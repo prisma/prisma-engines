@@ -5,7 +5,7 @@ import {bindAdapter, ErrorCapturingDriverAdapter} from '@prisma/driver-adapter-u
 import { webcrypto } from 'node:crypto'
 
 import type { DriverAdaptersManager } from './driver-adapters-manager'
-import { jsonRpc, DriverAdapterTag, Env, ExternalTestExecutor } from './types'
+import { jsonRpc, Env, ExternalTestExecutor } from './types'
 import * as qe from './qe'
 import { PgManager } from './driver-adapters-manager/pg'
 import { NeonWsManager } from './driver-adapters-manager/neon.ws'

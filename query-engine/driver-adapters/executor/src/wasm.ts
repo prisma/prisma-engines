@@ -11,18 +11,15 @@ const wasm = {
     sqlite: wasmSqlite
 }
 
-type EngineName = keyof typeof wasm;
+type EngineName = keyof typeof wasm
 
 const initializedModules = new Set<EngineName>()
-
-
 
 export async function getEngineForProvider(provider: EngineName) {
     const engine = wasm[provider]
     if (!initializedModules.has(provider)) {
         const subDir = provider === 'postgres' ? 'postgresql' : provider
         const bytes = await fs.readFile(path.resolve(__dirname, '..', '..', '..', 'query-engine-wasm', 'pkg', subDir, 'query_engine_bg.wasm'))
-        console.error(bytes)
         const module = new WebAssembly.Module(bytes) 
         const instance = new WebAssembly.Instance(module, { './query_engine_bg.js': engine })
         engine.__wbg_set_wasm(instance.exports);
