@@ -96,8 +96,6 @@ export const Request = S.extend(
   ),
 )
 
-// let initialize: S.Schema.Type<typeof Request> = { "id": 1, "jsonrpc": "2.0", "method": "initializeSchema", "params": { "schema": "datasource", "schemaId": "1", "url": "postgresql://" } }
-
 export type Request = S.Schema.Type<typeof Request>
 
 export const RequestFromString = S.transform(
