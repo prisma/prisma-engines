@@ -1,7 +1,9 @@
 import * as S from '@effect/schema/Schema'
 
 const DriverAdapterConfig = S.struct({
-  proxy_url: S.string,
+  proxy_url: S.string.pipe(S.nonEmpty({
+    message: () => 'proxy_url must not be empty',
+  })),
 })
 
 const DriverAdapterConfigFromString = S.transform(
