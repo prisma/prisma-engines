@@ -71,7 +71,7 @@ mod interactive_tx {
           @r###"{"data":{"createOneTestModel":{"id":1}}}"###
         );
 
-        time::sleep(time::Duration::from_millis(10500)).await;
+        time::sleep(time::Duration::from_millis(1500)).await;
         runner.clear_active_tx();
 
         // Everything must be rolled back.

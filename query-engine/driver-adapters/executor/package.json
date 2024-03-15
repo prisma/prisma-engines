@@ -22,17 +22,18 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "dependencies": {
-    "query-engine-wasm-latest": "npm:@prisma/query-engine-wasm@latest",
-    "query-engine-wasm-baseline": "npm:@prisma/query-engine-wasm@0.0.19",
     "@prisma/adapter-libsql": "workspace:*",
     "@prisma/adapter-neon": "workspace:*",
     "@prisma/adapter-pg": "workspace:*",
     "@prisma/adapter-planetscale": "workspace:*",
-    "@prisma/driver-adapter-utils": "workspace:*",
     "@prisma/bundled-js-drivers": "workspace:*",
+    "@prisma/driver-adapter-utils": "workspace:*",
+    "axios": "^1.6.7",
     "mitata": "0.1.11",
-     "undici": "6.7.0",
-     "ws": "8.16.0"
+    "query-engine-wasm-baseline": "npm:@prisma/query-engine-wasm@0.0.19",
+    "query-engine-wasm-latest": "npm:@prisma/query-engine-wasm@latest",
+    "undici": "6.7.0",
+    "ws": "8.16.0"
   },
   "devDependencies": {
     "@types/node": "20.11.24",

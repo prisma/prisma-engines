@@ -1,8 +1,12 @@
 import Axios from "axios";
 
-export function createRNEngineConnector(url: string, schema: string, logCallback: (msg: string) => void) {
+export function createRNEngineConnector(
+  url: string,
+  schema: string,
+  logCallback: (msg: string) => void
+) {
   const port = "3000";
-  const baseIP = "192.168.0.14";
+  const baseIP = "192.168.178.20";
   const deviceUrl = `http://${baseIP}:${port}`;
   const axios = Axios.create({
     baseURL: deviceUrl,
