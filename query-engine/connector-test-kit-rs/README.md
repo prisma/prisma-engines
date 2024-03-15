@@ -84,7 +84,7 @@ To run tests through a driver adapters, you should also configure the following 
 
 * `DRIVER_ADAPTER`: tells the test executor to use a particular driver adapter. Set to `neon`, `planetscale` or any other supported adapter.
 * `DRIVER_ADAPTER_CONFIG`: a json string with the configuration for the driver adapter. This is adapter specific. See the [github workflow for driver adapter tests](.github/workflows/query-engine-driver-adapters.yml) for examples on how to configure the driver adapters.
-* `ENGINE`: can be used to run either `wasm` or `napi` version of the engine.
+* `ENGINE`: can be used to run either `wasm` or `napi` or `mobile` version of the engine.
 
 Example:
 

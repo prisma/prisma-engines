@@ -5,7 +5,7 @@ use query_engine_tests::test_suite;
     exclude(
         Vitess("planetscale.js", "planetscale.js.wasm"),
         Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"),
-        Sqlite("libsql.js", "libsql.js.wasm")
+        Sqlite("libsql.js", "libsql.js.wasm", "rn")
     )
 )]
 mod metrics {

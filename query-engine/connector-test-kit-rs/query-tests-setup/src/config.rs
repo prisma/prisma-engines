@@ -7,10 +7,11 @@ use std::{convert::TryFrom, env, fmt::Display, fs::File, io::Read, path::PathBuf
 
 static TEST_CONFIG_FILE_NAME: &str = ".test_config";
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone, Copy, PartialEq)]
 pub enum TestExecutor {
     Napi,
     Wasm,
+    Mobile,
 }
 
 impl Display for TestExecutor {
@@ -18,6 +19,7 @@ impl Display for TestExecutor {
         match self {
             TestExecutor::Napi => f.write_str("Napi"),
             TestExecutor::Wasm => f.write_str("Wasm"),
+            TestExecutor::Mobile => f.write_str("Mobile"),
         }
     }
 }
@@ -39,7 +41,7 @@ pub struct TestConfig {
     /// Used when testing driver adapters, this process is expected to be a javascript process
     /// loading the library engine (as a library, or WASM modules) and providing it with a
     /// driver adapter.
-    /// Possible values: Napi, Wasm
+    /// Possible values: Napi, Wasm, Mobile
     /// Env key: `EXTERNAL_TEST_EXECUTOR`
     pub(crate) external_test_executor: Option<TestExecutor>,
 
@@ -162,10 +164,10 @@ impl TestConfig {
 
     fn from_file() -> Option<Self> {
         let current_dir = env::current_dir().ok();
-
-        current_dir
+        let result = current_dir
             .and_then(|path| Self::try_path(config_path(path)))
-            .or_else(|| Self::workspace_root().and_then(|path| Self::try_path(config_path(path))))
+            .or_else(|| Self::workspace_root().and_then(|path| Self::try_path(config_path(path))));
+        result
     }
 
     fn try_path(path: PathBuf) -> Option<Self> {
@@ -244,10 +246,12 @@ impl TestConfig {
             }
         }
 
-        if self.external_test_executor.is_some() && self.driver_adapter.is_none() {
-            exit_with_message(
-                "When using an external test executor, the driver adapter (DRIVER_ADAPTER env var) must be set.",
-            );
+        if let Some(external_test_executor) = &self.external_test_executor {
+            if *external_test_executor != TestExecutor::Mobile && self.driver_adapter.is_none() {
+                exit_with_message(
+                    "When using an external test executor, the driver adapter (DRIVER_ADAPTER env var) must be set.",
+                );
+            }
         }
 
         if self.driver_adapter.is_some() && self.external_test_executor.is_none() {

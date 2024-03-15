@@ -18,9 +18,6 @@
   "rangeStrategy": "pin",
   "separateMinorPatch": true,
   "configMigration": true,
-  "ignoreDeps": [
-    "query-engine-wasm-baseline",
-  ],
   "packageRules": [
     {
       "matchFileNames": [

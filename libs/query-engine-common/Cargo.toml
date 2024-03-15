@@ -20,11 +20,11 @@ tracing.workspace = true
 tracing-subscriber = { version = "0.3" }
 tracing-futures = "0.2"
 tracing-opentelemetry = "0.17.3"
-opentelemetry = { version = "0.17"}
+opentelemetry = { version = "0.17" }
 
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-napi.workspace = true
+[target.'cfg(all(not(target_arch = "wasm32"), not(target_os = "ios"), not(target_os = "android")))'.dependencies]
 query-engine-metrics = { path = "../../query-engine/metrics" }
+napi.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen.workspace = true

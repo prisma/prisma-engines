@@ -29,6 +29,7 @@ impl ConnectorTagInterface for SqliteConnectorTag {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SqliteVersion {
     V3,
+    RN,
     LibsqlJsNapi,
     LibsqlJsWasm,
 }
@@ -36,6 +37,7 @@ pub enum SqliteVersion {
 impl ToString for SqliteVersion {
     fn to_string(&self) -> String {
         match self {
+            SqliteVersion::RN => "rn".to_string(),
             SqliteVersion::V3 => "3".to_string(),
             SqliteVersion::LibsqlJsNapi => "libsql.js".to_string(),
             SqliteVersion::LibsqlJsWasm => "libsql.js.wasm".to_string(),
@@ -51,6 +53,7 @@ impl TryFrom<&str> for SqliteVersion {
             "3" => Self::V3,
             "libsql.js" => Self::LibsqlJsNapi,
             "libsql.js.wasm" => Self::LibsqlJsWasm,
+            "rn" => Self::RN,
             _ => return Err(TestError::parse_error(format!("Unknown SQLite version `{s}`"))),
         };
         Ok(version)

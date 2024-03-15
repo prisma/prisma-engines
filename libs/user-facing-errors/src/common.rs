@@ -239,6 +239,16 @@ pub struct UnsupportedFeatureError {
     pub message: String,
 }
 
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3009",
+    message = "migrate found failed migrations in the target database, new migrations will not be applied. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve\n{details}"
+)]
+pub struct FoundFailedMigrations {
+    /// The details about each failed migration.
+    pub details: String,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

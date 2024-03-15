@@ -216,3 +216,16 @@ impl From<KnownError> for Error {
         }
     }
 }
+
+impl From<serde_json::Error> for Error {
+    fn from(serde_error: serde_json::Error) -> Self {
+        Error {
+            is_panic: false,
+            inner: ErrorType::Unknown(UnknownError {
+                message: format!("{}", serde_error),
+                backtrace: None,
+            }),
+            batch_request_idx: None,
+        }
+    }
+}

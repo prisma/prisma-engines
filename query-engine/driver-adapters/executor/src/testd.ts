@@ -20,6 +20,7 @@ import { PrismaPlanetScale } from '@prisma/adapter-planetscale'
 
 import {bindAdapter, DriverAdapter, ErrorCapturingDriverAdapter} from "@prisma/driver-adapter-utils";
 import { webcrypto } from 'node:crypto';
+import { createRNEngineConnector } from './rn'
 
 if (!global.crypto) {
   global.crypto = webcrypto as Crypto
@@ -112,7 +113,8 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
                 txId?: string
             }
 
-            debug("Got `query`", params)
+            debug("🔷 Test query params")
+            debug('\x1b[36m', JSON.stringify(params, null, 2), '\x1b[0m');
             const castParams = params as QueryPayload;
             const engine = state[castParams.schemaId].engine
             const result = await engine.query(JSON.stringify(castParams.query), "", castParams.txId)
@@ -130,7 +132,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
                 }
             }
 
-            debug("got response from engine: ", result)
+            debug("🟢 Engine response: ", result)
             // returning unparsed string: otherwise, some information gots lost during this round-trip. 
             // In particular, floating point without decimal part turn into integers
             return result
@@ -217,11 +219,16 @@ function respondOk(requestId: number, payload: unknown) {
 }
 
 async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<[qe.QueryEngine, ErrorCapturingDriverAdapter]> {
-    const engineType = process.env.EXTERNAL_TEST_EXECUTOR === "Wasm" ? "Wasm" : "Napi";
-    const adapter = await adapterFromEnv(url) as DriverAdapter
-    const errorCapturingAdapter = bindAdapter(adapter)
-    const engineInstance = await qe.initQueryEngine(engineType, errorCapturingAdapter, prismaSchema, logCallback, debug)
-    return [engineInstance, errorCapturingAdapter];
+    if(process.env.EXTERNAL_TEST_EXECUTOR === "Mobile") {
+      const engineInstance = createRNEngineConnector(url, prismaSchema, logCallback)
+      return [engineInstance, {} as any];
+    } else {
+      const engineType = process.env.EXTERNAL_TEST_EXECUTOR === "Wasm" ? "Wasm" : "Napi";
+      const adapter = await adapterFromEnv(url) as DriverAdapter
+      const errorCapturingAdapter = bindAdapter(adapter)
+      const engineInstance = await qe.initQueryEngine(engineType, errorCapturingAdapter, prismaSchema, logCallback, debug)
+      return [engineInstance, errorCapturingAdapter];
+    }
 }
 
 async function adapterFromEnv(url: string): Promise<DriverAdapter> {

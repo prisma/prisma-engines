@@ -1,0 +1,5 @@
+{
+  "connector": "sqlite",
+  "version": "rn",
+  "external_test_executor": "Mobile"
+}

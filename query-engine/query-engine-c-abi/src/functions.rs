@@ -1,0 +1,40 @@
+// use request_handlers::dmmf;
+// use std::sync::Arc;
+
+// use crate::error::ApiError;
+
+#[derive(serde::Serialize, Clone, Copy)]
+pub struct Version {
+    pub commit: &'static str,
+    pub version: &'static str,
+}
+
+pub fn version() -> Version {
+    Version {
+        commit: env!("GIT_HASH"),
+        version: env!("CARGO_PKG_VERSION"),
+    }
+}
+
+// pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
+//     let mut schema = psl::validate(datamodel_string.into());
+
+//     schema
+//         .diagnostics
+//         .to_result()
+//         .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
+
+//     let query_schema = query_core::schema::build(Arc::new(schema), true);
+//     let dmmf = dmmf::render_dmmf(&query_schema);
+
+//     Ok(serde_json::to_string(&dmmf)?)
+// }
+
+// pub fn debug_panic(panic_message: Option<String>) {
+//     let user_facing = user_facing_errors::Error::from_panic_payload(Box::new(
+//         panic_message.unwrap_or_else(|| "query-engine-node-api debug panic".to_string()),
+//     ));
+//     let message = serde_json::to_string(&user_facing).unwrap();
+
+//     Err(napi::Error::from_reason(message))
+// }
