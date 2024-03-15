@@ -17,7 +17,7 @@ export class NeonWsManager implements DriverAdaptersManager {
   #driver?: neon.Pool
   #adapter?: DriverAdapter
 
-  constructor(private env: EnvForAdapter<TAG>) {}
+  private constructor(private env: EnvForAdapter<TAG>) {}
 
   static async setup(env: EnvForAdapter<TAG>) {
     return new NeonWsManager(env)

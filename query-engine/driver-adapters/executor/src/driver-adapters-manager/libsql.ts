@@ -11,7 +11,7 @@ export class LibSQLManager implements DriverAdaptersManager {
   #driver?: libSql.Client
   #adapter?: DriverAdapter
 
-  constructor(private env: EnvForAdapter<TAG>) {}
+  private constructor(private env: EnvForAdapter<TAG>) {}
 
   static async setup(env: EnvForAdapter<TAG>) {
     return new LibSQLManager(env)

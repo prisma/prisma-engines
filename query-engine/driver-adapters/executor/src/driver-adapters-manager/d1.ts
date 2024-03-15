@@ -18,7 +18,7 @@ export class D1Manager implements DriverAdaptersManager {
   #dispose: () => Promise<void>
   #adapter?: DriverAdapter
 
-  constructor(private env: EnvForAdapter<TAG>, driver: D1Database, dispose: () => Promise<void>) {
+  private constructor(private env: EnvForAdapter<TAG>, driver: D1Database, dispose: () => Promise<void>) {
     this.#driver = driver
     this.#dispose = dispose
   }
@@ -37,8 +37,6 @@ export class D1Manager implements DriverAdaptersManager {
     /* prisma migrate diff */
     if (migrationScript) {
       console.warn('[D1] Running database migration script')
-      console.warn(migrationScript)
-
       await migrateDiff(D1_DATABASE, migrationScript)
     }
 
@@ -61,7 +59,7 @@ async function migrateDiff(D1_DATABASE: D1Database, migrationScript: string) {
   // We thus need to run each statement separately, splitting the script by `;`.
   const sqlStatements = migrationScript.split(';')
   const preparedStatements = sqlStatements.map((sqlStatement) => D1_DATABASE.prepare(sqlStatement))
-  await D1_DATABASE.batch(preparedStatements)
+  await runBatch(D1_DATABASE, preparedStatements)
 }
 
 async function migrateReset(D1_DATABASE: D1Database) {
@@ -82,7 +80,7 @@ async function migrateReset(D1_DATABASE: D1Database) {
     } else if (table.type === 'view') {
       batch.push(`DROP VIEW "${table.name}";`)
     } else {
-      // TODO: Stop polling indexes and test on CI, they're probabably automatically
+      // TODO: Consider stop polling indexes and test on CI, they're probabably automatically
       // deleted when their table is dropped.
 
       const { results: rawIndexes } = ((await D1_DATABASE.prepare(`PRAGMA main.index_list("${table.name}");`).run()) as D1Result)

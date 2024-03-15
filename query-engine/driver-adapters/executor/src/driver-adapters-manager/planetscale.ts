@@ -1,7 +1,7 @@
 import { PrismaPlanetScale } from '@prisma/adapter-planetscale'
 import { planetScale } from '@prisma/bundled-js-drivers'
 import { DriverAdapter } from '@prisma/driver-adapter-utils'
-// import { fetch } from 'undici'
+import { fetch } from 'undici'
 import { copyPathName } from '../utils'
 import type { ConnectParams, DriverAdaptersManager } from './index'
 import type { DriverAdapterTag, Env } from '../types'
@@ -13,7 +13,7 @@ export class PlanetScaleManager implements DriverAdaptersManager {
   #driver?: planetScale.Client
   #adapter?: DriverAdapter
 
-  constructor(private env: Env & { readonly DRIVER_ADAPTER: TAG }) {}
+  private constructor(private env: Env & { readonly DRIVER_ADAPTER: TAG }) {}
 
   static async setup(env: Env & { readonly DRIVER_ADAPTER: TAG }) {
     return new PlanetScaleManager(env)
