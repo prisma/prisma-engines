@@ -46,9 +46,9 @@ impl TryFrom<&str> for Provider {
     }
 }
 
-impl Into<String> for Provider {
-    fn into(self) -> String {
-        serde_json::to_string(&self).unwrap()
+impl From<Provider> for String {
+    fn from(val: Provider) -> Self {
+        serde_json::to_string(&val).unwrap()
     }
 }
 
