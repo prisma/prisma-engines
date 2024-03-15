@@ -86,19 +86,17 @@ where
             .map_err(|err| ConnectorError::from_msg(format!("Error migrating with D1 adapter: {}", err)))?;
 
         // TODO: consider adding a busy loop until JavaScript acknowledges the migration is complete.
-
-        Ok(())
     } else {
-        let connector_result = setup(prisma_schema, db_schemas).await?;
+        setup(prisma_schema, db_schemas).await?;
 
         // 3. Tell JavaScript to initialize the external test session.
         //    The schema migration is taken care of by the Schema Engine.
         initializer.init().await.map_err(|err| {
             ConnectorError::from_msg(format!("Error initializing {} adapter: {}", driver_adapter, err))
         })?;
-
-        Ok(connector_result)
     }
+
+    Ok(())
 }
 
 /// Database setup for connector-test-kit-rs.
