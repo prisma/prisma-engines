@@ -14,6 +14,9 @@ pub enum DriverAdapter {
 
     #[serde(rename = "libsql")]
     LibSQL,
+
+    #[serde(rename = "d1")]
+    D1,
 }
 
 impl From<String> for DriverAdapter {

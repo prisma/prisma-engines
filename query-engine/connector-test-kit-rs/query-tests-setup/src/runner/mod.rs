@@ -79,6 +79,47 @@ pub struct ExternalExecutor {
     schema_id: usize,
 }
 
+/// [`ExternalExecutorInitializer`] is responsible for initialising a test session for the external process.
+/// The initialisation can happen with or without a migration script, and is performed by submitting the
+/// "initializeSchema" JSON-RPC request.
+/// [`ExternalExecutorInitializer::schema_id`] is the schema id of the parent [`ExternalExecutor`].
+/// [`ExternalExecutorInitializer::url`] and [`ExternalExecutorInitializer::schema`] are the context
+/// necessary for the "initializeSchema" JSON-RPC request.
+/// The usage of `&'a str` is to avoid problems with `String` not implementing the `Copy` trait.
+struct ExternalExecutorInitializer<'a> {
+    schema_id: usize,
+    url: &'a str,
+    schema: &'a str,
+}
+
+impl<'a> qe_setup::ExternalInitializer<'a> for ExternalExecutorInitializer<'a> {
+    async fn init_with_migration(
+        &self,
+        migration_script: String,
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        let migration_script = Some(migration_script);
+        executor_process_request("initializeSchema", json!({ "schemaId": self.schema_id, "schema": self.schema, "url": self.url, "migrationScript": migration_script })).await?;
+        Ok(())
+    }
+
+    async fn init(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        executor_process_request(
+            "initializeSchema",
+            json!({ "schemaId": self.schema_id, "schema": self.schema, "url": self.url }),
+        )
+        .await?;
+        Ok(())
+    }
+
+    fn url(&self) -> &'a str {
+        self.url
+    }
+
+    fn datamodel(&self) -> &'a str {
+        self.schema
+    }
+}
+
 impl ExternalExecutor {
     /// Request a new schema id to be used for the external process.
     /// This operation wraps around on overflow.
@@ -87,23 +128,18 @@ impl ExternalExecutor {
         COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
     }
 
-    pub(crate) fn new() -> Self {
+    fn new() -> Self {
         let schema_id = Self::external_schema_id();
         Self { schema_id }
     }
 
-    pub(crate) async fn initialize_schema(
-        &self,
-        schema: &str,
-        url: &str,
-    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        executor_process_request(
-            "initializeSchema",
-            json!({ "schemaId": self.schema_id, "schema": schema, "url": url }),
-        )
-        .await?;
-
-        Ok(())
+    /// Create a temporary initializer for external Driver Adapters.
+    fn init<'a>(&self, datamodel: &'a str, url: &'a str) -> ExternalExecutorInitializer<'a> {
+        ExternalExecutorInitializer {
+            schema_id: self.schema_id,
+            url,
+            schema: datamodel,
+        }
     }
 
     pub(self) async fn query<JsonQuery: Serialize>(
@@ -174,7 +210,7 @@ pub struct Runner {
 
 impl Runner {
     pub(crate) fn schema_id(&self) -> Option<usize> {
-        match self.executor {
+        match &self.executor {
             RunnerExecutor::Builtin(_) => None,
             RunnerExecutor::External(external) => Some(external.schema_id),
         }
@@ -196,28 +232,26 @@ impl Runner {
         metrics: MetricRegistry,
         log_capture: TestLogCapture,
     ) -> TestResult<Self> {
-        qe_setup::setup(&datamodel, db_schemas).await?;
-
         let protocol = EngineProtocol::from(&ENGINE_PROTOCOL.to_string());
         let schema = psl::parse_schema(&datamodel).unwrap();
         let datasource = schema.configuration.datasources.first().unwrap();
         let url = datasource.load_url(|key| env::var(key).ok()).unwrap();
 
-        qe_setup::setup(&datamodel, db_schemas).await?;
-
         let (executor, db_version) = match crate::CONFIG.with_driver_adapter() {
-            Some(_with_driver_adapter) => {
+            Some(with_driver_adapter) => {
                 let external_executor = ExternalExecutor::new();
+                let external_initializer: ExternalExecutorInitializer<'_> =
+                    external_executor.init(&datamodel, url.as_str());
                 let executor = RunnerExecutor::External(external_executor);
 
-                external_executor.initialize_schema(&datamodel, url.as_str()).await?;
-
-                // TODO: setup for D1 will happen here
+                qe_setup::setup_external(with_driver_adapter.adapter, external_initializer, db_schemas).await?;
 
                 let database_version = None;
                 (executor, database_version)
             }
             None => {
+                qe_setup::setup(&datamodel, db_schemas).await?;
+
                 let query_executor = request_handlers::load_executor(
                     ConnectorKind::Rust {
                         url: url.to_owned(),
