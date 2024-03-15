@@ -5,8 +5,8 @@ import { fileURLToPath } from 'node:url'
 export const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export function copyPathName({ fromURL, toURL }: { fromURL: string, toURL: string }) {
-  const toObj = new URL(fromURL)
-  toObj.pathname = new URL(toURL).pathname
+  const toObj = new URL(toURL)
+  toObj.pathname = new URL(fromURL).pathname
 
   return toObj.toString()
 }
