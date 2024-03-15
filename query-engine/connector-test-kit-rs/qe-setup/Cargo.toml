@@ -13,6 +13,7 @@ test-setup = { path = "../../../libs/test-setup" }
 enumflags2.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+tokio.workspace = true
 
 connection-string = "*"
 mongodb = "2.8.0"

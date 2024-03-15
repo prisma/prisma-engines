@@ -18,8 +18,6 @@ if (!global.crypto) {
 }
 
 async function initialiseDriverAdapterManager(env: Env, migrationScript?: string): Promise<DriverAdaptersManager> {
-    console.warn('Initialising driver adapter manager with env:\n', env)
-
     return match(env)
       .with({ DRIVER_ADAPTER: 'pg' }, async (env) => await PgManager.setup(env))
       .with({ DRIVER_ADAPTER: 'neon:ws' }, async (env) => await NeonWsManager.setup(env))

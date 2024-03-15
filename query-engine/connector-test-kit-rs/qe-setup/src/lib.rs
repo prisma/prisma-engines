@@ -85,6 +85,9 @@ where
             .await
             .map_err(|err| ConnectorError::from_msg(format!("Error migrating with D1 adapter: {}", err)))?;
 
+        // TODO: add busy loop until JavaScript acknowledges the migration is complete.
+        tokio::time::sleep(std::time::Duration::from_millis(250)).await;
+
         Ok(())
     } else {
         // 3. Tell JavaScript to initialize the external test session.

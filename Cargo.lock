@@ -3542,6 +3542,7 @@ dependencies = [
  "serde_json",
  "sql-schema-connector",
  "test-setup",
+ "tokio",
  "url",
 ]
 
