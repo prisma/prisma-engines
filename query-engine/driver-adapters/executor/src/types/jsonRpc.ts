@@ -7,6 +7,7 @@ const InitializeSchemaParams = S.struct({
   schemaId: SchemaId,
   schema: S.string,
   url: S.string,
+  migrationScript: S.optional(S.string),
 })
 export type InitializeSchemaParams = S.Schema.Type<typeof InitializeSchemaParams>
 

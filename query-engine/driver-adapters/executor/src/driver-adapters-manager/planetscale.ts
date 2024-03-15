@@ -32,4 +32,6 @@ export class PlanetScaleManager implements DriverAdaptersManager {
 
     return this.#adapter
   }
+
+  async teardown() {}
 }

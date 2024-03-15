@@ -6,5 +6,5 @@ export type ConnectParams = {
 
 export interface DriverAdaptersManager {
   connect: (params: ConnectParams) => Promise<DriverAdapter>
-  teardown?: () => Promise<void>
+  teardown: () => Promise<void>
 }

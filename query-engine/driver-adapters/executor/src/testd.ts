@@ -17,7 +17,7 @@ if (!global.crypto) {
   global.crypto = webcrypto as Crypto
 }
 
-async function initialiseDriverAdapterManager(env: Env): Promise<DriverAdaptersManager> {
+async function initialiseDriverAdapterManager(env: Env, migrationScript?: string): Promise<DriverAdaptersManager> {
     console.warn('Initialising driver adapter manager with env:\n', env)
 
     return match(env)
@@ -25,7 +25,7 @@ async function initialiseDriverAdapterManager(env: Env): Promise<DriverAdaptersM
       .with({ DRIVER_ADAPTER: 'neon:ws' }, async (env) => await NeonWsManager.setup(env))
       .with({ DRIVER_ADAPTER: 'libsql' }, async (env) => await LibSQLManager.setup(env))
       .with({ DRIVER_ADAPTER: 'planetscale' }, async (env) => await PlanetScaleManager.setup(env))
-      .with({ DRIVER_ADAPTER: 'd1' }, async (env) => await D1Manager.setup(env))
+      .with({ DRIVER_ADAPTER: 'd1' }, async (env) => await D1Manager.setup(env, migrationScript))
       .exhaustive()
 }
 
@@ -69,7 +69,7 @@ async function main(): Promise<void> {
                 })
             }
         } catch (err) {
-            console.error("Received non-json line: ", line);
+            debug("Received non-json line: ", line);
             console.error(err)
         }
 
@@ -77,20 +77,21 @@ async function main(): Promise<void> {
 }
 
 const state: Record<number, {
-    engine: qe.QueryEngine,
-    adapter: ErrorCapturingDriverAdapter,
+    engine: qe.QueryEngine
+    driverAdapterManager: DriverAdaptersManager
+    adapter: ErrorCapturingDriverAdapter
     logs: string[]
 }> = {}
 
 async function handleRequest({ method, params }: jsonRpc.Request, env: Env): Promise<unknown> {
     switch (method) {
         case 'initializeSchema': {
-            const { url, schema, schemaId } = params
+            const { url, schema, schemaId, migrationScript } = params
             const logs = [] as string[]
 
             const logCallback = (log) => { logs.push(log) }
 
-            const driverAdapterManager = await initialiseDriverAdapterManager(env)
+            const driverAdapterManager = await initialiseDriverAdapterManager(env, migrationScript)
             const engineType = env.EXTERNAL_TEST_EXECUTOR ?? 'Napi'
 
             const { engine, adapter } = await initQe({
@@ -103,6 +104,7 @@ async function handleRequest({ method, params }: jsonRpc.Request, env: Env): Pro
 
             state[schemaId] = {
                 engine,
+                driverAdapterManager,
                 adapter,
                 logs
             }
@@ -156,7 +158,9 @@ async function handleRequest({ method, params }: jsonRpc.Request, env: Env): Pro
         case 'teardown': {
             debug("Got `teardown", params)
             const { schemaId } = params
+
             await state[schemaId].engine.disconnect("")
+            await state[schemaId].driverAdapterManager.teardown()
             delete state[schemaId]
 
             return {}

@@ -26,4 +26,8 @@ export class PgManager implements DriverAdaptersManager {
 
     return this.#adapter
   }
+
+  async teardown() {
+    await this.#driver?.end()
+  }
 }

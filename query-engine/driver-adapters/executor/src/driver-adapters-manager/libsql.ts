@@ -23,4 +23,6 @@ export class LibSQLManager implements DriverAdaptersManager {
 
     return this.#adapter
   }
+
+  async teardown() {}
 }

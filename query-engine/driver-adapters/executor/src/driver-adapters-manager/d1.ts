@@ -21,16 +21,31 @@ export class D1Manager implements DriverAdaptersManager {
     this.#dispose = dispose
   }
 
-  static async setup(env: EnvForAdapter<TAG>) {
+  static async setup(env: EnvForAdapter<TAG>, migrationScript?: string) {
     const { env: cfBindings, dispose } = await getPlatformProxy<{ D1_DATABASE: D1Database }>({
       configPath: path.join(__dirname, "../wrangler.toml"),
     })
-    
-    return new D1Manager(env, cfBindings.D1_DATABASE, dispose)
+
+    const { D1_DATABASE } = cfBindings
+
+    if (migrationScript) {
+      console.warn('Running migration script for D1 database')
+      console.warn(migrationScript)
+
+      // Note: when running a script with multiple statements, D1 fails with
+      // `D1_ERROR: A prepared SQL statement must contain only one statement.`
+      // We thus need to run each statement separately, splitting the script by `;`.
+      const sqlStatements = migrationScript.split(';')
+      const preparedStatements = sqlStatements.map((sqlStatement) => D1_DATABASE.prepare(sqlStatement))
+      await D1_DATABASE.batch(preparedStatements)
+    }
+
+    return new D1Manager(env, D1_DATABASE, dispose)
   }
 
-  async connect({ url }: ConnectParams) {
-    return new PrismaD1(this.#driver)
+  async connect({}: ConnectParams) {
+    this.#adapter = new PrismaD1(this.#driver)
+    return this.#adapter
   }
 
   async teardown() {
