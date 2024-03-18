@@ -8,7 +8,7 @@ use crate::{
 use async_trait::async_trait;
 use connector::Connector;
 use schema::QuerySchemaRef;
-use tokio::time::{self, Duration};
+use tokio::time::Duration;
 use tracing_futures::Instrument;
 
 /// Central query executor and main entry point into the query core.
@@ -36,7 +36,8 @@ where
     }
 }
 
-#[async_trait]
+#[cfg_attr(target_arch = "wasm32", async_trait(?Send))]
+#[cfg_attr(not(target_arch = "wasm32"), async_trait)]
 impl<C> QueryExecutor for InterpretingExecutor<C>
 where
     C: Connector + Send + Sync + 'static,
@@ -140,7 +141,8 @@ where
     }
 }
 
-#[async_trait]
+#[cfg_attr(target_arch = "wasm32", async_trait(?Send))]
+#[cfg_attr(not(target_arch = "wasm32"), async_trait)]
 impl<C> TransactionManager for InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
@@ -162,7 +164,7 @@ where
                 user_facing = true,
                 "db.type" = self.connector.name()
             );
-            let conn = time::timeout(
+            let conn = crosstarget_utils::time::timeout(
                 Duration::from_millis(tx_opts.max_acquisition_millis),
                 self.connector.get_connection(),
             )

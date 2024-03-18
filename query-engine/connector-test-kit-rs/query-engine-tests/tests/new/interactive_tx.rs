@@ -213,7 +213,7 @@ mod interactive_tx {
         Ok(())
     }
 
-    #[connector_test(exclude(JS))]
+    #[connector_test(exclude(Vitess("planetscale.js.wasm")))]
     async fn batch_queries_failure(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
         let tx_id = runner.start_tx(5000, 5000, None).await?;
@@ -256,7 +256,7 @@ mod interactive_tx {
         Ok(())
     }
 
-    #[connector_test(exclude(JS))]
+    #[connector_test(exclude(Vitess("planetscale.js.wasm")))]
     async fn tx_expiration_failure_cycle(mut runner: Runner) -> TestResult<()> {
         // Tx expires after one seconds.
         let tx_id = runner.start_tx(5000, 1000, None).await?;
@@ -573,7 +573,10 @@ mod itx_isolation {
     use query_engine_tests::*;
 
     // All (SQL) connectors support serializable.
-    #[connector_test(exclude(MongoDb))]
+    // However, there's a bug in the PlanetScale driver adapter:
+    // "Transaction characteristics can't be changed while a transaction is in progress
+    // (errno 1568) (sqlstate 25001) during query: SET TRANSACTION ISOLATION LEVEL SERIALIZABLE"
+    #[connector_test(exclude(MongoDb, Vitess("planetscale.js", "planetscale.js.wasm")))]
     async fn basic_serializable(mut runner: Runner) -> TestResult<()> {
         let tx_id = runner.start_tx(5000, 5000, Some("Serializable".to_owned())).await?;
         runner.set_active_tx(tx_id.clone());
@@ -595,7 +598,9 @@ mod itx_isolation {
         Ok(())
     }
 
-    #[connector_test(exclude(MongoDb))]
+    // On PlanetScale, this fails with:
+    // `InteractiveTransactionError("Error in connector: Error querying the database: Server error: `ERROR 25001 (1568): Transaction characteristics can't be changed while a transaction is in progress'")`
+    #[connector_test(exclude(MongoDb, Vitess("planetscale.js", "planetscale.js.wasm")))]
     async fn casing_doesnt_matter(mut runner: Runner) -> TestResult<()> {
         let tx_id = runner.start_tx(5000, 5000, Some("sErIaLiZaBlE".to_owned())).await?;
         runner.set_active_tx(tx_id.clone());

@@ -72,10 +72,7 @@ pub(super) fn unique_index_has_a_unique_custom_name_per_model(
 
 /// The database must support the index length prefix for it to be allowed in the data model.
 pub(crate) fn field_length_prefix_supported(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx
-        .connector
-        .has_capability(ConnectorCapability::IndexColumnLengthPrefixing)
-    {
+    if ctx.has_capability(ConnectorCapability::IndexColumnLengthPrefixing) {
         return;
     }
 
@@ -109,7 +106,7 @@ pub(crate) fn fulltext_index_preview_feature_enabled(index: IndexWalker<'_>, ctx
 
 /// `@@fulltext` should only be available if we support it in the database.
 pub(crate) fn fulltext_index_supported(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx.connector.has_capability(ConnectorCapability::FullTextIndex) {
+    if ctx.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
@@ -130,7 +127,7 @@ pub(crate) fn fulltext_columns_should_not_define_length(index: IndexWalker<'_>, 
         return;
     }
 
-    if !ctx.connector.has_capability(ConnectorCapability::FullTextIndex) {
+    if !ctx.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
@@ -155,7 +152,7 @@ pub(crate) fn fulltext_column_sort_is_supported(index: IndexWalker<'_>, ctx: &mu
         return;
     }
 
-    if !ctx.connector.has_capability(ConnectorCapability::FullTextIndex) {
+    if !ctx.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
@@ -163,10 +160,7 @@ pub(crate) fn fulltext_column_sort_is_supported(index: IndexWalker<'_>, ctx: &mu
         return;
     }
 
-    if ctx
-        .connector
-        .has_capability(ConnectorCapability::SortOrderInFullTextIndex)
-    {
+    if ctx.has_capability(ConnectorCapability::SortOrderInFullTextIndex) {
         return;
     }
 
@@ -191,7 +185,7 @@ pub(crate) fn fulltext_text_columns_should_be_bundled_together(index: IndexWalke
         return;
     }
 
-    if !ctx.connector.has_capability(ConnectorCapability::FullTextIndex) {
+    if !ctx.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
@@ -199,10 +193,7 @@ pub(crate) fn fulltext_text_columns_should_be_bundled_together(index: IndexWalke
         return;
     }
 
-    if !ctx
-        .connector
-        .has_capability(ConnectorCapability::SortOrderInFullTextIndex)
-    {
+    if !ctx.has_capability(ConnectorCapability::SortOrderInFullTextIndex) {
         return;
     }
 
@@ -285,7 +276,7 @@ pub(super) fn has_fields(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
 }
 
 pub(crate) fn supports_clustering_setting(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx.connector.has_capability(ConnectorCapability::ClusteringSetting) {
+    if ctx.has_capability(ConnectorCapability::ClusteringSetting) {
         return;
     }
 
@@ -301,7 +292,7 @@ pub(crate) fn supports_clustering_setting(index: IndexWalker<'_>, ctx: &mut Cont
 }
 
 pub(crate) fn clustering_can_be_defined_only_once(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.connector.has_capability(ConnectorCapability::ClusteringSetting) {
+    if !ctx.has_capability(ConnectorCapability::ClusteringSetting) {
         return;
     }
 
@@ -386,20 +377,25 @@ pub(crate) fn opclasses_are_not_allowed_with_other_than_normal_indices(index: In
     }
 }
 
-pub(crate) fn composite_types_are_not_allowed_in_index(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    for field in index.fields() {
-        if field.scalar_field_type().as_composite_type().is_some() {
-            let message = format!(
-                "Indexes can only contain scalar attributes. Please remove {:?} from the argument list of the indexes.",
-                field.name()
-            );
-            ctx.push_error(DatamodelError::new_attribute_validation_error(
-                &message,
-                index.attribute_name(),
-                index.ast_attribute().span,
-            ));
-            return;
-        }
+pub(crate) fn composite_type_in_compound_unique_index(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
+    if !index.is_unique() {
+        return;
+    }
+
+    let composite_type = index
+        .fields()
+        .find(|f| f.scalar_field_type().as_composite_type().is_some());
+
+    if index.fields().len() > 1 && composite_type.is_some() {
+        let message = format!(
+            "Prisma does not currently support composite types in compound unique indices, please remove {:?} from the index. See https://pris.ly/d/mongodb-composite-compound-indices for more details",
+            composite_type.unwrap().name()
+        );
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            &message,
+            index.attribute_name(),
+            index.ast_attribute().span,
+        ));
     }
 }
 

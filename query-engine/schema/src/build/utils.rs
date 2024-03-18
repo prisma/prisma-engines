@@ -1,6 +1,6 @@
 use super::*;
 use once_cell::sync::Lazy;
-use prisma_models::{walkers, DefaultKind};
+use query_structure::{walkers, DefaultKind};
 use std::borrow::Cow;
 
 /// Input object type convenience wrapper function.

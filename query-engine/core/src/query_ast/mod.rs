@@ -5,8 +5,7 @@ pub use read::*;
 pub use write::*;
 
 use crate::ToGraphviz;
-use connector::filter::Filter;
-use prisma_models::{FieldSelection, Model, SelectionResult};
+use query_structure::{FieldSelection, Filter, Model, SelectionResult};
 
 #[derive(Debug, Clone)]
 #[allow(clippy::large_enum_variant)]

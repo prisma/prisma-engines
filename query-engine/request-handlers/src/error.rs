@@ -56,6 +56,7 @@ impl From<connection_string::Error> for HandlerError {
     }
 }
 
+#[cfg(feature = "graphql-protocol")]
 impl From<graphql_parser::query::ParseError> for HandlerError {
     fn from(e: graphql_parser::query::ParseError) -> Self {
         Self::configuration(format!("Error parsing GraphQL query: {e}"))

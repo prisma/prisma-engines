@@ -34,7 +34,7 @@ macro_rules! features {
     };
 }
 
-// (Usually) Append-only list of features.
+// (Usually) Append-only list of features. (alphabetically sorted)
 features!(
     AggregateApi,
     AtomicNumberOperations,
@@ -64,6 +64,7 @@ features!(
     MultiSchema,
     NamedConstraints,
     NApi,
+    NativeDistinct,
     NativeTypes,
     OrderByAggregateGroup,
     OrderByNulls,
@@ -76,9 +77,10 @@ features!(
     TransactionApi,
     UncheckedScalarInputs,
     Views,
+    RelationJoins
 );
 
-/// Generator preview features
+/// Generator preview features (alphabetically sorted)
 pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
         Deno
@@ -87,9 +89,11 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | FullTextSearch
          | Metrics
          | MultiSchema
+         | NativeDistinct
          | PostgresqlExtensions
          | Tracing
          | Views
+         | RelationJoins
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations

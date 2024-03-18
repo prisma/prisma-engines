@@ -4,10 +4,7 @@ use parser_database::{ast::WithSpan, walkers::TwoWayEmbeddedManyToManyRelationWa
 
 /// Only MongoDb should support embedded M:N relations.
 pub(crate) fn supports_embedded_relations(relation: TwoWayEmbeddedManyToManyRelationWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx
-        .connector
-        .has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation)
-    {
+    if ctx.has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation) {
         return;
     }
 
@@ -31,10 +28,7 @@ pub(crate) fn defines_references_on_both_sides(
     relation: TwoWayEmbeddedManyToManyRelationWalker<'_>,
     ctx: &mut Context<'_>,
 ) {
-    if !ctx
-        .connector
-        .has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation)
-    {
+    if !ctx.has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation) {
         return;
     }
 
@@ -67,10 +61,7 @@ pub(crate) fn defines_fields_on_both_sides(
     relation: TwoWayEmbeddedManyToManyRelationWalker<'_>,
     ctx: &mut Context<'_>,
 ) {
-    if !ctx
-        .connector
-        .has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation)
-    {
+    if !ctx.has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation) {
         return;
     }
 
@@ -102,10 +93,7 @@ pub(crate) fn references_id_from_both_sides(
     relation: TwoWayEmbeddedManyToManyRelationWalker<'_>,
     ctx: &mut Context<'_>,
 ) {
-    if !ctx
-        .connector
-        .has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation)
-    {
+    if !ctx.has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation) {
         return;
     }
 
@@ -136,10 +124,7 @@ pub(crate) fn referencing_with_an_array_field_of_correct_type(
     relation: TwoWayEmbeddedManyToManyRelationWalker<'_>,
     ctx: &mut Context<'_>,
 ) {
-    if !ctx
-        .connector
-        .has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation)
-    {
+    if !ctx.has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation) {
         return;
     }
 
@@ -183,10 +168,7 @@ pub(crate) fn validate_no_referential_actions(
     relation: TwoWayEmbeddedManyToManyRelationWalker<'_>,
     ctx: &mut Context<'_>,
 ) {
-    if !ctx
-        .connector
-        .has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation)
-    {
+    if !ctx.has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation) {
         return;
     }
 

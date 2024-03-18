@@ -25,3 +25,34 @@ impl ConnectorTagInterface for SqliteConnectorTag {
         psl::builtin_connectors::SQLITE.capabilities()
     }
 }
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum SqliteVersion {
+    V3,
+    LibsqlJsNapi,
+    LibsqlJsWasm,
+}
+
+impl ToString for SqliteVersion {
+    fn to_string(&self) -> String {
+        match self {
+            SqliteVersion::V3 => "3".to_string(),
+            SqliteVersion::LibsqlJsNapi => "libsql.js".to_string(),
+            SqliteVersion::LibsqlJsWasm => "libsql.js.wasm".to_string(),
+        }
+    }
+}
+
+impl TryFrom<&str> for SqliteVersion {
+    type Error = TestError;
+
+    fn try_from(s: &str) -> Result<Self, Self::Error> {
+        let version = match s {
+            "3" => Self::V3,
+            "libsql.js" => Self::LibsqlJsNapi,
+            "libsql.js.wasm" => Self::LibsqlJsWasm,
+            _ => return Err(TestError::parse_error(format!("Unknown SQLite version `{s}`"))),
+        };
+        Ok(version)
+    }
+}

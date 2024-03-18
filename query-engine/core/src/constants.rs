@@ -1,5 +1,5 @@
 pub mod custom_types {
-    use prisma_models::PrismaValue;
+    use query_structure::PrismaValue;
 
     pub const TYPE: &str = "$type";
     pub const VALUE: &str = "value";
@@ -11,6 +11,7 @@ pub mod custom_types {
     pub const JSON: &str = "Json";
     pub const ENUM: &str = "Enum";
     pub const FIELD_REF: &str = "FieldRef";
+    pub const RAW: &str = "Raw";
 
     pub fn make_object(typ: &str, value: PrismaValue) -> PrismaValue {
         PrismaValue::Object(vec![make_type_pair(typ), make_value_pair(value)])

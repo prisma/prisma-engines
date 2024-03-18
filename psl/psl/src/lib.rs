@@ -1,17 +1,21 @@
 #![doc = include_str!("../README.md")]
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 
-pub use builtin_psl_connectors as builtin_connectors;
+pub use psl_core::builtin_connectors;
 pub use psl_core::{
+    builtin_connectors::{can_have_capability, can_support_relation_load_strategy, has_capability},
     datamodel_connector,
     diagnostics::{self, Diagnostics},
     is_reserved_type_name,
     mcf::config_to_mcf_json_value as get_config,
     mcf::{generators_to_json, render_sources_to_json}, // for tests
     parser_database::{self, SourceFile},
+    reachable_only_with_capability,
     reformat,
     schema_ast,
+    set_config_dir,
     Configuration,
+    ConnectorRegistry,
     Datasource,
     DatasourceConnectorData,
     Generator,
@@ -48,4 +52,9 @@ pub fn parse_schema(file: impl Into<SourceFile>) -> Result<ValidatedSchema, Stri
 /// validation information it can, and returns it along with any error and warning diagnostics.
 pub fn validate(file: SourceFile) -> ValidatedSchema {
     psl_core::validate(file, builtin_connectors::BUILTIN_CONNECTORS)
+}
+
+/// Parse a Prisma schema, but skip validations.
+pub fn parse_without_validation(file: SourceFile, connector_registry: ConnectorRegistry<'_>) -> ValidatedSchema {
+    psl_core::parse_without_validation(file, connector_registry)
 }

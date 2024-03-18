@@ -1,12 +1,12 @@
 use crate::{FieldQuery, HandlerError, JsonSingleQuery, SelectionSet};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use indexmap::IndexMap;
-use prisma_models::{decode_bytes, parse_datetime, prelude::ParentContainer, Field};
 use query_core::{
     constants::custom_types,
     schema::{ObjectType, OutputField, QuerySchema},
     ArgumentValue, Operation, Selection,
 };
+use query_structure::{decode_bytes, parse_datetime, prelude::ParentContainer, Field};
 use serde_json::Value as JsonValue;
 use std::str::FromStr;
 
@@ -198,6 +198,11 @@ impl<'a> JsonProtocolAdapter<'a> {
                     BigDecimal::from_str(value)
                         .map(ArgumentValue::float)
                         .map_err(|_| build_err())
+                }
+
+                Some(custom_types::RAW) => {
+                    let value = obj.get(custom_types::VALUE).ok_or_else(build_err)?;
+                    Ok(ArgumentValue::raw(value.clone()))
                 }
                 Some(custom_types::BYTES) => {
                     let value = obj

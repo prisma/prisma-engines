@@ -46,3 +46,16 @@ dmmf.json
 graph.dot
 
 prisma-schema-wasm/nodejs
+
+# Ignore pnpm-lock.yaml
+query-engine/driver-adapters/pnpm-lock.yaml
+package-lock.json
+
+# Useful for local wasm32-* development
+.cargo/
+
+# Human readable Wasm output
+*.wat
+
+# Folder with GraphViz representation of query graphs.
+.query_graphs
