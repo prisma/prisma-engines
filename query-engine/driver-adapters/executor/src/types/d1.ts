@@ -25,10 +25,3 @@ const D1Table = S.union(
 export type D1Table = S.Schema.Type<typeof D1Table>
 
 export const D1Tables = S.array(D1Table)
-
-const D1Index = S.struct({
-  name: S.string,
-  origin: S.literal('c', 'u', 'pk'),
-})
-
-export const D1Indexes = S.array(D1Index)

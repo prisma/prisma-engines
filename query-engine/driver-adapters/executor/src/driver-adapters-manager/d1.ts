@@ -8,7 +8,7 @@ import type { D1Database, D1Response, D1Result } from '@cloudflare/workers-types
 import { __dirname, runBatch } from '../utils'
 import type { ConnectParams, DriverAdaptersManager } from './index'
 import type { DriverAdapterTag, EnvForAdapter } from '../types'
-import { D1Indexes, D1Tables } from '../types/d1'
+import { D1Tables } from '../types/d1'
 
 const TAG = 'd1' as const satisfies DriverAdapterTag
 type TAG = typeof TAG
@@ -82,17 +82,8 @@ async function migrateReset(D1_DATABASE: D1Database) {
       // TODO: Consider stop polling indexes and test on CI, they're probabably automatically
       // deleted when their table is dropped.
 
-      const { results: rawIndexes } = ((await D1_DATABASE.prepare(`PRAGMA main.index_list("${table.name}");`).run()) as D1Result)
-
-      const indexes = S
-        .decodeUnknownSync(D1Indexes, { onExcessProperty: 'preserve' })(rawIndexes)
-
-      const indexesToDrop = indexes
-        .filter((index) => !['c'].includes(index.origin))
-        .map((index) => `DROP INDEX IF EXISTS "${index.name}";`)
-
       batch.push(`DROP TABLE IF EXISTS "${table.name}";`)
-      batch.push(...indexesToDrop)
+      // batch.push(...indexesToDrop)
     }
   }
 
