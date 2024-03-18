@@ -8,6 +8,7 @@ mod sqlite;
 mod vitess;
 
 pub use mysql::MySqlVersion;
+pub use sqlite::SqliteVersion;
 pub use vitess::VitessVersion;
 
 pub(crate) use cockroachdb::*;
