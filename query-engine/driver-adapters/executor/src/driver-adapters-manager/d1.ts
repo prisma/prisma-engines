@@ -78,7 +78,7 @@ async function migrateReset(D1_DATABASE: D1Database) {
     if (table.name === 'sqlite_sequence') {
       batch.push('DELETE FROM `sqlite_sequence`;')
     } else if (table.type === 'view') {
-      batch.push(`DROP VIEW "${table.name}";`)
+      batch.push(`DROP VIEW IF EXISTS "${table.name}";`)
     } else {
       // TODO: Consider stop polling indexes and test on CI, they're probabably automatically
       // deleted when their table is dropped.
@@ -92,7 +92,7 @@ async function migrateReset(D1_DATABASE: D1Database) {
         .filter((index) => !['c'].includes(index.origin))
         .map((index) => `DROP INDEX IF EXISTS "${index.name}";`)
 
-      batch.push(`DROP TABLE "${table.name}";`)
+      batch.push(`DROP TABLE IF EXISTS "${table.name}";`)
       batch.push(...indexesToDrop)
     }
   }

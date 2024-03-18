@@ -4,7 +4,7 @@ import { DriverAdapter } from '@prisma/driver-adapter-utils'
 import { fetch } from 'undici'
 import { copyPathName } from '../utils'
 import type { ConnectParams, DriverAdaptersManager } from './index'
-import type { DriverAdapterTag, Env } from '../types'
+import type { DriverAdapterTag, EnvForAdapter } from '../types'
 
 const TAG = 'planetscale' as const satisfies DriverAdapterTag
 type TAG = typeof TAG
@@ -13,9 +13,9 @@ export class PlanetScaleManager implements DriverAdaptersManager {
   #driver?: planetScale.Client
   #adapter?: DriverAdapter
 
-  private constructor(private env: Env & { readonly DRIVER_ADAPTER: TAG }) {}
+  private constructor(private env: EnvForAdapter<TAG>) {}
 
-  static async setup(env: Env & { readonly DRIVER_ADAPTER: TAG }) {
+  static async setup(env: EnvForAdapter<TAG>) {
     return new PlanetScaleManager(env)
   }
 

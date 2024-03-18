@@ -20,7 +20,7 @@ export async function getEngineForProvider(provider: EngineName) {
     if (!initializedModules.has(provider)) {
         const subDir = provider === 'postgres' ? 'postgresql' : provider
         const bytes = await fs.readFile(path.resolve(__dirname, '..', '..', '..', 'query-engine-wasm', 'pkg', subDir, 'query_engine_bg.wasm'))
-        const module = new WebAssembly.Module(bytes) 
+        const module = new WebAssembly.Module(bytes)
         const instance = new WebAssembly.Instance(module, { './query_engine_bg.js': engine })
         engine.__wbg_set_wasm(instance.exports);
         initializedModules.add(provider)
