@@ -72,7 +72,6 @@ async function migrateReset(D1_DATABASE: D1Database) {
 
   // temporarily allow violating foreign key constraints
   batch.push(`PRAGMA defer_foreign_keys = ${1};`)
-  batch.push(`PRAGMA foreign_keys = ${0};`)
 
   for (const table of tables) {
     if (table.name === 'sqlite_sequence') {
@@ -99,7 +98,6 @@ async function migrateReset(D1_DATABASE: D1Database) {
 
   // stop violating foreign key constraints
   batch.push(`PRAGMA defer_foreign_keys = ${0};`)
-  batch.push(`PRAGMA foreign_keys = ${1};`)
 
   const statements = batch.map((sql) => D1_DATABASE.prepare(sql))
   const batchResult = (await runBatch(D1_DATABASE, statements)) as D1Response[]
