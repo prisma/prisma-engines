@@ -32,9 +32,6 @@ export class D1Manager implements DriverAdaptersManager {
 
     /* prisma migrate reset */
     console.warn('[D1] Resetting database')
-    console.warn(typeof migrationScript)
-    console.warn(migrationScript === '')
-    console.warn(migrationScript)
     await migrateReset(D1_DATABASE)
 
     /* prisma migrate diff */
