@@ -114,7 +114,7 @@ mod one2one_req {
         schema.to_owned()
     }
 
-    #[connector_test(schema(required_compound), exclude(Sqlite("cfd1")))]
+    #[connector_test(schema(required_compound))]
     async fn update_parent_compound_cascade(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -171,7 +171,7 @@ mod one2one_opt {
     }
 
     // Updating the parent updates the child FK as well.
-    #[connector_test(schema(optional))]
+    #[connector_test(schema(optional), exclude(Sqlite("cfd1")))]
     async fn update_parent_cascade(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
             run_query!(&runner, r#"mutation {

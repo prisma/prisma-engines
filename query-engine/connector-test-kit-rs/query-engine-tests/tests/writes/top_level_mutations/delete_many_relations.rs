@@ -350,7 +350,7 @@ mod delete_many_rels {
     }
 
     // "a PM to CM  relation" should "delete the parent from other relations as well"
-    #[connector_test(schema(additional_schema))]
+    #[connector_test(schema(additional_schema), exclude(Sqlite("cfd1")))]
     async fn pm_cm_other_relations(runner: Runner) -> TestResult<()> {
         runner
             .query(

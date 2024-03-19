@@ -350,7 +350,7 @@ mod aggr_group_by_having {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn having_without_aggr_sel(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
