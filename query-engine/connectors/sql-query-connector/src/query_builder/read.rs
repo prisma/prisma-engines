@@ -2,49 +2,49 @@ use crate::{
     cursor_condition, filter::FilterBuilder, model_extensions::*, nested_aggregations, ordering::OrderByBuilder,
     sql_trace::SqlTraceComment, Context,
 };
-use connector_interface::{AggregationSelection, RelAggregationSelection};
+use connector_interface::AggregationSelection;
 use itertools::Itertools;
 use quaint::ast::*;
 use query_structure::*;
 use tracing::Span;
 
 pub(crate) trait SelectDefinition {
-    fn into_select(
+    fn into_select<'a>(
         self,
         _: &Model,
-        aggr_selections: &[RelAggregationSelection],
+        virtual_selections: impl IntoIterator<Item = &'a VirtualSelection>,
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>);
 }
 
 impl SelectDefinition for Filter {
-    fn into_select(
+    fn into_select<'a>(
         self,
         model: &Model,
-        aggr_selections: &[RelAggregationSelection],
+        virtual_selections: impl IntoIterator<Item = &'a VirtualSelection>,
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         let args = QueryArguments::from((model.clone(), self));
-        args.into_select(model, aggr_selections, ctx)
+        args.into_select(model, virtual_selections, ctx)
     }
 }
 
 impl SelectDefinition for &Filter {
-    fn into_select(
+    fn into_select<'a>(
         self,
         model: &Model,
-        aggr_selections: &[RelAggregationSelection],
+        virtual_selections: impl IntoIterator<Item = &'a VirtualSelection>,
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
-        self.clone().into_select(model, aggr_selections, ctx)
+        self.clone().into_select(model, virtual_selections, ctx)
     }
 }
 
 impl SelectDefinition for Select<'static> {
-    fn into_select(
+    fn into_select<'a>(
         self,
         _: &Model,
-        _: &[RelAggregationSelection],
+        _: impl IntoIterator<Item = &'a VirtualSelection>,
         _ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         (self, vec![])
@@ -52,15 +52,15 @@ impl SelectDefinition for Select<'static> {
 }
 
 impl SelectDefinition for QueryArguments {
-    fn into_select(
+    fn into_select<'a>(
         self,
         model: &Model,
-        aggr_selections: &[RelAggregationSelection],
+        virtual_selections: impl IntoIterator<Item = &'a VirtualSelection>,
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         let order_by_definitions = OrderByBuilder::default().build(&self, ctx);
         let cursor_condition = cursor_condition::build(&self, model, &order_by_definitions, ctx);
-        let aggregation_joins = nested_aggregations::build(aggr_selections, ctx);
+        let aggregation_joins = nested_aggregations::build(virtual_selections, ctx);
 
         let limit = if self.ignore_take { None } else { self.take_abs() };
         let skip = if self.ignore_skip { 0 } else { self.skip.unwrap_or(0) };
@@ -124,17 +124,17 @@ impl SelectDefinition for QueryArguments {
     }
 }
 
-pub(crate) fn get_records<T>(
+pub(crate) fn get_records<'a, T>(
     model: &Model,
     columns: impl Iterator<Item = Column<'static>>,
-    aggr_selections: &[RelAggregationSelection],
+    virtual_selections: impl IntoIterator<Item = &'a VirtualSelection>,
     query: T,
     ctx: &Context<'_>,
 ) -> Select<'static>
 where
     T: SelectDefinition,
 {
-    let (select, additional_selection_set) = query.into_select(model, aggr_selections, ctx);
+    let (select, additional_selection_set) = query.into_select(model, virtual_selections, ctx);
     let select = columns.fold(select, |acc, col| acc.column(col));
 
     let select = select.append_trace(&Span::current()).add_trace_id(ctx.trace_id);

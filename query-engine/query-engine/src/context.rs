@@ -4,6 +4,7 @@ use crate::{PrismaError, PrismaResult};
 use psl::PreviewFeature;
 use query_core::{
     protocol::EngineProtocol,
+    relation_load_strategy,
     schema::{self, QuerySchemaRef},
     QueryExecutor,
 };
@@ -46,10 +47,7 @@ impl PrismaContext {
 
         let query_schema_fut = tokio::runtime::Handle::current().spawn_blocking(move || {
             // Construct query schema
-            Arc::new(schema::build(
-                arced_schema,
-                enabled_features.contains(Feature::RawQueries),
-            ))
+            schema::build(arced_schema, enabled_features.contains(Feature::RawQueries))
         });
         let executor_fut = tokio::spawn(async move {
             let config = &arced_schema_2.configuration;
@@ -64,15 +62,22 @@ impl PrismaContext {
             let url = datasource.load_url(|key| env::var(key).ok())?;
             // Load executor
             let executor = load_executor(ConnectorKind::Rust { url, datasource }, preview_features).await?;
-            executor.primary_connector().get_connection().await?;
-            PrismaResult::<_>::Ok(executor)
+            let conn = executor.primary_connector().get_connection().await?;
+            let db_version = conn.version().await;
+
+            PrismaResult::<_>::Ok((executor, db_version))
         });
 
-        let (query_schema, executor) = tokio::join!(query_schema_fut, executor_fut);
+        let (query_schema, executor_with_db_version) = tokio::join!(query_schema_fut, executor_fut);
+        let (executor, db_version) = executor_with_db_version.unwrap()?;
+
+        let query_schema = query_schema.unwrap().with_db_version_supports_join_strategy(
+            relation_load_strategy::db_version_supports_joins_strategy(db_version)?,
+        );
 
         let context = Self {
-            query_schema: query_schema.unwrap(),
-            executor: executor.unwrap()?,
+            query_schema: Arc::new(query_schema),
+            executor,
             metrics: metrics.unwrap_or_default(),
             engine_protocol: protocol,
             enabled_features,

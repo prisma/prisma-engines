@@ -1,4 +1,4 @@
-use psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
+use psl::{datamodel_connector::ConnectorCapability, has_capability, PreviewFeature};
 
 use crate::*;
 
@@ -33,9 +33,26 @@ pub enum RelationLoadStrategy {
     Join,
     Query,
 }
+
 impl RelationLoadStrategy {
     pub fn is_query(&self) -> bool {
         matches!(self, RelationLoadStrategy::Query)
+    }
+}
+
+impl TryFrom<&str> for RelationLoadStrategy {
+    type Error = crate::error::DomainError;
+
+    fn try_from(value: &str) -> crate::Result<Self> {
+        // todo(team-orm#947) We ideally use the `load_strategy` enum defined in schema/constants, but first we need to extract the `schema-constants` crate.
+        match value {
+            "join" => Ok(RelationLoadStrategy::Join),
+            "query" => Ok(RelationLoadStrategy::Query),
+            _ => Err(DomainError::ConversionFailure(
+                value.to_owned(),
+                "RelationLoadStrategy".to_owned(),
+            )),
+        }
     }
 }
 
@@ -51,6 +68,7 @@ impl std::fmt::Debug for QueryArguments {
             .field("distinct", &self.distinct)
             .field("ignore_skip", &self.ignore_skip)
             .field("ignore_take", &self.ignore_take)
+            .field("relation_load_strategy", &self.relation_load_strategy)
             .finish()
     }
 }
@@ -92,6 +110,14 @@ impl QueryArguments {
         self.distinct.is_some() && !self.can_distinct_in_db()
     }
 
+    pub fn requires_inmemory_distinct_with_joins(&self) -> bool {
+        self.distinct.is_some() && !self.can_distinct_in_db_with_joins()
+    }
+
+    pub fn requires_inmemory_pagination_with_joins(&self) -> bool {
+        self.skip.or(self.take).is_some() && self.requires_inmemory_distinct_with_joins()
+    }
+
     fn can_distinct_in_db(&self) -> bool {
         let has_distinct_feature = self
             .model()
@@ -101,14 +127,18 @@ impl QueryArguments {
             .preview_features()
             .contains(PreviewFeature::NativeDistinct);
 
-        let connector_can_distinct_in_db = self
-            .model()
-            .dm
-            .schema
-            .connector
-            .has_capability(ConnectorCapability::DistinctOn);
+        has_distinct_feature && self.connector_supports_distinct_on() && self.order_by.is_empty()
+    }
 
-        has_distinct_feature && connector_can_distinct_in_db && self.order_by.is_empty()
+    // TODO: separation between `can_distinct_in_db` and `can_distinct_in_db_with_joins` shouldn't
+    // be necessary once nativeDistinct is GA.
+    pub fn can_distinct_in_db_with_joins(&self) -> bool {
+        self.connector_supports_distinct_on()
+            && native_distinct_compatible_with_order_by(self.distinct.as_ref(), &self.order_by)
+    }
+
+    fn connector_supports_distinct_on(&self) -> bool {
+        has_capability(self.model().dm.schema.connector, ConnectorCapability::DistinctOn)
     }
 
     /// An unstable cursor is a cursor that is used in conjunction with an unstable (non-unique) combination of orderBys.
@@ -204,7 +234,7 @@ impl QueryArguments {
     }
 
     pub fn take_abs(&self) -> Option<i64> {
-        self.take.map(|t| if t < 0 { -t } else { t })
+        self.take.map(|t| t.abs())
     }
 
     pub fn has_unbatchable_ordering(&self) -> bool {

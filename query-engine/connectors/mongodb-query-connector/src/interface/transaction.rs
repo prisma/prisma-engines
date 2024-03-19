@@ -3,9 +3,7 @@ use crate::{
     error::MongoError,
     root_queries::{aggregate, read, write},
 };
-use connector_interface::{
-    ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteOperations,
-};
+use connector_interface::{ConnectionLike, ReadOperations, Transaction, UpdateType, WriteOperations};
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
 use query_engine_metrics::{decrement_gauge, increment_gauge, metrics, PRISMA_CLIENT_QUERIES_ACTIVE};
 use query_structure::{RelationLoadStrategy, SelectionResult};
@@ -62,6 +60,10 @@ impl<'conn> Transaction for MongoDbTransaction<'conn> {
         Ok(())
     }
 
+    async fn version(&self) -> Option<String> {
+        None
+    }
+
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {
         self
     }
@@ -101,6 +103,17 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
             skip_duplicates,
         ))
         .await
+    }
+
+    async fn create_records_returning(
+        &mut self,
+        _model: &Model,
+        _args: Vec<connector_interface::WriteArgs>,
+        _skip_duplicates: bool,
+        _selected_fields: FieldSelection,
+        _trace_id: Option<String>,
+    ) -> connector_interface::Result<ManyRecords> {
+        unimplemented!()
     }
 
     async fn update_records(
@@ -264,7 +277,6 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         model: &Model,
         filter: &query_structure::Filter,
         selected_fields: &FieldSelection,
-        aggr_selections: &[RelAggregationSelection],
         _relation_load_strategy: RelationLoadStrategy,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<Option<SingleRecord>> {
@@ -274,7 +286,6 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
             model,
             filter,
             selected_fields,
-            aggr_selections,
         ))
         .await
     }
@@ -284,7 +295,6 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         model: &Model,
         query_arguments: query_structure::QueryArguments,
         selected_fields: &FieldSelection,
-        aggregation_selections: &[RelAggregationSelection],
         _relation_load_strategy: RelationLoadStrategy,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<ManyRecords> {
@@ -294,7 +304,6 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
             model,
             query_arguments,
             selected_fields,
-            aggregation_selections,
         ))
         .await
     }

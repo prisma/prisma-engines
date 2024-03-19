@@ -1,13 +1,15 @@
 mod native_types;
 mod validations;
 
+use chrono::FixedOffset;
 pub use native_types::MySqlType;
+use prisma_value::{decode_bytes, PrismaValueResult};
 
 use super::completions;
 use crate::{
     datamodel_connector::{
-        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
-        NativeTypeInstance, RelationMode,
+        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, JoinStrategySupport,
+        NativeTypeConstructor, NativeTypeInstance, RelationMode,
     },
     diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{walkers, ReferentialAction, ScalarType},
@@ -26,7 +28,7 @@ const TEXT_TYPE_NAME: &str = "Text";
 const MEDIUM_TEXT_TYPE_NAME: &str = "MediumText";
 const LONG_TEXT_TYPE_NAME: &str = "LongText";
 
-const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
+pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
     Enums |
     EnumArrayPush |
     Json |
@@ -47,8 +49,13 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     NamedForeignKeys |
     AdvancedJsonNullability |
     IndexColumnLengthPrefixing |
+
+    // why is this here, considering that using multiple schemas in MySQL leads to the
+    // "multiSchema migrations and introspection are not implemented on MySQL yet" error?
     MultiSchema |
+
     FullTextIndex |
+    FullTextSearch |
     FullTextSearchWithIndex |
     MultipleFullTextAttributesPerModel |
     ImplicitManyToManyRelation |
@@ -60,7 +67,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     SupportsTxIsolationRepeatableRead |
     SupportsTxIsolationSerializable |
     RowIn |
-    SupportsFiltersOnRelationsWithoutJoins
+    SupportsFiltersOnRelationsWithoutJoins |
+    CorrelatedSubqueries
 });
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];
@@ -156,7 +164,7 @@ impl Connector for MySqlDatamodelConnector {
         }
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> NativeTypeInstance {
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()
             .find(|(st, _)| st == scalar_type)
@@ -164,7 +172,7 @@ impl Connector for MySqlDatamodelConnector {
             .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
             .unwrap();
 
-        NativeTypeInstance::new::<MySqlType>(*native_type)
+        Some(NativeTypeInstance::new::<MySqlType>(*native_type))
     }
 
     fn native_type_is_default_for_scalar_type(
@@ -284,5 +292,38 @@ impl Connector for MySqlDatamodelConnector {
 
     fn flavour(&self) -> Flavour {
         Flavour::Mysql
+    }
+
+    fn parse_json_datetime(
+        &self,
+        str: &str,
+        nt: Option<NativeTypeInstance>,
+    ) -> chrono::ParseResult<chrono::DateTime<FixedOffset>> {
+        let native_type: Option<&MySqlType> = nt.as_ref().map(|nt| nt.downcast_ref());
+
+        match native_type {
+            Some(pt) => match pt {
+                Date => super::utils::common::parse_date(str),
+                Time(_) => super::utils::common::parse_time(str),
+                DateTime(_) => super::utils::mysql::parse_datetime(str),
+                Timestamp(_) => super::utils::mysql::parse_timestamp(str),
+                _ => unreachable!(),
+            },
+            None => self.parse_json_datetime(str, self.default_native_type_for_scalar_type(&ScalarType::DateTime)),
+        }
+    }
+
+    // On MySQL, bytes are encoded as base64 in the database directly.
+    fn parse_json_bytes(&self, str: &str, _nt: Option<NativeTypeInstance>) -> PrismaValueResult<Vec<u8>> {
+        decode_bytes(str)
+    }
+
+    fn runtime_join_strategy_support(&self) -> JoinStrategySupport {
+        match self.static_join_strategy_support() {
+            // Prior to MySQL 8.0.14 and for MariaDB, a derived table cannot contain outer references.
+            // Source: https://dev.mysql.com/doc/refman/8.0/en/derived-tables.html.
+            true => JoinStrategySupport::UnknownYet,
+            false => JoinStrategySupport::No,
+        }
     }
 }

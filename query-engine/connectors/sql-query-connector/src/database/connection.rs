@@ -3,7 +3,7 @@
 use super::{catch, transaction::SqlConnectorTransaction};
 use crate::{database::operations::*, Context, SqlError};
 use async_trait::async_trait;
-use connector::{ConnectionLike, RelAggregationSelection};
+use connector::ConnectionLike;
 use connector_interface::{
     self as connector, AggregationRow, AggregationSelection, Connection, ReadOperations, RecordFilter, Transaction,
     WriteArgs, WriteOperations,
@@ -26,9 +26,7 @@ impl<C> SqlConnection<C>
 where
     C: TransactionCapable + Send + Sync + 'static,
 {
-    pub fn new(inner: C, connection_info: &ConnectionInfo, features: psl::PreviewFeatures) -> Self {
-        let connection_info = connection_info.clone();
-
+    pub fn new(inner: C, connection_info: ConnectionInfo, features: psl::PreviewFeatures) -> Self {
         Self {
             inner,
             connection_info,
@@ -71,6 +69,10 @@ where
         .await
     }
 
+    async fn version(&self) -> Option<String> {
+        self.connection_info.version().map(|v| v.to_string())
+    }
+
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {
         self
     }
@@ -86,7 +88,6 @@ where
         model: &Model,
         filter: &Filter,
         selected_fields: &FieldSelection,
-        aggr_selections: &[RelAggregationSelection],
         relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> connector::Result<Option<SingleRecord>> {
@@ -99,7 +100,6 @@ where
                 model,
                 filter,
                 selected_fields,
-                aggr_selections,
                 relation_load_strategy,
                 &ctx,
             ),
@@ -112,7 +112,6 @@ where
         model: &Model,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
-        aggr_selections: &[RelAggregationSelection],
         relation_load_strategy: RelationLoadStrategy,
         trace_id: Option<String>,
     ) -> connector::Result<ManyRecords> {
@@ -124,7 +123,6 @@ where
                 model,
                 query_arguments,
                 selected_fields,
-                aggr_selections,
                 relation_load_strategy,
                 &ctx,
             ),
@@ -201,7 +199,23 @@ where
         let ctx = Context::new(&self.connection_info, trace_id.as_deref());
         catch(
             &self.connection_info,
-            write::create_records(&self.inner, model, args, skip_duplicates, &ctx),
+            write::create_records_count(&self.inner, model, args, skip_duplicates, &ctx),
+        )
+        .await
+    }
+
+    async fn create_records_returning(
+        &mut self,
+        model: &Model,
+        args: Vec<WriteArgs>,
+        skip_duplicates: bool,
+        selected_fields: FieldSelection,
+        trace_id: Option<String>,
+    ) -> connector::Result<ManyRecords> {
+        let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        catch(
+            &self.connection_info,
+            write::create_records_returning(&self.inner, model, args, skip_duplicates, selected_fields, &ctx),
         )
         .await
     }

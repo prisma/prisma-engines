@@ -111,13 +111,13 @@ pub fn itx_isolation_levels(ctx: &'_ QuerySchema) -> Option<EnumType> {
 }
 
 pub(crate) fn relation_load_strategy(ctx: &QuerySchema) -> Option<EnumType> {
-    if !ctx.has_feature(psl::PreviewFeature::RelationJoins) {
+    if !ctx.can_resolve_relation_with_joins() {
         return None;
     }
 
     let ident = Identifier::new_prisma(IdentifierType::RelationLoadStrategy);
 
-    let values = if ctx.has_capability(ConnectorCapability::LateralJoin) {
+    let values = if ctx.can_resolve_relation_with_joins() {
         vec![load_strategy::QUERY.to_owned(), load_strategy::JOIN.to_owned()]
     } else {
         vec![load_strategy::QUERY.to_owned()]

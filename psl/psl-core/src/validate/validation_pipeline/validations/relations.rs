@@ -175,7 +175,7 @@ fn referencing_fields_in_correct_order(relation: InlineRelationWalker<'_>, ctx: 
         return;
     }
 
-    if ctx.connector.allows_relation_fields_in_arbitrary_order() {
+    if ctx.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder) {
         return;
     }
 
@@ -222,9 +222,7 @@ fn referencing_fields_in_correct_order(relation: InlineRelationWalker<'_>, ctx: 
 /// foreign key. Many to many relations we skip. The user must set one of the
 /// relation links to NoAction for both referential actions.
 pub(super) fn cycles(relation: CompleteInlineRelationWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx
-        .connector
-        .has_capability(ConnectorCapability::ReferenceCycleDetection)
+    if !ctx.has_capability(ConnectorCapability::ReferenceCycleDetection)
         && ctx
             .datasource
             .map(|ds| ds.relation_mode().uses_foreign_keys())
@@ -302,11 +300,7 @@ pub(super) fn cycles(relation: CompleteInlineRelationWalker<'_>, ctx: &mut Conte
 /// The user must set one of these relations to use NoAction for onUpdate and
 /// onDelete.
 pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx
-        .connector
-        .has_capability(ConnectorCapability::ReferenceCycleDetection)
-        || ctx.relation_mode.is_prisma()
-    {
+    if !ctx.has_capability(ConnectorCapability::ReferenceCycleDetection) || ctx.relation_mode.is_prisma() {
         return;
     }
 

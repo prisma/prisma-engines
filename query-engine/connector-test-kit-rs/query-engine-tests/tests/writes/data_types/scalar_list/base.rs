@@ -252,9 +252,38 @@ mod basic_types {
         Ok(())
     }
 
-    // "An Update Mutation that pushes to some empty scalar lists" should "work"
     // Skipped for CockroachDB as enum array concatenation is not supported (https://github.com/cockroachdb/cockroach/issues/71388).
     #[connector_test(exclude(CockroachDb))]
+    async fn update_mut_push_empty_enum_array(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1 }"#).await?;
+        create_row(&runner, r#"{ id: 2 }"#).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneScalarModel(where: { id: 1 }, data: {              
+              enums:     { push: A }              
+            }) {             
+              enums              
+            }
+          }"#),
+          @r###"{"data":{"updateOneScalarModel":{"enums":["A"]}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneScalarModel(where: { id: 2 }, data: {              
+              enums:     { push: [A, B] }              
+            }) {           
+              enums              
+            }
+          }"#),
+          @r###"{"data":{"updateOneScalarModel":{"enums":["A","B"]}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
     async fn update_mut_push_empty_scalar_list(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1 }"#).await?;
         create_row(&runner, r#"{ id: 2 }"#).await?;
@@ -265,21 +294,19 @@ mod basic_types {
               strings:   { push: "future" }
               ints:      { push: 15 }
               floats:    { push: 2 }
-              booleans:  { push: true }
-              enums:     { push: A }
+              booleans:  { push: true }              
               dateTimes: { push: "2019-07-31T23:59:01.000Z" }
               bytes:     { push: "dGVzdA==" }
             }) {
               strings
               ints
               floats
-              booleans
-              enums
+              booleans              
               dateTimes
               bytes
             }
           }"#),
-          @r###"{"data":{"updateOneScalarModel":{"strings":["future"],"ints":[15],"floats":[2.0],"booleans":[true],"enums":["A"],"dateTimes":["2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA=="]}}}"###
+          @r###"{"data":{"updateOneScalarModel":{"strings":["future"],"ints":[15],"floats":[2.0],"booleans":[true],"dateTimes":["2019-07-31T23:59:01.000Z"],"bytes":["dGVzdA=="]}}}"###
         );
 
         insta::assert_snapshot!(
@@ -288,21 +315,19 @@ mod basic_types {
               strings:   { push: ["present", "future"] }
               ints:      { push: [14, 15] }
               floats:    { push: [1, 2] }
-              booleans:  { push: [false, true] }
-              enums:     { push: [A, B] }
+              booleans:  { push: [false, true] }              
               dateTimes: { push: ["2019-07-31T23:59:01.000Z", "2019-07-31T23:59:02.000Z"] }
               bytes:     { push: ["dGVzdA==", "dGVzdA=="] }
             }) {
               strings
               ints
               floats
-              booleans
-              enums
+              booleans              
               dateTimes
               bytes
             }
           }"#),
-          @r###"{"data":{"updateOneScalarModel":{"strings":["present","future"],"ints":[14,15],"floats":[1.0,2.0],"booleans":[false,true],"enums":["A","B"],"dateTimes":["2019-07-31T23:59:01.000Z","2019-07-31T23:59:02.000Z"],"bytes":["dGVzdA==","dGVzdA=="]}}}"###
+          @r###"{"data":{"updateOneScalarModel":{"strings":["present","future"],"ints":[14,15],"floats":[1.0,2.0],"booleans":[false,true],"dateTimes":["2019-07-31T23:59:01.000Z","2019-07-31T23:59:02.000Z"],"bytes":["dGVzdA==","dGVzdA=="]}}}"###
         );
 
         Ok(())

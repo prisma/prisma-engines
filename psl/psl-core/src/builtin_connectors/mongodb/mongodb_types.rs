@@ -39,7 +39,7 @@ static DEFAULT_MAPPING: Lazy<HashMap<ScalarType, MongoDbType>> = Lazy::new(|| {
         (ScalarType::Float, MongoDbType::Double),
         (ScalarType::Boolean, MongoDbType::Bool),
         (ScalarType::String, MongoDbType::String),
-        (ScalarType::DateTime, MongoDbType::Timestamp),
+        (ScalarType::DateTime, MongoDbType::Date),
         (ScalarType::Bytes, MongoDbType::BinData),
         (ScalarType::Json, MongoDbType::Json),
     ]

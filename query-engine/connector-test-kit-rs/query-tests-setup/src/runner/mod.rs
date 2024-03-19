@@ -10,6 +10,7 @@ use crate::{
 use colored::Colorize;
 use query_core::{
     protocol::EngineProtocol,
+    relation_load_strategy,
     schema::{self, QuerySchemaRef},
     QueryExecutor, TransactionOptions, TxId,
 };
@@ -107,6 +108,10 @@ impl Runner {
         self.query_schema.internal_data_model.schema.db.source()
     }
 
+    pub fn max_bind_values(&self) -> Option<usize> {
+        self.connector_version().max_bind_values()
+    }
+
     pub async fn load(
         datamodel: String,
         db_schemas: &[&str],
@@ -122,25 +127,34 @@ impl Runner {
         let datasource = schema.configuration.datasources.first().unwrap();
         let url = datasource.load_url(|key| env::var(key).ok()).unwrap();
 
-        let executor = match crate::CONFIG.external_test_executor() {
-            Some(_) => RunnerExecutor::new_external(&url, &datamodel).await?,
-            None => RunnerExecutor::Builtin(
-                request_handlers::load_executor(
+        let (executor, db_version) = match crate::CONFIG.external_test_executor() {
+            Some(_) => (RunnerExecutor::new_external(&url, &datamodel).await?, None),
+            None => {
+                let executor = request_handlers::load_executor(
                     ConnectorKind::Rust {
                         url: url.to_owned(),
                         datasource,
                     },
                     schema.configuration.preview_features(),
                 )
-                .await?,
-            ),
+                .await?;
+
+                let connector = executor.primary_connector();
+                let conn = connector.get_connection().await.unwrap();
+                let database_version = conn.version().await;
+
+                (RunnerExecutor::Builtin(executor), database_version)
+            }
         };
-        let query_schema: QuerySchemaRef = Arc::new(schema::build(Arc::new(schema), true));
+
+        let query_schema = schema::build(Arc::new(schema), true).with_db_version_supports_join_strategy(
+            relation_load_strategy::db_version_supports_joins_strategy(db_version)?,
+        );
 
         Ok(Self {
             version: connector_version,
             executor,
-            query_schema,
+            query_schema: Arc::new(query_schema),
             connector_tag,
             connection_url: url,
             current_tx_id: None,
@@ -224,13 +238,14 @@ impl Runner {
         tracing::debug!("Querying: {}", query.clone().green());
 
         println!("{}", query.bright_green());
+        let query: serde_json::Value = serde_json::from_str(&query).unwrap();
 
         let executor = match &self.executor {
             RunnerExecutor::Builtin(e) => e,
-            RunnerExecutor::External(_) => {
+            RunnerExecutor::External(schema_id) => {
                 let response_str: String = executor_process_request(
                     "query",
-                    json!({ "query": query, "txId": self.current_tx_id.as_ref().map(ToString::to_string) }),
+                    json!({ "query": query, "schemaId": schema_id, "txId": self.current_tx_id.as_ref().map(ToString::to_string) }),
                 )
                 .await?;
                 let response: QueryResult = serde_json::from_str(&response_str).unwrap();
@@ -240,7 +255,7 @@ impl Runner {
 
         let handler = RequestHandler::new(&**executor, &self.query_schema, EngineProtocol::Json);
 
-        let serialized_query: JsonSingleQuery = serde_json::from_str(&query).unwrap();
+        let serialized_query: JsonSingleQuery = serde_json::from_value(query).unwrap();
         let request_body = RequestBody::Json(JsonBody::Single(serialized_query));
 
         let result: QueryResult = handler

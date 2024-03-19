@@ -1,5 +1,5 @@
-use connector::{AggregationRow, RelAggregationRow};
-use query_structure::{ManyRecords, Model, SelectionResult};
+use connector::AggregationRow;
+use query_structure::{ManyRecords, Model, SelectionResult, VirtualSelection};
 
 #[derive(Debug, Clone)]
 pub(crate) enum QueryResult {
@@ -19,6 +19,11 @@ pub struct RecordSelectionWithRelations {
 
     /// Holds an ordered list of selected field names for each contained record.
     pub(crate) fields: Vec<String>,
+
+    /// Holds the list of virtual selections included in the query result.
+    /// TODO: in the future it should be covered by [`RecordSelection::fields`] by storing ordered
+    /// `Vec<SelectedField>` or `FieldSelection` instead of `Vec<String>`.
+    pub(crate) virtuals: Vec<VirtualSelection>,
 
     /// Selection results
     pub(crate) records: ManyRecords,
@@ -41,6 +46,8 @@ pub struct RelationRecordSelection {
     pub name: String,
     /// Holds an ordered list of selected field names for each contained record.
     pub fields: Vec<String>,
+    /// Holds the list of virtual selections included in the query result.
+    pub virtuals: Vec<VirtualSelection>,
     /// The model of the contained records.
     pub model: Model,
     /// Nested relation selections
@@ -55,8 +62,8 @@ pub struct RecordSelection {
     /// Holds an ordered list of selected field names for each contained record.
     pub(crate) fields: Vec<String>,
 
-    /// Scalar field results
-    pub(crate) scalars: ManyRecords,
+    /// Selection results (includes scalar and virtual fields)
+    pub(crate) records: ManyRecords,
 
     /// Nested query results
     // Todo this is only here because reads are still resolved in one go
@@ -65,8 +72,10 @@ pub struct RecordSelection {
     /// The model of the contained records.
     pub(crate) model: Model,
 
-    /// Holds an ordered list of aggregation selections results for each contained record
-    pub(crate) aggregation_rows: Option<Vec<RelAggregationRow>>,
+    /// The list of virtual selections included in the query result.
+    /// TODO: in the future it should be covered by [`RecordSelection::fields`] by storing ordered
+    /// `Vec<SelectedField>` or `FieldSelection` instead of `Vec<String>`.
+    pub(crate) virtual_fields: Vec<VirtualSelection>,
 }
 
 impl From<RecordSelection> for QueryResult {

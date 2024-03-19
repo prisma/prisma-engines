@@ -59,11 +59,6 @@ pub trait Connector: Send + Sync {
     /// The static list of capabilities for the connector.
     fn capabilities(&self) -> ConnectorCapabilities;
 
-    /// Does the connector have this capability?
-    fn has_capability(&self, capability: ConnectorCapability) -> bool {
-        self.capabilities().contains(capability)
-    }
-
     /// The maximum length of constraint names in bytes. Connectors without a
     /// limit should return usize::MAX.
     fn max_identifier_length(&self) -> usize;
@@ -103,22 +98,6 @@ pub trait Connector: Send + Sync {
     /// the action is actually triggered.
     fn allows_set_null_referential_action_on_non_nullable_fields(&self, _relation_mode: RelationMode) -> bool {
         false
-    }
-
-    fn supports_composite_types(&self) -> bool {
-        self.has_capability(ConnectorCapability::CompositeTypes)
-    }
-
-    fn supports_named_primary_keys(&self) -> bool {
-        self.has_capability(ConnectorCapability::NamedPrimaryKeys)
-    }
-
-    fn supports_named_foreign_keys(&self) -> bool {
-        self.has_capability(ConnectorCapability::NamedForeignKeys)
-    }
-
-    fn supports_named_default_values(&self) -> bool {
-        self.has_capability(ConnectorCapability::NamedDefaultValues)
     }
 
     fn supports_referential_action(&self, relation_mode: &RelationMode, action: ReferentialAction) -> bool {
@@ -195,7 +174,7 @@ pub trait Connector: Send + Sync {
 
     /// On each connector, each built-in Prisma scalar type (`Boolean`,
     /// `String`, `Float`, etc.) has a corresponding native type.
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> NativeTypeInstance;
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance>;
 
     /// Same mapping as `default_native_type_for_scalar_type()`, but in the opposite direction.
     fn native_type_is_default_for_scalar_type(
@@ -222,44 +201,18 @@ pub trait Connector: Send + Sync {
         diagnostics: &mut Diagnostics,
     ) -> Option<NativeTypeInstance>;
 
-    fn supports_scalar_lists(&self) -> bool {
-        self.has_capability(ConnectorCapability::ScalarLists)
+    fn static_join_strategy_support(&self) -> bool {
+        self.capabilities().contains(ConnectorCapability::LateralJoin)
+            || self.capabilities().contains(ConnectorCapability::CorrelatedSubqueries)
     }
 
-    fn supports_enums(&self) -> bool {
-        self.has_capability(ConnectorCapability::Enums)
-    }
-
-    fn supports_json(&self) -> bool {
-        self.has_capability(ConnectorCapability::Json)
-    }
-
-    fn supports_json_lists(&self) -> bool {
-        self.has_capability(ConnectorCapability::JsonLists)
-    }
-
-    fn supports_auto_increment(&self) -> bool {
-        self.has_capability(ConnectorCapability::AutoIncrement)
-    }
-
-    fn supports_non_id_auto_increment(&self) -> bool {
-        self.has_capability(ConnectorCapability::AutoIncrementAllowedOnNonId)
-    }
-
-    fn supports_multiple_auto_increment(&self) -> bool {
-        self.has_capability(ConnectorCapability::AutoIncrementMultipleAllowed)
-    }
-
-    fn supports_non_indexed_auto_increment(&self) -> bool {
-        self.has_capability(ConnectorCapability::AutoIncrementNonIndexedAllowed)
-    }
-
-    fn supports_compound_ids(&self) -> bool {
-        self.has_capability(ConnectorCapability::CompoundIds)
-    }
-
-    fn supports_decimal(&self) -> bool {
-        self.has_capability(ConnectorCapability::DecimalType)
+    // Returns whether the connector supports the `RelationLoadStrategy::Join`.
+    /// On some connectors, this might return `UnknownYet`.
+    fn runtime_join_strategy_support(&self) -> JoinStrategySupport {
+        match self.static_join_strategy_support() {
+            true => JoinStrategySupport::Yes,
+            false => JoinStrategySupport::No,
+        }
     }
 
     fn supported_index_types(&self) -> BitFlags<IndexAlgorithm> {
@@ -270,11 +223,6 @@ pub trait Connector: Send + Sync {
         self.supported_index_types().contains(algo)
     }
 
-    fn allows_relation_fields_in_arbitrary_order(&self) -> bool {
-        self.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
-    }
-
-    /// If true, the schema validator function checks whether the referencing fields in a `@relation` attribute
     /// are included in an index.
     fn should_suggest_missing_referencing_fields_indexes(&self) -> bool {
         true
@@ -319,6 +267,14 @@ pub trait Connector: Send + Sync {
         _str: &str,
         _nt: Option<NativeTypeInstance>,
     ) -> chrono::ParseResult<DateTime<FixedOffset>> {
+        unreachable!("This method is only implemented on connectors with lateral join support.")
+    }
+
+    fn parse_json_bytes(
+        &self,
+        _str: &str,
+        _nt: Option<NativeTypeInstance>,
+    ) -> prisma_value::PrismaValueResult<Vec<u8>> {
         unreachable!("This method is only implemented on connectors with lateral join support.")
     }
 }
@@ -397,4 +353,20 @@ impl ConstraintScope {
             )),
         }
     }
+}
+
+/// Describes whether a connector supports relation join strategy.
+#[derive(Debug, Copy, Clone)]
+pub enum JoinStrategySupport {
+    /// The connector supports it.
+    Yes,
+    /// The connector supports it but the specific database version does not.
+    /// This state can only be known at runtime by checking the actual database version.
+    UnsupportedDbVersion,
+    /// The connector does not support it.
+    No,
+    /// The connector may or may not support it. Additional runtime informations are required to determine the support.
+    /// This state is used when the connector does not have a static capability to determine the support.
+    /// For example, the MySQL connector supports relation join strategy, but only for versions >= 8.0.14.
+    UnknownYet,
 }

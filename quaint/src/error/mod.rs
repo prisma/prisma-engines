@@ -15,8 +15,11 @@ use std::time::Duration;
 #[cfg(not(target_arch = "wasm32"))]
 pub use native::NativeErrorKind;
 
+#[cfg(feature = "mysql")]
 pub use crate::connector::mysql::MysqlError;
+#[cfg(feature = "postgresql")]
 pub use crate::connector::postgres::PostgresError;
+#[cfg(feature = "sqlite")]
 pub use crate::connector::sqlite::SqliteError;
 pub(crate) use name::Name;
 
@@ -144,6 +147,9 @@ pub enum ErrorKind {
 
     #[error("Error querying the database: {}", _0)]
     QueryError(Box<dyn std::error::Error + Send + Sync + 'static>),
+
+    #[error("Too many DB connections opened")]
+    TooManyConnections(Box<dyn std::error::Error + Send + Sync + 'static>),
 
     #[error("Invalid input provided to query: {}", _0)]
     QueryInvalidInput(String),

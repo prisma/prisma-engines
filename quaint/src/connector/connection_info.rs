@@ -255,6 +255,26 @@ impl ConnectionInfo {
             ConnectionInfo::External(_) => "external".into(),
         }
     }
+
+    #[allow(unused_variables)]
+    pub fn set_version(&mut self, version: Option<String>) {
+        match self {
+            #[cfg(not(target_arch = "wasm32"))]
+            ConnectionInfo::Native(native) => native.set_version(version),
+            ConnectionInfo::External(_) => (),
+        }
+    }
+
+    pub fn version(&self) -> Option<&str> {
+        match self {
+            #[cfg(not(target_arch = "wasm32"))]
+            ConnectionInfo::Native(nt) => match nt {
+                NativeConnectionInfo::Mysql(m) => m.version(),
+                _ => None,
+            },
+            ConnectionInfo::External(_) => None,
+        }
+    }
 }
 
 /// One of the supported SQL variants.
@@ -295,6 +315,56 @@ impl SqlFamily {
             #[cfg(feature = "mysql")]
             "mysql" => Some(SqlFamily::Mysql),
             _ => None,
+        }
+    }
+
+    /// Get the default max rows for a batch insert.
+    pub fn max_insert_rows(&self) -> Option<usize> {
+        match self {
+            #[cfg(feature = "postgresql")]
+            SqlFamily::Postgres => None,
+            #[cfg(feature = "mysql")]
+            SqlFamily::Mysql => None,
+            #[cfg(feature = "sqlite")]
+            SqlFamily::Sqlite => Some(999),
+            #[cfg(feature = "mssql")]
+            SqlFamily::Mssql => Some(1000),
+        }
+    }
+
+    /// Get the max number of bind parameters for a single query, which in targets other
+    /// than Wasm can be controlled with the env var QUERY_BATCH_SIZE.
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn max_bind_values(&self) -> usize {
+        use std::sync::OnceLock;
+        static BATCH_SIZE_OVERRIDE: OnceLock<Option<usize>> = OnceLock::new();
+        BATCH_SIZE_OVERRIDE
+            .get_or_init(|| {
+                std::env::var("QUERY_BATCH_SIZE")
+                    .ok()
+                    .map(|size| size.parse().expect("QUERY_BATCH_SIZE: not a valid size"))
+            })
+            .unwrap_or(self.default_max_bind_values())
+    }
+
+    /// Get the max number of bind parameters for a single query, in Wasm there's no
+    /// environment, and we omit that knob.
+    #[cfg(target_arch = "wasm32")]
+    pub fn max_bind_values(&self) -> usize {
+        self.default_max_bind_values()
+    }
+
+    /// Get the default max number of bind parameters for a single query.
+    pub fn default_max_bind_values(&self) -> usize {
+        match self {
+            #[cfg(feature = "postgresql")]
+            SqlFamily::Postgres => 32766,
+            #[cfg(feature = "mysql")]
+            SqlFamily::Mysql => 65535,
+            #[cfg(feature = "sqlite")]
+            SqlFamily::Sqlite => 999,
+            #[cfg(feature = "mssql")]
+            SqlFamily::Mssql => 2099,
         }
     }
 

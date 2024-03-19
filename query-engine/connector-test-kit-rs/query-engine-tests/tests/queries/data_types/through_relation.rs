@@ -31,14 +31,12 @@ mod scalar_relations {
         schema.to_owned()
     }
 
-    // TODO: fix https://github.com/prisma/team-orm/issues/684, https://github.com/prisma/team-orm/issues/685  and unexclude DAs
+    // TODO: fix https://github.com/prisma/team-orm/issues/684 and unexclude DAs.
+    // On napi, this currently fails with "P2023":
+    // `Inconsistent column data: Unexpected conversion failure for field Child.bInt from Number(14324324234324.0) to BigInt`.
     #[connector_test(
         schema(schema_common),
-        exclude(
-            Postgres("pg.js", "neon.js", "pg.js.wasm", "neon.js.wasm"),
-            Vitess("planetscale.js", "planetscale.js.wasm"),
-            Sqlite("libsql.js.wasm")
-        )
+        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
     )]
     async fn common_types(runner: Runner) -> TestResult<()> {
         create_common_children(&runner).await?;
@@ -238,7 +236,7 @@ mod scalar_relations {
     }
 
     // TODO: fix https://github.com/prisma/team-orm/issues/684 and unexclude DAs
-
+    // On "pg.js.wasm", this fails with a `QueryParserError` due to bigint issues.
     #[connector_test(
         schema(schema_scalar_lists),
         capabilities(ScalarLists),
@@ -277,7 +275,7 @@ mod scalar_relations {
 
     async fn create_common_children(runner: &Runner) -> TestResult<()> {
         create_child(
-            &runner,
+            runner,
             r#"{
           childId: 1,
           string: "abc",
@@ -292,7 +290,7 @@ mod scalar_relations {
         .await?;
 
         create_child(
-            &runner,
+            runner,
             r#"{
           childId: 2,
           string: "def",
@@ -307,7 +305,7 @@ mod scalar_relations {
         .await?;
 
         create_parent(
-            &runner,
+            runner,
             r#"{ id: 1, children: { connect: [{ childId: 1 }, { childId: 2 }] } }"#,
         )
         .await?;

@@ -3,23 +3,19 @@ import * as readline from 'node:readline'
 import * as jsonRpc from './jsonRpc'
 
 // pg dependencies
-import pgDriver from 'pg'
 import * as prismaPg from '@prisma/adapter-pg'
 
 // neon dependencies
-import { Pool as NeonPool, neonConfig } from '@neondatabase/serverless'
 import { fetch } from 'undici'
 import { WebSocket } from 'ws'
+import { pg, neon, planetScale, libSql } from '@prisma/bundled-js-drivers'
 import * as prismaNeon from '@prisma/adapter-neon'
 
 // libsql dependencies
-import { createClient } from '@libsql/client'
 import { PrismaLibSQL } from '@prisma/adapter-libsql'
 
 // planetscale dependencies
-import { Client as PlanetscaleClient } from '@planetscale/database'
 import { PrismaPlanetScale } from '@prisma/adapter-planetscale'
-
 
 
 import {bindAdapter, DriverAdapter, ErrorCapturingDriverAdapter} from "@prisma/driver-adapter-utils";
@@ -70,7 +66,7 @@ async function main(): Promise<void> {
                 debug("[nodejs] Error from request handler: ", err)
                 respondErr(request.id, {
                     code: 1,
-                    message: err.toString(),
+                    message: err.stack ?? err.toString(),
                 })
             }
         } catch (err) {
@@ -257,7 +253,7 @@ function postgresSchemaName(url: string) {
 
 async function pgAdapter(url: string): Promise<DriverAdapter> {
     const schemaName = postgresSchemaName(url)
-    const pool = new pgDriver.Pool(postgres_options(url))
+    const pool = new pg.Pool(postgres_options(url))
     return new prismaPg.PrismaPg(pool, {
         schema: schemaName
     })
@@ -265,6 +261,7 @@ async function pgAdapter(url: string): Promise<DriverAdapter> {
 }
 
 async function neonWsAdapter(url: string): Promise<DriverAdapter> {
+    const { neonConfig, Pool: NeonPool } = neon
     const proxyURL = JSON.parse(process.env.DRIVER_ADAPTER_CONFIG || '{}').proxy_url ?? ''
     if (proxyURL == '') {
         throw new Error("DRIVER_ADAPTER_CONFIG is not defined or empty, but its required for neon adapter.");
@@ -282,7 +279,7 @@ async function neonWsAdapter(url: string): Promise<DriverAdapter> {
 }
 
 async function libsqlAdapter(url: string): Promise<DriverAdapter> {
-    const libsql = createClient({ url, intMode: 'bigint' })
+    const libsql = libSql.createClient({ url, intMode: 'bigint' })
     return new PrismaLibSQL(libsql)
 }
 
@@ -292,8 +289,7 @@ async function planetscaleAdapter(url: string): Promise<DriverAdapter> {
         throw new Error("DRIVER_ADAPTER_CONFIG is not defined or empty, but its required for planetscale adapter.");
     }
 
-
-    const client = new PlanetscaleClient({
+    const client = new planetScale.Client({
         // preserving path name so proxy url would look like real DB url
         url: copyPathName(url, proxyUrl),
         fetch,

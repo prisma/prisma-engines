@@ -5,10 +5,9 @@ use crate::{
     result_ast::{RecordSelectionWithRelations, RelationRecordSelection},
     CoreError, QueryResult, RecordAggregations, RecordSelection,
 };
-use connector::{AggregationResult, RelAggregationResult, RelAggregationRow};
+use connector::AggregationResult;
 use indexmap::IndexMap;
-use itertools::Itertools;
-use query_structure::{CompositeFieldRef, Field, PrismaValue, SelectionResult};
+use query_structure::{CompositeFieldRef, Field, Model, PrismaValue, SelectionResult, VirtualSelection};
 use schema::{
     constants::{aggregations::*, output_fields::*},
     *,
@@ -175,24 +174,6 @@ fn serialize_aggregations(
     Ok(envelope)
 }
 
-fn write_rel_aggregation_row(row: &RelAggregationRow, map: &mut HashMap<String, Item>) {
-    for result in row.iter() {
-        match result {
-            RelAggregationResult::Count(rf, count) => match map.get_mut(UNDERSCORE_COUNT) {
-                Some(item) => match item {
-                    Item::Map(inner_map) => inner_map.insert(rf.name().to_owned(), Item::Value(count.clone())),
-                    _ => unreachable!(),
-                },
-                None => {
-                    let mut inner_map: Map = Map::new();
-                    inner_map.insert(rf.name().to_owned(), Item::Value(count.clone()));
-                    map.insert(UNDERSCORE_COUNT.to_owned(), Item::Map(inner_map))
-                }
-            },
-        };
-    }
-}
-
 fn extract_aggregate_object_type<'a, 'b>(output_type: &'b OutputType<'a>) -> &'b ObjectType<'a> {
     match &output_type.inner {
         InnerOutputType::Object(obj) => obj,
@@ -326,6 +307,20 @@ fn finalize_objects(
     }
 }
 
+enum SerializedFieldWithRelations<'a, 'b> {
+    Model(Field, &'a OutputField<'b>),
+    VirtualsGroup(&'a str, Vec<&'a VirtualSelection>),
+}
+
+impl<'a, 'b> SerializedFieldWithRelations<'a, 'b> {
+    fn name(&self) -> &str {
+        match self {
+            Self::Model(f, _) => f.name(),
+            Self::VirtualsGroup(name, _) => name,
+        }
+    }
+}
+
 // TODO: Handle errors properly
 fn serialize_objects_with_relation(
     result: RecordSelectionWithRelations,
@@ -333,14 +328,10 @@ fn serialize_objects_with_relation(
 ) -> crate::Result<UncheckedItemsWithParents> {
     let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.records.records.len());
 
-    let model = result.model;
-    let db_field_names = result.records.field_names;
     let nested = result.nested;
 
-    let fields: Vec<_> = db_field_names
-        .iter()
-        .filter_map(|f| model.fields().all().find(|field| field.db_name() == f))
-        .collect();
+    let fields =
+        collect_serialized_fields_with_relations(typ, &result.model, &result.virtuals, &result.records.field_names);
 
     // Hack: we convert it to a hashset to support contains with &str as input
     // because Vec<String>::contains(&str) doesn't work and we don't want to allocate a string record value
@@ -360,13 +351,16 @@ fn serialize_objects_with_relation(
                 continue;
             }
 
-            let out_field = typ.find_field(field.name()).unwrap();
-
             match field {
-                Field::Scalar(_) if !out_field.field_type().is_object() => {
+                SerializedFieldWithRelations::Model(Field::Scalar(_), out_field)
+                    if !out_field.field_type().is_object() =>
+                {
                     object.insert(field.name().to_owned(), serialize_scalar(out_field, val)?);
                 }
-                Field::Relation(_) if out_field.field_type().is_list() => {
+
+                SerializedFieldWithRelations::Model(Field::Relation(_), out_field)
+                    if out_field.field_type().is_list() =>
+                {
                     let inner_typ = out_field.field_type.as_object_type().unwrap();
                     let rrs = nested.iter().find(|rrs| rrs.name == field.name()).unwrap();
 
@@ -379,7 +373,8 @@ fn serialize_objects_with_relation(
 
                     object.insert(field.name().to_owned(), Item::list(items));
                 }
-                Field::Relation(_) => {
+
+                SerializedFieldWithRelations::Model(Field::Relation(_), out_field) => {
                     let inner_typ = out_field.field_type.as_object_type().unwrap();
                     let rrs = nested.iter().find(|rrs| rrs.name == field.name()).unwrap();
 
@@ -388,11 +383,16 @@ fn serialize_objects_with_relation(
                         serialize_relation_selection(rrs, val, inner_typ)?,
                     );
                 }
+
+                SerializedFieldWithRelations::VirtualsGroup(group_name, virtuals) => {
+                    object.insert(group_name.to_string(), serialize_virtuals_group(val, virtuals)?);
+                }
+
                 _ => panic!("unexpected field"),
             }
         }
 
-        let map = reorder_object_with_selection_order(result.fields.clone(), object);
+        let map = reorder_object_with_selection_order(&result.fields, object);
 
         let result = Item::Map(map);
 
@@ -416,21 +416,18 @@ fn serialize_relation_selection(
 
     // TODO: better handle errors
     let mut value_obj: HashMap<String, PrismaValue> = HashMap::from_iter(value.into_object().unwrap());
-    let db_field_names = &rrs.fields;
-    let fields: Vec<_> = db_field_names
-        .iter()
-        .filter_map(|f| rrs.model.fields().all().find(|field| field.name() == f))
-        .collect();
+
+    let fields = collect_serialized_fields_with_relations(typ, &rrs.model, &rrs.virtuals, &rrs.fields);
 
     for field in fields {
-        let out_field = typ.find_field(field.name()).unwrap();
-        let value = value_obj.remove(field.db_name()).unwrap();
+        let value = value_obj.remove(field.name()).unwrap();
 
         match field {
-            Field::Scalar(_) if !out_field.field_type().is_object() => {
+            SerializedFieldWithRelations::Model(Field::Scalar(_), out_field) if !out_field.field_type().is_object() => {
                 map.insert(field.name().to_owned(), serialize_scalar(out_field, value)?);
             }
-            Field::Relation(_) if out_field.field_type().is_list() => {
+
+            SerializedFieldWithRelations::Model(Field::Relation(_), out_field) if out_field.field_type().is_list() => {
                 let inner_typ = out_field.field_type.as_object_type().unwrap();
                 let inner_rrs = rrs.nested.iter().find(|rrs| rrs.name == field.name()).unwrap();
 
@@ -443,7 +440,8 @@ fn serialize_relation_selection(
 
                 map.insert(field.name().to_owned(), Item::list(items));
             }
-            Field::Relation(_) => {
+
+            SerializedFieldWithRelations::Model(Field::Relation(_), out_field) => {
                 let inner_typ = out_field.field_type.as_object_type().unwrap();
                 let inner_rrs = rrs.nested.iter().find(|rrs| rrs.name == field.name()).unwrap();
 
@@ -452,11 +450,68 @@ fn serialize_relation_selection(
                     serialize_relation_selection(inner_rrs, value, inner_typ)?,
                 );
             }
+
+            SerializedFieldWithRelations::VirtualsGroup(group_name, virtuals) => {
+                map.insert(group_name.to_string(), serialize_virtuals_group(value, &virtuals)?);
+            }
+
             _ => (),
         }
     }
 
     Ok(Item::Map(map))
+}
+
+fn collect_serialized_fields_with_relations<'a, 'b>(
+    object_type: &'a ObjectType<'b>,
+    model: &Model,
+    virtuals: &'a [VirtualSelection],
+    db_field_names: &'a [String],
+) -> Vec<SerializedFieldWithRelations<'a, 'b>> {
+    db_field_names
+        .iter()
+        .map(|name| {
+            model
+                .fields()
+                .all()
+                .find(|field| field.name() == name)
+                .and_then(|field| {
+                    object_type
+                        .find_field(field.name())
+                        .map(|out_field| SerializedFieldWithRelations::Model(field, out_field))
+                })
+                .unwrap_or_else(|| {
+                    let matching_virtuals = virtuals.iter().filter(|vs| vs.serialized_name().0 == name).collect();
+                    SerializedFieldWithRelations::VirtualsGroup(name.as_str(), matching_virtuals)
+                })
+        })
+        .collect()
+}
+
+fn serialize_virtuals_group(obj_value: PrismaValue, virtuals: &[&VirtualSelection]) -> crate::Result<Item> {
+    let mut db_object: HashMap<String, PrismaValue> = HashMap::from_iter(obj_value.into_object().unwrap());
+    let mut out_object = Map::new();
+
+    // We have to reorder the object fields according to selection even if the query
+    // builder respects the initial order because JSONB does not preserve order.
+    for vs in virtuals {
+        let (group_name, nested_name) = vs.serialized_name();
+
+        let value = db_object.remove(nested_name).ok_or_else(|| {
+            CoreError::SerializationError(format!(
+                "Expected virtual field {nested_name} not found in {group_name} object"
+            ))
+        })?;
+
+        out_object.insert(nested_name.into(), Item::Value(vs.coerce_value(value)?));
+    }
+
+    Ok(Item::Map(out_object))
+}
+
+enum SerializedField<'a, 'b> {
+    Model(Field, &'a OutputField<'b>),
+    Virtual(&'a VirtualSelection),
 }
 
 /// Serializes the given result into objects of given type.
@@ -479,19 +534,38 @@ fn serialize_objects(
     // to prevent expensive copying during serialization).
 
     // Finally, serialize the objects based on the selected fields.
-    let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.scalars.records.len());
-    let db_field_names = result.scalars.field_names;
+    let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.records.records.len());
+    let db_field_names = result.records.field_names;
     let model = result.model;
 
     let fields: Vec<_> = db_field_names
         .iter()
-        .filter_map(|f| model.fields().find_from_non_virtual_by_db_name(f).ok())
+        .map(|name| {
+            model
+                .fields()
+                .find_from_non_virtual_by_db_name(name)
+                .ok()
+                .and_then(|field| {
+                    typ.find_field(field.name())
+                        .map(|out_field| SerializedField::Model(field, out_field))
+                })
+                .or_else(|| {
+                    result
+                        .virtual_fields
+                        .iter()
+                        .find(|f| f.db_alias() == *name)
+                        .map(SerializedField::Virtual)
+                })
+                // Shouldn't happen, implies that the query returned unknown fields.
+                .expect("Field must be a known scalar or virtual")
+        })
         .collect();
 
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
-    for (r_index, record) in result.scalars.records.into_iter().enumerate() {
-        let record_id = Some(record.extract_selection_result(&db_field_names, &model.primary_identifier())?);
+    for record in result.records.records {
+        let record_id =
+            Some(record.extract_selection_result_from_db_name(&db_field_names, &model.primary_identifier())?);
 
         if !object_mapping.contains_key(&record.parent_id) {
             object_mapping.insert(record.parent_id.clone(), Vec::new());
@@ -502,44 +576,33 @@ fn serialize_objects(
         let mut object = HashMap::with_capacity(values.len());
 
         for (val, field) in values.into_iter().zip(fields.iter()) {
-            let out_field = typ.find_field(field.name()).unwrap();
-
             match field {
-                Field::Composite(cf) => {
-                    object.insert(field.name().to_owned(), serialize_composite(cf, out_field, val)?);
+                SerializedField::Model(field, out_field) => {
+                    if let Field::Composite(cf) = field {
+                        object.insert(field.name().to_owned(), serialize_composite(cf, out_field, val)?);
+                    } else if !out_field.field_type().is_object() {
+                        object.insert(field.name().to_owned(), serialize_scalar(out_field, val)?);
+                    }
                 }
 
-                _ if !out_field.field_type().is_object() => {
-                    object.insert(field.name().to_owned(), serialize_scalar(out_field, val)?);
-                }
+                SerializedField::Virtual(vs) => {
+                    let (virtual_obj_name, nested_field_name) = vs.serialized_name();
 
-                _ => (),
+                    let virtual_obj = object
+                        .entry(virtual_obj_name.into())
+                        .or_insert(Item::Map(Map::new()))
+                        .as_map_mut()
+                        .expect("Virtual and scalar fields must not collide");
+
+                    virtual_obj.insert(nested_field_name.into(), Item::Value(vs.coerce_value(val)?));
+                }
             }
         }
 
         // Write nested results
         write_nested_items(&record_id, &mut nested_mapping, &mut object, typ)?;
 
-        let aggr_row = result.aggregation_rows.as_ref().map(|rows| rows.get(r_index).unwrap());
-        if let Some(aggr_row) = aggr_row {
-            write_rel_aggregation_row(aggr_row, &mut object);
-        }
-
-        let mut aggr_fields = aggr_row
-            .map(|row| {
-                row.iter()
-                    .map(|aggr_result| match aggr_result {
-                        RelAggregationResult::Count(_, _) => UNDERSCORE_COUNT.to_owned(),
-                    })
-                    .unique()
-                    .collect()
-            })
-            .unwrap_or_default();
-
-        let mut all_fields = result.fields.clone();
-        all_fields.append(&mut aggr_fields);
-
-        let map = reorder_object_with_selection_order(all_fields, object);
+        let map = reorder_object_with_selection_order(&result.fields, object);
 
         object_mapping.get_mut(&record.parent_id).unwrap().push(Item::Map(map));
     }
@@ -548,7 +611,7 @@ fn serialize_objects(
 }
 
 fn reorder_object_with_selection_order(
-    selection_order: Vec<String>,
+    selection_order: &[String],
     mut object: HashMap<String, Item>,
 ) -> IndexMap<String, Item> {
     selection_order

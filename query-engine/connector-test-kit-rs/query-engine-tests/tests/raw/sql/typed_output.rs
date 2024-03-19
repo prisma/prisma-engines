@@ -26,7 +26,7 @@ mod typed_output {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_pg), only(Postgres), exclude(Postgres("pg.js.wasm", "neon.js.wasm")))]
+    #[connector_test(schema(schema_pg), only(Postgres))]
     async fn all_scalars_pg(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,
@@ -483,7 +483,7 @@ mod typed_output {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_sqlite), only(Sqlite), exclude(Sqlite("libsql.js.wasm")))]
+    #[connector_test(schema(schema_sqlite), only(Sqlite))]
     async fn all_scalars_sqlite(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,

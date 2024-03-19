@@ -56,3 +56,6 @@ package-lock.json
 
 # Human readable Wasm output
 *.wat
+
+# Folder with GraphViz representation of query graphs.
+.query_graphs
