@@ -1,3 +1,4 @@
+//! D1 seems to silently ignore Cascade.
 use query_engine_tests::*;
 
 #[test_suite(suite = "cascade_onU_1to1_req", schema(required), relation_mode = "prisma")]
@@ -32,7 +33,7 @@ mod one2one_req {
         schema.to_owned()
     }
 
-    #[connector_test(schema(required))]
+    #[connector_test(schema(required), exclude(Sqlite("cfd1")))]
     async fn update_parent_cascade(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
             run_query!(&runner, r#"mutation {
@@ -113,7 +114,7 @@ mod one2one_req {
         schema.to_owned()
     }
 
-    #[connector_test(schema(required_compound))]
+    #[connector_test(schema(required_compound), exclude(Sqlite("cfd1")))]
     async fn update_parent_compound_cascade(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {

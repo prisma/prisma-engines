@@ -3,7 +3,7 @@ use query_engine_tests::*;
 // Note: Except for m:n cases that are always resolved using the primary identifier of the models, we use different
 // relation links to ensure that the underlying QE logic correctly uses link resolvers instead of
 // only primary id resolvers.
-#[test_suite]
+#[test_suite(exclude(Sqlite("cfd1")))]
 mod connect_or_create {
     use indoc::indoc;
     use query_engine_tests::run_query;

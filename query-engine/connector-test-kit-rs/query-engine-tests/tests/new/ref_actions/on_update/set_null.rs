@@ -1,4 +1,5 @@
 //! Only Postgres (except CockroachDB) allows SetNull on a non-nullable FK at all, rest fail during migration.
+//! D1 also seems to silently ignore Restrict.
 
 use indoc::indoc;
 use query_engine_tests::*;
@@ -64,7 +65,7 @@ mod one2one_opt {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn update_many_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
@@ -450,7 +451,7 @@ mod one2many_opt {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn update_many_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
