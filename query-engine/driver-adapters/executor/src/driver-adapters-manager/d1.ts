@@ -3,7 +3,7 @@ import * as S from '@effect/schema/Schema'
 import { PrismaD1 } from '@prisma/adapter-d1'
 import { DriverAdapter } from '@prisma/driver-adapter-utils'
 import { getPlatformProxy } from 'wrangler'
-import type { D1Database, D1Response, D1Result } from '@cloudflare/workers-types'
+import type { D1Database, D1Result } from '@cloudflare/workers-types'
 
 import { __dirname, runBatch } from '../utils'
 import type { ConnectParams, DriverAdaptersManager } from './index'
@@ -32,6 +32,9 @@ export class D1Manager implements DriverAdaptersManager {
 
     /* prisma migrate reset */
     console.warn('[D1] Resetting database')
+    console.warn(typeof migrationScript)
+    console.warn(migrationScript === '')
+    console.warn(migrationScript)
     await migrateReset(D1_DATABASE)
 
     /* prisma migrate diff */
@@ -66,33 +69,26 @@ async function migrateReset(D1_DATABASE: D1Database) {
   let { results: rawTables } = ((await D1_DATABASE.prepare(`PRAGMA main.table_list;`).run()) as D1Result)
   let tables = S
     .decodeUnknownSync(D1Tables, { onExcessProperty: 'preserve' })(rawTables)
-    .filter((item) => !['_cf_KV', 'sqlite_schema'].includes(item.name))
+    .filter((item) => !['_cf_KV', 'sqlite_schema', 'sqlite_sequence'].includes(item.name))
 
   const batch = [] as string[]
 
-  // temporarily allow violating foreign key constraints
+  // Allow violating foreign key constraints on the batch transaction.
+  // The foreign key constraints are automatically re-enabled at the end of the transaction, regardless of it succeeding.
   batch.push(`PRAGMA defer_foreign_keys = ${1};`)
+  batch.push(`DELETE FROM "sqlite_sequence";`)
 
   for (const table of tables) {
-    if (table.name === 'sqlite_sequence') {
-      batch.push('DELETE FROM `sqlite_sequence`;')
-    } else if (table.type === 'view') {
+    if (table.type === 'view') {
       batch.push(`DROP VIEW IF EXISTS "${table.name}";`)
     } else {
-      // TODO: Consider stop polling indexes and test on CI, they're probabably automatically
-      // deleted when their table is dropped.
-
       batch.push(`DROP TABLE IF EXISTS "${table.name}";`)
-      // batch.push(...indexesToDrop)
     }
   }
 
-  // stop violating foreign key constraints
-  batch.push(`PRAGMA defer_foreign_keys = ${0};`)
-
   const statements = batch.map((sql) => D1_DATABASE.prepare(sql))
-  const batchResult = (await runBatch(D1_DATABASE, statements)) as D1Response[]
-
+  const batchResult = await runBatch(D1_DATABASE, statements)
+  
   for (const { error } of batchResult) {
     if (error) {
       console.error('Error in batch: %O', error)
