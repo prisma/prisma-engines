@@ -438,8 +438,7 @@ mod relation_load_strategy {
                 count
             }
         }
-        "#,
-        exclude(Sqlite)
+        "#
     );
 
     relation_load_strategy_not_available_test!(
