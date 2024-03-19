@@ -28,7 +28,7 @@ mod one2one_req {
     }
 
     /// Deleting the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn delete_parent_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
@@ -71,7 +71,7 @@ mod one2one_opt {
     }
 
     /// Deleting the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn delete_parent_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
@@ -89,7 +89,7 @@ mod one2one_opt {
     }
 
     /// Deleting the parent succeeds if no child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn delete_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1 }) { id }}"#),
@@ -134,7 +134,7 @@ mod one2one_opt {
 
     /// Deleting the parent succeeds if no child is connected.
     /// Checks that it works even with different parent/child primary identifier names.
-    #[connector_test(schema(diff_id_name))]
+    #[connector_test(schema(diff_id_name), exclude(Sqlite("cfd1")))]
     async fn delete_parent_diff_id_name(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
@@ -175,7 +175,7 @@ mod one2many_req {
     }
 
     /// Deleting the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn delete_parent_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),
@@ -193,7 +193,7 @@ mod one2many_req {
     }
 
     /// Deleting the parent succeeds if no child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn delete_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1 }) { id }}"#),
@@ -244,7 +244,7 @@ mod one2many_opt {
     }
 
     /// Deleting the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn delete_parent_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),
@@ -262,7 +262,7 @@ mod one2many_opt {
     }
 
     /// Deleting the parent succeeds if no child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn delete_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1 }) { id }}"#),

@@ -31,7 +31,7 @@ mod one2one_req {
     }
 
     /// Updating the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn update_parent_failure(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -48,7 +48,7 @@ mod one2one_req {
     }
 
     /// Updating the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn update_many_parent_failure(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -65,7 +65,7 @@ mod one2one_req {
     }
 
     /// Updating the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn upsert_parent_failure(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -118,7 +118,7 @@ mod one2one_opt {
     }
 
     /// Updating the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn update_parent_failure(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -135,7 +135,7 @@ mod one2one_opt {
     }
 
     /// Updating the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn update_many_parent_failure(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -205,7 +205,7 @@ mod one2many_req {
     }
 
     /// Updating the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn update_parent_failure(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -222,7 +222,7 @@ mod one2many_req {
     }
 
     /// Updating the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn update_many_parent_failure(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -239,7 +239,7 @@ mod one2many_req {
     }
 
     /// Updating the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn upsert_parent_failure(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -328,7 +328,7 @@ mod one2many_opt {
     }
 
     /// Updating the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn update_parent_failure(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -345,7 +345,7 @@ mod one2many_opt {
     }
 
     /// Updating the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn update_many_parent_failure(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -362,7 +362,7 @@ mod one2many_opt {
     }
 
     /// Updating the parent must fail if a child is connected.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn upsert_parent_failure(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 

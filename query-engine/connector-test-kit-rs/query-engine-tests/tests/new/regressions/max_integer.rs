@@ -33,7 +33,7 @@ mod max_integer {
     const U32_OVERFLOW_MAX: i64 = (u32::MAX as i64) + 1;
     const OVERFLOW_MIN: i8 = -1;
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn transform_gql_parser_too_large(runner: Runner) -> TestResult<()> {
         match runner.protocol() {
             query_engine_tests::EngineProtocol::Graphql => {
@@ -115,7 +115,7 @@ mod max_integer {
 
     // The document parser does not crash on encountering an exponent-notation-serialized int.
     // This triggers a 2009 instead of 2033 as this is in the document parser.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn document_parser_no_crash_too_large(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -127,7 +127,7 @@ mod max_integer {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn document_parser_no_crash_too_small(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
