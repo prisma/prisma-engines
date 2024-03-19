@@ -213,7 +213,7 @@ mod interactive_tx {
         Ok(())
     }
 
-    #[connector_test(exclude(Vitess("planetscale.js.wasm")))]
+    #[connector_test(exclude(Vitess("planetscale.js.wasm"), Sqlite("cfd1")))]
     async fn batch_queries_failure(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
         let tx_id = runner.start_tx(5000, 5000, None).await?;
@@ -568,7 +568,7 @@ mod interactive_tx {
     }
 }
 
-#[test_suite(schema(generic))]
+#[test_suite(schema(generic), exclude(Sqlite("cfd1")))]
 mod itx_isolation {
     use query_engine_tests::*;
 
