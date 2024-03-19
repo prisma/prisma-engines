@@ -771,6 +771,7 @@ impl Queryable for PostgreSql {
 
     /// Statement to begin a transaction
     async fn begin_statement(&self, depth: i32) -> String {
+        println!("pg connector: Transaction depth: {}", depth);
         let savepoint_stmt = format!("SAVEPOINT savepoint{}", depth);
         let ret = if depth > 1 { savepoint_stmt } else { "BEGIN".to_string() };
 

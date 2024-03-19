@@ -319,8 +319,8 @@ impl TransactionCapable for JsQueryable {
             }
         }
 
-        let mut depth_guard = self.transaction_depth.lock().await;
-        *depth_guard += 1;
+        let depth_guard = self.transaction_depth.lock().await;
+        // *depth_guard += 1;
 
         let st_depth = *depth_guard;
 
