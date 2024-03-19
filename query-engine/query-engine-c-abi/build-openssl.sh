@@ -11,7 +11,6 @@ if [ ! -d ${OPENSSL_VERSION}.tar.gz ]; then
 	tar xfz "${OPENSSL_VERSION}.tar.gz"
 fi
 
-PROJECT_HOME=`pwd`
 PATH_ORG=$PATH
 OUTPUT_DIR="libs"
 
@@ -22,12 +21,11 @@ mkdir $OUTPUT_DIR
 build_android_clang() {
 
 	echo ""
-	echo "----- Build libcrypto & libssl.so for "$1" -----"
+	echo "----- Build libcrypto & libssl.so for $1 -----"
 	echo ""
 
 	ARCHITECTURE=$1
 	TOOLCHAIN=$2
-	stl="libc++"
 
 	# Set toolchain
 	export TOOLCHAIN_ROOT=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/darwin-x86_64
@@ -41,7 +39,7 @@ build_android_clang() {
 
 	cd "${OPENSSL_VERSION}"
 
-	./Configure $ARCHITECTURE no-asm no-shared -D__ANDROID_API__=21
+	./Configure "$ARCHITECTURE" no-asm no-shared -D__ANDROID_API__=21
 
 	make clean
 	# Apply patch that fixes the armcap instruction
@@ -52,18 +50,18 @@ build_android_clang() {
 
 	make
 
-	mkdir -p ../$OUTPUT_DIR/${ARCHITECTURE}/lib
-	mkdir -p ../$OUTPUT_DIR/${ARCHITECTURE}/include
+	mkdir -p ../$OUTPUT_DIR/"${ARCHITECTURE}"/lib
+	mkdir -p ../$OUTPUT_DIR/"${ARCHITECTURE}"/include
 
 	# file libcrypto.so
 	# file libssl.so
 
-	cp libcrypto.a ../$OUTPUT_DIR/${ARCHITECTURE}/lib/libcrypto.a
-	cp libssl.a ../$OUTPUT_DIR/${ARCHITECTURE}/lib/libssl.a
+	cp libcrypto.a ../$OUTPUT_DIR/"${ARCHITECTURE}"/lib/libcrypto.a
+	cp libssl.a ../$OUTPUT_DIR/"${ARCHITECTURE}"/lib/libssl.a
 	# cp libcrypto.so ../$OUTPUT_DIR/${ARCHITECTURE}/lib/libcrypto.so
 	# cp libssl.so ../$OUTPUT_DIR/${ARCHITECTURE}/lib/libssl.so
 
-	cp -R include/openssl ../$OUTPUT_DIR/${ARCHITECTURE}/include
+	cp -R include/openssl ../$OUTPUT_DIR/"${ARCHITECTURE}"/include
 
 	cd ..
 }
