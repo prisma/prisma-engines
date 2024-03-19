@@ -63,6 +63,8 @@ impl QuaintTransaction for JsTransaction {
         // Modify the depth value through the MutexGuard
         *depth_guard += 1;
 
+        println!("JsTransaction begin: incrementing depth_guard to: {}", *depth_guard);
+
         UnsafeFuture(self.tx_proxy.begin()).await
     }
     async fn commit(&mut self) -> quaint::Result<i32> {
