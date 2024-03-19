@@ -135,14 +135,14 @@ impl<'a> ToString for JsonVisitor<'a> {
 #[derive(Clone)]
 pub(crate) struct CallbackLayer<F>
 where
-    F: Fn(String) -> () + 'static,
+    F: Fn(String) + 'static,
 {
     callback: Arc<F>,
 }
 
 impl<F> CallbackLayer<F>
 where
-    F: Fn(String) -> () + 'static,
+    F: Fn(String) + 'static,
 {
     pub fn new(callback: Arc<F>) -> Self {
         CallbackLayer { callback }
@@ -151,7 +151,7 @@ where
 
 impl<F> StringCallback for CallbackLayer<F>
 where
-    F: Fn(String) -> () + 'static,
+    F: Fn(String) + 'static,
 {
     fn call(&self, message: String) -> Result<(), String> {
         let callback = &self.callback;
@@ -164,7 +164,7 @@ where
 impl<S, F> Layer<S> for CallbackLayer<F>
 where
     S: Subscriber,
-    F: Fn(String) -> (),
+    F: Fn(String),
 {
     fn on_event(&self, event: &tracing::Event<'_>, _ctx: tracing_subscriber::layer::Context<'_, S>) {
         let mut visitor = JsonVisitor::new(event.metadata().level(), event.metadata().target());

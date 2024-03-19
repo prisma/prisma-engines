@@ -35,7 +35,7 @@ impl MigrationDirectory {
     /// Read the migration script to a string.
     pub fn read_migration_script(&self) -> Result<String, Error> {
         let path = self.path.join("migration.sql");
-        std::fs::read_to_string(&path).map_err(|ioerr| UnknownError::new(&ioerr).into())
+        std::fs::read_to_string(path).map_err(|ioerr| UnknownError::new(&ioerr).into())
     }
 }
 

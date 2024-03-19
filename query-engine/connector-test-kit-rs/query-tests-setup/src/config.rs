@@ -279,7 +279,7 @@ impl TestConfig {
     }
 
     pub fn external_test_executor(&self) -> Option<TestExecutor> {
-        self.external_test_executor.clone()
+        self.external_test_executor
     }
 
     pub fn driver_adapter(&self) -> Option<&str> {
@@ -318,7 +318,7 @@ impl TestConfig {
             ),
             (
                 "EXTERNAL_TEST_EXECUTOR".to_string(),
-                self.external_test_executor.clone().unwrap_or(TestExecutor::Napi).to_string(),
+                self.external_test_executor.unwrap_or(TestExecutor::Napi).to_string(),
             ),
             (
                 "PRISMA_DISABLE_QUAINT_EXECUTORS".to_string(),

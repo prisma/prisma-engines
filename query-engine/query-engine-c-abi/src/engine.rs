@@ -284,7 +284,7 @@ impl QueryEngine {
             let tx_id = get_cstr_safe(tx_id_str);
             let trace = get_cstr_safe(trace_str).expect("Trace is needed");
 
-            let query = RequestBody::try_from_str(&body, engine.engine_protocol()).map_err(|err| Error::from(err))?;
+            let query = RequestBody::try_from_str(&body, engine.engine_protocol()).map_err(Error::from)?;
 
             let span = if tx_id.is_none() {
                 tracing::info_span!("prisma:engine", user_facing = true)
@@ -547,7 +547,7 @@ pub unsafe extern "C" fn prisma_query(
                 *error_string_ptr = Box::into_raw(Box::new(error_string.as_ptr())) as *mut c_char;
             });
             std::mem::forget(query_engine);
-            return null_mut();
+            null_mut()
         }
     }
 }
@@ -567,7 +567,7 @@ pub unsafe extern "C" fn prisma_start_transaction(
         }
         Err(_err) => {
             std::mem::forget(query_engine);
-            return null_mut();
+            null_mut()
         }
     }
 }
@@ -584,7 +584,7 @@ pub unsafe extern "C" fn prisma_commit_transaction(
     match result {
         Ok(query_result) => CString::new(query_result).unwrap().into_raw(),
         Err(_err) => {
-            return null_mut();
+            null_mut()
         }
     }
 }
@@ -601,7 +601,7 @@ pub unsafe extern "C" fn prisma_rollback_transaction(
     match result {
         Ok(query_result) => CString::new(query_result).unwrap().into_raw(),
         Err(_err) => {
-            return null_mut();
+            null_mut()
         }
     }
 }
@@ -614,7 +614,7 @@ pub unsafe extern "C" fn prisma_disconnect(qe: *mut QueryEngine, header_str: *co
     match result {
         Ok(_) => PRISMA_OK,
         Err(_err) => {
-            return PRISMA_UNKNOWN_ERROR;
+            PRISMA_UNKNOWN_ERROR
         }
     }
 }
@@ -640,7 +640,7 @@ pub unsafe extern "C" fn prisma_apply_pending_migrations(
                 *error_string_ptr = error_string.as_ptr() as *mut c_char;
             });
             std::mem::forget(query_engine);
-            return PRISMA_UNKNOWN_ERROR;
+            PRISMA_UNKNOWN_ERROR
         }
     }
 }
