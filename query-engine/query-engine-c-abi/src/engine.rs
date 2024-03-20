@@ -130,8 +130,6 @@ impl QueryEngine {
         let mut schema = psl::validate(datamodel.into());
         let config = &mut schema.configuration;
 
-        // let preview_features = config.preview_features();
-
         schema
             .diagnostics
             .to_result()
@@ -156,8 +154,6 @@ impl QueryEngine {
             .validate_that_one_datasource_is_provided()
             .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
 
-        // let enable_tracing = config.preview_features().contains(PreviewFeature::Tracing);
-        // let engine_protocol = constructor_options.engine_protocol.unwrap_or(EngineProtocol::Json);
         let engine_protocol = EngineProtocol::Json;
 
         let config_dir_string = get_cstr_safe(constructor_options.native.config_dir).expect("Config dir is expected");
@@ -311,15 +307,12 @@ impl QueryEngine {
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
     pub async fn disconnect(&self, trace_str: *const c_char) -> Result<(), Error> {
         let trace = get_cstr_safe(trace_str).expect("Trace is needed");
-        // let dispatcher = self.logger.dispatcher();
+        let dispatcher = self.logger.dispatcher();
 
-        // async_panic_to_js_error(async {
         let span = tracing::info_span!("prisma:engine:disconnect");
         let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
-        // TODO: when using Node Drivers, we need to call Driver::close() here.
-
-        // async {
+        // async move {
         let mut inner = self.inner.write().await;
         let engine = inner.as_engine()?;
 
@@ -338,7 +331,6 @@ impl QueryEngine {
         // }
         // .instrument(span)
         // .await
-        // })
         // .with_subscriber(dispatcher)
         // .await
     }
@@ -391,9 +383,6 @@ impl QueryEngine {
 
             applied_migration_names.push(unapplied_migration.migration_name().to_owned());
         }
-
-        //output applied migrations
-        dbg!(applied_migration_names);
 
         Ok(())
     }
