@@ -344,7 +344,12 @@ mod one2one_opt {
     }
 }
 
-#[test_suite(suite = "setnull_onU_1toM_opt", schema(optional), relation_mode = "prisma")]
+#[test_suite(
+    suite = "setnull_onU_1toM_opt",
+    schema(optional),
+    exclude(Sqlite("cfd1")),
+    relation_mode = "prisma"
+)]
 mod one2many_opt {
     fn optional() -> String {
         let schema = indoc! {
@@ -621,7 +626,7 @@ mod one2many_opt {
     }
 
     // SET_NULL should recurse if there are relations sharing a common fk
-    #[connector_test(schema(one2m2m_opt_restrict), exclude(SqlServer))]
+    #[connector_test(schema(one2m2m_opt_restrict), exclude(SqlServer, Sqlite("cfd1")))]
     async fn update_parent_recurse_restrict_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {

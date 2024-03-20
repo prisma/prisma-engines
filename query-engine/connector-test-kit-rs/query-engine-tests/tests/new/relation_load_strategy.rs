@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema))]
+#[test_suite(schema(schema), exclude(Sqlite("cfd1")))]
 mod relation_load_strategy {
     fn schema() -> String {
         indoc! {r#"

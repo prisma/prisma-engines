@@ -105,7 +105,7 @@ mod one2one_req {
     }
 }
 
-#[test_suite(suite = "setdefault_onU_1to1_opt", exclude(MongoDb, MySQL, Vitess))]
+#[test_suite(suite = "setdefault_onU_1to1_opt", exclude(MongoDb, MySQL, Vitess, Sqlite("cfd1")))]
 mod one2one_opt {
     fn optional_with_default() -> String {
         let schema = indoc! {

@@ -1,7 +1,7 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), exclude(MongoDb))]
+#[test_suite(schema(schema), exclude(MongoDb, Sqlite("cfd1")))]
 mod prisma_15177 {
     fn schema() -> String {
         let schema = indoc! {

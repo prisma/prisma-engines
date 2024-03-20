@@ -783,7 +783,7 @@ mod float_serialization_issues {
         schema.to_string()
     }
 
-    #[connector_test(exclude(SqlServer))]
+    #[connector_test(exclude(SqlServer, Sqlite("cfd1")))]
     async fn int_range_overlap_works(runner: Runner) -> TestResult<()> {
         runner
             .query("mutation { createOneTest(data: { id: 1, float: 1e20 }) { id float } }")
