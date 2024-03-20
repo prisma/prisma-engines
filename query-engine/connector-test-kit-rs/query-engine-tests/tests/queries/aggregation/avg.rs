@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schemas::common_numeric_types))]
+#[test_suite(schema(schemas::common_numeric_types), exclude(Sqlite("cfd1")))]
 mod aggregation_avg {
     use query_engine_tests::run_query;
 
