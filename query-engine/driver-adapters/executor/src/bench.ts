@@ -47,6 +47,7 @@ async function main(): Promise<void> {
   const { recorder, replayer, recordings } = recording(withErrorCapturing);
 
   // We exercise the queries recording them
+  // @ts-ignore
   await recordQueries(recorder, datamodel, prismaQueries);
 
   // Dump recordings if requested
