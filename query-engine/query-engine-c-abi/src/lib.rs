@@ -1,5 +1,6 @@
+use query_engine_common::error;
+
 pub mod engine;
-pub mod error;
 pub mod functions;
 pub mod logger;
 pub mod migrations;

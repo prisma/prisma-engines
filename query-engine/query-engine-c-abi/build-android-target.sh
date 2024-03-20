@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 TARGET="$1"
 
 if [ "$TARGET" = "" ]; then
@@ -57,4 +59,4 @@ CC=$TOOLS/bin/${NDK_TARGET}${API_VERSION}-clang \
 CXX=$TOOLS/bin/${NDK_TARGET}${API_VERSION}-clang++ \
 RANLIB=$TOOLS/bin/llvm-ranlib \
 CXXFLAGS="--target=$NDK_TARGET" \
-cargo build --release --target "$TARGET" "$EXTRA_ARGS"
+cargo build --release --target "$TARGET"

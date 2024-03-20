@@ -1,5 +1,4 @@
 use crate::{
-    error::ApiError,
     logger::Logger,
     migrations::{
         execute_migration_script, list_migration_dir, list_migrations, record_migration_started, MigrationDirectory,
@@ -27,8 +26,9 @@ use tokio::{
 use tracing::{field, instrument::WithSubscriber, level_filters::LevelFilter, Instrument, Span};
 use user_facing_errors::Error;
 
-use query_engine_common::engine::{
-    stringify_env_values, ConnectedEngine, ConnectedEngineNative, EngineBuilder, EngineBuilderNative, Inner,
+use query_engine_common::{
+    engine::{stringify_env_values, ConnectedEngine, ConnectedEngineNative, EngineBuilder, EngineBuilderNative, Inner},
+    error::ApiError,
 };
 use request_handlers::ConnectorKind;
 // use tracing_subscriber::filter::LevelFilter;
@@ -216,7 +216,7 @@ impl QueryEngine {
                     .load_url_with_config_dir(&builder.native.config_dir, |key| {
                         builder.native.env.get(key).map(ToString::to_string)
                     })
-                    .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?;
+                    .map_err(|err| ApiError::Conversion(err, builder.schema.db.source().to_owned()))?;
                 // This version of the query engine supports connecting via Rust bindings directly
                 // support for JS drivers can be added, but I commented it out for now
                 let connector_kind = ConnectorKind::Rust {
