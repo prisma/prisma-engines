@@ -41,7 +41,7 @@ Like any C-API, returning multiple chunks of data is done via passing pointers (
 
 Each operation should return an integer status code that indicates PRISMA_OK (0) if the opereation finished correctly or different error codes for each possible error.
 
-C calls are not compatible with tokio/async, so the C functions need to use `block_on` in order to keep synchronisity. If async functionality is wanted the calling language/environment should spin up their own threads and call the functions in there.
+C calls are not compatible with tokio/async, so the C functions need to use `block_on` in order to keep synchronicity. If async functionality is wanted the calling language/environment should spin up their own threads and call the functions in there.
 
 While `block_on` might not be the most efficient way to achieve things, it keeps changes to the core query_engine functionality at a minimum.
 
