@@ -1,5 +1,5 @@
 {
   "connector": "sqlite",
-  "version": "rn",
+  "version": "react-native",
   "external_test_executor": "Mobile"
 }

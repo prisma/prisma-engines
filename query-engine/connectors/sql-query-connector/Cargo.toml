@@ -38,10 +38,6 @@ opentelemetry = { version = "0.17", features = ["tokio"] }
 tracing-opentelemetry = "0.17.3"
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
 quaint.workspace = true
-# quaint = { path = "../../../quaint", default-features = false, features = [
-#   "sqlite",
-# ] }
-
 
 [dependencies.connector-interface]
 package = "query-connector"

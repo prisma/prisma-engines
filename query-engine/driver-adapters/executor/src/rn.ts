@@ -1,5 +1,3 @@
-import Axios from "axios";
-
 export function createRNEngineConnector(
   url: string,
   schema: string,
@@ -8,75 +6,93 @@ export function createRNEngineConnector(
   const port = "3000";
   const baseIP = "192.168.178.20";
   const deviceUrl = `http://${baseIP}:${port}`;
-  const axios = Axios.create({
-    baseURL: deviceUrl,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    transformResponse: (r) => r,
-  });
-
-  // axios.get("/ping").then(() => {
-  //   console.error(`✅ Connection to RN device successful! URL: ${deviceUrl}`);
-  // }).catch(() => {
-  //   throw new Error(`Could not ping device! Check server is runing on IP: ${deviceUrl}`)
-  // })
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
 
   return {
     connect: async () => {
-      const res = await axios.post(`/connect`, {
-        schema,
+      const res = await fetch(`${deviceUrl}/connect`, {
+        method: "POST",
+        mode: "no-cors",
+        headers,
+        body: JSON.stringify({ schema }),
       });
-      return res.data;
+
+      return await res.json();
     },
     query: async (
       body: string,
       trace: string,
       txId: string
     ): Promise<string> => {
-      const res = await axios.post("/query", {
-        body,
-        trace,
-        txId,
+      const res = await fetch(`${deviceUrl}/query`, {
+        method: "POST",
+        mode: "no-cors",
+        headers,
+        body: JSON.stringify({
+          body,
+          trace,
+          txId,
+        }),
       });
 
-      const response = JSON.parse(res.data)
+      const response = await res.json();
 
-      if(response.logs.length) {
-        response.logs.forEach(logCallback)
+      if (response.logs.length) {
+        response.logs.forEach(logCallback);
       }
 
       return response.engineResponse;
     },
     startTransaction: async (body: string, trace: string): Promise<string> => {
-      const res = await axios.post("/start_transaction", {
-        body,
-        trace,
+      const res = await fetch(`${deviceUrl}/start_transaction`, {
+        method: "POST",
+        mode: "no-cors",
+        headers,
+        body: JSON.stringify({
+          body,
+          trace,
+        }),
       });
-      // console.error("start transaction data", res.data);
-      return res.data;
+      return await res.json();
     },
     commitTransaction: async (txId: string, trace: string): Promise<string> => {
-      const res = await axios.post("/commit_transaction", {
-        txId,
-        trace,
+      const res = await fetch(`${deviceUrl}/commit_transaction`, {
+        method: "POST",
+        mode: "no-cors",
+        headers,
+        body: JSON.stringify({
+          txId,
+          trace,
+        }),
       });
-      // console.error(`🐲 ${res.data}`);
-      return res.data;
+      return res.json();
     },
     rollbackTransaction: async (
       txId: string,
       trace: string
     ): Promise<string> => {
-      const res = await axios.post("/rollback_transaction", {
-        txId,
-        trace,
+      const res = await fetch(`${deviceUrl}/rollback_transaction`, {
+        method: "POST",
+        mode: "no-cors",
+        headers,
+        body: JSON.stringify({
+          txId,
+          trace,
+        }),
       });
-      return res.data;
+      return res.json();
     },
     disconnect: async (trace: string) => {
-      await axios.post("/disconnect", {
-        trace,
+      await fetch(`${deviceUrl}/disconnect`, {
+        method: "POST",
+        mode: "no-cors",
+        headers,
+        body: JSON.stringify({
+          trace,
+        }),
       });
     },
   };
