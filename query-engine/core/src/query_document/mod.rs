@@ -32,7 +32,7 @@ use crate::{
     query_ast::{QueryOption, QueryOptions},
     query_graph_builder::resolve_compound_field,
 };
-use query_structure::Model;
+use query_structure::{Model, TypeIdentifier};
 use schema::{constants::*, QuerySchema};
 use std::collections::HashMap;
 use user_facing_errors::query_engine::validation::ValidationError;
@@ -85,6 +85,7 @@ impl BatchDocument {
             ArgumentValue::Object(_) if resolve_compound_field(key, &model).is_some() => false,
             // Otherwise, we just look for a scalar field inside the model. If it's not one, then we break.
             val => match model.fields().find_from_scalar(key) {
+                Ok(field) if matches!(field.type_identifier(), TypeIdentifier::Boolean) => true,
                 Ok(_) => match val {
                     // Consider scalar _only_ if the filter object contains "equals". eg: `{ scalar_field: { equals: 1 } }`
                     ArgumentValue::Object(obj) => !obj.contains_key(filters::EQUALS),
