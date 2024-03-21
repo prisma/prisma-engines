@@ -1,4 +1,4 @@
-use crate::{column_metadata::ColumnMetadata, error::SqlError, value::to_prisma_value};
+use crate::{column_metadata::ColumnMetadata, error::SqlError, value::to_prisma_value, MetadataFieldKind};
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
@@ -97,7 +97,7 @@ impl ToSqlRow for ResultRow {
                     ValueType::Array(None) => Ok(PrismaValue::List(Vec::new())),
                     ValueType::Array(Some(l)) => l
                         .into_iter()
-                        .map(|val| row_value_to_prisma_value(val, meta[i]))
+                        .map(|val| row_value_to_prisma_value(val, &meta[i]))
                         .collect::<crate::Result<Vec<_>>>()
                         .map(PrismaValue::List),
                     _ => {
@@ -108,7 +108,7 @@ impl ToSqlRow for ResultRow {
                         return Err(SqlError::ConversionError(error.into()));
                     }
                 },
-                _ => row_value_to_prisma_value(p_value, meta[i]),
+                _ => row_value_to_prisma_value(p_value, &meta[i]),
             }?;
 
             row.values.push(pv);
@@ -118,7 +118,7 @@ impl ToSqlRow for ResultRow {
     }
 }
 
-fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result<PrismaValue, SqlError> {
+fn row_value_to_prisma_value(p_value: Value, meta: &ColumnMetadata<'_>) -> Result<PrismaValue, SqlError> {
     let create_error = |value: &Value| {
         let message = match meta.name() {
             Some(name) => {
@@ -155,12 +155,34 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             ValueType::Text(Some(cow)) => PrismaValue::Enum(cow.into_owned()),
             _ => return Err(create_error(&p_value)),
         },
+        TypeIdentifier::Json => match meta.kind() {
+            MetadataFieldKind::Scalar => match p_value.typed {
+                value if value.is_null() => PrismaValue::Null,
+                ValueType::Text(Some(json)) => PrismaValue::new_json(json),
+                ValueType::Json(Some(json)) => PrismaValue::new_json(json.to_string()),
+                _ => return Err(create_error(&p_value)),
+            },
+            MetadataFieldKind::Relation(rs) => match p_value.typed {
+                value if value.is_null() => PrismaValue::Null,
+                #[cfg(feature = "relation_joins")]
+                ValueType::Json(Some(json)) => {
+                    use crate::database::operations::read::coerce::coerce_json_relation_to_pv;
 
-        TypeIdentifier::Json => match p_value.typed {
-            value if value.is_null() => PrismaValue::Null,
-            ValueType::Text(Some(json)) => PrismaValue::Json(json.into()),
-            ValueType::Json(Some(json)) => PrismaValue::Json(json.to_string()),
-            _ => return Err(create_error(&p_value)),
+                    let json = coerce_json_relation_to_pv(json, rs)?;
+
+                    PrismaValue::new_json(json)
+                }
+                _ => return Err(create_error(&p_value)),
+            },
+            MetadataFieldKind::Virtual(vs) => match p_value.typed {
+                #[cfg(feature = "relation_joins")]
+                ValueType::Json(Some(json)) => {
+                    use crate::database::operations::read::coerce::reorder_virtuals_group;
+
+                    PrismaValue::new_json(reorder_virtuals_group(json, vs))
+                }
+                _ => return Err(create_error(&p_value)),
+            },
         },
         TypeIdentifier::UUID => match p_value.typed {
             value if value.is_null() => PrismaValue::Null,

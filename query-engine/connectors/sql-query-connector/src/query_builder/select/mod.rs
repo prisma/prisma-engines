@@ -299,11 +299,11 @@ pub(crate) trait JoinSelectBuilder {
         ctx: &Context<'_>,
     ) -> Select<'static> {
         match vs {
-            VirtualSelection::RelationCount(rf, filter) => {
-                if rf.relation().is_many_to_many() {
-                    self.build_relation_count_query_m2m(vs.db_alias(), rf, filter, parent_alias, ctx)
+            VirtualSelection::RelationCount(rc) => {
+                if rc.field().relation().is_many_to_many() {
+                    self.build_relation_count_query_m2m(vs.db_alias(), rc.field(), rc.filter(), parent_alias, ctx)
                 } else {
-                    self.build_relation_count_query(vs.db_alias(), rf, filter, parent_alias, ctx)
+                    self.build_relation_count_query(vs.db_alias(), rc.field(), rc.filter(), parent_alias, ctx)
                 }
             }
         }
@@ -337,7 +337,7 @@ pub(crate) trait JoinSelectBuilder {
         &mut self,
         selection_name: impl Into<Cow<'static, str>>,
         rf: &RelationField,
-        filter: &Option<Filter>,
+        filter: Option<&Filter>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
@@ -351,7 +351,7 @@ pub(crate) trait JoinSelectBuilder {
         let select = Select::from_table(related_table)
             .value(count(asterisk()).alias(selection_name))
             .with_join_conditions(rf, parent_alias, related_table_alias, ctx)
-            .with_filters(filter.clone(), Some(related_table_alias), ctx);
+            .with_filters(filter.cloned(), Some(related_table_alias), ctx);
 
         select
     }
@@ -360,7 +360,7 @@ pub(crate) trait JoinSelectBuilder {
         &mut self,
         selection_name: impl Into<Cow<'static, str>>,
         rf: &RelationField,
-        filter: &Option<Filter>,
+        filter: Option<&Filter>,
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
@@ -399,7 +399,7 @@ pub(crate) trait JoinSelectBuilder {
             .value(count(asterisk()).alias(selection_name))
             .left_join(m2m_join_data)
             .and_where(aggregation_join_conditions)
-            .with_filters(filter.clone(), Some(related_table_alias), ctx);
+            .with_filters(filter.cloned(), Some(related_table_alias), ctx);
 
         select
     }

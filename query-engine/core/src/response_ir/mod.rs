@@ -10,6 +10,7 @@
 //! and a restructure might be necessary (good example is the default value handling sprinkled all over the place).
 mod internal;
 mod ir_serializer;
+mod json_ext;
 mod response;
 
 pub use response::*;

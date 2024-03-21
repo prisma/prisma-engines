@@ -20,6 +20,7 @@ impl<'a> IrSerializer<'a> {
         query_schema: &'a QuerySchema,
     ) -> crate::Result<ResponseData> {
         let _span = info_span!("prisma:engine:serialize", user_facing = true);
+
         match result {
             ExpressionResult::Query(QueryResult::Json(json)) => {
                 Ok(ResponseData::new(self.key.clone(), Item::Json(json)))

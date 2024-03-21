@@ -828,9 +828,9 @@ fn with_json_type_filter(
     match value {
         ConditionValue::Value(pv) => match pv {
             PrismaValue::Json(json) => {
-                let json: serde_json::Value = serde_json::from_str(json.as_str()).unwrap();
+                let json = json.try_as_value().unwrap();
 
-                match json {
+                match json.as_ref() {
                     serde_json::Value::String(_) if reverse => {
                         comparable.or(expr_json.json_type_not_equals(JsonType::String)).into()
                     }

@@ -74,7 +74,7 @@ fn parse_literal(s: &str, tpe: &ColumnType) -> Option<PrismaValue> {
             }
             _ => None,
         },
-        ColumnTypeFamily::Json => Some(PrismaValue::Json(s.to_owned())),
+        ColumnTypeFamily::Json => Some(PrismaValue::new_json(s)),
         ColumnTypeFamily::Enum(_) => {
             let tokens = tokenize(s);
             let mut parser = Parser::new(s, &tokens);

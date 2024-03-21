@@ -86,6 +86,14 @@ impl<'a> OutputType<'a> {
         }
     }
 
+    pub fn as_scalar(&self) -> Option<&ScalarType> {
+        if let InnerOutputType::Scalar(v) = &self.inner {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
     pub fn is_list(&self) -> bool {
         self.is_list
     }

@@ -268,7 +268,7 @@ pub fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<Sca
         ast::Expression::StringValue(v, _) => match scalar_type {
             Some(ScalarType::DateTime) => DefaultKind::Single(PrismaValue::DateTime(v.parse().unwrap())),
             Some(ScalarType::String) => DefaultKind::Single(PrismaValue::String(v.parse().unwrap())),
-            Some(ScalarType::Json) => DefaultKind::Single(PrismaValue::Json(v.parse().unwrap())),
+            Some(ScalarType::Json) => DefaultKind::Single(PrismaValue::new_json(v)),
             Some(ScalarType::Decimal) => DefaultKind::Single(PrismaValue::Float(v.parse().unwrap())),
             Some(ScalarType::Bytes) => DefaultKind::Single(PrismaValue::Bytes(prisma_value::decode_bytes(v).unwrap())),
             other => unreachable!("{:?}", other),

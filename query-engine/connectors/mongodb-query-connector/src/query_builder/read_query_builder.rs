@@ -361,14 +361,14 @@ impl MongoReadQueryBuilder {
     ) -> crate::Result<Self> {
         for aggr in virtual_selections {
             let join = match aggr {
-                VirtualSelection::RelationCount(rf, filter) => {
-                    let filter = filter
-                        .as_ref()
+                VirtualSelection::RelationCount(x) => {
+                    let filter = x
+                        .filter()
                         .map(|f| MongoFilterVisitor::new(FilterPrefix::default(), false).visit(f.clone()))
                         .transpose()?;
 
                     JoinStage {
-                        source: rf.clone(),
+                        source: x.field().clone(),
                         alias: Some(aggr.db_alias()),
                         nested: vec![],
                         filter,

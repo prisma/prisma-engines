@@ -18,7 +18,7 @@ pub(crate) enum DefaultKind<'a> {
     Cuid,
     Nanoid(Option<u8>),
     Now,
-    String(&'a str),
+    String(Cow<'a, str>),
     StringList(Vec<&'a str>),
     EnumVariant(Cow<'a, str>),
     Constant(&'a dyn fmt::Display),
@@ -57,8 +57,8 @@ impl<'a> DefaultValuePair<'a> {
             (Some(sql::DefaultKind::Now), sql::ColumnTypeFamily::DateTime) => Some(DefaultKind::Now),
 
             (Some(sql::DefaultKind::Value(PrismaValue::Null)), _) => Some(DefaultKind::Constant(&"null")),
-            (Some(sql::DefaultKind::Value(PrismaValue::String(val))), _) => Some(DefaultKind::String(val)),
-            (Some(sql::DefaultKind::Value(PrismaValue::Json(val))), _) => Some(DefaultKind::String(val)),
+            (Some(sql::DefaultKind::Value(PrismaValue::String(val))), _) => Some(DefaultKind::String(val.into())),
+            (Some(sql::DefaultKind::Value(PrismaValue::Json(val))), _) => Some(DefaultKind::String(val.as_str())),
 
             (Some(sql::DefaultKind::Value(PrismaValue::Boolean(val))), _) => Some(DefaultKind::Constant(val)),
             (Some(sql::DefaultKind::Value(PrismaValue::Enum(variant))), sql::ColumnTypeFamily::Enum(enum_id)) => {

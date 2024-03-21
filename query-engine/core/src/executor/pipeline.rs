@@ -32,13 +32,19 @@ impl<'conn, 'schema> QueryPipeline<'conn, 'schema> {
 
         let span = info_span!("prisma:engine:interpret");
 
+        let now = std::time::Instant::now();
         let result = self
             .interpreter
             .interpret(expr, Env::default(), 0, trace_id)
             .instrument(span)
             .await;
+        println!("interpret: {:.2?}", now.elapsed());
 
         trace!("{}", self.interpreter.log_output());
-        serializer.serialize(result?, query_schema)
+        let now = std::time::Instant::now();
+        let res = serializer.serialize(result?, query_schema);
+        println!("serialize: {:.2?}", now.elapsed());
+
+        res
     }
 }

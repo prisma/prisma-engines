@@ -21,7 +21,7 @@ enum VirtualSelectionKey {
 impl From<&VirtualSelection> for VirtualSelectionKey {
     fn from(vs: &VirtualSelection) -> Self {
         match vs {
-            VirtualSelection::RelationCount(rf, _) => Self::RelationCount(rf.clone()),
+            VirtualSelection::RelationCount(rc) => Self::RelationCount(rc.field().clone()),
         }
     }
 }

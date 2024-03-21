@@ -17,6 +17,13 @@ pub mod custom_types {
         PrismaValue::Object(vec![make_type_pair(typ), make_value_pair(value)])
     }
 
+    pub fn make_json_object(typ: &str, value: serde_json::Value) -> serde_json::Value {
+        serde_json::json!({
+            TYPE: typ,
+            VALUE: value,
+        })
+    }
+
     fn make_type_pair(typ: &str) -> (String, PrismaValue) {
         (TYPE.to_string(), PrismaValue::String(typ.to_string()))
     }

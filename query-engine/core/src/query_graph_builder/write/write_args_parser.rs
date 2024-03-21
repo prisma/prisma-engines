@@ -64,7 +64,7 @@ fn parse_scalar(sf: &ScalarFieldRef, v: ParsedInputValue<'_>) -> Result<WriteOpe
         ParsedInputValue::Single(PrismaValue::Enum(e)) if sf.type_identifier() == TypeIdentifier::Json => {
             let val = match e.as_str() {
                 json_null::DB_NULL => PrismaValue::Null,
-                json_null::JSON_NULL => PrismaValue::Json("null".to_owned()),
+                json_null::JSON_NULL => PrismaValue::new_json("null"),
                 _ => unreachable!(), // Validation guarantees correct enum values.
             };
 

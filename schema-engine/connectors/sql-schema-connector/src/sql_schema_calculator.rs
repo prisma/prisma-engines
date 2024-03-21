@@ -545,7 +545,7 @@ fn constant_expression_to_sql_default(expr: &ast::Expression, scalar_type: Scala
         ast::Expression::StringValue(val, _) => match scalar_type {
             ScalarType::String => PrismaValue::String(val.clone()),
             ScalarType::DateTime => PrismaValue::DateTime(val.parse().unwrap()),
-            ScalarType::Json => PrismaValue::Json(val.parse().unwrap()),
+            ScalarType::Json => PrismaValue::new_json(val),
             ScalarType::Bytes => PrismaValue::Bytes(PrismaValue::decode_bytes(val).unwrap()),
             ScalarType::Decimal => PrismaValue::Float(val.parse().unwrap()),
             other => unreachable!("{:?}", other),

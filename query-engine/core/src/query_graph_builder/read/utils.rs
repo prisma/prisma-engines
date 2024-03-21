@@ -148,11 +148,16 @@ fn extract_relation_selection(
 
     let related_model = rf.related_model();
 
+    let args = extract_query_args(pf.arguments, &related_model)?;
+
+    let mut selections = pairs_to_selections(related_model, &object.fields, query_schema)?;
+    selections.dedup();
+
     Ok(SelectedField::Relation(RelationSelection {
         field: rf,
-        args: extract_query_args(pf.arguments, &related_model)?,
+        args,
         result_fields: collect_selection_order(&object.fields),
-        selections: pairs_to_selections(related_model, &object.fields, query_schema)?,
+        selections,
     }))
 }
 
@@ -180,7 +185,9 @@ fn extract_relation_count_selections(
                 .map(|where_arg| extract_filter(where_arg.value.try_into()?, rf.related_model()))
                 .transpose()?;
 
-            Ok(SelectedField::Virtual(VirtualSelection::RelationCount(rf, filter)))
+            Ok(SelectedField::Virtual(VirtualSelection::RelationCount(
+                RelationCountSelection::new(rf, filter),
+            )))
         })
         .collect()
 }

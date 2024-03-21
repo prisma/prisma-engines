@@ -144,7 +144,7 @@ pub(crate) async fn update_many_from_ids_and_filter(
 
 fn process_result_row(
     row: quaint::prelude::ResultRow,
-    meta: &[ColumnMetadata<'_>],
+    meta: &[ColumnMetadata],
     selected_fields: &ModelProjection,
 ) -> crate::Result<SelectionResult> {
     let sql_row = row.to_sql_row(meta)?;

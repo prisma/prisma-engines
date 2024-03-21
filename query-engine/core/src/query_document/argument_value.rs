@@ -44,7 +44,7 @@ impl ArgumentValue {
     }
 
     pub fn json(str: String) -> Self {
-        Self::Scalar(PrismaValue::Json(str))
+        Self::Scalar(PrismaValue::Json(str.into()))
     }
 
     pub fn raw(value: serde_json::Value) -> Self {

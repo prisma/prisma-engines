@@ -22,13 +22,13 @@ pub(crate) fn build<'a>(
 
     for (index, selection) in virtual_selections.into_iter().enumerate() {
         match selection {
-            VirtualSelection::RelationCount(rf, filter) => {
+            VirtualSelection::RelationCount(rc) => {
                 let join_alias = format!("aggr_selection_{index}");
                 let aggregator_alias = selection.db_alias();
                 let join = compute_aggr_join(
-                    rf,
+                    rc.field(),
                     AggregationType::Count,
-                    filter.clone(),
+                    rc.filter().cloned(),
                     aggregator_alias.as_str(),
                     join_alias.as_str(),
                     None,

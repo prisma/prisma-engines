@@ -367,7 +367,7 @@ impl QueryDocumentParser {
             (PrismaValue::String(s), ScalarType::UUID) => self
                 .parse_uuid(selection_path, argument_path, s.as_str())
                 .map(PrismaValue::Uuid),
-            (PrismaValue::String(s), ScalarType::Json) => Ok(PrismaValue::Json(
+            (PrismaValue::String(s), ScalarType::Json) => Ok(PrismaValue::new_json(
                 self.parse_json(selection_path, argument_path, &s).map(|_| s)?,
             )),
             (PrismaValue::String(s), ScalarType::DateTime) => self
@@ -546,7 +546,7 @@ impl QueryDocumentParser {
                     Some(Box::new(err)),
                 )
             })
-            .map(PrismaValue::Json)
+            .map(PrismaValue::new_json)
     }
 
     fn parse_uuid(&self, selection_path: &Path, argument_path: &Path, s: &str) -> QueryParserResult<Uuid> {

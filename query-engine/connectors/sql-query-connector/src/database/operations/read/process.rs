@@ -1,124 +1,126 @@
-use std::borrow::Cow;
-
-use itertools::{Either, Itertools};
-use query_structure::{QueryArguments, Record};
+use std::collections::HashSet;
 
 use crate::query_arguments_ext::QueryArgumentsExt;
+use query_structure::{ManyRecords, QueryArguments};
 
-macro_rules! processor_state {
-    ($name:ident $(-> $transition:ident($bound:ident))?) => {
-        struct $name<T>(T);
-
-        impl<T, U> Iterator for $name<T>
-        where
-            T: Iterator<Item = U>,
-        {
-            type Item = U;
-
-            fn next(&mut self) -> Option<Self::Item> {
-                self.0.next()
-            }
-        }
-
-        impl<T, U> DoubleEndedIterator for $name<T>
-        where
-            T: DoubleEndedIterator<Item = U>,
-        {
-            fn next_back(&mut self) -> Option<Self::Item> {
-                self.0.next_back()
-            }
-        }
-
-        $(
-            impl<T, U> $transition<T> for $name<U> where U: $bound<Item = T> {}
-        )?
-    };
-}
-
-processor_state!(Initial -> ApplyReverseOrder(DoubleEndedIterator));
-processor_state!(WithReverseOrder -> ApplyDistinct(Iterator));
-processor_state!(WithDistinct -> ApplyPagination(Iterator));
-processor_state!(WithPagination);
-
-trait ApplyReverseOrder<T>: DoubleEndedIterator<Item = T>
-where
-    Self: Sized,
-{
-    fn apply_reverse_order(self, args: &QueryArguments) -> WithReverseOrder<impl DoubleEndedIterator<Item = T>> {
-        WithReverseOrder(match args.needs_reversed_order() {
-            true => Either::Left(self.rev()),
-            false => Either::Right(self),
-        })
-    }
-}
-
-trait ApplyDistinct<T>: Iterator<Item = T>
-where
-    Self: Sized,
-{
-    fn apply_distinct<'a>(
-        self,
-        args: &'a QueryArguments,
-        mut get_record_and_fields: impl for<'b> FnMut(&'b Self::Item) -> Option<(Cow<'b, Record>, Cow<'a, [String]>)> + 'a,
-    ) -> WithDistinct<impl Iterator<Item = T>> {
-        WithDistinct(match args.distinct.as_ref() {
-            Some(distinct) if args.requires_inmemory_distinct_with_joins() => {
-                Either::Left(self.unique_by(move |value| {
-                    get_record_and_fields(value).map(|(record, field_names)| {
-                        record
-                            .extract_selection_result_from_prisma_name(&field_names, distinct)
-                            .unwrap()
-                    })
-                }))
-            }
-            _ => Either::Right(self),
-        })
-    }
-}
-
-trait ApplyPagination<T>: Iterator<Item = T>
-where
-    Self: Sized,
-{
-    fn apply_pagination(self, args: &QueryArguments) -> WithPagination<impl Iterator<Item = T>> {
-        let iter = match args.skip {
-            Some(skip) if args.requires_inmemory_pagination_with_joins() => Either::Left(self.skip(skip as usize)),
-            _ => Either::Right(self),
-        };
-
-        let iter = match args.take_abs() {
-            Some(take) if args.requires_inmemory_pagination_with_joins() => Either::Left(iter.take(take as usize)),
-            _ => Either::Right(iter),
-        };
-
-        WithPagination(iter)
-    }
-}
-
-pub struct InMemoryProcessorForJoins<'a, I> {
+pub struct InMemoryProcessorForJoins<'a> {
     args: &'a QueryArguments,
-    records: I,
 }
 
-impl<'a, T, I> InMemoryProcessorForJoins<'a, I>
-where
-    T: 'a,
-    I: DoubleEndedIterator<Item = T> + 'a,
-{
-    pub fn new(args: &'a QueryArguments, records: impl IntoIterator<IntoIter = I>) -> Self {
-        Self {
-            args,
-            records: records.into_iter(),
+trait ApplyReverseOrder {
+    fn apply_reverse_order(&mut self, args: &QueryArguments);
+}
+
+trait ApplyDistinct {
+    fn apply_distinct(&mut self, args: &QueryArguments);
+}
+
+trait ApplyPagination {
+    fn apply_pagination(&mut self, args: &QueryArguments);
+}
+
+impl<T> ApplyReverseOrder for Vec<T> {
+    fn apply_reverse_order(&mut self, args: &QueryArguments) {
+        if args.needs_reversed_order() {
+            self.reverse();
         }
     }
+}
 
-    pub fn process(
-        self,
-        get_record_and_fields: impl for<'b> FnMut(&'b T) -> Option<(Cow<'b, Record>, Cow<'a, [String]>)> + 'a,
-    ) -> impl Iterator<Item = T> + 'a {
-        Initial(self.records)
-            .apply_reverse_order(self.args)
-            .apply_distinct(self.args, get_record_and_fields)
-            .apply_pagination(self.args)
+impl ApplyDistinct for ManyRecords {
+    fn apply_distinct(&mut self, args: &QueryArguments) {
+        if let Some(distinct) = args.distinct.as_ref() {
+            if args.requires_inmemory_distinct_with_joins() {
+                let mut seen = HashSet::new();
+
+                self.records.retain(|record| {
+                    seen.insert(
+                        record
+                            .extract_selection_result_from_prisma_name(&self.field_names, distinct)
+                            .unwrap(),
+                    )
+                });
+            }
+        }
+    }
+}
+
+#[derive(PartialEq, Eq, Hash)]
+enum ScalarJsonValue {
+    Null,
+    Bool(bool),
+    Number(serde_json::Number),
+    String(String),
+    Array(Vec<ScalarJsonValue>),
+}
+
+fn extract_json_scalars(value: &serde_json::Value) -> ScalarJsonValue {
+    match value {
+        serde_json::Value::Null => ScalarJsonValue::Null,
+        serde_json::Value::Bool(b) => ScalarJsonValue::Bool(*b),
+        serde_json::Value::Number(n) => ScalarJsonValue::Number(n.clone()),
+        serde_json::Value::String(s) => ScalarJsonValue::String(s.clone()),
+        serde_json::Value::Array(arr) => ScalarJsonValue::Array(arr.iter().map(extract_json_scalars).collect()),
+        _ => unreachable!(),
+    }
+}
+
+impl ApplyDistinct for Vec<serde_json::Value> {
+    fn apply_distinct(&mut self, args: &QueryArguments) {
+        if let Some(distinct) = args.distinct.as_ref() {
+            if args.requires_inmemory_distinct_with_joins() {
+                let mut seen = HashSet::new();
+
+                self.retain(|record| {
+                    let extracted_values = distinct
+                        .selections()
+                        .map(|sf| {
+                            (
+                                sf.prisma_name().into_owned(),
+                                extract_json_scalars(
+                                    record.as_object().unwrap().get(sf.prisma_name().as_ref()).unwrap(),
+                                ),
+                            )
+                        })
+                        .collect::<Vec<_>>();
+
+                    seen.insert(extracted_values)
+                });
+            }
+        }
+    }
+}
+
+impl<T> ApplyPagination for Vec<T> {
+    fn apply_pagination(&mut self, args: &QueryArguments) {
+        if let Some(skip) = args.skip {
+            if args.requires_inmemory_pagination_with_joins() {
+                self.drain(0..std::cmp::min(skip as usize, self.len()));
+            }
+        }
+
+        if let Some(take) = args.take_abs() {
+            if args.requires_inmemory_pagination_with_joins() {
+                self.truncate(std::cmp::min(take as usize, self.len()));
+            }
+        }
+    }
+}
+
+impl<'a> InMemoryProcessorForJoins<'a> {
+    pub fn new(args: &'a QueryArguments) -> Self {
+        Self { args }
+    }
+
+    pub fn process_records(&mut self, records: &mut ManyRecords) {
+        records.records.apply_reverse_order(self.args);
+        records.apply_distinct(self.args);
+        records.records.apply_pagination(self.args);
+    }
+
+    pub fn process_json_values(&mut self, records: &mut Vec<serde_json::Value>) {
+        records.apply_reverse_order(self.args);
+        records.apply_distinct(self.args);
+        records.apply_pagination(self.args);
     }
 }
