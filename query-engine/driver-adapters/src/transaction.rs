@@ -51,17 +51,17 @@ impl QuaintTransaction for JsTransaction {
         decrement_gauge!("prisma_client_queries_active", 1.0);
 
         let mut depth_guard = self.depth.lock().await;
-        let commit_stmt = "BEGIN";
-
-        if self.options().use_phantom_query {
-            let commit_stmt = JsBaseQueryable::phantom_query_message(commit_stmt);
-            self.raw_phantom_cmd(commit_stmt.as_str()).await?;
-        } else {
-            self.inner.raw_cmd(commit_stmt).await?;
-        }
-
         // Modify the depth value through the MutexGuard
         *depth_guard += 1;
+
+        let begin_stmt = self.begin_statement(*depth_guard).await;
+
+        if self.options().use_phantom_query {
+            let commit_stmt = JsBaseQueryable::phantom_query_message(&begin_stmt);
+            self.raw_phantom_cmd(commit_stmt.as_str()).await?;
+        } else {
+            self.inner.raw_cmd(&begin_stmt).await?;
+        }
 
         println!("JsTransaction begin: incrementing depth_guard to: {}", *depth_guard);
 
@@ -72,13 +72,13 @@ impl QuaintTransaction for JsTransaction {
         decrement_gauge!("prisma_client_queries_active", 1.0);
 
         let mut depth_guard = self.depth.lock().await;
-        let commit_stmt = &self.commit_stmt;
+        let commit_stmt = self.commit_statement(*depth_guard).await;
 
         if self.options().use_phantom_query {
-            let commit_stmt = JsBaseQueryable::phantom_query_message(commit_stmt);
+            let commit_stmt = JsBaseQueryable::phantom_query_message(&commit_stmt);
             self.raw_phantom_cmd(commit_stmt.as_str()).await?;
         } else {
-            self.inner.raw_cmd(commit_stmt).await?;
+            self.inner.raw_cmd(&commit_stmt).await?;
         }
 
         // Modify the depth value through the MutexGuard
@@ -94,13 +94,13 @@ impl QuaintTransaction for JsTransaction {
         decrement_gauge!("prisma_client_queries_active", 1.0);
 
         let mut depth_guard = self.depth.lock().await;
-        let rollback_stmt = &self.rollback_stmt;
+        let rollback_stmt = self.rollback_statement(*depth_guard).await;
 
         if self.options().use_phantom_query {
-            let rollback_stmt = JsBaseQueryable::phantom_query_message(rollback_stmt);
+            let rollback_stmt = JsBaseQueryable::phantom_query_message(&rollback_stmt);
             self.raw_phantom_cmd(rollback_stmt.as_str()).await?;
         } else {
-            self.inner.raw_cmd(rollback_stmt).await?;
+            self.inner.raw_cmd(&rollback_stmt).await?;
         }
 
         // Modify the depth value through the MutexGuard
@@ -164,6 +164,18 @@ impl Queryable for JsTransaction {
 
     fn requires_isolation_first(&self) -> bool {
         self.inner.requires_isolation_first()
+    } 
+
+    async fn begin_statement(&self, depth: i32) -> String {
+        self.inner.begin_statement(depth).await
+    }
+
+    async fn commit_statement(&self, depth: i32) -> String {
+        self.inner.commit_statement(depth).await
+    }
+
+    async fn rollback_statement(&self, depth: i32) -> String {
+        self.inner.rollback_statement(depth).await
     }
 }
 

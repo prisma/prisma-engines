@@ -319,28 +319,30 @@ impl TransactionCapable for JsQueryable {
             }
         }
 
-        let depth_guard = self.transaction_depth.lock().await;
-        // *depth_guard += 1;
+        {
+            let mut depth_guard = tx.depth.lock().await;
+            *depth_guard += 1;
 
-        let st_depth = *depth_guard;
+            let st_depth = *depth_guard;
 
-        let begin_stmt = tx.begin_statement(st_depth).await;
+            let begin_stmt = tx.begin_statement(st_depth).await;
 
-        let tx_opts = tx.options();
-        if tx_opts.use_phantom_query {
-            let begin_stmt = JsBaseQueryable::phantom_query_message(&begin_stmt);
-            tx.raw_phantom_cmd(begin_stmt.as_str()).await?;
-        } else {
-            tx.raw_cmd(&begin_stmt).await?;
-        }
-
-        if !isolation_first {
-            if let Some(isolation) = isolation {
-                tx.set_tx_isolation_level(isolation).await?;
+            let tx_opts = tx.options();
+            if tx_opts.use_phantom_query {
+                let begin_stmt = JsBaseQueryable::phantom_query_message(&begin_stmt);
+                tx.raw_phantom_cmd(begin_stmt.as_str()).await?;
+            } else {
+                tx.raw_cmd(&begin_stmt).await?;
             }
-        }
 
-        self.server_reset_query(tx.as_ref()).await?;
+            if !isolation_first {
+                if let Some(isolation) = isolation {
+                    tx.set_tx_isolation_level(isolation).await?;
+                }
+            }
+
+            self.server_reset_query(tx.as_ref()).await?;
+        }
 
         Ok(tx)
     }
