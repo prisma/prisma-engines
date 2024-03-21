@@ -261,7 +261,7 @@ impl<'a> RequestHandler<'a> {
             },
             (ArgumentValue::Scalar(PrismaValue::Float(s1)), ArgumentValue::Scalar(PrismaValue::String(s2)))
             | (ArgumentValue::Scalar(PrismaValue::String(s2)), ArgumentValue::Scalar(PrismaValue::Float(s1))) => {
-                BigDecimal::from_str(&s2).map(|s2| s2 == *s1).unwrap_or(false)
+                BigDecimal::from_str(s2).map(|s2| s2 == *s1).unwrap_or(false)
             }
             (left, right) => left == right,
         }
