@@ -68,12 +68,17 @@ async function migrateReset(D1_DATABASE: D1Database) {
     .decodeUnknownSync(D1Tables, { onExcessProperty: 'preserve' })(rawTables)
     .filter((item) => !['_cf_KV', 'sqlite_schema', 'sqlite_sequence'].includes(item.name))
 
-  // This may sometimes fail with `D1_ERROR: no such table: sqlite_sequence`, but no error is thrown.
-  // It just needs to be outside of the batch transaction.
+  // This may sometimes fail with `D1_ERROR: no such table: sqlite_sequence`,
+  // so it needs to be outside of the batch transaction.
   // From the docs (https://www.sqlite.org/autoinc.html):
   // "The sqlite_sequence table is created automatically, if it does not already exist,
   // whenever a normal table that contains an AUTOINCREMENT column is created".
-  await D1_DATABASE.prepare(`DELETE FROM "sqlite_sequence";`).run()
+  try {
+    await D1_DATABASE.prepare(`DELETE FROM "sqlite_sequence";`).run()
+  } catch (_) {
+    // Ignore the error, as the table may not exist.
+    console.warn('Failed to reset sqlite_sequence table, but continuing with the reset.')
+  }
 
   const batch = [] as string[]
 
