@@ -339,7 +339,7 @@ run_query!(
 
 **Accepting a snapshot update will replace, directly in your code, the expected output in the assertion.**
 
-If you dislike the interactive view, you can also run `cargo insta accept` to automatically accept all snapshots and then use your git diff to check if everything is as intented.
+If you dislike the interactive view, you can also run `cargo insta accept` to automatically accept all snapshots and then use your git diff to check if everything is as intended.
 
 ##### Without `cargo-insta`
 
