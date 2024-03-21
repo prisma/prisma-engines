@@ -43,6 +43,9 @@ mod regression {
             r#"query {findUniqueArtist(where:{firstName_netWorth:{firstName:"George",netWorth:"-0.23660010012409"}}) {firstName netWorth}}"#.to_string(),
         ];
 
+        let doc = compact_batch(&runner, queries.clone()).await?;
+        assert!(doc.is_compact());
+
         let batch_results = runner.batch(queries, false, None).await?;
         insta::assert_snapshot!(
             batch_results.to_string(),
@@ -78,6 +81,9 @@ mod regression {
             r#"query {findUniqueArtist(where:{firstName_netWorth:{firstName:"Michael",netWorth:236600000.12409}}) {firstName netWorth}}"#.to_string(),
             r#"query {findUniqueArtist(where:{firstName_netWorth:{firstName:"George",netWorth:-0.23660010012409}}) {firstName netWorth}}"#.to_string(),
         ];
+
+        let doc = compact_batch(&runner, queries.clone()).await?;
+        assert!(doc.is_compact());
 
         let batch_results = runner.batch(queries, false, None).await?;
         insta::assert_snapshot!(
