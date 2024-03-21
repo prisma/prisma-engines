@@ -7,7 +7,12 @@ mod delete_many_rels {
     use query_test_macros::relation_link_test;
 
     // "a P1 to C1  relation " should "succeed when trying to delete the parent"
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", id_only = true)]
+    #[relation_link_test(
+        on_parent = "ToOneOpt",
+        on_child = "ToOneOpt",
+        id_only = true,
+        exclude(Sqlite("cfd1"))
+    )]
     async fn p1_c1(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         runner
             .query(indoc! { r#"
