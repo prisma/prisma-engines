@@ -84,8 +84,6 @@ where
             .init_with_migration(migration_script)
             .await
             .map_err(|err| ConnectorError::from_msg(format!("Error migrating with D1 adapter: {}", err)))?;
-
-        // TODO: consider adding a busy loop until JavaScript acknowledges the migration is complete.
     } else {
         setup(prisma_schema, db_schemas).await?;
 

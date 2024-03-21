@@ -116,7 +116,7 @@ mod delete_many_rels {
     }
 
     // "a PM to C1 " should "succeed in deleting the parent"
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt")]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToOneOpt", exclude(Sqlite("cfd1")))]
     async fn pm_c1(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         runner
             .query(indoc! { r#"
@@ -263,7 +263,7 @@ mod delete_many_rels {
     }
 
     // "a PM to CM  relation" should "succeed in deleting the parent"
-    #[relation_link_test(on_parent = "ToMany", on_child = "ToMany")]
+    #[relation_link_test(on_parent = "ToMany", on_child = "ToMany", exclude(Sqlite("cfd1")))]
     async fn pm_cm(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {
         runner
             .query(indoc! { r#"

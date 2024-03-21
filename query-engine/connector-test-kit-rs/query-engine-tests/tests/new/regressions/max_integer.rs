@@ -157,7 +157,8 @@ mod max_integer {
     // Specific messages are asserted down below for native types.
     // MongoDB is excluded because it automatically upcasts a value as an i64 if doesn't fit in an i32.
     // MySQL 5.6 is excluded because it never overflows but inserts the min or max of the range of the column type instead.
-    #[connector_test(exclude(MongoDb, MySql(5.6)))]
+    // D1 doesn't fail.
+    #[connector_test(exclude(MongoDb, MySql(5.6), Sqlite("cfd1")))]
     async fn unfitted_int_should_fail(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
