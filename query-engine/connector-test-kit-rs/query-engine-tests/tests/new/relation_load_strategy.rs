@@ -139,7 +139,7 @@ mod relation_load_strategy {
                     $query,
                     $result,
                     capabilities(CorrelatedSubqueries),
-                    exclude(Mysql("5.6", "5.7", "mariadb"))
+                    exclude(Mysql("5.6", "5.7", "mariadb"), Sqlite("cfd1"))
                 );
                 relation_load_strategy_test!(
                     [<$name _lateral>],

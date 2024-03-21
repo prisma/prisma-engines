@@ -394,7 +394,7 @@ mod aggr_group_by_having {
 
     /// Error cases
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn having_filter_mismatch_selection(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,

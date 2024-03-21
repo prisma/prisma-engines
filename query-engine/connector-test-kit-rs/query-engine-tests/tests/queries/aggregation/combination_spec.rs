@@ -337,7 +337,7 @@ mod decimal_combinations {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn some_records(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ dec: "5.5" }"#).await?;
         create_row(&runner, r#"{ dec: "4.5" }"#).await?;

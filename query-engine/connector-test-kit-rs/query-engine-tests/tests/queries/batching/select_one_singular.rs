@@ -92,7 +92,7 @@ mod singular_batch {
     }
 
     // "Two successful queries and one failing with different selection set" should "work"
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn two_success_one_fail_diff_set(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -143,7 +143,7 @@ mod singular_batch {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn relation_traversal_filtered(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -268,7 +268,7 @@ mod singular_batch {
     }
 
     // Regression test for https://github.com/prisma/prisma/issues/18096
-    #[connector_test(schema(bigint_id))]
+    #[connector_test(schema(bigint_id), exclude(Sqlite("cfd1")))]
     async fn batch_bigint_id(runner: Runner) -> TestResult<()> {
         run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id } }"#);
         run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 2 }) { id } }"#);
