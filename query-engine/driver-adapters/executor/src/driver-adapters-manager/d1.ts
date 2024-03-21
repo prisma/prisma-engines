@@ -68,12 +68,18 @@ async function migrateReset(D1_DATABASE: D1Database) {
     .decodeUnknownSync(D1Tables, { onExcessProperty: 'preserve' })(rawTables)
     .filter((item) => !['_cf_KV', 'sqlite_schema', 'sqlite_sequence'].includes(item.name))
 
+  // This may sometimes fail with `D1_ERROR: no such table: sqlite_sequence`, but no error is thrown.
+  // It just needs to be outside of the batch transaction.
+  // From the docs (https://www.sqlite.org/autoinc.html):
+  // "The sqlite_sequence table is created automatically, if it does not already exist,
+  // whenever a normal table that contains an AUTOINCREMENT column is created".
+  await D1_DATABASE.prepare(`DELETE FROM "sqlite_sequence";`).run()
+
   const batch = [] as string[]
 
   // Allow violating foreign key constraints on the batch transaction.
   // The foreign key constraints are automatically re-enabled at the end of the transaction, regardless of it succeeding.
   batch.push(`PRAGMA defer_foreign_keys = ${1};`)
-  batch.push(`DELETE FROM "sqlite_sequence";`)
 
   for (const table of tables) {
     if (table.type === 'view') {
