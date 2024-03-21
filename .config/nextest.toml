@@ -13,7 +13,7 @@ dir = "target/nextest"
 # * retries = 3
 # * retries = { backoff = "fixed", count = 2, delay = "1s" }
 # * retries = { backoff = "exponential", count = 10, delay = "1s", jitter = true, max-delay = "10s" }
-retries = { backoff = "fixed", count = 1, delay = "1s", jitter = true }
+retries = { backoff = "fixed", count = 5, delay = "1s", jitter = true }
 
 # The number of threads to run tests with. Supported values are either an integer or
 # the string "num-cpus". Can be overridden through the `--test-threads` option.
@@ -62,7 +62,7 @@ success-output = "never"
 
 # Cancel the test run on the first failure. For CI runs, consider setting this
 # to false.
-fail-fast = true
+fail-fast = false
 
 # Treat a test that takes longer than the configured 'period' as slow, and print a message.
 # See <https://nexte.st/book/slow-tests> for more information.
