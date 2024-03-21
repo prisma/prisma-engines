@@ -19,8 +19,6 @@ pub(crate) struct JsTransaction {
     tx_proxy: TransactionProxy,
     inner: JsBaseQueryable,
     pub depth: Arc<Mutex<i32>>,
-    pub commit_stmt: String,
-    pub rollback_stmt: String,
 }
 
 impl JsTransaction {
@@ -28,8 +26,6 @@ impl JsTransaction {
         Self {
             inner,
             tx_proxy,
-            commit_stmt: "COMMIT".to_string(),
-            rollback_stmt: "ROLLBACK".to_string(),
             depth: Arc::new(futures::lock::Mutex::new(0)),
         }
     }
