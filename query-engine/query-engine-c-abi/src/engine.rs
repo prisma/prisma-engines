@@ -1,7 +1,8 @@
 use crate::{
     logger::Logger,
     migrations::{
-        execute_migration_script, list_migration_dir, list_migrations, record_migration_started, MigrationDirectory,
+        detect_failed_migrations, execute_migration_script, list_migration_dir, list_migrations,
+        record_migration_started, MigrationDirectory,
     },
 };
 use once_cell::sync::Lazy;
@@ -369,8 +370,7 @@ impl QueryEngine {
             })
             .collect();
 
-        // TODO enable this later
-        // detect_failed_migrations(&migrations_from_database)?;
+        detect_failed_migrations(&migrations_from_database)?;
 
         let mut applied_migration_names: Vec<String> = Vec::with_capacity(unapplied_migrations.len());
 
