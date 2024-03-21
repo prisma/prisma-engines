@@ -1,10 +1,11 @@
 use indoc::indoc;
+use query_engine_common::error::ApiError;
+use query_engine_common::Result;
 use rusqlite::Connection;
 use std::{
     fs::{read_dir, DirEntry},
     path::{Path, PathBuf},
 };
-use user_facing_errors::{Error, UnknownError};
 
 pub type Timestamp = chrono::DateTime<chrono::Utc>;
 
@@ -17,12 +18,6 @@ pub struct MigrationDirectory {
 }
 
 impl MigrationDirectory {
-    /// Initialize a MigrationDirectory at the provided path. This will not
-    /// validate that the path is valid and exists.
-    pub fn new(path: PathBuf) -> MigrationDirectory {
-        MigrationDirectory { path }
-    }
-
     /// The `{timestamp}_{name}` formatted migration name.
     pub fn migration_name(&self) -> &str {
         self.path
@@ -33,9 +28,9 @@ impl MigrationDirectory {
     }
 
     /// Read the migration script to a string.
-    pub fn read_migration_script(&self) -> Result<String, Error> {
+    pub fn read_migration_script(&self) -> Result<String> {
         let path = self.path.join("migration.sql");
-        std::fs::read_to_string(path).map_err(|ioerr| UnknownError::new(&ioerr).into())
+        std::fs::read_to_string(path).map_err(|err| ApiError::Configuration(err.to_string()))
     }
 }
 
@@ -59,19 +54,22 @@ pub struct MigrationRecord {
     pub started_at: Timestamp,
 }
 
-pub fn list_migration_dir(migrations_directory_path: &Path) -> Result<Vec<MigrationDirectory>, Error> {
+pub fn list_migration_dir(migrations_directory_path: &Path) -> Result<Vec<MigrationDirectory>> {
     let mut entries: Vec<MigrationDirectory> = Vec::new();
 
     let read_dir_entries = match read_dir(migrations_directory_path) {
         Ok(read_dir_entries) => read_dir_entries,
-        // Err(err) if matches!(err.kind(), std::io::ErrorKind::NotFound) => return Ok(entries),
-        Err(err) => return Err(UnknownError::new(&err).into()),
+        Err(err) => return Err(ApiError::Configuration(err.to_string())),
     };
 
     for entry in read_dir_entries {
-        let entry = entry.map_err(|err| UnknownError::new(&err))?;
+        let entry = entry.map_err(|err| ApiError::Configuration(err.to_string()))?;
 
-        if entry.file_type().map_err(|err| UnknownError::new(&err))?.is_dir() {
+        if entry
+            .file_type()
+            .map_err(|err| ApiError::Configuration(err.to_string()))?
+            .is_dir()
+        {
             entries.push(entry.into());
         }
     }
@@ -121,8 +119,8 @@ pub fn list_migration_dir(migrations_directory_path: &Path) -> Result<Vec<Migrat
 //     ))
 // }
 
-pub fn list_migrations(database_filename: &Path) -> Result<Vec<MigrationRecord>, Error> {
-    let conn = Connection::open(database_filename).map_err(|err| UnknownError::new(&err))?;
+pub fn list_migrations(database_filename: &Path) -> Result<Vec<MigrationRecord>> {
+    let conn = Connection::open(database_filename).map_err(|err| ApiError::Configuration(err.to_string()))?;
 
     // Check if the migrations table exists
     let table_exists = conn
@@ -141,13 +139,14 @@ pub fn list_migrations(database_filename: &Path) -> Result<Vec<MigrationRecord>,
             );
         "#};
 
-        conn.execute(sql, []).map_err(|err| UnknownError::new(&err))?;
+        conn.execute(sql, [])
+            .map_err(|err| ApiError::Configuration(err.to_string()))?;
     }
 
     let mut stmt = conn
         .prepare("SELECT id, migration_name, started_at, finished_at FROM _prisma_migrations")
-        .map_err(|err| UnknownError::new(&err))?;
-    let mut rows = stmt.query([]).map_err(|err| UnknownError::new(&err))?;
+        .map_err(|err| ApiError::Configuration(err.to_string()))?;
+    let mut rows = stmt.query([]).map_err(|err| ApiError::Configuration(err.to_string()))?;
 
     let mut entries: Vec<MigrationRecord> = Vec::new();
 
@@ -168,24 +167,25 @@ pub fn list_migrations(database_filename: &Path) -> Result<Vec<MigrationRecord>,
     Ok(entries)
 }
 
-pub fn record_migration_started(database_filename: &Path, migration_name: &str) -> Result<(), Error> {
-    let conn = Connection::open(database_filename).map_err(|err| UnknownError::new(&err))?;
+pub fn record_migration_started(database_filename: &Path, migration_name: &str) -> Result<()> {
+    let conn = Connection::open(database_filename).map_err(|err| ApiError::Configuration(err.to_string()))?;
 
     let sql = "INSERT INTO _prisma_migrations (id, migration_name) VALUES (?, ?)";
     conn.execute(sql, [uuid::Uuid::new_v4().to_string(), migration_name.to_owned()])
-        .map_err(|err| UnknownError::new(&err))?;
+        .map_err(|err| ApiError::Configuration(err.to_string()))?;
 
     Ok(())
 }
 
-pub fn execute_migration_script(database_filename: &Path, migration_name: &str, script: &str) -> Result<(), Error> {
-    let conn = Connection::open(database_filename).map_err(|err| UnknownError::new(&err))?;
+pub fn execute_migration_script(database_filename: &Path, migration_name: &str, script: &str) -> Result<()> {
+    let conn = Connection::open(database_filename).map_err(|err| ApiError::Configuration(err.to_string()))?;
 
-    conn.execute_batch(script).map_err(|err| UnknownError::new(&err))?;
+    conn.execute_batch(script)
+        .map_err(|err| ApiError::Configuration(err.to_string()))?;
 
     let sql = "UPDATE _prisma_migrations SET finished_at = current_timestamp WHERE migration_name = ?";
     conn.execute(sql, [migration_name])
-        .map_err(|err| UnknownError::new(&err))?;
+        .map_err(|err| ApiError::Configuration(err.to_string()))?;
 
     Ok(())
 }

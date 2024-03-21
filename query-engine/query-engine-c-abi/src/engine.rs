@@ -24,8 +24,8 @@ use tokio::{
     sync::RwLock,
 };
 use tracing::{field, instrument::WithSubscriber, level_filters::LevelFilter, Instrument, Span};
-use user_facing_errors::Error;
 
+use query_engine_common::Result;
 use query_engine_common::{
     engine::{stringify_env_values, ConnectedEngine, ConnectedEngineNative, EngineBuilder, EngineBuilderNative, Inner},
     error::ApiError,
@@ -87,7 +87,7 @@ fn get_cstr_safe(ptr: *const c_char) -> Option<String> {
     }
 }
 
-fn map_known_error(err: query_core::CoreError) -> crate::Result<String> {
+fn map_known_error(err: query_core::CoreError) -> Result<String> {
     let user_error: user_facing_errors::Error = err.into();
     let value = serde_json::to_string(&user_error)?;
 
@@ -100,7 +100,7 @@ fn map_known_error(err: query_core::CoreError) -> crate::Result<String> {
 // a call to connect is necessary to start executing queries
 impl QueryEngine {
     /// Parse a valid datamodel and configuration to allow connecting later on.
-    pub fn new(constructor_options: ConstructorOptions) -> Result<Self, Error> {
+    pub fn new(constructor_options: ConstructorOptions) -> Result<Self> {
         // Create a logs closure that can be passed around and called at any time
         // safe scheduling should be taken care by the code/language/environment calling this C-compatible API
         let engine_id = get_cstr_safe(constructor_options.id).expect("engine id cannot be missing");
@@ -182,7 +182,7 @@ impl QueryEngine {
         })
     }
 
-    pub async fn connect(&self, trace: *const c_char) -> Result<(), Error> {
+    pub async fn connect(&self, trace: *const c_char) -> Result<()> {
         if let Some(base_path) = self.base_path.as_ref() {
             env::set_current_dir(Path::new(&base_path)).expect("Could not change directory");
         }
@@ -231,7 +231,7 @@ impl QueryEngine {
 
                 connector.get_connection().instrument(conn_span).await?;
 
-                crate::Result::<_>::Ok(executor)
+                Result::<_>::Ok(executor)
             };
 
             let query_schema_span = tracing::info_span!("prisma:engine:schema");
@@ -255,7 +255,7 @@ impl QueryEngine {
                     #[cfg(all(not(target_os = "ios"), not(target_os = "android")))]
                     metrics: None,
                 },
-            }) as crate::Result<ConnectedEngine>
+            }) as Result<ConnectedEngine>
         }
         .instrument(span)
         .await?;
@@ -269,7 +269,7 @@ impl QueryEngine {
         body_str: *const c_char,
         trace_str: *const c_char,
         tx_id_str: *const c_char,
-    ) -> Result<String, Error> {
+    ) -> Result<String> {
         let dispatcher = self.logger.dispatcher();
 
         async move {
@@ -280,7 +280,7 @@ impl QueryEngine {
             let tx_id = get_cstr_safe(tx_id_str);
             let trace = get_cstr_safe(trace_str).expect("Trace is needed");
 
-            let query = RequestBody::try_from_str(&body, engine.engine_protocol()).map_err(Error::from)?;
+            let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
 
             let span = if tx_id.is_none() {
                 tracing::info_span!("prisma:engine", user_facing = true)
@@ -305,9 +305,9 @@ impl QueryEngine {
     }
 
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
-    pub async fn disconnect(&self, trace_str: *const c_char) -> Result<(), Error> {
+    pub async fn disconnect(&self, trace_str: *const c_char) -> Result<()> {
         let trace = get_cstr_safe(trace_str).expect("Trace is needed");
-        let dispatcher = self.logger.dispatcher();
+        // let dispatcher = self.logger.dispatcher();
 
         let span = tracing::info_span!("prisma:engine:disconnect");
         let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
@@ -335,7 +335,7 @@ impl QueryEngine {
         // .await
     }
 
-    async unsafe fn apply_migrations(&self, migration_folder_path: *const c_char) -> Result<(), Error> {
+    async unsafe fn apply_migrations(&self, migration_folder_path: *const c_char) -> Result<()> {
         if let Some(base_path) = self.base_path.as_ref() {
             env::set_current_dir(Path::new(&base_path)).expect("Could not change directory");
         }
@@ -388,7 +388,7 @@ impl QueryEngine {
     }
 
     /// If connected, attempts to start a transaction in the core and returns its ID.
-    pub async fn start_transaction(&self, input_str: *const c_char, trace_str: *const c_char) -> Result<String, Error> {
+    pub async fn start_transaction(&self, input_str: *const c_char, trace_str: *const c_char) -> Result<String> {
         let input = get_cstr_safe(input_str).expect("Input string missing");
         let trace = get_cstr_safe(trace_str).expect("trace is required in transactions");
         let inner = self.inner.read().await;
@@ -417,7 +417,7 @@ impl QueryEngine {
     }
 
     // If connected, attempts to commit a transaction with id `tx_id` in the core.
-    pub async fn commit_transaction(&self, tx_id_str: *const c_char, _trace: *const c_char) -> Result<String, Error> {
+    pub async fn commit_transaction(&self, tx_id_str: *const c_char, _trace: *const c_char) -> Result<String> {
         let tx_id = get_cstr_safe(tx_id_str).expect("Input string missing");
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
@@ -435,7 +435,7 @@ impl QueryEngine {
     }
 
     // If connected, attempts to roll back a transaction with id `tx_id` in the core.
-    pub async fn rollback_transaction(&self, tx_id_str: *const c_char, _trace: *const c_char) -> Result<String, Error> {
+    pub async fn rollback_transaction(&self, tx_id_str: *const c_char, _trace: *const c_char) -> Result<String> {
         let tx_id = get_cstr_safe(tx_id_str).expect("Input string missing");
         // let trace = get_cstr_safe(trace_str).expect("trace is required in transactions");
         let inner = self.inner.read().await;
@@ -510,7 +510,7 @@ pub unsafe extern "C" fn prisma_connect(
         Err(err) => {
             RUNTIME.block_on(async {
                 let mut error_string = query_engine.error_string.write().await;
-                *error_string = CString::new(err.message()).unwrap();
+                *error_string = CString::new(err.to_string()).unwrap();
                 *error_string_ptr = error_string.as_ptr() as *mut c_char;
             });
             std::mem::forget(query_engine);
@@ -541,7 +541,7 @@ pub unsafe extern "C" fn prisma_query(
         Err(err) => {
             RUNTIME.block_on(async {
                 let mut error_string = query_engine.error_string.write().await;
-                *error_string = CString::new(err.message()).unwrap();
+                *error_string = CString::new(err.to_string()).unwrap();
                 *error_string_ptr = Box::into_raw(Box::new(error_string.as_ptr())) as *mut c_char;
             });
             std::mem::forget(query_engine);
@@ -643,7 +643,7 @@ pub unsafe extern "C" fn prisma_apply_pending_migrations(
         Err(err) => {
             RUNTIME.block_on(async {
                 let mut error_string = query_engine.error_string.write().await;
-                *error_string = CString::new(err.message()).unwrap();
+                *error_string = CString::new(err.to_string()).unwrap();
                 *error_string_ptr = error_string.as_ptr() as *mut c_char;
             });
             std::mem::forget(query_engine);
