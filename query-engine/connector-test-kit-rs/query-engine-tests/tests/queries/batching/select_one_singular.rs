@@ -390,7 +390,7 @@ mod singular_batch {
             @r###"{"batchResult":[{"data":{"findUniqueUser":{"id":"A","isManager":true}}},{"data":{"findUniqueUser":{"id":"B","isManager":false}}}]}"###
         );
 
-        assert!(!compact_doc.is_compact());
+        assert!(compact_doc.is_compact());
 
         Ok(())
     }
