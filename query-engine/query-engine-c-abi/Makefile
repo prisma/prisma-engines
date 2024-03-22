@@ -9,7 +9,6 @@
 
 ARCH_IOS_SIM = aarch64-apple-ios-sim
 ARCHS_IOS = x86_64-apple-ios aarch64-apple-ios aarch64-apple-ios-sim
-# ARCHS_IOS = aarch64-apple-ios aarch64-apple-ios-sim
 ARCHS_ANDROID = aarch64-linux-android armv7-linux-androideabi x86_64-linux-android i686-linux-android
 LIB = libquery_engine.a
 XCFRAMEWORK = QueryEngine.xcframework
@@ -52,8 +51,7 @@ $(ARCHS_IOS): %:
 	cargo build --release --target $@ 
 
 $(XCFRAMEWORK): $(ARCHS_IOS)
-# Library is too large to be published with all the targets on NPM. Therefore we are not shipping the intel version (for older intel macs)
 	lipo -create $(wildcard ../../target/x86_64-apple-ios/release/$(LIB)) $(wildcard ../../target/aarch64-apple-ios-sim/release/$(LIB)) -output simulator_fat/libquery_engine.a
 	xcodebuild -create-xcframework -library $(wildcard ../../target/aarch64-apple-ios/release/$(LIB)) -headers include -library simulator_fat/libquery_engine.a -headers include -output $@
-	# xcodebuild -create-xcframework -library $(wildcard ../../target/aarch64-apple-ios/release/$(LIB)) -headers include -library $(wildcard ../../target/aarch64-apple-ios-sim/release/$(LIB)) -headers include -output $@
+
 	./copy-ios.sh

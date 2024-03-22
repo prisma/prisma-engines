@@ -92,6 +92,11 @@ fn map_known_error(err: query_core::CoreError) -> Result<String> {
     Ok(value)
 }
 
+fn serialize_api_error(err: ApiError) -> String {
+    let user_error: user_facing_errors::Error = err.into();
+    serde_json::to_string(&user_error).unwrap()
+}
+
 // Struct that holds an internal prisma engine
 // the inner prop holds the internal state, it starts as a Builder
 // meaning it is not connected to the database
@@ -565,9 +570,9 @@ pub unsafe extern "C" fn prisma_start_transaction(
             std::mem::forget(query_engine);
             CString::new(query_result).unwrap().into_raw()
         }
-        Err(_err) => {
+        Err(err) => {
             std::mem::forget(query_engine);
-            null_mut()
+            CString::new(serialize_api_error(err)).unwrap().into_raw()
         }
     }
 }
@@ -586,7 +591,7 @@ pub unsafe extern "C" fn prisma_commit_transaction(
     std::mem::forget(query_engine);
     match result {
         Ok(query_result) => CString::new(query_result).unwrap().into_raw(),
-        Err(_err) => null_mut(),
+        Err(err) => CString::new(serialize_api_error(err)).unwrap().into_raw(),
     }
 }
 
@@ -604,7 +609,7 @@ pub unsafe extern "C" fn prisma_rollback_transaction(
     std::mem::forget(query_engine);
     match result {
         Ok(query_result) => CString::new(query_result).unwrap().into_raw(),
-        Err(_err) => null_mut(),
+        Err(err) => CString::new(serialize_api_error(err)).unwrap().into_raw(),
     }
 }
 
