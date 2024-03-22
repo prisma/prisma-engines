@@ -227,7 +227,7 @@ services:
       - databases
 
   mysql-5-6:
-    image: mysql:5.6.50
+    image: mysql:5.6.51
     command: mysqld --table_definition_cache=2000
     restart: unless-stopped
     platform: linux/x86_64
