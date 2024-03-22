@@ -3,9 +3,6 @@ export function createRNEngineConnector(
   schema: string,
   logCallback: (msg: string) => void
 ) {
-  const port = "3000";
-  const baseIP = "192.168.178.20";
-  const deviceUrl = `http://${baseIP}:${port}`;
   const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -13,7 +10,7 @@ export function createRNEngineConnector(
 
   return {
     connect: async () => {
-      const res = await fetch(`${deviceUrl}/connect`, {
+      const res = await fetch(`${url}/connect`, {
         method: "POST",
         mode: "no-cors",
         headers,
@@ -27,7 +24,7 @@ export function createRNEngineConnector(
       trace: string,
       txId: string
     ): Promise<string> => {
-      const res = await fetch(`${deviceUrl}/query`, {
+      const res = await fetch(`${url}/query`, {
         method: "POST",
         mode: "no-cors",
         headers,
@@ -47,7 +44,7 @@ export function createRNEngineConnector(
       return response.engineResponse;
     },
     startTransaction: async (body: string, trace: string): Promise<string> => {
-      const res = await fetch(`${deviceUrl}/start_transaction`, {
+      const res = await fetch(`${url}/start_transaction`, {
         method: "POST",
         mode: "no-cors",
         headers,
@@ -59,7 +56,7 @@ export function createRNEngineConnector(
       return await res.json();
     },
     commitTransaction: async (txId: string, trace: string): Promise<string> => {
-      const res = await fetch(`${deviceUrl}/commit_transaction`, {
+      const res = await fetch(`${url}/commit_transaction`, {
         method: "POST",
         mode: "no-cors",
         headers,
@@ -74,7 +71,7 @@ export function createRNEngineConnector(
       txId: string,
       trace: string
     ): Promise<string> => {
-      const res = await fetch(`${deviceUrl}/rollback_transaction`, {
+      const res = await fetch(`${url}/rollback_transaction`, {
         method: "POST",
         mode: "no-cors",
         headers,
@@ -86,7 +83,7 @@ export function createRNEngineConnector(
       return res.json();
     },
     disconnect: async (trace: string) => {
-      await fetch(`${deviceUrl}/disconnect`, {
+      await fetch(`${url}/disconnect`, {
         method: "POST",
         mode: "no-cors",
         headers,

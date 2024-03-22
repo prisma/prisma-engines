@@ -45,6 +45,11 @@ pub struct TestConfig {
     /// Env key: `EXTERNAL_TEST_EXECUTOR`
     pub(crate) external_test_executor: Option<TestExecutor>,
 
+    // For mobile tests a running device with a valid http server is required.
+    // This is the URL to the mobile emulator which will execute the queries against
+    // the instances of the engine running on the device.
+    pub(crate) mobile_emulator_url: Option<String>,
+
     /// The driver adapter to use when running tests, will be forwarded to the external test
     /// executor by setting the `DRIVER_ADAPTER` env var when spawning the executor process
     pub(crate) driver_adapter: Option<String>,
@@ -88,6 +93,7 @@ And optionally, to test driver adapters
 - EXTERNAL_TEST_EXECUTOR
 - DRIVER_ADAPTER
 - DRIVER_ADAPTER_CONFIG (optional, not required by all driver adapters)
+- MOBILE_EMULATOR_URL (optional, only required by mobile external test executor)
 
 📁 Config file
 
@@ -149,6 +155,8 @@ impl TestConfig {
             .map(|config| serde_json::from_str::<DriverAdapterConfig>(config.as_str()).ok())
             .unwrap_or_default();
 
+        let mobile_emulator_url = std::env::var("MOBILE_EMULATOR_URL").ok();
+
         // Just care for a set value for now.
         let is_ci = std::env::var("BUILDKITE").is_ok();
 
@@ -159,6 +167,7 @@ impl TestConfig {
             external_test_executor,
             driver_adapter,
             driver_adapter_config,
+            mobile_emulator_url,
         })
     }
 
@@ -246,6 +255,12 @@ impl TestConfig {
         }
 
         if let Some(external_test_executor) = &self.external_test_executor {
+            if *external_test_executor == TestExecutor::Mobile && self.mobile_emulator_url.is_none() {
+                exit_with_message(
+                    "When using the mobile external test executor, the mobile emulator URL (MOBILE_EMULATOR_URL env var) must be set.",
+                );
+            }
+
             if *external_test_executor != TestExecutor::Mobile && self.driver_adapter.is_none() {
                 exit_with_message(
                     "When using an external test executor, the driver adapter (DRIVER_ADAPTER env var) must be set.",
@@ -323,6 +338,10 @@ impl TestConfig {
             (
                 "PRISMA_DISABLE_QUAINT_EXECUTORS".to_string(),
                 "1".to_string(),
+            ),
+            (
+                "MOBILE_EMULATOR_URL".to_string(),
+                self.mobile_emulator_url.clone().unwrap_or_default()
             ),
         )
     }

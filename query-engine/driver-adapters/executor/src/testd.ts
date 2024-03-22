@@ -220,6 +220,9 @@ function respondOk(requestId: number, payload: unknown) {
 
 async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<[qe.QueryEngine, ErrorCapturingDriverAdapter]> {
     if(process.env.EXTERNAL_TEST_EXECUTOR === "Mobile") {
+      if(process.env.MOBILE_EMULATOR_URL) {
+        url = process.env.MOBILE_EMULATOR_URL
+      }
       const engineInstance = createRNEngineConnector(url, prismaSchema, logCallback)
       return [engineInstance, {} as any];
     } else {
