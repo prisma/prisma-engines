@@ -185,8 +185,6 @@ impl CompactedDocument {
 
     /// Here be the dragons. Ay caramba!
     pub fn from_operations(ops: Vec<Operation>, schema: &QuerySchema) -> Self {
-        dbg!(&ops);
-
         let field = schema.find_query_field(ops.first().unwrap().name()).unwrap();
         let model = schema.internal_data_model.clone().zip(field.model().unwrap());
         // Unpack all read queries (an enum) into a collection of selections.
@@ -230,8 +228,6 @@ impl CompactedDocument {
 
                 acc
             });
-
-            dbg!(&selection_set);
 
             // We must select all unique fields in the query so we can
             // match the right response back to the right request later on.
