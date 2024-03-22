@@ -1,0 +1,18 @@
+datasource db {
+  provider = "sqlserver"
+  url = "mssql://"
+}
+
+model A {
+  id     Int  @id @default(autoincrement())
+  child  A?   @relation(name: "a_self_relation")
+  parent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)
+  aId    Int? @unique
+}
+// [1;91merror[0m: [1mError validating: A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes. (Implicit default `onUpdate`: `Cascade`) Read more at https://pris.ly/d/cyclic-referential-actions[0m
+//   [1;94m-->[0m  [4mschema.prisma:9[0m
+// [1;94m   | [0m
+// [1;94m 8 | [0m  child  A?   @relation(name: "a_self_relation")
+// [1;94m 9 | [0m  [1;91mparent A?   @relation(name: "a_self_relation", fields: [aId], references: [id], onDelete: Cascade)[0m
+// [1;94m10 | [0m  aId    Int? @unique
+// [1;94m   | [0m
