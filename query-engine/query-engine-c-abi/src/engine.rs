@@ -309,32 +309,33 @@ impl QueryEngine {
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
     pub async fn disconnect(&self, trace_str: *const c_char) -> Result<()> {
         let trace = get_cstr_safe(trace_str).expect("Trace is needed");
-        // let dispatcher = self.logger.dispatcher();
+        let dispatcher = self.logger.dispatcher();
+        async {
+            let span = tracing::info_span!("prisma:engine:disconnect");
+            let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
-        let span = tracing::info_span!("prisma:engine:disconnect");
-        let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+            async {
+                let mut inner = self.inner.write().await;
+                let engine = inner.as_engine()?;
 
-        // async move {
-        let mut inner = self.inner.write().await;
-        let engine = inner.as_engine()?;
+                let builder = EngineBuilder {
+                    schema: engine.schema.clone(),
+                    engine_protocol: engine.engine_protocol(),
+                    native: EngineBuilderNative {
+                        config_dir: engine.native.config_dir.clone(),
+                        env: engine.native.env.clone(),
+                    },
+                };
 
-        let builder = EngineBuilder {
-            schema: engine.schema.clone(),
-            engine_protocol: engine.engine_protocol(),
-            native: EngineBuilderNative {
-                config_dir: engine.native.config_dir.clone(),
-                env: engine.native.env.clone(),
-            },
-        };
+                *inner = Inner::Builder(builder);
 
-        *inner = Inner::Builder(builder);
-
-        Ok(())
-        // }
-        // .instrument(span)
-        // .await
-        // .with_subscriber(dispatcher)
-        // .await
+                Ok(())
+            }
+            .instrument(span)
+            .await
+        }
+        .with_subscriber(dispatcher)
+        .await
     }
 
     async unsafe fn apply_migrations(&self, migration_folder_path: *const c_char) -> Result<()> {
@@ -395,26 +396,25 @@ impl QueryEngine {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
 
-        // TODO(osp) check with team about this dispatcher
-        // let dispatcher = self.logger.dispatcher();
+        let dispatcher = self.logger.dispatcher();
 
-        // async move {
-        let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
-        telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+        async move {
+            let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
+            telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
-        let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
-        match engine
-            .executor()
-            .start_tx(engine.query_schema().clone(), engine.engine_protocol(), tx_opts)
-            .instrument(span)
-            .await
-        {
-            Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
-            Err(err) => Ok(map_known_error(err)?),
+            let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
+            match engine
+                .executor()
+                .start_tx(engine.query_schema().clone(), engine.engine_protocol(), tx_opts)
+                .instrument(span)
+                .await
+            {
+                Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
+                Err(err) => Ok(map_known_error(err)?),
+            }
         }
-        // }
-        // .with_subscriber(dispatcher)
-        // .await
+        .with_subscriber(dispatcher)
+        .await
     }
 
     // If connected, attempts to commit a transaction with id `tx_id` in the core.
@@ -423,16 +423,16 @@ impl QueryEngine {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
 
-        // let dispatcher = self.logger.dispatcher();
+        let dispatcher = self.logger.dispatcher();
 
-        // async move {
-        match engine.executor().commit_tx(TxId::from(tx_id)).await {
-            Ok(_) => Ok("{}".to_string()),
-            Err(err) => Ok(map_known_error(err)?),
+        async move {
+            match engine.executor().commit_tx(TxId::from(tx_id)).await {
+                Ok(_) => Ok("{}".to_string()),
+                Err(err) => Ok(map_known_error(err)?),
+            }
         }
-        // }
-        // .with_subscriber(dispatcher)
-        // .await
+        .with_subscriber(dispatcher)
+        .await
     }
 
     // If connected, attempts to roll back a transaction with id `tx_id` in the core.
@@ -442,16 +442,16 @@ impl QueryEngine {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
 
-        // let dispatcher = self.logger.dispatcher();
+        let dispatcher = self.logger.dispatcher();
 
-        // async move {
-        match engine.executor().rollback_tx(TxId::from(tx_id)).await {
-            Ok(_) => Ok("{}".to_string()),
-            Err(err) => Ok(map_known_error(err)?),
+        async move {
+            match engine.executor().rollback_tx(TxId::from(tx_id)).await {
+                Ok(_) => Ok("{}".to_string()),
+                Err(err) => Ok(map_known_error(err)?),
+            }
         }
-        // }
-        // .with_subscriber(dispatcher)
-        // .await
+        .with_subscriber(dispatcher)
+        .await
     }
 }
 
