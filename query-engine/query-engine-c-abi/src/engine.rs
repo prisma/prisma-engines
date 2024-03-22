@@ -49,8 +49,6 @@ pub static PRISMA_MISSING_POINTER: i32 = 2;
 /// This struct holds an instance of the prisma query engine
 /// You can instanciate as many as you want
 pub struct QueryEngine {
-    // This String pointer will be pointed to by passed error pointer and will allow calling code to have a bit more information when something goes wrong
-    error_string: RwLock<CString>,
     inner: RwLock<Inner>,
     base_path: Option<String>,
     logger: Logger,
@@ -68,8 +66,7 @@ pub struct ConstructorOptionsNative {
 pub struct ConstructorOptions {
     id: *const c_char,
     datamodel: *const c_char,
-    // Used on iOS/Android to navigate to the sandboxed app folder to execute all file operations
-    base_path: *const c_char,
+    base_path: *const c_char, // Used on iOS/Android to navigate to the sandboxed app folder to execute all file operations
     log_level: *const c_char,
     log_queries: bool,
     datasource_overrides: *const c_char,
@@ -176,7 +173,6 @@ impl QueryEngine {
         );
 
         Ok(Self {
-            error_string: RwLock::new(CString::new("").unwrap()),
             inner: RwLock::new(Inner::Builder(builder)),
             base_path,
             logger,
@@ -468,10 +464,14 @@ impl QueryEngine {
 // when adding a new function remember to always call mem::forget
 
 /// # Safety
-///
 /// The calling context needs to pass a valid pointer that will store the reference
+/// The calling context also need to clear the pointer of the error string if it is not null
 #[no_mangle]
-pub unsafe extern "C" fn prisma_create(options: ConstructorOptions, qe_ptr: *mut *mut QueryEngine) -> c_int {
+pub unsafe extern "C" fn prisma_create(
+    options: ConstructorOptions,
+    qe_ptr: *mut *mut QueryEngine,
+    error_string_ptr: *mut *mut c_char,
+) -> c_int {
     if qe_ptr.is_null() {
         return PRISMA_MISSING_POINTER;
     }
@@ -482,8 +482,9 @@ pub unsafe extern "C" fn prisma_create(options: ConstructorOptions, qe_ptr: *mut
             *qe_ptr = Box::into_raw(Box::new(v));
             PRISMA_OK
         }
-        Err(e) => {
-            println!("Error creating query engine {:#?}", e);
+        Err(err) => {
+            let error_string = CString::new(err.to_string()).unwrap();
+            *error_string_ptr = error_string.into_raw() as *mut c_char;
             PRISMA_UNKNOWN_ERROR
         }
     }
@@ -492,6 +493,7 @@ pub unsafe extern "C" fn prisma_create(options: ConstructorOptions, qe_ptr: *mut
 /// # Safety
 ///
 /// The calling context needs to pass a valid pointer that will store the reference to the error string
+/// The calling context also need to clear the pointer of the error string if it is not null
 #[no_mangle]
 pub unsafe extern "C" fn prisma_connect(
     qe: *mut QueryEngine,
@@ -508,11 +510,8 @@ pub unsafe extern "C" fn prisma_connect(
             PRISMA_OK
         }
         Err(err) => {
-            RUNTIME.block_on(async {
-                let mut error_string = query_engine.error_string.write().await;
-                *error_string = CString::new(err.to_string()).unwrap();
-                *error_string_ptr = error_string.as_ptr() as *mut c_char;
-            });
+            let error_string = CString::new(err.to_string()).unwrap();
+            *error_string_ptr = error_string.into_raw() as *mut c_char;
             std::mem::forget(query_engine);
             PRISMA_UNKNOWN_ERROR
         }
@@ -522,6 +521,7 @@ pub unsafe extern "C" fn prisma_connect(
 /// # Safety
 ///
 /// The calling context needs to pass a valid pointer that will store the reference to the error string
+/// The calling context also need to clear the pointer of the error string if it is not null
 #[no_mangle]
 pub unsafe extern "C" fn prisma_query(
     qe: *mut QueryEngine,
@@ -539,11 +539,9 @@ pub unsafe extern "C" fn prisma_query(
             CString::new(query_result).unwrap().into_raw()
         }
         Err(err) => {
-            RUNTIME.block_on(async {
-                let mut error_string = query_engine.error_string.write().await;
-                *error_string = CString::new(err.to_string()).unwrap();
-                *error_string_ptr = Box::into_raw(Box::new(error_string.as_ptr())) as *mut c_char;
-            });
+            let error_string = CString::new(err.to_string()).unwrap();
+            *error_string_ptr = error_string.into_raw() as *mut c_char;
+
             std::mem::forget(query_engine);
             null_mut()
         }
@@ -553,6 +551,7 @@ pub unsafe extern "C" fn prisma_query(
 /// # Safety
 ///
 /// The calling context needs to pass a valid pointer that will store the reference to the error string
+/// The calling context also need to clear the pointer of the error string if it is not null
 #[no_mangle]
 pub unsafe extern "C" fn prisma_start_transaction(
     qe: *mut QueryEngine,
@@ -626,6 +625,7 @@ pub unsafe extern "C" fn prisma_disconnect(qe: *mut QueryEngine, header_str: *co
 /// # Safety
 ///
 /// The calling context needs to pass a valid pointer that will store the reference to the error string
+/// The calling context also need to clear the pointer of the error string if it is not null
 #[no_mangle]
 pub unsafe extern "C" fn prisma_apply_pending_migrations(
     qe: *mut QueryEngine,
@@ -641,11 +641,8 @@ pub unsafe extern "C" fn prisma_apply_pending_migrations(
             PRISMA_OK
         }
         Err(err) => {
-            RUNTIME.block_on(async {
-                let mut error_string = query_engine.error_string.write().await;
-                *error_string = CString::new(err.to_string()).unwrap();
-                *error_string_ptr = error_string.as_ptr() as *mut c_char;
-            });
+            let error_string = CString::new(err.to_string()).unwrap();
+            *error_string_ptr = error_string.into_raw() as *mut c_char;
             std::mem::forget(query_engine);
             PRISMA_UNKNOWN_ERROR
         }
