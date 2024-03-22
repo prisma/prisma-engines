@@ -1,4 +1,4 @@
-use bigdecimal::{BigDecimal, FromPrimitive, ParseBigDecimalError};
+use bigdecimal::{BigDecimal, ParseBigDecimalError};
 use itertools::Itertools;
 use query_structure::*;
 use std::{borrow::Cow, io, str::FromStr};
@@ -137,13 +137,9 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
                 build_conversion_error(sf, &format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
             })?)),
             TypeIdentifier::Float | TypeIdentifier::Decimal => {
-                let bd = n
-                    .as_f64()
-                    .and_then(BigDecimal::from_f64)
-                    .map(|bd| bd.normalized())
-                    .ok_or_else(|| {
-                        build_conversion_error(sf, &format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
-                    })?;
+                let bd = parse_decimal(&n.to_string()).map_err(|_| {
+                    build_conversion_error(sf, &format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
+                })?;
 
                 Ok(PrismaValue::Float(bd))
             }
