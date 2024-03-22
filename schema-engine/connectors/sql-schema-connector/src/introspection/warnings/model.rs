@@ -57,6 +57,12 @@ pub(super) fn generate_warnings(model: ModelPair<'_>, warnings: &mut Warnings) {
         })
     }
 
+    if model.is_foreign_data_wrapper() {
+        warnings.foreign_data_wrapper.push(generators::Model {
+            model: model.name().to_string(),
+        })
+    }
+
     for constraint in model.check_constraints() {
         warnings.check_constraints.push(generators::ModelAndConstraint {
             model: model.name().to_string(),

@@ -3,6 +3,7 @@ SELECT
   namespace.nspname as namespace,
   false as is_partition,
   false as has_subclass,
+  false as is_foreign_table,
   false as has_row_level_security,
   reloptions,
   obj_description(tbl.oid, 'pg_class') as description
