@@ -464,7 +464,7 @@ impl QueryEngine {
 // This API is meant to be stateless. This means the box pointer to the query engine structure will be returned to the
 // calling code and should be passed to subsequent calls
 //
-// Be should be careful about not de-allocating the pointer
+// We should be careful about not de-allocating the pointer
 // when adding a new function remember to always call mem::forget
 
 /// # Safety
