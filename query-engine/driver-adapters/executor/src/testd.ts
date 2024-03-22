@@ -79,7 +79,7 @@ async function main(): Promise<void> {
 
 const state: Record<number, {
     engine: qe.QueryEngine,
-    adapter: ErrorCapturingDriverAdapter,
+    adapter: ErrorCapturingDriverAdapter | null,
     logs: string[]
 }> = {}
 
@@ -97,6 +97,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             const [engine, adapter] = await initQe(castParams.url, castParams.schema, (log) => {
                 logs.push(log)
             });
+
             await engine.connect("")
 
             state[castParams.schemaId] = {
@@ -123,7 +124,7 @@ async function handleRequest(method: string, params: unknown): Promise<unknown> 
             if (parsedResult.errors) {
                 const error = parsedResult.errors[0]?.user_facing_error
                 if (error.error_code === 'P2036') {
-                    const jsError = state[castParams.schemaId].adapter.errorRegistry.consumeError(error.meta.id)
+                    const jsError = state[castParams.schemaId].adapter?.errorRegistry.consumeError(error.meta.id)
                     if (!jsError) {
                         err(`Something went wrong. Engine reported external error with id ${error.meta.id}, but it was not registered.`)
                     } else {
@@ -218,13 +219,13 @@ function respondOk(requestId: number, payload: unknown) {
     console.log(JSON.stringify(msg))
 }
 
-async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<[qe.QueryEngine, ErrorCapturingDriverAdapter]> {
+async function initQe(url: string, prismaSchema: string, logCallback: qe.QueryLogCallback): Promise<[qe.QueryEngine, ErrorCapturingDriverAdapter | null]> {
     if(process.env.EXTERNAL_TEST_EXECUTOR === "Mobile") {
       if(process.env.MOBILE_EMULATOR_URL) {
         url = process.env.MOBILE_EMULATOR_URL
       }
       const engineInstance = createRNEngineConnector(url, prismaSchema, logCallback)
-      return [engineInstance, {} as any];
+      return [engineInstance, null];
     } else {
       const engineType = process.env.EXTERNAL_TEST_EXECUTOR === "Wasm" ? "Wasm" : "Napi";
       const adapter = await adapterFromEnv(url) as DriverAdapter
