@@ -80,6 +80,7 @@ mod native {
     use super::*;
     use tracing::trace;
 
+    #[cfg(feature = "sqlite")]
     pub(crate) async fn sqlite(
         source: &Datasource,
         url: &str,

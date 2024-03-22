@@ -42,7 +42,10 @@ driver-adapters = ["sql-query-connector/driver-adapters"]
 native = ["sql-query-connector/native"]
 all = [
     "mongodb",
-    "sql",
+    "mysql",
+    "sqlite",
+    "postgresql",
+    "cockroachdb",
     "graphql-protocol",
     "sql-query-connector/all",
     "psl/all",
