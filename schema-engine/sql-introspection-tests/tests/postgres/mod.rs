@@ -478,3 +478,83 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres))]
+async fn index_sort_order_stopgap_control(api: &mut TestApi) -> TestResult {
+    let schema = indoc! {r#"
+CREATE TABLE "Post" (
+    "id" text NOT NULL,
+    "createdAt" timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" timestamp(3) NOT NULL DEFAULT '1970-01-01 00:00:00'::timestamp without time zone,
+    "published" boolean NOT NULL DEFAULT false,
+    "title" text NOT NULL,
+    "content" text,
+    "authorId" text,
+    "jsonData" jsonb,
+    "coinflips" _bool,
+    PRIMARY KEY ("id")
+);
+DROP TABLE IF EXISTS "User" CASCADE;
+CREATE TABLE "User" (
+    "id" text,
+    "email" text NOT NULL,
+    "name" text,
+    PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX "User.email" ON "User"("email");
+ALTER TABLE "Post"
+ADD FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE
+SET NULL ON UPDATE CASCADE;
+INSERT INTO "User" (email, id, name)
+VALUES (
+        'a@a.de',
+        '576eddf9-2434-421f-9a86-58bede16fd95',
+        'Alice'
+    );
+    "#};
+
+    api.raw_cmd(schema).await;
+
+    /*
+    this actually returns differnet things for Postgres and Cockroach, this here is the Postgres one
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model Post {
+          id        String    @id
+          createdAt DateTime  @default(now())
+          updatedAt DateTime  @default(dbgenerated("'1970-01-01 00:00:00'::timestamp without time zone"))
+          published Boolean   @default(false)
+          title     String
+          content   String?
+          authorId  String?
+          jsonData  Json?
+          coinflips Boolean[]
+          User      User?     @relation(fields: [authorId], references: [id])
+        }
+
+        model User {
+          id    String  @id
+          email String  @unique(map: "User.email")
+          name  String?
+          Post  Post[]
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+    */
+
+    let expectation = expect![[r#"
+        []"#]];
+
+    api.expect_warnings(&expectation).await;
+
+    Ok(())
+}
