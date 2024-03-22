@@ -41,6 +41,8 @@ $$
 
 #[test_connector(tags(Postgres))]
 async fn a_table_with_descending_unique(api: &mut TestApi) -> TestResult {
+    api.normalise_int_type().await?;
+
     let setup = r#"
        CREATE TABLE "A" (
            id INTEGER NOT NULL,
@@ -67,6 +69,8 @@ async fn a_table_with_descending_unique(api: &mut TestApi) -> TestResult {
 
 #[test_connector(tags(Postgres))]
 async fn a_table_with_descending_compound_unique(api: &mut TestApi) -> TestResult {
+    api.normalise_int_type().await?;
+
     let setup = indoc! {r#"
        CREATE TABLE "A" (
            id INTEGER NOT NULL,
@@ -97,6 +101,8 @@ async fn a_table_with_descending_compound_unique(api: &mut TestApi) -> TestResul
 
 #[test_connector(tags(Postgres))]
 async fn a_table_with_descending_index(api: &mut TestApi) -> TestResult {
+    api.normalise_int_type().await?;
+
     let setup = indoc! {r#"
        CREATE TABLE "A" (
            id INTEGER NOT NULL,
@@ -155,6 +161,8 @@ async fn a_table_with_a_hash_index(api: &mut TestApi) -> TestResult {
 
 #[test_connector(tags(Postgres))]
 async fn ignoring_of_partial_indices(api: &mut TestApi) -> TestResult {
+    api.normalise_int_type().await?;
+
     let setup = indoc! {r#"
        CREATE TABLE "A" (
            id INTEGER NOT NULL,
@@ -181,6 +189,8 @@ async fn ignoring_of_partial_indices(api: &mut TestApi) -> TestResult {
 
 #[test_connector(tags(Postgres))]
 async fn introspecting_now_functions(api: &mut TestApi) -> TestResult {
+    api.normalise_int_type().await?;
+
     let setup = indoc! {r#"
        CREATE TABLE "A" (
            id INTEGER NOT NULL Primary Key,

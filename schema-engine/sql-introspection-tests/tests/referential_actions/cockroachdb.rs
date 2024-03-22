@@ -27,7 +27,7 @@ async fn default_referential_actions_with_restrict(api: &mut TestApi) -> TestRes
 
         model b {
           id   BigInt @id @default(autoincrement())
-          a_id Int
+          a_id BigInt
           a    a      @relation(fields: [a_id], references: [id], map: "asdf")
         }
     "#]];
@@ -64,7 +64,7 @@ async fn referential_actions(api: &mut TestApi) -> TestResult {
 
         model b {
           id   BigInt @id @default(autoincrement())
-          a_id Int
+          a_id BigInt
           a    a      @relation(fields: [a_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "asdf")
         }
     "#]];

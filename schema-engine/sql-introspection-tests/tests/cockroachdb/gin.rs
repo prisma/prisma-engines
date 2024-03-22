@@ -55,8 +55,8 @@ async fn array_ops(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         model A {
-          id   BigInt @id @default(autoincrement())
-          data Int[]
+          id   BigInt   @id @default(autoincrement())
+          data BigInt[]
 
           @@index([data], type: Gin)
         }
