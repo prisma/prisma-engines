@@ -174,9 +174,9 @@ fn shadow_db_not_reachable_error_must_have_the_right_connection_info(api: TestAp
         .to_user_facing();
 
     let assertion = expect![[r#"
-        Can't reach database server at `localhost`:`39824`
+        Can't reach database server at `localhost:39824`
 
-        Please make sure your database server is running at `localhost`:`39824`."#]];
+        Please make sure your database server is running at `localhost:39824`."#]];
 
     assertion.assert_eq(err.message());
 
