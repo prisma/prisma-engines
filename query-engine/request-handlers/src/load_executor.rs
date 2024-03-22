@@ -51,7 +51,7 @@ pub async fn load(
                 p if POSTGRES.is_provider(p) => native::postgres(datasource, &url, features).await,
                 #[cfg(feature = "mssql")]
                 p if MSSQL.is_provider(p) => native::mssql(datasource, &url, features).await,
-                #[cfg(feature = "cockroach")]
+                #[cfg(feature = "cockroachdb")]
                 p if COCKROACH.is_provider(p) => native::postgres(datasource, &url, features).await,
                 #[cfg(feature = "mongodb")]
                 p if MONGODB.is_provider(p) => native::mongodb(datasource, &url, features).await,

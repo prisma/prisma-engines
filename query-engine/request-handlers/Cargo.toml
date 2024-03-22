@@ -38,6 +38,7 @@ postgresql = ["sql", "sql-query-connector/postgresql", "psl/postgresql"]
 mysql = ["sql", "sql-query-connector/mysql", "psl/mysql"]
 sqlite = ["sql", "sql-query-connector/sqlite", "psl/sqlite"]
 cockroachdb = ["sql", "sql-query-connector/postgresql", "psl/cockroachdb"]
+mssql = ["sql", "sql-query-connector/mssql", "psl/mssql"]
 driver-adapters = ["sql-query-connector/driver-adapters"]
 native = ["sql-query-connector/native"]
 all = [
@@ -46,6 +47,7 @@ all = [
     "sqlite",
     "postgresql",
     "cockroachdb",
+    "mssql",
     "graphql-protocol",
     "sql-query-connector/all",
     "psl/all",
