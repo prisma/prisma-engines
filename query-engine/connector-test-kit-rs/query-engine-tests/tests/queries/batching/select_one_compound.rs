@@ -3,7 +3,6 @@ use query_engine_tests::*;
 #[test_suite(schema(schema), capabilities(AnyId))]
 mod compound_batch {
     use indoc::indoc;
-    use query_engine_tests::query_core::{BatchDocument, QueryDocument};
 
     fn schema() -> String {
         let schema = indoc! {
@@ -382,30 +381,6 @@ mod compound_batch {
         );
 
         Ok(())
-    }
-
-    async fn compact_batch(runner: &Runner, queries: Vec<String>) -> TestResult<BatchDocument> {
-        // Ensure individual queries are valid. Helps to debug tests when writing them.
-        for q in queries.iter() {
-            run_query!(runner, q.to_string());
-        }
-
-        // Ensure batched queries are valid
-        runner.batch(queries.clone(), false, None).await?.assert_success();
-
-        let doc = GraphqlBody::Multi(MultiQuery::new(
-            queries.into_iter().map(Into::into).collect(),
-            false,
-            None,
-        ))
-        .into_doc()
-        .unwrap();
-        let batch = match doc {
-            QueryDocument::Multi(batch) => batch.compact(runner.query_schema()),
-            _ => unreachable!(),
-        };
-
-        Ok(batch.compact(runner.query_schema()))
     }
 
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
