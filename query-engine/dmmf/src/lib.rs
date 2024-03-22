@@ -4,6 +4,7 @@ mod serialization_ast;
 #[cfg(test)]
 mod tests;
 
+use psl::ValidatedSchema;
 pub use serialization_ast::DataModelMetaFormat;
 
 use ast_builders::schema_to_dmmf;
@@ -12,6 +13,11 @@ use std::sync::Arc;
 
 pub fn dmmf_json_from_schema(schema: &str) -> String {
     let dmmf = dmmf_from_schema(schema);
+    serde_json::to_string(&dmmf).unwrap()
+}
+
+pub fn dmmf_json_from_validate_schema(schema: ValidatedSchema) -> String {
+    let dmmf = from_precomputed_parts(&schema::build(Arc::new(schema), true));
     serde_json::to_string(&dmmf).unwrap()
 }
 

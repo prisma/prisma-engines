@@ -174,6 +174,11 @@ impl ParserDatabase {
         self.asts.iter().map(|(_, _, _, ast)| ast)
     }
 
+    /// Iterate all parsed ASTs, consuming parser database
+    pub fn into_iter_asts(self) -> impl Iterator<Item = ast::SchemaAst> {
+        self.asts.into_iter().map(|(_, _, _, ast)| ast)
+    }
+
     /// A parsed AST.
     pub fn ast(&self, file_id: FileId) -> &ast::SchemaAst {
         &self.asts[file_id].2
