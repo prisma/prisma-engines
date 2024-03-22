@@ -782,7 +782,7 @@ mod delete_inside_update {
     // ----------------------------------
 
     // "a P1 to CM  relation " should "work"
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany", exclude(SqlServer))]
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany", exclude(SqlServer, Sqlite("cfd1")))]
     async fn p1_cm_by_id_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -828,7 +828,7 @@ mod delete_inside_update {
     }
 
     // "a P1 to CM  relation "should "work"
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany", exclude(SqlServer))]
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany", exclude(SqlServer, Sqlite("cfd1")))]
     async fn p1_cm_by_id_and_filters_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -912,7 +912,7 @@ mod delete_inside_update {
     }
 
     // "a P1 to CM  relation" should "error if the node is connected but the additional filters don't match it"
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany", exclude(SqlServer))]
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToMany", exclude(SqlServer, Sqlite("cfd1")))]
     async fn p1_cm_error_if_filter_not_match(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(

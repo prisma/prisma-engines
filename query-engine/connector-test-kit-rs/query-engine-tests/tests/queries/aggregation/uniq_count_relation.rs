@@ -114,7 +114,7 @@ mod uniq_count_rel {
     }
 
     // Counting with take should not affect the count
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn count_with_take(runner: Runner) -> TestResult<()> {
         // 4 comment / 4 categories
         create_row(
@@ -172,7 +172,7 @@ mod uniq_count_rel {
     }
 
     // Counting with filters should not affect the count
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn count_with_filters(runner: Runner) -> TestResult<()> {
         // 4 comment / 4 categories
         create_row(

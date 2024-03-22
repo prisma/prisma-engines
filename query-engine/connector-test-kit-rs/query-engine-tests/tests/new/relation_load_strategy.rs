@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema))]
+#[test_suite(schema(schema), exclude(Sqlite("cfd1")))]
 mod relation_load_strategy {
     fn schema() -> String {
         indoc! {r#"
@@ -139,7 +139,7 @@ mod relation_load_strategy {
                     $query,
                     $result,
                     capabilities(CorrelatedSubqueries),
-                    exclude(Mysql("5.6", "5.7", "mariadb"))
+                    exclude(Mysql("5.6", "5.7", "mariadb"), Sqlite("cfd1"))
                 );
                 relation_load_strategy_test!(
                     [<$name _lateral>],

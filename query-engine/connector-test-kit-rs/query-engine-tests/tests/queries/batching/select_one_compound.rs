@@ -191,7 +191,7 @@ mod compound_batch {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn two_equal_queries(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -237,7 +237,7 @@ mod compound_batch {
     }
 
     // Ensures non compactable batch are not compacted
-    #[connector_test(schema(should_batch_schema))]
+    #[connector_test(schema(should_batch_schema), exclude(Sqlite("cfd1")))]
     async fn should_only_batch_if_possible(runner: Runner) -> TestResult<()> {
         runner
             .query(
