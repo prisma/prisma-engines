@@ -383,6 +383,45 @@ mod compound_batch {
         Ok(())
     }
 
+    #[connector_test(schema(common_list_types), capabilities(ScalarLists))]
+    async fn should_only_batch_if_possible_list_boolean(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+                createOneTestModel(data: { id: 1, bool: [true, false] }) { id }
+            }"#
+        );
+        run_query!(
+            &runner,
+            r#"mutation {
+                createOneTestModel(data: { id: 2, bool: [false, true] }) { id }
+            }"#
+        );
+
+        let queries = vec![
+            r#"query {
+                findUniqueTestModel(where: { id: 1, bool: { equals: [true, false] } }) { id, bool }
+            }"#
+            .to_string(),
+            r#"query {
+                findUniqueTestModel( where: { id: 2, bool: { equals: [false, true] } }) { id, bool }
+            }"#
+            .to_string(),
+        ];
+
+        // COMPACT: Queries use scalar list
+        let doc = compact_batch(&runner, queries.clone()).await?;
+        assert!(doc.is_compact());
+
+        let batch_results = runner.batch(queries, false, None).await?;
+        insta::assert_snapshot!(
+            batch_results.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueTestModel":{"id":1,"bool":[true,false]}}},{"data":{"findUniqueTestModel":{"id":2,"bool":[false,true]}}}]}"###
+        );
+
+        Ok(())
+    }
+
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query(r#"mutation { createOneArtist(data: { firstName: "Musti" lastName: "Naukio", non_unique: 0 }) { firstName }}"#)
