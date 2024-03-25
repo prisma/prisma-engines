@@ -352,7 +352,7 @@ mod singular_batch {
         let schema = indoc! {
             r#"
         model User {
-            id String @id
+            #id(id, String, @id)
             isManager Boolean? @unique
           }
         "#
