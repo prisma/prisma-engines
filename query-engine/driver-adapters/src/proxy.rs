@@ -21,6 +21,9 @@ pub(crate) struct CommonProxy {
     /// returning the number of affected rows.
     execute_raw: AdapterMethod<Query, u32>,
 
+    /// Execute a query given as SQL, interpolating the given parameters.
+    batch: AdapterMethod<Query, JSResultSet>,
+
     /// Return the provider for this driver.
     pub(crate) provider: String,
 }
@@ -55,6 +58,7 @@ impl CommonProxy {
         Ok(Self {
             query_raw: get_named_property(object, "queryRaw")?,
             execute_raw: get_named_property(object, "executeRaw")?,
+            batch: get_named_property(object, "batch")?,
             provider: to_rust_str(provider)?,
         })
     }
@@ -66,11 +70,16 @@ impl CommonProxy {
     pub async fn execute_raw(&self, params: Query) -> quaint::Result<u32> {
         self.execute_raw.call_as_async(params).await
     }
+
+    pub async fn batch_(&self, params: Query) -> quaint::Result<u32> {
+        self.batch(params).call_as_async(params).await
+    }
 }
 
 impl DriverProxy {
     pub fn new(object: &JsObject) -> JsResult<Self> {
         Ok(Self {
+            batch: get_named_property(object, "batch")?,
             start_transaction: get_named_property(object, "startTransaction")?,
             get_connection_info: get_optional_named_property(object, "getConnectionInfo")?,
         })

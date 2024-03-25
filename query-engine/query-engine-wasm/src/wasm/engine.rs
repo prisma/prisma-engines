@@ -211,6 +211,31 @@ impl QueryEngine {
         .await
     }
 
+    #[wasm_bindgen(js_name = batch)]
+    pub async fn batch(&self, tx_id: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
+        let inner = self.inner.read().await;
+        let engine = inner.as_engine()?;
+        let dispatcher = self.logger.dispatcher();
+
+        let span = tracing::info_span!("prisma:engine", user_facing = true);
+
+        let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
+
+        async move {
+            match engine
+                .executor()
+                .batch(engine.query_schema().clone(), engine.engine_protocol(), tx_opts)
+                .instrument(span)
+                .await
+            {
+                Ok(_) => Ok("{}".to_string()),
+                Err(err) => Ok(map_known_error(err)?),
+            }
+        }
+        .with_subscriber(dispatcher)
+        .await
+    }
+
     /// If connected, attempts to start a transaction in the core and returns its ID.
     #[wasm_bindgen(js_name = startTransaction)]
     pub async fn start_transaction(&self, input: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
@@ -241,7 +266,6 @@ impl QueryEngine {
     pub async fn commit_transaction(&self, tx_id: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
-
         let dispatcher = self.logger.dispatcher();
 
         async move {
@@ -259,7 +283,6 @@ impl QueryEngine {
     pub async fn rollback_transaction(&self, tx_id: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
-
         let dispatcher = self.logger.dispatcher();
 
         async move {
