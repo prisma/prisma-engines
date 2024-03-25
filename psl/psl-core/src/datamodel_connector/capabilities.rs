@@ -74,6 +74,8 @@ capabilities!(
     InsensitiveFilters,
     CreateMany,
     CreateManyWriteableAutoIncId,
+    // TODO laplab: comment.
+    CreateManyRequiresSplitByShape,
     WritableAutoincField,
     CreateSkipDuplicates,
     UpdateableId,

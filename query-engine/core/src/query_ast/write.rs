@@ -272,6 +272,8 @@ pub struct CreateManyRecords {
     /// Fields of created records that client has requested to return.
     /// `None` if the connector does not support returning the created rows.
     pub selected_fields: Option<CreateManyRecordsFields>,
+    // TODO laplab: comment.
+    pub split_by_shape: bool,
 }
 
 #[derive(Debug, Clone)]
