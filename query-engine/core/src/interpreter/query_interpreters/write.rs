@@ -63,87 +63,101 @@ async fn create_many(
     q: CreateManyRecords,
     trace_id: Option<String>,
 ) -> InterpretationResult<QueryResult> {
-    // TODO laplab: split into two functions.
     if q.split_by_shape {
-        let mut args_by_shape: HashMap<Vec<DatasourceFieldName>, Vec<WriteArgs>> = Default::default();
-        for write_args in q.args {
-            let mut shape: Vec<_> = write_args.args.keys().cloned().collect();
-            // This ensures that shapes is not dependent on order of fields.
-            shape.sort_unstable();
-            args_by_shape.entry(shape).or_default().push(write_args);
-        }
+        return create_many_split_by_shape(tx, q, trace_id).await;
+    }
 
-        if let Some(selected_fields) = q.selected_fields {
-            let mut result: Option<ManyRecords> = None;
-            for args in args_by_shape.into_values() {
-                let current_batch = tx
-                    .create_records_returning(
-                        &q.model,
-                        args,
-                        q.skip_duplicates,
-                        selected_fields.fields.clone(),
-                        trace_id.clone(),
-                    )
-                    .await?;
+    if let Some(selected_fields) = q.selected_fields {
+        let records = tx
+            .create_records_returning(&q.model, q.args, q.skip_duplicates, selected_fields.fields, trace_id)
+            .await?;
 
-                if let Some(result) = &mut result {
-                    // We assume that all records have the same set and order of fields,
-                    // since we pass the same `selected_fields.fields` to the
-                    // `create_records_returning()` above.
-                    result.records.extend(current_batch.records.into_iter());
-                } else {
-                    result = Some(current_batch);
-                }
-            }
+        let selection = RecordSelection {
+            name: q.name,
+            fields: selected_fields.order,
+            records,
+            nested: vec![],
+            model: q.model,
+            virtual_fields: vec![],
+        };
 
-            let records = if let Some(result) = result {
-                result
-            } else {
-                // Empty result means that the list of arguments was empty as well.
-                tx.create_records_returning(&q.model, vec![], q.skip_duplicates, selected_fields.fields, trace_id)
-                    .await?
-            };
-
-            let selection = RecordSelection {
-                name: q.name,
-                fields: selected_fields.order,
-                records,
-                nested: vec![],
-                model: q.model,
-                virtual_fields: vec![],
-            };
-
-            Ok(QueryResult::RecordSelection(Some(Box::new(selection))))
-        } else {
-            let mut result = 0;
-            for args in args_by_shape.into_values() {
-                let affected_records = tx
-                    .create_records(&q.model, args, q.skip_duplicates, trace_id.clone())
-                    .await?;
-                result += affected_records;
-            }
-            Ok(QueryResult::Count(result))
-        }
+        Ok(QueryResult::RecordSelection(Some(Box::new(selection))))
     } else {
-        if let Some(selected_fields) = q.selected_fields {
-            let records = tx
-                .create_records_returning(&q.model, q.args, q.skip_duplicates, selected_fields.fields, trace_id)
+        let affected_records = tx.create_records(&q.model, q.args, q.skip_duplicates, trace_id).await?;
+        Ok(QueryResult::Count(affected_records))
+    }
+}
+
+/// Performs bulk inserts grouped by record shape.
+///
+/// By "record shape" we mean "unique set of fields". This is required to support connectors which
+/// do not support `DEFAULT` in the list of values for `INSERT`. For these, we need to rely on the
+/// fact that the database will use the default value for the column if it is not listed in `INSERT`
+/// statement. Grouping by record shape allows us to use this property, because each batch of fields
+/// has the same columns listed for the `INSERT` statement.
+async fn create_many_split_by_shape(
+    tx: &mut dyn ConnectionLike,
+    q: CreateManyRecords,
+    trace_id: Option<String>,
+) -> InterpretationResult<QueryResult> {
+    let mut args_by_shape: HashMap<Vec<DatasourceFieldName>, Vec<WriteArgs>> = Default::default();
+    for write_args in q.args {
+        let mut shape: Vec<_> = write_args.args.keys().cloned().collect();
+        // This ensures that shapes is not dependent on order of fields.
+        shape.sort_unstable();
+        args_by_shape.entry(shape).or_default().push(write_args);
+    }
+
+    if let Some(selected_fields) = q.selected_fields {
+        let mut result: Option<ManyRecords> = None;
+        for args in args_by_shape.into_values() {
+            let current_batch = tx
+                .create_records_returning(
+                    &q.model,
+                    args,
+                    q.skip_duplicates,
+                    selected_fields.fields.clone(),
+                    trace_id.clone(),
+                )
                 .await?;
 
-            let selection = RecordSelection {
-                name: q.name,
-                fields: selected_fields.order,
-                records,
-                nested: vec![],
-                model: q.model,
-                virtual_fields: vec![],
-            };
-
-            Ok(QueryResult::RecordSelection(Some(Box::new(selection))))
-        } else {
-            let affected_records = tx.create_records(&q.model, q.args, q.skip_duplicates, trace_id).await?;
-            Ok(QueryResult::Count(affected_records))
+            if let Some(result) = &mut result {
+                // We assume that all records have the same set and order of fields,
+                // since we pass the same `selected_fields.fields` to the
+                // `create_records_returning()` above.
+                result.records.extend(current_batch.records.into_iter());
+            } else {
+                result = Some(current_batch);
+            }
         }
+
+        let records = if let Some(result) = result {
+            result
+        } else {
+            // Empty result means that the list of arguments was empty as well.
+            tx.create_records_returning(&q.model, vec![], q.skip_duplicates, selected_fields.fields, trace_id)
+                .await?
+        };
+
+        let selection = RecordSelection {
+            name: q.name,
+            fields: selected_fields.order,
+            records,
+            nested: vec![],
+            model: q.model,
+            virtual_fields: vec![],
+        };
+
+        Ok(QueryResult::RecordSelection(Some(Box::new(selection))))
+    } else {
+        let mut result = 0;
+        for args in args_by_shape.into_values() {
+            let affected_records = tx
+                .create_records(&q.model, args, q.skip_duplicates, trace_id.clone())
+                .await?;
+            result += affected_records;
+        }
+        Ok(QueryResult::Count(result))
     }
 }
 

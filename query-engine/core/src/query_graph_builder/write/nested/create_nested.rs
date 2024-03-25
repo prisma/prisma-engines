@@ -75,7 +75,7 @@ pub fn nested_create(
             args: data_maps.into_iter().map(|(args, _nested)| args).collect(),
             skip_duplicates: false,
             selected_fields,
-            split_by_shape: query_schema.has_capability(ConnectorCapability::CreateManyRequiresSplitByShape),
+            split_by_shape: !query_schema.has_capability(ConnectorCapability::SupportsDefaultInInsert),
         };
         let create_many_node = graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));
 
@@ -587,7 +587,7 @@ pub fn nested_create_many(
         args,
         skip_duplicates,
         selected_fields: None,
-        split_by_shape: query_schema.has_capability(ConnectorCapability::CreateManyRequiresSplitByShape),
+        split_by_shape: !query_schema.has_capability(ConnectorCapability::SupportsDefaultInInsert),
     };
 
     let create_node = graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));

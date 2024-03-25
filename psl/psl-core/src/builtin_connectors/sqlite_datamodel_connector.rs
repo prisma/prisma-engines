@@ -30,8 +30,7 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     UpdateReturning |
     SupportsFiltersOnRelationsWithoutJoins |
     CreateMany |
-    CreateManyWriteableAutoIncId |
-    CreateManyRequiresSplitByShape
+    CreateManyWriteableAutoIncId
 });
 
 pub struct SqliteDatamodelConnector;

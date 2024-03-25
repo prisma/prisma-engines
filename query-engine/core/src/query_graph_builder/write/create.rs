@@ -99,7 +99,7 @@ pub(crate) fn create_many_records(
         args,
         skip_duplicates,
         selected_fields: None,
-        split_by_shape: query_schema.has_capability(ConnectorCapability::CreateManyRequiresSplitByShape),
+        split_by_shape: !query_schema.has_capability(ConnectorCapability::SupportsDefaultInInsert),
     };
 
     graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));
