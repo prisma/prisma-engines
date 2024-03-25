@@ -208,15 +208,15 @@ fn create_missing_attribute<'a>(
 }
 
 fn range_after_span(schema: &str, span: Span) -> Range {
-    let start = crate::offset_to_position(span.end - 1, schema);
-    let end = crate::offset_to_position(span.end, schema);
+    let start = crate::offset_to_position(span.end() - 1, schema);
+    let end = crate::offset_to_position(span.end(), schema);
 
     Range { start, end }
 }
 
 fn span_to_range(schema: &str, span: Span) -> Range {
-    let start = crate::offset_to_position(span.start, schema);
-    let end = crate::offset_to_position(span.end, schema);
+    let start = crate::offset_to_position(span.start(), schema);
+    let end = crate::offset_to_position(span.end(), schema);
 
     Range { start, end }
 }

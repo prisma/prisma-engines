@@ -26,9 +26,9 @@ impl ast::SchemaAst {
         let top_idx = self.tops.binary_search_by(|top| {
             let span = top.span();
 
-            if span.start > position {
+            if span.start() > position {
                 Ordering::Greater
-            } else if span.end < position {
+            } else if span.end() < position {
                 Ordering::Less
             } else {
                 Ordering::Equal
@@ -136,16 +136,16 @@ impl<'ast> FieldPosition<'ast> {
                             .map(|arg| (Some(arg.name.name.as_str()), arg.name.span())),
                     )
                     .collect();
-                spans.sort_by_key(|(_, span)| span.start);
+                spans.sort_by_key(|(_, span)| span.start());
                 let mut arg_name = None;
 
-                for (name, _) in spans.iter().take_while(|(_, span)| span.start < position) {
+                for (name, _) in spans.iter().take_while(|(_, span)| span.start() < position) {
                     arg_name = Some(*name);
                 }
 
                 // If the cursor is after a trailing comma, we're not in an argument.
                 if let Some(span) = attr.arguments.trailing_comma {
-                    if position > span.start {
+                    if position > span.start() {
                         arg_name = None;
                     }
                 }
@@ -184,16 +184,16 @@ impl<'ast> EnumValuePosition<'ast> {
                             .map(|arg| (Some(arg.name.name.as_str()), arg.name.span())),
                     )
                     .collect();
-                spans.sort_by_key(|(_, span)| span.start);
+                spans.sort_by_key(|(_, span)| span.start());
                 let mut arg_name = None;
 
-                for (name, _) in spans.iter().take_while(|(_, span)| span.start < position) {
+                for (name, _) in spans.iter().take_while(|(_, span)| span.start() < position) {
                     arg_name = Some(*name);
                 }
 
                 // If the cursor is after a trailing comma, we're not in an argument.
                 if let Some(span) = attr.arguments.trailing_comma {
-                    if position > span.start {
+                    if position > span.start() {
                         arg_name = None;
                     }
                 }
@@ -234,16 +234,16 @@ impl<'ast> AttributePosition<'ast> {
                 )
                 .collect();
 
-            spans.sort_by_key(|(_, span)| span.start);
+            spans.sort_by_key(|(_, span)| span.start());
 
             let mut arg_name = None;
-            for (name, _) in spans.iter().take_while(|(_, span)| span.start < position) {
+            for (name, _) in spans.iter().take_while(|(_, span)| span.start() < position) {
                 arg_name = Some(*name);
             }
 
             // If the cursor is after a trailing comma, we're not in an argument.
             if let Some(span) = attr.arguments.trailing_comma {
-                if position > span.start {
+                if position > span.start() {
                     arg_name = None;
                 }
             }
@@ -289,16 +289,16 @@ impl<'ast> ExpressionPosition<'ast> {
                     )
                     .collect();
 
-                spans.sort_by_key(|(_, span)| span.start);
+                spans.sort_by_key(|(_, span)| span.start());
 
                 let mut arg_name = None;
-                for (name, _) in spans.iter().take_while(|(_, span)| span.start < position) {
+                for (name, _) in spans.iter().take_while(|(_, span)| span.start() < position) {
                     arg_name = Some(*name);
                 }
 
                 // If the cursor is after a trailing comma, we're not in an argument.
                 if let Some(span) = args.trailing_comma {
-                    if position > span.start {
+                    if position > span.start() {
                         arg_name = None;
                     }
                 }

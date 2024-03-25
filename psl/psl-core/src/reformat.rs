@@ -104,9 +104,9 @@ fn push_inline_relation_missing_arguments(
         let extra_args = extra_args.join(", ");
 
         let (prefix, suffix, position) = if relation_attribute.arguments.arguments.is_empty() {
-            ("(", ")", relation_attribute.span.end)
+            ("(", ")", relation_attribute.span.end())
         } else {
-            (", ", "", relation_attribute.span.end - 1)
+            (", ", "", relation_attribute.span.end() - 1)
         };
 
         ctx.missing_bits.push(MissingBit {
@@ -137,7 +137,7 @@ fn push_missing_relation_attribute(inline_relation: walkers::InlineRelationWalke
         content.push(')');
 
         ctx.missing_bits.push(MissingBit {
-            position: after_type(forward.ast_field().field_type.span().end, ctx.original_schema),
+            position: after_type(forward.ast_field().field_type.span().end(), ctx.original_schema),
             content,
         })
     }
@@ -168,7 +168,7 @@ fn push_missing_relation_fields(inline: walkers::InlineRelationWalker<'_>, ctx: 
         let arity = if inline.is_one_to_one() { "?" } else { "[]" };
 
         ctx.missing_bits.push(MissingBit {
-            position: inline.referenced_model().ast_model().span().end - 1,
+            position: inline.referenced_model().ast_model().span().end() - 1,
             content: format!("{referencing_model_name} {referencing_model_name}{arity} {ignore}\n"),
         });
     }
@@ -180,7 +180,7 @@ fn push_missing_relation_fields(inline: walkers::InlineRelationWalker<'_>, ctx: 
         let fields_arg = fields_argument(inline);
         let references_arg = references_argument(inline);
         ctx.missing_bits.push(MissingBit {
-            position: inline.referencing_model().ast_model().span().end - 1,
+            position: inline.referencing_model().ast_model().span().end() - 1,
             content: format!("{field_name} {field_type}{arity} @relation({fields_arg}, {references_arg})\n"),
         })
     }
@@ -211,11 +211,11 @@ fn push_missing_scalar_fields(inline: walkers::InlineRelationWalker<'_>, ctx: &m
 
         let mut attributes: String = String::new();
         if let Some((_datasource_name, _type_name, _args, span)) = field.blueprint.raw_native_type() {
-            attributes.push_str(&ctx.original_schema[span.start..span.end]);
+            attributes.push_str(&ctx.original_schema[span.start()..span.end()]);
         }
 
         ctx.missing_bits.push(MissingBit {
-            position: inline.referencing_model().ast_model().span().end - 1,
+            position: inline.referencing_model().ast_model().span().end() - 1,
             content: format!("{field_name} {field_type}{arity} {attributes}\n"),
         });
     }

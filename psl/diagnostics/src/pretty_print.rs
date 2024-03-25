@@ -17,8 +17,8 @@ pub(crate) fn pretty_print(
     description: &str,
     colorer: &'static dyn DiagnosticColorer,
 ) -> std::io::Result<()> {
-    let start_line_number = text[..span.start].matches('\n').count();
-    let end_line_number = text[..span.end].matches('\n').count();
+    let start_line_number = text[..span.start()].matches('\n').count();
+    let end_line_number = text[..span.end()].matches('\n').count();
     let file_lines = text.split('\n').collect::<Vec<&str>>();
 
     let chars_in_line_before: usize = file_lines[..start_line_number].iter().map(|l| l.len()).sum();
@@ -27,8 +27,8 @@ pub(crate) fn pretty_print(
 
     let line = &file_lines[start_line_number];
 
-    let start_in_line = span.start - chars_in_line_before;
-    let end_in_line = std::cmp::min(start_in_line + (span.end - span.start), line.len());
+    let start_in_line = span.start() - chars_in_line_before;
+    let end_in_line = std::cmp::min(start_in_line + (span.end() - span.start()), line.len());
 
     let prefix = &line[..start_in_line];
     let offending = colorer.primary_color(&line[start_in_line..end_in_line]).bold();

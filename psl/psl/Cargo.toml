@@ -10,7 +10,16 @@ mysql = ["psl-core/mysql"]
 cockroachdb = ["psl-core/cockroachdb"]
 mssql = ["psl-core/mssql"]
 mongodb = ["psl-core/mongodb"]
-all = ["postgresql", "sqlite", "mysql", "cockroachdb", "mssql", "mongodb"]
+full-spans = ["psl-core/full-spans"]
+all = [
+    "postgresql",
+    "sqlite",
+    "mysql",
+    "cockroachdb",
+    "mssql",
+    "mongodb",
+    "full-spans",
+]
 
 [dependencies]
 psl-core = { path = "../psl-core" }
