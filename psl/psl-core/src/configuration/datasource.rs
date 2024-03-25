@@ -252,7 +252,7 @@ impl Datasource {
     }
 
     pub fn url_defined(&self) -> bool {
-        self.url_span.end > self.url_span.start
+        self.url_span.end() > self.url_span.start()
     }
 
     pub fn direct_url_defined(&self) -> bool {

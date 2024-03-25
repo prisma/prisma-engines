@@ -16,8 +16,8 @@ pub(crate) fn run(schema: &str) -> String {
         .errors()
         .iter()
         .map(|err: &DatamodelError| MiniError {
-            start: err.span().start,
-            end: err.span().end,
+            start: err.span().start(),
+            end: err.span().end(),
             text: err.message().to_string(),
             is_warning: false,
         })
@@ -27,8 +27,8 @@ pub(crate) fn run(schema: &str) -> String {
         .warnings()
         .iter()
         .map(|warn: &DatamodelWarning| MiniError {
-            start: warn.span().start,
-            end: warn.span().end,
+            start: warn.span().start(),
+            end: warn.span().end(),
             text: warn.message().to_owned(),
             is_warning: true,
         })

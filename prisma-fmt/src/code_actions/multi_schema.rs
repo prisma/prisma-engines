@@ -142,7 +142,7 @@ pub(super) fn add_schema_to_schemas(
                 formatted_attribute,
                 true,
                 // todo: update spans so that we can just append to the end of the _inside_ of the array. Instead of needing to re-append the `]` or taking the span end -1
-                Span::new(span.start, span.end - 1, psl::parser_database::FileId::ZERO),
+                Span::new(span.start(), span.end() - 1, psl::parser_database::FileId::ZERO),
                 params,
             )
         }

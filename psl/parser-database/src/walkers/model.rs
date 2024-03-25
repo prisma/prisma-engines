@@ -213,7 +213,7 @@ impl<'db> ModelWalker<'db> {
         };
 
         let src = self.db.source(self.id.0);
-        let start = field.ast_field().span().start;
+        let start = field.ast_field().span().start();
 
         let mut spaces = 0;
 
@@ -238,7 +238,7 @@ impl<'db> ModelWalker<'db> {
         };
 
         let src = self.db.source(self.id.0);
-        let start = field.ast_field().span().end - 2;
+        let start = field.ast_field().span().end() - 2;
 
         match src.chars().nth(start) {
             Some('\r') => NewlineType::Windows,
