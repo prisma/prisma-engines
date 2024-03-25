@@ -181,7 +181,7 @@ mod scalar_relations {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_decimal), capabilities(DecimalType))]
+    #[connector_test(schema(schema_decimal), capabilities(DecimalType), exclude(Sqlite("cfd1")))]
     async fn decimal_type(runner: Runner) -> TestResult<()> {
         create_child(&runner, r#"{ childId: 1, dec: "1" }"#).await?;
         create_child(&runner, r#"{ childId: 2, dec: "-1" }"#).await?;
