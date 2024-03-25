@@ -287,11 +287,57 @@ impl DatamodelError {
     }
 
     pub fn new_type_not_found_error(type_name: &str, span: Span) -> DatamodelError {
-        let msg = format!(
-            "Type \"{type_name}\" is neither a built-in type, nor refers to another model, custom type, or enum."
-        );
+        // Rust built-in types and common mistakes mapping
+        const BUILT_IN_TYPES: [&str; 18] = [
+            "bool",
+            "char",
+            "i8", "i16", "i32", "i64", "i128",
+            "u8", "u16", "u32", "u64", "u128",
+            "isize", "usize",
+            "f32", "f64",
+            "str",
+            "fn"
+        ];
+    
+        const COMMON_MISTAKES: [( &str, &str ); 2] = [
+            ("integer", "i32"),  // i32 is the default integer type in Rust
+            ("character", "char")
+        ];
+    
+        let lowercase_input = type_name.to_lowercase();
+    
+        // First check for exact matches in built-in types
+        let suggestion = BUILT_IN_TYPES.iter()
+            .find(|&&known_type| known_type.to_lowercase() == lowercase_input);
+    
+        let msg = match suggestion {
+            Some(suggested_type) => format!(
+                "Type \"{}\" is neither a built-in type, nor refers to another model, custom type, or enum. Did you mean \"{}\"?",
+                type_name, suggested_type
+            ),
+            None => {
+                // If no exact match, check against common mistakes
+                let common_suggestion = COMMON_MISTAKES.iter()
+                    .find(|&&(mistake, _)| mistake == &lowercase_input)
+                    .map(|(_, correct_type)| *correct_type);
+    
+                match common_suggestion {
+                    Some(suggested_type) => format!(
+                        "Type \"{}\" is neither a built-in type, nor refers to another model, custom type, or enum. Did you mean \"{}\"?",
+                        type_name, suggested_type
+                    ),
+                    None => format!(
+                        "Type \"{}\" is neither a built-in type, nor refers to another model, custom type, or enum.",
+                        type_name
+                    )
+                }
+            }
+        };
+        
         Self::new(msg, span)
     }
+    
+    
 
     pub fn new_scalar_type_not_found_error(type_name: &str, span: Span) -> DatamodelError {
         Self::new(format!("Type \"{type_name}\" is not a built-in type."), span)
