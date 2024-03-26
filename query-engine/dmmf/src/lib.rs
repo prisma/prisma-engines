@@ -16,7 +16,7 @@ pub fn dmmf_json_from_schema(schema: &str) -> String {
     serde_json::to_string(&dmmf).unwrap()
 }
 
-pub fn dmmf_json_from_validate_schema(schema: ValidatedSchema) -> String {
+pub fn dmmf_json_from_validated_schema(schema: ValidatedSchema) -> String {
     let dmmf = from_precomputed_parts(&schema::build(Arc::new(schema), true));
     serde_json::to_string(&dmmf).unwrap()
 }

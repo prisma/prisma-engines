@@ -3,7 +3,6 @@ mod code_actions;
 mod get_config;
 mod get_dmmf;
 mod lint;
-mod merge_schemas;
 mod native;
 mod preview;
 mod schema_file_input;

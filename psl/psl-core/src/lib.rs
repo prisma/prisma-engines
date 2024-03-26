@@ -20,7 +20,7 @@ pub use crate::{
     configuration::{
         Configuration, Datasource, DatasourceConnectorData, Generator, GeneratorConfigValue, StringFromEnvVar,
     },
-    reformat::reformat,
+    reformat::{reformat, reformat_multiple},
 };
 pub use diagnostics;
 pub use parser_database::{self, is_reserved_type_name};
