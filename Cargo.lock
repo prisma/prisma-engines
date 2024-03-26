@@ -3560,8 +3560,11 @@ dependencies = [
  "psl",
  "quaint",
  "schema-core",
+ "serde",
+ "serde_json",
  "sql-schema-connector",
  "test-setup",
+ "tokio",
  "url",
 ]
 

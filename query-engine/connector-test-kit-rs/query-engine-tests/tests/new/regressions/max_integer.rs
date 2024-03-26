@@ -33,7 +33,7 @@ mod max_integer {
     const U32_OVERFLOW_MAX: i64 = (u32::MAX as i64) + 1;
     const OVERFLOW_MIN: i8 = -1;
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn transform_gql_parser_too_large(runner: Runner) -> TestResult<()> {
         match runner.protocol() {
             query_engine_tests::EngineProtocol::Graphql => {
@@ -115,7 +115,7 @@ mod max_integer {
 
     // The document parser does not crash on encountering an exponent-notation-serialized int.
     // This triggers a 2009 instead of 2033 as this is in the document parser.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn document_parser_no_crash_too_large(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -127,7 +127,7 @@ mod max_integer {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn document_parser_no_crash_too_small(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -157,7 +157,8 @@ mod max_integer {
     // Specific messages are asserted down below for native types.
     // MongoDB is excluded because it automatically upcasts a value as an i64 if doesn't fit in an i32.
     // MySQL 5.6 is excluded because it never overflows but inserts the min or max of the range of the column type instead.
-    #[connector_test(exclude(MongoDb, MySql(5.6)))]
+    // D1 doesn't fail.
+    #[connector_test(exclude(MongoDb, MySql(5.6), Sqlite("cfd1")))]
     async fn unfitted_int_should_fail(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -783,7 +784,7 @@ mod float_serialization_issues {
         schema.to_string()
     }
 
-    #[connector_test(exclude(SqlServer))]
+    #[connector_test(exclude(SqlServer, Sqlite("cfd1")))]
     async fn int_range_overlap_works(runner: Runner) -> TestResult<()> {
         runner
             .query("mutation { createOneTest(data: { id: 1, float: 1e20 }) { id float } }")

@@ -191,9 +191,10 @@ impl<'a> GetRow for SqliteRow<'a> {
                     }
                 }
                 ValueRef::Real(f) if column.is_real() => {
-                    use bigdecimal::{BigDecimal, FromPrimitive};
+                    use bigdecimal::BigDecimal;
+                    use std::str::FromStr;
 
-                    Value::numeric(BigDecimal::from_f64(f).unwrap())
+                    Value::numeric(BigDecimal::from_str(&f.to_string()).unwrap())
                 }
                 ValueRef::Real(f) => Value::double(f),
                 ValueRef::Text(bytes) if column.is_datetime() => {

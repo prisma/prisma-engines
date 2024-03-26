@@ -6,7 +6,7 @@ mod update_with_no_select {
         include_str!("occ_simple.prisma").to_owned()
     }
 
-    #[connector_test(schema(occ_simple))]
+    #[connector_test(schema(occ_simple), exclude(Sqlite("cfd1")))]
     async fn update_with_no_select(mut runner: Runner) -> TestResult<()> {
         let create_one_resource = r#"
         mutation {

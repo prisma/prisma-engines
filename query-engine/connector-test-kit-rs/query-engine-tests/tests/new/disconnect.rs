@@ -7,7 +7,7 @@ use query_engine_tests::*;
 mod disconnect_security {
     use query_engine_tests::assert_query;
 
-    #[connector_test(schema(schemas::a1_to_bm_opt))]
+    #[connector_test(schema(schemas::a1_to_bm_opt), exclude(Sqlite("cfd1")))]
     async fn must_honor_connect_scope_one2m(runner: Runner) -> TestResult<()> {
         one_to_many_test_data(&runner).await?;
 
@@ -35,7 +35,7 @@ mod disconnect_security {
         Ok(())
     }
 
-    #[connector_test(schema(schemas::posts_categories))]
+    #[connector_test(schema(schemas::posts_categories), exclude(Sqlite("cfd1")))]
     async fn must_honor_connect_scope_m2m(runner: Runner) -> TestResult<()> {
         many_to_many_test_data(&runner).await?;
 

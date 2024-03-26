@@ -181,25 +181,26 @@ mod scalar_relations {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_decimal), capabilities(DecimalType))]
+    #[connector_test(schema(schema_decimal), capabilities(DecimalType), exclude(Sqlite("cfd1")))]
     async fn decimal_type(runner: Runner) -> TestResult<()> {
         create_child(&runner, r#"{ childId: 1, dec: "1" }"#).await?;
         create_child(&runner, r#"{ childId: 2, dec: "-1" }"#).await?;
         create_child(&runner, r#"{ childId: 3, dec: "123.45678910" }"#).await?;
+        create_child(&runner, r#"{ childId: 4, dec: "95993.57" }"#).await?;
         create_parent(
             &runner,
-            r#"{ id: 1, children: { connect: [{ childId: 1 }, { childId: 2 }, { childId: 3 }] } }"#,
+            r#"{ id: 1, children: { connect: [{ childId: 1 }, { childId: 2 }, { childId: 3 }, { childId: 4 }] } }"#,
         )
         .await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findManyParent(orderBy: { id: asc }) { id children { childId dec } } }"#),
-          @r###"{"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"dec":"1"},{"childId":2,"dec":"-1"},{"childId":3,"dec":"123.4567891"}]}]}}"###
+          @r###"{"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"dec":"1"},{"childId":2,"dec":"-1"},{"childId":3,"dec":"123.4567891"},{"childId":4,"dec":"95993.57"}]}]}}"###
         );
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findUniqueParent(where: { id: 1 }) { id children { childId dec } } }"#),
-          @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"dec":"1"},{"childId":2,"dec":"-1"},{"childId":3,"dec":"123.4567891"}]}}}"###
+          @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"dec":"1"},{"childId":2,"dec":"-1"},{"childId":3,"dec":"123.4567891"},{"childId":4,"dec":"95993.57"}]}}}"###
         );
 
         Ok(())

@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema))]
+#[test_suite(schema(schema), exclude(Sqlite("cfd1")))]
 mod bigint {
     use indoc::indoc;
     use query_engine_tests::run_query;
@@ -17,7 +17,7 @@ mod bigint {
     }
 
     // "Using a BigInt field" should "work"
-    #[connector_test()]
+    #[connector_test]
     async fn using_bigint_field(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {

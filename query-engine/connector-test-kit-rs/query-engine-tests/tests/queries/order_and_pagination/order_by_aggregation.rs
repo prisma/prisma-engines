@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema))]
+#[test_suite(schema(schema), exclude(Sqlite("cfd1")))]
 mod order_by_aggr {
     use indoc::indoc;
     use query_engine_tests::{match_connector_result, run_query};

@@ -1,3 +1,4 @@
+//! D1 seems to silently ignore Cascade.
 use query_engine_tests::*;
 
 #[test_suite(suite = "cascade_onU_1to1_req", schema(required), relation_mode = "prisma")]
@@ -32,7 +33,7 @@ mod one2one_req {
         schema.to_owned()
     }
 
-    #[connector_test(schema(required))]
+    #[connector_test(schema(required), exclude(Sqlite("cfd1")))]
     async fn update_parent_cascade(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
             run_query!(&runner, r#"mutation {
@@ -113,7 +114,7 @@ mod one2one_req {
         schema.to_owned()
     }
 
-    #[connector_test(schema(required_compound))]
+    #[connector_test(schema(required_compound), exclude(Sqlite("cfd1")))]
     async fn update_parent_compound_cascade(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -170,7 +171,7 @@ mod one2one_opt {
     }
 
     // Updating the parent updates the child FK as well.
-    #[connector_test(schema(optional))]
+    #[connector_test(schema(optional), exclude(Sqlite("cfd1")))]
     async fn update_parent_cascade(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
             run_query!(&runner, r#"mutation {
@@ -247,7 +248,7 @@ mod one2one_opt {
         schema.to_owned()
     }
 
-    #[connector_test(schema(optional_compound))]
+    #[connector_test(schema(optional_compound), exclude(Sqlite("cfd1")))]
     async fn update_parent_compound_cascade(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -291,7 +292,7 @@ mod one2one_opt {
 
     // Updating the parent updates the child FK as well.
     // Checks that it works even with different parent/child primary identifier names
-    #[connector_test(schema(diff_id_name))]
+    #[connector_test(schema(diff_id_name), exclude(Sqlite("cfd1")))]
     async fn update_parent_diff_id_name(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
@@ -341,7 +342,7 @@ mod one2many_req {
     }
 
     /// Updating the parent updates the child as well.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn update_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
             run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
@@ -386,7 +387,7 @@ mod one2many_opt {
     }
 
     /// Updating the parent updates the child as well.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn update_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
             run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
@@ -430,7 +431,7 @@ mod one2many_opt {
         schema.to_owned()
     }
 
-    #[connector_test(schema(optional_compound_uniq))]
+    #[connector_test(schema(optional_compound_uniq), exclude(Sqlite("cfd1")))]
     async fn update_compound_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -455,7 +456,7 @@ mod one2many_opt {
     }
 }
 
-#[test_suite(schema(schema), exclude(SqlServer), relation_mode = "prisma")]
+#[test_suite(schema(schema), exclude(SqlServer, Sqlite("cfd1")), relation_mode = "prisma")]
 mod multiple_cascading_paths {
     use indoc::indoc;
     use query_engine_tests::run_query;

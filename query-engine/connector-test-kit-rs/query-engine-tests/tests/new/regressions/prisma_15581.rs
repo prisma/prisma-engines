@@ -88,7 +88,7 @@ mod prisma_15581 {
         .to_owned()
     }
 
-    #[connector_test(schema(single_field_id_schema))]
+    #[connector_test(schema(single_field_id_schema), exclude(Sqlite("cfd1")))]
     async fn single_create_one_model_with_default_now_in_id(runner: Runner) -> TestResult<()> {
         run_query!(
             runner,

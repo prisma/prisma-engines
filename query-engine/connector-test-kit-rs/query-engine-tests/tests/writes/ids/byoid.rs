@@ -60,6 +60,9 @@ mod byoid {
             | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
                 "constraint: `PRIMARY`"
             }
+            query_engine_tests::ConnectorVersion::Sqlite(Some(query_tests_setup::SqliteVersion::CloudflareD1)) => {
+                "fields: (`UNIQUE constraint failed`)"
+            }
             query_engine_tests::ConnectorVersion::Vitess(_) => "(not available)",
             _ => "fields: (`id`)",
         };
@@ -91,6 +94,9 @@ mod byoid {
             | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsNapi))
             | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
                 "constraint: `PRIMARY`"
+            }
+            query_engine_tests::ConnectorVersion::Sqlite(Some(query_tests_setup::SqliteVersion::CloudflareD1)) => {
+                "fields: (`UNIQUE constraint failed`)"
             }
             ConnectorVersion::Vitess(_) => "(not available)",
             _ => "fields: (`id`)",
@@ -154,6 +160,9 @@ mod byoid {
             | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
                 "constraint: `PRIMARY`"
             }
+            query_engine_tests::ConnectorVersion::Sqlite(Some(query_tests_setup::SqliteVersion::CloudflareD1)) => {
+                "fields: (`UNIQUE constraint failed`)"
+            }
             ConnectorVersion::Vitess(_) => "(not available)",
             _ => "fields: (`id`)",
         };
@@ -185,6 +194,9 @@ mod byoid {
             | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsNapi))
             | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
                 "constraint: `PRIMARY`"
+            }
+            query_engine_tests::ConnectorVersion::Sqlite(Some(query_tests_setup::SqliteVersion::CloudflareD1)) => {
+                "fields: (`UNIQUE constraint failed`)"
             }
             ConnectorVersion::Vitess(_) => "(not available)",
             _ => "fields: (`id`)",

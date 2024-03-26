@@ -32,6 +32,7 @@ pub enum SqliteVersion {
     ReactNative,
     LibsqlJsNapi,
     LibsqlJsWasm,
+    CloudflareD1,
 }
 
 impl ToString for SqliteVersion {
@@ -41,6 +42,7 @@ impl ToString for SqliteVersion {
             SqliteVersion::V3 => "3".to_string(),
             SqliteVersion::LibsqlJsNapi => "libsql.js".to_string(),
             SqliteVersion::LibsqlJsWasm => "libsql.js.wasm".to_string(),
+            SqliteVersion::CloudflareD1 => "cfd1".to_owned(),
         }
     }
 }
@@ -54,6 +56,7 @@ impl TryFrom<&str> for SqliteVersion {
             "libsql.js" => Self::LibsqlJsNapi,
             "libsql.js.wasm" => Self::LibsqlJsWasm,
             "react-native" => Self::ReactNative,
+            "cfd1" => Self::CloudflareD1,
             _ => return Err(TestError::parse_error(format!("Unknown SQLite version `{s}`"))),
         };
         Ok(version)

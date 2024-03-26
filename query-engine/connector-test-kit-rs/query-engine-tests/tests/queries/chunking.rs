@@ -96,7 +96,7 @@ mod chunking {
         Ok(())
     }
 
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test(exclude(MongoDb, Sqlite("cfd1")))]
     async fn order_by_aggregation_should_fail(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
