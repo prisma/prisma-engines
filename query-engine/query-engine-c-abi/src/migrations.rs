@@ -90,7 +90,7 @@ pub fn detect_failed_migrations(migrations_from_database: &[MigrationRecord]) ->
         .peekable();
 
     if failed_migrations.peek().is_none() {
-        return Ok(());
+        Ok(())
     } else {
         Err(ApiError::Configuration(
             format!(

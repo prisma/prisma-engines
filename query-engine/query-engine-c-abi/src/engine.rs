@@ -358,7 +358,8 @@ impl QueryEngine {
         let migration_folder_path = Path::new(&migration_folder_path_str);
         let migrations_from_filesystem = list_migration_dir(migration_folder_path)?;
 
-        let url_without_prefix = self.url.strip_prefix("file:").unwrap_or(&url);
+        let url = self.url.clone();
+        let url_without_prefix = url.strip_prefix("file:").unwrap_or(&url);
         let database_path = Path::new(url_without_prefix);
 
         let migrations_from_database = list_migrations(database_path).unwrap();
