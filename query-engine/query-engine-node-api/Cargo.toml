@@ -25,7 +25,9 @@ request-handlers = { path = "../request-handlers", features = [
     "all",
 ] }
 query-connector = { path = "../connectors/query-connector" }
-query-engine-common = { path = "../../libs/query-engine-common" }
+query-engine-common = { path = "../../libs/query-engine-common", features = [
+    "metrics",
+] }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 psl = { workspace = true, features = ["all"] }
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector", features = [

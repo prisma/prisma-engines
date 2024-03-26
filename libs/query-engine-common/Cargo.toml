@@ -3,7 +3,8 @@ name = "query-engine-common"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[features]
+metrics = []
 
 [dependencies]
 thiserror = "1"
@@ -22,7 +23,7 @@ tracing-futures = "0.2"
 tracing-opentelemetry = "0.17.3"
 opentelemetry = { version = "0.17" }
 
-[target.'cfg(all(not(target_arch = "wasm32"), not(target_os = "ios"), not(target_os = "android")))'.dependencies]
+[target.'cfg(all(not(target_arch = "wasm32")))'.dependencies]
 query-engine-metrics = { path = "../../query-engine/metrics" }
 napi.workspace = true
 

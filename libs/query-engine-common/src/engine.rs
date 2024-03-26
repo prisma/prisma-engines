@@ -58,7 +58,7 @@ pub struct EngineBuilder {
 pub struct ConnectedEngineNative {
     pub config_dir: PathBuf,
     pub env: HashMap<String, String>,
-    #[cfg(all(not(target_os = "ios"), not(target_os = "android")))]
+    #[cfg(feature = "metrics")]
     pub metrics: Option<query_engine_metrics::MetricRegistry>,
 }
 
