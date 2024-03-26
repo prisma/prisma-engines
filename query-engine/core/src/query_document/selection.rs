@@ -2,7 +2,7 @@ use crate::{ArgumentValue, ArgumentValueObject};
 use indexmap::IndexMap;
 use itertools::Itertools;
 use schema::constants::filters;
-use std::borrow::Cow;
+use std::{borrow::Cow, collections::HashMap};
 
 pub type SelectionArgument = (String, ArgumentValue);
 
@@ -104,8 +104,10 @@ impl Selection {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum SelectionSet<'a> {
-    Single(Cow<'a, str>, Vec<ArgumentValue>),
-    Multi(Vec<Vec<Cow<'a, str>>>, Vec<Vec<ArgumentValue>>),
+    // Single(Cow<'a, str>, Vec<ArgumentValue>),
+    Single(Cow<'a, str>, Vec<(usize, ArgumentValue)>),
+    // Multi(Vec<Vec<Cow<'a, str>>>, Vec<Vec<ArgumentValue>>),
+    Multi(HashMap<usize, Vec<(Cow<'a, str>, ArgumentValue)>>),
     Empty,
 }
 
@@ -120,41 +122,31 @@ impl<'a> SelectionSet<'a> {
         Self::default()
     }
 
-    pub fn push(self, column: impl Into<Cow<'a, str>>, value: ArgumentValue) -> Self {
+    pub fn push(self, column: impl Into<Cow<'a, str>>, value: ArgumentValue, index: usize) -> Self {
         let column = column.into();
 
         match self {
             Self::Single(key, mut vals) if key == column => {
-                vals.push(value);
+                vals.push((index, value));
                 Self::Single(key, vals)
             }
-            Self::Single(key, mut vals) => {
-                vals.push(value);
-                Self::Multi(vec![vec![key, column]], vec![vals])
-            }
-            Self::Multi(mut keys, mut vals) => {
-                match (keys.last_mut(), vals.last_mut()) {
-                    (Some(keys), Some(vals)) if !keys.contains(&column) => {
-                        keys.push(column);
-                        vals.push(value);
-                    }
-                    _ => {
-                        keys.push(vec![column]);
-                        vals.push(vec![value]);
-                    }
+            Self::Single(key, vals) => {
+                let mut hm: HashMap<usize, Vec<(Cow<'_, str>, ArgumentValue)>> = HashMap::new();
+
+                for val in vals {
+                    hm.entry(val.0).or_default().push((key.clone(), val.1))
                 }
 
-                Self::Multi(keys, vals)
-            }
-            Self::Empty => Self::Single(column, vec![value]),
-        }
-    }
+                hm.entry(index).or_default().push((column, value));
 
-    pub fn len(&self) -> usize {
-        match self {
-            Self::Single(_, _) => 1,
-            Self::Multi(v, _) => v.len(),
-            Self::Empty => 0,
+                Self::Multi(hm)
+            }
+            Self::Multi(mut key_vals) => {
+                key_vals.entry(index).or_default().push((column, value));
+
+                Self::Multi(key_vals)
+            }
+            Self::Empty => Self::Single(column, vec![(index, value)]),
         }
     }
 
@@ -163,25 +155,24 @@ impl<'a> SelectionSet<'a> {
     }
 
     pub fn is_multi(&self) -> bool {
-        matches!(self, Self::Multi(_, _))
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len() == 0
+        matches!(self, Self::Multi(_))
     }
 
     pub fn keys(&self) -> Vec<&str> {
         match self {
             Self::Single(key, _) => vec![key.as_ref()],
-            Self::Multi(keys, _) => match keys.first() {
-                Some(keys) => keys.iter().map(|key| key.as_ref()).collect(),
-                None => Vec::new(),
-            },
+            Self::Multi(keys) => keys
+                .values()
+                .flatten()
+                .map(|(key, _)| key.as_ref())
+                .unique()
+                .collect_vec(),
             Self::Empty => Vec::new(),
         }
     }
 }
 
+#[derive(Debug)]
 pub struct In<'a> {
     selection_set: SelectionSet<'a>,
 }
@@ -195,11 +186,9 @@ impl<'a> In<'a> {
 impl<'a> From<In<'a>> for ArgumentValue {
     fn from(other: In<'a>) -> Self {
         match other.selection_set {
-            SelectionSet::Multi(key_sets, val_sets) => {
-                let key_vals = key_sets.into_iter().zip(val_sets);
-
-                let conjuctive = key_vals.fold(Conjuctive::new(), |acc, (keys, vals)| {
-                    let ands = keys.into_iter().zip(vals).fold(Conjuctive::new(), |acc, (key, val)| {
+            SelectionSet::Multi(key_vals) => {
+                let conjuctive = key_vals.into_values().fold(Conjuctive::new(), |acc, key_val| {
+                    let ands = key_val.into_iter().fold(Conjuctive::new(), |acc, (key, val)| {
                         let mut argument = IndexMap::new();
                         argument.insert(key.into_owned(), val);
 
@@ -212,15 +201,16 @@ impl<'a> From<In<'a>> for ArgumentValue {
                 ArgumentValue::from(conjuctive)
             }
             SelectionSet::Single(key, vals) => {
-                let is_bool = vals.iter().any(|v| match v {
+                let is_bool = vals.clone().into_iter().any(|(_, v)| match v {
                     ArgumentValue::Scalar(s) => matches!(s, query_structure::PrismaValue::Boolean(_)),
                     _ => false,
                 });
 
                 if is_bool {
-                    let conjunctive = vals.into_iter().fold(Conjuctive::new(), |acc, val| {
-                        let mut argument: IndexMap<String, ArgumentValue> = IndexMap::new();
-                        argument.insert(key.clone().into_owned(), val);
+                    let conjunctive = vals.into_iter().fold(Conjuctive::new(), |acc, (_, val)| {
+                        let mut argument = IndexMap::new();
+
+                        argument.insert(key.to_string(), val);
                         acc.or(argument)
                     });
 
@@ -229,7 +219,10 @@ impl<'a> From<In<'a>> for ArgumentValue {
 
                 ArgumentValue::object([(
                     key.to_string(),
-                    ArgumentValue::object([(filters::IN.to_owned(), ArgumentValue::list(vals))]),
+                    ArgumentValue::object([(
+                        filters::IN.to_owned(),
+                        ArgumentValue::list(vals.into_iter().map(|(_, val)| val).collect_vec()),
+                    )]),
                 )])
             }
             SelectionSet::Empty => ArgumentValue::null(),
