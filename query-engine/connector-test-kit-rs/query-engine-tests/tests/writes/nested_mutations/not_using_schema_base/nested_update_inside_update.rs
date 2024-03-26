@@ -793,7 +793,7 @@ mod update_inside_update {
     }
 
     // "a deeply nested mutation" should "execute all levels of the mutation if there are only node edges on the path"
-    #[connector_test(schema(schema_3), exclude(Sqlite("cfd1")))]
+    #[connector_test(schema(schema_3))]
     async fn deep_nested_mutation_exec_all_muts(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,

@@ -383,8 +383,7 @@ mod aggr_group_by_having {
     #[connector_test(exclude(Sqlite("cfd1")))]
     // On D1, this panics with:
     //
-    // ```sh
-    // thread 'queries::aggregation::group_by_having::aggr_group_by_having::having_without_aggr_sel' panicked at query-engine/connector-test-kit-rs/query-engine-tests/tests/queries/aggregation/group_by_having.rs:392:9:
+    // ```
     // assertion `left == right` failed: Query result: {"data":{"groupByTestModel":[]}} is not part of the expected results: ["{\"data\":{\"groupByTestModel\":[{\"string\":\"group1\"},{\"string\":\"group2\"}]}}", "{\"data\":{\"groupByTestModel\":[{\"string\":\"group2\"},{\"string\":\"group1\"}]}}"] for connector SQLite (cfd1)
     //   left: false
     //  right: true

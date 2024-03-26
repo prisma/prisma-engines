@@ -34,6 +34,12 @@ mod order_by_aggr {
     }
 
     #[connector_test(exclude(Sqlite("cfd1")))]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"findManyUser":[{"id":3,"posts":[]},{"id":1,"posts":[{"title":"alice_post_1"}]},{"id":2,"posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]}]}}
+    // + {"data":{"findManyUser":[{"id":1,"posts":[{"title":"alice_post_1"}]},{"id":2,"posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]},{"id":3,"posts":[]}]}}
+    // ```
     async fn one2m_count_asc(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -53,6 +59,12 @@ mod order_by_aggr {
     }
 
     #[connector_test(exclude(Sqlite("cfd1")))]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"findManyUser":[{"id":2,"posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]},{"id":1,"posts":[{"title":"alice_post_1"}]},{"id":3,"posts":[]}]}}
+    // + {"data":{"findManyUser":[{"id":3,"posts":[]},{"id":2,"posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]},{"id":1,"posts":[{"title":"alice_post_1"}]}]}}
+    // ```
     async fn one2m_count_desc(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -110,6 +122,12 @@ mod order_by_aggr {
     }
 
     #[connector_test(exclude(Sqlite("cfd1")))]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"findManyUser":[{"id":3,"name":"Motongo","posts":[]},{"id":1,"name":"Alice","posts":[{"title":"alice_post_1"}]},{"id":2,"name":"Bob","posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]}]}}
+    // + {"data":{"findManyUser":[{"id":1,"name":"Alice","posts":[{"title":"alice_post_1"}]},{"id":2,"name":"Bob","posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]},{"id":3,"name":"Motongo","posts":[]}]}}
+    // ```
     async fn one2m_count_asc_field_asc(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -438,7 +456,13 @@ mod order_by_aggr {
     // With pagination tests
 
     // "[Cursor] Ordering by one2m count asc" should "work"
-    #[connector_test(exclude(Sqlite("cfd1")))]
+    #[connector_test]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"findManyUser":[{"id":1,"posts":[{"id":1}]},{"id":2,"posts":[{"id":2},{"id":3}]}]}}
+    // + {"data":{"findManyUser":[{"id":1,"posts":[{"id":1}]},{"id":2,"posts":[{"id":2},{"id":3}]},{"id":3,"posts":[]}]}}
+    // ```
     async fn cursor_one2m_count_asc(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -459,6 +483,12 @@ mod order_by_aggr {
 
     // "[Cursor] Ordering by one2m count desc" should "work"
     #[connector_test(exclude(Sqlite("cfd1")))]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"findManyUser":[{"id":1,"posts":[{"id":1}]},{"id":2,"posts":[{"id":2},{"id":3}]}]}}
+    // + {"data":{"findManyUser":[{"id":1,"posts":[{"id":1}]},{"id":2,"posts":[{"id":2},{"id":3}]},{"id":3,"posts":[]}]}}
+    // ```
     async fn cursor_one2m_count_desc(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -521,6 +551,12 @@ mod order_by_aggr {
 
     // "[Cursor][Combo] Ordering by one2m count asc + field asc"
     #[connector_test(exclude(Sqlite("cfd1")))]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"findManyUser":[{"id":2,"name":"Bob","posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]}]}}
+    // + {"data":{"findManyUser":[{"id":2,"name":"Bob","posts":[{"title":"bob_post_1"},{"title":"bob_post_2"}]},{"id":3,"name":"Motongo","posts":[]}]}}
+    // ```
     async fn cursor_one2m_count_asc_field_asc(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
