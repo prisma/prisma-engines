@@ -53,6 +53,12 @@ mod aggr_group_by_having {
     }
 
     #[connector_test(exclude(Sqlite("cfd1")))]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"groupByTestModel":[{"string":"group1","_count":{"int":2}}]}}
+    // + {"data":{"groupByTestModel":[]}}
+    // ```
     async fn having_count_scalar_filter(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, int: 1, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, int: 2, string: "group1" }"#).await?;
@@ -128,6 +134,12 @@ mod aggr_group_by_having {
     }
 
     #[connector_test(exclude(Sqlite("cfd1")))]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"groupByTestModel":[{"string":"group1","_sum":{"float":16.0,"int":16}}]}}
+    // + {"data":{"groupByTestModel":[]}}
+    // ```
     async fn having_sum_scalar_filter(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 6, int: 6, string: "group1" }"#).await?;
@@ -197,6 +209,12 @@ mod aggr_group_by_having {
     }
 
     #[connector_test(exclude(Sqlite("cfd1")))]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0.0,"int":0}},{"string":"group2","_min":{"float":0.0,"int":0}}]}}
+    // + {"data":{"groupByTestModel":[]}}
+    // ```
     async fn having_min_scalar_filter(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
@@ -265,6 +283,12 @@ mod aggr_group_by_having {
     }
 
     #[connector_test(exclude(Sqlite("cfd1")))]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10.0,"int":10}},{"string":"group2","_max":{"float":10.0,"int":10}}]}}
+    // + {"data":{"groupByTestModel":[]}}
+    // ```
     async fn having_max_scalar_filter(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
@@ -333,6 +357,12 @@ mod aggr_group_by_having {
     }
 
     #[connector_test(exclude(Sqlite("cfd1")))]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"groupByTestModel":[{"string":"group1","_count":{"string":2}}]}}
+    // + {"data":{"groupByTestModel":[]}}
+    // ```
     async fn having_count_non_numerical_field(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
@@ -351,6 +381,16 @@ mod aggr_group_by_having {
     }
 
     #[connector_test(exclude(Sqlite("cfd1")))]
+    // On D1, this panics with:
+    //
+    // ```sh
+    // thread 'queries::aggregation::group_by_having::aggr_group_by_having::having_without_aggr_sel' panicked at query-engine/connector-test-kit-rs/query-engine-tests/tests/queries/aggregation/group_by_having.rs:392:9:
+    // assertion `left == right` failed: Query result: {"data":{"groupByTestModel":[]}} is not part of the expected results: ["{\"data\":{\"groupByTestModel\":[{\"string\":\"group1\"},{\"string\":\"group2\"}]}}", "{\"data\":{\"groupByTestModel\":[{\"string\":\"group2\"},{\"string\":\"group1\"}]}}"] for connector SQLite (cfd1)
+    //   left: false
+    //  right: true
+    // note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+    // FAILED
+    // ```
     async fn having_without_aggr_sel(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
@@ -394,7 +434,7 @@ mod aggr_group_by_having {
 
     /// Error cases
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
+    #[connector_test]
     async fn having_filter_mismatch_selection(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
