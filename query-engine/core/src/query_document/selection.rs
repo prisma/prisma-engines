@@ -2,7 +2,7 @@ use crate::{ArgumentValue, ArgumentValueObject};
 use indexmap::IndexMap;
 use itertools::Itertools;
 use schema::constants::filters;
-use std::{borrow::Cow, collections::HashMap};
+use std::collections::HashMap;
 
 pub type SelectionArgument = (String, ArgumentValue);
 
@@ -103,118 +103,127 @@ impl Selection {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum SelectionSet<'a> {
-    // Single(Cow<'a, str>, Vec<ArgumentValue>),
-    Single(Cow<'a, str>, Vec<(usize, ArgumentValue)>),
-    // Multi(Vec<Vec<Cow<'a, str>>>, Vec<Vec<ArgumentValue>>),
-    Multi(HashMap<usize, Vec<(Cow<'a, str>, ArgumentValue)>>),
+pub struct QueryFilters(Vec<(String, ArgumentValue)>);
+
+impl QueryFilters {
+    pub fn new(filters: Vec<(String, ArgumentValue)>) -> Self {
+        Self(filters)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum SelectionSet {
+    Single(String, Vec<ArgumentValue>),
+    Many(Vec<HashMap<String, Vec<ArgumentValue>>>),
     Empty,
 }
 
-impl<'a> Default for SelectionSet<'a> {
+impl Default for SelectionSet {
     fn default() -> Self {
         Self::Empty
     }
 }
 
-impl<'a> SelectionSet<'a> {
-    pub fn new() -> Self {
-        Self::default()
+impl SelectionSet {
+    pub fn new(filters: Vec<QueryFilters>) -> Self {
+        filters.into_iter().fold(Self::default(), |acc, query_filters| {
+            acc.push(query_filters).flush_many()
+        })
     }
 
-    pub fn push(self, column: impl Into<Cow<'a, str>>, value: ArgumentValue, index: usize) -> Self {
-        let column = column.into();
+    fn push(self, query_filters: QueryFilters) -> Self {
+        query_filters
+            .0
+            .into_iter()
+            .fold(self, |acc, (new_key, new_value)| match acc {
+                SelectionSet::Single(key, mut values) if key == new_key => {
+                    values.push(new_value);
 
-        dbg!(&column);
-        dbg!(&value);
-
-        match self {
-            Self::Single(key, mut vals) if key == column => {
-                vals.push((index, value));
-                Self::Single(key, vals)
-            }
-            Self::Single(key, vals) => {
-                let mut hm: HashMap<usize, Vec<(Cow<'_, str>, ArgumentValue)>> = HashMap::new();
-
-                for val in vals {
-                    hm.entry(val.0).or_default().push((key.clone(), val.1))
+                    SelectionSet::Single(key, values)
                 }
+                SelectionSet::Single(key, values) => {
+                    let mut map: HashMap<_, _> = HashMap::from_iter([(key, values)]);
 
-                hm.entry(index).or_default().push((column, value));
+                    map.entry(new_key).or_default().push(new_value);
 
-                Self::Multi(hm)
+                    SelectionSet::Many(vec![map])
+                }
+                SelectionSet::Many(mut maps) => {
+                    maps.last_mut().unwrap().entry(new_key).or_default().push(new_value);
+
+                    SelectionSet::Many(maps)
+                }
+                SelectionSet::Empty => SelectionSet::Single(new_key, vec![new_value]),
+            })
+    }
+
+    fn flush_many(self) -> Self {
+        match self {
+            SelectionSet::Many(mut maps) => {
+                maps.push(HashMap::new());
+
+                SelectionSet::Many(maps)
             }
-            Self::Multi(mut key_vals) => {
-                key_vals.entry(index).or_default().push((column, value));
-
-                Self::Multi(key_vals)
-            }
-            Self::Empty => Self::Single(column, vec![(index, value)]),
+            _ => self,
         }
-    }
-
-    pub fn is_single(&self) -> bool {
-        matches!(self, Self::Single(_, _))
-    }
-
-    pub fn is_multi(&self) -> bool {
-        matches!(self, Self::Multi(_))
     }
 
     pub fn keys(&self) -> Vec<&str> {
         match self {
             Self::Single(key, _) => vec![key.as_ref()],
-            Self::Multi(keys) => keys
-                .values()
-                .flatten()
-                .map(|(key, _)| key.as_ref())
+            Self::Many(filters) => filters
+                .iter()
+                .flat_map(|f| f.keys())
+                .map(|key| key.as_ref())
                 .unique()
-                .collect_vec(),
+                .collect(),
             Self::Empty => Vec::new(),
         }
     }
 }
 
 #[derive(Debug)]
-pub struct In<'a> {
-    selection_set: SelectionSet<'a>,
+pub struct In {
+    selection_set: SelectionSet,
 }
 
-impl<'a> In<'a> {
-    pub fn new(selection_set: SelectionSet<'a>) -> Self {
+impl In {
+    pub fn new(selection_set: SelectionSet) -> Self {
         Self { selection_set }
     }
 }
 
-impl<'a> From<In<'a>> for ArgumentValue {
-    fn from(other: In<'a>) -> Self {
+impl From<In> for ArgumentValue {
+    fn from(other: In) -> Self {
         match other.selection_set {
-            SelectionSet::Multi(key_vals) => {
-                // let key_vals = key_sets.into_iter().zip(val_sets);
+            SelectionSet::Many(buckets) => {
+                let conjuctive = buckets.into_iter().fold(Conjuctive::new(), |acc, filters| {
+                    // Needed because we flush the last bucket by pushing an empty one, which gets translated to a `Null` as the Conjunctive is empty.
+                    if !filters.is_empty() {
+                        let ands = filters.into_iter().fold(Conjuctive::new(), |mut acc, (key, values)| {
+                            for value in values {
+                                let mut argument = IndexMap::with_capacity(1);
+                                argument.insert(key.clone(), value);
 
-                // dbg!(&key_vals);
+                                acc = acc.and(argument)
+                            }
 
-                let conjuctive = key_vals.into_values().fold(Conjuctive::new(), |acc, key_val| {
-                    // dbg!(&keys);
-                    // dbg!(&vals);
-                    let ands = key_val.into_iter().fold(Conjuctive::new(), |acc, (key, val)| {
-                        let mut argument = IndexMap::new();
-                        argument.insert(key.into_owned(), val);
+                            acc
+                        });
 
-                        acc.and(argument)
-                    });
-
-                    acc.or(ands)
+                        acc.or(ands)
+                    } else {
+                        acc
+                    }
                 });
+
+                dbg!(&conjuctive);
 
                 ArgumentValue::from(conjuctive)
             }
             SelectionSet::Single(key, vals) => ArgumentValue::object([(
                 key.to_string(),
-                ArgumentValue::object([(
-                    filters::IN.to_owned(),
-                    ArgumentValue::list(vals.into_iter().map(|(_, val)| val).collect_vec()),
-                )]),
+                ArgumentValue::object([(filters::IN.to_owned(), ArgumentValue::list(vals))]),
             )]),
             SelectionSet::Empty => ArgumentValue::null(),
         }
