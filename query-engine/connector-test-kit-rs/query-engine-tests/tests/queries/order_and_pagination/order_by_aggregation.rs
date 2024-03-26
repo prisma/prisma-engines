@@ -769,8 +769,14 @@ mod order_by_aggr {
         schema.to_owned()
     }
 
-    // Regression test for: // https://github.com/prisma/prisma/issues/8036
     #[connector_test(schema(schema_regression_8036), exclude(Sqlite("cfd1")))]
+    // Regression test for: // https://github.com/prisma/prisma/issues/8036
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"findManyPost":[{"id":2,"title":"Second","_count":{"LikedPeople":0}},{"id":3,"title":"Third","_count":{"LikedPeople":0}},{"id":4,"title":"Fourth","_count":{"LikedPeople":0}},{"id":5,"title":"Fifth","_count":{"LikedPeople":0}}]}}
+    // + {"data":{"findManyPost":[]}}
+    // ```
     async fn count_m2m_records_not_connected(runner: Runner) -> TestResult<()> {
         run_query!(
             runner,
