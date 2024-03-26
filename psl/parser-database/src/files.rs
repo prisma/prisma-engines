@@ -15,6 +15,13 @@ impl Files {
             .enumerate()
             .map(|(idx, (path, contents, ast))| (FileId(idx as u32), path, contents, ast))
     }
+
+    pub(crate) fn into_iter(self) -> impl Iterator<Item = (FileId, String, schema_ast::SourceFile, ast::SchemaAst)> {
+        self.0
+            .into_iter()
+            .enumerate()
+            .map(|(idx, (path, contents, ast))| (FileId(idx as u32), path, contents, ast))
+    }
 }
 
 impl Index<crate::FileId> for Files {

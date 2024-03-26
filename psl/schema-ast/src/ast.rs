@@ -52,6 +52,12 @@ pub struct SchemaAst {
 }
 
 impl SchemaAst {
+    /// merge multiple asts together
+    pub fn merge(asts: impl Iterator<Item = SchemaAst>) -> Self {
+        Self {
+            tops: asts.flat_map(|ast| ast.tops).collect(),
+        }
+    }
     /// Iterate over all the top-level items in the schema.
     pub fn iter_tops(&self) -> impl Iterator<Item = (TopId, &Top)> {
         self.tops

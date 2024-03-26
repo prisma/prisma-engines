@@ -10,6 +10,10 @@ pub(crate) fn reformat(input: &str) -> String {
     psl::reformat(input, 2).unwrap_or_else(|| input.to_owned())
 }
 
+pub(crate) fn reformat_multiple(sources: &[(&str, &str)]) -> Vec<(String, String)> {
+    psl::reformat_multiple(sources, 2)
+}
+
 pub(crate) fn parse_unwrap_err(schema: &str) -> String {
     psl::parse_schema(schema).map(drop).unwrap_err()
 }

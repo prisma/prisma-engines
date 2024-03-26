@@ -5,6 +5,7 @@ mod get_dmmf;
 mod lint;
 mod native;
 mod preview;
+mod schema_file_input;
 mod text_document_completion;
 mod validate;
 
