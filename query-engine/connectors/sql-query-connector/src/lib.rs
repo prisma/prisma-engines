@@ -6,7 +6,7 @@ mod context;
 mod cursor_condition;
 mod database;
 mod error;
-mod filter_conversion;
+mod filter;
 mod join_utils;
 mod model_extensions;
 mod nested_aggregations;
@@ -19,12 +19,15 @@ mod sql_trace;
 mod value;
 mod value_ext;
 
-use self::{column_metadata::*, context::Context, filter_conversion::*, query_ext::QueryExt, row::*};
+use self::{column_metadata::*, context::Context, query_ext::QueryExt, row::*};
 use quaint::prelude::Queryable;
 
-#[cfg(feature = "js-connectors")]
-pub use database::{register_js_connector, Js};
-pub use database::{FromSource, Mssql, Mysql, PostgreSql, Sqlite};
+pub use database::FromSource;
+#[cfg(feature = "driver-adapters")]
+pub use database::Js;
 pub use error::SqlError;
+
+#[cfg(not(target_arch = "wasm32"))]
+pub use database::{Mssql, Mysql, PostgreSql, Sqlite};
 
 type Result<T> = std::result::Result<T, error::SqlError>;

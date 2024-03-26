@@ -4,7 +4,7 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use core::fmt;
 use indexmap::{IndexMap, IndexSet};
-use prisma_models::{DefaultKind, PrismaValue, ValueGeneratorFn};
+use query_structure::{DefaultKind, PrismaValue, ValueGeneratorFn};
 use std::{borrow::Cow, convert::TryFrom, rc::Rc, str::FromStr};
 use user_facing_errors::query_engine::validation::ValidationError;
 use uuid::Uuid;
@@ -414,7 +414,7 @@ impl QueryDocumentParser {
         argument_path: &Path,
         s: &str,
     ) -> QueryParserResult<DateTime<FixedOffset>> {
-        prisma_models::parse_datetime(s).map_err(|err| {
+        query_structure::parse_datetime(s).map_err(|err| {
             ValidationError::invalid_argument_value(
                 selection_path.segments(),
                 argument_path.segments(),
@@ -426,15 +426,17 @@ impl QueryDocumentParser {
     }
 
     fn parse_bytes(&self, selection_path: &Path, argument_path: &Path, s: String) -> QueryParserResult<PrismaValue> {
-        prisma_models::decode_bytes(&s).map(PrismaValue::Bytes).map_err(|err| {
-            ValidationError::invalid_argument_value(
-                selection_path.segments(),
-                argument_path.segments(),
-                s.to_string(),
-                "base64 String",
-                Some(Box::new(err)),
-            )
-        })
+        query_structure::decode_bytes(&s)
+            .map(PrismaValue::Bytes)
+            .map_err(|err| {
+                ValidationError::invalid_argument_value(
+                    selection_path.segments(),
+                    argument_path.segments(),
+                    s.to_string(),
+                    "base64 String",
+                    Some(Box::new(err)),
+                )
+            })
     }
 
     fn parse_decimal(
@@ -715,7 +717,7 @@ impl QueryDocumentParser {
             })
             .collect::<QueryParserResult<ParsedInputMap<'a>>>()?;
 
-        map.extend(defaults.into_iter());
+        map.extend(defaults);
 
         // Ensure the constraints are upheld. If any `fields` are specified, then the constraints should be upheld against those only.
         // If no `fields` are specified, then the constraints should be upheld against all fields of the object.
@@ -782,7 +784,7 @@ pub(crate) mod conversions {
         schema::{InputType, OutputType},
         ArgumentValue,
     };
-    use prisma_models::PrismaValue;
+    use query_structure::PrismaValue;
     use schema::InnerOutputType;
     use user_facing_errors::query_engine::validation::{self, InputTypeDescription};
 
@@ -869,6 +871,7 @@ pub(crate) mod conversions {
                 format!("({})", itertools::join(v.iter().map(argument_value_to_type_name), ", "))
             }
             ArgumentValue::FieldRef(_) => "FieldRef".to_string(),
+            ArgumentValue::Raw(_) => "JSON".to_string(),
         }
     }
 

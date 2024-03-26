@@ -251,10 +251,7 @@ impl GenericApi for EngineState {
                 std::path::Path::new(file_path)
                     .parent()
                     .map(|config_dir| {
-                        datasource
-                            .active_connector
-                            .set_config_dir(config_dir, &url)
-                            .into_owned()
+                        psl::set_config_dir(datasource.active_connector.flavour(), config_dir, &url).into_owned()
                     })
                     .unwrap_or(url)
             }

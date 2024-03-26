@@ -1,8 +1,8 @@
 use super::GQLResponse;
 use crate::{GQLError, PrismaResponse, RequestBody};
+use bigdecimal::BigDecimal;
 use futures::FutureExt;
 use indexmap::IndexMap;
-use prisma_models::{parse_datetime, stringify_datetime, PrismaValue};
 use query_core::{
     constants::custom_types,
     protocol::EngineProtocol,
@@ -11,7 +11,8 @@ use query_core::{
     ArgumentValue, ArgumentValueObject, BatchDocument, BatchDocumentTransaction, CompactedDocument, Operation,
     QueryDocument, QueryExecutor, TxId,
 };
-use std::{collections::HashMap, fmt, panic::AssertUnwindSafe};
+use query_structure::{parse_datetime, stringify_datetime, PrismaValue};
+use std::{collections::HashMap, fmt, panic::AssertUnwindSafe, str::FromStr};
 
 type ArgsToResult = (HashMap<String, ArgumentValue>, IndexMap<String, Item>);
 
@@ -258,6 +259,10 @@ impl<'a> RequestHandler<'a> {
                 Some(t1) => Self::compare_values(t1, t2),
                 None => left == right,
             },
+            (ArgumentValue::Scalar(PrismaValue::Float(s1)), ArgumentValue::Scalar(PrismaValue::String(s2)))
+            | (ArgumentValue::Scalar(PrismaValue::String(s2)), ArgumentValue::Scalar(PrismaValue::Float(s1))) => {
+                BigDecimal::from_str(s2).map(|s2| s2 == *s1).unwrap_or(false)
+            }
             (left, right) => left == right,
         }
     }

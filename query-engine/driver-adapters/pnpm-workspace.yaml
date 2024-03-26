@@ -1,0 +1,10 @@
+packages:
+  - '../../../prisma/packages/adapter-d1'
+  - '../../../prisma/packages/adapter-libsql'
+  - '../../../prisma/packages/adapter-neon'
+  - '../../../prisma/packages/adapter-planetscale'
+  - '../../../prisma/packages/adapter-pg'
+  - '../../../prisma/packages/bundled-js-drivers'
+  - '../../../prisma/packages/debug'
+  - '../../../prisma/packages/driver-adapter-utils'
+  - './executor'

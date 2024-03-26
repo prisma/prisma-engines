@@ -3,8 +3,8 @@ use crate::{Identifier, IdentifierType, InputField, InputType, OutputField, Outp
 use constants::*;
 use input_types::{fields::data_input_mapper::*, list_union_type};
 use output_types::objects;
-use prisma_models::{Model, RelationFieldRef};
 use psl::datamodel_connector::ConnectorCapability;
+use query_structure::{Model, RelationFieldRef};
 
 /// Builds a create many mutation field (e.g. createManyUsers) for given model.
 pub(crate) fn create_many(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> {

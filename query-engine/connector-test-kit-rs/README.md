@@ -1,6 +1,5 @@
 # Query Engine Test Kit - A Full Guide
-The test kit is a (currently incomplete) port of the Scala test kit, located in `../connector-test-kit`.
-It's fully focused on integration testing the query engine through request-response assertions.
+The test kit is focused on integration testing the query engine through request-response assertions.
 
 ## Test organization
 
@@ -35,8 +34,10 @@ Contains the main bulk of logic to make tests run, which is mostly invisible to 
 Tests are executed in the context of *one* _connector_ (with version) and _runner_. Some tests may only be specified to run for a subset of connectors or versions, in which case they will be skipped. Testing all connectors at once is not supported, however, for example, CI will run all the different connectors and versions concurrently in separate runs.
 
 ### Configuration
+
 Tests must be configured to run There's a set of env vars that is always useful to have and an optional one.
 Always useful to have:
+
 ```shell
 export WORKSPACE_ROOT=/path/to/engines/repository/root
 ```
@@ -54,6 +55,7 @@ As previously stated, the above can be omitted in favor of the `.test_config` co
     "version": "10"
 }
 ```
+
 The config file must be either in the current working folder from which you invoke a test run or in `$WORKSPACE_ROOT`.
 It's recommended to use the file-based config as it's easier to switch between providers with an open IDE (reloading env vars would usually require reloading the IDE).
 The workspace root makefile contains a series of convenience commands to setup different connector test configs, e.g. `make dev-postgres10` sets up the correct test config file for the tests to pick up.
@@ -63,6 +65,7 @@ On the note of docker containers: Most connectors require an endpoint to run aga
 If you choose to set up the databases yourself, please note that the connection strings used in the tests (found in the files in `<repo_root>/query-engine/connector-test-kit-rs/query-tests-setup/src/connector_tag/`) to set up user, password and database for the test user.
 
 ### Running
+
 Note that by default tests run concurrently.
 
 - VSCode should automatically detect tests and display `run test`.
@@ -70,6 +73,37 @@ Note that by default tests run concurrently.
 - `cargo test` in the `query-engine-tests` crate.
 - A single test can be tested with the normal cargo rust facilities from command line, e.g. `cargo test --package query-engine-tests --test query_engine_tests --all-features -- queries::filters::where_unique::where_unique::no_unique_fields --exact --nocapture` where `queries::filters::where_unique::where_unique::no_unique_fields` can be substituted for the path you want to test.
 - If you want to test a single relation test, define the `RELATION_TEST_IDX` env var with its index.
+
+#### Running tests through driver adapters
+
+The query engine is able to delegate query execution to javascript through driver adapters.
+This means that instead of drivers being implemented in Rust, it's a layer of adapters over NodeJs
+drivers the code that actually communicates with the databases. See [`adapter-*` packages in prisma/prisma](https://github.com/prisma/prisma/tree/main/packages)
+
+To run tests through a driver adapters, you should also configure the following environment variables:
+
+* `DRIVER_ADAPTER`: tells the test executor to use a particular driver adapter. Set to `neon`, `planetscale` or any other supported adapter.
+* `DRIVER_ADAPTER_CONFIG`: a json string with the configuration for the driver adapter. This is adapter specific. See the [github workflow for driver adapter tests](.github/workflows/query-engine-driver-adapters.yml) for examples on how to configure the driver adapters.
+* `ENGINE`: can be used to run either `wasm` or `napi` version of the engine.
+
+Example:
+
+```shell
+export EXTERNAL_TEST_EXECUTOR="$WORKSPACE_ROOT/query-engine/driver-adapters/executor/script/testd.sh"
+export DRIVER_ADAPTER=neon
+export ENGINE=wasm
+export DRIVER_ADAPTER_CONFIG ='{ "proxyUrl": "127.0.0.1:5488/v1" }'
+````
+
+We have provided helpers to run the query-engine tests with driver adapters, these helpers set all the required environment
+variables for you:
+
+```shell
+DRIVER_ADAPTER=$adapter ENGINE=$engine make test-qe
+```
+
+Where `$adapter` is one of the supported adapters: `neon`, `planetscale`, `libsql`.
+
 
 ## Authoring tests
 The following is an example on how to write a new test suite, as extending or changing an existing one follows the same rules and considerations.

@@ -1,4 +1,3 @@
-#[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
 use super::compare::{JsonCompare, JsonType};
 use crate::ast::*;
 use query::SelectQuery;
@@ -43,38 +42,44 @@ impl<'a> Expression<'a> {
         }
     }
 
-    #[cfg(feature = "json")]
+    #[cfg(feature = "mysql")]
     pub(crate) fn is_json_expr(&self) -> bool {
         match &self.kind {
-            #[cfg(feature = "json")]
-            ExpressionKind::Parameterized(Value::Json(_)) => true,
-            #[cfg(feature = "json")]
+            ExpressionKind::Parameterized(Value {
+                typed: ValueType::Json(_),
+                ..
+            }) => true,
+
             ExpressionKind::Value(expr) => expr.is_json_value(),
-            #[cfg(feature = "json")]
+
             ExpressionKind::Function(fun) => fun.returns_json(),
             _ => false,
         }
     }
 
     #[allow(dead_code)]
-    #[cfg(feature = "json")]
+
     pub(crate) fn is_json_value(&self) -> bool {
         match &self.kind {
-            #[cfg(feature = "json")]
-            ExpressionKind::Parameterized(Value::Json(_)) => true,
-            #[cfg(feature = "json")]
+            ExpressionKind::Parameterized(Value {
+                typed: ValueType::Json(_),
+                ..
+            }) => true,
+
             ExpressionKind::Value(expr) => expr.is_json_value(),
             _ => false,
         }
     }
 
     #[allow(dead_code)]
-    #[cfg(feature = "json")]
+
     pub(crate) fn into_json_value(self) -> Option<serde_json::Value> {
         match self.kind {
-            #[cfg(feature = "json")]
-            ExpressionKind::Parameterized(Value::Json(json_val)) => json_val,
-            #[cfg(feature = "json")]
+            ExpressionKind::Parameterized(Value {
+                typed: ValueType::Json(json_val),
+                ..
+            }) => json_val,
+
             ExpressionKind::Value(expr) => expr.into_json_value(),
             _ => None,
         }
@@ -221,7 +226,10 @@ pub enum ExpressionKind<'a> {
 impl<'a> ExpressionKind<'a> {
     pub(crate) fn is_xml_value(&self) -> bool {
         match self {
-            Self::Parameterized(Value::Xml(_)) => true,
+            Self::Parameterized(Value {
+                typed: ValueType::Xml(_),
+                ..
+            }) => true,
             Self::Value(expr) => expr.is_xml_value(),
             _ => false,
         }
@@ -427,7 +435,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::Raw(Box::new(self), raw_comparator.into(), Box::new(right.into()))
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn json_array_contains<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -435,7 +442,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::JsonCompare(JsonCompare::ArrayContains(Box::new(self), Box::new(item.into())))
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn json_array_not_contains<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -443,7 +449,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::JsonCompare(JsonCompare::ArrayNotContains(Box::new(self), Box::new(item.into())))
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn json_array_begins_with<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -453,7 +458,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::Equals(Box::new(array_starts_with), Box::new(item.into()))
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn json_array_not_begins_with<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -463,7 +467,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::NotEquals(Box::new(array_starts_with), Box::new(item.into()))
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn json_array_ends_into<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -473,7 +476,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::Equals(Box::new(array_ends_into), Box::new(item.into()))
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn json_array_not_ends_into<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -483,7 +485,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::NotEquals(Box::new(array_ends_into), Box::new(item.into()))
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn json_type_equals<T>(self, json_type: T) -> Compare<'a>
     where
         T: Into<JsonType<'a>>,
@@ -491,7 +492,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::JsonCompare(JsonCompare::TypeEquals(Box::new(self), json_type.into()))
     }
 
-    #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn json_type_not_equals<T>(self, json_type: T) -> Compare<'a>
     where
         T: Into<JsonType<'a>>,
@@ -499,7 +499,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::JsonCompare(JsonCompare::TypeNotEquals(Box::new(self), json_type.into()))
     }
 
-    #[cfg(feature = "postgresql")]
     fn matches<T>(self, query: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -507,7 +506,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::Matches(Box::new(self), query.into())
     }
 
-    #[cfg(feature = "postgresql")]
     fn not_matches<T>(self, query: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -515,12 +513,10 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::NotMatches(Box::new(self), query.into())
     }
 
-    #[cfg(feature = "postgresql")]
     fn any(self) -> Compare<'a> {
         Compare::Any(Box::new(self))
     }
 
-    #[cfg(feature = "postgresql")]
     fn all(self) -> Compare<'a> {
         Compare::All(Box::new(self))
     }

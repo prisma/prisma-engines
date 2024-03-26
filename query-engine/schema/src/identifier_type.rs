@@ -1,5 +1,5 @@
 use crate::{capitalize, constants::ordering, scalar_filter_name};
-use prisma_models::{ast::FieldArity, prelude::*, *};
+use query_structure::{ast::FieldArity, prelude::*, *};
 
 /// Enum used to represent unique schema type names.
 /// It helps deferring the allocation + formatting of strings
@@ -34,6 +34,7 @@ pub enum IdentifierType {
     OrderByRelevanceInput(ParentContainer),
     OrderByToManyAggregateInput(ParentContainer),
     RelationCreateInput(RelationField, RelationField, bool),
+    RelationLoadStrategy,
     RelationUpdateInput(RelationField, RelationField, bool),
     ScalarFieldEnum(Model),
     ScalarFilterInput(Model, bool),
@@ -304,6 +305,7 @@ impl std::fmt::Display for IdentifierType {
                 ),
                 _ => write!(f, "{}UncheckedUpdateManyInput", model.name()),
             },
+            IdentifierType::RelationLoadStrategy => write!(f, "RelationLoadStrategy"),
         }
     }
 }

@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schemas::numeric_text_optional_one2m))]
+#[test_suite(schema(schemas::numeric_text_optional_one2m), exclude(Sqlite("cfd1")))]
 mod aggregation_group_by {
     use query_engine_tests::{assert_error, run_query};
 
@@ -510,6 +510,54 @@ mod aggregation_group_by {
                   }"
             ),
             @r###"{"data":{"groupByA":[{"_sum":{"int":3}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_21789() -> String {
+        let schema = indoc! {
+            r#"model Test {
+              #id(id, Int, @id)
+              group Int
+              color Color
+            }
+            
+            enum Color {
+              blue
+              red
+              green
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    // regression test for https://github.com/prisma/prisma/issues/21789
+    #[connector_test(schema(schema_21789), only(Postgres, CockroachDB))]
+    async fn regression_21789(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneTest(data: { id: 1, group: 1, color: "red" }) { id } }"#
+        );
+        run_query!(
+            &runner,
+            r#"mutation { createOneTest(data: { id: 2, group: 2, color: "green" }) { id } }"#
+        );
+        run_query!(
+            &runner,
+            r#"mutation { createOneTest(data: { id: 3, group: 1, color: "blue" }) { id } }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ aggregateTest { _max { color } _min { color } } }"#),
+          @r###"{"data":{"aggregateTest":{"_max":{"color":"green"},"_min":{"color":"blue"}}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ groupByTest(by: [group], orderBy: { group: asc }) { group _max { color } _min { color } } }"#),
+          @r###"{"data":{"groupByTest":[{"group":1,"_max":{"color":"red"},"_min":{"color":"blue"}},{"group":2,"_max":{"color":"green"},"_min":{"color":"green"}}]}}"###
         );
 
         Ok(())

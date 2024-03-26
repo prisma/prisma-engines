@@ -16,7 +16,7 @@ use psl::{
     builtin_connectors::{CockroachType, PostgresType},
     datamodel_connector::NativeTypeInstance,
 };
-use quaint::{connector::ResultRow, prelude::Queryable, Value::Array};
+use quaint::{connector::ResultRow, prelude::Queryable, Value};
 use regex::Regex;
 use std::{
     any::type_name,
@@ -663,13 +663,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             WHERE n.nspname = ANY ( $1 )
         "#;
 
-        let rows = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
 
         let mut procedures = Vec::with_capacity(rows.len());
 
@@ -691,10 +685,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_namespaces(&self, sql_schema: &mut SqlSchema, namespaces: &[&str]) -> DescriberResult<()> {
         let sql = include_str!("postgres/namespaces_query.sql");
 
-        let rows = self
-            .conn
-            .query_raw(sql, &[Array(Some(namespaces.iter().map(|s| (*s).into()).collect()))])
-            .await?;
+        let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
 
         let names = rows.into_iter().map(|row| (row.get_expect_string("namespace_name")));
 
@@ -718,13 +709,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let namespaces = &sql_schema.namespaces;
 
-        let rows = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
 
         let mut names = Vec::with_capacity(rows.len());
 
@@ -826,13 +811,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             WHERE schemaname = ANY ( $1 )
         "#};
 
-        let result_set = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let result_set = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
 
         for row in result_set.into_iter() {
             let name = row.get_expect_string("view_name");
@@ -886,6 +865,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                  FROM pg_class
                  JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
                  AND pg_namespace.nspname = ANY ( $1 )
+                 WHERE reltype > 0
                 ) as oid on oid.oid = att.attrelid 
                   AND relname = info.table_name
                   AND namespace = info.table_schema
@@ -895,13 +875,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         "#
         );
 
-        let rows = self
-            .conn
-            .query_raw(
-                sql.as_str(),
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql.as_str(), &[Value::array(namespaces)]).await?;
 
         for col in rows {
             let namespace = col.get_expect_string("namespace");
@@ -1004,7 +978,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         let (character_maximum_length, numeric_precision, numeric_scale, time_precision) =
             if matches!(col.get_expect_string("data_type").as_str(), "ARRAY") {
                 fn get_single(formatted_type: &str) -> Option<u32> {
-                    static SINGLE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([0-9]*)\).*\[\]$"#).unwrap());
+                    static SINGLE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r".*\(([0-9]*)\).*\[\]$").unwrap());
 
                     SINGLE_REGEX
                         .captures(formatted_type)
@@ -1014,7 +988,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
                 fn get_dual(formatted_type: &str) -> (Option<u32>, Option<u32>) {
                     static DUAL_REGEX: Lazy<Regex> =
-                        Lazy::new(|| Regex::new(r#"numeric\(([0-9]*),([0-9]*)\)\[\]$"#).unwrap());
+                        Lazy::new(|| Regex::new(r"numeric\(([0-9]*),([0-9]*)\)\[\]$").unwrap());
                     let first = DUAL_REGEX
                         .captures(formatted_type)
                         .and_then(|cap| cap.get(1).and_then(|precision| precision.as_str().parse().ok()));
@@ -1140,13 +1114,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         // One foreign key with multiple columns will be represented here as several
         // rows with the same ID.
-        let result_set = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let result_set = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
 
         for row in result_set.into_iter() {
             trace!("Got description FK row {:?}", row);
@@ -1253,13 +1221,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         let namespaces = &sql_schema.namespaces;
         let sql = include_str!("postgres/constraints_query.sql");
 
-        let rows = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
 
         for row in rows {
             let namespace = row.get_expect_string("namespace");
@@ -1297,13 +1259,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     ) -> DescriberResult<()> {
         let namespaces = &sql_schema.namespaces;
         let sql = include_str!("postgres/indexes_query.sql");
-        let rows = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
 
         let mut result_rows = Vec::new();
         let mut index_rows = rows.into_iter().peekable();
@@ -1373,13 +1329,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             "#
         };
 
-        let rows = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
         let sequences = rows.into_iter().map(|seq| Sequence {
             namespace_id: sql_schema
                 .get_namespace_id(&seq.get_expect_string("namespace"))
@@ -1413,13 +1363,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             WHERE n.nspname = ANY ( $1 )
             ORDER BY e.enumsortorder";
 
-        let rows = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
         let mut enum_values: BTreeMap<(NamespaceId, String, Option<String>), Vec<String>> = BTreeMap::new();
 
         for row in rows.into_iter() {
@@ -1429,9 +1373,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let description = row.get_string("description");
             let namespace_id = sql_schema.get_namespace_id(&namespace).unwrap();
 
-            let values = enum_values
-                .entry((namespace_id, name, description))
-                .or_insert_with(Vec::new);
+            let values = enum_values.entry((namespace_id, name, description)).or_default();
 
             values.push(value);
         }

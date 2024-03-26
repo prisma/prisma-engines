@@ -196,28 +196,42 @@ impl<'a> From<In<'a>> for ArgumentValue {
     fn from(other: In<'a>) -> Self {
         match other.selection_set {
             SelectionSet::Multi(key_sets, val_sets) => {
-                let key_vals = key_sets.into_iter().zip(val_sets.into_iter());
+                let key_vals = key_sets.into_iter().zip(val_sets);
 
                 let conjuctive = key_vals.fold(Conjuctive::new(), |acc, (keys, vals)| {
-                    let ands = keys
-                        .into_iter()
-                        .zip(vals.into_iter())
-                        .fold(Conjuctive::new(), |acc, (key, val)| {
-                            let mut argument = IndexMap::new();
-                            argument.insert(key.into_owned(), val);
+                    let ands = keys.into_iter().zip(vals).fold(Conjuctive::new(), |acc, (key, val)| {
+                        let mut argument = IndexMap::new();
+                        argument.insert(key.into_owned(), val);
 
-                            acc.and(argument)
-                        });
+                        acc.and(argument)
+                    });
 
                     acc.or(ands)
                 });
 
                 ArgumentValue::from(conjuctive)
             }
-            SelectionSet::Single(key, vals) => ArgumentValue::object([(
-                key.to_string(),
-                ArgumentValue::object([(filters::IN.to_owned(), ArgumentValue::list(vals))]),
-            )]),
+            SelectionSet::Single(key, vals) => {
+                let is_bool = vals.iter().any(|v| match v {
+                    ArgumentValue::Scalar(s) => matches!(s, query_structure::PrismaValue::Boolean(_)),
+                    _ => false,
+                });
+
+                if is_bool {
+                    let conjunctive = vals.into_iter().fold(Conjuctive::new(), |acc, val| {
+                        let mut argument: IndexMap<String, ArgumentValue> = IndexMap::new();
+                        argument.insert(key.clone().into_owned(), val);
+                        acc.or(argument)
+                    });
+
+                    return ArgumentValue::from(conjunctive);
+                }
+
+                ArgumentValue::object([(
+                    key.to_string(),
+                    ArgumentValue::object([(filters::IN.to_owned(), ArgumentValue::list(vals))]),
+                )])
+            }
             SelectionSet::Empty => ArgumentValue::null(),
         }
     }

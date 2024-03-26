@@ -47,6 +47,7 @@ pub enum Circumstances {
     MariaDb,
     MySql56,
     MySql57,
+    CheckConstraints,
 }
 
 pub struct SqlSchemaDescriber<'a> {
@@ -737,7 +738,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         table_names: &IndexMap<String, TableId>,
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
-        // Only MySQL 8 and above supports check constraints and has the CHECK_CONSTRAINTS table we can query.
+        // Only MySQL 8.0.16 and above supports check constraints and has the CHECK_CONSTRAINTS table we can query.
         if !self.supports_check_constraints() {
             return Ok(());
         }
@@ -768,7 +769,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     fn extract_precision(input: &str) -> Option<u32> {
-        static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([1-9])\)"#).unwrap());
+        static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r".*\(([1-9])\)").unwrap());
         RE.captures(input)
             .and_then(|cap| cap.get(1).map(|precision| precision.as_str().parse::<u32>().unwrap()))
     }
@@ -778,8 +779,8 @@ impl<'a> SqlSchemaDescriber<'a> {
     // In addition, MariaDB will return string literals with the quotes and extra backslashes around
     // control characters like `\n`.
     fn unescape_and_unquote_default_string(default: String, flavour: &Flavour) -> String {
-        static MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\('|\\[^\\])|'(')"#).unwrap());
-        static MARIADB_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\n"#).unwrap());
+        static MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"\\('|\\[^\\])|'(')").unwrap());
+        static MARIADB_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"\\n").unwrap());
         static MARIADB_DEFAULT_QUOTE_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'(.*)'"#).unwrap());
 
         let maybe_unquoted: Cow<'_, str> = if matches!(flavour, Flavour::MariaDb) {
@@ -799,21 +800,14 @@ impl<'a> SqlSchemaDescriber<'a> {
     /// Tests whether an introspected default value should be categorized as current_timestamp.
     fn default_is_current_timestamp(default_str: &str) -> bool {
         static MYSQL_CURRENT_TIMESTAMP_RE: Lazy<Regex> =
-            Lazy::new(|| Regex::new(r#"(?i)^current_timestamp(\([0-9]*\))?$"#).unwrap());
+            Lazy::new(|| Regex::new(r"(?i)^current_timestamp(\([0-9]*\))?$").unwrap());
 
         MYSQL_CURRENT_TIMESTAMP_RE.is_match(default_str)
     }
 
     /// Tests whether the current database supports check constraints
     fn supports_check_constraints(&self) -> bool {
-        // MySQL 8 and above supports check constraints.
-        // MySQL 5.6 and 5.7 do not have a CHECK_CONSTRAINTS table we can query.
-        // MariaDB, although it supports check constraints, adds them unexpectedly.
-        // E.g., MariaDB 10 adds the `json_valid(\`Priv\`)` check constraint on every JSON column;
-        // this creates a noisy, unexpected diff when comparing the introspected schema with the prisma schema.
-        !self
-            .circumstances
-            .intersects(Circumstances::MySql56 | Circumstances::MySql57 | Circumstances::MariaDb)
+        self.circumstances.contains(Circumstances::CheckConstraints)
     }
 }
 

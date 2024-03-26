@@ -33,7 +33,7 @@ mod max_integer {
     const U32_OVERFLOW_MAX: i64 = (u32::MAX as i64) + 1;
     const OVERFLOW_MIN: i8 = -1;
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn transform_gql_parser_too_large(runner: Runner) -> TestResult<()> {
         match runner.protocol() {
             query_engine_tests::EngineProtocol::Graphql => {
@@ -115,7 +115,7 @@ mod max_integer {
 
     // The document parser does not crash on encountering an exponent-notation-serialized int.
     // This triggers a 2009 instead of 2033 as this is in the document parser.
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn document_parser_no_crash_too_large(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -127,7 +127,7 @@ mod max_integer {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn document_parser_no_crash_too_small(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -157,7 +157,8 @@ mod max_integer {
     // Specific messages are asserted down below for native types.
     // MongoDB is excluded because it automatically upcasts a value as an i64 if doesn't fit in an i32.
     // MySQL 5.6 is excluded because it never overflows but inserts the min or max of the range of the column type instead.
-    #[connector_test(exclude(MongoDb, MySql(5.6)))]
+    // D1 doesn't fail.
+    #[connector_test(exclude(MongoDb, MySql(5.6), Sqlite("cfd1")))]
     async fn unfitted_int_should_fail(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -187,8 +188,20 @@ mod max_integer {
         schema.to_owned()
     }
 
-    #[connector_test(schema(overflow_pg), only(Postgres))]
-    async fn unfitted_int_should_fail_pg(runner: Runner) -> TestResult<()> {
+    // Info: `driver-adapters` are currently excluded because they yield a different error message,
+    // coming straight from the database. This is because these "Unable to fit integer value" errors
+    // are only thrown by the native quaint driver, not the underlying database driver.
+    #[connector_test(
+        schema(overflow_pg),
+        only(Postgres),
+        exclude(
+            Postgres("neon.js"),
+            Postgres("pg.js"),
+            Postgres("neon.js.wasm"),
+            Postgres("pg.js.wasm")
+        )
+    )]
+    async fn unfitted_int_should_fail_pg_quaint(runner: Runner) -> TestResult<()> {
         // int
         assert_error!(
             runner,
@@ -229,6 +242,55 @@ mod max_integer {
             format!("mutation {{ createOneTest(data: {{ oid: {OVERFLOW_MIN} }}) {{ id }} }}"),
             None,
             "Unable to fit integer value '-1' into an OID (32-bit unsigned integer)."
+        );
+
+        Ok(())
+    }
+
+    // The driver adapter for neon provides different error messages on overflow
+    #[connector_test(schema(overflow_pg), only(Postgres("neon.js"), Postgres("pg.js")))]
+    async fn unfitted_int_should_fail_pg_js(runner: Runner) -> TestResult<()> {
+        // int
+        assert_error!(
+            runner,
+            format!("mutation {{ createOneTest(data: {{ int: {I32_OVERFLOW_MAX} }}) {{ id }} }}"),
+            None,
+            "value \\\"2147483648\\\" is out of range for type integer"
+        );
+        assert_error!(
+            runner,
+            format!("mutation {{ createOneTest(data: {{ int: {I32_OVERFLOW_MIN} }}) {{ id }} }}"),
+            None,
+            "value \\\"-2147483649\\\" is out of range for type integer"
+        );
+
+        // smallint
+        assert_error!(
+            runner,
+            format!("mutation {{ createOneTest(data: {{ smallint: {I16_OVERFLOW_MAX} }}) {{ id }} }}"),
+            None,
+            "value \\\"32768\\\" is out of range for type smallint"
+        );
+        assert_error!(
+            runner,
+            format!("mutation {{ createOneTest(data: {{ smallint: {I16_OVERFLOW_MIN} }}) {{ id }} }}"),
+            None,
+            "value \\\"-32769\\\" is out of range for type smallint"
+        );
+
+        //oid
+        assert_error!(
+            runner,
+            format!("mutation {{ createOneTest(data: {{ oid: {U32_OVERFLOW_MAX} }}) {{ id }} }}"),
+            None,
+            "value \\\"4294967296\\\" is out of range for type oid"
+        );
+
+        // The underlying driver swallows a negative id by interpreting it as unsigned.
+        // {"data":{"createOneTest":{"id":1,"oid":4294967295}}}
+        run_query!(
+            runner,
+            format!("mutation {{ createOneTest(data: {{ oid: {OVERFLOW_MIN} }}) {{ id, oid }} }}")
         );
 
         Ok(())
@@ -722,7 +784,7 @@ mod float_serialization_issues {
         schema.to_string()
     }
 
-    #[connector_test(exclude(SqlServer))]
+    #[connector_test(exclude(SqlServer, Sqlite("cfd1")))]
     async fn int_range_overlap_works(runner: Runner) -> TestResult<()> {
         runner
             .query("mutation { createOneTest(data: { id: 1, float: 1e20 }) { id float } }")

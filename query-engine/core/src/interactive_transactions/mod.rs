@@ -1,7 +1,9 @@
 use crate::CoreError;
 use connector::Transaction;
+use crosstarget_utils::time::ElapsedTimeCounter;
+use serde::Deserialize;
 use std::fmt::Display;
-use tokio::time::{Duration, Instant};
+use tokio::time::Duration;
 
 mod actor_manager;
 mod actors;
@@ -37,7 +39,7 @@ pub(crate) use messages::*;
 /// the TransactionActorManager can reply with a helpful error message which explains that no operation can be performed on a closed transaction
 /// rather than an error message stating that the transaction does not exist.
 
-#[derive(Debug, Clone, Hash, Eq, PartialEq)]
+#[derive(Debug, Clone, Hash, Eq, PartialEq, Deserialize)]
 pub struct TxId(String);
 
 const MINIMUM_TX_ID_LENGTH: usize = 24;
@@ -103,7 +105,7 @@ impl<'a> CachedTx<'a> {
         }
     }
 
-    pub(crate) fn to_closed(&self, start_time: Instant, timeout: Duration) -> Option<ClosedTx> {
+    pub(crate) fn to_closed(&self, start_time: ElapsedTimeCounter, timeout: Duration) -> Option<ClosedTx> {
         match self {
             CachedTx::Open(_) => None,
             CachedTx::Committed => Some(ClosedTx::Committed),
@@ -116,5 +118,8 @@ impl<'a> CachedTx<'a> {
 pub(crate) enum ClosedTx {
     Committed,
     RolledBack,
-    Expired { start_time: Instant, timeout: Duration },
+    Expired {
+        start_time: ElapsedTimeCounter,
+        timeout: Duration,
+    },
 }

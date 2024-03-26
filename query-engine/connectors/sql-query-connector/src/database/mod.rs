@@ -1,23 +1,26 @@
 mod connection;
-#[cfg(feature = "js-connectors")]
+#[cfg(feature = "driver-adapters")]
 mod js;
-mod mssql;
-mod mysql;
-mod postgresql;
-mod sqlite;
 mod transaction;
+
+#[cfg(not(target_arch = "wasm32"))]
+pub(crate) mod native {
+    pub(crate) mod mssql;
+    pub(crate) mod mysql;
+    pub(crate) mod postgresql;
+    pub(crate) mod sqlite;
+}
 
 pub(crate) mod operations;
 
 use async_trait::async_trait;
 use connector_interface::{error::ConnectorError, Connector};
 
-#[cfg(feature = "js-connectors")]
+#[cfg(feature = "driver-adapters")]
 pub use js::*;
-pub use mssql::*;
-pub use mysql::*;
-pub use postgresql::*;
-pub use sqlite::*;
+
+#[cfg(not(target_arch = "wasm32"))]
+pub use native::{mssql::*, mysql::*, postgresql::*, sqlite::*};
 
 #[async_trait]
 pub trait FromSource {
@@ -40,12 +43,10 @@ pub trait FromSource {
         Self: Connector + Sized;
 }
 
+#[inline]
 async fn catch<O>(
-    connection_info: quaint::prelude::ConnectionInfo,
+    connection_info: &quaint::prelude::ConnectionInfo,
     fut: impl std::future::Future<Output = Result<O, crate::SqlError>>,
 ) -> Result<O, ConnectorError> {
-    match fut.await {
-        Ok(o) => Ok(o),
-        Err(err) => Err(err.into_connector_error(&connection_info)),
-    }
+    fut.await.map_err(|err| err.into_connector_error(connection_info))
 }

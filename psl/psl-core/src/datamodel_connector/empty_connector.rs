@@ -41,8 +41,8 @@ impl Connector for EmptyDatamodelConnector {
         ScalarType::String
     }
 
-    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType) -> NativeTypeInstance {
-        unreachable!()
+    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
+        None
     }
 
     fn native_type_is_default_for_scalar_type(

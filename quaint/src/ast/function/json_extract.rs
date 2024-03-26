@@ -11,14 +11,11 @@ pub struct JsonExtract<'a> {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum JsonPath<'a> {
-    #[cfg(feature = "mysql")]
     String(Cow<'a, str>),
-    #[cfg(feature = "postgresql")]
     Array(Vec<Cow<'a, str>>),
 }
 
 impl<'a> JsonPath<'a> {
-    #[cfg(feature = "mysql")]
     pub fn string<S>(string: S) -> JsonPath<'a>
     where
         S: Into<Cow<'a, str>>,
@@ -26,7 +23,6 @@ impl<'a> JsonPath<'a> {
         JsonPath::String(string.into())
     }
 
-    #[cfg(feature = "postgresql")]
     pub fn array<A, V>(array: A) -> JsonPath<'a>
     where
         V: Into<Cow<'a, str>>,

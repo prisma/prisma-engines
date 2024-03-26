@@ -43,7 +43,7 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "TinyInt",
-            Value::integer(u8::MAX),
+            Value::int32(u8::MAX),
             &[
                 "SmallInt",
                 "Int",
@@ -69,7 +69,7 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "SmallInt",
-            Value::integer(i16::MAX),
+            Value::int32(i16::MAX),
             &[
                 "Int",
                 "BigInt",
@@ -92,7 +92,7 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "Int",
-            Value::integer(i32::MAX),
+            Value::int32(i32::MAX),
             &[
                 "BigInt",
                 "Decimal",
@@ -198,7 +198,7 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "Date",
-            Value::date(Utc::today().naive_utc()),
+            Value::date(Utc::now().naive_utc().date()),
             &[
                 "DateTime",
                 "DateTime2",
@@ -423,12 +423,12 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     vec![
         (
             "TinyInt",
-            Value::integer(u8::MAX),
+            Value::int32(u8::MAX),
             &["Decimal(2,0)", "Char(2)", "NChar(2)", "VarChar(2)", "NVarChar(2)"],
         ),
         (
             "SmallInt",
-            Value::integer(i16::MAX),
+            Value::int32(i16::MAX),
             &[
                 "Bit",
                 "TinyInt",
@@ -443,7 +443,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "Int",
-            Value::integer(i32::MAX),
+            Value::int32(i32::MAX),
             &[
                 "Bit",
                 "TinyInt",
@@ -468,7 +468,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "BigInt",
-            Value::integer(i32::MAX),
+            Value::int32(i32::MAX),
             &[
                 "Bit",
                 "TinyInt",
@@ -728,7 +728,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "NVarChar",
             ],
         ),
-        ("Date", Value::date(Utc::today().naive_utc()), &["SmallDateTime"]),
+        ("Date", Value::date(Utc::now().naive_utc().date()), &["SmallDateTime"]),
         (
             "Time",
             Value::time(Utc::now().naive_utc().time()),
@@ -1402,7 +1402,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "TinyInt",
-            Value::integer(u8::MAX),
+            Value::int32(u8::MAX),
             &[
                 "Date",
                 "Time",
@@ -1417,7 +1417,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "SmallInt",
-            Value::integer(i16::MAX),
+            Value::int32(i16::MAX),
             &[
                 "Date",
                 "Time",
@@ -1432,7 +1432,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "Int",
-            Value::integer(i32::MAX),
+            Value::int32(i32::MAX),
             &[
                 "Date",
                 "Time",
@@ -1537,7 +1537,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "Date",
-            Value::date(Utc::today().naive_utc()),
+            Value::date(Utc::now().naive_utc().date()),
             &[
                 "TinyInt",
                 "SmallInt",

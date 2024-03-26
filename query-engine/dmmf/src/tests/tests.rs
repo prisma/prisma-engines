@@ -19,7 +19,10 @@ fn views_ignore() {
 }
 
 fn assert_comment(actual: Option<&String>, expected: &str) {
-    assert!(actual.is_some_and(|c| c.as_str() == expected))
+    match actual {
+        Some(actual) => assert_eq!(actual.as_str(), expected),
+        None => panic!("Expected comment: {}", expected),
+    }
 }
 
 #[test]
@@ -81,6 +84,54 @@ fn unsupported_in_composite_type() {
         model sample_model {
             id         String     @id @default(auto()) @map("_id") @db.ObjectId
             some_field NestedType
+        }
+    "#;
+
+    dmmf_from_schema(schema);
+}
+
+// Regression test for https://github.com/prisma/prisma/issues/20986
+#[test]
+fn unusupported_in_compound_unique_must_not_panic() {
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url      = env("TEST_DATABASE_URL")
+        }
+
+        generator client {
+            provider = "postgresql"
+        }
+
+        model A {
+            id          Int                      @id
+            field       Int
+            unsupported Unsupported("tstzrange")
+
+            @@unique([field, unsupported])
+        }
+    "#;
+
+    dmmf_from_schema(schema);
+}
+
+#[test]
+fn unusupported_in_compound_id_must_not_panic() {
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url      = env("TEST_DATABASE_URL")
+        }
+
+        generator client {
+            provider = "postgresql"
+        }
+
+        model A {
+            field       Int                      @unique
+            unsupported Unsupported("tstzrange")
+
+            @@id([field, unsupported])
         }
     "#;
 

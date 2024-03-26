@@ -26,7 +26,7 @@ mod prisma_12572 {
         .to_owned()
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn all_generated_timestamps_are_the_same(runner: Runner) -> TestResult<()> {
         runner
             .query(r#"mutation { createOneTest1(data: {id:"one", test2s: { create: {id: "two"}}}) { id }}"#)

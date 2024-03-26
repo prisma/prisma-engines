@@ -1,8 +1,8 @@
 use super::*;
 use input_types::fields::arguments;
 use mutations::{create_many, create_one};
-use prisma_models::{DefaultKind, PrismaValue};
 use psl::datamodel_connector::ConnectorCapability;
+use query_structure::{DefaultKind, PrismaValue};
 
 /// Builds the root `Mutation` type.
 pub(crate) fn mutation_fields(ctx: &QuerySchema) -> Vec<FieldFn> {

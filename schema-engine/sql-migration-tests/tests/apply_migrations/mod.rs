@@ -406,11 +406,7 @@ fn migrations_should_not_reapply_modified_migrations(api: TestApi) {
 
     api.apply_migrations(&migrations_directory).send_sync();
 
-    let mut file = std::fs::OpenOptions::new()
-        .append(true)
-        .write(true)
-        .open(initial_path)
-        .unwrap();
+    let mut file = std::fs::OpenOptions::new().append(true).open(initial_path).unwrap();
     file.write_all(b"-- this is just a harmless comment\nSELECT 1;")
         .unwrap();
 

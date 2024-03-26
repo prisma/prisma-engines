@@ -52,7 +52,7 @@ mod aggr_group_by_having {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn having_count_scalar_filter(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, int: 1, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, int: 2, string: "group1" }"#).await?;
@@ -127,7 +127,7 @@ mod aggr_group_by_having {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn having_sum_scalar_filter(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 6, int: 6, string: "group1" }"#).await?;
@@ -196,7 +196,7 @@ mod aggr_group_by_having {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn having_min_scalar_filter(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
@@ -264,7 +264,7 @@ mod aggr_group_by_having {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn having_max_scalar_filter(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
@@ -332,7 +332,7 @@ mod aggr_group_by_having {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn having_count_non_numerical_field(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
@@ -350,7 +350,7 @@ mod aggr_group_by_having {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn having_without_aggr_sel(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 10, int: 10, string: "group1" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 0, int: 0, string: "group1" }"#).await?;
@@ -394,7 +394,7 @@ mod aggr_group_by_having {
 
     /// Error cases
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn having_filter_mismatch_selection(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,

@@ -2,7 +2,7 @@ pub use expect_test::expect;
 pub use indoc::{formatdoc, indoc};
 pub use quaint::{prelude::Queryable, single::Quaint};
 pub use test_macros::test_connector;
-pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
+pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Tags};
 
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{
@@ -179,9 +179,9 @@ impl SqlSchemaAssertionsExt for SqlSchema {
     }
 
     fn assert_not_namespace(&self, namespace_name: &str) -> &Self {
-        self.walk_namespaces()
-            .find(|ns| ns.name() == namespace_name)
-            .and_then::<(), _>(|_x| panic!("Found unexpected namespace '{namespace_name}'"));
+        if self.walk_namespaces().any(|ns| ns.name() == namespace_name) {
+            panic!("Found unexpected namespace '{namespace_name}'")
+        }
         self
     }
 }

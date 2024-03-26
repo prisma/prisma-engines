@@ -3,8 +3,6 @@
     crane = {
       url = "github:ipetkov/crane";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.rust-overlay.follows = "rust-overlay";
-      inputs.flake-utils.follows = "flake-utils";
     };
     flake-utils = {
       url = "github:numtide/flake-utils";
@@ -33,16 +31,9 @@
       perSystem = { config, system, pkgs, craneLib, ... }: {
         config._module.args.flakeInputs = inputs;
         imports = [
-          ./nix/all-engines.nix
           ./nix/args.nix
-          ./nix/cargo-doc.nix
-          ./nix/cli-shell.nix
-          ./nix/cli-prisma.nix
-          ./nix/dev-vm.nix
-          ./nix/memory-profiling.nix
-          ./nix/prisma-schema-wasm.nix
-          ./nix/publish-engine-size.nix
           ./nix/shell.nix
+          ./nix/publish-engine-size.nix
         ];
       };
     };

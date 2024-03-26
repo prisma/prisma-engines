@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(capabilities(NativeUpsert))]
 mod native_upsert {
 
-    #[connector_test(schema(user))]
+    #[connector_test(schema(user), exclude(Sqlite("cfd1")))]
     async fn should_upsert_on_single_unique(mut runner: Runner) -> TestResult<()> {
         let upsert = r#"
           mutation {
@@ -42,7 +42,7 @@ mod native_upsert {
         Ok(())
     }
 
-    #[connector_test(schema(user))]
+    #[connector_test(schema(user), exclude(Sqlite("cfd1")))]
     async fn should_upsert_on_id(mut runner: Runner) -> TestResult<()> {
         let upsert = r#"
           mutation {
@@ -85,7 +85,7 @@ mod native_upsert {
         Ok(())
     }
 
-    #[connector_test(schema(user))]
+    #[connector_test(schema(user), exclude(Sqlite("cfd1")))]
     async fn should_upsert_on_unique_list(mut runner: Runner) -> TestResult<()> {
         let upsert = r#"
           mutation {
@@ -129,7 +129,7 @@ mod native_upsert {
         Ok(())
     }
 
-    #[connector_test(schema(user))]
+    #[connector_test(schema(user), exclude(Sqlite("cfd1")))]
     async fn should_not_use_native_upsert_on_two_uniques(mut runner: Runner) -> TestResult<()> {
         let upsert = r#"
           mutation {
@@ -175,7 +175,7 @@ mod native_upsert {
 
     // Should not use native upsert when the unique field values defined in the where clause
     // do not match the same uniques fields in the create clause
-    #[connector_test(schema(user))]
+    #[connector_test(schema(user), exclude(Sqlite("cfd1")))]
     async fn should_not_use_if_where_and_create_different(mut runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
@@ -228,7 +228,7 @@ mod native_upsert {
         Ok(())
     }
 
-    #[connector_test(schema(user))]
+    #[connector_test(schema(user), exclude(Sqlite("cfd1")))]
     async fn should_not_if_missing_update(mut runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -278,7 +278,7 @@ mod native_upsert {
         schema.to_owned()
     }
 
-    #[connector_test(schema(relations))]
+    #[connector_test(schema(relations), exclude(Sqlite("cfd1")))]
     async fn should_not_if_has_nested_select(mut runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -322,7 +322,7 @@ mod native_upsert {
         schema.to_owned()
     }
 
-    #[connector_test(schema(compound_id))]
+    #[connector_test(schema(compound_id), exclude(Sqlite("cfd1")))]
     async fn should_upsert_on_compound_id(mut runner: Runner) -> TestResult<()> {
         let upsert = r#"
           mutation {

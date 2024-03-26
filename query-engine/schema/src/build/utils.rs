@@ -1,6 +1,6 @@
 use super::*;
 use once_cell::sync::Lazy;
-use prisma_models::{walkers, DefaultKind};
+use query_structure::{walkers, DefaultKind};
 use std::borrow::Cow;
 
 /// Input object type convenience wrapper function.
@@ -81,7 +81,7 @@ pub(crate) fn input_field<'a>(
 
 /// Appends an option of type T to a vector over T if the option is Some.
 pub(crate) fn append_opt<T>(vec: &mut Vec<T>, opt: Option<T>) {
-    vec.extend(opt.into_iter())
+    vec.extend(opt)
 }
 
 /// Computes a compound field name based on an index.

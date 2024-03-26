@@ -6,7 +6,7 @@ use std::convert::TryFrom;
 ///
 /// Not complete and not meant for external use in this state. Made for
 /// compatibility purposes.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Merge<'a> {
     pub(crate) table: Table<'a>,
     pub(crate) using: Using<'a>,
@@ -52,7 +52,7 @@ impl<'a> From<Merge<'a>> for Query<'a> {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Using<'a> {
     pub(crate) base_query: Query<'a>,
     pub(crate) columns: Vec<Column<'a>>,
@@ -106,7 +106,7 @@ impl<'a> TryFrom<Insert<'a>> for Merge<'a> {
 
         let query = match insert.values.kind {
             ExpressionKind::Row(row) => {
-                let cols_vals = columns.iter().zip(row.values.into_iter());
+                let cols_vals = columns.iter().zip(row.values);
 
                 let select = cols_vals.fold(Select::default(), |query, (col, val)| {
                     query.value(val.alias(col.name.clone()))
@@ -117,14 +117,14 @@ impl<'a> TryFrom<Insert<'a>> for Merge<'a> {
             ExpressionKind::Values(values) => {
                 let mut rows = values.rows;
                 let row = rows.pop().unwrap();
-                let cols_vals = columns.iter().zip(row.values.into_iter());
+                let cols_vals = columns.iter().zip(row.values);
 
                 let select = cols_vals.fold(Select::default(), |query, (col, val)| {
                     query.value(val.alias(col.name.clone()))
                 });
 
                 let union = rows.into_iter().fold(Union::new(select), |union, row| {
-                    let cols_vals = columns.iter().zip(row.values.into_iter());
+                    let cols_vals = columns.iter().zip(row.values);
 
                     let select = cols_vals.fold(Select::default(), |query, (col, val)| {
                         query.value(val.alias(col.name.clone()))

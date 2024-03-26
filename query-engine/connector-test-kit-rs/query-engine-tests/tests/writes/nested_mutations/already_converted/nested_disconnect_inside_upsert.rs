@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite]
+#[test_suite(exclude(Sqlite("cfd1")))]
 mod disconnect_inside_upsert {
     use query_engine_tests::{assert_error, run_query, run_query_json};
     use query_test_macros::relation_link_test;
@@ -116,7 +116,7 @@ mod disconnect_inside_upsert {
 
     // "a P1 to C1 relation " should "be disconnectable through a nested mutation by id"
     // TODO: MongoDB doesn't support joins on top-level updates. It should be un-excluded once we fix that.
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(MongoDb))]
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(MongoDb, Sqlite("cfd1")))]
     async fn p1_c1_by_fails_if_filter_no_match(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let res = run_query_json!(
             runner,
