@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schemas::common_numeric_types), exclude(Sqlite("cfd1")))]
+#[test_suite(schema(schemas::common_numeric_types))]
 mod aggregation_avg {
     use query_engine_tests::run_query;
 
@@ -97,7 +97,7 @@ mod decimal_aggregation_avg {
         schema.to_owned()
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
+    #[connector_test]
     async fn avg_no_records(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
             run_query!(
@@ -110,7 +110,7 @@ mod decimal_aggregation_avg {
         Ok(())
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
+    #[connector_test]
     async fn avg_some_records(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, decimal: "5.5" }"#).await?;
         create_row(&runner, r#"{ id: 2, decimal: "4.5" }"#).await?;

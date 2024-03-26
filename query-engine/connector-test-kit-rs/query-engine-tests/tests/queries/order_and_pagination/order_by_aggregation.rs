@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), exclude(Sqlite("cfd1")))]
+#[test_suite(schema(schema))]
 mod order_by_aggr {
     use indoc::indoc;
     use query_engine_tests::{match_connector_result, run_query};
@@ -33,7 +33,7 @@ mod order_by_aggr {
         schema.to_owned()
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn one2m_count_asc(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -52,7 +52,7 @@ mod order_by_aggr {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn one2m_count_desc(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -109,7 +109,7 @@ mod order_by_aggr {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn one2m_count_asc_field_asc(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -438,7 +438,7 @@ mod order_by_aggr {
     // With pagination tests
 
     // "[Cursor] Ordering by one2m count asc" should "work"
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn cursor_one2m_count_asc(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -458,7 +458,7 @@ mod order_by_aggr {
     }
 
     // "[Cursor] Ordering by one2m count desc" should "work"
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn cursor_one2m_count_desc(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -520,7 +520,7 @@ mod order_by_aggr {
     }
 
     // "[Cursor][Combo] Ordering by one2m count asc + field asc"
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn cursor_one2m_count_asc_field_asc(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -770,7 +770,7 @@ mod order_by_aggr {
     }
 
     // Regression test for: // https://github.com/prisma/prisma/issues/8036
-    #[connector_test(schema(schema_regression_8036))]
+    #[connector_test(schema(schema_regression_8036), exclude(Sqlite("cfd1")))]
     async fn count_m2m_records_not_connected(runner: Runner) -> TestResult<()> {
         run_query!(
             runner,
