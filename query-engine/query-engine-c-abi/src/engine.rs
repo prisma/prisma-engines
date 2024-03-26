@@ -66,7 +66,9 @@ pub struct ConstructorOptionsNative {
 pub struct ConstructorOptions {
     id: *const c_char,
     datamodel: *const c_char,
-    base_path: *const c_char, // Used on iOS/Android to navigate to the sandboxed app folder to execute all file operations
+    // Used on iOS/Android to navigate to the sandboxed app folder to execute all file operations because file systems are sandboxed
+    // Take a look at README for a more detailed explanation
+    base_path: *const c_char,
     log_level: *const c_char,
     log_queries: bool,
     datasource_overrides: *const c_char,
@@ -141,7 +143,7 @@ impl QueryEngine {
         let base_path = get_cstr_safe(constructor_options.base_path);
         match &base_path {
             Some(path) => env::set_current_dir(Path::new(&path)).expect("Could not change directory"),
-            _ => println!("No base path passed!"),
+            _ => tracing::trace!("No base path provided"),
         }
 
         config
