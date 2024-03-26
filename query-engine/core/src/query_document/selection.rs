@@ -211,10 +211,27 @@ impl<'a> From<In<'a>> for ArgumentValue {
 
                 ArgumentValue::from(conjuctive)
             }
-            SelectionSet::Single(key, vals) => ArgumentValue::object([(
-                key.to_string(),
-                ArgumentValue::object([(filters::IN.to_owned(), ArgumentValue::list(vals))]),
-            )]),
+            SelectionSet::Single(key, vals) => {
+                let is_bool = vals.iter().any(|v| match v {
+                    ArgumentValue::Scalar(s) => matches!(s, query_structure::PrismaValue::Boolean(_)),
+                    _ => false,
+                });
+
+                if is_bool {
+                    let conjunctive = vals.into_iter().fold(Conjuctive::new(), |acc, val| {
+                        let mut argument: IndexMap<String, ArgumentValue> = IndexMap::new();
+                        argument.insert(key.clone().into_owned(), val);
+                        acc.or(argument)
+                    });
+
+                    return ArgumentValue::from(conjunctive);
+                }
+
+                ArgumentValue::object([(
+                    key.to_string(),
+                    ArgumentValue::object([(filters::IN.to_owned(), ArgumentValue::list(vals))]),
+                )])
+            }
             SelectionSet::Empty => ArgumentValue::null(),
         }
     }

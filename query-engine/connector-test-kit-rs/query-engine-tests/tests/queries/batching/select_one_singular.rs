@@ -348,6 +348,53 @@ mod singular_batch {
         Ok(())
     }
 
+    fn boolean_unique() -> String {
+        let schema = indoc! {
+            r#"
+        model User {
+            #id(id, String, @id)
+            isManager Boolean? @unique
+          }
+        "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(boolean_unique))]
+    async fn batch_boolean(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+            createOneUser(data: { id: "A", isManager: true }) { id }
+        }"#
+        );
+        run_query!(
+            &runner,
+            r#"mutation {
+            createOneUser(data: { id: "B", isManager: false }) { id }
+        }"#
+        );
+
+        let (res, compact_doc) = compact_batch(
+            &runner,
+            vec![
+                r#"{ findUniqueUser(where: { isManager: true }) { id, isManager } }"#.to_string(),
+                r#"{ findUniqueUser(where: { isManager: false }) { id, isManager } }"#.to_string(),
+            ],
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+            res.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueUser":{"id":"A","isManager":true}}},{"data":{"findUniqueUser":{"id":"B","isManager":false}}}]}"###
+        );
+
+        assert!(compact_doc.is_compact());
+
+        Ok(())
+    }
+
     // Regression test for https://github.com/prisma/prisma/issues/16548
     #[connector_test(schema(schemas::generic))]
     async fn repro_16548(runner: Runner) -> TestResult<()> {
