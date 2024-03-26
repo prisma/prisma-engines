@@ -53,5 +53,4 @@ $(ARCHS_IOS): %:
 $(XCFRAMEWORK): $(ARCHS_IOS)
 	lipo -create $(wildcard ../../target/x86_64-apple-ios/release/$(LIB)) $(wildcard ../../target/aarch64-apple-ios-sim/release/$(LIB)) -output simulator_fat/libquery_engine.a
 	xcodebuild -create-xcframework -library $(wildcard ../../target/aarch64-apple-ios/release/$(LIB)) -headers include -library simulator_fat/libquery_engine.a -headers include -output $@
-
 	./copy-ios.sh

@@ -32,7 +32,6 @@ use query_engine_common::{
     error::ApiError,
 };
 use request_handlers::ConnectorKind;
-// use tracing_subscriber::filter::LevelFilter;
 
 // The query engine code is async by nature, however the C API does not function with async functions
 // This runtime is here to allow the C API to block_on it and return the responses in a sync manner
@@ -52,6 +51,7 @@ pub struct QueryEngine {
     inner: RwLock<Inner>,
     base_path: Option<String>,
     logger: Logger,
+    url: String,
 }
 
 #[repr(C)]
@@ -133,6 +133,15 @@ impl QueryEngine {
 
         let datamodel = get_cstr_safe(constructor_options.datamodel).expect("Datamodel must be present");
         let mut schema = psl::validate(datamodel.into());
+        // extract the url for later use in apply_migrations
+        let url = schema
+            .configuration
+            .datasources
+            .first()
+            .unwrap()
+            .load_url(|key| env::var(key).ok())
+            .unwrap();
+
         let config = &mut schema.configuration;
 
         schema
@@ -183,6 +192,7 @@ impl QueryEngine {
             inner: RwLock::new(Inner::Builder(builder)),
             base_path,
             logger,
+            url,
         })
     }
 
@@ -348,18 +358,7 @@ impl QueryEngine {
         let migration_folder_path = Path::new(&migration_folder_path_str);
         let migrations_from_filesystem = list_migration_dir(migration_folder_path)?;
 
-        let inner = self.inner.read().await;
-        let engine = inner.as_engine()?;
-        let url = engine
-            .schema
-            .configuration
-            .datasources
-            .first()
-            .unwrap()
-            .load_url(|key| env::var(key).ok())
-            .unwrap();
-
-        let url_without_prefix = url.strip_prefix("file:").unwrap_or(&url);
+        let url_without_prefix = self.url.strip_prefix("file:").unwrap_or(&url);
         let database_path = Path::new(url_without_prefix);
 
         let migrations_from_database = list_migrations(database_path).unwrap();
