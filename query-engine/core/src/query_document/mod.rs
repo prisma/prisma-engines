@@ -213,21 +213,26 @@ impl CompactedDocument {
 
             // The query arguments are extracted here. Combine all query
             // arguments from the different queries into a one large argument.
-            let selection_set = selections.iter().fold(SelectionSet::new(), |mut acc, selection| {
-                // findUnique always has only one argument. We know it must be an object, otherwise this will panic.
-                let where_obj = selection.arguments()[0]
-                    .1
-                    .clone()
-                    .into_object()
-                    .expect("Trying to compact a selection with non-object argument");
-                let filters = extract_filter(where_obj, &model);
+            let selection_set =
+                selections
+                    .iter()
+                    .enumerate()
+                    .fold(SelectionSet::new(), |mut acc, (index, selection)| {
+                        // findUnique always has only one argument. We know it must be an object, otherwise this will panic.
+                        let where_obj = selection.arguments()[0]
+                            .1
+                            .clone()
+                            .into_object()
+                            .expect("Trying to compact a selection with non-object argument");
 
-                for (field, filter) in filters {
-                    acc = acc.push(field, filter);
-                }
+                        let filters = extract_filter(where_obj, &model);
 
-                acc
-            });
+                        for (field, filter) in filters {
+                            acc = acc.push(field, filter, index);
+                        }
+
+                        acc
+                    });
 
             // We must select all unique fields in the query so we can
             // match the right response back to the right request later on.
@@ -239,7 +244,7 @@ impl CompactedDocument {
 
             // The `In` handles both cases, with singular id it'll do an `IN`
             // expression and with a compound id a combination of `AND` and `OR`.
-            builder.push_argument(args::WHERE, In::new(selection_set));
+            builder.push_argument(args::WHERE, dbg!(In::new(selection_set)));
 
             builder.set_alias(selections[0].alias().clone());
 
