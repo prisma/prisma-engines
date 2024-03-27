@@ -316,6 +316,9 @@ mod create_many {
 
         let mut id = 1;
 
+        // Generates a powerset of all combinations of these fields
+        // In an attempt to ensure that we never generate invalid insert statements
+        // because of the grouping logic.
         for sets in vec!["req_default", "opt", "opt_default"]
             .into_iter()
             .powerset()
