@@ -683,15 +683,6 @@ impl QueryDocumentParser {
                                 argument_path.segments(),
                                 &conversions::input_types_to_input_type_descriptions(field.field_types()),
                             )))
-                        } else if field
-                            .field_types()
-                            .iter()
-                            .any(|field_type| matches!(field_type, InputType::Scalar(ScalarType::Null)))
-                        {
-                            // The fact that the field is not required does not mean it is nullable. For example,
-                            // logical operators like "AND", "OR" and "NOT" are considered fields in this context.
-                            // They are not required, but they do not accept null as an input.
-                            Some(Ok((field.name.clone(), ParsedInputValue::Single(PrismaValue::Null))))
                         } else {
                             None
                         }
