@@ -348,7 +348,8 @@ mod create_many {
         Ok(())
     }
 
-    #[connector_test(schema(schema_7), only(Sqlite))]
+    // LibSQL & co are ignored because they don't support metrics
+    #[connector_test(schema(schema_7), only(Sqlite("3")))]
     async fn create_many_by_shape_counter_1(runner: Runner) -> TestResult<()> {
         use query_engine_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
 
@@ -389,7 +390,8 @@ mod create_many {
         Ok(())
     }
 
-    #[connector_test(schema(schema_7), only(Sqlite))]
+    // LibSQL & co are ignored because they don't support metrics
+    #[connector_test(schema(schema_7), only(Sqlite("3")))]
     async fn create_many_by_shape_counter_2(runner: Runner) -> TestResult<()> {
         use query_engine_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
 
@@ -418,16 +420,17 @@ mod create_many {
         let counter = metrics::get_counter(&json, PRISMA_DATASOURCE_QUERIES_TOTAL);
 
         match runner.max_bind_values() {
-          Some(x) if x >= 18 => assert_eq!(counter, 3), // 1 createMany queries (BEGIN/COMMIT are counted)
-          // Some queries are being split because of `QUERY_BATCH_SIZE` being set to `10` in dev.
-          Some(_) => assert_eq!(counter, 4), // 2 createMany queries (BEGIN/COMMIT are counted)
-          _ => panic!("Expected max bind values to be set"),
-      }
+            Some(x) if x >= 18 => assert_eq!(counter, 3), // 1 createMany queries (BEGIN/COMMIT are counted)
+            // Some queries are being split because of `QUERY_BATCH_SIZE` being set to `10` in dev.
+            Some(_) => assert_eq!(counter, 4), // 2 createMany queries (BEGIN/COMMIT are counted)
+            _ => panic!("Expected max bind values to be set"),
+        }
 
         Ok(())
     }
 
-    #[connector_test(schema(schema_7), only(Sqlite))]
+    // LibSQL & co are ignored because they don't support metrics
+    #[connector_test(schema(schema_7), only(Sqlite("3")))]
     async fn create_many_by_shape_counter_3(runner: Runner) -> TestResult<()> {
         use query_engine_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
 
@@ -458,11 +461,11 @@ mod create_many {
         let counter = metrics::get_counter(&json, PRISMA_DATASOURCE_QUERIES_TOTAL);
 
         match runner.max_bind_values() {
-          Some(x) if x > 21 => assert_eq!(counter, 4), // 3 createMany queries in total (BEGIN/COMMIT are counted)
-          // Some queries are being split because of `QUERY_BATCH_SIZE` being set to `10` in dev.
-          Some(_) => assert_eq!(counter, 5), // 3 createMany queries in total (BEGIN/COMMIT are counted)
-          _ => panic!("Expected max bind values to be set"),
-      }
+            Some(x) if x > 21 => assert_eq!(counter, 4), // 3 createMany queries in total (BEGIN/COMMIT are counted)
+            // Some queries are being split because of `QUERY_BATCH_SIZE` being set to `10` in dev.
+            Some(_) => assert_eq!(counter, 5), // 3 createMany queries in total (BEGIN/COMMIT are counted)
+            _ => panic!("Expected max bind values to be set"),
+        }
 
         Ok(())
     }
