@@ -37,6 +37,8 @@ use schema::{constants::*, QuerySchema};
 use std::collections::HashMap;
 use user_facing_errors::query_engine::validation::ValidationError;
 
+use self::selection::QueryFilters;
+
 pub(crate) type QueryParserResult<T> = std::result::Result<T, ValidationError>;
 
 #[derive(Debug)]
@@ -213,26 +215,21 @@ impl CompactedDocument {
 
             // The query arguments are extracted here. Combine all query
             // arguments from the different queries into a one large argument.
-            let selection_set =
-                selections
-                    .iter()
-                    .enumerate()
-                    .fold(SelectionSet::new(), |mut acc, (index, selection)| {
-                        // findUnique always has only one argument. We know it must be an object, otherwise this will panic.
-                        let where_obj = selection.arguments()[0]
-                            .1
-                            .clone()
-                            .into_object()
-                            .expect("Trying to compact a selection with non-object argument");
+            let query_filters = selections
+                .iter()
+                .map(|selection| {
+                    // findUnique always has only one argument. We know it must be an object, otherwise this will panic.
+                    let where_obj = selection.arguments()[0]
+                        .1
+                        .clone()
+                        .into_object()
+                        .expect("Trying to compact a selection with non-object argument");
+                    let filters = extract_filter(where_obj, &model);
 
-                        let filters = extract_filter(where_obj, &model);
-
-                        for (field, filter) in filters {
-                            acc = acc.push(field, filter, index);
-                        }
-
-                        acc
-                    });
+                    QueryFilters::new(filters)
+                })
+                .collect();
+            let selection_set = SelectionSet::new(query_filters);
 
             // We must select all unique fields in the query so we can
             // match the right response back to the right request later on.
