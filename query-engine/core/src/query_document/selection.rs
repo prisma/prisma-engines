@@ -165,8 +165,8 @@ impl QuerySingle {
     fn push(mut previous: Self, next: &QueryFilters) -> Option<Self> {
         if next.0.is_empty() {
             Some(previous)
-        // If the next query filters has only one key, it a `Single`
-        // So we can continue building it
+        // We have already validated that all `QueryFilters` have a single key.
+        // So we can continue building it.
         } else {
             let (key, value) = next.0.first().unwrap();
 
