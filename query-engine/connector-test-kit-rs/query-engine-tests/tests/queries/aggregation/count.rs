@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schemas::common_nullable_types), exclude(Sqlite("cfd1")))]
+#[test_suite(schema(schemas::common_nullable_types))]
 mod aggregation_count {
     use query_engine_tests::run_query;
 

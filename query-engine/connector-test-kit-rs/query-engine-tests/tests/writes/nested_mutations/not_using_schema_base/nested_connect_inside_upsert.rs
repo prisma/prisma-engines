@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), exclude(Sqlite("cfd1")))]
+#[test_suite(schema(schema))]
 mod connect_inside_upsert {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query, run_query_json};

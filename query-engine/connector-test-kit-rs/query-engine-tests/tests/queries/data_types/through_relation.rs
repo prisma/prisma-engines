@@ -182,6 +182,14 @@ mod scalar_relations {
     }
 
     #[connector_test(schema(schema_decimal), capabilities(DecimalType), exclude(Sqlite("cfd1")))]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"dec":"1"},{"childId":2,"dec":"-1"},{"childId":3,"dec":"123.4567891"},{"childId":4,"dec":"95993.57"}]}]}}
+    // + {"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"dec":"1"},{"childId":2,"dec":"-1"},{"childId":3,"dec":"123.4567891"},{"childId":4,"dec":"95993.57000000001"}]}]}}
+    // ```
+    //
+    // Basically, decimals are treated as doubles (and lose precision) due to D1 not providing column type information on queries.
     async fn decimal_type(runner: Runner) -> TestResult<()> {
         create_child(&runner, r#"{ childId: 1, dec: "1" }"#).await?;
         create_child(&runner, r#"{ childId: 2, dec: "-1" }"#).await?;

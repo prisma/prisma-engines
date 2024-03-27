@@ -143,7 +143,7 @@ mod many_count_rel {
     }
 
     // Counting with skip should not affect the count
-    #[connector_test(exclude(Sqlite("cfd1")))]
+    #[connector_test]
     async fn count_with_skip(runner: Runner) -> TestResult<()> {
         // 4 comment / 4 categories
         create_row(
@@ -201,7 +201,7 @@ mod many_count_rel {
     }
 
     // Counting with distinct should not affect the count
-    #[connector_test(exclude(Sqlite("cfd1")))]
+    #[connector_test]
     async fn count_with_distinct(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,
@@ -272,7 +272,7 @@ mod many_count_rel {
     }
 
     // Counting nested one2m and m2m should work
-    #[connector_test(schema(schema_nested), exclude(Sqlite("cfd1")))]
+    #[connector_test(schema(schema_nested))]
     async fn nested_count_one2m_m2m(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
@@ -619,11 +619,7 @@ mod many_count_rel {
     }
 
     // Regression test for: https://github.com/prisma/prisma/issues/7299
-    #[connector_test(
-        schema(schema_one2m_multi_fks),
-        capabilities(CompoundIds),
-        exclude(CockroachDb, Sqlite("cfd1"))
-    )]
+    #[connector_test(schema(schema_one2m_multi_fks), capabilities(CompoundIds), exclude(CockroachDb))]
     async fn count_one2m_compound_ids(runner: Runner) -> TestResult<()> {
         run_query!(
             runner,

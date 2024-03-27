@@ -6,7 +6,7 @@ mod connect_inside_update {
     use query_test_macros::relation_link_test;
 
     // "a P1 to C1  relation with the child already in a relation" should "be connectable through a nested mutation if the child is already in a relation"
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(SqlServer, Sqlite("cfd1")))]
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(SqlServer))]
     async fn p1_c1_child_in_rel_connect_mut(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let loose_child = t.child().parse(
             run_query_json!(
@@ -166,7 +166,7 @@ mod connect_inside_update {
     }
 
     // "a P1 to C1 relation with the child without a relation" should "be connectable through a nested mutation"
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(SqlServer, Sqlite("cfd1")))]
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(SqlServer))]
     async fn p1_c1_child_wo_rel_connect_mut(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let child = t.child().parse(
             run_query_json!(
@@ -218,7 +218,7 @@ mod connect_inside_update {
     }
 
     // "a P1 to C1  relation with the parent without a relation" should "be connectable through a nested mutation"
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(SqlServer, Sqlite("cfd1")))]
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(SqlServer))]
     async fn p1_c1_parnt_wo_rel_connect_mut(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -1142,10 +1142,7 @@ mod connect_inside_update {
     // Regression test for https://github.com/prisma/prisma/issues/18173
     // Excluded on MongoDB because all models require an @id attribute
     // Excluded on SQLServer because models with unique nulls can't have multiple NULLs, unlike other dbs.
-    #[connector_test(
-        schema(p1_c1_child_compound_unique_schema),
-        exclude(MongoDb, SqlServer, Sqlite("cfd1"))
-    )]
+    #[connector_test(schema(p1_c1_child_compound_unique_schema), exclude(MongoDb, SqlServer))]
     async fn p1_c1_child_compound_unique(runner: Runner) -> TestResult<()> {
         run_query!(&runner, r#"mutation { createOneParent(data: { id: 1 }) { id } }"#);
         run_query!(
