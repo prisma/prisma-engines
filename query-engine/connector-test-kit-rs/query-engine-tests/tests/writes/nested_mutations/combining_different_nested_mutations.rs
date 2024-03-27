@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(exclude(Sqlite("cfd1")))]
+#[test_suite]
 mod many_nested_muts {
     use query_engine_tests::{run_query, DatamodelWithParams};
     use query_test_macros::relation_link_test;

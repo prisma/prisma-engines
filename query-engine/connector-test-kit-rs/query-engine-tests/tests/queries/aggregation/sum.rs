@@ -94,7 +94,7 @@ mod decimal_aggregation_sum {
         schema.to_owned()
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
+    #[connector_test]
     async fn sum_no_records(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, "query { aggregateTestModel { _sum { decimal } } }"),

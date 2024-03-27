@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), exclude(Sqlite("cfd1")))]
+#[test_suite(schema(schema))]
 mod transactional {
     use indoc::indoc;
     use query_engine_tests::run_query;
@@ -44,7 +44,13 @@ mod transactional {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"findManyModelA":[]}}
+    // + {"data":{"findManyModelA":[{"id":1}]}}
+    // ```
     async fn one_success_one_fail(runner: Runner) -> TestResult<()> {
         let queries = vec![
             r#"mutation { createOneModelA(data: { id: 1 }) { id }}"#.to_string(),
@@ -77,7 +83,13 @@ mod transactional {
         Ok(())
     }
 
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"findManyModelB":[]}}
+    // + {"data":{"findManyModelB":[{"id":1}]}}
+    // ```
     async fn one_query(runner: Runner) -> TestResult<()> {
         // Existing ModelA in the DB will prevent the nested ModelA creation in the batch.
         insta::assert_snapshot!(

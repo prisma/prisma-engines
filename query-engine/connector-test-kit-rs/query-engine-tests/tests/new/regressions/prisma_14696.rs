@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 // mongodb has very specific constraint on id fields
 // mssql fails with a multiple cascading referential actions paths error
-#[test_suite(schema(schema), exclude(MongoDB, SqlServer, Sqlite("cfd1")))]
+#[test_suite(schema(schema), exclude(MongoDB, SqlServer))]
 mod prisma_14696 {
     fn schema() -> String {
         include_str!("./prisma_14696.prisma").to_string()
