@@ -1,8 +1,9 @@
+use std::iter;
+
 use crate::{ArgumentValue, ArgumentValueObject};
 use indexmap::IndexMap;
 use itertools::Itertools;
 use schema::constants::filters;
-use std::collections::HashMap;
 
 pub type SelectionArgument = (String, ArgumentValue);
 
@@ -102,20 +103,84 @@ impl Selection {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct QueryFilters(Vec<(String, ArgumentValue)>);
 
 impl QueryFilters {
     pub fn new(filters: Vec<(String, ArgumentValue)>) -> Self {
         Self(filters)
     }
+
+    pub fn keys(&self) -> impl IntoIterator<Item = &str> + '_ {
+        self.0.iter().map(|(key, _)| key.as_str())
+    }
+
+    pub fn has_many_keys(&self) -> bool {
+        self.0.len() > 1
+    }
+
+    pub fn get_single_key(&self) -> Option<&(String, ArgumentValue)> {
+        self.0.first()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum SelectionSet {
-    Single(String, Vec<ArgumentValue>),
-    Many(Vec<HashMap<String, Vec<ArgumentValue>>>),
+    Single(QuerySingle),
+    Many(Vec<QueryFilters>),
     Empty,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct QuerySingle(String, Vec<ArgumentValue>);
+
+impl QuerySingle {
+    /// Attempt at building a single query filter from multiple query filters.
+    /// Returns `None` if one of the query filters have more than one key.
+    pub fn new(query_filters: &[QueryFilters]) -> Option<Self> {
+        if query_filters.is_empty() {
+            return None;
+        }
+
+        if query_filters.iter().any(|query_filters| query_filters.has_many_keys()) {
+            return None;
+        }
+
+        let first = query_filters.first().unwrap();
+        let (key, value) = first.get_single_key().unwrap();
+
+        let mut result = QuerySingle(key.clone(), vec![value.clone()]);
+
+        for filters in query_filters.iter().skip(1) {
+            if let Some(single) = QuerySingle::push(result, filters) {
+                result = single;
+            } else {
+                return None;
+            }
+        }
+
+        Some(result)
+    }
+
+    fn push(mut previous: Self, next: &QueryFilters) -> Option<Self> {
+        if next.0.is_empty() {
+            Some(previous)
+        // If the next query filters has only one key, it a `Single`
+        // So we can continue building it
+        } else {
+            let (key, value) = next.0.first().unwrap();
+
+            // if key matches, push value
+            if key == &previous.0 {
+                previous.1.push(value.clone());
+
+                Some(previous)
+            } else {
+                // if key does not match, it's a many
+                None
+            }
+        }
+    }
 }
 
 impl Default for SelectionSet {
@@ -126,58 +191,20 @@ impl Default for SelectionSet {
 
 impl SelectionSet {
     pub fn new(filters: Vec<QueryFilters>) -> Self {
-        filters.into_iter().fold(Self::default(), |acc, query_filters| {
-            acc.push(query_filters).flush_many()
-        })
-    }
+        let single = QuerySingle::new(&filters);
 
-    fn push(self, query_filters: QueryFilters) -> Self {
-        query_filters
-            .0
-            .into_iter()
-            .fold(self, |acc, (new_key, new_value)| match acc {
-                SelectionSet::Single(key, mut values) if key == new_key => {
-                    values.push(new_value);
-
-                    SelectionSet::Single(key, values)
-                }
-                SelectionSet::Single(key, values) => {
-                    let mut map: HashMap<_, _> = HashMap::from_iter([(key, values)]);
-
-                    map.entry(new_key).or_default().push(new_value);
-
-                    SelectionSet::Many(vec![map])
-                }
-                SelectionSet::Many(mut maps) => {
-                    maps.last_mut().unwrap().entry(new_key).or_default().push(new_value);
-
-                    SelectionSet::Many(maps)
-                }
-                SelectionSet::Empty => SelectionSet::Single(new_key, vec![new_value]),
-            })
-    }
-
-    fn flush_many(self) -> Self {
-        match self {
-            SelectionSet::Many(mut maps) => {
-                maps.push(HashMap::new());
-
-                SelectionSet::Many(maps)
-            }
-            _ => self,
+        match single {
+            Some(single) => SelectionSet::Single(single),
+            None if filters.is_empty() => SelectionSet::Empty,
+            None => SelectionSet::Many(filters),
         }
     }
 
-    pub fn keys(&self) -> Vec<&str> {
+    pub fn keys(&self) -> Box<dyn Iterator<Item = &str> + '_> {
         match self {
-            Self::Single(key, _) => vec![key.as_ref()],
-            Self::Many(filters) => filters
-                .iter()
-                .flat_map(|f| f.keys())
-                .map(|key| key.as_ref())
-                .unique()
-                .collect(),
-            Self::Empty => Vec::new(),
+            Self::Single(single) => Box::new(iter::once(single.0.as_str())),
+            Self::Many(filters) => Box::new(filters.iter().flat_map(|f| f.keys()).unique()),
+            Self::Empty => Box::new(iter::empty()),
         }
     }
 }
@@ -199,29 +226,19 @@ impl From<In> for ArgumentValue {
             SelectionSet::Many(buckets) => {
                 let conjuctive = buckets.into_iter().fold(Conjuctive::new(), |acc, filters| {
                     // Needed because we flush the last bucket by pushing an empty one, which gets translated to a `Null` as the Conjunctive is empty.
-                    if !filters.is_empty() {
-                        let ands = filters.into_iter().fold(Conjuctive::new(), |mut acc, (key, values)| {
-                            for value in values {
-                                let mut argument = IndexMap::with_capacity(1);
-                                argument.insert(key.clone(), value);
+                    let ands = filters.0.into_iter().fold(Conjuctive::new(), |acc, (key, value)| {
+                        let mut argument = IndexMap::with_capacity(1);
+                        argument.insert(key.clone(), value);
 
-                                acc = acc.and(argument)
-                            }
+                        acc.and(argument)
+                    });
 
-                            acc
-                        });
-
-                        acc.or(ands)
-                    } else {
-                        acc
-                    }
+                    acc.or(ands)
                 });
-
-                dbg!(&conjuctive);
 
                 ArgumentValue::from(conjuctive)
             }
-            SelectionSet::Single(key, vals) => ArgumentValue::object([(
+            SelectionSet::Single(QuerySingle(key, vals)) => ArgumentValue::object([(
                 key.to_string(),
                 ArgumentValue::object([(filters::IN.to_owned(), ArgumentValue::list(vals))]),
             )]),
