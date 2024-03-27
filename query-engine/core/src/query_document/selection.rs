@@ -224,9 +224,9 @@ impl From<In> for ArgumentValue {
     fn from(other: In) -> Self {
         match other.selection_set {
             SelectionSet::Many(buckets) => {
-                let conjuctive = buckets.into_iter().fold(Conjuctive::new(), |acc, filters| {
+                let conjuctive = buckets.into_iter().fold(Conjuctive::new(), |acc, bucket| {
                     // Needed because we flush the last bucket by pushing an empty one, which gets translated to a `Null` as the Conjunctive is empty.
-                    let ands = filters.0.into_iter().fold(Conjuctive::new(), |acc, (key, value)| {
+                    let ands = bucket.0.into_iter().fold(Conjuctive::new(), |acc, (key, value)| {
                         let mut argument = IndexMap::with_capacity(1);
                         argument.insert(key.clone(), value);
 
