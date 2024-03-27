@@ -294,6 +294,159 @@ mod create_many {
 
         Ok(())
     }
+
+    fn schema_7() -> String {
+        let schema = indoc! {
+          r#"model Test {
+            req Int @id
+            req_default Int @default(dbgenerated("1"))
+            req_default_static Int @default(1)
+            opt Int?
+            opt_default Int? @default(dbgenerated("1"))
+            opt_default_static Int? @default(1)
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_7), only(Sqlite))]
+    async fn create_many_by_shape(runner: Runner) -> TestResult<()> {
+        use itertools::Itertools;
+
+        let mut id = 1;
+
+        for sets in vec!["req_default", "opt", "opt_default"]
+            .into_iter()
+            .powerset()
+            .map(|mut set| {
+                set.extend_from_slice(&["req"]);
+                set
+            })
+            .powerset()
+        {
+            let data = sets
+                .into_iter()
+                .map(|set| {
+                    let res = set.into_iter().map(|field| format!("{field}: {id}")).join(", ");
+
+                    id += 1;
+
+                    format!("{{ {res} }}")
+                })
+                .join(", ");
+
+            run_query!(
+                &runner,
+                format!(r#"mutation {{ createManyTest(data: [{data}]) {{ count }} }}"#)
+            );
+        }
+
+        Ok(())
+    }
+
+    #[connector_test(schema(schema_7), only(Sqlite))]
+    async fn create_many_by_shape_counter_1(runner: Runner) -> TestResult<()> {
+        use query_engine_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
+
+        // Generated queries:
+        // INSERT INTO `main`.`Test` (`opt`, `req`) VALUES (null, ?), (?, ?) params=[1,2,2]
+        // INSERT INTO `main`.`Test` (`opt_default`, `opt`, `req`) VALUES (?, null, ?), (?, ?, ?) params=[3,3,6,6,6]
+        // INSERT INTO `main`.`Test` (`req_default`, `opt_default`, `req`, `opt`) VALUES (?, ?, ?, null), (?, ?, ?, ?) params=[5,5,5,7,7,7,7]
+        // INSERT INTO `main`.`Test` (`req`, `req_default`, `opt`) VALUES (?, ?, ?) params=[4,4,4]
+        run_query!(
+            &runner,
+            r#"mutation {
+              createManyTest(
+                data: [
+                  { req: 1 }
+                  { opt: 2, req: 2 }
+                  { opt_default: 3, req: 3 }
+                  { req_default: 4, opt: 4, req: 4 }
+                  { req_default: 5, opt_default: 5, req: 5 }
+                  { opt: 6, opt_default: 6, req: 6 }
+                  { req_default: 7, opt: 7, opt_default: 7, req: 7 }
+                ]
+              ) {
+                count
+              }
+            }"#
+        );
+
+        let json = runner.get_metrics().to_json(Default::default());
+        let counter = metrics::get_counter(&json, PRISMA_DATASOURCE_QUERIES_TOTAL);
+
+        assert_eq!(counter, 6); // 4 queries in total (BEGIN/COMMIT are counted)
+
+        Ok(())
+    }
+
+    #[connector_test(schema(schema_7), only(Sqlite))]
+    async fn create_many_by_shape_counter_2(runner: Runner) -> TestResult<()> {
+        use query_engine_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
+
+        // Generated queries:
+        // INSERT INTO `main`.`Test` ( `opt_default_static`, `req_default_static`, `opt`, `req` ) VALUES (?, ?, null, ?), (?, ?, null, ?), (?, ?, null, ?) params=[1,1,1,2,1,2,1,3,3]
+        // INSERT INTO `main`.`Test` ( `opt_default_static`, `req_default_static`, `opt`, `req` ) VALUES (?, ?, ?, ?), (?, ?, ?, ?) params=[1,1,8,4,1,1,null,5]
+        // Note: Two queries are generated because QUERY_BATCH_SIZE is set to 10. In production, a single query would be generated for this example.
+        run_query!(
+            &runner,
+            r#"mutation {
+              createManyTest(
+                data: [
+                  { req: 1 }
+                  { req: 2, opt_default_static: 2 },
+                  { req: 3, req_default_static: 3 },
+                  { req: 4, opt: 8 },
+                  { req: 5, opt: null },
+                ]
+              ) {
+                count
+              }
+            }"#
+        );
+
+        let json = runner.get_metrics().to_json(Default::default());
+        let counter = metrics::get_counter(&json, PRISMA_DATASOURCE_QUERIES_TOTAL);
+
+        assert_eq!(counter, 4); // 2 queries in total (BEGIN/COMMIT are counted)
+
+        Ok(())
+    }
+
+    #[connector_test(schema(schema_7), only(Sqlite))]
+    async fn create_many_by_shape_counter_3(runner: Runner) -> TestResult<()> {
+        use query_engine_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
+
+        // Generated queries:
+        // INSERT INTO `main`.`Test` ( `opt_default_static`, `req_default_static`, `opt`, `req` ) VALUES (?, ?, null, ?), (?, ?, null, ?), (?, ?, null, ?) params=[1,1,1,2,1,2,1,3,3]
+        // INSERT INTO `main`.`Test` ( `opt_default_static`, `req_default_static`, `opt`, `req` ) VALUES (?, ?, ?, ?), (?, ?, ?, ?) params=[1,1,8,4,1,1,null,5]
+        // Note: Two queries are generated because QUERY_BATCH_SIZE is set to 10. In production, a single query would be generated for this example.
+        run_query!(
+            &runner,
+            r#"mutation {
+              createManyTest(
+                data: [
+                  { req: 1 }
+                  { req: 2, opt_default_static: 2 },
+                  { req: 3, req_default_static: 3 },
+                  { req: 4, opt: 8 },
+                  { req: 5, opt: null },
+                  { req: 6, opt_default: 3 },
+                ]
+              ) {
+                count
+              }
+            }"#
+        );
+
+        let json = runner.get_metrics().to_json(Default::default());
+        let counter = metrics::get_counter(&json, PRISMA_DATASOURCE_QUERIES_TOTAL);
+
+        assert_eq!(counter, 5); // 3 queries in total (BEGIN/COMMIT are counted)
+
+        Ok(())
+    }
 }
 
 #[test_suite(schema(json_opt), exclude(MySql(5.6)), capabilities(CreateMany, Json))]

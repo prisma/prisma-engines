@@ -6,7 +6,7 @@ use crate::{
     QueryResult, RecordSelection,
 };
 use connector::{ConnectionLike, DatasourceFieldName, NativeUpsert, WriteArgs};
-use query_structure::ManyRecords;
+use query_structure::{ManyRecords, Model};
 
 pub(crate) async fn execute(
     tx: &mut dyn ConnectionLike,
@@ -90,21 +90,19 @@ async fn create_many(
 
 /// Performs bulk inserts grouped by record shape.
 ///
-/// By "record shape" we mean "unique set of fields". This is required to support connectors which
-/// do not support `DEFAULT` in the list of values for `INSERT`. For these, we need to rely on the
-/// fact that the database will use the default value for the column if it is not listed in `INSERT`
-/// statement. Grouping by record shape allows us to use this property, because each batch of fields
-/// has the same columns listed for the `INSERT` statement.
+/// This is required to support connectors which do not support `DEFAULT` in the list of values for `INSERT`.
+/// See [`create_many_shape`] for more information as to which heuristic we use to group create many entries.
 async fn create_many_split_by_shape(
     tx: &mut dyn ConnectionLike,
     q: CreateManyRecords,
     trace_id: Option<String>,
 ) -> InterpretationResult<QueryResult> {
-    let mut args_by_shape: HashMap<Vec<DatasourceFieldName>, Vec<WriteArgs>> = Default::default();
+    let mut args_by_shape: HashMap<CreateManyShape, Vec<WriteArgs>> = Default::default();
+    let model = &q.model;
+
     for write_args in q.args {
-        let mut shape: Vec<_> = write_args.args.keys().cloned().collect();
-        // This ensures that shapes is not dependent on order of fields.
-        shape.sort_unstable();
+        let shape = create_many_shape(&write_args, model);
+
         args_by_shape.entry(shape).or_default().push(write_args);
     }
 
@@ -159,6 +157,38 @@ async fn create_many_split_by_shape(
         }
         Ok(QueryResult::Count(result))
     }
+}
+
+#[derive(Debug, PartialEq, Eq, Hash)]
+struct CreateManyShape(Vec<DatasourceFieldName>);
+
+/// Returns a [`CreateManyShape`] that can be used to group CreateMany entries optimally.
+///
+/// This is needed for connectors that don't support the `DEFAULT` expression when inserting records in bulk.
+/// `DEFAULT` is needed for fields that have a default value that the QueryEngine cannot generate at runtime (@autoincrement(), @dbgenerated()).
+///
+/// Two CreateMany entries cannot be grouped together when they contain different fields that require the use of a `DEFAULT` expression.
+/// - When they have the same set of fields that require `DEFAULT`, those fields can be ommited entirely from the `INSERT` expression, in which case `DEFAULT` is implied.
+/// - When they don't, since all `VALUES` entries of the `INSERT` expression must be the same, we have to split the CreateMany entries into separate `INSERT` expressions.
+///
+/// Consequently, if a field has a default value and is _not_ present in the [`WriteArgs`], this constitutes a discriminant that can be used to group CreateMany entries.
+///
+/// As such, the [`CreateManyShape`] that we compute for a given CreateMany entry is the set of fields that are _not_ present in the [`WriteArgs`] and that have a default value.
+/// Note: This works because the [`crate::QueryDocumentParser`] injects into the CreateMany entries, the default values that _can_ be generated at runtime.
+/// Note: We can ignore optional fields without default values because they can be inserted as `NULL`. It is a value that the QueryEngine _can_ generate at runtime.
+fn create_many_shape(write_args: &WriteArgs, model: &Model) -> CreateManyShape {
+    let mut shape = Vec::new();
+
+    for field in model.fields().scalar() {
+        if !write_args.args.contains_key(field.db_name()) && field.default_value().is_some() {
+            shape.push(DatasourceFieldName(field.db_name().to_string()));
+        }
+    }
+
+    // This ensures that shapes are not dependent on order of fields.
+    shape.sort_unstable();
+
+    CreateManyShape(shape)
 }
 
 async fn update_one(
