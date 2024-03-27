@@ -34,6 +34,12 @@ mod one2one_req {
     }
 
     #[connector_test(schema(required), exclude(Sqlite("cfd1")))]
+    /// On D1, this fails with:
+    ///
+    /// ```diff
+    /// - {"data":{"updateManyParent":{"count":1}}}
+    /// + {"data":{"updateManyParent":{"count":2}}}
+    /// ```
     async fn update_parent_cascade(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
             run_query!(&runner, r#"mutation {
@@ -170,8 +176,14 @@ mod one2one_opt {
         schema.to_owned()
     }
 
-    // Updating the parent updates the child FK as well.
     #[connector_test(schema(optional), exclude(Sqlite("cfd1")))]
+    // Updating the parent updates the child FK as well.
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"updateManyParent":{"count":1}}}
+    // + {"data":{"updateManyParent":{"count":2}}}
+    // ```
     async fn update_parent_cascade(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
             run_query!(&runner, r#"mutation {

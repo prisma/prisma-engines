@@ -66,6 +66,12 @@ mod one2one_opt {
     }
 
     #[connector_test(exclude(Sqlite("cfd1")))]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"updateManyParent":{"count":1}}}
+    // + {"data":{"updateManyParent":{"count":2}}}
+    // ```
     async fn update_many_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
@@ -386,7 +392,7 @@ mod one2many_opt {
     }
 
     /// Updating the parent succeeds and sets the FK null.
-    #[connector_test(exclude(Sqlite("cfd1")))]
+    #[connector_test]
     async fn update_parent_nested(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
@@ -406,7 +412,7 @@ mod one2many_opt {
         Ok(())
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
+    #[connector_test]
     async fn upsert_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
@@ -426,7 +432,7 @@ mod one2many_opt {
         Ok(())
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
+    #[connector_test]
     async fn upsert_parent_nested(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
@@ -452,6 +458,12 @@ mod one2many_opt {
     }
 
     #[connector_test(exclude(Sqlite("cfd1")))]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"updateManyParent":{"count":1}}}
+    // + {"data":{"updateManyParent":{"count":2}}}
+    // ```
     async fn update_many_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
@@ -621,7 +633,7 @@ mod one2many_opt {
     }
 
     // SET_NULL should recurse if there are relations sharing a common fk
-    #[connector_test(schema(one2m2m_opt_restrict), exclude(SqlServer, Sqlite("cfd1")))]
+    #[connector_test(schema(one2m2m_opt_restrict), exclude(SqlServer))]
     async fn update_parent_recurse_restrict_failure(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -694,7 +706,7 @@ mod one2many_opt {
     }
 
     // SET_NULL should not recurse if there is no relation sharing a common fk
-    #[connector_test(schema(one2m2m_no_shared_fk), exclude(Sqlite("cfd1")))]
+    #[connector_test(schema(one2m2m_no_shared_fk))]
     async fn update_parent_no_recursion(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -781,7 +793,7 @@ mod one2many_opt {
     }
 
     // Relation fields with at least one shared compound should also be set to null
-    #[connector_test(schema(one2m2m_compound_opt_set_null), exclude(Sqlite("cfd1")))]
+    #[connector_test(schema(one2m2m_compound_opt_set_null))]
     async fn update_parent_compound_recurse(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {

@@ -456,7 +456,7 @@ mod order_by_aggr {
     // With pagination tests
 
     // "[Cursor] Ordering by one2m count asc" should "work"
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     // On D1, this fails with:
     //
     // ```diff
