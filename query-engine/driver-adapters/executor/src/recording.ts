@@ -21,6 +21,9 @@ function recorder(adapter: DriverAdapter, recordings: Recordings) {
   return {
     provider: adapter.provider,
     adapterName: adapter.adapterName,
+    batch: () => {
+      throw new Error('batch Not implemented');
+    },
     startTransaction: () => {
       throw new Error("Not implemented");
     },
@@ -43,6 +46,9 @@ function replayer(adapter: DriverAdapter, recordings: Recordings) {
     provider: adapter.provider,
     adapterName: adapter.adapterName,
     recordings: recordings,
+    batch: () => {
+      throw new Error('batch Not implemented');
+    },
     startTransaction: () => {
       throw new Error("Not implemented");
     },
