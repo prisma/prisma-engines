@@ -36,13 +36,13 @@
     "query-engine-wasm-baseline": "npm:@prisma/query-engine-wasm@0.0.19",
     "query-engine-wasm-latest": "npm:@prisma/query-engine-wasm@latest",
     "ts-pattern": "^5.0.8",
-    "undici": "6.7.0",
+    "undici": "6.7.1",
     "wrangler": "^3.34.2",
     "ws": "8.16.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240314.0",
-    "@types/node": "20.11.24",
+    "@types/node": "20.11.28",
     "tsup": "8.0.2",
     "tsx": "4.7.1",
     "typescript": "5.4.2"
