@@ -136,6 +136,9 @@ start-sqlite:
 dev-sqlite:
 	cp $(CONFIG_PATH)/sqlite $(CONFIG_FILE)
 
+dev-react-native:
+	cp $(CONFIG_PATH)/react-native $(CONFIG_FILE)
+
 dev-libsql-js: build-qe-napi build-driver-adapters-kit
 	cp $(CONFIG_PATH)/libsql-js $(CONFIG_FILE)
 

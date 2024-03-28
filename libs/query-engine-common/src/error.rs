@@ -94,6 +94,7 @@ impl From<serde_json::Error> for ApiError {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
 impl From<ApiError> for napi::Error {
     fn from(e: ApiError) -> Self {
         let user_facing = user_facing_errors::Error::from(e);

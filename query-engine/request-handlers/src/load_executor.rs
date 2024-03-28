@@ -43,12 +43,16 @@ pub async fn load(
             }
 
             match datasource.active_provider {
+                #[cfg(feature = "sqlite")]
                 p if SQLITE.is_provider(p) => native::sqlite(datasource, &url, features).await,
+                #[cfg(feature = "mysql")]
                 p if MYSQL.is_provider(p) => native::mysql(datasource, &url, features).await,
+                #[cfg(feature = "postgresql")]
                 p if POSTGRES.is_provider(p) => native::postgres(datasource, &url, features).await,
+                #[cfg(feature = "mssql")]
                 p if MSSQL.is_provider(p) => native::mssql(datasource, &url, features).await,
+                #[cfg(feature = "cockroachdb")]
                 p if COCKROACH.is_provider(p) => native::postgres(datasource, &url, features).await,
-
                 #[cfg(feature = "mongodb")]
                 p if MONGODB.is_provider(p) => native::mongodb(datasource, &url, features).await,
 
@@ -76,6 +80,7 @@ mod native {
     use super::*;
     use tracing::trace;
 
+    #[cfg(feature = "sqlite")]
     pub(crate) async fn sqlite(
         source: &Datasource,
         url: &str,
@@ -87,6 +92,7 @@ mod native {
         Ok(executor_for(sqlite, false))
     }
 
+    #[cfg(feature = "postgresql")]
     pub(crate) async fn postgres(
         source: &Datasource,
         url: &str,
@@ -109,6 +115,7 @@ mod native {
         Ok(executor_for(psql, force_transactions))
     }
 
+    #[cfg(feature = "mysql")]
     pub(crate) async fn mysql(
         source: &Datasource,
         url: &str,
@@ -119,6 +126,7 @@ mod native {
         Ok(executor_for(mysql, false))
     }
 
+    #[cfg(feature = "mssql")]
     pub(crate) async fn mssql(
         source: &Datasource,
         url: &str,
