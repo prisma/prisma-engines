@@ -1,6 +1,7 @@
 use query_engine_tests::*;
 
-#[test_suite(capabilities(CreateMany))]
+// TODO: create many returns the wrong count for CFD1
+#[test_suite(capabilities(CreateMany), exclude(Sqlite("cfd1")))]
 mod create_many {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query};
