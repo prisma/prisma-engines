@@ -35,7 +35,7 @@ impl ConnectorError {
                 }))
             }
             ErrorKind::InvalidDatabaseUrl { details, url: _ } => {
-                let details = user_facing_errors::quaint::invalid_connection_string_description(details);
+                let details = user_facing_errors::invalid_connection_string_description(details);
 
                 Some(KnownError::new(user_facing_errors::common::InvalidConnectionString {
                     details,

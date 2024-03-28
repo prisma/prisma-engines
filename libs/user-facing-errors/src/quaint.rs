@@ -27,17 +27,6 @@ impl From<quaint::error::DatabaseConstraint> for query_engine::DatabaseConstrain
     }
 }
 
-pub fn invalid_connection_string_description(error_details: &str) -> String {
-    let docs = r#"https://www.prisma.io/docs/reference/database-reference/connection-urls"#;
-
-    let details = formatdoc! {r#"
-            {} in database URL. Please refer to the documentation in {} for constructing a correct
-            connection string. In some cases, certain characters must be escaped. Please
-            check the string for any illegal characters."#, error_details, docs};
-
-    details.replace('\n', " ")
-}
-
 pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -> Option<KnownError> {
     let default_value: Option<KnownError> = None;
 
