@@ -239,3 +239,42 @@ fn type_aliases_must_error() {
 
     expectation.assert_eq(&error);
 }
+
+#[test]
+fn must_return_good_error_message_for_type_match() {
+    let dml = indoc! {r#"
+        model User {
+          firstName String
+        }
+        model B {
+          a  datetime
+          b  footime
+          u user
+        }
+    "#};
+
+    let error = parse_unwrap_err(dml);
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mType "datetime" is neither a built-in type, nor refers to another model, custom type, or enum. Did you mean DateTime?[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0mmodel B {
+        [1;94m 5 | [0m  a  [1;91mdatetime[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mType "footime" is neither a built-in type, nor refers to another model, custom type, or enum.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m  a  datetime
+        [1;94m 6 | [0m  b  [1;91mfootime[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mType "user" is neither a built-in type, nor refers to another model, custom type, or enum. Did you mean User?[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
+        [1;94m   | [0m
+        [1;94m 6 | [0m  b  footime
+        [1;94m 7 | [0m  u [1;91muser[0m
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}
