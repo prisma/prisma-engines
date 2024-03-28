@@ -41,8 +41,8 @@ impl FromStr for AdapterFlavour {
     }
 }
 
-impl From<AdapterFlavour> for SqlFamily {
-    fn from(value: AdapterFlavour) -> Self {
+impl From<&AdapterFlavour> for SqlFamily {
+    fn from(value: &AdapterFlavour) -> Self {
         match value {
             #[cfg(feature = "mysql")]
             AdapterFlavour::Mysql => SqlFamily::Mysql,
@@ -60,14 +60,21 @@ impl From<AdapterFlavour> for SqlFamily {
 #[derive(Default)]
 pub(crate) struct JsConnectionInfo {
     pub schema_name: Option<String>,
+    pub max_bind_values: Option<u32>,
 }
 
 impl JsConnectionInfo {
     pub fn into_external_connection_info(self, provider: &AdapterFlavour) -> ExternalConnectionInfo {
         let schema_name = self.get_schema_name(provider);
-        let sql_family = provider.to_owned().into();
-        ExternalConnectionInfo::new(sql_family, schema_name.to_owned())
+        let sql_family = SqlFamily::from(provider);
+
+        ExternalConnectionInfo::new(
+            sql_family,
+            schema_name.to_owned(),
+            self.max_bind_values.map(|v| v as usize),
+        )
     }
+
     fn get_schema_name(&self, provider: &AdapterFlavour) -> &str {
         match self.schema_name.as_ref() {
             Some(name) => name,
