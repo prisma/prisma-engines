@@ -65,7 +65,11 @@ mod create_many {
     }
 
     // Covers: AutoIncrement ID working with basic autonincrement functionality.
-    #[connector_test(schema(schema_2), capabilities(CreateManyWriteableAutoIncId), exclude(CockroachDb))]
+    #[connector_test(
+        schema(schema_2),
+        capabilities(CreateManyWriteableAutoIncId),
+        exclude(CockroachDb, Sqlite("cfd1"))
+    )]
     async fn basic_create_many_autoincrement(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
