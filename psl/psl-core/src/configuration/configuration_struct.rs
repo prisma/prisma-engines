@@ -6,7 +6,7 @@ use crate::{
 };
 use enumflags2::BitFlags;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Configuration {
     pub generators: Vec<Generator>,
     pub datasources: Vec<Datasource>,
@@ -18,7 +18,7 @@ impl Configuration {
         if self.datasources.is_empty() {
             Err(DatamodelError::new_validation_error(
                 "You defined no datasource. You must define exactly one datasource.",
-                schema_ast::ast::Span::new(0, 0),
+                schema_ast::ast::Span::new(0, 0, diagnostics::FileId::ZERO),
             )
             .into())
         } else {

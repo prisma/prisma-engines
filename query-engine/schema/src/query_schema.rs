@@ -2,9 +2,9 @@ use crate::{IdentifierType, ObjectType, OutputField};
 use psl::{
     can_support_relation_load_strategy,
     datamodel_connector::{Connector, ConnectorCapabilities, ConnectorCapability, JoinStrategySupport, RelationMode},
-    has_capability, PreviewFeature, PreviewFeatures,
+    has_capability, parser_database as db, PreviewFeature, PreviewFeatures,
 };
-use query_structure::{ast, InternalDataModel};
+use query_structure::InternalDataModel;
 use std::{collections::HashMap, fmt};
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
@@ -218,7 +218,7 @@ impl QuerySchema {
 /// Designates a specific top-level operation on a corresponding model.
 #[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub struct QueryInfo {
-    pub model: Option<ast::ModelId>,
+    pub model: Option<db::ModelId>,
     pub tag: QueryTag,
 }
 

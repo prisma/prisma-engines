@@ -1,11 +1,10 @@
+use crate::{ast, ast::WithDocumentation, types, walkers::Walker};
 use schema_ast::ast::{IndentationType, NewlineType};
 
-use crate::{ast, ast::WithDocumentation, types, walkers::Walker};
-
 /// An `enum` declaration in the schema.
-pub type EnumWalker<'db> = Walker<'db, ast::EnumId>;
+pub type EnumWalker<'db> = Walker<'db, crate::EnumId>;
 /// One value in an `enum` declaration in the schema.
-pub type EnumValueWalker<'db> = Walker<'db, (ast::EnumId, usize)>;
+pub type EnumValueWalker<'db> = Walker<'db, (crate::EnumId, usize)>;
 
 impl<'db> EnumWalker<'db> {
     fn attributes(self) -> &'db types::EnumAttributes {
@@ -19,7 +18,7 @@ impl<'db> EnumWalker<'db> {
 
     /// The AST node.
     pub fn ast_enum(self) -> &'db ast::Enum {
-        &self.db.ast()[self.id]
+        &self.db.asts[self.id]
     }
 
     /// The database name of the enum.

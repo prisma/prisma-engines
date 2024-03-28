@@ -19,8 +19,8 @@ fn parse_schema_diagnostics(file: impl Into<SourceFile>) -> Option<Vec<Diagnosti
                     severity: Some(DiagnosticSeverity::WARNING),
                     message: warn.message().to_owned(),
                     range: lsp_types::Range {
-                        start: offset_to_position(warn.span().start, schema.db.source()),
-                        end: offset_to_position(warn.span().end, schema.db.source()),
+                        start: offset_to_position(warn.span().start, schema.db.source_assert_single()),
+                        end: offset_to_position(warn.span().end, schema.db.source_assert_single()),
                     },
                     ..Default::default()
                 });
@@ -31,8 +31,8 @@ fn parse_schema_diagnostics(file: impl Into<SourceFile>) -> Option<Vec<Diagnosti
                     severity: Some(DiagnosticSeverity::ERROR),
                     message: error.message().to_owned(),
                     range: lsp_types::Range {
-                        start: offset_to_position(error.span().start, schema.db.source()),
-                        end: offset_to_position(error.span().end, schema.db.source()),
+                        start: offset_to_position(error.span().start, schema.db.source_assert_single()),
+                        end: offset_to_position(error.span().end, schema.db.source_assert_single()),
                     },
                     ..Default::default()
                 });

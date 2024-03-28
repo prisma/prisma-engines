@@ -14,11 +14,11 @@ pub(super) fn has_a_unique_constraint_name(index: IndexWalker<'_>, names: &super
     let name = index.constraint_name(ctx.connector);
     let model = index.model();
 
-    for violation in names.constraint_namespace.constraint_name_scope_violations(
-        model.model_id(),
-        ConstraintName::Index(name.as_ref()),
-        ctx,
-    ) {
+    for violation in
+        names
+            .constraint_namespace
+            .constraint_name_scope_violations(model.id, ConstraintName::Index(name.as_ref()), ctx)
+    {
         let message = format!(
             "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
             name,
@@ -52,7 +52,7 @@ pub(super) fn unique_index_has_a_unique_custom_name_per_model(
     if let Some(name) = index.name() {
         if names
             .constraint_namespace
-            .local_custom_name_scope_violations(model.model_id(), name.as_ref())
+            .local_custom_name_scope_violations(model.id, name.as_ref())
         {
             let message = format!(
                 "The given custom name `{name}` has to be unique on the model. Please provide a different name for the `name` argument."

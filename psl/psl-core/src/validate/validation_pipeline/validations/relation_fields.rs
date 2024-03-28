@@ -59,7 +59,7 @@ pub(super) fn ambiguity(field: RelationFieldWalker<'_>, names: &Names<'_>) -> Re
     let model = field.model();
     let related_model = field.related_model();
 
-    let identifier = (model.model_id(), related_model.model_id(), field.relation_name());
+    let identifier = (model.id, related_model.id, field.relation_name());
 
     match names.relation_names.get(&identifier) {
         Some(fields) if fields.len() > 1 => {

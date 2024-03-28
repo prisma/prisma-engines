@@ -1,6 +1,7 @@
 use super::*;
 use crate::EnumType;
 use constants::{filters, itx, json_null, load_strategy, ordering};
+use psl::parser_database as db;
 use query_structure::prelude::ParentContainer;
 
 pub(crate) fn sort_order_enum() -> EnumType {
@@ -16,7 +17,7 @@ pub(crate) fn nulls_order_enum() -> EnumType {
     )
 }
 
-pub(crate) fn map_schema_enum_type(ctx: &'_ QuerySchema, enum_id: ast::EnumId) -> EnumType {
+pub(crate) fn map_schema_enum_type(ctx: &'_ QuerySchema, enum_id: db::EnumId) -> EnumType {
     let ident = Identifier::new_model(IdentifierType::Enum(ctx.internal_data_model.clone().zip(enum_id)));
 
     let schema_enum = ctx.internal_data_model.clone().zip(enum_id);

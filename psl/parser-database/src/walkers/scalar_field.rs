@@ -19,7 +19,7 @@ impl<'db> ScalarFieldWalker<'db> {
     /// The field node in the AST.
     pub fn ast_field(self) -> &'db ast::Field {
         let ScalarField { model_id, field_id, .. } = self.attributes();
-        &self.db.ast[*model_id][*field_id]
+        &self.db.asts[*model_id][*field_id]
     }
 
     /// Is this field unique? This method will return true if:
@@ -53,7 +53,7 @@ impl<'db> ScalarFieldWalker<'db> {
             .default
             .as_ref()
             .map(|d| d.default_attribute)
-            .map(|id| &self.db.ast[id])
+            .map(|id| &self.db.asts[id])
     }
 
     /// The final database name of the field. See crate docs for explanations on database names.
@@ -169,7 +169,7 @@ pub struct DefaultValueWalker<'db> {
 impl<'db> DefaultValueWalker<'db> {
     /// The AST node of the attribute.
     pub fn ast_attribute(self) -> &'db ast::Attribute {
-        &self.db.ast[self.default.default_attribute]
+        &self.db.asts[self.default.default_attribute]
     }
 
     /// The value expression in the `@default` attribute.
@@ -374,7 +374,7 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
         let mut result = vec![(root_name, None)];
 
         for (ctid, field_id) in path.path() {
-            let ct = &self.db.ast[*ctid];
+            let ct = &self.db.asts[*ctid];
             let field = ct[*field_id].name();
 
             result.push((field, Some(ct.name())));
@@ -400,7 +400,7 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
         let mut result = vec![(root, None)];
 
         for (ctid, field_id) in path.path() {
-            let ct = &self.db.ast[*ctid];
+            let ct = &self.db.asts[*ctid];
 
             let field = &self.db.types.composite_type_fields[&(*ctid, *field_id)]
                 .mapped_name

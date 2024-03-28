@@ -8,7 +8,7 @@ use crate::{
 /// An `@(@)id` attribute in the schema.
 #[derive(Copy, Clone)]
 pub struct PrimaryKeyWalker<'db> {
-    pub(crate) model_id: ast::ModelId,
+    pub(crate) model_id: crate::ModelId,
     pub(crate) attribute: &'db IdAttribute,
     pub(crate) db: &'db ParserDatabase,
 }
@@ -16,7 +16,7 @@ pub struct PrimaryKeyWalker<'db> {
 impl<'db> PrimaryKeyWalker<'db> {
     /// The `@(@)id` AST node.
     pub fn ast_attribute(self) -> &'db ast::Attribute {
-        &self.db.ast[self.attribute.source_attribute]
+        &self.db.asts[(self.model_id.0, self.attribute.source_attribute.1)]
     }
 
     /// The mapped name of the id.

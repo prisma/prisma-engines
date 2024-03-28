@@ -177,7 +177,8 @@ impl EngineState {
             return Err(ConnectorError::from_msg("Missing --datamodel".to_owned()));
         };
 
-        self.with_connector_for_schema(schema.db.source(), None, f).await
+        self.with_connector_for_schema(schema.db.source_assert_single(), None, f)
+            .await
     }
 }
 

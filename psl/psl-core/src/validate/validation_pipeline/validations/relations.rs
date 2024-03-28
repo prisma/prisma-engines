@@ -38,7 +38,7 @@ pub(super) fn has_a_unique_constraint_name(
     let model = relation.referencing_model();
 
     for violation in names.constraint_namespace.constraint_name_scope_violations(
-        model.model_id(),
+        model.id,
         ConstraintName::Relation(name.as_ref()),
         ctx,
     ) {

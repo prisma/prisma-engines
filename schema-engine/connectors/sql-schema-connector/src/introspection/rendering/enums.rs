@@ -5,11 +5,11 @@ use crate::introspection::{
     sanitize_datamodel_names,
 };
 use datamodel_renderer::datamodel as renderer;
-use psl::parser_database::ast;
+use psl::parser_database as db;
 
 /// Render all enums.
 pub(super) fn render<'a>(ctx: &'a DatamodelCalculatorContext<'a>, rendered: &mut renderer::Datamodel<'a>) {
-    let mut all_enums: Vec<(Option<ast::EnumId>, renderer::Enum<'_>)> = Vec::new();
+    let mut all_enums: Vec<(Option<db::EnumId>, renderer::Enum<'_>)> = Vec::new();
 
     for pair in ctx.enum_pairs() {
         all_enums.push((pair.previous_position(), render_enum(pair)))

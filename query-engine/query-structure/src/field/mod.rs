@@ -6,8 +6,8 @@ pub use composite::*;
 pub use relation::*;
 pub use scalar::*;
 
-use crate::{ast, parent_container::ParentContainer, Model};
-use psl::parser_database::{walkers, ScalarType};
+use crate::{parent_container::ParentContainer, Model};
+use psl::parser_database::{walkers, EnumId, ScalarType};
 use std::{borrow::Cow, hash::Hash};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -143,7 +143,7 @@ pub enum TypeIdentifier {
     Float,
     Decimal,
     Boolean,
-    Enum(ast::EnumId),
+    Enum(EnumId),
     UUID,
     Json,
     DateTime,

@@ -1,6 +1,7 @@
 use crate::{ast, Field};
+use psl::parser_database::CompositeTypeId;
 
-pub type CompositeType = crate::Zipper<ast::CompositeTypeId>;
+pub type CompositeType = crate::Zipper<CompositeTypeId>;
 
 impl CompositeType {
     pub fn name(&self) -> &str {
