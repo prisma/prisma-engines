@@ -68,7 +68,8 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     SupportsTxIsolationSerializable |
     RowIn |
     SupportsFiltersOnRelationsWithoutJoins |
-    CorrelatedSubqueries
+    CorrelatedSubqueries |
+    SupportsDefaultInInsert
 });
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];
