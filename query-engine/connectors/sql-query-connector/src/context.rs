@@ -13,9 +13,8 @@ pub(super) struct Context<'a> {
 
 impl<'a> Context<'a> {
     pub(crate) fn new(connection_info: &'a ConnectionInfo, trace_id: Option<&'a str>) -> Self {
-        let sql_family = connection_info.sql_family();
-        let max_insert_rows = sql_family.max_insert_rows();
-        let max_bind_values = sql_family.max_bind_values();
+        let max_insert_rows = connection_info.max_insert_rows();
+        let max_bind_values = connection_info.max_bind_values();
 
         Context {
             connection_info,
