@@ -422,6 +422,69 @@ mod compound_batch {
         Ok(())
     }
 
+    fn schema_23343() -> String {
+        let schema = indoc! { r#"
+            model Post {
+                id       Int
+                tenantId String
+                userId   Int
+                text     String
+
+                @@unique([tenantId, userId])
+            }
+        "# };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_23343))]
+    async fn batch_23343(runner: Runner) -> TestResult<()> {
+        create_test_data_23343(&runner).await?;
+
+        let queries = vec![
+            r#"query {
+                findUniquePost(where: { tenantId_userId: { tenantId: "tenant1", userId: 1 }, tenantId: "tenant1" })
+                { id, tenantId, userId, text }}"#
+                .to_string(),
+            r#"query {
+                findUniquePost(where: { tenantId_userId: { tenantId: "tenant2", userId: 3 }, tenantId: "tenant2" })
+                { id, tenantId, userId, text }}"#
+                .to_string(),
+        ];
+
+        let batch_results = runner.batch(queries, false, None).await?;
+        insta::assert_snapshot!(
+            batch_results.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniquePost":{"id":1,"tenantId":"tenant1","userId":1,"text":"Post 1!"}}},{"data":{"findUniquePost":{"id":3,"tenantId":"tenant2","userId":3,"text":"Post 3!"}}}]}"###
+        );
+
+        Ok(())
+    }
+
+    async fn create_test_data_23343(runner: &Runner) -> TestResult<()> {
+        runner
+            .query(r#"mutation { createOnePost(data: { id: 1, tenantId: "tenant1", userId: 1, text: "Post 1!" }) { id } }"#)
+            .await?
+            .assert_success();
+
+        runner
+            .query(r#"mutation { createOnePost(data: { id: 2, tenantId: "tenant1", userId: 2, text: "Post 2!" }) { id } }"#)
+            .await?
+            .assert_success();
+
+        runner
+            .query(r#"mutation { createOnePost(data: { id: 3, tenantId: "tenant2", userId: 3, text: "Post 3!" }) { id } }"#)
+            .await?
+            .assert_success();
+
+        runner
+            .query(r#"mutation { createOnePost(data: { id: 4, tenantId: "tenant2", userId: 4, text: "Post 4!" }) { id } }"#)
+            .await?
+            .assert_success();
+
+        Ok(())
+    }
+
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query(r#"mutation { createOneArtist(data: { firstName: "Musti" lastName: "Naukio", non_unique: 0 }) { firstName }}"#)
