@@ -138,6 +138,13 @@ fn push_inline_relations(ctx: &mut Context<'_>) {
         let relation_field = relation
             .forward_relation_field()
             .expect("Expecting a complete relation in sql_schmea_calculator");
+
+        let mut fields = relation_field.fields().expect("TODO write a proper message here");
+
+        if fields.all(|field| field.ast_field().arity.is_required()) && relation_field.ast_field().arity.is_optional() {
+            continue;
+        }
+
         let referencing_model = ctx.model_id_to_table_id[&relation_field.model().model_id()];
         let referenced_model = ctx.model_id_to_table_id[&relation.referenced_model().model_id()];
         let on_delete_action = relation_field.explicit_on_delete().unwrap_or_else(|| {
