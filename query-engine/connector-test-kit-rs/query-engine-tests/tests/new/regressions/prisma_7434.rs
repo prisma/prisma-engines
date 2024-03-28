@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(autoinc_id), capabilities(CreateMany, AutoIncrement), exclude(CockroachDb))]
+#[test_suite(schema(autoinc_id), capabilities(AutoIncrement), exclude(CockroachDb))]
 mod not_in_chunking {
     use query_engine_tests::Runner;
 

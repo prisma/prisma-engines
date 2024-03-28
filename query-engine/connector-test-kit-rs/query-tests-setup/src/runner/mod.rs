@@ -206,6 +206,9 @@ pub struct Runner {
     metrics: MetricRegistry,
     protocol: EngineProtocol,
     log_capture: TestLogCapture,
+    // This is a local override for the max bind values that can be used in a query.
+    // It is set in the test config files, specifically for D1 for now, which has a lower limit than the SQLite native connector.
+    local_max_bind_values: Option<usize>,
 }
 
 impl Runner {
@@ -221,7 +224,8 @@ impl Runner {
     }
 
     pub fn max_bind_values(&self) -> Option<usize> {
-        self.connector_version().max_bind_values()
+        self.local_max_bind_values
+            .or_else(|| self.connector_version().max_bind_values())
     }
 
     pub async fn load(
@@ -229,6 +233,7 @@ impl Runner {
         db_schemas: &[&str],
         connector_version: ConnectorVersion,
         connector_tag: ConnectorTag,
+        local_max_bind_values: Option<usize>,
         metrics: MetricRegistry,
         log_capture: TestLogCapture,
     ) -> TestResult<Self> {
@@ -240,11 +245,12 @@ impl Runner {
         let (executor, db_version) = match crate::CONFIG.with_driver_adapter() {
             Some(with_driver_adapter) => {
                 let external_executor = ExternalExecutor::new();
-                let external_initializer: ExternalExecutorInitializer<'_> =
-                    external_executor.init(&datamodel, url.as_str());
-                let executor = RunnerExecutor::External(external_executor);
+
+                let external_initializer = external_executor.init(&datamodel, url.as_str());
 
                 qe_setup::setup_external(with_driver_adapter.adapter, external_initializer, db_schemas).await?;
+
+                let executor = RunnerExecutor::External(external_executor);
 
                 let database_version = None;
                 (executor, database_version)
@@ -263,8 +269,8 @@ impl Runner {
                 let connector = query_executor.primary_connector();
                 let conn = connector.get_connection().await.unwrap();
                 let database_version = conn.version().await;
-
                 let executor = RunnerExecutor::Builtin(query_executor);
+
                 (executor, database_version)
             }
         };
@@ -283,6 +289,7 @@ impl Runner {
             metrics,
             protocol,
             log_capture,
+            local_max_bind_values,
         })
     }
 

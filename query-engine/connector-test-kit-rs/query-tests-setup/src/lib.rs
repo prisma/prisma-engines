@@ -168,7 +168,7 @@ fn run_relation_link_test_impl(
             run_with_tokio(
                 async move {
                     println!("Used datamodel:\n {}", datamodel.yellow());
-                    let runner = Runner::load(datamodel.clone(), &[], version, connector_tag, metrics, log_capture)
+                    let runner = Runner::load(datamodel.clone(), &[], version, connector_tag, CONFIG.max_bind_values(), metrics, log_capture)
                         .await
                         .unwrap();
 
@@ -286,6 +286,7 @@ fn run_connector_test_impl(
                 db_schemas,
                 version,
                 connector_tag,
+                CONFIG.max_bind_values(),
                 metrics,
                 log_capture,
             )

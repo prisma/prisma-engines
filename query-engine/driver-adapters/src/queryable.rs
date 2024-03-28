@@ -236,6 +236,7 @@ impl std::fmt::Debug for JsQueryable {
 impl ExternalConnector for JsQueryable {
     async fn get_connection_info(&self) -> quaint::Result<ExternalConnectionInfo> {
         let conn_info = self.driver_proxy.get_connection_info().await?;
+
         Ok(conn_info.into_external_connection_info(&self.inner.provider))
     }
 }

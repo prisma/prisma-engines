@@ -190,6 +190,19 @@ impl ConnectionInfo {
         }
     }
 
+    pub fn max_insert_rows(&self) -> Option<usize> {
+        self.sql_family().max_insert_rows()
+    }
+
+    pub fn max_bind_values(&self) -> usize {
+        match self {
+            #[cfg(not(target_arch = "wasm32"))]
+            ConnectionInfo::Native(_) => self.sql_family().max_bind_values(),
+            // Wasm connectors can override the default max bind values.
+            ConnectionInfo::External(info) => info.max_bind_values.unwrap_or(self.sql_family().max_bind_values()),
+        }
+    }
+
     /// The family of databases connected.
     pub fn sql_family(&self) -> SqlFamily {
         match self {
@@ -316,7 +329,7 @@ impl SqlFamily {
     }
 
     /// Get the default max rows for a batch insert.
-    pub fn max_insert_rows(&self) -> Option<usize> {
+    pub(crate) fn max_insert_rows(&self) -> Option<usize> {
         match self {
             #[cfg(feature = "postgresql")]
             SqlFamily::Postgres => None,
