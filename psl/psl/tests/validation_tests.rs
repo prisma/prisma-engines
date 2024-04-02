@@ -91,7 +91,7 @@ fn run_validation_test(test_file_path: &str) {
         return;
     }
 
-    panic_with_diff::panic_with_diff(&last_comment_contents, &diagnostics)
+    panic_with_diff::panic_with_diff(&last_comment_contents, &diagnostics, None)
 }
 
 include!(concat!(env!("OUT_DIR"), "/validation_tests.rs"));
