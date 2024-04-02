@@ -95,7 +95,7 @@ mod reformat_multi_file {
                 let file_name = entry.file_name();
                 let file_name = file_name.to_str().unwrap();
                 if !file_name.ends_with(".prisma") {
-                    return None;
+                    None
                 } else {
                     let full_path = root_dir_path.clone().join(file_name);
                     let content = fs::read_to_string(full_path).unwrap();

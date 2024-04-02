@@ -62,7 +62,7 @@ fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConf
 fn create_get_config_error(schema: &ValidatedSchema, diagnostics: &Diagnostics) -> GetConfigError {
     use std::fmt::Write as _;
 
-    let mut rendered_diagnostics = schema.render_diagnostics(&diagnostics);
+    let mut rendered_diagnostics = schema.render_diagnostics(diagnostics);
     write!(
         rendered_diagnostics,
         "\nValidation Error Count: {}",

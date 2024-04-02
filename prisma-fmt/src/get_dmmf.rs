@@ -18,7 +18,7 @@ pub(crate) fn get_dmmf(params: &str) -> Result<String, String> {
         }
     };
 
-    validate::run(params.prisma_schema, params.no_color).map(|schema| dmmf::dmmf_json_from_validated_schema(schema))
+    validate::run(params.prisma_schema, params.no_color).map(dmmf::dmmf_json_from_validated_schema)
 }
 
 #[cfg(test)]

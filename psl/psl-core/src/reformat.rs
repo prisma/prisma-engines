@@ -7,14 +7,14 @@ use std::{borrow::Cow, collections::HashMap, sync::Arc};
 /// Returns either the reformatted schema, or the original input if we can't reformat. This happens
 /// if and only if the source does not parse to a well formed AST.
 pub fn reformat(source: &str, indent_width: usize) -> Option<String> {
-    let reformatted = reformat_multiple(&vec![("schema.prisma".to_owned(), source.to_owned())], indent_width);
+    let reformatted = reformat_multiple(&[("schema.prisma".to_owned(), source.to_owned())], indent_width);
 
     reformatted.first().map(|(_, source)| source).cloned()
 }
 
 pub fn reformat_multiple(sources: &[(String, String)], indent_width: usize) -> Vec<(String, String)> {
     let sources = sources
-        .into_iter()
+        .iter()
         .map(|(path, content)| {
             (
                 path.to_owned(),
