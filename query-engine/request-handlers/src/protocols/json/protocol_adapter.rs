@@ -39,6 +39,13 @@ impl<'a> JsonProtocolAdapter<'a> {
 
         let selection = self.convert_selection(&field, container.as_ref(), query)?;
 
+        if selection.nested_selections().is_empty() && field.field_type().is_object() {
+            return Err(HandlerError::query_conversion(format!(
+                "No fields selected for operation {}.",
+                field.name()
+            )));
+        }
+
         match operation_type {
             OperationType::Read => Ok(Operation::Read(selection)),
             OperationType::Write => Ok(Operation::Write(selection)),
@@ -139,13 +146,6 @@ impl<'a> JsonProtocolAdapter<'a> {
         // This is important because otherwise, the selection wouldn't be filled and `<field>: false` would have nothing to filter out.
         for key in excluded_keys {
             selection.remove_nested_selection(&key);
-        }
-
-        if selection.nested_selections().is_empty() && field.field_type().is_object() {
-            return Err(HandlerError::query_conversion(format!(
-                "No fields selected for operation {}.",
-                field.name()
-            )));
         }
 
         Ok(selection)
