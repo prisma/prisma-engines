@@ -24,7 +24,7 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "dependencies": {
-    "@effect/schema": "0.64.16",
+    "@effect/schema": "0.64.18",
     "@prisma/adapter-d1": "workspace:*",
     "@prisma/adapter-libsql": "workspace:*",
     "@prisma/adapter-neon": "workspace:*",
