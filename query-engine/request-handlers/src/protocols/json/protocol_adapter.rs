@@ -39,13 +39,6 @@ impl<'a> JsonProtocolAdapter<'a> {
 
         let selection = self.convert_selection(&field, container.as_ref(), query)?;
 
-        if selection.nested_selections().is_empty() && field.field_type().is_object() {
-            return Err(HandlerError::query_conversion(format!(
-                "No fields selected for operation {}.",
-                field.name()
-            )));
-        }
-
         match operation_type {
             OperationType::Read => Ok(Operation::Read(selection)),
             OperationType::Write => Ok(Operation::Write(selection)),
@@ -1092,41 +1085,6 @@ mod tests {
     }
 
     #[test]
-    fn wildcard_and_full_scalar_exclusion() {
-        let query: JsonSingleQuery = serde_json::from_str(
-            r#"{
-            "modelName": "User",
-            "action": "updateOne",
-            "query": {
-                "selection": {
-                    "$scalars": true,
-                    "$composites": true,
-                    "id": false,
-                    "name": false,
-                    "email": false,
-                    "role": false,
-                    "roles": false,
-                    "tags": false,
-                    "posts": false,
-                    "address": false
-                }
-            }
-        }"#,
-        )
-        .unwrap();
-
-        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query);
-
-        assert_debug_snapshot!(operation, @r###"
-        Err(
-            Configuration(
-                "No fields selected for operation updateOneUser.",
-            ),
-        )
-        "###);
-    }
-
-    #[test]
     fn composite_wildcard_and_composite_selection() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
@@ -1152,33 +1110,6 @@ mod tests {
         Err(
             Configuration(
                 "Cannot select both '$composites: true' and a specific composite field 'address'.",
-            ),
-        )
-        "###);
-    }
-
-    #[test]
-    fn composite_wildcard_and_full_composite_exclusion() {
-        let query: JsonSingleQuery = serde_json::from_str(
-            r#"{
-            "modelName": "User",
-            "action": "updateOne",
-            "query": {
-                "selection": {
-                    "$composites": true,
-                    "address": false
-                }
-            }
-        }"#,
-        )
-        .unwrap();
-
-        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query);
-
-        assert_debug_snapshot!(operation, @r###"
-        Err(
-            Configuration(
-                "No fields selected for operation updateOneUser.",
             ),
         )
         "###);
