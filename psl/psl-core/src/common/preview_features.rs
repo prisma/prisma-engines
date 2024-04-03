@@ -78,7 +78,8 @@ features!(
     UncheckedScalarInputs,
     Views,
     RelationJoins,
-    PrismaSchemaFolder
+    PrismaSchemaFolder,
+    ReactNative
 );
 
 /// Generator preview features (alphabetically sorted)
@@ -129,7 +130,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | TransactionApi
         | UncheckedScalarInputs
     }),
-    hidden: enumflags2::make_bitflags!(PreviewFeature::{PrismaSchemaFolder}),
+    hidden: enumflags2::make_bitflags!(PreviewFeature::{PrismaSchemaFolder | ReactNative}),
 };
 
 #[derive(Debug)]
