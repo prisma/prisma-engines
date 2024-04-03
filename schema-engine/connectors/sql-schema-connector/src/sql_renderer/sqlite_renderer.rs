@@ -208,9 +208,13 @@ impl SqlRenderer for SqliteFlavour {
             for index in tables.next.indexes().filter(|idx| !idx.is_primary_key()) {
                 result.push(self.render_create_index(index));
             }
+
+            result.push(format!(
+                r#"PRAGMA foreign_key_check("{new_name}")"#,
+                new_name = tables.next.name()
+            ));
         }
 
-        result.push("PRAGMA foreign_key_check".to_string());
         result.push("PRAGMA foreign_keys=ON".to_string());
 
         result
