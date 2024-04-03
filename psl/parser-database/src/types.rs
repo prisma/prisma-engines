@@ -649,7 +649,14 @@ fn visit_model<'db>(model_id: ast::ModelId, ast_model: &'db ast::Model, ctx: &mu
                 });
             }
             Err(supported) => {
-                let top_names: Vec<_> = ctx.ast.iter_tops().map(|(_, top)| &top.identifier().name).collect();
+                let top_names: Vec<_> = ctx
+                    .ast
+                    .iter_tops()
+                    .filter_map(|(_, top)| match top {
+                        ast::Top::Source(_) | ast::Top::Generator(_) => None,
+                        _ => Some(&top.identifier().name),
+                    })
+                    .collect();
 
                 match top_names.iter().find(|&name| name.to_lowercase() == supported) {
                     Some(ignore_case_match) => {

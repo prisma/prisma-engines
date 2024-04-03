@@ -249,7 +249,20 @@ fn must_return_good_error_message_for_type_match() {
         model B {
           a  datetime
           b  footime
-          u user
+          c user
+          d DB
+          e JS
+        }
+
+        datasource db {
+          provider   = "postgresql"
+          url        = env("TEST_DATABASE_URL")
+          extensions = [citext, pg_trgm]
+        }
+
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["postgresqlExtensions"]
         }
     "#};
 
@@ -272,7 +285,19 @@ fn must_return_good_error_message_for_type_match() {
           [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
         [1;94m 6 | [0m  b  footime
-        [1;94m 7 | [0m  u [1;91muser[0m
+        [1;94m 7 | [0m  c [1;91muser[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mType "DB" is neither a built-in type, nor refers to another model, custom type, or enum.[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m  c user
+        [1;94m 8 | [0m  d [1;91mDB[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mType "JS" is neither a built-in type, nor refers to another model, custom type, or enum.[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
+        [1;94m   | [0m
+        [1;94m 8 | [0m  d DB
+        [1;94m 9 | [0m  e [1;91mJS[0m
         [1;94m   | [0m
     "#]];
 
