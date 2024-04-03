@@ -63,6 +63,7 @@ impl<'a> JsonProtocolAdapter<'a> {
 
         let all_scalars_set = query_selection.all_scalars();
         let all_composites_set = query_selection.all_composites();
+        let excluded_keys = query_selection.get_excluded_keys();
 
         let mut selection = Selection::new(field.name().clone(), None, arguments, Vec::new());
 
@@ -91,7 +92,7 @@ impl<'a> JsonProtocolAdapter<'a> {
                 crate::SelectionSetValue::Shorthand(true) => {
                     selection.push_nested_selection(self.create_shorthand_selection(
                         field,
-                        &selection_name,
+                        selection_name,
                         container,
                         all_scalars_set,
                     )?);
@@ -104,7 +105,7 @@ impl<'a> JsonProtocolAdapter<'a> {
                         let schema_field = field
                             .field_type()
                             .as_object_type()
-                            .and_then(|t| t.find_field(selection_name.as_str()))
+                            .and_then(|t| t.find_field(&selection_name))
                             .ok_or_else(|| {
                                 HandlerError::query_conversion(format!(
                                     "Unknown nested field '{}' for operation {} does not match any query.",
@@ -131,6 +132,20 @@ impl<'a> JsonProtocolAdapter<'a> {
                     }
                 }
             }
+        }
+
+        // Keys have to be removed after the nested selections have been created
+        // because we can't guarantee that we will encounter `<field>: false` _after_ `$scalars|$composites: true`.
+        // This is important because otherwise, the selection wouldn't be filled and `<field>: false` would have nothing to filter out.
+        for key in excluded_keys {
+            selection.remove_nested_selection(&key);
+        }
+
+        if selection.nested_selections().is_empty() && field.field_type().is_object() {
+            return Err(HandlerError::query_conversion(format!(
+                "No fields selected for operation {}.",
+                field.name()
+            )));
         }
 
         Ok(selection)
@@ -261,22 +276,23 @@ impl<'a> JsonProtocolAdapter<'a> {
     fn create_shorthand_selection(
         &mut self,
         parent_field: &OutputField<'a>,
-        nested_field_name: &str,
+        nested_field_name: String,
         container: Option<&ParentContainer>,
         all_scalars_set: bool,
     ) -> crate::Result<Selection> {
         let nested_object_type = parent_field
             .field_type()
             .as_object_type()
-            .and_then(|parent_object| self.get_output_field(parent_object, nested_field_name))
+            .and_then(|parent_object| self.get_output_field(parent_object, &nested_field_name))
             .and_then(|nested_field| nested_field.field_type.as_object_type());
 
         if let Some(nested_object_type) = nested_object_type {
             // case for a relation - we select all nested scalar fields and composite fields
-            let mut nested_selection = Selection::new(nested_field_name, None, vec![], vec![]);
             let nested_container = container
-                .and_then(|c| c.find_field(nested_field_name))
+                .and_then(|c| c.find_field(&nested_field_name))
                 .map(|f| f.related_container());
+
+            let mut nested_selection = Selection::new(nested_field_name, None, vec![], vec![]);
 
             Self::default_scalar_and_composite_selection(
                 &mut nested_selection,
@@ -447,6 +463,7 @@ mod tests {
             posts Post[]
             address Address
           }
+
           model Post {
             id String @id @map("_id")
             title String
@@ -1017,6 +1034,99 @@ mod tests {
     }
 
     #[test]
+    fn scalar_wildcard_and_scalar_exclusion() {
+        let query: JsonSingleQuery = serde_json::from_str(
+            r#"{
+            "modelName": "User",
+            "action": "updateOne",
+            "query": {
+                "selection": {
+                    "$scalars": true,
+                    "email": false,
+                    "id": false
+                }
+            }
+        }"#,
+        )
+        .unwrap();
+
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query);
+
+        assert_debug_snapshot!(operation, @r###"
+        Ok(
+            Write(
+                Selection {
+                    name: "updateOneUser",
+                    alias: None,
+                    arguments: [],
+                    nested_selections: [
+                        Selection {
+                            name: "name",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [],
+                        },
+                        Selection {
+                            name: "role",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [],
+                        },
+                        Selection {
+                            name: "roles",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [],
+                        },
+                        Selection {
+                            name: "tags",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [],
+                        },
+                    ],
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn wildcard_and_full_scalar_exclusion() {
+        let query: JsonSingleQuery = serde_json::from_str(
+            r#"{
+            "modelName": "User",
+            "action": "updateOne",
+            "query": {
+                "selection": {
+                    "$scalars": true,
+                    "$composites": true,
+                    "id": false,
+                    "name": false,
+                    "email": false,
+                    "role": false,
+                    "roles": false,
+                    "tags": false,
+                    "posts": false,
+                    "address": false
+                }
+            }
+        }"#,
+        )
+        .unwrap();
+
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query);
+
+        assert_debug_snapshot!(operation, @r###"
+        Err(
+            Configuration(
+                "No fields selected for operation updateOneUser.",
+            ),
+        )
+        "###);
+    }
+
+    #[test]
     fn composite_wildcard_and_composite_selection() {
         let query: JsonSingleQuery = serde_json::from_str(
             r#"{
@@ -1042,6 +1152,33 @@ mod tests {
         Err(
             Configuration(
                 "Cannot select both '$composites: true' and a specific composite field 'address'.",
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn composite_wildcard_and_full_composite_exclusion() {
+        let query: JsonSingleQuery = serde_json::from_str(
+            r#"{
+            "modelName": "User",
+            "action": "updateOne",
+            "query": {
+                "selection": {
+                    "$composites": true,
+                    "address": false
+                }
+            }
+        }"#,
+        )
+        .unwrap();
+
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query);
+
+        assert_debug_snapshot!(operation, @r###"
+        Err(
+            Configuration(
+                "No fields selected for operation updateOneUser.",
             ),
         )
         "###);
