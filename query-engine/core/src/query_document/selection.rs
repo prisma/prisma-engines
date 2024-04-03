@@ -82,6 +82,10 @@ impl Selection {
         self.nested_selections.push(selection);
     }
 
+    pub fn remove_nested_selection(&mut self, name: &str) {
+        self.nested_selections.retain(|sel| sel.name() != name);
+    }
+
     pub fn contains_nested_selection(&self, name: &str) -> bool {
         self.nested_selections.iter().any(|sel| sel.name() == name)
     }
