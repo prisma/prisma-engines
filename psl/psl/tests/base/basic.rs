@@ -269,7 +269,7 @@ fn must_return_good_error_message_for_type_match() {
     let error = parse_unwrap_err(dml);
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mType "datetime" is neither a built-in type, nor refers to another model, custom type, or enum. Did you mean DateTime?[0m
+        [1;91merror[0m: [1mType "datetime" is neither a built-in type, nor refers to another model, custom type, or enum. Did you mean "DateTime"?[0m
           [1;94m-->[0m  [4mschema.prisma:5[0m
         [1;94m   | [0m
         [1;94m 4 | [0mmodel B {
@@ -281,7 +281,7 @@ fn must_return_good_error_message_for_type_match() {
         [1;94m 5 | [0m  a  datetime
         [1;94m 6 | [0m  b  [1;91mfootime[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mType "user" is neither a built-in type, nor refers to another model, custom type, or enum. Did you mean User?[0m
+        [1;91merror[0m: [1mType "user" is neither a built-in type, nor refers to another model, custom type, or enum. Did you mean "User"?[0m
           [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
         [1;94m 6 | [0m  b  footime

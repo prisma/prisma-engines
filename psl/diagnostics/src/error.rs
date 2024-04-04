@@ -295,7 +295,7 @@ impl DatamodelError {
 
     pub fn new_type_for_case_not_found_error(type_name: &str, suggestion: &str, span: Span) -> DatamodelError {
         let msg = format!(
-            "Type \"{type_name}\" is neither a built-in type, nor refers to another model, custom type, or enum. Did you mean {suggestion}?"
+            "Type \"{type_name}\" is neither a built-in type, nor refers to another model, custom type, or enum. Did you mean \"{suggestion}\"?"
         );
         Self::new(msg, span)
     }
