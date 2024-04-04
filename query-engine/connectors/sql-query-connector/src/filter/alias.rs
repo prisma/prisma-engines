@@ -50,6 +50,7 @@ impl Alias {
         }
     }
 
+    #[cfg(feature = "relation_joins")]
     pub fn to_table_string(&self) -> String {
         self.to_string(Some(AliasMode::Table))
     }

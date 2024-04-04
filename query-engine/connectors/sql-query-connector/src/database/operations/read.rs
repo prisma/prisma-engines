@@ -1,4 +1,8 @@
-use super::coerce::{coerce_record_with_json_relation, IndexedSelection};
+#[cfg(feature = "relation_joins")]
+mod coerce;
+#[cfg(feature = "relation_joins")]
+mod process;
+
 use crate::{
     column_metadata,
     model_extensions::*,
@@ -21,18 +25,24 @@ pub(crate) async fn get_single_record(
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SingleRecord>> {
     match relation_load_strategy {
+        #[cfg(feature = "relation_joins")]
         RelationLoadStrategy::Join => get_single_record_joins(conn, model, filter, selected_fields, ctx).await,
+        #[cfg(not(feature = "relation_joins"))]
+        RelationLoadStrategy::Join => unreachable!(),
         RelationLoadStrategy::Query => get_single_record_wo_joins(conn, model, filter, selected_fields, ctx).await,
     }
 }
 
-pub(crate) async fn get_single_record_joins(
+#[cfg(feature = "relation_joins")]
+async fn get_single_record_joins(
     conn: &dyn Queryable,
     model: &Model,
     filter: &Filter,
     selected_fields: &FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SingleRecord>> {
+    use coerce::coerce_record_with_json_relation;
+
     let selected_fields = selected_fields.to_virtuals_last();
     let field_names: Vec<_> = selected_fields.prisma_names_grouping_virtuals().collect();
     let idents = selected_fields.type_identifiers_with_arities_grouping_virtuals();
@@ -58,7 +68,7 @@ pub(crate) async fn get_single_record_joins(
     Ok(record.map(|record| SingleRecord { record, field_names }))
 }
 
-pub(crate) async fn get_single_record_wo_joins(
+async fn get_single_record_wo_joins(
     conn: &dyn Queryable,
     model: &Model,
     filter: &Filter,
@@ -117,20 +127,27 @@ pub(crate) async fn get_many_records(
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
     match relation_load_strategy {
+        #[cfg(feature = "relation_joins")]
         RelationLoadStrategy::Join => get_many_records_joins(conn, model, query_arguments, selected_fields, ctx).await,
+        #[cfg(not(feature = "relation_joins"))]
+        RelationLoadStrategy::Join => unreachable!(),
         RelationLoadStrategy::Query => {
             get_many_records_wo_joins(conn, model, query_arguments, selected_fields, ctx).await
         }
     }
 }
 
-pub(crate) async fn get_many_records_joins(
+#[cfg(feature = "relation_joins")]
+async fn get_many_records_joins(
     conn: &dyn Queryable,
     _model: &Model,
     query_arguments: QueryArguments,
     selected_fields: &FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
+    use coerce::coerce_record_with_json_relation;
+    use std::borrow::Cow;
+
     let selected_fields = selected_fields.to_virtuals_last();
     let field_names: Vec<_> = selected_fields.prisma_names_grouping_virtuals().collect();
     let idents = selected_fields.type_identifiers_with_arities_grouping_virtuals();
@@ -168,15 +185,16 @@ pub(crate) async fn get_many_records_joins(
         records.push(record)
     }
 
-    // Reverses order when using negative take
-    if query_arguments.needs_reversed_order() {
-        records.reverse();
+    if query_arguments.needs_inmemory_processing_with_joins() {
+        records.records = process::InMemoryProcessorForJoins::new(&query_arguments, records.records)
+            .process(|record| Some((Cow::Borrowed(record), Cow::Borrowed(&records.field_names))))
+            .collect();
     }
 
     Ok(records)
 }
 
-pub(crate) async fn get_many_records_wo_joins(
+async fn get_many_records_wo_joins(
     conn: &dyn Queryable,
     model: &Model,
     mut query_arguments: QueryArguments,
@@ -409,11 +427,14 @@ async fn group_by_aggregate(
 
 /// Find the indexes of the relation records and the virtual selection objects to traverse a set of
 /// records faster when coercing JSON values.
+#[cfg(feature = "relation_joins")]
 fn get_selection_indexes<'a>(
     relations: Vec<&'a RelationSelection>,
     virtuals: Vec<&'a VirtualSelection>,
     field_names: &'a [String],
-) -> Vec<(usize, IndexedSelection<'a>)> {
+) -> Vec<(usize, coerce::IndexedSelection<'a>)> {
+    use coerce::IndexedSelection;
+
     field_names
         .iter()
         .enumerate()

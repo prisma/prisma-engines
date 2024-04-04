@@ -28,7 +28,7 @@ const TEXT_TYPE_NAME: &str = "Text";
 const MEDIUM_TEXT_TYPE_NAME: &str = "MediumText";
 const LONG_TEXT_TYPE_NAME: &str = "LongText";
 
-const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
+pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
     Enums |
     EnumArrayPush |
     Json |
@@ -55,6 +55,7 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     MultiSchema |
 
     FullTextIndex |
+    FullTextSearch |
     FullTextSearchWithIndex |
     MultipleFullTextAttributesPerModel |
     ImplicitManyToManyRelation |
@@ -67,7 +68,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     SupportsTxIsolationSerializable |
     RowIn |
     SupportsFiltersOnRelationsWithoutJoins |
-    CorrelatedSubqueries
+    CorrelatedSubqueries |
+    SupportsDefaultInInsert
 });
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];

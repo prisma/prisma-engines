@@ -64,15 +64,6 @@ impl ReadQuery {
             ReadQuery::AggregateRecordsQuery(_) => false,
         }
     }
-
-    pub(crate) fn requires_inmemory_distinct_with_joins(&self) -> bool {
-        match self {
-            ReadQuery::RecordQuery(_) => false,
-            ReadQuery::ManyRecordsQuery(q) => q.requires_inmemory_distinct_with_joins(),
-            ReadQuery::RelatedRecordsQuery(q) => q.requires_inmemory_distinct_with_joins(),
-            ReadQuery::AggregateRecordsQuery(_) => false,
-        }
-    }
 }
 
 impl FilteredQuery for ReadQuery {
@@ -207,13 +198,6 @@ pub struct ManyRecordsQuery {
     pub relation_load_strategy: RelationLoadStrategy,
 }
 
-impl ManyRecordsQuery {
-    pub fn requires_inmemory_distinct_with_joins(&self) -> bool {
-        self.args.requires_inmemory_distinct_with_joins()
-            || self.nested.iter().any(|q| q.requires_inmemory_distinct_with_joins())
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct RelatedRecordsQuery {
     pub name: String,
@@ -232,11 +216,6 @@ pub struct RelatedRecordsQuery {
 impl RelatedRecordsQuery {
     pub fn has_cursor(&self) -> bool {
         self.args.cursor.is_some() || self.nested.iter().any(|q| q.has_cursor())
-    }
-
-    pub fn requires_inmemory_distinct_with_joins(&self) -> bool {
-        self.args.requires_inmemory_distinct_with_joins()
-            || self.nested.iter().any(|q| q.requires_inmemory_distinct_with_joins())
     }
 }
 

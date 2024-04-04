@@ -298,6 +298,9 @@ mod update_many {
 
         // MySql does not count incrementing a null so the count is different
         if !matches!(runner.connector_version(), ConnectorVersion::MySql(_)) {
+            // On PlanetScale, this fails with:
+            //   left: Number(2)
+            //   right: 3
             assert_eq!(count, 3);
         }
 

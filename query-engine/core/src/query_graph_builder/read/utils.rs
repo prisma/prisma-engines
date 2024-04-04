@@ -1,7 +1,8 @@
 use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
-use psl::datamodel_connector::{ConnectorCapability, JoinStrategySupport};
-use query_structure::{native_distinct_compatible_with_order_by, prelude::*, RelationLoadStrategy};
+use once_cell::sync::Lazy;
+use psl::datamodel_connector::JoinStrategySupport;
+use query_structure::{prelude::*, RelationLoadStrategy};
 use schema::{
     constants::{aggregations::*, args},
     QuerySchema,
@@ -254,23 +255,32 @@ pub fn merge_cursor_fields(selected_fields: FieldSelection, cursor: &Option<Sele
 pub(crate) fn get_relation_load_strategy(
     requested_strategy: Option<RelationLoadStrategy>,
     cursor: Option<&SelectionResult>,
-    distinct: Option<&FieldSelection>,
-    order_by: &[OrderBy],
     nested_queries: &[ReadQuery],
     query_schema: &QuerySchema,
 ) -> QueryGraphBuilderResult<RelationLoadStrategy> {
+    static DEFAULT_RELATION_LOAD_STRATEGY: Lazy<Option<RelationLoadStrategy>> = Lazy::new(|| {
+        std::env::var("PRISMA_RELATION_LOAD_STRATEGY")
+            .map(|e| e.as_str().try_into().unwrap())
+            .ok()
+    });
+
     match query_schema.join_strategy_support() {
         // Connector and database version supports the `Join` strategy...
         JoinStrategySupport::Yes => match requested_strategy {
             // But incoming query cannot be resolved with joins.
-            _ if !query_can_be_resolved_with_joins(query_schema, cursor, distinct, order_by, nested_queries) => {
+            _ if !query_can_be_resolved_with_joins(cursor, nested_queries) => {
                 // So we fallback to the `Query` one.
                 Ok(RelationLoadStrategy::Query)
             }
             // But requested strategy is `Query`.
             Some(RelationLoadStrategy::Query) => Ok(RelationLoadStrategy::Query),
-            // And requested strategy is `Join` or there's none selected, in which case the default is still `Join`.
-            Some(RelationLoadStrategy::Join) | None => Ok(RelationLoadStrategy::Join),
+            // Or requested strategy is `Join`.
+            Some(RelationLoadStrategy::Join) => Ok(RelationLoadStrategy::Join),
+            // or there's none selected, in which case we check for an envar else `Join`.
+            None => match *DEFAULT_RELATION_LOAD_STRATEGY {
+                Some(rls) => Ok(rls),
+                None => Ok(RelationLoadStrategy::Join),
+            },
         },
         // Connector supports `Join` strategy but database version does not...
         JoinStrategySupport::UnsupportedDbVersion => match requested_strategy {
@@ -289,20 +299,10 @@ pub(crate) fn get_relation_load_strategy(
     }
 }
 
-fn query_can_be_resolved_with_joins(
-    query_schema: &QuerySchema,
-    cursor: Option<&SelectionResult>,
-    distinct: Option<&FieldSelection>,
-    order_by: &[OrderBy],
-    nested_queries: &[ReadQuery],
-) -> bool {
-    let can_distinct_in_db_with_joins = query_schema.has_capability(ConnectorCapability::DistinctOn)
-        && native_distinct_compatible_with_order_by(distinct, order_by);
-
+fn query_can_be_resolved_with_joins(cursor: Option<&SelectionResult>, nested_queries: &[ReadQuery]) -> bool {
     cursor.is_none()
-        && (distinct.is_none() || can_distinct_in_db_with_joins)
         && !nested_queries.iter().any(|q| match q {
-            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.requires_inmemory_distinct_with_joins(),
+            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor(),
             _ => false,
         })
 }

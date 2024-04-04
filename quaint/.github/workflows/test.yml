@@ -71,7 +71,7 @@ jobs:
           toolchain: stable
           override: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
@@ -83,7 +83,7 @@ jobs:
         run: docker-compose -f docker-compose.yml up -d
 
       - name: Sleep for 20s
-        uses: juliangruber/sleep-action@v1
+        uses: juliangruber/sleep-action@v2
         with:
           time: 20s
 
@@ -101,7 +101,7 @@ jobs:
         with:
           toolchain: nightly
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry

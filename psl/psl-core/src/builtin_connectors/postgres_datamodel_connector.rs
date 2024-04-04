@@ -26,7 +26,7 @@ const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
     ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey,
 ];
 
-const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
+pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
     AdvancedJsonNullability |
     AnyId |
     AutoIncrement |
@@ -39,6 +39,7 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     CreateSkipDuplicates |
     Enums |
     EnumArrayPush |
+    FullTextSearch |
     FullTextSearchWithoutIndex |
     InsensitiveFilters |
     Json |
@@ -70,7 +71,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     DistinctOn |
     DeleteReturning |
     SupportsFiltersOnRelationsWithoutJoins |
-    LateralJoin
+    LateralJoin |
+    SupportsDefaultInInsert
 });
 
 pub struct PostgresDatamodelConnector;

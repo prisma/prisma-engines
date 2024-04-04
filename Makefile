@@ -149,6 +149,12 @@ dev-libsql-wasm: build-qe-wasm build-driver-adapters-kit
 test-libsql-wasm: dev-libsql-wasm test-qe-st
 test-driver-adapter-libsql-wasm: test-libsql-wasm
 
+dev-d1: build-qe-wasm build-driver-adapters-kit
+	cp $(CONFIG_PATH)/cloudflare-d1 $(CONFIG_FILE)
+
+test-d1: dev-d1 test-qe-st
+test-driver-adapter-d1: test-d1
+
 start-postgres9:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans postgres9
 

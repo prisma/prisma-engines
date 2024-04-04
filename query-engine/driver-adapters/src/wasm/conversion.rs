@@ -24,6 +24,7 @@ impl ToJsValue for Query {
 impl ToJsValue for JSArg {
     fn to_js_value(&self) -> Result<wasm_bindgen::prelude::JsValue, wasm_bindgen::prelude::JsValue> {
         match self {
+            JSArg::SafeInt(num) => Ok(JsValue::from(*num)),
             JSArg::Value(value) => serde_serialize(value),
             JSArg::Buffer(buf) => {
                 let array = Uint8Array::from(buf.as_slice());

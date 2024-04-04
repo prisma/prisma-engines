@@ -10,7 +10,7 @@ use enumflags2::BitFlags;
 
 const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[];
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalKeyIndex];
-const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
+pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
     AnyId |
     AutoIncrement |
     CompoundIds |
@@ -28,7 +28,9 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     InsertReturning |
     DeleteReturning |
     UpdateReturning |
-    SupportsFiltersOnRelationsWithoutJoins
+    SupportsFiltersOnRelationsWithoutJoins |
+    CreateMany |
+    CreateManyWriteableAutoIncId
 });
 
 pub struct SqliteDatamodelConnector;

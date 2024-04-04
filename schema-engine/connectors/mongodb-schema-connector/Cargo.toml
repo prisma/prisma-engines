@@ -4,7 +4,7 @@ name = "mongodb-schema-connector"
 version = "0.1.0"
 
 [dependencies]
-psl.workspace = true
+psl = { workspace = true, features = ["mongodb"] }
 mongodb-client = { path = "../../../libs/mongodb-client" }
 mongodb-schema-describer = { path = "../../mongodb-schema-describer" }
 datamodel-renderer = { path = "../../datamodel-renderer" }

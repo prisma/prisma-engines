@@ -1,9 +1,9 @@
-import {
-  type DriverAdapter,
-  type Query,
-  type Result,
-  type ResultSet,
-} from "@prisma/driver-adapter-utils";
+import type {
+  DriverAdapter,
+  Query,
+  Result,
+  ResultSet,
+} from "@prisma/driver-adapter-utils"
 
 type Recordings = ReturnType<typeof createInMemoryRecordings>;
 
@@ -20,6 +20,7 @@ export function recording(adapter: DriverAdapter) {
 function recorder(adapter: DriverAdapter, recordings: Recordings) {
   return {
     provider: adapter.provider,
+    adapterName: adapter.adapterName,
     startTransaction: () => {
       throw new Error("Not implemented");
     },
@@ -34,12 +35,13 @@ function recorder(adapter: DriverAdapter, recordings: Recordings) {
     executeRaw: async (params) => {
       throw new Error("Not implemented");
     },
-  };
+  } satisfies DriverAdapter
 }
 
 function replayer(adapter: DriverAdapter, recordings: Recordings) {
   return {
     provider: adapter.provider,
+    adapterName: adapter.adapterName,
     recordings: recordings,
     startTransaction: () => {
       throw new Error("Not implemented");
@@ -53,7 +55,7 @@ function replayer(adapter: DriverAdapter, recordings: Recordings) {
     executeRaw: async (params) => {
       return recordings.getCommandResults(params);
     },
-  };
+  } satisfies DriverAdapter & { recordings: Recordings }
 }
 
 function createInMemoryRecordings() {

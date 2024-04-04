@@ -31,7 +31,11 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     DefaultValueAuto |
     TwoWayEmbeddedManyToManyRelation |
     UndefinedType |
-    DeleteReturning
+    DeleteReturning |
+    // MongoDB does not have a notion of default values for fields.
+    // This capability is enabled as a performance optimisation to avoid issuing multiple queries
+    // when using `createMany()` with MongoDB.
+    SupportsDefaultInInsert
 });
 
 pub(crate) struct MongoDbDatamodelConnector;

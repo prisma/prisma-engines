@@ -1,9 +1,11 @@
-use bigdecimal::{BigDecimal, FromPrimitive, ParseBigDecimalError};
-use itertools::{Either, Itertools};
+use bigdecimal::{BigDecimal, ParseBigDecimalError};
+use itertools::Itertools;
 use query_structure::*;
-use std::{io, str::FromStr};
+use std::{borrow::Cow, io, str::FromStr};
 
-use crate::{query_arguments_ext::QueryArgumentsExt, SqlError};
+use crate::SqlError;
+
+use super::process::InMemoryProcessorForJoins;
 
 pub(crate) enum IndexedSelection<'a> {
     Relation(&'a RelationSelection),
@@ -69,11 +71,18 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
                 }
             });
 
-            // Reverses order when using negative take.
-            let iter = match rs.args.needs_reversed_order() {
-                true => Either::Left(iter.rev()),
-                false => Either::Right(iter),
-            };
+            let iter = InMemoryProcessorForJoins::new(&rs.args, iter).process(|maybe_value| {
+                maybe_value.as_ref().ok().map(|value| {
+                    let object = value
+                        .clone()
+                        .into_object()
+                        .expect("Expected coerced_json_relation_to_pv to return list of objects");
+
+                    let (field_names, values) = object.into_iter().unzip();
+
+                    (Cow::Owned(Record::new(values)), Cow::Owned(field_names))
+                })
+            });
 
             Ok(PrismaValue::List(iter.collect::<crate::Result<Vec<_>>>()?))
         }
@@ -128,13 +137,9 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
                 build_conversion_error(sf, &format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
             })?)),
             TypeIdentifier::Float | TypeIdentifier::Decimal => {
-                let bd = n
-                    .as_f64()
-                    .and_then(BigDecimal::from_f64)
-                    .map(|bd| bd.normalized())
-                    .ok_or_else(|| {
-                        build_conversion_error(sf, &format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
-                    })?;
+                let bd = parse_decimal(&n.to_string()).map_err(|_| {
+                    build_conversion_error(sf, &format!("Number({n})"), &format!("{:?}", sf.type_identifier()))
+                })?;
 
                 Ok(PrismaValue::Float(bd))
             }

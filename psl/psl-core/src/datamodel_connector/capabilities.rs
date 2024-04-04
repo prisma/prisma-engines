@@ -70,10 +70,11 @@ capabilities!(
     MultipleFullTextAttributesPerModel,
     ClusteringSetting,
     // Start of query-engine-only Capabilities
-    EnumArrayPush,
+    EnumArrayPush, // implies the ScalarList capability. Necessary, as CockroachDB supports pushing to a list of scalars, but not to the particular case of an enum list. See https://github.com/cockroachdb/cockroach/issues/71388
     InsensitiveFilters,
     CreateMany,
     CreateManyWriteableAutoIncId,
+    SupportsDefaultInInsert, // This capability is set if connector supports using `DEFAULT` instead of a value in the list of `INSERT` arguments.
     WritableAutoincField,
     CreateSkipDuplicates,
     UpdateableId,
@@ -86,6 +87,7 @@ capabilities!(
     AnyId, // Any (or combination of) uniques and not only id fields can constitute an id for a model.
     SqlQueryRaw,
     MongoDbQueryRaw,
+    FullTextSearch,
     FullTextSearchWithoutIndex,
     FullTextSearchWithIndex,
     AdvancedJsonNullability,    // Connector distinguishes between their null type and JSON null.
