@@ -120,4 +120,5 @@ considered for diffing.
 shape = "PathContainer"
 
 [recordShapes.PathContainer]
+description = "An object describing the file location to a Prisma schema."
 fields.path.shape = "string"

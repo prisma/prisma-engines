@@ -9,9 +9,11 @@ connection string. See variants.
 
 [enumShapes.DatasourceParam.variants.SchemaPath]
 shape = "PathContainer"
+isList = true
 
 [enumShapes.DatasourceParam.variants.SchemaString]
 shape = "SchemaContainer"
+isList = true
 
 [enumShapes.DatasourceParam.variants.ConnectionString]
 shape = "UrlContainer"

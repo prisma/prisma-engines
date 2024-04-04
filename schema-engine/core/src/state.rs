@@ -76,7 +76,7 @@ impl EngineState {
 
     async fn with_connector_for_schema<O: Send + 'static>(
         &self,
-        schema: &str,
+        schemas: NonEmpty<(String, &str)>,
         config_dir: Option<&Path>,
         f: ConnectorRequest<O>,
     ) -> CoreResult<O> {

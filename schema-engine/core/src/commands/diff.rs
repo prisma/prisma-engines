@@ -96,8 +96,8 @@ fn namespaces_and_preview_features_from_diff_targets(
     for target in targets {
         match target {
             DiffTarget::Migrations(_) | DiffTarget::Empty | DiffTarget::Url(_) => (),
-            DiffTarget::SchemaDatasource(SchemaContainer { schema })
-            | DiffTarget::SchemaDatamodel(SchemaContainer { schema }) => {
+            DiffTarget::SchemaDatasource(SchemaContainer { schema, path })
+            | DiffTarget::SchemaDatamodel(SchemaContainer { schema, path }) => {
                 let schema_str: String = std::fs::read_to_string(schema).map_err(|err| {
                     ConnectorError::from_source_with_context(
                         err,
@@ -143,7 +143,7 @@ async fn json_rpc_diff_target_to_connector(
 
     match target {
         DiffTarget::Empty => Ok(None),
-        DiffTarget::SchemaDatasource(SchemaContainer { schema }) => {
+        DiffTarget::SchemaDatasource(SchemaContainer { schema, path }) => {
             let schema_contents = read_prisma_schema_from_path(schema)?;
             let schema_dir = std::path::Path::new(schema).parent();
             let mut connector = crate::schema_to_connector(&schema_contents, schema_dir)?;
@@ -154,7 +154,7 @@ async fn json_rpc_diff_target_to_connector(
                 .await?;
             Ok(Some((connector, schema)))
         }
-        DiffTarget::SchemaDatamodel(SchemaContainer { schema }) => {
+        DiffTarget::SchemaDatamodel(SchemaContainer { schema, path }) => {
             let schema_contents = read_prisma_schema_from_path(schema)?;
             let mut connector = crate::schema_to_connector_unchecked(&schema_contents)?;
             connector.set_preview_features(preview_features);

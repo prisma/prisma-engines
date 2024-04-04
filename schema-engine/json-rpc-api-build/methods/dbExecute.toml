@@ -7,8 +7,11 @@ requestShape = "DbExecuteParams"
 responseShape = "DbExecuteResult"
 
 [recordShapes.SchemaContainer]
-description = "An object with a `schema` field."
+description = "An object describing a Prisma schema and its file location."
 fields.schema.shape = "string"
+# Note: the name of the struct would suggest that `schema` models the contents of the Prisma schema file, rather than its path.
+# This is counterintuitive.
+fields.schema.description = "The contents of the Prisma schema file."
 
 [recordShapes.UrlContainer]
 description = "An object with a `url` field."

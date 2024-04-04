@@ -138,8 +138,19 @@ fn generate_types_rs(mut file: impl std::io::Write, api: &Api) -> CrateResult {
             }
 
             if let Some(shape) = &variant.shape {
-                writeln!(file, "    {cc_variant_name}({}),", rustify_type_name(shape))?;
+                let type_name = rustify_type_name(&shape);
+                let type_name: Cow<'static, str> = match variant.is_list {
+                    true => format!("Vec<{type_name}>").into(),
+                    false => type_name,
+                };
+
+                writeln!(file, "    {cc_variant_name}({}),", type_name)?;
             } else {
+                let cc_variant_name: String = match variant.is_list {
+                    true => format!("Vec<{cc_variant_name}>").into(),
+                    false => cc_variant_name,
+                };
+
                 writeln!(file, "    {cc_variant_name},")?;
             }
         }
