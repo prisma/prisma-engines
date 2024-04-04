@@ -17,6 +17,7 @@ mod state;
 mod timings;
 
 pub use self::{api::GenericApi, core_error::*, rpc::rpc_api, timings::TimingsLayer};
+use nonempty::NonEmpty;
 pub use schema_connector;
 
 use enumflags2::BitFlags;
@@ -165,6 +166,7 @@ fn connector_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector
 }
 
 /// Top-level constructor for the schema engine API.
+/// Only used by `migration-tests`.
 pub fn schema_api(
     datamodel: Option<String>,
     host: Option<std::sync::Arc<dyn schema_connector::ConnectorHost>>,
@@ -174,8 +176,15 @@ pub fn schema_api(
         parse_configuration(datamodel)?;
     }
 
+    let datamodel = datamodel.map(|datamodel| NonEmpty::new(("schema.prisma".to_owned(), SourceFile::from(datamodel))));
     let state = state::EngineState::new(datamodel, host);
     Ok(Box::new(state))
+}
+
+/// Only used by `schema-engine-cli`.
+pub fn empty_schema_api() -> Box<dyn api::GenericApi> {
+    let state = state::EngineState::new(None, None);
+    Box::new(state)
 }
 
 fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFlags<PreviewFeature>, Option<String>)> {

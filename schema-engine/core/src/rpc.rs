@@ -1,11 +1,19 @@
 use crate::{json_rpc::method_names::*, CoreError, CoreResult, GenericApi};
 use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
+use nonempty::NonEmpty;
+use psl::SourceFile;
 use std::sync::Arc;
 
 /// Initialize a JSON-RPC ready schema engine API.
-pub fn rpc_api(prisma_schema: Option<String>, host: Arc<dyn schema_connector::ConnectorHost>) -> IoHandler {
+pub fn rpc_api(
+    initial_datamodels: Option<NonEmpty<(String, String)>>,
+    host: Arc<dyn schema_connector::ConnectorHost>,
+) -> IoHandler {
     let mut io_handler = IoHandler::default();
-    let api = Arc::new(crate::state::EngineState::new(prisma_schema, Some(host)));
+    let initial_datamodels =
+        initial_datamodels.map(|schemas| schemas.map(|(name, schema)| (name, SourceFile::from(schema))));
+
+    let api = Arc::new(crate::state::EngineState::new(initial_datamodels, Some(host)));
 
     for cmd in METHOD_NAMES {
         let api = api.clone();

@@ -24,7 +24,7 @@ impl Cli {
     }
 
     pub(crate) async fn run_inner(self) -> Result<String, ConnectorError> {
-        let api = schema_core::schema_api(None, None)?;
+        let api = schema_core::empty_schema_api();
         match self.command {
             CliCommand::CreateDatabase => {
                 let schema_core::json_rpc::types::CreateDatabaseResult { database_name } = api

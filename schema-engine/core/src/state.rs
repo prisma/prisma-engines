@@ -5,6 +5,7 @@
 
 use crate::{api::GenericApi, commands, json_rpc::types::*, CoreError, CoreResult};
 use enumflags2::BitFlags;
+use nonempty::NonEmpty;
 use psl::{parser_database::SourceFile, PreviewFeature};
 use schema_connector::{ConnectorError, ConnectorHost, Namespaces, SchemaConnector};
 use std::{collections::HashMap, future::Future, path::Path, pin::Pin, sync::Arc};
@@ -41,9 +42,12 @@ type ErasedConnectorRequest = Box<
 >;
 
 impl EngineState {
-    pub(crate) fn new(initial_datamodel: Option<String>, host: Option<Arc<dyn ConnectorHost>>) -> Self {
+    pub(crate) fn new(
+        initial_datamodels: Option<NonEmpty<(String, SourceFile)>>,
+        host: Option<Arc<dyn ConnectorHost>>,
+    ) -> Self {
         EngineState {
-            initial_datamodel: initial_datamodel.map(|s| psl::validate(s.into())),
+            initial_datamodel: initial_datamodels.map(|s| psl::validate_multi_file(s.into())),
             host: host.unwrap_or_else(|| Arc::new(schema_connector::EmptyHost)),
             connectors: Default::default(),
         }

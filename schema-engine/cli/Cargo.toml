@@ -12,6 +12,7 @@ backtrace = "0.3.59"
 base64 = "0.13"
 jsonrpc-core = "17"
 structopt = "0.3.8"
+nonempty.workspace = true
 serde_json.workspace = true
 serde.workspace = true
 tokio.workspace = true
