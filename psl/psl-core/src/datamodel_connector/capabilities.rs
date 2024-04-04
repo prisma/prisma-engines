@@ -74,6 +74,7 @@ capabilities!(
     InsensitiveFilters,
     CreateMany,
     CreateManyWriteableAutoIncId,
+    SupportsDefaultInInsert, // This capability is set if connector supports using `DEFAULT` instead of a value in the list of `INSERT` arguments.
     WritableAutoincField,
     CreateSkipDuplicates,
     UpdateableId,

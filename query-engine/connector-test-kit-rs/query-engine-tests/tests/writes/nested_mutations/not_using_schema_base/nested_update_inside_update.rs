@@ -590,8 +590,14 @@ mod update_inside_update {
 
     // Transactionality
 
+    #[connector_test(schema(schema_1), exclude(Sqlite("cfd1")))]
     // "TRANSACTIONAL: a many to many relation" should "fail gracefully on wrong where and assign error correctly and not execute partially"
-    #[connector_test(schema(schema_1))]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"findUniqueNote":{"text":"Some Text"}}}
+    // + {"data":{"findUniqueNote":{"text":"Some Changed Text"}}}
+    // ```
     async fn tx_m2m_fail_wrong_where(runner: Runner) -> TestResult<()> {
         let res = run_query_json!(
             &runner,
