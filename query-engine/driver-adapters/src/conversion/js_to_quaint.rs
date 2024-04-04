@@ -2,7 +2,7 @@ use std::borrow::Cow;
 use std::str::FromStr;
 
 pub use crate::types::{ColumnType, JSResultSet};
-use quaint::bigdecimal::{BigDecimal, FromPrimitive};
+use quaint::bigdecimal::BigDecimal;
 use quaint::chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 use quaint::{
     connector::ResultSet as QuaintResultSet,
@@ -137,12 +137,8 @@ pub fn js_value_to_quaint(
             serde_json::Value::String(s) => BigDecimal::from_str(&s).map(QuaintValue::numeric).map_err(|e| {
                 conversion_error!("invalid numeric value when parsing {s} in column '{column_name}': {e}")
             }),
-            serde_json::Value::Number(n) => n
-                .as_f64()
-                .and_then(BigDecimal::from_f64)
-                .ok_or(conversion_error!(
-                    "number must be an f64 in column '{column_name}', got {n}"
-                ))
+            serde_json::Value::Number(n) => BigDecimal::from_str(&n.to_string())
+                .map_err(|_| conversion_error!("number must be an f64 in column '{column_name}', got {n}"))
                 .map(QuaintValue::numeric),
             serde_json::Value::Null => Ok(QuaintValue::null_numeric()),
             mismatch => Err(conversion_error!(

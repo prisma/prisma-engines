@@ -769,7 +769,6 @@ mod order_by_aggr {
         schema.to_owned()
     }
 
-    // Regression test for: // https://github.com/prisma/prisma/issues/8036
     #[connector_test(schema(schema_regression_8036))]
     async fn count_m2m_records_not_connected(runner: Runner) -> TestResult<()> {
         run_query!(

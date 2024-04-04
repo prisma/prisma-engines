@@ -66,7 +66,7 @@ pub(crate) fn create_record(
 /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
 pub(crate) fn create_many_records(
     graph: &mut QueryGraph,
-    _query_schema: &QuerySchema,
+    query_schema: &QuerySchema,
     model: Model,
     mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
@@ -99,6 +99,7 @@ pub(crate) fn create_many_records(
         args,
         skip_duplicates,
         selected_fields: None,
+        split_by_shape: !query_schema.has_capability(ConnectorCapability::SupportsDefaultInInsert),
     };
 
     graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));
