@@ -15,4 +15,4 @@ cp ../../target/x86_64-linux-android/release/libquery_engine.a $TARGET_DIR/andro
 
 cp ./include/query_engine.h $TARGET_DIR/cpp/query_engine.h
 
-pingme "✅ Android compilation ready"
+# pingme "✅ Android compilation ready"

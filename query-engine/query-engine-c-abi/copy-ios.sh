@@ -9,4 +9,4 @@ cp ./include/query_engine.h $TARGET_DIR/cpp/query_engine.h
 
 cp -R QueryEngine.xcframework $TARGET_DIR
 
-pingme "✅ Prisma iOS Finished"
+# pingme "✅ Prisma iOS Finished"
