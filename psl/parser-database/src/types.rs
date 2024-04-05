@@ -648,10 +648,41 @@ fn visit_model<'db>(model_id: ast::ModelId, ast_model: &'db ast::Model, ctx: &mu
                     native_type: None,
                 });
             }
-            Err(supported) => ctx.push_error(DatamodelError::new_type_not_found_error(
-                supported,
-                ast_field.field_type.span(),
-            )),
+            Err(supported) => {
+                let top_names: Vec<_> = ctx
+                    .ast
+                    .iter_tops()
+                    .filter_map(|(_, top)| match top {
+                        ast::Top::Source(_) | ast::Top::Generator(_) => None,
+                        _ => Some(&top.identifier().name),
+                    })
+                    .collect();
+
+                match top_names.iter().find(|&name| name.to_lowercase() == supported) {
+                    Some(ignore_case_match) => {
+                        ctx.push_error(DatamodelError::new_type_for_case_not_found_error(
+                            supported,
+                            ignore_case_match.as_str(),
+                            ast_field.field_type.span(),
+                        ));
+                    }
+                    None => match ScalarType::try_from_str(supported, true) {
+                        Some(ignore_case_match) => {
+                            ctx.push_error(DatamodelError::new_type_for_case_not_found_error(
+                                supported,
+                                ignore_case_match.as_str(),
+                                ast_field.field_type.span(),
+                            ));
+                        }
+                        None => {
+                            ctx.push_error(DatamodelError::new_type_not_found_error(
+                                supported,
+                                ast_field.field_type.span(),
+                            ));
+                        }
+                    },
+                }
+            }
         }
     }
 }
@@ -699,7 +730,7 @@ fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<Fie
     };
     let supported_string_id = ctx.interner.intern(supported);
 
-    if let Some(tpe) = ScalarType::try_from_str(supported) {
+    if let Some(tpe) = ScalarType::try_from_str(supported, false) {
         return Ok(FieldType::Scalar(ScalarFieldType::BuiltInScalar(tpe)));
     }
 
@@ -1423,18 +1454,32 @@ impl ScalarType {
         matches!(self, ScalarType::Bytes)
     }
 
-    pub(crate) fn try_from_str(s: &str) -> Option<ScalarType> {
-        match s {
-            "Int" => Some(ScalarType::Int),
-            "BigInt" => Some(ScalarType::BigInt),
-            "Float" => Some(ScalarType::Float),
-            "Boolean" => Some(ScalarType::Boolean),
-            "String" => Some(ScalarType::String),
-            "DateTime" => Some(ScalarType::DateTime),
-            "Json" => Some(ScalarType::Json),
-            "Bytes" => Some(ScalarType::Bytes),
-            "Decimal" => Some(ScalarType::Decimal),
-            _ => None,
+    pub(crate) fn try_from_str(s: &str, ignore_case: bool) -> Option<ScalarType> {
+        match ignore_case {
+            true => match s.to_lowercase().as_str() {
+                "int" => Some(ScalarType::Int),
+                "bigint" => Some(ScalarType::BigInt),
+                "float" => Some(ScalarType::Float),
+                "boolean" => Some(ScalarType::Boolean),
+                "string" => Some(ScalarType::String),
+                "datetime" => Some(ScalarType::DateTime),
+                "json" => Some(ScalarType::Json),
+                "bytes" => Some(ScalarType::Bytes),
+                "decimal" => Some(ScalarType::Decimal),
+                _ => None,
+            },
+            _ => match s {
+                "Int" => Some(ScalarType::Int),
+                "BigInt" => Some(ScalarType::BigInt),
+                "Float" => Some(ScalarType::Float),
+                "Boolean" => Some(ScalarType::Boolean),
+                "String" => Some(ScalarType::String),
+                "DateTime" => Some(ScalarType::DateTime),
+                "Json" => Some(ScalarType::Json),
+                "Bytes" => Some(ScalarType::Bytes),
+                "Decimal" => Some(ScalarType::Decimal),
+                _ => None,
+            },
         }
     }
 }
