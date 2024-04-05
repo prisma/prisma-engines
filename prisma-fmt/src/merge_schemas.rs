@@ -8,7 +8,7 @@ pub struct MergeSchemasParams {
     schema: SchemaFileInput,
 }
 
-pub(crate) fn merge_schemas(params: &str) -> String {
+pub(crate) fn merge_schemas(params: &str) -> Result<String, String> {
     let params: MergeSchemasParams = match serde_json::from_str(params) {
         Ok(params) => params,
         Err(serde_err) => {
@@ -16,16 +16,12 @@ pub(crate) fn merge_schemas(params: &str) -> String {
         }
     };
 
-    let params_as_vec: Vec<_> = params.schema.into();
-    let validated_schema = psl::validate_multi_file(params_as_vec.clone());
-
-    // diagnostics aren't supposed to have errors, as they should be validated before-hand.
-    if validated_schema.diagnostics.has_errors() {
-        panic!("Invalid schemas.");
-    }
+    let validated_schema = crate::validate::run(params.schema, false)?;
 
     let indent_width = 2usize;
-    reformat_validated_schema_into_single(validated_schema, indent_width).unwrap()
+    let merged_schema = reformat_validated_schema_into_single(validated_schema, indent_width).unwrap();
+
+    Ok(merged_schema)
 }
 
 #[cfg(test)]
@@ -85,12 +81,11 @@ mod tests {
             }
         "#]];
 
-        let response = merge_schemas(&request.to_string());
+        let response = merge_schemas(&request.to_string()).unwrap();
         expected.assert_eq(&response);
     }
 
     #[test]
-    #[should_panic]
     fn merge_two_invalid_schemas_panics() {
         let schema = vec![
             (
@@ -122,6 +117,9 @@ mod tests {
             "schema": schema,
         });
 
-        merge_schemas(&request.to_string());
+        let expected = expect![];
+
+        let response = merge_schemas(&request.to_string()).unwrap_err();
+        expected.assert_eq(&response);
     }
 }

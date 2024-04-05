@@ -44,13 +44,6 @@ pub fn code_actions(schema: String, params: &str) -> String {
     serde_json::to_string(&actions).unwrap()
 }
 
-/// Given a list of Prisma schema files (and their locations), returns the merged schema.
-/// This is useful for `@prisma/client` generation, where the client needs a single - potentially large - schema,
-/// while still allowing the user to split their schema copies into multiple files.
-pub fn merge_schemas(params: String) -> String {
-    merge_schemas::merge_schemas(&params)
-}
-
 /// The two parameters are:
 /// - The Prisma schema to reformat, as a string.
 /// - An LSP
@@ -96,6 +89,14 @@ pub fn lint(schema: String) -> String {
 /// This function isn't supposed to panic.
 pub fn validate(validate_params: String) -> Result<(), String> {
     validate::validate(&validate_params)
+}
+
+/// Given a list of Prisma schema files (and their locations), returns the merged schema.
+/// This is useful for `@prisma/client` generation, where the client needs a single - potentially large - schema,
+/// while still allowing the user to split their schema copies into multiple files.
+/// Internally, it uses `[validate]`.
+pub fn merge_schemas(params: String) -> Result<String, String> {
+    merge_schemas::merge_schemas(&params)
 }
 
 pub fn native_types(schema: String) -> String {
