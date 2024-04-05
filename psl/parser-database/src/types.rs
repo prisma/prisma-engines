@@ -652,7 +652,6 @@ fn visit_model<'db>(model_id: crate::ModelId, ast_model: &'db ast::Model, ctx: &
             }
             Err(supported) => {
                 let top_names: Vec<_> = ctx
-                    .ast
                     .iter_tops()
                     .filter_map(|(_, top)| match top {
                         ast::Top::Source(_) | ast::Top::Generator(_) => None,
