@@ -12,7 +12,7 @@ pub(crate) fn merge_schemas(params: &str) -> String {
     let params: MergeSchemasParams = match serde_json::from_str(params) {
         Ok(params) => params,
         Err(serde_err) => {
-            panic!("Failed to deserialize GetDmmfParams: {serde_err}");
+            panic!("Failed to deserialize MergeSchemasParams: {serde_err}");
         }
     };
 
