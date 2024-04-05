@@ -68,6 +68,10 @@ jobs:
         if: steps.cache-cocoapods.outputs.cache-hit != 'true'
         run: pod install
 
+      - name: Open Metro Bundler in Background
+        run: |
+          ../react-native-prisma/example/node_modules/react-native/scripts/launchPackager.command &
+
       - name: start simulator in release mode
         working-directory: ../react-native-prisma/example
         run: yarn ios:release
