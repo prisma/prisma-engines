@@ -42,7 +42,7 @@ jobs:
 
       - name: change example app to use local prisma client
         working-directory: ../react-native-prisma/example
-        run: yarn add @prisma/client@../../packages/client
+        run: yarn add @prisma/client@5.9.0-integration-react-native.5
 
       - name: Install dependencies
         working-directory: ../react-native-prisma
