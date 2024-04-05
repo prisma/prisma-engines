@@ -61,7 +61,7 @@ napi = { version = "2.15.1", default-features = false, features = [
   "tokio_rt",
   "serde-json",
 ] }
-napi-derive = "2.16.1"
+napi-derive = "2.15.0"
 js-sys = { version = "0.3" }
 rand = { version = "0.8" }
 serde_repr = { version = "0.1.18" }
