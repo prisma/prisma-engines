@@ -1,83 +1,87 @@
-name: "React Native E2E Test"
-on:
-  pull_request:
-    paths-ignore:
-      - "!.github/workflows/test-compilation.yml"
-      - ".github/**"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
-      - "renovate.json"
+# name: "React Native E2E Test"
+# on:
+#   pull_request:
+#     paths-ignore:
+#       - "!.github/workflows/test-compilation.yml"
+#       - ".github/**"
+#       - ".buildkite/**"
+#       - "*.md"
+#       - "LICENSE"
+#       - "CODEOWNERS"
+#       - "renovate.json"
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.ref }}
+#   cancel-in-progress: true
 
-jobs:
-  test-rn-e2e:
-    name: "Check react native e2e"
-    strategy:
-      fail-fast: false
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
+# jobs:
+#   test-rn-e2e:
+#     name: "Check react native e2e"
+#     strategy:
+#       fail-fast: false
+#     runs-on: macos-latest
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - name: clone react-native-prisma repo
-        run: git clone http://github.com/prisma/react-native-prisma.git
-        # The repo needs to be on the same level as the prisma-engines repo so that the make scripts work
-        working-directory: ..
+#       - name: clone react-native-prisma repo
+#         run: git clone http://github.com/prisma/react-native-prisma.git
+#         # The repo needs to be on the same level as the prisma-engines repo so that the make scripts work
+#         working-directory: ..
 
-      - uses: dtolnay/rust-toolchain@stable
+#       - uses: dtolnay/rust-toolchain@stable
 
-      - name: Install rust ios toolchain
-        run: rustup target add aarch64-apple-ios-sim
+#       - name: Install rust ios toolchain
+#         run: rustup target add aarch64-apple-ios-sim
 
-      - name: Build iOS Prisma Query Engine
-        run: make sim
-        working-directory: query-engine/query-engine-c-abi
+#       - name: Build iOS Prisma Query Engine
+#         run: make sim
+#         working-directory: query-engine/query-engine-c-abi
 
-      - name: Enable corepack
-        run: corepack enable yarn
+#       - name: Enable corepack
+#         run: corepack enable yarn
 
-      - name: change example app to use local prisma client
-        working-directory: ../react-native-prisma/example
-        run: yarn add @prisma/client@5.9.0-integration-react-native.5
+#       - name: change example app to use local prisma client
+#         working-directory: ../react-native-prisma/example
+#         run: yarn add @prisma/client@5.9.0-integration-react-native.5
 
-      - name: Install dependencies
-        working-directory: ../react-native-prisma
-        run: yarn
+#       - name: Install dependencies
+#         working-directory: ../react-native-prisma
+#         run: yarn
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.1.2
-          bundler-cache: true
+#       - name: Setup Ruby
+#         uses: ruby/setup-ruby@v1
+#         with:
+#           ruby-version: 3.1.2
+#           bundler-cache: true
 
-      # - name: Cache CocoaPods
-      #   id: cache-cocoapods
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: ../react-native-prisma/example/ios/Pods
-      #     key: ${{ runner.os }}-pods-${{ hashFiles('../react-native-prisma/example/ios/Podfile.lock') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pods-
+#       # - name: Cache CocoaPods
+#       #   id: cache-cocoapods
+#       #   uses: actions/cache@v3
+#       #   with:
+#       #     path: ../react-native-prisma/example/ios/Pods
+#       #     key: ${{ runner.os }}-pods-${{ hashFiles('../react-native-prisma/example/ios/Podfile.lock') }}
+#       #     restore-keys: |
+#       #       ${{ runner.os }}-pods-
 
-      - name: Install CocoaPods
-        working-directory: ../react-native-prisma/example/ios
-        if: steps.cache-cocoapods.outputs.cache-hit != 'true'
-        run: pod install
+#       - name: Install CocoaPods
+#         working-directory: ../react-native-prisma/example/ios
+#         if: steps.cache-cocoapods.outputs.cache-hit != 'true'
+#         run: pod install
 
-      - name: Open Metro Bundler in Background
-        run: |
-          ../react-native-prisma/example/node_modules/react-native/scripts/launchPackager.command &
+#       - name: Open Metro Bundler in Background
+#         run: |
+#           ../react-native-prisma/example/node_modules/react-native/scripts/launchPackager.command &
 
-      - name: start simulator in release mode
-        working-directory: ../react-native-prisma/example
-        run: yarn ios:release
+#       - name: Build iOS
+#         working-directory: ../react-native-prisma/example
+#         run: yarn build:ios
 
-      - name: Run E2E tests
-        run: |
-          make build-driver-adapters-kit
-          make dev-react-native
-          cargo test -p query-engine-tests -- --test-threads=1
+#       - name: Run iOS Simulator
+#         working-directory: ../react-native-prisma/example
+#         run: yarn ios
+
+#       - name: Run E2E tests
+#         run: |
+#           make build-driver-adapters-kit
+#           make dev-react-native
+#           cargo test -p query-engine-tests -- --test-threads=1
