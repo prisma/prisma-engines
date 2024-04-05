@@ -30,6 +30,9 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
+      - name: Install rust ios toolchain
+        run: rustup target add aarch64-apple-ios-sim
+
       - name: Build iOS Prisma Query Engine
         run: make sim
         working-directory: query-engine/query-engine-c-abi
