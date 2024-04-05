@@ -61,6 +61,6 @@ jobs:
             ${{ runner.os }}-pods-
 
       - name: Install CocoaPods
-        working-directory: ../react-native-prisma/example
+        working-directory: ../react-native-prisma/example/ios
         if: steps.cache-cocoapods.outputs.cache-hit != 'true'
-        run: cd ios ; pod install ; cd -
+        run: pod install
