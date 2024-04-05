@@ -3,8 +3,10 @@ mod code_actions;
 mod get_config;
 mod get_dmmf;
 mod lint;
+mod merge_schemas;
 mod native;
 mod preview;
+mod schema_file_input;
 mod text_document_completion;
 mod validate;
 
@@ -40,6 +42,13 @@ pub fn code_actions(schema: String, params: &str) -> String {
 
     let actions = code_actions::available_actions(schema, params);
     serde_json::to_string(&actions).unwrap()
+}
+
+/// Given a list of Prisma schema files (and their locations), returns the merged schema.
+/// This is useful for `@prisma/client` generation, where the client needs a single - potentially large - schema,
+/// while still allowing the user to split their schema copies into multiple files.
+pub fn merge_schemas(params: String) -> String {
+    merge_schemas::merge_schemas(&params)
 }
 
 /// The two parameters are:

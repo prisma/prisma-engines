@@ -20,7 +20,7 @@ pub use crate::{
     configuration::{
         Configuration, Datasource, DatasourceConnectorData, Generator, GeneratorConfigValue, StringFromEnvVar,
     },
-    reformat::reformat,
+    reformat::{reformat, reformat_multiple, reformat_validated_schema_into_single},
 };
 pub use diagnostics;
 pub use parser_database::{self, is_reserved_type_name};
@@ -53,10 +53,14 @@ impl ValidatedSchema {
         self.relation_mode
     }
 
-    pub fn render_diagnostics(&self) -> String {
+    pub fn render_own_diagnostics(&self) -> String {
+        self.render_diagnostics(&self.diagnostics)
+    }
+
+    pub fn render_diagnostics(&self, diagnostics: &Diagnostics) -> String {
         let mut out = Vec::new();
 
-        for error in self.diagnostics.errors() {
+        for error in diagnostics.errors() {
             let (file_name, source, _) = &self.db[error.span().file_id];
             error.pretty_print(&mut out, file_name, source.as_str()).unwrap();
         }
