@@ -43,7 +43,7 @@ fn reformat(s: &str) -> String {
 mod reformat_multi_file {
     use std::{collections::HashMap, fs, io::Write, path};
 
-    use psl::reformat_multiple;
+    use psl::{reformat_multiple, SourceFile};
 
     use crate::panic_with_diff;
 
@@ -57,12 +57,14 @@ mod reformat_multi_file {
         fs::create_dir_all(&snapshot_dir_path).unwrap();
         let schemas: Vec<_> = read_schemas_from_dir(dir_path).collect();
 
-        let result = reformat_multiple(&schemas, 2);
+        let result = reformat_multiple(schemas, 2);
 
         let should_update = std::env::var("UPDATE_EXPECT").is_ok();
         let mut snapshot_schemas: HashMap<_, _> = read_schemas_from_dir(&snapshot_dir_path).collect();
         for (path, content) in result {
+            let content = content.as_str();
             let snapshot_content = snapshot_schemas.remove(&path).unwrap_or_default();
+            let snapshot_content = snapshot_content.as_str();
             if content == snapshot_content {
                 continue;
             }
@@ -72,7 +74,7 @@ mod reformat_multi_file {
                 let mut file = fs::File::create(&snapshot_file_path).unwrap();
                 file.write_all(content.as_bytes()).unwrap()
             } else {
-                panic_with_diff::panic_with_diff(&snapshot_content, &content, Some(&path));
+                panic_with_diff::panic_with_diff(snapshot_content, content, Some(&path));
             }
         }
 
@@ -86,7 +88,7 @@ mod reformat_multi_file {
         }
     }
 
-    fn read_schemas_from_dir(root_dir_path: impl AsRef<path::Path>) -> impl Iterator<Item = (String, String)> {
+    fn read_schemas_from_dir(root_dir_path: impl AsRef<path::Path>) -> impl Iterator<Item = (String, SourceFile)> {
         let root_dir_path = root_dir_path.as_ref().to_owned();
         fs::read_dir(&root_dir_path)
             .unwrap()
@@ -99,7 +101,7 @@ mod reformat_multi_file {
                 } else {
                     let full_path = root_dir_path.clone().join(file_name);
                     let content = fs::read_to_string(full_path).unwrap();
-                    Some((file_name.to_owned(), content))
+                    Some((file_name.to_owned(), content.into()))
                 }
             })
     }

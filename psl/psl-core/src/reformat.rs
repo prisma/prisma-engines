@@ -1,27 +1,30 @@
-use crate::ParserDatabase;
+use crate::{ParserDatabase, ValidatedSchema};
 use diagnostics::FileId;
 use parser_database::{ast::WithSpan, walkers};
 use schema_ast::{ast, SourceFile};
-use std::{borrow::Cow, collections::HashMap, sync::Arc};
+use std::{borrow::Cow, collections::HashMap};
 
 /// Returns either the reformatted schema, or the original input if we can't reformat. This happens
 /// if and only if the source does not parse to a well formed AST.
 pub fn reformat(source: &str, indent_width: usize) -> Option<String> {
-    let reformatted = reformat_multiple(&[("schema.prisma".to_owned(), source.to_owned())], indent_width);
+    let reformatted = reformat_multiple(vec![("schema.prisma".to_owned(), source.into())], indent_width);
 
     reformatted.first().map(|(_, source)| source).cloned()
 }
 
-pub fn reformat_multiple(sources: &[(String, String)], indent_width: usize) -> Vec<(String, String)> {
-    let sources = sources
-        .iter()
-        .map(|(path, content)| {
-            (
-                path.to_owned(),
-                SourceFile::new_allocated(Arc::from(content.to_owned().into_boxed_str())),
-            )
-        })
-        .collect();
+pub fn reformat_validated_schema_into_single(schema: ValidatedSchema, indent_width: usize) -> Option<String> {
+    let db = schema.db;
+
+    let source = db
+        .iter_sources()
+        .map(|source| source.to_owned())
+        .collect::<Vec<String>>()
+        .join("\n");
+
+    schema_ast::reformat(&source, indent_width)
+}
+
+pub fn reformat_multiple(sources: Vec<(String, SourceFile)>, indent_width: usize) -> Vec<(String, String)> {
     let mut diagnostics = diagnostics::Diagnostics::new();
     let db = parser_database::ParserDatabase::new(sources, &mut diagnostics);
 

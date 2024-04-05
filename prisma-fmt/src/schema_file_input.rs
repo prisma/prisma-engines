@@ -19,7 +19,7 @@ impl From<SchemaFileInput> for Vec<(String, SourceFile)> {
             SchemaFileInput::Single(content) => vec![("schema.prisma".to_owned(), content.into())],
             SchemaFileInput::Multiple(file_list) => file_list
                 .into_iter()
-                .map(|(name, content)| (name, content.into()))
+                .map(|(filename, content)| (filename, content.into()))
                 .collect(),
         }
     }
