@@ -61,14 +61,14 @@ napi = { version = "2.15.1", default-features = false, features = [
   "tokio_rt",
   "serde-json",
 ] }
-napi-derive = "2.15.0"
+napi-derive = "2.16.1"
 js-sys = { version = "0.3" }
 rand = { version = "0.8" }
-serde_repr = { version = "0.1.17" }
-serde-wasm-bindgen = { version = "0.5" }
+serde_repr = { version = "0.1.18" }
+serde-wasm-bindgen = { version = "0.6" }
 tracing = { version = "0.1" }
 tsify = { version = "0.4.5" }
-wasm-bindgen = { version = "0.2.89" }
+wasm-bindgen = { version = "0.2.92" }
 wasm-bindgen-futures = { version = "0.4" }
 wasm-rs-dbg = { version = "0.1.2" }
 wasm-bindgen-test = { version = "0.3.0" }
