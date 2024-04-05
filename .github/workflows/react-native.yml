@@ -54,16 +54,26 @@ jobs:
           ruby-version: 3.1.2
           bundler-cache: true
 
-      - name: Cache CocoaPods
-        id: cache-cocoapods
-        uses: actions/cache@v3
-        with:
-          path: ../react-native-prisma/example/ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('../react-native-prisma/example/ios/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
+      # - name: Cache CocoaPods
+      #   id: cache-cocoapods
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ../react-native-prisma/example/ios/Pods
+      #     key: ${{ runner.os }}-pods-${{ hashFiles('../react-native-prisma/example/ios/Podfile.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-pods-
 
       - name: Install CocoaPods
         working-directory: ../react-native-prisma/example/ios
         if: steps.cache-cocoapods.outputs.cache-hit != 'true'
         run: pod install
+
+      - name: start simulator in release mode
+        working-directory: ../react-native-prisma/example
+        run: yarn ios:release
+
+      - name: Run E2E tests
+        run: |
+          make build-driver-adapters-kit
+          make dev-react-native
+          cargo test -p query-engine-tests -- --test-threads=1
