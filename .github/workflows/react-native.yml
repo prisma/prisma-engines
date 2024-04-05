@@ -1,4 +1,4 @@
-name: "All crates: compilation"
+name: "React Native E2E Test"
 on:
   pull_request:
     paths-ignore:
