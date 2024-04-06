@@ -3,6 +3,7 @@ mod multi_schema;
 mod relation_mode;
 mod relations;
 
+use crate::offsets::{offset_to_position, position_after_span, range_to_span};
 use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic, Range, TextEdit, WorkspaceEdit};
 use psl::{
     diagnostics::Span,
@@ -15,7 +16,6 @@ use psl::{
     PreviewFeature,
 };
 use std::{collections::HashMap, sync::Arc};
-use crate::offsets::{position_after_span, offset_to_position, range_to_span};
 
 pub(crate) fn empty_code_actions() -> Vec<CodeActionOrCommand> {
     Vec::new()

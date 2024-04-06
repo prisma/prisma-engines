@@ -4,10 +4,10 @@ mod get_config;
 mod get_dmmf;
 mod lint;
 mod native;
+mod offsets;
 mod preview;
 mod text_document_completion;
 mod validate;
-mod offsets;
 
 use log::*;
 pub use offsets::offset_to_position;

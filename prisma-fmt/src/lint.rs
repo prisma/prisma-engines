@@ -1,5 +1,5 @@
-use psl::diagnostics::{DatamodelError, DatamodelWarning};
 use crate::offsets::offset_to_lsp_offset;
+use psl::diagnostics::{DatamodelError, DatamodelWarning};
 
 #[derive(serde::Serialize)]
 pub struct MiniError {
@@ -75,7 +75,7 @@ mod tests {
 
         expected.assert_eq(&lint(dml));
     }
-    
+
     #[test]
     fn deprecated_preview_features_should_give_a_warning() {
         let dml = indoc! {r#"

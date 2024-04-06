@@ -2,8 +2,8 @@ mod actions;
 mod format;
 mod lint;
 mod native;
-mod preview;
 mod offsets;
+mod preview;
 
 use std::{
     io::{self, Read},
