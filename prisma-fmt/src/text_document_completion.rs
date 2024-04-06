@@ -9,8 +9,7 @@ use psl::{
     Configuration, Datasource, Diagnostics, Generator, PreviewFeature,
 };
 use std::sync::Arc;
-
-use crate::position_to_offset;
+use crate::offsets::position_to_offset;
 
 mod datasource;
 
@@ -25,7 +24,7 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
     let source_file = SourceFile::new_allocated(Arc::from(schema.into_boxed_str()));
 
     let position =
-        if let Some(pos) = super::position_to_offset(&params.text_document_position.position, source_file.as_str()) {
+        if let Some(pos) = position_to_offset(&params.text_document_position.position, source_file.as_str()) {
             pos
         } else {
             warn!("Received a position outside of the document boundaries in CompletionParams");

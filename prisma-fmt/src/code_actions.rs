@@ -15,6 +15,7 @@ use psl::{
     PreviewFeature,
 };
 use std::{collections::HashMap, sync::Arc};
+use crate::offsets::{position_after_span, offset_to_position, range_to_span};
 
 pub(crate) fn empty_code_actions() -> Vec<CodeActionOrCommand> {
     Vec::new()
@@ -135,7 +136,7 @@ pub(super) fn diagnostics_for_span(
 ) -> Option<Vec<Diagnostic>> {
     let res: Vec<_> = diagnostics
         .iter()
-        .filter(|diag| span.overlaps(crate::range_to_span(diag.range, schema)))
+        .filter(|diag| span.overlaps(range_to_span(diag.range, schema)))
         .cloned()
         .collect();
 
@@ -169,7 +170,7 @@ fn create_missing_attribute<'a>(
         let new_text = format!(" @{attribute_name}");
 
         let field = fields.next().unwrap();
-        let position = crate::position_after_span(field.ast_field().span(), schema);
+        let position = position_after_span(field.ast_field().span(), schema);
 
         let range = Range {
             start: position,
@@ -197,15 +198,15 @@ fn create_missing_attribute<'a>(
 }
 
 fn range_after_span(schema: &str, span: Span) -> Range {
-    let start = crate::offset_to_position(span.end - 1, schema);
-    let end = crate::offset_to_position(span.end, schema);
+    let start = offset_to_position(span.end - 1, schema);
+    let end = offset_to_position(span.end, schema);
 
     Range { start, end }
 }
 
 fn span_to_range(schema: &str, span: Span) -> Range {
-    let start = crate::offset_to_position(span.start, schema);
-    let end = crate::offset_to_position(span.end, schema);
+    let start = offset_to_position(span.start, schema);
+    let end = offset_to_position(span.end, schema);
 
     Range { start, end }
 }

@@ -3,6 +3,7 @@ mod format;
 mod lint;
 mod native;
 mod preview;
+mod offsets;
 
 use std::{
     io::{self, Read},

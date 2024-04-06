@@ -1,6 +1,5 @@
 use psl::diagnostics::{DatamodelError, DatamodelWarning};
-
-use crate::offset_to_lsp_offset;
+use crate::offsets::offset_to_lsp_offset;
 
 #[derive(serde::Serialize)]
 pub struct MiniError {
