@@ -1,5 +1,7 @@
 use psl::diagnostics::{DatamodelError, DatamodelWarning};
 
+use crate::offset_to_lsp_offset;
+
 #[derive(serde::Serialize)]
 pub struct MiniError {
     start: usize,
@@ -9,15 +11,15 @@ pub struct MiniError {
 }
 
 pub(crate) fn run(schema: &str) -> String {
-    let schema = psl::validate(schema.into());
-    let diagnostics = &schema.diagnostics;
+    let validated_schema = psl::validate(schema.into());
+    let diagnostics = &validated_schema.diagnostics;
 
     let mut mini_errors: Vec<MiniError> = diagnostics
         .errors()
         .iter()
         .map(|err: &DatamodelError| MiniError {
-            start: err.span().start,
-            end: err.span().end,
+            start: offset_to_lsp_offset(err.span().start, schema),
+            end: offset_to_lsp_offset(err.span().end, schema),
             text: err.message().to_string(),
             is_warning: false,
         })
@@ -27,8 +29,8 @@ pub(crate) fn run(schema: &str) -> String {
         .warnings()
         .iter()
         .map(|warn: &DatamodelWarning| MiniError {
-            start: warn.span().start,
-            end: warn.span().end,
+            start: offset_to_lsp_offset(warn.span().start, schema),
+            end: offset_to_lsp_offset(warn.span().end, schema),
             text: warn.message().to_owned(),
             is_warning: true,
         })
@@ -55,6 +57,26 @@ mod tests {
         serde_json::to_string_pretty(&value).unwrap()
     }
 
+    #[test]
+    fn should_return_utf16_offset() {
+        let dml = indoc! {r#"
+            // 🌐 ｍｕｌｔｉｂｙｔｅ
+            😀
+        "#};
+
+        let expected = expect![[r#"
+            [
+              {
+                "start": 16,
+                "end": 19,
+                "text": "Error validating: This line is invalid. It does not start with any known Prisma schema keyword.",
+                "is_warning": false
+              }
+            ]"#]];
+
+        expected.assert_eq(&lint(dml));
+    }
+    
     #[test]
     fn deprecated_preview_features_should_give_a_warning() {
         let dml = indoc! {r#"

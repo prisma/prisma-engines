@@ -186,18 +186,18 @@ pub fn get_dmmf(get_dmmf_params: String) -> Result<String, String> {
 pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<usize> {
     let mut offset = 0;
     let mut line_offset = position.line;
-    let mut character_offset = position.character;
+    let mut character_offset = position.character as usize;
     let mut chars = document.chars();
 
     while line_offset > 0 {
         loop {
             match chars.next() {
                 Some('\n') => {
-                    offset += 1;
+                    offset += '\n'.len_utf8();
                     break;
                 }
-                Some(_) => {
-                    offset += 1;
+                Some(chr) => {
+                    offset += chr.len_utf8();
                 }
                 None => return Some(offset),
             }
@@ -209,9 +209,9 @@ pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<
     while character_offset > 0 {
         match chars.next() {
             Some('\n') | None => return Some(offset),
-            Some(_) => {
-                offset += 1;
-                character_offset -= 1;
+            Some(chr) => {
+                offset += chr.len_utf8();
+                character_offset -= chr.len_utf16();
             }
         }
     }
@@ -236,11 +236,12 @@ pub(crate) fn position_after_span(span: ast::Span, document: &str) -> Position {
 /// Converts a byte offset to an LSP position, if the given offset
 /// does not overflow the document.
 pub fn offset_to_position(offset: usize, document: &str) -> Position {
+    let mut current_offset = 0;
     let mut position = Position::default();
 
-    for (i, chr) in document.chars().enumerate() {
+    for chr in document.chars() {
         match chr {
-            _ if i == offset => {
+            _ if offset <= current_offset => {
                 return position;
             }
             '\n' => {
@@ -248,12 +249,28 @@ pub fn offset_to_position(offset: usize, document: &str) -> Position {
                 position.line += 1;
             }
             _ => {
-                position.character += 1;
+                position.character += chr.len_utf16() as u32;
             }
         }
+        current_offset += chr.len_utf8();
     }
 
     position
+}
+
+pub fn offset_to_lsp_offset(offset: usize, document: &str) -> usize {
+    let mut current_offset = 0;
+    let mut current_lsp_offset = 0;
+
+    for chr in document.chars() {
+        if offset <= current_offset {
+            break;
+        }
+        current_offset += chr.len_utf8();
+        current_lsp_offset += chr.len_utf16();
+    }
+
+    current_lsp_offset
 }
 
 #[cfg(test)]
@@ -265,9 +282,30 @@ mod tests {
     fn position_to_offset_with_crlf() {
         let schema = "\r\nmodel Test {\r\n    id Int @id\r\n}";
         // Let's put the cursor on the "i" in "id Int".
-        let expected_offset = schema.chars().position(|c| c == 'i').unwrap();
+        let expected_offset = schema.bytes().position(|c| c == b'i').unwrap();
         let found_offset = super::position_to_offset(&Position { line: 2, character: 4 }, schema).unwrap();
 
         assert_eq!(found_offset, expected_offset);
+    }
+
+    // LSP server should return utf-16 offset
+    #[test]
+    fn offset_to_position_with_multibyte() {
+        let schema = "// 🌐 ｍｕｌｔｉｂｙｔｅ\n😀@\n";
+        
+        let cursor_offset = schema.bytes().position(|c| c == b'@').unwrap();
+        let expected_position = Position { line: 1, character: 2 };
+        let found_position = super::offset_to_position(cursor_offset, schema);
+
+        assert_eq!(expected_position, found_position);
+    }
+    #[test]
+    fn position_to_offset_with_multibyte() {
+        let schema = "// 🌐 ｍｕｌｔｉｂｙｔｅ\n😀@\n";
+        
+        let expected_offset = schema.bytes().position(|c| c == b'@').unwrap();
+        let found_offset = super::position_to_offset(&Position { line: 1, character: 2 }, schema).unwrap();
+
+        assert_eq!(expected_offset, found_offset);
     }
 }
