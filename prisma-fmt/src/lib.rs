@@ -230,7 +230,7 @@ pub(crate) fn range_to_span(range: Range, document: &str) -> ast::Span {
 
 /// Gives the LSP position right after the given span.
 pub(crate) fn position_after_span(span: ast::Span, document: &str) -> Position {
-    offset_to_position(span.end - 1, document)
+    offset_to_position(span.end() - 1, document)
 }
 
 /// Converts a byte offset to an LSP position, if the given offset
