@@ -1,8 +1,6 @@
 mod actions;
 mod format;
-mod lint;
 mod native;
-mod offsets;
 mod preview;
 
 use std::{
@@ -10,6 +8,7 @@ use std::{
     path::PathBuf,
 };
 use structopt::StructOpt;
+use prisma_fmt::lint;
 
 #[derive(Debug, StructOpt, Clone)]
 pub struct FormatOpts {

@@ -2,14 +2,14 @@ mod actions;
 mod code_actions;
 mod get_config;
 mod get_dmmf;
-mod lint;
 mod merge_schemas;
 mod native;
-mod offsets;
 mod preview;
 mod schema_file_input;
 mod text_document_completion;
 mod validate;
+pub mod lint;
+pub mod offsets;
 
 use log::*;
 pub use offsets::offset_to_position;
