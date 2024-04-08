@@ -1,10 +1,10 @@
 {
   "is_panic": false,
-  "message": "Expected a minimum of 1 field to be present, got 0",
+  "message": "Field 'unknown_field' not found in enclosing type 'Post'",
   "meta": {
-    "kind": "EmptySelection",
+    "kind": "UnknownExcludedField",
     "outputType": {
-      "name": "User",
+      "name": "Post",
       "fields": [
         {
           "name": "id",
@@ -12,29 +12,26 @@
           "isRelation": false
         },
         {
-          "name": "email",
+          "name": "name",
           "typeName": "String",
           "isRelation": false
         },
         {
-          "name": "dob",
-          "typeName": "DateTime",
+          "name": "userId",
+          "typeName": "Int",
           "isRelation": false
         },
         {
-          "name": "posts",
-          "typeName": "Post[]",
+          "name": "user",
+          "typeName": "User",
           "isRelation": true
-        },
-        {
-          "name": "_count",
-          "typeName": "UserCountOutputType",
-          "isRelation": false
         }
       ]
     },
     "selectionPath": [
-      "findManyUser"
+      "findManyUser",
+      "posts",
+      "unknown_field"
     ]
   },
   "error_code": "P2009"

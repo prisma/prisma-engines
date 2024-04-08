@@ -1,8 +1,8 @@
 {
   "is_panic": false,
-  "message": "Expected a minimum of 1 field to be present, got 0",
+  "message": "Field 'unknown_field' not found in enclosing type 'User'",
   "meta": {
-    "kind": "EmptySelection",
+    "kind": "UnknownExcludedField",
     "outputType": {
       "name": "User",
       "fields": [
@@ -34,7 +34,8 @@
       ]
     },
     "selectionPath": [
-      "findManyUser"
+      "findManyUser",
+      "unknown_field"
     ]
   },
   "error_code": "P2009"
