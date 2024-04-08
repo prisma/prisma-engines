@@ -47,7 +47,7 @@ pub(crate) fn range_to_span(range: Range, document: &str) -> Span {
     let start = position_to_offset(&range.start, document).unwrap();
     let end = position_to_offset(&range.end, document).unwrap();
 
-    Span::new(start, end)
+    Span::new(start, end, psl::parser_database::FileId::ZERO)
 }
 
 /// Gives the LSP position right after the given span.
