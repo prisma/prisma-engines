@@ -98,7 +98,9 @@ impl<'a> JsonProtocolAdapter<'a> {
                     )?);
                 }
                 // <field_name>: false
-                crate::SelectionSetValue::Shorthand(false) => (),
+                crate::SelectionSetValue::Shorthand(false) => {
+                    selection.push_nested_exclusion(selection_name);
+                }
                 // <field_name>: { selection: { ... }, arguments: { ... } }
                 crate::SelectionSetValue::Nested(nested_query) => {
                     if field.field_type().as_object_type().is_some() {
@@ -509,38 +511,45 @@ mod tests {
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                     Selection {
                         name: "name",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                     Selection {
                         name: "email",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                     Selection {
                         name: "role",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                     Selection {
                         name: "roles",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                     Selection {
                         name: "tags",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                 ],
+                nested_exclusions: None,
             },
         )
         "###);
@@ -578,22 +587,27 @@ mod tests {
                                 alias: None,
                                 arguments: [],
                                 nested_selections: [],
+                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "street",
                                 alias: None,
                                 arguments: [],
                                 nested_selections: [],
+                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "zipCode",
                                 alias: None,
                                 arguments: [],
                                 nested_selections: [],
+                                nested_exclusions: None,
                             },
                         ],
+                        nested_exclusions: None,
                     },
                 ],
+                nested_exclusions: None,
             },
         )
         "###);
@@ -629,8 +643,16 @@ mod tests {
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                 ],
+                nested_exclusions: Some(
+                    [
+                        Exclusion {
+                            name: "email",
+                        },
+                    ],
+                ),
             },
         )
         "###);
@@ -668,36 +690,42 @@ mod tests {
                                 alias: None,
                                 arguments: [],
                                 nested_selections: [],
+                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "name",
                                 alias: None,
                                 arguments: [],
                                 nested_selections: [],
+                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "email",
                                 alias: None,
                                 arguments: [],
                                 nested_selections: [],
+                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "role",
                                 alias: None,
                                 arguments: [],
                                 nested_selections: [],
+                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "roles",
                                 alias: None,
                                 arguments: [],
                                 nested_selections: [],
+                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "tags",
                                 alias: None,
                                 arguments: [],
                                 nested_selections: [],
+                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "address",
@@ -709,24 +737,30 @@ mod tests {
                                         alias: None,
                                         arguments: [],
                                         nested_selections: [],
+                                        nested_exclusions: None,
                                     },
                                     Selection {
                                         name: "street",
                                         alias: None,
                                         arguments: [],
                                         nested_selections: [],
+                                        nested_exclusions: None,
                                     },
                                     Selection {
                                         name: "zipCode",
                                         alias: None,
                                         arguments: [],
                                         nested_selections: [],
+                                        nested_exclusions: None,
                                     },
                                 ],
+                                nested_exclusions: None,
                             },
                         ],
+                        nested_exclusions: None,
                     },
                 ],
+                nested_exclusions: None,
             },
         )
         "###);
@@ -777,38 +811,45 @@ mod tests {
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                     Selection {
                         name: "name",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                     Selection {
                         name: "email",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                     Selection {
                         name: "role",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                     Selection {
                         name: "roles",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                     Selection {
                         name: "tags",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                 ],
+                nested_exclusions: None,
             },
         )
         "###);
@@ -849,36 +890,42 @@ mod tests {
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                     Selection {
                         name: "name",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                     Selection {
                         name: "email",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                     Selection {
                         name: "role",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                     Selection {
                         name: "roles",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                     Selection {
                         name: "tags",
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                     Selection {
                         name: "posts",
@@ -903,22 +950,27 @@ mod tests {
                                 alias: None,
                                 arguments: [],
                                 nested_selections: [],
+                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "title",
                                 alias: None,
                                 arguments: [],
                                 nested_selections: [],
+                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "userId",
                                 alias: None,
                                 arguments: [],
                                 nested_selections: [],
+                                nested_exclusions: None,
                             },
                         ],
+                        nested_exclusions: None,
                     },
                 ],
+                nested_exclusions: None,
             },
         )
         "###);
@@ -954,8 +1006,10 @@ mod tests {
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                 ],
+                nested_exclusions: None,
             },
         )
         "###);
@@ -991,8 +1045,16 @@ mod tests {
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                 ],
+                nested_exclusions: Some(
+                    [
+                        Exclusion {
+                            name: "email",
+                        },
+                    ],
+                ),
             },
         )
         "###);
@@ -1058,26 +1120,40 @@ mod tests {
                             alias: None,
                             arguments: [],
                             nested_selections: [],
+                            nested_exclusions: None,
                         },
                         Selection {
                             name: "role",
                             alias: None,
                             arguments: [],
                             nested_selections: [],
+                            nested_exclusions: None,
                         },
                         Selection {
                             name: "roles",
                             alias: None,
                             arguments: [],
                             nested_selections: [],
+                            nested_exclusions: None,
                         },
                         Selection {
                             name: "tags",
                             alias: None,
                             arguments: [],
                             nested_selections: [],
+                            nested_exclusions: None,
                         },
                     ],
+                    nested_exclusions: Some(
+                        [
+                            Exclusion {
+                                name: "email",
+                            },
+                            Exclusion {
+                                name: "id",
+                            },
+                        ],
+                    ),
                 },
             ),
         )
@@ -1152,28 +1228,40 @@ mod tests {
                                     alias: None,
                                     arguments: [],
                                     nested_selections: [],
+                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "street",
                                     alias: None,
                                     arguments: [],
                                     nested_selections: [],
+                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "zipCode",
                                     alias: None,
                                     arguments: [],
                                     nested_selections: [],
+                                    nested_exclusions: None,
                                 },
                             ],
+                            nested_exclusions: None,
                         },
                         Selection {
                             name: "id",
                             alias: None,
                             arguments: [],
                             nested_selections: [],
+                            nested_exclusions: None,
                         },
                     ],
+                    nested_exclusions: Some(
+                        [
+                            Exclusion {
+                                name: "email",
+                            },
+                        ],
+                    ),
                 },
             ),
         )
@@ -1486,6 +1574,7 @@ mod tests {
                         ),
                     ],
                     nested_selections: [],
+                    nested_exclusions: None,
                 },
             ),
         )
@@ -1556,12 +1645,14 @@ mod tests {
                 alias: None,
                 arguments: [],
                 nested_selections: [],
+                nested_exclusions: None,
             },
             Selection {
                 name: "country",
                 alias: None,
                 arguments: [],
                 nested_selections: [],
+                nested_exclusions: None,
             },
             Selection {
                 name: "content",
@@ -1573,6 +1664,7 @@ mod tests {
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                        nested_exclusions: None,
                     },
                     Selection {
                         name: "upvotes",
@@ -1584,16 +1676,20 @@ mod tests {
                                 alias: None,
                                 arguments: [],
                                 nested_selections: [],
+                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "userId",
                                 alias: None,
                                 arguments: [],
                                 nested_selections: [],
+                                nested_exclusions: None,
                             },
                         ],
+                        nested_exclusions: None,
                     },
                 ],
+                nested_exclusions: None,
             },
         ]
         "###);
@@ -1752,20 +1848,24 @@ mod tests {
                                     alias: None,
                                     arguments: [],
                                     nested_selections: [],
+                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "street",
                                     alias: None,
                                     arguments: [],
                                     nested_selections: [],
+                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "zipCode",
                                     alias: None,
                                     arguments: [],
                                     nested_selections: [],
+                                    nested_exclusions: None,
                                 },
                             ],
+                            nested_exclusions: None,
                         },
                         Selection {
                             name: "shippingAddress",
@@ -1777,22 +1877,27 @@ mod tests {
                                     alias: None,
                                     arguments: [],
                                     nested_selections: [],
+                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "street",
                                     alias: None,
                                     arguments: [],
                                     nested_selections: [],
+                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "zipCode",
                                     alias: None,
                                     arguments: [],
                                     nested_selections: [],
+                                    nested_exclusions: None,
                                 },
                             ],
+                            nested_exclusions: None,
                         },
                     ],
+                    nested_exclusions: None,
                 },
             ),
         )
@@ -1876,28 +1981,34 @@ mod tests {
                                             alias: None,
                                             arguments: [],
                                             nested_selections: [],
+                                            nested_exclusions: None,
                                         },
                                         Selection {
                                             name: "houseNumber",
                                             alias: None,
                                             arguments: [],
                                             nested_selections: [],
+                                            nested_exclusions: None,
                                         },
                                     ],
+                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "zipCode",
                                     alias: None,
                                     arguments: [],
                                     nested_selections: [],
+                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "city",
                                     alias: None,
                                     arguments: [],
                                     nested_selections: [],
+                                    nested_exclusions: None,
                                 },
                             ],
+                            nested_exclusions: None,
                         },
                         Selection {
                             name: "shippingAddress",
@@ -1914,30 +2025,37 @@ mod tests {
                                             alias: None,
                                             arguments: [],
                                             nested_selections: [],
+                                            nested_exclusions: None,
                                         },
                                         Selection {
                                             name: "houseNumber",
                                             alias: None,
                                             arguments: [],
                                             nested_selections: [],
+                                            nested_exclusions: None,
                                         },
                                     ],
+                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "zipCode",
                                     alias: None,
                                     arguments: [],
                                     nested_selections: [],
+                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "city",
                                     alias: None,
                                     arguments: [],
                                     nested_selections: [],
+                                    nested_exclusions: None,
                                 },
                             ],
+                            nested_exclusions: None,
                         },
                     ],
+                    nested_exclusions: None,
                 },
             ),
         )

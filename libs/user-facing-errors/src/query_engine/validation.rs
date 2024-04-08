@@ -48,6 +48,8 @@ pub enum ValidationErrorKind {
     UnknownInputField,
     /// See [`ValidationError::unknown_selection_field`]
     UnknownSelectionField,
+    /// See [`ValidationError::unknown_excluded_field`]
+    UnknownExcludedField,
     /// See [`ValidationError::value_too_large`]
     ValueTooLarge,
 }
@@ -391,6 +393,35 @@ impl ValidationError {
         );
         ValidationError {
             kind: ValidationErrorKind::UnknownSelectionField,
+            message,
+            meta: Some(json!({ "outputType": output_type_description, "selectionPath": selection_path })),
+        }
+    }
+
+    /// Creates an [`ValidationErrorKind::UnknownExcludedField`] kind of error, which happens when
+    /// the exclusion of fields for a query contains a field that does not exist in the schema for the
+    /// enclosing type.
+    ///
+    /// Example json query:
+    ///
+    /// {
+    ///     "action": "findMany",
+    ///     "modelName": "User",
+    ///     "query": {
+    ///         "selection": {
+    ///             "notAField": false
+    ///         }
+    ///     }
+    // }
+    pub fn unknown_excluded_field(selection_path: Vec<&str>, output_type_description: OutputTypeDescription) -> Self {
+        let message = format!(
+            "Field '{}' not found in enclosing type '{}'",
+            selection_path.last().expect("Selection path must not be empty"),
+            output_type_description.name
+        );
+
+        ValidationError {
+            kind: ValidationErrorKind::UnknownExcludedField,
             message,
             meta: Some(json!({ "outputType": output_type_description, "selectionPath": selection_path })),
         }
