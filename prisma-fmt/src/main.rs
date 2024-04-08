@@ -3,12 +3,12 @@ mod format;
 mod native;
 mod preview;
 
+use prisma_fmt::lint;
 use std::{
     io::{self, Read},
     path::PathBuf,
 };
 use structopt::StructOpt;
-use prisma_fmt::lint;
 
 #[derive(Debug, StructOpt, Clone)]
 pub struct FormatOpts {
