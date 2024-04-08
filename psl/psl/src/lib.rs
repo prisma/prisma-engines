@@ -12,6 +12,8 @@ pub use psl_core::{
     parser_database::{self, SourceFile},
     reachable_only_with_capability,
     reformat,
+    reformat_multiple,
+    reformat_validated_schema_into_single,
     schema_ast,
     set_config_dir,
     Configuration,

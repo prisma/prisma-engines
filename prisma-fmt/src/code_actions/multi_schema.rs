@@ -147,8 +147,7 @@ pub(super) fn add_schema_to_schemas(
             )
         }
         None => {
-            let has_properties = datasource.provider_defined()
-                || datasource.url_defined()
+            let has_properties = datasource.provider_defined() | datasource.url_defined()
                 || datasource.direct_url_defined()
                 || datasource.shadow_url_defined()
                 || datasource.relation_mode_defined()

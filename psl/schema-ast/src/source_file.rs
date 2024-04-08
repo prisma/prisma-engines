@@ -6,6 +6,14 @@ pub struct SourceFile {
     contents: Contents,
 }
 
+impl Default for SourceFile {
+    fn default() -> Self {
+        Self {
+            contents: Contents::Static(""),
+        }
+    }
+}
+
 impl SourceFile {
     pub fn new_static(content: &'static str) -> Self {
         Self {

@@ -175,6 +175,16 @@ impl ParserDatabase {
         self.asts.iter().map(|(_, _, _, ast)| ast)
     }
 
+    /// Iterate all parsed ASTs, consuming parser database
+    pub fn into_iter_asts(self) -> impl Iterator<Item = ast::SchemaAst> {
+        self.asts.into_iter().map(|(_, _, _, ast)| ast)
+    }
+
+    /// Iterate all file ids
+    pub fn iter_file_ids(&self) -> impl Iterator<Item = FileId> + '_ {
+        self.asts.iter().map(|(file_id, _, _, _)| file_id)
+    }
+
     /// A parsed AST.
     pub fn ast(&self, file_id: FileId) -> &ast::SchemaAst {
         &self.asts[file_id].2
@@ -199,8 +209,18 @@ impl ParserDatabase {
     }
 
     /// The source file contents.
-    pub(crate) fn source(&self, file_id: FileId) -> &str {
+    pub fn source(&self, file_id: FileId) -> &str {
         self.asts[file_id].1.as_str()
+    }
+
+    /// Iterate all source file contents.
+    pub fn iter_sources(&self) -> impl Iterator<Item = &str> {
+        self.asts.iter().map(|ast| ast.2.as_str())
+    }
+
+    /// The name of the file.
+    pub fn file_name(&self, file_id: FileId) -> &str {
+        self.asts[file_id].0.as_str()
     }
 }
 
