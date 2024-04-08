@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use lsp_types::{Position, Range};
 use psl::parser_database::ast::Span;
 
