@@ -111,7 +111,7 @@ mod tests {
         assert_eq!(found_offset, expected_offset);
     }
 
-    // LSP server should return utf-16 offset
+    // In the LSP protocol, the number of the UTF-16 code unit should be used as the offset.
     #[test]
     fn offset_to_position_with_multibyte() {
         let schema = "// 🌐 ｍｕｌｔｉｂｙｔｅ\n😀@\n";
