@@ -93,15 +93,8 @@ impl BatchDocument {
                     ArgumentValue::Object(obj) => !obj.contains_key(filters::EQUALS),
                     _ => {
                         if let Some(nti) = sf.native_type() {
-                            dbg!(nti.name());
-                            if nti.name() == "Citext" {
-                                return true;
-                            }
+                            return !schema.connector.native_type_supports_compacting(nti.native_type);
                         }
-
-                        // let x = sf
-                        //     .native_type()
-                        //     .inspect(|x| x.connector.native_type_supports_compacting(x));
 
                         false
                     }
