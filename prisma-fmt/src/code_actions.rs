@@ -32,8 +32,13 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
 
     let datasource = config.datasources.first();
 
-    for source in validated_schema.db.ast().sources() {
-        relation_mode::edit_referential_integrity(&mut actions, &params, validated_schema.db.source(), source)
+    for source in validated_schema.db.ast_assert_single().sources() {
+        relation_mode::edit_referential_integrity(
+            &mut actions,
+            &params,
+            validated_schema.db.source_assert_single(),
+            source,
+        )
     }
 
     // models AND views
@@ -46,21 +51,27 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
             multi_schema::add_schema_block_attribute_model(
                 &mut actions,
                 &params,
-                validated_schema.db.source(),
+                validated_schema.db.source_assert_single(),
                 config,
                 model,
             );
 
-            multi_schema::add_schema_to_schemas(&mut actions, &params, validated_schema.db.source(), config, model);
+            multi_schema::add_schema_to_schemas(
+                &mut actions,
+                &params,
+                validated_schema.db.source_assert_single(),
+                config,
+                model,
+            );
         }
 
         if matches!(datasource, Some(ds) if ds.active_provider == "mongodb") {
-            mongodb::add_at_map_for_id(&mut actions, &params, validated_schema.db.source(), model);
+            mongodb::add_at_map_for_id(&mut actions, &params, validated_schema.db.source_assert_single(), model);
 
             mongodb::add_native_for_auto_id(
                 &mut actions,
                 &params,
-                validated_schema.db.source(),
+                validated_schema.db.source_assert_single(),
                 model,
                 datasource.unwrap(),
             );
@@ -72,7 +83,7 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
             multi_schema::add_schema_block_attribute_enum(
                 &mut actions,
                 &params,
-                validated_schema.db.source(),
+                validated_schema.db.source_assert_single(),
                 config,
                 enumerator,
             )
@@ -89,7 +100,7 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
             relations::add_referenced_side_unique(
                 &mut actions,
                 &params,
-                validated_schema.db.source(),
+                validated_schema.db.source_assert_single(),
                 complete_relation,
             );
 
@@ -97,7 +108,7 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
                 relations::add_referencing_side_unique(
                     &mut actions,
                     &params,
-                    validated_schema.db.source(),
+                    validated_schema.db.source_assert_single(),
                     complete_relation,
                 );
             }
@@ -106,7 +117,7 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
                 relations::add_index_for_relation_fields(
                     &mut actions,
                     &params,
-                    validated_schema.db.source(),
+                    validated_schema.db.source_assert_single(),
                     complete_relation.referencing_field(),
                 );
             }
@@ -115,7 +126,7 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
                 relation_mode::replace_set_default_mysql(
                     &mut actions,
                     &params,
-                    validated_schema.db.source(),
+                    validated_schema.db.source_assert_single(),
                     complete_relation,
                     config,
                 )
