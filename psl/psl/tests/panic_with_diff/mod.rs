@@ -1,9 +1,12 @@
-pub(crate) fn panic_with_diff(expected: &str, found: &str) {
+pub(crate) fn panic_with_diff(expected: &str, found: &str, name: Option<&str>) {
+    let title = name
+        .map(|name| format!("Snapshot '{name}'"))
+        .unwrap_or("Snapshot".to_owned());
     let chunks = dissimilar::diff(expected, found);
     let diff = format_chunks(chunks);
     panic!(
         r#"
-Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the environment to update the snapshot.
+${title} comparison failed. Run the test again with UPDATE_EXPECT=1 in the environment to update the snapshot.
 
 ===== EXPECTED ====
 {expected}

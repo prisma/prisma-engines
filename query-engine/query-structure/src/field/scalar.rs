@@ -1,7 +1,7 @@
 use crate::{ast, parent_container::ParentContainer, prelude::*, DefaultKind, NativeTypeInstance, ValueGenerator};
 use chrono::{DateTime, FixedOffset};
 use psl::{
-    parser_database::{walkers, ScalarFieldType, ScalarType},
+    parser_database::{self as db, walkers, ScalarFieldType, ScalarType},
     schema_ast::ast::FieldArity,
 };
 use std::fmt::{Debug, Display};
@@ -12,7 +12,7 @@ pub type ScalarFieldRef = ScalarField;
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub enum ScalarFieldId {
     InModel(psl::parser_database::ScalarFieldId),
-    InCompositeType((ast::CompositeTypeId, ast::FieldId)),
+    InCompositeType((db::CompositeTypeId, ast::FieldId)),
 }
 
 impl ScalarField {
