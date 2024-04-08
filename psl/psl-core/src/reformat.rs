@@ -9,7 +9,7 @@ pub fn reformat(source: &str, indent_width: usize) -> Option<String> {
     let file = SourceFile::new_allocated(Arc::from(source.to_owned().into_boxed_str()));
 
     let mut diagnostics = diagnostics::Diagnostics::new();
-    let db = parser_database::ParserDatabase::new(file, &mut diagnostics);
+    let db = parser_database::ParserDatabase::new_single_file(file, &mut diagnostics);
 
     let source_to_reformat = if diagnostics.has_errors() {
         Cow::Borrowed(source)

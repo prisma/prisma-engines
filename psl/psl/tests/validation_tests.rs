@@ -10,7 +10,7 @@ fn parse_schema_fail_on_diagnostics(file: impl Into<SourceFile>) -> Result<Valid
     let schema = psl::validate(file.into());
 
     let file_name = "schema.prisma";
-    let datamodel_string = schema.db.source();
+    let datamodel_string = schema.db.source_assert_single();
 
     match (schema.diagnostics.warnings(), schema.diagnostics.errors()) {
         ([], []) => Ok(schema),
