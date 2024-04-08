@@ -91,13 +91,7 @@ impl BatchDocument {
                 Ok(sf) => match val {
                     // Consider scalar _only_ if the filter object contains "equals". eg: `{ scalar_field: { equals: 1 } }`
                     ArgumentValue::Object(obj) => !obj.contains_key(filters::EQUALS),
-                    _ => {
-                        if let Some(nti) = sf.native_type() {
-                            return !schema.connector.native_type_supports_compacting(nti.native_type);
-                        }
-
-                        false
-                    }
+                    _ => !sf.can_be_compacted(),
                 },
                 Err(_) => true,
             },

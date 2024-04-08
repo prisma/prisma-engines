@@ -201,7 +201,7 @@ pub trait Connector: Send + Sync {
         diagnostics: &mut Diagnostics,
     ) -> Option<NativeTypeInstance>;
 
-    fn native_type_supports_compacting(&self, _: NativeTypeInstance) -> bool {
+    fn native_type_supports_compacting(&self, _: Option<NativeTypeInstance>) -> bool {
         true
     }
 
