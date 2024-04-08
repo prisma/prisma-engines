@@ -73,6 +73,7 @@ impl BatchDocument {
     /// Those filters are:
     /// - non scalar filters (ie: relation filters, boolean operators...)
     /// - any scalar filters that is not `EQUALS`
+    /// - nativetypes (citext)
     fn invalid_compact_filter(op: &Operation, schema: &QuerySchema) -> bool {
         if !op.is_find_unique(schema) {
             return true;
@@ -87,10 +88,23 @@ impl BatchDocument {
             ArgumentValue::Object(_) if resolve_compound_field(key, &model).is_some() => false,
             // Otherwise, we just look for a scalar field inside the model. If it's not one, then we break.
             val => match model.fields().find_from_scalar(key) {
-                Ok(_) => match val {
+                Ok(sf) => match val {
                     // Consider scalar _only_ if the filter object contains "equals". eg: `{ scalar_field: { equals: 1 } }`
                     ArgumentValue::Object(obj) => !obj.contains_key(filters::EQUALS),
-                    _ => false,
+                    _ => {
+                        if let Some(nti) = sf.native_type() {
+                            dbg!(nti.name());
+                            if nti.name() == "Citext" {
+                                return true;
+                            }
+                        }
+
+                        // let x = sf
+                        //     .native_type()
+                        //     .inspect(|x| x.connector.native_type_supports_compacting(x));
+
+                        false
+                    }
                 },
                 Err(_) => true,
             },

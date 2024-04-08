@@ -500,27 +500,25 @@ mod singular_batch {
         }"#
         );
 
-        let (res, compact_doc) = compact_batch(
-            &runner,
-            vec![
-                r#"{ findUniqueUser(
-                    where: { caseInsensitiveField: "HELLO WORLD" }
-                ) { id, caseInsensitiveField } }"#
-                    .to_string(),
-                r#"{ findUniqueUser(
-                    where: { caseInsensitiveField: "HELLO WORLD" }
-                ) { id, caseInsensitiveField } }"#
-                    .to_string(),
-            ],
-        )
-        .await?;
+        let queries = vec![
+            r#"{ findUniqueUser(
+                where: { caseInsensitiveField: "HELLO WORLD" }
+            ) { id, caseInsensitiveField } }"#
+                .to_string(),
+            r#"{ findUniqueUser(
+                where: { caseInsensitiveField: "HELLO WORLD" }
+            ) { id, caseInsensitiveField } }"#
+                .to_string(),
+        ];
+
+        let (res, compact_doc) = compact_batch(&runner, queries.clone()).await?;
+
+        assert!(!compact_doc.is_compact());
 
         insta::assert_snapshot!(
             res.to_string(),
-            @r###"{"batchResult":[{"data":{"findUniqueUser":null}},{"data":{"findUniqueUser":null}}]}"###
+            @r###"{"batchResult":[{"data":{"findUniqueUser":{"id":"9df0f936-51d6-4c55-8e01-5144e588a8a1","caseInsensitiveField":"hello world"}}},{"data":{"findUniqueUser":{"id":"9df0f936-51d6-4c55-8e01-5144e588a8a1","caseInsensitiveField":"hello world"}}}]}"###
         );
-
-        assert!(compact_doc.is_compact());
 
         Ok(())
     }
