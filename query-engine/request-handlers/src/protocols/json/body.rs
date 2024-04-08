@@ -135,7 +135,7 @@ impl SelectionSet {
     }
 
     pub(crate) fn into_selection(self) -> impl Iterator<Item = (String, SelectionSetValue)> {
-        self.0.into_iter().filter(|(_, v)| v.is_selected())
+        self.0.into_iter()
     }
 }
 

@@ -13,6 +13,13 @@ pub struct Selection {
     alias: Option<String>,
     arguments: Vec<(String, ArgumentValue)>,
     nested_selections: Vec<Selection>,
+    nested_exclusions: Option<Vec<Exclusion>>,
+}
+
+/// Represents a field that's excluded.
+#[derive(Debug, Clone)]
+pub struct Exclusion {
+    pub name: String,
 }
 
 impl PartialEq for Selection {
@@ -45,6 +52,7 @@ impl Selection {
             alias,
             arguments: arguments.into(),
             nested_selections: nested_selections.into(),
+            nested_exclusions: None,
         }
     }
 
@@ -82,6 +90,15 @@ impl Selection {
         self.nested_selections.push(selection);
     }
 
+    pub fn push_nested_exclusion(&mut self, name: impl Into<String>) {
+        let exclusion = Exclusion { name: name.into() };
+
+        match self.nested_exclusions {
+            Some(ref mut exclusions) => exclusions.push(exclusion),
+            None => self.nested_exclusions = Some(vec![exclusion]),
+        }
+    }
+
     pub fn remove_nested_selection(&mut self, name: &str) {
         self.nested_selections.retain(|sel| sel.name() != name);
     }
@@ -104,6 +121,10 @@ impl Selection {
 
     pub fn set_alias(&mut self, alias: Option<String>) {
         self.alias = alias
+    }
+
+    pub fn nested_exclusions(&self) -> Option<&[Exclusion]> {
+        self.nested_exclusions.as_deref()
     }
 }
 
