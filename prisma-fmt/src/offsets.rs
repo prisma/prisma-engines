@@ -55,7 +55,7 @@ pub(crate) fn position_after_span(span: Span, document: &str) -> Position {
     offset_to_position(span.end - 1, document)
 }
 
-/// Converts the byte offset to the offset used in LSP
+/// Converts the byte offset to the offset used in the LSP, which is the number of the UTF-16 code unit.
 pub(crate) fn offset_to_lsp_offset(offset: usize, document: &str) -> usize {
     let mut current_offset = 0;
     let mut current_lsp_offset = 0;
