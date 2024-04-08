@@ -9,7 +9,6 @@ fn expect_errors(schemas: &[[&'static str; 2]], expectation: expect_test::Expect
     );
 
     let actual = out.render_own_diagnostics();
-    let actual = out.render_diagnostics();
     expectation.assert_eq(&actual)
 }
 
