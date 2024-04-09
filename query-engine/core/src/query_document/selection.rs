@@ -1,9 +1,8 @@
-use std::iter;
-
 use crate::{ArgumentValue, ArgumentValueObject};
 use indexmap::IndexMap;
 use itertools::Itertools;
 use schema::constants::filters;
+use std::iter;
 
 pub type SelectionArgument = (String, ArgumentValue);
 
@@ -87,7 +86,20 @@ impl Selection {
     }
 
     pub fn push_nested_selection(&mut self, selection: Selection) {
-        self.nested_selections.push(selection);
+        // If a selection with the same name and alias already exists, replace it.
+        // We do that to avoid duplicates in the selection set. This can happen in the JSON protocol when
+        // a wildcard selection and an explicit selection set are combined. eg: `$scalars: true, id: true`
+        // This case should technically never happen atm, but it's a safety net which ensures we always keep the last one that we encounter.
+        match self
+            .nested_selections
+            .iter()
+            .find_position(|sel| sel.name() == selection.name() && sel.alias() == selection.alias())
+        {
+            Some((idx, _)) => {
+                self.nested_selections[idx] = selection;
+            }
+            None => self.nested_selections.push(selection),
+        }
     }
 
     pub fn push_nested_exclusion(&mut self, name: impl Into<String>) {
