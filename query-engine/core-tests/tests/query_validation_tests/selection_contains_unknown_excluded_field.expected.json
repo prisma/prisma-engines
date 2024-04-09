@@ -2,7 +2,7 @@
   "is_panic": false,
   "message": "Field 'unknown_field' not found in enclosing type 'User'",
   "meta": {
-    "kind": "UnknownExcludedField",
+    "kind": "UnknownSelectionField",
     "outputType": {
       "name": "User",
       "fields": [
