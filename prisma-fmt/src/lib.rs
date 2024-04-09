@@ -3,8 +3,10 @@ mod code_actions;
 mod get_config;
 mod get_dmmf;
 mod lint;
+mod merge_schemas;
 mod native;
 mod preview;
+mod schema_file_input;
 mod text_document_completion;
 mod validate;
 
@@ -87,6 +89,14 @@ pub fn lint(schema: String) -> String {
 /// This function isn't supposed to panic.
 pub fn validate(validate_params: String) -> Result<(), String> {
     validate::validate(&validate_params)
+}
+
+/// Given a list of Prisma schema files (and their locations), returns the merged schema.
+/// This is useful for `@prisma/client` generation, where the client needs a single - potentially large - schema,
+/// while still allowing the user to split their schema copies into multiple files.
+/// Internally, it uses `[validate]`.
+pub fn merge_schemas(params: String) -> Result<String, String> {
+    merge_schemas::merge_schemas(&params)
 }
 
 pub fn native_types(schema: String) -> String {
@@ -225,7 +235,7 @@ pub(crate) fn range_to_span(range: Range, document: &str) -> ast::Span {
     let start = position_to_offset(&range.start, document).unwrap();
     let end = position_to_offset(&range.end, document).unwrap();
 
-    ast::Span::new(start, end)
+    ast::Span::new(start, end, psl::parser_database::FileId::ZERO)
 }
 
 /// Gives the LSP position right after the given span.

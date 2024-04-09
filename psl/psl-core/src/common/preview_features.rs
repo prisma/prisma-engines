@@ -77,7 +77,8 @@ features!(
     TransactionApi,
     UncheckedScalarInputs,
     Views,
-    RelationJoins
+    RelationJoins,
+    PrismaSchemaFolder
 );
 
 /// Generator preview features (alphabetically sorted)
@@ -128,7 +129,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | TransactionApi
         | UncheckedScalarInputs
     }),
-    hidden: enumflags2::BitFlags::EMPTY,
+    hidden: enumflags2::make_bitflags!(PreviewFeature::{PrismaSchemaFolder}),
 };
 
 #[derive(Debug)]

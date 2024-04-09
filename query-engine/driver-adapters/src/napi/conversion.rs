@@ -16,6 +16,7 @@ impl FromNapiValue for JSArg {
 impl ToNapiValue for JSArg {
     unsafe fn to_napi_value(env: napi::sys::napi_env, value: Self) -> napi::Result<napi::sys::napi_value> {
         match value {
+            JSArg::SafeInt(v) => ToNapiValue::to_napi_value(env, v),
             JSArg::Value(v) => ToNapiValue::to_napi_value(env, v),
             JSArg::Buffer(bytes) => {
                 let env = napi::Env::from_raw(env);

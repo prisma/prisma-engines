@@ -1,7 +1,7 @@
 mod json_adapter;
 
 pub use json_adapter::*;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     executor_process_request, ConnectorTag, ConnectorVersion, QueryResult, TestError, TestLogCapture, TestResult,
@@ -48,6 +48,13 @@ impl From<TransactionEndResponse> for TxResult {
     }
 }
 
+#[derive(Deserialize, Debug)]
+#[serde(untagged)]
+enum StartTransactionResponse {
+    Ok { id: String },
+    Error(user_facing_errors::Error),
+}
+
 pub enum RunnerExecutor {
     // Builtin is a runner that uses the query engine in-process, issuing queries against a
     // `core::InterpretingExecutor` that uses the particular connector under test in the test suite.
@@ -56,30 +63,135 @@ pub enum RunnerExecutor {
     // External is a runner that uses an external process that responds to queries piped to its STDIN
     // in JsonRPC format. In particular this is used to test the query engine against a node process
     // running a library engine configured to use a javascript driver adapter to connect to a database.
-    //
-    // In this struct variant, usize represents the index of the schema used for the test suite to
-    // execute queries against. When the suite starts, a message with the schema and the id is sent to
-    // the external process, which will create a new instance of the library engine configured to
-    // access that schema.
-    //
-    // Everytime a query is sent to the external process, it's provided the id of the schema, so the
-    // process knows how to associate the query to the instance of the library engine that will dispatch
-    // it.
-    External(usize),
+    External(ExternalExecutor),
 }
 
-impl RunnerExecutor {
-    async fn new_external(url: &str, schema: &str) -> TestResult<RunnerExecutor> {
-        static COUNTER: AtomicUsize = AtomicUsize::new(0);
-        let id = COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+/// [`ExternalExecutor::schema_id`] represents the index of the schema used for the test suite to
+/// execute queries against. When the suite starts, a message with the schema and the id is sent to
+/// the external process, which will create a new instance of the library engine configured to
+/// access that schema.
+///
+/// Everytime a query is sent to the external process, it's provided the id of the schema, so the
+/// process knows how to associate the query to the instance of the library engine that will dispatch
+/// it.
+#[derive(Copy, Clone)]
+pub struct ExternalExecutor {
+    schema_id: usize,
+}
 
+/// [`ExternalExecutorInitializer`] is responsible for initialising a test session for the external process.
+/// The initialisation can happen with or without a migration script, and is performed by submitting the
+/// "initializeSchema" JSON-RPC request.
+/// [`ExternalExecutorInitializer::schema_id`] is the schema id of the parent [`ExternalExecutor`].
+/// [`ExternalExecutorInitializer::url`] and [`ExternalExecutorInitializer::schema`] are the context
+/// necessary for the "initializeSchema" JSON-RPC request.
+/// The usage of `&'a str` is to avoid problems with `String` not implementing the `Copy` trait.
+struct ExternalExecutorInitializer<'a> {
+    schema_id: usize,
+    url: &'a str,
+    schema: &'a str,
+}
+
+impl<'a> qe_setup::ExternalInitializer<'a> for ExternalExecutorInitializer<'a> {
+    async fn init_with_migration(
+        &self,
+        migration_script: String,
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        let migration_script = Some(migration_script);
+        executor_process_request("initializeSchema", json!({ "schemaId": self.schema_id, "schema": self.schema, "url": self.url, "migrationScript": migration_script })).await?;
+        Ok(())
+    }
+
+    async fn init(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         executor_process_request(
             "initializeSchema",
-            json!({ "schema": schema, "schemaId": id, "url": url }),
+            json!({ "schemaId": self.schema_id, "schema": self.schema, "url": self.url }),
         )
         .await?;
+        Ok(())
+    }
 
-        Ok(RunnerExecutor::External(id))
+    fn url(&self) -> &'a str {
+        self.url
+    }
+
+    fn datamodel(&self) -> &'a str {
+        self.schema
+    }
+}
+
+impl ExternalExecutor {
+    /// Request a new schema id to be used for the external process.
+    /// This operation wraps around on overflow.
+    fn external_schema_id() -> usize {
+        static COUNTER: AtomicUsize = AtomicUsize::new(0);
+        COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+    }
+
+    fn new() -> Self {
+        let schema_id = Self::external_schema_id();
+        Self { schema_id }
+    }
+
+    /// Create a temporary initializer for external Driver Adapters.
+    fn init<'a>(&self, datamodel: &'a str, url: &'a str) -> ExternalExecutorInitializer<'a> {
+        ExternalExecutorInitializer {
+            schema_id: self.schema_id,
+            url,
+            schema: datamodel,
+        }
+    }
+
+    pub(self) async fn query<JsonQuery: Serialize>(
+        &self,
+        json_query: JsonQuery,
+        current_tx_id: Option<&TxId>,
+    ) -> Result<QueryResult, Box<dyn std::error::Error + Send + Sync>> {
+        let response_str: String = executor_process_request(
+            "query",
+            json!({ "schemaId": self.schema_id, "query": json_query, "txId": current_tx_id.map(ToString::to_string) }),
+        )
+        .await?;
+        let response: QueryResult = serde_json::from_str(&response_str).unwrap();
+        Ok(response)
+    }
+
+    pub(self) async fn start_tx(
+        &self,
+        tx_opts: TransactionOptions,
+    ) -> Result<StartTransactionResponse, Box<dyn std::error::Error + Send + Sync>> {
+        let response: StartTransactionResponse =
+            executor_process_request("startTx", json!({ "schemaId": self.schema_id, "options": tx_opts })).await?;
+        Ok(response)
+    }
+
+    pub(self) async fn commit_tx(
+        &self,
+        tx_id: TxId,
+    ) -> Result<TransactionEndResponse, Box<dyn std::error::Error + Send + Sync>> {
+        let response: TransactionEndResponse = executor_process_request(
+            "commitTx",
+            json!({ "schemaId": self.schema_id, "txId": tx_id.to_string() }),
+        )
+        .await?;
+        Ok(response)
+    }
+
+    pub(self) async fn rollback_tx(
+        &self,
+        tx_id: TxId,
+    ) -> Result<TransactionEndResponse, Box<dyn std::error::Error + Send + Sync>> {
+        let response: TransactionEndResponse = executor_process_request(
+            "rollbackTx",
+            json!({ "schemaId": self.schema_id, "txId": tx_id.to_string() }),
+        )
+        .await?;
+        Ok(response)
+    }
+
+    pub(crate) async fn get_logs(&self) -> Result<Vec<String>, Box<dyn std::error::Error + Send + Sync>> {
+        let response: Vec<String> = executor_process_request("getLogs", json!({ "schemaId": self.schema_id })).await?;
+        Ok(response)
     }
 }
 
@@ -98,14 +210,14 @@ pub struct Runner {
 
 impl Runner {
     pub(crate) fn schema_id(&self) -> Option<usize> {
-        match self.executor {
+        match &self.executor {
             RunnerExecutor::Builtin(_) => None,
-            RunnerExecutor::External(schema_id) => Some(schema_id),
+            RunnerExecutor::External(external) => Some(external.schema_id),
         }
     }
 
     pub fn prisma_dml(&self) -> &str {
-        self.query_schema.internal_data_model.schema.db.source()
+        self.query_schema.internal_data_model.schema.db.source_assert_single()
     }
 
     pub fn max_bind_values(&self) -> Option<usize> {
@@ -120,17 +232,27 @@ impl Runner {
         metrics: MetricRegistry,
         log_capture: TestLogCapture,
     ) -> TestResult<Self> {
-        qe_setup::setup(&datamodel, db_schemas).await?;
-
         let protocol = EngineProtocol::from(&ENGINE_PROTOCOL.to_string());
         let schema = psl::parse_schema(&datamodel).unwrap();
         let datasource = schema.configuration.datasources.first().unwrap();
         let url = datasource.load_url(|key| env::var(key).ok()).unwrap();
 
-        let (executor, db_version) = match crate::CONFIG.external_test_executor() {
-            Some(_) => (RunnerExecutor::new_external(&url, &datamodel).await?, None),
+        let (executor, db_version) = match crate::CONFIG.with_driver_adapter() {
+            Some(with_driver_adapter) => {
+                let external_executor = ExternalExecutor::new();
+                let external_initializer: ExternalExecutorInitializer<'_> =
+                    external_executor.init(&datamodel, url.as_str());
+                let executor = RunnerExecutor::External(external_executor);
+
+                qe_setup::setup_external(with_driver_adapter.adapter, external_initializer, db_schemas).await?;
+
+                let database_version = None;
+                (executor, database_version)
+            }
             None => {
-                let executor = request_handlers::load_executor(
+                qe_setup::setup(&datamodel, db_schemas).await?;
+
+                let query_executor = request_handlers::load_executor(
                     ConnectorKind::Rust {
                         url: url.to_owned(),
                         datasource,
@@ -138,12 +260,12 @@ impl Runner {
                     schema.configuration.preview_features(),
                 )
                 .await?;
-
-                let connector = executor.primary_connector();
+                let connector = query_executor.primary_connector();
                 let conn = connector.get_connection().await.unwrap();
                 let database_version = conn.version().await;
 
-                (RunnerExecutor::Builtin(executor), database_version)
+                let executor = RunnerExecutor::Builtin(query_executor);
+                (executor, database_version)
             }
         };
 
@@ -172,11 +294,9 @@ impl Runner {
 
         let executor = match &self.executor {
             RunnerExecutor::Builtin(e) => e,
-            RunnerExecutor::External(schema_id) => match JsonRequest::from_graphql(&query, self.query_schema()) {
+            RunnerExecutor::External(external) => match JsonRequest::from_graphql(&query, self.query_schema()) {
                 Ok(json_query) => {
-                    let response_str: String =
-                    executor_process_request("query", json!({ "query": json_query, "schemaId": schema_id, "txId": self.current_tx_id.as_ref().map(ToString::to_string) })).await?;
-                    let mut response: QueryResult = serde_json::from_str(&response_str).unwrap();
+                    let mut response = external.query(json_query, self.current_tx_id.as_ref()).await?;
                     response.detag();
                     return Ok(response);
                 }
@@ -242,13 +362,8 @@ impl Runner {
 
         let executor = match &self.executor {
             RunnerExecutor::Builtin(e) => e,
-            RunnerExecutor::External(schema_id) => {
-                let response_str: String = executor_process_request(
-                    "query",
-                    json!({ "query": query, "schemaId": schema_id, "txId": self.current_tx_id.as_ref().map(ToString::to_string) }),
-                )
-                .await?;
-                let response: QueryResult = serde_json::from_str(&response_str).unwrap();
+            RunnerExecutor::External(external) => {
+                let response = external.query(query, self.current_tx_id.as_ref()).await?;
                 return Ok(response);
             }
         };
@@ -316,7 +431,7 @@ impl Runner {
         isolation_level: Option<String>,
     ) -> TestResult<crate::QueryResult> {
         let executor = match &self.executor {
-            RunnerExecutor::External(schema_id) => {
+            RunnerExecutor::External(external) => {
                 // Translate the GraphQL query to JSON
                 let batch = queries
                     .into_iter()
@@ -328,12 +443,7 @@ impl Runner {
                     false => None,
                 };
                 let json_query = JsonBody::Batch(JsonBatchQuery { batch, transaction });
-                let response_str: String = executor_process_request(
-                        "query",
-                        json!({ "query": json_query, "schemaId": schema_id, "txId": self.current_tx_id.as_ref().map(ToString::to_string) })
-                    ).await?;
-
-                let mut response: QueryResult = serde_json::from_str(&response_str).unwrap();
+                let mut response: QueryResult = external.query(json_query, self.current_tx_id.as_ref()).await?;
                 response.detag();
                 return Ok(response);
             }
@@ -390,15 +500,8 @@ impl Runner {
                     .await?;
                 Ok(id)
             }
-            RunnerExecutor::External(schema_id) => {
-                #[derive(Deserialize, Debug)]
-                #[serde(untagged)]
-                enum StartTransactionResponse {
-                    Ok { id: String },
-                    Error(user_facing_errors::Error),
-                }
-                let response: StartTransactionResponse =
-                    executor_process_request("startTx", json!({ "schemaId": schema_id, "options": tx_opts })).await?;
+            RunnerExecutor::External(external) => {
+                let response: StartTransactionResponse = external.start_tx(tx_opts).await?;
 
                 match response {
                     StartTransactionResponse::Ok { id } => Ok(id.into()),
@@ -421,11 +524,8 @@ impl Runner {
                     Ok(Ok(()))
                 }
             }
-            RunnerExecutor::External(schema_id) => {
-                let response: TransactionEndResponse =
-                    executor_process_request("commitTx", json!({ "schemaId": schema_id, "txId": tx_id.to_string() }))
-                        .await?;
-
+            RunnerExecutor::External(external) => {
+                let response = external.commit_tx(tx_id).await?;
                 Ok(response.into())
             }
         }
@@ -442,13 +542,8 @@ impl Runner {
                     Ok(Ok(()))
                 }
             }
-            RunnerExecutor::External(schema_id) => {
-                let response: TransactionEndResponse = executor_process_request(
-                    "rollbackTx",
-                    json!({ "schemaId": schema_id, "txId": tx_id.to_string() }),
-                )
-                .await?;
-
+            RunnerExecutor::External(external) => {
+                let response = external.rollback_tx(tx_id).await?;
                 Ok(response.into())
             }
         }
@@ -478,11 +573,8 @@ impl Runner {
         let mut logs = self.log_capture.get_logs().await;
         match &self.executor {
             RunnerExecutor::Builtin(_) => logs,
-            RunnerExecutor::External(schema_id) => {
-                let mut external_logs: Vec<String> =
-                    executor_process_request("getLogs", json!({ "schemaId": schema_id }))
-                        .await
-                        .unwrap();
+            RunnerExecutor::External(external) => {
+                let mut external_logs = external.get_logs().await.unwrap();
                 logs.append(&mut external_logs);
                 logs
             }

@@ -59,7 +59,7 @@ pub(super) fn ambiguity(field: RelationFieldWalker<'_>, names: &Names<'_>) -> Re
     let model = field.model();
     let related_model = field.related_model();
 
-    let identifier = (model.model_id(), related_model.model_id(), field.relation_name());
+    let identifier = (model.id, related_model.id, field.relation_name());
 
     match names.relation_names.get(&identifier) {
         Some(fields) if fields.len() > 1 => {
@@ -267,23 +267,27 @@ pub(super) fn validate_missing_relation_indexes(relation_field: RelationFieldWal
         // Considers all groups of indexes explicitly declared in the given model.
         // An index group can be:
         // - a singleton (@unique or @id)
-        // - an ordered set (@@unique or @@index)
-        let index_field_groups = model.indexes();
-
-        let referencing_fields_appear_in_index = index_field_groups
-            .map(|index_walker| index_walker.fields().map(|index| index.field_id()))
-            .any(|index_fields_it| {
-                let fields_it = referencing_fields_it.clone();
-                is_leftwise_included_it(fields_it, index_fields_it)
-            });
-
-        if !referencing_fields_appear_in_index {
-            let ast_field = relation_field.ast_field();
-            let span = ast_field
-                .span_for_attribute("relation")
-                .unwrap_or_else(|| ast_field.span());
-            ctx.push_warning(DatamodelWarning::new_missing_index_on_emulated_relation(span));
+        // - an ordered set (@@unique, @@index, or @@id)
+        for index_walker in model.indexes() {
+            let index_fields_it = index_walker.fields().map(|col| col.field_id());
+            let referencing_fields_it = referencing_fields_it.clone();
+            if is_leftwise_included_it(referencing_fields_it, index_fields_it) {
+                return;
+            }
         }
+
+        if let Some(primary_key_walker) = model.primary_key() {
+            let primary_key_fields_it = primary_key_walker.fields().map(|col| col.field_id());
+            if is_leftwise_included_it(referencing_fields_it, primary_key_fields_it) {
+                return;
+            }
+        }
+
+        let ast_field = relation_field.ast_field();
+        let span = ast_field
+            .span_for_attribute("relation")
+            .unwrap_or_else(|| ast_field.span());
+        ctx.push_warning(DatamodelWarning::new_missing_index_on_emulated_relation(span));
     }
 }
 

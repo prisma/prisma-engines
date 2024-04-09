@@ -5,7 +5,7 @@
 import { webcrypto } from "node:crypto";
 import * as fs from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { __dirname } from './utils'
 
 import * as qe from "./qe";
 
@@ -32,9 +32,8 @@ if (!global.crypto) {
 async function main(): Promise<void> {
   // read the prisma schema from stdin
 
-  const dirname = path.dirname(fileURLToPath(import.meta.url));
   var datamodel = (
-    await fs.readFile(path.resolve(dirname, "..", "bench", "schema.prisma"))
+    await fs.readFile(path.resolve(__dirname, "..", "bench", "schema.prisma"))
   ).toString();
 
   const url = process.env.DATABASE_URL;

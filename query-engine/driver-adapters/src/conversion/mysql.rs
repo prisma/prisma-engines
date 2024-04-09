@@ -13,6 +13,7 @@ pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
         quaint::ValueType::Bytes(Some(bytes)) => JSArg::Buffer(bytes.to_vec()),
         quaint::ValueType::Date(Some(d)) => JSArg::Value(JsonValue::String(d.format(DATE_FORMAT).to_string())),
         quaint::ValueType::DateTime(Some(dt)) => JSArg::Value(JsonValue::String(dt.format(DATETIME_FORMAT).to_string())),
+        quaint::ValueType::Int32(Some(value)) => JSArg::SafeInt(*value),
         quaint::ValueType::Time(Some(t)) => JSArg::Value(JsonValue::String(t.format(TIME_FORMAT).to_string())),
         quaint::ValueType::Array(Some(ref items)) => JSArg::Array(
             items

@@ -71,7 +71,8 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     DistinctOn |
     DeleteReturning |
     SupportsFiltersOnRelationsWithoutJoins |
-    LateralJoin
+    LateralJoin |
+    SupportsDefaultInInsert
 });
 
 pub struct PostgresDatamodelConnector;
@@ -496,7 +497,7 @@ impl Connector for PostgresDatamodelConnector {
                 let index_field = db
                     .walk_models()
                     .chain(db.walk_views())
-                    .find(|model| model.model_id() == model_id)
+                    .find(|model| model.id.1 == model_id)
                     .and_then(|model| {
                         model.indexes().find(|index| {
                             index.attribute_id()

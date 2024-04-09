@@ -1,14 +1,14 @@
-use psl::Diagnostics;
+use psl::{Diagnostics, ValidatedSchema};
 use serde::Deserialize;
 use serde_json::json;
 use std::collections::HashMap;
 
-use crate::validate::SCHEMA_PARSER_ERROR_CODE;
+use crate::{schema_file_input::SchemaFileInput, validate::SCHEMA_PARSER_ERROR_CODE};
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 struct GetConfigParams {
-    prisma_schema: String,
+    prisma_schema: SchemaFileInput,
     #[serde(default)]
     ignore_env_var_errors: bool,
     #[serde(default)]
@@ -43,29 +43,38 @@ pub(crate) fn get_config(params: &str) -> Result<String, String> {
 }
 
 fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConfigError> {
-    let wrap_get_config_err = |errors: Diagnostics| -> GetConfigError {
-        use std::fmt::Write as _;
-
-        let mut full_error = errors.to_pretty_string("schema.prisma", &params.prisma_schema);
-        write!(full_error, "\nValidation Error Count: {}", errors.errors().len()).unwrap();
-
-        GetConfigError {
-            // this mirrors user_facing_errors::common::SchemaParserError
-            error_code: Some(SCHEMA_PARSER_ERROR_CODE),
-            message: full_error,
-        }
-    };
-
-    let mut config = psl::parse_configuration(&params.prisma_schema).map_err(wrap_get_config_err)?;
+    let mut schema = psl::validate_multi_file(params.prisma_schema.into());
+    if schema.diagnostics.has_errors() {
+        return Err(create_get_config_error(&schema, &schema.diagnostics));
+    }
 
     if !params.ignore_env_var_errors {
         let overrides: Vec<(_, _)> = params.datasource_overrides.into_iter().collect();
-        config
+        schema
+            .configuration
             .resolve_datasource_urls_prisma_fmt(&overrides, |key| params.env.get(key).map(String::from))
-            .map_err(wrap_get_config_err)?;
+            .map_err(|diagnostics| create_get_config_error(&schema, &diagnostics))?;
     }
 
-    Ok(psl::get_config(&config))
+    Ok(psl::get_config(&schema.configuration))
+}
+
+fn create_get_config_error(schema: &ValidatedSchema, diagnostics: &Diagnostics) -> GetConfigError {
+    use std::fmt::Write as _;
+
+    let mut rendered_diagnostics = schema.render_diagnostics(diagnostics);
+    write!(
+        rendered_diagnostics,
+        "\nValidation Error Count: {}",
+        diagnostics.errors().len()
+    )
+    .unwrap();
+
+    GetConfigError {
+        // this mirrors user_facing_errors::common::SchemaParserError
+        error_code: Some(SCHEMA_PARSER_ERROR_CODE),
+        message: rendered_diagnostics,
+    }
 }
 
 #[cfg(test)]

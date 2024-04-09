@@ -20,7 +20,7 @@ pub use crate::{
     configuration::{
         Configuration, Datasource, DatasourceConnectorData, Generator, GeneratorConfigValue, StringFromEnvVar,
     },
-    reformat::reformat,
+    reformat::{reformat, reformat_multiple, reformat_validated_schema_into_single},
 };
 pub use diagnostics;
 pub use parser_database::{self, is_reserved_type_name};
@@ -52,14 +52,61 @@ impl ValidatedSchema {
     pub fn relation_mode(&self) -> datamodel_connector::RelationMode {
         self.relation_mode
     }
+
+    pub fn render_own_diagnostics(&self) -> String {
+        self.render_diagnostics(&self.diagnostics)
+    }
+
+    pub fn render_diagnostics(&self, diagnostics: &Diagnostics) -> String {
+        let mut out = Vec::new();
+
+        for error in diagnostics.errors() {
+            let (file_name, source, _) = &self.db[error.span().file_id];
+            error.pretty_print(&mut out, file_name, source.as_str()).unwrap();
+        }
+
+        String::from_utf8(out).unwrap()
+    }
 }
 
 /// The most general API for dealing with Prisma schemas. It accumulates what analysis and
 /// validation information it can, and returns it along with any error and warning diagnostics.
 pub fn validate(file: SourceFile, connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
     let mut diagnostics = Diagnostics::new();
-    let db = ParserDatabase::new(file, &mut diagnostics);
-    let configuration = validate_configuration(db.ast(), &mut diagnostics, connectors);
+    let db = ParserDatabase::new_single_file(file, &mut diagnostics);
+    let configuration = validate_configuration(db.ast_assert_single(), &mut diagnostics, connectors);
+    let datasources = &configuration.datasources;
+    let out = validate::validate(db, datasources, configuration.preview_features(), diagnostics);
+
+    ValidatedSchema {
+        diagnostics: out.diagnostics,
+        configuration,
+        connector: out.connector,
+        db: out.db,
+        relation_mode: out.relation_mode,
+    }
+}
+
+/// The most general API for dealing with Prisma schemas. It accumulates what analysis and
+/// validation information it can, and returns it along with any error and warning diagnostics.
+pub fn validate_multi_file(files: Vec<(String, SourceFile)>, connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
+    assert!(
+        !files.is_empty(),
+        "psl::validate_multi_file() must be called with at least one file"
+    );
+    let mut diagnostics = Diagnostics::new();
+    let db = ParserDatabase::new(files, &mut diagnostics);
+
+    // TODO: the bulk of configuration block analysis should be part of ParserDatabase::new().
+    let mut configuration = Configuration::default();
+    for ast in db.iter_asts() {
+        let new_config = validate_configuration(ast, &mut diagnostics, connectors);
+
+        configuration.datasources.extend(new_config.datasources.into_iter());
+        configuration.generators.extend(new_config.generators.into_iter());
+        configuration.warnings.extend(new_config.warnings.into_iter());
+    }
+
     let datasources = &configuration.datasources;
     let out = validate::validate(db, datasources, configuration.preview_features(), diagnostics);
 
@@ -77,8 +124,8 @@ pub fn validate(file: SourceFile, connectors: ConnectorRegistry<'_>) -> Validate
 /// computationally or in terms of bundle size (e.g., for `query-engine-wasm`).
 pub fn parse_without_validation(file: SourceFile, connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
     let mut diagnostics = Diagnostics::new();
-    let db = ParserDatabase::new(file, &mut diagnostics);
-    let configuration = validate_configuration(db.ast(), &mut diagnostics, connectors);
+    let db = ParserDatabase::new_single_file(file, &mut diagnostics);
+    let configuration = validate_configuration(db.ast_assert_single(), &mut diagnostics, connectors);
     let datasources = &configuration.datasources;
     let out = validate::parse_without_validation(db, datasources);
 
@@ -97,7 +144,7 @@ pub fn parse_configuration(
     connectors: ConnectorRegistry<'_>,
 ) -> Result<Configuration, diagnostics::Diagnostics> {
     let mut diagnostics = Diagnostics::default();
-    let ast = schema_ast::parse_schema(schema, &mut diagnostics);
+    let ast = schema_ast::parse_schema(schema, &mut diagnostics, diagnostics::FileId::ZERO);
     let out = validate_configuration(&ast, &mut diagnostics, connectors);
     diagnostics.to_result().map(|_| out)
 }

@@ -3,7 +3,6 @@ use query_engine_tests::*;
 #[test_suite(schema(schema), capabilities(AnyId))]
 mod compound_batch {
     use indoc::indoc;
-    use query_engine_tests::query_core::{BatchDocument, QueryDocument};
 
     fn schema() -> String {
         let schema = indoc! {
@@ -384,28 +383,106 @@ mod compound_batch {
         Ok(())
     }
 
-    async fn compact_batch(runner: &Runner, queries: Vec<String>) -> TestResult<BatchDocument> {
-        // Ensure individual queries are valid. Helps to debug tests when writing them.
-        for q in queries.iter() {
-            run_query!(runner, q.to_string());
-        }
+    #[connector_test(schema(common_list_types), capabilities(ScalarLists))]
+    async fn should_only_batch_if_possible_list_boolean(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+                createOneTestModel(data: { id: 1, bool: [true, false] }) { id }
+            }"#
+        );
+        run_query!(
+            &runner,
+            r#"mutation {
+                createOneTestModel(data: { id: 2, bool: [false, true] }) { id }
+            }"#
+        );
 
-        // Ensure batched queries are valid
-        runner.batch(queries.clone(), false, None).await?.assert_success();
+        let queries = vec![
+            r#"query {
+                findUniqueTestModel(where: { id: 1, bool: { equals: [true, false] } }) { id, bool }
+            }"#
+            .to_string(),
+            r#"query {
+                findUniqueTestModel( where: { id: 2, bool: { equals: [false, true] } }) { id, bool }
+            }"#
+            .to_string(),
+        ];
 
-        let doc = GraphqlBody::Multi(MultiQuery::new(
-            queries.into_iter().map(Into::into).collect(),
-            false,
-            None,
-        ))
-        .into_doc()
-        .unwrap();
-        let batch = match doc {
-            QueryDocument::Multi(batch) => batch.compact(runner.query_schema()),
-            _ => unreachable!(),
-        };
+        // COMPACT: Queries use scalar list
+        let doc = compact_batch(&runner, queries.clone()).await?;
+        assert!(doc.is_compact());
 
-        Ok(batch.compact(runner.query_schema()))
+        let batch_results = runner.batch(queries, false, None).await?;
+        insta::assert_snapshot!(
+            batch_results.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueTestModel":{"id":1,"bool":[true,false]}}},{"data":{"findUniqueTestModel":{"id":2,"bool":[false,true]}}}]}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_23343() -> String {
+        let schema = indoc! { r#"
+            model Post {
+                id       Int
+                tenantId String
+                userId   Int
+                text     String
+
+                @@unique([tenantId, userId])
+            }
+        "# };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_23343))]
+    async fn batch_23343(runner: Runner) -> TestResult<()> {
+        create_test_data_23343(&runner).await?;
+
+        let queries = vec![
+            r#"query {
+                findUniquePost(where: { tenantId_userId: { tenantId: "tenant1", userId: 1 }, tenantId: "tenant1" })
+                { id, tenantId, userId, text }}"#
+                .to_string(),
+            r#"query {
+                findUniquePost(where: { tenantId_userId: { tenantId: "tenant2", userId: 3 }, tenantId: "tenant2" })
+                { id, tenantId, userId, text }}"#
+                .to_string(),
+        ];
+
+        let batch_results = runner.batch(queries, false, None).await?;
+        insta::assert_snapshot!(
+            batch_results.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniquePost":{"id":1,"tenantId":"tenant1","userId":1,"text":"Post 1!"}}},{"data":{"findUniquePost":{"id":3,"tenantId":"tenant2","userId":3,"text":"Post 3!"}}}]}"###
+        );
+
+        Ok(())
+    }
+
+    async fn create_test_data_23343(runner: &Runner) -> TestResult<()> {
+        runner
+            .query(r#"mutation { createOnePost(data: { id: 1, tenantId: "tenant1", userId: 1, text: "Post 1!" }) { id } }"#)
+            .await?
+            .assert_success();
+
+        runner
+            .query(r#"mutation { createOnePost(data: { id: 2, tenantId: "tenant1", userId: 2, text: "Post 2!" }) { id } }"#)
+            .await?
+            .assert_success();
+
+        runner
+            .query(r#"mutation { createOnePost(data: { id: 3, tenantId: "tenant2", userId: 3, text: "Post 3!" }) { id } }"#)
+            .await?
+            .assert_success();
+
+        runner
+            .query(r#"mutation { createOnePost(data: { id: 4, tenantId: "tenant2", userId: 4, text: "Post 4!" }) { id } }"#)
+            .await?
+            .assert_success();
+
+        Ok(())
     }
 
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
