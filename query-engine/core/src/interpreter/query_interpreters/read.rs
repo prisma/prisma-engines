@@ -30,8 +30,6 @@ fn read_one(
     query: RecordQuery,
     trace_id: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
-    println!("laplab: executing record query {query:#?}");
-
     let fut = async move {
         let model = query.model;
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
@@ -44,8 +42,6 @@ fn read_one(
                 trace_id,
             )
             .await?;
-
-        println!("laplab: got single record: {record:#?}");
 
         match record {
             Some(record) if query.relation_load_strategy.is_query() => {

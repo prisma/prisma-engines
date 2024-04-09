@@ -231,7 +231,7 @@ impl<'conn> QueryInterpreter<'conn> {
                             .await?;
                         inner_env.insert(binding.name, result);
 
-                        self.log_line(level + 1, || "} ,");
+                        self.log_line(level + 1, || "},");
                     }
 
                     // the unwrapping improves the readability of the log significantly
@@ -306,10 +306,7 @@ impl<'conn> QueryInterpreter<'conn> {
                 result
             }),
 
-            Expression::Return { result } => Box::pin(async move {
-                self.log_line(level, || format!("return {result:?}"));
-                Ok(*result)
-            }),
+            Expression::Return { result } => Box::pin(async move { Ok(*result) }),
         }
     }
 
