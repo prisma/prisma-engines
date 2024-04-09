@@ -70,7 +70,7 @@ impl QueryDocumentParser {
         if let Some(exclusions) = exclusions {
             for exclusion in exclusions {
                 if resolve_field(&exclusion.name).is_none() {
-                    return Err(ValidationError::unknown_excluded_field(
+                    return Err(ValidationError::unknown_selection_field(
                         selection_path.add(exclusion.name.to_owned()).segments(),
                         conversions::schema_object_to_output_type_description(schema_object),
                     ));
