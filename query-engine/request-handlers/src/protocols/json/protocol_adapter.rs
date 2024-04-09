@@ -485,53 +485,26 @@ mod tests {
         Read(
             Selection {
                 name: "findFirstUser",
-                alias: None,
-                arguments: [],
                 nested_selections: [
                     Selection {
                         name: "id",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                     Selection {
                         name: "name",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                     Selection {
                         name: "email",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                     Selection {
                         name: "role",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                     Selection {
                         name: "roles",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                     Selection {
                         name: "tags",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                 ],
-                nested_exclusions: None,
             },
         )
         "###);
@@ -556,40 +529,22 @@ mod tests {
         Write(
             Selection {
                 name: "createOneUser",
-                alias: None,
-                arguments: [],
                 nested_selections: [
                     Selection {
                         name: "address",
-                        alias: None,
-                        arguments: [],
                         nested_selections: [
                             Selection {
                                 name: "number",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
-                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "street",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
-                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "zipCode",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
-                                nested_exclusions: None,
                             },
                         ],
-                        nested_exclusions: None,
                     },
                 ],
-                nested_exclusions: None,
             },
         )
         "###);
@@ -617,15 +572,9 @@ mod tests {
         Read(
             Selection {
                 name: "findFirstUser",
-                alias: None,
-                arguments: [],
                 nested_selections: [
                     Selection {
                         name: "id",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                 ],
                 nested_exclusions: Some(
@@ -659,90 +608,45 @@ mod tests {
         Read(
             Selection {
                 name: "findFirstPost",
-                alias: None,
-                arguments: [],
                 nested_selections: [
                     Selection {
                         name: "user",
-                        alias: None,
-                        arguments: [],
                         nested_selections: [
                             Selection {
                                 name: "id",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
-                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "name",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
-                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "email",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
-                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "role",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
-                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "roles",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
-                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "tags",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
-                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "address",
-                                alias: None,
-                                arguments: [],
                                 nested_selections: [
                                     Selection {
                                         name: "number",
-                                        alias: None,
-                                        arguments: [],
-                                        nested_selections: [],
-                                        nested_exclusions: None,
                                     },
                                     Selection {
                                         name: "street",
-                                        alias: None,
-                                        arguments: [],
-                                        nested_selections: [],
-                                        nested_exclusions: None,
                                     },
                                     Selection {
                                         name: "zipCode",
-                                        alias: None,
-                                        arguments: [],
-                                        nested_selections: [],
-                                        nested_exclusions: None,
                                     },
                                 ],
-                                nested_exclusions: None,
                             },
                         ],
-                        nested_exclusions: None,
                     },
                 ],
-                nested_exclusions: None,
             },
         )
         "###);
@@ -772,7 +676,6 @@ mod tests {
         Read(
             Selection {
                 name: "findFirstUser",
-                alias: None,
                 arguments: [
                     (
                         "where",
@@ -790,48 +693,23 @@ mod tests {
                 nested_selections: [
                     Selection {
                         name: "id",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                     Selection {
                         name: "name",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                     Selection {
                         name: "email",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                     Selection {
                         name: "role",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                     Selection {
                         name: "roles",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                     Selection {
                         name: "tags",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                 ],
-                nested_exclusions: None,
             },
         )
         "###);
@@ -864,54 +742,27 @@ mod tests {
         Read(
             Selection {
                 name: "findFirstUser",
-                alias: None,
-                arguments: [],
                 nested_selections: [
                     Selection {
                         name: "id",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                     Selection {
                         name: "name",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                     Selection {
                         name: "email",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                     Selection {
                         name: "role",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                     Selection {
                         name: "roles",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                     Selection {
                         name: "tags",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                     Selection {
                         name: "posts",
-                        alias: None,
                         arguments: [
                             (
                                 "where",
@@ -929,30 +780,16 @@ mod tests {
                         nested_selections: [
                             Selection {
                                 name: "id",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
-                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "title",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
-                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "userId",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
-                                nested_exclusions: None,
                             },
                         ],
-                        nested_exclusions: None,
                     },
                 ],
-                nested_exclusions: None,
             },
         )
         "###);
@@ -980,18 +817,11 @@ mod tests {
         Write(
             Selection {
                 name: "deleteManyUser",
-                alias: None,
-                arguments: [],
                 nested_selections: [
                     Selection {
                         name: "count",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                 ],
-                nested_exclusions: None,
             },
         )
         "###);
@@ -1019,15 +849,9 @@ mod tests {
         Write(
             Selection {
                 name: "updateOneUser",
-                alias: None,
-                arguments: [],
                 nested_selections: [
                     Selection {
                         name: "id",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                 ],
                 nested_exclusions: Some(
@@ -1066,43 +890,21 @@ mod tests {
             Write(
                 Selection {
                     name: "updateOneUser",
-                    alias: None,
-                    arguments: [],
                     nested_selections: [
                         Selection {
                             name: "id",
-                            alias: None,
-                            arguments: [],
-                            nested_selections: [],
-                            nested_exclusions: None,
                         },
                         Selection {
                             name: "name",
-                            alias: None,
-                            arguments: [],
-                            nested_selections: [],
-                            nested_exclusions: None,
                         },
                         Selection {
                             name: "role",
-                            alias: None,
-                            arguments: [],
-                            nested_selections: [],
-                            nested_exclusions: None,
                         },
                         Selection {
                             name: "roles",
-                            alias: None,
-                            arguments: [],
-                            nested_selections: [],
-                            nested_exclusions: None,
                         },
                         Selection {
                             name: "tags",
-                            alias: None,
-                            arguments: [],
-                            nested_selections: [],
-                            nested_exclusions: None,
                         },
                     ],
                     nested_exclusions: Some(
@@ -1142,36 +944,18 @@ mod tests {
             Write(
                 Selection {
                     name: "updateOneUser",
-                    alias: None,
-                    arguments: [],
                     nested_selections: [
                         Selection {
                             name: "name",
-                            alias: None,
-                            arguments: [],
-                            nested_selections: [],
-                            nested_exclusions: None,
                         },
                         Selection {
                             name: "role",
-                            alias: None,
-                            arguments: [],
-                            nested_selections: [],
-                            nested_exclusions: None,
                         },
                         Selection {
                             name: "roles",
-                            alias: None,
-                            arguments: [],
-                            nested_selections: [],
-                            nested_exclusions: None,
                         },
                         Selection {
                             name: "tags",
-                            alias: None,
-                            arguments: [],
-                            nested_selections: [],
-                            nested_exclusions: None,
                         },
                     ],
                     nested_exclusions: Some(
@@ -1217,40 +1001,22 @@ mod tests {
             Write(
                 Selection {
                     name: "updateOneUser",
-                    alias: None,
-                    arguments: [],
                     nested_selections: [
                         Selection {
                             name: "address",
-                            alias: None,
-                            arguments: [],
                             nested_selections: [
                                 Selection {
                                     name: "number",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
-                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "street",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
-                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "zipCode",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
-                                    nested_exclusions: None,
                                 },
                             ],
-                            nested_exclusions: None,
                         },
                     ],
-                    nested_exclusions: None,
                 },
             ),
         )
@@ -1281,44 +1047,23 @@ mod tests {
             Write(
                 Selection {
                     name: "updateOneUser",
-                    alias: None,
-                    arguments: [],
                     nested_selections: [
                         Selection {
                             name: "address",
-                            alias: None,
-                            arguments: [],
                             nested_selections: [
                                 Selection {
                                     name: "number",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
-                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "street",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
-                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "zipCode",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
-                                    nested_exclusions: None,
                                 },
                             ],
-                            nested_exclusions: None,
                         },
                         Selection {
                             name: "id",
-                            alias: None,
-                            arguments: [],
-                            nested_selections: [],
-                            nested_exclusions: None,
                         },
                     ],
                     nested_exclusions: Some(
@@ -1624,7 +1369,6 @@ mod tests {
             Write(
                 Selection {
                     name: "runCommandRaw",
-                    alias: None,
                     arguments: [
                         (
                             "data",
@@ -1639,8 +1383,6 @@ mod tests {
                             ),
                         ),
                     ],
-                    nested_selections: [],
-                    nested_exclusions: None,
                 },
             ),
         )
@@ -1708,54 +1450,28 @@ mod tests {
         [
             Selection {
                 name: "id",
-                alias: None,
-                arguments: [],
-                nested_selections: [],
-                nested_exclusions: None,
             },
             Selection {
                 name: "country",
-                alias: None,
-                arguments: [],
-                nested_selections: [],
-                nested_exclusions: None,
             },
             Selection {
                 name: "content",
-                alias: None,
-                arguments: [],
                 nested_selections: [
                     Selection {
                         name: "text",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
-                        nested_exclusions: None,
                     },
                     Selection {
                         name: "upvotes",
-                        alias: None,
-                        arguments: [],
                         nested_selections: [
                             Selection {
                                 name: "vote",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
-                                nested_exclusions: None,
                             },
                             Selection {
                                 name: "userId",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
-                                nested_exclusions: None,
                             },
                         ],
-                        nested_exclusions: None,
                     },
                 ],
-                nested_exclusions: None,
             },
         ]
         "###);
@@ -1790,41 +1506,24 @@ mod tests {
             Write(
                 Selection {
                     name: "createOneComment",
-                    alias: None,
-                    arguments: [],
                     nested_selections: [
                         Selection {
                             name: "content",
-                            alias: None,
-                            arguments: [],
                             nested_selections: [
                                 Selection {
                                     name: "text",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
-                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "upvotes",
-                                    alias: None,
-                                    arguments: [],
                                     nested_selections: [
                                         Selection {
                                             name: "vote",
-                                            alias: None,
-                                            arguments: [],
-                                            nested_selections: [],
-                                            nested_exclusions: None,
                                         },
                                     ],
-                                    nested_exclusions: None,
                                 },
                             ],
-                            nested_exclusions: None,
                         },
                     ],
-                    nested_exclusions: None,
                 },
             ),
         )
@@ -1938,69 +1637,36 @@ mod tests {
             Write(
                 Selection {
                     name: "createOneUser",
-                    alias: None,
-                    arguments: [],
                     nested_selections: [
                         Selection {
                             name: "billingAddress",
-                            alias: None,
-                            arguments: [],
                             nested_selections: [
                                 Selection {
                                     name: "number",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
-                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "street",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
-                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "zipCode",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
-                                    nested_exclusions: None,
                                 },
                             ],
-                            nested_exclusions: None,
                         },
                         Selection {
                             name: "shippingAddress",
-                            alias: None,
-                            arguments: [],
                             nested_selections: [
                                 Selection {
                                     name: "number",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
-                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "street",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
-                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "zipCode",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
-                                    nested_exclusions: None,
                                 },
                             ],
-                            nested_exclusions: None,
                         },
                     ],
-                    nested_exclusions: None,
                 },
             ),
         )
@@ -2066,99 +1732,52 @@ mod tests {
             Write(
                 Selection {
                     name: "createOneUser",
-                    alias: None,
-                    arguments: [],
                     nested_selections: [
                         Selection {
                             name: "billingAddress",
-                            alias: None,
-                            arguments: [],
                             nested_selections: [
                                 Selection {
                                     name: "streetAddress",
-                                    alias: None,
-                                    arguments: [],
                                     nested_selections: [
                                         Selection {
                                             name: "streetName",
-                                            alias: None,
-                                            arguments: [],
-                                            nested_selections: [],
-                                            nested_exclusions: None,
                                         },
                                         Selection {
                                             name: "houseNumber",
-                                            alias: None,
-                                            arguments: [],
-                                            nested_selections: [],
-                                            nested_exclusions: None,
                                         },
                                     ],
-                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "zipCode",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
-                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "city",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
-                                    nested_exclusions: None,
                                 },
                             ],
-                            nested_exclusions: None,
                         },
                         Selection {
                             name: "shippingAddress",
-                            alias: None,
-                            arguments: [],
                             nested_selections: [
                                 Selection {
                                     name: "streetAddress",
-                                    alias: None,
-                                    arguments: [],
                                     nested_selections: [
                                         Selection {
                                             name: "streetName",
-                                            alias: None,
-                                            arguments: [],
-                                            nested_selections: [],
-                                            nested_exclusions: None,
                                         },
                                         Selection {
                                             name: "houseNumber",
-                                            alias: None,
-                                            arguments: [],
-                                            nested_selections: [],
-                                            nested_exclusions: None,
                                         },
                                     ],
-                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "zipCode",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
-                                    nested_exclusions: None,
                                 },
                                 Selection {
                                     name: "city",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
-                                    nested_exclusions: None,
                                 },
                             ],
-                            nested_exclusions: None,
                         },
                     ],
-                    nested_exclusions: None,
                 },
             ),
         )

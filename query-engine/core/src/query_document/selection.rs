@@ -6,13 +6,39 @@ use std::iter;
 
 pub type SelectionArgument = (String, ArgumentValue);
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Selection {
     name: String,
     alias: Option<String>,
     arguments: Vec<(String, ArgumentValue)>,
     nested_selections: Vec<Selection>,
     nested_exclusions: Option<Vec<Exclusion>>,
+}
+
+impl std::fmt::Debug for Selection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut strct = f.debug_struct("Selection");
+
+        strct.field("name", &self.name);
+
+        if self.alias.is_some() {
+            strct.field("alias", &self.alias);
+        }
+
+        if !self.arguments().is_empty() {
+            strct.field("arguments", &self.arguments);
+        }
+
+        if !self.nested_selections().is_empty() {
+            strct.field("nested_selections", &self.nested_selections);
+        }
+
+        if self.nested_exclusions.is_some() {
+            strct.field("nested_exclusions", &self.nested_exclusions);
+        }
+
+        strct.finish()
+    }
 }
 
 /// Represents a field that's excluded.
