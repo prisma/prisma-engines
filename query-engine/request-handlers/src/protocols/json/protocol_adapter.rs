@@ -61,8 +61,6 @@ impl<'a> JsonProtocolAdapter<'a> {
             None => vec![],
         };
 
-        let all_scalars_set = query_selection.all_scalars();
-        let all_composites_set = query_selection.all_composites();
         let excluded_keys = query_selection.get_excluded_keys();
 
         let mut selection = Selection::new(field.name().clone(), None, arguments, Vec::new());
@@ -94,7 +92,6 @@ impl<'a> JsonProtocolAdapter<'a> {
                         field,
                         selection_name,
                         container,
-                        all_scalars_set,
                     )?);
                 }
                 // <field_name>: false
@@ -117,14 +114,7 @@ impl<'a> JsonProtocolAdapter<'a> {
                             })?;
 
                         let field = container.and_then(|container| container.find_field(schema_field.name()));
-                        let is_composite_field = field.as_ref().map(|f| f.is_composite()).unwrap_or(false);
                         let nested_container = field.map(|f| f.related_container());
-
-                        if is_composite_field && all_composites_set {
-                            return Err(HandlerError::query_conversion(format!(
-                                "Cannot select both '$composites: true' and a specific composite field '{selection_name}'.",
-                            )));
-                        }
 
                         selection.push_nested_selection(self.convert_selection(
                             schema_field,
@@ -273,7 +263,6 @@ impl<'a> JsonProtocolAdapter<'a> {
         parent_field: &OutputField<'a>,
         nested_field_name: String,
         container: Option<&ParentContainer>,
-        all_scalars_set: bool,
     ) -> crate::Result<Selection> {
         let nested_object_type = parent_field
             .field_type()
@@ -296,13 +285,6 @@ impl<'a> JsonProtocolAdapter<'a> {
             )?;
 
             return Ok(nested_selection);
-        }
-
-        // case for a scalar - just picking the specified field without any nested selections
-        if all_scalars_set {
-            return Err(HandlerError::query_conversion(format!(
-                "Cannot select both '$scalars: true' and a specific scalar field '{nested_field_name}'.",
-            )));
         }
 
         Ok(Selection::with_name(nested_field_name))
@@ -1080,9 +1062,57 @@ mod tests {
         let operation = JsonProtocolAdapter::new(&schema()).convert_single(query);
 
         assert_debug_snapshot!(operation, @r###"
-        Err(
-            Configuration(
-                "Cannot select both '$scalars: true' and a specific scalar field 'id'.",
+        Ok(
+            Write(
+                Selection {
+                    name: "updateOneUser",
+                    alias: None,
+                    arguments: [],
+                    nested_selections: [
+                        Selection {
+                            name: "id",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [],
+                            nested_exclusions: None,
+                        },
+                        Selection {
+                            name: "name",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [],
+                            nested_exclusions: None,
+                        },
+                        Selection {
+                            name: "role",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [],
+                            nested_exclusions: None,
+                        },
+                        Selection {
+                            name: "roles",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [],
+                            nested_exclusions: None,
+                        },
+                        Selection {
+                            name: "tags",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [],
+                            nested_exclusions: None,
+                        },
+                    ],
+                    nested_exclusions: Some(
+                        [
+                            Exclusion {
+                                name: "email",
+                            },
+                        ],
+                    ),
+                },
             ),
         )
         "###);
@@ -1183,9 +1213,45 @@ mod tests {
         let operation = JsonProtocolAdapter::new(&schema()).convert_single(query);
 
         assert_debug_snapshot!(operation, @r###"
-        Err(
-            Configuration(
-                "Cannot select both '$composites: true' and a specific composite field 'address'.",
+        Ok(
+            Write(
+                Selection {
+                    name: "updateOneUser",
+                    alias: None,
+                    arguments: [],
+                    nested_selections: [
+                        Selection {
+                            name: "address",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [
+                                Selection {
+                                    name: "number",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                    nested_exclusions: None,
+                                },
+                                Selection {
+                                    name: "street",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                    nested_exclusions: None,
+                                },
+                                Selection {
+                                    name: "zipCode",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                    nested_exclusions: None,
+                                },
+                            ],
+                            nested_exclusions: None,
+                        },
+                    ],
+                    nested_exclusions: None,
+                },
             ),
         )
         "###);
@@ -1720,9 +1786,46 @@ mod tests {
         let operation = JsonProtocolAdapter::new(&composite_schema()).convert_single(query);
 
         assert_debug_snapshot!(operation, @r###"
-        Err(
-            Configuration(
-                "Cannot select both '$composites: true' and a specific composite field 'upvotes'.",
+        Ok(
+            Write(
+                Selection {
+                    name: "createOneComment",
+                    alias: None,
+                    arguments: [],
+                    nested_selections: [
+                        Selection {
+                            name: "content",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [
+                                Selection {
+                                    name: "text",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                    nested_exclusions: None,
+                                },
+                                Selection {
+                                    name: "upvotes",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [
+                                        Selection {
+                                            name: "vote",
+                                            alias: None,
+                                            arguments: [],
+                                            nested_selections: [],
+                                            nested_exclusions: None,
+                                        },
+                                    ],
+                                    nested_exclusions: None,
+                                },
+                            ],
+                            nested_exclusions: None,
+                        },
+                    ],
+                    nested_exclusions: None,
+                },
             ),
         )
         "###);
