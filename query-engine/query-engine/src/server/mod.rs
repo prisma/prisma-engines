@@ -15,7 +15,7 @@ use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Instant;
-use tracing::{field, Instrument};
+use tracing::{field, Instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// Starts up the graphql query engine server
@@ -116,8 +116,13 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
     let tx_id = transaction_id(headers);
     let tracing_cx = get_parent_span_context(headers);
 
-    let span = info_span!("prisma:engine", user_facing = true);
-    span.set_parent(tracing_cx);
+    let span = if tx_id.is_none() {
+        let span = info_span!("prisma:engine", user_facing = true);
+        span.set_parent(tracing_cx);
+        span
+    } else {
+        Span::none()
+    };
 
     let mut traceparent = traceparent(headers);
     let mut trace_id = get_trace_id_from_traceparent(traceparent.as_deref());
