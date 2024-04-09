@@ -10,7 +10,7 @@ use serde::Deserialize;
 #[serde(untagged)]
 pub(crate) enum SchemaFileInput {
     Single(String),
-    Multiple(Vec<(String, String)>),
+    Multiple(Vec<(String, SourceFile)>),
 }
 
 impl From<SchemaFileInput> for Vec<(String, SourceFile)> {

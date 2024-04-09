@@ -29,7 +29,7 @@ fn register_panic_hook() {
 #[wasm_bindgen]
 pub fn format(schema: String, params: String) -> String {
     register_panic_hook();
-    prisma_fmt::format(&schema, &params)
+    prisma_fmt::format(schema, &params)
 }
 
 /// Docs: https://prisma.github.io/prisma-engines/doc/prisma_fmt/fn.get_config.html
