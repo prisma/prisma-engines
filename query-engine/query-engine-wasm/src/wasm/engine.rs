@@ -21,7 +21,7 @@ use request_handlers::{load_executor, RequestBody, RequestHandler};
 use serde_json::json;
 use std::{marker::PhantomData, sync::Arc};
 use tokio::sync::RwLock;
-use tracing::{field, instrument::WithSubscriber, Instrument, Level, Span};
+use tracing::{field, instrument::WithSubscriber, Instrument, Level};
 use tracing_subscriber::filter::LevelFilter;
 use wasm_bindgen::prelude::wasm_bindgen;
 
