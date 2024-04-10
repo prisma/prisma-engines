@@ -173,7 +173,7 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
         match serialized_body {
             Ok(body) => {
                 let handler = RequestHandler::new(cx.executor(), cx.query_schema(), cx.engine_protocol());
-                let mut result = handler.handle(body, tx_id, traceparent).await;
+                let mut result = handler.handle(body, tx_id, traceparent).instrument(span).await;
 
                 if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
                     let telemetry = capturer.fetch_captures().await;
@@ -183,8 +183,7 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
                     }
                 }
 
-                let json_span = tracing::info_span!("prisma:engine:response_json_serialization", user_facing = true);
-                let res = json_span.in_scope(|| build_json_response(StatusCode::OK, &result));
+                let res = build_json_response(StatusCode::OK, &result);
 
                 Ok(res)
             }
@@ -203,7 +202,7 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
         }
     };
 
-    work.instrument(span).await
+    work.await
 }
 
 /// Expose the GraphQL playground if enabled.
