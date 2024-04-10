@@ -13,6 +13,7 @@ mod validate;
 use log::*;
 use lsp_types::{Position, Range};
 use psl::parser_database::ast;
+use schema_file_input::SchemaFileInput;
 
 /// The API is modelled on an LSP [completion
 /// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_completion).
@@ -45,27 +46,49 @@ pub fn code_actions(schema: String, params: &str) -> String {
 }
 
 /// The two parameters are:
-/// - The Prisma schema to reformat, as a string.
+/// - The [`SchemaFileInput`] to reformat, as a string.
 /// - An LSP
 /// [DocumentFormattingParams](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_formatting) object, as JSON.
 ///
 /// The function returns the formatted schema, as a string.
+/// If the schema or any of the provided parameters is invalid, the function returns the original schema.
+/// This function never panics.
 ///
 /// Of the DocumentFormattingParams, we only take into account tabSize, at the moment.
-pub fn format(schema: &str, params: &str) -> String {
-    let params: lsp_types::DocumentFormattingParams = match serde_json::from_str(params) {
+pub fn format(datamodel: String, params: &str) -> String {
+    let schema: SchemaFileInput = match serde_json::from_str(&datamodel) {
         Ok(params) => params,
-        Err(err) => {
-            warn!("Error parsing DocumentFormattingParams params: {}", err);
-            return schema.to_owned();
+        Err(_) => {
+            return datamodel;
         }
     };
 
-    psl::reformat(schema, params.options.tab_size as usize).unwrap_or_else(|| schema.to_owned())
+    let params: lsp_types::DocumentFormattingParams = match serde_json::from_str(params) {
+        Ok(params) => params,
+        Err(_) => {
+            return datamodel;
+        }
+    };
+
+    let indent_width = params.options.tab_size as usize;
+
+    match schema {
+        SchemaFileInput::Single(single) => psl::reformat(&single, indent_width).unwrap_or(datamodel),
+        SchemaFileInput::Multiple(multiple) => {
+            let result = psl::reformat_multiple(multiple, indent_width);
+            serde_json::to_string(&result).unwrap_or(datamodel)
+        }
+    }
 }
 
 pub fn lint(schema: String) -> String {
-    lint::run(&schema)
+    let schema: SchemaFileInput = match serde_json::from_str(&schema) {
+        Ok(params) => params,
+        Err(serde_err) => {
+            panic!("Failed to deserialize SchemaFileInput: {serde_err}");
+        }
+    };
+    lint::run(schema)
 }
 
 /// Function that throws a human-friendly error message when the schema is invalid, following the JSON formatting
