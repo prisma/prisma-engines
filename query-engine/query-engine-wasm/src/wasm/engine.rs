@@ -188,23 +188,17 @@ impl QueryEngine {
 
             let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
 
+            let span = tracing::info_span!("prisma:engine", user_facing = true);
+            let trace_id = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+
             async move {
-                let span = if tx_id.is_none() {
-                    tracing::info_span!("prisma:engine", user_facing = true)
-                } else {
-                    Span::none()
-                };
-
-                let trace_id = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
-
                 let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
-                let response = handler
-                    .handle(query, tx_id.map(TxId::from), trace_id)
-                    .instrument(span)
-                    .await;
+                let response = handler.handle(query, tx_id.map(TxId::from), trace_id).await;
 
-                Ok(serde_json::to_string(&response)?)
+                let serde_span = tracing::info_span!("prisma:engine:response_json_serialization", user_facing = true);
+                Ok(serde_span.in_scope(|| serde_json::to_string(&response))?)
             }
+            .instrument(span)
             .await
         }
         .with_subscriber(dispatcher)
