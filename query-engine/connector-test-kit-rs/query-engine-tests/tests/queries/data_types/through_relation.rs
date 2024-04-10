@@ -304,8 +304,8 @@ mod scalar_relations {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_oid), only(Postgres))]
-    async fn pg_oid(runner: Runner) -> TestResult<()> {
+    #[connector_test(schema(schema_oid), only(Postgres, CockroachDb))]
+    async fn oid_type(runner: Runner) -> TestResult<()> {
         create_child(&runner, r#"{ childId: 1, oid: 0 }"#).await?;
         create_child(&runner, r#"{ childId: 2, oid: 1 }"#).await?;
         create_child(&runner, r#"{ childId: 3, oid: 65587 }"#).await?;
