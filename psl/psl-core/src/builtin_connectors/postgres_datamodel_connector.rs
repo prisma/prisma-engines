@@ -386,6 +386,15 @@ impl Connector for PostgresDatamodelConnector {
         }
     }
 
+    fn native_type_supports_compacting(&self, nt: Option<NativeTypeInstance>) -> bool {
+        let native_type: Option<&PostgresType> = nt.as_ref().map(|nt| nt.downcast_ref());
+
+        match native_type {
+            Some(pt) => !matches!(pt, Citext),
+            None => true,
+        }
+    }
+
     fn validate_model(&self, model: walkers::ModelWalker<'_>, _: RelationMode, errors: &mut Diagnostics) {
         for index in model.indexes() {
             validations::compatible_native_types(index, self, errors);

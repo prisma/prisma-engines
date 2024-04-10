@@ -159,7 +159,7 @@ fn run_relation_link_test_impl(
                 continue;
             }
 
-            let datamodel = render_test_datamodel(&test_db_name, template, &[], None, Default::default(), None);
+            let datamodel = render_test_datamodel(&test_db_name, template, &[], None, Default::default(), Default::default(), None);
             let (connector_tag, version) = CONFIG.test_connector().unwrap();
             let metrics = setup_metrics();
             let metrics_for_subscriber = metrics.clone();
@@ -215,6 +215,7 @@ pub fn run_connector_test<T>(
     excluded_features: &[&str],
     handler: fn() -> String,
     db_schemas: &[&str],
+    db_extensions: &[&str],
     referential_override: Option<String>,
     test_fn: T,
 ) where
@@ -235,6 +236,7 @@ pub fn run_connector_test<T>(
         excluded_features,
         handler,
         db_schemas,
+        db_extensions,
         referential_override,
         &boxify(test_fn),
     )
@@ -250,6 +252,7 @@ fn run_connector_test_impl(
     excluded_features: &[&str],
     handler: fn() -> String,
     db_schemas: &[&str],
+    db_extensions: &[&str],
     referential_override: Option<String>,
     test_fn: &dyn Fn(Runner) -> BoxFuture<'static, TestResult<()>>,
 ) {
@@ -266,6 +269,7 @@ fn run_connector_test_impl(
         excluded_features,
         referential_override,
         db_schemas,
+        db_extensions,
         None,
     );
     let (connector_tag, version) = CONFIG.test_connector().unwrap();

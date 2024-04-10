@@ -479,6 +479,50 @@ mod singular_batch {
         Ok(())
     }
 
+    fn citext_unique() -> String {
+        let schema = indoc! { r#"
+            model User {
+                #id(id, String, @id)
+                caseInsensitiveField String @unique @test.Citext
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/13534
+    #[connector_test(only(Postgres), schema(citext_unique), db_extensions("citext"))]
+    async fn repro_13534(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+            createOneUser(data: { id: "9df0f936-51d6-4c55-8e01-5144e588a8a1", caseInsensitiveField: "hello world" }) { id }
+        }"#
+        );
+
+        let queries = vec![
+            r#"{ findUniqueUser(
+                where: { caseInsensitiveField: "HELLO WORLD" }
+            ) { id, caseInsensitiveField } }"#
+                .to_string(),
+            r#"{ findUniqueUser(
+                where: { caseInsensitiveField: "HELLO WORLD" }
+            ) { id, caseInsensitiveField } }"#
+                .to_string(),
+        ];
+
+        let (res, compact_doc) = compact_batch(&runner, queries.clone()).await?;
+
+        assert!(!compact_doc.is_compact());
+
+        insta::assert_snapshot!(
+            res.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueUser":{"id":"9df0f936-51d6-4c55-8e01-5144e588a8a1","caseInsensitiveField":"hello world"}}},{"data":{"findUniqueUser":{"id":"9df0f936-51d6-4c55-8e01-5144e588a8a1","caseInsensitiveField":"hello world"}}}]}"###
+        );
+
+        Ok(())
+    }
+
     async fn compact_batch(runner: &Runner, queries: Vec<String>) -> TestResult<(QueryResult, BatchDocument)> {
         let res = runner.batch(queries.clone(), false, None).await?;
 
