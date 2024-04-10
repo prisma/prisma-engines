@@ -80,7 +80,13 @@ pub fn format(datamodel: String, params: &str) -> String {
 }
 
 pub fn lint(schema: String) -> String {
-    lint::run(&schema)
+    let schema: SchemaFileInput = match serde_json::from_str(&schema) {
+        Ok(params) => params,
+        Err(serde_err) => {
+            panic!("Failed to deserialize SchemaFileInput: {serde_err}");
+        }
+    };
+    lint::run(schema)
 }
 
 /// Function that throws a human-friendly error message when the schema is invalid, following the JSON formatting
@@ -283,7 +289,6 @@ pub fn offset_to_position(offset: usize, document: &str) -> Position {
 
 #[cfg(test)]
 mod tests {
-    use super::format;
     use lsp_types::Position;
 
     // On Windows, a newline is actually two characters.
