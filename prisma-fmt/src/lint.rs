@@ -1,5 +1,8 @@
 use crate::offsets::offset_to_lsp_offset;
-use psl::diagnostics::{DatamodelError, DatamodelWarning};
+use psl::{
+    diagnostics::{DatamodelError, DatamodelWarning},
+    ValidatedSchema,
+};
 
 use crate::schema_file_input::SchemaFileInput;
 
@@ -12,18 +15,18 @@ pub struct MiniError {
 }
 
 pub(crate) fn run(schema: SchemaFileInput) -> String {
-    let schema = match schema {
+    let validated_schema = match schema {
         SchemaFileInput::Single(file) => psl::validate(file.into()),
         SchemaFileInput::Multiple(files) => psl::validate_multi_file(files),
     };
-    let diagnostics = &schema.diagnostics;
+    let ValidatedSchema { diagnostics, db, .. } = &validated_schema;
 
     let mut mini_errors: Vec<MiniError> = diagnostics
         .errors()
         .iter()
         .map(|err: &DatamodelError| MiniError {
-            start: offset_to_lsp_offset(err.span().start, schema),
-            end: offset_to_lsp_offset(err.span().end, schema),
+            start: offset_to_lsp_offset(err.span().start, db.source(err.span().file_id)),
+            end: offset_to_lsp_offset(err.span().end, db.source(err.span().file_id)),
             text: err.message().to_string(),
             is_warning: false,
         })
@@ -33,8 +36,8 @@ pub(crate) fn run(schema: SchemaFileInput) -> String {
         .warnings()
         .iter()
         .map(|warn: &DatamodelWarning| MiniError {
-            start: offset_to_lsp_offset(warn.span().start, schema),
-            end: offset_to_lsp_offset(warn.span().end, schema),
+            start: offset_to_lsp_offset(warn.span().start, db.source(warn.span().file_id)),
+            end: offset_to_lsp_offset(warn.span().end, db.source(warn.span().file_id)),
             text: warn.message().to_owned(),
             is_warning: true,
         })
@@ -64,10 +67,11 @@ mod tests {
 
     #[test]
     fn should_return_utf16_offset() {
-        let dml = indoc! {r#"
+        let schema = indoc! {r#"
             // 🌐 ｍｕｌｔｉｂｙｔｅ
             😀
         "#};
+        let datamodel = SchemaFileInput::Single(schema.to_string());
 
         let expected = expect![[r#"
             [
@@ -79,7 +83,7 @@ mod tests {
               }
             ]"#]];
 
-        expected.assert_eq(&lint(dml));
+        expected.assert_eq(&lint(datamodel));
     }
 
     #[test]
