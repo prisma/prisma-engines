@@ -44,8 +44,6 @@ pub fn render_test_datamodel(
     let (tag, version) = CONFIG.test_connector().unwrap();
     let preview_features = render_preview_features(excluded_features);
 
-    dbg!(&preview_features);
-
     let is_multi_schema = !db_schemas.is_empty();
 
     let datasource = DatasourceBuilder::new("test")
