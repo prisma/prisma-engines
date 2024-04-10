@@ -46,15 +46,17 @@ pub fn code_actions(schema: String, params: &str) -> String {
 }
 
 /// The two parameters are:
-/// - The Prisma schema to reformat, as a string.
+/// - The [`SchemaFileInput`] to reformat, as a string.
 /// - An LSP
 /// [DocumentFormattingParams](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_formatting) object, as JSON.
 ///
 /// The function returns the formatted schema, as a string.
+/// If the schema or any of the provided parameters is invalid, the function returns the original schema.
+/// This function never panics.
 ///
 /// Of the DocumentFormattingParams, we only take into account tabSize, at the moment.
 pub fn format(datamodel: String, params: &str) -> String {
-    let schema: SchemaFileInput = match serde_json::from_str(params) {
+    let schema: SchemaFileInput = match serde_json::from_str(&datamodel) {
         Ok(params) => params,
         Err(_) => {
             return datamodel;
@@ -74,7 +76,7 @@ pub fn format(datamodel: String, params: &str) -> String {
         SchemaFileInput::Single(single) => psl::reformat(&single, indent_width).unwrap_or(datamodel),
         SchemaFileInput::Multiple(multiple) => {
             let result = psl::reformat_multiple(multiple, indent_width);
-            serde_json::to_string(&result).unwrap()
+            serde_json::to_string(&result).unwrap_or(datamodel)
         }
     }
 }
