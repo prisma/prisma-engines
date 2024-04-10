@@ -178,6 +178,14 @@ impl ScalarField {
         })
     }
 
+    pub fn can_be_compacted(&self) -> bool {
+        let connector = self.dm.schema.connector;
+
+        let nt = self.native_type().map(|nt| nt.native_type);
+
+        connector.native_type_supports_compacting(nt)
+    }
+
     pub fn parse_json_datetime(&self, value: &str) -> chrono::ParseResult<DateTime<FixedOffset>> {
         let nt = self.native_type().map(|nt| nt.native_type);
         let connector = self.dm.schema.connector;
