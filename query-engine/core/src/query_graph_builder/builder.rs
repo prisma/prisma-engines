@@ -67,7 +67,6 @@ impl<'a> QueryGraphBuilder<'a> {
             None,
             &root_object,
             root_object_fields,
-            self.query_schema,
         )?;
 
         // Because we're processing root objects, there can only be one query / mutation.
