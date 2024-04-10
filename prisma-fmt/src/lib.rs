@@ -71,7 +71,7 @@ pub fn format(datamodel: String, params: &str) -> String {
     let indent_width = params.options.tab_size as usize;
 
     match schema {
-        SchemaFileInput::Single(single) => psl::reformat(&single, indent_width).unwrap_or_else(|| datamodel),
+        SchemaFileInput::Single(single) => psl::reformat(&single, indent_width).unwrap_or(datamodel),
         SchemaFileInput::Multiple(multiple) => {
             let result = psl::reformat_multiple(multiple, indent_width);
             serde_json::to_string(&result).unwrap()

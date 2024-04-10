@@ -17,10 +17,7 @@ impl From<SchemaFileInput> for Vec<(String, SourceFile)> {
     fn from(value: SchemaFileInput) -> Self {
         match value {
             SchemaFileInput::Single(content) => vec![("schema.prisma".to_owned(), content.into())],
-            SchemaFileInput::Multiple(file_list) => file_list
-                .into_iter()
-                .map(|(filename, content)| (filename, content.into()))
-                .collect(),
+            SchemaFileInput::Multiple(file_list) => file_list,
         }
     }
 }
