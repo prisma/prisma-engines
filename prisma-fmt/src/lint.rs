@@ -9,7 +9,7 @@ pub struct MiniError {
     is_warning: bool,
 }
 
-pub fn run(schema: &str) -> String {
+pub(crate) fn run(schema: &str) -> String {
     let validated_schema = psl::validate(schema.into());
     let diagnostics = &validated_schema.diagnostics;
 

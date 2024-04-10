@@ -5,7 +5,7 @@ use psl::parser_database::ast::Span;
 /// offsets. This function converts from an LSP position to a pest byte offset. Returns `None` if
 /// the position has a line past the end of the document, or a character position past the end of
 /// the line.
-pub fn position_to_offset(position: &Position, document: &str) -> Option<usize> {
+pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<usize> {
     let mut offset = 0;
     let mut line_offset = position.line;
     let mut character_offset = position.character as i64;
@@ -43,7 +43,7 @@ pub fn position_to_offset(position: &Position, document: &str) -> Option<usize> 
 
 #[track_caller]
 /// Converts an LSP range to a span.
-pub fn range_to_span(range: Range, document: &str) -> Span {
+pub(crate) fn range_to_span(range: Range, document: &str) -> Span {
     let start = position_to_offset(&range.start, document).unwrap();
     let end = position_to_offset(&range.end, document).unwrap();
 
@@ -51,12 +51,12 @@ pub fn range_to_span(range: Range, document: &str) -> Span {
 }
 
 /// Gives the LSP position right after the given span.
-pub fn position_after_span(span: Span, document: &str) -> Position {
+pub(crate) fn position_after_span(span: Span, document: &str) -> Position {
     offset_to_position(span.end - 1, document)
 }
 
 /// Converts the byte offset to the offset used in the LSP, which is the number of the UTF-16 code unit.
-pub fn offset_to_lsp_offset(offset: usize, document: &str) -> usize {
+pub(crate) fn offset_to_lsp_offset(offset: usize, document: &str) -> usize {
     let mut current_offset = 0;
     let mut current_lsp_offset = 0;
 
