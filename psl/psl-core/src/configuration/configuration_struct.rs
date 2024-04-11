@@ -14,6 +14,12 @@ pub struct Configuration {
 }
 
 impl Configuration {
+    pub fn extend(&mut self, configuration: Configuration) {
+        self.generators.extend(configuration.generators);
+        self.datasources.extend(configuration.datasources);
+        self.warnings.extend(configuration.warnings);
+    }
+
     pub fn validate_that_one_datasource_is_provided(&self) -> Result<(), Diagnostics> {
         if self.datasources.is_empty() {
             Err(DatamodelError::new_validation_error(

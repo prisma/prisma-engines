@@ -38,20 +38,20 @@ mod names;
 mod relations;
 mod types;
 
+use self::{context::Context, interner::StringId, relations::Relations, types::Types};
 pub use coerce_expression::{coerce, coerce_array, coerce_opt};
 pub use diagnostics::FileId;
+use diagnostics::{DatamodelError, Diagnostics};
+pub use files::Files;
 pub use ids::*;
 pub use names::is_reserved_type_name;
+use names::Names;
 pub use relations::{ManyToManyRelationId, ReferentialAction, RelationId};
 pub use schema_ast::{ast, SourceFile};
 pub use types::{
     IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, RelationFieldId, ScalarFieldId, ScalarFieldType,
     ScalarType, SortOrder,
 };
-
-use self::{context::Context, files::Files, interner::StringId, relations::Relations, types::Types};
-use diagnostics::{DatamodelError, Diagnostics};
-use names::Names;
 
 /// ParserDatabase is a container for a Schema AST, together with information
 /// gathered during schema validation. Each validation step enriches the
@@ -88,16 +88,7 @@ impl ParserDatabase {
 
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
     pub fn new(schemas: Vec<(String, schema_ast::SourceFile)>, diagnostics: &mut Diagnostics) -> Self {
-        let asts = schemas
-            .into_iter()
-            .enumerate()
-            .map(|(file_idx, (path, source))| {
-                let id = FileId(file_idx as u32);
-                let ast = schema_ast::parse_schema(source.as_str(), diagnostics, id);
-                (path, source, ast)
-            })
-            .collect();
-        let asts = Files(asts);
+        let asts = Files::new(schemas, diagnostics);
 
         let mut interner = Default::default();
         let mut names = Default::default();
@@ -159,6 +150,12 @@ impl ParserDatabase {
             types,
             relations,
         }
+    }
+
+    /// Render the given diagnostics (warnings + errors) into a String.
+    /// This method is multi-file aware.
+    pub fn render_diagnostics(&self, diagnostics: &Diagnostics) -> String {
+        self.asts.render_diagnostics(diagnostics)
     }
 
     /// The parsed AST. This methods asserts that there is a single prisma schema file. As

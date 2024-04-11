@@ -29,7 +29,7 @@ pub use set_config_dir::set_config_dir;
 
 use self::validate::{datasource_loader, generator_loader};
 use diagnostics::Diagnostics;
-use parser_database::{ast, ParserDatabase, SourceFile};
+use parser_database::{ast, Files, ParserDatabase, SourceFile};
 
 /// The collection of all available connectors.
 pub type ConnectorRegistry<'a> = &'a [&'static dyn datamodel_connector::Connector];
@@ -54,18 +54,7 @@ impl ValidatedSchema {
     }
 
     pub fn render_own_diagnostics(&self) -> String {
-        self.render_diagnostics(&self.diagnostics)
-    }
-
-    pub fn render_diagnostics(&self, diagnostics: &Diagnostics) -> String {
-        let mut out = Vec::new();
-
-        for error in diagnostics.errors() {
-            let (file_name, source, _) = &self.db[error.span().file_id];
-            error.pretty_print(&mut out, file_name, source.as_str()).unwrap();
-        }
-
-        String::from_utf8(out).unwrap()
+        self.db.render_diagnostics(&self.diagnostics)
     }
 }
 
@@ -147,6 +136,26 @@ pub fn parse_configuration(
     let ast = schema_ast::parse_schema(schema, &mut diagnostics, diagnostics::FileId::ZERO);
     let out = validate_configuration(&ast, &mut diagnostics, connectors);
     diagnostics.to_result().map(|_| out)
+}
+
+pub fn parse_configuration_multi_file(
+    files: Vec<(String, SourceFile)>,
+    connectors: ConnectorRegistry<'_>,
+) -> Result<(Files, Configuration), (Files, diagnostics::Diagnostics)> {
+    let mut diagnostics = Diagnostics::default();
+    let mut configuration = Configuration::default();
+
+    let asts = Files::new(files, &mut diagnostics);
+
+    for (_, _, _, ast) in asts.iter() {
+        let out = validate_configuration(ast, &mut diagnostics, connectors);
+        configuration.extend(out);
+    }
+
+    match diagnostics.to_result() {
+        Ok(_) => Ok((asts, configuration)),
+        Err(err) => Err((asts, err)),
+    }
 }
 
 fn validate_configuration(
