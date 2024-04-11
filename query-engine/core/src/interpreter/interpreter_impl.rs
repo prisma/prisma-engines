@@ -306,7 +306,10 @@ impl<'conn> QueryInterpreter<'conn> {
                 result
             }),
 
-            Expression::Return { result } => Box::pin(async move { Ok(*result) }),
+            Expression::Return { result } => Box::pin(async move {
+                self.log_line(level, || "returnValue");
+                Ok(*result)
+            }),
         }
     }
 
