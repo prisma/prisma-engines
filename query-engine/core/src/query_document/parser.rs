@@ -14,7 +14,52 @@ pub(crate) struct QueryDocumentParser {
     default_now: PrismaValue,
 }
 
-type ResolveField<'a, 'b> = &'b dyn Fn(&str) -> Option<OutputField<'a>>;
+type FieldResolver<'a, 'b> = &'b dyn Fn(&str) -> Option<OutputField<'a>>;
+
+#[derive(Clone)]
+pub(crate) struct ParserContext<'a, 'b> {
+    selection_path: Path,
+    argument_path: Path,
+    field_resolver: FieldResolver<'a, 'b>,
+}
+
+impl<'a, 'b> fmt::Debug for ParserContext<'a, 'b> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ParserContext")
+            .field("selection_path", &self.selection_path)
+            .field("argument_path", &self.argument_path)
+            .field("resolve_fields", &"<field resolver>")
+            .finish()
+    }
+}
+
+impl<'a, 'b> ParserContext<'a, 'b> {
+    pub(crate) fn new(field_resolver: FieldResolver<'a, 'b>) -> Self {
+        Self {
+            selection_path: Default::default(),
+            argument_path: Default::default(),
+            field_resolver,
+        }
+    }
+
+    pub(crate) fn add_selection_path(self, path: String) -> Self {
+        ParserContext {
+            selection_path: self.selection_path.add(path),
+            ..self
+        }
+    }
+
+    pub(crate) fn add_argument_path(self, path: String) -> Self {
+        ParserContext {
+            argument_path: self.argument_path.add(path),
+            ..self
+        }
+    }
+
+    pub(crate) fn set_field_resolver(self, field_resolver: FieldResolver<'a, 'b>) -> Self {
+        ParserContext { field_resolver, ..self }
+    }
+}
 
 impl QueryDocumentParser {
     pub(crate) fn new(default_now: PrismaValue) -> Self {
@@ -27,18 +72,11 @@ impl QueryDocumentParser {
         selections: &[Selection],
         exclusions: Option<&[Exclusion]>,
         schema_object: &ObjectType<'a>,
-        fields: ResolveField<'a, '_>,
-        query_schema: &'a QuerySchema,
+        field_resolver: FieldResolver<'a, '_>,
     ) -> QueryParserResult<ParsedObject<'a>> {
-        self.parse_object(
-            Path::default(),
-            Path::default(),
-            selections,
-            exclusions,
-            schema_object,
-            Some(fields),
-            query_schema,
-        )
+        let ctx = ParserContext::new(field_resolver);
+
+        self.parse_object(selections, exclusions, schema_object, ctx)
     }
 
     /// Parses and validates a set of selections against a schema (output) object.
@@ -49,29 +87,25 @@ impl QueryDocumentParser {
     #[allow(clippy::too_many_arguments)]
     fn parse_object<'a>(
         &self,
-        selection_path: Path,
-        argument_path: Path,
         selections: &[Selection],
         exclusions: Option<&[Exclusion]>,
         schema_object: &ObjectType<'a>,
-        resolve_field: Option<ResolveField<'a, '_>>,
-        query_schema: &'a QuerySchema,
+        ctx: ParserContext<'a, '_>,
     ) -> QueryParserResult<ParsedObject<'a>> {
         if selections.is_empty() {
             return Err(ValidationError::empty_selection(
-                selection_path.segments(),
+                ctx.selection_path.segments(),
                 conversions::schema_object_to_output_type_description(schema_object),
             ));
         }
 
-        let resolve_adhoc = move |name: &str| schema_object.find_field(name).cloned();
-        let resolve_field = resolve_field.unwrap_or(&resolve_adhoc);
+        let field_resolver = ctx.field_resolver;
 
         if let Some(exclusions) = exclusions {
             for exclusion in exclusions {
-                if resolve_field(&exclusion.name).is_none() {
+                if field_resolver(&exclusion.name).is_none() {
                     return Err(ValidationError::unknown_selection_field(
-                        selection_path.add(exclusion.name.to_owned()).segments(),
+                        ctx.selection_path.add(exclusion.name.to_owned()).segments(),
                         conversions::schema_object_to_output_type_description(schema_object),
                     ));
                 }
@@ -82,16 +116,10 @@ impl QueryDocumentParser {
             .iter()
             .map(|selection| {
                 let field_name = selection.name();
-                match resolve_field(field_name) {
-                    Some(field) => self.parse_field(
-                        selection_path.clone(),
-                        argument_path.clone(),
-                        selection,
-                        field,
-                        query_schema,
-                    ),
+                match field_resolver(field_name) {
+                    Some(field) => self.parse_field(selection, field, ctx.clone()),
                     None => Err(ValidationError::unknown_selection_field(
-                        selection_path.add(field_name.to_owned()).segments(),
+                        ctx.selection_path.add(field_name.to_owned()).segments(),
                         conversions::schema_object_to_output_type_description(schema_object),
                     )),
                 }
@@ -103,76 +131,64 @@ impl QueryDocumentParser {
     /// Parses and validates a selection against a schema (output) field.
     fn parse_field<'a>(
         &self,
-        selection_path: Path,
-        argument_path: Path,
         selection: &Selection,
         schema_field: OutputField<'a>,
-        query_schema: &'a QuerySchema,
+        ctx: ParserContext<'a, '_>,
     ) -> QueryParserResult<FieldPair<'a>> {
-        let selection_path = selection_path.add(schema_field.name().clone().into_owned());
+        let ctx = ctx.add_selection_path(schema_field.name().clone().into_owned());
 
         // Parse and validate all provided arguments for the field
-        self.parse_arguments(
-            selection_path.clone(),
-            argument_path.clone(),
-            &schema_field,
-            selection.arguments(),
-            query_schema,
-        )
-        .and_then(move |arguments| {
-            if !selection.nested_selections().is_empty() && schema_field.field_type().is_scalar() {
-                return Err(ValidationError::selection_set_on_scalar(
-                    selection.name().to_string(),
-                    selection_path.segments(),
-                ));
-            } else {
-                // If the output type of the field is an object type of any form, validate the sub selection as well.
-                let nested_fields = schema_field.field_type().as_object_type().map(|obj| {
-                    self.parse_object(
-                        selection_path.clone(),
-                        argument_path.clone(),
-                        selection.nested_selections(),
-                        selection.nested_exclusions(),
-                        obj,
-                        None,
-                        query_schema,
-                    )
-                });
+        self.parse_arguments(&schema_field, selection.arguments(), ctx.clone())
+            .and_then(move |arguments| {
+                if !selection.nested_selections().is_empty() && schema_field.field_type().is_scalar() {
+                    Err(ValidationError::selection_set_on_scalar(
+                        selection.name().to_string(),
+                        ctx.selection_path.segments(),
+                    ))
+                } else {
+                    // If the output type of the field is an object type of any form, validate the sub selection as well.
+                    let nested_fields = schema_field.field_type().as_object_type().map(|obj| {
+                        self.parse_object(
+                            selection.nested_selections(),
+                            selection.nested_exclusions(),
+                            obj,
+                            ctx.set_field_resolver(&|name: &str| obj.find_field(name).cloned()),
+                        )
+                    });
 
-                let nested_fields = match nested_fields {
-                    Some(sub) => Some(sub?),
-                    None => None,
-                };
+                    let nested_fields = match nested_fields {
+                        Some(sub) => Some(sub?),
+                        None => None,
+                    };
 
-                let parsed_field = ParsedField {
-                    name: selection.name().to_string(),
-                    alias: selection.alias().clone(),
-                    arguments,
-                    nested_fields,
-                };
+                    let parsed_field = ParsedField {
+                        name: selection.name().to_string(),
+                        alias: selection.alias().clone(),
+                        arguments,
+                        nested_fields,
+                    };
 
-                Ok(FieldPair {
-                    parsed_field,
-                    schema_field,
-                })
-            }
-        })
+                    Ok(FieldPair {
+                        parsed_field,
+                        schema_field,
+                    })
+                }
+            })
     }
 
     /// Parses and validates selection arguments against a schema defined field.
     fn parse_arguments<'a>(
         &self,
-        selection_path: Path,
-        argument_path: Path,
         schema_field: &OutputField<'a>,
         given_arguments: &[(String, ArgumentValue)],
-        query_schema: &'a QuerySchema,
+        ctx: ParserContext<'a, '_>,
     ) -> QueryParserResult<Vec<ParsedArgument<'a>>> {
         for (name, _) in given_arguments {
             if !schema_field.arguments().iter().any(|arg| arg.name == name.as_str()) {
-                let argument_path = argument_path.add(name.clone());
+                let argument_path = ctx.argument_path.add(name.clone());
+
                 return Err(ValidationError::unknown_argument(
-                    selection_path.segments(),
+                    ctx.selection_path.segments(),
                     argument_path.segments(),
                     conversions::schema_arguments_to_argument_description_vec(schema_field.arguments().iter().cloned()),
                 ));
@@ -190,29 +206,22 @@ impl QueryDocumentParser {
                     .find(|given_argument| given_argument.0 == input_field.name)
                     .cloned();
 
-                let argument_path = argument_path.add(input_field.name.clone().into_owned());
+                let ctx = ctx.clone().add_argument_path(input_field.name.clone().into_owned());
 
                 // If optional and not present ignore the field.
                 // If present, parse normally.
                 // If not present but required, throw a validation error.
                 match selection_arg {
-                    Some((_, value)) => Some(
-                        self.parse_input_value(
-                            selection_path.clone(),
-                            argument_path,
-                            value,
-                            input_field.field_types(),
-                            query_schema,
-                        )
-                        .map(|value| ParsedArgument {
+                    Some((_, value)) => Some(self.parse_input_value(value, input_field.field_types(), ctx).map(
+                        |value| ParsedArgument {
                             name: input_field.name.clone().into_owned(),
                             value,
-                        }),
-                    ),
+                        },
+                    )),
                     None if !input_field.is_required() => None,
                     _ => Some(Err(ValidationError::required_argument_missing(
-                        selection_path.segments(),
-                        argument_path.segments(),
+                        ctx.selection_path.segments(),
+                        ctx.argument_path.segments(),
                         &conversions::input_types_to_input_type_descriptions(input_field.field_types()),
                     ))),
                 }
@@ -226,11 +235,9 @@ impl QueryDocumentParser {
     /// Matching is done in order of definition on the input type. First matching type wins.
     fn parse_input_value<'a>(
         &self,
-        selection_path: Path,
-        argument_path: Path,
         value: ArgumentValue,
         possible_input_types: &[InputType<'a>],
-        query_schema: &'a QuerySchema,
+        ctx: ParserContext<'a, '_>,
     ) -> QueryParserResult<ParsedInputValue<'a>> {
         let mut failures = Vec::new();
 
@@ -255,11 +262,7 @@ impl QueryDocumentParser {
                 (value, InputType::<'a>::Scalar(ScalarType::Json))
                     if value.should_be_parsed_as_json() && get_engine_protocol().is_json() =>
                 {
-                    return Ok(ParsedInputValue::Single(self.to_json(
-                        &selection_path,
-                        &argument_path,
-                        &value,
-                    )?))
+                    return Ok(ParsedInputValue::Single(self.to_json(&value, &ctx)?))
                 }
                 // With the JSON protocol, JSON values are sent as deserialized values.
                 // This means that a JsonList([1, 2]) will be coerced as an `ArgumentValue::List([1, 2])`.
@@ -269,14 +272,14 @@ impl QueryDocumentParser {
                 {
                     let json_val = serde_json::to_value(list.clone()).map_err(|err| {
                         ValidationError::invalid_argument_value(
-                            selection_path.segments(),
-                            argument_path.segments(),
+                            ctx.selection_path.segments(),
+                            ctx.argument_path.segments(),
                             format!("{list:?}"),
                             "JSON array",
                             Some(Box::new(err)),
                         )
                     })?;
-                    let json_list = self.parse_json_list_from_value(&selection_path, &argument_path, json_val)?;
+                    let json_list = self.parse_json_list_from_value(json_val, &ctx)?;
 
                     return Ok(ParsedInputValue::Single(json_list));
                 }
@@ -286,31 +289,33 @@ impl QueryDocumentParser {
                         return Ok(ParsedInputValue::Single(PrismaValue::Null))
                     }
                     (PrismaValue::Null, input_type) => try_this!(Err(ValidationError::required_argument_missing(
-                        selection_path.segments(),
-                        argument_path.segments(),
+                        ctx.selection_path.segments(),
+                        ctx.argument_path.segments(),
                         &conversions::input_types_to_input_type_descriptions(&[input_type.clone()],),
                     ))),
                     // Scalar handling
-                    (pv, InputType::Scalar(st)) => try_this!(self
-                        .parse_scalar(&selection_path, &argument_path, pv, *st, &value)
-                        .map(ParsedInputValue::Single)),
+                    (pv, InputType::Scalar(st)) => {
+                        try_this!(self
+                            .parse_scalar(pv, *st, &value, ctx.clone())
+                            .map(ParsedInputValue::Single))
+                    }
 
                     // Enum handling
                     (pv @ PrismaValue::Enum(_), InputType::Enum(et)) => {
-                        try_this!(self.parse_enum(&selection_path, &argument_path, pv, et))
+                        try_this!(self.parse_enum(pv, et, ctx.clone()))
                     }
                     (pv @ PrismaValue::String(_), InputType::Enum(et)) => {
-                        try_this!(self.parse_enum(&selection_path, &argument_path, pv, et))
+                        try_this!(self.parse_enum(pv, et, ctx.clone()))
                     }
                     (pv @ PrismaValue::Boolean(_), InputType::Enum(et)) => {
-                        try_this!(self.parse_enum(&selection_path, &argument_path, pv, et))
+                        try_this!(self.parse_enum(pv, et, ctx.clone()))
                     }
                     // Invalid combinations
                     (_, input_type) => try_this!(Err(ValidationError::invalid_argument_type(
-                        selection_path.segments(),
-                        argument_path.segments(),
+                        ctx.selection_path.segments(),
+                        ctx.argument_path.segments(),
                         conversions::input_type_to_argument_description(
-                            argument_path.last().unwrap_or_default(),
+                            ctx.argument_path.last().unwrap_or_default(),
                             input_type,
                         ),
                         conversions::argument_value_to_type_name(&value),
@@ -318,27 +323,25 @@ impl QueryDocumentParser {
                 },
 
                 // List handling.
-                (ArgumentValue::List(values), InputType::List(l)) => try_this!(self
-                    .parse_list(&selection_path, &argument_path, values.clone(), l, query_schema)
-                    .map(ParsedInputValue::List)),
+                (ArgumentValue::List(values), InputType::List(l)) => {
+                    try_this!(self
+                        .parse_list(values.clone(), l, ctx.clone())
+                        .map(ParsedInputValue::List))
+                }
 
                 // Object handling
-                (ArgumentValue::Object(o) | ArgumentValue::FieldRef(o), InputType::Object(obj)) => try_this!(self
-                    .parse_input_object(
-                        selection_path.clone(),
-                        argument_path.clone(),
-                        o.clone(),
-                        obj,
-                        query_schema,
-                    )
-                    .map(ParsedInputValue::Map)),
+                (ArgumentValue::Object(o) | ArgumentValue::FieldRef(o), InputType::Object(obj)) => {
+                    try_this!(self
+                        .parse_input_object(o.clone(), obj, ctx.clone())
+                        .map(ParsedInputValue::Map))
+                }
 
                 // Invalid combinations
                 (_, input_type) => try_this!(Err(ValidationError::invalid_argument_type(
-                    selection_path.segments(),
-                    argument_path.segments(),
+                    ctx.selection_path.segments(),
+                    ctx.argument_path.segments(),
                     conversions::input_type_to_argument_description(
-                        argument_path.last().unwrap_or_default(),
+                        ctx.argument_path.last().unwrap_or_default(),
                         input_type,
                     ),
                     conversions::argument_value_to_type_name(&value),
@@ -356,11 +359,10 @@ impl QueryDocumentParser {
     /// Attempts to parse given query value into a concrete PrismaValue based on given scalar type.
     fn parse_scalar(
         &self,
-        selection_path: &Path,
-        argument_path: &Path,
         value: PrismaValue,
         scalar_type: ScalarType,
         argument_value: &ArgumentValue,
+        ctx: ParserContext<'_, '_>,
     ) -> QueryParserResult<PrismaValue> {
         match (value, scalar_type) {
             // Identity matchers
@@ -374,21 +376,15 @@ impl QueryDocumentParser {
             (PrismaValue::Null, ScalarType::Null) => Ok(PrismaValue::Null),
 
             // String coercion matchers
-            (PrismaValue::String(s), ScalarType::JsonList) => {
-                self.parse_json_list_from_str(selection_path, argument_path, &s)
+            (PrismaValue::String(s), ScalarType::JsonList) => self.parse_json_list_from_str(&s, &ctx),
+            (PrismaValue::String(s), ScalarType::Bytes) => self.parse_bytes(s, &ctx),
+            (PrismaValue::String(s), ScalarType::Decimal) => self.parse_decimal(s, &ctx),
+            (PrismaValue::String(s), ScalarType::BigInt) => self.parse_bigint(s, &ctx),
+            (PrismaValue::String(s), ScalarType::UUID) => self.parse_uuid(s.as_str(), &ctx).map(PrismaValue::Uuid),
+            (PrismaValue::String(s), ScalarType::Json) => Ok(PrismaValue::Json(self.parse_json(&s, &ctx).map(|_| s)?)),
+            (PrismaValue::String(s), ScalarType::DateTime) => {
+                self.parse_datetime(s.as_str(), &ctx).map(PrismaValue::DateTime)
             }
-            (PrismaValue::String(s), ScalarType::Bytes) => self.parse_bytes(selection_path, argument_path, s),
-            (PrismaValue::String(s), ScalarType::Decimal) => self.parse_decimal(selection_path, argument_path, s),
-            (PrismaValue::String(s), ScalarType::BigInt) => self.parse_bigint(selection_path, argument_path, s),
-            (PrismaValue::String(s), ScalarType::UUID) => self
-                .parse_uuid(selection_path, argument_path, s.as_str())
-                .map(PrismaValue::Uuid),
-            (PrismaValue::String(s), ScalarType::Json) => Ok(PrismaValue::Json(
-                self.parse_json(selection_path, argument_path, &s).map(|_| s)?,
-            )),
-            (PrismaValue::String(s), ScalarType::DateTime) => self
-                .parse_datetime(selection_path, argument_path, s.as_str())
-                .map(PrismaValue::DateTime),
 
             // Int coercion matchers
             (PrismaValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
@@ -402,8 +398,8 @@ impl QueryDocumentParser {
             (PrismaValue::Float(f), ScalarType::Int) => match f.to_i64() {
                 Some(converted) => Ok(PrismaValue::Int(converted)),
                 None => Err(ValidationError::value_too_large(
-                    selection_path.segments(),
-                    argument_path.segments(),
+                    ctx.selection_path.segments(),
+                    ctx.argument_path.segments(),
                     f.to_string(),
                 )),
             },
@@ -413,10 +409,10 @@ impl QueryDocumentParser {
 
             // All other combinations are value type mismatches.
             (_, _) => Err(ValidationError::invalid_argument_type(
-                selection_path.segments(),
-                argument_path.segments(),
+                ctx.selection_path.segments(),
+                ctx.argument_path.segments(),
                 conversions::input_type_to_argument_description(
-                    argument_path.last().unwrap_or_default(),
+                    ctx.argument_path.last().unwrap_or_default(),
                     &InputType::Scalar(scalar_type),
                 ),
                 conversions::argument_value_to_type_name(argument_value),
@@ -424,16 +420,11 @@ impl QueryDocumentParser {
         }
     }
 
-    fn parse_datetime(
-        &self,
-        selection_path: &Path,
-        argument_path: &Path,
-        s: &str,
-    ) -> QueryParserResult<DateTime<FixedOffset>> {
+    fn parse_datetime(&self, s: &str, ctx: &ParserContext<'_, '_>) -> QueryParserResult<DateTime<FixedOffset>> {
         query_structure::parse_datetime(s).map_err(|err| {
             ValidationError::invalid_argument_value(
-                selection_path.segments(),
-                argument_path.segments(),
+                ctx.selection_path.segments(),
+                ctx.argument_path.segments(),
                 s.to_string(),
                 "ISO-8601 DateTime",
                 Some(Box::new(err)),
@@ -441,13 +432,13 @@ impl QueryDocumentParser {
         })
     }
 
-    fn parse_bytes(&self, selection_path: &Path, argument_path: &Path, s: String) -> QueryParserResult<PrismaValue> {
+    fn parse_bytes(&self, s: String, ctx: &ParserContext<'_, '_>) -> QueryParserResult<PrismaValue> {
         query_structure::decode_bytes(&s)
             .map(PrismaValue::Bytes)
             .map_err(|err| {
                 ValidationError::invalid_argument_value(
-                    selection_path.segments(),
-                    argument_path.segments(),
+                    ctx.selection_path.segments(),
+                    ctx.argument_path.segments(),
                     s.to_string(),
                     "base64 String",
                     Some(Box::new(err)),
@@ -455,16 +446,11 @@ impl QueryDocumentParser {
             })
     }
 
-    fn parse_decimal(
-        &self,
-        selection_path: &Path,
-        argument_path: &Path,
-        value: String,
-    ) -> QueryParserResult<PrismaValue> {
+    fn parse_decimal(&self, value: String, ctx: &ParserContext<'_, '_>) -> QueryParserResult<PrismaValue> {
         BigDecimal::from_str(&value).map(PrismaValue::Float).map_err(|err| {
             ValidationError::invalid_argument_value(
-                selection_path.segments(),
-                argument_path.segments(),
+                ctx.selection_path.segments(),
+                ctx.argument_path.segments(),
                 value,
                 "decimal String",
                 Some(Box::new(err)),
@@ -472,16 +458,11 @@ impl QueryDocumentParser {
         })
     }
 
-    fn parse_bigint(
-        &self,
-        selection_path: &Path,
-        argument_path: &Path,
-        value: String,
-    ) -> QueryParserResult<PrismaValue> {
+    fn parse_bigint(&self, value: String, ctx: &ParserContext<'_, '_>) -> QueryParserResult<PrismaValue> {
         value.parse::<i64>().map(PrismaValue::BigInt).map_err(|err| {
             ValidationError::invalid_argument_value(
-                selection_path.segments(),
-                argument_path.segments(),
+                ctx.selection_path.segments(),
+                ctx.argument_path.segments(),
                 value,
                 "big integer String",
                 Some(Box::new(err)),
@@ -489,26 +470,21 @@ impl QueryDocumentParser {
         })
     }
 
-    fn parse_json_list_from_str(
-        &self,
-        selection_path: &Path,
-        argument_path: &Path,
-        value: &str,
-    ) -> QueryParserResult<PrismaValue> {
-        let json = self.parse_json(selection_path, argument_path, value)?;
-        self.parse_json_list_from_value(selection_path, argument_path, json)
+    fn parse_json_list_from_str(&self, value: &str, ctx: &ParserContext<'_, '_>) -> QueryParserResult<PrismaValue> {
+        let json = self.parse_json(value, ctx)?;
+
+        self.parse_json_list_from_value(json, ctx)
     }
 
     fn parse_json_list_from_value(
         &self,
-        selection_path: &Path,
-        argument_path: &Path,
         json: serde_json::Value,
+        ctx: &ParserContext<'_, '_>,
     ) -> QueryParserResult<PrismaValue> {
         let values = json.as_array().ok_or_else(|| {
             ValidationError::invalid_argument_value(
-                selection_path.segments(),
-                argument_path.segments(),
+                ctx.selection_path.segments(),
+                ctx.argument_path.segments(),
                 json.to_string(),
                 "JSON array",
                 None,
@@ -520,8 +496,8 @@ impl QueryDocumentParser {
         for v in values.iter() {
             let pv = PrismaValue::try_from(v.clone()).map_err(|err| {
                 ValidationError::invalid_argument_value(
-                    selection_path.segments(),
-                    argument_path.segments(),
+                    ctx.selection_path.segments(),
+                    ctx.argument_path.segments(),
                     json.to_string(),
                     "Flat JSON array (no nesting)",
                     Some(Box::new(err)),
@@ -534,11 +510,11 @@ impl QueryDocumentParser {
         Ok(PrismaValue::List(prisma_values))
     }
 
-    fn parse_json(&self, selection_path: &Path, argument_path: &Path, s: &str) -> QueryParserResult<serde_json::Value> {
+    fn parse_json(&self, s: &str, ctx: &ParserContext<'_, '_>) -> QueryParserResult<serde_json::Value> {
         serde_json::from_str(s).map_err(|err| {
             ValidationError::invalid_argument_value(
-                selection_path.segments(),
-                argument_path.segments(),
+                ctx.selection_path.segments(),
+                ctx.argument_path.segments(),
                 s.to_string(),
                 "JSON String",
                 Some(Box::new(err)),
@@ -546,17 +522,12 @@ impl QueryDocumentParser {
         })
     }
 
-    fn to_json(
-        &self,
-        selection_path: &Path,
-        argument_path: &Path,
-        value: &ArgumentValue,
-    ) -> QueryParserResult<PrismaValue> {
+    fn to_json(&self, value: &ArgumentValue, ctx: &ParserContext<'_, '_>) -> QueryParserResult<PrismaValue> {
         serde_json::to_string(&value)
             .map_err(|err| {
                 ValidationError::invalid_argument_value(
-                    selection_path.segments(),
-                    argument_path.segments(),
+                    ctx.selection_path.segments(),
+                    ctx.argument_path.segments(),
                     format!("{value:?}"),
                     "JSON String",
                     Some(Box::new(err)),
@@ -565,11 +536,11 @@ impl QueryDocumentParser {
             .map(PrismaValue::Json)
     }
 
-    fn parse_uuid(&self, selection_path: &Path, argument_path: &Path, s: &str) -> QueryParserResult<Uuid> {
+    fn parse_uuid(&self, s: &str, ctx: &ParserContext<'_, '_>) -> QueryParserResult<Uuid> {
         Uuid::parse_str(s).map_err(|err| {
             ValidationError::invalid_argument_value(
-                selection_path.segments(),
-                argument_path.segments(),
+                ctx.selection_path.segments(),
+                ctx.argument_path.segments(),
                 s.to_string(),
                 "UUID String",
                 Some(Box::new(err)),
@@ -579,32 +550,21 @@ impl QueryDocumentParser {
 
     fn parse_list<'a>(
         &self,
-        selection_path: &Path,
-        argument_path: &Path,
         values: Vec<ArgumentValue>,
         value_type: &InputType<'a>,
-        query_schema: &'a QuerySchema,
+        ctx: ParserContext<'a, '_>,
     ) -> QueryParserResult<Vec<ParsedInputValue<'a>>> {
         values
             .into_iter()
-            .map(|val| {
-                self.parse_input_value(
-                    selection_path.clone(),
-                    argument_path.clone(),
-                    val,
-                    &[value_type.clone()],
-                    query_schema,
-                )
-            })
+            .map(|val| self.parse_input_value(val, &[value_type.clone()], ctx.clone()))
             .collect::<QueryParserResult<Vec<ParsedInputValue<'a>>>>()
     }
 
     fn parse_enum<'a>(
         &self,
-        selection_path: &Path,
-        argument_path: &Path,
         val: PrismaValue,
         typ: &EnumType,
+        ctx: ParserContext<'_, '_>,
     ) -> QueryParserResult<ParsedInputValue<'a>> {
         let raw = match val {
             PrismaValue::Enum(s) => s,
@@ -612,8 +572,8 @@ impl QueryDocumentParser {
             PrismaValue::Boolean(b) => if b { "true" } else { "false" }.to_owned(), // Case where a bool was misinterpreted as constant literal
             _ => {
                 return Err(ValidationError::invalid_argument_value(
-                    selection_path.segments(),
-                    argument_path.segments(),
+                    ctx.selection_path.segments(),
+                    ctx.argument_path.segments(),
                     format!("{val:?}"),
                     &typ.name(),
                     None,
@@ -623,8 +583,8 @@ impl QueryDocumentParser {
 
         let err = |name: &str| {
             Err(ValidationError::invalid_argument_value(
-                selection_path.segments(),
-                argument_path.segments(),
+                ctx.selection_path.segments(),
+                ctx.argument_path.segments(),
                 raw.clone(),
                 name,
                 None,
@@ -650,11 +610,9 @@ impl QueryDocumentParser {
     /// Parses and validates an input object recursively.
     fn parse_input_object<'a>(
         &self,
-        selection_path: Path,
-        argument_path: Path,
         object: ArgumentValueObject,
         schema_object: &InputObjectType<'a>,
-        query_schema: &'a QuerySchema,
+        ctx: ParserContext<'a, '_>,
     ) -> QueryParserResult<ParsedInputMap<'a>> {
         let fields = schema_object.get_fields().iter();
         let valid_field_names: IndexSet<Cow<'_, str>> = fields.clone().map(|field| field.name.clone()).collect();
@@ -668,7 +626,7 @@ impl QueryDocumentParser {
         let defaults = missing_field_names
             .filter_map(|unset_field_name| {
                 let field = schema_fields.get(unset_field_name.as_ref()).unwrap();
-                let argument_path = argument_path.add(field.name.clone().into_owned());
+                let ctx = ctx.clone().add_argument_path(field.name.clone().into_owned());
 
                 // If the input field has a default, add the default to the result.
                 // If it's not optional and has no default, a required field has not been provided.
@@ -681,13 +639,7 @@ impl QueryDocumentParser {
                             _ => default_value.get()?,
                         };
 
-                        match self.parse_input_value(
-                            selection_path.clone(),
-                            argument_path,
-                            default_pv.into(),
-                            field.field_types(),
-                            query_schema,
-                        ) {
+                        match self.parse_input_value(default_pv.into(), field.field_types(), ctx.clone()) {
                             Ok(value) => Some(Ok((field.name.clone(), value))),
                             Err(err) => Some(Err(err)),
                         }
@@ -695,8 +647,8 @@ impl QueryDocumentParser {
                     None => {
                         if field.is_required() {
                             Some(Err(ValidationError::required_argument_missing(
-                                selection_path.segments(),
-                                argument_path.segments(),
+                                ctx.selection_path.segments(),
+                                ctx.argument_path.segments(),
                                 &conversions::input_types_to_input_type_descriptions(field.field_types()),
                             )))
                         } else {
@@ -714,20 +666,15 @@ impl QueryDocumentParser {
             .map(|(field_name, value)| {
                 let field = schema_fields.get(field_name.as_str()).ok_or_else(|| {
                     ValidationError::unknown_input_field(
-                        selection_path.segments(),
-                        argument_path.add(field_name.clone()).segments(),
+                        ctx.selection_path.segments(),
+                        ctx.argument_path.add(field_name.clone()).segments(),
                         conversions::schema_input_object_type_to_input_type_description(schema_object),
                     )
                 })?;
 
-                let argument_path = argument_path.add(field.name.clone().into_owned());
-                let parsed = self.parse_input_value(
-                    selection_path.clone(),
-                    argument_path,
-                    value,
-                    field.field_types(),
-                    query_schema,
-                )?;
+                let ctx = ctx.clone().add_argument_path(field.name.clone().into_owned());
+
+                let parsed = self.parse_input_value(value, field.field_types(), ctx)?;
 
                 Ok((Cow::Owned(field_name), parsed))
             })
@@ -760,8 +707,8 @@ impl QueryDocumentParser {
             .unwrap_or(false);
         if too_many {
             return Err(ValidationError::too_many_fields_given(
-                selection_path.segments(),
-                argument_path.segments(),
+                ctx.selection_path.segments(),
+                ctx.argument_path.segments(),
                 schema_object.constraints.min_num_fields,
                 schema_object.constraints.max_num_fields,
                 schema_object.constraints.fields.as_ref().cloned(),
@@ -777,8 +724,8 @@ impl QueryDocumentParser {
             .unwrap_or(false);
         if some_missing {
             return Err(ValidationError::some_fields_missing(
-                selection_path.segments(),
-                argument_path.segments(),
+                ctx.selection_path.segments(),
+                ctx.argument_path.segments(),
                 schema_object.constraints.min_num_fields,
                 schema_object.constraints.max_num_fields,
                 schema_object.constraints.fields.as_ref().cloned(),
