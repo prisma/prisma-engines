@@ -267,8 +267,9 @@ impl<'conn> QueryInterpreter<'conn> {
                     .find_map(|binding_name| {
                         env.get(&binding_name)
                             .map(|_| env.clone().remove(&binding_name).unwrap())
+                            .filter(|result| !matches!(result, ExpressionResult::Empty))
                     })
-                    .unwrap())
+                    .unwrap_or(ExpressionResult::Empty))
             }),
 
             Expression::If {
