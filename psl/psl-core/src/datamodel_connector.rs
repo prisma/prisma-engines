@@ -201,6 +201,10 @@ pub trait Connector: Send + Sync {
         diagnostics: &mut Diagnostics,
     ) -> Option<NativeTypeInstance>;
 
+    fn native_type_supports_compacting(&self, _: Option<NativeTypeInstance>) -> bool {
+        true
+    }
+
     fn static_join_strategy_support(&self) -> bool {
         self.capabilities().contains(ConnectorCapability::LateralJoin)
             || self.capabilities().contains(ConnectorCapability::CorrelatedSubqueries)

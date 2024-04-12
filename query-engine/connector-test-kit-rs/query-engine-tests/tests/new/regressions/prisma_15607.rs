@@ -69,6 +69,7 @@ impl Actor {
             &[],
             None,
             &[],
+            &[],
             Some("READ COMMITTED"),
         );
 
