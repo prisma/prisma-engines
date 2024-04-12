@@ -296,12 +296,7 @@ impl QueryEngine {
 
             let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
 
-            let span = if tx_id.is_none() {
-                tracing::info_span!("prisma:engine", user_facing = true)
-            } else {
-                Span::none()
-            };
-
+            let span = tracing::info_span!("prisma:engine", user_facing = true);
             let trace_id = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
             async move {
