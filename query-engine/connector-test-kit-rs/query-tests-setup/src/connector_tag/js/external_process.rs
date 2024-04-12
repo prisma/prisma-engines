@@ -196,8 +196,9 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
         .build()
         .unwrap()
         .block_on(async move {
+            let environment = CONFIG.for_external_executor();
             let process = match Command::new(&path)
-                .envs(CONFIG.for_external_executor())
+                .envs(environment)
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
                 .stderr(Stdio::inherit())

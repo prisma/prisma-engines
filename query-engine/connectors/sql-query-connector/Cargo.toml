@@ -10,15 +10,8 @@ sqlite = ["quaint/sqlite", "psl/sqlite"]
 mssql = ["quaint/mssql"]
 cockroachdb = ["relation_joins", "quaint/postgresql", "psl/cockroachdb"]
 vendored-openssl = ["quaint/vendored-openssl"]
-native_all = [
-    "sqlite",
-    "mysql",
-    "postgresql",
-    "mssql",
-    "cockroachdb",
-    "quaint/native",
-    "quaint/pooled",
-]
+all = ["sqlite", "mysql", "postgresql", "mssql", "cockroachdb", "native"]
+native = ["quaint/native", "quaint/pooled"]
 # TODO: At the moment of writing (rustc 1.77.0), can_have_capability from psl does not eliminate joins
 # code from bundle for some reason, so we are doing it explicitly. Check with a newer version of compiler - if elimination
 # happens successfully, we don't need this feature anymore
@@ -45,7 +38,6 @@ opentelemetry = { version = "0.17", features = ["tokio"] }
 tracing-opentelemetry = "0.17.3"
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
 quaint.workspace = true
-
 
 [dependencies.connector-interface]
 package = "query-connector"
