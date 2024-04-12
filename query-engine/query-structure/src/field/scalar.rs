@@ -1,7 +1,7 @@
 use crate::{ast, parent_container::ParentContainer, prelude::*, DefaultKind, NativeTypeInstance, ValueGenerator};
 use chrono::{DateTime, FixedOffset};
 use psl::{
-    parser_database::{walkers, ScalarFieldType, ScalarType},
+    parser_database::{self as db, walkers, ScalarFieldType, ScalarType},
     schema_ast::ast::FieldArity,
 };
 use std::fmt::{Debug, Display};
@@ -12,7 +12,7 @@ pub type ScalarFieldRef = ScalarField;
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub enum ScalarFieldId {
     InModel(psl::parser_database::ScalarFieldId),
-    InCompositeType((ast::CompositeTypeId, ast::FieldId)),
+    InCompositeType((db::CompositeTypeId, ast::FieldId)),
 }
 
 impl ScalarField {
@@ -176,6 +176,14 @@ impl ScalarField {
             native_type: nt,
             connector,
         })
+    }
+
+    pub fn can_be_compacted(&self) -> bool {
+        let connector = self.dm.schema.connector;
+
+        let nt = self.native_type().map(|nt| nt.native_type);
+
+        connector.native_type_supports_compacting(nt)
     }
 
     pub fn parse_json_datetime(&self, value: &str) -> chrono::ParseResult<DateTime<FixedOffset>> {

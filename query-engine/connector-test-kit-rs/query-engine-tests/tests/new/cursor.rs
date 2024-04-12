@@ -17,7 +17,7 @@ mod bigint_cursor {
         schema.to_owned()
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
+    #[connector_test]
     async fn bigint_id_must_work(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 

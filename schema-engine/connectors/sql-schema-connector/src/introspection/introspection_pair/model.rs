@@ -1,7 +1,7 @@
 use psl::{
     datamodel_connector::walker_ext_traits::IndexWalkerExt,
-    parser_database::walkers,
-    schema_ast::ast::{self, WithDocumentation},
+    parser_database::{self as db, walkers},
+    schema_ast::ast::WithDocumentation,
 };
 use sql::postgres::PostgresSchemaExt;
 use sql_schema_describer as sql;
@@ -18,7 +18,7 @@ pub(crate) type ModelPair<'a> = IntrospectionPair<'a, Option<walkers::ModelWalke
 impl<'a> ModelPair<'a> {
     /// The position of the model from the PSL, if existing. Used for
     /// sorting the models in the final introspected data model.
-    pub(crate) fn previous_position(self) -> Option<ast::ModelId> {
+    pub(crate) fn previous_position(self) -> Option<db::ModelId> {
         self.previous.map(|m| m.id)
     }
 

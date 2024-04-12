@@ -272,6 +272,14 @@ pub struct CreateManyRecords {
     /// Fields of created records that client has requested to return.
     /// `None` if the connector does not support returning the created rows.
     pub selected_fields: Option<CreateManyRecordsFields>,
+    /// If set to true, connector will perform the operation using multiple bulk `INSERT` queries.
+    /// One query will be issued per a unique set of fields present in the batch. For example, if
+    /// `args` contains records:
+    ///   {a: 1, b: 1}
+    ///   {a: 2, b: 2}
+    ///   {a: 3, b: 3, c: 3}
+    /// Two queries will be issued: one containing first two records and one for the last record.
+    pub split_by_shape: bool,
 }
 
 #[derive(Debug, Clone)]

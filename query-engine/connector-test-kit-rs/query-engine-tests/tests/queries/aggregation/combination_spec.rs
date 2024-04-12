@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), exclude(Sqlite("cfd1")))]
+#[test_suite(schema(schema))]
 mod combinations {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query};
@@ -337,7 +337,7 @@ mod decimal_combinations {
         Ok(())
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
+    #[connector_test]
     async fn some_records(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ dec: "5.5" }"#).await?;
         create_row(&runner, r#"{ dec: "4.5" }"#).await?;
