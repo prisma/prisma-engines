@@ -78,8 +78,9 @@ features!(
     UncheckedScalarInputs,
     Views,
     RelationJoins,
+    ReactNative,
     PrismaSchemaFolder,
-    ReactNative
+    OmitApi
 );
 
 /// Generator preview features (alphabetically sorted)
@@ -96,6 +97,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | Tracing
          | Views
          | RelationJoins
+         | OmitApi
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations
