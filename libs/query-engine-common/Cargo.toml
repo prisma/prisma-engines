@@ -3,9 +3,6 @@ name = "query-engine-common"
 version = "0.1.0"
 edition = "2021"
 
-[features]
-metrics = []
-
 [dependencies]
 thiserror = "1"
 url.workspace = true

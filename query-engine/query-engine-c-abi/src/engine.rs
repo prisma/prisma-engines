@@ -266,7 +266,6 @@ impl QueryEngine {
                 native: ConnectedEngineNative {
                     config_dir: builder.native.config_dir.clone(),
                     env: builder.native.env.clone(),
-                    #[cfg(feature = "metrics")]
                     metrics: None,
                 },
             }) as Result<ConnectedEngine>
