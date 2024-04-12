@@ -1,18 +1,50 @@
-use std::iter;
-
 use crate::{ArgumentValue, ArgumentValueObject};
 use indexmap::IndexMap;
 use itertools::Itertools;
 use schema::constants::filters;
+use std::iter;
 
 pub type SelectionArgument = (String, ArgumentValue);
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Selection {
     name: String,
     alias: Option<String>,
     arguments: Vec<(String, ArgumentValue)>,
     nested_selections: Vec<Selection>,
+    nested_exclusions: Option<Vec<Exclusion>>,
+}
+
+impl std::fmt::Debug for Selection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut strct = f.debug_struct("Selection");
+
+        strct.field("name", &self.name);
+
+        if self.alias.is_some() {
+            strct.field("alias", &self.alias);
+        }
+
+        if !self.arguments().is_empty() {
+            strct.field("arguments", &self.arguments);
+        }
+
+        if !self.nested_selections().is_empty() {
+            strct.field("nested_selections", &self.nested_selections);
+        }
+
+        if self.nested_exclusions.is_some() {
+            strct.field("nested_exclusions", &self.nested_exclusions);
+        }
+
+        strct.finish()
+    }
+}
+
+/// Represents a field that's excluded.
+#[derive(Debug, Clone)]
+pub struct Exclusion {
+    pub name: String,
 }
 
 impl PartialEq for Selection {
@@ -45,6 +77,7 @@ impl Selection {
             alias,
             arguments: arguments.into(),
             nested_selections: nested_selections.into(),
+            nested_exclusions: None,
         }
     }
 
@@ -79,7 +112,33 @@ impl Selection {
     }
 
     pub fn push_nested_selection(&mut self, selection: Selection) {
-        self.nested_selections.push(selection);
+        // If a selection with the same name and alias already exists, replace it.
+        // We do that to avoid duplicates in the selection set. This can happen in the JSON protocol when
+        // a wildcard selection and an explicit selection set are combined. eg: `$scalars: true, id: true`
+        // This case should technically never happen atm, but it's a safety net which ensures we always keep the last one that we encounter.
+        match self
+            .nested_selections
+            .iter()
+            .find_position(|sel| sel.name() == selection.name() && sel.alias() == selection.alias())
+        {
+            Some((idx, _)) => {
+                self.nested_selections[idx] = selection;
+            }
+            None => self.nested_selections.push(selection),
+        }
+    }
+
+    pub fn push_nested_exclusion(&mut self, name: impl Into<String>) {
+        let exclusion = Exclusion { name: name.into() };
+
+        match self.nested_exclusions {
+            Some(ref mut exclusions) => exclusions.push(exclusion),
+            None => self.nested_exclusions = Some(vec![exclusion]),
+        }
+    }
+
+    pub fn remove_nested_selection(&mut self, name: &str) {
+        self.nested_selections.retain(|sel| sel.name() != name);
     }
 
     pub fn contains_nested_selection(&self, name: &str) -> bool {
@@ -100,6 +159,10 @@ impl Selection {
 
     pub fn set_alias(&mut self, alias: Option<String>) {
         self.alias = alias
+    }
+
+    pub fn nested_exclusions(&self) -> Option<&[Exclusion]> {
+        self.nested_exclusions.as_deref()
     }
 }
 
