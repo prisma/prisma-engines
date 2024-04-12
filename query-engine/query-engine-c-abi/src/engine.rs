@@ -24,7 +24,7 @@ use tokio::{
     runtime::{self, Runtime},
     sync::RwLock,
 };
-use tracing::{field, instrument::WithSubscriber, level_filters::LevelFilter, Instrument, Span};
+use tracing::{field, instrument::WithSubscriber, level_filters::LevelFilter, Instrument};
 
 use query_engine_common::Result;
 use query_engine_common::{
@@ -147,7 +147,7 @@ impl QueryEngine {
         schema
             .diagnostics
             .to_result()
-            .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
+            .map_err(|err| ApiError::conversion(err, schema.db.source_assert_single()))?;
 
         let base_path = get_cstr_safe(constructor_options.base_path);
         match &base_path {
@@ -162,11 +162,11 @@ impl QueryEngine {
                 // constructor_options.ignore_env_var_errors,
                 true,
             )
-            .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
+            .map_err(|err| ApiError::conversion(err, schema.db.source_assert_single()))?;
 
         config
             .validate_that_one_datasource_is_provided()
-            .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
+            .map_err(|errors| ApiError::conversion(errors, schema.db.source_assert_single()))?;
 
         let engine_protocol = EngineProtocol::Json;
 
@@ -226,7 +226,7 @@ impl QueryEngine {
                     .load_url_with_config_dir(&builder.native.config_dir, |key| {
                         builder.native.env.get(key).map(ToString::to_string)
                     })
-                    .map_err(|err| ApiError::Conversion(err, builder.schema.db.source().to_owned()))?;
+                    .map_err(|err| ApiError::Conversion(err, builder.schema.db.source_assert_single().to_owned()))?;
                 // This version of the query engine supports connecting via Rust bindings directly
                 // support for JS drivers can be added, but I commented it out for now
                 let connector_kind = ConnectorKind::Rust {
@@ -266,7 +266,7 @@ impl QueryEngine {
                 native: ConnectedEngineNative {
                     config_dir: builder.native.config_dir.clone(),
                     env: builder.native.env.clone(),
-                    #[cfg(all(not(target_os = "ios"), not(target_os = "android")))]
+                    #[cfg(feature = "metrics")]
                     metrics: None,
                 },
             }) as Result<ConnectedEngine>

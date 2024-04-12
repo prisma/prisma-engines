@@ -8,6 +8,9 @@ doc = false
 crate-type = ["staticlib"]
 name = "query_engine"
 
+[features]
+metrics = ["query-engine-common/metrics"]
+
 [dependencies]
 anyhow = "1"
 async-trait = "0.1"
