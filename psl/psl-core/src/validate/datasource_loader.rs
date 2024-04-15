@@ -167,8 +167,8 @@ fn lift_datasource(
         shadow_database_url.clone(),
         direct_url.clone(),
         url.clone(),
-        direct_url_span.clone(),
-        url_span.clone(),
+        direct_url_span,
+        url_span,
     ) {
         if shadow_url == direct_url {
             diagnostics.push_error(DatamodelError::new_shadow_database_is_same_as_direct_url_error(
