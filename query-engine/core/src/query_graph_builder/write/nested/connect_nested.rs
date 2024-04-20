@@ -230,7 +230,7 @@ fn handle_one_to_many(
                 let query_result = parent_result.as_query_result().unwrap();
 
                 if let QueryResult::Count(c) = query_result {
-                    if c != &expected_id_count {
+                    if c < &expected_id_count {
                         return Err(QueryGraphBuilderError::RecordNotFound(format!(
                             "Expected {expected_id_count} records to be connected after connect operation on one-to-many relation '{relation_name}', found {c}.",
                         )));
