@@ -207,6 +207,19 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
 
                 Ok(PrismaValue::Bytes(bytes))
             }
+            // Oid is returned as string
+            TypeIdentifier::Int => {
+                let res = s.parse::<i64>().map_err(|err| {
+                    build_conversion_error_with_reason(
+                        sf,
+                        &format!("String({s})"),
+                        &format!("{:?}", sf.type_identifier()),
+                        &err.to_string(),
+                    )
+                })?;
+
+                Ok(PrismaValue::Int(res))
+            }
             _ => Err(build_conversion_error(
                 sf,
                 &format!("String({s})"),
