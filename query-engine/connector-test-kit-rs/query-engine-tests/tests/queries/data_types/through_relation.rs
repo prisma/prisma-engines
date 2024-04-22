@@ -317,7 +317,7 @@ mod scalar_relations {
         .await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findManyParent { id children { oid } } }"#),
+          run_query!(&runner, r#"{ findManyParent { id children(orderBy: { oid: asc }) { oid } } }"#),
           @r###"{"data":{"findManyParent":[{"id":1,"children":[{"oid":0},{"oid":1},{"oid":65587},{"oid":4294967295}]}]}}"###
         );
 
