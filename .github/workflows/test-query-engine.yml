@@ -59,6 +59,26 @@ jobs:
             single_threaded: false
             connector: "cockroachdb"
             version: "22.1"
+          - name: 'mysql_5_6'
+            single_threaded: true
+            connector: 'mysql'
+            version: '5.6'
+          - name: 'mysql_5_7'
+            single_threaded: true
+            connector: 'mysql'
+            version: '5.7'
+          - name: 'mysql_8'
+            single_threaded: true
+            connector: 'mysql'
+            version: '8'
+          - name: 'mysql_mariadb'
+            single_threaded: true
+            connector: 'mysql'
+            version: 'mariadb'
+          - name: 'sqlite'
+            single_threaded: false
+            connector: 'sqlite'
+            version: 'n/a'
         engine_protocol: [graphql, json]
         relation_load_strategy: [join, query]
         partition: ["1/4", "2/4", "3/4", "4/4"]
