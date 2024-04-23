@@ -45,7 +45,7 @@ mod byoid {
     }
 
     // "A Create Mutation" should "create and return item with own Id"
-    #[connector_test(schema(schema_1))]
+    #[connector_test(schema(schema_1), only(MySql, Postgres, Sqlite, Vitess))]
     async fn create_and_return_item_woi_1(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -55,7 +55,14 @@ mod byoid {
         );
 
         let error_target = match runner.connector_version() {
-            query_engine_tests::ConnectorVersion::MySql(_) => "constraint: `PRIMARY`",
+            query_engine_tests::ConnectorVersion::MySql(_)
+            | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsNapi))
+            | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
+                "constraint: `PRIMARY`"
+            }
+            query_engine_tests::ConnectorVersion::Sqlite(Some(query_tests_setup::SqliteVersion::CloudflareD1)) => {
+                "fields: (`UNIQUE constraint failed`)"
+            }
             query_engine_tests::ConnectorVersion::Vitess(_) => "(not available)",
             _ => "fields: (`id`)",
         };
@@ -73,7 +80,7 @@ mod byoid {
     }
 
     // "A Create Mutation" should "create and return item with own Id"
-    #[connector_test(schema(schema_2))]
+    #[connector_test(schema(schema_2), only(MySql, Postgres, Sqlite, Vitess))]
     async fn create_and_return_item_woi_2(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -83,7 +90,14 @@ mod byoid {
         );
 
         let error_target = match runner.connector_version() {
-            ConnectorVersion::MySql(_) => "constraint: `PRIMARY`",
+            query_engine_tests::ConnectorVersion::MySql(_)
+            | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsNapi))
+            | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
+                "constraint: `PRIMARY`"
+            }
+            query_engine_tests::ConnectorVersion::Sqlite(Some(query_tests_setup::SqliteVersion::CloudflareD1)) => {
+                "fields: (`UNIQUE constraint failed`)"
+            }
             ConnectorVersion::Vitess(_) => "(not available)",
             _ => "fields: (`id`)",
         };
@@ -131,7 +145,7 @@ mod byoid {
     }
 
     // "A Nested Create Mutation" should "create and return item with own Id"
-    #[connector_test(schema(schema_1))]
+    #[connector_test(schema(schema_1), only(MySql, Postgres, Sqlite, Vitess))]
     async fn nested_create_return_item_woi_1(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -141,7 +155,14 @@ mod byoid {
         );
 
         let error_target = match runner.connector_version() {
-            ConnectorVersion::MySql(_) => "constraint: `PRIMARY`",
+            query_engine_tests::ConnectorVersion::MySql(_)
+            | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsNapi))
+            | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
+                "constraint: `PRIMARY`"
+            }
+            query_engine_tests::ConnectorVersion::Sqlite(Some(query_tests_setup::SqliteVersion::CloudflareD1)) => {
+                "fields: (`UNIQUE constraint failed`)"
+            }
             ConnectorVersion::Vitess(_) => "(not available)",
             _ => "fields: (`id`)",
         };
@@ -159,7 +180,7 @@ mod byoid {
     }
 
     // "A Nested Create Mutation" should "create and return item with own Id"
-    #[connector_test(schema(schema_2))]
+    #[connector_test(schema(schema_2), only(MySql, Postgres, Sqlite, Vitess))]
     async fn nested_create_return_item_woi_2(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -169,7 +190,14 @@ mod byoid {
         );
 
         let error_target = match runner.connector_version() {
-            ConnectorVersion::MySql(_) => "constraint: `PRIMARY`",
+            query_engine_tests::ConnectorVersion::MySql(_)
+            | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsNapi))
+            | query_engine_tests::ConnectorVersion::Vitess(Some(query_tests_setup::VitessVersion::PlanetscaleJsWasm)) => {
+                "constraint: `PRIMARY`"
+            }
+            query_engine_tests::ConnectorVersion::Sqlite(Some(query_tests_setup::SqliteVersion::CloudflareD1)) => {
+                "fields: (`UNIQUE constraint failed`)"
+            }
             ConnectorVersion::Vitess(_) => "(not available)",
             _ => "fields: (`id`)",
         };

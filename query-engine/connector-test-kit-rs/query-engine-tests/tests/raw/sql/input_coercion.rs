@@ -5,7 +5,7 @@ mod input_coercion {
     use query_engine_tests::fmt_execute_raw;
 
     // Checks that query raw inputs are coerced to the correct types
-    #[connector_test]
+    #[connector_test(only(Postgres))]
     async fn scalar_input_correctly_coerced(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,

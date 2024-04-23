@@ -1,3 +1,4 @@
 {
     "connector": "postgres",
-    "version": "13"}
+    "version": "13"
+}

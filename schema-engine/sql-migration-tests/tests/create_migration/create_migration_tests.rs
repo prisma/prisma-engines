@@ -1029,6 +1029,7 @@ fn alter_constraint_name(mut api: TestApi) {
     let is_mssql = api.is_mssql();
     let is_postgres = api.is_postgres();
     let is_postgres15 = api.is_postgres_15();
+    let is_postgres16 = api.is_postgres_16();
     let is_cockroach = api.is_cockroach();
     let is_sqlite = api.is_sqlite();
 
@@ -1099,7 +1100,7 @@ fn alter_constraint_name(mut api: TestApi) {
                     -- RenameIndex
                     ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
                 "#]]
-            } else if is_postgres15 {
+            } else if is_postgres15 || is_postgres16 {
                 expect![[r#"
                     -- AlterTable
                     ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";

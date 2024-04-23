@@ -23,11 +23,11 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
         }
     }
 
-    fn push_connector_data(&self, context: &mut super::super::Context<'_>) {
+    fn push_connector_data(&self, context: &mut crate::sql_schema_calculator::Context<'_>) {
         let mut data = MssqlSchemaExt::default();
 
         for model in context.datamodel.db.walk_models() {
-            let table_id = context.model_id_to_table_id[&model.model_id()];
+            let table_id = context.model_id_to_table_id[&model.id];
             let table = context.schema.walk(table_id);
             if model
                 .primary_key()

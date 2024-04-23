@@ -1,7 +1,7 @@
 use super::*;
 use fmt::Debug;
 use once_cell::sync::Lazy;
-use prisma_models::ast::ModelId;
+use psl::parser_database as db;
 use std::{borrow::Cow, fmt};
 
 #[derive(Debug, Clone)]
@@ -120,8 +120,7 @@ pub struct ObjectType<'a> {
     pub(crate) fields: OutputObjectFields<'a>,
 
     // Object types can directly map to models.
-    pub(crate) model: Option<ModelId>,
-    _heh: (),
+    pub(crate) model: Option<db::ModelId>,
 }
 
 impl Debug for ObjectType<'_> {
@@ -145,7 +144,6 @@ impl<'a> ObjectType<'a> {
             identifier,
             fields: Arc::new(lazy),
             model: None,
-            _heh: (),
         }
     }
 
@@ -215,7 +213,7 @@ impl<'a> OutputField<'a> {
         }
     }
 
-    pub fn model(&self) -> Option<ModelId> {
+    pub fn model(&self) -> Option<db::ModelId> {
         self.query_info.as_ref().and_then(|info| info.model)
     }
 

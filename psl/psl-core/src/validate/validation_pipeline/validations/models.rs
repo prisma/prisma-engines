@@ -1,6 +1,5 @@
 use super::database_name::validate_db_name;
 use crate::{
-    ast,
     datamodel_connector::{walker_ext_traits::*, ConnectorCapability},
     diagnostics::DatamodelError,
     parser_database::ast::{WithName, WithSpan},
@@ -77,7 +76,7 @@ pub(super) fn has_a_unique_primary_key_name(model: ModelWalker<'_>, names: &supe
     );
 
     for violation in names.constraint_namespace.constraint_name_scope_violations(
-        model.model_id(),
+        model.id,
         super::constraint_namespace::ConstraintName::PrimaryKey(name.as_ref()),
         ctx,
     ) {
@@ -115,7 +114,7 @@ pub(super) fn has_a_unique_custom_primary_key_name_per_model(
     if let Some(name) = pk.name() {
         if names
             .constraint_namespace
-            .local_custom_name_scope_violations(model.model_id(), name.as_ref())
+            .local_custom_name_scope_violations(model.id, name.as_ref())
         {
             let message = format!(
                 "The given custom name `{name}` has to be unique on the model. Please provide a different name for the `name` argument."
@@ -137,10 +136,7 @@ pub(super) fn has_a_unique_custom_primary_key_name_per_model(
 
 /// The database must support the primary key length prefix for it to be allowed in the data model.
 pub(crate) fn primary_key_length_prefix_supported(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx
-        .connector
-        .has_capability(ConnectorCapability::IndexColumnLengthPrefixing)
-    {
+    if ctx.has_capability(ConnectorCapability::IndexColumnLengthPrefixing) {
         return;
     }
 
@@ -160,10 +156,7 @@ pub(crate) fn primary_key_length_prefix_supported(model: ModelWalker<'_>, ctx: &
 
 /// Not every database is allowing sort definition in the primary key.
 pub(crate) fn primary_key_sort_order_supported(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx
-        .connector
-        .has_capability(ConnectorCapability::PrimaryKeySortOrderDefinition)
-    {
+    if ctx.has_capability(ConnectorCapability::PrimaryKeySortOrderDefinition) {
         return;
     }
 
@@ -186,14 +179,11 @@ pub(crate) fn only_one_fulltext_attribute_allowed(model: ModelWalker<'_>, ctx: &
         return;
     }
 
-    if !ctx.connector.has_capability(ConnectorCapability::FullTextIndex) {
+    if !ctx.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
-    if ctx
-        .connector
-        .has_capability(ConnectorCapability::MultipleFullTextAttributesPerModel)
-    {
+    if ctx.has_capability(ConnectorCapability::MultipleFullTextAttributesPerModel) {
         return;
     }
 
@@ -226,7 +216,7 @@ pub(crate) fn primary_key_connector_specific(model: ModelWalker<'_>, ctx: &mut C
 
     let container_type = if model.ast_model().is_view() { "view" } else { "model" };
 
-    if primary_key.mapped_name().is_some() && !ctx.connector.supports_named_primary_keys() {
+    if primary_key.mapped_name().is_some() && !ctx.has_capability(ConnectorCapability::NamedPrimaryKeys) {
         ctx.push_error(DatamodelError::new_model_validation_error(
             "You defined a database name for the primary key on the model. This is not supported by the provider.",
             container_type,
@@ -235,7 +225,7 @@ pub(crate) fn primary_key_connector_specific(model: ModelWalker<'_>, ctx: &mut C
         ));
     }
 
-    if primary_key.fields().len() > 1 && !ctx.connector.supports_compound_ids() {
+    if primary_key.fields().len() > 1 && !ctx.has_capability(ConnectorCapability::CompoundIds) {
         return ctx.push_error(DatamodelError::new_model_validation_error(
             "The current connector does not support compound ids.",
             container_type,
@@ -289,7 +279,7 @@ pub(super) fn schema_is_defined_in_the_datasource(model: ModelWalker<'_>, ctx: &
         return;
     }
 
-    if !ctx.connector.has_capability(ConnectorCapability::MultiSchema) {
+    if !ctx.has_capability(ConnectorCapability::MultiSchema) {
         return;
     }
 
@@ -318,7 +308,7 @@ pub(super) fn schema_attribute_supported_in_connector(model: ModelWalker<'_>, ct
         return;
     }
 
-    if ctx.connector.has_capability(ConnectorCapability::MultiSchema) {
+    if ctx.has_capability(ConnectorCapability::MultiSchema) {
         return;
     }
 
@@ -338,7 +328,7 @@ pub(super) fn schema_attribute_missing(model: ModelWalker<'_>, ctx: &mut Context
         return;
     }
 
-    if !ctx.connector.has_capability(ConnectorCapability::MultiSchema) {
+    if !ctx.has_capability(ConnectorCapability::MultiSchema) {
         return;
     }
 
@@ -371,15 +361,16 @@ pub(super) fn schema_attribute_missing(model: ModelWalker<'_>, ctx: &mut Context
 
 pub(super) fn database_name_clashes(ctx: &mut Context<'_>) {
     // (schema_name, model_database_name) -> ModelId
-    let mut database_names: HashMap<(Option<&str>, &str), ast::ModelId> = HashMap::with_capacity(ctx.db.models_count());
+    let mut database_names: HashMap<(Option<&str>, &str), parser_database::ModelId> =
+        HashMap::with_capacity(ctx.db.models_count());
 
     for model in ctx.db.walk_models().chain(ctx.db.walk_views()) {
         let key = (model.schema().map(|(name, _)| name), model.database_name());
-        match database_names.insert(key, model.model_id()) {
+        match database_names.insert(key, model.id) {
             // Two branches because we want to put the error on the @@map attribute, and it can be
             // on either model.
             Some(existing) if model.mapped_name().is_some() => {
-                let existing_model_name = &ctx.db.ast()[existing].name();
+                let existing_model_name = &ctx.db.ast(existing.0)[existing.1].name();
                 let attribute = model
                     .ast_model()
                     .attributes
@@ -394,7 +385,7 @@ pub(super) fn database_name_clashes(ctx: &mut Context<'_>) {
                 ));
             }
             Some(existing) => {
-                let existing_model = &ctx.db.ast()[existing];
+                let existing_model = &ctx.db.ast(existing.0)[existing.1];
                 let attribute = existing_model
                     .attributes
                     .iter()

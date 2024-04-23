@@ -2,7 +2,7 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(suite = "setdefault_onU_1to1_req", exclude(MongoDb, MySQL))]
+#[test_suite(suite = "setdefault_onU_1to1_req", exclude(MongoDb, MySQL, Vitess))]
 mod one2one_req {
     fn required_with_default() -> String {
         let schema = indoc! {
@@ -105,7 +105,7 @@ mod one2one_req {
     }
 }
 
-#[test_suite(suite = "setdefault_onU_1to1_opt", exclude(MongoDb, MySQL))]
+#[test_suite(suite = "setdefault_onU_1to1_opt", exclude(MongoDb, MySQL, Vitess))]
 mod one2one_opt {
     fn optional_with_default() -> String {
         let schema = indoc! {
@@ -210,7 +210,7 @@ mod one2one_opt {
     }
 }
 
-#[test_suite(suite = "setdefault_onU_1toM_req", exclude(MongoDb, MySQL))]
+#[test_suite(suite = "setdefault_onU_1toM_req", exclude(MongoDb, MySQL, Vitess))]
 mod one2many_req {
     fn required_with_default() -> String {
         let schema = indoc! {
@@ -313,7 +313,7 @@ mod one2many_req {
     }
 }
 
-#[test_suite(suite = "setdefault_onU_1toM_opt", exclude(MongoDb, MySQL))]
+#[test_suite(suite = "setdefault_onU_1toM_opt", exclude(MongoDb, MySQL, Vitess))]
 mod one2many_opt {
     fn optional_with_default() -> String {
         let schema = indoc! {

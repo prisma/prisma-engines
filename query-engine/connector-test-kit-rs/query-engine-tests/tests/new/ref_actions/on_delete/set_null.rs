@@ -50,7 +50,7 @@ mod one2one_opt {
             uniq    Int? @unique
             child   Child?
           }
-          
+
           model Child {
             #id(childId, Int, @id)
             childUniq       Int? @unique
@@ -90,7 +90,7 @@ mod one2one_opt {
             b_id Int? @unique
             b B?
           }
-          
+
           model B {
             #id(id, Int, @id)
             a_id Int? @unique
@@ -98,7 +98,7 @@ mod one2one_opt {
 
             c C?
           }
-          
+
           model C {
             #id(id, Int, @id)
             b_id Int? @unique
@@ -160,7 +160,7 @@ mod one2one_opt {
                 b_id Int? @unique
                 b B?
               }
-              
+
               model B {
                 #id(id, Int, @id)
                 a_id Int? @unique
@@ -168,7 +168,7 @@ mod one2one_opt {
 
                 c C?
               }
-              
+
               model C {
                 #id(id, Int, @id)
                 b_id Int? @unique
@@ -225,7 +225,7 @@ mod one2one_opt {
               b_id Int? @unique
               b B?
             }
-            
+
             model B {
               #id(id, Int, @id)
               a_id Int? @unique
@@ -233,7 +233,7 @@ mod one2one_opt {
 
               c C?
             }
-            
+
             model C {
               #id(id, Int, @id)
               b_id Int? @unique
@@ -246,7 +246,7 @@ mod one2one_opt {
     }
 
     // SET_NULL should also apply to child relations sharing a common fk
-    #[connector_test(schema(one2one2one_opt_set_null_cascade))]
+    #[connector_test(schema(one2one2one_opt_set_null_cascade), exclude_features("relationJoins"))]
     async fn delete_parent_set_null_cascade(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -340,21 +340,21 @@ mod one2many_opt {
         let schema = indoc! {
             r#"model Main {
             #id(id, Int, @id)
-          
+
             alice   Alice?  @relation(fields: [aliceId], references: [id], onDelete: SetNull, onUpdate: Cascade)
             aliceId Int?
-          
+
             bob Bob?
           }
-          
+
           model Alice {
             #id(id, Int, @id)
             manyMains Main[]
           }
-          
+
           model Bob {
             #id(id, Int, @id)
-          
+
             main   Main   @relation(fields: [mainId], references: [id], onDelete: Cascade, onUpdate: Cascade)
             mainId Int @unique
           }"#

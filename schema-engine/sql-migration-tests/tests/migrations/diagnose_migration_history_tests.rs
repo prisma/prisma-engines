@@ -474,7 +474,6 @@ fn diagnose_migrations_history_can_detect_edited_migrations(api: TestApi) {
         .assert_applied_migrations(&["initial", "second-migration"]);
 
     let mut file = std::fs::OpenOptions::new()
-        .write(true)
         .append(true)
         .open(initial_migration_path)
         .unwrap();
@@ -532,11 +531,7 @@ fn diagnose_migrations_history_reports_migrations_failing_to_apply_cleanly(api: 
         .send_sync()
         .assert_applied_migrations(&["initial", "second-migration"]);
 
-    let mut file = std::fs::OpenOptions::new()
-        .write(true)
-        .append(true)
-        .open(initial_path)
-        .unwrap();
+    let mut file = std::fs::OpenOptions::new().append(true).open(initial_path).unwrap();
     file.write_all(b"SELECT YOLO;\n").unwrap();
 
     let DiagnoseMigrationHistoryOutput {

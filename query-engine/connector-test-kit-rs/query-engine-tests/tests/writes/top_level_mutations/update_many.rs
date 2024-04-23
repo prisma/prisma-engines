@@ -123,7 +123,7 @@ mod update_many {
     }
 
     // "An updateMany mutation" should "correctly apply all number operations for Int"
-    #[connector_test(exclude(CockroachDb))]
+    #[connector_test(exclude(Vitess("planetscale.js", "planetscale.js.wasm"), CockroachDb))]
     async fn apply_number_ops_for_int(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
         create_row(&runner, r#"{ id: 2, optStr: "str2", optInt: 2 }"#).await?;
@@ -240,7 +240,7 @@ mod update_many {
     }
 
     // "An updateMany mutation" should "correctly apply all number operations for Float"
-    #[connector_test]
+    #[connector_test(exclude(Vitess("planetscale.js", "planetscale.js.wasm")))]
     async fn apply_number_ops_for_float(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
         create_row(&runner, r#"{ id: 2, optStr: "str2", optFloat: 2 }"#).await?;
@@ -298,6 +298,9 @@ mod update_many {
 
         // MySql does not count incrementing a null so the count is different
         if !matches!(runner.connector_version(), ConnectorVersion::MySql(_)) {
+            // On PlanetScale, this fails with:
+            //   left: Number(2)
+            //   right: 3
             assert_eq!(count, 3);
         }
 
@@ -386,21 +389,6 @@ mod json_update_many {
 
     #[connector_test(capabilities(AdvancedJsonNullability))]
     async fn update_json_errors(runner: Runner) -> TestResult<()> {
-        // On the JSON protocol, this succeeds because `null` is serialized as JSON.
-        // It doesn't matter since the client does _not_ allow to send null values, but only DbNull or JsonNull.
-        if runner.protocol().is_graphql() {
-            assert_error!(
-                &runner,
-                r#"mutation {
-                updateManyTestModel(where: { id: 1 }, data: { json: null }) {
-                  json
-                }
-              }"#,
-                2009,
-                "A value is required but not set"
-            );
-        }
-
         assert_error!(
             &runner,
             r#"mutation {

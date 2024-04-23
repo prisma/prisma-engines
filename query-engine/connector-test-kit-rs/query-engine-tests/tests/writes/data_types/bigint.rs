@@ -16,8 +16,14 @@ mod bigint {
         schema.to_owned()
     }
 
-    // "Using a BigInt field" should "work"
-    #[connector_test]
+    #[connector_test(exclude(Sqlite("cfd1")))]
+    // "Using a BigInt field" should "work".
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"createOneModel":{"field":"123456789012341234"}}}
+    // + {"data":{"createOneModel":{"field":"123456789012341200"}}}
+    // ```
     async fn using_bigint_field(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {

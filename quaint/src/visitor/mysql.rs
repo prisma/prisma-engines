@@ -8,7 +8,6 @@ use std::fmt::{self, Write};
 /// A visitor to generate queries for the MySQL database.
 ///
 /// The returned parameter values can be used directly with the mysql crate.
-#[cfg_attr(feature = "docs", doc(cfg(feature = "mysql")))]
 pub struct Mysql<'a> {
     query: String,
     parameters: Vec<Value<'a>>,
@@ -91,6 +90,36 @@ impl<'a> Mysql<'a> {
 
         Ok(())
     }
+
+    fn visit_json_build_obj_expr(&mut self, expr: Expression<'a>) -> crate::Result<()> {
+        match expr.kind() {
+            // Convert bytes data to base64
+            ExpressionKind::Column(col) => match (col.type_family.as_ref(), col.native_type.as_deref()) {
+                (
+                    Some(TypeFamily::Text(_)),
+                    Some("LONGBLOB") | Some("BLOB") | Some("MEDIUMBLOB") | Some("SMALLBLOB") | Some("TINYBLOB")
+                    | Some("VARBINARY") | Some("BINARY") | Some("BIT"),
+                ) => {
+                    self.write("to_base64")?;
+                    self.surround_with("(", ")", |s| s.visit_expression(expr))?;
+
+                    Ok(())
+                }
+                // Convert floats to string to avoid losing precision
+                (_, Some("FLOAT")) => {
+                    self.write("CONVERT")?;
+                    self.surround_with("(", ")", |s| {
+                        s.visit_expression(expr)?;
+                        s.write(", ")?;
+                        s.write("CHAR")
+                    })?;
+                    Ok(())
+                }
+                _ => self.visit_expression(expr),
+            },
+            _ => self.visit_expression(expr),
+        }
+    }
 }
 
 impl<'a> Visitor<'a> for Mysql<'a> {
@@ -106,7 +135,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         let mut mysql = Mysql {
             query: String::with_capacity(4096),
             parameters: Vec::with_capacity(128),
-            target_table: get_target_table(query.clone()),
+            target_table: get_target_table(&query),
         };
 
         Mysql::visit_query(&mut mysql, query)?;
@@ -120,27 +149,27 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     }
 
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
-        let res = match value {
-            Value::Int32(i) => i.map(|i| self.write(i)),
-            Value::Int64(i) => i.map(|i| self.write(i)),
-            Value::Float(d) => d.map(|f| match f {
+        let res = match &value.typed {
+            ValueType::Int32(i) => i.map(|i| self.write(i)),
+            ValueType::Int64(i) => i.map(|i| self.write(i)),
+            ValueType::Float(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f32::INFINITY => self.write("'Infinity'"),
                 f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            Value::Double(d) => d.map(|f| match f {
+            ValueType::Double(d) => d.map(|f| match f {
                 f if f.is_nan() => self.write("'NaN'"),
                 f if f == f64::INFINITY => self.write("'Infinity'"),
                 f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
                 v => self.write(format!("{v:?}")),
             }),
-            Value::Text(t) => t.map(|t| self.write(format!("'{t}'"))),
-            Value::Enum(e) => e.map(|e| self.write(e)),
-            Value::Bytes(b) => b.map(|b| self.write(format!("x'{}'", hex::encode(b)))),
-            Value::Boolean(b) => b.map(|b| self.write(b)),
-            Value::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
-            Value::Array(_) => {
+            ValueType::Text(t) => t.as_ref().map(|t| self.write(format!("'{t}'"))),
+            ValueType::Enum(e, _) => e.as_ref().map(|e| self.write(e)),
+            ValueType::Bytes(b) => b.as_ref().map(|b| self.write(format!("x'{}'", hex::encode(b)))),
+            ValueType::Boolean(b) => b.map(|b| self.write(b)),
+            ValueType::Char(c) => c.map(|c| self.write(format!("'{c}'"))),
+            ValueType::Array(_) | ValueType::EnumArray(_, _) => {
                 let msg = "Arrays are not supported in MySQL.";
                 let kind = ErrorKind::conversion(msg);
 
@@ -149,22 +178,21 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
                 return Err(builder.build());
             }
-            #[cfg(feature = "bigdecimal")]
-            Value::Numeric(r) => r.map(|r| self.write(r)),
 
-            Value::Json(j) => match j {
+            ValueType::Numeric(r) => r.as_ref().map(|r| self.write(r)),
+
+            ValueType::Json(j) => match j {
                 Some(ref j) => {
                     let s = serde_json::to_string(&j)?;
                     Some(self.write(format!("CONVERT('{s}', JSON)")))
                 }
                 None => None,
             },
-            #[cfg(feature = "uuid")]
-            Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
-            Value::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
-            Value::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
-            Value::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
-            Value::Xml(cow) => cow.map(|cow| self.write(format!("'{cow}'"))),
+            ValueType::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
+            ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
+            ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
+            ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
+            ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
         };
 
         match res {
@@ -293,8 +321,20 @@ impl<'a> Visitor<'a> for Mysql<'a> {
                 self.write(" OFFSET ")?;
                 self.visit_parameterized(offset)
             }
-            (None, Some(Value::Int32(Some(offset)))) if offset < 1 => Ok(()),
-            (None, Some(Value::Int64(Some(offset)))) if offset < 1 => Ok(()),
+            (
+                None,
+                Some(Value {
+                    typed: ValueType::Int32(Some(offset)),
+                    ..
+                }),
+            ) if offset < 1 => Ok(()),
+            (
+                None,
+                Some(Value {
+                    typed: ValueType::Int64(Some(offset)),
+                    ..
+                }),
+            ) if offset < 1 => Ok(()),
             (None, Some(offset)) => {
                 self.write(" LIMIT ")?;
                 self.visit_parameterized(Value::from(9_223_372_036_854_775_807i64))?;
@@ -378,7 +418,6 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         self.write(", ")?;
 
         match json_extract.path.clone() {
-            #[cfg(feature = "postgresql")]
             JsonPath::Array(_) => panic!("JSON path array notation is not supported for MySQL"),
             JsonPath::String(path) => self.visit_parameterized(Value::text(path))?,
         }
@@ -421,27 +460,27 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
         match json_type {
             JsonType::Array => {
-                self.visit_expression(Value::text("ARRAY").into())?;
+                self.visit_expression(Expression::from(Value::text("ARRAY")))?;
             }
             JsonType::Boolean => {
-                self.visit_expression(Value::text("BOOLEAN").into())?;
+                self.visit_expression(Expression::from(Value::text("BOOLEAN")))?;
             }
             JsonType::Number => {
-                self.visit_expression(Value::text("INTEGER").into())?;
+                self.visit_expression(Expression::from(Value::text("INTEGER")))?;
                 self.write(" OR JSON_TYPE(")?;
                 self.visit_expression(left)?;
                 self.write(")")?;
                 self.write(" = ")?;
-                self.visit_expression(Value::text("DOUBLE").into())?;
+                self.visit_expression(Expression::from(Value::text("DOUBLE")))?;
             }
             JsonType::Object => {
-                self.visit_expression(Value::text("OBJECT").into())?;
+                self.visit_expression(Expression::from(Value::text("OBJECT")))?;
             }
             JsonType::String => {
-                self.visit_expression(Value::text("STRING").into())?;
+                self.visit_expression(Expression::from(Value::text("STRING")))?;
             }
             JsonType::Null => {
-                self.visit_expression(Value::text("NULL").into())?;
+                self.visit_expression(Expression::from(Value::text("NULL")))?;
             }
             JsonType::ColumnRef(column) => {
                 self.write("JSON_TYPE")?;
@@ -552,6 +591,36 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
+    #[cfg(feature = "mysql")]
+    fn visit_json_array_agg(&mut self, array_agg: JsonArrayAgg<'a>) -> visitor::Result {
+        self.write("JSON_ARRAYAGG")?;
+        self.surround_with("(", ")", |s| s.visit_expression(*array_agg.expr))?;
+
+        Ok(())
+    }
+
+    #[cfg(feature = "mysql")]
+    fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> visitor::Result {
+        let len = build_obj.exprs.len();
+
+        self.write("JSON_OBJECT")?;
+        self.surround_with("(", ")", |s| {
+            for (i, (name, expr)) in build_obj.exprs.into_iter().enumerate() {
+                s.visit_raw_value(Value::text(name))?;
+                s.write(", ")?;
+                s.visit_json_build_obj_expr(expr)?;
+
+                if i < (len - 1) {
+                    s.write(", ")?;
+                }
+            }
+
+            Ok(())
+        })?;
+
+        Ok(())
+    }
+
     fn visit_ordering(&mut self, ordering: Ordering<'a>) -> visitor::Result {
         let len = ordering.0.len();
 
@@ -599,7 +668,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     }
 }
 
-fn get_target_table(query: Query<'_>) -> Option<Table<'_>> {
+fn get_target_table<'a>(query: &Query<'a>) -> Option<Table<'a>> {
     match query {
         Query::Delete(delete) => Some(delete.table.clone()),
         Query::Update(update) => Some(update.table.clone()),
@@ -741,7 +810,7 @@ mod tests {
 
     #[test]
     fn test_raw_null() {
-        let (sql, params) = Mysql::build(Select::default().value(Value::Text(None).raw())).unwrap();
+        let (sql, params) = Mysql::build(Select::default().value(ValueType::Text(None).raw())).unwrap();
         assert_eq!("SELECT null", sql);
         assert!(params.is_empty());
     }
@@ -769,7 +838,7 @@ mod tests {
 
     #[test]
     fn test_raw_bytes() {
-        let (sql, params) = Mysql::build(Select::default().value(Value::bytes(vec![1, 2, 3]).raw())).unwrap();
+        let (sql, params) = Mysql::build(Select::default().value(ValueType::bytes(vec![1, 2, 3]).raw())).unwrap();
         assert_eq!("SELECT x'010203'", sql);
         assert!(params.is_empty());
     }
@@ -787,7 +856,7 @@ mod tests {
 
     #[test]
     fn test_raw_char() {
-        let (sql, params) = Mysql::build(Select::default().value(Value::character('a').raw())).unwrap();
+        let (sql, params) = Mysql::build(Select::default().value(ValueType::character('a').raw())).unwrap();
         assert_eq!("SELECT 'a'", sql);
         assert!(params.is_empty());
     }
@@ -848,7 +917,6 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "uuid")]
     fn test_raw_uuid() {
         let uuid = uuid::Uuid::new_v4();
         let (sql, params) = Mysql::build(Select::default().value(uuid.raw())).unwrap();
@@ -897,7 +965,7 @@ mod tests {
     #[test]
 
     fn test_json_negation() {
-        let conditions = ConditionTree::not("json".equals(Value::Json(Some(serde_json::Value::Null))));
+        let conditions = ConditionTree::not("json".equals(ValueType::Json(Some(serde_json::Value::Null))));
         let (sql, _) = Mysql::build(Select::from_table("test").so_that(conditions)).unwrap();
 
         assert_eq!(
@@ -909,7 +977,7 @@ mod tests {
     #[test]
 
     fn test_json_not_negation() {
-        let conditions = ConditionTree::not("json".not_equals(Value::Json(Some(serde_json::Value::Null))));
+        let conditions = ConditionTree::not("json".not_equals(ValueType::Json(Some(serde_json::Value::Null))));
         let (sql, _) = Mysql::build(Select::from_table("test").so_that(conditions)).unwrap();
 
         assert_eq!(
@@ -924,7 +992,7 @@ mod tests {
         let table_2 = "table2";
 
         let join = table_2.alias("j").on(("j", "id").equals(Column::from(("t1", "id2"))));
-        let a = table_1.clone().alias("t1");
+        let a = table_1.alias("t1");
         let selection = Select::from_table(a).column(("t1", "id")).inner_join(join);
 
         let id1 = Column::from((table_1, "id"));
@@ -945,7 +1013,7 @@ mod tests {
         let table_2 = "table2";
 
         let join = table_2.alias("j").on(("j", "id").equals(Column::from(("t1", "id2"))));
-        let a = table_1.clone().alias("t1");
+        let a = table_1.alias("t1");
         let selection = Select::from_table(a).column(("t1", "id")).inner_join(join);
 
         let id1 = Column::from((table_1, "id"));

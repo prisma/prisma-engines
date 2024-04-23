@@ -2,6 +2,7 @@ use crate::{
     configuration::StringFromEnvVar,
     datamodel_connector::{Connector, ConnectorCapabilities, RelationMode},
     diagnostics::{DatamodelError, Diagnostics, Span},
+    set_config_dir,
 };
 use std::{any::Any, borrow::Cow, path::Path};
 
@@ -208,7 +209,7 @@ impl Datasource {
     {
         //CHECKUP
         let url = self.load_url(env)?;
-        let url = self.active_connector.set_config_dir(config_dir, &url);
+        let url = set_config_dir(self.active_connector.flavour(), config_dir, &url);
 
         Ok(url.into_owned())
     }

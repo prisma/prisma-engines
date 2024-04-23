@@ -1,6 +1,6 @@
-use connector_interface::{AggregationSelection, RelAggregationSelection};
+use connector_interface::AggregationSelection;
 use indexmap::IndexMap;
-use prisma_models::{
+use query_structure::{
     ast::FieldArity, DefaultKind, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier,
 };
 
@@ -48,18 +48,12 @@ impl CompositeOutputMeta {
     }
 }
 
-pub fn from_selected_fields(
-    selected_fields: &FieldSelection,
-    aggregation_selections: &[RelAggregationSelection],
-) -> OutputMetaMapping {
-    let selections: Vec<&SelectedField> = selected_fields.selections().collect();
-    from_selections(&selections, aggregation_selections)
+pub fn from_selected_fields(selected_fields: &FieldSelection) -> OutputMetaMapping {
+    let selections: Vec<_> = selected_fields.selections().collect();
+    from_selections(&selections)
 }
 
-pub fn from_selections(
-    selected_fields: &[&SelectedField],
-    aggregation_selections: &[RelAggregationSelection],
-) -> OutputMetaMapping {
+pub fn from_selections(selected_fields: &[&SelectedField]) -> OutputMetaMapping {
     let mut map = OutputMetaMapping::new();
 
     for selection in selected_fields {
@@ -70,7 +64,7 @@ pub fn from_selections(
 
             SelectedField::Composite(cs) => {
                 let selections: Vec<&SelectedField> = cs.selections.iter().collect();
-                let inner = from_selections(&selections, &[]);
+                let inner = from_selections(&selections);
 
                 map.insert(
                     cs.field.db_name().to_owned(),
@@ -80,11 +74,22 @@ pub fn from_selections(
                     }),
                 );
             }
-        }
-    }
 
-    for selection in aggregation_selections {
-        map.insert(selection.db_alias(), from_rel_aggregation_selection(selection));
+            SelectedField::Relation(_) => unreachable!(),
+
+            SelectedField::Virtual(vs) => {
+                let (ident, arity) = vs.type_identifier_with_arity();
+
+                map.insert(
+                    vs.db_alias(),
+                    OutputMeta::Scalar(ScalarOutputMeta {
+                        ident,
+                        default: None,
+                        list: matches!(arity, FieldArity::List),
+                    }),
+                );
+            }
+        }
     }
 
     map
@@ -123,18 +128,6 @@ pub fn from_aggregation_selection(selection: &AggregationSelection) -> OutputMet
     }
 
     map
-}
-
-/// Mapping for one specific relation aggregation selection.
-/// DB alias -> OutputMeta
-pub fn from_rel_aggregation_selection(aggr_selection: &RelAggregationSelection) -> OutputMeta {
-    let (ident, arity) = aggr_selection.type_identifier_with_arity();
-
-    OutputMeta::Scalar(ScalarOutputMeta {
-        ident,
-        default: None,
-        list: matches!(arity, FieldArity::List),
-    })
 }
 
 impl From<ScalarOutputMeta> for OutputMeta {

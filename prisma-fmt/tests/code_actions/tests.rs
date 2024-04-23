@@ -29,6 +29,9 @@ scenarios! {
     multi_schema_one_model
     multi_schema_one_model_one_enum
     multi_schema_two_models
+    multi_schema_add_to_existing_schemas
+    multi_schema_add_to_nonexisting_schemas
     mongodb_at_map
     mongodb_at_map_with_validation_errors
+    mongodb_auto_native
 }

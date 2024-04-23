@@ -6,7 +6,7 @@ use std::convert::TryFrom;
 ///
 /// Not complete and not meant for external use in this state. Made for
 /// compatibility purposes.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Merge<'a> {
     pub(crate) table: Table<'a>,
     pub(crate) using: Using<'a>,
@@ -52,7 +52,7 @@ impl<'a> From<Merge<'a>> for Query<'a> {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Using<'a> {
     pub(crate) base_query: Query<'a>,
     pub(crate) columns: Vec<Column<'a>>,

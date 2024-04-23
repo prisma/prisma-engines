@@ -122,6 +122,100 @@ mod json {
         Ok(())
     }
 
+    #[connector_test(capabilities(AdvancedJsonNullability))]
+    async fn json_null_must_not_be_confused_with_literal_string(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, json: "\"null\"" }"#).await?;
+
+        match runner.protocol() {
+            query_engine_tests::EngineProtocol::Graphql => {
+                let res = run_query!(runner, r#"{ findManyTestModel { json } }"#);
+
+                insta::assert_snapshot!(
+                  res,
+                  @r###"{"data":{"findManyTestModel":[{"json":"\"null\""}]}}"###
+                );
+            }
+            query_engine_tests::EngineProtocol::Json => {
+                let res = runner
+                    .query_json(
+                        r#"{
+                            "modelName": "TestModel",
+                            "action": "findMany",
+                            "query": {
+                                "selection": {
+                                    "json": true
+                                }
+                            }
+                        }"#,
+                    )
+                    .await?;
+
+                insta::assert_snapshot!(
+                  res.to_string(),
+                  @r###"{"data":{"findManyTestModel":[{"json":{"$type":"Json","value":"\"null\""}}]}}"###
+                );
+            }
+        }
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn dollar_type_in_json_protocol(runner: Runner) -> TestResult<()> {
+        let res = runner
+            .query_json(
+                r#"{
+                    "modelName": "TestModel",
+                    "action": "createOne",
+                    "query": {
+                       "selection": { "json": true },
+                       "arguments": {
+                          "data": {
+                             "id": 1,
+                             "json": { "$type": "Raw", "value": {"$type": "Something" } }
+                          }
+                       }
+                    }
+                }"#,
+            )
+            .await?;
+
+        res.assert_success();
+
+        insta::assert_snapshot!(res.to_string(), @r###"{"data":{"createOneTestModel":{"json":{"$type":"Json","value":"{\"$type\":\"Something\"}"}}}}"###);
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn nested_dollar_type_in_json_protocol(runner: Runner) -> TestResult<()> {
+        let res = runner
+            .query_json(
+                r#"{
+                    "modelName": "TestModel",
+                    "action": "createOne",
+                    "query": {
+                       "selection": { "json": true },
+                       "arguments": {
+                          "data": {
+                             "id": 1,
+                             "json": {
+                                "something": { "$type": "Raw", "value": {"$type": "Something" } }
+                             }
+                          }
+                       }
+                    }
+                }"#,
+            )
+            .await?;
+
+        res.assert_success();
+
+        insta::assert_snapshot!(res.to_string(), @r###"{"data":{"createOneTestModel":{"json":{"$type":"Json","value":"{\"something\":{\"$type\":\"Something\"}}"}}}}"###);
+
+        Ok(())
+    }
+
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, json: "{}" }"#).await?;
         create_row(runner, r#"{ id: 2, json: "{\"a\":\"b\"}" }"#).await?;
