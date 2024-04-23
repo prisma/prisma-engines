@@ -1,4 +1,5 @@
 use crate::{
+    datamodel_connector::ConnectorCapability,
     diagnostics::DatamodelError,
     parser_database::{ast::WithSpan, walkers::ModelWalker},
     validate::validation_pipeline::context::Context,
@@ -12,7 +13,7 @@ pub(super) fn validate_auto_increment(model: ModelWalker<'_>, ctx: &mut Context<
     }
 
     // First check if the provider supports autoincrement at all. If yes, proceed with the detailed checks.
-    if !ctx.connector.supports_auto_increment() {
+    if !ctx.has_capability(ConnectorCapability::AutoIncrement) {
         for field in autoincrement_fields() {
             let msg = "The `autoincrement()` default value is used with a datasource that does not support it.";
 
@@ -27,7 +28,7 @@ pub(super) fn validate_auto_increment(model: ModelWalker<'_>, ctx: &mut Context<
         return;
     }
 
-    if !ctx.connector.supports_multiple_auto_increment() && autoincrement_fields().count() > 1 {
+    if !ctx.has_capability(ConnectorCapability::AutoIncrementMultipleAllowed) && autoincrement_fields().count() > 1 {
         let msg = "The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table.";
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
@@ -41,7 +42,9 @@ pub(super) fn validate_auto_increment(model: ModelWalker<'_>, ctx: &mut Context<
     for field in autoincrement_fields() {
         let field_is_indexed = || model.field_is_indexed_for_autoincrement(field.field_id());
 
-        if !ctx.connector.supports_non_id_auto_increment() && !model.field_is_single_pk(field.field_id()) {
+        if !ctx.has_capability(ConnectorCapability::AutoIncrementAllowedOnNonId)
+            && !model.field_is_single_pk(field.field_id())
+        {
             let msg = "The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.";
 
             ctx.push_error(DatamodelError::new_attribute_validation_error(
@@ -51,7 +54,7 @@ pub(super) fn validate_auto_increment(model: ModelWalker<'_>, ctx: &mut Context<
             ))
         }
 
-        if !ctx.connector.supports_non_indexed_auto_increment() && !field_is_indexed() {
+        if !ctx.has_capability(ConnectorCapability::AutoIncrementNonIndexedAllowed) && !field_is_indexed() {
             let msg = "The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this.";
 
             ctx.push_error(DatamodelError::new_attribute_validation_error(

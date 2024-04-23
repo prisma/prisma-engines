@@ -1,5 +1,5 @@
 use crate::{prelude::*, CompositeType, InternalEnum};
-use psl::schema_ast::ast;
+use psl::parser_database as db;
 use std::sync::Arc;
 
 pub(crate) type InternalDataModelRef = InternalDataModel;
@@ -52,11 +52,11 @@ impl InternalDataModel {
             .ok_or_else(|| DomainError::ModelNotFound { name: name.to_string() })
     }
 
-    pub fn find_composite_type_by_id(&self, ctid: ast::CompositeTypeId) -> CompositeType {
+    pub fn find_composite_type_by_id(&self, ctid: db::CompositeTypeId) -> CompositeType {
         self.clone().zip(ctid)
     }
 
-    pub fn find_model_by_id(&self, model_id: ast::ModelId) -> Model {
+    pub fn find_model_by_id(&self, model_id: db::ModelId) -> Model {
         self.clone().zip(model_id)
     }
 

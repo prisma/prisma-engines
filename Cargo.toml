@@ -25,6 +25,7 @@ members = [
   "query-engine/query-engine",
   "query-engine/query-engine-node-api",
   "query-engine/query-engine-wasm",
+  "query-engine/query-engine-c-abi",
   "query-engine/request-handlers",
   "query-engine/schema",
   "libs/*",
@@ -76,16 +77,6 @@ url = { version = "2.5.0" }
 
 [workspace.dependencies.quaint]
 path = "quaint"
-features = [
-  "expose-drivers",
-  "fmt-sql",
-  "mssql",
-  "mysql",
-  "pooled",
-  "postgresql",
-  "sqlite",
-  "native",
-]
 
 [profile.dev.package.backtrace]
 opt-level = 3
@@ -94,6 +85,9 @@ opt-level = 3
 strip = "symbols"
 
 [profile.release.package.query-engine]
+strip = "symbols"
+
+[profile.release.package.query-engine-c-abi]
 strip = "symbols"
 
 [profile.release]

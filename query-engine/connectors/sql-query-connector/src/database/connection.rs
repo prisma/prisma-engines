@@ -199,7 +199,23 @@ where
         let ctx = Context::new(&self.connection_info, trace_id.as_deref());
         catch(
             &self.connection_info,
-            write::create_records(&self.inner, model, args, skip_duplicates, &ctx),
+            write::create_records_count(&self.inner, model, args, skip_duplicates, &ctx),
+        )
+        .await
+    }
+
+    async fn create_records_returning(
+        &mut self,
+        model: &Model,
+        args: Vec<WriteArgs>,
+        skip_duplicates: bool,
+        selected_fields: FieldSelection,
+        trace_id: Option<String>,
+    ) -> connector::Result<ManyRecords> {
+        let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        catch(
+            &self.connection_info,
+            write::create_records_returning(&self.inner, model, args, skip_duplicates, selected_fields, &ctx),
         )
         .await
     }

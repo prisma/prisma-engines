@@ -5,8 +5,8 @@ edition = "2021"
 
 [dependencies]
 colored = "2"
-dmmf = { path = "../query-engine/dmmf"}
-psl.workspace = true
+dmmf = { path = "../query-engine/dmmf" }
+psl = { workspace = true, features = ["all"] }
 serde_json.workspace = true
 serde.workspace = true
 indoc.workspace = true

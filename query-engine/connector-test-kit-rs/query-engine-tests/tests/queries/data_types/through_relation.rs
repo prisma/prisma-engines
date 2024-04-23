@@ -181,25 +181,34 @@ mod scalar_relations {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_decimal), capabilities(DecimalType))]
+    #[connector_test(schema(schema_decimal), capabilities(DecimalType), exclude(Sqlite("cfd1")))]
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"dec":"1"},{"childId":2,"dec":"-1"},{"childId":3,"dec":"123.4567891"},{"childId":4,"dec":"95993.57"}]}]}}
+    // + {"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"dec":"1"},{"childId":2,"dec":"-1"},{"childId":3,"dec":"123.4567891"},{"childId":4,"dec":"95993.57000000001"}]}]}}
+    // ```
+    //
+    // Basically, decimals are treated as doubles (and lose precision) due to D1 not providing column type information on queries.
     async fn decimal_type(runner: Runner) -> TestResult<()> {
         create_child(&runner, r#"{ childId: 1, dec: "1" }"#).await?;
         create_child(&runner, r#"{ childId: 2, dec: "-1" }"#).await?;
         create_child(&runner, r#"{ childId: 3, dec: "123.45678910" }"#).await?;
+        create_child(&runner, r#"{ childId: 4, dec: "95993.57" }"#).await?;
         create_parent(
             &runner,
-            r#"{ id: 1, children: { connect: [{ childId: 1 }, { childId: 2 }, { childId: 3 }] } }"#,
+            r#"{ id: 1, children: { connect: [{ childId: 1 }, { childId: 2 }, { childId: 3 }, { childId: 4 }] } }"#,
         )
         .await?;
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findManyParent(orderBy: { id: asc }) { id children { childId dec } } }"#),
-          @r###"{"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"dec":"1"},{"childId":2,"dec":"-1"},{"childId":3,"dec":"123.4567891"}]}]}}"###
+          @r###"{"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"dec":"1"},{"childId":2,"dec":"-1"},{"childId":3,"dec":"123.4567891"},{"childId":4,"dec":"95993.57"}]}]}}"###
         );
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findUniqueParent(where: { id: 1 }) { id children { childId dec } } }"#),
-          @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"dec":"1"},{"childId":2,"dec":"-1"},{"childId":3,"dec":"123.4567891"}]}}}"###
+          @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"dec":"1"},{"childId":2,"dec":"-1"},{"childId":3,"dec":"123.4567891"},{"childId":4,"dec":"95993.57"}]}}}"###
         );
 
         Ok(())
@@ -268,6 +277,48 @@ mod scalar_relations {
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findUniqueParent(where: { id: 1 }) { id children { childId string int bInt float bytes bool dt empty unset } } }"#),
           @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"string":["abc","def"],"int":[1,-1,1234567],"bInt":["1","-1","9223372036854775807","-9223372036854775807"],"float":[1.5,-1.5,1.234567],"bytes":["AQID","Qk9OSk9VUg=="],"bool":[false,true],"dt":["1900-10-10T01:10:10.001Z","1999-12-12T21:12:12.121Z"],"empty":[],"unset":[]}]}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_oid() -> String {
+        let schema = indoc! {
+            r#"model Parent {
+            #id(id, Int, @id)
+
+            children Child[]
+          }
+          
+          model Child {
+            #id(childId, Int, @id)
+
+            parentId Int?
+            parent Parent? @relation(fields: [parentId], references: [id])
+
+            oid Int @test.Oid
+          }
+          "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_oid), only(Postgres, CockroachDb))]
+    async fn oid_type(runner: Runner) -> TestResult<()> {
+        create_child(&runner, r#"{ childId: 1, oid: 0 }"#).await?;
+        create_child(&runner, r#"{ childId: 2, oid: 1 }"#).await?;
+        create_child(&runner, r#"{ childId: 3, oid: 65587 }"#).await?;
+        create_child(&runner, &format!(r#"{{ childId: 4, oid: {} }}"#, u32::MAX)).await?;
+        create_parent(
+            &runner,
+            r#"{ id: 1, children: { connect: [{ childId: 1 }, { childId: 2 }, { childId: 3 }, { childId: 4 }] } }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyParent { id children(orderBy: { oid: asc }) { oid } } }"#),
+          @r###"{"data":{"findManyParent":[{"id":1,"children":[{"oid":0},{"oid":1},{"oid":65587},{"oid":4294967295}]}]}}"###
         );
 
         Ok(())

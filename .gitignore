@@ -6,6 +6,7 @@ prisma-gpg-private.asc
 .test_config
 *.pending-snap
 .pending.md
+dev.db
 
 *.class
 *.log
@@ -56,3 +57,6 @@ package-lock.json
 
 # Human readable Wasm output
 *.wat
+
+# Folder with GraphViz representation of query graphs.
+.query_graphs

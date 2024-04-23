@@ -4,12 +4,18 @@ name = "sql-query-connector"
 version = "0.1.0"
 
 [features]
-default = ["postgresql", "sqlite", "mysql"]
+postgresql = ["relation_joins", "quaint/postgresql", "psl/postgresql"]
+mysql = ["relation_joins", "quaint/mysql", "psl/mysql"]
+sqlite = ["quaint/sqlite", "psl/sqlite"]
+mssql = ["quaint/mssql"]
+cockroachdb = ["relation_joins", "quaint/postgresql", "psl/cockroachdb"]
 vendored-openssl = ["quaint/vendored-openssl"]
-postgresql = ["quaint/postgresql"]
-sqlite = ["quaint/sqlite"]
-mysql = ["quaint/mysql"]
-
+all = ["sqlite", "mysql", "postgresql", "mssql", "cockroachdb", "native"]
+native = ["quaint/native", "quaint/pooled"]
+# TODO: At the moment of writing (rustc 1.77.0), can_have_capability from psl does not eliminate joins
+# code from bundle for some reason, so we are doing it explicitly. Check with a newer version of compiler - if elimination
+# happens successfully, we don't need this feature anymore
+relation_joins = []
 # Enable Driver Adapters
 driver-adapters = []
 
@@ -31,12 +37,7 @@ uuid.workspace = true
 opentelemetry = { version = "0.17", features = ["tokio"] }
 tracing-opentelemetry = "0.17.3"
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
-
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 quaint.workspace = true
-
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-quaint = { path = "../../../quaint", default-features = false }
 
 [dependencies.connector-interface]
 package = "query-connector"

@@ -5,8 +5,8 @@ use super::{
     parse_types::parse_field_type,
     Rule,
 };
-use crate::ast::*;
-use diagnostics::{DatamodelError, Diagnostics};
+use crate::ast::{self, *};
+use diagnostics::{DatamodelError, Diagnostics, FileId};
 
 pub(crate) fn parse_field(
     model_name: &str,
@@ -14,6 +14,7 @@ pub(crate) fn parse_field(
     pair: Pair<'_>,
     block_comment: Option<Pair<'_>>,
     diagnostics: &mut Diagnostics,
+    file_id: FileId,
 ) -> Result<Field, DatamodelError> {
     let pair_span = pair.as_span();
     let mut name: Option<Identifier> = None;
@@ -23,15 +24,15 @@ pub(crate) fn parse_field(
 
     for current in pair.into_inner() {
         match current.as_rule() {
-            Rule::identifier => name = Some(current.into()),
-            Rule::field_type => field_type = Some(parse_field_type(current, diagnostics)?),
+            Rule::identifier => name = Some(ast::Identifier::new(current, file_id)),
+            Rule::field_type => field_type = Some(parse_field_type(current, diagnostics, file_id)?),
             Rule::LEGACY_COLON => {
                 return Err(DatamodelError::new_legacy_parser_error(
                     "Field declarations don't require a `:`.",
-                    current.as_span().into(),
+                    (file_id, current.as_span()).into(),
                 ))
             }
-            Rule::field_attribute => attributes.push(parse_attribute(current, diagnostics)),
+            Rule::field_attribute => attributes.push(parse_attribute(current, diagnostics, file_id)),
             Rule::trailing_comment => {
                 comment = match (comment, parse_trailing_comment(current)) {
                     (c, None) | (None, c) => c,
@@ -51,13 +52,13 @@ pub(crate) fn parse_field(
             arity,
             attributes,
             documentation: comment,
-            span: Span::from(pair_span),
+            span: Span::from((file_id, pair_span)),
         }),
         _ => Err(DatamodelError::new_model_validation_error(
             "This field declaration is invalid. It is either missing a name or a type.",
             container_type,
             model_name,
-            pair_span.into(),
+            (file_id, pair_span).into(),
         )),
     }
 }

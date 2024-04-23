@@ -28,7 +28,7 @@ impl<'db> RelationFieldWalker<'db> {
     /// The AST node of the field.
     pub fn ast_field(self) -> &'db ast::Field {
         let RelationField { model_id, field_id, .. } = self.db.types[self.id];
-        &self.db.ast[model_id][field_id]
+        &self.db.asts[model_id][field_id]
     }
 
     pub(crate) fn attributes(self) -> &'db RelationField {
@@ -83,11 +83,12 @@ impl<'db> RelationFieldWalker<'db> {
 
     /// The `@relation` attribute in the field AST.
     pub fn relation_attribute(self) -> Option<&'db ast::Attribute> {
-        self.attributes().relation_attribute.map(|id| &self.db.ast[id])
+        let attrs = self.attributes();
+        attrs.relation_attribute.map(|id| &self.db.asts[(attrs.model_id.0, id)])
     }
 
     /// Does the relation field reference the passed in model?
-    pub fn references_model(self, other: ast::ModelId) -> bool {
+    pub fn references_model(self, other: crate::ModelId) -> bool {
         self.attributes().referenced_model == other
     }
 

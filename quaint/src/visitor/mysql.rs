@@ -418,7 +418,6 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         self.write(", ")?;
 
         match json_extract.path.clone() {
-            #[cfg(feature = "postgresql")]
             JsonPath::Array(_) => panic!("JSON path array notation is not supported for MySQL"),
             JsonPath::String(path) => self.visit_parameterized(Value::text(path))?,
         }

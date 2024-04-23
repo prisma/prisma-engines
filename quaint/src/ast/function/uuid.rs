@@ -13,7 +13,6 @@ use crate::ast::Expression;
 /// # Ok(())
 /// # }
 /// ```
-#[cfg(feature = "mysql")]
 pub fn uuid_to_bin() -> Expression<'static> {
     let func = Function {
         typ_: FunctionType::UuidToBin,
@@ -56,7 +55,6 @@ pub fn uuid_to_bin_swapped() -> Expression<'static> {
 /// # Ok(())
 /// # }
 /// ```
-#[cfg(feature = "mysql")]
 pub fn native_uuid() -> Expression<'static> {
     let func = Function {
         typ_: FunctionType::Uuid,

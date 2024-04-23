@@ -20,6 +20,16 @@
           "name": "dob",
           "typeName": "DateTime",
           "isRelation": false
+        },
+        {
+          "name": "posts",
+          "typeName": "Post[]",
+          "isRelation": true
+        },
+        {
+          "name": "_count",
+          "typeName": "UserCountOutputType",
+          "isRelation": false
         }
       ]
     },
