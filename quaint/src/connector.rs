@@ -11,7 +11,10 @@
 
 mod connection_info;
 
+pub mod external;
 pub mod metrics;
+#[cfg(feature = "native")]
+pub mod native;
 mod queryable;
 mod result_set;
 #[cfg(any(feature = "mssql-native", feature = "postgresql-native", feature = "mysql-native"))]
@@ -21,6 +24,11 @@ mod type_identifier;
 
 pub use self::result_set::*;
 pub use connection_info::*;
+
+#[cfg(feature = "native")]
+pub use native::*;
+
+pub use external::*;
 pub use queryable::*;
 pub use transaction::*;
 #[cfg(any(feature = "mssql-native", feature = "postgresql-native", feature = "mysql-native"))]

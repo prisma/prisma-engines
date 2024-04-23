@@ -33,4 +33,5 @@ scenarios! {
     multi_schema_add_to_nonexisting_schemas
     mongodb_at_map
     mongodb_at_map_with_validation_errors
+    mongodb_auto_native
 }

@@ -32,10 +32,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.enginesHash }}
-      - uses: cachix/install-nix-action@v23
+
+      - uses: ./.github/workflows/include/rust-wasm-setup
 
       - name: Build
-        run: nix build .#prisma-schema-wasm
+        run: make build-schema-wasm PROFILE=release SCHEMA_WASM_VERSION=${{ github.event.inputs.enginesWrapperVersion }}
 
       - uses: actions/setup-node@v4
         with:
@@ -45,11 +46,9 @@ jobs:
       - name: Set up NPM token for publishing later
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
-      - name: Update version in package.json & Publish @prisma/prisma-schema-wasm
-        run: |
-          # Update version in package.json and return directory for later usage
-          PACKAGE_DIR=$( nix run .#renderPrismaSchemaWasmPackage ${{ github.event.inputs.enginesWrapperVersion }})
-          npm publish "$PACKAGE_DIR" --access public --tag ${{ github.event.inputs.npmDistTag }}
+      - name: Publish @prisma/prisma-schema-wasm
+        run: npm publish --access public --tag ${{ github.event.inputs.npmDistTag }}
+        working-directory: target/prisma-schema-wasm
       #
       # Failure handlers
       #
@@ -58,7 +57,7 @@ jobs:
         run: echo "SLACK_FOOTER=<$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID|Click here to go to the job logs>" >> $GITHUB_ENV
       - name: Slack Notification on Failure
         if: ${{ failure() }}
-        uses: rtCamp/action-slack-notify@v2.2.1
+        uses: rtCamp/action-slack-notify@v2.3.0
         env:
           SLACK_TITLE: 'Building and publishing @prisma/prisma-schema-wasm failed :x:'
           SLACK_COLOR: '#FF0000'

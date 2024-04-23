@@ -77,7 +77,7 @@ mod bytes {
         Ok(())
     }
 
-    #[connector_test(schema(bytes_id), exclude(MySQL, Vitess, SqlServer))]
+    #[connector_test(schema(bytes_id), exclude(MySQL, Vitess, SqlServer,))]
     async fn byte_id_coercion(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"

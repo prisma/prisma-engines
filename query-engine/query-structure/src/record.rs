@@ -1,4 +1,6 @@
-use crate::{DomainError, FieldSelection, ModelProjection, OrderBy, PrismaValue, SelectionResult, SortOrder};
+use crate::{
+    DomainError, FieldSelection, ModelProjection, OrderBy, PrismaValue, SelectedField, SelectionResult, SortOrder,
+};
 use itertools::Itertools;
 use std::collections::HashMap;
 
@@ -24,7 +26,7 @@ impl SingleRecord {
 
     pub fn extract_selection_result(&self, extraction_selection: &FieldSelection) -> crate::Result<SelectionResult> {
         self.record
-            .extract_selection_result(&self.field_names, extraction_selection)
+            .extract_selection_result_from_db_name(&self.field_names, extraction_selection)
     }
 
     pub fn get_field_value(&self, field: &str) -> crate::Result<&PrismaValue> {
@@ -49,7 +51,7 @@ impl ManyRecords {
     pub fn empty(selected_fields: &FieldSelection) -> Self {
         Self {
             records: Vec::new(),
-            field_names: selected_fields.prisma_names().collect(),
+            field_names: selected_fields.db_names().collect(),
         }
     }
 
@@ -91,11 +93,27 @@ impl ManyRecords {
         self.records.push(record);
     }
 
-    /// Builds `SelectionResults` from this `ManyRecords` based on the given FieldSelection.
-    pub fn extract_selection_results(&self, selections: &FieldSelection) -> crate::Result<Vec<SelectionResult>> {
+    /// Builds `SelectionResult`s from this `ManyRecords` based on the given `FieldSelection`
+    /// using the database field names.
+    pub fn extract_selection_results_from_db_name(
+        &self,
+        selections: &FieldSelection,
+    ) -> crate::Result<Vec<SelectionResult>> {
         self.records
             .iter()
-            .map(|record| record.extract_selection_result(&self.field_names, selections))
+            .map(|record| record.extract_selection_result_from_db_name(&self.field_names, selections))
+            .collect()
+    }
+
+    /// Builds `SelectionResult`s from this `ManyRecords` based on the given `FieldSelection`
+    /// using the Prisma field names.
+    pub fn extract_selection_results_from_prisma_name(
+        &self,
+        selections: &FieldSelection,
+    ) -> crate::Result<Vec<SelectionResult>> {
+        self.records
+            .iter()
+            .map(|record| record.extract_selection_result_from_prisma_name(&self.field_names, selections))
             .collect()
     }
 
@@ -161,18 +179,37 @@ impl Record {
         }
     }
 
-    /// Extract a `SelectionResult` from this `Record`
+    /// Extracts a `SelectionResult` from this `Record`.
     /// `field_names`: Database names of the fields contained in this `Record`.
     /// `selected_fields`: The selection to extract.
-    pub fn extract_selection_result(
+    pub fn extract_selection_result_from_db_name(
         &self,
         field_names: &[String],
         extraction_selection: &FieldSelection,
     ) -> crate::Result<SelectionResult> {
+        self.extract_selection_result(field_names, extraction_selection, SelectedField::db_name)
+    }
+
+    /// Extracts a `SelectionResult` from this `Record` using Prisma field names rather than
+    /// database names.
+    pub fn extract_selection_result_from_prisma_name(
+        &self,
+        field_names: &[String],
+        extraction_selection: &FieldSelection,
+    ) -> crate::Result<SelectionResult> {
+        self.extract_selection_result(field_names, extraction_selection, SelectedField::prisma_name)
+    }
+
+    fn extract_selection_result<'a, S: AsRef<str> + 'a>(
+        &self,
+        field_names: &[String],
+        extraction_selection: &'a FieldSelection,
+        map_name: impl Fn(&'a SelectedField) -> S,
+    ) -> crate::Result<SelectionResult> {
         let pairs: Vec<_> = extraction_selection
             .selections()
             .map(|selection| {
-                self.get_field_value(field_names, selection.db_name())
+                self.get_field_value(field_names, map_name(selection).as_ref())
                     .and_then(|val| Ok((selection.clone(), selection.coerce_value(val.clone())?)))
             })
             .collect::<crate::Result<Vec<_>>>()?;

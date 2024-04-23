@@ -3,8 +3,16 @@ name = "psl"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+postgresql = ["psl-core/postgresql"]
+sqlite = ["psl-core/sqlite"]
+mysql = ["psl-core/mysql"]
+cockroachdb = ["psl-core/cockroachdb"]
+mssql = ["psl-core/mssql"]
+mongodb = ["psl-core/mongodb"]
+all = ["postgresql", "sqlite", "mysql", "cockroachdb", "mssql", "mongodb"]
+
 [dependencies]
-builtin-psl-connectors = { path = "../builtin-connectors" }
 psl-core = { path = "../psl-core" }
 
 [dev-dependencies]

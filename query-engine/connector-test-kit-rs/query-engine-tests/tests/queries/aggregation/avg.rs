@@ -33,7 +33,7 @@ mod aggregation_avg {
         Ok(())
     }
 
-    #[connector_test(exclude(MongoDb, Vitess("planetscale.js")))]
+    #[connector_test(exclude(MongoDb))]
     async fn avg_with_all_sorts_of_query_args(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, float: 5.5, int: 5, bInt: "5" }"#).await?;
         create_row(&runner, r#"{ id: 2, float: 4.5, int: 10, bInt: "10" }"#).await?;
@@ -126,7 +126,7 @@ mod decimal_aggregation_avg {
         Ok(())
     }
 
-    #[connector_test(exclude(MongoDb, Vitess("planetscale.js")))]
+    #[connector_test(exclude(MongoDb))]
     async fn avg_with_all_sorts_of_query_args(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, decimal: "5.5" }"#).await?;
         create_row(&runner, r#"{ id: 2, decimal: "4.5" }"#).await?;

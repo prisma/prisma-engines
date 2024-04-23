@@ -80,7 +80,7 @@ mod nested_pagination {
      ***************/
 
     // should skip the first item
-    #[connector_test(exclude(Vitess("planetscale.js")))]
+    #[connector_test]
     async fn mid_lvl_skip_1(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -102,7 +102,7 @@ mod nested_pagination {
     }
 
     // should "skip all items"
-    #[connector_test(exclude(Vitess("planetscale.js")))]
+    #[connector_test]
     async fn mid_lvl_skip_3(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -124,7 +124,7 @@ mod nested_pagination {
     }
 
     // should "skip all items"
-    #[connector_test(exclude(Vitess("planetscale.js")))]
+    #[connector_test]
     async fn mid_lvl_skip_4(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -357,7 +357,7 @@ mod nested_pagination {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-            findManyTop{t, middles(take: -1, orderBy: { id: asc }){m}}
+            findManyTop(orderBy: {t: asc}){t, middles(take: -1, orderBy: { id: asc }){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M13"}]},{"t":"T2","middles":[{"m":"M23"}]},{"t":"T3","middles":[{"m":"M33"}]}]}}"###
         );
@@ -372,7 +372,7 @@ mod nested_pagination {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-            findManyTop{t, middles(take: -3, orderBy: { id: asc }) {m}}
+            findManyTop(orderBy: {t: asc}){t, middles(take: -3, orderBy: { id: asc }) {m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}"###
         );
@@ -387,7 +387,7 @@ mod nested_pagination {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-                findManyTop{t, middles(take: -4, orderBy: { id: asc }) {m}}
+                findManyTop(orderBy: {t: asc}){t, middles(take: -4, orderBy: { id: asc }) {m}}
               }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}"###
         );
@@ -402,7 +402,7 @@ mod nested_pagination {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-            findManyTop{middles{bottoms(take: -1, orderBy: { id: asc }){b}}}
+            findManyTop{middles(orderBy: {m: asc}){bottoms(take: -1, orderBy: { id: asc }){b}}}
           }"#),
           @r###"{"data":{"findManyTop":[{"middles":[{"bottoms":[{"b":"B113"}]},{"bottoms":[{"b":"B123"}]},{"bottoms":[{"b":"B133"}]}]},{"middles":[{"bottoms":[{"b":"B213"}]},{"bottoms":[{"b":"B223"}]},{"bottoms":[{"b":"B233"}]}]},{"middles":[{"bottoms":[{"b":"B313"}]},{"bottoms":[{"b":"B323"}]},{"bottoms":[{"b":"B333"}]}]}]}}"###
         );
@@ -417,7 +417,7 @@ mod nested_pagination {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-                findManyTop{middles{bottoms(take: -3, orderBy: { id: asc }){b}}}
+                findManyTop{middles(orderBy: {m: asc}){bottoms(take: -3, orderBy: { id: asc }){b}}}
               }"#),
           @r###"{"data":{"findManyTop":[{"middles":[{"bottoms":[{"b":"B111"},{"b":"B112"},{"b":"B113"}]},{"bottoms":[{"b":"B121"},{"b":"B122"},{"b":"B123"}]},{"bottoms":[{"b":"B131"},{"b":"B132"},{"b":"B133"}]}]},{"middles":[{"bottoms":[{"b":"B211"},{"b":"B212"},{"b":"B213"}]},{"bottoms":[{"b":"B221"},{"b":"B222"},{"b":"B223"}]},{"bottoms":[{"b":"B231"},{"b":"B232"},{"b":"B233"}]}]},{"middles":[{"bottoms":[{"b":"B311"},{"b":"B312"},{"b":"B313"}]},{"bottoms":[{"b":"B321"},{"b":"B322"},{"b":"B323"}]},{"bottoms":[{"b":"B331"},{"b":"B332"},{"b":"B333"}]}]}]}}"###
         );
@@ -432,7 +432,7 @@ mod nested_pagination {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-                    findManyTop{middles{bottoms(take: -4, orderBy: { id: asc }){b}}}
+                    findManyTop{middles(orderBy: {m: asc}){bottoms(take: -4, orderBy: { id: asc }){b}}}
                   }"#),
           @r###"{"data":{"findManyTop":[{"middles":[{"bottoms":[{"b":"B111"},{"b":"B112"},{"b":"B113"}]},{"bottoms":[{"b":"B121"},{"b":"B122"},{"b":"B123"}]},{"bottoms":[{"b":"B131"},{"b":"B132"},{"b":"B133"}]}]},{"middles":[{"bottoms":[{"b":"B211"},{"b":"B212"},{"b":"B213"}]},{"bottoms":[{"b":"B221"},{"b":"B222"},{"b":"B223"}]},{"bottoms":[{"b":"B231"},{"b":"B232"},{"b":"B233"}]}]},{"middles":[{"bottoms":[{"b":"B311"},{"b":"B312"},{"b":"B313"}]},{"bottoms":[{"b":"B321"},{"b":"B322"},{"b":"B323"}]},{"bottoms":[{"b":"B331"},{"b":"B332"},{"b":"B333"}]}]}]}}"###
         );
@@ -451,7 +451,7 @@ mod nested_pagination {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-            findManyTop(skip: 1, take: 1){t, middles{m}}
+            findManyTop(skip: 1, take: 1){t, middles(orderBy: { m: asc }){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]}]}}"###
         );
@@ -466,7 +466,7 @@ mod nested_pagination {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-            findManyTop(skip: 1, take: 3){t, middles{m}}
+            findManyTop(skip: 1, take: 3){t, middles(orderBy: { m: asc }){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}"###
         );
@@ -511,7 +511,7 @@ mod nested_pagination {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-            findManyTop(skip: 1, take: -3, orderBy: { id: asc }){t, middles{m}}
+            findManyTop(skip: 1, take: -3, orderBy: { id: asc }){t, middles(orderBy: { m: asc }){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]}]}}"###
         );
@@ -526,7 +526,7 @@ mod nested_pagination {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-            findManyTop{t, middles(skip: 1, take: -1, orderBy: { id: asc }){m}}
+            findManyTop(orderBy: { t: asc }){t, middles(skip: 1, take: -1, orderBy: { id: asc }){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M12"}]},{"t":"T2","middles":[{"m":"M22"}]},{"t":"T3","middles":[{"m":"M32"}]}]}}"###
         );
@@ -541,7 +541,7 @@ mod nested_pagination {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-            findManyTop{t, middles(skip: 1, take: -3, orderBy: { id: asc }){m}}
+            findManyTop(orderBy: { t: asc }){t, middles(skip: 1, take: -3, orderBy: { id: asc }){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"}]}]}}"###
         );
@@ -560,7 +560,7 @@ mod nested_pagination {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-            findManyTop{t, middles(orderBy: { m: desc }, take: 1){m}}
+            findManyTop(orderBy: { t: asc }){t, middles(orderBy: { m: desc }, take: 1){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M13"}]},{"t":"T2","middles":[{"m":"M23"}]},{"t":"T3","middles":[{"m":"M33"}]}]}}"###
         );
@@ -575,7 +575,7 @@ mod nested_pagination {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-            findManyTop{t, middles(orderBy: { m: desc }, take: 3){m}}
+            findManyTop(orderBy: { t: asc }){t, middles(orderBy: { m: desc }, take: 3){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M13"},{"m":"M12"},{"m":"M11"}]},{"t":"T2","middles":[{"m":"M23"},{"m":"M22"},{"m":"M21"}]},{"t":"T3","middles":[{"m":"M33"},{"m":"M32"},{"m":"M31"}]}]}}"###
         );
@@ -885,7 +885,7 @@ mod nested_pagination {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-            findManyModelA {
+            findManyModelA(orderBy: { id: asc }) {
               id
               manyB(skip: 1) {
                 id
@@ -909,7 +909,7 @@ mod nested_pagination {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-            findManyModelA {
+            findManyModelA(orderBy: { id: asc }) {
               id
               manyB(skip: 1, take: 2) {
                 id
@@ -933,7 +933,7 @@ mod nested_pagination {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{
-            findManyModelA {
+            findManyModelA(orderBy: { id: asc }) {
               id
               manyB(skip: 1, take: -2, orderBy: { id: asc }) {
                 id

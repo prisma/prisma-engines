@@ -84,12 +84,12 @@ To run tests through a driver adapters, you should also configure the following 
 
 * `DRIVER_ADAPTER`: tells the test executor to use a particular driver adapter. Set to `neon`, `planetscale` or any other supported adapter.
 * `DRIVER_ADAPTER_CONFIG`: a json string with the configuration for the driver adapter. This is adapter specific. See the [github workflow for driver adapter tests](.github/workflows/query-engine-driver-adapters.yml) for examples on how to configure the driver adapters.
-* `ENGINE`: can be used to run either `wasm` or `napi` version of the engine.
+* `ENGINE`: can be used to run either `wasm` or `napi` or `c-abi` version of the engine.
 
 Example:
 
 ```shell
-export EXTERNAL_TEST_EXECUTOR="$WORKSPACE_ROOT/query-engine/driver-adapters/connector-test-kit-executor/script/start_node.sh"
+export EXTERNAL_TEST_EXECUTOR="$WORKSPACE_ROOT/query-engine/driver-adapters/executor/script/testd.sh"
 export DRIVER_ADAPTER=neon
 export ENGINE=wasm
 export DRIVER_ADAPTER_CONFIG ='{ "proxyUrl": "127.0.0.1:5488/v1" }'

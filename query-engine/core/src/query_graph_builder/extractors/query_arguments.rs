@@ -54,6 +54,11 @@ pub fn extract_query_args(
                     }
                 }
 
+                args::RELATION_LOAD_STRATEGY => Ok(QueryArguments {
+                    relation_load_strategy: Some(arg.value.try_into()?),
+                    ..result
+                }),
+
                 _ => Ok(result),
             }
         },
@@ -212,10 +217,10 @@ fn extract_order_by_args(
 ) -> QueryGraphBuilderResult<(SortOrder, Option<NullsOrder>)> {
     match field_value {
         ParsedInputValue::Map(mut map) => {
-            let sort: PrismaValue = map.remove(ordering::SORT).unwrap().try_into()?;
+            let sort: PrismaValue = map.swap_remove(ordering::SORT).unwrap().try_into()?;
             let sort = pv_to_sort_order(sort)?;
             let nulls = map
-                .remove(ordering::NULLS)
+                .swap_remove(ordering::NULLS)
                 .map(PrismaValue::try_from)
                 .transpose()?
                 .map(pv_to_nulls_order)
@@ -319,7 +324,7 @@ fn extract_compound_cursor_field(
     let mut pairs = vec![];
 
     for field in fields {
-        let value = map.remove(field.name()).unwrap();
+        let value = map.swap_remove(field.name()).unwrap();
         pairs.extend(extract_cursor_field(field, value)?);
     }
 

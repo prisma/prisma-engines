@@ -25,7 +25,7 @@ mod nested_create_many {
     }
 
     // "A basic createMany on a create top level" should "work"
-    #[connector_test(exclude(Sqlite))]
+    #[connector_test]
     async fn create_many_on_create(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -53,7 +53,7 @@ mod nested_create_many {
     }
 
     // "A basic createMany on a create top level" should "work"
-    #[connector_test(exclude(Sqlite))]
+    #[connector_test]
     async fn create_many_shorthand_on_create(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -78,7 +78,7 @@ mod nested_create_many {
 
     // "Nested createMany" should "error on duplicates by default"
     // TODO(dom): Not working for mongo
-    #[connector_test(exclude(Sqlite, MongoDb, Vitess("planetscale.js")))]
+    #[connector_test(exclude(MongoDb))]
     async fn nested_createmany_fail_dups(runner: Runner) -> TestResult<()> {
         assert_error!(
             &runner,
@@ -140,7 +140,7 @@ mod nested_create_many {
     // Each DB allows a certain amount of params per single query, and a certain number of rows.
     // We create 1000 nested records.
     // "Nested createMany" should "allow creating a large number of records (horizontal partitioning check)"
-    #[connector_test(exclude(Sqlite))]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn allow_create_large_number_records(runner: Runner) -> TestResult<()> {
         let records: Vec<_> = (1..=1000).map(|i| format!(r#"{{ id: {i}, str1: "{i}" }}"#)).collect();
 

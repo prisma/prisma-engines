@@ -116,6 +116,15 @@ impl ConnectorError {
             ErrorKind::ExternalError(id) => Some(user_facing_errors::KnownError::new(
                 user_facing_errors::query_engine::ExternalError { id: id.to_owned() },
             )),
+            ErrorKind::RecordDoesNotExist { cause } => Some(KnownError::new(
+                user_facing_errors::query_engine::RecordRequiredButNotFound { cause: cause.clone() },
+            )),
+
+            ErrorKind::TooManyConnections(e) => Some(user_facing_errors::KnownError::new(
+                user_facing_errors::query_engine::TooManyConnections {
+                    message: format!("{}", e),
+                },
+            )),
             _ => None,
         };
 
@@ -146,8 +155,8 @@ pub enum ErrorKind {
     #[error("Foreign key constraint failed")]
     ForeignKeyConstraintViolation { constraint: DatabaseConstraint },
 
-    #[error("Record does not exist.")]
-    RecordDoesNotExist,
+    #[error("Record does not exist: {cause}")]
+    RecordDoesNotExist { cause: String },
 
     #[error("Column '{}' does not exist.", column)]
     ColumnDoesNotExist { column: String },
@@ -272,6 +281,15 @@ pub enum ErrorKind {
 
     #[error("External connector error")]
     ExternalError(i32),
+
+    #[error("Invalid driver adapter: {0}")]
+    InvalidDriverAdapter(String),
+
+    #[error("Too many DB connections opened: {}", _0)]
+    TooManyConnections(Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("Failed to parse database version: {}. Reason: {}", version, reason)]
+    UnexpectedDatabaseVersion { version: String, reason: String },
 }
 
 impl From<DomainError> for ConnectorError {

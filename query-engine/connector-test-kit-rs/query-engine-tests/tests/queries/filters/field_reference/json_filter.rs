@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(capabilities(JsonFiltering), exclude(MySql(5.6)))]
+#[test_suite(capabilities(JsonFiltering), exclude(MySQL(5.6)))]
 mod json_filter {
     use query_engine_tests::run_query;
 
@@ -15,6 +15,27 @@ mod json_filter {
         };
 
         schema.to_owned()
+    }
+
+    // Note: testing the absence of "JSON-null stripping" in Napi.rs Driver Adapters requires patching napi.rs.
+    #[connector_test(schema(schema), exclude(MySQL(5.6)))]
+    async fn does_not_strip_nulls_in_json(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneTestModel(data: { id: 1, json: "{\"a\":null}"}) { id } }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+          findManyTestModel {
+              id
+              json
+          }
+        }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"json":"{\"a\":null}"}]}}"###
+        );
+
+        Ok(())
     }
 
     #[connector_test(schema(schema))]
@@ -126,7 +147,7 @@ mod json_filter {
         Ok(())
     }
 
-    #[connector_test(schema(schema), exclude(MySQL(5.6), Vitess("planetscale.js")))]
+    #[connector_test(schema(schema), exclude(MySQL(5.6)))]
     async fn string_comparison_filters(runner: Runner) -> TestResult<()> {
         test_string_data(&runner).await?;
 
@@ -169,7 +190,7 @@ mod json_filter {
         Ok(())
     }
 
-    #[connector_test(schema(schema), exclude(MySQL(5.6), Vitess("planetscale.js")))]
+    #[connector_test(schema(schema), exclude(MySQL(5.6)))]
     async fn array_comparison_filters(runner: Runner) -> TestResult<()> {
         test_array_data(&runner).await?;
 
@@ -463,7 +484,7 @@ mod json_filter {
     fn json_path(runner: &Runner) -> &'static str {
         match runner.connector_version() {
             ConnectorVersion::Postgres(_) | ConnectorVersion::CockroachDb(_) => r#"path: ["a", "b"]"#,
-            ConnectorVersion::MySql(_) => r#"path: "$.a.b""#,
+            ConnectorVersion::MySql(_) | ConnectorVersion::Vitess(_) => r#"path: "$.a.b""#,
             x => unreachable!("JSON filtering is not supported on {:?}", x),
         }
     }

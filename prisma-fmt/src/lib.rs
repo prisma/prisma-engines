@@ -3,14 +3,17 @@ mod code_actions;
 mod get_config;
 mod get_dmmf;
 mod lint;
+mod merge_schemas;
 mod native;
 mod preview;
+mod schema_file_input;
 mod text_document_completion;
 mod validate;
 
 use log::*;
 use lsp_types::{Position, Range};
 use psl::parser_database::ast;
+use schema_file_input::SchemaFileInput;
 
 /// The API is modelled on an LSP [completion
 /// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_completion).
@@ -43,27 +46,49 @@ pub fn code_actions(schema: String, params: &str) -> String {
 }
 
 /// The two parameters are:
-/// - The Prisma schema to reformat, as a string.
+/// - The [`SchemaFileInput`] to reformat, as a string.
 /// - An LSP
 /// [DocumentFormattingParams](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_formatting) object, as JSON.
 ///
 /// The function returns the formatted schema, as a string.
+/// If the schema or any of the provided parameters is invalid, the function returns the original schema.
+/// This function never panics.
 ///
 /// Of the DocumentFormattingParams, we only take into account tabSize, at the moment.
-pub fn format(schema: &str, params: &str) -> String {
-    let params: lsp_types::DocumentFormattingParams = match serde_json::from_str(params) {
+pub fn format(datamodel: String, params: &str) -> String {
+    let schema: SchemaFileInput = match serde_json::from_str(&datamodel) {
         Ok(params) => params,
-        Err(err) => {
-            warn!("Error parsing DocumentFormattingParams params: {}", err);
-            return schema.to_owned();
+        Err(_) => {
+            return datamodel;
         }
     };
 
-    psl::reformat(schema, params.options.tab_size as usize).unwrap_or_else(|| schema.to_owned())
+    let params: lsp_types::DocumentFormattingParams = match serde_json::from_str(params) {
+        Ok(params) => params,
+        Err(_) => {
+            return datamodel;
+        }
+    };
+
+    let indent_width = params.options.tab_size as usize;
+
+    match schema {
+        SchemaFileInput::Single(single) => psl::reformat(&single, indent_width).unwrap_or(datamodel),
+        SchemaFileInput::Multiple(multiple) => {
+            let result = psl::reformat_multiple(multiple, indent_width);
+            serde_json::to_string(&result).unwrap_or(datamodel)
+        }
+    }
 }
 
 pub fn lint(schema: String) -> String {
-    lint::run(&schema)
+    let schema: SchemaFileInput = match serde_json::from_str(&schema) {
+        Ok(params) => params,
+        Err(serde_err) => {
+            panic!("Failed to deserialize SchemaFileInput: {serde_err}");
+        }
+    };
+    lint::run(schema)
 }
 
 /// Function that throws a human-friendly error message when the schema is invalid, following the JSON formatting
@@ -87,6 +112,14 @@ pub fn lint(schema: String) -> String {
 /// This function isn't supposed to panic.
 pub fn validate(validate_params: String) -> Result<(), String> {
     validate::validate(&validate_params)
+}
+
+/// Given a list of Prisma schema files (and their locations), returns the merged schema.
+/// This is useful for `@prisma/client` generation, where the client needs a single - potentially large - schema,
+/// while still allowing the user to split their schema copies into multiple files.
+/// Internally, it uses `[validate]`.
+pub fn merge_schemas(params: String) -> Result<String, String> {
+    merge_schemas::merge_schemas(&params)
 }
 
 pub fn native_types(schema: String) -> String {
@@ -225,7 +258,7 @@ pub(crate) fn range_to_span(range: Range, document: &str) -> ast::Span {
     let start = position_to_offset(&range.start, document).unwrap();
     let end = position_to_offset(&range.end, document).unwrap();
 
-    ast::Span::new(start, end)
+    ast::Span::new(start, end, psl::parser_database::FileId::ZERO)
 }
 
 /// Gives the LSP position right after the given span.

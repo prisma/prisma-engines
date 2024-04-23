@@ -277,7 +277,7 @@ mod pagination {
      ********************/
 
     // "A skip" should "return all records after the offset specified"
-    #[connector_test(exclude(Vitess("planetscale.js")))]
+    #[connector_test]
     async fn skip_returns_all_after_offset(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -296,7 +296,7 @@ mod pagination {
     }
 
     // "A skip with order reversed" should "return all records after the offset specified"
-    #[connector_test(exclude(Vitess("planetscale.js")))]
+    #[connector_test]
     async fn skip_reversed_order(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -315,7 +315,7 @@ mod pagination {
     }
 
     // "A skipping beyond all records" should "return no records"
-    #[connector_test(exclude(Vitess("planetscale.js")))]
+    #[connector_test]
     async fn skipping_beyond_all_records(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 

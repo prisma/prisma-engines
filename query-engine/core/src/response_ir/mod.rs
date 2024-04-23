@@ -126,6 +126,16 @@ impl Item {
         }
     }
 
+    /// Returns a mutable reference to the underlying map, if the element is a map and the map is
+    /// owned. Unlike [`Item::as_map`], it doesn't allow obtaining a reference to a shared map
+    /// referenced via [`ItemRef`].
+    pub fn as_map_mut(&mut self) -> Option<&mut Map> {
+        match self {
+            Self::Map(m) => Some(m),
+            _ => None,
+        }
+    }
+
     pub fn into_map(self) -> Option<Map> {
         match self {
             Self::Map(m) => Some(m),

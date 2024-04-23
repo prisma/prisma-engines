@@ -34,9 +34,11 @@ impl SelectionResultExt for SelectionResult {
     fn db_values<'a>(&self, ctx: &Context<'_>) -> Vec<Value<'a>> {
         self.pairs
             .iter()
-            .map(|(selection, v)| match selection {
-                SelectedField::Scalar(sf) => sf.value(v.clone(), ctx),
-                SelectedField::Composite(_cf) => todo!(), // [Composites] todo
+            .filter_map(|(selection, v)| match selection {
+                SelectedField::Scalar(sf) => Some(sf.value(v.clone(), ctx)),
+                SelectedField::Composite(_) => None,
+                SelectedField::Relation(_) => None,
+                SelectedField::Virtual(_) => None,
             })
             .collect()
     }

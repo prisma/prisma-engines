@@ -87,7 +87,7 @@ mod combinations {
     }
 
     // Mongo precision issue.
-    #[connector_test(exclude(MongoDB, Vitess("planetscale.js")))]
+    #[connector_test(exclude(MongoDB))]
     async fn with_query_args(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: "1", float: 5.5, int: 5 }"#).await?;
         create_row(&runner, r#"{ id: "2", float: 4.5, int: 10 }"#).await?;
@@ -369,7 +369,7 @@ mod decimal_combinations {
     }
 
     // Mongo precision issue.
-    #[connector_test(exclude(MongoDB, Vitess("planetscale.js")))]
+    #[connector_test(exclude(MongoDB))]
     async fn with_query_args(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: "1", dec: "5.5" }"#).await?;
         create_row(&runner, r#"{ id: "2", dec: "4.5" }"#).await?;

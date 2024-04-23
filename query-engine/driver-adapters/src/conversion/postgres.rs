@@ -1,6 +1,6 @@
 use crate::conversion::JSArg;
-use chrono::format::StrftimeItems;
 use once_cell::sync::Lazy;
+use quaint::chrono::format::StrftimeItems;
 use serde_json::value::Value as JsonValue;
 
 static TIME_FMT: Lazy<StrftimeItems> = Lazy::new(|| StrftimeItems::new("%H:%M:%S%.f"));
@@ -14,6 +14,7 @@ pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
         (quaint::ValueType::DateTime(Some(dt)), _) => JSArg::Value(JsonValue::String(dt.naive_utc().to_string())),
         (quaint::ValueType::Json(Some(s)), _) => JSArg::Value(JsonValue::String(serde_json::to_string(s)?)),
         (quaint::ValueType::Bytes(Some(bytes)), _) => JSArg::Buffer(bytes.to_vec()),
+        (quaint::ValueType::Int32(Some(value)), _) => JSArg::SafeInt(*value),
         (quaint::ValueType::Numeric(Some(bd)), _) =>  JSArg::Value(JsonValue::String(bd.to_string())),
         (quaint::ValueType::Array(Some(items)), _) => JSArg::Array(
             items
@@ -30,8 +31,8 @@ pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use bigdecimal::BigDecimal;
-    use chrono::*;
+    use quaint::bigdecimal::BigDecimal;
+    use quaint::chrono::*;
     use quaint::ValueType;
     use std::str::FromStr;
 
@@ -104,6 +105,10 @@ mod test {
                     JSArg::Value(JsonValue::String("23:13:01".to_string())),
                     JSArg::Value(JsonValue::Null),
                 ))
+            ),
+            (
+                ValueType::Bytes(Some("hello".as_bytes().into())).into_value(),
+                JSArg::Buffer("hello".as_bytes().to_vec())
             ),
         ];
 

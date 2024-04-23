@@ -27,7 +27,7 @@ mod json_filters {
         schema.to_owned()
     }
 
-    #[connector_test(exclude(MySQL(5.6), Vitess("planetscale.js")))]
+    #[connector_test(exclude(MySQL(5.6)))]
     async fn no_path_without_filter(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -46,53 +46,68 @@ mod json_filters {
         create_row(&runner, 4, r#"{ \"a\": { \"b\": [null] } }"#, false).await?;
         create_row(&runner, 5, r#"{ }"#, false).await?;
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"path: ["a", "b"], equals: "\"c\"" "#, Some(""))
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        let res = run_query!(
+            runner,
+            jsonq(&runner, r#"path: ["a", "b"], equals: "\"c\"" "#, Some(""))
         );
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"path: ["a", "b", "0"], equals: "1" "#, Some(""))
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        let res = run_query!(
+            runner,
+            jsonq(&runner, r#"path: ["a", "b", "0"], equals: "1" "#, Some(""))
         );
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"path: ["a", "b", "0"], equals: JsonNull "#, Some(""))
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":4}]}}"###
+        let res = run_query!(
+            runner,
+            jsonq(&runner, r#"path: ["a", "b", "0"], equals: JsonNull "#, Some(""))
         );
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":4}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"path: ["a", "b"], equals: JsonNull "#, Some(""))
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
+        let res = run_query!(
+            runner,
+            jsonq(&runner, r#"path: ["a", "b"], equals: JsonNull "#, Some(""))
         );
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"path: ["a", "b"], equals: DbNull "#, Some(""))
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":5}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"path: ["a", "b"], equals: DbNull "#, Some("")));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":5}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"path: ["a", "b"], equals: AnyNull "#, Some(""))
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":3},{"id":5}]}}"###
+        let res = run_query!(
+            runner,
+            jsonq(&runner, r#"path: ["a", "b"], equals: AnyNull "#, Some(""))
         );
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":3},{"id":5}]}}"###
+            );
+        }
 
         Ok(())
     }
@@ -120,13 +135,13 @@ mod json_filters {
         create_row(&runner, 5, r#"{ \"a\": { \"b\": [null] } }"#, false).await?;
         create_row(&runner, 6, r#"{ }"#, false).await?;
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"path: "$.a.b", equals: "\"c\"" "#, Some(""))
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"path: "$.a.b", equals: "\"c\"" "#, Some("")));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+            );
+        }
 
         insta::assert_snapshot!(
             run_query!(
@@ -136,29 +151,32 @@ mod json_filters {
             @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"###
         );
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"path: "$.a.b[0]", equals: JsonNull "#, Some(""))
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":4},{"id":5}]}}"###
+        let res = run_query!(
+            runner,
+            jsonq(&runner, r#"path: "$.a.b[0]", equals: JsonNull "#, Some(""))
         );
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":4},{"id":5}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"path: "$.a.b", equals: DbNull "#, Some(""))
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":6}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"path: "$.a.b", equals: DbNull "#, Some("")));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":6}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"path: "$.a.b", equals: AnyNull "#, Some(""))
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":4},{"id":6}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"path: "$.a.b", equals: AnyNull "#, Some("")));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":4},{"id":6}]}}"###
+            );
+        }
 
         Ok(())
     }
@@ -174,36 +192,36 @@ mod json_filters {
         create_row(&runner, 8, r#"[1, [null], 2]"#, true).await?;
 
         // array_contains
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"array_contains: "[3]""#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
-        );
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"array_contains: "[\"a\"]""#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":4}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"array_contains: "[3]""#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+            );
+        }
+        let res = run_query!(runner, jsonq(&runner, r#"array_contains: "[\"a\"]""#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":4}]}}"###
+            );
+        }
 
         // NOT array_contains
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                not_jsonq(&runner, r#"array_contains: "[3]""#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":4},{"id":6},{"id":7},{"id":8}]}}"###
-        );
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                not_jsonq(&runner, r#"array_contains: "[\"a\"]""#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":6},{"id":7},{"id":8}]}}"###
-        );
+        let res = run_query!(runner, not_jsonq(&runner, r#"array_contains: "[3]""#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":4},{"id":6},{"id":7},{"id":8}]}}"###
+            );
+        }
+        let res = run_query!(runner, not_jsonq(&runner, r#"array_contains: "[\"a\"]""#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":6},{"id":7},{"id":8}]}}"###
+            );
+        }
 
         // MySQL has slightly different semantics and also coerces null to [null].
         is_one_of!(
@@ -225,30 +243,30 @@ mod json_filters {
         match runner.connector_version() {
             // MariaDB does not support finding arrays in arrays, unlike MySQL
             ConnectorVersion::MySql(Some(MySqlVersion::MariaDb)) => {
-                insta::assert_snapshot!(
-                    run_query!(
-                        runner,
-                        jsonq(&runner, r#"array_contains: "[[1, 2]]" "#, None)
-                    ),
-                    @r###"{"data":{"findManyTestModel":[{"id":1},{"id":6},{"id":7},{"id":8}]}}"###
-                );
+                let res = run_query!(runner, jsonq(&runner, r#"array_contains: "[[1, 2]]" "#, None));
+                insta::allow_duplicates! {
+                    insta::assert_snapshot!(
+                        res,
+                        @r###"{"data":{"findManyTestModel":[{"id":1},{"id":6},{"id":7},{"id":8}]}}"###
+                    );
+                }
             }
             _ => {
-                insta::assert_snapshot!(
-                    run_query!(
-                        runner,
-                        jsonq(&runner, r#"array_contains: "[[1, 2]]" "#, None)
-                    ),
-                    @r###"{"data":{"findManyTestModel":[{"id":6}]}}"###
-                );
+                let res = run_query!(runner, jsonq(&runner, r#"array_contains: "[[1, 2]]" "#, None));
+                insta::allow_duplicates! {
+                    insta::assert_snapshot!(
+                        res,
+                        @r###"{"data":{"findManyTestModel":[{"id":6}]}}"###
+                    );
+                }
 
-                insta::assert_snapshot!(
-                    run_query!(
-                        runner,
-                        jsonq(&runner, r#"array_contains: "[[null]]" "#, None)
-                    ),
-                    @r###"{"data":{"findManyTestModel":[{"id":8}]}}"###
-                );
+                let res = run_query!(runner, jsonq(&runner, r#"array_contains: "[[null]]" "#, None));
+                insta::allow_duplicates! {
+                    insta::assert_snapshot!(
+                        res,
+                        @r###"{"data":{"findManyTestModel":[{"id":8}]}}"###
+                    );
+                }
             }
         }
 
@@ -262,7 +280,7 @@ mod json_filters {
         Ok(())
     }
 
-    #[connector_test(exclude(MySQL(5.6), Vitess("planetscale.js")))]
+    #[connector_test(exclude(MySQL(5.6)))]
     async fn array_contains(runner: Runner) -> TestResult<()> {
         array_contains_runner(runner).await?;
 
@@ -280,86 +298,86 @@ mod json_filters {
         create_row(&runner, 8, r#"[null, \"test\"]"#, true).await?;
         create_row(&runner, 9, r#"[[null], \"test\"]"#, true).await?;
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"array_starts_with: "3" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"array_starts_with: "3" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"array_starts_with: "\"a\"" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":4}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"array_starts_with: "\"a\"" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":4}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"array_starts_with: "[1, 2]" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":6}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"array_starts_with: "[1, 2]" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":6}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"array_starts_with: "null" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":8}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"array_starts_with: "null" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":8}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"array_starts_with: "[null]" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":9}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"array_starts_with: "[null]" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":9}]}}"###
+            );
+        }
 
         // NOT
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                not_jsonq(&runner, r#"array_starts_with: "3" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4},{"id":6},{"id":8},{"id":9}]}}"###
-        );
+        let res = run_query!(runner, not_jsonq(&runner, r#"array_starts_with: "3" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4},{"id":6},{"id":8},{"id":9}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                not_jsonq(&runner, r#"array_starts_with: "\"a\"" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":6},{"id":8},{"id":9}]}}"###
-        );
+        let res = run_query!(runner, not_jsonq(&runner, r#"array_starts_with: "\"a\"" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":6},{"id":8},{"id":9}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                not_jsonq(&runner, r#"array_starts_with: "[1, 2]" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":8},{"id":9}]}}"###
-        );
+        let res = run_query!(runner, not_jsonq(&runner, r#"array_starts_with: "[1, 2]" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":8},{"id":9}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                not_jsonq(&runner, r#"array_starts_with: "null" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":6},{"id":9}]}}"###
-        );
+        let res = run_query!(runner, not_jsonq(&runner, r#"array_starts_with: "null" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":6},{"id":9}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                not_jsonq(&runner, r#"array_starts_with: "[null]" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":6},{"id":8}]}}"###
-        );
+        let res = run_query!(runner, not_jsonq(&runner, r#"array_starts_with: "[null]" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":6},{"id":8}]}}"###
+            );
+        }
 
         Ok(())
     }
@@ -371,7 +389,7 @@ mod json_filters {
         Ok(())
     }
 
-    #[connector_test(exclude(MySQL(5.6), Vitess("planetscale.js")))]
+    #[connector_test(exclude(MySQL(5.6)))]
     async fn array_starts_with(runner: Runner) -> TestResult<()> {
         array_starts_with_runner(runner).await?;
 
@@ -387,86 +405,86 @@ mod json_filters {
         create_row(&runner, 8, r#"[\"test\", null]"#, true).await?;
         create_row(&runner, 9, r#"[\"test\", [null]]"#, true).await?;
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"array_ends_with: "3" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"array_ends_with: "3" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"array_ends_with: "\"b\"" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"array_ends_with: "\"b\"" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"array_ends_with: "[3, 4]" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":4}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"array_ends_with: "[3, 4]" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":4}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"array_ends_with: "null" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":8}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"array_ends_with: "null" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":8}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"array_ends_with: "[null]" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":9}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"array_ends_with: "[null]" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":9}]}}"###
+            );
+        }
 
         // NOT
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                not_jsonq(&runner, r#"array_ends_with: "3" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3},{"id":4},{"id":8},{"id":9}]}}"###
-        );
+        let res = run_query!(runner, not_jsonq(&runner, r#"array_ends_with: "3" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3},{"id":4},{"id":8},{"id":9}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                not_jsonq(&runner, r#"array_ends_with: "\"b\"" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":8},{"id":9}]}}"###
-        );
+        let res = run_query!(runner, not_jsonq(&runner, r#"array_ends_with: "\"b\"" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":8},{"id":9}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                not_jsonq(&runner, r#"array_ends_with: "[3, 4]" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":8},{"id":9}]}}"###
-        );
+        let res = run_query!(runner, not_jsonq(&runner, r#"array_ends_with: "[3, 4]" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":8},{"id":9}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                not_jsonq(&runner, r#"array_ends_with: "null" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":9}]}}"###
-        );
+        let res = run_query!(runner, not_jsonq(&runner, r#"array_ends_with: "null" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":9}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                not_jsonq(&runner, r#"array_ends_with: "[null]" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":8}]}}"###
-        );
+        let res = run_query!(runner, not_jsonq(&runner, r#"array_ends_with: "[null]" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":8}]}}"###
+            );
+        }
 
         Ok(())
     }
@@ -478,7 +496,7 @@ mod json_filters {
         Ok(())
     }
 
-    #[connector_test(exclude(MySQL(5.6), Vitess("planetscale.js")))]
+    #[connector_test(exclude(MySQL(5.6)))]
     async fn array_ends_with(runner: Runner) -> TestResult<()> {
         array_ends_with_runner(runner).await?;
 
@@ -490,22 +508,22 @@ mod json_filters {
         create_row(&runner, 2, r#"\"fool\""#, true).await?;
         create_row(&runner, 3, r#"[\"foo\"]"#, true).await?;
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"string_contains: "oo" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"string_contains: "oo" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+            );
+        }
 
         // NOT
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                not_jsonq(&runner, r#"string_contains: "ab" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
-        );
+        let res = run_query!(runner, not_jsonq(&runner, r#"string_contains: "ab" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+            );
+        }
 
         Ok(())
     }
@@ -517,7 +535,7 @@ mod json_filters {
         Ok(())
     }
 
-    #[connector_test(exclude(MySQL(5.6), Vitess("planetscale.js")))]
+    #[connector_test(exclude(MySQL(5.6)))]
     async fn string_contains(runner: Runner) -> TestResult<()> {
         string_contains_runner(runner).await?;
 
@@ -530,22 +548,22 @@ mod json_filters {
         create_row(&runner, 3, r#"[\"foo\"]"#, true).await?;
 
         // string_starts_with
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"string_starts_with: "foo" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"string_starts_with: "foo" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+            );
+        }
 
         // NOT string_starts_with
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                not_jsonq(&runner, r#"string_starts_with: "ab" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
-        );
+        let res = run_query!(runner, not_jsonq(&runner, r#"string_starts_with: "ab" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+            );
+        }
 
         Ok(())
     }
@@ -557,7 +575,7 @@ mod json_filters {
         Ok(())
     }
 
-    #[connector_test(exclude(MySQL(5.6), Vitess("planetscale.js")))]
+    #[connector_test(exclude(MySQL(5.6)))]
     async fn string_starts_with(runner: Runner) -> TestResult<()> {
         string_starts_with_runner(runner).await?;
 
@@ -569,22 +587,22 @@ mod json_filters {
         create_row(&runner, 2, r#"\"fool\""#, true).await?;
         create_row(&runner, 3, r#"[\"foo\"]"#, true).await?;
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"string_ends_with: "oo" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"string_ends_with: "oo" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+            );
+        }
 
         // NOT
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                not_jsonq(&runner, r#"string_ends_with: "oo" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
-        );
+        let res = run_query!(runner, not_jsonq(&runner, r#"string_ends_with: "oo" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+            );
+        }
 
         Ok(())
     }
@@ -596,7 +614,7 @@ mod json_filters {
         Ok(())
     }
 
-    #[connector_test(exclude(MySQL(5.6), Vitess("planetscale.js")))]
+    #[connector_test(exclude(MySQL(5.6)))]
     async fn string_ends_with(runner: Runner) -> TestResult<()> {
         string_ends_with_runner(runner).await?;
 
@@ -612,37 +630,37 @@ mod json_filters {
         create_row(&runner, 6, r#"100"#, true).await?;
         create_row(&runner, 7, r#"[\"foo\"]"#, true).await?;
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"gt: "\"b\"" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"gt: "\"b\"" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"gte: "\"b\"" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"gte: "\"b\"" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"gt: "1" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":4},{"id":5},{"id":6}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"gt: "1" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":4},{"id":5},{"id":6}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"gte: "1" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5},{"id":6}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"gte: "1" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5},{"id":6}]}}"###
+            );
+        }
 
         Ok(())
     }
@@ -693,37 +711,37 @@ mod json_filters {
         create_row(&runner, 6, r#"100"#, true).await?;
         create_row(&runner, 7, r#"[\"foo\"]"#, true).await?;
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"lt: "\"f\"" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"lt: "\"f\"" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"lte: "\"foo\"" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"lte: "\"foo\"" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"lt: "100" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"lt: "100" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5}]}}"###
+            );
+        }
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                jsonq(&runner, r#"lte: "100" "#, None)
-            ),
-            @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5},{"id":6}]}}"###
-        );
+        let res = run_query!(runner, jsonq(&runner, r#"lte: "100" "#, None));
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5},{"id":6}]}}"###
+            );
+        }
 
         Ok(())
     }
@@ -753,70 +771,97 @@ mod json_filters {
         create_row(&runner, 6, r#"2.4"#, true).await?;
         create_row(&runner, 7, r#"3"#, true).await?;
 
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                format!(r#"query {{
-                    findManyTestModel(
-                        where: {{ json: {{ {}, array_contains: "3", array_starts_with: "3" }} }},
-                        cursor: {{ id: 2 }},
-                        take: 2
-                    ) {{ json }}
-                }}"#, json_path(&runner))
-            ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[3,4,5]}}"},{"json":"{\"a\":{\"b\":[3,4,6]}}"}]}}"###
+        let res = run_query!(
+            runner,
+            format!(
+                r#"query {{
+                findManyTestModel(
+                    where: {{ json: {{ {}, array_contains: "3", array_starts_with: "3" }} }},
+                    cursor: {{ id: 2 }},
+                    take: 2
+                ) {{ json }}
+            }}"#,
+                json_path(&runner)
+            )
         );
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                format!(r#"query {{
-                    findManyTestModel(
-                        where: {{
-                            AND: [
-                                {{ json: {{ {}, gte: "1" }} }},
-                                {{ json: {{ {}, lt: "3" }} }},
-                            ]
-                        }}
-                    ) {{ json }}
-                }}"#, json_path(&runner), json_path(&runner))
-            ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":2.4}}"}]}}"###
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[3,4,5]}}"},{"json":"{\"a\":{\"b\":[3,4,6]}}"}]}}"###
+            );
+        }
+
+        let res = run_query!(
+            runner,
+            format!(
+                r#"query {{
+                findManyTestModel(
+                    where: {{
+                        AND: [
+                            {{ json: {{ {}, gte: "1" }} }},
+                            {{ json: {{ {}, lt: "3" }} }},
+                        ]
+                    }}
+                ) {{ json }}
+            }}"#,
+                json_path(&runner),
+                json_path(&runner)
+            )
         );
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":2.4}}"}]}}"###
+            );
+        }
 
         // NOT
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                format!(r#"query {{
-                    findManyTestModel(
-                        where: {{ NOT: {{ json: {{ {}, array_contains: "3", array_starts_with: "3" }} }} }},
-                        cursor: {{ id: 2 }},
-                        take: 2
-                    ) {{ json }}
-                }}"#, json_path(&runner))
-            ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[5,6,7]}}"}]}}"###
+        let res = run_query!(
+            runner,
+            format!(
+                r#"query {{
+                findManyTestModel(
+                    where: {{ NOT: {{ json: {{ {}, array_contains: "3", array_starts_with: "3" }} }} }},
+                    cursor: {{ id: 2 }},
+                    take: 2
+                ) {{ json }}
+            }}"#,
+                json_path(&runner)
+            )
         );
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":[5,6,7]}}"}]}}"###
+            );
+        }
         // 1, 2.4, 3
         // filter: false, true, false
         // negated: true, false, true
         // result: 1, 3
-        insta::assert_snapshot!(
-            run_query!(
-                runner,
-                format!(r#"query {{
-                    findManyTestModel(
-                        where: {{
-                            NOT: {{ AND: [
-                                    {{ json: {{ {}, gt: "1" }} }},
-                                    {{ json: {{ {}, lt: "3" }} }},
-                            ]}}
-                        }}
-                    ) {{ json }}
-                }}"#, json_path(&runner), json_path(&runner))
-            ),
-            @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":3}}"}]}}"###
+        let res = run_query!(
+            runner,
+            format!(
+                r#"query {{
+                findManyTestModel(
+                    where: {{
+                        NOT: {{ AND: [
+                                {{ json: {{ {}, gt: "1" }} }},
+                                {{ json: {{ {}, lt: "3" }} }},
+                        ]}}
+                    }}
+                ) {{ json }}
+            }}"#,
+                json_path(&runner),
+                json_path(&runner)
+            )
         );
+        insta::allow_duplicates! {
+            insta::assert_snapshot!(
+                res,
+                @r###"{"data":{"findManyTestModel":[{"json":"{\"a\":{\"b\":1}}"},{"json":"{\"a\":{\"b\":3}}"}]}}"###
+            );
+        }
 
         Ok(())
     }
@@ -896,7 +941,7 @@ mod json_filters {
     fn json_path(runner: &Runner) -> &'static str {
         match runner.connector_version() {
             ConnectorVersion::Postgres(_) | ConnectorVersion::CockroachDb(_) => r#"path: ["a", "b"]"#,
-            ConnectorVersion::MySql(_) => r#"path: "$.a.b""#,
+            ConnectorVersion::MySql(_) | ConnectorVersion::Vitess(_) => r#"path: "$.a.b""#,
             x => unreachable!("JSON filtering is not supported on {:?}", x),
         }
     }

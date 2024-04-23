@@ -27,7 +27,7 @@ mod aggregation_count {
         Ok(())
     }
 
-    #[connector_test(exclude(Vitess("planetscale.js")))]
+    #[connector_test]
     async fn count_with_all_sorts_of_query_args(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, string: "1" }"#).await?;
         create_row(&runner, r#"{ id: 2, string: "2" }"#).await?;

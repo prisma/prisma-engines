@@ -183,6 +183,11 @@ mod one_relation {
             @r###"{"data":{"findManyBlog":[{"name":"blog 1","post":{"title":"post 1","comment":{"text":"comment 1"}}},{"name":"blog 2","post":null},{"name":"blog 3","post":null}]}}"###
         );
 
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"query { findManyBlog { name, post(where: { title: "post 1", comment: { is: { text: "comment 1" } } }) { title } }}"#),
+            @r###"{"data":{"findManyBlog":[{"name":"blog 1","post":{"title":"post 1"}},{"name":"blog 2","post":null},{"name":"blog 3","post":null}]}}"###
+        );
+
         Ok(())
     }
 

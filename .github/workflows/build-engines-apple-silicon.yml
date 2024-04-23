@@ -29,7 +29,7 @@ jobs:
       - name: Install aarch64 toolchain
         run: rustup target add aarch64-apple-darwin
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
@@ -42,7 +42,7 @@ jobs:
       - run: |
           cargo build --target=aarch64-apple-darwin --release -p query-engine -p query-engine-node-api -p schema-engine-cli -p prisma-fmt
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: binaries
           path: |

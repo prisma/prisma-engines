@@ -112,7 +112,28 @@ mod occ {
         assert_eq!(booked_user_id, found_booked_user_id);
     }
 
-    #[connector_test(schema(occ_simple), exclude(MongoDB, CockroachDb, Vitess("planetscale.js")))]
+    // On PlanetScale, this fails with:
+    // ```
+    // assertion `left == right` failed
+    // left: 6
+    // right: 1
+    // ```
+    //
+    // On D1, this fails with:
+    // ```
+    // assertion `left == right` failed
+    // left: 3
+    // right: 1
+    // ```
+    #[connector_test(
+        schema(occ_simple),
+        exclude(
+            MongoDB,
+            CockroachDb,
+            Vitess("planetscale.js", "planetscale.js.wasm"),
+            Sqlite("cfd1")
+        )
+    )]
     async fn occ_update_many_test(runner: Runner) -> TestResult<()> {
         let runner = Arc::new(runner);
 
@@ -127,7 +148,10 @@ mod occ {
         Ok(())
     }
 
-    #[connector_test(schema(occ_simple), exclude(CockroachDb, Vitess("planetscale.js")))]
+    #[connector_test(
+        schema(occ_simple),
+        exclude(CockroachDb, Vitess("planetscale.js", "planetscale.js.wasm"))
+    )]
     async fn occ_update_test(runner: Runner) -> TestResult<()> {
         let runner = Arc::new(runner);
 
@@ -158,7 +182,7 @@ mod occ {
         Ok(())
     }
 
-    #[connector_test(schema(occ_simple), exclude(Vitess("planetscale.js")))]
+    #[connector_test(schema(occ_simple), exclude(Vitess("planetscale.js", "planetscale.js.wasm")))]
     async fn occ_delete_test(runner: Runner) -> TestResult<()> {
         let runner = Arc::new(runner);
 

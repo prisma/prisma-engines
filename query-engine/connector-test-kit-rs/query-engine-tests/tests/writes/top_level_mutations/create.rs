@@ -205,7 +205,7 @@ mod create {
     // TODO(dom): Not working on mongo
     // TODO(dom): 'Expected result to return an error, but found success: {"data":{"createOneScalarModel":{"optUnique":"test"}}}'
     // Comment(dom): Expected, we're not enforcing uniqueness for the test setup yet.
-    #[connector_test(exclude(MongoDb, Vitess("planetscale.js")))]
+    #[connector_test(exclude(MongoDb))]
     async fn gracefully_fails_when_uniq_violation(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,

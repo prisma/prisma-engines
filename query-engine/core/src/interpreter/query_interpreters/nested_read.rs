@@ -1,6 +1,6 @@
-use super::{inmemory_record_processor::InMemoryRecordProcessor, read};
+use super::inmemory_record_processor::InMemoryRecordProcessor;
 use crate::{interpreter::InterpretationResult, query_ast::*};
-use connector::{self, ConnectionLike, RelAggregationRow, RelAggregationSelection};
+use connector::ConnectionLike;
 use query_structure::*;
 use std::collections::HashMap;
 
@@ -9,8 +9,9 @@ pub(crate) async fn m2m(
     query: &mut RelatedRecordsQuery,
     parent_result: Option<&ManyRecords>,
     trace_id: Option<String>,
-) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
+) -> InterpretationResult<ManyRecords> {
     let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
+
     let parent_field = &query.parent_field;
     let child_link_id = parent_field.related_field().linking_fields();
 
@@ -21,19 +22,19 @@ pub(crate) async fn m2m(
             let parent_model_id = query.parent_field.model().primary_identifier();
             parent_result
                 .expect("[ID retrieval] No parent results present in the query graph for reading related records.")
-                .extract_selection_results(&parent_model_id)?
+                .extract_selection_results_from_db_name(&parent_model_id)?
         }
     };
 
     if parent_ids.is_empty() {
-        return Ok((ManyRecords::empty(&query.selected_fields), None));
+        return Ok(ManyRecords::empty(&query.selected_fields));
     }
 
     let ids = tx
         .get_related_m2m_record_ids(&query.parent_field, &parent_ids, trace_id.clone())
         .await?;
     if ids.is_empty() {
-        return Ok((ManyRecords::empty(&query.selected_fields), None));
+        return Ok(ManyRecords::empty(&query.selected_fields));
     }
 
     let child_model_id = query.parent_field.related_model().primary_identifier();
@@ -48,30 +49,31 @@ pub(crate) async fn m2m(
 
     // a roundtrip can be avoided if:
     // - there is no additional filter
-    // - there is no aggregation selection
+    // - there is no virtual fields selection (relation aggregation)
     // - the selection set is the child_link_id
-    let mut scalars =
-        if query.args.do_nothing() && query.aggregation_selections.is_empty() && child_link_id == query.selected_fields
-        {
-            ManyRecords::from((child_ids, &query.selected_fields)).with_unique_records()
-        } else {
-            let mut args = query.args.clone();
-            let filter = child_link_id.is_in(ConditionListValue::list(child_ids));
+    let mut scalars = if query.args.do_nothing()
+        && !query.selected_fields.has_virtual_fields()
+        && child_link_id == query.selected_fields
+    {
+        ManyRecords::from((child_ids, &query.selected_fields)).with_unique_records()
+    } else {
+        let mut args = query.args.clone();
+        let filter = child_link_id.is_in(ConditionListValue::list(child_ids));
 
-            args.filter = match args.filter {
-                Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
-                None => Some(filter),
-            };
-
-            tx.get_many_records(
-                &query.parent_field.related_model(),
-                args,
-                &query.selected_fields,
-                &query.aggregation_selections,
-                trace_id.clone(),
-            )
-            .await?
+        args.filter = match args.filter {
+            Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
+            None => Some(filter),
         };
+
+        tx.get_many_records(
+            &query.parent_field.related_model(),
+            args,
+            &query.selected_fields,
+            RelationLoadStrategy::Query,
+            trace_id.clone(),
+        )
+        .await?
+    };
 
     // Child id to parent ids
     let mut id_map: HashMap<SelectionResult, Vec<SelectionResult>> = HashMap::new();
@@ -92,7 +94,7 @@ pub(crate) async fn m2m(
     let mut additional_records: Vec<(usize, Vec<Record>)> = vec![];
 
     for (index, record) in scalars.records.iter_mut().enumerate() {
-        let record_id = record.extract_selection_result(fields, &child_model_id)?;
+        let record_id = record.extract_selection_result_from_db_name(fields, &child_model_id)?;
         let mut parent_ids = id_map.remove(&record_id).expect("1");
         let first = parent_ids.pop().expect("2");
 
@@ -122,10 +124,8 @@ pub(crate) async fn m2m(
     }
 
     let scalars = processor.apply(scalars);
-    let (scalars, aggregation_rows) =
-        read::extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections.clone());
 
-    Ok((scalars, aggregation_rows))
+    Ok(scalars)
 }
 
 // [DTODO] This is implemented in an inefficient fashion, e.g. too much Arc cloning going on.
@@ -137,9 +137,8 @@ pub async fn one2m(
     parent_result: Option<&ManyRecords>,
     mut query_args: QueryArguments,
     selected_fields: &FieldSelection,
-    aggr_selections: Vec<RelAggregationSelection>,
     trace_id: Option<String>,
-) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
+) -> InterpretationResult<ManyRecords> {
     let parent_model_id = parent_field.model().primary_identifier();
     let parent_link_id = parent_field.linking_fields();
     let child_link_id = parent_field.related_field().linking_fields();
@@ -151,7 +150,7 @@ pub async fn one2m(
             let extractor = parent_model_id.clone().merge(parent_link_id.clone());
             parent_result
                 .expect("[ID retrieval] No parent results present in the query graph for reading related records.")
-                .extract_selection_results(&extractor)?
+                .extract_selection_results_from_db_name(&extractor)?
         }
     };
 
@@ -183,7 +182,7 @@ pub async fn one2m(
         .collect();
 
     if uniq_selections.is_empty() {
-        return Ok((ManyRecords::empty(selected_fields), None));
+        return Ok(ManyRecords::empty(selected_fields));
     }
 
     // If we're fetching related records from a single parent, then we can apply normal pagination instead of in-memory processing.
@@ -208,7 +207,7 @@ pub async fn one2m(
             &parent_field.related_model(),
             args,
             selected_fields,
-            &aggr_selections,
+            RelationLoadStrategy::Query,
             trace_id,
         )
         .await?
@@ -220,7 +219,8 @@ pub async fn one2m(
         let mut additional_records = vec![];
 
         for record in scalars.records.iter_mut() {
-            let child_link: SelectionResult = record.extract_selection_result(&scalars.field_names, &child_link_id)?;
+            let child_link: SelectionResult =
+                record.extract_selection_result_from_db_name(&scalars.field_names, &child_link_id)?;
             let child_link_values: Vec<PrismaValue> = child_link.pairs.into_iter().map(|(_, v)| v).collect();
 
             if let Some(parent_ids) = link_mapping.get_mut(&child_link_values) {
@@ -245,7 +245,7 @@ pub async fn one2m(
 
         for record in scalars.records.iter_mut() {
             let child_link: SelectionResult =
-                record.extract_selection_result(&scalars.field_names, &child_link_fields)?;
+                record.extract_selection_result_from_db_name(&scalars.field_names, &child_link_fields)?;
             let child_link_values: Vec<PrismaValue> = child_link.pairs.into_iter().map(|(_, v)| v).collect();
 
             if let Some(parent_ids) = link_mapping.get(&child_link_values) {
@@ -266,7 +266,6 @@ pub async fn one2m(
     } else {
         scalars
     };
-    let (scalars, aggregation_rows) = read::extract_aggregation_rows_from_scalars(scalars, aggr_selections);
 
-    Ok((scalars, aggregation_rows))
+    Ok(scalars)
 }

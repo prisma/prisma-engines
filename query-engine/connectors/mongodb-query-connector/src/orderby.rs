@@ -188,7 +188,7 @@ impl OrderByPrefix {
     }
 
     pub(crate) fn first(&self) -> Option<&String> {
-        self.parts.get(0)
+        self.parts.first()
     }
 }
 
