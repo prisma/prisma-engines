@@ -17,7 +17,7 @@ use connect_or_create_nested::*;
 use create_nested::*;
 use delete_nested::*;
 use disconnect_nested::*;
-use prisma_models::RelationFieldRef;
+use query_structure::RelationFieldRef;
 use schema::{constants::operations, QuerySchema};
 use set_nested::*;
 use update_nested::*;
@@ -36,7 +36,7 @@ pub fn connect_nested_query(
     for (field_name, value) in data_map {
         match field_name.as_ref() {
             operations::CREATE => nested_create(graph, query_schema,parent, &parent_relation_field, value, &child_model)?,
-            operations::CREATE_MANY => nested_create_many(graph, parent, &parent_relation_field, value, &child_model)?,
+            operations::CREATE_MANY => nested_create_many(graph, query_schema, parent, &parent_relation_field, value, &child_model)?,
             operations::UPDATE => nested_update(graph, query_schema, &parent, &parent_relation_field, value, &child_model)?,
             operations::UPSERT => nested_upsert(graph, query_schema, parent, &parent_relation_field, value)?,
             operations::DELETE => nested_delete(graph, query_schema, &parent, &parent_relation_field, value, &child_model)?,

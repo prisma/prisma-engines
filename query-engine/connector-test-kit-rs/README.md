@@ -64,25 +64,6 @@ On the note of docker containers: Most connectors require an endpoint to run aga
 
 If you choose to set up the databases yourself, please note that the connection strings used in the tests (found in the files in `<repo_root>/query-engine/connector-test-kit-rs/query-tests-setup/src/connector_tag/`) to set up user, password and database for the test user.
 
-#### Running tests through driver adapters
-
-The query engine is able to delegate query execution to javascript through [driver adapters](query-engine/driver-adapters/js/README.md).
-This means that instead of drivers being implemented in Rust, it's a layer of adapters over NodeJs drivers the code that actually communicates with the databases. 
-
-To run tests through a driver adapters, you should also configure the following environment variables:
-
-* `EXTERNAL_TEST_EXECUTOR`: tells the query engine test kit to use an external process to run the queries, this is a node process running a program that will read the queries to run from STDIN, and return responses to STDOUT. The connector kit follows a protocol over JSON RPC for this communication. 
-* `DRIVER_ADAPTER`: tells the test executor to use a particular driver adapter. Set to `neon`, `planetscale` or any other supported adapter.
-* `DRIVER_ADAPTER_CONFIG`: a json string with the configuration for the driver adapter. This is adapter specific. See the [github workflow for driver adapter tests](.github/workflows/query-engine-driver-adapters.yml) for examples on how to configure the driver adapters.
-
-Example:
-
-```shell
-export EXTERNAL_TEST_EXECUTOR="$WORKSPACE_ROOT/query-engine/driver-adapters/js/connector-test-kit-executor/script/start_node.sh"
-export DRIVER_ADAPTER=neon
-export DRIVER_ADAPTER_CONFIG ='{ "proxyUrl": "127.0.0.1:5488/v1" }'
-````
-
 ### Running
 
 Note that by default tests run concurrently.
@@ -92,6 +73,37 @@ Note that by default tests run concurrently.
 - `cargo test` in the `query-engine-tests` crate.
 - A single test can be tested with the normal cargo rust facilities from command line, e.g. `cargo test --package query-engine-tests --test query_engine_tests --all-features -- queries::filters::where_unique::where_unique::no_unique_fields --exact --nocapture` where `queries::filters::where_unique::where_unique::no_unique_fields` can be substituted for the path you want to test.
 - If you want to test a single relation test, define the `RELATION_TEST_IDX` env var with its index.
+
+#### Running tests through driver adapters
+
+The query engine is able to delegate query execution to javascript through driver adapters.
+This means that instead of drivers being implemented in Rust, it's a layer of adapters over NodeJs
+drivers the code that actually communicates with the databases. See [`adapter-*` packages in prisma/prisma](https://github.com/prisma/prisma/tree/main/packages)
+
+To run tests through a driver adapters, you should also configure the following environment variables:
+
+* `DRIVER_ADAPTER`: tells the test executor to use a particular driver adapter. Set to `neon`, `planetscale` or any other supported adapter.
+* `DRIVER_ADAPTER_CONFIG`: a json string with the configuration for the driver adapter. This is adapter specific. See the [github workflow for driver adapter tests](.github/workflows/query-engine-driver-adapters.yml) for examples on how to configure the driver adapters.
+* `ENGINE`: can be used to run either `wasm` or `napi` or `c-abi` version of the engine.
+
+Example:
+
+```shell
+export EXTERNAL_TEST_EXECUTOR="$WORKSPACE_ROOT/query-engine/driver-adapters/executor/script/testd.sh"
+export DRIVER_ADAPTER=neon
+export ENGINE=wasm
+export DRIVER_ADAPTER_CONFIG ='{ "proxyUrl": "127.0.0.1:5488/v1" }'
+````
+
+We have provided helpers to run the query-engine tests with driver adapters, these helpers set all the required environment
+variables for you:
+
+```shell
+DRIVER_ADAPTER=$adapter ENGINE=$engine make test-qe
+```
+
+Where `$adapter` is one of the supported adapters: `neon`, `planetscale`, `libsql`.
+
 
 ## Authoring tests
 The following is an example on how to write a new test suite, as extending or changing an existing one follows the same rules and considerations.

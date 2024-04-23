@@ -2,8 +2,8 @@ use crate::{column_metadata::ColumnMetadata, error::SqlError, value::to_prisma_v
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
-use prisma_models::{ConversionFailure, FieldArity, PrismaValue, Record, TypeIdentifier};
 use quaint::{connector::ResultRow, Value, ValueType};
+use query_structure::{ConversionFailure, FieldArity, PrismaValue, Record, TypeIdentifier};
 use std::{io, str::FromStr};
 use uuid::Uuid;
 
@@ -147,6 +147,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             ValueType::Boolean(Some(b)) => PrismaValue::Boolean(b),
             ValueType::Bytes(Some(bytes)) if bytes.as_ref() == [0u8] => PrismaValue::Boolean(false),
             ValueType::Bytes(Some(bytes)) if bytes.as_ref() == [1u8] => PrismaValue::Boolean(true),
+            ValueType::Double(Some(i)) => PrismaValue::Boolean(i.to_i64().unwrap() != 0),
             _ => return Err(create_error(&p_value)),
         },
         TypeIdentifier::Enum(_) => match p_value.typed {

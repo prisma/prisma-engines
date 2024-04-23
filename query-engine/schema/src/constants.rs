@@ -1,6 +1,7 @@
 pub mod args {
     pub const WHERE: &str = "where";
     pub const DATA: &str = "data";
+    pub const RELATION_LOAD_STRATEGY: &str = "relationLoadStrategy";
 
     // upsert args
     pub const CREATE: &str = "create";
@@ -166,3 +167,8 @@ pub mod itx {
 }
 
 pub mod deprecation {}
+
+pub mod load_strategy {
+    pub const JOIN: &str = "join";
+    pub const QUERY: &str = "query";
+}

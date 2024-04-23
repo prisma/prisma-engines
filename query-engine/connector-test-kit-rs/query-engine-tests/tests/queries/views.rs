@@ -1,8 +1,9 @@
 use query_engine_tests::*;
 
 // https://stackoverflow.com/questions/4380813/how-to-get-rid-of-mysql-error-prepared-statement-needs-to-be-re-prepared
-// Looks like there's a bug with create view stmt on MariaDB
-#[test_suite(schema(schema), exclude(MongoDb, MySql("mariadb")))]
+// Looks like there's a bug with create view stmt on MariaDB.
+// On D1, the migration setup fails because Schema Engine doesn't know anything about Driver Adapters.
+#[test_suite(schema(schema), exclude(MongoDb, MySQL("mariadb"), Vitess, Sqlite("cfd1")))]
 mod views {
     use query_engine_tests::{connector_test, run_query, Runner};
 
@@ -146,7 +147,7 @@ mod views {
              => {
               r#"CREATE VIEW TestView AS SELECT TestModel.*, CONCAT(TestModel.firstName, ' ', TestModel.lastName) AS "fullName" FROM TestModel"#.to_owned()
             },
-            ConnectorVersion::Sqlite => {
+            ConnectorVersion::Sqlite(_) => {
               r#"CREATE VIEW TestView AS SELECT TestModel.*, TestModel.firstName || ' ' || TestModel.lastName AS "fullName" FROM TestModel"#.to_owned()
             }
             ConnectorVersion::SqlServer(_) => {

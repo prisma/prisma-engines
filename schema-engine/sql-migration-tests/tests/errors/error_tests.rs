@@ -90,6 +90,10 @@ fn authentication_failure_must_return_a_known_error_on_mysql(api: TestApi) {
     assert_eq!(json_error, expected);
 }
 
+// TODO(tech-debt): get rid of provider-specific PSL `dm` declaration, and use `test_api::datamodel_with_provider` utility instead.
+// See: https://github.com/prisma/team-orm/issues/835.
+// This issue also currently prevents us from defining an `Mssql`-specific copy of this `unreachable_database_*` test case,
+// due to url parsing differences between the `url` crate and `quaint`'s `MssqlUrl` struct.
 #[test_connector(tags(Mysql))]
 fn unreachable_database_must_return_a_proper_error_on_mysql(api: TestApi) {
     let mut url: Url = api.connection_string().parse().unwrap();

@@ -1,5 +1,5 @@
 use super::*;
-use prisma_models::{prelude::ParentContainer, ScalarField};
+use query_structure::{prelude::ParentContainer, ScalarField};
 
 pub(crate) mod group_by;
 pub(crate) mod plain;

@@ -177,7 +177,8 @@ impl EngineState {
             return Err(ConnectorError::from_msg("Missing --datamodel".to_owned()));
         };
 
-        self.with_connector_for_schema(schema.db.source(), None, f).await
+        self.with_connector_for_schema(schema.db.source_assert_single(), None, f)
+            .await
     }
 }
 
@@ -245,10 +246,7 @@ impl GenericApi for EngineState {
                 std::path::Path::new(file_path)
                     .parent()
                     .map(|config_dir| {
-                        datasource
-                            .active_connector
-                            .set_config_dir(config_dir, &url)
-                            .into_owned()
+                        psl::set_config_dir(datasource.active_connector.flavour(), config_dir, &url).into_owned()
                     })
                     .unwrap_or(url)
             }

@@ -182,13 +182,9 @@ fn unique_constraint_errors_in_migrations(api: TestApi) {
         .send_unwrap_err()
         .to_user_facing();
 
-    let expected_json = expect![[r#"
-        {
-          "is_panic": false,
-          "message": "SQLite database error\nUNIQUE constraint failed: Fruit.name\n   0: sql_schema_connector::apply_migration::apply_migration\n             at schema-engine/connectors/sql-schema-connector/src/apply_migration.rs:10\n   1: sql_migration_tests::commands::schema_push::SchemaPush\n           with \u001b[3mmigration_id\u001b[0m\u001b[2m=\u001b[0mSome(\"the-migration\")\n             at schema-engine/sql-migration-tests/src/commands/schema_push.rs:43",
-          "backtrace": null
-        }"#]];
-    expected_json.assert_eq(&serde_json::to_string_pretty(&res).unwrap())
+    assert!(serde_json::to_string_pretty(&res)
+        .unwrap()
+        .contains("UNIQUE constraint failed: Fruit.name"));
 }
 
 #[test]

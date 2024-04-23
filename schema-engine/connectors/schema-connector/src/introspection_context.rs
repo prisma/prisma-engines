@@ -38,13 +38,14 @@ impl IntrospectionContext {
     ) -> Self {
         let mut config_blocks = String::new();
 
-        for source in previous_schema.db.ast().sources() {
-            config_blocks.push_str(&previous_schema.db.source()[source.span.start..source.span.end]);
+        for source in previous_schema.db.ast_assert_single().sources() {
+            config_blocks.push_str(&previous_schema.db.source_assert_single()[source.span.start..source.span.end]);
             config_blocks.push('\n');
         }
 
-        for generator in previous_schema.db.ast().generators() {
-            config_blocks.push_str(&previous_schema.db.source()[generator.span.start..generator.span.end]);
+        for generator in previous_schema.db.ast_assert_single().generators() {
+            config_blocks
+                .push_str(&previous_schema.db.source_assert_single()[generator.span.start..generator.span.end]);
             config_blocks.push('\n');
         }
 
@@ -70,7 +71,7 @@ impl IntrospectionContext {
 
     /// The string source of the PSL schema file.
     pub fn schema_string(&self) -> &str {
-        self.previous_schema.db.source()
+        self.previous_schema.db.source_assert_single()
     }
 
     /// The configuration block of the PSL schema file.
