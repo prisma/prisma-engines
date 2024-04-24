@@ -13,7 +13,12 @@ mod connection_info;
 
 pub mod external;
 pub mod metrics;
-#[cfg(feature = "native")]
+#[cfg(any(
+    feature = "mssql-native",
+    feature = "mysql-native",
+    feature = "postgresql-native",
+    feature = "sqlite-native"
+))]
 pub mod native;
 mod queryable;
 mod result_set;
@@ -25,13 +30,24 @@ mod type_identifier;
 pub use self::result_set::*;
 pub use connection_info::*;
 
-#[cfg(feature = "native")]
+#[cfg(any(
+    feature = "mssql-native",
+    feature = "mysql-native",
+    feature = "postgresql-native",
+    feature = "sqlite-native"
+))]
 pub use native::*;
 
 pub use external::*;
 pub use queryable::*;
 pub use transaction::*;
-#[cfg(any(feature = "mssql-native", feature = "postgresql-native", feature = "mysql-native"))]
+
+#[cfg(any(
+    feature = "mssql-native",
+    feature = "mysql-native",
+    feature = "postgresql-native",
+    feature = "sqlite-native"
+))]
 #[allow(unused_imports)]
 pub(crate) use type_identifier::*;
 

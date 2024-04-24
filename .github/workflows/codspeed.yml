@@ -31,7 +31,7 @@ jobs:
         run: cargo codspeed build -p schema --features all_connectors
 
       - name: "Build the benchmark targets: request-handlers"
-        run: cargo codspeed build -p request-handlers --features native,all
+        run: cargo codspeed build -p request-handlers --features all
 
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@v2

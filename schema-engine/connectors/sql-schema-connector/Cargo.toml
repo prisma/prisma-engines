@@ -9,7 +9,7 @@ vendored-openssl = ["quaint/vendored-openssl"]
 [dependencies]
 psl.workspace = true
 quaint = { workspace = true, features = [
-    "native",
+    "all-native",
     "expose-drivers",
     "pooled",
     "fmt-sql",
@@ -26,6 +26,7 @@ datamodel-renderer = { path = "../../datamodel-renderer" }
 sql-ddl = { path = "../../../libs/sql-ddl" }
 user-facing-errors = { path = "../../../libs/user-facing-errors", features = [
     "sql",
+    "all-native",
 ] }
 
 chrono.workspace = true

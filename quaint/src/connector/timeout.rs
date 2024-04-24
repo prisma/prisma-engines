@@ -2,7 +2,12 @@ use crate::error::{Error, ErrorKind};
 use futures::Future;
 use std::time::Duration;
 
-#[cfg(feature = "native")]
+#[cfg(any(
+    feature = "mssql-native",
+    feature = "mysql-native",
+    feature = "postgresql-native",
+    feature = "sqlite-native"
+))]
 pub async fn connect<T, F, E>(duration: Option<Duration>, f: F) -> crate::Result<T>
 where
     F: Future<Output = std::result::Result<T, E>>,

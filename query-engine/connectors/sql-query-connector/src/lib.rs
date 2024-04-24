@@ -27,16 +27,16 @@ pub use database::FromSource;
 pub use database::Js;
 pub use error::SqlError;
 
-#[cfg(all(feature = "native", feature = "mssql"))]
+#[cfg(feature = "mssql-native")]
 pub use database::Mssql;
 
-#[cfg(all(feature = "native", feature = "mysql"))]
+#[cfg(feature = "mysql-native")]
 pub use database::Mysql;
 
-#[cfg(all(feature = "native", feature = "postgresql"))]
+#[cfg(feature = "postgresql-native")]
 pub use database::PostgreSql;
 
-#[cfg(all(feature = "native", feature = "sqlite"))]
+#[cfg(feature = "sqlite-native")]
 pub use database::Sqlite;
 
 type Result<T> = std::result::Result<T, error::SqlError>;

@@ -11,7 +11,14 @@ use std::sync::Arc;
 use url::Url;
 
 pub enum ConnectorKind<'a> {
-    #[cfg(feature = "native")]
+    #[cfg(any(
+        feature = "mongodb",
+        feature = "mssql-native",
+        feature = "mysql-native",
+        feature = "postgresql-native",
+        feature = "sqlite-native",
+        feature = "cockroachdb-native"
+    ))]
     Rust { url: String, datasource: &'a Datasource },
     Js {
         adapter: Arc<dyn ExternalConnector>,
@@ -33,7 +40,14 @@ pub async fn load(
         #[cfg(feature = "driver-adapters")]
         ConnectorKind::Js { adapter, _phantom } => driver_adapter(adapter, features).await,
 
-        #[cfg(feature = "native")]
+        #[cfg(any(
+            feature = "mongodb",
+            feature = "mssql-native",
+            feature = "mysql-native",
+            feature = "postgresql-native",
+            feature = "sqlite-native",
+            feature = "cockroachdb-native"
+        ))]
         ConnectorKind::Rust { url, datasource } => {
             if let Ok(value) = env::var("PRISMA_DISABLE_QUAINT_EXECUTORS") {
                 let disable = value.to_uppercase();
@@ -43,15 +57,15 @@ pub async fn load(
             }
 
             match datasource.active_provider {
-                #[cfg(feature = "sqlite")]
+                #[cfg(feature = "sqlite-native")]
                 p if SQLITE.is_provider(p) => native::sqlite(datasource, &url, features).await,
-                #[cfg(feature = "mysql")]
+                #[cfg(feature = "mysql-native")]
                 p if MYSQL.is_provider(p) => native::mysql(datasource, &url, features).await,
-                #[cfg(feature = "postgresql")]
+                #[cfg(feature = "postgresql-native")]
                 p if POSTGRES.is_provider(p) => native::postgres(datasource, &url, features).await,
-                #[cfg(feature = "mssql")]
+                #[cfg(feature = "mssql-native")]
                 p if MSSQL.is_provider(p) => native::mssql(datasource, &url, features).await,
-                #[cfg(feature = "cockroachdb")]
+                #[cfg(feature = "cockroachdb-native")]
                 p if COCKROACH.is_provider(p) => native::postgres(datasource, &url, features).await,
                 #[cfg(feature = "mongodb")]
                 p if MONGODB.is_provider(p) => native::mongodb(datasource, &url, features).await,
@@ -75,12 +89,19 @@ async fn driver_adapter(
     Ok(executor_for(js, false))
 }
 
-#[cfg(feature = "native")]
+#[cfg(any(
+    feature = "mongodb",
+    feature = "mssql-native",
+    feature = "mysql-native",
+    feature = "postgresql-native",
+    feature = "sqlite-native",
+    feature = "cockroachdb-native"
+))]
 mod native {
     use super::*;
     use tracing::trace;
 
-    #[cfg(feature = "sqlite")]
+    #[cfg(feature = "sqlite-native")]
     pub(crate) async fn sqlite(
         source: &Datasource,
         url: &str,
@@ -92,7 +113,7 @@ mod native {
         Ok(executor_for(sqlite, false))
     }
 
-    #[cfg(feature = "postgresql")]
+    #[cfg(feature = "postgresql-native")]
     pub(crate) async fn postgres(
         source: &Datasource,
         url: &str,
@@ -115,7 +136,7 @@ mod native {
         Ok(executor_for(psql, force_transactions))
     }
 
-    #[cfg(feature = "mysql")]
+    #[cfg(feature = "mysql-native")]
     pub(crate) async fn mysql(
         source: &Datasource,
         url: &str,
@@ -126,7 +147,7 @@ mod native {
         Ok(executor_for(mysql, false))
     }
 
-    #[cfg(feature = "mssql")]
+    #[cfg(feature = "mssql-native")]
     pub(crate) async fn mssql(
         source: &Datasource,
         url: &str,
