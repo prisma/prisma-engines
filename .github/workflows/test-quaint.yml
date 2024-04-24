@@ -38,7 +38,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ matrix.features }}
 
       - name: Start Databases
-        run: docker-compose -f docker-compose.yml up -d
+        run: docker compose -f docker-compose.yml up -d
         working-directory: ./quaint
 
       - name: Sleep for 20s
