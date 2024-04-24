@@ -1,5 +1,0 @@
----
-source: query-engine/connector-test-kit-rs/query-engine-tests/tests/writes/top_level_mutations/upsert.rs
-expression: RESULT
----
-{"data":{"upsertOneTodo":{"id":1,"title":"title"}}}

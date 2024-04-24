@@ -416,10 +416,9 @@ mod upsert {
               title
             }
         }"#;
-        const RESULT: &str = r#"{"data":{"upsertOneTodo":{"id":1,"title":"title"}}}"#;
 
-        insta::assert_snapshot!(run_query!(&runner, MUTATION), RESULT);
-        insta::assert_snapshot!(run_query!(&runner, MUTATION), RESULT);
+        insta::assert_snapshot!(run_query!(&runner, MUTATION), @r#"{"data":{"upsertOneTodo":{"id":1,"title":"title"}}}"#);
+        insta::assert_snapshot!(run_query!(&runner, MUTATION), @r#"{"data":{"upsertOneTodo":{"id":1,"title":"title"}}}"#);
 
         assert_eq!(count_todo(&runner).await?, 1);
 
