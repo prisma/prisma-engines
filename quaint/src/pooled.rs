@@ -152,11 +152,11 @@ mod manager;
 
 pub use manager::*;
 
-#[cfg(feature = "native")]
-use crate::{connector::NativeConnectionInfo, error::NativeErrorKind};
+#[cfg(native)]
+use crate::error::NativeErrorKind;
 
 use crate::{
-    connector::{ConnectionInfo, PostgresFlavour},
+    connector::ConnectionInfo,
     error::{Error, ErrorKind},
 };
 use mobc::Pool;
@@ -305,7 +305,9 @@ impl Builder {
     /// - Unknown: Always add a network roundtrip by setting the search path through a database query.
     ///
     /// - Defaults to `PostgresFlavour::Unknown`.
-    pub fn set_postgres_flavour(&mut self, flavour: PostgresFlavour) {
+    #[cfg(feature = "postgresql-native")]
+    pub fn set_postgres_flavour(&mut self, flavour: crate::connector::PostgresFlavour) {
+        use crate::connector::NativeConnectionInfo;
         if let ConnectionInfo::Native(NativeConnectionInfo::Postgres(ref mut url)) = self.connection_info {
             url.set_flavour(flavour);
         }

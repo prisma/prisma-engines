@@ -6,7 +6,9 @@ edition = "2021"
 [dependencies]
 schema-connector = { path = "../connectors/schema-connector" }
 schema-core = { path = "../core" }
-user-facing-errors = { path = "../../libs/user-facing-errors" }
+user-facing-errors = { path = "../../libs/user-facing-errors", features = [
+    "all-native",
+] }
 
 backtrace = "0.3.59"
 base64 = "0.13"
@@ -32,7 +34,7 @@ url.workspace = true
 indoc.workspace = true
 connection-string.workspace = true
 expect-test = "1.4.0"
-quaint = { workspace = true, features = ["native"] }
+quaint = { workspace = true, features = ["all-native"] }
 
 [[bin]]
 name = "schema-engine"

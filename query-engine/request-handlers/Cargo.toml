@@ -33,27 +33,49 @@ codspeed-criterion-compat = "1.1.0"
 
 [features]
 mongodb = ["mongodb-query-connector", "psl/mongodb"]
-sql = ["sql-query-connector"]
+sql = ["dep:sql-query-connector"]
 postgresql = ["sql", "sql-query-connector/postgresql", "psl/postgresql"]
+postgresql-native = [
+    "postgresql",
+    "sql-query-connector/postgresql-native",
+    "user-facing-errors/postgresql-native",
+]
 mysql = ["sql", "sql-query-connector/mysql", "psl/mysql"]
+mysql-native = [
+    "mysql",
+    "sql-query-connector/mysql-native",
+    "user-facing-errors/mysql-native",
+]
 sqlite = ["sql", "sql-query-connector/sqlite", "psl/sqlite"]
+sqlite-native = ["sqlite", "sql-query-connector/sqlite-native"]
 cockroachdb = ["sql", "sql-query-connector/postgresql", "psl/cockroachdb"]
+cockroachdb-native = [
+    "cockroachdb",
+    "sql-query-connector/cockroachdb",
+    "user-facing-errors/postgresql-native",
+]
 mssql = ["sql", "sql-query-connector/mssql", "psl/mssql"]
+mssql-native = [
+    "mssql",
+    "sql-query-connector/mssql-native",
+    "user-facing-errors/mssql-native",
+]
 driver-adapters = ["sql-query-connector/driver-adapters"]
-native = ["sql-query-connector/native"]
 all = [
     "mongodb",
-    "mysql",
-    "sqlite",
-    "postgresql",
-    "cockroachdb",
-    "mssql",
+    "mysql-native",
+    "sqlite-native",
+    "postgresql-native",
+    "cockroachdb-native",
+    "mssql-native",
     "graphql-protocol",
-    "sql-query-connector/all",
     "psl/all",
     "query-core/metrics",
 ]
 graphql-protocol = ["query-core/graphql-protocol", "dep:graphql-parser"]
+
+[build-dependencies]
+cfg_aliases = "0.2.0"
 
 [[bench]]
 name = "query_planning_bench"

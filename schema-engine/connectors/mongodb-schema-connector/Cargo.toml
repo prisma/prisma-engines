@@ -9,7 +9,9 @@ mongodb-client = { path = "../../../libs/mongodb-client" }
 mongodb-schema-describer = { path = "../../mongodb-schema-describer" }
 datamodel-renderer = { path = "../../datamodel-renderer" }
 schema-connector = { path = "../schema-connector" }
-user-facing-errors = { path = "../../../libs/user-facing-errors" }
+user-facing-errors = { path = "../../../libs/user-facing-errors", features = [
+    "all-native",
+] }
 
 enumflags2.workspace = true
 futures = "0.3"

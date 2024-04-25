@@ -6,5 +6,5 @@ pub use crate::connector::{
 };
 pub use crate::{col, val, values};
 
-#[cfg(feature = "native")]
+#[cfg(native)]
 pub use crate::connector::NativeConnectionInfo;

@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         features:
-          - "--lib --features=all"
+          - "--lib --features=all-native"
     env:
       TEST_MYSQL: "mysql://root:prisma@localhost:3306/prisma"
       TEST_MYSQL8: "mysql://root:prisma@localhost:3307/prisma"

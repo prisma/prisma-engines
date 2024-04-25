@@ -2,6 +2,5 @@ QueryEngine.xcframework
 simulator_fat
 # Artifacts of the C ABI engine
 *.tar.gz
-openssl-3.1.4
 libs
 include
