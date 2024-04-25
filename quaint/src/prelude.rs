@@ -6,10 +6,5 @@ pub use crate::connector::{
 };
 pub use crate::{col, val, values};
 
-#[cfg(any(
-    feature = "mssql-native",
-    feature = "mysql-native",
-    feature = "postgresql-native",
-    feature = "sqlite-native"
-))]
+#[cfg(native)]
 pub use crate::connector::NativeConnectionInfo;

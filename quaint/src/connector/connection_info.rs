@@ -18,12 +18,7 @@ use std::convert::TryFrom;
 
 use super::ExternalConnectionInfo;
 
-#[cfg(any(
-    feature = "mssql-native",
-    feature = "mysql-native",
-    feature = "postgresql-native",
-    feature = "sqlite-native"
-))]
+#[cfg(native)]
 use super::NativeConnectionInfo;
 
 /// General information about a SQL connection.

@@ -180,3 +180,6 @@ optional = true
 version = "0.6"
 features = ["compat"]
 optional = true
+
+[build-dependencies]
+cfg_aliases = "0.1.0"

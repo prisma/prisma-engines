@@ -10,12 +10,7 @@ use std::{fmt, sync::Arc};
 #[cfg(feature = "sqlite-native")]
 use std::convert::TryFrom;
 
-#[cfg(any(
-    feature = "mssql-native",
-    feature = "mysql-native",
-    feature = "postgresql-native",
-    feature = "sqlite-native"
-))]
+#[cfg(native)]
 use crate::connector::NativeConnectionInfo;
 
 /// The main entry point and an abstraction over a database connection.
@@ -133,12 +128,7 @@ impl Quaint {
     /// - `isolationLevel` the transaction isolation level. Possible values:
     ///   `READ UNCOMMITTED`, `READ COMMITTED`, `REPEATABLE READ`, `SNAPSHOT`,
     ///   `SERIALIZABLE`.
-    #[cfg(any(
-        feature = "mssql-native",
-        feature = "mysql-native",
-        feature = "postgresql-native",
-        feature = "sqlite-native"
-    ))]
+    #[cfg(native)]
     #[allow(unreachable_code)]
     pub async fn new(url_str: &str) -> crate::Result<Self> {
         let inner = match url_str {
@@ -196,12 +186,7 @@ impl Quaint {
         &self.connection_info
     }
 
-    #[cfg(any(
-        feature = "mssql-native",
-        feature = "mysql-native",
-        feature = "postgresql-native",
-        feature = "sqlite-native"
-    ))]
+    #[cfg(native)]
     fn log_start(info: &ConnectionInfo) {
         let family = info.sql_family();
         let pg_bouncer = if info.pg_bouncer() { " in PgBouncer mode" } else { "" };

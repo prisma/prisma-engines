@@ -152,12 +152,7 @@ mod manager;
 
 pub use manager::*;
 
-#[cfg(any(
-    feature = "mssql-native",
-    feature = "mysql-native",
-    feature = "postgresql-native",
-    feature = "sqlite-native"
-))]
+#[cfg(native)]
 use crate::error::NativeErrorKind;
 
 use crate::{
