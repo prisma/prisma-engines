@@ -11,14 +11,7 @@ use std::sync::Arc;
 use url::Url;
 
 pub enum ConnectorKind<'a> {
-    #[cfg(any(
-        feature = "mongodb",
-        feature = "mssql-native",
-        feature = "mysql-native",
-        feature = "postgresql-native",
-        feature = "sqlite-native",
-        feature = "cockroachdb-native"
-    ))]
+    #[cfg(native)]
     Rust { url: String, datasource: &'a Datasource },
     Js {
         adapter: Arc<dyn ExternalConnector>,
@@ -40,14 +33,7 @@ pub async fn load(
         #[cfg(feature = "driver-adapters")]
         ConnectorKind::Js { adapter, _phantom } => driver_adapter(adapter, features).await,
 
-        #[cfg(any(
-            feature = "mongodb",
-            feature = "mssql-native",
-            feature = "mysql-native",
-            feature = "postgresql-native",
-            feature = "sqlite-native",
-            feature = "cockroachdb-native"
-        ))]
+        #[cfg(native)]
         ConnectorKind::Rust { url, datasource } => {
             if let Ok(value) = env::var("PRISMA_DISABLE_QUAINT_EXECUTORS") {
                 let disable = value.to_uppercase();
@@ -89,14 +75,7 @@ async fn driver_adapter(
     Ok(executor_for(js, false))
 }
 
-#[cfg(any(
-    feature = "mongodb",
-    feature = "mssql-native",
-    feature = "mysql-native",
-    feature = "postgresql-native",
-    feature = "sqlite-native",
-    feature = "cockroachdb-native"
-))]
+#[cfg(native)]
 mod native {
     use super::*;
     use tracing::trace;

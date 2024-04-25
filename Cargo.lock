@@ -525,6 +525,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fd16c4719339c4530435d38e511904438d07cce7950afa3718a84ac36c10e89e"
 
 [[package]]
+name = "cfg_aliases"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "77e53693616d3075149f4ead59bdeecd204ac6b8192d8969757601b74bddf00f"
+
+[[package]]
 name = "chrono"
 version = "0.4.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3584,7 +3590,7 @@ dependencies = [
  "bit-vec",
  "byteorder",
  "bytes",
- "cfg_aliases",
+ "cfg_aliases 0.1.1",
  "chrono",
  "connection-string",
  "crosstarget-utils",
@@ -4249,6 +4255,7 @@ name = "request-handlers"
 version = "0.1.0"
 dependencies = [
  "bigdecimal",
+ "cfg_aliases 0.2.0",
  "codspeed-criterion-compat",
  "connection-string",
  "dmmf",
