@@ -332,6 +332,62 @@ mod create_many {
         Ok(())
     }
 
+    fn schema_11_child() -> String {
+        let schema = indoc! {
+            r#"model Test {
+              #id(id, Int, @id)
+
+              child Child?
+            }
+            
+            model Child {
+              #id(id, Int, @id)
+
+              testId Int? @unique
+              test Test? @relation(fields: [testId], references: [id])
+            
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_1m_child))]
+    async fn create_many_11_inline_rel_read_works(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createManyTestAndReturn(data: [{ id: 1 }, { id: 2 }]) { id } }"#),
+          @r###"{"data":{"createManyTestAndReturn":[{"id":1},{"id":2}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            createManyChildAndReturn(data: [
+              { id: 1,  testId: 1 },
+              { id: 2,  testId: 2 },
+              { id: 3,            },
+            ]) { id test { id } }
+          }"#),
+          @r###"{"data":{"createManyChildAndReturn":[{"id":1,"test":{"id":1}},{"id":2,"test":{"id":2}},{"id":3,"test":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(schema_11_child))]
+    async fn create_many_11_non_inline_rel_read_fails(runner: Runner) -> TestResult<()> {
+        // Runs only on GraphQL protocol otherwise the GraphQL to JSON translation fails before it reaches the parser.
+        if runner.protocol().is_graphql() {
+            assert_error!(
+                &runner,
+                r#"mutation { createManyTestAndReturn(data: { id: 1 }) { id child { id } } }"#,
+                2009,
+                "Field 'child' not found in enclosing type"
+            );
+        }
+
+        Ok(())
+    }
+
     fn schema_1m_child() -> String {
         let schema = indoc! {
             r#"model Test {
@@ -381,11 +437,11 @@ mod create_many {
 
     #[connector_test(schema(schema_1m_child))]
     async fn create_many_1m_non_inline_rel_read_fails(runner: Runner) -> TestResult<()> {
-      // Runs only on GraphQL protocol otherwise the GraphQL to JSON translation fails before it reaches the parser.
+        // Runs only on GraphQL protocol otherwise the GraphQL to JSON translation fails before it reaches the parser.
         if runner.protocol().is_graphql() {
             assert_error!(
                 &runner,
-                r#"mutation { createManyTestAndReturn(data: [{ id: 1, str1: "1" }, { id: 2, str1: "2" }]) { id children { id } } }"#,
+                r#"mutation { createManyTestAndReturn(data: { id: 1 }) { id children { id } } }"#,
                 2009,
                 "Field 'children' not found in enclosing type"
             );
@@ -420,16 +476,45 @@ mod create_many {
         if runner.protocol().is_graphql() {
             assert_error!(
                 &runner,
-                r#"mutation { createManyTestAndReturn(data: [{ id: 1, str1: "1" }, { id: 2, str1: "2" }]) { id children { id } } }"#,
+                r#"mutation { createManyTestAndReturn(data: { id: 1 }) { id children { id } } }"#,
                 2009,
                 "Field 'children' not found in enclosing type"
             );
 
             assert_error!(
                 &runner,
-                r#"mutation { createManyChildAndReturn(data: [{ id: 1 }, { id: 2 }]) { id tests { id } } }"#,
+                r#"mutation { createManyChildAndReturn(data: { id: 1 }) { id tests { id } } }"#,
                 2009,
                 "Field 'tests' not found in enclosing type"
+            );
+        }
+
+        Ok(())
+    }
+
+    fn schema_self_rel_child() -> String {
+        let schema = indoc! {
+            r#"model Child {
+              #id(id, Int, @id)
+            
+              teacherId Int?
+              teacher   Child?  @relation("TeacherStudents", fields: [teacherId], references: [id])
+              students  Child[] @relation("TeacherStudents")
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_self_rel_child))]
+    async fn create_many_self_rel_read_fails(runner: Runner) -> TestResult<()> {
+        // Runs only on GraphQL protocol otherwise the GraphQL to JSON translation fails before it reaches the parser.
+        if runner.protocol().is_graphql() {
+            assert_error!(
+                &runner,
+                r#"mutation { createManyChildAndReturn(data: { id: 1 }) { id students { id } } }"#,
+                2009,
+                "Field 'students' not found in enclosing type"
             );
         }
 
