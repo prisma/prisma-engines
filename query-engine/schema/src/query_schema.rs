@@ -287,6 +287,7 @@ impl From<&str> for QueryTag {
             "findMany" => Self::FindMany,
             "createOne" => Self::CreateOne,
             "createMany" => Self::CreateMany,
+            "createManyAndReturn" => Self::CreateManyAndReturn,
             "updateOne" => Self::UpdateOne,
             "updateMany" => Self::UpdateMany,
             "deleteOne" => Self::DeleteOne,
