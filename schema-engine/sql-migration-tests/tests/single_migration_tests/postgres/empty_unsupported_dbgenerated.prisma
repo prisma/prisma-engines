@@ -7,15 +7,15 @@ datasource testds {
 }
 
 model table {
-    id            String @id
-    hereBeDragons String @default(dbgenerated())
+    id            String                   @id
+    hereBeDragons Unsupported("tsvector")? @default(dbgenerated())
 }
 
 // Expected Migration:
 // -- CreateTable
 // CREATE TABLE "table" (
 //     "id" TEXT NOT NULL,
-//     "hereBeDragons" TEXT NOT NULL,
+//     "hereBeDragons" tsvector,
 // 
 //     CONSTRAINT "table_pkey" PRIMARY KEY ("id")
 // );
