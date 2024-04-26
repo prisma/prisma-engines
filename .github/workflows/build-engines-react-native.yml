@@ -10,7 +10,7 @@ jobs:
   build-ios:
     # Do not change `name`, prisma-engines Buildkite build job depends on this name ending with the commit
     name: "iOS build on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
-    runs-on: macos-13
+    runs-on: macos-14
 
     steps:
       - name: Output link to real commit
@@ -51,7 +51,7 @@ jobs:
       - name: Output link to real commit
         run: echo ${{ github.repository }}/commit/${{ github.event.inputs.commit }}
 
-      - name: Checkout  # TODO: commit
+      - name: Checkout 
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.commit }}
