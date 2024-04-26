@@ -381,12 +381,15 @@ mod create_many {
 
     #[connector_test(schema(schema_1m_child))]
     async fn create_many_1m_non_inline_rel_read_fails(runner: Runner) -> TestResult<()> {
-        assert_error!(
-            &runner,
-            r#"mutation { createManyTestAndReturn(data: [{ id: 1, str1: "1" }, { id: 2, str1: "2" }]) { id children { id } } }"#,
-            2009,
-            "Field 'children' not found in enclosing type"
-        );
+      // Runs only on GraphQL protocol otherwise the GraphQL to JSON translation fails before it reaches the parser.
+        if runner.protocol().is_graphql() {
+            assert_error!(
+                &runner,
+                r#"mutation { createManyTestAndReturn(data: [{ id: 1, str1: "1" }, { id: 2, str1: "2" }]) { id children { id } } }"#,
+                2009,
+                "Field 'children' not found in enclosing type"
+            );
+        }
 
         Ok(())
     }
@@ -413,19 +416,22 @@ mod create_many {
 
     #[connector_test(schema(schema_m2m_child))]
     async fn create_many_m2m_rel_read_fails(runner: Runner) -> TestResult<()> {
-        assert_error!(
-            &runner,
-            r#"mutation { createManyTestAndReturn(data: [{ id: 1, str1: "1" }, { id: 2, str1: "2" }]) { id children { id } } }"#,
-            2009,
-            "Field 'children' not found in enclosing type"
-        );
+        // Runs only on GraphQL protocol otherwise the GraphQL to JSON translation fails before it reaches the parser.
+        if runner.protocol().is_graphql() {
+            assert_error!(
+                &runner,
+                r#"mutation { createManyTestAndReturn(data: [{ id: 1, str1: "1" }, { id: 2, str1: "2" }]) { id children { id } } }"#,
+                2009,
+                "Field 'children' not found in enclosing type"
+            );
 
-        assert_error!(
-            &runner,
-            r#"mutation { createManyChildAndReturn(data: [{ id: 1 }, { id: 2 }]) { id tests { id } } }"#,
-            2009,
-            "Field 'tests' not found in enclosing type"
-        );
+            assert_error!(
+                &runner,
+                r#"mutation { createManyChildAndReturn(data: [{ id: 1 }, { id: 2 }]) { id tests { id } } }"#,
+                2009,
+                "Field 'tests' not found in enclosing type"
+            );
+        }
 
         Ok(())
     }
