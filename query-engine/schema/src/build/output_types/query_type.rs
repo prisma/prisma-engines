@@ -15,7 +15,7 @@ pub(crate) fn query_fields(ctx: &QuerySchema) -> Vec<FieldFn> {
     for model in ctx.internal_data_model.models() {
         field!(find_first_field, model);
         field!(find_first_or_throw_field, model);
-        field!(all_items_field, model);
+        field!(find_many_field, model);
         field!(plain_aggregation_field, model);
         field!(group_by_aggregation_field, model);
         field!(find_unique_field, model);
@@ -113,7 +113,7 @@ fn find_first_or_throw_field(ctx: &QuerySchema, model: Model) -> OutputField<'_>
 }
 
 /// Builds a "multiple" query arity items field (e.g. "users", "posts", ...) for given model.
-fn all_items_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
+fn find_many_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
     let field_name = format!("findMany{}", model.name());
     let object_type = objects::model::model_object_type(ctx, model.clone());
     let model_id = model.id;

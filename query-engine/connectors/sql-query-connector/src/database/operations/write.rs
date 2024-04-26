@@ -265,13 +265,16 @@ pub(crate) async fn create_records_returning(
     selected_fields: FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
-    let field_names: Vec<String> = selected_fields.db_names().collect();
     let idents = selected_fields.type_identifiers_with_arities();
+    let field_names: Vec<String> = selected_fields.db_names().collect();
     let meta = column_metadata::create(&field_names, &idents);
-    let mut records = ManyRecords::new(field_names.clone());
     let inserts = generate_insert_statements(model, args, skip_duplicates, Some(&selected_fields.into()), ctx);
+
+    let mut records = ManyRecords::new(field_names.clone());
+
     for insert in inserts {
         let result_set = conn.query(insert.into()).await?;
+
         for result_row in result_set {
             let sql_row = result_row.to_sql_row(&meta)?;
             let record = Record::from(sql_row);
