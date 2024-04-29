@@ -375,15 +375,20 @@ mod create_many {
 
     #[connector_test(schema(schema_11_child))]
     async fn create_many_11_non_inline_rel_read_fails(runner: Runner) -> TestResult<()> {
-        // Runs only on GraphQL protocol otherwise the GraphQL to JSON translation fails before it reaches the parser.
-        if runner.protocol().is_graphql() {
-            assert_error!(
-                &runner,
-                r#"mutation { createManyTestAndReturn(data: { id: 1 }) { id child { id } } }"#,
-                2009,
-                "Field 'child' not found in enclosing type"
-            );
-        }
+        runner
+            .query_json(serde_json::json!({
+              "modelName": "Test",
+              "action": "createManyAndReturn",
+              "query": {
+                "arguments": { "data": { "id": 1 } },
+                "selection": {
+                  "id": true,
+                  "child": true
+                }
+              }
+            }))
+            .await?
+            .assert_failure(2009, Some("Field 'child' not found in enclosing type".to_string()));
 
         Ok(())
     }
@@ -437,15 +442,20 @@ mod create_many {
 
     #[connector_test(schema(schema_1m_child))]
     async fn create_many_1m_non_inline_rel_read_fails(runner: Runner) -> TestResult<()> {
-        // Runs only on GraphQL protocol otherwise the GraphQL to JSON translation fails before it reaches the parser.
-        if runner.protocol().is_graphql() {
-            assert_error!(
-                &runner,
-                r#"mutation { createManyTestAndReturn(data: { id: 1 }) { id children { id } } }"#,
-                2009,
-                "Field 'children' not found in enclosing type"
-            );
-        }
+        runner
+            .query_json(serde_json::json!({
+              "modelName": "Test",
+              "action": "createManyAndReturn",
+              "query": {
+                "arguments": { "data": { "id": 1 } },
+                "selection": {
+                  "id": true,
+                  "children": true
+                }
+              }
+            }))
+            .await?
+            .assert_failure(2009, Some("Field 'children' not found in enclosing type".to_string()));
 
         Ok(())
     }
@@ -472,22 +482,35 @@ mod create_many {
 
     #[connector_test(schema(schema_m2m_child))]
     async fn create_many_m2m_rel_read_fails(runner: Runner) -> TestResult<()> {
-        // Runs only on GraphQL protocol otherwise the GraphQL to JSON translation fails before it reaches the parser.
-        if runner.protocol().is_graphql() {
-            assert_error!(
-                &runner,
-                r#"mutation { createManyTestAndReturn(data: { id: 1 }) { id children { id } } }"#,
-                2009,
-                "Field 'children' not found in enclosing type"
-            );
+        runner
+            .query_json(serde_json::json!({
+              "modelName": "Test",
+              "action": "createManyAndReturn",
+              "query": {
+                "arguments": { "data": { "id": 1 } },
+                "selection": {
+                  "id": true,
+                  "children": true
+                }
+              }
+            }))
+            .await?
+            .assert_failure(2009, Some("Field 'children' not found in enclosing type".to_string()));
 
-            assert_error!(
-                &runner,
-                r#"mutation { createManyChildAndReturn(data: { id: 1 }) { id tests { id } } }"#,
-                2009,
-                "Field 'tests' not found in enclosing type"
-            );
-        }
+        runner
+            .query_json(serde_json::json!({
+              "modelName": "Child",
+              "action": "createManyAndReturn",
+              "query": {
+                "arguments": { "data": { "id": 1 } },
+                "selection": {
+                  "id": true,
+                  "tests": true
+                }
+              }
+            }))
+            .await?
+            .assert_failure(2009, Some("Field 'tests' not found in enclosing type".to_string()));
 
         Ok(())
     }
@@ -508,15 +531,20 @@ mod create_many {
 
     #[connector_test(schema(schema_self_rel_child))]
     async fn create_many_self_rel_read_fails(runner: Runner) -> TestResult<()> {
-        // Runs only on GraphQL protocol otherwise the GraphQL to JSON translation fails before it reaches the parser.
-        if runner.protocol().is_graphql() {
-            assert_error!(
-                &runner,
-                r#"mutation { createManyChildAndReturn(data: { id: 1 }) { id students { id } } }"#,
-                2009,
-                "Field 'students' not found in enclosing type"
-            );
-        }
+        runner
+            .query_json(serde_json::json!({
+              "modelName": "Child",
+              "action": "createManyAndReturn",
+              "query": {
+                "arguments": { "data": { "id": 1 } },
+                "selection": {
+                  "id": true,
+                  "students": true
+                }
+              }
+            }))
+            .await?
+            .assert_failure(2009, Some("Field 'students' not found in enclosing type".to_string()));
 
         Ok(())
     }
