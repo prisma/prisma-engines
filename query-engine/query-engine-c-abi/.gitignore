@@ -1,4 +1,5 @@
-QueryEngine.xcframework
+ios
+android
 simulator_fat
 # Artifacts of the C ABI engine
 *.tar.gz
