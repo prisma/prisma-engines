@@ -15,7 +15,7 @@ impl Connector for EmptyDatamodelConnector {
         std::any::type_name::<EmptyDatamodelConnector>()
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+    fn foreign_key_referential_actions(&self) -> BitFlags<ReferentialAction> {
         BitFlags::all()
     }
 
