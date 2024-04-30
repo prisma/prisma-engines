@@ -11,6 +11,9 @@ pub struct Configuration {
     pub generators: Vec<Generator>,
     pub datasources: Vec<Datasource>,
     pub warnings: Vec<diagnostics::DatamodelWarning>,
+
+    generators_files: Vec<parser_database::FileId>,
+    datasources_files: Vec<parser_database::FileId>,
 }
 
 impl Configuration {
@@ -166,5 +169,21 @@ impl Configuration {
         }
 
         Ok(())
+    }
+
+    pub fn generators_with_files(&self) -> Vec<parser_database::InFile<&Generator>> {
+        self.generators
+            .iter()
+            .zip(&self.generators_files)
+            .map(|(gen, file_id)| (*file_id, gen))
+            .collect()
+    }
+
+    pub fn datasources_with_files(&self) -> Vec<parser_database::InFile<&Datasource>> {
+        self.datasources
+            .iter()
+            .zip(&self.datasources_files)
+            .map(|(ds, file_id)| (*file_id, ds))
+            .collect()
     }
 }

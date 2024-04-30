@@ -1,10 +1,12 @@
 pub use super::TestResult;
 pub use expect_test::expect;
 pub use indoc::{formatdoc, indoc};
+use itertools::Itertools;
 pub use quaint::prelude::Queryable;
 use schema_connector::CompositeTypeDepth;
 use schema_connector::ConnectorResult;
 use schema_connector::IntrospectionContext;
+use schema_connector::IntrospectionMultiResult;
 use schema_connector::IntrospectionResult;
 use schema_connector::ViewDefinition;
 pub use test_macros::test_connector;
@@ -161,9 +163,23 @@ impl TestApi {
         Ok(introspection_result.data_model)
     }
 
+    pub async fn introspect_multi(&mut self) -> Result<String> {
+        let previous_schema = psl::validate(self.pure_config().into());
+        let introspection_result = self.test_introspect_internal(previous_schema, true).await?;
+
+        Ok(introspection_result.data_model)
+    }
+
     pub async fn introspect_views(&mut self) -> Result<Option<Vec<ViewDefinition>>> {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, true).await?;
+
+        Ok(introspection_result.views)
+    }
+
+    pub async fn introspect_views_multi(&mut self) -> Result<Option<Vec<ViewDefinition>>> {
+        let previous_schema = psl::validate(self.pure_config().into());
+        let introspection_result = self.test_introspect_multi_internal(previous_schema, true).await?;
 
         Ok(introspection_result.views)
     }
@@ -210,6 +226,21 @@ impl TestApi {
             .await
     }
 
+    async fn test_introspect_multi_internal(
+        &mut self,
+        previous_schema: psl::ValidatedSchema,
+        render_config: bool,
+    ) -> ConnectorResult<IntrospectionMultiTestResult> {
+        let mut ctx = IntrospectionContext::new(previous_schema, CompositeTypeDepth::Infinite, None);
+        ctx.render_config = render_config;
+
+        self.api
+            .introspect_multi(&ctx)
+            .instrument(tracing::info_span!("introspect_multi"))
+            .await
+            .map(Into::into)
+    }
+
     #[tracing::instrument(skip(self, data_model_string))]
     pub async fn re_introspect(&mut self, data_model_string: &str) -> Result<String> {
         let schema = format!("{}{}", self.pure_config(), data_model_string);
@@ -217,6 +248,15 @@ impl TestApi {
         let introspection_result = self.test_introspect_internal(schema, true).await?;
 
         Ok(introspection_result.data_model)
+    }
+
+    #[tracing::instrument(skip(self, data_model_string))]
+    pub async fn re_introspect_multi(&mut self, data_model_string: &str) -> Result<String> {
+        let schema = format!("{}{}", self.pure_config(), data_model_string);
+        let schema = parse_datamodel(&schema);
+        let introspection_result = self.test_introspect_multi_internal(schema, true).await?;
+
+        Ok(introspection_result.datamodels)
     }
 
     #[tracing::instrument(skip(self, data_model_string))]
@@ -233,6 +273,14 @@ impl TestApi {
         let introspection_result = self.test_introspect_internal(data_model, true).await?;
 
         Ok(introspection_result.data_model)
+    }
+
+    #[tracing::instrument(skip(self, data_model_string))]
+    pub async fn re_introspect_config_multi(&mut self, data_model_string: &str) -> Result<String> {
+        let data_model = parse_datamodel(data_model_string);
+        let introspection_result = self.test_introspect_multi_internal(data_model, true).await?;
+
+        Ok(introspection_result.datamodels)
     }
 
     pub async fn re_introspect_warnings(&mut self, data_model_string: &str) -> Result<String> {
@@ -325,8 +373,12 @@ impl TestApi {
         )
     }
 
-    fn pure_config(&self) -> String {
-        format!("{}\n{}", &self.datasource_block_string(), &self.generator_block())
+    pub fn pure_config(&self) -> String {
+        format!(
+            "{}\n{}",
+            &self.datasource_block_string(),
+            &self.generator_block_string()
+        )
     }
 
     pub fn configuration(&self) -> Configuration {
@@ -338,13 +390,29 @@ impl TestApi {
         expectation.assert_eq(&found);
     }
 
+    pub async fn expect_datamodels(&mut self, expectation: &expect_test::Expect) {
+        let found = self.introspect_multi().await.unwrap();
+
+        expectation.assert_eq(&found);
+    }
+
+    fn process_views(&self, view_name: &str, views: Vec<ViewDefinition>) -> ViewDefinition {
+        views
+            .into_iter()
+            .find(|v| v.schema == self.schema_name() && v.name == view_name)
+            .expect("Could not find view with the given name.")
+    }
+
     pub async fn expect_view_definition(&mut self, view: &str, expectation: &expect_test::Expect) {
         let views = self.introspect_views().await.unwrap().unwrap_or_default();
+        let view = self.process_views(view, views);
 
-        let view = views
-            .into_iter()
-            .find(|v| v.schema == self.schema_name() && v.name == view)
-            .expect("Could not find view with the given name.");
+        expectation.assert_eq(&view.definition);
+    }
+
+    pub async fn expect_view_definition_multi(&mut self, view: &str, expectation: &expect_test::Expect) {
+        let views = self.introspect_views_multi().await.unwrap().unwrap_or_default();
+        let view = self.process_views(view, views);
 
         expectation.assert_eq(&view.definition);
     }
@@ -374,6 +442,18 @@ impl TestApi {
         expectation.assert_eq(&warnings);
     }
 
+    pub async fn expect_warnings_multi(&mut self, expectation: &expect_test::Expect) {
+        let previous_schema = psl::validate(self.pure_config().into());
+        let introspection_result = self
+            .test_introspect_multi_internal(previous_schema, true)
+            .await
+            .unwrap();
+
+        let warnings = introspection_result.warnings.unwrap_or_default();
+
+        expectation.assert_eq(&warnings);
+    }
+
     pub async fn expect_no_warnings(&mut self) {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, true).await.unwrap();
@@ -389,10 +469,33 @@ impl TestApi {
         expectation.assert_eq(&reintrospected.data_model);
     }
 
+    pub async fn expect_re_introspected_datamodels(
+        &mut self,
+        datamodels: &[(&str, String)],
+        expectation: expect_test::Expect,
+    ) {
+        let schema = parse_datamodels(datamodels);
+        let reintrospected = self.test_introspect_multi_internal(schema, true).await.unwrap();
+
+        expectation.assert_eq(&reintrospected.datamodels);
+    }
+
     pub async fn expect_re_introspect_warnings(&mut self, schema: &str, expectation: expect_test::Expect) {
         let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), schema));
         let introspection_result = self.test_introspect_internal(data_model, false).await.unwrap();
 
+        let warnings = introspection_result.warnings.unwrap_or_default();
+
+        expectation.assert_eq(&warnings);
+    }
+
+    pub async fn expect_re_introspect_datamodels_warnings(
+        &mut self,
+        datamodels: &[(&str, String)],
+        expectation: expect_test::Expect,
+    ) {
+        let data_model = parse_datamodels(datamodels);
+        let introspection_result = self.test_introspect_internal(data_model, false).await.unwrap();
         let warnings = introspection_result.warnings.unwrap_or_default();
 
         expectation.assert_eq(&warnings);
@@ -417,12 +520,12 @@ impl TestApi {
     fn dm_with_generator_and_preview_flags(&self, schema: &str) -> String {
         let mut out = String::with_capacity(320 + schema.len());
 
-        write!(out, "{}\n{}", self.generator_block(), schema).unwrap();
+        write!(out, "{}\n{}", self.generator_block_string(), schema).unwrap();
 
         out
     }
 
-    fn generator_block(&self) -> String {
+    pub fn generator_block_string(&self) -> String {
         let preview_features: Vec<String> = self.preview_features().iter().map(|pf| format!(r#""{pf}""#)).collect();
 
         let preview_feature_string = if preview_features.is_empty() {
@@ -447,4 +550,44 @@ impl TestApi {
 #[track_caller]
 fn parse_datamodel(dm: &str) -> psl::ValidatedSchema {
     psl::parse_schema(dm).unwrap()
+}
+
+#[track_caller]
+fn parse_datamodels(datamodels: &[(&str, String)]) -> psl::ValidatedSchema {
+    let datamodels = datamodels
+        .iter()
+        .map(|(file_name, dm)| (file_name.to_string(), psl::SourceFile::from(dm)))
+        .collect();
+
+    psl::validate_multi_file(datamodels)
+}
+
+pub struct IntrospectionMultiTestResult {
+    /// Datamodels joined with file paths
+    pub datamodels: String,
+    /// The introspected data model is empty
+    pub is_empty: bool,
+    /// Introspection warnings
+    pub warnings: Option<String>,
+    /// The database view definitions. None if preview feature
+    /// is not enabled.
+    pub views: Option<Vec<ViewDefinition>>,
+}
+
+impl From<IntrospectionMultiResult> for IntrospectionMultiTestResult {
+    fn from(res: IntrospectionMultiResult) -> Self {
+        let datamodels = res
+            .datamodels
+            .into_iter()
+            .sorted_unstable_by_key(|(file_name, _)| file_name.to_owned())
+            .map(|(file_name, dm)| format!("// file: {file_name}\n{dm}"))
+            .join("------\n");
+
+        Self {
+            datamodels,
+            is_empty: res.is_empty,
+            warnings: res.warnings,
+            views: res.views,
+        }
+    }
 }

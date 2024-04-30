@@ -5,10 +5,14 @@ use crate::introspection::{
     sanitize_datamodel_names,
 };
 use datamodel_renderer::datamodel as renderer;
-use psl::parser_database as db;
+use psl::{diagnostics::FileId, parser_database as db, schema_ast::ast::EnumId};
 
 /// Render all enums.
-pub(super) fn render<'a>(ctx: &'a DatamodelCalculatorContext<'a>, rendered: &mut renderer::Datamodel<'a>) {
+pub(super) fn render<'a>(
+    introspection_file_name: &str,
+    ctx: &'a DatamodelCalculatorContext<'a>,
+    rendered: &mut renderer::Datamodel<'a>,
+) {
     let mut all_enums: Vec<(Option<db::EnumId>, renderer::Enum<'_>)> = Vec::new();
 
     for pair in ctx.enum_pairs() {
@@ -25,9 +29,40 @@ pub(super) fn render<'a>(ctx: &'a DatamodelCalculatorContext<'a>, rendered: &mut
         });
     }
 
-    for (_, enm) in all_enums {
-        rendered.push_enum(enm);
+    for (previous_schema_enum, enm) in all_enums {
+        let file_name = match previous_schema_enum {
+            Some((prev_file_id, _)) => ctx.previous_schema.db.file_name(prev_file_id),
+            None => introspection_file_name,
+        };
+
+        rendered.push_enum(file_name.to_string(), enm);
     }
+
+    let removed_enums = compute_removed_enums(ctx);
+
+    // Ensures that if an enum is removed, the file remains present in the result.
+    for (prev_file_id, _) in removed_enums {
+        let file_name = ctx.previous_schema.db.file_name(prev_file_id);
+
+        rendered.create_empty_file(file_name.to_owned());
+    }
+}
+
+fn compute_removed_enums(ctx: &DatamodelCalculatorContext<'_>) -> Vec<(FileId, EnumId)> {
+    let mut removed_enums = Vec::new();
+
+    for eenums in ctx.previous_schema.db.walk_enums() {
+        let previous_enum = (eenums.id.0, eenums.id.1);
+
+        if !ctx
+            .enum_pairs()
+            .any(|eenum| eenum.previous_position() == Some(previous_enum))
+        {
+            removed_enums.push(previous_enum);
+        }
+    }
+
+    removed_enums
 }
 
 /// Render a single enum.

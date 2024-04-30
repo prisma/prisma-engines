@@ -1,27 +1,35 @@
 //! Rendering of the datasource and generator parts of the PSL.
 
 use datamodel_renderer as render;
-use psl::Configuration;
+use psl::ValidatedSchema;
 use sql_schema_describer::SqlSchema;
 
 /// Render a configuration block.
 pub(super) fn render<'a>(
-    config: &'a Configuration,
+    previous_schema: &'a ValidatedSchema,
     schema: &'a SqlSchema,
     force_namespaces: Option<&'a [String]>,
 ) -> render::Configuration<'a> {
+    let datasources_with_files = previous_schema.configuration.datasources_with_files();
+    let (prev_ds_file, prev_ds) = datasources_with_files.first().unwrap();
+    let prev_ds_file_name = previous_schema.db.file_name(*prev_ds_file);
+
     let mut output = render::Configuration::default();
-    let prev_ds = config.datasources.first().unwrap();
     let mut datasource = render::configuration::Datasource::from_psl(prev_ds, force_namespaces);
 
     if prev_ds.active_connector.is_provider("postgres") {
-        super::postgres::add_extensions(&mut datasource, schema, config);
+        super::postgres::add_extensions(&mut datasource, schema, &previous_schema.configuration);
     }
 
-    output.push_datasource(datasource);
+    output.push_datasource(prev_ds_file_name.to_owned(), datasource);
 
-    for prev in config.generators.iter() {
-        output.push_generator(render::configuration::Generator::from_psl(prev));
+    for (prev_gen_file, prev_gen) in previous_schema.configuration.generators_with_files() {
+        let prev_gen_file_name = previous_schema.db.file_name(prev_gen_file);
+
+        output.push_generator(
+            prev_gen_file_name.to_owned(),
+            render::configuration::Generator::from_psl(prev_gen),
+        );
     }
 
     output

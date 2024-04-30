@@ -274,6 +274,25 @@ impl SchemaConnector for SqlSchemaConnector {
         })
     }
 
+    fn introspect_multi<'a>(
+        &'a mut self,
+        ctx: &'a IntrospectionContext,
+    ) -> BoxFuture<'a, ConnectorResult<IntrospectionMultiResult>> {
+        Box::pin(async move {
+            let mut namespace_names = match ctx.namespaces() {
+                Some(namespaces) => namespaces.iter().map(|s| s.to_string()).collect(),
+                None => ctx.datasource().namespaces.iter().map(|(s, _)| s.to_string()).collect(),
+            };
+
+            let namespaces = Namespaces::from_vec(&mut namespace_names);
+            let sql_schema = self.flavour.introspect(namespaces, ctx).await?;
+            let search_path = self.flavour.search_path();
+            let datamodels = introspection::datamodel_calculator::calculate_multi(&sql_schema, ctx, search_path);
+
+            Ok(datamodels)
+        })
+    }
+
     fn migration_file_extension(&self) -> &'static str {
         "sql"
     }

@@ -9,7 +9,7 @@ use mongodb::{
     Database,
 };
 use mongodb_schema_describer::MongoSchema;
-use schema_connector::{warnings::Model, IntrospectionContext, IntrospectionResult, Warnings};
+use schema_connector::{warnings::Model, IntrospectionContext, IntrospectionMultiResult, Warnings};
 use statistics::*;
 
 /// From the given database, lists all collections as models, and samples
@@ -23,7 +23,7 @@ pub(super) async fn sample(
     database: Database,
     schema: MongoSchema,
     ctx: &IntrospectionContext,
-) -> Result<IntrospectionResult, mongodb::error::Error> {
+) -> Result<IntrospectionMultiResult, mongodb::error::Error> {
     let mut statistics = Statistics::new(ctx.composite_type_depth);
     let mut warnings = Warnings::new();
 
@@ -61,14 +61,18 @@ pub(super) async fn sample(
     }
 
     let mut data_model = render::Datamodel::default();
-    statistics.render(ctx.datasource(), &mut data_model, &mut warnings);
 
-    let psl_string = if ctx.render_config {
-        let config = render::Configuration::from_psl(ctx.configuration(), None);
-        format!("{config}\n{data_model}")
-    } else {
-        data_model.to_string()
-    };
+    statistics.render(ctx, &mut data_model, &mut warnings);
+
+    let is_empty = data_model.is_empty();
+
+    if ctx.render_config {
+        let config = render::Configuration::from_psl(ctx.configuration(), ctx.previous_schema(), None);
+
+        data_model.set_configuration(config);
+    }
+
+    let sources = data_model.render();
 
     let warnings = if !warnings.is_empty() {
         Some(warnings.to_string())
@@ -76,9 +80,9 @@ pub(super) async fn sample(
         None
     };
 
-    Ok(IntrospectionResult {
-        data_model: psl::reformat(&psl_string, 2).unwrap(),
-        is_empty: data_model.is_empty(),
+    Ok(IntrospectionMultiResult {
+        datamodels: psl::reformat_multiple(sources, 2),
+        is_empty,
         warnings,
         views: None,
     })

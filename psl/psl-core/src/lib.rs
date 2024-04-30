@@ -91,9 +91,7 @@ pub fn validate_multi_file(files: Vec<(String, SourceFile)>, connectors: Connect
     for ast in db.iter_asts() {
         let new_config = validate_configuration(ast, &mut diagnostics, connectors);
 
-        configuration.datasources.extend(new_config.datasources.into_iter());
-        configuration.generators.extend(new_config.generators.into_iter());
-        configuration.warnings.extend(new_config.warnings.into_iter());
+        configuration.extend(new_config);
     }
 
     let datasources = &configuration.datasources;
@@ -163,13 +161,15 @@ fn validate_configuration(
     diagnostics: &mut Diagnostics,
     connectors: ConnectorRegistry<'_>,
 ) -> Configuration {
-    let generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics);
+    let (generators, generators_files) = generator_loader::load_generators_from_ast(schema_ast, diagnostics);
+    let (datasources, datasources_files) =
+        datasource_loader::load_datasources_from_ast(schema_ast, diagnostics, connectors);
 
-    let datasources = datasource_loader::load_datasources_from_ast(schema_ast, diagnostics, connectors);
-
-    Configuration {
+    Configuration::new(
         generators,
+        generators_files,
         datasources,
-        warnings: diagnostics.warnings().to_owned(),
-    }
+        datasources_files,
+        diagnostics.warnings().to_owned(),
+    )
 }
