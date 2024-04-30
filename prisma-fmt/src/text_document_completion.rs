@@ -13,6 +13,8 @@ use std::sync::Arc;
 use crate::position_to_offset;
 
 mod datasource;
+mod multi_schema;
+mod referential_actions;
 
 pub(crate) fn empty_completion_list() -> CompletionList {
     CompletionList {
@@ -97,13 +99,7 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
             ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("relation", _, Some(attr_name))),
         ) if attr_name == "onDelete" || attr_name == "onUpdate" => {
             for referential_action in ctx.connector().referential_actions().iter() {
-                completion_list.items.push(CompletionItem {
-                    label: referential_action.as_str().to_owned(),
-                    kind: Some(CompletionItemKind::ENUM),
-                    // what is the difference between detail and documentation?
-                    detail: Some(referential_action.documentation().to_owned()),
-                    ..Default::default()
-                });
+                referential_actions::referential_action_completion(completion_list, referential_action)
             }
         }
 
@@ -196,12 +192,7 @@ fn push_namespaces(ctx: CompletionContext<'_>, completion_list: &mut CompletionL
             namespace.to_string()
         };
 
-        completion_list.items.push(CompletionItem {
-            label: String::from(namespace),
-            insert_text: Some(insert_text),
-            kind: Some(CompletionItemKind::PROPERTY),
-            ..Default::default()
-        })
+        multi_schema::schema_namespace_completion(completion_list, namespace, insert_text);
     }
 }
 
