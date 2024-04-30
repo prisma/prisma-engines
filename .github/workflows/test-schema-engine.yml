@@ -208,7 +208,7 @@ jobs:
         db:
           - name: "mysql@8.3"
             url: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
-          - name: "mariadb@11.3"
+          - name: "mariadb@11.3.2"
             url: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
         rust:
           - stable
