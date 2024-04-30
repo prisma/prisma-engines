@@ -3,10 +3,12 @@ use crate::introspection::{
     datamodel_calculator::DatamodelCalculatorContext, introspection_helpers as helpers, introspection_pair::ViewPair,
 };
 use datamodel_renderer::datamodel as renderer;
+use psl::{diagnostics::FileId, schema_ast::ast::ModelId};
 use schema_connector::ViewDefinition;
 
 /// Render all view blocks to the PSL.
 pub(super) fn render<'a>(
+    introspection_file_name: &str,
     ctx: &'a DatamodelCalculatorContext<'a>,
     rendered: &mut renderer::Datamodel<'a>,
 ) -> Vec<ViewDefinition> {
@@ -32,11 +34,40 @@ pub(super) fn render<'a>(
 
     views_with_idx.sort_by(|(a, _), (b, _)| helpers::compare_options_none_last(*a, *b));
 
-    for (_, render) in views_with_idx.into_iter() {
-        rendered.push_view(render);
+    for (previous_view, render) in views_with_idx.into_iter() {
+        let file_name = match previous_view {
+            Some((previous_file_id, _)) => ctx.previous_schema.db.file_name(previous_file_id),
+            None => introspection_file_name,
+        };
+
+        rendered.push_view(file_name.to_string(), render);
+    }
+
+    // Ensures that if a view is removed, the file remains present in the result.
+    for removed_view in compute_removed_views(ctx) {
+        let file_name = ctx.previous_schema.db.file_name(removed_view.0);
+
+        rendered.create_empty_file(file_name.to_owned());
     }
 
     definitions
+}
+
+fn compute_removed_views(ctx: &DatamodelCalculatorContext<'_>) -> Vec<(FileId, ModelId)> {
+    let mut removed_views = Vec::new();
+
+    for view in ctx.previous_schema.db.walk_views() {
+        let previous_view = (view.id.0, view.id.1);
+
+        if !ctx
+            .view_pairs()
+            .any(|view| view.previous_position() == Some(previous_view))
+        {
+            removed_views.push(previous_view);
+        }
+    }
+
+    removed_views
 }
 
 /// Render a single view.

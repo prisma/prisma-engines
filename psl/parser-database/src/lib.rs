@@ -200,6 +200,11 @@ impl ParserDatabase {
         self.types.model_attributes.len()
     }
 
+    /// The total number of files for the schema. This is O(1).
+    pub fn files_count(&self) -> usize {
+        self.asts.len()
+    }
+
     /// The source file contents. This methods asserts that there is a single prisma schema file.
     /// As multi-file schemas are implemented, calls to this methods should be replaced with
     /// `ParserDatabase::source()` and `ParserDatabase::iter_sources()`.

@@ -78,6 +78,15 @@ impl crate::ParserDatabase {
             .map(|model_id| self.walk(model_id))
     }
 
+    /// Find a composite type by name.
+    pub fn find_composite_type<'db>(&'db self, name: &str) -> Option<CompositeTypeWalker<'db>> {
+        self.interner
+            .lookup(name)
+            .and_then(|name_id| self.names.tops.get(&name_id))
+            .and_then(|(file_id, top_id)| top_id.as_composite_type_id().map(|id| (*file_id, id)))
+            .map(|ct_id| self.walk(ct_id))
+    }
+
     /// Traverse a schema element by id.
     pub fn walk<I>(&self, id: I) -> Walker<'_, I> {
         Walker { db: self, id }

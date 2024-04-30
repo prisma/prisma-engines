@@ -11,9 +11,36 @@ pub struct Configuration {
     pub generators: Vec<Generator>,
     pub datasources: Vec<Datasource>,
     pub warnings: Vec<diagnostics::DatamodelWarning>,
+
+    generators_files: Vec<parser_database::FileId>,
+    datasources_files: Vec<parser_database::FileId>,
 }
 
 impl Configuration {
+    pub fn new(
+        generators: Vec<Generator>,
+        generators_files: Vec<parser_database::FileId>,
+        datasources: Vec<Datasource>,
+        datasources_files: Vec<parser_database::FileId>,
+        warnings: Vec<diagnostics::DatamodelWarning>,
+    ) -> Self {
+        Self {
+            generators,
+            datasources,
+            warnings,
+            generators_files,
+            datasources_files,
+        }
+    }
+
+    pub fn extend(&mut self, other: Configuration) {
+        self.generators.extend(other.generators);
+        self.datasources.extend(other.datasources);
+        self.warnings.extend(other.warnings);
+        self.generators_files.extend(other.generators_files);
+        self.datasources_files.extend(other.datasources_files);
+    }
+
     pub fn validate_that_one_datasource_is_provided(&self) -> Result<(), Diagnostics> {
         if self.datasources.is_empty() {
             Err(DatamodelError::new_validation_error(
@@ -160,5 +187,21 @@ impl Configuration {
         }
 
         Ok(())
+    }
+
+    pub fn generators_with_files(&self) -> Vec<parser_database::InFile<&Generator>> {
+        self.generators
+            .iter()
+            .zip(&self.generators_files)
+            .map(|(gen, file_id)| (*file_id, gen))
+            .collect()
+    }
+
+    pub fn datasources_with_files(&self) -> Vec<parser_database::InFile<&Datasource>> {
+        self.datasources
+            .iter()
+            .zip(&self.datasources_files)
+            .map(|(ds, file_id)| (*file_id, ds))
+            .collect()
     }
 }

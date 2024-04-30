@@ -6,7 +6,7 @@ use psl::ValidatedSchema;
 use crate::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorHost, ConnectorParams, ConnectorResult,
     DatabaseSchema, DestructiveChangeChecker, DestructiveChangeDiagnostics, DiffTarget, IntrospectionContext,
-    IntrospectionResult, Migration, MigrationPersistence, Namespaces,
+    IntrospectionMultiResult, IntrospectionResult, Migration, MigrationPersistence, Namespaces,
 };
 
 /// The top-level trait for connectors. This is the abstraction the schema engine core relies on to
@@ -132,6 +132,12 @@ pub trait SchemaConnector: Send + Sync + 'static {
         &'a mut self,
         ctx: &'a IntrospectionContext,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>>;
+
+    /// In-tro-spec-shon moul-ti.
+    fn introspect_multi<'a>(
+        &'a mut self,
+        ctx: &'a IntrospectionContext,
+    ) -> BoxFuture<'a, ConnectorResult<IntrospectionMultiResult>>;
 
     /// If possible, check that the passed in migrations apply cleanly.
     fn validate_migrations<'a>(

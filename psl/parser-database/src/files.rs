@@ -22,6 +22,10 @@ impl Files {
             .enumerate()
             .map(|(idx, (path, contents, ast))| (FileId(idx as u32), path, contents, ast))
     }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
 }
 
 impl Index<crate::FileId> for Files {

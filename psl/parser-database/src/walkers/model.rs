@@ -25,6 +25,11 @@ impl<'db> ModelWalker<'db> {
         self.ast_model().name()
     }
 
+    /// The ID of the file containing the model.
+    pub fn file_id(self) -> FileId {
+        self.id.0
+    }
+
     /// Traverse the fields of the models in the order they were defined.
     pub fn fields(self) -> impl ExactSizeIterator<Item = FieldWalker<'db>> + Clone {
         self.ast_model()
