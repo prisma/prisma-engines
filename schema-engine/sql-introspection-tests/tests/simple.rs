@@ -73,7 +73,7 @@ fn run_simple_test(test_file_path: &str, test_function_name: &'static str) {
     let mut database_url = std::env::var("TEST_DATABASE_URL").expect(r#"
 Missing TEST_DATABASE_URL from environment.
 
-If you are developing with the docker-compose based setup, you can find the environment variables under .test_database_urls at the project root.
+If you are developing with the docker compose based setup, you can find the environment variables under .test_database_urls at the project root.
 
 Example usage:
 

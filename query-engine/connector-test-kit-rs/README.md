@@ -354,7 +354,7 @@ Let's say you already have connector tests for MongoDB but right now it runs onl
 2. Create a connector file in the `query-engine/connector-test-kit-rs/test-configs/` with the connector data (see other examples in that director), name it with something that makes sense, for example `mongo5`
 3. Add the credentials to access the _data store service_ from the docker compose file, this is done creating the required file in `.test_database_urls`, for example `.test_database_urls/mongo5`
 4. Make sure this image is available to build and prepare the environment in the `Makefile`, in the query engine we depend in two Make targets, `dev-` and `start-`
-   - The `start-` target (for example `start-mongo5`) will execute the _data store service_ in docker compose, for example `docker-compose -f docker-compose.yml up -d --remove-orphans mongo5`
+   - The `start-` target (for example `start-mongo5`) will execute the _data store service_ in docker compose, for example `docker compose -f docker-compose.yml up -d --remove-orphans mongo5`
    - The `dev-` target (for example `dev-mongo5`) will depend on the `start-` target and copy the correct _connector file_, for example `cp $(CONFIG_PATH)/mongodb5 $(CONFIG_FILE)`
 5. Add the new test data store source to the `query-engine/connector-test-kit-rs/query-test-setup/src/connector_tag` file, if it is a completely new data store create the required file, in our case we need to modify `mongodb.rs`
    - Add the new version to the version enum (ex. `MongoDbVersion`)
