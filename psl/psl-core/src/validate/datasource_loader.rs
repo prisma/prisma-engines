@@ -163,8 +163,8 @@ fn lift_datasource(
         None => (None, None),
     };
 
-    if let Some((shadow_url, _)) = shadow_database_url.clone() {
-        if let (Some(direct_url), Some(direct_url_span)) = (direct_url.clone(), direct_url_span) {
+    if let Some((shadow_url, _)) = &shadow_database_url {
+        if let (Some(direct_url), Some(direct_url_span)) = (&direct_url, direct_url_span) {
             if shadow_url == direct_url {
                 diagnostics.push_error(DatamodelError::new_shadow_database_is_same_as_direct_url_error(
                     source_name,
@@ -173,7 +173,7 @@ fn lift_datasource(
             }
         }
 
-        if shadow_url == url {
+        if shadow_url == &url {
             diagnostics.push_error(DatamodelError::new_shadow_database_is_same_as_main_url_error(
                 source_name,
                 url_span,
