@@ -414,16 +414,10 @@ fn push_column_for_model_unsupported_scalar_field(
     table_id: sql::TableId,
     ctx: &mut Context<'_>,
 ) {
-    let default = field.default_value().and_then(|def| {
+    let default = field.default_value().map(|def| {
         // This is validated as @default(dbgenerated("...")), we can unwrap.
-        let dbgenerated_contents = unwrap_dbgenerated(def.value());
-        if let Some(value) = dbgenerated_contents {
-            let default =
-                sql::DefaultValue::db_generated(value).with_constraint_name(ctx.flavour.default_constraint_name(def));
-            Some(default)
-        } else {
-            None
-        }
+        sql::DefaultValue::db_generated::<String>(unwrap_dbgenerated(def.value()))
+            .with_constraint_name(ctx.flavour.default_constraint_name(def))
     });
 
     if let Some(default) = default {

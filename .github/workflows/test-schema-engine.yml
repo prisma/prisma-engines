@@ -206,9 +206,9 @@ jobs:
       fail-fast: false
       matrix:
         db:
-          - name: mysql
+          - name: "mysql-lts"
             url: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
-          - name: mariadb
+          - name: "mariadb"
             url: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
         rust:
           - stable

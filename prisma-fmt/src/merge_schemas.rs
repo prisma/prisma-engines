@@ -12,7 +12,7 @@ pub(crate) fn merge_schemas(params: &str) -> String {
     let params: MergeSchemasParams = match serde_json::from_str(params) {
         Ok(params) => params,
         Err(serde_err) => {
-            panic!("Failed to deserialize GetDmmfParams: {serde_err}");
+            panic!("Failed to deserialize MergeSchemasParams: {serde_err}");
         }
     };
 
@@ -122,6 +122,11 @@ mod tests {
             "schema": schema,
         });
 
-        merge_schemas(&request.to_string());
+        let expected = expect![[
+            r#"{"error_code":"P1012","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating field `a` in model `B`: The relation field `a` on model `B` is missing an opposite relation field on the model `A`. Either run `prisma format` or add it manually.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mb.prisma:4\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 3 | \u001b[0m                    id String @id\n\u001b[1;94m 4 | \u001b[0m                    \u001b[1;91ma A?\u001b[0m\n\u001b[1;94m 5 | \u001b[0m                }\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1"}"#
+        ]];
+
+        let response = merge_schemas(&request.to_string()).unwrap_err();
+        expected.assert_eq(&response);
     }
 }

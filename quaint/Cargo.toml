@@ -28,9 +28,12 @@ docs = []
 # way to access database-specific methods when you need extra control.
 expose-drivers = []
 
-native = ["postgresql-native", "mysql-native", "mssql-native", "sqlite-native"]
-
-all = ["native", "pooled"]
+all-native = [
+  "postgresql-native",
+  "mysql-native",
+  "mssql-native",
+  "sqlite-native",
+]
 
 vendored-openssl = [
   "postgres-native-tls/vendored-openssl",
@@ -177,3 +180,6 @@ optional = true
 version = "0.6"
 features = ["compat"]
 optional = true
+
+[build-dependencies]
+cfg_aliases = "0.1.0"

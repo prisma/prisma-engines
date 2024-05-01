@@ -20,7 +20,7 @@ tracing.workspace = true
 tracing-error = "0.2"
 tracing-futures = "0.2"
 quaint = { workspace = true, features = [
-    "native",
+    "all-native",
     "pooled",
     "expose-drivers",
     "fmt-sql",

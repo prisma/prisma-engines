@@ -164,6 +164,7 @@ impl ParserDatabase {
     /// The parsed AST. This methods asserts that there is a single prisma schema file. As
     /// multi-file schemas are implemented, calls to this methods should be replaced with
     /// `ParserDatabase::ast()` and `ParserDatabase::iter_asts()`.
+    /// TODO: consider removing once the `multiFileSchema` preview feature goes GA.
     pub fn ast_assert_single(&self) -> &ast::SchemaAst {
         assert_eq!(self.asts.0.len(), 1);
         &self.asts.0.first().unwrap().2

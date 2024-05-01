@@ -78,7 +78,9 @@ features!(
     UncheckedScalarInputs,
     Views,
     RelationJoins,
-    PrismaSchemaFolder
+    ReactNative,
+    PrismaSchemaFolder,
+    OmitApi
 );
 
 /// Generator preview features (alphabetically sorted)
@@ -95,6 +97,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | Tracing
          | Views
          | RelationJoins
+         | OmitApi
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations
@@ -129,7 +132,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | TransactionApi
         | UncheckedScalarInputs
     }),
-    hidden: enumflags2::make_bitflags!(PreviewFeature::{PrismaSchemaFolder}),
+    hidden: enumflags2::make_bitflags!(PreviewFeature::{PrismaSchemaFolder | ReactNative}),
 };
 
 #[derive(Debug)]

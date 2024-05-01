@@ -35,6 +35,9 @@ pub struct ConnectorTestArgs {
 
     #[darling(default)]
     pub db_schemas: DbSchemas,
+
+    #[darling(default)]
+    pub db_extensions: DBExtensions,
 }
 
 impl ConnectorTestArgs {
@@ -145,6 +148,24 @@ impl darling::FromMeta for DbSchemas {
     fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
         let db_schemas = strings_to_list("DbSchemas", items)?;
         Ok(DbSchemas { db_schemas })
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct DBExtensions {
+    db_extensions: Vec<String>,
+}
+
+impl DBExtensions {
+    pub fn extensions(&self) -> &[String] {
+        self.db_extensions.as_ref()
+    }
+}
+
+impl darling::FromMeta for DBExtensions {
+    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+        let db_extensions = strings_to_list("DbExtensions", items)?;
+        Ok(Self { db_extensions })
     }
 }
 

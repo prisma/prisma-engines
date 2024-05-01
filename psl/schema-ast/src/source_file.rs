@@ -1,9 +1,21 @@
 use std::sync::Arc;
 
+use serde::{Deserialize, Deserializer};
+
 /// A Prisma schema document.
 #[derive(Debug, Clone)]
 pub struct SourceFile {
     contents: Contents,
+}
+
+impl<'de> Deserialize<'de> for SourceFile {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s: String = serde::de::Deserialize::deserialize(deserializer)?;
+        Ok(s.into())
+    }
 }
 
 impl Default for SourceFile {

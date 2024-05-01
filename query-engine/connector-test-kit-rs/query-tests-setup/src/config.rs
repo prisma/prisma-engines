@@ -8,11 +8,12 @@ use std::{convert::TryFrom, env, fmt::Display, fs::File, io::Read, path::PathBuf
 
 static TEST_CONFIG_FILE_NAME: &str = ".test_config";
 
-#[derive(Debug, Deserialize, Default, Clone)]
+#[derive(Debug, Deserialize, Default, Clone, Copy, PartialEq)]
 pub enum TestExecutor {
     #[default]
     Napi,
     Wasm,
+    Mobile,
 }
 
 impl Display for TestExecutor {
@@ -20,6 +21,7 @@ impl Display for TestExecutor {
         match self {
             TestExecutor::Napi => f.write_str("Napi"),
             TestExecutor::Wasm => f.write_str("Wasm"),
+            TestExecutor::Mobile => f.write_str("Mobile"),
         }
     }
 }
@@ -62,6 +64,11 @@ pub struct TestConfigFromSerde {
     /// test executor by setting the `DRIVER_ADAPTER_CONFIG` env var when spawning the executor.
     /// Correctness: if set, [`TestConfigFromSerde::driver_adapter`] must be set as well.
     pub(crate) driver_adapter_config: Option<DriverAdapterConfig>,
+
+    /// For mobile tests a running device with a valid http server is required.
+    /// This is the URL to the mobile emulator which will execute the queries against
+    /// the instances of the engine running on the device.
+    pub(crate) mobile_emulator_url: Option<String>,
 }
 
 impl TestConfigFromSerde {
@@ -105,10 +112,18 @@ impl TestConfigFromSerde {
             Err(err) => exit_with_message(&err.to_string()),
         }
 
-        if self.external_test_executor.is_some() && self.driver_adapter.is_none() {
-            exit_with_message(
-                "When using an external test executor, the driver adapter (DRIVER_ADAPTER env var) must be set.",
-            );
+        if self.external_test_executor.is_some() {
+            if self.external_test_executor.unwrap() == TestExecutor::Mobile && self.mobile_emulator_url.is_none() {
+                exit_with_message(
+                    "When using the mobile external test executor, the mobile emulator URL (MOBILE_EMULATOR_URL env var) must be set.",
+                );
+            }
+
+            if self.external_test_executor.unwrap() != TestExecutor::Mobile && self.driver_adapter.is_none() {
+                exit_with_message(
+                    "When using an external test executor, the driver adapter (DRIVER_ADAPTER env var) must be set.",
+                );
+            }
         }
 
         if self.driver_adapter.is_some() && self.external_test_executor.is_none() {
@@ -154,6 +169,7 @@ pub struct TestConfig {
     pub(crate) connector_version: Option<String>,
     pub(crate) with_driver_adapter: Option<WithDriverAdapter>,
     pub(crate) is_ci: bool,
+    pub(crate) mobile_emulator_url: Option<String>,
 }
 
 impl From<TestConfigFromSerde> for TestConfig {
@@ -174,6 +190,7 @@ impl From<TestConfigFromSerde> for TestConfig {
             connector_version: config.connector_version,
             is_ci: config.is_ci,
             with_driver_adapter,
+            mobile_emulator_url: config.mobile_emulator_url,
         }
     }
 }
@@ -213,6 +230,7 @@ And optionally, to test driver adapters
 - EXTERNAL_TEST_EXECUTOR
 - DRIVER_ADAPTER
 - DRIVER_ADAPTER_CONFIG (optional, not required by all driver adapters)
+- MOBILE_EMULATOR_URL (optional, only required by mobile external test executor)
 
 📁 Config file
 
@@ -278,6 +296,8 @@ impl TestConfig {
             .map(|config| serde_json::from_str::<DriverAdapterConfig>(config.as_str()).ok())
             .unwrap_or_default();
 
+        let mobile_emulator_url = std::env::var("MOBILE_EMULATOR_URL").ok();
+
         // Just care for a set value for now.
         let is_ci = std::env::var("BUILDKITE").is_ok();
 
@@ -289,13 +309,13 @@ impl TestConfig {
                 external_test_executor,
                 driver_adapter,
                 driver_adapter_config,
+                mobile_emulator_url,
             })
             .map(Self::from)
     }
 
     fn from_file() -> Option<Self> {
         let current_dir = env::current_dir().ok();
-
         current_dir
             .and_then(|path| Self::try_path(config_path(path)))
             .or_else(|| Self::workspace_root().and_then(|path| Self::try_path(config_path(path))))
@@ -401,6 +421,10 @@ impl TestConfig {
             (
                 "PRISMA_DISABLE_QUAINT_EXECUTORS".to_string(),
                 "1".to_string(),
+            ),
+            (
+                "MOBILE_EMULATOR_URL".to_string(),
+                self.mobile_emulator_url.clone().unwrap_or_default()
             ),
         )
     }

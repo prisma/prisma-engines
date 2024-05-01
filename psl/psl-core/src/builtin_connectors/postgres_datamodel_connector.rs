@@ -273,7 +273,7 @@ impl Connector for PostgresDatamodelConnector {
         63
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+    fn foreign_key_referential_actions(&self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
         NoAction | Restrict | Cascade | SetNull | SetDefault
@@ -383,6 +383,15 @@ impl Connector for PostgresDatamodelConnector {
                 errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
             }
             _ => (),
+        }
+    }
+
+    fn native_type_supports_compacting(&self, nt: Option<NativeTypeInstance>) -> bool {
+        let native_type: Option<&PostgresType> = nt.as_ref().map(|nt| nt.downcast_ref());
+
+        match native_type {
+            Some(pt) => !matches!(pt, Citext),
+            None => true,
         }
     }
 
