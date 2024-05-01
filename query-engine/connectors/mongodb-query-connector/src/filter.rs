@@ -188,43 +188,60 @@ impl MongoFilterVisitor {
             // Todo: The nested list unpack looks like a bug somewhere.
             //       Likely join code mistakenly repacks a list into a list of PrismaValue somewhere in the core.
             ScalarCondition::In(vals) => match vals {
-                ConditionListValue::List(vals) => match vals.split_first() {
-                    // List is list of lists, we need to flatten.
-                    Some((PrismaValue::List(_), _)) => {
-                        let mut bson_values = Vec::with_capacity(vals.len());
+                ConditionListValue::List(values) => {
+                    let mut equalities = Vec::with_capacity(values.len());
 
-                        for pv in vals {
-                            if let PrismaValue::List(inner) = pv {
-                                bson_values.extend(
-                                    inner
-                                        .into_iter()
-                                        .map(|val| self.coerce_to_bson_for_filter(field, val))
-                                        .collect::<crate::Result<Vec<_>>>()?,
-                                )
-                            }
+                    for value in values {
+                        // TODO laplab: I am pretty sure this is still incorrect, but at least we stopped dropping values.
+                        //              Need to test `in` operator with nested arrays.
+                        if let PrismaValue::List(list) = value {
+                            // List is list of lists, we need to flatten.
+                            equalities.extend(
+                                list.into_iter()
+                                    .map(|value| {
+                                        let value = self.coerce_to_bson_for_filter(field, value)?;
+                                        Ok(doc! { "$eq": [&field_name, value] })
+                                    })
+                                    .collect::<crate::Result<Vec<_>>>()?,
+                            );
+                        } else {
+                            let value = self.coerce_to_bson_for_filter(field, value)?;
+                            equalities.push(doc! { "$eq": [&field_name, value] })
                         }
+                    }
 
-                        doc! { "$in": [&field_name, bson_values] }
-                    }
-                    _ => {
-                        doc! { "$in": [&field_name, self.coerce_to_bson_for_filter(field, PrismaValue::List(vals))?] }
-                    }
-                },
+                    doc! { "$or": equalities }
+                }
                 ConditionListValue::FieldRef(field_ref) => {
-                    doc! { "$in": [&field_name, coerce_as_array(self.prefixed_field_ref(&field_ref)?)] }
+                    let field_ref = self.prefixed_field_ref(&field_ref)?;
+                    doc! {
+                        "$and": [
+                            { "$ne": [&field_ref, null] },
+                            { "$eq": [&field_name, &field_ref]}
+                        ]
+                    }
                 }
             },
             ScalarCondition::NotIn(vals) => match vals {
                 ConditionListValue::List(vals) => {
-                    let bson_values = vals
+                    let equalities = vals
                         .into_iter()
-                        .map(|val| self.coerce_to_bson_for_filter(field, val))
+                        .map(|value| {
+                            let value = self.coerce_to_bson_for_filter(field, value)?;
+                            Ok(doc! { "$ne": [&field_name, value] })
+                        })
                         .collect::<crate::Result<Vec<_>>>()?;
 
-                    doc! { "$not": { "$in": [&field_name, bson_values] } }
+                    doc! { "$and": equalities }
                 }
                 ConditionListValue::FieldRef(field_ref) => {
-                    doc! { "$not": { "$in": [&field_name, coerce_as_array(self.prefixed_field_ref(&field_ref)?)] } }
+                    let field_ref = self.prefixed_field_ref(&field_ref)?;
+                    doc! {
+                        "$or": [
+                            { "$eq": [&field_ref, null] },
+                            { "$ne": [&field_name, &field_ref]}
+                        ]
+                    }
                 }
             },
             ScalarCondition::JsonCompare(jc) => match *jc.condition {
