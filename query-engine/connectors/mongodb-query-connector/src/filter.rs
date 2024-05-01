@@ -192,10 +192,14 @@ impl MongoFilterVisitor {
                     let mut equalities = Vec::with_capacity(values.len());
 
                     for value in values {
-                        // TODO laplab: I am pretty sure this is still incorrect, but at least we stopped dropping values.
-                        //              Need to test `in` operator with nested arrays.
+                        // List is list of lists, we need to flatten.
+                        // This flattening behaviour does not affect user queries because Prisma does
+                        // not support storing arrays as values inside a field. It is possible to have
+                        // a 1-dimensional array field, but not 2 dimensional. Thus, we never have
+                        // user queries which have arrays in the argument of `in` operator. If we
+                        // encounter such case, then this query was produced internally and we can
+                        // safely flatten it.
                         if let PrismaValue::List(list) = value {
-                            // List is list of lists, we need to flatten.
                             equalities.extend(
                                 list.into_iter()
                                     .map(|value| {
@@ -214,6 +218,8 @@ impl MongoFilterVisitor {
                 }
                 ConditionListValue::FieldRef(field_ref) => {
                     let field_ref = self.prefixed_field_ref(&field_ref)?;
+                    // TODO laplab: I think that these semantics are actually quite confusing. What if both fields
+                    // are null and the user wants to compare them?
                     doc! {
                         "$and": [
                             { "$ne": [&field_ref, null] },
