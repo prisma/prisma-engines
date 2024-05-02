@@ -251,15 +251,6 @@ impl TestApi {
     }
 
     #[tracing::instrument(skip(self, data_model_string))]
-    pub async fn re_introspect_multi(&mut self, data_model_string: &str) -> Result<String> {
-        let schema = format!("{}{}", self.pure_config(), data_model_string);
-        let schema = parse_datamodel(&schema);
-        let introspection_result = self.test_introspect_multi_internal(schema, true).await?;
-
-        Ok(introspection_result.datamodels)
-    }
-
-    #[tracing::instrument(skip(self, data_model_string))]
     pub async fn re_introspect_dml(&mut self, data_model_string: &str) -> Result<String> {
         let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), data_model_string));
         let introspection_result = self.test_introspect_internal(data_model, false).await?;
@@ -273,14 +264,6 @@ impl TestApi {
         let introspection_result = self.test_introspect_internal(data_model, true).await?;
 
         Ok(introspection_result.data_model)
-    }
-
-    #[tracing::instrument(skip(self, data_model_string))]
-    pub async fn re_introspect_config_multi(&mut self, data_model_string: &str) -> Result<String> {
-        let data_model = parse_datamodel(data_model_string);
-        let introspection_result = self.test_introspect_multi_internal(data_model, true).await?;
-
-        Ok(introspection_result.datamodels)
     }
 
     pub async fn re_introspect_warnings(&mut self, data_model_string: &str) -> Result<String> {
