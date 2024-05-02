@@ -24,6 +24,9 @@ impl Configuration {
         datasources_files: Vec<parser_database::FileId>,
         warnings: Vec<diagnostics::DatamodelWarning>,
     ) -> Self {
+        assert_eq!(generators.len(), generators_files.len());
+        assert_eq!(datasources.len(), datasources_files.len());
+
         Self {
             generators,
             datasources,
