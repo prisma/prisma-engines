@@ -217,15 +217,8 @@ impl MongoFilterVisitor {
                     doc! { "$or": equalities }
                 }
                 ConditionListValue::FieldRef(field_ref) => {
-                    let field_ref = self.prefixed_field_ref(&field_ref)?;
-                    // TODO laplab: I think that these semantics are actually quite confusing. What if both fields
-                    // are null and the user wants to compare them?
-                    doc! {
-                        "$and": [
-                            { "$ne": [&field_ref, null] },
-                            { "$eq": [&field_name, &field_ref]}
-                        ]
-                    }
+                    // In this context, `field_ref` refers to an array field, so we actually need an `$in` operator.
+                    doc! { "$in": [&field_name, coerce_as_array(self.prefixed_field_ref(&field_ref)?)] }
                 }
             },
             ScalarCondition::NotIn(vals) => match vals {
@@ -241,13 +234,8 @@ impl MongoFilterVisitor {
                     doc! { "$and": equalities }
                 }
                 ConditionListValue::FieldRef(field_ref) => {
-                    let field_ref = self.prefixed_field_ref(&field_ref)?;
-                    doc! {
-                        "$or": [
-                            { "$eq": [&field_ref, null] },
-                            { "$ne": [&field_name, &field_ref]}
-                        ]
-                    }
+                    // In this context, `field_ref` refers to an array field, so we actually need an `$in` operator.
+                    doc! { "$not": { "$in": [&field_name, coerce_as_array(self.prefixed_field_ref(&field_ref)?)] } }
                 }
             },
             ScalarCondition::JsonCompare(jc) => match *jc.condition {
