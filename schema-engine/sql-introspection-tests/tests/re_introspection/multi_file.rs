@@ -12,12 +12,12 @@ async fn reintrospect_new_model_single_file(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]));
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("Unrelated_pkey", types::primary_constraint(vec!["id"]));
             });
         })
@@ -35,11 +35,11 @@ async fn reintrospect_new_model_single_file(api: &mut TestApi) -> TestResult {
     let expected = expect![[r#"
         // file: main.prisma
         model User {
-          id Int @id @default(autoincrement())
+          id String @id
         }
 
         model Unrelated {
-          id Int @id @default(autoincrement())
+          id String @id
         }
     "#]];
 
@@ -57,17 +57,17 @@ async fn reintrospect_new_model_multi_file(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]));
             });
 
             migration.create_table("Post", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("Post_pkey", types::primary_constraint(vec!["id"]));
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("Unrelated_pkey", types::primary_constraint(vec!["id"]));
             });
         })
@@ -92,17 +92,17 @@ async fn reintrospect_new_model_multi_file(api: &mut TestApi) -> TestResult {
     let expected = expect![[r#"
         // file: introspected.prisma
         model Unrelated {
-          id Int @id @default(autoincrement())
+          id String @id
         }
         ------
         // file: post.prisma
         model Post {
-          id Int @id @default(autoincrement())
+          id String @id
         }
         ------
         // file: user.prisma
         model User {
-          id Int @id @default(autoincrement())
+          id String @id
         }
     "#]];
 
@@ -116,7 +116,7 @@ async fn reintrospect_removed_model_single_file(api: &mut TestApi) -> TestResult
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]));
             });
         })
@@ -138,7 +138,7 @@ async fn reintrospect_removed_model_single_file(api: &mut TestApi) -> TestResult
     let expected = expect![[r#"
         // file: main.prisma
         model User {
-          id Int @id @default(autoincrement())
+          id String @id
         }
     "#]];
 
@@ -156,12 +156,12 @@ async fn reintrospect_removed_model_multi_file(api: &mut TestApi) -> TestResult 
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]));
             });
 
             migration.create_table("Unrelated", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("Unrelated_pkey", types::primary_constraint(vec!["id"]));
             });
         })
@@ -186,7 +186,7 @@ async fn reintrospect_removed_model_multi_file(api: &mut TestApi) -> TestResult 
     let expected = expect![[r#"
         // file: introspected.prisma
         model Unrelated {
-          id Int @id @default(autoincrement())
+          id String @id
         }
         ------
         // file: post.prisma
@@ -194,7 +194,7 @@ async fn reintrospect_removed_model_multi_file(api: &mut TestApi) -> TestResult 
         ------
         // file: user.prisma
         model User {
-          id Int @id @default(autoincrement())
+          id String @id
         }
     "#]];
 
@@ -210,7 +210,7 @@ async fn reintrospect_new_enum_single_file(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]));
             });
         })
@@ -229,7 +229,7 @@ async fn reintrospect_new_enum_single_file(api: &mut TestApi) -> TestResult {
     let expected = expect![[r#"
         // file: main.prisma
         model User {
-          id Int @id @default(autoincrement())
+          id String @id
         }
 
         enum theEnumName {
@@ -252,7 +252,7 @@ async fn reintrospect_removed_enum_single_file(api: &mut TestApi) -> TestResult 
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]));
             });
         })
@@ -274,7 +274,7 @@ async fn reintrospect_removed_enum_single_file(api: &mut TestApi) -> TestResult 
     let expected = expect![[r#"
         // file: main.prisma
         model User {
-          id Int @id @default(autoincrement())
+          id String @id
         }
     "#]];
 
@@ -292,12 +292,12 @@ async fn reintrospect_new_enum_multi_file(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]));
             });
 
             migration.create_table("Post", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("Post_pkey", types::primary_constraint(vec!["id"]));
             });
         })
@@ -331,12 +331,12 @@ async fn reintrospect_new_enum_multi_file(api: &mut TestApi) -> TestResult {
         ------
         // file: post.prisma
         model Post {
-          id Int @id @default(autoincrement())
+          id String @id
         }
         ------
         // file: user.prisma
         model User {
-          id Int @id @default(autoincrement())
+          id String @id
         }
     "#]];
 
@@ -354,7 +354,7 @@ async fn reintrospect_removed_enum_multi_file(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]));
             });
         })
@@ -384,7 +384,7 @@ async fn reintrospect_removed_enum_multi_file(api: &mut TestApi) -> TestResult {
         ------
         // file: user.prisma
         model User {
-          id Int @id @default(autoincrement())
+          id String @id
         }
     "#]];
 
@@ -690,17 +690,17 @@ async fn reintrospect_removed_view_multi_file(api: &mut TestApi) -> TestResult {
 }
 
 // ----- Configuration -----
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn reintrospect_keep_configuration_in_same_file(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]));
             });
 
             migration.create_table("Post", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("Post_pkey", types::primary_constraint(vec!["id"]));
             });
         })
@@ -720,7 +720,7 @@ async fn reintrospect_keep_configuration_in_same_file(api: &mut TestApi) -> Test
     let expected = expect![[r#"
         // file: post.prisma
         model Post {
-          id Int @id @default(autoincrement())
+          id String @id
         }
         ------
         // file: user.prisma
@@ -734,7 +734,7 @@ async fn reintrospect_keep_configuration_in_same_file(api: &mut TestApi) -> Test
         }
 
         model User {
-          id Int @id @default(autoincrement())
+          id String @id
         }
     "#]];
 
@@ -759,12 +759,12 @@ async fn reintrospect_keep_configuration_in_same_file(api: &mut TestApi) -> Test
         }
 
         model Post {
-          id Int @id @default(autoincrement())
+          id String @id
         }
         ------
         // file: user.prisma
         model User {
-          id Int @id @default(autoincrement())
+          id String @id
         }
     "#]];
 
@@ -780,17 +780,17 @@ async fn reintrospect_keep_configuration_in_same_file(api: &mut TestApi) -> Test
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]));
             });
 
             migration.create_table("Post", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("Post_pkey", types::primary_constraint(vec!["id"]));
             });
         })
@@ -814,7 +814,7 @@ async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut Test
         }
 
         model Post {
-          id Int @id @default(autoincrement())
+          id String @id
         }
         ------
         // file: user.prisma
@@ -824,7 +824,7 @@ async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut Test
         }
 
         model User {
-          id Int @id @default(autoincrement())
+          id String @id
         }
     "#]];
 
@@ -845,7 +845,7 @@ async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut Test
         }
 
         model Post {
-          id Int @id @default(autoincrement())
+          id String @id
         }
         ------
         // file: user.prisma
@@ -854,7 +854,7 @@ async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut Test
         }
 
         model User {
-          id Int @id @default(autoincrement())
+          id String @id
         }
     "#]];
 
@@ -870,12 +870,12 @@ async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut Test
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn reintrospect_keep_configuration_when_no_models(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::integer().increments(true));
+                t.add_column("id", types::text());
                 t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]));
             });
         })
@@ -905,7 +905,7 @@ async fn reintrospect_keep_configuration_when_no_models(api: &mut TestApi) -> Te
         }
 
         model User {
-          id Int @id @default(autoincrement())
+          id String @id
         }
     "#]];
 
@@ -931,7 +931,7 @@ async fn reintrospect_keep_configuration_when_no_models(api: &mut TestApi) -> Te
         }
 
         model User {
-          id Int @id @default(autoincrement())
+          id String @id
         }
     "#]];
 
@@ -949,7 +949,7 @@ async fn reintrospect_keep_configuration_when_no_models(api: &mut TestApi) -> Te
 
 // ----- Miscellaneous -----
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn reintrospect_empty_multi_file(api: &mut TestApi) -> TestResult {
     let user_dm = indoc! {r#"
       model User {
