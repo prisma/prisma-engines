@@ -25,6 +25,13 @@ pub(crate) fn to_psl_string(
     let mut datamodel = renderer::Datamodel::new();
     let mut views = Vec::new();
 
+    // Ensures that all previous files are present in the new datamodel, even when empty after re-introspection.
+    for file_id in ctx.previous_schema.db.iter_file_ids() {
+        let file_name = ctx.previous_schema.db.file_name(file_id);
+
+        datamodel.create_empty_file(file_name.to_string());
+    }
+
     enums::render(introspection_file_name, ctx, &mut datamodel);
     models::render(introspection_file_name, ctx, &mut datamodel);
 
@@ -41,8 +48,6 @@ pub(crate) fn to_psl_string(
     }
 
     let sources = datamodel.render();
-
-    dbg!(&sources);
 
     (psl::reformat_multiple(sources, 2), is_empty, views)
 }

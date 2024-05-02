@@ -172,6 +172,18 @@ mod tests {
 
     use super::*;
     use expect_test::expect;
+    use itertools::Itertools as _;
+
+    fn pretty_render(data_model: Datamodel) -> String {
+        let sources = data_model.render();
+        let sources = psl::reformat_multiple(sources, 2);
+
+        sources
+            .into_iter()
+            .sorted_unstable_by_key(|(file_name, _)| file_name.to_owned())
+            .map(|(file_name, dm)| format!("// file: {file_name}\n{}", dm.as_str()))
+            .join("------\n")
+    }
 
     #[test]
     fn simple_data_model() {
@@ -218,15 +230,108 @@ mod tests {
         data_model.push_view(file_name.to_string(), view);
 
         let expected = expect![[r#"
-            [
-                (
-                    "schema.prisma",
-                    "type Address {\n  street String\n}\n\nmodel User {\n  id Int @id @default(autoincrement())\n}\n\nview Meow {\n  id Int @id\n}\n\nenum TrafficLight {\n  Red\n  Yellow\n  Green\n}\n\nenum Cat {\n  Asleep\n  Hungry\n}\n",
-                ),
-            ]
-        "#]];
-        let rendered = psl::reformat_multiple(data_model.render(), 2);
+            // file: schema.prisma
+            type Address {
+              street String
+            }
 
-        expected.assert_debug_eq(&rendered);
+            model User {
+              id Int @id @default(autoincrement())
+            }
+
+            view Meow {
+              id Int @id
+            }
+
+            enum TrafficLight {
+              Red
+              Yellow
+              Green
+            }
+
+            enum Cat {
+              Asleep
+              Hungry
+            }
+        "#]];
+        let rendered = pretty_render(data_model);
+
+        expected.assert_eq(&rendered);
+    }
+
+    #[test]
+    fn data_model_multi_file() {
+        let mut data_model = Datamodel::new();
+
+        let mut composite = CompositeType::new("Address");
+        let field = Field::new("street", "String");
+        composite.push_field(field);
+
+        data_model.push_composite_type("a.prisma".to_string(), composite);
+
+        let mut model = Model::new("User");
+
+        let mut field = Field::new("id", "Int");
+        field.id(IdFieldDefinition::default());
+
+        let dv = DefaultValue::function(Function::new("autoincrement"));
+        field.default(dv);
+
+        model.push_field(field);
+        data_model.push_model("a.prisma".to_string(), model);
+
+        let mut traffic_light = Enum::new("TrafficLight");
+
+        traffic_light.push_variant("Red");
+        traffic_light.push_variant("Yellow");
+        traffic_light.push_variant("Green");
+
+        data_model.push_enum("b.prisma".to_string(), traffic_light);
+
+        let mut cat = Enum::new("Cat");
+        cat.push_variant("Asleep");
+        cat.push_variant("Hungry");
+
+        data_model.push_enum("c.prisma".to_string(), cat);
+
+        let mut view = View::new("Meow");
+        let mut field = Field::new("id", "Int");
+        field.id(IdFieldDefinition::default());
+
+        view.push_field(field);
+
+        data_model.push_view("d.prisma".to_string(), view);
+
+        let expected = expect![[r#"
+            // file: a.prisma
+            type Address {
+              street String
+            }
+
+            model User {
+              id Int @id @default(autoincrement())
+            }
+            ------
+            // file: b.prisma
+            enum TrafficLight {
+              Red
+              Yellow
+              Green
+            }
+            ------
+            // file: c.prisma
+            enum Cat {
+              Asleep
+              Hungry
+            }
+            ------
+            // file: d.prisma
+            view Meow {
+              id Int @id
+            }
+        "#]];
+        let rendered = pretty_render(data_model);
+
+        expected.assert_eq(&rendered);
     }
 }

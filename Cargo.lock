@@ -1020,6 +1020,7 @@ dependencies = [
  "base64 0.13.1",
  "expect-test",
  "indoc 2.0.3",
+ "itertools 0.12.0",
  "once_cell",
  "psl",
  "regex",

@@ -17,7 +17,7 @@ use datamodel_renderer as renderer;
 use mongodb::bson::{Bson, Document};
 use mongodb_schema_describer::{CollectionWalker, IndexWalker};
 use once_cell::sync::Lazy;
-use psl::{datamodel_connector::constraint_names::ConstraintNames, ValidatedSchema};
+use psl::datamodel_connector::constraint_names::ConstraintNames;
 use regex::Regex;
 use std::{
     cmp::Ordering,
@@ -410,9 +410,6 @@ impl<'a> Statistics<'a> {
             }
         }
 
-        self.handle_removed_models(&models, ctx.previous_schema(), rendered);
-        self.handle_removed_composites(&types, ctx.previous_schema(), rendered);
-
         for (ct_name, r#type) in types {
             let file_name = match ctx.previous_schema().db.find_composite_type(ct_name) {
                 Some(walker) => ctx.previous_schema().db.file_name(walker.file_id()),
@@ -429,36 +426,6 @@ impl<'a> Statistics<'a> {
             };
 
             rendered.push_model(file_name.to_string(), model);
-        }
-    }
-
-    fn handle_removed_models(
-        &self,
-        new_models: &BTreeMap<&str, renderer::datamodel::Model<'_>>,
-        previous_schema: &ValidatedSchema,
-        rendered: &mut renderer::Datamodel<'a>,
-    ) {
-        for model in previous_schema.db.walk_models() {
-            if !new_models.contains_key(model.name()) {
-                let file_name = previous_schema.db.file_name(model.file_id());
-
-                rendered.create_empty_file(file_name.to_owned());
-            }
-        }
-    }
-
-    fn handle_removed_composites(
-        &self,
-        new_composites: &BTreeMap<&str, renderer::datamodel::CompositeType<'_>>,
-        previous_schema: &ValidatedSchema,
-        rendered: &mut renderer::Datamodel<'a>,
-    ) {
-        for composite in previous_schema.db.walk_composite_types() {
-            if !new_composites.contains_key(composite.name()) {
-                let file_name = previous_schema.db.file_name(composite.file_id());
-
-                rendered.create_empty_file(file_name.to_owned());
-            }
         }
     }
 
