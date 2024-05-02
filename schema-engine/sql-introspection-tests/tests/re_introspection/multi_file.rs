@@ -34,15 +34,6 @@ async fn reintrospect_new_model_single_file(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         // file: main.prisma
-        generator client {
-          provider = "prisma-client-js"
-        }
-
-        datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
         model User {
           id Int @id @default(autoincrement())
         }
@@ -110,15 +101,6 @@ async fn reintrospect_new_model_multi_file(api: &mut TestApi) -> TestResult {
         }
         ------
         // file: user.prisma
-        generator client {
-          provider = "prisma-client-js"
-        }
-
-        datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
         model User {
           id Int @id @default(autoincrement())
         }
@@ -155,15 +137,6 @@ async fn reintrospect_removed_model_single_file(api: &mut TestApi) -> TestResult
 
     let expected = expect![[r#"
         // file: main.prisma
-        generator client {
-          provider = "prisma-client-js"
-        }
-
-        datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
         model User {
           id Int @id @default(autoincrement())
         }
@@ -220,15 +193,6 @@ async fn reintrospect_removed_model_multi_file(api: &mut TestApi) -> TestResult 
 
         ------
         // file: user.prisma
-        generator client {
-          provider = "prisma-client-js"
-        }
-
-        datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
         model User {
           id Int @id @default(autoincrement())
         }
@@ -802,7 +766,7 @@ async fn reintrospect_removed_view_multi_file(api: &mut TestApi) -> TestResult {
 }
 
 // ----- Configuration -----
-#[test_connector]
+#[test_connector(tags(Postgres))]
 async fn reintrospect_keep_configuration_in_same_file(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -850,7 +814,7 @@ async fn reintrospect_keep_configuration_in_same_file(api: &mut TestApi) -> Test
         }
     "#]];
 
-    api.expect_re_introspected_datamodels(
+    api.expect_re_introspected_datamodels_with_config(
         &[
             ("user.prisma", with_config(user_dm, api.pure_config())),
             ("post.prisma", post_dm.to_string()),
@@ -880,7 +844,7 @@ async fn reintrospect_keep_configuration_in_same_file(api: &mut TestApi) -> Test
         }
     "#]];
 
-    api.expect_re_introspected_datamodels(
+    api.expect_re_introspected_datamodels_with_config(
         &[
             ("user.prisma", user_dm.to_string()),
             ("post.prisma", with_config(post_dm, api.pure_config())),
@@ -892,7 +856,7 @@ async fn reintrospect_keep_configuration_in_same_file(api: &mut TestApi) -> Test
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(tags(Postgres))]
 async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -940,7 +904,7 @@ async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut Test
         }
     "#]];
 
-    api.expect_re_introspected_datamodels(
+    api.expect_re_introspected_datamodels_with_config(
         &[
             ("user.prisma", format!("{}\n{user_dm}", api.datasource_block_string())),
             ("post.prisma", format!("{}\n{post_dm}", api.generator_block_string())),
@@ -970,7 +934,7 @@ async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut Test
         }
     "#]];
 
-    api.expect_re_introspected_datamodels(
+    api.expect_re_introspected_datamodels_with_config(
         &[
             ("user.prisma", format!("{}\n{user_dm}", api.generator_block_string())),
             ("post.prisma", format!("{}\n{post_dm}", api.datasource_block_string())),
@@ -982,7 +946,7 @@ async fn reintrospect_keep_configuration_when_spread_across_files(api: &mut Test
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(tags(Postgres))]
 async fn reintrospect_keep_configuration_when_no_models(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -1021,7 +985,7 @@ async fn reintrospect_keep_configuration_when_no_models(api: &mut TestApi) -> Te
         }
     "#]];
 
-    api.expect_re_introspected_datamodels(
+    api.expect_re_introspected_datamodels_with_config(
         &[
             ("user.prisma", format!("{}\n{user_dm}", api.datasource_block_string())),
             ("post.prisma", format!("{}\n{post_dm}", api.generator_block_string())),
@@ -1047,7 +1011,7 @@ async fn reintrospect_keep_configuration_when_no_models(api: &mut TestApi) -> Te
         }
     "#]];
 
-    api.expect_re_introspected_datamodels(
+    api.expect_re_introspected_datamodels_with_config(
         &[
             ("user.prisma", format!("{}\n{user_dm}", api.generator_block_string())),
             ("post.prisma", format!("{}\n{post_dm}", api.datasource_block_string())),
@@ -1061,7 +1025,7 @@ async fn reintrospect_keep_configuration_when_no_models(api: &mut TestApi) -> Te
 
 // ----- Miscellaneous -----
 
-#[test_connector]
+#[test_connector(tags(Postgres))]
 async fn reintrospect_empty_multi_file(api: &mut TestApi) -> TestResult {
     let user_dm = indoc! {r#"
       model User {
@@ -1094,7 +1058,8 @@ async fn reintrospect_empty_multi_file(api: &mut TestApi) -> TestResult {
         }
     "#]];
 
-    api.expect_re_introspected_datamodels(&input_dms, expected).await;
+    api.expect_re_introspected_datamodels_with_config(&input_dms, expected)
+        .await;
 
     Ok(())
 }

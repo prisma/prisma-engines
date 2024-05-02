@@ -441,7 +441,6 @@ impl TestApi {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, true).await.unwrap();
 
-        dbg!(&introspection_result.warnings);
         assert!(introspection_result.warnings.is_none())
     }
 
@@ -453,6 +452,17 @@ impl TestApi {
     }
 
     pub async fn expect_re_introspected_datamodels(
+        &mut self,
+        datamodels: &[(&str, String)],
+        expectation: expect_test::Expect,
+    ) {
+        let schema = parse_datamodels(datamodels);
+        let reintrospected = self.test_introspect_multi_internal(schema, false).await.unwrap();
+
+        expectation.assert_eq(&reintrospected.datamodels);
+    }
+
+    pub async fn expect_re_introspected_datamodels_with_config(
         &mut self,
         datamodels: &[(&str, String)],
         expectation: expect_test::Expect,
