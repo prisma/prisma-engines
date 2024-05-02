@@ -45,7 +45,6 @@ mod mongodb {
         );
         let logs = runner.get_logs().await;
         let last_log_line = logs.last().unwrap();
-        // TODO laplab: update the test.
         let query = format!(
             r#"
 db.Standing.updateMany({{
