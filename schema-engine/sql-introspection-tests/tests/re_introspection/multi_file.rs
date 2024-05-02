@@ -228,15 +228,6 @@ async fn reintrospect_new_enum_single_file(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         // file: main.prisma
-        generator client {
-          provider = "prisma-client-js"
-        }
-
-        datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
         model User {
           id Int @id @default(autoincrement())
         }
@@ -282,15 +273,6 @@ async fn reintrospect_removed_enum_single_file(api: &mut TestApi) -> TestResult 
 
     let expected = expect![[r#"
         // file: main.prisma
-        generator client {
-          provider = "prisma-client-js"
-        }
-
-        datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
         model User {
           id Int @id @default(autoincrement())
         }
@@ -353,15 +335,6 @@ async fn reintrospect_new_enum_multi_file(api: &mut TestApi) -> TestResult {
         }
         ------
         // file: user.prisma
-        generator client {
-          provider = "prisma-client-js"
-        }
-
-        datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
         model User {
           id Int @id @default(autoincrement())
         }
@@ -410,15 +383,6 @@ async fn reintrospect_removed_enum_multi_file(api: &mut TestApi) -> TestResult {
 
         ------
         // file: user.prisma
-        generator client {
-          provider = "prisma-client-js"
-        }
-
-        datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
         model User {
           id Int @id @default(autoincrement())
         }
@@ -504,16 +468,6 @@ async fn reintrospect_new_view_single_file(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         // file: main.prisma
-        generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["views"]
-        }
-
-        datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
         model User {
           id         Int     @id @default(autoincrement())
           first_name String  @db.VarChar(255)
@@ -586,16 +540,6 @@ async fn reintrospect_removed_view_single_file(api: &mut TestApi) -> TestResult 
 
     let expected = expect![[r#"
         // file: main.prisma
-        generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["views"]
-        }
-
-        datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
         model User {
           id         Int     @id @default(autoincrement())
           first_name String  @db.VarChar(255)
@@ -663,16 +607,6 @@ async fn reintrospect_new_view_multi_file(api: &mut TestApi) -> TestResult {
         }
         ------
         // file: user.prisma
-        generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["views"]
-        }
-
-        datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
         model User {
           id         Int     @id @default(autoincrement())
           first_name String  @db.VarChar(255)
@@ -737,16 +671,6 @@ async fn reintrospect_removed_view_multi_file(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         // file: user.prisma
-        generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["views"]
-        }
-
-        datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
         model User {
           id         Int     @id @default(autoincrement())
           first_name String  @db.VarChar(255)
