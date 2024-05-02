@@ -18,7 +18,7 @@ pub static CONN_STR: Lazy<String> = Lazy::new(|| match std::env::var("TEST_DATAB
     }
 });
 
-pub(crate) fn gen_db_name() -> String {
+pub(crate) fn generate_database_name() -> String {
     let mut names = Generator::default();
 
     names.next().unwrap().replace('-', "")

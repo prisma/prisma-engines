@@ -111,6 +111,12 @@ impl IntrospectionContext {
             "introspected.prisma"
         }
     }
+
+    /// Removes the rendering of the configuration.
+    pub fn without_config_rendering(mut self) -> Self {
+        self.render_config = false;
+        self
+    }
 }
 
 /// Control type for composite type traversal.

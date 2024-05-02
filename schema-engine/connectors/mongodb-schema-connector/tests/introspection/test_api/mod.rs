@@ -106,7 +106,7 @@ where
     F: FnOnce(TestApi) -> U,
     U: Future<Output = mongodb::error::Result<T>>,
 {
-    let database_name = gen_db_name();
+    let database_name = generate_database_name();
     let connection_string = get_connection_string(&database_name);
 
     RT.block_on(async move {
@@ -145,28 +145,6 @@ where
     with_database_features(setup, BitFlags::empty())
 }
 
-fn internal_introspect_features<F, U>(
-    ctx: &IntrospectionContext,
-    preview_features: BitFlags<PreviewFeature>,
-    init_database: F,
-) -> IntrospectionMultiResult
-where
-    F: FnOnce(Database) -> U,
-    U: Future<Output = mongodb::error::Result<()>>,
-{
-    with_database_features(
-        |mut api| async move {
-            init_database(api.db).await.unwrap();
-
-            let res = api.connector.introspect_multi(&ctx).await.unwrap();
-
-            Ok(res)
-        },
-        preview_features,
-    )
-    .unwrap()
-}
-
 pub(super) fn introspect_features<F, U>(
     composite_type_depth: CompositeTypeDepth,
     preview_features: BitFlags<PreviewFeature>,
@@ -178,9 +156,18 @@ where
 {
     let datamodel_string = config_block_string(preview_features);
     let validated_schema = psl::parse_schema(datamodel_string).unwrap();
-    let mut ctx = IntrospectionContext::new(validated_schema, composite_type_depth, None);
-    ctx.render_config = false;
-    let res = internal_introspect_features(&ctx, preview_features, init_database);
+    let ctx = IntrospectionContext::new(validated_schema, composite_type_depth, None).without_config_rendering();
+    let res = with_database_features(
+        |mut api| async move {
+            init_database(api.db).await.unwrap();
+
+            let res = api.connector.introspect_multi(&ctx).await.unwrap();
+
+            Ok(res)
+        },
+        preview_features,
+    )
+    .unwrap();
 
     TestResult {
         datamodel: res.datamodels.into_iter().next().unwrap().1,
