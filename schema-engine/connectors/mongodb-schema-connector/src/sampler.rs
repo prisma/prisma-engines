@@ -62,6 +62,13 @@ pub(super) async fn sample(
 
     let mut data_model = render::Datamodel::default();
 
+    // Ensures that all previous files are present in the new datamodel, even when empty after re-introspection.
+    for file_id in ctx.previous_schema().db.iter_file_ids() {
+        let file_name = ctx.previous_schema().db.file_name(file_id);
+
+        data_model.create_empty_file(file_name.to_string());
+    }
+
     statistics.render(ctx, &mut data_model, &mut warnings);
 
     let is_empty = data_model.is_empty();

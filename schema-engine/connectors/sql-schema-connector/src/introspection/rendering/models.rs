@@ -7,7 +7,6 @@ use crate::introspection::{
     introspection_pair::ModelPair,
 };
 use datamodel_renderer::datamodel as renderer;
-use psl::{diagnostics::FileId, schema_ast::ast::ModelId};
 use quaint::prelude::SqlFamily;
 
 /// Render all model blocks to the PSL.
@@ -32,30 +31,6 @@ pub(super) fn render<'a>(
 
         rendered.push_model(file_name.to_string(), render);
     }
-
-    // Ensures that if a model is removed, the file remains present in the result.
-    for (prev_file_id, _) in compute_removed_models(ctx) {
-        let file_name = ctx.previous_schema.db.file_name(prev_file_id);
-
-        rendered.create_empty_file(file_name.to_owned());
-    }
-}
-
-fn compute_removed_models(ctx: &DatamodelCalculatorContext<'_>) -> Vec<(FileId, ModelId)> {
-    let mut removed_models = Vec::new();
-
-    for model in ctx.previous_schema.db.walk_models() {
-        let previous_model = (model.id.0, model.id.1);
-
-        if !ctx
-            .model_pairs()
-            .any(|model| model.previous_position() == Some(previous_model))
-        {
-            removed_models.push(previous_model);
-        }
-    }
-
-    removed_models
 }
 
 /// Render a single model.
