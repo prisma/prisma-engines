@@ -52,7 +52,7 @@ impl Connector for SqliteDatamodelConnector {
         10000
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+    fn foreign_key_referential_actions(&self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
         SetNull | SetDefault | Cascade | Restrict | NoAction

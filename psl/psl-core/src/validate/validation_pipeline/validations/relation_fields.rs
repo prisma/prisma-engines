@@ -153,7 +153,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
 
     // validation template for relationMode = "foreignKeys"
     let msg_foreign_keys = |action: ReferentialAction| {
-        let allowed_actions = connector.referential_actions();
+        let allowed_actions = connector.referential_actions(&relation_mode);
 
         format!(
             "Invalid referential action: `{}`. Allowed values: ({})",

@@ -3,8 +3,6 @@ name = "query-engine-common"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 thiserror = "1"
 url.workspace = true
@@ -20,11 +18,11 @@ tracing.workspace = true
 tracing-subscriber = { version = "0.3" }
 tracing-futures = "0.2"
 tracing-opentelemetry = "0.17.3"
-opentelemetry = { version = "0.17"}
+opentelemetry = { version = "0.17" }
 
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-napi.workspace = true
+[target.'cfg(all(not(target_arch = "wasm32")))'.dependencies]
 query-engine-metrics = { path = "../../query-engine/metrics" }
+napi.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen.workspace = true

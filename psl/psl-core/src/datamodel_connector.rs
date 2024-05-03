@@ -78,8 +78,15 @@ pub trait Connector: Send + Sync {
         RelationMode::ForeignKeys
     }
 
+    fn referential_actions(&self, relation_mode: &RelationMode) -> BitFlags<ReferentialAction> {
+        match relation_mode {
+            RelationMode::ForeignKeys => self.foreign_key_referential_actions(),
+            RelationMode::Prisma => self.emulated_referential_actions(),
+        }
+    }
+
     /// The referential actions supported by the connector.
-    fn referential_actions(&self) -> BitFlags<ReferentialAction>;
+    fn foreign_key_referential_actions(&self) -> BitFlags<ReferentialAction>;
 
     /// The referential actions supported when using relationMode = "prisma" by the connector.
     /// There are in fact scenarios in which the set of emulated referential actions supported may change
@@ -101,10 +108,7 @@ pub trait Connector: Send + Sync {
     }
 
     fn supports_referential_action(&self, relation_mode: &RelationMode, action: ReferentialAction) -> bool {
-        match relation_mode {
-            RelationMode::ForeignKeys => self.referential_actions().contains(action),
-            RelationMode::Prisma => self.emulated_referential_actions().contains(action),
-        }
+        self.referential_actions(relation_mode).contains(action)
     }
 
     /// This is used by the query engine schema builder.

@@ -22,6 +22,7 @@ use request_handlers::{
 use serde_json::json;
 use std::{
     env,
+    fmt::Display,
     sync::{atomic::AtomicUsize, Arc},
 };
 
@@ -349,11 +350,8 @@ impl Runner {
         Ok(result)
     }
 
-    pub async fn query_json<T>(&self, query: T) -> TestResult<QueryResult>
-    where
-        T: Into<String>,
-    {
-        let query = query.into();
+    pub async fn query_json(&self, query: impl Display) -> TestResult<QueryResult> {
+        let query = query.to_string();
 
         tracing::debug!("Querying: {}", query.clone().green());
 
@@ -364,6 +362,7 @@ impl Runner {
             RunnerExecutor::Builtin(e) => e,
             RunnerExecutor::External(external) => {
                 let response = external.query(query, self.current_tx_id.as_ref()).await?;
+
                 return Ok(response);
             }
         };

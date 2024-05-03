@@ -1,6 +1,6 @@
 use super::*;
 use input_types::fields::arguments;
-use mutations::{create_many, create_one};
+use mutations::{create_many, create_many_and_return, create_one};
 use psl::datamodel_connector::ConnectorCapability;
 use query_structure::{DefaultKind, PrismaValue};
 
@@ -20,8 +20,13 @@ pub(crate) fn mutation_fields(ctx: &QuerySchema) -> Vec<FieldFn> {
             field!(create_one, model);
 
             field!(upsert_item_field, model);
+
             if ctx.has_capability(ConnectorCapability::CreateMany) {
                 field!(create_many, model);
+
+                if ctx.has_capability(ConnectorCapability::InsertReturning) {
+                    field!(create_many_and_return, model);
+                }
             }
         }
 

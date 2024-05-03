@@ -282,6 +282,48 @@ mod scalar_relations {
         Ok(())
     }
 
+    fn schema_oid() -> String {
+        let schema = indoc! {
+            r#"model Parent {
+            #id(id, Int, @id)
+
+            children Child[]
+          }
+          
+          model Child {
+            #id(childId, Int, @id)
+
+            parentId Int?
+            parent Parent? @relation(fields: [parentId], references: [id])
+
+            oid Int @test.Oid
+          }
+          "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_oid), only(Postgres, CockroachDb))]
+    async fn oid_type(runner: Runner) -> TestResult<()> {
+        create_child(&runner, r#"{ childId: 1, oid: 0 }"#).await?;
+        create_child(&runner, r#"{ childId: 2, oid: 1 }"#).await?;
+        create_child(&runner, r#"{ childId: 3, oid: 65587 }"#).await?;
+        create_child(&runner, &format!(r#"{{ childId: 4, oid: {} }}"#, u32::MAX)).await?;
+        create_parent(
+            &runner,
+            r#"{ id: 1, children: { connect: [{ childId: 1 }, { childId: 2 }, { childId: 3 }, { childId: 4 }] } }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyParent { id children(orderBy: { oid: asc }) { oid } } }"#),
+          @r###"{"data":{"findManyParent":[{"id":1,"children":[{"oid":0},{"oid":1},{"oid":65587},{"oid":4294967295}]}]}}"###
+        );
+
+        Ok(())
+    }
+
     async fn create_common_children(runner: &Runner) -> TestResult<()> {
         create_child(
             runner,
