@@ -41,6 +41,23 @@
     {
       "matchPackageNames": ["node", "pnpm"],
       "enabled": false
+    },
+    {
+      "groupName": "rust toolchain update",
+      "matchManagers": ["regex"],
+      "matchDepNames": ["rust"]
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["^rust-toolchain\\.toml?$"],
+      "matchStrings": [
+        "channel\\s*=\\s*\"(?<currentValue>\\d+\\.\\d+(\\.\\d+)?)\""
+      ],
+      "depNameTemplate": "rust",
+      "lookupNameTemplate": "rust-lang/rust",
+      "datasourceTemplate": "github-releases"
     }
   ]
 }
