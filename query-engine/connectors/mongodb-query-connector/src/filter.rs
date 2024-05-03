@@ -214,6 +214,10 @@ impl MongoFilterVisitor {
                         }
                     }
 
+                    // Previously, `$in` operator was used instead of a tree of `$or` + `$eq` operators.
+                    // At the moment of writing, MongoDB does not optimise aggregation version of `$in`
+                    // operator to use indexes, leading to significant performance problems. Until this
+                    // is fixed, we rely on `$eq` operator which does have index optimisation implemented.
                     doc! { "$or": equalities }
                 }
                 ConditionListValue::FieldRef(field_ref) => {
@@ -231,6 +235,10 @@ impl MongoFilterVisitor {
                         })
                         .collect::<crate::Result<Vec<_>>>()?;
 
+                    // Previously, `$not` + `$in` operators were used instead of a tree of `$and` + `$ne` operators.
+                    // At the moment of writing, MongoDB does not optimise aggregation version of `$in`
+                    // operator to use indexes, leading to significant performance problems. Until this
+                    // is fixed, we rely on `$ne` operator which does have index optimisation implemented.
                     doc! { "$and": equalities }
                 }
                 ConditionListValue::FieldRef(field_ref) => {
