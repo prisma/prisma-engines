@@ -137,6 +137,7 @@ fn read_many_by_queries(
             record_not_found()
         } else {
             let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&records)).await?;
+
             Ok(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
@@ -268,7 +269,7 @@ async fn aggregate(
     }))
 }
 
-fn process_nested<'conn>(
+pub(crate) fn process_nested<'conn>(
     tx: &'conn mut dyn ConnectionLike,
     nested: Vec<ReadQuery>,
     parent_result: Option<&'conn ManyRecords>,

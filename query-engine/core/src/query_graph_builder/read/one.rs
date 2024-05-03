@@ -44,11 +44,8 @@ fn find_unique_with_options(
 
     let name = field.name;
     let alias = field.alias;
-    let nested_fields = field.nested_fields.unwrap().fields;
-    let selection_order = utils::collect_selection_order(&nested_fields);
-    let selected_fields = utils::collect_selected_fields(&nested_fields, None, &model, query_schema)?;
-    let nested = utils::collect_nested_queries(nested_fields, &model, query_schema)?;
-    let selected_fields = utils::merge_relation_selections(selected_fields, None, &nested);
+    let (selected_fields, selection_order, nested) =
+        utils::extract_selected_fields(field.nested_fields.unwrap().fields, &model, query_schema)?;
 
     let relation_load_strategy = get_relation_load_strategy(requested_rel_load_strategy, None, &nested, query_schema)?;
 
