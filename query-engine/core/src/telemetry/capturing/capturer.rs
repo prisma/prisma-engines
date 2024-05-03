@@ -97,7 +97,7 @@ impl SpanProcessor for Processor {
     /// determines if a span represents a query event.
     ///
     /// In the case of mongo, an event represents the query, but it needs to be transformed before
-    /// capturing it. `Event::query_event` does that.    
+    /// capturing it. `Event::query_event` does that.
     fn on_end(&self, span_data: SpanData) {
         task::span_data_processed(span_data).unwrap();
     }
@@ -134,7 +134,7 @@ mod task {
             if self.settings.included_log_levels.contains("query") {
                 if let Some(target) = self.value.attributes.get("target") {
                     if let Some(val) = target.as_str() {
-                        return (val == "quaint::connector::metrics" && self.value.attributes.get("query").is_some())
+                        return (val == "quaint::connector::metrics" && self.value.attributes.contains_key("query"))
                             || val == "mongodb_query_connector::query";
                     }
                 }

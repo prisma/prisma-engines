@@ -11,17 +11,6 @@ use tokio::sync::{mpsc, oneshot, RwLock};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
-#[derive(Debug)]
-struct GenericError(String);
-
-impl Display for GenericError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
-impl std::error::Error for GenericError {}
-
 pub(crate) struct ExecutorProcess {
     task_handle: mpsc::Sender<ReqImpl>,
     request_id_counter: AtomicU64,
@@ -216,9 +205,9 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
                 tokio::select! {
                     line = stdout.next_line() => {
                         match line {
-                            // Two error modes in here: the external process can response with 
-                            // something that is not a jsonrpc response (basically any normal logging 
-                            // output), or it can respond with a jsonrpc response that represents a 
+                            // Two error modes in here: the external process can response with
+                            // something that is not a jsonrpc response (basically any normal logging
+                            // output), or it can respond with a jsonrpc response that represents a
                             // failure.
                             Ok(Some(line)) => // new response
                             {

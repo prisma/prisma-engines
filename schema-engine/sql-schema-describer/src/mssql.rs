@@ -640,7 +640,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 let definition = row
                     .get_string("system_type_name")
                     .map(|name| match (max_length, precision, scale) {
-                        (Some(len), _, _) if len == -1 => format!("{name}(max)"),
+                        (Some(-1), _, _) => format!("{name}(max)"),
                         (Some(len), _, _) => format!("{name}({len})"),
                         (_, Some(p), Some(s)) => format!("{name}({p},{s})"),
                         _ => name,

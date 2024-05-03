@@ -2,7 +2,7 @@ use crate::join::JoinStage;
 use itertools::Itertools;
 use mongodb::bson::{doc, Document};
 use query_structure::{OrderBy, OrderByHop, OrderByToManyAggregation, SortOrder};
-use std::iter;
+use std::{fmt::Display, iter};
 
 #[derive(Debug)]
 pub(crate) struct OrderByData {
@@ -176,9 +176,9 @@ pub(crate) struct OrderByPrefix {
     parts: Vec<String>,
 }
 
-impl ToString for OrderByPrefix {
-    fn to_string(&self) -> String {
-        self.parts.join(".")
+impl Display for OrderByPrefix {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.parts.join("."))
     }
 }
 
