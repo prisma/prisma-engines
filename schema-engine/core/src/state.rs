@@ -6,7 +6,7 @@
 use crate::{api::GenericApi, commands, json_rpc::types::*, CoreError, CoreResult};
 use enumflags2::BitFlags;
 use psl::{parser_database::SourceFile, PreviewFeature};
-use schema_connector::{ConnectorError, ConnectorHost, Namespaces, SchemaConnector};
+use schema_connector::{ConnectorError, ConnectorHost, IntrospectionResult, Namespaces, SchemaConnector};
 use std::{collections::HashMap, future::Future, path::Path, pin::Pin, sync::Arc};
 use tokio::sync::{mpsc, Mutex};
 use tracing_futures::Instrument;
@@ -355,12 +355,17 @@ impl GenericApi for EngineState {
             None,
             Box::new(move |connector| {
                 Box::pin(async move {
-                    let result = connector.introspect(&ctx).await?;
+                    let IntrospectionResult {
+                        mut datamodels,
+                        views,
+                        warnings,
+                        is_empty,
+                    } = connector.introspect(&ctx).await?;
 
-                    if result.is_empty {
+                    if is_empty {
                         Err(ConnectorError::into_introspection_result_empty_error())
                     } else {
-                        let views = result.views.map(|v| {
+                        let views = views.map(|v| {
                             v.into_iter()
                                 .map(|view| IntrospectionView {
                                     schema: view.schema,
@@ -371,9 +376,9 @@ impl GenericApi for EngineState {
                         });
 
                         Ok(IntrospectResult {
-                            datamodel: result.data_model,
+                            datamodel: datamodels.remove(0).1,
                             views,
-                            warnings: result.warnings,
+                            warnings,
                         })
                     }
                 })
