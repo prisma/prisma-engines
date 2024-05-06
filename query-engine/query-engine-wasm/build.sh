@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 # Call this script as `./build.sh <npm_version>`
 set -euo pipefail
 
@@ -11,7 +11,7 @@ OUT_TARGET="bundler"
 WASM_OPT_ARGS=(
     "-Os"                                 # execute size-focused optimization passes (-Oz actually increases size by 1KB)
     "--vacuum"                            # removes obviously unneeded code
-    "--duplicate-function-elimination"    # removes duplicate functions 
+    "--duplicate-function-elimination"    # removes duplicate functions
     "--duplicate-import-elimination"      # removes duplicate imports
     "--remove-unused-module-elements"     # removes unused module elements
     "--dae-optimizing"                    # removes arguments to calls in an lto-like manner
@@ -50,16 +50,13 @@ fi
 
 
 build() {
-    echo "ℹ️  Configuring rust toolchain to use nightly and rust-src component"
-    rustup default nightly-2024-01-25
-    rustup target add wasm32-unknown-unknown
-    rustup component add rust-std --target wasm32-unknown-unknown
-    rustup component add rust-src --target wasm32-unknown-unknown
+    echo "ℹ️  Note that query-engine compiled to WASM uses a different Rust toolchain"
+    cargo --version
 
     local CONNECTOR="$1"
     local CARGO_TARGET_DIR
     CARGO_TARGET_DIR=$(cargo metadata --format-version 1 | jq -r .target_directory)
-    echo "🔨 Building $CONNECTOR"    
+    echo "🔨 Building $CONNECTOR"
     RUSTFLAGS="-Zlocation-detail=none" CARGO_PROFILE_RELEASE_OPT_LEVEL="z" cargo build \
         -p query-engine-wasm \
         --profile "$WASM_BUILD_PROFILE" \
