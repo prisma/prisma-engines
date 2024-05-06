@@ -171,19 +171,21 @@ impl Configuration {
         Ok(())
     }
 
-    pub fn generators_with_files(&self) -> Vec<parser_database::InFile<&Generator>> {
+    pub fn generators_with_files(&self) -> impl Iterator<Item = parser_database::InFile<&Generator>> {
         self.generators
             .iter()
             .zip(&self.generators_files)
             .map(|(gen, file_id)| (*file_id, gen))
-            .collect()
     }
 
-    pub fn datasources_with_files(&self) -> Vec<parser_database::InFile<&Datasource>> {
+    pub fn datasources_with_files(&self) -> impl Iterator<Item = parser_database::InFile<&Datasource>> {
         self.datasources
             .iter()
             .zip(&self.datasources_files)
             .map(|(ds, file_id)| (*file_id, ds))
-            .collect()
+    }
+
+    pub fn first_datasource_with_file(&self) -> parser_database::InFile<&Datasource> {
+        self.datasources_with_files().next().unwrap()
     }
 }

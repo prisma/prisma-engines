@@ -9,7 +9,7 @@ use mongodb::{
     Database,
 };
 use mongodb_schema_describer::MongoSchema;
-use schema_connector::{warnings::Model, IntrospectionContext, IntrospectionMultiResult, Warnings};
+use schema_connector::{warnings::Model, IntrospectionContext, IntrospectionResult, Warnings};
 use statistics::*;
 
 /// From the given database, lists all collections as models, and samples
@@ -23,7 +23,7 @@ pub(super) async fn sample(
     database: Database,
     schema: MongoSchema,
     ctx: &IntrospectionContext,
-) -> Result<IntrospectionMultiResult, mongodb::error::Error> {
+) -> Result<IntrospectionResult, mongodb::error::Error> {
     let mut statistics = Statistics::new(ctx.composite_type_depth);
     let mut warnings = Warnings::new();
 
@@ -87,7 +87,7 @@ pub(super) async fn sample(
         None
     };
 
-    Ok(IntrospectionMultiResult {
+    Ok(IntrospectionResult {
         datamodels: psl::reformat_multiple(sources, 2),
         is_empty,
         warnings,

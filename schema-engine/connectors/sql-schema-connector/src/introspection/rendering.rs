@@ -32,6 +32,12 @@ pub(crate) fn to_psl_string(
         datamodel.create_empty_file(file_name.to_string());
     }
 
+    for file_id in ctx.previous_schema.db.iter_file_ids() {
+        let file_name = ctx.previous_schema.db.file_name(file_id);
+
+        datamodel.create_empty_file(file_name.to_string());
+    }
+
     enums::render(introspection_file_name, ctx, &mut datamodel);
     models::render(introspection_file_name, ctx, &mut datamodel);
 

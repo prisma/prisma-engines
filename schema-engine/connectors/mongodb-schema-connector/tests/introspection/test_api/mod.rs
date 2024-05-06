@@ -9,7 +9,7 @@ use mongodb_schema_connector::MongoDbSchemaConnector;
 use once_cell::sync::Lazy;
 use psl::PreviewFeature;
 use schema_connector::{
-    CompositeTypeDepth, ConnectorParams, IntrospectionContext, IntrospectionMultiResult, SchemaConnector,
+    CompositeTypeDepth, ConnectorParams, IntrospectionContext, IntrospectionResult, SchemaConnector,
 };
 use std::future::Future;
 use tokio::runtime::Runtime;
@@ -45,8 +45,8 @@ impl TestMultiResult {
     }
 }
 
-impl From<IntrospectionMultiResult> for TestResult {
-    fn from(res: IntrospectionMultiResult) -> Self {
+impl From<IntrospectionResult> for TestResult {
+    fn from(res: IntrospectionResult) -> Self {
         Self {
             datamodel: res.datamodels.into_iter().next().unwrap().1,
             warnings: res.warnings.unwrap_or_default(),
@@ -54,8 +54,8 @@ impl From<IntrospectionMultiResult> for TestResult {
     }
 }
 
-impl From<IntrospectionMultiResult> for TestMultiResult {
-    fn from(res: IntrospectionMultiResult) -> Self {
+impl From<IntrospectionResult> for TestMultiResult {
+    fn from(res: IntrospectionResult) -> Self {
         let datamodels = res
             .datamodels
             .into_iter()
@@ -82,7 +82,7 @@ impl TestApi {
     pub async fn re_introspect_multi(&mut self, datamodels: &[(&str, String)], expectation: expect_test::Expect) {
         let schema = parse_datamodels(datamodels);
         let ctx = IntrospectionContext::new(schema, CompositeTypeDepth::Infinite, None);
-        let reintrospected = self.connector.introspect_multi(&ctx).await.unwrap();
+        let reintrospected = self.connector.introspect(&ctx).await.unwrap();
         let reintrospected = TestMultiResult::from(reintrospected);
 
         expectation.assert_eq(reintrospected.datamodels());
@@ -91,7 +91,7 @@ impl TestApi {
     pub async fn expect_warnings(&mut self, expectation: &expect_test::Expect) {
         let previous_schema = psl::validate(config_block_string(self.features).into());
         let ctx = IntrospectionContext::new(previous_schema, CompositeTypeDepth::Infinite, None);
-        let result = self.connector.introspect_multi(&ctx).await.unwrap();
+        let result = self.connector.introspect(&ctx).await.unwrap();
         let result = TestMultiResult::from(result);
 
         expectation.assert_eq(&result.warnings);
@@ -161,7 +161,7 @@ where
         |mut api| async move {
             init_database(api.db).await.unwrap();
 
-            let res = api.connector.introspect_multi(&ctx).await.unwrap();
+            let res = api.connector.introspect(&ctx).await.unwrap();
 
             Ok(res)
         },

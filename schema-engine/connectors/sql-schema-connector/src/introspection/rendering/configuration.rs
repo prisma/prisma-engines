@@ -10,9 +10,8 @@ pub(super) fn render<'a>(
     schema: &'a SqlSchema,
     force_namespaces: Option<&'a [String]>,
 ) -> render::Configuration<'a> {
-    let datasources_with_files = previous_schema.configuration.datasources_with_files();
-    let (prev_ds_file, prev_ds) = datasources_with_files.first().unwrap();
-    let prev_ds_file_name = previous_schema.db.file_name(*prev_ds_file);
+    let (prev_ds_file, prev_ds) = previous_schema.configuration.first_datasource_with_file();
+    let prev_ds_file_name = previous_schema.db.file_name(prev_ds_file);
 
     let mut output = render::Configuration::default();
     let mut datasource = render::configuration::Datasource::from_psl(prev_ds, force_namespaces);
