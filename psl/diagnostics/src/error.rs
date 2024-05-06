@@ -332,8 +332,13 @@ impl DatamodelError {
         Self::new(format!("Datasource provider not known: \"{provider}\"."), span)
     }
 
-    pub fn new_shadow_database_is_same_as_main_url_error(source_name: String, span: Span) -> DatamodelError {
-        let msg = format!("shadowDatabaseUrl is the same as url for datasource \"{source_name}\". Please specify a different database as shadow database.");
+    pub fn new_shadow_database_is_same_as_main_url_error(source_name: &str, span: Span) -> DatamodelError {
+        let msg = format!("shadowDatabaseUrl is the same as url for datasource \"{source_name}\". Please specify a different database as shadow database to avoid data loss.");
+        Self::new(msg, span)
+    }
+
+    pub fn new_shadow_database_is_same_as_direct_url_error(source_name: &str, span: Span) -> DatamodelError {
+        let msg = format!("shadowDatabaseUrl is the same as directUrl for datasource \"{source_name}\". Please specify a different database as shadow database to avoid data loss.");
         Self::new(msg, span)
     }
 

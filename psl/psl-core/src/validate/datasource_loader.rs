@@ -163,6 +163,24 @@ fn lift_datasource(
         None => (None, None),
     };
 
+    if let Some((shadow_url, _)) = &shadow_database_url {
+        if let (Some(direct_url), Some(direct_url_span)) = (&direct_url, direct_url_span) {
+            if shadow_url == direct_url {
+                diagnostics.push_error(DatamodelError::new_shadow_database_is_same_as_direct_url_error(
+                    source_name,
+                    direct_url_span,
+                ));
+            }
+        }
+
+        if shadow_url == &url {
+            diagnostics.push_error(DatamodelError::new_shadow_database_is_same_as_main_url_error(
+                source_name,
+                url_span,
+            ));
+        }
+    }
+
     preview_features_guardrail(&mut args, diagnostics);
 
     let documentation = ast_source.documentation().map(String::from);

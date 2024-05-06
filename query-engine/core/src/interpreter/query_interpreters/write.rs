@@ -72,11 +72,13 @@ async fn create_many(
             .create_records_returning(&q.model, q.args, q.skip_duplicates, selected_fields.fields, trace_id)
             .await?;
 
+        let nested: Vec<QueryResult> = super::read::process_nested(tx, selected_fields.nested, Some(&records)).await?;
+
         let selection = RecordSelection {
             name: q.name,
             fields: selected_fields.order,
             records,
-            nested: vec![],
+            nested,
             model: q.model,
             virtual_fields: vec![],
         };
@@ -84,6 +86,7 @@ async fn create_many(
         Ok(QueryResult::RecordSelection(Some(Box::new(selection))))
     } else {
         let affected_records = tx.create_records(&q.model, q.args, q.skip_duplicates, trace_id).await?;
+
         Ok(QueryResult::Count(affected_records))
     }
 }
@@ -108,6 +111,7 @@ async fn create_many_split_by_shape(
 
     if let Some(selected_fields) = q.selected_fields {
         let mut result: Option<ManyRecords> = None;
+
         for args in args_by_shape.into_values() {
             let current_batch = tx
                 .create_records_returning(
@@ -137,11 +141,14 @@ async fn create_many_split_by_shape(
                 .await?
         };
 
+        let nested: Vec<QueryResult> =
+            super::read::process_nested(tx, selected_fields.nested.clone(), Some(&records)).await?;
+
         let selection = RecordSelection {
             name: q.name,
             fields: selected_fields.order,
             records,
-            nested: vec![],
+            nested,
             model: q.model,
             virtual_fields: vec![],
         };
@@ -149,12 +156,14 @@ async fn create_many_split_by_shape(
         Ok(QueryResult::RecordSelection(Some(Box::new(selection))))
     } else {
         let mut result = 0;
+
         for args in args_by_shape.into_values() {
             let affected_records = tx
                 .create_records(&q.model, args, q.skip_duplicates, trace_id.clone())
                 .await?;
             result += affected_records;
         }
+
         Ok(QueryResult::Count(result))
     }
 }
