@@ -16,12 +16,12 @@ jobs:
       - name: Output link to real commit
         run: echo ${{ github.repository }}/commit/${{ github.event.inputs.commit }}
 
-      - name: Checkout 
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.commit }}
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@master
         with:
           targets: x86_64-apple-ios,aarch64-apple-ios,aarch64-apple-ios-sim
 
@@ -51,11 +51,11 @@ jobs:
       - name: Output link to real commit
         run: echo ${{ github.repository }}/commit/${{ github.event.inputs.commit }}
 
-      - name: Checkout 
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.commit }}
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@master
         with:
           targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android,i686-linux-android
 
@@ -84,13 +84,13 @@ jobs:
     # Do not change `name`, prisma-engines Buildkite build job depends on this name ending with the commit
     name: "Combine iOS and Android artifacts on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
     runs-on: ubuntu-latest
-    needs: 
+    needs:
       - build-ios
       - build-android
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
-      
+
       - name: Upload combined artifact
         uses: actions/upload-artifact@v4
         with:

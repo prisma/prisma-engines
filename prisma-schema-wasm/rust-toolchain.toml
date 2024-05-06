@@ -1,8 +1,0 @@
-# Note: None of these properties is overriden by the `rust-toolchain.toml`
-# in the root of the workspace. `rustup` and friends treats this file as
-# a complete toolchain definition.
-[toolchain]
-channel = "1.78.0"
-components = []
-targets = ["wasm32-unknown-unknown"]
-profile = "minimal"
