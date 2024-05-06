@@ -403,6 +403,7 @@ async fn introspect_multi_view_preview_feature_is_required(api: &mut TestApi) ->
     api.raw_cmd(setup).await;
 
     let expected = expect![[r#"
+        // file: schema.prisma
         generator client {
           provider = "prisma-client-js"
         }

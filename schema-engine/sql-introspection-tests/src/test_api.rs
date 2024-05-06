@@ -157,37 +157,52 @@ impl TestApi {
 
     pub async fn introspect(&mut self) -> Result<String> {
         let previous_schema = psl::validate(self.pure_config().into());
-        let introspection_result = self.test_introspect_internal(previous_schema, true).await?;
+        let introspection_result = self
+            .test_introspect_internal(previous_schema, true)
+            .await?
+            .to_single_test_result();
 
-        Ok(introspection_result.into_single_datamodel())
+        Ok(introspection_result.datamodel)
     }
 
     pub async fn introspect_multi(&mut self) -> Result<String> {
         let previous_schema = psl::validate(self.pure_config().into());
-        let introspection_result = self.test_introspect_internal(previous_schema, true).await?;
+        let introspection_result = self
+            .test_introspect_internal(previous_schema, true)
+            .await?
+            .to_multi_test_result();
 
-        Ok(introspection_result.into_single_datamodel())
+        Ok(introspection_result.datamodels)
     }
 
     pub async fn introspect_views(&mut self) -> Result<Option<Vec<ViewDefinition>>> {
         let previous_schema = psl::validate(self.pure_config().into());
-        let introspection_result = self.test_introspect_internal(previous_schema, true).await?;
+        let introspection_result = self
+            .test_introspect_internal(previous_schema, true)
+            .await?
+            .to_single_test_result();
 
         Ok(introspection_result.views)
     }
 
     pub async fn introspect_views_multi(&mut self) -> Result<Option<Vec<ViewDefinition>>> {
         let previous_schema = psl::validate(self.pure_config().into());
-        let introspection_result = self.test_introspect_internal(previous_schema, true).await?;
+        let introspection_result = self
+            .test_introspect_internal(previous_schema, true)
+            .await?
+            .to_multi_test_result();
 
         Ok(introspection_result.views)
     }
 
     pub async fn introspect_dml(&mut self) -> Result<String> {
         let previous_schema = psl::validate(self.pure_config().into());
-        let introspection_result = self.test_introspect_internal(previous_schema, false).await?;
+        let introspection_result = self
+            .test_introspect_internal(previous_schema, false)
+            .await?
+            .to_single_test_result();
 
-        Ok(introspection_result.into_single_datamodel())
+        Ok(introspection_result.datamodel)
     }
 
     pub fn is_cockroach(&self) -> bool {
@@ -229,25 +244,34 @@ impl TestApi {
     pub async fn re_introspect(&mut self, data_model_string: &str) -> Result<String> {
         let schema = format!("{}{}", self.pure_config(), data_model_string);
         let schema = parse_datamodel(&schema);
-        let introspection_result = self.test_introspect_internal(schema, true).await?;
+        let introspection_result = self
+            .test_introspect_internal(schema, true)
+            .await?
+            .to_single_test_result();
 
-        Ok(introspection_result.into_single_datamodel())
+        Ok(introspection_result.datamodel)
     }
 
     #[tracing::instrument(skip(self, data_model_string))]
     pub async fn re_introspect_dml(&mut self, data_model_string: &str) -> Result<String> {
         let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), data_model_string));
-        let introspection_result = self.test_introspect_internal(data_model, false).await?;
+        let introspection_result = self
+            .test_introspect_internal(data_model, false)
+            .await?
+            .to_single_test_result();
 
-        Ok(introspection_result.into_single_datamodel())
+        Ok(introspection_result.datamodel)
     }
 
     #[tracing::instrument(skip(self, data_model_string))]
     pub async fn re_introspect_config(&mut self, data_model_string: &str) -> Result<String> {
         let data_model = parse_datamodel(data_model_string);
-        let introspection_result = self.test_introspect_internal(data_model, true).await?;
+        let introspection_result = self
+            .test_introspect_internal(data_model, true)
+            .await?
+            .to_single_test_result();
 
-        Ok(introspection_result.into_single_datamodel())
+        Ok(introspection_result.datamodel)
     }
 
     pub async fn re_introspect_warnings(&mut self, data_model_string: &str) -> Result<String> {
@@ -422,9 +446,9 @@ impl TestApi {
             .test_introspect_internal(data_model, false)
             .await
             .unwrap()
-            .to_multi_test_result();
+            .to_single_test_result();
 
-        expectation.assert_eq(&reintrospected.datamodels);
+        expectation.assert_eq(&reintrospected.datamodel);
     }
 
     pub async fn expect_re_introspected_datamodels(
