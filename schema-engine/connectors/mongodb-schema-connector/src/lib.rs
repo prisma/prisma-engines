@@ -14,7 +14,6 @@ mod schema_calculator;
 
 use client_wrapper::{mongo_error_to_connector_error, Client};
 use enumflags2::BitFlags;
-use futures::{FutureExt, TryFutureExt};
 use migration::MongoDbMigration;
 use mongodb_schema_describer::MongoSchema;
 use psl::PreviewFeature;
@@ -169,13 +168,6 @@ impl SchemaConnector for MongoDbSchemaConnector {
         &'a mut self,
         ctx: &'a IntrospectionContext,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
-        self.introspect_multi(ctx).map_ok(IntrospectionResult::from).boxed()
-    }
-
-    fn introspect_multi<'a>(
-        &'a mut self,
-        ctx: &'a IntrospectionContext,
-    ) -> BoxFuture<'a, ConnectorResult<IntrospectionMultiResult>> {
         Box::pin(async move {
             let client = self.client().await?;
             let schema = client.describe().await?;

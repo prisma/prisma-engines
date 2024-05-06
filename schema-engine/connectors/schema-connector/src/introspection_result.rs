@@ -15,19 +15,6 @@ pub struct ViewDefinition {
 #[derive(Debug)]
 pub struct IntrospectionResult {
     /// Datamodel
-    pub data_model: String,
-    /// The introspected data model is empty
-    pub is_empty: bool,
-    /// Introspection warnings
-    pub warnings: Option<String>,
-    /// The database view definitions. None if preview feature
-    /// is not enabled.
-    pub views: Option<Vec<ViewDefinition>>,
-}
-
-/// The result structure from a successful introspection run for multiple schema files.
-pub struct IntrospectionMultiResult {
-    /// Datamodels
     pub datamodels: Vec<(String, String)>,
     /// The introspected data model is empty
     pub is_empty: bool,
@@ -38,18 +25,14 @@ pub struct IntrospectionMultiResult {
     pub views: Option<Vec<ViewDefinition>>,
 }
 
-impl From<IntrospectionMultiResult> for IntrospectionResult {
-    fn from(res: IntrospectionMultiResult) -> Self {
-        let data_model = match res.datamodels.is_empty() {
-            true => String::new(),
-            false => res.datamodels.into_iter().next().unwrap().1,
-        };
+impl IntrospectionResult {
+    /// Consumes the result and returns the first datamodel in the introspection result.
+    pub fn into_single_datamodel(mut self) -> String {
+        self.datamodels.remove(0).1
+    }
 
-        Self {
-            data_model,
-            is_empty: res.is_empty,
-            warnings: res.warnings,
-            views: res.views,
-        }
+    /// Returns the first datamodel in the introspection result.
+    pub fn single_datamodel(&self) -> &str {
+        &self.datamodels[0].1
     }
 }

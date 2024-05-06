@@ -6,20 +6,11 @@ pub(crate) use context::DatamodelCalculatorContext;
 
 use crate::introspection::{rendering, warnings};
 use psl::PreviewFeature;
-use schema_connector::{IntrospectionContext, IntrospectionMultiResult, IntrospectionResult};
+use schema_connector::{IntrospectionContext, IntrospectionResult};
 use sql_schema_describer as sql;
 
-/// Calculate a data model from a database schema.
-pub fn calculate(schema: &sql::SqlSchema, ctx: &IntrospectionContext, search_path: &str) -> IntrospectionResult {
-    IntrospectionResult::from(calculate_multi(schema, ctx, search_path))
-}
-
 /// Calculate datamodels from a database schema.
-pub fn calculate_multi(
-    schema: &sql::SqlSchema,
-    ctx: &IntrospectionContext,
-    search_path: &str,
-) -> IntrospectionMultiResult {
+pub fn calculate(schema: &sql::SqlSchema, ctx: &IntrospectionContext, search_path: &str) -> IntrospectionResult {
     let introspection_file_name = ctx.introspection_file_name();
     let ctx = DatamodelCalculatorContext::new(ctx, schema, search_path);
 
@@ -37,7 +28,7 @@ pub fn calculate_multi(
         false => Some(warnings.to_string()),
     };
 
-    IntrospectionMultiResult {
+    IntrospectionResult {
         datamodels,
         is_empty,
         warnings,

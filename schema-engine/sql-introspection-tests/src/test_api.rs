@@ -6,7 +6,6 @@ pub use quaint::prelude::Queryable;
 use schema_connector::CompositeTypeDepth;
 use schema_connector::ConnectorResult;
 use schema_connector::IntrospectionContext;
-use schema_connector::IntrospectionMultiResult;
 use schema_connector::IntrospectionResult;
 use schema_connector::ViewDefinition;
 pub use test_macros::test_connector;
@@ -160,14 +159,14 @@ impl TestApi {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, true).await?;
 
-        Ok(introspection_result.data_model)
+        Ok(introspection_result.into_single_datamodel())
     }
 
     pub async fn introspect_multi(&mut self) -> Result<String> {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, true).await?;
 
-        Ok(introspection_result.data_model)
+        Ok(introspection_result.into_single_datamodel())
     }
 
     pub async fn introspect_views(&mut self) -> Result<Option<Vec<ViewDefinition>>> {
@@ -179,7 +178,7 @@ impl TestApi {
 
     pub async fn introspect_views_multi(&mut self) -> Result<Option<Vec<ViewDefinition>>> {
         let previous_schema = psl::validate(self.pure_config().into());
-        let introspection_result = self.test_introspect_multi_internal(previous_schema, true).await?;
+        let introspection_result = self.test_introspect_internal(previous_schema, true).await?;
 
         Ok(introspection_result.views)
     }
@@ -188,7 +187,7 @@ impl TestApi {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, false).await?;
 
-        Ok(introspection_result.data_model)
+        Ok(introspection_result.into_single_datamodel())
     }
 
     pub fn is_cockroach(&self) -> bool {
@@ -226,28 +225,13 @@ impl TestApi {
             .await
     }
 
-    async fn test_introspect_multi_internal(
-        &mut self,
-        previous_schema: psl::ValidatedSchema,
-        render_config: bool,
-    ) -> ConnectorResult<IntrospectionMultiTestResult> {
-        let mut ctx = IntrospectionContext::new(previous_schema, CompositeTypeDepth::Infinite, None);
-        ctx.render_config = render_config;
-
-        self.api
-            .introspect_multi(&ctx)
-            .instrument(tracing::info_span!("introspect_multi"))
-            .await
-            .map(Into::into)
-    }
-
     #[tracing::instrument(skip(self, data_model_string))]
     pub async fn re_introspect(&mut self, data_model_string: &str) -> Result<String> {
         let schema = format!("{}{}", self.pure_config(), data_model_string);
         let schema = parse_datamodel(&schema);
         let introspection_result = self.test_introspect_internal(schema, true).await?;
 
-        Ok(introspection_result.data_model)
+        Ok(introspection_result.into_single_datamodel())
     }
 
     #[tracing::instrument(skip(self, data_model_string))]
@@ -255,7 +239,7 @@ impl TestApi {
         let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), data_model_string));
         let introspection_result = self.test_introspect_internal(data_model, false).await?;
 
-        Ok(introspection_result.data_model)
+        Ok(introspection_result.into_single_datamodel())
     }
 
     #[tracing::instrument(skip(self, data_model_string))]
@@ -263,7 +247,7 @@ impl TestApi {
         let data_model = parse_datamodel(data_model_string);
         let introspection_result = self.test_introspect_internal(data_model, true).await?;
 
-        Ok(introspection_result.data_model)
+        Ok(introspection_result.into_single_datamodel())
     }
 
     pub async fn re_introspect_warnings(&mut self, data_model_string: &str) -> Result<String> {
@@ -425,18 +409,6 @@ impl TestApi {
         expectation.assert_eq(&warnings);
     }
 
-    pub async fn expect_warnings_multi(&mut self, expectation: &expect_test::Expect) {
-        let previous_schema = psl::validate(self.pure_config().into());
-        let introspection_result = self
-            .test_introspect_multi_internal(previous_schema, true)
-            .await
-            .unwrap();
-
-        let warnings = introspection_result.warnings.unwrap_or_default();
-
-        expectation.assert_eq(&warnings);
-    }
-
     pub async fn expect_no_warnings(&mut self) {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, true).await.unwrap();
@@ -446,9 +418,13 @@ impl TestApi {
 
     pub async fn expect_re_introspected_datamodel(&mut self, schema: &str, expectation: expect_test::Expect) {
         let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), schema));
-        let reintrospected = self.test_introspect_internal(data_model, false).await.unwrap();
+        let reintrospected = self
+            .test_introspect_internal(data_model, false)
+            .await
+            .unwrap()
+            .to_multi_test_result();
 
-        expectation.assert_eq(&reintrospected.data_model);
+        expectation.assert_eq(&reintrospected.datamodels);
     }
 
     pub async fn expect_re_introspected_datamodels(
@@ -457,7 +433,11 @@ impl TestApi {
         expectation: expect_test::Expect,
     ) {
         let schema = parse_datamodels(datamodels);
-        let reintrospected = self.test_introspect_multi_internal(schema, false).await.unwrap();
+        let reintrospected = self
+            .test_introspect_internal(schema, false)
+            .await
+            .unwrap()
+            .to_multi_test_result();
 
         expectation.assert_eq(&reintrospected.datamodels);
     }
@@ -468,7 +448,11 @@ impl TestApi {
         expectation: expect_test::Expect,
     ) {
         let schema = parse_datamodels(datamodels);
-        let reintrospected = self.test_introspect_multi_internal(schema, true).await.unwrap();
+        let reintrospected = self
+            .test_introspect_internal(schema, true)
+            .await
+            .unwrap()
+            .to_multi_test_result();
 
         expectation.assert_eq(&reintrospected.datamodels);
     }
@@ -567,8 +551,46 @@ pub struct IntrospectionMultiTestResult {
     pub views: Option<Vec<ViewDefinition>>,
 }
 
-impl From<IntrospectionMultiResult> for IntrospectionMultiTestResult {
-    fn from(res: IntrospectionMultiResult) -> Self {
+pub struct IntrospectionTestResult {
+    /// Datamodel
+    pub datamodel: String,
+    /// The introspected data model is empty
+    pub is_empty: bool,
+    /// Introspection warnings
+    pub warnings: Option<String>,
+    /// The database view definitions. None if preview feature
+    /// is not enabled.
+    pub views: Option<Vec<ViewDefinition>>,
+}
+
+pub trait ToIntrospectionTestResult {
+    fn to_single_test_result(self) -> IntrospectionTestResult;
+    fn to_multi_test_result(self) -> IntrospectionMultiTestResult;
+}
+
+impl ToIntrospectionTestResult for IntrospectionResult {
+    fn to_single_test_result(self) -> IntrospectionTestResult {
+        IntrospectionTestResult::from(self)
+    }
+
+    fn to_multi_test_result(self) -> IntrospectionMultiTestResult {
+        IntrospectionMultiTestResult::from(self)
+    }
+}
+
+impl From<IntrospectionResult> for IntrospectionTestResult {
+    fn from(res: IntrospectionResult) -> Self {
+        Self {
+            datamodel: res.single_datamodel().to_string(),
+            is_empty: res.is_empty,
+            warnings: res.warnings,
+            views: res.views,
+        }
+    }
+}
+
+impl From<IntrospectionResult> for IntrospectionMultiTestResult {
+    fn from(res: IntrospectionResult) -> Self {
         let datamodels = res
             .datamodels
             .into_iter()

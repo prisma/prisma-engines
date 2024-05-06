@@ -45,9 +45,7 @@ async fn reintrospect_new_model_single_file(api: &mut TestApi) -> TestResult {
 
     api.expect_re_introspected_datamodels(&input_dms, expected).await;
 
-    let expected = expect![];
-
-    api.expect_warnings_multi(&expected).await;
+    api.expect_no_warnings().await;
 
     Ok(())
 }
@@ -144,9 +142,7 @@ async fn reintrospect_removed_model_single_file(api: &mut TestApi) -> TestResult
 
     api.expect_re_introspected_datamodels(&input_dms, expected).await;
 
-    let expected = expect![];
-
-    api.expect_warnings_multi(&expected).await;
+    api.expect_no_warnings().await;
 
     Ok(())
 }
@@ -240,9 +236,7 @@ async fn reintrospect_new_enum_single_file(api: &mut TestApi) -> TestResult {
 
     api.expect_re_introspected_datamodels(&input_dms, expected).await;
 
-    let expected = expect![];
-
-    api.expect_warnings_multi(&expected).await;
+    api.expect_no_warnings().await;
 
     Ok(())
 }
@@ -280,9 +274,7 @@ async fn reintrospect_removed_enum_single_file(api: &mut TestApi) -> TestResult 
 
     api.expect_re_introspected_datamodels(&input_dms, expected).await;
 
-    let expected = expect![];
-
-    api.expect_warnings_multi(&expected).await;
+    api.expect_no_warnings().await;
 
     Ok(())
 }
@@ -342,9 +334,7 @@ async fn reintrospect_new_enum_multi_file(api: &mut TestApi) -> TestResult {
 
     api.expect_re_introspected_datamodels(&input_dms, expected).await;
 
-    let expected = expect![];
-
-    api.expect_warnings_multi(&expected).await;
+    api.expect_no_warnings().await;
 
     Ok(())
 }
@@ -390,9 +380,7 @@ async fn reintrospect_removed_enum_multi_file(api: &mut TestApi) -> TestResult {
 
     api.expect_re_introspected_datamodels(&input_dms, expected).await;
 
-    let expected = expect![];
-
-    api.expect_warnings_multi(&expected).await;
+    api.expect_no_warnings().await;
 
     Ok(())
 }
@@ -433,9 +421,7 @@ async fn introspect_multi_view_preview_feature_is_required(api: &mut TestApi) ->
 
     api.expect_datamodels(&expected).await;
 
-    let expected = expect![];
-
-    api.expect_warnings_multi(&expected).await;
+    api.expect_no_warnings().await;
 
     Ok(())
 }
@@ -502,7 +488,7 @@ async fn reintrospect_new_view_single_file(api: &mut TestApi) -> TestResult {
         The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
           - "Schwuser"
     "#]];
-    api.expect_warnings_multi(&expected).await;
+    api.expect_warnings(&expected).await;
 
     Ok(())
 }
@@ -550,7 +536,7 @@ async fn reintrospect_removed_view_single_file(api: &mut TestApi) -> TestResult 
     api.expect_re_introspected_datamodels(&input_dms, expected).await;
 
     let expected = expect![""];
-    api.expect_warnings_multi(&expected).await;
+    api.expect_warnings(&expected).await;
 
     Ok(())
 }
@@ -632,7 +618,7 @@ async fn reintrospect_new_view_multi_file(api: &mut TestApi) -> TestResult {
         The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
           - "Schwuser"
     "#]];
-    api.expect_warnings_multi(&expected).await;
+    api.expect_warnings(&expected).await;
 
     Ok(())
 }
@@ -684,7 +670,7 @@ async fn reintrospect_removed_view_multi_file(api: &mut TestApi) -> TestResult {
     api.expect_re_introspected_datamodels(&input_dms, expected).await;
 
     let expected = expect![""];
-    api.expect_warnings_multi(&expected).await;
+    api.expect_warnings(&expected).await;
 
     Ok(())
 }
