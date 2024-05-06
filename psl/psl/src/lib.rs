@@ -43,10 +43,24 @@ pub fn parse_configuration(schema: &str) -> Result<Configuration, Diagnostics> {
 /// Parse and analyze a Prisma schema.
 pub fn parse_schema(file: impl Into<SourceFile>) -> Result<ValidatedSchema, String> {
     let mut schema = validate(file.into());
+
     schema
         .diagnostics
         .to_result()
         .map_err(|err| err.to_pretty_string("schema.prisma", schema.db.source_assert_single()))?;
+    Ok(schema)
+}
+
+/// Parse and analyze many Prisma schemas.
+pub fn parse_schema_multi(files: Vec<(String, SourceFile)>) -> Result<ValidatedSchema, String> {
+    let mut schema = validate_multi_file(files);
+
+    // TODO: Errors should be file specific.
+    schema
+        .diagnostics
+        .to_result()
+        .map_err(|err| err.to_pretty_string("schema.prisma", schema.db.source_assert_single()))?;
+
     Ok(schema)
 }
 

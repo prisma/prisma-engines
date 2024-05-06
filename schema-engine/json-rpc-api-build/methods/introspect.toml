@@ -6,8 +6,9 @@ responseShape = "introspectResult"
 [recordShapes.introspectParams]
 description = "Params type for the introspect method."
 
-[recordShapes.introspectParams.fields.schema]
-shape = "string"
+[recordShapes.introspectParams.fields.schemas]
+shape = "introspectionDatamodel"
+isList = true
 
 [recordShapes.introspectParams.fields.force]
 shape = "bool"
@@ -15,7 +16,7 @@ shape = "bool"
 [recordShapes.introspectParams.fields.compositeTypeDepth]
 shape = "isize"
 
-[recordShapes.introspectParams.fields.schemas]
+[recordShapes.introspectParams.fields.namespaces]
 shape = "string"
 isList = true
 isNullable = true
@@ -23,8 +24,9 @@ isNullable = true
 [recordShapes.introspectResult]
 description = "Result type for the introspect method."
 
-[recordShapes.introspectResult.fields.datamodel]
-shape = "string"
+[recordShapes.introspectResult.fields.datamodels]
+shape = "introspectionDatamodel"
+isList = true
 
 [recordShapes.introspectResult.fields.warnings]
 shape = "string"
@@ -44,4 +46,13 @@ shape = "string"
 shape = "string"
 
 [recordShapes.introspectionView.fields.definition]
+shape = "string"
+
+[recordShapes.introspectionDatamodel]
+description = "Datamodel introspection result with their file names."
+
+[recordShapes.introspectionDatamodel.fields.fileName]
+shape = "string"
+
+[recordShapes.introspectionDatamodel.fields.content]
 shape = "string"

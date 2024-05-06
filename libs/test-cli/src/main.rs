@@ -207,15 +207,18 @@ async fn main() -> anyhow::Result<()> {
             let api = schema_core::schema_api(Some(schema.clone()), None)?;
 
             let params = IntrospectParams {
-                schema,
+                schemas: vec![IntrospectionDatamodel {
+                    file_name: "schema.prisma".to_string(),
+                    content: schema,
+                }],
                 force: false,
                 composite_type_depth: composite_type_depth.unwrap_or(0),
-                schemas: None,
+                namespaces: None,
             };
 
-            let introspected = api.introspect(params).await.map_err(|err| anyhow::anyhow!("{err:?}"))?;
+            let mut introspected = api.introspect(params).await.map_err(|err| anyhow::anyhow!("{err:?}"))?;
 
-            println!("{}", &introspected.datamodel);
+            println!("{}", introspected.datamodels.remove(0).content);
         }
         Command::ValidateDatamodel(cmd) => {
             use std::io::Read as _;
@@ -315,18 +318,21 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
             let api = schema_core::schema_api(Some(skeleton.clone()), None)?;
 
             let params = IntrospectParams {
-                schema: skeleton,
+                schemas: vec![IntrospectionDatamodel {
+                    file_name: "schema.prisma".to_string(),
+                    content: skeleton,
+                }],
                 force: false,
                 composite_type_depth: -1,
-                schemas: None,
+                namespaces: None,
             };
 
-            let introspected = api.introspect(params).await.map_err(|err| anyhow::anyhow!("{err:?}"))?;
+            let mut introspected = api.introspect(params).await.map_err(|err| anyhow::anyhow!("{err:?}"))?;
 
             eprintln!("{}", "Schema was successfully introspected from database URL".green());
 
             let path = "/tmp/prisma-test-cli-introspected.prisma";
-            std::fs::write(path, introspected.datamodel)?;
+            std::fs::write(path, introspected.datamodels.remove(0).content)?;
             path.to_owned()
         } else if let Some(file_path) = cmd.file_path.as_ref() {
             file_path.clone()

@@ -4,7 +4,7 @@ mod failure_modes;
 use prisma_value::PrismaValue;
 use psl::parser_database::*;
 use quaint::prelude::Insert;
-use schema_core::schema_connector::DiffTarget;
+use schema_core::{json_rpc::types::IntrospectionDatamodel, schema_connector::DiffTarget};
 use serde_json::json;
 use sql_migration_tests::test_api::*;
 use sql_schema_describer::{ColumnTypeFamily, ForeignKeyAction};
@@ -1461,8 +1461,11 @@ fn cockroach_introspection_with_postgres_provider_fails() {
     let error = tok(me.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema,
-        schemas: None,
+        schemas: vec![IntrospectionDatamodel {
+            file_name: "schema.prisma".to_string(),
+            content: schema,
+        }],
+        namespaces: None,
     }))
     .unwrap_err()
     .message()

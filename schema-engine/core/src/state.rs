@@ -320,22 +320,36 @@ impl GenericApi for EngineState {
     }
 
     async fn introspect(&self, params: IntrospectParams) -> CoreResult<IntrospectResult> {
-        tracing::info!("{:?}", params.schema);
-        let source_file = SourceFile::new_allocated(Arc::from(params.schema.clone().into_boxed_str()));
+        tracing::info!("{:?}", params.schemas);
 
-        let has_some_namespaces = params.schemas.is_some();
+        let source_files: Vec<(String, SourceFile)> = params
+            .schemas
+            .into_iter()
+            .map(|dm| {
+                (
+                    dm.file_name,
+                    SourceFile::new_allocated(Arc::from(dm.content.clone().into_boxed_str())),
+                )
+            })
+            .collect();
+        let schema_str = merge_schemas(&source_files);
+
+        let has_some_namespaces = params.namespaces.is_some();
         let composite_type_depth = From::from(params.composite_type_depth);
 
         let ctx = if params.force {
-            let previous_schema = psl::validate(source_file);
+            let previous_schema = psl::validate_multi_file(source_files);
+
             schema_connector::IntrospectionContext::new_config_only(
                 previous_schema,
                 composite_type_depth,
-                params.schemas,
+                params.namespaces,
             )
         } else {
-            let previous_schema = psl::parse_schema(source_file).map_err(ConnectorError::new_schema_parser_error)?;
-            schema_connector::IntrospectionContext::new(previous_schema, composite_type_depth, params.schemas)
+            let previous_schema =
+                psl::parse_schema_multi(source_files).map_err(ConnectorError::new_schema_parser_error)?;
+
+            schema_connector::IntrospectionContext::new(previous_schema, composite_type_depth, params.namespaces)
         };
 
         if !ctx
@@ -351,7 +365,7 @@ impl GenericApi for EngineState {
         }
 
         self.with_connector_for_schema(
-            &params.schema,
+            &schema_str,
             None,
             Box::new(move |connector| {
                 Box::pin(async move {
@@ -376,7 +390,11 @@ impl GenericApi for EngineState {
                         });
 
                         Ok(IntrospectResult {
-                            datamodel: datamodels.remove(0).1,
+                            datamodels: result
+                                .datamodels
+                                .into_iter()
+                                .map(|(file_name, content)| IntrospectionDatamodel { file_name, content })
+                                .collect(),
                             views,
                             warnings,
                         })
@@ -440,4 +458,13 @@ impl GenericApi for EngineState {
         }))
         .await
     }
+}
+
+// TODO: Remove this once the new API is fully implemented.
+fn merge_schemas(schemas: &[(String, SourceFile)]) -> String {
+    schemas
+        .iter()
+        .map(|(_, content)| content.as_str())
+        .collect::<Vec<_>>()
+        .join("\n")
 }

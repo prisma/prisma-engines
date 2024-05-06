@@ -1,6 +1,6 @@
 use expect_test::expect;
 use quaint::connector::rusqlite;
-use schema_core::json_rpc::types::IntrospectParams;
+use schema_core::json_rpc::types::{IntrospectParams, IntrospectionDatamodel};
 use test_setup::runtime::run_with_thread_local_runtime as tok;
 
 #[test]
@@ -30,15 +30,21 @@ fn introspect_force_with_invalid_schema() {
     let api = schema_core::schema_api(Some(schema.clone()), None).unwrap();
 
     let params = IntrospectParams {
-        schema,
+        schemas: vec![IntrospectionDatamodel {
+            file_name: "schema.prisma".to_string().to_string(),
+            content: schema,
+        }],
         force: true,
         composite_type_depth: 0,
-        schemas: None,
+        namespaces: None,
     };
 
     let result = &tok(api.introspect(params))
         .unwrap()
-        .datamodel
+        .datamodels
+        .first()
+        .map(|dm| dm.content.as_str())
+        .unwrap()
         .replace(db_path.as_str(), "<db_path>");
 
     let expected = expect![[r#"
@@ -85,10 +91,13 @@ fn introspect_no_force_with_invalid_schema() {
     let api = schema_core::schema_api(Some(schema.clone()), None).unwrap();
 
     let params = IntrospectParams {
-        schema,
+        schemas: vec![IntrospectionDatamodel {
+            file_name: "schema.prisma".to_string(),
+            content: schema,
+        }],
         force: false,
         composite_type_depth: 0,
-        schemas: None,
+        namespaces: None,
     };
 
     let ufe = tok(api.introspect(params)).unwrap_err().to_user_facing();
