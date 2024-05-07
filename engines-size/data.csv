@@ -1921,3 +1921,11 @@ date_time,branch,commit,file,size_bytes
 2024-05-07T10:42:07+00:00,main,b34f35d03b987c7b0bf2210cb0227e6e0f98052d,query-engine-mysql.wasm,2224191
 2024-05-07T10:42:07+00:00,main,b34f35d03b987c7b0bf2210cb0227e6e0f98052d,query-engine-sqlite.wasm.gz,812487
 2024-05-07T10:42:07+00:00,main,b34f35d03b987c7b0bf2210cb0227e6e0f98052d,query-engine-sqlite.wasm,2113808
+2024-05-07T12:03:47+00:00,main,f77c9dda7ac0ef0b13b8882bb4eb176109f0a53d,query-engine,18808992
+2024-05-07T12:03:47+00:00,main,f77c9dda7ac0ef0b13b8882bb4eb176109f0a53d,libquery_engine.node,16483864
+2024-05-07T12:03:47+00:00,main,f77c9dda7ac0ef0b13b8882bb4eb176109f0a53d,query-engine-postgresql.wasm.gz,866536
+2024-05-07T12:03:47+00:00,main,f77c9dda7ac0ef0b13b8882bb4eb176109f0a53d,query-engine-postgresql.wasm,2256628
+2024-05-07T12:03:47+00:00,main,f77c9dda7ac0ef0b13b8882bb4eb176109f0a53d,query-engine-mysql.wasm.gz,852333
+2024-05-07T12:03:47+00:00,main,f77c9dda7ac0ef0b13b8882bb4eb176109f0a53d,query-engine-mysql.wasm,2223428
+2024-05-07T12:03:47+00:00,main,f77c9dda7ac0ef0b13b8882bb4eb176109f0a53d,query-engine-sqlite.wasm.gz,812225
+2024-05-07T12:03:47+00:00,main,f77c9dda7ac0ef0b13b8882bb4eb176109f0a53d,query-engine-sqlite.wasm,2112424
