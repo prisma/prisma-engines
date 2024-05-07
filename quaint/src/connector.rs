@@ -20,6 +20,7 @@ mod result_set;
 #[cfg(any(feature = "mssql-native", feature = "postgresql-native", feature = "mysql-native"))]
 mod timeout;
 mod transaction;
+#[cfg(not(target_arch = "wasm32"))]
 mod type_identifier;
 
 pub use self::result_set::*;

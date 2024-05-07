@@ -167,7 +167,7 @@ impl EngineState {
         }
     }
 
-    async fn with_default_connector<O: Send + 'static>(&self, f: ConnectorRequest<O>) -> CoreResult<O>
+    async fn with_default_connector<O>(&self, f: ConnectorRequest<O>) -> CoreResult<O>
     where
         O: Sized + Send + 'static,
     {

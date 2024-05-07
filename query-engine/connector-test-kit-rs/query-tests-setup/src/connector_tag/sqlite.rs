@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use super::*;
 use crate::{BoxFuture, SqlDatamodelRenderer};
 use quaint::{prelude::Queryable, single::Quaint};
@@ -35,14 +37,14 @@ pub enum SqliteVersion {
     CloudflareD1,
 }
 
-impl ToString for SqliteVersion {
-    fn to_string(&self) -> String {
+impl Display for SqliteVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            SqliteVersion::ReactNative => "react-native".to_string(),
-            SqliteVersion::V3 => "3".to_string(),
-            SqliteVersion::LibsqlJsNapi => "libsql.js".to_string(),
-            SqliteVersion::LibsqlJsWasm => "libsql.js.wasm".to_string(),
-            SqliteVersion::CloudflareD1 => "cfd1".to_owned(),
+            SqliteVersion::ReactNative => f.write_str("react-native"),
+            SqliteVersion::V3 => f.write_str("3"),
+            SqliteVersion::LibsqlJsNapi => f.write_str("libsql.js"),
+            SqliteVersion::LibsqlJsWasm => f.write_str("libsql.js.wasm"),
+            SqliteVersion::CloudflareD1 => f.write_str("cfd1"),
         }
     }
 }

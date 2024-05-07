@@ -22,12 +22,12 @@ pub struct TextSearch<'a> {
 /// );
 ///
 /// assert_eq!(params, vec![Value::from("chicken")]);
-/// # Ok(())    
+/// # Ok(())
 /// # }
 /// ```
-pub fn text_search<'a, T: Clone>(exprs: &[T]) -> super::Function<'a>
+pub fn text_search<'a, T>(exprs: &[T]) -> super::Function<'a>
 where
-    T: Into<Expression<'a>>,
+    T: Clone + Into<Expression<'a>>,
 {
     let exprs: Vec<Expression> = exprs.iter().map(|c| c.clone().into()).collect();
     let fun = TextSearch { exprs };
@@ -57,12 +57,12 @@ pub struct TextSearchRelevance<'a> {
 /// );
 ///
 /// assert_eq!(params, vec![Value::from("chicken"), Value::from(0.1)]);
-/// # Ok(())    
+/// # Ok(())
 /// # }
 /// ```
-pub fn text_search_relevance<'a, E: Clone, Q>(exprs: &[E], query: Q) -> super::Function<'a>
+pub fn text_search_relevance<'a, E, Q>(exprs: &[E], query: Q) -> super::Function<'a>
 where
-    E: Into<Expression<'a>>,
+    E: Clone + Into<Expression<'a>>,
     Q: Into<Cow<'a, str>>,
 {
     let exprs: Vec<Expression> = exprs.iter().map(|c| c.clone().into()).collect();
