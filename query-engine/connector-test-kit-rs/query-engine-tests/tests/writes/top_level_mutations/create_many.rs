@@ -1,7 +1,6 @@
 use query_engine_tests::*;
 
-// TODO: create many returns the wrong count for CFD1
-#[test_suite(capabilities(CreateMany), exclude(Sqlite("cfd1")))]
+#[test_suite(capabilities(CreateMany))]
 mod create_many {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query};
@@ -212,7 +211,8 @@ mod create_many {
     // Covers: Batching by row number.
     // Each DB allows a certain amount of params per single query, and a certain number of rows.
     // Each created row has 1 param and we create 1000 records.
-    #[connector_test(schema(schema_4))]
+    // TODO: unexclude d1 once https://github.com/prisma/team-orm/issues/1070 is fixed
+    #[connector_test(schema(schema_4), exclude(Sqlite("cfd1")))]
     async fn large_num_records_horizontal(runner: Runner) -> TestResult<()> {
         let mut records: Vec<String> = vec![];
 
@@ -250,7 +250,8 @@ mod create_many {
     // Covers: Batching by row number.
     // Each DB allows a certain amount of params per single query, and a certain number of rows.
     // Each created row has 4 params and we create 1000 rows.
-    #[connector_test(schema(schema_5))]
+    // TODO: unexclude d1 once https://github.com/prisma/team-orm/issues/1070 is fixed
+    #[connector_test(schema(schema_5), exclude(Sqlite("cfd1")))]
     async fn large_num_records_vertical(runner: Runner) -> TestResult<()> {
         let mut records: Vec<String> = vec![];
 
