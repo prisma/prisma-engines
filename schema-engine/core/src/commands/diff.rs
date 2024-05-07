@@ -1,9 +1,8 @@
 use crate::{
     core_error::CoreResult,
-    json_rpc::types::{DiffParams, DiffResult, DiffTarget, PathContainer, SchemaContainer, UrlContainer},
+    json_rpc::types::{DiffParams, DiffResult, DiffTarget, PathContainer, UrlContainer},
 };
 use enumflags2::BitFlags;
-use psl::parser_database::SourceFile;
 use schema_connector::{
     ConnectorError, ConnectorHost, DatabaseSchema, DiffTarget as McDiff, Namespaces, SchemaConnector,
 };
@@ -96,16 +95,10 @@ fn namespaces_and_preview_features_from_diff_targets(
     for target in targets {
         match target {
             DiffTarget::Migrations(_) | DiffTarget::Empty | DiffTarget::Url(_) => (),
-            DiffTarget::SchemaDatasource(SchemaContainer { schema, path })
-            | DiffTarget::SchemaDatamodel(SchemaContainer { schema, path }) => {
-                let schema_str: String = std::fs::read_to_string(schema).map_err(|err| {
-                    ConnectorError::from_source_with_context(
-                        err,
-                        format!("Error trying to read Prisma schema file at `{schema}`.").into_boxed_str(),
-                    )
-                })?;
+            DiffTarget::SchemaDatasource(paths) | DiffTarget::SchemaDatamodel(paths) => {
+                let schemas = crate::read_schemas_from_paths(paths)?;
+                let validated_schema = psl::validate_multi_file(schemas);
 
-                let validated_schema = psl::validate(schema_str.into());
                 for (namespace, _span) in validated_schema
                     .configuration
                     .datasources
@@ -132,21 +125,12 @@ async fn json_rpc_diff_target_to_connector(
     namespaces: Option<Namespaces>,
     preview_features: BitFlags<psl::PreviewFeature>,
 ) -> CoreResult<Option<(Box<dyn SchemaConnector>, DatabaseSchema)>> {
-    let read_prisma_schema_from_path = |schema_path: &str| -> CoreResult<String> {
-        std::fs::read_to_string(schema_path).map_err(|err| {
-            ConnectorError::from_source_with_context(
-                err,
-                format!("Error trying to read Prisma schema file at `{schema_path}`.").into_boxed_str(),
-            )
-        })
-    };
-
     match target {
         DiffTarget::Empty => Ok(None),
-        DiffTarget::SchemaDatasource(SchemaContainer { schema, path }) => {
-            let schema_contents = read_prisma_schema_from_path(schema)?;
-            let schema_dir = std::path::Path::new(schema).parent();
-            let mut connector = crate::schema_to_connector(&schema_contents, schema_dir)?;
+        DiffTarget::SchemaDatasource(paths) => {
+            let schema_contents = crate::read_schemas_from_paths(paths)?;
+            let schema_dir = crate::find_common_root_path(paths);
+            let mut connector = crate::schemas_to_connector(schema_contents, schema_dir)?;
             connector.ensure_connection_validity().await?;
             connector.set_preview_features(preview_features);
             let schema = connector
@@ -154,13 +138,16 @@ async fn json_rpc_diff_target_to_connector(
                 .await?;
             Ok(Some((connector, schema)))
         }
-        DiffTarget::SchemaDatamodel(SchemaContainer { schema, path }) => {
-            let schema_contents = read_prisma_schema_from_path(schema)?;
-            let mut connector = crate::schema_to_connector_unchecked(&schema_contents)?;
+        DiffTarget::SchemaDatamodel(paths) => {
+            let schema_contents = crate::read_schemas_from_paths(paths)?;
+            let mut connector = crate::schemas_to_connector_unchecked(schema_contents)?;
             connector.set_preview_features(preview_features);
+
             let schema = connector
                 .database_schema_from_diff_target(
-                    McDiff::Datamodel(SourceFile::new_allocated(Arc::from(schema_contents.into_boxed_str()))),
+                    // TODO: Pass list of schemas
+                    todo!(),
+                    // McDiff::Datamodel(SourceFile::new_allocated(Arc::from(schema_contents.into_boxed_str()))),
                     None,
                     namespaces,
                 )

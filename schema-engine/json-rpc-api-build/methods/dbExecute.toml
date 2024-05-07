@@ -13,6 +13,9 @@ fields.schema.shape = "string"
 # This is counterintuitive.
 fields.schema.description = "The contents of the Prisma schema file."
 
+fields.file_name.shape = "string"
+fields.file_name.description = "The file name of the Prisma schema file."
+
 [recordShapes.UrlContainer]
 description = "An object with a `url` field."
 fields.url.shape = "string"
@@ -30,6 +33,8 @@ description = "The type of results returned by dbExecute."
 [enumShapes.DbExecuteDatasourceType]
 description = "The location of the live database to connect to."
 variants.schema.description = "Path to the Prisma schema file to take the datasource URL from."
-variants.schema.shape = "SchemaContainer"
+variants.schema.shape = "PathContainer"
+variants.schema.isList = true
+
 variants.url.description = "The URL of the database to run the command on."
 variants.url.shape = "UrlContainer"

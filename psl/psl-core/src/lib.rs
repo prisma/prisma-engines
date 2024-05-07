@@ -149,6 +149,33 @@ pub fn parse_configuration(
     diagnostics.to_result().map(|_| out)
 }
 
+/// Loads all configuration blocks from a list of datamodel using the built-in source definitions.
+pub fn parse_configuration_multi_file(
+    files: Vec<(String, SourceFile)>,
+    connectors: ConnectorRegistry<'_>,
+) -> Result<Configuration, diagnostics::Diagnostics> {
+    assert!(
+        !files.is_empty(),
+        "psl::parse_configuration_multi_file() must be called with at least one file"
+    );
+
+    let mut diagnostics = Diagnostics::new();
+    let db = ParserDatabase::new(files, &mut diagnostics);
+
+    // TODO: the bulk of configuration block analysis should be part of ParserDatabase::new().
+    let mut configuration = Configuration::default();
+
+    for ast in db.iter_asts() {
+        let new_config = validate_configuration(ast, &mut diagnostics, connectors);
+
+        configuration.datasources.extend(new_config.datasources.into_iter());
+        configuration.generators.extend(new_config.generators.into_iter());
+        configuration.warnings.extend(new_config.warnings.into_iter());
+    }
+
+    diagnostics.to_result().map(|_| configuration)
+}
+
 fn validate_configuration(
     schema_ast: &ast::SchemaAst,
     diagnostics: &mut Diagnostics,

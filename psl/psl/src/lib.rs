@@ -40,9 +40,25 @@ pub fn parse_configuration(schema: &str) -> Result<Configuration, Diagnostics> {
     psl_core::parse_configuration(schema, builtin_connectors::BUILTIN_CONNECTORS)
 }
 
+/// Parses and validate a schema, but skip analyzing everything except datasource and generator
+/// blocks.
+pub fn parse_configuration_multi_file(schemas: Vec<(String, SourceFile)>) -> Result<Configuration, Diagnostics> {
+    psl_core::parse_configuration_multi_file(schemas, builtin_connectors::BUILTIN_CONNECTORS)
+}
+
 /// Parse and analyze a Prisma schema.
 pub fn parse_schema(file: impl Into<SourceFile>) -> Result<ValidatedSchema, String> {
     let mut schema = validate(file.into());
+    schema
+        .diagnostics
+        .to_result()
+        .map_err(|err| err.to_pretty_string("schema.prisma", schema.db.source_assert_single()))?;
+    Ok(schema)
+}
+
+/// Parse and analyze a Prisma schema.
+pub fn parse_schema_multi(files: Vec<(String, SourceFile)>) -> Result<ValidatedSchema, String> {
+    let mut schema = validate_multi_file(files);
     schema
         .diagnostics
         .to_result()

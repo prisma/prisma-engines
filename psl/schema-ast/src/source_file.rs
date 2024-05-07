@@ -3,7 +3,7 @@ use std::sync::Arc;
 use serde::{Deserialize, Deserializer};
 
 /// A Prisma schema document.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct SourceFile {
     contents: Contents,
 }
@@ -77,7 +77,7 @@ impl From<String> for SourceFile {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 enum Contents {
     Static(&'static str),
     Allocated(Arc<str>),
