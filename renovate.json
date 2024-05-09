@@ -46,7 +46,7 @@
       "groupName": "rust toolchain update",
       "matchManagers": ["regex"],
       "matchDepNames": ["rust"],
-      "schedule": ["every 5 mins"]
+      "schedule": ["before 7am every weekday"]
     }
   ],
   "customManagers": [
