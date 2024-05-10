@@ -18,12 +18,7 @@ pub(crate) fn extensions_completion(completion_list: &mut lsp_types::CompletionL
     })
 }
 
-#[cfg(any(
-    feature = "postgresql",
-    feature = "cockroachdb",
-    feature = "mssql",
-    feature = "mysql"
-))]
+#[cfg(any(feature = "postgresql", feature = "cockroachdb", feature = "mysql"))]
 pub(crate) fn schemas_completion(completion_list: &mut lsp_types::CompletionList) {
     use lsp_types::*;
     completion_list.items.push(CompletionItem {
