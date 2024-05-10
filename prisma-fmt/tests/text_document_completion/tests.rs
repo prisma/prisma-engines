@@ -15,9 +15,11 @@ scenarios! {
     argument_after_trailing_comma
     default_map_end_of_args_list
     default_map_mssql
+    default_map_mssql_multifile
     empty_schema
     extended_indexes_basic
     extended_indexes_types_postgres
+    extended_indexes_types_postgres_multifile
     extended_indexes_types_mysql
     extended_indexes_types_sqlserver
     extended_indexes_types_sqlite
@@ -30,6 +32,8 @@ scenarios! {
     extended_indexes_operators_cockroach_gin
     language_tools_relation_directive
     no_default_map_on_postgres
+    no_default_map_on_postgres_multifile
+    referential_actions_multifile
     referential_actions_end_of_args_list
     referential_actions_in_progress
     referential_actions_in_progress_2
