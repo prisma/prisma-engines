@@ -1,6 +1,5 @@
 // `clippy::empty_docs` is required because of the `tsify` crate.
-// TODO: uncomment after rust 1.78 update
-#![allow(unused_imports/*, clippy::empty_docs*/)]
+#![allow(unused_imports, clippy::empty_docs)]
 
 use std::str::FromStr;
 
