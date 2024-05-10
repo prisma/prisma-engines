@@ -44,7 +44,7 @@ pub fn parse_configuration(schema: &str) -> Result<Configuration, Diagnostics> {
 /// Parses and validates Prisma schemas, but skip analyzing everything except datasource and generator
 /// blocks.
 pub fn parse_configuration_multi_file(
-    files: Vec<(String, SourceFile)>,
+    files: &[(String, SourceFile)],
 ) -> Result<(Files, Configuration), (Files, Diagnostics)> {
     psl_core::parse_configuration_multi_file(files, builtin_connectors::BUILTIN_CONNECTORS)
 }

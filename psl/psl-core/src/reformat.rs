@@ -26,7 +26,7 @@ pub fn reformat_validated_schema_into_single(schema: ValidatedSchema, indent_wid
 
 pub fn reformat_multiple(sources: Vec<(String, SourceFile)>, indent_width: usize) -> Vec<(String, String)> {
     let mut diagnostics = diagnostics::Diagnostics::new();
-    let db = parser_database::ParserDatabase::new(sources, &mut diagnostics);
+    let db = parser_database::ParserDatabase::new(&sources, &mut diagnostics);
 
     if diagnostics.has_errors() {
         db.iter_file_ids()

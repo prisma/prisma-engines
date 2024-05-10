@@ -1,5 +1,8 @@
 use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand};
-use psl::{parser_database::walkers::CompleteInlineRelationWalker, schema_ast::ast::SourceConfig, Configuration};
+use psl::{
+    diagnostics::FileId, parser_database::walkers::CompleteInlineRelationWalker, schema_ast::ast::SourceConfig,
+    Configuration,
+};
 
 pub(crate) fn edit_referential_integrity(
     actions: &mut Vec<CodeActionOrCommand>,
@@ -39,6 +42,7 @@ pub(crate) fn edit_referential_integrity(
 pub(crate) fn replace_set_default_mysql(
     actions: &mut Vec<CodeActionOrCommand>,
     params: &lsp_types::CodeActionParams,
+    file_id: FileId,
     schema: &str,
     relation: CompleteInlineRelationWalker<'_>,
     config: &Configuration,
@@ -56,6 +60,10 @@ pub(crate) fn replace_set_default_mysql(
         Some(span) => span,
         None => return,
     };
+
+    if span.file_id != file_id {
+        return;
+    }
 
     let span_diagnostics = match super::diagnostics_for_span(schema, &params.context.diagnostics, span) {
         Some(sd) => sd,

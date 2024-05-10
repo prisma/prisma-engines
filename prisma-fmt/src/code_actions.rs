@@ -3,6 +3,7 @@ mod multi_schema;
 mod relation_mode;
 mod relations;
 
+use log::warn;
 use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic, Range, TextEdit, WorkspaceEdit};
 use psl::{
     diagnostics::Span,
@@ -14,28 +15,35 @@ use psl::{
     schema_ast::ast::{Attribute, IndentationType, NewlineType, WithSpan},
     PreviewFeature,
 };
-use std::{collections::HashMap, sync::Arc};
+use std::collections::HashMap;
 
 pub(crate) fn empty_code_actions() -> Vec<CodeActionOrCommand> {
     Vec::new()
 }
 
-pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec<CodeActionOrCommand> {
+pub(crate) fn available_actions(
+    schema_files: Vec<(String, SourceFile)>,
+    initiating_file_name: &str,
+    params: CodeActionParams,
+) -> Vec<CodeActionOrCommand> {
     let mut actions = Vec::new();
 
-    let file = SourceFile::new_allocated(Arc::from(schema.into_boxed_str()));
-
-    let validated_schema = psl::validate(file);
+    let validated_schema = psl::validate_multi_file(schema_files);
 
     let config = &validated_schema.configuration;
 
     let datasource = config.datasources.first();
+    let Some(initiating_file_id) = validated_schema.db.file_id(initiating_file_name) else {
+        warn!("Initiating file name is not found in the schema");
+        return vec![];
+    };
 
-    for source in validated_schema.db.ast_assert_single().sources() {
+    let initiating_ast = validated_schema.db.ast(initiating_file_id);
+    for source in initiating_ast.sources() {
         relation_mode::edit_referential_integrity(
             &mut actions,
             &params,
-            validated_schema.db.source_assert_single(),
+            validated_schema.db.source(initiating_file_id),
             source,
         )
     }
@@ -43,14 +51,14 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
     // models AND views
     for model in validated_schema
         .db
-        .walk_models()
-        .chain(validated_schema.db.walk_views())
+        .walk_models_in_file(initiating_file_id)
+        .chain(validated_schema.db.walk_views_in_file(initiating_file_id))
     {
         if config.preview_features().contains(PreviewFeature::MultiSchema) {
             multi_schema::add_schema_block_attribute_model(
                 &mut actions,
                 &params,
-                validated_schema.db.source_assert_single(),
+                validated_schema.db.source(initiating_file_id),
                 config,
                 model,
             );
@@ -58,7 +66,7 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
             multi_schema::add_schema_to_schemas(
                 &mut actions,
                 &params,
-                validated_schema.db.source_assert_single(),
+                validated_schema.db.source(initiating_file_id),
                 config,
                 model,
             );
@@ -70,19 +78,19 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
             mongodb::add_native_for_auto_id(
                 &mut actions,
                 &params,
-                validated_schema.db.source_assert_single(),
+                validated_schema.db.source(initiating_file_id),
                 model,
                 datasource.unwrap(),
             );
         }
     }
 
-    for enumerator in validated_schema.db.walk_enums() {
+    for enumerator in validated_schema.db.walk_enums_in_file(initiating_file_id) {
         if config.preview_features().contains(PreviewFeature::MultiSchema) {
             multi_schema::add_schema_block_attribute_enum(
                 &mut actions,
                 &params,
-                validated_schema.db.source_assert_single(),
+                validated_schema.db.source(initiating_file_id),
                 config,
                 enumerator,
             )
@@ -96,36 +104,41 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
                 None => continue,
             };
 
-            relations::add_referenced_side_unique(
-                &mut actions,
-                &params,
-                validated_schema.db.source_assert_single(),
-                complete_relation,
-            );
-
-            if relation.is_one_to_one() {
-                relations::add_referencing_side_unique(
+            if relation.referenced_model().is_defined_in_file(initiating_file_id) {
+                relations::add_referenced_side_unique(
                     &mut actions,
                     &params,
-                    validated_schema.db.source_assert_single(),
+                    validated_schema.db.source(initiating_file_id),
                     complete_relation,
                 );
             }
 
-            if validated_schema.relation_mode().is_prisma() {
-                relations::add_index_for_relation_fields(
-                    &mut actions,
-                    &params,
-                    validated_schema.db.source_assert_single(),
-                    complete_relation.referencing_field(),
-                );
+            if relation.referencing_model().is_defined_in_file(initiating_file_id) {
+                if relation.is_one_to_one() {
+                    relations::add_referencing_side_unique(
+                        &mut actions,
+                        &params,
+                        validated_schema.db.source(initiating_file_id),
+                        complete_relation,
+                    );
+                }
+
+                if validated_schema.relation_mode().is_prisma() {
+                    relations::add_index_for_relation_fields(
+                        &mut actions,
+                        &params,
+                        validated_schema.db.source(initiating_file_id),
+                        complete_relation.referencing_field(),
+                    );
+                }
             }
 
             if validated_schema.relation_mode().uses_foreign_keys() {
                 relation_mode::replace_set_default_mysql(
                     &mut actions,
                     &params,
-                    validated_schema.db.source_assert_single(),
+                    initiating_file_id,
+                    validated_schema.db.source(initiating_file_id),
                     complete_relation,
                     config,
                 )

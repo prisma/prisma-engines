@@ -47,6 +47,7 @@ pub use ids::*;
 pub use names::is_reserved_type_name;
 use names::Names;
 pub use relations::{ManyToManyRelationId, ReferentialAction, RelationId};
+use schema_ast::ast::SourceConfig;
 pub use schema_ast::{ast, SourceFile};
 pub use types::{
     IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, RelationFieldId, ScalarFieldId, ScalarFieldType,
@@ -83,12 +84,12 @@ pub struct ParserDatabase {
 impl ParserDatabase {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
     pub fn new_single_file(file: SourceFile, diagnostics: &mut Diagnostics) -> Self {
-        Self::new(vec![("schema.prisma".to_owned(), file)], diagnostics)
+        Self::new(&[("schema.prisma".to_owned(), file)], diagnostics)
     }
 
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub fn new(schemas: Vec<(String, schema_ast::SourceFile)>, diagnostics: &mut Diagnostics) -> Self {
-        let asts = Files::new(schemas, diagnostics);
+    pub fn new(schemas: &[(String, schema_ast::SourceFile)], diagnostics: &mut Diagnostics) -> Self {
+        let asts = Files::new(&schemas, diagnostics);
 
         let mut interner = Default::default();
         let mut names = Default::default();
@@ -172,6 +173,13 @@ impl ParserDatabase {
         self.asts.iter().map(|(_, _, _, ast)| ast)
     }
 
+    /// Returns file id by name
+    pub fn file_id(&self, file_name: &str) -> Option<FileId> {
+        self.asts
+            .iter()
+            .find_map(|(file_id, name, _, _)| if name == file_name { Some(file_id) } else { None })
+    }
+
     /// Iterate all parsed ASTs, consuming parser database
     pub fn into_iter_asts(self) -> impl Iterator<Item = ast::SchemaAst> {
         self.asts.into_iter().map(|(_, _, _, ast)| ast)
@@ -218,6 +226,11 @@ impl ParserDatabase {
     /// The name of the file.
     pub fn file_name(&self, file_id: FileId) -> &str {
         self.asts[file_id].0.as_str()
+    }
+
+    /// Iterate all datasources defined in the schema
+    pub fn datasources(&self) -> impl Iterator<Item = &SourceConfig> {
+        self.iter_asts().flat_map(|ast| ast.sources())
     }
 }
 
