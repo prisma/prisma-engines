@@ -70,7 +70,6 @@ impl<'db> ModelWalker<'db> {
         &self.db.asts[self.id]
     }
 
-
     /// The parsed attributes.
     #[track_caller]
     pub(crate) fn attributes(self) -> &'db ModelAttributes {

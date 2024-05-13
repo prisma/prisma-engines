@@ -83,7 +83,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
                     None
                 }
             })
-            .expect(&format!("Expected to have {TARGET_SCHEMA_FILE} in multifile schemas"))
+            .unwrap_or_else(|| panic!("Expected to have {TARGET_SCHEMA_FILE} in when multi-file schema are used"))
             .as_str()
     };
 

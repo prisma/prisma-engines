@@ -4,7 +4,6 @@ pub fn load_schema_files(dir: impl AsRef<Path>) -> Vec<(String, String)> {
     let schema_files = {
         std::fs::read_dir(dir.as_ref())
             .unwrap()
-            .into_iter()
             .map(Result::unwrap)
             .filter_map(|entry| {
                 let ft = entry.file_type().ok()?;
@@ -25,7 +24,7 @@ pub fn load_schema_files(dir: impl AsRef<Path>) -> Vec<(String, String)> {
             })
             .collect::<Vec<_>>()
     };
-    assert!(schema_files.len() > 0);
+    assert!(!schema_files.is_empty());
 
     schema_files
 }
