@@ -4,18 +4,71 @@ mod relation_mode;
 mod relations;
 
 use log::warn;
-use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic, Range, TextEdit, WorkspaceEdit};
+use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic, Range, TextEdit, Url, WorkspaceEdit};
 use psl::{
-    diagnostics::Span,
+    diagnostics::{FileId, Span},
     parser_database::{
         ast,
         walkers::{ModelWalker, RefinedRelationWalker, ScalarFieldWalker},
-        SourceFile,
+        ParserDatabase, SourceFile,
     },
     schema_ast::ast::{Attribute, IndentationType, NewlineType, WithSpan},
-    PreviewFeature,
+    Configuration, Datasource, PreviewFeature,
 };
 use std::collections::HashMap;
+
+pub(super) struct CodeActionsContext<'a> {
+    pub(super) db: &'a ParserDatabase,
+    pub(super) config: &'a Configuration,
+    pub(super) initiating_file_id: FileId,
+    pub(super) lsp_params: CodeActionParams,
+}
+
+impl<'a> CodeActionsContext<'a> {
+    pub(super) fn initiating_file_source(&self) -> &str {
+        self.db.source(self.initiating_file_id)
+    }
+
+    pub(super) fn initiating_file_uri(&self) -> &str {
+        self.db.file_name(self.initiating_file_id)
+    }
+
+    pub(super) fn diagnostics(&self) -> &[Diagnostic] {
+        &self.lsp_params.context.diagnostics
+    }
+
+    pub(super) fn datasource(&self) -> Option<&Datasource> {
+        self.config.datasources.first()
+    }
+
+    /// A function to find diagnostics matching the given span. Used for
+    /// copying the diagnostics to a code action quick fix.
+    #[track_caller]
+    pub(super) fn diagnostics_for_span(&self, span: ast::Span) -> Option<Vec<Diagnostic>> {
+        if span.file_id != self.initiating_file_id {
+            return None;
+        }
+
+        let res: Vec<_> = self
+            .diagnostics()
+            .iter()
+            .filter(|diag| {
+                span.overlaps(crate::range_to_span(
+                    diag.range,
+                    self.initiating_file_source(),
+                    self.initiating_file_id,
+                ))
+            })
+            .cloned()
+            .collect();
+
+        if res.is_empty() {
+            None
+        } else {
+            Some(res)
+        }
+    }
+}
 
 pub(crate) fn empty_code_actions() -> Vec<CodeActionOrCommand> {
     Vec::new()
@@ -38,14 +91,16 @@ pub(crate) fn available_actions(
         return vec![];
     };
 
+    let context = CodeActionsContext {
+        db: &validated_schema.db,
+        config,
+        initiating_file_id,
+        lsp_params: params,
+    };
+
     let initiating_ast = validated_schema.db.ast(initiating_file_id);
     for source in initiating_ast.sources() {
-        relation_mode::edit_referential_integrity(
-            &mut actions,
-            &params,
-            validated_schema.db.source(initiating_file_id),
-            source,
-        )
+        relation_mode::edit_referential_integrity(&mut actions, &context, source)
     }
 
     // models AND views
@@ -55,45 +110,21 @@ pub(crate) fn available_actions(
         .chain(validated_schema.db.walk_views_in_file(initiating_file_id))
     {
         if config.preview_features().contains(PreviewFeature::MultiSchema) {
-            multi_schema::add_schema_block_attribute_model(
-                &mut actions,
-                &params,
-                validated_schema.db.source(initiating_file_id),
-                config,
-                model,
-            );
+            multi_schema::add_schema_block_attribute_model(&mut actions, &context, model);
 
-            multi_schema::add_schema_to_schemas(
-                &mut actions,
-                &params,
-                validated_schema.db.source(initiating_file_id),
-                config,
-                model,
-            );
+            multi_schema::add_schema_to_schemas(&mut actions, &context, model);
         }
 
         if matches!(datasource, Some(ds) if ds.active_provider == "mongodb") {
-            mongodb::add_at_map_for_id(&mut actions, &params, validated_schema.db.source_assert_single(), model);
+            mongodb::add_at_map_for_id(&mut actions, &context, model);
 
-            mongodb::add_native_for_auto_id(
-                &mut actions,
-                &params,
-                validated_schema.db.source(initiating_file_id),
-                model,
-                datasource.unwrap(),
-            );
+            mongodb::add_native_for_auto_id(&mut actions, &context, model, datasource.unwrap());
         }
     }
 
     for enumerator in validated_schema.db.walk_enums_in_file(initiating_file_id) {
         if config.preview_features().contains(PreviewFeature::MultiSchema) {
-            multi_schema::add_schema_block_attribute_enum(
-                &mut actions,
-                &params,
-                validated_schema.db.source(initiating_file_id),
-                config,
-                enumerator,
-            )
+            multi_schema::add_schema_block_attribute_enum(&mut actions, &context, enumerator)
         }
     }
 
@@ -104,70 +135,29 @@ pub(crate) fn available_actions(
                 None => continue,
             };
 
-            if relation.referenced_model().is_defined_in_file(initiating_file_id) {
-                relations::add_referenced_side_unique(
-                    &mut actions,
-                    &params,
-                    validated_schema.db.source(initiating_file_id),
-                    complete_relation,
-                );
+            relations::add_referenced_side_unique(&mut actions, &context, complete_relation);
+
+            if relation.is_one_to_one() {
+                relations::add_referencing_side_unique(&mut actions, &context, complete_relation);
             }
 
             if relation.referencing_model().is_defined_in_file(initiating_file_id) {
-                if relation.is_one_to_one() {
-                    relations::add_referencing_side_unique(
-                        &mut actions,
-                        &params,
-                        validated_schema.db.source(initiating_file_id),
-                        complete_relation,
-                    );
-                }
-
                 if validated_schema.relation_mode().is_prisma() {
                     relations::add_index_for_relation_fields(
                         &mut actions,
-                        &params,
-                        validated_schema.db.source(initiating_file_id),
+                        &context,
                         complete_relation.referencing_field(),
                     );
                 }
             }
 
             if validated_schema.relation_mode().uses_foreign_keys() {
-                relation_mode::replace_set_default_mysql(
-                    &mut actions,
-                    &params,
-                    initiating_file_id,
-                    validated_schema.db.source(initiating_file_id),
-                    complete_relation,
-                    config,
-                )
+                relation_mode::replace_set_default_mysql(&mut actions, &context, complete_relation)
             }
         }
     }
 
     actions
-}
-
-/// A function to find diagnostics matching the given span. Used for
-/// copying the diagnostics to a code action quick fix.
-#[track_caller]
-pub(super) fn diagnostics_for_span(
-    schema: &str,
-    diagnostics: &[Diagnostic],
-    span: ast::Span,
-) -> Option<Vec<Diagnostic>> {
-    let res: Vec<_> = diagnostics
-        .iter()
-        .filter(|diag| span.overlaps(crate::range_to_span(diag.range, schema)))
-        .cloned()
-        .collect();
-
-    if res.is_empty() {
-        None
-    } else {
-        Some(res)
-    }
 }
 
 fn filter_diagnostics(span_diagnostics: Vec<Diagnostic>, diagnostic_message: &str) -> Option<Vec<Diagnostic>> {
@@ -272,15 +262,15 @@ fn format_block_attribute(
 }
 
 fn create_text_edit(
-    schema: &str,
+    target_file_uri: &str,
+    target_file_content: &str,
     formatted_attribute: String,
     append: bool,
     span: Span,
-    params: &CodeActionParams,
-) -> WorkspaceEdit {
+) -> Result<WorkspaceEdit, Box<dyn std::error::Error>> {
     let range = match append {
-        true => range_after_span(schema, span),
-        false => span_to_range(schema, span),
+        true => range_after_span(target_file_content, span),
+        false => span_to_range(target_file_content, span),
     };
 
     let text = TextEdit {
@@ -289,10 +279,19 @@ fn create_text_edit(
     };
 
     let mut changes = HashMap::new();
-    changes.insert(params.text_document.uri.clone(), vec![text]);
+    let url = parse_url(target_file_uri)?;
+    changes.insert(url, vec![text]);
 
-    WorkspaceEdit {
+    Ok(WorkspaceEdit {
         changes: Some(changes),
         ..Default::default()
+    })
+}
+
+pub(crate) fn parse_url(url: &str) -> Result<Url, Box<dyn std::error::Error>> {
+    let result = Url::parse(url);
+    if result.is_err() {
+        warn!("Could not parse url {url}")
     }
+    return Ok(result?);
 }

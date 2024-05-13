@@ -1,11 +1,11 @@
-use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, TextEdit, WorkspaceEdit};
+use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, TextEdit, Url, WorkspaceEdit};
 use psl::parser_database::{
     ast::WithSpan,
     walkers::{CompleteInlineRelationWalker, RelationFieldWalker},
 };
 use std::collections::HashMap;
 
-use super::format_block_attribute;
+use super::{format_block_attribute, CodeActionsContext};
 
 /// If the referencing side of the one-to-one relation does not point
 /// to a unique constraint, the action adds the attribute.
@@ -49,8 +49,7 @@ use super::format_block_attribute;
 /// ```
 pub(super) fn add_referencing_side_unique(
     actions: &mut Vec<CodeActionOrCommand>,
-    params: &CodeActionParams,
-    schema: &str,
+    context: &CodeActionsContext<'_>,
     relation: CompleteInlineRelationWalker<'_>,
 ) {
     if relation
@@ -69,14 +68,14 @@ pub(super) fn add_referencing_side_unique(
 
     let attribute_name = "unique";
     let text = super::create_missing_attribute(
-        schema,
+        context.initiating_file_source(),
         relation.referencing_model(),
         relation.referencing_fields(),
         attribute_name,
     );
 
     let mut changes = HashMap::new();
-    changes.insert(params.text_document.uri.clone(), vec![text]);
+    changes.insert(context.lsp_params.text_document.uri.clone(), vec![text]);
 
     let edit = WorkspaceEdit {
         changes: Some(changes),
@@ -85,11 +84,7 @@ pub(super) fn add_referencing_side_unique(
 
     // The returned diagnostics are the ones we promise to fix with
     // the code action.
-    let diagnostics = super::diagnostics_for_span(
-        schema,
-        &params.context.diagnostics,
-        relation.referencing_field().ast_field().span(),
-    );
+    let diagnostics = context.diagnostics_for_span(relation.referencing_field().ast_field().span());
 
     let action = CodeAction {
         title: String::from("Make referencing fields unique"),
@@ -141,8 +136,7 @@ pub(super) fn add_referencing_side_unique(
 /// ```
 pub(super) fn add_referenced_side_unique(
     actions: &mut Vec<CodeActionOrCommand>,
-    params: &CodeActionParams,
-    schema: &str,
+    context: &CodeActionsContext<'_>,
     relation: CompleteInlineRelationWalker<'_>,
 ) {
     if relation
@@ -153,6 +147,10 @@ pub(super) fn add_referenced_side_unique(
         return;
     }
 
+    let file_id = relation.referenced_model().ast_model().span().file_id;
+    let file_uri = relation.db.file_name(file_id);
+    let file_content = relation.db.source(file_id);
+
     match (relation.referencing_fields().len(), relation.referenced_fields().len()) {
         (0, 0) => return,
         (a, b) if a != b => return,
@@ -161,14 +159,15 @@ pub(super) fn add_referenced_side_unique(
 
     let attribute_name = "unique";
     let text = super::create_missing_attribute(
-        schema,
+        file_content,
         relation.referenced_model(),
         relation.referenced_fields(),
         attribute_name,
     );
 
     let mut changes = HashMap::new();
-    changes.insert(params.text_document.uri.clone(), vec![text]);
+    // TODO: don't unwrap
+    changes.insert(Url::parse(file_uri).unwrap(), vec![text]);
 
     let edit = WorkspaceEdit {
         changes: Some(changes),
@@ -177,11 +176,7 @@ pub(super) fn add_referenced_side_unique(
 
     // The returned diagnostics are the ones we promise to fix with
     // the code action.
-    let diagnostics = super::diagnostics_for_span(
-        schema,
-        &params.context.diagnostics,
-        relation.referencing_field().ast_field().span(),
-    );
+    let diagnostics = context.diagnostics_for_span(relation.referencing_field().ast_field().span());
 
     let action = CodeAction {
         title: String::from("Make referenced field(s) unique"),
@@ -241,8 +236,7 @@ pub(super) fn add_referenced_side_unique(
 /// ```
 pub(super) fn add_index_for_relation_fields(
     actions: &mut Vec<CodeActionOrCommand>,
-    params: &CodeActionParams,
-    schema: &str,
+    context: &CodeActionsContext<'_>,
     relation: RelationFieldWalker<'_>,
 ) {
     let fields = match relation.fields() {
@@ -269,25 +263,21 @@ pub(super) fn add_index_for_relation_fields(
         &relation.model().ast_model().attributes,
     );
 
-    let range = super::range_after_span(schema, relation.model().ast_model().span());
+    let range = super::range_after_span(context.initiating_file_source(), relation.model().ast_model().span());
     let text = TextEdit {
         range,
         new_text: formatted_attribute,
     };
 
     let mut changes = HashMap::new();
-    changes.insert(params.text_document.uri.clone(), vec![text]);
+    changes.insert(context.lsp_params.text_document.uri.clone(), vec![text]);
 
     let edit = WorkspaceEdit {
         changes: Some(changes),
         ..Default::default()
     };
 
-    let span_diagnostics = match super::diagnostics_for_span(
-        schema,
-        &params.context.diagnostics,
-        relation.relation_attribute().unwrap().span(),
-    ) {
+    let span_diagnostics = match context.diagnostics_for_span(relation.relation_attribute().unwrap().span()) {
         Some(sd) => sd,
         None => return,
     };

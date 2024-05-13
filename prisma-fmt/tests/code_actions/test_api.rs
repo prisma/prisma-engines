@@ -2,40 +2,58 @@ use lsp_types::{Diagnostic, DiagnosticSeverity};
 use once_cell::sync::Lazy;
 use prisma_fmt::offset_to_position;
 use psl::SourceFile;
-use std::{fmt::Write as _, io::Write as _, sync::Arc};
+use std::{fmt::Write as _, io::Write as _, path::PathBuf};
+
+use crate::helpers::load_schema_files;
 
 const SCENARIOS_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/code_actions/scenarios");
+/**
+ * File used as a target for code-actions in multi-file
+ * tests
+ */
+const TARGET_SCHEMA_FILE: &str = "_target.prisma";
 static UPDATE_EXPECT: Lazy<bool> = Lazy::new(|| std::env::var("UPDATE_EXPECT").is_ok());
 
-fn parse_schema_diagnostics(file: impl Into<SourceFile>) -> Option<Vec<Diagnostic>> {
-    let schema = psl::validate(file.into());
+fn parse_schema_diagnostics(files: &[(String, String)], initiating_file_name: &str) -> Option<Vec<Diagnostic>> {
+    let schema = psl::validate_multi_file(
+        files
+            .iter()
+            .map(|(name, content)| (name.to_owned(), SourceFile::from(content)))
+            .collect(),
+    );
 
+    let file_id = schema.db.file_id(initiating_file_name).unwrap();
+    let source = schema.db.source(file_id);
     match (schema.diagnostics.warnings(), schema.diagnostics.errors()) {
         ([], []) => None,
         (warnings, errors) => {
             let mut diagnostics = Vec::new();
             for warn in warnings.iter() {
-                diagnostics.push(Diagnostic {
-                    severity: Some(DiagnosticSeverity::WARNING),
-                    message: warn.message().to_owned(),
-                    range: lsp_types::Range {
-                        start: offset_to_position(warn.span().start, schema.db.source_assert_single()),
-                        end: offset_to_position(warn.span().end, schema.db.source_assert_single()),
-                    },
-                    ..Default::default()
-                });
+                if warn.span().file_id == file_id {
+                    diagnostics.push(Diagnostic {
+                        severity: Some(DiagnosticSeverity::WARNING),
+                        message: warn.message().to_owned(),
+                        range: lsp_types::Range {
+                            start: offset_to_position(warn.span().start, source),
+                            end: offset_to_position(warn.span().end, source),
+                        },
+                        ..Default::default()
+                    });
+                }
             }
 
             for error in errors.iter() {
-                diagnostics.push(Diagnostic {
-                    severity: Some(DiagnosticSeverity::ERROR),
-                    message: error.message().to_owned(),
-                    range: lsp_types::Range {
-                        start: offset_to_position(error.span().start, schema.db.source_assert_single()),
-                        end: offset_to_position(error.span().end, schema.db.source_assert_single()),
-                    },
-                    ..Default::default()
-                });
+                if error.span().file_id == file_id {
+                    diagnostics.push(Diagnostic {
+                        severity: Some(DiagnosticSeverity::ERROR),
+                        message: error.message().to_owned(),
+                        range: lsp_types::Range {
+                            start: offset_to_position(error.span().start, source),
+                            end: offset_to_position(error.span().end, source),
+                        },
+                        ..Default::default()
+                    });
+                }
             }
 
             Some(diagnostics)
@@ -46,14 +64,30 @@ fn parse_schema_diagnostics(file: impl Into<SourceFile>) -> Option<Vec<Diagnosti
 pub(crate) fn test_scenario(scenario_name: &str) {
     let mut path = String::with_capacity(SCENARIOS_PATH.len() + 12);
 
-    let schema = {
-        write!(path, "{SCENARIOS_PATH}/{scenario_name}/schema.prisma").unwrap();
-        std::fs::read_to_string(&path).unwrap()
+    let schema_files = {
+        write!(path, "{SCENARIOS_PATH}/{scenario_name}").unwrap();
+        load_schema_files(&path)
     };
 
-    let source_file = psl::parser_database::SourceFile::new_allocated(Arc::from(schema.clone().into_boxed_str()));
+    let initiating_file_name = if schema_files.len() == 1 {
+        schema_files[0].0.as_str()
+    } else {
+        schema_files
+            .iter()
+            .find_map(|(file_path, _)| {
+                let path = PathBuf::from(file_path);
+                let file_name = path.file_name()?;
+                if file_name == TARGET_SCHEMA_FILE {
+                    Some(file_path)
+                } else {
+                    None
+                }
+            })
+            .expect(&format!("Expected to have {TARGET_SCHEMA_FILE} in multifile schemas"))
+            .as_str()
+    };
 
-    let diagnostics = match parse_schema_diagnostics(source_file) {
+    let diagnostics = match parse_schema_diagnostics(&schema_files, initiating_file_name) {
         Some(diagnostics) => diagnostics,
         None => Vec::new(),
     };
@@ -64,7 +98,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
 
     let params = lsp_types::CodeActionParams {
         text_document: lsp_types::TextDocumentIdentifier {
-            uri: "file:/path/to/schema.prisma".parse().unwrap(),
+            uri: initiating_file_name.parse().unwrap(),
         },
         range: lsp_types::Range::default(),
         context: lsp_types::CodeActionContext {
@@ -77,10 +111,9 @@ pub(crate) fn test_scenario(scenario_name: &str) {
         },
     };
 
-    let schema_files = serde_json::to_string_pretty(&[("schema.prisma", schema)]).unwrap();
     let result = prisma_fmt::code_actions(
-        schema_files,
-        "schema.prisma".into(),
+        serde_json::to_string_pretty(&schema_files).unwrap(),
+        initiating_file_name,
         &serde_json::to_string_pretty(&params).unwrap(),
     );
     // Prettify the JSON

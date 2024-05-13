@@ -1,0 +1,41 @@
+[
+  {
+    "title": "Make referencing fields unique",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 4,
+            "character": 2
+          },
+          "end": {
+            "line": 5,
+            "character": 0
+          }
+        },
+        "severity": 1,
+        "message": "Error parsing attribute \"@relation\": A one-to-one relation must use unique fields on the defining side. Either add an `@@unique([bId1, bId2])` attribute to the model, or change the relation to one-to-many."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/_target.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 5,
+                "character": 0
+              },
+              "end": {
+                "line": 5,
+                "character": 1
+              }
+            },
+            "newText": "\n  @@unique([bId1, bId2])\n}"
+          }
+        ]
+      }
+    }
+  }
+]

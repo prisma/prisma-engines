@@ -12,14 +12,14 @@ mod validate;
 
 use log::*;
 use lsp_types::{Position, Range};
-use psl::parser_database::ast;
+use psl::{diagnostics::FileId, parser_database::ast};
 use schema_file_input::SchemaFileInput;
 
 /// The API is modelled on an LSP [completion
 /// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_completion).
 /// Input and output are both JSON, the request being a `CompletionParams` object and the response
 /// being a `CompletionList` object.
-pub fn text_document_completion(schema_files: String, initiating_file_name: String, params: &str) -> String {
+pub fn text_document_completion(schema_files: String, initiating_file_name: &str, params: &str) -> String {
     let params = if let Ok(params) = serde_json::from_str::<lsp_types::CompletionParams>(params) {
         params
     } else {
@@ -38,7 +38,7 @@ pub fn text_document_completion(schema_files: String, initiating_file_name: Stri
 }
 
 /// This API is modelled on an LSP [code action request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_codeAction=). Input and output are both JSON, the request being a `CodeActionParams` object and the response being a list of `CodeActionOrCommand` objects.
-pub fn code_actions(schema_files: String, initiating_file_name: String, params: &str) -> String {
+pub fn code_actions(schema_files: String, initiating_file_name: &str, params: &str) -> String {
     let params = if let Ok(params) = serde_json::from_str::<lsp_types::CodeActionParams>(params) {
         params
     } else {
@@ -264,11 +264,11 @@ pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<
 
 #[track_caller]
 /// Converts an LSP range to a span.
-pub(crate) fn range_to_span(range: Range, document: &str) -> ast::Span {
+pub(crate) fn range_to_span(range: Range, document: &str, file_id: FileId) -> ast::Span {
     let start = position_to_offset(&range.start, document).unwrap();
     let end = position_to_offset(&range.end, document).unwrap();
 
-    ast::Span::new(start, end, psl::parser_database::FileId::ZERO)
+    ast::Span::new(start, end, file_id)
 }
 
 /// Gives the LSP position right after the given span.

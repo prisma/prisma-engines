@@ -1,3 +1,4 @@
+use crate::helpers::load_schema_files;
 use once_cell::sync::Lazy;
 use std::{fmt::Write as _, io::Write as _};
 
@@ -10,36 +11,14 @@ pub(crate) fn test_scenario(scenario_name: &str) {
 
     let schema_files = {
         write!(path, "{SCENARIOS_PATH}/{scenario_name}").unwrap();
-        std::fs::read_dir(&path)
-            .unwrap()
-            .into_iter()
-            .map(Result::unwrap)
-            .filter_map(|entry| {
-                let ft = entry.file_type().ok()?;
-                if ft.is_dir() {
-                    return None;
-                }
-                let path = entry.path();
-                let ext = path.extension()?;
-                if ext == "prisma" {
-                    Some((
-                        path.to_str().unwrap().to_owned(),
-                        std::fs::read_to_string(&path).unwrap(),
-                    ))
-                } else {
-                    None
-                }
-            })
-            .collect::<Vec<_>>()
+        load_schema_files(&path)
     };
-
-    assert!(schema_files.len() > 0);
 
     path.clear();
     write!(path, "{SCENARIOS_PATH}/{scenario_name}/result.json").unwrap();
     let expected_result = std::fs::read_to_string(&path).unwrap_or_else(|_| String::new());
 
-    let (initiating_file, cursor_position, schema_files) = take_cursor(schema_files);
+    let (initiating_file_name, cursor_position, schema_files) = take_cursor(schema_files);
     let params = lsp_types::CompletionParams {
         text_document_position: lsp_types::TextDocumentPositionParams {
             text_document: lsp_types::TextDocumentIdentifier {
@@ -56,7 +35,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
 
     let result = prisma_fmt::text_document_completion(
         serde_json::to_string_pretty(&schema_files).unwrap(),
-        initiating_file,
+        &initiating_file_name,
         &serde_json::to_string_pretty(&params).unwrap(),
     );
     // Prettify the JSON
