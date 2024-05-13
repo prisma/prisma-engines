@@ -512,7 +512,7 @@ impl<'a> Statistics<'a> {
 
                     let type_name = format!("{container_name}_{field}").to_case(Case::Pascal);
                     let type_name = sanitize_string(&type_name).unwrap_or(type_name);
-                    container_name = type_name.clone();
+                    container_name.clone_from(&type_name);
 
                     if let Some(sampler) = self.samples.get_mut(&key) {
                         let has_composites = sampler.types.iter().any(|t| t.0.has_documents());

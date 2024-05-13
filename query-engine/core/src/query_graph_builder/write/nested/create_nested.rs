@@ -65,6 +65,7 @@ pub fn nested_create(
             Some(CreateManyRecordsFields {
                 fields: selected_fields,
                 order: selection_order,
+                nested: Vec::new(),
             })
         } else {
             None
@@ -75,6 +76,7 @@ pub fn nested_create(
             args: data_maps.into_iter().map(|(args, _nested)| args).collect(),
             skip_duplicates: false,
             selected_fields,
+            split_by_shape: !query_schema.has_capability(ConnectorCapability::SupportsDefaultInInsert),
         };
         let create_many_node = graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));
 
@@ -554,6 +556,7 @@ fn handle_one_to_one(
 
 pub fn nested_create_many(
     graph: &mut QueryGraph,
+    query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue<'_>,
@@ -585,6 +588,7 @@ pub fn nested_create_many(
         args,
         skip_duplicates,
         selected_fields: None,
+        split_by_shape: !query_schema.has_capability(ConnectorCapability::SupportsDefaultInInsert),
     };
 
     let create_node = graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));

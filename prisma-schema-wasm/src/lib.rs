@@ -29,7 +29,7 @@ fn register_panic_hook() {
 #[wasm_bindgen]
 pub fn format(schema: String, params: String) -> String {
     register_panic_hook();
-    prisma_fmt::format(&schema, &params)
+    prisma_fmt::format(schema, &params)
 }
 
 /// Docs: https://prisma.github.io/prisma-engines/doc/prisma_fmt/fn.get_config.html
@@ -56,6 +56,12 @@ pub fn lint(input: String) -> String {
 pub fn validate(params: String) -> Result<(), JsError> {
     register_panic_hook();
     prisma_fmt::validate(params).map_err(|e| JsError::new(&e))
+}
+
+#[wasm_bindgen]
+pub fn merge_schemas(input: String) -> Result<String, JsError> {
+    register_panic_hook();
+    prisma_fmt::merge_schemas(input).map_err(|e| JsError::new(&e))
 }
 
 #[wasm_bindgen]

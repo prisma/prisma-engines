@@ -41,7 +41,7 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
 
     let db = {
         let mut diag = Diagnostics::new();
-        ParserDatabase::new(source_file, &mut diag)
+        ParserDatabase::new_single_file(source_file, &mut diag)
     };
 
     let ctx = CompletionContext {
@@ -91,12 +91,17 @@ impl<'a> CompletionContext<'a> {
 }
 
 fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut CompletionList) {
-    match ctx.db.ast().find_at_position(ctx.position) {
+    let relation_mode = match ctx.config.map(|c| c.relation_mode()) {
+        Some(Some(rm)) => rm,
+        _ => ctx.connector().default_relation_mode(),
+    };
+
+    match ctx.db.ast_assert_single().find_at_position(ctx.position) {
         ast::SchemaPosition::Model(
             _model_id,
             ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("relation", _, Some(attr_name))),
         ) if attr_name == "onDelete" || attr_name == "onUpdate" => {
-            for referential_action in ctx.connector().referential_actions().iter() {
+            for referential_action in ctx.connector().referential_actions(&relation_mode).iter() {
                 completion_list.items.push(CompletionItem {
                     label: referential_action.as_str().to_owned(),
                     kind: Some(CompletionItemKind::ENUM),
@@ -190,7 +195,7 @@ fn ds_has_prop(ctx: CompletionContext<'_>, prop: &str) -> bool {
 
 fn push_namespaces(ctx: CompletionContext<'_>, completion_list: &mut CompletionList) {
     for (namespace, _) in ctx.namespaces() {
-        let insert_text = if add_quotes(ctx.params, ctx.db.source()) {
+        let insert_text = if add_quotes(ctx.params, ctx.db.source_assert_single()) {
             format!(r#""{namespace}""#)
         } else {
             namespace.to_string()

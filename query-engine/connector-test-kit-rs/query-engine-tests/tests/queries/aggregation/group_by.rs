@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schemas::numeric_text_optional_one2m), exclude(Sqlite("cfd1")))]
+#[test_suite(schema(schemas::numeric_text_optional_one2m))]
 mod aggregation_group_by {
     use query_engine_tests::{assert_error, run_query};
 

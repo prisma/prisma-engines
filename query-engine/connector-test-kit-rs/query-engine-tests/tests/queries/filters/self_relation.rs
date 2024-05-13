@@ -43,8 +43,12 @@ mod self_relation_filters {
         schema.to_owned()
     }
 
-    // Filter Queries along self relations should succeed with one level.
     #[connector_test(exclude(SqlServer, Sqlite("cfd1")))]
+    // Filter Queries along self relations should succeed with one level.
+    // On D1, this test fails with a panic:
+    // ```
+    // {"errors":[{"error":"RecordNotFound(\"Expected 1 records to be connected after connect operation on one-to-many relation 'Cuckoo', found 4.\")","user_facing_error":{"is_panic":false,"message":"The required connected records were not found. Expected 1 records to be connected after connect operation on one-to-many relation 'Cuckoo', found 4.","meta":{"details":"Expected 1 records to be connected after connect operation on one-to-many relation 'Cuckoo', found 4."},"error_code":"P2018"}}]}
+    // ```
     async fn l1_query(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 

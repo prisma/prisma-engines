@@ -151,7 +151,7 @@ impl InMemoryRecordProcessor {
 
                 // Reset, new parent
                 if current_parent_id != record.parent_id {
-                    current_parent_id = record.parent_id.clone();
+                    current_parent_id.clone_from(&record.parent_id);
                     cursor_seen = false;
                 }
 
@@ -173,7 +173,7 @@ impl InMemoryRecordProcessor {
             if last_parent_id == record.parent_id {
                 current_count += 1;
             } else {
-                last_parent_id = record.parent_id.clone();
+                last_parent_id.clone_from(&record.parent_id);
                 current_count = 1; // this is the first record we see for this parent id
             };
 

@@ -167,7 +167,7 @@ impl EngineState {
         }
     }
 
-    async fn with_default_connector<O: Send + 'static>(&self, f: ConnectorRequest<O>) -> CoreResult<O>
+    async fn with_default_connector<O>(&self, f: ConnectorRequest<O>) -> CoreResult<O>
     where
         O: Sized + Send + 'static,
     {
@@ -177,7 +177,8 @@ impl EngineState {
             return Err(ConnectorError::from_msg("Missing --datamodel".to_owned()));
         };
 
-        self.with_connector_for_schema(schema.db.source(), None, f).await
+        self.with_connector_for_schema(schema.db.source_assert_single(), None, f)
+            .await
     }
 }
 

@@ -92,7 +92,7 @@ mod singular_batch {
     }
 
     // "Two successful queries and one failing with different selection set" should "work"
-    #[connector_test(exclude(Sqlite("cfd1")))]
+    #[connector_test]
     async fn two_success_one_fail_diff_set(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -143,7 +143,7 @@ mod singular_batch {
         Ok(())
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
+    #[connector_test]
     async fn relation_traversal_filtered(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -268,7 +268,7 @@ mod singular_batch {
     }
 
     // Regression test for https://github.com/prisma/prisma/issues/18096
-    #[connector_test(schema(bigint_id), exclude(Sqlite("cfd1")))]
+    #[connector_test(schema(bigint_id))]
     async fn batch_bigint_id(runner: Runner) -> TestResult<()> {
         run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id } }"#);
         run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 2 }) { id } }"#);
@@ -343,6 +343,53 @@ mod singular_batch {
           res.to_string(),
           @r###"{"batchResult":[{"data":{"findUniqueTestModel":{"id":"A"}}},{"data":{"findUniqueTestModel":{"id":"B"}}}]}"###
         );
+        assert!(compact_doc.is_compact());
+
+        Ok(())
+    }
+
+    fn boolean_unique() -> String {
+        let schema = indoc! {
+            r#"
+        model User {
+            #id(id, String, @id)
+            isManager Boolean? @unique
+          }
+        "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(boolean_unique))]
+    async fn batch_boolean(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+            createOneUser(data: { id: "A", isManager: true }) { id }
+        }"#
+        );
+        run_query!(
+            &runner,
+            r#"mutation {
+            createOneUser(data: { id: "B", isManager: false }) { id }
+        }"#
+        );
+
+        let (res, compact_doc) = compact_batch(
+            &runner,
+            vec![
+                r#"{ findUniqueUser(where: { isManager: true }) { id, isManager } }"#.to_string(),
+                r#"{ findUniqueUser(where: { isManager: false }) { id, isManager } }"#.to_string(),
+            ],
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+            res.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueUser":{"id":"A","isManager":true}}},{"data":{"findUniqueUser":{"id":"B","isManager":false}}}]}"###
+        );
+
         assert!(compact_doc.is_compact());
 
         Ok(())
@@ -428,6 +475,50 @@ mod singular_batch {
           @r###"{"batchResult":[{"data":{"findUniqueTestModelOrThrow":{"id":2}}},{"data":{"findUniqueTestModel":null}}]}"###
         );
         assert!(!compact_doc.is_compact());
+
+        Ok(())
+    }
+
+    fn citext_unique() -> String {
+        let schema = indoc! { r#"
+            model User {
+                #id(id, String, @id)
+                caseInsensitiveField String @unique @test.Citext
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/13534
+    #[connector_test(only(Postgres), schema(citext_unique), db_extensions("citext"))]
+    async fn repro_13534(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+            createOneUser(data: { id: "9df0f936-51d6-4c55-8e01-5144e588a8a1", caseInsensitiveField: "hello world" }) { id }
+        }"#
+        );
+
+        let queries = vec![
+            r#"{ findUniqueUser(
+                where: { caseInsensitiveField: "HELLO WORLD" }
+            ) { id, caseInsensitiveField } }"#
+                .to_string(),
+            r#"{ findUniqueUser(
+                where: { caseInsensitiveField: "HELLO WORLD" }
+            ) { id, caseInsensitiveField } }"#
+                .to_string(),
+        ];
+
+        let (res, compact_doc) = compact_batch(&runner, queries.clone()).await?;
+
+        assert!(!compact_doc.is_compact());
+
+        insta::assert_snapshot!(
+            res.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueUser":{"id":"9df0f936-51d6-4c55-8e01-5144e588a8a1","caseInsensitiveField":"hello world"}}},{"data":{"findUniqueUser":{"id":"9df0f936-51d6-4c55-8e01-5144e588a8a1","caseInsensitiveField":"hello world"}}}]}"###
+        );
 
         Ok(())
     }

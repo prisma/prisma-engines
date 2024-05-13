@@ -1,3 +1,6 @@
+// `clippy::empty_docs` is required because of the `wasm-bindgen` crate.
+#![allow(clippy::empty_docs)]
+
 use js_sys::{Date, Function, Promise, Reflect};
 use std::future::Future;
 use std::time::Duration;

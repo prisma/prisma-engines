@@ -51,7 +51,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     SupportsTxIsolationRepeatableRead |
     SupportsTxIsolationSerializable |
     SupportsTxIsolationSnapshot |
-    SupportsFiltersOnRelationsWithoutJoins
+    SupportsFiltersOnRelationsWithoutJoins |
+    SupportsDefaultInInsert
     // InsertReturning | DeleteReturning - unimplemented.
 });
 
@@ -92,7 +93,7 @@ impl Connector for MsSqlDatamodelConnector {
         128
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+    fn foreign_key_referential_actions(&self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
         NoAction | Cascade | SetNull | SetDefault

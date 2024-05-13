@@ -59,6 +59,7 @@ pub(crate) fn create_records_nonempty(
 
             for field in affected_fields.iter() {
                 let value = arg.take_field_value(field.db_name());
+
                 match value {
                     Some(write_op) => {
                         let value: PrismaValue = write_op
@@ -67,7 +68,10 @@ pub(crate) fn create_records_nonempty(
 
                         row.push(field.value(value, ctx).into());
                     }
-
+                    // We can't use `DEFAULT` for SQLite so we provided an explicit `NULL` instead.
+                    None if !field.is_required() && field.default_value().is_none() => {
+                        row.push(Value::null_int32().raw().into())
+                    }
                     None => row.push(default_value()),
                 }
             }

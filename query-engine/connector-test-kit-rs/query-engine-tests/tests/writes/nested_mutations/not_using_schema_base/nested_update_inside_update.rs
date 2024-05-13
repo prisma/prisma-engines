@@ -590,8 +590,14 @@ mod update_inside_update {
 
     // Transactionality
 
-    // "TRANSACTIONAL: a many to many relation" should "fail gracefully on wrong where and assign error correctly and not execute partially"
     #[connector_test(schema(schema_1), exclude(Sqlite("cfd1")))]
+    // "TRANSACTIONAL: a many to many relation" should "fail gracefully on wrong where and assign error correctly and not execute partially"
+    // On D1, this fails with:
+    //
+    // ```diff
+    // - {"data":{"findUniqueNote":{"text":"Some Text"}}}
+    // + {"data":{"findUniqueNote":{"text":"Some Changed Text"}}}
+    // ```
     async fn tx_m2m_fail_wrong_where(runner: Runner) -> TestResult<()> {
         let res = run_query_json!(
             &runner,
@@ -793,7 +799,7 @@ mod update_inside_update {
     }
 
     // "a deeply nested mutation" should "execute all levels of the mutation if there are only node edges on the path"
-    #[connector_test(schema(schema_3), exclude(Sqlite("cfd1")))]
+    #[connector_test(schema(schema_3))]
     async fn deep_nested_mutation_exec_all_muts(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,

@@ -6,6 +6,7 @@ prisma-gpg-private.asc
 .test_config
 *.pending-snap
 .pending.md
+dev.db
 
 *.class
 *.log

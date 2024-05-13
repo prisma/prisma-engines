@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(exclude(Sqlite("cfd1")))]
+#[test_suite]
 // update_many_inside_update
 mod um_inside_update {
     use query_engine_tests::{assert_error, run_query, run_query_json, DatamodelWithParams, Runner, TestResult};

@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use indoc::indoc;
 use schema_core::json_rpc::types::*;
 use sql_migration_tests::test_api::*;

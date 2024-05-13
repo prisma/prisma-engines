@@ -19,7 +19,7 @@
   "separateMinorPatch": true,
   "configMigration": true,
   "ignoreDeps": [
-    "query-engine-wasm-baseline",
+    "query-engine-wasm-baseline"
   ],
   "packageRules": [
     {
@@ -55,7 +55,9 @@
     },
     {
       "groupName": "Driver Adapters directory",
-      "matchFileNames": ["query-engine/driver-adapters/**"]
+      "matchFileNames": [
+        "query-engine/driver-adapters/**"
+      ]
     },
     {
       "matchPackageNames": [
@@ -63,6 +65,32 @@
         "pnpm"
       ],
       "enabled": false
+    },
+    {
+      "groupName": "rust toolchain update",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchDepNames": [
+        "rust"
+      ],
+      "schedule": [
+        "before 7am every weekday"
+      ]
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^rust-toolchain\\.toml?$"
+      ],
+      "matchStrings": [
+        "channel\\s*=\\s*\"(?<currentValue>\\d+\\.\\d+(\\.\\d+)?)\""
+      ],
+      "depNameTemplate": "rust",
+      "packageNameTemplate": "rust-lang/rust",
+      "datasourceTemplate": "github-releases"
     }
   ]
 }

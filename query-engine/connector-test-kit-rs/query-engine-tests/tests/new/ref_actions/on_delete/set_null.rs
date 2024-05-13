@@ -23,7 +23,7 @@ mod one2one_opt {
     }
 
     /// Deleting the parent suceeds and sets the FK null.
-    #[connector_test(exclude(Sqlite("cfd1")))]
+    #[connector_test]
     async fn delete_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
@@ -63,7 +63,7 @@ mod one2one_opt {
 
     /// Deleting the parent suceeds and sets the FK null.
     /// Checks that it works even with different parent/child primary identifier names.
-    #[connector_test(schema(diff_id_name), exclude(Sqlite("cfd1")))]
+    #[connector_test(schema(diff_id_name))]
     async fn delete_parent_diff_id_name(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
@@ -111,7 +111,7 @@ mod one2one_opt {
     }
 
     // SET_NULL should also apply to child relations sharing a common fk
-    #[connector_test(schema(one2one2one_opt_set_null), exclude(Sqlite("cfd1")))]
+    #[connector_test(schema(one2one2one_opt_set_null))]
     async fn delete_parent_recurse_set_null(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -181,7 +181,7 @@ mod one2one_opt {
     }
 
     // SET_NULL should also apply to child relations sharing a common fk
-    #[connector_test(schema(one2one2one_opt_set_null_restrict), exclude(Sqlite("cfd1")))]
+    #[connector_test(schema(one2one2one_opt_set_null_restrict))]
     async fn delete_parent_set_null_restrict(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -246,11 +246,7 @@ mod one2one_opt {
     }
 
     // SET_NULL should also apply to child relations sharing a common fk
-    #[connector_test(
-        schema(one2one2one_opt_set_null_cascade),
-        exclude_features("relationJoins"),
-        exclude(Sqlite("cfd1"))
-    )]
+    #[connector_test(schema(one2one2one_opt_set_null_cascade), exclude_features("relationJoins"))]
     async fn delete_parent_set_null_cascade(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
@@ -320,7 +316,7 @@ mod one2many_opt {
     }
 
     /// Deleting the parent suceeds and sets the FK null.
-    #[connector_test(exclude(Sqlite("cfd1")))]
+    #[connector_test]
     async fn delete_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, children: { create: { id: 1 }}}) { id }}"#),
@@ -368,7 +364,7 @@ mod one2many_opt {
     }
 
     // Do not recurse when relations have no fks in common
-    #[connector_test(schema(prisma_17255_schema), exclude(Sqlite("cfd1")))]
+    #[connector_test(schema(prisma_17255_schema))]
     async fn prisma_17255(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,

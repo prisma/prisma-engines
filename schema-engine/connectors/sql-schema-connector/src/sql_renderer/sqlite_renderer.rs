@@ -185,6 +185,7 @@ impl SqlRenderer for SqliteFlavour {
     fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: MigrationPair<&SqlSchema>) -> Vec<String> {
         // Based on 'Making Other Kinds Of Table Schema Changes' from https://www.sqlite.org/lang_altertable.html
         let mut result = vec!["PRAGMA foreign_keys=OFF".to_string()];
+        let mut foreign_key_checks = vec![];
 
         for redefine_table in tables {
             let tables = schemas.walk(redefine_table.table_ids);
@@ -208,9 +209,17 @@ impl SqlRenderer for SqliteFlavour {
             for index in tables.next.indexes().filter(|idx| !idx.is_primary_key()) {
                 result.push(self.render_create_index(index));
             }
+
+            // Collect foreign key checks for any renamed tables.
+            // These must be executed immediately before `PRAGMA foreign_keys=ON`.
+            foreign_key_checks.push(format!(
+                r#"PRAGMA foreign_key_check("{new_name}")"#,
+                new_name = tables.next.name()
+            ));
         }
 
-        result.push("PRAGMA foreign_key_check".to_string());
+        result.extend(foreign_key_checks);
+
         result.push("PRAGMA foreign_keys=ON".to_string());
 
         result

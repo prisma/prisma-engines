@@ -1,0 +1,30 @@
+{
+  "isIncomplete": false,
+  "items": [
+    {
+      "label": "Cascade",
+      "kind": 13,
+      "detail": "Delete the child records when the parent record is deleted."
+    },
+    {
+      "label": "Restrict",
+      "kind": 13,
+      "detail": "Prevent deleting a parent record as long as it is referenced."
+    },
+    {
+      "label": "NoAction",
+      "kind": 13,
+      "detail": "Prevent deleting a parent record as long as it is referenced."
+    },
+    {
+      "label": "SetNull",
+      "kind": 13,
+      "detail": "Set the referencing fields to NULL when the referenced record is deleted."
+    },
+    {
+      "label": "SetDefault",
+      "kind": 13,
+      "detail": "Set the referencing field's value to the default when the referenced record is deleted."
+    }
+  ]
+}
