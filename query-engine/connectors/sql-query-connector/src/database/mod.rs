@@ -3,7 +3,12 @@ mod connection;
 mod js;
 mod transaction;
 
-#[cfg(feature = "native")]
+#[cfg(any(
+    feature = "mssql-native",
+    feature = "mysql-native",
+    feature = "postgresql-native",
+    feature = "sqlite-native"
+))]
 pub(crate) mod native {
     #[cfg(feature = "mssql")]
     pub(crate) mod mssql;
@@ -23,16 +28,16 @@ use connector_interface::{error::ConnectorError, Connector};
 #[cfg(feature = "driver-adapters")]
 pub use js::*;
 
-#[cfg(all(feature = "native", feature = "mssql"))]
+#[cfg(feature = "mssql-native")]
 pub use native::mssql::*;
 
-#[cfg(all(feature = "native", feature = "mysql"))]
+#[cfg(feature = "mysql-native")]
 pub use native::mysql::*;
 
-#[cfg(all(feature = "native", feature = "postgresql"))]
+#[cfg(feature = "postgresql-native")]
 pub use native::postgresql::*;
 
-#[cfg(all(feature = "native", feature = "sqlite"))]
+#[cfg(feature = "sqlite-native")]
 pub use native::sqlite::*;
 
 #[async_trait]

@@ -1,0 +1,21 @@
+[toolchain]
+channel = "1.78.0"
+components = ["clippy", "rustfmt", "rust-src"]
+targets = [
+    # WASM target for serverless and edge environments.
+    "wasm32-unknown-unknown",
+
+    # React Native targets we support.
+    "x86_64-apple-ios",
+    "aarch64-apple-ios",
+    "aarch64-apple-ios-sim",
+    "aarch64-linux-android",
+    "x86_64-linux-android",
+    "armv7-linux-androideabi",
+    "i686-linux-android",
+
+    # Server targets we support.
+    "x86_64-unknown-linux-musl",
+    "aarch64-unknown-linux-gnu",
+    "aarch64-unknown-linux-musl"
+]

@@ -354,9 +354,7 @@ impl<'ast> SourcePosition<'ast> {
 pub enum PropertyPosition<'ast> {
     /// prop
     Property,
-    ///
     Value(&'ast str),
-    ///
     FunctionValue(&'ast str),
 }
 

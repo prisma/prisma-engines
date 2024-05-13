@@ -82,6 +82,7 @@ impl TypeIdentifier for Column<'_> {
         )
     }
 
+    #[cfg(feature = "mysql")]
     fn is_time(&self) -> bool {
         false
     }
@@ -118,9 +119,12 @@ impl TypeIdentifier for Column<'_> {
         matches!(self.decl_type(), Some("BOOLEAN") | Some("boolean"))
     }
 
+    #[cfg(feature = "mysql")]
     fn is_json(&self) -> bool {
         false
     }
+
+    #[cfg(feature = "mysql")]
     fn is_enum(&self) -> bool {
         false
     }

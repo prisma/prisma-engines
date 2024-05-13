@@ -17,7 +17,7 @@ runs:
       shell: bash
       run: |
         cargo binstall -y \
-            wasm-bindgen-cli@0.2.89 \
+            wasm-bindgen-cli@0.2.92 \
             wasm-opt@0.116.0
 
     - name: Install bc

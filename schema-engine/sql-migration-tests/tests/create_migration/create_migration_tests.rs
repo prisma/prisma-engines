@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use indoc::indoc;
 use sql_migration_tests::test_api::*;
 
@@ -664,31 +666,31 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                          "name" TEXT NOT NULL,
                          "a" TEXT NOT NULL,
                          "b" TEXT NOT NULL,
-                     
+
                          CONSTRAINT "A_pkey" PRIMARY KEY ("id")
                      );
-                     
+
                      -- CreateTable
                      CREATE TABLE "B" (
                          "a" TEXT NOT NULL,
                          "b" TEXT NOT NULL,
                          "aId" INTEGER NOT NULL,
-                 
+
                          CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
                      );
-                     
+
                      -- CreateIndex
                      CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
-                     
+
                      -- CreateIndex
                      CREATE INDEX "A_a_idx" ON "A"("a");
-                     
+
                      -- CreateIndex
                      CREATE UNIQUE INDEX "A_a_b_key" ON "A"("a", "b");
-                     
+
                      -- CreateIndex
                      CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
-                     
+
                      -- AddForeignKey
                      ALTER TABLE "B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
@@ -702,23 +704,23 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                      `name` VARCHAR(191) NOT NULL,
                      `a` VARCHAR(191) NOT NULL,
                      `b` VARCHAR(191) NOT NULL,
-                 
+
                      UNIQUE INDEX `A_name_key`(`name`),
                      INDEX `A_a_idx`(`a`),
                      UNIQUE INDEX `A_a_b_key`(`a`, `b`),
                      PRIMARY KEY (`id`)
                  ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-                 
+
                  -- CreateTable
                  CREATE TABLE `B` (
                      `a` VARCHAR(191) NOT NULL,
                      `b` VARCHAR(191) NOT NULL,
                      `aId` INTEGER NOT NULL,
-                 
+
                      INDEX `B_a_b_idx`(`a`, `b`),
                      PRIMARY KEY (`a`, `b`)
                  ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-                 
+
                  -- AddForeignKey
                  ALTER TABLE `B` ADD CONSTRAINT `B_aId_fkey` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
@@ -732,26 +734,26 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                      "a" TEXT NOT NULL,
                      "b" TEXT NOT NULL
                  );
-                 
+
                  -- CreateTable
                  CREATE TABLE "B" (
                      "a" TEXT NOT NULL,
                      "b" TEXT NOT NULL,
                      "aId" INTEGER NOT NULL,
-                 
+
                      PRIMARY KEY ("a", "b"),
                      CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
                  );
-                 
+
                  -- CreateIndex
                  CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
-                 
+
                  -- CreateIndex
                  CREATE INDEX "A_a_idx" ON "A"("a");
-                 
+
                  -- CreateIndex
                  CREATE UNIQUE INDEX "A_a_b_key" ON "A"("a", "b");
-                 
+
                  -- CreateIndex
                  CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
                  "#
@@ -778,7 +780,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
            @@unique([a, b], map:"UnNamedCompoundUnique")
            @@index([a], map: "SingleIndex")
          }
-         
+
          model B {
            a   String
            b   String
@@ -898,34 +900,34 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                          "name" TEXT NOT NULL,
                          "a" TEXT NOT NULL,
                          "b" TEXT NOT NULL,
-                     
+
                          CONSTRAINT "A_pkey" PRIMARY KEY ("id")
                      );
-                     
+
                      -- CreateTable
                      CREATE TABLE "B" (
                          "a" TEXT NOT NULL,
                          "b" TEXT NOT NULL,
                          "aId" INTEGER NOT NULL,
-                     
+
                          CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
                      );
-                     
+
                      -- CreateIndex
                      CREATE UNIQUE INDEX "SingleUnique" ON "A"("name");
-                     
+
                      -- CreateIndex
                      CREATE INDEX "SingleIndex" ON "A"("a");
-                     
+
                      -- CreateIndex
                      CREATE UNIQUE INDEX "NamedCompoundUnique" ON "A"("a", "b");
-                     
+
                      -- CreateIndex
                      CREATE UNIQUE INDEX "UnNamedCompoundUnique" ON "A"("a", "b");
-                     
+
                      -- CreateIndex
                      CREATE INDEX "CompoundIndex" ON "B"("a", "b");
-                     
+
                      -- AddForeignKey
                      ALTER TABLE "B" ADD CONSTRAINT "ForeignKey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
@@ -939,24 +941,24 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                      `name` VARCHAR(191) NOT NULL,
                      `a` VARCHAR(191) NOT NULL,
                      `b` VARCHAR(191) NOT NULL,
-                 
+
                      UNIQUE INDEX `SingleUnique`(`name`),
                      INDEX `SingleIndex`(`a`),
                      UNIQUE INDEX `NamedCompoundUnique`(`a`, `b`),
                      UNIQUE INDEX `UnNamedCompoundUnique`(`a`, `b`),
                      PRIMARY KEY (`id`)
                  ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-                 
+
                  -- CreateTable
                  CREATE TABLE `B` (
                      `a` VARCHAR(191) NOT NULL,
                      `b` VARCHAR(191) NOT NULL,
                      `aId` INTEGER NOT NULL,
-                 
+
                      INDEX `CompoundIndex`(`a`, `b`),
                      PRIMARY KEY (`a`, `b`)
                  ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-                 
+
                  -- AddForeignKey
                  ALTER TABLE `B` ADD CONSTRAINT `ForeignKey` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
@@ -1151,15 +1153,15 @@ fn alter_constraint_name(mut api: TestApi) {
                  -- RedefineIndex
                  DROP INDEX "A_a_b_key";
                  CREATE UNIQUE INDEX "CustomCompoundUnique" ON "A"("a", "b");
-                 
+
                  -- RedefineIndex
                  DROP INDEX "A_a_idx";
                  CREATE INDEX "CustomIndex" ON "A"("a");
-                 
+
                  -- RedefineIndex
                  DROP INDEX "A_name_key";
                  CREATE UNIQUE INDEX "CustomUnique" ON "A"("name");
-                 
+
                  -- RedefineIndex
                  DROP INDEX "B_a_b_idx";
                  CREATE INDEX "AnotherCustomIndex" ON "B"("a", "b");

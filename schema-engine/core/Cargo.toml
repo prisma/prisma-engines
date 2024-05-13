@@ -8,7 +8,9 @@ psl = { workspace = true, features = ["all"] }
 schema-connector = { path = "../connectors/schema-connector" }
 mongodb-schema-connector = { path = "../connectors/mongodb-schema-connector" }
 sql-schema-connector = { path = "../connectors/sql-schema-connector" }
-user-facing-errors = { path = "../../libs/user-facing-errors" }
+user-facing-errors = { path = "../../libs/user-facing-errors", features = [
+    "all-native",
+] }
 
 async-trait.workspace = true
 chrono.workspace = true

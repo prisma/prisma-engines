@@ -306,3 +306,16 @@ fn query_can_be_resolved_with_joins(cursor: Option<&SelectionResult>, nested_que
             _ => false,
         })
 }
+
+pub(crate) fn extract_selected_fields(
+    nested_fields: Vec<FieldPair<'_>>,
+    model: &Model,
+    query_schema: &QuerySchema,
+) -> crate::QueryGraphBuilderResult<(FieldSelection, Vec<String>, Vec<ReadQuery>)> {
+    let selection_order = utils::collect_selection_order(&nested_fields);
+    let selected_fields = utils::collect_selected_fields(&nested_fields, None, model, query_schema)?;
+    let nested = utils::collect_nested_queries(nested_fields, model, query_schema)?;
+    let selected_fields = utils::merge_relation_selections(selected_fields, None, &nested);
+
+    Ok((selected_fields, selection_order, nested))
+}

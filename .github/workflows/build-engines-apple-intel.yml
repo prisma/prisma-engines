@@ -27,7 +27,7 @@ jobs:
         with:
           ref: ${{ github.event.inputs.commit }}
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
 
       - uses: actions/cache@v4
         with:

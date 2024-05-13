@@ -1,4 +1,4 @@
-use psl::{Diagnostics, ValidatedSchema};
+use psl::{parser_database::Files, Diagnostics};
 use serde::Deserialize;
 use serde_json::json;
 use std::collections::HashMap;
@@ -43,26 +43,23 @@ pub(crate) fn get_config(params: &str) -> Result<String, String> {
 }
 
 fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConfigError> {
-    let mut schema = psl::validate_multi_file(params.prisma_schema.into());
-    if schema.diagnostics.has_errors() {
-        return Err(create_get_config_error(&schema, &schema.diagnostics));
-    }
+    let (files, mut config) =
+        psl::parse_configuration_multi_file(params.prisma_schema.into()).map_err(create_get_config_error)?;
 
     if !params.ignore_env_var_errors {
         let overrides: Vec<(_, _)> = params.datasource_overrides.into_iter().collect();
-        schema
-            .configuration
+        config
             .resolve_datasource_urls_prisma_fmt(&overrides, |key| params.env.get(key).map(String::from))
-            .map_err(|diagnostics| create_get_config_error(&schema, &diagnostics))?;
+            .map_err(|diagnostics| create_get_config_error((files, diagnostics)))?;
     }
 
-    Ok(psl::get_config(&schema.configuration))
+    Ok(psl::get_config(&config))
 }
 
-fn create_get_config_error(schema: &ValidatedSchema, diagnostics: &Diagnostics) -> GetConfigError {
+fn create_get_config_error((files, diagnostics): (Files, Diagnostics)) -> GetConfigError {
     use std::fmt::Write as _;
 
-    let mut rendered_diagnostics = schema.render_diagnostics(diagnostics);
+    let mut rendered_diagnostics = files.render_diagnostics(&diagnostics);
     write!(
         rendered_diagnostics,
         "\nValidation Error Count: {}",

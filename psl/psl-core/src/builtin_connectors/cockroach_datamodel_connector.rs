@@ -100,7 +100,7 @@ impl Connector for CockroachDatamodelConnector {
         63
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+    fn foreign_key_referential_actions(&self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
         NoAction | Restrict | Cascade | SetNull | SetDefault

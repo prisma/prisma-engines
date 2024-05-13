@@ -64,7 +64,7 @@ mod cockroachdb {
 mod single_col {
     use query_engine_tests::run_query;
 
-    #[connector_test(exclude(CockroachDb, Sqlite("cfd1")))]
+    #[connector_test(exclude(CockroachDb))]
     async fn foo(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, "mutation { createManyTestModel(data: [{},{}]) { count }}"),

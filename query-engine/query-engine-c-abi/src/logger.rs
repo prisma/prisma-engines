@@ -3,8 +3,8 @@ use query_core::telemetry;
 use query_engine_common::logger::StringCallback;
 // use query_engine_metrics::MetricRegistry;
 use serde_json::Value;
-use std::collections::BTreeMap;
 use std::sync::Arc;
+use std::{collections::BTreeMap, fmt::Display};
 use tracing::{
     field::{Field, Visit},
     level_filters::LevelFilter,
@@ -126,9 +126,9 @@ impl<'a> Visit for JsonVisitor<'a> {
     }
 }
 
-impl<'a> ToString for JsonVisitor<'a> {
-    fn to_string(&self) -> String {
-        serde_json::to_string(&self.values).unwrap()
+impl<'a> Display for JsonVisitor<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&serde_json::to_string(&self.values).unwrap())
     }
 }
 

@@ -65,6 +65,7 @@ pub fn nested_create(
             Some(CreateManyRecordsFields {
                 fields: selected_fields,
                 order: selection_order,
+                nested: Vec::new(),
             })
         } else {
             None

@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use super::*;
 use darling::{FromMeta, ToTokens};
 use proc_macro2::Span;
@@ -71,11 +73,11 @@ impl darling::FromMeta for RelationMode {
     }
 }
 
-impl ToString for RelationMode {
-    fn to_string(&self) -> String {
+impl Display for RelationMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Prisma => "prisma".to_string(),
-            Self::ForeignKeys => "foreignKeys".to_string(),
+            Self::Prisma => f.write_str("prisma"),
+            Self::ForeignKeys => f.write_str("foreignKeys"),
         }
     }
 }

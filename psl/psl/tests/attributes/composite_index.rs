@@ -527,7 +527,7 @@ fn pointing_to_a_non_existing_type() {
     let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mType "C" is neither a built-in type, nor refers to another model, custom type, or enum.[0m
+        [1;91merror[0m: [1mType "C" is neither a built-in type, nor refers to another model, composite type, or enum.[0m
           [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
         [1;94m16 | [0m  id Int @id @map("_id")

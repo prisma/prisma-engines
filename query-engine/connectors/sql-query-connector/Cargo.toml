@@ -5,13 +5,27 @@ version = "0.1.0"
 
 [features]
 postgresql = ["relation_joins", "quaint/postgresql", "psl/postgresql"]
+postgresql-native = ["postgresql", "quaint/postgresql-native", "quaint/pooled"]
 mysql = ["relation_joins", "quaint/mysql", "psl/mysql"]
+mysql-native = ["mysql", "quaint/mysql-native", "quaint/pooled"]
 sqlite = ["quaint/sqlite", "psl/sqlite"]
+sqlite-native = ["sqlite", "quaint/sqlite-native", "quaint/pooled"]
 mssql = ["quaint/mssql"]
+mssql-native = ["mssql", "quaint/mssql-native", "quaint/pooled"]
 cockroachdb = ["relation_joins", "quaint/postgresql", "psl/cockroachdb"]
+cockroachdb-native = [
+    "cockroachdb",
+    "quaint/postgresql-native",
+    "quaint/pooled",
+]
 vendored-openssl = ["quaint/vendored-openssl"]
-all = ["sqlite", "mysql", "postgresql", "mssql", "cockroachdb", "native"]
-native = ["quaint/native", "quaint/pooled"]
+all-native = [
+    "sqlite-native",
+    "mysql-native",
+    "postgresql-native",
+    "mssql-native",
+    "cockroachdb-native",
+]
 # TODO: At the moment of writing (rustc 1.77.0), can_have_capability from psl does not eliminate joins
 # code from bundle for some reason, so we are doing it explicitly. Check with a newer version of compiler - if elimination
 # happens successfully, we don't need this feature anymore
@@ -31,7 +45,7 @@ rand.workspace = true
 serde_json.workspace = true
 thiserror = "1.0"
 tokio = { version = "1.0", features = ["macros", "time"] }
-tracing.workspace = true
+tracing = { workspace = true, features = ["log"] }
 tracing-futures = "0.2"
 uuid.workspace = true
 opentelemetry = { version = "0.17", features = ["tokio"] }

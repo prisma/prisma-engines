@@ -133,16 +133,23 @@ impl QueryEngine {
 
         let datamodel = get_cstr_safe(constructor_options.datamodel).expect("Datamodel must be present");
         let mut schema = psl::validate(datamodel.into());
+
+        let config = &mut schema.configuration;
+        config
+            .resolve_datasource_urls_query_engine(
+                &overrides,
+                |key| env.get(key).map(ToString::to_string),
+                // constructor_options.ignore_env_var_errors,
+                true,
+            )
+            .map_err(|err| ApiError::conversion(err, schema.db.source_assert_single()))?;
         // extract the url for later use in apply_migrations
-        let url = schema
-            .configuration
+        let url = config
             .datasources
             .first()
             .unwrap()
             .load_url(|key| env::var(key).ok())
-            .unwrap();
-
-        let config = &mut schema.configuration;
+            .map_err(|err| ApiError::conversion(err, schema.db.source_assert_single()))?;
 
         schema
             .diagnostics
@@ -154,15 +161,6 @@ impl QueryEngine {
             Some(path) => env::set_current_dir(Path::new(&path)).expect("Could not change directory"),
             _ => tracing::trace!("No base path provided"),
         }
-
-        config
-            .resolve_datasource_urls_query_engine(
-                &overrides,
-                |key| env.get(key).map(ToString::to_string),
-                // constructor_options.ignore_env_var_errors,
-                true,
-            )
-            .map_err(|err| ApiError::conversion(err, schema.db.source_assert_single()))?;
 
         config
             .validate_that_one_datasource_is_provided()

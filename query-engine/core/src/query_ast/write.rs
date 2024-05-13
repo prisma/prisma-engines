@@ -1,6 +1,6 @@
 //! Write query AST
 use super::{FilteredNestedMutation, FilteredQuery};
-use crate::{RecordQuery, ToGraphviz};
+use crate::{ReadQuery, RecordQuery, ToGraphviz};
 use connector::{DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
 use query_structure::{prelude::*, Filter};
 use std::collections::HashMap;
@@ -286,6 +286,7 @@ pub struct CreateManyRecords {
 pub struct CreateManyRecordsFields {
     pub fields: FieldSelection,
     pub order: Vec<String>,
+    pub nested: Vec<ReadQuery>,
 }
 
 #[derive(Debug, Clone)]

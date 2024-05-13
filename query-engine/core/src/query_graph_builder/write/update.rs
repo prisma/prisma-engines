@@ -170,7 +170,7 @@ pub fn update_many_records(
 }
 
 /// Creates an update record write node and adds it to the query graph.
-pub fn update_record_node<T: Clone>(
+pub fn update_record_node<T>(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
     filter: T,
@@ -179,7 +179,7 @@ pub fn update_record_node<T: Clone>(
     field: Option<&ParsedField<'_>>,
 ) -> QueryGraphBuilderResult<NodeRef>
 where
-    T: Into<Filter>,
+    T: Clone + Into<Filter>,
 {
     let update_args = WriteArgsParser::from(&model, data_map)?;
     let mut args = update_args.args;

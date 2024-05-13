@@ -245,7 +245,7 @@ As explained in [Testing driver adapters](./query-engine/connector-test-kit-rs/R
 will ensure you have prisma checked out in your filesystem in the same directory as prisma-engines. This is needed because the driver adapters code is symlinked in prisma-engines.
 
 When working on a feature or bugfix spanning adapters code and query-engine code, you will need to open sibling PRs in `prisma/prisma` and `prisma/prisma-engines` respectively.
-Locally, each time you run `DRIVER_ADAPTER=$adapter make qe-test` tests will run using the driver adapters built from the source code in the working copy of prisma/prisma. All good.
+Locally, each time you run `DRIVER_ADAPTER=$adapter make test-qe` tests will run using the driver adapters built from the source code in the working copy of prisma/prisma. All good.
 
 In CI, tho', we need to denote which branch of prisma/prisma we want to use for tests. In CI, there's no working copy of prisma/prisma before tests run.
 The CI jobs clones prisma/prisma `main` branch by default, which doesn't include your local changes. To test in integration, we can tell CI to use the branch of prisma/prisma containing

@@ -1,3 +1,6 @@
+// `clippy::empty_docs` is required because of the `tsify` crate.
+#![allow(clippy::empty_docs)]
+
 use serde::Serialize;
 use tsify::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;

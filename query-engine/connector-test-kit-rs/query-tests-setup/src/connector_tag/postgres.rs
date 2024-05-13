@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use super::*;
 use crate::{datamodel_rendering::SqlDatamodelRenderer, BoxFuture, TestError};
 use quaint::{prelude::Queryable, single::Quaint};
@@ -68,23 +70,22 @@ impl TryFrom<&str> for PostgresVersion {
     }
 }
 
-impl ToString for PostgresVersion {
-    fn to_string(&self) -> String {
+impl Display for PostgresVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            PostgresVersion::V9 => "9",
-            PostgresVersion::V10 => "10",
-            PostgresVersion::V11 => "11",
-            PostgresVersion::V12 => "12",
-            PostgresVersion::V13 => "13",
-            PostgresVersion::V14 => "14",
-            PostgresVersion::V15 => "15",
-            PostgresVersion::V16 => "16",
-            PostgresVersion::PgBouncer => "pgbouncer",
-            PostgresVersion::NeonJsNapi => "neon.js",
-            PostgresVersion::PgJsNapi => "pg.js",
-            PostgresVersion::PgJsWasm => "pg.js.wasm",
-            PostgresVersion::NeonJsWasm => "pg.js.wasm",
+            PostgresVersion::V9 => f.write_str("9"),
+            PostgresVersion::V10 => f.write_str("10"),
+            PostgresVersion::V11 => f.write_str("11"),
+            PostgresVersion::V12 => f.write_str("12"),
+            PostgresVersion::V13 => f.write_str("13"),
+            PostgresVersion::V14 => f.write_str("14"),
+            PostgresVersion::V15 => f.write_str("15"),
+            PostgresVersion::V16 => f.write_str("16"),
+            PostgresVersion::PgBouncer => f.write_str("pgbouncer"),
+            PostgresVersion::NeonJsNapi => f.write_str("neon.js"),
+            PostgresVersion::PgJsNapi => f.write_str("pg.js"),
+            PostgresVersion::PgJsWasm => f.write_str("pg.js.wasm"),
+            PostgresVersion::NeonJsWasm => f.write_str("pg.js.wasm"),
         }
-        .to_owned()
     }
 }

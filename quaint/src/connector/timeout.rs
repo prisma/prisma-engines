@@ -2,7 +2,7 @@ use crate::error::{Error, ErrorKind};
 use futures::Future;
 use std::time::Duration;
 
-#[cfg(feature = "native")]
+#[cfg(native)]
 pub async fn connect<T, F, E>(duration: Option<Duration>, f: F) -> crate::Result<T>
 where
     F: Future<Output = std::result::Result<T, E>>,

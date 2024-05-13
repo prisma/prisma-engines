@@ -4,9 +4,7 @@ name = "query-engine"
 version = "0.1.0"
 
 [features]
-default = ["sql", "mongodb"]
-mongodb = ["mongodb-connector"]
-sql = ["sql-connector", "sql-connector/all", "sql-connector/native"]
+sql = ["sql-connector", "sql-connector/all-native"]
 vendored-openssl = ["sql-connector/vendored-openssl"]
 
 [dependencies]
@@ -21,10 +19,7 @@ psl = { workspace = true, features = ["all"] }
 graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
 mongodb-connector = { path = "../connectors/mongodb-query-connector", optional = true, package = "mongodb-query-connector" }
 query-core = { path = "../core", features = ["metrics"] }
-request-handlers = { path = "../request-handlers", features = [
-    "native",
-    "all",
-] }
+request-handlers = { path = "../request-handlers", features = ["all"] }
 serde.workspace = true
 serde_json.workspace = true
 sql-connector = { path = "../connectors/sql-query-connector", optional = true, package = "sql-query-connector" }
