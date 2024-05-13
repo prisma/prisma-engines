@@ -19,7 +19,7 @@ use schema_file_input::SchemaFileInput;
 /// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_completion).
 /// Input and output are both JSON, the request being a `CompletionParams` object and the response
 /// being a `CompletionList` object.
-pub fn text_document_completion(schema_files: String, initiating_file_name: &str, params: &str) -> String {
+pub fn text_document_completion(schema_files: String, params: &str) -> String {
     let params = if let Ok(params) = serde_json::from_str::<lsp_types::CompletionParams>(params) {
         params
     } else {
@@ -32,13 +32,13 @@ pub fn text_document_completion(schema_files: String, initiating_file_name: &str
         return serde_json::to_string(&text_document_completion::empty_completion_list()).unwrap();
     };
 
-    let completion_list = text_document_completion::completion(input.into(), &initiating_file_name, params);
+    let completion_list = text_document_completion::completion(input.into(), params);
 
     serde_json::to_string(&completion_list).unwrap()
 }
 
 /// This API is modelled on an LSP [code action request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_codeAction=). Input and output are both JSON, the request being a `CodeActionParams` object and the response being a list of `CodeActionOrCommand` objects.
-pub fn code_actions(schema_files: String, initiating_file_name: &str, params: &str) -> String {
+pub fn code_actions(schema_files: String, params: &str) -> String {
     let params = if let Ok(params) = serde_json::from_str::<lsp_types::CodeActionParams>(params) {
         params
     } else {
@@ -51,7 +51,7 @@ pub fn code_actions(schema_files: String, initiating_file_name: &str, params: &s
         return serde_json::to_string(&text_document_completion::empty_completion_list()).unwrap();
     };
 
-    let actions = code_actions::available_actions(input.into(), &initiating_file_name, params);
+    let actions = code_actions::available_actions(input.into(), params);
     serde_json::to_string(&actions).unwrap()
 }
 

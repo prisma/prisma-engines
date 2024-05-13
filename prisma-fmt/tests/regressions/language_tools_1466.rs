@@ -29,7 +29,6 @@ fn code_actions_should_not_crash_on_validation_errors_with_mongodb() {
 
     prisma_fmt::code_actions(
         serde_json::to_string_pretty(&[("schema.prisma", schema.to_owned())]).unwrap(),
-        "schema.prisma".into(),
         &serde_json::to_string_pretty(&params).unwrap(),
     );
 }

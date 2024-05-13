@@ -113,7 +113,6 @@ pub(crate) fn test_scenario(scenario_name: &str) {
 
     let result = prisma_fmt::code_actions(
         serde_json::to_string_pretty(&schema_files).unwrap(),
-        initiating_file_name,
         &serde_json::to_string_pretty(&params).unwrap(),
     );
     // Prettify the JSON

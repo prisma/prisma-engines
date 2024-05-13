@@ -76,7 +76,6 @@ pub(crate) fn empty_code_actions() -> Vec<CodeActionOrCommand> {
 
 pub(crate) fn available_actions(
     schema_files: Vec<(String, SourceFile)>,
-    initiating_file_name: &str,
     params: CodeActionParams,
 ) -> Vec<CodeActionOrCommand> {
     let mut actions = Vec::new();
@@ -86,7 +85,8 @@ pub(crate) fn available_actions(
     let config = &validated_schema.configuration;
 
     let datasource = config.datasources.first();
-    let Some(initiating_file_id) = validated_schema.db.file_id(initiating_file_name) else {
+    let file_uri = params.text_document.uri.as_str();
+    let Some(initiating_file_id) = validated_schema.db.file_id(file_uri) else {
         warn!("Initiating file name is not found in the schema");
         return vec![];
     };
@@ -141,14 +141,10 @@ pub(crate) fn available_actions(
                 relations::add_referencing_side_unique(&mut actions, &context, complete_relation);
             }
 
-            if relation.referencing_model().is_defined_in_file(initiating_file_id) {
-                if validated_schema.relation_mode().is_prisma() {
-                    relations::add_index_for_relation_fields(
-                        &mut actions,
-                        &context,
-                        complete_relation.referencing_field(),
-                    );
-                }
+            if validated_schema.relation_mode().is_prisma()
+                && relation.referencing_model().is_defined_in_file(initiating_file_id)
+            {
+                relations::add_index_for_relation_fields(&mut actions, &context, complete_relation.referencing_field());
             }
 
             if validated_schema.relation_mode().uses_foreign_keys() {
@@ -293,5 +289,5 @@ pub(crate) fn parse_url(url: &str) -> Result<Url, Box<dyn std::error::Error>> {
     if result.is_err() {
         warn!("Could not parse url {url}")
     }
-    return Ok(result?);
+    Ok(result?)
 }

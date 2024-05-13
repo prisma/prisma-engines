@@ -13,7 +13,7 @@ impl Files {
     /// Create a new Files instance from multiple files.
     pub fn new(files: &[(String, schema_ast::SourceFile)], diagnostics: &mut Diagnostics) -> Self {
         let asts = files
-            .into_iter()
+            .iter()
             .enumerate()
             .map(|(file_idx, (path, source))| {
                 let id = FileId(file_idx as u32);

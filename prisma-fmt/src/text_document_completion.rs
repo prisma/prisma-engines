@@ -20,11 +20,7 @@ pub(crate) fn empty_completion_list() -> CompletionList {
     }
 }
 
-pub(crate) fn completion(
-    schema_files: Vec<(String, SourceFile)>,
-    initiating_file_name: &str,
-    params: CompletionParams,
-) -> CompletionList {
+pub(crate) fn completion(schema_files: Vec<(String, SourceFile)>, params: CompletionParams) -> CompletionList {
     let config = parse_configuration_multi_file(&schema_files)
         .ok()
         .map(|(_, config)| config);
@@ -39,7 +35,7 @@ pub(crate) fn completion(
         ParserDatabase::new(&schema_files, &mut diag)
     };
 
-    let Some(initiating_file_id) = db.file_id(initiating_file_name) else {
+    let Some(initiating_file_id) = db.file_id(params.text_document_position.text_document.uri.as_str()) else {
         warn!("Initiating file name is not found in the schema");
         return empty_completion_list();
     };

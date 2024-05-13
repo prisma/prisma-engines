@@ -18,11 +18,11 @@ pub(crate) fn test_scenario(scenario_name: &str) {
     write!(path, "{SCENARIOS_PATH}/{scenario_name}/result.json").unwrap();
     let expected_result = std::fs::read_to_string(&path).unwrap_or_else(|_| String::new());
 
-    let (initiating_file_name, cursor_position, schema_files) = take_cursor(schema_files);
+    let (initiating_file_uri, cursor_position, schema_files) = take_cursor(schema_files);
     let params = lsp_types::CompletionParams {
         text_document_position: lsp_types::TextDocumentPositionParams {
             text_document: lsp_types::TextDocumentIdentifier {
-                uri: "https://example.com/meow".parse().unwrap(),
+                uri: initiating_file_uri.parse().unwrap(),
             }, // ignored
             position: cursor_position,
         },
@@ -35,7 +35,6 @@ pub(crate) fn test_scenario(scenario_name: &str) {
 
     let result = prisma_fmt::text_document_completion(
         serde_json::to_string_pretty(&schema_files).unwrap(),
-        &initiating_file_name,
         &serde_json::to_string_pretty(&params).unwrap(),
     );
     // Prettify the JSON

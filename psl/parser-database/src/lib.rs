@@ -89,7 +89,7 @@ impl ParserDatabase {
 
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
     pub fn new(schemas: &[(String, schema_ast::SourceFile)], diagnostics: &mut Diagnostics) -> Self {
-        let asts = Files::new(&schemas, diagnostics);
+        let asts = Files::new(schemas, diagnostics);
 
         let mut interner = Default::default();
         let mut names = Default::default();
