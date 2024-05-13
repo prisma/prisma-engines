@@ -10,7 +10,7 @@ use query_engine_common::engine::{
     ConstructorOptionsNative, EngineBuilder, EngineBuilderNative, Inner,
 };
 use query_engine_metrics::MetricFormat;
-use request_handlers::{dmmf, load_executor, render_graphql_schema, ConnectorKind, RequestBody, RequestHandler};
+use request_handlers::{load_executor, render_graphql_schema, ConnectorKind, RequestBody, RequestHandler};
 use serde::Deserialize;
 use serde_json::json;
 use std::{collections::HashMap, future::Future, marker::PhantomData, panic::AssertUnwindSafe, sync::Arc};
@@ -388,31 +388,6 @@ impl QueryEngine {
             }
             .with_subscriber(dispatcher)
             .await
-        })
-        .await
-    }
-
-    #[napi]
-    pub async fn dmmf(&self, trace: String) -> napi::Result<String> {
-        async_panic_to_js_error(async {
-            let inner = self.inner.read().await;
-            let engine = inner.as_engine()?;
-
-            let dispatcher = self.logger.dispatcher();
-
-            tracing::dispatcher::with_default(&dispatcher, || {
-                let span = tracing::info_span!("prisma:engine:dmmf");
-                let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
-                let _guard = span.enter();
-                let dmmf = dmmf::render_dmmf(&engine.query_schema);
-
-                let json = {
-                    let _span = tracing::info_span!("prisma:engine:dmmf_to_json").entered();
-                    serde_json::to_string(&dmmf)?
-                };
-
-                Ok(json)
-            })
         })
         .await
     }
