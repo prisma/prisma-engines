@@ -1,4 +1,4 @@
-use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, TextEdit, Url, WorkspaceEdit};
+use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, TextEdit, WorkspaceEdit};
 use psl::parser_database::{
     ast::WithSpan,
     walkers::{CompleteInlineRelationWalker, RelationFieldWalker},
