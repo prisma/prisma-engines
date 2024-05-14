@@ -1099,7 +1099,7 @@ async fn dupes_are_renamed(api: &mut TestApi) -> TestResult {
         The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
           - "public_A"
 
-        These items were renamed due to their names being duplicates in the Prisma Schema Language:
+        These items were renamed due to their names being duplicates in the Prisma schema:
           - Type: "model", name: "private_A"
           - Type: "view", name: "public_A"
     "#]];
