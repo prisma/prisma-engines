@@ -1,15 +1,15 @@
 use lsp_types::{Diagnostic, DiagnosticSeverity};
 use once_cell::sync::Lazy;
 use prisma_fmt::offset_to_position;
-use psl::SourceFile;
+use psl::{diagnostics::Span, SourceFile};
 use std::{fmt::Write as _, io::Write as _, path::PathBuf};
 
 use crate::helpers::load_schema_files;
 
 const SCENARIOS_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/code_actions/scenarios");
 /**
- * File used as a target for code-actions in multi-file
- * tests
+ * Code actions are requested only for single file. So, when emulating lsp request
+ * we need a way to designate that file somehow.
  */
 const TARGET_SCHEMA_FILE: &str = "_target.prisma";
 static UPDATE_EXPECT: Lazy<bool> = Lazy::new(|| std::env::var("UPDATE_EXPECT").is_ok());
@@ -30,34 +30,40 @@ fn parse_schema_diagnostics(files: &[(String, String)], initiating_file_name: &s
             let mut diagnostics = Vec::new();
             for warn in warnings.iter() {
                 if warn.span().file_id == file_id {
-                    diagnostics.push(Diagnostic {
-                        severity: Some(DiagnosticSeverity::WARNING),
-                        message: warn.message().to_owned(),
-                        range: lsp_types::Range {
-                            start: offset_to_position(warn.span().start, source),
-                            end: offset_to_position(warn.span().end, source),
-                        },
-                        ..Default::default()
-                    });
+                    diagnostics.push(create_diagnostic(
+                        DiagnosticSeverity::WARNING,
+                        warn.message(),
+                        warn.span(),
+                        source,
+                    ));
                 }
             }
 
             for error in errors.iter() {
                 if error.span().file_id == file_id {
-                    diagnostics.push(Diagnostic {
-                        severity: Some(DiagnosticSeverity::ERROR),
-                        message: error.message().to_owned(),
-                        range: lsp_types::Range {
-                            start: offset_to_position(error.span().start, source),
-                            end: offset_to_position(error.span().end, source),
-                        },
-                        ..Default::default()
-                    });
+                    diagnostics.push(create_diagnostic(
+                        DiagnosticSeverity::ERROR,
+                        error.message(),
+                        error.span(),
+                        source,
+                    ));
                 }
             }
 
             Some(diagnostics)
         }
+    }
+}
+
+fn create_diagnostic(severity: DiagnosticSeverity, message: &str, span: Span, source: &str) -> Diagnostic {
+    Diagnostic {
+        severity: Some(severity),
+        message: message.to_owned(),
+        range: lsp_types::Range {
+            start: offset_to_position(span.start, source),
+            end: offset_to_position(span.end, source),
+        },
+        ..Default::default()
     }
 }
 
