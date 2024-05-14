@@ -44,29 +44,21 @@ impl<'a> CodeActionsContext<'a> {
     /// A function to find diagnostics matching the given span. Used for
     /// copying the diagnostics to a code action quick fix.
     #[track_caller]
-    pub(super) fn diagnostics_for_span(&self, span: ast::Span) -> Option<Vec<Diagnostic>> {
-        if span.file_id != self.initiating_file_id {
-            return None;
-        }
+    pub(super) fn diagnostics_for_span(&self, span: ast::Span) -> impl Iterator<Item = &Diagnostic> {
+        self.diagnostics().iter().filter(move |diag| {
+            span.overlaps(crate::range_to_span(
+                diag.range,
+                self.initiating_file_source(),
+                self.initiating_file_id,
+            ))
+        })
+    }
 
-        let res: Vec<_> = self
-            .diagnostics()
-            .iter()
-            .filter(|diag| {
-                span.overlaps(crate::range_to_span(
-                    diag.range,
-                    self.initiating_file_source(),
-                    self.initiating_file_id,
-                ))
-            })
+    pub(super) fn diagnostics_for_span_with_message(&self, span: Span, message: &str) -> Vec<Diagnostic> {
+        self.diagnostics_for_span(span)
+            .filter(|diag| diag.message.contains(message))
             .cloned()
-            .collect();
-
-        if res.is_empty() {
-            None
-        } else {
-            Some(res)
-        }
+            .collect()
     }
 }
 
@@ -154,19 +146,6 @@ pub(crate) fn available_actions(
     }
 
     actions
-}
-
-fn filter_diagnostics(span_diagnostics: Vec<Diagnostic>, diagnostic_message: &str) -> Option<Vec<Diagnostic>> {
-    let diagnostics = span_diagnostics
-        .into_iter()
-        .filter(|diag| diag.message.contains(diagnostic_message))
-        .collect::<Vec<Diagnostic>>();
-
-    if diagnostics.is_empty() {
-        return None;
-    }
-
-    Some(diagnostics)
 }
 
 fn create_missing_attribute<'a>(

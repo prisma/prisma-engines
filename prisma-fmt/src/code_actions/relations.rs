@@ -84,13 +84,16 @@ pub(super) fn add_referencing_side_unique(
 
     // The returned diagnostics are the ones we promise to fix with
     // the code action.
-    let diagnostics = context.diagnostics_for_span(relation.referencing_field().ast_field().span());
+    let diagnostics = context
+        .diagnostics_for_span(relation.referencing_field().ast_field().span())
+        .cloned()
+        .collect();
 
     let action = CodeAction {
         title: String::from("Make referencing fields unique"),
         kind: Some(CodeActionKind::QUICKFIX),
         edit: Some(edit),
-        diagnostics,
+        diagnostics: Some(diagnostics),
         ..Default::default()
     };
 
@@ -178,13 +181,16 @@ pub(super) fn add_referenced_side_unique(
 
     // The returned diagnostics are the ones we promise to fix with
     // the code action.
-    let diagnostics = context.diagnostics_for_span(relation.referencing_field().ast_field().span());
+    let diagnostics = context
+        .diagnostics_for_span(relation.referencing_field().ast_field().span())
+        .cloned()
+        .collect();
 
     let action = CodeAction {
         title: String::from("Make referenced field(s) unique"),
         kind: Some(CodeActionKind::QUICKFIX),
         edit: Some(edit),
-        diagnostics,
+        diagnostics: Some(diagnostics),
         ..Default::default()
     };
 
@@ -279,15 +285,12 @@ pub(super) fn add_index_for_relation_fields(
         ..Default::default()
     };
 
-    let span_diagnostics = match context.diagnostics_for_span(relation.relation_attribute().unwrap().span()) {
-        Some(sd) => sd,
-        None => return,
-    };
+    let diagnostics = context
+        .diagnostics_for_span_with_message(relation.relation_attribute().unwrap().span, "relationMode = \"prisma\"");
 
-    let diagnostics = match super::filter_diagnostics(span_diagnostics, "relationMode = \"prisma\"") {
-        Some(value) => value,
-        None => return,
-    };
+    if diagnostics.is_empty() {
+        return;
+    }
 
     let action = CodeAction {
         title: String::from("Add an index for the relation's field(s)"),

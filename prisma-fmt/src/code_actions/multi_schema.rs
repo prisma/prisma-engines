@@ -29,16 +29,14 @@ pub(super) fn add_schema_block_attribute_model(
     let file_uri = model.db.file_name(file_id);
     let file_content = model.db.source(file_id);
 
-    let span_diagnostics = match context.diagnostics_for_span(model.ast_model().span()) {
-        Some(sd) => sd,
-        None => return,
-    };
+    let diagnostics = context.diagnostics_for_span_with_message(
+        model.ast_model().span(),
+        "This model is missing an `@@schema` attribute.",
+    );
 
-    let diagnostics =
-        match super::filter_diagnostics(span_diagnostics, "This model is missing an `@@schema` attribute.") {
-            Some(value) => value,
-            None => return,
-        };
+    if diagnostics.is_empty() {
+        return;
+    }
 
     let formatted_attribute = super::format_block_attribute(
         "schema()",
@@ -90,16 +88,14 @@ pub(super) fn add_schema_block_attribute_enum(
     let file_uri = enumerator.db.file_name(file_id);
     let file_content = enumerator.db.source(file_id);
 
-    let span_diagnostics = match context.diagnostics_for_span(enumerator.ast_enum().span()) {
-        Some(sd) => sd,
-        None => return,
-    };
+    let diagnostics = context.diagnostics_for_span_with_message(
+        enumerator.ast_enum().span(),
+        "This enum is missing an `@@schema` attribute.",
+    );
 
-    let diagnostics = match super::filter_diagnostics(span_diagnostics, "This enum is missing an `@@schema` attribute.")
-    {
-        Some(value) => value,
-        None => return,
-    };
+    if diagnostics.is_empty() {
+        return;
+    }
 
     let formatted_attribute = super::format_block_attribute(
         "schema()",
@@ -139,16 +135,14 @@ pub(super) fn add_schema_to_schemas(
         None => return,
     };
 
-    let span_diagnostics = match context.diagnostics_for_span(model.ast_model().span()) {
-        Some(sd) => sd,
-        None => return,
-    };
+    let diagnostics = context.diagnostics_for_span_with_message(
+        model.ast_model().span(),
+        "This schema is not defined in the datasource.",
+    );
 
-    let diagnostics = match super::filter_diagnostics(span_diagnostics, "This schema is not defined in the datasource.")
-    {
-        Some(value) => value,
-        None => return,
-    };
+    if diagnostics.is_empty() {
+        return;
+    }
 
     let datasource_file_id = datasource.span.file_id;
     let datasource_file_uri = context.db.file_name(datasource_file_id);

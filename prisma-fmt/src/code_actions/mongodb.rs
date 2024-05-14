@@ -25,18 +25,14 @@ pub(super) fn add_at_map_for_id(
     let file_id = model.ast_model().span().file_id;
     let file_uri = model.db.file_name(file_id);
     let file_content = model.db.source(file_id);
-    let span_diagnostics = match context.diagnostics_for_span(model.ast_model().span()) {
-        Some(sd) => sd,
-        None => return,
-    };
-
-    let diagnostics = match super::filter_diagnostics(
-        span_diagnostics,
+    let diagnostics = context.diagnostics_for_span_with_message(
+        model.ast_model().span(),
         r#"MongoDB model IDs must have an @map("_id") annotation."#,
-    ) {
-        Some(value) => value,
-        None => return,
-    };
+    );
+
+    if diagnostics.is_empty() {
+        return;
+    }
 
     let formatted_attribute = super::format_field_attribute(r#"@map("_id")"#);
 
@@ -85,18 +81,14 @@ pub(super) fn add_native_for_auto_id(
     let file_uri = model.db.file_name(file_id);
     let file_content = model.db.source(file_id);
 
-    let span_diagnostics = match context.diagnostics_for_span(model.ast_model().span()) {
-        Some(sd) => sd,
-        None => return,
-    };
-
-    let diagnostics = match super::filter_diagnostics(
-        span_diagnostics,
+    let diagnostics = context.diagnostics_for_span_with_message(
+        model.ast_model().span(),
         r#"MongoDB `@default(auto())` fields must have `ObjectId` native type."#,
-    ) {
-        Some(value) => value,
-        None => return,
-    };
+    );
+
+    if diagnostics.is_empty() {
+        return;
+    }
 
     let formatted_attribute = super::format_field_attribute(format!("@{}.ObjectId", source.name).as_str());
 
