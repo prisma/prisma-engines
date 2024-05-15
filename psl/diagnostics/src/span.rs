@@ -38,7 +38,7 @@ impl Span {
 
     /// Is the given span overlapping with the current span.
     pub fn overlaps(self, other: Span) -> bool {
-        self.contains(other.start) || self.contains(other.end)
+        self.file_id == other.file_id && (self.contains(other.start) || self.contains(other.end))
     }
 }
 

@@ -87,9 +87,9 @@ pub fn preview_features() -> String {
 /// Input and output are both JSON, the request being a `CompletionParams` object and the response
 /// being a `CompletionList` object.
 #[wasm_bindgen]
-pub fn text_document_completion(schema: String, params: String) -> String {
+pub fn text_document_completion(schema_files: String, params: String) -> String {
     register_panic_hook();
-    prisma_fmt::text_document_completion(schema, &params)
+    prisma_fmt::text_document_completion(schema_files, &params)
 }
 
 /// This API is modelled on an LSP [code action

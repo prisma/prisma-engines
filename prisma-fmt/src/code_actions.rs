@@ -3,89 +3,120 @@ mod multi_schema;
 mod relation_mode;
 mod relations;
 
-use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic, Range, TextEdit, WorkspaceEdit};
+use log::warn;
+use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic, Range, TextEdit, Url, WorkspaceEdit};
 use psl::{
-    diagnostics::Span,
+    diagnostics::{FileId, Span},
     parser_database::{
         ast,
         walkers::{ModelWalker, RefinedRelationWalker, ScalarFieldWalker},
-        SourceFile,
+        ParserDatabase, SourceFile,
     },
     schema_ast::ast::{Attribute, IndentationType, NewlineType, WithSpan},
-    PreviewFeature,
+    Configuration, Datasource, PreviewFeature,
 };
-use std::{collections::HashMap, sync::Arc};
+use std::collections::HashMap;
+
+pub(super) struct CodeActionsContext<'a> {
+    pub(super) db: &'a ParserDatabase,
+    pub(super) config: &'a Configuration,
+    pub(super) initiating_file_id: FileId,
+    pub(super) lsp_params: CodeActionParams,
+}
+
+impl<'a> CodeActionsContext<'a> {
+    pub(super) fn initiating_file_source(&self) -> &str {
+        self.db.source(self.initiating_file_id)
+    }
+
+    pub(super) fn initiating_file_uri(&self) -> &str {
+        self.db.file_name(self.initiating_file_id)
+    }
+
+    pub(super) fn diagnostics(&self) -> &[Diagnostic] {
+        &self.lsp_params.context.diagnostics
+    }
+
+    pub(super) fn datasource(&self) -> Option<&Datasource> {
+        self.config.datasources.first()
+    }
+
+    /// A function to find diagnostics matching the given span. Used for
+    /// copying the diagnostics to a code action quick fix.
+    #[track_caller]
+    pub(super) fn diagnostics_for_span(&self, span: ast::Span) -> impl Iterator<Item = &Diagnostic> {
+        self.diagnostics().iter().filter(move |diag| {
+            span.overlaps(crate::range_to_span(
+                diag.range,
+                self.initiating_file_source(),
+                self.initiating_file_id,
+            ))
+        })
+    }
+
+    pub(super) fn diagnostics_for_span_with_message(&self, span: Span, message: &str) -> Vec<Diagnostic> {
+        self.diagnostics_for_span(span)
+            .filter(|diag| diag.message.contains(message))
+            .cloned()
+            .collect()
+    }
+}
 
 pub(crate) fn empty_code_actions() -> Vec<CodeActionOrCommand> {
     Vec::new()
 }
 
-pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec<CodeActionOrCommand> {
+pub(crate) fn available_actions(
+    schema_files: Vec<(String, SourceFile)>,
+    params: CodeActionParams,
+) -> Vec<CodeActionOrCommand> {
     let mut actions = Vec::new();
 
-    let file = SourceFile::new_allocated(Arc::from(schema.into_boxed_str()));
-
-    let validated_schema = psl::validate(file);
+    let validated_schema = psl::validate_multi_file(schema_files);
 
     let config = &validated_schema.configuration;
 
     let datasource = config.datasources.first();
+    let file_uri = params.text_document.uri.as_str();
+    let Some(initiating_file_id) = validated_schema.db.file_id(file_uri) else {
+        warn!("Initiating file name is not found in the schema");
+        return vec![];
+    };
 
-    for source in validated_schema.db.ast_assert_single().sources() {
-        relation_mode::edit_referential_integrity(
-            &mut actions,
-            &params,
-            validated_schema.db.source_assert_single(),
-            source,
-        )
+    let context = CodeActionsContext {
+        db: &validated_schema.db,
+        config,
+        initiating_file_id,
+        lsp_params: params,
+    };
+
+    let initiating_ast = validated_schema.db.ast(initiating_file_id);
+    for source in initiating_ast.sources() {
+        relation_mode::edit_referential_integrity(&mut actions, &context, source)
     }
 
     // models AND views
     for model in validated_schema
         .db
-        .walk_models()
-        .chain(validated_schema.db.walk_views())
+        .walk_models_in_file(initiating_file_id)
+        .chain(validated_schema.db.walk_views_in_file(initiating_file_id))
     {
         if config.preview_features().contains(PreviewFeature::MultiSchema) {
-            multi_schema::add_schema_block_attribute_model(
-                &mut actions,
-                &params,
-                validated_schema.db.source_assert_single(),
-                config,
-                model,
-            );
+            multi_schema::add_schema_block_attribute_model(&mut actions, &context, model);
 
-            multi_schema::add_schema_to_schemas(
-                &mut actions,
-                &params,
-                validated_schema.db.source_assert_single(),
-                config,
-                model,
-            );
+            multi_schema::add_schema_to_schemas(&mut actions, &context, model);
         }
 
         if matches!(datasource, Some(ds) if ds.active_provider == "mongodb") {
-            mongodb::add_at_map_for_id(&mut actions, &params, validated_schema.db.source_assert_single(), model);
+            mongodb::add_at_map_for_id(&mut actions, &context, model);
 
-            mongodb::add_native_for_auto_id(
-                &mut actions,
-                &params,
-                validated_schema.db.source_assert_single(),
-                model,
-                datasource.unwrap(),
-            );
+            mongodb::add_native_for_auto_id(&mut actions, &context, model, datasource.unwrap());
         }
     }
 
-    for enumerator in validated_schema.db.walk_enums() {
+    for enumerator in validated_schema.db.walk_enums_in_file(initiating_file_id) {
         if config.preview_features().contains(PreviewFeature::MultiSchema) {
-            multi_schema::add_schema_block_attribute_enum(
-                &mut actions,
-                &params,
-                validated_schema.db.source_assert_single(),
-                config,
-                enumerator,
-            )
+            multi_schema::add_schema_block_attribute_enum(&mut actions, &context, enumerator)
         }
     }
 
@@ -96,78 +127,25 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
                 None => continue,
             };
 
-            relations::add_referenced_side_unique(
-                &mut actions,
-                &params,
-                validated_schema.db.source_assert_single(),
-                complete_relation,
-            );
+            relations::add_referenced_side_unique(&mut actions, &context, complete_relation);
 
             if relation.is_one_to_one() {
-                relations::add_referencing_side_unique(
-                    &mut actions,
-                    &params,
-                    validated_schema.db.source_assert_single(),
-                    complete_relation,
-                );
+                relations::add_referencing_side_unique(&mut actions, &context, complete_relation);
             }
 
-            if validated_schema.relation_mode().is_prisma() {
-                relations::add_index_for_relation_fields(
-                    &mut actions,
-                    &params,
-                    validated_schema.db.source_assert_single(),
-                    complete_relation.referencing_field(),
-                );
+            if validated_schema.relation_mode().is_prisma()
+                && relation.referencing_model().is_defined_in_file(initiating_file_id)
+            {
+                relations::add_index_for_relation_fields(&mut actions, &context, complete_relation.referencing_field());
             }
 
             if validated_schema.relation_mode().uses_foreign_keys() {
-                relation_mode::replace_set_default_mysql(
-                    &mut actions,
-                    &params,
-                    validated_schema.db.source_assert_single(),
-                    complete_relation,
-                    config,
-                )
+                relation_mode::replace_set_default_mysql(&mut actions, &context, complete_relation)
             }
         }
     }
 
     actions
-}
-
-/// A function to find diagnostics matching the given span. Used for
-/// copying the diagnostics to a code action quick fix.
-#[track_caller]
-pub(super) fn diagnostics_for_span(
-    schema: &str,
-    diagnostics: &[Diagnostic],
-    span: ast::Span,
-) -> Option<Vec<Diagnostic>> {
-    let res: Vec<_> = diagnostics
-        .iter()
-        .filter(|diag| span.overlaps(crate::range_to_span(diag.range, schema)))
-        .cloned()
-        .collect();
-
-    if res.is_empty() {
-        None
-    } else {
-        Some(res)
-    }
-}
-
-fn filter_diagnostics(span_diagnostics: Vec<Diagnostic>, diagnostic_message: &str) -> Option<Vec<Diagnostic>> {
-    let diagnostics = span_diagnostics
-        .into_iter()
-        .filter(|diag| diag.message.contains(diagnostic_message))
-        .collect::<Vec<Diagnostic>>();
-
-    if diagnostics.is_empty() {
-        return None;
-    }
-
-    Some(diagnostics)
 }
 
 fn create_missing_attribute<'a>(
@@ -259,15 +237,15 @@ fn format_block_attribute(
 }
 
 fn create_text_edit(
-    schema: &str,
+    target_file_uri: &str,
+    target_file_content: &str,
     formatted_attribute: String,
     append: bool,
     span: Span,
-    params: &CodeActionParams,
-) -> WorkspaceEdit {
+) -> Result<WorkspaceEdit, Box<dyn std::error::Error>> {
     let range = match append {
-        true => range_after_span(schema, span),
-        false => span_to_range(schema, span),
+        true => range_after_span(target_file_content, span),
+        false => span_to_range(target_file_content, span),
     };
 
     let text = TextEdit {
@@ -276,10 +254,19 @@ fn create_text_edit(
     };
 
     let mut changes = HashMap::new();
-    changes.insert(params.text_document.uri.clone(), vec![text]);
+    let url = parse_url(target_file_uri)?;
+    changes.insert(url, vec![text]);
 
-    WorkspaceEdit {
+    Ok(WorkspaceEdit {
         changes: Some(changes),
         ..Default::default()
+    })
+}
+
+pub(crate) fn parse_url(url: &str) -> Result<Url, Box<dyn std::error::Error>> {
+    let result = Url::parse(url);
+    if result.is_err() {
+        warn!("Could not parse url {url}")
     }
+    Ok(result?)
 }

@@ -1,10 +1,11 @@
 use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand};
 use psl::{parser_database::walkers::ModelWalker, schema_ast::ast::WithSpan, Datasource};
 
+use super::CodeActionsContext;
+
 pub(super) fn add_at_map_for_id(
     actions: &mut Vec<CodeActionOrCommand>,
-    params: &lsp_types::CodeActionParams,
-    schema: &str,
+    context: &CodeActionsContext<'_>,
     model: ModelWalker<'_>,
 ) {
     let pk = match model.primary_key() {
@@ -21,23 +22,29 @@ pub(super) fn add_at_map_for_id(
         None => return,
     };
 
-    let span_diagnostics =
-        match super::diagnostics_for_span(schema, &params.context.diagnostics, model.ast_model().span()) {
-            Some(sd) => sd,
-            None => return,
-        };
-
-    let diagnostics = match super::filter_diagnostics(
-        span_diagnostics,
+    let file_id = model.ast_model().span().file_id;
+    let file_uri = model.db.file_name(file_id);
+    let file_content = model.db.source(file_id);
+    let diagnostics = context.diagnostics_for_span_with_message(
+        model.ast_model().span(),
         r#"MongoDB model IDs must have an @map("_id") annotation."#,
-    ) {
-        Some(value) => value,
-        None => return,
-    };
+    );
+
+    if diagnostics.is_empty() {
+        return;
+    }
 
     let formatted_attribute = super::format_field_attribute(r#"@map("_id")"#);
 
-    let edit = super::create_text_edit(schema, formatted_attribute, true, field.ast_field().span(), params);
+    let Ok(edit) = super::create_text_edit(
+        file_uri,
+        file_content,
+        formatted_attribute,
+        true,
+        field.ast_field().span(),
+    ) else {
+        return;
+    };
 
     let action = CodeAction {
         title: r#"Add @map("_id")"#.to_owned(),
@@ -52,8 +59,7 @@ pub(super) fn add_at_map_for_id(
 
 pub(super) fn add_native_for_auto_id(
     actions: &mut Vec<CodeActionOrCommand>,
-    params: &lsp_types::CodeActionParams,
-    schema: &str,
+    context: &CodeActionsContext<'_>,
     model: ModelWalker<'_>,
     source: &Datasource,
 ) {
@@ -71,23 +77,30 @@ pub(super) fn add_native_for_auto_id(
         None => return,
     };
 
-    let span_diagnostics =
-        match super::diagnostics_for_span(schema, &params.context.diagnostics, model.ast_model().span()) {
-            Some(sd) => sd,
-            None => return,
-        };
+    let file_id = model.ast_model().span().file_id;
+    let file_uri = model.db.file_name(file_id);
+    let file_content = model.db.source(file_id);
 
-    let diagnostics = match super::filter_diagnostics(
-        span_diagnostics,
+    let diagnostics = context.diagnostics_for_span_with_message(
+        model.ast_model().span(),
         r#"MongoDB `@default(auto())` fields must have `ObjectId` native type."#,
-    ) {
-        Some(value) => value,
-        None => return,
-    };
+    );
+
+    if diagnostics.is_empty() {
+        return;
+    }
 
     let formatted_attribute = super::format_field_attribute(format!("@{}.ObjectId", source.name).as_str());
 
-    let edit = super::create_text_edit(schema, formatted_attribute, true, field.ast_field().span(), params);
+    let Ok(edit) = super::create_text_edit(
+        file_uri,
+        file_content,
+        formatted_attribute,
+        true,
+        field.ast_field().span(),
+    ) else {
+        return;
+    };
 
     let action = CodeAction {
         title: r#"Add @db.ObjectId"#.to_owned(),

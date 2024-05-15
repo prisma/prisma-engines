@@ -84,7 +84,7 @@ pub fn validate_multi_file(files: Vec<(String, SourceFile)>, connectors: Connect
         "psl::validate_multi_file() must be called with at least one file"
     );
     let mut diagnostics = Diagnostics::new();
-    let db = ParserDatabase::new(files, &mut diagnostics);
+    let db = ParserDatabase::new(&files, &mut diagnostics);
 
     // TODO: the bulk of configuration block analysis should be part of ParserDatabase::new().
     let mut configuration = Configuration::default();
@@ -139,7 +139,7 @@ pub fn parse_configuration(
 }
 
 pub fn parse_configuration_multi_file(
-    files: Vec<(String, SourceFile)>,
+    files: &[(String, SourceFile)],
     connectors: ConnectorRegistry<'_>,
 ) -> Result<(Files, Configuration), (Files, diagnostics::Diagnostics)> {
     let mut diagnostics = Diagnostics::default();

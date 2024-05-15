@@ -12,14 +12,14 @@ mod validate;
 
 use log::*;
 use lsp_types::{Position, Range};
-use psl::parser_database::ast;
+use psl::{diagnostics::FileId, parser_database::ast};
 use schema_file_input::SchemaFileInput;
 
 /// The API is modelled on an LSP [completion
 /// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_completion).
 /// Input and output are both JSON, the request being a `CompletionParams` object and the response
 /// being a `CompletionList` object.
-pub fn text_document_completion(schema: String, params: &str) -> String {
+pub fn text_document_completion(schema_files: String, params: &str) -> String {
     let params = if let Ok(params) = serde_json::from_str::<lsp_types::CompletionParams>(params) {
         params
     } else {
@@ -27,13 +27,18 @@ pub fn text_document_completion(schema: String, params: &str) -> String {
         return serde_json::to_string(&text_document_completion::empty_completion_list()).unwrap();
     };
 
-    let completion_list = text_document_completion::completion(schema, params);
+    let Ok(input) = serde_json::from_str::<SchemaFileInput>(&schema_files) else {
+        warn!("Failed to parse schema file input");
+        return serde_json::to_string(&text_document_completion::empty_completion_list()).unwrap();
+    };
+
+    let completion_list = text_document_completion::completion(input.into(), params);
 
     serde_json::to_string(&completion_list).unwrap()
 }
 
 /// This API is modelled on an LSP [code action request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_codeAction=). Input and output are both JSON, the request being a `CodeActionParams` object and the response being a list of `CodeActionOrCommand` objects.
-pub fn code_actions(schema: String, params: &str) -> String {
+pub fn code_actions(schema_files: String, params: &str) -> String {
     let params = if let Ok(params) = serde_json::from_str::<lsp_types::CodeActionParams>(params) {
         params
     } else {
@@ -41,7 +46,12 @@ pub fn code_actions(schema: String, params: &str) -> String {
         return serde_json::to_string(&code_actions::empty_code_actions()).unwrap();
     };
 
-    let actions = code_actions::available_actions(schema, params);
+    let Ok(input) = serde_json::from_str::<SchemaFileInput>(&schema_files) else {
+        warn!("Failed to parse schema file input");
+        return serde_json::to_string(&text_document_completion::empty_completion_list()).unwrap();
+    };
+
+    let actions = code_actions::available_actions(input.into(), params);
     serde_json::to_string(&actions).unwrap()
 }
 
@@ -254,11 +264,11 @@ pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<
 
 #[track_caller]
 /// Converts an LSP range to a span.
-pub(crate) fn range_to_span(range: Range, document: &str) -> ast::Span {
+pub(crate) fn range_to_span(range: Range, document: &str, file_id: FileId) -> ast::Span {
     let start = position_to_offset(&range.start, document).unwrap();
     let end = position_to_offset(&range.end, document).unwrap();
 
-    ast::Span::new(start, end, psl::parser_database::FileId::ZERO)
+    ast::Span::new(start, end, file_id)
 }
 
 /// Gives the LSP position right after the given span.

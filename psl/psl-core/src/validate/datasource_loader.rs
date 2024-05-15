@@ -10,6 +10,7 @@ use parser_database::{
     ast::{Expression, WithDocumentation},
     coerce, coerce_array, coerce_opt,
 };
+use schema_ast::ast::WithSpan;
 use std::{borrow::Cow, collections::HashMap};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
@@ -219,6 +220,7 @@ fn lift_datasource(
 
     Some(Datasource {
         namespaces: schemas.into_iter().map(|(s, span)| (s.to_owned(), span)).collect(),
+        span: ast_source.span(),
         schemas_span,
         name: source_name.to_owned(),
         provider: provider.to_owned(),

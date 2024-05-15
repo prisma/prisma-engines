@@ -1,0 +1,41 @@
+[
+  {
+    "title": "Make referenced field(s) unique",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 4,
+            "character": 2
+          },
+          "end": {
+            "line": 5,
+            "character": 0
+          }
+        },
+        "severity": 1,
+        "message": "Error parsing attribute \"@relation\": The argument `references` must refer to a unique criterion in the related model. Consider adding an `@@unique([field1, field2])` attribute to the model `A`."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/A.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 5,
+                "character": 0
+              },
+              "end": {
+                "line": 5,
+                "character": 1
+              }
+            },
+            "newText": "\n    @@unique([field1, field2])\n}"
+          }
+        ]
+      }
+    }
+  }
+]

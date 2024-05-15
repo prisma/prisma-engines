@@ -43,8 +43,8 @@ pub(crate) fn get_config(params: &str) -> Result<String, String> {
 }
 
 fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConfigError> {
-    let (files, mut config) =
-        psl::parse_configuration_multi_file(params.prisma_schema.into()).map_err(create_get_config_error)?;
+    let prisma_schema: Vec<_> = params.prisma_schema.into();
+    let (files, mut config) = psl::parse_configuration_multi_file(&prisma_schema).map_err(create_get_config_error)?;
 
     if !params.ignore_env_var_errors {
         let overrides: Vec<(_, _)> = params.datasource_overrides.into_iter().collect();

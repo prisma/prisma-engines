@@ -9,6 +9,8 @@ use std::{any::Any, borrow::Cow, path::Path};
 /// a `datasource` from the prisma schema.
 pub struct Datasource {
     pub name: String,
+    /// Span of the whole datasource block (including `datasource` keyword and braces)
+    pub span: Span,
     /// The provider string
     pub provider: String,
     /// The provider that was selected as active from all specified providers
