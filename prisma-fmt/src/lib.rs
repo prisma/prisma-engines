@@ -327,7 +327,7 @@ mod tests {
     fn position_after_span_no_newline() {
         let str = "some string";
         let span = Span::new(0, str.len(), FileId::ZERO);
-        let pos = position_after_span(span, &str);
+        let pos = position_after_span(span, str);
         assert_eq!(pos.line, 0);
         assert_eq!(pos.character, 11);
     }
@@ -336,7 +336,7 @@ mod tests {
     fn position_after_span_lf() {
         let str = "some string\n";
         let span = Span::new(0, str.len(), FileId::ZERO);
-        let pos = position_after_span(span, &str);
+        let pos = position_after_span(span, str);
         assert_eq!(pos.line, 0);
         assert_eq!(pos.character, 11);
     }
@@ -345,7 +345,7 @@ mod tests {
     fn position_after_span_crlf() {
         let str = "some string\r\n";
         let span = Span::new(0, str.len(), FileId::ZERO);
-        let pos = position_after_span(span, &str);
+        let pos = position_after_span(span, str);
         assert_eq!(pos.line, 0);
         assert_eq!(pos.character, 11);
     }
