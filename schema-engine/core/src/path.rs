@@ -1,4 +1,4 @@
-///! Borrowed from https://docs.rs/common-path
+//! Borrowed from https://docs.rs/common-path
 use std::path::{Path, PathBuf};
 
 /// Find the common prefix, if any, between any number of paths
@@ -22,7 +22,7 @@ pub fn common_path_all<'a>(paths: impl IntoIterator<Item = &'a Path>) -> Option<
     let mut path_iter = paths.into_iter();
     let mut result = path_iter.next()?.to_path_buf();
     for path in path_iter {
-        if let Some(r) = common_path(&result, &path) {
+        if let Some(r) = common_path(&result, path) {
             result = r;
         } else {
             return None;

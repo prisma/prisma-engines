@@ -384,7 +384,10 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
 
     let migration = api.connector_diff(
         DiffTarget::Database,
-        DiffTarget::Datamodel(SourceFile::new_static(target_schema)),
+        DiffTarget::Datamodel(vec![(
+            "schema.prisma".to_string(),
+            SourceFile::new_static(target_schema),
+        )]),
         None,
     );
     let expected = expect![[r#"
@@ -482,9 +485,10 @@ fn connecting_to_a_postgres_database_with_the_cockroach_connector_fails(_api: Te
     let engine = schema_core::schema_api(None, None).unwrap();
     let err = tok(
         engine.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
-            datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer {
+            datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(vec![SchemaContainer {
+                file_path: "schema.prisma".to_string(),
                 schema: dm.to_owned(),
-            }),
+            }]),
         }),
     )
     .unwrap_err()
@@ -617,8 +621,8 @@ fn scalar_list_default_diffing(api: TestApi) {
     "#;
 
     let migration = api.connector_diff(
-        DiffTarget::Datamodel(SourceFile::new_static(schema_1)),
-        DiffTarget::Datamodel(SourceFile::new_static(schema_2)),
+        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_1))]),
+        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_2))]),
         None,
     );
 

@@ -10,9 +10,10 @@ description = "Request params for the `schemaPush` method."
 description = "Push the schema ignoring destructive change warnings."
 shape = "bool"
 
-[recordShapes.schemaPushInput.fields.schema]
+[recordShapes.schemaPushInput.fields.schemas]
 description = "The Prisma schema."
-shape = "string"
+shape = "SchemaContainer"
+isList = true
 
 [recordShapes.schemaPushOutput]
 description = "Response result for the `schemaPush` method."

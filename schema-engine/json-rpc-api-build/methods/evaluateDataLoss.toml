@@ -21,9 +21,10 @@ description = "The input to the `evaluateDataLoss` command."
 description = "The location of the migrations directory."
 shape = "string"
 
-[recordShapes.evaluateDataLossInput.fields.prismaSchema]
+[recordShapes.evaluateDataLossInput.fields.schemas]
 description = "The prisma schema to migrate to."
-shape = "string"
+shape = "SchemaContainer"
+isList = true
 
 [recordShapes.evaluateDataLossOutput]
 description = """

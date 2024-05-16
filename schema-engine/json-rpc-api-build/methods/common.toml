@@ -2,14 +2,9 @@
 
 [enumShapes.DatasourceParam]
 description = """
-The path to a live database taken as input. For flexibility, this can be the path to a Prisma
-schema file containing the datasource, or the whole Prisma schema as a string, or only the
+The path to a live database taken as input. For flexibility, this can be the whole Prisma schemas as strings, or only the
 connection string. See variants.
 """
-
-[enumShapes.DatasourceParam.variants.SchemaPath]
-shape = "PathContainer"
-isList = true
 
 [enumShapes.DatasourceParam.variants.SchemaString]
 shape = "SchemaContainer"

@@ -1453,7 +1453,10 @@ async fn migration_with_shadow_database() {
 
     let migration = CreateMigrationInput {
         migrations_directory_path: migrations_directory.path().to_str().unwrap().to_owned(),
-        prisma_schema: dm.clone(),
+        schemas: vec![SchemaContainer {
+            file_path: "schema.prisma".to_string(),
+            schema: dm.clone(),
+        }],
         draft: false,
         migration_name: "init".to_string(),
     };

@@ -319,7 +319,7 @@ impl TestApi {
     pub fn expect_sql_for_schema(&mut self, schema: &'static str, sql: &expect_test::Expect) {
         let found = self.connector_diff(
             DiffTarget::Empty,
-            DiffTarget::Datamodel(SourceFile::new_static(schema)),
+            DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema))]),
             None,
         );
         sql.assert_eq(&found);

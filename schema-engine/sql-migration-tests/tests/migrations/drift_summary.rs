@@ -6,16 +6,19 @@ fn check(from: &str, to: &str, expectation: Expect) {
     let tmpdir = tempfile::tempdir().unwrap();
     let from_schema = write_file_to_tmp(from, &tmpdir, "from.prisma");
     let to_schema = write_file_to_tmp(to, &tmpdir, "to.prisma");
+
     let params = DiffParams {
         exit_code: None,
-        from: schema_core::json_rpc::types::DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: from_schema.to_str().unwrap().to_owned(),
-        }),
+        from: schema_core::json_rpc::types::DiffTarget::SchemaDatamodel(vec![SchemaContainer {
+            file_path: from_schema.to_str().unwrap().to_owned(),
+            schema: from.to_string(),
+        }]),
         script: false,
         shadow_database_url: None,
-        to: schema_core::json_rpc::types::DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: to_schema.to_str().unwrap().to_owned(),
-        }),
+        to: schema_core::json_rpc::types::DiffTarget::SchemaDatamodel(vec![SchemaContainer {
+            file_path: to_schema.to_str().unwrap().to_owned(),
+            schema: to.to_string(),
+        }]),
     };
 
     let host = Arc::new(TestConnectorHost::default());

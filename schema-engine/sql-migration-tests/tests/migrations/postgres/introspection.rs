@@ -53,8 +53,11 @@ ALTER TABLE blocks
     let result = tok(me.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema,
-        schemas: None,
+        schemas: vec![SchemaContainer {
+            file_path: "schema.prisma".to_string(),
+            schema,
+        }],
+        namespaces: None,
     }))
     .unwrap();
 
@@ -123,8 +126,11 @@ CREATE TABLE capitals (
     let result = tok(me.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema,
-        schemas: None,
+        schemas: vec![SchemaContainer {
+            file_path: "schema.prisma".to_string(),
+            schema,
+        }],
+        namespaces: None,
     }))
     .unwrap();
 
@@ -194,8 +200,11 @@ CREATE TABLE capitals (
     let result = tok(me.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema,
-        schemas: None,
+        schemas: vec![SchemaContainer {
+            file_path: "schema.prisma".to_string(),
+            schema,
+        }],
+        namespaces: None,
     }))
     .unwrap();
 

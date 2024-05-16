@@ -5,7 +5,7 @@ use std::fmt::Debug;
 /// Diffable things
 pub enum DiffTarget<'a> {
     /// A Prisma schema.
-    Datamodel(SourceFile),
+    Datamodel(Vec<(String, SourceFile)>),
     /// A migrations folder. What is diffable is the state of the database schema at the end of the
     /// migrations history.
     Migrations(&'a [MigrationDirectory]),
@@ -26,12 +26,12 @@ impl Debug for DiffTarget<'_> {
     }
 }
 
-impl DiffTarget<'_> {
-    /// Try interpreting the DiffTarget as a Datamodel variant.
-    pub fn as_datamodel(&self) -> Option<&str> {
-        match self {
-            DiffTarget::Datamodel(schema) => Some(schema.as_str()),
-            _ => None,
-        }
-    }
-}
+// impl DiffTarget<'_> {
+//     /// Try interpreting the DiffTarget as a Datamodel variant.
+//     pub fn as_datamodel(&self) -> Option<&str> {
+//         match self {
+//             DiffTarget::Datamodel(schema) => Some(schema.as_str()),
+//             _ => None,
+//         }
+//     }
+// }

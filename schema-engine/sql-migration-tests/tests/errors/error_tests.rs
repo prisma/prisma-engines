@@ -16,7 +16,10 @@ pub(crate) async fn connection_error(schema: String) -> ConnectorError {
     };
 
     api.ensure_connection_validity(EnsureConnectionValidityParams {
-        datasource: DatasourceParam::SchemaString(SchemaContainer { schema }),
+        datasource: DatasourceParam::SchemaString(vec![SchemaContainer {
+            file_path: "schema.prisma".to_string(),
+            schema,
+        }]),
     })
     .await
     .unwrap_err()
@@ -403,7 +406,10 @@ async fn connection_string_problems_give_a_nice_error() {
         let api = schema_core::schema_api(Some(dm.clone()), None).unwrap();
         let error = api
             .ensure_connection_validity(EnsureConnectionValidityParams {
-                datasource: DatasourceParam::SchemaString(SchemaContainer { schema: dm }),
+                datasource: DatasourceParam::SchemaString(vec![SchemaContainer {
+                    file_path: "schema.prisma".to_string(),
+                    schema: dm,
+                }]),
             })
             .await
             .unwrap_err();

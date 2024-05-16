@@ -95,8 +95,11 @@ fn namespaces_and_preview_features_from_diff_targets(
     for target in targets {
         match target {
             DiffTarget::Migrations(_) | DiffTarget::Empty | DiffTarget::Url(_) => (),
-            DiffTarget::SchemaDatasource(paths) | DiffTarget::SchemaDatamodel(paths) => {
-                let schemas = crate::read_schemas_from_paths(paths)?;
+            DiffTarget::SchemaDatasource(schemas) | DiffTarget::SchemaDatamodel(schemas) => {
+                let schemas = schemas
+                    .iter()
+                    .map(|container| (container.file_path.clone(), psl::SourceFile::from(&container.schema)))
+                    .collect();
                 let validated_schema = psl::validate_multi_file(schemas);
 
                 for (namespace, _span) in validated_schema
@@ -127,10 +130,15 @@ async fn json_rpc_diff_target_to_connector(
 ) -> CoreResult<Option<(Box<dyn SchemaConnector>, DatabaseSchema)>> {
     match target {
         DiffTarget::Empty => Ok(None),
-        DiffTarget::SchemaDatasource(paths) => {
-            let schema_contents = crate::read_schemas_from_paths(paths)?;
-            let schema_dir = crate::find_common_root_path(paths);
-            let mut connector = crate::schemas_to_connector(schema_contents, schema_dir)?;
+        DiffTarget::SchemaDatasource(schemas) => {
+            let schema_dir = crate::find_common_root_path(schemas);
+            let schema_dir = schema_dir.as_deref();
+            let sources: Vec<_> = schemas
+                .iter()
+                .map(|container| (container.file_path.clone(), psl::SourceFile::from(&container.schema)))
+                .collect();
+
+            let mut connector = crate::schemas_to_connector(sources, schema_dir)?;
             connector.ensure_connection_validity().await?;
             connector.set_preview_features(preview_features);
             let schema = connector
@@ -138,19 +146,16 @@ async fn json_rpc_diff_target_to_connector(
                 .await?;
             Ok(Some((connector, schema)))
         }
-        DiffTarget::SchemaDatamodel(paths) => {
-            let schema_contents = crate::read_schemas_from_paths(paths)?;
-            let mut connector = crate::schemas_to_connector_unchecked(schema_contents)?;
+        DiffTarget::SchemaDatamodel(schemas) => {
+            let sources: Vec<_> = schemas
+                .iter()
+                .map(|container| (container.file_path.clone(), psl::SourceFile::from(&container.schema)))
+                .collect();
+            let mut connector = crate::schemas_to_connector_unchecked(sources.clone())?;
             connector.set_preview_features(preview_features);
 
             let schema = connector
-                .database_schema_from_diff_target(
-                    // TODO: Pass list of schemas
-                    todo!(),
-                    // McDiff::Datamodel(SourceFile::new_allocated(Arc::from(schema_contents.into_boxed_str()))),
-                    None,
-                    namespaces,
-                )
+                .database_schema_from_diff_target(McDiff::Datamodel(sources), None, namespaces)
                 .await?;
             Ok(Some((connector, schema)))
         }

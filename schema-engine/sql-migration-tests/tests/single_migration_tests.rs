@@ -104,9 +104,12 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
         script: true,
         shadow_database_url: None,
         from: schema_core::json_rpc::types::DiffTarget::Empty,
-        to: schema_core::json_rpc::types::DiffTarget::SchemaDatamodel(schema_core::json_rpc::types::SchemaContainer {
-            schema: file_path.to_str().unwrap().to_owned(),
-        }),
+        to: schema_core::json_rpc::types::DiffTarget::SchemaDatamodel(vec![
+            schema_core::json_rpc::types::SchemaContainer {
+                file_path: file_path.to_str().unwrap().to_owned(),
+                schema: text.to_string(),
+            },
+        ]),
     }))
     .unwrap();
 
@@ -129,9 +132,12 @@ fn run_single_migration_test(test_file_path: &str, test_function_name: &'static 
         from: schema_core::json_rpc::types::DiffTarget::Url(schema_core::json_rpc::types::UrlContainer {
             url: connection_string,
         }),
-        to: schema_core::json_rpc::types::DiffTarget::SchemaDatamodel(schema_core::json_rpc::types::SchemaContainer {
-            schema: file_path.to_str().unwrap().to_owned(),
-        }),
+        to: schema_core::json_rpc::types::DiffTarget::SchemaDatamodel(vec![
+            schema_core::json_rpc::types::SchemaContainer {
+                file_path: file_path.to_str().unwrap().to_owned(),
+                schema: text.to_string(),
+            },
+        ]),
     }))
     .unwrap();
 

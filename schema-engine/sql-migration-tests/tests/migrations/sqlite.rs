@@ -202,8 +202,11 @@ fn introspecting_a_non_existing_db_fails() {
     let err = tok(api.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema: dm.to_owned(),
-        schemas: None,
+        schemas: vec![SchemaContainer {
+            file_path: "schema.prisma".to_string(),
+            schema: dm.to_string(),
+        }],
+        namespaces: None,
     }))
     .unwrap_err();
 

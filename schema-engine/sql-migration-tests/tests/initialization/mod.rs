@@ -58,7 +58,10 @@ fn connecting_to_a_postgres_database_with_missing_schema_creates_it(api: TestApi
         let me = schema_api(Some(schema.clone()), None).unwrap();
         tok(
             me.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
-                datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer { schema }),
+                datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(vec![SchemaContainer {
+                    file_path: "schema.prisma".to_string(),
+                    schema,
+                }]),
             }),
         )
         .unwrap();
@@ -104,7 +107,10 @@ fn ipv6_addresses_are_supported_in_connection_strings(api: TestApi) {
     let engine = schema_api(Some(schema.clone()), None).unwrap();
     tok(
         engine.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
-            datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer { schema }),
+            datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(vec![SchemaContainer {
+                file_path: "schema.prisma".to_string(),
+                schema,
+            }]),
         }),
     )
     .unwrap();

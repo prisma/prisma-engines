@@ -4,10 +4,9 @@ mod commands;
 mod json_rpc_stdio;
 mod logger;
 
-use nonempty::NonEmpty;
 use schema_connector::{BoxFuture, ConnectorHost, ConnectorResult};
 use schema_core::rpc_api;
-use std::{str::FromStr, sync::Arc};
+use std::sync::Arc;
 use structopt::StructOpt;
 
 /// When no subcommand is specified, the schema engine will default to starting as a JSON-RPC
@@ -98,23 +97,30 @@ async fn start_engine(datamodel_locations: Vec<String>) {
 
     tracing::info!(git_hash = env!("GIT_HASH"), "Starting schema engine RPC server",);
 
-    let maybe_datamodel_locations = NonEmpty::from_vec(datamodel_locations);
-    let maybe_datamodels = maybe_datamodel_locations.map(|datamodel_locations| {
-        datamodel_locations.map(|location| {
-            let mut file = match std::fs::File::open(&location) {
-                Ok(file) => file,
-                Err(e) => panic!("Error opening datamodel file in `{location}`: {e}"),
-            };
+    let maybe_datamodels = match datamodel_locations.is_empty() {
+        true => None,
+        false => {
+            let datamodels = datamodel_locations
+                .into_iter()
+                .map(|location| {
+                    let mut file = match std::fs::File::open(&location) {
+                        Ok(file) => file,
+                        Err(e) => panic!("Error opening datamodel file in `{location}`: {e}"),
+                    };
 
-            let mut datamodel = String::new();
+                    let mut datamodel = String::new();
 
-            if let Err(e) = file.read_to_string(&mut datamodel) {
-                panic!("Error reading datamodel file `{location}`: {e}");
-            };
+                    if let Err(e) = file.read_to_string(&mut datamodel) {
+                        panic!("Error reading datamodel file `{location}`: {e}");
+                    };
 
-            (location, datamodel)
-        })
-    });
+                    (location, datamodel)
+                })
+                .collect();
+
+            Some(datamodels)
+        }
+    };
 
     let (client, adapter) = json_rpc_stdio::new_client();
     let host = JsonRpcHost { client };

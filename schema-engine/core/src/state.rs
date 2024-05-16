@@ -3,7 +3,7 @@
 //! Why this rather than using connectors directly? We must be able to use the schema engine
 //! without a valid schema or database connection for commands like createDatabase and diff.
 
-use crate::{api::GenericApi, commands, json_rpc::types::*, CoreError, CoreResult};
+use crate::{api::GenericApi, commands, json_rpc::types::*, CoreError, CoreResult, SchemaContainerExt};
 use enumflags2::BitFlags;
 use psl::{parser_database::SourceFile, PreviewFeature};
 use schema_connector::{ConnectorError, ConnectorHost, Namespaces, SchemaConnector};
@@ -31,7 +31,7 @@ pub(crate) struct EngineState {
 }
 
 impl EngineState {
-    fn get_url_from_paths(&self, paths: &[PathContainer]) -> CoreResult<String> {
+    fn get_url_from_schemas(&self, paths: &[SchemaContainer]) -> CoreResult<String> {
         for path in paths {
             if let Ok(url) = self.get_url_from_path(path) {
                 return Ok(url);
@@ -41,8 +41,8 @@ impl EngineState {
         Err(ConnectorError::from_msg("No datasource block found".to_owned()))
     }
 
-    fn get_url_from_path(&self, container: &PathContainer) -> CoreResult<String> {
-        let file_path = &container.path;
+    fn get_url_from_path(&self, container: &SchemaContainer) -> CoreResult<String> {
+        let file_path = &container.file_path;
         let mut schema_file = std::fs::File::open(file_path)
             .map_err(|err| ConnectorError::from_source(err, "Opening Prisma schema file."))?;
         let mut schema_string = String::new();
@@ -60,19 +60,13 @@ impl EngineState {
 
 #[derive(Debug, Eq, Hash, PartialEq)]
 enum ConnectorRequestType {
-    SingleSchema(String),
-    MultiSchema(Vec<(String, SourceFile)>),
+    Schema(Vec<(String, SourceFile)>),
     Url(String),
 }
 
 impl From<Vec<(String, String)>> for ConnectorRequestType {
     fn from(schemas: Vec<(String, String)>) -> Self {
-        Self::MultiSchema(
-            schemas
-                .into_iter()
-                .map(|(a, b)| (a, SourceFile::from(b)).into())
-                .collect(),
-        )
+        Self::Schema(schemas.into_iter().map(|(a, b)| (a, SourceFile::from(b))).collect())
     }
 }
 
@@ -92,7 +86,7 @@ impl EngineState {
         host: Option<Arc<dyn ConnectorHost>>,
     ) -> Self {
         EngineState {
-            initial_datamodel: initial_datamodels.map(|s| psl::validate_multi_file(s.into())),
+            initial_datamodel: initial_datamodels.map(psl::validate_multi_file),
             host: host.unwrap_or_else(|| Arc::new(schema_connector::EmptyHost)),
             connectors: Default::default(),
         }
@@ -106,17 +100,6 @@ impl EngineState {
                 let mut names = ds.namespaces.iter().map(|(ns, _)| ns.to_owned()).collect();
                 Namespaces::from_vec(&mut names)
             })
-    }
-
-    async fn with_connector_from_schema_paths<O: Send + 'static>(
-        &self,
-        paths: &[PathContainer],
-        f: ConnectorRequest<O>,
-    ) -> CoreResult<O> {
-        let schemas = crate::read_schemas_from_paths(paths)?;
-        let config_dir = crate::find_common_root_path(paths);
-
-        self.with_connector_for_schema(schemas, config_dir, f).await
     }
 
     async fn with_connector_for_schema<O: Send + 'static>(
@@ -138,7 +121,7 @@ impl EngineState {
 
         let mut connectors = self.connectors.lock().await;
 
-        match connectors.get(&ConnectorRequestType::MultiSchema(schemas.clone())) {
+        match connectors.get(&ConnectorRequestType::Schema(schemas.clone())) {
             Some(request_sender) => match request_sender.send(erased).await {
                 Ok(()) => (),
                 Err(_) => return Err(ConnectorError::from_msg("tokio mpsc send error".to_owned())),
@@ -157,7 +140,7 @@ impl EngineState {
                     Ok(()) => (),
                     Err(_) => return Err(ConnectorError::from_msg("erased sender send error".to_owned())),
                 };
-                connectors.insert(ConnectorRequestType::MultiSchema(schemas), erased_sender);
+                connectors.insert(ConnectorRequestType::Schema(schemas), erased_sender);
             }
         }
 
@@ -206,21 +189,13 @@ impl EngineState {
 
     async fn with_connector_from_datasource_param<O: Send + 'static>(
         &self,
-        param: &DatasourceParam,
+        param: DatasourceParam,
         f: ConnectorRequest<O>,
     ) -> CoreResult<O> {
         match param {
-            DatasourceParam::ConnectionString(UrlContainer { url }) => {
-                self.with_connector_for_url(url.clone(), f).await
-            }
-            DatasourceParam::SchemaPath(paths) => self.with_connector_from_schema_paths(&paths, f).await,
+            DatasourceParam::ConnectionString(UrlContainer { url }) => self.with_connector_for_url(url, f).await,
             DatasourceParam::SchemaString(schemas) => {
-                let schemas = schemas
-                    .iter()
-                    .map(|container| (container.file_name.to_owned(), SourceFile::from(&container.schema)))
-                    .collect::<Vec<_>>();
-
-                self.with_connector_for_schema(schemas, None, f).await
+                self.with_connector_for_schema(schemas.to_psl_input(), None, f).await
             }
         }
     }
@@ -251,7 +226,7 @@ impl GenericApi for EngineState {
         let f: ConnectorRequest<String> = Box::new(|connector| connector.version());
 
         match params {
-            Some(params) => self.with_connector_from_datasource_param(&params.datasource, f).await,
+            Some(params) => self.with_connector_from_datasource_param(params.datasource, f).await,
             None => self.with_default_connector(f).await,
         }
     }
@@ -270,7 +245,7 @@ impl GenericApi for EngineState {
 
     async fn create_database(&self, params: CreateDatabaseParams) -> CoreResult<CreateDatabaseResult> {
         self.with_connector_from_datasource_param(
-            &params.datasource,
+            params.datasource,
             Box::new(|connector| {
                 Box::pin(async move {
                     let database_name = SchemaConnector::create_database(connector).await?;
@@ -296,7 +271,7 @@ impl GenericApi for EngineState {
     async fn db_execute(&self, params: DbExecuteParams) -> CoreResult<()> {
         let url: String = match &params.datasource_type {
             DbExecuteDatasourceType::Url(UrlContainer { url }) => url.clone(),
-            DbExecuteDatasourceType::Schema(paths) => self.get_url_from_paths(&paths)?,
+            DbExecuteDatasourceType::Schema(schemas) => self.get_url_from_schemas(schemas)?,
         };
 
         self.with_connector_for_url(url, Box::new(move |connector| connector.db_execute(params.script)))
@@ -348,7 +323,7 @@ impl GenericApi for EngineState {
         params: EnsureConnectionValidityParams,
     ) -> CoreResult<EnsureConnectionValidityResult> {
         self.with_connector_from_datasource_param(
-            &params.datasource,
+            params.datasource,
             Box::new(|connector| {
                 Box::pin(async move {
                     SchemaConnector::ensure_connection_validity(connector).await?;
@@ -367,10 +342,10 @@ impl GenericApi for EngineState {
     }
 
     async fn introspect(&self, params: IntrospectParams) -> CoreResult<IntrospectResult> {
-        tracing::info!("{:?}", params.schema);
-        let source_files = crate::read_schemas_from_paths(&params.schema)?;
+        tracing::info!("{:?}", params.schemas);
+        let source_files = params.schemas.to_psl_input();
 
-        let has_some_namespaces = params.schemas.is_some();
+        let has_some_namespaces = params.namespaces.is_some();
         let composite_type_depth = From::from(params.composite_type_depth);
 
         let ctx = if params.force {
@@ -379,13 +354,13 @@ impl GenericApi for EngineState {
             schema_connector::IntrospectionContext::new_config_only(
                 previous_schema,
                 composite_type_depth,
-                params.schemas,
+                params.namespaces,
             )
         } else {
             let previous_schema =
                 psl::parse_schema_multi(source_files.clone()).map_err(ConnectorError::new_schema_parser_error)?;
 
-            schema_connector::IntrospectionContext::new(previous_schema, composite_type_depth, params.schemas)
+            schema_connector::IntrospectionContext::new(previous_schema, composite_type_depth, params.namespaces)
         };
 
         if !ctx

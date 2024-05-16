@@ -30,7 +30,10 @@ fn db_push_on_cockroach_db_with_postgres_provider_fails(api: TestApi) {
     let connector = schema_core::schema_api(Some(schema.clone()), None).unwrap();
     let error = tok(connector.schema_push(schema_core::json_rpc::types::SchemaPushInput {
         force: false,
-        schema: schema.clone(),
+        schemas: vec![SchemaContainer {
+            file_path: "schema.prisma".to_string(),
+            schema,
+        }],
     }))
     .unwrap_err()
     .message()
@@ -437,9 +440,10 @@ fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_fails(_api
     let engine = schema_core::schema_api(None, None).unwrap();
     let err = tok(
         engine.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
-            datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer {
+            datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(vec![SchemaContainer {
+                file_path: "schema.prisma".to_string(),
                 schema: dm.to_owned(),
-            }),
+            }]),
         }),
     )
     .unwrap_err()
@@ -1333,8 +1337,8 @@ fn alter_type_works(api: TestApi) {
     "#;
 
     let migration = api.connector_diff(
-        DiffTarget::Datamodel(schema.into()),
-        DiffTarget::Datamodel(to_schema.into()),
+        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), schema.into())]),
+        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), to_schema.into())]),
         None,
     );
 
@@ -1404,7 +1408,10 @@ fn schema_from_introspection_docs_works(api: TestApi) {
 
     let migration = api.connector_diff(
         DiffTarget::Database,
-        DiffTarget::Datamodel(SourceFile::new_static(introspected_schema)),
+        DiffTarget::Datamodel(vec![(
+            "schema.prisma".to_string(),
+            SourceFile::new_static(introspected_schema),
+        )]),
         None,
     );
 
@@ -1461,8 +1468,11 @@ fn cockroach_introspection_with_postgres_provider_fails() {
     let error = tok(me.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema,
-        schemas: None,
+        schemas: vec![SchemaContainer {
+            file_path: "schema.prisma".to_string(),
+            schema,
+        }],
+        namespaces: None,
     }))
     .unwrap_err()
     .message()

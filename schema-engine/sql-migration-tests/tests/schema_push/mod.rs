@@ -485,7 +485,10 @@ model m1 {
     let api = schema_core::schema_api(Some(schema.to_owned()), None).unwrap();
     let err = tok(api.schema_push(schema_core::json_rpc::types::SchemaPushInput {
         force: false,
-        schema: schema.to_owned(),
+        schemas: vec![SchemaContainer {
+            file_path: "schema.prisma".to_string(),
+            schema: schema.to_owned(),
+        }],
     }))
     .unwrap_err();
 

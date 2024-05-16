@@ -138,7 +138,7 @@ fn generate_types_rs(mut file: impl std::io::Write, api: &Api) -> CrateResult {
             }
 
             if let Some(shape) = &variant.shape {
-                let type_name = rustify_type_name(&shape);
+                let type_name = rustify_type_name(shape);
                 let type_name: Cow<'static, str> = match variant.is_list {
                     true => format!("Vec<{type_name}>").into(),
                     false => type_name,
@@ -147,7 +147,7 @@ fn generate_types_rs(mut file: impl std::io::Write, api: &Api) -> CrateResult {
                 writeln!(file, "    {cc_variant_name}({}),", type_name)?;
             } else {
                 let cc_variant_name: String = match variant.is_list {
-                    true => format!("Vec<{cc_variant_name}>").into(),
+                    true => format!("Vec<{cc_variant_name}>"),
                     false => cc_variant_name,
                 };
 

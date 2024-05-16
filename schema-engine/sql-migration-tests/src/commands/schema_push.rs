@@ -39,7 +39,10 @@ impl<'a> SchemaPush<'a> {
 
     fn send_impl(self) -> CoreResult<SchemaPushAssertion> {
         let input = SchemaPushInput {
-            schema: self.schema,
+            schemas: vec![SchemaContainer {
+                file_path: "schema.prisma".to_string(),
+                schema: self.schema,
+            }],
             force: self.force,
         };
 
