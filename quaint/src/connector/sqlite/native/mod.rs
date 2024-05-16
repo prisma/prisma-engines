@@ -51,9 +51,8 @@ impl TryFrom<&str> for Sqlite {
             // The database is created if it does not already exist.
             rusqlite::OpenFlags::SQLITE_OPEN_READ_WRITE
                 | rusqlite::OpenFlags::SQLITE_OPEN_CREATE
-                // The new database connection will use the "multi-thread" threading mode.
-                // This means that separate threads are allowed to use SQLite at the same time, as long as each thread is using a different database connection.
-                | rusqlite::OpenFlags::SQLITE_OPEN_NO_MUTEX
+                // The new database connection will use the "serialized" threading mode.
+                | rusqlite::OpenFlags::SQLITE_OPEN_FULL_MUTEX
                 // The filename can be interpreted as a URI if this flag is set.
                 | rusqlite::OpenFlags::SQLITE_OPEN_URI,
         )?;
