@@ -52,14 +52,23 @@ impl TryFrom<&str> for Sqlite {
             rusqlite::OpenFlags::SQLITE_OPEN_READ_WRITE
                 | rusqlite::OpenFlags::SQLITE_OPEN_CREATE
                 // The new database connection will use the "serialized" threading mode.
-                | rusqlite::OpenFlags::SQLITE_OPEN_FULL_MUTEX
+                | rusqlite::OpenFlags::SQLITE_OPEN_NO_MUTEX
                 // The filename can be interpreted as a URI if this flag is set.
                 | rusqlite::OpenFlags::SQLITE_OPEN_URI,
         )?;
 
+        println!("params.socket_timeout: {:?}", &params.socket_timeout);
+
         if let Some(timeout) = params.socket_timeout {
+            // setting this will change the busy handler.
             conn.busy_timeout(timeout)?;
         };
+
+        conn.busy_handler(Some(|n| {
+            println!("n @ busy_handler: {:?}", n);
+
+            n <= 3
+        }))?;
 
         let client = Mutex::new(conn);
 

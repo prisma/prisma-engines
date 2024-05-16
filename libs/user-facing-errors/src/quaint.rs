@@ -175,6 +175,15 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
                         .into(),
                 }))
             }
+            ConnectionInfo::Native(NativeConnectionInfo::Sqlite { file_path, db_name: _ }) => {
+                Some(KnownError::new(common::DatabaseOperationTimeout {
+                    time: "N/A".into(),
+                    context: format!(
+                        "Socket timeout (the database failed to respond to a query within the configured timeout — see https://pris.ly/d/sqlite-connector for more details.). Database: {}",
+                        file_path
+                    ),
+                }))
+            }
             _ => unreachable!(),
         },
 
