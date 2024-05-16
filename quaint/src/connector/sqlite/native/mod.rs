@@ -35,7 +35,28 @@ impl TryFrom<&str> for Sqlite {
         let params = SqliteParams::try_from(path)?;
         let file_path = params.file_path;
 
-        let conn = rusqlite::Connection::open(file_path.as_str())?;
+        // Read about SQLite threading modes here: https://www.sqlite.org/threadsafe.html.
+        // - "single-thread". In this mode, all mutexes are disabled and SQLite is unsafe to use in more than a single thread at once.
+        // - "multi-thread". In this mode, SQLite can be safely used by multiple threads provided that no single database connection nor any
+        //   object derived from database connection, such as a prepared statement, is used in two or more threads at the same time.
+        // - "serialized". In serialized mode, API calls to affect or use any SQLite database connection or any object derived from such a
+        //   database connection can be made safely from multiple threads. The effect on an individual object is the same as if the API calls
+        //   had all been made in the same order from a single thread.
+        //
+        // `rusqlite` uses `SQLITE_OPEN_NO_MUTEX` by default, which means that the connection uses the "multi-thread" threading mode.
+
+        let conn = rusqlite::Connection::open_with_flags(
+            file_path.as_str(),
+            // The database is opened for reading and writing if possible, or reading only if the file is write protected by the operating system.
+            // The database is created if it does not already exist.
+            rusqlite::OpenFlags::SQLITE_OPEN_READ_WRITE
+                | rusqlite::OpenFlags::SQLITE_OPEN_CREATE
+                // The new database connection will use the "multi-thread" threading mode.
+                // This means that separate threads are allowed to use SQLite at the same time, as long as each thread is using a different database connection.
+                | rusqlite::OpenFlags::SQLITE_OPEN_NO_MUTEX
+                // The filename can be interpreted as a URI if this flag is set.
+                | rusqlite::OpenFlags::SQLITE_OPEN_URI,
+        )?;
 
         if let Some(timeout) = params.socket_timeout {
             conn.busy_timeout(timeout)?;
