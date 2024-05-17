@@ -59,6 +59,16 @@ pub fn parse_schema(file: impl Into<SourceFile>) -> Result<ValidatedSchema, Stri
     Ok(schema)
 }
 
+/// Parse and analyze a Prisma schema.
+pub fn parse_schema_multi(files: Vec<(String, SourceFile)>) -> Result<ValidatedSchema, String> {
+    let mut schema = validate_multi_file(files);
+    schema
+        .diagnostics
+        .to_result()
+        .map_err(|err| err.to_pretty_string("schema.prisma", schema.db.source_assert_single()))?;
+    Ok(schema)
+}
+
 /// The most general API for dealing with Prisma schemas. It accumulates what analysis and
 /// validation information it can, and returns it along with any error and warning diagnostics.
 pub fn validate(file: SourceFile) -> ValidatedSchema {

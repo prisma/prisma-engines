@@ -22,7 +22,12 @@ impl<'a> EvaluateDataLoss<'a> {
         let fut = evaluate_data_loss(
             EvaluateDataLossInput {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
-                prisma_schema: self.prisma_schema,
+                schema: SchemasContainer {
+                    files: vec![SchemaContainer {
+                        path: "schema.prisma".to_string(),
+                        content: self.prisma_schema,
+                    }],
+                },
             },
             self.api,
         );

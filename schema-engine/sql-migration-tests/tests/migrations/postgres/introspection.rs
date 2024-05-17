@@ -1,3 +1,4 @@
+use schema_core::json_rpc::types::SchemasContainer;
 use sql_migration_tests::test_api::*;
 
 #[test]
@@ -53,8 +54,13 @@ ALTER TABLE blocks
     let result = tok(me.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema,
-        schemas: None,
+        schema: SchemasContainer {
+            files: vec![SchemaContainer {
+                path: "schema.prisma".to_string(),
+                content: schema,
+            }],
+        },
+        namespaces: None,
     }))
     .unwrap();
 
@@ -123,8 +129,13 @@ CREATE TABLE capitals (
     let result = tok(me.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema,
-        schemas: None,
+        schema: SchemasContainer {
+            files: vec![SchemaContainer {
+                path: "schema.prisma".to_string(),
+                content: schema,
+            }],
+        },
+        namespaces: None,
     }))
     .unwrap();
 
@@ -194,8 +205,13 @@ CREATE TABLE capitals (
     let result = tok(me.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema,
-        schemas: None,
+        schema: SchemasContainer {
+            files: vec![SchemaContainer {
+                path: "schema.prisma".to_string(),
+                content: schema,
+            }],
+        },
+        namespaces: None,
     }))
     .unwrap();
 

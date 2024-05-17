@@ -12,11 +12,13 @@ pub mod commands;
 
 mod api;
 mod core_error;
+mod path;
 mod rpc;
 mod state;
 mod timings;
 
 pub use self::{api::GenericApi, core_error::*, rpc::rpc_api, timings::TimingsLayer};
+use json_rpc::types::{SchemaContainer, SchemasContainer};
 pub use schema_connector;
 
 use enumflags2::BitFlags;
@@ -27,11 +29,14 @@ use psl::{
 };
 use schema_connector::ConnectorParams;
 use sql_schema_connector::SqlSchemaConnector;
-use std::{env, path::Path};
+use std::{
+    env,
+    path::{Path, PathBuf},
+};
 use user_facing_errors::common::InvalidConnectionString;
 
-fn parse_schema(schema: SourceFile) -> CoreResult<ValidatedSchema> {
-    psl::parse_schema(schema).map_err(CoreError::new_schema_parser_error)
+fn parse_schema_multi(files: Vec<(String, SourceFile)>) -> CoreResult<ValidatedSchema> {
+    psl::parse_schema_multi(files).map_err(CoreError::new_schema_parser_error)
 }
 
 fn connector_for_connection_string(
@@ -97,9 +102,11 @@ fn connector_for_connection_string(
 }
 
 /// Same as schema_to_connector, but it will only read the provider, not the connector params.
-fn schema_to_connector_unchecked(schema: &str) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
-    let config = psl::parse_configuration(schema)
-        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", schema)))?;
+fn schemas_to_connector_unchecked(
+    schemas: &[(String, SourceFile)],
+) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
+    let (_, config) = psl::parse_configuration_multi_file(schemas)
+        .map_err(|(files, err)| CoreError::new_schema_parser_error(files.render_diagnostics(&err)))?;
 
     let preview_features = config.preview_features();
     let source = config
@@ -121,13 +128,13 @@ fn schema_to_connector_unchecked(schema: &str) -> CoreResult<Box<dyn schema_conn
     Ok(connector)
 }
 
-/// Go from a schema to a connector
-fn schema_to_connector(
-    schema: &str,
+fn prepare_connector(
     config_dir: Option<&Path>,
+    source: Datasource,
+    url: String,
+    preview_features: BitFlags<PreviewFeature, u64>,
+    shadow_database_url: Option<String>,
 ) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
-    let (source, url, preview_features, shadow_database_url) = parse_configuration(schema)?;
-
     let url = config_dir
         .map(|config_dir| psl::set_config_dir(source.active_connector.flavour(), config_dir, &url).into_owned())
         .unwrap_or(url);
@@ -140,7 +147,21 @@ fn schema_to_connector(
 
     let mut connector = connector_for_provider(source.active_provider)?;
     connector.set_params(params)?;
+
     Ok(connector)
+}
+
+/// Go from a schema to a connector
+fn schemas_to_connector(
+    schemas: Vec<(String, SourceFile)>,
+    config_dir: Option<&Path>,
+) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
+    let (source, url, preview_features, shadow_database_url) = schemas
+        .iter()
+        .find_map(|(_, schema)| parse_configuration(schema.as_str()).ok())
+        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
+
+    prepare_connector(config_dir, source, url, preview_features, shadow_database_url)
 }
 
 fn connector_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
@@ -174,6 +195,7 @@ pub fn schema_api(
         parse_configuration(datamodel)?;
     }
 
+    let datamodel = datamodel.map(|datamodel| vec![("schema.prisma".to_owned(), SourceFile::from(datamodel))]);
     let state = state::EngineState::new(datamodel, host);
     Ok(Box::new(state))
 }
@@ -199,4 +221,48 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFl
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
     Ok((source, url, preview_features, shadow_database_url))
+}
+
+pub(crate) fn find_common_root_path(container: &SchemasContainer) -> Option<PathBuf> {
+    path::common_path_all(container.files.iter().map(|container| Path::new(&container.path)))
+}
+
+trait SchemaContainerExt {
+    fn to_psl_input(self) -> Vec<(String, SourceFile)>;
+}
+
+impl SchemaContainerExt for SchemasContainer {
+    fn to_psl_input(self) -> Vec<(String, SourceFile)> {
+        self.files.to_psl_input()
+    }
+}
+
+impl SchemaContainerExt for &SchemasContainer {
+    fn to_psl_input(self) -> Vec<(String, SourceFile)> {
+        (&self.files).to_psl_input()
+    }
+}
+
+impl SchemaContainerExt for Vec<SchemaContainer> {
+    fn to_psl_input(self) -> Vec<(String, SourceFile)> {
+        self.into_iter()
+            .map(|container| (container.path, SourceFile::from(container.content)))
+            .collect()
+    }
+}
+
+impl SchemaContainerExt for Vec<&SchemaContainer> {
+    fn to_psl_input(self) -> Vec<(String, SourceFile)> {
+        self.into_iter()
+            .map(|container| (container.path.clone(), SourceFile::from(&container.content)))
+            .collect()
+    }
+}
+
+impl SchemaContainerExt for &Vec<SchemaContainer> {
+    fn to_psl_input(self) -> Vec<(String, SourceFile)> {
+        self.iter()
+            .map(|container| (container.path.clone(), SourceFile::from(&container.content)))
+            .collect()
+    }
 }

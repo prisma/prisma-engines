@@ -40,7 +40,12 @@ impl<'a> CreateMigration<'a> {
         let output = create_migration(
             CreateMigrationInput {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
-                prisma_schema: self.schema.to_owned(),
+                schema: SchemasContainer {
+                    files: vec![SchemaContainer {
+                        path: "schema.prisma".to_string(),
+                        content: self.schema.to_owned(),
+                    }],
+                },
                 draft: self.draft,
                 migration_name: self.name.to_owned(),
             },

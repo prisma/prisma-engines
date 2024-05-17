@@ -1,4 +1,5 @@
 use quaint::{prelude::Queryable, single::Quaint};
+use schema_core::json_rpc::types::SchemasContainer;
 use sql_migration_tests::test_api::*;
 
 #[test]
@@ -61,7 +62,7 @@ fn db_execute_happy_path_with_prisma_schema() {
         url.replace('\\', "\\\\")
     );
     let schema_path = tmpdir.path().join("schema.prisma");
-    std::fs::write(&schema_path, prisma_schema).unwrap();
+    std::fs::write(&schema_path, prisma_schema.clone()).unwrap();
     let script = r#"
         CREATE TABLE "dogs" ( id INTEGER PRIMARY KEY, name TEXT );
         INSERT INTO "dogs" ("name") VALUES ('snoopy'), ('marmaduke');
@@ -70,8 +71,11 @@ fn db_execute_happy_path_with_prisma_schema() {
     // Execute the command.
     let generic_api = schema_core::schema_api(None, None).unwrap();
     tok(generic_api.db_execute(DbExecuteParams {
-        datasource_type: DbExecuteDatasourceType::Schema(SchemaContainer {
-            schema: schema_path.to_string_lossy().into_owned(),
+        datasource_type: DbExecuteDatasourceType::Schema(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: schema_path.to_string_lossy().into_owned(),
+                content: prisma_schema.to_string(),
+            }],
         }),
         script: script.to_owned(),
     }))
@@ -166,8 +170,11 @@ fn sqlite_db_execute_with_schema_datasource_resolves_relative_paths_correctly() 
 
     let api = schema_core::schema_api(None, None).unwrap();
     tok(api.db_execute(DbExecuteParams {
-        datasource_type: DbExecuteDatasourceType::Schema(SchemaContainer {
-            schema: schema_path.to_str().unwrap().to_owned(),
+        datasource_type: DbExecuteDatasourceType::Schema(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: schema_path.to_str().unwrap().to_owned(),
+                content: schema.to_owned(),
+            }],
         }),
         script: "CREATE TABLE dog ( id INTEGER PRIMARY KEY )".to_owned(),
     }))

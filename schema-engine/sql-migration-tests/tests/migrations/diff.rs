@@ -1,7 +1,7 @@
 use quaint::{prelude::Queryable, single::Quaint};
 use schema_core::{
     commands::diff,
-    json_rpc::types::{DiffTarget, PathContainer},
+    json_rpc::types::{DiffTarget, PathContainer, SchemasContainer},
     schema_connector::SchemaConnector,
 };
 use sql_migration_tests::test_api::*;
@@ -16,7 +16,7 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
 
     api.connector.set_host(host.clone());
 
-    let from = r#"
+    let from_schema = r#"
         datasource db {
             provider = "postgresql"
             url = "postgresql://example.com/test"
@@ -28,9 +28,9 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
         }
     "#;
 
-    let from_file = write_file_to_tmp(from, &tempdir, "from");
+    let from_file = write_file_to_tmp(from_schema, &tempdir, "from");
 
-    let to = r#"
+    let to_schema = r#"
         datasource db {
             provider = "postgresql"
             url = "postgresql://example.com/test"
@@ -46,16 +46,22 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
         }
     "#;
 
-    let to_file = write_file_to_tmp(to, &tempdir, "to");
+    let to_file = write_file_to_tmp(to_schema, &tempdir, "to");
 
     api.diff(DiffParams {
         exit_code: None,
-        from: DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: from_file.to_string_lossy().into_owned(),
+        from: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: from_file.to_string_lossy().into_owned(),
+                content: from_schema.to_string(),
+            }],
         }),
         shadow_database_url: None,
-        to: DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: to_file.to_string_lossy().into_owned(),
+        to: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: to_file.to_string_lossy().into_owned(),
+                content: to_schema.to_string(),
+            }],
         }),
         script: true,
     })
@@ -63,12 +69,18 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
 
     api.diff(DiffParams {
         exit_code: None,
-        from: DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: from_file.to_string_lossy().into_owned(),
+        from: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: from_file.to_string_lossy().into_owned(),
+                content: from_schema.to_string(),
+            }],
         }),
         shadow_database_url: None,
-        to: DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: to_file.to_string_lossy().into_owned(),
+        to: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: to_file.to_string_lossy().into_owned(),
+                content: to_schema.to_string(),
+            }],
         }),
         script: false,
     })
@@ -192,8 +204,11 @@ fn from_schema_datamodel_to_url(mut api: TestApi) {
 
     let input = DiffParams {
         exit_code: None,
-        from: DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: schema_path.to_string_lossy().into_owned(),
+        from: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: schema_path.to_string_lossy().into_owned(),
+                content: first_schema.to_string(),
+            }],
         }),
         script: true,
         shadow_database_url: None,
@@ -240,8 +255,11 @@ fn from_schema_datasource_relative(mut api: TestApi) {
 
     let params = DiffParams {
         exit_code: None,
-        from: DiffTarget::SchemaDatasource(SchemaContainer {
-            schema: schema_path.to_string_lossy().into_owned(),
+        from: DiffTarget::SchemaDatasource(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: schema_path.to_string_lossy().into_owned(),
+                content: schema.to_string(),
+            }],
         }),
         script: true,
         shadow_database_url: None,
@@ -296,8 +314,11 @@ fn from_schema_datasource_to_url(mut api: TestApi) {
 
     let input = DiffParams {
         exit_code: None,
-        from: DiffTarget::SchemaDatasource(SchemaContainer {
-            schema: schema_path.to_string_lossy().into_owned(),
+        from: DiffTarget::SchemaDatasource(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: schema_path.to_string_lossy().into_owned(),
+                content: schema_content.to_string(),
+            }],
         }),
         script: true,
         shadow_database_url: None,
@@ -396,12 +417,18 @@ fn diffing_mongo_schemas_to_script_returns_a_nice_error() {
 
     let params = DiffParams {
         exit_code: None,
-        from: DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: from_file.to_string_lossy().into_owned(),
+        from: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: from_file.to_string_lossy().into_owned(),
+                content: from.to_string(),
+            }],
         }),
         shadow_database_url: None,
-        to: DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: to_file.to_string_lossy().into_owned(),
+        to: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: to_file.to_string_lossy().into_owned(),
+                content: to.to_string(),
+            }],
         }),
         script: true,
     };
@@ -480,12 +507,18 @@ fn diffing_mongo_schemas_works() {
 
     let params = DiffParams {
         exit_code: None,
-        from: DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: from_file.to_string_lossy().into_owned(),
+        from: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: from_file.to_string_lossy().into_owned(),
+                content: from.to_string(),
+            }],
         }),
         shadow_database_url: None,
-        to: DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: to_file.to_string_lossy().into_owned(),
+        to: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: to_file.to_string_lossy().into_owned(),
+                content: to.to_string(),
+            }],
         }),
         script: false,
     };
@@ -496,48 +529,6 @@ fn diffing_mongo_schemas_works() {
     "#]];
 
     expected_printed_messages.assert_eq(&diff_output(params));
-}
-
-#[test]
-fn with_missing_prisma_schema_should_return_helpful_error() {
-    // We are counting on this path not existing.
-    let tmp_path = std::env::temp_dir().join("prisma_migrate_diff_test_this_file_does_not_exist");
-    let tmp_path_str = tmp_path.to_str().unwrap();
-
-    // We want to test for both --schema-datamodel and --schema-datasource
-    let test_with_from_target = |from_target: DiffTarget| {
-        let params = DiffParams {
-            exit_code: None,
-            from: from_target,
-            script: false,
-            shadow_database_url: None,
-            to: DiffTarget::Empty,
-        };
-
-        let error = diff_error(params);
-        assert!(error.match_indices(tmp_path_str).next().is_some());
-
-        let expected = if cfg!(windows) {
-            expect![[r#"
-                Error trying to read Prisma schema file at `<the-path>`.
-                The system cannot find the file specified. (os error 2)
-            "#]]
-        } else {
-            expect![[r#"
-                Error trying to read Prisma schema file at `<the-path>`.
-                No such file or directory (os error 2)
-            "#]]
-        };
-
-        expected.assert_eq(&error.replace(tmp_path_str, "<the-path>"));
-    };
-
-    test_with_from_target(DiffTarget::SchemaDatamodel(SchemaContainer {
-        schema: tmp_path_str.to_owned(),
-    }));
-    test_with_from_target(DiffTarget::SchemaDatasource(SchemaContainer {
-        schema: tmp_path_str.to_owned(),
-    }));
 }
 
 #[test]
@@ -566,8 +557,8 @@ fn diffing_two_schema_datamodels_with_missing_datasource_env_vars() {
         );
 
         let tmpdir = tempfile::tempdir().unwrap();
-        let schema_a = write_file_to_tmp(&schema_a, &tmpdir, "schema_a");
-        let schema_b = write_file_to_tmp(&schema_b, &tmpdir, "schema_b");
+        let schema_a_path = write_file_to_tmp(&schema_a, &tmpdir, "schema_a");
+        let schema_b_path = write_file_to_tmp(&schema_b, &tmpdir, "schema_b");
 
         let expected = expect![[r#"
 
@@ -576,13 +567,19 @@ fn diffing_two_schema_datamodels_with_missing_datasource_env_vars() {
         "#]];
         expected.assert_eq(&diff_output(DiffParams {
             exit_code: None,
-            from: DiffTarget::SchemaDatamodel(SchemaContainer {
-                schema: schema_a.to_str().unwrap().to_owned(),
+            from: DiffTarget::SchemaDatamodel(SchemasContainer {
+                files: vec![SchemaContainer {
+                    path: schema_a_path.to_str().unwrap().to_owned(),
+                    content: schema_a.to_string(),
+                }],
             }),
             script: false,
             shadow_database_url: None,
-            to: DiffTarget::SchemaDatamodel(SchemaContainer {
-                schema: schema_b.to_str().unwrap().to_owned(),
+            to: DiffTarget::SchemaDatamodel(SchemasContainer {
+                files: vec![SchemaContainer {
+                    path: schema_b_path.to_str().unwrap().to_owned(),
+                    content: schema_b.to_string(),
+                }],
             }),
         }))
     }
@@ -607,11 +604,17 @@ fn diff_with_exit_code_and_empty_diff_returns_zero() {
 
     let (result, diff) = diff_result(DiffParams {
         exit_code: Some(true),
-        from: DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: path.to_str().unwrap().to_owned(),
+        from: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: path.to_str().unwrap().to_owned(),
+                content: schema.to_string(),
+            }],
         }),
-        to: DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: path.to_str().unwrap().to_owned(),
+        to: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: path.to_str().unwrap().to_owned(),
+                content: schema.to_string(),
+            }],
         }),
         script: false,
         shadow_database_url: None,
@@ -644,8 +647,11 @@ fn diff_with_exit_code_and_non_empty_diff_returns_two() {
     let (result, diff) = diff_result(DiffParams {
         exit_code: Some(true),
         from: DiffTarget::Empty,
-        to: DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: path.to_str().unwrap().to_owned(),
+        to: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: path.to_str().unwrap().to_owned(),
+                content: schema.to_string(),
+            }],
         }),
         script: false,
         shadow_database_url: None,
@@ -705,8 +711,11 @@ fn diff_with_non_existing_sqlite_database_from_datasource() {
         from: DiffTarget::Empty,
         script: false,
         shadow_database_url: None,
-        to: DiffTarget::SchemaDatasource(SchemaContainer {
-            schema: schema_path.to_string_lossy().into_owned(),
+        to: DiffTarget::SchemaDatasource(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: schema_path.to_string_lossy().into_owned(),
+                content: schema.to_string(),
+            }],
         }),
     });
 

@@ -151,7 +151,11 @@ pub(crate) async fn diff(schema: &str, url: String, connector: &mut dyn SchemaCo
         .database_schema_from_diff_target(DiffTarget::Empty, None, None)
         .await?;
     let to = connector
-        .database_schema_from_diff_target(DiffTarget::Datamodel(schema.into()), None, None)
+        .database_schema_from_diff_target(
+            DiffTarget::Datamodel(vec![("schema.prisma".to_string(), schema.into())]),
+            None,
+            None,
+        )
         .await?;
     let migration = connector.diff(from, to);
     connector.render_script(&migration, &Default::default())

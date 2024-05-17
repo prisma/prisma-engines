@@ -1,9 +1,9 @@
 use crate::{
     core_error::CoreResult,
-    json_rpc::types::{DiffParams, DiffResult, DiffTarget, PathContainer, SchemaContainer, UrlContainer},
+    json_rpc::types::{DiffParams, DiffResult, DiffTarget, PathContainer, UrlContainer},
+    SchemaContainerExt,
 };
 use enumflags2::BitFlags;
-use psl::parser_database::SourceFile;
 use schema_connector::{
     ConnectorError, ConnectorHost, DatabaseSchema, DiffTarget as McDiff, Namespaces, SchemaConnector,
 };
@@ -96,16 +96,10 @@ fn namespaces_and_preview_features_from_diff_targets(
     for target in targets {
         match target {
             DiffTarget::Migrations(_) | DiffTarget::Empty | DiffTarget::Url(_) => (),
-            DiffTarget::SchemaDatasource(SchemaContainer { schema })
-            | DiffTarget::SchemaDatamodel(SchemaContainer { schema }) => {
-                let schema_str: String = std::fs::read_to_string(schema).map_err(|err| {
-                    ConnectorError::from_source_with_context(
-                        err,
-                        format!("Error trying to read Prisma schema file at `{schema}`.").into_boxed_str(),
-                    )
-                })?;
+            DiffTarget::SchemaDatasource(schemas) | DiffTarget::SchemaDatamodel(schemas) => {
+                let schemas = schemas.to_psl_input();
+                let validated_schema = psl::validate_multi_file(schemas);
 
-                let validated_schema = psl::validate(schema_str.into());
                 for (namespace, _span) in validated_schema
                     .configuration
                     .datasources
@@ -132,21 +126,13 @@ async fn json_rpc_diff_target_to_connector(
     namespaces: Option<Namespaces>,
     preview_features: BitFlags<psl::PreviewFeature>,
 ) -> CoreResult<Option<(Box<dyn SchemaConnector>, DatabaseSchema)>> {
-    let read_prisma_schema_from_path = |schema_path: &str| -> CoreResult<String> {
-        std::fs::read_to_string(schema_path).map_err(|err| {
-            ConnectorError::from_source_with_context(
-                err,
-                format!("Error trying to read Prisma schema file at `{schema_path}`.").into_boxed_str(),
-            )
-        })
-    };
-
     match target {
         DiffTarget::Empty => Ok(None),
-        DiffTarget::SchemaDatasource(SchemaContainer { schema }) => {
-            let schema_contents = read_prisma_schema_from_path(schema)?;
-            let schema_dir = std::path::Path::new(schema).parent();
-            let mut connector = crate::schema_to_connector(&schema_contents, schema_dir)?;
+        DiffTarget::SchemaDatasource(schemas) => {
+            let schema_dir = crate::find_common_root_path(schemas);
+            let schema_dir = schema_dir.as_deref().and_then(|p| p.parent());
+            let sources: Vec<_> = schemas.to_psl_input();
+            let mut connector = crate::schemas_to_connector(sources, schema_dir)?;
             connector.ensure_connection_validity().await?;
             connector.set_preview_features(preview_features);
             let schema = connector
@@ -154,16 +140,13 @@ async fn json_rpc_diff_target_to_connector(
                 .await?;
             Ok(Some((connector, schema)))
         }
-        DiffTarget::SchemaDatamodel(SchemaContainer { schema }) => {
-            let schema_contents = read_prisma_schema_from_path(schema)?;
-            let mut connector = crate::schema_to_connector_unchecked(&schema_contents)?;
+        DiffTarget::SchemaDatamodel(schemas) => {
+            let sources = schemas.to_psl_input();
+            let mut connector = crate::schemas_to_connector_unchecked(&sources)?;
             connector.set_preview_features(preview_features);
+
             let schema = connector
-                .database_schema_from_diff_target(
-                    McDiff::Datamodel(SourceFile::new_allocated(Arc::from(schema_contents.into_boxed_str()))),
-                    None,
-                    namespaces,
-                )
+                .database_schema_from_diff_target(McDiff::Datamodel(sources), None, namespaces)
                 .await?;
             Ok(Some((connector, schema)))
         }

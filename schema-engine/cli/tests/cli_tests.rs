@@ -41,7 +41,18 @@ where
     }));
 
     child.kill().unwrap();
-    res.unwrap();
+    match res {
+        Ok(_) => (),
+        Err(panic_payload) => {
+            let res = panic_payload
+                .downcast_ref::<&str>()
+                .map(|s| -> String { (*s).to_owned() })
+                .or_else(|| panic_payload.downcast_ref::<String>().map(|s| s.to_owned()))
+                .unwrap_or_default();
+
+            panic!("Error: '{}'", res)
+        }
+    }
 }
 
 struct TestApi {
@@ -324,7 +335,7 @@ fn basic_jsonrpc_roundtrip_works_with_no_params(_api: TestApi) {
     fs::write(&tmpfile, datamodel).unwrap();
 
     let mut command = Command::new(schema_engine_bin_path());
-    command.arg("--datamodel").arg(&tmpfile).env("RUST_LOG", "info");
+    command.arg("--datamodels").arg(&tmpfile).env("RUST_LOG", "info");
 
     with_child_process(command, |process| {
         let stdin = process.stdin.as_mut().unwrap();
@@ -350,12 +361,12 @@ fn basic_jsonrpc_roundtrip_works_with_params(_api: TestApi) {
     let tmpdir = tempfile::tempdir().unwrap();
     let tmpfile = tmpdir.path().join("datamodel");
 
-    let datamodel = r#"
+    let datamodel = indoc! {r#"
         datasource db {
             provider = "postgres"
             url = env("TEST_DATABASE_URL")
         }
-    "#;
+    "#};
 
     fs::create_dir_all(&tmpdir).unwrap();
     fs::write(&tmpfile, datamodel).unwrap();
@@ -363,10 +374,19 @@ fn basic_jsonrpc_roundtrip_works_with_params(_api: TestApi) {
     let command = Command::new(schema_engine_bin_path());
 
     let path = tmpfile.to_str().unwrap();
-    let schema_path_params = format!(r#"{{ "datasource": {{ "tag": "SchemaPath", "path": "{path}" }} }}"#);
+    let schema_path_params = serde_json::json!({
+        "datasource": {
+            "tag": "SchemaString",
+            "files": [{ "path": path, "content": datamodel }]
+        }
+    });
 
-    let url = std::env::var("TEST_DATABASE_URL").unwrap();
-    let connection_string_params = format!(r#"{{ "datasource": {{ "tag": "ConnectionString", "url": "{url}" }} }}"#);
+    let connection_string_params = serde_json::json!({
+        "datasource": {
+            "tag": "ConnectionString",
+            "url": std::env::var("TEST_DATABASE_URL").unwrap()
+        }
+    });
 
     with_child_process(command, |process| {
         let stdin = process.stdin.as_mut().unwrap();
@@ -374,8 +394,13 @@ fn basic_jsonrpc_roundtrip_works_with_params(_api: TestApi) {
 
         for _ in 0..2 {
             for params in [&schema_path_params, &connection_string_params] {
-                let params_template =
-                    format!(r#"{{ "jsonrpc": "2.0", "method": "getDatabaseVersion", "params": {params}, "id": 1 }}"#);
+                let params_template = serde_json::json!({
+                    "jsonrpc": "2.0",
+                    "method": "getDatabaseVersion",
+                    "params": params,
+                    "id": 1
+                })
+                .to_string();
 
                 writeln!(stdin, "{}", &params_template).unwrap();
 
@@ -416,7 +441,7 @@ fn introspect_sqlite_empty_database() {
             "method": "introspect",
             "id": 1,
             "params": {
-                "schema": schema,
+                "schema": { "files": [{ "path": "schema.prisma", "content": schema }] },
                 "force": true,
                 "compositeTypeDepth": 5,
             }
@@ -463,7 +488,7 @@ fn introspect_sqlite_invalid_empty_database() {
             "method": "introspect",
             "id": 1,
             "params": {
-                "schema": schema,
+                "schema": { "files": [{ "path": "schema.prisma", "content": schema }] },
                 "force": true,
                 "compositeTypeDepth": -1,
             }
@@ -517,7 +542,7 @@ fn execute_postgres(api: TestApi) {
             "params": {
                 "datasourceType": {
                     "tag": "schema",
-                    "schema": &schema_path,
+                    "files": [{ "path": &schema_path, "content": &schema }],
                 },
                 "script": "SELECT 1;",
             }
@@ -593,7 +618,7 @@ fn introspect_postgres(api: TestApi) {
             "params": {
                 "datasourceType": {
                     "tag": "schema",
-                    "schema": &schema_path,
+                    "files": [{ "path": &schema_path, "content": &schema }],
                 },
                 "script": script,
             }
@@ -617,7 +642,7 @@ fn introspect_postgres(api: TestApi) {
             "method": "introspect",
             "id": 1,
             "params": {
-                "schema": &schema,
+                "schema": { "files": [{ "path": &schema_path, "content": &schema }] },
                 "force": true,
                 "compositeTypeDepth": 5,
             }

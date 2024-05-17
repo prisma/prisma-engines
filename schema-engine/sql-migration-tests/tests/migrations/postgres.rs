@@ -4,7 +4,7 @@ mod multi_schema;
 
 use psl::parser_database::SourceFile;
 use quaint::Value;
-use schema_core::schema_connector::DiffTarget;
+use schema_core::{json_rpc::types::SchemasContainer, schema_connector::DiffTarget};
 use sql_migration_tests::test_api::*;
 use std::fmt::Write;
 
@@ -384,7 +384,10 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
 
     let migration = api.connector_diff(
         DiffTarget::Database,
-        DiffTarget::Datamodel(SourceFile::new_static(target_schema)),
+        DiffTarget::Datamodel(vec![(
+            "schema.prisma".to_string(),
+            SourceFile::new_static(target_schema),
+        )]),
         None,
     );
     let expected = expect![[r#"
@@ -482,8 +485,11 @@ fn connecting_to_a_postgres_database_with_the_cockroach_connector_fails(_api: Te
     let engine = schema_core::schema_api(None, None).unwrap();
     let err = tok(
         engine.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
-            datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer {
-                schema: dm.to_owned(),
+            datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(SchemasContainer {
+                files: vec![SchemaContainer {
+                    path: "schema.prisma".to_string(),
+                    content: dm.to_owned(),
+                }],
             }),
         }),
     )
@@ -617,8 +623,8 @@ fn scalar_list_default_diffing(api: TestApi) {
     "#;
 
     let migration = api.connector_diff(
-        DiffTarget::Datamodel(SourceFile::new_static(schema_1)),
-        DiffTarget::Datamodel(SourceFile::new_static(schema_2)),
+        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_1))]),
+        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_2))]),
         None,
     );
 
