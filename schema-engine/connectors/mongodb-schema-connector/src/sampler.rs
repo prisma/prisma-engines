@@ -11,6 +11,7 @@ use mongodb::{
 use mongodb_schema_describer::MongoSchema;
 use schema_connector::{warnings::Model, IntrospectionContext, IntrospectionResult, Warnings};
 use statistics::*;
+use std::borrow::Cow;
 
 /// From the given database, lists all collections as models, and samples
 /// maximum of SAMPLE_SIZE documents for their fields with the following rules:
@@ -66,7 +67,7 @@ pub(super) async fn sample(
     for file_id in ctx.previous_schema().db.iter_file_ids() {
         let file_name = ctx.previous_schema().db.file_name(file_id);
 
-        data_model.create_empty_file(file_name.to_string());
+        data_model.create_empty_file(Cow::Borrowed(file_name));
     }
 
     statistics.render(ctx, &mut data_model, &mut warnings);

@@ -4,10 +4,11 @@ use crate::introspection::{
 };
 use datamodel_renderer::datamodel as renderer;
 use schema_connector::ViewDefinition;
+use std::borrow::Cow;
 
 /// Render all view blocks to the PSL.
 pub(super) fn render<'a>(
-    introspection_file_name: &str,
+    introspection_file_name: &'a str,
     ctx: &'a DatamodelCalculatorContext<'a>,
     rendered: &mut renderer::Datamodel<'a>,
 ) -> Vec<ViewDefinition> {
@@ -39,7 +40,7 @@ pub(super) fn render<'a>(
             None => introspection_file_name,
         };
 
-        rendered.push_view(file_name.to_string(), render);
+        rendered.push_view(Cow::Borrowed(file_name), render);
     }
 
     definitions

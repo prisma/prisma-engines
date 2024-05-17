@@ -15,6 +15,7 @@ use crate::introspection::datamodel_calculator::DatamodelCalculatorContext;
 use datamodel_renderer as renderer;
 use psl::PreviewFeature;
 use schema_connector::ViewDefinition;
+use std::borrow::Cow;
 
 /// Combines the SQL database schema and an existing PSL schema to a
 /// PSL schema definition string.
@@ -29,7 +30,7 @@ pub(crate) fn to_psl_string(
     for file_id in ctx.previous_schema.db.iter_file_ids() {
         let file_name = ctx.previous_schema.db.file_name(file_id);
 
-        datamodel.create_empty_file(file_name.to_string());
+        datamodel.create_empty_file(Cow::Borrowed(file_name));
     }
 
     enums::render(introspection_file_name, ctx, &mut datamodel);

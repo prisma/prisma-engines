@@ -20,6 +20,7 @@ use once_cell::sync::Lazy;
 use psl::datamodel_connector::constraint_names::ConstraintNames;
 use regex::Regex;
 use std::{
+    borrow::Cow,
     cmp::Ordering,
     collections::{BTreeMap, HashMap, HashSet},
     fmt,
@@ -416,7 +417,7 @@ impl<'a> Statistics<'a> {
                 None => ctx.introspection_file_name(),
             };
 
-            rendered.push_composite_type(file_name.to_string(), r#type);
+            rendered.push_composite_type(Cow::Borrowed(file_name), r#type);
         }
 
         for (model_name, model) in models.into_iter() {
@@ -425,7 +426,7 @@ impl<'a> Statistics<'a> {
                 None => ctx.introspection_file_name(),
             };
 
-            rendered.push_model(file_name.to_string(), model);
+            rendered.push_model(Cow::Borrowed(file_name), model);
         }
     }
 
