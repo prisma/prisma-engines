@@ -1,4 +1,4 @@
-use psl::{diagnostics::DatamodelError, parse_configuration_multi_file, parser_database::Files};
+use psl::{diagnostics::DatamodelError, parse_configuration_multi_file, parser_database::Files, Diagnostics};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -8,6 +8,8 @@ use crate::schema_file_input::SchemaFileInput;
 #[serde(rename_all = "camelCase")]
 struct GetConfigParams {
     prisma_schema: SchemaFileInput,
+    #[serde(default)]
+    ignore_env_var_errors: bool,
     #[serde(default)]
     env: HashMap<String, String>,
     #[serde(default)]
@@ -38,19 +40,26 @@ pub(crate) fn get_config(params: &str) -> String {
 
     let (files, mut configuration, diagnostics) = parse_configuration_multi_file(&schema);
 
-    let overrides: Vec<(_, _)> = params.datasource_overrides.into_iter().collect();
-    let override_results =
-        configuration.resolve_datasource_urls_prisma_fmt(&overrides, |key| params.env.get(key).map(String::from));
-
-    let config = psl::get_config(&configuration);
-    let errors = if let Err(ref override_diagnostics) = override_results {
-        let all_errors = diagnostics.errors().iter().chain(override_diagnostics.errors().iter());
-        serialize_errors(all_errors, &files)
+    let override_diagnostics = if params.ignore_env_var_errors {
+        Diagnostics::default()
     } else {
-        serialize_errors(diagnostics.errors().iter(), &files)
+        let overrides: Vec<(_, _)> = params.datasource_overrides.into_iter().collect();
+        let override_result =
+            configuration.resolve_datasource_urls_prisma_fmt(&overrides, |key| params.env.get(key).map(String::from));
+
+        match override_result {
+            Err(diagnostics) => diagnostics,
+            _ => Diagnostics::default(),
+        }
     };
 
-    let result = GetConfigResult { config, errors };
+    let config = psl::get_config(&configuration);
+    let all_errors = diagnostics.errors().iter().chain(override_diagnostics.errors().iter());
+
+    let result = GetConfigResult {
+        config,
+        errors: serialize_errors(all_errors, &files),
+    };
 
     serde_json::to_string(&result).unwrap()
 }
@@ -239,6 +248,26 @@ mod tests {
         });
         let expected = expect![[
             r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST","value":null},"schemas":[]}],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mEnvironment variable not found: NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:4\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 3 | \u001b[0m                provider = \"postgresql\"\n\u001b[1;94m 4 | \u001b[0m                url = \u001b[1;91menv(\"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n"}]}"#
+        ]];
+        let response = get_config(&request.to_string());
+        expected.assert_eq(&response);
+    }
+
+    #[test]
+    fn get_config_missing_env_var_with_ignore_env_var_error() {
+        let schema = r#"
+            datasource thedb {
+                provider = "postgresql"
+                url = env("NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST")
+            }
+        "#;
+
+        let request = json!({
+            "prismaSchema": schema,
+            "ignoreEnvVarErrors": true,
+        });
+        let expected = expect![[
+            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST","value":null},"schemas":[]}],"warnings":[]},"errors":[]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
