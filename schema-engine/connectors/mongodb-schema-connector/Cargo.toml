@@ -31,3 +31,5 @@ once_cell = "1.8.0"
 url.workspace = true
 expect-test = "1"
 names = { version = "0.12", default-features = false }
+itertools.workspace = true
+indoc.workspace = true

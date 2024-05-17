@@ -4,7 +4,7 @@ use indoc::formatdoc;
 use psl::PreviewFeature;
 use quaint::single::Quaint;
 use schema_connector::{CompositeTypeDepth, ConnectorParams, IntrospectionContext, SchemaConnector};
-use sql_introspection_tests::test_api::Queryable;
+use sql_introspection_tests::test_api::{Queryable, ToIntrospectionTestResult};
 use sql_schema_connector::SqlSchemaConnector;
 use std::{fs, io::Write as _, path};
 use test_setup::{
@@ -210,8 +210,9 @@ source .test_database_urls/mysql_5_6
     let ctx = IntrospectionContext::new(psl, CompositeTypeDepth::Infinite, namespaces.clone());
 
     let introspected = tok(api.introspect(&ctx))
+        .map(ToIntrospectionTestResult::to_single_test_result)
         .unwrap_or_else(|err| panic!("{}", err))
-        .data_model;
+        .datamodel;
 
     let last_comment_idx = text
         .match_indices("/*")
@@ -237,8 +238,9 @@ source .test_database_urls/mysql_5_6
             let ctx = IntrospectionContext::new(introspected_schema, CompositeTypeDepth::Infinite, namespaces);
 
             tok(api.introspect(&ctx))
+                .map(ToIntrospectionTestResult::to_single_test_result)
                 .unwrap_or_else(|err| panic!("{}", err))
-                .data_model
+                .datamodel
         };
 
         if introspected == re_introspected {

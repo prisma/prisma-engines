@@ -1,4 +1,5 @@
 mod mssql;
+mod multi_file;
 mod mysql;
 mod postgresql;
 mod relation_mode;
@@ -1561,7 +1562,7 @@ async fn re_introspecting_custom_compound_unique_upgrade(api: &mut TestApi) -> T
 
     let input_dm = indoc! {r#"
          model User {
-             id     Int @id @default(autoincrement()) 
+             id     Int @id @default(autoincrement())
              first  Int
              last   Int
 
@@ -1571,7 +1572,7 @@ async fn re_introspecting_custom_compound_unique_upgrade(api: &mut TestApi) -> T
 
     let final_dm = indoc! {r#"
          model User {
-             id     Int @id @default(autoincrement()) 
+             id     Int @id @default(autoincrement())
              first  Int
              last   Int
 

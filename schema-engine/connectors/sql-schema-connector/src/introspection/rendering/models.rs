@@ -1,5 +1,7 @@
 //! Rendering of model blocks.
 
+use std::borrow::Cow;
+
 use super::{id, indexes, relation_field, scalar_field};
 use crate::introspection::{
     datamodel_calculator::DatamodelCalculatorContext,
@@ -10,7 +12,11 @@ use datamodel_renderer::datamodel as renderer;
 use quaint::prelude::SqlFamily;
 
 /// Render all model blocks to the PSL.
-pub(super) fn render<'a>(ctx: &'a DatamodelCalculatorContext<'a>, rendered: &mut renderer::Datamodel<'a>) {
+pub(super) fn render<'a>(
+    introspection_file_name: &'a str,
+    ctx: &'a DatamodelCalculatorContext<'a>,
+    rendered: &mut renderer::Datamodel<'a>,
+) {
     let mut models_with_idx: Vec<(Option<_>, renderer::Model<'a>)> = Vec::with_capacity(ctx.sql_schema.tables_count());
 
     for model in ctx.model_pairs() {
@@ -19,8 +25,13 @@ pub(super) fn render<'a>(ctx: &'a DatamodelCalculatorContext<'a>, rendered: &mut
 
     models_with_idx.sort_by(|(a, _), (b, _)| helpers::compare_options_none_last(*a, *b));
 
-    for (_, render) in models_with_idx.into_iter() {
-        rendered.push_model(render);
+    for (previous_model, render) in models_with_idx.into_iter() {
+        let file_name = match previous_model {
+            Some((prev_file_id, _)) => ctx.previous_schema.db.file_name(prev_file_id),
+            None => introspection_file_name,
+        };
+
+        rendered.push_model(Cow::Borrowed(file_name), render);
     }
 }
 
