@@ -4,7 +4,7 @@ use lsp_types::*;
 use psl::{
     datamodel_connector::Connector,
     diagnostics::{FileId, Span},
-    parse_configuration_multi_file,
+    infallible_parse_configuration,
     parser_database::{ast, ParserDatabase, SourceFile},
     Configuration, Datasource, Diagnostics, Generator, PreviewFeature,
 };
@@ -21,9 +21,7 @@ pub(crate) fn empty_completion_list() -> CompletionList {
 }
 
 pub(crate) fn completion(schema_files: Vec<(String, SourceFile)>, params: CompletionParams) -> CompletionList {
-    let config = parse_configuration_multi_file(&schema_files)
-        .ok()
-        .map(|(_, config)| config);
+    let (_, config, _) = infallible_parse_configuration(&schema_files);
 
     let mut list = CompletionList {
         is_incomplete: false,
@@ -50,7 +48,7 @@ pub(crate) fn completion(schema_files: Vec<(String, SourceFile)>, params: Comple
     };
 
     let ctx = CompletionContext {
-        config: config.as_ref(),
+        config: &config,
         params: &params,
         db: &db,
         position,
@@ -64,7 +62,7 @@ pub(crate) fn completion(schema_files: Vec<(String, SourceFile)>, params: Comple
 
 #[derive(Debug, Clone, Copy)]
 struct CompletionContext<'a> {
-    config: Option<&'a Configuration>,
+    config: &'a Configuration,
     params: &'a CompletionParams,
     db: &'a ParserDatabase,
     position: usize,
@@ -89,19 +87,19 @@ impl<'a> CompletionContext<'a> {
     }
 
     fn datasource(self) -> Option<&'a Datasource> {
-        self.config.and_then(|conf| conf.datasources.first())
+        self.config.datasources.first()
     }
 
     fn generator(self) -> Option<&'a Generator> {
-        self.config.and_then(|conf| conf.generators.first())
+        self.config.generators.first()
     }
 }
 
 fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut CompletionList) {
-    let relation_mode = match ctx.config.map(|c| c.relation_mode()) {
-        Some(Some(rm)) => rm,
-        _ => ctx.connector().default_relation_mode(),
-    };
+    let relation_mode = ctx
+        .config
+        .relation_mode()
+        .unwrap_or_else(|| ctx.connector().default_relation_mode());
 
     match ctx.db.ast(ctx.initiating_file_id).find_at_position(ctx.position) {
         ast::SchemaPosition::Model(
@@ -154,9 +152,7 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
                 datasource::relation_mode_completion(completion_list);
             }
 
-            if let Some(config) = ctx.config {
-                ctx.connector().datasource_completions(config, completion_list);
-            }
+            ctx.connector().datasource_completions(ctx.config, completion_list);
         }
 
         ast::SchemaPosition::DataSource(

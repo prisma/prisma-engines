@@ -34,9 +34,9 @@ pub fn format(schema: String, params: String) -> String {
 
 /// Docs: https://prisma.github.io/prisma-engines/doc/prisma_fmt/fn.get_config.html
 #[wasm_bindgen]
-pub fn get_config(params: String) -> Result<String, JsError> {
+pub fn get_config(params: String) -> String {
     register_panic_hook();
-    prisma_fmt::get_config(params).map_err(|e| JsError::new(&e))
+    prisma_fmt::get_config(params)
 }
 
 /// Docs: https://prisma.github.io/prisma-engines/doc/prisma_fmt/fn.get_dmmf.html
