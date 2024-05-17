@@ -1,5 +1,7 @@
 //! Rendering of model blocks.
 
+use std::borrow::Cow;
+
 use super::{id, indexes, relation_field, scalar_field};
 use crate::introspection::{
     datamodel_calculator::DatamodelCalculatorContext,
@@ -11,7 +13,7 @@ use quaint::prelude::SqlFamily;
 
 /// Render all model blocks to the PSL.
 pub(super) fn render<'a>(
-    introspection_file_name: &str,
+    introspection_file_name: &'a str,
     ctx: &'a DatamodelCalculatorContext<'a>,
     rendered: &mut renderer::Datamodel<'a>,
 ) {
@@ -29,7 +31,7 @@ pub(super) fn render<'a>(
             None => introspection_file_name,
         };
 
-        rendered.push_model(file_name.to_string(), render);
+        rendered.push_model(Cow::Borrowed(file_name), render);
     }
 }
 

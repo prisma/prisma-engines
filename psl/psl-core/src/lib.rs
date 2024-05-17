@@ -161,15 +161,8 @@ fn validate_configuration(
     diagnostics: &mut Diagnostics,
     connectors: ConnectorRegistry<'_>,
 ) -> Configuration {
-    let (generators, generators_files) = generator_loader::load_generators_from_ast(schema_ast, diagnostics);
-    let (datasources, datasources_files) =
-        datasource_loader::load_datasources_from_ast(schema_ast, diagnostics, connectors);
+    let generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics);
+    let datasources = datasource_loader::load_datasources_from_ast(schema_ast, diagnostics, connectors);
 
-    Configuration::new(
-        generators,
-        generators_files,
-        datasources,
-        datasources_files,
-        diagnostics.warnings().to_owned(),
-    )
+    Configuration::new(generators, datasources, diagnostics.warnings().to_owned())
 }

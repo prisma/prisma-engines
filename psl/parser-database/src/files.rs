@@ -56,6 +56,7 @@ impl Files {
     }
 
     /// Returns the number of files.
+    #[allow(clippy::len_without_is_empty)]
     pub fn len(&self) -> usize {
         self.0.len()
     }

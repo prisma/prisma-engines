@@ -27,14 +27,12 @@ pub(crate) fn load_datasources_from_ast(
     ast_schema: &ast::SchemaAst,
     diagnostics: &mut Diagnostics,
     connectors: crate::ConnectorRegistry<'_>,
-) -> (Vec<Datasource>, Vec<parser_database::FileId>) {
+) -> Vec<Datasource> {
     let mut sources = Vec::new();
-    let mut sources_files = Vec::new();
 
     for src in ast_schema.sources() {
         if let Some(source) = lift_datasource(src, diagnostics, connectors) {
             sources.push(source);
-            sources_files.push(src.span.file_id);
         }
     }
 
@@ -48,7 +46,7 @@ pub(crate) fn load_datasources_from_ast(
         }
     }
 
-    (sources, sources_files)
+    sources
 }
 
 fn lift_datasource(

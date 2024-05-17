@@ -21,21 +21,16 @@ const ENGINE_TYPE_KEY: &str = "engineType";
 const FIRST_CLASS_PROPERTIES: &[&str] = &[PROVIDER_KEY, OUTPUT_KEY, BINARY_TARGETS_KEY, PREVIEW_FEATURES_KEY];
 
 /// Load and validate Generators defined in an AST.
-pub(crate) fn load_generators_from_ast(
-    ast_schema: &ast::SchemaAst,
-    diagnostics: &mut Diagnostics,
-) -> (Vec<Generator>, Vec<parser_database::FileId>) {
+pub(crate) fn load_generators_from_ast(ast_schema: &ast::SchemaAst, diagnostics: &mut Diagnostics) -> Vec<Generator> {
     let mut generators: Vec<Generator> = Vec::new();
-    let mut generators_files: Vec<parser_database::FileId> = Vec::new();
 
     for gen in ast_schema.generators() {
         if let Some(generator) = lift_generator(gen, diagnostics) {
             generators.push(generator);
-            generators_files.push(gen.span.file_id);
         }
     }
 
-    (generators, generators_files)
+    generators
 }
 
 fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagnostics) -> Option<Generator> {
@@ -128,6 +123,7 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
         preview_features,
         config: properties,
         documentation: ast_generator.documentation().map(String::from),
+        span: ast_generator.span,
     })
 }
 

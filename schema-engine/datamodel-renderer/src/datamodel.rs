@@ -23,17 +23,20 @@ use psl::SourceFile;
 pub use view::View;
 
 use crate::Configuration;
-use std::collections::{HashMap, HashSet};
+use std::{
+    borrow::Cow,
+    collections::{HashMap, HashSet},
+};
 
 /// The PSL data model declaration.
 #[derive(Default, Debug)]
 pub struct Datamodel<'a> {
-    models: HashMap<String, Vec<Model<'a>>>,
-    views: HashMap<String, Vec<View<'a>>>,
-    enums: HashMap<String, Vec<Enum<'a>>>,
-    composite_types: HashMap<String, Vec<CompositeType<'a>>>,
+    models: HashMap<Cow<'a, str>, Vec<Model<'a>>>,
+    views: HashMap<Cow<'a, str>, Vec<View<'a>>>,
+    enums: HashMap<Cow<'a, str>, Vec<Enum<'a>>>,
+    composite_types: HashMap<Cow<'a, str>, Vec<CompositeType<'a>>>,
     configuration: Option<Configuration<'a>>,
-    empty_files: HashSet<String>,
+    empty_files: HashSet<Cow<'a, str>>,
 }
 
 impl<'a> Datamodel<'a> {
@@ -43,8 +46,8 @@ impl<'a> Datamodel<'a> {
     }
 
     /// Create an empty file in the data model.
-    pub fn create_empty_file(&mut self, file: String) {
-        self.empty_files.insert(file);
+    pub fn create_empty_file(&mut self, file: impl Into<Cow<'a, str>>) {
+        self.empty_files.insert(file.into());
     }
 
     /// Add a model block to the data model.
@@ -54,8 +57,8 @@ impl<'a> Datamodel<'a> {
     ///   id Int @id // < this
     /// }            // <
     /// ```
-    pub fn push_model(&mut self, file: String, model: Model<'a>) {
-        self.models.entry(file).or_default().push(model);
+    pub fn push_model(&mut self, file: impl Into<Cow<'a, str>>, model: Model<'a>) {
+        self.models.entry(file.into()).or_default().push(model);
     }
 
     /// Add an enum block to the data model.
@@ -65,8 +68,8 @@ impl<'a> Datamodel<'a> {
     ///   Bar      // < this
     /// }          // <
     /// ```
-    pub fn push_enum(&mut self, file: String, r#enum: Enum<'a>) {
-        self.enums.entry(file).or_default().push(r#enum);
+    pub fn push_enum(&mut self, file: impl Into<Cow<'a, str>>, r#enum: Enum<'a>) {
+        self.enums.entry(file.into()).or_default().push(r#enum);
     }
 
     /// Add a view block to the data model.
@@ -76,8 +79,8 @@ impl<'a> Datamodel<'a> {
     ///   id Int @id // < this
     /// }            // <
     /// ```
-    pub fn push_view(&mut self, file: String, view: View<'a>) {
-        self.views.entry(file).or_default().push(view);
+    pub fn push_view(&mut self, file: impl Into<Cow<'a, str>>, view: View<'a>) {
+        self.views.entry(file.into()).or_default().push(view);
     }
 
     /// Add a composite type block to the data model.
@@ -87,8 +90,11 @@ impl<'a> Datamodel<'a> {
     ///   street String // < this
     /// }               // <
     /// ```
-    pub fn push_composite_type(&mut self, file: String, composite_type: CompositeType<'a>) {
-        self.composite_types.entry(file).or_default().push(composite_type);
+    pub fn push_composite_type(&mut self, file: impl Into<Cow<'a, str>>, composite_type: CompositeType<'a>) {
+        self.composite_types
+            .entry(file.into())
+            .or_default()
+            .push(composite_type);
     }
 
     /// True if the render output would be an empty string.
@@ -98,7 +104,7 @@ impl<'a> Datamodel<'a> {
 
     /// Renders the datamodel into a list of file names and their content.
     pub fn render(self) -> Vec<(String, SourceFile)> {
-        let mut rendered: HashMap<String, String> = HashMap::new();
+        let mut rendered: HashMap<Cow<'a, str>, String> = HashMap::new();
 
         if let Some(config) = self.configuration {
             for (file, generators) in config.generators {
@@ -156,7 +162,7 @@ impl<'a> Datamodel<'a> {
 
         rendered
             .into_iter()
-            .map(|(file, content)| (file, SourceFile::from(content)))
+            .map(|(file, content)| (file.into_owned(), SourceFile::from(content)))
             .collect()
     }
 

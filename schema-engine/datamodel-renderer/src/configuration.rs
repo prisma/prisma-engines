@@ -9,6 +9,7 @@ pub use datasource::Datasource;
 pub use generator::Generator;
 use psl::ValidatedSchema;
 
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fmt;
 
@@ -17,20 +18,20 @@ use std::fmt;
 #[derive(Debug, Default)]
 pub struct Configuration<'a> {
     /// Generators blocks by file name.
-    pub generators: HashMap<String, Vec<Generator<'a>>>,
+    pub generators: HashMap<Cow<'a, str>, Vec<Generator<'a>>>,
     /// Datasources blocks by file name.
-    pub datasources: HashMap<String, Vec<Datasource<'a>>>,
+    pub datasources: HashMap<Cow<'a, str>, Vec<Datasource<'a>>>,
 }
 
 impl<'a> Configuration<'a> {
     /// Add a new generator to the configuration.
-    pub fn push_generator(&mut self, file: String, generator: Generator<'a>) {
-        self.generators.entry(file).or_default().push(generator);
+    pub fn push_generator(&mut self, file: impl Into<Cow<'a, str>>, generator: Generator<'a>) {
+        self.generators.entry(file.into()).or_default().push(generator);
     }
 
     /// Add a new datasource to the configuration.
-    pub fn push_datasource(&mut self, file: String, datasource: Datasource<'a>) {
-        self.datasources.entry(file).or_default().push(datasource);
+    pub fn push_datasource(&mut self, file: impl Into<Cow<'a, str>>, datasource: Datasource<'a>) {
+        self.datasources.entry(file.into()).or_default().push(datasource);
     }
 
     /// Create a rendering from a PSL datasource.
@@ -41,16 +42,19 @@ impl<'a> Configuration<'a> {
     ) -> Self {
         let mut config = Self::default();
 
-        for (file_id, generator) in psl_cfg.generators_with_files() {
-            let file_name = prev_schema.db.file_name(file_id);
+        for generator in &psl_cfg.generators {
+            let file_name = prev_schema.db.file_name(generator.span.file_id);
 
-            config.push_generator(file_name.to_owned(), Generator::from_psl(generator));
+            config.push_generator(Cow::Borrowed(file_name), Generator::from_psl(generator));
         }
 
-        for (file_id, datasource) in psl_cfg.datasources_with_files() {
-            let file_name = prev_schema.db.file_name(file_id);
+        for datasource in &psl_cfg.datasources {
+            let file_name = prev_schema.db.file_name(datasource.span.file_id);
 
-            config.push_datasource(file_name.to_owned(), Datasource::from_psl(datasource, force_namespaces));
+            config.push_datasource(
+                Cow::Borrowed(file_name),
+                Datasource::from_psl(datasource, force_namespaces),
+            );
         }
 
         config

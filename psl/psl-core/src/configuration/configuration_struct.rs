@@ -11,16 +11,25 @@ pub struct Configuration {
     pub generators: Vec<Generator>,
     pub datasources: Vec<Datasource>,
     pub warnings: Vec<diagnostics::DatamodelWarning>,
-
-    generators_files: Vec<parser_database::FileId>,
-    datasources_files: Vec<parser_database::FileId>,
 }
 
 impl Configuration {
-    pub fn extend(&mut self, configuration: Configuration) {
-        self.generators.extend(configuration.generators);
-        self.datasources.extend(configuration.datasources);
-        self.warnings.extend(configuration.warnings);
+    pub fn new(
+        generators: Vec<Generator>,
+        datasources: Vec<Datasource>,
+        warnings: Vec<diagnostics::DatamodelWarning>,
+    ) -> Self {
+        Self {
+            generators,
+            datasources,
+            warnings,
+        }
+    }
+
+    pub fn extend(&mut self, other: Configuration) {
+        self.generators.extend(other.generators);
+        self.datasources.extend(other.datasources);
+        self.warnings.extend(other.warnings);
     }
 
     pub fn validate_that_one_datasource_is_provided(&self) -> Result<(), Diagnostics> {
@@ -171,21 +180,7 @@ impl Configuration {
         Ok(())
     }
 
-    pub fn generators_with_files(&self) -> impl Iterator<Item = parser_database::InFile<&Generator>> {
-        self.generators
-            .iter()
-            .zip(&self.generators_files)
-            .map(|(gen, file_id)| (*file_id, gen))
-    }
-
-    pub fn datasources_with_files(&self) -> impl Iterator<Item = parser_database::InFile<&Datasource>> {
-        self.datasources
-            .iter()
-            .zip(&self.datasources_files)
-            .map(|(ds, file_id)| (*file_id, ds))
-    }
-
-    pub fn first_datasource_with_file(&self) -> parser_database::InFile<&Datasource> {
-        self.datasources_with_files().next().unwrap()
+    pub fn first_datasource(&self) -> &Datasource {
+        self.datasources.first().expect("Expected a datasource to exist.")
     }
 }
