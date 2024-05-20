@@ -8,7 +8,7 @@ import {
 import { webcrypto } from "node:crypto";
 
 import type { DriverAdaptersManager } from "./driver-adapters-manager";
-import { jsonRpc, Env, ExternalTestExecutor } from "./types";
+import { jsonRpc, Env } from "./types";
 import * as qe from "./qe";
 import { PgManager } from "./driver-adapters-manager/pg";
 import { NeonWsManager } from "./driver-adapters-manager/neon.ws";
@@ -119,10 +119,9 @@ async function handleRequest(
         env,
         migrationScript
       );
-      const engineType = env.EXTERNAL_TEST_EXECUTOR ?? "Napi";
 
       const { engine, adapter } = await initQe({
-        engineType,
+        env,
         url,
         driverAdapterManager,
         schema,
@@ -136,7 +135,15 @@ async function handleRequest(
         adapter,
         logs,
       };
-      return null;
+
+      if (adapter && adapter.getConnectionInfo) {
+        const maxBindValuesResult = adapter.getConnectionInfo().map(info => info.maxBindValues)
+        if (maxBindValuesResult.ok) {
+          return { maxBindValues: maxBindValuesResult.value }
+        }
+      }
+
+      return { maxBindValues: null }
     }
     case "query": {
       debug("Got `query`", params);
@@ -235,41 +242,40 @@ function respondOk(requestId: number, payload: unknown) {
 }
 
 type InitQueryEngineParams = {
-  engineType: ExternalTestExecutor;
-  driverAdapterManager: DriverAdaptersManager;
-  url: string;
-  schema: string;
-  logCallback: qe.QueryLogCallback;
+  env: Env
+  driverAdapterManager: DriverAdaptersManager
+  url: string
+  schema: string
+  logCallback: qe.QueryLogCallback
 };
 
 async function initQe({
-  engineType,
+  env,
   driverAdapterManager,
   url,
   schema,
   logCallback,
 }: InitQueryEngineParams) {
-  if (process.env.EXTERNAL_TEST_EXECUTOR === "Mobile") {
-    if (process.env.MOBILE_EMULATOR_URL) {
-      url = process.env.MOBILE_EMULATOR_URL;
-    }
+  if (env.EXTERNAL_TEST_EXECUTOR === 'Mobile') {
+    url = env.MOBILE_EMULATOR_URL;
+
     const engine = createRNEngineConnector(url, schema, logCallback);
     return { engine, adapter: null };
-  } else {
-    const adapter = await driverAdapterManager.connect({ url });
-    const errorCapturingAdapter = bindAdapter(adapter);
-    const engineInstance = await qe.initQueryEngine(
-      engineType,
-      errorCapturingAdapter,
-      schema,
-      logCallback,
-      debug
-    );
+  }
 
-    return {
-      engine: engineInstance,
-      adapter: errorCapturingAdapter,
-    };
+  const adapter = await driverAdapterManager.connect({ url })
+  const errorCapturingAdapter = bindAdapter(adapter)
+  const engineInstance = await qe.initQueryEngine(
+    env.EXTERNAL_TEST_EXECUTOR,
+    errorCapturingAdapter,
+    schema,
+    logCallback,
+    debug
+  )
+
+  return {
+    engine: engineInstance,
+    adapter: errorCapturingAdapter,
   }
 }
 
