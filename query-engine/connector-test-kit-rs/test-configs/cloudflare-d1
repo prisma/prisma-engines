@@ -2,6 +2,5 @@
     "connector": "sqlite",
     "version": "cfd1",
     "driver_adapter": "d1",
-    "external_test_executor": "Wasm",
-    "driver_adapter_max_bind_value": 100
+    "external_test_executor": "Wasm"
 }
