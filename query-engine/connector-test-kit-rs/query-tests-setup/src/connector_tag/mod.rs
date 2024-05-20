@@ -298,7 +298,11 @@ impl ConnectorVersion {
     /// will use. i.e. if it's a WASM connector, the default, not overridable one. Otherwise the one
     /// as seen by the test binary (which will be the same as the engine exercised)
     pub fn max_bind_values(&self) -> Option<usize> {
-        self.sql_family().map(|f| f.max_bind_values())
+        if self.is_wasm() {
+            self.sql_family().map(|f| f.default_max_bind_values())
+        } else {
+            self.sql_family().map(|f| f.max_bind_values())
+        }
     }
 
     /// SQL family for the connector
@@ -312,6 +316,20 @@ impl ConnectorVersion {
             Self::Vitess(_) => Some(SqlFamily::Mysql),
             _ => None,
         }
+    }
+
+    /// Determines if the connector uses a driver adapter implemented in Wasm.
+    /// Do not delete! This is used because the `#[cfg(target_arch = "wasm32")]` conditional compilation
+    /// directive doesn't work in the test runner.
+    fn is_wasm(&self) -> bool {
+        matches!(
+            self,
+            Self::Postgres(Some(PostgresVersion::PgJsWasm))
+                | Self::Postgres(Some(PostgresVersion::NeonJsWasm))
+                | Self::Vitess(Some(VitessVersion::PlanetscaleJsWasm))
+                | Self::Sqlite(Some(SqliteVersion::LibsqlJsWasm))
+                | Self::Sqlite(Some(SqliteVersion::CloudflareD1))
+        )
     }
 }
 
