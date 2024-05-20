@@ -22,4 +22,4 @@ features = ["js"]
 
 [features]
 # Support for generating default UUID, CUID, nanoid and datetime values.
-default_generators = ["uuid/v4", "cuid", "nanoid"]
+default_generators = ["uuid/v4", "uuid/v7", "cuid", "nanoid"]
