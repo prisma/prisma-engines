@@ -97,19 +97,19 @@ impl<'a> qe_setup::ExternalInitializer<'a> for ExternalExecutorInitializer<'a> {
     async fn init_with_migration(
         &self,
         migration_script: String,
-    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    ) -> Result<qe_setup::InitResult, Box<dyn std::error::Error + Send + Sync>> {
         let migration_script = Some(migration_script);
-        executor_process_request("initializeSchema", json!({ "schemaId": self.schema_id, "schema": self.schema, "url": self.url, "migrationScript": migration_script })).await?;
-        Ok(())
+        let init_result = executor_process_request("initializeSchema", json!({ "schemaId": self.schema_id, "schema": self.schema, "url": self.url, "migrationScript": migration_script })).await?;
+        Ok(init_result)
     }
 
-    async fn init(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        executor_process_request(
+    async fn init(&self) -> Result<qe_setup::InitResult, Box<dyn std::error::Error + Send + Sync>> {
+        let init_result = executor_process_request(
             "initializeSchema",
             json!({ "schemaId": self.schema_id, "schema": self.schema, "url": self.url }),
         )
         .await?;
-        Ok(())
+        Ok(init_result)
     }
 
     fn url(&self) -> &'a str {
@@ -207,8 +207,6 @@ pub struct Runner {
     metrics: MetricRegistry,
     protocol: EngineProtocol,
     log_capture: TestLogCapture,
-    // This is a local override for the max bind values that can be used in a query.
-    // It is set in the test config files, specifically for D1 for now, which has a lower limit than the SQLite native connector.
     local_max_bind_values: Option<usize>,
 }
 
@@ -234,7 +232,7 @@ impl Runner {
         db_schemas: &[&str],
         connector_version: ConnectorVersion,
         connector_tag: ConnectorTag,
-        local_max_bind_values: Option<usize>,
+        override_local_max_bind_values: Option<usize>,
         metrics: MetricRegistry,
         log_capture: TestLogCapture,
     ) -> TestResult<Self> {
@@ -243,18 +241,19 @@ impl Runner {
         let datasource = schema.configuration.datasources.first().unwrap();
         let url = datasource.load_url(|key| env::var(key).ok()).unwrap();
 
-        let (executor, db_version) = match crate::CONFIG.with_driver_adapter() {
+        let (executor, db_version, init_external_result) = match crate::CONFIG.with_driver_adapter() {
             Some(with_driver_adapter) => {
                 let external_executor = ExternalExecutor::new();
 
                 let external_initializer = external_executor.init(&datamodel, url.as_str());
 
-                qe_setup::setup_external(with_driver_adapter.adapter, external_initializer, db_schemas).await?;
-
-                let executor = RunnerExecutor::External(external_executor);
+                let init_external_result =
+                    qe_setup::setup_external(with_driver_adapter.adapter, external_initializer, db_schemas).await?;
 
                 let database_version = None;
-                (executor, database_version)
+                let executor = RunnerExecutor::External(external_executor);
+
+                (executor, database_version, Some(init_external_result))
             }
             None => {
                 qe_setup::setup(&datamodel, db_schemas).await?;
@@ -272,8 +271,21 @@ impl Runner {
                 let database_version = conn.version().await;
                 let executor = RunnerExecutor::Builtin(query_executor);
 
-                (executor, database_version)
+                (executor, database_version, None)
             }
+        };
+
+        // If `override_local_max_bind_values` is provided, use that.
+        // Otherwise, if the external process has provided an `init_result`, use `init_result.max_bind_values`.
+        // Otherwise, use the connector's (Wasm-aware) default.
+        //
+        // Note: Use `override_local_max_bind_values` only for local testing purposes.
+        // If a feature requires a specific `max_bind_values` value for a Driver Adapter, it should be set in the
+        // TypeScript Driver Adapter implementation itself.
+        let local_max_bind_values = match (override_local_max_bind_values, init_external_result) {
+            (Some(override_max_bind_values), _) => Some(override_max_bind_values),
+            (_, Some(init_result)) => init_result.max_bind_values,
+            (_, None) => None,
         };
 
         let query_schema = schema::build(Arc::new(schema), true).with_db_version_supports_join_strategy(
