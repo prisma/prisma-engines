@@ -56,9 +56,8 @@ fn id_should_error_on_invalid_uuid_version() {
         [1;91merror[0m: [1mError parsing attribute "@default": `uuid()` takes either no argument, or a single integer argument which is either 4 or 7.[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
         [1;94m   | [0m
-        [1;94m   | [0m
-        [1;94m 1 | [0m[1;91mmodel Model {[0m
-        [1;94m 2 | [0m  id String   @id @default(uuid(1))
+        [1;94m 1 | [0mmodel Model {
+        [1;94m 2 | [0m  id String   @id [1;91m@default(uuid(1))[0m
         [1;94m   | [0m
     "#]];
 
