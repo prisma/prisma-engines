@@ -19,7 +19,7 @@ description = "The type of results returned by dbExecute."
 [enumShapes.DbExecuteDatasourceType]
 description = "The location of the live database to connect to."
 variants.schema.description = "Prisma schema files and content to take the datasource URL from."
-variants.schema.shape = "SchemasContainer"
+variants.schema.shape = "SchemasWithConfigDir"
 
 variants.url.description = "The URL of the database to run the command on."
 variants.url.shape = "UrlContainer"

@@ -59,6 +59,12 @@ pub fn validate(params: String) -> Result<(), JsError> {
 }
 
 #[wasm_bindgen]
+pub fn merge_schemas(input: String) -> Result<String, JsError> {
+    register_panic_hook();
+    prisma_fmt::merge_schemas(input).map_err(|e| JsError::new(&e))
+}
+
+#[wasm_bindgen]
 pub fn native_types(input: String) -> String {
     register_panic_hook();
     prisma_fmt::native_types(input)

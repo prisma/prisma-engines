@@ -229,8 +229,8 @@ impl ParserDatabase {
     }
 
     /// Iterate all source file contents and their file paths.
-    pub fn iter_file_sources(&self) -> impl Iterator<Item = (&str, &str)> {
-        self.asts.iter().map(|ast| (ast.1.as_str(), ast.2.as_str()))
+    pub fn iter_file_sources(&self) -> impl Iterator<Item = (&str, &SourceFile)> {
+        self.asts.iter().map(|ast| (ast.1.as_str(), ast.2))
     }
 
     /// The name of the file.

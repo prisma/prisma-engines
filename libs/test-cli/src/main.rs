@@ -245,9 +245,9 @@ async fn main() -> anyhow::Result<()> {
             let api = schema_core::schema_api(Some(schema.clone()), None)?;
 
             api.create_database(CreateDatabaseParams {
-                datasource: DatasourceParam::SchemaString(SchemasContainer {
+                datasource: DatasourceParam::Schema(SchemasContainer {
                     files: vec![SchemaContainer {
-                        path: "schema.prisma".to_string(),
+                        path: cmd.schema_path.to_owned(),
                         content: schema,
                     }],
                 }),
@@ -439,10 +439,12 @@ async fn migrate_diff(cmd: &MigrateDiff) -> anyhow::Result<()> {
 
     let api = schema_core::schema_api(None, Some(Arc::new(DiffHost)))?;
     let to = if let Some(to_schema_datamodel) = &cmd.to_schema_datamodel {
+        let to_schema_datamodel_str = std::fs::read_to_string(to_schema_datamodel)?;
+
         DiffTarget::SchemaDatamodel(SchemasContainer {
             files: vec![SchemaContainer {
-                path: "schema.prisma".to_string(),
-                content: to_schema_datamodel.clone(),
+                path: to_schema_datamodel.to_owned(),
+                content: to_schema_datamodel_str,
             }],
         })
     } else {

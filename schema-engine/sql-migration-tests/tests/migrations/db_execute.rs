@@ -1,5 +1,5 @@
 use quaint::{prelude::Queryable, single::Quaint};
-use schema_core::json_rpc::types::SchemasContainer;
+use schema_core::json_rpc::types::SchemasWithConfigDir;
 use sql_migration_tests::test_api::*;
 
 #[test]
@@ -71,11 +71,12 @@ fn db_execute_happy_path_with_prisma_schema() {
     // Execute the command.
     let generic_api = schema_core::schema_api(None, None).unwrap();
     tok(generic_api.db_execute(DbExecuteParams {
-        datasource_type: DbExecuteDatasourceType::Schema(SchemasContainer {
+        datasource_type: DbExecuteDatasourceType::Schema(SchemasWithConfigDir {
             files: vec![SchemaContainer {
                 path: schema_path.to_string_lossy().into_owned(),
                 content: prisma_schema.to_string(),
             }],
+            config_dir: schema_path.parent().unwrap().to_string_lossy().into_owned(),
         }),
         script: script.to_owned(),
     }))
@@ -170,11 +171,12 @@ fn sqlite_db_execute_with_schema_datasource_resolves_relative_paths_correctly() 
 
     let api = schema_core::schema_api(None, None).unwrap();
     tok(api.db_execute(DbExecuteParams {
-        datasource_type: DbExecuteDatasourceType::Schema(SchemasContainer {
+        datasource_type: DbExecuteDatasourceType::Schema(SchemasWithConfigDir {
             files: vec![SchemaContainer {
                 path: schema_path.to_str().unwrap().to_owned(),
                 content: schema.to_owned(),
             }],
+            config_dir: schema_path.parent().unwrap().to_string_lossy().into_owned(),
         }),
         script: "CREATE TABLE dog ( id INTEGER PRIMARY KEY )".to_owned(),
     }))

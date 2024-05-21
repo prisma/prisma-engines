@@ -1,7 +1,7 @@
 use quaint::{prelude::Queryable, single::Quaint};
 use schema_core::{
     commands::diff,
-    json_rpc::types::{DiffTarget, PathContainer, SchemasContainer},
+    json_rpc::types::{DiffTarget, PathContainer, SchemasContainer, SchemasWithConfigDir},
     schema_connector::SchemaConnector,
 };
 use sql_migration_tests::test_api::*;
@@ -255,11 +255,12 @@ fn from_schema_datasource_relative(mut api: TestApi) {
 
     let params = DiffParams {
         exit_code: None,
-        from: DiffTarget::SchemaDatasource(SchemasContainer {
+        from: DiffTarget::SchemaDatasource(SchemasWithConfigDir {
             files: vec![SchemaContainer {
                 path: schema_path.to_string_lossy().into_owned(),
                 content: schema.to_string(),
             }],
+            config_dir: schema_path.parent().unwrap().to_string_lossy().into_owned(),
         }),
         script: true,
         shadow_database_url: None,
@@ -314,11 +315,12 @@ fn from_schema_datasource_to_url(mut api: TestApi) {
 
     let input = DiffParams {
         exit_code: None,
-        from: DiffTarget::SchemaDatasource(SchemasContainer {
+        from: DiffTarget::SchemaDatasource(SchemasWithConfigDir {
             files: vec![SchemaContainer {
                 path: schema_path.to_string_lossy().into_owned(),
                 content: schema_content.to_string(),
             }],
+            config_dir: schema_path.parent().unwrap().to_string_lossy().into_owned(),
         }),
         script: true,
         shadow_database_url: None,
@@ -711,11 +713,12 @@ fn diff_with_non_existing_sqlite_database_from_datasource() {
         from: DiffTarget::Empty,
         script: false,
         shadow_database_url: None,
-        to: DiffTarget::SchemaDatasource(SchemasContainer {
+        to: DiffTarget::SchemaDatasource(SchemasWithConfigDir {
             files: vec![SchemaContainer {
                 path: schema_path.to_string_lossy().into_owned(),
                 content: schema.to_string(),
             }],
+            config_dir: schema_path.parent().unwrap().to_string_lossy().into_owned(),
         }),
     });
 

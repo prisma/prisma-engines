@@ -6,23 +6,35 @@ The path to a live database taken as input. For flexibility, this can be Prisma 
 connection string. See variants.
 """
 
-[enumShapes.DatasourceParam.variants.SchemaString]
+[enumShapes.DatasourceParam.variants.Schema]
 shape = "SchemasContainer"
 
 [enumShapes.DatasourceParam.variants.ConnectionString]
 shape = "UrlContainer"
 
 [recordShapes.SchemasContainer]
-description = "An object with a `schemas` field."
+description = "A container that holds multiple Prisma schema files."
 fields.files.shape = "SchemaContainer"
 fields.files.isList = true
 
 [recordShapes.SchemaContainer]
-description = "An object with a `schema` field."
+description = "A container that holds the path and the content of a Prisma schema file."
+
+fields.content.description = "The content of the Prisma schema file."
 fields.content.shape = "string"
 
 fields.path.shape = "string"
 fields.path.description = "The file name of the Prisma schema file."
+
+[recordShapes.SchemasWithConfigDir]
+description = "A list of Prisma schema files with a config directory."
+
+fields.files.description = "A list of Prisma schema files."
+fields.files.shape = "SchemaContainer"
+fields.files.isList = true
+
+fields.configDir.description = "An optional directory containing the config files such as SSL certificates."
+fields.configDir.shape = "string"
 
 [recordShapes.UrlContainer]
 description = "An object with a `url` field."

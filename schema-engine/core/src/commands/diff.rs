@@ -96,27 +96,41 @@ fn namespaces_and_preview_features_from_diff_targets(
     for target in targets {
         match target {
             DiffTarget::Migrations(_) | DiffTarget::Empty | DiffTarget::Url(_) => (),
-            DiffTarget::SchemaDatasource(schemas) | DiffTarget::SchemaDatamodel(schemas) => {
-                let schemas = schemas.to_psl_input();
-                let validated_schema = psl::validate_multi_file(schemas);
+            DiffTarget::SchemaDatasource(schemas) => {
+                let sources = (&schemas.files).to_psl_input();
 
-                for (namespace, _span) in validated_schema
-                    .configuration
-                    .datasources
-                    .iter()
-                    .flat_map(|ds| ds.namespaces.iter())
-                {
-                    namespaces.push(namespace.clone());
-                }
+                extract_namespaces(&sources, &mut namespaces, &mut preview_features);
+            }
+            DiffTarget::SchemaDatamodel(schemas) => {
+                let sources = (&schemas.files).to_psl_input();
 
-                for generator in &validated_schema.configuration.generators {
-                    preview_features |= generator.preview_features.unwrap_or_default();
-                }
+                extract_namespaces(&sources, &mut namespaces, &mut preview_features);
             }
         }
     }
 
     Ok((Namespaces::from_vec(&mut namespaces), preview_features))
+}
+
+fn extract_namespaces(
+    files: &[(String, psl::SourceFile)],
+    namespaces: &mut Vec<String>,
+    preview_features: &mut BitFlags<psl::PreviewFeature>,
+) {
+    let validated_schema = psl::validate_multi_file(files);
+
+    for (namespace, _span) in validated_schema
+        .configuration
+        .datasources
+        .iter()
+        .flat_map(|ds| ds.namespaces.iter())
+    {
+        namespaces.push(namespace.clone());
+    }
+
+    for generator in &validated_schema.configuration.generators {
+        *preview_features |= generator.preview_features.unwrap_or_default();
+    }
 }
 
 // `None` in case the target is empty
@@ -129,10 +143,9 @@ async fn json_rpc_diff_target_to_connector(
     match target {
         DiffTarget::Empty => Ok(None),
         DiffTarget::SchemaDatasource(schemas) => {
-            let schema_dir = crate::find_common_root_path(schemas);
-            let schema_dir = schema_dir.as_deref().and_then(|p| p.parent());
+            let config_dir = std::path::Path::new(&schemas.config_dir);
             let sources: Vec<_> = schemas.to_psl_input();
-            let mut connector = crate::schemas_to_connector(sources, schema_dir)?;
+            let mut connector = crate::schemas_to_connector(&sources, Some(config_dir))?;
             connector.ensure_connection_validity().await?;
             connector.set_preview_features(preview_features);
             let schema = connector

@@ -6,7 +6,7 @@ use tracing_futures::Instrument;
 /// interacting with the migrations directory nor the migrations table.
 pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConnector) -> CoreResult<SchemaPushOutput> {
     let sources = input.schema.to_psl_input();
-    let datamodel = parse_schema_multi(sources.clone())?;
+    let datamodel = parse_schema_multi(&sources)?;
 
     if let Some(err) = connector.check_database_version_compatibility(&datamodel) {
         return Err(ConnectorError::user_facing(err));

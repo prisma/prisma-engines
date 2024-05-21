@@ -132,7 +132,7 @@ impl SqlSchemaConnector {
     ) -> ConnectorResult<SqlDatabaseSchema> {
         match target {
             DiffTarget::Datamodel(sources) => {
-                let schema = psl::parse_schema_multi(sources).map_err(ConnectorError::new_schema_parser_error)?;
+                let schema = psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
 
                 self.flavour.check_schema_features(&schema)?;
                 Ok(sql_schema_calculator::calculate_sql_schema(

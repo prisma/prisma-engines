@@ -485,7 +485,7 @@ fn connecting_to_a_postgres_database_with_the_cockroach_connector_fails(_api: Te
     let engine = schema_core::schema_api(None, None).unwrap();
     let err = tok(
         engine.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
-            datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(SchemasContainer {
+            datasource: schema_core::json_rpc::types::DatasourceParam::Schema(SchemasContainer {
                 files: vec![SchemaContainer {
                     path: "schema.prisma".to_string(),
                     content: dm.to_owned(),

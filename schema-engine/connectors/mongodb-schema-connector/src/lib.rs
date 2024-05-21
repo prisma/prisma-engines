@@ -54,7 +54,7 @@ impl MongoDbSchemaConnector {
         match target {
             DiffTarget::Datamodel(sources) => {
                 let validated_schema =
-                    psl::parse_schema_multi(sources).map_err(ConnectorError::new_schema_parser_error)?;
+                    psl::parse_schema_multi(&sources).map_err(ConnectorError::new_schema_parser_error)?;
 
                 Ok(schema_calculator::calculate(&validated_schema))
             }

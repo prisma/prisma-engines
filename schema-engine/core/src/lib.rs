@@ -12,13 +12,12 @@ pub mod commands;
 
 mod api;
 mod core_error;
-mod path;
 mod rpc;
 mod state;
 mod timings;
 
 pub use self::{api::GenericApi, core_error::*, rpc::rpc_api, timings::TimingsLayer};
-use json_rpc::types::{SchemaContainer, SchemasContainer};
+use json_rpc::types::{SchemaContainer, SchemasContainer, SchemasWithConfigDir};
 pub use schema_connector;
 
 use enumflags2::BitFlags;
@@ -29,13 +28,10 @@ use psl::{
 };
 use schema_connector::ConnectorParams;
 use sql_schema_connector::SqlSchemaConnector;
-use std::{
-    env,
-    path::{Path, PathBuf},
-};
+use std::{env, path::Path};
 use user_facing_errors::common::InvalidConnectionString;
 
-fn parse_schema_multi(files: Vec<(String, SourceFile)>) -> CoreResult<ValidatedSchema> {
+fn parse_schema_multi(files: &[(String, SourceFile)]) -> CoreResult<ValidatedSchema> {
     psl::parse_schema_multi(files).map_err(CoreError::new_schema_parser_error)
 }
 
@@ -153,13 +149,10 @@ fn prepare_connector(
 
 /// Go from a schema to a connector
 fn schemas_to_connector(
-    schemas: Vec<(String, SourceFile)>,
+    files: &[(String, SourceFile)],
     config_dir: Option<&Path>,
 ) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
-    let (source, url, preview_features, shadow_database_url) = schemas
-        .iter()
-        .find_map(|(_, schema)| parse_configuration(schema.as_str()).ok())
-        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
+    let (source, url, preview_features, shadow_database_url) = parse_configuration_multi(files)?;
 
     prepare_connector(config_dir, source, url, preview_features, shadow_database_url)
 }
@@ -204,6 +197,26 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFl
     let config = psl::parse_configuration(datamodel)
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
+    extract_configuration(config, |err| {
+        CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel))
+    })
+}
+
+fn parse_configuration_multi(
+    files: &[(String, SourceFile)],
+) -> CoreResult<(Datasource, String, BitFlags<PreviewFeature>, Option<String>)> {
+    let (files, config) = psl::parse_configuration_multi_file(files)
+        .map_err(|(files, err)| CoreError::new_schema_parser_error(files.render_diagnostics(&err)))?;
+
+    extract_configuration(config, |err| {
+        CoreError::new_schema_parser_error(files.render_diagnostics(&err))
+    })
+}
+
+fn extract_configuration(
+    config: psl::Configuration,
+    mut err_handler: impl FnMut(psl::Diagnostics) -> CoreError,
+) -> CoreResult<(Datasource, String, BitFlags<PreviewFeature>, Option<String>)> {
     let preview_features = config.preview_features();
 
     let source = config
@@ -214,17 +227,11 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFl
 
     let url = source
         .load_direct_url(|key| env::var(key).ok())
-        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
+        .map_err(&mut err_handler)?;
 
-    let shadow_database_url = source
-        .load_shadow_database_url()
-        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
+    let shadow_database_url = source.load_shadow_database_url().map_err(err_handler)?;
 
     Ok((source, url, preview_features, shadow_database_url))
-}
-
-pub(crate) fn find_common_root_path(container: &SchemasContainer) -> Option<PathBuf> {
-    path::common_path_all(container.files.iter().map(|container| Path::new(&container.path)))
 }
 
 trait SchemaContainerExt {
@@ -264,5 +271,11 @@ impl SchemaContainerExt for &Vec<SchemaContainer> {
         self.iter()
             .map(|container| (container.path.clone(), SourceFile::from(&container.content)))
             .collect()
+    }
+}
+
+impl SchemaContainerExt for &SchemasWithConfigDir {
+    fn to_psl_input(self) -> Vec<(String, SourceFile)> {
+        (&self.files).to_psl_input()
     }
 }
