@@ -48,19 +48,17 @@ fn id_should_error_multiple_ids_are_provided() {
 fn id_should_error_on_invalid_uuid_version() {
     let dml = indoc! {r#"
         model Model {
-          id         Int      @id
-          internalId String   @id @default(uuid(1))
+          id String   @id @default(uuid(1))
         }
     "#};
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating model "Model": `uuid()` takes either no argument, or a single integer argument which is either 4 or 7..[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": `uuid()` takes either no argument, or a single integer argument which is either 4 or 7.[0m
           [1;94m-->[0m  [4mschema.prisma:1[0m
         [1;94m   | [0m
         [1;94m   | [0m
         [1;94m 1 | [0m[1;91mmodel Model {[0m
-        [1;94m 2 | [0m  id         Int      @id
-        [1;94m 3 | [0m  internalId String   @id @default(uuid(1))
+        [1;94m 3 | [0m  id String   @id @default(uuid(1))
         [1;94m 4 | [0m}
         [1;94m   | [0m
     "#]];
