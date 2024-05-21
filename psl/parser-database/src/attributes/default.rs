@@ -196,10 +196,9 @@ fn validate_model_builtin_scalar_type_default(
             {
                 validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
             }
-        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_CUID =>
-            {
-                validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
-            }
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_CUID => {
+            validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
+        }
         (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_UUID => {
             validate_uuid_args(&funcargs.arguments, accept, ctx)
         }
@@ -244,14 +243,12 @@ fn validate_composite_builtin_scalar_type_default(
 ) {
     match (scalar_type, value) {
         // Functions
-        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_CUID =>
-            {
-                validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
-            }
-        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_UUID =>
-            {
-                validate_uuid_args(&funcargs.arguments, accept, ctx)
-            }
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_CUID => {
+            validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
+        }
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_UUID => {
+            validate_uuid_args(&funcargs.arguments, accept, ctx)
+        }
         (ScalarType::DateTime, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_NOW => {
             validate_empty_function_args(FN_NOW, &funcargs.arguments, accept, ctx)
         }
