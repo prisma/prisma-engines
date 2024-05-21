@@ -196,7 +196,7 @@ impl ValueGenerator {
                 format!("nanoid({length})"),
                 vec![(None, PrismaValue::Int(length.into()))],
             )
-                .unwrap()
+            .unwrap()
         } else {
             ValueGenerator::new("nanoid()".to_owned(), vec![]).unwrap()
         }
@@ -288,7 +288,8 @@ impl ValueGeneratorFn {
             4 => uuid::Uuid::new_v4(),
             7 => {
                 let now = chrono::Utc::now();
-                let timestamp = uuid::Timestamp::from_unix(uuid::NoContext, now.timestamp() as u64, now.timestamp_subsec_nanos());
+                let timestamp =
+                    uuid::Timestamp::from_unix(uuid::NoContext, now.timestamp() as u64, now.timestamp_subsec_nanos());
                 uuid::Uuid::new_v7(timestamp)
             }
             _ => panic!("Unknown UUID version: {}", version),
