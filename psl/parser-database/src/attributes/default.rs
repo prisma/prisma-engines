@@ -192,10 +192,10 @@ fn validate_model_builtin_scalar_type_default(
         }
         (ScalarType::Int, ast::Expression::Function(funcname, funcargs, _))
         | (ScalarType::BigInt, ast::Expression::Function(funcname, funcargs, _))
-        if funcname == FN_AUTOINCREMENT =>
-            {
-                validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
-            }
+            if funcname == FN_AUTOINCREMENT =>
+        {
+            validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
+        }
         (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_CUID => {
             validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
         }
