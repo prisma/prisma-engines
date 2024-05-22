@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v26
+      - uses: cachix/install-nix-action@v27
         with:
           # we need internet access for the moment
           extra_nix_config: |
