@@ -145,7 +145,7 @@ async fn json_rpc_diff_target_to_connector(
         DiffTarget::SchemaDatasource(schemas) => {
             let config_dir = std::path::Path::new(&schemas.config_dir);
             let sources: Vec<_> = schemas.to_psl_input();
-            let mut connector = crate::schemas_to_connector(&sources, Some(config_dir))?;
+            let mut connector = crate::schema_to_connector(&sources, Some(config_dir))?;
             connector.ensure_connection_validity().await?;
             connector.set_preview_features(preview_features);
             let schema = connector
@@ -155,7 +155,7 @@ async fn json_rpc_diff_target_to_connector(
         }
         DiffTarget::SchemaDatamodel(schemas) => {
             let sources = schemas.to_psl_input();
-            let mut connector = crate::schemas_to_connector_unchecked(&sources)?;
+            let mut connector = crate::schema_to_connector_unchecked(&sources)?;
             connector.set_preview_features(preview_features);
 
             let schema = connector

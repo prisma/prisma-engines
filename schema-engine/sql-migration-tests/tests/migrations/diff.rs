@@ -4,7 +4,7 @@ use schema_core::{
     json_rpc::types::{DiffTarget, PathContainer, SchemasContainer, SchemasWithConfigDir},
     schema_connector::SchemaConnector,
 };
-use sql_migration_tests::test_api::*;
+use sql_migration_tests::{test_api::*, utils::to_schema_containers};
 use std::sync::Arc;
 
 #[test_connector(tags(Sqlite))]
@@ -727,6 +727,141 @@ fn diff_with_non_existing_sqlite_database_from_datasource() {
     }
 
     expected.assert_eq(&error);
+}
+
+#[test_connector]
+fn from_multi_file_schema_datasource_to_url(mut api: TestApi) {
+    let host = Arc::new(TestConnectorHost::default());
+    api.connector.set_host(host.clone());
+
+    let base_dir = tempfile::TempDir::new().unwrap();
+    let base_dir_str = base_dir.path().to_string_lossy();
+    let first_url = format!("file:{base_dir_str}/first_db.sqlite");
+    let second_url = format!("file:{base_dir_str}/second_db.sqlite");
+
+    tok(async {
+        let q = quaint::single::Quaint::new(&first_url).await.unwrap();
+        q.raw_cmd("CREATE TABLE cows ( id INTEGER PRIMARY KEY, moos BOOLEAN DEFAULT true );")
+            .await
+            .unwrap();
+    });
+
+    tok(async {
+        let q = quaint::single::Quaint::new(&second_url).await.unwrap();
+        q.raw_cmd("CREATE TABLE cats ( id INTEGER PRIMARY KEY, meows BOOLEAN DEFAULT true );")
+            .await
+            .unwrap();
+    });
+
+    let schema_a = format!(
+        r#"
+          datasource db {{
+              provider = "sqlite"
+              url = "{}"
+          }}
+        "#,
+        first_url.replace('\\', "\\\\")
+    );
+    let schema_a_path = write_file_to_tmp(&schema_a, &base_dir, "a.prisma");
+
+    let schema_b = r#"
+          model cats {
+            id Int @id
+            meows Boolean
+          }
+        "#;
+    let schema_b_path = write_file_to_tmp(&schema_b, &base_dir, "b.prisma");
+
+    let files = to_schema_containers(&[
+        (schema_a_path.to_string_lossy().into_owned(), &schema_a),
+        (schema_b_path.to_string_lossy().into_owned(), &schema_b),
+    ]);
+
+    let input = DiffParams {
+        exit_code: None,
+        from: DiffTarget::SchemaDatasource(SchemasWithConfigDir {
+            files,
+            config_dir: base_dir.path().to_string_lossy().into_owned(),
+        }),
+        script: true,
+        shadow_database_url: None,
+        to: DiffTarget::Url(UrlContainer { url: second_url }),
+    };
+
+    api.diff(input).unwrap();
+
+    let expected_printed_messages = expect![[r#"
+        [
+            "-- DropTable\nPRAGMA foreign_keys=off;\nDROP TABLE \"cows\";\nPRAGMA foreign_keys=on;\n\n-- CreateTable\nCREATE TABLE \"cats\" (\n    \"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n    \"meows\" BOOLEAN DEFAULT true\n);\n",
+        ]
+    "#]];
+    expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
+}
+
+#[test_connector]
+fn from_multi_file_schema_datamodel_to_url(mut api: TestApi) {
+    let host = Arc::new(TestConnectorHost::default());
+    api.connector.set_host(host.clone());
+
+    let base_dir = tempfile::TempDir::new().unwrap();
+    let base_dir_str = base_dir.path().to_string_lossy();
+    let first_url = format!("file:{base_dir_str}/first_db.sqlite");
+    let second_url = format!("file:{base_dir_str}/second_db.sqlite");
+
+    tok(async {
+        let q = quaint::single::Quaint::new(&second_url).await.unwrap();
+        q.raw_cmd("CREATE TABLE cats ( id INTEGER PRIMARY KEY, meows BOOLEAN DEFAULT true );")
+            .await
+            .unwrap();
+    });
+
+    let from_files = {
+        let schema_a = format!(
+            r#"
+              datasource db {{
+                  provider = "sqlite"
+                  url = "{}"
+              }}
+    
+              model cows {{
+                id Int @id
+                meows Boolean
+              }}
+            "#,
+            first_url.replace('\\', "\\\\")
+        );
+        let schema_a_path = write_file_to_tmp(&schema_a, &base_dir, "a.prisma");
+
+        let schema_b = r#"
+              model dogs {
+                id Int @id
+                wouaf Boolean
+              }
+            "#;
+        let schema_b_path = write_file_to_tmp(&schema_b, &base_dir, "b.prisma");
+
+        to_schema_containers(&[
+            (schema_a_path.to_string_lossy().into_owned(), &schema_a),
+            (schema_b_path.to_string_lossy().into_owned(), &schema_b),
+        ])
+    };
+
+    let input = DiffParams {
+        exit_code: None,
+        from: DiffTarget::SchemaDatamodel(SchemasContainer { files: from_files }),
+        script: true,
+        shadow_database_url: None,
+        to: DiffTarget::Url(UrlContainer { url: second_url }),
+    };
+
+    api.diff(input).unwrap();
+
+    let expected_printed_messages = expect![[r#"
+        [
+            "-- DropTable\nPRAGMA foreign_keys=off;\nDROP TABLE \"cows\";\nPRAGMA foreign_keys=on;\n\n-- DropTable\nPRAGMA foreign_keys=off;\nDROP TABLE \"dogs\";\nPRAGMA foreign_keys=on;\n\n-- CreateTable\nCREATE TABLE \"cats\" (\n    \"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n    \"meows\" BOOLEAN DEFAULT true\n);\n",
+        ]
+    "#]];
+    expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
 }
 
 // Call diff, and expect it to error. Return the error.

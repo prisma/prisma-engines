@@ -98,10 +98,10 @@ fn connector_for_connection_string(
 }
 
 /// Same as schema_to_connector, but it will only read the provider, not the connector params.
-fn schemas_to_connector_unchecked(
-    schemas: &[(String, SourceFile)],
+fn schema_to_connector_unchecked(
+    files: &[(String, SourceFile)],
 ) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
-    let (_, config) = psl::parse_configuration_multi_file(schemas)
+    let (_, config) = psl::parse_configuration_multi_file(files)
         .map_err(|(files, err)| CoreError::new_schema_parser_error(files.render_diagnostics(&err)))?;
 
     let preview_features = config.preview_features();
@@ -124,13 +124,13 @@ fn schemas_to_connector_unchecked(
     Ok(connector)
 }
 
-fn prepare_connector(
+/// Go from a schema to a connector
+fn schema_to_connector(
+    files: &[(String, SourceFile)],
     config_dir: Option<&Path>,
-    source: Datasource,
-    url: String,
-    preview_features: BitFlags<PreviewFeature, u64>,
-    shadow_database_url: Option<String>,
 ) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
+    let (source, url, preview_features, shadow_database_url) = parse_configuration_multi(files)?;
+
     let url = config_dir
         .map(|config_dir| psl::set_config_dir(source.active_connector.flavour(), config_dir, &url).into_owned())
         .unwrap_or(url);
@@ -145,16 +145,6 @@ fn prepare_connector(
     connector.set_params(params)?;
 
     Ok(connector)
-}
-
-/// Go from a schema to a connector
-fn schemas_to_connector(
-    files: &[(String, SourceFile)],
-    config_dir: Option<&Path>,
-) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
-    let (source, url, preview_features, shadow_database_url) = parse_configuration_multi(files)?;
-
-    prepare_connector(config_dir, source, url, preview_features, shadow_database_url)
 }
 
 fn connector_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {

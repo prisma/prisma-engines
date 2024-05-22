@@ -1,6 +1,8 @@
 use quaint::{prelude::Queryable, single::Quaint};
 use schema_core::json_rpc::types::SchemasWithConfigDir;
 use sql_migration_tests::test_api::*;
+use sql_migration_tests::utils::to_schema_containers;
+use sql_migration_tests::*;
 
 #[test]
 fn db_execute_input_source_takes_expected_json_shape() {
@@ -183,4 +185,45 @@ fn sqlite_db_execute_with_schema_datasource_resolves_relative_paths_correctly() 
     .unwrap();
 
     assert!(expected_sqlite_path.exists());
+}
+
+#[test]
+fn db_execute_multi_file() {
+    let (tmpdir, files) = write_multi_file! {
+        "a.prisma" => r#"
+            datasource dbtest {
+                provider = "sqlite"
+                url = "file:db1.sqlite"
+            }
+        "#,
+        "b.prisma" => r#"
+            model dogs {
+                id Int @id
+            }
+        "#,
+    };
+
+    let url = format!("file:{}/db1.sqlite", tmpdir.path().to_string_lossy());
+    let script = r#"
+        CREATE TABLE "dogs" ( id INTEGER PRIMARY KEY, name TEXT );
+        INSERT INTO "dogs" ("name") VALUES ('snoopy'), ('marmaduke');
+    "#;
+
+    // Execute the command.
+    let generic_api = schema_core::schema_api(None, None).unwrap();
+    tok(generic_api.db_execute(DbExecuteParams {
+        datasource_type: DbExecuteDatasourceType::Schema(SchemasWithConfigDir {
+            files: to_schema_containers(&files),
+            config_dir: tmpdir.path().to_string_lossy().into_owned(),
+        }),
+        script: script.to_owned(),
+    }))
+    .unwrap();
+
+    // Check that the command was executed
+    let q = tok(quaint::single::Quaint::new(&url)).unwrap();
+    let result = tok(q.query_raw("SELECT name FROM dogs;", &[])).unwrap();
+    let mut rows = result.into_iter();
+    assert_eq!(rows.next().unwrap()[0].to_string().unwrap(), "snoopy");
+    assert_eq!(rows.next().unwrap()[0].to_string().unwrap(), "marmaduke");
 }

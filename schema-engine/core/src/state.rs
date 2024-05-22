@@ -52,12 +52,6 @@ enum ConnectorRequestType {
     Url(String),
 }
 
-impl From<Vec<(String, String)>> for ConnectorRequestType {
-    fn from(schemas: Vec<(String, String)>) -> Self {
-        Self::Schema(schemas.into_iter().map(|(a, b)| (a, SourceFile::from(b))).collect())
-    }
-}
-
 /// A request from the core to a connector, in the form of an async closure.
 type ConnectorRequest<O> = Box<
     dyn for<'c> FnOnce(&'c mut dyn SchemaConnector) -> Pin<Box<dyn Future<Output = CoreResult<O>> + Send + 'c>> + Send,
@@ -115,7 +109,7 @@ impl EngineState {
                 Err(_) => return Err(ConnectorError::from_msg("tokio mpsc send error".to_owned())),
             },
             None => {
-                let mut connector = crate::schemas_to_connector(&schemas, config_dir)?;
+                let mut connector = crate::schema_to_connector(&schemas, config_dir)?;
 
                 connector.set_host(self.host.clone());
                 let (erased_sender, mut erased_receiver) = mpsc::channel::<ErasedConnectorRequest>(12);

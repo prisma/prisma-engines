@@ -488,3 +488,36 @@ fn migrations_should_succeed_on_an_uninitialized_nonempty_database_with_postgis_
         .send_sync()
         .assert_applied_migrations(&["01-init"]);
 }
+
+#[test_connector]
+fn applying_a_single_migration_multi_file_should_work(api: TestApi) {
+    let schema_a = api.datamodel_with_provider(
+        r#"
+        model Cat {
+            id Int @id
+            name String
+        }
+    "#,
+    );
+    let schema_b = indoc::indoc! {r#"
+        model Dog {
+            id Int @id
+            name String
+        }
+    "#};
+
+    let dir = api.create_migrations_directory();
+
+    api.create_migration_multi_file(
+        "init",
+        &[("schema_a.prisma", schema_a.as_str()), ("schema_b.prisma", schema_b)],
+        &dir,
+    )
+    .send_sync();
+
+    api.apply_migrations(&dir)
+        .send_sync()
+        .assert_applied_migrations(&["init"]);
+
+    api.apply_migrations(&dir).send_sync().assert_applied_migrations(&[]);
+}
