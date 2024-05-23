@@ -218,15 +218,9 @@ pub fn js_value_to_quaint(
                 // DbNull
                 serde_json::Value::Null => Ok(QuaintValue::null_json()),
                 // JsonNull
-                serde_json::Value::String(s) => {
-                    if s == "$__prisma_null" {
-                        Ok(QuaintValue::json(serde_json::Value::Null))
-                    } else {
-                        serde_json::from_str(&s)
-                            .map_err(|_| conversion_error!("Failed to parse json"))
-                            .map(QuaintValue::json)
-                    }
-                }
+                serde_json::Value::String(s) => serde_json::from_str(&s)
+                    .map_err(|_| conversion_error!("Failed to parse json"))
+                    .map(QuaintValue::json),
                 json => Ok(QuaintValue::json(json)),
             }
         }
