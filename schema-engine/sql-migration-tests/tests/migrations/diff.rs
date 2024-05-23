@@ -770,11 +770,11 @@ fn from_multi_file_schema_datasource_to_url(mut api: TestApi) {
             meows Boolean
           }
         "#;
-    let schema_b_path = write_file_to_tmp(&schema_b, &base_dir, "b.prisma");
+    let schema_b_path = write_file_to_tmp(schema_b, &base_dir, "b.prisma");
 
     let files = to_schema_containers(&[
         (schema_a_path.to_string_lossy().into_owned(), &schema_a),
-        (schema_b_path.to_string_lossy().into_owned(), &schema_b),
+        (schema_b_path.to_string_lossy().into_owned(), schema_b),
     ]);
 
     let input = DiffParams {
@@ -838,11 +838,11 @@ fn from_multi_file_schema_datamodel_to_url(mut api: TestApi) {
                 wouaf Boolean
               }
             "#;
-        let schema_b_path = write_file_to_tmp(&schema_b, &base_dir, "b.prisma");
+        let schema_b_path = write_file_to_tmp(schema_b, &base_dir, "b.prisma");
 
         to_schema_containers(&[
             (schema_a_path.to_string_lossy().into_owned(), &schema_a),
-            (schema_b_path.to_string_lossy().into_owned(), &schema_b),
+            (schema_b_path.to_string_lossy().into_owned(), schema_b),
         ])
     };
 

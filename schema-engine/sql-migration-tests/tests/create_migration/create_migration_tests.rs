@@ -137,6 +137,14 @@ fn basic_create_migration_multi_file_works(api: TestApi) {
 
                         CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                     );
+
+                    -- CreateTable
+                    CREATE TABLE "Dog" (
+                        "id" INT4 NOT NULL,
+                        "name" STRING NOT NULL,
+
+                        CONSTRAINT "Dog_pkey" PRIMARY KEY ("id")
+                    );
                 "#]]
             } else if is_postgres {
                 expect![[r#"

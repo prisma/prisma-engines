@@ -377,7 +377,7 @@ fn basic_jsonrpc_roundtrip_works_with_params(_api: TestApi) {
     let path = tmpfile.to_str().unwrap();
     let schema_path_params = serde_json::json!({
         "datasource": {
-            "tag": "SchemaString",
+            "tag": "Schema",
             "files": [{ "path": path, "content": datamodel }]
         }
     });
@@ -544,6 +544,7 @@ fn execute_postgres(api: TestApi) {
                 "datasourceType": {
                     "tag": "schema",
                     "files": [{ "path": &schema_path, "content": &schema }],
+                    "configDir": schema_path.parent().unwrap().to_string_lossy(),
                 },
                 "script": "SELECT 1;",
             }
@@ -620,6 +621,7 @@ fn introspect_postgres(api: TestApi) {
                 "datasourceType": {
                     "tag": "schema",
                     "files": [{ "path": &schema_path, "content": &schema }],
+                    "configDir": schema_path.parent().unwrap().to_string_lossy(),
                 },
                 "script": script,
             }
