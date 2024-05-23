@@ -44,7 +44,10 @@ fn introspect_force_with_invalid_schema() {
 
     let result = &tok(api.introspect(params))
         .unwrap()
-        .datamodel
+        .datamodels
+        .first()
+        .map(|dm| dm.content.as_str())
+        .unwrap()
         .replace(db_path.as_str(), "<db_path>");
 
     let expected = expect![[r#"

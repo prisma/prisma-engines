@@ -218,9 +218,9 @@ async fn main() -> anyhow::Result<()> {
                 namespaces: None,
             };
 
-            let introspected = api.introspect(params).await.map_err(|err| anyhow::anyhow!("{err:?}"))?;
+            let mut introspected = api.introspect(params).await.map_err(|err| anyhow::anyhow!("{err:?}"))?;
 
-            println!("{}", &introspected.datamodel);
+            println!("{}", &introspected.datamodels.remove(0).content);
         }
         Command::ValidateDatamodel(cmd) => {
             use std::io::Read as _;
@@ -328,11 +328,12 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
             let skeleton = minimal_schema_from_url(url)?;
 
             let api = schema_core::schema_api(Some(skeleton.clone()), None)?;
+            let path = "/tmp/prisma-test-cli-introspected.prisma";
 
             let params = IntrospectParams {
                 schema: SchemasContainer {
                     files: vec![SchemaContainer {
-                        path: "schema.prisma".to_string(),
+                        path: path.to_string(),
                         content: skeleton,
                     }],
                 },
@@ -345,8 +346,10 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
 
             eprintln!("{}", "Schema was successfully introspected from database URL".green());
 
-            let path = "/tmp/prisma-test-cli-introspected.prisma";
-            std::fs::write(path, introspected.datamodel)?;
+            for schema in introspected.datamodels {
+                std::fs::write(schema.path, schema.content)?;
+            }
+
             path.to_owned()
         } else if let Some(file_path) = cmd.file_path.as_ref() {
             file_path.clone()

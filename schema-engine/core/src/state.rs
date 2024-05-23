@@ -361,7 +361,7 @@ impl GenericApi for EngineState {
             Box::new(move |connector| {
                 Box::pin(async move {
                     let IntrospectionResult {
-                        mut datamodels,
+                        datamodels,
                         views,
                         warnings,
                         is_empty,
@@ -381,7 +381,10 @@ impl GenericApi for EngineState {
                         });
 
                         Ok(IntrospectResult {
-                            datamodel: datamodels.remove(0).1,
+                            datamodels: datamodels
+                                .into_iter()
+                                .map(|(path, content)| SchemaContainer { path, content })
+                                .collect(),
                             views,
                             warnings,
                         })
