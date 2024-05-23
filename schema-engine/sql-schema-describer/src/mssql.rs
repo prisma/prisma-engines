@@ -61,7 +61,7 @@ static DEFAULT_DB_GEN: Lazy<Regex> = Lazy::new(|| Regex::new(r"\((.*)\)").unwrap
 /// ```ignore
 /// CREATE DEFAULT catcat AS 'musti';
 /// ```
-static DEFAULT_SHARED_CONSTRAINT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^CREATE DEFAULT (.*)").unwrap());
+static DEFAULT_SHARED_CONSTRAINT: Lazy<Regex> = Lazy::new(|| Regex::new(r"CREATE DEFAULT (.*)").unwrap());
 
 pub struct SqlSchemaDescriber<'a> {
     conn: &'a dyn Queryable,
