@@ -631,7 +631,7 @@ impl DefaultValueAssert for ast::Expression {
 
     #[track_caller]
     fn assert_uuid(&self) -> &Self {
-        assert!(matches!(self, ast::Expression::Function(name, args, _) if name == "uuid"));
+        assert!(matches!(self, ast::Expression::Function(name, _, _) if name == "uuid"));
 
         self
     }
