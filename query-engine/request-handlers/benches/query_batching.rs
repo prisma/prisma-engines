@@ -13,7 +13,6 @@ fn criterion_benchmark(c: &mut Criterion) {
     let mut adapter = request_handlers::JsonProtocolAdapter::new(&query_schema);
 
     let queries = (0..20000)
-        .into_iter()
         .map(|i| {
             format!(
                 r#"{{
