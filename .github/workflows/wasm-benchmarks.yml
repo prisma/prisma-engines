@@ -59,7 +59,6 @@ jobs:
 
       - name: Run benchmarks
         id: bench
-        if: false
         run: |
           make run-bench | tee results.txt
 
@@ -123,7 +122,6 @@ jobs:
             echo EOF
           } >> "$GITHUB_OUTPUT"
       - name: Find past report comment
-        if: false
         uses: peter-evans/find-comment@v3
         id: findReportComment
         with:
@@ -134,9 +132,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v4
         # Only run on branches from our repository
         # It avoids an expected failure on forks
-        # if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
-        if: false
-
+        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
         with:
           comment-id: ${{ steps.findReportComment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
@@ -156,8 +152,7 @@ jobs:
           edit-mode: replace
 
       - name: Fail workflow if regression detected
-        # if: steps.bench.outputs.status == 'failed'
-        if: false
+        if: steps.bench.outputs.status == 'failed'
         run: |
           echo "Workflow failed due to benchmark regression."
           exit 1
