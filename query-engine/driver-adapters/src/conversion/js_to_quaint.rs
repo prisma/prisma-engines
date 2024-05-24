@@ -217,7 +217,6 @@ pub fn js_value_to_quaint(
             match json_value {
                 // DbNull
                 serde_json::Value::Null => Ok(QuaintValue::null_json()),
-                // JsonNull
                 serde_json::Value::String(s) => serde_json::from_str(&s)
                     .map_err(|_| conversion_error!("Failed to parse incoming json from a driver adapter"))
                     .map(QuaintValue::json),
