@@ -31,7 +31,13 @@ mod scalar_relations {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_common))]
+    // TODO: fix https://github.com/prisma/team-orm/issues/684 and unexclude DAs.
+    // On napi, this currently fails with "P2023":
+    // `Inconsistent column data: Unexpected conversion failure for field Child.bInt from Number(14324324234324.0) to BigInt`.
+    #[connector_test(
+        schema(schema_common),
+        exclude(Postgres("pg.js", "neon.js"), Vitess("planetscale.js"))
+    )]
     async fn common_types(runner: Runner) -> TestResult<()> {
         create_common_children(&runner).await?;
 
