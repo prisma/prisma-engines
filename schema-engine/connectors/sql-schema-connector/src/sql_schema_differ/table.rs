@@ -67,7 +67,22 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
     }
 
     pub(crate) fn foreign_key_pairs(&self) -> impl Iterator<Item = MigrationPair<ForeignKeyWalker<'schema>>> + '_ {
-        self.previous_foreign_keys().filter_map(move |previous_fk| {
+        let singular_fks = self.previous_foreign_keys().filter(move |left| {
+            let number_of_identical_fks = self
+                .previous_foreign_keys()
+                .filter(|right| {
+                    left.referenced_columns().len() == right.referenced_columns().len()
+                        && left
+                            .referenced_columns()
+                            .zip(right.referenced_columns())
+                            .all(|(a, b)| a.name() == b.name())
+                })
+                .count();
+
+            number_of_identical_fks == 1
+        });
+
+        singular_fks.filter_map(move |previous_fk| {
             self.next_foreign_keys()
                 .find(move |next_fk| foreign_keys_match(MigrationPair::new(&previous_fk, next_fk), self.db))
                 .map(move |next_fk| MigrationPair::new(previous_fk, next_fk))
