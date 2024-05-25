@@ -4,12 +4,11 @@ use log::*;
 use lsp_types::*;
 use psl::{
     datamodel_connector::Connector,
-    diagnostics::Span,
-    parse_configuration,
+    diagnostics::{FileId, Span},
+    parse_configuration_multi_file,
     parser_database::{ast, ParserDatabase, SourceFile},
     Configuration, Datasource, Diagnostics, Generator, PreviewFeature,
 };
-use std::sync::Arc;
 
 mod datasource;
 
@@ -20,18 +19,10 @@ pub(crate) fn empty_completion_list() -> CompletionList {
     }
 }
 
-pub(crate) fn completion(schema: String, params: CompletionParams) -> CompletionList {
-    let source_file = SourceFile::new_allocated(Arc::from(schema.into_boxed_str()));
-
-    let position = if let Some(pos) = position_to_offset(&params.text_document_position.position, source_file.as_str())
-    {
-        pos
-    } else {
-        warn!("Received a position outside of the document boundaries in CompletionParams");
-        return empty_completion_list();
-    };
-
-    let config = parse_configuration(source_file.as_str()).ok();
+pub(crate) fn completion(schema_files: Vec<(String, SourceFile)>, params: CompletionParams) -> CompletionList {
+    let config = parse_configuration_multi_file(&schema_files)
+        .ok()
+        .map(|(_, config)| config);
 
     let mut list = CompletionList {
         is_incomplete: false,
@@ -40,7 +31,20 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
 
     let db = {
         let mut diag = Diagnostics::new();
-        ParserDatabase::new_single_file(source_file, &mut diag)
+        ParserDatabase::new(&schema_files, &mut diag)
+    };
+
+    let Some(initiating_file_id) = db.file_id(params.text_document_position.text_document.uri.as_str()) else {
+        warn!("Initiating file name is not found in the schema");
+        return empty_completion_list();
+    };
+
+    let initiating_doc = db.source(initiating_file_id);
+    let position = if let Some(pos) = position_to_offset(&params.text_document_position.position, initiating_doc) {
+        pos
+    } else {
+        warn!("Received a position outside of the document boundaries in CompletionParams");
+        return empty_completion_list();
     };
 
     let ctx = CompletionContext {
@@ -48,6 +52,7 @@ pub(crate) fn completion(schema: String, params: CompletionParams) -> Completion
         params: &params,
         db: &db,
         position,
+        initiating_file_id,
     };
 
     push_ast_completions(ctx, &mut list);
@@ -61,6 +66,7 @@ struct CompletionContext<'a> {
     params: &'a CompletionParams,
     db: &'a ParserDatabase,
     position: usize,
+    initiating_file_id: FileId,
 }
 
 impl<'a> CompletionContext<'a> {
@@ -90,12 +96,17 @@ impl<'a> CompletionContext<'a> {
 }
 
 fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut CompletionList) {
-    match ctx.db.ast_assert_single().find_at_position(ctx.position) {
+    let relation_mode = match ctx.config.map(|c| c.relation_mode()) {
+        Some(Some(rm)) => rm,
+        _ => ctx.connector().default_relation_mode(),
+    };
+
+    match ctx.db.ast(ctx.initiating_file_id).find_at_position(ctx.position) {
         ast::SchemaPosition::Model(
             _model_id,
             ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("relation", _, Some(attr_name))),
         ) if attr_name == "onDelete" || attr_name == "onUpdate" => {
-            for referential_action in ctx.connector().referential_actions().iter() {
+            for referential_action in ctx.connector().referential_actions(&relation_mode).iter() {
                 completion_list.items.push(CompletionItem {
                     label: referential_action.as_str().to_owned(),
                     kind: Some(CompletionItemKind::ENUM),
@@ -189,7 +200,7 @@ fn ds_has_prop(ctx: CompletionContext<'_>, prop: &str) -> bool {
 
 fn push_namespaces(ctx: CompletionContext<'_>, completion_list: &mut CompletionList) {
     for (namespace, _) in ctx.namespaces() {
-        let insert_text = if add_quotes(ctx.params, ctx.db.source_assert_single()) {
+        let insert_text = if add_quotes(ctx.params, ctx.db.source(ctx.initiating_file_id)) {
             format!(r#""{namespace}""#)
         } else {
             namespace.to_string()

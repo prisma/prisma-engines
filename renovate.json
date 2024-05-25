@@ -11,36 +11,86 @@
   "sbt": {
     "enabled": false
   },
-  "schedule": ["every weekend"],
+  "schedule": [
+    "every weekend"
+  ],
   "minimumReleaseAge": "7 days",
   "rangeStrategy": "pin",
   "separateMinorPatch": true,
   "configMigration": true,
-  "ignoreDeps": ["query-engine-wasm-baseline"],
+  "ignoreDeps": [
+    "query-engine-wasm-baseline"
+  ],
   "packageRules": [
     {
-      "matchFileNames": ["docker-compose.yml"],
-      "matchUpdateTypes": ["minor", "major"],
+      "matchFileNames": [
+        "docker-compose.yml"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "major"
+      ],
       "enabled": false
     },
     {
       "groupName": "Weekly vitess docker image version update",
-      "matchPackageNames": ["vitess/vttestserver"],
-      "schedule": ["before 7am on Wednesday"]
+      "matchPackageNames": [
+        "vitess/vttestserver"
+      ],
+      "schedule": [
+        "before 7am on Wednesday"
+      ]
     },
     {
       "groupName": "Prisma Driver Adapters",
-      "matchPackageNames": ["@prisma/driver-adapter-utils"],
-      "matchPackagePrefixes": ["@prisma/adapter"],
-      "schedule": ["at any time"]
+      "matchPackageNames": [
+        "@prisma/driver-adapter-utils"
+      ],
+      "matchPackagePrefixes": [
+        "@prisma/adapter"
+      ],
+      "schedule": [
+        "at any time"
+      ]
     },
     {
       "groupName": "Driver Adapters directory",
-      "matchFileNames": ["query-engine/driver-adapters/**"]
+      "matchFileNames": [
+        "query-engine/driver-adapters/**"
+      ]
     },
     {
-      "matchPackageNames": ["node", "pnpm"],
+      "matchPackageNames": [
+        "node",
+        "pnpm"
+      ],
       "enabled": false
+    },
+    {
+      "groupName": "rust toolchain update",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchDepNames": [
+        "rust"
+      ],
+      "schedule": [
+        "before 7am every weekday"
+      ]
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^rust-toolchain\\.toml?$"
+      ],
+      "matchStrings": [
+        "channel\\s*=\\s*\"(?<currentValue>\\d+\\.\\d+(\\.\\d+)?)\""
+      ],
+      "depNameTemplate": "rust",
+      "packageNameTemplate": "rust-lang/rust",
+      "datasourceTemplate": "github-releases"
     }
   ]
 }

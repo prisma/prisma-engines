@@ -8,6 +8,7 @@ use crate::schema_file_input::SchemaFileInput;
 
 #[derive(serde::Serialize)]
 pub struct MiniError {
+    file_name: String,
     start: usize,
     end: usize,
     text: String,
@@ -25,6 +26,7 @@ pub(crate) fn run(schema: SchemaFileInput) -> String {
         .errors()
         .iter()
         .map(|err: &DatamodelError| MiniError {
+            file_name: db.file_name(err.span().file_id).to_owned(),
             start: offset_to_lsp_offset(err.span().start, db.source(err.span().file_id)),
             end: offset_to_lsp_offset(err.span().end, db.source(err.span().file_id)),
             text: err.message().to_string(),
@@ -36,6 +38,7 @@ pub(crate) fn run(schema: SchemaFileInput) -> String {
         .warnings()
         .iter()
         .map(|warn: &DatamodelWarning| MiniError {
+            file_name: db.file_name(warn.span().file_id).to_owned(),
             start: offset_to_lsp_offset(warn.span().start, db.source(warn.span().file_id)),
             end: offset_to_lsp_offset(warn.span().end, db.source(warn.span().file_id)),
             text: warn.message().to_owned(),
@@ -76,6 +79,7 @@ mod tests {
         let expected = expect![[r#"
             [
               {
+                "file_name": "schema.prisma",
                 "start": 16,
                 "end": 19,
                 "text": "Error validating: This line is invalid. It does not start with any known Prisma schema keyword.",
@@ -108,6 +112,7 @@ mod tests {
         let expected = expect![[r#"
             [
               {
+                "file_name": "schema.prisma",
                 "start": 149,
                 "end": 163,
                 "text": "Preview feature \"createMany\" is deprecated. The functionality can be used without specifying it as a preview feature.",
@@ -146,6 +151,7 @@ mod tests {
         let expected = expect![[r#"
             [
               {
+                "file_name": "schema1.prisma",
                 "start": 149,
                 "end": 163,
                 "text": "Preview feature \"createMany\" is deprecated. The functionality can be used without specifying it as a preview feature.",

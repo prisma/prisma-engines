@@ -14,6 +14,24 @@ pub struct Configuration {
 }
 
 impl Configuration {
+    pub fn new(
+        generators: Vec<Generator>,
+        datasources: Vec<Datasource>,
+        warnings: Vec<diagnostics::DatamodelWarning>,
+    ) -> Self {
+        Self {
+            generators,
+            datasources,
+            warnings,
+        }
+    }
+
+    pub fn extend(&mut self, other: Configuration) {
+        self.generators.extend(other.generators);
+        self.datasources.extend(other.datasources);
+        self.warnings.extend(other.warnings);
+    }
+
     pub fn validate_that_one_datasource_is_provided(&self) -> Result<(), Diagnostics> {
         if self.datasources.is_empty() {
             Err(DatamodelError::new_validation_error(
@@ -160,5 +178,9 @@ impl Configuration {
         }
 
         Ok(())
+    }
+
+    pub fn first_datasource(&self) -> &Datasource {
+        self.datasources.first().expect("Expected a datasource to exist.")
     }
 }

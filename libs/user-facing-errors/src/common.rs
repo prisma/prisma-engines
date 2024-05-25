@@ -24,9 +24,9 @@ pub struct IncorrectDatabaseCredentials {
 #[user_facing(
     code = "P1001",
     message = "\
-Can't reach database server at `{database_host}`:`{database_port}`
+Can't reach database server at `{database_host}:{database_port}`
 
-Please make sure your database server is running at `{database_host}`:`{database_port}`."
+Please make sure your database server is running at `{database_host}:{database_port}`."
 )]
 pub struct DatabaseNotReachable {
     /// Database host URI
@@ -40,11 +40,11 @@ pub struct DatabaseNotReachable {
 #[user_facing(
     code = "P1002",
     message = "\
-The database server at `{database_host}`:`{database_port}` was reached but timed out.
+The database server at `{database_host}:{database_port}` was reached but timed out.
 
 Please try again.
 
-Please make sure your database server is running at `{database_host}`:`{database_port}`.
+Please make sure your database server is running at `{database_host}:{database_port}`.
 
 Context: {context}
 "
@@ -94,7 +94,7 @@ impl UserFacingError for DatabaseDoesNotExist {
                 database_file_name,
                 database_file_path,
             } => format!(
-                "Database {database_file_name} does not exist at {database_file_path}"
+                "Database `{database_file_name}` does not exist at `{database_file_path}`."
             ),
             DatabaseDoesNotExist::Postgres {
                 database_name,
@@ -251,7 +251,10 @@ mod tests {
             database_file_name: "dev.db".into(),
         };
 
-        assert_eq!(sqlite_err.message(), "Database dev.db does not exist at /tmp/dev.db");
+        assert_eq!(
+            sqlite_err.message(),
+            "Database `dev.db` does not exist at `/tmp/dev.db`."
+        );
 
         let mysql_err = DatabaseDoesNotExist::Mysql {
             database_name: "root".into(),

@@ -38,20 +38,21 @@ mod names;
 mod relations;
 mod types;
 
+use self::{context::Context, interner::StringId, relations::Relations, types::Types};
 pub use coerce_expression::{coerce, coerce_array, coerce_opt};
 pub use diagnostics::FileId;
+use diagnostics::{DatamodelError, Diagnostics};
+pub use files::Files;
 pub use ids::*;
 pub use names::is_reserved_type_name;
+use names::Names;
 pub use relations::{ManyToManyRelationId, ReferentialAction, RelationId};
+use schema_ast::ast::SourceConfig;
 pub use schema_ast::{ast, SourceFile};
 pub use types::{
     IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, RelationFieldId, ScalarFieldId, ScalarFieldType,
     ScalarType, SortOrder,
 };
-
-use self::{context::Context, files::Files, interner::StringId, relations::Relations, types::Types};
-use diagnostics::{DatamodelError, Diagnostics};
-use names::Names;
 
 /// ParserDatabase is a container for a Schema AST, together with information
 /// gathered during schema validation. Each validation step enriches the
@@ -83,21 +84,12 @@ pub struct ParserDatabase {
 impl ParserDatabase {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
     pub fn new_single_file(file: SourceFile, diagnostics: &mut Diagnostics) -> Self {
-        Self::new(vec![("schema.prisma".to_owned(), file)], diagnostics)
+        Self::new(&[("schema.prisma".to_owned(), file)], diagnostics)
     }
 
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub fn new(schemas: Vec<(String, schema_ast::SourceFile)>, diagnostics: &mut Diagnostics) -> Self {
-        let asts = schemas
-            .into_iter()
-            .enumerate()
-            .map(|(file_idx, (path, source))| {
-                let id = FileId(file_idx as u32);
-                let ast = schema_ast::parse_schema(source.as_str(), diagnostics, id);
-                (path, source, ast)
-            })
-            .collect();
-        let asts = Files(asts);
+    pub fn new(schemas: &[(String, schema_ast::SourceFile)], diagnostics: &mut Diagnostics) -> Self {
+        let asts = Files::new(schemas, diagnostics);
 
         let mut interner = Default::default();
         let mut names = Default::default();
@@ -161,6 +153,12 @@ impl ParserDatabase {
         }
     }
 
+    /// Render the given diagnostics (warnings + errors) into a String.
+    /// This method is multi-file aware.
+    pub fn render_diagnostics(&self, diagnostics: &Diagnostics) -> String {
+        self.asts.render_diagnostics(diagnostics)
+    }
+
     /// The parsed AST. This methods asserts that there is a single prisma schema file. As
     /// multi-file schemas are implemented, calls to this methods should be replaced with
     /// `ParserDatabase::ast()` and `ParserDatabase::iter_asts()`.
@@ -173,6 +171,13 @@ impl ParserDatabase {
     /// Iterate all parsed ASTs.
     pub fn iter_asts(&self) -> impl Iterator<Item = &ast::SchemaAst> {
         self.asts.iter().map(|(_, _, _, ast)| ast)
+    }
+
+    /// Returns file id by name
+    pub fn file_id(&self, file_name: &str) -> Option<FileId> {
+        self.asts
+            .iter()
+            .find_map(|(file_id, name, _, _)| if name == file_name { Some(file_id) } else { None })
     }
 
     /// Iterate all parsed ASTs, consuming parser database
@@ -200,6 +205,11 @@ impl ParserDatabase {
         self.types.model_attributes.len()
     }
 
+    /// The total number of files for the schema. This is O(1).
+    pub fn files_count(&self) -> usize {
+        self.asts.len()
+    }
+
     /// The source file contents. This methods asserts that there is a single prisma schema file.
     /// As multi-file schemas are implemented, calls to this methods should be replaced with
     /// `ParserDatabase::source()` and `ParserDatabase::iter_sources()`.
@@ -221,6 +231,11 @@ impl ParserDatabase {
     /// The name of the file.
     pub fn file_name(&self, file_id: FileId) -> &str {
         self.asts[file_id].0.as_str()
+    }
+
+    /// Iterate all datasources defined in the schema
+    pub fn datasources(&self) -> impl Iterator<Item = &SourceConfig> {
+        self.iter_asts().flat_map(|ast| ast.sources())
     }
 }
 

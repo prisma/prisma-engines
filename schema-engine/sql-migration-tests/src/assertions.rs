@@ -20,10 +20,6 @@ use sql_schema_describer::{
 };
 use test_setup::{BitFlags, Tags};
 
-pub trait SqlSchemaExt {
-    fn assert_table<'a>(&'a self, table_name: &str) -> TableAssertion<'a>;
-}
-
 pub struct SchemaAssertion {
     schema: SqlSchema,
     context: Option<&'static str>,

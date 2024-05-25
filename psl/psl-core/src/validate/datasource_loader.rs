@@ -10,6 +10,7 @@ use parser_database::{
     ast::{Expression, WithDocumentation},
     coerce, coerce_array, coerce_opt,
 };
+use schema_ast::ast::WithSpan;
 use std::{borrow::Cow, collections::HashMap};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
@@ -31,7 +32,7 @@ pub(crate) fn load_datasources_from_ast(
 
     for src in ast_schema.sources() {
         if let Some(source) = lift_datasource(src, diagnostics, connectors) {
-            sources.push(source)
+            sources.push(source);
         }
     }
 
@@ -163,6 +164,24 @@ fn lift_datasource(
         None => (None, None),
     };
 
+    if let Some((shadow_url, _)) = &shadow_database_url {
+        if let (Some(direct_url), Some(direct_url_span)) = (&direct_url, direct_url_span) {
+            if shadow_url == direct_url {
+                diagnostics.push_error(DatamodelError::new_shadow_database_is_same_as_direct_url_error(
+                    source_name,
+                    direct_url_span,
+                ));
+            }
+        }
+
+        if shadow_url == &url {
+            diagnostics.push_error(DatamodelError::new_shadow_database_is_same_as_main_url_error(
+                source_name,
+                url_span,
+            ));
+        }
+    }
+
     preview_features_guardrail(&mut args, diagnostics);
 
     let documentation = ast_source.documentation().map(String::from);
@@ -201,6 +220,7 @@ fn lift_datasource(
 
     Some(Datasource {
         namespaces: schemas.into_iter().map(|(s, span)| (s.to_owned(), span)).collect(),
+        span: ast_source.span(),
         schemas_span,
         name: source_name.to_owned(),
         provider: provider.to_owned(),

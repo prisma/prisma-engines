@@ -25,6 +25,11 @@ impl<'db> ModelWalker<'db> {
         self.ast_model().name()
     }
 
+    /// The ID of the file containing the model.
+    pub fn file_id(self) -> FileId {
+        self.id.0
+    }
+
     /// Traverse the fields of the models in the order they were defined.
     pub fn fields(self) -> impl ExactSizeIterator<Item = FieldWalker<'db>> + Clone {
         self.ast_model()
@@ -58,6 +63,11 @@ impl<'db> ModelWalker<'db> {
                 exists && pk.fields().len() > 1
             })
             .is_some()
+    }
+
+    /// Is the model defined in a specific file?
+    pub fn is_defined_in_file(self, file_id: FileId) -> bool {
+        return self.ast_model().span().file_id == file_id;
     }
 
     /// The AST node.

@@ -3,8 +3,8 @@
 mod builder;
 mod error;
 mod extractors;
-mod read;
 
+pub(crate) mod read;
 pub(crate) mod write;
 pub(crate) use extractors::*;
 

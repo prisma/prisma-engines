@@ -68,6 +68,7 @@ pub(crate) fn create_many_records(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
     model: Model,
+    with_field_selection: bool,
     mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
@@ -93,16 +94,30 @@ pub(crate) fn create_many_records(
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
+    let selected_fields = if with_field_selection {
+        let (selected_fields, selection_order, nested_read) =
+            super::read::utils::extract_selected_fields(field.nested_fields.unwrap().fields, &model, query_schema)?;
+
+        Some(CreateManyRecordsFields {
+            fields: selected_fields,
+            order: selection_order,
+            nested: nested_read,
+        })
+    } else {
+        None
+    };
+
     let query = CreateManyRecords {
         name: field.name,
         model,
         args,
         skip_duplicates,
-        selected_fields: None,
+        selected_fields,
         split_by_shape: !query_schema.has_capability(ConnectorCapability::SupportsDefaultInInsert),
     };
 
     graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));
+
     Ok(())
 }
 

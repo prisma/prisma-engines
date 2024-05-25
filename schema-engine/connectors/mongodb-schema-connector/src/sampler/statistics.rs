@@ -8,7 +8,7 @@ use renderer::{
 };
 use schema_connector::{
     warnings::{ModelAndField, ModelAndFieldAndType, TypeAndField, TypeAndFieldAndType},
-    CompositeTypeDepth, Warnings,
+    CompositeTypeDepth, IntrospectionContext, Warnings,
 };
 
 use super::field_type::FieldType;
@@ -20,6 +20,7 @@ use once_cell::sync::Lazy;
 use psl::datamodel_connector::constraint_names::ConstraintNames;
 use regex::Regex;
 use std::{
+    borrow::Cow,
     cmp::Ordering,
     collections::{BTreeMap, HashMap, HashSet},
     fmt,
@@ -121,7 +122,7 @@ impl<'a> Statistics<'a> {
 
     pub(super) fn render(
         &'a self,
-        datasource: &'a psl::Datasource,
+        ctx: &'a IntrospectionContext,
         rendered: &mut renderer::Datamodel<'a>,
         warnings: &mut Warnings,
     ) {
@@ -164,7 +165,7 @@ impl<'a> Statistics<'a> {
                     let mut field = renderer::datamodel::Field::new("id", "String");
 
                     field.map("_id");
-                    field.native_type(&datasource.name, "ObjectId", Vec::new());
+                    field.native_type(&ctx.datasource().name, "ObjectId", Vec::new());
                     field.default(renderer::datamodel::DefaultValue::function(Function::new("auto")));
                     field.id(IdFieldDefinition::new());
 
@@ -285,7 +286,7 @@ impl<'a> Statistics<'a> {
             }
 
             if let Some(native_type) = field_type.native_type() {
-                field.native_type(&datasource.name, native_type.to_string(), Vec::new());
+                field.native_type(&ctx.datasource().name, native_type.to_string(), Vec::new());
             }
 
             if field_type.is_array() {
@@ -410,12 +411,22 @@ impl<'a> Statistics<'a> {
             }
         }
 
-        for (_, r#type) in types {
-            rendered.push_composite_type(r#type);
+        for (ct_name, r#type) in types {
+            let file_name = match ctx.previous_schema().db.find_composite_type(ct_name) {
+                Some(walker) => ctx.previous_schema().db.file_name(walker.file_id()),
+                None => ctx.introspection_file_name(),
+            };
+
+            rendered.push_composite_type(Cow::Borrowed(file_name), r#type);
         }
 
-        for (_, model) in models.into_iter() {
-            rendered.push_model(model);
+        for (model_name, model) in models.into_iter() {
+            let file_name = match ctx.previous_schema().db.find_model(model_name) {
+                Some(walker) => ctx.previous_schema().db.file_name(walker.file_id()),
+                None => ctx.introspection_file_name(),
+            };
+
+            rendered.push_model(Cow::Borrowed(file_name), model);
         }
     }
 
@@ -512,7 +523,7 @@ impl<'a> Statistics<'a> {
 
                     let type_name = format!("{container_name}_{field}").to_case(Case::Pascal);
                     let type_name = sanitize_string(&type_name).unwrap_or(type_name);
-                    container_name = type_name.clone();
+                    container_name.clone_from(&type_name);
 
                     if let Some(sampler) = self.samples.get_mut(&key) {
                         let has_composites = sampler.types.iter().any(|t| t.0.has_documents());

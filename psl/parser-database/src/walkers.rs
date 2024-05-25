@@ -24,6 +24,7 @@ pub use r#enum::*;
 pub use relation::*;
 pub use relation_field::*;
 pub use scalar_field::*;
+use schema_ast::ast::WithSpan;
 
 use crate::{ast, FileId};
 
@@ -78,6 +79,15 @@ impl crate::ParserDatabase {
             .map(|model_id| self.walk(model_id))
     }
 
+    /// Find a composite type by name.
+    pub fn find_composite_type<'db>(&'db self, name: &str) -> Option<CompositeTypeWalker<'db>> {
+        self.interner
+            .lookup(name)
+            .and_then(|name_id| self.names.tops.get(&name_id))
+            .and_then(|(file_id, top_id)| top_id.as_composite_type_id().map(|id| (*file_id, id)))
+            .map(|ct_id| self.walk(ct_id))
+    }
+
     /// Traverse a schema element by id.
     pub fn walk<I>(&self, id: I) -> Walker<'_, I> {
         Walker { db: self, id }
@@ -90,6 +100,12 @@ impl crate::ParserDatabase {
             .map(move |enum_id| self.walk(enum_id))
     }
 
+    /// walk all enums in specified file
+    pub fn walk_enums_in_file(&self, file_id: FileId) -> impl Iterator<Item = EnumWalker<'_>> {
+        self.walk_enums()
+            .filter(move |walker| walker.ast_enum().span().file_id == file_id)
+    }
+
     /// Walk all the models in the schema.
     pub fn walk_models(&self) -> impl Iterator<Item = ModelWalker<'_>> + '_ {
         self.iter_tops()
@@ -98,12 +114,24 @@ impl crate::ParserDatabase {
             .filter(|m| !m.ast_model().is_view())
     }
 
+    /// walk all models in specified file
+    pub fn walk_models_in_file(&self, file_id: FileId) -> impl Iterator<Item = ModelWalker<'_>> {
+        self.walk_models()
+            .filter(move |walker| walker.is_defined_in_file(file_id))
+    }
+
     /// Walk all the views in the schema.
     pub fn walk_views(&self) -> impl Iterator<Item = ModelWalker<'_>> + '_ {
         self.iter_tops()
             .filter_map(|(file_id, top_id, _)| top_id.as_model_id().map(|id| (file_id, id)))
             .map(move |model_id| self.walk(model_id))
             .filter(|m| m.ast_model().is_view())
+    }
+
+    /// walk all views in specified file
+    pub fn walk_views_in_file(&self, file_id: FileId) -> impl Iterator<Item = ModelWalker<'_>> {
+        self.walk_views()
+            .filter(move |walker| walker.is_defined_in_file(file_id))
     }
 
     /// Walk all the composite types in the schema.

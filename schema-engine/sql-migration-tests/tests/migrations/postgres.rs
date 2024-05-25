@@ -735,3 +735,35 @@ fn dbgenerated_on_generated_columns_is_idempotent(api: TestApi) {
 
     api.schema_push(schema).send().assert_green().assert_no_steps();
 }
+
+// https://github.com/prisma/prisma/issues/15654
+#[test_connector(tags(Postgres12), exclude(CockroachDb))]
+fn dbgenerated_on_generated_unsupported_columns_is_idempotent(api: TestApi) {
+    let sql = r#"
+        CREATE TABLE "table" (
+            "id" TEXT NOT NULL,
+            -- NOTE: Modified to make it a PG generated column
+            "hereBeDragons" tsvector GENERATED ALWAYS AS (
+                to_tsvector('english', id::text)
+            ) STORED,
+
+            CONSTRAINT "table_pkey" PRIMARY KEY ("id")
+        );
+    "#;
+
+    api.raw_cmd(sql);
+
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model table {
+            id String @id
+            hereBeDragons Unsupported("tsvector")? @default(dbgenerated())
+        }
+    "#;
+
+    api.schema_push(schema).send().assert_green().assert_no_steps();
+}

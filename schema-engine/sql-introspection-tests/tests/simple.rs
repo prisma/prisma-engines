@@ -4,7 +4,7 @@ use indoc::formatdoc;
 use psl::PreviewFeature;
 use quaint::single::Quaint;
 use schema_connector::{CompositeTypeDepth, ConnectorParams, IntrospectionContext, SchemaConnector};
-use sql_introspection_tests::test_api::Queryable;
+use sql_introspection_tests::test_api::{Queryable, ToIntrospectionTestResult};
 use sql_schema_connector::SqlSchemaConnector;
 use std::{fs, io::Write as _, path};
 use test_setup::{
@@ -73,7 +73,7 @@ fn run_simple_test(test_file_path: &str, test_function_name: &'static str) {
     let mut database_url = std::env::var("TEST_DATABASE_URL").expect(r#"
 Missing TEST_DATABASE_URL from environment.
 
-If you are developing with the docker-compose based setup, you can find the environment variables under .test_database_urls at the project root.
+If you are developing with the docker compose based setup, you can find the environment variables under .test_database_urls at the project root.
 
 Example usage:
 
@@ -210,8 +210,9 @@ source .test_database_urls/mysql_5_6
     let ctx = IntrospectionContext::new(psl, CompositeTypeDepth::Infinite, namespaces.clone());
 
     let introspected = tok(api.introspect(&ctx))
+        .map(ToIntrospectionTestResult::to_single_test_result)
         .unwrap_or_else(|err| panic!("{}", err))
-        .data_model;
+        .datamodel;
 
     let last_comment_idx = text
         .match_indices("/*")
@@ -237,8 +238,9 @@ source .test_database_urls/mysql_5_6
             let ctx = IntrospectionContext::new(introspected_schema, CompositeTypeDepth::Infinite, namespaces);
 
             tok(api.introspect(&ctx))
+                .map(ToIntrospectionTestResult::to_single_test_result)
                 .unwrap_or_else(|err| panic!("{}", err))
-                .data_model
+                .datamodel
         };
 
         if introspected == re_introspected {

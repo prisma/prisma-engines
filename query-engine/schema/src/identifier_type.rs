@@ -22,6 +22,7 @@ pub enum IdentifierType {
     CompositeUpdateManyInput(CompositeType),
     CompositeUpsertObjectInput(CompositeType),
     CreateManyInput(Model, Option<RelationField>),
+    CreateManyAndReturnOutput(Model),
     CreateOneScalarList(ScalarField),
     Enum(InternalEnum),
     FieldUpdateOperationsInput(bool, String),
@@ -296,6 +297,9 @@ impl std::fmt::Display for IdentifierType {
                 Some(ref rf) => write!(f, "{}CreateMany{}Input", model.name(), capitalize(rf.name())),
                 _ => write!(f, "{}CreateManyInput", model.name()),
             },
+            IdentifierType::CreateManyAndReturnOutput(model) => {
+                write!(f, "CreateMany{}AndReturnOutputType", model.name())
+            }
             IdentifierType::UncheckedUpdateManyInput(model, related_field) => match related_field {
                 Some(rf) => write!(
                     f,

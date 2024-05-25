@@ -100,6 +100,23 @@ impl IntrospectionContext {
             name => unreachable!("The name `{}` for the datamodel connector is not known", name),
         }
     }
+
+    /// Returns the file name into which new introspection data should be written.
+    pub fn introspection_file_name(&self) -> &str {
+        if self.previous_schema.db.files_count() == 1 {
+            let file_id = self.previous_schema.db.iter_file_ids().next().unwrap();
+
+            self.previous_schema.db.file_name(file_id)
+        } else {
+            "introspected.prisma"
+        }
+    }
+
+    /// Removes the rendering of the configuration.
+    pub fn without_config_rendering(mut self) -> Self {
+        self.render_config = false;
+        self
+    }
 }
 
 /// Control type for composite type traversal.

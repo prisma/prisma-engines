@@ -1,0 +1,101 @@
+name: Build Engines for React native
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "Commit on the given branch to build"
+        required: false
+
+jobs:
+  build-ios:
+    # Do not change `name`, prisma-engines Buildkite build job depends on this name ending with the commit
+    name: "iOS build on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
+    runs-on: macos-14
+
+    steps:
+      - name: Output link to real commit
+        run: echo ${{ github.repository }}/commit/${{ github.event.inputs.commit }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.commit }}
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          targets: x86_64-apple-ios,aarch64-apple-ios,aarch64-apple-ios-sim
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-ios-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - run: |
+          cd query-engine/query-engine-c-abi
+          make ios
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios
+          path: |
+            ${{ github.workspace }}/query-engine/query-engine-c-abi/ios/*
+
+  build-android:
+    # Do not change `name`, prisma-engines Buildkite build job depends on this name ending with the commit
+    name: "Android build on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Output link to real commit
+        run: echo ${{ github.repository }}/commit/${{ github.event.inputs.commit }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.commit }}
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android,i686-linux-android
+
+      - uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r26d
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-android-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - run: |
+          cd query-engine/query-engine-c-abi
+          make android
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: |
+            ${{ github.workspace }}/query-engine/query-engine-c-abi/android/*
+  combine-artifacts:
+    # Do not change `name`, prisma-engines Buildkite build job depends on this name ending with the commit
+    name: "Combine iOS and Android artifacts on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
+    runs-on: ubuntu-latest
+    needs:
+      - build-ios
+      - build-android
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Upload combined artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries
+          path: |
+            ${{ github.workspace }}/ios
+            ${{ github.workspace }}/android
+

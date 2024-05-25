@@ -288,14 +288,14 @@ impl DatamodelError {
 
     pub fn new_type_not_found_error(type_name: &str, span: Span) -> DatamodelError {
         let msg = format!(
-            "Type \"{type_name}\" is neither a built-in type, nor refers to another model, custom type, or enum."
+            "Type \"{type_name}\" is neither a built-in type, nor refers to another model, composite type, or enum."
         );
         Self::new(msg, span)
     }
 
     pub fn new_type_for_case_not_found_error(type_name: &str, suggestion: &str, span: Span) -> DatamodelError {
         let msg = format!(
-            "Type \"{type_name}\" is neither a built-in type, nor refers to another model, custom type, or enum. Did you mean \"{suggestion}\"?"
+            "Type \"{type_name}\" is neither a built-in type, nor refers to another model, composite type, or enum. Did you mean \"{suggestion}\"?"
         );
         Self::new(msg, span)
     }
@@ -332,8 +332,13 @@ impl DatamodelError {
         Self::new(format!("Datasource provider not known: \"{provider}\"."), span)
     }
 
-    pub fn new_shadow_database_is_same_as_main_url_error(source_name: String, span: Span) -> DatamodelError {
-        let msg = format!("shadowDatabaseUrl is the same as url for datasource \"{source_name}\". Please specify a different database as shadow database.");
+    pub fn new_shadow_database_is_same_as_main_url_error(source_name: &str, span: Span) -> DatamodelError {
+        let msg = format!("shadowDatabaseUrl is the same as url for datasource \"{source_name}\". Please specify a different database as shadow database to avoid data loss.");
+        Self::new(msg, span)
+    }
+
+    pub fn new_shadow_database_is_same_as_direct_url_error(source_name: &str, span: Span) -> DatamodelError {
+        let msg = format!("shadowDatabaseUrl is the same as directUrl for datasource \"{source_name}\". Please specify a different database as shadow database to avoid data loss.");
         Self::new(msg, span)
     }
 

@@ -1,0 +1,41 @@
+[
+  {
+    "title": "Replace SetDefault with NoAction",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 4,
+            "character": 62
+          },
+          "end": {
+            "line": 4,
+            "character": 82
+          }
+        },
+        "severity": 2,
+        "message": "MySQL does not actually support the `SetDefault` referential action, so using it may result in unexpected errors. Read more at https://pris.ly/d/mysql-set-default "
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/_target.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 4,
+                "character": 72
+              },
+              "end": {
+                "line": 4,
+                "character": 82
+              }
+            },
+            "newText": "NoAction"
+          }
+        ]
+      }
+    }
+  }
+]

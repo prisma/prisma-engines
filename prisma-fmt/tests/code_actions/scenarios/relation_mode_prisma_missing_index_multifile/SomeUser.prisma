@@ -1,0 +1,4 @@
+model SomeUser {
+    id    Int    @id
+    posts Post[]
+}

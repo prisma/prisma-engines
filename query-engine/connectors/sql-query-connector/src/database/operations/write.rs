@@ -270,11 +270,14 @@ pub(crate) async fn create_records_returning(
     let meta = column_metadata::create(&field_names, &idents);
     let mut records = ManyRecords::new(field_names.clone());
     let inserts = generate_insert_statements(model, args, skip_duplicates, Some(&selected_fields.into()), ctx);
+
     for insert in inserts {
         let result_set = conn.query(insert.into()).await?;
+
         for result_row in result_set {
             let sql_row = result_row.to_sql_row(&meta)?;
             let record = Record::from(sql_row);
+
             records.push(record);
         }
     }

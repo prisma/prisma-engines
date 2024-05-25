@@ -102,9 +102,9 @@ impl<'a> Visit for JsonVisitor<'a> {
     }
 }
 
-impl<'a> ToString for JsonVisitor<'a> {
-    fn to_string(&self) -> String {
-        serde_json::to_string(&self.values).unwrap()
+impl<'a> std::fmt::Display for JsonVisitor<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&serde_json::to_string(&self.values).unwrap())
     }
 }
 

@@ -64,6 +64,7 @@ impl<'a> QueryGraphBuilder<'a> {
         let mut selections = vec![selection];
         let mut parsed_object = QueryDocumentParser::new(crate::executor::get_request_now()).parse(
             &selections,
+            None,
             &root_object,
             root_object_fields,
             self.query_schema,
@@ -112,7 +113,8 @@ impl<'a> QueryGraphBuilder<'a> {
             (QueryTag::Aggregate, Some(m)) => read::aggregate(parsed_field, m).map(Into::into),
             (QueryTag::GroupBy, Some(m)) => read::group_by(parsed_field, m).map(Into::into),
             (QueryTag::CreateOne, Some(m)) => QueryGraph::root(|g| write::create_record(g, query_schema, m, parsed_field)),
-            (QueryTag::CreateMany, Some(m)) => QueryGraph::root(|g| write::create_many_records(g, query_schema,m, parsed_field)),
+            (QueryTag::CreateMany, Some(m)) => QueryGraph::root(|g| write::create_many_records(g, query_schema, m, false, parsed_field)),
+            (QueryTag::CreateManyAndReturn, Some(m)) => QueryGraph::root(|g| write::create_many_records(g, query_schema, m, true, parsed_field)),
             (QueryTag::UpdateOne, Some(m)) => QueryGraph::root(|g| write::update_record(g, query_schema, m, parsed_field)),
             (QueryTag::UpdateMany, Some(m)) => QueryGraph::root(|g| write::update_many_records(g, query_schema, m, parsed_field)),
             (QueryTag::UpsertOne, Some(m)) => QueryGraph::root(|g| write::upsert_record(g, query_schema, m, parsed_field)),

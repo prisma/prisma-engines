@@ -28,6 +28,11 @@ impl<'db> CompositeTypeWalker<'db> {
         self.id
     }
 
+    /// The ID of the file containing the composite type.
+    pub fn file_id(self) -> FileId {
+        self.id.0
+    }
+
     /// The composite type node in the AST.
     pub fn ast_composite_type(self) -> &'db ast::CompositeType {
         &self.db.asts[self.id]

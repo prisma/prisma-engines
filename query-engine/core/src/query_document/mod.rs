@@ -23,7 +23,7 @@ mod transformers;
 
 pub use argument_value::{ArgumentValue, ArgumentValueObject};
 pub use operation::Operation;
-pub use selection::{In, Selection, SelectionArgument, SelectionSet};
+pub use selection::{Exclusion, In, Selection, SelectionArgument, SelectionSet};
 
 pub(crate) use parse_ast::*;
 pub(crate) use parser::*;

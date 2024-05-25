@@ -26,7 +26,7 @@ pub(crate) fn load_generators_from_ast(ast_schema: &ast::SchemaAst, diagnostics:
 
     for gen in ast_schema.generators() {
         if let Some(generator) = lift_generator(gen, diagnostics) {
-            generators.push(generator)
+            generators.push(generator);
         }
     }
 
@@ -123,6 +123,7 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
         preview_features,
         config: properties,
         documentation: ast_generator.documentation().map(String::from),
+        span: ast_generator.span,
     })
 }
 

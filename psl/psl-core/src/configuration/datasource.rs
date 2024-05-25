@@ -1,3 +1,5 @@
+use schema_ast::ast::WithSpan;
+
 use crate::{
     configuration::StringFromEnvVar,
     datamodel_connector::{Connector, ConnectorCapabilities, RelationMode},
@@ -9,6 +11,8 @@ use std::{any::Any, borrow::Cow, path::Path};
 /// a `datasource` from the prisma schema.
 pub struct Datasource {
     pub name: String,
+    /// Span of the whole datasource block (including `datasource` keyword and braces)
+    pub span: Span,
     /// The provider string
     pub provider: String,
     /// The provider that was selected as active from all specified providers
@@ -269,6 +273,12 @@ impl Datasource {
 
     pub fn schemas_defined(&self) -> bool {
         self.schemas_span.is_some()
+    }
+}
+
+impl WithSpan for Datasource {
+    fn span(&self) -> Span {
+        self.span
     }
 }
 

@@ -1,5 +1,5 @@
 use lsp_types::{Position, Range};
-use psl::parser_database::ast::Span;
+use psl::{diagnostics::FileId, parser_database::ast::Span};
 
 /// The LSP position is expressed as a (line, col) tuple, but our pest-based parser works with byte
 /// offsets. This function converts from an LSP position to a pest byte offset. Returns `None` if
@@ -43,11 +43,11 @@ pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<
 
 #[track_caller]
 /// Converts an LSP range to a span.
-pub(crate) fn range_to_span(range: Range, document: &str) -> Span {
+pub(crate) fn range_to_span(range: Range, document: &str, file_id: FileId) -> Span {
     let start = position_to_offset(&range.start, document).unwrap();
     let end = position_to_offset(&range.end, document).unwrap();
 
-    Span::new(start, end, psl::parser_database::FileId::ZERO)
+    Span::new(start, end, file_id)
 }
 
 /// Gives the LSP position right after the given span.

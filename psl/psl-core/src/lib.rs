@@ -29,7 +29,7 @@ pub use set_config_dir::set_config_dir;
 
 use self::validate::{datasource_loader, generator_loader};
 use diagnostics::Diagnostics;
-use parser_database::{ast, ParserDatabase, SourceFile};
+use parser_database::{ast, Files, ParserDatabase, SourceFile};
 
 /// The collection of all available connectors.
 pub type ConnectorRegistry<'a> = &'a [&'static dyn datamodel_connector::Connector];
@@ -54,18 +54,7 @@ impl ValidatedSchema {
     }
 
     pub fn render_own_diagnostics(&self) -> String {
-        self.render_diagnostics(&self.diagnostics)
-    }
-
-    pub fn render_diagnostics(&self, diagnostics: &Diagnostics) -> String {
-        let mut out = Vec::new();
-
-        for error in diagnostics.errors() {
-            let (file_name, source, _) = &self.db[error.span().file_id];
-            error.pretty_print(&mut out, file_name, source.as_str()).unwrap();
-        }
-
-        String::from_utf8(out).unwrap()
+        self.db.render_diagnostics(&self.diagnostics)
     }
 }
 
@@ -95,16 +84,14 @@ pub fn validate_multi_file(files: Vec<(String, SourceFile)>, connectors: Connect
         "psl::validate_multi_file() must be called with at least one file"
     );
     let mut diagnostics = Diagnostics::new();
-    let db = ParserDatabase::new(files, &mut diagnostics);
+    let db = ParserDatabase::new(&files, &mut diagnostics);
 
     // TODO: the bulk of configuration block analysis should be part of ParserDatabase::new().
     let mut configuration = Configuration::default();
     for ast in db.iter_asts() {
         let new_config = validate_configuration(ast, &mut diagnostics, connectors);
 
-        configuration.datasources.extend(new_config.datasources.into_iter());
-        configuration.generators.extend(new_config.generators.into_iter());
-        configuration.warnings.extend(new_config.warnings.into_iter());
+        configuration.extend(new_config);
     }
 
     let datasources = &configuration.datasources;
@@ -149,18 +136,33 @@ pub fn parse_configuration(
     diagnostics.to_result().map(|_| out)
 }
 
+pub fn parse_configuration_multi_file(
+    files: &[(String, SourceFile)],
+    connectors: ConnectorRegistry<'_>,
+) -> Result<(Files, Configuration), (Files, diagnostics::Diagnostics)> {
+    let mut diagnostics = Diagnostics::default();
+    let mut configuration = Configuration::default();
+
+    let asts = Files::new(files, &mut diagnostics);
+
+    for (_, _, _, ast) in asts.iter() {
+        let out = validate_configuration(ast, &mut diagnostics, connectors);
+        configuration.extend(out);
+    }
+
+    match diagnostics.to_result() {
+        Ok(_) => Ok((asts, configuration)),
+        Err(err) => Err((asts, err)),
+    }
+}
+
 fn validate_configuration(
     schema_ast: &ast::SchemaAst,
     diagnostics: &mut Diagnostics,
     connectors: ConnectorRegistry<'_>,
 ) -> Configuration {
     let generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics);
-
     let datasources = datasource_loader::load_datasources_from_ast(schema_ast, diagnostics, connectors);
 
-    Configuration {
-        generators,
-        datasources,
-        warnings: diagnostics.warnings().to_owned(),
-    }
+    Configuration::new(generators, datasources, diagnostics.warnings().to_owned())
 }

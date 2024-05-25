@@ -2,6 +2,7 @@
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 
 pub use psl_core::builtin_connectors;
+use psl_core::parser_database::Files;
 pub use psl_core::{
     builtin_connectors::{can_have_capability, can_support_relation_load_strategy, has_capability},
     datamodel_connector,
@@ -38,6 +39,14 @@ pub mod get_config {
 /// blocks.
 pub fn parse_configuration(schema: &str) -> Result<Configuration, Diagnostics> {
     psl_core::parse_configuration(schema, builtin_connectors::BUILTIN_CONNECTORS)
+}
+
+/// Parses and validates Prisma schemas, but skip analyzing everything except datasource and generator
+/// blocks.
+pub fn parse_configuration_multi_file(
+    files: &[(String, SourceFile)],
+) -> Result<(Files, Configuration), (Files, Diagnostics)> {
+    psl_core::parse_configuration_multi_file(files, builtin_connectors::BUILTIN_CONNECTORS)
 }
 
 /// Parse and analyze a Prisma schema.

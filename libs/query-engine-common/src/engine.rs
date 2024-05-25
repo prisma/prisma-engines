@@ -1,4 +1,5 @@
-#![allow(unused_imports)]
+// `clippy::empty_docs` is required because of the `tsify` crate.
+#![allow(unused_imports, clippy::empty_docs)]
 
 use crate::error::ApiError;
 use query_core::{protocol::EngineProtocol, schema::QuerySchema, QueryExecutor};

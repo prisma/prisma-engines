@@ -1,0 +1,5 @@
+model A {
+  id    Int @id
+  field Int @unique
+  B     B?
+}
