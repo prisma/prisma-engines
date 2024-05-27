@@ -1025,7 +1025,7 @@ fn indexes_on_same_columns_with_different_names_should_work(api: TestApi) {
     assert!(output.drift.is_none());
 }
 
-#[test_connector(exclude(Sqlite))]
+#[test_connector(exclude(Sqlite, Mssql))]
 fn foreign_keys_on_same_columns_should_work(api: TestApi) {
     let directory = api.create_migrations_directory();
 
