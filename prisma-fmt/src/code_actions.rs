@@ -1,3 +1,4 @@
+mod block;
 mod mongodb;
 mod multi_schema;
 mod relation_mode;
@@ -101,6 +102,8 @@ pub(crate) fn available_actions(
         .walk_models_in_file(initiating_file_id)
         .chain(validated_schema.db.walk_views_in_file(initiating_file_id))
     {
+        block::create_missing_block(&mut actions, &context, model);
+
         if config.preview_features().contains(PreviewFeature::MultiSchema) {
             multi_schema::add_schema_block_attribute_model(&mut actions, &context, model);
 
@@ -116,7 +119,7 @@ pub(crate) fn available_actions(
 
     for enumerator in validated_schema.db.walk_enums_in_file(initiating_file_id) {
         if config.preview_features().contains(PreviewFeature::MultiSchema) {
-            multi_schema::add_schema_block_attribute_enum(&mut actions, &context, enumerator)
+            multi_schema::add_schema_block_attribute_enum(&mut actions, &context, enumerator);
         }
     }
 
