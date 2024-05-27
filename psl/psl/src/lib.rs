@@ -42,11 +42,19 @@ pub fn parse_configuration(schema: &str) -> Result<Configuration, Diagnostics> {
 }
 
 /// Parses and validates Prisma schemas, but skip analyzing everything except datasource and generator
+/// blocks.
+pub fn parse_configuration_multi_file(
+    files: &[(String, SourceFile)],
+) -> Result<(Files, Configuration), (Files, Diagnostics)> {
+    psl_core::parse_configuration_multi_file(files, builtin_connectors::BUILTIN_CONNECTORS)
+}
+
+/// Parses and validates Prisma schemas, but skip analyzing everything except datasource and generator
 /// blocks. Never fails. In case of errors, tries to return as much of configuration as it was able to parse
 /// and reports the errors in `Diagnostics` params. Consumers then may decided themselves if they want
 /// to use incomplete configuration or convert `Diagnostics` into error.
-pub fn parse_configuration_multi_file(files: &[(String, SourceFile)]) -> (Files, Configuration, Diagnostics) {
-    psl_core::parse_configuration_multi_file(files, builtin_connectors::BUILTIN_CONNECTORS)
+pub fn infallible_parse_configuration(files: &[(String, SourceFile)]) -> (Files, Configuration, Diagnostics) {
+    psl_core::infallible_parse_configuration(files, builtin_connectors::BUILTIN_CONNECTORS)
 }
 
 /// Parse and analyze a Prisma schema.

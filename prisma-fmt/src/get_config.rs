@@ -1,4 +1,4 @@
-use psl::{diagnostics::DatamodelError, parse_configuration_multi_file, parser_database::Files, Diagnostics};
+use psl::{diagnostics::DatamodelError, infallible_parse_configuration, parser_database::Files, Diagnostics};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -38,7 +38,7 @@ pub(crate) fn get_config(params: &str) -> String {
 
     let schema: Vec<_> = params.prisma_schema.into();
 
-    let (files, mut configuration, diagnostics) = parse_configuration_multi_file(&schema);
+    let (files, mut configuration, diagnostics) = infallible_parse_configuration(&schema);
 
     let override_diagnostics = if params.ignore_env_var_errors {
         Diagnostics::default()

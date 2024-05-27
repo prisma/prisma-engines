@@ -4,7 +4,7 @@ use lsp_types::*;
 use psl::{
     datamodel_connector::Connector,
     diagnostics::{FileId, Span},
-    parse_configuration_multi_file,
+    infallible_parse_configuration,
     parser_database::{ast, ParserDatabase, SourceFile},
     Configuration, Datasource, Diagnostics, Generator, PreviewFeature,
 };
@@ -21,7 +21,7 @@ pub(crate) fn empty_completion_list() -> CompletionList {
 }
 
 pub(crate) fn completion(schema_files: Vec<(String, SourceFile)>, params: CompletionParams) -> CompletionList {
-    let (_, config, _) = parse_configuration_multi_file(&schema_files);
+    let (_, config, _) = infallible_parse_configuration(&schema_files);
 
     let mut list = CompletionList {
         is_incomplete: false,
