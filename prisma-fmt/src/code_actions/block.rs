@@ -63,7 +63,7 @@ fn push_missing_block(
     block_type: &str,
     actions: &mut Vec<CodeActionOrCommand>,
 ) {
-    let name: &str = diag.message.split("\"").collect::<Vec<&str>>()[1];
+    let name: &str = diag.message.split('\"').collect::<Vec<&str>>()[1];
     let new_text = format!("\n{block_type} {name} {{\n\n}}\n");
     let text = TextEdit { range, new_text };
 
