@@ -1,3 +1,5 @@
+use schema_ast::ast::WithSpan;
+
 use crate::{
     configuration::StringFromEnvVar,
     datamodel_connector::{Connector, ConnectorCapabilities, RelationMode},
@@ -271,6 +273,12 @@ impl Datasource {
 
     pub fn schemas_defined(&self) -> bool {
         self.schemas_span.is_some()
+    }
+}
+
+impl WithSpan for Datasource {
+    fn span(&self) -> Span {
+        self.span
     }
 }
 

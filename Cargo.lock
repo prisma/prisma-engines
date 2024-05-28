@@ -19,9 +19,9 @@ checksum = "f26201604c87b1e01bd3d98f8d5d9a8fcbb815e8cedb41ffccbeb4bf593a35fe"
 
 [[package]]
 name = "ahash"
-version = "0.7.6"
+version = "0.7.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fcb51a0695d8f838b1ee009b3fbf66bda078cd64590202a864a8f3e8c4315c47"
+checksum = "891477e0c6a8957309ee5c45a6368af3ae14bb510732d2684ffa19af310920f9"
 dependencies = [
  "getrandom 0.2.11",
  "once_cell",
@@ -1020,6 +1020,7 @@ dependencies = [
  "base64 0.13.1",
  "expect-test",
  "indoc 2.0.3",
+ "itertools 0.12.0",
  "once_cell",
  "psl",
  "regex",
@@ -1646,7 +1647,7 @@ version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ab5ef0d4909ef3724cc8cce6ccc8572c5c817592e9285f5464f8e86f8bd3726e"
 dependencies = [
- "ahash 0.7.6",
+ "ahash 0.7.8",
 ]
 
 [[package]]
@@ -1655,7 +1656,7 @@ version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
 dependencies = [
- "ahash 0.7.6",
+ "ahash 0.7.8",
 ]
 
 [[package]]
@@ -2310,7 +2311,7 @@ version = "0.18.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2e52eb6380b6d2a10eb3434aec0885374490f5b82c8aaf5cd487a183c98be834"
 dependencies = [
- "ahash 0.7.6",
+ "ahash 0.7.8",
  "metrics-macros",
 ]
 
@@ -2320,7 +2321,7 @@ version = "0.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "142c53885123b68d94108295a09d4afe1a1388ed95b54d5dacd9a454753030f2"
 dependencies = [
- "ahash 0.7.6",
+ "ahash 0.7.8",
  "metrics-macros",
 ]
 
@@ -2545,6 +2546,7 @@ dependencies = [
  "expect-test",
  "futures",
  "indoc 2.0.3",
+ "itertools 0.12.0",
  "mongodb",
  "mongodb-client",
  "mongodb-schema-describer",
@@ -5023,6 +5025,7 @@ dependencies = [
  "enumflags2",
  "expect-test",
  "indoc 2.0.3",
+ "itertools 0.12.0",
  "pretty_assertions",
  "psl",
  "quaint",

@@ -1,6 +1,8 @@
 use crate::{configuration::StringFromEnvVar, PreviewFeature};
+use diagnostics::Span;
 use enumflags2::BitFlags;
 use parser_database::ast::Expression;
+use schema_ast::ast::WithSpan;
 use serde::{ser::SerializeSeq, Serialize, Serializer};
 use std::collections::HashMap;
 
@@ -45,6 +47,15 @@ pub struct Generator {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
+
+    #[serde(skip)]
+    pub span: Span,
+}
+
+impl WithSpan for Generator {
+    fn span(&self) -> Span {
+        self.span
+    }
 }
 
 pub fn mcf_preview_features<S>(feats: &Option<BitFlags<PreviewFeature>>, s: S) -> Result<S::Ok, S::Error>
