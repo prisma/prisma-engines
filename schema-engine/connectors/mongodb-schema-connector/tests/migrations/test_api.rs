@@ -185,7 +185,11 @@ pub(crate) fn test_scenario(scenario_name: &str) {
             .await
             .unwrap();
         let to = connector
-            .database_schema_from_diff_target(DiffTarget::Datamodel(schema.clone()), None, None)
+            .database_schema_from_diff_target(
+                DiffTarget::Datamodel(vec![("schema.prisma".to_string(), schema.clone())]),
+                None,
+                None,
+            )
             .await
             .unwrap();
         let migration = connector.diff(from, to);
@@ -227,7 +231,11 @@ Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the envir
             .await
             .unwrap();
         let to = connector
-            .database_schema_from_diff_target(DiffTarget::Datamodel(schema), None, None)
+            .database_schema_from_diff_target(
+                DiffTarget::Datamodel(vec![("schema.prisma".to_string(), schema.clone())]),
+                None,
+                None,
+            )
             .await
             .unwrap();
         let migration = connector.diff(from, to);

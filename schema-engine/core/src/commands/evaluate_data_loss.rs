@@ -1,7 +1,5 @@
-use crate::{json_rpc::types::*, CoreResult};
-use psl::parser_database::SourceFile;
+use crate::{json_rpc::types::*, CoreResult, SchemaContainerExt};
 use schema_connector::{migrations_directory::*, DiffTarget, SchemaConnector};
-use std::sync::Arc;
 
 /// Development command for migrations. Evaluate the data loss induced by the
 /// next migration the engine would generate on the main database.
@@ -13,12 +11,12 @@ pub async fn evaluate_data_loss(
     connector: &mut dyn SchemaConnector,
 ) -> CoreResult<EvaluateDataLossOutput> {
     error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
-    let source_file = SourceFile::new_allocated(Arc::from(input.prisma_schema.into_boxed_str()));
+    let sources: Vec<_> = input.schema.to_psl_input();
 
     let migrations_from_directory = list_migrations(input.migrations_directory_path.as_ref())?;
 
     let to = connector
-        .database_schema_from_diff_target(DiffTarget::Datamodel(source_file), None, None)
+        .database_schema_from_diff_target(DiffTarget::Datamodel(sources), None, None)
         .await?;
 
     let namespaces = connector.extract_namespaces(&to);

@@ -2,10 +2,10 @@ use crate::common::expect;
 
 fn expect_errors(schemas: &[[&'static str; 2]], expectation: expect_test::Expect) {
     let out = psl::validate_multi_file(
-        schemas
+        &schemas
             .iter()
             .map(|[file_name, contents]| ((*file_name).into(), (*contents).into()))
-            .collect(),
+            .collect::<Vec<_>>(),
     );
 
     let actual = out.render_own_diagnostics();

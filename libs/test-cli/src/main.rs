@@ -196,10 +196,10 @@ async fn main() -> anyhow::Result<()> {
                 );
             }
 
-            let schema = if let Some(file_path) = file_path {
-                read_datamodel_from_file(&file_path)?
-            } else if let Some(url) = url {
-                minimal_schema_from_url(&url)?
+            let schema = if let Some(file_path) = &file_path {
+                read_datamodel_from_file(file_path)?
+            } else if let Some(url) = &url {
+                minimal_schema_from_url(url)?
             } else {
                 unreachable!()
             };
@@ -207,10 +207,15 @@ async fn main() -> anyhow::Result<()> {
             let api = schema_core::schema_api(Some(schema.clone()), None)?;
 
             let params = IntrospectParams {
-                schema,
+                schema: SchemasContainer {
+                    files: vec![SchemaContainer {
+                        path: file_path.unwrap_or_else(|| "schema.prisma".to_string()),
+                        content: schema,
+                    }],
+                },
                 force: false,
                 composite_type_depth: composite_type_depth.unwrap_or(0),
-                schemas: None,
+                namespaces: None,
             };
 
             let introspected = api.introspect(params).await.map_err(|err| anyhow::anyhow!("{err:?}"))?;
@@ -240,7 +245,12 @@ async fn main() -> anyhow::Result<()> {
             let api = schema_core::schema_api(Some(schema.clone()), None)?;
 
             api.create_database(CreateDatabaseParams {
-                datasource: DatasourceParam::SchemaString(SchemaContainer { schema }),
+                datasource: DatasourceParam::Schema(SchemasContainer {
+                    files: vec![SchemaContainer {
+                        path: cmd.schema_path.to_owned(),
+                        content: schema,
+                    }],
+                }),
             })
             .await?;
         }
@@ -252,7 +262,12 @@ async fn main() -> anyhow::Result<()> {
 
             let input = CreateMigrationInput {
                 migrations_directory_path: cmd.migrations_path,
-                prisma_schema,
+                schema: SchemasContainer {
+                    files: vec![SchemaContainer {
+                        path: cmd.schema_path,
+                        content: prisma_schema,
+                    }],
+                },
                 migration_name: cmd.name,
                 draft: true,
             };
@@ -315,10 +330,15 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
             let api = schema_core::schema_api(Some(skeleton.clone()), None)?;
 
             let params = IntrospectParams {
-                schema: skeleton,
+                schema: SchemasContainer {
+                    files: vec![SchemaContainer {
+                        path: "schema.prisma".to_string(),
+                        content: skeleton,
+                    }],
+                },
                 force: false,
                 composite_type_depth: -1,
-                schemas: None,
+                namespaces: None,
             };
 
             let introspected = api.introspect(params).await.map_err(|err| anyhow::anyhow!("{err:?}"))?;
@@ -355,7 +375,12 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
 
     let response = api
         .schema_push(SchemaPushInput {
-            schema,
+            schema: SchemasContainer {
+                files: vec![SchemaContainer {
+                    path: cmd.schema_path.clone(),
+                    content: schema,
+                }],
+            },
             force: cmd.force,
         })
         .await?;
@@ -414,8 +439,13 @@ async fn migrate_diff(cmd: &MigrateDiff) -> anyhow::Result<()> {
 
     let api = schema_core::schema_api(None, Some(Arc::new(DiffHost)))?;
     let to = if let Some(to_schema_datamodel) = &cmd.to_schema_datamodel {
-        DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: to_schema_datamodel.clone(),
+        let to_schema_datamodel_str = std::fs::read_to_string(to_schema_datamodel)?;
+
+        DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: to_schema_datamodel.to_owned(),
+                content: to_schema_datamodel_str,
+            }],
         })
     } else {
         todo!("can't handle {:?} yet", cmd)

@@ -7,7 +7,7 @@ responseShape = "introspectResult"
 description = "Params type for the introspect method."
 
 [recordShapes.introspectParams.fields.schema]
-shape = "string"
+shape = "SchemasContainer"
 
 [recordShapes.introspectParams.fields.force]
 shape = "bool"
@@ -15,7 +15,7 @@ shape = "bool"
 [recordShapes.introspectParams.fields.compositeTypeDepth]
 shape = "isize"
 
-[recordShapes.introspectParams.fields.schemas]
+[recordShapes.introspectParams.fields.namespaces]
 shape = "string"
 isList = true
 isNullable = true

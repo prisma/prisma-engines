@@ -78,13 +78,13 @@ pub fn validate(file: SourceFile, connectors: ConnectorRegistry<'_>) -> Validate
 
 /// The most general API for dealing with Prisma schemas. It accumulates what analysis and
 /// validation information it can, and returns it along with any error and warning diagnostics.
-pub fn validate_multi_file(files: Vec<(String, SourceFile)>, connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
+pub fn validate_multi_file(files: &[(String, SourceFile)], connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
     assert!(
         !files.is_empty(),
         "psl::validate_multi_file() must be called with at least one file"
     );
     let mut diagnostics = Diagnostics::new();
-    let db = ParserDatabase::new(&files, &mut diagnostics);
+    let db = ParserDatabase::new(files, &mut diagnostics);
 
     // TODO: the bulk of configuration block analysis should be part of ParserDatabase::new().
     let mut configuration = Configuration::default();

@@ -1,6 +1,7 @@
 use connection_string::JdbcString;
 use expect_test::expect;
 use indoc::*;
+use schema_core::json_rpc::types::*;
 use std::{
     fs,
     io::{BufRead, BufReader, Write as _},
@@ -41,7 +42,18 @@ where
     }));
 
     child.kill().unwrap();
-    res.unwrap();
+    match res {
+        Ok(_) => (),
+        Err(panic_payload) => {
+            let res = panic_payload
+                .downcast_ref::<&str>()
+                .map(|s| -> String { (*s).to_owned() })
+                .or_else(|| panic_payload.downcast_ref::<String>().map(|s| s.to_owned()))
+                .unwrap_or_default();
+
+            panic!("Error: '{}'", res)
+        }
+    }
 }
 
 struct TestApi {
@@ -324,7 +336,7 @@ fn basic_jsonrpc_roundtrip_works_with_no_params(_api: TestApi) {
     fs::write(&tmpfile, datamodel).unwrap();
 
     let mut command = Command::new(schema_engine_bin_path());
-    command.arg("--datamodel").arg(&tmpfile).env("RUST_LOG", "info");
+    command.arg("--datamodels").arg(&tmpfile).env("RUST_LOG", "info");
 
     with_child_process(command, |process| {
         let stdin = process.stdin.as_mut().unwrap();
@@ -350,12 +362,12 @@ fn basic_jsonrpc_roundtrip_works_with_params(_api: TestApi) {
     let tmpdir = tempfile::tempdir().unwrap();
     let tmpfile = tmpdir.path().join("datamodel");
 
-    let datamodel = r#"
+    let datamodel = indoc! {r#"
         datasource db {
             provider = "postgres"
             url = env("TEST_DATABASE_URL")
         }
-    "#;
+    "#};
 
     fs::create_dir_all(&tmpdir).unwrap();
     fs::write(&tmpfile, datamodel).unwrap();
@@ -363,10 +375,19 @@ fn basic_jsonrpc_roundtrip_works_with_params(_api: TestApi) {
     let command = Command::new(schema_engine_bin_path());
 
     let path = tmpfile.to_str().unwrap();
-    let schema_path_params = format!(r#"{{ "datasource": {{ "tag": "SchemaPath", "path": "{path}" }} }}"#);
+    let schema_path_params = serde_json::json!({
+        "datasource": {
+            "tag": "Schema",
+            "files": [{ "path": path, "content": datamodel }]
+        }
+    });
 
-    let url = std::env::var("TEST_DATABASE_URL").unwrap();
-    let connection_string_params = format!(r#"{{ "datasource": {{ "tag": "ConnectionString", "url": "{url}" }} }}"#);
+    let connection_string_params = serde_json::json!({
+        "datasource": {
+            "tag": "ConnectionString",
+            "url": std::env::var("TEST_DATABASE_URL").unwrap()
+        }
+    });
 
     with_child_process(command, |process| {
         let stdin = process.stdin.as_mut().unwrap();
@@ -374,8 +395,13 @@ fn basic_jsonrpc_roundtrip_works_with_params(_api: TestApi) {
 
         for _ in 0..2 {
             for params in [&schema_path_params, &connection_string_params] {
-                let params_template =
-                    format!(r#"{{ "jsonrpc": "2.0", "method": "getDatabaseVersion", "params": {params}, "id": 1 }}"#);
+                let params_template = serde_json::json!({
+                    "jsonrpc": "2.0",
+                    "method": "getDatabaseVersion",
+                    "params": params,
+                    "id": 1
+                })
+                .to_string();
 
                 writeln!(stdin, "{}", &params_template).unwrap();
 
@@ -416,7 +442,7 @@ fn introspect_sqlite_empty_database() {
             "method": "introspect",
             "id": 1,
             "params": {
-                "schema": schema,
+                "schema": { "files": [{ "path": "schema.prisma", "content": schema }] },
                 "force": true,
                 "compositeTypeDepth": 5,
             }
@@ -463,7 +489,7 @@ fn introspect_sqlite_invalid_empty_database() {
             "method": "introspect",
             "id": 1,
             "params": {
-                "schema": schema,
+                "schema": { "files": [{ "path": "schema.prisma", "content": schema }] },
                 "force": true,
                 "compositeTypeDepth": -1,
             }
@@ -517,7 +543,8 @@ fn execute_postgres(api: TestApi) {
             "params": {
                 "datasourceType": {
                     "tag": "schema",
-                    "schema": &schema_path,
+                    "files": [{ "path": &schema_path, "content": &schema }],
+                    "configDir": schema_path.parent().unwrap().to_string_lossy(),
                 },
                 "script": "SELECT 1;",
             }
@@ -593,7 +620,8 @@ fn introspect_postgres(api: TestApi) {
             "params": {
                 "datasourceType": {
                     "tag": "schema",
-                    "schema": &schema_path,
+                    "files": [{ "path": &schema_path, "content": &schema }],
+                    "configDir": schema_path.parent().unwrap().to_string_lossy(),
                 },
                 "script": script,
             }
@@ -617,7 +645,7 @@ fn introspect_postgres(api: TestApi) {
             "method": "introspect",
             "id": 1,
             "params": {
-                "schema": &schema,
+                "schema": { "files": [{ "path": &schema_path, "content": &schema }] },
                 "force": true,
                 "compositeTypeDepth": 5,
             }
@@ -684,5 +712,108 @@ fn introspect_e2e() {
         dbg!("response: {:?}", &response);
 
         assert!(response.starts_with(r#"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n","warnings":[]},"#));
+    });
+}
+
+macro_rules! write_multi_file_vec {
+    // Match multiple pairs of filename and content
+    ( $( $filename:expr => $content:expr ),* $(,)? ) => {
+        {
+            use std::fs::File;
+            use std::io::Write;
+
+            // Create a result vector to collect errors
+            let mut results = Vec::new();
+            let tmpdir = tempfile::tempdir().unwrap();
+
+            fs::create_dir_all(&tmpdir).unwrap();
+
+            $(
+                let file_path = tmpdir.path().join($filename);
+                // Attempt to create or open the file
+                let result = (|| -> std::io::Result<()> {
+                    let mut file = File::create(&file_path)?;
+                    file.write_all($content.as_bytes())?;
+                    Ok(())
+                })();
+
+                result.unwrap();
+
+                // Push the result of the operation to the results vector
+                results.push((file_path.to_string_lossy().into_owned(), $content));
+            )*
+
+            // Return the results vector for further inspection if needed
+            results
+        }
+    };
+}
+
+fn to_schema_containers(files: Vec<(String, &str)>) -> Vec<SchemaContainer> {
+    files
+        .into_iter()
+        .map(|(path, content)| SchemaContainer {
+            path: path.to_string(),
+            content: content.to_string(),
+        })
+        .collect()
+}
+
+fn to_schemas_container(files: Vec<(String, &str)>) -> SchemasContainer {
+    SchemasContainer {
+        files: to_schema_containers(files),
+    }
+}
+
+#[test_connector(tags(Postgres))]
+fn get_database_version_multi_file(_api: TestApi) {
+    let files = write_multi_file_vec! {
+        "a.prisma" => r#"
+            datasource db {
+                provider = "postgres"
+                url = env("TEST_DATABASE_URL")
+            }
+        "#,
+        "b.prisma" => r#"
+            model User {
+                id Int @id
+            }
+        "#,
+    };
+
+    let command = Command::new(schema_engine_bin_path());
+
+    let schema_path_params = GetDatabaseVersionInput {
+        datasource: DatasourceParam::Schema(to_schemas_container(files)),
+    };
+
+    let connection_string_params = GetDatabaseVersionInput {
+        datasource: DatasourceParam::ConnectionString(UrlContainer {
+            url: std::env::var("TEST_DATABASE_URL").unwrap(),
+        }),
+    };
+
+    with_child_process(command, |process| {
+        let stdin = process.stdin.as_mut().unwrap();
+        let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+        for _ in 0..2 {
+            for params in [&schema_path_params, &connection_string_params] {
+                let params_template = serde_json::json!({
+                    "jsonrpc": "2.0",
+                    "method": "getDatabaseVersion",
+                    "params": params,
+                    "id": 1
+                })
+                .to_string();
+
+                writeln!(stdin, "{}", &params_template).unwrap();
+
+                let mut response = String::new();
+                stdout.read_line(&mut response).unwrap();
+
+                assert!(response.contains("PostgreSQL") || response.contains("CockroachDB"));
+            }
+        }
     });
 }

@@ -59,6 +59,18 @@ pub fn parse_schema(file: impl Into<SourceFile>) -> Result<ValidatedSchema, Stri
     Ok(schema)
 }
 
+/// Parse and analyze a Prisma schema.
+pub fn parse_schema_multi(files: &[(String, SourceFile)]) -> Result<ValidatedSchema, String> {
+    let mut schema = validate_multi_file(files);
+
+    schema
+        .diagnostics
+        .to_result()
+        .map_err(|err| schema.db.render_diagnostics(&err))?;
+
+    Ok(schema)
+}
+
 /// The most general API for dealing with Prisma schemas. It accumulates what analysis and
 /// validation information it can, and returns it along with any error and warning diagnostics.
 pub fn validate(file: SourceFile) -> ValidatedSchema {
@@ -71,6 +83,6 @@ pub fn parse_without_validation(file: SourceFile, connector_registry: ConnectorR
 }
 /// The most general API for dealing with Prisma schemas. It accumulates what analysis and
 /// validation information it can, and returns it along with any error and warning diagnostics.
-pub fn validate_multi_file(files: Vec<(String, SourceFile)>) -> ValidatedSchema {
+pub fn validate_multi_file(files: &[(String, SourceFile)]) -> ValidatedSchema {
     psl_core::validate_multi_file(files, builtin_connectors::BUILTIN_CONNECTORS)
 }
