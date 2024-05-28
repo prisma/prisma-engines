@@ -4,7 +4,7 @@ use query_engine_tests::*;
 mod not_in_chunking {
     use query_engine_tests::Runner;
 
-    #[connector_test(exclude(CockroachDb, Sqlite("cfd1")))]
+    #[connector_test]
     async fn not_in_batch_filter(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
