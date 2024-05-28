@@ -50,9 +50,9 @@ pub fn parse_configuration_multi_file(
 }
 
 /// Parses and validates Prisma schemas, but skip analyzing everything except datasource and generator
-/// blocks. Never fails. In case of errors, tries to return as much of configuration as it was able to parse
-/// and reports the errors in `Diagnostics` params. Consumers then may decided themselves if they want
-/// to use incomplete configuration or convert `Diagnostics` into error.
+/// blocks. It never fails, but when the returned `Diagnostics` contains errors, it implies that the 
+/// `Configuration` content is partial.  
+/// Consumers may then decide  whether to convert `Diagnostics` into an error.
 pub fn infallible_parse_configuration(files: &[(String, SourceFile)]) -> (Files, Configuration, Diagnostics) {
     psl_core::infallible_parse_configuration(files, builtin_connectors::BUILTIN_CONNECTORS)
 }
