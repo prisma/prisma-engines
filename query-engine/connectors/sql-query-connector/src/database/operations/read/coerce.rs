@@ -111,6 +111,11 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
 
             Ok(PrismaValue::Object(map))
         }
+        serde_json::Value::String(s) => {
+            let v = serde_json::from_str(&s)?;
+
+            coerce_json_relation_to_pv(v, rs)
+        }
         x => unreachable!("Unexpected value when deserializing JSON relation data: {x:?}"),
     }
 }
