@@ -381,10 +381,12 @@ impl GenericApi for EngineState {
                         });
 
                         Ok(IntrospectResult {
-                            datamodels: datamodels
-                                .into_iter()
-                                .map(|(path, content)| SchemaContainer { path, content })
-                                .collect(),
+                            schema: SchemasContainer {
+                                files: datamodels
+                                    .into_iter()
+                                    .map(|(path, content)| SchemaContainer { path, content })
+                                    .collect(),
+                            },
                             views,
                             warnings,
                         })

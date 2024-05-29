@@ -23,9 +23,8 @@ isNullable = true
 [recordShapes.introspectResult]
 description = "Result type for the introspect method."
 
-[recordShapes.introspectResult.fields.datamodels]
-shape = "SchemaContainer"
-isList = true
+[recordShapes.introspectResult.fields.schema]
+shape = "SchemasContainer"
 
 [recordShapes.introspectResult.fields.warnings]
 shape = "string"

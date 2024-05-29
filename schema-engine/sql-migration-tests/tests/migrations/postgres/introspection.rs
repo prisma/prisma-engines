@@ -83,7 +83,7 @@ model blocks {{
 "#,
         url_str
     );
-    pretty_assertions::assert_eq!(expected, result.datamodels.first().unwrap().content.as_str());
+    pretty_assertions::assert_eq!(expected, result.schema.files.first().unwrap().content.as_str());
 }
 
 #[test]
@@ -161,7 +161,7 @@ model cities {{
 "#,
         url_str
     );
-    pretty_assertions::assert_eq!(expected, result.datamodels.first().unwrap().content.as_str());
+    pretty_assertions::assert_eq!(expected, result.schema.files.first().unwrap().content.as_str());
 }
 
 #[test]
@@ -240,5 +240,5 @@ model cities {{
 "#,
         url_str
     );
-    pretty_assertions::assert_eq!(expected, result.datamodels.first().unwrap().content.as_str());
+    pretty_assertions::assert_eq!(expected, result.schema.files.first().unwrap().content.as_str());
 }

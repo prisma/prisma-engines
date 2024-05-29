@@ -44,7 +44,8 @@ fn introspect_force_with_invalid_schema() {
 
     let result = &tok(api.introspect(params))
         .unwrap()
-        .datamodels
+        .schema
+        .files
         .first()
         .map(|dm| dm.content.as_str())
         .unwrap()

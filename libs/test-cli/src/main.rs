@@ -220,7 +220,7 @@ async fn main() -> anyhow::Result<()> {
 
             let mut introspected = api.introspect(params).await.map_err(|err| anyhow::anyhow!("{err:?}"))?;
 
-            println!("{}", &introspected.datamodels.remove(0).content);
+            println!("{}", &introspected.schema.files.remove(0).content);
         }
         Command::ValidateDatamodel(cmd) => {
             use std::io::Read as _;
@@ -346,7 +346,7 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
 
             eprintln!("{}", "Schema was successfully introspected from database URL".green());
 
-            for schema in introspected.datamodels {
+            for schema in introspected.schema.files {
                 std::fs::write(schema.path, schema.content)?;
             }
 
