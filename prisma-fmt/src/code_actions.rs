@@ -102,7 +102,7 @@ pub(crate) fn available_actions(
         .walk_models_in_file(initiating_file_id)
         .chain(validated_schema.db.walk_views_in_file(initiating_file_id))
     {
-        block::create_missing_block(&mut actions, &context, model);
+        block::create_missing_block_for_model(&mut actions, &context, model);
 
         if config.preview_features().contains(PreviewFeature::MultiSchema) {
             multi_schema::add_schema_block_attribute_model(&mut actions, &context, model);
@@ -114,6 +114,12 @@ pub(crate) fn available_actions(
             mongodb::add_at_map_for_id(&mut actions, &context, model);
 
             mongodb::add_native_for_auto_id(&mut actions, &context, model, datasource.unwrap());
+        }
+    }
+
+    if matches!(datasource, Some(ds) if ds.active_provider == "mongodb") {
+        for composite_type in validated_schema.db.walk_composite_types_in_file(initiating_file_id) {
+            block::create_missing_block_for_type(&mut actions, &context, composite_type);
         }
     }
 

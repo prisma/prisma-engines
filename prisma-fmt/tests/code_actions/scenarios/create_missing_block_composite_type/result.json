@@ -1,0 +1,80 @@
+[
+  {
+    "title": "Create new type 'Animal'",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 11,
+            "character": 11
+          },
+          "end": {
+            "line": 11,
+            "character": 17
+          }
+        },
+        "severity": 1,
+        "message": "Type \"Animal\" is neither a built-in type, nor refers to another model, composite type, or enum."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/schema.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 12,
+                "character": 1
+              },
+              "end": {
+                "line": 13,
+                "character": 0
+              }
+            },
+            "newText": "\ntype Animal {\n\n}\n"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "title": "Create new enum 'Animal'",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 11,
+            "character": 11
+          },
+          "end": {
+            "line": 11,
+            "character": 17
+          }
+        },
+        "severity": 1,
+        "message": "Type \"Animal\" is neither a built-in type, nor refers to another model, composite type, or enum."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/schema.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 12,
+                "character": 1
+              },
+              "end": {
+                "line": 13,
+                "character": 0
+              }
+            },
+            "newText": "\nenum Animal {\n\n}\n"
+          }
+        ]
+      }
+    }
+  }
+]

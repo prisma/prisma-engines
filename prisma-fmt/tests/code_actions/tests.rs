@@ -47,5 +47,6 @@ scenarios! {
     mongodb_at_map_with_validation_errors
     mongodb_auto_native
     create_missing_block
+    create_missing_block_composite_type
     create_missing_block_mongodb
 }

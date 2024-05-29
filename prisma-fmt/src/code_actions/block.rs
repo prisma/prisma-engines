@@ -1,11 +1,15 @@
 use std::collections::HashMap;
 
 use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, Diagnostic, Range, TextEdit, Url, WorkspaceEdit};
-use psl::{diagnostics::Span, parser_database::walkers::ModelWalker, schema_ast::ast::WithSpan};
+use psl::{
+    diagnostics::Span,
+    parser_database::walkers::{CompositeTypeWalker, ModelWalker},
+    schema_ast::ast::WithSpan,
+};
 
 use super::CodeActionsContext;
 
-pub(super) fn create_missing_block(
+pub(super) fn create_missing_block_for_model(
     actions: &mut Vec<CodeActionOrCommand>,
     context: &CodeActionsContext<'_>,
     model: ModelWalker<'_>,
@@ -19,9 +23,9 @@ pub(super) fn create_missing_block(
     }
 
     let span = Span {
-        start: model.ast_model().span().start,
-        end: model.ast_model().span().end + 1, // * otherwise it's still not outside the closing brace
-        file_id: model.ast_model().span().file_id,
+        start: span_model.start,
+        end: span_model.end + 1, // * otherwise it's still not outside the closing brace
+        file_id: span_model.file_id,
     };
 
     let range = super::range_after_span(context.initiating_file_source(), span);
@@ -53,6 +57,45 @@ pub(super) fn create_missing_block(
                 );
             }
         }
+    })
+}
+
+pub(super) fn create_missing_block_for_type(
+    actions: &mut Vec<CodeActionOrCommand>,
+    context: &CodeActionsContext<'_>,
+    composite_type: CompositeTypeWalker<'_>,
+) {
+    let span_type = composite_type.ast_composite_type().span;
+
+    let diagnostics = context
+        .diagnostics_for_span_with_message(span_type, "is neither a built-in type, nor refers to another model,");
+
+    if diagnostics.is_empty() {
+        return;
+    }
+
+    let span = Span {
+        start: span_type.start,
+        end: span_type.end + 1, // * otherwise it's still not outside the closing brace
+        file_id: span_type.file_id,
+    };
+
+    let range = super::range_after_span(context.initiating_file_source(), span);
+    diagnostics.iter().for_each(|diag| {
+        push_missing_block(
+            diag,
+            context.lsp_params.text_document.uri.clone(),
+            range,
+            "type",
+            actions,
+        );
+        push_missing_block(
+            diag,
+            context.lsp_params.text_document.uri.clone(),
+            range,
+            "enum",
+            actions,
+        );
     })
 }
 
