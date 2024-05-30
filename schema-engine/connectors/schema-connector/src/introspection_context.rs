@@ -1,6 +1,10 @@
+use std::path::PathBuf;
+
 use enumflags2::BitFlags;
 use psl::{Datasource, PreviewFeature};
 use quaint::prelude::SqlFamily;
+
+const INTROSPECTION_FILE_NAME: &str = "introspected.prisma";
 
 /// Input parameters for a database introspection.
 pub struct IntrospectionContext {
@@ -12,6 +16,7 @@ pub struct IntrospectionContext {
     pub composite_type_depth: CompositeTypeDepth,
     previous_schema: psl::ValidatedSchema,
     namespaces: Option<Vec<String>>,
+    base_path_directory: PathBuf,
 }
 
 impl IntrospectionContext {
@@ -20,12 +25,14 @@ impl IntrospectionContext {
         previous_schema: psl::ValidatedSchema,
         composite_type_depth: CompositeTypeDepth,
         namespaces: Option<Vec<String>>,
+        base_path_directory: PathBuf,
     ) -> Self {
         IntrospectionContext {
             previous_schema,
             composite_type_depth,
             render_config: true,
             namespaces,
+            base_path_directory,
         }
     }
 
@@ -35,23 +42,36 @@ impl IntrospectionContext {
         previous_schema: psl::ValidatedSchema,
         composite_type_depth: CompositeTypeDepth,
         namespaces: Option<Vec<String>>,
+        base_directory_path: PathBuf,
     ) -> Self {
         let mut config_blocks = String::new();
 
-        for source in previous_schema.db.ast_assert_single().sources() {
-            config_blocks.push_str(&previous_schema.db.source_assert_single()[source.span.start..source.span.end]);
+        for source in previous_schema.db.datasources() {
+            config_blocks.push_str(&previous_schema.db.source(source.span.file_id)[source.span.start..source.span.end]);
             config_blocks.push('\n');
         }
 
-        for generator in previous_schema.db.ast_assert_single().generators() {
+        for generator in previous_schema.db.generators() {
             config_blocks
-                .push_str(&previous_schema.db.source_assert_single()[generator.span.start..generator.span.end]);
+                .push_str(&previous_schema.db.source(generator.span.file_id)[generator.span.start..generator.span.end]);
             config_blocks.push('\n');
         }
 
-        let previous_schema_config_only = psl::parse_schema(config_blocks).unwrap();
+        let previous_schema_config_only = psl::parse_schema_multi(&[(
+            base_directory_path
+                .join(INTROSPECTION_FILE_NAME)
+                .to_string_lossy()
+                .to_string(),
+            config_blocks.into(),
+        )])
+        .unwrap();
 
-        Self::new(previous_schema_config_only, composite_type_depth, namespaces)
+        Self::new(
+            previous_schema_config_only,
+            composite_type_depth,
+            namespaces,
+            base_directory_path,
+        )
     }
 
     /// The PSL file with the previous schema definition.
@@ -102,13 +122,17 @@ impl IntrospectionContext {
     }
 
     /// Returns the file name into which new introspection data should be written.
-    pub fn introspection_file_name(&self) -> &str {
+    pub fn introspection_file_path(&self) -> std::borrow::Cow<'_, str> {
         if self.previous_schema.db.files_count() == 1 {
             let file_id = self.previous_schema.db.iter_file_ids().next().unwrap();
 
-            self.previous_schema.db.file_name(file_id)
+            self.previous_schema.db.file_name(file_id).into()
         } else {
-            "introspected.prisma"
+            self.base_path_directory
+                .join(INTROSPECTION_FILE_NAME)
+                .to_string_lossy()
+                .to_string()
+                .into()
         }
     }
 

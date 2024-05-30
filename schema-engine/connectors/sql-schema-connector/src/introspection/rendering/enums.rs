@@ -11,7 +11,7 @@ use psl::parser_database as db;
 
 /// Render all enums.
 pub(super) fn render<'a>(
-    introspection_file_name: &'a str,
+    introspection_file_name: Cow<'a, str>,
     ctx: &'a DatamodelCalculatorContext<'a>,
     rendered: &mut renderer::Datamodel<'a>,
 ) {
@@ -33,11 +33,11 @@ pub(super) fn render<'a>(
 
     for (previous_schema_enum, enm) in all_enums {
         let file_name = match previous_schema_enum {
-            Some((prev_file_id, _)) => ctx.previous_schema.db.file_name(prev_file_id),
-            None => introspection_file_name,
+            Some((prev_file_id, _)) => Cow::Borrowed(ctx.previous_schema.db.file_name(prev_file_id)),
+            None => introspection_file_name.clone(),
         };
 
-        rendered.push_enum(Cow::Borrowed(file_name), enm);
+        rendered.push_enum(file_name, enm);
     }
 }
 

@@ -60,6 +60,7 @@ ALTER TABLE blocks
                 content: schema,
             }],
         },
+        base_directory_path: "/".to_string(),
         namespaces: None,
     }))
     .unwrap();
@@ -135,6 +136,7 @@ CREATE TABLE capitals (
                 content: schema,
             }],
         },
+        base_directory_path: "/".to_string(),
         namespaces: None,
     }))
     .unwrap();
@@ -211,6 +213,7 @@ CREATE TABLE capitals (
                 content: schema,
             }],
         },
+        base_directory_path: "/".to_string(),
         namespaces: None,
     }))
     .unwrap();

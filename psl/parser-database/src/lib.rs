@@ -47,7 +47,7 @@ pub use ids::*;
 pub use names::is_reserved_type_name;
 use names::Names;
 pub use relations::{ManyToManyRelationId, ReferentialAction, RelationId};
-use schema_ast::ast::SourceConfig;
+use schema_ast::ast::{GeneratorConfig, SourceConfig};
 pub use schema_ast::{ast, SourceFile};
 pub use types::{
     IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, RelationFieldId, ScalarFieldId, ScalarFieldType,
@@ -241,6 +241,11 @@ impl ParserDatabase {
     /// Iterate all datasources defined in the schema
     pub fn datasources(&self) -> impl Iterator<Item = &SourceConfig> {
         self.iter_asts().flat_map(|ast| ast.sources())
+    }
+
+    /// Iterate all generators defined in the schema
+    pub fn generators(&self) -> impl Iterator<Item = &GeneratorConfig> {
+        self.iter_asts().flat_map(|ast| ast.generators())
     }
 }
 

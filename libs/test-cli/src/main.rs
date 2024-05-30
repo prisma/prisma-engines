@@ -204,6 +204,11 @@ async fn main() -> anyhow::Result<()> {
                 unreachable!()
             };
 
+            let base_directory_path = file_path
+                .as_ref()
+                .map(|p| std::path::Path::new(p).parent().unwrap().to_string_lossy().to_string())
+                .unwrap_or_else(|| "/".to_string());
+
             let api = schema_core::schema_api(Some(schema.clone()), None)?;
 
             let params = IntrospectParams {
@@ -213,6 +218,7 @@ async fn main() -> anyhow::Result<()> {
                         content: schema,
                     }],
                 },
+                base_directory_path,
                 force: false,
                 composite_type_depth: composite_type_depth.unwrap_or(0),
                 namespaces: None,
@@ -328,6 +334,7 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
             let skeleton = minimal_schema_from_url(url)?;
 
             let api = schema_core::schema_api(Some(skeleton.clone()), None)?;
+            let base_path_directory = "/tmp";
             let path = "/tmp/prisma-test-cli-introspected.prisma";
 
             let params = IntrospectParams {
@@ -337,6 +344,7 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
                         content: skeleton,
                     }],
                 },
+                base_directory_path: base_path_directory.to_string(),
                 force: false,
                 composite_type_depth: -1,
                 namespaces: None,

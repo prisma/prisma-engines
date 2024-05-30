@@ -20,7 +20,7 @@ use std::borrow::Cow;
 /// Combines the SQL database schema and an existing PSL schema to a
 /// PSL schema definition string.
 pub(crate) fn to_psl_string(
-    introspection_file_name: &str,
+    introspection_file_name: Cow<'_, str>,
     ctx: &DatamodelCalculatorContext<'_>,
 ) -> (Vec<(String, String)>, bool, Vec<ViewDefinition>) {
     let mut datamodel = renderer::Datamodel::new();
@@ -33,8 +33,8 @@ pub(crate) fn to_psl_string(
         datamodel.create_empty_file(Cow::Borrowed(file_name));
     }
 
-    enums::render(introspection_file_name, ctx, &mut datamodel);
-    models::render(introspection_file_name, ctx, &mut datamodel);
+    enums::render(introspection_file_name.clone(), ctx, &mut datamodel);
+    models::render(introspection_file_name.clone(), ctx, &mut datamodel);
 
     if ctx.config.preview_features().contains(PreviewFeature::Views) {
         views.extend(views::render(introspection_file_name, ctx, &mut datamodel));

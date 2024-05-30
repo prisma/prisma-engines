@@ -1478,6 +1478,7 @@ fn cockroach_introspection_with_postgres_provider_fails() {
                 content: schema,
             }],
         },
+        base_directory_path: "/".to_string(),
         namespaces: None,
     }))
     .unwrap_err()
