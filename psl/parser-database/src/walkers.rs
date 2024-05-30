@@ -141,6 +141,12 @@ impl crate::ParserDatabase {
             .map(|id| self.walk(id))
     }
 
+    /// Walk all composite types in specified file
+    pub fn walk_composite_types_in_file(&self, file_id: FileId) -> impl Iterator<Item = CompositeTypeWalker<'_>> + '_ {
+        self.walk_composite_types()
+            .filter(move |walker| walker.is_defined_in_file(file_id))
+    }
+
     /// Walk all scalar field defaults with a function not part of the common ones.
     pub fn walk_scalar_field_defaults_with_unknown_function(&self) -> impl Iterator<Item = DefaultValueWalker<'_>> {
         self.types

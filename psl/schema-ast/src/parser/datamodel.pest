@@ -26,7 +26,7 @@ schema = {
 // ######################################
 
 // At the syntax level, models and composite types are the same.
-model_declaration = { 
+model_declaration = {
     (MODEL_KEYWORD | TYPE_KEYWORD | VIEW_KEYWORD)
     ~ identifier
     ~ BLOCK_OPEN
@@ -100,7 +100,7 @@ enum_declaration = {
 
 enum_value_declaration = { identifier ~ field_attribute* ~ trailing_comment? ~ NEWLINE }
 enum_contents = {
-    (enum_value_declaration | (block_attribute ~ NEWLINE) | comment_block | empty_lines | BLOCK_LEVEL_CATCH_ALL)* 
+    (enum_value_declaration | (block_attribute ~ NEWLINE) | comment_block | empty_lines | BLOCK_LEVEL_CATCH_ALL)*
 }
 
 // ######################################

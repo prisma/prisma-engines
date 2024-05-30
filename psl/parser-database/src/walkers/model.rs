@@ -67,7 +67,7 @@ impl<'db> ModelWalker<'db> {
 
     /// Is the model defined in a specific file?
     pub fn is_defined_in_file(self, file_id: FileId) -> bool {
-        return self.ast_model().span().file_id == file_id;
+        self.ast_model().span().file_id == file_id
     }
 
     /// The AST node.
