@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use enumflags2::BitFlags;
 use psl::{Datasource, PreviewFeature};
@@ -125,7 +125,7 @@ impl IntrospectionContext {
 
     fn introspection_file_path_impl<'a>(
         previous_schema: &'a psl::ValidatedSchema,
-        base_directory_path: &PathBuf,
+        base_directory_path: &Path,
     ) -> std::borrow::Cow<'a, str> {
         if previous_schema.db.files_count() == 1 {
             let file_id = previous_schema.db.iter_file_ids().next().unwrap();
