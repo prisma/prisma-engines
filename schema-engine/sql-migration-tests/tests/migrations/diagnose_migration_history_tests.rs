@@ -1065,6 +1065,7 @@ fn foreign_keys_on_same_columns_should_work(api: TestApi) {
         .into_output();
 
     assert!(output.drift.is_none());
+    assert!(output.is_empty());
 }
 
 #[test_connector(tags(Postgres))]
