@@ -232,12 +232,7 @@ impl TestApi {
         previous_schema: psl::ValidatedSchema,
         render_config: bool,
     ) -> ConnectorResult<IntrospectionResult> {
-        let mut ctx = IntrospectionContext::new(
-            previous_schema,
-            CompositeTypeDepth::Infinite,
-            None,
-            PathBuf::new(),
-        );
+        let mut ctx = IntrospectionContext::new(previous_schema, CompositeTypeDepth::Infinite, None, PathBuf::new());
         ctx.render_config = render_config;
 
         self.api
@@ -251,12 +246,8 @@ impl TestApi {
         previous_schema: psl::ValidatedSchema,
         render_config: bool,
     ) -> ConnectorResult<IntrospectionResult> {
-        let mut ctx = IntrospectionContext::new_config_only(
-            previous_schema,
-            CompositeTypeDepth::Infinite,
-            None,
-            PathBuf::new(),
-        );
+        let mut ctx =
+            IntrospectionContext::new_config_only(previous_schema, CompositeTypeDepth::Infinite, None, PathBuf::new());
         ctx.render_config = render_config;
 
         self.api
