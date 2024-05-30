@@ -211,12 +211,7 @@ source .test_database_urls/mysql_5_6
 
     let psl = psl::validate(config.into());
 
-    let ctx = IntrospectionContext::new(
-        psl,
-        CompositeTypeDepth::Infinite,
-        namespaces.clone(),
-        PathBuf::new().join("/"),
-    );
+    let ctx = IntrospectionContext::new(psl, CompositeTypeDepth::Infinite, namespaces.clone(), PathBuf::new());
 
     let introspected = tok(api.introspect(&ctx))
         .map(ToIntrospectionTestResult::to_single_test_result)
@@ -248,7 +243,7 @@ source .test_database_urls/mysql_5_6
                 introspected_schema,
                 CompositeTypeDepth::Infinite,
                 namespaces,
-                PathBuf::new().join("/"),
+                PathBuf::new(),
             );
 
             tok(api.introspect(&ctx))

@@ -31,8 +31,7 @@ async fn introspecting_cockroach_db_with_postgres_provider_fails(api: TestApi) {
     api.raw_cmd(setup).await;
 
     let schema = psl::parse_schema(schema).unwrap();
-    let ctx =
-        IntrospectionContext::new_config_only(schema, CompositeTypeDepth::Infinite, None, PathBuf::new().join("/"));
+    let ctx = IntrospectionContext::new_config_only(schema, CompositeTypeDepth::Infinite, None, PathBuf::new());
 
     // Instantiate the schema connector manually for this test because `TestApi`
     // chooses the provider type based on the current database under test and
