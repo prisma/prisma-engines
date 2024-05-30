@@ -1,8 +1,10 @@
+use std::collections::HashSet;
+
 use super::{differ_database::DifferDatabase, foreign_keys_match};
 use crate::{flavour::SqlFlavour, migration_pair::MigrationPair};
 use sql_schema_describer::{
     walkers::{ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker},
-    TableId,
+    IndexId, TableId,
 };
 
 pub(crate) struct TableDiffer<'a, 'b> {
@@ -75,26 +77,16 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
     }
 
     pub(crate) fn index_pairs<'a>(&'a self) -> impl Iterator<Item = MigrationPair<IndexWalker<'schema>>> + 'a {
-        let singular_indexes = self.previous_indexes().filter(move |left| {
-            // Renaming an index in a situation where we have multiple indexes
-            // with the same columns, but a different name, is highly unstable.
-            // We do not rename them for now.
-            let number_of_identical_indexes = self
-                .previous_indexes()
-                .filter(|right| {
-                    left.column_names().len() == right.column_names().len()
-                        && left.column_names().zip(right.column_names()).all(|(a, b)| a == b)
-                        && left.index_type() == right.index_type()
-                })
-                .count();
+        let mut seen_indices: HashSet<IndexId> = HashSet::new();
 
-            number_of_identical_indexes == 1
-        });
-
-        singular_indexes.filter_map(move |previous_index| {
+        self.previous_indexes().filter_map(move |previous_index| {
             self.next_indexes()
+                .filter(|next_index| !seen_indices.contains(&next_index.id))
                 .find(|next_index| indexes_match(previous_index, *next_index, self.db.flavour))
-                .map(|renamed_index| MigrationPair::new(previous_index, renamed_index))
+                .map(|renamed_index| {
+                    seen_indices.insert(renamed_index.id);
+                    MigrationPair::new(previous_index, renamed_index)
+                })
         })
     }
 
