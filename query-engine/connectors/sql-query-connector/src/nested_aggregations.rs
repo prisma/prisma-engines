@@ -35,7 +35,17 @@ pub(crate) fn build<'a>(
                     ctx,
                 );
 
-                columns.push(Column::from((join.alias.clone(), aggregator_alias)).into());
+                let exprs: Vec<Expression> = vec![
+                    Column::from((join.alias.clone(), aggregator_alias.clone())).into(),
+                    Value::int64(0).raw().into(),
+                ];
+
+                // We coalesce the COUNT to 0 so that if there's no relation,
+                // `COALESCE(NULL, 0)` will return `0`, thus avoiding
+                // https://github.com/prisma/prisma/issues/23778 in Turso.
+                // We also need to add the alias to the COALESCE'd column explicitly,
+                // to reference it later.
+                columns.push(Expression::from(coalesce(exprs)).alias(aggregator_alias));
                 joins.push(join);
             }
         }
