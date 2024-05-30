@@ -229,7 +229,7 @@ async fn reintrospect_force_single_file(api: &mut TestApi) -> TestResult {
     let input_dms = [("foo.prisma", with_config(foo_dm, api.pure_config()))];
 
     let expected = expect![[r#"
-        // file: introspected.prisma
+        // file: foo.prisma
         model Post {
           id Int @id @default(autoincrement())
         }

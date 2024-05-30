@@ -16,7 +16,7 @@ pub struct IntrospectionContext {
     pub composite_type_depth: CompositeTypeDepth,
     previous_schema: psl::ValidatedSchema,
     namespaces: Option<Vec<String>>,
-    base_path_directory: PathBuf,
+    base_directory_path: PathBuf,
 }
 
 impl IntrospectionContext {
@@ -25,14 +25,14 @@ impl IntrospectionContext {
         previous_schema: psl::ValidatedSchema,
         composite_type_depth: CompositeTypeDepth,
         namespaces: Option<Vec<String>>,
-        base_path_directory: PathBuf,
+        base_directory_path: PathBuf,
     ) -> Self {
         IntrospectionContext {
             previous_schema,
             composite_type_depth,
             render_config: true,
             namespaces,
-            base_path_directory,
+            base_directory_path,
         }
     }
 
@@ -58,10 +58,7 @@ impl IntrospectionContext {
         }
 
         let previous_schema_config_only = psl::parse_schema_multi(&[(
-            base_directory_path
-                .join(INTROSPECTION_FILE_NAME)
-                .to_string_lossy()
-                .to_string(),
+            Self::introspection_file_path_impl(&previous_schema, &base_directory_path).to_string(),
             config_blocks.into(),
         )])
         .unwrap();
@@ -123,12 +120,19 @@ impl IntrospectionContext {
 
     /// Returns the file name into which new introspection data should be written.
     pub fn introspection_file_path(&self) -> std::borrow::Cow<'_, str> {
-        if self.previous_schema.db.files_count() == 1 {
-            let file_id = self.previous_schema.db.iter_file_ids().next().unwrap();
+        Self::introspection_file_path_impl(&self.previous_schema, &self.base_directory_path)
+    }
 
-            self.previous_schema.db.file_name(file_id).into()
+    fn introspection_file_path_impl<'a>(
+        previous_schema: &'a psl::ValidatedSchema,
+        base_directory_path: &PathBuf,
+    ) -> std::borrow::Cow<'a, str> {
+        if previous_schema.db.files_count() == 1 {
+            let file_id = previous_schema.db.iter_file_ids().next().unwrap();
+
+            previous_schema.db.file_name(file_id).into()
         } else {
-            self.base_path_directory
+            base_directory_path
                 .join(INTROSPECTION_FILE_NAME)
                 .to_string_lossy()
                 .to_string()
