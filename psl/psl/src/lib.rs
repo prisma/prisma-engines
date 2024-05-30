@@ -53,8 +53,8 @@ pub fn parse_configuration_multi_file(
 /// blocks. It never fails, but when the returned `Diagnostics` contains errors, it implies that the
 /// `Configuration` content is partial.
 /// Consumers may then decide  whether to convert `Diagnostics` into an error.
-pub fn infallible_parse_configuration(files: &[(String, SourceFile)]) -> (Files, Configuration, Diagnostics) {
-    psl_core::infallible_parse_configuration(files, builtin_connectors::BUILTIN_CONNECTORS)
+pub fn error_tolerant_parse_configuration(files: &[(String, SourceFile)]) -> (Files, Configuration, Diagnostics) {
+    psl_core::error_tolerant_parse_configuration(files, builtin_connectors::BUILTIN_CONNECTORS)
 }
 
 /// Parse and analyze a Prisma schema.

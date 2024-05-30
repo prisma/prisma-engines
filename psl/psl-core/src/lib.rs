@@ -134,7 +134,7 @@ pub fn parse_configuration(
 ) -> Result<Configuration, diagnostics::Diagnostics> {
     let source_file = SourceFile::new_allocated(Arc::from(schema.to_owned().into_boxed_str()));
     let (_, out, mut diagnostics) =
-        infallible_parse_configuration(&[("schema.prisma".into(), source_file)], connectors);
+        error_tolerant_parse_configuration(&[("schema.prisma".into(), source_file)], connectors);
     diagnostics.to_result().map(|_| out)
 }
 
@@ -142,14 +142,14 @@ pub fn parse_configuration_multi_file(
     files: &[(String, SourceFile)],
     connectors: ConnectorRegistry<'_>,
 ) -> Result<(Files, Configuration), (Files, diagnostics::Diagnostics)> {
-    let (files, configuration, mut diagnostics) = infallible_parse_configuration(files, connectors);
+    let (files, configuration, mut diagnostics) = error_tolerant_parse_configuration(files, connectors);
     match diagnostics.to_result() {
         Ok(_) => Ok((files, configuration)),
         Err(err) => Err((files, err)),
     }
 }
 
-pub fn infallible_parse_configuration(
+pub fn error_tolerant_parse_configuration(
     files: &[(String, SourceFile)],
     connectors: ConnectorRegistry<'_>,
 ) -> (Files, Configuration, Diagnostics) {
