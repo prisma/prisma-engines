@@ -8,10 +8,9 @@ pub(crate) fn run(input: &str) -> String {
         Err(_) => return "[]".to_owned(),
     };
 
-    let schema: Vec<_> = schema.into();
     let validated_configuration = match psl::parse_configuration_multi_file(&schema) {
         Ok((_, validated_configuration)) => validated_configuration,
-        Err(_) => return "[]".to_owned()
+        Err(_) => return "[]".to_owned(),
     };
 
     if validated_configuration.datasources.len() != 1 {
