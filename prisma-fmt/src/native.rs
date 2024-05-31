@@ -15,7 +15,6 @@ pub(crate) fn run(input: &str) -> String {
     };
 
     if validated_configuration.datasources.len() != 1 {
-        dbg!(3);
         return "[]".to_owned();
     }
 
