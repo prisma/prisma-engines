@@ -98,6 +98,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | Views
          | RelationJoins
          | OmitApi
+         | PrismaSchemaFolder
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations
