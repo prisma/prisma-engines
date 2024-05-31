@@ -9,7 +9,13 @@ use crate::{
 use enumflags2::BitFlags;
 use psl::{parser_database::SourceFile, PreviewFeature};
 use schema_connector::{ConnectorError, ConnectorHost, IntrospectionResult, Namespaces, SchemaConnector};
-use std::{collections::HashMap, future::Future, path::Path, pin::Pin, sync::Arc};
+use std::{
+    collections::HashMap,
+    future::Future,
+    path::{Path, PathBuf},
+    pin::Pin,
+    sync::Arc,
+};
 use tokio::sync::{mpsc, Mutex};
 use tracing_futures::Instrument;
 
@@ -335,12 +341,18 @@ impl GenericApi for EngineState {
                 previous_schema,
                 composite_type_depth,
                 params.namespaces,
+                PathBuf::new().join(&params.base_directory_path),
             )
         } else {
             let previous_schema =
                 psl::parse_schema_multi(&source_files).map_err(ConnectorError::new_schema_parser_error)?;
 
-            schema_connector::IntrospectionContext::new(previous_schema, composite_type_depth, params.namespaces)
+            schema_connector::IntrospectionContext::new(
+                previous_schema,
+                composite_type_depth,
+                params.namespaces,
+                PathBuf::new().join(&params.base_directory_path),
+            )
         };
 
         if !ctx
@@ -361,7 +373,7 @@ impl GenericApi for EngineState {
             Box::new(move |connector| {
                 Box::pin(async move {
                     let IntrospectionResult {
-                        mut datamodels,
+                        datamodels,
                         views,
                         warnings,
                         is_empty,
@@ -381,7 +393,12 @@ impl GenericApi for EngineState {
                         });
 
                         Ok(IntrospectResult {
-                            datamodel: datamodels.remove(0).1,
+                            schema: SchemasContainer {
+                                files: datamodels
+                                    .into_iter()
+                                    .map(|(path, content)| SchemaContainer { path, content })
+                                    .collect(),
+                            },
                             views,
                             warnings,
                         })

@@ -209,6 +209,7 @@ fn introspecting_a_non_existing_db_fails() {
                 content: dm.to_string(),
             }],
         },
+        base_directory_path: "/".to_string(),
         namespaces: None,
     }))
     .unwrap_err();

@@ -11,7 +11,7 @@ use sql_schema_describer as sql;
 
 /// Calculate datamodels from a database schema.
 pub fn calculate(schema: &sql::SqlSchema, ctx: &IntrospectionContext, search_path: &str) -> IntrospectionResult {
-    let introspection_file_name = ctx.introspection_file_name();
+    let introspection_file_name = ctx.introspection_file_path();
     let ctx = DatamodelCalculatorContext::new(ctx, schema, search_path);
 
     let (datamodels, is_empty, views) = rendering::to_psl_string(introspection_file_name, &ctx);

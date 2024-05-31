@@ -413,20 +413,20 @@ impl<'a> Statistics<'a> {
 
         for (ct_name, r#type) in types {
             let file_name = match ctx.previous_schema().db.find_composite_type(ct_name) {
-                Some(walker) => ctx.previous_schema().db.file_name(walker.file_id()),
-                None => ctx.introspection_file_name(),
+                Some(walker) => Cow::Borrowed(ctx.previous_schema().db.file_name(walker.file_id())),
+                None => ctx.introspection_file_path(),
             };
 
-            rendered.push_composite_type(Cow::Borrowed(file_name), r#type);
+            rendered.push_composite_type(file_name, r#type);
         }
 
         for (model_name, model) in models.into_iter() {
             let file_name = match ctx.previous_schema().db.find_model(model_name) {
-                Some(walker) => ctx.previous_schema().db.file_name(walker.file_id()),
-                None => ctx.introspection_file_name(),
+                Some(walker) => Cow::Borrowed(ctx.previous_schema().db.file_name(walker.file_id())),
+                None => ctx.introspection_file_path(),
             };
 
-            rendered.push_model(Cow::Borrowed(file_name), model);
+            rendered.push_model(file_name, model);
         }
     }
 

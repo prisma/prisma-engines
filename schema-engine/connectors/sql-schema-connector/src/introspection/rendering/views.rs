@@ -8,7 +8,7 @@ use std::borrow::Cow;
 
 /// Render all view blocks to the PSL.
 pub(super) fn render<'a>(
-    introspection_file_name: &'a str,
+    introspection_file_name: Cow<'a, str>,
     ctx: &'a DatamodelCalculatorContext<'a>,
     rendered: &mut renderer::Datamodel<'a>,
 ) -> Vec<ViewDefinition> {
@@ -36,11 +36,11 @@ pub(super) fn render<'a>(
 
     for (previous_view, render) in views_with_idx.into_iter() {
         let file_name = match previous_view {
-            Some((previous_file_id, _)) => ctx.previous_schema.db.file_name(previous_file_id),
-            None => introspection_file_name,
+            Some((previous_file_id, _)) => Cow::Borrowed(ctx.previous_schema.db.file_name(previous_file_id)),
+            None => introspection_file_name.clone(),
         };
 
-        rendered.push_view(Cow::Borrowed(file_name), render);
+        rendered.push_view(file_name, render);
     }
 
     definitions
