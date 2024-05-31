@@ -54,7 +54,18 @@ impl<'db> EnumWalker<'db> {
 
     /// What kind of newlines the enum uses.
     pub fn newline(self) -> NewlineType {
-        NewlineType::Unix
+        let value = match self.ast_enum().values.last() {
+            Some(value) => value,
+            None => return NewlineType::default(),
+        };
+
+        let src = self.db.source(self.id.0);
+        let start = value.span.end - 2;
+
+        match src.chars().nth(start) {
+            Some('\r') => NewlineType::Windows,
+            _ => NewlineType::Unix,
+        }
     }
 
     /// The name of the schema the enum belongs to.

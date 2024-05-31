@@ -1,7 +1,7 @@
 use super::Walker;
 use crate::{ast, FileId, ScalarFieldType, ScalarType};
 use diagnostics::Span;
-use schema_ast::ast::{WithDocumentation, WithName};
+use schema_ast::ast::{NewlineType, WithDocumentation, WithName, WithSpan};
 
 /// A composite type, introduced with the `type` keyword in the schema.
 ///
@@ -53,6 +53,22 @@ impl<'db> CompositeTypeWalker<'db> {
         self.ast_composite_type()
             .iter_fields()
             .map(move |(id, _)| self.walk((self.id, id)))
+    }
+
+    /// What kind of newlines the composite type uses.
+    pub fn newline(self) -> NewlineType {
+        let field = match self.fields().last() {
+            Some(field) => field,
+            None => return NewlineType::default(),
+        };
+
+        let src = self.db.source(self.id.0);
+        let start = field.ast_field().span().end - 2;
+
+        match src.chars().nth(start) {
+            Some('\r') => NewlineType::Windows,
+            _ => NewlineType::Unix,
+        }
     }
 }
 
