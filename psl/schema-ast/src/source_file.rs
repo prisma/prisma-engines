@@ -3,7 +3,7 @@ use std::sync::Arc;
 use serde::{Deserialize, Deserializer};
 
 /// A Prisma schema document.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct SourceFile {
     contents: Contents,
 }
@@ -81,4 +81,30 @@ impl From<String> for SourceFile {
 enum Contents {
     Static(&'static str),
     Allocated(Arc<str>),
+}
+
+impl std::hash::Hash for Contents {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        match self {
+            Contents::Static(s) => (*s).hash(state),
+            Contents::Allocated(s) => {
+                let s: &str = s;
+
+                s.hash(state);
+            }
+        }
+    }
+}
+
+impl Eq for Contents {}
+
+impl PartialEq for Contents {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Contents::Static(l), Contents::Static(r)) => l == r,
+            (Contents::Allocated(l), Contents::Allocated(r)) => l == r,
+            (Contents::Static(l), Contents::Allocated(r)) => *l == &**r,
+            (Contents::Allocated(l), Contents::Static(r)) => &**l == *r,
+        }
+    }
 }

@@ -33,6 +33,11 @@ impl<'db> CompositeTypeWalker<'db> {
         self.id.0
     }
 
+    /// Is the composite type defined in a specific file?
+    pub fn is_defined_in_file(self, file_id: FileId) -> bool {
+        self.ast_composite_type().span.file_id == file_id
+    }
+
     /// The composite type node in the AST.
     pub fn ast_composite_type(self) -> &'db ast::CompositeType {
         &self.db.asts[self.id]

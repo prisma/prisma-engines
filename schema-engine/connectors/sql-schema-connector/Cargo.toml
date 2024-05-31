@@ -18,6 +18,7 @@ tokio.workspace = true
 serde.workspace = true
 indoc.workspace = true
 uuid.workspace = true
+indexmap.workspace = true
 
 prisma-value = { path = "../../../libs/prisma-value" }
 schema-connector = { path = "../schema-connector" }

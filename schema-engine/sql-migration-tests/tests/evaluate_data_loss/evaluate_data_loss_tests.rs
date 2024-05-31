@@ -284,3 +284,67 @@ fn evaluate_data_loss_maps_warnings_to_the_right_steps(api: TestApi) {
             ("Added the required column `isGoodDog` to the `Dog` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".into(), if is_postgres { 2 } else { 1 }),
         ]);
 }
+
+#[test_connector(capabilities(Enums))]
+fn evaluate_data_loss_multi_file_maps_warnings_to_the_right_steps(api: TestApi) {
+    let dm1 = api.datamodel_with_provider(
+        r#"
+        model Cat {
+            id Int @id
+            name String
+        }
+
+        model Dog {
+            id Int @id
+            name String
+        }
+    "#,
+    );
+
+    let directory = api.create_migrations_directory();
+    api.create_migration("1-initial", &dm1, &directory).send_sync();
+    api.apply_migrations(&directory).send_sync();
+
+    api.insert("Cat").value("id", 1).value("name", "Felix").result_raw();
+    api.insert("Dog").value("id", 1).value("name", "Norbert").result_raw();
+
+    let schema_a = api.datamodel_with_provider(
+        r#"
+        model Hyena {
+            id Int @id
+            name String
+        }
+
+        model Cat {
+            id Int @id
+        }
+    "#,
+    );
+
+    let schema_b = indoc::indoc! {r#"
+        model Dog {
+            id Int @id
+            name String
+            isGoodDog BetterBoolean
+        }
+
+        enum BetterBoolean {
+            YES
+        }
+    "#};
+
+    let warn = format!(
+        "You are about to drop the column `name` on the `{}` table, which still contains 1 non-null values.",
+        api.normalize_identifier("Cat")
+    );
+
+    let is_postgres = api.is_postgres();
+
+    #[allow(clippy::bool_to_int_with_if)]
+    api.evaluate_data_loss_multi_file(&directory, &[("schema_a", &schema_a), ("schema_b", schema_b)])
+        .send()
+        .assert_warnings_with_indices(&[(warn.into(), if is_postgres { 1 } else { 0 })])
+        .assert_unexecutables_with_indices(&[
+            ("Added the required column `isGoodDog` to the `Dog` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".into(), if is_postgres { 2 } else { 1 }),
+        ]);
+}

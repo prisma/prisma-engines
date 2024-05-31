@@ -313,7 +313,12 @@ impl EngineTestApi {
         schema: &'a str,
         migrations_directory: &'a TempDir,
     ) -> CreateMigration<'a> {
-        CreateMigration::new(&mut self.connector, name, schema, migrations_directory)
+        CreateMigration::new(
+            &mut self.connector,
+            name,
+            &[("schema.prisma", schema)],
+            migrations_directory,
+        )
     }
 
     /// Builder and assertions to call the DiagnoseMigrationHistory command.
@@ -336,7 +341,13 @@ impl EngineTestApi {
 
     /// Plan a `schemaPush` command
     pub fn schema_push(&mut self, dm: impl Into<String>) -> SchemaPush<'_> {
-        SchemaPush::new(&mut self.connector, dm.into(), self.max_ddl_refresh_delay)
+        let dm: String = dm.into();
+
+        SchemaPush::new(
+            &mut self.connector,
+            &[("schema.prisma", &dm)],
+            self.max_ddl_refresh_delay,
+        )
     }
 
     /// The schema name of the current connected database.

@@ -99,6 +99,145 @@ fn basic_create_migration_works(api: TestApi) {
 }
 
 #[test_connector]
+fn basic_create_migration_multi_file_works(api: TestApi) {
+    let schema_a = api.datamodel_with_provider(
+        r#"
+        model Cat {
+            id      Int @id
+            name    String
+        }
+    "#,
+    );
+
+    let schema_b = indoc::indoc! {r#"
+        model Dog {
+            id Int @id
+            name String
+        }
+    "#};
+
+    let dir = api.create_migrations_directory();
+
+    let is_postgres = api.is_postgres();
+    let is_mysql = api.is_mysql();
+    let is_sqlite = api.is_sqlite();
+    let is_cockroach = api.is_cockroach();
+    let is_mssql = api.is_mssql();
+
+    api.create_migration_multi_file("create-cats", &[("a.prisma", &schema_a), ("b.prisma", schema_b)], &dir)
+        .send_sync()
+        .assert_migration_directories_count(1)
+        .assert_migration("create-cats", move |migration| {
+            let expected_script = if is_cockroach {
+                expect![[r#"
+                    -- CreateTable
+                    CREATE TABLE "Cat" (
+                        "id" INT4 NOT NULL,
+                        "name" STRING NOT NULL,
+
+                        CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
+                    );
+
+                    -- CreateTable
+                    CREATE TABLE "Dog" (
+                        "id" INT4 NOT NULL,
+                        "name" STRING NOT NULL,
+
+                        CONSTRAINT "Dog_pkey" PRIMARY KEY ("id")
+                    );
+                "#]]
+            } else if is_postgres {
+                expect![[r#"
+                    -- CreateTable
+                    CREATE TABLE "Cat" (
+                        "id" INTEGER NOT NULL,
+                        "name" TEXT NOT NULL,
+
+                        CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
+                    );
+
+                    -- CreateTable
+                    CREATE TABLE "Dog" (
+                        "id" INTEGER NOT NULL,
+                        "name" TEXT NOT NULL,
+
+                        CONSTRAINT "Dog_pkey" PRIMARY KEY ("id")
+                    );
+                "#]]
+            } else if is_mysql {
+                expect![[r#"
+                    -- CreateTable
+                    CREATE TABLE `Cat` (
+                        `id` INTEGER NOT NULL,
+                        `name` VARCHAR(191) NOT NULL,
+
+                        PRIMARY KEY (`id`)
+                    ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+                    -- CreateTable
+                    CREATE TABLE `Dog` (
+                        `id` INTEGER NOT NULL,
+                        `name` VARCHAR(191) NOT NULL,
+
+                        PRIMARY KEY (`id`)
+                    ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+                "#]]
+            } else if is_sqlite {
+                expect![[r#"
+                    -- CreateTable
+                    CREATE TABLE "Cat" (
+                        "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                        "name" TEXT NOT NULL
+                    );
+
+                    -- CreateTable
+                    CREATE TABLE "Dog" (
+                        "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                        "name" TEXT NOT NULL
+                    );
+                "#]]
+            } else if is_mssql {
+                expect![[r#"
+                    BEGIN TRY
+
+                    BEGIN TRAN;
+
+                    -- CreateTable
+                    CREATE TABLE [dbo].[Cat] (
+                        [id] INT NOT NULL,
+                        [name] NVARCHAR(1000) NOT NULL,
+                        CONSTRAINT [Cat_pkey] PRIMARY KEY CLUSTERED ([id])
+                    );
+
+                    -- CreateTable
+                    CREATE TABLE [dbo].[Dog] (
+                        [id] INT NOT NULL,
+                        [name] NVARCHAR(1000) NOT NULL,
+                        CONSTRAINT [Dog_pkey] PRIMARY KEY CLUSTERED ([id])
+                    );
+
+                    COMMIT TRAN;
+
+                    END TRY
+                    BEGIN CATCH
+
+                    IF @@TRANCOUNT > 0
+                    BEGIN
+                        ROLLBACK TRAN;
+                    END;
+                    THROW
+
+                    END CATCH
+                "#]]
+            } else {
+                unreachable!()
+            };
+
+            migration.expect_contents(expected_script)
+        });
+}
+
+#[test_connector]
 fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(api: TestApi) {
     let dm1 = api.datamodel_with_provider(
         r#"
