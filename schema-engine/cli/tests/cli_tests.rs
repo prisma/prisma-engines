@@ -86,6 +86,40 @@ impl TestApi {
     }
 }
 
+macro_rules! write_multi_file_vec {
+    // Match multiple pairs of filename and content
+    ( $( $filename:expr => $content:expr ),* $(,)? ) => {
+        {
+            use std::fs::File;
+            use std::io::Write;
+
+            // Create a result vector to collect errors
+            let mut results = Vec::new();
+            let tmpdir = tempfile::tempdir().unwrap();
+
+            fs::create_dir_all(&tmpdir).unwrap();
+
+            $(
+                let file_path = tmpdir.path().join($filename);
+                // Attempt to create or open the file
+                let result = (|| -> std::io::Result<()> {
+                    let mut file = File::create(&file_path)?;
+                    file.write_all($content.as_bytes())?;
+                    Ok(())
+                })();
+
+                result.unwrap();
+
+                // Push the result of the operation to the results vector
+                results.push((file_path.to_string_lossy().into_owned(), $content));
+            )*
+
+            // Return the results vector for further inspection if needed
+            (tmpdir, results)
+        }
+    };
+  }
+
 #[test_connector(tags(Mysql))]
 fn test_connecting_with_a_working_mysql_connection_string(api: TestApi) {
     let connection_string = api.connection_string();
@@ -445,6 +479,7 @@ fn introspect_sqlite_empty_database() {
                 "schema": { "files": [{ "path": "schema.prisma", "content": schema }] },
                 "force": true,
                 "compositeTypeDepth": 5,
+                "baseDirectoryPath": "./base_directory_path/"
             }
         }))
         .unwrap();
@@ -492,6 +527,7 @@ fn introspect_sqlite_invalid_empty_database() {
                 "schema": { "files": [{ "path": "schema.prisma", "content": schema }] },
                 "force": true,
                 "compositeTypeDepth": -1,
+                "baseDirectoryPath": "./base_directory_path/"
             }
         }))
         .unwrap();
@@ -566,7 +602,7 @@ fn execute_postgres(api: TestApi) {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("views"))]
-fn introspect_postgres(api: TestApi) {
+fn introspect_single_postgres_force(api: TestApi) {
     /* Drop and create database via `drop-database` and `create-database` */
 
     let connection_string = api.connection_string();
@@ -590,7 +626,7 @@ fn introspect_postgres(api: TestApi) {
         }
     "#};
 
-    let schema_path = tmpdir.path().join("prisma.schema");
+    let schema_path = tmpdir.path().join("schema.prisma");
     fs::write(&schema_path, schema).unwrap();
 
     let command = Command::new(schema_engine_bin_path());
@@ -645,9 +681,10 @@ fn introspect_postgres(api: TestApi) {
             "method": "introspect",
             "id": 1,
             "params": {
-                "schema": { "files": [{ "path": &schema_path, "content": &schema }] },
+                "schema": { "files": [{ "path": "./prisma/schema.prisma", "content": &schema }] },
                 "force": true,
                 "compositeTypeDepth": 5,
+                "baseDirectoryPath": "./base_directory_path/"
             }
         }))
         .unwrap();
@@ -659,7 +696,119 @@ fn introspect_postgres(api: TestApi) {
         stdout.read_line(&mut response).unwrap();
 
         let expected = expect![[r#"
-            {"jsonrpc":"2.0","result":{"datamodel":"generator js {\n  provider        = \"prisma-client-js\"\n  previewFeatures = [\"views\"]\n}\n\ndatasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n\nmodel A {\n  id   Int     @id @default(autoincrement())\n  data String?\n}\n\n/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.\nview B {\n  col Int?\n\n  @@ignore\n}\n","views":[{"definition":"SELECT\n  1 AS col;","name":"B","schema":"public"}],"warnings":"*** WARNING ***\n\nThe following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers\n  - \"B\"\n"},"id":1}
+            {"jsonrpc":"2.0","result":{"schema":{"files":[{"content":"generator js {\n  provider        = \"prisma-client-js\"\n  previewFeatures = [\"views\"]\n}\n\ndatasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n\nmodel A {\n  id   Int     @id @default(autoincrement())\n  data String?\n}\n\n/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.\nview B {\n  col Int?\n\n  @@ignore\n}\n","path":"./prisma/schema.prisma"}]},"views":[{"definition":"SELECT\n  1 AS col;","name":"B","schema":"public"}],"warnings":"*** WARNING ***\n\nThe following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers\n  - \"B\"\n"},"id":1}
+        "#]];
+
+        expected.assert_eq(&response);
+    });
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("views"))]
+fn introspect_multi_postgres_force(api: TestApi) {
+    /* Drop and create database via `drop-database` and `create-database` */
+
+    let connection_string = api.connection_string();
+
+    let output = api.run(&["--datasource", &connection_string, "drop-database"]);
+    assert!(output.status.success(), "{output:#?}");
+
+    let output = api.run(&["--datasource", &connection_string, "create-database"]);
+    assert!(output.status.success(), "{output:#?}");
+
+    let (tmpdir, files) = write_multi_file_vec! {
+        "a.prisma" => r#"
+            datasource db {
+                provider = "postgres"
+                url = env("TEST_DATABASE_URL")
+            }
+        "#,
+        "b.prisma" => r#"
+            model User {
+                id Int @id
+            }
+        "#,
+    };
+
+    let files = files
+        .into_iter()
+        .map(|(schema_path, content)| SchemaContainer {
+            path: schema_path,
+            content: content.to_string(),
+        })
+        .collect::<Vec<_>>();
+
+    for file in &files {
+        fs::write(&file.path, &file.content).unwrap();
+    }
+
+    let command = Command::new(schema_engine_bin_path());
+
+    with_child_process(command, |process| {
+        let stdin = process.stdin.as_mut().unwrap();
+        let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+        /* Create table via `dbExecute` */
+
+        let script = indoc! {r#"
+            DROP TABLE IF EXISTS "public"."A";
+            DROP VIEW IF EXISTS "public"."B";
+
+            CREATE TABLE "public"."A" (
+                id SERIAL PRIMARY KEY,
+                data TEXT
+            );
+
+            CREATE VIEW "public"."B" AS SELECT 1 AS col;
+        "#};
+
+        let msg = serde_json::to_string(&serde_json::json!({
+            "jsonrpc": "2.0",
+            "method": "dbExecute",
+            "id": 1,
+            "params": {
+                "datasourceType": {
+                    "tag": "schema",
+                    "files": files,
+                    "configDir": tmpdir.path().to_string_lossy().to_string(),
+                },
+                "script": script,
+            }
+        }))
+        .unwrap();
+        stdin.write_all(msg.as_bytes()).unwrap();
+        stdin.write_all(b"\n").unwrap();
+
+        let mut response = String::new();
+        stdout.read_line(&mut response).unwrap();
+
+        let expected = expect![[r#"
+            {"jsonrpc":"2.0","result":null,"id":1}
+        "#]];
+
+        expected.assert_eq(&response);
+
+        /* Introspect via `introspect` */
+        let msg = serde_json::to_string(&serde_json::json!({
+            "jsonrpc": "2.0",
+            "method": "introspect",
+            "id": 1,
+            "params": {
+                "schema": { "files": files },
+                "force": true,
+                "compositeTypeDepth": 5,
+                "baseDirectoryPath": "./base_directory_path/"
+            }
+        }))
+        .unwrap();
+
+        stdin.write_all(msg.as_bytes()).unwrap();
+        stdin.write_all(b"\n").unwrap();
+
+        let mut response = String::new();
+        stdout.read_line(&mut response).unwrap();
+
+        let expected = expect![[r#"
+            {"jsonrpc":"2.0","result":{"schema":{"files":[{"content":"datasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n\nmodel A {\n  id   Int     @id @default(autoincrement())\n  data String?\n}\n","path":"./base_directory_path/introspected.prisma"}]},"views":null,"warnings":null},"id":1}
         "#]];
 
         expected.assert_eq(&response);
@@ -700,6 +849,7 @@ fn introspect_e2e() {
                 "schema": schema,
                 "force": true,
                 "compositeTypeDepth": 5,
+                "baseDirectoryPath": "./base_directory_path/",
             }
         }))
         .unwrap();
@@ -713,40 +863,6 @@ fn introspect_e2e() {
 
         assert!(response.starts_with(r#"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n","warnings":[]},"#));
     });
-}
-
-macro_rules! write_multi_file_vec {
-    // Match multiple pairs of filename and content
-    ( $( $filename:expr => $content:expr ),* $(,)? ) => {
-        {
-            use std::fs::File;
-            use std::io::Write;
-
-            // Create a result vector to collect errors
-            let mut results = Vec::new();
-            let tmpdir = tempfile::tempdir().unwrap();
-
-            fs::create_dir_all(&tmpdir).unwrap();
-
-            $(
-                let file_path = tmpdir.path().join($filename);
-                // Attempt to create or open the file
-                let result = (|| -> std::io::Result<()> {
-                    let mut file = File::create(&file_path)?;
-                    file.write_all($content.as_bytes())?;
-                    Ok(())
-                })();
-
-                result.unwrap();
-
-                // Push the result of the operation to the results vector
-                results.push((file_path.to_string_lossy().into_owned(), $content));
-            )*
-
-            // Return the results vector for further inspection if needed
-            results
-        }
-    };
 }
 
 fn to_schema_containers(files: Vec<(String, &str)>) -> Vec<SchemaContainer> {
@@ -767,7 +883,7 @@ fn to_schemas_container(files: Vec<(String, &str)>) -> SchemasContainer {
 
 #[test_connector(tags(Postgres))]
 fn get_database_version_multi_file(_api: TestApi) {
-    let files = write_multi_file_vec! {
+    let (_, files) = write_multi_file_vec! {
         "a.prisma" => r#"
             datasource db {
                 provider = "postgres"

@@ -37,6 +37,7 @@ fn introspect_force_with_invalid_schema() {
                 content: schema,
             }],
         },
+        base_directory_path: "/".to_string(),
         force: true,
         composite_type_depth: 0,
         namespaces: None,
@@ -44,7 +45,11 @@ fn introspect_force_with_invalid_schema() {
 
     let result = &tok(api.introspect(params))
         .unwrap()
-        .datamodel
+        .schema
+        .files
+        .first()
+        .map(|dm| dm.content.as_str())
+        .unwrap()
         .replace(db_path.as_str(), "<db_path>");
 
     let expected = expect![[r#"
@@ -97,6 +102,7 @@ fn introspect_no_force_with_invalid_schema() {
                 content: schema,
             }],
         },
+        base_directory_path: "/".to_string(),
         force: false,
         composite_type_depth: 0,
         namespaces: None,

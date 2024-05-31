@@ -13,7 +13,7 @@ use quaint::prelude::SqlFamily;
 
 /// Render all model blocks to the PSL.
 pub(super) fn render<'a>(
-    introspection_file_name: &'a str,
+    introspection_file_name: Cow<'a, str>,
     ctx: &'a DatamodelCalculatorContext<'a>,
     rendered: &mut renderer::Datamodel<'a>,
 ) {
@@ -27,11 +27,11 @@ pub(super) fn render<'a>(
 
     for (previous_model, render) in models_with_idx.into_iter() {
         let file_name = match previous_model {
-            Some((prev_file_id, _)) => ctx.previous_schema.db.file_name(prev_file_id),
-            None => introspection_file_name,
+            Some((prev_file_id, _)) => Cow::Borrowed(ctx.previous_schema.db.file_name(prev_file_id)),
+            None => introspection_file_name.clone(),
         };
 
-        rendered.push_model(Cow::Borrowed(file_name), render);
+        rendered.push_model(file_name, render);
     }
 }
 

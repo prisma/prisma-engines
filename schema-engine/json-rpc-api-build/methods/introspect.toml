@@ -9,6 +9,9 @@ description = "Params type for the introspect method."
 [recordShapes.introspectParams.fields.schema]
 shape = "SchemasContainer"
 
+[recordShapes.introspectParams.fields.baseDirectoryPath]
+shape = "string"
+
 [recordShapes.introspectParams.fields.force]
 shape = "bool"
 
@@ -23,8 +26,8 @@ isNullable = true
 [recordShapes.introspectResult]
 description = "Result type for the introspect method."
 
-[recordShapes.introspectResult.fields.datamodel]
-shape = "string"
+[recordShapes.introspectResult.fields.schema]
+shape = "SchemasContainer"
 
 [recordShapes.introspectResult.fields.warnings]
 shape = "string"
