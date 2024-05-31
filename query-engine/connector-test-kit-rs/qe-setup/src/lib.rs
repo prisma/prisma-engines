@@ -21,15 +21,21 @@ use psl::{builtin_connectors::*, Datasource};
 use schema_core::schema_connector::{ConnectorResult, DiffTarget, SchemaConnector};
 use std::env;
 
+#[derive(Debug, serde::Deserialize, PartialEq)]
+pub struct InitResult {
+    pub max_bind_values: Option<usize>,
+}
+
 pub trait ExternalInitializer<'a>
 where
     Self: Sized,
 {
     #[allow(async_fn_in_trait)]
-    async fn init_with_migration(&self, script: String) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
+    async fn init_with_migration(&self, script: String)
+        -> Result<InitResult, Box<dyn std::error::Error + Send + Sync>>;
 
     #[allow(async_fn_in_trait)]
-    async fn init(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>>;
+    async fn init(&self) -> Result<InitResult, Box<dyn std::error::Error + Send + Sync>>;
 
     fn url(&self) -> &'a str;
     fn datamodel(&self) -> &'a str;
@@ -63,38 +69,41 @@ pub async fn setup_external<'a, EI>(
     driver_adapter: DriverAdapter,
     initializer: EI,
     db_schemas: &[&str],
-) -> ConnectorResult<()>
+) -> ConnectorResult<InitResult>
 where
     EI: ExternalInitializer<'a> + ?Sized,
 {
     let prisma_schema = initializer.datamodel();
     let (source, url, _preview_features) = parse_configuration(prisma_schema)?;
 
-    if driver_adapter == DriverAdapter::D1 {
-        // 1. Compute the diff migration script.
-        std::fs::remove_file(source.url.as_literal().unwrap().trim_start_matches("file:")).ok();
-        let mut connector = sql_schema_connector::SqlSchemaConnector::new_sqlite();
-        let migration_script = crate::diff(prisma_schema, url, &mut connector).await?;
+    let init_result = match driver_adapter {
+        DriverAdapter::D1 => {
+            // 1. Compute the diff migration script.
+            std::fs::remove_file(source.url.as_literal().unwrap().trim_start_matches("file:")).ok();
+            let mut connector = sql_schema_connector::SqlSchemaConnector::new_sqlite();
+            let migration_script = crate::diff(prisma_schema, url, &mut connector).await?;
 
-        // 2. Tell JavaScript to take care of the schema migration.
-        //    This results in a JSON-RPC call to the JS runtime.
-        //    The JSON-RPC machinery is defined in the `[query-tests-setup]` crate, and it
-        //    implements the `ExternalInitializer<'a>` trait.
-        initializer
-            .init_with_migration(migration_script)
-            .await
-            .map_err(|err| ConnectorError::from_msg(format!("Error migrating with D1 adapter: {}", err)))?;
-    } else {
-        setup(prisma_schema, db_schemas).await?;
+            // 2. Tell JavaScript to take care of the schema migration.
+            //    This results in a JSON-RPC call to the JS runtime.
+            //    The JSON-RPC machinery is defined in the `[query-tests-setup]` crate, and it
+            //    implements the `ExternalInitializer<'a>` trait.
+            initializer
+                .init_with_migration(migration_script)
+                .await
+                .map_err(|err| ConnectorError::from_msg(format!("Error migrating with D1 adapter: {}", err)))
+        }
+        _ => {
+            setup(prisma_schema, db_schemas).await?;
 
-        // 3. Tell JavaScript to initialize the external test session.
-        //    The schema migration is taken care of by the Schema Engine.
-        initializer.init().await.map_err(|err| {
-            ConnectorError::from_msg(format!("Error initializing {} adapter: {}", driver_adapter, err))
-        })?;
-    }
+            // 3. Tell JavaScript to initialize the external test session.
+            //    The schema migration is taken care of by the Schema Engine.
+            initializer.init().await.map_err(|err| {
+                ConnectorError::from_msg(format!("Error initializing {} adapter: {}", driver_adapter, err))
+            })
+        }
+    }?;
 
-    Ok(())
+    Ok(init_result)
 }
 
 /// Database setup for connector-test-kit-rs.

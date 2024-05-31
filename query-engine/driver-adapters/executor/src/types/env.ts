@@ -2,7 +2,7 @@ import * as S from '@effect/schema/Schema'
 
 const DriverAdapterConfig = S.struct({
   proxy_url: S.string.pipe(S.nonEmpty({
-    message: () => 'proxy_url must not be empty',
+    message: () => '`proxy_url` must not be empty',
   })),
 })
 
@@ -23,8 +23,14 @@ const EnvNeonWS = S.struct({
   DRIVER_ADAPTER_CONFIG: DriverAdapterConfigFromString,
 })
 
+export const MobileAdapterConfig = S.struct({
+  EXTERNAL_TEST_EXECUTOR: S.literal('Mobile'),
+  MOBILE_EMULATOR_URL: S.string.pipe(S.nonEmpty({
+    message: () => '`MOBILE_EMULATOR_URL` must not be empty',
+  })),
+})
+
 export const ExternalTestExecutor = S.literal('Wasm', 'Napi')
-export type ExternalTestExecutor = S.Schema.Type<typeof ExternalTestExecutor>
 
 export const Env = S.extend(
   S.union(
@@ -34,9 +40,14 @@ export const Env = S.extend(
       DRIVER_ADAPTER: S.literal('pg', 'libsql', 'd1'),
     }),
   ),
-  S.struct({
-    EXTERNAL_TEST_EXECUTOR: S.optional(ExternalTestExecutor),
-  }),
+  S.union(
+    MobileAdapterConfig,
+    S.struct({
+      EXTERNAL_TEST_EXECUTOR: S.optional(ExternalTestExecutor, {
+        default: () => 'Napi',
+      }),
+    }),
+  ),
 )
 
 export type Env = S.Schema.Type<typeof Env>
