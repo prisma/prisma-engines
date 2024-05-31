@@ -132,7 +132,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | TransactionApi
         | UncheckedScalarInputs
     }),
-    hidden: enumflags2::make_bitflags!(PreviewFeature::{PrismaSchemaFolder | ReactNative}),
+    hidden: enumflags2::make_bitflags!(PreviewFeature::{ReactNative}),
 };
 
 #[derive(Debug)]
