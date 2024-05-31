@@ -3,6 +3,7 @@ mod format;
 // mod lint;
 mod native;
 mod preview;
+mod schema_file_input;
 
 use std::{
     io::{self, Read},

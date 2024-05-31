@@ -1,8 +1,15 @@
 use psl::datamodel_connector::NativeTypeConstructor;
 
-pub(crate) fn run(schema: &str) -> String {
-    let validated_configuration = match psl::parse_configuration(schema) {
-        Ok(validated_configuration) => validated_configuration,
+use crate::schema_file_input::SchemaFileInput;
+
+pub(crate) fn run(input: &str) -> String {
+    let schema: Vec<_> = match serde_json::from_str::<SchemaFileInput>(input) {
+        Ok(input) => input.into(),
+        Err(_) => return "[]".to_owned(),
+    };
+
+    let validated_configuration = match psl::parse_configuration_multi_file(&schema) {
+        Ok((_, validated_configuration)) => validated_configuration,
         Err(_) => return "[]".to_owned(),
     };
 

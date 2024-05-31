@@ -132,8 +132,8 @@ pub fn merge_schemas(params: String) -> Result<String, String> {
     merge_schemas::merge_schemas(&params)
 }
 
-pub fn native_types(schema: String) -> String {
-    native::run(&schema)
+pub fn native_types(input: String) -> String {
+    native::run(&input)
 }
 
 pub fn preview_features() -> String {
