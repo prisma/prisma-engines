@@ -1,10 +1,9 @@
-use darling::ToTokens;
+use darling::{ToTokens, ast::NestedMeta};
 use quote::{quote, TokenStreamExt};
 use std::{
     collections::{hash_map, HashMap},
     ops::{Deref, DerefMut},
 };
-use syn::{AttributeArgs, NestedMeta};
 
 #[derive(Debug, Default)]
 pub struct NestedAttrMap {
@@ -50,17 +49,17 @@ impl NestedAttrMap {
     }
 }
 
-impl From<&AttributeArgs> for NestedAttrMap {
-    fn from(args: &AttributeArgs) -> Self {
+impl From<&Vec<NestedMeta>> for NestedAttrMap {
+    fn from(args: &Vec<NestedMeta>) -> Self {
         let mut map = HashMap::new();
 
         for attr in args {
             match attr {
-                syn::NestedMeta::Meta(ref meta) => {
+                NestedMeta::Meta(ref meta) => {
                     let ident = meta.path().get_ident().unwrap().to_string();
                     map.insert(ident, attr.clone());
                 }
-                syn::NestedMeta::Lit(_) => unimplemented!("Unexpected literal encountered in NestedAttrMap parsing."),
+                NestedMeta::Lit(_) => unimplemented!("Unexpected literal encountered in NestedAttrMap parsing."),
             }
         }
 
