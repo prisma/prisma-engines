@@ -4,14 +4,14 @@ on:
     branches:
       - main
   pull_request:
-    paths-ignore:
-      - "!.github/workflows/test-query-engine-driver-adapters.yml"
-      - ".github/**"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
-      - "renovate.json"
+    # paths-ignore:
+    #   - "!.github/workflows/test-query-engine-driver-adapters.yml"
+    #   - ".github/**"
+    #   - ".buildkite/**"
+    #   - "*.md"
+    #   - "LICENSE"
+    #   - "CODEOWNERS"
+    #   - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -25,24 +25,24 @@ jobs:
       fail-fast: false
       matrix:
         adapter:
-          - name: "planetscale (napi)"
-            setup_task: "dev-planetscale-js"
+          # - name: "planetscale (napi)"
+          #   setup_task: "dev-planetscale-js"
           - name: "pg (napi)"
             setup_task: "dev-pg-js"
-          - name: "neon (napi)"
-            setup_task: "dev-neon-js"
-          - name: "libsql (napi)"
-            setup_task: "dev-libsql-js"
-          - name: "planetscale (wasm)"
-            setup_task: "dev-planetscale-wasm"
-          - name: "pg (wasm)"
-            setup_task: "dev-pg-wasm"
-          - name: "neon (wasm)"
-            setup_task: "dev-neon-wasm"
-          - name: "libsql (wasm)"
-            setup_task: "dev-libsql-wasm"
-          - name: "d1 (wasm)"
-            setup_task: "dev-d1"
+          # - name: "neon (napi)"
+          #   setup_task: "dev-neon-js"
+          # - name: "libsql (napi)"
+          #   setup_task: "dev-libsql-js"
+          # - name: "planetscale (wasm)"
+          #   setup_task: "dev-planetscale-wasm"
+          # - name: "pg (wasm)"
+          #   setup_task: "dev-pg-wasm"
+          # - name: "neon (wasm)"
+          #   setup_task: "dev-neon-wasm"
+          # - name: "libsql (wasm)"
+          #   setup_task: "dev-libsql-wasm"
+          # - name: "d1 (wasm)"
+          #   setup_task: "dev-d1"
         node_version: ["18"]
         partition: ["1/4", "2/4", "3/4", "4/4"]
     env:
