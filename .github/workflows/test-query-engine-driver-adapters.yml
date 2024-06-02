@@ -106,3 +106,4 @@ jobs:
 
       - name: "Run tests"
         run: cargo nextest run --package query-engine-tests --test-threads=1 --partition hash:${{ matrix.partition }}
+        
