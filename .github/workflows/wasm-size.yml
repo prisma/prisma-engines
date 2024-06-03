@@ -1,14 +1,14 @@
 name: "QE: WASM Query Engine size"
 on:
   pull_request:
-    paths-ignore:
-      - ".github/**"
-      - "!.github/workflows/wasm-size.yml"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
-      - "renovate.json"
+    # paths-ignore:
+    #   - ".github/**"
+    #   - "!.github/workflows/wasm-size.yml"
+    #   - ".buildkite/**"
+    #   - "*.md"
+    #   - "LICENSE"
+    #   - "CODEOWNERS"
+    #   - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

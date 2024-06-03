@@ -4,14 +4,14 @@ on:
     branches:
       - main
   pull_request:
-    paths-ignore:
-      - "!.github/workflows/build-prisma-schema-wasm.yml"
-      - ".github/**"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
-      - "renovate.json"
+    # paths-ignore:
+    #   - "!.github/workflows/build-prisma-schema-wasm.yml"
+    #   - ".github/**"
+    #   - ".buildkite/**"
+    #   - "*.md"
+    #   - "LICENSE"
+    #   - "CODEOWNERS"
+    #   - "renovate.json"
 
 jobs:
   build:

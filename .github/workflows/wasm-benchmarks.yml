@@ -1,14 +1,14 @@
 name: "QE: WASM benchmarks"
 on:
   pull_request:
-    paths-ignore:
-      - ".github/**"
-      - "!.github/workflows/wasm-benchmarks.yml"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
-      - "renovate.json"
+    # paths-ignore:
+    #   - ".github/**"
+    #   - "!.github/workflows/wasm-benchmarks.yml"
+    #   - ".buildkite/**"
+    #   - "*.md"
+    #   - "LICENSE"
+    #   - "CODEOWNERS"
+    #   - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

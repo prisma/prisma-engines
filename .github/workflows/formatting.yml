@@ -4,14 +4,14 @@ on:
     branches:
       - main
   pull_request:
-    paths-ignore:
-      - ".github/**"
-      - "!.github/workflows/formatting.yml"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
-      - "renovate.json"
+    # paths-ignore:
+    #   - ".github/**"
+    #   - "!.github/workflows/formatting.yml"
+    #   - ".buildkite/**"
+    #   - "*.md"
+    #   - "LICENSE"
+    #   - "CODEOWNERS"
+    #   - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

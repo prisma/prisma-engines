@@ -4,16 +4,16 @@ on:
     branches:
       - main
   pull_request:
-    paths-ignore:
-      - ".github/**"
-      - "!.github/workflows/test-schema-engine.yml"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
-      - "renovate.json"
-      # Specific
-      - "query-engine/**"
+    # paths-ignore:
+    #   - ".github/**"
+    #   - "!.github/workflows/test-schema-engine.yml"
+    #   - ".buildkite/**"
+    #   - "*.md"
+    #   - "LICENSE"
+    #   - "CODEOWNERS"
+    #   - "renovate.json"
+    #   # Specific
+    #   - "query-engine/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
