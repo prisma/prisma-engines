@@ -117,7 +117,7 @@ mod chunking {
 
             let query = "{ id: 201, posts: { connect: [{ id: 1 }, { id: 2 }] } }";
 
-            create_user(&runner, &query).await?;
+            create_user(&runner, query).await?;
 
             Ok(())
         }
