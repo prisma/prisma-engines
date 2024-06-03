@@ -34,7 +34,7 @@ crate::native_type_definition! {
 
 static DEFAULT_MAPPING: Lazy<HashMap<ScalarType, MongoDbType>> = Lazy::new(|| {
     vec![
-        (ScalarType::Int, MongoDbType::Int),
+        (ScalarType::Int, MongoDbType::Long),
         (ScalarType::BigInt, MongoDbType::Long),
         (ScalarType::Float, MongoDbType::Double),
         (ScalarType::Boolean, MongoDbType::Bool),
