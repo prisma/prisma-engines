@@ -14,8 +14,8 @@ mod chunking {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query};
 
-    #[test_suite(schema(schema), only(Sqlite("cfd1")))]
-    mod d1 {
+    #[test_suite(schema(schema))]
+    mod reproductions {
         fn schema() -> String {
             let schema = indoc! {
               r#"
@@ -86,8 +86,8 @@ mod chunking {
             Ok(())
         }
 
-        #[connector_test(exclude_features("relationJoins"))]
-        // It used to error on D1 with
+        #[connector_test(exclude_features("relationJoins"), exclude(Sqlite("cfd1")))]
+        // It errors on D1 with
         // Error in performIO: Error: D1_ERROR: Expression tree is too large (maximum depth 100)
         // see https://github.com/prisma/prisma/issues/23919
         async fn issue_23919(runner: Runner) -> TestResult<()> {
@@ -111,13 +111,11 @@ mod chunking {
                 .collect::<Vec<i64>>();
 
             let posts_as_graphql: Vec<String> = ids_vec.into_iter().map(|id| format!("{{ id: {} }}", id)).collect();
+            assert_eq!(posts_as_graphql.len(), 400);
 
             let query = format!("{{ id: 201, posts: {{ connect: [{}] }} }}", posts_as_graphql.join(", "));
-            println!("query: {}", &query);
 
-            let query = "{ id: 201, posts: { connect: [{ id: 1 }, { id: 2 }] } }";
-
-            create_user(&runner, query).await?;
+            create_user(&runner, &query).await?;
 
             Ok(())
         }
