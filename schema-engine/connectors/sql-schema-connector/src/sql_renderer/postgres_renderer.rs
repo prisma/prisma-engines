@@ -231,8 +231,8 @@ impl SqlRenderer for PostgresFlavour {
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: MigrationPair<&SqlSchema>) -> Vec<String> {
         let AlterTable { changes, table_ids } = alter_table;
         let mut lines = Vec::new();
-        let mut before_statements = Vec::new();
         let mut separate_lines = Vec::new();
+        let mut before_statements = Vec::new();
         let mut after_statements = Vec::new();
         let tables = schemas.walk(*table_ids);
 
@@ -312,7 +312,7 @@ impl SqlRenderer for PostgresFlavour {
         if self.is_cockroachdb() {
             let mut out = Vec::with_capacity(before_statements.len() + after_statements.len() + lines.len());
             out.extend(before_statements);
-            for line in lines {
+            for line in lines.into_iter().chain(separate_lines) {
                 out.push(format!(
                     "ALTER TABLE {} {}",
                     QuotedWithPrefix::pg_from_table_walker(tables.previous),
@@ -322,19 +322,12 @@ impl SqlRenderer for PostgresFlavour {
             out.extend(after_statements);
             out
         } else {
+            let table = QuotedWithPrefix::pg_new(tables.previous.namespace(), tables.previous.name());
             for line in separate_lines {
-                after_statements.push(format!(
-                    "ALTER TABLE {} {}",
-                    QuotedWithPrefix::pg_new(tables.previous.namespace(), tables.previous.name()),
-                    line
-                ))
+                after_statements.push(format!("ALTER TABLE {} {}", table, line))
             }
 
-            let alter_table = format!(
-                "ALTER TABLE {} {}",
-                QuotedWithPrefix::pg_new(tables.previous.namespace(), tables.previous.name()),
-                lines.join(",\n")
-            );
+            let alter_table = format!("ALTER TABLE {} {}", table, lines.join(",\n"));
 
             before_statements
                 .into_iter()
