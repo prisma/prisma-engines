@@ -19,23 +19,24 @@ and test them.
 
 This repository contains four engines:
 
-- *Query engine*, used by the client to run database queries from Prisma Client
-- *Schema engine*, used to create and run migrations and introspection
-- *Prisma Format*, used to format prisma files
+- _Query engine_, used by the client to run database queries from Prisma Client
+- _Schema engine_, used to create and run migrations and introspection
+- _Prisma Format_, used to format prisma files
 
-Additionally, the *psl* (Prisma Schema Language) is the library that defines how
+Additionally, the _psl_ (Prisma Schema Language) is the library that defines how
 the language looks like, how it's parsed, etc.
 
 You'll also find:
-- *libs*, for various (small) libraries such as macros, user facing errors,
-    various connector/database-specific libraries, etc.
+
+- _libs_, for various (small) libraries such as macros, user facing errors,
+  various connector/database-specific libraries, etc.
 - a `docker-compose.yml` file that's helpful for running tests and bringing up
-    containers for various databases
+  containers for various databases
 - a `flake.nix` file for bringing up all dependencies and making it easy to
-    build the code in this repository (the use of this file and `nix` is
-    entirely optional, but can be a good and easy way to get started)
+  build the code in this repository (the use of this file and `nix` is
+  entirely optional, but can be a good and easy way to get started)
 - an `.envrc` file to make it easier to set everything up, including the `nix
-    shell`
+shell`
 
 ## Documentation
 
@@ -76,7 +77,7 @@ compiled binaries inside the repository root in the `target/debug` (without
 
 ## Prisma Schema Language
 
-The *Prisma Schema Language* is a library which defines the data structures and
+The _Prisma Schema Language_ is a library which defines the data structures and
 parsing rules for prisma files, including the available database connectors. For
 more technical details, please check the [library README](./psl/README.md).
 
@@ -86,23 +87,25 @@ also used as input for the query engine.
 
 ## Query Engine
 
-The *Query Engine* is how Prisma Client queries are executed. Here's a brief
+The _Query Engine_ is how Prisma Client queries are executed. Here's a brief
 description of what it does:
+
 - takes as inputs an annotated version of the Prisma Schema file called the
-    DataModeL (DML),
+  DataModeL (DML),
 - using the DML (specifically, the datasources and providers), it builds up a
-    [GraphQL](https://graphql.org) model for queries and responses,
+  [GraphQL](https://graphql.org) model for queries and responses,
 - runs as a server listening for GraphQL queries,
 - it translates the queries to the respective native datasource(s) and
-    returns GraphQL responses, and
+  returns GraphQL responses, and
 - handles all connections and communication with the native databases.
 
 When used through Prisma Client, there are two ways for the Query Engine to
 be executed:
+
 - as a binary, downloaded during installation, launched at runtime;
-    communication happens via HTTP (`./query-engine/query-engine`)
+  communication happens via HTTP (`./query-engine/query-engine`)
 - as a native, platform-specific Node.js addon; also downloaded during
-    installation (`./query-engine/query-engine-node-api`)
+  installation (`./query-engine/query-engine-node-api`)
 
 ### Usage
 
@@ -115,7 +118,7 @@ Notable environment flags:
 
 - `RUST_LOG_FORMAT=(devel|json)` sets the log format. By default outputs `json`.
 - `QE_LOG_LEVEL=(info|debug|trace)` sets the log level for the Query Engine. If
-    you need Query Graph debugging logs, set it to "trace"
+  you need Query Graph debugging logs, set it to "trace"
 - `FMT_SQL=1` enables logging _formatted_ SQL queries
 - `PRISMA_DML_PATH=[path_to_datamodel_file]` should point to the datamodel file
   location. This or `PRISMA_DML` is required for the Query Engine to run.
@@ -147,13 +150,15 @@ Navigate to `http://localhost:3000` to view the Grafana dashboard.
 
 ## Schema Engine
 
-The *Schema Engine* does a couple of things:
+The _Schema Engine_ does a couple of things:
+
 - creates new migrations by comparing the prisma file with the current state of
-    the database, in order to bring the database in sync with the prisma file
+  the database, in order to bring the database in sync with the prisma file
 - run these migrations and keeps track of which migrations have been executed
 - (re-)generate a prisma schema file starting from a live database
 
 The engine uses:
+
 - the prisma files, as the source of truth
 - the database it connects to, for diffing and running migrations, as well as
   keeping track of migrations in the `_prisma_migrations` table
@@ -168,13 +173,14 @@ a node package. You can read more [here](./prisma-schema-wasm/README.md).
 ## Debugging
 
 When trying to debug code, here's a few things that might be useful:
+
 - use the language server; being able to go to definition and reason about code
-    can make things a lot easier,
+  can make things a lot easier,
 - add `dbg!()` statements to validate code paths, inspect variables, etc.,
 - you can control the amount of logs you see, and where they come from using the
-    `RUST_LOG` environment variable; see [the documentation](https://docs.rs/env_logger/0.9.1/env_logger/#enabling-logging),
+  `RUST_LOG` environment variable; see [the documentation](https://docs.rs/env_logger/0.9.1/env_logger/#enabling-logging),
 - you can use the `test-cli` to test migration and introspection without having
-    to go through the `prisma` npm package.
+  to go through the `prisma` npm package.
 
 ## Testing
 
@@ -186,7 +192,7 @@ integration tests.
 
   You can find them across the whole codebase, usually in `./tests` folders at
   the root of modules. These tests can be executed via `cargo test`. Note that
-  some of them will require the `TEST_DATABASE_URL` enviornment variable set up.
+  some of them will require the `TEST_DATABASE_URL` environment variable set up.
 
 - **Integration tests**: They run GraphQL queries against isolated
   instances of the Query Engine and asserts that the responses are correct.
@@ -268,6 +274,7 @@ You can trigger releases from this repository to npm that can be used for testin
 (Since July 2022). Any branch name starting with `integration/` will, first, run the full test suite in Buildkite `[Test] Prisma Engines` and, second, if passing, run the publish pipeline (build and upload engines to S3 & R2)
 
 The journey through the pipeline is the same as a commit on the `main` branch.
+
 - It will trigger [`prisma/engines-wrapper`](https://github.com/prisma/engines-wrapper) and publish a new [`@prisma/engines-version`](https://www.npmjs.com/package/@prisma/engines-version) npm package but on the `integration` tag.
 - Which triggers [`prisma/prisma`](https://github.com/prisma/prisma) to create a `chore(Automated Integration PR): [...]` PR with a branch name also starting with `integration/`
 - Since in `prisma/prisma` we also trigger the publish pipeline when a branch name starts with `integration/`, this will publish all `prisma/prisma` monorepo packages to npm on the `integration` tag.
@@ -276,8 +283,9 @@ The journey through the pipeline is the same as a commit on the `main` branch.
 This end to end will take minimum ~1h20 to complete, but is completely automated :robot:
 
 Notes:
+
 - in `prisma/prisma` repository, we do not run tests for `integration/` branches, it is much faster and also means that there is no risk of tests failing (e.g. flaky tests, snapshots) that would stop the publishing process.
-- in `prisma/prisma-engines` the Buildkite test pipeline must first pass, then the engines will be built and uploaded to our storage via the Buildkite release pipeline. These 2 pipelines can fail for different reasons, it's recommended to keep an eye on them (check notifications in Slack) and restart jobs as needed. Finally, it will trigger [`prisma/engines-wrapper`](https://github.com/prisma/engines-wrapper). 
+- in `prisma/prisma-engines` the Buildkite test pipeline must first pass, then the engines will be built and uploaded to our storage via the Buildkite release pipeline. These 2 pipelines can fail for different reasons, it's recommended to keep an eye on them (check notifications in Slack) and restart jobs as needed. Finally, it will trigger [`prisma/engines-wrapper`](https://github.com/prisma/engines-wrapper).
 
 #### Manual integration releases from this repository to npm
 
@@ -291,7 +299,6 @@ rust-analyzer. To avoid this. Open VSCode settings and search for `Check on Save
 ```
 --target-dir:/tmp/rust-analyzer-check
 ```
-
 
 ## Community PRs: create a local branch for a branch coming from a fork
 

@@ -232,6 +232,7 @@ impl SqlRenderer for PostgresFlavour {
         let AlterTable { changes, table_ids } = alter_table;
         let mut lines = Vec::new();
         let mut before_statements = Vec::new();
+        let mut separate_lines = Vec::new();
         let mut after_statements = Vec::new();
         let tables = schemas.walk(*table_ids);
 
@@ -241,7 +242,7 @@ impl SqlRenderer for PostgresFlavour {
                     "DROP CONSTRAINT {}",
                     Quoted::postgres_ident(tables.previous.primary_key().unwrap().name())
                 )),
-                TableChange::RenamePrimaryKey => lines.push(format!(
+                TableChange::RenamePrimaryKey => separate_lines.push(format!(
                     "RENAME CONSTRAINT {} TO {}",
                     Quoted::postgres_ident(tables.previous.primary_key().unwrap().name()),
                     Quoted::postgres_ident(tables.next.primary_key().unwrap().name())
@@ -321,6 +322,14 @@ impl SqlRenderer for PostgresFlavour {
             out.extend(after_statements);
             out
         } else {
+            for line in separate_lines {
+                after_statements.push(format!(
+                    "ALTER TABLE {} {}",
+                    QuotedWithPrefix::pg_new(tables.previous.namespace(), tables.previous.name()),
+                    line
+                ))
+            }
+
             let alter_table = format!(
                 "ALTER TABLE {} {}",
                 QuotedWithPrefix::pg_new(tables.previous.namespace(), tables.previous.name()),
