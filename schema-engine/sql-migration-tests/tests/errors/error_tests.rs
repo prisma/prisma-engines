@@ -104,10 +104,7 @@ fn authentication_failure_must_return_a_known_error_on_mssql(api: TestApi) {
     let properties = url.properties_mut();
     let user = properties.get("user").cloned().unwrap();
 
-    match properties.get_mut("password") {
-        Some(password) => *password = "obviously-not-right".to_string(),
-        _ => unreachable!(),
-    };
+    *properties.get_mut("password").unwrap() = "obviously-not-right".to_string();
 
     let dm = format!(
         r#"
