@@ -1,5 +1,8 @@
-use crate::{ast, ast::WithDocumentation, types, walkers::Walker};
-use schema_ast::ast::{IndentationType, NewlineType};
+use crate::{
+    ast::{self, IndentationType, NewlineType, WithDocumentation},
+    types,
+    walkers::{newline, Walker},
+};
 
 /// An `enum` declaration in the schema.
 pub type EnumWalker<'db> = Walker<'db, crate::EnumId>;
@@ -60,12 +63,8 @@ impl<'db> EnumWalker<'db> {
         };
 
         let src = self.db.source(self.id.0);
-        let start = value.span.end - 2;
 
-        match src.chars().nth(start) {
-            Some('\r') => NewlineType::Windows,
-            _ => NewlineType::Unix,
-        }
+        newline(src, value.span)
     }
 
     /// The name of the schema the enum belongs to.

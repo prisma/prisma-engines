@@ -17,6 +17,7 @@ mod scalar_field;
 
 pub use crate::types::RelationFieldId;
 pub use composite_type::*;
+use diagnostics::Span;
 pub use field::*;
 pub use index::*;
 pub use model::*;
@@ -24,7 +25,7 @@ pub use r#enum::*;
 pub use relation::*;
 pub use relation_field::*;
 pub use scalar_field::*;
-use schema_ast::ast::WithSpan;
+use schema_ast::ast::{NewlineType, WithSpan};
 
 use crate::{ast, FileId};
 
@@ -51,6 +52,16 @@ where
     #[allow(unconditional_recursion)]
     fn eq(&self, other: &Self) -> bool {
         self.id.eq(&other.id)
+    }
+}
+
+/// Retrieves newline variant for a block.
+pub(crate) fn newline(source: &str, span: Span) -> NewlineType {
+    let start = span.end - 2;
+
+    match source.chars().nth(start) {
+        Some('\r') => NewlineType::Windows,
+        _ => NewlineType::Unix,
     }
 }
 
