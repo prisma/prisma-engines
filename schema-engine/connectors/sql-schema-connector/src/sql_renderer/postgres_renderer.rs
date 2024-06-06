@@ -327,13 +327,16 @@ impl SqlRenderer for PostgresFlavour {
                 after_statements.push(format!("ALTER TABLE {} {}", table, line))
             }
 
-            let out = before_statements.into_iter().chain(after_statements).collect();
             if lines.is_empty() {
-                return out;
+                return before_statements.into_iter().chain(after_statements).collect();
             }
 
             let alter_table = format!("ALTER TABLE {} {}", table, lines.join(",\n"));
-            out.into_iter().chain(std::iter::once(alter_table)).collect()
+            before_statements
+                .into_iter()
+                .chain(std::iter::once(alter_table))
+                .chain(after_statements)
+                .collect()
         }
     }
 
