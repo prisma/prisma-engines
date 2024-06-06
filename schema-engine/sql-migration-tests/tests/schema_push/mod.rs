@@ -241,6 +241,41 @@ fn alter_constraint_name_push(api: TestApi) {
     });
 }
 
+#[test_connector(exclude(Sqlite, Mysql))]
+fn alter_constraint_name_and_alter_columns_at_same_time_push(api: TestApi) {
+    let dm1 = r#"
+         model A {
+           id   Int     @id
+           name String?
+         }
+     "#;
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+
+    let id = if api.is_sqlite() || api.is_mysql() {
+        ""
+    } else {
+        r#"(map: "CustomId")"#
+    };
+
+    let dm2 = format!(
+        r#"
+         model A {{
+           id       Int     @id{id}
+           name     String?
+           lastName String?
+         }}
+     "#
+    );
+
+    api.schema_push_w_datasource(dm2).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_pk(|pk| pk.assert_constraint_name("CustomId"));
+        table.assert_columns_count(3).assert_has_column("lastName")
+    });
+}
+
 #[test_connector(tags(Sqlite))]
 fn sqlite_reserved_name_space_can_be_used(api: TestApi) {
     let plain_dm = r#"
