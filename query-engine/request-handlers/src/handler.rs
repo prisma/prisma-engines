@@ -224,10 +224,16 @@ impl<'a> RequestHandler<'a> {
     }
 
     fn compare_args(left: &HashMap<String, ArgumentValue>, right: &HashMap<String, ArgumentValue>) -> bool {
-        left.iter().all(|(key, left_value)| {
-            right
+        let (large, small) = if left.len() > right.len() {
+            (&left, &right)
+        } else {
+            (&right, &left)
+        };
+
+        small.iter().all(|(key, small_value)| {
+            large
                 .get(key)
-                .map_or(false, |right_value| Self::compare_values(left_value, right_value))
+                .map_or(false, |large_value| Self::compare_values(small_value, large_value))
         })
     }
 

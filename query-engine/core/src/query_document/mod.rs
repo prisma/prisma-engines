@@ -285,11 +285,13 @@ impl CompactedDocument {
             .collect();
 
         // Gets the argument keys for later mapping.
-        let keys: Vec<_> = arguments[0]
+        let keys: Vec<_> = arguments
             .iter()
-            .flat_map(|pair| match pair {
-                (_, ArgumentValue::Object(obj)) => obj.keys().map(ToOwned::to_owned).collect(),
-                (key, _) => vec![key.to_owned()],
+            .flat_map(|map| {
+                map.iter().flat_map(|(key, value)| match value {
+                    ArgumentValue::Object(obj) => obj.keys().map(ToOwned::to_owned).collect::<Vec<_>>(),
+                    _ => vec![key.to_owned()],
+                })
             })
             .collect();
 
