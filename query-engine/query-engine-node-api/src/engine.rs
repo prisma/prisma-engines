@@ -98,23 +98,16 @@ impl QueryEngine {
 
         let mut connector_mode = ConnectorMode::Rust;
 
-        if !preview_features.contains(PreviewFeature::DriverAdapters) {
-            tracing::info!(
-                "Please enable the {} preview feature to use driver adapters.",
-                PreviewFeature::DriverAdapters
-            );
-        } else {
-            #[cfg(feature = "driver-adapters")]
-            if let Some(adapter) = maybe_adapter {
-                let js_queryable = driver_adapters::from_js(adapter);
+        #[cfg(feature = "driver-adapters")]
+        if let Some(adapter) = maybe_adapter {
+            let js_queryable = driver_adapters::from_js(adapter);
 
-                connector_mode = ConnectorMode::Js {
-                    adapter: Arc::new(js_queryable),
-                };
+            connector_mode = ConnectorMode::Js {
+                adapter: Arc::new(js_queryable),
+            };
 
-                let provider_name = schema.connector.provider_name();
-                tracing::info!("Registered driver adapter for {provider_name}.");
-            }
+            let provider_name = schema.connector.provider_name();
+            tracing::info!("Registered driver adapter for {provider_name}.");
         }
 
         let connector_mode = connector_mode;
