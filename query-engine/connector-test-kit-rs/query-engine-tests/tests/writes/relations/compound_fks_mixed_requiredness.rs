@@ -25,11 +25,11 @@ mod compound_fks {
         schema.to_owned()
     }
 
-    // "A One to Many relation with mixed requiredness" should "be writable and readable"-
-    // In PlanetScale, this fails with:
-    // `Expected result to return an error, but found success: {"data":{"createOnePost":{"id":2,"user_id":2,"user_age":2,"User":null}}}`
-    #[connector_test(exclude(MySql(5.6), MongoDb, Vitess("planetscale.js", "planetscale.js.wasm")))]
+    // "A One to Many relation with mixed requiredness" should "be writable and readable"
+    #[connector_test(exclude(MySql(5.6), MongoDb))]
     async fn one2m_mix_required_writable_readable(runner: Runner) -> TestResult<()> {
+        use query_tests_setup::{ConnectorVersion, VitessVersion::*};
+
         // Setup user
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation{createOneUser(data:{id: 1, nr:1, age: 1}){id, nr, age, Post{id}}}"#),
@@ -49,12 +49,17 @@ mod compound_fks {
           @r###"{"data":{"createOnePost":{"id":1,"user_id":1,"user_age":null,"User":null}}}"###
         );
 
-        // Foreign key violation
-        assert_error!(
-            &runner,
-            r#"mutation{createOnePost(data:{id: 2, user_id:2, user_age: 2}){id, user_id, user_age, User{id}}}"#,
-            2003
-        );
+        // Foreign key violation, which doesn't happen on PlanetScale.
+        if !matches!(
+            runner.connector_version(),
+            ConnectorVersion::Vitess(Some(PlanetscaleJsNapi)) | ConnectorVersion::Vitess(Some(PlanetscaleJsWasm))
+        ) {
+            assert_error!(
+                &runner,
+                r#"mutation{createOnePost(data:{id: 2, user_id:2, user_age: 2}){id, user_id, user_age, User{id}}}"#,
+                2003
+            );
+        }
 
         // Success
         insta::assert_snapshot!(
