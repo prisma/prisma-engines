@@ -119,7 +119,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
         },
 
         (ErrorKind::AuthenticationFailed { .. }, ConnectionInfo::External(_)) => default_value,
-        #[cfg(any(feature = "mysql-native", feature = "postgresql-native"))]
+        #[cfg(any(feature = "mysql-native", feature = "postgresql-native", feature = "mssql-native"))]
         (ErrorKind::AuthenticationFailed { user }, _) => match connection_info {
             ConnectionInfo::Native(NativeConnectionInfo::Postgres(url)) => {
                 Some(KnownError::new(common::IncorrectDatabaseCredentials {
@@ -128,6 +128,12 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
                 }))
             }
             ConnectionInfo::Native(NativeConnectionInfo::Mysql(url)) => {
+                Some(KnownError::new(common::IncorrectDatabaseCredentials {
+                    database_user: format!("{user}"),
+                    database_host: url.host().to_owned(),
+                }))
+            }
+            ConnectionInfo::Native(NativeConnectionInfo::Mssql(url)) => {
                 Some(KnownError::new(common::IncorrectDatabaseCredentials {
                     database_user: format!("{user}"),
                     database_host: url.host().to_owned(),
