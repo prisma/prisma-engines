@@ -94,7 +94,6 @@ impl QueryEngine {
 
         let mut schema = psl::validate(datamodel.into());
         let config = &mut schema.configuration;
-        let preview_features = config.preview_features();
 
         let mut connector_mode = ConnectorMode::Rust;
 
