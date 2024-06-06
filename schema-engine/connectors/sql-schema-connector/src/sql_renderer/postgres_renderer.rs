@@ -305,7 +305,7 @@ impl SqlRenderer for PostgresFlavour {
             };
         }
 
-        if lines.is_empty() {
+        if lines.is_empty() && separate_lines.is_empty() {
             return Vec::new();
         }
 
@@ -327,13 +327,13 @@ impl SqlRenderer for PostgresFlavour {
                 after_statements.push(format!("ALTER TABLE {} {}", table, line))
             }
 
-            let alter_table = format!("ALTER TABLE {} {}", table, lines.join(",\n"));
+            let out = before_statements.into_iter().chain(after_statements).collect();
+            if lines.is_empty() {
+                return out;
+            }
 
-            before_statements
-                .into_iter()
-                .chain(std::iter::once(alter_table))
-                .chain(after_statements)
-                .collect()
+            let alter_table = format!("ALTER TABLE {} {}", table, lines.join(",\n"));
+            out.into_iter().chain(std::iter::once(alter_table)).collect()
         }
     }
 
