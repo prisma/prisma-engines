@@ -1330,9 +1330,9 @@ fn alter_constraint_name_and_alter_columns_at_same_time(mut api: TestApi) {
     let custom_dm = api.datamodel_with_provider(&format!(
         r#"
          model A {{
-           id   Int    @id{}
+           id   Int     @id{}
            a    String
-           b    String
+           b    String?
          }}
      "#,
         if api.is_sqlite() || api.is_mysql() || api.is_mssql() {
@@ -1354,13 +1354,13 @@ fn alter_constraint_name_and_alter_columns_at_same_time(mut api: TestApi) {
             let expected_script = if is_cockroach {
                 expect![[r#"
                     -- AlterTable
-                    ALTER TABLE "A" ADD COLUMN     "b" TEXT NOT NULL;
+                    ALTER TABLE "A" ADD COLUMN     "b" TEXT;
                     ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
                 "#]]
             } else if is_postgres || is_postgres15 || is_postgres16 {
                 expect![[r#"
                     -- AlterTable
-                    ALTER TABLE "A" ADD COLUMN     "b" TEXT NOT NULL;
+                    ALTER TABLE "A" ADD COLUMN     "b" TEXT;
                     ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
                 "#]]
             } else {
