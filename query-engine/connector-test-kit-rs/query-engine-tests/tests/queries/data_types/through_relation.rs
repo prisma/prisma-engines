@@ -238,13 +238,7 @@ mod scalar_relations {
         schema.to_owned()
     }
 
-    // TODO: fix https://github.com/prisma/team-orm/issues/684 and unexclude DAs
-    // On "pg.js.wasm", this fails with a `QueryParserError` due to bigint issues.
-    #[connector_test(
-        schema(schema_scalar_lists),
-        capabilities(ScalarLists),
-        exclude(Postgres("pg.js", "neon.js", "pg.js.wasm", "neon.js.wasm"))
-    )]
+    #[connector_test(schema(schema_scalar_lists), capabilities(ScalarLists))]
     async fn scalar_lists(runner: Runner) -> TestResult<()> {
         create_child(
             &runner,
