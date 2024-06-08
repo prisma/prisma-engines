@@ -8,6 +8,13 @@ doc = false
 crate-type = ["staticlib"]
 name = "query_engine"
 
+[features]
+metrics = [
+  "query-core/metrics",
+  "query-engine-common/metrics",
+  "query-engine-metrics"
+]
+
 [dependencies]
 anyhow = "1"
 async-trait = "0.1"
@@ -17,6 +24,7 @@ request-handlers = { path = "../request-handlers", features = [
 ] }
 query-connector = { path = "../connectors/query-connector" }
 query-engine-common = { path = "../../libs/query-engine-common" }
+query-engine-metrics = { path = "../../query-engine/metrics", optional = true }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 psl = { workspace = true, features = ["sqlite"] }
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }

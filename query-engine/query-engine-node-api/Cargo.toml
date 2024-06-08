@@ -9,17 +9,22 @@ crate-type = ["cdylib"]
 name = "query_engine"
 
 [features]
-default = ["driver-adapters"]
+default = ["driver-adapters", "metrics"]
 vendored-openssl = ["sql-connector/vendored-openssl"]
 driver-adapters = [
     "request-handlers/driver-adapters",
     "sql-connector/driver-adapters",
 ]
+metrics = [
+    "query-core/metrics",
+    "query-engine-common/metrics",
+    "query-engine-metrics",
+]
 
 [dependencies]
 anyhow = "1"
 async-trait.workspace = true
-query-core = { path = "../core", features = ["metrics"] }
+query-core = { path = "../core" }
 request-handlers = { path = "../request-handlers", features = ["all"] }
 query-connector = { path = "../connectors/query-connector" }
 query-engine-common = { path = "../../libs/query-engine-common" }
@@ -52,7 +57,7 @@ opentelemetry = { version = "0.17" }
 quaint.workspace = true
 tokio.workspace = true
 futures = "0.3"
-query-engine-metrics = { path = "../metrics" }
+query-engine-metrics = { path = "../metrics", optional = true }
 
 [build-dependencies]
 napi-build = "1"
