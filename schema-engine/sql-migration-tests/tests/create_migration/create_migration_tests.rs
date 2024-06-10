@@ -1312,3 +1312,70 @@ fn alter_constraint_name(mut api: TestApi) {
             migration.expect_contents(expected_script)
         });
 }
+
+#[test_connector(exclude(Mysql, Sqlite))]
+fn rename_table_with_explicit_id(mut api: TestApi) {
+    let dm1 = api.datamodel_with_provider(
+        r#"
+        model A {
+            id    Int @id(map: "custom_id")
+            other Int
+        }
+     "#,
+    );
+
+    let dir = api.create_migrations_directory();
+    api.create_migration("dm1_migration", &dm1, &dir).send_sync();
+
+    let custom_dm = api.datamodel_with_provider(
+        r#"
+        model B {
+            id    Int @id(map: "custom_id")
+            other Int 
+        }
+    "#,
+    );
+
+    let is_mssql = api.is_mssql();
+    let is_postgres = api.is_postgres();
+    let is_postgres15 = api.is_postgres_15();
+    let is_postgres16 = api.is_postgres_16();
+    let is_cockroach = api.is_cockroach();
+
+    api.create_migration("dm2_migration", &custom_dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(2)
+        .assert_migration("dm2_migration", move |migration| {
+            let expected_script = if is_mssql {
+                expect![[r#"
+                    BEGIN TRY
+
+                    BEGIN TRAN;
+
+                    -- AlterTable
+                    EXEC SP_RENAME N'dbo.A', N'B';
+
+                    COMMIT TRAN;
+
+                    END TRY
+                    BEGIN CATCH
+
+                    IF @@TRANCOUNT > 0
+                    BEGIN
+                        ROLLBACK TRAN;
+                    END;
+                    THROW
+
+                    END CATCH
+                "#]]
+            } else if is_cockroach || is_postgres || is_postgres15 || is_postgres16 {
+                expect![[r#"
+                    -- AlterTable
+                    ALTER TABLE "A" RENAME TO "B";
+                "#]]
+            } else {
+                panic!()
+            };
+            migration.expect_contents(expected_script)
+        });
+}

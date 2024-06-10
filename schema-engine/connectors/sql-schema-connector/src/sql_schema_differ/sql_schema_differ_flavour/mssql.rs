@@ -9,6 +9,10 @@ use psl::builtin_connectors::{MsSqlType, MsSqlTypeParameter};
 use sql_schema_describer::{self as sql, mssql::MssqlSchemaExt, ColumnTypeFamily, TableColumnId};
 
 impl SqlSchemaDifferFlavour for MssqlFlavour {
+    fn can_rename_tables(&self) -> bool {
+        true
+    }
+
     fn can_rename_foreign_key(&self) -> bool {
         true
     }
