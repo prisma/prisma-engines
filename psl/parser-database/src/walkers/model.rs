@@ -6,15 +6,15 @@ pub use primary_key::*;
 pub(crate) use unique_criteria::*;
 
 use super::{
-    CompleteInlineRelationWalker, FieldWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker, RelationWalker,
-    ScalarFieldWalker,
+    newline, CompleteInlineRelationWalker, FieldWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker,
+    RelationWalker, ScalarFieldWalker,
 };
+
 use crate::{
-    ast::{self, WithName},
+    ast::{self, IndentationType, NewlineType, WithName, WithSpan},
     types::ModelAttributes,
     FileId,
 };
-use schema_ast::ast::{IndentationType, NewlineType, WithSpan};
 
 /// A `model` declaration in the Prisma schema.
 pub type ModelWalker<'db> = super::Walker<'db, (FileId, ast::ModelId)>;
@@ -248,12 +248,9 @@ impl<'db> ModelWalker<'db> {
         };
 
         let src = self.db.source(self.id.0);
-        let start = field.ast_field().span().end - 2;
+        let span = field.ast_field().span();
 
-        match src.chars().nth(start) {
-            Some('\r') => NewlineType::Windows,
-            _ => NewlineType::Unix,
-        }
+        newline(src, span)
     }
 
     /// The name of the schema the model belongs to.

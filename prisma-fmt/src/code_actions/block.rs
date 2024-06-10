@@ -4,7 +4,7 @@ use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, Diagnostic, Ran
 use psl::{
     diagnostics::Span,
     parser_database::walkers::{CompositeTypeWalker, ModelWalker},
-    schema_ast::ast::WithSpan,
+    schema_ast::ast::{NewlineType, WithSpan},
 };
 
 use super::CodeActionsContext;
@@ -37,6 +37,7 @@ pub(super) fn create_missing_block_for_model(
             range,
             "model",
             actions,
+            model.newline(),
         );
         push_missing_block(
             diag,
@@ -44,6 +45,7 @@ pub(super) fn create_missing_block_for_model(
             range,
             "enum",
             actions,
+            model.newline(),
         );
 
         if let Some(ds) = context.datasource() {
@@ -54,6 +56,7 @@ pub(super) fn create_missing_block_for_model(
                     range,
                     "type",
                     actions,
+                    model.newline(),
                 );
             }
         }
@@ -88,6 +91,7 @@ pub(super) fn create_missing_block_for_type(
             range,
             "type",
             actions,
+            composite_type.newline(),
         );
         push_missing_block(
             diag,
@@ -95,6 +99,7 @@ pub(super) fn create_missing_block_for_type(
             range,
             "enum",
             actions,
+            composite_type.newline(),
         );
     })
 }
@@ -105,9 +110,10 @@ fn push_missing_block(
     range: Range,
     block_type: &str,
     actions: &mut Vec<CodeActionOrCommand>,
+    newline: NewlineType,
 ) {
     let name: &str = diag.message.split('\"').collect::<Vec<&str>>()[1];
-    let new_text = format!("\n{block_type} {name} {{\n\n}}\n");
+    let new_text = format!("\n{block_type} {name} {{{newline}{newline}}}{newline}");
     let text = TextEdit { range, new_text };
 
     let mut changes = HashMap::new();

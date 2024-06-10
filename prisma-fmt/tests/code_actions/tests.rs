@@ -48,5 +48,6 @@ scenarios! {
     mongodb_auto_native
     create_missing_block
     create_missing_block_composite_type
+    create_missing_block_composite_type_crlf
     create_missing_block_mongodb
 }
