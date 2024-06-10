@@ -32,7 +32,7 @@
                 "character": 2
               }
             },
-            "newText": "\ntype Animal {\r\n\r\n}\r\n"
+            "newText": "\r\ntype Animal {\r\n\r\n}\r\n"
           }
         ]
       }
@@ -71,7 +71,7 @@
                 "character": 2
               }
             },
-            "newText": "\nenum Animal {\r\n\r\n}\r\n"
+            "newText": "\r\nenum Animal {\r\n\r\n}\r\n"
           }
         ]
       }

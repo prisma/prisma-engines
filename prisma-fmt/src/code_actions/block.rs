@@ -113,7 +113,7 @@ fn push_missing_block(
     newline: NewlineType,
 ) {
     let name: &str = diag.message.split('\"').collect::<Vec<&str>>()[1];
-    let new_text = format!("\n{block_type} {name} {{{newline}{newline}}}{newline}");
+    let new_text = format!("{newline}{block_type} {name} {{{newline}{newline}}}{newline}");
     let text = TextEdit { range, new_text };
 
     let mut changes = HashMap::new();
