@@ -51,7 +51,7 @@ impl TryFrom<&str> for Sqlite {
             // The database is created if it does not already exist.
             rusqlite::OpenFlags::SQLITE_OPEN_READ_WRITE
                 | rusqlite::OpenFlags::SQLITE_OPEN_CREATE
-                // The new database connection will use the "serialized" threading mode.
+                // The new database connection will use the "multi-thread" threading mode.
                 | rusqlite::OpenFlags::SQLITE_OPEN_NO_MUTEX
                 // The filename can be interpreted as a URI if this flag is set.
                 | rusqlite::OpenFlags::SQLITE_OPEN_URI,
