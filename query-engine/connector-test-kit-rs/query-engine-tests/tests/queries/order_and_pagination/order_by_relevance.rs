@@ -395,41 +395,41 @@ async fn on_1m_relation_field(runner: Runner) -> TestResult<()> {
 
     // Single field required
     insta::assert_snapshot!(
-      run_query!(&runner, r#"{ findManyRelation(orderBy: { testModel: { _relevance: { fields: fieldA, search: "developer", sort: desc } } }) { id } }"#),
-      @r###"{"data":{"findManyRelation":[{"id":2},{"id":1},{"id":3}]}}"###
+      run_query!(&runner, r#"{ findManyRelation(orderBy: [{ testModel: { _relevance: { fields: fieldA, search: "developer", sort: desc } } }, { id: desc }]) { id } }"#),
+      @r###"{"data":{"findManyRelation":[{"id":2},{"id":3},{"id":1}]}}"###
     );
     insta::assert_snapshot!(
-      run_query!(&runner, r#"{ findManyRelation(orderBy: { testModel: { _relevance: { fields: fieldA, search: "developer", sort: asc } } }) { id } }"#),
+      run_query!(&runner, r#"{ findManyRelation(orderBy: [{ testModel: { _relevance: { fields: fieldA, search: "developer", sort: asc } } }, { id: asc }]) { id } }"#),
       @r###"{"data":{"findManyRelation":[{"id":1},{"id":3},{"id":2}]}}"###
     );
 
     // Single field optional
     insta::assert_snapshot!(
-      run_query!(&runner, r#"{ findManyRelation(orderBy: { testModel: { _relevance: { fields: fieldC, search: "developer", sort: desc } } }) { id } }"#),
-      @r###"{"data":{"findManyRelation":[{"id":3},{"id":1},{"id":2}]}}"###
+      run_query!(&runner, r#"{ findManyRelation(orderBy: [{ testModel: { _relevance: { fields: fieldC, search: "developer", sort: desc } } }, { id: desc }]) { id } }"#),
+      @r###"{"data":{"findManyRelation":[{"id":3},{"id":2},{"id":1}]}}"###
     );
     insta::assert_snapshot!(
-      run_query!(&runner, r#"{ findManyRelation(orderBy: { testModel: { _relevance: { fields: fieldC, search: "developer", sort: asc } } }) { id } }"#),
+      run_query!(&runner, r#"{ findManyRelation(orderBy: [{ testModel: { _relevance: { fields: fieldC, search: "developer", sort: asc } } }, { id: asc }]) { id } }"#),
       @r###"{"data":{"findManyRelation":[{"id":1},{"id":2},{"id":3}]}}"###
     );
 
     // Many fields required
     insta::assert_snapshot!(
-      run_query!(&runner, r#"{ findManyRelation(orderBy: { testModel: { _relevance: { fields: [fieldA, fieldB], search: "developer", sort: desc } } }) { id } }"#),
+      run_query!(&runner, r#"{ findManyRelation(orderBy: [{ testModel: { _relevance: { fields: [fieldA, fieldB], search: "developer", sort: desc } } }, { id: desc }]) { id } }"#),
       @r###"{"data":{"findManyRelation":[{"id":1},{"id":2},{"id":3}]}}"###
     );
     insta::assert_snapshot!(
-      run_query!(&runner, r#"{ findManyRelation(orderBy: { testModel: { _relevance: { fields: [fieldA, fieldB], search: "developer", sort: asc } } }) { id } }"#),
+      run_query!(&runner, r#"{ findManyRelation(orderBy: [{ testModel: { _relevance: { fields: [fieldA, fieldB], search: "developer", sort: asc } } }, { id: asc }]) { id } }"#),
       @r###"{"data":{"findManyRelation":[{"id":3},{"id":2},{"id":1}]}}"###
     );
 
     // Many fields optional
     insta::assert_snapshot!(
-      run_query!(&runner, r#"{ findManyRelation(orderBy: { testModel: { _relevance: { fields: [fieldB, fieldC], search: "developer", sort: desc } } }) { id } }"#),
+      run_query!(&runner, r#"{ findManyRelation(orderBy: [{ testModel: { _relevance: { fields: [fieldB, fieldC], search: "developer", sort: desc } } }, { id: desc }]) { id } }"#),
       @r###"{"data":{"findManyRelation":[{"id":1},{"id":3},{"id":2}]}}"###
     );
     insta::assert_snapshot!(
-      run_query!(&runner, r#"{ findManyRelation(orderBy: { testModel: { _relevance: { fields: [fieldB, fieldC], search: "developer", sort: asc } } }) { id } }"#),
+      run_query!(&runner, r#"{ findManyRelation(orderBy: [{ testModel: { _relevance: { fields: [fieldB, fieldC], search: "developer", sort: asc } } }, { id: asc }]) { id } }"#),
       @r###"{"data":{"findManyRelation":[{"id":2},{"id":3},{"id":1}]}}"###
     );
 
