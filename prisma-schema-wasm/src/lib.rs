@@ -19,6 +19,9 @@ fn register_panic_hook() {
     static SET_HOOK: Once = Once::new();
 
     SET_HOOK.call_once(|| {
+        #[cfg(feature = "wasm-logger")]
+        wasm_logger::init(wasm_logger::Config::default());
+
         panic::set_hook(Box::new(|info| {
             let message = &info.to_string();
             prisma_set_wasm_panic_message(message);
