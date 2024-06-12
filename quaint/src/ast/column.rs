@@ -5,7 +5,7 @@ use crate::{
 };
 use std::borrow::Cow;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TypeDataLength {
     Constant(u16),
     Maximum,

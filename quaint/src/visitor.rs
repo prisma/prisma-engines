@@ -165,11 +165,22 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
+    fn visit_parameterized_text(&mut self, txt: Option<Cow<'a, str>>, nt: Option<NativeColumnType<'a>>) -> Result {
+        self.add_parameter(Value {
+            typed: ValueType::Text(txt),
+            native_column_type: nt,
+        });
+        self.parameter_substitution()?;
+
+        Ok(())
+    }
+
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: Value<'a>) -> Result {
         match value.typed {
             ValueType::Enum(Some(variant), name) => self.visit_parameterized_enum(variant, name),
             ValueType::EnumArray(Some(variants), name) => self.visit_parameterized_enum_array(variants, name),
+            ValueType::Text(txt) => self.visit_parameterized_text(txt, value.native_column_type),
             _ => {
                 self.add_parameter(value);
                 self.parameter_substitution()
