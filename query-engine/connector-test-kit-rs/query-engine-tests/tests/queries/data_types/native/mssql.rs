@@ -92,6 +92,18 @@ mod string {
             .iter()
             .any(|log| log.contains("WHERE [string_native_string].[Parent].[vCharMax] = CAST(@P1 AS VARCHAR(MAX))")));
 
+        // Ensure it works as well with gt
+        runner.clear_logs().await;
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyParent(where: { vChar40: { gt: "0" } }) { id vChar40 } }"#),
+          @r###"{"data":{"findManyParent":[{"id":1,"vChar40":"0123456789012345678901234567890123456789"}]}}"###
+        );
+        assert!(runner
+            .get_logs()
+            .await
+            .iter()
+            .any(|log| log.contains("WHERE [string_native_string].[Parent].[vChar40] > CAST(@P1 AS VARCHAR(40))")));
+
         Ok(())
     }
 
