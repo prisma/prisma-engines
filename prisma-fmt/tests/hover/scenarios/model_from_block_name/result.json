@@ -1,0 +1,6 @@
+{
+  "contents": {
+    "kind": "markdown",
+    "value": "```prisma\nmodel ModelNameB {}\n```\n___\nThis is doc for B"
+  }
+}
