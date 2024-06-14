@@ -144,7 +144,7 @@ pub(super) fn url_env_db_completion(completion_list: &mut CompletionList, kind: 
         _ => unreachable!(),
     };
 
-    let insert_text = if add_quotes(ctx.params, ctx.db.source(ctx.initiating_file_id)) {
+    let insert_text = if add_quotes(&ctx.params, ctx.db.source(ctx.initiating_file_id)) {
         format!(r#""{text}""#)
     } else {
         text.to_owned()
