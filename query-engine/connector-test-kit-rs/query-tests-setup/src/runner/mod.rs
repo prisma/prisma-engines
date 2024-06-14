@@ -599,6 +599,10 @@ impl Runner {
         }
     }
 
+    pub async fn clear_logs(&mut self) {
+        self.log_capture.clear_logs().await
+    }
+
     pub fn connector_version(&self) -> &ConnectorVersion {
         &self.version
     }

@@ -331,4 +331,8 @@ impl TestLogCapture {
 
         logs
     }
+
+    pub async fn clear_logs(&mut self) {
+        while self.rx.try_recv().is_ok() {}
+    }
 }

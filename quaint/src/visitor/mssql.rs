@@ -1,4 +1,4 @@
-use super::Visitor;
+use super::{NativeColumnType, Visitor};
 #[cfg(any(feature = "postgresql", feature = "mysql"))]
 use crate::prelude::{JsonArrayAgg, JsonBuildObject, JsonExtract, JsonType, JsonUnquote};
 use crate::{
@@ -10,7 +10,7 @@ use crate::{
     prelude::{Aliasable, Average, Query},
     visitor, Value, ValueType,
 };
-use std::{convert::TryFrom, fmt::Write, iter};
+use std::{borrow::Cow, convert::TryFrom, fmt::Write, iter};
 
 static GENERATED_KEYS: &str = "@generated_keys";
 
@@ -176,6 +176,14 @@ impl<'a> Mssql<'a> {
 
         Ok(())
     }
+
+    fn visit_text(&mut self, txt: Option<Cow<'a, str>>, nt: Option<NativeColumnType<'a>>) -> visitor::Result {
+        self.add_parameter(Value {
+            typed: ValueType::Text(txt),
+            native_column_type: nt,
+        });
+        self.parameter_substitution()
+    }
 }
 
 impl<'a> Visitor<'a> for Mssql<'a> {
@@ -205,6 +213,39 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
     fn add_parameter(&mut self, value: Value<'a>) {
         self.parameters.push(value)
+    }
+
+    fn visit_parameterized_text(
+        &mut self,
+        txt: Option<Cow<'a, str>>,
+        nt: Option<NativeColumnType<'a>>,
+    ) -> visitor::Result {
+        match nt {
+            Some(nt) => match (nt.name.as_ref(), nt.length) {
+                // Tiberius encodes strings as NVARCHAR by default. This causes implicit coercions which avoids using indexes.
+                // This cast ensures that VARCHAR instead.
+                ("VARCHAR", length) => self.surround_with("CAST(", ")", |this| {
+                    this.visit_text(txt, Some(nt))?;
+                    this.write(" AS VARCHAR")?;
+
+                    match length {
+                        Some(TypeDataLength::Constant(length)) => {
+                            this.write("(")?;
+                            this.write(length)?;
+                            this.write(")")?;
+                        }
+                        Some(TypeDataLength::Maximum) => {
+                            this.write("(MAX)")?;
+                        }
+                        None => (),
+                    }
+
+                    Ok(())
+                }),
+                _ => self.visit_text(txt, Some(nt)),
+            },
+            nt => self.visit_text(txt, nt),
+        }
     }
 
     /// A point to modify an incoming query to make it compatible with the
