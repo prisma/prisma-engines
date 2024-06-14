@@ -14,7 +14,7 @@ model SomeUser {
     posts Post[]
 }
 
-// comment
+/// абвгд
 model Post {
     id     Int      @id
     userId Int

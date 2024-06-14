@@ -31,6 +31,7 @@ scenarios! {
     one_to_one_referencing_side_misses_unique_compound_field_indentation_four_spaces
     relation_mode_prisma_missing_index
     relation_mode_prisma_missing_index_multifile
+    relation_mode_prisma_missing_index_multibyte
     relation_mode_referential_integrity
     relation_mode_mysql_foreign_keys_set_default
     relation_mode_mysql_foreign_keys_set_default_multifile
