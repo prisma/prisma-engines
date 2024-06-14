@@ -2,6 +2,7 @@ mod actions;
 mod code_actions;
 mod get_config;
 mod get_dmmf;
+mod hover;
 mod lint;
 mod merge_schemas;
 mod native;
@@ -106,6 +107,31 @@ pub fn references(schema_files: String, params: &str) -> String {
 
     let references = references::references(input.into(), params);
     serde_json::to_string(&references).unwrap()
+}
+
+pub fn hover(schema_files: String, params: &str) -> String {
+    info!("Calling Hover");
+    let schema: SchemaFileInput = match serde_json::from_str(&schema_files) {
+        Ok(schema) => schema,
+        Err(serde_err) => {
+            info!("Failed to deserialize SchemaFileInput");
+            panic!("Failed to deserialize SchemaFileInput: {serde_err}")
+        }
+    };
+
+    let params: lsp_types::HoverParams = match serde_json::from_str(params) {
+        Ok(params) => params,
+        Err(_) => {
+            info!("Failed to deserialize Hover");
+            panic!("Failed to deserialise Hover")
+        }
+    };
+
+    let hover = hover::run(schema.into(), params);
+
+    info!("{:?}", hover);
+
+    serde_json::to_string(&hover).unwrap()
 }
 
 /// The two parameters are:
