@@ -351,3 +351,306 @@ mod multiple_cascading_paths {
         Ok(())
     }
 }
+
+///
+/// This test suite is for testing the behaviour of cascading deletes on implicit m2m when
+/// relation_mode is prisma (i.e. cascade deletion is emulated)
+///
+#[test_suite(
+    suite = "cascade_on_im2m_prisma_rm",
+    schema(implicit_m2m::schema),
+    relation_mode = "prisma",
+    capabilities(ImplicitManyToManyRelation),
+    exclude(MongoDB, SqlServer)
+)]
+mod implicit_m2m_prisma {
+    #[connector_test]
+    async fn delete_one_deletes_pivot_records(runner: Runner) -> TestResult<()> {
+        implicit_m2m::delete_one_deletes_pivot_records(
+            runner,
+            "cascade_on_im2m_prisma_rm_delete_one_deletes_pivot_records",
+        )
+        .await
+    }
+
+    #[connector_test]
+    async fn delete_many_deletes_pivot_records(runner: Runner) -> TestResult<()> {
+        implicit_m2m::delete_many_deletes_pivot_records(
+            runner,
+            "cascade_on_im2m_prisma_rm_delete_many_deletes_pivot_records",
+        )
+        .await
+    }
+}
+
+///
+/// This test suite is for testing the behaviour of cascading deletes on implicit m2m when
+/// relation_mode is the default (i.e. foreing keys are used)
+///
+#[test_suite(
+    suite = "cascade_on_im2m_fk_rm",
+    schema(implicit_m2m::schema),
+    relation_mode = "foreignkeys",
+    capabilities(ImplicitManyToManyRelation, NamedForeignKeys),
+    exclude(MongoDB, SqlServer)
+)]
+mod implicit_m2m_fk {
+
+    #[connector_test]
+    async fn delete_one_deletes_pivot_records(runner: Runner) -> TestResult<()> {
+        implicit_m2m::delete_one_deletes_pivot_records(runner, "cascade_on_im2m_fk_rm_delete_one_deletes_pivot_records")
+            .await
+    }
+
+    #[connector_test]
+    async fn delete_many_deletes_pivot_records(runner: Runner) -> TestResult<()> {
+        implicit_m2m::delete_many_deletes_pivot_records(
+            runner,
+            "cascade_on_im2m_fk_rm_delete_many_deletes_pivot_records",
+        )
+        .await
+    }
+}
+
+mod implicit_m2m {
+    use indoc::indoc;
+    use query_engine_tests::utils::*;
+    use query_engine_tests::*;
+
+    macro_rules! assert_pivot_row_count {
+      ($runner:expr, $db_name:expr, $col:literal, $val:literal, $count:literal) => {
+          let raw_query = match $runner.connector_version() {
+              ConnectorVersion::Postgres(_) | ConnectorVersion::CockroachDb => {
+                  format!(
+                      r#"SELECT COUNT(*) FROM "{}"."_CategoryToItem" where "{}" = $1"#,
+                      $db_name, $col
+                  )
+              },
+              ConnectorVersion::MySql(_) => {
+                  format!(
+                      r#"SELECT COUNT(*) as count FROM `{}`.`_CategoryToItem` where `{}` = ?"#,
+                      $db_name, $col
+                  )
+              },
+              ConnectorVersion::Sqlite => {
+                  format!(
+                      r#"SELECT COUNT(*) as count FROM _CategoryToItem where `{}` = ?"#,
+                      $col
+                  )
+              },
+              _ => todo!(),
+          };
+          let query = fmt_query_raw(&raw_query, vec![$val.into()]);
+          let snapshot = format!("{{\"data\":{{\"queryRaw\":[{{\"count\":{{\"prisma__type\":\"bigint\",\"prisma__value\":\"{}\"}}}}]}}}}", $count);
+
+          insta::assert_snapshot!(
+              insta::_macro_support::ReferenceValue::Inline(&snapshot),
+              run_query!($runner, query),
+              &snapshot
+          );
+      };
+    }
+
+    pub fn schema() -> String {
+        let schema = indoc! {
+            r#"model Item {
+                #id(id, Int, @id)
+                categories Category[]
+            }
+
+            model Category {
+                #id(id, Int, @id)              
+                items Item[]
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    pub async fn delete_one_deletes_pivot_records(runner: Runner, db_name: &str) -> TestResult<()> {
+        // ┌────────┐                            ┌────────┐
+        // │Category│                            │  Item  │
+        // ├────────┤    ┌──────────────────┐    ├────────┤
+        // │   id   │◀┐  │ _CategoryToItem  │ ┌─▶│   id   │
+        // ├────────┤ │  ├─────────┬────────┤ │  ├────────┤
+        // │   1    │ └──│    A    │   B    │─┘  │   1    │
+        // └────────┘    ├─────────┼────────┤    ├────────┤
+        //               │    1    │   1    │    │   2    │
+        //               ├─────────┼────────┤    └────────┘
+        //               │    1    │   2    │
+        //               └─────────┴────────┘
+        run_query!(
+            &runner,
+            r#"
+            mutation {
+              createOneCategory(data: {
+                id: 1,
+                items: {
+                  create: [
+                    { id: 1 },
+                    { id: 2 }
+                  ]
+                }
+              }) {
+                id
+              }
+            }"#
+        );
+        assert_pivot_row_count!(&runner, db_name, "B", 1, 1);
+        assert_pivot_row_count!(&runner, db_name, "B", 2, 1);
+        assert_pivot_row_count!(&runner, db_name, "A", 1, 2);
+
+        // ┌────────┐                            ┌────────┐
+        // │Category│                            │  Item  │
+        // ├────────┤    ┌──────────────────┐    ├────────┤
+        // │   id   │◀┐  │ _CategoryToItem  │ ┌─▶│   id   │
+        // ├────────┤ │  ├─────────┬────────┤ │  ├────────┤
+        // │   1    │ └──│    A    │   B    │─┘  │   1    │
+        // └────────┘    ├─────────┼────────┤    └────────┘
+        //               │    1    │   1    │
+        //               └─────────┴────────┘
+        run_query!(
+            &runner,
+            r#"
+              mutation {
+                deleteOneItem(where: { id: 2 }) {
+                  id
+                }
+              }
+            "#
+        );
+        assert_pivot_row_count!(&runner, db_name, "B", 2, 0);
+        assert_pivot_row_count!(&runner, db_name, "B", 1, 1);
+
+        // ┌────────┐                            ┌────────┐
+        // │Category│                            │  Item  │
+        // ├────────┤    ┌──────────────────┐    ├────────┤
+        // │   id   │◀┐  │ _CategoryToItem  │ ┌─▶│   id   │
+        // └────────┘ │  ├─────────┬────────┤ │  ├────────┤
+        //            └──│    A    │   B    │─┘  │   1    │
+        //               └─────────┴────────┘    └────────┘
+        run_query!(
+            &runner,
+            r#"
+              mutation {
+                deleteOneCategory(where: { id: 1 }) {
+                  id
+                }
+              }
+            "#
+        );
+        assert_pivot_row_count!(&runner, db_name, "B", 1, 0);
+
+        Ok(())
+    }
+
+    pub async fn delete_many_deletes_pivot_records(runner: Runner, db_name: &str) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"
+            mutation {
+              createOneCategory(data: {
+                id: 1,
+                items: {
+                  create: [
+                    { id: 1 },
+                    { id: 2 }
+                  ]
+                }
+              }) {
+                id
+              }
+            }"#
+        );
+        run_query!(
+            &runner,
+            r#"
+            mutation {
+              createOneCategory(data: {
+                id: 2,
+                items: {
+                 create: [
+                    { id: 3 },
+                    { id: 4 }
+                  ]
+                }
+              }) {
+                id
+              }
+            }"#
+        );
+        // ┌────────┐                            ┌────────┐
+        // │Category│                            │  Item  │
+        // ├────────┤    ┌──────────────────┐    ├────────┤
+        // │   id   │◀┐  │ _CategoryToItem  │ ┌─▶│   id   │
+        // ├────────┤ │  ├─────────┬────────┤ │  ├────────┤
+        // │   1    │ └──│    A    │   B    │─┘  │   1    │
+        // ├────────┤    ├─────────┼────────┤    ├────────┤
+        // │   2    │    │    1    │   1    │    │   2    │
+        // └────────┘    ├─────────┼────────┤    ├────────┤
+        //               │    1    │   2    │    │   3    │
+        //               ├─────────┼────────┤    ├────────┤
+        //               │    2    │   3    │    │   4    │
+        //               ├─────────┼────────┤    └────────┘
+        //               │    2    │   4    │
+        //               └─────────┴────────┘
+        assert_pivot_row_count!(&runner, db_name, "A", 1, 2);
+        assert_pivot_row_count!(&runner, db_name, "A", 2, 2);
+        assert_pivot_row_count!(&runner, db_name, "B", 1, 1);
+        assert_pivot_row_count!(&runner, db_name, "B", 2, 1);
+        assert_pivot_row_count!(&runner, db_name, "B", 3, 1);
+        assert_pivot_row_count!(&runner, db_name, "B", 4, 1);
+
+        run_query!(
+            &runner,
+            r#"
+              mutation {
+                deleteManyItem(where: {id: {in: [2,3]}}) {
+                  count
+                }
+              }
+            "#
+        );
+        // ┌────────┐                            ┌────────┐
+        // │Category│                            │  Item  │
+        // ├────────┤    ┌──────────────────┐    ├────────┤
+        // │   id   │◀┐  │ _CategoryToItem  │ ┌─▶│   id   │
+        // ├────────┤ │  ├─────────┬────────┤ │  ├────────┤
+        // │   1    │ └──│    A    │   B    │─┘  │   1    │
+        // ├────────┤    ├─────────┼────────┤    ├────────┤
+        // │   2    │    │    1    │   1    │    │   4    │
+        // └────────┘    ├─────────┼────────┤    └────────┘
+        //               │    2    │   4    │
+        //               └─────────┴────────┘
+        assert_pivot_row_count!(&runner, db_name, "B", 1, 1);
+        assert_pivot_row_count!(&runner, db_name, "B", 2, 0);
+        assert_pivot_row_count!(&runner, db_name, "B", 3, 0);
+        assert_pivot_row_count!(&runner, db_name, "B", 4, 1);
+        assert_pivot_row_count!(&runner, db_name, "A", 1, 1);
+        assert_pivot_row_count!(&runner, db_name, "A", 2, 1);
+
+        run_query!(
+            &runner,
+            r#"
+              mutation {
+                deleteManyCategory(where: {id: {in: [1,2]}}) {
+                  count
+                }
+              }
+            "#
+        );
+        // ┌────────┐                            ┌────────┐
+        // │Category│                            │  Item  │
+        // ├────────┤    ┌──────────────────┐    ├────────┤
+        // │   id   │◀┐  │ _CategoryToItem  │ ┌─▶│   id   │
+        // └────────┘ │  ├─────────┬────────┤ │  ├────────┤
+        //            └──│    A    │   B    │─┘  │   1    │
+        //               └─────────┴────────┘    └────────┘
+        assert_pivot_row_count!(&runner, db_name, "B", 1, 0);
+        assert_pivot_row_count!(&runner, db_name, "B", 4, 0);
+        assert_pivot_row_count!(&runner, db_name, "A", 1, 0);
+        assert_pivot_row_count!(&runner, db_name, "A", 1, 0);
+
+        Ok(())
+    }
+}
