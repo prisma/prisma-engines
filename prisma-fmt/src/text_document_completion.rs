@@ -204,7 +204,7 @@ fn ds_has_prop(ctx: &CompletionContext<'_>, prop: &str) -> bool {
 
 fn push_namespaces(ctx: CompletionContext<'_>, completion_list: &mut CompletionList) {
     for (namespace, _) in ctx.namespaces() {
-        let insert_text = if add_quotes(ctx.params, ctx.db.source(ctx.initiating_file_id)) {
+        let insert_text = if add_quotes(&ctx.params, ctx.db.source(ctx.initiating_file_id)) {
             format!(r#""{namespace}""#)
         } else {
             namespace.to_string()

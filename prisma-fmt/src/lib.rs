@@ -13,7 +13,6 @@ mod text_document_completion;
 mod validate;
 
 use log::*;
-pub use offsets::span_to_range;
 use psl::{
     datamodel_connector::Connector, diagnostics::FileId, parser_database::ParserDatabase, Configuration, Datasource,
     Generator,
