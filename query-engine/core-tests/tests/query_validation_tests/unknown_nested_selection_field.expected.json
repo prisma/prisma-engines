@@ -1,0 +1,42 @@
+{
+  "is_panic": false,
+  "message": "Field 'notAField' not found in enclosing type 'User'",
+  "meta": {
+    "kind": "UnknownSelectionField",
+    "outputType": {
+      "name": "User",
+      "fields": [
+        {
+          "name": "id",
+          "typeName": "Int",
+          "isRelation": false
+        },
+        {
+          "name": "email",
+          "typeName": "String",
+          "isRelation": false
+        },
+        {
+          "name": "dob",
+          "typeName": "DateTime",
+          "isRelation": false
+        },
+        {
+          "name": "posts",
+          "typeName": "Post[]",
+          "isRelation": true
+        },
+        {
+          "name": "_count",
+          "typeName": "UserCountOutputType",
+          "isRelation": false
+        }
+      ]
+    },
+    "selectionPath": [
+      "findManyUser",
+      "notAField"
+    ]
+  },
+  "error_code": "P2009"
+}

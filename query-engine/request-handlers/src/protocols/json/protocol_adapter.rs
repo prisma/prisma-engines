@@ -101,26 +101,23 @@ impl<'a> JsonProtocolAdapter<'a> {
                 // <field_name>: { selection: { ... }, arguments: { ... } }
                 crate::SelectionSetValue::Nested(nested_query) => {
                     if field.field_type().as_object_type().is_some() {
-                        let schema_field = field
+                        if let Some(schema_field) = field
                             .field_type()
                             .as_object_type()
                             .and_then(|t| t.find_field(&selection_name))
-                            .ok_or_else(|| {
-                                HandlerError::query_conversion(format!(
-                                    "Unknown nested field '{}' for operation {} does not match any query.",
-                                    selection_name,
-                                    field.name()
-                                ))
-                            })?;
+                        {
+                            let field = container.and_then(|container| container.find_field(schema_field.name()));
+                            let nested_container = field.map(|f| f.related_container());
 
-                        let field = container.and_then(|container| container.find_field(schema_field.name()));
-                        let nested_container = field.map(|f| f.related_container());
-
-                        selection.push_nested_selection(self.convert_selection(
-                            schema_field,
-                            nested_container.as_ref(),
-                            nested_query,
-                        )?);
+                            selection.push_nested_selection(self.convert_selection(
+                                schema_field,
+                                nested_container.as_ref(),
+                                nested_query,
+                            )?);
+                        } else {
+                            // Unknown nested field that we keep around so that parser can fail with a rich error.
+                            selection.push_nested_selection(Selection::with_name(selection_name));
+                        }
                     }
                 }
             }
