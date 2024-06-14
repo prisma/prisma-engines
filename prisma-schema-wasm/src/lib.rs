@@ -117,6 +117,12 @@ pub fn references(schema: String, params: String) -> String {
     prisma_fmt::references(schema, &params)
 }
 
+#[wasm_bindgen]
+pub fn hover(schema_files: String, params: String) -> String {
+    register_panic_hook();
+    prisma_fmt::hover(schema_files, &params)
+}
+
 /// Trigger a panic inside the wasm module. This is only useful in development for testing panic
 /// handling.
 #[wasm_bindgen]
