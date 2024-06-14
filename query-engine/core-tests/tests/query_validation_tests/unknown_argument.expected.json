@@ -16,8 +16,8 @@
       {
         "name": "orderBy",
         "typeNames": [
-          "UserOrderByWithRelationAndSearchRelevanceInput[]",
-          "UserOrderByWithRelationAndSearchRelevanceInput"
+          "UserOrderByWithRelationInput[]",
+          "UserOrderByWithRelationInput"
         ]
       },
       {
