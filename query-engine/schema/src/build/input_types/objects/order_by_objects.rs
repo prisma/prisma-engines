@@ -30,7 +30,7 @@ impl OrderByOptions {
         ) {
             (true, false, _) => "WithRelation",
             (false, true, false) => "WithAggregation",
-            _ => unreachable!(),
+            _ => "",
         }
     }
 }
