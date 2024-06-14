@@ -69,10 +69,7 @@ fn hover(ctx: HoverContext<'_>) -> Hover {
 
             let top = ast.iter_tops().find(|(_, top)| top.name() == name);
 
-            let doc = match top.and_then(|(_, top)| top.documentation()) {
-                Some(documentation) => documentation,
-                None => "",
-            };
+            let doc = top.and_then(|(_, top)| top.documentation()).unwrap_or("");
 
             format_hover_content(doc, "model", name)
         }
