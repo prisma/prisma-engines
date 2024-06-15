@@ -191,6 +191,10 @@ impl<'ast> FieldPosition<'ast> {
             }
         }
 
+        if field.field_type.span().contains(position) {
+            return FieldPosition::Type(field.field_type.name());
+        }
+
         FieldPosition::Field
     }
 }

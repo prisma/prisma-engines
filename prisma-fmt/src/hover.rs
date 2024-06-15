@@ -54,9 +54,7 @@ fn hover(ctx: HoverContext<'_>) -> Hover {
 
     let ast = ctx.db.ast(ctx.initiating_file_id);
     let contents = match ast.find_at_position(position) {
-        psl::schema_ast::ast::SchemaPosition::TopLevel => {
-            format_hover_content("documentation", "top_variant", "top_name")
-        }
+        psl::schema_ast::ast::SchemaPosition::TopLevel => format_hover_content("", "", ""),
         psl::schema_ast::ast::SchemaPosition::Model(_model_id, model_position) => {
             info!("We're inside a model");
             info!("We are here: {:?}", model_position);
@@ -64,30 +62,47 @@ fn hover(ctx: HoverContext<'_>) -> Hover {
             let name = match model_position {
                 ast::ModelPosition::Name(name) => name,
                 ast::ModelPosition::Field(_, FieldPosition::Type(name)) => name,
-                _ => todo!(),
+                _ => "",
             };
 
-            let top = ast.iter_tops().find(|(_, top)| top.name() == name);
+            info!("{}", name);
 
-            let doc = top.and_then(|(_, top)| top.documentation()).unwrap_or("");
+            let top = ctx.db.iter_tops().find(|(_, _, top)| top.name() == name);
 
-            format_hover_content(doc, "model", name)
+            info!("{:?}", top);
+
+            let (variant, doc) = match top.map(|(_file_id, _top_id, top)| top) {
+                Some(top) => {
+                    let doc = top.documentation().unwrap_or("");
+                    (top.get_type(), doc)
+                }
+                None => ("", ""),
+            };
+
+            format_hover_content(doc, variant, name)
         }
         psl::schema_ast::ast::SchemaPosition::Enum(_enum_id, enum_position) => {
             info!("We are here: {:?}", enum_position);
-            format_hover_content("documentation", "top_variant", "top_name")
+            format_hover_content("", "", "")
         }
         psl::schema_ast::ast::SchemaPosition::DataSource(_ds_id, source_position) => {
             info!("We are here: {:?}", source_position);
-            format_hover_content("documentation", "top_variant", "top_name")
+            format_hover_content("", "", "")
         }
     };
 
     Hover { contents, range: None }
 }
 
-fn format_hover_content(documentation: &str, top_variant: &str, top_name: &str) -> HoverContents {
-    let full_signature = format!("```prisma\n{top_variant} {top_name} {{}}\n```\n___\n{documentation}");
+fn format_hover_content(documentation: &str, variant: &str, top_name: &str) -> HoverContents {
+    let fancy_line_break = String::from("\n___\n");
+    let prisma_display = match variant {
+        "model" | "enum" | "view" | "composite type" => {
+            format!("```prisma\n{variant} {top_name} {{}}\n```{fancy_line_break}")
+        }
+        _ => "".to_owned(),
+    };
+    let full_signature = format!("{prisma_display}{documentation}");
 
     HoverContents::Markup(MarkupContent {
         kind: MarkupKind::Markdown,
