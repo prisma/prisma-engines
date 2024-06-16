@@ -50,9 +50,15 @@ pub(crate) fn range_to_span(range: Range, document: &str, file_id: FileId) -> Sp
     Span::new(start, end, file_id)
 }
 
-/// Gives the LSP position right after the given span.
+/// Gives the LSP position right after the given span, skipping any trailing newlines
 pub(crate) fn position_after_span(span: Span, document: &str) -> Position {
-    offset_to_position(span.end - 1, document)
+    let end = match (document.chars().nth(span.end - 2), document.chars().nth(span.end - 1)) {
+        (Some('\r'), Some('\n')) => span.end - 2,
+        (_, Some('\n')) => span.end - 1,
+        _ => span.end,
+    };
+
+    offset_to_position(end, document)
 }
 
 /// Converts the byte offset to the offset used in the LSP, which is the number of the UTF-16 code unit.
@@ -99,6 +105,7 @@ pub fn offset_to_position(offset: usize, document: &str) -> Position {
 #[cfg(test)]
 mod tests {
     use lsp_types::Position;
+    use psl::diagnostics::{FileId, Span};
 
     // On Windows, a newline is actually two characters.
     #[test]
@@ -109,6 +116,33 @@ mod tests {
         let found_offset = super::position_to_offset(&Position { line: 2, character: 4 }, schema).unwrap();
 
         assert_eq!(found_offset, expected_offset);
+    }
+
+    #[test]
+    fn position_after_span_no_newline() {
+        let str = "some string";
+        let span = Span::new(0, str.len(), FileId::ZERO);
+        let pos = super::position_after_span(span, str);
+        assert_eq!(pos.line, 0);
+        assert_eq!(pos.character, 11);
+    }
+
+    #[test]
+    fn position_after_span_lf() {
+        let str = "some string\n";
+        let span = Span::new(0, str.len(), FileId::ZERO);
+        let pos = super::position_after_span(span, str);
+        assert_eq!(pos.line, 0);
+        assert_eq!(pos.character, 11);
+    }
+
+    #[test]
+    fn position_after_span_crlf() {
+        let str = "some string\r\n";
+        let span = Span::new(0, str.len(), FileId::ZERO);
+        let pos = super::position_after_span(span, str);
+        assert_eq!(pos.line, 0);
+        assert_eq!(pos.character, 11);
     }
 
     // In the LSP protocol, the number of the UTF-16 code unit should be used as the offset.
