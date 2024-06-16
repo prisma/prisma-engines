@@ -81,11 +81,10 @@ fn generate_types_rs(mut file: impl std::io::Write, api: &Api) -> CrateResult {
             file.write_all(b"\n/// ```\n")?;
         }
 
-        writeln!(
-            file,
-            "#[derive(Serialize, Deserialize, Debug)]\npub struct {} {{",
-            rustify_type_name(type_name)
-        )?;
+        writeln!(file, "#[derive(Serialize, Deserialize, Debug)]",)?;
+
+        writeln!(file, "pub struct {} {{", rustify_type_name(type_name))?;
+
         for (field_name, field) in &record_type.fields {
             if let Some(description) = &field.description {
                 for line in description.lines() {

@@ -17,6 +17,7 @@ mod scalar_field;
 
 pub use crate::types::RelationFieldId;
 pub use composite_type::*;
+use diagnostics::Span;
 pub use field::*;
 pub use index::*;
 pub use model::*;
@@ -24,7 +25,7 @@ pub use r#enum::*;
 pub use relation::*;
 pub use relation_field::*;
 pub use scalar_field::*;
-use schema_ast::ast::WithSpan;
+use schema_ast::ast::{NewlineType, WithSpan};
 
 use crate::{ast, FileId};
 
@@ -51,6 +52,16 @@ where
     #[allow(unconditional_recursion)]
     fn eq(&self, other: &Self) -> bool {
         self.id.eq(&other.id)
+    }
+}
+
+/// Retrieves newline variant for a block.
+pub(crate) fn newline(source: &str, span: Span) -> NewlineType {
+    let start = span.end - 2;
+
+    match source.chars().nth(start) {
+        Some('\r') => NewlineType::Windows,
+        _ => NewlineType::Unix,
     }
 }
 
@@ -139,6 +150,12 @@ impl crate::ParserDatabase {
         self.iter_tops()
             .filter_map(|(file_id, top_id, _)| top_id.as_composite_type_id().map(|id| (file_id, id)))
             .map(|id| self.walk(id))
+    }
+
+    /// Walk all composite types in specified file
+    pub fn walk_composite_types_in_file(&self, file_id: FileId) -> impl Iterator<Item = CompositeTypeWalker<'_>> + '_ {
+        self.walk_composite_types()
+            .filter(move |walker| walker.is_defined_in_file(file_id))
     }
 
     /// Walk all scalar field defaults with a function not part of the common ones.

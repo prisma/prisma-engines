@@ -97,19 +97,19 @@ impl<'a> qe_setup::ExternalInitializer<'a> for ExternalExecutorInitializer<'a> {
     async fn init_with_migration(
         &self,
         migration_script: String,
-    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    ) -> Result<qe_setup::InitResult, Box<dyn std::error::Error + Send + Sync>> {
         let migration_script = Some(migration_script);
-        executor_process_request("initializeSchema", json!({ "schemaId": self.schema_id, "schema": self.schema, "url": self.url, "migrationScript": migration_script })).await?;
-        Ok(())
+        let init_result = executor_process_request("initializeSchema", json!({ "schemaId": self.schema_id, "schema": self.schema, "url": self.url, "migrationScript": migration_script })).await?;
+        Ok(init_result)
     }
 
-    async fn init(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        executor_process_request(
+    async fn init(&self) -> Result<qe_setup::InitResult, Box<dyn std::error::Error + Send + Sync>> {
+        let init_result = executor_process_request(
             "initializeSchema",
             json!({ "schemaId": self.schema_id, "schema": self.schema, "url": self.url }),
         )
         .await?;
-        Ok(())
+        Ok(init_result)
     }
 
     fn url(&self) -> &'a str {
@@ -207,6 +207,7 @@ pub struct Runner {
     metrics: MetricRegistry,
     protocol: EngineProtocol,
     log_capture: TestLogCapture,
+    local_max_bind_values: Option<usize>,
 }
 
 impl Runner {
@@ -222,7 +223,8 @@ impl Runner {
     }
 
     pub fn max_bind_values(&self) -> Option<usize> {
-        self.connector_version().max_bind_values()
+        self.local_max_bind_values
+            .or_else(|| self.connector_version().max_bind_values())
     }
 
     pub async fn load(
@@ -230,6 +232,7 @@ impl Runner {
         db_schemas: &[&str],
         connector_version: ConnectorVersion,
         connector_tag: ConnectorTag,
+        override_local_max_bind_values: Option<usize>,
         metrics: MetricRegistry,
         log_capture: TestLogCapture,
     ) -> TestResult<Self> {
@@ -238,17 +241,19 @@ impl Runner {
         let datasource = schema.configuration.datasources.first().unwrap();
         let url = datasource.load_url(|key| env::var(key).ok()).unwrap();
 
-        let (executor, db_version) = match crate::CONFIG.with_driver_adapter() {
+        let (executor, db_version, init_external_result) = match crate::CONFIG.with_driver_adapter() {
             Some(with_driver_adapter) => {
                 let external_executor = ExternalExecutor::new();
-                let external_initializer: ExternalExecutorInitializer<'_> =
-                    external_executor.init(&datamodel, url.as_str());
-                let executor = RunnerExecutor::External(external_executor);
 
-                qe_setup::setup_external(with_driver_adapter.adapter, external_initializer, db_schemas).await?;
+                let external_initializer = external_executor.init(&datamodel, url.as_str());
+
+                let init_external_result =
+                    qe_setup::setup_external(with_driver_adapter.adapter, external_initializer, db_schemas).await?;
 
                 let database_version = None;
-                (executor, database_version)
+                let executor = RunnerExecutor::External(external_executor);
+
+                (executor, database_version, Some(init_external_result))
             }
             None => {
                 qe_setup::setup(&datamodel, db_schemas).await?;
@@ -264,10 +269,23 @@ impl Runner {
                 let connector = query_executor.primary_connector();
                 let conn = connector.get_connection().await.unwrap();
                 let database_version = conn.version().await;
-
                 let executor = RunnerExecutor::Builtin(query_executor);
-                (executor, database_version)
+
+                (executor, database_version, None)
             }
+        };
+
+        // If `override_local_max_bind_values` is provided, use that.
+        // Otherwise, if the external process has provided an `init_result`, use `init_result.max_bind_values`.
+        // Otherwise, use the connector's (Wasm-aware) default.
+        //
+        // Note: Use `override_local_max_bind_values` only for local testing purposes.
+        // If a feature requires a specific `max_bind_values` value for a Driver Adapter, it should be set in the
+        // TypeScript Driver Adapter implementation itself.
+        let local_max_bind_values = match (override_local_max_bind_values, init_external_result) {
+            (Some(override_max_bind_values), _) => Some(override_max_bind_values),
+            (_, Some(init_result)) => init_result.max_bind_values,
+            (_, None) => None,
         };
 
         let query_schema = schema::build(Arc::new(schema), true).with_db_version_supports_join_strategy(
@@ -284,6 +302,7 @@ impl Runner {
             metrics,
             protocol,
             log_capture,
+            local_max_bind_values,
         })
     }
 
@@ -578,6 +597,10 @@ impl Runner {
                 logs
             }
         }
+    }
+
+    pub async fn clear_logs(&mut self) {
+        self.log_capture.clear_logs().await
     }
 
     pub fn connector_version(&self) -> &ConnectorVersion {

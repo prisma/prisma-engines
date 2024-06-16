@@ -132,8 +132,8 @@ pub fn merge_schemas(params: String) -> Result<String, String> {
     merge_schemas::merge_schemas(&params)
 }
 
-pub fn native_types(schema: String) -> String {
-    native::run(&schema)
+pub fn native_types(input: String) -> String {
+    native::run(&input)
 }
 
 pub fn preview_features() -> String {
@@ -182,7 +182,7 @@ pub fn referential_actions(schema: String) -> String {
 /// type GetConfigResponse = GetConfigErrorResponse | GetConfigSuccessResponse
 ///
 /// ```
-pub fn get_config(get_config_params: String) -> Result<String, String> {
+pub fn get_config(get_config_params: String) -> String {
     get_config::get_config(&get_config_params)
 }
 

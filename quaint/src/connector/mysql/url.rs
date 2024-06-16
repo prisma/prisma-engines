@@ -82,7 +82,10 @@ impl MysqlUrl {
                     host
                 }
             }
-            (_, Some(host)) => host,
+            (_, Some(host)) => match &self.query_params.socket {
+                Some(socket) => socket,
+                None => host,
+            },
             _ => "localhost",
         }
     }
@@ -342,6 +345,13 @@ mod tests {
         let url = MysqlUrl::new(Url::parse("mysql://root@localhost/dbname?socket=(/tmp/mysql.sock)").unwrap()).unwrap();
         assert_eq!("dbname", url.dbname());
         assert_eq!(&Some(String::from("/tmp/mysql.sock")), url.socket());
+    }
+
+    #[test]
+    fn should_parse_socket_url_as_host() {
+        let url = MysqlUrl::new(Url::parse("mysql://root@localhost/dbname?socket=(/tmp/mysql.sock)").unwrap()).unwrap();
+        assert_eq!("dbname", url.dbname());
+        assert_eq!(&String::from("/tmp/mysql.sock"), url.host());
     }
 
     #[test]

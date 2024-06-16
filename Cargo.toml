@@ -71,7 +71,7 @@ tracing = { version = "0.1" }
 tsify = { version = "0.4.5" }
 wasm-bindgen = { version = "0.2.92" }
 wasm-bindgen-futures = { version = "0.4" }
-wasm-rs-dbg = { version = "0.1.2" }
+wasm-rs-dbg = { version = "0.1.2", default-features = false, features = ["console-error"] }
 wasm-bindgen-test = { version = "0.3.0" }
 url = { version = "2.5.0" }
 

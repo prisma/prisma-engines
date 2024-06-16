@@ -35,19 +35,34 @@ where
 
 /// A native-column type, i.e. the connector-specific type of the column.
 #[derive(Debug, Clone, PartialEq)]
-pub struct NativeColumnType<'a>(Cow<'a, str>);
+pub struct NativeColumnType<'a> {
+    pub name: Cow<'a, str>,
+    pub length: Option<TypeDataLength>,
+}
 
 impl<'a> std::ops::Deref for NativeColumnType<'a> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        &self.name
     }
 }
 
 impl<'a> From<&'a str> for NativeColumnType<'a> {
     fn from(s: &'a str) -> Self {
-        Self(Cow::Owned(s.to_uppercase()))
+        Self {
+            name: Cow::Owned(s.to_uppercase()),
+            length: None,
+        }
+    }
+}
+
+impl<'a> From<(&'a str, Option<TypeDataLength>)> for NativeColumnType<'a> {
+    fn from((name, length): (&'a str, Option<TypeDataLength>)) -> Self {
+        Self {
+            name: Cow::Owned(name.to_uppercase()),
+            length,
+        }
     }
 }
 

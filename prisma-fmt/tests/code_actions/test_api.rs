@@ -15,12 +15,11 @@ const TARGET_SCHEMA_FILE: &str = "_target.prisma";
 static UPDATE_EXPECT: Lazy<bool> = Lazy::new(|| std::env::var("UPDATE_EXPECT").is_ok());
 
 fn parse_schema_diagnostics(files: &[(String, String)], initiating_file_name: &str) -> Option<Vec<Diagnostic>> {
-    let schema = psl::validate_multi_file(
-        files
-            .iter()
-            .map(|(name, content)| (name.to_owned(), SourceFile::from(content)))
-            .collect(),
-    );
+    let sources: Vec<_> = files
+        .iter()
+        .map(|(name, content)| (name.to_owned(), SourceFile::from(content)))
+        .collect();
+    let schema = psl::validate_multi_file(&sources);
 
     let file_id = schema.db.file_id(initiating_file_name).unwrap();
     let source = schema.db.source(file_id);

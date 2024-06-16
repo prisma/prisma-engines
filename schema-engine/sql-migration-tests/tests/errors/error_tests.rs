@@ -1,12 +1,14 @@
+use connection_string::JdbcString;
 use indoc::{formatdoc, indoc};
 use pretty_assertions::assert_eq;
 use quaint::prelude::Insert;
 use schema_core::{
-    json_rpc::types::{DatasourceParam, EnsureConnectionValidityParams},
+    json_rpc::types::{DatasourceParam, EnsureConnectionValidityParams, SchemasContainer},
     schema_connector::ConnectorError,
 };
 use serde_json::json;
 use sql_migration_tests::test_api::*;
+use std::str::FromStr;
 use url::Url;
 
 pub(crate) async fn connection_error(schema: String) -> ConnectorError {
@@ -16,7 +18,12 @@ pub(crate) async fn connection_error(schema: String) -> ConnectorError {
     };
 
     api.ensure_connection_validity(EnsureConnectionValidityParams {
-        datasource: DatasourceParam::SchemaString(SchemaContainer { schema }),
+        datasource: DatasourceParam::Schema(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: "schema.prisma".to_string(),
+                content: schema,
+            }],
+        }),
     })
     .await
     .unwrap_err()
@@ -75,6 +82,41 @@ fn authentication_failure_must_return_a_known_error_on_mysql(api: TestApi) {
 
     let user = url.username();
     let host = url.host().unwrap().to_string();
+
+    let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
+    let expected = json!({
+        "is_panic": false,
+        "message": format!("Authentication failed against database server at `{host}`, the provided database credentials for `{user}` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `{host}`."),
+        "meta": {
+            "database_user": user,
+            "database_host": host,
+        },
+        "error_code": "P1000"
+    });
+
+    assert_eq!(json_error, expected);
+}
+
+#[test_connector(tags(Mssql))]
+fn authentication_failure_must_return_a_known_error_on_mssql(api: TestApi) {
+    let mut url = JdbcString::from_str(&format!("jdbc:{}", api.connection_string())).unwrap();
+    let host = url.server_name().unwrap().to_string();
+    let properties = url.properties_mut();
+    let user = properties.get("user").cloned().unwrap();
+
+    *properties.get_mut("password").unwrap() = "obviously-not-right".to_string();
+
+    let dm = format!(
+        r#"
+            datasource db {{
+              provider = "sqlserver"
+              url      = "{}"
+            }}
+        "#,
+        url.to_string().replace("jdbc:", "")
+    );
+
+    let error = tok(connection_error(dm));
 
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
@@ -403,7 +445,12 @@ async fn connection_string_problems_give_a_nice_error() {
         let api = schema_core::schema_api(Some(dm.clone()), None).unwrap();
         let error = api
             .ensure_connection_validity(EnsureConnectionValidityParams {
-                datasource: DatasourceParam::SchemaString(SchemaContainer { schema: dm }),
+                datasource: DatasourceParam::Schema(SchemasContainer {
+                    files: vec![SchemaContainer {
+                        path: "schema.prisma".to_string(),
+                        content: dm,
+                    }],
+                }),
             })
             .await
             .unwrap_err();

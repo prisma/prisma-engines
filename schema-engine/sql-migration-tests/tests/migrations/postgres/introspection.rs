@@ -1,3 +1,4 @@
+use schema_core::json_rpc::types::SchemasContainer;
 use sql_migration_tests::test_api::*;
 
 #[test]
@@ -53,8 +54,14 @@ ALTER TABLE blocks
     let result = tok(me.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema,
-        schemas: None,
+        schema: SchemasContainer {
+            files: vec![SchemaContainer {
+                path: "schema.prisma".to_string(),
+                content: schema,
+            }],
+        },
+        base_directory_path: "/".to_string(),
+        namespaces: None,
     }))
     .unwrap();
 
@@ -77,7 +84,7 @@ model blocks {{
 "#,
         url_str
     );
-    pretty_assertions::assert_eq!(expected, result.datamodel.as_str());
+    pretty_assertions::assert_eq!(expected, result.schema.files.first().unwrap().content.as_str());
 }
 
 #[test]
@@ -123,8 +130,14 @@ CREATE TABLE capitals (
     let result = tok(me.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema,
-        schemas: None,
+        schema: SchemasContainer {
+            files: vec![SchemaContainer {
+                path: "schema.prisma".to_string(),
+                content: schema,
+            }],
+        },
+        base_directory_path: "/".to_string(),
+        namespaces: None,
     }))
     .unwrap();
 
@@ -150,7 +163,7 @@ model cities {{
 "#,
         url_str
     );
-    pretty_assertions::assert_eq!(expected, result.datamodel.as_str());
+    pretty_assertions::assert_eq!(expected, result.schema.files.first().unwrap().content.as_str());
 }
 
 #[test]
@@ -194,8 +207,14 @@ CREATE TABLE capitals (
     let result = tok(me.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema,
-        schemas: None,
+        schema: SchemasContainer {
+            files: vec![SchemaContainer {
+                path: "schema.prisma".to_string(),
+                content: schema,
+            }],
+        },
+        base_directory_path: "/".to_string(),
+        namespaces: None,
     }))
     .unwrap();
 
@@ -224,5 +243,5 @@ model cities {{
 "#,
         url_str
     );
-    pretty_assertions::assert_eq!(expected, result.datamodel.as_str());
+    pretty_assertions::assert_eq!(expected, result.schema.files.first().unwrap().content.as_str());
 }

@@ -20,6 +20,7 @@ use futures::{future::FutureExt, lock::Mutex};
 use lru_cache::LruCache;
 use native_tls::{Certificate, Identity, TlsConnector};
 use postgres_native_tls::MakeTlsConnector;
+use std::hash::{DefaultHasher, Hash, Hasher};
 use std::{
     borrow::Borrow,
     fmt::{Debug, Display},
@@ -49,8 +50,38 @@ pub struct PostgreSql {
     client: PostgresClient,
     pg_bouncer: bool,
     socket_timeout: Option<Duration>,
-    statement_cache: Mutex<LruCache<String, Statement>>,
+    statement_cache: Mutex<StatementCache>,
     is_healthy: AtomicBool,
+}
+
+/// Key uniquely representing an SQL statement in the prepared statements cache.
+#[derive(PartialEq, Eq, Hash)]
+pub(crate) struct StatementKey {
+    /// Hash of a string with SQL query.
+    sql: u64,
+    /// Combined hash of types for all parameters from the query.
+    types_hash: u64,
+}
+
+pub(crate) type StatementCache = LruCache<StatementKey, Statement>;
+
+impl StatementKey {
+    fn new(sql: &str, params: &[Value<'_>]) -> Self {
+        Self {
+            sql: {
+                let mut hasher = DefaultHasher::new();
+                sql.hash(&mut hasher);
+                hasher.finish()
+            },
+            types_hash: {
+                let mut hasher = DefaultHasher::new();
+                for param in params {
+                    std::mem::discriminant(&param.typed).hash(&mut hasher);
+                }
+                hasher.finish()
+            },
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -121,11 +152,11 @@ impl SslParams {
 }
 
 impl PostgresUrl {
-    pub(crate) fn cache(&self) -> LruCache<String, Statement> {
+    pub(crate) fn cache(&self) -> StatementCache {
         if self.query_params.pg_bouncer {
-            LruCache::new(0)
+            StatementCache::new(0)
         } else {
-            LruCache::new(self.query_params.statement_cache_size)
+            StatementCache::new(self.query_params.statement_cache_size)
         }
     }
 
@@ -256,11 +287,12 @@ impl PostgreSql {
     }
 
     async fn fetch_cached(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<Statement> {
+        let statement_key = StatementKey::new(sql, params);
         let mut cache = self.statement_cache.lock().await;
         let capacity = cache.capacity();
         let stored = cache.len();
 
-        match cache.get_mut(sql) {
+        match cache.get_mut(&statement_key) {
             Some(stmt) => {
                 tracing::trace!(
                     message = "CACHE HIT!",
@@ -282,7 +314,7 @@ impl PostgreSql {
                 let param_types = conversion::params_to_types(params);
                 let stmt = self.perform_io(self.client.0.prepare_typed(sql, &param_types)).await?;
 
-                cache.insert(sql.to_string(), stmt.clone());
+                cache.insert(statement_key, stmt.clone());
 
                 Ok(stmt)
             }

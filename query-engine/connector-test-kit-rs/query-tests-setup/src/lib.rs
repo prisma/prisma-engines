@@ -168,7 +168,8 @@ fn run_relation_link_test_impl(
             run_with_tokio(
                 async move {
                     println!("Used datamodel:\n {}", datamodel.yellow());
-                    let runner = Runner::load(datamodel.clone(), &[], version, connector_tag, metrics, log_capture)
+                    let override_local_max_bind_values = None;
+                    let runner = Runner::load(datamodel.clone(), &[], version, connector_tag, override_local_max_bind_values, metrics, log_capture)
                         .await
                         .unwrap();
 
@@ -281,11 +282,13 @@ fn run_connector_test_impl(
     crate::run_with_tokio(
         async {
             println!("Used datamodel:\n {}", datamodel.yellow());
+            let override_local_max_bind_values = None;
             let runner = Runner::load(
                 datamodel.clone(),
                 db_schemas,
                 version,
                 connector_tag,
+                override_local_max_bind_values,
                 metrics,
                 log_capture,
             )
@@ -327,5 +330,9 @@ impl TestLogCapture {
         }
 
         logs
+    }
+
+    pub async fn clear_logs(&mut self) {
+        while self.rx.try_recv().is_ok() {}
     }
 }

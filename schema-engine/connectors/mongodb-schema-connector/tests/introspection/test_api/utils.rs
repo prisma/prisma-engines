@@ -70,10 +70,10 @@ pub(crate) fn config_block_string(features: BitFlags<PreviewFeature>) -> String 
 
 #[track_caller]
 pub(crate) fn parse_datamodels(datamodels: &[(&str, String)]) -> psl::ValidatedSchema {
-    let datamodels = datamodels
+    let datamodels: Vec<_> = datamodels
         .iter()
         .map(|(file_name, dm)| (file_name.to_string(), psl::SourceFile::from(dm)))
         .collect();
 
-    psl::validate_multi_file(datamodels)
+    psl::validate_multi_file(&datamodels)
 }

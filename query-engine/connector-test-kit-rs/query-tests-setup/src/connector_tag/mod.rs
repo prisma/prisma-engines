@@ -290,11 +290,11 @@ impl ConnectorVersion {
     /// From the PoV of the test binary, the target architecture is that of where the test runs,
     /// generally x86_64, or aarch64, etc.
     ///
-    /// As a consequence there is an mismatch between the the max_bind_values as seen by the test
+    /// As a consequence there is a mismatch between the max_bind_values as seen by the test
     /// binary (overriden by the QUERY_BATCH_SIZE env var) and the max_bind_values as seen by the
     /// WASM engine being exercised in those tests, through the RunnerExecutor::External test runner.
     ///
-    /// What we do in here, is returning the number of max_bind_values hat the connector under test
+    /// What we do in here, is returning the number of max_bind_values that the connector under test
     /// will use. i.e. if it's a WASM connector, the default, not overridable one. Otherwise the one
     /// as seen by the test binary (which will be the same as the engine exercised)
     pub fn max_bind_values(&self) -> Option<usize> {
@@ -318,7 +318,9 @@ impl ConnectorVersion {
         }
     }
 
-    /// Determines if the connector uses a driver adapter implemented in Wasm
+    /// Determines if the connector uses a driver adapter implemented in Wasm.
+    /// Do not delete! This is used because the `#[cfg(target_arch = "wasm32")]` conditional compilation
+    /// directive doesn't work in the test runner.
     fn is_wasm(&self) -> bool {
         matches!(
             self,
@@ -326,6 +328,7 @@ impl ConnectorVersion {
                 | Self::Postgres(Some(PostgresVersion::NeonJsWasm))
                 | Self::Vitess(Some(VitessVersion::PlanetscaleJsWasm))
                 | Self::Sqlite(Some(SqliteVersion::LibsqlJsWasm))
+                | Self::Sqlite(Some(SqliteVersion::CloudflareD1))
         )
     }
 }

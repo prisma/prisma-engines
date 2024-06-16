@@ -29,7 +29,8 @@ pub(crate) fn validate(params: &str) -> Result<(), String> {
 }
 
 pub fn run(input_schema: SchemaFileInput, no_color: bool) -> Result<ValidatedSchema, String> {
-    let validate_schema = psl::validate_multi_file(input_schema.into());
+    let sources: Vec<(String, psl::SourceFile)> = input_schema.into();
+    let validate_schema = psl::validate_multi_file(&sources);
     let diagnostics = &validate_schema.diagnostics;
 
     if !diagnostics.has_errors() {

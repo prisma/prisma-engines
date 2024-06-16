@@ -199,6 +199,112 @@ async fn reintrospect_removed_model_multi_file(api: &mut TestApi) -> TestResult 
     Ok(())
 }
 
+#[test_connector(exclude(CockroachDb))]
+async fn reintrospect_force_single_file(api: &mut TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]));
+            });
+
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Post_pkey", types::primary_constraint(vec!["id"]));
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(vec!["id"]));
+            });
+        })
+        .await?;
+
+    let foo_dm = indoc! {r#"
+      model Foo {
+          id Int @id @default(autoincrement())
+      }
+    "#};
+
+    let input_dms = [("foo.prisma", with_config(foo_dm, api.pure_config()))];
+
+    let expected = expect![[r#"
+        // file: foo.prisma
+        model Post {
+          id Int @id @default(autoincrement())
+        }
+
+        model Unrelated {
+          id Int @id @default(autoincrement())
+        }
+
+        model User {
+          id Int @id @default(autoincrement())
+        }
+    "#]];
+
+    api.expect_re_introspected_force_datamodels(&input_dms, expected).await;
+
+    Ok(())
+}
+
+#[test_connector(exclude(CockroachDb))]
+async fn reintrospect_force_multi_file(api: &mut TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]));
+            });
+
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Post_pkey", types::primary_constraint(vec!["id"]));
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Unrelated_pkey", types::primary_constraint(vec!["id"]));
+            });
+        })
+        .await?;
+
+    let foo_dm = indoc! {r#"
+      model Foo {
+          id Int @id @default(autoincrement())
+      }
+    "#};
+    let bar_dm = indoc! {r#"
+      model Bar {
+        id Int @id @default(autoincrement())
+      }
+    "#};
+
+    let input_dms = [
+        ("foo.prisma", with_config(foo_dm, api.pure_config())),
+        ("bar.prisma", bar_dm.to_string()),
+    ];
+
+    let expected = expect![[r#"
+        // file: introspected.prisma
+        model Post {
+          id Int @id @default(autoincrement())
+        }
+
+        model Unrelated {
+          id Int @id @default(autoincrement())
+        }
+
+        model User {
+          id Int @id @default(autoincrement())
+        }
+    "#]];
+
+    api.expect_re_introspected_force_datamodels(&input_dms, expected).await;
+
+    Ok(())
+}
+
 // ----- Enums -----
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]

@@ -18,6 +18,7 @@ use quaint::{prelude::SqlFamily, single::Quaint};
 use schema_connector::{ConnectorParams, SchemaConnector};
 use sql_schema_connector::SqlSchemaConnector;
 use std::fmt::Write;
+use std::path::PathBuf;
 use test_setup::{sqlite_test_url, DatasourceBlock, TestApiArgs};
 use tracing::Instrument;
 
@@ -231,7 +232,22 @@ impl TestApi {
         previous_schema: psl::ValidatedSchema,
         render_config: bool,
     ) -> ConnectorResult<IntrospectionResult> {
-        let mut ctx = IntrospectionContext::new(previous_schema, CompositeTypeDepth::Infinite, None);
+        let mut ctx = IntrospectionContext::new(previous_schema, CompositeTypeDepth::Infinite, None, PathBuf::new());
+        ctx.render_config = render_config;
+
+        self.api
+            .introspect(&ctx)
+            .instrument(tracing::info_span!("introspect"))
+            .await
+    }
+
+    async fn test_introspect_force_internal(
+        &mut self,
+        previous_schema: psl::ValidatedSchema,
+        render_config: bool,
+    ) -> ConnectorResult<IntrospectionResult> {
+        let mut ctx =
+            IntrospectionContext::new_config_only(previous_schema, CompositeTypeDepth::Infinite, None, PathBuf::new());
         ctx.render_config = render_config;
 
         self.api
@@ -466,6 +482,21 @@ impl TestApi {
         expectation.assert_eq(&reintrospected.datamodels);
     }
 
+    pub async fn expect_re_introspected_force_datamodels(
+        &mut self,
+        datamodels: &[(&str, String)],
+        expectation: expect_test::Expect,
+    ) {
+        let schema = parse_datamodels(datamodels);
+        let reintrospected = self
+            .test_introspect_force_internal(schema, false)
+            .await
+            .unwrap()
+            .to_multi_test_result();
+
+        expectation.assert_eq(&reintrospected.datamodels);
+    }
+
     pub async fn expect_re_introspected_datamodels_with_config(
         &mut self,
         datamodels: &[(&str, String)],
@@ -555,12 +586,12 @@ fn parse_datamodel(dm: &str) -> psl::ValidatedSchema {
 
 #[track_caller]
 fn parse_datamodels(datamodels: &[(&str, String)]) -> psl::ValidatedSchema {
-    let datamodels = datamodels
+    let datamodels: Vec<_> = datamodels
         .iter()
         .map(|(file_name, dm)| (file_name.to_string(), psl::SourceFile::from(dm)))
         .collect();
 
-    psl::validate_multi_file(datamodels)
+    psl::validate_multi_file(&datamodels)
 }
 
 pub struct IntrospectionMultiTestResult {

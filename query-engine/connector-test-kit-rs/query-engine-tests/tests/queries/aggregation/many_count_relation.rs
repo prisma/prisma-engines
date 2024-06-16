@@ -884,6 +884,33 @@ mod many_count_rel {
         Ok(())
     }
 
+    // Regression test for https://github.com/prisma/prisma/issues/23778.
+    #[connector_test]
+    async fn regression_nullable_count_libsql(runner: Runner) -> TestResult<()> {
+        // Create post without any comment
+        create_row(&runner, r#"{ id: 1, title: "Without comments" }"#).await?;
+
+        // Create post with a comment
+        create_row(
+            &runner,
+            r#"{ id: 2, title: "With comments", comments: { create: { id: 1 } } }"#,
+        )
+        .await?;
+
+        // Nullable counts should be COALESCE'd to 0.
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+          findManyPost {
+            _count { comments }
+          }
+        }
+        "#),
+          @r###"{"data":{"findManyPost":[{"_count":{"comments":0}},{"_count":{"comments":1}}]}}"###
+        );
+
+        Ok(())
+    }
+
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
             .query(format!("mutation {{ createOnePost(data: {data}) {{ id }} }}"))

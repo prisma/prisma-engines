@@ -15,6 +15,8 @@ mod reformat;
 mod set_config_dir;
 mod validate;
 
+use std::sync::Arc;
+
 pub use crate::{
     common::{PreviewFeature, PreviewFeatures, ALL_PREVIEW_FEATURES},
     configuration::{
@@ -78,13 +80,13 @@ pub fn validate(file: SourceFile, connectors: ConnectorRegistry<'_>) -> Validate
 
 /// The most general API for dealing with Prisma schemas. It accumulates what analysis and
 /// validation information it can, and returns it along with any error and warning diagnostics.
-pub fn validate_multi_file(files: Vec<(String, SourceFile)>, connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
+pub fn validate_multi_file(files: &[(String, SourceFile)], connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
     assert!(
         !files.is_empty(),
         "psl::validate_multi_file() must be called with at least one file"
     );
     let mut diagnostics = Diagnostics::new();
-    let db = ParserDatabase::new(&files, &mut diagnostics);
+    let db = ParserDatabase::new(files, &mut diagnostics);
 
     // TODO: the bulk of configuration block analysis should be part of ParserDatabase::new().
     let mut configuration = Configuration::default();
@@ -130,9 +132,9 @@ pub fn parse_configuration(
     schema: &str,
     connectors: ConnectorRegistry<'_>,
 ) -> Result<Configuration, diagnostics::Diagnostics> {
-    let mut diagnostics = Diagnostics::default();
-    let ast = schema_ast::parse_schema(schema, &mut diagnostics, diagnostics::FileId::ZERO);
-    let out = validate_configuration(&ast, &mut diagnostics, connectors);
+    let source_file = SourceFile::new_allocated(Arc::from(schema.to_owned().into_boxed_str()));
+    let (_, out, mut diagnostics) =
+        error_tolerant_parse_configuration(&[("schema.prisma".into(), source_file)], connectors);
     diagnostics.to_result().map(|_| out)
 }
 
@@ -140,6 +142,17 @@ pub fn parse_configuration_multi_file(
     files: &[(String, SourceFile)],
     connectors: ConnectorRegistry<'_>,
 ) -> Result<(Files, Configuration), (Files, diagnostics::Diagnostics)> {
+    let (files, configuration, mut diagnostics) = error_tolerant_parse_configuration(files, connectors);
+    match diagnostics.to_result() {
+        Ok(_) => Ok((files, configuration)),
+        Err(err) => Err((files, err)),
+    }
+}
+
+pub fn error_tolerant_parse_configuration(
+    files: &[(String, SourceFile)],
+    connectors: ConnectorRegistry<'_>,
+) -> (Files, Configuration, Diagnostics) {
     let mut diagnostics = Diagnostics::default();
     let mut configuration = Configuration::default();
 
@@ -150,10 +163,7 @@ pub fn parse_configuration_multi_file(
         configuration.extend(out);
     }
 
-    match diagnostics.to_result() {
-        Ok(_) => Ok((asts, configuration)),
-        Err(err) => Err((asts, err)),
-    }
+    (asts, configuration, diagnostics)
 }
 
 fn validate_configuration(

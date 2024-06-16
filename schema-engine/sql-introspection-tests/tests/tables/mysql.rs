@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use indoc::{formatdoc, indoc};
 use schema_connector::{ConnectorParams, IntrospectionContext, SchemaConnector};
 use sql_introspection_tests::test_api::*;
@@ -419,7 +421,7 @@ async fn missing_select_rights(api: &mut TestApi) -> TestResult {
 
     let config = psl::parse_schema(datasource).unwrap();
 
-    let ctx = IntrospectionContext::new(config, Default::default(), None);
+    let ctx = IntrospectionContext::new(config, Default::default(), None, PathBuf::new());
 
     let res = conn.introspect(&ctx).await.unwrap();
     assert!(res.is_empty);

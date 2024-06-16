@@ -69,6 +69,9 @@ pub struct TestConfigFromSerde {
     /// This is the URL to the mobile emulator which will execute the queries against
     /// the instances of the engine running on the device.
     pub(crate) mobile_emulator_url: Option<String>,
+
+    /// The maximum number of bind values to use in a query for a driver adapter test runner.
+    pub(crate) driver_adapter_max_bind_values: Option<usize>,
 }
 
 impl TestConfigFromSerde {
@@ -156,6 +159,9 @@ pub(crate) struct WithDriverAdapter {
     /// The driver adapter configuration to forward as a stringified JSON object to the external
     /// test executor by setting the `DRIVER_ADAPTER_CONFIG` env var when spawning the executor.
     pub(crate) config: Option<DriverAdapterConfig>,
+
+    /// The maximum number of bind values to use in a query for a driver adapter test runner.
+    pub(crate) max_bind_values: Option<usize>,
 }
 
 impl WithDriverAdapter {
@@ -181,6 +187,7 @@ impl From<TestConfigFromSerde> for TestConfig {
                 adapter,
                 test_executor: config.external_test_executor.unwrap(),
                 config: config.driver_adapter_config,
+                max_bind_values: config.driver_adapter_max_bind_values,
             }),
             None => None,
         };
@@ -295,6 +302,9 @@ impl TestConfig {
         let driver_adapter_config = std::env::var("DRIVER_ADAPTER_CONFIG")
             .map(|config| serde_json::from_str::<DriverAdapterConfig>(config.as_str()).ok())
             .unwrap_or_default();
+        let driver_adapter_max_bind_values = std::env::var("DRIVER_ADAPTER_MAX_BIND_VALUES")
+            .ok()
+            .map(|v| v.parse::<usize>().unwrap());
 
         let mobile_emulator_url = std::env::var("MOBILE_EMULATOR_URL").ok();
 
@@ -310,6 +320,7 @@ impl TestConfig {
                 driver_adapter,
                 driver_adapter_config,
                 mobile_emulator_url,
+                driver_adapter_max_bind_values,
             })
             .map(Self::from)
     }
@@ -387,7 +398,7 @@ impl TestConfig {
     }
 
     pub fn test_connector(&self) -> TestResult<(ConnectorTag, ConnectorVersion)> {
-        let version = ConnectorVersion::try_from((self.connector(), self.connector_version()))?;
+        let version = self.parse_connector_version()?;
         let tag = match version {
             ConnectorVersion::SqlServer(_) => &SqlServerConnectorTag as ConnectorTag,
             ConnectorVersion::Postgres(_) => &PostgresConnectorTag,
@@ -399,6 +410,17 @@ impl TestConfig {
         };
 
         Ok((tag, version))
+    }
+
+    pub fn max_bind_values(&self) -> Option<usize> {
+        let version = self.parse_connector_version().unwrap();
+        let local_mbv = self.with_driver_adapter().and_then(|config| config.max_bind_values);
+
+        local_mbv.or_else(|| version.max_bind_values())
+    }
+
+    fn parse_connector_version(&self) -> TestResult<ConnectorVersion> {
+        ConnectorVersion::try_from((self.connector(), self.connector_version()))
     }
 
     #[rustfmt::skip]
