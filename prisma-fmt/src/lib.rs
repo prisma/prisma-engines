@@ -12,7 +12,7 @@ mod text_document_completion;
 mod validate;
 
 use log::*;
-pub use offsets::offset_to_position;
+pub use offsets::span_to_range;
 use schema_file_input::SchemaFileInput;
 
 /// The API is modelled on an LSP [completion

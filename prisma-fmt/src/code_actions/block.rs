@@ -28,7 +28,7 @@ pub(super) fn create_missing_block_for_model(
         file_id: span_model.file_id,
     };
 
-    let range = super::range_after_span(context.initiating_file_source(), span);
+    let range = super::range_after_span(span, context.initiating_file_source());
 
     diagnostics.iter().for_each(|diag| {
         push_missing_block(
@@ -83,7 +83,7 @@ pub(super) fn create_missing_block_for_type(
         file_id: span_type.file_id,
     };
 
-    let range = super::range_after_span(context.initiating_file_source(), span);
+    let range = super::range_after_span(span, context.initiating_file_source());
     diagnostics.iter().for_each(|diag| {
         push_missing_block(
             diag,

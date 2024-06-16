@@ -4,7 +4,7 @@ mod multi_schema;
 mod relation_mode;
 mod relations;
 
-use crate::offsets::{offset_to_position, position_after_span, range_to_span};
+use crate::offsets::{position_after_span, range_to_span, span_to_range};
 use log::warn;
 use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic, Range, TextEdit, Url, WorkspaceEdit};
 use psl::{
@@ -188,25 +188,15 @@ fn create_missing_attribute<'a>(
             &model.ast_model().attributes,
         );
 
-        let range = range_after_span(schema, model.ast_model().span());
+        let range = range_after_span(model.ast_model().span(), schema);
         (formatted_attribute, range)
     };
 
     TextEdit { range, new_text }
 }
 
-fn range_after_span(schema: &str, span: Span) -> Range {
-    let start = offset_to_position(span.end - 1, schema);
-    let end = offset_to_position(span.end, schema);
-
-    Range { start, end }
-}
-
-fn span_to_range(schema: &str, span: Span) -> Range {
-    let start = offset_to_position(span.start, schema);
-    let end = offset_to_position(span.end, schema);
-
-    Range { start, end }
+fn range_after_span(span: Span, schema: &str) -> Range {
+    span_to_range(Span::new(span.end - 1, span.end, span.file_id), schema)
 }
 
 fn format_field_attribute(attribute: &str) -> String {
@@ -254,8 +244,8 @@ fn create_text_edit(
     span: Span,
 ) -> Result<WorkspaceEdit, Box<dyn std::error::Error>> {
     let range = match append {
-        true => range_after_span(target_file_content, span),
-        false => span_to_range(target_file_content, span),
+        true => range_after_span(span, target_file_content),
+        false => span_to_range(span, target_file_content),
     };
 
     let text = TextEdit {

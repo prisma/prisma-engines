@@ -77,16 +77,19 @@ pub(crate) fn offset_to_lsp_offset(offset: usize, document: &str) -> usize {
     current_lsp_offset
 }
 
-/// Converts a byte offset to an LSP position, if the given offset
-/// does not overflow the document.
-pub fn offset_to_position(offset: usize, document: &str) -> Position {
-    let mut current_offset = 0;
-    let mut position = Position::default();
+fn offset_to_position_and_new_offset(
+    offset: usize,
+    document: &str,
+    initial_position: Position,
+    initial_offset: usize,
+) -> (Position, usize) {
+    let mut position = initial_position;
+    let mut current_offset = initial_offset;
 
-    for chr in document.chars() {
+    for chr in document[current_offset..].chars() {
         match chr {
             _ if offset <= current_offset => {
-                return position;
+                return (position, current_offset);
             }
             '\n' => {
                 position.character = 0;
@@ -99,12 +102,27 @@ pub fn offset_to_position(offset: usize, document: &str) -> Position {
         current_offset += chr.len_utf8();
     }
 
+    (position, current_offset)
+}
+
+/// Converts a byte offset to an LSP position, if the given offset
+/// does not overflow the document.
+fn offset_to_position(offset: usize, document: &str) -> Position {
+    let (position, _) = offset_to_position_and_new_offset(offset, document, Position::default(), 0);
     position
+}
+
+/// Converts a span to a pair of LSP positions.
+pub fn span_to_range(span: Span, document: &str) -> Range {
+    let (start, next_offset) = offset_to_position_and_new_offset(span.start, document, Position::default(), 0);
+    let (end, _) = offset_to_position_and_new_offset(span.end, document, start, next_offset);
+
+    Range { start, end }
 }
 
 #[cfg(test)]
 mod tests {
-    use lsp_types::Position;
+    use lsp_types::{Position, Range};
     use psl::diagnostics::{FileId, Span};
 
     // On Windows, a newline is actually two characters.
@@ -164,5 +182,20 @@ mod tests {
         let found_offset = super::position_to_offset(&Position { line: 1, character: 2 }, schema).unwrap();
 
         assert_eq!(expected_offset, found_offset);
+    }
+
+    #[test]
+    fn span_to_range_with_multibyte() {
+        let schema = "// 🌐 ｍｕｌｔｉｂｙｔｅ\n^😀$\n";
+
+        let span = Span::new(
+            schema.bytes().position(|c| c == b'^').unwrap(),
+            schema.bytes().position(|c| c == b'$').unwrap(),
+            FileId::ZERO,
+        );
+        let expected_range = Range::new(Position { line: 1, character: 0 }, Position { line: 1, character: 3 });
+        let found_range = super::span_to_range(span, schema);
+
+        assert_eq!(expected_range, found_range);
     }
 }
