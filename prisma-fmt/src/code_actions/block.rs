@@ -33,7 +33,7 @@ pub(super) fn create_missing_block_for_model(
     diagnostics.iter().for_each(|diag| {
         push_missing_block(
             diag,
-            context.lsp_params.text_document.uri.clone(),
+            context.params.text_document.uri.clone(),
             range,
             "model",
             actions,
@@ -41,7 +41,7 @@ pub(super) fn create_missing_block_for_model(
         );
         push_missing_block(
             diag,
-            context.lsp_params.text_document.uri.clone(),
+            context.params.text_document.uri.clone(),
             range,
             "enum",
             actions,
@@ -52,7 +52,7 @@ pub(super) fn create_missing_block_for_model(
             if ds.active_provider == "mongodb" {
                 push_missing_block(
                     diag,
-                    context.lsp_params.text_document.uri.clone(),
+                    context.params.text_document.uri.clone(),
                     range,
                     "type",
                     actions,
@@ -87,7 +87,7 @@ pub(super) fn create_missing_block_for_type(
     diagnostics.iter().for_each(|diag| {
         push_missing_block(
             diag,
-            context.lsp_params.text_document.uri.clone(),
+            context.params.text_document.uri.clone(),
             range,
             "type",
             actions,
@@ -95,7 +95,7 @@ pub(super) fn create_missing_block_for_type(
         );
         push_missing_block(
             diag,
-            context.lsp_params.text_document.uri.clone(),
+            context.params.text_document.uri.clone(),
             range,
             "enum",
             actions,
