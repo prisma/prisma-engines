@@ -1,0 +1,63 @@
+name: Build Engines for Apple Intel
+
+on:
+  workflow_call:
+    inputs:
+      commit:
+        description: 'Commit on the given branch to build'
+        type: string
+        required: false
+
+jobs:
+  build:
+    name: 'MacOS Intel engines build for commit ${{ inputs.commit }}'
+    env:
+      SQLITE_MAX_VARIABLE_NUMBER: 250000
+      SQLITE_MAX_EXPR_DEPTH: 10000
+
+      # minimum supported version of macOS
+      MACOSX_DEPLOYMENT_TARGET: 10.15
+    runs-on: macos-13
+
+    steps:
+      - name: Output link to real commit
+        run: echo ${{ github.repository }}/commit/${{ inputs.commit }}
+
+      - name: Checkout ${{ inputs.commit }}
+        uses: actions/checkout@v4
+        with:
+          repository: prisma/prisma-engines
+          ref: ${{ inputs.commit }}
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - run: |
+          cargo build --release -p query-engine -p query-engine-node-api -p schema-engine-cli -p prisma-fmt
+
+      - name: Rename files
+        working-directory: ${{ github.workspace }}/target/release/
+        run: |
+          echo "Files in target/release before renaming"
+          ls -la .
+
+          mv libquery_engine.dylib libquery_engine.dylib.node
+
+          echo "Files in target/release after renaming"
+          ls -la .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: darwin
+          path: |
+            ${{ github.workspace }}/target/release/schema-engine
+            ${{ github.workspace }}/target/release/prisma-fmt
+            ${{ github.workspace }}/target/release/query-engine
+            ${{ github.workspace }}/target/release/libquery_engine.dylib.node

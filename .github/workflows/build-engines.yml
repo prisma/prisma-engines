@@ -1,179 +1,284 @@
 name: Build Engines
-run-name: Build Engines for ${{ github.event.inputs.commit }}
+run-name: Build Engines for ${{ inputs.commit }}
+
+# Run on `push` only for main, if not it will trigger `push` & `pull_request` on PRs at the same time
 on:
+  push:
+    branches:
+      - main
+      - '*.*.x'
+    paths-ignore:
+      - '!.github/workflows/build-engines*'
+      - '.github/**'
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+      - 'renovate.json'
   workflow_dispatch:
     inputs:
       commit:
-        description: 'Commit on the given branch to build'
+        description: 'Commit to build (from prisma-engines)'
         required: false
   pull_request:
+    paths-ignore:
+      - '!.github/workflows/build-engines*'
+      - '.github/**'
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+      - 'renovate.json'
 
 jobs:
   build-linux:
-    name: '${{ matrix.target.name }} (on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }})'
-    # env:
-    #   # default build config
-    #   SQLITE_MAX_VARIABLE_NUMBER: 250000
-    #   SQLITE_MAX_EXPR_DEPTH: 10000
+    name: Build Engines for Linux
+    uses: ./.github/workflows/build-engines-linux-template.yml
+    with:
+      commit: ${{ inputs.commit }}
 
-    runs-on: ubuntu-latest
+  build-macos-intel:
+    name: Build Engines for Apple Intel
+    uses: ./.github/workflows/build-engines-apple-intel-template.yml
+    with:
+      commit: ${{ inputs.commit }}
 
-    strategy:
-      fail-fast: false
-      matrix:
-        target:
-          # Linux Glibc
-          - name: 'Linux Glibc [1.0.x]'
-            image: 'prismagraphql/build:rhel-libssl1.0.x'
-            target_string: ''
-            target_path: ''
-            features_string: '--features vendored-openssl'
-          - name: 'Linux Glibc [1.1.x]'
-            image: 'prismagraphql/build:rhel-libssl1.1.x'
-            target_string: ''
-            target_path: ''
-            features_string: ''
-          - name: 'Linux Glibc [3.0.x]'
-            image: 'prismagraphql/build:rhel-libssl3.0.x'
-            target_string: ''
-            target_path: ''
-            features_string: ''
-          # Linux Musl
-          - name: 'Linux Musl [1.1.x]'
-            image: 'prismagraphql/build:alpine-libssl1.1.x'
-            target_string: ''
-            target_path: ''
-            features_string: ''
-          - name: 'Linux Musl [3.0.x]'
-            image: 'prismagraphql/build:alpine-libssl3.0.x'
-            target_string: ''
-            target_path: ''
-            features_string: ''
-          # Linux Static
-          - name: 'Linux Static x86_64'
-            image: 'prismagraphql/build:linux-static-x64'
-            target_string: '--target x86_64-unknown-linux-musl'
-            target_path: 'x86_64-unknown-linux-musl'
-            features_string: '--features vendored-openssl'
-          # Linux Arm64 Glibc
-          - name: 'Linux ARM64 [1.0.x]'
-            image: 'prismagraphql/build:cross-linux-arm-ssl-1.0.x'
-            target_string: '--target aarch64-unknown-linux-gnu'
-            target_path: 'aarch64-unknown-linux-gnu'
-            features_string: '--features vendored-openssl'
-          - name: 'Linux ARM64 [1.1.x]'
-            image: 'prismagraphql/build:cross-linux-arm-ssl-1.1.x'
-            target_string: '--target aarch64-unknown-linux-gnu'
-            target_path: 'aarch64-unknown-linux-gnu'
-            features_string: ''
-          - name: 'Linux ARM64 [3.0.x]'
-            image: 'prismagraphql/build:cross-linux-arm-ssl-3.0.x'
-            target_string: '--target aarch64-unknown-linux-gnu'
-            target_path: 'aarch64-unknown-linux-gnu'
-            features_string: ''
-          # Linux Arm64 Musl
-          - name: 'Linux Musl ARM64 [1.1.x]'
-            image: 'prismagraphql/build:cross-linux-musl-arm-ssl-1.1.x'
-            target_string: '--target aarch64-unknown-linux-musl'
-            target_path: 'aarch64-unknown-linux-musl'
-            features_string: ''
-          - name: 'Linux Musl ARM64 [3.0.x]'
-            image: 'prismagraphql/build:cross-linux-musl-arm-ssl-3.0.x'
-            target_string: '--target aarch64-unknown-linux-musl'
-            target_path: 'aarch64-unknown-linux-musl'
-            features_string: ''
-          # Linux Arm64 Static
-          - name: 'Linux Static ARM64'
-            image: 'prismagraphql/build:linux-static-arm64'
-            target_string: '--target aarch64-unknown-linux-musl'
-            target_path: 'aarch64-unknown-linux-musl'
-            features_string: '--features vendored-openssl'
+  build-macos-silicon:
+    name: Build Engines for Apple Silicon
+    uses: ./.github/workflows/build-engines-apple-silicon-template.yml
+    with:
+      commit: ${{ inputs.commit }}
+
+  build-react-native:
+    name: Build Engines for React native
+    uses: ./.github/workflows/build-engines-react-native-template.yml
+    with:
+      commit: ${{ inputs.commit }}
+
+  build-windows:
+    name: Build Engines for Windows
+    uses: ./.github/workflows/build-engines-windows-template.yml
+    with:
+      commit: ${{ inputs.commit }}
+
+  is-release-necessary:
+    name: 'Decide if a release of the engines artifacts is necessary'
+    runs-on: ubuntu-22.04
+    outputs:
+      release: ${{ steps.decision.outputs.release }}
+    steps:
+      - name: Debug Pull Request Event
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          echo "Pull Request: ${{ github.event.pull_request.number }}"
+          echo "Pull Request Author: ${{ github.event.pull_request.user.login }}"
+          echo "Pull Request Author Association: ${{ github.event.pull_request.author_association }}"
+          echo "Pull Request Body contains /integration: ${{ contains(env.PR_BODY, '/integration') }}"
+
+      - name: 'Check if the PR body contains `/integration` and the PR author has permissions to trigger the workflow'
+        id: check-pr-description
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        # See https://docs.github.com/en/graphql/reference/enums
+        # https://michaelheap.com/github-actions-check-permission/
+        # Check if
+        # - the PR body contains `/integration`
+        # - the PR author has permissions to trigger the workflow (must be part of the org or a collaborator)
+        if: |
+          github.event_name == 'pull_request' &&
+          contains(env.PR_BODY, '/integration') && 
+          (
+            github.event.pull_request.author_association == 'OWNER' ||
+            github.event.pull_request.author_association == 'MEMBER' ||
+            github.event.pull_request.author_association == 'COLLABORATOR' ||
+            github.event.pull_request.author_association == 'CONTRIBUTOR'
+          )
+        run: |
+          echo "PR body contains /integration and PR author has permissions" 
+          # set value to GitHub output 
+          echo "release=true" >> $GITHUB_OUTPUT
+
+      - name: Find "/integration" comment
+        uses: peter-evans/find-comment@v3
+        id: check-comments
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: '/integration'
+
+      - name: Debug event & outputs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_PATH: ${{ github.event_path }}
+          CHECK_PR_DESC: ${{ steps.check-pr-description.outputs.release }}
+          CHECK_COMMENT: ${{ steps.check-comments.outputs.comment-id }}
+        run: |
+          echo "Event Name: $EVENT_NAME"
+          echo "Event path: $EVENT_PATH"
+          echo "Check PR Description outputs: $CHECK_PR_DESC"
+          echo "Check Comments outputs: $CHECK_COMMENT"
+
+      - name: Release is necessary!
+        # https://github.com/peter-evans/find-comment/tree/v3/?tab=readme-ov-file#outputs
+        # Tip: Empty strings evaluate to zero in GitHub Actions expressions. e.g. If comment-id is an empty string steps.fc.outputs.comment-id == 0 evaluates to true.
+        if: github.event_name == 'push' || steps.check-comments.outputs.comment-id != 0 || steps.check-pr-description.outputs.release == 'true'
+        id: decision
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_PATH: ${{ github.event_path }}
+          CHECK_PR_DESC: ${{ steps.check-pr-description.outputs.release }}
+          CHECK_COMMENT: ${{ steps.check-comments.outputs.comment-id }}
+        run: |
+          echo "Event Name: $EVENT_NAME"
+          echo "Event path: $EVENT_PATH"
+          echo "Check PR Description outputs: $CHECK_PR_DESC"
+          echo "Check Comments outputs: $CHECK_COMMENT"
+
+          echo "Release is necessary"
+          echo "release=true" >> $GITHUB_OUTPUT
+
+  release-artifacts:
+    name: 'Release artifacts from branch ${{ github.event.ref }} for commit ${{ inputs.commit }}'
+    runs-on: ubuntu-22.04
+    concurrency:
+      group: ${{ inputs.commit }}
+    needs:
+      - is-release-necessary
+      - build-linux
+      - build-macos-intel
+      - build-macos-silicon
+      - build-react-native
+      - build-windows
+    if: ${{ needs.is-release-necessary.outputs.release == 'true' }}
+
+    env:
+      BUCKET_NAME: 'prisma-builds-github-actions'
+      PRISMA_ENGINES_COMMIT_SHA: ${{ inputs.commit }}
+      DESTINATION_TARGET_PATH: 's3://prisma-builds-github-actions/all_commits/${{ inputs.commit }}'
 
     steps:
-      - name: Output link to real commit
-        if: ${{ github.event.inputs.commit }}
-        run: echo https://github.com/prisma/prisma-engines/commit/${{ github.event.inputs.commit }}
-
-      - name: Checkout ${{ github.event.inputs.commit }}
+      # Because we need the scripts
+      - name: Checkout git repository
         uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
         with:
-          repository: prisma/prisma-engines
-          ref: ${{ github.event.inputs.commit }}
+          path: engines-artifacts
+          # For debug purposes
+          # A previous run ID can be specified, to avoid the build step
+          # First disable the build step, then specify the run ID
+          # The github-token is mandatory for this to work
+          # https://github.com/prisma/prisma-engines-builds/actions/runs/9526334324
+          # run-id: 9526334324
+          # github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: dtolnay/rust-toolchain@stable
-
-      # TODO proper way to do cache?
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-${{ matrix.target.name }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: 'TODO: Check if artifacts were already built and published before via .finished file'
-        run: echo "foo"
-
-      - name: Construct Build Command
-        id: construct_build_command
+      - name: 'R2: Check if artifacts were already built and uploaded before via `.finished` file'
         env:
-          TARGET_NAME: ${{ matrix.target.name }}
-          IMAGE: ${{ matrix.target.image }}
-          TARGET_STRING: ${{ matrix.target.target_string }}
-          FEATURES_STRING: ${{ matrix.target.features_string }}
+          FILE_PATH: 'all_commits/${{ inputs.commit }}/.finished'
+          FILE_PATH_LEGACY: 'all_commits/${{ inputs.commit }}/rhel-openssl-1.1.x/.finished'
+          AWS_DEFAULT_REGION: 'auto'
+          AWS_ACCESS_KEY_ID: ${{ vars.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_ENDPOINT_URL_S3: ${{ vars.R2_ENDPOINT }}
+        working-directory: .github/workflows/utils
+        run: bash checkFinishedMarker.sh
+
+      - name: 'S3: Check if artifacts were already built and uploaded before via `.finished` file'
+        env:
+          FILE_PATH: 'all_commits/${{ inputs.commit }}/.finished'
+          FILE_PATH_LEGACY: 'all_commits/${{ inputs.commit }}/rhel-openssl-1.1.x/.finished'
+          AWS_DEFAULT_REGION: 'eu-west-1'
+          AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        working-directory: .github/workflows/utils
+        run: bash checkFinishedMarker.sh
+
+      - name: Display structure of downloaded files
+        run: ls -Rl engines-artifacts
+
+      # TODO in a next major version of Prisma: remove this, and replace both `Debian` and `Rhel` with a single `LinuxGlibc`/`LinuxGnu` option.
+      - name: Duplicate engines for debian
+        working-directory: engines-artifacts
         run: |
-          # full command
-          command="docker run \
-            -e SQLITE_MAX_VARIABLE_NUMBER=250000 \
-            -e SQLITE_MAX_EXPR_DEPTH=10000 \
-            -e LIBZ_SYS_STATIC=1 \
-            -w /root/build \
-            -v \"$(pwd)\":/root/build \
-            $IMAGE \
-            bash -c \
-              \" \
-              cargo clean \
-              && cargo build --release -p query-engine          --manifest-path query-engine/query-engine/Cargo.toml          $TARGET_STRING $FEATURES_STRING \
-              && cargo build --release -p query-engine-node-api --manifest-path query-engine/query-engine-node-api/Cargo.toml $TARGET_STRING $FEATURES_STRING \
-              && cargo build --release -p schema-engine-cli     --manifest-path schema-engine/cli/Cargo.toml                  $TARGET_STRING $FEATURES_STRING \
-              && cargo build --release -p prisma-fmt            --manifest-path prisma-fmt/Cargo.toml                         $TARGET_STRING $FEATURES_STRING \
-              \" \
-            "
-          # remove query-engine-node-api for "static" targets
-          if [[ "$TARGET_NAME" == *Static* ]]; then
-            substring_to_replace="&& cargo build --release -p query-engine-node-api --manifest-path query-engine/query-engine-node-api/Cargo.toml $TARGET_STRING $FEATURES_STRING"
-            replacement_string=""
-            command=$(echo "$command" | sed "s|$substring_to_replace|$replacement_string|")
-          fi
-          # store command in github output
-          echo "COMMAND=$command" >> "$GITHUB_OUTPUT"
-      - name: Show Build Command
+          cp -r rhel-openssl-1.0.x debian-openssl-1.0.x
+          cp -r rhel-openssl-1.1.x debian-openssl-1.1.x
+          cp -r rhel-openssl-3.0.x debian-openssl-3.0.x
+
+      - name: Create .zip for react-native
+        working-directory: engines-artifacts
+        run: |
+          mkdir react-native
+          zip -r react-native/binaries.zip ios android
+          rm -rf ios android
+
+      - name: 'Create compressed engine files (.gz)'
+        working-directory: engines-artifacts
+        run: |
+          set -eu
+
+          find . -type f -not -name "*.zip" | while read filename; do
+            gzip -c "$filename" > "$filename.gz"
+            echo "$filename.gz file created."
+          done
+
+          ls -Rl .
+
+      - name: 'Create SHA256 checksum files (.sha256).'
+        working-directory: engines-artifacts
+        run: |
+          set -eu
+
+          find . -type f | while read filename; do
+            sha256sum "$filename" > "$filename.sha256" 
+            echo "$filename.sha256 file created."
+          done
+
+          ls -Rl .
+
+      # https://github.com/crazy-max/ghaction-import-gpg
+      - name: Import GPG key
+        # See https://github.com/crazy-max/ghaction-import-gpg/releases
+        # v6 -> 01dd5d3ca463c7f10f7f4f7b4f177225ac661ee4
+        # For security reasons, we should pin the version of the action
+        uses: crazy-max/ghaction-import-gpg@01dd5d3ca463c7f10f7f4f7b4f177225ac661ee4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_KEY_PASSPHRASE }}
+
+      - name: List keys
+        run: gpg -K
+
+      # next to each file (excluding .sha256 files)
+      - name: 'Create a GPG detached signature (.sig)'
+        working-directory: engines-artifacts
+        run: |
+          set -eu
+
+          for file in $(find . -type f ! -name "*.sha256"); do
+            gpg --detach-sign --armor --batch --output "${file#*/}.sig" "$file"
+          done
+
+          ls -Rl .
+
+      - name: 'Cloudflare R2: Upload to bucket and verify uploaded files then create `.finished` file'
+        # https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-envvars.html
         env:
-          COMMAND: ${{ steps.construct_build_command.outputs.COMMAND }}"
-        run: echo "Build command is $COMMAND"
-      - name: Execute Build command
-        run: ${{ steps.construct_build_command.outputs.command }}
+          AWS_DEFAULT_REGION: 'auto'
+          AWS_ACCESS_KEY_ID: ${{ vars.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_ENDPOINT_URL_S3: ${{ vars.R2_ENDPOINT }}
+        run: bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-r2
 
-      - name: 'TODO: Compressing binary files'
-        run: echo "foo"
-      - name: 'TODO: do things with prismagraphql/build:release image (upload artifacts, verify uploaded artifacts)'
-        run: echo "foo"
+      # TODO uncomment
+      # This fails with permission denied at the moment
+      # - name: 'AWS S3: Upload to bucket and verify uploaded files then create `.finished` file'
+      #   env:
+      #     AWS_DEFAULT_REGION: 'eu-west-1'
+      #     AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #   run: bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-s3
 
-      - uses: actions/upload-artifact@v4
-        if: ${{ matrix.target.target_path == '' }}
-        with:
-          name: Engine files ${{ matrix.target.name }}
-          path: |
-            ${{ github.workspace }}/target/release/libquery_engine.dylib
-            ${{ github.workspace }}/target/release/schema-engine
-            ${{ github.workspace }}/target/release/query-engine
-            ${{ github.workspace }}/target/release/prisma-fmt
-      - uses: actions/upload-artifact@v4
-        if: ${{ matrix.target.target_path != '' }}
-        with:
-          name: Engine files ${{ matrix.target.name }}
-          path: |
-            ${{ github.workspace }}/target/${{ matrix.target.target_path }}/release/libquery_engine.dylib
-            ${{ github.workspace }}/target/${{ matrix.target.target_path }}/release/schema-engine
-            ${{ github.workspace }}/target/${{ matrix.target.target_path }}/release/query-engine
-            ${{ github.workspace }}/target/${{ matrix.target.target_path }}/release/prisma-fmt
+      - name: Cleanup local directories
+        run: rm -rf engines-artifacts engines-artifacts-for-r2 engines-artifacts-for-s3

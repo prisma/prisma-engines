@@ -1,0 +1,64 @@
+name: Build Engines for Windows
+
+on:
+  workflow_call:
+    inputs:
+      commit:
+        description: 'Commit on the given branch to build'
+        type: string
+        required: false
+
+jobs:
+  build:
+    name: 'Windows engines build for commit ${{ inputs.commit }}'
+    env:
+      SQLITE_MAX_VARIABLE_NUMBER: 250000
+      SQLITE_MAX_EXPR_DEPTH: 10000
+      RUSTFLAGS: '-C target-feature=+crt-static'
+    runs-on: windows-latest
+
+    steps:
+      - name: Output link to real commit
+        run: echo ${{ github.repository }}/commit/${{ inputs.commit }}
+
+      - name: Checkout ${{ inputs.commit }}
+        uses: actions/checkout@v4
+        with:
+          repository: prisma/prisma-engines
+          ref: ${{ inputs.commit }}
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - run: cargo build --release -p query-engine -p query-engine-node-api -p schema-engine-cli -p prisma-fmt
+
+      - name: Rename files
+        working-directory: ${{ github.workspace }}/target/release/
+        run: |
+          echo "Files in target/release before renaming"
+          ls .
+
+          mv query_engine.dll query_engine.dll.node
+          mv query-engine.exe query-engine.exe
+
+          echo "Files in target/release after renaming"
+          ls .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            ${{ github.workspace }}/target/release/prisma-fmt.exe
+            ${{ github.workspace }}/target/release/schema-engine.exe
+            ${{ github.workspace }}/target/release/query-engine.exe
+            ${{ github.workspace }}/target/release/query_engine.dll.node
