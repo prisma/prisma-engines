@@ -89,6 +89,8 @@ impl From<SqliteError> for Error {
                 builder.set_original_code(format!("{extended_code}"));
 
                 if let Some(description) = message {
+                    println!("SQLITE_ERR_MSG ({}): {}", extended_code, &description);
+
                     builder.set_original_message(description);
                 }
 
