@@ -1,4 +1,4 @@
-use crate::offsets::offset_to_lsp_offset;
+use crate::offsets::span_to_lsp_offsets;
 use psl::{
     diagnostics::{DatamodelError, DatamodelWarning},
     ValidatedSchema,
@@ -25,24 +25,30 @@ pub(crate) fn run(schema: SchemaFileInput) -> String {
     let mut mini_errors: Vec<MiniError> = diagnostics
         .errors()
         .iter()
-        .map(|err: &DatamodelError| MiniError {
-            file_name: db.file_name(err.span().file_id).to_owned(),
-            start: offset_to_lsp_offset(err.span().start, db.source(err.span().file_id)),
-            end: offset_to_lsp_offset(err.span().end, db.source(err.span().file_id)),
-            text: err.message().to_string(),
-            is_warning: false,
+        .map(|err: &DatamodelError| {
+            let (start, end) = span_to_lsp_offsets(err.span(), db.source(err.span().file_id));
+            MiniError {
+                file_name: db.file_name(err.span().file_id).to_owned(),
+                start,
+                end,
+                text: err.message().to_string(),
+                is_warning: false,
+            }
         })
         .collect();
 
     let mut mini_warnings: Vec<MiniError> = diagnostics
         .warnings()
         .iter()
-        .map(|warn: &DatamodelWarning| MiniError {
-            file_name: db.file_name(warn.span().file_id).to_owned(),
-            start: offset_to_lsp_offset(warn.span().start, db.source(warn.span().file_id)),
-            end: offset_to_lsp_offset(warn.span().end, db.source(warn.span().file_id)),
-            text: warn.message().to_owned(),
-            is_warning: true,
+        .map(|warn: &DatamodelWarning| {
+            let (start, end) = span_to_lsp_offsets(warn.span(), db.source(warn.span().file_id));
+            MiniError {
+                file_name: db.file_name(warn.span().file_id).to_owned(),
+                start,
+                end,
+                text: warn.message().to_owned(),
+                is_warning: true,
+            }
         })
         .collect();
 

@@ -61,35 +61,21 @@ pub(crate) fn position_after_span(span: Span, document: &str) -> Position {
     offset_to_position(end, document)
 }
 
-/// Converts the byte offset to the offset used in the LSP, which is the number of the UTF-16 code unit.
-pub(crate) fn offset_to_lsp_offset(offset: usize, document: &str) -> usize {
-    let mut current_offset = 0;
-    let mut current_lsp_offset = 0;
-
-    for chr in document.chars() {
-        if offset <= current_offset {
-            break;
-        }
-        current_offset += chr.len_utf8();
-        current_lsp_offset += chr.len_utf16();
-    }
-
-    current_lsp_offset
-}
-
-fn offset_to_position_and_new_offset(
+fn offset_to_position_and_next_offset(
     offset: usize,
     document: &str,
     initial_position: Position,
+    initial_lsp_offset: usize,
     initial_offset: usize,
-) -> (Position, usize) {
+) -> (Position, usize, usize) {
     let mut position = initial_position;
+    let mut current_lsp_offset = initial_lsp_offset;
     let mut current_offset = initial_offset;
 
     for chr in document[current_offset..].chars() {
         match chr {
             _ if offset <= current_offset => {
-                return (position, current_offset);
+                return (position, current_lsp_offset, current_offset);
             }
             '\n' => {
                 position.character = 0;
@@ -100,24 +86,50 @@ fn offset_to_position_and_new_offset(
             }
         }
         current_offset += chr.len_utf8();
+        current_lsp_offset += chr.len_utf16();
     }
 
-    (position, current_offset)
+    (position, current_lsp_offset, current_offset)
+}
+
+#[allow(dead_code)]
+/// Converts the byte offset to the offset used in the LSP, which is the number of the UTF-16 code unit.
+pub(crate) fn offset_to_lsp_offset(offset: usize, document: &str) -> usize {
+    let (_, lsp_offset, _) = offset_to_position_and_next_offset(offset, document, Position::default(), 0, 0);
+    lsp_offset
 }
 
 /// Converts a byte offset to an LSP position, if the given offset
 /// does not overflow the document.
 fn offset_to_position(offset: usize, document: &str) -> Position {
-    let (position, _) = offset_to_position_and_new_offset(offset, document, Position::default(), 0);
+    let (position, _, _) = offset_to_position_and_next_offset(offset, document, Position::default(), 0, 0);
     position
+}
+
+fn span_to_range_and_lsp_offsets(span: Span, document: &str) -> (Range, (usize, usize)) {
+    let (start_position, start_lsp_offset, next_offset) =
+        offset_to_position_and_next_offset(span.start, document, Position::default(), 0, 0);
+    let (end_position, end_lsp_offset, _) =
+        offset_to_position_and_next_offset(span.end, document, start_position, start_lsp_offset, next_offset);
+
+    (
+        Range::new(start_position, end_position),
+        (start_lsp_offset, end_lsp_offset),
+    )
+}
+
+/// Converts a span to a pair of LSP offsets.
+pub fn span_to_lsp_offsets(span: Span, document: &str) -> (usize, usize) {
+    let (_, lsp_offsets) = span_to_range_and_lsp_offsets(span, document);
+
+    lsp_offsets
 }
 
 /// Converts a span to a pair of LSP positions.
 pub fn span_to_range(span: Span, document: &str) -> Range {
-    let (start, next_offset) = offset_to_position_and_new_offset(span.start, document, Position::default(), 0);
-    let (end, _) = offset_to_position_and_new_offset(span.end, document, start, next_offset);
+    let (range, _) = span_to_range_and_lsp_offsets(span, document);
 
-    Range { start, end }
+    range
 }
 
 #[cfg(test)]
