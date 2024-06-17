@@ -123,7 +123,7 @@ jobs:
       - name: Release is necessary!
         # https://github.com/peter-evans/find-comment/tree/v3/?tab=readme-ov-file#outputs
         # Tip: Empty strings evaluate to zero in GitHub Actions expressions. e.g. If comment-id is an empty string steps.fc.outputs.comment-id == 0 evaluates to true.
-        if: github.event_name == 'push' || steps.check-comments.outputs.comment-id != 0 || steps.check-pr-description.outputs.release == 'true'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || steps.check-comments.outputs.comment-id != 0 || steps.check-pr-description.outputs.release == 'true'
         id: decision
         env:
           EVENT_NAME: ${{ github.event_name }}
