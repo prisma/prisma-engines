@@ -1,0 +1,65 @@
+name: Build Engines for Apple Silicon
+
+on:
+  workflow_call:
+    inputs:
+      commit:
+        description: 'Commit on the given branch to build'
+        type: string
+        required: false
+
+jobs:
+  build:
+    name: 'MacOS ARM64 (Apple Silicon) engines build for commit ${{ inputs.commit }}'
+    env:
+      SQLITE_MAX_VARIABLE_NUMBER: 250000
+      SQLITE_MAX_EXPR_DEPTH: 10000
+    runs-on: macos-13
+
+    steps:
+      - name: Output link to real commit
+        run: echo ${{ github.repository }}/commit/${{ inputs.commit }}
+
+      - name: Checkout ${{ inputs.commit }}
+        uses: actions/checkout@v4
+        with:
+          repository: prisma/prisma-engines
+          ref: ${{ inputs.commit }}
+
+      - run: xcodebuild -showsdks
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Install aarch64 toolchain
+        run: rustup target add aarch64-apple-darwin
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - run: |
+          cargo build --target=aarch64-apple-darwin --release -p query-engine -p query-engine-node-api -p schema-engine-cli -p prisma-fmt
+
+      - name: Rename files
+        working-directory: ${{ github.workspace }}/target/aarch64-apple-darwin/release
+        run: |
+          echo "Files in target/release before renaming"
+          ls -la .
+
+          mv libquery_engine.dylib libquery_engine.dylib.node
+
+          echo "Files in target/release after renaming"
+          ls -la .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: darwin-arm64
+          path: |
+            ${{ github.workspace }}/target/aarch64-apple-darwin/release/schema-engine
+            ${{ github.workspace }}/target/aarch64-apple-darwin/release/prisma-fmt
+            ${{ github.workspace }}/target/aarch64-apple-darwin/release/query-engine
+            ${{ github.workspace }}/target/aarch64-apple-darwin/release/libquery_engine.dylib.node
