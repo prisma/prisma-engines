@@ -5,7 +5,9 @@ mod sqlite {
     #[connector_test]
     async fn close_tx_on_error(runner: Runner) -> TestResult<()> {
         // Try to open a transaction with unsupported isolation error in SQLite.
-        let result = runner.start_tx(2000, 5000, Some("ReadUncommitted".to_owned())).await;
+        let result = runner
+            .start_tx(2000, 5000, Some("ReadUncommitted".to_owned()), None)
+            .await;
         assert!(result.is_err());
 
         // Without the changes from https://github.com/prisma/prisma-engines/pull/4286 or
@@ -16,7 +18,7 @@ mod sqlite {
         // IMMEDIATE if we had control over SQLite transaction type here, as that would not rely on
         // both transactions using the same connection if we were to pool multiple SQLite
         // connections in the future.
-        let tx = runner.start_tx(2000, 5000, None).await?;
+        let tx = runner.start_tx(2000, 5000, None, None).await?;
         runner.rollback_tx(tx).await?.unwrap();
 
         Ok(())
