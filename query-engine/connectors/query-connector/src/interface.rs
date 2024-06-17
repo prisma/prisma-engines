@@ -2,6 +2,7 @@ use crate::{NativeUpsert, WriteArgs};
 use async_trait::async_trait;
 use prisma_value::PrismaValue;
 use query_structure::{ast::FieldArity, *};
+use serde::Serialize;
 use std::collections::HashMap;
 
 #[async_trait]
@@ -359,5 +360,5 @@ pub trait WriteOperations {
         model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         query_type: Option<String>,
-    ) -> crate::Result<serde_json::Value>;
+    ) -> crate::Result<String>;
 }

@@ -1,7 +1,8 @@
 use crate::filter::FilterBuilder;
+// use crate::value_ext::IntoTypedJsonExtension;
 use crate::{
     column_metadata, error::*, model_extensions::*, sql_trace::trace_parent_to_string, sql_trace::SqlTraceComment,
-    value_ext::IntoTypedJsonExtension, ColumnMetadata, Context, SqlRow, ToSqlRow,
+    ColumnMetadata, Context, SqlRow, ToSqlRow,
 };
 use async_trait::async_trait;
 use connector_interface::RecordFilter;
@@ -11,7 +12,6 @@ use opentelemetry::trace::TraceContextExt;
 use opentelemetry::trace::TraceFlags;
 use quaint::{ast::*, connector::Queryable};
 use query_structure::*;
-use serde_json::{Map, Value};
 use std::{collections::HashMap, panic::AssertUnwindSafe};
 use tracing::{info_span, Span};
 use tracing_futures::Instrument;
@@ -54,7 +54,7 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
     async fn raw_json<'a>(
         &'a self,
         mut inputs: HashMap<String, PrismaValue>,
-    ) -> std::result::Result<Value, crate::error::RawError> {
+    ) -> std::result::Result<String, crate::error::RawError> {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
@@ -62,24 +62,26 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         let result_set = AssertUnwindSafe(self.query_raw_typed(&query, &params))
             .catch_unwind()
             .await??;
+        let res = serde_json::to_string(&result_set).unwrap();
 
-        // `query_raw` does not return column names in `ResultSet` when a call to a stored procedure is done
-        let columns: Vec<String> = result_set.columns().iter().map(ToString::to_string).collect();
-        let mut result = Vec::new();
+        Ok(res)
+        // // `query_raw` does not return column names in `ResultSet` when a call to a stored procedure is done
+        // let columns: Vec<String> = result_set.columns().iter().map(ToString::to_string).collect();
+        // let mut result = Vec::new();
 
-        for row in result_set.into_iter() {
-            let mut object = Map::new();
+        // for row in result_set.into_iter() {
+        //     let mut object = Map::new();
 
-            for (idx, p_value) in row.into_iter().enumerate() {
-                let column_name = columns.get(idx).unwrap_or(&format!("f{idx}")).clone();
+        //     for (idx, p_value) in row.into_iter().enumerate() {
+        //         let column_name = columns.get(idx).unwrap_or(&format!("f{idx}")).clone();
 
-                object.insert(column_name, p_value.as_typed_json());
-            }
+        //         object.insert(column_name, p_value.as_typed_json());
+        //     }
 
-            result.push(Value::Object(object));
-        }
+        //     result.push(Value::Object(object));
+        // }
 
-        Ok(Value::Array(result))
+        // Ok(Value::Array(result))
     }
 
     async fn raw_count<'a>(
@@ -190,7 +192,7 @@ pub(crate) trait QueryExt {
     async fn raw_json<'a>(
         &'a self,
         mut inputs: HashMap<String, PrismaValue>,
-    ) -> std::result::Result<Value, crate::error::RawError>;
+    ) -> std::result::Result<String, crate::error::RawError>;
 
     /// Execute a singular SQL query in the database, returning the number of
     /// affected rows.

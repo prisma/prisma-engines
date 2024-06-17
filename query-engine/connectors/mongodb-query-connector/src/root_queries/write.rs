@@ -505,70 +505,71 @@ pub async fn query_raw<'conn>(
     model: Option<&Model>,
     inputs: HashMap<String, PrismaValue>,
     query_type: Option<String>,
-) -> crate::Result<serde_json::Value> {
-    let db_statement = get_raw_db_statement(&query_type, &model, database);
-    let span = info_span!(
-        "prisma:engine:db_query",
-        user_facing = true,
-        "db.statement" = &&db_statement.as_str()
-    );
+) -> crate::Result<String> {
+    todo!()
+    // let db_statement = get_raw_db_statement(&query_type, &model, database);
+    // let span = info_span!(
+    //     "prisma:engine:db_query",
+    //     user_facing = true,
+    //     "db.statement" = &&db_statement.as_str()
+    // );
 
-    let mongo_command = MongoCommand::from_raw_query(model, inputs, query_type)?;
+    // let mongo_command = MongoCommand::from_raw_query(model, inputs, query_type)?;
 
-    async {
-        let json_result = match mongo_command {
-            MongoCommand::Raw { cmd } => {
-                let query_string_builder = RunCommand::new(&cmd);
-                let mut result = observing(&query_string_builder, || {
-                    database.run_command_with_session(cmd.clone(), None, session)
-                })
-                .await?;
+    // async {
+    //     let json_result = match mongo_command {
+    //         MongoCommand::Raw { cmd } => {
+    //             let query_string_builder = RunCommand::new(&cmd);
+    //             let mut result = observing(&query_string_builder, || {
+    //                 database.run_command_with_session(cmd.clone(), None, session)
+    //             })
+    //             .await?;
 
-                // Removes unnecessary properties from raw response
-                // See https://docs.mongodb.com/v5.0/reference/method/db.runCommand
-                result.remove("operationTime");
-                result.remove("$clusterTime");
-                result.remove("opTime");
-                result.remove("electionId");
+    //             // Removes unnecessary properties from raw response
+    //             // See https://docs.mongodb.com/v5.0/reference/method/db.runCommand
+    //             result.remove("operationTime");
+    //             result.remove("$clusterTime");
+    //             result.remove("opTime");
+    //             result.remove("electionId");
 
-                let json_result: serde_json::Value = Bson::Document(result).into();
+    //             let json_result: serde_json::Value = Bson::Document(result).into();
 
-                json_result
-            }
-            MongoCommand::Handled { collection, operation } => {
-                let coll = database.collection::<Document>(collection.as_str());
+    //             json_result
+    //         }
+    //         MongoCommand::Handled { collection, operation } => {
+    //             let coll = database.collection::<Document>(collection.as_str());
 
-                match operation {
-                    MongoOperation::Find(filter, options) => {
-                        let unwrapped_filter = filter.clone().unwrap_or_default();
-                        let projection = options
-                            .as_ref()
-                            .and_then(|options| options.projection.clone())
-                            .unwrap_or_default();
-                        let query_string_builder = Find::new(&unwrapped_filter, &projection, coll.name());
-                        let cursor = observing(&query_string_builder, || {
-                            coll.find_with_session(filter, options, session)
-                        })
-                        .await?;
+    //             match operation {
+    //                 MongoOperation::Find(filter, options) => {
+    //                     let unwrapped_filter = filter.clone().unwrap_or_default();
+    //                     let projection = options
+    //                         .as_ref()
+    //                         .and_then(|options| options.projection.clone())
+    //                         .unwrap_or_default();
+    //                     let query_string_builder = Find::new(&unwrapped_filter, &projection, coll.name());
+    //                     let cursor = observing(&query_string_builder, || {
+    //                         coll.find_with_session(filter, options, session)
+    //                     })
+    //                     .await?;
 
-                        raw::cursor_to_json(cursor, session).await?
-                    }
-                    MongoOperation::Aggregate(pipeline, options) => {
-                        let query_string_builder = Aggregate::new(&pipeline, coll.name());
-                        let cursor = observing(&query_string_builder, || {
-                            coll.aggregate_with_session(pipeline.clone(), options, session)
-                        })
-                        .await?;
+    //                     raw::cursor_to_json(cursor, session).await?
+    //                 }
+    //                 MongoOperation::Aggregate(pipeline, options) => {
+    //                     let query_string_builder = Aggregate::new(&pipeline, coll.name());
+    //                     let cursor = observing(&query_string_builder, || {
+    //                         coll.aggregate_with_session(pipeline.clone(), options, session)
+    //                     })
+    //                     .await?;
 
-                        raw::cursor_to_json(cursor, session).await?
-                    }
-                }
-            }
-        };
-        Ok(json_result)
-    }
-    .instrument(span)
-    .await
+    //                     raw::cursor_to_json(cursor, session).await?
+    //                 }
+    //             }
+    //         }
+    //     };
+    //     Ok(json_result)
+    // }
+    // .instrument(span)
+    // .await
 }
 
 fn get_raw_db_statement(query_type: &Option<String>, model: &Option<&Model>, database: &Database) -> String {

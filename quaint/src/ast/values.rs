@@ -3,6 +3,8 @@ use crate::error::{Error, ErrorKind};
 
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
+use serde::ser::SerializeMap as _;
+use serde::Serialize;
 use serde_json::{Number, Value as JsonValue};
 use std::fmt::Display;
 use std::{
@@ -1291,6 +1293,101 @@ impl<'a> TryFrom<&Value<'a>> for Option<uuid::Uuid> {
                 Err(Error::builder(kind).build())
             }
         }
+    }
+}
+
+impl<'a> serde::Serialize for Value<'a> {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut obj = serializer.serialize_map(Some(1))?;
+        let type_name = type_name(&self);
+
+        match &self.typed {
+            ValueType::Array(values) => {
+                obj.serialize_entry(type_name, values)?;
+            }
+            ValueType::Int32(value) => {
+                obj.serialize_entry(type_name, value)?;
+            }
+            ValueType::Int64(value) => {
+                obj.serialize_entry(type_name, &value.map(|val| val.to_string()))?;
+            }
+            ValueType::Numeric(decimal) => {
+                obj.serialize_entry(type_name, &decimal.as_ref().map(|dec| dec.normalized().to_string()))?;
+            }
+            ValueType::Float(value) => {
+                obj.serialize_entry(type_name, value)?;
+            }
+            ValueType::Double(value) => {
+                obj.serialize_entry(type_name, value)?;
+            }
+            ValueType::Text(value) => {
+                obj.serialize_entry(type_name, value)?;
+            }
+            ValueType::Enum(value, _) => {
+                obj.serialize_entry(type_name, &value.as_ref().map(|val| val.inner()))?;
+            }
+            ValueType::EnumArray(_, _) => {
+                todo!()
+            }
+            ValueType::Bytes(value) => {
+                obj.serialize_entry(type_name, value)?;
+            }
+            ValueType::Boolean(value) => {
+                obj.serialize_entry(type_name, value)?;
+            }
+            ValueType::Char(value) => {
+                obj.serialize_entry(type_name, value)?;
+            }
+            ValueType::Json(value) => {
+                obj.serialize_entry(type_name, value)?;
+            }
+            ValueType::Xml(value) => {
+                obj.serialize_entry(type_name, value)?;
+            }
+            ValueType::Uuid(value) => {
+                obj.serialize_entry(type_name, value)?;
+            }
+            ValueType::DateTime(value) => {
+                obj.serialize_entry(type_name, value)?;
+            }
+            ValueType::Date(value) => {
+                obj.serialize_entry(type_name, value)?;
+            }
+            ValueType::Time(value) => {
+                obj.serialize_entry(type_name, value)?;
+            }
+        }
+
+        obj.end()
+    }
+}
+
+fn type_name<'a>(val: &'a Value) -> &'a str {
+    if val.is_null() {
+        return "null";
+    }
+
+    match val.typed {
+        ValueType::Int32(_) => "int",
+        ValueType::Int64(_) => "bigint",
+        ValueType::Float(_) => "float",
+        ValueType::Double(_) => "double",
+        ValueType::Text(_) => "string",
+        ValueType::Enum(_, _) => "enum",
+        ValueType::Bytes(_) => "bytes",
+        ValueType::Boolean(_) => "bool",
+        ValueType::Char(_) => "char",
+        ValueType::Numeric(_) => "decimal",
+        ValueType::Json(_) => "json",
+        ValueType::Xml(_) => "xml",
+        ValueType::Uuid(_) => "uuid",
+        ValueType::DateTime(_) => "datetime",
+        ValueType::Date(_) => "date",
+        ValueType::Time(_) => "time",
+        ValueType::Array(_) | ValueType::EnumArray(_, _) => "array",
     }
 }
 

@@ -51,3 +51,5 @@ pub use psl::{
 };
 
 pub type Result<T> = std::result::Result<T, DomainError>;
+
+pub struct QueryRawResult<T>(pub T);

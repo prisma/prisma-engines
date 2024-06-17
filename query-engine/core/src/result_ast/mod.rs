@@ -8,6 +8,7 @@ pub(crate) enum QueryResult {
     RecordSelection(Option<Box<RecordSelection>>),
     RecordSelectionWithRelations(Box<RecordSelectionWithRelations>),
     Json(serde_json::Value),
+    QueyRaw(String),
     RecordAggregations(RecordAggregations),
     Unit,
 }

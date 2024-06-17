@@ -125,3 +125,12 @@ impl From<ResultSet> for serde_json::Value {
         serde_json::Value::Array(result)
     }
 }
+
+impl serde::Serialize for ResultSet {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.collect_seq(self.rows.iter())
+    }
+}
