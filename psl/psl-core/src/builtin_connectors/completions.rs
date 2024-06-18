@@ -1,9 +1,6 @@
-use crate::datamodel_connector::format_completion_docs;
-use lsp_types::{
-    CompletionItem, CompletionItemKind, CompletionList, Documentation, InsertTextFormat, MarkupContent, MarkupKind,
-};
-
-pub(crate) fn extensions_completion(completion_list: &mut CompletionList) {
+#[cfg(feature = "postgresql")]
+pub(crate) fn extensions_completion(completion_list: &mut lsp_types::CompletionList) {
+    use lsp_types::*;
     completion_list.items.push(CompletionItem {
         label: "extensions".to_owned(),
         insert_text: Some("extensions = [$0]".to_owned()),
@@ -11,7 +8,7 @@ pub(crate) fn extensions_completion(completion_list: &mut CompletionList) {
         kind: Some(CompletionItemKind::FIELD),
         documentation: Some(Documentation::MarkupContent(MarkupContent {
             kind: MarkupKind::Markdown,
-            value: format_completion_docs(
+            value: crate::datamodel_connector::format_completion_docs(
                 r#"extensions = [pg_trgm, postgis(version: "2.1")]"#,
                 r#"Enable PostgreSQL extensions. [Learn more](https://pris.ly/d/postgresql-extensions)"#,
                 None,
@@ -21,7 +18,9 @@ pub(crate) fn extensions_completion(completion_list: &mut CompletionList) {
     })
 }
 
-pub(crate) fn schemas_completion(completion_list: &mut CompletionList) {
+#[cfg(any(feature = "postgresql", feature = "cockroachdb", feature = "mysql"))]
+pub(crate) fn schemas_completion(completion_list: &mut lsp_types::CompletionList) {
+    use lsp_types::*;
     completion_list.items.push(CompletionItem {
         label: "schemas".to_owned(),
         insert_text: Some(r#"schemas = [$0]"#.to_owned()),
@@ -29,7 +28,7 @@ pub(crate) fn schemas_completion(completion_list: &mut CompletionList) {
         kind: Some(CompletionItemKind::FIELD),
         documentation: Some(Documentation::MarkupContent(MarkupContent {
             kind: MarkupKind::Markdown,
-            value: format_completion_docs(
+            value: crate::datamodel_connector::format_completion_docs(
                 r#"schemas = ["foo", "bar", "baz"]"#,
                 "The list of database schemas. [Learn More](https://pris.ly/d/multi-schema-configuration)",
                 None,

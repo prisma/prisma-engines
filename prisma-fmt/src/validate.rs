@@ -1,6 +1,9 @@
+use psl::ValidatedSchema;
 use serde::Deserialize;
 use serde_json::json;
 use std::fmt::Write as _;
+
+use crate::schema_file_input::SchemaFileInput;
 
 // this mirrors user_facing_errors::common::SchemaParserError
 pub(crate) static SCHEMA_PARSER_ERROR_CODE: &str = "P1012";
@@ -8,7 +11,7 @@ pub(crate) static SCHEMA_PARSER_ERROR_CODE: &str = "P1012";
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 struct ValidateParams {
-    prisma_schema: String,
+    prisma_schema: SchemaFileInput,
     #[serde(default)]
     no_color: bool,
 }
@@ -21,21 +24,23 @@ pub(crate) fn validate(params: &str) -> Result<(), String> {
         }
     };
 
-    run(&params.prisma_schema, params.no_color)
+    run(params.prisma_schema, params.no_color)?;
+    Ok(())
 }
 
-pub fn run(input_schema: &str, no_color: bool) -> Result<(), String> {
-    let validate_schema = psl::validate(input_schema.into());
+pub fn run(input_schema: SchemaFileInput, no_color: bool) -> Result<ValidatedSchema, String> {
+    let sources: Vec<(String, psl::SourceFile)> = input_schema.into();
+    let validate_schema = psl::validate_multi_file(&sources);
     let diagnostics = &validate_schema.diagnostics;
 
     if !diagnostics.has_errors() {
-        return Ok(());
+        return Ok(validate_schema);
     }
 
     // always colorise output regardless of the environment, which is important for Wasm
     colored::control::set_override(!no_color);
 
-    let mut formatted_error = diagnostics.to_pretty_string("schema.prisma", input_schema);
+    let mut formatted_error = validate_schema.render_own_diagnostics();
     write!(
         formatted_error,
         "\nValidation Error Count: {}",
@@ -107,6 +112,83 @@ mod tests {
         });
 
         validate(&request.to_string()).unwrap();
+    }
+
+    #[test]
+    fn validate_multiple_files() {
+        let schema = vec![
+            (
+                "a.prisma",
+                r#"
+                datasource thedb {
+                    provider = "postgresql"
+                    url = env("DBURL")
+                }
+
+                model A {
+                    id String @id
+                    b_id String @unique
+                    b B @relation(fields: [b_id], references: [id])
+                }
+            "#,
+            ),
+            (
+                "b.prisma",
+                r#"
+                model B {
+                    id String @id
+                    a A?
+                }
+            "#,
+            ),
+        ];
+
+        let request = json!({
+            "prismaSchema": schema,
+        });
+
+        validate(&request.to_string()).unwrap();
+    }
+
+    #[test]
+    fn validate_multiple_files_error() {
+        let schema = vec![
+            (
+                "a.prisma",
+                r#"
+                datasource thedb {
+                    provider = "postgresql"
+                    url = env("DBURL")
+                }
+
+                model A {
+                    id String @id
+                    b_id String @unique
+                    b B @relation(fields: [b_id], references: [id])
+                }
+            "#,
+            ),
+            (
+                "b.prisma",
+                r#"
+                model B {
+                    id String @id
+                    a A
+                }
+            "#,
+            ),
+        ];
+
+        let request = json!({
+            "prismaSchema": schema,
+        });
+
+        let expected = expect![[
+            r#"{"error_code":"P1012","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError parsing attribute \"@relation\": The relation field `a` on Model `B` is required. This is not valid because it's not possible to enforce this constraint on the database level. Please change the field type from `A` to `A?` to fix this.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mb.prisma:4\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 3 | \u001b[0m                    id String @id\n\u001b[1;94m 4 | \u001b[0m                    \u001b[1;91ma A\u001b[0m\n\u001b[1;94m 5 | \u001b[0m                }\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1"}"#
+        ]];
+
+        let response = validate(&request.to_string()).unwrap_err();
+        expected.assert_eq(&response);
     }
 
     #[test]

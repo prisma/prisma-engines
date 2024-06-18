@@ -20,6 +20,11 @@ pub struct RecordSelectionWithRelations {
     /// Holds an ordered list of selected field names for each contained record.
     pub(crate) fields: Vec<String>,
 
+    /// Holds the list of virtual selections included in the query result.
+    /// TODO: in the future it should be covered by [`RecordSelection::fields`] by storing ordered
+    /// `Vec<SelectedField>` or `FieldSelection` instead of `Vec<String>`.
+    pub(crate) virtuals: Vec<VirtualSelection>,
+
     /// Selection results
     pub(crate) records: ManyRecords,
 
@@ -41,6 +46,8 @@ pub struct RelationRecordSelection {
     pub name: String,
     /// Holds an ordered list of selected field names for each contained record.
     pub fields: Vec<String>,
+    /// Holds the list of virtual selections included in the query result.
+    pub virtuals: Vec<VirtualSelection>,
     /// The model of the contained records.
     pub model: Model,
     /// Nested relation selections

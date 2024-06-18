@@ -20,10 +20,7 @@ pub(super) fn schemas_property_with_no_connector_support(datasource: &Datasource
         return;
     }
 
-    if ctx
-        .connector
-        .has_capability(crate::datamodel_connector::ConnectorCapability::MultiSchema)
-    {
+    if ctx.has_capability(crate::datamodel_connector::ConnectorCapability::MultiSchema) {
         return;
     }
 

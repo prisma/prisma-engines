@@ -1,0 +1,38 @@
+{
+  "is_panic": false,
+  "message": "Field 'unknown_field' not found in enclosing type 'Post'",
+  "meta": {
+    "kind": "UnknownSelectionField",
+    "outputType": {
+      "name": "Post",
+      "fields": [
+        {
+          "name": "id",
+          "typeName": "Int",
+          "isRelation": false
+        },
+        {
+          "name": "name",
+          "typeName": "String",
+          "isRelation": false
+        },
+        {
+          "name": "userId",
+          "typeName": "Int",
+          "isRelation": false
+        },
+        {
+          "name": "user",
+          "typeName": "User",
+          "isRelation": true
+        }
+      ]
+    },
+    "selectionPath": [
+      "findManyUser",
+      "posts",
+      "unknown_field"
+    ]
+  },
+  "error_code": "P2009"
+}

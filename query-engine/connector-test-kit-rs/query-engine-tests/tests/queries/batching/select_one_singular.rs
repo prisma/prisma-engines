@@ -348,6 +348,53 @@ mod singular_batch {
         Ok(())
     }
 
+    fn boolean_unique() -> String {
+        let schema = indoc! {
+            r#"
+        model User {
+            #id(id, String, @id)
+            isManager Boolean? @unique
+          }
+        "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(boolean_unique))]
+    async fn batch_boolean(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+            createOneUser(data: { id: "A", isManager: true }) { id }
+        }"#
+        );
+        run_query!(
+            &runner,
+            r#"mutation {
+            createOneUser(data: { id: "B", isManager: false }) { id }
+        }"#
+        );
+
+        let (res, compact_doc) = compact_batch(
+            &runner,
+            vec![
+                r#"{ findUniqueUser(where: { isManager: true }) { id, isManager } }"#.to_string(),
+                r#"{ findUniqueUser(where: { isManager: false }) { id, isManager } }"#.to_string(),
+            ],
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+            res.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueUser":{"id":"A","isManager":true}}},{"data":{"findUniqueUser":{"id":"B","isManager":false}}}]}"###
+        );
+
+        assert!(compact_doc.is_compact());
+
+        Ok(())
+    }
+
     // Regression test for https://github.com/prisma/prisma/issues/16548
     #[connector_test(schema(schemas::generic))]
     async fn repro_16548(runner: Runner) -> TestResult<()> {
@@ -428,6 +475,50 @@ mod singular_batch {
           @r###"{"batchResult":[{"data":{"findUniqueTestModelOrThrow":{"id":2}}},{"data":{"findUniqueTestModel":null}}]}"###
         );
         assert!(!compact_doc.is_compact());
+
+        Ok(())
+    }
+
+    fn citext_unique() -> String {
+        let schema = indoc! { r#"
+            model User {
+                #id(id, String, @id)
+                caseInsensitiveField String @unique @test.Citext
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/13534
+    #[connector_test(only(Postgres), schema(citext_unique), db_extensions("citext"))]
+    async fn repro_13534(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+            createOneUser(data: { id: "9df0f936-51d6-4c55-8e01-5144e588a8a1", caseInsensitiveField: "hello world" }) { id }
+        }"#
+        );
+
+        let queries = vec![
+            r#"{ findUniqueUser(
+                where: { caseInsensitiveField: "HELLO WORLD" }
+            ) { id, caseInsensitiveField } }"#
+                .to_string(),
+            r#"{ findUniqueUser(
+                where: { caseInsensitiveField: "HELLO WORLD" }
+            ) { id, caseInsensitiveField } }"#
+                .to_string(),
+        ];
+
+        let (res, compact_doc) = compact_batch(&runner, queries.clone()).await?;
+
+        assert!(!compact_doc.is_compact());
+
+        insta::assert_snapshot!(
+            res.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueUser":{"id":"9df0f936-51d6-4c55-8e01-5144e588a8a1","caseInsensitiveField":"hello world"}}},{"data":{"findUniqueUser":{"id":"9df0f936-51d6-4c55-8e01-5144e588a8a1","caseInsensitiveField":"hello world"}}}]}"###
+        );
 
         Ok(())
     }

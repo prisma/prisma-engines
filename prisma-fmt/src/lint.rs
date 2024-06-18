@@ -1,21 +1,28 @@
 use psl::diagnostics::{DatamodelError, DatamodelWarning};
 
+use crate::schema_file_input::SchemaFileInput;
+
 #[derive(serde::Serialize)]
 pub struct MiniError {
+    file_name: String,
     start: usize,
     end: usize,
     text: String,
     is_warning: bool,
 }
 
-pub(crate) fn run(schema: &str) -> String {
-    let schema = psl::validate(schema.into());
+pub(crate) fn run(schema: SchemaFileInput) -> String {
+    let schema = match schema {
+        SchemaFileInput::Single(file) => psl::validate(file.into()),
+        SchemaFileInput::Multiple(files) => psl::validate_multi_file(&files),
+    };
     let diagnostics = &schema.diagnostics;
 
     let mut mini_errors: Vec<MiniError> = diagnostics
         .errors()
         .iter()
         .map(|err: &DatamodelError| MiniError {
+            file_name: schema.db.file_name(err.span().file_id).to_owned(),
             start: err.span().start,
             end: err.span().end,
             text: err.message().to_string(),
@@ -27,6 +34,7 @@ pub(crate) fn run(schema: &str) -> String {
         .warnings()
         .iter()
         .map(|warn: &DatamodelWarning| MiniError {
+            file_name: schema.db.file_name(warn.span().file_id).to_owned(),
             start: warn.span().start,
             end: warn.span().end,
             text: warn.message().to_owned(),
@@ -45,19 +53,20 @@ fn print_diagnostics(diagnostics: Vec<MiniError>) -> String {
 
 #[cfg(test)]
 mod tests {
+    use super::SchemaFileInput;
     use expect_test::expect;
     use indoc::indoc;
 
-    fn lint(s: &str) -> String {
-        let result = super::run(s);
+    fn lint(schema: SchemaFileInput) -> String {
+        let result = super::run(schema);
         let value: serde_json::Value = serde_json::from_str(&result).unwrap();
 
         serde_json::to_string_pretty(&value).unwrap()
     }
 
     #[test]
-    fn deprecated_preview_features_should_give_a_warning() {
-        let dml = indoc! {r#"
+    fn single_deprecated_preview_features_should_give_a_warning() {
+        let schema = indoc! {r#"
             datasource db {
               provider = "postgresql"
               url      = env("DATABASE_URL")
@@ -72,10 +81,12 @@ mod tests {
               id  String   @id
             }
         "#};
+        let datamodel = SchemaFileInput::Single(schema.to_string());
 
         let expected = expect![[r#"
             [
               {
+                "file_name": "schema.prisma",
                 "start": 149,
                 "end": 163,
                 "text": "Preview feature \"createMany\" is deprecated. The functionality can be used without specifying it as a preview feature.",
@@ -83,6 +94,45 @@ mod tests {
               }
             ]"#]];
 
-        expected.assert_eq(&lint(dml));
+        expected.assert_eq(&lint(datamodel));
+    }
+
+    #[test]
+    fn multi_deprecated_preview_features_should_give_a_warning() {
+        let schema1 = indoc! {r#"
+            datasource db {
+              provider = "postgresql"
+              url      = env("DATABASE_URL")
+            }
+
+            generator client {
+              provider = "prisma-client-js"
+              previewFeatures = ["createMany"]
+            }
+        "#};
+
+        let schema2 = indoc! {r#"
+            model A {
+              id  String   @id
+            }
+        "#};
+
+        let datamodel = SchemaFileInput::Multiple(vec![
+            ("schema1.prisma".to_string(), schema1.into()),
+            ("schema2.prisma".to_string(), schema2.into()),
+        ]);
+
+        let expected = expect![[r#"
+            [
+              {
+                "file_name": "schema1.prisma",
+                "start": 149,
+                "end": 163,
+                "text": "Preview feature \"createMany\" is deprecated. The functionality can be used without specifying it as a preview feature.",
+                "is_warning": true
+              }
+            ]"#]];
+
+        expected.assert_eq(&lint(datamodel));
     }
 }

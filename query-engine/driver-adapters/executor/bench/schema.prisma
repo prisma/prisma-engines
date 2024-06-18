@@ -5,7 +5,7 @@ datasource db {
 
 generator foo {
     provider        = "prisma-client-js"
-    previewFeatures = ["driverAdapters"]
+    previewFeatures = ["driverAdapters", "relationJoins"]
 }
 
 model Movie {

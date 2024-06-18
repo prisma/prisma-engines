@@ -7,7 +7,7 @@ use crate::{
 };
 use connector::AggregationResult;
 use indexmap::IndexMap;
-use query_structure::{CompositeFieldRef, Field, PrismaValue, SelectionResult, VirtualSelection};
+use query_structure::{CompositeFieldRef, Field, Model, PrismaValue, SelectionResult, VirtualSelection};
 use schema::{
     constants::{aggregations::*, output_fields::*},
     *,
@@ -307,6 +307,20 @@ fn finalize_objects(
     }
 }
 
+enum SerializedFieldWithRelations<'a, 'b> {
+    Model(Field, &'a OutputField<'b>),
+    VirtualsGroup(&'a str, Vec<&'a VirtualSelection>),
+}
+
+impl<'a, 'b> SerializedFieldWithRelations<'a, 'b> {
+    fn name(&self) -> &str {
+        match self {
+            Self::Model(f, _) => f.name(),
+            Self::VirtualsGroup(name, _) => name,
+        }
+    }
+}
+
 // TODO: Handle errors properly
 fn serialize_objects_with_relation(
     result: RecordSelectionWithRelations,
@@ -314,14 +328,10 @@ fn serialize_objects_with_relation(
 ) -> crate::Result<UncheckedItemsWithParents> {
     let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.records.records.len());
 
-    let model = result.model;
-    let db_field_names = result.records.field_names;
     let nested = result.nested;
 
-    let fields: Vec<_> = db_field_names
-        .iter()
-        .filter_map(|f| model.fields().all().find(|field| field.db_name() == f))
-        .collect();
+    let fields =
+        collect_serialized_fields_with_relations(typ, &result.model, &result.virtuals, &result.records.field_names);
 
     // Hack: we convert it to a hashset to support contains with &str as input
     // because Vec<String>::contains(&str) doesn't work and we don't want to allocate a string record value
@@ -341,13 +351,16 @@ fn serialize_objects_with_relation(
                 continue;
             }
 
-            let out_field = typ.find_field(field.name()).unwrap();
-
             match field {
-                Field::Scalar(_) if !out_field.field_type().is_object() => {
+                SerializedFieldWithRelations::Model(Field::Scalar(_), out_field)
+                    if !out_field.field_type().is_object() =>
+                {
                     object.insert(field.name().to_owned(), serialize_scalar(out_field, val)?);
                 }
-                Field::Relation(_) if out_field.field_type().is_list() => {
+
+                SerializedFieldWithRelations::Model(Field::Relation(_), out_field)
+                    if out_field.field_type().is_list() =>
+                {
                     let inner_typ = out_field.field_type.as_object_type().unwrap();
                     let rrs = nested.iter().find(|rrs| rrs.name == field.name()).unwrap();
 
@@ -360,7 +373,8 @@ fn serialize_objects_with_relation(
 
                     object.insert(field.name().to_owned(), Item::list(items));
                 }
-                Field::Relation(_) => {
+
+                SerializedFieldWithRelations::Model(Field::Relation(_), out_field) => {
                     let inner_typ = out_field.field_type.as_object_type().unwrap();
                     let rrs = nested.iter().find(|rrs| rrs.name == field.name()).unwrap();
 
@@ -369,6 +383,11 @@ fn serialize_objects_with_relation(
                         serialize_relation_selection(rrs, val, inner_typ)?,
                     );
                 }
+
+                SerializedFieldWithRelations::VirtualsGroup(group_name, virtuals) => {
+                    object.insert(group_name.to_string(), serialize_virtuals_group(val, virtuals)?);
+                }
+
                 _ => panic!("unexpected field"),
             }
         }
@@ -397,21 +416,18 @@ fn serialize_relation_selection(
 
     // TODO: better handle errors
     let mut value_obj: HashMap<String, PrismaValue> = HashMap::from_iter(value.into_object().unwrap());
-    let db_field_names = &rrs.fields;
-    let fields: Vec<_> = db_field_names
-        .iter()
-        .filter_map(|f| rrs.model.fields().all().find(|field| field.name() == f))
-        .collect();
+
+    let fields = collect_serialized_fields_with_relations(typ, &rrs.model, &rrs.virtuals, &rrs.fields);
 
     for field in fields {
-        let out_field = typ.find_field(field.name()).unwrap();
-        let value = value_obj.remove(field.db_name()).unwrap();
+        let value = value_obj.remove(field.name()).unwrap();
 
         match field {
-            Field::Scalar(_) if !out_field.field_type().is_object() => {
+            SerializedFieldWithRelations::Model(Field::Scalar(_), out_field) if !out_field.field_type().is_object() => {
                 map.insert(field.name().to_owned(), serialize_scalar(out_field, value)?);
             }
-            Field::Relation(_) if out_field.field_type().is_list() => {
+
+            SerializedFieldWithRelations::Model(Field::Relation(_), out_field) if out_field.field_type().is_list() => {
                 let inner_typ = out_field.field_type.as_object_type().unwrap();
                 let inner_rrs = rrs.nested.iter().find(|rrs| rrs.name == field.name()).unwrap();
 
@@ -424,7 +440,8 @@ fn serialize_relation_selection(
 
                 map.insert(field.name().to_owned(), Item::list(items));
             }
-            Field::Relation(_) => {
+
+            SerializedFieldWithRelations::Model(Field::Relation(_), out_field) => {
                 let inner_typ = out_field.field_type.as_object_type().unwrap();
                 let inner_rrs = rrs.nested.iter().find(|rrs| rrs.name == field.name()).unwrap();
 
@@ -433,11 +450,63 @@ fn serialize_relation_selection(
                     serialize_relation_selection(inner_rrs, value, inner_typ)?,
                 );
             }
+
+            SerializedFieldWithRelations::VirtualsGroup(group_name, virtuals) => {
+                map.insert(group_name.to_string(), serialize_virtuals_group(value, &virtuals)?);
+            }
+
             _ => (),
         }
     }
 
     Ok(Item::Map(map))
+}
+
+fn collect_serialized_fields_with_relations<'a, 'b>(
+    object_type: &'a ObjectType<'b>,
+    model: &Model,
+    virtuals: &'a [VirtualSelection],
+    db_field_names: &'a [String],
+) -> Vec<SerializedFieldWithRelations<'a, 'b>> {
+    db_field_names
+        .iter()
+        .map(|name| {
+            model
+                .fields()
+                .all()
+                .find(|field| field.name() == name)
+                .and_then(|field| {
+                    object_type
+                        .find_field(field.name())
+                        .map(|out_field| SerializedFieldWithRelations::Model(field, out_field))
+                })
+                .unwrap_or_else(|| {
+                    let matching_virtuals = virtuals.iter().filter(|vs| vs.serialized_name().0 == name).collect();
+                    SerializedFieldWithRelations::VirtualsGroup(name.as_str(), matching_virtuals)
+                })
+        })
+        .collect()
+}
+
+fn serialize_virtuals_group(obj_value: PrismaValue, virtuals: &[&VirtualSelection]) -> crate::Result<Item> {
+    let mut db_object: HashMap<String, PrismaValue> = HashMap::from_iter(obj_value.into_object().unwrap());
+    let mut out_object = Map::new();
+
+    // We have to reorder the object fields according to selection even if the query
+    // builder respects the initial order because JSONB does not preserve order.
+    for vs in virtuals {
+        let (group_name, nested_name) = vs.serialized_name();
+
+        let value = db_object.remove(nested_name).ok_or_else(|| {
+            CoreError::SerializationError(format!(
+                "Expected virtual field {nested_name} not found in {group_name} object"
+            ))
+        })?;
+
+        out_object.insert(nested_name.into(), Item::Value(vs.coerce_value(value)?));
+    }
+
+    Ok(Item::Map(out_object))
 }
 
 enum SerializedField<'a, 'b> {
@@ -495,7 +564,8 @@ fn serialize_objects(
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
     for record in result.records.records {
-        let record_id = Some(record.extract_selection_result(&db_field_names, &model.primary_identifier())?);
+        let record_id =
+            Some(record.extract_selection_result_from_db_name(&db_field_names, &model.primary_identifier())?);
 
         if !object_mapping.contains_key(&record.parent_id) {
             object_mapping.insert(record.parent_id.clone(), Vec::new());

@@ -1,15 +1,21 @@
 //! Rendering of enumerators.
 
+use std::borrow::Cow;
+
 use crate::introspection::{
     datamodel_calculator::DatamodelCalculatorContext, introspection_helpers as helpers, introspection_pair::EnumPair,
     sanitize_datamodel_names,
 };
 use datamodel_renderer::datamodel as renderer;
-use psl::parser_database::ast;
+use psl::parser_database as db;
 
 /// Render all enums.
-pub(super) fn render<'a>(ctx: &'a DatamodelCalculatorContext<'a>, rendered: &mut renderer::Datamodel<'a>) {
-    let mut all_enums: Vec<(Option<ast::EnumId>, renderer::Enum<'_>)> = Vec::new();
+pub(super) fn render<'a>(
+    introspection_file_name: Cow<'a, str>,
+    ctx: &'a DatamodelCalculatorContext<'a>,
+    rendered: &mut renderer::Datamodel<'a>,
+) {
+    let mut all_enums: Vec<(Option<db::EnumId>, renderer::Enum<'_>)> = Vec::new();
 
     for pair in ctx.enum_pairs() {
         all_enums.push((pair.previous_position(), render_enum(pair)))
@@ -25,8 +31,13 @@ pub(super) fn render<'a>(ctx: &'a DatamodelCalculatorContext<'a>, rendered: &mut
         });
     }
 
-    for (_, enm) in all_enums {
-        rendered.push_enum(enm);
+    for (previous_schema_enum, enm) in all_enums {
+        let file_name = match previous_schema_enum {
+            Some((prev_file_id, _)) => Cow::Borrowed(ctx.previous_schema.db.file_name(prev_file_id)),
+            None => introspection_file_name.clone(),
+        };
+
+        rendered.push_enum(file_name, enm);
     }
 }
 

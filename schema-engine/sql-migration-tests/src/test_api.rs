@@ -96,7 +96,21 @@ impl TestApi {
         schema: &'a str,
         migrations_directory: &'a TempDir,
     ) -> CreateMigration<'a> {
-        CreateMigration::new(&mut self.connector, name, schema, migrations_directory)
+        CreateMigration::new(
+            &mut self.connector,
+            name,
+            &[("schema.prisma", schema)],
+            migrations_directory,
+        )
+    }
+
+    pub fn create_migration_multi_file<'a>(
+        &'a mut self,
+        name: &'a str,
+        files: &[(&'a str, &'a str)],
+        migrations_directory: &'a TempDir,
+    ) -> CreateMigration<'a> {
+        CreateMigration::new(&mut self.connector, name, files, migrations_directory)
     }
 
     /// Create a temporary directory to serve as a test migrations directory.
@@ -132,7 +146,15 @@ impl TestApi {
         migrations_directory: &'a TempDir,
         schema: String,
     ) -> EvaluateDataLoss<'a> {
-        EvaluateDataLoss::new(&mut self.connector, migrations_directory, schema)
+        EvaluateDataLoss::new(&mut self.connector, migrations_directory, &[("schema.prisma", &schema)])
+    }
+
+    pub fn evaluate_data_loss_multi_file<'a>(
+        &'a mut self,
+        migrations_directory: &'a TempDir,
+        files: &[(&'a str, &'a str)],
+    ) -> EvaluateDataLoss<'a> {
+        EvaluateDataLoss::new(&mut self.connector, migrations_directory, files)
     }
 
     /// Returns true only when testing on MSSQL.
@@ -319,7 +341,7 @@ impl TestApi {
     pub fn expect_sql_for_schema(&mut self, schema: &'static str, sql: &expect_test::Expect) {
         let found = self.connector_diff(
             DiffTarget::Empty,
-            DiffTarget::Datamodel(SourceFile::new_static(schema)),
+            DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema))]),
             None,
         );
         sql.assert_eq(&found);
@@ -331,10 +353,25 @@ impl TestApi {
         self.schema_push(schema)
     }
 
+    pub fn schema_push_w_datasource_multi_file(&mut self, files: &[(&str, &str)]) -> SchemaPush<'_> {
+        let (first, rest) = files.split_first().unwrap();
+        let first_with_provider = self.datamodel_with_provider(first.1);
+        let recombined = [&[(first.0, first_with_provider.as_str())], rest].concat();
+
+        self.schema_push_multi_file(&recombined)
+    }
+
     /// Plan a `schemaPush` command
     pub fn schema_push(&mut self, dm: impl Into<String>) -> SchemaPush<'_> {
         let max_ddl_refresh_delay = self.max_ddl_refresh_delay();
-        SchemaPush::new(&mut self.connector, dm.into(), max_ddl_refresh_delay)
+        let dm: String = dm.into();
+
+        SchemaPush::new(&mut self.connector, &[("schema.prisma", &dm)], max_ddl_refresh_delay)
+    }
+
+    pub fn schema_push_multi_file(&mut self, files: &[(&str, &str)]) -> SchemaPush<'_> {
+        let max_ddl_refresh_delay = self.max_ddl_refresh_delay();
+        SchemaPush::new(&mut self.connector, files, max_ddl_refresh_delay)
     }
 
     pub fn tags(&self) -> BitFlags<Tags> {

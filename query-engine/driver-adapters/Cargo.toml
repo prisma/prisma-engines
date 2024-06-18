@@ -3,15 +3,20 @@ name = "driver-adapters"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+mysql = ["quaint/mysql"]
+sqlite = ["quaint/sqlite"]
+postgresql = ["quaint/postgresql"]
+
 [dependencies]
-async-trait = "0.1"
+async-trait.workspace = true
 once_cell = "1.15"
 serde.workspace = true
 serde_json.workspace = true
-tracing = "0.1"
+tracing.workspace = true
 tracing-core = "0.1"
 metrics = "0.18"
-uuid = { version = "1", features = ["v4"] }
+uuid.workspace = true
 pin-project = "1"
 serde_repr.workspace = true
 
@@ -28,7 +33,7 @@ napi-derive.workspace = true
 quaint.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-quaint = { path = "../../quaint" }
+quaint = { path = "../../quaint", default-features = false }
 js-sys.workspace = true
 serde-wasm-bindgen.workspace = true
 wasm-bindgen.workspace = true

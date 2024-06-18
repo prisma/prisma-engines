@@ -82,6 +82,7 @@ impl TypeIdentifier for Column<'_> {
         )
     }
 
+    #[cfg(feature = "mysql")]
     fn is_time(&self) -> bool {
         false
     }
@@ -118,9 +119,12 @@ impl TypeIdentifier for Column<'_> {
         matches!(self.decl_type(), Some("BOOLEAN") | Some("boolean"))
     }
 
+    #[cfg(feature = "mysql")]
     fn is_json(&self) -> bool {
         false
     }
+
+    #[cfg(feature = "mysql")]
     fn is_enum(&self) -> bool {
         false
     }
@@ -191,9 +195,10 @@ impl<'a> GetRow for SqliteRow<'a> {
                     }
                 }
                 ValueRef::Real(f) if column.is_real() => {
-                    use bigdecimal::{BigDecimal, FromPrimitive};
+                    use bigdecimal::BigDecimal;
+                    use std::str::FromStr;
 
-                    Value::numeric(BigDecimal::from_f64(f).unwrap())
+                    Value::numeric(BigDecimal::from_str(&f.to_string()).unwrap())
                 }
                 ValueRef::Real(f) => Value::double(f),
                 ValueRef::Text(bytes) if column.is_datetime() => {

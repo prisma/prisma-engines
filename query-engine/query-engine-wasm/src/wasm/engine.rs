@@ -7,11 +7,11 @@ use crate::{
 };
 use driver_adapters::JsObject;
 use js_sys::Function as JsFunction;
-use psl::builtin_connectors::{MYSQL, POSTGRES, SQLITE};
 use psl::ConnectorRegistry;
 use quaint::connector::ExternalConnector;
 use query_core::{
     protocol::EngineProtocol,
+    relation_load_strategy,
     schema::{self},
     telemetry, TransactionOptions, TxId,
 };
@@ -24,6 +24,15 @@ use tokio::sync::RwLock;
 use tracing::{field, instrument::WithSubscriber, Instrument, Level, Span};
 use tracing_subscriber::filter::LevelFilter;
 use wasm_bindgen::prelude::wasm_bindgen;
+
+const CONNECTOR_REGISTRY: ConnectorRegistry<'_> = &[
+    #[cfg(feature = "postgresql")]
+    psl::builtin_connectors::POSTGRES,
+    #[cfg(feature = "mysql")]
+    psl::builtin_connectors::MYSQL,
+    #[cfg(feature = "sqlite")]
+    psl::builtin_connectors::SQLITE,
+];
 
 /// The main query engine used by JS
 #[wasm_bindgen]
@@ -51,8 +60,7 @@ impl QueryEngine {
         } = options;
 
         // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
-        let connector_registry: ConnectorRegistry<'_> = &[POSTGRES, MYSQL, SQLITE];
-        let schema = psl::parse_without_validation(datamodel.into(), connector_registry);
+        let schema = psl::parse_without_validation(datamodel.into(), CONNECTOR_REGISTRY);
 
         let js_queryable = Arc::new(driver_adapters::from_js(adapter));
 
@@ -106,10 +114,16 @@ impl QueryEngine {
                     "db.type" = connector.name(),
                 );
 
-                connector.get_connection().instrument(conn_span).await?;
+                let conn = connector.get_connection().instrument(conn_span).await?;
+                let db_version = conn.version().await;
 
                 let query_schema_span = tracing::info_span!("prisma:engine:schema");
-                let query_schema = query_schema_span.in_scope(|| schema::build(arced_schema, true));
+
+                let query_schema = query_schema_span
+                    .in_scope(|| schema::build(arced_schema, true))
+                    .with_db_version_supports_join_strategy(
+                        relation_load_strategy::db_version_supports_joins_strategy(db_version)?,
+                    );
 
                 Ok(ConnectedEngine {
                     schema: builder.schema.clone(),

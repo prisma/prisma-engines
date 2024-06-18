@@ -2,6 +2,7 @@ use super::{inmemory_record_processor::InMemoryRecordProcessor, *};
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
 use connector::{error::ConnectorError, ConnectionLike};
 use futures::future::{BoxFuture, FutureExt};
+use psl::can_support_relation_load_strategy;
 use query_structure::{ManyRecords, RelationLoadStrategy, RelationSelection};
 use user_facing_errors::KnownError;
 
@@ -64,6 +65,7 @@ fn read_one(
                     name: query.name,
                     model,
                     fields: query.selection_order,
+                    virtuals: query.selected_fields.virtuals_owned(),
                     records,
                     nested: build_relation_record_selection(query.selected_fields.relations()),
                 }
@@ -135,6 +137,7 @@ fn read_many_by_queries(
             record_not_found()
         } else {
             let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&records)).await?;
+
             Ok(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
@@ -155,6 +158,9 @@ fn read_many_by_joins(
     query: ManyRecordsQuery,
     trace_id: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
+    if !can_support_relation_load_strategy() {
+        unreachable!()
+    }
     let fut = async move {
         let result = tx
             .get_many_records(
@@ -172,6 +178,7 @@ fn read_many_by_joins(
             Ok(RecordSelectionWithRelations {
                 name: query.name,
                 fields: query.selection_order,
+                virtuals: query.selected_fields.virtuals_owned(),
                 records: result,
                 nested: build_relation_record_selection(query.selected_fields.relations()),
                 model: query.model,
@@ -190,6 +197,7 @@ fn build_relation_record_selection<'a>(
         .map(|rq| RelationRecordSelection {
             name: rq.field.name().to_owned(),
             fields: rq.result_fields.clone(),
+            virtuals: rq.virtuals().cloned().collect(),
             model: rq.field.related_model(),
             nested: build_relation_record_selection(rq.relations()),
         })
@@ -261,7 +269,7 @@ async fn aggregate(
     }))
 }
 
-fn process_nested<'conn>(
+pub(crate) fn process_nested<'conn>(
     tx: &'conn mut dyn ConnectionLike,
     nested: Vec<ReadQuery>,
     parent_result: Option<&'conn ManyRecords>,

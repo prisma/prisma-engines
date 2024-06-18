@@ -16,7 +16,7 @@ pub struct WriteArgs {
 /// Wrapper struct to force a bit of a reflection whether or not the string passed
 /// to the write arguments is the data source field name, not the model field name.
 /// Also helps to avoid errors with convenient from-field conversions.
-#[derive(Debug, PartialEq, Clone, Hash, Eq)]
+#[derive(Debug, PartialEq, Clone, Hash, Eq, PartialOrd, Ord)]
 pub struct DatasourceFieldName(pub String);
 
 impl Deref for DatasourceFieldName {
@@ -376,7 +376,7 @@ impl WriteArgs {
     }
 
     pub fn take_field_value(&mut self, field: &str) -> Option<WriteOperation> {
-        self.args.remove(field)
+        self.args.swap_remove(field)
     }
 
     pub fn keys(&self) -> Keys<DatasourceFieldName, WriteOperation> {

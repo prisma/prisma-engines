@@ -1,0 +1,25 @@
+name: Rust + WASM common deps
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set default toolchain
+      shell: bash
+      run: rustup default stable
+
+    - name: Add WASM target
+      shell: bash
+      run: rustup target add wasm32-unknown-unknown
+
+    - uses: cargo-bins/cargo-binstall@main
+
+    - name: Install wasm-bindgen, wasm-opt
+      shell: bash
+      run: |
+        cargo binstall -y \
+            wasm-bindgen-cli@0.2.92 \
+            wasm-opt@0.116.0
+
+    - name: Install bc
+      shell: bash
+      run: sudo apt update && sudo apt-get install -y bc

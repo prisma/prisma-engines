@@ -8,11 +8,15 @@
   "description": "",
   "private": true,
   "scripts": {
-    "build": "tsup ./src/testd.ts ./src/bench.ts --format esm --dts"
+    "build": "tsup ./src/testd.ts ./src/bench.ts --format esm --dts",
+    "test": "node --import tsx ./src/testd.ts",
+    "clean:d1": "rm -rf ../../connector-test-kit-rs/query-engine-tests/.wrangler"
   },
   "tsup": {
     "external": [
-      "../../../query-engine-wasm/pkg/query_engine_bg.js"
+      "../../../query-engine-wasm/pkg/postgresql/query_engine_bg.js",
+      "../../../query-engine-wasm/pkg/mysql/query_engine_bg.js",
+      "../../../query-engine-wasm/pkg/sqlite/query_engine_bg.js"
     ]
   },
   "keywords": [],
@@ -20,25 +24,27 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "dependencies": {
-    "@libsql/client": "0.3.6",
-    "@neondatabase/serverless": "0.7.2",
-    "@planetscale/database": "1.14.0",
-    "query-engine-wasm-latest": "npm:@prisma/query-engine-wasm@latest",
-    "query-engine-wasm-baseline": "npm:@prisma/query-engine-wasm@0.0.19",
+    "@effect/schema": "0.64.20",
+    "@prisma/adapter-d1": "workspace:*",
     "@prisma/adapter-libsql": "workspace:*",
     "@prisma/adapter-neon": "workspace:*",
     "@prisma/adapter-pg": "workspace:*",
     "@prisma/adapter-planetscale": "workspace:*",
+    "@prisma/bundled-js-drivers": "workspace:*",
     "@prisma/driver-adapter-utils": "workspace:*",
-    "@types/pg": "8.10.9",
-    "mitata": "^0.1.6",
-    "pg": "8.11.3",
-    "undici": "6.0.1",
-    "ws": "8.14.2"
+    "mitata": "0.1.11",
+    "query-engine-wasm-baseline": "npm:@prisma/query-engine-wasm@0.0.19",
+    "query-engine-wasm-latest": "npm:@prisma/query-engine-wasm@latest",
+    "ts-pattern": "5.1.1",
+    "undici": "6.13.0",
+    "wrangler": "3.50.0",
+    "ws": "8.16.0"
   },
   "devDependencies": {
-    "@types/node": "20.10.4",
-    "tsup": "8.0.1",
-    "typescript": "5.3.3"
+    "@cloudflare/workers-types": "4.20240405.0",
+    "@types/node": "20.12.7",
+    "tsup": "8.0.2",
+    "tsx": "4.7.2",
+    "typescript": "5.4.5"
   }
 }

@@ -3,9 +3,8 @@ use connection_string::JdbcString;
 use indoc::{formatdoc, indoc};
 use psl::PreviewFeature;
 use schema_core::{
-    commands::apply_migrations,
-    commands::create_migration,
-    json_rpc::types::{ApplyMigrationsInput, CreateMigrationInput},
+    commands::{apply_migrations, create_migration},
+    json_rpc::types::{ApplyMigrationsInput, CreateMigrationInput, SchemasContainer},
     schema_connector::{ConnectorParams, SchemaConnector},
 };
 use sql_migration_tests::test_api::*;
@@ -1219,7 +1218,12 @@ async fn migration_with_shadow_database() {
 
     let migration = CreateMigrationInput {
         migrations_directory_path: migrations_directory.path().to_str().unwrap().to_owned(),
-        prisma_schema: dm.clone(),
+        schema: SchemasContainer {
+            files: vec![SchemaContainer {
+                path: "schema.prisma".to_string(),
+                content: dm.clone(),
+            }],
+        },
         draft: false,
         migration_name: "init".to_string(),
     };

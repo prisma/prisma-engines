@@ -24,6 +24,8 @@ pub trait Connection: ConnectionLike {
         isolation_level: Option<String>,
     ) -> crate::Result<Box<dyn Transaction + 'a>>;
 
+    async fn version(&self) -> Option<String>;
+
     /// Explicit upcast.
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike;
 }
@@ -32,6 +34,8 @@ pub trait Connection: ConnectionLike {
 pub trait Transaction: ConnectionLike {
     async fn commit(&mut self) -> crate::Result<()>;
     async fn rollback(&mut self) -> crate::Result<()>;
+
+    async fn version(&self) -> Option<String>;
 
     /// Explicit upcast of self reference. Rusts current vtable layout doesn't allow for an upcast if
     /// `trait A`, `trait B: A`, so that `Box<dyn B> as Box<dyn A>` works. This is a simple, explicit workaround.
@@ -258,6 +262,19 @@ pub trait WriteOperations {
         trace_id: Option<String>,
     ) -> crate::Result<usize>;
 
+    /// Inserts many records at once into the database and returns their
+    /// selected fields.
+    /// This method should not be used if the connector does not support
+    /// returning created rows.
+    async fn create_records_returning(
+        &mut self,
+        model: &Model,
+        args: Vec<WriteArgs>,
+        skip_duplicates: bool,
+        selected_fields: FieldSelection,
+        trace_id: Option<String>,
+    ) -> crate::Result<ManyRecords>;
+
     /// Update records in the `Model` with the given `WriteArgs` filtered by the
     /// `Filter`.
     async fn update_records(
@@ -295,9 +312,10 @@ pub trait WriteOperations {
         trace_id: Option<String>,
     ) -> crate::Result<usize>;
 
-    /// Delete single record in the `Model` with the given `Filter`.
-    /// Return selected fields of the deleted record, if the connector
-    /// supports it. If the connector does not support it, error is returned.
+    /// Delete single record in the `Model` with the given `Filter` and returns
+    /// selected fields of the deleted record.
+    /// This method should not be used if the connector does not support returning
+    /// deleted rows.
     async fn delete_record(
         &mut self,
         model: &Model,

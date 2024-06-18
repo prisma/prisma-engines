@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use indoc::indoc;
 use schema_core::json_rpc::types::*;
 use sql_migration_tests::test_api::*;
@@ -468,11 +470,17 @@ fn dropping_m2m_relation_from_datamodel_works() {
 
     let (_result, diff) = super::diff::diff_result(DiffParams {
         exit_code: None,
-        from: DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: path.to_str().unwrap().to_owned(),
+        from: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: path.to_str().unwrap().to_owned(),
+                content: schema.to_string(),
+            }],
         }),
-        to: DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: path2.to_str().unwrap().to_owned(),
+        to: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: path2.to_str().unwrap().to_owned(),
+                content: schema2.to_string(),
+            }],
         }),
         script: true,
         shadow_database_url: None,

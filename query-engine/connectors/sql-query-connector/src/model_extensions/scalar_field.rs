@@ -78,7 +78,9 @@ impl ScalarFieldExt for ScalarField {
             },
         };
 
-        value.with_native_column_type(self.native_type().map(|nt| nt.name()))
+        let nt_col_type = self.native_type().map(|nt| (nt.name(), parse_scalar_length(self)));
+
+        value.with_native_column_type(nt_col_type)
     }
 
     fn type_family(&self) -> TypeFamily {

@@ -147,6 +147,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             ValueType::Boolean(Some(b)) => PrismaValue::Boolean(b),
             ValueType::Bytes(Some(bytes)) if bytes.as_ref() == [0u8] => PrismaValue::Boolean(false),
             ValueType::Bytes(Some(bytes)) if bytes.as_ref() == [1u8] => PrismaValue::Boolean(true),
+            ValueType::Double(Some(i)) => PrismaValue::Boolean(i.to_i64().unwrap() != 0),
             _ => return Err(create_error(&p_value)),
         },
         TypeIdentifier::Enum(_) => match p_value.typed {

@@ -51,7 +51,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     SupportsTxIsolationRepeatableRead |
     SupportsTxIsolationSerializable |
     SupportsTxIsolationSnapshot |
-    SupportsFiltersOnRelationsWithoutJoins
+    SupportsFiltersOnRelationsWithoutJoins |
+    SupportsDefaultInInsert
     // InsertReturning | DeleteReturning - unimplemented.
 });
 
@@ -92,7 +93,7 @@ impl Connector for MsSqlDatamodelConnector {
         128
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+    fn foreign_key_referential_actions(&self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
         NoAction | Cascade | SetNull | SetDefault
@@ -141,14 +142,15 @@ impl Connector for MsSqlDatamodelConnector {
         }
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> NativeTypeInstance {
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
         let nt = SCALAR_TYPE_DEFAULTS
             .iter()
             .find(|(st, _)| st == scalar_type)
             .map(|(_, native_type)| native_type)
             .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
             .unwrap();
-        NativeTypeInstance::new::<MsSqlType>(*nt)
+
+        Some(NativeTypeInstance::new::<MsSqlType>(*nt))
     }
 
     fn native_type_is_default_for_scalar_type(

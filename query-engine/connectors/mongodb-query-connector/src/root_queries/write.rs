@@ -46,7 +46,7 @@ pub async fn create_record<'conn>(
         .non_relational()
         .iter()
         .filter(|field| args.has_arg_for(field.db_name()))
-        .map(Clone::clone)
+        .cloned()
         .collect();
 
     let mut doc = Document::new();

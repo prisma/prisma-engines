@@ -10,7 +10,7 @@ use enumflags2::BitFlags;
 
 const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[];
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalKeyIndex];
-const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
+pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
     AnyId |
     AutoIncrement |
     CompoundIds |
@@ -28,7 +28,9 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     InsertReturning |
     DeleteReturning |
     UpdateReturning |
-    SupportsFiltersOnRelationsWithoutJoins
+    SupportsFiltersOnRelationsWithoutJoins |
+    CreateMany |
+    CreateManyWriteableAutoIncId
 });
 
 pub struct SqliteDatamodelConnector;
@@ -50,7 +52,7 @@ impl Connector for SqliteDatamodelConnector {
         10000
     }
 
-    fn referential_actions(&self) -> BitFlags<ReferentialAction> {
+    fn foreign_key_referential_actions(&self) -> BitFlags<ReferentialAction> {
         use ReferentialAction::*;
 
         SetNull | SetDefault | Cascade | Restrict | NoAction
@@ -66,8 +68,8 @@ impl Connector for SqliteDatamodelConnector {
         unreachable!("No native types on Sqlite");
     }
 
-    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType) -> NativeTypeInstance {
-        NativeTypeInstance::new(())
+    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
+        None
     }
 
     fn native_type_is_default_for_scalar_type(

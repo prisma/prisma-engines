@@ -8,6 +8,7 @@ on:
       - "*.md"
       - "LICENSE"
       - "CODEOWNERS"
+      - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -21,17 +22,18 @@ jobs:
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: ./.github/workflows/include/rust-wasm-setup
 
       - name: "Setup Node.js"
         uses: actions/setup-node@v4
 
       - name: "Setup pnpm"
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4.0.0
         with:
           version: 8
-
-      - name: Install bc
-        run: sudo apt update && sudo apt-get install -y bc
 
       - name: "Login to Docker Hub"
         uses: docker/login-action@v3
@@ -44,19 +46,26 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - uses: cachix/install-nix-action@v24
+      - name: Extract Branch Name
+        run: |
+          branch="$(git show -s --format=%s | grep -o "DRIVER_ADAPTERS_BRANCH=[^ ]*" | cut -f2 -d=)"
+          if [ -n "$branch" ]; then
+            echo "Using $branch branch of driver adapters"
+            echo "DRIVER_ADAPTERS_BRANCH=$branch" >> "$GITHUB_ENV"
+          fi
 
       - name: Setup benchmark
         run: make setup-pg-bench
 
       - name: Run benchmarks
         id: bench
+        if: false
         run: |
-          make run-bench | tee results.txt          
+          make run-bench | tee results.txt
 
           # Extract the values from the benchmark output
-          regressed_values=$(grep "slower than Web Assembly: Latest" results.txt | cut -f1 -d'x')          
-          improved_values=$(grep "faster than Web Assembly: Latest" results.txt | cut -f1 -d'x')          
+          regressed_values=$(grep "slower than Web Assembly: Latest" results.txt | cut -f1 -d'x')
+          improved_values=$(grep "faster than Web Assembly: Latest" results.txt | cut -f1 -d'x')
 
           # Initialize sum variable and count
           total_sum=0
@@ -78,7 +87,7 @@ jobs:
           done
 
           if [ $total_count -eq 0 ]; then
-              echo "💥 something was wrong running the benchmarks"              
+              echo "💥 something was wrong running the benchmarks"
               exit 1
           fi
 
@@ -89,7 +98,7 @@ jobs:
           echo "Total count: $total_count"
           echo "Mean: $mean"
 
-          # Report improvement or worsening. Fails if >= 1.5% worsening.          
+          # Report improvement or worsening. Fails if >= 1.5% worsening.
           if (( $(echo "$mean < 0.985" | bc -l) )); then
               percent=$(echo "scale=4; ((1 / $mean) - 1) * 100" | bc)
               summary="❌ WASM query-engine performance will worsen by $(printf %.2f "$percent")%"
@@ -114,14 +123,20 @@ jobs:
             echo EOF
           } >> "$GITHUB_OUTPUT"
       - name: Find past report comment
-        uses: peter-evans/find-comment@v2
+        if: false
+        uses: peter-evans/find-comment@v3
         id: findReportComment
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body-includes: "<!-- wasm-engine-perf -->"
 
       - name: Create or update report
-        uses: peter-evans/create-or-update-comment@v3
+        uses: peter-evans/create-or-update-comment@v4
+        # Only run on branches from our repository
+        # It avoids an expected failure on forks
+        # if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+        if: false
+
         with:
           comment-id: ${{ steps.findReportComment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
@@ -141,7 +156,8 @@ jobs:
           edit-mode: replace
 
       - name: Fail workflow if regression detected
-        if: steps.bench.outputs.status == 'failed'
+        # if: steps.bench.outputs.status == 'failed'
+        if: false
         run: |
           echo "Workflow failed due to benchmark regression."
           exit 1

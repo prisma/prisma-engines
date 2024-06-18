@@ -1,6 +1,7 @@
 use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
-use psl::{datamodel_connector::ConnectorCapability, PreviewFeature};
+use once_cell::sync::Lazy;
+use psl::datamodel_connector::JoinStrategySupport;
 use query_structure::{prelude::*, RelationLoadStrategy};
 use schema::{
     constants::{aggregations::*, args},
@@ -72,8 +73,7 @@ fn pairs_to_selections<T>(
 where
     T: Into<ParentContainer>,
 {
-    let should_collect_relation_selection = query_schema.has_capability(ConnectorCapability::LateralJoin)
-        && query_schema.has_feature(PreviewFeature::RelationJoins);
+    let should_collect_relation_selection = query_schema.can_resolve_relation_with_joins();
 
     let parent = parent.into();
 
@@ -255,24 +255,67 @@ pub fn merge_cursor_fields(selected_fields: FieldSelection, cursor: &Option<Sele
 pub(crate) fn get_relation_load_strategy(
     requested_strategy: Option<RelationLoadStrategy>,
     cursor: Option<&SelectionResult>,
-    distinct: Option<&FieldSelection>,
     nested_queries: &[ReadQuery],
-    selected_fields: &FieldSelection,
     query_schema: &QuerySchema,
-) -> RelationLoadStrategy {
-    if query_schema.has_feature(PreviewFeature::RelationJoins)
-        && query_schema.has_capability(ConnectorCapability::LateralJoin)
-        && cursor.is_none()
-        && distinct.is_none()
-        && !selected_fields.has_virtual_fields()
+) -> QueryGraphBuilderResult<RelationLoadStrategy> {
+    static DEFAULT_RELATION_LOAD_STRATEGY: Lazy<Option<RelationLoadStrategy>> = Lazy::new(|| {
+        std::env::var("PRISMA_RELATION_LOAD_STRATEGY")
+            .map(|e| e.as_str().try_into().unwrap())
+            .ok()
+    });
+
+    match query_schema.join_strategy_support() {
+        // Connector and database version supports the `Join` strategy...
+        JoinStrategySupport::Yes => match requested_strategy {
+            // But incoming query cannot be resolved with joins.
+            _ if !query_can_be_resolved_with_joins(cursor, nested_queries) => {
+                // So we fallback to the `Query` one.
+                Ok(RelationLoadStrategy::Query)
+            }
+            // But requested strategy is `Query`.
+            Some(RelationLoadStrategy::Query) => Ok(RelationLoadStrategy::Query),
+            // Or requested strategy is `Join`.
+            Some(RelationLoadStrategy::Join) => Ok(RelationLoadStrategy::Join),
+            // or there's none selected, in which case we check for an envar else `Join`.
+            None => match *DEFAULT_RELATION_LOAD_STRATEGY {
+                Some(rls) => Ok(rls),
+                None => Ok(RelationLoadStrategy::Join),
+            },
+        },
+        // Connector supports `Join` strategy but database version does not...
+        JoinStrategySupport::UnsupportedDbVersion => match requested_strategy {
+            // So we error out if the requested strategy is `Join`.
+            Some(RelationLoadStrategy::Join) => Err(QueryGraphBuilderError::InputError(
+                "`relationLoadStrategy: join` is not available for MySQL < 8.0.14 and MariaDB.".into(),
+            )),
+            // Otherwise we fallback to the `Query` one. (This makes the default relation load strategy `Query` for database versions that do not support joins.)
+            Some(RelationLoadStrategy::Query) | None => Ok(RelationLoadStrategy::Query),
+        },
+        // Connectors does not support the join strategy so we always fallback to the `Query` one.
+        JoinStrategySupport::No => Ok(RelationLoadStrategy::Query),
+        JoinStrategySupport::UnknownYet => {
+            unreachable!("Connector should have resolved the join strategy support by now.")
+        }
+    }
+}
+
+fn query_can_be_resolved_with_joins(cursor: Option<&SelectionResult>, nested_queries: &[ReadQuery]) -> bool {
+    cursor.is_none()
         && !nested_queries.iter().any(|q| match q {
-            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor() || q.has_distinct() || q.has_virtual_selections(),
+            ReadQuery::RelatedRecordsQuery(q) => q.has_cursor(),
             _ => false,
         })
-        && requested_strategy != Some(RelationLoadStrategy::Query)
-    {
-        RelationLoadStrategy::Join
-    } else {
-        RelationLoadStrategy::Query
-    }
+}
+
+pub(crate) fn extract_selected_fields(
+    nested_fields: Vec<FieldPair<'_>>,
+    model: &Model,
+    query_schema: &QuerySchema,
+) -> crate::QueryGraphBuilderResult<(FieldSelection, Vec<String>, Vec<ReadQuery>)> {
+    let selection_order = utils::collect_selection_order(&nested_fields);
+    let selected_fields = utils::collect_selected_fields(&nested_fields, None, model, query_schema)?;
+    let nested = utils::collect_nested_queries(nested_fields, model, query_schema)?;
+    let selected_fields = utils::merge_relation_selections(selected_fields, None, &nested);
+
+    Ok((selected_fields, selection_order, nested))
 }

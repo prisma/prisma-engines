@@ -1,0 +1,35 @@
+{
+  "isIncomplete": false,
+  "items": [
+    {
+      "label": "BTree",
+      "kind": 13,
+      "detail": "Can handle equality and range queries on data that can be sorted into some ordering (default)."
+    },
+    {
+      "label": "Hash",
+      "kind": 13,
+      "detail": "Can handle simple equality queries, but no ordering. Faster than BTree, if ordering is not needed."
+    },
+    {
+      "label": "Gist",
+      "kind": 13,
+      "detail": "Generalized Search Tree. A framework for building specialized indices for custom data types."
+    },
+    {
+      "label": "Gin",
+      "kind": 13,
+      "detail": "Generalized Inverted Index. Useful for indexing composite items, such as arrays or text."
+    },
+    {
+      "label": "SpGist",
+      "kind": 13,
+      "detail": "Space-partitioned Generalized Search Tree. For implenting a wide range of different non-balanced data structures."
+    },
+    {
+      "label": "Brin",
+      "kind": 13,
+      "detail": "Block Range Index. If the data has some natural correlation with their physical location within the table, can compress very large amount of data into a small space."
+    }
+  ]
+}

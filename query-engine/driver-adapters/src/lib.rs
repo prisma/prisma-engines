@@ -34,8 +34,11 @@ impl From<DriverAdapterError> for QuaintError {
                 .build()
             }
             DriverAdapterError::GenericJs { id } => QuaintError::external_error(id),
+            #[cfg(feature = "postgresql")]
             DriverAdapterError::Postgres(e) => e.into(),
+            #[cfg(feature = "mysql")]
             DriverAdapterError::Mysql(e) => e.into(),
+            #[cfg(feature = "sqlite")]
             DriverAdapterError::Sqlite(e) => e.into(),
             // in future, more error types would be added and we'll need to convert them to proper QuaintErrors here
         }

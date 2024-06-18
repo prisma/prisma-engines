@@ -1,7 +1,9 @@
-use super::Walker;
-use crate::{ast, ScalarFieldType, ScalarType};
+use crate::{
+    ast::{self, NewlineType, WithDocumentation, WithName, WithSpan},
+    walkers::{newline, Walker},
+    FileId, ScalarFieldType, ScalarType,
+};
 use diagnostics::Span;
-use schema_ast::ast::{WithDocumentation, WithName};
 
 /// A composite type, introduced with the `type` keyword in the schema.
 ///
@@ -17,20 +19,30 @@ use schema_ast::ast::{WithDocumentation, WithName};
 ///     countryCode String
 /// }
 /// ```
-pub type CompositeTypeWalker<'db> = Walker<'db, ast::CompositeTypeId>;
+pub type CompositeTypeWalker<'db> = Walker<'db, crate::CompositeTypeId>;
 
 /// A field in a composite type.
-pub type CompositeTypeFieldWalker<'db> = Walker<'db, (ast::CompositeTypeId, ast::FieldId)>;
+pub type CompositeTypeFieldWalker<'db> = Walker<'db, (crate::CompositeTypeId, ast::FieldId)>;
 
 impl<'db> CompositeTypeWalker<'db> {
     /// The ID of the composite type node in the AST.
-    pub fn composite_type_id(self) -> ast::CompositeTypeId {
+    pub fn composite_type_id(self) -> (FileId, ast::CompositeTypeId) {
         self.id
+    }
+
+    /// The ID of the file containing the composite type.
+    pub fn file_id(self) -> FileId {
+        self.id.0
+    }
+
+    /// Is the composite type defined in a specific file?
+    pub fn is_defined_in_file(self, file_id: FileId) -> bool {
+        self.ast_composite_type().span.file_id == file_id
     }
 
     /// The composite type node in the AST.
     pub fn ast_composite_type(self) -> &'db ast::CompositeType {
-        &self.db.ast()[self.id]
+        &self.db.asts[self.id]
     }
 
     /// The name of the composite type in the schema.
@@ -44,6 +56,19 @@ impl<'db> CompositeTypeWalker<'db> {
             .iter_fields()
             .map(move |(id, _)| self.walk((self.id, id)))
     }
+
+    /// What kind of newlines the composite type uses.
+    pub fn newline(self) -> NewlineType {
+        let field = match self.fields().last() {
+            Some(field) => field,
+            None => return NewlineType::default(),
+        };
+
+        let src = self.db.source(self.id.0);
+        let span = field.ast_field().span();
+
+        newline(src, span)
+    }
 }
 
 impl<'db> CompositeTypeFieldWalker<'db> {
@@ -53,7 +78,7 @@ impl<'db> CompositeTypeFieldWalker<'db> {
 
     /// The AST node for the field.
     pub fn ast_field(self) -> &'db ast::Field {
-        &self.db.ast[self.id.0][self.id.1]
+        &self.db.asts[self.id.0][self.id.1]
     }
 
     /// The composite type containing the field.
@@ -101,7 +126,10 @@ impl<'db> CompositeTypeFieldWalker<'db> {
 
     /// The `@default()` AST attribute on the field, if any.
     pub fn default_attribute(self) -> Option<&'db ast::Attribute> {
-        self.field().default.as_ref().map(|d| &self.db.ast[d.default_attribute])
+        self.field()
+            .default
+            .as_ref()
+            .map(|d| &self.db.asts[(self.id.0 .0, d.default_attribute.1)])
     }
 
     /// (attribute scope, native type name, arguments, span)

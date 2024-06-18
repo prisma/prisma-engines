@@ -1,11 +1,13 @@
-use schema_ast::ast::{IndentationType, NewlineType};
-
-use crate::{ast, ast::WithDocumentation, types, walkers::Walker};
+use crate::{
+    ast::{self, IndentationType, NewlineType, WithDocumentation},
+    types,
+    walkers::{newline, Walker},
+};
 
 /// An `enum` declaration in the schema.
-pub type EnumWalker<'db> = Walker<'db, ast::EnumId>;
+pub type EnumWalker<'db> = Walker<'db, crate::EnumId>;
 /// One value in an `enum` declaration in the schema.
-pub type EnumValueWalker<'db> = Walker<'db, (ast::EnumId, usize)>;
+pub type EnumValueWalker<'db> = Walker<'db, (crate::EnumId, usize)>;
 
 impl<'db> EnumWalker<'db> {
     fn attributes(self) -> &'db types::EnumAttributes {
@@ -19,7 +21,7 @@ impl<'db> EnumWalker<'db> {
 
     /// The AST node.
     pub fn ast_enum(self) -> &'db ast::Enum {
-        &self.db.ast()[self.id]
+        &self.db.asts[self.id]
     }
 
     /// The database name of the enum.
@@ -55,7 +57,14 @@ impl<'db> EnumWalker<'db> {
 
     /// What kind of newlines the enum uses.
     pub fn newline(self) -> NewlineType {
-        NewlineType::Unix
+        let value = match self.ast_enum().values.last() {
+            Some(value) => value,
+            None => return NewlineType::default(),
+        };
+
+        let src = self.db.source(self.id.0);
+
+        newline(src, value.span)
     }
 
     /// The name of the schema the enum belongs to.

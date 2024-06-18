@@ -1,6 +1,6 @@
 //! Write query AST
 use super::{FilteredNestedMutation, FilteredQuery};
-use crate::{RecordQuery, ToGraphviz};
+use crate::{ReadQuery, RecordQuery, ToGraphviz};
 use connector::{DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
 use query_structure::{prelude::*, Filter};
 use std::collections::HashMap;
@@ -25,24 +25,26 @@ impl WriteQuery {
     pub fn inject_result_into_args(&mut self, result: SelectionResult) {
         let model = self.model();
 
-        let args = match self {
-            Self::CreateRecord(ref mut x) => &mut x.args,
-            Self::UpdateRecord(ref mut x) => match x {
-                UpdateRecord::WithSelection(u) => &mut u.args,
-                UpdateRecord::WithoutSelection(u) => &mut u.args,
-            },
-            Self::UpdateManyRecords(x) => &mut x.args,
-            _ => return,
+        let inject = |args: &mut WriteArgs| {
+            for (selected_field, value) in result.pairs() {
+                args.insert(
+                    DatasourceFieldName(selected_field.db_name().into_owned()),
+                    (selected_field, value.clone()),
+                )
+            }
+            args.update_datetimes(&model);
         };
 
-        for (selected_field, value) in result {
-            args.insert(
-                DatasourceFieldName(selected_field.db_name().into_owned()),
-                (&selected_field, value),
-            )
-        }
-
-        args.update_datetimes(&model);
+        match self {
+            Self::CreateRecord(ref mut x) => inject(&mut x.args),
+            Self::CreateManyRecords(ref mut x) => x.args.iter_mut().map(inject).collect(),
+            Self::UpdateRecord(ref mut x) => match x {
+                UpdateRecord::WithSelection(u) => inject(&mut u.args),
+                UpdateRecord::WithoutSelection(u) => inject(&mut u.args),
+            },
+            Self::UpdateManyRecords(x) => inject(&mut x.args),
+            _ => (),
+        };
     }
 
     pub fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
@@ -71,7 +73,13 @@ impl WriteQuery {
 
         match self {
             Self::CreateRecord(cr) => Some(cr.selected_fields.clone()),
-            Self::CreateManyRecords(_) => None,
+            Self::CreateManyRecords(CreateManyRecords {
+                selected_fields: Some(selected_fields),
+                ..
+            }) => Some(selected_fields.fields.clone()),
+            Self::CreateManyRecords(CreateManyRecords {
+                selected_fields: None, ..
+            }) => None,
             Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => Some(ur.selected_fields.clone()),
             Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => returns_id,
             Self::DeleteRecord(DeleteRecord {
@@ -95,7 +103,13 @@ impl WriteQuery {
             Self::CreateRecord(cr) => cr.selected_fields.merge_in_place(fields),
             Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => ur.selected_fields.merge_in_place(fields),
             Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => (),
-            Self::CreateManyRecords(_) => (),
+            Self::CreateManyRecords(CreateManyRecords {
+                selected_fields: Some(selected_fields),
+                ..
+            }) => selected_fields.fields.merge_in_place(fields),
+            Self::CreateManyRecords(CreateManyRecords {
+                selected_fields: None, ..
+            }) => (),
             Self::DeleteRecord(DeleteRecord {
                 selected_fields: Some(selected_fields),
                 ..
@@ -213,7 +227,11 @@ impl ToGraphviz for WriteQuery {
     fn to_graphviz(&self) -> String {
         match self {
             Self::CreateRecord(q) => format!("CreateRecord(model: {}, args: {:?})", q.model.name(), q.args),
-            Self::CreateManyRecords(q) => format!("CreateManyRecord(model: {})", q.model.name()),
+            Self::CreateManyRecords(q) => format!(
+                "CreateManyRecord(model: {}, selected_fields: {:?})",
+                q.model.name(),
+                q.selected_fields
+            ),
             Self::UpdateRecord(q) => format!(
                 "UpdateRecord(model: {}, selection: {:?})",
                 q.model().name(),
@@ -247,22 +265,28 @@ pub struct CreateRecord {
 
 #[derive(Debug, Clone)]
 pub struct CreateManyRecords {
+    pub name: String,
     pub model: Model,
     pub args: Vec<WriteArgs>,
     pub skip_duplicates: bool,
+    /// Fields of created records that client has requested to return.
+    /// `None` if the connector does not support returning the created rows.
+    pub selected_fields: Option<CreateManyRecordsFields>,
+    /// If set to true, connector will perform the operation using multiple bulk `INSERT` queries.
+    /// One query will be issued per a unique set of fields present in the batch. For example, if
+    /// `args` contains records:
+    ///   {a: 1, b: 1}
+    ///   {a: 2, b: 2}
+    ///   {a: 3, b: 3, c: 3}
+    /// Two queries will be issued: one containing first two records and one for the last record.
+    pub split_by_shape: bool,
 }
 
-impl CreateManyRecords {
-    pub fn inject_result_into_all(&mut self, result: SelectionResult) {
-        for (selected_field, value) in result {
-            for args in self.args.iter_mut() {
-                args.insert(
-                    DatasourceFieldName(selected_field.db_name().into_owned()),
-                    (&selected_field, value.clone()),
-                )
-            }
-        }
-    }
+#[derive(Debug, Clone)]
+pub struct CreateManyRecordsFields {
+    pub fields: FieldSelection,
+    pub order: Vec<String>,
+    pub nested: Vec<ReadQuery>,
 }
 
 #[derive(Debug, Clone)]

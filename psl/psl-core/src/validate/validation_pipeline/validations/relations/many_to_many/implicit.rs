@@ -60,10 +60,7 @@ pub(crate) fn validate_no_referential_actions(relation: ImplicitManyToManyRelati
 
 /// We do not support implicit m:n relations on MongoDb.
 pub(crate) fn supports_implicit_relations(relation: ImplicitManyToManyRelationWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx
-        .connector
-        .has_capability(ConnectorCapability::ImplicitManyToManyRelation)
-    {
+    if ctx.has_capability(ConnectorCapability::ImplicitManyToManyRelation) {
         return;
     }
 
