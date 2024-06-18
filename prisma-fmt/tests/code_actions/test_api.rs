@@ -1,6 +1,6 @@
 use lsp_types::{Diagnostic, DiagnosticSeverity};
 use once_cell::sync::Lazy;
-use prisma_fmt::offset_to_position;
+use prisma_fmt::span_to_range;
 use psl::{diagnostics::Span, SourceFile};
 use std::{fmt::Write as _, io::Write as _, path::PathBuf};
 
@@ -58,10 +58,7 @@ fn create_diagnostic(severity: DiagnosticSeverity, message: &str, span: Span, so
     Diagnostic {
         severity: Some(severity),
         message: message.to_owned(),
-        range: lsp_types::Range {
-            start: offset_to_position(span.start, source),
-            end: offset_to_position(span.end, source),
-        },
+        range: span_to_range(span, source),
         ..Default::default()
     }
 }

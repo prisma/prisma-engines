@@ -271,7 +271,7 @@ pub(super) fn add_index_for_relation_fields(
         &relation.model().ast_model().attributes,
     );
 
-    let range = super::range_after_span(context.initiating_file_source(), relation.model().ast_model().span());
+    let range = super::range_after_span(relation.model().ast_model().span(), context.initiating_file_source());
     let text = TextEdit {
         range,
         new_text: formatted_attribute,

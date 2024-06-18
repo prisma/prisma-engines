@@ -1,4 +1,8 @@
-use psl::diagnostics::{DatamodelError, DatamodelWarning};
+use crate::offsets::span_to_lsp_offsets;
+use psl::{
+    diagnostics::{DatamodelError, DatamodelWarning},
+    ValidatedSchema,
+};
 
 use crate::schema_file_input::SchemaFileInput;
 
@@ -12,33 +16,39 @@ pub struct MiniError {
 }
 
 pub(crate) fn run(schema: SchemaFileInput) -> String {
-    let schema = match schema {
+    let validated_schema = match schema {
         SchemaFileInput::Single(file) => psl::validate(file.into()),
         SchemaFileInput::Multiple(files) => psl::validate_multi_file(&files),
     };
-    let diagnostics = &schema.diagnostics;
+    let ValidatedSchema { diagnostics, db, .. } = &validated_schema;
 
     let mut mini_errors: Vec<MiniError> = diagnostics
         .errors()
         .iter()
-        .map(|err: &DatamodelError| MiniError {
-            file_name: schema.db.file_name(err.span().file_id).to_owned(),
-            start: err.span().start,
-            end: err.span().end,
-            text: err.message().to_string(),
-            is_warning: false,
+        .map(|err: &DatamodelError| {
+            let (start, end) = span_to_lsp_offsets(err.span(), db.source(err.span().file_id));
+            MiniError {
+                file_name: db.file_name(err.span().file_id).to_owned(),
+                start,
+                end,
+                text: err.message().to_string(),
+                is_warning: false,
+            }
         })
         .collect();
 
     let mut mini_warnings: Vec<MiniError> = diagnostics
         .warnings()
         .iter()
-        .map(|warn: &DatamodelWarning| MiniError {
-            file_name: schema.db.file_name(warn.span().file_id).to_owned(),
-            start: warn.span().start,
-            end: warn.span().end,
-            text: warn.message().to_owned(),
-            is_warning: true,
+        .map(|warn: &DatamodelWarning| {
+            let (start, end) = span_to_lsp_offsets(warn.span(), db.source(warn.span().file_id));
+            MiniError {
+                file_name: db.file_name(warn.span().file_id).to_owned(),
+                start,
+                end,
+                text: warn.message().to_owned(),
+                is_warning: true,
+            }
         })
         .collect();
 
@@ -62,6 +72,28 @@ mod tests {
         let value: serde_json::Value = serde_json::from_str(&result).unwrap();
 
         serde_json::to_string_pretty(&value).unwrap()
+    }
+
+    #[test]
+    fn should_return_utf16_offset() {
+        let schema = indoc! {r#"
+            // 🌐 ｍｕｌｔｉｂｙｔｅ
+            😀
+        "#};
+        let datamodel = SchemaFileInput::Single(schema.to_string());
+
+        let expected = expect![[r#"
+            [
+              {
+                "file_name": "schema.prisma",
+                "start": 16,
+                "end": 19,
+                "text": "Error validating: This line is invalid. It does not start with any known Prisma schema keyword.",
+                "is_warning": false
+              }
+            ]"#]];
+
+        expected.assert_eq(&lint(datamodel));
     }
 
     #[test]
