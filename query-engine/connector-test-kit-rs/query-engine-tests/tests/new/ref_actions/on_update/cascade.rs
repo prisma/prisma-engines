@@ -33,7 +33,7 @@ mod one2one_req {
         schema.to_owned()
     }
 
-    #[connector_test(schema(required), exclude(Sqlite("cfd1")))]
+    #[connector_test(schema(required))]
     /// On D1, this fails with:
     ///
     /// ```diff
@@ -176,7 +176,7 @@ mod one2one_opt {
         schema.to_owned()
     }
 
-    #[connector_test(schema(optional), exclude(Sqlite("cfd1")))]
+    #[connector_test(schema(optional))]
     // Updating the parent updates the child FK as well.
     // On D1, this fails with:
     //

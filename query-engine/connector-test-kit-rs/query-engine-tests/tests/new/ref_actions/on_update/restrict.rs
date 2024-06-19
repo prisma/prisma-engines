@@ -255,13 +255,7 @@ mod one2many_req {
         Ok(())
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
-    /// Updating the parent succeeds if no child is connected or if the linking fields aren't part of the update payload.
-    ///
-    /// ```diff
-    /// - {"data":{"updateManyParent":{"count":1}}}
-    /// + {"data":{"updateManyParent":{"count":2}}}
-    /// ```
+    #[connector_test]
     async fn update_parent(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
         run_query!(
@@ -383,13 +377,7 @@ mod one2many_opt {
         Ok(())
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
-    /// Updating the parent succeeds if no child is connected or if the linking fields aren't part of the update payload.
-    ///
-    /// ```diff
-    /// - {"data":{"updateManyParent":{"count":1}}}
-    /// + {"data":{"updateManyParent":{"count":2}}}
-    /// ```
+    #[connector_test]
     async fn update_parent(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
         run_query!(
