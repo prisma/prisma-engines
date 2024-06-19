@@ -1,4 +1,4 @@
-use serde::{Serialize};
+use serde::Serialize;
 use serde_json::value::RawValue;
 
 /// We are using RawJson object to prevent stringification of

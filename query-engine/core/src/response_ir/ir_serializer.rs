@@ -24,7 +24,7 @@ impl<'a> IrSerializer<'a> {
             ExpressionResult::Query(QueryResult::Json(json)) => {
                 Ok(ResponseData::new(self.key.clone(), Item::Json(json)))
             }
-            
+
             ExpressionResult::Query(QueryResult::QueryRaw(val)) => {
                 Ok(ResponseData::new(self.key.clone(), Item::RawJson(val)))
             }
