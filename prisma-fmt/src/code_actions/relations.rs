@@ -75,7 +75,7 @@ pub(super) fn add_referencing_side_unique(
     );
 
     let mut changes = HashMap::new();
-    changes.insert(context.lsp_params.text_document.uri.clone(), vec![text]);
+    changes.insert(context.params.text_document.uri.clone(), vec![text]);
 
     let edit = WorkspaceEdit {
         changes: Some(changes),
@@ -278,7 +278,7 @@ pub(super) fn add_index_for_relation_fields(
     };
 
     let mut changes = HashMap::new();
-    changes.insert(context.lsp_params.text_document.uri.clone(), vec![text]);
+    changes.insert(context.params.text_document.uri.clone(), vec![text]);
 
     let edit = WorkspaceEdit {
         changes: Some(changes),

@@ -3,14 +3,35 @@ use enumflags2::BitFlags;
 use log::*;
 use lsp_types::*;
 use psl::{
-    datamodel_connector::Connector,
-    diagnostics::{FileId, Span},
+    diagnostics::Span,
     error_tolerant_parse_configuration,
     parser_database::{ast, ParserDatabase, SourceFile},
-    Configuration, Datasource, Diagnostics, Generator, PreviewFeature,
+    Diagnostics, PreviewFeature,
 };
 
+use crate::LSPContext;
+
 mod datasource;
+
+pub(super) type CompletionContext<'a> = LSPContext<'a, CompletionParams>;
+
+impl<'a> CompletionContext<'a> {
+    pub(super) fn namespaces(&'a self) -> &'a [(String, Span)] {
+        self.datasource().map(|ds| ds.namespaces.as_slice()).unwrap_or(&[])
+    }
+    pub(super) fn preview_features(&self) -> BitFlags<PreviewFeature> {
+        self.generator()
+            .and_then(|gen| gen.preview_features)
+            .unwrap_or_default()
+    }
+
+    pub(super) fn position(&self) -> Option<usize> {
+        let pos = self.params.text_document_position.position;
+        let initiating_doc = self.initiating_file_source();
+
+        position_to_offset(&pos, initiating_doc)
+    }
+}
 
 pub(crate) fn empty_completion_list() -> CompletionList {
     CompletionList {
@@ -37,19 +58,10 @@ pub(crate) fn completion(schema_files: Vec<(String, SourceFile)>, params: Comple
         return empty_completion_list();
     };
 
-    let initiating_doc = db.source(initiating_file_id);
-    let position = if let Some(pos) = position_to_offset(&params.text_document_position.position, initiating_doc) {
-        pos
-    } else {
-        warn!("Received a position outside of the document boundaries in CompletionParams");
-        return empty_completion_list();
-    };
-
     let ctx = CompletionContext {
         config: &config,
         params: &params,
         db: &db,
-        position,
         initiating_file_id,
     };
 
@@ -58,48 +70,22 @@ pub(crate) fn completion(schema_files: Vec<(String, SourceFile)>, params: Comple
     list
 }
 
-#[derive(Debug, Clone, Copy)]
-struct CompletionContext<'a> {
-    config: &'a Configuration,
-    params: &'a CompletionParams,
-    db: &'a ParserDatabase,
-    position: usize,
-    initiating_file_id: FileId,
-}
-
-impl<'a> CompletionContext<'a> {
-    pub(crate) fn connector(self) -> &'static dyn Connector {
-        self.datasource()
-            .map(|ds| ds.active_connector)
-            .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector)
-    }
-
-    pub(crate) fn namespaces(self) -> &'a [(String, Span)] {
-        self.datasource().map(|ds| ds.namespaces.as_slice()).unwrap_or(&[])
-    }
-
-    pub(crate) fn preview_features(self) -> BitFlags<PreviewFeature> {
-        self.generator()
-            .and_then(|gen| gen.preview_features)
-            .unwrap_or_default()
-    }
-
-    fn datasource(self) -> Option<&'a Datasource> {
-        self.config.datasources.first()
-    }
-
-    fn generator(self) -> Option<&'a Generator> {
-        self.config.generators.first()
-    }
-}
-
 fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut CompletionList) {
+    let position = match ctx.position() {
+        Some(pos) => pos,
+        None => {
+            warn!("Received a position outside of the document boundaries in CompletionParams");
+            completion_list.is_incomplete = true;
+            return;
+        }
+    };
+
     let relation_mode = ctx
         .config
         .relation_mode()
         .unwrap_or_else(|| ctx.connector().default_relation_mode());
 
-    match ctx.db.ast(ctx.initiating_file_id).find_at_position(ctx.position) {
+    match ctx.db.ast(ctx.initiating_file_id).find_at_position(position) {
         ast::SchemaPosition::Model(
             _model_id,
             ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("relation", _, Some(attr_name))),
@@ -130,23 +116,23 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
         }
 
         ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Source) => {
-            if !ds_has_prop(ctx, "provider") {
+            if !ds_has_prop(&ctx, "provider") {
                 datasource::provider_completion(completion_list);
             }
 
-            if !ds_has_prop(ctx, "url") {
+            if !ds_has_prop(&ctx, "url") {
                 datasource::url_completion(completion_list);
             }
 
-            if !ds_has_prop(ctx, "shadowDatabaseUrl") {
+            if !ds_has_prop(&ctx, "shadowDatabaseUrl") {
                 datasource::shadow_db_completion(completion_list);
             }
 
-            if !ds_has_prop(ctx, "directUrl") {
+            if !ds_has_prop(&ctx, "directUrl") {
                 datasource::direct_url_completion(completion_list);
             }
 
-            if !ds_has_prop(ctx, "relationMode") {
+            if !ds_has_prop(&ctx, "relationMode") {
                 datasource::relation_mode_completion(completion_list);
             }
 
@@ -179,7 +165,7 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
     }
 }
 
-fn ds_has_prop(ctx: CompletionContext<'_>, prop: &str) -> bool {
+fn ds_has_prop(ctx: &CompletionContext<'_>, prop: &str) -> bool {
     if let Some(ds) = ctx.datasource() {
         match prop {
             "relationMode" => ds.relation_mode_defined(),
