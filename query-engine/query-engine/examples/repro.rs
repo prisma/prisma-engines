@@ -60,7 +60,7 @@ async fn main() {
     println!("setup: {:.2?}", now.elapsed());
 
     let now = std::time::Instant::now();
-    let res = executor
+    executor
         .execute(
             None,
             operation.clone(),

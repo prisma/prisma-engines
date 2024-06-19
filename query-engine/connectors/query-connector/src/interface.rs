@@ -360,5 +360,5 @@ pub trait WriteOperations {
         model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         query_type: Option<String>,
-    ) -> crate::Result<String>;
+    ) -> crate::Result<RawJson>;
 }

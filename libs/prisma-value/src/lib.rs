@@ -1,6 +1,7 @@
 pub mod arithmetic;
 
 mod error;
+mod raw_json;
 
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::prelude::*;
@@ -11,6 +12,7 @@ use std::{convert::TryFrom, fmt, str::FromStr};
 use uuid::Uuid;
 
 pub use error::ConversionFailure;
+pub use raw_json::RawJson;
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
 

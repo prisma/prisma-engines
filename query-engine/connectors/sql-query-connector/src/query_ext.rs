@@ -54,7 +54,7 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
     async fn raw_json<'a>(
         &'a self,
         mut inputs: HashMap<String, PrismaValue>,
-    ) -> std::result::Result<String, crate::error::RawError> {
+    ) -> std::result::Result<RawJson, crate::error::RawError> {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
@@ -62,9 +62,10 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         let result_set = AssertUnwindSafe(self.query_raw_typed(&query, &params))
             .catch_unwind()
             .await??;
-        let res = serde_json::to_string(&result_set).unwrap();
+        let json_string = serde_json::to_string(&result_set).unwrap();
+        let raw_json = RawJson::from_string(json_string);
 
-        Ok(res)
+        Ok(raw_json)
         // // `query_raw` does not return column names in `ResultSet` when a call to a stored procedure is done
         // let columns: Vec<String> = result_set.columns().iter().map(ToString::to_string).collect();
         // let mut result = Vec::new();
@@ -192,7 +193,7 @@ pub(crate) trait QueryExt {
     async fn raw_json<'a>(
         &'a self,
         mut inputs: HashMap<String, PrismaValue>,
-    ) -> std::result::Result<String, crate::error::RawError>;
+    ) -> std::result::Result<RawJson, crate::error::RawError>;
 
     /// Execute a singular SQL query in the database, returning the number of
     /// affected rows.

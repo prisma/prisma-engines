@@ -31,7 +31,7 @@ pub(crate) async fn execute(
 async fn query_raw(tx: &mut dyn ConnectionLike, q: RawQuery) -> InterpretationResult<QueryResult> {
     let res = tx.query_raw(q.model.as_ref(), q.inputs, q.query_type).await?;
 
-    Ok(QueryResult::QueyRaw(res))
+    Ok(QueryResult::QueryRaw(res))
 }
 
 async fn execute_raw(tx: &mut dyn ConnectionLike, q: RawQuery) -> InterpretationResult<QueryResult> {

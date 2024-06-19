@@ -505,7 +505,7 @@ pub async fn query_raw<'conn>(
     model: Option<&Model>,
     inputs: HashMap<String, PrismaValue>,
     query_type: Option<String>,
-) -> crate::Result<String> {
+) -> crate::Result<RawJson> {
     todo!()
     // let db_statement = get_raw_db_statement(&query_type, &model, database);
     // let span = info_span!(
