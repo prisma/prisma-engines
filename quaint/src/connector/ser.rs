@@ -25,8 +25,9 @@ impl<'a> serde::Serialize for ResultRowRef<'a> {
     {
         let mut map = serializer.serialize_map(Some(self.columns.len()))?;
 
-        for (i, value) in self.values.iter().enumerate() {
-            map.serialize_entry(&self.columns[i], value)?;
+        for (idx, value) in self.values.iter().enumerate() {
+            // `query_raw` does not return column names in `ResultSet` when a call to a stored procedure is done
+            map.serialize_entry(&self.columns.get(idx).unwrap_or(&format!("f{idx}")), value)?;
         }
 
         map.end()

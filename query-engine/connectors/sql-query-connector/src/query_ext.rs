@@ -1,5 +1,4 @@
 use crate::filter::FilterBuilder;
-// use crate::value_ext::IntoTypedJsonExtension;
 use crate::{
     column_metadata, error::*, model_extensions::*, sql_trace::trace_parent_to_string, sql_trace::SqlTraceComment,
     ColumnMetadata, Context, SqlRow, ToSqlRow,
@@ -62,27 +61,10 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         let result_set = AssertUnwindSafe(self.query_raw_typed(&query, &params))
             .catch_unwind()
             .await??;
-        let json_string = serde_json::to_string(&result_set).unwrap();
-        let raw_json = RawJson::from_string(json_string);
+        let json_str = serde_json::to_string(&result_set).unwrap();
+        let raw_json = RawJson::from_string(json_str);
 
         Ok(raw_json)
-        // // `query_raw` does not return column names in `ResultSet` when a call to a stored procedure is done
-        // let columns: Vec<String> = result_set.columns().iter().map(ToString::to_string).collect();
-        // let mut result = Vec::new();
-
-        // for row in result_set.into_iter() {
-        //     let mut object = Map::new();
-
-        //     for (idx, p_value) in row.into_iter().enumerate() {
-        //         let column_name = columns.get(idx).unwrap_or(&format!("f{idx}")).clone();
-
-        //         object.insert(column_name, p_value.as_typed_json());
-        //     }
-
-        //     result.push(Value::Object(object));
-        // }
-
-        // Ok(Value::Array(result))
     }
 
     async fn raw_count<'a>(
