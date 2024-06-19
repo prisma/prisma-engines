@@ -1,3 +1,4 @@
+use crate::offsets::position_to_offset;
 use enumflags2::BitFlags;
 use log::*;
 use lsp_types::*;
@@ -8,8 +9,6 @@ use psl::{
     parser_database::{ast, ParserDatabase, SourceFile},
     Configuration, Datasource, Diagnostics, Generator, PreviewFeature,
 };
-
-use crate::position_to_offset;
 
 mod datasource;
 
@@ -39,8 +38,7 @@ pub(crate) fn completion(schema_files: Vec<(String, SourceFile)>, params: Comple
     };
 
     let initiating_doc = db.source(initiating_file_id);
-    let position = if let Some(pos) = super::position_to_offset(&params.text_document_position.position, initiating_doc)
-    {
+    let position = if let Some(pos) = position_to_offset(&params.text_document_position.position, initiating_doc) {
         pos
     } else {
         warn!("Received a position outside of the document boundaries in CompletionParams");

@@ -232,8 +232,7 @@ mod create_many {
     // Covers: Batching by row number.
     // Each DB allows a certain amount of params per single query, and a certain number of rows.
     // Each created row has 1 param and we create 1000 records.
-    // TODO: unexclude d1 once https://github.com/prisma/team-orm/issues/1070 is fixed
-    #[connector_test(schema(schema_4), exclude(Sqlite("cfd1")))]
+    #[connector_test(schema(schema_4))]
     async fn large_num_records_horizontal(runner: Runner) -> TestResult<()> {
         let mut records: Vec<String> = vec![];
 
@@ -277,8 +276,7 @@ mod create_many {
     // Covers: Batching by row number.
     // Each DB allows a certain amount of params per single query, and a certain number of rows.
     // Each created row has 4 params and we create 1000 rows.
-    // TODO: unexclude d1 once https://github.com/prisma/team-orm/issues/1070 is fixed
-    #[connector_test(schema(schema_5), exclude(Sqlite("cfd1")))]
+    #[connector_test(schema(schema_5))]
     async fn large_num_records_vertical(runner: Runner) -> TestResult<()> {
         let mut records: Vec<String> = vec![];
 

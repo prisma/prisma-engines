@@ -5,14 +5,14 @@ mod get_dmmf;
 mod lint;
 mod merge_schemas;
 mod native;
+mod offsets;
 mod preview;
 mod schema_file_input;
 mod text_document_completion;
 mod validate;
 
 use log::*;
-use lsp_types::{Position, Range};
-use psl::{diagnostics::FileId, parser_database::ast};
+pub use offsets::span_to_range;
 use schema_file_input::SchemaFileInput;
 
 /// The API is modelled on an LSP [completion
@@ -220,133 +220,4 @@ pub fn get_config(get_config_params: String) -> String {
 /// ```
 pub fn get_dmmf(get_dmmf_params: String) -> Result<String, String> {
     get_dmmf::get_dmmf(&get_dmmf_params)
-}
-
-/// The LSP position is expressed as a (line, col) tuple, but our pest-based parser works with byte
-/// offsets. This function converts from an LSP position to a pest byte offset. Returns `None` if
-/// the position has a line past the end of the document, or a character position past the end of
-/// the line.
-pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<usize> {
-    let mut offset = 0;
-    let mut line_offset = position.line;
-    let mut character_offset = position.character;
-    let mut chars = document.chars();
-
-    while line_offset > 0 {
-        loop {
-            match chars.next() {
-                Some('\n') => {
-                    offset += 1;
-                    break;
-                }
-                Some(_) => {
-                    offset += 1;
-                }
-                None => return Some(offset),
-            }
-        }
-
-        line_offset -= 1;
-    }
-
-    while character_offset > 0 {
-        match chars.next() {
-            Some('\n') | None => return Some(offset),
-            Some(_) => {
-                offset += 1;
-                character_offset -= 1;
-            }
-        }
-    }
-
-    Some(offset)
-}
-
-#[track_caller]
-/// Converts an LSP range to a span.
-pub(crate) fn range_to_span(range: Range, document: &str, file_id: FileId) -> ast::Span {
-    let start = position_to_offset(&range.start, document).unwrap();
-    let end = position_to_offset(&range.end, document).unwrap();
-
-    ast::Span::new(start, end, file_id)
-}
-
-/// Gives the LSP position right after the given span, skipping any trailing newlines
-pub(crate) fn position_after_span(span: ast::Span, document: &str) -> Position {
-    let end = match (document.chars().nth(span.end - 2), document.chars().nth(span.end - 1)) {
-        (Some('\r'), Some('\n')) => span.end - 2,
-        (_, Some('\n')) => span.end - 1,
-        _ => span.end,
-    };
-
-    offset_to_position(end, document)
-}
-
-/// Converts a byte offset to an LSP position, if the given offset
-/// does not overflow the document.
-pub fn offset_to_position(offset: usize, document: &str) -> Position {
-    let mut position = Position::default();
-
-    for (i, chr) in document.chars().enumerate() {
-        match chr {
-            _ if i == offset => {
-                return position;
-            }
-            '\n' => {
-                position.character = 0;
-                position.line += 1;
-            }
-            _ => {
-                position.character += 1;
-            }
-        }
-    }
-
-    position
-}
-
-#[cfg(test)]
-mod tests {
-    use lsp_types::Position;
-    use psl::diagnostics::{FileId, Span};
-
-    use crate::position_after_span;
-
-    // On Windows, a newline is actually two characters.
-    #[test]
-    fn position_to_offset_with_crlf() {
-        let schema = "\r\nmodel Test {\r\n    id Int @id\r\n}";
-        // Let's put the cursor on the "i" in "id Int".
-        let expected_offset = schema.chars().position(|c| c == 'i').unwrap();
-        let found_offset = super::position_to_offset(&Position { line: 2, character: 4 }, schema).unwrap();
-
-        assert_eq!(found_offset, expected_offset);
-    }
-
-    #[test]
-    fn position_after_span_no_newline() {
-        let str = "some string";
-        let span = Span::new(0, str.len(), FileId::ZERO);
-        let pos = position_after_span(span, str);
-        assert_eq!(pos.line, 0);
-        assert_eq!(pos.character, 11);
-    }
-
-    #[test]
-    fn position_after_span_lf() {
-        let str = "some string\n";
-        let span = Span::new(0, str.len(), FileId::ZERO);
-        let pos = position_after_span(span, str);
-        assert_eq!(pos.line, 0);
-        assert_eq!(pos.character, 11);
-    }
-
-    #[test]
-    fn position_after_span_crlf() {
-        let str = "some string\r\n";
-        let span = Span::new(0, str.len(), FileId::ZERO);
-        let pos = position_after_span(span, str);
-        assert_eq!(pos.line, 0);
-        assert_eq!(pos.character, 11);
-    }
 }
