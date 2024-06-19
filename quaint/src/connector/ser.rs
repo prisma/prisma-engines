@@ -1,67 +1,52 @@
-use super::{ResultRowRef, ResultSet};
+use super::ResultSet;
 use crate::{Value, ValueType};
-use ser::{SerializeMap as _, SerializeSeq as _};
+use ser::SerializeSeq as _;
 use serde::*;
 
-impl serde::Serialize for ResultSet {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut seq = serializer.serialize_seq(Some(self.rows.len()))?;
+#[derive(Serialize)]
+struct SerializedResultSet<'a> {
+    columns: &'a Vec<String>,
+    types: SerializedTypes<'a>,
+    rows: &'a Vec<Vec<Value<'a>>>,
+}
 
-        for row in self.iter() {
-            seq.serialize_element(&row)?;
+struct SerializedTypes<'a>(&'a Vec<Value<'a>>);
+
+impl<'a> Serialize for SerializedTypes<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut seq = serializer.serialize_seq(Some(self.0.len()))?;
+
+        for value in self.0 {
+            seq.serialize_element(get_value_type_name(value))?;
         }
 
         seq.end()
     }
 }
 
-impl<'a> serde::Serialize for ResultRowRef<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        let mut map = serializer.serialize_map(Some(self.columns.len()))?;
-
-        for (idx, value) in self.values.iter().enumerate() {
-            // `query_raw` does not return column names in `ResultSet` when a call to a stored procedure is done
-            map.serialize_entry(&self.columns.get(idx).unwrap_or(&format!("f{idx}")), value)?;
-        }
-
-        map.end()
-    }
-}
-
-#[derive(serde::Serialize)]
-pub(crate) struct ValueContainer<'a> {
-    #[serde(rename = "prisma__type")]
-    prisma_type: &'a str,
-    #[serde(rename = "prisma__value")]
-    prisma_value: &'a SerializedValue<'a>,
-}
-
-impl<'a> serde::Serialize for Value<'a> {
+impl serde::Serialize for ResultSet {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
-        ValueContainer {
-            prisma_type: get_value_type_name(self),
-            prisma_value: &SerializedValue(self),
+        SerializedResultSet {
+            columns: self.columns(),
+            types: SerializedTypes(&self.rows[0]),
+            rows: &self.rows,
         }
         .serialize(serializer)
     }
 }
-struct SerializedValue<'a>(&'a Value<'a>);
 
-impl<'a> Serialize for SerializedValue<'a> {
+impl<'a> Serialize for Value<'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
-        let val = &self.0;
+        let val = &self;
 
         if val.is_null() {
             return serde_json::Value::Null.serialize(serializer);
