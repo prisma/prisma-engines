@@ -396,8 +396,7 @@ fn new_lines_in_source_must_work() {
         }
     "#};
 
-    let config = parse_configuration(schema);
-    let rendered = psl::render_sources_to_json(&config.datasources);
+    let rendered = render_datasources(&schema);
 
     let expected = expect![[r#"
         [
@@ -431,8 +430,7 @@ fn multischema_must_work() {
       }
     "#};
 
-    let config = parse_configuration(schema);
-    let rendered = psl::render_sources_to_json(&config.datasources);
+    let rendered = render_datasources(&schema);
 
     // schemas are sorted in ascending order
     let expected = expect![[r#"
