@@ -396,7 +396,7 @@ fn new_lines_in_source_must_work() {
         }
     "#};
 
-    let rendered = render_datasources(&schema);
+    let rendered = render_datasources(schema);
 
     let expected = expect![[r#"
         [
@@ -431,7 +431,7 @@ fn multischema_must_work() {
       }
     "#};
 
-    let rendered = render_datasources(&schema);
+    let rendered = render_datasources(schema);
 
     // schemas are sorted in ascending order
     let expected = expect![[r#"
