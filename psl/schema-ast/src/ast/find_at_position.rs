@@ -57,7 +57,14 @@ pub enum SchemaPosition<'ast> {
 pub enum ModelPosition<'ast> {
     /// In the model, but not somewhere more specific.
     Model,
-    /// In the name of the model (model name).
+    /// In the name of the model.
+    /// ```prisma
+    /// model People {
+    /// //    ^^^^^^
+    ///     id       String     @id @map("_id")
+    ///     SomeUser SomeUser[]
+    /// }
+    /// ```
     Name(&'ast str),
     /// In an attribute (attr name, attr index, position).
     ModelAttribute(&'ast str, usize, AttributePosition<'ast>),
@@ -92,6 +99,15 @@ impl<'ast> ModelPosition<'ast> {
 pub enum EnumPosition<'ast> {
     /// In the enum, but not somewhere more specific.
     Enum,
+    /// In the enum's name.
+    /// ```prisma
+    /// enum Animal {
+    /// //   ^^^^^^
+    ///     Dog
+    ///     RedPanda
+    /// }
+    /// ```
+    Name(&'ast str),
     /// In an attribute (attr name, attr index, position).
     EnumAttribute(&'ast str, usize, AttributePosition<'ast>),
     /// In a value.
@@ -100,6 +116,10 @@ pub enum EnumPosition<'ast> {
 
 impl<'ast> EnumPosition<'ast> {
     fn new(r#enum: &'ast ast::Enum, position: usize) -> Self {
+        if r#enum.name.span.contains(position) {
+            return EnumPosition::Name(r#enum.name());
+        }
+
         for (enum_value_id, value) in r#enum.iter_values() {
             if value.span().contains(position) {
                 return EnumPosition::Value(enum_value_id, EnumValuePosition::new(value, position));
@@ -121,9 +141,23 @@ impl<'ast> EnumPosition<'ast> {
 pub enum FieldPosition<'ast> {
     /// Nowhere specific inside the field
     Field,
-    /// In the field's name (name).
+    /// In the field's name
+    /// ```prisma
+    /// model People {
+    ///     id    String @id @map("_id")
+    ///     field Float
+    /// //  ^^^^^
+    /// }
+    /// ```
     Name(&'ast str),
-    /// In the field's type definition (type name).
+    /// In the field's type definition
+    /// ```prisma
+    /// model People {
+    ///     id    String @id @map("_id")
+    ///     field Float
+    /// //        ^^^^^
+    /// }
+    /// ```
     Type(&'ast str),
     /// In an attribute. (name, idx, optional arg)
     Attribute(&'ast str, usize, Option<&'ast str>),

@@ -168,11 +168,6 @@ impl ParserDatabase {
         &self.asts.0.first().unwrap().2
     }
 
-    /// Iterate all parsed ASTs.
-    pub fn iter_asts(&self) -> impl Iterator<Item = &ast::SchemaAst> {
-        self.asts.iter().map(|(_, _, _, ast)| ast)
-    }
-
     /// Returns file id by name
     pub fn file_id(&self, file_name: &str) -> Option<FileId> {
         self.asts
@@ -180,14 +175,9 @@ impl ParserDatabase {
             .find_map(|(file_id, name, _, _)| if name == file_name { Some(file_id) } else { None })
     }
 
-    /// Iterate all parsed ASTs, consuming parser database
-    pub fn into_iter_asts(self) -> impl Iterator<Item = ast::SchemaAst> {
-        self.asts.into_iter().map(|(_, _, _, ast)| ast)
-    }
-
-    /// Iterate all file ids
-    pub fn iter_file_ids(&self) -> impl Iterator<Item = FileId> + '_ {
-        self.asts.iter().map(|(file_id, _, _, _)| file_id)
+    /// The name of the file.
+    pub fn file_name(&self, file_id: FileId) -> &str {
+        self.asts[file_id].0.as_str()
     }
 
     /// A parsed AST.
@@ -223,6 +213,16 @@ impl ParserDatabase {
         self.asts[file_id].1.as_str()
     }
 
+    /// Iterate all parsed ASTs, consuming parser database
+    pub fn into_iter_asts(self) -> impl Iterator<Item = ast::SchemaAst> {
+        self.asts.into_iter().map(|(_, _, _, ast)| ast)
+    }
+
+    /// Iterate all parsed ASTs.
+    pub fn iter_asts(&self) -> impl Iterator<Item = &ast::SchemaAst> {
+        self.asts.iter().map(|(_, _, _, ast)| ast)
+    }
+
     /// Iterate all source file contents.
     pub fn iter_sources(&self) -> impl Iterator<Item = &str> {
         self.asts.iter().map(|ast| ast.2.as_str())
@@ -233,11 +233,10 @@ impl ParserDatabase {
         self.asts.iter().map(|ast| (ast.1.as_str(), ast.2))
     }
 
-    /// The name of the file.
-    pub fn file_name(&self, file_id: FileId) -> &str {
-        self.asts[file_id].0.as_str()
+    /// Iterate all file ids
+    pub fn iter_file_ids(&self) -> impl Iterator<Item = FileId> + '_ {
+        self.asts.iter().map(|(file_id, _, _, _)| file_id)
     }
-
     /// Iterate all datasources defined in the schema
     pub fn datasources(&self) -> impl Iterator<Item = &SourceConfig> {
         self.iter_asts().flat_map(|ast| ast.sources())
