@@ -7,7 +7,7 @@ use psl::{
     Diagnostics, SourceFile,
 };
 
-use crate::LSPContext;
+use crate::{offsets::position_to_offset, LSPContext};
 
 pub(super) type HoverContext<'a> = LSPContext<'a, HoverParams>;
 
@@ -16,7 +16,7 @@ impl<'a> HoverContext<'a> {
         let pos = self.params.text_document_position_params.position;
         let initiating_doc = self.initiating_file_source();
 
-        super::position_to_offset(&pos, initiating_doc)
+        position_to_offset(&pos, initiating_doc)
     }
 }
 
