@@ -1,7 +1,8 @@
 use crate::{error::PrismaError, PrismaResult};
+use psl::{parser_database::Files, SourceFile};
 use query_core::protocol::EngineProtocol;
 use serde::Deserialize;
-use std::{env, ffi::OsStr, fs::File, io::Read};
+use std::{env, ffi::OsStr, fs::File, io::Read, sync::Arc};
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt, Clone)]
@@ -171,8 +172,9 @@ impl PrismaOpt {
         Ok(schema)
     }
 
-    pub(crate) fn configuration(&self, ignore_env_errors: bool) -> PrismaResult<psl::Configuration> {
+    pub(crate) fn configuration(&self, ignore_env_errors: bool) -> PrismaResult<(Files, psl::Configuration)> {
         let datamodel_str = self.datamodel_str()?;
+        let source_file = SourceFile::new_allocated(Arc::from(datamodel_str.to_owned().into_boxed_str()));
 
         let datasource_url_overrides: Vec<(String, String)> = if let Some(ref json) = self.overwrite_datasources {
             let datasource_url_overrides: Vec<SourceOverride> = serde_json::from_str(json)?;
@@ -181,17 +183,21 @@ impl PrismaOpt {
             Vec::new()
         };
 
-        psl::parse_configuration(datamodel_str)
-            .and_then(|mut config| {
-                config.resolve_datasource_urls_query_engine(
-                    &datasource_url_overrides,
-                    |key| env::var(key).ok(),
-                    ignore_env_errors,
-                )?;
+        let file_name = self
+            .datamodel_path
+            .as_ref()
+            .map(ToOwned::to_owned)
+            .unwrap_or_else(|| "schema.prisma".to_owned());
 
-                Ok(config)
-            })
-            .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
+        let (files, mut config) = psl::parse_configuration_multi_file(&[(file_name, source_file)])
+            .map_err(|(_, errors)| PrismaError::ConversionError(errors, datamodel_str.to_string()))?;
+
+        config.resolve_datasource_urls_query_engine(
+            &datasource_url_overrides,
+            |key| env::var(key).ok(),
+            ignore_env_errors,
+        )?;
+        Ok((files, config))
     }
 
     /// Extract the log format from on the RUST_LOG_FORMAT env var.
