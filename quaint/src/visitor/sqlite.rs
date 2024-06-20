@@ -224,7 +224,6 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         self.returning(insert.returning)?;
 
         if let Some(comment) = insert.comment {
-            self.write("; ")?;
             self.visit_comment(comment)?;
         }
 
