@@ -57,6 +57,8 @@ pub enum SchemaPosition<'ast> {
 pub enum ModelPosition<'ast> {
     /// In the model, but not somewhere more specific.
     Model,
+    /// In the name of the model (model name).
+    Name(&'ast str),
     /// In an attribute (attr name, attr index, position).
     ModelAttribute(&'ast str, usize, AttributePosition<'ast>),
     /// In a field.
@@ -65,6 +67,10 @@ pub enum ModelPosition<'ast> {
 
 impl<'ast> ModelPosition<'ast> {
     fn new(model: &'ast ast::Model, position: usize) -> Self {
+        if model.name.span.contains(position) {
+            return ModelPosition::Name(model.name());
+        }
+
         for (field_id, field) in model.iter_fields() {
             if field.span().contains(position) {
                 return ModelPosition::Field(field_id, FieldPosition::new(field, position));
@@ -115,12 +121,24 @@ impl<'ast> EnumPosition<'ast> {
 pub enum FieldPosition<'ast> {
     /// Nowhere specific inside the field
     Field,
+    /// In the field's name (name).
+    Name(&'ast str),
+    /// In the field's type definition (type name).
+    Type(&'ast str),
     /// In an attribute. (name, idx, optional arg)
     Attribute(&'ast str, usize, Option<&'ast str>),
 }
 
 impl<'ast> FieldPosition<'ast> {
     fn new(field: &'ast ast::Field, position: usize) -> FieldPosition<'ast> {
+        if field.name.span.contains(position) {
+            return FieldPosition::Name(field.name());
+        }
+
+        if field.field_type.span().contains(position) {
+            return FieldPosition::Type(field.field_type.name());
+        }
+
         for (attr_idx, attr) in field.attributes.iter().enumerate() {
             if attr.span().contains(position) {
                 // We can't go by Span::contains() because we also care about the empty space
@@ -328,6 +346,8 @@ impl<'ast> ExpressionPosition<'ast> {
 pub enum SourcePosition<'ast> {
     /// In the general datasource
     Source,
+    /// In the datasource's name
+    Name(&'ast str),
     /// In a property
     Property(&'ast str, PropertyPosition<'ast>),
     /// Outside of the braces
@@ -336,6 +356,10 @@ pub enum SourcePosition<'ast> {
 
 impl<'ast> SourcePosition<'ast> {
     fn new(source: &'ast ast::SourceConfig, position: usize) -> Self {
+        if source.name.span.contains(position) {
+            return SourcePosition::Name(source.name());
+        }
+
         for property in &source.properties {
             if property.span.contains(position) {
                 return SourcePosition::Property(&property.name.name, PropertyPosition::new(property, position));

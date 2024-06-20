@@ -66,7 +66,8 @@ pub(crate) fn newline(source: &str, span: Span) -> NewlineType {
 }
 
 impl crate::ParserDatabase {
-    fn iter_tops(&self) -> impl Iterator<Item = (FileId, ast::TopId, &ast::Top)> + '_ {
+    /// Iterate all top level blocks.
+    pub fn iter_tops(&self) -> impl Iterator<Item = (FileId, ast::TopId, &ast::Top)> + '_ {
         self.asts
             .iter()
             .flat_map(move |(file_id, _, _, ast)| ast.iter_tops().map(move |(top_id, top)| (file_id, top_id, top)))
