@@ -106,6 +106,17 @@ pub fn code_actions(schema: String, params: String) -> String {
     prisma_fmt::code_actions(schema, &params)
 }
 
+/// This API is modelled on an LSP [code action
+/// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_codeAction=).
+/// Input and output are both JSON, the request being a
+/// `CodeActionParams` object and the response being a list of
+/// `CodeActionOrCommand` objects.
+#[wasm_bindgen]
+pub fn references(schema: String, params: String) -> String {
+    register_panic_hook();
+    prisma_fmt::references(schema, &params)
+}
+
 /// Trigger a panic inside the wasm module. This is only useful in development for testing panic
 /// handling.
 #[wasm_bindgen]
