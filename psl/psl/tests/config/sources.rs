@@ -408,7 +408,8 @@ fn new_lines_in_source_must_work() {
               "fromEnvVar": null,
               "value": "postgresql://localhost"
             },
-            "schemas": []
+            "schemas": [],
+            "sourceFilePath": "schema.prisma"
           }
         ]"#]];
 
@@ -446,7 +447,8 @@ fn multischema_must_work() {
             "schemas": [
               "public",
               "transactional"
-            ]
+            ],
+            "sourceFilePath": "schema.prisma"
           }
         ]"#]];
 

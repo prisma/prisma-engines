@@ -40,7 +40,8 @@ fn serialize_builtin_sources_to_dmmf() {
               "fromEnvVar": null,
               "value": "postgresql://localhost/postgres1"
             },
-            "schemas": []
+            "schemas": [],
+            "sourceFilePath": "schema.prisma"
           }
         ]"#]];
 
@@ -63,7 +64,8 @@ fn serialize_builtin_sources_to_dmmf() {
               "fromEnvVar": "pg2",
               "value": null
             },
-            "schemas": []
+            "schemas": [],
+            "sourceFilePath": "schema.prisma"
           }
         ]"#]];
 
@@ -86,7 +88,8 @@ fn serialize_builtin_sources_to_dmmf() {
               "fromEnvVar": null,
               "value": "file://file.db"
             },
-            "schemas": []
+            "schemas": [],
+            "sourceFilePath": "schema.prisma"
           }
         ]"#]];
 
@@ -109,7 +112,8 @@ fn serialize_builtin_sources_to_dmmf() {
               "fromEnvVar": null,
               "value": "mysql://localhost"
             },
-            "schemas": []
+            "schemas": [],
+            "sourceFilePath": "schema.prisma"
           }
         ]"#]];
 
