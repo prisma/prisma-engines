@@ -40,11 +40,12 @@ fn serialize_builtin_sources_to_dmmf() {
               "fromEnvVar": null,
               "value": "postgresql://localhost/postgres1"
             },
-            "schemas": []
+            "schemas": [],
+            "sourceFilePath": "schema.prisma"
           }
         ]"#]];
 
-    expect.assert_eq(&render_schema_json(schema));
+    expect.assert_eq(&render_datasources(schema));
 
     let schema = indoc! {r#"
         datasource pg2 {
@@ -63,11 +64,12 @@ fn serialize_builtin_sources_to_dmmf() {
               "fromEnvVar": "pg2",
               "value": null
             },
-            "schemas": []
+            "schemas": [],
+            "sourceFilePath": "schema.prisma"
           }
         ]"#]];
 
-    expect.assert_eq(&render_schema_json(schema));
+    expect.assert_eq(&render_datasources(schema));
 
     let schema = indoc! {r#"
         datasource sqlite1 {
@@ -86,11 +88,12 @@ fn serialize_builtin_sources_to_dmmf() {
               "fromEnvVar": null,
               "value": "file://file.db"
             },
-            "schemas": []
+            "schemas": [],
+            "sourceFilePath": "schema.prisma"
           }
         ]"#]];
 
-    expect.assert_eq(&render_schema_json(schema));
+    expect.assert_eq(&render_datasources(schema));
 
     let schema = indoc! {r#"
         datasource mysql1 {
@@ -109,11 +112,12 @@ fn serialize_builtin_sources_to_dmmf() {
               "fromEnvVar": null,
               "value": "mysql://localhost"
             },
-            "schemas": []
+            "schemas": [],
+            "sourceFilePath": "schema.prisma"
           }
         ]"#]];
 
-    expect.assert_eq(&render_schema_json(schema));
+    expect.assert_eq(&render_datasources(schema));
 }
 
 #[test]
@@ -270,11 +274,6 @@ fn schemas_array_without_preview_feature_should_error() {
     "#]];
 
     expect_error(schema, &expect);
-}
-
-fn render_schema_json(schema: &str) -> String {
-    let config = parse_configuration(schema);
-    psl::get_config::render_sources_to_json(&config.datasources)
 }
 
 #[test]

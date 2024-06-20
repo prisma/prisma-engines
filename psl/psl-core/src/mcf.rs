@@ -22,7 +22,7 @@ pub struct SerializeableMcf {
 fn model_to_serializable(config: &crate::Configuration, files: &Files) -> SerializeableMcf {
     SerializeableMcf {
         generators: generator::generators_to_json_value(&config.generators, files),
-        datasources: source::render_sources_to_json_value(&config.datasources),
+        datasources: source::render_sources_to_json_value(&config.datasources, files),
         warnings: config.warnings.iter().map(|f| f.message().to_owned()).collect(),
     }
 }
