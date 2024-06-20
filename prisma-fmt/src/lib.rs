@@ -6,12 +6,13 @@ mod hover;
 mod lint;
 mod merge_schemas;
 mod native;
-mod offsets;
 mod preview;
 mod references;
 mod schema_file_input;
 mod text_document_completion;
 mod validate;
+
+pub mod offsets;
 
 use log::*;
 use psl::{
