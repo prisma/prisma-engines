@@ -286,12 +286,7 @@ impl ValueGeneratorFn {
     fn generate_uuid(version: u8) -> PrismaValue {
         PrismaValue::Uuid(match version {
             4 => uuid::Uuid::new_v4(),
-            7 => {
-                let now = chrono::Utc::now();
-                let timestamp =
-                    uuid::Timestamp::from_unix(uuid::NoContext, now.timestamp() as u64, now.timestamp_subsec_nanos());
-                uuid::Uuid::new_v7(timestamp)
-            }
+            7 => uuid::Uuid::now_v7(),
             _ => panic!("Unknown UUID version: {}", version),
         })
     }
