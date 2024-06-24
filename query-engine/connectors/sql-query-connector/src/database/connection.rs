@@ -13,7 +13,7 @@ use quaint::{
     connector::{IsolationLevel, TransactionCapable},
     prelude::{ConnectionInfo, Queryable},
 };
-use query_structure::{prelude::*, Filter, QueryArguments, RelationLoadStrategy, SelectionResult};
+use query_structure::{prelude::*, Filter, QueryArguments, RawResult, RelationLoadStrategy, SelectionResult};
 use std::{collections::HashMap, str::FromStr};
 
 pub(crate) struct SqlConnection<C> {
@@ -332,7 +332,7 @@ where
         _model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         _query_type: Option<String>,
-    ) -> connector::Result<serde_json::Value> {
+    ) -> connector::Result<RawResult> {
         catch(&self.connection_info, write::query_raw(&self.inner, inputs)).await
     }
 }

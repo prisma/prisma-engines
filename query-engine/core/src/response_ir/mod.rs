@@ -18,14 +18,14 @@ pub(crate) use ir_serializer::*;
 
 use crate::ArgumentValue;
 use indexmap::IndexMap;
-use query_structure::PrismaValue;
+use query_structure::{PrismaValue, RawResult};
 use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
 use std::{collections::HashMap, fmt, sync::Arc};
 
 /// A `key -> value` map to an IR item
 pub type Map = IndexMap<String, Item>;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone)]
 pub struct List {
     inner: Vec<Item>,
 }
@@ -96,12 +96,13 @@ impl<'a> IntoIterator for &'a List {
 pub type ItemRef = Arc<Item>;
 
 /// An IR item that either expands to a subtype or leaf-record.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum Item {
     Map(Map),
     List(List),
     Value(PrismaValue),
     Json(serde_json::Value),
+    RawJson(RawResult),
 
     /// Wrapper type to allow multiple parent records
     /// to claim the same item without copying data
@@ -200,6 +201,7 @@ impl Serialize for Item {
             }
             Self::Value(pv) => pv.serialize(serializer),
             Self::Json(value) => value.serialize(serializer),
+            Self::RawJson(value) => value.serialize(serializer),
             Self::Ref(item_ref) => item_ref.serialize(serializer),
         }
     }

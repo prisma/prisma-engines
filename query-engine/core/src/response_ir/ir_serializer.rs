@@ -25,6 +25,10 @@ impl<'a> IrSerializer<'a> {
                 Ok(ResponseData::new(self.key.clone(), Item::Json(json)))
             }
 
+            ExpressionResult::Query(QueryResult::QueryRaw(val)) => {
+                Ok(ResponseData::new(self.key.clone(), Item::RawJson(val)))
+            }
+
             ExpressionResult::Query(r) => {
                 let serialized = serialize_internal(r, &self.output_field, false, query_schema)?;
 

@@ -6,7 +6,7 @@ use query_core::{
 
 use crate::HandlerError;
 
-#[derive(Debug, serde::Serialize, Default, PartialEq)]
+#[derive(Debug, serde::Serialize, Default)]
 pub struct GQLResponse {
     #[serde(skip_serializing_if = "IndexMap::is_empty")]
     pub data: Map,
@@ -16,9 +16,24 @@ pub struct GQLResponse {
 
     #[serde(skip_serializing_if = "IndexMap::is_empty")]
     pub extensions: Map,
+
+    pub format: ResponseFormat,
 }
 
-#[derive(Debug, serde::Serialize, Default, PartialEq)]
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum ResponseFormat {
+    Json,
+    Js,
+}
+
+impl Default for ResponseFormat {
+    fn default() -> Self {
+        Self::Json
+    }
+}
+
+#[derive(Debug, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GQLBatchResponse {
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -114,6 +129,14 @@ impl GQLResponse {
 
     pub fn set_extension(&mut self, key: String, val: serde_json::Value) {
         self.extensions.entry(key).or_insert(Item::Json(val));
+    }
+
+    pub fn set_format(&mut self, format: ResponseFormat) {
+        self.format = format;
+    }
+
+    pub(crate) fn is_sql_raw_response(&self) -> bool {
+        self.data.len() == 1 && (self.data.contains_key("queryRaw") || self.data.contains_key("executeRaw"))
     }
 }
 

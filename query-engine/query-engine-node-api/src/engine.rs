@@ -1,4 +1,4 @@
-use crate::{error::ApiError, logger::Logger};
+use crate::{error::ApiError, logger::Logger, response::NapiResponse};
 use futures::FutureExt;
 use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
@@ -310,7 +310,7 @@ impl QueryEngine {
 
     /// If connected, sends a query to the core and returns the response.
     #[napi]
-    pub async fn query(&self, body: String, trace: String, tx_id: Option<String>) -> napi::Result<String> {
+    pub async fn query(&self, body: String, trace: String, tx_id: Option<String>) -> napi::Result<NapiResponse> {
         let dispatcher = self.logger.dispatcher();
 
         async_panic_to_js_error(async {
@@ -331,8 +331,12 @@ impl QueryEngine {
                 let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
                 let response = handler.handle(query, tx_id.map(TxId::from), trace_id).await;
 
-                let serde_span = tracing::info_span!("prisma:engine:response_json_serialization", user_facing = true);
-                Ok(serde_span.in_scope(|| serde_json::to_string(&response))?)
+                let serde_span = tracing::info_span!("prisma:engine:response_serialization", user_facing = true);
+
+                Ok(serde_span.in_scope(|| match response.is_sql_raw_response() {
+                    true => Ok(NapiResponse::Js(response)),
+                    false => serde_json::to_string(&response).map(NapiResponse::Json),
+                })?)
             }
             .instrument(span)
             .await

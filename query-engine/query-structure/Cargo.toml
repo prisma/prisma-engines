@@ -9,6 +9,8 @@ itertools.workspace = true
 prisma-value = { path = "../../libs/prisma-value" }
 bigdecimal = "0.3"
 thiserror = "1.0"
+erased-serde = "0.4.5"
+serde.workspace = true
 
 getrandom = { version = "0.2" }
 uuid = { workspace = true, optional = true }
