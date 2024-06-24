@@ -12,13 +12,14 @@ mod internal;
 mod ir_serializer;
 mod response;
 
+use quaint::connector::ResultSet;
 pub use response::*;
 
 pub(crate) use ir_serializer::*;
 
 use crate::ArgumentValue;
 use indexmap::IndexMap;
-use query_structure::{PrismaValue, RawJson};
+use query_structure::PrismaValue;
 use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
 use std::{collections::HashMap, fmt, sync::Arc};
 
@@ -102,7 +103,7 @@ pub enum Item {
     List(List),
     Value(PrismaValue),
     Json(serde_json::Value),
-    RawJson(RawJson),
+    RawJson(ResultSet),
 
     /// Wrapper type to allow multiple parent records
     /// to claim the same item without copying data

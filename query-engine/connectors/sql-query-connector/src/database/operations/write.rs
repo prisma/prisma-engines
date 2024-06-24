@@ -15,7 +15,6 @@ use quaint::{
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
 };
 use query_structure::*;
-use serde::Serialize;
 use std::borrow::Cow;
 use std::{
     collections::{HashMap, HashSet},
@@ -506,6 +505,6 @@ pub(crate) async fn execute_raw(
 
 /// Execute a plain SQL query with the given parameters, returning the answer as
 /// a JSON `Value`.
-pub(crate) async fn query_raw(conn: &dyn Queryable, inputs: HashMap<String, PrismaValue>) -> crate::Result<RawJson> {
+pub(crate) async fn query_raw(conn: &dyn Queryable, inputs: HashMap<String, PrismaValue>) -> crate::Result<ResultSet> {
     Ok(conn.raw_json(inputs).await?)
 }

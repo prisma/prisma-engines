@@ -26,7 +26,6 @@ mod type_identifier;
 
 pub use self::result_set::*;
 pub use connection_info::*;
-pub use ser::*;
 
 #[cfg(native)]
 pub use native::*;

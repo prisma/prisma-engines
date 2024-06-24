@@ -3,8 +3,6 @@ use crate::error::{Error, ErrorKind};
 
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
-use serde::ser::SerializeMap as _;
-use serde::Serialize;
 use serde_json::{Number, Value as JsonValue};
 use std::fmt::Display;
 use std::{

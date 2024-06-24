@@ -4,8 +4,7 @@ use crate::{
     filter::{FilterPrefix, MongoFilter, MongoFilterVisitor},
     output_meta,
     query_builder::MongoReadQueryBuilder,
-    query_strings::{Aggregate, DeleteMany, DeleteOne, Find, InsertMany, InsertOne, RunCommand, UpdateMany, UpdateOne},
-    root_queries::raw::{MongoCommand, MongoOperation},
+    query_strings::{DeleteMany, DeleteOne, InsertMany, InsertOne, UpdateMany, UpdateOne},
     IntoBson,
 };
 use connector_interface::*;
@@ -15,6 +14,7 @@ use mongodb::{
     options::InsertManyOptions,
     ClientSession, Collection, Database,
 };
+use quaint::connector::ResultSet;
 use query_structure::{Model, PrismaValue, SelectionResult};
 use std::{collections::HashMap, convert::TryInto};
 use tracing::{info_span, Instrument};
@@ -500,12 +500,12 @@ pub async fn execute_raw<'conn>(
 
 /// Execute a plain MongoDB query, returning the answer as a JSON `Value`.
 pub async fn query_raw<'conn>(
-    database: &Database,
-    session: &mut ClientSession,
-    model: Option<&Model>,
-    inputs: HashMap<String, PrismaValue>,
-    query_type: Option<String>,
-) -> crate::Result<RawJson> {
+    _database: &Database,
+    _session: &mut ClientSession,
+    _model: Option<&Model>,
+    _inputs: HashMap<String, PrismaValue>,
+    _query_type: Option<String>,
+) -> crate::Result<ResultSet> {
     todo!()
     // let db_statement = get_raw_db_statement(&query_type, &model, database);
     // let span = info_span!(
@@ -572,13 +572,13 @@ pub async fn query_raw<'conn>(
     // .await
 }
 
-fn get_raw_db_statement(query_type: &Option<String>, model: &Option<&Model>, database: &Database) -> String {
-    match (query_type.as_deref(), model) {
-        (Some("findRaw"), Some(m)) => format!("db.{}.findRaw(*)", database.collection::<Document>(m.db_name()).name()),
-        (Some("aggregateRaw"), Some(m)) => format!(
-            "db.{}.aggregateRaw(*)",
-            database.collection::<Document>(m.db_name()).name()
-        ),
-        _ => "db.runCommandRaw(*)".to_string(),
-    }
-}
+// fn get_raw_db_statement(query_type: &Option<String>, model: &Option<&Model>, database: &Database) -> String {
+//     match (query_type.as_deref(), model) {
+//         (Some("findRaw"), Some(m)) => format!("db.{}.findRaw(*)", database.collection::<Document>(m.db_name()).name()),
+//         (Some("aggregateRaw"), Some(m)) => format!(
+//             "db.{}.aggregateRaw(*)",
+//             database.collection::<Document>(m.db_name()).name()
+//         ),
+//         _ => "db.runCommandRaw(*)".to_string(),
+//     }
+// }

@@ -9,6 +9,7 @@ use futures::future::FutureExt;
 use itertools::Itertools;
 use opentelemetry::trace::TraceContextExt;
 use opentelemetry::trace::TraceFlags;
+use quaint::connector::ResultSet;
 use quaint::{ast::*, connector::Queryable};
 use query_structure::*;
 use std::{collections::HashMap, panic::AssertUnwindSafe};
@@ -53,7 +54,7 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
     async fn raw_json<'a>(
         &'a self,
         mut inputs: HashMap<String, PrismaValue>,
-    ) -> std::result::Result<RawJson, crate::error::RawError> {
+    ) -> std::result::Result<ResultSet, crate::error::RawError> {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
@@ -61,10 +62,8 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         let result_set = AssertUnwindSafe(self.query_raw_typed(&query, &params))
             .catch_unwind()
             .await??;
-        let json_str = serde_json::to_string(&result_set).unwrap();
-        let raw_json = RawJson::from_string(json_str);
 
-        Ok(raw_json)
+        Ok(result_set)
     }
 
     async fn raw_count<'a>(
@@ -175,7 +174,7 @@ pub(crate) trait QueryExt {
     async fn raw_json<'a>(
         &'a self,
         mut inputs: HashMap<String, PrismaValue>,
-    ) -> std::result::Result<RawJson, crate::error::RawError>;
+    ) -> std::result::Result<ResultSet, crate::error::RawError>;
 
     /// Execute a singular SQL query in the database, returning the number of
     /// affected rows.

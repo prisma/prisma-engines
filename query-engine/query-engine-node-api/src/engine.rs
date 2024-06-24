@@ -1,6 +1,9 @@
 use crate::{error::ApiError, logger::Logger};
 use futures::FutureExt;
-use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsObject, JsUnknown};
+use napi::{
+    bindgen_prelude::ToNapiValue, threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsObject, JsUnknown,
+    NapiRaw,
+};
 use napi_derive::napi;
 use psl::PreviewFeature;
 use quaint::connector::ExternalConnector;
@@ -10,7 +13,9 @@ use query_engine_common::engine::{
     ConstructorOptionsNative, EngineBuilder, EngineBuilderNative, Inner,
 };
 use query_engine_metrics::MetricFormat;
-use request_handlers::{load_executor, render_graphql_schema, ConnectorKind, RequestBody, RequestHandler};
+use request_handlers::{
+    load_executor, render_graphql_schema, ConnectorKind, PrismaResponse, RequestBody, RequestHandler,
+};
 use serde::Deserialize;
 use serde_json::json;
 use std::{collections::HashMap, future::Future, marker::PhantomData, panic::AssertUnwindSafe, sync::Arc};
@@ -310,7 +315,7 @@ impl QueryEngine {
 
     /// If connected, sends a query to the core and returns the response.
     #[napi]
-    pub async fn query(&self, body: String, trace: String, tx_id: Option<String>) -> napi::Result<String> {
+    pub async fn query(&self, body: String, trace: String, tx_id: Option<String>) -> napi::Result<NapiResponse> {
         let dispatcher = self.logger.dispatcher();
 
         async_panic_to_js_error(async {
@@ -332,7 +337,8 @@ impl QueryEngine {
                 let response = handler.handle(query, tx_id.map(TxId::from), trace_id).await;
 
                 let serde_span = tracing::info_span!("prisma:engine:response_json_serialization", user_facing = true);
-                Ok(serde_span.in_scope(|| serde_json::to_string(&response))?)
+
+                Ok(serde_span.in_scope(|| NapiResponse(response)))
             }
             .instrument(span)
             .await
@@ -461,5 +467,16 @@ where
             Some(message) => Err(napi::Error::from_reason(format!("PANIC: {message}"))),
             None => Err(napi::Error::from_reason("PANIC: unknown panic".to_string())),
         },
+    }
+}
+
+pub struct NapiResponse(PrismaResponse);
+
+impl ToNapiValue for NapiResponse {
+    unsafe fn to_napi_value(env: napi::sys::napi_env, val: Self) -> napi::Result<napi::sys::napi_value> {
+        let env = Env::from_raw(env);
+        let val = env.to_js_value(&val.0)?.coerce_to_object()?;
+
+        Ok(val.raw())
     }
 }

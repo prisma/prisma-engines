@@ -10,7 +10,7 @@ use connector_interface::{
 };
 use prisma_value::PrismaValue;
 use quaint::{
-    connector::{IsolationLevel, TransactionCapable},
+    connector::{IsolationLevel, ResultSet, TransactionCapable},
     prelude::{ConnectionInfo, Queryable},
 };
 use query_structure::{prelude::*, Filter, QueryArguments, RelationLoadStrategy, SelectionResult};
@@ -332,7 +332,7 @@ where
         _model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         _query_type: Option<String>,
-    ) -> connector::Result<RawJson> {
+    ) -> connector::Result<ResultSet> {
         catch(&self.connection_info, write::query_raw(&self.inner, inputs)).await
     }
 }

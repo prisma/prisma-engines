@@ -1,5 +1,6 @@
 use connector::AggregationRow;
-use query_structure::{ManyRecords, Model, RawJson, SelectionResult, VirtualSelection};
+use quaint::connector::ResultSet;
+use query_structure::{ManyRecords, Model, SelectionResult, VirtualSelection};
 
 #[derive(Debug, Clone)]
 pub(crate) enum QueryResult {
@@ -8,7 +9,7 @@ pub(crate) enum QueryResult {
     RecordSelection(Option<Box<RecordSelection>>),
     RecordSelectionWithRelations(Box<RecordSelectionWithRelations>),
     Json(serde_json::Value),
-    QueryRaw(RawJson),
+    QueryRaw(ResultSet),
     RecordAggregations(RecordAggregations),
     Unit,
 }

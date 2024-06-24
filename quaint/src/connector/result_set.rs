@@ -9,7 +9,7 @@ use serde_json::Map;
 use std::sync::Arc;
 
 /// Encapsulates a set of results and their respective column names.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone, PartialEq)]
 pub struct ResultSet {
     pub(crate) columns: Arc<Vec<String>>,
     pub(crate) rows: Vec<Vec<Value<'static>>>,
