@@ -40,7 +40,7 @@ pub(crate) fn load_datasources_from_ast(
         for src in ast_schema.sources() {
             diagnostics.push_error(DatamodelError::new_source_validation_error(
                 "You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.",
-                &src.name(),
+                src.name(),
                 src.span,
             ));
         }

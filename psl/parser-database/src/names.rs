@@ -51,7 +51,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
 
                     if !tmp_names.insert(&value.name.name) {
                         ctx.push_error(DatamodelError::new_duplicate_enum_value_error(
-                            &ast_enum.name(),
+                            ast_enum.name(),
                             &value.name.name,
                             value.span,
                         ))

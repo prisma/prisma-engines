@@ -16,7 +16,7 @@ impl<'db> EnumWalker<'db> {
 
     /// The name of the enum.
     pub fn name(self) -> &'db str {
-        &self.ast_enum().name()
+        self.ast_enum().name()
     }
 
     /// The AST node.
