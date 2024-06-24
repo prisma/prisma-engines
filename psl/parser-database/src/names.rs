@@ -186,7 +186,7 @@ fn check_for_duplicate_properties<'a>(
 ) {
     tmp_names.clear();
     for arg in props {
-        if !tmp_names.insert(&arg.name()) {
+        if !tmp_names.insert(arg.name()) {
             ctx.push_error(DatamodelError::new_duplicate_config_key_error(
                 &format!("{} \"{}\"", top.get_type(), top.name()),
                 arg.name(),

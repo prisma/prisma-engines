@@ -76,7 +76,7 @@ impl crate::ParserDatabase {
     }
 
     /// Intern any top by name.
-    pub fn intern_top<'db>(&'db self, name: &str) -> Option<TopWalker<'db>> {
+    pub fn find_top<'db>(&'db self, name: &str) -> Option<TopWalker<'db>> {
         self.interner
             .lookup(name)
             .and_then(|name_id| self.names.tops.get(&name_id))

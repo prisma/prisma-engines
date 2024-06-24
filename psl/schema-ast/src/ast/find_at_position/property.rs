@@ -37,7 +37,7 @@ pub enum PropertyPosition<'ast> {
 impl<'ast> PropertyPosition<'ast> {
     pub(crate) fn new(property: &'ast ast::ConfigBlockProperty, position: usize) -> Self {
         if property.name.span.contains(position) {
-            return PropertyPosition::Name(&property.name());
+            return PropertyPosition::Name(property.name());
         }
 
         if let Some(val) = &property.value {

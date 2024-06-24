@@ -37,7 +37,7 @@ impl<'ast> ExpressionPosition<'ast> {
 fn narrow_function_position<'ast>(
     args: &'ast ast::ArgumentsList,
     position: usize,
-    name: &'ast String,
+    name: &'ast str,
 ) -> ExpressionPosition<'ast> {
     let mut spans: Vec<(Option<&str>, ast::Span)> = args
         .arguments
