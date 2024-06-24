@@ -224,7 +224,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         self.returning(insert.returning)?;
 
         if let Some(comment) = insert.comment {
-            self.write("; ")?;
+            self.write(" ")?;
             self.visit_comment(comment)?;
         }
 
@@ -855,7 +855,7 @@ mod tests {
 
     #[test]
     fn test_comment_insert() {
-        let expected_sql = "INSERT INTO `users` DEFAULT VALUES; /* trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2' */";
+        let expected_sql = "INSERT INTO `users` DEFAULT VALUES /* trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2' */";
         let query = Insert::single_into("users");
         let insert =
             Insert::from(query).comment("trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2'");
