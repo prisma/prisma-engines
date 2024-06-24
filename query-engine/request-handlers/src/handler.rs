@@ -3,6 +3,7 @@ use crate::{GQLError, PrismaResponse, RequestBody};
 use bigdecimal::BigDecimal;
 use futures::FutureExt;
 use indexmap::IndexMap;
+use quaint::connector::tiberius::Uuid;
 use query_core::{
     constants::custom_types,
     protocol::EngineProtocol,
@@ -262,6 +263,12 @@ impl<'a> RequestHandler<'a> {
             (ArgumentValue::Scalar(PrismaValue::Float(s1)), ArgumentValue::Scalar(PrismaValue::String(s2)))
             | (ArgumentValue::Scalar(PrismaValue::String(s2)), ArgumentValue::Scalar(PrismaValue::Float(s1))) => {
                 BigDecimal::from_str(s2).map(|s2| s2 == *s1).unwrap_or(false)
+            }
+            (ArgumentValue::Scalar(PrismaValue::String(s1)), ArgumentValue::Scalar(PrismaValue::String(s2))) => {
+                match (Uuid::from_str(s1).map(|s1| s1), Uuid::from_str(s2).map(|s2| s2)) {
+                    (Ok(s1), Ok(s2)) => s1 == s2,
+                    _ => left == right,
+                }
             }
             (left, right) => left == right,
         }

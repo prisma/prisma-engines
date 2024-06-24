@@ -523,6 +523,53 @@ mod singular_batch {
         Ok(())
     }
 
+    fn schema_uuid() -> String {
+        let schema = indoc! { r#"
+            model Cup {
+                #id(id, String, @id, @default(uuid()), @map("id"), @test.Uuid)
+            }
+        "# };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_uuid))]
+    async fn batch_uuid(runner: Runner) -> TestResult<()> {
+        runner
+            .query(
+                r#"mutation {
+                    createOneCup(data: { id: "11111111111111111111111111111111" })
+                    { id }
+                }"#,
+            )
+            .await?
+            .assert_success();
+
+        let queries = vec![
+            r#"query {
+                    findUniqueCup(where: { id: "11111111111111111111111111111111" })
+                    { id }
+                }"#
+            .to_owned(),
+            r#"query {
+                    findUniqueCup(where: { id: "11111111111111111111111111111111" })
+                    { id }
+                }"#
+            .to_owned(),
+        ];
+
+        let (res, compact_doc) = compact_batch(&runner, queries.clone()).await?;
+
+        assert!(compact_doc.is_compact());
+
+        insta::assert_snapshot!(
+            res.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueCup":{"id":"11111111-1111-1111-1111-111111111111"}}},{"data":{"findUniqueCup":{"id":"11111111-1111-1111-1111-111111111111"}}}]}"###
+        );
+
+        Ok(())
+    }
+
     async fn compact_batch(runner: &Runner, queries: Vec<String>) -> TestResult<(QueryResult, BatchDocument)> {
         let res = runner.batch(queries.clone(), false, None).await?;
 
