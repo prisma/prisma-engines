@@ -320,7 +320,7 @@ async fn same_table_name_with_relation_in_two_schemas(api: &mut TestApi) -> Test
 
         model second_schema_tbl {
           id  BigInt     @id @default(autoincrement())
-          fst Int?
+          fst BigInt?
           tbl first_tbl? @relation(fields: [fst], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
           @@map("tbl")
