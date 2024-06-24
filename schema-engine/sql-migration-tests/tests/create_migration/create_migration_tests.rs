@@ -1312,3 +1312,61 @@ fn alter_constraint_name(mut api: TestApi) {
             migration.expect_contents(expected_script)
         });
 }
+
+#[test_connector(exclude(Mysql, Sqlite, Mssql))]
+fn alter_constraint_name_and_alter_columns_at_same_time(mut api: TestApi) {
+    let plain_dm = api.datamodel_with_provider(
+        r#"
+         model A {
+           id   Int    @id
+           a    String
+         }
+     "#,
+    );
+
+    let dir = api.create_migrations_directory();
+    api.create_migration("plain_migration", &plain_dm, &dir).send_sync();
+
+    let custom_dm = api.datamodel_with_provider(&format!(
+        r#"
+         model A {{
+           id   Int     @id{}
+           a    String
+           b    String?
+         }}
+     "#,
+        if api.is_sqlite() || api.is_mysql() || api.is_mssql() {
+            ""
+        } else {
+            r#"(map: "CustomId")"#
+        }
+    ));
+
+    let is_postgres = api.is_postgres();
+    let is_postgres15 = api.is_postgres_15();
+    let is_postgres16 = api.is_postgres_16();
+    let is_cockroach = api.is_cockroach();
+
+    api.create_migration("custom_migration", &custom_dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(2)
+        .assert_migration("custom_migration", move |migration| {
+            let expected_script = if is_cockroach {
+                expect![[r#"
+                    -- AlterTable
+                    ALTER TABLE "A" ADD COLUMN     "b" STRING;
+                    ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
+                "#]]
+            } else if is_postgres || is_postgres15 || is_postgres16 {
+                expect![[r#"
+                    -- AlterTable
+                    ALTER TABLE "A" ADD COLUMN     "b" TEXT;
+                    ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
+                "#]]
+            } else {
+                panic!()
+            };
+
+            migration.expect_contents(expected_script)
+        });
+}
