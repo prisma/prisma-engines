@@ -158,11 +158,4 @@ impl FieldType {
             FieldType::Supported(_) => None,
         }
     }
-
-    pub fn name(&self) -> &str {
-        match self {
-            FieldType::Supported(supported) => &supported.name,
-            FieldType::Unsupported(name, _) => name,
-        }
-    }
 }
