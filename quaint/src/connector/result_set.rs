@@ -72,7 +72,7 @@ impl ResultSet {
         }
     }
 
-    pub fn iter<'a>(&'a self) -> ResultSetIterator<'a> {
+    pub fn iter(&self) -> ResultSetIterator<'_> {
         ResultSetIterator {
             columns: self.columns.clone(),
             internal_iterator: self.rows.iter(),
@@ -125,7 +125,7 @@ impl<'a> Iterator for ResultSetIterator<'a> {
         match self.internal_iterator.next() {
             Some(row) => Some(ResultRowRef {
                 columns: Arc::clone(&self.columns),
-                values: &row,
+                values: row,
             }),
             None => None,
         }

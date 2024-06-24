@@ -18,7 +18,7 @@ pub use response::*;
 
 pub type Result<T> = std::result::Result<T, HandlerError>;
 
-#[derive(Debug, serde::Serialize, PartialEq)]
+#[derive(Debug, serde::Serialize)]
 #[serde(untagged)]
 pub enum PrismaResponse {
     Single(GQLResponse),
@@ -37,6 +37,20 @@ impl PrismaResponse {
         match self {
             Self::Single(r) => r.set_extension(key, val),
             Self::Multi(r) => r.set_extension(key, val),
+        }
+    }
+
+    pub fn set_format(&mut self, format: ResponseFormat) {
+        match self {
+            Self::Single(r) => r.set_format(format),
+            Self::Multi(_) => (),
+        }
+    }
+
+    pub fn is_sql_raw_response(&self) -> bool {
+        match self {
+            Self::Single(r) => r.is_sql_raw_response(),
+            Self::Multi(_) => false,
         }
     }
 }

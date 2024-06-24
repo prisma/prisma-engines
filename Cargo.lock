@@ -1276,6 +1276,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
 
 [[package]]
+name = "erased-serde"
+version = "0.4.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "24e2389d65ab4fab27dc2a5de7b191e1f6617d1f1c8855c0dc569c94a4cbb18d"
+dependencies = [
+ "serde",
+ "typeid",
+]
+
+[[package]]
 name = "errno"
 version = "0.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2520,7 +2530,6 @@ dependencies = [
  "pretty_assertions",
  "prisma-value",
  "psl",
- "quaint",
  "query-connector",
  "query-engine-metrics",
  "query-structure",
@@ -3599,6 +3608,7 @@ dependencies = [
  "connection-string",
  "crosstarget-utils",
  "either",
+ "erased-serde",
  "futures",
  "getrandom 0.2.11",
  "hex",
@@ -3684,7 +3694,6 @@ dependencies = [
  "indexmap 2.2.2",
  "itertools 0.12.0",
  "prisma-value",
- "quaint",
  "query-structure",
  "serde",
  "serde_json",
@@ -3713,7 +3722,6 @@ dependencies = [
  "opentelemetry",
  "petgraph 0.4.13",
  "psl",
- "quaint",
  "query-connector",
  "query-engine-metrics",
  "query-structure",
@@ -3949,11 +3957,13 @@ dependencies = [
  "bigdecimal",
  "chrono",
  "cuid",
+ "erased-serde",
  "getrandom 0.2.11",
  "itertools 0.12.0",
  "nanoid",
  "prisma-value",
  "psl",
+ "serde",
  "thiserror",
  "uuid",
 ]
@@ -4728,9 +4738,9 @@ checksum = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 
 [[package]]
 name = "serde"
-version = "1.0.183"
+version = "1.0.203"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32ac8da02677876d532745a130fc9d8e6edfa81a269b107c5b00829b91d8eb3c"
+checksum = "7253ab4de971e72fb7be983802300c30b5a7f0c2e56fab8abfc6a214307c0094"
 dependencies = [
  "serde_derive",
 ]
@@ -4757,9 +4767,9 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.183"
+version = "1.0.203"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aafe972d60b0b9bee71a91b92fee2d4fb3c9d7e8f6b179aa99f27203d99a4816"
+checksum = "500cbc0ebeb6f46627f50f3f5811ccf6bf00643be300b4c3eabc0ef55dc5b5ba"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5950,6 +5960,12 @@ dependencies = [
  "quote",
  "syn 1.0.109",
 ]
+
+[[package]]
+name = "typeid"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "059d83cc991e7a42fc37bd50941885db0888e34209f8cfd9aab07ddec03bc9cf"
 
 [[package]]
 name = "typenum"

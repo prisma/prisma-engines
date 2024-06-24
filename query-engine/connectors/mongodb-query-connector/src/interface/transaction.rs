@@ -5,9 +5,8 @@ use crate::{
 };
 use connector_interface::{ConnectionLike, ReadOperations, Transaction, UpdateType, WriteOperations};
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
-use quaint::connector::ResultSet;
 use query_engine_metrics::{decrement_gauge, increment_gauge, metrics, PRISMA_CLIENT_QUERIES_ACTIVE};
-use query_structure::{RelationLoadStrategy, SelectionResult};
+use query_structure::{RawResult, RelationLoadStrategy, SelectionResult};
 use std::collections::HashMap;
 
 pub struct MongoDbTransaction<'conn> {
@@ -259,7 +258,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         query_type: Option<String>,
-    ) -> connector_interface::Result<ResultSet> {
+    ) -> connector_interface::Result<RawResult> {
         catch(write::query_raw(
             &self.connection.database,
             &mut self.connection.session,

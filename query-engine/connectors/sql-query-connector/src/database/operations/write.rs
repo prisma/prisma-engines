@@ -9,7 +9,6 @@ use crate::{
 use connector_interface::*;
 use itertools::Itertools;
 use quaint::ast::Insert;
-use quaint::connector::ResultSet;
 use quaint::{
     error::ErrorKind,
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
@@ -505,6 +504,6 @@ pub(crate) async fn execute_raw(
 
 /// Execute a plain SQL query with the given parameters, returning the answer as
 /// a JSON `Value`.
-pub(crate) async fn query_raw(conn: &dyn Queryable, inputs: HashMap<String, PrismaValue>) -> crate::Result<ResultSet> {
+pub(crate) async fn query_raw(conn: &dyn Queryable, inputs: HashMap<String, PrismaValue>) -> crate::Result<RawResult> {
     Ok(conn.raw_json(inputs).await?)
 }

@@ -73,10 +73,6 @@ impl ResultRow {
             None => Err(Error::builder(ErrorKind::NotFound).build()),
         }
     }
-
-    pub fn len(&self) -> usize {
-        self.columns.len()
-    }
 }
 
 impl<'a> ResultRowRef<'a> {

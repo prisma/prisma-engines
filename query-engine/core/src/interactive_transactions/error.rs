@@ -23,7 +23,7 @@ pub enum TransactionError {
     Unknown { reason: String },
 }
 
-#[derive(Debug, serde::Serialize, PartialEq)]
+#[derive(Debug, serde::Serialize)]
 pub struct ExtendedTransactionUserFacingError {
     #[serde(flatten)]
     user_facing_error: user_facing_errors::Error,

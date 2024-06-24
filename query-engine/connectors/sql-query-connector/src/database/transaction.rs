@@ -7,8 +7,8 @@ use connector_interface::{
     WriteOperations,
 };
 use prisma_value::PrismaValue;
-use quaint::{connector::ResultSet, prelude::ConnectionInfo};
-use query_structure::{prelude::*, Filter, QueryArguments, RelationLoadStrategy, SelectionResult};
+use quaint::prelude::ConnectionInfo;
+use query_structure::{prelude::*, Filter, QueryArguments, RawResult, RelationLoadStrategy, SelectionResult};
 use std::collections::HashMap;
 
 pub struct SqlConnectorTransaction<'tx> {
@@ -334,7 +334,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         _model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         _query_type: Option<String>,
-    ) -> connector::Result<ResultSet> {
+    ) -> connector::Result<RawResult> {
         catch(
             &self.connection_info,
             write::query_raw(self.inner.as_queryable(), inputs),

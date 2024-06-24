@@ -9,8 +9,7 @@ use connector_interface::{
     Connection, ConnectionLike, ReadOperations, Transaction, UpdateType, WriteArgs, WriteOperations,
 };
 use mongodb::{ClientSession, Database};
-use quaint::connector::ResultSet;
-use query_structure::{prelude::*, RelationLoadStrategy, SelectionResult};
+use query_structure::{prelude::*, RawResult, RelationLoadStrategy, SelectionResult};
 use std::collections::HashMap;
 
 pub struct MongoDbConnection {
@@ -222,7 +221,7 @@ impl WriteOperations for MongoDbConnection {
         model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         query_type: Option<String>,
-    ) -> connector_interface::Result<ResultSet> {
+    ) -> connector_interface::Result<RawResult> {
         catch(write::query_raw(
             &self.database,
             &mut self.session,

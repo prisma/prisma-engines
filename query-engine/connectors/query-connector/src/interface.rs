@@ -1,7 +1,6 @@
 use crate::{NativeUpsert, WriteArgs};
 use async_trait::async_trait;
 use prisma_value::PrismaValue;
-use quaint::connector::ResultSet;
 use query_structure::{ast::FieldArity, *};
 use std::collections::HashMap;
 
@@ -360,5 +359,5 @@ pub trait WriteOperations {
         model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         query_type: Option<String>,
-    ) -> crate::Result<ResultSet>;
+    ) -> crate::Result<RawResult>;
 }
