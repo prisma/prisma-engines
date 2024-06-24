@@ -59,10 +59,10 @@ fn lift_datasource(
         .properties
         .iter()
         .map(|arg| match &arg.value {
-            Some(expr) => Some((arg.name.name.as_str(), (arg.span, expr))),
+            Some(expr) => Some((arg.name(), (arg.span, expr))),
             None => {
                 diagnostics.push_error(DatamodelError::new_config_property_missing_value_error(
-                    &arg.name.name,
+                    arg.name(),
                     source_name,
                     "datasource",
                     ast_source.span,
