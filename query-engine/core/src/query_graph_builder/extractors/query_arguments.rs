@@ -100,7 +100,7 @@ fn process_order_object(
             if field_name.as_ref() == ordering::UNDERSCORE_RELEVANCE {
                 let object: ParsedInputMap<'_> = field_value.try_into()?;
 
-                return extract_order_by_relevance(container, object);
+                return extract_order_by_relevance(container, object, path);
             }
 
             if let Some(sort_aggr) = extract_sort_aggregation(field_name.as_ref()) {
@@ -172,6 +172,7 @@ fn process_order_object(
 fn extract_order_by_relevance(
     container: &ParentContainer,
     object: ParsedInputMap<'_>,
+    path: Vec<OrderByHop>,
 ) -> QueryGraphBuilderResult<Option<OrderBy>> {
     let (sort_order, _) = extract_order_by_args(object.get(ordering::SORT).unwrap().clone())?;
     let search: PrismaValue = object.get(ordering::SEARCH).unwrap().clone().try_into()?;
@@ -198,7 +199,7 @@ fn extract_order_by_relevance(
         })
         .collect::<Result<Vec<ScalarFieldRef>, _>>()?;
 
-    Ok(Some(OrderBy::relevance(fields, search, sort_order)))
+    Ok(Some(OrderBy::relevance(fields, search, sort_order, path)))
 }
 
 fn extract_sort_aggregation(field_name: &str) -> Option<SortAggregation> {
