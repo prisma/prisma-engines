@@ -25,7 +25,7 @@ pub(crate) fn validate_model_name(ast_model: &ast::Model, block_type: &'static s
 }
 
 pub(crate) fn validate_enum_name(ast_enum: &ast::Enum, diagnostics: &mut Diagnostics) {
-    if !is_reserved_type_name(&ast_enum.name.name) {
+    if !is_reserved_type_name(ast_enum.name()) {
         return;
     }
 

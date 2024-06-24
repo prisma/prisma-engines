@@ -10,6 +10,7 @@ use parser_database::{
     ast::{self, Expression, WithDocumentation},
     coerce, coerce_array,
 };
+use schema_ast::ast::WithName;
 use std::collections::HashMap;
 
 const PROVIDER_KEY: &str = "provider";
@@ -39,10 +40,10 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
         .properties
         .iter()
         .map(|arg| match &arg.value {
-            Some(expr) => Some((arg.name.name.as_str(), expr)),
+            Some(expr) => Some((arg.name(), expr)),
             None => {
                 diagnostics.push_error(DatamodelError::new_config_property_missing_value_error(
-                    arg.name.name.as_str(),
+                    arg.name(),
                     generator_name,
                     "generator",
                     ast_generator.span,
@@ -94,7 +95,7 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
         .map(|(arr, span)| parse_and_validate_preview_features(arr, &ALL_PREVIEW_FEATURES, span, diagnostics));
 
     for prop in &ast_generator.properties {
-        let is_first_class_prop = FIRST_CLASS_PROPERTIES.iter().any(|k| *k == prop.name.name);
+        let is_first_class_prop = FIRST_CLASS_PROPERTIES.iter().any(|k| *k == prop.name());
         if is_first_class_prop {
             continue;
         }
@@ -103,7 +104,7 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
             Some(val) => GeneratorConfigValue::from(val),
             None => {
                 diagnostics.push_error(DatamodelError::new_config_property_missing_value_error(
-                    &prop.name.name,
+                    prop.name(),
                     generator_name,
                     "generator",
                     prop.span,
@@ -112,7 +113,7 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
             }
         };
 
-        properties.insert(prop.name.name.clone(), value);
+        properties.insert(prop.name().to_owned(), value);
     }
 
     Some(Generator {

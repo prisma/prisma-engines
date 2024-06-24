@@ -41,7 +41,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
         let namespace = match (top_id, top) {
             (_, ast::Top::Enum(ast_enum)) => {
                 tmp_names.clear();
-                validate_identifier(&ast_enum.name, "Enum", ctx);
+                validate_identifier(ast_enum.identifier(), "Enum", ctx);
                 validate_enum_name(ast_enum, ctx.diagnostics);
                 validate_attribute_identifiers(ast_enum, ctx);
 
@@ -51,7 +51,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
 
                     if !tmp_names.insert(&value.name.name) {
                         ctx.push_error(DatamodelError::new_duplicate_enum_value_error(
-                            &ast_enum.name.name,
+                            ast_enum.name(),
                             &value.name.name,
                             value.span,
                         ))
@@ -186,11 +186,11 @@ fn check_for_duplicate_properties<'a>(
 ) {
     tmp_names.clear();
     for arg in props {
-        if !tmp_names.insert(&arg.name.name) {
+        if !tmp_names.insert(arg.name()) {
             ctx.push_error(DatamodelError::new_duplicate_config_key_error(
                 &format!("{} \"{}\"", top.get_type(), top.name()),
-                &arg.name.name,
-                arg.name.span,
+                arg.name(),
+                arg.identifier().span,
             ));
         }
     }

@@ -1,5 +1,5 @@
 use crate::{
-    ast::{self, IndentationType, NewlineType, WithDocumentation},
+    ast::{self, IndentationType, NewlineType, WithDocumentation, WithName},
     types,
     walkers::{newline, Walker},
 };
@@ -16,7 +16,7 @@ impl<'db> EnumWalker<'db> {
 
     /// The name of the enum.
     pub fn name(self) -> &'db str {
-        &self.ast_enum().name.name
+        self.ast_enum().name()
     }
 
     /// The AST node.
