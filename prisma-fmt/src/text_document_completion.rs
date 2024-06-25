@@ -6,6 +6,7 @@ use psl::{
     diagnostics::Span,
     error_tolerant_parse_configuration,
     parser_database::{ast, ParserDatabase, SourceFile},
+    schema_ast::ast::AttributePosition,
     Diagnostics, PreviewFeature,
 };
 
@@ -88,7 +89,10 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
     match ctx.db.ast(ctx.initiating_file_id).find_at_position(position) {
         ast::SchemaPosition::Model(
             _model_id,
-            ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("relation", _, Some(attr_name))),
+            ast::ModelPosition::Field(
+                _,
+                ast::FieldPosition::Attribute("relation", _, AttributePosition::Argument(attr_name)),
+            ),
         ) if attr_name == "onDelete" || attr_name == "onUpdate" => {
             for referential_action in ctx.connector().referential_actions(&relation_mode).iter() {
                 completion_list.items.push(CompletionItem {
