@@ -12,6 +12,8 @@ macro_rules! scenarios {
 }
 
 scenarios! {
+    enum_as_type
+    enum_name
     view_as_type
     view_name
 }
