@@ -107,7 +107,10 @@ mod uuid_create_graphql {
         }
 
         // Test findMany
-        let res = run_query_json!(&runner, "query { findManyTodo() { id }}");
+        let res = run_query_json!(
+            &runner,
+            r#"query { findManyTodo(where: { title: "the title" }) { id }}"#
+        );
         if let serde_json::Value::String(str) = &res["data"]["findManyTodo"][0]["id"] {
             assert_eq!(str, uuid);
         } else {
@@ -115,8 +118,11 @@ mod uuid_create_graphql {
         }
 
         // Test findUnique
-        let res = run_query_json!(&runner, "query { findUniqueTodo() { id }}");
-        if let serde_json::Value::String(str) = &res["data"]["findUniqueTodo"][0]["id"] {
+        let res = run_query_json!(
+            &runner,
+            r#"query { findUniqueTodo(where: { title: "the title" }) { id }}"#
+        );
+        if let serde_json::Value::String(str) = &res["data"]["findUniqueTodo"]["id"] {
             assert_eq!(str, uuid);
         } else {
             panic!("Expected UUID but got something else.");
