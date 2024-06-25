@@ -109,6 +109,17 @@ fn reference_locations_for_target(ctx: ReferencesContext<'_>, target: SchemaPosi
             _ => empty_references(),
         },
 
+        // ? This might make more sense to add as a definition rather than a reference
+        SchemaPosition::Model(_, ModelPosition::Field(_, FieldPosition::Attribute(name, _, _)))
+        | SchemaPosition::CompositeType(_, CompositeTypePosition::Field(_, FieldPosition::Attribute(name, _, _))) => {
+            if let Some(ds) = ctx.datasource() {
+                if name.contains(ds.name.as_str()) {
+                    return find_where_used_as_top_name(&ctx, ds.name.as_str());
+                }
+            }
+            empty_references()
+        }
+
         SchemaPosition::Model(
             model_id,
             ModelPosition::ModelAttribute(_attr_name, _, AttributePosition::ArgumentValue(_, arg_val)),
