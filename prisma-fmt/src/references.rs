@@ -51,10 +51,10 @@ pub(crate) fn references(schema_files: Vec<(String, SourceFile)>, params: Refere
         params: &params,
     };
 
-    get_reference_target(ctx, target_position)
+    reference_locations_for_target(ctx, target_position)
 }
 
-fn get_reference_target(ctx: ReferencesContext<'_>, target: SchemaPosition) -> Vec<Location> {
+fn reference_locations_for_target(ctx: ReferencesContext<'_>, target: SchemaPosition) -> Vec<Location> {
     info!("{:?}", target);
 
     match target {
@@ -68,7 +68,7 @@ fn get_reference_target(ctx: ReferencesContext<'_>, target: SchemaPosition) -> V
                 .collect()
         }
 
-        SchemaPosition::DataSource(_, SourcePosition::Name(name)) => find_where_used_for_native_type(ctx, name),
+        SchemaPosition::DataSource(_, SourcePosition::Name(name)) => find_where_used_for_native_type(&ctx, name),
 
         // Fields
         SchemaPosition::Model(_, ModelPosition::Field(_, FieldPosition::Type(r#type)))
@@ -94,7 +94,7 @@ fn get_reference_target(ctx: ReferencesContext<'_>, target: SchemaPosition) -> V
     }
 }
 
-fn find_where_used_for_native_type(ctx: ReferencesContext<'_>, name: &str) -> Vec<Location> {
+fn find_where_used_for_native_type(ctx: &ReferencesContext<'_>, name: &str) -> Vec<Location> {
     info!("Get references for native types");
 
     let references = ctx

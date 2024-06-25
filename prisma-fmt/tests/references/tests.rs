@@ -20,4 +20,6 @@ scenarios! {
     model_name
     view_as_type
     view_name
+    datasource_as_attribute
+    datasource_name
 }
