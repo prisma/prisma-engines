@@ -120,7 +120,7 @@ mod uuid_create_graphql {
         // Test findUnique
         let res = run_query_json!(
             &runner,
-            r#"query { findUniqueTodo(where: { title: "the title" }) { id }}"#
+            format!(r#"query {{ findUniqueTodo(where: {{ id: "{}" }}) {{ id }} }}"#, uuid)
         );
         if let serde_json::Value::String(str) = &res["data"]["findUniqueTodo"]["id"] {
             assert_eq!(str, uuid);
