@@ -132,16 +132,17 @@ fn find_where_used_in_model(
     let Some(model) = ctx
         .db
         .walk_models()
+        .chain(ctx.db.walk_views())
         .find(|model| model.id.1 == model_id && model.file_id() == file_id)
     else {
-        info!("Couldn't find model");
+        warn!("Could not find model");
         return empty_references();
     };
 
     let identifier = if let Some(field) = model.scalar_fields().find(|field| field.name() == name) {
         field.ast_field().identifier()
     } else {
-        warn!("Couldn't find field with name: `{}`", name);
+        warn!("Could not find field with name: `{}`", name);
         return empty_references();
     };
 
@@ -282,7 +283,7 @@ fn identifiers_to_locations<'a>(ids: Vec<&'a Identifier>, ctx: &ReferencesContex
             let uri = if let Ok(uri) = Url::parse(file_name) {
                 uri
             } else {
-                warn!("Failed to parse file path: {:?}", file_name);
+                warn!("Could not find file at path: {:?}", file_name);
                 return None;
             };
 

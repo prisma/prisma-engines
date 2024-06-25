@@ -22,6 +22,8 @@ scenarios! {
     model_relation_references
     view_as_type
     view_name
+    view_relation_fields
+    view_relation_references
     datasource_as_attribute
     datasource_name
 }
