@@ -109,15 +109,10 @@ fn reference_locations_for_target(ctx: ReferencesContext<'_>, target: SchemaPosi
             _ => empty_references(),
         },
 
-        SchemaPosition::Model(_, ModelPosition::Field(_, FieldPosition::Attribute(name, _, _)))
-        | SchemaPosition::CompositeType(_, CompositeTypePosition::Field(_, FieldPosition::Attribute(name, _, _))) => {
-            let ds_name = ctx.datasource().map(|ds| ds.name.as_str());
-
-            match ds_name {
-                Some(ds_name) if name.contains(ds_name) => find_where_used_as_top_name(&ctx, ds_name),
-                _ => empty_references(),
-            }
-        }
+        SchemaPosition::Model(
+            model_id,
+            ModelPosition::ModelAttribute(_attr_name, _, AttributePosition::ArgumentValue(_, arg_val)),
+        ) => find_where_used_in_model(&ctx, arg_val.as_str(), model_id, ctx.initiating_file_id),
 
         _ => empty_references(),
     }

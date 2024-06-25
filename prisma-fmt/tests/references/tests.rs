@@ -20,7 +20,9 @@ scenarios! {
     model_name
     model_relation_fields
     model_relation_references
+    model_unique_fields
     view_as_type
+    view_index_fields
     view_name
     view_relation_fields
     view_relation_references
