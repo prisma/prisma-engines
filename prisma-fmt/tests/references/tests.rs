@@ -18,6 +18,7 @@ scenarios! {
     enum_name
     model_as_type
     model_name
+    model_relation_fields
     view_as_type
     view_name
     datasource_as_attribute
