@@ -19,6 +19,7 @@ scenarios! {
     model_as_type
     model_name
     model_relation_fields
+    model_relation_references
     view_as_type
     view_name
     datasource_as_attribute

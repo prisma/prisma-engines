@@ -1,11 +1,12 @@
 use log::*;
 use lsp_types::{Location, ReferenceParams, Url};
 use psl::{
+    diagnostics::FileId,
     error_tolerant_parse_configuration,
     parser_database::ParserDatabase,
     schema_ast::ast::{
-        CompositeTypePosition, EnumPosition, Field, FieldId, FieldPosition, FieldType, Identifier, ModelPosition,
-        SchemaPosition, SourcePosition, Top, WithIdentifier, WithName,
+        AttributePosition, CompositeTypePosition, EnumPosition, Field, FieldId, FieldPosition, FieldType, Identifier,
+        ModelId, ModelPosition, SchemaPosition, SourcePosition, Top, WithIdentifier, WithName,
     },
     Diagnostics, SourceFile,
 };
@@ -80,6 +81,34 @@ fn reference_locations_for_target(ctx: ReferencesContext<'_>, target: SchemaPosi
         }
 
         // Attributes
+        SchemaPosition::Model(
+            model_id,
+            ModelPosition::Field(
+                field_id,
+                FieldPosition::Attribute(_, _, AttributePosition::ArgumentValue(arg_name, arg_value)),
+            ),
+        ) => match arg_name {
+            Some("fields") => find_where_used_in_model(&ctx, arg_value.as_str(), model_id, ctx.initiating_file_id),
+            Some("references") => {
+                info!("finding the field from references");
+
+                let (_, field) = ctx.db.ast(ctx.initiating_file_id)[model_id]
+                    .iter_fields()
+                    .find(|(id, _)| id == &field_id)
+                    .unwrap();
+
+                let referenced_model = field.field_type.name();
+
+                let Some(ref_model_id) = ctx.db.find_model(referenced_model) else {
+                    warn!("Could not find model with name: {}", referenced_model);
+                    return empty_references();
+                };
+
+                find_where_used_in_model(&ctx, arg_value.as_str(), ref_model_id.id.1, ref_model_id.id.0)
+            }
+            _ => empty_references(),
+        },
+
         SchemaPosition::Model(_, ModelPosition::Field(_, FieldPosition::Attribute(name, _, _)))
         | SchemaPosition::CompositeType(_, CompositeTypePosition::Field(_, FieldPosition::Attribute(name, _, _))) => {
             let ds_name = ctx.datasource().map(|ds| ds.name.as_str());
@@ -92,6 +121,31 @@ fn reference_locations_for_target(ctx: ReferencesContext<'_>, target: SchemaPosi
 
         _ => empty_references(),
     }
+}
+
+fn find_where_used_in_model(
+    ctx: &ReferencesContext<'_>,
+    name: &str,
+    model_id: ModelId,
+    file_id: FileId,
+) -> Vec<Location> {
+    let Some(model) = ctx
+        .db
+        .walk_models()
+        .find(|model| model.id.1 == model_id && model.file_id() == file_id)
+    else {
+        info!("Couldn't find model");
+        return empty_references();
+    };
+
+    let identifier = if let Some(field) = model.scalar_fields().find(|field| field.name() == name) {
+        field.ast_field().identifier()
+    } else {
+        warn!("Couldn't find field with name: `{}`", name);
+        return empty_references();
+    };
+
+    identifiers_to_locations(vec![identifier], &ctx)
 }
 
 fn find_where_used_for_native_type(ctx: &ReferencesContext<'_>, name: &str) -> Vec<Location> {
@@ -167,10 +221,6 @@ fn find_where_used_as_type(ctx: ReferencesContext<'_>, name: &str) -> Vec<Locati
 
     references
 }
-
-// fn find_where_used_in_relation(ctx: &ReferencesContext<'_>, name: &str) -> Vec<Location> {
-//     empty_references()
-// }
 
 fn find_where_used_as_top_name(ctx: &ReferencesContext<'_>, name: &str) -> Vec<Location> {
     fn ident_to_location(id: &Identifier, name: &str, ctx: &ReferencesContext<'_>) -> Vec<Location> {
