@@ -1,0 +1,14 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["prismaSchemaFolder", "views"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+type Add<|>ress {
+city     String
+postCode String
+}
