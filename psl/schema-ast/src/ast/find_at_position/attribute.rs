@@ -11,8 +11,8 @@ pub enum AttributePosition<'ast> {
     Argument(&'ast str),
     /// In an argument's value. (argument name, value)
     ArgumentValue(Option<&'ast str>, String),
-    /// In an function argument. (function name, argument name)
-    FunctionArgument(&'ast str, &'ast str),
+    /// In an function argument. (function name, argument name, argument value)
+    FunctionArgument(&'ast str, &'ast str, String),
 }
 
 impl<'ast> AttributePosition<'ast> {
@@ -45,7 +45,15 @@ impl<'ast> AttributePosition<'ast> {
 
         if let Some(arg) = attr.arguments.iter().find(|arg| arg.span().contains(position)) {
             if let ExpressionPosition::FunctionArgument(fun, name) = ExpressionPosition::new(&arg.value, position) {
-                return Self::FunctionArgument(fun, name);
+                return Self::FunctionArgument(fun, name, arg.value.to_string());
+            }
+
+            if arg.value.is_array() {
+                let arr = arg.value.as_array().unwrap();
+                let expr = arr.0.iter().find(|expr| expr.span().contains(position));
+                if let Some(expr) = expr {
+                    return Self::ArgumentValue(arg.name(), expr.to_string());
+                }
             }
 
             return Self::ArgumentValue(arg.name(), arg.value.to_string());
