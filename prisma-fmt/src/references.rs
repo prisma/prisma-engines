@@ -4,8 +4,8 @@ use psl::{
     error_tolerant_parse_configuration,
     parser_database::ParserDatabase,
     schema_ast::ast::{
-        EnumPosition, Field, FieldId, FieldPosition, FieldType, Identifier, ModelPosition, SchemaPosition,
-        SourcePosition, Top, WithIdentifier,
+        CompositeTypePosition, EnumPosition, Field, FieldId, FieldPosition, FieldType, Identifier, ModelPosition,
+        SchemaPosition, SourcePosition, Top, WithIdentifier, WithName,
     },
     Diagnostics, SourceFile,
 };
@@ -58,24 +58,82 @@ fn get_reference_target(ctx: ReferencesContext<'_>, target: SchemaPosition) -> V
     info!("{:?}", target);
 
     match target {
-        // Block Names
-        SchemaPosition::Model(_, ModelPosition::Name(name)) => find_where_used_as_top_name(&ctx, name)
-            .into_iter()
-            .chain(find_where_used_as_type(ctx, name))
-            .collect(),
+        // Blocks
+        SchemaPosition::Model(_, ModelPosition::Name(name))
+        | SchemaPosition::Enum(_, EnumPosition::Name(name))
+        | SchemaPosition::CompositeType(_, CompositeTypePosition::Name(name)) => {
+            find_where_used_as_top_name(&ctx, name)
+                .into_iter()
+                .chain(find_where_used_as_type(ctx, name))
+                .collect()
+        }
 
-        SchemaPosition::Enum(_, EnumPosition::Name(name)) => find_where_used_as_type(ctx, name),
-        SchemaPosition::DataSource(_, SourcePosition::Name(_name)) => empty_references(),
+        SchemaPosition::DataSource(_, SourcePosition::Name(name)) => find_where_used_for_native_type(ctx, name),
+
         // Fields
-        SchemaPosition::Model(_, ModelPosition::Field(_, FieldPosition::Type(r#type))) => {
+        SchemaPosition::Model(_, ModelPosition::Field(_, FieldPosition::Type(r#type)))
+        | SchemaPosition::CompositeType(_, CompositeTypePosition::Field(_, FieldPosition::Type(r#type))) => {
             find_where_used_as_top_name(&ctx, r#type)
                 .into_iter()
                 .chain(find_where_used_as_type(ctx, r#type))
                 .collect()
         }
 
+        // Attributes
+        SchemaPosition::Model(_, ModelPosition::Field(_, FieldPosition::Attribute(name, _, _)))
+        | SchemaPosition::CompositeType(_, CompositeTypePosition::Field(_, FieldPosition::Attribute(name, _, _))) => {
+            let ds_name = ctx.datasource().map(|ds| ds.name.as_str());
+
+            match ds_name {
+                Some(ds_name) if name.contains(ds_name) => find_where_used_as_top_name(&ctx, ds_name),
+                _ => empty_references(),
+            }
+        }
+
         _ => empty_references(),
     }
+}
+
+fn find_where_used_for_native_type(ctx: ReferencesContext<'_>, name: &str) -> Vec<Location> {
+    info!("Get references for native types");
+
+    let references = ctx
+        .db
+        .walk_tops()
+        .into_iter()
+        .flat_map(|top| match top.ast_top() {
+            Top::CompositeType(composite_type) => find_native_type_locations(&ctx, name, composite_type.iter_fields()),
+            Top::Model(model) => find_native_type_locations(&ctx, name, model.iter_fields()),
+
+            Top::Enum(_) | Top::Source(_) | Top::Generator(_) => empty_references(),
+        })
+        .collect();
+
+    references
+}
+
+fn find_native_type_locations<'a>(
+    ctx: &ReferencesContext<'_>,
+    name: &str,
+    fields: impl Iterator<Item = (FieldId, &'a Field)>,
+) -> Vec<Location> {
+    let identifiers = fields
+        .filter_map(|field| {
+            field
+                .1
+                .attributes
+                .iter()
+                .find(|attr| extract_ds_from_native_type(attr.name()) == name)
+                .map(|attr| attr.identifier())
+        })
+        .collect();
+
+    identifiers_to_locations(identifiers, &ctx)
+}
+
+fn extract_ds_from_native_type(attr_name: &str) -> &str {
+    let split = attr_name.split(".").collect::<Vec<&str>>()[0];
+    split
 }
 
 fn find_where_used_as_type(ctx: ReferencesContext<'_>, name: &str) -> Vec<Location> {
@@ -83,11 +141,11 @@ fn find_where_used_as_type(ctx: ReferencesContext<'_>, name: &str) -> Vec<Locati
 
     let references: Vec<Location> = ctx
         .db
-        .iter_tops()
-        .map(|(file_id, _top_id, top)| match top {
+        .walk_tops()
+        .into_iter()
+        .flat_map(|top| match top.ast_top() {
             Top::Model(model) => {
                 info!("Get references in model");
-                info!("{:?}", file_id);
 
                 let fields = model.iter_fields();
 
@@ -97,7 +155,6 @@ fn find_where_used_as_type(ctx: ReferencesContext<'_>, name: &str) -> Vec<Locati
             }
             Top::CompositeType(composite_type) => {
                 info!("Get references in composite type");
-                info!("{:?}", file_id);
 
                 let fields = composite_type.iter_fields();
                 let ids = get_relevent_identifiers(fields, name);
@@ -106,7 +163,6 @@ fn find_where_used_as_type(ctx: ReferencesContext<'_>, name: &str) -> Vec<Locati
             }
             Top::Enum(_) | Top::Source(_) | Top::Generator(_) => empty_references(),
         })
-        .flatten()
         .collect();
 
     references
@@ -124,10 +180,12 @@ fn find_where_used_as_top_name(ctx: &ReferencesContext<'_>, name: &str) -> Vec<L
             empty_references()
         }
     }
+
     let references: Vec<Location> = ctx
         .db
-        .iter_tops()
-        .map(|(_file_id, _top_id, top)| match top {
+        .walk_tops()
+        .into_iter()
+        .flat_map(|top| match top.ast_top() {
             Top::CompositeType(composite_type) => ident_to_location(composite_type.identifier(), name, ctx),
 
             Top::Enum(enm) => ident_to_location(enm.identifier(), name, ctx),
@@ -138,33 +196,27 @@ fn find_where_used_as_top_name(ctx: &ReferencesContext<'_>, name: &str) -> Vec<L
 
             Top::Generator(_) => empty_references(),
         })
-        .flatten()
         .collect();
 
     references
 }
 
 fn get_relevent_identifiers<'a, 'b>(
-    fields: impl Iterator<Item = (FieldId, &'a Field)> + std::iter::ExactSizeIterator,
+    fields: impl Iterator<Item = (FieldId, &'a Field)>,
     name: &str,
 ) -> Vec<&'a Identifier> {
-    let filter_map = fields
-        .filter_map(|(_id, field)| {
-            info!("{:?}", field);
-            match &field.field_type {
-                FieldType::Supported(id) => {
-                    if id.name == name {
-                        Some(id)
-                    } else {
-                        None
-                    }
+    fields
+        .filter_map(|(_id, field)| match &field.field_type {
+            FieldType::Supported(id) => {
+                if id.name == name {
+                    Some(id)
+                } else {
+                    None
                 }
-                FieldType::Unsupported(_, _) => None,
             }
+            FieldType::Unsupported(_, _) => None,
         })
-        .collect::<Vec<&Identifier>>();
-
-    filter_map
+        .collect()
 }
 
 fn identifiers_to_locations<'a>(ids: Vec<&'a Identifier>, ctx: &ReferencesContext<'_>) -> Vec<Location> {
