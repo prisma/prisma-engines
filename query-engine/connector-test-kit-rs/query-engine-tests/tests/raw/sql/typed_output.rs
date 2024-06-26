@@ -53,136 +53,94 @@ mod typed_output {
           @r###"
         {
           "data": {
-            "queryRaw": [
-              {
-                "id": {
-                  "prisma__type": "int",
-                  "prisma__value": 1
-                },
-                "string": {
-                  "prisma__type": "string",
-                  "prisma__value": "str"
-                },
-                "int": {
-                  "prisma__type": "int",
-                  "prisma__value": 42
-                },
-                "bInt": {
-                  "prisma__type": "bigint",
-                  "prisma__value": "9223372036854775807"
-                },
-                "float": {
-                  "prisma__type": "double",
-                  "prisma__value": 1.5432
-                },
-                "bytes": {
-                  "prisma__type": "bytes",
-                  "prisma__value": "AQID"
-                },
-                "bool": {
-                  "prisma__type": "bool",
-                  "prisma__value": true
-                },
-                "dt": {
-                  "prisma__type": "datetime",
-                  "prisma__value": "1900-10-10T01:10:10.001+00:00"
-                },
-                "dec": {
-                  "prisma__type": "decimal",
-                  "prisma__value": "123.4567891"
-                },
-                "json": {
-                  "prisma__type": "json",
-                  "prisma__value": {
+            "queryRaw": {
+              "columns": [
+                "id",
+                "string",
+                "int",
+                "bInt",
+                "float",
+                "bytes",
+                "bool",
+                "dt",
+                "dec",
+                "json",
+                "string_list",
+                "bInt_list"
+              ],
+              "types": [
+                "int",
+                "string",
+                "int",
+                "bigint",
+                "double",
+                "bytes",
+                "bool",
+                "datetime",
+                "decimal",
+                "json",
+                "array",
+                "array"
+              ],
+              "rows": [
+                [
+                  1,
+                  "str",
+                  42,
+                  "9223372036854775807",
+                  1.5432,
+                  "AQID",
+                  true,
+                  "1900-10-10T01:10:10.001+00:00",
+                  "123.4567891",
+                  {
                     "a": "b"
-                  }
-                },
-                "string_list": {
-                  "prisma__type": "array",
-                  "prisma__value": [
-                    {
-                      "prisma__type": "string",
-                      "prisma__value": "1"
-                    },
-                    {
-                      "prisma__type": "string",
-                      "prisma__value": "a"
-                    },
-                    {
-                      "prisma__type": "string",
-                      "prisma__value": "2"
-                    },
-                    {
-                      "prisma__type": "string",
-                      "prisma__value": "123123213"
-                    }
+                  },
+                  [
+                    [
+                      "string",
+                      "1"
+                    ],
+                    [
+                      "string",
+                      "a"
+                    ],
+                    [
+                      "string",
+                      "2"
+                    ],
+                    [
+                      "string",
+                      "123123213"
+                    ]
+                  ],
+                  [
+                    [
+                      "bigint",
+                      "-9223372036854775808"
+                    ],
+                    [
+                      "bigint",
+                      "9223372036854775807"
+                    ]
                   ]
-                },
-                "bInt_list": {
-                  "prisma__type": "array",
-                  "prisma__value": [
-                    {
-                      "prisma__type": "bigint",
-                      "prisma__value": "-9223372036854775808"
-                    },
-                    {
-                      "prisma__type": "bigint",
-                      "prisma__value": "9223372036854775807"
-                    }
-                  ]
-                }
-              },
-              {
-                "id": {
-                  "prisma__type": "int",
-                  "prisma__value": 2
-                },
-                "string": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "int": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bInt": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "float": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bytes": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bool": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "dt": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "dec": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "json": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "string_list": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bInt_list": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                }
-              }
-            ]
+                ],
+                [
+                  2,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null
+                ]
+              ]
+            }
           }
         }
         "###
@@ -190,7 +148,7 @@ mod typed_output {
 
         insta::assert_snapshot!(
           run_query!(&runner, fmt_query_raw(r#"SELECT 1 + 1;"#, vec![])),
-          @r###"{"data":{"queryRaw":[{"?column?":{"prisma__type":"int","prisma__value":2}}]}}"###
+          @r###"{"data":{"queryRaw":{"columns":["?column?"],"types":["int"],"rows":[[2]]}}}"###
         );
 
         Ok(())
@@ -240,94 +198,60 @@ mod typed_output {
           @r###"
         {
           "data": {
-            "queryRaw": [
-              {
-                "id": {
-                  "prisma__type": "int",
-                  "prisma__value": 1
-                },
-                "string": {
-                  "prisma__type": "string",
-                  "prisma__value": "str"
-                },
-                "int": {
-                  "prisma__type": "int",
-                  "prisma__value": 42
-                },
-                "bInt": {
-                  "prisma__type": "bigint",
-                  "prisma__value": "9223372036854775807"
-                },
-                "float": {
-                  "prisma__type": "double",
-                  "prisma__value": 1.5432
-                },
-                "bytes": {
-                  "prisma__type": "bytes",
-                  "prisma__value": "AQID"
-                },
-                "bool": {
-                  "prisma__type": "int",
-                  "prisma__value": 1
-                },
-                "dt": {
-                  "prisma__type": "datetime",
-                  "prisma__value": "1900-10-10T01:10:10.001+00:00"
-                },
-                "dec": {
-                  "prisma__type": "decimal",
-                  "prisma__value": "123.4567891"
-                },
-                "json": {
-                  "prisma__type": "json",
-                  "prisma__value": {
+            "queryRaw": {
+              "columns": [
+                "id",
+                "string",
+                "int",
+                "bInt",
+                "float",
+                "bytes",
+                "bool",
+                "dt",
+                "dec",
+                "json"
+              ],
+              "types": [
+                "int",
+                "string",
+                "int",
+                "bigint",
+                "double",
+                "bytes",
+                "int",
+                "datetime",
+                "decimal",
+                "json"
+              ],
+              "rows": [
+                [
+                  1,
+                  "str",
+                  42,
+                  "9223372036854775807",
+                  1.5432,
+                  "AQID",
+                  1,
+                  "1900-10-10T01:10:10.001+00:00",
+                  "123.4567891",
+                  {
                     "a": "b"
                   }
-                }
-              },
-              {
-                "id": {
-                  "prisma__type": "int",
-                  "prisma__value": 2
-                },
-                "string": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "int": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bInt": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "float": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bytes": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bool": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "dt": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "dec": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "json": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                }
-              }
-            ]
+                ],
+                [
+                  2,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null
+                ]
+              ]
+            }
           }
         }
         "###
@@ -366,92 +290,58 @@ mod typed_output {
           @r###"
         {
           "data": {
-            "queryRaw": [
-              {
-                "id": {
-                  "prisma__type": "int",
-                  "prisma__value": 1
-                },
-                "string": {
-                  "prisma__type": "string",
-                  "prisma__value": "str"
-                },
-                "int": {
-                  "prisma__type": "int",
-                  "prisma__value": 42
-                },
-                "bInt": {
-                  "prisma__type": "bigint",
-                  "prisma__value": "9223372036854775807"
-                },
-                "float": {
-                  "prisma__type": "double",
-                  "prisma__value": 1.5432
-                },
-                "bytes": {
-                  "prisma__type": "bytes",
-                  "prisma__value": "AQID"
-                },
-                "bool": {
-                  "prisma__type": "int",
-                  "prisma__value": 1
-                },
-                "dt": {
-                  "prisma__type": "datetime",
-                  "prisma__value": "1900-10-10T01:10:10.001+00:00"
-                },
-                "dec": {
-                  "prisma__type": "decimal",
-                  "prisma__value": "123.4567891"
-                },
-                "json": {
-                  "prisma__type": "string",
-                  "prisma__value": "{\"a\":\"b\"}"
-                }
-              },
-              {
-                "id": {
-                  "prisma__type": "int",
-                  "prisma__value": 2
-                },
-                "string": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "int": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bInt": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "float": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bytes": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bool": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "dt": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "dec": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "json": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                }
-              }
-            ]
+            "queryRaw": {
+              "columns": [
+                "id",
+                "string",
+                "int",
+                "bInt",
+                "float",
+                "bytes",
+                "bool",
+                "dt",
+                "dec",
+                "json"
+              ],
+              "types": [
+                "int",
+                "string",
+                "int",
+                "bigint",
+                "double",
+                "bytes",
+                "int",
+                "datetime",
+                "decimal",
+                "string"
+              ],
+              "rows": [
+                [
+                  1,
+                  "str",
+                  42,
+                  "9223372036854775807",
+                  1.5432,
+                  "AQID",
+                  1,
+                  "1900-10-10T01:10:10.001+00:00",
+                  "123.4567891",
+                  "{\"a\":\"b\"}"
+                ],
+                [
+                  2,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null
+                ]
+              ]
+            }
           }
         }
         "###
@@ -507,84 +397,54 @@ mod typed_output {
           @r###"
         {
           "data": {
-            "queryRaw": [
-              {
-                "id": {
-                  "prisma__type": "int",
-                  "prisma__value": 1
-                },
-                "string": {
-                  "prisma__type": "string",
-                  "prisma__value": "str"
-                },
-                "int": {
-                  "prisma__type": "int",
-                  "prisma__value": 42
-                },
-                "bInt": {
-                  "prisma__type": "bigint",
-                  "prisma__value": "9223372036854775807"
-                },
-                "float": {
-                  "prisma__type": "double",
-                  "prisma__value": 1.5432
-                },
-                "bytes": {
-                  "prisma__type": "bytes",
-                  "prisma__value": "AQID"
-                },
-                "bool": {
-                  "prisma__type": "bool",
-                  "prisma__value": true
-                },
-                "dt": {
-                  "prisma__type": "datetime",
-                  "prisma__value": "1900-10-10T01:10:10.001+00:00"
-                },
-                "dec": {
-                  "prisma__type": "decimal",
-                  "prisma__value": "123.4567891"
-                }
-              },
-              {
-                "id": {
-                  "prisma__type": "int",
-                  "prisma__value": 2
-                },
-                "string": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "int": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bInt": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "float": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bytes": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bool": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "dt": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "dec": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                }
-              }
-            ]
+            "queryRaw": {
+              "columns": [
+                "id",
+                "string",
+                "int",
+                "bInt",
+                "float",
+                "bytes",
+                "bool",
+                "dt",
+                "dec"
+              ],
+              "types": [
+                "int",
+                "string",
+                "int",
+                "bigint",
+                "double",
+                "bytes",
+                "bool",
+                "datetime",
+                "decimal"
+              ],
+              "rows": [
+                [
+                  1,
+                  "str",
+                  42,
+                  "9223372036854775807",
+                  1.5432,
+                  "AQID",
+                  true,
+                  "1900-10-10T01:10:10.001+00:00",
+                  "123.4567891"
+                ],
+                [
+                  2,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null
+                ]
+              ]
+            }
           }
         }
         "###

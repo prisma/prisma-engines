@@ -17,6 +17,7 @@ pub mod metrics;
 pub mod native;
 mod queryable;
 mod result_set;
+mod ser;
 #[cfg(any(feature = "mssql-native", feature = "postgresql-native", feature = "mysql-native"))]
 mod timeout;
 mod transaction;
@@ -31,6 +32,7 @@ pub use native::*;
 
 pub use external::*;
 pub use queryable::*;
+pub use ser::*;
 pub use transaction::*;
 
 #[cfg(native)]

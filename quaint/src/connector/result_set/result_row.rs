@@ -108,4 +108,18 @@ impl<'a> ResultRowRef<'a> {
     pub fn get(&self, name: &str) -> Option<&'a Value<'static>> {
         self.columns.iter().position(|c| c == name).map(|idx| &self.values[idx])
     }
+
+    /// Returns the length of the row.
+    pub fn len(&self) -> usize {
+        self.values.len()
+    }
+
+    /// Returns whether the rows are empty.
+    pub fn is_empty(&self) -> bool {
+        self.values.is_empty()
+    }
+
+    pub fn values(&self) -> impl Iterator<Item = &'a Value<'static>> {
+        self.values.iter()
+    }
 }
