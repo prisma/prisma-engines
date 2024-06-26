@@ -152,7 +152,7 @@ fn find_where_used_in_model(
         return empty_references();
     };
 
-    identifiers_to_locations(vec![identifier], &ctx)
+    identifiers_to_locations(vec![identifier], ctx)
 }
 
 fn find_where_used_for_native_type(ctx: &ReferencesContext<'_>, name: &str) -> Vec<Location> {
@@ -161,10 +161,9 @@ fn find_where_used_for_native_type(ctx: &ReferencesContext<'_>, name: &str) -> V
     let references = ctx
         .db
         .walk_tops()
-        .into_iter()
         .flat_map(|top| match top.ast_top() {
-            Top::CompositeType(composite_type) => find_native_type_locations(&ctx, name, composite_type.iter_fields()),
-            Top::Model(model) => find_native_type_locations(&ctx, name, model.iter_fields()),
+            Top::CompositeType(composite_type) => find_native_type_locations(ctx, name, composite_type.iter_fields()),
+            Top::Model(model) => find_native_type_locations(ctx, name, model.iter_fields()),
 
             Top::Enum(_) | Top::Source(_) | Top::Generator(_) => empty_references(),
         })
@@ -189,11 +188,11 @@ fn find_native_type_locations<'a>(
         })
         .collect();
 
-    identifiers_to_locations(identifiers, &ctx)
+    identifiers_to_locations(identifiers, ctx)
 }
 
 fn extract_ds_from_native_type(attr_name: &str) -> &str {
-    let split = attr_name.split(".").collect::<Vec<&str>>()[0];
+    let split = attr_name.split('.').collect::<Vec<&str>>()[0];
     split
 }
 
@@ -203,7 +202,6 @@ fn find_where_used_as_type(ctx: ReferencesContext<'_>, name: &str) -> Vec<Locati
     let references: Vec<Location> = ctx
         .db
         .walk_tops()
-        .into_iter()
         .flat_map(|top| match top.ast_top() {
             Top::Model(model) => {
                 info!("Get references in model");
@@ -241,7 +239,6 @@ fn find_where_used_as_top_name(ctx: &ReferencesContext<'_>, name: &str) -> Vec<L
     let references: Vec<Location> = ctx
         .db
         .walk_tops()
-        .into_iter()
         .flat_map(|top| match top.ast_top() {
             Top::CompositeType(composite_type) => ident_to_location(composite_type.identifier(), name, ctx),
 
@@ -276,7 +273,7 @@ fn get_relevent_identifiers<'a, 'b>(
         .collect()
 }
 
-fn identifiers_to_locations<'a>(ids: Vec<&'a Identifier>, ctx: &ReferencesContext<'_>) -> Vec<Location> {
+fn identifiers_to_locations(ids: Vec<&Identifier>, ctx: &ReferencesContext<'_>) -> Vec<Location> {
     ids.iter()
         .filter_map(|identifier| {
             let file_id = identifier.span.file_id;
