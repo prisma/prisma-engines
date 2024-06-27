@@ -2,17 +2,18 @@ mod actions;
 mod code_actions;
 mod get_config;
 mod get_dmmf;
+mod hover;
 mod lint;
 mod merge_schemas;
 mod native;
-mod offsets;
 mod preview;
 mod schema_file_input;
 mod text_document_completion;
 mod validate;
 
+pub mod offsets;
+
 use log::*;
-pub use offsets::span_to_range;
 use psl::{
     datamodel_connector::Connector, diagnostics::FileId, parser_database::ParserDatabase, Configuration, Datasource,
     Generator,
@@ -89,6 +90,31 @@ pub fn code_actions(schema_files: String, params: &str) -> String {
 
     let actions = code_actions::available_actions(input.into(), params);
     serde_json::to_string(&actions).unwrap()
+}
+
+pub fn hover(schema_files: String, params: &str) -> String {
+    info!("Calling Hover");
+    let schema: SchemaFileInput = match serde_json::from_str(&schema_files) {
+        Ok(schema) => schema,
+        Err(serde_err) => {
+            info!("Failed to deserialize SchemaFileInput");
+            panic!("Failed to deserialize SchemaFileInput: {serde_err}")
+        }
+    };
+
+    let params: lsp_types::HoverParams = match serde_json::from_str(params) {
+        Ok(params) => params,
+        Err(_) => {
+            info!("Failed to deserialize Hover");
+            panic!("Failed to deserialise Hover")
+        }
+    };
+
+    let hover = hover::run(schema.into(), params);
+
+    info!("{:?}", hover);
+
+    serde_json::to_string(&hover).unwrap()
 }
 
 /// The two parameters are:
