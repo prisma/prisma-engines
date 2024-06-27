@@ -103,6 +103,7 @@ serde = { version = "1.0", features = ["derive"] }
 quaint-test-macros = { path = "quaint-test-macros" }
 quaint-test-setup = { path = "quaint-test-setup" }
 tokio = { version = "1.0", features = ["macros", "time"] }
+expect-test = "1"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies.getrandom]
 version = "0.2"

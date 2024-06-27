@@ -79,8 +79,8 @@ mod typed_output {
                 "datetime",
                 "decimal",
                 "json",
-                "array",
-                "array"
+                "string-array",
+                "bigint-array"
               ],
               "rows": [
                 [
@@ -97,32 +97,14 @@ mod typed_output {
                     "a": "b"
                   },
                   [
-                    [
-                      "string",
-                      "1"
-                    ],
-                    [
-                      "string",
-                      "a"
-                    ],
-                    [
-                      "string",
-                      "2"
-                    ],
-                    [
-                      "string",
-                      "123123213"
-                    ]
+                    "1",
+                    "a",
+                    "2",
+                    "123123213"
                   ],
                   [
-                    [
-                      "bigint",
-                      "-9223372036854775808"
-                    ],
-                    [
-                      "bigint",
-                      "9223372036854775807"
-                    ]
+                    "-9223372036854775808",
+                    "9223372036854775807"
                   ]
                 ],
                 [

@@ -1,15 +1,14 @@
 use super::ResultSet;
 use crate::{Value, ValueType};
-use ser::{SerializeSeq, SerializeTuple};
-use serde::*;
+use serde::{ser::*, Serialize, Serializer};
 
 pub struct SerializedResultSet(pub ResultSet);
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 struct InnerSerializedResultSet<'a> {
     columns: SerializedColumns<'a>,
-    types: SerializedTypes<'a>,
-    rows: &'a Vec<Vec<Value<'a>>>,
+    types: &'a SerializedTypes,
+    rows: SerializedRows<'a>,
 }
 
 impl serde::Serialize for SerializedResultSet {
@@ -18,16 +17,18 @@ impl serde::Serialize for SerializedResultSet {
         S: serde::Serializer,
     {
         let this = &self.0;
+        let types = SerializedTypes::new(&this.rows);
 
         InnerSerializedResultSet {
             columns: SerializedColumns(this),
-            types: SerializedTypes(&this.rows),
-            rows: &this.rows,
+            types: &types,
+            rows: SerializedRows(&this.rows, &types),
         }
         .serialize(serializer)
     }
 }
 
+#[derive(Debug)]
 struct SerializedColumns<'a>(&'a ResultSet);
 
 impl<'a> Serialize for SerializedColumns<'a> {
@@ -47,6 +48,8 @@ impl<'a> Serialize for SerializedColumns<'a> {
             if let Some(column_name) = self.0.columns.get(idx) {
                 seq.serialize_element(column_name)?;
             } else {
+                // `query_raw` does not return column names in `ResultSet` when a call to a stored procedure is done
+                // See https://github.com/prisma/prisma/issues/6173
                 seq.serialize_element(&format!("f{idx}"))?;
             }
         }
@@ -55,57 +58,137 @@ impl<'a> Serialize for SerializedColumns<'a> {
     }
 }
 
-struct SerializedTypes<'a>(&'a Vec<Vec<Value<'a>>>);
+#[derive(Debug, Serialize)]
+#[serde(transparent)]
+struct SerializedTypes(Vec<SerializedValueType>);
 
-impl<'a> Serialize for SerializedTypes<'a> {
+impl SerializedTypes {
+    fn new<'a>(rows: &'a Vec<Vec<Value<'a>>>) -> Self {
+        if rows.is_empty() {
+            return Self(Vec::with_capacity(0));
+        }
+
+        let row_len = rows.first().unwrap().len();
+        let mut types = vec![SerializedValueType::Unknown; row_len];
+        let mut types_found = 0;
+        let mut unknown_array_types = 0;
+
+        'outer: for row in rows.iter() {
+            for (idx, value) in row.iter().enumerate() {
+                let current_type = types[idx];
+
+                if matches!(
+                    current_type,
+                    SerializedValueType::Unknown | SerializedValueType::UnknownArray
+                ) {
+                    let inferred_type = SerializedValueType::infer_from(value);
+
+                    if inferred_type != SerializedValueType::Unknown && inferred_type != current_type {
+                        types[idx] = inferred_type;
+                        types_found += 1;
+
+                        if inferred_type == SerializedValueType::UnknownArray {
+                            unknown_array_types += 1;
+                        }
+
+                        if current_type == SerializedValueType::UnknownArray {
+                            unknown_array_types -= 1;
+                        }
+                    }
+                }
+
+                if types_found == row_len && unknown_array_types <= 0 {
+                    break 'outer;
+                }
+            }
+        }
+
+        Self(types)
+    }
+
+    pub(crate) fn get(&self, idx: usize) -> SerializedValueType {
+        *self.0.get(idx).unwrap()
+    }
+}
+
+#[derive(Debug)]
+struct SerializedRows<'a>(&'a Vec<Vec<Value<'a>>>, &'a SerializedTypes);
+
+impl<'a> Serialize for SerializedRows<'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
-        if self.0.is_empty() {
-            return serializer.serialize_seq(Some(0))?.end();
-        }
+        let mut seq = serializer.serialize_seq(Some(self.0.len()))?;
 
-        let first_row = &self.0[0];
-        let mut seq = serializer.serialize_seq(Some(first_row.len()))?;
-
-        for value in first_row {
-            seq.serialize_element(get_value_type_name(value))?;
+        for row in self.0.iter() {
+            seq.serialize_element(&SerializedRow(row, self.1))?;
         }
 
         seq.end()
     }
 }
 
-struct SerializedArrayValue<'a>(&'a Value<'a>);
+struct SerializedRow<'a>(&'a Vec<Value<'a>>, &'a SerializedTypes);
 
-impl<'a> Serialize for SerializedArrayValue<'a> {
+impl Serialize for SerializedRow<'_> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let (row, types) = (self.0, self.1);
+        let mut seq = serializer.serialize_seq(Some(self.0.len()))?;
+
+        for (value_idx, value) in row.iter().enumerate() {
+            seq.serialize_element(&SerializedValue(value, types.get(value_idx)))?;
+        }
+
+        seq.end()
+    }
+}
+
+struct SerializedAnyArrayValue<'a>(&'a Value<'a>);
+
+impl<'a> Serialize for SerializedAnyArrayValue<'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
         let mut tuple = serializer.serialize_tuple(2)?;
+        let typ = SerializedValueType::infer_from(self.0);
 
-        tuple.serialize_element(get_value_type_name(self.0))?;
-        tuple.serialize_element(self.0)?;
+        tuple.serialize_element(&typ)?;
+        tuple.serialize_element(&SerializedValue(self.0, typ))?;
 
         tuple.end()
     }
 }
 
-impl<'a> Serialize for Value<'a> {
+struct SerializedValue<'a>(&'a Value<'a>, SerializedValueType);
+
+impl<'a> Serialize for SerializedValue<'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
-        let val = &self;
+        let val = &self.0;
+        let typ = &self.1;
 
         match &val.typed {
+            ValueType::Array(Some(values)) if typ.is_known_array() => {
+                let mut seq = serializer.serialize_seq(Some(values.len()))?;
+
+                for value in values {
+                    seq.serialize_element(&SerializedValue(value, SerializedValueType::infer_from(value)))?;
+                }
+
+                seq.end()
+            }
             ValueType::Array(Some(values)) => {
                 let mut seq = serializer.serialize_seq(Some(values.len()))?;
 
                 for value in values {
-                    seq.serialize_element(&SerializedArrayValue(value))?;
+                    seq.serialize_element(&SerializedAnyArrayValue(value))?;
                 }
 
                 seq.end()
@@ -144,26 +227,150 @@ impl<'a> Serialize for Value<'a> {
     }
 }
 
-fn get_value_type_name<'a>(value: &'a Value<'_>) -> &'a str {
-    match &value.typed {
-        crate::ValueType::Int32(_) => "int",
-        crate::ValueType::Int64(_) => "bigint",
-        crate::ValueType::Float(_) => "float",
-        crate::ValueType::Double(_) => "double",
-        crate::ValueType::Text(_) => "string",
-        crate::ValueType::Enum(_, _) => "enum",
-        crate::ValueType::Bytes(_) => "bytes",
-        crate::ValueType::Boolean(_) => "bool",
-        crate::ValueType::Char(_) => "char",
-        crate::ValueType::Numeric(_) => "decimal",
-        crate::ValueType::Json(_) => "json",
-        crate::ValueType::Xml(_) => "xml",
-        crate::ValueType::Uuid(_) => "uuid",
-        crate::ValueType::DateTime(_) => "datetime",
-        crate::ValueType::Date(_) => "date",
-        crate::ValueType::Time(_) => "time",
-        crate::ValueType::EnumArray(_, _) => "string-array",
-        crate::ValueType::Array(_) => "array",
+#[derive(Debug, Copy, Clone, PartialEq, Serialize)]
+enum SerializedValueType {
+    #[serde(rename = "int")]
+    Int32,
+    #[serde(rename = "bigint")]
+    Int64,
+    #[serde(rename = "float")]
+    Float,
+    #[serde(rename = "double")]
+    Double,
+    #[serde(rename = "string")]
+    Text,
+    #[serde(rename = "enum")]
+    Enum,
+    #[serde(rename = "bytes")]
+    Bytes,
+    #[serde(rename = "bool")]
+    Boolean,
+    #[serde(rename = "char")]
+    Char,
+    #[serde(rename = "decimal")]
+    Numeric,
+    #[serde(rename = "json")]
+    Json,
+    #[serde(rename = "xml")]
+    Xml,
+    #[serde(rename = "uuid")]
+    Uuid,
+    #[serde(rename = "datetime")]
+    DateTime,
+    #[serde(rename = "date")]
+    Date,
+    #[serde(rename = "time")]
+    Time,
+
+    #[serde(rename = "int-array")]
+    Int32Array,
+    #[serde(rename = "bigint-array")]
+    Int64Array,
+    #[serde(rename = "float-array")]
+    FloatArray,
+    #[serde(rename = "double-array")]
+    DoubleArray,
+    #[serde(rename = "string-array")]
+    TextArray,
+    #[serde(rename = "bytes-array")]
+    BytesArray,
+    #[serde(rename = "bool-array")]
+    BooleanArray,
+    #[serde(rename = "char-array")]
+    CharArray,
+    #[serde(rename = "decimal-array")]
+    NumericArray,
+    #[serde(rename = "json-array")]
+    JsonArray,
+    #[serde(rename = "xml-array")]
+    XmlArray,
+    #[serde(rename = "uuid-array")]
+    UuidArray,
+    #[serde(rename = "datetime-array")]
+    DateTimeArray,
+    #[serde(rename = "date-array")]
+    DateArray,
+    #[serde(rename = "time-array")]
+    TimeArray,
+
+    #[serde(rename = "unknown-array")]
+    UnknownArray,
+
+    #[serde(rename = "unknown")]
+    Unknown,
+}
+
+impl SerializedValueType {
+    fn infer_from(value: &Value) -> SerializedValueType {
+        match &value.typed {
+            ValueType::Int32(_) => SerializedValueType::Int32,
+            ValueType::Int64(_) => SerializedValueType::Int64,
+            ValueType::Float(_) => SerializedValueType::Float,
+            ValueType::Double(_) => SerializedValueType::Double,
+            ValueType::Text(_) => SerializedValueType::Text,
+            ValueType::Enum(_, _) => SerializedValueType::Enum,
+            ValueType::EnumArray(_, _) => SerializedValueType::TextArray,
+            ValueType::Bytes(_) => SerializedValueType::Bytes,
+            ValueType::Boolean(_) => SerializedValueType::Boolean,
+            ValueType::Char(_) => SerializedValueType::Char,
+            ValueType::Numeric(_) => SerializedValueType::Numeric,
+            ValueType::Json(_) => SerializedValueType::Json,
+            ValueType::Xml(_) => SerializedValueType::Xml,
+            ValueType::Uuid(_) => SerializedValueType::Uuid,
+            ValueType::DateTime(_) => SerializedValueType::DateTime,
+            ValueType::Date(_) => SerializedValueType::Date,
+            ValueType::Time(_) => SerializedValueType::Time,
+
+            ValueType::Array(Some(values)) => {
+                if values.is_empty() {
+                    return SerializedValueType::UnknownArray;
+                }
+
+                match &values[0].typed {
+                    ValueType::Int32(_) => SerializedValueType::Int32Array,
+                    ValueType::Int64(_) => SerializedValueType::Int64Array,
+                    ValueType::Float(_) => SerializedValueType::FloatArray,
+                    ValueType::Double(_) => SerializedValueType::DoubleArray,
+                    ValueType::Text(_) => SerializedValueType::TextArray,
+                    ValueType::Bytes(_) => SerializedValueType::BytesArray,
+                    ValueType::Boolean(_) => SerializedValueType::BooleanArray,
+                    ValueType::Char(_) => SerializedValueType::CharArray,
+                    ValueType::Numeric(_) => SerializedValueType::NumericArray,
+                    ValueType::Json(_) => SerializedValueType::JsonArray,
+                    ValueType::Xml(_) => SerializedValueType::XmlArray,
+                    ValueType::Uuid(_) => SerializedValueType::UuidArray,
+                    ValueType::DateTime(_) => SerializedValueType::DateTimeArray,
+                    ValueType::Date(_) => SerializedValueType::DateArray,
+                    ValueType::Time(_) => SerializedValueType::TimeArray,
+                    ValueType::Enum(_, _) => SerializedValueType::TextArray,
+                    ValueType::Array(_) | ValueType::EnumArray(_, _) => {
+                        unreachable!("Only PG supports scalar lists and tokio-postgres does not support 2d arrays")
+                    }
+                }
+            }
+            ValueType::Array(None) => SerializedValueType::UnknownArray,
+        }
+    }
+
+    pub fn is_known_array(&self) -> bool {
+        matches!(
+            self,
+            SerializedValueType::Int32Array
+                | SerializedValueType::Int64Array
+                | SerializedValueType::FloatArray
+                | SerializedValueType::DoubleArray
+                | SerializedValueType::TextArray
+                | SerializedValueType::BytesArray
+                | SerializedValueType::BooleanArray
+                | SerializedValueType::CharArray
+                | SerializedValueType::NumericArray
+                | SerializedValueType::JsonArray
+                | SerializedValueType::XmlArray
+                | SerializedValueType::UuidArray
+                | SerializedValueType::DateTimeArray
+                | SerializedValueType::DateArray
+                | SerializedValueType::TimeArray
+        )
     }
 }
 
@@ -176,6 +383,7 @@ mod tests {
     };
     use bigdecimal::BigDecimal;
     use chrono::{DateTime, Utc};
+    use expect_test::expect;
     use std::str::FromStr;
 
     #[test]
@@ -226,80 +434,75 @@ mod tests {
 
         let serialized = serde_json::to_string_pretty(&SerializedResultSet(result_set)).unwrap();
 
-        let expected = indoc::indoc! {r#"{
-      "columns": [
-        "int32",
-        "int64",
-        "float",
-        "double",
-        "text",
-        "enum",
-        "bytes",
-        "boolean",
-        "char",
-        "numeric",
-        "json",
-        "xml",
-        "uuid",
-        "datetime",
-        "date",
-        "time",
-        "intArray"
-      ],
-      "types": [
-        "int",
-        "bigint",
-        "float",
-        "double",
-        "string",
-        "enum",
-        "bytes",
-        "bool",
-        "char",
-        "decimal",
-        "json",
-        "xml",
-        "uuid",
-        "datetime",
-        "date",
-        "time",
-        "array"
-      ],
-      "rows": [
-        [
-          42,
-          "42",
-          42.523,
-          42.523,
-          "heLlo",
-          "Red",
-          "aGVsbG8=",
-          true,
-          "c",
-          "123456789.123456789",
-          {
-            "hello": "world"
-          },
-          "<hello>world</hello>",
-          "550e8400-e29b-41d4-a716-446655440000",
-          "2021-01-01T02:00:00+00:00",
-          "2021-01-01",
-          "02:00:00",
-          [
-            [
-              "int",
-              42
-            ],
-            [
-              "int",
-              42
-            ]
-          ]
-        ]
-      ]
-    }"#};
+        let expected = expect![[r#"
+            {
+              "columns": [
+                "int32",
+                "int64",
+                "float",
+                "double",
+                "text",
+                "enum",
+                "bytes",
+                "boolean",
+                "char",
+                "numeric",
+                "json",
+                "xml",
+                "uuid",
+                "datetime",
+                "date",
+                "time",
+                "intArray"
+              ],
+              "types": [
+                "int",
+                "bigint",
+                "float",
+                "double",
+                "string",
+                "enum",
+                "bytes",
+                "bool",
+                "char",
+                "decimal",
+                "json",
+                "xml",
+                "uuid",
+                "datetime",
+                "date",
+                "time",
+                "int-array"
+              ],
+              "rows": [
+                [
+                  42,
+                  "42",
+                  42.523,
+                  42.523,
+                  "heLlo",
+                  "Red",
+                  "aGVsbG8=",
+                  true,
+                  "c",
+                  "123456789.123456789",
+                  {
+                    "hello": "world"
+                  },
+                  "<hello>world</hello>",
+                  "550e8400-e29b-41d4-a716-446655440000",
+                  "2021-01-01T02:00:00+00:00",
+                  "2021-01-01",
+                  "02:00:00",
+                  [
+                    42,
+                    42
+                  ]
+                ]
+              ]
+            }"#]];
 
-        assert_eq!(serialized, expected);
+        expected.assert_eq(&serialized);
     }
 
     #[test]
@@ -308,17 +511,17 @@ mod tests {
         let result_set = ResultSet::new(names, vec![]);
 
         let serialized = serde_json::to_string_pretty(&SerializedResultSet(result_set)).unwrap();
-        println!("{}", serialized);
 
-        let expected = indoc::indoc! {r#"{
-          "columns": [
-            "hello"
-          ],
-          "types": [],
-          "rows": []
-        }"#};
+        let expected = expect![[r#"
+            {
+              "columns": [
+                "hello"
+              ],
+              "types": [],
+              "rows": []
+            }"#]];
 
-        assert_eq!(serialized, expected);
+        expected.assert_eq(&serialized)
     }
 
     #[test]
@@ -332,47 +535,35 @@ mod tests {
         let result_set = ResultSet::new(names, rows);
 
         let serialized = serde_json::to_string_pretty(&SerializedResultSet(result_set)).unwrap();
-        println!("{}", serialized);
 
-        let expected = indoc::indoc! {r#"{
-        "columns": [
-          "array"
-        ],
-        "types": [
-          "array"
-        ],
-        "rows": [
-          [
-            null
-          ],
-          [
-            [
-              [
-                "int",
-                42
+        let expected = expect![[r#"
+            {
+              "columns": [
+                "array"
               ],
-              [
-                "bigint",
-                "42"
-              ]
-            ]
-          ],
-          [
-            [
-              [
-                "string",
-                "heLlo"
+              "types": [
+                "int-array"
               ],
-              [
-                "string",
-                null
+              "rows": [
+                [
+                  null
+                ],
+                [
+                  [
+                    42,
+                    "42"
+                  ]
+                ],
+                [
+                  [
+                    "heLlo",
+                    null
+                  ]
+                ]
               ]
-            ]
-          ]
-        ]
-      }"#};
+            }"#]];
 
-        assert_eq!(serialized, expected);
+        expected.assert_eq(&serialized);
     }
 
     #[test]
@@ -389,26 +580,27 @@ mod tests {
 
         let serialized = serde_json::to_string_pretty(&SerializedResultSet(result_set)).unwrap();
 
-        let expected = indoc::indoc! {r#"{
-        "columns": [
-          "array"
-        ],
-        "types": [
-          "string-array"
-        ],
-        "rows": [
-          [
-            [
-              "A",
-              "B"
-            ]
-          ],
-          [
-            null
-          ]
-        ]
-      }"#};
+        let expected = expect![[r#"
+            {
+              "columns": [
+                "array"
+              ],
+              "types": [
+                "string-array"
+              ],
+              "rows": [
+                [
+                  [
+                    "A",
+                    "B"
+                  ]
+                ],
+                [
+                  null
+                ]
+              ]
+            }"#]];
 
-        assert_eq!(serialized, expected);
+        expected.assert_eq(&serialized);
     }
 }
