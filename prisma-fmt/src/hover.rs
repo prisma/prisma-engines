@@ -67,11 +67,17 @@ fn hover(ctx: HoverContext<'_>) -> Hover {
 
             info!("{}", name);
 
-            let top = ctx.db.iter_tops().find(|(_, _, top)| top.name() == name);
+            let top = ctx.db.walk_tops().find_map(|top| {
+                if top.ast_top().name() == name {
+                    Some(top.ast_top())
+                } else {
+                    None
+                }
+            });
 
             info!("{:?}", top);
 
-            let (variant, doc) = match top.map(|(_file_id, _top_id, top)| top) {
+            let (variant, doc) = match top {
                 Some(top) => {
                     let doc = top.documentation().unwrap_or("");
                     (top.get_type(), doc)
@@ -81,17 +87,29 @@ fn hover(ctx: HoverContext<'_>) -> Hover {
 
             format_hover_content(doc, variant, name)
         }
+        psl::schema_ast::ast::SchemaPosition::CompositeType(_composite_id, composite_positon) => {
+            info!("We are here: {:?}", composite_positon);
+            no_hover()
+        }
         psl::schema_ast::ast::SchemaPosition::Enum(_enum_id, enum_position) => {
             info!("We are here: {:?}", enum_position);
-            format_hover_content("", "", "")
+            no_hover()
         }
         psl::schema_ast::ast::SchemaPosition::DataSource(_ds_id, source_position) => {
             info!("We are here: {:?}", source_position);
-            format_hover_content("", "", "")
+            no_hover()
+        }
+        psl::schema_ast::ast::SchemaPosition::Generator(_gen_id, gen_position) => {
+            info!("We are here: {:?}", gen_position);
+            no_hover()
         }
     };
 
     Hover { contents, range: None }
+}
+
+fn no_hover() -> HoverContents {
+    format_hover_content("", "", "")
 }
 
 fn format_hover_content(documentation: &str, variant: &str, top_name: &str) -> HoverContents {
