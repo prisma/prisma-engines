@@ -7,7 +7,7 @@ mod prisma_21369 {
         match_connector_result!(
             &runner,
             fmt_query_raw("SELECT NULL AS result", []),
-            Sqlite(_) => vec![r#"{"data":{"queryRaw":{"columns":["result"],"types":["int"],"rows":[[null]]}}}"#],
+            Sqlite(_) | MySql(_) | SqlServer(_) => vec![r#"{"data":{"queryRaw":{"columns":["result"],"types":["int"],"rows":[[null]]}}}"#],
             _ => vec![r#"{"data":{"queryRaw":{"columns":["result"],"types":["string"],"rows":[[null]]}}}"#]
 
         );

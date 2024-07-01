@@ -241,7 +241,7 @@ mod typed_output {
 
         insta::assert_snapshot!(
           run_query!(&runner, fmt_query_raw(r#"SELECT 1 + 1;"#, vec![])),
-          @r###"{"data":{"queryRaw":[{"1 + 1":{"prisma__type":"bigint","prisma__value":"2"}}]}}"###
+          @r###"{"data":{"queryRaw":{"columns":["1 + 1"],"types":["bigint"],"rows":[["2"]]}}}"###
         );
 
         Ok(())
@@ -331,7 +331,7 @@ mod typed_output {
 
         insta::assert_snapshot!(
           run_query!(&runner, fmt_query_raw(r#"SELECT 1 + 1;"#, vec![])),
-          @r###"{"data":{"queryRaw":[{"1 + 1":{"prisma__type":"int","prisma__value":2}}]}}"###
+          @r###"{"data":{"queryRaw":{"columns":["1 + 1"],"types":["int"],"rows":[[2]]}}}"###
         );
 
         Ok(())
