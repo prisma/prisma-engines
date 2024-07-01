@@ -17,12 +17,11 @@ impl serde::Serialize for SerializedResultSet {
         S: serde::Serializer,
     {
         let this = &self.0;
-        let types = SerializedTypes::new(&this.rows);
 
         InnerSerializedResultSet {
             columns: SerializedColumns(this),
-            types: &types,
-            rows: SerializedRows(&this.rows, &types),
+            types: &SerializedTypes::new(&this.rows),
+            rows: SerializedRows(&this.rows),
         }
         .serialize(serializer)
     }
@@ -63,7 +62,7 @@ impl<'a> Serialize for SerializedColumns<'a> {
 struct SerializedTypes(Vec<SerializedValueType>);
 
 impl SerializedTypes {
-    fn new<'a>(rows: &'a Vec<Vec<Value<'a>>>) -> Self {
+    fn new<'a>(rows: &'a [Vec<Value<'a>>]) -> Self {
         if rows.is_empty() {
             return Self(Vec::with_capacity(0));
         }
@@ -71,7 +70,6 @@ impl SerializedTypes {
         let row_len = rows.first().unwrap().len();
         let mut types = vec![SerializedValueType::Unknown; row_len];
         let mut types_found = 0;
-        let mut unknown_array_types = 0;
 
         'outer: for row in rows.iter() {
             for (idx, value) in row.iter().enumerate() {
@@ -85,19 +83,14 @@ impl SerializedTypes {
 
                     if inferred_type != SerializedValueType::Unknown && inferred_type != current_type {
                         types[idx] = inferred_type;
-                        types_found += 1;
 
-                        if inferred_type == SerializedValueType::UnknownArray {
-                            unknown_array_types += 1;
-                        }
-
-                        if current_type == SerializedValueType::UnknownArray {
-                            unknown_array_types -= 1;
+                        if inferred_type != SerializedValueType::UnknownArray {
+                            types_found += 1;
                         }
                     }
                 }
 
-                if types_found == row_len && unknown_array_types <= 0 {
+                if types_found == row_len {
                     break 'outer;
                 }
             }
@@ -105,66 +98,46 @@ impl SerializedTypes {
 
         Self(types)
     }
-
-    pub(crate) fn get(&self, idx: usize) -> SerializedValueType {
-        *self.0.get(idx).unwrap()
-    }
 }
 
 #[derive(Debug)]
-struct SerializedRows<'a>(&'a Vec<Vec<Value<'a>>>, &'a SerializedTypes);
+struct SerializedRows<'a>(&'a Vec<Vec<Value<'a>>>);
 
 impl<'a> Serialize for SerializedRows<'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
-        let mut seq = serializer.serialize_seq(Some(self.0.len()))?;
+        let rows = &self.0;
+        let mut seq = serializer.serialize_seq(Some(rows.len()))?;
 
-        for row in self.0.iter() {
-            seq.serialize_element(&SerializedRow(row, self.1))?;
+        for row in rows.iter() {
+            seq.serialize_element(&SerializedRow(row))?;
         }
 
         seq.end()
     }
 }
 
-struct SerializedRow<'a>(&'a Vec<Value<'a>>, &'a SerializedTypes);
+struct SerializedRow<'a>(&'a Vec<Value<'a>>);
 
 impl Serialize for SerializedRow<'_> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
-        let (row, types) = (self.0, self.1);
+        let row = &self.0;
         let mut seq = serializer.serialize_seq(Some(self.0.len()))?;
 
-        for (value_idx, value) in row.iter().enumerate() {
-            seq.serialize_element(&SerializedValue(value, types.get(value_idx)))?;
+        for value in row.iter() {
+            seq.serialize_element(&SerializedValue(value))?;
         }
 
         seq.end()
     }
 }
 
-struct SerializedAnyArrayValue<'a>(&'a Value<'a>);
-
-impl<'a> Serialize for SerializedAnyArrayValue<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let mut tuple = serializer.serialize_tuple(2)?;
-        let typ = SerializedValueType::infer_from(self.0);
-
-        tuple.serialize_element(&typ)?;
-        tuple.serialize_element(&SerializedValue(self.0, typ))?;
-
-        tuple.end()
-    }
-}
-
-struct SerializedValue<'a>(&'a Value<'a>, SerializedValueType);
+struct SerializedValue<'a>(&'a Value<'a>);
 
 impl<'a> Serialize for SerializedValue<'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -172,23 +145,13 @@ impl<'a> Serialize for SerializedValue<'a> {
         S: Serializer,
     {
         let val = &self.0;
-        let typ = &self.1;
 
         match &val.typed {
-            ValueType::Array(Some(values)) if typ.is_known_array() => {
-                let mut seq = serializer.serialize_seq(Some(values.len()))?;
-
-                for value in values {
-                    seq.serialize_element(&SerializedValue(value, SerializedValueType::infer_from(value)))?;
-                }
-
-                seq.end()
-            }
             ValueType::Array(Some(values)) => {
                 let mut seq = serializer.serialize_seq(Some(values.len()))?;
 
                 for value in values {
-                    seq.serialize_element(&SerializedAnyArrayValue(value))?;
+                    seq.serialize_element(&SerializedValue(value))?;
                 }
 
                 seq.end()
@@ -350,27 +313,6 @@ impl SerializedValueType {
             }
             ValueType::Array(None) => SerializedValueType::UnknownArray,
         }
-    }
-
-    pub fn is_known_array(&self) -> bool {
-        matches!(
-            self,
-            SerializedValueType::Int32Array
-                | SerializedValueType::Int64Array
-                | SerializedValueType::FloatArray
-                | SerializedValueType::DoubleArray
-                | SerializedValueType::TextArray
-                | SerializedValueType::BytesArray
-                | SerializedValueType::BooleanArray
-                | SerializedValueType::CharArray
-                | SerializedValueType::NumericArray
-                | SerializedValueType::JsonArray
-                | SerializedValueType::XmlArray
-                | SerializedValueType::UuidArray
-                | SerializedValueType::DateTimeArray
-                | SerializedValueType::DateArray
-                | SerializedValueType::TimeArray
-        )
     }
 }
 
