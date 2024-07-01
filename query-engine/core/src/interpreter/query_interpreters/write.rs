@@ -6,7 +6,7 @@ use crate::{
     QueryResult, RecordSelection,
 };
 use connector::{ConnectionLike, DatasourceFieldName, NativeUpsert, WriteArgs};
-use query_structure::{ManyRecords, Model};
+use query_structure::{ManyRecords, Model, RawJson};
 
 pub(crate) async fn execute(
     tx: &mut dyn ConnectionLike,
@@ -31,14 +31,16 @@ pub(crate) async fn execute(
 async fn query_raw(tx: &mut dyn ConnectionLike, q: RawQuery) -> InterpretationResult<QueryResult> {
     let res = tx.query_raw(q.model.as_ref(), q.inputs, q.query_type).await?;
 
-    Ok(QueryResult::Json(res))
+    Ok(QueryResult::RawJson(res))
 }
 
 async fn execute_raw(tx: &mut dyn ConnectionLike, q: RawQuery) -> InterpretationResult<QueryResult> {
     let res = tx.execute_raw(q.inputs).await?;
     let num = serde_json::Value::Number(serde_json::Number::from(res));
 
-    Ok(QueryResult::Json(num))
+    Ok(QueryResult::RawJson(
+        RawJson::try_new(num).map_err(|err| InterpreterError::Generic(err.to_string()))?,
+    ))
 }
 
 async fn create_one(

@@ -15,9 +15,9 @@ mod query_arguments_ext;
 mod query_builder;
 mod query_ext;
 mod row;
+mod ser_raw;
 mod sql_trace;
 mod value;
-mod value_ext;
 
 use self::{column_metadata::*, context::Context, query_ext::QueryExt, row::*};
 use quaint::prelude::Queryable;

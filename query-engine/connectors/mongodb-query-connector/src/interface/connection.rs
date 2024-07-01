@@ -221,7 +221,7 @@ impl WriteOperations for MongoDbConnection {
         model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         query_type: Option<String>,
-    ) -> connector_interface::Result<serde_json::Value> {
+    ) -> connector_interface::Result<RawJson> {
         catch(write::query_raw(
             &self.database,
             &mut self.session,

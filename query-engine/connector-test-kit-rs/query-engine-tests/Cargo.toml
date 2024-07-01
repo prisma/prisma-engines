@@ -26,5 +26,5 @@ futures = "0.3"
 paste = "1.0.14"
 
 [dev-dependencies]
-insta = "1.7.1"
+insta = { version = "1.7.1", features = ["json", "redactions"] }
 itertools.workspace = true

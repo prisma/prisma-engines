@@ -67,6 +67,7 @@ fn item_ref_to_owned_item(item_ref: ItemRef) -> Item {
         Item::List(list) => Item::List(list.to_owned()),
         Item::Value(val) => Item::Value(val.to_owned()),
         Item::Json(json) => Item::Json(json.to_owned()),
+        Item::RawJson(json) => Item::RawJson(json.clone()),
         Item::Ref(nested_ref) => item_ref_to_owned_item(nested_ref.clone()),
     }
 }

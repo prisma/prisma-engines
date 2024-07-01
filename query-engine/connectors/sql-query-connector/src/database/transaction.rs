@@ -334,7 +334,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         _model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         _query_type: Option<String>,
-    ) -> connector::Result<serde_json::Value> {
+    ) -> connector::Result<RawJson> {
         catch(
             &self.connection_info,
             write::query_raw(self.inner.as_queryable(), inputs),

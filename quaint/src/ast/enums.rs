@@ -13,6 +13,10 @@ impl<'a> EnumVariant<'a> {
         self.0.into_owned()
     }
 
+    pub fn inner(&self) -> &str {
+        self.0.as_ref()
+    }
+
     pub fn into_text(self) -> Value<'a> {
         Value::text(self.0)
     }

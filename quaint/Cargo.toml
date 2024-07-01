@@ -89,7 +89,7 @@ native-tls = { version = "0.2", optional = true }
 bit-vec = { version = "0.6.1", optional = true }
 bytes = { version = "1.0", optional = true }
 mobc = { version = "0.8", optional = true }
-serde = { version = "1.0", optional = true }
+serde = { version = "1.0" }
 sqlformat = { version = "0.2.3", optional = true }
 uuid.workspace = true
 crosstarget-utils = { path = "../libs/crosstarget-utils" }
@@ -103,6 +103,7 @@ serde = { version = "1.0", features = ["derive"] }
 quaint-test-macros = { path = "quaint-test-macros" }
 quaint-test-setup = { path = "quaint-test-setup" }
 tokio = { version = "1.0", features = ["macros", "time"] }
+expect-test = "1"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies.getrandom]
 version = "0.2"

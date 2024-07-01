@@ -18,7 +18,7 @@ pub(crate) use ir_serializer::*;
 
 use crate::ArgumentValue;
 use indexmap::IndexMap;
-use query_structure::PrismaValue;
+use query_structure::{PrismaValue, RawJson};
 use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
 use std::{collections::HashMap, fmt, sync::Arc};
 
@@ -102,6 +102,7 @@ pub enum Item {
     List(List),
     Value(PrismaValue),
     Json(serde_json::Value),
+    RawJson(RawJson),
 
     /// Wrapper type to allow multiple parent records
     /// to claim the same item without copying data
@@ -200,6 +201,7 @@ impl Serialize for Item {
             }
             Self::Value(pv) => pv.serialize(serializer),
             Self::Json(value) => value.serialize(serializer),
+            Self::RawJson(value) => value.serialize(serializer),
             Self::Ref(item_ref) => item_ref.serialize(serializer),
         }
     }
