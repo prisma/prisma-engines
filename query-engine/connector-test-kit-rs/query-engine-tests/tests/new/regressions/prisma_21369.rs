@@ -4,9 +4,12 @@ use query_engine_tests::*;
 mod prisma_21369 {
     #[connector_test]
     async fn select_null_works(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-            run_query!(runner, fmt_query_raw("SELECT NULL AS result", [])),
-            @r###"{"data":{"queryRaw":{"columns":["result"],"types":["string"],"rows":[[null]]}}}"###
+        match_connector_result!(
+            &runner,
+            fmt_query_raw("SELECT NULL AS result", []),
+            Sqlite(_) => vec![r#"{"data":{"queryRaw":{"columns":["result"],"types":["int"],"rows":[[null]]}}}"#],
+            _ => vec![r#"{"data":{"queryRaw":{"columns":["result"],"types":["string"],"rows":[[null]]}}}"#]
+
         );
 
         Ok(())
