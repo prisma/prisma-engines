@@ -3,10 +3,17 @@
 use std::pin::Pin;
 
 use super::CachedTx;
-use crate::{execute_many_operations, execute_single_operation, Operation, ResponseData, TxId};
+use crate::{
+    execute_many_operations, execute_single_operation, CoreError, Operation, ResponseData, TransactionError, TxId,
+};
 use connector::{Connection, Transaction};
+use crosstarget_utils::time::ElapsedTimeCounter;
+use futures::Future;
 use schema::QuerySchemaRef;
-use tokio::time::Duration;
+use tokio::{
+    sync::mpsc::{UnboundedReceiver, UnboundedSender},
+    time::Duration,
+};
 use tracing_futures::Instrument;
 
 #[cfg(feature = "metrics")]
@@ -59,13 +66,42 @@ impl TransactionState {
     pub fn set_rolled_back(&mut self) {
         self.cached_tx = CachedTx::RolledBack;
     }
+
+    pub fn is_finished(&self) -> bool {
+        matches!(self.cached_tx, CachedTx::Committed | CachedTx::RolledBack)
+    }
 }
 
 pub struct InteractiveTransaction {
     id: TxId,
     state: TransactionState,
+    start_time: ElapsedTimeCounter,
     timeout: Duration,
     query_schema: QuerySchemaRef,
+}
+
+macro_rules! tx_timeout {
+    ($self:expr, $fut:expr) => {
+        if let Some(remaining_time) = $self.timeout.checked_sub($self.start_time.elapsed_time()) {
+            tokio::select! {
+                _ = crosstarget_utils::time::sleep(remaining_time) => {
+                    $self.rollback(true).await?;
+                    Err(TransactionError::Closed {
+                        reason: "Could not perform operation".to_string(),
+                    }.into())
+                }
+                result = $fut => {
+                    result
+                }
+            }
+        } else {
+            $self.rollback(true).await?;
+            Err(TransactionError::Closed {
+                reason: "Could not perform operation".to_string(),
+            }
+            .into())
+        }
+    };
 }
 
 impl InteractiveTransaction {
@@ -82,6 +118,7 @@ impl InteractiveTransaction {
         Ok(Self {
             id,
             state,
+            start_time: ElapsedTimeCounter::start(),
             timeout,
             query_schema,
         })
@@ -93,19 +130,20 @@ impl InteractiveTransaction {
         traceparent: Option<String>,
     ) -> crate::Result<ResponseData> {
         let span = info_span!("prisma:engine:itx_query_builder", user_facing = true);
-
         #[cfg(feature = "metrics")]
         set_span_link_from_traceparent(&span, traceparent.clone());
-
         let conn = self.state.as_open()?;
-        execute_single_operation(
-            self.query_schema.clone(),
-            conn.as_connection_like(),
-            operation,
-            traceparent,
+
+        tx_timeout!(
+            self,
+            execute_single_operation(
+                self.query_schema.clone(),
+                conn.as_connection_like(),
+                operation,
+                traceparent,
+            )
+            .instrument(span)
         )
-        .instrument(span)
-        .await
     }
 
     pub(crate) async fn execute_batch(
@@ -113,27 +151,29 @@ impl InteractiveTransaction {
         operations: &[Operation],
         traceparent: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
-        let span = info_span!("prisma:engine:itx_execute", user_facing = true);
-
-        let conn = self.state.as_open()?;
-        execute_many_operations(
-            self.query_schema.clone(),
-            conn.as_connection_like(),
-            operations,
-            traceparent,
-        )
-        .instrument(span)
-        .await
+        tx_timeout!(self, async {
+            let span = info_span!("prisma:engine:itx_execute", user_facing = true);
+            let conn = self.state.as_open()?;
+            execute_many_operations(
+                self.query_schema.clone(),
+                conn.as_connection_like(),
+                operations,
+                traceparent,
+            )
+            .instrument(span)
+            .await
+        })
     }
 
     pub(crate) async fn commit(&mut self) -> crate::Result<()> {
-        if let Ok(open_tx) = self.state.as_open() {
-            trace!("[{}] committing.", self.id.to_string());
-            open_tx.commit().await?;
-            self.state.set_committed();
-        }
-
-        Ok(())
+        tx_timeout!(self, async {
+            if let Ok(open_tx) = self.state.as_open() {
+                trace!("[{}] committing.", self.id.to_string());
+                open_tx.commit().await?;
+                self.state.set_committed();
+            }
+            Ok(())
+        })
     }
 
     pub(crate) async fn rollback(&mut self, was_timeout: bool) -> crate::Result<()> {

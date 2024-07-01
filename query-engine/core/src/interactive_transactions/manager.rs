@@ -1,10 +1,17 @@
 use crate::{protocol::EngineProtocol, ClosedTx, CoreError, InteractiveTransaction, Operation, ResponseData};
 use connector::Connection;
+use futures::channel::mpsc::unbounded;
 use lru::LruCache;
 use once_cell::sync::Lazy;
 use schema::QuerySchemaRef;
 use std::collections::HashMap;
-use tokio::{sync::RwLock, time::Duration};
+use tokio::{
+    sync::{
+        mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender},
+        RwLock,
+    },
+    time::Duration,
+};
 
 use super::{TransactionError, TxId};
 
@@ -41,6 +48,7 @@ impl ITXManager {
         // TODO laplab: maintain dispatcher and span.
         // TODO laplab: monitor timeout.
         // TODO laplab: use `engine_protocol`.
+        // TODO laplab: start a background task to clear stale transactions.
 
         let transaction =
             InteractiveTransaction::new(tx_id.clone(), conn, timeout, query_schema, isolation_level).await?;
