@@ -3760,7 +3760,6 @@ dependencies = [
  "thiserror",
  "tokio",
  "tracing",
- "tracing-error",
  "tracing-opentelemetry",
  "tracing-subscriber",
  "url",
