@@ -5086,6 +5086,7 @@ dependencies = [
  "bigdecimal",
  "chrono",
  "cuid",
+ "expect-test",
  "futures",
  "itertools 0.12.0",
  "once_cell",

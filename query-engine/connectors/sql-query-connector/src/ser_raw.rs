@@ -1,5 +1,7 @@
-use super::ResultSet;
-use crate::{Value, ValueType};
+use quaint::{
+    connector::{ResultRowRef, ResultSet},
+    Value, ValueType,
+};
 use serde::{ser::*, Serialize, Serializer};
 
 pub struct SerializedResultSet(pub ResultSet);
@@ -20,8 +22,8 @@ impl serde::Serialize for SerializedResultSet {
 
         InnerSerializedResultSet {
             columns: SerializedColumns(this),
-            types: &SerializedTypes::new(&this.rows),
-            rows: SerializedRows(&this.rows),
+            types: &SerializedTypes::new(this),
+            rows: SerializedRows(this),
         }
         .serialize(serializer)
     }
@@ -35,16 +37,18 @@ impl<'a> Serialize for SerializedColumns<'a> {
     where
         S: Serializer,
     {
-        if self.0.rows.is_empty() {
-            return self.0.columns().serialize(serializer);
+        let this = &self.0;
+
+        if this.is_empty() {
+            return this.columns().serialize(serializer);
         }
 
-        let first_row = self.0.rows.first().unwrap();
+        let first_row = this.first().unwrap();
 
         let mut seq = serializer.serialize_seq(Some(first_row.len()))?;
 
         for (idx, _) in first_row.iter().enumerate() {
-            if let Some(column_name) = self.0.columns.get(idx) {
+            if let Some(column_name) = this.columns().get(idx) {
                 seq.serialize_element(column_name)?;
             } else {
                 // `query_raw` does not return column names in `ResultSet` when a call to a stored procedure is done
@@ -62,7 +66,7 @@ impl<'a> Serialize for SerializedColumns<'a> {
 struct SerializedTypes(Vec<SerializedValueType>);
 
 impl SerializedTypes {
-    fn new<'a>(rows: &'a [Vec<Value<'a>>]) -> Self {
+    fn new(rows: &ResultSet) -> Self {
         if rows.is_empty() {
             return Self(Vec::with_capacity(0));
         }
@@ -101,7 +105,7 @@ impl SerializedTypes {
 }
 
 #[derive(Debug)]
-struct SerializedRows<'a>(&'a Vec<Vec<Value<'a>>>);
+struct SerializedRows<'a>(&'a ResultSet);
 
 impl<'a> Serialize for SerializedRows<'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -112,14 +116,14 @@ impl<'a> Serialize for SerializedRows<'a> {
         let mut seq = serializer.serialize_seq(Some(rows.len()))?;
 
         for row in rows.iter() {
-            seq.serialize_element(&SerializedRow(row))?;
+            seq.serialize_element(&SerializedRow(&row))?;
         }
 
         seq.end()
     }
 }
 
-struct SerializedRow<'a>(&'a Vec<Value<'a>>);
+struct SerializedRow<'a>(&'a ResultRowRef<'a>);
 
 impl Serialize for SerializedRow<'_> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -177,7 +181,7 @@ impl<'a> Serialize for SerializedValue<'a> {
                 seq.end()
             }
             ValueType::EnumArray(None, _) => serializer.serialize_none(),
-            ValueType::Bytes(value) => value.as_ref().map(base64::encode).serialize(serializer),
+            ValueType::Bytes(value) => value.as_ref().map(prisma_value::encode_base64).serialize(serializer),
             ValueType::Boolean(value) => value.serialize(serializer),
             ValueType::Char(value) => value.serialize(serializer),
             ValueType::Json(value) => value.serialize(serializer),
@@ -318,14 +322,15 @@ impl SerializedValueType {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        connector::SerializedResultSet,
-        prelude::{EnumName, EnumVariant, ResultSet},
-        Value,
-    };
+    use super::SerializedResultSet;
     use bigdecimal::BigDecimal;
     use chrono::{DateTime, Utc};
     use expect_test::expect;
+    use quaint::{
+        ast::{EnumName, EnumVariant},
+        connector::ResultSet,
+        Value,
+    };
     use std::str::FromStr;
 
     #[test]

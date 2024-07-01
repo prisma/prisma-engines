@@ -16,6 +16,8 @@ pub use raw_json::RawJson;
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
 
+pub use base64::encode as encode_base64;
+
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
 #[serde(untagged)]
 pub enum PrismaValue {

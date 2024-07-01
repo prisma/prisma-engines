@@ -1,4 +1,5 @@
 use crate::filter::FilterBuilder;
+use crate::ser_raw::SerializedResultSet;
 use crate::{
     column_metadata, error::*, model_extensions::*, sql_trace::trace_parent_to_string, sql_trace::SqlTraceComment,
     ColumnMetadata, Context, SqlRow, ToSqlRow,
@@ -9,7 +10,6 @@ use futures::future::FutureExt;
 use itertools::Itertools;
 use opentelemetry::trace::TraceContextExt;
 use opentelemetry::trace::TraceFlags;
-use quaint::connector::SerializedResultSet;
 use quaint::{ast::*, connector::Queryable};
 use query_structure::*;
 use std::{collections::HashMap, panic::AssertUnwindSafe};

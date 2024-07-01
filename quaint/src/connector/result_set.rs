@@ -71,14 +71,21 @@ impl ResultSet {
             None => Err(Error::builder(ErrorKind::NotFound).build()),
         }
     }
+
+    pub fn iter(&self) -> ResultSetIterator<'_> {
+        ResultSetIterator {
+            columns: self.columns.clone(),
+            internal_iterator: self.rows.iter(),
+        }
+    }
 }
 
 impl IntoIterator for ResultSet {
     type Item = ResultRow;
-    type IntoIter = ResultSetIterator;
+    type IntoIter = ResultSetIntoIterator;
 
     fn into_iter(self) -> Self::IntoIter {
-        ResultSetIterator {
+        ResultSetIntoIterator {
             columns: self.columns,
             internal_iterator: self.rows.into_iter(),
         }
@@ -87,17 +94,36 @@ impl IntoIterator for ResultSet {
 
 /// Thin iterator for ResultSet rows.
 /// Might become lazy one day.
-pub struct ResultSetIterator {
+pub struct ResultSetIntoIterator {
     pub(crate) columns: Arc<Vec<String>>,
     pub(crate) internal_iterator: std::vec::IntoIter<Vec<Value<'static>>>,
 }
 
-impl Iterator for ResultSetIterator {
+impl Iterator for ResultSetIntoIterator {
     type Item = ResultRow;
 
     fn next(&mut self) -> Option<Self::Item> {
         match self.internal_iterator.next() {
             Some(row) => Some(ResultRow {
+                columns: Arc::clone(&self.columns),
+                values: row,
+            }),
+            None => None,
+        }
+    }
+}
+
+pub struct ResultSetIterator<'a> {
+    pub(crate) columns: Arc<Vec<String>>,
+    pub(crate) internal_iterator: std::slice::Iter<'a, Vec<Value<'static>>>,
+}
+
+impl<'a> Iterator for ResultSetIterator<'a> {
+    type Item = ResultRowRef<'a>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.internal_iterator.next() {
+            Some(row) => Some(ResultRowRef {
                 columns: Arc::clone(&self.columns),
                 values: row,
             }),

@@ -41,6 +41,12 @@ pub struct ResultRowRef<'a> {
     pub(crate) values: &'a Vec<Value<'static>>,
 }
 
+impl<'a> ResultRowRef<'a> {
+    pub fn iter(&self) -> impl Iterator<Item = &'a Value<'a>> {
+        self.values.iter()
+    }
+}
+
 impl ResultRow {
     /// Take a value from a certain position in the row, if having a value in
     /// that position. Usage documentation in

@@ -15,6 +15,7 @@ mod query_arguments_ext;
 mod query_builder;
 mod query_ext;
 mod row;
+mod ser_raw;
 mod sql_trace;
 mod value;
 
