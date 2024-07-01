@@ -5,16 +5,14 @@ use serde::Deserialize;
 use std::fmt::Display;
 use tokio::time::Duration;
 
-mod actor_manager;
-mod actors;
 mod error;
-mod messages;
+mod manager;
+mod transaction;
 
 pub use error::*;
 
-pub(crate) use actor_manager::*;
-pub(crate) use actors::*;
-pub(crate) use messages::*;
+pub(crate) use manager::*;
+pub(crate) use transaction::*;
 
 /// How Interactive Transactions work
 /// The Interactive Transactions (iTx) follow an actor model design. Where each iTx is created in its own process.
@@ -76,14 +74,14 @@ impl Display for TxId {
     }
 }
 
-pub enum CachedTx<'a> {
-    Open(Box<dyn Transaction + 'a>),
+pub enum CachedTx {
+    Open(Box<dyn Transaction>),
     Committed,
     RolledBack,
     Expired,
 }
 
-impl Display for CachedTx<'_> {
+impl Display for CachedTx {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             CachedTx::Open(_) => f.write_str("Open"),
@@ -94,9 +92,9 @@ impl Display for CachedTx<'_> {
     }
 }
 
-impl<'a> CachedTx<'a> {
+impl CachedTx {
     /// Requires this cached TX to be `Open`, else an error will be raised that it is no longer valid.
-    pub(crate) fn as_open(&mut self) -> crate::Result<&mut Box<dyn Transaction + 'a>> {
+    pub(crate) fn as_open(&mut self) -> crate::Result<&mut Box<dyn Transaction>> {
         if let Self::Open(ref mut otx) = self {
             Ok(otx)
         } else {

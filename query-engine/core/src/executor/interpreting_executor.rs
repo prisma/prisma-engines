@@ -1,8 +1,9 @@
 use super::execute_operation::{execute_many_operations, execute_many_self_contained, execute_single_self_contained};
 use super::request_context;
+use crate::ITXManager;
 use crate::{
     protocol::EngineProtocol, BatchDocumentTransaction, CoreError, Operation, QueryExecutor, ResponseData,
-    TransactionActorManager, TransactionError, TransactionManager, TransactionOptions, TxId,
+    TransactionError, TransactionManager, TransactionOptions, TxId,
 };
 
 use async_trait::async_trait;
@@ -16,7 +17,7 @@ pub struct InterpretingExecutor<C> {
     /// The loaded connector
     connector: C,
 
-    itx_manager: TransactionActorManager,
+    itx_manager: ITXManager,
 
     /// Flag that forces individual operations to run in a transaction.
     /// Does _not_ force batches to use transactions.
@@ -31,7 +32,7 @@ where
         InterpretingExecutor {
             connector,
             force_transactions,
-            itx_manager: TransactionActorManager::new(),
+            itx_manager: ITXManager::new(),
         }
     }
 }
