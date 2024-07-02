@@ -74,8 +74,6 @@ impl ITXManager {
         isolation_level: Option<String>,
         timeout: Duration,
     ) -> crate::Result<()> {
-        // TODO laplab: start a background task to clear stale transactions.
-
         crosstarget_utils::task::spawn({
             let timeout_sender = self.timeout_sender.clone();
             let tx_id = tx_id.clone();
