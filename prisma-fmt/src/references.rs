@@ -81,9 +81,10 @@ fn reference_locations_for_target(ctx: ReferencesContext<'_>, target: SchemaPosi
                 .chain(find_where_used_as_field_type(&ctx, name))
                 .collect()
         }
-        SchemaPosition::DataSource(_, SourcePosition::Name(name)) => {
-            find_where_used_for_native_type(&ctx, name).collect()
-        }
+        SchemaPosition::DataSource(_, SourcePosition::Name(name)) => find_where_used_as_top_name(&ctx, name)
+            .into_iter()
+            .chain(find_where_used_for_native_type(&ctx, name))
+            .collect(),
 
         // Fields
         SchemaPosition::Model(_, ModelPosition::Field(_, FieldPosition::Type(r#type)))
@@ -217,7 +218,7 @@ fn find_where_used_as_top_name<'ast>(ctx: &'ast ReferencesContext<'_>, name: &'a
 }
 
 fn extract_ds_from_native_type(attr_name: &str) -> &str {
-    attr_name.split('.').collect::<Vec<&str>>()[0]
+    attr_name.split('.').next().unwrap_or("")
 }
 
 fn ident_to_location<'ast>(id: &'ast Identifier, ctx: &'ast ReferencesContext<'_>) -> Option<Location> {
