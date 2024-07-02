@@ -107,6 +107,14 @@ impl std::ops::Index<EnumId> for SchemaAst {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct GeneratorId(u32);
 
+impl std::ops::Index<GeneratorId> for SchemaAst {
+    type Output = GeneratorConfig;
+
+    fn index(&self, index: GeneratorId) -> &Self::Output {
+        self.tops[index.0 as usize].as_generator().unwrap()
+    }
+}
+
 /// An opaque identifier for a datasource block in a schema AST.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SourceId(u32);

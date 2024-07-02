@@ -13,7 +13,43 @@ mod validate;
 
 use log::*;
 pub use offsets::span_to_range;
+use psl::{
+    datamodel_connector::Connector, diagnostics::FileId, parser_database::ParserDatabase, Configuration, Datasource,
+    Generator,
+};
 use schema_file_input::SchemaFileInput;
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct LSPContext<'a, T> {
+    pub(crate) db: &'a ParserDatabase,
+    pub(crate) config: &'a Configuration,
+    pub(crate) initiating_file_id: FileId,
+    pub(crate) params: &'a T,
+}
+
+impl<'a, T> LSPContext<'a, T> {
+    pub(crate) fn initiating_file_source(&self) -> &str {
+        self.db.source(self.initiating_file_id)
+    }
+
+    pub(crate) fn initiating_file_uri(&self) -> &str {
+        self.db.file_name(self.initiating_file_id)
+    }
+
+    pub(crate) fn datasource(&self) -> Option<&Datasource> {
+        self.config.datasources.first()
+    }
+
+    pub(crate) fn connector(&self) -> &'static dyn Connector {
+        self.datasource()
+            .map(|ds| ds.active_connector)
+            .unwrap_or(&psl::datamodel_connector::EmptyDatamodelConnector)
+    }
+
+    pub(crate) fn generator(&self) -> Option<&'a Generator> {
+        self.config.generators.first()
+    }
+}
 
 /// The API is modelled on an LSP [completion
 /// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_completion).

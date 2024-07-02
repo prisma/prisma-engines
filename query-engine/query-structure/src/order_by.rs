@@ -99,11 +99,17 @@ impl OrderBy {
         })
     }
 
-    pub fn relevance(fields: Vec<ScalarFieldRef>, search: String, sort_order: SortOrder) -> Self {
+    pub fn relevance(
+        fields: Vec<ScalarFieldRef>,
+        search: String,
+        sort_order: SortOrder,
+        path: Vec<OrderByHop>,
+    ) -> Self {
         Self::Relevance(OrderByRelevance {
             fields,
             sort_order,
             search,
+            path,
         })
     }
 }
@@ -201,6 +207,7 @@ pub struct OrderByRelevance {
     pub fields: Vec<ScalarFieldRef>,
     pub sort_order: SortOrder,
     pub search: String,
+    pub path: Vec<OrderByHop>,
 }
 
 impl Display for SortOrder {

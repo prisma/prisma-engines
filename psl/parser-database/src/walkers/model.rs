@@ -17,7 +17,7 @@ use crate::{
 };
 
 /// A `model` declaration in the Prisma schema.
-pub type ModelWalker<'db> = super::Walker<'db, (FileId, ast::ModelId)>;
+pub type ModelWalker<'db> = super::Walker<'db, crate::ModelId>;
 
 impl<'db> ModelWalker<'db> {
     /// The name of the model.

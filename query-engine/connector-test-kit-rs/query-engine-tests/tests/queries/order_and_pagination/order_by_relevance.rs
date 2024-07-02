@@ -376,6 +376,92 @@ async fn on_many_fields_with_aggr_and_pagination(runner: Runner) -> TestResult<(
     Ok(())
 }
 
+async fn on_1m_relation_field(runner: Runner) -> TestResult<()> {
+    create_row(
+        &runner,
+        r#"{ id: 1, fieldA: "developer", fieldB: "developer developer developer", relations: { create: [{ id: 1 }] }}"#,
+    )
+    .await?;
+    create_row(
+        &runner,
+        r#"{ id: 2, fieldA: "developer developer", fieldB: "developer", relations: { create: [{ id: 2 }] }}"#,
+    )
+    .await?;
+    create_row(
+        &runner,
+        r#"{ id: 3, fieldA: "a developer", fieldB: "developer", fieldC: "developer", relations: { create: [{ id: 3 }] }}"#,
+    )
+    .await?;
+
+    // Single field required
+    insta::assert_snapshot!(
+      run_query!(&runner, r#"{ findManyRelation(orderBy: [{ testModel: { _relevance: { fields: fieldA, search: "developer", sort: desc } } }, { id: desc }]) { id } }"#),
+      @r###"{"data":{"findManyRelation":[{"id":2},{"id":3},{"id":1}]}}"###
+    );
+    insta::assert_snapshot!(
+      run_query!(&runner, r#"{ findManyRelation(orderBy: [{ testModel: { _relevance: { fields: fieldA, search: "developer", sort: asc } } }, { id: asc }]) { id } }"#),
+      @r###"{"data":{"findManyRelation":[{"id":1},{"id":3},{"id":2}]}}"###
+    );
+
+    // Single field optional
+    insta::assert_snapshot!(
+      run_query!(&runner, r#"{ findManyRelation(orderBy: [{ testModel: { _relevance: { fields: fieldC, search: "developer", sort: desc } } }, { id: desc }]) { id } }"#),
+      @r###"{"data":{"findManyRelation":[{"id":3},{"id":2},{"id":1}]}}"###
+    );
+    insta::assert_snapshot!(
+      run_query!(&runner, r#"{ findManyRelation(orderBy: [{ testModel: { _relevance: { fields: fieldC, search: "developer", sort: asc } } }, { id: asc }]) { id } }"#),
+      @r###"{"data":{"findManyRelation":[{"id":1},{"id":2},{"id":3}]}}"###
+    );
+
+    // Many fields required
+    insta::assert_snapshot!(
+      run_query!(&runner, r#"{ findManyRelation(orderBy: [{ testModel: { _relevance: { fields: [fieldA, fieldB], search: "developer", sort: desc } } }, { id: desc }]) { id } }"#),
+      @r###"{"data":{"findManyRelation":[{"id":1},{"id":2},{"id":3}]}}"###
+    );
+    insta::assert_snapshot!(
+      run_query!(&runner, r#"{ findManyRelation(orderBy: [{ testModel: { _relevance: { fields: [fieldA, fieldB], search: "developer", sort: asc } } }, { id: asc }]) { id } }"#),
+      @r###"{"data":{"findManyRelation":[{"id":3},{"id":2},{"id":1}]}}"###
+    );
+
+    // Many fields optional
+    insta::assert_snapshot!(
+      run_query!(&runner, r#"{ findManyRelation(orderBy: [{ testModel: { _relevance: { fields: [fieldB, fieldC], search: "developer", sort: desc } } }, { id: desc }]) { id } }"#),
+      @r###"{"data":{"findManyRelation":[{"id":1},{"id":3},{"id":2}]}}"###
+    );
+    insta::assert_snapshot!(
+      run_query!(&runner, r#"{ findManyRelation(orderBy: [{ testModel: { _relevance: { fields: [fieldB, fieldC], search: "developer", sort: asc } } }, { id: asc }]) { id } }"#),
+      @r###"{"data":{"findManyRelation":[{"id":2},{"id":3},{"id":1}]}}"###
+    );
+
+    // Many fields optional with cursor
+    insta::assert_snapshot!(
+      run_query!(&runner, r#"{
+        findManyRelation(
+          orderBy: {
+            testModel: { _relevance: { fields: [fieldB, fieldC], search: "developer", sort: desc } }
+          }
+          cursor: { id: 3 },
+          skip: 1
+        ) { id } }
+      "#),
+      @r###"{"data":{"findManyRelation":[{"id":2}]}}"###
+    );
+    insta::assert_snapshot!(
+      run_query!(&runner, r#"{
+        findManyRelation(
+          orderBy: {
+            testModel: { _relevance: { fields: [fieldB, fieldC], search: "developer", sort: asc } }
+          }
+          cursor: { id: 3 },
+          skip: 1
+        ) { id } }
+      "#),
+      @r###"{"data":{"findManyRelation":[{"id":1}]}}"###
+    );
+
+    Ok(())
+}
+
 async fn create_test_data(runner: &Runner) -> TestResult<()> {
     create_row(
         runner,
@@ -479,6 +565,11 @@ mod order_by_relevance_without_index {
     async fn on_many_fields_aggr_pagination(runner: Runner) -> TestResult<()> {
         super::on_many_fields_with_aggr_and_pagination(runner).await
     }
+
+    #[connector_test]
+    async fn on_1m_relation_field(runner: Runner) -> TestResult<()> {
+        super::on_1m_relation_field(runner).await
+    }
 }
 
 #[test_suite(schema(schema), capabilities(FullTextSearchWithIndex))]
@@ -560,5 +651,10 @@ mod order_by_relevance_with_index {
     #[connector_test]
     async fn on_many_fields_aggr_pagination(runner: Runner) -> TestResult<()> {
         super::on_many_fields_with_aggr_and_pagination(runner).await
+    }
+
+    #[connector_test]
+    async fn on_1m_relation_field(runner: Runner) -> TestResult<()> {
+        super::on_1m_relation_field(runner).await
     }
 }

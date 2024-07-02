@@ -53,7 +53,7 @@ pub(crate) fn get_config(params: &str) -> String {
         }
     };
 
-    let config = psl::get_config(&configuration);
+    let config = psl::get_config(&configuration, &files);
     let all_errors = diagnostics.errors().iter().chain(override_diagnostics.errors().iter());
 
     let result = GetConfigResult {
@@ -130,7 +130,7 @@ mod tests {
         });
 
         let expected = expect![[
-            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client-js"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":["prismaSchemaFolder"]}],"datasources":[],"warnings":[]},"errors":[]}"#
+            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client-js"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":["prismaSchemaFolder"],"sourceFilePath":"schema.prisma"}],"datasources":[],"warnings":[]},"errors":[]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
@@ -152,7 +152,7 @@ mod tests {
         });
 
         let expected = expect![[
-            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client-js"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":["prismaSchemaFolder"]}],"datasources":[],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:7\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 6 | \u001b[0m\n\u001b[1;94m 7 | \u001b[0m            \u001b[1;91mmodel M {\u001b[0m\n\u001b[1;94m 8 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n"}]}"#
+            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client-js"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":["prismaSchemaFolder"],"sourceFilePath":"schema.prisma"}],"datasources":[],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:7\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 6 | \u001b[0m\n\u001b[1;94m 7 | \u001b[0m            \u001b[1;91mmodel M {\u001b[0m\n\u001b[1;94m 8 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n"}]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
@@ -176,7 +176,7 @@ mod tests {
         });
 
         let expected = expect![[
-            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client-js"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":["prismaSchemaFolder"]}],"datasources":[],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating model \"M\": This field declaration is invalid. It is either missing a name or a type.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:8\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 7 | \u001b[0m            model M {\n\u001b[1;94m 8 | \u001b[0m                \u001b[1;91mfield\u001b[0m\n\u001b[1;94m 9 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n"}]}"#
+            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client-js"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":["prismaSchemaFolder"],"sourceFilePath":"schema.prisma"}],"datasources":[],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating model \"M\": This field declaration is invalid. It is either missing a name or a type.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:8\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 7 | \u001b[0m            model M {\n\u001b[1;94m 8 | \u001b[0m                \u001b[1;91mfield\u001b[0m\n\u001b[1;94m 9 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n"}]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
@@ -198,7 +198,7 @@ mod tests {
         });
 
         let expected = expect![[
-            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client-js"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":["prismaSchemaFolder"]}],"datasources":[],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:7\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 6 | \u001b[0m\n\u001b[1;94m 7 | \u001b[0m            \u001b[1;91mdatasource D {\u001b[0m\n\u001b[1;94m 8 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n"}]}"#
+            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client-js"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":["prismaSchemaFolder"],"sourceFilePath":"schema.prisma"}],"datasources":[],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:7\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 6 | \u001b[0m\n\u001b[1;94m 7 | \u001b[0m            \u001b[1;91mdatasource D {\u001b[0m\n\u001b[1;94m 8 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n"}]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
@@ -228,7 +228,7 @@ mod tests {
         });
 
         let expected = expect![[
-            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client-js"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":["prismaSchemaFolder"]}],"datasources":[{"name":"db","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":null,"value":"postgresql://example.com/db"},"schemas":[]}],"warnings":[]},"errors":[]}"#
+            r#"{"config":{"generators":[{"name":"js","provider":{"fromEnvVar":null,"value":"prisma-client-js"},"output":null,"config":{},"binaryTargets":[],"previewFeatures":["prismaSchemaFolder"],"sourceFilePath":"generator.prisma"}],"datasources":[{"name":"db","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":null,"value":"postgresql://example.com/db"},"schemas":[],"sourceFilePath":"datasource.prisma"}],"warnings":[]},"errors":[]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
@@ -247,7 +247,7 @@ mod tests {
             "prismaSchema": schema,
         });
         let expected = expect![[
-            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST","value":null},"schemas":[]}],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mEnvironment variable not found: NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:4\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 3 | \u001b[0m                provider = \"postgresql\"\n\u001b[1;94m 4 | \u001b[0m                url = \u001b[1;91menv(\"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n"}]}"#
+            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST","value":null},"schemas":[],"sourceFilePath":"schema.prisma"}],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mEnvironment variable not found: NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:4\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 3 | \u001b[0m                provider = \"postgresql\"\n\u001b[1;94m 4 | \u001b[0m                url = \u001b[1;91menv(\"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n"}]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
@@ -267,7 +267,7 @@ mod tests {
             "ignoreEnvVarErrors": true,
         });
         let expected = expect![[
-            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST","value":null},"schemas":[]}],"warnings":[]},"errors":[]}"#
+            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST","value":null},"schemas":[],"sourceFilePath":"schema.prisma"}],"warnings":[]},"errors":[]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
@@ -289,7 +289,7 @@ mod tests {
             }
         });
         let expected = expect![[
-            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":"postgresql://example.com/mydb"},"schemas":[]}],"warnings":[]},"errors":[]}"#
+            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":"postgresql://example.com/mydb"},"schemas":[],"sourceFilePath":"schema.prisma"}],"warnings":[]},"errors":[]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
@@ -312,7 +312,7 @@ mod tests {
             }
         });
         let expected = expect![[
-            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":"postgresql://example.com/mydb"},"directUrl":{"fromEnvVar":null,"value":"postgresql://example.com/direct"},"schemas":[]}],"warnings":[]},"errors":[]}"#
+            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":"postgresql://example.com/mydb"},"directUrl":{"fromEnvVar":null,"value":"postgresql://example.com/direct"},"schemas":[],"sourceFilePath":"schema.prisma"}],"warnings":[]},"errors":[]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
@@ -336,7 +336,7 @@ mod tests {
             }
         });
         let expected = expect![[
-            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":"postgresql://example.com/mydb"},"directUrl":{"fromEnvVar":"DBDIRURL","value":"postgresql://example.com/direct"},"schemas":[]}],"warnings":[]},"errors":[]}"#
+            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":"postgresql://example.com/mydb"},"directUrl":{"fromEnvVar":"DBDIRURL","value":"postgresql://example.com/direct"},"schemas":[],"sourceFilePath":"schema.prisma"}],"warnings":[]},"errors":[]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
@@ -359,7 +359,7 @@ mod tests {
             }
         });
         let expected = expect![[
-            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":null},"directUrl":{"fromEnvVar":null,"value":""},"schemas":[]}],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating datasource `thedb`: You must provide a nonempty direct URL\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                directUrl = \u001b[1;91m\"\"\u001b[0m\n\u001b[1;94m   | \u001b[0m\n"}]}"#
+            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":null},"directUrl":{"fromEnvVar":null,"value":""},"schemas":[],"sourceFilePath":"schema.prisma"}],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating datasource `thedb`: You must provide a nonempty direct URL\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                directUrl = \u001b[1;91m\"\"\u001b[0m\n\u001b[1;94m   | \u001b[0m\n"}]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
@@ -382,7 +382,7 @@ mod tests {
             }
         });
         let expected = expect![[
-            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":null},"directUrl":{"fromEnvVar":"DOES_NOT_EXIST","value":null},"schemas":[]}],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mEnvironment variable not found: DOES_NOT_EXIST.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                directUrl = \u001b[1;91menv(\"DOES_NOT_EXIST\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n"}]}"#
+            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":null},"directUrl":{"fromEnvVar":"DOES_NOT_EXIST","value":null},"schemas":[],"sourceFilePath":"schema.prisma"}],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mEnvironment variable not found: DOES_NOT_EXIST.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                directUrl = \u001b[1;91menv(\"DOES_NOT_EXIST\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n"}]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);
@@ -406,7 +406,7 @@ mod tests {
             }
         });
         let expected = expect![[
-            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":null},"directUrl":{"fromEnvVar":"DOES_NOT_EXIST","value":null},"schemas":[]}],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating datasource `thedb`: You must provide a nonempty direct URL. The environment variable `DOES_NOT_EXIST` resolved to an empty string.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                directUrl = \u001b[1;91menv(\"DOES_NOT_EXIST\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n"}]}"#
+            r#"{"config":{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":null},"directUrl":{"fromEnvVar":"DOES_NOT_EXIST","value":null},"schemas":[],"sourceFilePath":"schema.prisma"}],"warnings":[]},"errors":[{"file_name":"schema.prisma","message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating datasource `thedb`: You must provide a nonempty direct URL. The environment variable `DOES_NOT_EXIST` resolved to an empty string.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                directUrl = \u001b[1;91menv(\"DOES_NOT_EXIST\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n"}]}"#
         ]];
         let response = get_config(&request.to_string());
         expected.assert_eq(&response);

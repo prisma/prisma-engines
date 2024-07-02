@@ -145,6 +145,13 @@ impl FieldType {
         }
     }
 
+    pub fn name(&self) -> &str {
+        match self {
+            FieldType::Supported(supported) => &supported.name,
+            FieldType::Unsupported(name, _) => name,
+        }
+    }
+
     pub fn as_unsupported(&self) -> Option<(&str, &Span)> {
         match self {
             FieldType::Unsupported(name, span) => Some((name, span)),

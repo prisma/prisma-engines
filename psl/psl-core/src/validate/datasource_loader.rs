@@ -1,5 +1,5 @@
 use crate::{
-    ast::{self, SourceConfig, Span},
+    ast::{self, SourceConfig, Span, WithName},
     configuration::StringFromEnvVar,
     datamodel_connector::RelationMode,
     diagnostics::{DatamodelError, Diagnostics},
@@ -40,7 +40,7 @@ pub(crate) fn load_datasources_from_ast(
         for src in ast_schema.sources() {
             diagnostics.push_error(DatamodelError::new_source_validation_error(
                 "You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.",
-                &src.name.name,
+                src.name(),
                 src.span,
             ));
         }
@@ -54,15 +54,15 @@ fn lift_datasource(
     diagnostics: &mut Diagnostics,
     connectors: crate::ConnectorRegistry<'_>,
 ) -> Option<Datasource> {
-    let source_name = ast_source.name.name.as_str();
+    let source_name = ast_source.name();
     let mut args: HashMap<_, (_, &Expression)> = ast_source
         .properties
         .iter()
         .map(|arg| match &arg.value {
-            Some(expr) => Some((arg.name.name.as_str(), (arg.span, expr))),
+            Some(expr) => Some((arg.name(), (arg.span, expr))),
             None => {
                 diagnostics.push_error(DatamodelError::new_config_property_missing_value_error(
-                    &arg.name.name,
+                    arg.name(),
                     source_name,
                     "datasource",
                     ast_source.span,
