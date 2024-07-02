@@ -1,8 +1,9 @@
 use super::execute_operation::{execute_many_operations, execute_many_self_contained, execute_single_self_contained};
 use super::request_context;
+use crate::ITXManager;
 use crate::{
     protocol::EngineProtocol, BatchDocumentTransaction, CoreError, Operation, QueryExecutor, ResponseData,
-    TransactionActorManager, TransactionError, TransactionManager, TransactionOptions, TxId,
+    TransactionError, TransactionManager, TransactionOptions, TxId,
 };
 
 use async_trait::async_trait;
@@ -16,7 +17,7 @@ pub struct InterpretingExecutor<C> {
     /// The loaded connector
     connector: C,
 
-    itx_manager: TransactionActorManager,
+    itx_manager: ITXManager,
 
     /// Flag that forces individual operations to run in a transaction.
     /// Does _not_ force batches to use transactions.
@@ -31,7 +32,7 @@ where
         InterpretingExecutor {
             connector,
             force_transactions,
-            itx_manager: TransactionActorManager::new(),
+            itx_manager: ITXManager::new(),
         }
     }
 }
@@ -51,11 +52,10 @@ where
         trace_id: Option<String>,
         engine_protocol: EngineProtocol,
     ) -> crate::Result<ResponseData> {
-        // If a Tx id is provided, execute on that one. Else execute normally as a single operation.
-        if let Some(tx_id) = tx_id {
-            self.itx_manager.execute(&tx_id, operation, trace_id).await
-        } else {
-            request_context::with_request_context(engine_protocol, async move {
+        request_context::with_request_context(engine_protocol, async move {
+            if let Some(tx_id) = tx_id {
+                self.itx_manager.execute(&tx_id, operation, trace_id).await
+            } else {
                 execute_single_self_contained(
                     &self.connector,
                     query_schema,
@@ -64,9 +64,9 @@ where
                     self.force_transactions,
                 )
                 .await
-            })
-            .await
-        }
+            }
+        })
+        .await
     }
 
     /// Executes a batch of operations.
@@ -90,38 +90,35 @@ where
         trace_id: Option<String>,
         engine_protocol: EngineProtocol,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
-        if let Some(tx_id) = tx_id {
-            let batch_isolation_level = transaction.and_then(|t| t.isolation_level());
-            if batch_isolation_level.is_some() {
-                return Err(CoreError::UnsupportedFeatureError(
-                    "Can not set batch isolation level within interactive transaction".into(),
-                ));
-            }
-            self.itx_manager.batch_execute(&tx_id, operations, trace_id).await
-        } else if let Some(transaction) = transaction {
-            let conn_span = info_span!(
-                "prisma:engine:connection",
-                user_facing = true,
-                "db.type" = self.connector.name(),
-            );
-            let mut conn = self.connector.get_connection().instrument(conn_span).await?;
-            let mut tx = conn.start_transaction(transaction.isolation_level()).await?;
+        request_context::with_request_context(engine_protocol, async move {
+            if let Some(tx_id) = tx_id {
+                let batch_isolation_level = transaction.and_then(|t| t.isolation_level());
+                if batch_isolation_level.is_some() {
+                    return Err(CoreError::UnsupportedFeatureError(
+                        "Can not set batch isolation level within interactive transaction".into(),
+                    ));
+                }
+                self.itx_manager.batch_execute(&tx_id, operations, trace_id).await
+            } else if let Some(transaction) = transaction {
+                let conn_span = info_span!(
+                    "prisma:engine:connection",
+                    user_facing = true,
+                    "db.type" = self.connector.name(),
+                );
+                let mut conn = self.connector.get_connection().instrument(conn_span).await?;
+                let mut tx = conn.start_transaction(transaction.isolation_level()).await?;
 
-            let results = request_context::with_request_context(
-                engine_protocol,
-                execute_many_operations(query_schema, tx.as_connection_like(), &operations, trace_id),
-            )
-            .await;
+                let results =
+                    execute_many_operations(query_schema, tx.as_connection_like(), &operations, trace_id).await;
 
-            if results.is_err() {
-                tx.rollback().await?;
+                if results.is_err() {
+                    tx.rollback().await?;
+                } else {
+                    tx.commit().await?;
+                }
+
+                results
             } else {
-                tx.commit().await?;
-            }
-
-            results
-        } else {
-            request_context::with_request_context(engine_protocol, async move {
                 execute_many_self_contained(
                     &self.connector,
                     query_schema,
@@ -131,9 +128,9 @@ where
                     engine_protocol,
                 )
                 .await
-            })
-            .await
-        }
+            }
+        })
+        .await
     }
 
     fn primary_connector(&self) -> &(dyn Connector + Send + Sync) {
@@ -180,7 +177,6 @@ where
                     conn,
                     isolation_level,
                     Duration::from_millis(valid_for_millis),
-                    engine_protocol,
                 )
                 .await?;
 
