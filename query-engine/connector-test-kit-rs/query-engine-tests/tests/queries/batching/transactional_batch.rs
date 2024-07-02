@@ -22,6 +22,12 @@ mod transactional {
                 model ModelC {
                     #id(id, Int, @id)
                 }
+
+                model User {
+                    #id(id, Int, @id)
+                    email      String    @unique
+                    name       String    @unique
+                }
             "#
         };
 
@@ -39,6 +45,29 @@ mod transactional {
         insta::assert_snapshot!(
             batch_results.to_string(),
             @r###"{"batchResult":[{"data":{"createOneModelA":{"id":1}}},{"data":{"createOneModelA":{"id":2}}}]}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test()]
+    async fn two_query_for_batch(runner: Runner) -> TestResult<()> {
+        let queries = vec![
+            r#"mutation { createOneUser(data: { id: 1, email: "test@test.com", name: "page" }) { id } }"#.to_string(),
+        ];
+
+        runner.batch(queries, true, None).await?;
+
+        let queries2 = vec![
+            r#"query { findUniqueUser(where: { email: "test@test.com" }) { id } }"#.to_string(),
+            r#"query { findUniqueUser(where: { name: "test" }) { id } }"#.to_string(),
+        ];
+
+        let batch_results = runner.batch(queries2, true, None).await?;
+
+        insta::assert_snapshot!(
+            batch_results.to_string(),
+            @r###"{"batchResult":[{"data":{"findUniqueUser":{"id":1}}},{"data":{"findUniqueUser":null}}]}"###
         );
 
         Ok(())
