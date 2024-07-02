@@ -52,6 +52,8 @@ where
         trace_id: Option<String>,
         engine_protocol: EngineProtocol,
     ) -> crate::Result<ResponseData> {
+        // TODO laplab: use `with_request_context` for all `TransactionManager` operations.
+
         // If a Tx id is provided, execute on that one. Else execute normally as a single operation.
         if let Some(tx_id) = tx_id {
             self.itx_manager.execute(&tx_id, operation, trace_id).await
@@ -181,7 +183,6 @@ where
                     conn,
                     isolation_level,
                     Duration::from_millis(valid_for_millis),
-                    engine_protocol,
                 )
                 .await?;
 
