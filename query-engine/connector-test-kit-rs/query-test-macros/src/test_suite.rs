@@ -1,9 +1,8 @@
 use crate::{attr_map::NestedAttrMap, ConnectorTestArgs};
-use darling::{FromMeta, ToTokens};
+use darling::{FromMeta, ToTokens, ast::NestedMeta};
 use proc_macro::TokenStream;
-use quote::quote;
 use std::collections::hash_map::Entry;
-use syn::{parse_macro_input, parse_quote, AttributeArgs, Item, ItemMod, Meta, NestedMeta};
+use syn::{parse_macro_input, parse_quote, Attribute, Item, ItemMod, Meta};
 
 /// What does this do?
 /// Test attributes (like `schema(handler)`, `only`, ...) can be defined on the test (`connector_test`) or on the module.
@@ -37,7 +36,10 @@ use syn::{parse_macro_input, parse_quote, AttributeArgs, Item, ItemMod, Meta, Ne
 /// A notable expansion is that the name of the test mod is added as `suite = <name>` to the tests.
 pub fn test_suite_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     // Validate input by simply parsing it, which will point out invalid fields and connector names etc.
-    let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
+    let attributes_meta: Vec<NestedMeta> = match NestedMeta::parse_meta_list(attr.into()) {
+        Ok(v) => v,
+        Err(e) => { return TokenStream::from(darling::Error::from(e).write_errors()); }
+    };
     let args = ConnectorTestArgs::from_list(&attributes_meta);
     let args = match args {
         Ok(args) => args,
@@ -54,7 +56,7 @@ pub fn test_suite_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     let mut module_attrs = NestedAttrMap::from(&attributes_meta);
 
     let suite_meta: Meta = parse_quote! { suite = #module_name };
-    let suite_nested_meta = NestedMeta::from(suite_meta);
+    let suite_nested_meta = NestedMeta::Meta(suite_meta);
 
     if let Entry::Vacant(entry) = module_attrs.entry("suite".to_owned()) {
         entry.insert(suite_nested_meta);
@@ -66,26 +68,27 @@ pub fn test_suite_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
         for item in items {
             if let syn::Item::Fn(ref mut f) = item {
                 // Check if the function is marked as `connector_test` or `relation_link_test`.
-                if let Some(ref mut attr) = f.attrs.iter_mut().find(|attr| match attr.path.get_ident() {
+                if let Some(ref mut attr) = f.attrs.iter_mut().find(|attr| match attr.path().get_ident() {
                     Some(ident) => &ident.to_string() == "connector_test" || &ident.to_string() == "relation_link_test",
                     None => false,
                 }) {
-                    let meta = attr.parse_meta().expect("Invalid attribute meta.");
-                    let fn_attrs = match meta {
+                    let fn_attrs = match &attr.meta {
                         // `connector_test` attribute has no futher attributes.
                         Meta::Path(_) => NestedAttrMap::default(),
 
                         // `connector_test` attribute has a list of attributes.
-                        Meta::List(l) => NestedAttrMap::from(&l.nested.clone().into_iter().collect::<Vec<_>>()),
+                        Meta::List(l) => NestedAttrMap::from(&darling::export::NestedMeta::parse_meta_list(l.tokens.clone()).expect("Failed to parse list!").into_iter().collect::<Vec<_>>()),
 
                         // Not supported
                         Meta::NameValue(_) => unimplemented!("Unexpected NameValue list for function attribute."),
                     };
 
                     let final_attrs = fn_attrs.merge(&module_attrs);
-
-                    // Replace attr.tokens
-                    attr.tokens = quote! { (#final_attrs) };
+                    
+                    // Parse final_tokens and turn them into a new attribute, then replace the old one.
+                    let new_attr: Attribute = parse_quote! { #[connector_test(#final_attrs)] };
+                    
+                    **attr = new_attr;
                 }
             }
         }

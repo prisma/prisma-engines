@@ -3,11 +3,15 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use proc_macro2::{Delimiter, TokenTree};
 use quote::quote;
-use syn::{parse_macro_input, AttributeArgs, Lit, LitStr, Meta, MetaList, MetaNameValue, NestedMeta, Signature};
+use darling::ast::NestedMeta;
+use syn::{Expr, Lit, LitStr, Meta, MetaList, MetaNameValue, ExprLit, Signature};
 
 #[proc_macro_attribute]
 pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
-    let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
+    let attributes_meta: Vec<NestedMeta> = match NestedMeta::parse_meta_list(attr.into()) {
+        Ok(v) => v,
+        Err(e) => { return TokenStream::from(darling::Error::from(e).write_errors()); }
+    };
     let input = proc_macro2::TokenStream::from(input);
 
     // First the attributes
@@ -21,9 +25,9 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
                 }
             }
             NestedMeta::Meta(Meta::NameValue(MetaNameValue {
-                lit: Lit::Str(litstr),
                 eq_token: _,
                 path,
+                value: Expr::Lit(ExprLit { lit: Lit::Str(litstr), .. }),
             })) if path.is_ident("ignore") => attrs.ignore_reason = Some(litstr),
             other => {
                 return syn::Error::new_spanned(other, "Unexpected argument")
@@ -127,14 +131,16 @@ struct TestConnectorAttrs {
 
 impl TestConnectorAttrs {
     fn ingest_meta_list(&mut self, list: MetaList) -> Result<(), syn::Error> {
+        let nested = NestedMeta::parse_meta_list(list.tokens)?;
+
         let target: &mut Vec<_> = match list.path {
             p if p.is_ident("tags") => &mut self.include_tagged,
             p if p.is_ident("exclude") => &mut self.exclude_tagged,
             p if p.is_ident("capabilities") => &mut self.capabilities,
             p if p.is_ident("preview_features") => {
-                self.preview_features.reserve(list.nested.len());
+                self.preview_features.reserve(nested.len());
 
-                for item in list.nested {
+                for item in nested {
                     match item {
                         NestedMeta::Lit(Lit::Str(s)) => self.preview_features.push(s),
                         other => return Err(syn::Error::new_spanned(other, "Unexpected argument")),
@@ -144,9 +150,9 @@ impl TestConnectorAttrs {
                 return Ok(());
             }
             p if p.is_ident("namespaces") => {
-                self.namespaces.reserve(list.nested.len());
+                self.namespaces.reserve(nested.len());
 
-                for item in list.nested {
+                for item in nested {
                     match item {
                         NestedMeta::Lit(Lit::Str(s)) => self.namespaces.push(s),
                         other => return Err(syn::Error::new_spanned(other, "Unexpected argument")),
@@ -158,9 +164,9 @@ impl TestConnectorAttrs {
             other => return Err(syn::Error::new_spanned(other, "Unexpected argument")),
         };
 
-        target.reserve(list.nested.len());
+        target.reserve(nested.len());
 
-        for item in list.nested {
+        for item in nested {
             match item {
                 NestedMeta::Meta(Meta::Path(p)) if p.get_ident().is_some() => {
                     target.push(p);

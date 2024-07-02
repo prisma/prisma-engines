@@ -100,7 +100,7 @@ impl<'a> UserErrorDeriveInput<'a> {
 
         for attr in &input.attrs {
             if !attr
-                .path
+                .path()
                 .get_ident()
                 .map(|ident| ident == "user_facing")
                 .unwrap_or(false)
@@ -111,8 +111,8 @@ impl<'a> UserErrorDeriveInput<'a> {
             for namevalue in attr.parse_args_with(|stream: &'_ syn::parse::ParseBuffer| {
                 syn::punctuated::Punctuated::<syn::MetaNameValue, syn::Token![,]>::parse_terminated(stream)
             })? {
-                let litstr = match namevalue.lit {
-                    syn::Lit::Str(litstr) => litstr,
+                let litstr = match namevalue.value {
+                    syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(litstr), .. }) => litstr,
                     other => {
                         return Err(syn::Error::new_spanned(
                             other,
