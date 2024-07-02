@@ -4,7 +4,7 @@ use std::pin::Pin;
 
 use super::CachedTx;
 use crate::{
-    execute_many_operations, execute_single_operation, get_current_dispatcher, Operation, ResponseData,
+    execute_many_operations, execute_single_operation, get_current_dispatcher, ClosedTx, Operation, ResponseData,
     TransactionError, TxId,
 };
 use connector::{Connection, Transaction};
@@ -63,6 +63,10 @@ impl TransactionState {
 
     pub fn set_rolled_back(&mut self) {
         self.cached_tx = CachedTx::RolledBack;
+    }
+
+    pub(crate) fn to_closed(&self, start_time: ElapsedTimeCounter, timeout: Duration) -> Option<ClosedTx> {
+        self.cached_tx.to_closed(start_time, timeout)
     }
 }
 
@@ -202,6 +206,10 @@ impl InteractiveTransaction {
         }
 
         Ok(())
+    }
+
+    pub(crate) fn to_closed(&self) -> Option<ClosedTx> {
+        self.state.to_closed(self.start_time, self.timeout)
     }
 
     pub(crate) fn name(&self) -> String {

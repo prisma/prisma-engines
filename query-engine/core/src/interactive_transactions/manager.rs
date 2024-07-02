@@ -3,8 +3,14 @@ use connector::Connection;
 use lru::LruCache;
 use once_cell::sync::Lazy;
 use schema::QuerySchemaRef;
-use std::collections::HashMap;
-use tokio::{sync::RwLock, time::Duration};
+use std::{collections::HashMap, sync::Arc};
+use tokio::{
+    sync::{
+        mpsc::{unbounded_channel, UnboundedSender},
+        RwLock,
+    },
+    time::Duration,
+};
 
 use super::{TransactionError, TxId};
 
@@ -14,18 +20,49 @@ pub static CLOSED_TX_CACHE_SIZE: Lazy<usize> = Lazy::new(|| match std::env::var(
 });
 
 pub struct ITXManager {
-    transactions: RwLock<HashMap<TxId, InteractiveTransaction>>,
+    transactions: Arc<RwLock<HashMap<TxId, InteractiveTransaction>>>,
 
     /// Cache of closed transactions. We keep the last N closed transactions in memory to
     /// return better error messages if operations are performed on closed transactions.
-    closed_txs: RwLock<LruCache<TxId, Option<ClosedTx>>>,
+    closed_txs: Arc<RwLock<LruCache<TxId, ClosedTx>>>,
+
+    timeout_sender: UnboundedSender<TxId>,
 }
 
 impl ITXManager {
     pub fn new() -> Self {
+        let transactions = Arc::new(RwLock::new(HashMap::default()));
+        let closed_txs = Arc::new(RwLock::new(LruCache::new(*CLOSED_TX_CACHE_SIZE)));
+        let (timeout_sender, mut timeout_receiver) = unbounded_channel();
+
+        crosstarget_utils::task::spawn({
+            let transactions = transactions.clone();
+            let closed_txs = closed_txs.clone();
+            async move {
+                while let Some(tx_id) = timeout_receiver.recv().await {
+                    let mut transactions = transactions.write().await;
+                    let closed_tx = {
+                        let transaction: &mut InteractiveTransaction =
+                            transactions.get_mut(&tx_id).expect("invalid tx_id");
+
+                        // If transaction was already committed, rollback will be ignored.
+                        let _ = transaction.rollback(true).await;
+
+                        transaction
+                            .to_closed()
+                            .expect("transaction must be closed after rollback")
+                    };
+
+                    transactions.remove(&tx_id);
+                    closed_txs.write().await.put(tx_id, closed_tx);
+                }
+            }
+        });
+
         Self {
-            transactions: Default::default(),
-            closed_txs: RwLock::new(LruCache::new(*CLOSED_TX_CACHE_SIZE)),
+            transactions,
+            closed_txs,
+            timeout_sender,
         }
     }
 
@@ -39,6 +76,15 @@ impl ITXManager {
     ) -> crate::Result<()> {
         // TODO laplab: start a background task to clear stale transactions.
 
+        crosstarget_utils::task::spawn({
+            let timeout_sender = self.timeout_sender.clone();
+            let tx_id = tx_id.clone();
+            async move {
+                crosstarget_utils::time::sleep(timeout).await;
+                timeout_sender.send(tx_id).expect("receiver must exist");
+            }
+        });
+
         let transaction =
             InteractiveTransaction::new(tx_id.clone(), conn, timeout, query_schema, isolation_level).await?;
 
@@ -50,13 +96,13 @@ impl ITXManager {
         if let Some(closed_tx) = self.closed_txs.read().await.peek(tx_id) {
             TransactionError::Closed {
                 reason: match closed_tx {
-                    Some(ClosedTx::Committed) => {
+                    ClosedTx::Committed => {
                         format!("A {from_operation} cannot be executed on a committed transaction")
                     }
-                    Some(ClosedTx::RolledBack) => {
+                    ClosedTx::RolledBack => {
                         format!("A {from_operation} cannot be executed on a transaction that was rolled back")
                     }
-                    Some(ClosedTx::Expired { start_time, timeout }) => {
+                    ClosedTx::Expired { start_time, timeout } => {
                         format!(
                             "A {from_operation} cannot be executed on an expired transaction. \
                              The timeout for this transaction was {} ms, however {} ms passed since the start \
@@ -65,10 +111,6 @@ impl ITXManager {
                             timeout.as_millis(),
                             start_time.elapsed_time().as_millis(),
                         )
-                    }
-                    None => {
-                        error!("[{tx_id}] no details about closed transaction");
-                        format!("A {from_operation} cannot be executed on a closed transaction")
                     }
                 },
             }
