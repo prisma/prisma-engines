@@ -87,7 +87,6 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
         .unwrap_or_else(|| ctx.connector().default_relation_mode());
 
     let find_at_position = ctx.db.ast(ctx.initiating_file_id).find_at_position(position);
-    info!("cursor position: {:?}", find_at_position);
 
     fn push_referential_action(completion_list: &mut CompletionList, referential_action: ReferentialAction) {
         completion_list.items.push(CompletionItem {
