@@ -68,6 +68,13 @@ impl Argument {
     pub fn is_unnamed(&self) -> bool {
         self.name.is_none()
     }
+
+    pub fn name(&self) -> Option<&str> {
+        match &self.name {
+            Some(ident) => Some(ident.name.as_str()),
+            None => None,
+        }
+    }
 }
 
 impl WithSpan for Argument {

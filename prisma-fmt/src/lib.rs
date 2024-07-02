@@ -7,6 +7,7 @@ mod merge_schemas;
 mod native;
 mod offsets;
 mod preview;
+mod references;
 mod schema_file_input;
 mod text_document_completion;
 mod validate;
@@ -84,11 +85,28 @@ pub fn code_actions(schema_files: String, params: &str) -> String {
 
     let Ok(input) = serde_json::from_str::<SchemaFileInput>(&schema_files) else {
         warn!("Failed to parse schema file input");
-        return serde_json::to_string(&text_document_completion::empty_completion_list()).unwrap();
+        return serde_json::to_string(&code_actions::empty_code_actions()).unwrap();
     };
 
     let actions = code_actions::available_actions(input.into(), params);
     serde_json::to_string(&actions).unwrap()
+}
+
+pub fn references(schema_files: String, params: &str) -> String {
+    let params: lsp_types::ReferenceParams = if let Ok(params) = serde_json::from_str(params) {
+        params
+    } else {
+        warn!("Failed to parse params to references() as ReferenceParams.");
+        return serde_json::to_string(&references::empty_references()).unwrap();
+    };
+
+    let Ok(input) = serde_json::from_str::<SchemaFileInput>(&schema_files) else {
+        warn!("Failed to parse schema file input");
+        return serde_json::to_string(&references::empty_references()).unwrap();
+    };
+
+    let references = references::references(input.into(), params);
+    serde_json::to_string(&references).unwrap()
 }
 
 /// The two parameters are:

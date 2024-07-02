@@ -1,6 +1,6 @@
 use crate::ast::{self};
 
-use super::{WithName, WithSpan};
+use super::{AttributePosition, WithName, WithSpan};
 
 /// In a scalar field.
 #[derive(Debug)]
@@ -33,7 +33,8 @@ pub enum FieldPosition<'ast> {
     ///     field Float
     /// }
     /// ```
-    Attribute(&'ast str, usize, Option<&'ast str>),
+    // Attribute(&'ast str, usize, Option<&'ast str>),
+    Attribute(&'ast str, usize, AttributePosition<'ast>),
 }
 
 impl<'ast> FieldPosition<'ast> {
@@ -50,32 +51,7 @@ impl<'ast> FieldPosition<'ast> {
             if attr.span().contains(position) {
                 // We can't go by Span::contains() because we also care about the empty space
                 // between arguments and that's hard to capture in the pest grammar.
-                let mut spans: Vec<(Option<&str>, ast::Span)> = attr
-                    .arguments
-                    .iter()
-                    .map(|arg| (arg.name.as_ref().map(|n| n.name.as_str()), arg.span()))
-                    .chain(
-                        attr.arguments
-                            .empty_arguments
-                            .iter()
-                            .map(|arg| (Some(arg.name.name.as_str()), arg.name.span())),
-                    )
-                    .collect();
-                spans.sort_by_key(|(_, span)| span.start);
-                let mut arg_name = None;
-
-                for (name, _) in spans.iter().take_while(|(_, span)| span.start < position) {
-                    arg_name = Some(*name);
-                }
-
-                // If the cursor is after a trailing comma, we're not in an argument.
-                if let Some(span) = attr.arguments.trailing_comma {
-                    if position > span.start {
-                        arg_name = None;
-                    }
-                }
-
-                return FieldPosition::Attribute(attr.name(), attr_idx, arg_name.flatten());
+                return FieldPosition::Attribute(attr.name(), attr_idx, AttributePosition::new(attr, position));
             }
         }
 

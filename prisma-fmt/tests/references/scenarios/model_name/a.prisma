@@ -1,0 +1,16 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["prismaSchemaFolder", "views"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User<|>Two {
+id String @id @map("_id") @db.String
+
+posts  Post   @relation(fields: [postId], references: [id])
+postId String
+}

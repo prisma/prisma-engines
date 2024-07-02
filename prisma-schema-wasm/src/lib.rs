@@ -86,7 +86,7 @@ pub fn preview_features() -> String {
 }
 
 /// The API is modelled on an LSP [completion
-/// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_completion).
+/// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#completion-request-leftwards_arrow_with_hook).
 /// Input and output are both JSON, the request being a `CompletionParams` object and the response
 /// being a `CompletionList` object.
 #[wasm_bindgen]
@@ -96,7 +96,7 @@ pub fn text_document_completion(schema_files: String, params: String) -> String 
 }
 
 /// This API is modelled on an LSP [code action
-/// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_codeAction=).
+/// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#code-action-request-leftwards_arrow_with_hook).
 /// Input and output are both JSON, the request being a
 /// `CodeActionParams` object and the response being a list of
 /// `CodeActionOrCommand` objects.
@@ -104,6 +104,17 @@ pub fn text_document_completion(schema_files: String, params: String) -> String 
 pub fn code_actions(schema: String, params: String) -> String {
     register_panic_hook();
     prisma_fmt::code_actions(schema, &params)
+}
+
+/// This API is modelled on an LSP [references
+/// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#find-references-request-leftwards_arrow_with_hook).
+/// Input and output are both JSON, the request being a
+/// `CodeActionParams` object and the response being a list of
+/// `CodeActionOrCommand` objects.
+#[wasm_bindgen]
+pub fn references(schema: String, params: String) -> String {
+    register_panic_hook();
+    prisma_fmt::references(schema, &params)
 }
 
 /// Trigger a panic inside the wasm module. This is only useful in development for testing panic

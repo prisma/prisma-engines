@@ -495,7 +495,7 @@ impl Connector for PostgresDatamodelConnector {
                 ast::ModelPosition::ModelAttribute(
                     "index",
                     attr_id,
-                    ast::AttributePosition::FunctionArgument(field_name, "ops"),
+                    ast::AttributePosition::FunctionArgument(field_name, "ops", _),
                 ),
             ) => {
                 // let's not care about composite field indices yet
