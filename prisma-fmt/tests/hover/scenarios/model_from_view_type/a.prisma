@@ -1,8 +1,6 @@
-view UserView {
-    id String @id
-
-    postId String
-    posts  Po<|>st   @relation(fields: [postId], references: [id])
-
-    @@map("hi")
+/// This is doc for A
+model ModelNameA {
+    id  Int        @id
+    bId Int
+    val ModelNameB @relation(fields: [bId], references: [id])
 }

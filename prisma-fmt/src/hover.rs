@@ -3,7 +3,7 @@ use lsp_types::{Hover, HoverContents, HoverParams, MarkupContent, MarkupKind};
 use psl::{
     error_tolerant_parse_configuration,
     parser_database::{walkers::Walker, ParserDatabase, RelationFieldId},
-    schema_ast::ast::{self, Field, FieldPosition, WithName},
+    schema_ast::ast::{self, Field, FieldPosition, Model, ModelPosition, WithDocumentation, WithName},
     Diagnostics, SourceFile,
 };
 
@@ -30,6 +30,7 @@ pub fn run(schema_files: Vec<(String, SourceFile)>, params: HoverParams) -> Opti
 
     let Some(initiating_file_id) = db.file_id(params.text_document_position_params.text_document.uri.as_str()) else {
         warn!("Initiating file name is not found in the schema");
+        dbg!("Initiating file name is not found in the schema");
         return None;
     };
 
@@ -48,7 +49,7 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
     let position = match ctx.position() {
         Some(pos) => pos,
         None => {
-            warn!("Received a position outside of the document boundaries in CompletionParams");
+            warn!("Received a position outside of the document boundaries in HoverParams");
             return None;
         }
     };
@@ -56,85 +57,49 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
     let ast = ctx.db.ast(ctx.initiating_file_id);
     let contents = match ast.find_at_position(position) {
         psl::schema_ast::ast::SchemaPosition::TopLevel => None,
-        psl::schema_ast::ast::SchemaPosition::Model(model_id, model_position) => {
-            let Some(model) = ctx
-                .db
-                .walk_models()
-                .chain(ctx.db.walk_views())
-                .find(|model| model.id.1 == model_id)
-            else {
-                warn!("This shouldn't be possible");
+        psl::schema_ast::ast::SchemaPosition::Model(model_id, ModelPosition::Name(name)) => {
+            let walker = ctx.db.walk((ctx.initiating_file_id, model_id));
+            let model = walker.ast_model();
+            let variant = if model.is_view() { "view" } else { "model" };
+
+            Some(format_hover_content(
+                model.documentation().unwrap_or(""),
+                variant,
+                name,
+                None,
+            ))
+        }
+
+        psl::schema_ast::ast::SchemaPosition::Model(
+            model_id,
+            ModelPosition::Field(field_id, FieldPosition::Type(name)),
+        ) => {
+            let initiating_model = &ctx.db.ast(ctx.initiating_file_id)[model_id];
+            let initiating_field = &initiating_model[field_id];
+
+            let Some(target_top) = ctx.db.find_top(name).map(|top| top.ast_top()) else {
+                warn!("Couldn't find a block called {}", name);
                 return None;
             };
 
-            let (name, relation) = match model_position {
-                ast::ModelPosition::Name(name) => (name, None),
-                ast::ModelPosition::Field(_, FieldPosition::Type(name)) => {
-                    let target_model = ctx.db.walk_models().chain(ctx.db.walk_views()).find_map(|model| {
-                        if model.ast_model().name() == name {
-                            Some(model.ast_model())
-                        } else {
-                            None
-                        }
-                    });
-
-                    let Some(target_model) = target_model else {
-                        warn!("Could not find model with name: {:?}", name);
-                        return None;
-                    };
-
-                    let relation_kind = ctx.db.walk_relations().find_map(|relation| {
-                        let [referencing_model, referenced_model] = relation.models();
-
-                        relation
-                            .models()
-                            .iter()
-                            .for_each(|(fid, mid)| info!("{}", &ctx.db.ast(*fid)[*mid].name()));
-
-                        let referencing_name = ctx.db.ast(referencing_model.0)[referencing_model.1].name();
-                        let referenced_name = ctx.db.ast(referenced_model.0)[referenced_model.1].name();
-
-                        info!(
-                            "referencing from: {} referenced: {}, target name: {}",
-                            referencing_name,
-                            referenced_name,
-                            target_model.name()
-                        );
-
-                        let self_relation = if relation.is_self_relation() { " on self" } else { " " };
-                        let relation_kind = format!("{}{}", relation.relation_kind(), self_relation);
-                        dbg!(&relation_kind);
-
-                        let field = if referencing_name == model.ast_model().name()
-                            && referenced_name == target_model.name()
-                        {
-                            relation.relation_fields().collect::<Vec<Walker<RelationFieldId>>>()[1]
-                        } else if referencing_name == target_model.name() && referenced_name == model.ast_model().name()
-                        {
-                            relation.relation_fields().collect::<Vec<Walker<RelationFieldId>>>()[0]
-                        } else {
-                            return None;
-                        };
-
-                        Some((relation_kind, field.ast_field()))
-                    });
-
-                    (name, relation_kind)
+            let relation_info = match target_top.get_type() {
+                "model" | "view" => {
+                    let target_model = target_top.as_model().unwrap();
+                    get_relation_info(&ctx, initiating_model, target_model, initiating_field)
                 }
-                _ => ("", None),
+                _ => None,
             };
 
-            let top = ctx.db.find_top(name).map(|top| top.ast_top());
-
-            let (variant, doc) = match top {
-                Some(top) => {
-                    let doc = top.documentation().unwrap_or("");
-                    (top.get_type(), doc)
-                }
-                None => ("", ""),
-            };
-
-            Some(format_hover_content(doc, variant, name, relation))
+            Some(format_hover_content(
+                target_top.documentation().unwrap_or(""),
+                target_top.get_type(),
+                name,
+                relation_info,
+            ))
+        }
+        ast::SchemaPosition::Model(_, model_position) => {
+            info!("We are here {:?}", model_position);
+            None
         }
         psl::schema_ast::ast::SchemaPosition::CompositeType(_composite_id, composite_positon) => {
             info!("We are here: {:?}", composite_positon);
@@ -155,6 +120,57 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
     };
 
     contents.map(|contents| Hover { contents, range: None })
+}
+
+fn get_relation_info<'a>(
+    ctx: &'a LSPContext<'a, HoverParams>,
+    model: &Model,
+    target_model: &'a ast::Model,
+    field: &'a Field,
+) -> Option<(String, &'a Field)> {
+    ctx.db.walk_relations().find_map(|relation| {
+        let [referencing_model, referenced_model] = relation.models();
+        let fields = relation.relation_fields().collect::<Vec<Walker<RelationFieldId>>>();
+
+        let referencing_name = ctx.db.ast(referencing_model.0)[referencing_model.1].name();
+        let referenced_name = ctx.db.ast(referenced_model.0)[referenced_model.1].name();
+
+        dbg!("referenced from {}; referencing {}", model.name(), target_model.name());
+        dbg!("referenced from {}; referencing {}", referencing_name, referenced_name);
+
+        let self_relation = if relation.is_self_relation() { " on self" } else { " " };
+        let relation_kind = format!("{}{}", relation.relation_kind(), self_relation);
+
+        let field = if referencing_name == model.name() && referenced_name == target_model.name() {
+            if relation.is_self_relation() && fields[1].ast_field().name() == field.name() {
+                fields[0]
+            } else {
+                fields[1]
+            }
+            // * (@druue) Flipped for one-to-many relations when accessing from the block that has the many relation.
+            // ```
+            // model ModelNameA {
+            //    id  Int        @id
+            //    bId Int
+            //    val ModelNameB @relation(fields: [bId], references: [id])
+            // }
+            //
+            // model ModelNameB {
+            //   id Int          @id
+            //   A  ModelNameA[]
+            //      ^^^^^^^^^^ // When accessing from here
+            // }
+            // ```
+            // * I have no idea why.
+        } else if referencing_name == target_model.name() && referenced_name == model.name() {
+            fields[0]
+        } else {
+            warn!("couldn't find relation");
+            return None;
+        };
+
+        Some((relation_kind, field.ast_field()))
+    })
 }
 
 fn format_hover_content(

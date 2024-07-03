@@ -1,9 +1,9 @@
-generator client {
+generator js {
     provider        = "prisma-client-js"
-    previewFeatures = ["prismaSchemaFolder", "views", "fullTextIndex"]
+    previewFeatures = ["views", "prismaSchemaFolder"]
 }
 
 datasource db {
-    provider = "mysql"
+    provider = "postgres"
     url      = env("DATABASE_URL")
 }
