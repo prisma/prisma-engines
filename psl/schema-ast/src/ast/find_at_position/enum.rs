@@ -79,7 +79,9 @@ pub enum EnumValuePosition<'ast> {
 
 impl<'ast> EnumValuePosition<'ast> {
     fn new(value: &'ast ast::EnumValue, position: usize) -> EnumValuePosition<'ast> {
-        if value.name.span().contains(position) {}
+        if value.name.span().contains(position) {
+            return EnumValuePosition::Name(value.name());
+        }
         for (attr_idx, attr) in value.attributes.iter().enumerate() {
             if attr.span().contains(position) {
                 // We can't go by Span::contains() because we also care about the empty space
