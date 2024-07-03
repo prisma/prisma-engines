@@ -1,5 +1,5 @@
 /// This is doc for B
-model ModelNameB {
+view ModelNameB {
     id Int @id
     A  ModelNa<|>meA[]
 }

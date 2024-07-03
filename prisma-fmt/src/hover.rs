@@ -30,7 +30,6 @@ pub fn run(schema_files: Vec<(String, SourceFile)>, params: HoverParams) -> Opti
 
     let Some(initiating_file_id) = db.file_id(params.text_document_position_params.text_document.uri.as_str()) else {
         warn!("Initiating file name is not found in the schema");
-        dbg!("Initiating file name is not found in the schema");
         return None;
     };
 
@@ -134,9 +133,6 @@ fn get_relation_info<'a>(
 
         let referencing_name = ctx.db.ast(referencing_model.0)[referencing_model.1].name();
         let referenced_name = ctx.db.ast(referenced_model.0)[referenced_model.1].name();
-
-        dbg!("referenced from {}; referencing {}", model.name(), target_model.name());
-        dbg!("referenced from {}; referencing {}", referencing_name, referenced_name);
 
         let self_relation = if relation.is_self_relation() { " on self" } else { " " };
         let relation_kind = format!("{}{}", relation.relation_kind(), self_relation);
