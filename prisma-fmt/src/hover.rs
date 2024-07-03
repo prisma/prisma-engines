@@ -1,4 +1,4 @@
-use log::info;
+use log::{info, warn};
 use lsp_types::{Hover, HoverContents, HoverParams, MarkupContent, MarkupKind};
 use psl::{
     error_tolerant_parse_configuration,
@@ -20,7 +20,7 @@ impl<'a> HoverContext<'a> {
     }
 }
 
-pub fn run(schema_files: Vec<(String, SourceFile)>, params: HoverParams) -> Hover {
+pub fn run(schema_files: Vec<(String, SourceFile)>, params: HoverParams) -> Option<Hover> {
     let (_, config, _) = error_tolerant_parse_configuration(&schema_files);
 
     let db = {
@@ -29,8 +29,8 @@ pub fn run(schema_files: Vec<(String, SourceFile)>, params: HoverParams) -> Hove
     };
 
     let Some(initiating_file_id) = db.file_id(params.text_document_position_params.text_document.uri.as_str()) else {
-        info!("Initiating file name is not found in the schema");
-        panic!("Initiating file name is not found in the schema");
+        warn!("Initiating file name is not found in the schema");
+        return None;
     };
 
     let ctx = HoverContext {
@@ -43,29 +43,25 @@ pub fn run(schema_files: Vec<(String, SourceFile)>, params: HoverParams) -> Hove
     hover(ctx)
 }
 
-fn hover(ctx: HoverContext<'_>) -> Hover {
+fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
+    info!("Calling Hover");
     let position = match ctx.position() {
         Some(pos) => pos,
         None => {
-            info!("Received a position outside of the document boundaries in CompletionParams");
-            panic!("Received a position outside of the document boundaries in CompletionParams")
+            warn!("Received a position outside of the document boundaries in CompletionParams");
+            return None;
         }
     };
 
     let ast = ctx.db.ast(ctx.initiating_file_id);
     let contents = match ast.find_at_position(position) {
-        psl::schema_ast::ast::SchemaPosition::TopLevel => format_hover_content("", "", ""),
+        psl::schema_ast::ast::SchemaPosition::TopLevel => None,
         psl::schema_ast::ast::SchemaPosition::Model(_model_id, model_position) => {
-            info!("We're inside a model");
-            info!("We are here: {:?}", model_position);
-
             let name = match model_position {
                 ast::ModelPosition::Name(name) => name,
                 ast::ModelPosition::Field(_, FieldPosition::Type(name)) => name,
                 _ => "",
             };
-
-            info!("{}", name);
 
             let top = ctx.db.walk_tops().find_map(|top| {
                 if top.ast_top().name() == name {
@@ -75,8 +71,6 @@ fn hover(ctx: HoverContext<'_>) -> Hover {
                 }
             });
 
-            info!("{:?}", top);
-
             let (variant, doc) = match top {
                 Some(top) => {
                     let doc = top.documentation().unwrap_or("");
@@ -85,31 +79,30 @@ fn hover(ctx: HoverContext<'_>) -> Hover {
                 None => ("", ""),
             };
 
-            format_hover_content(doc, variant, name)
+            Some(format_hover_content(doc, variant, name))
         }
         psl::schema_ast::ast::SchemaPosition::CompositeType(_composite_id, composite_positon) => {
             info!("We are here: {:?}", composite_positon);
-            no_hover()
+            None
         }
         psl::schema_ast::ast::SchemaPosition::Enum(_enum_id, enum_position) => {
             info!("We are here: {:?}", enum_position);
-            no_hover()
+            None
         }
         psl::schema_ast::ast::SchemaPosition::DataSource(_ds_id, source_position) => {
             info!("We are here: {:?}", source_position);
-            no_hover()
+            None
         }
         psl::schema_ast::ast::SchemaPosition::Generator(_gen_id, gen_position) => {
             info!("We are here: {:?}", gen_position);
-            no_hover()
+            None
         }
     };
 
-    Hover { contents, range: None }
-}
-
-fn no_hover() -> HoverContents {
-    format_hover_content("", "", "")
+    match contents {
+        Some(contents) => Some(Hover { contents, range: None }),
+        None => None,
+    }
 }
 
 fn format_hover_content(documentation: &str, variant: &str, top_name: &str) -> HoverContents {
