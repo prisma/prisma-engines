@@ -30,7 +30,7 @@ impl<'db> ModelWalker<'db> {
         self.id.0
     }
 
-    /// Returns a specific field from the model.
+    /// Returns the specific field from the model.
     pub fn field(&self, field_id: ast::FieldId) -> FieldWalker<'db> {
         self.walk((self.id, field_id))
     }
