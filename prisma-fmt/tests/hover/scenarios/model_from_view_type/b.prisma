@@ -1,6 +1,5 @@
-model Post {
-    id String @id
-
-    authorId String
-    user     UserView[]
+/// This is doc for B
+model ModelNameB {
+    id Int @id
+    A  ModelNa<|>meA[]
 }
