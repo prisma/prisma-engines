@@ -12,6 +12,8 @@ macro_rules! scenarios {
 }
 
 scenarios! {
+    composite_from_field_type
+    enum_from_field_type
     model_from_block_name
     model_from_view_type
     one_to_many_self_relation
