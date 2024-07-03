@@ -195,6 +195,10 @@ impl Relation {
         matches!(self.attributes, RelationAttributes::ImplicitManyToMany { .. })
     }
 
+    pub(crate) fn is_two_way_embedded_many_to_many(&self) -> bool {
+        matches!(self.attributes, RelationAttributes::TwoWayEmbeddedManyToMany { .. })
+    }
+
     pub(crate) fn as_complete_fields(&self) -> Option<(RelationFieldId, RelationFieldId)> {
         match &self.attributes {
             RelationAttributes::ImplicitManyToMany { field_a, field_b } => Some((*field_a, *field_b)),
@@ -205,10 +209,6 @@ impl Relation {
             }
             _ => None,
         }
-    }
-
-    pub(crate) fn is_two_way_embedded_many_to_many(&self) -> bool {
-        matches!(self.attributes, RelationAttributes::TwoWayEmbeddedManyToMany { .. })
     }
 }
 

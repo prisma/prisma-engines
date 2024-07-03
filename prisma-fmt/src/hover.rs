@@ -2,8 +2,8 @@ use log::{info, warn};
 use lsp_types::{Hover, HoverContents, HoverParams, MarkupContent, MarkupKind};
 use psl::{
     error_tolerant_parse_configuration,
-    parser_database::ParserDatabase,
-    schema_ast::ast::{self, FieldPosition},
+    parser_database::{walkers::Walker, ParserDatabase, RelationFieldId},
+    schema_ast::ast::{self, Field, FieldPosition, WithName},
     Diagnostics, SourceFile,
 };
 
@@ -56,11 +56,72 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
     let ast = ctx.db.ast(ctx.initiating_file_id);
     let contents = match ast.find_at_position(position) {
         psl::schema_ast::ast::SchemaPosition::TopLevel => None,
-        psl::schema_ast::ast::SchemaPosition::Model(_model_id, model_position) => {
-            let name = match model_position {
-                ast::ModelPosition::Name(name) => name,
-                ast::ModelPosition::Field(_, FieldPosition::Type(name)) => name,
-                _ => "",
+        psl::schema_ast::ast::SchemaPosition::Model(model_id, model_position) => {
+            let Some(model) = ctx
+                .db
+                .walk_models()
+                .chain(ctx.db.walk_views())
+                .find(|model| model.id.1 == model_id)
+            else {
+                warn!("This shouldn't be possible");
+                return None;
+            };
+
+            let (name, relation) = match model_position {
+                ast::ModelPosition::Name(name) => (name, None),
+                ast::ModelPosition::Field(_, FieldPosition::Type(name)) => {
+                    let target_model = ctx.db.walk_models().chain(ctx.db.walk_views()).find_map(|model| {
+                        if model.ast_model().name() == name {
+                            Some(model.ast_model())
+                        } else {
+                            None
+                        }
+                    });
+
+                    let Some(target_model) = target_model else {
+                        warn!("Could not find model with name: {:?}", name);
+                        return None;
+                    };
+
+                    let relation_kind = ctx.db.walk_relations().find_map(|relation| {
+                        let [referencing_model, referenced_model] = relation.models();
+
+                        relation
+                            .models()
+                            .iter()
+                            .for_each(|(fid, mid)| info!("{}", &ctx.db.ast(*fid)[*mid].name()));
+
+                        let referencing_name = ctx.db.ast(referencing_model.0)[referencing_model.1].name();
+                        let referenced_name = ctx.db.ast(referenced_model.0)[referenced_model.1].name();
+
+                        info!(
+                            "referencing from: {} referenced: {}, target name: {}",
+                            referencing_name,
+                            referenced_name,
+                            target_model.name()
+                        );
+
+                        let self_relation = if relation.is_self_relation() { " on self" } else { " " };
+                        let relation_kind = format!("{}{}", relation.relation_kind(), self_relation);
+                        dbg!(&relation_kind);
+
+                        let field = if referencing_name == model.ast_model().name()
+                            && referenced_name == target_model.name()
+                        {
+                            relation.relation_fields().collect::<Vec<Walker<RelationFieldId>>>()[1]
+                        } else if referencing_name == target_model.name() && referenced_name == model.ast_model().name()
+                        {
+                            relation.relation_fields().collect::<Vec<Walker<RelationFieldId>>>()[0]
+                        } else {
+                            return None;
+                        };
+
+                        Some((relation_kind, field.ast_field()))
+                    });
+
+                    (name, relation_kind)
+                }
+                _ => ("", None),
             };
 
             let top = ctx.db.walk_tops().find_map(|top| {
@@ -79,7 +140,7 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
                 None => ("", ""),
             };
 
-            Some(format_hover_content(doc, variant, name))
+            Some(format_hover_content(doc, variant, name, relation))
         }
         psl::schema_ast::ast::SchemaPosition::CompositeType(_composite_id, composite_positon) => {
             info!("We are here: {:?}", composite_positon);
@@ -105,11 +166,19 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
     }
 }
 
-fn format_hover_content(documentation: &str, variant: &str, top_name: &str) -> HoverContents {
+fn format_hover_content(
+    documentation: &str,
+    variant: &str,
+    top_name: &str,
+    relation: Option<(String, &Field)>,
+) -> HoverContents {
     let fancy_line_break = String::from("\n___\n");
+    let (field, relation_kind) = relation.map_or((Default::default(), Default::default()), |(rk, field)| {
+        (format!("\n\t...\n\t{field}\n"), format!("{rk}{fancy_line_break}"))
+    });
     let prisma_display = match variant {
         "model" | "enum" | "view" | "composite type" => {
-            format!("```prisma\n{variant} {top_name} {{}}\n```{fancy_line_break}")
+            format!("```prisma\n{variant} {top_name} {{{field}}}\n```{fancy_line_break}{relation_kind}")
         }
         _ => "".to_owned(),
     };

@@ -1,0 +1,8 @@
+view UserView {
+    id String @id
+
+    postId String
+    posts  Po<|>st   @relation(fields: [postId], references: [id])
+
+    @@map("hi")
+}
