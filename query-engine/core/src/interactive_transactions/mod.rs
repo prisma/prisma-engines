@@ -78,37 +78,32 @@ pub enum CachedTx {
     Open(Box<dyn Transaction>),
     Committed,
     RolledBack,
-    Expired,
-}
-
-impl Display for CachedTx {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            CachedTx::Open(_) => f.write_str("Open"),
-            CachedTx::Committed => f.write_str("Committed"),
-            CachedTx::RolledBack => f.write_str("Rolled back"),
-            CachedTx::Expired => f.write_str("Expired"),
-        }
-    }
+    Expired {
+        start_time: ElapsedTimeCounter,
+        timeout: Duration,
+    },
 }
 
 impl CachedTx {
     /// Requires this cached TX to be `Open`, else an error will be raised that it is no longer valid.
-    pub(crate) fn as_open(&mut self) -> crate::Result<&mut Box<dyn Transaction>> {
-        if let Self::Open(ref mut otx) = self {
-            Ok(otx)
-        } else {
-            let reason = format!("Transaction is no longer valid. Last state: '{self}'");
-            Err(CoreError::from(TransactionError::Closed { reason }))
+    pub(crate) fn as_open(&mut self, from_operation: &str) -> crate::Result<&mut Box<dyn Transaction>> {
+        match self {
+            CachedTx::Open(tx) => Ok(tx),
+            tx @ _ => Err(CoreError::from(TransactionError::Closed {
+                reason: tx.to_closed().unwrap().error_message_for(from_operation),
+            })),
         }
     }
 
-    pub(crate) fn to_closed(&self, start_time: ElapsedTimeCounter, timeout: Duration) -> Option<ClosedTx> {
+    pub(crate) fn to_closed(&self) -> Option<ClosedTx> {
         match self {
             CachedTx::Open(_) => None,
             CachedTx::Committed => Some(ClosedTx::Committed),
             CachedTx::RolledBack => Some(ClosedTx::RolledBack),
-            CachedTx::Expired => Some(ClosedTx::Expired { start_time, timeout }),
+            CachedTx::Expired { start_time, timeout } => Some(ClosedTx::Expired {
+                start_time: *start_time,
+                timeout: *timeout,
+            }),
         }
     }
 }
@@ -120,4 +115,27 @@ pub(crate) enum ClosedTx {
         start_time: ElapsedTimeCounter,
         timeout: Duration,
     },
+}
+
+impl ClosedTx {
+    pub fn error_message_for(&self, operation: &str) -> String {
+        match self {
+            ClosedTx::Committed => {
+                format!("A {operation} cannot be executed on a committed transaction")
+            }
+            ClosedTx::RolledBack => {
+                format!("A {operation} cannot be executed on a transaction that was rolled back")
+            }
+            ClosedTx::Expired { start_time, timeout } => {
+                format!(
+                    "A {operation} cannot be executed on an expired transaction. \
+                     The timeout for this transaction was {} ms, however {} ms passed since the start \
+                     of the transaction. Consider increasing the interactive transaction timeout \
+                     or doing less work in the transaction",
+                    timeout.as_millis(),
+                    start_time.elapsed_time().as_millis(),
+                )
+            }
+        }
+    }
 }
