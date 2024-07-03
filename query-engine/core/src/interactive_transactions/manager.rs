@@ -45,7 +45,7 @@ impl ITXManager {
                         let transaction: &mut InteractiveTransaction =
                             transactions.get_mut(&tx_id).expect("invalid tx_id");
 
-                        // If transaction was already committed, rollback will be ignored.
+                        // If transaction was already committed, rollback will error.
                         let _ = transaction.rollback(true).await;
 
                         transaction
@@ -93,24 +93,7 @@ impl ITXManager {
     async fn transaction_absent(&self, tx_id: &TxId, from_operation: &str) -> CoreError {
         if let Some(closed_tx) = self.closed_txs.read().await.peek(tx_id) {
             TransactionError::Closed {
-                reason: match closed_tx {
-                    ClosedTx::Committed => {
-                        format!("A {from_operation} cannot be executed on a committed transaction")
-                    }
-                    ClosedTx::RolledBack => {
-                        format!("A {from_operation} cannot be executed on a transaction that was rolled back")
-                    }
-                    ClosedTx::Expired { start_time, timeout } => {
-                        format!(
-                            "A {from_operation} cannot be executed on an expired transaction. \
-                             The timeout for this transaction was {} ms, however {} ms passed since the start \
-                             of the transaction. Consider increasing the interactive transaction timeout \
-                             or doing less work in the transaction",
-                            timeout.as_millis(),
-                            start_time.elapsed_time().as_millis(),
-                        )
-                    }
-                },
+                reason: closed_tx.error_message_for(from_operation),
             }
             .into()
         } else {

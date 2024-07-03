@@ -28,7 +28,7 @@ impl TransactionState {
     pub fn new(conn: Box<dyn Connection + Send + Sync>) -> Self {
         Self {
             conn: Box::into_pin(conn),
-            cached_tx: CachedTx::Expired,
+            cached_tx: CachedTx::RolledBack,
         }
     }
 
@@ -49,24 +49,24 @@ impl TransactionState {
         Ok(())
     }
 
-    pub fn as_open(&mut self) -> crate::Result<&mut Box<dyn Transaction>> {
-        self.cached_tx.as_open()
+    pub fn as_open(&mut self, from_operation: &str) -> crate::Result<&mut Box<dyn Transaction>> {
+        self.cached_tx.as_open(from_operation)
     }
 
     pub fn set_committed(&mut self) {
         self.cached_tx = CachedTx::Committed;
     }
 
-    pub fn set_expired(&mut self) {
-        self.cached_tx = CachedTx::Expired;
+    pub fn set_expired(&mut self, start_time: ElapsedTimeCounter, timeout: Duration) {
+        self.cached_tx = CachedTx::Expired { start_time, timeout };
     }
 
     pub fn set_rolled_back(&mut self) {
         self.cached_tx = CachedTx::RolledBack;
     }
 
-    pub(crate) fn to_closed(&self, start_time: ElapsedTimeCounter, timeout: Duration) -> Option<ClosedTx> {
-        self.cached_tx.to_closed(start_time, timeout)
+    pub(crate) fn to_closed(&self) -> Option<ClosedTx> {
+        self.cached_tx.to_closed()
     }
 }
 
@@ -137,7 +137,7 @@ impl InteractiveTransaction {
         let span = info_span!(parent: &self.span, "prisma:engine:itx_execute_single", user_facing = true);
         #[cfg(feature = "metrics")]
         set_span_link_from_traceparent(&span, traceparent.clone());
-        let conn = self.state.as_open()?;
+        let conn = self.state.as_open("query")?;
 
         tx_timeout!(
             self,
@@ -161,7 +161,7 @@ impl InteractiveTransaction {
             let span = info_span!(parent: &self.span, "prisma:engine:itx_execute_batch", user_facing = true);
             #[cfg(feature = "metrics")]
             set_span_link_from_traceparent(&span, traceparent.clone());
-            let conn = self.state.as_open()?;
+            let conn = self.state.as_open("batch query")?;
             execute_many_operations(
                 self.query_schema.clone(),
                 conn.as_connection_like(),
@@ -176,40 +176,38 @@ impl InteractiveTransaction {
 
     pub(crate) async fn commit(&mut self) -> crate::Result<()> {
         tx_timeout!(self, async {
-            if let Ok(open_tx) = self.state.as_open() {
-                let span = info_span!(parent: &self.span, "prisma:engine:itx_commit", user_facing = true);
-                open_tx
-                    .commit()
-                    .instrument(span)
-                    .with_subscriber(self.dispatcher.clone())
-                    .await?;
-                self.state.set_committed();
-            }
+            let open_tx = self.state.as_open("commit")?;
+            let span = info_span!(parent: &self.span, "prisma:engine:itx_commit", user_facing = true);
+            open_tx
+                .commit()
+                .instrument(span)
+                .with_subscriber(self.dispatcher.clone())
+                .await?;
+            self.state.set_committed();
             Ok(())
         })
     }
 
     pub(crate) async fn rollback(&mut self, was_timeout: bool) -> crate::Result<()> {
         debug!("[{}] rolling back, was timed out = {was_timeout}", self.name());
-        if let Ok(open_tx) = self.state.as_open() {
-            let span = info_span!(parent: &self.span, "prisma:engine:itx_rollback", user_facing = true);
-            open_tx
-                .rollback()
-                .instrument(span)
-                .with_subscriber(self.dispatcher.clone())
-                .await?;
-            if was_timeout {
-                self.state.set_expired();
-            } else {
-                self.state.set_rolled_back();
-            }
+        let open_tx = self.state.as_open("rollback")?;
+        let span = info_span!(parent: &self.span, "prisma:engine:itx_rollback", user_facing = true);
+        open_tx
+            .rollback()
+            .instrument(span)
+            .with_subscriber(self.dispatcher.clone())
+            .await?;
+        if was_timeout {
+            self.state.set_expired(self.start_time, self.timeout);
+        } else {
+            self.state.set_rolled_back();
         }
 
         Ok(())
     }
 
     pub(crate) fn to_closed(&self) -> Option<ClosedTx> {
-        self.state.to_closed(self.start_time, self.timeout)
+        self.state.to_closed()
     }
 
     pub(crate) fn name(&self) -> String {
