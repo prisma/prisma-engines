@@ -2,8 +2,11 @@ use log::{info, warn};
 use lsp_types::{Hover, HoverContents, HoverParams, MarkupContent, MarkupKind};
 use psl::{
     error_tolerant_parse_configuration,
-    parser_database::ParserDatabase,
-    schema_ast::ast::{self, Field, FieldPosition, ModelPosition, WithDocumentation, WithName},
+    parser_database::{walkers, ParserDatabase, ScalarFieldType},
+    schema_ast::ast::{
+        self, CompositeTypePosition, EnumPosition, EnumValuePosition, Field, FieldPosition, ModelPosition,
+        SchemaPosition, WithDocumentation, WithName,
+    },
     Diagnostics, SourceFile,
 };
 
@@ -55,12 +58,12 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
     };
 
     let ast = ctx.db.ast(ctx.initiating_file_id);
-    let contents = match dbg!(ast.find_at_position(position)) {
-        psl::schema_ast::ast::SchemaPosition::TopLevel => None,
+    let contents = match ast.find_at_position(position) {
+        SchemaPosition::TopLevel => None,
 
-        psl::schema_ast::ast::SchemaPosition::Model(model_id, ModelPosition::Name(name)) => {
-            let walker = ctx.db.walk((ctx.initiating_file_id, model_id));
-            let model = walker.ast_model();
+        // --- Block Names ---
+        SchemaPosition::Model(model_id, ModelPosition::Name(name)) => {
+            let model = ctx.db.walk((ctx.initiating_file_id, model_id)).ast_model();
             let variant = if model.is_view() { "view" } else { "model" };
 
             Some(format_hover_content(
@@ -70,37 +73,59 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
                 None,
             ))
         }
+        SchemaPosition::Enum(enum_id, EnumPosition::Name(name)) => {
+            let enm = ctx.db.walk((ctx.initiating_file_id, enum_id)).ast_enum();
+            Some(hover_enum(enm, name))
+        }
+        SchemaPosition::CompositeType(ct_id, CompositeTypePosition::Name(name)) => {
+            let ct = ctx.db.walk((ctx.initiating_file_id, ct_id)).ast_composite_type();
+            Some(hover_composite(ct, name))
+        }
 
-        psl::schema_ast::ast::SchemaPosition::Model(
-            model_id,
-            ModelPosition::Field(field_id, FieldPosition::Type(name)),
-        ) => {
+        // --- Block Field Names ---
+        SchemaPosition::Model(model_id, ModelPosition::Field(field_id, FieldPosition::Name(name))) => {
+            let field = ctx
+                .db
+                .walk((ctx.initiating_file_id, model_id))
+                .field(field_id)
+                .ast_field();
+
+            Some(format_hover_content(
+                field.documentation().unwrap_or_default(),
+                "field",
+                name,
+                None,
+            ))
+        }
+        SchemaPosition::CompositeType(ct_id, CompositeTypePosition::Field(field_id, FieldPosition::Name(name))) => {
+            let field = ctx.db.walk((ctx.initiating_file_id, ct_id)).field(field_id).ast_field();
+
+            Some(format_hover_content(
+                field.documentation().unwrap_or_default(),
+                "field",
+                name,
+                None,
+            ))
+        }
+
+        // --- Block Field Types ---
+        SchemaPosition::Model(model_id, ModelPosition::Field(field_id, FieldPosition::Type(name))) => {
             let initiating_field = &ctx.db.walk((ctx.initiating_file_id, model_id)).field(field_id);
 
             match initiating_field.refine() {
-                psl::parser_database::walkers::RefinedFieldWalker::Scalar(scalar) => match scalar.scalar_field_type() {
-                    psl::parser_database::ScalarFieldType::CompositeType(_) => {
-                        let ct = scalar.field_type_as_composite_type().unwrap();
-                        Some(format_hover_content(
-                            ct.ast_composite_type().documentation().unwrap_or_default(),
-                            "type",
-                            ct.ast_composite_type().name(),
-                            None,
-                        ))
+                walkers::RefinedFieldWalker::Scalar(scalar) => match scalar.scalar_field_type() {
+                    ScalarFieldType::CompositeType(_) => {
+                        let ct = scalar.field_type_as_composite_type().unwrap().ast_composite_type();
+                        Some(hover_composite(ct, ct.name()))
                     }
-                    psl::parser_database::ScalarFieldType::Enum(_) => {
-                        let enm = scalar.field_type_as_enum().unwrap();
-                        Some(format_hover_content(
-                            enm.ast_enum().documentation().unwrap_or_default(),
-                            "enum",
-                            enm.ast_enum().name(),
-                            None,
-                        ))
+                    ScalarFieldType::Enum(_) => {
+                        let enm = scalar.field_type_as_enum().unwrap().ast_enum();
+                        Some(hover_enum(enm, enm.name()))
                     }
                     _ => None,
                 },
 
-                psl::parser_database::walkers::RefinedFieldWalker::Relation(rf) => {
+                walkers::RefinedFieldWalker::Relation(rf) => {
                     let relation = rf.relation();
                     let opposite_model = rf.related_model();
                     let opposite_field = rf.opposite_relation_field().unwrap().ast_field();
@@ -121,35 +146,39 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
                 }
             }
         }
-        ast::SchemaPosition::Model(_, model_position) => {
-            info!("We are here {:?}", model_position);
-            None
+
+        SchemaPosition::CompositeType(ct_id, CompositeTypePosition::Field(field_id, FieldPosition::Type(_))) => {
+            let field = &ctx.db.walk((ctx.initiating_file_id, ct_id)).field(field_id);
+            match field.r#type() {
+                psl::parser_database::ScalarFieldType::CompositeType(_) => {
+                    let ct = field.field_type_as_composite_type().unwrap().ast_composite_type();
+                    Some(hover_composite(ct, ct.name()))
+                }
+                psl::parser_database::ScalarFieldType::Enum(_) => {
+                    let enm = field.field_type_as_enum().unwrap().ast_enum();
+                    Some(hover_enum(enm, enm.name()))
+                }
+                _ => None,
+            }
         }
-        psl::schema_ast::ast::SchemaPosition::CompositeType(_composite_id, composite_positon) => {
-            info!("We are here: {:?}", composite_positon);
-            None
-        }
-        psl::schema_ast::ast::SchemaPosition::Enum(_enum_id, enum_position) => {
-            info!("We are here: {:?}", enum_position);
-            None
-        }
-        psl::schema_ast::ast::SchemaPosition::DataSource(_ds_id, source_position) => {
-            info!("We are here: {:?}", source_position);
-            None
-        }
-        psl::schema_ast::ast::SchemaPosition::Generator(_gen_id, gen_position) => {
-            info!("We are here: {:?}", gen_position);
-            None
-        }
+        _ => None,
     };
 
     contents.map(|contents| Hover { contents, range: None })
 }
 
+fn hover_enum(enm: &ast::Enum, name: &str) -> HoverContents {
+    format_hover_content(enm.documentation().unwrap_or_default(), "enum", name, None)
+}
+
+fn hover_composite(ct: &ast::CompositeType, name: &str) -> HoverContents {
+    format_hover_content(ct.documentation().unwrap_or_default(), "type", name, None)
+}
+
 fn format_hover_content(
     documentation: &str,
     variant: &str,
-    top_name: &str,
+    name: &str,
     relation: Option<(String, &Field)>,
 ) -> HoverContents {
     let fancy_line_break = String::from("\n___\n");
@@ -158,8 +187,9 @@ fn format_hover_content(
     });
     let prisma_display = match variant {
         "model" | "enum" | "view" | "type" => {
-            format!("```prisma\n{variant} {top_name} {{{field}}}\n```{fancy_line_break}{relation_kind}")
+            format!("```prisma\n{variant} {name} {{{field}}}\n```{fancy_line_break}{relation_kind}")
         }
+        "field" => format!("```prisma\n{name}\n```{fancy_line_break}"),
         _ => "".to_owned(),
     };
     let full_signature = format!("{prisma_display}{documentation}");
