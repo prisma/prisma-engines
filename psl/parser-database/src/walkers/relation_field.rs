@@ -162,6 +162,11 @@ impl<'db> RelationFieldWalker<'db> {
             .as_ref()
             .map(move |fields| fields.iter().map(move |field_id| self.db.walk(*field_id)))
     }
+
+    /// relation_kind doc
+    pub fn relation_kind(self) -> &'db str {
+        self.relation().relation_kind()
+    }
 }
 
 /// The relation name.

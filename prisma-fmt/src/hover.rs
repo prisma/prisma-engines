@@ -2,8 +2,8 @@ use log::{info, warn};
 use lsp_types::{Hover, HoverContents, HoverParams, MarkupContent, MarkupKind};
 use psl::{
     error_tolerant_parse_configuration,
-    parser_database::{walkers::Walker, ParserDatabase, RelationFieldId},
-    schema_ast::ast::{self, Field, FieldPosition, Model, ModelPosition, WithDocumentation, WithName},
+    parser_database::ParserDatabase,
+    schema_ast::ast::{self, Field, FieldPosition, ModelPosition, WithDocumentation},
     Diagnostics, SourceFile,
 };
 
@@ -73,28 +73,30 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
             model_id,
             ModelPosition::Field(field_id, FieldPosition::Type(name)),
         ) => {
-            let initiating_model = &ctx.db.ast(ctx.initiating_file_id)[model_id];
-            let initiating_field = &initiating_model[field_id];
+            let initiating_field = &ctx.db.walk((ctx.initiating_file_id, model_id)).field(field_id);
 
-            let Some(target_top) = ctx.db.find_top(name).map(|top| top.ast_top()) else {
-                warn!("Couldn't find a block called {}", name);
-                return None;
-            };
+            match initiating_field.refine() {
+                psl::parser_database::walkers::RefinedFieldWalker::Scalar(_) => None,
+                psl::parser_database::walkers::RefinedFieldWalker::Relation(rf) => {
+                    let relation = rf.relation();
+                    let opposite_model = rf.related_model();
+                    let opposite_field = rf.opposite_relation_field().unwrap().ast_field();
+                    let related_model_type = if opposite_model.ast_model().is_view() {
+                        "view"
+                    } else {
+                        "model"
+                    };
+                    let self_relation = if relation.is_self_relation() { " on self" } else { " " };
+                    let relation_kind = format!("{}{}", relation.relation_kind(), self_relation);
 
-            let relation_info = match target_top.get_type() {
-                "model" | "view" => {
-                    let target_model = target_top.as_model().unwrap();
-                    get_relation_info(&ctx, initiating_model, target_model, initiating_field)
+                    Some(format_hover_content(
+                        opposite_model.ast_model().documentation().unwrap_or_default(),
+                        related_model_type,
+                        name,
+                        Some((relation_kind, opposite_field)),
+                    ))
                 }
-                _ => None,
-            };
-
-            Some(format_hover_content(
-                target_top.documentation().unwrap_or(""),
-                target_top.get_type(),
-                name,
-                relation_info,
-            ))
+            }
         }
         ast::SchemaPosition::Model(_, model_position) => {
             info!("We are here {:?}", model_position);
@@ -119,54 +121,6 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
     };
 
     contents.map(|contents| Hover { contents, range: None })
-}
-
-fn get_relation_info<'a>(
-    ctx: &'a LSPContext<'a, HoverParams>,
-    model: &Model,
-    target_model: &'a ast::Model,
-    field: &'a Field,
-) -> Option<(String, &'a Field)> {
-    ctx.db.walk_relations().find_map(|relation| {
-        let [referencing_model, referenced_model] = relation.models();
-        let fields = relation.relation_fields().collect::<Vec<Walker<RelationFieldId>>>();
-
-        let referencing_name = ctx.db.ast(referencing_model.0)[referencing_model.1].name();
-        let referenced_name = ctx.db.ast(referenced_model.0)[referenced_model.1].name();
-
-        let self_relation = if relation.is_self_relation() { " on self" } else { " " };
-        let relation_kind = format!("{}{}", relation.relation_kind(), self_relation);
-
-        let field = if referencing_name == model.name() && referenced_name == target_model.name() {
-            if relation.is_self_relation() && fields[1].ast_field().name() == field.name() {
-                fields[0]
-            } else {
-                fields[1]
-            }
-            // * (@druue) Flipped for one-to-many relations when accessing from the block that has the many relation.
-            // ```
-            // model ModelNameA {
-            //    id  Int        @id
-            //    bId Int
-            //    val ModelNameB @relation(fields: [bId], references: [id])
-            // }
-            //
-            // model ModelNameB {
-            //   id Int          @id
-            //   A  ModelNameA[]
-            //      ^^^^^^^^^^ // When accessing from here
-            // }
-            // ```
-            // * I have no idea why.
-        } else if referencing_name == target_model.name() && referenced_name == model.name() {
-            fields[0]
-        } else {
-            warn!("couldn't find relation");
-            return None;
-        };
-
-        Some((relation_kind, field.ast_field()))
-    })
 }
 
 fn format_hover_content(
