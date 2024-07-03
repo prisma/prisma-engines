@@ -76,7 +76,7 @@ impl crate::ParserDatabase {
     }
 
     /// Find the datasource by name.
-    pub fn find_source<'db>(&'db self, name: &str) -> Option<(FileId, ast::TopId)> {
+    pub fn find_source(&self, name: &str) -> Option<(FileId, ast::TopId)> {
         self.interner
             .lookup(name)
             .and_then(|name_id| self.names.datasources.get(&name_id))
