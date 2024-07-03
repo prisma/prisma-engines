@@ -11,7 +11,10 @@ use psl::{
     Diagnostics, SourceFile,
 };
 
-use crate::{offsets::position_to_offset, span_to_range, LSPContext};
+use crate::{
+    offsets::{position_to_offset, span_to_range},
+    LSPContext,
+};
 
 pub(super) type ReferencesContext<'a> = LSPContext<'a, ReferenceParams>;
 
