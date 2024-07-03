@@ -81,14 +81,13 @@ fn resolve_composite_type_attributes<'db>(
 fn resolve_enum_attributes<'db>(enum_id: crate::EnumId, ast_enum: &'db ast::Enum, ctx: &mut Context<'db>) {
     let mut enum_attributes = EnumAttributes::default();
 
-    for value_idx in 0..ast_enum.values.len() {
-        ctx.visit_attributes((enum_id.0, (enum_id.1, value_idx as u32)));
+    for (value_id, _) in ast_enum.iter_values() {
+        ctx.visit_attributes((enum_id.0, (enum_id.1, value_id)));
         // @map
         if ctx.visit_optional_single_attr("map") {
             if let Some(mapped_name) = map::visit_map_attribute(ctx) {
-                enum_attributes.mapped_values.insert(value_idx as u32, mapped_name);
-                ctx.mapped_enum_value_names
-                    .insert((enum_id, mapped_name), value_idx as u32);
+                enum_attributes.mapped_values.insert(value_id, mapped_name);
+                ctx.mapped_enum_value_names.insert((enum_id, mapped_name), value_id);
             }
             ctx.validate_visited_arguments();
         }
