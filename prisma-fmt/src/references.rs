@@ -177,7 +177,7 @@ fn find_where_used_for_native_type<'ast>(
                 .1
                 .attributes
                 .iter()
-                .find(|attr| extract_ds_from_native_type(attr.name()) == name)
+                .find(|attr| extract_ds_from_native_type(attr.name()) == Some(name))
                 .map(|attr| attr.identifier())
         }))
     }
@@ -224,8 +224,8 @@ fn find_where_used_as_ds_name<'ast>(ctx: &'ast ReferencesContext<'_>, name: &'as
         .map(|source| ctx.db.ast(source.0)[source.1].identifier())
 }
 
-fn extract_ds_from_native_type(attr_name: &str) -> &str {
-    attr_name.split('.').next().unwrap_or("")
+fn extract_ds_from_native_type(attr_name: &str) -> Option<&str> {
+    attr_name.split('.').next()
 }
 
 fn ident_to_location<'ast>(id: &'ast Identifier, ctx: &'ast ReferencesContext<'_>) -> Option<Location> {
