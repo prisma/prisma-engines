@@ -47,7 +47,7 @@ impl<'db> EnumWalker<'db> {
 
     /// Returns the specific value from the model.
     pub fn value(self, value_id: ast::EnumValueId) -> EnumValueWalker<'db> {
-        self.walk((self.id, value_id.into()))
+        self.walk((self.id, value_id))
     }
 
     /// The values of the enum.
