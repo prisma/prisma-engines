@@ -97,7 +97,7 @@ impl<'db> RelationFieldWalker<'db> {
         self.db.walk(self.attributes().referenced_model)
     }
 
-    /// The fields in the `@relation(references: ...)` argument.
+    /// The fields in the `@relation(references: [...])` argument.
     pub fn referenced_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>>> {
         self.attributes()
             .references
@@ -154,7 +154,7 @@ impl<'db> RelationFieldWalker<'db> {
         self.fields()
     }
 
-    /// The fields in the `fields: [...]` argument in the forward relation field.
+    /// The fields in the `@relation(fields: [...])` argument in the forward relation field.
     pub fn fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + Clone> {
         let attributes = &self.db.types[self.id];
         attributes

@@ -2,7 +2,10 @@ use log::{info, warn};
 use lsp_types::{Hover, HoverContents, HoverParams, MarkupContent, MarkupKind};
 use psl::{
     error_tolerant_parse_configuration,
-    parser_database::{walkers, ParserDatabase, ScalarFieldType},
+    parser_database::{
+        walkers::{self, Walker},
+        ParserDatabase, RelationFieldId, ScalarFieldType,
+    },
     schema_ast::ast::{
         self, CompositeTypePosition, EnumPosition, EnumValuePosition, Field, FieldPosition, ModelPosition,
         SchemaPosition, WithDocumentation, WithName,
@@ -140,22 +143,20 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
                 },
 
                 walkers::RefinedFieldWalker::Relation(rf) => {
-                    let relation = rf.relation();
                     let opposite_model = rf.related_model();
-                    let opposite_field = rf.opposite_relation_field().unwrap().ast_field();
+                    let opposite_rf = rf.opposite_relation_field().unwrap();
+                    let opposite_field = opposite_rf.ast_field();
                     let related_model_type = if opposite_model.ast_model().is_view() {
                         "view"
                     } else {
                         "model"
                     };
-                    let self_relation = if relation.is_self_relation() { " on self" } else { " " };
-                    let relation_kind = format!("{}{}", relation.relation_kind(), self_relation);
 
                     Some(format_hover_content(
                         opposite_model.ast_model().documentation().unwrap_or_default(),
                         related_model_type,
                         name,
-                        Some((relation_kind, opposite_field)),
+                        Some((opposite_rf, opposite_field)),
                     ))
                 }
             }
@@ -193,12 +194,12 @@ fn format_hover_content(
     documentation: &str,
     variant: &str,
     name: &str,
-    relation: Option<(String, &Field)>,
+    relation: Option<(Walker<RelationFieldId>, &Field)>,
 ) -> HoverContents {
     let fancy_line_break = String::from("\n___\n");
-    let (field, relation_kind) = relation.map_or((Default::default(), Default::default()), |(rk, field)| {
-        (format!("\n\t...\n\t{field}\n"), format!("{rk}{fancy_line_break}"))
-    });
+
+    let (field, relation_kind) = format_relation_info(relation, &fancy_line_break);
+
     let prisma_display = match variant {
         "model" | "enum" | "view" | "type" => {
             format!("```prisma\n{variant} {name} {{{field}}}\n```{fancy_line_break}{relation_kind}")
@@ -212,4 +213,36 @@ fn format_hover_content(
         kind: MarkupKind::Markdown,
         value: full_signature,
     })
+}
+
+fn format_relation_info(
+    relation: Option<(Walker<RelationFieldId>, &Field)>,
+    fancy_line_break: &String,
+) -> (String, String) {
+    if let Some((rf, field)) = relation {
+        let relation = rf.relation();
+
+        let fields = rf
+            .referencing_fields()
+            .map(|fields| fields.map(|f| f.to_string()).collect::<Vec<String>>().join(", "))
+            .map_or_else(String::new, |fields| format!(", fields: [{fields}]"));
+
+        let references = rf
+            .referenced_fields()
+            .map(|fields| fields.map(|f| f.to_string()).collect::<Vec<String>>().join(", "))
+            .map_or_else(String::new, |fields| format!(", references: [{fields}]"));
+
+        let self_relation = if relation.is_self_relation() { " on self" } else { " " };
+        let relation_kind = format!("{}{}", relation.relation_kind(), self_relation);
+
+        let relation_name = relation.relation_name();
+        let relation_inner = format!("name: \"{relation_name}\"{fields}{references}");
+
+        (
+            format!("\n\t...\n\t{field} @relation({relation_inner})\n"),
+            format!("{relation_kind}{fancy_line_break}"),
+        )
+    } else {
+        ("".to_owned(), "".to_owned())
+    }
 }

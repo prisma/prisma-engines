@@ -1,3 +1,5 @@
+use std::fmt;
+
 use crate::{
     ast::{self, WithName},
     types::{DefaultAttribute, FieldWithArgs, OperatorClassStore, ScalarField, ScalarType, SortOrder},
@@ -160,6 +162,12 @@ impl<'db> ScalarFieldWalker<'db> {
             ScalarFieldType::BuiltInScalar(scalar) => Some(scalar),
             _ => None,
         }
+    }
+}
+
+impl<'db> fmt::Display for ScalarFieldWalker<'db> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.name())
     }
 }
 
