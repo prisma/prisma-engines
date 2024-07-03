@@ -124,13 +124,7 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
                 _ => ("", None),
             };
 
-            let top = ctx.db.walk_tops().find_map(|top| {
-                if top.ast_top().name() == name {
-                    Some(top.ast_top())
-                } else {
-                    None
-                }
-            });
+            let top = ctx.db.find_top(name).map(|top| top.ast_top());
 
             let (variant, doc) = match top {
                 Some(top) => {
@@ -160,10 +154,7 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
         }
     };
 
-    match contents {
-        Some(contents) => Some(Hover { contents, range: None }),
-        None => None,
-    }
+    contents.map(|contents| Hover { contents, range: None })
 }
 
 fn format_hover_content(
