@@ -81,7 +81,7 @@ fn reference_locations_for_target(ctx: ReferencesContext<'_>, target: SchemaPosi
                 .chain(find_where_used_as_field_type(&ctx, name))
                 .collect()
         }
-        SchemaPosition::DataSource(_, SourcePosition::Name(name)) => find_where_used_as_top_name(&ctx, name)
+        SchemaPosition::DataSource(_, SourcePosition::Name(name)) => find_where_used_as_ds_name(&ctx, name)
             .into_iter()
             .chain(find_where_used_for_native_type(&ctx, name))
             .collect(),
@@ -126,9 +126,10 @@ fn reference_locations_for_target(ctx: ReferencesContext<'_>, target: SchemaPosi
         SchemaPosition::Model(_, ModelPosition::Field(_, FieldPosition::Attribute(name, _, _)))
         | SchemaPosition::CompositeType(_, CompositeTypePosition::Field(_, FieldPosition::Attribute(name, _, _))) => {
             match ctx.datasource().map(|ds| &ds.name) {
-                Some(ds_name) if name.contains(ds_name) => {
-                    find_where_used_as_top_name(&ctx, ds_name).into_iter().collect()
-                }
+                Some(ds_name) if name.contains(ds_name) => find_where_used_as_ds_name(&ctx, ds_name)
+                    .into_iter()
+                    .chain(find_where_used_for_native_type(&ctx, ds_name))
+                    .collect(),
                 _ => vec![],
             }
         }
@@ -215,6 +216,12 @@ fn find_where_used_as_field_type<'ast>(
 
 fn find_where_used_as_top_name<'ast>(ctx: &'ast ReferencesContext<'_>, name: &'ast str) -> Option<&'ast Identifier> {
     ctx.db.find_top(name).map(|top| top.ast_top().identifier())
+}
+
+fn find_where_used_as_ds_name<'ast>(ctx: &'ast ReferencesContext<'_>, name: &'ast str) -> Option<&'ast Identifier> {
+    ctx.db
+        .find_source(name)
+        .map(|source| ctx.db.ast(source.0)[source.1].identifier())
 }
 
 fn extract_ds_from_native_type(attr_name: &str) -> &str {
