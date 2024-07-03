@@ -3,7 +3,7 @@ use lsp_types::{Hover, HoverContents, HoverParams, MarkupContent, MarkupKind};
 use psl::{
     error_tolerant_parse_configuration,
     parser_database::ParserDatabase,
-    schema_ast::ast::{self, Field, FieldPosition, ModelPosition, WithDocumentation},
+    schema_ast::ast::{self, Field, FieldPosition, ModelPosition, WithDocumentation, WithName},
     Diagnostics, SourceFile,
 };
 
@@ -49,13 +49,15 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
         Some(pos) => pos,
         None => {
             warn!("Received a position outside of the document boundaries in HoverParams");
+            warn!("Received a position outside of the document boundaries in HoverParams");
             return None;
         }
     };
 
     let ast = ctx.db.ast(ctx.initiating_file_id);
-    let contents = match ast.find_at_position(position) {
+    let contents = match dbg!(ast.find_at_position(position)) {
         psl::schema_ast::ast::SchemaPosition::TopLevel => None,
+
         psl::schema_ast::ast::SchemaPosition::Model(model_id, ModelPosition::Name(name)) => {
             let walker = ctx.db.walk((ctx.initiating_file_id, model_id));
             let model = walker.ast_model();
@@ -76,7 +78,28 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
             let initiating_field = &ctx.db.walk((ctx.initiating_file_id, model_id)).field(field_id);
 
             match initiating_field.refine() {
-                psl::parser_database::walkers::RefinedFieldWalker::Scalar(_) => None,
+                psl::parser_database::walkers::RefinedFieldWalker::Scalar(scalar) => match scalar.scalar_field_type() {
+                    psl::parser_database::ScalarFieldType::CompositeType(_) => {
+                        let ct = scalar.field_type_as_composite_type().unwrap();
+                        Some(format_hover_content(
+                            ct.ast_composite_type().documentation().unwrap_or_default(),
+                            "type",
+                            ct.ast_composite_type().name(),
+                            None,
+                        ))
+                    }
+                    psl::parser_database::ScalarFieldType::Enum(_) => {
+                        let enm = scalar.field_type_as_enum().unwrap();
+                        Some(format_hover_content(
+                            enm.ast_enum().documentation().unwrap_or_default(),
+                            "enum",
+                            enm.ast_enum().name(),
+                            None,
+                        ))
+                    }
+                    _ => None,
+                },
+
                 psl::parser_database::walkers::RefinedFieldWalker::Relation(rf) => {
                     let relation = rf.relation();
                     let opposite_model = rf.related_model();
@@ -134,7 +157,7 @@ fn format_hover_content(
         (format!("\n\t...\n\t{field}\n"), format!("{rk}{fancy_line_break}"))
     });
     let prisma_display = match variant {
-        "model" | "enum" | "view" | "composite type" => {
+        "model" | "enum" | "view" | "type" => {
             format!("```prisma\n{variant} {top_name} {{{field}}}\n```{fancy_line_break}{relation_kind}")
         }
         _ => "".to_owned(),
