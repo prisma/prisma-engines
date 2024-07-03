@@ -4,7 +4,7 @@ use crate::{context::Context, interner::StringId, walkers::IndexFieldWalker, Dat
 use either::Either;
 use enumflags2::bitflags;
 use rustc_hash::FxHashMap as HashMap;
-use schema_ast::ast::{self, WithName};
+use schema_ast::ast::{self, EnumValueId, WithName};
 use std::{collections::BTreeMap, fmt};
 
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
@@ -623,7 +623,7 @@ pub struct FieldWithArgs {
 pub(super) struct EnumAttributes {
     pub(super) mapped_name: Option<StringId>,
     /// @map on enum values.
-    pub(super) mapped_values: HashMap<u32, StringId>,
+    pub(super) mapped_values: HashMap<EnumValueId, StringId>,
     /// ```ignore
     /// @@schema("public")
     ///          ^^^^^^^^
