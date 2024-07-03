@@ -107,6 +107,20 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
                 None,
             ))
         }
+        SchemaPosition::Enum(enm_id, EnumPosition::Value(value_id, EnumValuePosition::Name(name))) => {
+            let value = ctx
+                .db
+                .walk((ctx.initiating_file_id, enm_id))
+                .value(value_id)
+                .ast_value();
+
+            Some(format_hover_content(
+                value.documentation().unwrap_or_default(),
+                "value",
+                name,
+                None,
+            ))
+        }
 
         // --- Block Field Types ---
         SchemaPosition::Model(model_id, ModelPosition::Field(field_id, FieldPosition::Type(name))) => {
@@ -189,7 +203,7 @@ fn format_hover_content(
         "model" | "enum" | "view" | "type" => {
             format!("```prisma\n{variant} {name} {{{field}}}\n```{fancy_line_break}{relation_kind}")
         }
-        "field" => format!("```prisma\n{name}\n```{fancy_line_break}"),
+        "field" | "value" => format!("```prisma\n{name}\n```{fancy_line_break}"),
         _ => "".to_owned(),
     };
     let full_signature = format!("{prisma_display}{documentation}");
