@@ -20,6 +20,7 @@ use psl::{
     Generator,
 };
 use schema_file_input::SchemaFileInput;
+use serde_json::json;
 
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct LSPContext<'a, T> {
@@ -111,26 +112,23 @@ pub fn references(schema_files: String, params: &str) -> String {
 }
 
 pub fn hover(schema_files: String, params: &str) -> String {
-    info!("Calling Hover");
     let schema: SchemaFileInput = match serde_json::from_str(&schema_files) {
         Ok(schema) => schema,
         Err(serde_err) => {
-            info!("Failed to deserialize SchemaFileInput");
-            panic!("Failed to deserialize SchemaFileInput: {serde_err}")
+            warn!("Failed to deserialize SchemaFileInput: {serde_err}");
+            return json!(null).to_string();
         }
     };
 
     let params: lsp_types::HoverParams = match serde_json::from_str(params) {
         Ok(params) => params,
         Err(_) => {
-            info!("Failed to deserialize Hover");
-            panic!("Failed to deserialise Hover")
+            warn!("Failed to deserialize Hover");
+            return json!(null).to_string();
         }
     };
 
     let hover = hover::run(schema.into(), params);
-
-    info!("{:?}", hover);
 
     serde_json::to_string(&hover).unwrap()
 }
