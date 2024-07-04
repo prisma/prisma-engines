@@ -1,4 +1,4 @@
-use log::{info, warn};
+use log::warn;
 use lsp_types::{Hover, HoverContents, HoverParams, MarkupContent, MarkupKind};
 use psl::{
     error_tolerant_parse_configuration,
@@ -50,7 +50,6 @@ pub fn run(schema_files: Vec<(String, SourceFile)>, params: HoverParams) -> Opti
 }
 
 fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
-    info!("Calling Hover");
     let position = match ctx.position() {
         Some(pos) => pos,
         None => {
@@ -144,8 +143,7 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
 
                 walkers::RefinedFieldWalker::Relation(rf) => {
                     let opposite_model = rf.related_model();
-                    let opposite_rf = rf.opposite_relation_field().unwrap();
-                    let opposite_field = opposite_rf.ast_field();
+                    let relation_info = rf.opposite_relation_field().map(|rf| (rf, rf.ast_field()));
                     let related_model_type = if opposite_model.ast_model().is_view() {
                         "view"
                     } else {
@@ -156,7 +154,7 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
                         opposite_model.ast_model().documentation().unwrap_or_default(),
                         related_model_type,
                         name,
-                        Some((opposite_rf, opposite_field)),
+                        relation_info,
                     ))
                 }
             }
@@ -232,7 +230,7 @@ fn format_relation_info(
             .map(|fields| fields.map(|f| f.to_string()).collect::<Vec<String>>().join(", "))
             .map_or_else(String::new, |fields| format!(", references: [{fields}]"));
 
-        let self_relation = if relation.is_self_relation() { " on self" } else { " " };
+        let self_relation = if relation.is_self_relation() { " on self" } else { "" };
         let relation_kind = format!("{}{}", relation.relation_kind(), self_relation);
 
         let relation_name = relation.relation_name();

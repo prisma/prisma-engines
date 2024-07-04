@@ -19,7 +19,9 @@ scenarios! {
     field_from_composite_field_name
     field_from_model_field_name
     model_from_block_name
+    model_from_model_type_broken_relations
     model_from_view_type
     one_to_many_self_relation
     value_from_enum_value_name
+    postgresql
 }
