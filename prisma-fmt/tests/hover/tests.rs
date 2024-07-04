@@ -23,5 +23,5 @@ scenarios! {
     model_from_view_type
     one_to_many_self_relation
     value_from_enum_value_name
-    postgresql
+
 }
