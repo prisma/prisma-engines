@@ -7,7 +7,7 @@ mod error;
 
 pub(crate) use crate::connector::postgres::url::PostgresUrl;
 use crate::connector::postgres::url::{Hidden, SslAcceptMode, SslParams};
-use crate::connector::{timeout, ColumnType, IsolationLevel, Transaction};
+use crate::connector::{timeout, ColumnType, IsolationLevel, ParsedRawItem, ParsedRawQuery, Transaction};
 use crate::error::NativeErrorKind;
 
 use crate::{
@@ -469,6 +469,23 @@ impl Queryable for PostgreSql {
             Ok(result)
         })
         .await
+    }
+
+    async fn parse_raw_query(&self, sql: &str) -> crate::Result<ParsedRawQuery> {
+        let stmt = self.fetch_cached(sql, &[]).await?;
+
+        let columns = stmt.columns().iter().map(ParsedRawItem::from).collect();
+        let parameters = stmt
+            .params()
+            .iter()
+            .enumerate()
+            .map(|(idx, p)| ParsedRawItem {
+                name: format!("${idx}"),
+                typ: p.as_parsed_query_type(),
+            })
+            .collect();
+
+        Ok(ParsedRawQuery { columns, parameters })
     }
 
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {

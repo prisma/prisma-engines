@@ -1,7 +1,8 @@
-use crate::connector::ColumnType;
+use crate::connector::{ColumnType, ParsedRawItem};
 
 use std::borrow::Cow;
 use tokio_postgres::types::{Kind as PostgresKind, Type as PostgresType};
+use tokio_postgres::Column;
 
 macro_rules! create_pg_mapping {
   (
@@ -126,4 +127,13 @@ create_pg_mapping! {
   [EnumArray => TextArray],
   [UnknownArray => TextArray],
   [Unknown => Text]
+}
+
+impl From<&Column> for ParsedRawItem {
+    fn from(col: &Column) -> Self {
+        Self {
+            name: col.name().to_string(),
+            typ: col.type_().as_parsed_query_type(),
+        }
+    }
 }

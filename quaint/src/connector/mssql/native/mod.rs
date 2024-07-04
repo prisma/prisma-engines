@@ -6,7 +6,7 @@ mod conversion;
 mod error;
 
 pub(crate) use crate::connector::mssql::MssqlUrl;
-use crate::connector::{timeout, IsolationLevel, Transaction, TransactionOptions};
+use crate::connector::{timeout, IsolationLevel, ParsedRawQuery, Transaction, TransactionOptions};
 
 use crate::{
     ast::{Query, Value},
@@ -181,6 +181,13 @@ impl Queryable for Mssql {
 
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         self.query_raw(sql, params).await
+    }
+
+    async fn parse_raw_query(&self, sql: &str) -> crate::Result<ParsedRawQuery> {
+        let mut _client = self.client.lock().await;
+        let mut _query = tiberius::Query::new(sql);
+
+        todo!("implement prepare in tiberius");
     }
 
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {

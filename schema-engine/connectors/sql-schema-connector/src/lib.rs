@@ -346,6 +346,32 @@ impl SchemaConnector for SqlSchemaConnector {
                 .collect::<Vec<String>>(),
         )
     }
+
+    fn introspect_sql(
+        &mut self,
+        input: IntrospectSqlQueryInput,
+    ) -> BoxFuture<'_, ConnectorResult<IntrospectSqlQueryOutput>> {
+        Box::pin(async move {
+            let res = self.flavour.parse_query_raw(&input.source).await?;
+            let parameters = res
+                .parameters
+                .into_iter()
+                .map(IntrospectSqlQueryParameterOutput::from)
+                .collect();
+            let columns = res
+                .columns
+                .into_iter()
+                .map(IntrospectSqlQueryColumnOutput::from)
+                .collect();
+
+            Ok(IntrospectSqlQueryOutput {
+                name: input.name,
+                documentation: String::new(),
+                parameters,
+                result_columns: columns,
+            })
+        })
+    }
 }
 
 fn new_shadow_database_name() -> String {

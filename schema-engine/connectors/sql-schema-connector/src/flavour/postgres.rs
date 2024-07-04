@@ -221,6 +221,15 @@ impl SqlFlavour for PostgresFlavour {
         })
     }
 
+    fn parse_query_raw<'a>(
+        &'a mut self,
+        sql: &'a str,
+    ) -> BoxFuture<'a, ConnectorResult<quaint::connector::ParsedRawQuery>> {
+        with_connection(self, move |conn_params, _, conn| {
+            conn.parse_raw_query(sql, &conn_params.url)
+        })
+    }
+
     fn apply_migration_script<'a>(
         &'a mut self,
         migration_name: &'a str,

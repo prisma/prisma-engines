@@ -175,6 +175,11 @@ pub(crate) trait SqlFlavour:
         self.describe_schema(namespaces)
     }
 
+    fn parse_query_raw<'a>(
+        &'a mut self,
+        sql: &'a str,
+    ) -> BoxFuture<'a, ConnectorResult<quaint::connector::ParsedRawQuery>>;
+
     fn load_migrations_table(
         &mut self,
     ) -> BoxFuture<'_, ConnectorResult<Result<Vec<MigrationRecord>, PersistenceNotInitializedError>>> {

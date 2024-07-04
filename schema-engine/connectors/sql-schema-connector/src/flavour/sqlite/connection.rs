@@ -72,6 +72,13 @@ impl Connection {
             converted_rows,
         ))
     }
+
+    pub(super) fn parse_query_raw(&mut self, _sql: &str) -> ConnectorResult<quaint::connector::ParsedRawQuery> {
+        // tracing::debug!(query_type = "query_raw", sql);
+        // let conn = self.0.lock().unwrap();
+        // let mut stmt = conn.prepare_cached(sql).map_err(convert_error)?;
+        unimplemented!()
+    }
 }
 
 pub(super) fn generic_apply_migration_script(

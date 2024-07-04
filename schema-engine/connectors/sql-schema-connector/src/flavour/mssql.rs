@@ -501,6 +501,13 @@ impl SqlFlavour for MssqlFlavour {
     fn search_path(&self) -> &str {
         self.schema_name()
     }
+
+    fn parse_query_raw<'a>(
+        &'a mut self,
+        _sql: &str,
+    ) -> BoxFuture<'a, ConnectorResult<quaint::connector::ParsedRawQuery>> {
+        todo!()
+    }
 }
 
 fn with_connection<'a, O, F, C>(state: &'a mut State, f: C) -> BoxFuture<'a, ConnectorResult<O>>

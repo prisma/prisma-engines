@@ -409,6 +409,46 @@ impl GenericApi for EngineState {
         .await
     }
 
+    async fn introspect_sql(&self, params: IntrospectSqlParams) -> CoreResult<IntrospectSqlResult> {
+        self.with_connector_for_url(
+            params.url.clone(),
+            Box::new(move |conn| {
+                Box::pin(async move {
+                    let res = crate::commands::introspect_sql(params, conn).await?;
+
+                    Ok(IntrospectSqlResult {
+                        queries: res
+                            .queries
+                            .into_iter()
+                            .map(|q| SqlQueryOutput {
+                                name: q.name,
+                                documentation: q.documentation,
+                                parameters: q
+                                    .parameters
+                                    .into_iter()
+                                    .map(|p| SqlQueryParameterOutput {
+                                        name: p.name,
+                                        typ: p.typ,
+                                        documentation: p.documentation,
+                                    })
+                                    .collect(),
+                                result_columns: q
+                                    .result_columns
+                                    .into_iter()
+                                    .map(|c| SqlQueryColumnOutput {
+                                        name: c.name,
+                                        typ: c.typ,
+                                    })
+                                    .collect(),
+                            })
+                            .collect(),
+                    })
+                })
+            }),
+        )
+        .await
+    }
+
     async fn list_migration_directories(
         &self,
         input: ListMigrationDirectoriesInput,
