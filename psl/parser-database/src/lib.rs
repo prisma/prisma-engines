@@ -108,17 +108,17 @@ impl ParserDatabase {
         names::resolve_names(&mut ctx);
 
         // Return early on name resolution errors.
-        if ctx.diagnostics.has_errors() {
-            attributes::create_default_attributes(&mut ctx);
+        // if ctx.diagnostics.has_errors() {
+        // attributes::create_default_attributes(&mut ctx);
 
-            // return ParserDatabase {
-            //     asts,
-            //     interner,
-            //     names,
-            //     types,
-            //     relations,
-            // };
-        }
+        // return ParserDatabase {
+        //     asts,
+        //     interner,
+        //     names,
+        //     types,
+        //     relations,
+        // };
+        // }
 
         // Second pass: resolve top-level items and field types.
         types::resolve_types(&mut ctx);

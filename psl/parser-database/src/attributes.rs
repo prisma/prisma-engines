@@ -45,7 +45,12 @@ fn resolve_composite_type_attributes<'db>(
     ctx: &mut Context<'db>,
 ) {
     for (field_id, field) in ct.iter_fields() {
-        let CompositeTypeField { r#type, .. } = ctx.types.composite_type_fields[&(ctid, field_id)];
+        let CompositeTypeField { r#type, .. } =
+            if let Some(val) = ctx.types.composite_type_fields.get(&(ctid, field_id)) {
+                val.clone()
+            } else {
+                continue;
+            };
 
         ctx.visit_attributes((ctid.0, (ctid.1, field_id)));
 
@@ -1095,26 +1100,4 @@ fn validate_client_name(span: Span, object_name: &str, name: StringId, attribute
 fn validate_clustering_setting(ctx: &mut Context<'_>) -> Option<bool> {
     ctx.visit_optional_arg("clustered")
         .and_then(|sort| coerce::boolean(sort, ctx.diagnostics))
-}
-
-/// Create the default values of [`ModelAttributes`] and [`EnumAttributes`] for each model and enum
-/// in the AST to ensure [`crate::walkers::ModelWalker`] and [`crate::walkers::EnumWalker`] can
-/// access their corresponding entries in the attributes map in the database even in the presence
-/// of name and type resolution errors. This is useful for the language tools.
-pub(super) fn create_default_attributes(ctx: &mut Context<'_>) {
-    for ((file_id, top), _) in ctx.iter_tops() {
-        match top {
-            ast::TopId::Model(model_id) => {
-                ctx.types
-                    .model_attributes
-                    .insert((file_id, model_id), ModelAttributes::default());
-            }
-            ast::TopId::Enum(enum_id) => {
-                ctx.types
-                    .enum_attributes
-                    .insert((file_id, enum_id), EnumAttributes::default());
-            }
-            _ => (),
-        }
-    }
 }
