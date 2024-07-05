@@ -633,15 +633,16 @@ fn common_index_validations(
                 let mut suggested_fields = Vec::new();
 
                 for (_, field_id) in &relation_fields {
-                    let fields = ctx
+                    let Some(rf) = ctx
                         .types
                         .range_model_relation_fields(model_id)
                         .find(|(_, rf)| rf.field_id == *field_id)
-                        .unwrap()
-                        .1
-                        .fields
-                        .iter()
-                        .flatten();
+                    else {
+                        continue;
+                    };
+
+                    let fields = rf.1.fields.iter().flatten();
+
                     for underlying_field in fields {
                         let ScalarField { model_id, field_id, .. } = ctx.types[*underlying_field];
                         suggested_fields.push(ctx.asts[model_id][field_id].name());
