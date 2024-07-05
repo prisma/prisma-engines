@@ -4,7 +4,11 @@ use crate::{
     walkers::*,
     ReferentialAction,
 };
-use std::{borrow::Cow, fmt, hash::Hasher};
+use std::{
+    borrow::Cow,
+    fmt::{self, Debug},
+    hash::Hasher,
+};
 
 /// A relation field on a model in the schema.
 pub type RelationFieldWalker<'db> = Walker<'db, RelationFieldId>;
