@@ -262,7 +262,10 @@ impl Connector for MsSqlDatamodelConnector {
     ) {
         if let ast::SchemaPosition::Model(
             _model_id,
-            ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("default", _, None)),
+            ast::ModelPosition::Field(
+                _,
+                ast::FieldPosition::Attribute("default", _, ast::AttributePosition::Attribute),
+            ),
         ) = position
         {
             completions.items.push(CompletionItem {

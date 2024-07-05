@@ -75,7 +75,15 @@ impl crate::ParserDatabase {
             .flat_map(move |(file_id, _, _, ast)| ast.iter_tops().map(move |(top_id, top)| (file_id, top_id, top)))
     }
 
-    /// Intern any top by name.
+    /// Find the datasource by name.
+    pub fn find_source(&self, name: &str) -> Option<(FileId, ast::TopId)> {
+        self.interner
+            .lookup(name)
+            .and_then(|name_id| self.names.datasources.get(&name_id))
+            .map(|(file_id, top_id)| (*file_id, *top_id))
+    }
+
+    /// Find any top by name.
     pub fn find_top<'db>(&'db self, name: &str) -> Option<TopWalker<'db>> {
         self.interner
             .lookup(name)
