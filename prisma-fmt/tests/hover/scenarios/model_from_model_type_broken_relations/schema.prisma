@@ -16,6 +16,10 @@ model Post {
 
     userId Int?
     User   User? @relation(fields: [userId], references: [id])
+}
+
+model interm {
+    id Int @id
 
     forumId Int
     forum   Forum @relation(fields: [forumId], references: [id])
@@ -25,8 +29,8 @@ model Post {
 /// ! thread 'hover::tests::model_from_model_type_broken_relations' panicked at
 /// ! psl/parser-database/src/walkers/relation_field.rs:120:36:
 /// ! no entry found for key
-model Forum {
-    id   Int    @id
-    name String
-    Post Post[]
-}
+// model Forum {
+//     id   Int      @id
+//     name String
+//     Post interm[]
+// }
