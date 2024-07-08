@@ -12,6 +12,7 @@ macro_rules! scenarios {
 }
 
 scenarios! {
+    add_missing_opposite_relation
     one_to_many_referenced_side_misses_unique_single_field
     one_to_many_referenced_side_misses_unique_single_field_multifile
     one_to_many_referenced_side_misses_unique_single_field_broken_relation

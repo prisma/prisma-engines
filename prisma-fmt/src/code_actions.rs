@@ -1,4 +1,5 @@
 mod block;
+mod field;
 mod mongodb;
 mod multi_schema;
 mod relation_mode;
@@ -86,6 +87,10 @@ pub(crate) fn available_actions(
         .walk_models_in_file(initiating_file_id)
         .chain(validated_schema.db.walk_views_in_file(initiating_file_id))
     {
+        for field in context.db.walk_fields(model.id) {
+            field::add_missing_opposite_relation(&mut actions, &context, field);
+        }
+
         block::create_missing_block_for_model(&mut actions, &context, model);
 
         if config.preview_features().contains(PreviewFeature::MultiSchema) {
