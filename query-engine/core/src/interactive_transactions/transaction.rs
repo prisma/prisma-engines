@@ -186,7 +186,7 @@ impl InteractiveTransaction {
                 // We don't know if the transaction was committed or not. Because of that, we cannot
                 // leave it in "open" state. We attempt to rollback to get the transaction into a
                 // known state.
-                let _ = self.rollback(false);
+                let _ = self.rollback(false).await;
                 Err(err.into())
             } else {
                 self.state.set_committed();
@@ -221,6 +221,6 @@ impl InteractiveTransaction {
     }
 
     pub(crate) fn name(&self) -> String {
-        format!("itx-{}", self.id.to_string())
+        format!("itx-{}", self.id)
     }
 }
