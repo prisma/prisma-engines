@@ -81,27 +81,25 @@ pub struct InteractiveTransaction {
 }
 
 macro_rules! tx_timeout {
-    ($self:expr, $fut:expr) => {
-        if let Some(remaining_time) = $self.timeout.checked_sub($self.start_time.elapsed_time()) {
-            tokio::select! {
-                _ = crosstarget_utils::time::sleep(remaining_time) => {
-                    $self.rollback(true).await?;
-                    Err(TransactionError::Closed {
-                        reason: "Could not perform operation".to_string(),
-                    }.into())
+    ($self:expr, $operation:expr, $fut:expr) => {{
+        let remaining_time = $self
+            .timeout
+            .checked_sub($self.start_time.elapsed_time())
+            .unwrap_or(Duration::ZERO);
+        tokio::select! {
+            _ = crosstarget_utils::time::sleep(remaining_time) => {
+                if $self.state.as_open($operation).is_ok() {
+                    let _ = $self.rollback(true).await;
                 }
-                result = $fut => {
-                    result
-                }
+                Err(TransactionError::Closed {
+                    reason: $self.to_closed().unwrap().error_message_for($operation),
+                }.into())
             }
-        } else {
-            $self.rollback(true).await?;
-            Err(TransactionError::Closed {
-                reason: "Could not perform operation".to_string(),
+            result = $fut => {
+                result
             }
-            .into())
         }
-    };
+    }};
 }
 
 impl InteractiveTransaction {
@@ -141,6 +139,7 @@ impl InteractiveTransaction {
 
         tx_timeout!(
             self,
+            "query",
             execute_single_operation(
                 self.query_schema.clone(),
                 conn.as_connection_like(),
@@ -157,7 +156,7 @@ impl InteractiveTransaction {
         operations: &[Operation],
         traceparent: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
-        tx_timeout!(self, async {
+        tx_timeout!(self, "batch query", async {
             let span = info_span!(parent: &self.span, "prisma:engine:itx_execute_batch", user_facing = true);
             #[cfg(feature = "metrics")]
             set_span_link_from_traceparent(&span, traceparent.clone());
@@ -175,16 +174,24 @@ impl InteractiveTransaction {
     }
 
     pub(crate) async fn commit(&mut self) -> crate::Result<()> {
-        tx_timeout!(self, async {
+        tx_timeout!(self, "commit", async {
             let open_tx = self.state.as_open("commit")?;
             let span = info_span!(parent: &self.span, "prisma:engine:itx_commit", user_facing = true);
-            open_tx
+            if let Err(err) = open_tx
                 .commit()
                 .instrument(span)
                 .with_subscriber(self.dispatcher.clone())
-                .await?;
-            self.state.set_committed();
-            Ok(())
+                .await
+            {
+                // We don't know if the transaction was committed or not. Because of that, we cannot
+                // leave it in "open" state. We attempt to rollback to get the transaction into a
+                // known state.
+                let _ = self.rollback(false);
+                Err(err.into())
+            } else {
+                self.state.set_committed();
+                Ok(())
+            }
         })
     }
 
@@ -192,18 +199,21 @@ impl InteractiveTransaction {
         debug!("[{}] rolling back, was timed out = {was_timeout}", self.name());
         let open_tx = self.state.as_open("rollback")?;
         let span = info_span!(parent: &self.span, "prisma:engine:itx_rollback", user_facing = true);
-        open_tx
+
+        let result = open_tx
             .rollback()
             .instrument(span)
             .with_subscriber(self.dispatcher.clone())
-            .await?;
+            .await;
+
+        // Ensure that the transaction isn't left in the "open" state after the rollback.
         if was_timeout {
             self.state.set_expired(self.start_time, self.timeout);
         } else {
             self.state.set_rolled_back();
         }
 
-        Ok(())
+        result.map_err(<_>::into)
     }
 
     pub(crate) fn to_closed(&self) -> Option<ClosedTx> {
@@ -211,6 +221,6 @@ impl InteractiveTransaction {
     }
 
     pub(crate) fn name(&self) -> String {
-        format!("itx-{:?}", self.id.to_string())
+        format!("itx-{}", self.id.to_string())
     }
 }
