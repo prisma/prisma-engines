@@ -89,7 +89,7 @@ impl CachedTx {
     pub(crate) fn as_open(&mut self, from_operation: &str) -> crate::Result<&mut Box<dyn Transaction>> {
         match self {
             CachedTx::Open(tx) => Ok(tx),
-            tx @ _ => Err(CoreError::from(TransactionError::Closed {
+            tx => Err(CoreError::from(TransactionError::Closed {
                 reason: tx.to_closed().unwrap().error_message_for(from_operation),
             })),
         }
