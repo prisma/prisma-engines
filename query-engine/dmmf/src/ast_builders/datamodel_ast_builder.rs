@@ -148,14 +148,14 @@ fn model_to_dmmf(model: walkers::ModelWalker<'_>) -> Model {
 }
 
 fn should_skip_model_field(field: &walkers::FieldWalker<'_>) -> bool {
-    match field.refine() {
+    match field.refine_known() {
         walkers::RefinedFieldWalker::Scalar(f) => f.is_ignored() || f.is_unsupported(),
         walkers::RefinedFieldWalker::Relation(f) => f.is_ignored(),
     }
 }
 
 fn field_to_dmmf(field: walkers::FieldWalker<'_>) -> Field {
-    match field.refine() {
+    match field.refine_known() {
         walkers::RefinedFieldWalker::Scalar(sf) => scalar_field_to_dmmf(sf),
         walkers::RefinedFieldWalker::Relation(rf) => relation_field_to_dmmf(rf),
     }

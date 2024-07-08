@@ -21,6 +21,12 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
     }
 }
 
+pub enum RefinedFieldVariant {
+    Relation(RelationFieldId),
+    Scalar(ScalarFieldId),
+    Unknown,
+}
+
 #[derive(Debug, Default)]
 pub(super) struct Types {
     pub(super) composite_type_fields: BTreeMap<(crate::CompositeTypeId, ast::FieldId), CompositeTypeField>,
@@ -92,16 +98,16 @@ impl Types {
             .map(move |(idx, rf)| (RelationFieldId((first_relation_field_idx + idx) as u32), rf))
     }
 
-    pub(super) fn refine_field(&self, id: (crate::ModelId, ast::FieldId)) -> Either<RelationFieldId, ScalarFieldId> {
+    pub(super) fn refine_field(&self, id: (crate::ModelId, ast::FieldId)) -> RefinedFieldVariant {
         self.relation_fields
             .binary_search_by_key(&id, |rf| (rf.model_id, rf.field_id))
-            .map(|idx| Either::Left(RelationFieldId(idx as u32)))
+            .map(|idx| RefinedFieldVariant::Relation(RelationFieldId(idx as u32)))
             .or_else(|_| {
                 self.scalar_fields
                     .binary_search_by_key(&id, |sf| (sf.model_id, sf.field_id))
-                    .map(|id| Either::Right(ScalarFieldId(id as u32)))
+                    .map(|id| RefinedFieldVariant::Scalar(ScalarFieldId(id as u32)))
             })
-            .expect("expected field to be either scalar or relation field")
+            .unwrap_or(RefinedFieldVariant::Unknown)
     }
 
     pub(super) fn push_relation_field(&mut self, relation_field: RelationField) -> RelationFieldId {
