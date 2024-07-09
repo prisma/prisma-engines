@@ -3725,6 +3725,7 @@ dependencies = [
  "crossbeam-channel",
  "crosstarget-utils",
  "cuid",
+ "derive_more",
  "enumflags2",
  "futures",
  "indexmap 2.2.2",
