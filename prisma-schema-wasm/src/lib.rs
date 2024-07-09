@@ -50,6 +50,12 @@ pub fn get_dmmf(params: String) -> Result<String, JsError> {
 }
 
 #[wasm_bindgen]
+pub fn get_datamodel(params: String) -> Result<String, JsError> {
+    register_panic_hook();
+    prisma_fmt::get_datamodel(params).map_err(|e| JsError::new(&e))
+}
+
+#[wasm_bindgen]
 pub fn lint(input: String) -> String {
     register_panic_hook();
     prisma_fmt::lint(input)
