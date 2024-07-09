@@ -128,7 +128,7 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
         SchemaPosition::Model(model_id, ModelPosition::Field(field_id, FieldPosition::Type(name))) => {
             let initiating_field = &ctx.db.walk((ctx.initiating_file_id, model_id)).field(field_id);
 
-            match initiating_field.refine() {
+            initiating_field.refine().and_then(|field| match field {
                 walkers::RefinedFieldWalker::Scalar(scalar) => match scalar.scalar_field_type() {
                     ScalarFieldType::CompositeType(_) => {
                         let ct = scalar.field_type_as_composite_type().unwrap().ast_composite_type();
@@ -140,7 +140,6 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
                     }
                     _ => None,
                 },
-
                 walkers::RefinedFieldWalker::Relation(rf) => {
                     let opposite_model = rf.related_model();
                     let relation_info = rf.opposite_relation_field().map(|rf| (rf, rf.ast_field()));
@@ -157,7 +156,7 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
                         relation_info,
                     ))
                 }
-            }
+            })
         }
 
         SchemaPosition::CompositeType(ct_id, CompositeTypePosition::Field(field_id, FieldPosition::Type(_))) => {

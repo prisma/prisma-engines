@@ -60,3 +60,15 @@ model B {
 // [1;94m15 | [0m    @@index([other, field])
 // [1;94m16 | [0m    [1;91m@@unique([content, rank])[0m
 // [1;94m   | [0m
+// [1;91merror[0m: [1mAttribute not known: "@id".[0m
+//   [1;94m-->[0m  [4mschema.prisma:7[0m
+// [1;94m   | [0m
+// [1;94m 6 | [0mtype A {
+// [1;94m 7 | [0m    pk String [1;91m@id[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mAttribute not known: "@unique".[0m
+//   [1;94m-->[0m  [4mschema.prisma:8[0m
+// [1;94m   | [0m
+// [1;94m 7 | [0m    pk String @id
+// [1;94m 8 | [0m    field Int [1;91m@unique[0m
+// [1;94m   | [0m

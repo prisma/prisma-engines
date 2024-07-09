@@ -36,7 +36,8 @@ pub(crate) fn test_scenario(scenario_name: &str) {
     );
 
     // Prettify the JSON
-    let result = serde_json::to_string_pretty(&serde_json::from_str::<lsp_types::Hover>(&result).unwrap()).unwrap();
+    let result =
+        serde_json::to_string_pretty(&serde_json::from_str::<Option<lsp_types::Hover>>(&result).unwrap()).unwrap();
 
     if *UPDATE_EXPECT {
         let mut file = std::fs::File::create(&path).unwrap(); // truncate
