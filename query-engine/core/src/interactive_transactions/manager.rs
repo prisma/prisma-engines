@@ -58,19 +58,22 @@ impl ITXManager {
             let closed_txs = closed_txs.clone();
             async move {
                 while let Some(tx_id) = timeout_receiver.recv().await {
-                    let closed_tx = {
-                        let transaction_entry = transactions.read().await.get(&tx_id).expect("invalid tx_id").clone();
-                        let mut transaction = transaction_entry.write().await;
-
-                        // If transaction was already committed, rollback will error.
-                        let _ = transaction.rollback(true).await;
-
-                        transaction
-                            .to_closed()
-                            .expect("transaction must be closed after rollback")
+                    let transaction_entry = match transactions.write().await.remove(&tx_id) {
+                        Some(transaction_entry) => transaction_entry,
+                        None => {
+                            // Transaction was committed or rolled back already.
+                            continue;
+                        }
                     };
+                    let mut transaction = transaction_entry.write().await;
 
-                    transactions.write().await.remove(&tx_id);
+                    // If transaction was already committed, rollback will error.
+                    let _ = transaction.rollback(true).await;
+
+                    let closed_tx = transaction
+                        .to_closed()
+                        .expect("transaction must be closed after rollback");
+
                     closed_txs.write().await.put(tx_id, closed_tx);
                 }
             }
@@ -157,21 +160,42 @@ impl ITXManager {
             .await
     }
 
+    async fn try_remove_transaction(&self, tx_id: &TxId) {
+        if let Some(transaction) = self.transactions.write().await.remove(tx_id) {
+            let closed_tx = transaction
+                .read()
+                .await
+                .to_closed()
+                .expect("attempt to remove active transaction");
+            self.closed_txs.write().await.put(tx_id.clone(), closed_tx);
+        }
+    }
+
     pub async fn commit_tx(&self, tx_id: &TxId) -> crate::Result<()> {
-        self.get_transaction(tx_id, "commit")
+        let result = self
+            .get_transaction(tx_id, "commit")
             .await?
             .write()
             .await
             .commit()
-            .await
+            .await;
+        // Remove the transaction after attempt to commit as soon as possible to return connection
+        // to the connection pool.
+        self.try_remove_transaction(tx_id).await;
+        result
     }
 
     pub async fn rollback_tx(&self, tx_id: &TxId) -> crate::Result<()> {
-        self.get_transaction(tx_id, "rollback")
+        let result = self
+            .get_transaction(tx_id, "rollback")
             .await?
             .write()
             .await
             .rollback(false)
-            .await
+            .await;
+        // Remove the transaction after attempt to roll back as soon as possible to return connection
+        // to the connection pool.
+        self.try_remove_transaction(tx_id).await;
+        result
     }
 }

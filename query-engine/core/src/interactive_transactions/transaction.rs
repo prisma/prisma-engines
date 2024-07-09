@@ -85,9 +85,7 @@ macro_rules! tx_timeout {
             .unwrap_or(Duration::ZERO);
         tokio::select! {
             _ = crosstarget_utils::time::sleep(remaining_time) => {
-                if $self.state.as_open($operation).is_ok() {
-                    let _ = $self.rollback(true).await;
-                }
+                let _ = $self.rollback(true).await;
                 Err(TransactionError::Closed {
                     reason: $self.to_closed().unwrap().error_message_for($operation),
                 }.into())
