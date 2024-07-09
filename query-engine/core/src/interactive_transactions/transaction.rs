@@ -168,15 +168,19 @@ impl InteractiveTransaction {
 
     pub(crate) async fn commit(&mut self) -> crate::Result<()> {
         tx_timeout!(self, "commit", async {
+            let name = self.name();
             let open_tx = self.state.as_open("commit")?;
             let span = info_span!("prisma:engine:itx_commit", user_facing = true);
+
             if let Err(err) = open_tx.commit().instrument(span).await {
+                debug!("transaction {name} failed to commit");
                 // We don't know if the transaction was committed or not. Because of that, we cannot
                 // leave it in "open" state. We attempt to rollback to get the transaction into a
                 // known state.
                 let _ = self.rollback(false).await;
                 Err(err.into())
             } else {
+                debug!("transaction {name} committed");
                 self.state.set_committed();
                 Ok(())
             }
@@ -184,11 +188,16 @@ impl InteractiveTransaction {
     }
 
     pub(crate) async fn rollback(&mut self, was_timeout: bool) -> crate::Result<()> {
-        debug!("[{}] rolling back, was timed out = {was_timeout}", self.name());
+        let name = self.name();
         let open_tx = self.state.as_open("rollback")?;
         let span = info_span!("prisma:engine:itx_rollback", user_facing = true);
 
         let result = open_tx.rollback().instrument(span).await;
+        if result.is_err() {
+            debug!("transaction {name} failed to roll back (roll back initiated because of timeout = {was_timeout})");
+        } else {
+            debug!("transaction {name} rolled back (roll back initiated because of timeout = {was_timeout})");
+        }
 
         // Ensure that the transaction isn't left in the "open" state after the rollback.
         if was_timeout {
