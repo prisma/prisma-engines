@@ -5,7 +5,7 @@ mod serialization_ast;
 mod tests;
 
 use psl::ValidatedSchema;
-pub use serialization_ast::DataModelMetaFormat;
+pub use serialization_ast::{DataModelMetaFormat, Datamodel};
 
 use ast_builders::schema_to_dmmf;
 use schema::QuerySchema;
@@ -35,4 +35,9 @@ pub fn from_precomputed_parts(query_schema: &QuerySchema) -> DataModelMetaFormat
         schema,
         mappings,
     }
+}
+
+#[inline]
+pub fn datamodel_from_validated_schema(schema: &ValidatedSchema) -> Datamodel {
+    schema_to_dmmf(schema)
 }
