@@ -4,14 +4,13 @@ use std::pin::Pin;
 
 use super::CachedTx;
 use crate::{
-    execute_many_operations, execute_single_operation, get_current_dispatcher, ClosedTx, Operation, ResponseData,
-    TransactionError, TxId,
+    execute_many_operations, execute_single_operation, ClosedTx, Operation, ResponseData, TransactionError, TxId,
 };
 use connector::{Connection, Transaction};
 use crosstarget_utils::time::ElapsedTimeCounter;
 use schema::QuerySchemaRef;
 use tokio::time::Duration;
-use tracing::{instrument::WithSubscriber, Dispatch, Span};
+use tracing::Span;
 use tracing_futures::Instrument;
 
 #[cfg(feature = "metrics")]
@@ -76,8 +75,6 @@ pub struct InteractiveTransaction {
     start_time: ElapsedTimeCounter,
     timeout: Duration,
     query_schema: QuerySchemaRef,
-    span: Span,
-    dispatcher: Dispatch,
 }
 
 macro_rules! tx_timeout {
@@ -122,8 +119,6 @@ impl InteractiveTransaction {
             start_time: ElapsedTimeCounter::start(),
             timeout,
             query_schema,
-            span,
-            dispatcher: get_current_dispatcher(),
         })
     }
 
@@ -132,7 +127,7 @@ impl InteractiveTransaction {
         operation: &Operation,
         traceparent: Option<String>,
     ) -> crate::Result<ResponseData> {
-        let span = info_span!(parent: &self.span, "prisma:engine:itx_execute_single", user_facing = true);
+        let span = info_span!("prisma:engine:itx_execute_single", user_facing = true);
         #[cfg(feature = "metrics")]
         set_span_link_from_traceparent(&span, traceparent.clone());
         let conn = self.state.as_open("query")?;
@@ -147,7 +142,6 @@ impl InteractiveTransaction {
                 traceparent,
             )
             .instrument(span)
-            .with_subscriber(self.dispatcher.clone())
         )
     }
 
@@ -157,7 +151,7 @@ impl InteractiveTransaction {
         traceparent: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         tx_timeout!(self, "batch query", async {
-            let span = info_span!(parent: &self.span, "prisma:engine:itx_execute_batch", user_facing = true);
+            let span = info_span!("prisma:engine:itx_execute_batch", user_facing = true);
             #[cfg(feature = "metrics")]
             set_span_link_from_traceparent(&span, traceparent.clone());
             let conn = self.state.as_open("batch query")?;
@@ -168,7 +162,6 @@ impl InteractiveTransaction {
                 traceparent,
             )
             .instrument(span)
-            .with_subscriber(self.dispatcher.clone())
             .await
         })
     }
@@ -176,13 +169,8 @@ impl InteractiveTransaction {
     pub(crate) async fn commit(&mut self) -> crate::Result<()> {
         tx_timeout!(self, "commit", async {
             let open_tx = self.state.as_open("commit")?;
-            let span = info_span!(parent: &self.span, "prisma:engine:itx_commit", user_facing = true);
-            if let Err(err) = open_tx
-                .commit()
-                .instrument(span)
-                .with_subscriber(self.dispatcher.clone())
-                .await
-            {
+            let span = info_span!("prisma:engine:itx_commit", user_facing = true);
+            if let Err(err) = open_tx.commit().instrument(span).await {
                 // We don't know if the transaction was committed or not. Because of that, we cannot
                 // leave it in "open" state. We attempt to rollback to get the transaction into a
                 // known state.
@@ -198,13 +186,9 @@ impl InteractiveTransaction {
     pub(crate) async fn rollback(&mut self, was_timeout: bool) -> crate::Result<()> {
         debug!("[{}] rolling back, was timed out = {was_timeout}", self.name());
         let open_tx = self.state.as_open("rollback")?;
-        let span = info_span!(parent: &self.span, "prisma:engine:itx_rollback", user_facing = true);
+        let span = info_span!("prisma:engine:itx_rollback", user_facing = true);
 
-        let result = open_tx
-            .rollback()
-            .instrument(span)
-            .with_subscriber(self.dispatcher.clone())
-            .await;
+        let result = open_tx.rollback().instrument(span).await;
 
         // Ensure that the transaction isn't left in the "open" state after the rollback.
         if was_timeout {
