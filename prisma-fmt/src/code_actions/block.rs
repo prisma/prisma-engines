@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, Diagnostic, Range, TextEdit, Url, WorkspaceEdit};
+use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, Diagnostic, Range, TextEdit, Uri, WorkspaceEdit};
 use psl::{
     diagnostics::Span,
     parser_database::walkers::{CompositeTypeWalker, ModelWalker},
@@ -106,7 +106,7 @@ pub(super) fn create_missing_block_for_type(
 
 fn push_missing_block(
     diag: &Diagnostic,
-    uri: Url,
+    uri: Uri,
     range: Range,
     block_type: &str,
     actions: &mut Vec<CodeActionOrCommand>,

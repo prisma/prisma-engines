@@ -31,6 +31,6 @@ either = "1.8.1"
 hex = "0.4"
 
 # For the connector API.
-lsp-types = "0.91.1"
+lsp-types = "0.97.0"
 url.workspace = true
 cfg-if = "1.0.0"

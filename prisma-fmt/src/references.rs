@@ -1,5 +1,7 @@
+use std::str::FromStr;
+
 use log::*;
-use lsp_types::{Location, ReferenceParams, Url};
+use lsp_types::{Location, ReferenceParams, Uri};
 use psl::{
     diagnostics::FileId,
     error_tolerant_parse_configuration,
@@ -235,7 +237,7 @@ fn ident_to_location<'ast>(id: &'ast Identifier, ctx: &'ast ReferencesContext<'_
     let range = span_to_range(id.span, source);
     let file_name = ctx.db.file_name(file_id);
 
-    let uri = if let Ok(uri) = Url::parse(file_name) {
+    let uri = if let Ok(uri) = Uri::from_str(file_name) {
         uri
     } else {
         return None;
