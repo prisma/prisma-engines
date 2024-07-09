@@ -6,7 +6,7 @@ mod relations;
 
 use crate::offsets::{position_after_span, range_to_span, span_to_range};
 use log::warn;
-use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic, Range, TextEdit, Uri, WorkspaceEdit};
+use lsp_types::{CodeActionOrCommand, CodeActionParams, Diagnostic, Range, TextEdit, Url, WorkspaceEdit};
 use psl::{
     diagnostics::Span,
     parser_database::{
@@ -16,7 +16,7 @@ use psl::{
     schema_ast::ast::{self, Attribute, IndentationType, NewlineType, WithSpan},
     PreviewFeature,
 };
-use std::{collections::HashMap, str::FromStr};
+use std::collections::HashMap;
 
 use crate::LSPContext;
 
@@ -246,8 +246,8 @@ fn create_text_edit(
     })
 }
 
-pub(crate) fn parse_url(url: &str) -> Result<Uri, Box<dyn std::error::Error>> {
-    let result = Uri::from_str(url);
+pub(crate) fn parse_url(url: &str) -> Result<Url, Box<dyn std::error::Error>> {
+    let result = Url::parse(url);
     if result.is_err() {
         warn!("Could not parse url {url}")
     }

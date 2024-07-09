@@ -10,7 +10,7 @@ psl = { workspace = true, features = ["all"] }
 serde_json.workspace = true
 serde.workspace = true
 indoc.workspace = true
-lsp-types = "0.97.0"
+lsp-types = "0.95.1"
 log = "0.4.14"
 enumflags2.workspace = true
 
