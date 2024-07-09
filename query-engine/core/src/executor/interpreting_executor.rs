@@ -153,7 +153,7 @@ where
         super::with_request_context(engine_protocol, async move {
             let isolation_level = tx_opts.isolation_level;
             let valid_for_millis = tx_opts.valid_for_millis;
-            let id = tx_opts.new_tx_id.unwrap_or_else(TxId::new);
+            let id = tx_opts.new_tx_id.unwrap_or_default();
 
             let conn_span = info_span!(
                 "prisma:engine:connection",

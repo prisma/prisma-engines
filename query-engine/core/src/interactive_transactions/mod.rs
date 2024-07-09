@@ -18,8 +18,8 @@ pub(crate) use transaction::*;
 #[display(fmt = "{}", _0)]
 pub struct TxId(String);
 
-impl TxId {
-    pub fn new() -> Self {
+impl Default for TxId {
+    fn default() -> Self {
         #[allow(deprecated)]
         Self(cuid::cuid().unwrap())
     }
