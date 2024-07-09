@@ -5,7 +5,7 @@ use lsp_types::*;
 use psl::{
     diagnostics::Span,
     error_tolerant_parse_configuration,
-    parser_database::{ast, ParserDatabase, ReferentialAction, SourceFile},
+    parser_database::{ast, ParserDatabase, SourceFile},
     schema_ast::ast::AttributePosition,
     Diagnostics, PreviewFeature,
 };
