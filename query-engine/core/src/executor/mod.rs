@@ -90,7 +90,7 @@ impl TransactionOptions {
     /// Generates a new transaction id before the transaction is started and returns a modified version
     /// of self with the new predefined_id set.
     pub fn with_new_transaction_id(&mut self) -> TxId {
-        let tx_id: TxId = Default::default();
+        let tx_id = TxId::new();
         self.new_tx_id = Some(tx_id.clone());
         tx_id
     }

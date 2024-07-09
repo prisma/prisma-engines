@@ -153,9 +153,8 @@ where
         super::with_request_context(engine_protocol, async move {
             let isolation_level = tx_opts.isolation_level;
             let valid_for_millis = tx_opts.valid_for_millis;
-            let id = tx_opts.new_tx_id.unwrap_or_default();
+            let id = tx_opts.new_tx_id.unwrap_or_else(TxId::new);
 
-            trace!("[{}] Starting...", id);
             let conn_span = info_span!(
                 "prisma:engine:connection",
                 user_facing = true,
@@ -180,19 +179,16 @@ where
                 )
                 .await?;
 
-            debug!("[{}] Started.", id);
             Ok(id)
         })
         .await
     }
 
     async fn commit_tx(&self, tx_id: TxId) -> crate::Result<()> {
-        trace!("[{}] Committing.", tx_id);
         self.itx_manager.commit_tx(&tx_id).await
     }
 
     async fn rollback_tx(&self, tx_id: TxId) -> crate::Result<()> {
-        trace!("[{}] Rolling back.", tx_id);
         self.itx_manager.rollback_tx(&tx_id).await
     }
 }
