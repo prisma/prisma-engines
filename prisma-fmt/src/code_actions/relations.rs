@@ -282,7 +282,11 @@ pub(super) fn add_referencing_side_relation(
                 .find(|arg| arg.value.is_string())
                 .map_or(Default::default(), |arg| format!("{arg}, "));
 
-            let relation_attr = format!("@relation({}fields: [], references: [])", name);
+            let references = initiating_field
+                .referenced_fields()
+                .map_or("references: []".to_owned(), |refs| format!("references: [{}]", refs.map(|r| r.name()).collect::<Vec<&str>>().join(", ")));
+
+            let relation_attr = format!("@relation({}fields: [], {})", name, references);
             let range = super::span_to_range(attr.span(), ctx.initiating_file_source());
 
             TextEdit {
