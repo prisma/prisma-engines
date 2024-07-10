@@ -108,33 +108,61 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body-includes: '/integration'
 
+      #
+      # A patch branch (e.g. "4.6.x")
+      #
+      - name: Check if branch is a patch or integration branch
+        id: check-branch
+        uses: actions/github-script@v7
+        env:
+          BRANCH: ${{ github.ref }}
+        with:
+          script: |
+            const { BRANCH } = process.env
+            const parts = BRANCH.split('.')
+            if (parts.length === 3 && parts[2] === 'x') {
+              console.log(`Branch is a patch branch: ${BRANCH}`)
+              # set value to GitHub output 
+              core.setOutput('release', true)
+            } else if (BRANCH.startsWith("integration/")) {
+              console.log(`Branch is an "integration/" branch: ${BRANCH}`)
+              # set value to GitHub output 
+              core.setOutput('release', true)
+            } else {
+              core.setOutput('release', false)
+            }
+
       - name: Debug event & outputs
         env:
           EVENT_NAME: ${{ github.event_name }}
           EVENT_PATH: ${{ github.event_path }}
           CHECK_PR_DESC: ${{ steps.check-pr-description.outputs.release }}
           CHECK_COMMENT: ${{ steps.check-comments.outputs.comment-id }}
+          CHECK_BRANCH: ${{ steps.check-branch.outputs.release }}
         run: |
           echo "Event Name: $EVENT_NAME"
           echo "Event path: $EVENT_PATH"
           echo "Check PR Description outputs: $CHECK_PR_DESC"
           echo "Check Comments outputs: $CHECK_COMMENT"
+          echo "Check branch: $CHECK_BRANCH"
 
       - name: Release is necessary!
         # https://github.com/peter-evans/find-comment/tree/v3/?tab=readme-ov-file#outputs
         # Tip: Empty strings evaluate to zero in GitHub Actions expressions. e.g. If comment-id is an empty string steps.fc.outputs.comment-id == 0 evaluates to true.
-        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || steps.check-comments.outputs.comment-id != 0 || steps.check-pr-description.outputs.release == 'true'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || steps.check-comments.outputs.comment-id != 0 || steps.check-pr-description.outputs.release == 'true' || steps.check-branch.outputs.release == 'true'
         id: decision
         env:
           EVENT_NAME: ${{ github.event_name }}
           EVENT_PATH: ${{ github.event_path }}
           CHECK_PR_DESC: ${{ steps.check-pr-description.outputs.release }}
           CHECK_COMMENT: ${{ steps.check-comments.outputs.comment-id }}
+          CHECK_BRANCH: ${{ steps.check-branch.outputs.release }}
         run: |
           echo "Event Name: $EVENT_NAME"
           echo "Event path: $EVENT_PATH"
           echo "Check PR Description outputs: $CHECK_PR_DESC"
           echo "Check Comments outputs: $CHECK_COMMENT"
+          echo "Check branch: $CHECK_BRANCH"
 
           echo "Release is necessary"
           echo "release=true" >> $GITHUB_OUTPUT
@@ -278,5 +306,12 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-s3
 
+      - name: Workflow dispatch to prisma/engines-wrapper
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: .github/workflows/publish-engines.yml
+          repo: prisma/engines-wrapper
+          token: ${{ secrets.GITHUB_TOKEN }}
+          inputs: '{ "commit": "${{ github.sha }}", "branch": "${{ github.ref }}" }'
       - name: Cleanup local directories
         run: rm -rf engines-artifacts engines-artifacts-for-r2 engines-artifacts-for-s3
