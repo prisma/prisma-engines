@@ -5,6 +5,7 @@ pub struct Datamodel {
     pub enums: Vec<Enum>,
     pub models: Vec<Model>,
     pub types: Vec<Model>, // composite types
+    pub indexes: Vec<Index>,
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -107,3 +108,63 @@ pub struct EnumValue {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
 }
+
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Index {
+    pub model: String,
+    pub r#type: IndexType,
+    pub is_defined_on_field: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mapped_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub algorithm: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub clustered: Option<bool>,
+    pub fields: Vec<IndexField>,
+}
+
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct IndexField {
+    /// Path to the indexed field. Each tuple consists of the field name and
+    /// the name of the type this field is defined on.
+    pub path: Vec<(String, String)>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sort_order: Option<SortOrder>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub length: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub operator_class: Option<String>,
+}
+
+macro_rules! convert_enum {
+    ( $from:path => $to:ident { $( $variant:ident, )+ } ) => {
+        #[derive(Debug, serde::Serialize)]
+        #[serde(rename_all = "camelCase")]
+        pub enum $to {
+            $( $variant, )+
+        }
+
+        impl From<$from> for $to {
+            fn from(value: $from) -> Self {
+                match value {
+                    $( <$from>::$variant => <$to>::$variant, )+
+                }
+            }
+        }
+    };
+}
+
+convert_enum!(psl::parser_database::IndexType => IndexType {
+    Normal,
+    Unique,
+    Fulltext,
+});
+
+convert_enum!(psl::parser_database::SortOrder => SortOrder {
+    Asc,
+    Desc,
+});

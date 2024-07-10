@@ -1,7 +1,9 @@
-use crate::serialization_ast::datamodel_ast::{
-    Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex,
+use crate::serialization_ast::{
+    datamodel_ast::{Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex},
+    Index, IndexField,
 };
 use bigdecimal::ToPrimitive;
+use itertools::Either;
 use psl::{
     parser_database::{walkers, ScalarFieldType},
     schema_ast::ast::WithDocumentation,
@@ -13,6 +15,7 @@ pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
         models: Vec::with_capacity(schema.db.models_count()),
         enums: Vec::with_capacity(schema.db.enums_count()),
         types: Vec::new(),
+        indexes: Vec::new(),
     };
 
     for enum_model in schema.db.walk_enums() {
@@ -26,6 +29,7 @@ pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
         .chain(schema.db.walk_views().filter(|view| !view.is_ignored()))
     {
         datamodel.models.push(model_to_dmmf(model));
+        datamodel.indexes.extend(model_indexes_to_dmmf(model));
     }
 
     for ct in schema.db.walk_composite_types() {
@@ -236,6 +240,36 @@ fn relation_field_to_dmmf(field: walkers::RelationFieldWalker<'_>) -> Field {
         is_updated_at: Some(false),
         documentation: ast_field.documentation().map(ToOwned::to_owned),
     }
+}
+
+fn model_indexes_to_dmmf(model: walkers::ModelWalker<'_>) -> impl Iterator<Item = Index> + '_ {
+    model.indexes().map(move |index| Index {
+        model: model.name().to_owned(),
+        r#type: index.index_type().into(),
+        is_defined_on_field: index.is_defined_on_field(),
+        name: index.name().map(ToOwned::to_owned),
+        mapped_name: index.mapped_name().map(ToOwned::to_owned),
+        algorithm: index.algorithm().map(|alg| alg.to_string()),
+        clustered: index.clustered(),
+        fields: index
+            .scalar_field_attributes()
+            .map(|sfa| IndexField {
+                path: sfa
+                    .as_path_to_indexed_field()
+                    .into_iter()
+                    .map(|(field_name, type_name)| {
+                        (field_name.to_owned(), type_name.unwrap_or(model.name()).to_owned())
+                    })
+                    .collect(),
+                sort_order: sfa.sort_order().map(Into::into),
+                length: sfa.length(),
+                operator_class: sfa.operator_class().map(|oc| match oc.get() {
+                    Either::Left(oc) => oc.to_string(),
+                    Either::Right(oc) => oc.to_owned(),
+                }),
+            })
+            .collect(),
+    })
 }
 
 fn default_value_to_serde(dv: &DefaultKind) -> serde_json::Value {
