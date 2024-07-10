@@ -255,15 +255,23 @@ pub(super) fn add_referencing_side_relation(
     }
 
     // * In the prisma-fmt incarnation of this, we assume:
-    // * fields contains a field with the name `referenced_modelId`
-    // * references contains a field named `id`
-    // * It feels cleaner to not do that and allow users to self-define
-    // * what their fields will actually be called rather than adding more clutter.
+    // * - fields contains a field with the name `referenced_modelId`
+    // * - references contains a field named `id`
+    // * It feels cleaner to not do that and allow users to self-define what their
+    // * fields will actually be called rather than adding more clutter.
+    // * This also avoids collisions when dealing with cases with multiple relations on the same model.
     // TODO: Use this once actually available
     // TODO: https://github.com/microsoft/language-server-protocol/pull/1892
-    let relation_attr = format!("@relation(fields: [], references: [])");
     let text = match initiating_field.relation_attribute() {
         Some(attr) => {
+            let name = attr
+                .arguments
+                .arguments
+                .iter()
+                .find(|arg| arg.value.is_string())
+                .map_or(Default::default(), |arg| format!("\"{}\", ", arg.value.as_string_value().unwrap().0));
+
+            let relation_attr = format!("@relation({}fields: [], references: [])", name);
             let range = super::span_to_range(attr.span(), ctx.initiating_file_source());
 
             TextEdit {
@@ -272,7 +280,10 @@ pub(super) fn add_referencing_side_relation(
             }
         }
         None => {
-            let new_text = format!(" {}{}", relation_attr, initiating_field.model().newline());
+            let new_text = format!(
+                " @relation(fields: [], references: []){}",
+                initiating_field.model().newline()
+            );
             let range = super::range_after_span(initiating_field.ast_field().span(), ctx.initiating_file_source());
 
             TextEdit { range, new_text }
