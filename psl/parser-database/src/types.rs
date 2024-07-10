@@ -4,7 +4,7 @@ use crate::{context::Context, interner::StringId, walkers::IndexFieldWalker, Dat
 use either::Either;
 use enumflags2::bitflags;
 use rustc_hash::FxHashMap as HashMap;
-use schema_ast::ast::{self, WithName};
+use schema_ast::ast::{self, EnumValueId, WithName};
 use std::{collections::BTreeMap, fmt};
 
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
@@ -19,6 +19,12 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
             _ => unreachable!(),
         }
     }
+}
+
+pub enum RefinedFieldVariant {
+    Relation(RelationFieldId),
+    Scalar(ScalarFieldId),
+    Unknown,
 }
 
 #[derive(Debug, Default)]
@@ -92,16 +98,16 @@ impl Types {
             .map(move |(idx, rf)| (RelationFieldId((first_relation_field_idx + idx) as u32), rf))
     }
 
-    pub(super) fn refine_field(&self, id: (crate::ModelId, ast::FieldId)) -> Either<RelationFieldId, ScalarFieldId> {
+    pub(super) fn refine_field(&self, id: (crate::ModelId, ast::FieldId)) -> RefinedFieldVariant {
         self.relation_fields
             .binary_search_by_key(&id, |rf| (rf.model_id, rf.field_id))
-            .map(|idx| Either::Left(RelationFieldId(idx as u32)))
+            .map(|idx| RefinedFieldVariant::Relation(RelationFieldId(idx as u32)))
             .or_else(|_| {
                 self.scalar_fields
                     .binary_search_by_key(&id, |sf| (sf.model_id, sf.field_id))
-                    .map(|id| Either::Right(ScalarFieldId(id as u32)))
+                    .map(|id| RefinedFieldVariant::Scalar(ScalarFieldId(id as u32)))
             })
-            .expect("expected field to be either scalar or relation field")
+            .unwrap_or(RefinedFieldVariant::Unknown)
     }
 
     pub(super) fn push_relation_field(&mut self, relation_field: RelationField) -> RelationFieldId {
@@ -623,7 +629,7 @@ pub struct FieldWithArgs {
 pub(super) struct EnumAttributes {
     pub(super) mapped_name: Option<StringId>,
     /// @map on enum values.
-    pub(super) mapped_values: HashMap<u32, StringId>,
+    pub(super) mapped_values: HashMap<EnumValueId, StringId>,
     /// ```ignore
     /// @@schema("public")
     ///          ^^^^^^^^

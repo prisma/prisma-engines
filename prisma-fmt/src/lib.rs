@@ -3,23 +3,25 @@ mod code_actions;
 mod get_config;
 mod get_datamodel;
 mod get_dmmf;
+mod hover;
 mod lint;
 mod merge_schemas;
 mod native;
-mod offsets;
 mod preview;
 mod references;
 mod schema_file_input;
 mod text_document_completion;
 mod validate;
 
+pub mod offsets;
+
 use log::*;
-pub use offsets::span_to_range;
 use psl::{
     datamodel_connector::Connector, diagnostics::FileId, parser_database::ParserDatabase, Configuration, Datasource,
     Generator,
 };
 use schema_file_input::SchemaFileInput;
+use serde_json::json;
 
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct LSPContext<'a, T> {
@@ -108,6 +110,28 @@ pub fn references(schema_files: String, params: &str) -> String {
 
     let references = references::references(input.into(), params);
     serde_json::to_string(&references).unwrap()
+}
+
+pub fn hover(schema_files: String, params: &str) -> String {
+    let schema: SchemaFileInput = match serde_json::from_str(&schema_files) {
+        Ok(schema) => schema,
+        Err(serde_err) => {
+            warn!("Failed to deserialize SchemaFileInput: {serde_err}");
+            return json!(null).to_string();
+        }
+    };
+
+    let params: lsp_types::HoverParams = match serde_json::from_str(params) {
+        Ok(params) => params,
+        Err(_) => {
+            warn!("Failed to deserialize Hover");
+            return json!(null).to_string();
+        }
+    };
+
+    let hover = hover::run(schema.into(), params);
+
+    serde_json::to_string(&hover).unwrap()
 }
 
 /// The two parameters are:

@@ -1,0 +1,16 @@
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+model Humans {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    animalIds String[] @db.ObjectId
+    family    An<|>imals[] @relation(fields: [animalIds], references: [id])
+}
+
+model Animals {
+    id       String   @id @default(auto()) @map("_id") @db.ObjectId
+    humanIds String[] @db.ObjectId
+    family   Humans[] @relation(fields: [humanIds], references: [id])
+}

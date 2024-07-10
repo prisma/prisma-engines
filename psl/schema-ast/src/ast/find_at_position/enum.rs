@@ -63,6 +63,8 @@ impl<'ast> EnumPosition<'ast> {
 pub enum EnumValuePosition<'ast> {
     /// Nowhere specific inside the value
     Value,
+    /// In the name
+    Name(&'ast str),
     /// In an attribute. (name, idx, optional arg)
     /// In a value.
     /// ```prisma
@@ -77,6 +79,9 @@ pub enum EnumValuePosition<'ast> {
 
 impl<'ast> EnumValuePosition<'ast> {
     fn new(value: &'ast ast::EnumValue, position: usize) -> EnumValuePosition<'ast> {
+        if value.name.span().contains(position) {
+            return EnumValuePosition::Name(value.name());
+        }
         for (attr_idx, attr) in value.attributes.iter().enumerate() {
             if attr.span().contains(position) {
                 // We can't go by Span::contains() because we also care about the empty space

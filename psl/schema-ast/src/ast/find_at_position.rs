@@ -16,7 +16,7 @@ pub use field::FieldPosition;
 pub use generator::GeneratorPosition;
 pub use model::ModelPosition;
 pub use property::PropertyPosition;
-pub use r#enum::EnumPosition;
+pub use r#enum::{EnumPosition, EnumValuePosition};
 
 use crate::ast::{self, top_idx_to_top_id, traits::*};
 
