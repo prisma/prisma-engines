@@ -3,32 +3,32 @@ run-name: Build Engines for ${{ inputs.commit }}
 
 # Run on `push` only for main, if not it will trigger `push` & `pull_request` on PRs at the same time
 on:
-  push:
-    branches:
-      - main
-      - '*.*.x'
-    paths-ignore:
-      - '!.github/workflows/build-engines*'
-      - '.github/**'
-      - '.buildkite/**'
-      - '*.md'
-      - 'LICENSE'
-      - 'CODEOWNERS'
-      - 'renovate.json'
+  # push:
+  #   branches:
+  #     - main
+  #     - '*.*.x'
+  #   paths-ignore:
+  #     - '!.github/workflows/build-engines*'
+  #     - '.github/**'
+  #     - '.buildkite/**'
+  #     - '*.md'
+  #     - 'LICENSE'
+  #     - 'CODEOWNERS'
+  #     - 'renovate.json'
   workflow_dispatch:
     inputs:
       commit:
         description: 'Commit to build (from prisma-engines)'
         required: false
-  pull_request:
-    paths-ignore:
-      - '!.github/workflows/build-engines*'
-      - '.github/**'
-      - '.buildkite/**'
-      - '*.md'
-      - 'LICENSE'
-      - 'CODEOWNERS'
-      - 'renovate.json'
+  # pull_request:
+  #   paths-ignore:
+  #     - '!.github/workflows/build-engines*'
+  #     - '.github/**'
+  #     - '.buildkite/**'
+  #     - '*.md'
+  #     - 'LICENSE'
+  #     - 'CODEOWNERS'
+  #     - 'renovate.json'
 
 jobs:
   build-linux:
