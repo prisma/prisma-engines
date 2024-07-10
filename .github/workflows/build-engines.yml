@@ -156,7 +156,7 @@ jobs:
     env:
       BUCKET_NAME: 'prisma-builds-github-actions'
       PRISMA_ENGINES_COMMIT_SHA: ${{ inputs.commit || github.sha }}
-      DESTINATION_TARGET_PATH: 's3://prisma-builds-github-actions/all_commits/${{ inputs.commit }}'
+      DESTINATION_TARGET_PATH: 's3://prisma-builds-github-actions/all_commits/${{ inputs.commit || github.sha }}'
 
     steps:
       # Because we need the scripts
@@ -271,14 +271,12 @@ jobs:
           AWS_ENDPOINT_URL_S3: ${{ vars.R2_ENDPOINT }}
         run: bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-r2
 
-      # TODO uncomment
-      # This fails with permission denied at the moment
-      # - name: 'AWS S3: Upload to bucket and verify uploaded files then create `.finished` file'
-      #   env:
-      #     AWS_DEFAULT_REGION: 'eu-west-1'
-      #     AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #   run: bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-s3
+      - name: 'AWS S3: Upload to bucket and verify uploaded files then create `.finished` file'
+        env:
+          AWS_DEFAULT_REGION: 'eu-west-1'
+          AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-s3
 
       - name: Cleanup local directories
         run: rm -rf engines-artifacts engines-artifacts-for-r2 engines-artifacts-for-s3
