@@ -167,7 +167,11 @@ impl<'db> RelationFieldWalker<'db> {
             .map(move |fields| fields.iter().map(move |field_id| self.db.walk(*field_id)))
     }
 
-    /// relation_kind doc
+    /// Gets relation kind; possibilities:
+    /// - "implicit many-to-many",
+    /// - "explicit many-to-many",
+    /// - "one-to-one",
+    /// - "one-to-many",
     pub fn relation_kind(self) -> &'db str {
         self.relation().relation_kind()
     }

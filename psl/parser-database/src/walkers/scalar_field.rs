@@ -110,7 +110,7 @@ impl<'db> ScalarFieldWalker<'db> {
         self.scalar_field_type().as_enum().map(|id| self.db.walk(id))
     }
 
-    /// Is this field's type an enum? If yes, walk the enum.
+    /// Is this field's type a composite type? If yes, walk the composite type.
     pub fn field_type_as_composite_type(self) -> Option<CompositeTypeWalker<'db>> {
         self.scalar_field_type().as_composite_type().map(|id| self.db.walk(id))
     }

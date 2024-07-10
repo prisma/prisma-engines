@@ -42,7 +42,7 @@ impl<'db> RelationWalker<'db> {
         r.model_a == r.model_b
     }
 
-    /// relation_kind doc
+    /// Gets relation kind
     pub fn relation_kind(self) -> &'db str {
         let r = self.ast_relation();
 
