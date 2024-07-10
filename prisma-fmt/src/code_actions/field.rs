@@ -13,8 +13,8 @@ pub(super) fn add_missing_opposite_relation(
     field: FieldWalker<'_>,
 ) {
     match field.refine() {
-        walkers::RefinedFieldWalker::Scalar(_) => return,
-        walkers::RefinedFieldWalker::Relation(_) => (),
+        Some(walkers::RefinedFieldWalker::Relation(_)) => (),
+        _ => return,
     }
 
     let name = field.model().name();
