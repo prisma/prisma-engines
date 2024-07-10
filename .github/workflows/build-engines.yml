@@ -143,7 +143,7 @@ jobs:
     name: 'Release artifacts from branch ${{ github.event.ref }} for commit ${{ inputs.commit }}'
     runs-on: ubuntu-22.04
     concurrency:
-      group: ${{ inputs.commit }}
+      group: ${{ inputs.commit || github.sha }}
     needs:
       - is-release-necessary
       - build-linux
@@ -155,7 +155,7 @@ jobs:
 
     env:
       BUCKET_NAME: 'prisma-builds-github-actions'
-      PRISMA_ENGINES_COMMIT_SHA: ${{ inputs.commit }}
+      PRISMA_ENGINES_COMMIT_SHA: ${{ inputs.commit || github.sha }}
       DESTINATION_TARGET_PATH: 's3://prisma-builds-github-actions/all_commits/${{ inputs.commit }}'
 
     steps:
