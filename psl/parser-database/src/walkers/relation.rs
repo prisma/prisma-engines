@@ -48,7 +48,7 @@ impl<'db> RelationWalker<'db> {
 
         match r.attributes {
             RelationAttributes::ImplicitManyToMany { .. } => "implicit many-to-many",
-            RelationAttributes::TwoWayEmbeddedManyToMany { .. } => "explicit many-to-many",
+            RelationAttributes::TwoWayEmbeddedManyToMany { .. } => "implicit many-to-many",
             RelationAttributes::OneToOne(_) => "one-to-one",
             RelationAttributes::OneToMany(_) => "one-to-many",
         }

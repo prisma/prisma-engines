@@ -54,7 +54,6 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
         Some(pos) => pos,
         None => {
             warn!("Received a position outside of the document boundaries in HoverParams");
-            warn!("Received a position outside of the document boundaries in HoverParams");
             return None;
         }
     };
