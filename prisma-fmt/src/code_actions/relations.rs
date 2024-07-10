@@ -245,10 +245,21 @@ pub(super) fn add_referencing_side_relation(
     // ! The relation field `forum` on Model `Interm` must specify
     // ! the `fields` argument in the @relation attribute.
     // ! You can run `prisma format` to fix this automatically.
-    let diagnostics = ctx.diagnostics_for_span_with_message(
+    let mut diagnostics = ctx.diagnostics_for_span_with_message(
         initiating_field.ast_field().span(),
         "must specify the `fields` argument in the @relation attribute.",
     );
+
+    // ? (@druue) We seem to have a slightly different message for effectively the same schema state
+    // * Full example diagnostic message:
+    // ! Error parsing attribute "@relation":
+    // ! The relation fields `wife` on Model `User` and `husband` on Model `User`
+    // ! do not provide the `fields` argument in the @relation attribute.
+    // ! You have to provide it on one of the two fields.
+    diagnostics.extend(ctx.diagnostics_for_span_with_message(
+        initiating_field.ast_field().span(),
+        "do not provide the `fields` argument in the @relation attribute.",
+    ));
 
     if diagnostics.is_empty() {
         return;
@@ -269,7 +280,7 @@ pub(super) fn add_referencing_side_relation(
                 .arguments
                 .iter()
                 .find(|arg| arg.value.is_string())
-                .map_or(Default::default(), |arg| format!("\"{}\", ", arg.value.as_string_value().unwrap().0));
+                .map_or(Default::default(), |arg| format!("{arg}, "));
 
             let relation_attr = format!("@relation({}fields: [], references: [])", name);
             let range = super::span_to_range(attr.span(), ctx.initiating_file_source());
