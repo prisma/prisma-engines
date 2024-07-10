@@ -1,6 +1,7 @@
 mod actions;
 mod code_actions;
 mod get_config;
+mod get_datamodel;
 mod get_dmmf;
 mod lint;
 mod merge_schemas;
@@ -274,4 +275,8 @@ pub fn get_config(get_config_params: String) -> String {
 /// ```
 pub fn get_dmmf(get_dmmf_params: String) -> Result<String, String> {
     get_dmmf::get_dmmf(&get_dmmf_params)
+}
+
+pub fn get_datamodel(get_datamodel_params: String) -> Result<String, String> {
+    get_datamodel::get_datamodel(&get_datamodel_params)
 }
