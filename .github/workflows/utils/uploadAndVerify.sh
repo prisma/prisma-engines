@@ -13,7 +13,7 @@ fi
 
 echo "Uploading files..."
 cd engines-artifacts
-aws s3 sync . $DESTINATION_TARGET_PATH --no-progress \
+aws s3 sync . "$DESTINATION_TARGET_PATH" --no-progress \
     --exclude "*" \
     --include "*.gz" \
     --include "*.zip" \
@@ -22,9 +22,9 @@ aws s3 sync . $DESTINATION_TARGET_PATH --no-progress \
 cd ".."
 
 echo "Downloading files..."
-mkdir $LOCAL_DIR_PATH
-cd $LOCAL_DIR_PATH
-aws s3 sync $DESTINATION_TARGET_PATH . --no-progress
+mkdir "$LOCAL_DIR_PATH"
+cd "$LOCAL_DIR_PATH"
+aws s3 sync "$DESTINATION_TARGET_PATH" . --no-progress
 
 echo "Verifing downloaded files..."
 ls -R .
@@ -75,24 +75,24 @@ find . | sort > ../currentFiles.txt
 cd ..
 echo "Comparing expectedFiles.txt vs currentFiles.txt"
 diff -c .github/workflows/utils/expectedFiles.txt currentFiles.txt
-cd $LOCAL_DIR_PATH
+cd "$LOCAL_DIR_PATH"
 
 # Unpack all .gz files first
-find . -type f | while read filename; do
+find . -type f | while read -r filename; do
     echo "Unpacking $filename file."
     gzip -d "$filename" --keep -q
 done
 
 # Verify .sha256 files
-find . -type f -name "*.sha256" | while read filename; do
+find . -type f -name "*.sha256" | while read -r filename; do
     echo "Validating sha256 sum."
     sha256sum -c "$filename"
 done
 
 # Verify .sig files
-find . -type f -name "*.sig" | while read filename; do
+find . -type f -name "*.sig" | while read -r filename; do
     # Remove .sig from the file name
-    fileToVerify=$(echo $filename | rev | cut -c5- | rev)
+    fileToVerify=$(echo "$filename" | rev | cut -c5- | rev)
 
     echo "Validating signature $filename for $fileToVerify"
     gpg --verify "$filename" "$fileToVerify"
