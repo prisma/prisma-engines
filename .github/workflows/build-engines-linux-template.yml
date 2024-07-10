@@ -112,8 +112,6 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
 
-      - uses: dtolnay/rust-toolchain@stable
-
       - name: Construct build command
         id: construct_build_command
         env:
@@ -131,6 +129,10 @@ jobs:
           -e LIBZ_SYS_STATIC=1 \
           -w /root/build \
           -v \"$(pwd)\":/root/build \
+          -v \"$HOME\"/.cargo/bin:/root/cargo/bin" \
+          -v \"$HOME\"/.cargo/registry/index:/root/cargo/registry/index" \
+          -v \"$HOME\"/.cargo/registry/cache:/root/cargo/registry/cache" \
+          -v \"$HOME\"/.cargo/git/db:/root/cargo/git/db" \
           $IMAGE \
           bash -c \
               \" \
