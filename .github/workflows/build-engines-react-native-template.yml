@@ -20,6 +20,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          repository: prisma/prisma-engines
           ref: ${{ inputs.commit }}
 
       - uses: actions/cache@v4
@@ -62,6 +63,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          repository: prisma/prisma-engines
           ref: ${{ inputs.commit }}
 
       - uses: actions/cache@v4
