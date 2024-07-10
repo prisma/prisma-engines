@@ -349,7 +349,13 @@ mod tests {
 
             let datamodel_string = load_from_file(format!("{test_case}.prisma").as_str());
             let dmmf_string = render_to_dmmf(&datamodel_string);
+
+            if std::env::var("UPDATE_EXPECT") == Ok("1".into()) {
+                save_to_file(&format!("{test_case}.json"), &dmmf_string);
+            }
+
             let expected_json = load_from_file(format!("{test_case}.json").as_str());
+
             println!("{dmmf_string}");
             assert_eq_json(&dmmf_string, &expected_json, test_case);
         }
@@ -363,8 +369,13 @@ mod tests {
         assert_eq!(json_a, json_b, "{}", msg);
     }
 
+    const SAMPLES_FOLDER_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/test_files");
+
     fn load_from_file(file: &str) -> String {
-        let samples_folder_path = concat!(env!("CARGO_MANIFEST_DIR"), "/test_files");
-        fs::read_to_string(format!("{samples_folder_path}/{file}")).unwrap()
+        fs::read_to_string(format!("{SAMPLES_FOLDER_PATH}/{file}")).unwrap()
+    }
+
+    fn save_to_file(file: &str, content: &str) {
+        fs::write(format!("{SAMPLES_FOLDER_PATH}/{file}"), content).unwrap();
     }
 }

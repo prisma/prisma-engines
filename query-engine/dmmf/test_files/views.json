@@ -135,7 +135,7 @@
       "uniqueIndexes": [],
       "isGenerated": false
     },
-        {
+    {
       "name": "UserInfo",
       "dbName": null,
       "fields": [
@@ -198,5 +198,31 @@
       "isGenerated": false
     }
   ],
-  "types": []
+  "types": [],
+  "indexes": [
+    {
+      "model": "User",
+      "type": "unique",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "path": [
+            "email"
+          ]
+        }
+      ]
+    },
+    {
+      "model": "Profile",
+      "type": "unique",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "path": [
+            "userId"
+          ]
+        }
+      ]
+    }
+  ]
 }
