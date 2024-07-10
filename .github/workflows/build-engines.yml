@@ -122,11 +122,9 @@ jobs:
             const parts = BRANCH.split('.')
             if (parts.length === 3 && parts[2] === 'x') {
               console.log(`Branch is a patch branch: ${BRANCH}`)
-              # set value to GitHub output 
               core.setOutput('release', true)
             } else if (BRANCH.startsWith("integration/")) {
               console.log(`Branch is an "integration/" branch: ${BRANCH}`)
-              # set value to GitHub output 
               core.setOutput('release', true)
             } else {
               core.setOutput('release', false)
