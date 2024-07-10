@@ -298,6 +298,56 @@ pub(super) fn add_referencing_side_relation(
     actions.push(CodeActionOrCommand::CodeAction(action))
 }
 
+pub(super) fn make_referencing_side_many(
+    actions: &mut Vec<CodeActionOrCommand>,
+    ctx: &CodeActionsContext<'_>,
+    relation: CompleteInlineRelationWalker<'_>,
+) {
+    let initiating_field = relation.referencing_field();
+
+    // * Full example diagnostic message:
+    // ! Error parsing attribute "@relation":
+    // ! The relation field `forum` on Model `Interm` must specify
+    // ! the `fields` argument in the @relation attribute.
+    // ! You can run `prisma format` to fix this automatically.
+    let diagnostics = ctx.diagnostics_for_span_with_message(
+        initiating_field.ast_field().span(),
+        "must specify the `fields` argument in the @relation attribute.",
+    );
+
+    if diagnostics.is_empty() {
+        return;
+    }
+
+    let text = match initiating_field.relation_attribute() {
+        Some(_) => return,
+        None => {
+            let new_text = format!("[]{}", initiating_field.model().newline());
+            let range = super::range_after_span(initiating_field.ast_field().span(), ctx.initiating_file_source());
+
+            TextEdit { range, new_text }
+        }
+    };
+
+    let mut changes: HashMap<lsp_types::Url, Vec<TextEdit>> = HashMap::new();
+    changes.insert(ctx.params.text_document.uri.clone(), vec![text]);
+
+    let edit = WorkspaceEdit {
+        changes: Some(changes),
+        ..Default::default()
+    };
+
+    let action = CodeAction {
+        title: String::from("Mark relation field as many `[]`"),
+        kind: Some(CodeActionKind::QUICKFIX),
+        edit: Some(edit),
+        diagnostics: Some(diagnostics),
+        ..Default::default()
+    };
+
+    actions.push(CodeActionOrCommand::CodeAction(action))
+}
+
 /// For schema's with emulated relations,
 /// If the referenced side of the relation does not point to a unique
 /// constraint, the action adds the attribute.

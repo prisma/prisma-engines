@@ -127,6 +127,10 @@ pub(crate) fn available_actions(
                 None => continue,
             };
 
+            if matches!(datasource, Some(ds) if ds.active_provider != "mongodb") {
+                relations::make_referencing_side_many(&mut actions, &context, complete_relation);
+            }
+
             relations::add_referenced_side_unique(&mut actions, &context, complete_relation);
 
             if inline_relation.is_one_to_one() {
