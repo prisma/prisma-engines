@@ -154,9 +154,9 @@ jobs:
     if: ${{ needs.is-release-necessary.outputs.release == 'true' }}
 
     env:
-      BUCKET_NAME: 'prisma-builds-github-actions'
+      BUCKET_NAME: 'prisma-builds'
       PRISMA_ENGINES_COMMIT_SHA: ${{ inputs.commit || github.sha }}
-      DESTINATION_TARGET_PATH: 's3://prisma-builds-github-actions/all_commits/${{ inputs.commit || github.sha }}'
+      DESTINATION_TARGET_PATH: 's3://prisma-builds/all_commits/${{ inputs.commit || github.sha }}'
 
     steps:
       # Because we need the scripts
