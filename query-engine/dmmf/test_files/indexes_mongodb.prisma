@@ -1,0 +1,24 @@
+datasource db {
+  provider = "mongodb"
+  url      = "mongodb://"
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextIndex"]
+}
+
+model Post {
+  id       String    @id @map("_id") @db.ObjectId
+  title    String
+  content  String
+  comments Comment[]
+
+  @@index([comments.userId])
+  @@fulltext([title(sort: Desc), content])
+}
+
+type Comment {
+  userId  String @db.ObjectId
+  content String
+}
