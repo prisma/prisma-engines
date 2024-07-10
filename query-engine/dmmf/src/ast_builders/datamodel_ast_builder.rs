@@ -257,8 +257,9 @@ fn model_indexes_to_dmmf(model: walkers::ModelWalker<'_>) -> impl Iterator<Item 
                 path: sfa
                     .as_path_to_indexed_field()
                     .into_iter()
-                    .map(|(field_name, type_name)| {
-                        (field_name.to_owned(), type_name.unwrap_or(model.name()).to_owned())
+                    .map(|(field_name, type_name)| match type_name {
+                        None => field_name.to_owned(),
+                        Some(type_name) => format!("{type_name}.{field_name}"),
                     })
                     .collect(),
                 sort_order: sfa.sort_order().map(Into::into),
