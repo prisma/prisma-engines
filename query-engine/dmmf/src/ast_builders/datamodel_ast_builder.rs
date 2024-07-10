@@ -331,18 +331,15 @@ mod tests {
         serde_json::to_string_pretty(&dmmf).expect("Failed to render JSON")
     }
 
+    const SAMPLES_FOLDER_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/test_files");
+
     #[test]
     fn test_dmmf_rendering() {
-        let test_cases = vec![
-            "general",
-            "functions",
-            "source",
-            "source_with_comments",
-            "source_with_generator",
-            "without_relation_name",
-            "ignore",
-            "views",
-        ];
+        let test_cases = fs::read_dir(SAMPLES_FOLDER_PATH)
+            .unwrap()
+            .map(|entry| entry.unwrap().file_name().into_string().unwrap())
+            .filter(|name| name.ends_with(".prisma"))
+            .map(|name| name.trim_end_matches(".prisma").to_owned());
 
         for test_case in test_cases {
             println!("TESTING: {test_case}");
@@ -357,7 +354,7 @@ mod tests {
             let expected_json = load_from_file(format!("{test_case}.json").as_str());
 
             println!("{dmmf_string}");
-            assert_eq_json(&dmmf_string, &expected_json, test_case);
+            assert_eq_json(&dmmf_string, &expected_json, &test_case);
         }
     }
 
@@ -368,8 +365,6 @@ mod tests {
 
         assert_eq!(json_a, json_b, "{}", msg);
     }
-
-    const SAMPLES_FOLDER_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/test_files");
 
     fn load_from_file(file: &str) -> String {
         fs::read_to_string(format!("{SAMPLES_FOLDER_PATH}/{file}")).unwrap()
