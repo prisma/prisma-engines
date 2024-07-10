@@ -17,5 +17,6 @@ targets = [
     # Server targets we support.
     "x86_64-unknown-linux-musl",
     "aarch64-unknown-linux-gnu",
-    "aarch64-unknown-linux-musl"
+    "aarch64-unknown-linux-musl",
+    "aarch64-apple-darwin"
 ]
