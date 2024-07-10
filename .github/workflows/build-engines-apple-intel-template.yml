@@ -26,6 +26,7 @@ jobs:
       - name: Checkout ${{ inputs.commit }}
         uses: actions/checkout@v4
         with:
+          repository: prisma/prisma-engines
           ref: ${{ inputs.commit }}
 
       - uses: dtolnay/rust-toolchain@stable
