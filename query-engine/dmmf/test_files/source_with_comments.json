@@ -41,5 +41,18 @@
     }
   ],
   "types": [],
-  "indexes": []
+  "indexes": [
+    {
+      "model": "Author",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "path": [
+            "id"
+          ]
+        }
+      ]
+    }
+  ]
 }

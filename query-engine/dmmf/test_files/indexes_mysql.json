@@ -87,6 +87,25 @@
   "indexes": [
     {
       "model": "Post",
+      "type": "id",
+      "isDefinedOnField": false,
+      "fields": [
+        {
+          "path": [
+            "title"
+          ],
+          "length": 100
+        },
+        {
+          "path": [
+            "abstract"
+          ],
+          "length": 10
+        }
+      ]
+    },
+    {
+      "model": "Post",
       "type": "unique",
       "isDefinedOnField": true,
       "fields": [

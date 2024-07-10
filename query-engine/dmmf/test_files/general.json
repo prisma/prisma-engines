@@ -729,6 +729,18 @@
   "indexes": [
     {
       "model": "User",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "path": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "model": "User",
       "type": "unique",
       "isDefinedOnField": true,
       "fields": [
@@ -741,12 +753,65 @@
     },
     {
       "model": "Profile",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "path": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "model": "Profile",
       "type": "unique",
       "isDefinedOnField": true,
       "fields": [
         {
           "path": [
             "userId"
+          ]
+        }
+      ]
+    },
+    {
+      "model": "Post",
+      "type": "id",
+      "isDefinedOnField": false,
+      "fields": [
+        {
+          "path": [
+            "title"
+          ]
+        },
+        {
+          "path": [
+            "createdAt"
+          ]
+        }
+      ]
+    },
+    {
+      "model": "Category",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "path": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "model": "PostToCategory",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "path": [
+            "id"
           ]
         }
       ]
@@ -770,12 +835,55 @@
     },
     {
       "model": "A",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "path": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "model": "A",
       "type": "unique",
       "isDefinedOnField": true,
       "fields": [
         {
           "path": [
             "bId"
+          ]
+        }
+      ]
+    },
+    {
+      "model": "B",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "path": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "model": "NamedCompounds",
+      "type": "id",
+      "isDefinedOnField": false,
+      "name": "MyPrimary",
+      "mappedName": "DbPrimary",
+      "fields": [
+        {
+          "path": [
+            "a"
+          ]
+        },
+        {
+          "path": [
+            "b"
           ]
         }
       ]
@@ -795,6 +903,19 @@
         {
           "path": [
             "d"
+          ]
+        }
+      ]
+    },
+    {
+      "model": "MappedSingles",
+      "type": "id",
+      "isDefinedOnField": true,
+      "mappedName": "Primary",
+      "fields": [
+        {
+          "path": [
+            "a"
           ]
         }
       ]

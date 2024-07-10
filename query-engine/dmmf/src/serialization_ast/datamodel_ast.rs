@@ -141,31 +141,36 @@ pub struct IndexField {
     pub operator_class: Option<String>,
 }
 
-macro_rules! convert_enum {
-    ( $from:path => $to:ident { $( $variant:ident, )+ } ) => {
-        #[derive(Debug, serde::Serialize)]
-        #[serde(rename_all = "camelCase")]
-        pub enum $to {
-            $( $variant, )+
-        }
-
+macro_rules! from {
+    ( $from:path => $to:ident { $( $variant:ident ),+ } ) => {
         impl From<$from> for $to {
             fn from(value: $from) -> Self {
                 match value {
-                    $( <$from>::$variant => <$to>::$variant, )+
+                    $( <$from>::$variant => <$to>::$variant ),+
                 }
             }
         }
     };
 }
 
-convert_enum!(psl::parser_database::IndexType => IndexType {
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum IndexType {
+    Id,
     Normal,
     Unique,
     Fulltext,
-});
+}
 
-convert_enum!(psl::parser_database::SortOrder => SortOrder {
+// `Id` doesn't exist in `psl::parser_database::IndexType` as primary keys are not represented as
+// such on that level, so we only generate the From impl for the other three variants.
+from!(psl::parser_database::IndexType => IndexType { Normal, Unique, Fulltext });
+
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum SortOrder {
     Asc,
     Desc,
-});
+}
+
+from!(psl::parser_database::SortOrder => SortOrder { Asc, Desc });

@@ -98,5 +98,30 @@
     }
   ],
   "types": [],
-  "indexes": []
+  "indexes": [
+    {
+      "model": "User",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "path": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "model": "Post",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "path": [
+            "id"
+          ]
+        }
+      ]
+    }
+  ]
 }

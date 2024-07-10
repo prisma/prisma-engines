@@ -1,6 +1,6 @@
 use crate::serialization_ast::{
     datamodel_ast::{Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex},
-    Index, IndexField,
+    Index, IndexField, IndexType,
 };
 use bigdecimal::ToPrimitive;
 use itertools::Either;
@@ -243,34 +243,56 @@ fn relation_field_to_dmmf(field: walkers::RelationFieldWalker<'_>) -> Field {
 }
 
 fn model_indexes_to_dmmf(model: walkers::ModelWalker<'_>) -> impl Iterator<Item = Index> + '_ {
-    model.indexes().map(move |index| Index {
-        model: model.name().to_owned(),
-        r#type: index.index_type().into(),
-        is_defined_on_field: index.is_defined_on_field(),
-        name: index.name().map(ToOwned::to_owned),
-        mapped_name: index.mapped_name().map(ToOwned::to_owned),
-        algorithm: index.algorithm().map(|alg| alg.to_string()),
-        clustered: index.clustered(),
-        fields: index
-            .scalar_field_attributes()
-            .map(|sfa| IndexField {
-                path: sfa
-                    .as_path_to_indexed_field()
-                    .into_iter()
-                    .map(|(field_name, type_name)| match type_name {
-                        None => field_name.to_owned(),
-                        Some(type_name) => format!("{type_name}.{field_name}"),
-                    })
+    model
+        .primary_key()
+        .into_iter()
+        .map(move |pk| Index {
+            model: model.name().to_owned(),
+            r#type: IndexType::Id,
+            is_defined_on_field: pk.is_defined_on_field(),
+            name: pk.name().map(ToOwned::to_owned),
+            mapped_name: pk.mapped_name().map(ToOwned::to_owned),
+            algorithm: None,
+            clustered: pk.clustered(),
+            fields: pk
+                .scalar_field_attributes()
+                .map(scalar_field_attribute_to_dmmf)
+                .collect(),
+        })
+        .chain(model.indexes().map(move |index| {
+            Index {
+                model: model.name().to_owned(),
+                r#type: index.index_type().into(),
+                is_defined_on_field: index.is_defined_on_field(),
+                name: index.name().map(ToOwned::to_owned),
+                mapped_name: index.mapped_name().map(ToOwned::to_owned),
+                algorithm: index.algorithm().map(|alg| alg.to_string()),
+                clustered: index.clustered(),
+                fields: index
+                    .scalar_field_attributes()
+                    .map(scalar_field_attribute_to_dmmf)
                     .collect(),
-                sort_order: sfa.sort_order().map(Into::into),
-                length: sfa.length(),
-                operator_class: sfa.operator_class().map(|oc| match oc.get() {
-                    Either::Left(oc) => oc.to_string(),
-                    Either::Right(oc) => oc.to_owned(),
-                }),
+            }
+        }))
+}
+
+fn scalar_field_attribute_to_dmmf(sfa: walkers::ScalarFieldAttributeWalker<'_>) -> IndexField {
+    IndexField {
+        path: sfa
+            .as_path_to_indexed_field()
+            .into_iter()
+            .map(|(field_name, type_name)| match type_name {
+                None => field_name.to_owned(),
+                Some(type_name) => format!("{type_name}.{field_name}"),
             })
             .collect(),
-    })
+        sort_order: sfa.sort_order().map(Into::into),
+        length: sfa.length(),
+        operator_class: sfa.operator_class().map(|oc| match oc.get() {
+            Either::Left(oc) => oc.to_string(),
+            Either::Right(oc) => oc.to_owned(),
+        }),
+    }
 }
 
 fn default_value_to_serde(dv: &DefaultKind) -> serde_json::Value {

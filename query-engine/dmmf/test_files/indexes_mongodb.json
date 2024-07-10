@@ -101,6 +101,18 @@
   "indexes": [
     {
       "model": "Post",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "path": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "model": "Post",
       "type": "normal",
       "isDefinedOnField": false,
       "fields": [

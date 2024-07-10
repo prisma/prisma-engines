@@ -194,12 +194,36 @@ mod tests {
               "indexes": [
                 {
                   "model": "User",
+                  "type": "id",
+                  "isDefinedOnField": true,
+                  "fields": [
+                    {
+                      "path": [
+                        "id"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "model": "User",
                   "type": "unique",
                   "isDefinedOnField": true,
                   "fields": [
                     {
                       "path": [
                         "email"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "model": "Post",
+                  "type": "id",
+                  "isDefinedOnField": true,
+                  "fields": [
+                    {
+                      "path": [
+                        "id"
                       ]
                     }
                   ]

@@ -470,12 +470,36 @@ mod tests {
                 "indexes": [
                   {
                     "model": "A",
+                    "type": "id",
+                    "isDefinedOnField": true,
+                    "fields": [
+                      {
+                        "path": [
+                          "id"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "model": "A",
                     "type": "unique",
                     "isDefinedOnField": true,
                     "fields": [
                       {
                         "path": [
                           "b_id"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "model": "B",
+                    "type": "id",
+                    "isDefinedOnField": true,
+                    "fields": [
+                      {
+                        "path": [
+                          "id"
                         ]
                       }
                     ]

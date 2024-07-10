@@ -42,6 +42,18 @@
   "indexes": [
     {
       "model": "Example",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "path": [
+            "id"
+          ]
+        }
+      ]
+    },
+    {
+      "model": "Example",
       "type": "normal",
       "isDefinedOnField": false,
       "algorithm": "Gin",
