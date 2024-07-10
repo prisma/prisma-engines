@@ -129,10 +129,10 @@ jobs:
           -e LIBZ_SYS_STATIC=1 \
           -w /root/build \
           -v \"$(pwd)\":/root/build \
-          -v \"$HOME\"/.cargo/bin:/root/cargo/bin" \
-          -v \"$HOME\"/.cargo/registry/index:/root/cargo/registry/index" \
-          -v \"$HOME\"/.cargo/registry/cache:/root/cargo/registry/cache" \
-          -v \"$HOME\"/.cargo/git/db:/root/cargo/git/db" \
+          -v \"$HOME\"/.cargo/bin:/root/cargo/bin \
+          -v \"$HOME\"/.cargo/registry/index:/root/cargo/registry/index \
+          -v \"$HOME\"/.cargo/registry/cache:/root/cargo/registry/cache \
+          -v \"$HOME\"/.cargo/git/db:/root/cargo/git/db \
           $IMAGE \
           bash -c \
               \" \
