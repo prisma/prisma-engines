@@ -41,6 +41,7 @@ jobs:
           - name: "postgres9"
             version: "9"
     uses: ./.github/workflows/test-query-engine-template.yml
+    name: ${{ matrix.database.version }}
     with:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}

@@ -1,4 +1,4 @@
-name: "QE: postgres"
+name: "QE: mysql"
 on:
   push:
     branches:
@@ -34,6 +34,7 @@ jobs:
             version: "mariadb"
 
     uses: ./.github/workflows/test-query-engine-template.yml
+    name: ${{ matrix.database.version }}
     with:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}

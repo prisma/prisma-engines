@@ -1,4 +1,4 @@
-name: "QE: postgres"
+name: "QE: sqlite"
 on:
   push:
     branches:
@@ -21,6 +21,7 @@ concurrency:
 jobs:
   qe-tests:
     uses: ./.github/workflows/test-query-engine-template.yml
+    name: '3'
     with:
       name: 'sqlite'
       version: 3
