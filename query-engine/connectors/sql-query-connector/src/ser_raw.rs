@@ -75,6 +75,10 @@ impl SerializedTypes {
         let mut types = vec![SerializedValueType::Unknown; row_len];
         let mut types_found = 0;
 
+        // This attempts to infer types based on `quaint::Value` present in the rows.
+        // We need to go through every row because because empty and null arrays don't encode their inner type.
+        // In the best case scenario, this loop stops at the first row.
+        // In the worst case scenario, it'll keep looping until it finds an array with a non-null value.
         'outer: for row in rows.iter() {
             for (idx, value) in row.iter().enumerate() {
                 let current_type = types[idx];
@@ -99,6 +103,9 @@ impl SerializedTypes {
                 }
             }
         }
+
+        // Client doesn't know how to handle unknown types.
+        assert!(!types.contains(&SerializedValueType::Unknown));
 
         Self(types)
     }
