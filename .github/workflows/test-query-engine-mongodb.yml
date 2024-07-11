@@ -1,0 +1,41 @@
+name: "QE: mongodb"
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths-ignore:
+      - "!.github/workflows/test-query-engine.yml"
+      - ".github/**"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
+
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qe-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - name: "mongodb_4_2"
+            version: "4.2"
+          - name: "mongodb_4_4"
+            version: "4.4"
+          - name: "mongodb_5"
+            connector: "mongodb"
+            version: "5"
+    uses: ./.github/workflows/test-query-engine-template.yml
+    name: ${{ matrix.database.version }}
+    with:
+      name: ${{ matrix.database.name }}
+      version: ${{ matrix.database.version }}
+      single_threaded: true
+      connector: 'mongodb'
+      relation_load_strategy: '["query"]'
