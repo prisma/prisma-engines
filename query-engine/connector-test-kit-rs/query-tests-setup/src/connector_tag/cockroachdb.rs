@@ -8,6 +8,7 @@ pub(crate) struct CockroachDbConnectorTag;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CockroachDbVersion {
+    V232,
     V231,
     V222,
     V221,
@@ -21,6 +22,7 @@ impl TryFrom<&str> for CockroachDbVersion {
             "22.1" => Self::V221,
             "22.2" => Self::V222,
             "23.1" => Self::V231,
+            "23.2" => Self::V232,
             _ => return Err(TestError::parse_error(format!("Unknown CockroachDB version `{s}`"))),
         };
 
@@ -31,6 +33,7 @@ impl TryFrom<&str> for CockroachDbVersion {
 impl fmt::Display for CockroachDbVersion {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            CockroachDbVersion::V232 => f.write_str("23.2"),
             CockroachDbVersion::V231 => f.write_str("23.1"),
             CockroachDbVersion::V222 => f.write_str("22.2"),
             CockroachDbVersion::V221 => f.write_str("22.1"),
