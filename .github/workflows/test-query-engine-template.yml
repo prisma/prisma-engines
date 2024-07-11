@@ -1,4 +1,5 @@
 name: "QE: integration template"
+run-name: ${{ inputs.connector }}
 on:
   workflow_call:
     inputs:
@@ -21,7 +22,7 @@ on:
 
 jobs:
   rust-query-engine-tests:
-    name: "${{ inputs.name }} - ${{ matrix.engine_protocol }} ${{ matrix.relation_load_strategy }} ${{ matrix.partition }}"
+    name: "${{ inputs.version }} - ${{ matrix.engine_protocol }} ${{ matrix.relation_load_strategy }} ${{ matrix.partition }}"
 
     strategy:
       fail-fast: false
