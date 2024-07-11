@@ -105,9 +105,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "id"
-          ]
+          "name": "id"
         }
       ]
     },
@@ -117,10 +115,7 @@
       "isDefinedOnField": false,
       "fields": [
         {
-          "path": [
-            "comments",
-            "Comment.userId"
-          ]
+          "name": "comments.userId"
         }
       ]
     },
@@ -130,15 +125,11 @@
       "isDefinedOnField": false,
       "fields": [
         {
-          "path": [
-            "title"
-          ],
+          "name": "title",
           "sortOrder": "desc"
         },
         {
-          "path": [
-            "content"
-          ]
+          "name": "content"
         }
       ]
     }

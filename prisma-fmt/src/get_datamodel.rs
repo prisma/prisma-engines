@@ -198,9 +198,7 @@ mod tests {
                   "isDefinedOnField": true,
                   "fields": [
                     {
-                      "path": [
-                        "id"
-                      ]
+                      "name": "id"
                     }
                   ]
                 },
@@ -210,9 +208,7 @@ mod tests {
                   "isDefinedOnField": true,
                   "fields": [
                     {
-                      "path": [
-                        "email"
-                      ]
+                      "name": "email"
                     }
                   ]
                 },
@@ -222,9 +218,7 @@ mod tests {
                   "isDefinedOnField": true,
                   "fields": [
                     {
-                      "path": [
-                        "id"
-                      ]
+                      "name": "id"
                     }
                   ]
                 },
@@ -235,9 +229,7 @@ mod tests {
                   "mappedName": "idx_post_on_title",
                   "fields": [
                     {
-                      "path": [
-                        "title"
-                      ]
+                      "name": "title"
                     }
                   ]
                 }

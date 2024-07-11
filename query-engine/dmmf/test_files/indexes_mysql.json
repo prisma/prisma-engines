@@ -91,15 +91,11 @@
       "isDefinedOnField": false,
       "fields": [
         {
-          "path": [
-            "title"
-          ],
+          "name": "title",
           "length": 100
         },
         {
-          "path": [
-            "abstract"
-          ],
+          "name": "abstract",
           "length": 10
         }
       ]
@@ -110,9 +106,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "slug"
-          ],
+          "name": "slug",
           "sortOrder": "desc",
           "length": 42
         }
@@ -124,14 +118,10 @@
       "isDefinedOnField": false,
       "fields": [
         {
-          "path": [
-            "author"
-          ]
+          "name": "author"
         },
         {
-          "path": [
-            "created_at"
-          ],
+          "name": "created_at",
           "sortOrder": "desc"
         }
       ]

@@ -56,9 +56,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "id"
-          ]
+          "name": "id"
         }
       ]
     },
@@ -68,9 +66,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "ip"
-          ]
+          "name": "ip"
         }
       ]
     }

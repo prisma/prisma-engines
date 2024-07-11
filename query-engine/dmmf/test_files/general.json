@@ -733,9 +733,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "id"
-          ]
+          "name": "id"
         }
       ]
     },
@@ -745,9 +743,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "email"
-          ]
+          "name": "email"
         }
       ]
     },
@@ -757,9 +753,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "id"
-          ]
+          "name": "id"
         }
       ]
     },
@@ -769,9 +763,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "userId"
-          ]
+          "name": "userId"
         }
       ]
     },
@@ -781,14 +773,10 @@
       "isDefinedOnField": false,
       "fields": [
         {
-          "path": [
-            "title"
-          ]
+          "name": "title"
         },
         {
-          "path": [
-            "createdAt"
-          ]
+          "name": "createdAt"
         }
       ]
     },
@@ -798,9 +786,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "id"
-          ]
+          "name": "id"
         }
       ]
     },
@@ -810,9 +796,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "id"
-          ]
+          "name": "id"
         }
       ]
     },
@@ -822,14 +806,10 @@
       "isDefinedOnField": false,
       "fields": [
         {
-          "path": [
-            "postTitle"
-          ]
+          "name": "postTitle"
         },
         {
-          "path": [
-            "categoryId"
-          ]
+          "name": "categoryId"
         }
       ]
     },
@@ -839,9 +819,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "id"
-          ]
+          "name": "id"
         }
       ]
     },
@@ -851,9 +829,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "bId"
-          ]
+          "name": "bId"
         }
       ]
     },
@@ -863,9 +839,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "id"
-          ]
+          "name": "id"
         }
       ]
     },
@@ -877,14 +851,10 @@
       "mappedName": "DbPrimary",
       "fields": [
         {
-          "path": [
-            "a"
-          ]
+          "name": "a"
         },
         {
-          "path": [
-            "b"
-          ]
+          "name": "b"
         }
       ]
     },
@@ -896,14 +866,10 @@
       "mappedName": "DbUnique",
       "fields": [
         {
-          "path": [
-            "c"
-          ]
+          "name": "c"
         },
         {
-          "path": [
-            "d"
-          ]
+          "name": "d"
         }
       ]
     },
@@ -914,9 +880,7 @@
       "mappedName": "Primary",
       "fields": [
         {
-          "path": [
-            "a"
-          ]
+          "name": "a"
         }
       ]
     },
@@ -927,9 +891,7 @@
       "mappedName": "Unique",
       "fields": [
         {
-          "path": [
-            "b"
-          ]
+          "name": "b"
         }
       ]
     }

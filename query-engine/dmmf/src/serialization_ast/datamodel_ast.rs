@@ -129,10 +129,7 @@ pub struct Index {
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct IndexField {
-    /// Path to the indexed field. If the field is defined on the model, only its name is
-    /// specified. If it is defined on a composite type, it is specified in the format
-    /// `CompositeType.fieldName` (and the consumer of the DMMF may need to split it).
-    pub path: Vec<String>,
+    pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sort_order: Option<SortOrder>,
     #[serde(skip_serializing_if = "Option::is_none")]

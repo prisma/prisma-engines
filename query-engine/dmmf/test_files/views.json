@@ -206,9 +206,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "id"
-          ]
+          "name": "id"
         }
       ]
     },
@@ -218,9 +216,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "email"
-          ]
+          "name": "email"
         }
       ]
     },
@@ -230,9 +226,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "id"
-          ]
+          "name": "id"
         }
       ]
     },
@@ -242,9 +236,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "userId"
-          ]
+          "name": "userId"
         }
       ]
     },
@@ -254,9 +246,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "id"
-          ]
+          "name": "id"
         }
       ]
     }

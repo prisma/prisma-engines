@@ -3,7 +3,7 @@ use crate::serialization_ast::{
     Index, IndexField, IndexType,
 };
 use bigdecimal::ToPrimitive;
-use itertools::Either;
+use itertools::{Either, Itertools};
 use psl::{
     parser_database::{walkers, ScalarFieldType},
     schema_ast::ast::WithDocumentation,
@@ -278,14 +278,11 @@ fn model_indexes_to_dmmf(model: walkers::ModelWalker<'_>) -> impl Iterator<Item 
 
 fn scalar_field_attribute_to_dmmf(sfa: walkers::ScalarFieldAttributeWalker<'_>) -> IndexField {
     IndexField {
-        path: sfa
+        name: sfa
             .as_path_to_indexed_field()
             .into_iter()
-            .map(|(field_name, type_name)| match type_name {
-                None => field_name.to_owned(),
-                Some(type_name) => format!("{type_name}.{field_name}"),
-            })
-            .collect(),
+            .map(|(field_name, _)| field_name.to_owned())
+            .join("."),
         sort_order: sfa.sort_order().map(Into::into),
         length: sfa.length(),
         operator_class: sfa.operator_class().map(|oc| match oc.get() {

@@ -46,9 +46,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "id"
-          ]
+          "name": "id"
         }
       ]
     },
@@ -59,9 +57,7 @@
       "algorithm": "Gin",
       "fields": [
         {
-          "path": [
-            "value"
-          ],
+          "name": "value",
           "operatorClass": "JsonbPathOps"
         }
       ]

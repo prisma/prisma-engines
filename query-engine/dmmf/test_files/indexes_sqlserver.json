@@ -128,9 +128,7 @@
       "clustered": false,
       "fields": [
         {
-          "path": [
-            "id"
-          ]
+          "name": "id"
         }
       ]
     },
@@ -141,9 +139,7 @@
       "clustered": true,
       "fields": [
         {
-          "path": [
-            "value"
-          ]
+          "name": "value"
         }
       ]
     },
@@ -153,15 +149,11 @@
       "isDefinedOnField": false,
       "fields": [
         {
-          "path": [
-            "title"
-          ],
+          "name": "title",
           "sortOrder": "desc"
         },
         {
-          "path": [
-            "abstract"
-          ]
+          "name": "abstract"
         }
       ]
     },
@@ -171,9 +163,7 @@
       "isDefinedOnField": true,
       "fields": [
         {
-          "path": [
-            "slug"
-          ],
+          "name": "slug",
           "sortOrder": "desc"
         }
       ]
@@ -184,14 +174,10 @@
       "isDefinedOnField": false,
       "fields": [
         {
-          "path": [
-            "author"
-          ]
+          "name": "author"
         },
         {
-          "path": [
-            "created_at"
-          ],
+          "name": "created_at",
           "sortOrder": "desc"
         }
       ]

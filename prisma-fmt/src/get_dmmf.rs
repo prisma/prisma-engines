@@ -474,9 +474,7 @@ mod tests {
                     "isDefinedOnField": true,
                     "fields": [
                       {
-                        "path": [
-                          "id"
-                        ]
+                        "name": "id"
                       }
                     ]
                   },
@@ -486,9 +484,7 @@ mod tests {
                     "isDefinedOnField": true,
                     "fields": [
                       {
-                        "path": [
-                          "b_id"
-                        ]
+                        "name": "b_id"
                       }
                     ]
                   },
@@ -498,9 +494,7 @@ mod tests {
                     "isDefinedOnField": true,
                     "fields": [
                       {
-                        "path": [
-                          "id"
-                        ]
+                        "name": "id"
                       }
                     ]
                   }
