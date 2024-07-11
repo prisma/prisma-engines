@@ -1,4 +1,4 @@
-name: "QE: postgres"
+name: "QE: mssql"
 on:
   push:
     branches:
@@ -31,6 +31,7 @@ jobs:
           - name: "mssql_2017"
             version: "2017"
     uses: ./.github/workflows/test-query-engine-template.yml
+    name: ${{ matrix.database.version }}
     with:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}

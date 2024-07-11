@@ -1,4 +1,4 @@
-name: "QE: postgres"
+name: "QE: cockroachdb"
 on:
   push:
     branches:
@@ -32,6 +32,7 @@ jobs:
           - name: "cockroach_22_1_0"
             version: "22.1"
     uses: ./.github/workflows/test-query-engine-template.yml
+    name: ${{ matrix.database.version }}
     with:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
