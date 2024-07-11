@@ -305,6 +305,6 @@ jobs:
         with:
           event-type: publish-engines
           token: ${{ secrets.PRISMA_BOT_TOKEN }}
-          client-payload: '{ "commit": "${{ github.sha }}", "branch": "${{ github.ref }}" }'
+          client-payload: '{ "commit": "${{ github.sha }}", "branch": "${{ github.ref_name }}" }'
       - name: Cleanup local directories
         run: rm -rf engines-artifacts engines-artifacts-for-r2 engines-artifacts-for-s3
