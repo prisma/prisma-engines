@@ -6,16 +6,16 @@
       {
         "range": {
           "start": {
-            "line": 4,
-            "character": 4
+            "line": 2,
+            "character": 2
           },
           "end": {
-            "line": 5,
+            "line": 3,
             "character": 0
           }
         },
         "severity": 1,
-        "message": "Error parsing attribute \"@relation\": The relation field `forum` on Model `interm` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically."
+        "message": "Error parsing attribute \"@relation\": The relation field `post` on Model `User` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically."
       }
     ],
     "edit": {
@@ -24,28 +24,28 @@
           {
             "range": {
               "start": {
-                "line": 4,
-                "character": 18
+                "line": 2,
+                "character": 19
               },
               "end": {
-                "line": 4,
-                "character": 29
+                "line": 2,
+                "character": 51
               }
             },
-            "newText": "@relation(fields: [Forumid], references: [id])"
+            "newText": "@relation(fields: [Postpost_id], references: [post_id])"
           },
           {
             "range": {
               "start": {
-                "line": 4,
-                "character": 29
+                "line": 2,
+                "character": 51
               },
               "end": {
-                "line": 5,
+                "line": 3,
                 "character": 0
               }
             },
-            "newText": "\nForumid Int?\n"
+            "newText": "\nPostpost_id Int?\n"
           }
         ]
       }

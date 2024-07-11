@@ -32,7 +32,20 @@
                 "character": 0
               }
             },
-            "newText": " @relation(fields: [], references: [])\n"
+            "newText": " @relation(fields: [Forumid], references: [id])\n"
+          },
+          {
+            "range": {
+              "start": {
+                "line": 9,
+                "character": 17
+              },
+              "end": {
+                "line": 10,
+                "character": 0
+              }
+            },
+            "newText": "\nForumid Int?\n"
           }
         ]
       }

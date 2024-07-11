@@ -2,7 +2,7 @@ use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand};
 use psl::{
     diagnostics::Span,
     parser_database::walkers::{self, FieldWalker},
-    schema_ast::ast::{WithAttributes, WithSpan},
+    schema_ast::ast::{WithAttributes, WithName, WithSpan},
 };
 
 use super::CodeActionsContext;
@@ -51,7 +51,16 @@ pub(super) fn add_missing_opposite_relation(
     let indentation = target_model.indentation();
     let newline = target_model.newline();
 
-    let formatted_content = format!("{separator}{indentation}{name} {name}[]{newline}");
+    let name_arg = field
+        .ast_field()
+        .attributes
+        .iter()
+        .find(|attr| attr.name() == "relation")
+        .and_then(|attr| attr.arguments.arguments.iter().find(|arg| arg.value.is_string()));
+
+    let relation = name_arg.map_or(Default::default(), |arg| format!(" @relation({})", arg));
+
+    let formatted_content = format!("{separator}{indentation}{name} {name}[]{relation}{newline}");
 
     let Ok(edit) = super::create_text_edit(
         context.db.file_name(target_file_id),

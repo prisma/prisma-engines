@@ -32,7 +32,20 @@
                 "character": 60
               }
             },
-            "newText": "@relation(fields: [], references: [id])"
+            "newText": "@relation(fields: [organizationid], references: [id])"
+          },
+          {
+            "range": {
+              "start": {
+                "line": 3,
+                "character": 60
+              },
+              "end": {
+                "line": 4,
+                "character": 0
+              }
+            },
+            "newText": "\norganizationid String?\n"
           }
         ]
       }

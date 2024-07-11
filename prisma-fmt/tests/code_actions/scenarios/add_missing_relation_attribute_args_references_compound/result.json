@@ -6,16 +6,16 @@
       {
         "range": {
           "start": {
-            "line": 4,
+            "line": 3,
             "character": 4
           },
           "end": {
-            "line": 5,
+            "line": 4,
             "character": 0
           }
         },
         "severity": 1,
-        "message": "Error parsing attribute \"@relation\": The relation field `forum` on Model `interm` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically."
+        "message": "Error parsing attribute \"@relation\": The relation field `organization` on Model `user` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically."
       }
     ],
     "edit": {
@@ -24,28 +24,28 @@
           {
             "range": {
               "start": {
-                "line": 4,
-                "character": 18
+                "line": 3,
+                "character": 33
               },
               "end": {
-                "line": 4,
-                "character": 29
+                "line": 3,
+                "character": 58
               }
             },
-            "newText": "@relation(fields: [Forumid], references: [id])"
+            "newText": "@relation(fields: [organizationname, organizationceo], references: [name, ceo])"
           },
           {
             "range": {
               "start": {
-                "line": 4,
-                "character": 29
+                "line": 3,
+                "character": 58
               },
               "end": {
-                "line": 5,
+                "line": 4,
                 "character": 0
               }
             },
-            "newText": "\nForumid Int?\n"
+            "newText": "\norganizationname String?\norganizationceo String?\n"
           }
         ]
       }

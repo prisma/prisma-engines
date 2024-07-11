@@ -265,15 +265,37 @@ pub(super) fn add_referencing_side_relation(
         return;
     }
 
+    let pk = relation.referenced_model().primary_key();
+    let newline = relation.referenced_model().newline();
+
+    let Some((reference_ids, field_ids, fields)) = pk.map(|pk| {
+        let fields = pk.fields();
+        let (names, (field_ids, fields)): (Vec<&str>, (Vec<String>, Vec<String>)) = fields
+            .map(|f| {
+                let field_name = f.name();
+                let field_id = format!("{}{}", relation.referenced_model().name(), field_name);
+                let field_full = format!("{} {}?", field_id, f.ast_field().field_type.name());
+
+                (field_name, (field_id, field_full))
+            })
+            .unzip();
+
+        (
+            names.join(", "),
+            field_ids.join(", "),
+            format!("\n{}{}", fields.join(newline.as_ref()), newline),
+        )
+    }) else {
+        return;
+    };
+
+    let references = format!("references: [{reference_ids}]");
+    let fields_arg = format!("fields: [{field_ids}]");
+
     // * In the prisma-fmt incarnation of this, we assume:
     // * - fields contains a field with the name `referenced_modelId`
     // * - references contains a field named `id`
-    // * It feels cleaner to not do that and allow users to self-define what their
-    // * fields will actually be called rather than adding more clutter.
-    // * This also avoids collisions when dealing with cases with multiple relations on the same model.
-    // TODO: Use this once actually available
-    // TODO: https://github.com/microsoft/language-server-protocol/pull/1892
-    let text = match initiating_field.relation_attribute() {
+    let (range, new_text) = match initiating_field.relation_attribute() {
         Some(attr) => {
             let name = attr
                 .arguments
@@ -282,31 +304,35 @@ pub(super) fn add_referencing_side_relation(
                 .find(|arg| arg.value.is_string())
                 .map_or(Default::default(), |arg| format!("{arg}, "));
 
-            let references = initiating_field
-                .referenced_fields()
-                .map_or("references: []".to_owned(), |refs| format!("references: [{}]", refs.map(|r| r.name()).collect::<Vec<&str>>().join(", ")));
-
-            let relation_attr = format!("@relation({}fields: [], {})", name, references);
+            let new_text = format!("@relation({}{}, {})", name, fields_arg, references);
             let range = super::span_to_range(attr.span(), ctx.initiating_file_source());
 
-            TextEdit {
-                range,
-                new_text: relation_attr,
-            }
+            (range, new_text)
         }
         None => {
             let new_text = format!(
-                " @relation(fields: [], references: []){}",
+                " @relation({}, {}){}",
+                fields_arg,
+                references,
                 initiating_field.model().newline()
             );
             let range = super::range_after_span(initiating_field.ast_field().span(), ctx.initiating_file_source());
 
-            TextEdit { range, new_text }
+            (range, new_text)
         }
     };
 
     let mut changes: HashMap<lsp_types::Url, Vec<TextEdit>> = HashMap::new();
-    changes.insert(ctx.params.text_document.uri.clone(), vec![text]);
+    changes.insert(
+        ctx.params.text_document.uri.clone(),
+        vec![
+            TextEdit { range, new_text },
+            TextEdit {
+                range: super::range_after_span(initiating_field.ast_field().span(), ctx.initiating_file_source()),
+                new_text: fields,
+            },
+        ],
+    );
 
     let edit = WorkspaceEdit {
         changes: Some(changes),
