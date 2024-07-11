@@ -22,7 +22,7 @@ on:
 
 jobs:
   rust-query-engine-tests:
-    name: "${{ inputs.version }} - ${{ matrix.engine_protocol }} ${{ matrix.relation_load_strategy }} ${{ matrix.partition }}"
+    name: "${{ matrix.engine_protocol }} ${{ matrix.relation_load_strategy }} ${{ matrix.partition }}"
 
     strategy:
       fail-fast: false
