@@ -1,5 +1,5 @@
 name: Build Engines
-run-name: Build Engines for ${{ inputs.commit }}
+run-name: Build Engines for ${{ github.sha }}
 
 # Run on `push` only for main, if not it will trigger `push` & `pull_request` on PRs at the same time
 on:
@@ -16,10 +16,6 @@ on:
   #     - 'CODEOWNERS'
   #     - 'renovate.json'
   workflow_dispatch:
-    inputs:
-      commit:
-        description: 'Commit to build (from prisma-engines)'
-        required: false
   pull_request:
   #   paths-ignore:
   #     - '!.github/workflows/build-engines*'
@@ -35,31 +31,31 @@ jobs:
     name: Build Engines for Linux
     uses: ./.github/workflows/build-engines-linux-template.yml
     with:
-      commit: ${{ inputs.commit }}
+      commit: ${{ github.sha }}
 
   build-macos-intel:
     name: Build Engines for Apple Intel
     uses: ./.github/workflows/build-engines-apple-intel-template.yml
     with:
-      commit: ${{ inputs.commit }}
+      commit: ${{ github.sha }}
 
   build-macos-silicon:
     name: Build Engines for Apple Silicon
     uses: ./.github/workflows/build-engines-apple-silicon-template.yml
     with:
-      commit: ${{ inputs.commit }}
+      commit: ${{ github.sha }}
 
   build-react-native:
     name: Build Engines for React native
     uses: ./.github/workflows/build-engines-react-native-template.yml
     with:
-      commit: ${{ inputs.commit }}
+      commit: ${{ github.sha }}
 
   build-windows:
     name: Build Engines for Windows
     uses: ./.github/workflows/build-engines-windows-template.yml
     with:
-      commit: ${{ inputs.commit }}
+      commit: ${{ github.sha }}
 
   is-release-necessary:
     name: 'Decide if a release of the engines artifacts is necessary'
@@ -169,7 +165,7 @@ jobs:
     name: 'Release artifacts from branch ${{ github.event.ref }} for commit ${{ inputs.commit }}'
     runs-on: ubuntu-22.04
     concurrency:
-      group: ${{ inputs.commit || github.sha }}
+      group: ${{ github.sha }}
     needs:
       - is-release-necessary
       - build-linux
@@ -181,8 +177,8 @@ jobs:
 
     env:
       BUCKET_NAME: 'prisma-builds'
-      PRISMA_ENGINES_COMMIT_SHA: ${{ inputs.commit || github.sha }}
-      DESTINATION_TARGET_PATH: 's3://prisma-builds/all_commits/${{ inputs.commit || github.sha }}'
+      PRISMA_ENGINES_COMMIT_SHA: ${{ github.sha }}
+      DESTINATION_TARGET_PATH: 's3://prisma-builds/all_commits/${{ github.sha }}'
 
     steps:
       # Because we need the scripts
@@ -202,8 +198,8 @@ jobs:
 
       - name: 'R2: Check if artifacts were already built and uploaded before via `.finished` file'
         env:
-          FILE_PATH: 'all_commits/${{ inputs.commit }}/.finished'
-          FILE_PATH_LEGACY: 'all_commits/${{ inputs.commit }}/rhel-openssl-1.1.x/.finished'
+          FILE_PATH: 'all_commits/${{ github.sha }}/.finished'
+          FILE_PATH_LEGACY: 'all_commits/${{ github.sha }}/rhel-openssl-1.1.x/.finished'
           AWS_DEFAULT_REGION: 'auto'
           AWS_ACCESS_KEY_ID: ${{ vars.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
@@ -213,8 +209,8 @@ jobs:
 
       - name: 'S3: Check if artifacts were already built and uploaded before via `.finished` file'
         env:
-          FILE_PATH: 'all_commits/${{ inputs.commit }}/.finished'
-          FILE_PATH_LEGACY: 'all_commits/${{ inputs.commit }}/rhel-openssl-1.1.x/.finished'
+          FILE_PATH: 'all_commits/${{ github.sha }}/.finished'
+          FILE_PATH_LEGACY: 'all_commits/${{ github.sha }}/rhel-openssl-1.1.x/.finished'
           AWS_DEFAULT_REGION: 'eu-west-1'
           AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
