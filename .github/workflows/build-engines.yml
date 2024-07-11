@@ -305,7 +305,7 @@ jobs:
         with:
           workflow: .github/workflows/publish-engines.yml
           repo: prisma/engines-wrapper
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PRISMA_BOT_TOKEN }}
           inputs: '{ "commit": "${{ github.sha }}", "branch": "${{ github.ref }}" }'
       - name: Cleanup local directories
         run: rm -rf engines-artifacts engines-artifacts-for-r2 engines-artifacts-for-s3
