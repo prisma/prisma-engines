@@ -300,12 +300,11 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-s3
 
-      - name: Workflow dispatch to prisma/engines-wrapper
-        uses: benc-uk/workflow-dispatch@v1
+      - name: Repository dispatch to prisma/engines-wrapper
+        uses: peter-evans/repository-dispatch@v3
         with:
-          workflow: .github/workflows/publish-engines.yml
-          repo: prisma/engines-wrapper
+          event-type: publish-engines
           token: ${{ secrets.PRISMA_BOT_TOKEN }}
-          inputs: '{ "commit": "${{ github.sha }}", "branch": "${{ github.ref }}" }'
+          client-payload: '{ "commit": "${{ github.sha }}", "branch": "${{ github.ref }}" }'
       - name: Cleanup local directories
         run: rm -rf engines-artifacts engines-artifacts-for-r2 engines-artifacts-for-s3
