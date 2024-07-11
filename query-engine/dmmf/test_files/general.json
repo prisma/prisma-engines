@@ -848,7 +848,7 @@
       "type": "id",
       "isDefinedOnField": false,
       "name": "MyPrimary",
-      "mappedName": "DbPrimary",
+      "dbName": "DbPrimary",
       "fields": [
         {
           "name": "a"
@@ -863,7 +863,7 @@
       "type": "unique",
       "isDefinedOnField": false,
       "name": "MyUnique",
-      "mappedName": "DbUnique",
+      "dbName": "DbUnique",
       "fields": [
         {
           "name": "c"
@@ -877,7 +877,7 @@
       "model": "MappedSingles",
       "type": "id",
       "isDefinedOnField": true,
-      "mappedName": "Primary",
+      "dbName": "Primary",
       "fields": [
         {
           "name": "a"
@@ -888,7 +888,7 @@
       "model": "MappedSingles",
       "type": "unique",
       "isDefinedOnField": true,
-      "mappedName": "Unique",
+      "dbName": "Unique",
       "fields": [
         {
           "name": "b"

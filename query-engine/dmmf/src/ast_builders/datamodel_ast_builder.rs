@@ -251,7 +251,7 @@ fn model_indexes_to_dmmf(model: walkers::ModelWalker<'_>) -> impl Iterator<Item 
             r#type: IndexType::Id,
             is_defined_on_field: pk.is_defined_on_field(),
             name: pk.name().map(ToOwned::to_owned),
-            mapped_name: pk.mapped_name().map(ToOwned::to_owned),
+            db_name: pk.mapped_name().map(ToOwned::to_owned),
             algorithm: None,
             clustered: pk.clustered(),
             fields: pk
@@ -265,7 +265,7 @@ fn model_indexes_to_dmmf(model: walkers::ModelWalker<'_>) -> impl Iterator<Item 
                 r#type: index.index_type().into(),
                 is_defined_on_field: index.is_defined_on_field(),
                 name: index.name().map(ToOwned::to_owned),
-                mapped_name: index.mapped_name().map(ToOwned::to_owned),
+                db_name: index.mapped_name().map(ToOwned::to_owned),
                 algorithm: index.algorithm().map(|alg| alg.to_string()),
                 clustered: index.clustered(),
                 fields: index

@@ -118,7 +118,7 @@ pub struct Index {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub mapped_name: Option<String>,
+    pub db_name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub algorithm: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]

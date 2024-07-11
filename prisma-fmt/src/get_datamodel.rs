@@ -226,7 +226,7 @@ mod tests {
                   "model": "Post",
                   "type": "normal",
                   "isDefinedOnField": false,
-                  "mappedName": "idx_post_on_title",
+                  "dbName": "idx_post_on_title",
                   "fields": [
                     {
                       "name": "title"
