@@ -39,3 +39,4 @@ jobs:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
       connector: 'mysql'
+      single_threaded: true
