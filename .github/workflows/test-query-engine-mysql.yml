@@ -35,6 +35,7 @@ jobs:
             relation_load_strategy: '["join", "query"]'
           - name: "mysql_mariadb"
             version: "mariadb"
+            relation_load_strategy: '["query"]'
 
     uses: ./.github/workflows/test-query-engine-template.yml
     name: ${{ matrix.database.version }}
