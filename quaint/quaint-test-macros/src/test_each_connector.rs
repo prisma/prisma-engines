@@ -1,4 +1,4 @@
-use darling::FromMeta;
+use darling::{FromMeta, ast::NestedMeta};
 use once_cell::sync::Lazy;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
@@ -6,7 +6,7 @@ use proc_macro2::Span;
 use quaint_test_setup::{ConnectorDefinition, Tags, CONNECTORS};
 use quote::quote;
 use std::str::FromStr;
-use syn::{parse_macro_input, spanned::Spanned, AttributeArgs, Ident, ItemFn};
+use syn::{parse_macro_input, spanned::Spanned, Ident, ItemFn};
 
 static TAGS_FILTER: Lazy<Tags> = Lazy::new(|| {
     let tags_str = std::env::var("TEST_EACH_CONNECTOR_TAGS").ok();
@@ -54,21 +54,21 @@ impl Default for TagsWrapper {
 }
 
 impl darling::FromMeta for TagsWrapper {
-    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+    fn from_list(items: &[NestedMeta]) -> Result<Self, darling::Error> {
         let mut tags = Tags::empty();
 
         for item in items {
             match item {
-                syn::NestedMeta::Lit(syn::Lit::Str(s)) => {
+                NestedMeta::Lit(syn::Lit::Str(s)) => {
                     let s = s.value();
                     let tag = Tags::from_str(&s)
                         .map_err(|err| darling::Error::unknown_value(&err.to_string()).with_span(&item.span()))?;
                     tags.insert(tag);
                 }
-                syn::NestedMeta::Lit(other) => {
+                NestedMeta::Lit(other) => {
                     return Err(darling::Error::unexpected_lit_type(other).with_span(&other.span()))
                 }
-                syn::NestedMeta::Meta(meta) => {
+                NestedMeta::Meta(meta) => {
                     return Err(darling::Error::unsupported_shape("Expected string literal").with_span(&meta.span()))
                 }
             }
@@ -80,7 +80,10 @@ impl darling::FromMeta for TagsWrapper {
 
 #[allow(clippy::needless_borrow)]
 pub fn test_each_connector_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
-    let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
+    let attributes_meta: Vec<NestedMeta> = match NestedMeta::parse_meta_list(attr.into()) {
+        Ok(v) => v,
+        Err(e) => { return TokenStream::from(darling::Error::from(e).write_errors()); }
+    };
     let args = TestEachConnectorArgs::from_list(&attributes_meta);
 
     let mut test_function = parse_macro_input!(input as ItemFn);
