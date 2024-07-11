@@ -1,0 +1,40 @@
+name: "QE: postgres"
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths-ignore:
+      - "!.github/workflows/test-query-engine.yml"
+      - ".github/**"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
+
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qe-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - name: "mysql_5_6"
+            version: "5.6"
+          - name: "mysql_5_7"
+            version: "5.7"
+          - name: "mysql_8"
+            version: "8"
+          - name: "mysql_mariadb"
+            version: "mariadb"
+
+    uses: ./.github/workflows/test-query-engine-template.yml
+    with:
+      name: ${{ matrix.database.name }}
+      version: ${{ matrix.database.version }}
+      connector: 'mysql'
