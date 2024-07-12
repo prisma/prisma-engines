@@ -39,7 +39,7 @@ members = [
 async-trait = { version = "0.1.77" }
 enumflags2 = { version = "0.7", features = ["serde"] }
 psl = { path = "./psl/psl" }
-serde_json = { version = "1", features = ["float_roundtrip", "preserve_order"] }
+serde_json = { version = "1", features = ["float_roundtrip", "preserve_order", "raw_value"] }
 serde = { version = "1", features = ["derive"] }
 tokio = { version = "1.25", features = [
   "rt-multi-thread",

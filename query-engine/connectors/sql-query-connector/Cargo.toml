@@ -53,6 +53,9 @@ tracing-opentelemetry = "0.17.3"
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
 quaint.workspace = true
 
+[dev-dependencies]
+expect-test = "1"
+
 [dependencies.connector-interface]
 package = "query-connector"
 path = "../query-connector"
