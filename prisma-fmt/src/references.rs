@@ -210,7 +210,7 @@ fn find_where_used_in_relation_attribute<'a>(
                     .and_then(|arg| {
                         arg.value.as_array().and_then(|arr| {
                             arr.0
-                                .into_iter()
+                                .iter()
                                 .find(|expr| expr.as_constant_value().map_or(false, |cv| cv.0 == name))
                         })
                     })
@@ -232,7 +232,7 @@ fn find_where_used_in_block_attribute<'ast>(
             .arguments
             .iter()
             .find_map(|arg| {
-                arg.value.as_array().map_or(None, |arr| {
+                arg.value.as_array().and_then(|arr| {
                     arr.0
                         .iter()
                         .find(|expr| expr.as_constant_value().map_or(false, |cv| cv.0 == name))
@@ -317,7 +317,7 @@ fn extract_ds_from_native_type(attr_name: &str) -> Option<&str> {
     attr_name.split('.').next()
 }
 
-fn span_to_location<'ast>(span: Span, ctx: &'ast ReferencesContext<'_>) -> Option<Location> {
+fn span_to_location(span: Span, ctx: &ReferencesContext<'_>) -> Option<Location> {
     let file_id = span.file_id;
 
     let source = ctx.db.source(file_id);
