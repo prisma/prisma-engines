@@ -1,4 +1,4 @@
-use crate::{ClosedTx, InteractiveTransaction, Operation, ResponseData};
+use crate::{ClosedTransaction, InteractiveTransaction, Operation, ResponseData};
 use connector::Connection;
 use lru::LruCache;
 use once_cell::sync::Lazy;
@@ -25,7 +25,7 @@ pub struct ITXManager {
     /// There are two tiers of locks here:
     ///  1. Lock on the entire hashmap. This *must* be taken only for short periods of time - for
     ///     example to insert/delete transaction or to clone transaction inside.
-    ///  2. Lock on the individual transactins. This one can be taken for prolonged periods of time - for
+    ///  2. Lock on the individual transactions. This one can be taken for prolonged periods of time - for
     ///     example to perform an I/O operation.
     ///
     /// The rationale behind this design is to make shared path (lock on the entire hashmap) as free
@@ -41,8 +41,10 @@ pub struct ITXManager {
 
     /// Cache of closed transactions. We keep the last N closed transactions in memory to
     /// return better error messages if operations are performed on closed transactions.
-    closed_txs: Arc<RwLock<LruCache<TxId, ClosedTx>>>,
+    closed_txs: Arc<RwLock<LruCache<TxId, ClosedTransaction>>>,
 
+    /// Sender part of the channel to which transaction id is sent when the timeout of the
+    /// transaction expires.
     timeout_sender: UnboundedSender<TxId>,
 }
 
@@ -53,6 +55,11 @@ impl ITXManager {
         let closed_txs = Arc::new(RwLock::new(LruCache::new(*CLOSED_TX_CACHE_SIZE)));
         let (timeout_sender, mut timeout_receiver) = unbounded_channel();
 
+        // This task rollbacks and removes any open transactions with expired timeouts from the
+        // `self.transactions`. It also removes any closed transactions to avoid `self.transactions`
+        // growing infinitely in size over time.
+        // Note that this task automatically exits when all transactions finish and the `ITXManager`
+        // is dropped, because that causes the `timeout_receiver` to become closed.
         crosstarget_utils::task::spawn({
             let transactions = transactions.clone();
             let closed_txs = closed_txs.clone();
@@ -71,7 +78,7 @@ impl ITXManager {
                     let _ = transaction.rollback(true).await;
 
                     let closed_tx = transaction
-                        .to_closed()
+                        .as_closed()
                         .expect("transaction must be closed after rollback");
 
                     closed_txs.write().await.put(tx_id, closed_tx);
@@ -86,7 +93,7 @@ impl ITXManager {
         }
     }
 
-    pub(crate) async fn create_tx(
+    pub async fn create_tx(
         &self,
         query_schema: QuerySchemaRef,
         tx_id: TxId,
@@ -94,6 +101,8 @@ impl ITXManager {
         isolation_level: Option<String>,
         timeout: Duration,
     ) -> crate::Result<()> {
+        // This task notifies the task spawned in `new()` method that the timeout for this
+        // transaction has expired.
         crosstarget_utils::task::spawn({
             let timeout_sender = self.timeout_sender.clone();
             let tx_id = tx_id.clone();
@@ -160,42 +169,21 @@ impl ITXManager {
             .await
     }
 
-    async fn try_remove_transaction(&self, tx_id: &TxId) {
-        if let Some(transaction) = self.transactions.write().await.remove(tx_id) {
-            let closed_tx = transaction
-                .read()
-                .await
-                .to_closed()
-                .expect("attempt to remove active transaction");
-            self.closed_txs.write().await.put(tx_id.clone(), closed_tx);
-        }
-    }
-
     pub async fn commit_tx(&self, tx_id: &TxId) -> crate::Result<()> {
-        let result = self
-            .get_transaction(tx_id, "commit")
+        self.get_transaction(tx_id, "commit")
             .await?
             .write()
             .await
             .commit()
-            .await;
-        // Remove the transaction after attempt to commit as soon as possible to return connection
-        // to the connection pool.
-        self.try_remove_transaction(tx_id).await;
-        result
+            .await
     }
 
     pub async fn rollback_tx(&self, tx_id: &TxId) -> crate::Result<()> {
-        let result = self
-            .get_transaction(tx_id, "rollback")
+        self.get_transaction(tx_id, "rollback")
             .await?
             .write()
             .await
             .rollback(false)
-            .await;
-        // Remove the transaction after attempt to roll back as soon as possible to return connection
-        // to the connection pool.
-        self.try_remove_transaction(tx_id).await;
-        result
+            .await
     }
 }
