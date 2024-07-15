@@ -12,6 +12,14 @@ macro_rules! scenarios {
 }
 
 scenarios! {
+    add_missing_opposite_relation
+    add_missing_relation_attribute
+    add_missing_relation_attribute_mongodb
+    add_missing_relation_attribute_args
+    add_missing_relation_attribute_args_self
+    add_missing_relation_attribute_args_fields
+    add_missing_relation_attribute_args_references_compound
+    add_missing_relation_attribute_args_references_single
     one_to_many_referenced_side_misses_unique_single_field
     one_to_many_referenced_side_misses_unique_single_field_multifile
     one_to_many_referenced_side_misses_unique_single_field_broken_relation

@@ -1,0 +1,13 @@
+model user {
+    id             String        @id
+    email          String        @unique
+    organization   organization? @relation(references: [])
+}
+
+model organization {
+    name  String
+    ceo   String
+    users user[]
+
+    @@id([name, ceo])
+}
