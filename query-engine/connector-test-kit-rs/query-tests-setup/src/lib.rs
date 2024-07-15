@@ -260,9 +260,6 @@ fn run_connector_test_impl(
 ) {
     let (connector, version) = CONFIG.test_connector().unwrap();
 
-    dbg!(std::env::vars());
-    panic!("Nope");
-
     if !should_run(&connector, &version, only, exclude, capabilities) {
         return;
     }

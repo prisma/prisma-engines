@@ -89,9 +89,7 @@ mod relation_load_strategy {
         dbg!(&logs);
         let actual = logs
             .iter()
-            .any(|l| {
-                l.contains("LEFT JOIN LATERAL") || (l.contains("JSON_ARRAYAGG") && l.contains("JSON_OBJECT"))
-            });
+            .any(|l| l.contains("LEFT JOIN LATERAL") || (l.contains("JSON_ARRAYAGG") && l.contains("JSON_OBJECT")));
 
         assert_eq!(
             actual, expected,
@@ -469,24 +467,10 @@ mod relation_load_strategy {
         "#
     );
 
-    #[connector_test(schema(schema), only(Mysql(5.6, 5.7, "mariadb")))]
+    #[connector_test(schema(schema))]
     async fn unsupported_join_strategy(runner: Runner) -> TestResult<()> {
-        seed(&runner).await?;
-
-        assert_error!(
-            &runner,
-            r#"{ findManyUser(relationLoadStrategy: join) { id } }"#,
-            2019,
-            "`relationLoadStrategy: join` is not available for MySQL < 8.0.14 and MariaDB."
-        );
-
-        assert_error!(
-            &runner,
-            r#"{ findFirstUser(relationLoadStrategy: join) { id } }"#,
-            2019,
-            "`relationLoadStrategy: join` is not available for MySQL < 8.0.14 and MariaDB."
-        );
-
-        Ok(())
+        dbg!(std::env::vars());
+        panic!("aaaa");
     }
+
 }
