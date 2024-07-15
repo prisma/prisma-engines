@@ -32,7 +32,7 @@
                 "character": 51
               }
             },
-            "newText": "@relation(fields: [Postpost_id], references: [post_id])"
+            "newText": "@relation(fields: [postpost_id], references: [post_id])"
           },
           {
             "range": {
@@ -45,7 +45,7 @@
                 "character": 0
               }
             },
-            "newText": "\nPostpost_id Int?\n"
+            "newText": "\npostpost_id Int?\n"
           }
         ]
       }

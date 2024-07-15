@@ -32,7 +32,7 @@
                 "character": 0
               }
             },
-            "newText": " @relation(fields: [Forumid], references: [id])\n"
+            "newText": " @relation(fields: [forumid], references: [id])\n"
           },
           {
             "range": {
@@ -45,7 +45,7 @@
                 "character": 0
               }
             },
-            "newText": "\nForumid Int?\n"
+            "newText": "\nforumid Int?\n"
           }
         ]
       }
