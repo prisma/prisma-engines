@@ -28,9 +28,9 @@ pub(super) fn add_missing_opposite_relation(
         return;
     }
 
-    // * We know that this is safe to unwrap here as otherwise this diagnostic would be
-    // * replaced with the one that we check for in `fn create_missing_block_for_model`
-    let target_model = context.db.find_model(target_name).unwrap();
+    let Some(target_model) = context.db.find_model(target_name) else {
+      return;
+    }
 
     let target_file_id = target_model.file_id();
     let target_file_content = context.db.source(target_file_id);
