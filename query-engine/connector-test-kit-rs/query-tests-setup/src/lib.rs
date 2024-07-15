@@ -54,7 +54,7 @@ async fn teardown_project(datamodel: &str, db_schemas: &[&str], schema_id: Optio
 
 /// Helper method to allow a sync shell function to run the async test blocks.
 fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
-    Builder::new_multi_thread()
+    Builder::new_current_thread()
         .enable_all()
         .build()
         .unwrap()
