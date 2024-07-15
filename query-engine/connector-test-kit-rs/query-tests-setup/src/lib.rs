@@ -25,6 +25,7 @@ use once_cell::sync::Lazy;
 use psl::datamodel_connector::ConnectorCapabilities;
 use query_engine_metrics::MetricRegistry;
 use std::future::Future;
+use std::os;
 use std::sync::Once;
 use tokio::runtime::Builder;
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
@@ -258,6 +259,9 @@ fn run_connector_test_impl(
     test_fn: &dyn Fn(Runner) -> BoxFuture<'static, TestResult<()>>,
 ) {
     let (connector, version) = CONFIG.test_connector().unwrap();
+
+    dbg!(std::env::vars());
+    panic!("Nope");
 
     if !should_run(&connector, &version, only, exclude, capabilities) {
         return;

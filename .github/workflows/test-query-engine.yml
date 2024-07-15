@@ -78,7 +78,6 @@ jobs:
     env:
       LOG_LEVEL: "info"
       LOG_QUERIES: "y"
-      RUST_LOG: "info"
       RUST_LOG_FORMAT: "devel"
       RUST_BACKTRACE: "1"
       CLICOLOR_FORCE: "1"
