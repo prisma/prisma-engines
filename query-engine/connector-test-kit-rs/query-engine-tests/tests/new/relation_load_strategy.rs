@@ -116,7 +116,8 @@ mod relation_load_strategy {
                         "query" => assert_used_lateral_join(&mut runner, false).await,
                         _ => panic!("invalid relation load strategy in macro invocation: {strategy}"),
                     }
-                    panic!("No!");
+
+                    Ok(())
                 }
             }
         };
@@ -464,4 +465,25 @@ mod relation_load_strategy {
         }
         "#
     );
+
+    #[connector_test(schema(schema), only(Mysql(5.6, 5.7, "mariadb")))]
+    async fn unsupported_join_strategy(runner: Runner) -> TestResult<()> {
+        seed(&runner).await?;
+
+        assert_error!(
+            &runner,
+            r#"{ findManyUser(relationLoadStrategy: join) { id } }"#,
+            2019,
+            "`relationLoadStrategy: join` is not available for MySQL < 8.0.14 and MariaDB."
+        );
+
+        assert_error!(
+            &runner,
+            r#"{ findFirstUser(relationLoadStrategy: join) { id } }"#,
+            2019,
+            "`relationLoadStrategy: join` is not available for MySQL < 8.0.14 and MariaDB."
+        );
+
+        Ok(())
+    }
 }
