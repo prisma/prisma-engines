@@ -32,7 +32,7 @@
                 "character": 54
               }
             },
-            "newText": "@relation(\"MarriagePartners\", fields: [Userid], references: [id])"
+            "newText": "@relation(\"MarriagePartners\", fields: [wifeid], references: [id])"
           },
           {
             "range": {
@@ -45,7 +45,7 @@
                 "character": 0
               }
             },
-            "newText": "\nUserid Int?\n"
+            "newText": "\nwifeid Int?\n"
           }
         ]
       }
@@ -84,7 +84,7 @@
                 "character": 53
               }
             },
-            "newText": "@relation(\"TeacherStudents\", fields: [Userid], references: [id])"
+            "newText": "@relation(\"TeacherStudents\", fields: [teacherid], references: [id])"
           },
           {
             "range": {
@@ -97,7 +97,7 @@
                 "character": 0
               }
             },
-            "newText": "\nUserid Int?\n"
+            "newText": "\nteacherid Int?\n"
           }
         ]
       }

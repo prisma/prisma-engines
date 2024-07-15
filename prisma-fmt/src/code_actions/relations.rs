@@ -269,11 +269,11 @@ pub(super) fn add_referencing_side_relation(
     let newline = relation.referenced_model().newline();
 
     let Some((reference_ids, field_ids, fields)) = pk.map(|pk| {
-        let fields = pk.fields();
-        let (names, (field_ids, fields)): (Vec<&str>, (Vec<String>, Vec<String>)) = fields
+        let (names, (field_ids, fields)): (Vec<&str>, (Vec<String>, Vec<String>)) = pk
+            .fields()
             .map(|f| {
                 let field_name = f.name();
-                let field_id = format!("{}{}", relation.referenced_model().name(), field_name);
+                let field_id = format!("{}{}", initiating_field.ast_field().name(), field_name);
                 let field_full = format!("{} {}?", field_id, f.ast_field().field_type.name());
 
                 (field_name, (field_id, field_full))
