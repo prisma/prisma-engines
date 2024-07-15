@@ -87,14 +87,14 @@ mod relation_load_strategy {
     async fn assert_used_lateral_join(runner: &mut Runner, expected: bool) {
         let logs = runner.get_logs().await;
         dbg!(&logs);
-        let actual = logs
-            .iter()
-            .any(|l| l.contains("LEFT JOIN LATERAL") || (l.contains("JSON_ARRAYAGG") && l.contains("JSON_OBJECT")));
+        // let actual = logs
+        //     .iter()
+        //     .any(|l| l.contains("LEFT JOIN LATERAL") || (l.contains("JSON_ARRAYAGG") && l.contains("JSON_OBJECT")));
 
-        assert_eq!(
-            actual, expected,
-            "expected lateral join to be used: {expected}, instead it was: {actual}"
-        );
+        // assert_eq!(
+        //     actual, expected,
+        //     "expected lateral join to be used: {expected}, instead it was: {actual}"
+        // );
     }
 
     macro_rules! relation_load_strategy_test {
@@ -117,8 +117,7 @@ mod relation_load_strategy {
                         "query" => assert_used_lateral_join(&mut runner, false).await,
                         _ => panic!("invalid relation load strategy in macro invocation: {strategy}"),
                     }
-
-                    Ok(())
+                    panic!("No!");
                 }
             }
         };
