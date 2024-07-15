@@ -29,13 +29,11 @@ pub(super) fn add_missing_opposite_relation(
     }
 
     let Some(target_model) = context.db.find_model(target_name) else {
-      return;
-    }
+        return;
+    };
 
     let target_file_id = target_model.file_id();
     let target_file_content = context.db.source(target_file_id);
-
-    target_model.fields().last().unwrap();
 
     let span = Span {
         start: target_model.ast_model().span().end - 1,
