@@ -1,0 +1,54 @@
+[
+  {
+    "uri": "file:///path/to/schema.prisma",
+    "range": {
+      "start": {
+        "line": 5,
+        "character": 4
+      },
+      "end": {
+        "line": 5,
+        "character": 12
+      }
+    }
+  },
+  {
+    "uri": "file:///path/to/schema.prisma",
+    "range": {
+      "start": {
+        "line": 7,
+        "character": 14
+      },
+      "end": {
+        "line": 7,
+        "character": 22
+      }
+    }
+  },
+  {
+    "uri": "file:///path/to/schema.prisma",
+    "range": {
+      "start": {
+        "line": 8,
+        "character": 13
+      },
+      "end": {
+        "line": 8,
+        "character": 21
+      }
+    }
+  },
+  {
+    "uri": "file:///path/to/schema.prisma",
+    "range": {
+      "start": {
+        "line": 4,
+        "character": 41
+      },
+      "end": {
+        "line": 4,
+        "character": 49
+      }
+    }
+  }
+]
