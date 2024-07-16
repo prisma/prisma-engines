@@ -1,0 +1,29 @@
+name: "QE: sqlite"
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths-ignore:
+      - "!.github/workflows/test-query-engine.yml"
+      - ".github/**"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
+
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qe-tests:
+    uses: ./.github/workflows/test-query-engine-template.yml
+    name: '3'
+    with:
+      name: 'sqlite'
+      version: 3
+      connector: 'sqlite'
+      relation_load_strategy: '["query"]'
