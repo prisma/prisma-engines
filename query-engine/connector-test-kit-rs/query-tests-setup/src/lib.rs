@@ -173,17 +173,18 @@ fn run_relation_link_test_impl(
                         .await
                         .unwrap();
 
-                    test_fn(&runner, &dm).await.unwrap();
+
+                    test_fn(&runner, &dm).with_subscriber(test_tracing_subscriber(
+                        ENV_LOG_LEVEL.to_string(),
+                        metrics_for_subscriber,
+                        log_tx,
+                    ))
+                    .await.unwrap();
 
                     teardown_project(&datamodel, Default::default(), runner.schema_id())
                         .await
                         .unwrap();
                 }
-                .with_subscriber(test_tracing_subscriber(
-                    ENV_LOG_LEVEL.to_string(),
-                    metrics_for_subscriber,
-                    log_tx,
-                )),
             );
         }
     }
@@ -279,37 +280,37 @@ fn run_connector_test_impl(
 
     let (log_capture, log_tx) = TestLogCapture::new();
 
-    crate::run_with_tokio(
-        async {
-            println!("Used datamodel:\n {}", datamodel.yellow());
-            let override_local_max_bind_values = None;
-            let runner = Runner::load(
-                datamodel.clone(),
-                db_schemas,
-                version,
-                connector_tag,
-                override_local_max_bind_values,
-                metrics,
-                log_capture,
-            )
+    crate::run_with_tokio(async {
+        println!("Used datamodel:\n {}", datamodel.yellow());
+        let override_local_max_bind_values = None;
+        let runner = Runner::load(
+            datamodel.clone(),
+            db_schemas,
+            version,
+            connector_tag,
+            override_local_max_bind_values,
+            metrics,
+            log_capture,
+        )
+        .await
+        .unwrap();
+        let schema_id = runner.schema_id();
+
+        if let Err(err) = test_fn(runner)
+            .with_subscriber(test_tracing_subscriber(
+                ENV_LOG_LEVEL.to_string(),
+                metrics_for_subscriber,
+                log_tx,
+            ))
+            .await
+        {
+            panic!("💥 Test failed due to an error: {err:?}");
+        }
+
+        crate::teardown_project(&datamodel, db_schemas, schema_id)
             .await
             .unwrap();
-            let schema_id = runner.schema_id();
-
-            if let Err(err) = test_fn(runner).await {
-                panic!("💥 Test failed due to an error: {err:?}");
-            }
-
-            crate::teardown_project(&datamodel, db_schemas, schema_id)
-                .await
-                .unwrap();
-        }
-        .with_subscriber(test_tracing_subscriber(
-            ENV_LOG_LEVEL.to_string(),
-            metrics_for_subscriber,
-            log_tx,
-        )),
-    );
+    });
 }
 
 pub type LogEmit = UnboundedSender<String>;
