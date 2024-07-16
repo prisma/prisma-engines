@@ -215,14 +215,14 @@ impl InteractiveTransaction {
             let span = info_span!("prisma:engine:itx_commit", user_facing = true);
 
             if let Err(err) = open_tx.commit().instrument(span).await {
-                debug!("transaction {name} failed to commit");
+                error!(?err, ?name, "transaction failed to commit");
                 // We don't know if the transaction was committed or not. Because of that, we cannot
                 // leave it in "open" state. We attempt to rollback to get the transaction into a
                 // known state.
                 let _ = self.rollback(false).await;
                 Err(err.into())
             } else {
-                debug!("transaction {name} committed");
+                debug!(?name, "transaction committed");
                 self.state = TransactionState::Committed;
                 Ok(())
             }
@@ -235,10 +235,10 @@ impl InteractiveTransaction {
         let span = info_span!("prisma:engine:itx_rollback", user_facing = true);
 
         let result = open_tx.rollback().instrument(span).await;
-        if result.is_err() {
-            debug!("transaction {name} failed to roll back (roll back initiated because of timeout = {was_timeout})");
+        if let Err(err) = &result {
+            error!(?err, ?was_timeout, ?name, "transaction failed to roll back");
         } else {
-            debug!("transaction {name} rolled back (roll back initiated because of timeout = {was_timeout})");
+            debug!(?was_timeout, ?name, "transaction rolled back");
         }
 
         // Ensure that the transaction isn't left in the "open" state after the rollback.
