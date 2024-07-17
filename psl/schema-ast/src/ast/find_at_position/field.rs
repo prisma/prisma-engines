@@ -1,3 +1,5 @@
+use diagnostics::Span;
+
 use crate::ast::{self};
 
 use super::{AttributePosition, WithName, WithSpan};
@@ -15,7 +17,7 @@ pub enum FieldPosition<'ast> {
     /// //  ^^^^^
     /// }
     /// ```
-    Name(&'ast str),
+    Name(&'ast str, Span),
     /// In the field's type definition
     /// ```prisma
     /// model People {
@@ -24,7 +26,7 @@ pub enum FieldPosition<'ast> {
     /// //        ^^^^^
     /// }
     /// ```
-    Type(&'ast str),
+    Type(&'ast str, Span),
     /// In an attribute. (name, idx, optional arg)
     /// ```prisma
     /// model People {
@@ -40,11 +42,11 @@ pub enum FieldPosition<'ast> {
 impl<'ast> FieldPosition<'ast> {
     pub(crate) fn new(field: &'ast ast::Field, position: usize) -> FieldPosition<'ast> {
         if field.name.span.contains(position) {
-            return FieldPosition::Name(field.name());
+            return FieldPosition::Name(field.name(), field.name.span);
         }
 
         if field.field_type.span().contains(position) {
-            return FieldPosition::Type(field.field_type.name());
+            return FieldPosition::Type(field.field_type.name(), field.field_type.span());
         }
 
         for (attr_idx, attr) in field.attributes.iter().enumerate() {

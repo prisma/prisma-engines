@@ -1,4 +1,4 @@
-use super::{Expression, Identifier, Span, WithSpan};
+use super::{Expression, Identifier, Span, WithName, WithSpan};
 use std::fmt::{Display, Formatter};
 
 /// A list of arguments inside parentheses.
@@ -94,4 +94,17 @@ impl WithSpan for Argument {
 #[derive(Debug, Clone)]
 pub struct EmptyArgument {
     pub name: Identifier,
+    pub(crate) span: Span,
+}
+
+impl WithName for EmptyArgument {
+    fn name(&self) -> &str {
+        &self.name.name
+    }
+}
+
+impl WithSpan for EmptyArgument {
+    fn span(&self) -> Span {
+        self.span
+    }
 }

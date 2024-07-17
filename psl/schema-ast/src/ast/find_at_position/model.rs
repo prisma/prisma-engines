@@ -1,4 +1,6 @@
-use super::{AttributePosition, FieldPosition, WithName, WithSpan};
+use diagnostics::Span;
+
+use super::{AttributePosition, FieldPosition, WithIdentifier, WithName, WithSpan};
 
 use crate::ast::{self};
 
@@ -15,7 +17,7 @@ pub enum ModelPosition<'ast> {
     ///     SomeUser SomeUser[]
     /// }
     /// ```
-    Name(&'ast str),
+    Name(&'ast str, Span),
     /// In an attribute (attr name, attr index, position).
     /// ```prisma
     /// model People {
@@ -41,7 +43,7 @@ pub enum ModelPosition<'ast> {
 impl<'ast> ModelPosition<'ast> {
     pub(crate) fn new(model: &'ast ast::Model, position: usize) -> Self {
         if model.name.span.contains(position) {
-            return ModelPosition::Name(model.name());
+            return ModelPosition::Name(model.name(), model.identifier().span());
         }
 
         for (field_id, field) in model.iter_fields() {

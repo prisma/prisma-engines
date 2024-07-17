@@ -114,7 +114,7 @@ field_attribute = { "@" ~ path ~ arguments_list? }
 // ######################################
 arguments_list = { "(" ~ (argument ~ ("," ~ argument)*)? ~ trailing_comma? ~ ")" }
 argument = _{ named_argument | empty_argument | expression }
-empty_argument = { identifier ~ ":" }
+empty_argument = { identifier ~ ":" ~ WHITESPACE*}
 named_argument = { identifier ~ ":" ~ expression }
 trailing_comma = @{ "," }
 

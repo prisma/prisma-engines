@@ -1,5 +1,6 @@
 mod actions;
 mod code_actions;
+mod find_where_used;
 mod get_config;
 mod get_datamodel;
 mod get_dmmf;
@@ -130,7 +131,6 @@ pub fn hover(schema_files: String, params: &str) -> String {
     };
 
     let hover = hover::run(schema.into(), params);
-
     serde_json::to_string(&hover).unwrap()
 }
 

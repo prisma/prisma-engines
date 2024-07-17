@@ -1,3 +1,5 @@
+use diagnostics::Span;
+
 use super::{PropertyPosition, WithName};
 use crate::ast::{self};
 
@@ -13,7 +15,7 @@ pub enum SourcePosition<'ast> {
     ///     url      = env("DATABASE_URL")
     /// }
     /// ```
-    Name(&'ast str),
+    Name(&'ast str, Span),
     /// In a property
     /// ```prisma
     /// datasource db {
@@ -30,7 +32,7 @@ pub enum SourcePosition<'ast> {
 impl<'ast> SourcePosition<'ast> {
     pub(crate) fn new(source: &'ast ast::SourceConfig, position: usize) -> Self {
         if source.name.span.contains(position) {
-            return SourcePosition::Name(source.name());
+            return SourcePosition::Name(source.name(), source.name.span);
         }
 
         for property in &source.properties {

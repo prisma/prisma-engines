@@ -283,7 +283,7 @@ impl Connector for CockroachDatamodelConnector {
     ) {
         if let ast::SchemaPosition::Model(
             _,
-            ast::ModelPosition::ModelAttribute("index", _, ast::AttributePosition::Argument("type")),
+            ast::ModelPosition::ModelAttribute("index", _, ast::AttributePosition::Argument("type", _)),
         ) = position
         {
             for index_type in self.supported_index_types() {
