@@ -52,7 +52,7 @@ impl<'ast> ModelPosition<'ast> {
 
         for (attr_id, attr) in model.attributes.iter().enumerate() {
             if attr.span().contains(position) {
-                return ModelPosition::ModelAttribute(&attr.name(), attr_id, AttributePosition::new(attr, position));
+                return ModelPosition::ModelAttribute(attr.name(), attr_id, AttributePosition::new(attr, position));
             }
         }
 
