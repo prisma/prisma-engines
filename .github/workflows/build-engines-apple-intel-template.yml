@@ -1,15 +1,16 @@
 name: Build Engines for Apple Intel
+
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       commit:
-        description: "Commit on the given branch to build"
+        description: 'Commit on the given branch to build'
+        type: string
         required: false
 
 jobs:
   build:
-    # Do not change `name`, prisma-engines Buildkite build job depends on this name ending with the commit
-    name: "MacOS Intel engines build on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
+    name: 'MacOS Intel engines build for commit ${{ inputs.commit }}'
     env:
       SQLITE_MAX_VARIABLE_NUMBER: 250000
       SQLITE_MAX_EXPR_DEPTH: 10000
@@ -20,12 +21,12 @@ jobs:
 
     steps:
       - name: Output link to real commit
-        run: echo ${{ github.repository }}/commit/${{ github.event.inputs.commit }}
+        run: echo ${{ github.repository }}/commit/${{ inputs.commit }}
 
-      - name: Checkout ${{ github.event.inputs.commit }}
+      - name: Checkout ${{ inputs.commit }}
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.commit }}
+          ref: ${{ inputs.commit }}
 
       - uses: actions-rust-lang/setup-rust-toolchain@v1
 
@@ -35,16 +36,27 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-intel-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - run: |
           cargo build --release -p query-engine -p query-engine-node-api -p schema-engine-cli -p prisma-fmt
 
+      - name: Rename files
+        working-directory: ${{ github.workspace }}/target/release/
+        run: |
+          echo "Files in target/release before renaming"
+          ls -la .
+
+          mv libquery_engine.dylib libquery_engine.dylib.node
+
+          echo "Files in target/release after renaming"
+          ls -la .
+
       - uses: actions/upload-artifact@v4
         with:
-          name: binaries
+          name: darwin
           path: |
             ${{ github.workspace }}/target/release/schema-engine
             ${{ github.workspace }}/target/release/prisma-fmt
             ${{ github.workspace }}/target/release/query-engine
-            ${{ github.workspace }}/target/release/libquery_engine.dylib
+            ${{ github.workspace }}/target/release/libquery_engine.dylib.node

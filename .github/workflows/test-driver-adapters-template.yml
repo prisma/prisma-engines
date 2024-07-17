@@ -1,48 +1,18 @@
 name: "QE: driver-adapter integration tests"
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    paths-ignore:
-      - "!.github/workflows/test-query-engine-driver-adapters.yml"
-      - ".github/**"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
-      - "renovate.json"
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
+    inputs:
+      setup_task:
+        type: string
+        required: true
 
 jobs:
   rust-query-engine-tests:
-    name: "${{ matrix.adapter.name }} ${{ matrix.partition }}"
+    name: "${{ matrix.partition }}"
 
     strategy:
       fail-fast: false
       matrix:
-        adapter:
-          - name: "planetscale (napi)"
-            setup_task: "dev-planetscale-js"
-          - name: "pg (napi)"
-            setup_task: "dev-pg-js"
-          - name: "neon (napi)"
-            setup_task: "dev-neon-js"
-          - name: "libsql (napi)"
-            setup_task: "dev-libsql-js"
-          - name: "planetscale (wasm)"
-            setup_task: "dev-planetscale-wasm"
-          - name: "pg (wasm)"
-            setup_task: "dev-pg-wasm"
-          - name: "neon (wasm)"
-            setup_task: "dev-neon-wasm"
-          - name: "libsql (wasm)"
-            setup_task: "dev-libsql-wasm"
-          - name: "d1 (wasm)"
-            setup_task: "dev-d1"
         node_version: ["18"]
         partition: ["1/4", "2/4", "3/4", "4/4"]
     env:
@@ -61,9 +31,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
       - name: "Setup Node.js"
         uses: actions/setup-node@v4
         with:
@@ -73,11 +40,6 @@ jobs:
         uses: pnpm/action-setup@v4.0.0
         with:
           version: 8
-
-      - name: "Get pnpm store directory"
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
       - name: "Login to Docker Hub"
         uses: docker/login-action@v3
@@ -102,7 +64,12 @@ jobs:
       - uses: ./.github/workflows/include/rust-wasm-setup
       - uses: taiki-e/install-action@nextest
 
-      - run: make ${{ matrix.adapter.setup_task }}
+      - name: Setup
+        env:
+          SETUP_TASK: ${{ inputs.setup_task }}
+        run: make "$SETUP_TASK"
 
       - name: "Run tests"
-        run: cargo nextest run --package query-engine-tests --test-threads=1 --partition hash:${{ matrix.partition }}
+        env:
+          PARTITION: ${{ matrix.partition }}
+        run: cargo nextest run --package query-engine-tests --test-threads=1 --partition hash:"$PARTITION"
