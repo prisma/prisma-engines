@@ -1,0 +1,54 @@
+[
+  {
+    "title": "Add relation attribute for relation field",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 3,
+            "character": 4
+          },
+          "end": {
+            "line": 4,
+            "character": 0
+          }
+        },
+        "severity": 1,
+        "message": "Error parsing attribute \"@relation\": The relation field `organization` on Model `user` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/schema.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 3,
+                "character": 33
+              },
+              "end": {
+                "line": 3,
+                "character": 58
+              }
+            },
+            "newText": "@relation(fields: [organizationname, organizationceo], references: [name, ceo])"
+          },
+          {
+            "range": {
+              "start": {
+                "line": 3,
+                "character": 58
+              },
+              "end": {
+                "line": 4,
+                "character": 0
+              }
+            },
+            "newText": "\norganizationname String?\norganizationceo String?\n"
+          }
+        ]
+      }
+    }
+  }
+]

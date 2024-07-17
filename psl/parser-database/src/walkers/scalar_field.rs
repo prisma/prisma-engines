@@ -1,3 +1,5 @@
+use std::fmt;
+
 use crate::{
     ast::{self, WithName},
     types::{DefaultAttribute, FieldWithArgs, OperatorClassStore, ScalarField, ScalarType, SortOrder},
@@ -108,6 +110,11 @@ impl<'db> ScalarFieldWalker<'db> {
         self.scalar_field_type().as_enum().map(|id| self.db.walk(id))
     }
 
+    /// Is this field's type a composite type? If yes, walk the composite type.
+    pub fn field_type_as_composite_type(self) -> Option<CompositeTypeWalker<'db>> {
+        self.scalar_field_type().as_composite_type().map(|id| self.db.walk(id))
+    }
+
     /// The name in the `@map(<name>)` attribute.
     pub fn mapped_name(self) -> Option<&'db str> {
         self.attributes().mapped_name.map(|id| &self.db[id])
@@ -155,6 +162,12 @@ impl<'db> ScalarFieldWalker<'db> {
             ScalarFieldType::BuiltInScalar(scalar) => Some(scalar),
             _ => None,
         }
+    }
+}
+
+impl<'db> fmt::Display for ScalarFieldWalker<'db> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.name())
     }
 }
 

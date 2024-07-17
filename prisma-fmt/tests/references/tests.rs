@@ -17,6 +17,7 @@ scenarios! {
     enum_as_type
     enum_name
     model_as_type
+    model_field_name
     model_name
     model_relation_fields
     model_relation_references

@@ -1,0 +1,14 @@
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id String @id @map("_id")
+    address Add<|>ress
+}
+
+/// Address Doc
+type Address {
+    street String
+}

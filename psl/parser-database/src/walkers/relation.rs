@@ -15,13 +15,13 @@ pub type RelationWalker<'db> = Walker<'db, RelationId>;
 impl<'db> RelationWalker<'db> {
     /// The models at each end of the relation. [model A, model B]. Can be the same model twice.
     pub fn models(self) -> [(FileId, ast::ModelId); 2] {
-        let rel = self.get();
+        let rel = self.ast_relation();
         [rel.model_a, rel.model_b]
     }
 
     /// The relation fields that define the relation. A then B.
     pub fn relation_fields(self) -> impl Iterator<Item = RelationFieldWalker<'db>> {
-        let (a, b) = self.get().attributes.fields();
+        let (a, b) = self.ast_relation().attributes.fields();
         [a, b].into_iter().flatten().map(move |field| self.walk(field))
     }
 
@@ -38,16 +38,28 @@ impl<'db> RelationWalker<'db> {
 
     /// Is this a relation where both ends are the same model?
     pub fn is_self_relation(self) -> bool {
-        let r = self.get();
+        let r = self.ast_relation();
         r.model_a == r.model_b
+    }
+
+    /// Gets relation kind
+    pub fn relation_kind(self) -> &'db str {
+        let r = self.ast_relation();
+
+        match r.attributes {
+            RelationAttributes::ImplicitManyToMany { .. } => "implicit many-to-many",
+            RelationAttributes::TwoWayEmbeddedManyToMany { .. } => "implicit many-to-many",
+            RelationAttributes::OneToOne(_) => "one-to-one",
+            RelationAttributes::OneToMany(_) => "one-to-many",
+        }
     }
 
     /// Converts the walker to either an implicit many to many, or a inline relation walker
     /// gathering 1:1 and 1:n relations.
     pub fn refine(self) -> RefinedRelationWalker<'db> {
-        if self.get().is_implicit_many_to_many() {
+        if self.ast_relation().is_implicit_many_to_many() {
             RefinedRelationWalker::ImplicitManyToMany(self.walk(ManyToManyRelationId(self.id)))
-        } else if self.get().is_two_way_embedded_many_to_many() {
+        } else if self.ast_relation().is_two_way_embedded_many_to_many() {
             RefinedRelationWalker::TwoWayEmbeddedManyToMany(TwoWayEmbeddedManyToManyRelationWalker(self))
         } else {
             RefinedRelationWalker::Inline(InlineRelationWalker(self))
@@ -61,7 +73,7 @@ impl<'db> RelationWalker<'db> {
     /// //                           ^^^^^^^^^^^^^^^^^^^^^^^
     /// ```
     pub fn explicit_relation_name(self) -> Option<&'db str> {
-        self.get().relation_name.map(|string_id| &self.db[string_id])
+        self.ast_relation().relation_name.map(|string_id| &self.db[string_id])
     }
 
     /// The relation name, explicit or inferred.
@@ -71,7 +83,7 @@ impl<'db> RelationWalker<'db> {
     ///                        ^^^^^^^^^^^
     /// ```
     pub fn relation_name(self) -> RelationName<'db> {
-        let relation = self.get();
+        let relation = self.ast_relation();
         relation
             .relation_name
             .map(|s| RelationName::Explicit(&self.db[s]))
@@ -81,7 +93,7 @@ impl<'db> RelationWalker<'db> {
     }
 
     /// The relation attributes parsed from the AST.
-    fn get(self) -> &'db Relation {
+    fn ast_relation(self) -> &'db Relation {
         &self.db.relations[self.id]
     }
 }

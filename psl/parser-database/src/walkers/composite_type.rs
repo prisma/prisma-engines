@@ -5,6 +5,8 @@ use crate::{
 };
 use diagnostics::Span;
 
+use super::EnumWalker;
+
 /// A composite type, introduced with the `type` keyword in the schema.
 ///
 /// Example:
@@ -48,6 +50,11 @@ impl<'db> CompositeTypeWalker<'db> {
     /// The name of the composite type in the schema.
     pub fn name(self) -> &'db str {
         self.ast_composite_type().name()
+    }
+
+    /// Returns a specific field from the model.
+    pub fn field(&self, field_id: ast::FieldId) -> CompositeTypeFieldWalker<'db> {
+        self.walk((self.id, field_id))
     }
 
     /// Iterator over all the fields of the composite type.
@@ -109,6 +116,16 @@ impl<'db> CompositeTypeFieldWalker<'db> {
     /// Is the field required, optional or a list?
     pub fn arity(self) -> ast::FieldArity {
         self.ast_field().arity
+    }
+
+    /// Is this field's type an enum? If yes, walk the enum.
+    pub fn field_type_as_enum(self) -> Option<EnumWalker<'db>> {
+        self.r#type().as_enum().map(|id| self.db.walk(id))
+    }
+
+    /// Is this field's type a composite type? If yes, walk the composite type.
+    pub fn field_type_as_composite_type(self) -> Option<CompositeTypeWalker<'db>> {
+        self.r#type().as_composite_type().map(|id| self.db.walk(id))
     }
 
     /// The type of the field, e.g. `String` in `streetName String?`.

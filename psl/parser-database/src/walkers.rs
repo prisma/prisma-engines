@@ -29,7 +29,7 @@ pub use scalar_field::*;
 use schema_ast::ast::{NewlineType, WithSpan};
 pub use top::*;
 
-use crate::{ast, FileId};
+use crate::{ast, FileId, ModelId};
 
 /// A generic walker. Only walkers intantiated with a concrete ID type (`I`) are useful.
 #[derive(Clone, Copy)]
@@ -194,6 +194,11 @@ impl crate::ParserDatabase {
                 db: self,
                 default: self.types[*id].default.as_ref().unwrap(),
             })
+    }
+
+    /// Walk all fields in a model
+    pub fn walk_fields(&self, model_id: ModelId) -> impl Iterator<Item = FieldWalker<'_>> {
+        self.walk(model_id).fields()
     }
 
     /// Walk all the relations in the schema. A relation may be defined by one or two fields; in

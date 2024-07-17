@@ -31,6 +31,7 @@ pub(crate) enum RawError {
     External {
         id: i32,
     },
+    ConversionError(anyhow::Error),
 }
 
 impl From<RawError> for SqlError {
@@ -55,6 +56,7 @@ impl From<RawError> for SqlError {
                 message: message.unwrap_or_else(|| String::from("N/A")),
             },
             RawError::External { id } => Self::ExternalError(id),
+            RawError::ConversionError(err) => Self::ConversionError(err),
         }
     }
 }
@@ -84,6 +86,12 @@ impl From<quaint::error::Error> for RawError {
             quaint::error::ErrorKind::ExternalError(id) => Self::External { id: *id },
             _ => default_value,
         }
+    }
+}
+
+impl From<serde_json::error::Error> for RawError {
+    fn from(e: serde_json::error::Error) -> Self {
+        Self::ConversionError(e.into())
     }
 }
 

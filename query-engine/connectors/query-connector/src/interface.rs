@@ -359,5 +359,5 @@ pub trait WriteOperations {
         model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         query_type: Option<String>,
-    ) -> crate::Result<serde_json::Value>;
+    ) -> crate::Result<RawJson>;
 }

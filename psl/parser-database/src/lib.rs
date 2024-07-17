@@ -107,34 +107,8 @@ impl ParserDatabase {
         // First pass: resolve names.
         names::resolve_names(&mut ctx);
 
-        // Return early on name resolution errors.
-        if ctx.diagnostics.has_errors() {
-            attributes::create_default_attributes(&mut ctx);
-
-            return ParserDatabase {
-                asts,
-                interner,
-                names,
-                types,
-                relations,
-            };
-        }
-
         // Second pass: resolve top-level items and field types.
         types::resolve_types(&mut ctx);
-
-        // Return early on type resolution errors.
-        if ctx.diagnostics.has_errors() {
-            attributes::create_default_attributes(&mut ctx);
-
-            return ParserDatabase {
-                asts,
-                interner,
-                names,
-                types,
-                relations,
-            };
-        }
 
         // Third pass: validate model and field attributes. All these
         // validations should be _order independent_ and only rely on

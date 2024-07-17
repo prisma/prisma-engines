@@ -7,7 +7,7 @@ use crate::{
 /// An `enum` declaration in the schema.
 pub type EnumWalker<'db> = Walker<'db, crate::EnumId>;
 /// One value in an `enum` declaration in the schema.
-pub type EnumValueWalker<'db> = Walker<'db, (crate::EnumId, usize)>;
+pub type EnumValueWalker<'db> = Walker<'db, (crate::EnumId, ast::EnumValueId)>;
 
 impl<'db> EnumWalker<'db> {
     fn attributes(self) -> &'db types::EnumAttributes {
@@ -45,9 +45,16 @@ impl<'db> EnumWalker<'db> {
         self.attributes().mapped_name.map(|id| &self.db[id])
     }
 
+    /// Returns the specific value from the model.
+    pub fn value(self, value_id: ast::EnumValueId) -> EnumValueWalker<'db> {
+        self.walk((self.id, value_id))
+    }
+
     /// The values of the enum.
     pub fn values(self) -> impl ExactSizeIterator<Item = EnumValueWalker<'db>> {
-        (0..self.ast_enum().values.len()).map(move |idx| self.walk((self.id, idx)))
+        self.ast_enum()
+            .iter_values()
+            .map(move |(value_id, _)| self.walk((self.id, value_id)))
     }
 
     /// How fields are indented in the enum.
@@ -79,18 +86,19 @@ impl<'db> EnumWalker<'db> {
 }
 
 impl<'db> EnumValueWalker<'db> {
-    fn r#enum(self) -> EnumWalker<'db> {
-        self.walk(self.id.0)
+    /// The AST node.
+    pub fn ast_value(self) -> &'db ast::EnumValue {
+        &self.db.asts[self.id.0][self.id.1]
     }
 
     /// The enum documentation
     pub fn documentation(self) -> Option<&'db str> {
-        self.r#enum().ast_enum().values[self.id.1].documentation()
+        self.ast_value().documentation()
     }
 
     /// The name of the value.
     pub fn name(self) -> &'db str {
-        &self.r#enum().ast_enum().values[self.id.1].name.name
+        self.ast_value().name()
     }
 
     /// The database name of the enum.
@@ -111,7 +119,7 @@ impl<'db> EnumValueWalker<'db> {
     pub fn mapped_name(self) -> Option<&'db str> {
         self.db.types.enum_attributes[&self.id.0]
             .mapped_values
-            .get(&(self.id.1 as u32))
+            .get(&(self.id.1))
             .map(|id| &self.db[*id])
     }
 }

@@ -1,6 +1,6 @@
 use super::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker, Walker};
 use crate::{
-    types::{RelationField, ScalarField},
+    types::{RefinedFieldVariant, RelationField, ScalarField},
     ScalarType,
 };
 use schema_ast::ast;
@@ -25,11 +25,19 @@ impl<'db> FieldWalker<'db> {
     }
 
     /// Find out which kind of field this is.
-    pub fn refine(self) -> RefinedFieldWalker<'db> {
+    /// Returns `None` if we encounter an unknown field.
+    pub fn refine(self) -> Option<RefinedFieldWalker<'db>> {
         match self.db.types.refine_field(self.id) {
-            either::Either::Left(id) => RefinedFieldWalker::Relation(self.walk(id)),
-            either::Either::Right(id) => RefinedFieldWalker::Scalar(self.walk(id)),
+            RefinedFieldVariant::Relation(id) => Some(RefinedFieldWalker::Relation(self.walk(id))),
+            RefinedFieldVariant::Scalar(id) => Some(RefinedFieldWalker::Scalar(self.walk(id))),
+            RefinedFieldVariant::Unknown => None,
         }
+    }
+
+    /// Find out which kind of field this is.
+    /// ! Panics on unknown field, only to be used in query-engine where unknowns should not exist.
+    pub fn refine_known(self) -> RefinedFieldWalker<'db> {
+        self.refine().unwrap()
     }
 }
 

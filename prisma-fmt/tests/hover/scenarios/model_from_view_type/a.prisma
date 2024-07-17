@@ -1,0 +1,6 @@
+/// This is doc for A
+model ModelNameA {
+    id  Int        @id
+    bId Int
+    val ModelNameB @relation(fields: [bId], references: [id])
+}

@@ -5,7 +5,7 @@ use crate::{
     ast, interner::StringInterner, names::Names, relations::Relations, types::Types, DatamodelError, Diagnostics,
     InFile, StringId,
 };
-use schema_ast::ast::{Expression, WithName};
+use schema_ast::ast::{EnumValueId, Expression, WithName};
 use std::collections::{HashMap, HashSet};
 
 /// Validation context. This is an implementation detail of ParserDatabase. It
@@ -33,7 +33,7 @@ pub(crate) struct Context<'db> {
     pub(super) mapped_model_scalar_field_names: HashMap<(crate::ModelId, StringId), ast::FieldId>,
     pub(super) mapped_composite_type_names: HashMap<(crate::CompositeTypeId, StringId), ast::FieldId>,
     pub(super) mapped_enum_names: HashMap<StringId, crate::EnumId>,
-    pub(super) mapped_enum_value_names: HashMap<(crate::EnumId, StringId), u32>,
+    pub(super) mapped_enum_value_names: HashMap<(crate::EnumId, StringId), EnumValueId>,
 }
 
 impl<'db> Context<'db> {

@@ -30,6 +30,11 @@ impl<'db> ModelWalker<'db> {
         self.id.0
     }
 
+    /// Returns the specific field from the model.
+    pub fn field(&self, field_id: ast::FieldId) -> FieldWalker<'db> {
+        self.walk((self.id, field_id))
+    }
+
     /// Traverse the fields of the models in the order they were defined.
     pub fn fields(self) -> impl ExactSizeIterator<Item = FieldWalker<'db>> + Clone {
         self.ast_model()

@@ -50,6 +50,12 @@ pub fn get_dmmf(params: String) -> Result<String, JsError> {
 }
 
 #[wasm_bindgen]
+pub fn get_datamodel(params: String) -> Result<String, JsError> {
+    register_panic_hook();
+    prisma_fmt::get_datamodel(params).map_err(|e| JsError::new(&e))
+}
+
+#[wasm_bindgen]
 pub fn lint(input: String) -> String {
     register_panic_hook();
     prisma_fmt::lint(input)
@@ -115,6 +121,15 @@ pub fn code_actions(schema: String, params: String) -> String {
 pub fn references(schema: String, params: String) -> String {
     register_panic_hook();
     prisma_fmt::references(schema, &params)
+}
+
+/// This api is modelled on an LSP [hover request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#hover-request-leftwards_arrow_with_hook).
+/// Input and output are both JSON, the request being a `HoverParams` object
+/// and the response being a `Hover` object.
+#[wasm_bindgen]
+pub fn hover(schema_files: String, params: String) -> String {
+    register_panic_hook();
+    prisma_fmt::hover(schema_files, &params)
 }
 
 /// Trigger a panic inside the wasm module. This is only useful in development for testing panic
