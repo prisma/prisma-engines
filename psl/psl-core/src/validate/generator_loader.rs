@@ -35,7 +35,7 @@ pub(crate) fn load_generators_from_ast(ast_schema: &ast::SchemaAst, diagnostics:
 }
 
 fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagnostics) -> Option<Generator> {
-    let generator_name = ast_generator.name.name.as_str();
+    let generator_name = ast_generator.name();
     let args: HashMap<_, &Expression> = ast_generator
         .properties
         .iter()
@@ -70,7 +70,7 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
         None => {
             diagnostics.push_error(DatamodelError::new_generator_argument_not_found_error(
                 PROVIDER_KEY,
-                &ast_generator.name.name,
+                ast_generator.name(),
                 ast_generator.span(),
             ));
             return None;
@@ -117,7 +117,7 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
     }
 
     Some(Generator {
-        name: ast_generator.name.name.clone(),
+        name: ast_generator.name().to_owned(),
         provider,
         output,
         binary_targets,

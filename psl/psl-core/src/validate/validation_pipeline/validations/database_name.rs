@@ -1,3 +1,5 @@
+use schema_ast::ast::{WithName, WithSpan};
+
 use crate::{ast, validate::validation_pipeline::context::Context};
 
 pub(super) fn validate_db_name(
@@ -9,10 +11,10 @@ pub(super) fn validate_db_name(
     double_at: bool,
 ) {
     if let Some(err) = crate::datamodel_connector::constraint_names::ConstraintNames::is_db_name_too_long(
-        attribute.span,
+        attribute.span(),
         model_name,
         db_name,
-        &attribute.name.name,
+        attribute.name(),
         ctx.connector,
         double_at,
     ) {

@@ -11,7 +11,7 @@ pub struct Attribute {
     /// @@index([a, b, c])
     ///   ^^^^^
     /// ```
-    pub name: Identifier,
+    pub(crate) name: Identifier,
     /// The arguments of the attribute.
     ///
     /// ```ignore
@@ -20,7 +20,7 @@ pub struct Attribute {
     /// ```
     pub arguments: ArgumentsList,
     /// The AST span of the node.
-    pub span: Span,
+    pub(crate) span: Span,
 }
 
 impl Attribute {

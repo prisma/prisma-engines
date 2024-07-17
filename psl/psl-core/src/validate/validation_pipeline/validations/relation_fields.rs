@@ -12,6 +12,7 @@ use parser_database::{
     walkers::{ModelWalker, RelationFieldId, RelationFieldWalker, RelationName},
     ReferentialAction,
 };
+use schema_ast::ast::WithAttributes;
 use std::fmt;
 
 struct Fields<'db> {
@@ -246,7 +247,7 @@ pub(super) fn map(field: RelationFieldWalker<'_>, ctx: &mut Context<'_>) {
 
     if let Some(relation_attr) = field
         .ast_field()
-        .attributes
+        .attributes()
         .iter()
         .find(|attr| attr.name() == "relation")
     {

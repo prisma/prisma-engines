@@ -49,9 +49,10 @@ impl<'ast> PropertyPosition<'ast> {
                 }
             }
         }
+
         if property.span.contains(position) && !property.name.span.contains(position) {
             // TODO(@druue): this should actually just return the value string, not the name of the property the value is for
-            return PropertyPosition::Value(&property.name.name);
+            return PropertyPosition::Value(property.name());
         }
 
         PropertyPosition::Property

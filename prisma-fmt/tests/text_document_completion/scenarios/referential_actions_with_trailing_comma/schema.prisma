@@ -10,10 +10,9 @@ model TestB {
 }
 
 model Test {
-  id      Int   @id
+  id      Int @id
   bId     Int
   // The user started typing Casc
   b       TestB @relation(fields: [testBId], references: [id], onDelete: <|>,)
   testBId Int
 }
-

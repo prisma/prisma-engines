@@ -7,6 +7,7 @@ use crate::{
 };
 use itertools::Itertools;
 use parser_database::{walkers::IndexWalker, IndexAlgorithm};
+use schema_ast::ast::WithSpan;
 
 /// Different databases validate index and unique constraint names in a certain namespace.
 /// Validates index and unique constraint names against the database requirements.
@@ -30,7 +31,7 @@ pub(super) fn has_a_unique_constraint_name(index: IndexWalker<'_>, names: &super
             .span_for_argument("map")
             .or_else(|| index.ast_attribute().span_for_argument("name"));
 
-        let span = from_arg.unwrap_or(index.ast_attribute().span);
+        let span = from_arg.unwrap_or(index.ast_attribute().span());
 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
@@ -59,7 +60,7 @@ pub(super) fn unique_index_has_a_unique_custom_name_per_model(
             );
 
             let from_arg = index.ast_attribute().span_for_argument("name");
-            let span = from_arg.unwrap_or(index.ast_attribute().span);
+            let span = from_arg.unwrap_or(index.ast_attribute().span());
 
             ctx.push_error(DatamodelError::new_attribute_validation_error(
                 &message,
@@ -82,7 +83,7 @@ pub(crate) fn field_length_prefix_supported(index: IndexWalker<'_>, ctx: &mut Co
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             message,
             index.attribute_name(),
-            index.ast_attribute().span,
+            index.ast_attribute().span(),
         ));
     }
 }
@@ -99,7 +100,7 @@ pub(crate) fn fulltext_index_preview_feature_enabled(index: IndexWalker<'_>, ctx
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             message,
             index.attribute_name(),
-            index.ast_attribute().span,
+            index.ast_attribute().span(),
         ));
     }
 }
@@ -116,7 +117,7 @@ pub(crate) fn fulltext_index_supported(index: IndexWalker<'_>, ctx: &mut Context
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             message,
             index.attribute_name(),
-            index.ast_attribute().span,
+            index.ast_attribute().span(),
         ));
     }
 }
@@ -141,7 +142,7 @@ pub(crate) fn fulltext_columns_should_not_define_length(index: IndexWalker<'_>, 
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             message,
             index.attribute_name(),
-            index.ast_attribute().span,
+            index.ast_attribute().span(),
         ));
     }
 }
@@ -170,7 +171,7 @@ pub(crate) fn fulltext_column_sort_is_supported(index: IndexWalker<'_>, ctx: &mu
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             message,
             index.attribute_name(),
-            index.ast_attribute().span,
+            index.ast_attribute().span(),
         ));
     }
 }
@@ -223,7 +224,7 @@ pub(crate) fn fulltext_text_columns_should_be_bundled_together(index: IndexWalke
                 ctx.push_error(DatamodelError::new_attribute_validation_error(
                     message,
                     index.attribute_name(),
-                    index.ast_attribute().span,
+                    index.ast_attribute().span(),
                 ));
 
                 return;
@@ -248,7 +249,7 @@ pub(crate) fn hash_index_must_not_use_sort_param(index: IndexWalker<'_>, ctx: &m
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             message,
             index.attribute_name(),
-            index.ast_attribute().span,
+            index.ast_attribute().span(),
         ));
     }
 }
@@ -271,7 +272,7 @@ pub(super) fn has_fields(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
     ctx.push_error(DatamodelError::new_attribute_validation_error(
         "The list of fields in an index cannot be empty. Please specify at least one field.",
         index.attribute_name(),
-        index.ast_attribute().span,
+        index.ast_attribute().span(),
     ))
 }
 
@@ -287,7 +288,7 @@ pub(crate) fn supports_clustering_setting(index: IndexWalker<'_>, ctx: &mut Cont
     ctx.push_error(DatamodelError::new_attribute_validation_error(
         "Defining clustering is not supported in the current connector.",
         index.attribute_name(),
-        index.ast_attribute().span,
+        index.ast_attribute().span(),
     ))
 }
 
@@ -305,7 +306,7 @@ pub(crate) fn clustering_can_be_defined_only_once(index: IndexWalker<'_>, ctx: &
             ctx.push_error(DatamodelError::new_attribute_validation_error(
                 "A model can only hold one clustered index or key.",
                 index.attribute_name(),
-                index.ast_attribute().span,
+                index.ast_attribute().span(),
             ));
         }
     }
@@ -322,7 +323,7 @@ pub(crate) fn clustering_can_be_defined_only_once(index: IndexWalker<'_>, ctx: &
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "A model can only hold one clustered index.",
             index.attribute_name(),
-            index.ast_attribute().span,
+            index.ast_attribute().span(),
         ));
 
         return;
@@ -345,7 +346,7 @@ pub(crate) fn index_algorithm_is_supported(index: IndexWalker<'_>, ctx: &mut Con
     let span = index
         .ast_attribute()
         .span_for_argument("type")
-        .unwrap_or_else(|| index.ast_attribute().span);
+        .unwrap_or_else(|| index.ast_attribute().span());
 
     ctx.push_error(DatamodelError::new_attribute_validation_error(
         message,
@@ -370,7 +371,7 @@ pub(crate) fn opclasses_are_not_allowed_with_other_than_normal_indices(index: In
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             message,
             index.attribute_name(),
-            index.ast_attribute().span,
+            index.ast_attribute().span(),
         ));
 
         return;
@@ -394,7 +395,7 @@ pub(crate) fn composite_type_in_compound_unique_index(index: IndexWalker<'_>, ct
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             &message,
             index.attribute_name(),
-            index.ast_attribute().span,
+            index.ast_attribute().span(),
         ));
     }
 }
@@ -424,7 +425,7 @@ pub(super) fn unique_client_name_does_not_clash_with_field(index: IndexWalker<'_
             &format!("The field `{idx_client_name}` clashes with the `{attr_name}` name. Please resolve the conflict by providing a custom id name: `{attr_name}([...], name: \"custom_name\")`"),
             container_type,
             index.model().name(),
-            index.ast_attribute().span,
+            index.ast_attribute().span(),
         ));
     }
 }

@@ -2,6 +2,7 @@ mod native_types;
 mod validations;
 
 pub use native_types::CockroachType;
+use schema_ast::ast::WithSpan;
 
 use crate::{
     datamodel_connector::{
@@ -370,7 +371,7 @@ impl SequenceFunction {
         let mut this = SequenceFunction::default();
 
         for arg in &args.arguments {
-            match arg.name.as_ref().map(|arg| arg.name.as_str()) {
+            match arg.name() {
                 Some("virtual") => this.r#virtual = coerce::boolean(&arg.value, diagnostics),
                 Some("cache") => this.cache = coerce::integer(&arg.value, diagnostics),
                 Some("increment") => this.increment = coerce::integer(&arg.value, diagnostics),
@@ -379,7 +380,7 @@ impl SequenceFunction {
                 Some("start") => this.start = coerce::integer(&arg.value, diagnostics),
                 Some(_) | None => diagnostics.push_error(DatamodelError::new_static(
                     "Unexpected argument in `sequence()` function call",
-                    arg.span,
+                    arg.span(),
                 )),
             }
         }

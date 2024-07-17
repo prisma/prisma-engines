@@ -14,7 +14,7 @@ use psl::{
         walkers::{ModelWalker, RefinedRelationWalker, ScalarFieldWalker},
         SourceFile,
     },
-    schema_ast::ast::{self, Attribute, IndentationType, NewlineType, WithSpan},
+    schema_ast::ast::{self, Attribute, IndentationType, NewlineType, WithAttributes, WithSpan},
     PreviewFeature,
 };
 use std::collections::HashMap;
@@ -181,7 +181,7 @@ fn create_missing_attribute<'a>(
             &attribute,
             model.indentation(),
             model.newline(),
-            &model.ast_model().attributes,
+            model.ast_model().attributes(),
         );
 
         let range = range_after_span(model.ast_model().span(), schema);

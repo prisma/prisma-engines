@@ -661,7 +661,7 @@ fn visit_model<'db>(model_id: crate::ModelId, ast_model: &'db ast::Model, ctx: &
                     .iter_tops()
                     .filter_map(|(_, top)| match top {
                         ast::Top::Source(_) | ast::Top::Generator(_) => None,
-                        _ => Some(&top.identifier().name),
+                        _ => Some(top.name()),
                     })
                     .collect();
 
@@ -669,7 +669,7 @@ fn visit_model<'db>(model_id: crate::ModelId, ast_model: &'db ast::Model, ctx: &
                     Some(ignore_case_match) => {
                         ctx.push_error(DatamodelError::new_type_for_case_not_found_error(
                             supported,
-                            ignore_case_match.as_str(),
+                            ignore_case_match,
                             ast_field.field_type.span(),
                         ));
                     }
@@ -729,7 +729,7 @@ fn visit_enum<'db>(enm: &'db ast::Enum, ctx: &mut Context<'db>) {
 /// does not match any we know of.
 fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<FieldType, &'db str> {
     let supported = match &field.field_type {
-        ast::FieldType::Supported(ident) => &ident.name,
+        ast::FieldType::Supported(ident) => ident.name(),
         ast::FieldType::Unsupported(name, _) => {
             let unsupported = UnsupportedType::new(ctx.interner.intern(name));
             return Ok(FieldType::Scalar(ScalarFieldType::Unsupported(unsupported)));
