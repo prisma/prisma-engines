@@ -288,7 +288,10 @@ impl Connector for MySqlDatamodelConnector {
 
     // On MySQL, bytes are encoded as base64 in the database directly.
     fn parse_json_bytes(&self, str: &str, _nt: Option<NativeTypeInstance>) -> PrismaValueResult<Vec<u8>> {
-        decode_bytes(str)
+        let mut buf = vec![0; str.len()];
+
+        // MySQL base64 encodes bytes with newlines every 76 characters.
+        decode_bytes(sanitize_base64(str, &mut buf))
     }
 
     fn runtime_join_strategy_support(&self) -> JoinStrategySupport {
@@ -299,4 +302,19 @@ impl Connector for MySqlDatamodelConnector {
             false => JoinStrategySupport::No,
         }
     }
+}
+
+/// Removes newlines from a base64 string.
+fn sanitize_base64<'a>(mut s: &str, buf: &'a mut [u8]) -> &'a [u8] {
+    let mut pos = 0;
+
+    while !s.is_empty() && pos < buf.len() {
+        let nl = s.find('\n').unwrap_or(s.len());
+        let len = nl.min(buf.len() - pos);
+        buf[pos..pos + len].copy_from_slice(&s.as_bytes()[..len]);
+        pos += len;
+        s = &s[(nl + 1).min(s.len())..];
+    }
+
+    &buf[0..pos]
 }
