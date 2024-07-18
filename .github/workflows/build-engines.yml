@@ -7,6 +7,7 @@ on:
   #   branches:
   #     - main
   #     - '*.*.x'
+  #     - 'integration/*'
   #   paths-ignore:
   #     - '!.github/workflows/build-engines*'
   #     - '.github/**'
@@ -35,44 +36,31 @@ jobs:
     steps:
       - name: Debug Pull Request Event
         if: ${{ github.event_name == 'pull_request' }}
-        env:
-          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
           echo "Pull Request: ${{ github.event.pull_request.number }}"
           echo "Pull Request Author: ${{ github.event.pull_request.user.login }}"
           echo "Pull Request Author Association: ${{ github.event.pull_request.author_association }}"
-          echo "Pull Request Body contains /integration: ${{ contains(env.PR_BODY, '/integration') }}"
+          echo "Commit message contains [integration]: ${{ contains(github.event.head_commit.message, '[integration]') }}"
 
-      - name: 'Check if the PR body contains `/integration` and the PR author has permissions to trigger the workflow'
-        id: check-pr-description
-        env:
-          PR_BODY: ${{ github.event.pull_request.body }}
+      - name: 'Check if commit message conatains `[integration]` and the PR author has permissions to trigger the workflow'
+        id: check-commit-message
         # See https://docs.github.com/en/graphql/reference/enums
         # https://michaelheap.com/github-actions-check-permission/
         # Check if
-        # - the PR body contains `/integration`
+        # - the commit message contains `[integration]`
         # - the PR author has permissions to trigger the workflow (must be part of the org or a collaborator)
         if: |
           github.event_name == 'pull_request' &&
-          contains(env.PR_BODY, '/integration') && 
+          contains(github.event.head_commit.message, '/integration') && 
           (
             github.event.pull_request.author_association == 'OWNER' ||
             github.event.pull_request.author_association == 'MEMBER' ||
-            github.event.pull_request.author_association == 'COLLABORATOR' ||
-            github.event.pull_request.author_association == 'CONTRIBUTOR'
+            github.event.pull_request.author_association == 'COLLABORATOR'
           )
         run: |
-          echo "PR body contains /integration and PR author has permissions" 
+          echo "Commit message contains [integration] and PR author has permissions" 
           # set value to GitHub output 
           echo "release=true" >> $GITHUB_OUTPUT
-
-      - name: Find "/integration" comment
-        uses: peter-evans/find-comment@v3
-        id: check-comments
-        if: ${{ github.event_name == 'pull_request' }}
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body-includes: '/integration'
 
       #
       # A patch branch (e.g. "4.6.x")
@@ -100,14 +88,12 @@ jobs:
         env:
           EVENT_NAME: ${{ github.event_name }}
           EVENT_PATH: ${{ github.event_path }}
-          CHECK_PR_DESC: ${{ steps.check-pr-description.outputs.release }}
-          CHECK_COMMENT: ${{ steps.check-comments.outputs.comment-id }}
+          CHECK_COMMIT_MESSAGE: ${{ steps.check-commit-message.outputs.release }}
           CHECK_BRANCH: ${{ steps.check-branch.outputs.release }}
         run: |
           echo "Event Name: $EVENT_NAME"
           echo "Event path: $EVENT_PATH"
-          echo "Check PR Description outputs: $CHECK_PR_DESC"
-          echo "Check Comments outputs: $CHECK_COMMENT"
+          echo "Check Commit Message outputs: $CHECK_COMMIT_MESSAGE"
           echo "Check branch: $CHECK_BRANCH"
 
       - name: Release is necessary!
@@ -116,22 +102,19 @@ jobs:
         if: |
           github.event_name == 'workflow_dispatch' || 
           github.event_name == 'push' || 
-          steps.check-comments.outputs.comment-id != 0 || 
-          steps.check-pr-description.outputs.release == 'true' || 
+          steps.check-commit-message.outputs.release == 'true' || 
           steps.check-branch.outputs.release == 'true'
 
         id: decision
         env:
           EVENT_NAME: ${{ github.event_name }}
           EVENT_PATH: ${{ github.event_path }}
-          CHECK_PR_DESC: ${{ steps.check-pr-description.outputs.release }}
-          CHECK_COMMENT: ${{ steps.check-comments.outputs.comment-id }}
+          CHECK_COMMIT_MESSAGE: ${{ steps.check-commit-message.outputs.release }}
           CHECK_BRANCH: ${{ steps.check-branch.outputs.release }}
         run: |
           echo "Event Name: $EVENT_NAME"
           echo "Event path: $EVENT_PATH"
-          echo "Check PR Description outputs: $CHECK_PR_DESC"
-          echo "Check Comments outputs: $CHECK_COMMENT"
+          echo "Check Commit Message outputs: $CHECK_COMMIT_MESSAGE"
           echo "Check branch: $CHECK_BRANCH"
 
           echo "Release is necessary"
