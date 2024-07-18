@@ -34,13 +34,20 @@ jobs:
     outputs:
       release: ${{ steps.decision.outputs.release }}
     steps:
+      - uses: actions/checkout@v4
+      - name: Get commit message
+        id: commit-msg
+        run: |
+          commit_msg=$(git log --format=%B -n)
+          echo "commit-msg=$commit_msg" >> $GITHUB_OUTPUT
+
       - name: Debug Pull Request Event
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           echo "Pull Request: ${{ github.event.pull_request.number }}"
           echo "Pull Request Author: ${{ github.event.pull_request.user.login }}"
           echo "Pull Request Author Association: ${{ github.event.pull_request.author_association }}"
-          echo "Commit message contains [integration]: ${{ contains(github.event.head_commit.message, '[integration]') }}"
+          echo "Commit message contains [integration]: ${{ contains(steps.commit-msg.outputs.commit-msg, '[integration]') }}"
 
       - name: 'Check if commit message conatains `[integration]` and the PR author has permissions to trigger the workflow'
         id: check-commit-message
@@ -51,7 +58,7 @@ jobs:
         # - the PR author has permissions to trigger the workflow (must be part of the org or a collaborator)
         if: |
           github.event_name == 'pull_request' &&
-          contains(github.event.head_commit.message, '[integration]') && 
+          contains(steps.commit-msg.outputs.commit-msg, '[integration]') && 
           (
             github.event.pull_request.author_association == 'OWNER' ||
             github.event.pull_request.author_association == 'MEMBER' ||
