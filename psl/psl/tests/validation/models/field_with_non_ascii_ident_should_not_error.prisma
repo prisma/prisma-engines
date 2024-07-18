@@ -1,0 +1,21 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model A {
+    id Int @id @map("_id")
+    lööps String[]
+}
+
+// [1;91merror[0m: [1mError validating: This line is not a valid field or attribute definition.[0m
+//   [1;94m-->[0m  [4mschema.prisma:12[0m
+// [1;94m   | [0m
+// [1;94m11 | [0m    id Int @id @map("_id")
+// [1;94m12 | [0m    [1;91mlööps String[][0m
+// [1;94m13 | [0m}
+// [1;94m   | [0m
