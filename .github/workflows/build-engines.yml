@@ -51,7 +51,7 @@ jobs:
         # - the PR author has permissions to trigger the workflow (must be part of the org or a collaborator)
         if: |
           github.event_name == 'pull_request' &&
-          contains(github.event.head_commit.message, '/integration') && 
+          contains(github.event.head_commit.message, '[integration]') && 
           (
             github.event.pull_request.author_association == 'OWNER' ||
             github.event.pull_request.author_association == 'MEMBER' ||
