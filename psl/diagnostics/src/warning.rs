@@ -44,6 +44,11 @@ impl DatamodelWarning {
         Self::new(message, span)
     }
 
+    pub fn new_named_env_val(span: Span) -> Self {
+        let message = "The env function doesn't expect named arguments".to_owned();
+        Self::new(message, span)
+    }
+
     pub fn new_field_validation(message: &str, model: &str, field: &str, span: Span) -> DatamodelWarning {
         let msg = format!(
             "Warning validating field `{}` in {} `{}`: {}",
