@@ -8,7 +8,7 @@ use tracing_futures::Instrument;
 
 pub struct SchemaPush<'a> {
     api: &'a mut dyn SchemaConnector,
-    schema: String,
+    files: Vec<SchemaContainer>,
     force: bool,
     /// Purely for logging diagnostics.
     migration_id: Option<&'a str>,
@@ -17,10 +17,16 @@ pub struct SchemaPush<'a> {
 }
 
 impl<'a> SchemaPush<'a> {
-    pub fn new(api: &'a mut dyn SchemaConnector, schema: String, max_refresh_delay: Option<Duration>) -> Self {
+    pub fn new(api: &'a mut dyn SchemaConnector, files: &[(&str, &str)], max_refresh_delay: Option<Duration>) -> Self {
         SchemaPush {
             api,
-            schema,
+            files: files
+                .iter()
+                .map(|(path, content)| SchemaContainer {
+                    path: path.to_string(),
+                    content: content.to_string(),
+                })
+                .collect(),
             force: false,
             migration_id: None,
             max_ddl_refresh_delay: max_refresh_delay,
@@ -39,7 +45,7 @@ impl<'a> SchemaPush<'a> {
 
     fn send_impl(self) -> CoreResult<SchemaPushAssertion> {
         let input = SchemaPushInput {
-            schema: self.schema,
+            schema: SchemasContainer { files: self.files },
             force: self.force,
         };
 

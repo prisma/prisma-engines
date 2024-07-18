@@ -2,7 +2,7 @@ pub use expect_test::expect;
 pub use indoc::{formatdoc, indoc};
 pub use quaint::{prelude::Queryable, single::Quaint};
 pub use test_macros::test_connector;
-pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
+pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Tags};
 
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{

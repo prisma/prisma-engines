@@ -1,6 +1,7 @@
 use super::*;
 use crate::EnumType;
-use constants::{filters, itx, json_null, ordering};
+use constants::{filters, itx, json_null, load_strategy, ordering};
+use psl::parser_database as db;
 use query_structure::prelude::ParentContainer;
 
 pub(crate) fn sort_order_enum() -> EnumType {
@@ -16,7 +17,7 @@ pub(crate) fn nulls_order_enum() -> EnumType {
     )
 }
 
-pub(crate) fn map_schema_enum_type(ctx: &'_ QuerySchema, enum_id: ast::EnumId) -> EnumType {
+pub(crate) fn map_schema_enum_type(ctx: &'_ QuerySchema, enum_id: db::EnumId) -> EnumType {
     let ident = Identifier::new_model(IdentifierType::Enum(ctx.internal_data_model.clone().zip(enum_id)));
 
     let schema_enum = ctx.internal_data_model.clone().zip(enum_id);
@@ -106,6 +107,22 @@ pub fn itx_isolation_levels(ctx: &'_ QuerySchema) -> Option<EnumType> {
     if values.is_empty() {
         return None;
     }
+
+    Some(EnumType::string(ident, values))
+}
+
+pub(crate) fn relation_load_strategy(ctx: &QuerySchema) -> Option<EnumType> {
+    if !ctx.can_resolve_relation_with_joins() {
+        return None;
+    }
+
+    let ident = Identifier::new_prisma(IdentifierType::RelationLoadStrategy);
+
+    let values = if ctx.can_resolve_relation_with_joins() {
+        vec![load_strategy::QUERY.to_owned(), load_strategy::JOIN.to_owned()]
+    } else {
+        vec![load_strategy::QUERY.to_owned()]
+    };
 
     Some(EnumType::string(ident, values))
 }

@@ -8,6 +8,8 @@ mod sqlite;
 mod vitess;
 
 pub use mysql::MySqlVersion;
+pub use sqlite::SqliteVersion;
+pub use vitess::VitessVersion;
 
 pub(crate) use cockroachdb::*;
 pub(crate) use js::*;
@@ -20,6 +22,7 @@ pub(crate) use vitess::*;
 
 use crate::{datamodel_rendering::DatamodelRenderer, BoxFuture, TestConfig, TestError, CONFIG};
 use psl::datamodel_connector::ConnectorCapabilities;
+use quaint::prelude::SqlFamily;
 use std::{convert::TryFrom, fmt};
 
 pub trait ConnectorTagInterface {
@@ -276,29 +279,81 @@ impl ConnectorVersion {
             | (_, Postgres(..)) => false,
         }
     }
+
+    /// The maximum number of rows allowed in a single insert query.
+    ///
+    /// max_bind_values is overriden by the QUERY_BATCH_SIZE env var in targets other than WASM.
+    ///
+    /// Connectors which underyling implementation is WASM don't have any max_bind_values override
+    /// as there's no such thing as runtime environment.
+    ///
+    /// From the PoV of the test binary, the target architecture is that of where the test runs,
+    /// generally x86_64, or aarch64, etc.
+    ///
+    /// As a consequence there is a mismatch between the max_bind_values as seen by the test
+    /// binary (overriden by the QUERY_BATCH_SIZE env var) and the max_bind_values as seen by the
+    /// WASM engine being exercised in those tests, through the RunnerExecutor::External test runner.
+    ///
+    /// What we do in here, is returning the number of max_bind_values that the connector under test
+    /// will use. i.e. if it's a WASM connector, the default, not overridable one. Otherwise the one
+    /// as seen by the test binary (which will be the same as the engine exercised)
+    pub fn max_bind_values(&self) -> Option<usize> {
+        if self.is_wasm() {
+            self.sql_family().map(|f| f.default_max_bind_values())
+        } else {
+            self.sql_family().map(|f| f.max_bind_values())
+        }
+    }
+
+    /// SQL family for the connector
+    fn sql_family(&self) -> Option<SqlFamily> {
+        match self {
+            Self::SqlServer(_) => Some(SqlFamily::Mssql),
+            Self::Postgres(_) => Some(SqlFamily::Postgres),
+            Self::MySql(_) => Some(SqlFamily::Mysql),
+            Self::Sqlite(_) => Some(SqlFamily::Sqlite),
+            Self::CockroachDb(_) => Some(SqlFamily::Postgres),
+            Self::Vitess(_) => Some(SqlFamily::Mysql),
+            _ => None,
+        }
+    }
+
+    /// Determines if the connector uses a driver adapter implemented in Wasm.
+    /// Do not delete! This is used because the `#[cfg(target_arch = "wasm32")]` conditional compilation
+    /// directive doesn't work in the test runner.
+    fn is_wasm(&self) -> bool {
+        matches!(
+            self,
+            Self::Postgres(Some(PostgresVersion::PgJsWasm))
+                | Self::Postgres(Some(PostgresVersion::NeonJsWasm))
+                | Self::Vitess(Some(VitessVersion::PlanetscaleJsWasm))
+                | Self::Sqlite(Some(SqliteVersion::LibsqlJsWasm))
+                | Self::Sqlite(Some(SqliteVersion::CloudflareD1))
+        )
+    }
 }
 
 impl fmt::Display for ConnectorVersion {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let printable = match self {
             Self::SqlServer(v) => match v {
-                Some(v) => format!("SQL Server ({})", v.to_string()),
+                Some(v) => format!("SQL Server ({v})"),
                 None => "SQL Server (unknown)".to_string(),
             },
             Self::Postgres(v) => match v {
-                Some(v) => format!("PostgreSQL ({})", v.to_string()),
+                Some(v) => format!("PostgreSQL ({v})"),
                 None => "PostgreSQL (unknown)".to_string(),
             },
             Self::MySql(v) => match v {
-                Some(v) => format!("MySQL ({})", v.to_string()),
+                Some(v) => format!("MySQL ({v})"),
                 None => "MySQL (unknown)".to_string(),
             },
             Self::MongoDb(v) => match v {
-                Some(v) => format!("MongoDB ({})", v.to_string()),
+                Some(v) => format!("MongoDB ({v})"),
                 None => "MongoDB (unknown)".to_string(),
             },
             Self::Sqlite(v) => match v {
-                Some(v) => format!("SQLite ({})", v.to_string()),
+                Some(v) => format!("SQLite ({v})"),
                 None => "SQLite (unknown)".to_string(),
             },
             Self::Vitess(v) => match v {
@@ -328,12 +383,12 @@ pub(crate) fn should_run(
 
     let exclusions = exclude
         .iter()
-        .filter_map(|c| ConnectorVersion::try_from(*c).ok())
+        .map(|c| ConnectorVersion::try_from(*c).unwrap())
         .collect::<Vec<_>>();
 
     let inclusions = only
         .iter()
-        .filter_map(|c| ConnectorVersion::try_from(*c).ok())
+        .map(|c| ConnectorVersion::try_from(*c).unwrap())
         .collect::<Vec<_>>();
 
     for exclusion in exclusions.iter() {
@@ -355,7 +410,7 @@ pub(crate) fn should_run(
 
     // FIXME: This skips vitess unless explicitly opted in. Replace with `true` when fixing
     // https://github.com/prisma/client-planning/issues/332
-    CONFIG.external_test_executor().is_some() || !matches!(version, ConnectorVersion::Vitess(_))
+    CONFIG.with_driver_adapter().is_some() || !matches!(version, ConnectorVersion::Vitess(_))
 }
 
 impl TryFrom<(&str, Option<&str>)> for ConnectorVersion {

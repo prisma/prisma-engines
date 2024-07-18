@@ -18,7 +18,7 @@ pub(crate) struct DbUnderTest {
 const MISSING_TEST_DATABASE_URL_MSG: &str = r#"
 Missing TEST_DATABASE_URL from environment.
 
-If you are developing with the docker-compose based setup, you can find the environment variables under .test_database_urls at the project root.
+If you are developing with the docker compose based setup, you can find the environment variables under .test_database_urls at the project root.
 
 Example usage:
 

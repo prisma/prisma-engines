@@ -1,0 +1,6 @@
+datasource db {
+    provider     = "postgresql"
+    url          = env("DATABASE_URL")
+    schemas      = ["a", "b"]
+    relationMode = "prisma"
+}

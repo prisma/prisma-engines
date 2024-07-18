@@ -1,0 +1,15 @@
+{
+  "type": "module",
+  "name": "@prisma/analyse-query-engine-wasm",
+  "private": true,
+  "scripts": {
+    "build": "(cd .. && WASM_BUILD_PROFILE=profiling ./build.sh 0.0.1 && wasm-pack pack)",
+    "prepare:crates": "twiggy top -f json ../pkg/query_engine_bg.wasm | jq > ./out/twiggy.profiling.json",
+    "crates": "node --import tsx --no-warnings ./src/crates.ts"
+  },
+  "devDependencies": {
+    "ts-node": "10.9.2",
+    "tsx": "4.15.1",
+    "typescript": "5.4.5"
+  }
+}

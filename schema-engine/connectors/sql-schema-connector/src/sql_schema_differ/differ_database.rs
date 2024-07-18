@@ -1,5 +1,6 @@
 use super::{column, enums::EnumDiffer, table::TableDiffer};
 use crate::{flavour::SqlFlavour, migration_pair::MigrationPair, SqlDatabaseSchema};
+use indexmap::IndexMap;
 use sql_schema_describer::{
     postgres::{ExtensionId, ExtensionWalker, PostgresSchemaExt},
     walkers::{EnumWalker, TableColumnWalker, TableWalker},
@@ -18,9 +19,9 @@ pub(crate) struct DifferDatabase<'a> {
     /// The schemas being diffed
     pub(crate) schemas: MigrationPair<&'a SqlDatabaseSchema>,
     /// Namespace name -> namespace indexes.
-    namespaces: HashMap<Cow<'a, str>, MigrationPair<Option<NamespaceId>>>,
+    namespaces: IndexMap<Cow<'a, str>, MigrationPair<Option<NamespaceId>>>,
     /// Table name -> table indexes.
-    tables: HashMap<Table<'a>, MigrationPair<Option<TableId>>>,
+    tables: IndexMap<Table<'a>, MigrationPair<Option<TableId>>>,
     /// (table_idxs, column_name) -> column_idxs. BTreeMap because we want range
     /// queries (-> all the columns in a table).
     columns: BTreeMap<(MigrationPair<TableId>, &'a str), MigrationPair<Option<TableColumnId>>>,
@@ -47,8 +48,8 @@ impl<'a> DifferDatabase<'a> {
         let mut db = DifferDatabase {
             flavour,
             schemas,
-            namespaces: HashMap::with_capacity(namespace_count_lb),
-            tables: HashMap::with_capacity(table_count_lb),
+            namespaces: IndexMap::with_capacity(namespace_count_lb),
+            tables: IndexMap::with_capacity(table_count_lb),
             columns: BTreeMap::new(),
             column_changes: Default::default(),
             extensions: Default::default(),

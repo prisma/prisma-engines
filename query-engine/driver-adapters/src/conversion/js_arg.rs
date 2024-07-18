@@ -1,9 +1,8 @@
-use serde::Serialize;
 use serde_json::value::Value as JsonValue;
 
-#[derive(Debug, PartialEq, Serialize)]
-#[serde(untagged)]
+#[derive(Debug, PartialEq)]
 pub enum JSArg {
+    SafeInt(i32),
     Value(serde_json::Value),
     Buffer(Vec<u8>),
     Array(Vec<JSArg>),

@@ -5,3 +5,6 @@ pub use crate::connector::{
     TransactionCapable,
 };
 pub use crate::{col, val, values};
+
+#[cfg(native)]
+pub use crate::connector::NativeConnectionInfo;

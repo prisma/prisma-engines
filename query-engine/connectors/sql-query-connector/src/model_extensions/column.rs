@@ -1,6 +1,6 @@
 use crate::{model_extensions::ScalarFieldExt, Context};
 use itertools::Itertools;
-use quaint::ast::{Column, Row};
+use quaint::ast::Column;
 use query_structure::{Field, ModelProjection, RelationField, ScalarField};
 
 pub struct ColumnIterator {
@@ -32,10 +32,6 @@ impl From<Vec<Column<'static>>> for ColumnIterator {
     }
 }
 
-pub(crate) trait AsRow {
-    fn as_row(&self, ctx: &Context<'_>) -> Row<'static>;
-}
-
 pub(crate) trait AsColumns {
     fn as_columns(&self, ctx: &Context<'_>) -> ColumnIterator;
 }
@@ -49,13 +45,6 @@ impl AsColumns for ModelProjection {
             .collect();
 
         ColumnIterator::from(cols)
-    }
-}
-
-impl AsRow for ModelProjection {
-    fn as_row(&self, ctx: &Context<'_>) -> Row<'static> {
-        let cols: Vec<Column<'static>> = self.as_columns(ctx).collect();
-        Row::from(cols)
     }
 }
 

@@ -7,4 +7,14 @@ model User {
   id    Int       @id
   email String
   dob   DateTime?
+
+  posts Post[]
+}
+
+model Post {
+  id     Int    @id
+  name   String
+
+  userId Int?
+  user   User?  @relation(fields: [userId], references: [id])
 }

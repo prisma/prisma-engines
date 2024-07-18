@@ -586,6 +586,7 @@ impl ToColumnNames for PostgresStatement {
     }
 }
 
+// TODO: consider porting this logic to Driver Adapters as well
 impl<'a> ToSql for Value<'a> {
     fn to_sql(
         &self,

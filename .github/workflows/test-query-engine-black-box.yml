@@ -61,7 +61,7 @@ jobs:
       - name: "Start ${{ matrix.database.name }} (${{ matrix.engine_protocol }})"
         run: make start-${{ matrix.database.name }}
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
 
       - run: export WORKSPACE_ROOT=$(pwd) && cargo build --package query-engine
         env:

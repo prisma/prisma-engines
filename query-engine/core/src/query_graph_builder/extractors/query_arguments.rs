@@ -54,6 +54,11 @@ pub fn extract_query_args(
                     }
                 }
 
+                args::RELATION_LOAD_STRATEGY => Ok(QueryArguments {
+                    relation_load_strategy: Some(arg.value.try_into()?),
+                    ..result
+                }),
+
                 _ => Ok(result),
             }
         },
@@ -95,7 +100,7 @@ fn process_order_object(
             if field_name.as_ref() == ordering::UNDERSCORE_RELEVANCE {
                 let object: ParsedInputMap<'_> = field_value.try_into()?;
 
-                return extract_order_by_relevance(container, object);
+                return extract_order_by_relevance(container, object, path);
             }
 
             if let Some(sort_aggr) = extract_sort_aggregation(field_name.as_ref()) {
@@ -167,6 +172,7 @@ fn process_order_object(
 fn extract_order_by_relevance(
     container: &ParentContainer,
     object: ParsedInputMap<'_>,
+    path: Vec<OrderByHop>,
 ) -> QueryGraphBuilderResult<Option<OrderBy>> {
     let (sort_order, _) = extract_order_by_args(object.get(ordering::SORT).unwrap().clone())?;
     let search: PrismaValue = object.get(ordering::SEARCH).unwrap().clone().try_into()?;
@@ -193,7 +199,7 @@ fn extract_order_by_relevance(
         })
         .collect::<Result<Vec<ScalarFieldRef>, _>>()?;
 
-    Ok(Some(OrderBy::relevance(fields, search, sort_order)))
+    Ok(Some(OrderBy::relevance(fields, search, sort_order, path)))
 }
 
 fn extract_sort_aggregation(field_name: &str) -> Option<SortAggregation> {
@@ -212,10 +218,10 @@ fn extract_order_by_args(
 ) -> QueryGraphBuilderResult<(SortOrder, Option<NullsOrder>)> {
     match field_value {
         ParsedInputValue::Map(mut map) => {
-            let sort: PrismaValue = map.remove(ordering::SORT).unwrap().try_into()?;
+            let sort: PrismaValue = map.swap_remove(ordering::SORT).unwrap().try_into()?;
             let sort = pv_to_sort_order(sort)?;
             let nulls = map
-                .remove(ordering::NULLS)
+                .swap_remove(ordering::NULLS)
                 .map(PrismaValue::try_from)
                 .transpose()?
                 .map(pv_to_nulls_order)
@@ -319,7 +325,7 @@ fn extract_compound_cursor_field(
     let mut pairs = vec![];
 
     for field in fields {
-        let value = map.remove(field.name()).unwrap();
+        let value = map.swap_remove(field.name()).unwrap();
         pairs.extend(extract_cursor_field(field, value)?);
     }
 

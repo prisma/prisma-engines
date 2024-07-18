@@ -2,7 +2,7 @@ use crate::{
     ast::{self, WithName},
     interner::StringId,
     walkers::RelationFieldId,
-    DatamodelError, Diagnostics,
+    DatamodelError, Diagnostics, FileId,
     {context::Context, types::RelationField},
 };
 use enumflags2::bitflags;
@@ -75,11 +75,11 @@ pub(crate) struct Relations {
     /// (model_a, model_b, relation_idx)
     ///
     /// This can be interpreted as the relations _from_ a model.
-    forward: BTreeSet<(ast::ModelId, ast::ModelId, RelationId)>,
+    forward: BTreeSet<(crate::ModelId, crate::ModelId, RelationId)>,
     /// (model_b, model_a, relation_idx)
     ///
     /// This can be interpreted as the relations _to_ a model.
-    back: BTreeSet<(ast::ModelId, ast::ModelId, RelationId)>,
+    back: BTreeSet<(crate::ModelId, crate::ModelId, RelationId)>,
 }
 
 impl std::ops::Index<RelationId> for Relations {
@@ -117,17 +117,23 @@ impl Relations {
     /// Iterator over relations where the provided model is model A, or the forward side of the
     /// relation.
     #[allow(clippy::wrong_self_convention)] // this is the name we want
-    pub(crate) fn from_model(&self, model_a_id: ast::ModelId) -> impl Iterator<Item = RelationId> + '_ {
+    pub(crate) fn from_model(&self, model_a_id: crate::ModelId) -> impl Iterator<Item = RelationId> + '_ {
         self.forward
-            .range((model_a_id, ast::ModelId::ZERO, RelationId::MIN)..(model_a_id, ast::ModelId::MAX, RelationId::MAX))
+            .range(
+                (model_a_id, (FileId::ZERO, ast::ModelId::ZERO), RelationId::MIN)
+                    ..(model_a_id, (FileId::MAX, ast::ModelId::MAX), RelationId::MAX),
+            )
             .map(move |(_, _, relation_id)| *relation_id)
     }
 
     /// Iterator over relationss where the provided model is model B, or the backrelation side of
     /// the relation.
-    pub(crate) fn to_model(&self, model_a_id: ast::ModelId) -> impl Iterator<Item = RelationId> + '_ {
+    pub(crate) fn to_model(&self, model_a_id: crate::ModelId) -> impl Iterator<Item = RelationId> + '_ {
         self.back
-            .range((model_a_id, ast::ModelId::ZERO, RelationId::MIN)..(model_a_id, ast::ModelId::MAX, RelationId::MAX))
+            .range(
+                (model_a_id, (FileId::ZERO, ast::ModelId::ZERO), RelationId::MIN)
+                    ..(model_a_id, (FileId::MAX, ast::ModelId::MAX), RelationId::MAX),
+            )
             .map(move |(_, _, relation_id)| *relation_id)
     }
 }
@@ -180,13 +186,17 @@ pub(crate) struct Relation {
     /// The `name` argument in `@relation`.
     pub(super) relation_name: Option<StringId>,
     pub(super) attributes: RelationAttributes,
-    pub(super) model_a: ast::ModelId,
-    pub(super) model_b: ast::ModelId,
+    pub(super) model_a: crate::ModelId,
+    pub(super) model_b: crate::ModelId,
 }
 
 impl Relation {
     pub(crate) fn is_implicit_many_to_many(&self) -> bool {
         matches!(self.attributes, RelationAttributes::ImplicitManyToMany { .. })
+    }
+
+    pub(crate) fn is_two_way_embedded_many_to_many(&self) -> bool {
+        matches!(self.attributes, RelationAttributes::TwoWayEmbeddedManyToMany { .. })
     }
 
     pub(crate) fn as_complete_fields(&self) -> Option<(RelationFieldId, RelationFieldId)> {
@@ -200,16 +210,11 @@ impl Relation {
             _ => None,
         }
     }
-
-    pub(crate) fn is_two_way_embedded_many_to_many(&self) -> bool {
-        matches!(self.attributes, RelationAttributes::TwoWayEmbeddedManyToMany { .. })
-    }
 }
 
 // Implementation detail for this module. Should stay private.
 pub(super) struct RelationEvidence<'db> {
     pub(super) ast_model: &'db ast::Model,
-    pub(super) model_id: ast::ModelId,
     pub(super) ast_field: &'db ast::Field,
     pub(super) field_id: RelationFieldId,
     pub(super) is_self_relation: bool,
@@ -219,14 +224,26 @@ pub(super) struct RelationEvidence<'db> {
     pub(super) opposite_relation_field: Option<(RelationFieldId, &'db ast::Field, &'db RelationField)>,
 }
 
+impl RelationEvidence<'_> {
+    fn model_id(&self) -> crate::ModelId {
+        self.relation_field.model_id
+    }
+
+    fn referenced_model_id(&self) -> crate::ModelId {
+        self.relation_field.referenced_model
+    }
+}
+
 pub(super) fn relation_evidence<'db>(
     (relation_field_id, relation_field): (RelationFieldId, &'db RelationField),
     ctx: &'db Context<'db>,
 ) -> RelationEvidence<'db> {
-    let ast = ctx.ast;
-    let ast_model = &ast[relation_field.model_id];
+    let rf = &ctx.types[relation_field_id];
+    let referencing_ast = &ctx.asts[rf.model_id.0].2;
+    let referenced_ast = &ctx.asts[rf.referenced_model.0].2;
+    let ast_model = &referencing_ast[relation_field.model_id.1];
     let ast_field = &ast_model[relation_field.field_id];
-    let opposite_model = &ast[relation_field.referenced_model];
+    let opposite_model = &referenced_ast[relation_field.referenced_model.1];
     let is_self_relation = relation_field.model_id == relation_field.referenced_model;
     let opposite_relation_field: Option<(RelationFieldId, &ast::Field, &'db RelationField)> = ctx
         .types
@@ -238,7 +255,13 @@ pub(super) fn relation_evidence<'db>(
             !is_self_relation || opposite_relation_field.field_id != relation_field.field_id
         })
         .find(|(_, opposite_relation_field)| opposite_relation_field.name == relation_field.name)
-        .map(|(opp_field_id, opp_rf)| (opp_field_id, &ast[opp_rf.model_id][opp_rf.field_id], opp_rf));
+        .map(|(opp_field_id, opp_rf)| {
+            (
+                opp_field_id,
+                &referenced_ast[opp_rf.model_id.1][opp_rf.field_id],
+                opp_rf,
+            )
+        });
 
     let is_two_way_embedded_many_to_many_relation = match (relation_field, opposite_relation_field) {
         (left, Some((_, _, right))) => left.fields.is_some() || right.fields.is_some(),
@@ -247,7 +270,6 @@ pub(super) fn relation_evidence<'db>(
 
     RelationEvidence {
         ast_model,
-        model_id: relation_field.model_id,
         ast_field,
         field_id: relation_field_id,
         relation_field,
@@ -359,7 +381,7 @@ pub(super) fn ingest_relation<'db>(evidence: RelationEvidence<'db>, relations: &
             match &evidence.relation_field.fields {
                 Some(fields) => {
                     let fields_are_unique =
-                        ctx.types.model_attributes[&evidence.model_id]
+                        ctx.types.model_attributes[&evidence.model_id()]
                             .ast_indexes
                             .iter()
                             .any(|(_, idx)| {
@@ -387,14 +409,14 @@ pub(super) fn ingest_relation<'db>(evidence: RelationEvidence<'db>, relations: &
         RelationAttributes::OneToMany(OneToManyRelationFields::Back(_)) => Relation {
             attributes: relation_type,
             relation_name: evidence.relation_field.name,
-            model_a: evidence.relation_field.referenced_model,
-            model_b: evidence.model_id,
+            model_a: evidence.referenced_model_id(),
+            model_b: evidence.model_id(),
         },
         _ => Relation {
             attributes: relation_type,
             relation_name: evidence.relation_field.name,
-            model_a: evidence.model_id,
-            model_b: evidence.relation_field.referenced_model,
+            model_a: evidence.model_id(),
+            model_b: evidence.referenced_model_id(),
         },
     };
 
@@ -408,11 +430,11 @@ pub(super) fn ingest_relation<'db>(evidence: RelationEvidence<'db>, relations: &
 
     relations
         .forward
-        .insert((evidence.model_id, evidence.relation_field.referenced_model, relation_id));
+        .insert((evidence.model_id(), evidence.referenced_model_id(), relation_id));
 
     relations
         .back
-        .insert((evidence.relation_field.referenced_model, evidence.model_id, relation_id));
+        .insert((evidence.referenced_model_id(), evidence.model_id(), relation_id));
 }
 
 /// An action describing the way referential integrity is managed in the system.

@@ -36,17 +36,18 @@ fn find_unique_with_options(
         None => None,
     };
 
+    let requested_rel_load_strategy = field
+        .arguments
+        .lookup(args::RELATION_LOAD_STRATEGY)
+        .map(|arg| arg.value.try_into())
+        .transpose()?;
+
     let name = field.name;
     let alias = field.alias;
-    let model = model;
-    let nested_fields = field.nested_fields.unwrap().fields;
-    let (aggr_fields_pairs, nested_fields) = extractors::extract_nested_rel_aggr_selections(nested_fields);
-    let aggregation_selections = utils::collect_relation_aggr_selections(aggr_fields_pairs, &model)?;
-    let selection_order: Vec<String> = utils::collect_selection_order(&nested_fields);
-    let selected_fields = utils::collect_selected_fields(&nested_fields, None, &model, query_schema)?;
-    let nested = utils::collect_nested_queries(nested_fields, &model, query_schema)?;
-    let selected_fields = utils::merge_relation_selections(selected_fields, None, &nested);
-    let relation_load_strategy = get_relation_load_strategy(None, None, &nested, &aggregation_selections, query_schema);
+    let (selected_fields, selection_order, nested) =
+        utils::extract_selected_fields(field.nested_fields.unwrap().fields, &model, query_schema)?;
+
+    let relation_load_strategy = get_relation_load_strategy(requested_rel_load_strategy, None, &nested, query_schema)?;
 
     Ok(ReadQuery::RecordQuery(RecordQuery {
         name,
@@ -56,7 +57,6 @@ fn find_unique_with_options(
         selected_fields,
         nested,
         selection_order,
-        aggregation_selections,
         options,
         relation_load_strategy,
     }))

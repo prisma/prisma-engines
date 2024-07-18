@@ -30,5 +30,8 @@ fn code_actions_should_not_crash_on_validation_errors_with_multi_schema() {
         },
     };
 
-    prisma_fmt::code_actions(schema.to_owned(), &serde_json::to_string_pretty(&params).unwrap());
+    prisma_fmt::code_actions(
+        serde_json::to_string_pretty(&[("schema.prisma", schema.to_owned())]).unwrap(),
+        &serde_json::to_string_pretty(&params).unwrap(),
+    );
 }

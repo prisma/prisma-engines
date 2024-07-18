@@ -84,9 +84,9 @@ mod uniq_count_rel {
         Ok(())
     }
 
-    // "Counting with some records and filters" should "not affect the count"
+    // Counting with cursor should not affect the count
     #[connector_test]
-    async fn count_with_filters(runner: Runner) -> TestResult<()> {
+    async fn count_with_cursor(runner: Runner) -> TestResult<()> {
         // 4 comment / 4 categories
         create_row(
             &runner,
@@ -108,6 +108,128 @@ mod uniq_count_rel {
             }
           }"#),
           @r###"{"data":{"findUniquePost":{"comments":[{"id":1}],"categories":[{"id":1}],"_count":{"comments":4,"categories":4}}}}"###
+        );
+
+        Ok(())
+    }
+
+    // Counting with take should not affect the count
+    #[connector_test]
+    async fn count_with_take(runner: Runner) -> TestResult<()> {
+        // 4 comment / 4 categories
+        create_row(
+            &runner,
+            r#"{
+                  id: 1,
+                  title: "a",
+                  comments: { create: [{id: 1}, {id: 2}, {id: 3}, {id: 4}] },
+                  categories: { create: [{id: 1}, {id: 2}, {id: 3}, {id: 4}] },
+            }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findUniquePost(where: { id: 1 }) {
+              comments(take: 1) { id }
+              categories(take: 1) { id }
+              _count { comments categories }
+            }
+          }"#),
+          @r###"{"data":{"findUniquePost":{"comments":[{"id":1}],"categories":[{"id":1}],"_count":{"comments":4,"categories":4}}}}"###
+        );
+
+        Ok(())
+    }
+
+    // Counting with skip should not affect the count
+    #[connector_test]
+    async fn count_with_skip(runner: Runner) -> TestResult<()> {
+        // 4 comment / 4 categories
+        create_row(
+            &runner,
+            r#"{
+                  id: 1,
+                  title: "a",
+                  comments: { create: [{id: 1}, {id: 2}, {id: 3}, {id: 4}] },
+                  categories: { create: [{id: 1}, {id: 2}, {id: 3}, {id: 4}] },
+            }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findUniquePost(where: { id: 1 }) {
+              comments(skip: 2) { id }
+              categories(skip: 2) { id }
+              _count { comments categories }
+            }
+          }"#),
+          @r###"{"data":{"findUniquePost":{"comments":[{"id":3},{"id":4}],"categories":[{"id":3},{"id":4}],"_count":{"comments":4,"categories":4}}}}"###
+        );
+
+        Ok(())
+    }
+
+    // Counting with filters should not affect the count
+    #[connector_test]
+    async fn count_with_filters(runner: Runner) -> TestResult<()> {
+        // 4 comment / 4 categories
+        create_row(
+            &runner,
+            r#"{
+                  id: 1,
+                  title: "a",
+                  comments: { create: [{id: 1}, {id: 2}, {id: 3}, {id: 4}] },
+                  categories: { create: [{id: 1}, {id: 2}, {id: 3}, {id: 4}] },
+            }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findUniquePost(where: { id: 1 }) {
+              comments(where: { id: 2}) { id }
+              categories(where: { id: 2}) { id }
+              _count { comments categories }
+            }
+          }"#),
+          @r###"{"data":{"findUniquePost":{"comments":[{"id":2}],"categories":[{"id":2}],"_count":{"comments":4,"categories":4}}}}"###
+        );
+
+        Ok(())
+    }
+
+    // Counting with distinct should not affect the count
+    #[connector_test]
+    async fn count_with_distinct(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+                  id: 1,
+                  title: "a",
+                  categories: { create: { id: 1 } }
+            }"#,
+        )
+        .await?;
+        create_row(
+            &runner,
+            r#"{
+                  id: 2,
+                  title: "a",
+                  categories: { connect: { id: 1 } }
+            }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"{
+              findUniqueCategory(where: { id: 1 }) {
+                posts(distinct: title) { id }
+                _count { posts }
+              }
+            }"#),
+            @r###"{"data":{"findUniqueCategory":{"posts":[{"id":1}],"_count":{"posts":2}}}}"###
         );
 
         Ok(())

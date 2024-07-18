@@ -214,7 +214,7 @@ mod m2m {
         schema.to_owned()
     }
 
-    // https://github.com/prisma/prisma/issues/16390
+    // ! (https://github.com/prisma/prisma/issues/16390) - Skip on RLS::Query
     #[connector_test(schema(schema_16390), relation_mode = "prisma", only(Postgres))]
     async fn repro_16390(runner: Runner) -> TestResult<()> {
         run_query!(&runner, r#"mutation { createOneCategory(data: {}) { id } }"#);
@@ -225,12 +225,18 @@ mod m2m {
         run_query!(&runner, r#"mutation { deleteOneItem(where: { id: 1 }) { id } }"#);
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findUniqueItem(where: { id: 1 }) { id categories { id } } }"#),
+          run_query!(&runner, r#"{
+                findUniqueItem(relationLoadStrategy: join, where: { id: 1 })
+                { id categories { id } } 
+            }"#),
           @r###"{"data":{"findUniqueItem":null}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findUniqueCategory(where: { id: 1 }) { id items { id } } }"#),
+          run_query!(&runner, r#"{
+                findUniqueCategory(relationLoadStrategy: join, where: { id: 1 })
+                { id items { id } }
+            }"#),
           @r###"{"data":{"findUniqueCategory":{"id":1,"items":[]}}}"###
         );
 

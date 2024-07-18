@@ -1,0 +1,132 @@
+[
+  {
+    "title": "Add @map(\"_id\")",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 6,
+            "character": 4
+          },
+          "end": {
+            "line": 7,
+            "character": 0
+          }
+        },
+        "severity": 1,
+        "message": "Error validating field `id` in model `interm`: MongoDB model IDs must have an @map(\"_id\") annotation."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/schema.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 6,
+                "character": 14
+              },
+              "end": {
+                "line": 7,
+                "character": 0
+              }
+            },
+            "newText": " @map(\"_id\")\n"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "title": "Add @map(\"_id\")",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 13,
+            "character": 4
+          },
+          "end": {
+            "line": 14,
+            "character": 0
+          }
+        },
+        "severity": 1,
+        "message": "Error validating field `id` in model `Forum`: MongoDB model IDs must have an @map(\"_id\") annotation."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/schema.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 13,
+                "character": 21
+              },
+              "end": {
+                "line": 14,
+                "character": 0
+              }
+            },
+            "newText": " @map(\"_id\")\n"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "title": "Add relation attribute for relation field",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 9,
+            "character": 4
+          },
+          "end": {
+            "line": 10,
+            "character": 0
+          }
+        },
+        "severity": 1,
+        "message": "Error parsing attribute \"@relation\": The relation field `forum` on Model `interm` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/schema.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 9,
+                "character": 17
+              },
+              "end": {
+                "line": 10,
+                "character": 0
+              }
+            },
+            "newText": " @relation(fields: [forumid], references: [id])\n"
+          },
+          {
+            "range": {
+              "start": {
+                "line": 9,
+                "character": 17
+              },
+              "end": {
+                "line": 10,
+                "character": 0
+              }
+            },
+            "newText": "\nforumid Int?\n"
+          }
+        ]
+      }
+    }
+  }
+]

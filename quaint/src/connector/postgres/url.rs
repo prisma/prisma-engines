@@ -1,10 +1,6 @@
 #![cfg_attr(target_arch = "wasm32", allow(dead_code))]
 
-use std::{
-    borrow::Cow,
-    fmt::{Debug, Display},
-    time::Duration,
-};
+use std::{borrow::Cow, fmt::Debug, time::Duration};
 
 use percent_encoding::percent_decode;
 use url::{Host, Url};
@@ -435,43 +431,6 @@ pub(crate) struct PostgresUrlQueryParams {
     pub(crate) ssl_mode: SslMode,
 }
 
-// A SearchPath connection parameter (Display-impl) for connection initialization.
-struct CockroachSearchPath<'a>(&'a str);
-
-impl Display for CockroachSearchPath<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(self.0)
-    }
-}
-
-// A SearchPath connection parameter (Display-impl) for connection initialization.
-struct PostgresSearchPath<'a>(&'a str);
-
-impl Display for PostgresSearchPath<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("\"")?;
-        f.write_str(self.0)?;
-        f.write_str("\"")?;
-
-        Ok(())
-    }
-}
-
-// A SetSearchPath statement (Display-impl) for connection initialization.
-struct SetSearchPath<'a>(Option<&'a str>);
-
-impl Display for SetSearchPath<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if let Some(schema) = self.0 {
-            f.write_str("SET search_path = \"")?;
-            f.write_str(schema)?;
-            f.write_str("\";\n")?;
-        }
-
-        Ok(())
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -608,7 +567,7 @@ mod tests {
         match res {
             Ok(_) => unreachable!(),
             Err(e) => match e.kind() {
-                ErrorKind::TlsError { .. } => (),
+                ErrorKind::Native(NativeErrorKind::TlsError { .. }) => (),
                 other => panic!("{:#?}", other),
             },
         }

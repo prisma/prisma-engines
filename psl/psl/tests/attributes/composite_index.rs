@@ -527,11 +527,17 @@ fn pointing_to_a_non_existing_type() {
     let error = parse_unwrap_err(&dml);
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mType "C" is neither a built-in type, nor refers to another model, custom type, or enum.[0m
+        [1;91merror[0m: [1mType "C" is neither a built-in type, nor refers to another model, composite type, or enum.[0m
           [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
         [1;94m16 | [0m  id Int @id @map("_id")
         [1;94m17 | [0m  a  [1;91mC[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError validating model "B": The index definition refers to the relation fields a. Index definitions must reference only scalar fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
+        [1;94m   | [0m
+        [1;94m18 | [0m
+        [1;94m19 | [0m  [1;91m@@index([a.field])[0m
         [1;94m   | [0m
     "#]];
 

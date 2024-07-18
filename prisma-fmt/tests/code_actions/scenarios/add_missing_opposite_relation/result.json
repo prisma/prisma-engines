@@ -1,0 +1,41 @@
+[
+  {
+    "title": "Add missing relation field to model Artist",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 2,
+            "character": 4
+          },
+          "end": {
+            "line": 3,
+            "character": 0
+          }
+        },
+        "severity": 1,
+        "message": "Error validating field `author` in model `Song`: The relation field `author` on model `Song` is missing an opposite relation field on the model `Artist`. Either run `prisma format` or add it manually."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/schema.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 7,
+                "character": 0
+              },
+              "end": {
+                "line": 7,
+                "character": 0
+              }
+            },
+            "newText": "\n    Song Song[]\n"
+          }
+        ]
+      }
+    }
+  }
+]

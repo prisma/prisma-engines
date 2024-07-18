@@ -1,34 +1,12 @@
 use query_core::telemetry::helpers as telemetry_helpers;
 use query_engine_metrics::MetricRegistry;
+use tracing::Subscriber;
 use tracing_error::ErrorLayer;
-use tracing_subscriber::{layer::Layered, prelude::*, Layer, Registry};
+use tracing_subscriber::{prelude::*, Layer};
 
 use crate::LogEmit;
 
-// Pretty ugly. I'm not sure how to make this better
-type Sub = Layered<
-    ErrorLayer<
-        Layered<
-            Box<
-                dyn tracing_subscriber::Layer<
-                        Layered<Box<dyn tracing_subscriber::Layer<Registry> + Send + Sync>, Registry>,
-                    > + Send
-                    + Sync,
-            >,
-            Layered<Box<dyn tracing_subscriber::Layer<Registry> + Send + Sync>, Registry>,
-        >,
-    >,
-    Layered<
-        Box<
-            dyn tracing_subscriber::Layer<Layered<Box<dyn tracing_subscriber::Layer<Registry> + Send + Sync>, Registry>>
-                + Send
-                + Sync,
-        >,
-        Layered<Box<dyn tracing_subscriber::Layer<Registry> + Send + Sync>, Registry>,
-    >,
->;
-
-pub fn test_tracing_subscriber(log_config: String, metrics: MetricRegistry, log_tx: LogEmit) -> Sub {
+pub fn test_tracing_subscriber(log_config: String, metrics: MetricRegistry, log_tx: LogEmit) -> impl Subscriber {
     let filter = telemetry_helpers::env_filter(true, telemetry_helpers::QueryEngineLogLevel::Override(log_config));
 
     let fmt_layer = tracing_subscriber::fmt::layer()

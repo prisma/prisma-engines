@@ -1,6 +1,7 @@
 pub mod arithmetic;
 
 mod error;
+mod raw_json;
 
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::prelude::*;
@@ -11,8 +12,11 @@ use std::{convert::TryFrom, fmt, str::FromStr};
 use uuid::Uuid;
 
 pub use error::ConversionFailure;
+pub use raw_json::RawJson;
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
+
+pub use base64::encode as encode_base64;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
 #[serde(untagged)]
@@ -65,7 +69,7 @@ pub fn encode_bytes(bytes: &[u8]) -> String {
     base64::encode(bytes)
 }
 
-pub fn decode_bytes(s: &str) -> PrismaValueResult<Vec<u8>> {
+pub fn decode_bytes(s: impl AsRef<[u8]>) -> PrismaValueResult<Vec<u8>> {
     base64::decode(s).map_err(|_| ConversionFailure::new("base64 encoded bytes", "PrismaValue::Bytes"))
 }
 

@@ -61,8 +61,7 @@ impl<'a> JsonProtocolAdapter<'a> {
             None => vec![],
         };
 
-        let all_scalars_set = query_selection.all_scalars();
-        let all_composites_set = query_selection.all_composites();
+        let excluded_keys = query_selection.get_excluded_keys();
 
         let mut selection = Selection::new(field.name().clone(), None, arguments, Vec::new());
 
@@ -91,46 +90,44 @@ impl<'a> JsonProtocolAdapter<'a> {
                 crate::SelectionSetValue::Shorthand(true) => {
                     selection.push_nested_selection(self.create_shorthand_selection(
                         field,
-                        &selection_name,
+                        selection_name,
                         container,
-                        all_scalars_set,
                     )?);
                 }
                 // <field_name>: false
-                crate::SelectionSetValue::Shorthand(false) => (),
+                crate::SelectionSetValue::Shorthand(false) => {
+                    selection.push_nested_exclusion(selection_name);
+                }
                 // <field_name>: { selection: { ... }, arguments: { ... } }
                 crate::SelectionSetValue::Nested(nested_query) => {
                     if field.field_type().as_object_type().is_some() {
-                        let schema_field = field
+                        if let Some(schema_field) = field
                             .field_type()
                             .as_object_type()
-                            .and_then(|t| t.find_field(selection_name.as_str()))
-                            .ok_or_else(|| {
-                                HandlerError::query_conversion(format!(
-                                    "Unknown nested field '{}' for operation {} does not match any query.",
-                                    selection_name,
-                                    field.name()
-                                ))
-                            })?;
+                            .and_then(|t| t.find_field(&selection_name))
+                        {
+                            let field = container.and_then(|container| container.find_field(schema_field.name()));
+                            let nested_container = field.map(|f| f.related_container());
 
-                        let field = container.and_then(|container| container.find_field(schema_field.name()));
-                        let is_composite_field = field.as_ref().map(|f| f.is_composite()).unwrap_or(false);
-                        let nested_container = field.map(|f| f.related_container());
-
-                        if is_composite_field && all_composites_set {
-                            return Err(HandlerError::query_conversion(format!(
-                                "Cannot select both '$composites: true' and a specific composite field '{selection_name}'.",
-                            )));
+                            selection.push_nested_selection(self.convert_selection(
+                                schema_field,
+                                nested_container.as_ref(),
+                                nested_query,
+                            )?);
+                        } else {
+                            // Unknown nested field that we keep around so that parser can fail with a rich error.
+                            selection.push_nested_selection(Selection::with_name(selection_name));
                         }
-
-                        selection.push_nested_selection(self.convert_selection(
-                            schema_field,
-                            nested_container.as_ref(),
-                            nested_query,
-                        )?);
                     }
                 }
             }
+        }
+
+        // Keys have to be removed after the nested selections have been created
+        // because we can't guarantee that we will encounter `<field>: false` _after_ `$scalars|$composites: true`.
+        // This is important because otherwise, the selection wouldn't be filled and `<field>: false` would have nothing to filter out.
+        for key in excluded_keys {
+            selection.remove_nested_selection(&key);
         }
 
         Ok(selection)
@@ -199,6 +196,11 @@ impl<'a> JsonProtocolAdapter<'a> {
                         .map(ArgumentValue::float)
                         .map_err(|_| build_err())
                 }
+
+                Some(custom_types::RAW) => {
+                    let value = obj.get(custom_types::VALUE).ok_or_else(build_err)?;
+                    Ok(ArgumentValue::raw(value.clone()))
+                }
                 Some(custom_types::BYTES) => {
                     let value = obj
                         .get(custom_types::VALUE)
@@ -256,22 +258,22 @@ impl<'a> JsonProtocolAdapter<'a> {
     fn create_shorthand_selection(
         &mut self,
         parent_field: &OutputField<'a>,
-        nested_field_name: &str,
+        nested_field_name: String,
         container: Option<&ParentContainer>,
-        all_scalars_set: bool,
     ) -> crate::Result<Selection> {
         let nested_object_type = parent_field
             .field_type()
             .as_object_type()
-            .and_then(|parent_object| self.get_output_field(parent_object, nested_field_name))
+            .and_then(|parent_object| self.get_output_field(parent_object, &nested_field_name))
             .and_then(|nested_field| nested_field.field_type.as_object_type());
 
         if let Some(nested_object_type) = nested_object_type {
             // case for a relation - we select all nested scalar fields and composite fields
-            let mut nested_selection = Selection::new(nested_field_name, None, vec![], vec![]);
             let nested_container = container
-                .and_then(|c| c.find_field(nested_field_name))
+                .and_then(|c| c.find_field(&nested_field_name))
                 .map(|f| f.related_container());
+
+            let mut nested_selection = Selection::new(nested_field_name, None, vec![], vec![]);
 
             Self::default_scalar_and_composite_selection(
                 &mut nested_selection,
@@ -280,13 +282,6 @@ impl<'a> JsonProtocolAdapter<'a> {
             )?;
 
             return Ok(nested_selection);
-        }
-
-        // case for a scalar - just picking the specified field without any nested selections
-        if all_scalars_set {
-            return Err(HandlerError::query_conversion(format!(
-                "Cannot select both '$scalars: true' and a specific scalar field '{nested_field_name}'.",
-            )));
         }
 
         Ok(Selection::with_name(nested_field_name))
@@ -442,6 +437,7 @@ mod tests {
             posts Post[]
             address Address
           }
+
           model Post {
             id String @id @map("_id")
             title String
@@ -486,44 +482,24 @@ mod tests {
         Read(
             Selection {
                 name: "findFirstUser",
-                alias: None,
-                arguments: [],
                 nested_selections: [
                     Selection {
                         name: "id",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                     Selection {
                         name: "name",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                     Selection {
                         name: "email",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                     Selection {
                         name: "role",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                     Selection {
                         name: "roles",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                     Selection {
                         name: "tags",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                 ],
             },
@@ -550,31 +526,18 @@ mod tests {
         Write(
             Selection {
                 name: "createOneUser",
-                alias: None,
-                arguments: [],
                 nested_selections: [
                     Selection {
                         name: "address",
-                        alias: None,
-                        arguments: [],
                         nested_selections: [
                             Selection {
                                 name: "number",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
                             },
                             Selection {
                                 name: "street",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
                             },
                             Selection {
                                 name: "zipCode",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
                             },
                         ],
                     },
@@ -606,16 +569,18 @@ mod tests {
         Read(
             Selection {
                 name: "findFirstUser",
-                alias: None,
-                arguments: [],
                 nested_selections: [
                     Selection {
                         name: "id",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                 ],
+                nested_exclusions: Some(
+                    [
+                        Exclusion {
+                            name: "email",
+                        },
+                    ],
+                ),
             },
         )
         "###);
@@ -640,72 +605,39 @@ mod tests {
         Read(
             Selection {
                 name: "findFirstPost",
-                alias: None,
-                arguments: [],
                 nested_selections: [
                     Selection {
                         name: "user",
-                        alias: None,
-                        arguments: [],
                         nested_selections: [
                             Selection {
                                 name: "id",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
                             },
                             Selection {
                                 name: "name",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
                             },
                             Selection {
                                 name: "email",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
                             },
                             Selection {
                                 name: "role",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
                             },
                             Selection {
                                 name: "roles",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
                             },
                             Selection {
                                 name: "tags",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
                             },
                             Selection {
                                 name: "address",
-                                alias: None,
-                                arguments: [],
                                 nested_selections: [
                                     Selection {
                                         name: "number",
-                                        alias: None,
-                                        arguments: [],
-                                        nested_selections: [],
                                     },
                                     Selection {
                                         name: "street",
-                                        alias: None,
-                                        arguments: [],
-                                        nested_selections: [],
                                     },
                                     Selection {
                                         name: "zipCode",
-                                        alias: None,
-                                        arguments: [],
-                                        nested_selections: [],
                                     },
                                 ],
                             },
@@ -741,7 +673,6 @@ mod tests {
         Read(
             Selection {
                 name: "findFirstUser",
-                alias: None,
                 arguments: [
                     (
                         "where",
@@ -759,39 +690,21 @@ mod tests {
                 nested_selections: [
                     Selection {
                         name: "id",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                     Selection {
                         name: "name",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                     Selection {
                         name: "email",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                     Selection {
                         name: "role",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                     Selection {
                         name: "roles",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                     Selection {
                         name: "tags",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                 ],
             },
@@ -826,48 +739,27 @@ mod tests {
         Read(
             Selection {
                 name: "findFirstUser",
-                alias: None,
-                arguments: [],
                 nested_selections: [
                     Selection {
                         name: "id",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                     Selection {
                         name: "name",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                     Selection {
                         name: "email",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                     Selection {
                         name: "role",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                     Selection {
                         name: "roles",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                     Selection {
                         name: "tags",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                     Selection {
                         name: "posts",
-                        alias: None,
                         arguments: [
                             (
                                 "where",
@@ -885,21 +777,12 @@ mod tests {
                         nested_selections: [
                             Selection {
                                 name: "id",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
                             },
                             Selection {
                                 name: "title",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
                             },
                             Selection {
                                 name: "userId",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
                             },
                         ],
                     },
@@ -931,14 +814,9 @@ mod tests {
         Write(
             Selection {
                 name: "deleteManyUser",
-                alias: None,
-                arguments: [],
                 nested_selections: [
                     Selection {
                         name: "count",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                 ],
             },
@@ -968,16 +846,18 @@ mod tests {
         Write(
             Selection {
                 name: "updateOneUser",
-                alias: None,
-                arguments: [],
                 nested_selections: [
                     Selection {
                         name: "id",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                 ],
+                nested_exclusions: Some(
+                    [
+                        Exclusion {
+                            name: "email",
+                        },
+                    ],
+                ),
             },
         )
         "###);
@@ -1003,9 +883,89 @@ mod tests {
         let operation = JsonProtocolAdapter::new(&schema()).convert_single(query);
 
         assert_debug_snapshot!(operation, @r###"
-        Err(
-            Configuration(
-                "Cannot select both '$scalars: true' and a specific scalar field 'id'.",
+        Ok(
+            Write(
+                Selection {
+                    name: "updateOneUser",
+                    nested_selections: [
+                        Selection {
+                            name: "id",
+                        },
+                        Selection {
+                            name: "name",
+                        },
+                        Selection {
+                            name: "role",
+                        },
+                        Selection {
+                            name: "roles",
+                        },
+                        Selection {
+                            name: "tags",
+                        },
+                    ],
+                    nested_exclusions: Some(
+                        [
+                            Exclusion {
+                                name: "email",
+                            },
+                        ],
+                    ),
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn scalar_wildcard_and_scalar_exclusion() {
+        let query: JsonSingleQuery = serde_json::from_str(
+            r#"{
+            "modelName": "User",
+            "action": "updateOne",
+            "query": {
+                "selection": {
+                    "$scalars": true,
+                    "email": false,
+                    "id": false
+                }
+            }
+        }"#,
+        )
+        .unwrap();
+
+        let operation = JsonProtocolAdapter::new(&schema()).convert_single(query);
+
+        assert_debug_snapshot!(operation, @r###"
+        Ok(
+            Write(
+                Selection {
+                    name: "updateOneUser",
+                    nested_selections: [
+                        Selection {
+                            name: "name",
+                        },
+                        Selection {
+                            name: "role",
+                        },
+                        Selection {
+                            name: "roles",
+                        },
+                        Selection {
+                            name: "tags",
+                        },
+                    ],
+                    nested_exclusions: Some(
+                        [
+                            Exclusion {
+                                name: "email",
+                            },
+                            Exclusion {
+                                name: "id",
+                            },
+                        ],
+                    ),
+                },
             ),
         )
         "###);
@@ -1034,9 +994,27 @@ mod tests {
         let operation = JsonProtocolAdapter::new(&schema()).convert_single(query);
 
         assert_debug_snapshot!(operation, @r###"
-        Err(
-            Configuration(
-                "Cannot select both '$composites: true' and a specific composite field 'address'.",
+        Ok(
+            Write(
+                Selection {
+                    name: "updateOneUser",
+                    nested_selections: [
+                        Selection {
+                            name: "address",
+                            nested_selections: [
+                                Selection {
+                                    name: "number",
+                                },
+                                Selection {
+                                    name: "street",
+                                },
+                                Selection {
+                                    name: "zipCode",
+                                },
+                            ],
+                        },
+                    ],
+                },
             ),
         )
         "###);
@@ -1066,41 +1044,32 @@ mod tests {
             Write(
                 Selection {
                     name: "updateOneUser",
-                    alias: None,
-                    arguments: [],
                     nested_selections: [
                         Selection {
                             name: "address",
-                            alias: None,
-                            arguments: [],
                             nested_selections: [
                                 Selection {
                                     name: "number",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
                                 },
                                 Selection {
                                     name: "street",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
                                 },
                                 Selection {
                                     name: "zipCode",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
                                 },
                             ],
                         },
                         Selection {
                             name: "id",
-                            alias: None,
-                            arguments: [],
-                            nested_selections: [],
                         },
                     ],
+                    nested_exclusions: Some(
+                        [
+                            Exclusion {
+                                name: "email",
+                            },
+                        ],
+                    ),
                 },
             ),
         )
@@ -1397,7 +1366,6 @@ mod tests {
             Write(
                 Selection {
                     name: "runCommandRaw",
-                    alias: None,
                     arguments: [
                         (
                             "data",
@@ -1412,7 +1380,6 @@ mod tests {
                             ),
                         ),
                     ],
-                    nested_selections: [],
                 },
             ),
         )
@@ -1480,43 +1447,24 @@ mod tests {
         [
             Selection {
                 name: "id",
-                alias: None,
-                arguments: [],
-                nested_selections: [],
             },
             Selection {
                 name: "country",
-                alias: None,
-                arguments: [],
-                nested_selections: [],
             },
             Selection {
                 name: "content",
-                alias: None,
-                arguments: [],
                 nested_selections: [
                     Selection {
                         name: "text",
-                        alias: None,
-                        arguments: [],
-                        nested_selections: [],
                     },
                     Selection {
                         name: "upvotes",
-                        alias: None,
-                        arguments: [],
                         nested_selections: [
                             Selection {
                                 name: "vote",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
                             },
                             Selection {
                                 name: "userId",
-                                alias: None,
-                                arguments: [],
-                                nested_selections: [],
                             },
                         ],
                     },
@@ -1551,9 +1499,29 @@ mod tests {
         let operation = JsonProtocolAdapter::new(&composite_schema()).convert_single(query);
 
         assert_debug_snapshot!(operation, @r###"
-        Err(
-            Configuration(
-                "Cannot select both '$composites: true' and a specific composite field 'upvotes'.",
+        Ok(
+            Write(
+                Selection {
+                    name: "createOneComment",
+                    nested_selections: [
+                        Selection {
+                            name: "content",
+                            nested_selections: [
+                                Selection {
+                                    name: "text",
+                                },
+                                Selection {
+                                    name: "upvotes",
+                                    nested_selections: [
+                                        Selection {
+                                            name: "vote",
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
             ),
         )
         "###);
@@ -1666,56 +1634,32 @@ mod tests {
             Write(
                 Selection {
                     name: "createOneUser",
-                    alias: None,
-                    arguments: [],
                     nested_selections: [
                         Selection {
                             name: "billingAddress",
-                            alias: None,
-                            arguments: [],
                             nested_selections: [
                                 Selection {
                                     name: "number",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
                                 },
                                 Selection {
                                     name: "street",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
                                 },
                                 Selection {
                                     name: "zipCode",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
                                 },
                             ],
                         },
                         Selection {
                             name: "shippingAddress",
-                            alias: None,
-                            arguments: [],
                             nested_selections: [
                                 Selection {
                                     name: "number",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
                                 },
                                 Selection {
                                     name: "street",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
                                 },
                                 Selection {
                                     name: "zipCode",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
                                 },
                             ],
                         },
@@ -1785,82 +1729,48 @@ mod tests {
             Write(
                 Selection {
                     name: "createOneUser",
-                    alias: None,
-                    arguments: [],
                     nested_selections: [
                         Selection {
                             name: "billingAddress",
-                            alias: None,
-                            arguments: [],
                             nested_selections: [
                                 Selection {
                                     name: "streetAddress",
-                                    alias: None,
-                                    arguments: [],
                                     nested_selections: [
                                         Selection {
                                             name: "streetName",
-                                            alias: None,
-                                            arguments: [],
-                                            nested_selections: [],
                                         },
                                         Selection {
                                             name: "houseNumber",
-                                            alias: None,
-                                            arguments: [],
-                                            nested_selections: [],
                                         },
                                     ],
                                 },
                                 Selection {
                                     name: "zipCode",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
                                 },
                                 Selection {
                                     name: "city",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
                                 },
                             ],
                         },
                         Selection {
                             name: "shippingAddress",
-                            alias: None,
-                            arguments: [],
                             nested_selections: [
                                 Selection {
                                     name: "streetAddress",
-                                    alias: None,
-                                    arguments: [],
                                     nested_selections: [
                                         Selection {
                                             name: "streetName",
-                                            alias: None,
-                                            arguments: [],
-                                            nested_selections: [],
                                         },
                                         Selection {
                                             name: "houseNumber",
-                                            alias: None,
-                                            arguments: [],
-                                            nested_selections: [],
                                         },
                                     ],
                                 },
                                 Selection {
                                     name: "zipCode",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
                                 },
                                 Selection {
                                     name: "city",
-                                    alias: None,
-                                    arguments: [],
-                                    nested_selections: [],
                                 },
                             ],
                         },

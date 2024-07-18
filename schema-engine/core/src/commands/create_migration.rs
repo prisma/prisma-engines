@@ -1,7 +1,6 @@
-use crate::{json_rpc::types::*, CoreError, CoreResult};
-use psl::parser_database::SourceFile;
+use crate::{json_rpc::types::*, CoreError, CoreResult, SchemaContainerExt};
 use schema_connector::{migrations_directory::*, DiffTarget, SchemaConnector};
-use std::{path::Path, sync::Arc};
+use std::path::Path;
 use user_facing_errors::schema_engine::MigrationNameTooLong;
 
 /// Create a new migration.
@@ -20,17 +19,11 @@ pub async fn create_migration(
 
     // Infer the migration.
     let previous_migrations = list_migrations(Path::new(&input.migrations_directory_path))?;
-
+    let sources: Vec<_> = input.schema.to_psl_input();
     // We need to start with the 'to', which is the Schema, in order to grab the
     // namespaces, in case we've got MultiSchema enabled.
     let to = connector
-        .database_schema_from_diff_target(
-            DiffTarget::Datamodel(SourceFile::new_allocated(Arc::from(
-                input.prisma_schema.into_boxed_str(),
-            ))),
-            None,
-            None,
-        )
+        .database_schema_from_diff_target(DiffTarget::Datamodel(sources), None, None)
         .await?;
 
     let namespaces = connector.extract_namespaces(&to);

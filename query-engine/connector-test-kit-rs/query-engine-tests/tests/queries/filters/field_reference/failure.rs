@@ -253,12 +253,25 @@ mod failure {
     /// we can't make it work both for MySQL and MariaDB without making MariaDB its own connector.
     #[connector_test(schema(schemas::json), only(MySql(5.7, 8, "mariadb")))]
     async fn alphanumeric_json_filter_fails(runner: Runner) -> TestResult<()> {
-        assert_error!(
-            runner,
-            r#"query { findManyTestModel(where: { json: { gt: { _ref: "json", _container: "TestModel" } } }) { id }}"#,
-            2009,
-            "Invalid argument type"
-        );
+        let res = match runner.protocol() {
+            EngineProtocol::Graphql => runner.query(r#"query { findManyTestModel(where: { json: { gt: { _ref: "json", _container: "TestModel" } } }) { id }}"#).await?,
+            EngineProtocol::Json => runner.query_json(r#"{
+                "modelName": "TestModel",
+                "action": "findMany",
+                "query": {
+                    "arguments": {
+                        "where": {
+                            "json": { "gt": { "$type": "FieldRef", "value": { "_ref": "json", "_container": "TestModel" } } }
+                        }
+                    },
+                    "selection": {
+                        "id": true
+                    }
+                }
+            }"#).await?,
+        };
+
+        res.assert_failure(2009, Some("Invalid argument type".to_owned()));
 
         Ok(())
     }

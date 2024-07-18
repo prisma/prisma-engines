@@ -1,0 +1,26 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id Int @id
+
+    posts Po<|>st[]
+}
+
+model Post {
+    id Int @id
+
+    content String
+
+    userId Int?
+    User   User? @relation(fields: [userId], references: [id])
+}
+
+model interm {
+    id Int @id
+
+    forumId Int
+    forum   Forum @relation(fields: [forumId], references: [id])
+}

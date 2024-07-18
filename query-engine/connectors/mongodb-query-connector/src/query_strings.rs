@@ -156,6 +156,29 @@ impl QueryString for UpdateMany<'_> {
 }
 
 #[derive(Constructor)]
+pub(crate) struct DeleteOne<'a> {
+    filter: &'a Document,
+    coll_name: &'a str,
+}
+
+impl QueryString for DeleteOne<'_> {
+    fn collection(&self) -> Option<&str> {
+        Some(self.coll_name)
+    }
+
+    fn query_type(&self) -> &str {
+        "findAndModify"
+    }
+
+    fn write_query(&self, buffer: &mut String) {
+        writeln!(buffer, "{{ query: ").unwrap();
+        fmt_doc(buffer, self.filter, 1).unwrap();
+
+        writeln!(buffer, ", remove: true, new: true }}").unwrap();
+    }
+}
+
+#[derive(Constructor)]
 pub(crate) struct UpdateOne<'a> {
     filter: &'a Document,
     update_doc: &'a Document,

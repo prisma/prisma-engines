@@ -1,7 +1,7 @@
 use crate::{ast, parent_container::ParentContainer, prelude::*, DefaultKind, NativeTypeInstance, ValueGenerator};
 use chrono::{DateTime, FixedOffset};
 use psl::{
-    parser_database::{walkers, ScalarFieldType, ScalarType},
+    parser_database::{self as db, walkers, ScalarFieldType, ScalarType},
     schema_ast::ast::FieldArity,
 };
 use std::fmt::{Debug, Display};
@@ -12,7 +12,7 @@ pub type ScalarFieldRef = ScalarField;
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub enum ScalarFieldId {
     InModel(psl::parser_database::ScalarFieldId),
-    InCompositeType((ast::CompositeTypeId, ast::FieldId)),
+    InCompositeType((db::CompositeTypeId, ast::FieldId)),
 }
 
 impl ScalarField {
@@ -155,15 +155,22 @@ impl ScalarField {
     }
 
     pub fn native_type(&self) -> Option<NativeTypeInstance> {
-        let (_, name, args, span) = match self.id {
-            ScalarFieldId::InModel(id) => self.dm.walk(id).raw_native_type(),
-            ScalarFieldId::InCompositeType(id) => self.dm.walk(id).raw_native_type(),
-        }?;
         let connector = self.dm.schema.connector;
 
-        let nt = connector
-            .parse_native_type(name, args, span, &mut Default::default())
-            .unwrap();
+        let raw_nt = match self.id {
+            ScalarFieldId::InModel(id) => self.dm.walk(id).raw_native_type(),
+            ScalarFieldId::InCompositeType(id) => self.dm.walk(id).raw_native_type(),
+        };
+
+        let psl_nt = raw_nt
+            .and_then(|(_, name, args, span)| connector.parse_native_type(name, args, span, &mut Default::default()));
+
+        let scalar_type = match self.id {
+            ScalarFieldId::InModel(id) => self.dm.walk(id).scalar_type(),
+            ScalarFieldId::InCompositeType(id) => self.dm.walk(id).scalar_type(),
+        };
+
+        let nt = psl_nt.or_else(|| scalar_type.and_then(|st| connector.default_native_type_for_scalar_type(&st)))?;
 
         Some(NativeTypeInstance {
             native_type: nt,
@@ -171,11 +178,26 @@ impl ScalarField {
         })
     }
 
+    pub fn can_be_compacted(&self) -> bool {
+        let connector = self.dm.schema.connector;
+
+        let nt = self.native_type().map(|nt| nt.native_type);
+
+        connector.native_type_supports_compacting(nt)
+    }
+
     pub fn parse_json_datetime(&self, value: &str) -> chrono::ParseResult<DateTime<FixedOffset>> {
         let nt = self.native_type().map(|nt| nt.native_type);
         let connector = self.dm.schema.connector;
 
         connector.parse_json_datetime(value, nt)
+    }
+
+    pub fn parse_json_bytes(&self, value: &str) -> PrismaValueResult<Vec<u8>> {
+        let nt = self.native_type().map(|nt| nt.native_type);
+        let connector = self.dm.schema.connector;
+
+        connector.parse_json_bytes(value, nt)
     }
 
     pub fn is_autoincrement(&self) -> bool {

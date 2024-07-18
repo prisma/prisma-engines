@@ -2,7 +2,7 @@ use std::borrow::Cow;
 use std::str::FromStr;
 
 pub use crate::types::{ColumnType, JSResultSet};
-use quaint::bigdecimal::{BigDecimal, FromPrimitive};
+use quaint::bigdecimal::BigDecimal;
 use quaint::chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 use quaint::{
     connector::ResultSet as QuaintResultSet,
@@ -137,12 +137,8 @@ pub fn js_value_to_quaint(
             serde_json::Value::String(s) => BigDecimal::from_str(&s).map(QuaintValue::numeric).map_err(|e| {
                 conversion_error!("invalid numeric value when parsing {s} in column '{column_name}': {e}")
             }),
-            serde_json::Value::Number(n) => n
-                .as_f64()
-                .and_then(BigDecimal::from_f64)
-                .ok_or(conversion_error!(
-                    "number must be an f64 in column '{column_name}', got {n}"
-                ))
+            serde_json::Value::Number(n) => BigDecimal::from_str(&n.to_string())
+                .map_err(|_| conversion_error!("number must be an f64 in column '{column_name}', got {n}"))
                 .map(QuaintValue::numeric),
             serde_json::Value::Null => Ok(QuaintValue::null_numeric()),
             mismatch => Err(conversion_error!(
@@ -221,8 +217,9 @@ pub fn js_value_to_quaint(
             match json_value {
                 // DbNull
                 serde_json::Value::Null => Ok(QuaintValue::null_json()),
-                // JsonNull
-                serde_json::Value::String(s) if s == "$__prisma_null" => Ok(QuaintValue::json(serde_json::Value::Null)),
+                serde_json::Value::String(s) => serde_json::from_str(&s)
+                    .map_err(|_| conversion_error!("Failed to parse incoming json from a driver adapter"))
+                    .map(QuaintValue::json),
                 json => Ok(QuaintValue::json(json)),
             }
         }
@@ -252,7 +249,7 @@ pub fn js_value_to_quaint(
             serde_json::Value::String(s) => uuid::Uuid::parse_str(&s)
                 .map(QuaintValue::uuid)
                 .map_err(|_| conversion_error!("Expected a UUID string in column '{column_name}'")),
-            serde_json::Value::Null => Ok(QuaintValue::null_bytes()),
+            serde_json::Value::Null => Ok(QuaintValue::null_uuid()),
             mismatch => Err(conversion_error!(
                 "Expected a UUID string in column '{column_name}', found {mismatch}"
             )),

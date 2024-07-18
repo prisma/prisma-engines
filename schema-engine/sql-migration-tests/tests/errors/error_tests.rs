@@ -1,12 +1,14 @@
+use connection_string::JdbcString;
 use indoc::{formatdoc, indoc};
 use pretty_assertions::assert_eq;
 use quaint::prelude::Insert;
 use schema_core::{
-    json_rpc::types::{DatasourceParam, EnsureConnectionValidityParams},
+    json_rpc::types::{DatasourceParam, EnsureConnectionValidityParams, SchemasContainer},
     schema_connector::ConnectorError,
 };
 use serde_json::json;
 use sql_migration_tests::test_api::*;
+use std::str::FromStr;
 use url::Url;
 
 pub(crate) async fn connection_error(schema: String) -> ConnectorError {
@@ -16,7 +18,12 @@ pub(crate) async fn connection_error(schema: String) -> ConnectorError {
     };
 
     api.ensure_connection_validity(EnsureConnectionValidityParams {
-        datasource: DatasourceParam::SchemaString(SchemaContainer { schema }),
+        datasource: DatasourceParam::Schema(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: "schema.prisma".to_string(),
+                content: schema,
+            }],
+        }),
     })
     .await
     .unwrap_err()
@@ -90,6 +97,45 @@ fn authentication_failure_must_return_a_known_error_on_mysql(api: TestApi) {
     assert_eq!(json_error, expected);
 }
 
+#[test_connector(tags(Mssql))]
+fn authentication_failure_must_return_a_known_error_on_mssql(api: TestApi) {
+    let mut url = JdbcString::from_str(&format!("jdbc:{}", api.connection_string())).unwrap();
+    let host = url.server_name().unwrap().to_string();
+    let properties = url.properties_mut();
+    let user = properties.get("user").cloned().unwrap();
+
+    *properties.get_mut("password").unwrap() = "obviously-not-right".to_string();
+
+    let dm = format!(
+        r#"
+            datasource db {{
+              provider = "sqlserver"
+              url      = "{}"
+            }}
+        "#,
+        url.to_string().replace("jdbc:", "")
+    );
+
+    let error = tok(connection_error(dm));
+
+    let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
+    let expected = json!({
+        "is_panic": false,
+        "message": format!("Authentication failed against database server at `{host}`, the provided database credentials for `{user}` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `{host}`."),
+        "meta": {
+            "database_user": user,
+            "database_host": host,
+        },
+        "error_code": "P1000"
+    });
+
+    assert_eq!(json_error, expected);
+}
+
+// TODO(tech-debt): get rid of provider-specific PSL `dm` declaration, and use `test_api::datamodel_with_provider` utility instead.
+// See: https://github.com/prisma/team-orm/issues/835.
+// This issue also currently prevents us from defining an `Mssql`-specific copy of this `unreachable_database_*` test case,
+// due to url parsing differences between the `url` crate and `quaint`'s `MssqlUrl` struct.
 #[test_connector(tags(Mysql))]
 fn unreachable_database_must_return_a_proper_error_on_mysql(api: TestApi) {
     let mut url: Url = api.connection_string().parse().unwrap();
@@ -113,7 +159,7 @@ fn unreachable_database_must_return_a_proper_error_on_mysql(api: TestApi) {
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
-        "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`."),
+        "message": format!("Can't reach database server at `{host}:{port}`\n\nPlease make sure your database server is running at `{host}:{port}`."),
         "meta": {
             "database_host": host,
             "database_port": port,
@@ -147,7 +193,7 @@ fn unreachable_database_must_return_a_proper_error_on_postgres(api: TestApi) {
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
-        "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`."),
+        "message": format!("Can't reach database server at `{host}:{port}`\n\nPlease make sure your database server is running at `{host}:{port}`."),
         "meta": {
             "database_host": host,
             "database_port": port,
@@ -273,7 +319,7 @@ fn datamodel_parser_errors_must_return_a_known_error(api: TestApi) {
 
     let error = api.schema_push_w_datasource(bad_dm).send_unwrap_err().to_user_facing();
 
-    let expected_msg = "\u{1b}[1;91merror\u{1b}[0m: \u{1b}[1mType \"Post\" is neither a built-in type, nor refers to another model, custom type, or enum.\u{1b}[0m\n  \u{1b}[1;94m-->\u{1b}[0m  \u{1b}[4mschema.prisma:10\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n\u{1b}[1;94m 9 | \u{1b}[0m            id Float @id\n\u{1b}[1;94m10 | \u{1b}[0m            post \u{1b}[1;91mPost\u{1b}[0m[]\n\u{1b}[1;94m   | \u{1b}[0m\n";
+    let expected_msg = "\u{1b}[1;91merror\u{1b}[0m: \u{1b}[1mType \"Post\" is neither a built-in type, nor refers to another model, composite type, or enum.\u{1b}[0m\n  \u{1b}[1;94m-->\u{1b}[0m  \u{1b}[4mschema.prisma:10\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n\u{1b}[1;94m 9 | \u{1b}[0m            id Float @id\n\u{1b}[1;94m10 | \u{1b}[0m            post \u{1b}[1;91mPost\u{1b}[0m[]\n\u{1b}[1;94m   | \u{1b}[0m\n";
 
     let expected_error = user_facing_errors::Error::from(user_facing_errors::KnownError {
         error_code: std::borrow::Cow::Borrowed("P1012"),
@@ -399,7 +445,12 @@ async fn connection_string_problems_give_a_nice_error() {
         let api = schema_core::schema_api(Some(dm.clone()), None).unwrap();
         let error = api
             .ensure_connection_validity(EnsureConnectionValidityParams {
-                datasource: DatasourceParam::SchemaString(SchemaContainer { schema: dm }),
+                datasource: DatasourceParam::Schema(SchemasContainer {
+                    files: vec![SchemaContainer {
+                        path: "schema.prisma".to_string(),
+                        content: dm,
+                    }],
+                }),
             })
             .await
             .unwrap_err();

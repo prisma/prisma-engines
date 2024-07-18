@@ -49,3 +49,7 @@ To try importing the , you can run:
 - Build the Wasm binary with `WASM_BUILD_PROFILE="profiling" ./build.sh "0.0.1"`
 - Run `twiggy top -n 20 ./pkg/query_engine_bg.wasm`
 - Take a look at this [Notion document](https://www.notion.so/prismaio/Edge-Functions-how-to-use-twiggy-and-other-size-tracking-tools-c1cb481cbd0c4a0488f6876674988382) for more details, and for instructions on how to refine `twiggy`'s output via [`./wasm-inspect.sh`](./wasm-inspect.sh).
+
+## How to analyse the size impact of Rust crates on the Wasm binary
+
+Please refer to the `pnpm crates` command in the [`./analyse`](./analyse/README.md) README.

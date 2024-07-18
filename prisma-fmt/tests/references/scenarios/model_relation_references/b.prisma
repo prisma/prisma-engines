@@ -1,0 +1,7 @@
+model UserTwo {
+    id String @id @map("_id")
+
+    compounds    Compound @relation(fields: [compoundId, compoundName], references: [id, n<|>ame])
+    compoundId   String
+    compoundName String
+}

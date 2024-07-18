@@ -5,11 +5,11 @@
 import { webcrypto } from "node:crypto";
 import * as fs from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { __dirname } from './utils'
 
 import * as qe from "./qe";
 
-import pgDriver from "pg";
+import { pg } from "@prisma/bundled-js-drivers";
 import * as prismaPg from "@prisma/adapter-pg";
 import { bindAdapter, DriverAdapter } from "@prisma/driver-adapter-utils";
 
@@ -19,16 +19,21 @@ import prismaQueries from "../bench/queries.json";
 import { run, bench, group, baseline } from "mitata";
 
 import { QueryEngine as WasmBaseline } from "query-engine-wasm-baseline";
-import { QueryEngine as WasmLatest } from "query-engine-wasm-latest";
 
-(global as any).crypto = webcrypto;
+// `query-engine-wasm-latest` refers to the latest published version of the Wasm Query Engine,
+// rather than the latest locally built one. We're pulling in the Postgres Query Engine
+// because benchmarks are only run against a Postgres database.
+import { QueryEngine as WasmLatest } from "query-engine-wasm-latest/postgresql/query_engine.js";
+
+if (!global.crypto) {
+  (global as any).crypto = webcrypto;
+}
 
 async function main(): Promise<void> {
   // read the prisma schema from stdin
 
-  const dirname = path.dirname(fileURLToPath(import.meta.url));
   var datamodel = (
-    await fs.readFile(path.resolve(dirname, "..", "bench", "schema.prisma"))
+    await fs.readFile(path.resolve(__dirname, "..", "bench", "schema.prisma"))
   ).toString();
 
   const url = process.env.DATABASE_URL;
@@ -39,10 +44,17 @@ async function main(): Promise<void> {
   const withErrorCapturing = bindAdapter(pg);
 
   // We build two decorators for recording and replaying db queries.
-  const { recorder, replayer } = recording(withErrorCapturing);
+  const { recorder, replayer, recordings } = recording(withErrorCapturing);
 
   // We exercise the queries recording them
   await recordQueries(recorder, datamodel, prismaQueries);
+
+  // Dump recordings if requested
+  if (process.env.BENCH_RECORDINGS_FILE != null) {
+    const recordingsJson = JSON.stringify(recordings.data(), null, 2);
+    await fs.writeFile(process.env.BENCH_RECORDINGS_FILE, recordingsJson);
+    debug(`Recordings written to ${process.env.BENCH_RECORDINGS_FILE}`);
+  }
 
   // Then we benchmark the execution of the queries but instead of hitting the DB
   // we fetch results from the recordings, thus isolating the performance
@@ -55,23 +67,37 @@ async function recordQueries(
   datamodel: string,
   prismaQueries: any
 ): Promise<void> {
-  const qe = await initQeWasmBaseLine(adapter, datamodel);
-  await qe.connect("");
+  // Different engines might have made different SQL queries to complete the same Prisma Query,
+  // so we record the results of all engines for the benchmarking phase.
+  const napi = await initQeNapiCurrent(adapter, datamodel);
+  await napi.connect("");
+  const wasmCurrent = await initQeWasmCurrent(adapter, datamodel);
+  await wasmCurrent.connect("");
+  const wasmBaseline = await initQeWasmBaseLine(adapter, datamodel);
+  await wasmBaseline.connect("");
+  const wasmLatest = await initQeWasmLatest(adapter, datamodel);
+  await wasmLatest.connect("");
 
   try {
-    for (const prismaQuery of prismaQueries) {
-      const { description, query } = prismaQuery;
-      const res = await qe.query(JSON.stringify(query), "", undefined);
+    for (const qe of [napi, wasmCurrent, wasmBaseline, wasmLatest]) {
+      for (const prismaQuery of prismaQueries) {
+        const { description, query } = prismaQuery;
+        const res = await qe.query(JSON.stringify(query), "", undefined);
+        console.log(res[9]);
 
-      const errors = JSON.parse(res).errors;
-      if (errors != null && errors.length > 0) {
-        throw new Error(
-          `Query failed for ${description}: ${JSON.stringify(res)}`
-        );
+        const errors = JSON.parse(res).errors;
+        if (errors != null) {
+          throw new Error(
+            `Query failed for ${description}: ${JSON.stringify(res)}`
+          );
+        }
       }
     }
   } finally {
-    await qe.disconnect("");
+    await napi.disconnect("");
+    await wasmCurrent.disconnect("");
+    await wasmBaseline.disconnect("");
+    await wasmLatest.disconnect("");
   }
 }
 
@@ -170,7 +196,7 @@ async function pgAdapter(url: string): Promise<DriverAdapter> {
   if (schemaName != null) {
     args.options = `--search_path="${schemaName}"`;
   }
-  const pool = new pgDriver.Pool(args);
+  const pool = new pg.Pool(args);
 
   return new prismaPg.PrismaPg(pool, {
     schema: schemaName,
@@ -211,6 +237,7 @@ function initQeWasmBaseLine(
   return new WasmBaseline(qe.queryEngineOptions(datamodel), debug, adapter);
 }
 
-const err = (...args: any[]) => console.error("[nodejs] ERROR:", ...args);
-
-main().catch(err);
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

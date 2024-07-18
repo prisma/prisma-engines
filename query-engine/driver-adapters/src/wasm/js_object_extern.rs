@@ -1,3 +1,6 @@
+// `clippy::empty_docs` is required because of the `wasm-bindgen` crate.
+#![allow(clippy::empty_docs)]
+
 use js_sys::{JsString, Object as JsObject};
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 

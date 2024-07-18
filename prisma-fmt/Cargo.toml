@@ -5,14 +5,14 @@ edition = "2021"
 
 [dependencies]
 colored = "2"
-dmmf = { path = "../query-engine/dmmf"}
-psl.workspace = true
+dmmf = { path = "../query-engine/dmmf" }
+psl = { workspace = true, features = ["all"] }
 serde_json.workspace = true
 serde.workspace = true
 indoc.workspace = true
-lsp-types = "0.91.1"
+lsp-types = "0.95.1"
 log = "0.4.14"
-enumflags2 = "0.7"
+enumflags2.workspace = true
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 structopt = "0.3"

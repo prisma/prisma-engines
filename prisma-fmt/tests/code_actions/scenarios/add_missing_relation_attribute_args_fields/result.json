@@ -1,0 +1,54 @@
+[
+  {
+    "title": "Add relation attribute for relation field",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 2,
+            "character": 2
+          },
+          "end": {
+            "line": 3,
+            "character": 0
+          }
+        },
+        "severity": 1,
+        "message": "Error parsing attribute \"@relation\": The relation field `post` on Model `User` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/schema.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 2,
+                "character": 19
+              },
+              "end": {
+                "line": 2,
+                "character": 51
+              }
+            },
+            "newText": "@relation(fields: [postpost_id], references: [post_id])"
+          },
+          {
+            "range": {
+              "start": {
+                "line": 2,
+                "character": 51
+              },
+              "end": {
+                "line": 3,
+                "character": 0
+              }
+            },
+            "newText": "\npostpost_id Int?\n"
+          }
+        ]
+      }
+    }
+  }
+]

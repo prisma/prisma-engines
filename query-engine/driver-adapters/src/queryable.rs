@@ -41,8 +41,11 @@ impl JsBaseQueryable {
     /// visit a quaint query AST according to the provider of the JS connector
     fn visit_quaint_query<'a>(&self, q: QuaintQuery<'a>) -> quaint::Result<(String, Vec<quaint::Value<'a>>)> {
         match self.provider {
+            #[cfg(feature = "mysql")]
             AdapterFlavour::Mysql => visitor::Mysql::build(q),
+            #[cfg(feature = "postgresql")]
             AdapterFlavour::Postgres => visitor::Postgres::build(q),
+            #[cfg(feature = "sqlite")]
             AdapterFlavour::Sqlite => visitor::Sqlite::build(q),
         }
     }
@@ -51,8 +54,11 @@ impl JsBaseQueryable {
         let sql: String = sql.to_string();
 
         let converter = match self.provider {
+            #[cfg(feature = "postgresql")]
             AdapterFlavour::Postgres => conversion::postgres::value_to_js_arg,
+            #[cfg(feature = "sqlite")]
             AdapterFlavour::Sqlite => conversion::sqlite::value_to_js_arg,
+            #[cfg(feature = "mysql")]
             AdapterFlavour::Mysql => conversion::mysql::value_to_js_arg,
         };
 
@@ -125,6 +131,7 @@ impl QuaintQueryable for JsBaseQueryable {
             return Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build());
         }
 
+        #[cfg(feature = "sqlite")]
         if self.provider == AdapterFlavour::Sqlite {
             return match isolation_level {
                 IsolationLevel::Serializable => Ok(()),
@@ -138,8 +145,12 @@ impl QuaintQueryable for JsBaseQueryable {
 
     fn requires_isolation_first(&self) -> bool {
         match self.provider {
+            #[cfg(feature = "mysql")]
             AdapterFlavour::Mysql => true,
-            AdapterFlavour::Postgres | AdapterFlavour::Sqlite => false,
+            #[cfg(feature = "postgresql")]
+            AdapterFlavour::Postgres => false,
+            #[cfg(feature = "sqlite")]
+            AdapterFlavour::Sqlite => false,
         }
     }
 }
@@ -225,6 +236,7 @@ impl std::fmt::Debug for JsQueryable {
 impl ExternalConnector for JsQueryable {
     async fn get_connection_info(&self) -> quaint::Result<ExternalConnectionInfo> {
         let conn_info = self.driver_proxy.get_connection_info().await?;
+
         Ok(conn_info.into_external_connection_info(&self.inner.provider))
     }
 }

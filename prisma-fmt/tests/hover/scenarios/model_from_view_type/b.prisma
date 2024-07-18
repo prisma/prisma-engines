@@ -1,0 +1,5 @@
+/// This is doc for B
+view ModelNameB {
+    id Int @id
+    A  ModelNa<|>meA[]
+}

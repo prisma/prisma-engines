@@ -14,9 +14,11 @@ mod model;
 mod relation;
 mod relation_field;
 mod scalar_field;
+mod top;
 
 pub use crate::types::RelationFieldId;
 pub use composite_type::*;
+use diagnostics::Span;
 pub use field::*;
 pub use index::*;
 pub use model::*;
@@ -24,6 +26,10 @@ pub use r#enum::*;
 pub use relation::*;
 pub use relation_field::*;
 pub use scalar_field::*;
+use schema_ast::ast::{NewlineType, WithSpan};
+pub use top::*;
+
+use crate::{ast, FileId, ModelId};
 
 /// A generic walker. Only walkers intantiated with a concrete ID type (`I`) are useful.
 #[derive(Clone, Copy)]
@@ -45,18 +51,53 @@ impl<'db, I> PartialEq for Walker<'db, I>
 where
     I: PartialEq,
 {
+    #[allow(unconditional_recursion)]
     fn eq(&self, other: &Self) -> bool {
         self.id.eq(&other.id)
     }
 }
 
+/// Retrieves newline variant for a block.
+pub(crate) fn newline(source: &str, span: Span) -> NewlineType {
+    let start = span.end - 2;
+
+    match source.chars().nth(start) {
+        Some('\r') => NewlineType::Windows,
+        _ => NewlineType::Unix,
+    }
+}
+
 impl crate::ParserDatabase {
+    /// Iterate all top level blocks.
+    fn iter_tops(&self) -> impl Iterator<Item = (FileId, ast::TopId, &ast::Top)> + '_ {
+        self.asts
+            .iter()
+            .flat_map(move |(file_id, _, _, ast)| ast.iter_tops().map(move |(top_id, top)| (file_id, top_id, top)))
+    }
+
+    /// Find the datasource by name.
+    pub fn find_source(&self, name: &str) -> Option<(FileId, ast::TopId)> {
+        self.interner
+            .lookup(name)
+            .and_then(|name_id| self.names.datasources.get(&name_id))
+            .map(|(file_id, top_id)| (*file_id, *top_id))
+    }
+
+    /// Find any top by name.
+    pub fn find_top<'db>(&'db self, name: &str) -> Option<TopWalker<'db>> {
+        self.interner
+            .lookup(name)
+            .and_then(|name_id| self.names.tops.get(&name_id))
+            .map(|(file_id, top_id)| (*file_id, *top_id))
+            .map(|(file_id, top_id)| self.walk((file_id, top_id)))
+    }
+
     /// Find an enum by name.
     pub fn find_enum<'db>(&'db self, name: &str) -> Option<EnumWalker<'db>> {
         self.interner
             .lookup(name)
             .and_then(|name_id| self.names.tops.get(&name_id))
-            .and_then(|top_id| top_id.as_enum_id())
+            .and_then(|(file_id, top_id)| top_id.as_enum_id().map(|id| (*file_id, id)))
             .map(|enum_id| self.walk(enum_id))
     }
 
@@ -65,8 +106,17 @@ impl crate::ParserDatabase {
         self.interner
             .lookup(name)
             .and_then(|name_id| self.names.tops.get(&name_id))
-            .and_then(|top_id| top_id.as_model_id())
+            .and_then(|(file_id, top_id)| top_id.as_model_id().map(|id| (*file_id, id)))
             .map(|model_id| self.walk(model_id))
+    }
+
+    /// Find a composite type by name.
+    pub fn find_composite_type<'db>(&'db self, name: &str) -> Option<CompositeTypeWalker<'db>> {
+        self.interner
+            .lookup(name)
+            .and_then(|name_id| self.names.tops.get(&name_id))
+            .and_then(|(file_id, top_id)| top_id.as_composite_type_id().map(|id| (*file_id, id)))
+            .map(|ct_id| self.walk(ct_id))
     }
 
     /// Traverse a schema element by id.
@@ -74,38 +124,64 @@ impl crate::ParserDatabase {
         Walker { db: self, id }
     }
 
+    /// Walk all tops in the schema.
+    pub fn walk_tops(&self) -> impl Iterator<Item = TopWalker<'_>> {
+        self.iter_tops()
+            .map(move |(file_id, top_id, _)| self.walk((file_id, top_id)))
+    }
+
     /// Walk all enums in the schema.
     pub fn walk_enums(&self) -> impl Iterator<Item = EnumWalker<'_>> {
-        self.ast()
-            .iter_tops()
-            .filter_map(|(top_id, _)| top_id.as_enum_id())
-            .map(move |enum_id| Walker { db: self, id: enum_id })
+        self.iter_tops()
+            .filter_map(|(file_id, top_id, _)| top_id.as_enum_id().map(|id| (file_id, id)))
+            .map(move |enum_id| self.walk(enum_id))
+    }
+
+    /// walk all enums in specified file
+    pub fn walk_enums_in_file(&self, file_id: FileId) -> impl Iterator<Item = EnumWalker<'_>> {
+        self.walk_enums()
+            .filter(move |walker| walker.ast_enum().span().file_id == file_id)
     }
 
     /// Walk all the models in the schema.
     pub fn walk_models(&self) -> impl Iterator<Item = ModelWalker<'_>> + '_ {
-        self.ast()
-            .iter_tops()
-            .filter_map(|(top_id, _)| top_id.as_model_id())
-            .map(move |model_id| self.walk(model_id))
+        self.iter_tops()
+            .filter_map(|(file_id, top_id, _)| top_id.as_model_id().map(|id| (file_id, id)))
+            .map(move |(file_id, model_id)| self.walk((file_id, model_id)))
             .filter(|m| !m.ast_model().is_view())
+    }
+
+    /// walk all models in specified file
+    pub fn walk_models_in_file(&self, file_id: FileId) -> impl Iterator<Item = ModelWalker<'_>> {
+        self.walk_models()
+            .filter(move |walker| walker.is_defined_in_file(file_id))
     }
 
     /// Walk all the views in the schema.
     pub fn walk_views(&self) -> impl Iterator<Item = ModelWalker<'_>> + '_ {
-        self.ast()
-            .iter_tops()
-            .filter_map(|(top_id, _)| top_id.as_model_id())
+        self.iter_tops()
+            .filter_map(|(file_id, top_id, _)| top_id.as_model_id().map(|id| (file_id, id)))
             .map(move |model_id| self.walk(model_id))
             .filter(|m| m.ast_model().is_view())
     }
 
+    /// walk all views in specified file
+    pub fn walk_views_in_file(&self, file_id: FileId) -> impl Iterator<Item = ModelWalker<'_>> {
+        self.walk_views()
+            .filter(move |walker| walker.is_defined_in_file(file_id))
+    }
+
     /// Walk all the composite types in the schema.
     pub fn walk_composite_types(&self) -> impl Iterator<Item = CompositeTypeWalker<'_>> + '_ {
-        self.ast()
-            .iter_tops()
-            .filter_map(|(top_id, _)| top_id.as_composite_type_id())
+        self.iter_tops()
+            .filter_map(|(file_id, top_id, _)| top_id.as_composite_type_id().map(|id| (file_id, id)))
             .map(|id| self.walk(id))
+    }
+
+    /// Walk all composite types in specified file
+    pub fn walk_composite_types_in_file(&self, file_id: FileId) -> impl Iterator<Item = CompositeTypeWalker<'_>> + '_ {
+        self.walk_composite_types()
+            .filter(move |walker| walker.is_defined_in_file(file_id))
     }
 
     /// Walk all scalar field defaults with a function not part of the common ones.
@@ -118,6 +194,11 @@ impl crate::ParserDatabase {
                 db: self,
                 default: self.types[*id].default.as_ref().unwrap(),
             })
+    }
+
+    /// Walk all fields in a model
+    pub fn walk_fields(&self, model_id: ModelId) -> impl Iterator<Item = FieldWalker<'_>> {
+        self.walk(model_id).fields()
     }
 
     /// Walk all the relations in the schema. A relation may be defined by one or two fields; in

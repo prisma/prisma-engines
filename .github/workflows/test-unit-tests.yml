@@ -25,10 +25,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
 
       - run: |
-          cargo test --workspace \
+          cargo test --workspace --all-features \
                 --exclude=quaint \
                 --exclude=query-engine \
                 --exclude=query-engine-node-api \

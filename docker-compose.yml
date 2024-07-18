@@ -228,7 +228,7 @@ services:
 
   mysql-5-6:
     image: mysql:5.6.50
-    command: mysqld
+    command: mysqld --table_definition_cache=2000
     restart: unless-stopped
     platform: linux/x86_64
     environment:
@@ -294,8 +294,21 @@ services:
       - databases
     tmpfs: /var/lib/mariadb
 
+  mariadb-11-0:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: prisma
+      MYSQL_DATABASE: prisma
+    ports:
+      - '3308:3306'
+    networks:
+      - databases
+    tmpfs: /var/lib/mariadb
+
   vitess-test-8_0:
-    image: vitess/vttestserver:mysql80@sha256:7c72efbee836ca3f025a6d57102834d2fad679c041e9405af628b2900549882c
+    image: vitess/vttestserver:mysql80@sha256:53a2d2f58ecf8e6cf984c725612f7651c4fc7ac9bc7d198dbd9964d50e28b9a2
     restart: unless-stopped
     ports:
       - 33807:33807
@@ -315,7 +328,7 @@ services:
       retries: 20
 
   vitess-shadow-8_0:
-    image: vitess/vttestserver:mysql80@sha256:7c72efbee836ca3f025a6d57102834d2fad679c041e9405af628b2900549882c
+    image: vitess/vttestserver:mysql80@sha256:53a2d2f58ecf8e6cf984c725612f7651c4fc7ac9bc7d198dbd9964d50e28b9a2
     restart: unless-stopped
     ports:
       - 33808:33807

@@ -197,4 +197,25 @@ mod mongodb {
 
         Ok(())
     }
+
+    fn default_int_type() -> String {
+        let schema = indoc! {
+            r#"model Test {
+                #id(id, String, @id, @default(cuid()))
+                int  Int
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(default_int_type))]
+    async fn default_int_type_is_long(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTest(data: { int: 9223372036854775807 }) { int } }"#),
+          @r###"{"data":{"createOneTest":{"int":9223372036854775807}}}"###
+        );
+
+        Ok(())
+    }
 }

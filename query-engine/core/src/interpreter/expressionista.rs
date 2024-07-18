@@ -172,8 +172,8 @@ impl Expressionista {
 
                         Ok(Expression::Return {
                             result: Box::new(ExpressionResult::Computation(ComputationResult::Diff(DiffResult {
-                                left: left_diff.into_iter().map(Clone::clone).collect(),
-                                right: right_diff.into_iter().map(Clone::clone).collect(),
+                                left: left_diff.into_iter().cloned().collect(),
+                                right: right_diff.into_iter().cloned().collect(),
                             }))),
                         })
                     }

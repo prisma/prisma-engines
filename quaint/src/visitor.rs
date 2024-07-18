@@ -121,37 +121,26 @@ pub trait Visitor<'a> {
     /// Visit a non-parameterized value.
     fn visit_raw_value(&mut self, value: Value<'a>) -> Result;
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> Result;
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> Result;
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_first_array_item(&mut self, extract: JsonExtractFirstArrayElem<'a>) -> Result;
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_array_contains(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result;
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_type_equals(&mut self, left: Expression<'a>, right: JsonType<'a>, not: bool) -> Result;
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> Result;
 
-    #[cfg(feature = "postgresql")]
     fn visit_json_array_agg(&mut self, array_agg: JsonArrayAgg<'a>) -> Result;
 
-    #[cfg(feature = "postgresql")]
     fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> Result;
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_text_search(&mut self, text_search: TextSearch<'a>) -> Result;
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>, not: bool) -> Result;
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_text_search_relevance(&mut self, text_search_relevance: TextSearchRelevance<'a>) -> Result;
 
     fn visit_parameterized_enum(&mut self, variant: EnumVariant<'a>, name: Option<EnumName<'a>>) -> Result {
@@ -176,11 +165,22 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
+    fn visit_parameterized_text(&mut self, txt: Option<Cow<'a, str>>, nt: Option<NativeColumnType<'a>>) -> Result {
+        self.add_parameter(Value {
+            typed: ValueType::Text(txt),
+            native_column_type: nt,
+        });
+        self.parameter_substitution()?;
+
+        Ok(())
+    }
+
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: Value<'a>) -> Result {
         match value.typed {
             ValueType::Enum(Some(variant), name) => self.visit_parameterized_enum(variant, name),
             ValueType::EnumArray(Some(variants), name) => self.visit_parameterized_enum_array(variants, name),
+            ValueType::Text(txt) => self.visit_parameterized_text(txt, value.native_column_type),
             _ => {
                 self.add_parameter(value);
                 self.parameter_substitution()
@@ -975,23 +975,18 @@ pub trait Visitor<'a> {
                 self.write(" ")?;
                 self.visit_expression(*right)
             }
-            #[cfg(any(feature = "postgresql", feature = "mysql"))]
             Compare::JsonCompare(json_compare) => match json_compare {
                 JsonCompare::ArrayContains(left, right) => self.visit_json_array_contains(*left, *right, false),
                 JsonCompare::ArrayNotContains(left, right) => self.visit_json_array_contains(*left, *right, true),
                 JsonCompare::TypeEquals(left, json_type) => self.visit_json_type_equals(*left, json_type, false),
                 JsonCompare::TypeNotEquals(left, json_type) => self.visit_json_type_equals(*left, json_type, true),
             },
-            #[cfg(feature = "postgresql")]
             Compare::Matches(left, right) => self.visit_matches(*left, right, false),
-            #[cfg(feature = "postgresql")]
             Compare::NotMatches(left, right) => self.visit_matches(*left, right, true),
-            #[cfg(feature = "postgresql")]
             Compare::Any(left) => {
                 self.write("ANY")?;
                 self.surround_with("(", ")", |s| s.visit_expression(*left))
             }
-            #[cfg(feature = "postgresql")]
             Compare::All(left) => {
                 self.write("ALL")?;
                 self.surround_with("(", ")", |s| s.visit_expression(*left))
@@ -1071,7 +1066,6 @@ pub trait Visitor<'a> {
             FunctionType::AggregateToString(agg) => {
                 self.visit_aggregate_to_string(agg.value.as_ref().clone())?;
             }
-            #[cfg(feature = "postgresql")]
             FunctionType::RowToJson(row_to_json) => {
                 self.write("ROW_TO_JSON")?;
                 self.surround_with("(", ")", |ref mut s| s.visit_table(row_to_json.expr, false))?
@@ -1101,48 +1095,37 @@ pub trait Visitor<'a> {
                 self.write("COALESCE")?;
                 self.surround_with("(", ")", |s| s.visit_columns(coalesce.exprs))?;
             }
-            #[cfg(any(feature = "postgresql", feature = "mysql"))]
             FunctionType::JsonExtract(json_extract) => {
                 self.visit_json_extract(json_extract)?;
             }
-            #[cfg(any(feature = "postgresql", feature = "mysql"))]
             FunctionType::JsonExtractFirstArrayElem(extract) => {
                 self.visit_json_extract_first_array_item(extract)?;
             }
-            #[cfg(any(feature = "postgresql", feature = "mysql"))]
             FunctionType::JsonExtractLastArrayElem(extract) => {
                 self.visit_json_extract_last_array_item(extract)?;
             }
-            #[cfg(any(feature = "postgresql", feature = "mysql"))]
             FunctionType::JsonUnquote(unquote) => {
                 self.visit_json_unquote(unquote)?;
             }
-            #[cfg(any(feature = "postgresql", feature = "mysql"))]
             FunctionType::TextSearch(text_search) => {
                 self.visit_text_search(text_search)?;
             }
-            #[cfg(any(feature = "postgresql", feature = "mysql"))]
             FunctionType::TextSearchRelevance(text_search_relevance) => {
                 self.visit_text_search_relevance(text_search_relevance)?;
             }
-            #[cfg(feature = "mysql")]
             FunctionType::UuidToBin => {
                 self.write("uuid_to_bin(uuid())")?;
             }
-            #[cfg(feature = "mysql")]
             FunctionType::UuidToBinSwapped => {
                 self.write("uuid_to_bin(uuid(), 1)")?;
             }
-            #[cfg(feature = "mysql")]
             FunctionType::Uuid => self.write("uuid()")?,
             FunctionType::Concat(concat) => {
                 self.visit_concat(concat)?;
             }
-            #[cfg(feature = "postgresql")]
             FunctionType::JsonArrayAgg(array_agg) => {
                 self.visit_json_array_agg(array_agg)?;
             }
-            #[cfg(feature = "postgresql")]
             FunctionType::JsonBuildObject(build_obj) => {
                 self.visit_json_build_object(build_obj)?;
             }

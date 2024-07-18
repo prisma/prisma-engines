@@ -1,6 +1,7 @@
 mod composite_type;
 mod convert;
 mod default_value;
+mod distinct;
 mod error;
 mod field;
 mod field_selection;
@@ -25,6 +26,7 @@ pub mod prelude;
 pub use self::{default_value::*, native_type_instance::*, zipper::*};
 pub use composite_type::*;
 pub use convert::convert;
+pub use distinct::*;
 pub use error::*;
 pub use field::*;
 pub use field_selection::*;

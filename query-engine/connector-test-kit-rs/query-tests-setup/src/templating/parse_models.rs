@@ -72,9 +72,10 @@ impl IdFragment {
     }
 }
 
-impl ToString for IdFragment {
-    fn to_string(&self) -> String {
-        format!(
+impl Display for IdFragment {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
             "{} {} {}",
             self.field_name,
             self.field_type,

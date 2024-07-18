@@ -15,7 +15,7 @@ pub struct ViewDefinition {
 #[derive(Debug)]
 pub struct IntrospectionResult {
     /// Datamodel
-    pub data_model: String,
+    pub datamodels: Vec<(String, String)>,
     /// The introspected data model is empty
     pub is_empty: bool,
     /// Introspection warnings
@@ -25,13 +25,14 @@ pub struct IntrospectionResult {
     pub views: Option<Vec<ViewDefinition>>,
 }
 
-/// The output type from introspection.
-#[derive(Debug, Deserialize, Serialize)]
-pub struct IntrospectionResultOutput {
-    /// Datamodel
-    pub datamodel: String,
-    /// warnings
-    pub warnings: Option<String>,
-    /// views
-    pub views: Option<Vec<ViewDefinition>>,
+impl IntrospectionResult {
+    /// Consumes the result and returns the first datamodel in the introspection result.
+    pub fn into_single_datamodel(mut self) -> String {
+        self.datamodels.remove(0).1
+    }
+
+    /// Returns the first datamodel in the introspection result.
+    pub fn single_datamodel(&self) -> &str {
+        &self.datamodels[0].1
+    }
 }

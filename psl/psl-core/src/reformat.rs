@@ -1,44 +1,93 @@
-use crate::ParserDatabase;
+use crate::{ParserDatabase, ValidatedSchema};
+use diagnostics::FileId;
 use parser_database::{ast::WithSpan, walkers};
 use schema_ast::{ast, SourceFile};
-use std::{borrow::Cow, sync::Arc};
+use std::{borrow::Cow, collections::HashMap};
 
 /// Returns either the reformatted schema, or the original input if we can't reformat. This happens
 /// if and only if the source does not parse to a well formed AST.
 pub fn reformat(source: &str, indent_width: usize) -> Option<String> {
-    let file = SourceFile::new_allocated(Arc::from(source.to_owned().into_boxed_str()));
+    let reformatted = reformat_multiple(vec![("schema.prisma".to_owned(), source.into())], indent_width);
 
+    reformatted.first().map(|(_, source)| source).cloned()
+}
+
+pub fn reformat_validated_schema_into_single(schema: ValidatedSchema, indent_width: usize) -> Option<String> {
+    let db = schema.db;
+
+    let source = db
+        .iter_sources()
+        .map(|source| source.to_owned())
+        .collect::<Vec<String>>()
+        .join("\n");
+
+    schema_ast::reformat(&source, indent_width)
+}
+
+pub fn reformat_multiple(sources: Vec<(String, SourceFile)>, indent_width: usize) -> Vec<(String, String)> {
     let mut diagnostics = diagnostics::Diagnostics::new();
-    let db = parser_database::ParserDatabase::new(file, &mut diagnostics);
+    let db = parser_database::ParserDatabase::new(&sources, &mut diagnostics);
 
-    let source_to_reformat = if diagnostics.has_errors() {
-        Cow::Borrowed(source)
+    if diagnostics.has_errors() {
+        db.iter_file_ids()
+            .filter_map(|file_id| {
+                let formatted_source = schema_ast::reformat(db.source(file_id), indent_width)?;
+                Some((db.file_name(file_id).to_owned(), formatted_source))
+            })
+            .collect()
     } else {
-        let mut missing_bits = Vec::new();
+        let mut missing_bits = HashMap::new();
+
         let mut ctx = MagicReformatCtx {
-            original_schema: source,
-            missing_bits: &mut missing_bits,
+            missing_bits_map: &mut missing_bits,
             db: &db,
         };
+
         push_missing_fields(&mut ctx);
         push_missing_attributes(&mut ctx);
         push_missing_relation_attribute_args(&mut ctx);
-        missing_bits.sort_by_key(|bit| bit.position);
+        ctx.sort_missing_bits();
 
-        if missing_bits.is_empty() {
-            Cow::Borrowed(source)
-        } else {
-            Cow::Owned(enrich(source, &missing_bits))
-        }
-    };
+        db.iter_file_ids()
+            .filter_map(|file_id| {
+                let source = if let Some(missing_bits) = ctx.get_missing_bits(file_id) {
+                    Cow::Owned(enrich(db.source(file_id), missing_bits))
+                } else {
+                    Cow::Borrowed(db.source(file_id))
+                };
 
-    schema_ast::reformat(&source_to_reformat, indent_width)
+                let formatted_source = schema_ast::reformat(&source, indent_width)?;
+
+                Some((db.file_name(file_id).to_owned(), formatted_source))
+            })
+            .collect()
+    }
 }
 
 struct MagicReformatCtx<'a> {
-    original_schema: &'a str,
-    missing_bits: &'a mut Vec<MissingBit>,
+    missing_bits_map: &'a mut HashMap<FileId, Vec<MissingBit>>,
     db: &'a ParserDatabase,
+}
+
+impl<'a> MagicReformatCtx<'a> {
+    fn add_missing_bit(&mut self, file_id: FileId, bit: MissingBit) {
+        self.missing_bits_map.entry(file_id).or_default().push(bit);
+    }
+
+    fn get_missing_bits(&self, file_id: FileId) -> Option<&Vec<MissingBit>> {
+        let bits_vec = self.missing_bits_map.get(&file_id)?;
+        if bits_vec.is_empty() {
+            None
+        } else {
+            Some(bits_vec)
+        }
+    }
+
+    fn sort_missing_bits(&mut self) {
+        self.missing_bits_map
+            .iter_mut()
+            .for_each(|(_, bits)| bits.sort_by_key(|bit| bit.position))
+    }
 }
 
 fn enrich(input: &str, missing_bits: &[MissingBit]) -> String {
@@ -109,10 +158,13 @@ fn push_inline_relation_missing_arguments(
             (", ", "", relation_attribute.span.end - 1)
         };
 
-        ctx.missing_bits.push(MissingBit {
-            position,
-            content: format!("{prefix}{extra_args}{suffix}"),
-        });
+        ctx.add_missing_bit(
+            relation_attribute.span.file_id,
+            MissingBit {
+                position,
+                content: format!("{prefix}{extra_args}{suffix}"),
+            },
+        );
     }
 }
 
@@ -136,10 +188,14 @@ fn push_missing_relation_attribute(inline_relation: walkers::InlineRelationWalke
         content.push_str(&references_argument(inline_relation));
         content.push(')');
 
-        ctx.missing_bits.push(MissingBit {
-            position: after_type(forward.ast_field().field_type.span().end, ctx.original_schema),
-            content,
-        })
+        let file_id = forward.ast_field().span().file_id;
+        ctx.add_missing_bit(
+            file_id,
+            MissingBit {
+                position: after_type(forward.ast_field().field_type.span().end, ctx.db.source(file_id)),
+                content,
+            },
+        );
     }
 }
 
@@ -167,10 +223,14 @@ fn push_missing_relation_fields(inline: walkers::InlineRelationWalker<'_>, ctx: 
         };
         let arity = if inline.is_one_to_one() { "?" } else { "[]" };
 
-        ctx.missing_bits.push(MissingBit {
-            position: inline.referenced_model().ast_model().span().end - 1,
-            content: format!("{referencing_model_name} {referencing_model_name}{arity} {ignore}\n"),
-        });
+        let span = inline.referenced_model().ast_model().span();
+        ctx.add_missing_bit(
+            span.file_id,
+            MissingBit {
+                position: span.end - 1,
+                content: format!("{referencing_model_name} {referencing_model_name}{arity} {ignore}\n"),
+            },
+        );
     }
 
     if inline.forward_relation_field().is_none() {
@@ -179,10 +239,14 @@ fn push_missing_relation_fields(inline: walkers::InlineRelationWalker<'_>, ctx: 
         let arity = render_arity(forward_relation_field_arity(inline));
         let fields_arg = fields_argument(inline);
         let references_arg = references_argument(inline);
-        ctx.missing_bits.push(MissingBit {
-            position: inline.referencing_model().ast_model().span().end - 1,
-            content: format!("{field_name} {field_type}{arity} @relation({fields_arg}, {references_arg})\n"),
-        })
+        let span = inline.referencing_model().ast_model().span();
+        ctx.add_missing_bit(
+            span.file_id,
+            MissingBit {
+                position: span.end - 1,
+                content: format!("{field_name} {field_type}{arity} @relation({fields_arg}, {references_arg})\n"),
+            },
+        )
     }
 }
 
@@ -211,13 +275,17 @@ fn push_missing_scalar_fields(inline: walkers::InlineRelationWalker<'_>, ctx: &m
 
         let mut attributes: String = String::new();
         if let Some((_datasource_name, _type_name, _args, span)) = field.blueprint.raw_native_type() {
-            attributes.push_str(&ctx.original_schema[span.start..span.end]);
+            attributes.push_str(&ctx.db.source(span.file_id)[span.start..span.end]);
         }
 
-        ctx.missing_bits.push(MissingBit {
-            position: inline.referencing_model().ast_model().span().end - 1,
-            content: format!("{field_name} {field_type}{arity} {attributes}\n"),
-        });
+        let span = inline.referencing_model().ast_model().span();
+        ctx.add_missing_bit(
+            span.file_id,
+            MissingBit {
+                position: span.end - 1,
+                content: format!("{field_name} {field_type}{arity} {attributes}\n"),
+            },
+        );
     }
 }
 
