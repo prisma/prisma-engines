@@ -33,16 +33,7 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       release: ${{ steps.decision.outputs.release }}
-    permissions: read-all
     steps:
-      - name: Check user for team affiliation
-        uses: tspascoal/get-user-teams-membership@v3
-        id: ormTeam
-        with:
-          GITHUB_TOKEN: ${{ secrets.PRISMA_BOT_TOKEN }}
-          username: ${{ github.actor }}
-          team: ORM
-
       - uses: actions/checkout@v4
         with:
           # using head ref rather than merge branch to get original commit message
@@ -68,13 +59,19 @@ jobs:
 
       - name: 'Check if commit message conatains `[integration]` and the PR author has permissions to trigger the workflow'
         id: check-commit-message
+        # See https://docs.github.com/en/graphql/reference/enums
+        # https://michaelheap.com/github-actions-check-permission/
         # Check if
         # - the commit message contains `[integration]`
-        # - the PR author has permissions to trigger the workflow (must be part of ORM Team)
+        # - the PR author has permissions to trigger the workflow (must be part of the org or a collaborator)
         if: |
           github.event_name == 'pull_request' &&
-          steps.ormTeam.outputs.isTeamMember == 'true' &&
-          contains(steps.commit-msg.outputs.commit-msg, '[integration]')
+          contains(steps.commit-msg.outputs.commit-msg, '[integration]') && 
+          (
+            github.event.pull_request.author_association == 'OWNER' ||
+            github.event.pull_request.author_association == 'MEMBER' ||
+            github.event.pull_request.author_association == 'COLLABORATOR'
+          )
         run: |
           echo "Commit message contains [integration] and PR author has permissions" 
           # set value to GitHub output 
