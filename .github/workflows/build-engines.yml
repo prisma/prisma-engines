@@ -33,6 +33,7 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       release: ${{ steps.decision.outputs.release }}
+    permissions: read-all
     steps:
       - name: Check user for team affiliation
         uses: tspascoal/get-user-teams-membership@v3
