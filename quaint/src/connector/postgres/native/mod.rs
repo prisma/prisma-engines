@@ -1,12 +1,13 @@
 //! Definitions for the Postgres connector.
 //! This module is not compatible with wasm32-* targets.
 //! This module is only available with the `postgresql-native` feature.
+pub(crate) mod column_type;
 mod conversion;
 mod error;
 
 pub(crate) use crate::connector::postgres::url::PostgresUrl;
 use crate::connector::postgres::url::{Hidden, SslAcceptMode, SslParams};
-use crate::connector::{timeout, IsolationLevel, Transaction};
+use crate::connector::{timeout, ColumnType, IsolationLevel, Transaction};
 use crate::error::NativeErrorKind;
 
 use crate::{
@@ -16,6 +17,7 @@ use crate::{
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
+use column_type::PGColumnType;
 use futures::{future::FutureExt, lock::Mutex};
 use lru_cache::LruCache;
 use native_tls::{Certificate, Identity, TlsConnector};
@@ -416,7 +418,13 @@ impl Queryable for PostgreSql {
                 .perform_io(self.client.0.query(&stmt, conversion::conv_params(params).as_slice()))
                 .await?;
 
-            let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
+            let col_types = stmt
+                .columns()
+                .iter()
+                .map(|c| PGColumnType::from_pg_type(c.type_()))
+                .map(ColumnType::from)
+                .collect::<Vec<_>>();
+            let mut result = ResultSet::new(stmt.to_column_names(), col_types, Vec::new());
 
             for row in rows {
                 result.rows.push(row.get_result_row()?);
@@ -442,11 +450,17 @@ impl Queryable for PostgreSql {
                 return Err(Error::builder(kind).build());
             }
 
+            let col_types = stmt
+                .columns()
+                .iter()
+                .map(|c| PGColumnType::from_pg_type(c.type_()))
+                .map(ColumnType::from)
+                .collect::<Vec<_>>();
             let rows = self
                 .perform_io(self.client.0.query(&stmt, conversion::conv_params(params).as_slice()))
                 .await?;
 
-            let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
+            let mut result = ResultSet::new(stmt.to_column_names(), col_types, Vec::new());
 
             for row in rows {
                 result.rows.push(row.get_result_row()?);

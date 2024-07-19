@@ -16,7 +16,7 @@ use rusqlite::{
 
 use chrono::TimeZone;
 
-impl TypeIdentifier for Column<'_> {
+impl TypeIdentifier for &Column<'_> {
     fn is_real(&self) -> bool {
         match self.decl_type() {
             Some(n) if n.starts_with("DECIMAL") => true,
@@ -146,8 +146,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                     c if c.is_int64() => Value::null_int64(),
                     c if c.is_text() => Value::null_text(),
                     c if c.is_bytes() => Value::null_bytes(),
-                    c if c.is_float() => Value::null_float(),
-                    c if c.is_double() => Value::null_double(),
+                    c if c.is_float() || c.is_double() => Value::null_double(),
                     c if c.is_real() => Value::null_numeric(),
                     c if c.is_datetime() => Value::null_datetime(),
                     c if c.is_date() => Value::null_date(),
@@ -251,7 +250,9 @@ impl<'a> ToSql for Value<'a> {
         let value = match &self.typed {
             ValueType::Int32(integer) => integer.map(ToSqlOutput::from),
             ValueType::Int64(integer) => integer.map(ToSqlOutput::from),
-            ValueType::Float(float) => float.map(|f| f as f64).map(ToSqlOutput::from),
+            ValueType::Float(float) => {
+                float.map(|float| ToSqlOutput::from(float.to_string().parse::<f64>().expect("f32 is not a f64.")))
+            }
             ValueType::Double(double) => double.map(ToSqlOutput::from),
             ValueType::Text(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
             ValueType::Enum(cow, _) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),

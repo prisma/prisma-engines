@@ -6,7 +6,7 @@ use std::str::FromStr;
 #[cfg(not(target_arch = "wasm32"))]
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 
-use quaint::connector::{ExternalConnectionInfo, SqlFamily};
+use quaint::connector::{ColumnType as QuaintColumnType, ExternalConnectionInfo, SqlFamily};
 #[cfg(target_arch = "wasm32")]
 use tsify::Tsify;
 
@@ -126,129 +126,149 @@ impl JSResultSet {
     }
 }
 
-#[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi)]
-#[cfg_attr(target_arch = "wasm32", derive(Clone, Copy, Deserialize_repr))]
-#[repr(u8)]
-#[derive(Debug)]
-pub enum ColumnType {
-    // [PLANETSCALE_TYPE] (MYSQL_TYPE) -> [TypeScript example]
+macro_rules! js_column_type {
+    ($($(#[$($attrss:tt)*])*$name:ident($val:expr) => $quaint_name:ident,)*) => {
+        #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi)]
+        #[cfg_attr(target_arch = "wasm32", derive(Clone, Copy, Deserialize_repr))]
+        #[repr(u8)]
+        #[derive(Debug)]
+        pub enum ColumnType {
+            $(
+                $(#[$($attrss)*])*
+                $name = $val,
+            )*
+        }
+
+        impl From<&ColumnType> for QuaintColumnType {
+            fn from(value: &ColumnType) -> Self {
+                match value {
+                    $(ColumnType::$name => QuaintColumnType::$quaint_name,)*
+                }
+            }
+        }
+    };
+}
+
+js_column_type! {
+    /// [PLANETSCALE_TYPE] (MYSQL_TYPE) -> [TypeScript example]
     /// The following PlanetScale type IDs are mapped into Int32:
     /// - INT8 (TINYINT) -> e.g. `127`
     /// - INT16 (SMALLINT) -> e.g. `32767`
     /// - INT24 (MEDIUMINT) -> e.g. `8388607`
     /// - INT32 (INT) -> e.g. `2147483647`
-    Int32 = 0,
+    Int32(0) => Int32,
 
     /// The following PlanetScale type IDs are mapped into Int64:
     /// - INT64 (BIGINT) -> e.g. `"9223372036854775807"` (String-encoded)
-    Int64 = 1,
+    Int64(1) => Int64,
 
     /// The following PlanetScale type IDs are mapped into Float:
     /// - FLOAT32 (FLOAT) -> e.g. `3.402823466`
-    Float = 2,
+    Float(2) => Float,
 
     /// The following PlanetScale type IDs are mapped into Double:
     /// - FLOAT64 (DOUBLE) -> e.g. `1.7976931348623157`
-    Double = 3,
+    Double(3) => Double,
 
     /// The following PlanetScale type IDs are mapped into Numeric:
     /// - DECIMAL (DECIMAL) -> e.g. `"99999999.99"` (String-encoded)
-    Numeric = 4,
+    Numeric(4) => Numeric,
 
     /// The following PlanetScale type IDs are mapped into Boolean:
     /// - BOOLEAN (BOOLEAN) -> e.g. `1`
-    Boolean = 5,
+    Boolean(5) => Boolean,
 
-    Character = 6,
+
+    Character(6) => Char,
 
     /// The following PlanetScale type IDs are mapped into Text:
     /// - TEXT (TEXT) -> e.g. `"foo"` (String-encoded)
     /// - VARCHAR (VARCHAR) -> e.g. `"foo"` (String-encoded)
-    Text = 7,
+    Text(7) => Text,
 
     /// The following PlanetScale type IDs are mapped into Date:
     /// - DATE (DATE) -> e.g. `"2023-01-01"` (String-encoded, yyyy-MM-dd)
-    Date = 8,
+    Date(8) => Date,
 
     /// The following PlanetScale type IDs are mapped into Time:
     /// - TIME (TIME) -> e.g. `"23:59:59"` (String-encoded, HH:mm:ss)
-    Time = 9,
+    Time(9) => Time,
+
 
     /// The following PlanetScale type IDs are mapped into DateTime:
     /// - DATETIME (DATETIME) -> e.g. `"2023-01-01 23:59:59"` (String-encoded, yyyy-MM-dd HH:mm:ss)
     /// - TIMESTAMP (TIMESTAMP) -> e.g. `"2023-01-01 23:59:59"` (String-encoded, yyyy-MM-dd HH:mm:ss)
-    DateTime = 10,
+    DateTime(10) => DateTime,
 
     /// The following PlanetScale type IDs are mapped into Json:
     /// - JSON (JSON) -> e.g. `"{\"key\": \"value\"}"` (String-encoded)
-    Json = 11,
+    Json(11) => Json,
 
     /// The following PlanetScale type IDs are mapped into Enum:
     /// - ENUM (ENUM) -> e.g. `"foo"` (String-encoded)
-    Enum = 12,
+    Enum(12) => Enum,
+
 
     /// The following PlanetScale type IDs are mapped into Bytes:
     /// - BLOB (BLOB) -> e.g. `"\u0012"` (String-encoded)
     /// - VARBINARY (VARBINARY) -> e.g. `"\u0012"` (String-encoded)
     /// - BINARY (BINARY) -> e.g. `"\u0012"` (String-encoded)
     /// - GEOMETRY (GEOMETRY) -> e.g. `"\u0012"` (String-encoded)
-    Bytes = 13,
+    Bytes(13) => Bytes,
+
 
     /// The following PlanetScale type IDs are mapped into Set:
     /// - SET (SET) -> e.g. `"foo,bar"` (String-encoded, comma-separated)
     /// This is currently unhandled, and will panic if encountered.
-    Set = 14,
+    Set(14) => Text,
 
     /// UUID from postgres-flavored driver adapters is mapped to this type.
-    Uuid = 15,
+    Uuid(15) => Uuid,
 
-    /*
-     * Scalar arrays
-     */
     /// Int32 array (INT2_ARRAY and INT4_ARRAY in PostgreSQL)
-    Int32Array = 64,
+    Int32Array(64) => Int32Array,
 
     /// Int64 array (INT8_ARRAY in PostgreSQL)
-    Int64Array = 65,
+    Int64Array(65) => Int64Array,
 
     /// Float array (FLOAT4_ARRAY in PostgreSQL)
-    FloatArray = 66,
+    FloatArray(66) => FloatArray,
 
     /// Double array (FLOAT8_ARRAY in PostgreSQL)
-    DoubleArray = 67,
+    DoubleArray(67) => DoubleArray,
 
     /// Numeric array (NUMERIC_ARRAY, MONEY_ARRAY etc in PostgreSQL)
-    NumericArray = 68,
+    NumericArray(68) => NumericArray,
 
     /// Boolean array (BOOL_ARRAY in PostgreSQL)
-    BooleanArray = 69,
+    BooleanArray(69) => BooleanArray,
 
     /// Char array (CHAR_ARRAY in PostgreSQL)
-    CharacterArray = 70,
+    CharacterArray(70) => CharArray,
 
     /// Text array (TEXT_ARRAY in PostgreSQL)
-    TextArray = 71,
+    TextArray(71) => TextArray,
 
     /// Date array (DATE_ARRAY in PostgreSQL)
-    DateArray = 72,
+    DateArray(72) => DateArray,
 
     /// Time array (TIME_ARRAY in PostgreSQL)
-    TimeArray = 73,
+    TimeArray(73) => TimeArray,
 
     /// DateTime array (TIMESTAMP_ARRAY in PostgreSQL)
-    DateTimeArray = 74,
+    DateTimeArray(74) => DateTimeArray,
 
     /// Json array (JSON_ARRAY in PostgreSQL)
-    JsonArray = 75,
+    JsonArray(75) => JsonArray,
 
-    /// Enum array
-    EnumArray = 76,
+    /// Enum array (ENUM_ARRAY in PostgreSQL)
+    EnumArray(76) => TextArray,
 
     /// Bytes array (BYTEA_ARRAY in PostgreSQL)
-    BytesArray = 77,
+    BytesArray(77) => BytesArray,
 
     /// Uuid array (UUID_ARRAY in PostgreSQL)
-    UuidArray = 78,
+    UuidArray(78) => UuidArray,
 
     /*
      * Below there are custom types that don't have a 1:1 translation with a quaint::Value.
@@ -259,7 +279,7 @@ pub enum ColumnType {
     ///
     /// It's used by some driver adapters, like libsql to return aggregation values like AVG, or
     /// COUNT, and it can be mapped to either Int64, or Double
-    UnknownNumber = 128,
+    UnknownNumber(128) => Unknown,
 }
 
 #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]

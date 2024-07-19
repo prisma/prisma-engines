@@ -75,7 +75,7 @@ all = [
 graphql-protocol = ["query-core/graphql-protocol", "dep:graphql-parser"]
 
 [build-dependencies]
-cfg_aliases = "0.2.0"
+cfg_aliases = "0.2.1"
 
 [[bench]]
 name = "query_planning_bench"
