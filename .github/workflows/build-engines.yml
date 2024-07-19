@@ -34,6 +34,14 @@ jobs:
     outputs:
       release: ${{ steps.decision.outputs.release }}
     steps:
+      - name: Check if organization member
+        id: is_organization_member
+        uses: JamesSingleton/is-organization-member@1.0.0
+        with:
+          organization: prisma
+          username: ${{ github.event.pull_request.user.login }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: actions/checkout@v4
         with:
           # using head ref rather than merge branch to get original commit message
@@ -52,6 +60,7 @@ jobs:
           echo "Pull Request: ${{ github.event.pull_request.number }}"
           echo "Pull Request Author: ${{ github.event.pull_request.user.login }}"
           echo "Pull Request Author Association: ${{ github.event.pull_request.author_association }}"
+          echo "Is org member: ${{ steps.is_organization_member.outputs.result }}"
           echo "Commit message: ${{ steps.commit-msg.outputs.commit-msg }}"
           echo "Commit message contains [integration]: ${{ contains(steps.commit-msg.outputs.commit-msg, '[integration]') }}"
 
@@ -64,6 +73,7 @@ jobs:
         # - the PR author has permissions to trigger the workflow (must be part of the org or a collaborator)
         if: |
           github.event_name == 'pull_request' &&
+          steps.is_organization_member.outputs.result == 'true' &&
           contains(steps.commit-msg.outputs.commit-msg, '[integration]') && 
           (
             github.event.pull_request.author_association == 'OWNER' ||

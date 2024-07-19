@@ -25,6 +25,5 @@ bash -c \
 # remove query-engine-node-api for "static" targets
 if [[ "$TARGET_NAME" == *-static-* ]]; then
     substring_to_replace="&& cargo build --release -p query-engine-node-api --manifest-path query-engine/query-engine-node-api/Cargo.toml $TARGET_STRING $FEATURES_STRING"
-    replacement_string=""
-    command=$(echo "$command" | sed "s|$substring_to_replace|$replacement_string|")
+    command="${command/$substring_to_replace/}"
 fi
