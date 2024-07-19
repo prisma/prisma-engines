@@ -42,7 +42,9 @@ jobs:
         id: commit-msg
         run: |
           commit_msg=$(git log --format=%B -n 1)
-          echo "commit-msg<<EOF\n$commit_msg\nEOF\n" >> $GITHUB_OUTPUT
+          echo 'commit-msg<<EOF' >> $GITHUB_OUTPUT
+          echo "$commit_msg" >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
 
       - name: Debug Pull Request Event
         if: ${{ github.event_name == 'pull_request' }}
