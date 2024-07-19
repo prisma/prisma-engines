@@ -35,11 +35,14 @@ jobs:
       release: ${{ steps.decision.outputs.release }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # using head ref rather than merge branch to get original commit message
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Get commit message
         id: commit-msg
         run: |
           commit_msg=$(git log --format=%B -n 1)
-          echo "commit-msg<<EOF\n$commit_msg\nEOF" >> $GITHUB_OUTPUT
+          echo "commit-msg<<EOF\n$commit_msg\nEOF\n" >> $GITHUB_OUTPUT
 
       - name: Debug Pull Request Event
         if: ${{ github.event_name == 'pull_request' }}
