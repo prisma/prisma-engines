@@ -39,7 +39,7 @@ jobs:
         id: commit-msg
         run: |
           commit_msg=$(git log --format=%B -n 1)
-          echo "commit-msg=$commit_msg" >> $GITHUB_OUTPUT
+          echo "commit-msg<<EOF\n$commit_msg\nEOF" >> $GITHUB_OUTPUT
 
       - name: Debug Pull Request Event
         if: ${{ github.event_name == 'pull_request' }}
@@ -47,6 +47,7 @@ jobs:
           echo "Pull Request: ${{ github.event.pull_request.number }}"
           echo "Pull Request Author: ${{ github.event.pull_request.user.login }}"
           echo "Pull Request Author Association: ${{ github.event.pull_request.author_association }}"
+          echo "Commit message: ${{ steps.commit-msg.outputs.commit-msg }}"
           echo "Commit message contains [integration]: ${{ contains(steps.commit-msg.outputs.commit-msg, '[integration]') }}"
 
       - name: 'Check if commit message conatains `[integration]` and the PR author has permissions to trigger the workflow'
