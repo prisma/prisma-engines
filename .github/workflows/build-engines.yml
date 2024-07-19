@@ -38,7 +38,7 @@ jobs:
       - name: Get commit message
         id: commit-msg
         run: |
-          commit_msg=$(git log --format=%B -n)
+          commit_msg=$(git log --format=%B -n 1)
           echo "commit-msg=$commit_msg" >> $GITHUB_OUTPUT
 
       - name: Debug Pull Request Event
