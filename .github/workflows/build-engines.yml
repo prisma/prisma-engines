@@ -34,13 +34,13 @@ jobs:
     outputs:
       release: ${{ steps.decision.outputs.release }}
     steps:
-      - name: Check if organization member
-        id: is_organization_member
-        uses: JamesSingleton/is-organization-member@1.0.0
+      - name: Check user for team affiliation
+        uses: tspascoal/get-user-teams-membership@v3
+        id: ormTeam
         with:
-          organization: ${{ github.repository_owner }}
-          username: ${{ github.event.pull_request.user.login }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ github.actor }}
+          team: ORM
 
       - uses: actions/checkout@v4
         with:
@@ -59,28 +59,21 @@ jobs:
         run: |
           echo "Pull Request: ${{ github.event.pull_request.number }}"
           echo "Repository Owner: $${{ github.repository_owner }}"
-          echo "Pull Request Author: ${{ github.event.pull_request.user.login }}"
+          echo "Pull Request Author: ${{ github.actor }}"
           echo "Pull Request Author Association: ${{ github.event.pull_request.author_association }}"
-          echo "Is org member: ${{ steps.is_organization_member.outputs.result }}"
+          echo "Is ORM team member: ${{ steps.ormTeam.outputs.isTeamMember }}"
           echo "Commit message: ${{ steps.commit-msg.outputs.commit-msg }}"
           echo "Commit message contains [integration]: ${{ contains(steps.commit-msg.outputs.commit-msg, '[integration]') }}"
 
       - name: 'Check if commit message conatains `[integration]` and the PR author has permissions to trigger the workflow'
         id: check-commit-message
-        # See https://docs.github.com/en/graphql/reference/enums
-        # https://michaelheap.com/github-actions-check-permission/
         # Check if
         # - the commit message contains `[integration]`
-        # - the PR author has permissions to trigger the workflow (must be part of the org or a collaborator)
+        # - the PR author has permissions to trigger the workflow (must be part of ORM Team)
         if: |
           github.event_name == 'pull_request' &&
-          steps.is_organization_member.outputs.result == 'true' &&
-          contains(steps.commit-msg.outputs.commit-msg, '[integration]') && 
-          (
-            github.event.pull_request.author_association == 'OWNER' ||
-            github.event.pull_request.author_association == 'MEMBER' ||
-            github.event.pull_request.author_association == 'COLLABORATOR'
-          )
+          steps.ormTeam.outputs.isTeamMember == 'true' &&
+          contains(steps.commit-msg.outputs.commit-msg, '[integration]')
         run: |
           echo "Commit message contains [integration] and PR author has permissions" 
           # set value to GitHub output 
