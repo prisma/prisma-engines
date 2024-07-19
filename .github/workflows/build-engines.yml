@@ -38,7 +38,7 @@ jobs:
         id: is_organization_member
         uses: JamesSingleton/is-organization-member@1.0.0
         with:
-          organization: prisma
+          organization: ${{ github.repository_owner }}
           username: ${{ github.event.pull_request.user.login }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -58,6 +58,7 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           echo "Pull Request: ${{ github.event.pull_request.number }}"
+          echo "Repository Owner: $${{ github.repository_owner }}"
           echo "Pull Request Author: ${{ github.event.pull_request.user.login }}"
           echo "Pull Request Author Association: ${{ github.event.pull_request.author_association }}"
           echo "Is org member: ${{ steps.is_organization_member.outputs.result }}"
