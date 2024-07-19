@@ -29,6 +29,13 @@ impl DatamodelError {
         )
     }
 
+    pub fn new_named_env_val(span: Span) -> Self {
+        Self::new(
+            "The env function expects a singular, unnamed, string argument.".to_owned(),
+            span,
+        )
+    }
+
     pub fn new_argument_not_found_error(argument_name: &str, span: Span) -> DatamodelError {
         Self::new(format!("Argument \"{argument_name}\" is missing."), span)
     }
