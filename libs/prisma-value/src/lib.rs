@@ -69,7 +69,7 @@ pub fn encode_bytes(bytes: &[u8]) -> String {
     base64::encode(bytes)
 }
 
-pub fn decode_bytes(s: &str) -> PrismaValueResult<Vec<u8>> {
+pub fn decode_bytes(s: impl AsRef<[u8]>) -> PrismaValueResult<Vec<u8>> {
     base64::decode(s).map_err(|_| ConversionFailure::new("base64 encoded bytes", "PrismaValue::Bytes"))
 }
 
