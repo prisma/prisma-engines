@@ -39,7 +39,7 @@ jobs:
         uses: tspascoal/get-user-teams-membership@v3
         id: ormTeam
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PRISMA_BOT_TOKEN }}
           username: ${{ github.actor }}
           team: ORM
 
