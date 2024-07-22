@@ -44,7 +44,7 @@ jobs:
       - name: compile ${{ matrix.crate }}
         env:
           CRATE: ${{ matrix.crate }}
-        run: cargo clean && cargo build --release -p "$CRATE"
+        run: cargo build --release -p "$CRATE"
 
       - name: "Check that Cargo.lock did not change"
         run: "git diff --exit-code"
