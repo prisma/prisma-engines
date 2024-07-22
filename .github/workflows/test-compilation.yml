@@ -16,10 +16,15 @@ concurrency:
 
 jobs:
   test-crate-compilation:
-    name: "Check release compilation"
+    name: "${{ matrix.os }}: check release compilation"
     strategy:
       fail-fast: false
-    runs-on: ubuntu-latest
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-13
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -38,3 +43,9 @@ jobs:
 
       - name: "Check that Cargo.lock did not change"
         run: "git diff --exit-code"
+
+  test-react-native-compilation:
+    uses: ./.github/workflows/build-engines-react-native-template.yml
+    with:
+      commit: ${{ github.sha }}
+      uploadArtifacts: false
