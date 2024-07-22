@@ -3,8 +3,7 @@ use crate::ast::{Value, ValueType};
 use bigdecimal::BigDecimal;
 use std::{borrow::Cow, convert::TryFrom};
 
-use tiberius::ToSql;
-use tiberius::{ColumnData, FromSql, IntoSql};
+use tiberius::{ColumnData, FromSql, IntoSql, ToSql};
 
 impl<'a> IntoSql<'a> for &'a Value<'a> {
     fn into_sql(self) -> ColumnData<'a> {

@@ -440,6 +440,40 @@ mod typed_output {
         Ok(())
     }
 
+    #[connector_test(schema(generic), only(Mysql))]
+    async fn unknown_type_mysql(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, fmt_query_raw(r#"SELECT POINT(1, 1);"#, vec![])),
+          @r###"{"data":{"queryRaw":{"columns":["POINT(1, 1)"],"types":["bytes"],"rows":[["AAAAAAEBAAAAAAAAAAAA8D8AAAAAAADwPw=="]]}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(generic), only(Postgres))]
+    async fn unknown_type_pg(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            &runner,
+            fmt_query_raw(r#"SELECT POINT(1, 1);"#, vec![]),
+            2010,
+            "Failed to deserialize column of type 'point'"
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(generic), only(SqlServer))]
+    async fn unknown_type_mssql(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            &runner,
+            fmt_query_raw(r#"SELECT geometry::Parse('POINT(3 4 7 2.5)');"#, vec![]),
+            2010,
+            "not yet implemented for Udt"
+        );
+
+        Ok(())
+    }
+
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
             .query(format!("mutation {{ createOneTestModel(data: {data}) {{ id }} }}"))

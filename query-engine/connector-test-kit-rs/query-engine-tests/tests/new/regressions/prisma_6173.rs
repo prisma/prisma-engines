@@ -19,13 +19,13 @@ mod query_raw {
         let res = run_query_json!(
             &runner,
             r#"
-                mutation {
-                    queryRaw(
-                        query: "BEGIN NOT ATOMIC\n INSERT INTO Test VALUES(FLOOR(RAND()*1000));\n SELECT * FROM Test;\n END",
-                        parameters: "[]"
-                    )
-                }
-                "#
+              mutation {
+                  queryRaw(
+                      query: "BEGIN NOT ATOMIC\n INSERT INTO Test VALUES(FLOOR(RAND()*1000));\n SELECT * FROM Test;\n END",
+                      parameters: "[]"
+                  )
+              }
+            "#
         );
         // fmt_execute_raw cannot run this query, doing it directly instead
         insta::assert_json_snapshot!(res,
@@ -46,6 +46,36 @@ mod query_raw {
                   "<rand_int>"
                 ]
               ]
+            }
+          }
+        }
+        "###);
+
+        Ok(())
+    }
+
+    #[connector_test(only(MySQL("mariadb")))]
+    async fn mysql_call_2(runner: Runner) -> TestResult<()> {
+        let res = run_query_json!(
+            &runner,
+            r#"
+              mutation {
+                  queryRaw(
+                      query: "BEGIN NOT ATOMIC\n INSERT INTO Test VALUES(FLOOR(RAND()*1000));\n SELECT * FROM Test WHERE 1=0;\n END",
+                      parameters: "[]"
+                  )
+              }
+            "#
+        );
+
+        insta::assert_json_snapshot!(res,
+          @r###"
+        {
+          "data": {
+            "queryRaw": {
+              "columns": [],
+              "types": [],
+              "rows": []
             }
           }
         }

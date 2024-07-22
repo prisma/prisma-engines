@@ -80,7 +80,7 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
     }
 }
 
-impl TypeIdentifier for my::Column {
+impl TypeIdentifier for &my::Column {
     fn is_real(&self) -> bool {
         use ColumnType::*;
 
@@ -175,14 +175,19 @@ impl TypeIdentifier for my::Column {
     fn is_bytes(&self) -> bool {
         use ColumnType::*;
 
-        let is_a_blob = matches!(
+        let is_bytes = matches!(
             self.column_type(),
-            MYSQL_TYPE_TINY_BLOB | MYSQL_TYPE_MEDIUM_BLOB | MYSQL_TYPE_LONG_BLOB | MYSQL_TYPE_BLOB
+            MYSQL_TYPE_TINY_BLOB
+                | MYSQL_TYPE_MEDIUM_BLOB
+                | MYSQL_TYPE_LONG_BLOB
+                | MYSQL_TYPE_BLOB
+                | MYSQL_TYPE_VAR_STRING
+                | MYSQL_TYPE_STRING
         ) && self.character_set() == 63;
 
         let is_bits = self.column_type() == MYSQL_TYPE_BIT && self.column_length() > 1;
 
-        is_a_blob || is_bits
+        is_bytes || is_bits
     }
 
     fn is_bool(&self) -> bool {
@@ -268,6 +273,20 @@ impl TakeRow for my::Row {
                 })?),
                 my::Value::Float(f) => Value::from(f),
                 my::Value::Double(f) => Value::from(f),
+                my::Value::Date(year, month, day, _, _, _, _) if column.is_date() => {
+                    if day == 0 || month == 0 {
+                        let msg = format!(
+                            "The column `{}` contained an invalid datetime value with either day or month set to zero.",
+                            column.name_str()
+                        );
+                        let kind = ErrorKind::value_out_of_range(msg);
+                        return Err(Error::builder(kind).build());
+                    }
+
+                    let date = NaiveDate::from_ymd_opt(year.into(), month.into(), day.into()).unwrap();
+
+                    Value::date(date)
+                }
                 my::Value::Date(year, month, day, hour, min, sec, micro) => {
                     if day == 0 || month == 0 {
                         let msg = format!(
