@@ -10,12 +10,16 @@ use crate::connector::{timeout, IsolationLevel, Transaction, TransactionOptions}
 use crate::{
     ast::{Query, Value},
     connector::{metrics, queryable::*, DefaultTransaction, ResultSet},
+    error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
+use connection_string::JdbcString;
 use futures::lock::Mutex;
 use std::{
+    collections::HashMap,
     convert::TryFrom,
+    env,
     future::Future,
     sync::atomic::{AtomicBool, Ordering},
     time::Duration,
@@ -64,7 +68,37 @@ pub struct Mssql {
 impl Mssql {
     /// Creates a new connection to SQL Server.
     pub async fn new(url: MssqlUrl) -> crate::Result<Self> {
-        let config = Config::from_jdbc_string(&url.connection_string)?;
+        let mut config = Config::from_jdbc_string(&url.connection_string)?;
+
+        // TODO: should I change Config so I don't need to parse this twice, once here
+        // and again inside Config::from_jdbc_string?
+        // TODO: maybe this code belongs in tiberius instead of up here?
+        //
+        // This code follows MS's documentation at https://learn.microsoft.com/en-us/azure/app-service/overview-managed-identity?tabs=portal%2Chttp#connect-to-azure-services-in-app-code
+        // TODO: I should actually be re-fetching the token after msi_response.get("expires_on") has passed
+        let jdbc_config: JdbcString = url.connection_string.parse()?;
+        if let Some(authentication_type) = jdbc_config.properties().get("authentication") {
+            if authentication_type == "ActiveDirectoryMsi" {
+                let mut msi_url = get_required_env_var("IDENTITY_ENDPOINT")?;
+                msi_url.push_str("?resource=https%3A%2F%2Fdatabase.windows.net%2F&api-version=2019-08-01");
+                let identity_header = get_required_env_var("IDENTITY_HEADER")?;
+                let client = reqwest::Client::new();
+                let msi_response = client
+                    .get(msi_url)
+                    .header("X-IDENTITY-HEADER", identity_header)
+                    .timeout(std::time::Duration::new(30, 0))
+                    .send()
+                    .await
+                    .map_err(|e| Error::builder(ErrorKind::AuthTokenFetchFailure(Box::new(e))).build())?
+                    .json::<HashMap<String, String>>()
+                    .await
+                    .map_err(|e| Error::builder(ErrorKind::AuthTokenFetchFailure(Box::new(e))).build())?;
+                if let Some(token) = msi_response.get("access_token") {
+                    config.authentication(tiberius::AuthMethod::AADToken(token.clone()));
+                }
+            }
+        }
+
         let tcp = TcpStream::connect_named(&config).await?;
         let socket_timeout = url.socket_timeout();
 
@@ -119,6 +153,10 @@ impl Mssql {
             res => res,
         }
     }
+}
+
+fn get_required_env_var(name: &str) -> std::result::Result<String, Error> {
+    env::var(name).map_err(|_| Error::builder(ErrorKind::MissingEnvironmentVariable { name: name.into() }).build())
 }
 
 #[async_trait]

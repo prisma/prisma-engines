@@ -54,7 +54,7 @@ postgresql-native = [
 ]
 postgresql = []
 
-mssql-native = ["mssql", "tiberius", "tokio-util", "tokio/time", "tokio/net"]
+mssql-native = ["mssql", "tiberius", "tokio-util", "tokio/time", "tokio/net", "reqwest/json"]
 mssql = []
 
 mysql-native = ["mysql", "mysql_async", "tokio/time", "lru-cache"]
@@ -79,6 +79,7 @@ futures = "0.3"
 url.workspace = true
 hex = "0.4"
 itertools.workspace = true
+reqwest = "0.11"
 
 either = { version = "1.6" }
 base64 = { version = "0.12.3" }

@@ -3620,6 +3620,7 @@ dependencies = [
  "postgres-types",
  "quaint-test-macros",
  "quaint-test-setup",
+ "reqwest",
  "rusqlite",
  "serde",
  "serde_json",
