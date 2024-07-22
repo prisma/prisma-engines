@@ -37,12 +37,12 @@ mod scalar_relations {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findManyParent { id children { childId string int bInt float bytes bool dt } } }"#),
-          @r###"{"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"string":"abc","int":1,"bInt":"1","float":1.5,"bytes":"AQID","bool":false,"dt":"1900-10-10T01:10:10.001Z"},{"childId":2,"string":"def","int":-4234234,"bInt":"14324324234324","float":-2.54367,"bytes":"FDSF","bool":true,"dt":"1999-12-12T21:12:12.121Z"}]}]}}"###
+          @r###"{"data":{"findManyParent":[{"id":1,"children":[{"childId":1,"string":"abc","int":1,"bInt":"1","float":1.5,"bytes":"VGhpcyBpcyBhIGxhcmdlIGJhc2U2NCBzdHJpbmcgdGhhdCBlbnN1cmVzIHdlIHNhbml0aXplIHRoZSBvdXRwdXQgb2YgTXlTUUwgYmFzZTY0IHN0cmluZy4=","bool":false,"dt":"1900-10-10T01:10:10.001Z"},{"childId":2,"string":"def","int":-4234234,"bInt":"14324324234324","float":-2.54367,"bytes":"FDSF","bool":true,"dt":"1999-12-12T21:12:12.121Z"}]}]}}"###
         );
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findUniqueParent(where: { id: 1 }) { id children { childId string int bInt float bytes bool dt } } }"#),
-          @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"string":"abc","int":1,"bInt":"1","float":1.5,"bytes":"AQID","bool":false,"dt":"1900-10-10T01:10:10.001Z"},{"childId":2,"string":"def","int":-4234234,"bInt":"14324324234324","float":-2.54367,"bytes":"FDSF","bool":true,"dt":"1999-12-12T21:12:12.121Z"}]}}}"###
+          @r###"{"data":{"findUniqueParent":{"id":1,"children":[{"childId":1,"string":"abc","int":1,"bInt":"1","float":1.5,"bytes":"VGhpcyBpcyBhIGxhcmdlIGJhc2U2NCBzdHJpbmcgdGhhdCBlbnN1cmVzIHdlIHNhbml0aXplIHRoZSBvdXRwdXQgb2YgTXlTUUwgYmFzZTY0IHN0cmluZy4=","bool":false,"dt":"1900-10-10T01:10:10.001Z"},{"childId":2,"string":"def","int":-4234234,"bInt":"14324324234324","float":-2.54367,"bytes":"FDSF","bool":true,"dt":"1999-12-12T21:12:12.121Z"}]}}}"###
         );
 
         insta::assert_snapshot!(
@@ -327,7 +327,7 @@ mod scalar_relations {
           int: 1,
           bInt: 1,
           float: 1.5,
-          bytes: "AQID",
+          bytes: "VGhpcyBpcyBhIGxhcmdlIGJhc2U2NCBzdHJpbmcgdGhhdCBlbnN1cmVzIHdlIHNhbml0aXplIHRoZSBvdXRwdXQgb2YgTXlTUUwgYmFzZTY0IHN0cmluZy4=",
           bool: false,
           dt: "1900-10-10T01:10:10.001Z",
       }"#,
