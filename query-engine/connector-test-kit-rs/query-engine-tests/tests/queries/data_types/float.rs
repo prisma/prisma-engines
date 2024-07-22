@@ -75,7 +75,7 @@ mod float {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findManyTestModel":[{"float":1.2},{"float":13.37},{"float":null}]}}"###
+                  @r###"{"data":{"findManyTestModel":[{"float":1.2},{"float":13.37},{"float":1.234567891011121},{"float":null}]}}"###
                 );
             }
         }
