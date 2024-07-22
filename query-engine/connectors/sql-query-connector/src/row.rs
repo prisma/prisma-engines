@@ -2,6 +2,7 @@ use crate::{column_metadata::ColumnMetadata, error::SqlError, value::to_prisma_v
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
+use prisma_value::parse_decimal;
 use quaint::{connector::ResultRow, Value, ValueType};
 use query_structure::{ConversionFailure, FieldArity, PrismaValue, Record, TypeIdentifier};
 use std::{io, str::FromStr};
@@ -209,7 +210,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             ValueType::Float(Some(f)) => match f {
                 f if f.is_nan() => return Err(create_error(&p_value)),
                 f if f.is_infinite() => return Err(create_error(&p_value)),
-                _ => PrismaValue::Float(BigDecimal::from_f32(f).unwrap().normalized()),
+                _ => PrismaValue::Float(parse_decimal(&f.to_string()).unwrap()),
             },
             ValueType::Int32(Some(i)) => match BigDecimal::from_i32(i) {
                 Some(dec) => PrismaValue::Float(dec),

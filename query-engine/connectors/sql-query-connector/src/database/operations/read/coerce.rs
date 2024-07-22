@@ -1,7 +1,6 @@
-use bigdecimal::{BigDecimal, ParseBigDecimalError};
 use itertools::Itertools;
 use query_structure::*;
-use std::{borrow::Cow, io, str::FromStr};
+use std::{borrow::Cow, io};
 
 use crate::SqlError;
 
@@ -287,8 +286,4 @@ fn build_conversion_error_with_reason(sf: &ScalarField, from: &str, to: &str, re
 fn build_generic_conversion_error(message: String) -> SqlError {
     let error = io::Error::new(io::ErrorKind::InvalidData, message);
     SqlError::ConversionError(error.into())
-}
-
-fn parse_decimal(str: &str) -> std::result::Result<BigDecimal, ParseBigDecimalError> {
-    BigDecimal::from_str(str).map(|bd| bd.normalized())
 }

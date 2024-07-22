@@ -55,7 +55,7 @@ mod float {
 
                 insta::assert_snapshot!(
                   res,
-                  @r###"{"data":{"findManyTestModel":[{"float":1.2},{"float":13.37},{"float":null}]}}"###
+                  @r###"{"data":{"findManyTestModel":[{"float":1.2},{"float":13.37},{"float":1.234567891011121},{"float":null}]}}"###
                 );
             }
             EngineProtocol::Json => {
@@ -86,7 +86,8 @@ mod float {
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, float: 1.2 }"#).await?;
         create_row(runner, r#"{ id: 2, float: 13.37 }"#).await?;
-        create_row(runner, r#"{ id: 3 }"#).await?;
+        create_row(runner, r#"{ id: 3, float: 1.23456789101112131415161718192 }"#).await?;
+        create_row(runner, r#"{ id: 4 }"#).await?;
 
         Ok(())
     }
