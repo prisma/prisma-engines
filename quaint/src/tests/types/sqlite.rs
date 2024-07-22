@@ -145,7 +145,7 @@ async fn test_type_text_datetime_custom(api: &mut dyn TestApi) -> crate::Result<
     let res = api.conn().select(select).await?.into_single()?;
 
     let naive = chrono::NaiveDateTime::parse_from_str("2020-04-20 16:20:00", "%Y-%m-%d %H:%M:%S").unwrap();
-    let expected = chrono::DateTime::from_utc(naive, chrono::Utc);
+    let expected = chrono::DateTime::from_naive_utc_and_offset(naive, chrono::Utc);
 
     assert_eq!(Some(&Value::datetime(expected)), res.at(0));
 

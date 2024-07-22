@@ -230,7 +230,7 @@ impl GetRow for PostgresRow {
                 PostgresType::TIMESTAMP => match row.try_get(i)? {
                     Some(val) => {
                         let ts: NaiveDateTime = val;
-                        let dt = DateTime::<Utc>::from_utc(ts, Utc);
+                        let dt = DateTime::<Utc>::from_naive_utc_and_offset(ts, Utc);
                         Value::datetime(dt)
                     }
                     None => Value::null_datetime(),
@@ -332,9 +332,9 @@ impl GetRow for PostgresRow {
                     Some(val) => {
                         let val: Vec<Option<NaiveDateTime>> = val;
 
-                        let dates = val
-                            .into_iter()
-                            .map(|dt| ValueType::DateTime(dt.map(|dt| DateTime::<Utc>::from_utc(dt, Utc))));
+                        let dates = val.into_iter().map(|dt| {
+                            ValueType::DateTime(dt.map(|dt| DateTime::<Utc>::from_naive_utc_and_offset(dt, Utc)))
+                        });
 
                         Value::array(dates)
                     }
