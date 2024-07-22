@@ -9,6 +9,7 @@
 //! implement the [Queryable](trait.Queryable.html) trait for generalized
 //! querying interface.
 
+mod column_type;
 mod connection_info;
 
 pub mod external;
@@ -24,6 +25,7 @@ mod transaction;
 mod type_identifier;
 
 pub use self::result_set::*;
+pub use column_type::*;
 pub use connection_info::*;
 
 #[cfg(native)]
