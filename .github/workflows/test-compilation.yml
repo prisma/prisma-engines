@@ -42,6 +42,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: compile ${{ matrix.crate }}
+        shell: bash
         env:
           CRATE: ${{ matrix.crate }}
         run: cargo build --release -p "$CRATE"
