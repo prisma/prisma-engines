@@ -149,6 +149,7 @@ macro_rules! js_column_type {
     };
 }
 
+// JsColumnType(discriminant) => quaint::ColumnType
 js_column_type! {
     /// [PLANETSCALE_TYPE] (MYSQL_TYPE) -> [TypeScript example]
     /// The following PlanetScale type IDs are mapped into Int32:
