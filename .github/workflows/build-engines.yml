@@ -3,29 +3,29 @@ run-name: Build Engines for ${{ github.sha }}
 
 # Run on `push` only for main, if not it will trigger `push` & `pull_request` on PRs at the same time
 on:
-  # push:
-  #   branches:
-  #     - main
-  #     - '*.*.x'
-  #     - 'integration/*'
-  #   paths-ignore:
-  #     - '!.github/workflows/build-engines*'
-  #     - '.github/**'
-  #     - '.buildkite/**'
-  #     - '*.md'
-  #     - 'LICENSE'
-  #     - 'CODEOWNERS'
-  #     - 'renovate.json'
+  push:
+    branches:
+      - main
+      - '*.*.x'
+      - 'integration/*'
+    paths-ignore:
+      - '!.github/workflows/build-engines*'
+      - '.github/**'
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+      - 'renovate.json'
   workflow_dispatch:
   pull_request:
-  #   paths-ignore:
-  #     - '!.github/workflows/build-engines*'
-  #     - '.github/**'
-  #     - '.buildkite/**'
-  #     - '*.md'
-  #     - 'LICENSE'
-  #     - 'CODEOWNERS'
-  #     - 'renovate.json'
+    paths-ignore:
+      - '!.github/workflows/build-engines*'
+      - '.github/**'
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+      - 'renovate.json'
 
 jobs:
   is-release-necessary:
