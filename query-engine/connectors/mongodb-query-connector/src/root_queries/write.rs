@@ -505,7 +505,7 @@ pub async fn query_raw<'conn>(
     model: Option<&Model>,
     inputs: HashMap<String, PrismaValue>,
     query_type: Option<String>,
-) -> crate::Result<serde_json::Value> {
+) -> crate::Result<RawJson> {
     let db_statement = get_raw_db_statement(&query_type, &model, database);
     let span = info_span!(
         "prisma:engine:db_query",
@@ -565,7 +565,8 @@ pub async fn query_raw<'conn>(
                 }
             }
         };
-        Ok(json_result)
+
+        Ok(RawJson::try_new(json_result)?)
     }
     .instrument(span)
     .await

@@ -34,12 +34,12 @@ mod metrics {
 
         match runner.connector_version() {
             Sqlite(_) => assert_eq!(total_queries, 2),
-            SqlServer(_) => assert_eq!(total_queries, 17),
+            SqlServer(_) => assert_eq!(total_queries, 10),
             MongoDb(_) => assert_eq!(total_queries, 5),
-            CockroachDb(_) => (), // not deterministic
-            MySql(_) => assert_eq!(total_queries, 12),
-            Vitess(_) => assert_eq!(total_queries, 11),
-            Postgres(_) => assert_eq!(total_queries, 7),
+            CockroachDb(_) => assert_eq!(total_queries, 2),
+            MySql(_) => assert_eq!(total_queries, 9),
+            Vitess(_) => assert_eq!(total_queries, 9),
+            Postgres(_) => assert_eq!(total_queries, 2),
         }
 
         assert_eq!(total_operations, 2);

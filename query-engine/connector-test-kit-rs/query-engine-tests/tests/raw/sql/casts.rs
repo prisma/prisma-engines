@@ -69,70 +69,61 @@ mod casts {
           @r###"
         {
           "data": {
-            "queryRaw": [
-              {
-                "i8_to_f4": {
-                  "prisma__type": "float",
-                  "prisma__value": 42.0
-                },
-                "i8_to_f8": {
-                  "prisma__type": "double",
-                  "prisma__value": 42.0
-                },
-                "numeric_to_i4": {
-                  "prisma__type": "int",
-                  "prisma__value": 43
-                },
-                "numeric_to_i8": {
-                  "prisma__type": "bigint",
-                  "prisma__value": "43"
-                },
-                "bigint_to_i4": {
-                  "prisma__type": "int",
-                  "prisma__value": 42
-                },
-                "bigint_to_f4": {
-                  "prisma__type": "float",
-                  "prisma__value": 42.0
-                },
-                "bigint_to_f8": {
-                  "prisma__type": "double",
-                  "prisma__value": 42.0
-                },
-                "decimal_to_i4": {
-                  "prisma__type": "int",
-                  "prisma__value": 43
-                },
-                "decimal_to_i8": {
-                  "prisma__type": "bigint",
-                  "prisma__value": "43"
-                },
-                "decimal_to_f4": {
-                  "prisma__type": "float",
-                  "prisma__value": 42.5099983215332
-                },
-                "decimal_to_f8": {
-                  "prisma__type": "double",
-                  "prisma__value": 42.51
-                },
-                "text_to_i4": {
-                  "prisma__type": "int",
-                  "prisma__value": 42
-                },
-                "text_to_i8": {
-                  "prisma__type": "bigint",
-                  "prisma__value": "42"
-                },
-                "text_to_f4": {
-                  "prisma__type": "float",
-                  "prisma__value": 42.5099983215332
-                },
-                "text_to_f8": {
-                  "prisma__type": "double",
-                  "prisma__value": 42.51
-                }
-              }
-            ]
+            "queryRaw": {
+              "columns": [
+                "i8_to_f4",
+                "i8_to_f8",
+                "numeric_to_i4",
+                "numeric_to_i8",
+                "bigint_to_i4",
+                "bigint_to_f4",
+                "bigint_to_f8",
+                "decimal_to_i4",
+                "decimal_to_i8",
+                "decimal_to_f4",
+                "decimal_to_f8",
+                "text_to_i4",
+                "text_to_i8",
+                "text_to_f4",
+                "text_to_f8"
+              ],
+              "types": [
+                "float",
+                "double",
+                "int",
+                "bigint",
+                "int",
+                "float",
+                "double",
+                "int",
+                "bigint",
+                "float",
+                "double",
+                "int",
+                "bigint",
+                "float",
+                "double"
+              ],
+              "rows": [
+                [
+                  42.0,
+                  42.0,
+                  43,
+                  "43",
+                  42,
+                  42.0,
+                  42.0,
+                  43,
+                  "43",
+                  42.51,
+                  42.51,
+                  42,
+                  "42",
+                  42.51,
+                  42.51
+                ]
+              ]
+            }
           }
         }
         "###
@@ -161,22 +152,25 @@ mod casts {
           @r###"
         {
           "data": {
-            "queryRaw": [
-              {
-                "text_to_interval": {
-                  "prisma__type": "datetime",
-                  "prisma__value": "2021-01-01T00:00:00+00:00"
-                },
-                "is_year_2023": {
-                  "prisma__type": "bool",
-                  "prisma__value": true
-                },
-                "text_to_time": {
-                  "prisma__type": "time",
-                  "prisma__value": "12:34:00"
-                }
-              }
-            ]
+            "queryRaw": {
+              "columns": [
+                "text_to_interval",
+                "is_year_2023",
+                "text_to_time"
+              ],
+              "types": [
+                "datetime",
+                "bool",
+                "time"
+              ],
+              "rows": [
+                [
+                  "2021-01-01T00:00:00+00:00",
+                  true,
+                  "12:34:00"
+                ]
+              ]
+            }
           }
         }
         "###

@@ -62,7 +62,7 @@ pub(crate) fn serialize_internal(
 
             Ok(result)
         }
-        QueryResult::Json(_) => unimplemented!(),
+        QueryResult::RawJson(_) => unimplemented!(),
         QueryResult::Id(_) | QueryResult::RecordSelection(None) => unreachable!(),
         QueryResult::Unit => unimplemented!(),
     }

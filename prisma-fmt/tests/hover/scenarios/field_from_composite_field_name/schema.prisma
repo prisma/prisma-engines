@@ -1,0 +1,15 @@
+generator js {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+type ModelNameA {
+    likesRedPandas Boolean
+
+    /// very important documentation
+    veryImpor<|>tantField DateTime
+}

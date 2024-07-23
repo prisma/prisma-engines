@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use super::{
     Attribute, Comment, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan,
 };
@@ -38,6 +40,20 @@ pub struct Field {
     pub(crate) documentation: Option<Comment>,
     /// The location of this field in the text representation.
     pub(crate) span: Span,
+}
+
+impl Display for Field {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let extension = if self.arity.is_list() {
+            "[]"
+        } else if self.arity.is_optional() {
+            "?"
+        } else {
+            ""
+        };
+
+        write!(f, "{} {}{}", self.name(), self.field_type.name(), extension)
+    }
 }
 
 impl Field {

@@ -45,7 +45,12 @@ fn resolve_composite_type_attributes<'db>(
     ctx: &mut Context<'db>,
 ) {
     for (field_id, field) in ct.iter_fields() {
-        let CompositeTypeField { r#type, .. } = ctx.types.composite_type_fields[&(ctid, field_id)];
+        let CompositeTypeField { r#type, .. } =
+            if let Some(val) = ctx.types.composite_type_fields.get(&(ctid, field_id)) {
+                val.clone()
+            } else {
+                continue;
+            };
 
         ctx.visit_attributes((ctid.0, (ctid.1, field_id)));
 
@@ -81,14 +86,13 @@ fn resolve_composite_type_attributes<'db>(
 fn resolve_enum_attributes<'db>(enum_id: crate::EnumId, ast_enum: &'db ast::Enum, ctx: &mut Context<'db>) {
     let mut enum_attributes = EnumAttributes::default();
 
-    for value_idx in 0..ast_enum.values.len() {
-        ctx.visit_attributes((enum_id.0, (enum_id.1, value_idx as u32)));
+    for (value_id, _) in ast_enum.iter_values() {
+        ctx.visit_attributes((enum_id.0, (enum_id.1, value_id)));
         // @map
         if ctx.visit_optional_single_attr("map") {
             if let Some(mapped_name) = map::visit_map_attribute(ctx) {
-                enum_attributes.mapped_values.insert(value_idx as u32, mapped_name);
-                ctx.mapped_enum_value_names
-                    .insert((enum_id, mapped_name), value_idx as u32);
+                enum_attributes.mapped_values.insert(value_id, mapped_name);
+                ctx.mapped_enum_value_names.insert((enum_id, mapped_name), value_id);
             }
             ctx.validate_visited_arguments();
         }
@@ -629,15 +633,16 @@ fn common_index_validations(
                 let mut suggested_fields = Vec::new();
 
                 for (_, field_id) in &relation_fields {
-                    let fields = ctx
+                    let Some(rf) = ctx
                         .types
                         .range_model_relation_fields(model_id)
                         .find(|(_, rf)| rf.field_id == *field_id)
-                        .unwrap()
-                        .1
-                        .fields
-                        .iter()
-                        .flatten();
+                    else {
+                        continue;
+                    };
+
+                    let fields = rf.1.fields.iter().flatten();
+
                     for underlying_field in fields {
                         let ScalarField { model_id, field_id, .. } = ctx.types[*underlying_field];
                         suggested_fields.push(ctx.asts[model_id][field_id].name());
@@ -1096,26 +1101,4 @@ fn validate_client_name(span: Span, object_name: &str, name: StringId, attribute
 fn validate_clustering_setting(ctx: &mut Context<'_>) -> Option<bool> {
     ctx.visit_optional_arg("clustered")
         .and_then(|sort| coerce::boolean(sort, ctx.diagnostics))
-}
-
-/// Create the default values of [`ModelAttributes`] and [`EnumAttributes`] for each model and enum
-/// in the AST to ensure [`crate::walkers::ModelWalker`] and [`crate::walkers::EnumWalker`] can
-/// access their corresponding entries in the attributes map in the database even in the presence
-/// of name and type resolution errors. This is useful for the language tools.
-pub(super) fn create_default_attributes(ctx: &mut Context<'_>) {
-    for ((file_id, top), _) in ctx.iter_tops() {
-        match top {
-            ast::TopId::Model(model_id) => {
-                ctx.types
-                    .model_attributes
-                    .insert((file_id, model_id), ModelAttributes::default());
-            }
-            ast::TopId::Enum(enum_id) => {
-                ctx.types
-                    .enum_attributes
-                    .insert((file_id, enum_id), EnumAttributes::default());
-            }
-            _ => (),
-        }
-    }
 }

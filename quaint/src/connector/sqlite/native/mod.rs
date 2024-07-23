@@ -1,11 +1,12 @@
 //! Definitions for the SQLite connector.
 //! This module is not compatible with wasm32-* targets.
 //! This module is only available with the `sqlite-native` feature.
+mod column_type;
 mod conversion;
 mod error;
 
-use crate::connector::sqlite::params::SqliteParams;
 use crate::connector::IsolationLevel;
+use crate::connector::{sqlite::params::SqliteParams, ColumnType};
 
 pub use rusqlite::{params_from_iter, version as sqlite_version};
 
@@ -104,8 +105,9 @@ impl Queryable for Sqlite {
 
             let mut stmt = client.prepare_cached(sql)?;
 
+            let col_types = stmt.columns().iter().map(ColumnType::from).collect::<Vec<_>>();
             let mut rows = stmt.query(params_from_iter(params.iter()))?;
-            let mut result = ResultSet::new(rows.to_column_names(), Vec::new());
+            let mut result = ResultSet::new(rows.to_column_names(), col_types, Vec::new());
 
             while let Some(row) = rows.next()? {
                 result.rows.push(row.get_result_row()?);

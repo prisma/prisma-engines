@@ -1,0 +1,326 @@
+name: Build Engines
+run-name: Build Engines for ${{ github.sha }}
+
+# Run on `push` only for main, if not it will trigger `push` & `pull_request` on PRs at the same time
+on:
+  push:
+    branches:
+      - main
+      - '*.*.x'
+      - 'integration/*'
+    paths-ignore:
+      - '!.github/workflows/build-engines*'
+      - '.github/**'
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+      - 'renovate.json'
+  workflow_dispatch:
+  pull_request:
+    paths-ignore:
+      - '!.github/workflows/build-engines*'
+      - '.github/**'
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+      - 'renovate.json'
+
+jobs:
+  is-release-necessary:
+    name: 'Decide if a release of the engines artifacts is necessary'
+    runs-on: ubuntu-22.04
+    outputs:
+      release: ${{ steps.decision.outputs.release }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # using head ref rather than merge branch to get original commit message
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Get commit message
+        id: commit-msg
+        run: |
+          commit_msg=$(git log --format=%B -n 1)
+          echo 'commit-msg<<EOF' >> $GITHUB_OUTPUT
+          echo "$commit_msg" >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+
+      - name: Debug Pull Request Event
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          echo "Pull Request: ${{ github.event.pull_request.number }}"
+          echo "Repository Owner: $${{ github.repository_owner }}"
+          echo "Pull Request Author: ${{ github.actor }}"
+          echo "Pull Request Author Association: ${{ github.event.pull_request.author_association }}"
+          echo "Commit message:${{ steps.commit-msg.outputs.commit-msg }}"
+          echo "Commit message contains [integration]: ${{ contains(steps.commit-msg.outputs.commit-msg, '[integration]') }}"
+
+      - name: 'Check if commit message conatains `[integration]` and the PR author has permissions to trigger the workflow'
+        id: check-commit-message
+        # See https://docs.github.com/en/graphql/reference/enums
+        # https://michaelheap.com/github-actions-check-permission/
+        # Check if
+        # - the commit message contains `[integration]`
+        # - the PR author has permissions to trigger the workflow (must be part of the org or a collaborator)
+        if: |
+          github.event_name == 'pull_request' &&
+          contains(steps.commit-msg.outputs.commit-msg, '[integration]') && 
+          (
+            github.event.pull_request.author_association == 'OWNER' ||
+            github.event.pull_request.author_association == 'MEMBER' ||
+            github.event.pull_request.author_association == 'COLLABORATOR'
+          )
+        run: |
+          echo "Commit message contains [integration] and PR author has permissions" 
+          # set value to GitHub output 
+          echo "release=true" >> $GITHUB_OUTPUT
+
+      #
+      # A patch branch (e.g. "4.6.x")
+      #
+      - name: Check if branch is a patch or integration branch
+        id: check-branch
+        uses: actions/github-script@v7
+        env:
+          BRANCH: ${{ github.ref }}
+        with:
+          script: |
+            const { BRANCH } = process.env
+            const parts = BRANCH.split('.')
+            if (parts.length === 3 && parts[2] === 'x') {
+              console.log(`Branch is a patch branch: ${BRANCH}`)
+              core.setOutput('release', true)
+            } else if (BRANCH.startsWith("integration/")) {
+              console.log(`Branch is an "integration/" branch: ${BRANCH}`)
+              core.setOutput('release', true)
+            } else {
+              core.setOutput('release', false)
+            }
+
+      - name: Debug event & outputs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_PATH: ${{ github.event_path }}
+          CHECK_COMMIT_MESSAGE: ${{ steps.check-commit-message.outputs.release }}
+          CHECK_BRANCH: ${{ steps.check-branch.outputs.release }}
+        run: |
+          echo "Event Name: $EVENT_NAME"
+          echo "Event path: $EVENT_PATH"
+          echo "Check Commit Message outputs: $CHECK_COMMIT_MESSAGE"
+          echo "Check branch: $CHECK_BRANCH"
+
+      - name: Release is necessary!
+        # https://github.com/peter-evans/find-comment/tree/v3/?tab=readme-ov-file#outputs
+        # Tip: Empty strings evaluate to zero in GitHub Actions expressions. e.g. If comment-id is an empty string steps.fc.outputs.comment-id == 0 evaluates to true.
+        if: |
+          github.event_name == 'workflow_dispatch' || 
+          github.event_name == 'push' || 
+          steps.check-commit-message.outputs.release == 'true' || 
+          steps.check-branch.outputs.release == 'true'
+
+        id: decision
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_PATH: ${{ github.event_path }}
+          CHECK_COMMIT_MESSAGE: ${{ steps.check-commit-message.outputs.release }}
+          CHECK_BRANCH: ${{ steps.check-branch.outputs.release }}
+        run: |
+          echo "Event Name: $EVENT_NAME"
+          echo "Event path: $EVENT_PATH"
+          echo "Check Commit Message outputs: $CHECK_COMMIT_MESSAGE"
+          echo "Check branch: $CHECK_BRANCH"
+
+          echo "Release is necessary"
+          echo "release=true" >> $GITHUB_OUTPUT
+
+  build-linux:
+    name: Build Engines for Linux
+    needs: 
+      - is-release-necessary
+    if: ${{ needs.is-release-necessary.outputs.release == 'true' }}
+    uses: ./.github/workflows/build-engines-linux-template.yml
+    with:
+      commit: ${{ github.sha }}
+
+  build-macos-intel:
+    name: Build Engines for Apple Intel
+    needs: 
+      - is-release-necessary
+    if: ${{ needs.is-release-necessary.outputs.release == 'true' }}
+    uses: ./.github/workflows/build-engines-apple-intel-template.yml
+    with:
+      commit: ${{ github.sha }}
+
+  build-macos-silicon:
+    name: Build Engines for Apple Silicon
+    needs: 
+      - is-release-necessary
+    if: ${{ needs.is-release-necessary.outputs.release == 'true' }}
+    uses: ./.github/workflows/build-engines-apple-silicon-template.yml
+    with:
+      commit: ${{ github.sha }}
+
+  build-react-native:
+    name: Build Engines for React native
+    needs: 
+      - is-release-necessary
+    if: ${{ needs.is-release-necessary.outputs.release == 'true' }}
+    uses: ./.github/workflows/build-engines-react-native-template.yml
+    with:
+      commit: ${{ github.sha }}
+
+  build-windows:
+    name: Build Engines for Windows
+    needs: 
+      - is-release-necessary
+    if: ${{ needs.is-release-necessary.outputs.release == 'true' }}
+    uses: ./.github/workflows/build-engines-windows-template.yml
+    with:
+      commit: ${{ github.sha }}
+
+  release-artifacts:
+    name: 'Release artifacts from branch ${{ github.head_ref || github.ref_name }} for commit ${{ github.sha }}'
+    runs-on: ubuntu-22.04
+    concurrency:
+      group: ${{ github.sha }}
+    needs:
+      - build-linux
+      - build-macos-intel
+      - build-macos-silicon
+      - build-react-native
+      - build-windows
+    env:
+      BUCKET_NAME: 'prisma-builds'
+      PRISMA_ENGINES_COMMIT_SHA: ${{ github.sha }}
+      DESTINATION_TARGET_PATH: 's3://prisma-builds/all_commits/${{ github.sha }}'
+
+    steps:
+      # Because we need the scripts
+      - name: Checkout git repository
+        uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: engines-artifacts
+          # For debug purposes
+          # A previous run ID can be specified, to avoid the build step
+          # First disable the build step, then specify the run ID
+          # The github-token is mandatory for this to work
+          # https://github.com/prisma/prisma-engines-builds/actions/runs/9526334324
+          # run-id: 9526334324
+          # github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 'R2: Check if artifacts were already built and uploaded before via `.finished` file'
+        env:
+          FILE_PATH: 'all_commits/${{ github.sha }}/.finished'
+          FILE_PATH_LEGACY: 'all_commits/${{ github.sha }}/rhel-openssl-1.1.x/.finished'
+          AWS_DEFAULT_REGION: 'auto'
+          AWS_ACCESS_KEY_ID: ${{ vars.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_ENDPOINT_URL_S3: ${{ vars.R2_ENDPOINT }}
+        working-directory: .github/workflows/utils
+        run: bash checkFinishedMarker.sh
+
+      - name: 'S3: Check if artifacts were already built and uploaded before via `.finished` file'
+        env:
+          FILE_PATH: 'all_commits/${{ github.sha }}/.finished'
+          FILE_PATH_LEGACY: 'all_commits/${{ github.sha }}/rhel-openssl-1.1.x/.finished'
+          AWS_DEFAULT_REGION: 'eu-west-1'
+          AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        working-directory: .github/workflows/utils
+        run: bash checkFinishedMarker.sh
+
+      - name: Display structure of downloaded files
+        run: ls -Rl engines-artifacts
+
+      # TODO in a next major version of Prisma: remove this, and replace both `Debian` and `Rhel` with a single `LinuxGlibc`/`LinuxGnu` option.
+      - name: Duplicate engines for debian
+        working-directory: engines-artifacts
+        run: |
+          cp -r rhel-openssl-1.0.x debian-openssl-1.0.x
+          cp -r rhel-openssl-1.1.x debian-openssl-1.1.x
+          cp -r rhel-openssl-3.0.x debian-openssl-3.0.x
+
+      - name: Create .zip for react-native
+        working-directory: engines-artifacts
+        run: |
+          mkdir react-native
+          zip -r react-native/binaries.zip ios android
+          rm -rf ios android
+
+      - name: 'Create compressed engine files (.gz)'
+        working-directory: engines-artifacts
+        run: |
+          set -eu
+
+          find . -type f -not -name "*.zip" | while read filename; do
+            gzip -c "$filename" > "$filename.gz"
+            echo "$filename.gz file created."
+          done
+
+          ls -Rl .
+
+      - name: 'Create SHA256 checksum files (.sha256).'
+        working-directory: engines-artifacts
+        run: |
+          set -eu
+
+          find . -type f | while read filename; do
+            sha256sum "$filename" > "$filename.sha256" 
+            echo "$filename.sha256 file created."
+          done
+
+          ls -Rl .
+
+      # https://github.com/crazy-max/ghaction-import-gpg
+      - name: Import GPG key
+        # See https://github.com/crazy-max/ghaction-import-gpg/releases
+        # v6 -> 01dd5d3ca463c7f10f7f4f7b4f177225ac661ee4
+        # For security reasons, we should pin the version of the action
+        uses: crazy-max/ghaction-import-gpg@01dd5d3ca463c7f10f7f4f7b4f177225ac661ee4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_KEY_PASSPHRASE }}
+
+      - name: List keys
+        run: gpg -K
+
+      # next to each file (excluding .sha256 files)
+      - name: 'Create a GPG detached signature (.sig)'
+        working-directory: engines-artifacts
+        run: |
+          set -eu
+
+          for file in $(find . -type f ! -name "*.sha256"); do
+            gpg --detach-sign --armor --batch --output "${file#*/}.sig" "$file"
+          done
+
+          ls -Rl .
+
+      - name: 'Cloudflare R2: Upload to bucket and verify uploaded files then create `.finished` file'
+        # https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-envvars.html
+        env:
+          AWS_DEFAULT_REGION: 'auto'
+          AWS_ACCESS_KEY_ID: ${{ vars.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_ENDPOINT_URL_S3: ${{ vars.R2_ENDPOINT }}
+        run: bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-r2
+
+      - name: 'AWS S3: Upload to bucket and verify uploaded files then create `.finished` file'
+        env:
+          AWS_DEFAULT_REGION: 'eu-west-1'
+          AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-s3
+
+      - name: Repository dispatch to prisma/engines-wrapper
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          repository: prisma/engines-wrapper
+          event-type: publish-engines
+          client-payload: '{ "commit": "${{ github.sha }}", "branch": "${{ github.head_ref || github.ref_name }}" }'
+          token: ${{ secrets.PRISMA_BOT_TOKEN }}
+      - name: Cleanup local directories
+        run: rm -rf engines-artifacts engines-artifacts-for-r2 engines-artifacts-for-s3

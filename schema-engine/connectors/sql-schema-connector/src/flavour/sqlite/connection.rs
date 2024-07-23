@@ -2,7 +2,7 @@
 
 pub(crate) use quaint::connector::rusqlite;
 
-use quaint::connector::{GetRow, ToColumnNames};
+use quaint::connector::{ColumnType, GetRow, ToColumnNames};
 use schema_connector::{ConnectorError, ConnectorResult};
 use sql_schema_describer::{sqlite as describer, DescriberErrorKind, SqlSchema};
 use std::sync::Mutex;
@@ -56,6 +56,7 @@ impl Connection {
         let conn = self.0.lock().unwrap();
         let mut stmt = conn.prepare_cached(sql).map_err(convert_error)?;
 
+        let column_types = stmt.columns().iter().map(ColumnType::from).collect::<Vec<_>>();
         let mut rows = stmt
             .query(rusqlite::params_from_iter(params.iter()))
             .map_err(convert_error)?;
@@ -65,7 +66,11 @@ impl Connection {
             converted_rows.push(row.get_result_row().unwrap());
         }
 
-        Ok(quaint::prelude::ResultSet::new(column_names, converted_rows))
+        Ok(quaint::prelude::ResultSet::new(
+            column_names,
+            column_types,
+            converted_rows,
+        ))
     }
 }
 

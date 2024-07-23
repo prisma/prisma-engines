@@ -112,6 +112,12 @@ impl WithDocumentation for Enum {
 pub struct EnumValue {
     /// The name of the enum value as it will be exposed by the api.
     pub name: Identifier,
+    /// The attributes of this value.
+    ///
+    /// ```ignore
+    /// yellow @map("orange")
+    ///        ^^^^^^^^^^^^^^
+    /// ```
     pub attributes: Vec<Attribute>,
     pub(crate) documentation: Option<Comment>,
     /// The location of this enum value in the text representation.

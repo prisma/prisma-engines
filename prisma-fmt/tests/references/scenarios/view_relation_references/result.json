@@ -11,5 +11,18 @@
         "character": 8
       }
     }
+  },
+  {
+    "uri": "file:///path/to/a.prisma",
+    "range": {
+      "start": {
+        "line": 5,
+        "character": 14
+      },
+      "end": {
+        "line": 5,
+        "character": 18
+      }
+    }
   }
 ]

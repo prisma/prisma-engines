@@ -47,7 +47,7 @@ mod tests {
             }
 
             model Post {
-                id        Int    @id @default(autoincrement())
+                id        Int     @id @default(autoincrement())
                 title     String
                 author    User    @relation(fields: [authorId], references: [id])
                 authorId  Int
@@ -190,7 +190,50 @@ mod tests {
                   "isGenerated": false
                 }
               ],
-              "types": []
+              "types": [],
+              "indexes": [
+                {
+                  "model": "User",
+                  "type": "id",
+                  "isDefinedOnField": true,
+                  "fields": [
+                    {
+                      "name": "id"
+                    }
+                  ]
+                },
+                {
+                  "model": "User",
+                  "type": "unique",
+                  "isDefinedOnField": true,
+                  "fields": [
+                    {
+                      "name": "email"
+                    }
+                  ]
+                },
+                {
+                  "model": "Post",
+                  "type": "id",
+                  "isDefinedOnField": true,
+                  "fields": [
+                    {
+                      "name": "id"
+                    }
+                  ]
+                },
+                {
+                  "model": "Post",
+                  "type": "normal",
+                  "isDefinedOnField": false,
+                  "dbName": "idx_post_on_title",
+                  "fields": [
+                    {
+                      "name": "title"
+                    }
+                  ]
+                }
+              ]
             }"#]];
 
         let response = get_datamodel(

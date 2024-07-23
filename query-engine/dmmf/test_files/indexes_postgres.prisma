@@ -1,0 +1,11 @@
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://"
+}
+
+model Example {
+  id    Int  @id
+  value Json
+
+  @@index([value(ops: JsonbPathOps)], type: Gin)
+}
