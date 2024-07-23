@@ -116,9 +116,7 @@ mod transactional {
         Ok(())
     }
 
-    // On PlanetScale, this fails with:
-    // "Error in connector: Error querying the database: Server error: `ERROR 25001 (1568): Transaction characteristics can't be changed while a transaction is in progress'""
-    #[connector_test(exclude(MongoDb, Vitess("planetscale.js", "planetscale.js.wasm")))]
+    #[connector_test(exclude(MongoDb))]
     async fn valid_isolation_level(runner: Runner) -> TestResult<()> {
         let queries = vec![r#"mutation { createOneModelB(data: { id: 1 }) { id }}"#.to_string()];
 

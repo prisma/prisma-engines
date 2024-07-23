@@ -598,9 +598,7 @@ mod itx_isolation {
         Ok(())
     }
 
-    // On PlanetScale, this fails with:
-    // `InteractiveTransactionError("Error in connector: Error querying the database: Server error: `ERROR 25001 (1568): Transaction characteristics can't be changed while a transaction is in progress'")`
-    #[connector_test(exclude(MongoDb, Vitess("planetscale.js", "planetscale.js.wasm"), Sqlite("cfd1")))]
+    #[connector_test(exclude(MongoDb))]
     async fn casing_doesnt_matter(mut runner: Runner) -> TestResult<()> {
         let tx_id = runner.start_tx(5000, 5000, Some("sErIaLiZaBlE".to_owned())).await?;
         runner.set_active_tx(tx_id.clone());
