@@ -598,7 +598,7 @@ mod itx_isolation {
         Ok(())
     }
 
-    #[connector_test(exclude(MongoDb))]
+    #[connector_test(exclude(MongoDb, Sqlite("cfd1")))]
     async fn casing_doesnt_matter(mut runner: Runner) -> TestResult<()> {
         let tx_id = runner.start_tx(5000, 5000, Some("sErIaLiZaBlE".to_owned())).await?;
         runner.set_active_tx(tx_id.clone());
