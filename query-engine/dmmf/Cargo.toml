@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 bigdecimal = "0.3.0"
+itertools.workspace = true
 psl.workspace = true
 serde.workspace = true
 serde_json.workspace = true

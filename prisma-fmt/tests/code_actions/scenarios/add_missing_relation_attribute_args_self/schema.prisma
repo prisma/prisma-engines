@@ -1,0 +1,10 @@
+model User {
+    id          Int      @id @default(autoincrement())
+    name        String?
+
+    husband     User?    @relation("MarriagePartners")
+    wife        User     @relation("MarriagePartners")
+
+    teacher     User?    @relation("TeacherStudents")
+    students    User[]   @relation("TeacherStudents")
+}

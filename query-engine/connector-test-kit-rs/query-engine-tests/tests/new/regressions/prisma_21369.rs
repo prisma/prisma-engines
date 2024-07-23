@@ -4,12 +4,12 @@ use query_engine_tests::*;
 mod prisma_21369 {
     #[connector_test]
     async fn select_null_works(runner: Runner) -> TestResult<()> {
-        let query = fmt_query_raw("SELECT NULL AS result", []);
-        let result = run_query!(runner, query);
+        match_connector_result!(
+            &runner,
+            fmt_query_raw("SELECT NULL AS result", []),
+            Sqlite(_) | MySql(_) | SqlServer(_) | Vitess(_) => vec![r#"{"data":{"queryRaw":{"columns":["result"],"types":["int"],"rows":[[null]]}}}"#],
+            _ => vec![r#"{"data":{"queryRaw":{"columns":["result"],"types":["string"],"rows":[[null]]}}}"#]
 
-        assert_eq!(
-            result,
-            r#"{"data":{"queryRaw":[{"result":{"prisma__type":"null","prisma__value":null}}]}}"#
         );
 
         Ok(())

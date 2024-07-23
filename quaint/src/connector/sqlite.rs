@@ -1,6 +1,7 @@
 //! Wasm-compatible definitions for the SQLite connector.
 //! This module is only available with the `sqlite` feature.
 mod defaults;
+
 pub(crate) mod error;
 mod ffi;
 pub(crate) mod params;

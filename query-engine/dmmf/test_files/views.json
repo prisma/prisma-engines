@@ -135,7 +135,7 @@
       "uniqueIndexes": [],
       "isGenerated": false
     },
-        {
+    {
       "name": "UserInfo",
       "dbName": null,
       "fields": [
@@ -198,5 +198,57 @@
       "isGenerated": false
     }
   ],
-  "types": []
+  "types": [],
+  "indexes": [
+    {
+      "model": "User",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "id"
+        }
+      ]
+    },
+    {
+      "model": "User",
+      "type": "unique",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "email"
+        }
+      ]
+    },
+    {
+      "model": "Profile",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "id"
+        }
+      ]
+    },
+    {
+      "model": "Profile",
+      "type": "unique",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "userId"
+        }
+      ]
+    },
+    {
+      "model": "UserInfo",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "id"
+        }
+      ]
+    }
+  ]
 }

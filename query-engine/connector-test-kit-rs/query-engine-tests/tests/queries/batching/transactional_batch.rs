@@ -174,7 +174,7 @@ mod transactional {
         let batch_results = runner.batch(queries, true, None).await?;
         insta::assert_snapshot!(
             batch_results.to_string(),
-            @r###"{"batchResult":[{"data":{"createOneModelB":{"id":1}}},{"data":{"executeRaw":1}},{"data":{"queryRaw":[]}}]}"###
+            @r###"{"batchResult":[{"data":{"createOneModelB":{"id":1}}},{"data":{"executeRaw":1}},{"data":{"queryRaw":{"columns":["id"],"types":["int"],"rows":[]}}}]}"###
         );
 
         Ok(())

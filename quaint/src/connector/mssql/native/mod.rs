@@ -1,6 +1,7 @@
 //! Definitions for the MSSQL connector.
 //! This module is not compatible with wasm32-* targets.
 //! This module is only available with the `mssql-native` feature.
+mod column_type;
 mod conversion;
 mod error;
 
@@ -9,7 +10,7 @@ use crate::connector::{timeout, IsolationLevel, Transaction, TransactionOptions}
 
 use crate::{
     ast::{Query, Value},
-    connector::{metrics, queryable::*, DefaultTransaction, ResultSet},
+    connector::{metrics, queryable::*, ColumnType as QuaintColumnType, DefaultTransaction, ResultSet},
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
@@ -144,12 +145,21 @@ impl Queryable for Mssql {
                 Some(rows) => {
                     let mut columns_set = false;
                     let mut columns = Vec::new();
+
+                    let mut types_set = false;
+                    let mut types = Vec::new();
+
                     let mut result_rows = Vec::with_capacity(rows.len());
 
                     for row in rows.into_iter() {
                         if !columns_set {
                             columns = row.columns().iter().map(|c| c.name().to_string()).collect();
                             columns_set = true;
+                        }
+
+                        if !types_set {
+                            types = row.columns().iter().map(QuaintColumnType::from).collect();
+                            types_set = true;
                         }
 
                         let mut values: Vec<Value<'_>> = Vec::with_capacity(row.len());
@@ -161,9 +171,9 @@ impl Queryable for Mssql {
                         result_rows.push(values);
                     }
 
-                    Ok(ResultSet::new(columns, result_rows))
+                    Ok(ResultSet::new(columns, types, result_rows))
                 }
-                None => Ok(ResultSet::new(Vec::new(), Vec::new())),
+                None => Ok(ResultSet::new(Vec::new(), Vec::new(), Vec::new())),
             }
         })
         .await

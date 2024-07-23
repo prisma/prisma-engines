@@ -3,8 +3,7 @@ use crate::ast::{Value, ValueType};
 use bigdecimal::BigDecimal;
 use std::{borrow::Cow, convert::TryFrom};
 
-use tiberius::ToSql;
-use tiberius::{ColumnData, FromSql, IntoSql};
+use tiberius::{ColumnData, FromSql, IntoSql, ToSql};
 
 impl<'a> IntoSql<'a> for &'a Value<'a> {
     fn into_sql(self) -> ColumnData<'a> {
@@ -49,13 +48,13 @@ impl TryFrom<ColumnData<'static>> for Value<'static> {
             dt @ ColumnData::DateTime(_) => {
                 use tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
-                let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_utc(dt, Utc));
+                let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_naive_utc_and_offset(dt, Utc));
                 ValueType::DateTime(dt)
             }
             dt @ ColumnData::SmallDateTime(_) => {
                 use tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
-                let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_utc(dt, Utc));
+                let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_naive_utc_and_offset(dt, Utc));
                 ValueType::DateTime(dt)
             }
             dt @ ColumnData::Time(_) => {
@@ -70,7 +69,7 @@ impl TryFrom<ColumnData<'static>> for Value<'static> {
             dt @ ColumnData::DateTime2(_) => {
                 use tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
-                let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_utc(dt, Utc));
+                let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_naive_utc_and_offset(dt, Utc));
 
                 ValueType::DateTime(dt)
             }

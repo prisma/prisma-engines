@@ -39,7 +39,7 @@ members = [
 async-trait = { version = "0.1.77" }
 enumflags2 = { version = "0.7", features = ["serde"] }
 psl = { path = "./psl/psl" }
-serde_json = { version = "1", features = ["float_roundtrip", "preserve_order"] }
+serde_json = { version = "1", features = ["float_roundtrip", "preserve_order", "raw_value"] }
 serde = { version = "1", features = ["derive"] }
 tokio = { version = "1.25", features = [
   "rt-multi-thread",
@@ -50,7 +50,7 @@ tokio = { version = "1.25", features = [
   "parking_lot",
   "time",
 ] }
-chrono = { version = "0.4", features = ["serde"] }
+chrono = { version = "0.4.38", features = ["serde"] }
 user-facing-errors = { path = "./libs/user-facing-errors" }
 uuid = { version = "1", features = ["serde", "v4"] }
 indoc = "2.0.1"

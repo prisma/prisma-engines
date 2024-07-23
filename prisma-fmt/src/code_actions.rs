@@ -1,4 +1,5 @@
 mod block;
+mod field;
 mod mongodb;
 mod multi_schema;
 mod relation_mode;
@@ -86,6 +87,10 @@ pub(crate) fn available_actions(
         .walk_models_in_file(initiating_file_id)
         .chain(validated_schema.db.walk_views_in_file(initiating_file_id))
     {
+        for field in context.db.walk_fields(model.id) {
+            field::add_missing_opposite_relation(&mut actions, &context, field);
+        }
+
         block::create_missing_block_for_model(&mut actions, &context, model);
 
         if config.preview_features().contains(PreviewFeature::MultiSchema) {
@@ -114,20 +119,28 @@ pub(crate) fn available_actions(
     }
 
     for relation in validated_schema.db.walk_relations() {
-        if let RefinedRelationWalker::Inline(relation) = relation.refine() {
-            let complete_relation = match relation.as_complete() {
+        if let RefinedRelationWalker::Inline(inline_relation) = relation.refine() {
+            relations::add_referencing_side_relation(&mut actions, &context, inline_relation);
+
+            let complete_relation = match inline_relation.as_complete() {
                 Some(relation) => relation,
                 None => continue,
             };
 
+            if matches!(datasource, Some(ds) if ds.active_provider != "mongodb") {
+                relations::make_referencing_side_many(&mut actions, &context, complete_relation);
+            }
+
             relations::add_referenced_side_unique(&mut actions, &context, complete_relation);
 
-            if relation.is_one_to_one() {
+            if inline_relation.is_one_to_one() {
                 relations::add_referencing_side_unique(&mut actions, &context, complete_relation);
             }
 
             if validated_schema.relation_mode().is_prisma()
-                && relation.referencing_model().is_defined_in_file(initiating_file_id)
+                && inline_relation
+                    .referencing_model()
+                    .is_defined_in_file(initiating_file_id)
             {
                 relations::add_index_for_relation_fields(&mut actions, &context, complete_relation.referencing_field());
             }

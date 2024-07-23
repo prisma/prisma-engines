@@ -1,6 +1,7 @@
 use lsp_types::{Diagnostic, DiagnosticSeverity};
 use once_cell::sync::Lazy;
-use prisma_fmt::span_to_range;
+
+use prisma_fmt::offsets::span_to_range;
 use psl::{diagnostics::Span, SourceFile};
 use std::{fmt::Write as _, io::Write as _, path::PathBuf};
 
