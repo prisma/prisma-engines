@@ -506,7 +506,7 @@ impl SqlFlavour for MssqlFlavour {
         &'a mut self,
         _sql: &str,
     ) -> BoxFuture<'a, ConnectorResult<quaint::connector::ParsedRawQuery>> {
-        todo!()
+        unimplemented!("MSSQL support for raw query parsing is not implemented yet.")
     }
 }
 

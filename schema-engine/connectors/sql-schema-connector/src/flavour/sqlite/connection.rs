@@ -2,7 +2,7 @@
 
 pub(crate) use quaint::connector::rusqlite;
 
-use quaint::connector::{ColumnType, GetRow, ToColumnNames};
+use quaint::connector::{ColumnType, GetRow, ParsedRawItem, ToColumnNames};
 use schema_connector::{ConnectorError, ConnectorResult};
 use sql_schema_describer::{sqlite as describer, DescriberErrorKind, SqlSchema};
 use std::sync::Mutex;
@@ -73,11 +73,32 @@ impl Connection {
         ))
     }
 
-    pub(super) fn parse_query_raw(&mut self, _sql: &str) -> ConnectorResult<quaint::connector::ParsedRawQuery> {
-        // tracing::debug!(query_type = "query_raw", sql);
-        // let conn = self.0.lock().unwrap();
-        // let mut stmt = conn.prepare_cached(sql).map_err(convert_error)?;
-        unimplemented!()
+    pub(super) fn parse_query_raw(&mut self, sql: &str) -> ConnectorResult<quaint::connector::ParsedRawQuery> {
+        tracing::debug!(query_type = "parse_query_raw", sql);
+        let conn = self.0.lock().unwrap();
+        let stmt = conn.prepare_cached(sql).map_err(convert_error)?;
+
+        let parameters = stmt
+            .columns()
+            .iter()
+            .enumerate()
+            .map(|(idx, col)| ParsedRawItem {
+                name: format!("_{idx}"),
+                typ: ColumnType::from(col),
+            })
+            .collect();
+        let columns = (1..stmt.parameter_count())
+            .into_iter()
+            .map(|idx| ParsedRawItem {
+                name: stmt
+                    .parameter_name(idx)
+                    .map(ToOwned::to_owned)
+                    .unwrap_or_else(|| format!("unnamed_{idx}")),
+                typ: ColumnType::Unknown,
+            })
+            .collect();
+
+        Ok(quaint::connector::ParsedRawQuery { columns, parameters })
     }
 }
 
