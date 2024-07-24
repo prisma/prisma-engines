@@ -210,6 +210,20 @@ impl ::napi::bindgen_prelude::FromNapiValue for JsTransaction {
     }
 }
 
+#[cfg(target_arch = "wasm32")]
+impl super::wasm::FromJsValue for JsTransactionContext {
+    fn from_js_value(value: wasm_bindgen::prelude::JsValue) -> JsResult<Self> {
+        use wasm_bindgen::JsCast;
+
+        let object = value.dyn_into::<JsObject>()?;
+        let common_proxy = CommonProxy::new(&object)?;
+        let base = JsBaseQueryable::new(common_proxy);
+        let tx_ctx_proxy = TransactionContextProxy::new(&object)?;
+
+        Ok(Self::new(base, tx_ctx_proxy))
+    }
+}
+
 /// Implementing unsafe `from_napi_value` allows retrieving a threadsafe `JsTransactionContext` in `DriverProxy`
 /// while keeping derived futures `Send`.
 #[cfg(not(target_arch = "wasm32"))]
