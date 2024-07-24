@@ -5,8 +5,8 @@ mod column_type;
 mod conversion;
 mod error;
 
-use crate::connector::IsolationLevel;
 use crate::connector::{sqlite::params::SqliteParams, ColumnType, ParsedRawQuery};
+use crate::connector::{IsolationLevel, ParsedRawItem};
 
 pub use rusqlite::{params_from_iter, version as sqlite_version};
 
@@ -124,8 +124,31 @@ impl Queryable for Sqlite {
         self.query_raw(sql, params).await
     }
 
-    async fn parse_raw_query(&self, _sql: &str) -> crate::Result<ParsedRawQuery> {
-        todo!()
+    async fn parse_raw_query(&self, sql: &str) -> crate::Result<ParsedRawQuery> {
+        let conn = self.client.lock().await;
+        let stmt = conn.prepare_cached(sql)?;
+
+        let parameters = stmt
+            .columns()
+            .iter()
+            .enumerate()
+            .map(|(idx, col)| ParsedRawItem {
+                name: format!("_{idx}"),
+                typ: ColumnType::from(col),
+            })
+            .collect();
+        let columns = (1..stmt.parameter_count())
+            .into_iter()
+            .map(|idx| ParsedRawItem {
+                name: stmt
+                    .parameter_name(idx)
+                    .map(ToOwned::to_owned)
+                    .unwrap_or_else(|| format!("unnamed_{idx}")),
+                typ: ColumnType::Unknown,
+            })
+            .collect();
+
+        Ok(ParsedRawQuery { columns, parameters })
     }
 
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
