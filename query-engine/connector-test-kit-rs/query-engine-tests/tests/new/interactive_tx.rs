@@ -573,10 +573,7 @@ mod itx_isolation {
     use query_engine_tests::*;
 
     // All (SQL) connectors support serializable.
-    // However, there's a bug in the PlanetScale driver adapter:
-    // "Transaction characteristics can't be changed while a transaction is in progress
-    // (errno 1568) (sqlstate 25001) during query: SET TRANSACTION ISOLATION LEVEL SERIALIZABLE"
-    #[connector_test(exclude(MongoDb, Vitess("planetscale.js", "planetscale.js.wasm"), Sqlite("cfd1")))]
+    #[connector_test(exclude(MongoDb, Sqlite("cfd1")))]
     async fn basic_serializable(mut runner: Runner) -> TestResult<()> {
         let tx_id = runner.start_tx(5000, 5000, Some("Serializable".to_owned())).await?;
         runner.set_active_tx(tx_id.clone());
