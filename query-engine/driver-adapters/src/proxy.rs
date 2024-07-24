@@ -1,10 +1,10 @@
-use crate::send_future::UnsafeFuture;
 use crate::types::JsConnectionInfo;
 pub use crate::types::{JSResultSet, Query, TransactionOptions};
 use crate::{
     from_js_value, get_named_property, get_optional_named_property, to_rust_str, AdapterMethod, JsObject, JsResult,
     JsString, JsTransaction,
 };
+use crate::{send_future::UnsafeFuture, transaction::JsTransactionContext};
 
 use futures::Future;
 use metrics::increment_gauge;
@@ -28,8 +28,19 @@ pub(crate) struct CommonProxy {
 /// This is a JS proxy for accessing the methods specific to top level
 /// JS driver objects
 pub(crate) struct DriverProxy {
-    start_transaction: AdapterMethod<(), JsTransaction>,
+    /// Retrieve driver-specific info, such as the maximum number of query parameters
     get_connection_info: Option<AdapterMethod<(), JsConnectionInfo>>,
+
+    /// Provide a transaction context, in which raw commands are guaranteed to be executed in
+    /// the same scope as a future transaction, which can be spawned by via
+    /// [`driver_adapters::transaction::JsTransactionContext::start_transaction`].
+    /// This was first introduced for supporting Isolation Levels in PlanetScale.
+    transaction_context: AdapterMethod<(), JsTransactionContext>,
+}
+
+/// This is a JS proxy for accessing the methods specific to JS transaction contexts.
+pub(crate) struct TransactionContextProxy {
+    start_transaction: AdapterMethod<(), JsTransaction>,
 }
 
 /// This a JS proxy for accessing the methods, specific
@@ -48,6 +59,7 @@ pub(crate) struct TransactionProxy {
     closed: AtomicBool,
 }
 
+// TypeScript: Queryable
 impl CommonProxy {
     pub fn new(object: &JsObject) -> JsResult<Self> {
         let provider: JsString = get_named_property(object, "provider")?;
@@ -68,11 +80,12 @@ impl CommonProxy {
     }
 }
 
+// TypeScript: DriverAdapter
 impl DriverProxy {
     pub fn new(object: &JsObject) -> JsResult<Self> {
         Ok(Self {
-            start_transaction: get_named_property(object, "startTransaction")?,
             get_connection_info: get_optional_named_property(object, "getConnectionInfo")?,
+            transaction_context: get_named_property(object, "transactionContext")?,
         })
     }
 
@@ -85,6 +98,20 @@ impl DriverProxy {
             }
         })
         .await
+    }
+
+    pub async fn transaction_context(&self) -> quaint::Result<Box<JsTransactionContext>> {
+        let ctx = self.transaction_context.call_as_async(()).await?;
+
+        Ok(Box::new(ctx))
+    }
+}
+
+impl TransactionContextProxy {
+    pub fn new(object: &JsObject) -> JsResult<Self> {
+        let start_transaction = get_named_property(object, "startTransaction")?;
+
+        Ok(Self { start_transaction })
     }
 
     async fn start_transaction_inner(&self) -> quaint::Result<Box<JsTransaction>> {
