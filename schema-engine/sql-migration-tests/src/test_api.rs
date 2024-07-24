@@ -183,7 +183,7 @@ impl TestApi {
             sql
         }
 
-        let sanitized = dbg!(sanitize(self, source));
+        let sanitized = sanitize(self, source);
 
         IntrospectSql::new(&mut self.connector, name, sanitized)
     }

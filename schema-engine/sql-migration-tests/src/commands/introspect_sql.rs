@@ -43,7 +43,7 @@ impl<'a> IntrospectSql<'a> {
 }
 
 pub struct IntrospectSqlAssertion {
-    output: IntrospectSqlQueryOutput,
+    pub output: IntrospectSqlQueryOutput,
 }
 
 impl std::fmt::Debug for IntrospectSqlAssertion {
@@ -54,7 +54,7 @@ impl std::fmt::Debug for IntrospectSqlAssertion {
 
 impl IntrospectSqlAssertion {
     #[track_caller]
-    pub fn expect_result(self, expectation: expect_test::Expect) {
+    pub fn expect_result(&self, expectation: expect_test::Expect) {
         expectation.assert_debug_eq(&self.output)
     }
 }

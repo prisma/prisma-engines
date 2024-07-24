@@ -1,3 +1,4 @@
+use quaint::Value;
 use sql_migration_tests::test_api::*;
 
 const SIMPLE_SCHEMA: &str = r#"
@@ -10,6 +11,24 @@ model model {
     bool    Boolean
     dt      DateTime
 }"#;
+
+fn typ_to_value(typ: &str) -> Value<'static> {
+    match typ {
+        "string" => Value::text("hello"),
+        "int" => Value::int32(i8::MAX),
+        "bigint" => Value::int64(i8::MAX),
+        "float" => Value::float(f32::EPSILON),
+        "double" => Value::double(f64::EPSILON),
+        "bytes" => Value::bytes("hello".as_bytes()),
+        "bool" => Value::boolean(false),
+        "datetime" => Value::datetime(
+            chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:00Z")
+                .unwrap()
+                .into(),
+        ),
+        _ => unimplemented!(),
+    }
+}
 
 #[test_connector(tags(Postgres, CockroachDb))]
 fn insert_pg(api: TestApi) {
@@ -98,6 +117,11 @@ fn insert_pg(api: TestApi) {
 fn insert_mysql(api: TestApi) {
     api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
+    let query =
+        "INSERT INTO `model` (`int`, `string`, `bigint`, `float`, `bytes`, `bool`, `dt`) VALUES (?, ?, ?, ?, ?, ?, ?);";
+
+    let res = api.introspect_sql("test_1", query).send_sync();
+
     let expected = expect![[r#"
         IntrospectSqlQueryOutput {
             documentation: "",
@@ -143,17 +167,28 @@ fn insert_mysql(api: TestApi) {
         }
     "#]];
 
-    api.introspect_sql(
-        "test_1",
-        "INSERT INTO `model` (`int`, `string`, `bigint`, `float`, `bytes`, `bool`, `dt`) VALUES (?, ?, ?, ?, ?, ?, ?);",
-    )
-    .send_sync()
-    .expect_result(expected)
+    res.expect_result(expected);
+
+    let values = res
+        .output
+        .parameters
+        .iter()
+        .map(|param| typ_to_value(&param.typ))
+        .collect::<Vec<_>>();
+
+    api.query_raw(&query, &values);
 }
 
 #[test_connector(tags(Mysql, Mariadb))]
 fn select_mysql(api: TestApi) {
     api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let res = api
+        .introspect_sql(
+            "test_1",
+            "SELECT `int`, `string`, `bigint`, `float`, `bytes`, `bool`, `dt` FROM `model`;",
+        )
+        .send_sync();
 
     let expected = expect![[r#"
         IntrospectSqlQueryOutput {
@@ -193,10 +228,5 @@ fn select_mysql(api: TestApi) {
         }
     "#]];
 
-    api.introspect_sql(
-        "test_1",
-        "SELECT `int`, `string`, `bigint`, `float`, `bytes`, `bool`, `dt` FROM `model`;",
-    )
-    .send_sync()
-    .expect_result(expected)
+    res.expect_result(expected);
 }
