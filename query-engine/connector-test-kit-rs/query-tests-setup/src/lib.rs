@@ -12,6 +12,7 @@ pub use config::*;
 pub use connector_tag::*;
 pub use datamodel_rendering::*;
 pub use error::*;
+use futures_util::StreamExt;
 pub use logging::*;
 pub use query_core;
 pub use query_result::*;
@@ -168,7 +169,6 @@ fn run_relation_link_test_impl(
             let (log_capture, log_tx) = TestLogCapture::new();
 
             futs.push(async move {
-                println!("Used datamodel:\n {}", datamodel.yellow());
                 let override_local_max_bind_values = None;
                 let runner = Runner::load(datamodel.clone(), &[], version, connector_tag, override_local_max_bind_values, metrics, log_capture)
                     .await
@@ -188,7 +188,7 @@ fn run_relation_link_test_impl(
         }
 
         run_with_tokio(async move {
-            futures_util::future::join_all(futs).await
+            futures_util::stream::iter(futs).buffer_unordered(30).collect::<Vec<_>>().await;
         });
     }
 }
