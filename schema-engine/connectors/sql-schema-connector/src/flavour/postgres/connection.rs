@@ -151,7 +151,7 @@ impl Connection {
         sql: &str,
         url: &PostgresUrl,
     ) -> ConnectorResult<quaint::connector::ParsedRawQuery> {
-        tracing::debug!(query_type = "parse_query_raw", sql);
+        tracing::debug!(query_type = "parse_raw_query", sql);
         self.0.parse_raw_query(sql).await.map_err(quaint_err(url))
     }
 

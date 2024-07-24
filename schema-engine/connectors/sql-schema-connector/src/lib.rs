@@ -352,7 +352,7 @@ impl SchemaConnector for SqlSchemaConnector {
         input: IntrospectSqlQueryInput,
     ) -> BoxFuture<'_, ConnectorResult<IntrospectSqlQueryOutput>> {
         Box::pin(async move {
-            let res = self.flavour.parse_query_raw(&input.source).await?;
+            let res = self.flavour.parse_raw_query(&input.source).await?;
             let parameters = res
                 .parameters
                 .into_iter()

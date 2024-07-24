@@ -175,7 +175,7 @@ pub(crate) trait SqlFlavour:
         self.describe_schema(namespaces)
     }
 
-    fn parse_query_raw<'a>(
+    fn parse_raw_query<'a>(
         &'a mut self,
         sql: &'a str,
     ) -> BoxFuture<'a, ConnectorResult<quaint::connector::ParsedRawQuery>>;

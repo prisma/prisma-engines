@@ -502,7 +502,7 @@ impl SqlFlavour for MssqlFlavour {
         self.schema_name()
     }
 
-    fn parse_query_raw<'a>(
+    fn parse_raw_query<'a>(
         &'a mut self,
         _sql: &str,
     ) -> BoxFuture<'a, ConnectorResult<quaint::connector::ParsedRawQuery>> {

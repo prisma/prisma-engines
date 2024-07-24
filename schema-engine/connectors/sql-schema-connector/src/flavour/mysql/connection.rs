@@ -115,12 +115,12 @@ impl Connection {
         self.0.query_raw(sql, params).await.map_err(quaint_err(url))
     }
 
-    pub(super) async fn parse_query_raw(
+    pub(super) async fn parse_raw_query(
         &self,
         sql: &str,
         url: &MysqlUrl,
     ) -> ConnectorResult<quaint::connector::ParsedRawQuery> {
-        tracing::debug!(query_type = "parse_query_raw", sql);
+        tracing::debug!(query_type = "parse_raw_query", sql);
         self.0.parse_raw_query(sql).await.map_err(quaint_err(url))
     }
 

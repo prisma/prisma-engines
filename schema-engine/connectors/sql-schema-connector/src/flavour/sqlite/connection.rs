@@ -73,8 +73,8 @@ impl Connection {
         ))
     }
 
-    pub(super) fn parse_query_raw(&mut self, sql: &str) -> ConnectorResult<quaint::connector::ParsedRawQuery> {
-        tracing::debug!(query_type = "parse_query_raw", sql);
+    pub(super) fn parse_raw_query(&mut self, sql: &str) -> ConnectorResult<quaint::connector::ParsedRawQuery> {
+        tracing::debug!(query_type = "parse_raw_query", sql);
         let conn = self.0.lock().unwrap();
         let stmt = conn.prepare_cached(sql).map_err(convert_error)?;
 
