@@ -1,10 +1,12 @@
 #[allow(missing_docs)]
+#[derive(Debug)]
 pub struct IntrospectSqlContext {
     pub queries: Vec<IntrospectSqlQueryInput>,
     pub force: bool,
 }
 
 #[allow(missing_docs)]
+#[derive(Debug)]
 pub struct IntrospectSqlQueryInput {
     pub name: String,
     pub source: String,
@@ -16,6 +18,7 @@ pub struct IntrospectSqlResult {
 }
 
 #[allow(missing_docs)]
+#[derive(Debug)]
 pub struct IntrospectSqlQueryOutput {
     pub documentation: String,
     pub name: String,
@@ -24,6 +27,7 @@ pub struct IntrospectSqlQueryOutput {
 }
 
 #[allow(missing_docs)]
+#[derive(Debug)]
 pub struct IntrospectSqlQueryParameterOutput {
     pub documentation: String,
     pub name: String,
@@ -31,6 +35,7 @@ pub struct IntrospectSqlQueryParameterOutput {
 }
 
 #[allow(missing_docs)]
+#[derive(Debug)]
 pub struct IntrospectSqlQueryColumnOutput {
     pub name: String,
     pub typ: String,

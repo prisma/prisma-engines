@@ -157,6 +157,37 @@ impl TestApi {
         EvaluateDataLoss::new(&mut self.connector, migrations_directory, files)
     }
 
+    pub fn introspect_sql<'a>(&'a mut self, name: &'a str, source: &'a str) -> IntrospectSql<'a> {
+        fn sanitize(api: &TestApi, sql: &str) -> String {
+            let mut counter = 1;
+            let mut sql = sql.to_string();
+
+            if api.is_mysql() || api.is_mariadb() {
+                return sql;
+            }
+
+            while let Some(idx) = sql.find('?') {
+                let replacer = if api.is_postgres() || api.is_cockroach() {
+                    format!("${}", counter)
+                } else if api.is_mssql() {
+                    format!("@P{}", counter)
+                } else {
+                    unimplemented!()
+                };
+
+                sql.replace_range(idx..idx + 1, &replacer);
+
+                counter += 1;
+            }
+
+            sql
+        }
+
+        let sanitized = dbg!(sanitize(self, source));
+
+        IntrospectSql::new(&mut self.connector, name, sanitized)
+    }
+
     /// Returns true only when testing on MSSQL.
     pub fn is_mssql(&self) -> bool {
         self.root.is_mssql()
