@@ -474,14 +474,21 @@ impl Queryable for PostgreSql {
     async fn parse_raw_query(&self, sql: &str) -> crate::Result<ParsedRawQuery> {
         let stmt = self.fetch_cached(sql, &[]).await?;
 
-        let columns = stmt.columns().iter().map(ParsedRawItem::from).collect();
+        let columns = stmt
+            .columns()
+            .iter()
+            .map(|p| ParsedRawItem {
+                name: p.name().to_string(),
+                typ: ColumnType::from(p.type_()),
+            })
+            .collect();
         let parameters = stmt
             .params()
             .iter()
             .enumerate()
             .map(|(idx, p)| ParsedRawItem {
                 name: format!("${idx}"),
-                typ: p.as_parsed_query_type(),
+                typ: ColumnType::from(p),
             })
             .collect();
 

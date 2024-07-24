@@ -249,8 +249,23 @@ impl Queryable for Mysql {
 
     async fn parse_raw_query(&self, sql: &str) -> crate::Result<ParsedRawQuery> {
         self.prepared(sql, |stmt| async move {
-            let columns = stmt.columns().iter().map(ParsedRawItem::from).collect();
-            let parameters = stmt.params().iter().map(ParsedRawItem::from).collect();
+            let columns = stmt
+                .columns()
+                .iter()
+                .map(|col| ParsedRawItem {
+                    name: col.name_str().into_owned(),
+                    typ: ColumnType::from(col),
+                })
+                .collect();
+            let parameters = stmt
+                .params()
+                .iter()
+                .enumerate()
+                .map(|(idx, col)| ParsedRawItem {
+                    name: format!("_{idx}"),
+                    typ: ColumnType::from(col),
+                })
+                .collect();
 
             Ok(ParsedRawQuery { columns, parameters })
         })
