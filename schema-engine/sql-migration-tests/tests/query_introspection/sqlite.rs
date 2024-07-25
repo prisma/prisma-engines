@@ -15,33 +15,44 @@ fn insert_sqlite(api: TestApi) {
         IntrospectSqlQueryOutput {
             documentation: "",
             name: "test_1",
-            parameters: [],
-            result_columns: [
-                IntrospectSqlQueryColumnOutput {
+            parameters: [
+                IntrospectSqlQueryParameterOutput {
+                    documentation: "",
                     name: "_1",
                     typ: "unknown",
                 },
-                IntrospectSqlQueryColumnOutput {
+                IntrospectSqlQueryParameterOutput {
+                    documentation: "",
                     name: "_2",
                     typ: "unknown",
                 },
-                IntrospectSqlQueryColumnOutput {
+                IntrospectSqlQueryParameterOutput {
+                    documentation: "",
                     name: "_3",
                     typ: "unknown",
                 },
-                IntrospectSqlQueryColumnOutput {
+                IntrospectSqlQueryParameterOutput {
+                    documentation: "",
                     name: "_4",
                     typ: "unknown",
                 },
-                IntrospectSqlQueryColumnOutput {
+                IntrospectSqlQueryParameterOutput {
+                    documentation: "",
                     name: "_5",
                     typ: "unknown",
                 },
-                IntrospectSqlQueryColumnOutput {
+                IntrospectSqlQueryParameterOutput {
+                    documentation: "",
                     name: "_6",
                     typ: "unknown",
                 },
+                IntrospectSqlQueryParameterOutput {
+                    documentation: "",
+                    name: "_7",
+                    typ: "unknown",
+                },
             ],
+            result_columns: [],
         }
     "#]];
 
@@ -63,44 +74,37 @@ fn select_sqlite(api: TestApi) {
         IntrospectSqlQueryOutput {
             documentation: "",
             name: "test_1",
-            parameters: [
-                IntrospectSqlQueryParameterOutput {
-                    documentation: "",
-                    name: "_0",
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "int",
                     typ: "int",
                 },
-                IntrospectSqlQueryParameterOutput {
-                    documentation: "",
-                    name: "_1",
+                IntrospectSqlQueryColumnOutput {
+                    name: "string",
                     typ: "string",
                 },
-                IntrospectSqlQueryParameterOutput {
-                    documentation: "",
-                    name: "_2",
+                IntrospectSqlQueryColumnOutput {
+                    name: "bigint",
                     typ: "bigint",
                 },
-                IntrospectSqlQueryParameterOutput {
-                    documentation: "",
-                    name: "_3",
+                IntrospectSqlQueryColumnOutput {
+                    name: "float",
                     typ: "double",
                 },
-                IntrospectSqlQueryParameterOutput {
-                    documentation: "",
-                    name: "_4",
+                IntrospectSqlQueryColumnOutput {
+                    name: "bytes",
                     typ: "bytes",
                 },
-                IntrospectSqlQueryParameterOutput {
-                    documentation: "",
-                    name: "_5",
+                IntrospectSqlQueryColumnOutput {
+                    name: "bool",
                     typ: "bool",
                 },
-                IntrospectSqlQueryParameterOutput {
-                    documentation: "",
-                    name: "_6",
+                IntrospectSqlQueryColumnOutput {
+                    name: "dt",
                     typ: "datetime",
                 },
             ],
-            result_columns: [],
         }
     "#]];
 

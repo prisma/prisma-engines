@@ -10,7 +10,10 @@ pub use test_macros::test_connector;
 pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
 
 use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
-use psl::parser_database::SourceFile;
+use psl::{
+    datamodel_connector::NativeTypeInstance,
+    parser_database::{ScalarType, SourceFile},
+};
 use quaint::{
     prelude::{ConnectionInfo, ResultSet},
     Value,
@@ -479,6 +482,10 @@ impl TestApi {
         out.push_str(schema);
 
         out
+    }
+
+    pub fn scalar_type_for_native_type(&self, typ: &NativeTypeInstance) -> ScalarType {
+        self.connector.scalar_type_for_native_type(typ)
     }
 }
 

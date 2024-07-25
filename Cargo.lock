@@ -5062,6 +5062,7 @@ dependencies = [
  "indoc 2.0.3",
  "jsonrpc-core",
  "once_cell",
+ "paste",
  "pretty_assertions",
  "prisma-value",
  "psl",

@@ -19,7 +19,7 @@ use database_schema::SqlDatabaseSchema;
 use enumflags2::BitFlags;
 use flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFlavour};
 use migration_pair::MigrationPair;
-use psl::ValidatedSchema;
+use psl::{datamodel_connector::NativeTypeInstance, parser_database::ScalarType, ValidatedSchema};
 use schema_connector::{migrations_directory::MigrationDirectory, *};
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer as sql;
@@ -148,6 +148,13 @@ impl SqlSchemaConnector {
             DiffTarget::Database => self.flavour.describe_schema(namespaces).await.map(From::from),
             DiffTarget::Empty => Ok(self.flavour.empty_database_schema().into()),
         }
+    }
+
+    /// Returns the native types that can be used to represent the given scalar type.
+    pub fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
+        self.flavour
+            .datamodel_connector()
+            .scalar_type_for_native_type(native_type)
     }
 }
 

@@ -78,17 +78,16 @@ impl Connection {
         let conn = self.0.lock().unwrap();
         let stmt = conn.prepare_cached(sql).map_err(convert_error)?;
 
-        let parameters = stmt
-            .columns()
-            .iter()
-            .enumerate()
-            .map(|(idx, col)| ParsedRawItem::new_unnamed(idx, col))
-            .collect();
-        let columns = (1..stmt.parameter_count())
+        let parameters = (1..=stmt.parameter_count())
             .map(|idx| match stmt.parameter_name(idx) {
                 Some(name) => ParsedRawItem::new_named(name, ColumnType::Unknown),
                 None => ParsedRawItem::new_unnamed(idx, ColumnType::Unknown),
             })
+            .collect();
+        let columns = stmt
+            .columns()
+            .iter()
+            .map(|col| ParsedRawItem::new_named(col.name(), col))
             .collect();
 
         Ok(quaint::connector::ParsedRawQuery { columns, parameters })

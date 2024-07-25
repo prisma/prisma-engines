@@ -1,3 +1,4 @@
+use quaint::prelude::ColumnType;
 use schema_core::{
     schema_connector::{IntrospectSqlQueryInput, IntrospectSqlQueryOutput, SchemaConnector},
     CoreError, CoreResult,
@@ -52,5 +53,43 @@ impl IntrospectSqlAssertion {
     #[track_caller]
     pub fn expect_result(&self, expectation: expect_test::Expect) {
         expectation.assert_debug_eq(&self.output)
+    }
+
+    #[track_caller]
+    pub fn expect_param_type(self, idx: usize, ty: ColumnType) -> Self {
+        let param = &self
+            .output
+            .parameters
+            .get(idx)
+            .expect(&format!("parameter at index {idx} not found"));
+        let param_name = &param.name;
+        let actual_typ = &param.typ;
+        let expected_typ = &ty.to_string();
+
+        assert_eq!(
+            expected_typ, actual_typ,
+            "expected param {param_name} to be of type {expected_typ}, got: {actual_typ}",
+        );
+
+        self
+    }
+
+    #[track_caller]
+    pub fn expect_column_type(self, idx: usize, ty: ColumnType) -> Self {
+        let column = &self
+            .output
+            .result_columns
+            .get(idx)
+            .expect(&format!("column at index {idx} not found"));
+        let column_name = &column.name;
+        let actual_typ = &column.typ;
+        let expected_typ = &ty.to_string();
+
+        assert_eq!(
+            expected_typ, actual_typ,
+            "expected column {column_name} to be of type {expected_typ}, got: {actual_typ}"
+        );
+
+        self
     }
 }
