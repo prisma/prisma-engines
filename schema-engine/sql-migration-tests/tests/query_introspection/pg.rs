@@ -1,6 +1,6 @@
 use super::utils::*;
 
-use psl::{builtin_connectors::PostgresType, parser_database::ScalarType};
+use psl::builtin_connectors::{CockroachType, PostgresType};
 use quaint::prelude::ColumnType;
 use sql_migration_tests::test_api::*;
 
@@ -74,8 +74,8 @@ fn empty_result(api: TestApi) {
         .expect_result(expected)
 }
 
-#[test_connector(tags(Postgres, CockroachDb))]
-fn unnamed_expr(api: TestApi) {
+#[test_connector(tags(Postgres))]
+fn unnamed_expr_pg(api: TestApi) {
     api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
     let expected = expect![[r#"
@@ -86,7 +86,7 @@ fn unnamed_expr(api: TestApi) {
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
                     name: "?column?",
-                    typ: "int",
+                    typ: "bigint",
                 },
             ],
         }
@@ -97,8 +97,31 @@ fn unnamed_expr(api: TestApi) {
         .expect_result(expected)
 }
 
-#[test_connector(tags(Postgres, CockroachDb))]
-fn named_expr(api: TestApi) {
+#[test_connector(tags(CockroachDb))]
+fn unnamed_expr_crdb(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            documentation: "",
+            name: "test_1",
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "?column?",
+                    typ: "bigint",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT 1 + 1;")
+        .send_sync()
+        .expect_result(expected)
+}
+
+#[test_connector(tags(Postgres))]
+fn named_expr_pg(api: TestApi) {
     api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
     let expected = expect![[r#"
@@ -109,7 +132,7 @@ fn named_expr(api: TestApi) {
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
                     name: "add",
-                    typ: "int",
+                    typ: "bigint",
                 },
             ],
         }
@@ -120,74 +143,65 @@ fn named_expr(api: TestApi) {
         .expect_result(expected)
 }
 
-const DATASOURCE: &str = r#"
+#[test_connector(tags(CockroachDb))]
+fn named_expr_crdb(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            documentation: "",
+            name: "test_1",
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "add",
+                    typ: "bigint",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT 1 + 1 as add;")
+        .send_sync()
+        .expect_result(expected)
+}
+
+macro_rules! test_native_types_pg {
+    (
+        $($test_name:ident($nt:expr) => $ct:ident,)*
+    ) => {
+        $(
+            paste::paste! {
+                #[test_connector(tags(Postgres), exclude(CockroachDb))]
+                fn [<pg _ $test_name>](api: TestApi) {
+                    let dm = render_native_type_datamodel::<PostgresType>(&api, PG_DATASOURCE, $nt.to_parts(), $nt);
+
+                    if PostgresType::Citext == $nt {
+                        api.raw_cmd("CREATE EXTENSION IF NOT EXISTS citext;");
+                    }
+
+                    api.schema_push(&dm).send();
+
+                    let query = "INSERT INTO test (field) VALUES (?) RETURNING field;";
+
+                    api.introspect_sql("test", query)
+                        .send_sync()
+                        .expect_param_type(0, ColumnType::$ct)
+                        .expect_column_type(0, ColumnType::$ct);
+                }
+            }
+        )*
+    };
+}
+
+const PG_DATASOURCE: &str = r#"
   datasource db {
     provider = "postgres"
     url      = "postgresql://localhost:5432"
 }
 "#;
 
-macro_rules! test_scalar_types {
-    ($
-        ($test_name:ident($st:expr) => $ct:ident,)
-    *) => {
-        $(
-            #[test_connector(tags(Postgres, CockroachDb))]
-            fn $test_name(api: TestApi) {
-                let dm = render_scalar_type_datamodel(DATASOURCE, $st);
-
-                api.schema_push(&dm).send();
-
-                let query = "INSERT INTO test (field) VALUES (?) RETURNING field;";
-
-                api.introspect_sql("test", query)
-                    .send_sync()
-                    .expect_param_type(0, ColumnType::$ct)
-                    .expect_column_type(0, ColumnType::$ct);
-            }
-        )*
-    };
-}
-
-macro_rules! test_native_types {
-    ($
-        ($test_name:ident($nt:expr) => $ct:ident,)
-    *) => {
-        $(
-            #[test_connector(tags(Postgres, CockroachDb))]
-            fn $test_name(api: TestApi) {
-                let dm = render_native_type_datamodel::<PostgresType>(&api, DATASOURCE, $nt.to_parts(), $nt);
-
-                if $nt == PostgresType::Citext {
-                    api.raw_cmd("CREATE EXTENSION IF NOT EXISTS citext;");
-                }
-
-                api.schema_push(&dm).send();
-
-                let query = "INSERT INTO test (field) VALUES (?) RETURNING field;";
-
-                api.introspect_sql("test", query)
-                    .send_sync()
-                    .expect_param_type(0, ColumnType::$ct)
-                    .expect_column_type(0, ColumnType::$ct);
-            }
-        )*
-    };
-}
-
-test_scalar_types! {
-    int(ScalarType::Int) => Int32,
-    string(ScalarType::String) => Text,
-    bigint(ScalarType::BigInt) => Int64,
-    float(ScalarType::Float) => Double,
-    bytes(ScalarType::Bytes) => Bytes,
-    bool(ScalarType::Boolean) => Boolean,
-    datetime(ScalarType::DateTime) => DateTime,
-    decimal(ScalarType::Decimal) => Numeric,
-    json(ScalarType::Json) => Json,
-}
-
-test_native_types! {
+test_native_types_pg! {
     small_int(PostgresType::SmallInt) => Int32,
     integer(PostgresType::Integer) => Int32,
     big_int(PostgresType::BigInt) => Int64,
@@ -214,4 +228,60 @@ test_native_types! {
     xml(PostgresType::Xml) => Xml,
     nt_json(PostgresType::Json) => Json,
     json_b(PostgresType::JsonB) => Json,
+}
+
+macro_rules! test_native_types_crdb {
+    (
+        $($test_name:ident($nt:expr) => $ct:ident,)*
+    ) => {
+        $(
+            paste::paste! {
+                #[test_connector(tags(CockroachDb))]
+                fn [<crdb _ $test_name>](api: TestApi) {
+                    let dm = render_native_type_datamodel::<CockroachType>(&api, CRDB_DATASOURCE, $nt.to_parts(), $nt);
+
+                    api.schema_push(&dm).send();
+
+                    let query = "INSERT INTO test (id, field) VALUES (?, ?) RETURNING field;";
+
+                    api.introspect_sql("test", query)
+                        .send_sync()
+                        .expect_param_type(1, ColumnType::$ct)
+                        .expect_column_type(0, ColumnType::$ct);
+                }
+            }
+        )*
+    };
+}
+
+const CRDB_DATASOURCE: &str = r#"
+  datasource db {
+    provider = "cockroachdb"
+    url      = "postgresql://localhost:5432"
+}
+"#;
+
+test_native_types_crdb! {
+    bit(CockroachType::Bit(Some(1))) => Text,
+    boolean(CockroachType::Bool) => Boolean,
+    nt_bytes(CockroachType::Bytes) => Bytes,
+    char(CockroachType::Char(Some(255))) => Text,
+    date(CockroachType::Date) => Date,
+    nt_decimal(CockroachType::Decimal(Some((4, 4)))) => Numeric,
+    float4(CockroachType::Float4) => Float,
+    float8(CockroachType::Float8) => Double,
+    inet(CockroachType::Inet) => Text,
+    int2(CockroachType::Int2) => Int32,
+    int4(CockroachType::Int4) => Int32,
+    int8(CockroachType::Int8) => Int64,
+    json_b(CockroachType::JsonB) => Json,
+    oid(CockroachType::Oid) => Int64,
+    catalog_single_char(CockroachType::CatalogSingleChar) => Char,
+    nt_string(CockroachType::String(Some(255))) => Text,
+    time(CockroachType::Time(Some(1))) => Time,
+    timestamp(CockroachType::Timestamp(Some(1))) => DateTime,
+    timestamptz(CockroachType::Timestamptz(Some(1))) => DateTime,
+    timetz(CockroachType::Timetz(Some(1))) => Time,
+    uuid(CockroachType::Uuid) => Uuid,
+    var_bit(CockroachType::VarBit(Some(1))) => Text,
 }

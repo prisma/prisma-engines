@@ -61,7 +61,7 @@ impl IntrospectSqlAssertion {
             .output
             .parameters
             .get(idx)
-            .expect(&format!("parameter at index {idx} not found"));
+            .unwrap_or_else(|| panic!("parameter at index {idx} not found"));
         let param_name = &param.name;
         let actual_typ = &param.typ;
         let expected_typ = &ty.to_string();
@@ -80,7 +80,7 @@ impl IntrospectSqlAssertion {
             .output
             .result_columns
             .get(idx)
-            .expect(&format!("column at index {idx} not found"));
+            .unwrap_or_else(|| panic!("column at index {idx} not found"));
         let column_name = &column.name;
         let actual_typ = &column.typ;
         let expected_typ = &ty.to_string();
