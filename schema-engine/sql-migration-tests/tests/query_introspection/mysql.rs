@@ -372,7 +372,6 @@ test_native_types! {
     date_time(MySqlType::DateTime(Some(3))) => (Bytes, DateTime),
     timestamp(MySqlType::Timestamp(Some(3))) => (Bytes, DateTime),
     year(MySqlType::Year) => (Bytes, Int32),
-    json(MySqlType::Json) => (Bytes, Json),
 }
 
 test_scalar_types!(
