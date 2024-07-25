@@ -110,3 +110,78 @@ fn select_sqlite(api: TestApi) {
 
     res.expect_result(expected);
 }
+
+#[test_connector(tags(Sqlite))]
+fn empty_result(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            documentation: "",
+            name: "test_1",
+            parameters: [
+                IntrospectSqlQueryParameterOutput {
+                    documentation: "",
+                    name: "_1",
+                    typ: "unknown",
+                },
+            ],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "int",
+                    typ: "int",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT int FROM model WHERE 1 = 0 AND int = ?;")
+        .send_sync()
+        .expect_result(expected)
+}
+
+#[test_connector(tags(Sqlite))]
+fn unnamed_expr(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            documentation: "",
+            name: "test_1",
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "1 + 1",
+                    typ: "unknown",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT 1 + 1;")
+        .send_sync()
+        .expect_result(expected)
+}
+
+#[test_connector(tags(Sqlite))]
+fn named_expr(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            documentation: "",
+            name: "test_1",
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "add",
+                    typ: "unknown",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT 1 + 1 as \"add\";")
+        .send_sync()
+        .expect_result(expected)
+}

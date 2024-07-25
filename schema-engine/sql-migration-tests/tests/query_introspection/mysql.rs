@@ -112,6 +112,81 @@ fn select_mysql(api: TestApi) {
     res.expect_result(expected);
 }
 
+#[test_connector(tags(Mysql8))]
+fn empty_result(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            documentation: "",
+            name: "test_1",
+            parameters: [
+                IntrospectSqlQueryParameterOutput {
+                    documentation: "",
+                    name: "int4",
+                    typ: "int",
+                },
+            ],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "int",
+                    typ: "int",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT int FROM model WHERE 1 = 0 AND int = ?;")
+        .send_sync()
+        .expect_result(expected)
+}
+
+#[test_connector(tags(Mysql8))]
+fn unnamed_expr(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            documentation: "",
+            name: "test_1",
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "1 + 1",
+                    typ: "bigint",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT 1 + 1;")
+        .send_sync()
+        .expect_result(expected)
+}
+
+#[test_connector(tags(Mysql8))]
+fn named_expr(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            documentation: "",
+            name: "test_1",
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "add",
+                    typ: "int",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT 1 + 1 as add;")
+        .send_sync()
+        .expect_result(expected)
+}
+
 const DATASOURCE: &str = r#"
   datasource db {
     provider = "mysql"
