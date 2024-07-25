@@ -252,19 +252,13 @@ impl Queryable for Mysql {
             let columns = stmt
                 .columns()
                 .iter()
-                .map(|col| ParsedRawItem {
-                    name: col.name_str().into_owned(),
-                    typ: ColumnType::from(col),
-                })
+                .map(|col| ParsedRawItem::new_named(col.name_str(), col))
                 .collect();
             let parameters = stmt
                 .params()
                 .iter()
                 .enumerate()
-                .map(|(idx, col)| ParsedRawItem {
-                    name: format!("_{idx}"),
-                    typ: ColumnType::from(col),
-                })
+                .map(|(idx, col)| ParsedRawItem::new_unnamed(idx, col))
                 .collect();
 
             Ok(ParsedRawQuery { columns, parameters })

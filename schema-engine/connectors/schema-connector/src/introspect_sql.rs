@@ -46,7 +46,7 @@ impl From<quaint::connector::ParsedRawItem> for IntrospectSqlQueryParameterOutpu
         Self {
             name: item.name,
             documentation: String::new(),
-            typ: item.typ.to_string(),
+            typ: item.enum_name.unwrap_or_else(|| item.typ.to_string()),
         }
     }
 }
@@ -55,7 +55,7 @@ impl From<quaint::connector::ParsedRawItem> for IntrospectSqlQueryColumnOutput {
     fn from(item: quaint::connector::ParsedRawItem) -> Self {
         Self {
             name: item.name,
-            typ: item.typ.to_string(),
+            typ: item.enum_name.unwrap_or_else(|| item.typ.to_string()),
         }
     }
 }

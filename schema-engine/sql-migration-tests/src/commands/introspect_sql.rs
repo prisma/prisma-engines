@@ -14,7 +14,7 @@ impl<'a> IntrospectSql<'a> {
     pub fn new(api: &'a mut dyn SchemaConnector, name: &'a str, source: String) -> Self {
         Self {
             api,
-            name: name,
+            name,
             source,
         }
     }

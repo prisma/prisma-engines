@@ -22,6 +22,7 @@ use futures::{future::FutureExt, lock::Mutex};
 use lru_cache::LruCache;
 use native_tls::{Certificate, Identity, TlsConnector};
 use postgres_native_tls::MakeTlsConnector;
+use postgres_types::{Kind as PostgresKind, Type as PostgresType};
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::{
     borrow::Borrow,
@@ -473,24 +474,40 @@ impl Queryable for PostgreSql {
 
     async fn parse_raw_query(&self, sql: &str) -> crate::Result<ParsedRawQuery> {
         let stmt = self.fetch_cached(sql, &[]).await?;
+        let mut columns: Vec<ParsedRawItem> = Vec::with_capacity(stmt.columns().len());
+        let mut parameters: Vec<ParsedRawItem> = Vec::with_capacity(stmt.params().len());
 
-        let columns = stmt
-            .columns()
-            .iter()
-            .map(|p| ParsedRawItem {
-                name: p.name().to_string(),
-                typ: ColumnType::from(p.type_()),
-            })
-            .collect();
-        let parameters = stmt
-            .params()
-            .iter()
-            .enumerate()
-            .map(|(idx, p)| ParsedRawItem {
-                name: format!("${idx}"),
-                typ: ColumnType::from(p),
-            })
-            .collect();
+        async fn infer_type(this: &PostgreSql, ty: &PostgresType) -> crate::Result<(ColumnType, Option<String>)> {
+            let column_type = ColumnType::from(ty);
+
+            match ty.kind() {
+                PostgresKind::Enum => {
+                    let enum_name = this
+                        .query_raw("SELECT typname FROM pg_type WHERE oid = $1;", &[Value::int64(ty.oid())])
+                        .await?
+                        .into_single()?
+                        .at(0)
+                        .expect("could not find enum name")
+                        .to_string()
+                        .expect("enum name is not a string");
+
+                    Ok((column_type, Some(enum_name)))
+                }
+                _ => Ok((column_type, None)),
+            }
+        }
+
+        for col in stmt.columns() {
+            let (typ, enum_name) = infer_type(self, col.type_()).await?;
+
+            columns.push(ParsedRawItem::new_named(col.name(), typ).with_enum_name(enum_name));
+        }
+
+        for param in stmt.params() {
+            let (typ, enum_name) = infer_type(self, param).await?;
+
+            parameters.push(ParsedRawItem::new_named(param.name(), typ).with_enum_name(enum_name));
+        }
 
         Ok(ParsedRawQuery { columns, parameters })
     }

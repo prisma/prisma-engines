@@ -82,19 +82,12 @@ impl Connection {
             .columns()
             .iter()
             .enumerate()
-            .map(|(idx, col)| ParsedRawItem {
-                name: format!("_{idx}"),
-                typ: ColumnType::from(col),
-            })
+            .map(|(idx, col)| ParsedRawItem::new_unnamed(idx, col))
             .collect();
         let columns = (1..stmt.parameter_count())
-            .into_iter()
-            .map(|idx| ParsedRawItem {
-                name: stmt
-                    .parameter_name(idx)
-                    .map(ToOwned::to_owned)
-                    .unwrap_or_else(|| format!("unnamed_{idx}")),
-                typ: ColumnType::Unknown,
+            .map(|idx| match stmt.parameter_name(idx) {
+                Some(name) => ParsedRawItem::new_named(name, ColumnType::Unknown),
+                None => ParsedRawItem::new_unnamed(idx, ColumnType::Unknown),
             })
             .collect();
 
