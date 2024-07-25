@@ -12,6 +12,19 @@ model model {
     dt      DateTime
 }"#;
 
+const ENUM_SCHEMA: &str = r#"
+model model {
+    id     Int     @id
+    enum    MyFancyEnum
+}
+
+enum MyFancyEnum {
+    A
+    B
+    C
+}
+"#;
+
 fn typ_to_value(typ: &str) -> Value<'static> {
     match typ {
         "string" => Value::text("hello"),
@@ -41,37 +54,37 @@ fn insert_pg(api: TestApi) {
             parameters: [
                 IntrospectSqlQueryParameterOutput {
                     documentation: "",
-                    name: "$0",
+                    name: "int4",
                     typ: "int",
                 },
                 IntrospectSqlQueryParameterOutput {
                     documentation: "",
-                    name: "$1",
+                    name: "text",
                     typ: "string",
                 },
                 IntrospectSqlQueryParameterOutput {
                     documentation: "",
-                    name: "$2",
+                    name: "int8",
                     typ: "bigint",
                 },
                 IntrospectSqlQueryParameterOutput {
                     documentation: "",
-                    name: "$3",
+                    name: "float8",
                     typ: "double",
                 },
                 IntrospectSqlQueryParameterOutput {
                     documentation: "",
-                    name: "$4",
+                    name: "bytea",
                     typ: "bytes",
                 },
                 IntrospectSqlQueryParameterOutput {
                     documentation: "",
-                    name: "$5",
+                    name: "bool",
                     typ: "bool",
                 },
                 IntrospectSqlQueryParameterOutput {
                     documentation: "",
-                    name: "$6",
+                    name: "timestamp",
                     typ: "datetime",
                 },
             ],
@@ -109,6 +122,44 @@ fn insert_pg(api: TestApi) {
     "#]];
 
     api.introspect_sql("test_1", "INSERT INTO model (int, string, bigint, float, bytes, bool, dt) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING int, string, bigint, float, bytes, bool, dt;")
+        .send_sync()
+        .expect_result(expected)
+}
+
+#[test_connector(tags(Postgres, CockroachDb))]
+fn enum_pg(api: TestApi) {
+    api.schema_push(ENUM_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            documentation: "",
+            name: "test_1",
+            parameters: [
+                IntrospectSqlQueryParameterOutput {
+                    documentation: "",
+                    name: "int4",
+                    typ: "int",
+                },
+                IntrospectSqlQueryParameterOutput {
+                    documentation: "",
+                    name: "MyFancyEnum",
+                    typ: "MyFancyEnum",
+                },
+            ],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "id",
+                    typ: "int",
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "enum",
+                    typ: "MyFancyEnum",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "INSERT INTO model (id, enum) VALUES (?, ?) RETURNING id, enum;")
         .send_sync()
         .expect_result(expected)
 }
