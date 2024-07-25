@@ -12,11 +12,7 @@ pub struct IntrospectSql<'a> {
 
 impl<'a> IntrospectSql<'a> {
     pub fn new(api: &'a mut dyn SchemaConnector, name: &'a str, source: String) -> Self {
-        Self {
-            api,
-            name,
-            source,
-        }
+        Self { api, name, source }
     }
 
     pub async fn send(self) -> CoreResult<IntrospectSqlAssertion> {
