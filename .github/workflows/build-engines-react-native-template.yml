@@ -7,6 +7,10 @@ on:
         description: 'Commit on the given branch to build'
         type: string
         required: false
+      uploadArtifacts:
+        description: If the job should upload artifacts after build finishes
+        type: boolean
+        default: true
 
 jobs:
   build-ios:
@@ -46,6 +50,7 @@ jobs:
           ls -la .
 
       - uses: actions/upload-artifact@v4
+        if: ${{ inputs.uploadArtifacts }}
         with:
           name: ios
           path: |
@@ -90,6 +95,7 @@ jobs:
           ls -la .
 
       - uses: actions/upload-artifact@v4
+        if: ${{ inputs.uploadArtifacts }}
         with:
           name: android
           path: |
