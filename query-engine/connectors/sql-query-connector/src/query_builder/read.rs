@@ -100,7 +100,7 @@ impl SelectDefinition for QueryArguments {
             .so_that(conditions)
             .offset(skip as usize)
             .append_trace(&Span::current())
-            .add_trace_id(ctx.traceparent);
+            .add_traceparent(ctx.traceparent);
 
         let select_ast = order_by_definitions
             .iter()
@@ -137,7 +137,7 @@ where
     let (select, additional_selection_set) = query.into_select(model, virtual_selections, ctx);
     let select = columns.fold(select, |acc, col| acc.column(col));
 
-    let select = select.append_trace(&Span::current()).add_trace_id(ctx.traceparent);
+    let select = select.append_trace(&Span::current()).add_traceparent(ctx.traceparent);
 
     additional_selection_set
         .into_iter()
@@ -183,7 +183,7 @@ pub(crate) fn aggregate(
     selections.iter().fold(
         Select::from_table(sub_table)
             .append_trace(&Span::current())
-            .add_trace_id(ctx.traceparent),
+            .add_traceparent(ctx.traceparent),
         |select, next_op| match next_op {
             AggregationSelection::Field(field) => select.column(
                 Column::from(field.db_name().to_owned())
@@ -271,7 +271,7 @@ pub(crate) fn group_by_aggregate(
     let grouped = group_by.into_iter().fold(
         select_query
             .append_trace(&Span::current())
-            .add_trace_id(ctx.traceparent),
+            .add_traceparent(ctx.traceparent),
         |query, field| query.group_by(field.as_column(ctx)),
     );
 

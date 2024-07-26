@@ -14,7 +14,7 @@ pub fn trace_parent_to_string(context: &SpanContext) -> String {
 
 pub trait SqlTraceComment: Sized {
     fn append_trace(self, span: &Span) -> Self;
-    fn add_trace_id(self, traceparent: Option<TraceParent>) -> Self;
+    fn add_traceparent(self, traceparent: Option<TraceParent>) -> Self;
 }
 
 macro_rules! sql_trace {
@@ -31,8 +31,9 @@ macro_rules! sql_trace {
                     self
                 }
             }
+
             // Temporary method to pass the traceid in an operation
-            fn add_trace_id(self, traceparent: Option<TraceParent>) -> Self {
+            fn add_traceparent(self, traceparent: Option<TraceParent>) -> Self {
                 if let Some(traceparent) = traceparent {
                     self.comment(format!("traceparent='{}'", traceparent))
                 } else {
