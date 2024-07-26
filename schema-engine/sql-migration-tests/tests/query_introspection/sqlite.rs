@@ -190,3 +190,75 @@ fn named_expr(api: TestApi) {
         .send_sync()
         .expect_result(expected)
 }
+
+#[test_connector(tags(Sqlite))]
+fn mixed_named_expr(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "SELECT `int` + 1 as \"add\" FROM `model`;",
+            documentation: "",
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "add",
+                    typ: "unknown",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT `int` + 1 as \"add\" FROM `model`;")
+        .send_sync()
+        .expect_result(expected)
+}
+
+#[test_connector(tags(Sqlite))]
+fn mixed_unnamed_expr(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "SELECT `int` + 1 FROM `model`;",
+            documentation: "",
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "`int` + 1",
+                    typ: "unknown",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT `int` + 1 FROM `model`;")
+        .send_sync()
+        .expect_result(expected)
+}
+
+#[test_connector(tags(Sqlite))]
+fn mixed_expr_cast(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "SELECT CAST(`int` + 1 as int) FROM `model`;",
+            documentation: "",
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "CAST(`int` + 1 as int)",
+                    typ: "unknown",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT CAST(`int` + 1 as int) FROM `model`;")
+        .send_sync()
+        .expect_result(expected)
+}
