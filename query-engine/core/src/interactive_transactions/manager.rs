@@ -4,6 +4,7 @@ use lru::LruCache;
 use once_cell::sync::Lazy;
 use schema::QuerySchemaRef;
 use std::{collections::HashMap, sync::Arc};
+use telemetry::helpers::TraceParent;
 use tokio::{
     sync::{
         mpsc::{unbounded_channel, UnboundedSender},
@@ -145,7 +146,7 @@ impl ITXManager {
         &self,
         tx_id: &TxId,
         operation: Operation,
-        traceparent: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<ResponseData> {
         self.get_transaction(tx_id, "query")
             .await?
@@ -159,7 +160,7 @@ impl ITXManager {
         &self,
         tx_id: &TxId,
         operations: Vec<Operation>,
-        traceparent: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         self.get_transaction(tx_id, "batch query")
             .await?

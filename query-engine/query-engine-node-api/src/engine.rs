@@ -4,7 +4,7 @@ use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsObject
 use napi_derive::napi;
 use psl::PreviewFeature;
 use quaint::connector::ExternalConnector;
-use query_core::{protocol::EngineProtocol, relation_load_strategy, schema, telemetry, TransactionOptions, TxId};
+use query_core::{protocol::EngineProtocol, relation_load_strategy, schema, TransactionOptions, TxId};
 use query_engine_common::engine::{
     map_known_error, stringify_env_values, ConnectedEngine, ConnectedEngineNative, ConstructorOptions,
     ConstructorOptionsNative, EngineBuilder, EngineBuilderNative, Inner,
@@ -14,8 +14,10 @@ use request_handlers::{load_executor, render_graphql_schema, ConnectorKind, Requ
 use serde::Deserialize;
 use serde_json::json;
 use std::{collections::HashMap, future::Future, marker::PhantomData, panic::AssertUnwindSafe, sync::Arc};
+use telemetry::helpers::TraceParent;
 use tokio::sync::RwLock;
 use tracing::{field, instrument::WithSubscriber, Instrument, Span};
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 use tracing_subscriber::filter::LevelFilter;
 use user_facing_errors::Error;
 
@@ -71,11 +73,11 @@ impl QueryEngine {
             native,
         } = napi_env.from_js_value(options).expect(
             r###"
-            Failed to deserialize constructor options. 
-            
-            This usually happens when the javascript object passed to the constructor is missing 
+            Failed to deserialize constructor options.
+
+            This usually happens when the javascript object passed to the constructor is missing
             properties for the ConstructorOptions fields that must have some value.
-            
+
             If you set some of these in javascript trough environment variables, make sure there are
             values for data_model, log_level, and any field that is not Option<T>
             "###,
@@ -178,7 +180,8 @@ impl QueryEngine {
 
         async_panic_to_js_error(async {
             let span = tracing::info_span!("prisma:engine:connect");
-            let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+            let parent_context = telemetry::helpers::restore_context_from_json_str(&trace);
+            span.set_parent(parent_context);
 
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
@@ -280,7 +283,8 @@ impl QueryEngine {
 
         async_panic_to_js_error(async {
             let span = tracing::info_span!("prisma:engine:disconnect");
-            let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+            let parent_context = telemetry::helpers::restore_context_from_json_str(&trace);
+            span.set_parent(parent_context);
 
             // TODO: when using Node Drivers, we need to call Driver::close() here.
 
@@ -325,11 +329,13 @@ impl QueryEngine {
                 Span::none()
             };
 
-            let trace_id = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+            let parent_context = telemetry::helpers::restore_context_from_json_str(&trace);
+            let traceparent = TraceParent::from_context(&parent_context);
+            span.set_parent(parent_context);
 
             async move {
                 let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
-                let response = handler.handle(query, tx_id.map(TxId::from), trace_id).await;
+                let response = handler.handle(query, tx_id.map(TxId::from), traceparent).await;
 
                 let serde_span = tracing::info_span!("prisma:engine:response_json_serialization", user_facing = true);
                 Ok(serde_span.in_scope(|| serde_json::to_string(&response))?)
@@ -352,7 +358,8 @@ impl QueryEngine {
 
             async move {
                 let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
-                telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+                let parent_context = telemetry::helpers::restore_context_from_json_str(&trace);
+                span.set_parent(parent_context);
 
                 let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
                 match engine

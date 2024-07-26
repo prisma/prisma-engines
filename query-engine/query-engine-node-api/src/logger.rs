@@ -1,6 +1,6 @@
 use core::fmt;
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction, ThreadsafeFunctionCallMode};
-use query_core::telemetry;
+
 use query_engine_common::logger::StringCallback;
 use query_engine_metrics::MetricRegistry;
 use serde_json::Value;

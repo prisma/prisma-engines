@@ -9,7 +9,7 @@ use once_cell::sync::Lazy;
 use query_core::{
     protocol::EngineProtocol,
     schema::{self},
-    telemetry, TransactionOptions, TxId,
+    TransactionOptions, TxId,
 };
 use request_handlers::{load_executor, RequestBody, RequestHandler};
 use serde_json::json;
@@ -20,11 +20,13 @@ use std::{
     ptr::null_mut,
     sync::Arc,
 };
+use telemetry::helpers::TraceParent;
 use tokio::{
     runtime::{self, Runtime},
     sync::RwLock,
 };
 use tracing::{field, instrument::WithSubscriber, level_filters::LevelFilter, Instrument};
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use query_engine_common::Result;
 use query_engine_common::{
@@ -202,7 +204,8 @@ impl QueryEngine {
         let trace_string = get_cstr_safe(trace).expect("Connect trace is missing");
 
         let span = tracing::info_span!("prisma:engine:connect");
-        let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace_string);
+        let parent_context = telemetry::helpers::restore_context_from_json_str(&trace_string);
+        span.set_parent(parent_context);
 
         let mut inner = self.inner.write().await;
         let builder = inner.as_builder()?;
@@ -294,11 +297,13 @@ impl QueryEngine {
             let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
 
             let span = tracing::info_span!("prisma:engine", user_facing = true);
-            let trace_id = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+            let parent_context = telemetry::helpers::restore_context_from_json_str(&trace);
+            let traceparent = TraceParent::from_context(&parent_context);
+            span.set_parent(parent_context);
 
             async move {
                 let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
-                let response = handler.handle(query, tx_id.map(TxId::from), trace_id).await;
+                let response = handler.handle(query, tx_id.map(TxId::from), traceparent).await;
 
                 let serde_span = tracing::info_span!("prisma:engine:response_json_serialization", user_facing = true);
                 Ok(serde_span.in_scope(|| serde_json::to_string(&response))?)
@@ -316,7 +321,8 @@ impl QueryEngine {
         let dispatcher = self.logger.dispatcher();
         async {
             let span = tracing::info_span!("prisma:engine:disconnect");
-            let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+            let parent_context = telemetry::helpers::restore_context_from_json_str(&trace);
+            span.set_parent(parent_context);
 
             async {
                 let mut inner = self.inner.write().await;
@@ -394,7 +400,8 @@ impl QueryEngine {
 
         async move {
             let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
-            telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+            let parent_context = telemetry::helpers::restore_context_from_json_str(&trace);
+            span.set_parent(parent_context);
 
             let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
             match engine

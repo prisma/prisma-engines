@@ -7,13 +7,14 @@ use crate::{
 };
 use connector::{Connection, Transaction};
 use crosstarget_utils::time::ElapsedTimeCounter;
+use opentelemetry::trace::TraceContextExt;
 use schema::QuerySchemaRef;
+use telemetry::helpers::TraceParent;
 use tokio::time::Duration;
 use tracing::Span;
 use tracing_futures::Instrument;
 
-#[cfg(feature = "metrics")]
-use crate::telemetry::helpers::set_span_link_from_traceparent;
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 // Note: it's important to maintain the correct state of the transaction throughout execution. If
 // the transaction is ever left in the `Open` state after rollback or commit operations, it means
@@ -120,6 +121,7 @@ pub struct InteractiveTransaction {
     start_time: ElapsedTimeCounter,
     timeout: Duration,
     query_schema: QuerySchemaRef,
+    tx_span: Span,
 }
 
 /// This macro executes the future until it's ready or the transaction's timeout expires.
@@ -154,6 +156,7 @@ impl InteractiveTransaction {
         let state = TransactionState::start_transaction(conn, isolation_level).await?;
 
         Span::current().record("itx_id", id.to_string());
+        let tx_span = info_span!("itx_runner", "itx_id" = id.to_string());
 
         Ok(Self {
             id,
@@ -161,18 +164,18 @@ impl InteractiveTransaction {
             start_time: ElapsedTimeCounter::start(),
             timeout,
             query_schema,
+            tx_span,
         })
     }
 
     pub async fn execute_single(
         &mut self,
         operation: &Operation,
-        traceparent: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<ResponseData> {
         tx_timeout!(self, "query", async {
-            let span = info_span!("prisma:engine:itx_execute_single", user_facing = true);
-            #[cfg(feature = "metrics")]
-            set_span_link_from_traceparent(&span, traceparent.clone());
+            let span = info_span!(parent: &self.tx_span, "prisma:engine:itx_execute_single", user_facing = true);
+            link_span_with_traceparent(&span, &traceparent);
 
             let conn = self.state.as_open("query")?;
             execute_single_operation(
@@ -189,12 +192,11 @@ impl InteractiveTransaction {
     pub async fn execute_batch(
         &mut self,
         operations: &[Operation],
-        traceparent: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         tx_timeout!(self, "batch query", async {
-            let span = info_span!("prisma:engine:itx_execute_batch", user_facing = true);
-            #[cfg(feature = "metrics")]
-            set_span_link_from_traceparent(&span, traceparent.clone());
+            let span = info_span!(parent: &self.tx_span, "prisma:engine:itx_execute_batch", user_facing = true);
+            link_span_with_traceparent(&span, &traceparent);
 
             let conn = self.state.as_open("batch query")?;
             execute_many_operations(
@@ -212,7 +214,7 @@ impl InteractiveTransaction {
         tx_timeout!(self, "commit", async {
             let name = self.name();
             let open_tx = self.state.as_open("commit")?;
-            let span = info_span!("prisma:engine:itx_commit", user_facing = true);
+            let span = info_span!(parent: &self.tx_span, "prisma:engine:itx_commit", user_facing = true);
 
             if let Err(err) = open_tx.commit().instrument(span).await {
                 error!(?err, ?name, "transaction failed to commit");
@@ -232,7 +234,7 @@ impl InteractiveTransaction {
     pub async fn rollback(&mut self, was_timeout: bool) -> crate::Result<()> {
         let name = self.name();
         let open_tx = self.state.as_open("rollback")?;
-        let span = info_span!("prisma:engine:itx_rollback", user_facing = true);
+        let span = info_span!(parent: &self.tx_span, "prisma:engine:itx_rollback", user_facing = true);
 
         let result = open_tx.rollback().instrument(span).await;
         if let Err(err) = &result {
@@ -260,5 +262,11 @@ impl InteractiveTransaction {
 
     pub fn name(&self) -> String {
         format!("itx-{}", self.id)
+    }
+}
+
+fn link_span_with_traceparent(span: &Span, traceparent: &Option<TraceParent>) {
+    if let Some(traceparent) = traceparent {
+        span.add_link(traceparent.as_remote_context().span().span_context().clone());
     }
 }

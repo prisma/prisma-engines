@@ -89,7 +89,8 @@ impl QueryEngine {
 
         async {
             let span = tracing::info_span!("prisma:engine:connect");
-            let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+            let parent_context = telemetry::helpers::restore_context_from_json_str(&trace);
+            span.set_parent(parent_context);
 
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
@@ -150,7 +151,8 @@ impl QueryEngine {
 
         async {
             let span = tracing::info_span!("prisma:engine:disconnect");
-            let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+            let parent_context = telemetry::helpers::restore_context_from_json_str(&trace);
+            span.set_parent(parent_context);
 
             async {
                 let mut inner = self.inner.write().await;
@@ -195,11 +197,13 @@ impl QueryEngine {
                     Span::none()
                 };
 
-                let trace_id = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+                let parent_context = telemetry::helpers::restore_context_from_json_str(&trace);
+                let traceparent = TraceParent::from_context(&parent_context);
+                span.set_parent(parent_context);
 
                 let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
                 let response = handler
-                    .handle(query, tx_id.map(TxId::from), trace_id)
+                    .handle(query, tx_id.map(TxId::from), traceparent)
                     .instrument(span)
                     .await;
 

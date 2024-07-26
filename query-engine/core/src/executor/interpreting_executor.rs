@@ -9,6 +9,7 @@ use crate::{
 use async_trait::async_trait;
 use connector::Connector;
 use schema::QuerySchemaRef;
+use telemetry::helpers::TraceParent;
 use tokio::time::Duration;
 use tracing_futures::Instrument;
 
@@ -49,18 +50,18 @@ where
         tx_id: Option<TxId>,
         operation: Operation,
         query_schema: QuerySchemaRef,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
         engine_protocol: EngineProtocol,
     ) -> crate::Result<ResponseData> {
         request_context::with_request_context(engine_protocol, async move {
             if let Some(tx_id) = tx_id {
-                self.itx_manager.execute(&tx_id, operation, trace_id).await
+                self.itx_manager.execute(&tx_id, operation, traceparent).await
             } else {
                 execute_single_self_contained(
                     &self.connector,
                     query_schema,
                     operation,
-                    trace_id,
+                    traceparent,
                     self.force_transactions,
                 )
                 .await
@@ -87,7 +88,7 @@ where
         operations: Vec<Operation>,
         transaction: Option<BatchDocumentTransaction>,
         query_schema: QuerySchemaRef,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
         engine_protocol: EngineProtocol,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         request_context::with_request_context(engine_protocol, async move {
@@ -98,7 +99,7 @@ where
                         "Can not set batch isolation level within interactive transaction".into(),
                     ));
                 }
-                self.itx_manager.batch_execute(&tx_id, operations, trace_id).await
+                self.itx_manager.batch_execute(&tx_id, operations, traceparent).await
             } else if let Some(transaction) = transaction {
                 let conn_span = info_span!(
                     "prisma:engine:connection",
@@ -109,7 +110,7 @@ where
                 let mut tx = conn.start_transaction(transaction.isolation_level()).await?;
 
                 let results =
-                    execute_many_operations(query_schema, tx.as_connection_like(), &operations, trace_id).await;
+                    execute_many_operations(query_schema, tx.as_connection_like(), &operations, traceparent).await;
 
                 if results.is_err() {
                     tx.rollback().await?;
@@ -123,7 +124,7 @@ where
                     &self.connector,
                     query_schema,
                     &operations,
-                    trace_id,
+                    traceparent,
                     self.force_transactions,
                     engine_protocol,
                 )
