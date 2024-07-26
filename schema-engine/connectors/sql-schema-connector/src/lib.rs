@@ -373,6 +373,7 @@ impl SchemaConnector for SqlSchemaConnector {
 
             Ok(IntrospectSqlQueryOutput {
                 name: input.name,
+                source: input.source,
                 documentation: String::new(),
                 parameters,
                 result_columns: columns,

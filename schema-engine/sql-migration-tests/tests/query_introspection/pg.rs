@@ -12,24 +12,25 @@ mod common {
         api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
         let expected = expect![[r#"
-        IntrospectSqlQueryOutput {
-            documentation: "",
-            name: "test_1",
-            parameters: [
-                IntrospectSqlQueryParameterOutput {
-                    documentation: "",
-                    name: "int4",
-                    typ: "int",
-                },
-            ],
-            result_columns: [
-                IntrospectSqlQueryColumnOutput {
-                    name: "int",
-                    typ: "int",
-                },
-            ],
-        }
-    "#]];
+            IntrospectSqlQueryOutput {
+                name: "test_1",
+                source: "SELECT int FROM model WHERE 1 = 0 AND int = $1;",
+                documentation: "",
+                parameters: [
+                    IntrospectSqlQueryParameterOutput {
+                        documentation: "",
+                        name: "int4",
+                        typ: "int",
+                    },
+                ],
+                result_columns: [
+                    IntrospectSqlQueryColumnOutput {
+                        name: "int",
+                        typ: "int",
+                    },
+                ],
+            }
+        "#]];
 
         api.introspect_sql("test_1", "SELECT int FROM model WHERE 1 = 0 AND int = ?;")
             .send_sync()
@@ -41,33 +42,34 @@ mod common {
         api.schema_push(ENUM_SCHEMA).send().assert_green();
 
         let expected = expect![[r#"
-        IntrospectSqlQueryOutput {
-            documentation: "",
-            name: "test_1",
-            parameters: [
-                IntrospectSqlQueryParameterOutput {
-                    documentation: "",
-                    name: "int4",
-                    typ: "int",
-                },
-                IntrospectSqlQueryParameterOutput {
-                    documentation: "",
-                    name: "MyFancyEnum",
-                    typ: "MyFancyEnum",
-                },
-            ],
-            result_columns: [
-                IntrospectSqlQueryColumnOutput {
-                    name: "id",
-                    typ: "int",
-                },
-                IntrospectSqlQueryColumnOutput {
-                    name: "enum",
-                    typ: "MyFancyEnum",
-                },
-            ],
-        }
-    "#]];
+            IntrospectSqlQueryOutput {
+                name: "test_1",
+                source: "INSERT INTO model (id, enum) VALUES ($1, $2) RETURNING id, enum;",
+                documentation: "",
+                parameters: [
+                    IntrospectSqlQueryParameterOutput {
+                        documentation: "",
+                        name: "int4",
+                        typ: "int",
+                    },
+                    IntrospectSqlQueryParameterOutput {
+                        documentation: "",
+                        name: "MyFancyEnum",
+                        typ: "MyFancyEnum",
+                    },
+                ],
+                result_columns: [
+                    IntrospectSqlQueryColumnOutput {
+                        name: "id",
+                        typ: "int",
+                    },
+                    IntrospectSqlQueryColumnOutput {
+                        name: "enum",
+                        typ: "MyFancyEnum",
+                    },
+                ],
+            }
+        "#]];
 
         api.introspect_sql(
             "test_1",
@@ -93,18 +95,19 @@ mod pg {
         api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
         let expected = expect![[r#"
-        IntrospectSqlQueryOutput {
-            documentation: "",
-            name: "test_1",
-            parameters: [],
-            result_columns: [
-                IntrospectSqlQueryColumnOutput {
-                    name: "add",
-                    typ: "int",
-                },
-            ],
-        }
-    "#]];
+            IntrospectSqlQueryOutput {
+                name: "test_1",
+                source: "SELECT 1 + 1 as add;",
+                documentation: "",
+                parameters: [],
+                result_columns: [
+                    IntrospectSqlQueryColumnOutput {
+                        name: "add",
+                        typ: "int",
+                    },
+                ],
+            }
+        "#]];
 
         api.introspect_sql("test_1", "SELECT 1 + 1 as add;")
             .send_sync()
@@ -116,18 +119,19 @@ mod pg {
         api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
         let expected = expect![[r#"
-        IntrospectSqlQueryOutput {
-            documentation: "",
-            name: "test_1",
-            parameters: [],
-            result_columns: [
-                IntrospectSqlQueryColumnOutput {
-                    name: "?column?",
-                    typ: "int",
-                },
-            ],
-        }
-    "#]];
+            IntrospectSqlQueryOutput {
+                name: "test_1",
+                source: "SELECT 1 + 1;",
+                documentation: "",
+                parameters: [],
+                result_columns: [
+                    IntrospectSqlQueryColumnOutput {
+                        name: "?column?",
+                        typ: "int",
+                    },
+                ],
+            }
+        "#]];
 
         api.introspect_sql("test_1", "SELECT 1 + 1;")
             .send_sync()
@@ -200,18 +204,19 @@ mod crdb {
         api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
         let expected = expect![[r#"
-        IntrospectSqlQueryOutput {
-            documentation: "",
-            name: "test_1",
-            parameters: [],
-            result_columns: [
-                IntrospectSqlQueryColumnOutput {
-                    name: "?column?",
-                    typ: "bigint",
-                },
-            ],
-        }
-    "#]];
+            IntrospectSqlQueryOutput {
+                name: "test_1",
+                source: "SELECT 1 + 1;",
+                documentation: "",
+                parameters: [],
+                result_columns: [
+                    IntrospectSqlQueryColumnOutput {
+                        name: "?column?",
+                        typ: "bigint",
+                    },
+                ],
+            }
+        "#]];
 
         api.introspect_sql("test_1", "SELECT 1 + 1;")
             .send_sync()
@@ -223,18 +228,19 @@ mod crdb {
         api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
         let expected = expect![[r#"
-        IntrospectSqlQueryOutput {
-            documentation: "",
-            name: "test_1",
-            parameters: [],
-            result_columns: [
-                IntrospectSqlQueryColumnOutput {
-                    name: "add",
-                    typ: "bigint",
-                },
-            ],
-        }
-    "#]];
+            IntrospectSqlQueryOutput {
+                name: "test_1",
+                source: "SELECT 1 + 1 as add;",
+                documentation: "",
+                parameters: [],
+                result_columns: [
+                    IntrospectSqlQueryColumnOutput {
+                        name: "add",
+                        typ: "bigint",
+                    },
+                ],
+            }
+        "#]];
 
         api.introspect_sql("test_1", "SELECT 1 + 1 as add;")
             .send_sync()

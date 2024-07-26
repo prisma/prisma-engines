@@ -422,6 +422,7 @@ impl GenericApi for EngineState {
                             .into_iter()
                             .map(|q| SqlQueryOutput {
                                 name: q.name,
+                                source: q.source,
                                 documentation: q.documentation,
                                 parameters: q
                                     .parameters

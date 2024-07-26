@@ -13,8 +13,9 @@ fn insert_sqlite(api: TestApi) {
 
     let expected = expect![[r#"
         IntrospectSqlQueryOutput {
-            documentation: "",
             name: "test_1",
+            source: "INSERT INTO `model` (`int`, `string`, `bigint`, `float`, `bytes`, `bool`, `dt`) VALUES (?, ?, ?, ?, ?, ?, ?);",
+            documentation: "",
             parameters: [
                 IntrospectSqlQueryParameterOutput {
                     documentation: "",
@@ -72,8 +73,9 @@ fn select_sqlite(api: TestApi) {
 
     let expected = expect![[r#"
         IntrospectSqlQueryOutput {
-            documentation: "",
             name: "test_1",
+            source: "SELECT `int`, `string`, `bigint`, `float`, `bytes`, `bool`, `dt` FROM `model`;",
+            documentation: "",
             parameters: [],
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
@@ -117,8 +119,9 @@ fn empty_result(api: TestApi) {
 
     let expected = expect![[r#"
         IntrospectSqlQueryOutput {
-            documentation: "",
             name: "test_1",
+            source: "SELECT int FROM model WHERE 1 = 0 AND int = ?;",
+            documentation: "",
             parameters: [
                 IntrospectSqlQueryParameterOutput {
                     documentation: "",
@@ -146,8 +149,9 @@ fn unnamed_expr(api: TestApi) {
 
     let expected = expect![[r#"
         IntrospectSqlQueryOutput {
-            documentation: "",
             name: "test_1",
+            source: "SELECT 1 + 1;",
+            documentation: "",
             parameters: [],
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
@@ -169,8 +173,9 @@ fn named_expr(api: TestApi) {
 
     let expected = expect![[r#"
         IntrospectSqlQueryOutput {
-            documentation: "",
             name: "test_1",
+            source: "SELECT 1 + 1 as \"add\";",
+            documentation: "",
             parameters: [],
             result_columns: [
                 IntrospectSqlQueryColumnOutput {

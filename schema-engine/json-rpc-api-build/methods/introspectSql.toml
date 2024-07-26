@@ -38,6 +38,8 @@ shape = "string"
 [recordShapes.sqlQueryOutput]
 [recordShapes.sqlQueryOutput.fields.name]
 shape = "string"
+[recordShapes.sqlQueryOutput.fields.source]
+shape = "string"
 [recordShapes.sqlQueryOutput.fields.documentation]
 shape = "string"
 [recordShapes.sqlQueryOutput.fields.parameters]

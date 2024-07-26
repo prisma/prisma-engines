@@ -20,8 +20,9 @@ pub struct IntrospectSqlResult {
 #[allow(missing_docs)]
 #[derive(Debug)]
 pub struct IntrospectSqlQueryOutput {
-    pub documentation: String,
     pub name: String,
+    pub source: String,
+    pub documentation: String,
     pub parameters: Vec<IntrospectSqlQueryParameterOutput>,
     pub result_columns: Vec<IntrospectSqlQueryColumnOutput>,
 }
