@@ -93,6 +93,7 @@ serde = { version = "1.0" }
 sqlformat = { version = "0.2.3", optional = true }
 uuid.workspace = true
 crosstarget-utils = { path = "../libs/crosstarget-utils" }
+concat-idents = "1.1.5"
 
 [dev-dependencies]
 once_cell = "1.3"
@@ -125,12 +126,12 @@ features = ["chrono", "column_decltype"]
 optional = true
 
 [target.'cfg(not(any(target_os = "macos", target_os = "ios")))'.dependencies.tiberius]
-version = "0.11.6"
+version = "0.11.8"
 optional = true
 features = ["sql-browser-tokio", "chrono", "bigdecimal"]
 
 [target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies.tiberius]
-version = "0.11.2"
+version = "0.11.8"
 optional = true
 default-features = false
 features = [
@@ -183,4 +184,4 @@ features = ["compat"]
 optional = true
 
 [build-dependencies]
-cfg_aliases = "0.1.0"
+cfg_aliases = "0.2.1"

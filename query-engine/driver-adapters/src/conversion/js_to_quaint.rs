@@ -5,7 +5,7 @@ pub use crate::types::{ColumnType, JSResultSet};
 use quaint::bigdecimal::BigDecimal;
 use quaint::chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 use quaint::{
-    connector::ResultSet as QuaintResultSet,
+    connector::{ColumnType as QuaintColumnType, ResultSet as QuaintResultSet},
     error::{Error as QuaintError, ErrorKind},
     Value as QuaintValue,
 };
@@ -22,6 +22,7 @@ impl TryFrom<JSResultSet> for QuaintResultSet {
         } = js_result_set;
 
         let mut quaint_rows = Vec::with_capacity(rows.len());
+        let quaint_column_types = column_types.iter().map(QuaintColumnType::from).collect::<Vec<_>>();
 
         for row in rows {
             let mut quaint_row = Vec::with_capacity(column_types.len());
@@ -37,7 +38,7 @@ impl TryFrom<JSResultSet> for QuaintResultSet {
         }
 
         let last_insert_id = last_insert_id.and_then(|id| id.parse::<u64>().ok());
-        let mut quaint_result_set = QuaintResultSet::new(column_names, quaint_rows);
+        let mut quaint_result_set = QuaintResultSet::new(column_names, quaint_column_types, quaint_rows);
 
         // Not a fan of this (extracting the `Some` value from an `Option` and pass it to a method that creates a new `Some` value),
         // but that's Quaint's ResultSet API and that's how the MySQL connector does it.
