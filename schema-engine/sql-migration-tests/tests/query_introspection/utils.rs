@@ -27,11 +27,12 @@ enum MyFancyEnum {
 }
 "#;
 
-pub(crate) fn render_scalar_type_datamodel(prisma_type: ScalarType) -> String {
+pub(crate) fn render_scalar_type_datamodel(datasource: &str, prisma_type: ScalarType) -> String {
     let prisma_type = prisma_type.as_str();
 
     format!(
         r#"
+        {datasource}
         model test {{
             id Int @id @default(autoincrement())
             field {prisma_type}
@@ -81,7 +82,7 @@ macro_rules! test_scalar_types {
                     #[test_connector(tags($tag))]
                     fn [<$test_name _ $tag:lower>](api: TestApi) {
 
-                        let dm = render_scalar_type_datamodel($st);
+                        let dm = render_scalar_type_datamodel(DATASOURCE, $st);
 
                         api.schema_push(&dm).send();
 
