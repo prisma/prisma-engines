@@ -27,6 +27,21 @@ enum MyFancyEnum {
 }
 "#;
 
+pub(crate) const RELATION_SCHEMA: &str = r#"
+model parent {
+    id     Int     @id
+
+    children   child[]
+}
+
+model child {
+    id     Int     @id
+
+    parent_id Int?
+    parent  parent?  @relation(fields: [parent_id], references: [id])
+}
+"#;
+
 pub(crate) fn render_scalar_type_datamodel(datasource: &str, prisma_type: ScalarType) -> String {
     let prisma_type = prisma_type.as_str();
 

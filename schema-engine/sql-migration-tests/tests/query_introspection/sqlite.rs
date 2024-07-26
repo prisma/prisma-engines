@@ -262,3 +262,55 @@ fn mixed_expr_cast(api: TestApi) {
         .send_sync()
         .expect_result(expected)
 }
+
+#[test_connector(tags(Sqlite))]
+fn subquery(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "SELECT `int` FROM (SELECT * FROM `model`)",
+            documentation: "",
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "int",
+                    typ: "int",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT `int` FROM (SELECT * FROM `model`)")
+        .send_sync()
+        .expect_result(expected)
+}
+
+#[test_connector(tags(Sqlite))]
+fn left_join(api: TestApi) {
+    api.schema_push(RELATION_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "SELECT `parent`.`id` as `parentId`, `child`.`id` as `childId` FROM `parent` LEFT JOIN `child` ON `parent`.`id` = `child`.`parent_id`",
+            documentation: "",
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "parentId",
+                    typ: "int",
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "childId",
+                    typ: "int",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT `parent`.`id` as `parentId`, `child`.`id` as `childId` FROM `parent` LEFT JOIN `child` ON `parent`.`id` = `child`.`parent_id`")
+        .send_sync()
+        .expect_result(expected)
+}
