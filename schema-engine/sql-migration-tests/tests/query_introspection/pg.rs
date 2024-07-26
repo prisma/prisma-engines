@@ -80,7 +80,7 @@ mod common {
     }
 }
 
-mod pg {
+mod postgres {
     use super::*;
 
     const PG_DATASOURCE: &str = r#"
