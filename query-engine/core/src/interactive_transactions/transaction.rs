@@ -127,6 +127,7 @@ pub struct InteractiveTransaction {
 /// This macro executes the future until it's ready or the transaction's timeout expires.
 macro_rules! tx_timeout {
     ($self:expr, $operation:expr, $fut:expr) => {{
+        let tx_span = $self.tx_span.clone();
         let remaining_time = $self
             .timeout
             .checked_sub($self.start_time.elapsed_time())
@@ -138,7 +139,7 @@ macro_rules! tx_timeout {
                     reason: $self.as_closed().unwrap().error_message_for($operation),
                 }.into())
             }
-            result = $fut => {
+            result = $fut.instrument(tx_span) => {
                 result
             }
         }
@@ -156,7 +157,7 @@ impl InteractiveTransaction {
         let state = TransactionState::start_transaction(conn, isolation_level).await?;
 
         Span::current().record("itx_id", id.to_string());
-        let tx_span = info_span!("itx_runner", "itx_id" = id.to_string());
+        let tx_span = info_span!("prisma:engine:itx_runner", "itx_id" = id.to_string());
 
         Ok(Self {
             id,
@@ -174,7 +175,7 @@ impl InteractiveTransaction {
         traceparent: Option<TraceParent>,
     ) -> crate::Result<ResponseData> {
         tx_timeout!(self, "query", async {
-            let span = info_span!(parent: &self.tx_span, "prisma:engine:itx_execute_single", user_facing = true);
+            let span = info_span!("prisma:engine:itx_execute_single", user_facing = true);
             link_span_with_traceparent(&span, &traceparent);
 
             let conn = self.state.as_open("query")?;
@@ -195,7 +196,7 @@ impl InteractiveTransaction {
         traceparent: Option<TraceParent>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         tx_timeout!(self, "batch query", async {
-            let span = info_span!(parent: &self.tx_span, "prisma:engine:itx_execute_batch", user_facing = true);
+            let span = info_span!("prisma:engine:itx_execute_batch", user_facing = true);
             link_span_with_traceparent(&span, &traceparent);
 
             let conn = self.state.as_open("batch query")?;
@@ -214,7 +215,7 @@ impl InteractiveTransaction {
         tx_timeout!(self, "commit", async {
             let name = self.name();
             let open_tx = self.state.as_open("commit")?;
-            let span = info_span!(parent: &self.tx_span, "prisma:engine:itx_commit", user_facing = true);
+            let span = info_span!("prisma:engine:itx_commit", user_facing = true);
 
             if let Err(err) = open_tx.commit().instrument(span).await {
                 error!(?err, ?name, "transaction failed to commit");
@@ -234,7 +235,7 @@ impl InteractiveTransaction {
     pub async fn rollback(&mut self, was_timeout: bool) -> crate::Result<()> {
         let name = self.name();
         let open_tx = self.state.as_open("rollback")?;
-        let span = info_span!(parent: &self.tx_span, "prisma:engine:itx_rollback", user_facing = true);
+        let span = info_span!("prisma:engine:itx_rollback", user_facing = true);
 
         let result = open_tx.rollback().instrument(span).await;
         if let Err(err) = &result {
