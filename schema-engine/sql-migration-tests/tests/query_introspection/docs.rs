@@ -136,7 +136,9 @@ fn invalid_position_fails(api: TestApi) {
     SELECT int FROM model WHERE int = ? and string = ?;
     "#;
 
-    let expected = expect!["SQL documentation parsing: invalid position. Expected a number found: hello at ' $hello:myInt some integer'."];
+    let expected = expect![
+        "SQL documentation parsing: invalid position. Expected a number found: hello at ' $hello:myInt some integer'."
+    ];
 
     expected.assert_eq(
         api.introspect_sql("test_1", sql)
@@ -145,7 +147,6 @@ fn invalid_position_fails(api: TestApi) {
             .unwrap_or_default(),
     );
 }
-
 
 #[test_connector(tags(Postgres))]
 fn unknown_type_fails(api: TestApi) {
@@ -215,7 +216,8 @@ fn missing_param_position_or_alias_fails(api: TestApi) {
     SELECT int FROM model WHERE int = ? and string = ?;
     "#;
 
-    let expected = expect!["SQL documentation parsing: missing position or alias (eg: $1:alias) at '@param  {Int} myInt'."];
+    let expected =
+        expect!["SQL documentation parsing: missing position or alias (eg: $1:alias) at '@param  {Int} myInt'."];
 
     expected.assert_eq(
         api.introspect_sql("test_1", sql)
@@ -234,7 +236,8 @@ fn missing_everything_fails(api: TestApi) {
     SELECT int FROM model WHERE int = ? and string = ?;
     "#;
 
-    let expected = expect!["SQL documentation parsing: invalid parameter: could not parse any information at '@param'."];
+    let expected =
+        expect!["SQL documentation parsing: invalid parameter: could not parse any information at '@param'."];
 
     expected.assert_eq(
         api.introspect_sql("test_1", sql)
