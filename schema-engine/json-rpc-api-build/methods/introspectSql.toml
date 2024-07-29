@@ -41,6 +41,7 @@ shape = "string"
 [recordShapes.sqlQueryOutput.fields.source]
 shape = "string"
 [recordShapes.sqlQueryOutput.fields.documentation]
+isNullable = true
 shape = "string"
 [recordShapes.sqlQueryOutput.fields.parameters]
 shape = "sqlQueryParameterOutput"
@@ -55,6 +56,7 @@ shape = "string"
 [recordShapes.sqlQueryParameterOutput.fields.typ]
 shape = "string"
 [recordShapes.sqlQueryParameterOutput.fields.documentation]
+isNullable = true
 shape = "string"
 
 [recordShapes.sqlQueryColumnOutput]
