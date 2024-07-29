@@ -480,12 +480,12 @@ mod tests {
                 ConnectorErrorImpl {
                     user_facing_error: None,
                     message: Some(
-                        "SQL documentation parsing: missing type at '{} valid user identifier'.",
+                        "SQL documentation parsing: missing type (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal') at '{} valid user identifier'.",
                     ),
                     source: None,
                     context: SpanTrace [],
                 }
-                SQL documentation parsing: missing type at '{} valid user identifier'.
+                SQL documentation parsing: missing type (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal') at '{} valid user identifier'.
                 ,
             )
         "#]];
