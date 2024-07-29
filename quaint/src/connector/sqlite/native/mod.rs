@@ -130,7 +130,11 @@ impl Queryable for Sqlite {
 
         let parameters = (1..=stmt.parameter_count())
             .map(|idx| match stmt.parameter_name(idx) {
-                Some(name) => ParsedRawItem::new_named(name, ColumnType::Unknown),
+                Some(name) => {
+                    let name = name.strip_prefix(':').unwrap_or(name);
+
+                    ParsedRawItem::new_named(name, ColumnType::Unknown)
+                }
                 None => ParsedRawItem::new_unnamed(idx, ColumnType::Unknown),
             })
             .collect();

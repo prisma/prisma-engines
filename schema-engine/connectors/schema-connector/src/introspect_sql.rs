@@ -22,7 +22,7 @@ pub struct IntrospectSqlResult {
 pub struct IntrospectSqlQueryOutput {
     pub name: String,
     pub source: String,
-    pub documentation: String,
+    pub documentation: Option<String>,
     pub parameters: Vec<IntrospectSqlQueryParameterOutput>,
     pub result_columns: Vec<IntrospectSqlQueryColumnOutput>,
 }
@@ -30,7 +30,7 @@ pub struct IntrospectSqlQueryOutput {
 #[allow(missing_docs)]
 #[derive(Debug)]
 pub struct IntrospectSqlQueryParameterOutput {
-    pub documentation: String,
+    pub documentation: Option<String>,
     pub name: String,
     pub typ: String,
 }
@@ -40,16 +40,6 @@ pub struct IntrospectSqlQueryParameterOutput {
 pub struct IntrospectSqlQueryColumnOutput {
     pub name: String,
     pub typ: String,
-}
-
-impl From<quaint::connector::ParsedRawItem> for IntrospectSqlQueryParameterOutput {
-    fn from(item: quaint::connector::ParsedRawItem) -> Self {
-        Self {
-            name: item.name,
-            documentation: String::new(),
-            typ: item.enum_name.unwrap_or_else(|| item.typ.to_string()),
-        }
-    }
 }
 
 impl From<quaint::connector::ParsedRawItem> for IntrospectSqlQueryColumnOutput {

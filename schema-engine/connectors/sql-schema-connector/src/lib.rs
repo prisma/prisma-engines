@@ -9,6 +9,7 @@ mod flavour;
 mod introspection;
 mod migration_pair;
 mod sql_destructive_change_checker;
+mod sql_doc_parser;
 mod sql_migration;
 mod sql_migration_persistence;
 mod sql_renderer;
@@ -21,6 +22,7 @@ use flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFla
 use migration_pair::MigrationPair;
 use psl::{datamodel_connector::NativeTypeInstance, parser_database::ScalarType, ValidatedSchema};
 use schema_connector::{migrations_directory::MigrationDirectory, *};
+use sql_doc_parser::parse_sql_doc;
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer as sql;
 use std::{future, sync::Arc};
@@ -359,13 +361,33 @@ impl SchemaConnector for SqlSchemaConnector {
         input: IntrospectSqlQueryInput,
     ) -> BoxFuture<'_, ConnectorResult<IntrospectSqlQueryOutput>> {
         Box::pin(async move {
-            let res = self.flavour.parse_raw_query(&input.source).await?;
-            let parameters = res
+            let parsed_query = self.flavour.parse_raw_query(&input.source).await?;
+            let sql_source = input.source.clone();
+            let parsed_doc = parse_sql_doc(&sql_source)?;
+
+            let parameters = parsed_query
                 .parameters
                 .into_iter()
-                .map(IntrospectSqlQueryParameterOutput::from)
+                .enumerate()
+                .map(|(idx, param)| {
+                    let parsed_param = parsed_doc
+                        .get_param_at(idx + 1)
+                        .or_else(|| parsed_doc.get_param_by_alias(&param.name));
+
+                    IntrospectSqlQueryParameterOutput {
+                        typ: parsed_param
+                            .and_then(|p| p.typ())
+                            .map(ToOwned::to_owned)
+                            .unwrap_or_else(|| param.typ.to_string()),
+                        name: parsed_param
+                            .and_then(|p| p.alias())
+                            .map(ToOwned::to_owned)
+                            .unwrap_or_else(|| param.name),
+                        documentation: parsed_param.and_then(|p| p.documentation()).map(ToOwned::to_owned),
+                    }
+                })
                 .collect();
-            let columns = res
+            let columns = parsed_query
                 .columns
                 .into_iter()
                 .map(IntrospectSqlQueryColumnOutput::from)
@@ -374,7 +396,7 @@ impl SchemaConnector for SqlSchemaConnector {
             Ok(IntrospectSqlQueryOutput {
                 name: input.name,
                 source: input.source,
-                documentation: String::new(),
+                documentation: parsed_doc.documentation().map(ToOwned::to_owned),
                 parameters,
                 result_columns: columns,
             })

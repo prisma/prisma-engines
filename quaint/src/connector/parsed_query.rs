@@ -2,11 +2,13 @@ use std::borrow::Cow;
 
 use super::ColumnType;
 
+#[derive(Debug)]
 pub struct ParsedRawQuery {
     pub parameters: Vec<ParsedRawItem>,
     pub columns: Vec<ParsedRawItem>,
 }
 
+#[derive(Debug)]
 pub struct ParsedRawItem {
     pub name: String,
     pub typ: ColumnType,

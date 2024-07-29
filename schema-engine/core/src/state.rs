@@ -423,14 +423,14 @@ impl GenericApi for EngineState {
                             .map(|q| SqlQueryOutput {
                                 name: q.name,
                                 source: q.source,
-                                documentation: q.documentation,
+                                documentation: q.documentation.unwrap_or_default(),
                                 parameters: q
                                     .parameters
                                     .into_iter()
                                     .map(|p| SqlQueryParameterOutput {
                                         name: p.name,
                                         typ: p.typ,
-                                        documentation: p.documentation,
+                                        documentation: p.documentation.unwrap_or_default(),
                                     })
                                     .collect(),
                                 result_columns: q
