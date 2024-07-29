@@ -15,10 +15,10 @@ mod common {
             IntrospectSqlQueryOutput {
                 name: "test_1",
                 source: "SELECT int FROM model WHERE 1 = 0 AND int = $1;",
-                documentation: "",
+                documentation: None,
                 parameters: [
                     IntrospectSqlQueryParameterOutput {
-                        documentation: "",
+                        documentation: None,
                         name: "int4",
                         typ: "int",
                     },
@@ -45,17 +45,17 @@ mod common {
             IntrospectSqlQueryOutput {
                 name: "test_1",
                 source: "INSERT INTO model (id, enum) VALUES ($1, $2) RETURNING id, enum;",
-                documentation: "",
+                documentation: None,
                 parameters: [
                     IntrospectSqlQueryParameterOutput {
-                        documentation: "",
+                        documentation: None,
                         name: "int4",
                         typ: "int",
                     },
                     IntrospectSqlQueryParameterOutput {
-                        documentation: "",
+                        documentation: None,
                         name: "MyFancyEnum",
-                        typ: "MyFancyEnum",
+                        typ: "string",
                     },
                 ],
                 result_columns: [
@@ -98,7 +98,7 @@ mod postgres {
             IntrospectSqlQueryOutput {
                 name: "test_1",
                 source: "SELECT 1 + 1 as add;",
-                documentation: "",
+                documentation: None,
                 parameters: [],
                 result_columns: [
                     IntrospectSqlQueryColumnOutput {
@@ -122,7 +122,7 @@ mod postgres {
             IntrospectSqlQueryOutput {
                 name: "test_1",
                 source: "SELECT 1 + 1;",
-                documentation: "",
+                documentation: None,
                 parameters: [],
                 result_columns: [
                     IntrospectSqlQueryColumnOutput {
@@ -207,7 +207,7 @@ mod crdb {
             IntrospectSqlQueryOutput {
                 name: "test_1",
                 source: "SELECT 1 + 1;",
-                documentation: "",
+                documentation: None,
                 parameters: [],
                 result_columns: [
                     IntrospectSqlQueryColumnOutput {
@@ -231,7 +231,7 @@ mod crdb {
             IntrospectSqlQueryOutput {
                 name: "test_1",
                 source: "SELECT 1 + 1 as add;",
-                documentation: "",
+                documentation: None,
                 parameters: [],
                 result_columns: [
                     IntrospectSqlQueryColumnOutput {

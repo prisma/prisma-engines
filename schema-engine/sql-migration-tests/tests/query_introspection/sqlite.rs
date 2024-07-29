@@ -15,40 +15,40 @@ fn insert_sqlite(api: TestApi) {
         IntrospectSqlQueryOutput {
             name: "test_1",
             source: "INSERT INTO `model` (`int`, `string`, `bigint`, `float`, `bytes`, `bool`, `dt`) VALUES (?, ?, ?, ?, ?, ?, ?);",
-            documentation: "",
+            documentation: None,
             parameters: [
                 IntrospectSqlQueryParameterOutput {
-                    documentation: "",
+                    documentation: None,
                     name: "_1",
                     typ: "unknown",
                 },
                 IntrospectSqlQueryParameterOutput {
-                    documentation: "",
+                    documentation: None,
                     name: "_2",
                     typ: "unknown",
                 },
                 IntrospectSqlQueryParameterOutput {
-                    documentation: "",
+                    documentation: None,
                     name: "_3",
                     typ: "unknown",
                 },
                 IntrospectSqlQueryParameterOutput {
-                    documentation: "",
+                    documentation: None,
                     name: "_4",
                     typ: "unknown",
                 },
                 IntrospectSqlQueryParameterOutput {
-                    documentation: "",
+                    documentation: None,
                     name: "_5",
                     typ: "unknown",
                 },
                 IntrospectSqlQueryParameterOutput {
-                    documentation: "",
+                    documentation: None,
                     name: "_6",
                     typ: "unknown",
                 },
                 IntrospectSqlQueryParameterOutput {
-                    documentation: "",
+                    documentation: None,
                     name: "_7",
                     typ: "unknown",
                 },
@@ -75,7 +75,7 @@ fn select_sqlite(api: TestApi) {
         IntrospectSqlQueryOutput {
             name: "test_1",
             source: "SELECT `int`, `string`, `bigint`, `float`, `bytes`, `bool`, `dt` FROM `model`;",
-            documentation: "",
+            documentation: None,
             parameters: [],
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
@@ -121,10 +121,10 @@ fn empty_result(api: TestApi) {
         IntrospectSqlQueryOutput {
             name: "test_1",
             source: "SELECT int FROM model WHERE 1 = 0 AND int = ?;",
-            documentation: "",
+            documentation: None,
             parameters: [
                 IntrospectSqlQueryParameterOutput {
-                    documentation: "",
+                    documentation: None,
                     name: "_1",
                     typ: "unknown",
                 },
@@ -151,7 +151,7 @@ fn unnamed_expr(api: TestApi) {
         IntrospectSqlQueryOutput {
             name: "test_1",
             source: "SELECT 1 + 1;",
-            documentation: "",
+            documentation: None,
             parameters: [],
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
@@ -175,7 +175,7 @@ fn named_expr(api: TestApi) {
         IntrospectSqlQueryOutput {
             name: "test_1",
             source: "SELECT 1 + 1 as \"add\";",
-            documentation: "",
+            documentation: None,
             parameters: [],
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
@@ -199,7 +199,7 @@ fn mixed_named_expr(api: TestApi) {
         IntrospectSqlQueryOutput {
             name: "test_1",
             source: "SELECT `int` + 1 as \"add\" FROM `model`;",
-            documentation: "",
+            documentation: None,
             parameters: [],
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
@@ -223,7 +223,7 @@ fn mixed_unnamed_expr(api: TestApi) {
         IntrospectSqlQueryOutput {
             name: "test_1",
             source: "SELECT `int` + 1 FROM `model`;",
-            documentation: "",
+            documentation: None,
             parameters: [],
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
@@ -247,7 +247,7 @@ fn mixed_expr_cast(api: TestApi) {
         IntrospectSqlQueryOutput {
             name: "test_1",
             source: "SELECT CAST(`int` + 1 as int) FROM `model`;",
-            documentation: "",
+            documentation: None,
             parameters: [],
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
@@ -271,7 +271,7 @@ fn subquery(api: TestApi) {
         IntrospectSqlQueryOutput {
             name: "test_1",
             source: "SELECT `int` FROM (SELECT * FROM `model`)",
-            documentation: "",
+            documentation: None,
             parameters: [],
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
@@ -295,7 +295,7 @@ fn left_join(api: TestApi) {
         IntrospectSqlQueryOutput {
             name: "test_1",
             source: "SELECT `parent`.`id` as `parentId`, `child`.`id` as `childId` FROM `parent` LEFT JOIN `child` ON `parent`.`id` = `child`.`parent_id`",
-            documentation: "",
+            documentation: None,
             parameters: [],
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
