@@ -183,11 +183,8 @@ impl Queryable for Mssql {
         self.query_raw(sql, params).await
     }
 
-    async fn parse_raw_query(&self, sql: &str) -> crate::Result<ParsedRawQuery> {
-        let mut _client = self.client.lock().await;
-        let mut _query = tiberius::Query::new(sql);
-
-        todo!("implement prepare in tiberius");
+    async fn parse_raw_query(&self, _sql: &str) -> crate::Result<ParsedRawQuery> {
+        unimplemented!("SQL Server support for raw query parsing is not implemented yet.")
     }
 
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
