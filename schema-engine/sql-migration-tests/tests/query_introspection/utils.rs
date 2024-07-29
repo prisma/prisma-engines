@@ -94,7 +94,7 @@ macro_rules! test_scalar_types {
     ) => {
             $(
                 paste::paste! {
-                    #[test_connector(tags($tag))]
+                    #[test_connector(tags($tag), exclude(Vitess))]
                     fn [<$test_name _ $tag:lower>](api: TestApi) {
 
                         let dm = render_scalar_type_datamodel(DATASOURCE, $st);

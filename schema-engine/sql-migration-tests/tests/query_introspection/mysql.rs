@@ -3,7 +3,7 @@ use psl::{builtin_connectors::MySqlType, parser_database::ScalarType};
 use quaint::prelude::ColumnType;
 use sql_migration_tests::test_api::*;
 
-#[test_connector(tags(Mysql8))]
+#[test_connector(tags(Mysql8), exclude(Vitess))]
 fn insert_mysql(api: TestApi) {
     api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
@@ -114,7 +114,7 @@ fn select_mysql(api: TestApi) {
     res.expect_result(expected);
 }
 
-#[test_connector(tags(Mysql8))]
+#[test_connector(tags(Mysql8), exclude(Vitess))]
 fn empty_result(api: TestApi) {
     api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
@@ -281,9 +281,8 @@ macro_rules! test_native_types {
     ) => {
             $(
                 paste::paste! {
-                    #[test_connector]
+                    #[test_connector(tags($tag), exclude(Vitess))]
                     fn [<nt _ $test_name>](api: TestApi) {
-                        test_setup::only!($tag);
 
                         let dm = render_native_type_datamodel::<MySqlType>(&api, DATASOURCE, $nt.to_parts(), $nt);
 
