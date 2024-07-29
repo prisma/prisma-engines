@@ -1,3 +1,5 @@
+use std::future::Future;
+
 use async_trait::async_trait;
 use metrics::decrement_gauge;
 use quaint::{
@@ -22,9 +24,13 @@ impl JsTransactionContext {
         Self { inner, tx_ctx_proxy }
     }
 
-    pub async fn start_transaction(&self) -> quaint::Result<Box<JsTransaction>> {
-        self.tx_ctx_proxy.start_transaction().await
+    pub fn start_transaction(&self) -> UnsafeFuture<impl Future<Output = quaint::Result<Box<JsTransaction>>> + '_> {
+        UnsafeFuture(self.tx_ctx_proxy.start_transaction())
     }
+
+    // pub async fn start_transaction(&self) -> quaint::Result<Box<JsTransaction>> {
+    //     self.tx_ctx_proxy.start_transaction().await
+    // }
 }
 
 #[async_trait]

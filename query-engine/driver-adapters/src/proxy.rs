@@ -211,8 +211,8 @@ macro_rules! impl_send_sync_on_wasm {
 
 // Assume the proxy object will not be sent to service workers, we can unsafe impl Send + Sync.
 impl_send_sync_on_wasm!(TransactionProxy);
+impl_send_sync_on_wasm!(JsTransaction);
 impl_send_sync_on_wasm!(TransactionContextProxy);
+impl_send_sync_on_wasm!(JsTransactionContext);
 impl_send_sync_on_wasm!(DriverProxy);
 impl_send_sync_on_wasm!(CommonProxy);
-impl_send_sync_on_wasm!(JsTransaction);
-impl_send_sync_on_wasm!(JsTransactionContext);
