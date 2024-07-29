@@ -7,7 +7,9 @@ mod error;
 
 pub(crate) use crate::connector::postgres::url::PostgresUrl;
 use crate::connector::postgres::url::{Hidden, SslAcceptMode, SslParams};
-use crate::connector::{timeout, ColumnType, IsolationLevel, ParsedRawItem, ParsedRawQuery, Transaction};
+use crate::connector::{
+    timeout, ColumnType, IsolationLevel, ParsedRawColumn, ParsedRawParameter, ParsedRawQuery, Transaction,
+};
 use crate::error::NativeErrorKind;
 
 use crate::{
@@ -474,8 +476,8 @@ impl Queryable for PostgreSql {
 
     async fn parse_raw_query(&self, sql: &str) -> crate::Result<ParsedRawQuery> {
         let stmt = self.fetch_cached(sql, &[]).await?;
-        let mut columns: Vec<ParsedRawItem> = Vec::with_capacity(stmt.columns().len());
-        let mut parameters: Vec<ParsedRawItem> = Vec::with_capacity(stmt.params().len());
+        let mut columns: Vec<ParsedRawColumn> = Vec::with_capacity(stmt.columns().len());
+        let mut parameters: Vec<ParsedRawParameter> = Vec::with_capacity(stmt.params().len());
 
         async fn infer_type(this: &PostgreSql, ty: &PostgresType) -> crate::Result<(ColumnType, Option<String>)> {
             let column_type = ColumnType::from(ty);
@@ -500,13 +502,13 @@ impl Queryable for PostgreSql {
         for col in stmt.columns() {
             let (typ, enum_name) = infer_type(self, col.type_()).await?;
 
-            columns.push(ParsedRawItem::new_named(col.name(), typ).with_enum_name(enum_name));
+            columns.push(ParsedRawColumn::new_named(col.name(), typ).with_enum_name(enum_name));
         }
 
         for param in stmt.params() {
             let (typ, enum_name) = infer_type(self, param).await?;
 
-            parameters.push(ParsedRawItem::new_named(param.name(), typ).with_enum_name(enum_name));
+            parameters.push(ParsedRawParameter::new_named(param.name(), typ).with_enum_name(enum_name));
         }
 
         Ok(ParsedRawQuery { columns, parameters })

@@ -42,8 +42,8 @@ pub struct IntrospectSqlQueryColumnOutput {
     pub typ: String,
 }
 
-impl From<quaint::connector::ParsedRawItem> for IntrospectSqlQueryColumnOutput {
-    fn from(item: quaint::connector::ParsedRawItem) -> Self {
+impl From<quaint::connector::ParsedRawColumn> for IntrospectSqlQueryColumnOutput {
+    fn from(item: quaint::connector::ParsedRawColumn) -> Self {
         Self {
             name: item.name,
             typ: item.enum_name.unwrap_or_else(|| item.typ.to_string()),

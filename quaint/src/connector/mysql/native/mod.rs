@@ -6,7 +6,7 @@ mod conversion;
 mod error;
 
 pub(crate) use crate::connector::mysql::MysqlUrl;
-use crate::connector::{timeout, ColumnType, IsolationLevel, ParsedRawItem, ParsedRawQuery};
+use crate::connector::{timeout, ColumnType, IsolationLevel, ParsedRawColumn, ParsedRawParameter, ParsedRawQuery};
 
 use crate::{
     ast::{Query, Value},
@@ -252,13 +252,13 @@ impl Queryable for Mysql {
             let columns = stmt
                 .columns()
                 .iter()
-                .map(|col| ParsedRawItem::new_named(col.name_str(), col))
+                .map(|col| ParsedRawColumn::new_named(col.name_str(), col))
                 .collect();
             let parameters = stmt
                 .params()
                 .iter()
                 .enumerate()
-                .map(|(idx, col)| ParsedRawItem::new_unnamed(idx, col))
+                .map(|(idx, col)| ParsedRawParameter::new_unnamed(idx, col))
                 .collect();
 
             Ok(ParsedRawQuery { columns, parameters })

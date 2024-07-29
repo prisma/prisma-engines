@@ -2,7 +2,7 @@
 
 pub(crate) use quaint::connector::rusqlite;
 
-use quaint::connector::{ColumnType, GetRow, ParsedRawItem, ToColumnNames};
+use quaint::connector::{ColumnType, GetRow, ParsedRawColumn, ParsedRawParameter, ToColumnNames};
 use schema_connector::{ConnectorError, ConnectorResult};
 use sql_schema_describer::{sqlite as describer, DescriberErrorKind, SqlSchema};
 use std::sync::Mutex;
@@ -83,15 +83,15 @@ impl Connection {
                 Some(name) => {
                     let name = name.strip_prefix(':').unwrap_or(name);
 
-                    ParsedRawItem::new_named(name, ColumnType::Unknown)
+                    ParsedRawParameter::new_named(name, ColumnType::Unknown)
                 }
-                None => ParsedRawItem::new_unnamed(idx, ColumnType::Unknown),
+                None => ParsedRawParameter::new_unnamed(idx, ColumnType::Unknown),
             })
             .collect();
         let columns = stmt
             .columns()
             .iter()
-            .map(|col| ParsedRawItem::new_named(col.name(), col))
+            .map(|col| ParsedRawColumn::new_named(col.name(), col))
             .collect();
 
         Ok(quaint::connector::ParsedRawQuery { columns, parameters })

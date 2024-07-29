@@ -6,7 +6,7 @@ mod conversion;
 mod error;
 
 use crate::connector::{sqlite::params::SqliteParams, ColumnType, ParsedRawQuery};
-use crate::connector::{IsolationLevel, ParsedRawItem};
+use crate::connector::{IsolationLevel, ParsedRawColumn, ParsedRawParameter};
 
 pub use rusqlite::{params_from_iter, version as sqlite_version};
 
@@ -133,15 +133,15 @@ impl Queryable for Sqlite {
                 Some(name) => {
                     let name = name.strip_prefix(':').unwrap_or(name);
 
-                    ParsedRawItem::new_named(name, ColumnType::Unknown)
+                    ParsedRawParameter::new_named(name, ColumnType::Unknown)
                 }
-                None => ParsedRawItem::new_unnamed(idx, ColumnType::Unknown),
+                None => ParsedRawParameter::new_unnamed(idx, ColumnType::Unknown),
             })
             .collect();
         let columns = stmt
             .columns()
             .iter()
-            .map(|col| ParsedRawItem::new_named(col.name(), col))
+            .map(|col| ParsedRawColumn::new_named(col.name(), col))
             .collect();
 
         Ok(ParsedRawQuery { columns, parameters })
