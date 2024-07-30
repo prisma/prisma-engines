@@ -8,6 +8,91 @@ mod common {
     use super::*;
 
     #[test_connector(tags(Postgres))]
+    fn insert(api: TestApi) {
+        api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+        let query = "INSERT INTO model (int, string, bigint, float, bytes, bool, dt) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING int, string, bigint, float, bytes, bool, dt;";
+        let res = api.introspect_sql("test_1", query).send_sync();
+
+        let expected = expect![[r#"
+            IntrospectSqlQueryOutput {
+                name: "test_1",
+                source: "INSERT INTO model (int, string, bigint, float, bytes, bool, dt) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING int, string, bigint, float, bytes, bool, dt;",
+                documentation: None,
+                parameters: [
+                    IntrospectSqlQueryParameterOutput {
+                        documentation: None,
+                        name: "int4",
+                        typ: "int",
+                    },
+                    IntrospectSqlQueryParameterOutput {
+                        documentation: None,
+                        name: "text",
+                        typ: "string",
+                    },
+                    IntrospectSqlQueryParameterOutput {
+                        documentation: None,
+                        name: "int8",
+                        typ: "bigint",
+                    },
+                    IntrospectSqlQueryParameterOutput {
+                        documentation: None,
+                        name: "float8",
+                        typ: "double",
+                    },
+                    IntrospectSqlQueryParameterOutput {
+                        documentation: None,
+                        name: "bytea",
+                        typ: "bytes",
+                    },
+                    IntrospectSqlQueryParameterOutput {
+                        documentation: None,
+                        name: "bool",
+                        typ: "bool",
+                    },
+                    IntrospectSqlQueryParameterOutput {
+                        documentation: None,
+                        name: "timestamp",
+                        typ: "datetime",
+                    },
+                ],
+                result_columns: [
+                    IntrospectSqlQueryColumnOutput {
+                        name: "int",
+                        typ: "int",
+                    },
+                    IntrospectSqlQueryColumnOutput {
+                        name: "string",
+                        typ: "string",
+                    },
+                    IntrospectSqlQueryColumnOutput {
+                        name: "bigint",
+                        typ: "bigint",
+                    },
+                    IntrospectSqlQueryColumnOutput {
+                        name: "float",
+                        typ: "double",
+                    },
+                    IntrospectSqlQueryColumnOutput {
+                        name: "bytes",
+                        typ: "bytes",
+                    },
+                    IntrospectSqlQueryColumnOutput {
+                        name: "bool",
+                        typ: "bool",
+                    },
+                    IntrospectSqlQueryColumnOutput {
+                        name: "dt",
+                        typ: "datetime",
+                    },
+                ],
+            }
+        "#]];
+
+        res.expect_result(expected);
+    }
+
+    #[test_connector(tags(Postgres))]
     fn empty_result(api: TestApi) {
         api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
@@ -191,7 +276,7 @@ mod postgres {
         var_bit(PostgresType::VarBit(Some(1))) => Text,
         uuid(PostgresType::Uuid) => Uuid,
         xml(PostgresType::Xml) => Xml,
-        nt_json(PostgresType::Json) => Json,
+        json(PostgresType::Json) => Json,
         json_b(PostgresType::JsonB) => Json,
     }
 }
@@ -254,7 +339,7 @@ mod crdb {
         $(
             paste::paste! {
                 #[test_connector(tags(CockroachDb))]
-                fn [<crdb _ $test_name>](api: TestApi) {
+                fn $test_name(api: TestApi) {
                     let dm = render_native_type_datamodel::<CockroachType>(&api, CRDB_DATASOURCE, $nt.to_parts(), $nt);
 
                     api.schema_push(&dm).send();
