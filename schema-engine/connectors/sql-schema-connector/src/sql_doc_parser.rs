@@ -36,7 +36,7 @@ impl<'a> ParsedSqlDoc<'a> {
         self.parameters.iter().find(|p| p.alias == Some(alias))
     }
 
-    pub(crate) fn documentation(&self) -> Option<&str> {
+    pub(crate) fn description(&self) -> Option<&str> {
         self.description
     }
 }
@@ -131,8 +131,8 @@ impl<'a> Input<'a> {
         Self(self.0.trim_end())
     }
 
-    fn take_until_pat_or_eol(&self, pat: &[char]) -> (Input<'a>, &'a str) {
-        if let Some(end) = self.find(pat) {
+    fn take_until_pattern_or_eol(&self, pattern: &[char]) -> (Input<'a>, &'a str) {
+        if let Some(end) = self.find(pattern) {
             (self.move_from(end), self.move_to(end).inner())
         } else {
             (self.move_to_end(), self.inner())
@@ -187,7 +187,7 @@ fn parse_position_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<us
     if let Some((param_input, param_pos)) = input
         .trim_start()
         .strip_prefix_char('$')
-        .map(|input| input.take_until_pat_or_eol(&[':', ' ']))
+        .map(|input| input.take_until_pattern_or_eol(&[':', ' ']))
     {
         match param_pos.parse::<usize>().map_err(|_| {
             build_error(
@@ -207,7 +207,7 @@ fn parse_alias_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<&'_ s
     if let Some((input, alias)) = input
         .trim_start()
         .strip_prefix_char(':')
-        .map(|input| input.take_until_pat_or_eol(&[' ']))
+        .map(|input| input.take_until_pattern_or_eol(&[' ']))
     {
         Ok((input, Some(alias)))
     } else {
@@ -266,7 +266,7 @@ fn parse_description(input: Input<'_>) -> ConnectorResult<Option<&str>> {
 pub(crate) fn parse_sql_doc(sql: &str) -> ConnectorResult<ParsedSqlDoc<'_>> {
     let mut parsed_sql = ParsedSqlDoc::default();
 
-    let lines = sql.lines().peekable();
+    let lines = sql.lines();
 
     for line in lines {
         let input = Input(line.trim());

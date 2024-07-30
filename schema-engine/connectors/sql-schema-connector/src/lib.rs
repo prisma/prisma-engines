@@ -396,7 +396,7 @@ impl SchemaConnector for SqlSchemaConnector {
             Ok(IntrospectSqlQueryOutput {
                 name: input.name,
                 source: input.source,
-                documentation: parsed_doc.documentation().map(ToOwned::to_owned),
+                documentation: parsed_doc.description().map(ToOwned::to_owned),
                 parameters,
                 result_columns: columns,
             })
