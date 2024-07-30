@@ -131,6 +131,7 @@ impl Queryable for Sqlite {
         let parameters = (1..=stmt.parameter_count())
             .map(|idx| match stmt.parameter_name(idx) {
                 Some(name) => {
+                    // SQLite parameter names are prefixed with a colon. We remove it here so that the js doc parser can match the names.
                     let name = name.strip_prefix(':').unwrap_or(name);
 
                     ParsedRawParameter::new_named(name, ColumnType::Unknown)
