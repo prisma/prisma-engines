@@ -45,6 +45,11 @@ impl ParsedRawParameter {
         self.enum_name = enum_name;
         self
     }
+
+    pub fn set_typ(mut self, typ: ColumnType) -> Self {
+        self.typ = typ;
+        self
+    }
 }
 
 impl ParsedRawColumn {
