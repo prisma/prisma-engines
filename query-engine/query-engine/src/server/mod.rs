@@ -379,7 +379,7 @@ async fn setup_telemetry(headers: &HeaderMap, tx_id: &Option<TxId>) -> (Span, Op
 
     let span = info_span!("prisma:engine", user_facing = true);
     let traceparent = if let Some(parent_context) = parent_context {
-        let requester_traceparent = TraceParent::from_context(&parent_context);
+        let requester_traceparent = TraceParent::from_remote_context(&parent_context);
         span.set_parent(parent_context);
         requester_traceparent
     } else if let Some(tx_id) = &tx_id {

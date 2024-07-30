@@ -25,7 +25,7 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         idents: &[ColumnMetadata<'_>],
         ctx: &Context<'_>,
     ) -> crate::Result<Vec<SqlRow>> {
-        let span = info_span!("filter read query");
+        let span = info_span!("prisma:engine:filter_read_query");
 
         let otel_ctx = span.context();
         let span_ref = otel_ctx.span();

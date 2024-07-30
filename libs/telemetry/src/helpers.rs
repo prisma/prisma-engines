@@ -25,20 +25,22 @@ pub static SHOW_ALL_TRACES: Lazy<bool> = Lazy::new(|| match std::env::var("PRISM
 #[derive(Display, Copy, Clone)]
 // This conforms with https://www.w3.org/TR/trace-context/#traceparent-header-field-values. Accelerate
 // relies on this behaviour.
-#[display(fmt = "00-{trace_id:032x}-{span_id:032x}-01")]
+#[display(fmt = "00-{trace_id:032x}-{span_id:016x}-01")]
 pub struct TraceParent {
     trace_id: TraceId,
     span_id: SpanId,
 }
 
 impl TraceParent {
-    pub fn new(trace_id: TraceId, span_id: SpanId) -> Self {
+    pub fn new_unsafe(trace_id: TraceId, span_id: SpanId) -> Self {
         Self { trace_id, span_id }
     }
 
-    pub fn from_context(context: &opentelemetry::Context) -> Option<Self> {
+    pub fn from_remote_context(context: &opentelemetry::Context) -> Option<Self> {
         let span = context.span();
         let span_context = span.span_context();
+        debug_assert!(span_context.is_remote());
+
         if span_context.is_valid() {
             Some(Self {
                 trace_id: span_context.trace_id(),
@@ -60,7 +62,9 @@ impl TraceParent {
         // can handle `traceparent` field (for example, `TraceContextPropagator`).
         let mut extractor = HashMap::new();
         extractor.insert("traceparent".to_string(), self.to_string());
-        opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&extractor))
+        let context = opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&extractor));
+        debug_assert!(context.span().span_context().is_remote());
+        context
     }
 }
 
@@ -73,11 +77,13 @@ pub fn spans_to_json(spans: Vec<SpanData>) -> String {
     serde_json::to_string(&span_result).unwrap_or_default()
 }
 
-pub fn restore_context_from_json_str(serialized: &str) -> opentelemetry::Context {
+pub fn restore_remote_context_from_json_str(serialized: &str) -> opentelemetry::Context {
     // This relies on the fact that global text map propagator was installed that
     // can handle `traceparent` field (for example, `TraceContextPropagator`).
     let trace: HashMap<String, String> = serde_json::from_str(serialized).unwrap_or_default();
-    opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&trace))
+    let context = opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&trace));
+    debug_assert!(context.span().span_context().is_remote());
+    context
 }
 
 pub enum QueryEngineLogLevel {

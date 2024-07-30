@@ -25,6 +25,11 @@ enum TransactionState {
         // First, we drop the `tx`, which may reference `_conn`. Only after that we drop `_conn`.
         tx: Box<dyn Transaction>,
         _conn: Pin<Box<dyn Connection + Send + Sync>>,
+        // Note: It's important for this span to be dropped as soon as the transaction is
+        // transitioned from the "open" state. Dropping the span later than that could leave to a
+        // significant delay in delivery because trace exporter considers this span (along with
+        // all its parent spans) "unfinished".
+        tx_span: Span,
     },
     Committed,
     RolledBack,
@@ -70,6 +75,7 @@ impl TransactionState {
     async fn start_transaction(
         conn: Box<dyn Connection + Send + Sync>,
         isolation_level: Option<String>,
+        tx_span: Span,
     ) -> crate::Result<Self> {
         // Note: This method creates a self-referential struct, which is why we need unsafe. Field
         // `tx` is referencing field `conn` in the `Self::Open` variant.
@@ -90,12 +96,13 @@ impl TransactionState {
         Ok(Self::Open {
             tx: tx_with_erased_lifetime,
             _conn: conn,
+            tx_span,
         })
     }
 
-    fn as_open(&mut self, from_operation: &str) -> crate::Result<&mut Box<dyn Transaction>> {
+    fn as_open(&mut self, from_operation: &str) -> crate::Result<(&mut Box<dyn Transaction>, Span)> {
         match self {
-            Self::Open { tx, .. } => Ok(tx),
+            Self::Open { tx, tx_span, .. } => Ok((tx, tx_span.clone())),
             tx => Err(CoreError::from(TransactionError::Closed {
                 reason: tx.as_closed().unwrap().error_message_for(from_operation),
             })),
@@ -121,13 +128,11 @@ pub struct InteractiveTransaction {
     start_time: ElapsedTimeCounter,
     timeout: Duration,
     query_schema: QuerySchemaRef,
-    tx_span: Span,
 }
 
 /// This macro executes the future until it's ready or the transaction's timeout expires.
 macro_rules! tx_timeout {
     ($self:expr, $operation:expr, $fut:expr) => {{
-        let tx_span = $self.tx_span.clone();
         let remaining_time = $self
             .timeout
             .checked_sub($self.start_time.elapsed_time())
@@ -139,7 +144,7 @@ macro_rules! tx_timeout {
                     reason: $self.as_closed().unwrap().error_message_for($operation),
                 }.into())
             }
-            result = $fut.instrument(tx_span) => {
+            result = $fut => {
                 result
             }
         }
@@ -154,18 +159,19 @@ impl InteractiveTransaction {
         query_schema: QuerySchemaRef,
         isolation_level: Option<String>,
     ) -> crate::Result<Self> {
-        let state = TransactionState::start_transaction(conn, isolation_level).await?;
-
         Span::current().record("itx_id", id.to_string());
-        let tx_span = info_span!("prisma:engine:itx_runner", "itx_id" = id.to_string());
+        let tx_span = info_span!(
+            "prisma:engine:itx_runner",
+            user_facing = true,
+            "itx_id" = id.to_string()
+        );
 
         Ok(Self {
             id,
-            state,
+            state: TransactionState::start_transaction(conn, isolation_level, tx_span).await?,
             start_time: ElapsedTimeCounter::start(),
             timeout,
             query_schema,
-            tx_span,
         })
     }
 
@@ -178,7 +184,7 @@ impl InteractiveTransaction {
             let span = info_span!("prisma:engine:itx_execute_single", user_facing = true);
             link_span_with_traceparent(&span, &traceparent);
 
-            let conn = self.state.as_open("query")?;
+            let (conn, tx_span) = self.state.as_open("query")?;
             execute_single_operation(
                 self.query_schema.clone(),
                 conn.as_connection_like(),
@@ -186,6 +192,7 @@ impl InteractiveTransaction {
                 traceparent,
             )
             .instrument(span)
+            .instrument(tx_span)
             .await
         })
     }
@@ -199,7 +206,7 @@ impl InteractiveTransaction {
             let span = info_span!("prisma:engine:itx_execute_batch", user_facing = true);
             link_span_with_traceparent(&span, &traceparent);
 
-            let conn = self.state.as_open("batch query")?;
+            let (conn, tx_span) = self.state.as_open("batch query")?;
             execute_many_operations(
                 self.query_schema.clone(),
                 conn.as_connection_like(),
@@ -207,6 +214,7 @@ impl InteractiveTransaction {
                 traceparent,
             )
             .instrument(span)
+            .instrument(tx_span)
             .await
         })
     }
@@ -214,10 +222,10 @@ impl InteractiveTransaction {
     pub async fn commit(&mut self) -> crate::Result<()> {
         tx_timeout!(self, "commit", async {
             let name = self.name();
-            let open_tx = self.state.as_open("commit")?;
+            let (conn, tx_span) = self.state.as_open("commit")?;
             let span = info_span!("prisma:engine:itx_commit", user_facing = true);
 
-            if let Err(err) = open_tx.commit().instrument(span).await {
+            if let Err(err) = conn.commit().instrument(span).instrument(tx_span).await {
                 error!(?err, ?name, "transaction failed to commit");
                 // We don't know if the transaction was committed or not. Because of that, we cannot
                 // leave it in "open" state. We attempt to rollback to get the transaction into a
@@ -234,10 +242,10 @@ impl InteractiveTransaction {
 
     pub async fn rollback(&mut self, was_timeout: bool) -> crate::Result<()> {
         let name = self.name();
-        let open_tx = self.state.as_open("rollback")?;
+        let (conn, tx_span) = self.state.as_open("rollback")?;
         let span = info_span!("prisma:engine:itx_rollback", user_facing = true);
 
-        let result = open_tx.rollback().instrument(span).await;
+        let result = conn.rollback().instrument(span).instrument(tx_span).await;
         if let Err(err) = &result {
             error!(?err, ?was_timeout, ?name, "transaction failed to roll back");
         } else {

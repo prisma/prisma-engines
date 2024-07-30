@@ -45,10 +45,11 @@ impl TxId {
         SpanId::from_bytes(buffer)
     }
 
-    /// Creates new root `TraceParent` that isn't nested under any other spans. Same transaction id
-    /// is guaranteed to have traceparent with the same trace_id and span_id.
+    /// Creates new artificial `TraceParent`. The span corresponding to this traceparent is never
+    /// emitted. Same transaction id is guaranteed to have traceparent with the same trace_id and
+    /// span_id.
     pub fn as_traceparent(&self) -> TraceParent {
-        TraceParent::new(self.as_trace_id(), self.as_span_id())
+        TraceParent::new_unsafe(self.as_trace_id(), self.as_span_id())
     }
 }
 
