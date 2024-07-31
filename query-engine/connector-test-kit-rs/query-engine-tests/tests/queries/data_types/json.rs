@@ -236,7 +236,11 @@ mod json {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_json_list), capabilities(Json, ScalarLists), exclude(Mysql(5.6)))]
+    #[connector_test(
+        schema(schema_json_list),
+        capabilities(Json, ScalarLists),
+        exclude(Mysql(5.6), CockroachDb)
+    )]
     async fn json_list(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,
