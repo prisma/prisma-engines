@@ -25,7 +25,7 @@ use tokio::{
     runtime::{self, Runtime},
     sync::RwLock,
 };
-use tracing::{instrument::WithSubscriber, level_filters::LevelFilter, Instrument, Span};
+use tracing::{instrument::WithSubscriber, level_filters::LevelFilter, Instrument};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 use query_engine_common::Result;
