@@ -26,8 +26,10 @@ impl TxId {
         let tx_id = self.0.as_bytes();
         let len = tx_id.len();
 
-        // First 8 bytes after letter 'c' in cuid represent timestamp in milliseconds.
-        buffer[0..8].copy_from_slice(&tx_id[1..9]);
+        // The first byte of CUID is always letter 'c'. Next 8 bytes after that represent timestamp
+        // in milliseconds. Next 4 bytes after that represent the counter.
+        // We take last 4 bytes of the timestamp and combine it with the counter.
+        buffer[0..8].copy_from_slice(&tx_id[(1 + 4)..(1 + 4 + 8)]);
         // Last 8 bytes of cuid are totally random.
         buffer[8..].copy_from_slice(&tx_id[len - 8..]);
 
