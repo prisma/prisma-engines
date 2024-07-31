@@ -52,7 +52,7 @@ tokio = { version = "1.25", features = [
 ] }
 chrono = { version = "0.4.38", features = ["serde"] }
 user-facing-errors = { path = "./libs/user-facing-errors" }
-uuid = { version = "1", features = ["serde", "v4", "v7"] }
+uuid = { version = "1", features = ["serde", "v4", "v7", "js"] }
 indoc = "2.0.1"
 indexmap = { version = "2.2.2", features = ["serde"] }
 itertools = "0.12"
