@@ -545,6 +545,7 @@ mod many_relation {
         schema.to_owned()
     }
 
+    // Regression test for https://github.com/prisma/prisma/issues/23742
     #[connector_test(schema(schema_23742))]
     async fn prisma_23742(runner: Runner) -> TestResult<()> {
         run_query!(
