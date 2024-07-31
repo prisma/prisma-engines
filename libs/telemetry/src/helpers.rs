@@ -18,7 +18,7 @@ pub static SHOW_ALL_TRACES: Lazy<bool> = Lazy::new(|| match std::env::var("PRISM
 /// By "remote" we mean that this span was not emitted in the current process. In real life, it is
 /// either:
 ///  - Emitted by the JS part of the Prisma ORM. This is true both for Accelerate (where the Rust
-///    part is deployed as a server) and for when the ORM (where the Rust part is a shared library)
+///    part is deployed as a server) and for the ORM (where the Rust part is a shared library)
 ///  - Never emitted at all. This happens when the `TraceParent` is created artificially from `TxId`
 ///    (see `TxId::as_traceparent`). In this case, `TraceParent` is used only to correlated logs
 ///    from different transaction operations - it is never used as a part of the trace
