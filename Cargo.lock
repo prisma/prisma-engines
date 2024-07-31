@@ -3940,6 +3940,7 @@ dependencies = [
  "serde-wasm-bindgen",
  "serde_json",
  "sql-query-connector",
+ "telemetry",
  "thiserror",
  "tokio",
  "tracing",

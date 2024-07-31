@@ -13,15 +13,17 @@ use query_core::{
     protocol::EngineProtocol,
     relation_load_strategy,
     schema::{self},
-    telemetry, TransactionOptions, TxId,
+    TransactionOptions, TxId,
 };
 use query_engine_common::engine::{map_known_error, ConnectedEngine, ConstructorOptions, EngineBuilder, Inner};
 use request_handlers::ConnectorKind;
 use request_handlers::{load_executor, RequestBody, RequestHandler};
 use serde_json::json;
 use std::{marker::PhantomData, sync::Arc};
+use telemetry::helpers::TraceParent;
 use tokio::sync::RwLock;
-use tracing::{field, instrument::WithSubscriber, Instrument, Level, Span};
+use tracing::{instrument::WithSubscriber, Instrument, Level};
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 use tracing_subscriber::filter::LevelFilter;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -89,7 +91,7 @@ impl QueryEngine {
 
         async {
             let span = tracing::info_span!("prisma:engine:connect");
-            let parent_context = telemetry::helpers::restore_context_from_json_str(&trace);
+            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
             span.set_parent(parent_context);
 
             let mut inner = self.inner.write().await;
@@ -151,7 +153,7 @@ impl QueryEngine {
 
         async {
             let span = tracing::info_span!("prisma:engine:disconnect", user_facing = true);
-            let parent_context = telemetry::helpers::restore_context_from_json_str(&trace);
+            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
             span.set_parent(parent_context);
 
             async {
@@ -192,8 +194,8 @@ impl QueryEngine {
 
             async move {
                 let span = tracing::info_span!("prisma:engine:query", user_facing = true);
-                let parent_context = telemetry::helpers::restore_context_from_json_str(&trace);
-                let traceparent = TraceParent::from_context(&parent_context);
+                let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
+                let traceparent = TraceParent::from_remote_context(&parent_context);
                 span.set_parent(parent_context);
 
                 let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
@@ -219,8 +221,8 @@ impl QueryEngine {
 
         async move {
             let span = tracing::info_span!("prisma:engine:start_transaction", user_facing = true);
-            let parent_context = telemetry::helpers::restore_context_from_json_str(&trace);
-            let traceparent = TraceParent::from_context(&parent_context);
+            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
+            let traceparent = TraceParent::from_remote_context(&parent_context);
             span.set_parent(parent_context);
 
             let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
@@ -247,8 +249,8 @@ impl QueryEngine {
 
         async move {
             let span = tracing::info_span!("prisma:engine:commit_transaction", user_facing = true);
-            let parent_context = telemetry::helpers::restore_context_from_json_str(&trace);
-            let traceparent = TraceParent::from_context(&parent_context);
+            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
+            let traceparent = TraceParent::from_remote_context(&parent_context);
             span.set_parent(parent_context);
 
             match engine.executor().commit_tx(TxId::from(tx_id)).await {
@@ -270,8 +272,8 @@ impl QueryEngine {
 
         async move {
             let span = tracing::info_span!("prisma:engine:rollback_transaction", user_facing = true);
-            let parent_context = telemetry::helpers::restore_context_from_json_str(&trace);
-            let traceparent = TraceParent::from_context(&parent_context);
+            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
+            let traceparent = TraceParent::from_remote_context(&parent_context);
             span.set_parent(parent_context);
 
             match engine.executor().rollback_tx(TxId::from(tx_id)).await {
