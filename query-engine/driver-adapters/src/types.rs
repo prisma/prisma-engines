@@ -10,7 +10,7 @@ use quaint::connector::{ColumnType as QuaintColumnType, ExternalConnectionInfo, 
 #[cfg(target_arch = "wasm32")]
 use tsify::Tsify;
 
-use crate::conversion::JSArg;
+use crate::conversion::{JSArg, JSArgType};
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
@@ -288,6 +288,7 @@ js_column_type! {
 pub struct Query {
     pub sql: String,
     pub args: Vec<JSArg>,
+    pub arg_types: Vec<Option<JSArgType>>,
 }
 
 #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]
