@@ -517,28 +517,28 @@ mod many_relation {
     fn schema_23742() -> String {
         let schema = indoc! {
             r#"model Top {
-                id Int @id
+                #id(id, Int, @id)
 
                 middleId Int?
                 middle Middle? @relation(fields: [middleId], references: [id])
 
-                bottoms Bottom[]
+                #m2m(bottoms, Bottom[], id, Int) 
               }
 
               model Middle {
-                id        Int @id
+                #id(id, Int, @id)
                 bottoms Bottom[]
 
                 tops    Top[]
               }
 
               model Bottom {
-                id        Int @id
+                #id(id, Int, @id)
 
                 middleId Int?
                 middle Middle?  @relation(fields: [middleId], references: [id])
 
-                tops Top[]
+                #m2m(tops, Top[], id, Int)
               }"#
         };
 
@@ -546,7 +546,8 @@ mod many_relation {
     }
 
     // Regression test for https://github.com/prisma/prisma/issues/23742
-    #[connector_test(schema(schema_23742))]
+    // SQL Server excluded because the m2m fragment does not support onUpdate/onDelete args which are needed.
+    #[connector_test(schema(schema_23742), exclude(SqlServer))]
     async fn prisma_23742(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
