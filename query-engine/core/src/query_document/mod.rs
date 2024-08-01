@@ -32,6 +32,7 @@ use crate::{
     query_ast::{QueryOption, QueryOptions},
     query_graph_builder::resolve_compound_field,
 };
+use itertools::Itertools;
 use query_structure::Model;
 use schema::{constants::*, QuerySchema};
 use std::collections::HashMap;
@@ -293,6 +294,7 @@ impl CompactedDocument {
                     _ => vec![key.to_owned()],
                 })
             })
+            .unique()
             .collect();
 
         Self {
