@@ -121,7 +121,7 @@ impl<'a> DefaultValuePair<'a> {
                 Some(previous) if previous.is_nanoid() => {
                     let length = previous.value().as_function().and_then(|(_, args, _)| {
                         args.arguments
-                            .get(0)
+                            .first()
                             .map(|arg| arg.value.as_numeric_value().unwrap().0.parse::<u8>().unwrap())
                     });
 

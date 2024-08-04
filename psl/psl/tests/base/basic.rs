@@ -235,7 +235,77 @@ fn type_aliases_must_error() {
         [1;94m   | [0m
         [1;94m 1 | [0m[1;91mtype MyString = String @default("B")[0m
         [1;94m   | [0m
+        [1;91merror[0m: [1mType "MyString" is neither a built-in type, nor refers to another model, composite type, or enum.[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m  id  Int      @id
+        [1;94m 5 | [0m  val [1;91mMyString[0m
+        [1;94m   | [0m
     "#]];
 
     expectation.assert_eq(&error);
+}
+
+#[test]
+fn must_return_good_error_message_for_type_match() {
+    let dml = indoc! {r#"
+        model User {
+          firstName String
+        }
+        model B {
+          a  datetime
+          b  footime
+          c user
+          d DB
+          e JS
+        }
+
+        datasource db {
+          provider   = "postgresql"
+          url        = env("TEST_DATABASE_URL")
+          extensions = [citext, pg_trgm]
+        }
+
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["postgresqlExtensions"]
+        }
+    "#};
+
+    let error = parse_unwrap_err(dml);
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mType "datetime" is neither a built-in type, nor refers to another model, composite type, or enum. Did you mean "DateTime"?[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0mmodel B {
+        [1;94m 5 | [0m  a  [1;91mdatetime[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mType "footime" is neither a built-in type, nor refers to another model, composite type, or enum.[0m
+          [1;94m-->[0m  [4mschema.prisma:6[0m
+        [1;94m   | [0m
+        [1;94m 5 | [0m  a  datetime
+        [1;94m 6 | [0m  b  [1;91mfootime[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mType "user" is neither a built-in type, nor refers to another model, composite type, or enum. Did you mean "User"?[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
+        [1;94m   | [0m
+        [1;94m 6 | [0m  b  footime
+        [1;94m 7 | [0m  c [1;91muser[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mType "DB" is neither a built-in type, nor refers to another model, composite type, or enum.[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m  c user
+        [1;94m 8 | [0m  d [1;91mDB[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mType "JS" is neither a built-in type, nor refers to another model, composite type, or enum.[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
+        [1;94m   | [0m
+        [1;94m 8 | [0m  d DB
+        [1;94m 9 | [0m  e [1;91mJS[0m
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
 }

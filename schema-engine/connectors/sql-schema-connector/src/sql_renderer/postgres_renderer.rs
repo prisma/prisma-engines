@@ -8,7 +8,7 @@ use crate::{
     },
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
-use psl::builtin_connectors::{CockroachType, GeometryParams, PostgresType};
+use psl::builtin_connectors::{CockroachType, PostgresType, geometry::GeometryParams};
 use sql_ddl::{
     postgres::{self as ddl, PostgresIdentifier},
     IndexColumn, SortOrder,
@@ -658,8 +658,8 @@ fn render_decimal_args(input: Option<(u32, u32)>) -> String {
 fn render_geometry_arg(input: Option<GeometryParams>) -> String {
     match input {
         None => "".to_string(),
-        Some(GeometryParams { ty, srid: 0 }) => format!("({ty})"),
-        Some(GeometryParams { ty, srid }) => format!("({ty}, {srid})"),
+        Some(GeometryParams { type_, srid: 0 }) => format!("({type_})"),
+        Some(GeometryParams { type_, srid }) => format!("({type_}, {srid})"),
     }
 }
 

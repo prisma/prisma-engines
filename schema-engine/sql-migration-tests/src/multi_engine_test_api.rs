@@ -14,7 +14,7 @@ use crate::{
 };
 use psl::PreviewFeature;
 use quaint::{
-    prelude::{ConnectionInfo, Queryable, ResultSet},
+    prelude::{ConnectionInfo, NativeConnectionInfo, Queryable, ResultSet},
     single::Quaint,
 };
 use schema_core::schema_connector::{ConnectorParams, SchemaConnector};
@@ -144,6 +144,11 @@ impl TestApi {
         self.tags().contains(Tags::Postgres15)
     }
 
+    /// Returns true only when testing on postgres version 16.
+    pub fn is_postgres_16(&self) -> bool {
+        self.tags().contains(Tags::Postgres16)
+    }
+
     /// Returns true only when testing on cockroach.
     pub fn is_cockroach(&self) -> bool {
         self.tags().contains(Tags::CockroachDb)
@@ -191,17 +196,19 @@ impl TestApi {
         };
 
         let mut connector = match &connection_info {
-            ConnectionInfo::Postgres(_) => {
+            ConnectionInfo::Native(NativeConnectionInfo::Postgres(_)) => {
                 if self.args.provider() == "cockroachdb" {
                     SqlSchemaConnector::new_cockroach()
                 } else {
                     SqlSchemaConnector::new_postgres()
                 }
             }
-            ConnectionInfo::Mysql(_) => SqlSchemaConnector::new_mysql(),
-            ConnectionInfo::Mssql(_) => SqlSchemaConnector::new_mssql(),
-            ConnectionInfo::Sqlite { .. } => SqlSchemaConnector::new_sqlite(),
-            ConnectionInfo::InMemorySqlite { .. } => unreachable!(),
+            ConnectionInfo::Native(NativeConnectionInfo::Mysql(_)) => SqlSchemaConnector::new_mysql(),
+            ConnectionInfo::Native(NativeConnectionInfo::Mssql(_)) => SqlSchemaConnector::new_mssql(),
+            ConnectionInfo::Native(NativeConnectionInfo::Sqlite { .. }) => SqlSchemaConnector::new_sqlite(),
+            ConnectionInfo::Native(NativeConnectionInfo::InMemorySqlite { .. }) | ConnectionInfo::External(_) => {
+                unreachable!()
+            }
         };
         connector.set_params(params).unwrap();
 
@@ -306,7 +313,12 @@ impl EngineTestApi {
         schema: &'a str,
         migrations_directory: &'a TempDir,
     ) -> CreateMigration<'a> {
-        CreateMigration::new(&mut self.connector, name, schema, migrations_directory)
+        CreateMigration::new(
+            &mut self.connector,
+            name,
+            &[("schema.prisma", schema)],
+            migrations_directory,
+        )
     }
 
     /// Builder and assertions to call the DiagnoseMigrationHistory command.
@@ -329,7 +341,13 @@ impl EngineTestApi {
 
     /// Plan a `schemaPush` command
     pub fn schema_push(&mut self, dm: impl Into<String>) -> SchemaPush<'_> {
-        SchemaPush::new(&mut self.connector, dm.into(), self.max_ddl_refresh_delay)
+        let dm: String = dm.into();
+
+        SchemaPush::new(
+            &mut self.connector,
+            &[("schema.prisma", &dm)],
+            self.max_ddl_refresh_delay,
+        )
     }
 
     /// The schema name of the current connected database.

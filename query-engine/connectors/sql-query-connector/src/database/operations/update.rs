@@ -21,15 +21,14 @@ pub(crate) async fn update_one_with_selection(
     selected_fields: FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SingleRecord>> {
-    let selected_fields = ModelProjection::from(selected_fields);
-
     // If there's nothing to update, just read the record.
     // TODO(perf): Technically, if the selectors are fulfilling the field selection, there's no need to perform an additional read.
     if args.args.is_empty() {
         let filter = build_update_one_filter(record_filter);
-
-        return get_single_record(conn, model, &filter, &selected_fields, &[], ctx).await;
+        return get_single_record(conn, model, &filter, &selected_fields, RelationLoadStrategy::Query, ctx).await;
     }
+
+    let selected_fields = ModelProjection::from(selected_fields);
 
     let cond = FilterBuilder::without_top_level_joins().visit_filter(build_update_one_filter(record_filter), ctx);
 

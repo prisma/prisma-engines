@@ -70,7 +70,7 @@ pub(crate) fn upsert_record(
     );
 
     let filter = extract_unique_filter(where_argument, &model)?;
-    let read_query = read::find_unique(field.clone(), model.clone())?;
+    let read_query = read::find_unique(field.clone(), model.clone(), query_schema)?;
 
     if can_use_native_upsert {
         if let ReadQuery::RecordQuery(read) = read_query {

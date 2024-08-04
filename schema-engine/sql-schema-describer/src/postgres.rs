@@ -13,7 +13,10 @@ use enumflags2::BitFlags;
 use indexmap::IndexMap;
 use indoc::indoc;
 use psl::{
-    builtin_connectors::{CockroachType, GeometryParams, GeometryType, PostgresType},
+    builtin_connectors::{
+        geometry::{GeometryParams, GeometryType},
+        CockroachType, PostgresType,
+    },
     datamodel_connector::NativeTypeInstance,
 };
 use quaint::{connector::ResultRow, prelude::Queryable, Value};
@@ -994,7 +997,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 .map(|v| v.as_str().parse::<i32>())
                 .unwrap_or(Ok(if is_geography && !is_cockroach { 4326 } else { 0 }));
             match (geom_type, srid) {
-                (Ok(ty), Ok(srid)) => Some(GeometryParams { ty, srid }),
+                (Ok(type_), Ok(srid)) => Some(GeometryParams { type_, srid }),
                 _ => None,
             }
         })

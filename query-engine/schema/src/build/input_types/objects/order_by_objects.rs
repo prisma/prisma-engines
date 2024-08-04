@@ -28,9 +28,8 @@ impl OrderByOptions {
             self.include_scalar_aggregations,
             self.include_full_text_search,
         ) {
-            (true, false, false) => "WithRelation",
+            (true, false, _) => "WithRelation",
             (false, true, false) => "WithAggregation",
-            (true, false, true) => "WithRelationAndSearchRelevance",
             _ => "",
         }
     }

@@ -831,8 +831,8 @@ pub enum DefaultKind {
 }
 
 impl DefaultValue {
-    pub fn db_generated(val: impl Into<String>) -> Self {
-        Self::new(DefaultKind::DbGenerated(Some(val.into())))
+    pub fn db_generated<S: Into<String>>(val: impl Into<Option<S>>) -> Self {
+        Self::new(DefaultKind::DbGenerated(val.into().map(Into::into)))
     }
 
     pub fn constraint_name(&self) -> Option<&str> {

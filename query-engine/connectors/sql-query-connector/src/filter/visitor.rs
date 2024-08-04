@@ -3,6 +3,7 @@ use crate::join_utils::{compute_one2m_join, AliasedJoin};
 use crate::{model_extensions::*, Context};
 
 use psl::datamodel_connector::ConnectorCapability;
+use psl::reachable_only_with_capability;
 use quaint::ast::concat;
 use quaint::ast::*;
 use query_structure::{filter::*, prelude::*};
@@ -27,7 +28,7 @@ pub(crate) trait FilterVisitorExt {
 }
 
 #[derive(Debug, Clone, Default)]
-pub(crate) struct FilterVisitor {
+pub struct FilterVisitor {
     /// The last alias that's been rendered.
     last_alias: Option<Alias>,
     /// The parent alias, used when rendering nested filters so that a child filter can refer to its join.
@@ -66,6 +67,12 @@ impl FilterVisitor {
     /// Returns the parent alias, if there's one set, so that nested filters can refer to the parent join/table.
     fn parent_alias(&self) -> Option<Alias> {
         self.parent_alias
+    }
+
+    #[cfg(feature = "relation_joins")]
+    pub fn set_parent_alias_opt(mut self, alias: Option<Alias>) -> Self {
+        self.parent_alias = alias;
+        self
     }
 
     /// A top-level join can be rendered if we're explicitly allowing it or if we're in a nested visitor.
@@ -348,6 +355,7 @@ impl FilterVisitorExt for FilterVisitor {
     fn visit_scalar_filter(&mut self, filter: ScalarFilter, ctx: &Context<'_>) -> ConditionTree<'static> {
         match filter.condition {
             ScalarCondition::Search(_, _) | ScalarCondition::NotSearch(_, _) => {
+                reachable_only_with_capability!(ConnectorCapability::FullTextSearch);
                 let mut projections = match filter.condition.clone() {
                     ScalarCondition::Search(_, proj) => proj,
                     ScalarCondition::NotSearch(_, proj) => proj,
@@ -596,6 +604,8 @@ impl FilterVisitorExt for FilterVisitor {
     }
 
     fn visit_scalar_list_filter(&mut self, filter: ScalarListFilter, ctx: &Context<'_>) -> ConditionTree<'static> {
+        reachable_only_with_capability!(ConnectorCapability::ScalarLists);
+
         let comparable: Expression = filter.field.aliased_col(self.parent_alias(), ctx).into();
         let cond = filter.condition;
         let field = &filter.field;
@@ -700,15 +710,18 @@ fn convert_scalar_filter(
     ctx: &Context<'_>,
 ) -> ConditionTree<'static> {
     match cond {
-        ScalarCondition::JsonCompare(json_compare) => convert_json_filter(
-            comparable,
-            json_compare,
-            reverse,
-            fields.first().unwrap(),
-            mode,
-            alias,
-            ctx,
-        ),
+        ScalarCondition::JsonCompare(json_compare) => {
+            reachable_only_with_capability!(ConnectorCapability::JsonFiltering);
+            convert_json_filter(
+                comparable,
+                json_compare,
+                reverse,
+                fields.first().unwrap(),
+                mode,
+                alias,
+                ctx,
+            )
+        }
         _ => match mode {
             QueryMode::Default => default_scalar_filter(comparable, cond, fields, alias, ctx),
             QueryMode::Insensitive => {
@@ -945,6 +958,7 @@ fn default_scalar_filter(
             comparable.not_equals(Expression::from(field_ref.aliased_col(alias, ctx)).all())
         }
         ScalarCondition::Search(value, _) => {
+            reachable_only_with_capability!(ConnectorCapability::FullTextSearch);
             let query: String = value
                 .into_value()
                 .unwrap()
@@ -954,6 +968,7 @@ fn default_scalar_filter(
             comparable.matches(query)
         }
         ScalarCondition::NotSearch(value, _) => {
+            reachable_only_with_capability!(ConnectorCapability::FullTextSearch);
             let query: String = value
                 .into_value()
                 .unwrap()
@@ -1137,6 +1152,7 @@ fn insensitive_scalar_filter(
             comparable.compare_raw("NOT ILIKE", Expression::from(field_ref.aliased_col(alias, ctx)).all())
         }
         ScalarCondition::Search(value, _) => {
+            reachable_only_with_capability!(ConnectorCapability::FullTextSearch);
             let query: String = value
                 .into_value()
                 .unwrap()
@@ -1146,6 +1162,7 @@ fn insensitive_scalar_filter(
             comparable.matches(query)
         }
         ScalarCondition::NotSearch(value, _) => {
+            reachable_only_with_capability!(ConnectorCapability::FullTextSearch);
             let query: String = value
                 .into_value()
                 .unwrap()

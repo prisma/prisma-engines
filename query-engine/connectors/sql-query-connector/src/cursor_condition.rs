@@ -577,7 +577,7 @@ fn take_last_two_elem<T>(slice: &[T]) -> (Option<&T>, Option<&T>) {
 
     match len {
         0 => (None, None),
-        1 => (None, slice.get(0)),
+        1 => (None, slice.first()),
         _ => (slice.get(len - 2), slice.get(len - 1)),
     }
 }

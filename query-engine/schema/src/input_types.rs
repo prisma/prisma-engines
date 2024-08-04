@@ -16,6 +16,7 @@ pub struct InputObjectType<'a> {
 }
 
 impl PartialEq for InputObjectType<'_> {
+    #[allow(unconditional_recursion)]
     fn eq(&self, other: &Self) -> bool {
         self.identifier.eq(&other.identifier)
     }

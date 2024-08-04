@@ -4,8 +4,9 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputList, ParsedInputMap,
 };
-use psl::datamodel_connector::ConnectorCapability;
-use query_structure::{IntoFilter, Model};
+use connector::WriteArgs;
+use psl::{datamodel_connector::ConnectorCapability, parser_database::RelationFieldId};
+use query_structure::{IntoFilter, Model, Zipper};
 use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 use write_args_parser::*;
@@ -32,7 +33,7 @@ pub(crate) fn create_record(
         let create_node = create::create_record_node(graph, query_schema, model.clone(), data_map)?;
 
         // Follow-up read query on the write
-        let read_query = read::find_unique(field, model.clone())?;
+        let read_query = read::find_unique(field, model.clone(), query_schema)?;
         let read_node = graph.create_node(Query::Read(read_query));
 
         graph.add_result_node(&read_node);
@@ -65,8 +66,9 @@ pub(crate) fn create_record(
 /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
 pub(crate) fn create_many_records(
     graph: &mut QueryGraph,
-    _query_schema: &QuerySchema,
+    query_schema: &QuerySchema,
     model: Model,
+    with_field_selection: bool,
     mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
@@ -92,13 +94,30 @@ pub(crate) fn create_many_records(
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
+    let selected_fields = if with_field_selection {
+        let (selected_fields, selection_order, nested_read) =
+            super::read::utils::extract_selected_fields(field.nested_fields.unwrap().fields, &model, query_schema)?;
+
+        Some(CreateManyRecordsFields {
+            fields: selected_fields,
+            order: selection_order,
+            nested: nested_read,
+        })
+    } else {
+        None
+    };
+
     let query = CreateManyRecords {
+        name: field.name,
         model,
         args,
         skip_duplicates,
+        selected_fields,
+        split_by_shape: !query_schema.has_capability(ConnectorCapability::SupportsDefaultInInsert),
     };
 
     graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));
+
     Ok(())
 }
 
@@ -108,11 +127,18 @@ pub fn create_record_node(
     model: Model,
     data_map: ParsedInputMap<'_>,
 ) -> QueryGraphBuilderResult<NodeRef> {
-    let create_args = WriteArgsParser::from(&model, data_map)?;
-    let mut args = create_args.args;
+    let mut parser = WriteArgsParser::from(&model, data_map)?;
+    parser.args.add_datetimes(&model);
+    create_record_node_from_args(graph, query_schema, model, parser.args, parser.nested)
+}
 
-    args.add_datetimes(&model);
-
+pub(crate) fn create_record_node_from_args(
+    graph: &mut QueryGraph,
+    query_schema: &QuerySchema,
+    model: Model,
+    args: WriteArgs,
+    nested: Vec<(Zipper<RelationFieldId>, ParsedInputMap<'_>)>,
+) -> QueryGraphBuilderResult<NodeRef> {
     let selected_fields = model.primary_identifier();
     let selection_order = selected_fields.db_names().collect();
 
@@ -127,7 +153,7 @@ pub fn create_record_node(
 
     let create_node = graph.create_node(Query::Write(WriteQuery::CreateRecord(cr)));
 
-    for (relation_field, data_map) in create_args.nested {
+    for (relation_field, data_map) in nested {
         nested::connect_nested_query(graph, query_schema, create_node, relation_field, data_map)?;
     }
 

@@ -115,3 +115,16 @@ macro_rules! retry {
         }
     }};
 }
+
+#[macro_export]
+macro_rules! with_id_excess {
+    ($runner:expr, $query_template:expr) => {{
+        let max_bind_values = $runner
+            .max_bind_values()
+            .expect("Test expected to run only for relational databases.");
+
+        let cycle = |argn: usize| (argn % 10 + 1).to_string();
+        let id_list = (0..=max_bind_values).map(cycle).collect::<Vec<_>>().join(",");
+        $query_template.replace(":id_list:", &id_list)
+    }};
+}

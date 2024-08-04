@@ -50,17 +50,17 @@ pub fn nested_update(
             // This is used to read the children first, to make sure they're actually connected.
             // The update itself operates on the record found by the read check.
             let mut map: ParsedInputMap<'_> = value.try_into()?;
-            let where_arg: ParsedInputMap<'_> = map.remove(args::WHERE).unwrap().try_into()?;
+            let where_arg: ParsedInputMap<'_> = map.swap_remove(args::WHERE).unwrap().try_into()?;
 
             let filter = extract_unique_filter(where_arg, child_model)?;
-            let data_value = map.remove(args::DATA).unwrap();
+            let data_value = map.swap_remove(args::DATA).unwrap();
 
             (data_value, filter)
         } else {
             match value {
                 // If the update input is of shape { where?: WhereInput, data: DataInput }
                 ParsedInputValue::Map(mut map) if map.is_nested_to_one_update_envelope() => {
-                    let filter = if let Some(where_arg) = map.remove(args::WHERE) {
+                    let filter = if let Some(where_arg) = map.swap_remove(args::WHERE) {
                         let where_arg: ParsedInputMap<'_> = where_arg.try_into()?;
 
                         extract_filter(where_arg, child_model)?
@@ -68,7 +68,7 @@ pub fn nested_update(
                         Filter::empty()
                     };
 
-                    let data_value = map.remove(args::DATA).unwrap();
+                    let data_value = map.swap_remove(args::DATA).unwrap();
 
                     (data_value, filter)
                 }
@@ -131,8 +131,8 @@ pub fn nested_update_many(
 ) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
         let mut map: ParsedInputMap<'_> = value.try_into()?;
-        let where_arg = map.remove(args::WHERE).unwrap();
-        let data_value = map.remove(args::DATA).unwrap();
+        let where_arg = map.swap_remove(args::WHERE).unwrap();
+        let data_value = map.swap_remove(args::DATA).unwrap();
         let data_map: ParsedInputMap<'_> = data_value.try_into()?;
         let where_map: ParsedInputMap<'_> = where_arg.try_into()?;
         let child_model_identifier = parent_relation_field.related_model().primary_identifier();

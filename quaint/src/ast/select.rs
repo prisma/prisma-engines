@@ -4,7 +4,7 @@ use std::borrow::Cow;
 /// A builder for a `SELECT` statement.
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct Select<'a> {
-    pub(crate) distinct: bool,
+    pub(crate) distinct: Option<DistinctType<'a>>,
     pub(crate) tables: Vec<Table<'a>>,
     pub(crate) columns: Vec<Expression<'a>>,
     pub(crate) conditions: Option<ConditionTree<'a>>,
@@ -16,6 +16,12 @@ pub struct Select<'a> {
     pub(crate) joins: Vec<Join<'a>>,
     pub(crate) ctes: Vec<CommonTableExpression<'a>>,
     pub(crate) comment: Option<Cow<'a, str>>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum DistinctType<'a> {
+    Default,
+    OnClause(Vec<Expression<'a>>),
 }
 
 impl<'a> From<Select<'a>> for Expression<'a> {
@@ -236,7 +242,12 @@ impl<'a> Select<'a> {
     /// # }
     /// ```
     pub fn distinct(mut self) -> Self {
-        self.distinct = true;
+        self.distinct = Some(DistinctType::Default);
+        self
+    }
+
+    pub fn distinct_on(mut self, columns: Vec<Expression<'a>>) -> Self {
+        self.distinct = Some(DistinctType::OnClause(columns));
         self
     }
 
@@ -389,6 +400,15 @@ impl<'a> Select<'a> {
     {
         self.joins.push(Join::Left(join.into()));
         self
+    }
+
+    pub fn left_join_lateral<J>(self, join: J) -> Self
+    where
+        J: Into<JoinData<'a>>,
+    {
+        let join_data: JoinData = join.into();
+
+        self.left_join(join_data.lateral())
     }
 
     /// Adds `RIGHT JOIN` clause to the query.

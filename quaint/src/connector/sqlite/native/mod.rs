@@ -1,11 +1,12 @@
 //! Definitions for the SQLite connector.
 //! This module is not compatible with wasm32-* targets.
 //! This module is only available with the `sqlite-native` feature.
+mod column_type;
 mod conversion;
 mod error;
 
-use crate::connector::sqlite::params::SqliteParams;
 use crate::connector::IsolationLevel;
+use crate::connector::{sqlite::params::SqliteParams, ColumnType};
 
 pub use rusqlite::{params_from_iter, version as sqlite_version, LoadExtensionGuard};
 
@@ -43,7 +44,7 @@ pub fn load_spatialite(conn: &rusqlite::Connection) -> crate::Result<()> {
                     _ => Err(Error::builder(ErrorKind::QueryError("Failed to load Spatialite".into())).build()),
                 },
                 3 => Ok(()),
-                _ => Err(Error::builder(ErrorKind::ConnectionError("Invalid Spatialite State".into())).build()),
+                _ => Err(Error::builder(ErrorKind::QueryError("Invalid Spatialite State".into())).build()),
             };
         }
     }
@@ -57,7 +58,28 @@ impl TryFrom<&str> for Sqlite {
         let params = SqliteParams::try_from(path)?;
         let file_path = params.file_path;
 
-        let conn = rusqlite::Connection::open(file_path.as_str())?;
+        // Read about SQLite threading modes here: https://www.sqlite.org/threadsafe.html.
+        // - "single-thread". In this mode, all mutexes are disabled and SQLite is unsafe to use in more than a single thread at once.
+        // - "multi-thread". In this mode, SQLite can be safely used by multiple threads provided that no single database connection nor any
+        //   object derived from database connection, such as a prepared statement, is used in two or more threads at the same time.
+        // - "serialized". In serialized mode, API calls to affect or use any SQLite database connection or any object derived from such a
+        //   database connection can be made safely from multiple threads. The effect on an individual object is the same as if the API calls
+        //   had all been made in the same order from a single thread.
+        //
+        // `rusqlite` uses `SQLITE_OPEN_NO_MUTEX` by default, which means that the connection uses the "multi-thread" threading mode.
+
+        let conn = rusqlite::Connection::open_with_flags(
+            file_path.as_str(),
+            // The database is opened for reading and writing if possible, or reading only if the file is write protected by the operating system.
+            // The database is created if it does not already exist.
+            rusqlite::OpenFlags::SQLITE_OPEN_READ_WRITE
+                | rusqlite::OpenFlags::SQLITE_OPEN_CREATE
+                // The new database connection will use the "multi-thread" threading mode.
+                | rusqlite::OpenFlags::SQLITE_OPEN_NO_MUTEX
+                // The filename can be interpreted as a URI if this flag is set.
+                | rusqlite::OpenFlags::SQLITE_OPEN_URI,
+        )?;
+
         load_spatialite(&conn)?;
 
         if let Some(timeout) = params.socket_timeout {
@@ -108,8 +130,9 @@ impl Queryable for Sqlite {
 
             let mut stmt = client.prepare_cached(sql)?;
 
+            let col_types = stmt.columns().iter().map(ColumnType::from).collect::<Vec<_>>();
             let mut rows = stmt.query(params_from_iter(params.iter()))?;
-            let mut result = ResultSet::new(rows.to_column_names(), Vec::new());
+            let mut result = ResultSet::new(rows.to_column_names(), col_types, Vec::new());
 
             while let Some(row) = rows.next()? {
                 result.rows.push(row.get_result_row()?);
@@ -177,6 +200,14 @@ impl Queryable for Sqlite {
 
     fn requires_isolation_first(&self) -> bool {
         false
+    }
+
+    fn begin_statement(&self) -> &'static str {
+        // From https://sqlite.org/isolation.html:
+        // `BEGIN IMMEDIATE` avoids possible `SQLITE_BUSY_SNAPSHOT` that arise when another connection jumps ahead in line.
+        //  The BEGIN IMMEDIATE command goes ahead and starts a write transaction, and thus blocks all other writers.
+        // If the BEGIN IMMEDIATE operation succeeds, then no subsequent operations in that transaction will ever fail with an SQLITE_BUSY error.
+        "BEGIN IMMEDIATE"
     }
 }
 

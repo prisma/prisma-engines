@@ -1,0 +1,21 @@
+// tags=postgres
+// exclude=cockroachdb
+
+datasource testds {
+    provider = "postgresql"
+    url      = env("TEST_DATABASE_URL")
+}
+
+model table {
+    id            String                   @id
+    hereBeDragons Unsupported("tsvector")? @default(dbgenerated())
+}
+
+// Expected Migration:
+// -- CreateTable
+// CREATE TABLE "table" (
+//     "id" TEXT NOT NULL,
+//     "hereBeDragons" tsvector,
+// 
+//     CONSTRAINT "table_pkey" PRIMARY KEY ("id")
+// );

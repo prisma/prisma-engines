@@ -1,0 +1,22 @@
+datasource db {
+  provider = "sqlserver"
+  url      = "sqlserver://"
+}
+
+model Example {
+  id    Int @id(clustered: false)
+  value Int
+
+  @@index([value], clustered: true)
+}
+
+model Post {
+  title      String   @db.VarChar(300)
+  abstract   String   @db.VarChar(3000)
+  slug       String   @unique(sort: Desc) @db.VarChar(3000)
+  author     String
+  created_at DateTime
+
+  @@id([title(sort: Desc), abstract])
+  @@index([author, created_at(sort: Desc)])
+}

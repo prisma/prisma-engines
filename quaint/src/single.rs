@@ -10,6 +10,9 @@ use std::{fmt, sync::Arc};
 #[cfg(feature = "sqlite-native")]
 use std::convert::TryFrom;
 
+#[cfg(native)]
+use crate::connector::NativeConnectionInfo;
+
 /// The main entry point and an abstraction over a database connection.
 #[derive(Clone)]
 pub struct Quaint {
@@ -125,7 +128,7 @@ impl Quaint {
     /// - `isolationLevel` the transaction isolation level. Possible values:
     ///   `READ UNCOMMITTED`, `READ COMMITTED`, `REPEATABLE READ`, `SNAPSHOT`,
     ///   `SERIALIZABLE`.
-    #[cfg_attr(target_arch = "wasm32", allow(unused_variables))]
+    #[cfg(native)]
     #[allow(unreachable_code)]
     pub async fn new(url_str: &str) -> crate::Result<Self> {
         let inner = match url_str {
@@ -168,13 +171,13 @@ impl Quaint {
     #[cfg(feature = "sqlite-native")]
     /// Open a new SQLite database in memory.
     pub fn new_in_memory() -> crate::Result<Quaint> {
-        use crate::connector::DEFAULT_SQLITE_SCHEMA_NAME;
+        use crate::connector::sqlite::DEFAULT_SQLITE_DATABASE;
 
         Ok(Quaint {
             inner: Arc::new(connector::Sqlite::new_in_memory()?),
-            connection_info: Arc::new(ConnectionInfo::InMemorySqlite {
-                db_name: DEFAULT_SQLITE_SCHEMA_NAME.to_owned(),
-            }),
+            connection_info: Arc::new(ConnectionInfo::Native(NativeConnectionInfo::InMemorySqlite {
+                db_name: DEFAULT_SQLITE_DATABASE.to_owned(),
+            })),
         })
     }
 
@@ -183,6 +186,7 @@ impl Quaint {
         &self.connection_info
     }
 
+    #[cfg(native)]
     fn log_start(info: &ConnectionInfo) {
         let family = info.sql_family();
         let pg_bouncer = if info.pg_bouncer() { " in PgBouncer mode" } else { "" };

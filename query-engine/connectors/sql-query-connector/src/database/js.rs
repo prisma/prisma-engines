@@ -1,36 +1,15 @@
 use super::connection::SqlConnection;
-use crate::FromSource;
 use async_trait::async_trait;
 use connector_interface::{
     self as connector,
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use once_cell::sync::Lazy;
 use quaint::{
-    connector::{IsolationLevel, Transaction},
+    connector::{ExternalConnector, IsolationLevel, Transaction},
     prelude::{Queryable as QuaintQueryable, *},
 };
-use std::sync::{Arc, Mutex};
-
-static ACTIVE_DRIVER_ADAPTER: Lazy<Mutex<Option<DriverAdapter>>> = Lazy::new(|| Mutex::new(None));
-
-fn active_driver_adapter(provider: &str) -> connector::Result<DriverAdapter> {
-    let lock = ACTIVE_DRIVER_ADAPTER.lock().unwrap();
-
-    lock.as_ref()
-        .map(|conn_ref| conn_ref.to_owned())
-        .ok_or(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(format!(
-            "A driver adapter for {} was not registered",
-            provider
-        ))))
-}
-
-pub fn activate_driver_adapter(connector: Arc<dyn TransactionCapable>) {
-    let mut lock = ACTIVE_DRIVER_ADAPTER.lock().unwrap();
-
-    *lock = Some(DriverAdapter { connector });
-}
+use std::sync::Arc;
 
 pub struct Js {
     connector: DriverAdapter,
@@ -38,29 +17,22 @@ pub struct Js {
     features: psl::PreviewFeatures,
 }
 
-fn get_connection_info(url: &str) -> connector::Result<ConnectionInfo> {
-    ConnectionInfo::from_url(url).map_err(|err| {
-        ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
-            details: err.to_string(),
-            url: url.to_string(),
-        })
-    })
-}
-
-#[async_trait]
-impl FromSource for Js {
-    async fn from_source(
-        source: &psl::Datasource,
-        url: &str,
+impl Js {
+    pub async fn new(
+        connector: Arc<dyn ExternalConnector>,
         features: psl::PreviewFeatures,
-    ) -> connector_interface::Result<Js> {
-        let connector = active_driver_adapter(source.active_provider)?;
-        let connection_info = get_connection_info(url)?;
+    ) -> connector_interface::Result<Self> {
+        let external_conn_info = connector.get_connection_info().await.map_err(|e| match e.kind() {
+            &quaint::error::ErrorKind::ExternalError(id) => ConnectorError::from_kind(ErrorKind::ExternalError(id)),
+            _ => ConnectorError::from_kind(ErrorKind::InvalidDriverAdapter(
+                "Error while calling getConnectionInfo()".into(),
+            )),
+        })?;
 
         Ok(Js {
-            connector,
-            connection_info,
+            connector: DriverAdapter { connector },
             features,
+            connection_info: ConnectionInfo::External(external_conn_info),
         })
     }
 }
@@ -68,8 +40,8 @@ impl FromSource for Js {
 #[async_trait]
 impl Connector for Js {
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
-        super::catch(self.connection_info.clone(), async move {
-            let sql_conn = SqlConnection::new(self.connector.clone(), &self.connection_info, self.features);
+        super::catch(&self.connection_info, async move {
+            let sql_conn = SqlConnection::new(self.connector.clone(), self.connection_info.clone(), self.features);
             Ok(Box::new(sql_conn) as Box<dyn Connection + Send + Sync + 'static>)
         })
         .await
@@ -84,26 +56,24 @@ impl Connector for Js {
     }
 }
 
-// TODO: miguelff: I haven´t found a better way to do this, yet... please continue reading.
-//
-// There is a bug in NAPI-rs by wich compiling a binary crate that links code using napi-rs
-// bindings breaks. We could have used a JsQueryable from the `driver-adapters` crate directly, as the
-// `connection` field of a driver adapter, but that will imply using napi-rs transitively, and break
-// the tests (which are compiled as binary creates)
-//
-// To avoid the problem above I separated interface from implementation, making DriverAdapter
-// independent on napi-rs. Initially, I tried having a field Arc<&dyn TransactionCabable> to hold
-// JsQueryable at runtime. I did this, because TransactionCapable is the trait bounds required to
-// create a value of  `SqlConnection` (see [SqlConnection::new])) to actually performt the queries.
-// using JSQueryable. However, this didn't work because TransactionCapable is not object safe.
-// (has Sized as a supertrait)
-//
-// The thing is that TransactionCapable is not object safe and cannot be used in a dynamic type
-// declaration, so finally I couldn't come up with anything better then wrapping a QuaintQueryable
-// in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
+/// There is a bug in NAPI-rs by wich compiling a binary crate that links code using napi-rs
+/// bindings breaks. We could have used a JsQueryable from the `driver-adapters` crate directly, as the
+/// `connection` field of a driver adapter, but that will imply using napi-rs transitively, and break
+/// the tests (which are compiled as binary creates)
+///
+/// To avoid the problem above I separated interface from implementation, making DriverAdapter
+/// independent on napi-rs. Initially, I tried having a field Arc<&dyn TransactionCabable> to hold
+/// JsQueryable at runtime. I did this, because TransactionCapable is the trait bounds required to
+/// create a value of  `SqlConnection` (see [SqlConnection::new])) to actually performt the queries.
+/// using JSQueryable. However, this didn't work because TransactionCapable is not object safe.
+/// (has Sized as a supertrait)
+///
+/// The thing is that TransactionCapable is not object safe and cannot be used in a dynamic type
+/// declaration, so finally I couldn't come up with anything better then wrapping a QuaintQueryable
+/// in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
 #[derive(Clone)]
 pub struct DriverAdapter {
-    connector: Arc<dyn TransactionCapable>,
+    connector: Arc<dyn ExternalConnector>,
 }
 
 #[async_trait]

@@ -10,7 +10,7 @@ use crate::{
 use std::borrow::Cow;
 
 /// @@id on models
-pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Context<'_>) {
+pub(super) fn model(model_data: &mut ModelAttributes, model_id: crate::ModelId, ctx: &mut Context<'_>) {
     let attr = ctx.current_attribute();
     let fields = match ctx.visit_default_arg("fields") {
         Ok(value) => value,
@@ -29,9 +29,9 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
             if !unresolvable_fields.is_empty() {
                 let fields_str = unresolvable_fields
                     .into_iter()
-                    .map(|(top_id, field_name)| match top_id {
+                    .map(|((file_id, top_id), field_name)| match top_id {
                         ast::TopId::CompositeType(ctid) => {
-                            let ct_name = &ctx.ast[ctid].name();
+                            let ct_name = ctx.asts[(file_id, ctid)].name();
 
                             Cow::from(format!("{field_name} in type {ct_name}"))
                         }
@@ -43,7 +43,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
 
                 let msg = format!("The multi field id declaration refers to the unknown fields {fields_str}.");
                 let error =
-                    DatamodelError::new_model_validation_error(&msg, "model", ctx.ast[model_id].name(), fields.span());
+                    DatamodelError::new_model_validation_error(&msg, "model", ctx.asts[model_id].name(), fields.span());
 
                 ctx.push_error(error);
             }
@@ -60,7 +60,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
                 ctx.push_error(DatamodelError::new_model_validation_error(
                     &msg,
                     "model",
-                    ctx.ast[model_id].name(),
+                    ctx.asts[model_id].name(),
                     attr.span,
                 ));
             }
@@ -69,7 +69,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
         }
     };
 
-    let ast_model = &ctx.ast[model_id];
+    let ast_model = &ctx.asts[model_id];
 
     // ID attribute fields must reference only required fields.
     let fields_that_are_not_required: Vec<&str> = resolved_fields
@@ -77,7 +77,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
         .filter_map(|field| match field.path.field_in_index() {
             either::Either::Left(id) => {
                 let ScalarField { model_id, field_id, .. } = ctx.types[id];
-                let field = &ctx.ast[model_id][field_id];
+                let field = &ctx.asts[model_id][field_id];
 
                 if field.arity.is_required() {
                     None
@@ -86,7 +86,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
                 }
             }
             either::Either::Right((ctid, field_id)) => {
-                let field = &ctx.ast[ctid][field_id];
+                let field = &ctx.asts[ctid][field_id];
 
                 if field.arity.is_required() {
                     None
@@ -198,7 +198,7 @@ pub(super) fn field<'db>(
 }
 
 pub(super) fn validate_id_field_arities(
-    model_id: ast::ModelId,
+    model_id: crate::ModelId,
     model_attributes: &ModelAttributes,
     ctx: &mut Context<'_>,
 ) {
@@ -213,7 +213,7 @@ pub(super) fn validate_id_field_arities(
     };
 
     let ast_field = if let Some(field_id) = pk.source_field {
-        &ctx.ast[model_id][field_id]
+        &ctx.asts[model_id][field_id]
     } else {
         return;
     };
@@ -222,7 +222,7 @@ pub(super) fn validate_id_field_arities(
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "Fields that are marked as id must be required.",
             "@id",
-            ctx.ast[pk.source_attribute].span,
+            ctx.asts[pk.source_attribute].span,
         ))
     }
 }

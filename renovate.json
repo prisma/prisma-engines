@@ -1,7 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "config:recommended",
+    ":noUnscheduledUpdates",
+    ":pinAllExceptPeerDependencies"
   ],
   "cargo": {
     "enabled": false
@@ -10,13 +12,15 @@
     "enabled": false
   },
   "schedule": [
-    "after 10pm every weekday",
-    "before 5am every weekday",
     "every weekend"
   ],
+  "minimumReleaseAge": "7 days",
   "rangeStrategy": "pin",
   "separateMinorPatch": true,
   "configMigration": true,
+  "ignoreDeps": [
+    "query-engine-wasm-baseline"
+  ],
   "packageRules": [
     {
       "matchFileNames": [
@@ -50,11 +54,43 @@
       ]
     },
     {
+      "groupName": "Driver Adapters directory",
+      "matchFileNames": [
+        "query-engine/driver-adapters/**"
+      ]
+    },
+    {
       "matchPackageNames": [
         "node",
         "pnpm"
       ],
       "enabled": false
+    },
+    {
+      "groupName": "rust toolchain update",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchDepNames": [
+        "rust"
+      ],
+      "schedule": [
+        "before 7am every weekday"
+      ]
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^rust-toolchain\\.toml?$"
+      ],
+      "matchStrings": [
+        "channel\\s*=\\s*\"(?<currentValue>\\d+\\.\\d+(\\.\\d+)?)\""
+      ],
+      "depNameTemplate": "rust",
+      "packageNameTemplate": "rust-lang/rust",
+      "datasourceTemplate": "github-releases"
     }
   ]
 }

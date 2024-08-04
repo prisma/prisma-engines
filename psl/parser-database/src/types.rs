@@ -4,30 +4,38 @@ use crate::{context::Context, interner::StringId, walkers::IndexFieldWalker, Dat
 use either::Either;
 use enumflags2::bitflags;
 use rustc_hash::FxHashMap as HashMap;
-use schema_ast::ast::{self, WithName};
+use schema_ast::ast::{self, EnumValueId, WithName};
 use std::{collections::BTreeMap, fmt};
 
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
-    for (top_id, top) in ctx.ast.iter_tops() {
+    for ((file_id, top_id), top) in ctx.iter_tops() {
         match (top_id, top) {
-            (ast::TopId::Model(model_id), ast::Top::Model(model)) => visit_model(model_id, model, ctx),
+            (ast::TopId::Model(model_id), ast::Top::Model(model)) => visit_model((file_id, model_id), model, ctx),
             (ast::TopId::Enum(_), ast::Top::Enum(enm)) => visit_enum(enm, ctx),
-            (ast::TopId::CompositeType(ct_id), ast::Top::CompositeType(ct)) => visit_composite_type(ct_id, ct, ctx),
+            (ast::TopId::CompositeType(ct_id), ast::Top::CompositeType(ct)) => {
+                visit_composite_type((file_id, ct_id), ct, ctx)
+            }
             (_, ast::Top::Source(_)) | (_, ast::Top::Generator(_)) => (),
             _ => unreachable!(),
         }
     }
 }
 
+pub enum RefinedFieldVariant {
+    Relation(RelationFieldId),
+    Scalar(ScalarFieldId),
+    Unknown,
+}
+
 #[derive(Debug, Default)]
 pub(super) struct Types {
-    pub(super) composite_type_fields: BTreeMap<(ast::CompositeTypeId, ast::FieldId), CompositeTypeField>,
+    pub(super) composite_type_fields: BTreeMap<(crate::CompositeTypeId, ast::FieldId), CompositeTypeField>,
     scalar_fields: Vec<ScalarField>,
     /// This contains only the relation fields actually present in the schema
     /// source text.
     relation_fields: Vec<RelationField>,
-    pub(super) enum_attributes: HashMap<ast::EnumId, EnumAttributes>,
-    pub(super) model_attributes: HashMap<ast::ModelId, ModelAttributes>,
+    pub(super) enum_attributes: HashMap<crate::EnumId, EnumAttributes>,
+    pub(super) model_attributes: HashMap<crate::ModelId, ModelAttributes>,
     /// Sorted array of scalar fields that have an `@default()` attribute with a function that is
     /// not part of the base Prisma ones. This is meant for later validation in the datamodel
     /// connector.
@@ -37,7 +45,7 @@ pub(super) struct Types {
 impl Types {
     pub(super) fn find_model_scalar_field(
         &self,
-        model_id: ast::ModelId,
+        model_id: crate::ModelId,
         field_id: ast::FieldId,
     ) -> Option<ScalarFieldId> {
         self.scalar_fields
@@ -48,7 +56,7 @@ impl Types {
 
     pub(super) fn range_model_scalar_fields(
         &self,
-        model_id: ast::ModelId,
+        model_id: crate::ModelId,
     ) -> impl Iterator<Item = (ScalarFieldId, &ScalarField)> + Clone {
         let start = self.scalar_fields.partition_point(|sf| sf.model_id < model_id);
         self.scalar_fields[start..]
@@ -71,7 +79,7 @@ impl Types {
 
     pub(super) fn range_model_scalar_field_ids(
         &self,
-        model_id: ast::ModelId,
+        model_id: crate::ModelId,
     ) -> impl Iterator<Item = ScalarFieldId> + Clone {
         let end = self.scalar_fields.partition_point(|sf| sf.model_id <= model_id);
         let start = self.scalar_fields[..end].partition_point(|sf| sf.model_id < model_id);
@@ -80,7 +88,7 @@ impl Types {
 
     pub(super) fn range_model_relation_fields(
         &self,
-        model_id: ast::ModelId,
+        model_id: crate::ModelId,
     ) -> impl Iterator<Item = (RelationFieldId, &RelationField)> + Clone {
         let first_relation_field_idx = self.relation_fields.partition_point(|rf| rf.model_id < model_id);
         self.relation_fields[first_relation_field_idx..]
@@ -90,16 +98,16 @@ impl Types {
             .map(move |(idx, rf)| (RelationFieldId((first_relation_field_idx + idx) as u32), rf))
     }
 
-    pub(super) fn refine_field(&self, id: (ast::ModelId, ast::FieldId)) -> Either<RelationFieldId, ScalarFieldId> {
+    pub(super) fn refine_field(&self, id: (crate::ModelId, ast::FieldId)) -> RefinedFieldVariant {
         self.relation_fields
             .binary_search_by_key(&id, |rf| (rf.model_id, rf.field_id))
-            .map(|idx| Either::Left(RelationFieldId(idx as u32)))
+            .map(|idx| RefinedFieldVariant::Relation(RelationFieldId(idx as u32)))
             .or_else(|_| {
                 self.scalar_fields
                     .binary_search_by_key(&id, |sf| (sf.model_id, sf.field_id))
-                    .map(|id| Either::Right(ScalarFieldId(id as u32)))
+                    .map(|id| RefinedFieldVariant::Scalar(ScalarFieldId(id as u32)))
             })
-            .expect("expected field to be either scalar or relation field")
+            .unwrap_or(RefinedFieldVariant::Unknown)
     }
 
     pub(super) fn push_relation_field(&mut self, relation_field: RelationField) -> RelationFieldId {
@@ -158,7 +166,7 @@ pub(super) struct CompositeTypeField {
 
 #[derive(Debug)]
 enum FieldType {
-    Model(ast::ModelId),
+    Model(crate::ModelId),
     Scalar(ScalarFieldType),
 }
 
@@ -177,9 +185,9 @@ impl UnsupportedType {
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ScalarFieldType {
     /// A composite type
-    CompositeType(ast::CompositeTypeId),
+    CompositeType(crate::CompositeTypeId),
     /// An enum
-    Enum(ast::EnumId),
+    Enum(crate::EnumId),
     /// A Prisma scalar type
     BuiltInScalar(ScalarType),
     /// An `Unsupported("...")` type
@@ -196,7 +204,7 @@ impl ScalarFieldType {
     }
 
     /// Try to interpret this field type as a Composite Type.
-    pub fn as_composite_type(self) -> Option<ast::CompositeTypeId> {
+    pub fn as_composite_type(self) -> Option<crate::CompositeTypeId> {
         match self {
             ScalarFieldType::CompositeType(id) => Some(id),
             _ => None,
@@ -204,7 +212,7 @@ impl ScalarFieldType {
     }
 
     /// Try to interpret this field type as an enum.
-    pub fn as_enum(self) -> Option<ast::EnumId> {
+    pub fn as_enum(self) -> Option<crate::EnumId> {
         match self {
             ScalarFieldType::Enum(id) => Some(id),
             _ => None,
@@ -266,12 +274,12 @@ impl ScalarFieldType {
 pub(crate) struct DefaultAttribute {
     pub(crate) mapped_name: Option<StringId>,
     pub(crate) argument_idx: usize,
-    pub(crate) default_attribute: ast::AttributeId,
+    pub(crate) default_attribute: crate::AttributeId,
 }
 
 #[derive(Debug)]
 pub(crate) struct ScalarField {
-    pub(crate) model_id: ast::ModelId,
+    pub(crate) model_id: crate::ModelId,
     pub(crate) field_id: ast::FieldId,
     pub(crate) r#type: ScalarFieldType,
     pub(crate) is_ignored: bool,
@@ -289,9 +297,9 @@ pub(crate) struct ScalarField {
 
 #[derive(Debug)]
 pub(crate) struct RelationField {
-    pub(crate) model_id: ast::ModelId,
+    pub(crate) model_id: crate::ModelId,
     pub(crate) field_id: ast::FieldId,
-    pub(crate) referenced_model: ast::ModelId,
+    pub(crate) referenced_model: crate::ModelId,
     pub(crate) on_delete: Option<(crate::ReferentialAction, ast::Span)>,
     pub(crate) on_update: Option<(crate::ReferentialAction, ast::Span)>,
     /// The fields _explicitly present_ in the AST.
@@ -307,7 +315,7 @@ pub(crate) struct RelationField {
 }
 
 impl RelationField {
-    fn new(model_id: ast::ModelId, field_id: ast::FieldId, referenced_model: ast::ModelId) -> Self {
+    fn new(model_id: crate::ModelId, field_id: ast::FieldId, referenced_model: crate::ModelId) -> Self {
         RelationField {
             model_id,
             field_id,
@@ -497,7 +505,7 @@ impl IndexAttribute {
 pub(crate) struct IdAttribute {
     pub(crate) fields: Vec<FieldWithArgs>,
     pub(super) source_field: Option<ast::FieldId>,
-    pub(super) source_attribute: ast::AttributeId,
+    pub(super) source_attribute: crate::AttributeId,
     pub(super) name: Option<StringId>,
     pub(super) mapped_name: Option<StringId>,
     pub(super) clustered: Option<bool>,
@@ -551,7 +559,7 @@ pub struct IndexFieldPath {
     /// //           ^this one is the path. in this case a vector of one element
     /// }
     /// ```
-    path: Vec<(ast::CompositeTypeId, ast::FieldId)>,
+    path: Vec<(crate::CompositeTypeId, ast::FieldId)>,
 }
 
 impl IndexFieldPath {
@@ -559,7 +567,7 @@ impl IndexFieldPath {
         Self { root, path: Vec::new() }
     }
 
-    pub(crate) fn push_field(&mut self, ctid: ast::CompositeTypeId, field_id: ast::FieldId) {
+    pub(crate) fn push_field(&mut self, ctid: crate::CompositeTypeId, field_id: ast::FieldId) {
         self.path.push((ctid, field_id));
     }
 
@@ -599,7 +607,7 @@ impl IndexFieldPath {
     ///   @@index([a.field])
     /// }
     /// ```
-    pub fn path(&self) -> &[(ast::CompositeTypeId, ast::FieldId)] {
+    pub fn path(&self) -> &[(crate::CompositeTypeId, ast::FieldId)] {
         &self.path
     }
 
@@ -607,10 +615,10 @@ impl IndexFieldPath {
     /// or in a composite type embedded in the model. Returns the same value as
     /// the [`root`](Self::root()) method if the field is in a model rather than in a
     /// composite type.
-    pub fn field_in_index(&self) -> Either<ScalarFieldId, (ast::CompositeTypeId, ast::FieldId)> {
+    pub fn field_in_index(&self) -> Either<ScalarFieldId, (crate::CompositeTypeId, ast::FieldId)> {
         self.path
             .last()
-            .map(|id| Either::Right(*id))
+            .map(|(ct, field)| Either::Right((*ct, *field)))
             .unwrap_or(Either::Left(self.root))
     }
 }
@@ -627,7 +635,7 @@ pub struct FieldWithArgs {
 pub(super) struct EnumAttributes {
     pub(super) mapped_name: Option<StringId>,
     /// @map on enum values.
-    pub(super) mapped_values: HashMap<u32, StringId>,
+    pub(super) mapped_values: HashMap<EnumValueId, StringId>,
     /// ```ignore
     /// @@schema("public")
     ///          ^^^^^^^^
@@ -635,7 +643,7 @@ pub(super) struct EnumAttributes {
     pub(crate) schema: Option<(StringId, ast::Span)>,
 }
 
-fn visit_model<'db>(model_id: ast::ModelId, ast_model: &'db ast::Model, ctx: &mut Context<'db>) {
+fn visit_model<'db>(model_id: crate::ModelId, ast_model: &'db ast::Model, ctx: &mut Context<'db>) {
     for (field_id, ast_field) in ast_model.iter_fields() {
         match field_type(ast_field, ctx) {
             Ok(FieldType::Model(referenced_model)) => {
@@ -654,15 +662,45 @@ fn visit_model<'db>(model_id: ast::ModelId, ast_model: &'db ast::Model, ctx: &mu
                     native_type: None,
                 });
             }
-            Err(supported) => ctx.push_error(DatamodelError::new_type_not_found_error(
-                supported,
-                ast_field.field_type.span(),
-            )),
+            Err(supported) => {
+                let top_names: Vec<_> = ctx
+                    .iter_tops()
+                    .filter_map(|(_, top)| match top {
+                        ast::Top::Source(_) | ast::Top::Generator(_) => None,
+                        _ => Some(&top.identifier().name),
+                    })
+                    .collect();
+
+                match top_names.iter().find(|&name| name.to_lowercase() == supported) {
+                    Some(ignore_case_match) => {
+                        ctx.push_error(DatamodelError::new_type_for_case_not_found_error(
+                            supported,
+                            ignore_case_match.as_str(),
+                            ast_field.field_type.span(),
+                        ));
+                    }
+                    None => match ScalarType::try_from_str(supported, true) {
+                        Some(ignore_case_match) => {
+                            ctx.push_error(DatamodelError::new_type_for_case_not_found_error(
+                                supported,
+                                ignore_case_match.as_str(),
+                                ast_field.field_type.span(),
+                            ));
+                        }
+                        None => {
+                            ctx.push_error(DatamodelError::new_type_not_found_error(
+                                supported,
+                                ast_field.field_type.span(),
+                            ));
+                        }
+                    },
+                }
+            }
         }
     }
 }
 
-fn visit_composite_type<'db>(ct_id: ast::CompositeTypeId, ct: &'db ast::CompositeType, ctx: &mut Context<'db>) {
+fn visit_composite_type<'db>(ct_id: crate::CompositeTypeId, ct: &'db ast::CompositeType, ctx: &mut Context<'db>) {
     for (field_id, ast_field) in ct.iter_fields() {
         match field_type(ast_field, ctx) {
             Ok(FieldType::Scalar(scalar_type)) => {
@@ -675,7 +713,7 @@ fn visit_composite_type<'db>(ct_id: ast::CompositeTypeId, ct: &'db ast::Composit
                 ctx.types.composite_type_fields.insert((ct_id, field_id), field);
             }
             Ok(FieldType::Model(referenced_model_id)) => {
-                let referenced_model_name = ctx.ast[referenced_model_id].name();
+                let referenced_model_name = ctx.asts[referenced_model_id].name();
                 ctx.push_error(DatamodelError::new_composite_type_validation_error(&format!("{referenced_model_name} refers to a model, making this a relation field. Relation fields inside composite types are not supported."), ct.name(), ast_field.field_type.span()))
             }
             Err(supported) => ctx.push_error(DatamodelError::new_type_not_found_error(
@@ -705,17 +743,24 @@ fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<Fie
     };
     let supported_string_id = ctx.interner.intern(supported);
 
-    if let Some(tpe) = ScalarType::try_from_str(supported) {
+    if let Some(tpe) = ScalarType::try_from_str(supported, false) {
         return Ok(FieldType::Scalar(ScalarFieldType::BuiltInScalar(tpe)));
     }
 
-    match ctx.names.tops.get(&supported_string_id).map(|id| (*id, &ctx.ast[*id])) {
-        Some((ast::TopId::Model(model_id), ast::Top::Model(_))) => Ok(FieldType::Model(model_id)),
-        Some((ast::TopId::Enum(enum_id), ast::Top::Enum(_))) => Ok(FieldType::Scalar(ScalarFieldType::Enum(enum_id))),
-        Some((ast::TopId::CompositeType(ctid), ast::Top::CompositeType(_))) => {
-            Ok(FieldType::Scalar(ScalarFieldType::CompositeType(ctid)))
+    match ctx
+        .names
+        .tops
+        .get(&supported_string_id)
+        .map(|id| (id.0, id.1, &ctx.asts[*id]))
+    {
+        Some((file_id, ast::TopId::Model(model_id), ast::Top::Model(_))) => Ok(FieldType::Model((file_id, model_id))),
+        Some((file_id, ast::TopId::Enum(enum_id), ast::Top::Enum(_))) => {
+            Ok(FieldType::Scalar(ScalarFieldType::Enum((file_id, enum_id))))
         }
-        Some((_, ast::Top::Generator(_))) | Some((_, ast::Top::Source(_))) => unreachable!(),
+        Some((file_id, ast::TopId::CompositeType(ctid), ast::Top::CompositeType(_))) => {
+            Ok(FieldType::Scalar(ScalarFieldType::CompositeType((file_id, ctid))))
+        }
+        Some((_, _, ast::Top::Generator(_))) | Some((_, _, ast::Top::Source(_))) => unreachable!(),
         None => Err(supported),
         _ => unreachable!(),
     }
@@ -1434,20 +1479,36 @@ impl ScalarType {
         matches!(self, ScalarType::Bytes)
     }
 
-    pub(crate) fn try_from_str(s: &str) -> Option<ScalarType> {
-        match s {
-            "Int" => Some(ScalarType::Int),
-            "BigInt" => Some(ScalarType::BigInt),
-            "Float" => Some(ScalarType::Float),
-            "Boolean" => Some(ScalarType::Boolean),
-            "String" => Some(ScalarType::String),
-            "DateTime" => Some(ScalarType::DateTime),
-            "Json" => Some(ScalarType::Json),
-            "Bytes" => Some(ScalarType::Bytes),
-            "Decimal" => Some(ScalarType::Decimal),
-            "GeoJson" => Some(ScalarType::GeoJson),
-            "Geometry" => Some(ScalarType::Geometry),
-            _ => None,
+    pub(crate) fn try_from_str(s: &str, ignore_case: bool) -> Option<ScalarType> {
+        match ignore_case {
+            true => match s.to_lowercase().as_str() {
+                "int" => Some(ScalarType::Int),
+                "bigint" => Some(ScalarType::BigInt),
+                "float" => Some(ScalarType::Float),
+                "boolean" => Some(ScalarType::Boolean),
+                "string" => Some(ScalarType::String),
+                "datetime" => Some(ScalarType::DateTime),
+                "json" => Some(ScalarType::Json),
+                "bytes" => Some(ScalarType::Bytes),
+                "decimal" => Some(ScalarType::Decimal),
+                "geojson" => Some(ScalarType::GeoJson),
+                "geometry" => Some(ScalarType::Geometry),
+                _ => None,
+            },
+            _ => match s {
+                "Int" => Some(ScalarType::Int),
+                "BigInt" => Some(ScalarType::BigInt),
+                "Float" => Some(ScalarType::Float),
+                "Boolean" => Some(ScalarType::Boolean),
+                "String" => Some(ScalarType::String),
+                "DateTime" => Some(ScalarType::DateTime),
+                "Json" => Some(ScalarType::Json),
+                "Bytes" => Some(ScalarType::Bytes),
+                "Decimal" => Some(ScalarType::Decimal),
+                "GeoJson" => Some(ScalarType::GeoJson),
+                "Geometry" => Some(ScalarType::Geometry),
+                _ => None,
+            },
         }
     }
 }

@@ -46,7 +46,7 @@ mod paging_one2m_stable_order {
         // Makes: [1 => 2, 2 => 3, 3 => 5]
         insta::assert_snapshot!(
           run_query!(&runner, r#"query {
-            findManyTestModel {
+            findManyTestModel(orderBy: { id: asc }) {
               id
               related(take: 1, orderBy: [{ fieldA: desc }, {fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
                 id
@@ -73,7 +73,7 @@ mod paging_one2m_stable_order {
         // Makes: [1 => 1, 2 => 4, 3 => 6]
         insta::assert_snapshot!(
           run_query!(&runner, r#"query {
-            findManyTestModel {
+            findManyTestModel(orderBy: { id: asc}) {
               id
               related(take: -1, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
                 id
@@ -185,7 +185,7 @@ mod paging_one2m_unstable_order {
         run_query!(
           &runner,
           r#"query {
-            findManyTestModel {
+            findManyTestModel(orderBy: { id: asc }) {
               id
               related(take: 1, orderBy: [{ fieldA: desc }, {fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
                 id
@@ -214,7 +214,7 @@ mod paging_one2m_unstable_order {
           run_query!(
               &runner,
               r#"query {
-                findManyTestModel {
+                findManyTestModel(orderBy: { id: asc }) {
                   id
                   related(take: -1, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
                     id

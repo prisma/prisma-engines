@@ -13,6 +13,7 @@ use url::{Host, Url};
 #[derive(Debug, Clone)]
 pub struct MysqlUrl {
     url: Url,
+    version: Option<String>,
     pub(crate) query_params: MysqlUrlQueryParams,
 }
 
@@ -22,7 +23,15 @@ impl MysqlUrl {
     pub fn new(url: Url) -> Result<Self, Error> {
         let query_params = Self::parse_query_params(&url)?;
 
-        Ok(Self { url, query_params })
+        Ok(Self {
+            url,
+            query_params,
+            version: None,
+        })
+    }
+
+    pub fn set_version(&mut self, version: Option<String>) {
+        self.version = version;
     }
 
     /// The bare `Url` to the database.
@@ -57,8 +66,8 @@ impl MysqlUrl {
     /// Name of the database connected. Defaults to `mysql`.
     pub fn dbname(&self) -> &str {
         match self.url.path_segments() {
-            Some(mut segments) => segments.next().unwrap_or("mysql"),
-            None => "mysql",
+            Some(mut segments) => segments.next().unwrap_or(super::defaults::DEFAULT_MYSQL_DB),
+            None => super::defaults::DEFAULT_MYSQL_DB,
         }
     }
 
@@ -73,7 +82,10 @@ impl MysqlUrl {
                     host
                 }
             }
-            (_, Some(host)) => host,
+            (_, Some(host)) => match &self.query_params.socket {
+                Some(socket) => socket,
+                None => host,
+            },
             _ => "localhost",
         }
     }
@@ -298,6 +310,10 @@ impl MysqlUrl {
     pub(crate) fn connection_limit(&self) -> Option<usize> {
         self.query_params.connection_limit
     }
+
+    pub fn version(&self) -> Option<&str> {
+        self.version.as_deref()
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -329,6 +345,13 @@ mod tests {
         let url = MysqlUrl::new(Url::parse("mysql://root@localhost/dbname?socket=(/tmp/mysql.sock)").unwrap()).unwrap();
         assert_eq!("dbname", url.dbname());
         assert_eq!(&Some(String::from("/tmp/mysql.sock")), url.socket());
+    }
+
+    #[test]
+    fn should_parse_socket_url_as_host() {
+        let url = MysqlUrl::new(Url::parse("mysql://root@localhost/dbname?socket=(/tmp/mysql.sock)").unwrap()).unwrap();
+        assert_eq!("dbname", url.dbname());
+        assert_eq!(&String::from("/tmp/mysql.sock"), url.host());
     }
 
     #[test]

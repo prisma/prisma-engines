@@ -1,20 +1,19 @@
-name: Test Schema Engine
+name: "SE: integration tests"
 on:
   push:
     branches:
       - main
   pull_request:
     paths-ignore:
-      # Generic
-      - '.github/**'
-      - '!.github/workflows/schema-engine.yml'
-      - '.buildkite/**'
-      - '*.md'
-      - 'LICENSE'
-      - 'CODEOWNERS'
-      - 'renovate.json'
+      - ".github/**"
+      - "!.github/workflows/test-schema-engine.yml"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
       # Specific
-      - 'query-engine/**'
+      - "query-engine/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,21 +21,22 @@ concurrency:
 
 jobs:
   test-mongodb-schema-connector:
-    name: '${{ matrix.database.name }} on Linux'
+    name: "${{ matrix.database.name }}"
     strategy:
       fail-fast: false
       matrix:
         database:
-          - name: 'mongodb42'
-            url: 'mongodb://prisma:prisma@localhost:27016/?authSource=admin&retryWrites=true'
-          - name: 'mongodb44'
-            url: 'mongodb://prisma:prisma@localhost:27017/?authSource=admin&retryWrites=true'
-          - name: 'mongodb5'
-            url: 'mongodb://prisma:prisma@localhost:27018/?authSource=admin&retryWrites=true'
+          - name: "mongodb42"
+            url: "mongodb://prisma:prisma@localhost:27016/?authSource=admin&retryWrites=true"
+          - name: "mongodb44"
+            url: "mongodb://prisma:prisma@localhost:27017/?authSource=admin&retryWrites=true"
+          - name: "mongodb5"
+            url: "mongodb://prisma:prisma@localhost:27018/?authSource=admin&retryWrites=true"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: taiki-e/install-action@nextest
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -45,69 +45,74 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: 'Start ${{ matrix.database.name }}'
+      - name: "Start ${{ matrix.database.name }}"
         run: make start-${{ matrix.database.name }}-single
 
-      - run: cargo test -p mongodb-schema-connector
+      - run: cargo nextest run -p mongodb-schema-connector
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
   test-linux:
-    name: '${{ matrix.database.name }} on Linux'
+    name: "${{ matrix.database.name }}"
 
     strategy:
       fail-fast: false
       matrix:
         database:
           - name: mssql_2017
-            url: 'sqlserver://localhost:1434;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED'
+            url: "sqlserver://localhost:1434;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
           - name: mssql_2019
-            url: 'sqlserver://localhost:1433;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED'
+            url: "sqlserver://localhost:1433;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
+          - name: mssql_2022
+            url: "sqlserver://localhost:1435;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
           - name: mysql_5_6
-            url: 'mysql://root:prisma@localhost:3309'
+            url: "mysql://root:prisma@localhost:3309"
           - name: mysql_5_7
-            url: 'mysql://root:prisma@localhost:3306'
+            url: "mysql://root:prisma@localhost:3306"
           - name: mysql_8
-            url: 'mysql://root:prisma@localhost:3307'
+            url: "mysql://root:prisma@localhost:3307"
           - name: mysql_mariadb
-            url: 'mysql://root:prisma@localhost:3308'
+            url: "mysql://root:prisma@localhost:3308"
           - name: postgres9
-            url: 'postgresql://postgres:prisma@localhost:5431'
+            url: "postgresql://postgres:prisma@localhost:5431"
           - name: postgres10
-            url: 'postgresql://postgres:prisma@localhost:5432'
+            url: "postgresql://postgres:prisma@localhost:5432"
           - name: postgres11
-            url: 'postgresql://postgres:prisma@localhost:5433'
+            url: "postgresql://postgres:prisma@localhost:5433"
           - name: postgres12
-            url: 'postgresql://postgres:prisma@localhost:5434'
+            url: "postgresql://postgres:prisma@localhost:5434"
           - name: postgres13
-            url: 'postgresql://postgres:prisma@localhost:5435'
+            url: "postgresql://postgres:prisma@localhost:5435"
           - name: postgres14
-            url: 'postgresql://postgres:prisma@localhost:5437'
+            url: "postgresql://postgres:prisma@localhost:5437"
           - name: postgres15
-            url: 'postgresql://postgres:prisma@localhost:5438'
-          - name: postgis15
-            url: 'postgresql://postgres:prisma@localhost:5439'
+            url: "postgresql://postgres:prisma@localhost:5438"
+          - name: postgres16
+            url: "postgresql://postgres:prisma@localhost:5439"
+          - name: postgis16
+            url: 'postgresql://postgres:prisma@localhost:5440'
           - name: cockroach_23_1
-            url: 'postgresql://prisma@localhost:26260'
+            url: "postgresql://prisma@localhost:26260"
           - name: cockroach_22_2
-            url: 'postgresql://prisma@localhost:26259'
+            url: "postgresql://prisma@localhost:26259"
           - name: cockroach_22_1_0
-            url: 'postgresql://prisma@localhost:26257'
+            url: "postgresql://prisma@localhost:26257"
           - name: sqlite
             url: sqlite
           - name: spatialite
             url: sqlite
           - name: vitess_8_0
-            url: 'mysql://root:prisma@localhost:33807/test'
-            shadow_database_url: 'mysql://root:prisma@localhost:33808/shadow'
+            url: "mysql://root:prisma@localhost:33807/test"
+            shadow_database_url: "mysql://root:prisma@localhost:33808/shadow"
             is_vitess: true
             single_threaded: true
 
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: taiki-e/install-action@nextest
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -124,46 +129,48 @@ jobs:
         if: ${{ matrix.database.name == 'spatialite' }}
         run: sudo apt install -y libsqlite3-mod-spatialite
   
-      - name: 'Start ${{ matrix.database.name }}'
+      - name: "Start ${{ matrix.database.name }}"
         run: make start-${{ matrix.database.name }}
 
-      - run: cargo test -p sql-introspection-tests
+      - run: cargo nextest run -p sql-introspection-tests
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
           SPATIALITE_PATH: ${{ matrix.database.name == 'spatialite' && 'mod_spatialite' || null }}
 
-      - run: cargo test -p sql-schema-describer
+      - run: cargo nextest run -p sql-schema-describer
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
           SPATIALITE_PATH: ${{ matrix.database.name == 'spatialite' && 'mod_spatialite' || null }}
 
-      - run: cargo test -p sql-migration-tests
-        if: ${{ !matrix.database.single_threaded }}
-        env:
-          CLICOLOR_FORCE: 1
-          TEST_DATABASE_URL: ${{ matrix.database.url }}
-          SPATIALITE_PATH: ${{ matrix.database.name == 'spatialite' && 'mod_spatialite' || null }}
-          RUST_LOG: debug
-
-      - run: cargo test -p schema-engine-cli
+      - run: cargo nextest run -p sql-migration-tests
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
           SPATIALITE_PATH: ${{ matrix.database.name == 'spatialite' && 'mod_spatialite' || null }}
 
-      - run: cargo test -p sql-introspection-tests -- --test-threads=1
+      - run: cargo nextest run -p schema-engine-cli
+        if: ${{ !matrix.database.single_threaded }}
+        env:
+          CLICOLOR_FORCE: 1
+          TEST_DATABASE_URL: ${{ matrix.database.url }}
+          SPATIALITE_PATH: ${{ matrix.database.name == 'spatialite' && 'mod_spatialite' || null }}
+
+      #
+      # Vitess tests
+      #
+      - run: cargo nextest run -p sql-introspection-tests --test-threads=1
         if: ${{ matrix.database.is_vitess }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
           TEST_SHADOW_DATABASE_URL: ${{ matrix.database.shadow_database_url }}
 
-      - run: cargo test -p sql-migration-tests -- --test-threads=1
+      - run: cargo nextest run -p sql-migration-tests --test-threads=1
         if: ${{ matrix.database.is_vitess }}
         env:
           CLICOLOR_FORCE: 1
@@ -171,33 +178,36 @@ jobs:
           TEST_SHADOW_DATABASE_URL: ${{ matrix.database.shadow_database_url }}
           RUST_LOG: debug
 
-      - run: cargo test -p schema-engine-cli -- --test-threads=1
+      - run: cargo nextest run -p schema-engine-cli --test-threads=1
         if: ${{ matrix.database.is_vitess }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
           TEST_SHADOW_DATABASE_URL: ${{ matrix.database.shadow_database_url }}
 
-      - run: cargo test -p sql-schema-describer -- --test-threads=1
+      #
+      # Single threaded tests (excluding Vitess)
+      #
+      - run: cargo nextest run -p sql-schema-describer --test-threads=1
         if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
-      - run: cargo test -p sql-introspection-tests -- --test-threads=1
+      - run: cargo nextest run -p sql-introspection-tests --test-threads=1
         if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
-      - run: cargo test -p sql-migration-tests -- --test-threads=1
+      - run: cargo nextest run -p sql-migration-tests --test-threads=1
         if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
           RUST_LOG: debug
 
-      - run: cargo test -p schema-engine-cli -- --test-threads=1
+      - run: cargo nextest run -p schema-engine-cli --test-threads=1
         if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
@@ -208,10 +218,10 @@ jobs:
       fail-fast: false
       matrix:
         db:
-          - name: mysql
-            url: 'mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60'
-          - name: mariadb
-            url: 'mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60'
+          - name: "mysql-lts"
+            url: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
+          - name: "mariadb"
+            url: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
         rust:
           - stable
         os:
@@ -219,13 +229,14 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
-    name: '${{ matrix.db.name }} on Windows'
+    name: "${{ matrix.db.name }} on Windows"
 
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: taiki-e/install-action@nextest
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
@@ -244,6 +255,6 @@ jobs:
           sudo sc start MySQL
 
       - name: Run tests
-        run: cargo test -p sql-migration-tests
+        run: cargo nextest run -p sql-migration-tests
         env:
           TEST_DATABASE_URL: ${{ matrix.db.url }}

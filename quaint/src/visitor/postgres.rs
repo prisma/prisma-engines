@@ -2,6 +2,7 @@ use crate::{
     ast::*,
     visitor::{self, Visitor},
 };
+use itertools::Itertools;
 use std::{
     fmt::{self, Write},
     ops::Deref,
@@ -14,6 +15,34 @@ use std::{
 pub struct Postgres<'a> {
     query: String,
     parameters: Vec<Value<'a>>,
+}
+
+impl<'a> Postgres<'a> {
+    fn visit_json_build_obj_expr(&mut self, expr: Expression<'a>) -> crate::Result<()> {
+        match expr.kind() {
+            ExpressionKind::Column(col) => match (col.type_family.as_ref(), col.native_type.as_deref()) {
+                (Some(TypeFamily::Decimal(_)), Some("MONEY")) => {
+                    self.visit_expression(expr)?;
+                    self.write("::numeric")?;
+
+                    Ok(())
+                }
+                _ => self.visit_expression(expr),
+            },
+            _ => self.visit_expression(expr),
+        }
+    }
+
+    fn visit_returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
+        if let Some(returning) = returning {
+            if !returning.is_empty() {
+                let values = returning.into_iter().map(|r| r.into()).collect();
+                self.write(" RETURNING ")?;
+                self.visit_columns(values)?;
+            }
+        }
+        Ok(())
+    }
 }
 
 impl<'a> Visitor<'a> for Postgres<'a> {
@@ -317,13 +346,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             None => (),
         }
 
-        if let Some(returning) = insert.returning {
-            if !returning.is_empty() {
-                let values = returning.into_iter().map(|r| r.into()).collect();
-                self.write(" RETURNING ")?;
-                self.visit_columns(values)?;
-            }
-        };
+        self.visit_returning(insert.returning)?;
 
         if let Some(comment) = insert.comment {
             self.write(" ")?;
@@ -399,7 +422,6 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> visitor::Result {
         match json_extract.path {
-            #[cfg(feature = "mysql")]
             JsonPath::String(_) => panic!("JSON path string notation is not supported for Postgres"),
             JsonPath::Array(json_path) => {
                 self.write("(")?;
@@ -510,6 +532,57 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                 self.write("::jsonb)")
             }
         }
+    }
+
+    #[cfg(feature = "postgresql")]
+    fn visit_json_array_agg(&mut self, array_agg: JsonArrayAgg<'a>) -> visitor::Result {
+        self.write("JSONB_AGG")?;
+        self.surround_with("(", ")", |s| s.visit_expression(*array_agg.expr))?;
+
+        Ok(())
+    }
+
+    #[cfg(feature = "postgresql")]
+    fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> visitor::Result {
+        // Functions in PostgreSQL can only accept up to 100 arguments, which means that we can't
+        // build an object with more than 50 fields using `JSON_BUILD_OBJECT`. To work around
+        // that, we chunk the fields into subsets of 50 fields or less, build one or more JSONB
+        // objects using one or more `JSONB_BUILD_OBJECT` invocations, and merge them together
+        // using the `||` operator (which is not possible with plain JSON).
+        //
+        // See <https://github.com/prisma/prisma/issues/22298>.
+        //
+        // Another alternative that was considered for the specific use case of loading relations
+        // in Query Engine was using `ROW_TO_JSON` but it turned out to not be a suitable
+        // replacement for several reasons, the main one being the limit of the length of field
+        // names (63 characters).
+        const MAX_FIELDS: usize = 50;
+        let num_chunks = build_obj.exprs.len().div_ceil(MAX_FIELDS);
+
+        for (i, chunk) in build_obj.exprs.into_iter().chunks(MAX_FIELDS).into_iter().enumerate() {
+            let mut chunk = chunk.peekable();
+
+            self.write("JSONB_BUILD_OBJECT")?;
+
+            self.surround_with("(", ")", |s| {
+                while let Some((name, expr)) = chunk.next() {
+                    s.visit_raw_value(Value::text(name))?;
+                    s.write(", ")?;
+                    s.visit_json_build_obj_expr(expr)?;
+                    if chunk.peek().is_some() {
+                        s.write(", ")?;
+                    }
+                }
+
+                Ok(())
+            })?;
+
+            if i < num_chunks - 1 {
+                self.write(" || ")?;
+            }
+        }
+
+        Ok(())
     }
 
     fn visit_geometry_type_equals(
@@ -693,6 +766,25 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
+    fn visit_delete(&mut self, delete: Delete<'a>) -> visitor::Result {
+        self.write("DELETE FROM ")?;
+        self.visit_table(delete.table, true)?;
+
+        if let Some(conditions) = delete.conditions {
+            self.write(" WHERE ")?;
+            self.visit_conditions(conditions)?;
+        }
+
+        self.visit_returning(delete.returning)?;
+
+        if let Some(comment) = delete.comment {
+            self.write(" ")?;
+            self.visit_comment(comment)?;
+        }
+
+        Ok(())
+    }
+
     fn visit_geom_as_text(&mut self, geom: GeomAsText<'a>) -> visitor::Result {
         self.surround_with("ST_AsEWKT(", ")", |s| s.visit_expression(*geom.expression))
     }
@@ -831,6 +923,19 @@ mod tests {
     fn test_distinct() {
         let expected_sql = "SELECT DISTINCT \"bar\" FROM \"test\"";
         let query = Select::from_table("test").column(Column::new("bar")).distinct();
+        let (sql, _) = Postgres::build(query).unwrap();
+
+        assert_eq!(expected_sql, sql);
+    }
+
+    #[test]
+    fn test_distinct_on() {
+        let expected_sql = "SELECT DISTINCT ON (\"bar\", \"foo\") \"bar\" FROM \"test\"";
+        let query = Select::from_table("test").column(Column::new("bar")).distinct_on(vec![
+            Expression::from(Column::from("bar")),
+            Expression::from(Column::from("foo")),
+        ]);
+
         let (sql, _) = Postgres::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
@@ -1262,5 +1367,57 @@ mod tests {
         let (sql, _) = Postgres::build(q).unwrap();
 
         assert_eq!("SELECT MIN(\"enum\")::text, MAX(\"enum\")::text FROM \"User\"", sql);
+    }
+
+    mod test_json_build_object {
+        use super::*;
+
+        #[test]
+        fn simple() {
+            let build_json = build_json_object(3);
+            let query = Select::default().value(build_json);
+            let (sql, _) = Postgres::build(query).unwrap();
+
+            assert_eq!("SELECT JSONB_BUILD_OBJECT('f1', $1, 'f2', $2, 'f3', $3)", sql);
+        }
+
+        #[test]
+        fn chunked() {
+            let build_json = build_json_object(110);
+            let query = Select::default().value(build_json);
+            let (sql, _) = Postgres::build(query).unwrap();
+
+            assert_eq!(
+                concat!(
+                    "SELECT JSONB_BUILD_OBJECT('f1', $1, 'f2', $2, 'f3', $3, 'f4', $4, 'f5', $5, 'f6', $6, 'f7', $7, 'f8', $8, 'f9', $9, 'f10', $10, 'f11', $11, 'f12', $12, 'f13', $13, 'f14', $14, 'f15', $15, 'f16', $16, 'f17', $17, 'f18', $18, 'f19', $19, 'f20', $20, 'f21', $21, 'f22', $22, 'f23', $23, 'f24', $24, 'f25', $25, 'f26', $26, 'f27', $27, 'f28', $28, 'f29', $29, 'f30', $30, 'f31', $31, 'f32', $32, 'f33', $33, 'f34', $34, 'f35', $35, 'f36', $36, 'f37', $37, 'f38', $38, 'f39', $39, 'f40', $40, 'f41', $41, 'f42', $42, 'f43', $43, 'f44', $44, 'f45', $45, 'f46', $46, 'f47', $47, 'f48', $48, 'f49', $49, 'f50', $50)",
+                    " || JSONB_BUILD_OBJECT('f51', $51, 'f52', $52, 'f53', $53, 'f54', $54, 'f55', $55, 'f56', $56, 'f57', $57, 'f58', $58, 'f59', $59, 'f60', $60, 'f61', $61, 'f62', $62, 'f63', $63, 'f64', $64, 'f65', $65, 'f66', $66, 'f67', $67, 'f68', $68, 'f69', $69, 'f70', $70, 'f71', $71, 'f72', $72, 'f73', $73, 'f74', $74, 'f75', $75, 'f76', $76, 'f77', $77, 'f78', $78, 'f79', $79, 'f80', $80, 'f81', $81, 'f82', $82, 'f83', $83, 'f84', $84, 'f85', $85, 'f86', $86, 'f87', $87, 'f88', $88, 'f89', $89, 'f90', $90, 'f91', $91, 'f92', $92, 'f93', $93, 'f94', $94, 'f95', $95, 'f96', $96, 'f97', $97, 'f98', $98, 'f99', $99, 'f100', $100)",
+                    " || JSONB_BUILD_OBJECT('f101', $101, 'f102', $102, 'f103', $103, 'f104', $104, 'f105', $105, 'f106', $106, 'f107', $107, 'f108', $108, 'f109', $109, 'f110', $110)"
+                ),
+                sql
+            );
+        }
+
+        #[test]
+        fn money() {
+            let build_json = json_build_object(vec![(
+                "money".into(),
+                Column::from("money")
+                    .native_column_type(Some("money"))
+                    .type_family(TypeFamily::Decimal(None))
+                    .into(),
+            )]);
+            let query = Select::default().value(build_json);
+            let (sql, _) = Postgres::build(query).unwrap();
+
+            assert_eq!(sql, "SELECT JSONB_BUILD_OBJECT('money', \"money\"::numeric)");
+        }
+
+        fn build_json_object(num_fields: u32) -> JsonBuildObject<'static> {
+            let fields = (1..=num_fields)
+                .map(|i| (format!("f{i}").into(), Expression::from(i as i64)))
+                .collect();
+
+            JsonBuildObject { exprs: fields }
+        }
     }
 }

@@ -13,6 +13,7 @@ pub mod custom_types {
     pub const GEOJSON: &str = "GeoJson";
     pub const ENUM: &str = "Enum";
     pub const FIELD_REF: &str = "FieldRef";
+    pub const RAW: &str = "Raw";
 
     pub fn make_object(typ: &str, value: PrismaValue) -> PrismaValue {
         PrismaValue::Object(vec![make_type_pair(typ), make_value_pair(value)])

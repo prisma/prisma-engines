@@ -16,7 +16,7 @@ pub enum AliasMode {
 #[derive(Clone, Copy, Debug, Default)]
 /// Aliasing tool to count the nesting level to help with heavily nested
 /// self-related queries.
-pub(crate) struct Alias {
+pub struct Alias {
     counter: usize,
     mode: AliasMode,
 }
@@ -48,6 +48,11 @@ impl Alias {
             AliasMode::Table => format!("t{}", self.counter),
             AliasMode::Join => format!("j{}", self.counter),
         }
+    }
+
+    #[cfg(feature = "relation_joins")]
+    pub fn to_table_string(&self) -> String {
+        self.to_string(Some(AliasMode::Table))
     }
 }
 

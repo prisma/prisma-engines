@@ -8,6 +8,8 @@
     in rec
     {
       pkgs = import flakeInputs.nixpkgs { inherit system overlays; };
-      rustToolchain = pkgs.rust-bin.stable.latest;
+      rustToolchain = pkgs.rust-bin.stable.latest.default.override {
+        targets = ["wasm32-unknown-unknown"];
+      };
     };
 }

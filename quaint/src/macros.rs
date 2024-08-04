@@ -1,3 +1,5 @@
+use crate::{connector::ColumnType, Value};
+
 /// Convert given set of tuples into `Values`.
 ///
 /// ```rust
@@ -173,7 +175,7 @@ macro_rules! expression {
 /// A test-generator to test types in the defined database.
 #[cfg(test)]
 macro_rules! test_type {
-    ($name:ident($db:ident, $sql_type:literal, $(($input:expr, $output:expr)),+ $(,)?)) => {
+    ($name:ident($db:ident, $sql_type:literal, $col_type:expr, $(($input:expr, $output:expr)),+ $(,)?)) => {
         paste::item! {
             #[test]
             fn [< test_type_ $name >] () -> crate::Result<()> {
@@ -198,7 +200,9 @@ macro_rules! test_type {
                         let select = Select::from_table(&table).column("value").order_by("id".descend());
                         let res = setup.conn().select(select).await?.into_single()?;
 
+                        assert_eq!($col_type, res.types[0]);
                         assert_eq!(Some(&output), res.at(0));
+                        assert_matching_value_and_column_type(&$col_type, res.at(0).unwrap());
                     )+
 
                     Result::<(), crate::error::Error>::Ok(())
@@ -209,7 +213,7 @@ macro_rules! test_type {
         }
     };
 
-    ($name:ident($db:ident, $sql_type:literal, $($value:expr),+ $(,)?)) => {
+    ($name:ident($db:ident, $sql_type:literal, $col_type:expr, $($value:expr),+ $(,)?)) => {
         paste::item! {
             #[test]
             fn [< test_type_ $name >] () -> crate::Result<()> {
@@ -232,7 +236,9 @@ macro_rules! test_type {
                         let select = Select::from_table(&table).column("value").order_by("id".descend());
                         let res = setup.conn().select(select).await?.into_single()?;
 
+                        assert_eq!($col_type, res.types[0]);
                         assert_eq!(Some(&value), res.at(0));
+                        assert_matching_value_and_column_type(&$col_type, &value);
                     )+
 
                     Result::<(), crate::error::Error>::Ok(())
@@ -242,4 +248,13 @@ macro_rules! test_type {
             }
         }
     };
+}
+
+#[allow(dead_code)]
+pub(crate) fn assert_matching_value_and_column_type(col_type: &ColumnType, value: &Value) {
+    let inferred_column_type = ColumnType::from(&value.typed);
+
+    if !inferred_column_type.is_unknown() {
+        assert_eq!(col_type, &inferred_column_type);
+    }
 }

@@ -177,13 +177,13 @@ services:
       - databases
     tmpfs: /var/lib/planetscale-mysql
     volumes:
-      - "./docker/planetscale-mysql/my.cnf:/etc/mysql/my.cnf"
+      - './docker/planetscale-mysql/my.cnf:/etc/mysql/my.cnf'
     ulimits:
       nofile:
         soft: 20000
         hard: 40000
     healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       timeout: 20s
       retries: 10
 
@@ -213,22 +213,35 @@ services:
     networks:
       - databases
 
-  postgis15:
-    image: postgis/postgis:15-3.3
-    restart: always
+  postgres16:
+    image: postgres:16
+    restart: unless-stopped
+    command: postgres -c 'max_connections=1000'
+    environment:
+      POSTGRES_PASSWORD: 'prisma'
+      POSTGRES_HOST_AUTH_METHOD: 'md5'
+      POSTGRES_INITDB_ARGS: '--auth-host=md5'
+    ports:
+      - '5439:5432'
+    networks:
+      - databases
+
+  postgis16:
+    image: postgis/postgis:16-3.4
+    restart: unless-stopped
     command: postgres -c 'max_connections=1000'
     environment:
       POSTGRES_PASSWORD: "prisma"
       POSTGRES_HOST_AUTH_METHOD: "md5"
       POSTGRES_INITDB_ARGS: "--auth-host=md5"
     ports:
-      - "5439:5432"
+      - "5440:5432"
     networks:
       - databases
 
   mysql-5-6:
     image: mysql:5.6.50
-    command: mysqld
+    command: mysqld --table_definition_cache=2000
     restart: unless-stopped
     platform: linux/x86_64
     environment:
@@ -241,7 +254,7 @@ services:
       - databases
     tmpfs: /var/lib/mysql
     healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       timeout: 20s
       retries: 10
 
@@ -259,7 +272,7 @@ services:
       - databases
     tmpfs: /var/lib/mysql
     healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       timeout: 20s
       retries: 10
 
@@ -277,7 +290,7 @@ services:
       - databases
     tmpfs: /var/lib/mysql8
     healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       timeout: 20s
       retries: 10
 
@@ -294,8 +307,21 @@ services:
       - databases
     tmpfs: /var/lib/mariadb
 
+  mariadb-11-0:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: prisma
+      MYSQL_DATABASE: prisma
+    ports:
+      - '3308:3306'
+    networks:
+      - databases
+    tmpfs: /var/lib/mariadb
+
   vitess-test-8_0:
-    image: vitess/vttestserver:mysql80@sha256:5a75cf290e45af3ab273bd037bdcf07f799132730f645dbe012684f28d58f8f6
+    image: vitess/vttestserver:mysql80@sha256:53a2d2f58ecf8e6cf984c725612f7651c4fc7ac9bc7d198dbd9964d50e28b9a2
     restart: unless-stopped
     ports:
       - 33807:33807
@@ -315,7 +341,7 @@ services:
       retries: 20
 
   vitess-shadow-8_0:
-    image: vitess/vttestserver:mysql80@sha256:5a75cf290e45af3ab273bd037bdcf07f799132730f645dbe012684f28d58f8f6
+    image: vitess/vttestserver:mysql80@sha256:53a2d2f58ecf8e6cf984c725612f7651c4fc7ac9bc7d198dbd9964d50e28b9a2
     restart: unless-stopped
     ports:
       - 33808:33807

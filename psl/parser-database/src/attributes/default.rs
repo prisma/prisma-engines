@@ -9,7 +9,7 @@ use crate::{
 /// @default on model scalar fields
 pub(super) fn visit_model_field_default(
     scalar_field_id: ScalarFieldId,
-    model_id: ast::ModelId,
+    model_id: crate::ModelId,
     field_id: ast::FieldId,
     r#type: ScalarFieldType,
     ctx: &mut Context<'_>,
@@ -19,7 +19,7 @@ pub(super) fn visit_model_field_default(
         Err(err) => return ctx.push_error(err),
     };
 
-    let ast_model = &ctx.ast[model_id];
+    let ast_model = &ctx.asts[model_id];
     let ast_field = &ast_model[field_id];
 
     let mapped_name = default_attribute_mapped_name(ctx);
@@ -74,7 +74,7 @@ pub(super) fn visit_model_field_default(
 
 /// @default on composite type fields
 pub(super) fn visit_composite_field_default(
-    ct_id: ast::CompositeTypeId,
+    ct_id: crate::CompositeTypeId,
     field_id: ast::FieldId,
     r#type: ScalarFieldType,
     ctx: &mut Context<'_>,
@@ -84,7 +84,7 @@ pub(super) fn visit_composite_field_default(
         Err(err) => return ctx.push_error(err),
     };
 
-    let ast_model = &ctx.ast[ct_id];
+    let ast_model = &ctx.asts[ct_id];
     let ast_field = &ast_model[field_id];
 
     if ctx.visit_optional_arg("map").is_some() {
@@ -183,10 +183,10 @@ fn validate_model_builtin_scalar_type_default(
     value: &ast::Expression,
     mapped_name: Option<StringId>,
     accept: AcceptFn<'_>,
-    field_id: (ast::ModelId, ast::FieldId),
+    field_id: (crate::ModelId, ast::FieldId),
     ctx: &mut Context<'_>,
 ) {
-    let arity = ctx.ast[field_id.0][field_id.1].arity;
+    let arity = ctx.asts[field_id.0][field_id.1].arity;
     match (scalar_type, value) {
         // Functions
         (_, ast::Expression::Function(funcname, _, _)) if funcname == FN_AUTOINCREMENT && mapped_name.is_some() => {
@@ -198,10 +198,11 @@ fn validate_model_builtin_scalar_type_default(
         {
             validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
         }
-        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _))
-            if funcname == FN_UUID || funcname == FN_CUID =>
-        {
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_CUID => {
             validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
+        }
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_UUID => {
+            validate_uuid_args(&funcargs.arguments, accept, ctx)
         }
         (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_NANOID => {
             validate_nanoid_args(&funcargs.arguments, accept, ctx)
@@ -244,10 +245,11 @@ fn validate_composite_builtin_scalar_type_default(
 ) {
     match (scalar_type, value) {
         // Functions
-        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _))
-            if funcname == FN_UUID || funcname == FN_CUID =>
-        {
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_CUID => {
             validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
+        }
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_UUID => {
+            validate_uuid_args(&funcargs.arguments, accept, ctx)
         }
         (ScalarType::DateTime, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_NOW => {
             validate_empty_function_args(FN_NOW, &funcargs.arguments, accept, ctx)
@@ -326,9 +328,13 @@ fn validate_invalid_function_default(fn_name: &str, scalar_type: ScalarType, ctx
     ));
 }
 
-fn validate_default_value_on_composite_type(ctid: ast::CompositeTypeId, ast_field: &ast::Field, ctx: &mut Context<'_>) {
+fn validate_default_value_on_composite_type(
+    ctid: crate::CompositeTypeId,
+    ast_field: &ast::Field,
+    ctx: &mut Context<'_>,
+) {
     let attr = ctx.current_attribute();
-    let ct_name = ctx.ast[ctid].name();
+    let ct_name = ctx.asts[ctid].name();
 
     ctx.push_error(DatamodelError::new_composite_type_field_validation_error(
         "Defaults on fields of type composite are not supported. Please remove the `@default` attribute.",
@@ -366,13 +372,31 @@ fn validate_dbgenerated_args(args: &[ast::Argument], accept: AcceptFn<'_>, ctx: 
         bail()
     }
 
-    match args.get(0).map(|arg| &arg.value) {
+    match args.first().map(|arg| &arg.value) {
         Some(ast::Expression::StringValue(val, _)) if val.is_empty() => {
             ctx.push_attribute_validation_error(
                 "dbgenerated() takes either no argument, or a single nonempty string argument.",
             );
         }
         None | Some(ast::Expression::StringValue(_, _)) => accept(ctx),
+        _ => bail(),
+    }
+}
+
+fn validate_uuid_args(args: &[ast::Argument], accept: AcceptFn<'_>, ctx: &mut Context<'_>) {
+    let mut bail = || ctx.push_attribute_validation_error("`uuid()` takes a single Int argument.");
+
+    if args.len() > 1 {
+        bail()
+    }
+
+    match args.first().map(|arg| &arg.value) {
+        Some(ast::Expression::NumericValue(val, _)) if ![4u8, 7u8].contains(&val.parse::<u8>().unwrap()) => {
+            ctx.push_attribute_validation_error(
+                "`uuid()` takes either no argument, or a single integer argument which is either 4 or 7.",
+            );
+        }
+        None | Some(ast::Expression::NumericValue(_, _)) => accept(ctx),
         _ => bail(),
     }
 }
@@ -384,7 +408,7 @@ fn validate_nanoid_args(args: &[ast::Argument], accept: AcceptFn<'_>, ctx: &mut 
         bail()
     }
 
-    match args.get(0).map(|arg| &arg.value) {
+    match args.first().map(|arg| &arg.value) {
         Some(ast::Expression::NumericValue(val, _)) if val.parse::<u8>().unwrap() < 2 => {
             ctx.push_attribute_validation_error(
                 "`nanoid()` takes either no argument, or a single integer argument >= 2.",
@@ -397,13 +421,13 @@ fn validate_nanoid_args(args: &[ast::Argument], accept: AcceptFn<'_>, ctx: &mut 
 
 fn validate_enum_default(
     found_value: &ast::Expression,
-    enum_id: ast::EnumId,
+    enum_id: crate::EnumId,
     accept: AcceptFn<'_>,
     ctx: &mut Context<'_>,
 ) {
     match found_value {
         ast::Expression::ConstantValue(enum_value, _) => {
-            if ctx.ast[enum_id].values.iter().any(|v| v.name() == enum_value) {
+            if ctx.asts[enum_id].values.iter().any(|v| v.name() == enum_value) {
                 accept(ctx)
             } else {
                 validate_invalid_default_enum_value(enum_value, ctx);
@@ -415,7 +439,7 @@ fn validate_enum_default(
 
 fn validate_enum_list_default(
     found_value: &ast::Expression,
-    enum_id: ast::EnumId,
+    enum_id: crate::EnumId,
     accept: AcceptFn<'_>,
     ctx: &mut Context<'_>,
 ) {

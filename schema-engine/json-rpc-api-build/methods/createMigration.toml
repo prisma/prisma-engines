@@ -25,9 +25,9 @@ shape = "string"
 description = "The filesystem path of the migrations directory to use."
 shape = "string"
 
-[recordShapes.createMigrationInput.fields.prismaSchema]
-description = "The Prisma schema to use as a target for the generated migration."
-shape = "string"
+[recordShapes.createMigrationInput.fields.schema]
+description = "The Prisma schema files to use as a target for the generated migration."
+shape = "SchemasContainer"
 
 [recordShapes.createMigrationOutput]
 description = "The output of the `creatMigration` command."

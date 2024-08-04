@@ -245,7 +245,7 @@ As explained in [Testing driver adapters](./query-engine/connector-test-kit-rs/R
 will ensure you have prisma checked out in your filesystem in the same directory as prisma-engines. This is needed because the driver adapters code is symlinked in prisma-engines.
 
 When working on a feature or bugfix spanning adapters code and query-engine code, you will need to open sibling PRs in `prisma/prisma` and `prisma/prisma-engines` respectively.
-Locally, each time you run `DRIVER_ADAPTER=$adapter make qe-test` tests will run using the driver adapters built from the source code in the working copy of prisma/prisma. All good.
+Locally, each time you run `DRIVER_ADAPTER=$adapter make test-qe` tests will run using the driver adapters built from the source code in the working copy of prisma/prisma. All good.
 
 In CI, tho', we need to denote which branch of prisma/prisma we want to use for tests. In CI, there's no working copy of prisma/prisma before tests run.
 The CI jobs clones prisma/prisma `main` branch by default, which doesn't include your local changes. To test in integration, we can tell CI to use the branch of prisma/prisma containing
@@ -265,7 +265,10 @@ You can trigger releases from this repository to npm that can be used for testin
 
 #### Automated integration releases from this repository to npm
 
-(Since July 2022). Any branch name starting with `integration/` will, first, run the full test suite in Buildkite `[Test] Prisma Engines` and, second, if passing, run the publish pipeline (build and upload engines to S3 & R2)
+Any branch name starting with `integration/` will, first, run the full test suite in GH Actions and, second, run the release workflow (build and upload engines to S3 & R2).
+To trigger the release on any other branch, you have two options:
+- Either run [build-engines](https://github.com/prisma/prisma-engines/actions/workflows/build-engines.yml) workflow on a specified branch manually.
+- Or add `[integration]` string anywhere in your commit messages/
 
 The journey through the pipeline is the same as a commit on the `main` branch.
 - It will trigger [`prisma/engines-wrapper`](https://github.com/prisma/engines-wrapper) and publish a new [`@prisma/engines-version`](https://www.npmjs.com/package/@prisma/engines-version) npm package but on the `integration` tag.
@@ -276,8 +279,8 @@ The journey through the pipeline is the same as a commit on the `main` branch.
 This end to end will take minimum ~1h20 to complete, but is completely automated :robot:
 
 Notes:
-- in `prisma/prisma` repository, we do not run tests for `integration/` branches, it is much faster and also means that there is no risk of tests failing (e.g. flaky tests, snapshots) that would stop the publishing process.
-- in `prisma/prisma-engines` the Buildkite test pipeline must first pass, then the engines will be built and uploaded to our storage via the Buildkite release pipeline. These 2 pipelines can fail for different reasons, it's recommended to keep an eye on them (check notifications in Slack) and restart jobs as needed. Finally, it will trigger [`prisma/engines-wrapper`](https://github.com/prisma/engines-wrapper). 
+- tests and publishing workflows are run in parallel in both `prisma/prisma-engines` and `prisma/prisma` repositories. So, it is possible that the engines would be published and only then test suite will 
+discover a defect. It is advised that to keep an eye on both test and publishing workflows.
 
 #### Manual integration releases from this repository to npm
 

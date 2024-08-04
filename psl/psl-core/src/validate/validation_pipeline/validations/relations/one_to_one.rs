@@ -237,7 +237,7 @@ pub(crate) fn back_relation_arity_is_optional(relation: InlineRelationWalker<'_>
 
     if back.ast_field().arity.is_required() {
         let message = format!(
-            "The relation field `{}` on Model `{}` is required. This is no longer valid because it's not possible to enforce this constraint on the database level. Please change the field type from `{}` to `{}?` to fix this.",
+            "The relation field `{}` on Model `{}` is required. This is not valid because it's not possible to enforce this constraint on the database level. Please change the field type from `{}` to `{}?` to fix this.",
             back.name(), back.model().name(), forward.model().name(), forward.model().name(),
         );
 

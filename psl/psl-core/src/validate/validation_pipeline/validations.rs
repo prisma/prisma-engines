@@ -13,6 +13,8 @@ mod relation_fields;
 mod relations;
 mod views;
 
+use crate::datamodel_connector::ConnectorCapability;
+
 use super::context::Context;
 use names::Names;
 use parser_database::walkers::RefinedRelationWalker;
@@ -134,7 +136,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
         }
     }
 
-    if ctx.connector.supports_enums() {
+    if ctx.has_capability(ConnectorCapability::Enums) {
         enums::database_name_clashes(ctx);
     }
 

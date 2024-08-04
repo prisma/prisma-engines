@@ -23,7 +23,7 @@ mod postgres {
     }
 
     //"Postgres native int types" should "work"
-    #[connector_test(schema(schema_int))]
+    #[connector_test(schema(schema_int), only(Postgres))]
     async fn native_int_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -191,7 +191,7 @@ mod postgres {
     }
 
     // "Other Postgres native types" should "work"
-    #[connector_test(schema(schema_other_types), only(Postgres), exclude(CockroachDb))]
+    #[connector_test(schema(schema_other_types), only(Postgres), exclude(CockroachDb,))]
     async fn native_other_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -368,7 +368,7 @@ mod postgres {
 
     // "PostGIS common geometry types" should "work"
     #[connector_test(
-        only(Postgres("15-postgis"), CockroachDb),
+        only(Postgres("16-postgis"), CockroachDb),
         schema(schema_ewkt_geometry),
         db_schemas("public", "test")
     )]
@@ -424,7 +424,7 @@ mod postgres {
 
     // "PostGIS common geometry types with srid" should "work"
     #[connector_test(
-        only(Postgres("15-postgis"), CockroachDb),
+        only(Postgres("16-postgis"), CockroachDb),
         schema(schema_ewkt_geometry_srid),
         db_schemas("public", "test")
     )]
@@ -480,7 +480,7 @@ mod postgres {
 
     // "PostGIS common geography types" should "work"
     #[connector_test(
-        only(Postgres("15-postgis"), CockroachDb),
+        only(Postgres("16-postgis"), CockroachDb),
         schema(schema_ewkt_geography),
         db_schemas("public", "test")
     )]
@@ -536,7 +536,7 @@ mod postgres {
 
     // "PostGIS common geography types with srid" should "work"
     #[connector_test(
-        only(Postgres("15-postgis"), CockroachDb),
+        only(Postgres("16-postgis"), CockroachDb),
         schema(schema_ewkt_geography_srid),
         db_schemas("public", "test")
     )]
@@ -592,7 +592,7 @@ mod postgres {
 
     // "PostGIS extra geometry types" should "work"
     #[connector_test(
-        only(Postgres("15-postgis")),
+        only(Postgres("16-postgis")),
         schema(schema_extra_geometry),
         db_schemas("public", "test")
     )]
@@ -648,7 +648,7 @@ mod postgres {
 
     // "PostGIS common geometry types" should "work" with GeoJSON
     #[connector_test(
-        only(Postgres("15-postgis"), CockroachDb),
+        only(Postgres("16-postgis"), CockroachDb),
         schema(schema_geojson_geometry),
         db_schemas("public", "test")
     )]
@@ -704,7 +704,7 @@ mod postgres {
 
     // "PostGIS common geometry types" should "work" with GeoJSON
     #[connector_test(
-        only(Postgres("15-postgis"), CockroachDb),
+        only(Postgres("16-postgis"), CockroachDb),
         schema(schema_geojson_geography),
         db_schemas("public", "test")
     )]

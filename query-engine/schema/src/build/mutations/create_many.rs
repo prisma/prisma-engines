@@ -2,7 +2,7 @@ use super::*;
 use crate::{Identifier, IdentifierType, InputField, InputType, OutputField, OutputType, QueryInfo, QueryTag};
 use constants::*;
 use input_types::{fields::data_input_mapper::*, list_union_type};
-use output_types::objects;
+use output_types::{field, objects};
 use psl::datamodel_connector::ConnectorCapability;
 use query_structure::{Model, RelationFieldRef};
 
@@ -20,6 +20,50 @@ pub(crate) fn create_many(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_>
             tag: QueryTag::CreateMany,
         }),
     )
+}
+
+/// Builds a create many mutation field (e.g. createManyUsers) for given model.
+pub(crate) fn create_many_and_return(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> {
+    let field_name = format!("createMany{}AndReturn", model.name());
+    let model_id = model.id;
+    let object_type = create_many_and_return_output_type(ctx, model.clone());
+
+    field(
+        field_name,
+        move || create_many_arguments(ctx, model),
+        OutputType::list(InnerOutputType::Object(object_type)),
+        Some(QueryInfo {
+            model: Some(model_id),
+            tag: QueryTag::CreateManyAndReturn,
+        }),
+    )
+}
+
+pub(crate) fn create_many_and_return_output_type(ctx: &'_ QuerySchema, model: Model) -> ObjectType<'_> {
+    let model_id = model.id;
+    let mut obj = ObjectType::new(
+        Identifier::new_model(IdentifierType::CreateManyAndReturnOutput(model.clone())),
+        move || {
+            let mut fields: Vec<_> = model
+                .fields()
+                .scalar()
+                .map(|sf| field::map_output_field(ctx, sf.into()))
+                .collect();
+
+            // If the relation is inlined in the enclosing model, that means the foreign keys can be set at creation
+            // and thus it makes sense to enable querying this relation.
+            for rf in model.fields().relation() {
+                if rf.is_inlined_on_enclosing_model() {
+                    fields.push(field::map_output_field(ctx, rf.into()));
+                }
+            }
+
+            fields
+        },
+    );
+
+    obj.model = Some(model_id);
+    obj
 }
 
 /// Builds "skip_duplicates" and "data" arguments intended for the create many field.

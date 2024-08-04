@@ -47,6 +47,7 @@ pub enum Circumstances {
     MariaDb,
     MySql56,
     MySql57,
+    CheckConstraints,
 }
 
 pub struct SqlSchemaDescriber<'a> {
@@ -758,7 +759,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         table_names: &IndexMap<String, TableId>,
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
-        // Only MySQL 8 and above supports check constraints and has the CHECK_CONSTRAINTS table we can query.
+        // Only MySQL 8.0.16 and above supports check constraints and has the CHECK_CONSTRAINTS table we can query.
         if !self.supports_check_constraints() {
             return Ok(());
         }
@@ -827,14 +828,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     /// Tests whether the current database supports check constraints
     fn supports_check_constraints(&self) -> bool {
-        // MySQL 8 and above supports check constraints.
-        // MySQL 5.6 and 5.7 do not have a CHECK_CONSTRAINTS table we can query.
-        // MariaDB, although it supports check constraints, adds them unexpectedly.
-        // E.g., MariaDB 10 adds the `json_valid(\`Priv\`)` check constraint on every JSON column;
-        // this creates a noisy, unexpected diff when comparing the introspected schema with the prisma schema.
-        !self
-            .circumstances
-            .intersects(Circumstances::MySql56 | Circumstances::MySql57 | Circumstances::MariaDb)
+        self.circumstances.contains(Circumstances::CheckConstraints)
     }
 
     /// Tests whether the current database supports geometry SRID constraints

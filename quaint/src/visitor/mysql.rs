@@ -90,6 +90,36 @@ impl<'a> Mysql<'a> {
 
         Ok(())
     }
+
+    fn visit_json_build_obj_expr(&mut self, expr: Expression<'a>) -> crate::Result<()> {
+        match expr.kind() {
+            // Convert bytes data to base64
+            ExpressionKind::Column(col) => match (col.type_family.as_ref(), col.native_type.as_deref()) {
+                (
+                    Some(TypeFamily::Text(_)),
+                    Some("LONGBLOB") | Some("BLOB") | Some("MEDIUMBLOB") | Some("SMALLBLOB") | Some("TINYBLOB")
+                    | Some("VARBINARY") | Some("BINARY") | Some("BIT"),
+                ) => {
+                    self.write("to_base64")?;
+                    self.surround_with("(", ")", |s| s.visit_expression(expr))?;
+
+                    Ok(())
+                }
+                // Convert floats to string to avoid losing precision
+                (_, Some("FLOAT")) => {
+                    self.write("CONVERT")?;
+                    self.surround_with("(", ")", |s| {
+                        s.visit_expression(expr)?;
+                        s.write(", ")?;
+                        s.write("CHAR")
+                    })?;
+                    Ok(())
+                }
+                _ => self.visit_expression(expr),
+            },
+            _ => self.visit_expression(expr),
+        }
+    }
 }
 
 impl<'a> Visitor<'a> for Mysql<'a> {
@@ -105,7 +135,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         let mut mysql = Mysql {
             query: String::with_capacity(4096),
             parameters: Vec::with_capacity(128),
-            target_table: get_target_table(query.clone()),
+            target_table: get_target_table(&query),
         };
 
         Mysql::visit_query(&mut mysql, query)?;
@@ -400,7 +430,6 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         self.write(", ")?;
 
         match json_extract.path.clone() {
-            #[cfg(feature = "postgresql")]
             JsonPath::Array(_) => panic!("JSON path array notation is not supported for MySQL"),
             JsonPath::String(path) => self.visit_parameterized(Value::text(path))?,
         }
@@ -600,6 +629,36 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
+    #[cfg(feature = "mysql")]
+    fn visit_json_array_agg(&mut self, array_agg: JsonArrayAgg<'a>) -> visitor::Result {
+        self.write("JSON_ARRAYAGG")?;
+        self.surround_with("(", ")", |s| s.visit_expression(*array_agg.expr))?;
+
+        Ok(())
+    }
+
+    #[cfg(feature = "mysql")]
+    fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> visitor::Result {
+        let len = build_obj.exprs.len();
+
+        self.write("JSON_OBJECT")?;
+        self.surround_with("(", ")", |s| {
+            for (i, (name, expr)) in build_obj.exprs.into_iter().enumerate() {
+                s.visit_raw_value(Value::text(name))?;
+                s.write(", ")?;
+                s.visit_json_build_obj_expr(expr)?;
+
+                if i < (len - 1) {
+                    s.write(", ")?;
+                }
+            }
+
+            Ok(())
+        })?;
+
+        Ok(())
+    }
+
     fn visit_ordering(&mut self, ordering: Ordering<'a>) -> visitor::Result {
         let len = ordering.0.len();
 
@@ -668,7 +727,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     }
 }
 
-fn get_target_table(query: Query<'_>) -> Option<Table<'_>> {
+fn get_target_table<'a>(query: &Query<'a>) -> Option<Table<'a>> {
     match query {
         Query::Delete(delete) => Some(delete.table.clone()),
         Query::Update(update) => Some(update.table.clone()),

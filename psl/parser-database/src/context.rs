@@ -3,9 +3,9 @@ mod attributes;
 use self::attributes::AttributesValidationState;
 use crate::{
     ast, interner::StringInterner, names::Names, relations::Relations, types::Types, DatamodelError, Diagnostics,
-    StringId,
+    InFile, StringId,
 };
-use schema_ast::ast::{Expression, WithName};
+use schema_ast::ast::{EnumValueId, Expression, WithName};
 use std::collections::{HashMap, HashSet};
 
 /// Validation context. This is an implementation detail of ParserDatabase. It
@@ -21,7 +21,7 @@ use std::collections::{HashMap, HashSet};
 ///
 /// See `visit_attributes()`.
 pub(crate) struct Context<'db> {
-    pub(crate) ast: &'db ast::SchemaAst,
+    pub(crate) asts: &'db crate::Files,
     pub(crate) interner: &'db mut StringInterner,
     pub(crate) names: &'db mut Names,
     pub(crate) types: &'db mut Types,
@@ -30,15 +30,15 @@ pub(crate) struct Context<'db> {
     attributes: AttributesValidationState, // state machine for attribute validation
 
     // @map'ed names indexes. These are not in the db because they are only used for validation.
-    pub(super) mapped_model_scalar_field_names: HashMap<(ast::ModelId, StringId), ast::FieldId>,
-    pub(super) mapped_composite_type_names: HashMap<(ast::CompositeTypeId, StringId), ast::FieldId>,
-    pub(super) mapped_enum_names: HashMap<StringId, ast::EnumId>,
-    pub(super) mapped_enum_value_names: HashMap<(ast::EnumId, StringId), u32>,
+    pub(super) mapped_model_scalar_field_names: HashMap<(crate::ModelId, StringId), ast::FieldId>,
+    pub(super) mapped_composite_type_names: HashMap<(crate::CompositeTypeId, StringId), ast::FieldId>,
+    pub(super) mapped_enum_names: HashMap<StringId, crate::EnumId>,
+    pub(super) mapped_enum_value_names: HashMap<(crate::EnumId, StringId), EnumValueId>,
 }
 
 impl<'db> Context<'db> {
     pub(super) fn new(
-        ast: &'db ast::SchemaAst,
+        asts: &'db crate::Files,
         interner: &'db mut StringInterner,
         names: &'db mut Names,
         types: &'db mut Types,
@@ -46,7 +46,7 @@ impl<'db> Context<'db> {
         diagnostics: &'db mut Diagnostics,
     ) -> Self {
         Context {
-            ast,
+            asts,
             interner,
             names,
             types,
@@ -68,7 +68,7 @@ impl<'db> Context<'db> {
     /// Return the attribute currently being validated. Panics if the context is not in the right
     /// state.
     #[track_caller]
-    pub(crate) fn current_attribute_id(&self) -> ast::AttributeId {
+    pub(crate) fn current_attribute_id(&self) -> crate::AttributeId {
         self.attributes.attribute.unwrap()
     }
 
@@ -76,8 +76,7 @@ impl<'db> Context<'db> {
     /// state.
     #[track_caller]
     pub(crate) fn current_attribute(&self) -> &'db ast::Attribute {
-        let id = self.attributes.attribute.unwrap();
-        &self.ast[id]
+        &self.asts[self.attributes.attribute.unwrap()]
     }
 
     /// Discard arguments without validation.
@@ -102,8 +101,8 @@ impl<'db> Context<'db> {
     ///
     /// Other than for this peculiarity, this method is identical to
     /// `visit_attributes()`.
-    pub(super) fn visit_scalar_field_attributes(&mut self, model_id: ast::ModelId, field_id: ast::FieldId) {
-        self.visit_attributes((model_id, field_id).into());
+    pub(super) fn visit_scalar_field_attributes(&mut self, model_id: crate::ModelId, field_id: ast::FieldId) {
+        self.visit_attributes((model_id.0, (model_id.1, field_id)));
     }
 
     /// All attribute validation should go through `visit_attributes()`. It lets
@@ -116,7 +115,11 @@ impl<'db> Context<'db> {
     ///   `validate_visited_arguments()`. Otherwise, Context will helpfully panic.
     /// - When you are done validating an attribute set, you must call
     ///   `validate_visited_attributes()`. Otherwise, Context will helpfully panic.
-    pub(super) fn visit_attributes(&mut self, ast_attributes: ast::AttributeContainer) {
+    pub(super) fn visit_attributes<T>(&mut self, ast_attributes: InFile<T>)
+    where
+        T: Into<ast::AttributeContainer>,
+    {
+        let ast_attributes: crate::AttributeContainer = (ast_attributes.0, ast_attributes.1.into());
         if self.attributes.attributes.is_some() || !self.attributes.unused_attributes.is_empty() {
             panic!(
                 "`ctx.visit_attributes() called with {:?} while the Context is still validating previous attribute set on {:?}`",
@@ -125,7 +128,8 @@ impl<'db> Context<'db> {
             );
         }
 
-        self.attributes.set_attributes(ast_attributes, self.ast);
+        self.attributes
+            .set_attributes(ast_attributes, &self.asts[ast_attributes.0].2);
     }
 
     /// Look for an optional attribute with a name of the form
@@ -136,8 +140,8 @@ impl<'db> Context<'db> {
     /// arguments to other attributes: everywhere else, attributes are named,
     /// with a default that can be first, but with native types, arguments are
     /// purely positional.
-    pub(crate) fn visit_datasource_scoped(&mut self) -> Option<(StringId, StringId, ast::AttributeId)> {
-        let attrs = iter_attributes(self.attributes.attributes.as_ref(), self.ast)
+    pub(crate) fn visit_datasource_scoped(&mut self) -> Option<(StringId, StringId, crate::AttributeId)> {
+        let attrs = iter_attributes(self.attributes.attributes.as_ref(), self.asts)
             .filter(|(_, attr)| attr.name.name.contains('.'));
         let mut native_type_attr = None;
         let diagnostics = &mut self.diagnostics;
@@ -172,7 +176,7 @@ impl<'db> Context<'db> {
     #[must_use]
     pub(crate) fn visit_optional_single_attr(&mut self, name: &'static str) -> bool {
         let mut attrs =
-            iter_attributes(self.attributes.attributes.as_ref(), self.ast).filter(|(_, a)| a.name.name == name);
+            iter_attributes(self.attributes.attributes.as_ref(), self.asts).filter(|(_, a)| a.name.name == name);
         let (first_idx, first) = match attrs.next() {
             Some(first) => first,
             None => return false,
@@ -181,7 +185,7 @@ impl<'db> Context<'db> {
 
         if attrs.next().is_some() {
             for (idx, attr) in
-                iter_attributes(self.attributes.attributes.as_ref(), self.ast).filter(|(_, a)| a.name.name == name)
+                iter_attributes(self.attributes.attributes.as_ref(), self.asts).filter(|(_, a)| a.name.name == name)
             {
                 diagnostics.push_error(DatamodelError::new_duplicate_attribute_error(
                     &attr.name.name,
@@ -205,7 +209,7 @@ impl<'db> Context<'db> {
         let mut has_valid_attribute = false;
 
         while !has_valid_attribute {
-            let first_attr = iter_attributes(self.attributes.attributes.as_ref(), self.ast)
+            let first_attr = iter_attributes(self.attributes.attributes.as_ref(), self.asts)
                 .filter(|(_, attr)| attr.name.name == name)
                 .find(|(attr_id, _)| self.attributes.unused_attributes.contains(attr_id));
             let (attr_id, attr) = if let Some(first_attr) = first_attr {
@@ -267,7 +271,7 @@ impl<'db> Context<'db> {
     /// otherwise.
     pub(crate) fn validate_visited_arguments(&mut self) {
         let attr = if let Some(attrid) = self.attributes.attribute {
-            &self.ast[attrid]
+            &self.asts[attrid]
         } else {
             panic!("State error: missing attribute in validate_visited_arguments.")
         };
@@ -290,7 +294,7 @@ impl<'db> Context<'db> {
 
         let diagnostics = &mut self.diagnostics;
         for attribute_id in &self.attributes.unused_attributes {
-            let attribute = &self.ast[*attribute_id];
+            let attribute = &self.asts[*attribute_id];
             diagnostics.push_error(DatamodelError::new_attribute_not_known_error(
                 &attribute.name.name,
                 attribute.span,
@@ -308,7 +312,7 @@ impl<'db> Context<'db> {
     }
 
     /// Find a specific field in a specific model.
-    pub(crate) fn find_model_field(&self, model_id: ast::ModelId, field_name: &str) -> Option<ast::FieldId> {
+    pub(crate) fn find_model_field(&self, model_id: crate::ModelId, field_name: &str) -> Option<ast::FieldId> {
         let name = self.interner.lookup(field_name)?;
         self.names.model_fields.get(&(model_id, name)).cloned()
     }
@@ -316,7 +320,7 @@ impl<'db> Context<'db> {
     /// Find a specific field in a specific composite type.
     pub(crate) fn find_composite_type_field(
         &self,
-        composite_type_id: ast::CompositeTypeId,
+        composite_type_id: crate::CompositeTypeId,
         field_name: &str,
     ) -> Option<ast::FieldId> {
         let name = self.interner.lookup(field_name)?;
@@ -327,9 +331,15 @@ impl<'db> Context<'db> {
             .cloned()
     }
 
+    pub(crate) fn iter_tops(&self) -> impl Iterator<Item = (crate::TopId, &'db ast::Top)> + 'db {
+        self.asts
+            .iter()
+            .flat_map(|(file_id, _, _, ast)| ast.iter_tops().map(move |(top_id, top)| ((file_id, top_id), top)))
+    }
+
     /// Starts validating the arguments for an attribute, checking for duplicate arguments in the
     /// process. Returns whether the attribute is valid enough to be usable.
-    fn set_attribute(&mut self, attribute_id: ast::AttributeId, attribute: &'db ast::Attribute) -> bool {
+    fn set_attribute(&mut self, attribute_id: crate::AttributeId, attribute: &'db ast::Attribute) -> bool {
         if self.attributes.attribute.is_some() || !self.attributes.args.is_empty() {
             panic!("State error: we cannot start validating new arguments before `validate_visited_arguments()` or `discard_arguments()` has been called.\n{:#?}", self.attributes);
         }
@@ -430,13 +440,15 @@ impl<'db> Context<'db> {
 
 // Implementation detail. Used for arguments validation.
 fn iter_attributes<'a, 'ast: 'a>(
-    attrs: Option<&'a ast::AttributeContainer>,
-    ast: &'ast ast::SchemaAst,
-) -> impl Iterator<Item = (ast::AttributeId, &'ast ast::Attribute)> + 'a {
+    attrs: Option<&'a crate::AttributeContainer>,
+    asts: &'ast crate::Files,
+) -> impl Iterator<Item = (crate::AttributeId, &'ast ast::Attribute)> + 'a {
     attrs
         .into_iter()
-        .flat_map(move |container| ast[*container].iter().enumerate().map(|a| (a, *container)))
-        .map(|((idx, attr), container)| (ast::AttributeId::new_in_container(container, idx), attr))
+        .flat_map(move |container| asts[*container].iter().enumerate().map(|a| (a, *container)))
+        .map(|((idx, attr), (file_id, container))| {
+            ((file_id, ast::AttributeId::new_in_container(container, idx)), attr)
+        })
 }
 
 impl std::ops::Index<StringId> for Context<'_> {

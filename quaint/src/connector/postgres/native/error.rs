@@ -2,7 +2,7 @@ use tokio_postgres::error::DbError;
 
 use crate::{
     connector::postgres::error::PostgresError,
-    error::{Error, ErrorKind},
+    error::{Error, ErrorKind, NativeErrorKind},
 };
 
 impl From<&DbError> for PostgresError {
@@ -21,7 +21,7 @@ impl From<&DbError> for PostgresError {
 impl From<tokio_postgres::error::Error> for Error {
     fn from(e: tokio_postgres::error::Error) -> Error {
         if e.is_closed() {
-            return Error::builder(ErrorKind::ConnectionClosed).build();
+            return Error::builder(ErrorKind::Native(NativeErrorKind::ConnectionClosed)).build();
         }
 
         if let Some(db_error) = e.as_db_error() {
@@ -46,7 +46,7 @@ impl From<tokio_postgres::error::Error> for Error {
 
         match reason.as_str() {
             "error connecting to server: timed out" => {
-                let mut builder = Error::builder(ErrorKind::ConnectTimeout);
+                let mut builder = Error::builder(ErrorKind::Native(NativeErrorKind::ConnectTimeout));
 
                 if let Some(code) = code {
                     builder.set_original_code(code);
@@ -57,9 +57,9 @@ impl From<tokio_postgres::error::Error> for Error {
             } // sigh...
             // https://github.com/sfackler/rust-postgres/blob/0c84ed9f8201f4e5b4803199a24afa2c9f3723b2/tokio-postgres/src/connect_tls.rs#L37
             "error performing TLS handshake: server does not support TLS" => {
-                let mut builder = Error::builder(ErrorKind::TlsError {
+                let mut builder = Error::builder(ErrorKind::Native(NativeErrorKind::TlsError {
                     message: reason.clone(),
-                });
+                }));
 
                 if let Some(code) = code {
                     builder.set_original_code(code);
@@ -105,7 +105,12 @@ fn try_extracting_io_error(err: &tokio_postgres::error::Error) -> Option<Error> 
 
     err.source()
         .and_then(|err| err.downcast_ref::<std::io::Error>())
-        .map(|err| ErrorKind::ConnectionError(Box::new(std::io::Error::new(err.kind(), format!("{err}")))))
+        .map(|err| {
+            ErrorKind::Native(NativeErrorKind::ConnectionError(Box::new(std::io::Error::new(
+                err.kind(),
+                format!("{err}"),
+            ))))
+        })
         .map(|kind| Error::builder(kind).build())
 }
 
@@ -117,9 +122,9 @@ impl From<native_tls::Error> for Error {
 
 impl From<&native_tls::Error> for Error {
     fn from(e: &native_tls::Error) -> Error {
-        let kind = ErrorKind::TlsError {
+        let kind = ErrorKind::Native(NativeErrorKind::TlsError {
             message: format!("{e}"),
-        };
+        });
 
         Error::builder(kind).build()
     }

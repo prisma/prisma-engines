@@ -1,0 +1,6 @@
+{
+  "connector": "sqlite",
+  "version": "react-native",
+  "external_test_executor": "Mobile",
+  "mobile_emulator_url": "http://localhost:3000"
+}

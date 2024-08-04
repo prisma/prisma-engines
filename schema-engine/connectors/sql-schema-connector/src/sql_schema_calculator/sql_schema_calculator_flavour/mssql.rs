@@ -27,7 +27,7 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
         let mut data = MssqlSchemaExt::default();
 
         for model in context.datamodel.db.walk_models() {
-            let table_id = context.model_id_to_table_id[&model.model_id()];
+            let table_id = context.model_id_to_table_id[&model.id];
             let table = context.schema.walk(table_id);
             if model
                 .primary_key()

@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use super::*;
 use crate::{MongoDbSchemaRenderer, TestError};
 use psl::builtin_connectors::MONGODB;
@@ -49,13 +51,12 @@ impl TryFrom<&str> for MongoDbVersion {
     }
 }
 
-impl ToString for MongoDbVersion {
-    fn to_string(&self) -> String {
+impl Display for MongoDbVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            MongoDbVersion::V4_4 => "4.4",
-            &MongoDbVersion::V4_2 => "4.2",
-            MongoDbVersion::V5 => "5",
+            MongoDbVersion::V4_4 => f.write_str("4.4"),
+            &MongoDbVersion::V4_2 => f.write_str("4.2"),
+            MongoDbVersion::V5 => f.write_str("5"),
         }
-        .to_owned()
     }
 }

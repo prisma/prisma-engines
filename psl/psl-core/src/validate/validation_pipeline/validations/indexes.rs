@@ -14,11 +14,11 @@ pub(super) fn has_a_unique_constraint_name(index: IndexWalker<'_>, names: &super
     let name = index.constraint_name(ctx.connector);
     let model = index.model();
 
-    for violation in names.constraint_namespace.constraint_name_scope_violations(
-        model.model_id(),
-        ConstraintName::Index(name.as_ref()),
-        ctx,
-    ) {
+    for violation in
+        names
+            .constraint_namespace
+            .constraint_name_scope_violations(model.id, ConstraintName::Index(name.as_ref()), ctx)
+    {
         let message = format!(
             "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
             name,
@@ -52,7 +52,7 @@ pub(super) fn unique_index_has_a_unique_custom_name_per_model(
     if let Some(name) = index.name() {
         if names
             .constraint_namespace
-            .local_custom_name_scope_violations(model.model_id(), name.as_ref())
+            .local_custom_name_scope_violations(model.id, name.as_ref())
         {
             let message = format!(
                 "The given custom name `{name}` has to be unique on the model. Please provide a different name for the `name` argument."
@@ -72,10 +72,7 @@ pub(super) fn unique_index_has_a_unique_custom_name_per_model(
 
 /// The database must support the index length prefix for it to be allowed in the data model.
 pub(crate) fn field_length_prefix_supported(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx
-        .connector
-        .has_capability(ConnectorCapability::IndexColumnLengthPrefixing)
-    {
+    if ctx.has_capability(ConnectorCapability::IndexColumnLengthPrefixing) {
         return;
     }
 
@@ -109,7 +106,7 @@ pub(crate) fn fulltext_index_preview_feature_enabled(index: IndexWalker<'_>, ctx
 
 /// `@@fulltext` should only be available if we support it in the database.
 pub(crate) fn fulltext_index_supported(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx.connector.has_capability(ConnectorCapability::FullTextIndex) {
+    if ctx.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
@@ -130,7 +127,7 @@ pub(crate) fn fulltext_columns_should_not_define_length(index: IndexWalker<'_>, 
         return;
     }
 
-    if !ctx.connector.has_capability(ConnectorCapability::FullTextIndex) {
+    if !ctx.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
@@ -155,7 +152,7 @@ pub(crate) fn fulltext_column_sort_is_supported(index: IndexWalker<'_>, ctx: &mu
         return;
     }
 
-    if !ctx.connector.has_capability(ConnectorCapability::FullTextIndex) {
+    if !ctx.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
@@ -163,10 +160,7 @@ pub(crate) fn fulltext_column_sort_is_supported(index: IndexWalker<'_>, ctx: &mu
         return;
     }
 
-    if ctx
-        .connector
-        .has_capability(ConnectorCapability::SortOrderInFullTextIndex)
-    {
+    if ctx.has_capability(ConnectorCapability::SortOrderInFullTextIndex) {
         return;
     }
 
@@ -191,7 +185,7 @@ pub(crate) fn fulltext_text_columns_should_be_bundled_together(index: IndexWalke
         return;
     }
 
-    if !ctx.connector.has_capability(ConnectorCapability::FullTextIndex) {
+    if !ctx.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
 
@@ -199,10 +193,7 @@ pub(crate) fn fulltext_text_columns_should_be_bundled_together(index: IndexWalke
         return;
     }
 
-    if !ctx
-        .connector
-        .has_capability(ConnectorCapability::SortOrderInFullTextIndex)
-    {
+    if !ctx.has_capability(ConnectorCapability::SortOrderInFullTextIndex) {
         return;
     }
 
@@ -285,7 +276,7 @@ pub(super) fn has_fields(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
 }
 
 pub(crate) fn supports_clustering_setting(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx.connector.has_capability(ConnectorCapability::ClusteringSetting) {
+    if ctx.has_capability(ConnectorCapability::ClusteringSetting) {
         return;
     }
 
@@ -301,7 +292,7 @@ pub(crate) fn supports_clustering_setting(index: IndexWalker<'_>, ctx: &mut Cont
 }
 
 pub(crate) fn clustering_can_be_defined_only_once(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.connector.has_capability(ConnectorCapability::ClusteringSetting) {
+    if !ctx.has_capability(ConnectorCapability::ClusteringSetting) {
         return;
     }
 

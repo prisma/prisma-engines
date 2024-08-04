@@ -10,5 +10,6 @@ mod native_upsert;
 mod occ;
 mod ref_actions;
 mod regressions;
+mod relation_load_strategy;
 mod update_no_select;
 mod write_conflict;

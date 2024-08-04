@@ -134,7 +134,8 @@
 //!    - Finally, the server sets the `logs` and `traces` extensions in the `PrismaResponse`**[12]**,
 //!     it serializes the extended response in json format and returns it as an HTTP Response
 //!     blob **[13]**.
-//!  
+//!
+#![allow(unused_imports, dead_code)]
 pub use self::capturer::Capturer;
 pub use self::settings::Settings;
 pub use tx_ext::TxTraceExt;
@@ -142,7 +143,6 @@ pub use tx_ext::TxTraceExt;
 use self::capturer::Processor;
 use once_cell::sync::Lazy;
 use opentelemetry::{global, sdk, trace};
-use query_engine_metrics::MetricRegistry;
 use tracing::subscriber;
 use tracing_subscriber::{
     filter::filter_fn, layer::Layered, prelude::__tracing_subscriber_SubscriberExt, Layer, Registry,
@@ -158,9 +158,13 @@ pub fn capturer(trace_id: trace::TraceId, settings: Settings) -> Capturer {
 
 /// Adds a capturing layer to the given subscriber and installs the transformed subscriber as the
 /// global, default subscriber
+#[cfg(feature = "metrics")]
 #[allow(clippy::type_complexity)]
 pub fn install_capturing_layer(
-    subscriber: Layered<Option<MetricRegistry>, Layered<Box<dyn Layer<Registry> + Send + Sync>, Registry>>,
+    subscriber: Layered<
+        Option<query_engine_metrics::MetricRegistry>,
+        Layered<Box<dyn Layer<Registry> + Send + Sync>, Registry>,
+    >,
     log_queries: bool,
 ) {
     // set a trace context propagator, so that the trace context is propagated via the

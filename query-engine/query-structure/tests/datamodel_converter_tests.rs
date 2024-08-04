@@ -53,7 +53,7 @@ fn converting_composite_types_compound() {
             author     User        @relation(fields: [authorId], references: [id])
             authorId   String      @db.ObjectId
             attributes Attribute[]
-      
+
             @@index([authorId, attributes])
         }
 
@@ -62,7 +62,7 @@ fn converting_composite_types_compound() {
             value String
             group String
         }
-      
+
         model User {
             id   String @id @default(auto()) @map("_id") @db.ObjectId
             Post Post[]
@@ -87,7 +87,7 @@ fn converting_composite_types_compound_unique() {
             author     User        @relation(fields: [authorId], references: [id])
             authorId   String      @db.ObjectId
             attributes Attribute[]
-      
+
             @@unique([authorId, attributes])
             //       ^^^^^^^^^^^^^^^^^^^^^^
             // Prisma does not currently support composite types in compound unique indices...
@@ -98,7 +98,7 @@ fn converting_composite_types_compound_unique() {
             value String
             group String
         }
-      
+
         model User {
             id   String @id @default(auto()) @map("_id") @db.ObjectId
             Post Post[]
@@ -115,16 +115,16 @@ fn converting_composite_types_compound_unique() {
 fn converting_composite_types_nested() {
     let res = psl::parse_schema(
         r#"
-        datasource db { 
+        datasource db {
             provider = "mongodb"
             url      = "mongodb://localhost:27017/hello"
         }
-          
+
         type TheatersLocation {
             address TheatersLocationAddress
             geo     TheatersLocationGeo
         }
-          
+
         type TheatersLocationAddress {
             city    String
             state   String
@@ -132,17 +132,17 @@ fn converting_composite_types_nested() {
             street2 String?
             zipcode String
         }
-          
+
         type TheatersLocationGeo {
             coordinates Float[]
             type        String
         }
-          
+
         model theaters {
             id        String           @id @default(auto()) @map("_id") @db.ObjectId
             location  TheatersLocation
             theaterId Int
-          
+
             @@index([location.geo], map: "geo index")
         }
         "#,
@@ -155,16 +155,16 @@ fn converting_composite_types_nested() {
 fn converting_composite_types_nested_scalar() {
     let res = psl::parse_schema(
         r#"
-        datasource db { 
+        datasource db {
             provider = "mongodb"
             url      = "mongodb://localhost:27017/hello"
         }
-          
+
         type TheatersLocation {
             address TheatersLocationAddress
             geo     TheatersLocationGeo
         }
-          
+
         type TheatersLocationAddress {
             city    String
             state   String
@@ -172,17 +172,17 @@ fn converting_composite_types_nested_scalar() {
             street2 String?
             zipcode String
         }
-          
+
         type TheatersLocationGeo {
             coordinates Float[]
             type        String
         }
-          
+
         model theaters {
             id        String           @id @default(auto()) @map("_id") @db.ObjectId
             location  TheatersLocation
             theaterId Int
-          
+
             @@index([location.geo.type], map: "geo index")
         }
         "#,
@@ -400,19 +400,19 @@ fn duplicate_relation_name() {
             userId String
             user   User   @relation("a", fields: [userId], references: [id])
           }
-          
+
           model User {
             id       String    @unique
             posts    Post[]    @relation("a")
             comments Comment[] @relation("a")
           }
-          
+
           model Comment {
             id     String @unique
             userId String
             user   User   @relation("a", fields: [userId], references: [id])
           }
-          
+
         "#;
 
     convert(schema);
@@ -491,17 +491,6 @@ impl ScalarFieldAssertions for ScalarField {
 
     fn assert_unique(&self) -> &Self {
         assert!(self.unique());
-        self
-    }
-}
-
-trait RelationAssertions {
-    fn assert_name(&self, name: &str) -> &Self;
-}
-
-impl RelationAssertions for Relation {
-    fn assert_name(&self, name: &str) -> &Self {
-        assert_eq!(self.name(), name);
         self
     }
 }

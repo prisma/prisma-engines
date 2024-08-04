@@ -15,6 +15,7 @@ use schema_connector::{
 use sql_schema_describer::SqlSchema;
 use std::future;
 use url::Url;
+use versions::Versioning;
 
 const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
 static QUALIFIED_NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"`[^ ]+`\.`[^ ]+`").unwrap());
@@ -173,21 +174,6 @@ impl SqlFlavour for MysqlFlavour {
             })
         } else {
             None
-        }
-    }
-
-    fn check_schema_features(&self, schema: &psl::ValidatedSchema) -> ConnectorResult<()> {
-        let has_namespaces = schema
-            .configuration
-            .datasources
-            .first()
-            .map(|ds| !ds.namespaces.is_empty());
-        if let Some(true) = has_namespaces {
-            Err(ConnectorError::from_msg(
-                "multiSchema migrations and introspection are not implemented on MySQL yet".to_owned(),
-            ))
-        } else {
-            Ok(())
         }
     }
 
@@ -430,6 +416,7 @@ pub(crate) enum Circumstances {
     IsMysql57,
     IsMariadb,
     IsVitess,
+    CheckConstraints,
 }
 
 fn check_datamodel_for_mysql_5_6(datamodel: &ValidatedSchema, errors: &mut Vec<String>) {
@@ -450,44 +437,6 @@ fn check_datamodel_for_mysql_5_6(datamodel: &ValidatedSchema, errors: &mut Vec<S
                 ))
             }
         });
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn debug_impl_does_not_leak_connection_info() {
-        let url = "mysql://myname:mypassword@myserver:8765/mydbname";
-
-        let mut flavour = MysqlFlavour::default();
-        let params = ConnectorParams {
-            connection_string: url.to_owned(),
-            preview_features: Default::default(),
-            shadow_database_connection_string: None,
-        };
-        flavour.set_params(params).unwrap();
-        let debugged = format!("{flavour:?}");
-
-        let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];
-
-        for word in words {
-            assert!(!debugged.contains(word));
-        }
-    }
-
-    #[test]
-    fn qualified_name_re_matches_as_expected() {
-        let should_match = r#"ALTER TABLE `mydb`.`cat` DROP PRIMARY KEY"#;
-        let should_not_match = r#"ALTER TABLE `cat` ADD FOREIGN KEY (`ab`, cd`) REFERENCES `dog`(`id`)"#;
-
-        assert!(
-            QUALIFIED_NAME_RE.is_match_at(should_match, 12),
-            "captures: {:?}",
-            QUALIFIED_NAME_RE.captures(should_match)
-        );
-        assert!(!QUALIFIED_NAME_RE.is_match(should_not_match));
-    }
 }
 
 fn with_connection<'a, O, F, C>(state: &'a mut State, f: C) -> BoxFuture<'a, ConnectorResult<O>>
@@ -533,6 +482,9 @@ where
                         let mut circumstances = BitFlags::<Circumstances>::default();
 
                         if let Some((version, global_version)) = versions {
+                            let semver = Versioning::new(&global_version).unwrap_or_default();
+                            let min_check_constraints_semver = Versioning::new("8.0.16").unwrap();
+
                             if version.contains("vitess") || version.contains("Vitess") {
                                 circumstances |= Circumstances::IsVitess;
                             }
@@ -547,6 +499,10 @@ where
 
                             if global_version.contains("MariaDB") {
                                 circumstances |= Circumstances::IsMariadb;
+                            }
+
+                            if semver >= min_check_constraints_semver {
+                                circumstances |= Circumstances::CheckConstraints;
                             }
                         }
 
@@ -590,4 +546,42 @@ fn scan_migration_script_impl(script: &str) {
 /// This bit of logic was given to us by a PlanetScale engineer.
 fn is_planetscale(connection_string: &str) -> bool {
     connection_string.contains(".psdb.cloud")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn debug_impl_does_not_leak_connection_info() {
+        let url = "mysql://myname:mypassword@myserver:8765/mydbname";
+
+        let mut flavour = MysqlFlavour::default();
+        let params = ConnectorParams {
+            connection_string: url.to_owned(),
+            preview_features: Default::default(),
+            shadow_database_connection_string: None,
+        };
+        flavour.set_params(params).unwrap();
+        let debugged = format!("{flavour:?}");
+
+        let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];
+
+        for word in words {
+            assert!(!debugged.contains(word));
+        }
+    }
+
+    #[test]
+    fn qualified_name_re_matches_as_expected() {
+        let should_match = r#"ALTER TABLE `mydb`.`cat` DROP PRIMARY KEY"#;
+        let should_not_match = r#"ALTER TABLE `cat` ADD FOREIGN KEY (`ab`, cd`) REFERENCES `dog`(`id`)"#;
+
+        assert!(
+            QUALIFIED_NAME_RE.is_match_at(should_match, 12),
+            "captures: {:?}",
+            QUALIFIED_NAME_RE.captures(should_match)
+        );
+        assert!(!QUALIFIED_NAME_RE.is_match(should_not_match));
+    }
 }

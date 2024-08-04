@@ -113,7 +113,8 @@ mod macros;
 #[macro_use]
 extern crate metrics;
 
-extern crate bigdecimal;
+pub extern crate bigdecimal;
+pub extern crate chrono;
 
 pub mod ast;
 pub mod connector;

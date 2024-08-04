@@ -2,7 +2,6 @@ mod compare;
 mod condition;
 mod projection;
 
-pub use compare::*;
 pub use condition::*;
 pub use projection::*;
 

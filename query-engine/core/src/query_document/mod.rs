@@ -23,7 +23,7 @@ mod transformers;
 
 pub use argument_value::{ArgumentValue, ArgumentValueObject};
 pub use operation::Operation;
-pub use selection::{In, Selection, SelectionArgument, SelectionSet};
+pub use selection::{Exclusion, In, Selection, SelectionArgument, SelectionSet};
 
 pub(crate) use parse_ast::*;
 pub(crate) use parser::*;
@@ -32,10 +32,13 @@ use crate::{
     query_ast::{QueryOption, QueryOptions},
     query_graph_builder::resolve_compound_field,
 };
+use itertools::Itertools;
 use query_structure::Model;
 use schema::{constants::*, QuerySchema};
 use std::collections::HashMap;
 use user_facing_errors::query_engine::validation::ValidationError;
+
+use self::selection::QueryFilters;
 
 pub(crate) type QueryParserResult<T> = std::result::Result<T, ValidationError>;
 
@@ -71,6 +74,7 @@ impl BatchDocument {
     /// Those filters are:
     /// - non scalar filters (ie: relation filters, boolean operators...)
     /// - any scalar filters that is not `EQUALS`
+    /// - nativetypes (citext)
     fn invalid_compact_filter(op: &Operation, schema: &QuerySchema) -> bool {
         if !op.is_find_unique(schema) {
             return true;
@@ -85,10 +89,10 @@ impl BatchDocument {
             ArgumentValue::Object(_) if resolve_compound_field(key, &model).is_some() => false,
             // Otherwise, we just look for a scalar field inside the model. If it's not one, then we break.
             val => match model.fields().find_from_scalar(key) {
-                Ok(_) => match val {
+                Ok(sf) => match val {
                     // Consider scalar _only_ if the filter object contains "equals". eg: `{ scalar_field: { equals: 1 } }`
                     ArgumentValue::Object(obj) => !obj.contains_key(filters::EQUALS),
-                    _ => false,
+                    _ => !sf.can_be_compacted(),
                 },
                 Err(_) => true,
             },
@@ -213,21 +217,21 @@ impl CompactedDocument {
 
             // The query arguments are extracted here. Combine all query
             // arguments from the different queries into a one large argument.
-            let selection_set = selections.iter().fold(SelectionSet::new(), |mut acc, selection| {
-                // findUnique always has only one argument. We know it must be an object, otherwise this will panic.
-                let where_obj = selection.arguments()[0]
-                    .1
-                    .clone()
-                    .into_object()
-                    .expect("Trying to compact a selection with non-object argument");
-                let filters = extract_filter(where_obj, &model);
+            let query_filters = selections
+                .iter()
+                .map(|selection| {
+                    // findUnique always has only one argument. We know it must be an object, otherwise this will panic.
+                    let where_obj = selection.arguments()[0]
+                        .1
+                        .clone()
+                        .into_object()
+                        .expect("Trying to compact a selection with non-object argument");
+                    let filters = extract_filter(where_obj, &model);
 
-                for (field, filter) in filters {
-                    acc = acc.push(field, filter);
-                }
-
-                acc
-            });
+                    QueryFilters::new(filters)
+                })
+                .collect();
+            let selection_set = SelectionSet::new(query_filters);
 
             // We must select all unique fields in the query so we can
             // match the right response back to the right request later on.
@@ -282,12 +286,15 @@ impl CompactedDocument {
             .collect();
 
         // Gets the argument keys for later mapping.
-        let keys: Vec<_> = arguments[0]
+        let keys: Vec<_> = arguments
             .iter()
-            .flat_map(|pair| match pair {
-                (_, ArgumentValue::Object(obj)) => obj.keys().map(ToOwned::to_owned).collect(),
-                (key, _) => vec![key.to_owned()],
+            .flat_map(|map| {
+                map.iter().flat_map(|(key, value)| match value {
+                    ArgumentValue::Object(obj) => obj.keys().map(ToOwned::to_owned).collect::<Vec<_>>(),
+                    _ => vec![key.to_owned()],
+                })
             })
+            .unique()
             .collect();
 
         Self {

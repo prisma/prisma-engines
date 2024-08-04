@@ -1,42 +1,40 @@
-name: Codspeed Benchmark
+name: "QE: Codespeed benchmarks"
 on:
   push:
     branches:
       - main
   pull_request:
     paths-ignore:
-      - '.github/**'
-      - '!.github/workflows/benchmark.yml'
-      - '.buildkite/**'
-      - '*.md'
-      - 'LICENSE'
-      - 'CODEOWNERS'
-      - 'renovate.json'
+      - ".github/**"
+      - "!.github/workflows/benchmark.yml"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  benchmark:
-    name: 'Run benchmarks on Linux'
-
+  run:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
 
       - name: Install cargo-codspeed
         run: cargo install cargo-codspeed
 
-      - name: 'Build the benchmark targets: schema'
-        run: cargo codspeed build -p schema
+      - name: "Build the benchmark targets: schema"
+        run: cargo codspeed build -p schema --features all_connectors
 
-      - name: 'Build the benchmark targets: request-handlers'
-        run: cargo codspeed build -p request-handlers
+      - name: "Build the benchmark targets: request-handlers"
+        run: cargo codspeed build -p request-handlers --features all
 
       - name: Run the benchmarks
-        uses: CodSpeedHQ/action@v1
+        uses: CodSpeedHQ/action@v2
         with:
           run: cargo codspeed run
           token: ${{ secrets.CODSPEED_TOKEN }}

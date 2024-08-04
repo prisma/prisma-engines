@@ -3,10 +3,9 @@ use query_engine_tests::test_suite;
 #[test_suite(
     schema(generic),
     exclude(
-        Vitess("planetscale.js"),
-        Postgres("neon.js"),
-        Postgres("pg.js"),
-        Sqlite("libsql.js")
+        Vitess("planetscale.js", "planetscale.js.wasm"),
+        Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"),
+        Sqlite("libsql.js", "libsql.js.wasm", "cfd1", "react-native")
     )
 )]
 mod metrics {
@@ -15,7 +14,6 @@ mod metrics {
     };
     use query_engine_tests::ConnectorVersion::*;
     use query_engine_tests::*;
-    use serde_json::Value;
 
     #[connector_test]
     async fn metrics_are_recorded(runner: Runner) -> TestResult<()> {
@@ -31,17 +29,17 @@ mod metrics {
 
         let json = runner.get_metrics().to_json(Default::default());
         // We cannot assert the full response it will be slightly different per database
-        let total_queries = get_counter(&json, PRISMA_DATASOURCE_QUERIES_TOTAL);
-        let total_operations = get_counter(&json, PRISMA_CLIENT_QUERIES_TOTAL);
+        let total_queries = utils::metrics::get_counter(&json, PRISMA_DATASOURCE_QUERIES_TOTAL);
+        let total_operations = utils::metrics::get_counter(&json, PRISMA_CLIENT_QUERIES_TOTAL);
 
         match runner.connector_version() {
-            Sqlite(_) => assert_eq!(total_queries, 9),
-            SqlServer(_) => assert_eq!(total_queries, 17),
+            Sqlite(_) => assert_eq!(total_queries, 2),
+            SqlServer(_) => assert_eq!(total_queries, 10),
             MongoDb(_) => assert_eq!(total_queries, 5),
-            CockroachDb(_) => (), // not deterministic
-            MySql(_) => assert_eq!(total_queries, 12),
-            Vitess(_) => assert_eq!(total_queries, 11),
-            Postgres(_) => assert_eq!(total_queries, 9),
+            CockroachDb(_) => assert_eq!(total_queries, 2),
+            MySql(_) => assert_eq!(total_queries, 9),
+            Vitess(_) => assert_eq!(total_queries, 9),
+            Postgres(_) => assert_eq!(total_queries, 2),
         }
 
         assert_eq!(total_operations, 2);
@@ -64,7 +62,7 @@ mod metrics {
         let _ = runner.commit_tx(tx_id).await?;
 
         let json = runner.get_metrics().to_json(Default::default());
-        let active_transactions = get_gauge(&json, PRISMA_CLIENT_QUERIES_ACTIVE);
+        let active_transactions = utils::metrics::get_gauge(&json, PRISMA_CLIENT_QUERIES_ACTIVE);
         assert_eq!(active_transactions, 0.0);
 
         let tx_id = runner.start_tx(5000, 5000, None).await?;
@@ -81,30 +79,8 @@ mod metrics {
         let _ = runner.rollback_tx(tx_id.clone()).await?;
 
         let json = runner.get_metrics().to_json(Default::default());
-        let active_transactions = get_gauge(&json, PRISMA_CLIENT_QUERIES_ACTIVE);
+        let active_transactions = utils::metrics::get_gauge(&json, PRISMA_CLIENT_QUERIES_ACTIVE);
         assert_eq!(active_transactions, 0.0);
         Ok(())
-    }
-
-    fn get_counter(json: &Value, name: &str) -> u64 {
-        let metric_value = get_metric_value(json, "counters", name);
-        metric_value.as_u64().unwrap()
-    }
-
-    fn get_gauge(json: &Value, name: &str) -> f64 {
-        let metric_value = get_metric_value(json, "gauges", name);
-        metric_value.as_f64().unwrap()
-    }
-
-    fn get_metric_value(json: &Value, metric_type: &str, name: &str) -> serde_json::Value {
-        let metrics = json.get(metric_type).unwrap().as_array().unwrap();
-        let metric = metrics
-            .iter()
-            .find(|metric| metric.get("key").unwrap().as_str() == Some(name))
-            .unwrap()
-            .as_object()
-            .unwrap();
-
-        metric.get("value").unwrap().clone()
     }
 }

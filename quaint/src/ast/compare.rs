@@ -37,21 +37,16 @@ pub enum Compare<'a> {
     /// without visitor transformation in between.
     Raw(Box<Expression<'a>>, Cow<'a, str>, Box<Expression<'a>>),
     /// All json related comparators
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     JsonCompare(JsonCompare<'a>),
     /// All geometry related comparators
     GeometryCompare(GeometryCompare<'a>),
     /// `left` @@ to_tsquery(`value`)
-    #[cfg(feature = "postgresql")]
     Matches(Box<Expression<'a>>, Cow<'a, str>),
     /// (NOT `left` @@ to_tsquery(`value`))
-    #[cfg(feature = "postgresql")]
     NotMatches(Box<Expression<'a>>, Cow<'a, str>),
     /// ANY (`left`)
-    #[cfg(feature = "postgresql")]
     Any(Box<Expression<'a>>),
     /// ALL (`left`)
-    #[cfg(feature = "postgresql")]
     All(Box<Expression<'a>>),
 }
 
@@ -623,7 +618,6 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_contains<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>;
@@ -643,7 +637,6 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_not_contains<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>;
@@ -673,7 +666,6 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_begins_with<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>;
@@ -703,7 +695,6 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_not_begins_with<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>;
@@ -731,7 +722,6 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_ends_into<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>;
@@ -759,7 +749,6 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_not_ends_into<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>;
@@ -778,7 +767,6 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_type_equals<T>(self, json_type: T) -> Compare<'a>
     where
         T: Into<JsonType<'a>>;
@@ -797,7 +785,6 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_type_not_equals<T>(self, json_type: T) -> Compare<'a>
     where
         T: Into<JsonType<'a>>;
@@ -1001,7 +988,6 @@ pub trait Comparable<'a> {
     /// # Ok(())    
     /// # }
     /// ```
-    #[cfg(feature = "postgresql")]
     fn matches<T>(self, query: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>;
@@ -1025,7 +1011,6 @@ pub trait Comparable<'a> {
     /// # Ok(())    
     /// # }
     /// ```
-    #[cfg(feature = "postgresql")]
     fn not_matches<T>(self, query: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>;
@@ -1041,7 +1026,6 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "postgresql")]
     fn any(self) -> Compare<'a>;
 
     /// Matches all elem of a list of values.
@@ -1055,7 +1039,6 @@ pub trait Comparable<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "postgresql")]
     fn all(self) -> Compare<'a>;
 
     /// Compares two expressions with a custom operator.
@@ -1222,7 +1205,6 @@ where
         left.compare_raw(raw_comparator.into(), right)
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_contains<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -1233,7 +1215,6 @@ where
         val.json_array_contains(item)
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_not_contains<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -1244,7 +1225,6 @@ where
         val.json_array_not_contains(item)
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_begins_with<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -1255,7 +1235,6 @@ where
         val.json_array_begins_with(item)
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_not_begins_with<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -1266,7 +1245,6 @@ where
         val.json_array_not_begins_with(item)
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_ends_into<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -1277,7 +1255,6 @@ where
         val.json_array_ends_into(item)
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_not_ends_into<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -1288,7 +1265,6 @@ where
         val.json_array_not_ends_into(item)
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_type_equals<T>(self, json_type: T) -> Compare<'a>
     where
         T: Into<JsonType<'a>>,
@@ -1299,7 +1275,6 @@ where
         val.json_type_equals(json_type)
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_type_not_equals<T>(self, json_type: T) -> Compare<'a>
     where
         T: Into<JsonType<'a>>,
@@ -1310,28 +1285,24 @@ where
         val.json_type_not_equals(json_type)
     }
 
-    #[allow(clippy::wrong_self_convention)]
     fn geometry_is_empty(self) -> Compare<'a> {
         let col: Column<'a> = self.into();
         let val: Expression<'a> = col.into();
         val.geometry_is_empty()
     }
 
-    #[allow(clippy::wrong_self_convention)]
     fn geometry_is_not_empty(self) -> Compare<'a> {
         let col: Column<'a> = self.into();
         let val: Expression<'a> = col.into();
         val.geometry_is_not_empty()
     }
 
-    #[allow(clippy::wrong_self_convention)]
     fn geometry_is_valid(self) -> Compare<'a> {
         let col: Column<'a> = self.into();
         let val: Expression<'a> = col.into();
         val.geometry_is_valid()
     }
 
-    #[allow(clippy::wrong_self_convention)]
     fn geometry_is_not_valid(self) -> Compare<'a> {
         let col: Column<'a> = self.into();
         let val: Expression<'a> = col.into();
@@ -1392,7 +1363,6 @@ where
         val.geometry_type_not_equals(geom_type)
     }
 
-    #[cfg(feature = "postgresql")]
     fn matches<T>(self, query: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -1403,7 +1373,6 @@ where
         val.matches(query)
     }
 
-    #[cfg(feature = "postgresql")]
     fn not_matches<T>(self, query: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -1414,7 +1383,6 @@ where
         val.not_matches(query)
     }
 
-    #[cfg(feature = "postgresql")]
     fn any(self) -> Compare<'a> {
         let col: Column<'a> = self.into();
         let val: Expression<'a> = col.into();
@@ -1422,7 +1390,6 @@ where
         val.any()
     }
 
-    #[cfg(feature = "postgresql")]
     fn all(self) -> Compare<'a> {
         let col: Column<'a> = self.into();
         let val: Expression<'a> = col.into();

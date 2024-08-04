@@ -6,7 +6,7 @@ use crate::{flavour::SqlFlavour, SqlDatabaseSchema};
 use psl::{
     datamodel_connector::walker_ext_traits::*,
     parser_database::{
-        ast,
+        self as db, ast,
         walkers::{ModelWalker, ScalarFieldWalker},
         ReferentialAction, ScalarFieldType, ScalarType, SortOrder,
     },
@@ -27,7 +27,7 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
         schemas: Default::default(),
     };
 
-    if let Some(ds) = context.datamodel.configuration.datasources.get(0) {
+    if let Some(ds) = context.datamodel.configuration.datasources.first() {
         for (schema, _) in &ds.namespaces {
             context
                 .schemas
@@ -61,7 +61,7 @@ fn push_model_tables(ctx: &mut Context<'_>) {
             .schema
             .describer_schema
             .push_table(model.database_name().to_owned(), namespace_id, None);
-        ctx.model_id_to_table_id.insert(model.model_id(), table_id);
+        ctx.model_id_to_table_id.insert(model.id, table_id);
 
         for field in model.scalar_fields() {
             push_column_for_scalar_field(field, table_id, ctx);
@@ -138,8 +138,8 @@ fn push_inline_relations(ctx: &mut Context<'_>) {
         let relation_field = relation
             .forward_relation_field()
             .expect("Expecting a complete relation in sql_schmea_calculator");
-        let referencing_model = ctx.model_id_to_table_id[&relation_field.model().model_id()];
-        let referenced_model = ctx.model_id_to_table_id[&relation.referenced_model().model_id()];
+        let referencing_model = ctx.model_id_to_table_id[&relation_field.model().id];
+        let referenced_model = ctx.model_id_to_table_id[&relation.referenced_model().id];
         let on_delete_action = relation_field.explicit_on_delete().unwrap_or_else(|| {
             relation_field.default_on_delete_action(
                 ctx.datamodel.configuration.relation_mode().unwrap_or_default(),
@@ -193,9 +193,9 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
             .take(datamodel.configuration.max_identifier_length())
             .collect::<String>();
         let model_a = m2m.model_a();
-        let model_a_table_id = ctx.model_id_to_table_id[&model_a.model_id()];
+        let model_a_table_id = ctx.model_id_to_table_id[&model_a.id];
         let model_b = m2m.model_b();
-        let model_b_table_id = ctx.model_id_to_table_id[&model_b.model_id()];
+        let model_b_table_id = ctx.model_id_to_table_id[&model_b.id];
         let model_a_column = m2m.column_a_name();
         let model_b_column = m2m.column_b_name();
         let model_a_id = model_a.primary_key().unwrap().fields().next().unwrap();
@@ -300,7 +300,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
         if ctx.datamodel.relation_mode().uses_foreign_keys() {
             let fkid = ctx.schema.describer_schema.push_foreign_key(
                 Some(model_a_fk_name),
-                [table_id, ctx.model_id_to_table_id[&model_a.model_id()]],
+                [table_id, ctx.model_id_to_table_id[&model_a.id]],
                 [flavour.m2m_foreign_key_action(model_a, model_b); 2],
             );
 
@@ -319,7 +319,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
 
             let fkid = ctx.schema.describer_schema.push_foreign_key(
                 Some(model_b_fk_name),
-                [table_id, ctx.model_id_to_table_id[&model_b.model_id()]],
+                [table_id, ctx.model_id_to_table_id[&model_b.id]],
                 [flavour.m2m_foreign_key_action(model_a, model_b); 2],
             );
 
@@ -354,7 +354,7 @@ fn push_column_for_scalar_field(field: ScalarFieldWalker<'_>, table_id: sql::Tab
 
 fn push_column_for_model_enum_scalar_field(
     field: ScalarFieldWalker<'_>,
-    enum_id: ast::EnumId,
+    enum_id: db::EnumId,
     table_id: sql::TableId,
     ctx: &mut Context<'_>,
 ) {
@@ -414,16 +414,10 @@ fn push_column_for_model_unsupported_scalar_field(
     table_id: sql::TableId,
     ctx: &mut Context<'_>,
 ) {
-    let default = field.default_value().and_then(|def| {
+    let default = field.default_value().map(|def| {
         // This is validated as @default(dbgenerated("...")), we can unwrap.
-        let dbgenerated_contents = unwrap_dbgenerated(def.value());
-        if let Some(value) = dbgenerated_contents {
-            let default =
-                sql::DefaultValue::db_generated(value).with_constraint_name(ctx.flavour.default_constraint_name(def));
-            Some(default)
-        } else {
-            None
-        }
+        sql::DefaultValue::db_generated::<String>(unwrap_dbgenerated(def.value()))
+            .with_constraint_name(ctx.flavour.default_constraint_name(def))
     });
 
     if let Some(default) = default {
@@ -467,7 +461,7 @@ fn push_column_for_builtin_scalar_type(
 
     let native_type = field
         .native_type_instance(connector)
-        .unwrap_or_else(|| connector.default_native_type_for_scalar_type(&scalar_type));
+        .or_else(|| connector.default_native_type_for_scalar_type(&scalar_type));
 
     enum ColumnDefault {
         Available(sql::DefaultValue),
@@ -523,7 +517,7 @@ fn push_column_for_builtin_scalar_type(
             family,
             full_data_type: String::new(),
             arity: column_arity(field.ast_field().arity),
-            native_type: Some(native_type),
+            native_type,
         },
         auto_increment: field.is_autoincrement() || ctx.flavour.field_is_implicit_autoincrement_primary_key(field),
         description: None,
@@ -584,8 +578,8 @@ pub(crate) struct Context<'a> {
     schema: &'a mut SqlDatabaseSchema,
     flavour: &'a dyn SqlFlavour,
     schemas: HashMap<&'a str, sql::NamespaceId>,
-    model_id_to_table_id: HashMap<ast::ModelId, sql::TableId>,
-    enum_ids: HashMap<ast::EnumId, sql::EnumId>,
+    model_id_to_table_id: HashMap<db::ModelId, sql::TableId>,
+    enum_ids: HashMap<db::EnumId, sql::EnumId>,
 }
 
 impl Context<'_> {
@@ -610,6 +604,6 @@ fn unwrap_dbgenerated(expr: &ast::Expression) -> Option<String> {
         .unwrap()
         .1
         .arguments
-        .get(0)
+        .first()
         .map(|arg| arg.value.as_string_value().unwrap().0.to_owned())
 }

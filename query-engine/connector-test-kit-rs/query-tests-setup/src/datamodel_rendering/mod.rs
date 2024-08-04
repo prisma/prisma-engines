@@ -1,10 +1,14 @@
+mod datasource;
 mod mongodb_renderer;
 mod sql_renderer;
 
 pub use mongodb_renderer::*;
 pub use sql_renderer::*;
 
-use crate::{connection_string, templating, DatamodelFragment, IdFragment, M2mFragment, CONFIG};
+use crate::{
+    connection_string, datamodel_rendering::datasource::DatasourceBuilder, templating, DatamodelFragment, IdFragment,
+    M2mFragment, CONFIG,
+};
 use indoc::indoc;
 use itertools::Itertools;
 use once_cell::sync::Lazy;
@@ -34,6 +38,7 @@ pub fn render_test_datamodel(
     excluded_features: &[&str],
     relation_mode_override: Option<String>,
     db_schemas: &[&str],
+    db_extensions: &[&str],
     isolation_level: Option<&'static str>,
 ) -> String {
     let (tag, version) = CONFIG.test_connector().unwrap();
@@ -41,31 +46,30 @@ pub fn render_test_datamodel(
 
     let is_multi_schema = !db_schemas.is_empty();
 
-    let schema_def = if is_multi_schema {
-        format!("schemas = {db_schemas:?}")
-    } else {
-        String::default()
-    };
+    let datasource = DatasourceBuilder::new("test")
+        .provider(tag.datamodel_provider())
+        .url(connection_string(
+            &CONFIG,
+            &version,
+            test_database,
+            is_multi_schema,
+            isolation_level,
+        ))
+        .relation_mode(relation_mode_override.unwrap_or_else(|| tag.relation_mode().to_string()))
+        .schemas_if_not_empty(db_schemas)
+        .extensions_if_not_empty(db_extensions)
+        .render();
 
     let datasource_with_generator = format!(
         indoc! {r#"
-            datasource test {{
-                provider = "{}"
-                url = "{}"
-                relationMode = "{}"
-                {}
-            }}
+            {}
 
             generator client {{
                 provider = "prisma-client-js"
                 previewFeatures = [{}]
             }}
         "#},
-        tag.datamodel_provider(),
-        connection_string(&CONFIG, &version, test_database, is_multi_schema, isolation_level),
-        relation_mode_override.unwrap_or_else(|| tag.relation_mode().to_string()),
-        schema_def,
-        preview_features
+        datasource, preview_features
     );
 
     let renderer = tag.datamodel_renderer();

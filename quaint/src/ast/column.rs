@@ -1,11 +1,11 @@
-use super::Aliasable;
+use super::{values::NativeColumnType, Aliasable};
 use crate::{
     ast::{Expression, ExpressionKind, Table},
     Value,
 };
 use std::borrow::Cow;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TypeDataLength {
     Constant(u16),
     Maximum,
@@ -34,6 +34,8 @@ pub struct Column<'a> {
     pub alias: Option<Cow<'a, str>>,
     pub(crate) default: Option<DefaultValue<'a>>,
     pub type_family: Option<TypeFamily>,
+    /// The underlying native type of the column.
+    pub(crate) native_type: Option<NativeColumnType<'a>>,
     /// Whether the column is an enum.
     pub(crate) is_enum: bool,
     /// Whether the column is a (scalar) list.
@@ -131,6 +133,11 @@ impl<'a> Column<'a> {
             .as_ref()
             .map(|d| d == &DefaultValue::Generated)
             .unwrap_or(false)
+    }
+
+    pub fn native_column_type<T: Into<NativeColumnType<'a>>>(mut self, native_type: Option<T>) -> Column<'a> {
+        self.native_type = native_type.map(|nt| nt.into());
+        self
     }
 }
 

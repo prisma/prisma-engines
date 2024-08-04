@@ -4,7 +4,10 @@ use crate::{
     ast::{Value, ValueType},
     connector::queryable::{GetRow, ToColumnNames},
     error::{Error, ErrorKind},
+    prelude::EnumVariant,
 };
+
+use super::column_type::*;
 
 use bigdecimal::{num_bigint::BigInt, BigDecimal, FromPrimitive, ToPrimitive};
 use bit_vec::BitVec;
@@ -14,7 +17,7 @@ use chrono::{DateTime, NaiveDateTime, Utc};
 pub(crate) use decimal::DecimalWrapper;
 use geozero::{wkb::Ewkb, ToWkt};
 use postgres_types::{FromSql, ToSql, WrongType};
-use std::{convert::TryFrom, error::Error as StdError};
+use std::{borrow::Cow, convert::TryFrom, error::Error as StdError};
 use tokio_postgres::{
     types::{self, IsNull, Kind, Type as PostgresType},
     Row as PostgresRow, Statement as PostgresStatement,
@@ -179,417 +182,535 @@ impl<'a> FromSql<'a> for NaiveMoney {
 impl GetRow for PostgresRow {
     fn get_result_row(&self) -> crate::Result<Vec<Value<'static>>> {
         fn convert(row: &PostgresRow, i: usize) -> crate::Result<Value<'static>> {
-            let result = match *row.columns()[i].type_() {
-                PostgresType::BOOL => ValueType::Boolean(row.try_get(i)?).into_value(),
-                PostgresType::INT2 => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: i16 = val;
-                        Value::int32(val)
-                    }
-                    None => Value::null_int32(),
-                },
-                PostgresType::INT4 => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: i32 = val;
-                        Value::int32(val)
-                    }
-                    None => Value::null_int32(),
-                },
-                PostgresType::INT8 => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: i64 = val;
-                        Value::int64(val)
-                    }
-                    None => Value::null_int64(),
-                },
-                PostgresType::FLOAT4 => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: f32 = val;
-                        Value::float(val)
-                    }
-                    None => Value::null_float(),
-                },
-                PostgresType::FLOAT8 => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: f64 = val;
-                        Value::double(val)
-                    }
-                    None => Value::null_double(),
-                },
-                PostgresType::BYTEA => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: &[u8] = val;
-                        Value::bytes(val.to_owned())
-                    }
-                    None => Value::null_bytes(),
-                },
-                PostgresType::BYTEA_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<Vec<u8>>> = val;
-                        let byteas = val.into_iter().map(|b| ValueType::Bytes(b.map(Into::into)));
+            let pg_ty = row.columns()[i].type_();
+            let column_type = PGColumnType::from_pg_type(pg_ty);
 
-                        Value::array(byteas)
-                    }
-                    None => Value::null_array(),
+            // This convoluted nested enum is macro-generated to ensure we have a single source of truth for
+            // the mapping between Postgres types and ColumnType. The macro is in `./column_type.rs`.
+            // PGColumnValidator<Type> are used to softly ensure that the correct `ValueType` variants are created.
+            // If you ever add a new type or change some mapping, please ensure you pass the data through `v.read()`.
+            let result = match column_type {
+                PGColumnType::Boolean(ty, v) => match ty {
+                    PGColumnTypeBoolean::BOOL => ValueType::Boolean(v.read(row.try_get(i)?)),
                 },
-                PostgresType::NUMERIC => {
-                    let dw: Option<DecimalWrapper> = row.try_get(i)?;
+                PGColumnType::Int32(ty, v) => match ty {
+                    PGColumnTypeInt32::INT2 => {
+                        let val: Option<i16> = row.try_get(i)?;
 
-                    ValueType::Numeric(dw.map(|dw| dw.0)).into_value()
-                }
-                PostgresType::MONEY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: NaiveMoney = val;
-                        Value::numeric(val.0)
+                        ValueType::Int32(v.read(val.map(i32::from)))
                     }
-                    None => Value::null_numeric(),
-                },
-                PostgresType::TIMESTAMP => match row.try_get(i)? {
-                    Some(val) => {
-                        let ts: NaiveDateTime = val;
-                        let dt = DateTime::<Utc>::from_utc(ts, Utc);
-                        Value::datetime(dt)
-                    }
-                    None => Value::null_datetime(),
-                },
-                PostgresType::TIMESTAMPTZ => match row.try_get(i)? {
-                    Some(val) => {
-                        let ts: DateTime<Utc> = val;
-                        Value::datetime(ts)
-                    }
-                    None => Value::null_datetime(),
-                },
-                PostgresType::DATE => match row.try_get(i)? {
-                    Some(val) => Value::date(val),
-                    None => Value::null_date(),
-                },
-                PostgresType::TIME => match row.try_get(i)? {
-                    Some(val) => Value::time(val),
-                    None => Value::null_time(),
-                },
-                PostgresType::TIMETZ => match row.try_get(i)? {
-                    Some(val) => {
-                        let time: TimeTz = val;
-                        Value::time(time.0)
-                    }
-                    None => Value::null_time(),
-                },
-                PostgresType::UUID => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Uuid = val;
-                        Value::uuid(val)
-                    }
-                    None => ValueType::Uuid(None).into_value(),
-                },
-                PostgresType::UUID_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<Uuid>> = val;
-                        let val = val.into_iter().map(ValueType::Uuid);
+                    PGColumnTypeInt32::INT4 => {
+                        let val: Option<i32> = row.try_get(i)?;
 
-                        Value::array(val)
+                        ValueType::Int32(v.read(val))
                     }
-                    None => Value::null_array(),
                 },
-                PostgresType::JSON | PostgresType::JSONB => ValueType::Json(row.try_get(i)?).into_value(),
-                PostgresType::INT2_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<i16>> = val;
-                        let ints = val.into_iter().map(|i| ValueType::Int32(i.map(|i| i as i32)));
+                PGColumnType::Int64(ty, v) => match ty {
+                    PGColumnTypeInt64::INT8 => {
+                        let val = v.read(row.try_get(i)?);
 
-                        Value::array(ints)
+                        ValueType::Int64(val)
                     }
-                    None => Value::null_array(),
-                },
-                PostgresType::INT4_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<i32>> = val;
-                        let ints = val.into_iter().map(ValueType::Int32);
+                    PGColumnTypeInt64::OID => {
+                        let val: Option<u32> = row.try_get(i)?;
 
-                        Value::array(ints)
+                        ValueType::Int64(v.read(val.map(i64::from)))
                     }
-                    None => Value::null_array(),
                 },
-                PostgresType::INT8_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<i64>> = val;
-                        let ints = val.into_iter().map(ValueType::Int64);
+                PGColumnType::Float(ty, v) => match ty {
+                    PGColumnTypeFloat::FLOAT4 => ValueType::Float(v.read(row.try_get(i)?)),
+                },
+                PGColumnType::Double(ty, v) => match ty {
+                    PGColumnTypeDouble::FLOAT8 => ValueType::Double(v.read(row.try_get(i)?)),
+                },
+                PGColumnType::Bytes(ty, v) => match ty {
+                    PGColumnTypeBytes::BYTEA => {
+                        let val: Option<&[u8]> = row.try_get(i)?;
+                        let val = val.map(ToOwned::to_owned).map(Cow::Owned);
 
-                        Value::array(ints)
+                        ValueType::Bytes(v.read(val))
                     }
-                    None => Value::null_array(),
                 },
-                PostgresType::FLOAT4_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<f32>> = val;
-                        let floats = val.into_iter().map(ValueType::Float);
+                PGColumnType::Text(ty, v) => match ty {
+                    PGColumnTypeText::INET | PGColumnTypeText::CIDR => {
+                        let val: Option<std::net::IpAddr> = row.try_get(i)?;
+                        let val = val.map(|val| val.to_string()).map(Cow::from);
 
-                        Value::array(floats)
+                        ValueType::Text(v.read(val))
                     }
-                    None => Value::null_array(),
-                },
-                PostgresType::FLOAT8_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<f64>> = val;
-                        let floats = val.into_iter().map(ValueType::Double);
+                    PGColumnTypeText::VARBIT | PGColumnTypeText::BIT => {
+                        let val: Option<BitVec> = row.try_get(i)?;
+                        let val_str = val.map(|val| bits_to_string(&val)).transpose()?.map(Cow::Owned);
 
-                        Value::array(floats)
+                        ValueType::Text(v.read(val_str))
                     }
-                    None => Value::null_array(),
                 },
-                PostgresType::BOOL_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<bool>> = val;
-                        let bools = val.into_iter().map(ValueType::Boolean);
+                PGColumnType::Char(ty, v) => match ty {
+                    PGColumnTypeChar::CHAR => {
+                        let val: Option<i8> = row.try_get(i)?;
+                        let val = val.map(|val| (val as u8) as char);
 
-                        Value::array(bools)
+                        ValueType::Char(v.read(val))
                     }
-                    None => Value::null_array(),
                 },
-                PostgresType::TIMESTAMP_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<NaiveDateTime>> = val;
+                PGColumnType::Numeric(ty, v) => match ty {
+                    PGColumnTypeNumeric::NUMERIC => {
+                        let dw: Option<DecimalWrapper> = row.try_get(i)?;
+                        let val = dw.map(|dw| dw.0);
 
-                        let dates = val
-                            .into_iter()
-                            .map(|dt| ValueType::DateTime(dt.map(|dt| DateTime::<Utc>::from_utc(dt, Utc))));
-
-                        Value::array(dates)
+                        ValueType::Numeric(v.read(val))
                     }
-                    None => Value::null_array(),
-                },
-                PostgresType::NUMERIC_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<DecimalWrapper>> = val;
+                    PGColumnTypeNumeric::MONEY => {
+                        let val: Option<NaiveMoney> = row.try_get(i)?;
 
-                        let decimals = val
-                            .into_iter()
-                            .map(|dec| ValueType::Numeric(dec.map(|dec| dec.0.to_string().parse().unwrap())));
-
-                        Value::array(decimals)
+                        ValueType::Numeric(v.read(val.map(|val| val.0)))
                     }
-                    None => Value::null_array(),
                 },
-                PostgresType::TEXT_ARRAY | PostgresType::NAME_ARRAY | PostgresType::VARCHAR_ARRAY => {
-                    match row.try_get(i)? {
-                        Some(val) => {
-                            let strings: Vec<Option<&str>> = val;
+                PGColumnType::DateTime(ty, v) => match ty {
+                    PGColumnTypeDateTime::TIMESTAMP => {
+                        let ts: Option<NaiveDateTime> = row.try_get(i)?;
+                        let dt = ts.map(|ts| DateTime::<Utc>::from_naive_utc_and_offset(ts, Utc));
 
-                            Value::array(strings.into_iter().map(|s| s.map(|s| s.to_string())))
+                        ValueType::DateTime(v.read(dt))
+                    }
+                    PGColumnTypeDateTime::TIMESTAMPTZ => {
+                        let ts: Option<DateTime<Utc>> = row.try_get(i)?;
+
+                        ValueType::DateTime(v.read(ts))
+                    }
+                },
+                PGColumnType::Date(ty, v) => match ty {
+                    PGColumnTypeDate::DATE => ValueType::Date(v.read(row.try_get(i)?)),
+                },
+                PGColumnType::Time(ty, v) => match ty {
+                    PGColumnTypeTime::TIME => ValueType::Time(v.read(row.try_get(i)?)),
+                    PGColumnTypeTime::TIMETZ => {
+                        let val: Option<TimeTz> = row.try_get(i)?;
+
+                        ValueType::Time(v.read(val.map(|val| val.0)))
+                    }
+                },
+                PGColumnType::Json(ty, v) => match ty {
+                    PGColumnTypeJson::JSON | PGColumnTypeJson::JSONB => ValueType::Json(v.read(row.try_get(i)?)),
+                },
+                PGColumnType::Xml(ty, v) => match ty {
+                    PGColumnTypeXml::XML => {
+                        let val: Option<XmlString> = row.try_get(i)?;
+
+                        ValueType::Xml(v.read(val.map(|val| Cow::Owned(val.0))))
+                    }
+                },
+                PGColumnType::Uuid(ty, v) => match ty {
+                    PGColumnTypeUuid::UUID => ValueType::Uuid(v.read(row.try_get(i)?)),
+                },
+                PGColumnType::Int32Array(ty, v) => match ty {
+                    PGColumnTypeInt32Array::INT2_ARRAY => {
+                        let vals: Option<Vec<Option<i16>>> = row.try_get(i)?;
+
+                        match vals {
+                            Some(vals) => {
+                                let ints = vals.into_iter().map(|val| val.map(i32::from));
+
+                                ValueType::Array(Some(
+                                    v.read(ints).map(ValueType::Int32).map(ValueType::into_value).collect(),
+                                ))
+                            }
+                            None => ValueType::Array(None),
                         }
-                        None => Value::null_array(),
                     }
-                }
-                PostgresType::MONEY_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<NaiveMoney>> = val;
-                        let nums = val.into_iter().map(|num| ValueType::Numeric(num.map(|num| num.0)));
+                    PGColumnTypeInt32Array::INT4_ARRAY => {
+                        let vals: Option<Vec<Option<i32>>> = row.try_get(i)?;
 
-                        Value::array(nums)
-                    }
-                    None => Value::null_array(),
-                },
-                PostgresType::OID_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<u32>> = val;
-                        let nums = val.into_iter().map(|oid| ValueType::Int64(oid.map(|oid| oid as i64)));
-
-                        Value::array(nums)
-                    }
-                    None => Value::null_array(),
-                },
-                PostgresType::TIMESTAMPTZ_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<DateTime<Utc>>> = val;
-                        let dates = val.into_iter().map(ValueType::DateTime);
-
-                        Value::array(dates)
-                    }
-                    None => Value::null_array(),
-                },
-                PostgresType::DATE_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<chrono::NaiveDate>> = val;
-                        let dates = val.into_iter().map(ValueType::Date);
-
-                        Value::array(dates)
-                    }
-                    None => Value::null_array(),
-                },
-                PostgresType::TIME_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<chrono::NaiveTime>> = val;
-                        let times = val.into_iter().map(ValueType::Time);
-
-                        Value::array(times)
-                    }
-                    None => Value::null_array(),
-                },
-                PostgresType::TIMETZ_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<TimeTz>> = val;
-                        let timetzs = val.into_iter().map(|time| ValueType::Time(time.map(|time| time.0)));
-
-                        Value::array(timetzs)
-                    }
-                    None => Value::null_array(),
-                },
-                PostgresType::JSON_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<serde_json::Value>> = val;
-                        let jsons = val.into_iter().map(ValueType::Json);
-
-                        Value::array(jsons)
-                    }
-                    None => Value::null_array(),
-                },
-                PostgresType::JSONB_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<serde_json::Value>> = val;
-                        let jsons = val.into_iter().map(ValueType::Json);
-
-                        Value::array(jsons)
-                    }
-                    None => Value::null_array(),
-                },
-                PostgresType::OID => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: u32 = val;
-                        Value::int64(val)
-                    }
-                    None => Value::null_int64(),
-                },
-                PostgresType::CHAR => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: i8 = val;
-                        Value::character((val as u8) as char)
-                    }
-                    None => Value::null_character(),
-                },
-                PostgresType::INET | PostgresType::CIDR => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: std::net::IpAddr = val;
-                        Value::text(val.to_string())
-                    }
-                    None => Value::null_text(),
-                },
-                PostgresType::INET_ARRAY | PostgresType::CIDR_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<std::net::IpAddr>> = val;
-                        let addrs = val
-                            .into_iter()
-                            .map(|ip| ValueType::Text(ip.map(|ip| ip.to_string().into())));
-
-                        Value::array(addrs)
-                    }
-                    None => Value::null_array(),
-                },
-                PostgresType::BIT | PostgresType::VARBIT => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: BitVec = val;
-                        Value::text(bits_to_string(&val)?)
-                    }
-                    None => Value::null_text(),
-                },
-                PostgresType::BIT_ARRAY | PostgresType::VARBIT_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<BitVec>> = val;
-                        val.into_iter()
-                            .map(|bits| match bits {
-                                Some(bits) => bits_to_string(&bits).map(|s| ValueType::Text(Some(s.into()))),
-                                None => Ok(ValueType::Text(None)),
-                            })
-                            .collect::<crate::Result<Vec<_>>>()
-                            .map(Value::array)?
-                    }
-                    None => Value::null_array(),
-                },
-                PostgresType::XML => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: XmlString = val;
-                        Value::xml(val.0)
-                    }
-                    None => Value::null_xml(),
-                },
-                PostgresType::XML_ARRAY => match row.try_get(i)? {
-                    Some(val) => {
-                        let val: Vec<Option<XmlString>> = val;
-                        let xmls = val.into_iter().map(|xml| xml.map(|xml| xml.0));
-
-                        Value::array(xmls)
-                    }
-                    None => Value::null_array(),
-                },
-                ref x if matches!(x.name(), "geometry" | "geography") => {
-                    match row.try_get::<_, Option<EwktString>>(i)? {
-                        Some(ewkt) => Value::text(ewkt.0),
-                        None => Value::null_text(),
-                    }
-                }
-                ref x => match x.kind() {
-                    Kind::Enum => match row.try_get(i)? {
-                        Some(val) => {
-                            let val: EnumString = val;
-
-                            Value::enum_variant(val.value)
+                        match vals {
+                            Some(vals) => ValueType::Array(Some(
+                                v.read(vals.into_iter())
+                                    .map(ValueType::Int32)
+                                    .map(ValueType::into_value)
+                                    .collect(),
+                            )),
+                            None => ValueType::Array(None),
                         }
-                        None => Value::null_enum(),
-                    },
-                    Kind::Array(inner) => match inner.kind() {
-                        Kind::Enum => match row.try_get(i)? {
-                            Some(val) => {
-                                let val: Vec<Option<EnumString>> = val;
-                                let variants = val
+                    }
+                },
+                PGColumnType::Int64Array(ty, v) => match ty {
+                    PGColumnTypeInt64Array::INT8_ARRAY => {
+                        let vals: Option<Vec<Option<i64>>> = row.try_get(i)?;
+
+                        match vals {
+                            Some(vals) => ValueType::Array(Some(
+                                v.read(vals.into_iter())
+                                    .map(ValueType::Int64)
+                                    .map(ValueType::into_value)
+                                    .collect(),
+                            )),
+                            None => ValueType::Array(None),
+                        }
+                    }
+                    PGColumnTypeInt64Array::OID_ARRAY => {
+                        let vals: Option<Vec<Option<u32>>> = row.try_get(i)?;
+
+                        match vals {
+                            Some(vals) => {
+                                let oids = vals.into_iter().map(|oid| oid.map(i64::from));
+
+                                ValueType::Array(Some(
+                                    v.read(oids).map(ValueType::Int64).map(ValueType::into_value).collect(),
+                                ))
+                            }
+                            None => ValueType::Array(None),
+                        }
+                    }
+                },
+                PGColumnType::FloatArray(ty, v) => match ty {
+                    PGColumnTypeFloatArray::FLOAT4_ARRAY => {
+                        let vals: Option<Vec<Option<f32>>> = row.try_get(i)?;
+
+                        match vals {
+                            Some(vals) => ValueType::Array(Some(
+                                v.read(vals.into_iter())
+                                    .map(ValueType::Float)
+                                    .map(ValueType::into_value)
+                                    .collect(),
+                            )),
+                            None => ValueType::Array(None),
+                        }
+                    }
+                },
+                PGColumnType::DoubleArray(ty, v) => match ty {
+                    PGColumnTypeDoubleArray::FLOAT8_ARRAY => {
+                        let vals: Option<Vec<Option<f64>>> = row.try_get(i)?;
+
+                        match vals {
+                            Some(vals) => ValueType::Array(Some(
+                                v.read(vals.into_iter())
+                                    .map(ValueType::Double)
+                                    .map(ValueType::into_value)
+                                    .collect(),
+                            )),
+                            None => ValueType::Array(None),
+                        }
+                    }
+                },
+                PGColumnType::TextArray(ty, v) => match ty {
+                    PGColumnTypeTextArray::TEXT_ARRAY
+                    | PGColumnTypeTextArray::NAME_ARRAY
+                    | PGColumnTypeTextArray::VARCHAR_ARRAY => {
+                        let vals: Option<Vec<Option<&str>>> = row.try_get(i)?;
+
+                        match vals {
+                            Some(vals) => {
+                                let strings = vals.into_iter().map(|s| s.map(ToOwned::to_owned).map(Cow::Owned));
+
+                                ValueType::Array(Some(
+                                    v.read(strings)
+                                        .map(ValueType::Text)
+                                        .map(ValueType::into_value)
+                                        .collect(),
+                                ))
+                            }
+                            None => ValueType::Array(None),
+                        }
+                    }
+                    PGColumnTypeTextArray::INET_ARRAY | PGColumnTypeTextArray::CIDR_ARRAY => {
+                        let vals: Option<Vec<Option<std::net::IpAddr>>> = row.try_get(i)?;
+
+                        match vals {
+                            Some(vals) => {
+                                let addrs = vals
                                     .into_iter()
-                                    .map(|x| ValueType::Enum(x.map(|x| x.value.into()), None));
+                                    .map(|ip| ip.as_ref().map(ToString::to_string).map(Cow::Owned));
 
-                                Ok(Value::array(variants))
+                                ValueType::Array(Some(
+                                    v.read(addrs).map(ValueType::Text).map(ValueType::into_value).collect(),
+                                ))
                             }
-                            None => Ok(Value::null_array()),
-                        },
-                        _ => match row.try_get(i) {
-                            Ok(Some(val)) => {
-                                let val: Vec<Option<String>> = val;
-                                let strings = val.into_iter().map(|str| ValueType::Text(str.map(Into::into)));
-
-                                Ok(Value::array(strings))
-                            }
-                            Ok(None) => Ok(Value::null_array()),
-                            Err(err) => {
-                                if err.source().map(|err| err.is::<WrongType>()).unwrap_or(false) {
-                                    let kind = ErrorKind::UnsupportedColumnType {
-                                        column_type: x.to_string(),
-                                    };
-
-                                    return Err(Error::builder(kind).build());
-                                } else {
-                                    Err(err)
-                                }
-                            }
-                        },
-                    }?,
-                    _ => match row.try_get(i) {
-                        Ok(Some(val)) => {
-                            let val: String = val;
-
-                            Ok(Value::text(val))
+                            None => ValueType::Array(None),
                         }
-                        Ok(None) => Ok(Value::from(ValueType::Text(None))),
-                        Err(err) => {
-                            if err.source().map(|err| err.is::<WrongType>()).unwrap_or(false) {
-                                let kind = ErrorKind::UnsupportedColumnType {
-                                    column_type: x.to_string(),
-                                };
+                    }
+                    PGColumnTypeTextArray::BIT_ARRAY | PGColumnTypeTextArray::VARBIT_ARRAY => {
+                        let vals: Option<Vec<Option<BitVec>>> = row.try_get(i)?;
 
-                                return Err(Error::builder(kind).build());
-                            } else {
-                                Err(err)
+                        match vals {
+                            Some(vals) => {
+                                let vals = vals
+                                    .into_iter()
+                                    .map(|bits| bits.map(|bits| bits_to_string(&bits).map(Cow::Owned)).transpose())
+                                    .collect::<crate::Result<Vec<_>>>()?;
+
+                                ValueType::Array(Some(
+                                    v.read(vals.into_iter())
+                                        .map(ValueType::Text)
+                                        .map(ValueType::into_value)
+                                        .collect(),
+                                ))
                             }
+                            None => ValueType::Array(None),
                         }
-                    }?,
+                    }
+                    PGColumnTypeTextArray::XML_ARRAY => {
+                        let vals: Option<Vec<Option<XmlString>>> = row.try_get(i)?;
+
+                        match vals {
+                            Some(vals) => {
+                                let xmls = vals.into_iter().map(|xml| xml.map(|xml| xml.0).map(Cow::Owned));
+
+                                ValueType::Array(Some(
+                                    v.read(xmls).map(ValueType::Text).map(ValueType::into_value).collect(),
+                                ))
+                            }
+                            None => ValueType::Array(None),
+                        }
+                    }
                 },
+                PGColumnType::BytesArray(ty, v) => match ty {
+                    PGColumnTypeBytesArray::BYTEA_ARRAY => {
+                        let vals: Option<Vec<Option<Vec<u8>>>> = row.try_get(i)?;
+
+                        match vals {
+                            Some(vals) => ValueType::Array(Some(
+                                v.read(vals.into_iter())
+                                    .map(|b| b.map(Cow::Owned))
+                                    .map(ValueType::Bytes)
+                                    .map(ValueType::into_value)
+                                    .collect(),
+                            )),
+                            None => ValueType::Array(None),
+                        }
+                    }
+                },
+                PGColumnType::BooleanArray(ty, v) => match ty {
+                    PGColumnTypeBooleanArray::BOOL_ARRAY => {
+                        let vals: Option<Vec<Option<bool>>> = row.try_get(i)?;
+
+                        match vals {
+                            Some(vals) => ValueType::Array(Some(
+                                v.read(vals.into_iter())
+                                    .map(ValueType::Boolean)
+                                    .map(ValueType::into_value)
+                                    .collect(),
+                            )),
+                            None => ValueType::Array(None),
+                        }
+                    }
+                },
+                PGColumnType::NumericArray(ty, v) => match ty {
+                    PGColumnTypeNumericArray::NUMERIC_ARRAY => {
+                        let vals: Option<Vec<Option<DecimalWrapper>>> = row.try_get(i)?;
+
+                        match vals {
+                            Some(vals) => {
+                                let decimals = vals.into_iter().map(|dec| dec.map(|dec| dec.0));
+
+                                ValueType::Array(Some(
+                                    v.read(decimals.into_iter())
+                                        .map(ValueType::Numeric)
+                                        .map(ValueType::into_value)
+                                        .collect(),
+                                ))
+                            }
+                            None => ValueType::Array(None),
+                        }
+                    }
+                    PGColumnTypeNumericArray::MONEY_ARRAY => {
+                        let vals: Option<Vec<Option<NaiveMoney>>> = row.try_get(i)?;
+
+                        match vals {
+                            Some(vals) => {
+                                let nums = vals.into_iter().map(|num| num.map(|num| num.0));
+
+                                ValueType::Array(Some(
+                                    v.read(nums.into_iter())
+                                        .map(ValueType::Numeric)
+                                        .map(ValueType::into_value)
+                                        .collect(),
+                                ))
+                            }
+                            None => ValueType::Array(None),
+                        }
+                    }
+                },
+                PGColumnType::JsonArray(ty, v) => match ty {
+                    PGColumnTypeJsonArray::JSON_ARRAY | PGColumnTypeJsonArray::JSONB_ARRAY => {
+                        let vals: Option<Vec<Option<serde_json::Value>>> = row.try_get(i)?;
+
+                        match vals {
+                            Some(vals) => ValueType::Array(Some(
+                                v.read(vals.into_iter())
+                                    .map(ValueType::Json)
+                                    .map(ValueType::into_value)
+                                    .collect(),
+                            )),
+                            None => ValueType::Array(None),
+                        }
+                    }
+                },
+                PGColumnType::UuidArray(ty, v) => match ty {
+                    PGColumnTypeUuidArray::UUID_ARRAY => match row.try_get(i)? {
+                        Some(vals) => {
+                            let vals: Vec<Option<Uuid>> = vals;
+
+                            ValueType::Array(Some(
+                                v.read(vals.into_iter())
+                                    .map(ValueType::Uuid)
+                                    .map(ValueType::into_value)
+                                    .collect(),
+                            ))
+                        }
+                        None => ValueType::Array(None),
+                    },
+                },
+                PGColumnType::DateTimeArray(ty, v) => match ty {
+                    PGColumnTypeDateTimeArray::TIMESTAMP_ARRAY => match row.try_get(i)? {
+                        Some(vals) => {
+                            let vals: Vec<Option<NaiveDateTime>> = vals;
+                            let dates = vals
+                                .into_iter()
+                                .map(|dt| dt.map(|dt| DateTime::<Utc>::from_naive_utc_and_offset(dt, Utc)));
+
+                            ValueType::Array(Some(
+                                v.read(dates)
+                                    .map(ValueType::DateTime)
+                                    .map(ValueType::into_value)
+                                    .collect(),
+                            ))
+                        }
+                        None => ValueType::Array(None),
+                    },
+                    PGColumnTypeDateTimeArray::TIMESTAMPTZ_ARRAY => match row.try_get(i)? {
+                        Some(vals) => {
+                            let vals: Vec<Option<DateTime<Utc>>> = vals;
+
+                            ValueType::Array(Some(
+                                v.read(vals.into_iter())
+                                    .map(ValueType::DateTime)
+                                    .map(ValueType::into_value)
+                                    .collect(),
+                            ))
+                        }
+                        None => ValueType::Array(None),
+                    },
+                },
+                PGColumnType::DateArray(ty, v) => match ty {
+                    PGColumnTypeDateArray::DATE_ARRAY => match row.try_get(i)? {
+                        Some(vals) => {
+                            let vals: Vec<Option<chrono::NaiveDate>> = vals;
+
+                            ValueType::Array(Some(
+                                v.read(vals.into_iter())
+                                    .map(ValueType::Date)
+                                    .map(ValueType::into_value)
+                                    .collect(),
+                            ))
+                        }
+                        None => ValueType::Array(None),
+                    },
+                },
+                PGColumnType::TimeArray(ty, v) => match ty {
+                    PGColumnTypeTimeArray::TIME_ARRAY => match row.try_get(i)? {
+                        Some(vals) => {
+                            let vals: Vec<Option<chrono::NaiveTime>> = vals;
+
+                            ValueType::Array(Some(
+                                v.read(vals.into_iter())
+                                    .map(ValueType::Time)
+                                    .map(ValueType::into_value)
+                                    .collect(),
+                            ))
+                        }
+                        None => ValueType::Array(None),
+                    },
+                    PGColumnTypeTimeArray::TIMETZ_ARRAY => match row.try_get(i)? {
+                        Some(val) => {
+                            let val: Vec<Option<TimeTz>> = val;
+                            let timetzs = val.into_iter().map(|time| time.map(|time| time.0));
+
+                            ValueType::Array(Some(
+                                v.read(timetzs.into_iter())
+                                    .map(ValueType::Time)
+                                    .map(ValueType::into_value)
+                                    .collect(),
+                            ))
+                        }
+                        None => ValueType::Array(None),
+                    },
+                },
+                PGColumnType::EnumArray(v) => {
+                    let vals: Option<Vec<Option<EnumString>>> = row.try_get(i)?;
+
+                    match vals {
+                        Some(vals) => {
+                            let enums = vals.into_iter().map(|val| val.map(|val| Cow::Owned(val.value)));
+
+                            ValueType::Array(Some(
+                                v.read(enums)
+                                    .map(|variant| ValueType::Enum(variant.map(EnumVariant::new), None))
+                                    .map(ValueType::into_value)
+                                    .collect(),
+                            ))
+                        }
+                        None => ValueType::Array(None),
+                    }
+                }
+                PGColumnType::Enum(v) => {
+                    let val: Option<EnumString> = row.try_get(i)?;
+                    let enum_variant = v.read(val.map(|x| Cow::Owned(x.value)));
+
+                    ValueType::Enum(enum_variant.map(EnumVariant::new), None)
+                }
+                PGColumnType::UnknownArray(v) => match row.try_get(i) {
+                    Ok(Some(vals)) => {
+                        let vals: Vec<Option<String>> = vals;
+                        let strings = vals.into_iter().map(|str| str.map(Cow::Owned));
+
+                        Ok(ValueType::Array(Some(
+                            v.read(strings.into_iter())
+                                .map(ValueType::Text)
+                                .map(ValueType::into_value)
+                                .collect(),
+                        )))
+                    }
+                    Ok(None) => Ok(ValueType::Array(None)),
+                    Err(err) => {
+                        if err.source().map(|err| err.is::<WrongType>()).unwrap_or(false) {
+                            let kind = ErrorKind::UnsupportedColumnType {
+                                column_type: pg_ty.to_string(),
+                            };
+
+                            return Err(Error::builder(kind).build());
+                        } else {
+                            Err(err)
+                        }
+                    }
+                }?,
+                PGColumnType::Unknown(_) if matches!(pg_ty.name(), "geometry" | "geography") => {
+                    let val: Option<EwktString> = row.try_get(i)?;
+                    match val {
+                        Some(ewkt) => ValueType::Text(Some(ewkt.0.into())),
+                        None => ValueType::Text(None),
+                    }
+                }
+                PGColumnType::Unknown(v) => match row.try_get(i) {
+                    Ok(Some(val)) => {
+                        let val: String = val;
+
+                        Ok(ValueType::Text(v.read(Some(Cow::Owned(val)))))
+                    }
+                    Ok(None) => Ok(ValueType::Text(None)),
+                    Err(err) => {
+                        if err.source().map(|err| err.is::<WrongType>()).unwrap_or(false) {
+                            let kind = ErrorKind::UnsupportedColumnType {
+                                column_type: pg_ty.to_string(),
+                            };
+
+                            return Err(Error::builder(kind).build());
+                        } else {
+                            Err(err)
+                        }
+                    }
+                }?,
             };
 
-            Ok(result)
+            Ok(result.into_value())
         }
 
         let num_columns = self.columns().len();
@@ -609,6 +730,7 @@ impl ToColumnNames for PostgresStatement {
     }
 }
 
+// TODO: consider porting this logic to Driver Adapters as well
 impl<'a> ToSql for Value<'a> {
     fn to_sql(
         &self,

@@ -1,21 +1,15 @@
 use super::*;
 use once_cell::sync::Lazy;
 use serde::de::DeserializeOwned;
-use std::{fmt::Display, io::Write as _, sync::atomic::Ordering};
-use tokio::sync::{mpsc, oneshot};
+use std::{
+    error::Error as StdError,
+    fmt::Display,
+    io::Write as _,
+    sync::{atomic::Ordering, Arc},
+};
+use tokio::sync::{mpsc, oneshot, RwLock};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
-
-#[derive(Debug)]
-struct GenericError(String);
-
-impl Display for GenericError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
-impl std::error::Error for GenericError {}
 
 pub(crate) struct ExecutorProcess {
     task_handle: mpsc::Sender<ReqImpl>,
@@ -29,6 +23,17 @@ fn exit_with_message(status_code: i32, message: &str) -> ! {
 }
 
 impl ExecutorProcess {
+    fn spawn() -> ExecutorProcess {
+        match std::thread::spawn(ExecutorProcess::new).join() {
+            Ok(Ok(process)) => process,
+            Ok(Err(err)) => exit_with_message(1, &format!("Failed to start node process. Details: {err}")),
+            Err(err) => {
+                let err = err.downcast_ref::<String>().map(ToOwned::to_owned).unwrap_or_default();
+                exit_with_message(1, &format!("Panic while trying to start node process.\nDetails: {err}"))
+            }
+        }
+    }
+
     fn new() -> Result<ExecutorProcess> {
         let (sender, receiver) = mpsc::channel::<ReqImpl>(300);
 
@@ -81,15 +86,86 @@ impl ExecutorProcess {
     }
 }
 
-pub(super) static EXTERNAL_PROCESS: Lazy<ExecutorProcess> =
-    Lazy::new(|| match std::thread::spawn(ExecutorProcess::new).join() {
-        Ok(Ok(process)) => process,
-        Ok(Err(err)) => exit_with_message(1, &format!("Failed to start node process. Details: {err}")),
-        Err(err) => {
-            let err = err.downcast_ref::<String>().map(ToOwned::to_owned).unwrap_or_default();
-            exit_with_message(1, &format!("Panic while trying to start node process.\nDetails: {err}"))
+/// Wraps an ExecutorProcess allowing for restarting it.
+///
+/// A node process can die for a number of reasons, being one that any `panic!` occurring in Rust
+/// asynchronous code are translated to an abort trap by wasm-bindgen, which kills the node process.
+#[derive(Clone)]
+pub(crate) struct RestartableExecutorProcess {
+    process: Arc<RwLock<ExecutorProcess>>,
+}
+
+impl RestartableExecutorProcess {
+    fn new() -> Self {
+        Self {
+            process: Arc::new(RwLock::new(ExecutorProcess::spawn())),
         }
-    });
+    }
+
+    async fn restart(&self) {
+        let mut process = self.process.write().await;
+        *process = ExecutorProcess::spawn();
+    }
+
+    pub(crate) async fn request<T: DeserializeOwned>(&self, method: &str, params: serde_json::Value) -> Result<T> {
+        let p = self.process.read().await;
+        p.request(method, params).await
+    }
+}
+
+struct ExecutorProcessDiedError;
+
+impl fmt::Debug for ExecutorProcessDiedError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "The external test executor process died")
+    }
+}
+
+impl Display for ExecutorProcessDiedError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(self, f)
+    }
+}
+
+impl StdError for ExecutorProcessDiedError {}
+
+struct PendingRequests {
+    map: HashMap<jsonrpc_core::Id, oneshot::Sender<Result<serde_json::value::Value>>>,
+    last_id: Option<jsonrpc_core::Id>,
+}
+
+impl PendingRequests {
+    fn new() -> Self {
+        Self {
+            map: HashMap::new(),
+            last_id: None,
+        }
+    }
+
+    fn insert(&mut self, id: jsonrpc_core::Id, sender: oneshot::Sender<Result<serde_json::value::Value>>) {
+        self.map.insert(id.clone(), sender);
+        self.last_id = Some(id);
+    }
+
+    fn respond(&mut self, id: &jsonrpc_core::Id, response: Result<serde_json::value::Value>) {
+        self.map
+            .remove(id)
+            .expect("no sender for response")
+            .send(response)
+            .unwrap();
+    }
+
+    fn respond_to_last(&mut self, response: Result<serde_json::value::Value>) {
+        let last_id = self
+            .last_id
+            .as_ref()
+            .expect("Expected last response to exist")
+            .to_owned();
+        self.respond(&last_id, response);
+    }
+}
+
+pub(super) static EXTERNAL_PROCESS: Lazy<RestartableExecutorProcess> = Lazy::new(RestartableExecutorProcess::new);
 
 type ReqImpl = (
     jsonrpc_core::MethodCall,
@@ -109,8 +185,9 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
         .build()
         .unwrap()
         .block_on(async move {
+            let environment = CONFIG.for_external_executor();
             let process = match Command::new(&path)
-                .envs(CONFIG.for_external_executor())
+                .envs(environment)
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
                 .stderr(Stdio::inherit())
@@ -122,34 +199,33 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
 
             let mut stdout = BufReader::new(process.stdout.unwrap()).lines();
             let mut stdin = process.stdin.unwrap();
-            let mut pending_requests: HashMap<jsonrpc_core::Id, oneshot::Sender<Result<serde_json::value::Value>>> =
-                HashMap::new();
+            let mut pending_requests = PendingRequests::new();
 
             loop {
                 tokio::select! {
                     line = stdout.next_line() => {
                         match line {
-                            // Two error modes in here: the external process can response with 
-                            // something that is not a jsonrpc response (basically any normal logging 
-                            // output), or it can respond with a jsonrpc response that represents a 
+                            // Two error modes in here: the external process can response with
+                            // something that is not a jsonrpc response (basically any normal logging
+                            // output), or it can respond with a jsonrpc response that represents a
                             // failure.
                             Ok(Some(line)) => // new response
                             {
                                 match serde_json::from_str::<jsonrpc_core::Output>(&line) {
-                                    Ok(response) => {
-                                        let sender = pending_requests.remove(response.id()).unwrap();
-                                        match response {
+                                    Ok(ref response) => {
+                                        let res: Result<serde_json::value::Value> = match response {
                                             jsonrpc_core::Output::Success(success) => {
                                                 // The other end may be dropped if the whole
                                                 // request future was dropped and not polled to
                                                 // completion, so we ignore send errors here.
-                                                _ = sender.send(Ok(success.result));
+                                                Ok(success.result.clone())
                                             }
                                             jsonrpc_core::Output::Failure(err) => {
                                                 tracing::error!("error response from jsonrpc: {err:?}");
-                                                _ = sender.send(Err(Box::new(err.error)));
+                                                Err(Box::new(err.error.clone()))
                                             }
-                                        }
+                                        };
+                                        pending_requests.respond(response.id(), res)
                                     }
                                     Err(err) => {
                                         tracing::error!(%err, "error when decoding response from child node process. Response was: `{}`", &line);
@@ -159,7 +235,11 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
                             }
                             Ok(None) => // end of the stream
                             {
-                                exit_with_message(1, "child node process stdout closed")
+                                tracing::error!("Error when reading from child node process. Process might have exited. Restarting...");
+
+                                pending_requests.respond_to_last(Err(Box::new(ExecutorProcessDiedError)));
+                                EXTERNAL_PROCESS.restart().await;
+                                break;
                             }
                             Err(err) => // log it
                             {
@@ -175,6 +255,7 @@ fn start_rpc_thread(mut receiver: mpsc::Receiver<ReqImpl>) -> Result<()> {
                             }
                             Some((request, response_sender)) => {
                                 pending_requests.insert(request.id.clone(), response_sender);
+
                                 let mut req = serde_json::to_vec(&request).unwrap();
                                 req.push(b'\n');
                                 stdin.write_all(&req).await.unwrap();

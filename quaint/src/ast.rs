@@ -49,10 +49,9 @@ pub use ordering::{IntoOrderDefinition, Order, OrderDefinition, Orderable, Order
 pub use over::*;
 pub use query::{Query, SelectQuery};
 pub use row::Row;
-pub use select::Select;
+pub use select::{DistinctType, Select};
 pub use table::*;
 pub use union::Union;
 pub use update::*;
-pub use values::GeometryValue;
-pub(crate) use values::Params;
-pub use values::{IntoRaw, Raw, Value, ValueType, Values};
+pub use values::{GeometryValue, IntoRaw, Raw, Value, ValueType, Values};
+pub(crate) use values::{NativeColumnType, Params};

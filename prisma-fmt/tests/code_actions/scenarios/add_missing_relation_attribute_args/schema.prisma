@@ -1,0 +1,13 @@
+model interm {
+    id Int @id
+
+    forumId Int
+    forum   Forum @relation()
+}
+
+model Forum {
+    id   Int      @id
+    name String
+
+    interm interm[]
+}

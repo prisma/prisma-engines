@@ -205,7 +205,7 @@ mod create {
     // TODO(dom): Not working on mongo
     // TODO(dom): 'Expected result to return an error, but found success: {"data":{"createOneScalarModel":{"optUnique":"test"}}}'
     // Comment(dom): Expected, we're not enforcing uniqueness for the test setup yet.
-    #[connector_test(exclude(MongoDb, Vitess("planetscale.js")))]
+    #[connector_test(exclude(MongoDb))]
     async fn gracefully_fails_when_uniq_violation(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
@@ -483,7 +483,7 @@ mod geometry_create {
     #[connector_test(
         schema(geometry_opt_postgres),
         db_schemas("public", "test"),
-        only(Postgres("15-postgis"))
+        only(Postgres("16-postgis"))
     )]
     async fn create_geometry_postgres(runner: Runner) -> TestResult<()> {
         create_geometry_test(runner).await

@@ -5,6 +5,7 @@ pub struct Datamodel {
     pub enums: Vec<Enum>,
     pub models: Vec<Model>,
     pub types: Vec<Model>, // composite types
+    pub indexes: Vec<Index>,
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -107,3 +108,66 @@ pub struct EnumValue {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
 }
+
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Index {
+    pub model: String,
+    pub r#type: IndexType,
+    pub is_defined_on_field: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub db_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub algorithm: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub clustered: Option<bool>,
+    pub fields: Vec<IndexField>,
+}
+
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct IndexField {
+    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sort_order: Option<SortOrder>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub length: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub operator_class: Option<String>,
+}
+
+macro_rules! from {
+    ( $from:path => $to:ident { $( $variant:ident ),+ } ) => {
+        impl From<$from> for $to {
+            fn from(value: $from) -> Self {
+                match value {
+                    $( <$from>::$variant => <$to>::$variant ),+
+                }
+            }
+        }
+    };
+}
+
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum IndexType {
+    Id,
+    Normal,
+    Unique,
+    Fulltext,
+}
+
+// `Id` doesn't exist in `psl::parser_database::IndexType` as primary keys are not represented as
+// such on that level, so we only generate the From impl for the other three variants.
+from!(psl::parser_database::IndexType => IndexType { Normal, Unique, Fulltext });
+
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum SortOrder {
+    Asc,
+    Desc,
+}
+
+from!(psl::parser_database::SortOrder => SortOrder { Asc, Desc });

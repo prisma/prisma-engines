@@ -1,6 +1,6 @@
 {
     "connector": "postgres",
-    "version": "13",
+    "version": "neon.js.wasm",
     "driver_adapter": "neon:ws",
     "driver_adapter_config": { "proxy_url": "127.0.0.1:5488/v1" },
     "external_test_executor": "Wasm"

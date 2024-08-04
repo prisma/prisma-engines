@@ -1,35 +1,56 @@
-use futures::{Future, FutureExt};
-use napi::Error as NapiError;
-use quaint::error::Error as QuaintError;
-use std::{any::Any, panic::AssertUnwindSafe};
+#[cfg(feature = "mysql")]
+use quaint::error::MysqlError;
 
-/// transforms a napi error into a quaint error copying the status and reason
-/// properties over
-pub(crate) fn into_quaint_error(napi_err: NapiError) -> QuaintError {
-    let status = napi_err.status.as_ref().to_owned();
-    let reason = napi_err.reason.clone();
+#[cfg(feature = "postgresql")]
+use quaint::error::PostgresError;
 
-    QuaintError::raw_connector_error(status, reason)
+#[cfg(feature = "sqlite")]
+use quaint::error::SqliteError;
+use serde::Deserialize;
+
+#[cfg(feature = "postgresql")]
+#[derive(Deserialize)]
+#[serde(remote = "PostgresError")]
+pub struct PostgresErrorDef {
+    code: String,
+    message: String,
+    severity: String,
+    detail: Option<String>,
+    column: Option<String>,
+    hint: Option<String>,
 }
 
-/// catches a panic thrown during the execution of an asynchronous closure and transforms it into
-/// the Error variant of a napi::Result.
-pub(crate) async fn async_unwinding_panic<F, R>(fut: F) -> napi::Result<R>
-where
-    F: Future<Output = napi::Result<R>>,
-{
-    AssertUnwindSafe(fut)
-        .catch_unwind()
-        .await
-        .unwrap_or_else(panic_to_napi_err)
+#[cfg(feature = "mysql")]
+#[derive(Deserialize)]
+#[serde(remote = "MysqlError")]
+pub struct MysqlErrorDef {
+    pub code: u16,
+    pub message: String,
+    pub state: String,
 }
 
-fn panic_to_napi_err<R>(panic_payload: Box<dyn Any + Send>) -> napi::Result<R> {
-    panic_payload
-        .downcast_ref::<&str>()
-        .map(|s| -> String { (*s).to_owned() })
-        .or_else(|| panic_payload.downcast_ref::<String>().map(|s| s.to_owned()))
-        .map(|message| Err(napi::Error::from_reason(format!("PANIC: {message}"))))
-        .ok_or(napi::Error::from_reason("PANIC: unknown panic".to_string()))
-        .unwrap()
+#[cfg(feature = "sqlite")]
+#[derive(Deserialize)]
+#[serde(remote = "SqliteError", rename_all = "camelCase")]
+pub struct SqliteErrorDef {
+    pub extended_code: i32,
+    pub message: Option<String>,
+}
+
+#[derive(Deserialize)]
+#[serde(tag = "kind")]
+/// Wrapper for JS-side errors
+pub(crate) enum DriverAdapterError {
+    /// Unexpected JS exception
+    GenericJs { id: i32 },
+    UnsupportedNativeDataType {
+        #[serde(rename = "type")]
+        native_type: String,
+    },
+    #[cfg(feature = "postgresql")]
+    Postgres(#[serde(with = "PostgresErrorDef")] PostgresError),
+    #[cfg(feature = "mysql")]
+    Mysql(#[serde(with = "MysqlErrorDef")] MysqlError),
+    #[cfg(feature = "sqlite")]
+    Sqlite(#[serde(with = "SqliteErrorDef")] SqliteError),
 }

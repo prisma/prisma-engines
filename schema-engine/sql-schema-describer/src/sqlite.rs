@@ -8,12 +8,15 @@ use crate::{
 use either::Either;
 use indexmap::IndexMap;
 use psl::{
-    builtin_connectors::{GeometryParams, GeometryType, SQLiteType},
+    builtin_connectors::{
+        geometry::{GeometryParams, GeometryType},
+        SQLiteType,
+    },
     datamodel_connector::NativeTypeInstance,
 };
 use quaint::{
     ast::{Value, ValueType},
-    connector::{GetRow, ToColumnNames},
+    connector::{ColumnType as QuaintColumnType, GetRow, ToColumnNames},
     prelude::ResultRow,
 };
 use regex::RegexSet;
@@ -45,6 +48,7 @@ impl Connection for std::sync::Mutex<quaint::connector::rusqlite::Connection> {
     ) -> quaint::Result<quaint::prelude::ResultSet> {
         let conn = self.lock().unwrap();
         let mut stmt = conn.prepare_cached(sql)?;
+        let column_types = stmt.columns().iter().map(QuaintColumnType::from).collect::<Vec<_>>();
         let mut rows = stmt.query(quaint::connector::rusqlite::params_from_iter(params.iter()))?;
         let column_names = rows.to_column_names();
         let mut converted_rows = Vec::new();
@@ -52,7 +56,11 @@ impl Connection for std::sync::Mutex<quaint::connector::rusqlite::Connection> {
             converted_rows.push(row.get_result_row().unwrap());
         }
 
-        Ok(quaint::prelude::ResultSet::new(column_names, converted_rows))
+        Ok(quaint::prelude::ResultSet::new(
+            column_names,
+            column_types,
+            converted_rows,
+        ))
     }
 }
 
@@ -175,7 +183,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
                 (name, r#type, definition)
             })
-            .filter(|(table_name, _, _)| !is_system_table(table_name));
+            .filter(|(table_name, _, _)| !is_table_ignored(table_name));
 
         let mut map = IndexMap::default();
 
@@ -394,13 +402,13 @@ async fn push_columns(
         let column_name = row.get_expect_string("name");
         let column_type = row.get_expect_string("type");
         let geometry_info = geometry_columns.get(&(table_name.to_lowercase(), column_name.to_lowercase()));
-        let tpe = if let Some((ty, srid)) = geometry_info {
+        let tpe = if let Some((type_, srid)) = geometry_info {
             ColumnType {
                 full_data_type: column_type,
                 family: ColumnTypeFamily::Geometry,
                 arity,
                 native_type: Some(NativeTypeInstance::new(SQLiteType::Geometry(Some(GeometryParams {
-                    ty: *ty,
+                    type_: *type_,
                     srid: *srid,
                 })))),
             }
@@ -670,13 +678,28 @@ fn unquote_sqlite_string_default(s: &str) -> Cow<'_, str> {
     }
 }
 
-/// Returns whether a table is one of the SQLite system tables.
-fn is_system_table(table_name: &str) -> bool {
-    SQLITE_SYSTEM_TABLES.is_match(table_name)
+/// Returns whether a table is one of the SQLite system tables or a Cloudflare D1 specific table.
+fn is_table_ignored(table_name: &str) -> bool {
+    SQLITE_IGNORED_TABLES.iter().any(|table| table_name == *table) || SPATIALITE_IGNORED_TABLES.is_match(table_name)
 }
 
 /// See https://www.sqlite.org/fileformat2.html
-pub static SQLITE_SYSTEM_TABLES: Lazy<RegexSet> = Lazy::new(|| {
+/// + Cloudflare D1 specific tables
+const SQLITE_IGNORED_TABLES: &[&str] = &[
+    // SQLite system tables
+    "sqlite_sequence",
+    "sqlite_stat1",
+    "sqlite_stat2",
+    "sqlite_stat3",
+    "sqlite_stat4",
+    // Cloudflare D1 specific tables
+    "_cf_KV",
+    // This is the default but can be configured by the user
+    "d1_migrations",
+];
+
+/// See https://www.sqlite.org/fileformat2.html
+pub static SPATIALITE_IGNORED_TABLES: Lazy<RegexSet> = Lazy::new(|| {
     RegexSet::new([
         "^sqlite_sequence$",
         "^sqlite_stat1$",

@@ -1,14 +1,14 @@
-name: Test release binary compilation
+name: "All crates: compilation"
 on:
   pull_request:
     paths-ignore:
-      - '.github/**'
-      - '!.github/workflows/compilation.yml'
-      - '.buildkite/**'
-      - '*.md'
-      - 'LICENSE'
-      - 'CODEOWNERS'
-      - 'renovate.json'
+      - "!.github/workflows/test-compilation.yml"
+      - ".github/**"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -16,25 +16,43 @@ concurrency:
 
 jobs:
   test-crate-compilation:
-    name: 'Compile top level crates on Linux'
+    name: "${{ matrix.crate }} on ${{ matrix.os }}"
     strategy:
       fail-fast: false
-    runs-on: ubuntu-latest
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-13
+        crate:
+          - schema-engine-cli
+          - prisma-fmt
+          - query-engine
+          - query-engine-node-api
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: 'cargo clean && cargo build --release -p schema-engine-cli'
-        name: 'Compile Migration Engine'
+      - name: compile ${{ matrix.crate }}
+        shell: bash
+        env:
+          CRATE: ${{ matrix.crate }}
+        run: cargo build --release -p "$CRATE"
 
-      - run: 'cargo clean && cargo build --release -p prisma-fmt'
-        name: 'Compile prisma-fmt'
+      - name: "Check that Cargo.lock did not change"
+        run: "git diff --exit-code"
 
-      - run: 'cargo clean && cargo build --release -p query-engine'
-        name: 'Compile Query Engine Binary'
-
-      - run: 'cargo clean && cargo build --release -p query-engine-node-api'
-        name: 'Compile Query Engine Library'
-
-      - name: 'Check that Cargo.lock did not change'
-        run: 'git diff --exit-code'
+  test-react-native-compilation:
+    name: React Native
+    uses: ./.github/workflows/build-engines-react-native-template.yml
+    with:
+      commit: ${{ github.sha }}
+      uploadArtifacts: false

@@ -3,12 +3,12 @@ use crate::{DomainError, GeometryFormat};
 use bigdecimal::ToPrimitive;
 
 pub(crate) trait PrismaValueExtensions {
-    fn coerce(self, to_type: &TypeIdentifier) -> crate::Result<PrismaValue>;
+    fn coerce(self, to_type: TypeIdentifier) -> crate::Result<PrismaValue>;
 }
 
 impl PrismaValueExtensions for PrismaValue {
     // Todo this is not exhaustive for now.
-    fn coerce(self, to_type: &TypeIdentifier) -> crate::Result<PrismaValue> {
+    fn coerce(self, to_type: TypeIdentifier) -> crate::Result<PrismaValue> {
         let coerced = match (self, to_type) {
             // Trivial cases
             (PrismaValue::Null, _) => PrismaValue::Null,

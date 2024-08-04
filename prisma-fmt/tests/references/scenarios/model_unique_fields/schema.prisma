@@ -1,0 +1,16 @@
+generator client {
+    provider        = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgres"
+    url      = env("DATABASE_URL")
+}
+
+model Compound {
+    id      String
+    name    String
+
+    @@unique([id, n<|>ame])
+}
+

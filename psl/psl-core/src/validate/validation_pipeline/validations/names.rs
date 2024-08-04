@@ -1,6 +1,8 @@
 use super::constraint_namespace::ConstraintNamespace;
-use crate::ast::ModelId;
-use parser_database::walkers::{RelationFieldId, RelationName};
+use parser_database::{
+    walkers::{RelationFieldId, RelationName},
+    ModelId,
+};
 use std::collections::{HashMap, HashSet};
 
 type RelationIdentifier<'db> = (ModelId, ModelId, RelationName<'db>);
@@ -28,11 +30,11 @@ impl<'db> Names<'db> {
         let mut primary_key_names: HashMap<ModelId, &'db str> = HashMap::new();
 
         for model in ctx.db.walk_models().chain(ctx.db.walk_views()) {
-            let model_id = model.model_id();
+            let model_id = model.id;
 
             for field in model.relation_fields() {
-                let model_id = field.model().model_id();
-                let related_model_id = field.related_model().model_id();
+                let model_id = field.model().id;
+                let related_model_id = field.related_model().id;
 
                 let identifier = (model_id, related_model_id, field.relation_name());
                 let field_ids = relation_names.entry(identifier).or_default();
@@ -51,7 +53,7 @@ impl<'db> Names<'db> {
             }
 
             if let Some(pk) = model.primary_key().and_then(|pk| pk.name()) {
-                primary_key_names.insert(model.model_id(), pk);
+                primary_key_names.insert(model.id, pk);
             }
         }
 

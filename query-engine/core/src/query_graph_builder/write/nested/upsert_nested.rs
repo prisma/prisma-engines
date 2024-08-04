@@ -107,9 +107,9 @@ pub fn nested_upsert(
         let child_link = parent_relation_field.related_field().linking_fields();
 
         let mut as_map: ParsedInputMap<'_> = value.try_into()?;
-        let create_input = as_map.remove(args::CREATE).expect("create argument is missing");
-        let update_input = as_map.remove(args::UPDATE).expect("update argument is missing");
-        let where_input = as_map.remove(args::WHERE);
+        let create_input = as_map.swap_remove(args::CREATE).expect("create argument is missing");
+        let update_input = as_map.swap_remove(args::UPDATE).expect("update argument is missing");
+        let where_input = as_map.swap_remove(args::WHERE);
 
         // Read child(ren) node
         let filter = match (where_input, parent_relation_field.is_list()) {

@@ -232,7 +232,7 @@ fn required_relation_field_must_error_if_it_is_virtual() {
     "#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `address` on Model `User` is required. This is no longer valid because it's not possible to enforce this constraint on the database level. Please change the field type from `Address` to `Address?` to fix this.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `address` on Model `User` is required. This is not valid because it's not possible to enforce this constraint on the database level. Please change the field type from `Address` to `Address?` to fix this.[0m
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m        id      Int     @id
@@ -747,7 +747,7 @@ fn must_error_for_required_one_to_one_self_relations() {
     "#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `friendOf` on Model `User` is required. This is no longer valid because it's not possible to enforce this constraint on the database level. Please change the field type from `User` to `User?` to fix this.[0m
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `friendOf` on Model `User` is required. This is not valid because it's not possible to enforce this constraint on the database level. Please change the field type from `User` to `User?` to fix this.[0m
           [1;94m-->[0m  [4mschema.prisma:6[0m
         [1;94m   | [0m
         [1;94m 5 | [0m      friend   User @relation("Friends", fields: friendId, references: id)

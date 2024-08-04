@@ -6,8 +6,8 @@ pub use composite::*;
 pub use relation::*;
 pub use scalar::*;
 
-use crate::{ast, parent_container::ParentContainer, Model};
-use psl::parser_database::{walkers, ScalarType};
+use crate::{parent_container::ParentContainer, Model};
+use psl::parser_database::{walkers, EnumId, ScalarType};
 use std::{borrow::Cow, hash::Hash};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -149,7 +149,7 @@ pub enum TypeIdentifier {
     Float,
     Decimal,
     Boolean,
-    Enum(ast::EnumId),
+    Enum(EnumId),
     UUID,
     Json,
     DateTime,
@@ -191,6 +191,11 @@ impl TypeIdentifier {
     /// Returns `true` if the type identifier is [`Enum`].
     pub fn is_enum(&self) -> bool {
         matches!(self, Self::Enum(..))
+    }
+
+    /// Returns `true` if the type identifier is [`Json`].
+    pub fn is_json(&self) -> bool {
+        matches!(self, Self::Json)
     }
 }
 

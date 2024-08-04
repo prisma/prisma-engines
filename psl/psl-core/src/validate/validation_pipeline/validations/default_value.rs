@@ -6,7 +6,7 @@ use schema_ast::ast::{self, Expression};
 
 /// Function `auto()` works for now only with MongoDB.
 pub(super) fn validate_auto_param(default_value: Option<&ast::Expression>, ctx: &mut Context<'_>) {
-    if ctx.connector.has_capability(ConnectorCapability::DefaultValueAuto) {
+    if ctx.has_capability(ConnectorCapability::DefaultValueAuto) {
         return;
     }
 

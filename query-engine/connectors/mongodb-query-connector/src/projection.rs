@@ -26,6 +26,10 @@ fn path_prefixed_selection(doc: &mut Document, parent_paths: Vec<String>, select
                 parent_paths.push(cs.field.db_name().to_owned());
                 path_prefixed_selection(doc, parent_paths, cs.selections);
             }
+
+            query_structure::SelectedField::Relation(_) => unreachable!(),
+
+            query_structure::SelectedField::Virtual(_) => {}
         }
     }
 }

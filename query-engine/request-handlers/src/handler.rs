@@ -1,5 +1,6 @@
 use super::GQLResponse;
 use crate::{GQLError, PrismaResponse, RequestBody};
+use bigdecimal::BigDecimal;
 use futures::FutureExt;
 use indexmap::IndexMap;
 use query_core::{
@@ -11,7 +12,7 @@ use query_core::{
     QueryDocument, QueryExecutor, TxId,
 };
 use query_structure::{parse_datetime, stringify_datetime, PrismaValue};
-use std::{collections::HashMap, fmt, panic::AssertUnwindSafe};
+use std::{collections::HashMap, fmt, panic::AssertUnwindSafe, str::FromStr};
 
 type ArgsToResult = (HashMap<String, ArgumentValue>, IndexMap<String, Item>);
 
@@ -223,10 +224,16 @@ impl<'a> RequestHandler<'a> {
     }
 
     fn compare_args(left: &HashMap<String, ArgumentValue>, right: &HashMap<String, ArgumentValue>) -> bool {
-        left.iter().all(|(key, left_value)| {
-            right
+        let (large, small) = if left.len() > right.len() {
+            (&left, &right)
+        } else {
+            (&right, &left)
+        };
+
+        small.iter().all(|(key, small_value)| {
+            large
                 .get(key)
-                .map_or(false, |right_value| Self::compare_values(left_value, right_value))
+                .map_or(false, |large_value| Self::compare_values(small_value, large_value))
         })
     }
 
@@ -258,6 +265,10 @@ impl<'a> RequestHandler<'a> {
                 Some(t1) => Self::compare_values(t1, t2),
                 None => left == right,
             },
+            (ArgumentValue::Scalar(PrismaValue::Float(s1)), ArgumentValue::Scalar(PrismaValue::String(s2)))
+            | (ArgumentValue::Scalar(PrismaValue::String(s2)), ArgumentValue::Scalar(PrismaValue::Float(s1))) => {
+                BigDecimal::from_str(s2).map(|s2| s2 == *s1).unwrap_or(false)
+            }
             (left, right) => left == right,
         }
     }

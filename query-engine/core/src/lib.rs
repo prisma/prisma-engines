@@ -8,20 +8,17 @@ pub mod executor;
 pub mod protocol;
 pub mod query_document;
 pub mod query_graph_builder;
+pub mod relation_load_strategy;
 pub mod response_ir;
-
-#[cfg(feature = "metrics")]
 pub mod telemetry;
 
+pub use self::telemetry::*;
 pub use self::{
     error::{CoreError, FieldConversionError},
     executor::{QueryExecutor, TransactionOptions},
     interactive_transactions::{ExtendedTransactionUserFacingError, TransactionError, TxId},
     query_document::*,
 };
-
-#[cfg(feature = "metrics")]
-pub use self::telemetry::*;
 
 pub use connector::{
     error::{ConnectorError, ErrorKind as ConnectorErrorKind},

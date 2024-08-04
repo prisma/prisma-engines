@@ -25,6 +25,7 @@ members = [
   "query-engine/query-engine",
   "query-engine/query-engine-node-api",
   "query-engine/query-engine-wasm",
+  "query-engine/query-engine-c-abi",
   "query-engine/request-handlers",
   "query-engine/schema",
   "libs/*",
@@ -35,8 +36,10 @@ members = [
 ]
 
 [workspace.dependencies]
+async-trait = { version = "0.1.77" }
+enumflags2 = { version = "0.7", features = ["serde"] }
 psl = { path = "./psl/psl" }
-serde_json = { version = "1", features = ["float_roundtrip", "preserve_order"] }
+serde_json = { version = "1", features = ["float_roundtrip", "preserve_order", "raw_value"] }
 serde = { version = "1", features = ["derive"] }
 tokio = { version = "1.25", features = [
   "rt-multi-thread",
@@ -47,29 +50,33 @@ tokio = { version = "1.25", features = [
   "parking_lot",
   "time",
 ] }
+chrono = { version = "0.4.38", features = ["serde"] }
 user-facing-errors = { path = "./libs/user-facing-errors" }
-uuid = { version = "1", features = ["serde"] }
+uuid = { version = "1", features = ["serde", "v4", "v7", "js"] }
 indoc = "2.0.1"
+indexmap = { version = "2.2.2", features = ["serde"] }
+itertools = "0.12"
 connection-string = "0.2"
-napi = { version = "2.12.4", default-features = false, features = [
+napi = { version = "2.15.1", default-features = false, features = [
   "napi8",
   "tokio_rt",
   "serde-json",
 ] }
-napi-derive = "2.12.4"
+napi-derive = "2.15.0"
+js-sys = { version = "0.3" }
+rand = { version = "0.8" }
+serde_repr = { version = "0.1.17" }
+serde-wasm-bindgen = { version = "0.5" }
+tracing = { version = "0.1" }
+tsify = { version = "0.4.5" }
+wasm-bindgen = { version = "0.2.92" }
+wasm-bindgen-futures = { version = "0.4" }
+wasm-rs-dbg = { version = "0.1.2", default-features = false, features = ["console-error"] }
+wasm-bindgen-test = { version = "0.3.0" }
+url = { version = "2.5.0" }
 
 [workspace.dependencies.quaint]
 path = "quaint"
-features = [
-  "expose-drivers",
-  "fmt-sql",
-  "mssql",
-  "mysql",
-  "pooled",
-  "postgresql",
-  "sqlite",
-  "native",
-]
 
 [profile.dev.package.backtrace]
 opt-level = 3
@@ -78,6 +85,9 @@ opt-level = 3
 strip = "symbols"
 
 [profile.release.package.query-engine]
+strip = "symbols"
+
+[profile.release.package.query-engine-c-abi]
 strip = "symbols"
 
 [profile.release]

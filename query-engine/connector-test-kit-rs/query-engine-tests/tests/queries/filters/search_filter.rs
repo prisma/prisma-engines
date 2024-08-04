@@ -229,7 +229,7 @@ mod search_filter_with_index {
         super::ensure_filter_tree_shake_works(runner).await
     }
 
-    #[connector_test(exclude(Vitess("planetscale.js")))]
+    #[connector_test]
     async fn throws_error_on_missing_index(runner: Runner) -> TestResult<()> {
         super::create_test_data(&runner).await?;
 

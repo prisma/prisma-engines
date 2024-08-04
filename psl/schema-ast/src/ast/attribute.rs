@@ -1,4 +1,4 @@
-use super::{ArgumentsList, Identifier, Span, WithIdentifier, WithSpan};
+use super::{ArgumentsList, EnumValueId, Identifier, Span, WithIdentifier, WithSpan};
 use std::ops::Index;
 
 /// An attribute (following `@` or `@@``) on a model, model field, enum, enum value or composite
@@ -51,7 +51,7 @@ pub enum AttributeContainer {
     Model(super::ModelId),
     ModelField(super::ModelId, super::FieldId),
     Enum(super::EnumId),
-    EnumValue(super::EnumId, u32),
+    EnumValue(super::EnumId, super::EnumValueId),
     CompositeTypeField(super::CompositeTypeId, super::FieldId),
 }
 
@@ -79,8 +79,8 @@ impl From<(super::CompositeTypeId, super::FieldId)> for AttributeContainer {
     }
 }
 
-impl From<(super::EnumId, u32)> for AttributeContainer {
-    fn from((enm, val): (super::EnumId, u32)) -> Self {
+impl From<(super::EnumId, EnumValueId)> for AttributeContainer {
+    fn from((enm, val): (super::EnumId, super::EnumValueId)) -> Self {
         Self::EnumValue(enm, val)
     }
 }
@@ -103,7 +103,7 @@ impl Index<AttributeContainer> for super::SchemaAst {
             AttributeContainer::Model(model_id) => &self[model_id].attributes,
             AttributeContainer::ModelField(model_id, field_id) => &self[model_id][field_id].attributes,
             AttributeContainer::Enum(enum_id) => &self[enum_id].attributes,
-            AttributeContainer::EnumValue(enum_id, value_idx) => &self[enum_id].values[value_idx as usize].attributes,
+            AttributeContainer::EnumValue(enum_id, value_idx) => &self[enum_id][value_idx].attributes,
             AttributeContainer::CompositeTypeField(ctid, field_id) => &self[ctid][field_id].attributes,
         }
     }

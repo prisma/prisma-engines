@@ -1,8 +1,8 @@
 use super::IntrospectionPair;
 use crate::introspection::sanitize_datamodel_names::{EnumVariantName, ModelName};
 use psl::{
-    parser_database::walkers,
-    schema_ast::ast::{self, WithDocumentation},
+    parser_database::{self as db, walkers},
+    schema_ast::ast::WithDocumentation,
 };
 use sql_schema_describer as sql;
 use std::borrow::Cow;
@@ -51,7 +51,7 @@ impl<'a> EnumPair<'a> {
 
     /// The position of the enum from the PSL, if existing. Used for
     /// sorting the enums in the final introspected data model.
-    pub(crate) fn previous_position(self) -> Option<ast::EnumId> {
+    pub(crate) fn previous_position(self) -> Option<db::EnumId> {
         self.previous.map(|e| e.id)
     }
 

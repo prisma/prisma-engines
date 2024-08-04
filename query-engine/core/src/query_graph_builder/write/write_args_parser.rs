@@ -162,10 +162,10 @@ fn parse_composite_update_many(
     mut value: ParsedInputMap<'_>,
     path: &mut [DatasourceFieldName],
 ) -> QueryGraphBuilderResult<WriteOperation> {
-    let where_map: ParsedInputMap<'_> = value.remove(args::WHERE).unwrap().try_into()?;
+    let where_map: ParsedInputMap<'_> = value.swap_remove(args::WHERE).unwrap().try_into()?;
     let filter = extract_filter(where_map, cf.typ())?;
 
-    let update_map: ParsedInputMap<'_> = value.remove(args::DATA).unwrap().try_into()?;
+    let update_map: ParsedInputMap<'_> = value.swap_remove(args::DATA).unwrap().try_into()?;
     let update = parse_composite_updates(cf, update_map, path)?
         .try_into_composite()
         .unwrap();
@@ -177,7 +177,7 @@ fn parse_composite_delete_many(
     cf: &CompositeFieldRef,
     mut value: ParsedInputMap<'_>,
 ) -> QueryGraphBuilderResult<WriteOperation> {
-    let where_map: ParsedInputMap<'_> = value.remove(args::WHERE).unwrap().try_into()?;
+    let where_map: ParsedInputMap<'_> = value.swap_remove(args::WHERE).unwrap().try_into()?;
     let filter = extract_filter(where_map, cf.typ())?;
 
     Ok(WriteOperation::composite_delete_many(filter))
@@ -188,9 +188,9 @@ fn parse_composite_upsert(
     mut value: ParsedInputMap<'_>,
     path: &mut Vec<DatasourceFieldName>,
 ) -> QueryGraphBuilderResult<WriteOperation> {
-    let set = value.remove(operations::SET).unwrap();
+    let set = value.swap_remove(operations::SET).unwrap();
     let set = parse_composite_writes(cf, set, path)?.try_into_composite().unwrap();
-    let update: ParsedInputMap<'_> = value.remove(operations::UPDATE).unwrap().try_into()?;
+    let update: ParsedInputMap<'_> = value.swap_remove(operations::UPDATE).unwrap().try_into()?;
     let update = parse_composite_updates(cf, update, path)?.try_into_composite().unwrap();
 
     Ok(WriteOperation::composite_upsert(set, update))

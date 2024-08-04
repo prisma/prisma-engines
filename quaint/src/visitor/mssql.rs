@@ -1,13 +1,13 @@
-use super::Visitor;
+use super::{NativeColumnType, Visitor};
 #[cfg(any(feature = "postgresql", feature = "mysql"))]
-use crate::prelude::{JsonExtract, JsonType, JsonUnquote};
+use crate::prelude::{JsonArrayAgg, JsonBuildObject, JsonExtract, JsonType, JsonUnquote};
 use crate::{
     ast::*,
     error::{Error, ErrorKind},
     prelude::{Aliasable, Average, Query},
     visitor, Value, ValueType,
 };
-use std::{convert::TryFrom, fmt::Write, iter};
+use std::{borrow::Cow, convert::TryFrom, fmt::Write, iter};
 
 static GENERATED_KEYS: &str = "@generated_keys";
 
@@ -176,6 +176,14 @@ impl<'a> Mssql<'a> {
         Ok(())
     }
 
+    fn visit_text(&mut self, txt: Option<Cow<'a, str>>, nt: Option<NativeColumnType<'a>>) -> visitor::Result {
+        self.add_parameter(Value {
+            typed: ValueType::Text(txt),
+            native_column_type: nt,
+        });
+        self.parameter_substitution()
+    }
+
     fn visit_geometry_equals(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
         self.surround_with("(", ")", |s| s.visit_expression(left))?;
         self.surround_with(".STEquals(", ")", |s| s.visit_expression(right))?;
@@ -206,6 +214,43 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     fn write<D: std::fmt::Display>(&mut self, s: D) -> visitor::Result {
         write!(&mut self.query, "{s}")?;
         Ok(())
+    }
+
+    fn add_parameter(&mut self, value: Value<'a>) {
+        self.parameters.push(value)
+    }
+
+    fn visit_parameterized_text(
+        &mut self,
+        txt: Option<Cow<'a, str>>,
+        nt: Option<NativeColumnType<'a>>,
+    ) -> visitor::Result {
+        match nt {
+            Some(nt) => match (nt.name.as_ref(), nt.length) {
+                // Tiberius encodes strings as NVARCHAR by default. This causes implicit coercions which avoids using indexes.
+                // This cast ensures that VARCHAR instead.
+                ("VARCHAR", length) => self.surround_with("CAST(", ")", |this| {
+                    this.visit_text(txt, Some(nt))?;
+                    this.write(" AS VARCHAR")?;
+
+                    match length {
+                        Some(TypeDataLength::Constant(length)) => {
+                            this.write("(")?;
+                            this.write(length)?;
+                            this.write(")")?;
+                        }
+                        Some(TypeDataLength::Maximum) => {
+                            this.write("(MAX)")?;
+                        }
+                        None => (),
+                    }
+
+                    Ok(())
+                }),
+                _ => self.visit_text(txt, Some(nt)),
+            },
+            nt => self.visit_text(txt, nt),
+        }
     }
 
     /// A point to modify an incoming query to make it compatible with the
@@ -548,10 +593,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         unimplemented!("Upsert not supported for the underlying database.")
     }
 
-    fn add_parameter(&mut self, value: Value<'a>) {
-        self.parameters.push(value)
-    }
-
     fn parameter_substitution(&mut self) -> visitor::Result {
         self.write("@P")?;
         self.write(self.parameters.len())
@@ -724,6 +765,16 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_unquote(&mut self, _json_unquote: JsonUnquote<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on MSSQL")
+    }
+
+    #[cfg(feature = "postgresql")]
+    fn visit_json_array_agg(&mut self, _array_agg: JsonArrayAgg<'a>) -> visitor::Result {
+        unimplemented!("JSON_AGG is not yet supported on MSSQL")
+    }
+
+    #[cfg(feature = "postgresql")]
+    fn visit_json_build_object(&mut self, _build_obj: JsonBuildObject<'a>) -> visitor::Result {
+        unimplemented!("JSON_BUILD_OBJECT is not yet supported on MSSQL")
     }
 
     #[cfg(feature = "postgresql")]

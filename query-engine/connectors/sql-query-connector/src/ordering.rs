@@ -1,5 +1,6 @@
 use crate::{join_utils::*, model_extensions::*, query_arguments_ext::QueryArgumentsExt, Context};
 use itertools::Itertools;
+use psl::{datamodel_connector::ConnectorCapability, reachable_only_with_capability};
 use quaint::ast::*;
 use query_structure::*;
 
@@ -18,8 +19,19 @@ pub(crate) struct OrderByDefinition {
 
 #[derive(Debug, Default)]
 pub(crate) struct OrderByBuilder {
-    // Used to generate unique join alias
+    /// Parent table alias, used mostly for relationLoadStrategy: join when performing nested ordering.
+    /// This parent alias enables us to prefix the ordered field with the correct parent join alias.
+    parent_alias: Option<String>,
+    /// Counter used to generate unique join alias
     join_counter: usize,
+}
+
+impl OrderByBuilder {
+    #[cfg(feature = "relation_joins")]
+    pub(crate) fn with_parent_alias(mut self, alias: Option<String>) -> Self {
+        self.parent_alias = alias;
+        self
+    }
 }
 
 impl OrderByBuilder {
@@ -27,7 +39,6 @@ impl OrderByBuilder {
     pub(crate) fn build(&mut self, query_arguments: &QueryArguments, ctx: &Context<'_>) -> Vec<OrderByDefinition> {
         let needs_reversed_order = query_arguments.needs_reversed_order();
 
-        // The index is used to differentiate potentially separate relations to the same model.
         query_arguments
             .order_by
             .iter()
@@ -37,7 +48,10 @@ impl OrderByBuilder {
                     self.build_order_aggr_scalar(order_by, needs_reversed_order, ctx)
                 }
                 OrderBy::ToManyAggregation(order_by) => self.build_order_aggr_rel(order_by, needs_reversed_order, ctx),
-                OrderBy::Relevance(order_by) => self.build_order_relevance(order_by, needs_reversed_order, ctx),
+                OrderBy::Relevance(order_by) => {
+                    reachable_only_with_capability!(ConnectorCapability::FullTextSearch);
+                    self.build_order_relevance(order_by, needs_reversed_order, ctx)
+                }
             })
             .collect_vec()
     }
@@ -69,15 +83,14 @@ impl OrderByBuilder {
         needs_reversed_order: bool,
         ctx: &Context<'_>,
     ) -> OrderByDefinition {
-        let columns: Vec<Expression> = order_by.fields.iter().map(|sf| sf.as_column(ctx).into()).collect();
-        let order_column: Expression = text_search_relevance(&columns, order_by.search.clone()).into();
+        let (joins, order_column) = self.compute_joins_relevance(order_by, ctx);
         let order: Option<Order> = Some(into_order(&order_by.sort_order, None, needs_reversed_order));
         let order_definition: OrderDefinition = (order_column.clone(), order);
 
         OrderByDefinition {
             order_column,
             order_definition,
-            joins: vec![],
+            joins,
         }
     }
 
@@ -135,17 +148,18 @@ impl OrderByBuilder {
         order_by: &OrderByToManyAggregation,
         ctx: &Context<'_>,
     ) -> (Vec<AliasedJoin>, Column<'static>) {
-        let (last_hop, rest_hops) = order_by
-            .path
-            .split_last()
-            .expect("An order by relation aggregation has to have at least one hop");
+        let intermediary_hops = order_by.intermediary_hops();
+        let aggregation_hop = order_by.aggregation_hop();
 
         // Unwraps are safe because the SQL connector doesn't yet support any other type of orderBy hop but the relation hop.
         let mut joins: Vec<AliasedJoin> = vec![];
 
-        for (i, hop) in rest_hops.iter().enumerate() {
+        let parent_alias = self.parent_alias.clone();
+
+        for (i, hop) in intermediary_hops.iter().enumerate() {
             let previous_join = if i > 0 { joins.get(i - 1) } else { None };
-            let previous_alias = previous_join.map(|j| j.alias.as_str());
+
+            let previous_alias = previous_join.map(|j| j.alias.as_str()).or(parent_alias.as_deref());
             let join = compute_one2m_join(hop.as_relation_hop().unwrap(), &self.join_prefix(), previous_alias, ctx);
 
             joins.push(join);
@@ -156,11 +170,11 @@ impl OrderByBuilder {
             _ => unreachable!("Order by relation aggregation other than count are not supported"),
         };
 
-        let previous_alias = joins.last().map(|j| j.alias.as_str());
+        let previous_alias = joins.last().map(|j| j.alias.as_str()).or(parent_alias.as_deref());
 
         // We perform the aggregation on the last join
         let last_aggr_join = compute_aggr_join(
-            last_hop.as_relation_hop().unwrap(),
+            aggregation_hop.as_relation_hop().unwrap(),
             aggregation_type,
             None,
             ORDER_AGGREGATOR_ALIAS,
@@ -183,28 +197,78 @@ impl OrderByBuilder {
         order_by: &OrderByScalar,
         ctx: &Context<'_>,
     ) -> (Vec<AliasedJoin>, Column<'static>) {
-        let mut joins: Vec<AliasedJoin> = vec![];
-
-        for (i, hop) in order_by.path.iter().enumerate() {
-            let previous_join = if i > 0 { joins.get(i - 1) } else { None };
-            let previous_alias = previous_join.map(|j| j.alias.as_str());
-            let join = compute_one2m_join(hop.as_relation_hop().unwrap(), &self.join_prefix(), previous_alias, ctx);
-
-            joins.push(join);
-        }
+        let parent_alias = self.parent_alias.clone();
+        let joins: Vec<AliasedJoin> = self.compute_one2m_join(&order_by.path, parent_alias.as_ref(), ctx);
 
         // This is the final column identifier to be used for the scalar field to order by.
         // - If we order by a scalar field on the base model, we simply use the model's scalar field. eg:
         //   `{modelTable}.{field}`
+        // - If there's a parent_alias, we use it to prefix the field, e.g. `{parent_alias}.{field}`
         // - If we order by some relations, we use the alias used for the last join, e.g.
         //   `{join_alias}.{field}`
-        let order_by_column = if let Some(last_join) = joins.last() {
-            Column::from((last_join.alias.to_owned(), order_by.field.db_name().to_owned()))
-        } else {
-            order_by.field.as_column(ctx)
-        };
+        let parent_table = joins
+            .last()
+            .map(|j| j.alias.to_owned())
+            .or_else(|| self.parent_alias.clone());
+        let order_by_column = order_by.field.as_column(ctx).opt_table(parent_table);
 
         (joins, order_by_column)
+    }
+
+    pub(crate) fn compute_joins_relevance(
+        &mut self,
+        order_by: &OrderByRelevance,
+        ctx: &Context<'_>,
+    ) -> (Vec<AliasedJoin>, Expression<'static>) {
+        let parent_alias = self.parent_alias.clone();
+        let joins: Vec<AliasedJoin> = self.compute_one2m_join(&order_by.path, parent_alias.as_ref(), ctx);
+
+        // This is the final column identifier to be used for the scalar field to order by.
+        // - If we order by a scalar field on the base model, we simply use the model's scalar field. eg:
+        //   `{modelTable}.{field}`
+        // - If there's a parent_alias, we use it to prefix the field, e.g. `{parent_alias}.{field}`
+        // - If we order by some relations, we use the alias used for the last join, e.g.
+        //   `{join_alias}.{field}`
+        let parent_table = joins
+            .last()
+            .map(|j| j.alias.to_owned())
+            .or_else(|| self.parent_alias.clone());
+        let order_by_columns: Vec<_> = order_by
+            .fields
+            .iter()
+            .map(|sf| sf.as_column(ctx).opt_table(parent_table.clone()))
+            .map(Expression::from)
+            .collect();
+        let text_search_expr = text_search_relevance(&order_by_columns, order_by.search.clone());
+
+        (joins, text_search_expr.into())
+    }
+
+    fn compute_one2m_join(
+        &mut self,
+        path: &[OrderByHop],
+        parent_alias: Option<&String>,
+        ctx: &Context<'_>,
+    ) -> Vec<AliasedJoin> {
+        let mut joins: Vec<AliasedJoin> = vec![];
+
+        for (i, hop) in path.iter().enumerate() {
+            let previous_join = if i > 0 { joins.get(i - 1) } else { None };
+            let previous_alias = previous_join
+                .map(|j| &j.alias)
+                .or(parent_alias)
+                .map(|alias| alias.as_str());
+            let join = crate::join_utils::compute_one2m_join(
+                hop.as_relation_hop().unwrap(),
+                &self.join_prefix(),
+                previous_alias,
+                ctx,
+            );
+
+            joins.push(join);
+        }
+
+        joins
     }
 
     fn join_prefix(&mut self) -> String {

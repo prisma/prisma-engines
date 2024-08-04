@@ -1,134 +1,181 @@
-name: Test Query Engine
+name: "QE"
 on:
   push:
     branches:
       - main
   pull_request:
     paths-ignore:
-      - '.github/**'
-      - '!.github/workflows/query-engine.yml'
-      - '.buildkite/**'
-      - '*.md'
-      - 'LICENSE'
-      - 'CODEOWNERS'
-      - 'renovate.json'
+      - "!.github/workflows/test-query-engine.yml"
+      - "!.github/workflows/test-query-engine-template.yml"
+      - ".github/**"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  rust-query-engine-tests:
-    name: '${{ matrix.database.name }} (${{ matrix.engine_protocol }}) on Linux'
-
+  postgres:
     strategy:
       fail-fast: false
       matrix:
         database:
-          - name: 'vitess_8_0'
-            single_threaded: true
-            connector: 'vitess'
-            version: '8.0'
-          - name: 'postgres15'
-            single_threaded: true
-            connector: 'postgres'
-            version: '15'
-          - name: 'postgis15'
-            single_threaded: true
-            connector: 'postgres'
-            version: '15-postgis'
-          - name: 'mssql_2022'
-            single_threaded: false
-            connector: 'sqlserver'
-            version: '2022'
-          - name: 'sqlite'
-            single_threaded: false
-            connector: 'sqlite'
-            version: '3'
-          - name: 'spatialite'
-            single_threaded: false
-            connector: 'sqlite'
-            version: '3-spatialite'
-          - name: 'mongodb_4_2'
-            single_threaded: true
-            connector: 'mongodb'
-            version: '4.2'
-          - name: 'cockroach_23_1'
-            single_threaded: false
-            connector: 'cockroachdb'
-            version: '23.1'
-          - name: 'cockroach_22_2'
-            single_threaded: false
-            connector: 'cockroachdb'
-            version: '22.2'
-          - name: 'cockroach_22_1_0'
-            single_threaded: false
-            connector: 'cockroachdb'
-            version: '22.1'
-          - name: 'mysql_5_6'
-            single_threaded: true
-            connector: 'mysql'
-            version: '5.6'
-          - name: 'mysql_5_7'
-            single_threaded: true
-            connector: 'mysql'
-            version: '5.7'
-          - name: 'mysql_8'
-            single_threaded: true
-            connector: 'mysql'
-            version: '8'
-          - name: 'mysql_mariadb'
-            single_threaded: true
-            connector: 'mysql'
-            version: 'mariadb'
-        engine_protocol: [graphql, json]
+          - name: "postgres16"
+            version: "16"
+          - name: "postgres15"
+            version: "15"
+          - name: "postgres14"
+            version: "14"
+          - name: "postgres13"
+            version: "13"
+          - name: "postgres12"
+            version: "12"
+          - name: "postgres11"
+            version: "11"
+          - name: "postgres10"
+            version: "10"
+          - name: "postgres9"
+            version: "9"
+          - name: 'postgis16'
+            version: '16-postgis'
+    uses: ./.github/workflows/test-query-engine-template.yml
+    name: postgres ${{ matrix.database.version }}
+    with:
+      name: ${{ matrix.database.name }}
+      version: ${{ matrix.database.version }}
+      connector: "postgres"
+      single_threaded: true
 
-    env:
-      LOG_LEVEL: 'info'
-      LOG_QUERIES: 'y'
-      RUST_LOG_FORMAT: 'devel'
-      RUST_BACKTRACE: '1'
-      CLICOLOR_FORCE: '1'
-      CLOSED_TX_CLEANUP: '2'
-      SIMPLE_TEST_MODE: '1'
-      QUERY_BATCH_SIZE: '10'
-      TEST_RUNNER: 'direct'
-      TEST_CONNECTOR: ${{ matrix.database.connector }}
-      TEST_CONNECTOR_VERSION: ${{ matrix.database.version }}
-      PRISMA_ENGINE_PROTOCOL: ${{ matrix.engine_protocol }}
+  mysql:
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - name: "mysql_5_6"
+            version: "5.6"
+            relation_load_strategy: '["query"]'
+          - name: "mysql_5_7"
+            version: "5.7"
+            relation_load_strategy: '["query"]'
+          - name: "mysql_8"
+            version: "8"
+            relation_load_strategy: '["join", "query"]'
+          - name: "mysql_mariadb"
+            version: "mariadb"
+            relation_load_strategy: '["query"]'
 
-    runs-on: buildjet-16vcpu-ubuntu-2004
-    steps:
-      - uses: actions/checkout@v4
+    uses: ./.github/workflows/test-query-engine-template.yml
+    name: mysql ${{ matrix.database.version }}
+    with:
+      name: ${{ matrix.database.name }}
+      version: ${{ matrix.database.version }}
+      connector: "mysql"
+      relation_load_strategy: ${{ matrix.database.relation_load_strategy }}
+      single_threaded: true
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        continue-on-error: true
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-        if: "${{ env.DOCKERHUB_USERNAME != '' && env.DOCKERHUB_TOKEN != '' }}"
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+  cockroachdb:
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - name: "cockroach_23_1"
+            version: "23.1"
+          - name: "cockroach_22_2"
+            version: "22.2"
+          - name: "cockroach_22_1_0"
+            version: "22.1"
+    uses: ./.github/workflows/test-query-engine-template.yml
+    name: cockroachdb ${{ matrix.database.version }}
+    with:
+      name: ${{ matrix.database.name }}
+      version: ${{ matrix.database.version }}
+      connector: "cockroachdb"
 
-      - name: 'Start ${{ matrix.database.name }} (${{ matrix.engine_protocol }})'
-        run: make start-${{ matrix.database.name }}
+  mongodb:
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - name: "mongodb_4_2"
+            version: "4.2"
+          - name: "mongodb_4_4"
+            version: "4.4"
+          - name: "mongodb_5"
+            connector: "mongodb"
+            version: "5"
+    uses: ./.github/workflows/test-query-engine-template.yml
+    name: mongodb ${{ matrix.database.version }}
+    with:
+      name: ${{ matrix.database.name }}
+      version: ${{ matrix.database.version }}
+      single_threaded: true
+      connector: "mongodb"
+      relation_load_strategy: '["query"]'
 
-      - uses: dtolnay/rust-toolchain@stable
+  mssql:
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - name: "mssql_2022"
+            version: "2022"
+          - name: "mssql_2019"
+            version: "2019"
+          - name: "mssql_2017"
+            version: "2017"
+    uses: ./.github/workflows/test-query-engine-template.yml
+    name: mssql ${{ matrix.database.version }}
+    with:
+      name: ${{ matrix.database.name }}
+      version: ${{ matrix.database.version }}
+      connector: "sqlserver"
+      relation_load_strategy: '["query"]'
 
-      - name: Install Spatialite
-        if: ${{ matrix.database.name == 'spatialite' }}
-        run: sudo apt install -y libsqlite3-mod-spatialite
-
-      - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=1
-        if: ${{ matrix.database.single_threaded }}
-        env:
-          CLICOLOR_FORCE: 1
-          SPATIALITE_PATH: ${{ matrix.database.name == 'spatialite' && 'mod_spatialite' || null }}
-
-      - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=8
-        if: ${{ !matrix.database.single_threaded }}
-        env:
-          CLICOLOR_FORCE: 1
-          SPATIALITE_PATH: ${{ matrix.database.name == 'spatialite' && 'mod_spatialite' || null }}
+  sqlite:
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - name: "sqlite"
+            version: "3"
+          - name: "spatialite"
+            version: "3-spatialite"
+    uses: ./.github/workflows/test-query-engine-template.yml
+    name: sqlite ${{ matrix.database.version }}
+    with:
+      name: ${{ matrix.database.name }}
+      version: ${{ matrix.database.version }}
+      connector: "sqlite"
+      relation_load_strategy: '["query"]'
+  
+  driver_adapters:
+    strategy:
+      fail-fast: false
+      matrix:
+        adapter:
+          - name: "planetscale (napi)"
+            setup_task: "dev-planetscale-js"
+          - name: "pg (napi)"
+            setup_task: "dev-pg-js"
+          - name: "neon (napi)"
+            setup_task: "dev-neon-js"
+          - name: "libsql (napi)"
+            setup_task: "dev-libsql-js"
+          - name: "planetscale (wasm)"
+            setup_task: "dev-planetscale-wasm"
+          - name: "pg (wasm)"
+            setup_task: "dev-pg-wasm"
+          - name: "neon (wasm)"
+            setup_task: "dev-neon-wasm"
+          - name: "libsql (wasm)"
+            setup_task: "dev-libsql-wasm"
+          - name: "d1 (wasm)"
+            setup_task: "dev-d1"
+    name: ${{ matrix.adapter.name }}
+    uses: ./.github/workflows/test-driver-adapters-template.yml
+    with:
+      setup_task: ${{ matrix.adapter.setup_task }}

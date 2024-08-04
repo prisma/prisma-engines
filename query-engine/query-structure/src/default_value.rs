@@ -45,7 +45,7 @@ impl DefaultKind {
 
     /// Does this match @default(uuid(_))?
     pub fn is_uuid(&self) -> bool {
-        matches!(self, DefaultKind::Expression(generator) if generator.name == "uuid")
+        matches!(self, DefaultKind::Expression(generator) if generator.name.starts_with("uuid"))
     }
 
     pub fn unwrap_single(self) -> PrismaValue {
@@ -59,7 +59,9 @@ impl DefaultKind {
     // intended for primary key values!
     pub fn to_dbgenerated_func(&self) -> Option<String> {
         match self {
-            DefaultKind::Expression(ref expr) if expr.is_dbgenerated() => expr.args.get(0).map(|val| val.1.to_string()),
+            DefaultKind::Expression(ref expr) if expr.is_dbgenerated() => {
+                expr.args.first().map(|val| val.1.to_string())
+            }
             _ => None,
         }
     }
@@ -184,8 +186,8 @@ impl ValueGenerator {
         ValueGenerator::new("cuid".to_owned(), vec![]).unwrap()
     }
 
-    pub fn new_uuid() -> Self {
-        ValueGenerator::new("uuid".to_owned(), vec![]).unwrap()
+    pub fn new_uuid(version: u8) -> Self {
+        ValueGenerator::new(format!("uuid({version})"), vec![]).unwrap()
     }
 
     pub fn new_nanoid(length: Option<u8>) -> Self {
@@ -217,7 +219,7 @@ impl ValueGenerator {
             return None;
         }
 
-        self.args.get(0).and_then(|v| v.1.as_string())
+        self.args.first().and_then(|v| v.1.as_string())
     }
 
     #[cfg(feature = "default_generators")]
@@ -236,7 +238,7 @@ impl ValueGenerator {
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum ValueGeneratorFn {
-    Uuid,
+    Uuid(u8),
     Cuid,
     Nanoid(Option<u8>),
     Now,
@@ -249,7 +251,8 @@ impl ValueGeneratorFn {
     fn new(name: &str) -> std::result::Result<Self, String> {
         match name {
             "cuid" => Ok(Self::Cuid),
-            "uuid" => Ok(Self::Uuid),
+            "uuid" | "uuid(4)" => Ok(Self::Uuid(4)),
+            "uuid(7)" => Ok(Self::Uuid(7)),
             "now" => Ok(Self::Now),
             "autoincrement" => Ok(Self::Autoincrement),
             "sequence" => Ok(Self::Autoincrement),
@@ -263,7 +266,7 @@ impl ValueGeneratorFn {
     #[cfg(feature = "default_generators")]
     fn invoke(&self) -> Option<PrismaValue> {
         match self {
-            Self::Uuid => Some(Self::generate_uuid()),
+            Self::Uuid(version) => Some(Self::generate_uuid(*version)),
             Self::Cuid => Some(Self::generate_cuid()),
             Self::Nanoid(length) => Some(Self::generate_nanoid(length)),
             Self::Now => Some(Self::generate_now()),
@@ -280,8 +283,12 @@ impl ValueGeneratorFn {
     }
 
     #[cfg(feature = "default_generators")]
-    fn generate_uuid() -> PrismaValue {
-        PrismaValue::Uuid(uuid::Uuid::new_v4())
+    fn generate_uuid(version: u8) -> PrismaValue {
+        PrismaValue::Uuid(match version {
+            4 => uuid::Uuid::new_v4(),
+            7 => uuid::Uuid::now_v7(),
+            _ => panic!("Unknown UUID version: {}", version),
+        })
     }
 
     #[cfg(feature = "default_generators")]
@@ -335,8 +342,16 @@ mod tests {
     }
 
     #[test]
-    fn default_value_is_uuid() {
-        let uuid_default = DefaultValue::new_expression(ValueGenerator::new_uuid());
+    fn default_value_is_uuidv4() {
+        let uuid_default = DefaultValue::new_expression(ValueGenerator::new_uuid(4));
+
+        assert!(uuid_default.is_uuid());
+        assert!(!uuid_default.is_autoincrement());
+    }
+
+    #[test]
+    fn default_value_is_uuidv7() {
+        let uuid_default = DefaultValue::new_expression(ValueGenerator::new_uuid(7));
 
         assert!(uuid_default.is_uuid());
         assert!(!uuid_default.is_autoincrement());

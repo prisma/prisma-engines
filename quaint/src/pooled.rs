@@ -152,8 +152,11 @@ mod manager;
 
 pub use manager::*;
 
+#[cfg(native)]
+use crate::error::NativeErrorKind;
+
 use crate::{
-    connector::{ConnectionInfo, PostgresFlavour},
+    connector::ConnectionInfo,
     error::{Error, ErrorKind},
 };
 use mobc::Pool;
@@ -302,8 +305,10 @@ impl Builder {
     /// - Unknown: Always add a network roundtrip by setting the search path through a database query.
     ///
     /// - Defaults to `PostgresFlavour::Unknown`.
-    pub fn set_postgres_flavour(&mut self, flavour: PostgresFlavour) {
-        if let ConnectionInfo::Postgres(ref mut url) = self.connection_info {
+    #[cfg(feature = "postgresql-native")]
+    pub fn set_postgres_flavour(&mut self, flavour: crate::connector::PostgresFlavour) {
+        use crate::connector::NativeConnectionInfo;
+        if let ConnectionInfo::Native(NativeConnectionInfo::Postgres(ref mut url)) = self.connection_info {
             url.set_flavour(flavour);
         }
 
@@ -484,7 +489,9 @@ impl Quaint {
 
         let inner = match res {
             Ok(conn) => conn,
-            Err(mobc::Error::PoolClosed) => return Err(Error::builder(ErrorKind::PoolClosed {}).build()),
+            Err(mobc::Error::PoolClosed) => {
+                return Err(Error::builder(ErrorKind::Native(NativeErrorKind::PoolClosed {})).build())
+            }
             Err(mobc::Error::Timeout) => {
                 let state = self.inner.state().await;
                 // We can use unwrap here because a pool timeout has to be set to use a connection pool
@@ -495,7 +502,7 @@ impl Quaint {
             }
             Err(mobc::Error::Inner(e)) => return Err(e),
             Err(e @ mobc::Error::BadConn) => {
-                let error = Error::builder(ErrorKind::ConnectionError(Box::new(e))).build();
+                let error = Error::builder(ErrorKind::Native(NativeErrorKind::ConnectionError(Box::new(e)))).build();
                 return Err(error);
             }
         };

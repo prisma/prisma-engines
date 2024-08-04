@@ -1,11 +1,22 @@
 use crate::{json_rpc::method_names::*, CoreError, CoreResult, GenericApi};
 use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
+use psl::SourceFile;
 use std::sync::Arc;
 
 /// Initialize a JSON-RPC ready schema engine API.
-pub fn rpc_api(prisma_schema: Option<String>, host: Arc<dyn schema_connector::ConnectorHost>) -> IoHandler {
+pub fn rpc_api(
+    initial_datamodels: Option<Vec<(String, String)>>,
+    host: Arc<dyn schema_connector::ConnectorHost>,
+) -> IoHandler {
     let mut io_handler = IoHandler::default();
-    let api = Arc::new(crate::state::EngineState::new(prisma_schema, Some(host)));
+    let initial_datamodels = initial_datamodels.map(|schemas| {
+        schemas
+            .into_iter()
+            .map(|(name, schema)| (name, SourceFile::from(schema)))
+            .collect()
+    });
+
+    let api = Arc::new(crate::state::EngineState::new(initial_datamodels, Some(host)));
 
     for cmd in METHOD_NAMES {
         let api = api.clone();
@@ -23,7 +34,6 @@ async fn run_command(
     cmd: &str,
     params: Params,
 ) -> Result<serde_json::Value, JsonRpcError> {
-    tracing::debug!(?cmd, "running the command");
     match cmd {
         APPLY_MIGRATIONS => render(executor.apply_migrations(params.parse()?).await),
         CREATE_DATABASE => render(executor.create_database(params.parse()?).await),

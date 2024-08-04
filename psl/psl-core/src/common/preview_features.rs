@@ -34,7 +34,7 @@ macro_rules! features {
     };
 }
 
-// (Usually) Append-only list of features.
+// (Usually) Append-only list of features. (alphabetically sorted)
 features!(
     AggregateApi,
     AtomicNumberOperations,
@@ -64,6 +64,7 @@ features!(
     MultiSchema,
     NamedConstraints,
     NApi,
+    NativeDistinct,
     NativeTypes,
     OrderByAggregateGroup,
     OrderByNulls,
@@ -76,9 +77,13 @@ features!(
     TransactionApi,
     UncheckedScalarInputs,
     Views,
+    RelationJoins,
+    ReactNative,
+    PrismaSchemaFolder,
+    OmitApi
 );
 
-/// Generator preview features
+/// Generator preview features (alphabetically sorted)
 pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
         Deno
@@ -87,9 +92,13 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | FullTextSearch
          | Metrics
          | MultiSchema
+         | NativeDistinct
          | PostgresqlExtensions
          | Tracing
          | Views
+         | RelationJoins
+         | OmitApi
+         | PrismaSchemaFolder
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations
@@ -124,7 +133,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | TransactionApi
         | UncheckedScalarInputs
     }),
-    hidden: enumflags2::BitFlags::EMPTY,
+    hidden: enumflags2::make_bitflags!(PreviewFeature::{ReactNative}),
 };
 
 #[derive(Debug)]

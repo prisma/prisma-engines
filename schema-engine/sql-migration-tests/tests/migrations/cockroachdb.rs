@@ -4,7 +4,7 @@ mod failure_modes;
 use prisma_value::PrismaValue;
 use psl::parser_database::*;
 use quaint::prelude::Insert;
-use schema_core::schema_connector::DiffTarget;
+use schema_core::{json_rpc::types::SchemasContainer, schema_connector::DiffTarget};
 use serde_json::json;
 use sql_migration_tests::test_api::*;
 use sql_schema_describer::{ColumnTypeFamily, ForeignKeyAction};
@@ -30,7 +30,12 @@ fn db_push_on_cockroach_db_with_postgres_provider_fails(api: TestApi) {
     let connector = schema_core::schema_api(Some(schema.clone()), None).unwrap();
     let error = tok(connector.schema_push(schema_core::json_rpc::types::SchemaPushInput {
         force: false,
-        schema: schema.clone(),
+        schema: schema_core::json_rpc::types::SchemasContainer {
+            files: vec![schema_core::json_rpc::types::SchemaContainer {
+                path: "schema.prisma".to_string(),
+                content: schema,
+            }],
+        },
     }))
     .unwrap_err()
     .message()
@@ -437,8 +442,11 @@ fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_fails(_api
     let engine = schema_core::schema_api(None, None).unwrap();
     let err = tok(
         engine.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
-            datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer {
-                schema: dm.to_owned(),
+            datasource: schema_core::json_rpc::types::DatasourceParam::Schema(SchemasContainer {
+                files: vec![SchemaContainer {
+                    path: "schema.prisma".to_string(),
+                    content: dm.to_owned(),
+                }],
             }),
         }),
     )
@@ -449,6 +457,72 @@ fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_fails(_api
         You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.
     "#]];
     expected_error.assert_eq(&err);
+}
+
+// This test follows https://github.com/prisma/prisma-engines/pull/4632.
+#[test_connector(tags(CockroachDb))]
+fn decimal_to_boolean_migrations_work(api: TestApi) {
+    let dir = api.create_migrations_directory();
+
+    let dm1 = r#"
+        datasource db {
+            provider = "cockroachdb"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        model Cat {
+            id  BigInt @id @default(autoincrement())
+            tag Decimal
+        }
+    "#;
+
+    api.create_migration("create-cats-decimal", dm1, &dir)
+        .send_sync()
+        .assert_migration_directories_count(1)
+        .assert_migration("create-cats-decimal", move |migration| {
+            let expected_script = expect![[r#"
+                -- CreateTable
+                CREATE TABLE "Cat" (
+                    "id" INT8 NOT NULL DEFAULT unique_rowid(),
+                    "tag" DECIMAL(65,30) NOT NULL,
+
+                    CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
+                );
+            "#]];
+
+            migration.expect_contents(expected_script)
+        });
+
+    let dm2 = r#"
+        datasource db {
+            provider = "cockroachdb"
+            url = env("TEST_DATABASE_URL")
+        }
+        
+        model Cat {
+            id  BigInt @id @default(autoincrement())
+            tag Boolean
+        }
+    "#;
+
+    api.create_migration("migrate-cats-boolean", dm2, &dir)
+        .send_sync()
+        .assert_migration_directories_count(2)
+        .assert_migration("migrate-cats-boolean", move |migration| {
+            let expected_script = expect![[r#"
+                /*
+                  Warnings:
+
+                  - Changed the type of `tag` on the `Cat` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.
+
+                */
+                -- AlterTable
+                ALTER TABLE "Cat" DROP COLUMN "tag";
+                ALTER TABLE "Cat" ADD COLUMN     "tag" BOOL NOT NULL;
+            "#]];
+
+            migration.expect_contents(expected_script)
+        });
 }
 
 #[test_connector(tags(CockroachDb))]
@@ -1267,8 +1341,8 @@ fn alter_type_works(api: TestApi) {
     "#;
 
     let migration = api.connector_diff(
-        DiffTarget::Datamodel(schema.into()),
-        DiffTarget::Datamodel(to_schema.into()),
+        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), schema.into())]),
+        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), to_schema.into())]),
         None,
     );
 
@@ -1338,7 +1412,10 @@ fn schema_from_introspection_docs_works(api: TestApi) {
 
     let migration = api.connector_diff(
         DiffTarget::Database,
-        DiffTarget::Datamodel(SourceFile::new_static(introspected_schema)),
+        DiffTarget::Datamodel(vec![(
+            "schema.prisma".to_string(),
+            SourceFile::new_static(introspected_schema),
+        )]),
         None,
     );
 
@@ -1395,8 +1472,14 @@ fn cockroach_introspection_with_postgres_provider_fails() {
     let error = tok(me.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema,
-        schemas: None,
+        schema: SchemasContainer {
+            files: vec![SchemaContainer {
+                path: "schema.prisma".to_string(),
+                content: schema,
+            }],
+        },
+        base_directory_path: "/".to_string(),
+        namespaces: None,
     }))
     .unwrap_err()
     .message()

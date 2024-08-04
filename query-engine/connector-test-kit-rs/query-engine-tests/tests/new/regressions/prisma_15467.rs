@@ -11,7 +11,7 @@ mod mongodb {
                 id String @id @default(auto()) @map("_id") @test.ObjectId
                 leagueId Int
                 teamId Int
-                awayLosses Int                
+                awayLosses Int
             }
             "#
         };

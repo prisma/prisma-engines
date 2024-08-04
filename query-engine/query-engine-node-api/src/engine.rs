@@ -3,26 +3,26 @@ use futures::FutureExt;
 use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
 use psl::PreviewFeature;
-use query_core::{
-    protocol::EngineProtocol,
-    schema::{self, QuerySchema},
-    telemetry, QueryExecutor, TransactionOptions, TxId,
+use quaint::connector::ExternalConnector;
+use query_core::{protocol::EngineProtocol, relation_load_strategy, schema, telemetry, TransactionOptions, TxId};
+use query_engine_common::engine::{
+    map_known_error, stringify_env_values, ConnectedEngine, ConnectedEngineNative, ConstructorOptions,
+    ConstructorOptionsNative, EngineBuilder, EngineBuilderNative, Inner,
 };
-use query_engine_metrics::{MetricFormat, MetricRegistry};
-use request_handlers::{dmmf, load_executor, render_graphql_schema, ConnectorMode, RequestBody, RequestHandler};
-use serde::{Deserialize, Serialize};
+use query_engine_metrics::MetricFormat;
+use request_handlers::{load_executor, render_graphql_schema, ConnectorKind, RequestBody, RequestHandler};
+use serde::Deserialize;
 use serde_json::json;
-use std::{
-    collections::{BTreeMap, HashMap},
-    future::Future,
-    panic::AssertUnwindSafe,
-    path::PathBuf,
-    sync::Arc,
-};
+use std::{collections::HashMap, future::Future, marker::PhantomData, panic::AssertUnwindSafe, sync::Arc};
 use tokio::sync::RwLock;
 use tracing::{field, instrument::WithSubscriber, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
 use user_facing_errors::Error;
+
+enum ConnectorMode {
+    Rust,
+    Js { adapter: Arc<dyn ExternalConnector> },
+}
 
 /// The main query engine used by JS
 #[napi]
@@ -30,43 +30,6 @@ pub struct QueryEngine {
     connector_mode: ConnectorMode,
     inner: RwLock<Inner>,
     logger: Logger,
-}
-
-/// The state of the engine.
-enum Inner {
-    /// Not connected, holding all data to form a connection.
-    Builder(EngineBuilder),
-    /// A connected engine, holding all data to disconnect and form a new
-    /// connection. Allows querying when on this state.
-    Connected(ConnectedEngine),
-}
-
-/// Everything needed to connect to the database and have the core running.
-struct EngineBuilder {
-    schema: Arc<psl::ValidatedSchema>,
-    config_dir: PathBuf,
-    env: HashMap<String, String>,
-    engine_protocol: EngineProtocol,
-}
-
-/// Internal structure for querying and reconnecting with the engine.
-struct ConnectedEngine {
-    schema: Arc<psl::ValidatedSchema>,
-    query_schema: Arc<QuerySchema>,
-    executor: crate::Executor,
-    config_dir: PathBuf,
-    env: HashMap<String, String>,
-    metrics: Option<MetricRegistry>,
-    engine_protocol: EngineProtocol,
-}
-
-/// Returned from the `serverInfo` method in javascript.
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-struct ServerInfo {
-    commit: String,
-    version: String,
-    primary_connector: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -80,59 +43,6 @@ struct MetricOptions {
 impl MetricOptions {
     fn is_json_format(&self) -> bool {
         self.format == MetricFormat::Json
-    }
-}
-
-impl ConnectedEngine {
-    /// The schema AST for Query Engine core.
-    pub fn query_schema(&self) -> &Arc<QuerySchema> {
-        &self.query_schema
-    }
-
-    /// The query executor.
-    pub fn executor(&self) -> &(dyn QueryExecutor + Send + Sync) {
-        self.executor.as_ref()
-    }
-
-    pub fn engine_protocol(&self) -> EngineProtocol {
-        self.engine_protocol
-    }
-}
-
-/// Parameters defining the construction of an engine.
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct ConstructorOptions {
-    datamodel: String,
-    log_level: String,
-    #[serde(default)]
-    log_queries: bool,
-    #[serde(default)]
-    datasource_overrides: BTreeMap<String, String>,
-    #[serde(default)]
-    env: serde_json::Value,
-    config_dir: PathBuf,
-    #[serde(default)]
-    ignore_env_var_errors: bool,
-    #[serde(default)]
-    engine_protocol: Option<EngineProtocol>,
-}
-
-impl Inner {
-    /// Returns a builder if the engine is not connected
-    fn as_builder(&self) -> crate::Result<&EngineBuilder> {
-        match self {
-            Inner::Builder(ref builder) => Ok(builder),
-            Inner::Connected(_) => Err(ApiError::AlreadyConnected),
-        }
-    }
-
-    /// Returns the engine if connected
-    fn as_engine(&self) -> crate::Result<&ConnectedEngine> {
-        match self {
-            Inner::Builder(_) => Err(ApiError::NotConnected),
-            Inner::Connected(ref engine) => Ok(engine),
-        }
     }
 }
 
@@ -158,11 +68,7 @@ impl QueryEngine {
             datamodel,
             log_level,
             log_queries,
-            datasource_overrides,
-            env,
-            config_dir,
-            ignore_env_var_errors,
-            engine_protocol,
+            native,
         } = napi_env.from_js_value(options).expect(
             r###"
             Failed to deserialize constructor options. 
@@ -174,6 +80,14 @@ impl QueryEngine {
             values for data_model, log_level, and any field that is not Option<T>
             "###,
         );
+
+        let ConstructorOptionsNative {
+            datasource_overrides,
+            config_dir,
+            env,
+            ignore_env_var_errors,
+            engine_protocol,
+        } = native;
 
         let env = stringify_env_values(env)?; // we cannot trust anything JS sends us from process.env
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
@@ -192,10 +106,11 @@ impl QueryEngine {
         } else {
             #[cfg(feature = "driver-adapters")]
             if let Some(adapter) = maybe_adapter {
-                let js_queryable = driver_adapters::from_napi(adapter);
+                let js_queryable = driver_adapters::from_js(adapter);
 
-                sql_connector::activate_driver_adapter(Arc::new(js_queryable));
-                connector_mode = ConnectorMode::Js;
+                connector_mode = ConnectorMode::Js {
+                    adapter: Arc::new(js_queryable),
+                };
 
                 let provider_name = schema.connector.provider_name();
                 tracing::info!("Registered driver adapter for {provider_name}.");
@@ -207,7 +122,7 @@ impl QueryEngine {
         schema
             .diagnostics
             .to_result()
-            .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
+            .map_err(|err| ApiError::conversion(err, schema.db.source_assert_single()))?;
 
         config
             .resolve_datasource_urls_query_engine(
@@ -215,11 +130,11 @@ impl QueryEngine {
                 |key| env.get(key).map(ToString::to_string),
                 ignore_env_var_errors,
             )
-            .map_err(|err| ApiError::conversion(err, schema.db.source()))?;
+            .map_err(|err| ApiError::conversion(err, schema.db.source_assert_single()))?;
 
         config
             .validate_that_one_datasource_is_provided()
-            .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
+            .map_err(|errors| ApiError::conversion(errors, schema.db.source_assert_single()))?;
 
         let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
         let enable_tracing = config.preview_features().contains(PreviewFeature::Tracing);
@@ -227,9 +142,8 @@ impl QueryEngine {
 
         let builder = EngineBuilder {
             schema: Arc::new(schema),
-            config_dir,
             engine_protocol,
-            env,
+            native: EngineBuilderNative { config_dir, env },
         };
 
         let log_level = log_level.parse::<LevelFilter>().unwrap();
@@ -271,18 +185,6 @@ impl QueryEngine {
             let arced_schema = Arc::clone(&builder.schema);
             let arced_schema_2 = Arc::clone(&builder.schema);
 
-            let url = {
-                let data_source = builder
-                    .schema
-                    .configuration
-                    .datasources
-                    .first()
-                    .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
-                data_source
-                    .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
-                    .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?
-            };
-
             let engine = async move {
                 // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
                 let data_source = arced_schema
@@ -294,7 +196,29 @@ impl QueryEngine {
                 let preview_features = arced_schema.configuration.preview_features();
 
                 let executor_fut = async {
-                    let executor = load_executor(self.connector_mode, data_source, preview_features, &url).await?;
+                    let connector_kind = match self.connector_mode {
+                        ConnectorMode::Rust => {
+                            let url = data_source
+                                .load_url_with_config_dir(&builder.native.config_dir, |key| {
+                                    builder.native.env.get(key).map(ToString::to_string)
+                                })
+                                .map_err(|err| {
+                                    crate::error::ApiError::Conversion(
+                                        err,
+                                        builder.schema.db.source_assert_single().to_owned(),
+                                    )
+                                })?;
+                            ConnectorKind::Rust {
+                                url,
+                                datasource: data_source,
+                            }
+                        }
+                        ConnectorMode::Js { ref adapter } => ConnectorKind::Js {
+                            adapter: Arc::clone(adapter),
+                            _phantom: PhantomData,
+                        },
+                    };
+                    let executor = load_executor(connector_kind, preview_features).await?;
                     let connector = executor.primary_connector();
 
                     let conn_span = tracing::info_span!(
@@ -303,9 +227,10 @@ impl QueryEngine {
                         "db.type" = connector.name(),
                     );
 
-                    connector.get_connection().instrument(conn_span).await?;
+                    let conn = connector.get_connection().instrument(conn_span).await?;
+                    let database_version = conn.version().await;
 
-                    crate::Result::<_>::Ok(executor)
+                    crate::Result::<_>::Ok((executor, database_version))
                 };
 
                 let query_schema_span = tracing::info_span!("prisma:engine:schema");
@@ -316,16 +241,23 @@ impl QueryEngine {
                     })
                     .instrument(query_schema_span);
 
-                let (query_schema, executor) = tokio::join!(query_schema_fut, executor_fut);
+                let (query_schema, executor_with_db_version) = tokio::join!(query_schema_fut, executor_fut);
+                let (executor, db_version) = executor_with_db_version?;
+
+                let query_schema = query_schema.unwrap().with_db_version_supports_join_strategy(
+                    relation_load_strategy::db_version_supports_joins_strategy(db_version)?,
+                );
 
                 Ok(ConnectedEngine {
                     schema: builder.schema.clone(),
-                    query_schema: Arc::new(query_schema.unwrap()),
-                    executor: executor?,
-                    config_dir: builder.config_dir.clone(),
-                    env: builder.env.clone(),
-                    metrics: self.logger.metrics(),
+                    query_schema: Arc::new(query_schema),
+                    executor,
                     engine_protocol: builder.engine_protocol,
+                    native: ConnectedEngineNative {
+                        config_dir: builder.native.config_dir.clone(),
+                        env: builder.native.env.clone(),
+                        metrics: self.logger.metrics(),
+                    },
                 }) as crate::Result<ConnectedEngine>
             }
             .instrument(span)
@@ -358,9 +290,11 @@ impl QueryEngine {
 
                 let builder = EngineBuilder {
                     schema: engine.schema.clone(),
-                    config_dir: engine.config_dir.clone(),
-                    env: engine.env.clone(),
                     engine_protocol: engine.engine_protocol(),
+                    native: EngineBuilderNative {
+                        config_dir: engine.native.config_dir.clone(),
+                        env: engine.native.env.clone(),
+                    },
                 };
 
                 *inner = Inner::Builder(builder);
@@ -458,31 +392,6 @@ impl QueryEngine {
         .await
     }
 
-    #[napi]
-    pub async fn dmmf(&self, trace: String) -> napi::Result<String> {
-        async_panic_to_js_error(async {
-            let inner = self.inner.read().await;
-            let engine = inner.as_engine()?;
-
-            let dispatcher = self.logger.dispatcher();
-
-            tracing::dispatcher::with_default(&dispatcher, || {
-                let span = tracing::info_span!("prisma:engine:dmmf");
-                let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
-                let _guard = span.enter();
-                let dmmf = dmmf::render_dmmf(&engine.query_schema);
-
-                let json = {
-                    let _span = tracing::info_span!("prisma:engine:dmmf_to_json").entered();
-                    serde_json::to_string(&dmmf)?
-                };
-
-                Ok(json)
-            })
-        })
-        .await
-    }
-
     /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
     #[napi]
     pub async fn rollback_transaction(&self, tx_id: String, _trace: String) -> napi::Result<String> {
@@ -523,7 +432,7 @@ impl QueryEngine {
             let engine = inner.as_engine()?;
             let options: MetricOptions = serde_json::from_str(&json_options)?;
 
-            if let Some(metrics) = &engine.metrics {
+            if let Some(metrics) = &engine.native.metrics {
                 if options.is_json_format() {
                     let engine_metrics = metrics.to_json(options.global_labels);
                     let res = serde_json::to_string(&engine_metrics)?;
@@ -540,44 +449,6 @@ impl QueryEngine {
         })
         .await
     }
-}
-
-fn map_known_error(err: query_core::CoreError) -> crate::Result<String> {
-    let user_error: user_facing_errors::Error = err.into();
-    let value = serde_json::to_string(&user_error)?;
-
-    Ok(value)
-}
-
-fn stringify_env_values(origin: serde_json::Value) -> crate::Result<HashMap<String, String>> {
-    use serde_json::Value;
-
-    let msg = match origin {
-        Value::Object(map) => {
-            let mut result: HashMap<String, String> = HashMap::new();
-
-            for (key, val) in map.into_iter() {
-                match val {
-                    Value::Null => continue,
-                    Value::String(val) => {
-                        result.insert(key, val);
-                    }
-                    val => {
-                        result.insert(key, val.to_string());
-                    }
-                }
-            }
-
-            return Ok(result);
-        }
-        Value::Null => return Ok(Default::default()),
-        Value::Bool(_) => "Expected an object for the env constructor parameter, got a boolean.",
-        Value::Number(_) => "Expected an object for the env constructor parameter, got a number.",
-        Value::String(_) => "Expected an object for the env constructor parameter, got a string.",
-        Value::Array(_) => "Expected an object for the env constructor parameter, got an array.",
-    };
-
-    Err(ApiError::JsonDecode(msg.to_string()))
 }
 
 async fn async_panic_to_js_error<F, R>(fut: F) -> napi::Result<R>

@@ -42,7 +42,7 @@ impl<'a> ScalarFilterParser<'a> {
     }
 
     pub fn parse(&self, mut filter_map: ParsedInputMap<'_>) -> QueryGraphBuilderResult<Vec<Filter>> {
-        let json_path: Option<JsonFilterPath> = match filter_map.remove(filters::PATH) {
+        let json_path: Option<JsonFilterPath> = match filter_map.swap_remove(filters::PATH) {
             Some(v) => Some(parse_json_path(v)?),
             _ => None,
         };
@@ -439,11 +439,11 @@ impl<'a> ScalarFilterParser<'a> {
 
         match input {
             ParsedInputValue::Map(mut map) => {
-                let field_ref_name = map.remove(filters::UNDERSCORE_REF).unwrap();
+                let field_ref_name = map.swap_remove(filters::UNDERSCORE_REF).unwrap();
                 let field_ref_name = PrismaValue::try_from(field_ref_name)?.into_string().unwrap();
                 let field_ref = field.container().find_field(&field_ref_name);
 
-                let container_ref_name = map.remove(filters::UNDERSCORE_CONTAINER).unwrap();
+                let container_ref_name = map.swap_remove(filters::UNDERSCORE_CONTAINER).unwrap();
                 let container_ref_name = PrismaValue::try_from(container_ref_name)?.into_string().unwrap();
 
                 if container_ref_name != field.container().name() {
@@ -517,7 +517,7 @@ impl<'a> ScalarFilterParser<'a> {
 
         match input {
             ParsedInputValue::Map(mut map) => {
-                let field_ref_name = map.remove(filters::UNDERSCORE_REF).unwrap();
+                let field_ref_name = map.swap_remove(filters::UNDERSCORE_REF).unwrap();
                 let field_ref_name = PrismaValue::try_from(field_ref_name)?.into_string().unwrap();
                 let field_ref = field.container().find_field(&field_ref_name);
 

@@ -4,6 +4,7 @@ use crate::{
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
+use psl::parser_database::Files;
 use query_core::{protocol::EngineProtocol, schema};
 use request_handlers::{dmmf, RequestBody, RequestHandler};
 use std::{env, sync::Arc};
@@ -22,6 +23,7 @@ pub struct DmmfRequest {
 
 pub struct GetConfigRequest {
     config: psl::Configuration,
+    files: Files,
     ignore_env_var_errors: bool,
 }
 
@@ -51,10 +53,14 @@ impl CliCommand {
                     schema: opts.schema(true)?,
                     enable_raw_queries: opts.enable_raw_queries,
                 }))),
-                CliOpt::GetConfig(input) => Ok(Some(CliCommand::GetConfig(GetConfigRequest {
-                    config: opts.configuration(input.ignore_env_var_errors)?,
-                    ignore_env_var_errors: input.ignore_env_var_errors,
-                }))),
+                CliOpt::GetConfig(input) => {
+                    let (files, config) = opts.configuration(input.ignore_env_var_errors)?;
+                    Ok(Some(CliCommand::GetConfig(GetConfigRequest {
+                        config,
+                        files,
+                        ignore_env_var_errors: input.ignore_env_var_errors,
+                    })))
+                }
                 CliOpt::ExecuteRequest(input) => {
                     let schema = opts.schema(false)?;
 
@@ -102,7 +108,7 @@ impl CliCommand {
 
         config.resolve_datasource_urls_query_engine(&[], |key| env::var(key).ok(), req.ignore_env_var_errors)?;
 
-        let json = psl::get_config::config_to_mcf_json_value(config);
+        let json = psl::get_config::config_to_mcf_json_value(config, &req.files);
         let serialized = serde_json::to_string(&json)?;
 
         println!("{serialized}");

@@ -1,6 +1,6 @@
 use query_engine_tests::test_suite;
 
-#[test_suite(capabilities(MultiSchema), exclude(Mysql, Vitess("planetscale.js")))]
+#[test_suite(capabilities(MultiSchema))]
 mod multi_schema {
     use query_engine_tests::*;
 
@@ -434,7 +434,7 @@ mod multi_schema {
         insta::assert_snapshot!(
           run_query!(&runner, r#"
                 query {
-                    findManyCategoriesOnPosts(where: {postId: {gt: 0}}) {
+                    findManyCategoriesOnPosts(orderBy: [{ postId: asc }, { categoryId: asc }], where: {postId: {gt: 0}}) {
                       category {
                         name
                       },

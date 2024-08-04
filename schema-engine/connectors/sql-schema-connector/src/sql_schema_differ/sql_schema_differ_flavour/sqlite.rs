@@ -4,7 +4,7 @@ use crate::{
     sql_schema_differ::differ_database::DifferDatabase,
 };
 
-use sql_schema_describer::{sqlite::SQLITE_SYSTEM_TABLES, walkers::TableColumnWalker, ColumnTypeFamily};
+use sql_schema_describer::{sqlite::SPATIALITE_IGNORED_TABLES, walkers::TableColumnWalker, ColumnTypeFamily};
 
 impl SqlSchemaDifferFlavour for SqliteFlavour {
     fn can_rename_foreign_key(&self) -> bool {
@@ -65,10 +65,10 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
     }
 
     fn table_should_be_ignored(&self, table_name: &str) -> bool {
-        SQLITE_SYSTEM_TABLES.is_match(table_name)
+        SPATIALITE_IGNORED_TABLES.is_match(table_name)
     }
 
     fn view_should_be_ignored(&self, view_name: &str) -> bool {
-        SQLITE_SYSTEM_TABLES.is_match(view_name)
+        SPATIALITE_IGNORED_TABLES.is_match(view_name)
     }
 }

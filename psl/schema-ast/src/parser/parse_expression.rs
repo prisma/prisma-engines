@@ -4,17 +4,21 @@ use super::{
     Rule,
 };
 use crate::ast::*;
-use diagnostics::{DatamodelError, Diagnostics};
+use diagnostics::{DatamodelError, Diagnostics, FileId};
 
-pub(crate) fn parse_expression(token: Pair<'_>, diagnostics: &mut diagnostics::Diagnostics) -> Expression {
+pub(crate) fn parse_expression(
+    token: Pair<'_>,
+    diagnostics: &mut diagnostics::Diagnostics,
+    file_id: FileId,
+) -> Expression {
     let first_child = token.into_inner().next().unwrap();
-    let span = Span::from(first_child.as_span());
+    let span = Span::from((file_id, first_child.as_span()));
     match first_child.as_rule() {
         Rule::numeric_literal => Expression::NumericValue(first_child.as_str().to_string(), span),
-        Rule::string_literal => Expression::StringValue(parse_string_literal(first_child, diagnostics), span),
+        Rule::string_literal => Expression::StringValue(parse_string_literal(first_child, diagnostics, file_id), span),
         Rule::path => Expression::ConstantValue(first_child.as_str().to_string(), span),
-        Rule::function_call => parse_function(first_child, diagnostics),
-        Rule::array_expression => parse_array(first_child, diagnostics),
+        Rule::function_call => parse_function(first_child, diagnostics, file_id),
+        Rule::array_expression => parse_array(first_child, diagnostics, file_id),
         _ => unreachable!(
             "Encountered impossible literal during parsing: {:?}",
             first_child.tokens()
@@ -22,7 +26,7 @@ pub(crate) fn parse_expression(token: Pair<'_>, diagnostics: &mut diagnostics::D
     }
 }
 
-fn parse_function(pair: Pair<'_>, diagnostics: &mut Diagnostics) -> Expression {
+fn parse_function(pair: Pair<'_>, diagnostics: &mut Diagnostics, file_id: FileId) -> Expression {
     let mut name: Option<String> = None;
     let mut arguments = ArgumentsList::default();
     let (pair_str, span) = (pair.as_str(), pair.as_span());
@@ -30,32 +34,32 @@ fn parse_function(pair: Pair<'_>, diagnostics: &mut Diagnostics) -> Expression {
     for current in pair.into_inner() {
         match current.as_rule() {
             Rule::path => name = Some(current.as_str().to_string()),
-            Rule::arguments_list => parse_arguments_list(current, &mut arguments, diagnostics),
+            Rule::arguments_list => parse_arguments_list(current, &mut arguments, diagnostics, file_id),
             _ => parsing_catch_all(&current, "function"),
         }
     }
 
     match name {
-        Some(name) => Expression::Function(name, arguments, Span::from(span)),
+        Some(name) => Expression::Function(name, arguments, Span::from((file_id, span))),
         _ => unreachable!("Encountered impossible function during parsing: {:?}", pair_str),
     }
 }
 
-fn parse_array(token: Pair<'_>, diagnostics: &mut Diagnostics) -> Expression {
+fn parse_array(token: Pair<'_>, diagnostics: &mut Diagnostics, file_id: FileId) -> Expression {
     let mut elements: Vec<Expression> = vec![];
     let span = token.as_span();
 
     for current in token.into_inner() {
         match current.as_rule() {
-            Rule::expression => elements.push(parse_expression(current, diagnostics)),
+            Rule::expression => elements.push(parse_expression(current, diagnostics, file_id)),
             _ => parsing_catch_all(&current, "array"),
         }
     }
 
-    Expression::Array(elements, Span::from(span))
+    Expression::Array(elements, Span::from((file_id, span)))
 }
 
-fn parse_string_literal(token: Pair<'_>, diagnostics: &mut Diagnostics) -> String {
+fn parse_string_literal(token: Pair<'_>, diagnostics: &mut Diagnostics, file_id: FileId) -> String {
     assert!(token.as_rule() == Rule::string_literal);
     let contents = token.clone().into_inner().next().unwrap();
     let contents_str = contents.as_str();
@@ -98,6 +102,7 @@ fn parse_string_literal(token: Pair<'_>, diagnostics: &mut Diagnostics) -> Strin
                         &contents_str[start..],
                         contents.as_span().start() + start,
                         diagnostics,
+                        file_id,
                     );
 
                     if let Some(char) = char {
@@ -109,7 +114,7 @@ fn parse_string_literal(token: Pair<'_>, diagnostics: &mut Diagnostics) -> Strin
                     }
                 }
                 (_, c) => {
-                    let mut final_span: crate::ast::Span = contents.as_span().into();
+                    let mut final_span: crate::ast::Span = (file_id, contents.as_span()).into();
                     final_span.start += start;
                     final_span.end = final_span.start + 1 + c.len_utf8();
                     diagnostics.push_error(DatamodelError::new_static(
@@ -132,11 +137,13 @@ fn try_parse_unicode_codepoint(
     slice: &str,
     slice_offset: usize,
     diagnostics: &mut Diagnostics,
+    file_id: FileId,
 ) -> (usize, Option<char>) {
     let unicode_sequence_error = |consumed| {
         let span = crate::ast::Span {
             start: slice_offset,
             end: (slice_offset + slice.len()).min(slice_offset + consumed),
+            file_id,
         };
         DatamodelError::new_static("Invalid unicode escape sequence.", span)
     };

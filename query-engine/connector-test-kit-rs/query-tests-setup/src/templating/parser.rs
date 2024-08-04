@@ -37,11 +37,10 @@ fn parse_fragment(input: &str) -> IResult<&str, DatamodelFragment> {
     Ok((input, fragment))
 }
 
-fn remove_whitespace<'a, F: 'a, O, E: nom::error::ParseError<&'a str>>(
-    inner: F,
-) -> impl FnMut(&'a str) -> IResult<&'a str, O, E>
+fn remove_whitespace<'a, F, O, E>(inner: F) -> impl FnMut(&'a str) -> IResult<&'a str, O, E>
 where
-    F: Fn(&'a str) -> IResult<&'a str, O, E>,
+    F: 'a + Fn(&'a str) -> IResult<&'a str, O, E>,
+    E: nom::error::ParseError<&'a str>,
 {
     delimited(multispace0, inner, multispace0)
 }

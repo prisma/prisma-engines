@@ -1,0 +1,54 @@
+[
+  {
+    "title": "Add relation attribute for relation field",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 4,
+            "character": 4
+          },
+          "end": {
+            "line": 5,
+            "character": 0
+          }
+        },
+        "severity": 1,
+        "message": "Error parsing attribute \"@relation\": The relation field `forum` on Model `interm` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically."
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/schema.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 4,
+                "character": 18
+              },
+              "end": {
+                "line": 4,
+                "character": 29
+              }
+            },
+            "newText": "@relation(fields: [forumid], references: [id])"
+          },
+          {
+            "range": {
+              "start": {
+                "line": 4,
+                "character": 29
+              },
+              "end": {
+                "line": 5,
+                "character": 0
+              }
+            },
+            "newText": "\nforumid Int?\n"
+          }
+        ]
+      }
+    }
+  }
+]

@@ -1,0 +1,137 @@
+{
+  "enums": [],
+  "models": [
+    {
+      "name": "Post",
+      "dbName": null,
+      "fields": [
+        {
+          "name": "id",
+          "dbName": "_id",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "String",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "title",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "String",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "content",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "String",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "comments",
+          "kind": "object",
+          "isList": true,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Comment",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "primaryKey": null,
+      "uniqueFields": [],
+      "uniqueIndexes": [],
+      "isGenerated": false
+    }
+  ],
+  "types": [
+    {
+      "name": "Comment",
+      "dbName": null,
+      "fields": [
+        {
+          "name": "userId",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "String"
+        },
+        {
+          "name": "content",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "String"
+        }
+      ],
+      "primaryKey": null,
+      "uniqueFields": [],
+      "uniqueIndexes": []
+    }
+  ],
+  "indexes": [
+    {
+      "model": "Post",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "id"
+        }
+      ]
+    },
+    {
+      "model": "Post",
+      "type": "normal",
+      "isDefinedOnField": false,
+      "fields": [
+        {
+          "name": "comments.userId"
+        }
+      ]
+    },
+    {
+      "model": "Post",
+      "type": "fulltext",
+      "isDefinedOnField": false,
+      "fields": [
+        {
+          "name": "title",
+          "sortOrder": "desc"
+        },
+        {
+          "name": "content"
+        }
+      ]
+    }
+  ]
+}

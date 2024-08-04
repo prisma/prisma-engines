@@ -122,17 +122,17 @@ mod geometry_filter_spec {
         geometric_comparison_filters_test(runner).await
     }
 
-    #[connector_test(schema(schema_postgres), db_schemas("public", "test"), only(Postgres("15-postgis")))]
+    #[connector_test(schema(schema_postgres), db_schemas("public", "test"), only(Postgres("16-postgis")))]
     async fn basic_where_postgres(runner: Runner) -> TestResult<()> {
         basic_where_test(runner).await
     }
 
-    #[connector_test(schema(schema_postgres), db_schemas("public", "test"), only(Postgres("15-postgis")))]
+    #[connector_test(schema(schema_postgres), db_schemas("public", "test"), only(Postgres("16-postgis")))]
     async fn where_shorthands_postgres(runner: Runner) -> TestResult<()> {
         where_shorthands_test(runner).await
     }
 
-    #[connector_test(schema(schema_postgres), db_schemas("public", "test"), only(Postgres("15-postgis")))]
+    #[connector_test(schema(schema_postgres), db_schemas("public", "test"), only(Postgres("16-postgis")))]
     async fn geometric_comparison_filters_postgres(runner: Runner) -> TestResult<()> {
         geometric_comparison_filters_test(runner).await
     }

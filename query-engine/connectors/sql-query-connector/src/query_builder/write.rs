@@ -47,6 +47,7 @@ pub(crate) fn create_records_nonempty(
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
     affected_fields: &HashSet<ScalarFieldRef>,
+    selected_fields: Option<&ModelProjection>,
     ctx: &Context<'_>,
 ) -> Insert<'static> {
     // We need to bring all write args into a uniform shape.
@@ -59,6 +60,7 @@ pub(crate) fn create_records_nonempty(
 
             for field in affected_fields.iter() {
                 let value = arg.take_field_value(field.db_name());
+
                 match value {
                     Some(write_op) => {
                         let value: PrismaValue = write_op
@@ -67,7 +69,10 @@ pub(crate) fn create_records_nonempty(
 
                         row.push(field.value(value, ctx).into());
                     }
-
+                    // We can't use `DEFAULT` for SQLite so we provided an explicit `NULL` instead.
+                    None if !field.is_required() && field.default_value().is_none() => {
+                        row.push(Value::null_int32().raw().into())
+                    }
                     None => row.push(default_value()),
                 }
             }
@@ -76,33 +81,42 @@ pub(crate) fn create_records_nonempty(
         })
         .collect();
 
-    let columns = affected_fields
-        .iter()
-        .map(Clone::clone)
-        .collect::<Vec<_>>()
-        .as_columns(ctx);
+    let columns = affected_fields.iter().cloned().collect::<Vec<_>>().as_columns(ctx);
     let insert = Insert::multi_into(model.as_table(ctx), columns);
     let insert = values.into_iter().fold(insert, |stmt, values| stmt.values(values));
     let insert: Insert = insert.into();
-    let insert = insert.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
+    let mut insert = insert.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
+
+    if let Some(selected_fields) = selected_fields {
+        insert = insert.returning(projection_into_columns(selected_fields, ctx));
+    }
 
     if skip_duplicates {
-        insert.on_conflict(OnConflict::DoNothing)
-    } else {
-        insert
+        insert = insert.on_conflict(OnConflict::DoNothing)
     }
+
+    insert
 }
 
 /// `INSERT` empty records statement.
-pub(crate) fn create_records_empty(model: &Model, skip_duplicates: bool, ctx: &Context<'_>) -> Insert<'static> {
+pub(crate) fn create_records_empty(
+    model: &Model,
+    skip_duplicates: bool,
+    selected_fields: Option<&ModelProjection>,
+    ctx: &Context<'_>,
+) -> Insert<'static> {
     let insert: Insert<'static> = Insert::single_into(model.as_table(ctx)).into();
-    let insert = insert.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
+    let mut insert = insert.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
+
+    if let Some(selected_fields) = selected_fields {
+        insert = insert.returning(projection_into_columns(selected_fields, ctx));
+    }
 
     if skip_duplicates {
-        insert.on_conflict(OnConflict::DoNothing)
-    } else {
-        insert
+        insert = insert.on_conflict(OnConflict::DoNothing);
     }
+
+    insert
 }
 
 pub(crate) fn build_update_and_set_query(
@@ -189,6 +203,28 @@ pub(crate) fn chunk_update_with_ids(
     });
 
     Ok(query)
+}
+
+/// Converts a list of selected fields into an iterator of table columns.
+fn projection_into_columns(
+    selected_fields: &ModelProjection,
+    ctx: &Context<'_>,
+) -> impl Iterator<Item = Column<'static>> {
+    selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true))
+}
+
+pub(crate) fn delete_returning(
+    model: &Model,
+    filter: ConditionTree<'static>,
+    selected_fields: &ModelProjection,
+    ctx: &Context<'_>,
+) -> Query<'static> {
+    Delete::from_table(model.as_table(ctx))
+        .so_that(filter)
+        .returning(projection_into_columns(selected_fields, ctx))
+        .append_trace(&Span::current())
+        .add_trace_id(ctx.trace_id)
+        .into()
 }
 
 pub(crate) fn delete_many_from_filter(

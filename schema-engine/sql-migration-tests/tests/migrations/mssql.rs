@@ -58,6 +58,43 @@ fn shared_default_constraints_are_ignored_issue_5423(api: TestApi) {
 }
 
 #[test_connector(tags(Mssql))]
+fn shared_default_constraints_with_multilines_are_ignored_issue_24275(api: TestApi) {
+    let schema = api.schema_name();
+
+    api.raw_cmd(&format!(
+        r#"
+        /* This is a comment */
+        CREATE DEFAULT [{schema}].dogdog AS 'mugi'
+        "#
+    ));
+
+    api.raw_cmd(&format!(
+        r#"
+            CREATE TABLE [{schema}].dogs (
+                id INT IDENTITY,
+                name NVARCHAR(255) NOT NULL,
+                CONSTRAINT [dogs_pkey] PRIMARY KEY CLUSTERED ([id] ASC)
+            )
+        "#
+    ));
+
+    api.raw_cmd(&format!("sp_bindefault '{schema}.dogdog', '{schema}.dogs.name'"));
+
+    let dm = r#"
+        model dogs {
+            id Int @id @default(autoincrement())
+            name String @db.NVarChar(255)
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm)
+        .migration_id(Some("first"))
+        .send()
+        .assert_green()
+        .assert_no_steps();
+}
+
+#[test_connector(tags(Mssql))]
 fn mssql_apply_migrations_error_output(api: TestApi) {
     let dm = "";
     let migrations_directory = api.create_migrations_directory();
@@ -170,7 +207,10 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
 
     let migration = api.connector_diff(
         DiffTarget::Database,
-        DiffTarget::Datamodel(SourceFile::new_static(target_schema)),
+        DiffTarget::Datamodel(vec![(
+            "schema.prisma".to_string(),
+            SourceFile::new_static(target_schema),
+        )]),
         None,
     );
     let expected = expect![[r#"

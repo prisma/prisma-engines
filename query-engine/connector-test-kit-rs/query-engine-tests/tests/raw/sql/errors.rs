@@ -34,10 +34,13 @@ mod raw_errors {
         Ok(())
     }
 
+    // On driver-adapters, this fails with:
+    // Raw query failed. Code: `22P02`. Message: `ERROR: invalid input syntax for type integer: \\\"{\\\"1\\\"}\\\"`.
+    // See: `list_param_for_scalar_column_should_not_panic_pg_js`
     #[connector_test(
         schema(common_nullable_types),
         only(Postgres),
-        exclude(Postgres("neon.js"), Postgres("pg.js"))
+        exclude(Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"))
     )]
     async fn list_param_for_scalar_column_should_not_panic_quaint(runner: Runner) -> TestResult<()> {
         assert_error!(
@@ -53,7 +56,10 @@ mod raw_errors {
         Ok(())
     }
 
-    #[connector_test(schema(common_nullable_types), only(Postgres("neon.js"), Postgres("pg.js")))]
+    #[connector_test(
+        schema(common_nullable_types),
+        only(Postgres("neon.js", "neon.js.wasm", "pg.js", "pg.js.wasm"))
+    )]
     async fn list_param_for_scalar_column_should_not_panic_pg_js(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,

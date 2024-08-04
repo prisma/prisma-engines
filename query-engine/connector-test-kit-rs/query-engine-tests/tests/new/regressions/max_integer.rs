@@ -157,7 +157,13 @@ mod max_integer {
     // Specific messages are asserted down below for native types.
     // MongoDB is excluded because it automatically upcasts a value as an i64 if doesn't fit in an i32.
     // MySQL 5.6 is excluded because it never overflows but inserts the min or max of the range of the column type instead.
-    #[connector_test(exclude(MongoDb, MySql(5.6)))]
+    // D1 doesn't fail.
+    //
+    // On D1, this panics with
+    // ```
+    // Expected result to return an error, but found success: {"data":{"createOneTest":{"id":1,"int":2147483648}}}
+    // ```
+    #[connector_test(exclude(MongoDb, MySql(5.6), Sqlite("cfd1")))]
     async fn unfitted_int_should_fail(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
@@ -187,7 +193,19 @@ mod max_integer {
         schema.to_owned()
     }
 
-    #[connector_test(schema(overflow_pg), only(Postgres), exclude(Postgres("neon.js"), Postgres("pg.js")))]
+    // Info: `driver-adapters` are currently excluded because they yield a different error message,
+    // coming straight from the database. This is because these "Unable to fit integer value" errors
+    // are only thrown by the native quaint driver, not the underlying database driver.
+    #[connector_test(
+        schema(overflow_pg),
+        only(Postgres),
+        exclude(
+            Postgres("neon.js"),
+            Postgres("pg.js"),
+            Postgres("neon.js.wasm"),
+            Postgres("pg.js.wasm")
+        )
+    )]
     async fn unfitted_int_should_fail_pg_quaint(runner: Runner) -> TestResult<()> {
         // int
         assert_error!(

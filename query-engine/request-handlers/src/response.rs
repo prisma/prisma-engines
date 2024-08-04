@@ -97,7 +97,7 @@ impl GQLResponse {
     }
 
     pub fn take_data(&mut self, key: impl AsRef<str>) -> Option<Item> {
-        self.data.remove(key.as_ref())
+        self.data.swap_remove(key.as_ref())
     }
 
     pub fn errors(&self) -> impl Iterator<Item = &GQLError> {

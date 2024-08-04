@@ -84,9 +84,9 @@ mod many_count_rel {
         Ok(())
     }
 
-    // "Counting with some records and filters" should "not affect the count"
+    // Counting with cursor should not affect the count
     #[connector_test]
-    async fn count_with_filters(runner: Runner) -> TestResult<()> {
+    async fn count_with_cursor(runner: Runner) -> TestResult<()> {
         // 4 comment / 4 categories
         create_row(
             &runner,
@@ -108,6 +108,128 @@ mod many_count_rel {
             }
           }"#),
           @r###"{"data":{"findManyPost":[{"comments":[{"id":1}],"categories":[{"id":1}],"_count":{"comments":4,"categories":4}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // Counting with take should not affect the count
+    #[connector_test]
+    async fn count_with_take(runner: Runner) -> TestResult<()> {
+        // 4 comment / 4 categories
+        create_row(
+            &runner,
+            r#"{
+                  id: 1,
+                  title: "a",
+                  comments: { create: [{id: 1}, {id: 2}, {id: 3}, {id: 4}] },
+                  categories: { create: [{id: 1}, {id: 2}, {id: 3}, {id: 4}] }
+            }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyPost(where: { id: 1 }) {
+              comments(take: 1) { id }
+              categories(take: 1) { id }
+              _count { comments categories }
+            }
+          }"#),
+          @r###"{"data":{"findManyPost":[{"comments":[{"id":1}],"categories":[{"id":1}],"_count":{"comments":4,"categories":4}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // Counting with skip should not affect the count
+    #[connector_test]
+    async fn count_with_skip(runner: Runner) -> TestResult<()> {
+        // 4 comment / 4 categories
+        create_row(
+            &runner,
+            r#"{
+                  id: 1,
+                  title: "a",
+                  comments: { create: [{id: 1}, {id: 2}, {id: 3}, {id: 4}] },
+                  categories: { create: [{id: 1}, {id: 2}, {id: 3}, {id: 4}] }
+            }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyPost(where: { id: 1 }) {
+              comments(skip: 3) { id }
+              categories(skip: 3) { id }
+              _count { comments categories }
+            }
+          }"#),
+          @r###"{"data":{"findManyPost":[{"comments":[{"id":4}],"categories":[{"id":4}],"_count":{"comments":4,"categories":4}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // Counting with filters should not affect the count
+    #[connector_test]
+    async fn count_with_filters(runner: Runner) -> TestResult<()> {
+        // 4 comment / 4 categories
+        create_row(
+            &runner,
+            r#"{
+                  id: 1,
+                  title: "a",
+                  comments: { create: [{id: 1}, {id: 2}, {id: 3}, {id: 4}] },
+                  categories: { create: [{id: 1}, {id: 2}, {id: 3}, {id: 4}] }
+            }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyPost(where: { id: 1 }) {
+              comments(where: { id: 2 }) { id }
+              categories(where: { id: 2 }) { id }
+              _count { comments categories }
+            }
+          }"#),
+          @r###"{"data":{"findManyPost":[{"comments":[{"id":2}],"categories":[{"id":2}],"_count":{"comments":4,"categories":4}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // Counting with distinct should not affect the count
+    #[connector_test]
+    async fn count_with_distinct(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+                  id: 1,
+                  title: "a",
+                  categories: { create: { id: 1 } }
+            }"#,
+        )
+        .await?;
+        create_row(
+            &runner,
+            r#"{
+                  id: 2,
+                  title: "a",
+                  categories: { connect: { id: 1 } }
+            }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"{
+              findManyCategory {
+                posts(distinct: title) { id }
+                _count { posts }
+              }
+            }"#),
+            @r###"{"data":{"findManyCategory":[{"posts":[{"id":1}],"_count":{"posts":2}}]}}"###
         );
 
         Ok(())
@@ -209,6 +331,124 @@ mod many_count_rel {
             }
           } }"#),
           @r###"{"data":{"findManyUser":[{"name":"Bob","posts":[{"title":"Wooow!","comments":[{"body":"Amazing","tags":[{"name":"LALA"},{"name":"LOLO"}],"_count":{"tags":2}}],"tags":[{"name":"A"},{"name":"B"},{"name":"C"}],"_count":{"comments":1,"tags":3}}],"_count":{"posts":1}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(schema_nested))]
+    async fn nested_count_same_field_on_many_levels(runner: Runner) -> TestResult<()> {
+        run_query!(
+            runner,
+            r#"
+            mutation {
+              createOneUser(
+                data: {
+                  id: 1,
+                  name: "Author",
+                  posts: {
+                    create: [
+                      {
+                        id: 1,
+                        title: "good post",
+                        comments: {
+                          create: [
+                            { id: 1, body: "insightful!" },
+                            { id: 2, body: "deep lore uncovered" }
+                          ]
+                        }
+                      },
+                      {
+                        id: 2,
+                        title: "boring post"
+                      }
+                    ]
+                  }
+                }
+              ) {
+                id
+              }
+            }
+            "#
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                r#"
+                query {
+                  findManyPost {
+                    comments {
+                      post {
+                        _count { comments }
+                      }
+                    }
+                    _count { comments }
+                  }
+                }
+                "#
+            ),
+            @r###"{"data":{"findManyPost":[{"comments":[{"post":{"_count":{"comments":2}}},{"post":{"_count":{"comments":2}}}],"_count":{"comments":2}},{"comments":[],"_count":{"comments":0}}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                r#"
+                query {
+                  findManyPost {
+                    comments {
+                      post {
+                        comments { id }
+                        _count { comments }
+                      }
+                    }
+                    _count { comments }
+                  }
+                }
+                "#
+            ),
+            @r###"{"data":{"findManyPost":[{"comments":[{"post":{"comments":[{"id":1},{"id":2}],"_count":{"comments":2}}},{"post":{"comments":[{"id":1},{"id":2}],"_count":{"comments":2}}}],"_count":{"comments":2}},{"comments":[],"_count":{"comments":0}}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                r#"
+                query {
+                  findManyPost {
+                    comments {
+                      post {
+                        comments(where: { id: 1 }) { id }
+                        _count { comments }
+                      }
+                    }
+                    _count { comments }
+                  }
+                }
+                "#
+            ),
+            @r###"{"data":{"findManyPost":[{"comments":[{"post":{"comments":[{"id":1}],"_count":{"comments":2}}},{"post":{"comments":[{"id":1}],"_count":{"comments":2}}}],"_count":{"comments":2}},{"comments":[],"_count":{"comments":0}}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(
+                runner,
+                r#"
+                query {
+                  findManyPost {
+                    comments(where: { id: 1}) {
+                      post {
+                        comments { id }
+                        _count { comments }
+                      }
+                    }
+                    _count { comments }
+                  }
+                }
+                "#
+            ),
+            @r###"{"data":{"findManyPost":[{"comments":[{"post":{"comments":[{"id":1},{"id":2}],"_count":{"comments":2}}}],"_count":{"comments":2}},{"comments":[],"_count":{"comments":0}}]}}"###
         );
 
         Ok(())
@@ -639,6 +879,33 @@ mod many_count_rel {
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findManyTestModel { _count { children(where: { composite: { is: { name: { in: ["A", "C"] } } } }) } } }"#),
           @r###"{"data":{"findManyTestModel":[{"_count":{"children":1}},{"_count":{"children":1}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/23778.
+    #[connector_test]
+    async fn regression_nullable_count_libsql(runner: Runner) -> TestResult<()> {
+        // Create post without any comment
+        create_row(&runner, r#"{ id: 1, title: "Without comments" }"#).await?;
+
+        // Create post with a comment
+        create_row(
+            &runner,
+            r#"{ id: 2, title: "With comments", comments: { create: { id: 1 } } }"#,
+        )
+        .await?;
+
+        // Nullable counts should be COALESCE'd to 0.
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+          findManyPost(orderBy: {id: "asc"}) {
+            _count { comments }
+          }
+        }
+        "#),
+          @r###"{"data":{"findManyPost":[{"_count":{"comments":0}},{"_count":{"comments":1}}]}}"###
         );
 
         Ok(())

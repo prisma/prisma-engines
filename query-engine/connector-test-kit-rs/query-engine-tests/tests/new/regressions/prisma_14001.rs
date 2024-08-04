@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), exclude(Sqlite))]
+#[test_suite(schema(schema))]
 mod prisma_14001 {
     fn schema() -> String {
         r#"

@@ -6,6 +6,7 @@ use std::borrow::Cow;
 pub struct Delete<'a> {
     pub(crate) table: Table<'a>,
     pub(crate) conditions: Option<ConditionTree<'a>>,
+    pub(crate) returning: Option<Vec<Column<'a>>>,
     pub(crate) comment: Option<Cow<'a, str>>,
 }
 
@@ -35,6 +36,7 @@ impl<'a> Delete<'a> {
         Self {
             table: table.into(),
             conditions: None,
+            returning: None,
             comment: None,
         }
     }
@@ -75,6 +77,26 @@ impl<'a> Delete<'a> {
         T: Into<ConditionTree<'a>>,
     {
         self.conditions = Some(conditions.into());
+        self
+    }
+
+    /// Sets the returned columns.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Delete::from_table("users").returning(vec!["id"]);
+    /// let (sql, _) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("DELETE FROM `users` RETURNING \"id\"", sql);
+    /// # Ok(())
+    /// # }
+    pub fn returning<K, I>(mut self, columns: I) -> Self
+    where
+        K: Into<Column<'a>>,
+        I: IntoIterator<Item = K>,
+    {
+        self.returning = Some(columns.into_iter().map(|k| k.into()).collect());
         self
     }
 }

@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use quaint::{prelude::Queryable, single::Quaint};
 
 use super::*;
@@ -49,13 +51,12 @@ impl TryFrom<&str> for SqlServerVersion {
     }
 }
 
-impl ToString for SqlServerVersion {
-    fn to_string(&self) -> String {
+impl Display for SqlServerVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            SqlServerVersion::V2017 => "2017",
-            SqlServerVersion::V2019 => "2019",
-            SqlServerVersion::V2022 => "2022",
+            SqlServerVersion::V2017 => f.write_str("2017"),
+            SqlServerVersion::V2019 => f.write_str("2019"),
+            SqlServerVersion::V2022 => f.write_str("2022"),
         }
-        .to_owned()
     }
 }

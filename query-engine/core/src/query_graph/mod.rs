@@ -795,8 +795,8 @@ impl QueryGraph {
                 selected_fields: identifiers.merge(primary_model_id.clone()),
                 nested: vec![],
                 selection_order: vec![],
-                aggregation_selections: vec![],
                 options: QueryOptions::none(),
+                relation_load_strategy: query_structure::RelationLoadStrategy::Query,
             });
 
             let reload_query = Query::Read(read_query);
@@ -888,8 +888,9 @@ impl QueryGraph {
                 continue;
             }
 
-            // No connector supports returning more than the primary identifier for a delete just yet.
-            if query.is_delete_one() {
+            // If the connector does not support returning more than the primary identifier for a delete,
+            // do not update the selection set.
+            if query.is_delete_one() && !capabilities.contains(ConnectorCapability::DeleteReturning) {
                 continue;
             }
 

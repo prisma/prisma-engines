@@ -19,6 +19,9 @@ fn register_panic_hook() {
     static SET_HOOK: Once = Once::new();
 
     SET_HOOK.call_once(|| {
+        #[cfg(feature = "wasm-logger")]
+        wasm_logger::init(wasm_logger::Config::default());
+
         panic::set_hook(Box::new(|info| {
             let message = &info.to_string();
             prisma_set_wasm_panic_message(message);
@@ -29,14 +32,14 @@ fn register_panic_hook() {
 #[wasm_bindgen]
 pub fn format(schema: String, params: String) -> String {
     register_panic_hook();
-    prisma_fmt::format(&schema, &params)
+    prisma_fmt::format(schema, &params)
 }
 
 /// Docs: https://prisma.github.io/prisma-engines/doc/prisma_fmt/fn.get_config.html
 #[wasm_bindgen]
-pub fn get_config(params: String) -> Result<String, JsError> {
+pub fn get_config(params: String) -> String {
     register_panic_hook();
-    prisma_fmt::get_config(params).map_err(|e| JsError::new(&e))
+    prisma_fmt::get_config(params)
 }
 
 /// Docs: https://prisma.github.io/prisma-engines/doc/prisma_fmt/fn.get_dmmf.html
@@ -44,6 +47,12 @@ pub fn get_config(params: String) -> Result<String, JsError> {
 pub fn get_dmmf(params: String) -> Result<String, JsError> {
     register_panic_hook();
     prisma_fmt::get_dmmf(params).map_err(|e| JsError::new(&e))
+}
+
+#[wasm_bindgen]
+pub fn get_datamodel(params: String) -> Result<String, JsError> {
+    register_panic_hook();
+    prisma_fmt::get_datamodel(params).map_err(|e| JsError::new(&e))
 }
 
 #[wasm_bindgen]
@@ -56,6 +65,12 @@ pub fn lint(input: String) -> String {
 pub fn validate(params: String) -> Result<(), JsError> {
     register_panic_hook();
     prisma_fmt::validate(params).map_err(|e| JsError::new(&e))
+}
+
+#[wasm_bindgen]
+pub fn merge_schemas(input: String) -> Result<String, JsError> {
+    register_panic_hook();
+    prisma_fmt::merge_schemas(input).map_err(|e| JsError::new(&e))
 }
 
 #[wasm_bindgen]
@@ -77,17 +92,17 @@ pub fn preview_features() -> String {
 }
 
 /// The API is modelled on an LSP [completion
-/// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_completion).
+/// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#completion-request-leftwards_arrow_with_hook).
 /// Input and output are both JSON, the request being a `CompletionParams` object and the response
 /// being a `CompletionList` object.
 #[wasm_bindgen]
-pub fn text_document_completion(schema: String, params: String) -> String {
+pub fn text_document_completion(schema_files: String, params: String) -> String {
     register_panic_hook();
-    prisma_fmt::text_document_completion(schema, &params)
+    prisma_fmt::text_document_completion(schema_files, &params)
 }
 
 /// This API is modelled on an LSP [code action
-/// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_codeAction=).
+/// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#code-action-request-leftwards_arrow_with_hook).
 /// Input and output are both JSON, the request being a
 /// `CodeActionParams` object and the response being a list of
 /// `CodeActionOrCommand` objects.
@@ -97,16 +112,30 @@ pub fn code_actions(schema: String, params: String) -> String {
     prisma_fmt::code_actions(schema, &params)
 }
 
+/// This API is modelled on an LSP [references
+/// request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#find-references-request-leftwards_arrow_with_hook).
+/// Input and output are both JSON, the request being a
+/// `CodeActionParams` object and the response being a list of
+/// `CodeActionOrCommand` objects.
+#[wasm_bindgen]
+pub fn references(schema: String, params: String) -> String {
+    register_panic_hook();
+    prisma_fmt::references(schema, &params)
+}
+
+/// This api is modelled on an LSP [hover request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#hover-request-leftwards_arrow_with_hook).
+/// Input and output are both JSON, the request being a `HoverParams` object
+/// and the response being a `Hover` object.
+#[wasm_bindgen]
+pub fn hover(schema_files: String, params: String) -> String {
+    register_panic_hook();
+    prisma_fmt::hover(schema_files, &params)
+}
+
 /// Trigger a panic inside the wasm module. This is only useful in development for testing panic
 /// handling.
 #[wasm_bindgen]
 pub fn debug_panic() {
     register_panic_hook();
     panic!("This is the panic triggered by `prisma_fmt::debug_panic()`");
-}
-
-#[cfg(feature = "wasm_logger")]
-#[wasm_bindgen]
-pub fn enable_logs() {
-    wasm_logger::init(wasm_logger::Config::default());
 }

@@ -231,6 +231,12 @@ impl From<MysqlError> for Error {
                 builder.set_original_message(error.message);
                 builder.build()
             }
+            1040 | 1203 => {
+                let mut builder = Error::builder(ErrorKind::TooManyConnections(error.clone().into()));
+                builder.set_original_code(format!("{code}"));
+                builder.set_original_message(error.message);
+                builder.build()
+            }
             _ => {
                 let kind = ErrorKind::QueryError(
                     MysqlAsyncError::Server(MysqlError {

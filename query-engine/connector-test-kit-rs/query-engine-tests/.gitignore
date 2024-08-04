@@ -1,0 +1,4 @@
+node_modules/
+
+# wrangler is used for testing the D1 adapter
+.wrangler

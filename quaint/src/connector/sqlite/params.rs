@@ -3,8 +3,6 @@
 use crate::error::{Error, ErrorKind};
 use std::{convert::TryFrom, path::Path, time::Duration};
 
-pub(crate) const DEFAULT_SQLITE_SCHEMA_NAME: &str = "main";
-
 /// Wraps a connection url and exposes the parsing logic used by Quaint,
 /// including default values.
 #[derive(Debug)]
@@ -95,7 +93,7 @@ impl TryFrom<&str> for SqliteParams {
             Ok(Self {
                 connection_limit,
                 file_path: path_str.to_owned(),
-                db_name: DEFAULT_SQLITE_SCHEMA_NAME.to_owned(),
+                db_name: super::DEFAULT_SQLITE_DATABASE.to_owned(),
                 socket_timeout,
                 max_connection_lifetime,
                 max_idle_connection_lifetime,

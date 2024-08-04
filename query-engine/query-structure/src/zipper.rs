@@ -10,6 +10,7 @@ pub struct Zipper<I> {
 }
 
 impl<I: PartialEq> PartialEq for Zipper<I> {
+    #[allow(unconditional_recursion)]
     fn eq(&self, other: &Self) -> bool {
         self.id.eq(&other.id)
     }

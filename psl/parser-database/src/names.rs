@@ -5,7 +5,7 @@ pub use reserved_model_names::is_reserved_type_name;
 use crate::{
     ast::{self, ConfigBlockProperty, TopId, WithAttributes, WithIdentifier, WithName, WithSpan},
     types::ScalarType,
-    Context, DatamodelError, StringId,
+    Context, DatamodelError, FileId, StringId,
 };
 use reserved_model_names::{validate_enum_name, validate_model_name};
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
@@ -14,13 +14,13 @@ use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 #[derive(Default)]
 pub(super) struct Names {
     /// Models, enums, composite types and type aliases
-    pub(super) tops: HashMap<StringId, TopId>,
+    pub(super) tops: HashMap<StringId, crate::TopId>,
     /// Generators have their own namespace.
-    pub(super) generators: HashMap<StringId, TopId>,
+    pub(super) generators: HashMap<StringId, crate::TopId>,
     /// Datasources have their own namespace.
-    pub(super) datasources: HashMap<StringId, TopId>,
-    pub(super) model_fields: HashMap<(ast::ModelId, StringId), ast::FieldId>,
-    pub(super) composite_type_fields: HashMap<(ast::CompositeTypeId, StringId), ast::FieldId>,
+    pub(super) datasources: HashMap<StringId, crate::TopId>,
+    pub(super) model_fields: HashMap<(crate::ModelId, StringId), ast::FieldId>,
+    pub(super) composite_type_fields: HashMap<(crate::CompositeTypeId, StringId), ast::FieldId>,
 }
 
 /// `resolve_names()` is responsible for populating `ParserDatabase.names` and
@@ -35,13 +35,13 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
     let mut tmp_names: HashSet<&str> = HashSet::default(); // throwaway container for duplicate checking
     let mut names = Names::default();
 
-    for (top_id, top) in ctx.ast.iter_tops() {
+    for ((file_id, top_id), top) in ctx.iter_tops() {
         assert_is_not_a_reserved_scalar_type(top.identifier(), ctx);
 
         let namespace = match (top_id, top) {
             (_, ast::Top::Enum(ast_enum)) => {
                 tmp_names.clear();
-                validate_identifier(&ast_enum.name, "Enum", ctx);
+                validate_identifier(ast_enum.identifier(), "Enum", ctx);
                 validate_enum_name(ast_enum, ctx.diagnostics);
                 validate_attribute_identifiers(ast_enum, ctx);
 
@@ -51,7 +51,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
 
                     if !tmp_names.insert(&value.name.name) {
                         ctx.push_error(DatamodelError::new_duplicate_enum_value_error(
-                            &ast_enum.name.name,
+                            ast_enum.name(),
                             &value.name.name,
                             value.span,
                         ))
@@ -70,7 +70,11 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                     validate_attribute_identifiers(field, ctx);
                     let field_name_id = ctx.interner.intern(field.name());
 
-                    if names.model_fields.insert((model_id, field_name_id), field_id).is_some() {
+                    if names
+                        .model_fields
+                        .insert(((file_id, model_id), field_name_id), field_id)
+                        .is_some()
+                    {
                         ctx.push_error(DatamodelError::new_duplicate_field_error(
                             model.name(),
                             field.name(),
@@ -92,7 +96,11 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                     validate_attribute_identifiers(field, ctx);
                     let field_name_id = ctx.interner.intern(field.name());
 
-                    if names.model_fields.insert((model_id, field_name_id), field_id).is_some() {
+                    if names
+                        .model_fields
+                        .insert(((file_id, model_id), field_name_id), field_id)
+                        .is_some()
+                    {
                         ctx.push_error(DatamodelError::new_duplicate_field_error(
                             model.name(),
                             field.name(),
@@ -112,7 +120,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                     // Check that there is no duplicate field on the composite type
                     if names
                         .composite_type_fields
-                        .insert((ctid, field_name_id), field_id)
+                        .insert(((file_id, ctid), field_name_id), field_id)
                         .is_some()
                     {
                         ctx.push_error(DatamodelError::new_composite_type_duplicate_field_error(
@@ -136,16 +144,22 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
             _ => unreachable!(),
         };
 
-        insert_name(top_id, top, namespace, ctx)
+        insert_name(file_id, top_id, top, namespace, ctx)
     }
 
     let _ = std::mem::replace(ctx.names, names);
 }
 
-fn insert_name(top_id: TopId, top: &ast::Top, namespace: &mut HashMap<StringId, TopId>, ctx: &mut Context<'_>) {
+fn insert_name(
+    file_id: FileId,
+    top_id: TopId,
+    top: &ast::Top,
+    namespace: &mut HashMap<StringId, (FileId, TopId)>,
+    ctx: &mut Context<'_>,
+) {
     let name = ctx.interner.intern(top.name());
-    if let Some(existing) = namespace.insert(name, top_id) {
-        ctx.push_error(duplicate_top_error(&ctx.ast[existing], top));
+    if let Some(existing_top) = namespace.insert(name, (file_id, top_id)) {
+        ctx.push_error(duplicate_top_error(&ctx.asts[existing_top], top));
     }
 }
 
@@ -159,7 +173,7 @@ fn duplicate_top_error(existing: &ast::Top, duplicate: &ast::Top) -> DatamodelEr
 }
 
 fn assert_is_not_a_reserved_scalar_type(ident: &ast::Identifier, ctx: &mut Context<'_>) {
-    if ScalarType::try_from_str(&ident.name).is_some() {
+    if ScalarType::try_from_str(&ident.name, false).is_some() {
         ctx.push_error(DatamodelError::new_reserved_scalar_type_error(&ident.name, ident.span));
     }
 }
@@ -172,11 +186,11 @@ fn check_for_duplicate_properties<'a>(
 ) {
     tmp_names.clear();
     for arg in props {
-        if !tmp_names.insert(&arg.name.name) {
+        if !tmp_names.insert(arg.name()) {
             ctx.push_error(DatamodelError::new_duplicate_config_key_error(
                 &format!("{} \"{}\"", top.get_type(), top.name()),
-                &arg.name.name,
-                arg.name.span,
+                arg.name(),
+                arg.identifier().span,
             ));
         }
     }

@@ -1,6 +1,4 @@
-use super::compare::{GeometryCompare, GeometryType};
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
-use super::compare::{JsonCompare, JsonType};
+use super::compare::{GeometryCompare, GeometryType, JsonCompare, JsonType};
 use crate::ast::*;
 use query::SelectQuery;
 use std::borrow::Cow;
@@ -44,6 +42,7 @@ impl<'a> Expression<'a> {
         }
     }
 
+    #[cfg(feature = "mysql")]
     pub(crate) fn is_json_expr(&self) -> bool {
         match &self.kind {
             ExpressionKind::Parameterized(Value {
@@ -467,7 +466,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::Raw(Box::new(self), raw_comparator.into(), Box::new(right.into()))
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_contains<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -475,7 +473,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::JsonCompare(JsonCompare::ArrayContains(Box::new(self), Box::new(item.into())))
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_not_contains<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -483,7 +480,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::JsonCompare(JsonCompare::ArrayNotContains(Box::new(self), Box::new(item.into())))
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_begins_with<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -493,7 +489,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::Equals(Box::new(array_starts_with), Box::new(item.into()))
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_not_begins_with<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -503,7 +498,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::NotEquals(Box::new(array_starts_with), Box::new(item.into()))
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_ends_into<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -513,7 +507,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::Equals(Box::new(array_ends_into), Box::new(item.into()))
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_array_not_ends_into<T>(self, item: T) -> Compare<'a>
     where
         T: Into<Expression<'a>>,
@@ -523,7 +516,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::NotEquals(Box::new(array_ends_into), Box::new(item.into()))
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_type_equals<T>(self, json_type: T) -> Compare<'a>
     where
         T: Into<JsonType<'a>>,
@@ -531,7 +523,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::JsonCompare(JsonCompare::TypeEquals(Box::new(self), json_type.into()))
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn json_type_not_equals<T>(self, json_type: T) -> Compare<'a>
     where
         T: Into<JsonType<'a>>,
@@ -597,7 +588,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::GeometryCompare(GeometryCompare::NotIntersects(Box::new(self), Box::new(geom.into())))
     }
 
-    #[cfg(feature = "postgresql")]
     fn matches<T>(self, query: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -605,7 +595,6 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::Matches(Box::new(self), query.into())
     }
 
-    #[cfg(feature = "postgresql")]
     fn not_matches<T>(self, query: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -613,12 +602,10 @@ impl<'a> Comparable<'a> for Expression<'a> {
         Compare::NotMatches(Box::new(self), query.into())
     }
 
-    #[cfg(feature = "postgresql")]
     fn any(self) -> Compare<'a> {
         Compare::Any(Box::new(self))
     }
 
-    #[cfg(feature = "postgresql")]
     fn all(self) -> Compare<'a> {
         Compare::All(Box::new(self))
     }

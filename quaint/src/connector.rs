@@ -9,21 +9,33 @@
 //! implement the [Queryable](trait.Queryable.html) trait for generalized
 //! querying interface.
 
+mod column_type;
 mod connection_info;
 
+pub mod external;
 pub mod metrics;
+#[cfg(native)]
+pub mod native;
 mod queryable;
 mod result_set;
 #[cfg(any(feature = "mssql-native", feature = "postgresql-native", feature = "mysql-native"))]
 mod timeout;
 mod transaction;
+#[cfg(not(target_arch = "wasm32"))]
 mod type_identifier;
 
 pub use self::result_set::*;
+pub use column_type::*;
 pub use connection_info::*;
+
+#[cfg(native)]
+pub use native::*;
+
+pub use external::*;
 pub use queryable::*;
 pub use transaction::*;
-#[cfg(any(feature = "mssql-native", feature = "postgresql-native", feature = "mysql-native"))]
+
+#[cfg(native)]
 #[allow(unused_imports)]
 pub(crate) use type_identifier::*;
 

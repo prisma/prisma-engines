@@ -21,7 +21,9 @@ mod prisma_17103 {
         schema.to_owned()
     }
 
-    #[connector_test(exclude(Vitess("planetscale.js")))]
+    // On PlanetScale, this fails with:
+    // "Expected 1 records to be connected after connect operation on one-to-many relation 'AToB', found 0."
+    #[connector_test(exclude(Vitess("planetscale.js", "planetscale.js.wasm")))]
     async fn regression(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,

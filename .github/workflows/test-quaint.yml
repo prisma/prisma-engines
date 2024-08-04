@@ -1,12 +1,13 @@
-name: Test Quaint
+name: "Quaint: integration tests"
 on:
   push:
     branches:
       - main
   pull_request:
     paths:
-      - 'quaint/**'
-  
+      - "quaint/**"
+      - "!.github/workflows/test-quaint.yml"
+
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -15,15 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         features:
-          - "--lib --features=all"
-          - "--lib --no-default-features --features=sqlite"
-          - "--lib --no-default-features --features=sqlite --features=pooled"
-          - "--lib --no-default-features --features=postgresql"
-          - "--lib --no-default-features --features=postgresql --features=pooled"
-          - "--lib --no-default-features --features=mysql"
-          - "--lib --no-default-features --features=mysql --features=pooled"
-          - "--lib --no-default-features --features=mssql"
-          - "--lib --no-default-features --features=mssql --features=pooled"          
+          - "--lib --features=all-native"
     env:
       TEST_MYSQL: "mysql://root:prisma@localhost:3306/prisma"
       TEST_MYSQL8: "mysql://root:prisma@localhost:3307/prisma"
@@ -34,9 +27,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
@@ -45,11 +38,11 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ matrix.features }}
 
       - name: Start Databases
-        run: docker-compose -f docker-compose.yml up -d
+        run: docker compose -f docker-compose.yml up -d
         working-directory: ./quaint
 
       - name: Sleep for 20s
-        uses: juliangruber/sleep-action@v1
+        uses: juliangruber/sleep-action@v2
         with:
           time: 20s
 

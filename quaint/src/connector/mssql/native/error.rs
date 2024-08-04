@@ -1,4 +1,4 @@
-use crate::error::{DatabaseConstraint, Error, ErrorKind};
+use crate::error::{DatabaseConstraint, Error, ErrorKind, NativeErrorKind};
 use tiberius::error::IoErrorKind;
 
 impl From<tiberius::error::Error> for Error {
@@ -8,17 +8,19 @@ impl From<tiberius::error::Error> for Error {
                 kind: IoErrorKind::UnexpectedEof,
                 message,
             } => {
-                let mut builder = Error::builder(ErrorKind::ConnectionClosed);
+                let mut builder = Error::builder(ErrorKind::Native(NativeErrorKind::ConnectionClosed));
                 builder.set_original_message(message);
                 builder.build()
             }
-            e @ tiberius::error::Error::Io { .. } => Error::builder(ErrorKind::ConnectionError(e.into())).build(),
+            e @ tiberius::error::Error::Io { .. } => {
+                Error::builder(ErrorKind::Native(NativeErrorKind::ConnectionError(e.into()))).build()
+            }
             tiberius::error::Error::Tls(message) => {
                 let message = format!(
                     "The TLS settings didn't allow the connection to be established. Please review your connection string. (error: {message})"
                 );
 
-                Error::builder(ErrorKind::TlsError { message }).build()
+                Error::builder(ErrorKind::Native(NativeErrorKind::TlsError { message })).build()
             }
             tiberius::error::Error::Server(e) if [3902u32, 3903u32, 3971u32].iter().any(|code| e.code() == *code) => {
                 let kind = ErrorKind::TransactionAlreadyClosed(e.message().to_string());
@@ -227,6 +229,13 @@ impl From<tiberius::error::Error> for Error {
             tiberius::error::Error::Server(e) if e.code() == 3903 => {
                 let mut builder = Error::builder(ErrorKind::RollbackWithoutBegin);
 
+                builder.set_original_code(format!("{}", e.code()));
+                builder.set_original_message(e.message().to_string());
+
+                builder.build()
+            }
+            tiberius::error::Error::Server(e) if e.code() == 5828 => {
+                let mut builder = Error::builder(ErrorKind::TooManyConnections(e.clone().into()));
                 builder.set_original_code(format!("{}", e.code()));
                 builder.set_original_message(e.message().to_string());
 

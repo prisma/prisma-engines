@@ -8,6 +8,7 @@ mod capabilities;
 mod common;
 mod config;
 mod functions;
+mod multi_file;
 mod parsing;
 mod reformat;
 mod types;

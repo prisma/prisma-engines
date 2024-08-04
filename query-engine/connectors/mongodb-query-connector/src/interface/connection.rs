@@ -6,11 +6,10 @@ use crate::{
 };
 use async_trait::async_trait;
 use connector_interface::{
-    Connection, ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteArgs,
-    WriteOperations,
+    Connection, ConnectionLike, ReadOperations, Transaction, UpdateType, WriteArgs, WriteOperations,
 };
 use mongodb::{ClientSession, Database};
-use query_structure::{prelude::*, SelectionResult};
+use query_structure::{prelude::*, RelationLoadStrategy, SelectionResult};
 use std::collections::HashMap;
 
 pub struct MongoDbConnection {
@@ -41,6 +40,10 @@ impl Connection for MongoDbConnection {
         Ok(tx as Box<dyn Transaction>)
     }
 
+    async fn version(&self) -> Option<String> {
+        None
+    }
+
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {
         self
     }
@@ -56,7 +59,7 @@ impl WriteOperations for MongoDbConnection {
         _selected_fields: FieldSelection,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<SingleRecord> {
-        catch(async move { write::create_record(&self.database, &mut self.session, model, args).await }).await
+        catch(write::create_record(&self.database, &mut self.session, model, args)).await
     }
 
     async fn create_records(
@@ -66,10 +69,25 @@ impl WriteOperations for MongoDbConnection {
         skip_duplicates: bool,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<usize> {
-        catch(
-            async move { write::create_records(&self.database, &mut self.session, model, args, skip_duplicates).await },
-        )
+        catch(write::create_records(
+            &self.database,
+            &mut self.session,
+            model,
+            args,
+            skip_duplicates,
+        ))
         .await
+    }
+
+    async fn create_records_returning(
+        &mut self,
+        _model: &Model,
+        _args: Vec<WriteArgs>,
+        _skip_duplicates: bool,
+        _selected_fields: FieldSelection,
+        _trace_id: Option<String>,
+    ) -> connector_interface::Result<ManyRecords> {
+        unimplemented!()
     }
 
     async fn update_records(
@@ -114,6 +132,7 @@ impl WriteOperations for MongoDbConnection {
             )
             .await?;
 
+            // NOTE: Atomic updates are not yet implemented for MongoDB, so we only return ids.
             let record = result.into_iter().next().map(|id| SingleRecord {
                 record: Record::from(id),
                 field_names: selected_fields
@@ -133,7 +152,30 @@ impl WriteOperations for MongoDbConnection {
         record_filter: connector_interface::RecordFilter,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<usize> {
-        catch(async move { write::delete_records(&self.database, &mut self.session, model, record_filter).await }).await
+        catch(write::delete_records(
+            &self.database,
+            &mut self.session,
+            model,
+            record_filter,
+        ))
+        .await
+    }
+
+    async fn delete_record(
+        &mut self,
+        model: &Model,
+        record_filter: connector_interface::RecordFilter,
+        selected_fields: FieldSelection,
+        _trace_id: Option<String>,
+    ) -> connector_interface::Result<SingleRecord> {
+        catch(write::delete_record(
+            &self.database,
+            &mut self.session,
+            model,
+            record_filter,
+            selected_fields,
+        ))
+        .await
     }
 
     async fn m2m_connect(
@@ -143,8 +185,14 @@ impl WriteOperations for MongoDbConnection {
         child_ids: &[SelectionResult],
         _trace_id: Option<String>,
     ) -> connector_interface::Result<()> {
-        catch(async move { write::m2m_connect(&self.database, &mut self.session, field, parent_id, child_ids).await })
-            .await
+        catch(write::m2m_connect(
+            &self.database,
+            &mut self.session,
+            field,
+            parent_id,
+            child_ids,
+        ))
+        .await
     }
 
     async fn m2m_disconnect(
@@ -154,14 +202,18 @@ impl WriteOperations for MongoDbConnection {
         child_ids: &[SelectionResult],
         _trace_id: Option<String>,
     ) -> connector_interface::Result<()> {
-        catch(
-            async move { write::m2m_disconnect(&self.database, &mut self.session, field, parent_id, child_ids).await },
-        )
+        catch(write::m2m_disconnect(
+            &self.database,
+            &mut self.session,
+            field,
+            parent_id,
+            child_ids,
+        ))
         .await
     }
 
     async fn execute_raw(&mut self, inputs: HashMap<String, PrismaValue>) -> connector_interface::Result<usize> {
-        catch(async move { write::execute_raw(&self.database, &mut self.session, inputs).await }).await
+        catch(write::execute_raw(&self.database, &mut self.session, inputs)).await
     }
 
     async fn query_raw(
@@ -169,8 +221,15 @@ impl WriteOperations for MongoDbConnection {
         model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         query_type: Option<String>,
-    ) -> connector_interface::Result<serde_json::Value> {
-        catch(async move { write::query_raw(&self.database, &mut self.session, model, inputs, query_type).await }).await
+    ) -> connector_interface::Result<RawJson> {
+        catch(write::query_raw(
+            &self.database,
+            &mut self.session,
+            model,
+            inputs,
+            query_type,
+        ))
+        .await
     }
 
     async fn native_upsert_record(
@@ -189,20 +248,16 @@ impl ReadOperations for MongoDbConnection {
         model: &Model,
         filter: &query_structure::Filter,
         selected_fields: &FieldSelection,
-        aggr_selections: &[RelAggregationSelection],
+        _relation_load_strategy: RelationLoadStrategy,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<Option<SingleRecord>> {
-        catch(async move {
-            read::get_single_record(
-                &self.database,
-                &mut self.session,
-                model,
-                filter,
-                selected_fields,
-                aggr_selections,
-            )
-            .await
-        })
+        catch(read::get_single_record(
+            &self.database,
+            &mut self.session,
+            model,
+            filter,
+            selected_fields,
+        ))
         .await
     }
 
@@ -211,20 +266,16 @@ impl ReadOperations for MongoDbConnection {
         model: &Model,
         query_arguments: query_structure::QueryArguments,
         selected_fields: &FieldSelection,
-        aggregation_selections: &[RelAggregationSelection],
+        _relation_load_strategy: RelationLoadStrategy,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<ManyRecords> {
-        catch(async move {
-            read::get_many_records(
-                &self.database,
-                &mut self.session,
-                model,
-                query_arguments,
-                selected_fields,
-                aggregation_selections,
-            )
-            .await
-        })
+        catch(read::get_many_records(
+            &self.database,
+            &mut self.session,
+            model,
+            query_arguments,
+            selected_fields,
+        ))
         .await
     }
 
@@ -234,9 +285,12 @@ impl ReadOperations for MongoDbConnection {
         from_record_ids: &[SelectionResult],
         _trace_id: Option<String>,
     ) -> connector_interface::Result<Vec<(SelectionResult, SelectionResult)>> {
-        catch(async move {
-            read::get_related_m2m_record_ids(&self.database, &mut self.session, from_field, from_record_ids).await
-        })
+        catch(read::get_related_m2m_record_ids(
+            &self.database,
+            &mut self.session,
+            from_field,
+            from_record_ids,
+        ))
         .await
     }
 
@@ -249,18 +303,15 @@ impl ReadOperations for MongoDbConnection {
         having: Option<query_structure::Filter>,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<Vec<connector_interface::AggregationRow>> {
-        catch(async move {
-            aggregate::aggregate(
-                &self.database,
-                &mut self.session,
-                model,
-                query_arguments,
-                selections,
-                group_by,
-                having,
-            )
-            .await
-        })
+        catch(aggregate::aggregate(
+            &self.database,
+            &mut self.session,
+            model,
+            query_arguments,
+            selections,
+            group_by,
+            having,
+        ))
         .await
     }
 }

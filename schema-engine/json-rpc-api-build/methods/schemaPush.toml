@@ -11,8 +11,8 @@ description = "Push the schema ignoring destructive change warnings."
 shape = "bool"
 
 [recordShapes.schemaPushInput.fields.schema]
-description = "The Prisma schema."
-shape = "string"
+description = "The Prisma schema files."
+shape = "SchemasContainer"
 
 [recordShapes.schemaPushOutput]
 description = "Response result for the `schemaPush` method."

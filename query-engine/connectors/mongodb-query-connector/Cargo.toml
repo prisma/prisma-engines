@@ -5,24 +5,25 @@ version = "0.1.0"
 
 [dependencies]
 anyhow = "1.0"
-async-trait = "0.1"
+async-trait.workspace = true
 bigdecimal = "0.3"
 # bson = {version = "1.1.0", features = ["decimal128"]}
 futures = "0.3"
-itertools = "0.10"
-mongodb = "2.3.0"
+itertools.workspace = true
+mongodb = "2.8.0"
 bson = { version = "2.4.0", features = ["chrono-0_4", "uuid-1"] }
-rand = "0.7"
+rand.workspace = true
 regex = "1"
-serde_json = { version = "1.0", features = ["float_roundtrip"] }
+serde_json.workspace = true
 thiserror = "1.0"
 tokio.workspace = true
-tracing = "0.1"
+tracing.workspace = true
 tracing-futures = "0.2"
 uuid.workspace = true
-indexmap = "1.7"
-query-engine-metrics = {path = "../../metrics"}
+indexmap.workspace = true
+query-engine-metrics = { path = "../../metrics" }
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
+derive_more = "0.99.17"
 
 [dependencies.query-structure]
 path = "../../query-structure"
@@ -50,3 +51,6 @@ workspace = true
 [dependencies.user-facing-errors]
 features = ["sql"]
 workspace = true
+
+[dev-dependencies]
+pretty_assertions = "1.4.0"

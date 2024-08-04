@@ -1,0 +1,15 @@
+datasource db {
+  provider = "mysql"
+  url      = "mysql://"
+}
+
+model Post {
+  title      String   @db.VarChar(300)
+  abstract   String   @db.VarChar(3000)
+  slug       String   @unique(sort: Desc, length: 42) @db.VarChar(3000)
+  author     String
+  created_at DateTime
+
+  @@id([title(length: 100), abstract(length: 10)])
+  @@index([author, created_at(sort: Desc)])
+}

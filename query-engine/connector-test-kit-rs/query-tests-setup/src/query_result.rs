@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use query_core::constants::custom_types;
 use request_handlers::{GQLError, PrismaResponse};
 use serde::{Deserialize, Serialize};
@@ -79,10 +81,7 @@ impl QueryResult {
     pub fn assert_failure(&self, err_code: impl Into<Option<usize>>, msg_contains: Option<String>) {
         let err_code: Option<usize> = err_code.into();
         if !self.failed() {
-            panic!(
-                "Expected result to return an error, but found success: {}",
-                self.to_string()
-            );
+            panic!("Expected result to return an error, but found success: {self}");
         }
 
         // 0 is the "do nothing marker"
@@ -107,13 +106,13 @@ impl QueryResult {
                     "Expected error with code `{}` and message `{}`, got: `{}`",
                     err_code.unwrap_or_else(|| "None".to_owned()),
                     msg,
-                    self.to_string()
+                    self
                 );
             } else {
                 panic!(
                     "Expected error with code `{}`, got: `{}`",
                     err_code.unwrap_or_else(|| "None".to_owned()),
-                    self.to_string()
+                    self
                 );
             }
         }
@@ -154,9 +153,9 @@ impl QueryResult {
     }
 }
 
-impl ToString for QueryResult {
-    fn to_string(&self) -> String {
-        serde_json::to_value(&self.response).unwrap().to_string()
+impl Display for QueryResult {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&serde_json::to_value(&self.response).unwrap().to_string())
     }
 }
 

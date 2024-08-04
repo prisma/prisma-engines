@@ -16,6 +16,29 @@ pub struct Sqlite<'a> {
 }
 
 impl<'a> Sqlite<'a> {
+    fn returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
+        if let Some(returning) = returning {
+            if !returning.is_empty() {
+                let values_len = returning.len();
+                self.write(" RETURNING ")?;
+
+                for (i, column) in returning.into_iter().enumerate() {
+                    // Workaround for SQLite parsing bug
+                    // https://sqlite.org/forum/info/6c141f151fa5c444db257eb4d95c302b70bfe5515901cf987e83ed8ebd434c49?t=h
+                    self.surround_with_backticks(&column.name)?;
+                    self.write(" AS ")?;
+                    self.surround_with_backticks(&column.name)?;
+                    if i < (values_len - 1) {
+                        self.write(", ")?;
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> Sqlite<'a> {
     fn visit_order_by(&mut self, direction: &str, value: Expression<'a>) -> visitor::Result {
         self.visit_expression(value)?;
         self.write(format!(" {direction}"))?;
@@ -205,25 +228,10 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             self.visit_upsert(update)?;
         }
 
-        if let Some(returning) = insert.returning {
-            if !returning.is_empty() {
-                let values_len = returning.len();
-                self.write(" RETURNING ")?;
-
-                for (i, column) in returning.into_iter().enumerate() {
-                    //yay https://sqlite.org/forum/info/6c141f151fa5c444db257eb4d95c302b70bfe5515901cf987e83ed8ebd434c49?t=h
-                    self.surround_with_backticks(&column.name)?;
-                    self.write(" AS ")?;
-                    self.surround_with_backticks(&column.name)?;
-                    if i < (values_len - 1) {
-                        self.write(", ")?;
-                    }
-                }
-            }
-        }
+        self.returning(insert.returning)?;
 
         if let Some(comment) = insert.comment {
-            self.write("; ")?;
+            self.write(" ")?;
             self.visit_comment(comment)?;
         }
 
@@ -325,12 +333,10 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         }
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract(&mut self, _json_extract: JsonExtract<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on SQLite")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_array_contains(
         &mut self,
         _left: Expression<'a>,
@@ -340,17 +346,14 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         unimplemented!("JSON filtering is not yet supported on SQLite")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_type_equals(&mut self, _left: Expression<'a>, _json_type: JsonType, _not: bool) -> visitor::Result {
         unimplemented!("JSON_TYPE is not yet supported on SQLite")
     }
 
-    #[cfg(feature = "postgresql")]
     fn visit_text_search(&mut self, _text_search: crate::prelude::TextSearch<'a>) -> visitor::Result {
         unimplemented!("Full-text search is not yet supported on SQLite")
     }
 
-    #[cfg(feature = "postgresql")]
     fn visit_matches(
         &mut self,
         _left: Expression<'a>,
@@ -360,24 +363,28 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         unimplemented!("Full-text search is not yet supported on SQLite")
     }
 
-    #[cfg(feature = "postgresql")]
     fn visit_text_search_relevance(&mut self, _text_search_relevance: TextSearchRelevance<'a>) -> visitor::Result {
         unimplemented!("Full-text search is not yet supported on SQLite")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_last_array_item(&mut self, _extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on SQLite")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_first_array_item(&mut self, _extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on SQLite")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_unquote(&mut self, _json_unquote: JsonUnquote<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on SQLite")
+    }
+
+    fn visit_json_array_agg(&mut self, _array_agg: JsonArrayAgg<'a>) -> visitor::Result {
+        unimplemented!("JSON_AGG is not yet supported on SQLite")
+    }
+
+    fn visit_json_build_object(&mut self, _build_obj: JsonBuildObject<'a>) -> visitor::Result {
+        unimplemented!("JSON_BUILD_OBJECT is not yet supported on SQLite")
     }
 
     fn visit_ordering(&mut self, ordering: Ordering<'a>) -> visitor::Result {
@@ -430,6 +437,60 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 
             Ok(())
         })?;
+
+        Ok(())
+    }
+
+    fn visit_delete(&mut self, delete: Delete<'a>) -> visitor::Result {
+        self.write("DELETE FROM ")?;
+        self.visit_table(delete.table, true)?;
+
+        if let Some(conditions) = delete.conditions {
+            self.write(" WHERE ")?;
+            self.visit_conditions(conditions)?;
+        }
+
+        self.returning(delete.returning)?;
+
+        if let Some(comment) = delete.comment {
+            self.write(" ")?;
+            self.visit_comment(comment)?;
+        }
+
+        Ok(())
+    }
+
+    fn visit_update(&mut self, update: Update<'a>) -> visitor::Result {
+        self.write("UPDATE ")?;
+        self.visit_table(update.table, true)?;
+
+        {
+            self.write(" SET ")?;
+            let pairs = update.columns.into_iter().zip(update.values);
+            let len = pairs.len();
+
+            for (i, (key, value)) in pairs.enumerate() {
+                self.visit_column(key)?;
+                self.write(" = ")?;
+                self.visit_expression(value)?;
+
+                if i < (len - 1) {
+                    self.write(", ")?;
+                }
+            }
+        }
+
+        if let Some(conditions) = update.conditions {
+            self.write(" WHERE ")?;
+            self.visit_conditions(conditions)?;
+        }
+
+        self.returning(update.returning)?;
+
+        if let Some(comment) = update.comment {
+            self.write(" ")?;
+            self.visit_comment(comment)?;
+        }
 
         Ok(())
     }
@@ -859,7 +920,7 @@ mod tests {
 
     #[test]
     fn test_comment_insert() {
-        let expected_sql = "INSERT INTO `users` DEFAULT VALUES; /* trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2' */";
+        let expected_sql = "INSERT INTO `users` DEFAULT VALUES /* trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2' */";
         let query = Insert::single_into("users");
         let insert =
             Insert::from(query).comment("trace_id='5bd66ef5095369c7b0d1f8f4bd33716a', parent_id='c532cb4098ac3dd2'");

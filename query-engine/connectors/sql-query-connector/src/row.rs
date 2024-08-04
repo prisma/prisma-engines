@@ -149,6 +149,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             ValueType::Boolean(Some(b)) => PrismaValue::Boolean(b),
             ValueType::Bytes(Some(bytes)) if bytes.as_ref() == [0u8] => PrismaValue::Boolean(false),
             ValueType::Bytes(Some(bytes)) if bytes.as_ref() == [1u8] => PrismaValue::Boolean(true),
+            ValueType::Double(Some(i)) => PrismaValue::Boolean(i.to_i64().unwrap() != 0),
             _ => return Err(create_error(&p_value)),
         },
         TypeIdentifier::Enum(_) => match p_value.typed {
@@ -176,8 +177,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
                 let ts = value.as_integer().unwrap();
                 let nsecs = ((ts % 1000) * 1_000_000) as u32;
                 let secs = ts / 1000;
-                let naive = chrono::NaiveDateTime::from_timestamp_opt(secs, nsecs).unwrap();
-                let datetime: DateTime<Utc> = DateTime::from_utc(naive, Utc);
+                let datetime = chrono::DateTime::from_timestamp(secs, nsecs).unwrap();
 
                 PrismaValue::DateTime(datetime.into())
             }
@@ -190,12 +190,12 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
                 PrismaValue::DateTime(dt.with_timezone(&Utc).into())
             }
             ValueType::Date(Some(d)) => {
-                let dt = DateTime::<Utc>::from_utc(d.and_hms_opt(0, 0, 0).unwrap(), Utc);
+                let dt = DateTime::<Utc>::from_naive_utc_and_offset(d.and_hms_opt(0, 0, 0).unwrap(), Utc);
                 PrismaValue::DateTime(dt.into())
             }
             ValueType::Time(Some(t)) => {
                 let d = NaiveDate::from_ymd_opt(1970, 1, 1).unwrap();
-                let dt = DateTime::<Utc>::from_utc(d.and_time(t), Utc);
+                let dt = DateTime::<Utc>::from_naive_utc_and_offset(d.and_time(t), Utc);
                 PrismaValue::DateTime(dt.into())
             }
             _ => return Err(create_error(&p_value)),
