@@ -127,7 +127,7 @@ jobs:
 
       - name: Install Spatialite
         if: ${{ matrix.database.name == 'spatialite' }}
-        run: sudo apt install -y libsqlite3-mod-spatialite
+        run: sudo apt install -y libsqlite3-mod-spatialite && echo "SPATIALITE_PATH=mod_spatialite" >> $GITHUB_ENV
   
       - name: "Start ${{ matrix.database.name }}"
         run: make start-${{ matrix.database.name }}
@@ -137,28 +137,24 @@ jobs:
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
-          SPATIALITE_PATH: ${{ matrix.database.name == 'spatialite' && 'mod_spatialite' || null }}
 
       - run: cargo nextest run -p sql-schema-describer
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
-          SPATIALITE_PATH: ${{ matrix.database.name == 'spatialite' && 'mod_spatialite' || null }}
 
       - run: cargo nextest run -p sql-migration-tests
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
-          SPATIALITE_PATH: ${{ matrix.database.name == 'spatialite' && 'mod_spatialite' || null }}
 
       - run: cargo nextest run -p schema-engine-cli
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
-          SPATIALITE_PATH: ${{ matrix.database.name == 'spatialite' && 'mod_spatialite' || null }}
 
       #
       # Vitess tests
