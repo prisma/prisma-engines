@@ -785,4 +785,28 @@ SELECT enum FROM "test_introspect_sql"."model" WHERE id = $1;"#,
 
         expected.assert_debug_eq(&res);
     }
+
+    #[test]
+    fn parse_sql_5() {
+        use expect_test::expect;
+
+        let res = parse_sql_doc(
+            r#"
+            /**
+             * Unhandled multi-line comment
+             */
+            SELECT enum FROM "test_introspect_sql"."model" WHERE id = $1;"#,
+        );
+
+        let expected = expect![[r#"
+            Ok(
+                ParsedSqlDoc {
+                    parameters: [],
+                    description: None,
+                },
+            )
+        "#]];
+
+        expected.assert_debug_eq(&res);
+    }
 }
