@@ -8,4 +8,5 @@ mod introspection;
 mod list_migration_directories;
 mod migrations;
 mod native_types;
+mod query_introspection;
 mod schema_push;

@@ -501,6 +501,13 @@ impl SqlFlavour for MssqlFlavour {
     fn search_path(&self) -> &str {
         self.schema_name()
     }
+
+    fn parse_raw_query<'a>(
+        &'a mut self,
+        _sql: &str,
+    ) -> BoxFuture<'a, ConnectorResult<quaint::connector::ParsedRawQuery>> {
+        unimplemented!("SQL Server support for raw query parsing is not implemented yet.")
+    }
 }
 
 fn with_connection<'a, O, F, C>(state: &'a mut State, f: C) -> BoxFuture<'a, ConnectorResult<O>>

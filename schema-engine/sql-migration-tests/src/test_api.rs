@@ -10,7 +10,10 @@ pub use test_macros::test_connector;
 pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
 
 use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
-use psl::parser_database::SourceFile;
+use psl::{
+    datamodel_connector::NativeTypeInstance,
+    parser_database::{ScalarType, SourceFile},
+};
 use quaint::{
     prelude::{ConnectionInfo, ResultSet},
     Value,
@@ -155,6 +158,37 @@ impl TestApi {
         files: &[(&'a str, &'a str)],
     ) -> EvaluateDataLoss<'a> {
         EvaluateDataLoss::new(&mut self.connector, migrations_directory, files)
+    }
+
+    pub fn introspect_sql<'a>(&'a mut self, name: &'a str, source: &'a str) -> IntrospectSql<'a> {
+        let sanitized = self.sanitize_sql(source);
+
+        IntrospectSql::new(&mut self.connector, name, sanitized)
+    }
+
+    pub fn sanitize_sql(&self, sql: &str) -> String {
+        let mut counter = 1;
+        let mut sql = sql.to_string();
+
+        if self.is_mysql() || self.is_mariadb() || self.is_sqlite() {
+            return sql;
+        }
+
+        while let Some(idx) = sql.find('?') {
+            let replacer = if self.is_postgres() || self.is_cockroach() {
+                format!("${}", counter)
+            } else if self.is_mssql() {
+                format!("@P{}", counter)
+            } else {
+                unimplemented!()
+            };
+
+            sql.replace_range(idx..idx + 1, &replacer);
+
+            counter += 1;
+        }
+
+        sql
     }
 
     /// Returns true only when testing on MSSQL.
@@ -448,6 +482,10 @@ impl TestApi {
         out.push_str(schema);
 
         out
+    }
+
+    pub fn scalar_type_for_native_type(&self, typ: &NativeTypeInstance) -> ScalarType {
+        self.connector.scalar_type_for_native_type(typ)
     }
 }
 

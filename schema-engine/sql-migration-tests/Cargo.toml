@@ -33,3 +33,6 @@ tracing.workspace = true
 tracing-futures = "0.2"
 url.workspace = true
 quaint = { workspace = true, features = ["all-native"] }
+
+[dev-dependencies]
+paste = "1"

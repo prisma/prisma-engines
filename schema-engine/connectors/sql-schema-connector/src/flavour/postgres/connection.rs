@@ -146,6 +146,15 @@ impl Connection {
         self.0.query_raw(sql, params).await.map_err(quaint_err(url))
     }
 
+    pub(super) async fn parse_raw_query(
+        &self,
+        sql: &str,
+        url: &PostgresUrl,
+    ) -> ConnectorResult<quaint::connector::ParsedRawQuery> {
+        tracing::debug!(query_type = "parse_raw_query", sql);
+        self.0.parse_raw_query(sql).await.map_err(quaint_err(url))
+    }
+
     pub(super) async fn apply_migration_script(&mut self, migration_name: &str, script: &str) -> ConnectorResult<()> {
         tracing::debug!(query_type = "raw_cmd", script);
         let client = self.0.client();
