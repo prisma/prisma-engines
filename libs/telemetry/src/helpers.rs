@@ -39,7 +39,6 @@ impl TraceParent {
     pub fn from_remote_context(context: &opentelemetry::Context) -> Option<Self> {
         let span = context.span();
         let span_context = span.span_context();
-        debug_assert!(span_context.is_remote());
 
         if span_context.is_valid() {
             Some(Self {
@@ -62,9 +61,7 @@ impl TraceParent {
         // can handle `traceparent` field (for example, `TraceContextPropagator`).
         let mut extractor = HashMap::new();
         extractor.insert("traceparent".to_string(), self.to_string());
-        let context = opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&extractor));
-        debug_assert!(context.span().span_context().is_remote());
-        context
+        opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&extractor))
     }
 }
 
@@ -81,8 +78,7 @@ pub fn restore_remote_context_from_json_str(serialized: &str) -> opentelemetry::
     // This relies on the fact that global text map propagator was installed that
     // can handle `traceparent` field (for example, `TraceContextPropagator`).
     let trace: HashMap<String, String> = serde_json::from_str(serialized).unwrap_or_default();
-    let context = opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&trace));
-    context
+    opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&trace))
 }
 
 pub enum QueryEngineLogLevel {
