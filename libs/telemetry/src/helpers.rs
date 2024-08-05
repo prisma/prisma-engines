@@ -82,7 +82,6 @@ pub fn restore_remote_context_from_json_str(serialized: &str) -> opentelemetry::
     // can handle `traceparent` field (for example, `TraceContextPropagator`).
     let trace: HashMap<String, String> = serde_json::from_str(serialized).unwrap_or_default();
     let context = opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&trace));
-    debug_assert!(context.span().span_context().is_remote());
     context
 }
 
