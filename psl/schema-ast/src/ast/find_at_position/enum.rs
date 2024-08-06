@@ -1,3 +1,5 @@
+use diagnostics::Span;
+
 use super::{AttributePosition, WithName, WithSpan};
 use crate::ast::{self};
 
@@ -14,7 +16,7 @@ pub enum EnumPosition<'ast> {
     ///     RedPanda
     /// }
     /// ```
-    Name(&'ast str),
+    Name(&'ast str, Span),
     /// In an attribute (attr name, attr index, position).
     /// ```prisma
     /// enum Animal {
@@ -39,7 +41,7 @@ pub enum EnumPosition<'ast> {
 impl<'ast> EnumPosition<'ast> {
     pub(crate) fn new(r#enum: &'ast ast::Enum, position: usize) -> Self {
         if r#enum.name.span.contains(position) {
-            return EnumPosition::Name(r#enum.name());
+            return EnumPosition::Name(r#enum.name(), r#enum.name.span);
         }
 
         for (enum_value_id, value) in r#enum.iter_values() {
@@ -64,9 +66,16 @@ pub enum EnumValuePosition<'ast> {
     /// Nowhere specific inside the value
     Value,
     /// In the name
-    Name(&'ast str),
     /// In an attribute. (name, idx, optional arg)
-    /// In a value.
+    /// ```prisma
+    /// enum Animal {
+    ///     Dog
+    ///     RedPanda @map("red_panda")
+    /// //  ^^^^^^^^
+    /// }
+    /// ```
+    Name(&'ast str, Span),
+    /// In an attribute. (name, idx, optional arg)
     /// ```prisma
     /// enum Animal {
     ///     Dog
@@ -74,44 +83,18 @@ pub enum EnumValuePosition<'ast> {
     /// //           ^^^^^^^^^^^^^^^^^
     /// }
     /// ```
-    Attribute(&'ast str, usize, Option<&'ast str>),
+    Attribute(&'ast str, usize, AttributePosition<'ast>),
 }
 
 impl<'ast> EnumValuePosition<'ast> {
     fn new(value: &'ast ast::EnumValue, position: usize) -> EnumValuePosition<'ast> {
         if value.name.span().contains(position) {
-            return EnumValuePosition::Name(value.name());
+            return EnumValuePosition::Name(value.name(), value.span());
         }
+
         for (attr_idx, attr) in value.attributes.iter().enumerate() {
             if attr.span().contains(position) {
-                // We can't go by Span::contains() because we also care about the empty space
-                // between arguments and that's hard to capture in the pest grammar.
-                let mut spans: Vec<(Option<&str>, ast::Span)> = attr
-                    .arguments
-                    .iter()
-                    .map(|arg| (arg.name.as_ref().map(|n| n.name.as_str()), arg.span()))
-                    .chain(
-                        attr.arguments
-                            .empty_arguments
-                            .iter()
-                            .map(|arg| (Some(arg.name.name.as_str()), arg.name.span())),
-                    )
-                    .collect();
-                spans.sort_by_key(|(_, span)| span.start);
-                let mut arg_name = None;
-
-                for (name, _) in spans.iter().take_while(|(_, span)| span.start < position) {
-                    arg_name = Some(*name);
-                }
-
-                // If the cursor is after a trailing comma, we're not in an argument.
-                if let Some(span) = attr.arguments.trailing_comma {
-                    if position > span.start {
-                        arg_name = None;
-                    }
-                }
-
-                return EnumValuePosition::Attribute(attr.name(), attr_idx, arg_name.flatten());
+                return EnumValuePosition::Attribute(attr.name(), attr_idx, AttributePosition::new(attr, position));
             }
         }
 
