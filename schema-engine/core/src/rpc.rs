@@ -47,6 +47,7 @@ async fn run_command(
         EVALUATE_DATA_LOSS => render(executor.evaluate_data_loss(params.parse()?).await),
         GET_DATABASE_VERSION => render(executor.version(params.parse()?).await),
         INTROSPECT => render(executor.introspect(params.parse()?).await),
+        INTROSPECT_SQL => render(executor.introspect_sql(params.parse()?).await),
         LIST_MIGRATION_DIRECTORIES => render(executor.list_migration_directories(params.parse()?).await),
         MARK_MIGRATION_APPLIED => render(executor.mark_migration_applied(params.parse()?).await),
         MARK_MIGRATION_ROLLED_BACK => render(executor.mark_migration_rolled_back(params.parse()?).await),

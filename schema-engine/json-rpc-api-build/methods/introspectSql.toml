@@ -1,0 +1,67 @@
+[methods.introspectSql]
+description = "Introspect a SQL query and returns type information"
+requestShape = "introspectSqlParams"
+responseShape = "introspectSqlResult"
+
+# Input
+
+[recordShapes.introspectSqlParams]
+description = "Params type for the introspectSql method."
+
+[recordShapes.introspectSqlParams.fields.url]
+shape = "string"
+
+[recordShapes.introspectSqlParams.fields.queries]
+shape = "sqlQueryInput"
+isList = true
+
+[recordShapes.introspectSqlParams.fields.force]
+shape = "bool"
+
+# Result
+
+[recordShapes.introspectSqlResult]
+description = "Result type for the introspectSql method."
+
+[recordShapes.introspectSqlResult.fields.queries]
+shape = "sqlQueryOutput"
+isList = true
+
+# Containers
+
+[recordShapes.sqlQueryInput]
+[recordShapes.sqlQueryInput.fields.name]
+shape = "string"
+[recordShapes.sqlQueryInput.fields.source]
+shape = "string"
+
+[recordShapes.sqlQueryOutput]
+[recordShapes.sqlQueryOutput.fields.name]
+shape = "string"
+[recordShapes.sqlQueryOutput.fields.source]
+shape = "string"
+[recordShapes.sqlQueryOutput.fields.documentation]
+isNullable = true
+shape = "string"
+[recordShapes.sqlQueryOutput.fields.parameters]
+shape = "sqlQueryParameterOutput"
+isList = true
+[recordShapes.sqlQueryOutput.fields.resultColumns]
+shape = "sqlQueryColumnOutput"
+isList = true
+
+[recordShapes.sqlQueryParameterOutput]
+[recordShapes.sqlQueryParameterOutput.fields.name]
+shape = "string"
+[recordShapes.sqlQueryParameterOutput.fields.typ]
+shape = "string"
+[recordShapes.sqlQueryParameterOutput.fields.documentation]
+isNullable = true
+shape = "string"
+
+[recordShapes.sqlQueryColumnOutput]
+[recordShapes.sqlQueryColumnOutput.fields.name]
+shape = "string"
+[recordShapes.sqlQueryColumnOutput.fields.typ]
+shape = "string"
+
