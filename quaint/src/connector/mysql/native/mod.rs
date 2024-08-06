@@ -6,7 +6,7 @@ mod conversion;
 mod error;
 
 pub(crate) use crate::connector::mysql::MysqlUrl;
-use crate::connector::{timeout, ColumnType, IsolationLevel};
+use crate::connector::{timeout, ColumnType, IsolationLevel, ParsedRawColumn, ParsedRawParameter, ParsedRawQuery};
 
 use crate::{
     ast::{Query, Value},
@@ -245,6 +245,25 @@ impl Queryable for Mysql {
 
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         self.query_raw(sql, params).await
+    }
+
+    async fn parse_raw_query(&self, sql: &str) -> crate::Result<ParsedRawQuery> {
+        self.prepared(sql, |stmt| async move {
+            let columns = stmt
+                .columns()
+                .iter()
+                .map(|col| ParsedRawColumn::new_named(col.name_str(), col))
+                .collect();
+            let parameters = stmt
+                .params()
+                .iter()
+                .enumerate()
+                .map(|(idx, col)| ParsedRawParameter::new_unnamed(idx, col))
+                .collect();
+
+            Ok(ParsedRawQuery { columns, parameters })
+        })
+        .await
     }
 
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {

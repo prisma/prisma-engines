@@ -9,6 +9,7 @@ mod database_schema;
 mod destructive_change_checker;
 mod diff;
 mod error;
+mod introspect_sql;
 mod introspection_context;
 mod introspection_result;
 mod migration;
@@ -29,6 +30,7 @@ pub use destructive_change_checker::{
 };
 pub use diff::DiffTarget;
 pub use error::{ConnectorError, ConnectorResult};
+pub use introspect_sql::*;
 pub use introspection_context::{CompositeTypeDepth, IntrospectionContext};
 pub use introspection_result::{IntrospectionResult, ViewDefinition};
 pub use migration::Migration;
