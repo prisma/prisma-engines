@@ -23,6 +23,7 @@ jobs:
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
+          # using head ref rather than merge branch to get original commit message
           ref: ${{ github.event.pull_request.head.sha }}
 
       - uses: ./.github/workflows/include/rust-wasm-setup
