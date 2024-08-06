@@ -1388,15 +1388,13 @@ async fn unsigned_integers_are_handled(api: &mut dyn TestApi) -> crate::Result<(
         .create_temp_table("id int4 auto_increment primary key, big bigint unsigned")
         .await?;
 
-    let insert = Insert::multi_into(&table, ["big"])
-        .values((2,))
-        .values((std::i64::MAX,));
+    let insert = Insert::multi_into(&table, ["big"]).values((2,)).values((i64::MAX,));
     api.conn().insert(insert.into()).await?;
 
     let select = Select::from_table(&table).column("big").order_by("id");
     let roundtripped = api.conn().select(select).await?;
 
-    let expected = &[2, std::i64::MAX];
+    let expected = &[2, i64::MAX];
     let actual: Vec<i64> = roundtripped
         .into_iter()
         .map(|row| row.at(0).unwrap().as_i64().unwrap())
