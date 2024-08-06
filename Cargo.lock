@@ -2533,6 +2533,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
+ "telemetry",
  "thiserror",
  "tokio",
  "tracing",
@@ -3694,6 +3695,7 @@ dependencies = [
  "query-structure",
  "serde",
  "serde_json",
+ "telemetry",
  "thiserror",
  "user-facing-errors",
  "uuid",
@@ -3710,6 +3712,7 @@ dependencies = [
  "crossbeam-channel",
  "crosstarget-utils",
  "cuid",
+ "derive_more",
  "enumflags2",
  "futures",
  "indexmap 2.2.2",
@@ -3725,6 +3728,7 @@ dependencies = [
  "schema",
  "serde",
  "serde_json",
+ "telemetry",
  "thiserror",
  "tokio",
  "tracing",
@@ -3761,6 +3765,7 @@ dependencies = [
  "serial_test",
  "sql-query-connector",
  "structopt",
+ "telemetry",
  "thiserror",
  "tokio",
  "tracing",
@@ -3794,6 +3799,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sql-query-connector",
+ "telemetry",
  "thiserror",
  "tokio",
  "tracing",
@@ -3819,6 +3825,7 @@ dependencies = [
  "query-engine-metrics",
  "serde",
  "serde_json",
+ "telemetry",
  "thiserror",
  "tracing",
  "tracing-futures",
@@ -3872,6 +3879,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sql-query-connector",
+ "telemetry",
  "thiserror",
  "tokio",
  "tracing",
@@ -3932,6 +3940,7 @@ dependencies = [
  "serde-wasm-bindgen",
  "serde_json",
  "sql-query-connector",
+ "telemetry",
  "thiserror",
  "tokio",
  "tracing",
@@ -4001,6 +4010,7 @@ dependencies = [
  "serde_json",
  "sql-query-connector",
  "strip-ansi-escapes",
+ "telemetry",
  "thiserror",
  "tokio",
  "tracing",
@@ -4285,6 +4295,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sql-query-connector",
+ "telemetry",
  "thiserror",
  "tracing",
  "url",
@@ -5062,6 +5073,7 @@ dependencies = [
  "indoc 2.0.3",
  "jsonrpc-core",
  "once_cell",
+ "paste",
  "pretty_assertions",
  "prisma-value",
  "psl",
@@ -5103,6 +5115,7 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "serde_json",
+ "telemetry",
  "thiserror",
  "tokio",
  "tracing",
@@ -5121,6 +5134,7 @@ dependencies = [
  "datamodel-renderer",
  "either",
  "enumflags2",
+ "expect-test",
  "indexmap 2.2.2",
  "indoc 2.0.3",
  "once_cell",
@@ -5318,6 +5332,35 @@ name = "tap"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
+
+[[package]]
+name = "telemetry"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "crossbeam-channel",
+ "crosstarget-utils",
+ "cuid",
+ "derive_more",
+ "enumflags2",
+ "futures",
+ "indexmap 2.2.2",
+ "itertools 0.12.0",
+ "lru 0.7.8",
+ "once_cell",
+ "opentelemetry",
+ "psl",
+ "query-engine-metrics",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "tracing-futures",
+ "tracing-opentelemetry",
+ "tracing-subscriber",
+ "uuid",
+]
 
 [[package]]
 name = "tempfile"
@@ -6079,12 +6122,13 @@ checksum = "711b9620af191e0cdc7468a8d14e709c3dcdb115b36f838e601583af800a370a"
 
 [[package]]
 name = "uuid"
-version = "1.4.1"
+version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "79daa5ed5740825c40b389c5e50312b9c86df53fccd33f281df655642b43869d"
+checksum = "81dfa00651efa65069b0b6b651f4aaa31ba9e3c3ce0137aaad053604ee7e0314"
 dependencies = [
  "getrandom 0.2.11",
  "serde",
+ "wasm-bindgen",
 ]
 
 [[package]]

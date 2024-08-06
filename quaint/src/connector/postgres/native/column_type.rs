@@ -84,6 +84,12 @@ macro_rules! create_pg_mapping {
               }
           }
       }
+
+      impl From<&PostgresType> for ColumnType {
+          fn from(ty: &PostgresType) -> ColumnType {
+              PGColumnType::from_pg_type(&ty).into()
+          }
+      }
   };
 }
 

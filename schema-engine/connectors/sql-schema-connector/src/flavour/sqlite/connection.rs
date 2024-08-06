@@ -2,7 +2,7 @@
 
 pub(crate) use quaint::connector::rusqlite;
 
-use quaint::connector::{ColumnType, GetRow, ToColumnNames};
+use quaint::connector::{ColumnType, GetRow, ParsedRawColumn, ParsedRawParameter, ToColumnNames};
 use schema_connector::{ConnectorError, ConnectorResult};
 use sql_schema_describer::{sqlite as describer, DescriberErrorKind, SqlSchema};
 use std::sync::Mutex;
@@ -71,6 +71,31 @@ impl Connection {
             column_types,
             converted_rows,
         ))
+    }
+
+    pub(super) fn parse_raw_query(&mut self, sql: &str) -> ConnectorResult<quaint::connector::ParsedRawQuery> {
+        tracing::debug!(query_type = "parse_raw_query", sql);
+        let conn = self.0.lock().unwrap();
+        let stmt = conn.prepare_cached(sql).map_err(convert_error)?;
+
+        let parameters = (1..=stmt.parameter_count())
+            .map(|idx| match stmt.parameter_name(idx) {
+                Some(name) => {
+                    // SQLite parameter names are prefixed with a colon. We remove it here so that the js doc parser can match the names.
+                    let name = name.strip_prefix(':').unwrap_or(name);
+
+                    ParsedRawParameter::new_named(name, ColumnType::Unknown)
+                }
+                None => ParsedRawParameter::new_unnamed(idx, ColumnType::Unknown),
+            })
+            .collect();
+        let columns = stmt
+            .columns()
+            .iter()
+            .map(|col| ParsedRawColumn::new_named(col.name(), col))
+            .collect();
+
+        Ok(quaint::connector::ParsedRawQuery { columns, parameters })
     }
 }
 
