@@ -13,7 +13,7 @@ use serde_json::value::RawValue;
 /// directly because:
 /// 1. We need `Eq` implementation
 /// 2. `serde_json::value::RawValue::from_string` may error and we'd like to delay handling of that error to
-/// serialization time
+///    serialization time
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RawJson {
     value: String,

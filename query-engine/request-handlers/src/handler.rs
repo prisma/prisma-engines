@@ -249,12 +249,15 @@ impl<'a> RequestHandler<'a> {
     }
 
     /// Compares two PrismaValues with special comparisons rules needed because user-inputted values are coerced differently than response values.
+    ///
     /// We need this when comparing user-inputted values with query response values in the context of compacted queries.
+    ///
     /// Here are the cases covered:
     /// - DateTime/String: User-input: DateTime / Response: String
     /// - Int/BigInt: User-input: Int / Response: BigInt
     /// - (JSON protocol only) Custom types (eg: { "$type": "BigInt", value: "1" }): User-input: Scalar / Response: Object
     /// - (JSON protocol only) String/Enum: User-input: String / Response: Enum
+    ///
     /// This should likely _not_ be used outside of this specific context.
     fn compare_values(left: &ArgumentValue, right: &ArgumentValue) -> bool {
         match (left, right) {
