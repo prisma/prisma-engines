@@ -736,7 +736,7 @@ async fn returning_update(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
-#[cfg(all(feature = "mssql", feature = "bigdecimal"))]
+#[cfg(feature = "mssql")]
 #[test_each_connector(tags("mssql"))]
 async fn returning_decimal_insert_with_type_defs(api: &mut dyn TestApi) -> crate::Result<()> {
     use bigdecimal::BigDecimal;
