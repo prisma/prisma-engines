@@ -48,7 +48,9 @@ jobs:
 
       - name: Extract Branch Name
         run: |
+          echo "Extracting branch name from: $(git show -s --format=%s)"
           branch="$(git show -s --format=%s | grep -o "DRIVER_ADAPTERS_BRANCH=[^ ]*" | cut -f2 -d=)"
+          echo "branch=$branch"
           if [ -n "$branch" ]; then
             echo "Using $branch branch of driver adapters"
             echo "DRIVER_ADAPTERS_BRANCH=$branch" >> "$GITHUB_ENV"
