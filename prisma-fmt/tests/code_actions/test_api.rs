@@ -90,10 +90,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
             .as_str()
     };
 
-    let diagnostics = match parse_schema_diagnostics(&schema_files, initiating_file_name) {
-        Some(diagnostics) => diagnostics,
-        None => Vec::new(),
-    };
+    let diagnostics = parse_schema_diagnostics(&schema_files, initiating_file_name).unwrap_or_default();
 
     path.clear();
     write!(path, "{SCENARIOS_PATH}/{scenario_name}/result.json").unwrap();

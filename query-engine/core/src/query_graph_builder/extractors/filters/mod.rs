@@ -309,7 +309,7 @@ fn extract_relation_filters(
 
         // Implicit is
         ParsedInputValue::Map(filter_map) => {
-            extract_filter(filter_map, &field.related_model()).map(|filter| vec![field.to_one_related(filter)])
+            extract_filter(filter_map, field.related_model()).map(|filter| vec![field.to_one_related(filter)])
         }
 
         x => Err(QueryGraphBuilderError::InputError(format!(
