@@ -30,7 +30,7 @@ impl ToJsValue for Query {
             };
             arg_types.push(&value);
         }
-        Reflect::set(&object, &JsValue::from(JsString::from("arg_types")), &arg_types)?;
+        Reflect::set(&object, &JsValue::from(JsString::from("argTypes")), &arg_types)?;
 
         Ok(JsValue::from(object))
     }
