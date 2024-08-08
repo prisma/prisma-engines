@@ -83,8 +83,8 @@ impl Connection {
         tracing::debug!(query_type = "parse_raw_query", sql);
         // SQLite only provides type information for _declared_ column types. That means any expression will not contain type information.
         // Sqlx works around this by running an `EXPLAIN` query and inferring types by interpreting sqlite bytecode.
-        // If you're curious, here's what they do: https://github.com/launchbadge/sqlx/blob/16e3f1025ad1e106d1acff05f591b8db62d688e2/sqlx-sqlite/src/connection/explain.rs#L557
-        //
+        // If you're curious, here's the code: https://github.com/launchbadge/sqlx/blob/16e3f1025ad1e106d1acff05f591b8db62d688e2/sqlx-sqlite/src/connection/explain.rs#L557
+        // We use SQLx's as a fallback for when quaint's infers Unknown.
         let describe = sqlx_sqlite::describe_blocking(sql, &params.file_path)
             .map_err(|err| ConnectorError::from_source(err, "Error describing the query."))?;
         let conn = self.0.lock().unwrap();
