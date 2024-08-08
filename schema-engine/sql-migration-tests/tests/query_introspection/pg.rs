@@ -60,30 +60,37 @@ mod common {
                     IntrospectSqlQueryColumnOutput {
                         name: "int",
                         typ: "int",
+                        nullable: false,
                     },
                     IntrospectSqlQueryColumnOutput {
                         name: "string",
                         typ: "string",
+                        nullable: false,
                     },
                     IntrospectSqlQueryColumnOutput {
                         name: "bigint",
                         typ: "bigint",
+                        nullable: false,
                     },
                     IntrospectSqlQueryColumnOutput {
                         name: "float",
                         typ: "double",
+                        nullable: false,
                     },
                     IntrospectSqlQueryColumnOutput {
                         name: "bytes",
                         typ: "bytes",
+                        nullable: false,
                     },
                     IntrospectSqlQueryColumnOutput {
                         name: "bool",
                         typ: "bool",
+                        nullable: false,
                     },
                     IntrospectSqlQueryColumnOutput {
                         name: "dt",
                         typ: "datetime",
+                        nullable: false,
                     },
                 ],
             }
@@ -112,6 +119,7 @@ mod common {
                     IntrospectSqlQueryColumnOutput {
                         name: "int",
                         typ: "int",
+                        nullable: false,
                     },
                 ],
             }
@@ -147,10 +155,12 @@ mod common {
                     IntrospectSqlQueryColumnOutput {
                         name: "id",
                         typ: "int",
+                        nullable: false,
                     },
                     IntrospectSqlQueryColumnOutput {
                         name: "enum",
                         typ: "MyFancyEnum",
+                        nullable: false,
                     },
                 ],
             }
@@ -189,6 +199,7 @@ mod postgres {
                     IntrospectSqlQueryColumnOutput {
                         name: "add",
                         typ: "int",
+                        nullable: false,
                     },
                 ],
             }
@@ -213,6 +224,7 @@ mod postgres {
                     IntrospectSqlQueryColumnOutput {
                         name: "?column?",
                         typ: "int",
+                        nullable: false,
                     },
                 ],
             }
@@ -298,6 +310,7 @@ mod crdb {
                     IntrospectSqlQueryColumnOutput {
                         name: "?column?",
                         typ: "bigint",
+                        nullable: false,
                     },
                 ],
             }
@@ -322,6 +335,7 @@ mod crdb {
                     IntrospectSqlQueryColumnOutput {
                         name: "add",
                         typ: "bigint",
+                        nullable: false,
                     },
                 ],
             }

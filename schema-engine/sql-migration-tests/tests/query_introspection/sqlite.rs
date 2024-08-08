@@ -81,30 +81,37 @@ fn select_sqlite(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "int",
                     typ: "int",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "string",
                     typ: "string",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "bigint",
                     typ: "bigint",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "float",
                     typ: "double",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "bytes",
                     typ: "bytes",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "bool",
                     typ: "bool",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "dt",
                     typ: "datetime",
+                    nullable: false,
                 },
             ],
         }
@@ -133,6 +140,7 @@ fn empty_result(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "int",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -482,6 +490,7 @@ fn subquery(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "int",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -506,10 +515,12 @@ fn left_join(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "parentId",
                     typ: "int",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "childId",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
