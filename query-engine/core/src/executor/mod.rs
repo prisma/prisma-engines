@@ -14,7 +14,6 @@ mod request_context;
 pub use self::{execute_operation::*, interpreting_executor::InterpretingExecutor};
 
 pub(crate) use request_context::*;
-use telemetry::helpers::TraceParent;
 
 use crate::{
     protocol::EngineProtocol, query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef,
@@ -36,7 +35,7 @@ pub trait QueryExecutor: TransactionManager {
         tx_id: Option<TxId>,
         operation: Operation,
         query_schema: QuerySchemaRef,
-        traceparent: Option<TraceParent>,
+        trace_id: Option<String>,
         engine_protocol: EngineProtocol,
     ) -> crate::Result<ResponseData>;
 
@@ -52,7 +51,7 @@ pub trait QueryExecutor: TransactionManager {
         operations: Vec<Operation>,
         transaction: Option<BatchDocumentTransaction>,
         query_schema: QuerySchemaRef,
-        traceparent: Option<TraceParent>,
+        trace_id: Option<String>,
         engine_protocol: EngineProtocol,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>>;
 
@@ -91,7 +90,7 @@ impl TransactionOptions {
     /// Generates a new transaction id before the transaction is started and returns a modified version
     /// of self with the new predefined_id set.
     pub fn with_new_transaction_id(&mut self) -> TxId {
-        let tx_id = TxId::default();
+        let tx_id: TxId = Default::default();
         self.new_tx_id = Some(tx_id.clone());
         tx_id
     }

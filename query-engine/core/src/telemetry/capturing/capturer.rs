@@ -29,20 +29,6 @@ impl Capturer {
 
         Self::Disabled
     }
-
-    pub async fn try_start_capturing(&self) {
-        if let Capturer::Enabled(capturer) = &self {
-            capturer.start_capturing().await
-        }
-    }
-
-    pub async fn try_fetch_captures(&self) -> Option<Storage> {
-        if let Capturer::Enabled(capturer) = &self {
-            capturer.fetch_captures().await
-        } else {
-            None
-        }
-    }
 }
 
 #[derive(Debug, Clone)]

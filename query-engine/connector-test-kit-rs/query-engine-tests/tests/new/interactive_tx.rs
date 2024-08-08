@@ -3,8 +3,6 @@ use std::borrow::Cow;
 
 #[test_suite(schema(generic), exclude(Sqlite("cfd1")))]
 mod interactive_tx {
-    use std::time::{Duration, Instant};
-
     use query_engine_tests::*;
     use tokio::time;
 
@@ -233,9 +231,7 @@ mod interactive_tx {
         let batch_results = runner.batch(queries, false, None).await?;
         batch_results.assert_failure(2002, None);
 
-        let now = Instant::now();
         let res = runner.commit_tx(tx_id.clone()).await?;
-        assert!(now.elapsed() <= Duration::from_millis(5000));
 
         if matches!(runner.connector_version(), ConnectorVersion::MongoDb(_)) {
             assert!(res.is_err());

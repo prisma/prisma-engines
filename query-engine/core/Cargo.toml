@@ -38,7 +38,5 @@ uuid.workspace = true
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
 schema = { path = "../schema" }
 crosstarget-utils = { path = "../../libs/crosstarget-utils" }
-telemetry = { path = "../../libs/telemetry" }
 lru = "0.7.7"
 enumflags2.workspace = true
-derive_more = "0.99.17"

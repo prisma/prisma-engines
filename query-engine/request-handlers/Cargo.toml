@@ -8,7 +8,6 @@ psl.workspace = true
 query-structure = { path = "../query-structure" }
 query-core = { path = "../core" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
-telemetry = { path = "../../libs/telemetry" }
 quaint.workspace = true
 dmmf_crate = { path = "../dmmf", package = "dmmf" }
 itertools.workspace = true

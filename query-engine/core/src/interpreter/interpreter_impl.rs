@@ -8,7 +8,6 @@ use connector::ConnectionLike;
 use futures::future::BoxFuture;
 use query_structure::prelude::*;
 use std::{collections::HashMap, fmt};
-use telemetry::helpers::TraceParent;
 use tracing::Instrument;
 
 #[derive(Debug, Clone)]
@@ -179,7 +178,7 @@ impl<'conn> QueryInterpreter<'conn> {
         exp: Expression,
         env: Env,
         level: usize,
-        traceparent: Option<TraceParent>,
+        trace_id: Option<String>,
     ) -> BoxFuture<'_, InterpretationResult<ExpressionResult>> {
         match exp {
             Expression::Func { func } => {
@@ -187,7 +186,7 @@ impl<'conn> QueryInterpreter<'conn> {
 
                 Box::pin(async move {
                     self.log_line(level, || "execute <lambda function> {");
-                    let result = self.interpret(expr?, env, level + 1, traceparent).await;
+                    let result = self.interpret(expr?, env, level + 1, trace_id).await;
                     self.log_line(level, || "}");
                     result
                 })
@@ -205,7 +204,7 @@ impl<'conn> QueryInterpreter<'conn> {
                     let mut results = Vec::with_capacity(seq.len());
 
                     for expr in seq {
-                        results.push(self.interpret(expr, env.clone(), level + 1, traceparent).await?);
+                        results.push(self.interpret(expr, env.clone(), level + 1, trace_id.clone()).await?);
                         self.log_line(level + 1, || ",");
                     }
 
@@ -228,7 +227,7 @@ impl<'conn> QueryInterpreter<'conn> {
                         self.log_line(level + 1, || format!("{} = {{", &binding.name));
 
                         let result = self
-                            .interpret(binding.expr, env.clone(), level + 2, traceparent)
+                            .interpret(binding.expr, env.clone(), level + 2, trace_id.clone())
                             .await?;
                         inner_env.insert(binding.name, result);
 
@@ -243,7 +242,7 @@ impl<'conn> QueryInterpreter<'conn> {
                     };
 
                     self.log_line(level, || "in {");
-                    let result = self.interpret(next_expression, inner_env, level + 1, traceparent).await;
+                    let result = self.interpret(next_expression, inner_env, level + 1, trace_id).await;
                     self.log_line(level, || "}");
                     result
                 })
@@ -254,7 +253,7 @@ impl<'conn> QueryInterpreter<'conn> {
                     Query::Read(read) => {
                         self.log_line(level, || format!("readExecute {read}"));
                         let span = info_span!("prisma:engine:read-execute");
-                        Ok(read::execute(self.conn, read, None, traceparent)
+                        Ok(read::execute(self.conn, read, None, trace_id)
                             .instrument(span)
                             .await
                             .map(ExpressionResult::Query)?)
@@ -263,7 +262,7 @@ impl<'conn> QueryInterpreter<'conn> {
                     Query::Write(write) => {
                         self.log_line(level, || format!("writeExecute {write}"));
                         let span = info_span!("prisma:engine:write-execute");
-                        Ok(write::execute(self.conn, write, traceparent)
+                        Ok(write::execute(self.conn, write, trace_id)
                             .instrument(span)
                             .await
                             .map(ExpressionResult::Query)?)
@@ -298,10 +297,10 @@ impl<'conn> QueryInterpreter<'conn> {
                 self.log_line(level, || format!("if <lambda condition> = {predicate} {{"));
 
                 let result = if predicate {
-                    self.interpret(Expression::Sequence { seq: then }, env, level + 1, traceparent)
+                    self.interpret(Expression::Sequence { seq: then }, env, level + 1, trace_id)
                         .await
                 } else {
-                    self.interpret(Expression::Sequence { seq: elze }, env, level + 1, traceparent)
+                    self.interpret(Expression::Sequence { seq: elze }, env, level + 1, trace_id)
                         .await
                 };
                 self.log_line(level, || "}");
