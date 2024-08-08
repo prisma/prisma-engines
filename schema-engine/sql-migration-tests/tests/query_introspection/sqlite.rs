@@ -284,7 +284,10 @@ fn unnamed_expr_string(api: TestApi) {
 
     api.introspect_sql("test_1", "SELECT 'hello world';")
         .send_sync()
-        .expect_result(expected)
+        .expect_result(expected);
+
+    api.query_raw("SELECT 'hello world' as `str`;", &[])
+        .assert_single_row(|row| row.assert_text_value("str", "hello world"));
 }
 
 #[test_connector(tags(Sqlite))]
@@ -312,7 +315,10 @@ fn unnamed_expr_bool(api: TestApi) {
 
     api.introspect_sql("test_1", "SELECT 1=1, 1=0;")
         .send_sync()
-        .expect_result(expected)
+        .expect_result(expected);
+
+    api.query_raw("SELECT 1=1 as `true`, 1=0 AS `false`;", &[])
+        .assert_single_row(|row| row.assert_int_value("true", 1).assert_int_value("false", 0));
 }
 
 #[test_connector(tags(Sqlite))]
@@ -344,7 +350,14 @@ fn unnamed_expr_real(api: TestApi) {
 
     api.introspect_sql("test_1", "SELECT 1.2, 2.34567891023, round(2.345);")
         .send_sync()
-        .expect_result(expected)
+        .expect_result(expected);
+
+    api.query_raw("SELECT 1.2 AS a, 2.34567891023 AS b, round(2.345) AS c;", &[])
+        .assert_single_row(|row| {
+            row.assert_float_value("a", 1.2)
+                .assert_float_value("b", 2.34567891023)
+                .assert_float_value("c", 2.0)
+        });
 }
 
 #[test_connector(tags(Sqlite))]
@@ -368,7 +381,10 @@ fn unnamed_expr_blob(api: TestApi) {
 
     api.introspect_sql("test_1", "SELECT unhex('537475666673');")
         .send_sync()
-        .expect_result(expected)
+        .expect_result(expected);
+
+    api.query_raw("SELECT unhex('537475666673') as blob;", &[])
+        .assert_single_row(|row| row.assert_bytes_value("blob", &[83, 116, 117, 102, 102, 115]));
 }
 
 #[test_connector(tags(Sqlite))]
@@ -392,7 +408,10 @@ fn unnamed_expr_date(api: TestApi) {
 
     api.introspect_sql("test_1", "SELECT date('2025-05-29 14:16:00');")
         .send_sync()
-        .expect_result(expected)
+        .expect_result(expected);
+
+    api.query_raw("SELECT date('2025-05-29 14:16:00') as dt;", &[])
+        .assert_single_row(|row| row.assert_text_value("dt", "2025-05-29"));
 }
 
 #[test_connector(tags(Sqlite))]
@@ -416,7 +435,10 @@ fn unnamed_expr_time(api: TestApi) {
 
     api.introspect_sql("test_1", "SELECT time('2025-05-29 14:16:00');")
         .send_sync()
-        .expect_result(expected)
+        .expect_result(expected);
+
+    api.query_raw("SELECT time('2025-05-29 14:16:00') as dt;", &[])
+        .assert_single_row(|row| row.assert_text_value("dt", "14:16:00"));
 }
 
 #[test_connector(tags(Sqlite))]
@@ -440,7 +462,10 @@ fn unnamed_expr_datetime(api: TestApi) {
 
     api.introspect_sql("test_1", "SELECT datetime('2025-05-29 14:16:00');")
         .send_sync()
-        .expect_result(expected)
+        .expect_result(expected);
+
+    api.query_raw("SELECT datetime('2025-05-29 14:16:00') as dt;", &[])
+        .assert_single_row(|row| row.assert_text_value("dt", "2025-05-29 14:16:00"));
 }
 
 #[test_connector(tags(Sqlite))]
