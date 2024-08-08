@@ -43,6 +43,7 @@ either = "1.6"
 sqlformat = "0.2.1"
 sqlparser = "0.32.0"
 versions = "6.1.0"
-
+sqlx-sqlite = { version = "0.8.0", features = ["offline"] }
+sqlx-core = "*"
 [dev-dependencies]
 expect-test = "1"

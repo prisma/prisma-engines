@@ -144,7 +144,7 @@ fn empty_result(api: TestApi) {
 }
 
 #[test_connector(tags(Sqlite))]
-fn unnamed_expr(api: TestApi) {
+fn unnamed_expr_int(api: TestApi) {
     api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
     let expected = expect![[r#"
@@ -156,7 +156,7 @@ fn unnamed_expr(api: TestApi) {
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
                     name: "1 + 1",
-                    typ: "unknown",
+                    typ: "int",
                 },
             ],
         }
@@ -168,7 +168,7 @@ fn unnamed_expr(api: TestApi) {
 }
 
 #[test_connector(tags(Sqlite))]
-fn named_expr(api: TestApi) {
+fn named_expr_int(api: TestApi) {
     api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
     let expected = expect![[r#"
@@ -180,7 +180,7 @@ fn named_expr(api: TestApi) {
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
                     name: "add",
-                    typ: "unknown",
+                    typ: "int",
                 },
             ],
         }
@@ -192,7 +192,7 @@ fn named_expr(api: TestApi) {
 }
 
 #[test_connector(tags(Sqlite))]
-fn mixed_named_expr(api: TestApi) {
+fn mixed_named_expr_int(api: TestApi) {
     api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
     let expected = expect![[r#"
@@ -204,7 +204,7 @@ fn mixed_named_expr(api: TestApi) {
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
                     name: "add",
-                    typ: "unknown",
+                    typ: "int",
                 },
             ],
         }
@@ -216,7 +216,7 @@ fn mixed_named_expr(api: TestApi) {
 }
 
 #[test_connector(tags(Sqlite))]
-fn mixed_unnamed_expr(api: TestApi) {
+fn mixed_unnamed_expr_int(api: TestApi) {
     api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
     let expected = expect![[r#"
@@ -228,7 +228,7 @@ fn mixed_unnamed_expr(api: TestApi) {
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
                     name: "`int` + 1",
-                    typ: "unknown",
+                    typ: "int",
                 },
             ],
         }
@@ -240,7 +240,7 @@ fn mixed_unnamed_expr(api: TestApi) {
 }
 
 #[test_connector(tags(Sqlite))]
-fn mixed_expr_cast(api: TestApi) {
+fn mixed_expr_cast_int(api: TestApi) {
     api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
     let expected = expect![[r#"
@@ -252,13 +252,193 @@ fn mixed_expr_cast(api: TestApi) {
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
                     name: "CAST(`int` + 1 as int)",
-                    typ: "unknown",
+                    typ: "int",
                 },
             ],
         }
     "#]];
 
     api.introspect_sql("test_1", "SELECT CAST(`int` + 1 as int) FROM `model`;")
+        .send_sync()
+        .expect_result(expected)
+}
+
+#[test_connector(tags(Sqlite))]
+fn unnamed_expr_string(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "SELECT 'hello world';",
+            documentation: None,
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "'hello world'",
+                    typ: "string",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT 'hello world';")
+        .send_sync()
+        .expect_result(expected)
+}
+
+#[test_connector(tags(Sqlite))]
+fn unnamed_expr_bool(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "SELECT 1=1, 1=0;",
+            documentation: None,
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "1=1",
+                    typ: "int",
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "1=0",
+                    typ: "int",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT 1=1, 1=0;")
+        .send_sync()
+        .expect_result(expected)
+}
+
+#[test_connector(tags(Sqlite))]
+fn unnamed_expr_real(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "SELECT 1.2, 2.34567891023, round(2.345);",
+            documentation: None,
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "1.2",
+                    typ: "double",
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "2.34567891023",
+                    typ: "double",
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "round(2.345)",
+                    typ: "double",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT 1.2, 2.34567891023, round(2.345);")
+        .send_sync()
+        .expect_result(expected)
+}
+
+#[test_connector(tags(Sqlite))]
+fn unnamed_expr_blob(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "SELECT unhex('537475666673');",
+            documentation: None,
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "unhex('537475666673')",
+                    typ: "bytes",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT unhex('537475666673');")
+        .send_sync()
+        .expect_result(expected)
+}
+
+#[test_connector(tags(Sqlite))]
+fn unnamed_expr_date(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "SELECT date('2025-05-29 14:16:00');",
+            documentation: None,
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "date('2025-05-29 14:16:00')",
+                    typ: "string",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT date('2025-05-29 14:16:00');")
+        .send_sync()
+        .expect_result(expected)
+}
+
+#[test_connector(tags(Sqlite))]
+fn unnamed_expr_time(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "SELECT time('2025-05-29 14:16:00');",
+            documentation: None,
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "time('2025-05-29 14:16:00')",
+                    typ: "string",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT time('2025-05-29 14:16:00');")
+        .send_sync()
+        .expect_result(expected)
+}
+
+#[test_connector(tags(Sqlite))]
+fn unnamed_expr_datetime(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "SELECT datetime('2025-05-29 14:16:00');",
+            documentation: None,
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "datetime('2025-05-29 14:16:00')",
+                    typ: "string",
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT datetime('2025-05-29 14:16:00');")
         .send_sync()
         .expect_result(expected)
 }
