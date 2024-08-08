@@ -19,6 +19,7 @@ pub struct ParsedRawParameter {
 pub struct ParsedRawColumn {
     pub name: String,
     pub typ: ColumnType,
+    pub nullable: bool,
     pub enum_name: Option<String>,
 }
 
@@ -60,6 +61,7 @@ impl ParsedRawColumn {
             name: name.into_owned(),
             typ: typ.into(),
             enum_name: None,
+            nullable: false,
         }
     }
 
@@ -68,11 +70,17 @@ impl ParsedRawColumn {
             name: format!("_{idx}"),
             typ: typ.into(),
             enum_name: None,
+            nullable: false,
         }
     }
 
     pub fn with_enum_name(mut self, enum_name: Option<String>) -> Self {
         self.enum_name = enum_name;
+        self
+    }
+
+    pub fn is_nullable(mut self, nullable: bool) -> Self {
+        self.nullable = nullable;
         self
     }
 }

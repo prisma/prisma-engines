@@ -40,6 +40,7 @@ pub struct IntrospectSqlQueryParameterOutput {
 pub struct IntrospectSqlQueryColumnOutput {
     pub name: String,
     pub typ: String,
+    pub nullable: bool,
 }
 
 impl From<quaint::connector::ParsedRawColumn> for IntrospectSqlQueryColumnOutput {
@@ -47,6 +48,7 @@ impl From<quaint::connector::ParsedRawColumn> for IntrospectSqlQueryColumnOutput
         Self {
             name: item.name,
             typ: item.enum_name.unwrap_or_else(|| item.typ.to_string()),
+            nullable: item.nullable,
         }
     }
 }

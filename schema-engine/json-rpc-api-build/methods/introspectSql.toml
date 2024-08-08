@@ -64,4 +64,6 @@ shape = "string"
 shape = "string"
 [recordShapes.sqlQueryColumnOutput.fields.typ]
 shape = "string"
+[recordShapes.sqlQueryColumnOutput.fields.nullable]
+shape = "bool"
 

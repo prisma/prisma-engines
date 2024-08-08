@@ -14,6 +14,17 @@ model model {
     dt      DateTime
 }"#;
 
+pub(crate) const SIMPLE_NULLABLE_SCHEMA: &str = r#"
+model model {
+    int     Int     @id
+    string  String?
+    bigint  BigInt?
+    float   Float?
+    bytes   Bytes?
+    bool    Boolean?
+    dt      DateTime?
+}"#;
+
 pub(crate) const ENUM_SCHEMA: &str = r#"
 model model {
     id     Int     @id

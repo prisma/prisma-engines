@@ -439,6 +439,7 @@ impl GenericApi for EngineState {
                                     .map(|c| SqlQueryColumnOutput {
                                         name: c.name,
                                         typ: c.typ,
+                                        nullable: c.nullable,
                                     })
                                     .collect(),
                             })
