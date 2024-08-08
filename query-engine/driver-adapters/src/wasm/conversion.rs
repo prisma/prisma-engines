@@ -20,15 +20,8 @@ impl ToJsValue for Query {
         Reflect::set(&object, &JsValue::from(JsString::from("args")), &args)?;
 
         let arg_types = Array::new();
-        for arg_type_opt in &self.arg_types {
-            // We need to unpack `Option<JSArgType>` in place to avoid the "conflicting implementation for `std::option::Option<JSArgType>`" compilation error
-            // when "impl ToJsValue for Option<JSArgType>" exists, or the "method `to_js_value` exists for enum `Option<JSArgType>`, but its trait bounds were not satisfied"
-            // compilation error otherwise.
-            let value = match arg_type_opt {
-                Some(arg_type) => arg_type.to_js_value()?,
-                None => JsValue::null(),
-            };
-            arg_types.push(&value);
+        for arg_type in &self.arg_types {
+            arg_types.push(&arg_type.to_js_value()?);
         }
         Reflect::set(&object, &JsValue::from(JsString::from("argTypes")), &arg_types)?;
 

@@ -1,3 +1,7 @@
+/// `JSArgType` is a 1:1 mapping of [`quaint::ValueType`] that:
+/// - only includes the type tag (e.g. `Int32`, `Text`, `Enum`, etc.)
+/// - doesn't care for the optionality of the actual value (e.g., `quaint::Value::Int32(None)` -> `JSArgType::Int32`)
+/// - is used to guide the JS side on how to serialize the query argument value before sending it to the JS driver.
 #[derive(Debug, PartialEq)]
 pub enum JSArgType {
     /// 32-bit signed integer.
@@ -65,27 +69,25 @@ impl core::fmt::Display for JSArgType {
     }
 }
 
-pub fn value_to_js_arg_type(value: &quaint::Value) -> Option<JSArgType> {
+pub fn value_to_js_arg_type(value: &quaint::Value) -> JSArgType {
     match &value.typed {
-        quaint::ValueType::Int32(Some(_)) => Some(JSArgType::Int32),
-        quaint::ValueType::Int64(Some(_)) => Some(JSArgType::Int64),
-        quaint::ValueType::Float(Some(_)) => Some(JSArgType::Float),
-        quaint::ValueType::Double(Some(_)) => Some(JSArgType::Double),
-        quaint::ValueType::Text(Some(_)) => Some(JSArgType::Text),
-        quaint::ValueType::Enum(Some(_), _) => Some(JSArgType::Enum),
-        quaint::ValueType::EnumArray(Some(_), _) => Some(JSArgType::EnumArray),
-        quaint::ValueType::Bytes(Some(_)) => Some(JSArgType::Bytes),
-        quaint::ValueType::Boolean(Some(_)) => Some(JSArgType::Boolean),
-        quaint::ValueType::Char(Some(_)) => Some(JSArgType::Char),
-        quaint::ValueType::Array(Some(_)) => Some(JSArgType::Array),
-        quaint::ValueType::Numeric(Some(_)) => Some(JSArgType::Numeric),
-        quaint::ValueType::Json(Some(_)) => Some(JSArgType::Json),
-        quaint::ValueType::Xml(Some(_)) => Some(JSArgType::Xml),
-        quaint::ValueType::Uuid(Some(_)) => Some(JSArgType::Uuid),
-        quaint::ValueType::DateTime(Some(_)) => Some(JSArgType::DateTime),
-        quaint::ValueType::Date(Some(_)) => Some(JSArgType::Date),
-        quaint::ValueType::Time(Some(_)) => Some(JSArgType::Time),
-
-        _ => None,
+        quaint::ValueType::Int32(_) => JSArgType::Int32,
+        quaint::ValueType::Int64(_) => JSArgType::Int64,
+        quaint::ValueType::Float(_) => JSArgType::Float,
+        quaint::ValueType::Double(_) => JSArgType::Double,
+        quaint::ValueType::Text(_) => JSArgType::Text,
+        quaint::ValueType::Enum(_, _) => JSArgType::Enum,
+        quaint::ValueType::EnumArray(_, _) => JSArgType::EnumArray,
+        quaint::ValueType::Bytes(_) => JSArgType::Bytes,
+        quaint::ValueType::Boolean(_) => JSArgType::Boolean,
+        quaint::ValueType::Char(_) => JSArgType::Char,
+        quaint::ValueType::Array(_) => JSArgType::Array,
+        quaint::ValueType::Numeric(_) => JSArgType::Numeric,
+        quaint::ValueType::Json(_) => JSArgType::Json,
+        quaint::ValueType::Xml(_) => JSArgType::Xml,
+        quaint::ValueType::Uuid(_) => JSArgType::Uuid,
+        quaint::ValueType::DateTime(_) => JSArgType::DateTime,
+        quaint::ValueType::Date(_) => JSArgType::Date,
+        quaint::ValueType::Time(_) => JSArgType::Time,
     }
 }

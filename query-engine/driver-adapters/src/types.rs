@@ -288,7 +288,7 @@ js_column_type! {
 pub struct Query {
     pub sql: String,
     pub args: Vec<JSArg>,
-    pub arg_types: Vec<Option<JSArgType>>,
+    pub arg_types: Vec<JSArgType>,
 }
 
 #[cfg_attr(not(target_arch = "wasm32"), napi_derive::napi(object))]

@@ -70,7 +70,7 @@ impl JsBaseQueryable {
         let arg_types = values
             .iter()
             .map(conversion::value_to_js_arg_type)
-            .collect::<Vec<Option<conversion::JSArgType>>>();
+            .collect::<Vec<conversion::JSArgType>>();
 
         Ok(Query { sql, args, arg_types })
     }
