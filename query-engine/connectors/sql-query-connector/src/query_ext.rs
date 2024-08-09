@@ -25,18 +25,18 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         idents: &[ColumnMetadata<'_>],
         ctx: &Context<'_>,
     ) -> crate::Result<Vec<SqlRow>> {
-        let span = info_span!("prisma:engine:filter_read_query");
+        let span = info_span!("filter read query");
 
         let otel_ctx = span.context();
         let span_ref = otel_ctx.span();
         let span_ctx = span_ref.span_context();
 
-        let q = match (q, ctx.traceparent) {
+        let q = match (q, ctx.trace_id) {
             (Query::Select(x), _) if span_ctx.trace_flags() == TraceFlags::SAMPLED => {
                 Query::Select(Box::from(x.comment(trace_parent_to_string(span_ctx))))
             }
             // This is part of the required changes to pass a traceid
-            (Query::Select(x), traceparent) => Query::Select(Box::from(x.add_traceparent(traceparent))),
+            (Query::Select(x), trace_id) => Query::Select(Box::from(x.add_trace_id(trace_id))),
             (q, _) => q,
         };
 
@@ -119,7 +119,7 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         let select = Select::from_table(model.as_table(ctx))
             .columns(id_cols)
             .append_trace(&Span::current())
-            .add_traceparent(ctx.traceparent)
+            .add_trace_id(ctx.trace_id)
             .so_that(condition);
 
         self.select_ids(select, model_id, ctx).await

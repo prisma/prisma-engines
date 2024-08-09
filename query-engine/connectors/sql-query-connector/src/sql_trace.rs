@@ -1,6 +1,5 @@
 use opentelemetry::trace::{SpanContext, TraceContextExt, TraceFlags};
 use quaint::ast::{Delete, Insert, Select, Update};
-use telemetry::helpers::TraceParent;
 use tracing::Span;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
@@ -9,12 +8,12 @@ pub fn trace_parent_to_string(context: &SpanContext) -> String {
     let span_id = context.span_id();
 
     // see https://www.w3.org/TR/trace-context/#traceparent-header-field-values
-    format!("traceparent='00-{trace_id:032x}-{span_id:016x}-01'")
+    format!("traceparent='00-{trace_id:032x}-{span_id:032x}-01'")
 }
 
 pub trait SqlTraceComment: Sized {
     fn append_trace(self, span: &Span) -> Self;
-    fn add_traceparent(self, traceparent: Option<TraceParent>) -> Self;
+    fn add_trace_id(self, trace_id: Option<&str>) -> Self;
 }
 
 macro_rules! sql_trace {
@@ -31,17 +30,24 @@ macro_rules! sql_trace {
                     self
                 }
             }
-
             // Temporary method to pass the traceid in an operation
-            fn add_traceparent(self, traceparent: Option<TraceParent>) -> Self {
-                if let Some(traceparent) = traceparent {
-                    self.comment(format!("traceparent='{}'", traceparent))
+            fn add_trace_id(self, trace_id: Option<&str>) -> Self {
+                if let Some(traceparent) = trace_id {
+                    if should_sample(&traceparent) {
+                        self.comment(format!("traceparent='{}'", traceparent))
+                    } else {
+                        self
+                    }
                 } else {
                     self
                 }
             }
         }
     };
+}
+
+fn should_sample(traceparent: &str) -> bool {
+    traceparent.split('-').count() == 4 && traceparent.ends_with("-01")
 }
 
 sql_trace!(Insert<'_>);
