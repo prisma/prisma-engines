@@ -21,7 +21,7 @@ function recorder(adapter: DriverAdapter, recordings: Recordings) {
   return {
     provider: adapter.provider,
     adapterName: adapter.adapterName,
-    startTransaction: () => {
+    transactionContext: () => {
       throw new Error("Not implemented");
     },
     getConnectionInfo: () => {
@@ -43,7 +43,7 @@ function replayer(adapter: DriverAdapter, recordings: Recordings) {
     provider: adapter.provider,
     adapterName: adapter.adapterName,
     recordings: recordings,
-    startTransaction: () => {
+    transactionContext: () => {
       throw new Error("Not implemented");
     },
     getConnectionInfo: () => {
