@@ -53,7 +53,7 @@ impl JsBaseQueryable {
     async fn build_query(&self, sql: &str, values: &[quaint::Value<'_>]) -> quaint::Result<Query> {
         let sql: String = sql.to_string();
 
-        let converter = match self.provider {
+        let args_converter = match self.provider {
             #[cfg(feature = "postgresql")]
             AdapterFlavour::Postgres => conversion::postgres::value_to_js_arg,
             #[cfg(feature = "sqlite")]
@@ -64,10 +64,15 @@ impl JsBaseQueryable {
 
         let args = values
             .iter()
-            .map(converter)
+            .map(args_converter)
             .collect::<serde_json::Result<Vec<conversion::JSArg>>>()?;
 
-        Ok(Query { sql, args })
+        let arg_types = values
+            .iter()
+            .map(conversion::value_to_js_arg_type)
+            .collect::<Vec<conversion::JSArgType>>();
+
+        Ok(Query { sql, args, arg_types })
     }
 }
 

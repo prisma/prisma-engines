@@ -3,13 +3,12 @@ use crate::{interpreter::InterpretationResult, query_ast::*};
 use connector::ConnectionLike;
 use query_structure::*;
 use std::collections::HashMap;
-use telemetry::helpers::TraceParent;
 
 pub(crate) async fn m2m(
     tx: &mut dyn ConnectionLike,
     query: &mut RelatedRecordsQuery,
     parent_result: Option<&ManyRecords>,
-    traceparent: Option<TraceParent>,
+    trace_id: Option<String>,
 ) -> InterpretationResult<ManyRecords> {
     let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
 
@@ -32,7 +31,7 @@ pub(crate) async fn m2m(
     }
 
     let ids = tx
-        .get_related_m2m_record_ids(&query.parent_field, &parent_ids, traceparent)
+        .get_related_m2m_record_ids(&query.parent_field, &parent_ids, trace_id.clone())
         .await?;
     if ids.is_empty() {
         return Ok(ManyRecords::empty(&query.selected_fields));
@@ -71,7 +70,7 @@ pub(crate) async fn m2m(
             args,
             &query.selected_fields,
             RelationLoadStrategy::Query,
-            traceparent,
+            trace_id.clone(),
         )
         .await?
     };
@@ -138,7 +137,7 @@ pub async fn one2m(
     parent_result: Option<&ManyRecords>,
     mut query_args: QueryArguments,
     selected_fields: &FieldSelection,
-    traceparent: Option<TraceParent>,
+    trace_id: Option<String>,
 ) -> InterpretationResult<ManyRecords> {
     let parent_model_id = parent_field.model().primary_identifier();
     let parent_link_id = parent_field.linking_fields();
@@ -209,7 +208,7 @@ pub async fn one2m(
             args,
             selected_fields,
             RelationLoadStrategy::Query,
-            traceparent,
+            trace_id,
         )
         .await?
     };

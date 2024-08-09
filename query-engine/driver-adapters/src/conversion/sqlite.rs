@@ -36,7 +36,7 @@ mod test {
     #[rustfmt::skip]
     fn test_value_to_js_arg() {
         let test_cases = vec![
-           (
+            (
                 // This is different than how mysql or postgres processes integral BigInt values.
                 ValueType::Numeric(Some(1.into())),
                 JSArg::Value(Value::Number("1.0".parse().unwrap()))
