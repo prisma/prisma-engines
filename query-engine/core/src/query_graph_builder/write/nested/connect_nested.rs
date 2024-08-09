@@ -327,7 +327,7 @@ fn handle_one_to_many(
 /// - Parent gets injected with a child on x, because that's what the connect is supposed to do.
 /// - The update runs, the relation is updated.
 /// - Now the check runs, because it's dependent on the parent's ID... but the check finds an existing child and fails...
-/// ... because we just updated the relation.
+///   ... because we just updated the relation.
 ///
 /// This is why we need to have an extra update at the end if it's inlined on the parent and a non-create.
 fn handle_one_to_one(

@@ -946,7 +946,7 @@ fn adding_fulltext_index_to_an_existing_column(api: TestApi) {
         }
     "#};
 
-    api.schema_push(&api.datamodel_with_provider(dm)).send().assert_green();
+    api.schema_push(api.datamodel_with_provider(dm)).send().assert_green();
 
     api.assert_schema()
         .assert_table("A", |table| table.assert_indexes_count(0));
@@ -961,7 +961,7 @@ fn adding_fulltext_index_to_an_existing_column(api: TestApi) {
         }
     "#};
 
-    api.schema_push(&api.datamodel_with_provider(dm)).send().assert_green();
+    api.schema_push(api.datamodel_with_provider(dm)).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_index_on_columns(&["a", "b"], |index| index.assert_is_fulltext())
@@ -980,7 +980,7 @@ fn changing_normal_index_to_a_fulltext_index(api: TestApi) {
         }
     "#};
 
-    api.schema_push(&api.datamodel_with_provider(dm)).send().assert_green();
+    api.schema_push(api.datamodel_with_provider(dm)).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_indexes_count(1);
@@ -997,7 +997,7 @@ fn changing_normal_index_to_a_fulltext_index(api: TestApi) {
         }
     "#};
 
-    api.schema_push(&api.datamodel_with_provider(dm)).send().assert_green();
+    api.schema_push(api.datamodel_with_provider(dm)).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_indexes_count(1);

@@ -18,7 +18,6 @@ use std::borrow::Cow;
 use std::{
     collections::{HashMap, HashSet},
     ops::Deref,
-    usize,
 };
 use user_facing_errors::query_engine::DatabaseConstraint;
 

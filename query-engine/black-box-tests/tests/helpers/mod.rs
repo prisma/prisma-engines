@@ -52,10 +52,7 @@ pub(crate) fn query_engine_cmd(dml: &str) -> (process::Command, String) {
     cmd.env_clear();
 
     let port = generate_free_port();
-    cmd.env("PRISMA_DML", dml)
-        .arg("--port")
-        .arg(&port.to_string())
-        .arg("-g");
+    cmd.env("PRISMA_DML", dml).arg("--port").arg(port.to_string()).arg("-g");
 
     (cmd, format!("http://0.0.0.0:{}", port))
 }

@@ -162,7 +162,7 @@ async fn int_unsigned_negative_value_out_of_range(api: &mut dyn TestApi) -> crat
 
     // Value too big
     {
-        let insert = Insert::multi_into(&table, ["big"]).values((std::i64::MAX,));
+        let insert = Insert::multi_into(&table, ["big"]).values((i64::MAX,));
         let result = api.conn().insert(insert.into()).await;
 
         assert!(matches!(result.unwrap_err().kind(), ErrorKind::ValueOutOfRange { .. }));

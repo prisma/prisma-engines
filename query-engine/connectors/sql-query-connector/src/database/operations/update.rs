@@ -9,7 +9,6 @@ use crate::{Context, QueryExt, Queryable};
 use connector_interface::*;
 use itertools::Itertools;
 use query_structure::*;
-use std::usize;
 
 /// Performs an update with an explicit selection set.
 /// This function is called for connectors that supports the `UpdateReturning` capability.

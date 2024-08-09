@@ -136,14 +136,15 @@ pub fn hover(schema_files: String, params: &str) -> String {
 
 /// The two parameters are:
 /// - The [`SchemaFileInput`] to reformat, as a string.
-/// - An LSP
-/// [DocumentFormattingParams](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_formatting) object, as JSON.
+/// - An LSP [`DocumentFormattingParams`][1] object, as JSON.
 ///
 /// The function returns the formatted schema, as a string.
 /// If the schema or any of the provided parameters is invalid, the function returns the original schema.
 /// This function never panics.
 ///
 /// Of the DocumentFormattingParams, we only take into account tabSize, at the moment.
+///
+/// [1]: https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#textDocument_formatting
 pub fn format(datamodel: String, params: &str) -> String {
     let schema: SchemaFileInput = match serde_json::from_str(&datamodel) {
         Ok(params) => params,

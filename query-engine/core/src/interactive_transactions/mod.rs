@@ -22,7 +22,7 @@ pub(crate) use messages::*;
 /// process and waits for messages to arrive via its receive channel to process.
 /// The Transaction Actor Manager will also create an ITXClient and add it to hashmap managed by an RwLock. The ITXClient is the only way to communicate
 /// with the ITXServer.
-
+///
 /// Once Prisma Client receives the iTx Id it can perform database operations using that iTx id. When an operation request is received by the
 /// TransactionActorManager, it looks for the client in the hashmap and passes the operation to the client. The ITXClient sends a message to the
 /// ITXServer and waits for a response. The ITXServer will then perform the operation and return the result. The ITXServer will perform one
@@ -31,10 +31,10 @@ pub(crate) use messages::*;
 /// The ITXServer will handle all messages until:
 /// - It transitions state, e.g "rollback" or "commit"
 /// - It exceeds its timeout, in which case the iTx is rolledback and the connection to the database is closed.
-
+///
 /// Once the ITXServer is done handling messages from the iTx Client, it sends a last message to the Background Client list Actor to say that it is completed and then shuts down.
 /// The Background Client list Actor removes the client from the list of active clients and keeps in cache the iTx id of the closed transaction.
-
+///
 /// We keep a list of closed transactions so that if any further messages are received for this iTx id,
 /// the TransactionActorManager can reply with a helpful error message which explains that no operation can be performed on a closed transaction
 /// rather than an error message stating that the transaction does not exist.

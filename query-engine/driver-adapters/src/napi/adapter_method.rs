@@ -13,7 +13,7 @@ use crate::AdapterResult;
 /// - Automatically unrefs the function so it won't hold off event loop
 /// - Awaits for returned Promise
 /// - Unpacks JS `Result` type into Rust `Result` type and converts the error
-/// into `quaint::Error`.
+///   into `quaint::Error`.
 /// - Catches panics and converts them to `quaint:Error`
 pub(crate) struct AdapterMethod<ArgType, ReturnType>
 where
