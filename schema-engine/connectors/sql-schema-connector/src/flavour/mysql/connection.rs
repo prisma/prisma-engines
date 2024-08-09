@@ -133,10 +133,10 @@ impl Connection {
                 .map(|p| p.set_typ(ColumnType::Unknown))
                 .collect();
 
-            Ok(parsed)
-        } else {
-            Ok(parsed)
+            return Ok(parsed);
         }
+
+        Ok(parsed)
     }
 
     pub(super) async fn apply_migration_script(

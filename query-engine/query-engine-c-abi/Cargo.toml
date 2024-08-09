@@ -25,7 +25,7 @@ chrono.workspace = true
 quaint = { path = "../../quaint", default-features = false, features = [
   "sqlite",
 ] }
-rusqlite = "0.29"
+rusqlite = "0.31"
 uuid.workspace = true
 thiserror = "1"
 connection-string.workspace = true
