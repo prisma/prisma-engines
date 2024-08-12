@@ -65,7 +65,7 @@ fn render(result: CoreResult<impl serde::Serialize>) -> jsonrpc_core::Result<jso
 }
 
 fn render_jsonrpc_error(crate_error: CoreError) -> JsonRpcError {
-    serde_json::to_value(&crate_error.to_user_facing())
+    serde_json::to_value(crate_error.to_user_facing())
         .map(|data| JsonRpcError {
             // We separate the JSON-RPC error code (defined by the JSON-RPC spec) from the
             // prisma error code, which is located in `data`.

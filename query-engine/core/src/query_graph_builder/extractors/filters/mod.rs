@@ -193,11 +193,11 @@ where
 /// are merged together to optimize the generated SQL statements.
 /// This is done in three steps (below transformations are using pseudo-code):
 /// 1. We flatten the filter tree.
-/// eg: `Filter(And([ScalarFilter, ScalarFilter], And([ScalarFilter])))` -> `Filter(And([ScalarFilter, ScalarFilter, ScalarFilter]))`
+///    eg: `Filter(And([ScalarFilter, ScalarFilter], And([ScalarFilter])))` -> `Filter(And([ScalarFilter, ScalarFilter, ScalarFilter]))`
 /// 2. We index search filters by their query.
-/// eg: `Filter(And([SearchFilter("query", [FieldA]), SearchFilter("query", [FieldB])]))` -> `{ "query": [FieldA, FieldB] }`
+///    eg: `Filter(And([SearchFilter("query", [FieldA]), SearchFilter("query", [FieldB])]))` -> `{ "query": [FieldA, FieldB] }`
 /// 3. We reconstruct the filter tree and merge the search filters that have the same query along the way
-/// eg: `Filter(And([SearchFilter("query", [FieldA]), SearchFilter("query", [FieldB])]))` -> `Filter(And([SearchFilter("query", [FieldA, FieldB])]))`
+///    eg: `Filter(And([SearchFilter("query", [FieldA]), SearchFilter("query", [FieldB])]))` -> `Filter(And([SearchFilter("query", [FieldA, FieldB])]))`
 fn merge_search_filters(filter: Filter) -> Filter {
     // The filter tree _needs_ to be flattened for the merge to work properly
     let flattened = fold_filter(filter);
@@ -309,7 +309,7 @@ fn extract_relation_filters(
 
         // Implicit is
         ParsedInputValue::Map(filter_map) => {
-            extract_filter(filter_map, &field.related_model()).map(|filter| vec![field.to_one_related(filter)])
+            extract_filter(filter_map, field.related_model()).map(|filter| vec![field.to_one_related(filter)])
         }
 
         x => Err(QueryGraphBuilderError::InputError(format!(
