@@ -514,6 +514,71 @@ mod many_relation {
         Ok(())
     }
 
+    fn schema_23742() -> String {
+        let schema = indoc! {
+            r#"model Top {
+                #id(id, Int, @id)
+
+                middleId Int?
+                middle Middle? @relation(fields: [middleId], references: [id])
+
+                #m2m(bottoms, Bottom[], id, Int) 
+              }
+
+              model Middle {
+                #id(id, Int, @id)
+                bottoms Bottom[]
+
+                tops    Top[]
+              }
+
+              model Bottom {
+                #id(id, Int, @id)
+
+                middleId Int?
+                middle Middle?  @relation(fields: [middleId], references: [id])
+
+                #m2m(tops, Top[], id, Int)
+              }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/23742
+    // SQL Server excluded because the m2m fragment does not support onUpdate/onDelete args which are needed.
+    #[connector_test(schema(schema_23742), exclude(SqlServer))]
+    async fn prisma_23742(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+              createOneTop(data: {
+                id: 1,
+                middle: { create: { id: 1, bottoms: { create: { id: 1, tops: { create: { id: 2 } } } } } }
+              }) {
+                id
+            }}"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findUniqueTop(where: { id: 1 }) {
+              middle {
+                bottoms(
+                  where: { tops: { some: { id: 2 } } }
+                ) {
+                  id
+                }
+              }
+            }
+          }
+        "#),
+          @r###"{"data":{"findUniqueTop":{"middle":{"bottoms":[{"id":1}]}}}}"###
+        );
+
+        Ok(())
+    }
+
     async fn test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query(indoc! { r#"
