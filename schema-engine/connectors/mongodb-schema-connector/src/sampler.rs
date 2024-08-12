@@ -17,7 +17,7 @@ use std::borrow::Cow;
 /// maximum of SAMPLE_SIZE documents for their fields with the following rules:
 ///
 /// - If the same field differs in types between documents, takes the most
-/// common type or if even, the latest type and adds a warning.
+///   common type or if even, the latest type and adds a warning.
 /// - Missing fields count as null.
 /// - Indices are taken, but not if they are partial.
 pub(super) async fn sample(

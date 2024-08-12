@@ -274,7 +274,7 @@ impl Builder {
     /// pool.
     ///
     /// - Defaults to `false`, meaning connections are never tested on
-    /// `check_out`.
+    ///   `check_out`.
     ///
     /// [`check_out`]: struct.Quaint.html#method.check_out
     pub fn test_on_check_out(&mut self, test_on_check_out: bool) {
