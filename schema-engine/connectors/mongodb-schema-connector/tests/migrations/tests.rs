@@ -5,7 +5,7 @@
 //! Each test scenario folder must contain two files:
 //!
 //! - `state.json` must contain the initial state of the database. See examples and `State` in
-//! `test_api.rs` for details.
+//!   `test_api.rs` for details.
 //! - `schema.prisma` must be the Prisma schema.
 //!
 //! On the first run, a `result` file will also be created. It is a snapshot test, do not edit it

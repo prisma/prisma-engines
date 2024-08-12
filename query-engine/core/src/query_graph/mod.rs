@@ -594,6 +594,7 @@ impl QueryGraph {
     /// - ... not an `if`-flow node themself
     /// - ... not already connected to the current `if`-flow node in any form (to prevent double edges)
     /// - ... not connected to another `if`-flow node with control flow edges (indirect sibling)
+    ///
     /// will be ordered below the currently processed `if`-flow node in execution predence.
     ///
     /// ```text

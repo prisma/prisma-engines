@@ -8,7 +8,6 @@ thiserror = "1"
 url.workspace = true
 query-connector = { path = "../../query-engine/connectors/query-connector" }
 query-core = { path = "../../query-engine/core" }
-telemetry = { path = "../telemetry" }
 user-facing-errors = { path = "../user-facing-errors" }
 serde_json.workspace = true
 serde.workspace = true

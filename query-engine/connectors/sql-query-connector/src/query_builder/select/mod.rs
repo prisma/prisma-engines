@@ -648,7 +648,10 @@ fn extract_filter_scalars(f: &Filter) -> Vec<ScalarFieldRef> {
         Filter::Scalar(x) => x.scalar_fields().into_iter().map(ToOwned::to_owned).collect(),
         Filter::ScalarList(x) => vec![x.field.clone()],
         Filter::OneRelationIsNull(x) => join_fields(&x.field),
-        Filter::Relation(x) => join_fields(&x.field),
+        Filter::Relation(x) => vec![join_fields(&x.field), extract_filter_scalars(&x.nested_filter)]
+            .into_iter()
+            .flatten()
+            .collect(),
         _ => Vec::new(),
     }
 }

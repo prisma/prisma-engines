@@ -5,6 +5,8 @@ pub(crate) use quaint::connector::rusqlite;
 use quaint::connector::{ColumnType, GetRow, ParsedRawColumn, ParsedRawParameter, ToColumnNames};
 use schema_connector::{ConnectorError, ConnectorResult};
 use sql_schema_describer::{sqlite as describer, DescriberErrorKind, SqlSchema};
+use sqlx_core::{column::Column, type_info::TypeInfo};
+use sqlx_sqlite::SqliteColumn;
 use std::sync::Mutex;
 use user_facing_errors::schema_engine::ApplyMigrationError;
 
@@ -73,8 +75,18 @@ impl Connection {
         ))
     }
 
-    pub(super) fn parse_raw_query(&mut self, sql: &str) -> ConnectorResult<quaint::connector::ParsedRawQuery> {
+    pub(super) fn parse_raw_query(
+        &mut self,
+        sql: &str,
+        params: &super::Params,
+    ) -> ConnectorResult<quaint::connector::ParsedRawQuery> {
         tracing::debug!(query_type = "parse_raw_query", sql);
+        // SQLite only provides type information for _declared_ column types. That means any expression will not contain type information.
+        // Sqlx works around this by running an `EXPLAIN` query and inferring types by interpreting sqlite bytecode.
+        // If you're curious, here's the code: https://github.com/launchbadge/sqlx/blob/16e3f1025ad1e106d1acff05f591b8db62d688e2/sqlx-sqlite/src/connection/explain.rs#L557
+        // We use SQLx's as a fallback for when quaint's infers Unknown.
+        let describe = sqlx_sqlite::describe_blocking(sql, &params.file_path)
+            .map_err(|err| ConnectorError::from_source(err, "Error describing the query."))?;
         let conn = self.0.lock().unwrap();
         let stmt = conn.prepare_cached(sql).map_err(convert_error)?;
 
@@ -92,7 +104,16 @@ impl Connection {
         let columns = stmt
             .columns()
             .iter()
-            .map(|col| ParsedRawColumn::new_named(col.name(), col))
+            .enumerate()
+            .map(|(idx, col)| {
+                let typ = match ColumnType::from(col) {
+                    // If the column type is unknown, we try to infer it from the describe.
+                    ColumnType::Unknown => describe.column(idx).to_column_type(),
+                    typ => typ,
+                };
+
+                ParsedRawColumn::new_named(col.name(), typ)
+            })
             .collect();
 
         Ok(quaint::connector::ParsedRawQuery { columns, parameters })
@@ -126,4 +147,31 @@ pub(super) fn generic_apply_migration_script(
 
 fn convert_error(err: rusqlite::Error) -> ConnectorError {
     ConnectorError::from_source(err, "SQLite database error")
+}
+
+trait ToColumnTypeExt {
+    fn to_column_type(&self) -> ColumnType;
+}
+
+impl ToColumnTypeExt for &SqliteColumn {
+    fn to_column_type(&self) -> ColumnType {
+        let ty = self.type_info();
+
+        match ty.name() {
+            "NULL" => ColumnType::Null,
+            "TEXT" => ColumnType::Text,
+            "REAL" => ColumnType::Double,
+            "BLOB" => ColumnType::Bytes,
+            "INTEGER" => ColumnType::Int32,
+            // Not supported by sqlx-sqlite
+            "NUMERIC" => ColumnType::Numeric,
+
+            // non-standard extensions
+            "BOOLEAN" => ColumnType::Boolean,
+            "DATE" => ColumnType::Date,
+            "TIME" => ColumnType::Time,
+            "DATETIME" => ColumnType::DateTime,
+            _ => ColumnType::Unknown,
+        }
+    }
 }

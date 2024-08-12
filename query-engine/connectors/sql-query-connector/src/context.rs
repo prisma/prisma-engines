@@ -1,9 +1,8 @@
 use quaint::prelude::ConnectionInfo;
-use telemetry::helpers::TraceParent;
 
 pub(super) struct Context<'a> {
     connection_info: &'a ConnectionInfo,
-    pub(crate) traceparent: Option<TraceParent>,
+    pub(crate) trace_id: Option<&'a str>,
     /// Maximum rows allowed at once for an insert query.
     /// None is unlimited.
     pub(crate) max_insert_rows: Option<usize>,
@@ -13,13 +12,13 @@ pub(super) struct Context<'a> {
 }
 
 impl<'a> Context<'a> {
-    pub(crate) fn new(connection_info: &'a ConnectionInfo, traceparent: Option<TraceParent>) -> Self {
+    pub(crate) fn new(connection_info: &'a ConnectionInfo, trace_id: Option<&'a str>) -> Self {
         let max_insert_rows = connection_info.max_insert_rows();
         let max_bind_values = connection_info.max_bind_values();
 
         Context {
             connection_info,
-            traceparent,
+            trace_id,
             max_insert_rows,
             max_bind_values: Some(max_bind_values),
         }

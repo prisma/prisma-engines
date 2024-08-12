@@ -1,4 +1,4 @@
-pub(crate) use crate::conversion::JSArg;
+pub(crate) use crate::conversion::{JSArg, JSArgType};
 
 use napi::bindgen_prelude::{FromNapiValue, ToNapiValue};
 use napi::NapiValue;
@@ -7,6 +7,12 @@ use napi::NapiValue;
 // Note: we can safely leave this unimplemented as we don't need deserialize napi_value back to JSArg.
 // However, removing this altogether would cause a compile error.
 impl FromNapiValue for JSArg {
+    unsafe fn from_napi_value(_env: napi::sys::napi_env, _napi_value: napi::sys::napi_value) -> napi::Result<Self> {
+        unreachable!()
+    }
+}
+
+impl FromNapiValue for JSArgType {
     unsafe fn from_napi_value(_env: napi::sys::napi_env, _napi_value: napi::sys::napi_value) -> napi::Result<Self> {
         unreachable!()
     }
@@ -44,5 +50,11 @@ impl ToNapiValue for JSArg {
                 ToNapiValue::to_napi_value(env.raw(), array)
             }
         }
+    }
+}
+
+impl ToNapiValue for JSArgType {
+    unsafe fn to_napi_value(env: napi::sys::napi_env, value: Self) -> napi::Result<napi::sys::napi_value> {
+        ToNapiValue::to_napi_value(env, value.to_string())
     }
 }

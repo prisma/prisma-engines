@@ -15,7 +15,6 @@ sql-query-connector = { path = "../../connectors/sql-query-connector" }
 query-engine = { path = "../../query-engine" }
 psl.workspace = true
 user-facing-errors = { path = "../../../libs/user-facing-errors" }
-telemetry = { path = "../../../libs/telemetry" }
 thiserror = "1.0"
 async-trait.workspace = true
 nom = "7.1"
