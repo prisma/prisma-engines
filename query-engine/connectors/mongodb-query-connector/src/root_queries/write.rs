@@ -16,6 +16,7 @@ use mongodb::{
     ClientSession, Collection, Database,
 };
 use query_structure::{Model, PrismaValue, SelectionResult};
+use std::future::IntoFuture;
 use std::{collections::HashMap, convert::TryInto};
 use tracing::{info_span, Instrument};
 use update::IntoUpdateDocumentExtension;
@@ -65,7 +66,7 @@ pub async fn create_record<'conn>(
     }
 
     let query_builder = InsertOne::new(&doc, coll.name());
-    let insert_result = observing(&query_builder, || coll.insert_one_with_session(&doc, None, session))
+    let insert_result = observing(&query_builder, || coll.insert_one(&doc).session(session).into_future())
         .instrument(span)
         .await?;
     let id_value = value_from_bson(insert_result.inserted_id, &id_meta)?;
@@ -123,17 +124,24 @@ pub async fn create_records<'conn>(
     let query_string_builder = InsertMany::new(&docs, coll.name(), ordered);
     let docs_iter = docs.iter();
     let insert = observing(&query_string_builder, || {
-        coll.insert_many_with_session(docs_iter, options, session)
+        coll.insert_many(docs_iter)
+            .with_options(options)
+            .session(session)
+            .into_future()
     })
     .instrument(span);
 
     match insert.await {
         Ok(insert_result) => Ok(insert_result.inserted_ids.len()),
         Err(err) if skip_duplicates => match err.kind.as_ref() {
-            ErrorKind::BulkWrite(ref failure) => match failure.write_errors {
-                Some(ref errs) if !errs.iter().any(|err| err.code != 11000) => Ok(num_records - errs.len()),
-                _ => Err(err.into()),
-            },
+            ErrorKind::BulkWrite(ref failure) => {
+                let errs = &failure.write_errors;
+                if !errs.iter().any(|(_, err)| err.code != 11000) {
+                    Ok(num_records - errs.len())
+                } else {
+                    Err(err.into())
+                }
+            }
 
             _ => Err(err.into()),
         },
@@ -205,7 +213,9 @@ pub async fn update_records<'conn>(
     if !update_docs.is_empty() {
         let query_string_builder = UpdateMany::new(&filter, &update_docs, coll.name());
         let res = observing(&query_string_builder, || {
-            coll.update_many_with_session(filter.clone(), update_docs.clone(), None, session)
+            coll.update_many(filter.clone(), update_docs.clone())
+                .session(session)
+                .into_future()
         })
         .instrument(span)
         .await?;
@@ -267,7 +277,7 @@ pub async fn delete_records<'conn>(
     let filter = doc! { id_field.db_name(): { "$in": ids } };
     let query_string_builder = DeleteMany::new(&filter, coll.name());
     let delete_result = observing(&query_string_builder, || {
-        coll.delete_many_with_session(filter.clone(), None, session)
+        coll.delete_many(filter.clone()).session(session).into_future()
     })
     .instrument(span)
     .await?;
@@ -304,7 +314,7 @@ pub async fn delete_record<'conn>(
     );
     let query_string_builder = DeleteOne::new(&filter, coll.name());
     let document = observing(&query_string_builder, || {
-        coll.find_one_and_delete_with_session(filter.clone(), None, session)
+        coll.find_one_and_delete(filter.clone()).session(session).into_future()
     })
     .instrument(span)
     .await?
@@ -394,7 +404,10 @@ pub async fn m2m_connect<'conn>(
     let query_string_builder = UpdateOne::new(&parent_filter, &parent_update, parent_coll.name());
 
     observing(&query_string_builder, || {
-        parent_coll.update_one_with_session(parent_filter.clone(), parent_update.clone(), None, session)
+        parent_coll
+            .update_one(parent_filter.clone(), parent_update.clone())
+            .session(&mut *session)
+            .into_future()
     })
     .await?;
 
@@ -415,7 +428,10 @@ pub async fn m2m_connect<'conn>(
     let child_updates = vec![child_update.clone()];
     let query_string_builder = UpdateMany::new(&child_filter, &child_updates, child_coll.name());
     observing(&query_string_builder, || {
-        child_coll.update_many_with_session(child_filter.clone(), child_update.clone(), None, session)
+        child_coll
+            .update_many(child_filter.clone(), child_update.clone())
+            .session(&mut *session)
+            .into_future()
     })
     .await?;
 
@@ -460,7 +476,10 @@ pub async fn m2m_disconnect<'conn>(
     // First update the parent and remove all child IDs to the m:n scalar field.
     let query_string_builder = UpdateOne::new(&parent_filter, &parent_update, parent_coll.name());
     observing(&query_string_builder, || {
-        parent_coll.update_one_with_session(parent_filter.clone(), parent_update.clone(), None, session)
+        parent_coll
+            .update_one(parent_filter.clone(), parent_update.clone())
+            .session(&mut *session)
+            .into_future()
     })
     .await?;
 
@@ -482,7 +501,10 @@ pub async fn m2m_disconnect<'conn>(
     let child_updates = vec![child_update.clone()];
     let query_string_builder = UpdateMany::new(&child_filter, &child_updates, child_coll.name());
     observing(&query_string_builder, || {
-        child_coll.update_many_with_session(child_filter.clone(), child_update, None, session)
+        child_coll
+            .update_many(child_filter.clone(), child_update)
+            .session(session)
+            .into_future()
     })
     .await?;
 
@@ -520,7 +542,7 @@ pub async fn query_raw<'conn>(
             MongoCommand::Raw { cmd } => {
                 let query_string_builder = RunCommand::new(&cmd);
                 let mut result = observing(&query_string_builder, || {
-                    database.run_command_with_session(cmd.clone(), None, session)
+                    database.run_command(cmd.clone()).session(session).into_future()
                 })
                 .await?;
 
@@ -547,7 +569,10 @@ pub async fn query_raw<'conn>(
                             .unwrap_or_default();
                         let query_string_builder = Find::new(&unwrapped_filter, &projection, coll.name());
                         let cursor = observing(&query_string_builder, || {
-                            coll.find_with_session(filter, options, session)
+                            coll.find(filter.unwrap_or_default())
+                                .with_options(options)
+                                .session(&mut *session)
+                                .into_future()
                         })
                         .await?;
 
@@ -556,7 +581,10 @@ pub async fn query_raw<'conn>(
                     MongoOperation::Aggregate(pipeline, options) => {
                         let query_string_builder = Aggregate::new(&pipeline, coll.name());
                         let cursor = observing(&query_string_builder, || {
-                            coll.aggregate_with_session(pipeline.clone(), options, session)
+                            coll.aggregate(pipeline.clone())
+                                .with_options(options)
+                                .session(&mut *session)
+                                .into_future()
                         })
                         .await?;
 

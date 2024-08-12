@@ -127,7 +127,7 @@ where
 
         let res = setup(api).await;
 
-        database.drop(None).await.unwrap();
+        database.drop().await.unwrap();
 
         res
     })

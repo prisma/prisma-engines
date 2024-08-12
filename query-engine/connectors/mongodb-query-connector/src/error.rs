@@ -181,32 +181,24 @@ fn driver_error_to_connector_error(err: DriverError) -> ConnectorError {
         },
 
         mongodb::error::ErrorKind::BulkWrite(err) => {
-            let mut errors = match err.write_errors {
-                Some(ref errors) => errors
-                    .iter()
-                    .map(|err| match err.code {
-                        11000 => unique_violation_error(err.message.as_str()),
-                        _ => ErrorKind::RawDatabaseError {
-                            code: err.code.to_string(),
-                            message: format!("Bulk write error on write index '{}': {}", err.index, err.message),
-                        },
-                    })
-                    .collect_vec(),
-
-                None => vec![],
-            };
-
-            if let Some(ref err) = err.write_concern_error {
-                let kind = match err.code {
+            let errors = err
+                .write_errors
+                .iter()
+                .map(|(index, err)| match err.code {
+                    11000 => unique_violation_error(err.message.as_str()),
+                    _ => ErrorKind::RawDatabaseError {
+                        code: err.code.to_string(),
+                        message: format!("Bulk write error on write index '{}': {}", index, err.message),
+                    },
+                })
+                .chain(err.write_concern_errors.iter().map(|err| match err.code {
                     11000 => unique_violation_error(err.message.as_str()),
                     _ => ErrorKind::RawDatabaseError {
                         code: err.code.to_string(),
                         message: format!("Bulk write concern error: {}", err.message),
                     },
-                };
-
-                errors.push(kind);
-            };
+                }))
+                .collect_vec();
 
             if errors.len() == 1 {
                 ConnectorError::from_kind(errors.into_iter().next().unwrap())

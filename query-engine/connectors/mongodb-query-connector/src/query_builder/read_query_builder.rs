@@ -19,6 +19,7 @@ use mongodb::{
 };
 use query_structure::{FieldSelection, Filter, Model, QueryArguments, ScalarFieldRef, VirtualSelection};
 use std::convert::TryFrom;
+use std::future::IntoFuture;
 
 // Mongo Driver broke usage of the simple API, can't be used by us anymore.
 // As such the read query will always be based on aggregation pipeline
@@ -37,7 +38,11 @@ impl ReadQuery {
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
         let query_string_builder = Aggregate::new(&self.stages, on_collection.name());
         let cursor = observing(&query_string_builder, || {
-            on_collection.aggregate_with_session(self.stages.clone(), opts, with_session)
+            on_collection
+                .aggregate(self.stages.clone())
+                .with_options(opts)
+                .session(&mut *with_session)
+                .into_future()
         })
         .await?;
 

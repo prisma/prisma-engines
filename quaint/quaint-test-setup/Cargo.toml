@@ -9,5 +9,5 @@ once_cell = "1.3.1"
 bitflags = "1.2.1"
 async-trait.workspace = true
 names = "0.11"
-tokio = { version = "1.0", features = ["rt-multi-thread"] }
+tokio = { workspace = true, features = ["rt-multi-thread"] }
 quaint = { path = "..", features = ["all-native", "pooled"] }

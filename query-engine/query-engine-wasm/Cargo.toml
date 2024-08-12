@@ -57,7 +57,7 @@ wasm-rs-dbg.workspace = true
 thiserror = "1"
 url.workspace = true
 serde.workspace = true
-tokio = { version = "1.25", features = ["macros", "sync", "io-util", "time"] }
+tokio = { workspace = true, features = ["macros", "sync", "io-util", "time"] }
 futures = "0.3"
 
 tracing.workspace = true
