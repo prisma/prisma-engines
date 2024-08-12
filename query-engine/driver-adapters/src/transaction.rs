@@ -3,7 +3,7 @@ use std::future::Future;
 use async_trait::async_trait;
 use metrics::decrement_gauge;
 use quaint::{
-    connector::{IsolationLevel, Transaction as QuaintTransaction},
+    connector::{IsolationLevel, ParsedRawQuery, Transaction as QuaintTransaction},
     prelude::{Query as QuaintQuery, Queryable, ResultSet},
     Value,
 };
@@ -154,6 +154,10 @@ impl Queryable for JsTransaction {
 
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
         self.inner.query_raw_typed(sql, params).await
+    }
+
+    async fn parse_raw_query(&self, sql: &str) -> quaint::Result<ParsedRawQuery> {
+        self.inner.parse_raw_query(sql).await
     }
 
     async fn execute(&self, q: QuaintQuery<'_>) -> quaint::Result<u64> {

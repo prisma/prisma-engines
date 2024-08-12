@@ -52,6 +52,9 @@ pub trait GenericApi: Send + Sync + 'static {
     /// Introspect the database schema.
     async fn introspect(&self, input: IntrospectParams) -> CoreResult<IntrospectResult>;
 
+    /// Introspects a SQL query and returns types information
+    async fn introspect_sql(&self, input: IntrospectSqlParams) -> CoreResult<IntrospectSqlResult>;
+
     /// List the migration directories.
     async fn list_migration_directories(
         &self,

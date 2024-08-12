@@ -5062,6 +5062,7 @@ dependencies = [
  "indoc 2.0.3",
  "jsonrpc-core",
  "once_cell",
+ "paste",
  "pretty_assertions",
  "prisma-value",
  "psl",
@@ -5121,6 +5122,7 @@ dependencies = [
  "datamodel-renderer",
  "either",
  "enumflags2",
+ "expect-test",
  "indexmap 2.2.2",
  "indoc 2.0.3",
  "once_cell",
@@ -6079,12 +6081,13 @@ checksum = "711b9620af191e0cdc7468a8d14e709c3dcdb115b36f838e601583af800a370a"
 
 [[package]]
 name = "uuid"
-version = "1.4.1"
+version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "79daa5ed5740825c40b389c5e50312b9c86df53fccd33f281df655642b43869d"
+checksum = "81dfa00651efa65069b0b6b651f4aaa31ba9e3c3ce0137aaad053604ee7e0314"
 dependencies = [
  "getrandom 0.2.11",
  "serde",
+ "wasm-bindgen",
 ]
 
 [[package]]

@@ -121,8 +121,21 @@ fn coerce_json_relation_to_pv(value: serde_json::Value, rs: &RelationSelection) 
 }
 
 pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarField) -> crate::Result<PrismaValue> {
-    if sf.type_identifier().is_json() {
+    if sf.type_identifier().is_json() && !sf.is_list() {
         return Ok(PrismaValue::Json(serde_json::to_string(&value)?));
+    }
+
+    if sf.type_identifier().is_json() && sf.is_list() {
+        return match value {
+            serde_json::Value::Null => Ok(PrismaValue::List(vec![])),
+            serde_json::Value::Array(values) => Ok(PrismaValue::List(
+                values
+                    .iter()
+                    .map(|v| PrismaValue::Json(serde_json::to_string(v).unwrap()))
+                    .collect(),
+            )),
+            _ => unreachable!("Invalid JSON value for JSON list field."),
+        };
     }
 
     match value {

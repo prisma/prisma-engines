@@ -16,6 +16,7 @@ pub mod external;
 pub mod metrics;
 #[cfg(native)]
 pub mod native;
+mod parsed_query;
 mod queryable;
 mod result_set;
 #[cfg(any(feature = "mssql-native", feature = "postgresql-native", feature = "mysql-native"))]
@@ -32,6 +33,7 @@ pub use connection_info::*;
 pub use native::*;
 
 pub use external::*;
+pub use parsed_query::*;
 pub use queryable::*;
 pub use transaction::*;
 

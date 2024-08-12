@@ -65,13 +65,7 @@ mod one2one_opt {
         Ok(())
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
-    // On D1, this fails with:
-    //
-    // ```diff
-    // - {"data":{"updateManyParent":{"count":1}}}
-    // + {"data":{"updateManyParent":{"count":2}}}
-    // ```
+    #[connector_test]
     async fn update_many_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", child: { create: { id: 1 }}}) { id }}"#),
@@ -457,13 +451,7 @@ mod one2many_opt {
         Ok(())
     }
 
-    #[connector_test(exclude(Sqlite("cfd1")))]
-    // On D1, this fails with:
-    //
-    // ```diff
-    // - {"data":{"updateManyParent":{"count":1}}}
-    // + {"data":{"updateManyParent":{"count":2}}}
-    // ```
+    #[connector_test]
     async fn update_many_parent(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, uniq: "1", children: { create: { id: 1 }}}) { id }}"#),
