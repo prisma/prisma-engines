@@ -44,7 +44,7 @@ once_cell = "1.3"
 rand.workspace = true
 serde_json.workspace = true
 thiserror = "1.0"
-tokio = { workspace = true, features = ["macros", "time"] }
+tokio = { version = "1", features = ["macros", "time"] }
 tracing = { workspace = true, features = ["log"] }
 tracing-futures = "0.2"
 uuid.workspace = true
