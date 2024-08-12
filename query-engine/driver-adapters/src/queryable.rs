@@ -301,9 +301,8 @@ impl QuaintQueryable for JsQueryable {
     }
 }
 
-#[async_trait]
-impl TransactionCapable for JsQueryable {
-    async fn start_transaction<'a>(
+impl JsQueryable {
+    async fn start_transaction_inner<'a>(
         &'a self,
         isolation: Option<IsolationLevel>,
     ) -> quaint::Result<Box<dyn Transaction + 'a>> {
@@ -345,6 +344,16 @@ impl TransactionCapable for JsQueryable {
         self.server_reset_query(tx.as_ref()).await?;
 
         Ok(tx)
+    }
+}
+
+#[async_trait]
+impl TransactionCapable for JsQueryable {
+    async fn start_transaction<'a>(
+        &'a self,
+        isolation: Option<IsolationLevel>,
+    ) -> quaint::Result<Box<dyn Transaction + 'a>> {
+        UnsafeFuture(self.start_transaction_inner(isolation)).await
     }
 }
 
