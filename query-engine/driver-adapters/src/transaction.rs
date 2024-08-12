@@ -67,6 +67,10 @@ impl Queryable for JsTransactionContext {
         self.inner.version().await
     }
 
+    async fn parse_raw_query(&self, sql: &str) -> quaint::Result<ParsedRawQuery> {
+        self.inner.parse_raw_query(sql).await
+    }
+
     fn is_healthy(&self) -> bool {
         self.inner.is_healthy()
     }
