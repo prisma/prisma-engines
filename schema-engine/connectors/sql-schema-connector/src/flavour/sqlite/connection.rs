@@ -104,15 +104,16 @@ impl Connection {
         let columns = stmt
             .columns()
             .iter()
+            .zip(&describe.nullable)
             .enumerate()
-            .map(|(idx, col)| {
+            .map(|(idx, (col, nullable))| {
                 let typ = match ColumnType::from(col) {
                     // If the column type is unknown, we try to infer it from the describe.
                     ColumnType::Unknown => describe.column(idx).to_column_type(),
                     typ => typ,
                 };
 
-                ParsedRawColumn::new_named(col.name(), typ)
+                ParsedRawColumn::new_named(col.name(), typ).is_nullable(nullable.unwrap_or(true))
             })
             .collect();
 

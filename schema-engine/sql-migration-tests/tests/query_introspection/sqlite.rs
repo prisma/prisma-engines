@@ -81,30 +81,97 @@ fn select_sqlite(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "int",
                     typ: "int",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "string",
                     typ: "string",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "bigint",
                     typ: "bigint",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "float",
                     typ: "double",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "bytes",
                     typ: "bytes",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "bool",
                     typ: "bool",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "dt",
                     typ: "datetime",
+                    nullable: false,
+                },
+            ],
+        }
+    "#]];
+
+    res.expect_result(expected);
+}
+
+#[test_connector(tags(Sqlite))]
+fn select_nullable_sqlite(api: TestApi) {
+    api.schema_push(SIMPLE_NULLABLE_SCHEMA).send().assert_green();
+
+    let res = api
+        .introspect_sql(
+            "test_1",
+            "SELECT `int`, `string`, `bigint`, `float`, `bytes`, `bool`, `dt` FROM `model`;",
+        )
+        .send_sync();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "SELECT `int`, `string`, `bigint`, `float`, `bytes`, `bool`, `dt` FROM `model`;",
+            documentation: None,
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "int",
+                    typ: "int",
+                    nullable: false,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "string",
+                    typ: "string",
+                    nullable: true,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "bigint",
+                    typ: "bigint",
+                    nullable: true,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "float",
+                    typ: "double",
+                    nullable: true,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "bytes",
+                    typ: "bytes",
+                    nullable: true,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "bool",
+                    typ: "bool",
+                    nullable: true,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "dt",
+                    typ: "datetime",
+                    nullable: true,
                 },
             ],
         }
@@ -133,6 +200,7 @@ fn empty_result(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "int",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -157,6 +225,7 @@ fn unnamed_expr_int(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "1 + 1",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -181,6 +250,7 @@ fn named_expr_int(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "add",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -205,6 +275,7 @@ fn mixed_named_expr_int(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "add",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -229,6 +300,7 @@ fn mixed_unnamed_expr_int(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "`int` + 1",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -253,6 +325,7 @@ fn mixed_expr_cast_int(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "CAST(`int` + 1 as int)",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -277,6 +350,7 @@ fn unnamed_expr_string(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "'hello world'",
                     typ: "string",
+                    nullable: false,
                 },
             ],
         }
@@ -304,10 +378,12 @@ fn unnamed_expr_bool(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "1=1",
                     typ: "int",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "1=0",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -335,14 +411,17 @@ fn unnamed_expr_real(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "1.2",
                     typ: "double",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "2.34567891023",
                     typ: "double",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "round(2.345)",
                     typ: "double",
+                    nullable: true,
                 },
             ],
         }
@@ -374,6 +453,7 @@ fn unnamed_expr_blob(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "unhex('537475666673')",
                     typ: "bytes",
+                    nullable: true,
                 },
             ],
         }
@@ -401,6 +481,7 @@ fn unnamed_expr_date(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "date('2025-05-29 14:16:00')",
                     typ: "string",
+                    nullable: true,
                 },
             ],
         }
@@ -428,6 +509,7 @@ fn unnamed_expr_time(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "time('2025-05-29 14:16:00')",
                     typ: "string",
+                    nullable: true,
                 },
             ],
         }
@@ -455,6 +537,7 @@ fn unnamed_expr_datetime(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "datetime('2025-05-29 14:16:00')",
                     typ: "string",
+                    nullable: true,
                 },
             ],
         }
@@ -482,6 +565,7 @@ fn subquery(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "int",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -506,10 +590,12 @@ fn left_join(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "parentId",
                     typ: "int",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "childId",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }

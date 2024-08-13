@@ -74,6 +74,7 @@ fn parses_doc_no_position(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "int",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }

@@ -82,30 +82,97 @@ fn select_mysql(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "int",
                     typ: "int",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "string",
                     typ: "string",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "bigint",
                     typ: "bigint",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "float",
                     typ: "double",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "bytes",
                     typ: "bytes",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "bool",
                     typ: "int",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "dt",
                     typ: "datetime",
+                    nullable: false,
+                },
+            ],
+        }
+    "#]];
+
+    res.expect_result(expected);
+}
+
+#[test_connector(tags(Mysql, Mariadb))]
+fn select_nullable_mysql(api: TestApi) {
+    api.schema_push(SIMPLE_NULLABLE_SCHEMA).send().assert_green();
+
+    let res = api
+        .introspect_sql(
+            "test_1",
+            "SELECT `int`, `string`, `bigint`, `float`, `bytes`, `bool`, `dt` FROM `model`;",
+        )
+        .send_sync();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "SELECT `int`, `string`, `bigint`, `float`, `bytes`, `bool`, `dt` FROM `model`;",
+            documentation: None,
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "int",
+                    typ: "int",
+                    nullable: false,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "string",
+                    typ: "string",
+                    nullable: true,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "bigint",
+                    typ: "bigint",
+                    nullable: true,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "float",
+                    typ: "double",
+                    nullable: true,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "bytes",
+                    typ: "bytes",
+                    nullable: true,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "bool",
+                    typ: "int",
+                    nullable: true,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "dt",
+                    typ: "datetime",
+                    nullable: true,
                 },
             ],
         }
@@ -134,6 +201,7 @@ fn empty_result(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "int",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -158,6 +226,7 @@ fn unnamed_expr(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "1 + 1",
                     typ: "bigint",
+                    nullable: false,
                 },
             ],
         }
@@ -182,6 +251,7 @@ fn named_expr(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "add",
                     typ: "bigint",
+                    nullable: false,
                 },
             ],
         }
@@ -206,6 +276,7 @@ fn mixed_named_expr(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "add",
                     typ: "bigint",
+                    nullable: false,
                 },
             ],
         }
@@ -230,6 +301,7 @@ fn mixed_unnamed_expr(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "`int` + 1",
                     typ: "bigint",
+                    nullable: false,
                 },
             ],
         }
@@ -254,6 +326,7 @@ fn mixed_expr_cast(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "test",
                     typ: "string",
+                    nullable: true,
                 },
             ],
         }
