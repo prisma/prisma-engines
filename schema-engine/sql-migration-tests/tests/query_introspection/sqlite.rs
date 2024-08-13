@@ -121,6 +121,66 @@ fn select_sqlite(api: TestApi) {
 }
 
 #[test_connector(tags(Sqlite))]
+fn select_nullable_sqlite(api: TestApi) {
+    api.schema_push(SIMPLE_NULLABLE_SCHEMA).send().assert_green();
+
+    let res = api
+        .introspect_sql(
+            "test_1",
+            "SELECT `int`, `string`, `bigint`, `float`, `bytes`, `bool`, `dt` FROM `model`;",
+        )
+        .send_sync();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "SELECT `int`, `string`, `bigint`, `float`, `bytes`, `bool`, `dt` FROM `model`;",
+            documentation: None,
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "int",
+                    typ: "int",
+                    nullable: false,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "string",
+                    typ: "string",
+                    nullable: true,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "bigint",
+                    typ: "bigint",
+                    nullable: true,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "float",
+                    typ: "double",
+                    nullable: true,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "bytes",
+                    typ: "bytes",
+                    nullable: true,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "bool",
+                    typ: "bool",
+                    nullable: true,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "dt",
+                    typ: "datetime",
+                    nullable: true,
+                },
+            ],
+        }
+    "#]];
+
+    res.expect_result(expected);
+}
+
+#[test_connector(tags(Sqlite))]
 fn empty_result(api: TestApi) {
     api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
