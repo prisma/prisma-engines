@@ -265,8 +265,19 @@ mod common {
         .send_sync()
         .expect_result(expected)
     }
+}
 
-    #[test_connector(tags(Postgres))]
+mod postgres {
+    use super::*;
+
+    const PG_DATASOURCE: &str = r#"
+        datasource db {
+            provider = "postgres"
+            url      = "postgresql://localhost:5432"
+        }
+    "#;
+
+    #[test_connector(tags(Postgres), exclude(CockroachDb))]
     fn named_expr(api: TestApi) {
         api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
@@ -291,7 +302,7 @@ mod common {
             .expect_result(expected)
     }
 
-    #[test_connector(tags(Postgres))]
+    #[test_connector(tags(Postgres), exclude(CockroachDb))]
     fn mixed_named_expr(api: TestApi) {
         api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
@@ -316,7 +327,7 @@ mod common {
             .expect_result(expected)
     }
 
-    #[test_connector(tags(Postgres))]
+    #[test_connector(tags(Postgres), exclude(CockroachDb))]
     fn mixed_unnamed_expr(api: TestApi) {
         api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
@@ -341,7 +352,7 @@ mod common {
             .expect_result(expected)
     }
 
-    #[test_connector(tags(Postgres))]
+    #[test_connector(tags(Postgres), exclude(CockroachDb))]
     fn mixed_expr_cast(api: TestApi) {
         api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
@@ -366,7 +377,7 @@ mod common {
             .expect_result(expected)
     }
 
-    #[test_connector(tags(Postgres))]
+    #[test_connector(tags(Postgres), exclude(CockroachDb))]
     fn subquery(api: TestApi) {
         api.schema_push(SIMPLE_NULLABLE_SCHEMA).send().assert_green();
 
@@ -404,7 +415,7 @@ mod common {
         .expect_result(expected)
     }
 
-    #[test_connector(tags(Postgres))]
+    #[test_connector(tags(Postgres), exclude(CockroachDb))]
     fn left_join(api: TestApi) {
         api.schema_push(RELATION_SCHEMA).send().assert_green();
 
@@ -445,7 +456,7 @@ mod common {
     }
 
     // test nullability inference for various joins
-    #[test_connector(tags(Postgres))]
+    #[test_connector(tags(Postgres), exclude(CockroachDb))]
     fn outer_join(api: TestApi) {
         api.schema_push(
             "model products {
@@ -597,67 +608,6 @@ mod common {
         .send_sync()
         .expect_result(expected);
     }
-}
-
-mod postgres {
-    use super::*;
-
-    const PG_DATASOURCE: &str = r#"
-        datasource db {
-            provider = "postgres"
-            url      = "postgresql://localhost:5432"
-        }
-    "#;
-
-    #[test_connector(tags(Postgres), exclude(CockroachDb))]
-    fn named_expr(api: TestApi) {
-        api.schema_push(SIMPLE_SCHEMA).send().assert_green();
-
-        let expected = expect![[r#"
-            IntrospectSqlQueryOutput {
-                name: "test_1",
-                source: "SELECT 1 + 1 as add;",
-                documentation: None,
-                parameters: [],
-                result_columns: [
-                    IntrospectSqlQueryColumnOutput {
-                        name: "add",
-                        typ: "int",
-                        nullable: true,
-                    },
-                ],
-            }
-        "#]];
-
-        api.introspect_sql("test_1", "SELECT 1 + 1 as add;")
-            .send_sync()
-            .expect_result(expected)
-    }
-
-    #[test_connector(tags(Postgres), exclude(CockroachDb))]
-    fn unnamed_expr(api: TestApi) {
-        api.schema_push(SIMPLE_SCHEMA).send().assert_green();
-
-        let expected = expect![[r#"
-            IntrospectSqlQueryOutput {
-                name: "test_1",
-                source: "SELECT 1 + 1;",
-                documentation: None,
-                parameters: [],
-                result_columns: [
-                    IntrospectSqlQueryColumnOutput {
-                        name: "?column?",
-                        typ: "int",
-                        nullable: true,
-                    },
-                ],
-            }
-        "#]];
-
-        api.introspect_sql("test_1", "SELECT 1 + 1;")
-            .send_sync()
-            .expect_result(expected)
-    }
 
     macro_rules! test_native_types_pg {
         (
@@ -721,53 +671,335 @@ mod crdb {
     use super::*;
 
     #[test_connector(tags(CockroachDb))]
-    fn unnamed_expr_crdb(api: TestApi) {
+    fn named_expr(api: TestApi) {
         api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
         let expected = expect![[r#"
             IntrospectSqlQueryOutput {
                 name: "test_1",
-                source: "SELECT 1 + 1;",
-                documentation: None,
-                parameters: [],
-                result_columns: [
-                    IntrospectSqlQueryColumnOutput {
-                        name: "?column?",
-                        typ: "bigint",
-                        nullable: false,
-                    },
-                ],
-            }
-        "#]];
-
-        api.introspect_sql("test_1", "SELECT 1 + 1;")
-            .send_sync()
-            .expect_result(expected)
-    }
-
-    #[test_connector(tags(CockroachDb))]
-    fn named_expr_crdb(api: TestApi) {
-        api.schema_push(SIMPLE_SCHEMA).send().assert_green();
-
-        let expected = expect![[r#"
-            IntrospectSqlQueryOutput {
-                name: "test_1",
-                source: "SELECT 1 + 1 as add;",
+                source: "SELECT 1 + 1 as \"add\";",
                 documentation: None,
                 parameters: [],
                 result_columns: [
                     IntrospectSqlQueryColumnOutput {
                         name: "add",
                         typ: "bigint",
+                        nullable: true,
+                    },
+                ],
+            }
+        "#]];
+
+        api.introspect_sql("test_1", "SELECT 1 + 1 as \"add\";")
+            .send_sync()
+            .expect_result(expected)
+    }
+
+    #[test_connector(tags(CockroachDb))]
+    fn mixed_named_expr(api: TestApi) {
+        api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+        let expected = expect![[r#"
+            IntrospectSqlQueryOutput {
+                name: "test_1",
+                source: "SELECT \"int\" + 1 as \"add\" FROM \"model\";",
+                documentation: None,
+                parameters: [],
+                result_columns: [
+                    IntrospectSqlQueryColumnOutput {
+                        name: "add",
+                        typ: "bigint",
+                        nullable: true,
+                    },
+                ],
+            }
+        "#]];
+
+        api.introspect_sql("test_1", "SELECT \"int\" + 1 as \"add\" FROM \"model\";")
+            .send_sync()
+            .expect_result(expected)
+    }
+
+    #[test_connector(tags(CockroachDb))]
+    fn mixed_unnamed_expr(api: TestApi) {
+        api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+        let expected = expect![[r#"
+            IntrospectSqlQueryOutput {
+                name: "test_1",
+                source: "SELECT \"int\" + 1 FROM \"model\";",
+                documentation: None,
+                parameters: [],
+                result_columns: [
+                    IntrospectSqlQueryColumnOutput {
+                        name: "?column?",
+                        typ: "bigint",
+                        nullable: true,
+                    },
+                ],
+            }
+        "#]];
+
+        api.introspect_sql("test_1", "SELECT \"int\" + 1 FROM \"model\";")
+            .send_sync()
+            .expect_result(expected)
+    }
+
+    #[test_connector(tags(CockroachDb))]
+    fn mixed_expr_cast(api: TestApi) {
+        api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+        let expected = expect![[r#"
+            IntrospectSqlQueryOutput {
+                name: "test_1",
+                source: "SELECT CAST(\"int\" + 1 as int) FROM model;",
+                documentation: None,
+                parameters: [],
+                result_columns: [
+                    IntrospectSqlQueryColumnOutput {
+                        name: "int8",
+                        typ: "bigint",
+                        nullable: true,
+                    },
+                ],
+            }
+        "#]];
+
+        api.introspect_sql("test_1", "SELECT CAST(\"int\" + 1 as int) FROM model;")
+            .send_sync()
+            .expect_result(expected)
+    }
+
+    #[test_connector(tags(CockroachDb))]
+    fn subquery(api: TestApi) {
+        api.schema_push(SIMPLE_NULLABLE_SCHEMA).send().assert_green();
+
+        let expected = expect![[r#"
+            IntrospectSqlQueryOutput {
+                name: "test_1",
+                source: "SELECT int, foo.int, foo.string FROM (SELECT * FROM model) AS foo",
+                documentation: None,
+                parameters: [],
+                result_columns: [
+                    IntrospectSqlQueryColumnOutput {
+                        name: "int",
+                        typ: "int",
+                        nullable: false,
+                    },
+                    IntrospectSqlQueryColumnOutput {
+                        name: "int",
+                        typ: "int",
+                        nullable: false,
+                    },
+                    IntrospectSqlQueryColumnOutput {
+                        name: "string",
+                        typ: "string",
+                        nullable: true,
+                    },
+                ],
+            }
+        "#]];
+
+        api.introspect_sql(
+            "test_1",
+            "SELECT int, foo.int, foo.string FROM (SELECT * FROM model) AS foo",
+        )
+        .send_sync()
+        .expect_result(expected)
+    }
+
+    #[test_connector(tags(CockroachDb))]
+    fn left_join(api: TestApi) {
+        api.schema_push(RELATION_SCHEMA).send().assert_green();
+
+        let expected = expect![[r#"
+            IntrospectSqlQueryOutput {
+                name: "test_1",
+                source: "SELECT parent.id as parentId, parent.nullable as parentNullable, child.id as childId, child.nullable as childNullable FROM parent LEFT JOIN child ON parent.id = child.parent_id",
+                documentation: None,
+                parameters: [],
+                result_columns: [
+                    IntrospectSqlQueryColumnOutput {
+                        name: "parentid",
+                        typ: "int",
+                        nullable: false,
+                    },
+                    IntrospectSqlQueryColumnOutput {
+                        name: "parentnullable",
+                        typ: "string",
+                        nullable: true,
+                    },
+                    IntrospectSqlQueryColumnOutput {
+                        name: "childid",
+                        typ: "int",
+                        nullable: false,
+                    },
+                    IntrospectSqlQueryColumnOutput {
+                        name: "childnullable",
+                        typ: "string",
+                        nullable: true,
+                    },
+                ],
+            }
+        "#]];
+
+        api.introspect_sql("test_1", "SELECT parent.id as parentId, parent.nullable as parentNullable, child.id as childId, child.nullable as childNullable FROM parent LEFT JOIN child ON parent.id = child.parent_id")
+        .send_sync()
+        .expect_result(expected)
+    }
+
+    // test nullability inference for various joins
+    #[test_connector(tags(CockroachDb))]
+    fn outer_join(api: TestApi) {
+        api.schema_push(
+            "model products {
+                    product_no Int     @id
+                    name       String?
+                }
+
+                model tweet {
+                    id   Int    @id @default(autoincrement())
+                    text String
+                }",
+        )
+        .send()
+        .assert_green();
+
+        let expected = expect![[r#"
+            IntrospectSqlQueryOutput {
+                name: "test_1",
+                source: "select tweet.id from (values (null)) vals(val) inner join tweet on false",
+                documentation: None,
+                parameters: [],
+                result_columns: [
+                    IntrospectSqlQueryColumnOutput {
+                        name: "id",
+                        typ: "int",
                         nullable: false,
                     },
                 ],
             }
         "#]];
 
-        api.introspect_sql("test_1", "SELECT 1 + 1 as add;")
-            .send_sync()
-            .expect_result(expected)
+        // inner join, nullability should not be overridden
+        api.introspect_sql(
+            "test_1",
+            "select tweet.id from (values (null)) vals(val) inner join tweet on false",
+        )
+        .send_sync()
+        .expect_result(expected);
+
+        let expected = expect![[r#"
+            IntrospectSqlQueryOutput {
+                name: "test_2",
+                source: "select tweet.id from (values (null)) vals(val) left join tweet on false",
+                documentation: None,
+                parameters: [],
+                result_columns: [
+                    IntrospectSqlQueryColumnOutput {
+                        name: "id",
+                        typ: "int",
+                        nullable: false,
+                    },
+                ],
+            }
+        "#]];
+
+        // tweet.id is marked NOT NULL but it's brought in from a left-join here
+        // which should make it nullable
+        api.introspect_sql(
+            "test_2",
+            "select tweet.id from (values (null)) vals(val) left join tweet on false",
+        )
+        .send_sync()
+        .expect_result(expected);
+
+        let expected = expect![[r#"
+            IntrospectSqlQueryOutput {
+                name: "test_3",
+                source: "select tweet1.id, tweet2.id from tweet tweet1 left join tweet tweet2 on false",
+                documentation: None,
+                parameters: [],
+                result_columns: [
+                    IntrospectSqlQueryColumnOutput {
+                        name: "id",
+                        typ: "int",
+                        nullable: false,
+                    },
+                    IntrospectSqlQueryColumnOutput {
+                        name: "id",
+                        typ: "int",
+                        nullable: false,
+                    },
+                ],
+            }
+        "#]];
+
+        // make sure we don't mis-infer for the outer half of the join
+        api.introspect_sql(
+            "test_3",
+            "select tweet1.id, tweet2.id from tweet tweet1 left join tweet tweet2 on false",
+        )
+        .send_sync()
+        .expect_result(expected);
+
+        let expected = expect![[r#"
+            IntrospectSqlQueryOutput {
+                name: "test_4",
+                source: "select tweet1.id, tweet2.id from tweet tweet1 right join tweet tweet2 on false",
+                documentation: None,
+                parameters: [],
+                result_columns: [
+                    IntrospectSqlQueryColumnOutput {
+                        name: "id",
+                        typ: "int",
+                        nullable: false,
+                    },
+                    IntrospectSqlQueryColumnOutput {
+                        name: "id",
+                        typ: "int",
+                        nullable: false,
+                    },
+                ],
+            }
+        "#]];
+
+        // right join, nullability should be inverted
+        api.introspect_sql(
+            "test_4",
+            "select tweet1.id, tweet2.id from tweet tweet1 right join tweet tweet2 on false",
+        )
+        .send_sync()
+        .expect_result(expected);
+
+        let expected = expect![[r#"
+            IntrospectSqlQueryOutput {
+                name: "test_5",
+                source: "select tweet1.id, tweet2.id from tweet tweet1 full join tweet tweet2 on false",
+                documentation: None,
+                parameters: [],
+                result_columns: [
+                    IntrospectSqlQueryColumnOutput {
+                        name: "id",
+                        typ: "int",
+                        nullable: false,
+                    },
+                    IntrospectSqlQueryColumnOutput {
+                        name: "id",
+                        typ: "int",
+                        nullable: false,
+                    },
+                ],
+            }
+        "#]];
+
+        // right join, nullability should be inverted
+        api.introspect_sql(
+            "test_5",
+            "select tweet1.id, tweet2.id from tweet tweet1 full join tweet tweet2 on false",
+        )
+        .send_sync()
+        .expect_result(expected);
     }
 
     macro_rules! test_native_types_crdb {

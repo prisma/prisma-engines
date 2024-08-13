@@ -32,6 +32,7 @@ fn parses_doc_complex(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "int",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -115,6 +116,7 @@ fn parses_doc_no_alias(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "int",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
