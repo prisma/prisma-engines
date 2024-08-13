@@ -12,6 +12,7 @@ use crate::connector::{
 };
 use crate::error::NativeErrorKind;
 
+use crate::ValueType;
 use crate::{
     ast::{Query, Value},
     connector::{metrics, queryable::*, ResultSet},
@@ -57,6 +58,8 @@ pub struct PostgreSql {
     socket_timeout: Option<Duration>,
     statement_cache: Mutex<StatementCache>,
     is_healthy: AtomicBool,
+    is_cockroachdb: bool,
+    is_materialize: bool,
 }
 
 /// Key uniquely representing an SQL statement in the prepared statements cache.
@@ -247,6 +250,9 @@ impl PostgreSql {
         let tls = MakeTlsConnector::new(tls_builder.build()?);
         let (client, conn) = timeout::connect(url.connect_timeout(), config.connect(tls)).await?;
 
+        let is_cockroachdb = conn.parameter("crdb_version").is_some();
+        let is_materialize = conn.parameter("mz_version").is_some();
+
         tokio::spawn(conn.map(|r| match r {
             Ok(_) => (),
             Err(e) => {
@@ -280,6 +286,8 @@ impl PostgreSql {
             pg_bouncer: url.query_params.pg_bouncer,
             statement_cache: Mutex::new(url.cache()),
             is_healthy: AtomicBool::new(true),
+            is_cockroachdb,
+            is_materialize,
         })
     }
 
@@ -353,6 +361,168 @@ impl PostgreSql {
             Ok(())
         }
     }
+
+    // All credits go to sqlx: https://github.com/launchbadge/sqlx/blob/a892ebc6e283f443145f92bbc7fce4ae44547331/sqlx-postgres/src/connection/describe.rs#L417
+    pub(crate) async fn get_nullable_for_columns(&self, stmt: &Statement) -> crate::Result<Vec<Option<bool>>> {
+        let columns = stmt.columns();
+
+        if columns.is_empty() {
+            return Ok(vec![]);
+        }
+
+        let mut nullable_query = String::from("SELECT NOT pg_attribute.attnotnull as nullable FROM (VALUES ");
+        let mut args = Vec::with_capacity(columns.len() * 3);
+
+        for (i, (column, bind)) in columns.iter().zip((1..).step_by(3)).enumerate() {
+            if !args.is_empty() {
+                nullable_query += ", ";
+            }
+
+            nullable_query.push_str(&format!("(${}::int4, ${}::int8, ${}::int4)", bind, bind + 1, bind + 2));
+
+            args.push(Value::from(i as i32));
+            args.push(ValueType::Int64(column.table_oid().map(i64::from)).into());
+            args.push(ValueType::Int32(column.column_id().map(i32::from)).into());
+        }
+
+        nullable_query.push_str(
+            ") as col(idx, table_id, col_idx) \
+            LEFT JOIN pg_catalog.pg_attribute \
+                ON table_id IS NOT NULL \
+               AND attrelid = table_id \
+               AND attnum = col_idx \
+            ORDER BY col.idx",
+        );
+
+        let nullable_query_result = self.query_raw(&nullable_query, &args).await?;
+        let mut nullables = Vec::with_capacity(nullable_query_result.len());
+
+        for row in nullable_query_result {
+            let nullable = row.at(0).and_then(|v| v.as_bool());
+
+            nullables.push(nullable)
+        }
+
+        // If the server is CockroachDB or Materialize, skip this step (#1248).
+        if !self.is_cockroachdb && !self.is_materialize {
+            // patch up our null inference with data from EXPLAIN
+            let nullable_patch = self.nullables_from_explain(stmt).await?;
+
+            for (nullable, patch) in nullables.iter_mut().zip(nullable_patch) {
+                *nullable = patch.or(*nullable);
+            }
+        }
+
+        Ok(nullables)
+    }
+
+    /// Infer nullability for columns of this statement using EXPLAIN VERBOSE.
+    ///
+    /// This currently only marks columns that are on the inner half of an outer join
+    /// and returns `None` for all others.
+    /// All credits go to sqlx: https://github.com/launchbadge/sqlx/blob/a892ebc6e283f443145f92bbc7fce4ae44547331/sqlx-postgres/src/connection/describe.rs#L482
+    async fn nullables_from_explain(&self, stmt: &Statement) -> Result<Vec<Option<bool>>, Error> {
+        let mut explain = format!("EXPLAIN (VERBOSE, FORMAT JSON) EXECUTE {}", stmt.name());
+        let params_len = stmt.params().len();
+        let mut comma = false;
+
+        if params_len > 0 {
+            explain += "(";
+
+            // fill the arguments list with NULL, which should theoretically be valid
+            for _ in 0..params_len {
+                if comma {
+                    explain += ", ";
+                }
+
+                explain += "NULL";
+                comma = true;
+            }
+
+            explain += ")";
+        }
+
+        let explain_result = self.query_raw(&explain, &[]).await?.into_single()?;
+        let explains = explain_result
+            .into_single()?
+            .into_json()
+            .map(serde_json::from_value::<[Explain; 1]>)
+            .transpose()?;
+        let explain = explains.as_ref().and_then(|x| x.first());
+
+        let mut nullables = Vec::new();
+
+        if let Some(Explain::Plan {
+            plan: plan @ Plan {
+                output: Some(ref outputs),
+                ..
+            },
+        }) = explain
+        {
+            nullables.resize(outputs.len(), None);
+            visit_plan(plan, outputs, &mut nullables);
+        }
+
+        Ok(nullables)
+    }
+}
+
+fn visit_plan(plan: &Plan, outputs: &[String], nullables: &mut Vec<Option<bool>>) {
+    if let Some(plan_outputs) = &plan.output {
+        // all outputs of a Full Join must be marked nullable
+        // otherwise, all outputs of the inner half of an outer join must be marked nullable
+        if plan.join_type.as_deref() == Some("Full") || plan.parent_relation.as_deref() == Some("Inner") {
+            for output in plan_outputs {
+                if let Some(i) = outputs.iter().position(|o| o == output) {
+                    // N.B. this may produce false positives but those don't cause runtime errors
+                    nullables[i] = Some(true);
+                }
+            }
+        }
+    }
+
+    if let Some(plans) = &plan.plans {
+        if let Some("Left") | Some("Right") = plan.join_type.as_deref() {
+            for plan in plans {
+                visit_plan(plan, outputs, nullables);
+            }
+        }
+    }
+}
+
+#[derive(serde::Deserialize, Debug)]
+#[serde(untagged)]
+enum Explain {
+    // NOTE: the returned JSON may not contain a `plan` field, for example, with `CALL` statements:
+    // https://github.com/launchbadge/sqlx/issues/1449
+    //
+    // In this case, we should just fall back to assuming all is nullable.
+    //
+    // It may also contain additional fields we don't care about, which should not break parsing:
+    // https://github.com/launchbadge/sqlx/issues/2587
+    // https://github.com/launchbadge/sqlx/issues/2622
+    Plan {
+        #[serde(rename = "Plan")]
+        plan: Plan,
+    },
+
+    // This ensures that parsing never technically fails.
+    //
+    // We don't want to specifically expect `"Utility Statement"` because there might be other cases
+    // and we don't care unless it contains a query plan anyway.
+    Other(serde::de::IgnoredAny),
+}
+
+#[derive(serde::Deserialize, Debug)]
+struct Plan {
+    #[serde(rename = "Join Type")]
+    join_type: Option<String>,
+    #[serde(rename = "Parent Relationship")]
+    parent_relation: Option<String>,
+    #[serde(rename = "Output")]
+    output: Option<Vec<String>>,
+    #[serde(rename = "Plans")]
+    plans: Option<Vec<Plan>>,
 }
 
 // A SearchPath connection parameter (Display-impl) for connection initialization.
@@ -476,6 +646,7 @@ impl Queryable for PostgreSql {
 
     async fn parse_raw_query(&self, sql: &str) -> crate::Result<ParsedRawQuery> {
         let stmt = self.fetch_cached(sql, &[]).await?;
+
         let mut columns: Vec<ParsedRawColumn> = Vec::with_capacity(stmt.columns().len());
         let mut parameters: Vec<ParsedRawParameter> = Vec::with_capacity(stmt.params().len());
 
@@ -499,10 +670,17 @@ impl Queryable for PostgreSql {
             }
         }
 
-        for col in stmt.columns() {
+        let nullables = self.get_nullable_for_columns(&stmt).await?;
+
+        for (col, nullable) in stmt.columns().iter().zip(nullables) {
             let (typ, enum_name) = infer_type(self, col.type_()).await?;
 
-            columns.push(ParsedRawColumn::new_named(col.name(), typ).with_enum_name(enum_name));
+            columns.push(
+                ParsedRawColumn::new_named(col.name(), typ)
+                    .with_enum_name(enum_name)
+                    // Make fields nullable by default if we can't infer nullability.
+                    .is_nullable(nullable.unwrap_or(true)),
+            );
         }
 
         for param in stmt.params() {

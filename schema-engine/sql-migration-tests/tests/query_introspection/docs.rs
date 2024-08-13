@@ -8,7 +8,7 @@ fn parses_doc_complex(api: TestApi) {
     let expected = expect![[r#"
         IntrospectSqlQueryOutput {
             name: "test_1",
-            source: "\n       --    @description   some  fancy   query\n  -- @param  {Int}   $1:myInt some integer\n      --   @param   {String}$2:myString    some   string\n    SELECT int FROM model WHERE int = $1 and string = $2;\n    ",
+            source: "\n       --    @description   some  fancy   query\n  -- @param  {Int!}   $1:myInt some integer\n      --   @param   {String?}$2:myString    some   string\n    SELECT int FROM model WHERE int = $1 and string = $2;\n    ",
             documentation: Some(
                 "some  fancy   query",
             ),
@@ -19,6 +19,7 @@ fn parses_doc_complex(api: TestApi) {
                     ),
                     name: "myInt",
                     typ: "Int",
+                    nullable: false,
                 },
                 IntrospectSqlQueryParameterOutput {
                     documentation: Some(
@@ -26,12 +27,14 @@ fn parses_doc_complex(api: TestApi) {
                     ),
                     name: "myString",
                     typ: "String",
+                    nullable: true,
                 },
             ],
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
                     name: "int",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -39,8 +42,8 @@ fn parses_doc_complex(api: TestApi) {
 
     let sql = r#"
        --    @description   some  fancy   query
-  -- @param  {Int}   $1:myInt some integer
-      --   @param   {String}$2:myString    some   string
+  -- @param  {Int!}   $1:myInt some integer
+      --   @param   {String?}$2:myString    some   string
     SELECT int FROM model WHERE int = ? and string = ?;
     "#;
 
@@ -63,17 +66,20 @@ fn parses_doc_no_position(api: TestApi) {
                     ),
                     name: "myInt",
                     typ: "String",
+                    nullable: false,
                 },
                 IntrospectSqlQueryParameterOutput {
                     documentation: None,
                     name: "_2",
                     typ: "unknown",
+                    nullable: false,
                 },
             ],
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
                     name: "int",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -101,6 +107,7 @@ fn parses_doc_no_alias(api: TestApi) {
                     documentation: None,
                     name: "int4",
                     typ: "int",
+                    nullable: false,
                 },
                 IntrospectSqlQueryParameterOutput {
                     documentation: Some(
@@ -108,12 +115,14 @@ fn parses_doc_no_alias(api: TestApi) {
                     ),
                     name: "text",
                     typ: "String",
+                    nullable: false,
                 },
             ],
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
                     name: "int",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
