@@ -32,7 +32,7 @@ impl RelationMode {
     }
 
     pub fn should_skip_emulated_referential_integrity(&self) -> bool {
-        matches!(self, Self::ForeignKeys) || matches!(self, Self::PrismaSkipIntegrity)
+        self.uses_foreign_keys() || matches!(self, Self::PrismaSkipIntegrity)
     }
 
     /// True, if integrity is in database foreign keys

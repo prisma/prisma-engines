@@ -10,7 +10,10 @@ pub use test_macros::test_connector;
 pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
 
 use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
-use psl::parser_database::SourceFile;
+use psl::{
+    datamodel_connector::NativeTypeInstance,
+    parser_database::{ScalarType, SourceFile},
+};
 use quaint::{
     prelude::{ConnectionInfo, ResultSet},
     Value,
@@ -21,6 +24,7 @@ use schema_core::{
 };
 use sql_schema_connector::SqlSchemaConnector;
 use sql_schema_describer::SqlSchema;
+use std::time::Duration;
 use std::{
     borrow::Cow,
     fmt::{Display, Write},
@@ -95,7 +99,21 @@ impl TestApi {
         schema: &'a str,
         migrations_directory: &'a TempDir,
     ) -> CreateMigration<'a> {
-        CreateMigration::new(&mut self.connector, name, schema, migrations_directory)
+        CreateMigration::new(
+            &mut self.connector,
+            name,
+            &[("schema.prisma", schema)],
+            migrations_directory,
+        )
+    }
+
+    pub fn create_migration_multi_file<'a>(
+        &'a mut self,
+        name: &'a str,
+        files: &[(&'a str, &'a str)],
+        migrations_directory: &'a TempDir,
+    ) -> CreateMigration<'a> {
+        CreateMigration::new(&mut self.connector, name, files, migrations_directory)
     }
 
     /// Create a temporary directory to serve as a test migrations directory.
@@ -131,7 +149,46 @@ impl TestApi {
         migrations_directory: &'a TempDir,
         schema: String,
     ) -> EvaluateDataLoss<'a> {
-        EvaluateDataLoss::new(&mut self.connector, migrations_directory, schema)
+        EvaluateDataLoss::new(&mut self.connector, migrations_directory, &[("schema.prisma", &schema)])
+    }
+
+    pub fn evaluate_data_loss_multi_file<'a>(
+        &'a mut self,
+        migrations_directory: &'a TempDir,
+        files: &[(&'a str, &'a str)],
+    ) -> EvaluateDataLoss<'a> {
+        EvaluateDataLoss::new(&mut self.connector, migrations_directory, files)
+    }
+
+    pub fn introspect_sql<'a>(&'a mut self, name: &'a str, source: &'a str) -> IntrospectSql<'a> {
+        let sanitized = self.sanitize_sql(source);
+
+        IntrospectSql::new(&mut self.connector, name, sanitized)
+    }
+
+    pub fn sanitize_sql(&self, sql: &str) -> String {
+        let mut counter = 1;
+        let mut sql = sql.to_string();
+
+        if self.is_mysql() || self.is_mariadb() || self.is_sqlite() {
+            return sql;
+        }
+
+        while let Some(idx) = sql.find('?') {
+            let replacer = if self.is_postgres() || self.is_cockroach() {
+                format!("${}", counter)
+            } else if self.is_mssql() {
+                format!("@P{}", counter)
+            } else {
+                unimplemented!()
+            };
+
+            sql.replace_range(idx..idx + 1, &replacer);
+
+            counter += 1;
+        }
+
+        sql
     }
 
     /// Returns true only when testing on MSSQL.
@@ -174,6 +231,11 @@ impl TestApi {
         self.root.is_postgres_15()
     }
 
+    /// Returns true only when testing on postgres version 16.
+    pub fn is_postgres_16(&self) -> bool {
+        self.root.is_postgres_16()
+    }
+
     /// Returns true only when testing on cockroach.
     pub fn is_cockroach(&self) -> bool {
         self.root.is_cockroach()
@@ -187,6 +249,12 @@ impl TestApi {
     /// Returns true only when testing on vitess.
     pub fn is_vitess(&self) -> bool {
         self.root.is_vitess()
+    }
+
+    /// Returns a duration that is guaranteed to be larger than the maximum refresh rate after a
+    /// DDL statement
+    pub fn max_ddl_refresh_delay(&self) -> Option<Duration> {
+        self.root.max_ddl_refresh_delay()
     }
 
     /// Insert test values
@@ -307,7 +375,7 @@ impl TestApi {
     pub fn expect_sql_for_schema(&mut self, schema: &'static str, sql: &expect_test::Expect) {
         let found = self.connector_diff(
             DiffTarget::Empty,
-            DiffTarget::Datamodel(SourceFile::new_static(schema)),
+            DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema))]),
             None,
         );
         sql.assert_eq(&found);
@@ -316,12 +384,28 @@ impl TestApi {
     /// Plan a `schemaPush` command adding the datasource
     pub fn schema_push_w_datasource(&mut self, dm: impl Into<String>) -> SchemaPush<'_> {
         let schema = self.datamodel_with_provider(&dm.into());
-        SchemaPush::new(&mut self.connector, schema)
+        self.schema_push(schema)
+    }
+
+    pub fn schema_push_w_datasource_multi_file(&mut self, files: &[(&str, &str)]) -> SchemaPush<'_> {
+        let (first, rest) = files.split_first().unwrap();
+        let first_with_provider = self.datamodel_with_provider(first.1);
+        let recombined = [&[(first.0, first_with_provider.as_str())], rest].concat();
+
+        self.schema_push_multi_file(&recombined)
     }
 
     /// Plan a `schemaPush` command
     pub fn schema_push(&mut self, dm: impl Into<String>) -> SchemaPush<'_> {
-        SchemaPush::new(&mut self.connector, dm.into())
+        let max_ddl_refresh_delay = self.max_ddl_refresh_delay();
+        let dm: String = dm.into();
+
+        SchemaPush::new(&mut self.connector, &[("schema.prisma", &dm)], max_ddl_refresh_delay)
+    }
+
+    pub fn schema_push_multi_file(&mut self, files: &[(&str, &str)]) -> SchemaPush<'_> {
+        let max_ddl_refresh_delay = self.max_ddl_refresh_delay();
+        SchemaPush::new(&mut self.connector, files, max_ddl_refresh_delay)
     }
 
     pub fn tags(&self) -> BitFlags<Tags> {
@@ -398,6 +482,10 @@ impl TestApi {
         out.push_str(schema);
 
         out
+    }
+
+    pub fn scalar_type_for_native_type(&self, typ: &NativeTypeInstance) -> ScalarType {
+        self.connector.scalar_type_for_native_type(typ)
     }
 }
 

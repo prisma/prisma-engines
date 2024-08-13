@@ -34,7 +34,8 @@ use once_cell::sync::Lazy;
 use recorder::*;
 pub use registry::MetricRegistry;
 use serde::Deserialize;
-use std::{collections::HashMap, sync::Once};
+use std::collections::HashMap;
+use std::sync::Once;
 
 pub extern crate metrics;
 pub use metrics::{
@@ -42,33 +43,31 @@ pub use metrics::{
     increment_counter, increment_gauge,
 };
 
-// Dependency metrics names emitted by the connector pool implementation (mobc) that will be renamed
-// using the `METRIC_RENAMES` map.
-pub const MOBC_POOL_CONNECTIONS_OPENED_TOTAL: &str = "mobc_pool_connections_opened_total";
-pub const MOBC_POOL_CONNECTIONS_CLOSED_TOTAL: &str = "mobc_pool_connections_closed_total";
-pub const MOBC_POOL_CONNECTIONS_OPEN: &str = "mobc_pool_connections_open";
-pub const MOBC_POOL_CONNECTIONS_BUSY: &str = "mobc_pool_connections_busy";
-pub const MOBC_POOL_CONNECTIONS_IDLE: &str = "mobc_pool_connections_idle";
-pub const MOBC_POOL_WAIT_COUNT: &str = "mobc_client_queries_wait";
-pub const MOBC_POOL_WAIT_DURATION: &str = "mobc_client_queries_wait_histogram_ms";
+// Metrics that we emit from the engines, third party metrics emitted by libraries and that we rename are omitted.
+pub const PRISMA_CLIENT_QUERIES_TOTAL: &str = "prisma_client_queries_total"; // counter
+pub const PRISMA_DATASOURCE_QUERIES_TOTAL: &str = "prisma_datasource_queries_total"; // counter
+pub const PRISMA_CLIENT_QUERIES_ACTIVE: &str = "prisma_client_queries_active"; // gauge
+pub const PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS: &str = "prisma_client_queries_duration_histogram_ms"; // histogram
+pub const PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS: &str = "prisma_datasource_queries_duration_histogram_ms"; // histogram
 
-// External metrics names that we expose.
-pub const PRISMA_CLIENT_QUERIES_TOTAL: &str = "prisma_client_queries_total";
-pub const PRISMA_CLIENT_QUERIES_HISTOGRAM_MS: &str = "prisma_client_queries_duration_histogram_ms";
-pub const PRISMA_POOL_CONNECTIONS_OPENED_TOTAL: &str = "prisma_pool_connections_opened_total";
-pub const PRISMA_POOL_CONNECTIONS_CLOSED_TOTAL: &str = "prisma_pool_connections_closed_total";
-pub const PRISMA_POOL_CONNECTIONS_OPEN: &str = "prisma_pool_connections_open";
-pub const PRISMA_POOL_CONNECTIONS_BUSY: &str = "prisma_pool_connections_busy";
-pub const PRISMA_POOL_CONNECTIONS_IDLE: &str = "prisma_pool_connections_idle";
-pub const PRISMA_CLIENT_QUERIES_WAIT: &str = "prisma_client_queries_wait";
-pub const PRISMA_CLIENT_QUERIES_WAIT_HISTOGRAM_MS: &str = "prisma_client_queries_wait_histogram_ms";
-pub const PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS: &str = "prisma_datasource_queries_duration_histogram_ms";
-pub const PRISMA_DATASOURCE_QUERIES_TOTAL: &str = "prisma_datasource_queries_total";
-pub const PRISMA_CLIENT_QUERIES_ACTIVE: &str = "prisma_client_queries_active";
+// metrics emitted by the connector pool implementation (mobc) that will be renamed using the `METRIC_RENAMES` map.
+const MOBC_POOL_CONNECTIONS_OPENED_TOTAL: &str = "mobc_pool_connections_opened_total"; // counter
+const MOBC_POOL_CONNECTIONS_CLOSED_TOTAL: &str = "mobc_pool_connections_closed_total"; // counter
+const MOBC_POOL_CONNECTIONS_OPEN: &str = "mobc_pool_connections_open"; // gauge
+const MOBC_POOL_CONNECTIONS_BUSY: &str = "mobc_pool_connections_busy"; // gauge
+const MOBC_POOL_CONNECTIONS_IDLE: &str = "mobc_pool_connections_idle"; // gauge
+const MOBC_POOL_WAIT_COUNT: &str = "mobc_client_queries_wait"; // gauge
+const MOBC_POOL_WAIT_DURATION: &str = "mobc_client_queries_wait_histogram_ms"; // histogram
 
-// We need a list of acceptable metrics, we don't want to accidentally process metrics emitted by a
-// third party library
-const ACCEPT_LIST: &[&str] = &[
+/// Accept list: both first-party (emitted by the query engine) and third-party (emitted) metrics
+pub const ACCEPT_LIST: &[&str] = &[
+    // first-party
+    PRISMA_CLIENT_QUERIES_TOTAL,
+    PRISMA_DATASOURCE_QUERIES_TOTAL,
+    PRISMA_CLIENT_QUERIES_ACTIVE,
+    PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
+    PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
+    // third-party, emitted by mobc
     MOBC_POOL_CONNECTIONS_OPENED_TOTAL,
     MOBC_POOL_CONNECTIONS_CLOSED_TOTAL,
     MOBC_POOL_CONNECTIONS_OPEN,
@@ -76,26 +75,86 @@ const ACCEPT_LIST: &[&str] = &[
     MOBC_POOL_CONNECTIONS_IDLE,
     MOBC_POOL_WAIT_COUNT,
     MOBC_POOL_WAIT_DURATION,
-    PRISMA_CLIENT_QUERIES_HISTOGRAM_MS,
-    PRISMA_CLIENT_QUERIES_TOTAL,
-    PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
-    PRISMA_DATASOURCE_QUERIES_TOTAL,
-    PRISMA_CLIENT_QUERIES_ACTIVE,
 ];
 
-// Some of the metrics we receive have their internal names, and we need to expose them under a different
-// name, this map translates from the internal names used by mobc to the external names we want to expose
-static METRIC_RENAMES: Lazy<HashMap<&str, &str>> = Lazy::new(|| {
+/// Map that for any given accepted metric that is emitted by a third-party, in this case only the
+/// connection pool library mobc, it points to an internal, accepted metrics name and its description
+/// as displayed to users. This is used to rebrand the third-party metrics to accepted, prisma-specific
+/// ones.
+#[rustfmt::skip]
+static METRIC_RENAMES: Lazy<HashMap<&'static str, (&'static str, &'static str)>> = Lazy::new(|| {
     HashMap::from([
-        (MOBC_POOL_CONNECTIONS_OPENED_TOTAL, PRISMA_POOL_CONNECTIONS_OPENED_TOTAL),
-        (MOBC_POOL_CONNECTIONS_CLOSED_TOTAL, PRISMA_POOL_CONNECTIONS_CLOSED_TOTAL),
-        (MOBC_POOL_CONNECTIONS_OPEN, PRISMA_POOL_CONNECTIONS_OPEN),
-        (MOBC_POOL_CONNECTIONS_BUSY, PRISMA_POOL_CONNECTIONS_BUSY),
-        (MOBC_POOL_CONNECTIONS_IDLE, PRISMA_POOL_CONNECTIONS_IDLE),
-        (MOBC_POOL_WAIT_COUNT, PRISMA_CLIENT_QUERIES_WAIT),
-        (MOBC_POOL_WAIT_DURATION, PRISMA_CLIENT_QUERIES_WAIT_HISTOGRAM_MS),
+        (MOBC_POOL_CONNECTIONS_OPENED_TOTAL, ("prisma_pool_connections_opened_total", "The total number of pool connections opened")),
+        (MOBC_POOL_CONNECTIONS_CLOSED_TOTAL, ("prisma_pool_connections_closed_total", "The total number of pool connections closed")),
+        (MOBC_POOL_CONNECTIONS_OPEN, ("prisma_pool_connections_open", "The number of pool connections currently open")),
+        (MOBC_POOL_CONNECTIONS_BUSY, ("prisma_pool_connections_busy", "The number of pool connections currently executing datasource queries")),
+        (MOBC_POOL_CONNECTIONS_IDLE, ("prisma_pool_connections_idle", "The number of pool connections that are not busy running a query")),
+        (MOBC_POOL_WAIT_COUNT, ("prisma_client_queries_wait", "The number of datasource queries currently waiting for a free connection")),
+        (MOBC_POOL_WAIT_DURATION, ("prisma_client_queries_wait_histogram_ms", "The distribution of the time all datasource queries spent waiting for a free connection")),
     ])
 });
+
+pub fn setup() {
+    set_recorder();
+    initialize_metrics();
+}
+
+static METRIC_RECORDER: Once = Once::new();
+
+fn set_recorder() {
+    METRIC_RECORDER.call_once(|| {
+        metrics::set_boxed_recorder(Box::new(MetricRecorder)).unwrap();
+    });
+}
+
+/// Initialize metrics descriptions and values
+pub fn initialize_metrics() {
+    initialize_metrics_descriptions();
+    initialize_metrics_values();
+}
+
+/// Describe all first-party metrics that we record in prisma-engines. Metrics recorded by third-parties
+/// --like mobc-- are described by such third parties, but ignored, and replaced by the descriptions in the
+/// METRICS_RENAMES map.
+fn initialize_metrics_descriptions() {
+    describe_counter!(
+        PRISMA_CLIENT_QUERIES_TOTAL,
+        "The total number of Prisma Client queries executed"
+    );
+    describe_counter!(
+        PRISMA_DATASOURCE_QUERIES_TOTAL,
+        "The total number of datasource queries executed"
+    );
+    describe_gauge!(
+        PRISMA_CLIENT_QUERIES_ACTIVE,
+        "The number of currently active Prisma Client queries"
+    );
+    describe_histogram!(
+        PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
+        "The distribution of the time Prisma Client queries took to run end to end"
+    );
+    describe_histogram!(
+        PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
+        "The distribution of the time datasource queries took to run"
+    );
+}
+
+/// Initialize all metrics values (first and third-party)
+///
+/// FIXME: https://github.com/prisma/prisma/issues/21070
+/// Histograms are excluded, as their initialization will alter the histogram values.
+/// (i.e. histograms don't have a neutral value, like counters or gauges)
+fn initialize_metrics_values() {
+    absolute_counter!(PRISMA_CLIENT_QUERIES_TOTAL, 0);
+    absolute_counter!(PRISMA_DATASOURCE_QUERIES_TOTAL, 0);
+    gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 0.0);
+    absolute_counter!(MOBC_POOL_CONNECTIONS_OPENED_TOTAL, 0);
+    absolute_counter!(MOBC_POOL_CONNECTIONS_CLOSED_TOTAL, 0);
+    gauge!(MOBC_POOL_CONNECTIONS_OPEN, 0.0);
+    gauge!(MOBC_POOL_CONNECTIONS_BUSY, 0.0);
+    gauge!(MOBC_POOL_CONNECTIONS_IDLE, 0.0);
+    gauge!(MOBC_POOL_WAIT_COUNT, 0.0);
+}
 
 // At the moment the histogram is only used for timings. So the bounds are hard coded here
 // The buckets are for ms
@@ -107,103 +166,6 @@ pub enum MetricFormat {
     Json,
     #[serde(alias = "prometheus")]
     Prometheus,
-}
-
-pub fn setup() {
-    set_recorder();
-    describe_metrics();
-}
-
-// Describe all metric here so that every time for create
-// a new metric registry for a Query Instance the descriptions
-// will be in place
-pub fn describe_metrics() {
-    describe_counter!(
-        PRISMA_POOL_CONNECTIONS_OPENED_TOTAL,
-        "Total number of Pool Connections opened"
-    );
-    describe_counter!(
-        PRISMA_POOL_CONNECTIONS_CLOSED_TOTAL,
-        "Total number of Pool Connections closed"
-    );
-    describe_gauge!(
-        PRISMA_POOL_CONNECTIONS_BUSY,
-        "Number of currently busy Pool Connections (executing a datasource query)"
-    );
-
-    describe_gauge!(
-        PRISMA_POOL_CONNECTIONS_IDLE,
-        "Number of currently unused Pool Connections (waiting for the next datasource query to run)"
-    );
-
-    describe_gauge!(
-        PRISMA_CLIENT_QUERIES_WAIT,
-        "Number of Prisma Client queries currently waiting for a connection"
-    );
-    describe_gauge!(
-        PRISMA_CLIENT_QUERIES_ACTIVE,
-        "Number of currently active Prisma Client queries"
-    );
-
-    gauge!(PRISMA_POOL_CONNECTIONS_BUSY, 0.0);
-    gauge!(PRISMA_POOL_CONNECTIONS_IDLE, 0.0);
-    gauge!(PRISMA_CLIENT_QUERIES_WAIT, 0.0);
-    gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 0.0);
-
-    describe_gauge!(
-        PRISMA_CLIENT_QUERIES_ACTIVE,
-        "Number of currently active Prisma Client queries"
-    );
-
-    describe_gauge!(
-        PRISMA_POOL_CONNECTIONS_BUSY,
-        "Number of currently busy Pool Connections (executing a datasource query)"
-    );
-
-    describe_gauge!(
-        PRISMA_POOL_CONNECTIONS_IDLE,
-        "Number of currently unused Pool Connections (waiting for the next datasource query to run)"
-    );
-
-    describe_gauge!(
-        PRISMA_CLIENT_QUERIES_WAIT,
-        "Number of Prisma Client queries currently waiting for a connection"
-    );
-
-    describe_histogram!(
-        PRISMA_CLIENT_QUERIES_WAIT_HISTOGRAM_MS,
-        "Histogram of the wait time of all Prisma Client Queries in ms"
-    );
-    describe_histogram!(
-        PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
-        "Histogram of the duration of all executed Datasource Queries in ms"
-    );
-
-    describe_histogram!(
-        PRISMA_CLIENT_QUERIES_HISTOGRAM_MS,
-        "Histogram of the duration of all executed Prisma Client queries in ms"
-    );
-
-    describe_counter!(
-        PRISMA_DATASOURCE_QUERIES_TOTAL,
-        "Total number of Datasource Queries executed"
-    );
-
-    describe_counter!(
-        PRISMA_CLIENT_QUERIES_TOTAL,
-        "Total number of Prisma Client queries executed"
-    );
-
-    absolute_counter!(PRISMA_DATASOURCE_QUERIES_TOTAL, 0);
-    absolute_counter!(PRISMA_CLIENT_QUERIES_TOTAL, 0);
-}
-
-static METRIC_RECORDER: Once = Once::new();
-
-fn set_recorder() {
-    METRIC_RECORDER.call_once(|| {
-        metrics::set_boxed_recorder(Box::new(MetricRecorder)).unwrap();
-    });
 }
 
 #[cfg(test)]
@@ -559,7 +521,7 @@ mod tests {
                 global_labels.insert("global_one".to_string(), "one".to_string());
 
                 let prometheus = metrics.to_prometheus(global_labels);
-                let snapshot = expect_test::expect![[r##"
+                let snapshot = expect_test::expect![[r#"
                     # HELP counter_1 
                     # TYPE counter_1 counter
                     counter_1{global_one="one",global_two="two",label="one"} 4
@@ -608,7 +570,7 @@ mod tests {
                     histogram_2_sum{global_one="one",global_two="two"} 1000
                     histogram_2_count{global_one="one",global_two="two"} 1
 
-                "##]];
+                "#]];
 
                 snapshot.assert_eq(&prometheus);
             }

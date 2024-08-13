@@ -60,7 +60,7 @@ impl QueryParams {
     pub fn parse_many_first(&self, json: serde_json::Value, path: &[&str]) -> Result<String, TestError> {
         let val = self.where_many.parse(&json, path)?;
 
-        Ok(val.get(0).unwrap().to_owned())
+        Ok(val.first().unwrap().to_owned())
     }
 
     /// Parses the JSON _array_ result of a mutation sent to the Query Engine in order to extract the generated id(s).

@@ -1,0 +1,127 @@
+name: "QE: WASM Query Engine size"
+on:
+  pull_request:
+    paths-ignore:
+      - ".github/**"
+      - "!.github/workflows/wasm-size.yml"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pr-wasm-size:
+    name: calculate module sizes (pr)
+    runs-on: ubuntu-latest
+    outputs:
+      postgresql_size: ${{ steps.measure.outputs.postgresql_size }}
+      postgresql_size_gz: ${{ steps.measure.outputs.postgresql_size_gz }}
+      mysql_size: ${{ steps.measure.outputs.mysql_size }}
+      mysql_size_gz: ${{ steps.measure.outputs.mysql_size_gz }}
+      sqlite_size: ${{ steps.measure.outputs.sqlite_size }}
+      sqlite_size_gz: ${{ steps.measure.outputs.sqlite_size_gz }}
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      - uses: ./.github/workflows/include/rust-wasm-setup
+
+      - name: Build and measure PR branch
+        id: measure
+        run: |
+          export ENGINE_SIZE_OUTPUT=$GITHUB_OUTPUT
+          make measure-qe-wasm
+
+  base-wasm-size:
+    name: calculate module sizes (base branch)
+    runs-on: ubuntu-latest
+    outputs:
+      postgresql_size: ${{ steps.measure.outputs.postgresql_size }}
+      postgresql_size_gz: ${{ steps.measure.outputs.postgresql_size_gz }}
+      mysql_size: ${{ steps.measure.outputs.mysql_size }}
+      mysql_size_gz: ${{ steps.measure.outputs.mysql_size_gz }}
+      sqlite_size: ${{ steps.measure.outputs.sqlite_size }}
+      sqlite_size_gz: ${{ steps.measure.outputs.sqlite_size_gz }}
+    steps:
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+
+      - uses: ./.github/workflows/include/rust-wasm-setup
+
+      - name: Build and measure base branch
+        id: measure
+        run: |
+          export ENGINE_SIZE_OUTPUT=$GITHUB_OUTPUT
+          make measure-qe-wasm
+
+  report-diff:
+    name: report module size
+    runs-on: ubuntu-latest
+    needs:
+      - pr-wasm-size
+      - base-wasm-size
+
+    steps:
+      - name: Compute difference
+        id: compute
+        run: |
+
+          fmt() {
+            echo "$1" | numfmt --format '%.3f' --to=iec-i --suffix=B
+          }
+
+          compute_diff() {
+            local provider="$1"
+            local base="$2"
+            local pr="$3"
+            local diff=$(fmt "$(($pr - $base))")
+
+            echo "${provider}_base=$(fmt "$base")" >> $GITHUB_OUTPUT
+            echo "${provider}_pr=$(fmt "$pr")" >> $GITHUB_OUTPUT
+            echo "${provider}_diff=$diff" >> $GITHUB_OUTPUT
+          }
+
+          compute_diff "postgresql" "${{ needs.base-wasm-size.outputs.postgresql_size }}" "${{ needs.pr-wasm-size.outputs.postgresql_size }}"
+          compute_diff "postgresql_gz" "${{ needs.base-wasm-size.outputs.postgresql_size_gz }}" "${{ needs.pr-wasm-size.outputs.postgresql_size_gz }}"
+
+          compute_diff "mysql" "${{ needs.base-wasm-size.outputs.mysql_size }}" "${{ needs.pr-wasm-size.outputs.mysql_size }}"
+          compute_diff "mysql_gz" "${{ needs.base-wasm-size.outputs.mysql_size_gz }}" "${{ needs.pr-wasm-size.outputs.mysql_size_gz }}"
+
+          compute_diff "sqlite" "${{ needs.base-wasm-size.outputs.sqlite_size }}" "${{ needs.pr-wasm-size.outputs.sqlite_size }}"
+          compute_diff "sqlite_gz" "${{ needs.base-wasm-size.outputs.sqlite_size_gz }}" "${{ needs.pr-wasm-size.outputs.sqlite_size_gz }}"
+
+      - name: Find past report comment
+        uses: peter-evans/find-comment@v3
+        id: findReportComment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: "<!-- wasm-size -->"
+
+      - name: Create or update report
+        uses: peter-evans/create-or-update-comment@v4
+        # Only run on branches from our repository
+        # It avoids an expected failure on forks
+        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+        with:
+          comment-id: ${{ steps.findReportComment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            <!-- wasm-size -->
+            ### WASM Query Engine file Size
+
+            |Engine            | This PR                                      | Base branch                                      | Diff
+            |------------------|----------------------------------------------|--------------------------------------------------|-----------------------------------------------
+            | Postgres         | ${{ steps.compute.outputs.postgresql_pr}}    |  ${{ steps.compute.outputs.postgresql_base }}    | ${{ steps.compute.outputs.postgresql_diff}}
+            | Postgres (gzip)  | ${{ steps.compute.outputs.postgresql_gz_pr}} |  ${{ steps.compute.outputs.postgresql_gz_base }} | ${{ steps.compute.outputs.postgresql_gz_diff}}
+            | Mysql            | ${{ steps.compute.outputs.mysql_pr}}         |  ${{ steps.compute.outputs.mysql_base}}          | ${{ steps.compute.outputs.mysql_diff}}
+            | Mysql (gzip)     | ${{ steps.compute.outputs.mysql_gz_pr}}      |  ${{ steps.compute.outputs.mysql_gz_base}}       | ${{ steps.compute.outputs.mysql_gz_diff}}
+            | Sqlite           | ${{ steps.compute.outputs.sqlite_pr}}        |  ${{ steps.compute.outputs.sqlite_base}}         | ${{ steps.compute.outputs.sqlite_diff}}
+            | Sqlite (gzip)    | ${{ steps.compute.outputs.sqlite_gz_pr}}     |  ${{ steps.compute.outputs.sqlite_gz_base }}     | ${{ steps.compute.outputs.sqlite_gz_diff}}
+          edit-mode: replace

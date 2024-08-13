@@ -1,9 +1,11 @@
 use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
 use crate::{
-    execute_many_operations, execute_single_operation, protocol::EngineProtocol,
-    telemetry::helpers::set_span_link_from_traceparent, ClosedTx, Operation, ResponseData, TxId,
+    execute_many_operations, execute_single_operation, protocol::EngineProtocol, ClosedTx, Operation, ResponseData,
+    TxId,
 };
 use connector::Connection;
+use crosstarget_utils::task::{spawn, spawn_controlled, JoinHandle};
+use crosstarget_utils::time::ElapsedTimeCounter;
 use schema::QuerySchemaRef;
 use std::{collections::HashMap, sync::Arc};
 use tokio::{
@@ -11,12 +13,14 @@ use tokio::{
         mpsc::{channel, Receiver, Sender},
         oneshot, RwLock,
     },
-    task::JoinHandle,
-    time::{self, Duration, Instant},
+    time::Duration,
 };
 use tracing::Span;
 use tracing_futures::Instrument;
 use tracing_futures::WithSubscriber;
+
+#[cfg(feature = "metrics")]
+use crate::telemetry::helpers::set_span_link_from_traceparent;
 
 #[derive(PartialEq)]
 enum RunState {
@@ -81,6 +85,8 @@ impl<'a> ITXServer<'a> {
         traceparent: Option<String>,
     ) -> crate::Result<ResponseData> {
         let span = info_span!("prisma:engine:itx_query_builder", user_facing = true);
+
+        #[cfg(feature = "metrics")]
         set_span_link_from_traceparent(&span, traceparent.clone());
 
         let conn = self.cached_tx.as_open()?;
@@ -267,7 +273,7 @@ pub(crate) async fn spawn_itx_actor(
     };
     let (open_transaction_send, open_transaction_rcv) = oneshot::channel();
 
-    tokio::task::spawn(
+    spawn(
         crate::executor::with_request_context(engine_protocol, async move {
             // We match on the result in order to send the error to the parent task and abort this
             // task, on error. This is a separate task (actor), not a function where we can just bubble up the
@@ -291,8 +297,8 @@ pub(crate) async fn spawn_itx_actor(
                 query_schema,
             );
 
-            let start_time = Instant::now();
-            let sleep = time::sleep(timeout);
+            let start_time = ElapsedTimeCounter::start();
+            let sleep = crosstarget_utils::time::sleep(timeout);
             tokio::pin!(sleep);
 
             loop {
@@ -309,6 +315,8 @@ pub(crate) async fn spawn_itx_actor(
                             if run_state == RunState::Finished {
                                 break
                             }
+                        } else {
+                            break;
                         }
                     }
                 }
@@ -380,17 +388,38 @@ pub(crate) fn spawn_client_list_clear_actor(
     closed_txs: Arc<RwLock<lru::LruCache<TxId, Option<ClosedTx>>>>,
     mut rx: Receiver<(TxId, Option<ClosedTx>)>,
 ) -> JoinHandle<()> {
-    tokio::task::spawn(async move {
-        loop {
-            if let Some((id, closed_tx)) = rx.recv().await {
-                trace!("removing {} from client list", id);
+    // Note: tasks implemented via loops cannot be cancelled implicitly, so we need to spawn them in a
+    // "controlled" way, via `spawn_controlled`.
+    // The `rx_exit` receiver is used to signal the loop to exit, and that signal is emitted whenever
+    // the task is aborted (likely, due to the engine shutting down and cleaning up the allocated resources).
+    spawn_controlled(Box::new(
+        |mut rx_exit: tokio::sync::broadcast::Receiver<()>| async move {
+            loop {
+                tokio::select! {
+                    result = rx.recv() => {
+                        match result {
+                            Some((id, closed_tx)) => {
+                                trace!("removing {} from client list", id);
 
-                let mut clients_guard = clients.write().await;
-                clients_guard.remove(&id);
-                drop(clients_guard);
+                                let mut clients_guard = clients.write().await;
 
-                closed_txs.write().await.put(id, closed_tx);
+                                clients_guard.remove(&id);
+                                drop(clients_guard);
+
+                                closed_txs.write().await.put(id, closed_tx);
+                            }
+                            None => {
+                                // the `rx` channel is closed.
+                                tracing::error!("rx channel is closed!");
+                                break;
+                            }
+                        }
+                    },
+                    _ = rx_exit.recv() => {
+                        break;
+                    },
+                }
             }
-        }
-    })
+        },
+    ))
 }

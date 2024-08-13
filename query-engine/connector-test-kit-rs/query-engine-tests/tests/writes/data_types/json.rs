@@ -17,7 +17,7 @@ mod json {
     }
 
     // "Json float accuracy" should "work"
-    #[connector_test(exclude(SqlServer, Mysql, Sqlite))]
+    #[connector_test(exclude(SqlServer, MySQL, Vitess, Sqlite))]
     async fn json_float_accuracy(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {

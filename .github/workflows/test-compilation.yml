@@ -1,0 +1,58 @@
+name: "All crates: compilation"
+on:
+  pull_request:
+    paths-ignore:
+      - "!.github/workflows/test-compilation.yml"
+      - ".github/**"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-crate-compilation:
+    name: "${{ matrix.crate }} on ${{ matrix.os }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-13
+        crate:
+          - schema-engine-cli
+          - prisma-fmt
+          - query-engine
+          - query-engine-node-api
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: compile ${{ matrix.crate }}
+        shell: bash
+        env:
+          CRATE: ${{ matrix.crate }}
+        run: cargo build --release -p "$CRATE"
+
+      - name: "Check that Cargo.lock did not change"
+        run: "git diff --exit-code"
+
+  test-react-native-compilation:
+    name: React Native
+    uses: ./.github/workflows/build-engines-react-native-template.yml
+    with:
+      commit: ${{ github.sha }}
+      uploadArtifacts: false

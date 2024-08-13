@@ -1,14 +1,16 @@
 #![allow(clippy::approx_constant)]
 
-#[cfg(feature = "bigdecimal")]
 mod bigdecimal;
 
-use crate::tests::test_api::*;
+use crate::macros::assert_matching_value_and_column_type;
+use crate::{connector::ColumnType, tests::test_api::*};
+use std::str::FromStr;
 
 test_type!(nvarchar_limited(
     mssql,
     "NVARCHAR(10)",
-    Value::Text(None),
+    ColumnType::Text,
+    Value::null_text(),
     Value::text("foobar"),
     Value::text("余"),
 ));
@@ -16,7 +18,8 @@ test_type!(nvarchar_limited(
 test_type!(nvarchar_max(
     mssql,
     "NVARCHAR(max)",
-    Value::Text(None),
+    ColumnType::Text,
+    Value::null_text(),
     Value::text("foobar"),
     Value::text("余"),
     Value::text("test¥฿😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏😐😑😒😓😔😕😖😗😘😙😚😛😜😝😞😟😠😡😢😣😤😥�😧😨😩😪😫😬😭😮😯😰😱😲😳😴😵😶😷😸😹😺😻😼😽😾😿🙀🙁�🙂🙃🙄🙅🙆🙇🙈🙉🙊🙋🙌🙍🙎🙏ऀँंःऄअआइईउऊऋऌऍऎएऐऑऒओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयर€₭₮₯₰₱₲₳₴₵₶₷₸₹₺₻₼₽₾₿⃀"),
@@ -25,7 +28,8 @@ test_type!(nvarchar_max(
 test_type!(ntext(
     mssql,
     "NTEXT",
-    Value::Text(None),
+    ColumnType::Text,
+    Value::null_text(),
     Value::text("foobar"),
     Value::text("余"),
 ));
@@ -33,23 +37,32 @@ test_type!(ntext(
 test_type!(varchar_limited(
     mssql,
     "VARCHAR(10)",
-    Value::Text(None),
+    ColumnType::Text,
+    Value::null_text(),
     Value::text("foobar"),
 ));
 
 test_type!(varchar_max(
     mssql,
     "VARCHAR(max)",
-    Value::Text(None),
+    ColumnType::Text,
+    Value::null_text(),
     Value::text("foobar"),
 ));
 
-test_type!(text(mssql, "TEXT", Value::Text(None), Value::text("foobar")));
+test_type!(text(
+    mssql,
+    "TEXT",
+    ColumnType::Text,
+    Value::null_text(),
+    Value::text("foobar")
+));
 
 test_type!(tinyint(
     mssql,
     "tinyint",
-    Value::Int32(None),
+    ColumnType::Int32,
+    Value::null_int32(),
     Value::int32(u8::MIN),
     Value::int32(u8::MAX),
 ));
@@ -57,7 +70,8 @@ test_type!(tinyint(
 test_type!(smallint(
     mssql,
     "smallint",
-    Value::Int32(None),
+    ColumnType::Int32,
+    Value::null_int32(),
     Value::int32(i16::MIN),
     Value::int32(i16::MAX),
 ));
@@ -65,7 +79,8 @@ test_type!(smallint(
 test_type!(int(
     mssql,
     "int",
-    Value::Int32(None),
+    ColumnType::Int32,
+    Value::null_int32(),
     Value::int32(i32::MIN),
     Value::int32(i32::MAX),
 ));
@@ -73,35 +88,57 @@ test_type!(int(
 test_type!(bigint(
     mssql,
     "bigint",
-    Value::Int64(None),
+    ColumnType::Int64,
+    Value::null_int64(),
     Value::int64(i64::MIN),
     Value::int64(i64::MAX),
 ));
 
-test_type!(float_24(mssql, "float(24)", Value::Float(None), Value::float(1.23456),));
+test_type!(float_24(
+    mssql,
+    "float(24)",
+    ColumnType::Float,
+    Value::null_float(),
+    Value::float(1.23456),
+));
 
-test_type!(real(mssql, "real", Value::Float(None), Value::float(1.123456)));
+test_type!(real(
+    mssql,
+    "real",
+    ColumnType::Float,
+    Value::null_float(),
+    Value::float(1.123456)
+));
 
 test_type!(float_53(
     mssql,
     "float(53)",
-    Value::Double(None),
+    ColumnType::Double,
+    Value::null_double(),
     Value::double(1.1234567891)
 ));
 
-test_type!(money(mssql, "money", Value::Double(None), Value::double(3.14)));
+test_type!(money(
+    mssql,
+    "money",
+    ColumnType::Double,
+    Value::null_double(),
+    Value::double(3.14)
+));
 
 test_type!(smallmoney(
     mssql,
     "smallmoney",
-    Value::Double(None),
+    ColumnType::Double,
+    Value::null_double(),
     Value::double(3.14)
 ));
 
 test_type!(boolean(
     mssql,
     "bit",
-    Value::Boolean(None),
+    ColumnType::Boolean,
+    Value::null_boolean(),
     Value::boolean(true),
     Value::boolean(false),
 ));
@@ -109,60 +146,99 @@ test_type!(boolean(
 test_type!(binary(
     mssql,
     "binary(8)",
-    Value::Bytes(None),
+    ColumnType::Bytes,
+    Value::null_bytes(),
     Value::bytes(b"DEADBEEF".to_vec()),
 ));
 
 test_type!(varbinary(
     mssql,
     "varbinary(8)",
-    Value::Bytes(None),
+    ColumnType::Bytes,
+    Value::null_bytes(),
     Value::bytes(b"DEADBEEF".to_vec()),
 ));
 
 test_type!(image(
     mssql,
     "image",
-    Value::Bytes(None),
+    ColumnType::Bytes,
+    Value::null_bytes(),
     Value::bytes(b"DEADBEEF".to_vec()),
 ));
 
-#[cfg(feature = "chrono")]
 test_type!(date(
     mssql,
     "date",
-    Value::Date(None),
+    ColumnType::Date,
+    Value::null_date(),
     Value::date(chrono::NaiveDate::from_ymd_opt(2020, 4, 20).unwrap())
 ));
 
-#[cfg(feature = "chrono")]
 test_type!(time(
     mssql,
     "time",
-    Value::Time(None),
+    ColumnType::Time,
+    Value::null_time(),
     Value::time(chrono::NaiveTime::from_hms_opt(16, 20, 00).unwrap())
 ));
 
-#[cfg(feature = "chrono")]
-test_type!(datetime2(mssql, "datetime2", Value::DateTime(None), {
-    let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:00Z").unwrap();
-    Value::datetime(dt.with_timezone(&chrono::Utc))
-}));
+test_type!(datetime2(
+    mssql,
+    "datetime2",
+    ColumnType::DateTime,
+    Value::null_datetime(),
+    {
+        let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:00Z").unwrap();
+        Value::datetime(dt.with_timezone(&chrono::Utc))
+    }
+));
 
-#[cfg(feature = "chrono")]
-test_type!(datetime(mssql, "datetime", Value::DateTime(None), {
-    let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
-    Value::datetime(dt.with_timezone(&chrono::Utc))
-}));
+test_type!(datetime(
+    mssql,
+    "datetime",
+    ColumnType::DateTime,
+    Value::null_datetime(),
+    {
+        let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
+        Value::datetime(dt.with_timezone(&chrono::Utc))
+    }
+));
 
-#[cfg(feature = "chrono")]
-test_type!(datetimeoffset(mssql, "datetimeoffset", Value::DateTime(None), {
-    let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
-    Value::datetime(dt.with_timezone(&chrono::Utc))
-}));
+test_type!(datetimeoffset(
+    mssql,
+    "datetimeoffset",
+    ColumnType::DateTime,
+    Value::null_datetime(),
+    {
+        let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
+        Value::datetime(dt.with_timezone(&chrono::Utc))
+    }
+));
 
-#[cfg(feature = "chrono")]
-test_type!(smalldatetime(mssql, "smalldatetime", Value::DateTime(None), {
-    let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:00Z").unwrap();
-    Value::datetime(dt.with_timezone(&chrono::Utc))
-}));
+test_type!(smalldatetime(
+    mssql,
+    "smalldatetime",
+    ColumnType::DateTime,
+    Value::null_datetime(),
+    {
+        let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:00Z").unwrap();
+        Value::datetime(dt.with_timezone(&chrono::Utc))
+    }
+));
+
+test_type!(uuid(
+    mssql,
+    "uniqueidentifier",
+    ColumnType::Uuid,
+    Value::null_uuid(),
+    Value::uuid(uuid::Uuid::from_str("936DA01F-9ABD-4D9D-80C7-02AF85C822A8").unwrap())
+));
+
+test_type!(xml(
+    mssql,
+    "xml",
+    ColumnType::Xml,
+    Value::null_xml(),
+    Value::xml("<foo>bar</foo>"),
+));

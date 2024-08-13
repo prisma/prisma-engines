@@ -3,7 +3,7 @@ use crate::{
     connector::Queryable,
     error::{DatabaseConstraint, ErrorKind, Name},
 };
-use test_macros::test_each_connector;
+use quaint_test_macros::test_each_connector;
 
 #[test_each_connector]
 async fn table_does_not_exist(api: &mut dyn TestApi) -> crate::Result<()> {
@@ -129,7 +129,7 @@ async fn null_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
     let insert = Insert::single_into(&table).value("id1", 50).value("id2", 55);
     api.conn().insert(insert.into()).await?;
 
-    let update = Update::table(&table).set("id2", Value::Int64(None));
+    let update = Update::table(&table).set("id2", ValueType::Int64(None));
     let res = api.conn().update(update).await;
 
     assert!(res.is_err());
@@ -162,7 +162,7 @@ async fn int_unsigned_negative_value_out_of_range(api: &mut dyn TestApi) -> crat
 
     // Value too big
     {
-        let insert = Insert::multi_into(&table, ["big"]).values((std::i64::MAX,));
+        let insert = Insert::multi_into(&table, ["big"]).values((i64::MAX,));
         let result = api.conn().insert(insert.into()).await;
 
         assert!(matches!(result.unwrap_err().kind(), ErrorKind::ValueOutOfRange { .. }));
@@ -257,7 +257,6 @@ async fn ms_my_foreign_key_constraint_violation(api: &mut dyn TestApi) -> crate:
     Ok(())
 }
 
-#[cfg(feature = "chrono")]
 #[test_each_connector(tags("mysql"))]
 async fn garbage_datetime_values(api: &mut dyn TestApi) -> crate::Result<()> {
     api.conn()
@@ -354,7 +353,6 @@ async fn should_execute_multi_statement_queries_with_raw_cmd(api: &mut dyn TestA
     Ok(())
 }
 
-#[cfg(feature = "uuid")]
 #[test_each_connector(tags("postgresql"))]
 async fn uuid_length_error(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("value uuid").await?;
@@ -415,7 +413,8 @@ async fn array_into_scalar_should_fail(api: &mut dyn TestApi) -> crate::Result<(
 
     let err = result.unwrap_err();
 
-    assert!(err.to_string().contains("Couldn't serialize value `Some([Text(Some(\"abc\")), Text(Some(\"def\"))])` into a `text`. Value is a list but `text` is not."));
+    assert!(err.to_string().contains("Couldn't serialize value"));
+    assert!(err.to_string().contains("Value is a list but `text` is not."));
 
     Ok(())
 }

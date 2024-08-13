@@ -1,8 +1,8 @@
 # Prisma Engines
 
-[![Query Engine](https://github.com/prisma/prisma-engines/actions/workflows/query-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/query-engine.yml)
-[![Schema Engine + sql_schema_describer](https://github.com/prisma/prisma-engines/actions/workflows/schema-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/schema-engine.yml)
-[![Cargo docs](https://github.com/prisma/prisma-engines/actions/workflows/cargo-doc.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/cargo-doc.yml)
+[![Query Engine](https://github.com/prisma/prisma-engines/actions/workflows/test-query-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/test-query-engine.yml)
+[![Schema Engine + sql_schema_describer](https://github.com/prisma/prisma-engines/actions/workflows/test-schema-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/test-schema-engine.yml)
+[![Cargo docs](https://github.com/prisma/prisma-engines/actions/workflows/on-push-to-main.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/on-push-to-main.yml)
 
 This repository contains a collection of engines that power the core stack for
 [Prisma](https://github.com/prisma/prisma), most prominently [Prisma
@@ -203,6 +203,7 @@ integration tests.
   - Alternatively: Load the defined environment in `./.envrc` manually in your shell.
 
 **Setup:**
+
 There are helper `make` commands to set up a test environment for a specific
 database connector you want to test. The commands set up a container (if needed)
 and write the `.test_config` file, which is picked up by the integration
@@ -234,6 +235,57 @@ Other variables may or may not be useful.
 
 Run `cargo test` in the repository root.
 
+### Testing driver adapters
+
+Please refer to the [Testing driver adapters](./query-engine/connector-test-kit-rs/README.md#testing-driver-adapters) section in the connector-test-kit-rs README.
+
+**ℹ️ Important note on developing features that require changes to the both the query engine, and driver adapters code**
+
+As explained in [Testing driver adapters](./query-engine/connector-test-kit-rs/README.md#testing-driver-adapters), running `DRIVER_ADAPTER=$adapter make qe-test`
+will ensure you have prisma checked out in your filesystem in the same directory as prisma-engines. This is needed because the driver adapters code is symlinked in prisma-engines.
+
+When working on a feature or bugfix spanning adapters code and query-engine code, you will need to open sibling PRs in `prisma/prisma` and `prisma/prisma-engines` respectively.
+Locally, each time you run `DRIVER_ADAPTER=$adapter make test-qe` tests will run using the driver adapters built from the source code in the working copy of prisma/prisma. All good.
+
+In CI, tho', we need to denote which branch of prisma/prisma we want to use for tests. In CI, there's no working copy of prisma/prisma before tests run.
+The CI jobs clones prisma/prisma `main` branch by default, which doesn't include your local changes. To test in integration, we can tell CI to use the branch of prisma/prisma containing
+the changes in adapters. To do it, you can use a simple convention in commit messages. Like this:
+
+```
+git commit -m "DRIVER_ADAPTERS_BRANCH=prisma-branch-with-changes-in-adapters [...]"
+```
+
+GitHub actions will then pick up the branch name and use it to clone that branch's code of prisma/prisma, and build the driver adapters code from there.
+
+When it's time to merge the sibling PRs, you'll need to merge the prisma/prisma PR first, so when merging the engines PR you have the code of the adapters ready in prisma/prisma `main` branch.
+
+### Testing engines in `prisma/prisma`
+
+You can trigger releases from this repository to npm that can be used for testing the engines in `prisma/prisma` either automatically or manually:
+
+#### Automated integration releases from this repository to npm
+
+Any branch name starting with `integration/` will, first, run the full test suite in GH Actions and, second, run the release workflow (build and upload engines to S3 & R2).
+To trigger the release on any other branch, you have two options:
+- Either run [build-engines](https://github.com/prisma/prisma-engines/actions/workflows/build-engines.yml) workflow on a specified branch manually.
+- Or add `[integration]` string anywhere in your commit messages/
+
+The journey through the pipeline is the same as a commit on the `main` branch.
+- It will trigger [`prisma/engines-wrapper`](https://github.com/prisma/engines-wrapper) and publish a new [`@prisma/engines-version`](https://www.npmjs.com/package/@prisma/engines-version) npm package but on the `integration` tag.
+- Which triggers [`prisma/prisma`](https://github.com/prisma/prisma) to create a `chore(Automated Integration PR): [...]` PR with a branch name also starting with `integration/`
+- Since in `prisma/prisma` we also trigger the publish pipeline when a branch name starts with `integration/`, this will publish all `prisma/prisma` monorepo packages to npm on the `integration` tag.
+- Our [ecosystem-tests](https://github.com/prisma/ecosystem-tests/) tests will automatically pick up this new version and run tests, results will show in [GitHub Actions](https://github.com/prisma/ecosystem-tests/actions?query=branch%3Aintegration)
+
+This end to end will take minimum ~1h20 to complete, but is completely automated :robot:
+
+Notes:
+- tests and publishing workflows are run in parallel in both `prisma/prisma-engines` and `prisma/prisma` repositories. So, it is possible that the engines would be published and only then test suite will 
+discover a defect. It is advised that to keep an eye on both test and publishing workflows.
+
+#### Manual integration releases from this repository to npm
+
+Additionally to the automated integration release for `integration/` branches, you can also trigger a publish **manually** in the Buildkite `[Test] Prisma Engines` job if that succeeds for _any_ branch name. Click "🚀 Publish binaries" at the bottom of the test list to unlock the publishing step. When all the jobs in `[Release] Prisma Engines` succeed, you also have to unlock the next step by clicking "🚀 Publish client". This will then trigger the same journey as described above.
+
 ## Parallel rust-analyzer builds
 
 When rust-analzyer runs `cargo check` it will lock the build directory and stop any cargo commands from running until it has completed. This makes the build process feel a lot longer. It is possible to avoid this by setting a different build path for
@@ -243,22 +295,25 @@ rust-analyzer. To avoid this. Open VSCode settings and search for `Check on Save
 --target-dir:/tmp/rust-analyzer-check
 ```
 
-### Automated integration releases from this repository to npm
 
-(Since July 2022). Any branch name starting with `integration/` will, first, run the full test suite and, second, if passing, run the publish pipeline (build and upload engines to S3)
+## Community PRs: create a local branch for a branch coming from a fork
 
-The journey through the pipeline is the same as a commit on the `main` branch.
-- It will trigger [prisma/engines-wrapper](https://github.com/prisma/engines-wrapper) and publish a new [`@prisma/engines-version`](https://www.npmjs.com/package/@prisma/engines-version) npm package but on the `integration` tag.
-- Which triggers [prisma/prisma](https://github.com/prisma/prisma) to create a `chore(Automated Integration PR): [...]` PR with a branch name also starting with `integration/`
-- Since in prisma/prisma we also trigger the publish pipeline when a branch name starts with `integration/`, this will publish all prisma/prisma monorepo packages to npm on the `integration` tag.
-- Our [ecosystem-tests](https://github.com/prisma/ecosystem-tests/) tests will automatically pick up this new version and run tests, results will show in [GitHub Actions](https://github.com/prisma/ecosystem-tests/actions?query=branch%3Aintegration)
+To trigger an [Automated integration releases from this repository to npm](#automated-integration-releases-from-this-repository-to-npm) or [Manual integration releases from this repository to npm](#manual-integration-releases-from-this-repository-to-npm) branches of forks need to be pulled into this repository so the Buildkite job is triggered. You can use these GitHub and git CLI commands to achieve that easily:
 
-This end to end will take minimum ~1h20 to complete, but is completely automated :robot:
+```
+gh pr checkout 4375
+git checkout -b integration/sql-nested-transactions
+git push --set-upstream origin integration/sql-nested-transactions
+```
 
-Notes:
-- in prisma/prisma repository, we do not run tests for `integration/` branches, it is much faster and also means that there is no risk of test failing (e.g. flaky tests, snapshots) that would stop the publishing process.
-- in prisma/prisma-engines tests must first pass, before publishing starts. So better keep an eye on them and restart them as needed.
+If there is a need to re-create this branch because it has been updated, deleting it and re-creating will make sure the content is identical and avoid any conflicts.
 
+```
+git branch --delete integration/sql-nested-transactions
+gh pr checkout 4375
+git checkout -b integration/sql-nested-transactions
+git push --set-upstream origin integration/sql-nested-transactions --force
+```
 
 ## Security
 

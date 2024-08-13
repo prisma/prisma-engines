@@ -5,9 +5,8 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputMap,
 };
-use connector::{Filter, IntoFilter};
-use prisma_models::Model;
 use psl::datamodel_connector::ConnectorCapability;
+use query_structure::{Filter, IntoFilter, Model};
 use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 
@@ -89,7 +88,7 @@ pub(crate) fn update_record(
     } else {
         graph.flag_transactional();
 
-        let read_query = read::find_unique(field, model.clone())?;
+        let read_query = read::find_unique(field, model.clone(), query_schema)?;
         let read_node = graph.create_node(Query::Read(read_query));
 
         graph.add_result_node(&read_node);
@@ -171,7 +170,7 @@ pub fn update_many_records(
 }
 
 /// Creates an update record write node and adds it to the query graph.
-pub fn update_record_node<T: Clone>(
+pub fn update_record_node<T>(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
     filter: T,
@@ -180,7 +179,7 @@ pub fn update_record_node<T: Clone>(
     field: Option<&ParsedField<'_>>,
 ) -> QueryGraphBuilderResult<NodeRef>
 where
-    T: Into<Filter>,
+    T: Clone + Into<Filter>,
 {
     let update_args = WriteArgsParser::from(&model, data_map)?;
     let mut args = update_args.args;
@@ -199,9 +198,9 @@ where
             let selection_order: Vec<String> = read::utils::collect_selection_order(&nested_fields);
             let selected_fields = read::utils::collect_selected_scalars(&nested_fields, &model);
 
-            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithExplicitSelection(
+            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
                 UpdateRecordWithSelection {
-                    name: field.name.to_owned(),
+                    name: field.name,
                     model: model.clone(),
                     record_filter: filter.into(),
                     args,
@@ -211,11 +210,17 @@ where
             )))
         // Otherwise, fallback to the primary identifier, that will be used to fulfill other nested operations requirements
         } else {
-            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithImplicitSelection(
-                UpdateRecordWithoutSelection {
+            let selected_fields = model.primary_identifier();
+            let selection_order = selected_fields.db_names().collect();
+
+            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
+                UpdateRecordWithSelection {
+                    name: String::new(), // This node will not be serialized so we don't need a name.
                     model: model.clone(),
                     record_filter: filter.into(),
                     args,
+                    selected_fields,
+                    selection_order,
                 },
             )))
         }

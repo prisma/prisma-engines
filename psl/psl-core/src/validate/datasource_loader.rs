@@ -1,5 +1,5 @@
 use crate::{
-    ast::{self, SourceConfig, Span},
+    ast::{self, SourceConfig, Span, WithName},
     configuration::StringFromEnvVar,
     datamodel_connector::RelationMode,
     diagnostics::{DatamodelError, Diagnostics},
@@ -10,6 +10,7 @@ use parser_database::{
     ast::{Expression, WithDocumentation},
     coerce, coerce_array, coerce_opt,
 };
+use schema_ast::ast::WithSpan;
 use std::{borrow::Cow, collections::HashMap};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
@@ -25,13 +26,13 @@ const PROVIDER_KEY: &str = "provider";
 pub(crate) fn load_datasources_from_ast(
     ast_schema: &ast::SchemaAst,
     diagnostics: &mut Diagnostics,
-    connectors: crate::ConnectorRegistry,
+    connectors: crate::ConnectorRegistry<'_>,
 ) -> Vec<Datasource> {
     let mut sources = Vec::new();
 
     for src in ast_schema.sources() {
         if let Some(source) = lift_datasource(src, diagnostics, connectors) {
-            sources.push(source)
+            sources.push(source);
         }
     }
 
@@ -39,7 +40,7 @@ pub(crate) fn load_datasources_from_ast(
         for src in ast_schema.sources() {
             diagnostics.push_error(DatamodelError::new_source_validation_error(
                 "You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.",
-                &src.name.name,
+                src.name(),
                 src.span,
             ));
         }
@@ -51,17 +52,17 @@ pub(crate) fn load_datasources_from_ast(
 fn lift_datasource(
     ast_source: &ast::SourceConfig,
     diagnostics: &mut Diagnostics,
-    connectors: crate::ConnectorRegistry,
+    connectors: crate::ConnectorRegistry<'_>,
 ) -> Option<Datasource> {
-    let source_name = ast_source.name.name.as_str();
+    let source_name = ast_source.name();
     let mut args: HashMap<_, (_, &Expression)> = ast_source
         .properties
         .iter()
         .map(|arg| match &arg.value {
-            Some(expr) => Some((arg.name.name.as_str(), (arg.span, expr))),
+            Some(expr) => Some((arg.name(), (arg.span, expr))),
             None => {
                 diagnostics.push_error(DatamodelError::new_config_property_missing_value_error(
-                    &arg.name.name,
+                    arg.name(),
                     source_name,
                     "datasource",
                     ast_source.span,
@@ -163,6 +164,24 @@ fn lift_datasource(
         None => (None, None),
     };
 
+    if let Some((shadow_url, _)) = &shadow_database_url {
+        if let (Some(direct_url), Some(direct_url_span)) = (&direct_url, direct_url_span) {
+            if shadow_url == direct_url {
+                diagnostics.push_error(DatamodelError::new_shadow_database_is_same_as_direct_url_error(
+                    source_name,
+                    direct_url_span,
+                ));
+            }
+        }
+
+        if shadow_url == &url {
+            diagnostics.push_error(DatamodelError::new_shadow_database_is_same_as_main_url_error(
+                source_name,
+                url_span,
+            ));
+        }
+    }
+
     preview_features_guardrail(&mut args, diagnostics);
 
     let documentation = ast_source.documentation().map(String::from);
@@ -201,6 +220,7 @@ fn lift_datasource(
 
     Some(Datasource {
         namespaces: schemas.into_iter().map(|(s, span)| (s.to_owned(), span)).collect(),
+        span: ast_source.span(),
         schemas_span,
         name: source_name.to_owned(),
         provider: provider.to_owned(),

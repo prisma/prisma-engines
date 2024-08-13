@@ -4,8 +4,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     Computation, ParsedInputMap, ParsedInputValue,
 };
-use connector::{Filter, IntoFilter};
-use prisma_models::{Model, RelationFieldRef, SelectionResult};
+use query_structure::{Filter, IntoFilter, Model, RelationFieldRef, SelectionResult};
 use schema::constants::args;
 use std::convert::TryInto;
 
@@ -99,10 +98,10 @@ fn handle_many_to_many(
     for value in values {
         let mut value: ParsedInputMap<'_> = value.try_into()?;
 
-        let where_arg = value.remove(args::WHERE).unwrap();
+        let where_arg = value.swap_remove(args::WHERE).unwrap();
         let where_map: ParsedInputMap<'_> = where_arg.try_into()?;
 
-        let create_arg = value.remove(args::CREATE).unwrap();
+        let create_arg = value.swap_remove(args::CREATE).unwrap();
         let create_map: ParsedInputMap<'_> = create_arg.try_into()?;
 
         let filter = extract_unique_filter(where_map, child_model)?;
@@ -186,10 +185,10 @@ fn handle_one_to_one(
     let value = values.pop().unwrap();
     let mut value: ParsedInputMap<'_> = value.try_into()?;
 
-    let where_arg = value.remove(args::WHERE).unwrap();
+    let where_arg = value.swap_remove(args::WHERE).unwrap();
     let where_map: ParsedInputMap<'_> = where_arg.try_into()?;
 
-    let create_arg = value.remove(args::CREATE).unwrap();
+    let create_arg = value.swap_remove(args::CREATE).unwrap();
     let create_data: ParsedInputMap<'_> = create_arg.try_into()?;
 
     let filter = extract_unique_filter(where_map, child_model)?;
@@ -260,10 +259,10 @@ fn one_to_many_inlined_child(
 
         let mut value: ParsedInputMap<'_> = value.try_into()?;
 
-        let where_arg = value.remove(args::WHERE).unwrap();
+        let where_arg = value.swap_remove(args::WHERE).unwrap();
         let where_map: ParsedInputMap<'_> = where_arg.try_into()?;
 
-        let create_arg = value.remove(args::CREATE).unwrap();
+        let create_arg = value.swap_remove(args::CREATE).unwrap();
         let create_map: ParsedInputMap<'_> = create_arg.try_into()?;
 
         let filter = extract_unique_filter(where_map, child_model)?;
@@ -399,10 +398,10 @@ fn one_to_many_inlined_parent(
     let value = values.pop().unwrap();
     let mut value: ParsedInputMap<'_> = value.try_into()?;
 
-    let where_arg = value.remove(args::WHERE).unwrap();
+    let where_arg = value.swap_remove(args::WHERE).unwrap();
     let where_map: ParsedInputMap<'_> = where_arg.try_into()?;
 
-    let create_arg = value.remove(args::CREATE).unwrap();
+    let create_arg = value.swap_remove(args::CREATE).unwrap();
     let create_map: ParsedInputMap<'_> = create_arg.try_into()?;
 
     let filter = extract_unique_filter(where_map, child_model)?;

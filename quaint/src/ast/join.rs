@@ -5,6 +5,7 @@ use crate::ast::{ConditionTree, Table};
 pub struct JoinData<'a> {
     pub(crate) table: Table<'a>,
     pub(crate) conditions: ConditionTree<'a>,
+    pub(crate) lateral: bool,
 }
 
 impl<'a> JoinData<'a> {
@@ -13,7 +14,13 @@ impl<'a> JoinData<'a> {
         Self {
             table: table.into(),
             conditions: ConditionTree::NoCondition,
+            lateral: false,
         }
+    }
+
+    pub fn lateral(mut self) -> Self {
+        self.lateral = true;
+        self
     }
 }
 
@@ -73,6 +80,7 @@ where
         JoinData {
             table: self.into(),
             conditions: conditions.into(),
+            lateral: false,
         }
     }
 }
@@ -90,6 +98,7 @@ impl<'a> Joinable<'a> for JoinData<'a> {
         JoinData {
             table: self.table,
             conditions,
+            lateral: false,
         }
     }
 }

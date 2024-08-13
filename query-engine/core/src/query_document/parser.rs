@@ -4,7 +4,7 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use core::fmt;
 use indexmap::{IndexMap, IndexSet};
-use prisma_models::{DefaultKind, PrismaValue, ValueGeneratorFn};
+use query_structure::{DefaultKind, PrismaValue, ValueGeneratorFn};
 use std::{borrow::Cow, convert::TryFrom, rc::Rc, str::FromStr};
 use user_facing_errors::query_engine::validation::ValidationError;
 use uuid::Uuid;
@@ -25,6 +25,7 @@ impl QueryDocumentParser {
     pub fn parse<'a>(
         &self,
         selections: &[Selection],
+        exclusions: Option<&[Exclusion]>,
         schema_object: &ObjectType<'a>,
         fields: ResolveField<'a, '_>,
         query_schema: &'a QuerySchema,
@@ -33,6 +34,7 @@ impl QueryDocumentParser {
             Path::default(),
             Path::default(),
             selections,
+            exclusions,
             schema_object,
             Some(fields),
             query_schema,
@@ -44,11 +46,13 @@ impl QueryDocumentParser {
     /// In contrast, nullable and optional types on an input object are separate concepts.
     /// The above is the reason we don't need to check nullability here, as it is done by the output
     /// validation in the serialization step.
+    #[allow(clippy::too_many_arguments)]
     fn parse_object<'a>(
         &self,
         selection_path: Path,
         argument_path: Path,
         selections: &[Selection],
+        exclusions: Option<&[Exclusion]>,
         schema_object: &ObjectType<'a>,
         resolve_field: Option<ResolveField<'a, '_>>,
         query_schema: &'a QuerySchema,
@@ -62,6 +66,17 @@ impl QueryDocumentParser {
 
         let resolve_adhoc = move |name: &str| schema_object.find_field(name).cloned();
         let resolve_field = resolve_field.unwrap_or(&resolve_adhoc);
+
+        if let Some(exclusions) = exclusions {
+            for exclusion in exclusions {
+                if resolve_field(&exclusion.name).is_none() {
+                    return Err(ValidationError::unknown_selection_field(
+                        selection_path.add(exclusion.name.to_owned()).segments(),
+                        conversions::schema_object_to_output_type_description(schema_object),
+                    ));
+                }
+            }
+        }
 
         selections
             .iter()
@@ -106,10 +121,10 @@ impl QueryDocumentParser {
         )
         .and_then(move |arguments| {
             if !selection.nested_selections().is_empty() && schema_field.field_type().is_scalar() {
-                Err(ValidationError::selection_set_on_scalar(
+                return Err(ValidationError::selection_set_on_scalar(
                     selection.name().to_string(),
                     selection_path.segments(),
-                ))
+                ));
             } else {
                 // If the output type of the field is an object type of any form, validate the sub selection as well.
                 let nested_fields = schema_field.field_type().as_object_type().map(|obj| {
@@ -117,6 +132,7 @@ impl QueryDocumentParser {
                         selection_path.clone(),
                         argument_path.clone(),
                         selection.nested_selections(),
+                        selection.nested_exclusions(),
                         obj,
                         None,
                         query_schema,
@@ -414,7 +430,7 @@ impl QueryDocumentParser {
         argument_path: &Path,
         s: &str,
     ) -> QueryParserResult<DateTime<FixedOffset>> {
-        prisma_models::parse_datetime(s).map_err(|err| {
+        query_structure::parse_datetime(s).map_err(|err| {
             ValidationError::invalid_argument_value(
                 selection_path.segments(),
                 argument_path.segments(),
@@ -426,15 +442,17 @@ impl QueryDocumentParser {
     }
 
     fn parse_bytes(&self, selection_path: &Path, argument_path: &Path, s: String) -> QueryParserResult<PrismaValue> {
-        prisma_models::decode_bytes(&s).map(PrismaValue::Bytes).map_err(|err| {
-            ValidationError::invalid_argument_value(
-                selection_path.segments(),
-                argument_path.segments(),
-                s.to_string(),
-                "base64 String",
-                Some(Box::new(err)),
-            )
-        })
+        query_structure::decode_bytes(&s)
+            .map(PrismaValue::Bytes)
+            .map_err(|err| {
+                ValidationError::invalid_argument_value(
+                    selection_path.segments(),
+                    argument_path.segments(),
+                    s.to_string(),
+                    "base64 String",
+                    Some(Box::new(err)),
+                )
+            })
     }
 
     fn parse_decimal(
@@ -715,7 +733,7 @@ impl QueryDocumentParser {
             })
             .collect::<QueryParserResult<ParsedInputMap<'a>>>()?;
 
-        map.extend(defaults.into_iter());
+        map.extend(defaults);
 
         // Ensure the constraints are upheld. If any `fields` are specified, then the constraints should be upheld against those only.
         // If no `fields` are specified, then the constraints should be upheld against all fields of the object.
@@ -782,7 +800,7 @@ pub(crate) mod conversions {
         schema::{InputType, OutputType},
         ArgumentValue,
     };
-    use prisma_models::PrismaValue;
+    use query_structure::PrismaValue;
     use schema::InnerOutputType;
     use user_facing_errors::query_engine::validation::{self, InputTypeDescription};
 
@@ -869,6 +887,7 @@ pub(crate) mod conversions {
                 format!("({})", itertools::join(v.iter().map(argument_value_to_type_name), ", "))
             }
             ArgumentValue::FieldRef(_) => "FieldRef".to_string(),
+            ArgumentValue::Raw(_) => "JSON".to_string(),
         }
     }
 

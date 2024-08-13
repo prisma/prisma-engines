@@ -59,8 +59,9 @@ impl<'a> Model<'a> {
         }
     }
 
-    /// Documentation of the model. If called repeteadly,
-    /// adds the new docs to the end with a newline.
+    /// Documentation of the model. If called repeatedly, adds the new docs to the end with a
+    /// newline. This method is also responsible for avoiding to add the same comment twice (mainly
+    /// in reintrospection).
     ///
     /// ```ignore
     /// /// This is the documentation.
@@ -68,10 +69,21 @@ impl<'a> Model<'a> {
     ///   ....
     /// }
     /// ```
-    pub fn documentation(&mut self, documentation: impl Into<Cow<'a, str>>) {
+    pub fn documentation(&mut self, new_documentation: impl Into<Cow<'a, str>>) {
+        let new_documentation: Cow<'_, str> = new_documentation.into();
+
+        if self
+            .documentation
+            .as_ref()
+            .map(|d| d.0.contains(new_documentation.as_ref()))
+            .unwrap_or_default()
+        {
+            return;
+        }
+
         match self.documentation.as_mut() {
-            Some(docs) => docs.push(documentation),
-            None => self.documentation = Some(Documentation(documentation.into())),
+            Some(documentation) => documentation.push(new_documentation),
+            None => self.documentation = Some(Documentation(new_documentation)),
         }
     }
 

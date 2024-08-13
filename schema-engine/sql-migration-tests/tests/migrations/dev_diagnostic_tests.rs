@@ -343,11 +343,7 @@ fn dev_diagnostic_can_detect_edited_migrations(api: TestApi) {
         .send_sync()
         .assert_applied_migrations(&["initial", "second-migration"]);
 
-    let mut file = std::fs::OpenOptions::new()
-        .write(true)
-        .append(true)
-        .open(initial_path)
-        .unwrap();
+    let mut file = std::fs::OpenOptions::new().append(true).open(initial_path).unwrap();
     file.write_all(b"-- test\nSELECT 1;").unwrap();
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
@@ -392,11 +388,7 @@ fn dev_diagnostic_reports_migrations_failing_to_apply_cleanly(api: TestApi) {
         .send_sync()
         .assert_applied_migrations(&["initial", "second-migration"]);
 
-    let mut file = std::fs::OpenOptions::new()
-        .write(true)
-        .append(true)
-        .open(initial_path)
-        .unwrap();
+    let mut file = std::fs::OpenOptions::new().append(true).open(initial_path).unwrap();
     file.write_all(b"SELECT YOLO;\n").unwrap();
 
     let err = api.dev_diagnostic(&directory).send_unwrap_err().to_user_facing();

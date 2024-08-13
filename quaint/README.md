@@ -13,23 +13,17 @@ Quaint is an abstraction over certain SQL databases. It provides:
 - Pooling with [mobc](https://crates.io/crates/mobc)
 - Async/await and Futures 0.3
 
-### Documentation
-
-- [Released](https://docs.rs/quaint)
-- [Main](https://prisma.github.io/quaint/quaint/index.html)
-
 ### Feature flags
 
 - `mysql`: Support for MySQL databases.
+  - On non-WebAssembly targets, choose `mysql-native` instead.
 - `postgresql`: Support for PostgreSQL databases.
+  - On non-WebAssembly targets, choose `postgresql-native` instead.
 - `sqlite`: Support for SQLite databases.
+  - On non-WebAssembly targets, choose `sqlite-native` instead.
 - `mssql`: Support for Microsoft SQL Server databases.
+  - On non-WebAssembly targets, choose `mssql-native` instead.
 - `pooled`: A connection pool in `pooled::Quaint`.
-- `json`: JSON type support with `serde_json` crate.
-- `uuid`: UUID type support with `uuid` crate.
-- `chrono`: DateTime type support with `chrono` crate.
-- `serde-support`: Deserialize support from result set with `serde` crate.
-- `bigdecimal`: Numeric values can be read as `BigDecimal`.
 - `vendored-openssl`: Statically links against a vendored OpenSSL library on
   non-Windows or non-Apple platforms.
 - `fmt-sql`: Enables logging SQL queries _formatted_. The `FMT_SQL` env var must be present for the formatting to be enabled.
@@ -51,7 +45,7 @@ choice.
 
 ```sh
  > cargo build --features all
- ```
+```
 
 ### Testing
 
@@ -77,11 +71,11 @@ The `FMT_SQL` environment variable can be used to log _formatted_ SQL queries. B
 This requires the rust nightly channel:
 
 ```sh
-> cargo +nightly rustdoc --all-features
+> cargo rustdoc --all-features
 ```
 
-Documentation index would be created at `$CARGO_TARGET_DIR/doc/quaint/index.html`
+Documentation index would be created at `$CARGO_TARGET_DIR/doc/quaint/index.html`.
 
 ## Security
 
-If you have a security issue to report, please contact us at [security@prisma.io](mailto:security@prisma.io?subject=[GitHub]%20Prisma%202%20Security%20Report%20Quaint)
+If you have a security issue to report, please contact us at [security@prisma.io](mailto:security@prisma.io?subject=[GitHub]%20Prisma%202%20Security%20Report%20Quaint).

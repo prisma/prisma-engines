@@ -52,7 +52,27 @@ pub(crate) struct Metric {
 }
 
 impl Metric {
-    pub fn new(key: Key, description: String, value: MetricValue, global_labels: HashMap<String, String>) -> Self {
+    pub(crate) fn renamed(
+        key: Key,
+        descriptions: &HashMap<String, String>,
+        value: MetricValue,
+        global_labels: &HashMap<String, String>,
+    ) -> Self {
+        match crate::METRIC_RENAMES.get(key.name()) {
+            Some((new_key, new_description)) => Self::new(
+                Key::from_parts(new_key.to_string(), key.labels()),
+                new_description.to_string(),
+                value,
+                global_labels.clone(),
+            ),
+            None => {
+                let description = descriptions.get(key.name()).map(|s| s.to_string()).unwrap_or_default();
+                Self::new(key, description, value, global_labels.clone())
+            }
+        }
+    }
+
+    fn new(key: Key, description: String, value: MetricValue, global_labels: HashMap<String, String>) -> Self {
         let (name, labels) = key.into_parts();
 
         let mut labels_map: HashMap<String, String> = labels
@@ -62,13 +82,8 @@ impl Metric {
 
         labels_map.extend(global_labels);
 
-        let mut key = name.as_str();
-        if let Some(rename) = crate::METRIC_RENAMES.get(key) {
-            key = rename;
-        }
-
         Self {
-            key: key.to_string(),
+            key: name.as_str().to_string(),
             value,
             description,
             labels: labels_map,

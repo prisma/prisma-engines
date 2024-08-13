@@ -29,7 +29,7 @@ impl<T> MigrationPair<T> {
     {
         f(&self.previous)
             .into_iter()
-            .zip(f(&self.next).into_iter())
+            .zip(f(&self.next))
             .map(MigrationPair::from)
     }
 

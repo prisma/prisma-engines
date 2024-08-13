@@ -1,15 +1,14 @@
 use super::read::get_single_record;
 
 use crate::column_metadata::{self, ColumnMetadata};
-use crate::filter_conversion::AliasedCondition;
+use crate::filter::FilterBuilder;
 use crate::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
 use crate::row::ToSqlRow;
 use crate::{Context, QueryExt, Queryable};
 
 use connector_interface::*;
 use itertools::Itertools;
-use prisma_models::*;
-use std::usize;
+use query_structure::*;
 
 /// Performs an update with an explicit selection set.
 /// This function is called for connectors that supports the `UpdateReturning` capability.
@@ -21,18 +20,18 @@ pub(crate) async fn update_one_with_selection(
     selected_fields: FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SingleRecord>> {
-    let selected_fields = ModelProjection::from(selected_fields);
-
     // If there's nothing to update, just read the record.
     // TODO(perf): Technically, if the selectors are fulfilling the field selection, there's no need to perform an additional read.
     if args.args.is_empty() {
         let filter = build_update_one_filter(record_filter);
-
-        return get_single_record(conn, model, &filter, &selected_fields, &[], ctx).await;
+        return get_single_record(conn, model, &filter, &selected_fields, RelationLoadStrategy::Query, ctx).await;
     }
 
-    let update = build_update_and_set_query(model, args, Some(&selected_fields), ctx)
-        .so_that(build_update_one_filter(record_filter).aliased_condition_from(None, false, ctx));
+    let selected_fields = ModelProjection::from(selected_fields);
+
+    let cond = FilterBuilder::without_top_level_joins().visit_filter(build_update_one_filter(record_filter), ctx);
+
+    let update = build_update_and_set_query(model, args, Some(&selected_fields), ctx).so_that(cond);
 
     let field_names: Vec<_> = selected_fields.db_names().collect();
     let idents = selected_fields.type_identifiers_with_arities();
@@ -101,7 +100,7 @@ pub(crate) async fn update_many_from_filter(
     ctx: &Context<'_>,
 ) -> crate::Result<usize> {
     let update = build_update_and_set_query(model, args, None, ctx);
-    let filter_condition = record_filter.filter.aliased_condition_from(None, false, ctx);
+    let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter, ctx);
     let update = update.so_that(filter_condition);
     let count = conn.execute(update.into()).await?;
 
@@ -117,7 +116,7 @@ pub(crate) async fn update_many_from_ids_and_filter(
     args: WriteArgs,
     ctx: &Context<'_>,
 ) -> crate::Result<(usize, Vec<SelectionResult>)> {
-    let filter_condition = record_filter.filter.aliased_condition_from(None, false, ctx);
+    let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter.clone(), ctx);
     let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter, ctx).await?;
 
     if ids.is_empty() {

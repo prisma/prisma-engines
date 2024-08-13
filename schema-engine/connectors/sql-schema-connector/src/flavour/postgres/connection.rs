@@ -5,7 +5,7 @@ use indoc::indoc;
 use psl::PreviewFeature;
 use quaint::{
     connector::{self, tokio_postgres::error::ErrorPosition, PostgresUrl},
-    prelude::{ConnectionInfo, Queryable},
+    prelude::{ConnectionInfo, NativeConnectionInfo, Queryable},
 };
 use schema_connector::{ConnectorError, ConnectorResult, Namespaces};
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
@@ -29,17 +29,44 @@ impl Connection {
 
         let version = quaint.version().await.map_err(quaint_err(&url))?;
 
-        if version.map(|v| v.starts_with("CockroachDB CCL v22.2")).unwrap_or(false) {
-            // first config issue: https://github.com/prisma/prisma/issues/16909
-            // second config value: Currently at least version 22.2.5, enums are
-            // not case-sensitive without this.
-            quaint
-                .raw_cmd(indoc! {r#"
-                    SET enable_implicit_transaction_for_batch_statements=false;
-                    SET use_declarative_schema_changer=off
-                "#})
-                .await
-                .map_err(quaint_err(&url))?;
+        if let Some(version) = version {
+            let cockroach_version_prefix = "CockroachDB CCL v";
+
+            let semver: Option<(u8, u8)> = version.strip_prefix(cockroach_version_prefix).and_then(|v| {
+                let semver_unparsed: String = v.chars().take_while(|&c| c.is_ascii_digit() || c == '.').collect();
+
+                // we only consider the major and minor version, as the patch version is not interesting for us
+                semver_unparsed.split_once('.').and_then(|(major, minor_and_patch)| {
+                    let major = major.parse::<u8>().ok();
+
+                    let minor = minor_and_patch
+                        .chars()
+                        .take_while(|&c| c != '.')
+                        .collect::<String>()
+                        .parse::<u8>()
+                        .ok();
+
+                    major.zip(minor)
+                })
+            });
+
+            match semver {
+                Some((major, minor)) if (major == 22 && minor >= 2) || major >= 23 => {
+                    // we're on 22.2+ or 23+
+                    //
+                    // first config issue: https://github.com/prisma/prisma/issues/16909
+                    // second config value: Currently at least version 22.2.5, enums are
+                    // not case-sensitive without this.
+                    quaint
+                        .raw_cmd(indoc! {r#"
+                            SET enable_implicit_transaction_for_batch_statements=false;
+                            SET use_declarative_schema_changer=off
+                        "#})
+                        .await
+                        .map_err(quaint_err(&url))?;
+                }
+                None | Some(_) => (),
+            };
         }
 
         Ok(Connection(quaint))
@@ -117,6 +144,15 @@ impl Connection {
     ) -> ConnectorResult<quaint::prelude::ResultSet> {
         tracing::debug!(query_type = "query_raw", sql, ?params);
         self.0.query_raw(sql, params).await.map_err(quaint_err(url))
+    }
+
+    pub(super) async fn parse_raw_query(
+        &self,
+        sql: &str,
+        url: &PostgresUrl,
+    ) -> ConnectorResult<quaint::connector::ParsedRawQuery> {
+        tracing::debug!(query_type = "parse_raw_query", sql);
+        self.0.parse_raw_query(sql).await.map_err(quaint_err(url))
     }
 
     pub(super) async fn apply_migration_script(&mut self, migration_name: &str, script: &str) -> ConnectorResult<()> {
@@ -202,5 +238,10 @@ fn normalize_sql_schema(schema: &mut SqlSchema, preview_features: BitFlags<Previ
 }
 
 fn quaint_err(url: &PostgresUrl) -> impl (Fn(quaint::error::Error) -> ConnectorError) + '_ {
-    |err| crate::flavour::quaint_error_to_connector_error(err, &ConnectionInfo::Postgres(url.clone()))
+    |err| {
+        crate::flavour::quaint_error_to_connector_error(
+            err,
+            &ConnectionInfo::Native(NativeConnectionInfo::Postgres(url.clone())),
+        )
+    }
 }

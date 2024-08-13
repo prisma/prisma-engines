@@ -160,20 +160,16 @@ impl MetricRegistry {
         let mut counters: Vec<Metric> = counter_handles
             .into_iter()
             .map(|(key, counter)| {
-                let key_name = key.name();
                 let value = counter.get_inner().load(Ordering::Acquire);
-                let description = descriptions.get(key_name).cloned().unwrap_or_default();
-                Metric::new(key, description, MetricValue::Counter(value), global_labels.clone())
+                Metric::renamed(key, &descriptions, MetricValue::Counter(value), &global_labels)
             })
             .collect();
 
         let mut gauges: Vec<Metric> = gauge_handles
             .into_iter()
             .map(|(key, gauge)| {
-                let key_name = key.name();
-                let description = descriptions.get(key_name).cloned().unwrap_or_default();
                 let value = f64::from_bits(gauge.get_inner().load(Ordering::Acquire));
-                Metric::new(key, description, MetricValue::Gauge(value), global_labels.clone())
+                Metric::renamed(key, &descriptions, MetricValue::Gauge(value), &global_labels)
             })
             .collect();
 
@@ -185,13 +181,11 @@ impl MetricRegistry {
                     histogram.record_many(s);
                 });
 
-                let key_name = key.name();
-                let description = descriptions.get(key_name).cloned().unwrap_or_default();
-                Metric::new(
+                Metric::renamed(
                     key,
-                    description,
+                    &descriptions,
                     MetricValue::Histogram(histogram.into()),
-                    global_labels.clone(),
+                    &global_labels,
                 )
             })
             .collect();

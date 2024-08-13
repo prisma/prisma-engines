@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use super::*;
 use constants::{aggregations, ordering};
 use output_types::aggregation;
-use prisma_models::prelude::ParentContainer;
+use query_structure::prelude::ParentContainer;
 
 #[derive(Debug, Default, Clone, Copy)]
 pub(crate) struct OrderByOptions {
@@ -28,9 +28,8 @@ impl OrderByOptions {
             self.include_scalar_aggregations,
             self.include_full_text_search,
         ) {
-            (true, false, false) => "WithRelation",
+            (true, false, _) => "WithRelation",
             (false, true, false) => "WithAggregation",
-            (true, false, true) => "WithRelationAndSearchRelevance",
             _ => "",
         }
     }

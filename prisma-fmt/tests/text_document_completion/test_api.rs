@@ -1,3 +1,4 @@
+use crate::helpers::load_schema_files;
 use once_cell::sync::Lazy;
 use std::{fmt::Write as _, io::Write as _};
 
@@ -8,20 +9,20 @@ static UPDATE_EXPECT: Lazy<bool> = Lazy::new(|| std::env::var("UPDATE_EXPECT").i
 pub(crate) fn test_scenario(scenario_name: &str) {
     let mut path = String::with_capacity(SCENARIOS_PATH.len() + 12);
 
-    let schema = {
-        write!(path, "{SCENARIOS_PATH}/{scenario_name}/schema.prisma").unwrap();
-        std::fs::read_to_string(&path).unwrap()
+    let schema_files = {
+        write!(path, "{SCENARIOS_PATH}/{scenario_name}").unwrap();
+        load_schema_files(&path)
     };
 
     path.clear();
     write!(path, "{SCENARIOS_PATH}/{scenario_name}/result.json").unwrap();
     let expected_result = std::fs::read_to_string(&path).unwrap_or_else(|_| String::new());
 
-    let (cursor_position, schema) = take_cursor(&schema);
+    let (initiating_file_uri, cursor_position, schema_files) = take_cursor(schema_files);
     let params = lsp_types::CompletionParams {
         text_document_position: lsp_types::TextDocumentPositionParams {
             text_document: lsp_types::TextDocumentIdentifier {
-                uri: "https://example.com/meow".parse().unwrap(),
+                uri: initiating_file_uri.parse().unwrap(),
             }, // ignored
             position: cursor_position,
         },
@@ -32,7 +33,10 @@ pub(crate) fn test_scenario(scenario_name: &str) {
         context: None,
     };
 
-    let result = prisma_fmt::text_document_completion(schema, &serde_json::to_string_pretty(&params).unwrap());
+    let result = prisma_fmt::text_document_completion(
+        serde_json::to_string_pretty(&schema_files).unwrap(),
+        &serde_json::to_string_pretty(&params).unwrap(),
+    );
     // Prettify the JSON
     let result =
         serde_json::to_string_pretty(&serde_json::from_str::<lsp_types::CompletionList>(&result).unwrap()).unwrap();
@@ -73,7 +77,24 @@ fn format_chunks(chunks: Vec<dissimilar::Chunk>) -> String {
     buf
 }
 
-fn take_cursor(schema: &str) -> (lsp_types::Position, String) {
+fn take_cursor(schema_files: Vec<(String, String)>) -> (String, lsp_types::Position, Vec<(String, String)>) {
+    let mut result = Vec::with_capacity(schema_files.len());
+    let mut file_and_pos = None;
+    for (file_name, content) in schema_files {
+        if let Some((pos, without_cursor)) = take_cursor_one(&content) {
+            file_and_pos = Some((file_name.clone(), pos));
+            result.push((file_name, without_cursor));
+        } else {
+            result.push((file_name, content));
+        }
+    }
+
+    let (file_name, position) = file_and_pos.expect("Could not find a cursor in any of the schema files");
+
+    (file_name, position, result)
+}
+
+fn take_cursor_one(schema: &str) -> Option<(lsp_types::Position, String)> {
     let mut schema_without_cursor = String::with_capacity(schema.len() - 3);
     let mut cursor_position = lsp_types::Position { character: 0, line: 0 };
     let mut cursor_found = false;
@@ -96,11 +117,13 @@ fn take_cursor(schema: &str) -> (lsp_types::Position, String) {
         }
     }
 
-    assert!(cursor_found);
+    if !cursor_found {
+        return None;
+    }
     // remove extra newline
     schema_without_cursor.truncate(schema_without_cursor.len() - 1);
 
-    (cursor_position, schema_without_cursor)
+    Some((cursor_position, schema_without_cursor))
 }
 
 #[test]
@@ -116,7 +139,7 @@ fn take_cursor_works() {
         }
     "#;
 
-    let (pos, schema) = take_cursor(schema);
+    let (pos, schema) = take_cursor_one(schema).unwrap();
     assert_eq!(pos.line, 2);
     assert_eq!(pos.character, 28);
     assert_eq!(schema, expected_schema);

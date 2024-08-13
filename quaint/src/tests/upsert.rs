@@ -1,20 +1,13 @@
 use super::test_api::*;
 use crate::{connector::Queryable, prelude::*};
-use test_macros::test_each_connector;
+use quaint_test_macros::test_each_connector;
 
 #[test_each_connector(tags("postgresql", "sqlite"))]
 async fn upsert_on_primary_key(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int primary key, x int").await?;
 
-    let update = Update::table(&table).set("x", 2).so_that((&table, "id").equals(1));
-
-    let insert: Insert = Insert::single_into(&table).value("id", 1).value("x", 1).into();
-
-    let query: Query = insert
-        .on_conflict(OnConflict::Update(update, Vec::from(["id".into()])))
-        .into();
     // Insert
-    let count = api.conn().execute(query.clone()).await?;
+    let count = api.conn().execute(upsert_on_primary_key_query(&table)).await?;
 
     assert_eq!(count, 1);
 
@@ -25,7 +18,7 @@ async fn upsert_on_primary_key(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(Some(1), row["x"].as_i32());
 
     // // Update
-    let count = api.conn().execute(query).await?;
+    let count = api.conn().execute(upsert_on_primary_key_query(&table)).await?;
     assert_eq!(count, 1);
 
     let row = api.conn().select(select).await?.into_single()?;
@@ -36,23 +29,22 @@ async fn upsert_on_primary_key(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
+fn upsert_on_primary_key_query(table: &str) -> Query<'_> {
+    let update = Update::table(table).set("x", 2).so_that((table, "id").equals(1));
+
+    let insert: Insert = Insert::single_into(table).value("id", 1).value("x", 1).into();
+
+    insert
+        .on_conflict(OnConflict::Update(update, Vec::from(["id".into()])))
+        .into()
+}
+
 #[test_each_connector(tags("postgresql", "sqlite"))]
 async fn upsert_on_unique_field(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int primary key, x int UNIQUE, y int").await?;
 
-    let update = Update::table(&table).set("y", 2).so_that((&table, "id").equals(1));
-
-    let insert: Insert = Insert::single_into(&table)
-        .value("id", 1)
-        .value("x", 1)
-        .value("y", 1)
-        .into();
-
-    let query: Query = insert
-        .on_conflict(OnConflict::Update(update, Vec::from(["x".into()])))
-        .into();
     // Insert
-    let count = api.conn().execute(query.clone()).await?;
+    let count = api.conn().execute(upsert_on_unique_field_query(&table)).await?;
 
     assert_eq!(count, 1);
 
@@ -64,7 +56,7 @@ async fn upsert_on_unique_field(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(Some(1), row["y"].as_i32());
 
     // Update
-    let count = api.conn().execute(query).await?;
+    let count = api.conn().execute(upsert_on_unique_field_query(&table)).await?;
     assert_eq!(count, 1);
 
     let row = api.conn().select(select).await?.into_single()?;
@@ -76,26 +68,31 @@ async fn upsert_on_unique_field(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
+fn upsert_on_unique_field_query(table: &str) -> Query<'_> {
+    let update = Update::table(table).set("y", 2).so_that((table, "id").equals(1));
+
+    let insert: Insert = Insert::single_into(table)
+        .value("id", 1)
+        .value("x", 1)
+        .value("y", 1)
+        .into();
+
+    insert
+        .on_conflict(OnConflict::Update(update, Vec::from(["x".into()])))
+        .into()
+}
+
 #[test_each_connector(tags("postgresql", "sqlite"))]
 async fn upsert_on_multiple_unique_fields(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api
         .create_temp_table("id int primary key, x int, y int, CONSTRAINT ux_x_y UNIQUE (x, y)")
         .await?;
 
-    let update = Update::table(&table).set("y", 2).so_that((&table, "id").equals(1));
-
-    let insert: Insert = Insert::single_into(&table)
-        .value("id", 1)
-        .value("x", 1)
-        .value("y", 1)
-        .into();
-
-    let query: Query = insert
-        .on_conflict(OnConflict::Update(update, Vec::from(["x".into(), "y".into()])))
-        .into();
-
     // Insert
-    let count = api.conn().execute(query.clone()).await?;
+    let count = api
+        .conn()
+        .execute(upsert_on_multiple_unique_fields_query(&table))
+        .await?;
 
     assert_eq!(count, 1);
 
@@ -107,7 +104,10 @@ async fn upsert_on_multiple_unique_fields(api: &mut dyn TestApi) -> crate::Resul
     assert_eq!(Some(1), row["y"].as_i32());
 
     // Update
-    let count = api.conn().execute(query).await?;
+    let count = api
+        .conn()
+        .execute(upsert_on_multiple_unique_fields_query(&table))
+        .await?;
     assert_eq!(count, 1);
 
     let row = api.conn().select(select).await?.into_single()?;
@@ -117,4 +117,18 @@ async fn upsert_on_multiple_unique_fields(api: &mut dyn TestApi) -> crate::Resul
     assert_eq!(Some(2), row["y"].as_i32());
 
     Ok(())
+}
+
+fn upsert_on_multiple_unique_fields_query(table: &str) -> Query<'_> {
+    let update = Update::table(table).set("y", 2).so_that((table, "id").equals(1));
+
+    let insert: Insert = Insert::single_into(table)
+        .value("id", 1)
+        .value("x", 1)
+        .value("y", 1)
+        .into();
+
+    insert
+        .on_conflict(OnConflict::Update(update, Vec::from(["x".into(), "y".into()])))
+        .into()
 }

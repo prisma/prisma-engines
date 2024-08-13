@@ -4,9 +4,13 @@ use indoc::formatdoc;
 use psl::PreviewFeature;
 use quaint::single::Quaint;
 use schema_connector::{CompositeTypeDepth, ConnectorParams, IntrospectionContext, SchemaConnector};
-use sql_introspection_tests::test_api::Queryable;
+use sql_introspection_tests::test_api::{Queryable, ToIntrospectionTestResult};
 use sql_schema_connector::SqlSchemaConnector;
-use std::{fs, io::Write as _, path};
+use std::{
+    fs,
+    io::Write as _,
+    path::{self, PathBuf},
+};
 use test_setup::{
     mssql::init_mssql_database, mysql::create_mysql_database, postgres::create_postgres_database,
     runtime::run_with_thread_local_runtime as tok, sqlite_test_url,
@@ -73,7 +77,7 @@ fn run_simple_test(test_file_path: &str, test_function_name: &'static str) {
     let mut database_url = std::env::var("TEST_DATABASE_URL").expect(r#"
 Missing TEST_DATABASE_URL from environment.
 
-If you are developing with the docker-compose based setup, you can find the environment variables under .test_database_urls at the project root.
+If you are developing with the docker compose based setup, you can find the environment variables under .test_database_urls at the project root.
 
 Example usage:
 
@@ -203,15 +207,16 @@ source .test_database_urls/mysql_5_6
         )
     };
 
-    let config = dbg!(format!("{datasource}\n\n{generator}"));
+    let config = format!("{datasource}\n\n{generator}");
 
     let psl = psl::validate(config.into());
 
-    let ctx = IntrospectionContext::new(psl, CompositeTypeDepth::Infinite, namespaces);
+    let ctx = IntrospectionContext::new(psl, CompositeTypeDepth::Infinite, namespaces.clone(), PathBuf::new());
 
     let introspected = tok(api.introspect(&ctx))
+        .map(ToIntrospectionTestResult::to_single_test_result)
         .unwrap_or_else(|err| panic!("{}", err))
-        .data_model;
+        .datamodel;
 
     let last_comment_idx = text
         .match_indices("/*")
@@ -225,7 +230,33 @@ source .test_database_urls/mysql_5_6
         .trim_end_matches("*/\n");
 
     if last_comment == introspected {
-        return; // success!
+        let introspected_schema = match psl::parse_schema(&introspected) {
+            Ok(s) => s,
+            Err(_err) => {
+                eprintln!("The introspected schema is invalid.");
+                return; // success! (?)
+            }
+        };
+
+        let re_introspected = {
+            let ctx = IntrospectionContext::new(
+                introspected_schema,
+                CompositeTypeDepth::Infinite,
+                namespaces,
+                PathBuf::new(),
+            );
+
+            tok(api.introspect(&ctx))
+                .map(ToIntrospectionTestResult::to_single_test_result)
+                .unwrap_or_else(|err| panic!("{}", err))
+                .datamodel
+        };
+
+        if introspected == re_introspected {
+            return; // success!
+        }
+
+        test_setup::panic_with_diff(&introspected, &re_introspected)
     }
 
     if std::env::var("UPDATE_EXPECT").is_ok() {

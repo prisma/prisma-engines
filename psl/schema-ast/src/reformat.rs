@@ -19,6 +19,8 @@ pub fn reformat(input: &str, indent_width: usize) -> Option<String> {
         renderer.stream.push('\n');
     }
 
+    // TODO: why do we need to use a `Some` here?
+    // Also: if we really want to return an `Option<String>`, why do unwrap in `ast.next()`?
     Some(renderer.stream)
 }
 

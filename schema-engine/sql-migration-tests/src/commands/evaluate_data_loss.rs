@@ -6,15 +6,25 @@ use tempfile::TempDir;
 pub struct EvaluateDataLoss<'a> {
     api: &'a mut dyn SchemaConnector,
     migrations_directory: &'a TempDir,
-    prisma_schema: String,
+    files: Vec<SchemaContainer>,
 }
 
 impl<'a> EvaluateDataLoss<'a> {
-    pub fn new(api: &'a mut dyn SchemaConnector, migrations_directory: &'a TempDir, prisma_schema: String) -> Self {
+    pub fn new<'b>(
+        api: &'a mut dyn SchemaConnector,
+        migrations_directory: &'a TempDir,
+        files: &[(&'b str, &'b str)],
+    ) -> Self {
         EvaluateDataLoss {
             api,
             migrations_directory,
-            prisma_schema,
+            files: files
+                .iter()
+                .map(|(path, content)| SchemaContainer {
+                    path: path.to_string(),
+                    content: content.to_string(),
+                })
+                .collect(),
         }
     }
 
@@ -22,7 +32,7 @@ impl<'a> EvaluateDataLoss<'a> {
         let fut = evaluate_data_loss(
             EvaluateDataLossInput {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
-                prisma_schema: self.prisma_schema,
+                schema: SchemasContainer { files: self.files },
             },
             self.api,
         );

@@ -1,0 +1,172 @@
+name: "QE"
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths-ignore:
+      - "!.github/workflows/test-query-engine.yml"
+      - "!.github/workflows/test-query-engine-template.yml"
+      - ".github/**"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  postgres:
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - name: "postgres16"
+            version: "16"
+          - name: "postgres15"
+            version: "15"
+          - name: "postgres14"
+            version: "14"
+          - name: "postgres13"
+            version: "13"
+          - name: "postgres12"
+            version: "12"
+          - name: "postgres11"
+            version: "11"
+          - name: "postgres10"
+            version: "10"
+          - name: "postgres9"
+            version: "9"
+    uses: ./.github/workflows/test-query-engine-template.yml
+    name: postgres ${{ matrix.database.version }}
+    with:
+      name: ${{ matrix.database.name }}
+      version: ${{ matrix.database.version }}
+      connector: "postgres"
+      single_threaded: true
+
+  mysql:
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - name: "mysql_5_6"
+            version: "5.6"
+            relation_load_strategy: '["query"]'
+          - name: "mysql_5_7"
+            version: "5.7"
+            relation_load_strategy: '["query"]'
+          - name: "mysql_8"
+            version: "8"
+            relation_load_strategy: '["join", "query"]'
+          - name: "mysql_mariadb"
+            version: "mariadb"
+            relation_load_strategy: '["query"]'
+
+    uses: ./.github/workflows/test-query-engine-template.yml
+    name: mysql ${{ matrix.database.version }}
+    with:
+      name: ${{ matrix.database.name }}
+      version: ${{ matrix.database.version }}
+      connector: "mysql"
+      relation_load_strategy: ${{ matrix.database.relation_load_strategy }}
+      single_threaded: true
+
+  cockroachdb:
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - name: "cockroach_23_1"
+            connector: "cockroachdb"
+            version: "23.1"
+          - name: "cockroach_22_2"
+            version: "22.2"
+          - name: "cockroach_22_1_0"
+            version: "22.1"
+    uses: ./.github/workflows/test-query-engine-template.yml
+    name: cockroachdb ${{ matrix.database.version }}
+    with:
+      name: ${{ matrix.database.name }}
+      version: ${{ matrix.database.version }}
+      connector: "cockroachdb"
+
+  mongodb:
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - name: "mongodb_4_2"
+            version: "4.2"
+          - name: "mongodb_4_4"
+            version: "4.4"
+          - name: "mongodb_5"
+            connector: "mongodb"
+            version: "5"
+    uses: ./.github/workflows/test-query-engine-template.yml
+    name: mongodb ${{ matrix.database.version }}
+    with:
+      name: ${{ matrix.database.name }}
+      version: ${{ matrix.database.version }}
+      single_threaded: true
+      connector: "mongodb"
+      relation_load_strategy: '["query"]'
+
+  mssql:
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - name: "mssql_2022"
+            version: "2022"
+          - name: "mssql_2019"
+            version: "2019"
+          - name: "mssql_2017"
+            version: "2017"
+    uses: ./.github/workflows/test-query-engine-template.yml
+    name: mssql ${{ matrix.database.version }}
+    with:
+      name: ${{ matrix.database.name }}
+      version: ${{ matrix.database.version }}
+      connector: "sqlserver"
+      relation_load_strategy: '["query"]'
+
+  sqlite:
+    uses: ./.github/workflows/test-query-engine-template.yml
+    name: sqlite
+    with:
+      name: "sqlite"
+      version: 3
+      connector: "sqlite"
+      relation_load_strategy: '["query"]'
+  
+  driver_adapters:
+    strategy:
+      fail-fast: false
+      matrix:
+        adapter:
+          - name: "planetscale (napi)"
+            setup_task: "dev-planetscale-js"
+          - name: "pg (napi)"
+            setup_task: "dev-pg-js"
+          - name: "neon (napi)"
+            setup_task: "dev-neon-js"
+          - name: "libsql (napi)"
+            setup_task: "dev-libsql-js"
+          - name: "planetscale (wasm)"
+            setup_task: "dev-planetscale-wasm"
+          - name: "pg (wasm)"
+            setup_task: "dev-pg-wasm"
+          - name: "neon (wasm)"
+            setup_task: "dev-neon-wasm"
+          - name: "libsql (wasm)"
+            setup_task: "dev-libsql-wasm"
+          - name: "d1 (wasm)"
+            setup_task: "dev-d1"
+    name: ${{ matrix.adapter.name }}
+    uses: ./.github/workflows/test-driver-adapters-template.yml
+    with:
+      setup_task: ${{ matrix.adapter.setup_task }}

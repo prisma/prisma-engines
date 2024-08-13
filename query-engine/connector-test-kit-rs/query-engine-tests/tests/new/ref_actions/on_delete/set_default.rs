@@ -2,7 +2,10 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(suite = "setdefault_onD_1to1_req", exclude(MongoDb, MySQL))]
+#[test_suite(
+    suite = "setdefault_onD_1to1_req",
+    exclude(MongoDb, MySQL, Vitess("planetscale.js", "planetscale.js.wasm"))
+)]
 mod one2one_req {
     fn required_with_default() -> String {
         let schema = indoc! {
@@ -103,7 +106,10 @@ mod one2one_req {
     }
 }
 
-#[test_suite(suite = "setdefault_onD_1to1_opt", exclude(MongoDb, MySQL))]
+#[test_suite(
+    suite = "setdefault_onD_1to1_opt",
+    exclude(MongoDb, MySQL, Vitess("planetscale.js", "planetscale.js.wasm"))
+)]
 mod one2one_opt {
     fn optional_with_default() -> String {
         let schema = indoc! {
@@ -167,7 +173,10 @@ mod one2one_opt {
     }
 
     /// Deleting the parent reconnects the child to the default and fails (the default doesn't exist).
-    #[connector_test(schema(optional_with_default))]
+    #[connector_test(
+        schema(optional_with_default),
+        exclude(MongoDb, MySQL, Vitess("planetscale.js", "planetscale.js.wasm"))
+    )]
     async fn delete_parent_no_exist_fail(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneParent(data: { id: 1, child: { create: { id: 1 }}}) { id }}"#),
@@ -206,7 +215,10 @@ mod one2one_opt {
     }
 }
 
-#[test_suite(suite = "setdefault_onD_1toM_req", exclude(MongoDb, MySQL))]
+#[test_suite(
+    suite = "setdefault_onD_1toM_req",
+    exclude(MongoDb, MySQL, Vitess("planetscale.js", "planetscale.js.wasm"))
+)]
 mod one2many_req {
     fn required_with_default() -> String {
         let schema = indoc! {
@@ -307,7 +319,10 @@ mod one2many_req {
     }
 }
 
-#[test_suite(suite = "setdefault_onD_1toM_opt", exclude(MongoDb, MySQL))]
+#[test_suite(
+    suite = "setdefault_onD_1toM_opt",
+    exclude(MongoDb, MySQL, Vitess("planetscale.js", "planetscale.js.wasm"))
+)]
 mod one2many_opt {
     fn optional_with_default() -> String {
         let schema = indoc! {

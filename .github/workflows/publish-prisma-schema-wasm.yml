@@ -1,6 +1,7 @@
 name: Build and publish @prisma/prisma-schema-wasm
+run-name: npm - release @prisma/prisma-schema-wasm@${{ github.event.inputs.enginesWrapperVersion }} from ${{ github.event.inputs.enginesHash }} on ${{ github.event.inputs.npmDistTag }}
 
-concurrency: build-prisma-schema-wasm
+concurrency: publish-prisma-schema-wasm
 
 on:
   # usually triggered via GH Actions Workflow in prisma/engines-wrapper repo
@@ -8,11 +9,14 @@ on:
     inputs:
       enginesWrapperVersion:
         required: true
+        description: 'New @prisma/prisma-schema-wasm package version'
       enginesHash:
         required: true
+        description: 'prisma-engines commit to build'
       npmDistTag:
         required: true
-        default: "latest"
+        default: 'latest'
+        description: 'npm dist-tag (e.g. latest or integration)'
 
 jobs:
   build:
@@ -21,50 +25,41 @@ jobs:
     steps:
       - name: Print input
         env:
-          THE_INPUT: "${{ toJson(github.event.inputs) }}"
+          THE_INPUT: '${{ toJson(github.event.inputs) }}'
         run: |
           echo $THE_INPUT
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.enginesHash }}
-      - uses: cachix/install-nix-action@v22
 
-      #
-      # Build
-      #
+      - uses: ./.github/workflows/include/rust-wasm-setup
 
-      - run: nix build .#prisma-schema-wasm
+      - name: Build
+        run: make build-schema-wasm PROFILE=release SCHEMA_WASM_VERSION=${{ github.event.inputs.enginesWrapperVersion }}
 
-      #
-      # Publish
-      #
-
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: "14.x"
+          node-version: '20.x'
 
-      - name: Set up NPM token
+      # This is needed to be done manually because of `PACKAGE_DIR` used later
+      - name: Set up NPM token for publishing later
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
-      - run: |
-          PACKAGE_DIR=$( nix run .#renderPrismaSchemaWasmPackage ${{ github.event.inputs.enginesWrapperVersion }})
-          npm publish "$PACKAGE_DIR" --access public --tag ${{ github.event.inputs.npmDistTag }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
+      - name: Publish @prisma/prisma-schema-wasm
+        run: npm publish --access public --tag ${{ github.event.inputs.npmDistTag }}
+        working-directory: target/prisma-schema-wasm
       #
       # Failure handlers
       #
-
       - name: Set current job url in SLACK_FOOTER env var
         if: ${{ failure() }}
         run: echo "SLACK_FOOTER=<$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID|Click here to go to the job logs>" >> $GITHUB_ENV
-
       - name: Slack Notification on Failure
         if: ${{ failure() }}
-        uses: rtCamp/action-slack-notify@v2.2.0
+        uses: rtCamp/action-slack-notify@v2.3.0
         env:
-          SLACK_TITLE: "prisma-schema-wasm publishing failed :x:"
-          SLACK_COLOR: "#FF0000"
+          SLACK_TITLE: 'Building and publishing @prisma/prisma-schema-wasm failed :x:'
+          SLACK_COLOR: '#FF0000'
+          SLACK_CHANNEL: feed-prisma-schema-wasm-publish-failures
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_WASM_FAILING }}

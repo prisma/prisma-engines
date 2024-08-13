@@ -37,7 +37,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
         }
     }
 
-    fn push_connector_data(&self, context: &mut super::super::Context<'_>) {
+    fn push_connector_data(&self, context: &mut crate::sql_schema_calculator::Context<'_>) {
         let mut postgres_ext = PostgresSchemaExt::default();
         let db = &context.datamodel.db;
 
@@ -69,7 +69,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
         }
 
         for model in db.walk_models() {
-            let table_id = context.model_id_to_table_id[&model.model_id()];
+            let table_id = context.model_id_to_table_id[&model.id];
 
             // Add index algorithms and opclasses.
             for index in model.indexes() {

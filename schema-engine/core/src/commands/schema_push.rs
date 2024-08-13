@@ -1,21 +1,19 @@
-use crate::{json_rpc::types::*, parse_schema, CoreResult};
-use psl::parser_database::SourceFile;
+use crate::{json_rpc::types::*, parse_schema_multi, CoreResult, SchemaContainerExt};
 use schema_connector::{ConnectorError, DiffTarget, SchemaConnector};
-use std::sync::Arc;
 use tracing_futures::Instrument;
 
 /// Command to bring the local database in sync with the prisma schema, without
 /// interacting with the migrations directory nor the migrations table.
 pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConnector) -> CoreResult<SchemaPushOutput> {
-    let source = SourceFile::new_allocated(Arc::from(input.schema.into_boxed_str()));
-    let datamodel = parse_schema(source.clone())?;
+    let sources = input.schema.to_psl_input();
+    let datamodel = parse_schema_multi(&sources)?;
 
     if let Some(err) = connector.check_database_version_compatibility(&datamodel) {
         return Err(ConnectorError::user_facing(err));
     };
 
     let to = connector
-        .database_schema_from_diff_target(DiffTarget::Datamodel(source), None, None)
+        .database_schema_from_diff_target(DiffTarget::Datamodel(sources), None, None)
         .instrument(tracing::info_span!("Calculate `to`"))
         .await?;
 

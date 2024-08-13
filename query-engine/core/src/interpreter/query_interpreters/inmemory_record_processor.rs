@@ -1,6 +1,5 @@
-use connector::QueryArguments;
 use itertools::Itertools;
-use prisma_models::{FieldSelection, ManyRecords, Record, SelectionResult};
+use query_structure::*;
 use std::ops::Deref;
 
 #[derive(Debug)]
@@ -21,17 +20,18 @@ impl InMemoryRecordProcessor {
     /// Creates a new processor from the given query args.
     /// The original args will be modified to prevent db level processing.
     pub(crate) fn new_from_query_args(args: &mut QueryArguments) -> Self {
-        let processor = Self { args: args.clone() };
+        let mut processor = Self { args: args.clone() };
 
-        args.distinct = None;
+        if !args.requires_inmemory_distinct() {
+            processor.args.distinct = None;
+        } else {
+            args.distinct = None;
+        }
+
         args.ignore_take = true;
         args.ignore_skip = true;
 
         processor
-    }
-
-    fn take_abs(&self) -> Option<i64> {
-        self.take.map(|t| if t < 0 { -t } else { t })
     }
 
     /// Checks whether or not we need to take records going backwards in the record list,
@@ -51,7 +51,12 @@ impl InMemoryRecordProcessor {
             records
         };
 
-        let records = self.apply_distinct(records);
+        let records = if self.requires_inmemory_distinct() {
+            self.apply_distinct(records)
+        } else {
+            records
+        };
+
         let mut records = self.apply_pagination(records);
 
         if self.needs_reversed_order() {
@@ -100,7 +105,7 @@ impl InMemoryRecordProcessor {
                         .into_iter()
                         .unique_by(|record| {
                             record
-                                .extract_selection_result(field_names, &distinct_selection)
+                                .extract_selection_result_from_db_name(field_names, &distinct_selection)
                                 .unwrap()
                         })
                         .collect();
@@ -114,7 +119,7 @@ impl InMemoryRecordProcessor {
                 .into_iter()
                 .unique_by(|record| {
                     record
-                        .extract_selection_result(field_names, &distinct_selection)
+                        .extract_selection_result_from_db_name(field_names, &distinct_selection)
                         .unwrap()
                 })
                 .collect()
@@ -139,12 +144,14 @@ impl InMemoryRecordProcessor {
             let mut cursor_seen = false;
 
             many_records.records.retain(|record| {
-                let cursor_comparator = record.extract_selection_result(field_names, &cursor_selection).unwrap();
+                let cursor_comparator = record
+                    .extract_selection_result_from_db_name(field_names, &cursor_selection)
+                    .unwrap();
                 let record_values: Vec<_> = cursor_comparator.values().collect();
 
                 // Reset, new parent
                 if current_parent_id != record.parent_id {
-                    current_parent_id = record.parent_id.clone();
+                    current_parent_id.clone_from(&record.parent_id);
                     cursor_seen = false;
                 }
 
@@ -166,7 +173,7 @@ impl InMemoryRecordProcessor {
             if last_parent_id == record.parent_id {
                 current_count += 1;
             } else {
-                last_parent_id = record.parent_id.clone();
+                last_parent_id.clone_from(&record.parent_id);
                 current_count = 1; // this is the first record we see for this parent id
             };
 

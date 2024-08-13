@@ -1,7 +1,7 @@
 use super::{database_name::validate_db_name, names::Names};
 use crate::{
     ast::{self, WithName, WithSpan},
-    datamodel_connector::RelationMode,
+    datamodel_connector::{ConnectorCapability, RelationMode},
     diagnostics::DatamodelError,
     validate::validation_pipeline::context::Context,
 };
@@ -59,7 +59,7 @@ pub(super) fn ambiguity(field: RelationFieldWalker<'_>, names: &Names<'_>) -> Re
     let model = field.model();
     let related_model = field.related_model();
 
-    let identifier = (model.model_id(), related_model.model_id(), field.relation_name());
+    let identifier = (model.id, related_model.id, field.relation_name());
 
     match names.relation_names.get(&identifier) {
         Some(fields) if fields.len() > 1 => {
@@ -153,7 +153,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Cont
 
     // validation template for relationMode = "foreignKeys"
     let msg_foreign_keys = |action: ReferentialAction| {
-        let allowed_actions = connector.referential_actions();
+        let allowed_actions = connector.referential_actions(&relation_mode);
 
         format!(
             "Invalid referential action: `{}`. Allowed values: ({})",
@@ -237,7 +237,7 @@ pub(super) fn map(field: RelationFieldWalker<'_>, ctx: &mut Context<'_>) {
         return;
     }
 
-    if !ctx.connector.supports_named_foreign_keys() {
+    if !ctx.has_capability(ConnectorCapability::NamedForeignKeys) {
         let span = field
             .ast_field()
             .span_for_attribute("relation")
@@ -274,23 +274,27 @@ pub(super) fn validate_missing_relation_indexes(relation_field: RelationFieldWal
         // Considers all groups of indexes explicitly declared in the given model.
         // An index group can be:
         // - a singleton (@unique or @id)
-        // - an ordered set (@@unique or @@index)
-        let index_field_groups = model.indexes();
-
-        let referencing_fields_appear_in_index = index_field_groups
-            .map(|index_walker| index_walker.fields().map(|index| index.field_id()))
-            .any(|index_fields_it| {
-                let fields_it = referencing_fields_it.clone();
-                is_leftwise_included_it(fields_it, index_fields_it)
-            });
-
-        if !referencing_fields_appear_in_index {
-            let ast_field = relation_field.ast_field();
-            let span = ast_field
-                .span_for_attribute("relation")
-                .unwrap_or_else(|| ast_field.span());
-            ctx.push_warning(DatamodelWarning::new_missing_index_on_emulated_relation(span));
+        // - an ordered set (@@unique, @@index, or @@id)
+        for index_walker in model.indexes() {
+            let index_fields_it = index_walker.fields().map(|col| col.field_id());
+            let referencing_fields_it = referencing_fields_it.clone();
+            if is_leftwise_included_it(referencing_fields_it, index_fields_it) {
+                return;
+            }
         }
+
+        if let Some(primary_key_walker) = model.primary_key() {
+            let primary_key_fields_it = primary_key_walker.fields().map(|col| col.field_id());
+            if is_leftwise_included_it(referencing_fields_it, primary_key_fields_it) {
+                return;
+            }
+        }
+
+        let ast_field = relation_field.ast_field();
+        let span = ast_field
+            .span_for_attribute("relation")
+            .unwrap_or_else(|| ast_field.span());
+        ctx.push_warning(DatamodelWarning::new_missing_index_on_emulated_relation(span));
     }
 }
 
@@ -314,17 +318,17 @@ mod tests {
     use super::is_leftwise_included_it;
     #[test]
     fn test_is_left_wise_included() {
-        let item = vec![1, 2];
-        let group = vec![1, 2, 3, 4];
+        let item = [1, 2];
+        let group = [1, 2, 3, 4];
         assert!(is_leftwise_included_it(item.iter(), group.iter()));
-        let item = vec![1, 2, 3, 4];
-        let group = vec![1, 2, 3, 4];
+        let item = [1, 2, 3, 4];
+        let group = [1, 2, 3, 4];
         assert!(is_leftwise_included_it(item.iter(), group.iter()));
-        let item = vec![1, 2, 3, 4];
-        let group = vec![1, 2];
+        let item = [1, 2, 3, 4];
+        let group = [1, 2];
         assert!(!is_leftwise_included_it(item.iter(), group.iter()));
-        let item = vec![2, 3];
-        let group = vec![1, 2, 3, 4];
+        let item = [2, 3];
+        let group = [1, 2, 3, 4];
         assert!(!is_leftwise_included_it(item.iter(), group.iter()));
     }
 }

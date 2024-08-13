@@ -2,24 +2,34 @@ use colored::Colorize;
 use schema_core::{
     commands::schema_push, json_rpc::types::*, schema_connector::SchemaConnector, CoreError, CoreResult,
 };
+use std::time::Duration;
 use std::{borrow::Cow, fmt::Debug};
 use tracing_futures::Instrument;
 
 pub struct SchemaPush<'a> {
     api: &'a mut dyn SchemaConnector,
-    schema: String,
+    files: Vec<SchemaContainer>,
     force: bool,
     /// Purely for logging diagnostics.
     migration_id: Option<&'a str>,
+    // In eventually-consistent systems, we might need to wait for a while before the system refreshes
+    max_ddl_refresh_delay: Option<Duration>,
 }
 
 impl<'a> SchemaPush<'a> {
-    pub fn new(api: &'a mut dyn SchemaConnector, schema: String) -> Self {
+    pub fn new(api: &'a mut dyn SchemaConnector, files: &[(&str, &str)], max_refresh_delay: Option<Duration>) -> Self {
         SchemaPush {
             api,
-            schema,
+            files: files
+                .iter()
+                .map(|(path, content)| SchemaContainer {
+                    path: path.to_string(),
+                    content: content.to_string(),
+                })
+                .collect(),
             force: false,
             migration_id: None,
+            max_ddl_refresh_delay: max_refresh_delay,
         }
     }
 
@@ -35,7 +45,7 @@ impl<'a> SchemaPush<'a> {
 
     fn send_impl(self) -> CoreResult<SchemaPushAssertion> {
         let input = SchemaPushInput {
-            schema: self.schema,
+            schema: SchemasContainer { files: self.files },
             force: self.force,
         };
 
@@ -43,6 +53,10 @@ impl<'a> SchemaPush<'a> {
             .instrument(tracing::info_span!("SchemaPush", migration_id = ?self.migration_id));
 
         let output = test_setup::runtime::run_with_thread_local_runtime(fut)?;
+
+        if let Some(delay) = self.max_ddl_refresh_delay {
+            std::thread::sleep(delay);
+        }
 
         Ok(SchemaPushAssertion {
             result: output,

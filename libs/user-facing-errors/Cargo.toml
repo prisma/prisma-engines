@@ -8,11 +8,21 @@ user-facing-error-macros = { path = "../user-facing-error-macros" }
 serde_json.workspace = true
 serde.workspace = true
 backtrace = "0.3.40"
-tracing = "0.1"
+tracing.workspace = true
 indoc.workspace = true
-itertools = "0.10"
-quaint = { workspace = true, optional = true }
+itertools.workspace = true
+quaint = { path = "../../quaint", default-features = false, optional = true }
 
 [features]
 default = []
 sql = ["quaint"]
+all-native = [
+    "postgresql-native",
+    "mssql-native",
+    "mysql-native",
+    "sqlite-native",
+]
+postgresql-native = ["quaint/postgresql-native"]
+mssql-native = ["quaint/mssql-native"]
+mysql-native = ["quaint/mysql-native"]
+sqlite-native = ["quaint/sqlite-native"]

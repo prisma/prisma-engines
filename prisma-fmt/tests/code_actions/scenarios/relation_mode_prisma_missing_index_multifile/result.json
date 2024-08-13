@@ -1,0 +1,41 @@
+[
+  {
+    "title": "Add an index for the relation's field(s)",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 3,
+            "character": 20
+          },
+          "end": {
+            "line": 3,
+            "character": 65
+          }
+        },
+        "severity": 2,
+        "message": "With `relationMode = \"prisma\"`, no foreign keys are used, so relation fields will not benefit from the index usually created by the relational database under the hood. This can lead to poor performance when querying these fields. We recommend adding an index manually. Learn more at https://pris.ly/d/relation-mode-prisma-indexes\" "
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/_target.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 4,
+                "character": 0
+              },
+              "end": {
+                "line": 4,
+                "character": 1
+              }
+            },
+            "newText": "\n    @@index([userId])\n}"
+          }
+        ]
+      }
+    }
+  }
+]

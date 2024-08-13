@@ -1,7 +1,6 @@
 use super::extract_filter;
 use crate::{ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
-use connector::{CompositeCompare, Filter};
-use prisma_models::{CompositeFieldRef, PrismaValue};
+use query_structure::{CompositeCompare, CompositeFieldRef, Filter, PrismaValue};
 use schema::{constants::filters, ObjectTag};
 use std::convert::TryInto;
 

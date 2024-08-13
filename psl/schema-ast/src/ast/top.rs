@@ -1,5 +1,7 @@
 use crate::ast::{traits::WithSpan, CompositeType, Enum, GeneratorConfig, Identifier, Model, SourceConfig, Span};
 
+use super::WithDocumentation;
+
 /// Enum for distinguishing between top-level entries
 #[derive(Debug, Clone)]
 pub enum Top {
@@ -42,6 +44,16 @@ impl Top {
     /// The name of the item.
     pub fn name(&self) -> &str {
         &self.identifier().name
+    }
+
+    pub fn documentation(&self) -> Option<&str> {
+        match self {
+            Top::CompositeType(t) => t.documentation(),
+            Top::Enum(t) => t.documentation(),
+            Top::Model(t) => t.documentation(),
+            Top::Source(t) => t.documentation(),
+            Top::Generator(t) => t.documentation(),
+        }
     }
 
     /// Try to interpret the item as a composite type declaration.

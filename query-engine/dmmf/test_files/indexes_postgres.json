@@ -1,0 +1,66 @@
+{
+  "enums": [],
+  "models": [
+    {
+      "name": "Example",
+      "dbName": null,
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Int",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "value",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": false,
+          "type": "Json",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "primaryKey": null,
+      "uniqueFields": [],
+      "uniqueIndexes": [],
+      "isGenerated": false
+    }
+  ],
+  "types": [],
+  "indexes": [
+    {
+      "model": "Example",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "id"
+        }
+      ]
+    },
+    {
+      "model": "Example",
+      "type": "normal",
+      "isDefinedOnField": false,
+      "algorithm": "Gin",
+      "fields": [
+        {
+          "name": "value",
+          "operatorClass": "JsonbPathOps"
+        }
+      ]
+    }
+  ]
+}

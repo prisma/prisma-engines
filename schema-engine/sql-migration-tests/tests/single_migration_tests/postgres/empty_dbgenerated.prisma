@@ -3,13 +3,14 @@
 
 datasource testds {
     provider = "postgresql"
-    url = env("TEST_DATABASE_URL")
+    url      = env("TEST_DATABASE_URL")
 }
 
 model table {
-    id String @id
+    id            String @id
     hereBeDragons String @default(dbgenerated())
 }
+
 // Expected Migration:
 // -- CreateTable
 // CREATE TABLE "table" (

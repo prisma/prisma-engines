@@ -1,0 +1,24 @@
+name: Prisma Schema (WASM)
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths-ignore:
+      - "!.github/workflows/build-prisma-schema-wasm.yml"
+      - ".github/**"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/workflows/include/rust-wasm-setup
+
+      - run: make check-schema-wasm-package PROFILE=release

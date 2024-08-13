@@ -8,7 +8,7 @@ use super::*;
 use crate::FieldPair;
 use connector::AggregationSelection;
 use itertools::Itertools;
-use prisma_models::{Model, ScalarFieldRef};
+use query_structure::{Model, ScalarFieldRef};
 use schema::constants::aggregations::*;
 
 /// Resolves the given field as a aggregation query.

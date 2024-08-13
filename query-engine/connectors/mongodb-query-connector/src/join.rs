@@ -1,6 +1,6 @@
 use crate::filter::MongoFilter;
 use mongodb::bson::{doc, Document};
-use prisma_models::{walkers, RelationFieldRef, ScalarFieldRef};
+use query_structure::{walkers, RelationFieldRef, ScalarFieldRef};
 
 /// A join stage describes a tree of joins and nested joins to be performed on a collection.
 /// Every document of the `source` side will be joined with the collection documents

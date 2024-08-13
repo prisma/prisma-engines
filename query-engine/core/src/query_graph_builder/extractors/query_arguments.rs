@@ -3,8 +3,7 @@ use crate::{
     query_document::{ParsedArgument, ParsedInputMap},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::QueryArguments;
-use prisma_models::prelude::*;
+use query_structure::{prelude::*, QueryArguments};
 use schema::constants::{aggregations, args, ordering};
 use std::convert::TryInto;
 
@@ -15,51 +14,52 @@ pub fn extract_query_args(
     arguments: Vec<ParsedArgument<'_>>,
     model: &Model,
 ) -> QueryGraphBuilderResult<QueryArguments> {
-    let query_args = arguments.into_iter().fold(
-        Ok(QueryArguments::new(model.clone())),
-        |result: QueryGraphBuilderResult<QueryArguments>, arg| {
-            if let Ok(res) = result {
-                match arg.name.as_str() {
-                    args::CURSOR => Ok(QueryArguments {
-                        cursor: extract_cursor(arg.value, model)?,
-                        ..res
-                    }),
+    let query_args = arguments.into_iter().try_fold(
+        QueryArguments::new(model.clone()),
+        |result, arg| -> QueryGraphBuilderResult<QueryArguments> {
+            match arg.name.as_str() {
+                args::CURSOR => Ok(QueryArguments {
+                    cursor: extract_cursor(arg.value, model)?,
+                    ..result
+                }),
 
-                    args::TAKE => Ok(QueryArguments {
-                        take: arg.value.try_into()?,
-                        ..res
-                    }),
+                args::TAKE => Ok(QueryArguments {
+                    take: arg.value.try_into()?,
+                    ..result
+                }),
 
-                    args::SKIP => Ok(QueryArguments {
-                        skip: extract_skip(arg.value)?,
-                        ..res
-                    }),
+                args::SKIP => Ok(QueryArguments {
+                    skip: extract_skip(arg.value)?,
+                    ..result
+                }),
 
-                    args::ORDER_BY => Ok(QueryArguments {
-                        order_by: extract_order_by(&model.into(), arg.value)?,
-                        ..res
-                    }),
+                args::ORDER_BY => Ok(QueryArguments {
+                    order_by: extract_order_by(&model.into(), arg.value)?,
+                    ..result
+                }),
 
-                    args::DISTINCT => Ok(QueryArguments {
-                        distinct: Some(extract_distinct(arg.value)?),
-                        ..res
-                    }),
+                args::DISTINCT => Ok(QueryArguments {
+                    distinct: Some(extract_distinct(arg.value)?),
+                    ..result
+                }),
 
-                    args::WHERE => {
-                        let val: Option<ParsedInputMap<'_>> = arg.value.try_into()?;
-                        match val {
-                            Some(m) => {
-                                let filter = Some(extract_filter(m, model)?);
-                                Ok(QueryArguments { filter, ..res })
-                            }
-                            None => Ok(res),
+                args::WHERE => {
+                    let val: Option<ParsedInputMap<'_>> = arg.value.try_into()?;
+                    match val {
+                        Some(m) => {
+                            let filter = Some(extract_filter(m, model)?);
+                            Ok(QueryArguments { filter, ..result })
                         }
+                        None => Ok(result),
                     }
-
-                    _ => Ok(res),
                 }
-            } else {
-                result
+
+                args::RELATION_LOAD_STRATEGY => Ok(QueryArguments {
+                    relation_load_strategy: Some(arg.value.try_into()?),
+                    ..result
+                }),
+
+                _ => Ok(result),
             }
         },
     )?;
@@ -100,7 +100,7 @@ fn process_order_object(
             if field_name.as_ref() == ordering::UNDERSCORE_RELEVANCE {
                 let object: ParsedInputMap<'_> = field_value.try_into()?;
 
-                return extract_order_by_relevance(container, object);
+                return extract_order_by_relevance(container, object, path);
             }
 
             if let Some(sort_aggr) = extract_sort_aggregation(field_name.as_ref()) {
@@ -139,7 +139,7 @@ fn process_order_object(
 
                     if let Some(sort_aggr) = parent_sort_aggregation {
                         // If the parent is a sort aggregation then this scalar is part of that one.
-                        Ok(Some(OrderBy::scalar_aggregation(sf, vec![], sort_order, sort_aggr)))
+                        Ok(Some(OrderBy::scalar_aggregation(sf, sort_order, sort_aggr)))
                     } else {
                         Ok(Some(OrderBy::scalar(sf, path, sort_order, nulls_order)))
                     }
@@ -172,6 +172,7 @@ fn process_order_object(
 fn extract_order_by_relevance(
     container: &ParentContainer,
     object: ParsedInputMap<'_>,
+    path: Vec<OrderByHop>,
 ) -> QueryGraphBuilderResult<Option<OrderBy>> {
     let (sort_order, _) = extract_order_by_args(object.get(ordering::SORT).unwrap().clone())?;
     let search: PrismaValue = object.get(ordering::SEARCH).unwrap().clone().try_into()?;
@@ -198,7 +199,7 @@ fn extract_order_by_relevance(
         })
         .collect::<Result<Vec<ScalarFieldRef>, _>>()?;
 
-    Ok(Some(OrderBy::relevance(fields, search, sort_order)))
+    Ok(Some(OrderBy::relevance(fields, search, sort_order, path)))
 }
 
 fn extract_sort_aggregation(field_name: &str) -> Option<SortAggregation> {
@@ -217,10 +218,10 @@ fn extract_order_by_args(
 ) -> QueryGraphBuilderResult<(SortOrder, Option<NullsOrder>)> {
     match field_value {
         ParsedInputValue::Map(mut map) => {
-            let sort: PrismaValue = map.remove(ordering::SORT).unwrap().try_into()?;
+            let sort: PrismaValue = map.swap_remove(ordering::SORT).unwrap().try_into()?;
             let sort = pv_to_sort_order(sort)?;
             let nulls = map
-                .remove(ordering::NULLS)
+                .swap_remove(ordering::NULLS)
                 .map(PrismaValue::try_from)
                 .transpose()?
                 .map(pv_to_nulls_order)
@@ -324,7 +325,7 @@ fn extract_compound_cursor_field(
     let mut pairs = vec![];
 
     for field in fields {
-        let value = map.remove(field.name()).unwrap();
+        let value = map.swap_remove(field.name()).unwrap();
         pairs.extend(extract_cursor_field(field, value)?);
     }
 

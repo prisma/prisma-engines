@@ -1,107 +1,54 @@
 use super::connection::SqlConnection;
-use crate::FromSource;
 use async_trait::async_trait;
 use connector_interface::{
     self as connector,
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use once_cell::sync::Lazy;
 use quaint::{
-    connector::IsolationLevel,
+    connector::{ExternalConnector, IsolationLevel, Transaction},
     prelude::{Queryable as QuaintQueryable, *},
 };
-use std::{
-    collections::{hash_map::Entry, HashMap},
-    sync::{Arc, Mutex},
-};
-
-/// Registry is the type for the global registry of Js connectors.
-type Registry = HashMap<String, JsConnector>;
-
-/// REGISTRY is the global registry of JsConnectors
-static REGISTRY: Lazy<Mutex<Registry>> = Lazy::new(|| Mutex::new(HashMap::new()));
-
-fn registered_js_connector(provider: &str) -> connector::Result<JsConnector> {
-    let lock = REGISTRY.lock().unwrap();
-    lock.get(provider)
-        .ok_or(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(format!(
-            "A Javascript connector proxy for {} was not registered",
-            provider
-        ))))
-        .map(|conn_ref| conn_ref.to_owned())
-}
-
-pub fn register_js_connector(provider: &str, connector: Arc<dyn QuaintQueryable>) -> Result<(), String> {
-    let mut lock = REGISTRY.lock().unwrap();
-    let entry = lock.entry(provider.to_string());
-    match entry {
-        Entry::Occupied(_) => Err(format!(
-            "A Javascript connector proxy for {} was already registered, and cannot be overridden.",
-            provider
-        )),
-        Entry::Vacant(v) => {
-            v.insert(JsConnector { connector });
-            Ok(())
-        }
-    }
-}
+use std::sync::Arc;
 
 pub struct Js {
-    connector: JsConnector,
+    connector: DriverAdapter,
     connection_info: ConnectionInfo,
     features: psl::PreviewFeatures,
-    psl_connector: psl::builtin_connectors::JsConnector,
 }
 
-fn get_connection_info(url: &str) -> connector::Result<ConnectionInfo> {
-    ConnectionInfo::from_url(url).map_err(|err| {
-        ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
-            details: err.to_string(),
-            url: url.to_string(),
-        })
-    })
-}
-
-#[async_trait]
-impl FromSource for Js {
-    async fn from_source(
-        source: &psl::Datasource,
-        url: &str,
+impl Js {
+    pub async fn new(
+        connector: Arc<dyn ExternalConnector>,
         features: psl::PreviewFeatures,
-    ) -> connector_interface::Result<Js> {
-        match source.active_connector.as_js_connector() {
-            Some(psl_connector) => {
-                let connector = registered_js_connector(source.active_provider)?;
-                let connection_info = get_connection_info(url)?;
+    ) -> connector_interface::Result<Self> {
+        let external_conn_info = connector.get_connection_info().await.map_err(|e| match e.kind() {
+            &quaint::error::ErrorKind::ExternalError(id) => ConnectorError::from_kind(ErrorKind::ExternalError(id)),
+            _ => ConnectorError::from_kind(ErrorKind::InvalidDriverAdapter(
+                "Error while calling getConnectionInfo()".into(),
+            )),
+        })?;
 
-                Ok(Js {
-                    connector,
-                    connection_info,
-                    features,
-                    psl_connector,
-                })
-            }
-            None => panic!(
-                "Connector for provider {} is not a JsConnector",
-                source.active_connector.provider_name()
-            ),
-        }
+        Ok(Js {
+            connector: DriverAdapter { connector },
+            features,
+            connection_info: ConnectionInfo::External(external_conn_info),
+        })
     }
 }
 
 #[async_trait]
 impl Connector for Js {
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
-        super::catch(self.connection_info.clone(), async move {
-            let sql_conn = SqlConnection::new(self.connector.clone(), &self.connection_info, self.features);
+        super::catch(&self.connection_info, async move {
+            let sql_conn = SqlConnection::new(self.connector.clone(), self.connection_info.clone(), self.features);
             Ok(Box::new(sql_conn) as Box<dyn Connection + Send + Sync + 'static>)
         })
         .await
     }
 
     fn name(&self) -> &'static str {
-        self.psl_connector.name
+        "js"
     }
 
     fn should_retry_on_transient_error(&self) -> bool {
@@ -109,30 +56,28 @@ impl Connector for Js {
     }
 }
 
-// TODO: miguelff: I haven´t found a better way to do this, yet... please continue reading.
-//
-// There is a bug in NAPI-rs by wich compiling a binary crate that links code using napi-rs
-// bindings breaks. We could have used a JsQueryable from the `js-connectors` crate directly, as the
-// `connection` field of a `Js` connector, but that will imply using napi-rs transitively, and break
-// the tests (which are compiled as binary creates)
-//
-// To avoid the problem above I separated interface from implementation, making JsConnector
-// independent on napi-rs. Initially, I tried having a field Arc<&dyn TransactionCabable> to hold
-// JsQueryable at runtime. I did this, because TransactionCapable is the trait bounds required to
-// create a value of  `SqlConnection` (see [SqlConnection::new])) to actually performt the queries.
-// using JSQueryable. However, this didn't work because TransactionCapable is not object safe.
-// (has Sized as a supertrait)
-//
-// The thing is that TransactionCapable is not object safe and cannot be used in a dynamic type
-// declaration, so finally I couldn't come up with anything better then wrapping a QuaintQueryable
-// in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
+/// There is a bug in NAPI-rs by wich compiling a binary crate that links code using napi-rs
+/// bindings breaks. We could have used a JsQueryable from the `driver-adapters` crate directly, as the
+/// `connection` field of a driver adapter, but that will imply using napi-rs transitively, and break
+/// the tests (which are compiled as binary creates)
+///
+/// To avoid the problem above I separated interface from implementation, making DriverAdapter
+/// independent on napi-rs. Initially, I tried having a field Arc<&dyn TransactionCabable> to hold
+/// JsQueryable at runtime. I did this, because TransactionCapable is the trait bounds required to
+/// create a value of  `SqlConnection` (see [SqlConnection::new])) to actually performt the queries.
+/// using JSQueryable. However, this didn't work because TransactionCapable is not object safe.
+/// (has Sized as a supertrait)
+///
+/// The thing is that TransactionCapable is not object safe and cannot be used in a dynamic type
+/// declaration, so finally I couldn't come up with anything better then wrapping a QuaintQueryable
+/// in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
 #[derive(Clone)]
-struct JsConnector {
-    connector: Arc<dyn QuaintQueryable>,
+pub struct DriverAdapter {
+    connector: Arc<dyn ExternalConnector>,
 }
 
 #[async_trait]
-impl QuaintQueryable for JsConnector {
+impl QuaintQueryable for DriverAdapter {
     async fn query(&self, q: Query<'_>) -> quaint::Result<quaint::prelude::ResultSet> {
         self.connector.query(q).await
     }
@@ -143,6 +88,10 @@ impl QuaintQueryable for JsConnector {
 
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<quaint::prelude::ResultSet> {
         self.connector.query_raw_typed(sql, params).await
+    }
+
+    async fn parse_raw_query(&self, sql: &str) -> quaint::Result<quaint::connector::ParsedRawQuery> {
+        self.connector.parse_raw_query(sql).await
     }
 
     async fn execute(&self, q: Query<'_>) -> quaint::Result<u64> {
@@ -183,4 +132,12 @@ impl QuaintQueryable for JsConnector {
     }
 }
 
-impl TransactionCapable for JsConnector {}
+#[async_trait]
+impl TransactionCapable for DriverAdapter {
+    async fn start_transaction<'a>(
+        &'a self,
+        isolation: Option<IsolationLevel>,
+    ) -> quaint::Result<Box<dyn Transaction + 'a>> {
+        self.connector.start_transaction(isolation).await
+    }
+}

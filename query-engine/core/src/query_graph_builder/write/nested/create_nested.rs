@@ -5,8 +5,8 @@ use crate::{
     write::write_args_parser::WriteArgsParser,
     ParsedInputList, ParsedInputValue,
 };
-use connector::{Filter, IntoFilter};
-use prisma_models::{Model, RelationFieldRef};
+use psl::datamodel_connector::ConnectorCapability;
+use query_structure::{Filter, IntoFilter, Model, RelationFieldRef};
 use schema::constants::args;
 use std::convert::TryInto;
 
@@ -23,20 +23,157 @@ pub fn nested_create(
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
-    // Build all create nodes upfront.
-    let creates: Vec<NodeRef> = utils::coerce_vec(value)
+    let data_maps = utils::coerce_vec(value)
         .into_iter()
-        .map(|value| create::create_record_node(graph, query_schema, child_model.clone(), value.try_into()?))
-        .collect::<QueryGraphBuilderResult<Vec<NodeRef>>>()?;
+        .map(|value| {
+            let mut parser = WriteArgsParser::from(child_model, value.try_into()?)?;
+            parser.args.add_datetimes(child_model);
+            Ok((parser.args, parser.nested))
+        })
+        .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
+    let child_records_count = data_maps.len();
 
-    if relation.is_many_to_many() {
-        handle_many_to_many(graph, parent_node, parent_relation_field, creates)?;
-    } else if relation.is_one_to_many() {
-        handle_one_to_many(graph, parent_node, parent_relation_field, creates)?;
+    // In some limited cases, we create related records in bulk. The conditions are:
+    // 1. Connector must support creating records in bulk
+    // 2. The number of child records should be greater than one. Technically, there is nothing
+    //    preventing us from using bulk creation for that case, it just does not make a lot of sense
+    // 3. None of the children have any nested create operations. The main reason for this
+    //    limitation is that we do not have any ordering guarantees on records returned from the
+    //    database after their creation. To put it simply, `INSERT ... RETURNING *` can and will
+    //    return records in random order, at least on Postgres. This means that if have 10 children
+    //    records of model X, each of which has 10 children records of model Y, we won't be able to
+    //    associate created records from model X with their children from model Y.
+    // 4. Relation is not 1-1. Again, no technical limitations here, but we know that there can only
+    //    ever be a single related record, so we do not support it in bulk operations due to (2).
+    // 5. If relation is 1-many, it must be inlined in children. Otherwise, we once again have only
+    //    one possible related record, see (2).
+    // 6. If relation is many-many, connector needs to support `RETURNING` or something similar,
+    //    because we need to know the ids of created children records.
+    let has_create_many = query_schema.has_capability(ConnectorCapability::CreateMany);
+    let has_returning = query_schema.has_capability(ConnectorCapability::InsertReturning);
+    let is_one_to_many_in_child = relation.is_one_to_many() && parent_relation_field.relation_is_inlined_in_child();
+    let is_many_to_many = relation.is_many_to_many() && has_returning;
+    let has_nested = data_maps.iter().any(|(_args, nested)| !nested.is_empty());
+    let should_use_bulk_create =
+        has_create_many && child_records_count > 1 && !has_nested && (is_one_to_many_in_child || is_many_to_many);
+
+    if should_use_bulk_create {
+        // Create all child records in a single query.
+        let selected_fields = if relation.is_many_to_many() {
+            let selected_fields = child_model.primary_identifier();
+            let selection_order = selected_fields.db_names().collect();
+            Some(CreateManyRecordsFields {
+                fields: selected_fields,
+                order: selection_order,
+                nested: Vec::new(),
+            })
+        } else {
+            None
+        };
+        let query = CreateManyRecords {
+            name: String::new(), // This node will not be serialized so we don't need a name.
+            model: child_model.clone(),
+            args: data_maps.into_iter().map(|(args, _nested)| args).collect(),
+            skip_duplicates: false,
+            selected_fields,
+            split_by_shape: !query_schema.has_capability(ConnectorCapability::SupportsDefaultInInsert),
+        };
+        let create_many_node = graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));
+
+        if relation.is_one_to_many() {
+            handle_one_to_many_bulk(graph, parent_node, parent_relation_field, create_many_node)?;
+        } else {
+            handle_many_to_many_bulk(
+                graph,
+                parent_node,
+                parent_relation_field,
+                create_many_node,
+                child_records_count,
+            )?;
+        }
     } else {
-        handle_one_to_one(graph, parent_node, parent_relation_field, creates)?;
+        // Create each child record separately.
+        let creates = data_maps
+            .into_iter()
+            .map(|(args, nested)| {
+                create::create_record_node_from_args(graph, query_schema, child_model.clone(), args, nested)
+            })
+            .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
+
+        if relation.is_many_to_many() {
+            handle_many_to_many(graph, parent_node, parent_relation_field, creates)?;
+        } else if relation.is_one_to_many() {
+            handle_one_to_many(graph, parent_node, parent_relation_field, creates)?;
+        } else {
+            handle_one_to_one(graph, parent_node, parent_relation_field, creates)?;
+        }
     }
 
+    Ok(())
+}
+
+/// Handles one-to-many nested bulk create.
+///
+/// This function only considers the case where relation is inlined in child.
+/// `parent_node` produces single ID of "one" side of the relation.
+/// `child_node` creates records for the "many" side of the relation, using ID from `parent_node`.
+///
+/// Resulting graph consists of just `parent_node` and `child_node` connected with an edge.
+fn handle_one_to_many_bulk(
+    graph: &mut QueryGraph,
+    parent_node: NodeRef,
+    parent_relation_field: &RelationFieldRef,
+    child_node: NodeRef,
+) -> QueryGraphBuilderResult<()> {
+    let parent_link = parent_relation_field.linking_fields();
+    let child_link = parent_relation_field.related_field().linking_fields();
+
+    let relation_name = parent_relation_field.relation().name().to_owned();
+    let parent_model_name = parent_relation_field.model().name().to_owned();
+    let child_model_name = parent_relation_field.related_model().name().to_owned();
+
+    graph.create_edge(
+        &parent_node,
+        &child_node,
+        QueryGraphDependency::ProjectedDataDependency(parent_link, Box::new(move |mut create_node, mut parent_links| {
+            let parent_link = match parent_links.pop() {
+                Some(link) => Ok(link),
+                None => Err(QueryGraphBuilderError::RecordNotFound(format!(
+                    "No '{parent_model_name}' record (needed to inline the relation on '{child_model_name}' record) was found for a nested create on one-to-many relation '{relation_name}'."
+                ))),
+            }?;
+
+            if let Node::Query(Query::Write(ref mut wq)) = create_node {
+                wq.inject_result_into_args(child_link.assimilate(parent_link)?);
+            }
+
+            Ok(create_node)
+        })))?;
+
+    Ok(())
+}
+
+/// Handles many-to-many nested bulk create.
+///
+/// `parent_node` produces single ID of one side of the many-to-many relation.
+/// `child_node` produces multiple IDs of another side of many-to-many relation.
+///
+/// Please refer to the `connect::connect_records_node` documentation for the resulting graph shape.
+fn handle_many_to_many_bulk(
+    graph: &mut QueryGraph,
+    parent_node: NodeRef,
+    parent_relation_field: &RelationFieldRef,
+    child_node: NodeRef,
+    expected_connects: usize,
+) -> QueryGraphBuilderResult<()> {
+    graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
+    connect::connect_records_node(
+        graph,
+        &parent_node,
+        &child_node,
+        parent_relation_field,
+        expected_connects,
+    )?;
     Ok(())
 }
 
@@ -278,7 +415,7 @@ fn handle_one_to_many(
 /// - Parent gets injected with a child on x, because that's what the nested create is supposed to do.
 /// - The update runs, the relation is updated.
 /// - Now the check runs, because it's dependent on the parent's ID... but the check finds an existing child and fails...
-/// ... because we just updated the relation.
+///   ... because we just updated the relation.
 ///
 /// For these reasons, we need to have an extra update at the end if it's inlined on the parent and a non-create.
 fn handle_one_to_one(
@@ -419,6 +556,7 @@ fn handle_one_to_one(
 
 pub fn nested_create_many(
     graph: &mut QueryGraph,
+    query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue<'_>,
@@ -427,8 +565,8 @@ pub fn nested_create_many(
     // Nested input is an object of { data: [...], skipDuplicates: bool }
     let mut obj: ParsedInputMap<'_> = value.try_into()?;
 
-    let data_list: ParsedInputList<'_> = utils::coerce_vec(obj.remove(args::DATA).unwrap());
-    let skip_duplicates: bool = match obj.remove(args::SKIP_DUPLICATES) {
+    let data_list: ParsedInputList<'_> = utils::coerce_vec(obj.swap_remove(args::DATA).unwrap());
+    let skip_duplicates: bool = match obj.swap_remove(args::SKIP_DUPLICATES) {
         Some(val) => val.try_into()?,
         None => false,
     };
@@ -445,44 +583,16 @@ pub fn nested_create_many(
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
     let query = CreateManyRecords {
+        name: String::new(), // This node will not be serialized so we don't need a name.
         model: child_model.clone(),
         args,
         skip_duplicates,
+        selected_fields: None,
+        split_by_shape: !query_schema.has_capability(ConnectorCapability::SupportsDefaultInInsert),
     };
 
     let create_node = graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));
 
-    // We know that the id must be inlined on the child, so we need the parent link to inline it.
-    let linking_fields = parent_relation_field.linking_fields();
-    let child_linking_fields = parent_relation_field.related_field().linking_fields();
-
-    let relation_name = parent_relation_field.relation().name();
-    let parent_model_name = parent_relation_field.model().name().to_owned();
-    let child_model_name = child_model.name().to_owned();
-
-    graph.create_edge(
-        &parent_node,
-        &create_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            linking_fields,
-            Box::new(move |mut create_many_node, mut parent_links| {
-                // There can only be one parent.
-                let parent_link = match parent_links.pop() {
-                    Some(p) => Ok(p),
-                    None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{parent_model_name}' record (needed to inline the relation on '{child_model_name}' record) was found for a nested createMany on relation '{relation_name}'."
-                    ))),
-                }?;
-
-                // Inject the parent id into all nested records.
-                if let Node::Query(Query::Write(WriteQuery::CreateManyRecords(ref mut cmr))) = create_many_node {
-                    cmr.inject_result_into_all(child_linking_fields.assimilate(parent_link)?);
-                }
-
-                Ok(create_many_node)
-            }),
-        ),
-    )?;
-
-    Ok(())
+    // Currently, `createMany` is only supported for 1-many relations. This is checked during parsing.
+    handle_one_to_many_bulk(graph, parent_node, parent_relation_field, create_node)
 }

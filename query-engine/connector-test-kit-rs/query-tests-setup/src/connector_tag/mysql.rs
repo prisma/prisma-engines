@@ -1,19 +1,20 @@
+use std::fmt::Display;
+
 use super::*;
-use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
+use crate::{datamodel_rendering::SqlDatamodelRenderer, BoxFuture, TestError};
+use quaint::{prelude::Queryable, single::Quaint};
 
 #[derive(Debug, Default, Clone)]
-pub struct MySqlConnectorTag {
-    version: Option<MySqlVersion>,
-}
-
-impl MySqlConnectorTag {
-    /// Get a reference to the MySQL connector tag's version.
-    pub fn version(&self) -> Option<MySqlVersion> {
-        self.version
-    }
-}
+pub(crate) struct MySqlConnectorTag;
 
 impl ConnectorTagInterface for MySqlConnectorTag {
+    fn raw_execute<'a>(&'a self, query: &'a str, connection_url: &'a str) -> BoxFuture<'a, Result<(), TestError>> {
+        Box::pin(async move {
+            let conn = Quaint::new(connection_url).await?;
+            Ok(conn.raw_cmd(query).await?)
+        })
+    }
+
     fn datamodel_provider(&self) -> &'static str {
         "mysql"
     }
@@ -22,42 +23,8 @@ impl ConnectorTagInterface for MySqlConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(
-        &self,
-        database: &str,
-        is_ci: bool,
-        _is_multi_schema: bool,
-        _: Option<&'static str>,
-    ) -> String {
-        match self.version {
-            Some(MySqlVersion::V5_6) if is_ci => format!("mysql://root:prisma@test-db-mysql-5-6:3306/{database}"),
-            Some(MySqlVersion::V5_7) if is_ci => format!("mysql://root:prisma@test-db-mysql-5-7:3306/{database}"),
-            Some(MySqlVersion::V8) if is_ci => format!("mysql://root:prisma@test-db-mysql-8:3306/{database}"),
-            Some(MySqlVersion::MariaDb) if is_ci => {
-                format!("mysql://root:prisma@test-db-mysql-mariadb:3306/{database}")
-            }
-            Some(MySqlVersion::V5_6) => format!("mysql://root:prisma@127.0.0.1:3309/{database}"),
-            Some(MySqlVersion::V5_7) => format!("mysql://root:prisma@127.0.0.1:3306/{database}"),
-            Some(MySqlVersion::V8) => format!("mysql://root:prisma@127.0.0.1:3307/{database}"),
-            Some(MySqlVersion::MariaDb) => {
-                format!("mysql://root:prisma@127.0.0.1:3308/{database}")
-            }
-
-            None => unreachable!("A versioned connector must have a concrete version to run."),
-        }
-    }
-
     fn capabilities(&self) -> ConnectorCapabilities {
         psl::builtin_connectors::MYSQL.capabilities()
-    }
-
-    fn as_parse_pair(&self) -> (String, Option<String>) {
-        let version = self.version.as_ref().map(ToString::to_string);
-        ("mysql".to_owned(), version)
-    }
-
-    fn is_versioned(&self) -> bool {
-        true
     }
 }
 
@@ -67,44 +34,6 @@ pub enum MySqlVersion {
     V5_7,
     V8,
     MariaDb,
-}
-
-impl MySqlConnectorTag {
-    pub fn new(version: Option<&str>) -> TestResult<Self> {
-        let version = match version {
-            Some(v) => Some(MySqlVersion::try_from(v)?),
-            None => None,
-        };
-
-        Ok(Self { version })
-    }
-
-    /// Returns all versions of this connector.
-    pub fn all() -> Vec<Self> {
-        vec![
-            Self {
-                version: Some(MySqlVersion::V5_6),
-            },
-            Self {
-                version: Some(MySqlVersion::V5_7),
-            },
-            Self {
-                version: Some(MySqlVersion::V8),
-            },
-            Self {
-                version: Some(MySqlVersion::MariaDb),
-            },
-        ]
-    }
-}
-
-impl PartialEq for MySqlConnectorTag {
-    fn eq(&self, other: &Self) -> bool {
-        match (self.version, other.version) {
-            (None, None) | (Some(_), None) | (None, Some(_)) => true,
-            (Some(v1), Some(v2)) => v1 == v2,
-        }
-    }
 }
 
 impl TryFrom<&str> for MySqlVersion {
@@ -123,14 +52,13 @@ impl TryFrom<&str> for MySqlVersion {
     }
 }
 
-impl ToString for MySqlVersion {
-    fn to_string(&self) -> String {
+impl Display for MySqlVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            MySqlVersion::V5_6 => "5.6",
-            MySqlVersion::V5_7 => "5.7",
-            MySqlVersion::V8 => "8",
-            MySqlVersion::MariaDb => "mariadb",
+            MySqlVersion::V5_6 => f.write_str("5.6"),
+            MySqlVersion::V5_7 => f.write_str("5.7"),
+            MySqlVersion::V8 => f.write_str("8"),
+            MySqlVersion::MariaDb => f.write_str("mariadb"),
         }
-        .to_owned()
     }
 }

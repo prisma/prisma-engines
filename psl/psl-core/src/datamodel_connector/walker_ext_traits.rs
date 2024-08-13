@@ -1,11 +1,16 @@
-use crate::datamodel_connector::{
-    constraint_names::ConstraintNames, Connector, NativeTypeInstance, ReferentialAction, RelationMode,
+use crate::{
+    builtin_connectors::has_capability,
+    datamodel_connector::{
+        constraint_names::ConstraintNames, Connector, NativeTypeInstance, ReferentialAction, RelationMode,
+    },
 };
 use parser_database::{
     ast::{self, WithSpan},
     walkers::*,
 };
 use std::borrow::Cow;
+
+use super::ConnectorCapability;
 
 pub trait IndexWalkerExt<'db> {
     fn constraint_name(self, connector: &dyn Connector) -> Cow<'db, str>;
@@ -60,7 +65,7 @@ pub trait PrimaryKeyWalkerExt<'db> {
 
 impl<'db> PrimaryKeyWalkerExt<'db> for PrimaryKeyWalker<'db> {
     fn constraint_name(self, connector: &dyn Connector) -> Option<Cow<'db, str>> {
-        if !connector.supports_named_primary_keys() {
+        if !has_capability(connector, ConnectorCapability::NamedPrimaryKeys) {
             return None;
         }
 

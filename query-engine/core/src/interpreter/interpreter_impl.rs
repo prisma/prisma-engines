@@ -6,7 +6,7 @@ use super::{
 use crate::{Query, QueryResult};
 use connector::ConnectionLike;
 use futures::future::BoxFuture;
-use prisma_models::prelude::*;
+use query_structure::prelude::*;
 use std::{collections::HashMap, fmt};
 use tracing::Instrument;
 
@@ -66,8 +66,15 @@ impl ExpressionResult {
 
                 // We always select IDs, the unwraps are safe.
                 QueryResult::RecordSelection(Some(rs)) => Some(
-                    rs.scalars
-                        .extract_selection_results(field_selection)
+                    rs.records
+                        .extract_selection_results_from_db_name(field_selection)
+                        .expect("Expected record selection to contain required model ID fields.")
+                        .into_iter()
+                        .collect(),
+                ),
+                QueryResult::RecordSelectionWithRelations(rsr) => Some(
+                    rsr.records
+                        .extract_selection_results_from_prisma_name(field_selection)
                         .expect("Expected record selection to contain required model ID fields.")
                         .into_iter()
                         .collect(),
@@ -177,20 +184,31 @@ impl<'conn> QueryInterpreter<'conn> {
             Expression::Func { func } => {
                 let expr = func(env.clone());
 
-                Box::pin(async move { self.interpret(expr?, env, level, trace_id).await })
+                Box::pin(async move {
+                    self.log_line(level, || "execute <lambda function> {");
+                    let result = self.interpret(expr?, env, level + 1, trace_id).await;
+                    self.log_line(level, || "}");
+                    result
+                })
             }
 
-            Expression::Sequence { seq } if seq.is_empty() => Box::pin(async { Ok(ExpressionResult::Empty) }),
+            Expression::Sequence { seq } if seq.is_empty() => Box::pin(async move {
+                self.log_line(level, || "[]");
+                Ok(ExpressionResult::Empty)
+            }),
 
             Expression::Sequence { seq } => {
                 Box::pin(async move {
-                    self.log_line(level, || "SEQ");
+                    self.log_line(level, || "[");
 
                     let mut results = Vec::with_capacity(seq.len());
 
                     for expr in seq {
                         results.push(self.interpret(expr, env.clone(), level + 1, trace_id.clone()).await?);
+                        self.log_line(level + 1, || ",");
                     }
+
+                    self.log_line(level, || "]");
 
                     // Last result gets returned
                     Ok(results.pop().unwrap())
@@ -203,15 +221,17 @@ impl<'conn> QueryInterpreter<'conn> {
             } => {
                 Box::pin(async move {
                     let mut inner_env = env.clone();
-                    self.log_line(level, || "LET");
+                    self.log_line(level, || "let");
 
                     for binding in bindings {
-                        self.log_line(level + 1, || format!("bind {} ", &binding.name));
+                        self.log_line(level + 1, || format!("{} = {{", &binding.name));
 
                         let result = self
                             .interpret(binding.expr, env.clone(), level + 2, trace_id.clone())
                             .await?;
                         inner_env.insert(binding.name, result);
+
+                        self.log_line(level + 1, || "},");
                     }
 
                     // the unwrapping improves the readability of the log significantly
@@ -221,14 +241,17 @@ impl<'conn> QueryInterpreter<'conn> {
                         Expression::Sequence { seq: expressions }
                     };
 
-                    self.interpret(next_expression, inner_env, level + 1, trace_id).await
+                    self.log_line(level, || "in {");
+                    let result = self.interpret(next_expression, inner_env, level + 1, trace_id).await;
+                    self.log_line(level, || "}");
+                    result
                 })
             }
 
             Expression::Query { query } => Box::pin(async move {
                 match *query {
                     Query::Read(read) => {
-                        self.log_line(level, || format!("READ {read}"));
+                        self.log_line(level, || format!("readExecute {read}"));
                         let span = info_span!("prisma:engine:read-execute");
                         Ok(read::execute(self.conn, read, None, trace_id)
                             .instrument(span)
@@ -237,7 +260,7 @@ impl<'conn> QueryInterpreter<'conn> {
                     }
 
                     Query::Write(write) => {
-                        self.log_line(level, || format!("WRITE {write}"));
+                        self.log_line(level, || format!("writeExecute {write}"));
                         let span = info_span!("prisma:engine:write-execute");
                         Ok(write::execute(self.conn, write, trace_id)
                             .instrument(span)
@@ -248,20 +271,21 @@ impl<'conn> QueryInterpreter<'conn> {
             }),
 
             Expression::Get { binding_name } => Box::pin(async move {
-                self.log_line(level, || format!("GET {binding_name}"));
+                self.log_line(level, || format!("getVariable {binding_name}"));
                 env.clone().remove(&binding_name)
             }),
 
             Expression::GetFirstNonEmpty { binding_names } => Box::pin(async move {
-                self.log_line(level, || format!("GET FIRST NON EMPTY {binding_names:?}"));
+                self.log_line(level, || format!("getFirstNonEmpty {binding_names:?}"));
 
                 Ok(binding_names
                     .into_iter()
                     .find_map(|binding_name| {
                         env.get(&binding_name)
                             .map(|_| env.clone().remove(&binding_name).unwrap())
+                            .filter(|result| !matches!(result, ExpressionResult::Empty))
                     })
-                    .unwrap())
+                    .unwrap_or(ExpressionResult::Empty))
             }),
 
             Expression::If {
@@ -269,19 +293,22 @@ impl<'conn> QueryInterpreter<'conn> {
                 then,
                 else_: elze,
             } => Box::pin(async move {
-                self.log_line(level, || "IF");
+                let predicate = func();
+                self.log_line(level, || format!("if <lambda condition> = {predicate} {{"));
 
-                if func() {
+                let result = if predicate {
                     self.interpret(Expression::Sequence { seq: then }, env, level + 1, trace_id)
                         .await
                 } else {
                     self.interpret(Expression::Sequence { seq: elze }, env, level + 1, trace_id)
                         .await
-                }
+                };
+                self.log_line(level, || "}");
+                result
             }),
 
             Expression::Return { result } => Box::pin(async move {
-                self.log_line(level, || "RETURN");
+                self.log_line(level, || "returnValue");
                 Ok(*result)
             }),
         }
@@ -290,7 +317,7 @@ impl<'conn> QueryInterpreter<'conn> {
     pub(crate) fn log_output(&self) -> String {
         let mut output = String::with_capacity(self.log.len() * 30);
 
-        for s in self.log.iter().rev() {
+        for s in self.log.iter() {
             output.push_str(s)
         }
 

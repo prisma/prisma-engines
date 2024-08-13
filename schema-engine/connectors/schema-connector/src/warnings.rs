@@ -298,7 +298,7 @@ impl fmt::Display for Warnings {
         )?;
 
         render_warnings(
-            "These items were renamed due to their names being duplicates in the Prisma Schema Language:",
+            "These items were renamed due to their names being duplicates in the Prisma schema:",
             &self.duplicate_names,
             f,
         )?;

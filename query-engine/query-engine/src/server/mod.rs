@@ -9,6 +9,7 @@ use query_core::helpers::*;
 use query_core::telemetry::capturing::TxTraceExt;
 use query_core::{telemetry, ExtendedTransactionUserFacingError, TransactionOptions, TxId};
 use request_handlers::{dmmf, render_graphql_schema, RequestBody, RequestHandler};
+use serde::Serialize;
 use serde_json::json;
 use std::collections::HashMap;
 use std::net::SocketAddr;
@@ -62,11 +63,7 @@ pub(crate) async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result
     let mut res = match (req.method(), req.uri().path()) {
         (&Method::POST, "/") => request_handler(cx, req).await?,
         (&Method::GET, "/") if cx.enabled_features.contains(Feature::Playground) => playground_handler(),
-        (&Method::GET, "/status") => Response::builder()
-            .status(StatusCode::OK)
-            .header(CONTENT_TYPE, "application/json")
-            .body(Body::from(r#"{"status":"ok"}"#))
-            .unwrap(),
+        (&Method::GET, "/status") => build_json_response(StatusCode::OK, &json!({"status": "ok"})),
 
         (&Method::GET, "/sdl") => {
             let schema = render_graphql_schema(cx.query_schema());
@@ -81,11 +78,7 @@ pub(crate) async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result
         (&Method::GET, "/dmmf") => {
             let schema = dmmf::render_dmmf(cx.query_schema());
 
-            Response::builder()
-                .status(StatusCode::OK)
-                .header(CONTENT_TYPE, "application/json")
-                .body(Body::from(serde_json::to_vec(&schema).unwrap()))
-                .unwrap()
+            build_json_response(StatusCode::OK, &schema)
         }
 
         (&Method::GET, "/server_info") => {
@@ -95,11 +88,7 @@ pub(crate) async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result
                 "primary_connector": cx.primary_connector(),
             });
 
-            Response::builder()
-                .status(StatusCode::OK)
-                .header(CONTENT_TYPE, "application/json")
-                .body(Body::from(serde_json::to_vec(&body).unwrap()))
-                .unwrap()
+            build_json_response(StatusCode::OK, &body)
         }
         _ => Response::builder()
             .status(StatusCode::NOT_FOUND)
@@ -194,31 +183,19 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
                     }
                 }
 
-                let result_bytes = serde_json::to_vec(&result).unwrap();
-
-                let res = Response::builder()
-                    .status(StatusCode::OK)
-                    .header(CONTENT_TYPE, "application/json")
-                    .body(Body::from(result_bytes))
-                    .unwrap();
+                let res = build_json_response(StatusCode::OK, &result);
 
                 Ok(res)
             }
             Err(e) => {
                 let ufe: user_facing_errors::Error = request_handlers::HandlerError::query_conversion(format!(
-                    "Error parsing {:?} query. {}",
+                    "Error parsing {:?} query. Ensure that engine protocol of the client and the engine matches. {}",
                     cx.engine_protocol(),
                     e
                 ))
                 .into();
 
-                let result_bytes = serde_json::to_vec(&ufe).unwrap();
-
-                let res = Response::builder()
-                    .status(StatusCode::UNPROCESSABLE_ENTITY) // 422
-                    .header(CONTENT_TYPE, "application/json")
-                    .body(Body::from(result_bytes))
-                    .unwrap();
+                let res = build_json_response(StatusCode::UNPROCESSABLE_ENTITY, &ufe);
 
                 Ok(res)
             }
@@ -258,11 +235,7 @@ async fn metrics_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
     let response = if requested_json {
         let metrics = cx.metrics.to_json(global_labels);
 
-        Response::builder()
-            .status(StatusCode::OK)
-            .header(CONTENT_TYPE, "application/json")
-            .body(Body::from(metrics.to_string()))
-            .unwrap()
+        build_json_response(StatusCode::OK, &metrics)
     } else {
         let metrics = cx.metrics.to_prometheus(global_labels);
 
@@ -368,13 +341,9 @@ async fn transaction_start_handler(cx: Arc<PrismaContext>, req: Request<Body>) -
             } else {
                 json!({ "id": tx_id.to_string() })
             };
-            let result_bytes = serde_json::to_vec(&result).unwrap();
 
-            let res = Response::builder()
-                .status(StatusCode::OK)
-                .header(CONTENT_TYPE, "application/json")
-                .body(Body::from(result_bytes))
-                .unwrap();
+            let res = build_json_response(StatusCode::OK, &result);
+
             Ok(res)
         }
         Err(err) => Ok(err_to_http_resp(err, telemetry)),
@@ -446,9 +415,8 @@ fn handle_debug_headers(req: &Request<Body>) -> Response<Body> {
         std::process::exit(1)
     } else if headers.contains_key(DEBUG_NON_FATAL_HEADER) {
         let err = user_facing_errors::Error::from_panic_payload(Box::new("Debug panic"));
-        let body = Body::from(serde_json::to_vec(&err).unwrap());
 
-        Response::builder().status(StatusCode::OK).body(body).unwrap()
+        build_json_response(StatusCode::OK, &err)
     } else {
         Response::builder().status(StatusCode::OK).body(Body::empty()).unwrap()
     }
@@ -472,13 +440,8 @@ fn empty_json_to_http_resp(captured_telemetry: Option<telemetry::capturing::stor
     } else {
         json!({})
     };
-    let result_bytes = serde_json::to_vec(&result).unwrap();
 
-    Response::builder()
-        .status(StatusCode::OK)
-        .header(CONTENT_TYPE, "application/json")
-        .body(Body::from(result_bytes))
-        .unwrap()
+    build_json_response(StatusCode::OK, &result)
 }
 
 fn err_to_http_resp(
@@ -487,15 +450,15 @@ fn err_to_http_resp(
 ) -> Response<Body> {
     let status = match err {
         query_core::CoreError::TransactionError(ref err) => match err {
-            query_core::TransactionError::AcquisitionTimeout => 504,
+            query_core::TransactionError::AcquisitionTimeout => StatusCode::GATEWAY_TIMEOUT,
             query_core::TransactionError::AlreadyStarted => todo!(),
-            query_core::TransactionError::NotFound => 404,
-            query_core::TransactionError::Closed { reason: _ } => 422,
-            query_core::TransactionError::Unknown { reason: _ } => 500,
+            query_core::TransactionError::NotFound => StatusCode::NOT_FOUND,
+            query_core::TransactionError::Closed { reason: _ } => StatusCode::UNPROCESSABLE_ENTITY,
+            query_core::TransactionError::Unknown { reason: _ } => StatusCode::INTERNAL_SERVER_ERROR,
         },
 
         // All other errors are treated as 500s, most of these paths should never be hit, only connector errors may occur.
-        _ => 500,
+        _ => StatusCode::INTERNAL_SERVER_ERROR,
     };
 
     let mut err: ExtendedTransactionUserFacingError = err.into();
@@ -503,8 +466,8 @@ fn err_to_http_resp(
         err.set_extension("traces".to_owned(), json!(telemetry.traces));
         err.set_extension("logs".to_owned(), json!(telemetry.logs));
     }
-    let body = Body::from(serde_json::to_vec(&err).unwrap());
-    Response::builder().status(status).body(body).unwrap()
+
+    build_json_response(status, &err)
 }
 
 fn capture_config(headers: &HeaderMap, tx_id: TxId) -> telemetry::capturing::Capturer {
@@ -558,4 +521,18 @@ fn transaction_id(headers: &HeaderMap) -> Option<TxId> {
 fn get_parent_span_context(headers: &HeaderMap) -> opentelemetry::Context {
     let extractor = HeaderExtractor(headers);
     global::get_text_map_propagator(|propagator| propagator.extract(&extractor))
+}
+
+fn build_json_response<T>(status_code: StatusCode, value: &T) -> Response<Body>
+where
+    T: ?Sized + Serialize,
+{
+    let result_bytes = serde_json::to_vec(value).unwrap();
+
+    Response::builder()
+        .status(status_code)
+        .header(CONTENT_TYPE, "application/json")
+        .header("QE-Content-Length", result_bytes.len()) // this header is read by Accelerate
+        .body(Body::from(result_bytes))
+        .unwrap()
 }

@@ -4,7 +4,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schema))]
 mod update_many {
     use indoc::indoc;
-    use query_engine_tests::{is_one_of, run_query, run_query_json, ConnectorTag};
+    use query_engine_tests::{is_one_of, run_query, run_query_json};
 
     fn schema() -> String {
         let schema = indoc! {
@@ -131,7 +131,7 @@ mod update_many {
 
         is_one_of!(
             query_number_operation(&runner, "optInt", "increment", "10").await?,
-            vec![
+            [
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":12},{"optInt":13}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":10},{"optInt":12},{"optInt":13}]}}"#
             ]
@@ -140,7 +140,7 @@ mod update_many {
         // optInts before this op are now: null/10, 12, 13
         is_one_of!(
             query_number_operation(&runner, "optInt", "decrement", "10").await?,
-            vec![
+            [
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":2},{"optInt":3}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":0},{"optInt":2},{"optInt":3}]}}"#
             ]
@@ -149,7 +149,7 @@ mod update_many {
         // optInts before this op are now: null/0, 2, 3
         is_one_of!(
             query_number_operation(&runner, "optInt", "multiply", "2").await?,
-            vec![
+            [
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":4},{"optInt":6}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":0},{"optInt":4},{"optInt":6}]}}"#
             ]
@@ -160,7 +160,7 @@ mod update_many {
             // optInts before this op are now: null/0, 4, 6
             is_one_of!(
                 query_number_operation(&runner, "optInt", "divide", "3").await?,
-                vec![
+                [
                     r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":1},{"optInt":2}]}}"#,
                     r#"{"data":{"findManyTestModel":[{"optInt":0},{"optInt":1},{"optInt":2}]}}"#
                 ]
@@ -169,7 +169,7 @@ mod update_many {
 
         is_one_of!(
             query_number_operation(&runner, "optInt", "set", "5").await?,
-            vec![
+            [
                 r#"{"data":{"findManyTestModel":[{"optInt":5},{"optInt":5},{"optInt":5}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":5},{"optInt":5},{"optInt":5}]}}"#
             ]
@@ -177,7 +177,7 @@ mod update_many {
 
         is_one_of!(
             query_number_operation(&runner, "optInt", "set", "null").await?,
-            vec![
+            [
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":null},{"optInt":null}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":null},{"optInt":null}]}}"#
             ]
@@ -196,7 +196,7 @@ mod update_many {
 
         is_one_of!(
             query_number_operation(&runner, "optInt", "increment", "10").await?,
-            vec![
+            [
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":12},{"optInt":13}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":10},{"optInt":12},{"optInt":13}]}}"#
             ]
@@ -205,7 +205,7 @@ mod update_many {
         // optInts before this op are now: null/10, 12, 13
         is_one_of!(
             query_number_operation(&runner, "optInt", "decrement", "10").await?,
-            vec![
+            [
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":2},{"optInt":3}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":0},{"optInt":2},{"optInt":3}]}}"#
             ]
@@ -214,7 +214,7 @@ mod update_many {
         // optInts before this op are now: null/0, 2, 3
         is_one_of!(
             query_number_operation(&runner, "optInt", "multiply", "2").await?,
-            vec![
+            [
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":4},{"optInt":6}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":0},{"optInt":4},{"optInt":6}]}}"#
             ]
@@ -222,7 +222,7 @@ mod update_many {
 
         is_one_of!(
             query_number_operation(&runner, "optInt", "set", "5").await?,
-            vec![
+            [
                 r#"{"data":{"findManyTestModel":[{"optInt":5},{"optInt":5},{"optInt":5}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":5},{"optInt":5},{"optInt":5}]}}"#
             ]
@@ -230,7 +230,7 @@ mod update_many {
 
         is_one_of!(
             query_number_operation(&runner, "optInt", "set", "null").await?,
-            vec![
+            [
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":null},{"optInt":null}]}}"#,
                 r#"{"data":{"findManyTestModel":[{"optInt":null},{"optInt":null},{"optInt":null}]}}"#
             ]
@@ -297,7 +297,10 @@ mod update_many {
         let count = &res["data"]["updateManyTestModel"]["count"];
 
         // MySql does not count incrementing a null so the count is different
-        if !matches!(runner.connector(), ConnectorTag::MySql(_)) {
+        if !matches!(
+            runner.connector_version(),
+            ConnectorVersion::MySql(_) | ConnectorVersion::Vitess(_)
+        ) {
             assert_eq!(count, 3);
         }
 
@@ -386,21 +389,6 @@ mod json_update_many {
 
     #[connector_test(capabilities(AdvancedJsonNullability))]
     async fn update_json_errors(runner: Runner) -> TestResult<()> {
-        // On the JSON protocol, this succeeds because `null` is serialized as JSON.
-        // It doesn't matter since the client does _not_ allow to send null values, but only DbNull or JsonNull.
-        if runner.protocol().is_graphql() {
-            assert_error!(
-                &runner,
-                r#"mutation {
-                updateManyTestModel(where: { id: 1 }, data: { json: null }) {
-                  json
-                }
-              }"#,
-                2009,
-                "A value is required but not set"
-            );
-        }
-
         assert_error!(
             &runner,
             r#"mutation {

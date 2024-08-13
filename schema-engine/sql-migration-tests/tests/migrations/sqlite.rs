@@ -1,4 +1,5 @@
 use quaint::prelude::Insert;
+use schema_core::json_rpc::types::SchemasContainer;
 use sql_migration_tests::test_api::*;
 
 #[test_connector(tags(Sqlite))]
@@ -182,13 +183,9 @@ fn unique_constraint_errors_in_migrations(api: TestApi) {
         .send_unwrap_err()
         .to_user_facing();
 
-    let expected_json = expect![[r#"
-        {
-          "is_panic": false,
-          "message": "SQLite database error\nUNIQUE constraint failed: Fruit.name\n   0: sql_schema_connector::apply_migration::apply_migration\n             at schema-engine/connectors/sql-schema-connector/src/apply_migration.rs:10\n   1: sql_migration_tests::commands::schema_push::SchemaPush\n           with \u001b[3mmigration_id\u001b[0m\u001b[2m=\u001b[0mSome(\"the-migration\")\n             at schema-engine/sql-migration-tests/src/commands/schema_push.rs:43",
-          "backtrace": null
-        }"#]];
-    expected_json.assert_eq(&serde_json::to_string_pretty(&res).unwrap())
+    assert!(serde_json::to_string_pretty(&res)
+        .unwrap()
+        .contains("UNIQUE constraint failed: Fruit.name"));
 }
 
 #[test]
@@ -206,13 +203,19 @@ fn introspecting_a_non_existing_db_fails() {
     let err = tok(api.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema: dm.to_owned(),
-        schemas: None,
+        schema: SchemasContainer {
+            files: vec![SchemaContainer {
+                path: "schema.prisma".to_string(),
+                content: dm.to_string(),
+            }],
+        },
+        base_directory_path: "/".to_string(),
+        namespaces: None,
     }))
     .unwrap_err();
 
     let expected = expect![[r#"
-        Database definitelies-does-not-exist.sqlite does not exist at /tmp/definitelies-does-not-exist.sqlite
+        Database `definitelies-does-not-exist.sqlite` does not exist at `/tmp/definitelies-does-not-exist.sqlite`.
     "#]];
     expected.assert_eq(&err.to_string());
 }

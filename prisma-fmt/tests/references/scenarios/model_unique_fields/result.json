@@ -1,0 +1,28 @@
+[
+  {
+    "uri": "file:///path/to/schema.prisma",
+    "range": {
+      "start": {
+        "line": 11,
+        "character": 4
+      },
+      "end": {
+        "line": 11,
+        "character": 8
+      }
+    }
+  },
+  {
+    "uri": "file:///path/to/schema.prisma",
+    "range": {
+      "start": {
+        "line": 13,
+        "character": 18
+      },
+      "end": {
+        "line": 13,
+        "character": 22
+      }
+    }
+  }
+]

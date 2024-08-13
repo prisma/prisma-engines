@@ -1,18 +1,21 @@
-use crate::serialization_ast::datamodel_ast::{
-    Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex,
+use crate::serialization_ast::{
+    datamodel_ast::{Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex},
+    Index, IndexField, IndexType,
 };
 use bigdecimal::ToPrimitive;
-use prisma_models::{dml_default_kind, encode_bytes, DefaultKind, FieldArity, PrismaValue};
+use itertools::{Either, Itertools};
 use psl::{
     parser_database::{walkers, ScalarFieldType},
     schema_ast::ast::WithDocumentation,
 };
+use query_structure::{dml_default_kind, encode_bytes, DefaultKind, FieldArity, PrismaValue};
 
 pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
     let mut datamodel = Datamodel {
         models: Vec::with_capacity(schema.db.models_count()),
         enums: Vec::with_capacity(schema.db.enums_count()),
         types: Vec::new(),
+        indexes: Vec::new(),
     };
 
     for enum_model in schema.db.walk_enums() {
@@ -26,6 +29,7 @@ pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
         .chain(schema.db.walk_views().filter(|view| !view.is_ignored()))
     {
         datamodel.models.push(model_to_dmmf(model));
+        datamodel.indexes.extend(model_indexes_to_dmmf(model));
     }
 
     for ct in schema.db.walk_composite_types() {
@@ -133,31 +137,29 @@ fn model_to_dmmf(model: walkers::ModelWalker<'_>) -> Model {
         primary_key,
         unique_fields: model
             .indexes()
-            .filter_map(|i| {
-                (i.is_unique() && !i.is_defined_on_field()).then(|| i.fields().map(|f| f.name().to_owned()).collect())
-            })
+            .filter(|&i| i.is_unique() && !i.is_defined_on_field())
+            .map(|i| i.fields().map(|f| f.name().to_owned()).collect())
             .collect(),
         unique_indexes: model
             .indexes()
-            .filter_map(|i| {
-                (i.is_unique() && !i.is_defined_on_field()).then(|| UniqueIndex {
-                    name: i.name().map(ToOwned::to_owned),
-                    fields: i.fields().map(|f| f.name().to_owned()).collect(),
-                })
+            .filter(|&i| i.is_unique() && !i.is_defined_on_field())
+            .map(|i| UniqueIndex {
+                name: i.name().map(ToOwned::to_owned),
+                fields: i.fields().map(|f| f.name().to_owned()).collect(),
             })
             .collect(),
     }
 }
 
 fn should_skip_model_field(field: &walkers::FieldWalker<'_>) -> bool {
-    match field.refine() {
+    match field.refine_known() {
         walkers::RefinedFieldWalker::Scalar(f) => f.is_ignored() || f.is_unsupported(),
         walkers::RefinedFieldWalker::Relation(f) => f.is_ignored(),
     }
 }
 
 fn field_to_dmmf(field: walkers::FieldWalker<'_>) -> Field {
-    match field.refine() {
+    match field.refine_known() {
         walkers::RefinedFieldWalker::Scalar(sf) => scalar_field_to_dmmf(sf),
         walkers::RefinedFieldWalker::Relation(rf) => relation_field_to_dmmf(rf),
     }
@@ -240,6 +242,56 @@ fn relation_field_to_dmmf(field: walkers::RelationFieldWalker<'_>) -> Field {
     }
 }
 
+fn model_indexes_to_dmmf(model: walkers::ModelWalker<'_>) -> impl Iterator<Item = Index> + '_ {
+    model
+        .primary_key()
+        .into_iter()
+        .map(move |pk| Index {
+            model: model.name().to_owned(),
+            r#type: IndexType::Id,
+            is_defined_on_field: pk.is_defined_on_field(),
+            name: pk.name().map(ToOwned::to_owned),
+            db_name: pk.mapped_name().map(ToOwned::to_owned),
+            algorithm: None,
+            clustered: pk.clustered(),
+            fields: pk
+                .scalar_field_attributes()
+                .map(scalar_field_attribute_to_dmmf)
+                .collect(),
+        })
+        .chain(model.indexes().map(move |index| {
+            Index {
+                model: model.name().to_owned(),
+                r#type: index.index_type().into(),
+                is_defined_on_field: index.is_defined_on_field(),
+                name: index.name().map(ToOwned::to_owned),
+                db_name: index.mapped_name().map(ToOwned::to_owned),
+                algorithm: index.algorithm().map(|alg| alg.to_string()),
+                clustered: index.clustered(),
+                fields: index
+                    .scalar_field_attributes()
+                    .map(scalar_field_attribute_to_dmmf)
+                    .collect(),
+            }
+        }))
+}
+
+fn scalar_field_attribute_to_dmmf(sfa: walkers::ScalarFieldAttributeWalker<'_>) -> IndexField {
+    IndexField {
+        name: sfa
+            .as_path_to_indexed_field()
+            .into_iter()
+            .map(|(field_name, _)| field_name.to_owned())
+            .join("."),
+        sort_order: sfa.sort_order().map(Into::into),
+        length: sfa.length(),
+        operator_class: sfa.operator_class().map(|oc| match oc.get() {
+            Either::Left(oc) => oc.to_string(),
+            Either::Right(oc) => oc.to_owned(),
+        }),
+    }
+}
+
 fn default_value_to_serde(dv: &DefaultKind) -> serde_json::Value {
     match dv {
         DefaultKind::Single(value) => prisma_value_to_serde(&value.clone()),
@@ -298,27 +350,30 @@ mod tests {
         serde_json::to_string_pretty(&dmmf).expect("Failed to render JSON")
     }
 
+    const SAMPLES_FOLDER_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/test_files");
+
     #[test]
     fn test_dmmf_rendering() {
-        let test_cases = vec![
-            "general",
-            "functions",
-            "source",
-            "source_with_comments",
-            "source_with_generator",
-            "without_relation_name",
-            "ignore",
-            "views",
-        ];
+        let test_cases = fs::read_dir(SAMPLES_FOLDER_PATH)
+            .unwrap()
+            .map(|entry| entry.unwrap().file_name().into_string().unwrap())
+            .filter(|name| name.ends_with(".prisma"))
+            .map(|name| name.trim_end_matches(".prisma").to_owned());
 
         for test_case in test_cases {
             println!("TESTING: {test_case}");
 
             let datamodel_string = load_from_file(format!("{test_case}.prisma").as_str());
             let dmmf_string = render_to_dmmf(&datamodel_string);
+
+            if std::env::var("UPDATE_EXPECT") == Ok("1".into()) {
+                save_to_file(&format!("{test_case}.json"), &dmmf_string);
+            }
+
             let expected_json = load_from_file(format!("{test_case}.json").as_str());
+
             println!("{dmmf_string}");
-            assert_eq_json(&dmmf_string, &expected_json, test_case);
+            assert_eq_json(&dmmf_string, &expected_json, &test_case);
         }
     }
 
@@ -331,7 +386,10 @@ mod tests {
     }
 
     fn load_from_file(file: &str) -> String {
-        let samples_folder_path = concat!(env!("CARGO_MANIFEST_DIR"), "/test_files");
-        fs::read_to_string(format!("{samples_folder_path}/{file}")).unwrap()
+        fs::read_to_string(format!("{SAMPLES_FOLDER_PATH}/{file}")).unwrap()
+    }
+
+    fn save_to_file(file: &str, content: &str) {
+        fs::write(format!("{SAMPLES_FOLDER_PATH}/{file}"), content).unwrap();
     }
 }

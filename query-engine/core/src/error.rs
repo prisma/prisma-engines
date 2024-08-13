@@ -1,6 +1,6 @@
 use crate::{InterpreterError, QueryGraphBuilderError, RelationViolation, TransactionError};
 use connector::error::ConnectorError;
-use prisma_models::DomainError;
+use query_structure::DomainError;
 use thiserror::Error;
 use user_facing_errors::UnknownError;
 

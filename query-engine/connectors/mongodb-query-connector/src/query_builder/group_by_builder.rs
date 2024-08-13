@@ -1,8 +1,8 @@
 use crate::constants::*;
 
-use connector_interface::{AggregationSelection, Filter};
+use connector_interface::AggregationSelection;
 use mongodb::bson::{doc, Bson, Document};
-use prisma_models::ScalarFieldRef;
+use query_structure::{AggregationFilter, Filter, ScalarFieldRef};
 use std::collections::HashSet;
 
 /// Represents a `$group` aggregation stage.
@@ -39,7 +39,7 @@ impl std::fmt::Display for AggregationType {
 
 impl GroupByBuilder {
     pub fn new() -> Self {
-        Self { ..Default::default() }
+        Default::default()
     }
 
     pub fn render(&self, by_fields: Vec<ScalarFieldRef>) -> (Document, Option<Document>) {
@@ -161,19 +161,19 @@ impl GroupByBuilder {
                 unfold_filters(filters);
             }
             Filter::Aggregation(aggregation) => match aggregation {
-                connector_interface::AggregationFilter::Count(filter) => {
+                AggregationFilter::Count(filter) => {
                     self.insert_from_filter(filter.as_ref(), AggregationType::Count);
                 }
-                connector_interface::AggregationFilter::Average(filter) => {
+                AggregationFilter::Average(filter) => {
                     self.insert_from_filter(filter.as_ref(), AggregationType::Average);
                 }
-                connector_interface::AggregationFilter::Sum(filter) => {
+                AggregationFilter::Sum(filter) => {
                     self.insert_from_filter(filter.as_ref(), AggregationType::Sum);
                 }
-                connector_interface::AggregationFilter::Min(filter) => {
+                AggregationFilter::Min(filter) => {
                     self.insert_from_filter(filter.as_ref(), AggregationType::Min);
                 }
-                connector_interface::AggregationFilter::Max(filter) => {
+                AggregationFilter::Max(filter) => {
                     self.insert_from_filter(filter.as_ref(), AggregationType::Max);
                 }
             },

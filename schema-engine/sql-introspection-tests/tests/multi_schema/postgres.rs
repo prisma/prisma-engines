@@ -195,7 +195,7 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
     let expected = expect![[r#"
         *** WARNING ***
 
-        These items were renamed due to their names being duplicates in the Prisma Schema Language:
+        These items were renamed due to their names being duplicates in the Prisma schema:
           - Type: "model", name: "first_A"
           - Type: "model", name: "second_A"
     "#]];
@@ -257,7 +257,7 @@ async fn multiple_schemas_w_duplicate_sanitized_table_names_are_introspected(api
     let expected = expect![[r#"
         *** WARNING ***
 
-        These items were renamed due to their names being duplicates in the Prisma Schema Language:
+        These items were renamed due to their names being duplicates in the Prisma schema:
           - Type: "model", name: "first_2A"
           - Type: "model", name: "second_1A"
     "#]];
@@ -539,7 +539,7 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) 
     let expected = expect![[r#"
         *** WARNING ***
 
-        These items were renamed due to their names being duplicates in the Prisma Schema Language:
+        These items were renamed due to their names being duplicates in the Prisma schema:
           - Type: "enum", name: "first_HappyMood"
           - Type: "enum", name: "second_HappyMood"
           - Type: "model", name: "first_HappyPerson"
@@ -667,7 +667,7 @@ async fn multiple_schemas_w_duplicate_models_are_reintrospected_never_renamed(ap
     let expected = expect![[r#"
         *** WARNING ***
 
-        These items were renamed due to their names being duplicates in the Prisma Schema Language:
+        These items were renamed due to their names being duplicates in the Prisma schema:
           - Type: "model", name: "second_HappyPerson"
     "#]];
 

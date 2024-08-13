@@ -12,8 +12,8 @@ use connector_interface::{
 };
 use futures::Future;
 use mongodb::Client;
-use prisma_models::prelude::*;
 use psl::Datasource;
+use query_structure::prelude::*;
 
 use crate::error::MongoError;
 

@@ -1,6 +1,6 @@
 use super::*;
 use constants::*;
-use prisma_models::CompositeFieldRef;
+use query_structure::CompositeFieldRef;
 
 pub(crate) struct UpdateDataInputFieldMapper {
     unchecked: bool,
@@ -75,13 +75,15 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
         let mut input_object = input_object_type(ident, move || {
             let mut object_fields = vec![simple_input_field(operations::SET, list_input_type.clone(), None).optional()];
 
-            // Todo this capability looks wrong to me.
-            if ctx.has_capability(ConnectorCapability::EnumArrayPush) {
+            if ctx.has_capability(ConnectorCapability::ScalarLists)
+                && (ctx.has_capability(ConnectorCapability::EnumArrayPush) || !type_identifier.is_enum())
+            {
                 let map_scalar_type = map_scalar_input_type(ctx, type_identifier, false);
                 object_fields.push(
                     input_field(operations::PUSH, vec![map_scalar_type, list_input_type.clone()], None).optional(),
                 )
             }
+
             object_fields
         });
         input_object.require_exactly_one_field();

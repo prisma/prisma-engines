@@ -2,7 +2,7 @@ use crate::{constants::*, output_meta, query_builder::MongoReadQueryBuilder, val
 
 use connector_interface::*;
 use mongodb::{bson::Document, ClientSession, Database};
-use prisma_models::prelude::*;
+use query_structure::{prelude::*, Filter, QueryArguments};
 
 pub async fn aggregate<'conn>(
     database: &Database,

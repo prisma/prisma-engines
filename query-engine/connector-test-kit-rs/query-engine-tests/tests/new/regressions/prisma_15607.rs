@@ -5,8 +5,8 @@
 
 use indoc::indoc;
 use query_engine_tests::{
-    query_core::TxId, render_test_datamodel, setup_metrics, test_tracing_subscriber, ConnectorTag, LogEmit,
-    QueryResult, Runner, TestError, TestLogCapture, TestResult, TryFrom, WithSubscriber, CONFIG, ENV_LOG_LEVEL,
+    query_core::TxId, render_test_datamodel, setup_metrics, test_tracing_subscriber, LogEmit, QueryResult, Runner,
+    TestError, TestLogCapture, TestResult, WithSubscriber, CONFIG, ENV_LOG_LEVEL,
 };
 use std::future::Future;
 use tokio::sync::mpsc;
@@ -61,8 +61,7 @@ impl Actor {
 
         let (query_sender, mut query_receiver) = mpsc::channel(100);
         let (response_sender, response_receiver) = mpsc::channel(100);
-
-        let tag = ConnectorTag::try_from(("sqlserver", None))?;
+        let (tag, version) = query_tests_setup::CONFIG.test_connector()?;
 
         let datamodel = render_test_datamodel(
             "sql_server_deadlocks_test",
@@ -70,10 +69,11 @@ impl Actor {
             &[],
             None,
             &[],
+            &[],
             Some("READ COMMITTED"),
         );
 
-        let mut runner = Runner::load(datamodel, &[], tag, setup_metrics(), log_capture).await?;
+        let mut runner = Runner::load(datamodel, &[], version, tag, None, setup_metrics(), log_capture).await?;
 
         tokio::spawn(async move {
             while let Some(message) = query_receiver.recv().await {

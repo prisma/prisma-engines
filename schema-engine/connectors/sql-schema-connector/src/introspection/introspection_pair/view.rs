@@ -1,12 +1,10 @@
-use std::borrow::Cow;
-
+use super::{IdPair, IndexPair, IntrospectionPair, RelationFieldPair, ScalarFieldPair};
 use psl::{
-    parser_database::walkers,
-    schema_ast::ast::{self, WithDocumentation},
+    parser_database::{self as db, walkers},
+    schema_ast::ast::WithDocumentation,
 };
 use sql_schema_describer as sql;
-
-use super::{IdPair, IndexPair, IntrospectionPair, RelationFieldPair, ScalarFieldPair};
+use std::borrow::Cow;
 
 /// Comparing a PSL view (which currently utilizes the
 /// model structure due to them being completely the same
@@ -16,7 +14,7 @@ pub(crate) type ViewPair<'a> = IntrospectionPair<'a, Option<walkers::ModelWalker
 impl<'a> ViewPair<'a> {
     /// The position of the view from the PSL, if existing. Used for
     /// sorting the views in the final introspected data model.
-    pub(crate) fn previous_position(self) -> Option<ast::ModelId> {
+    pub(crate) fn previous_position(self) -> Option<db::ModelId> {
         self.previous.map(|m| m.id)
     }
 

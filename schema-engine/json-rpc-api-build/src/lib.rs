@@ -8,6 +8,8 @@ use std::{
     path::Path,
 };
 
+// Note: the easiest way to update the generated JSON-RPC API types is to comment out every line in `schema-engine/core/src/lib.rs`
+// but the `include!` macro invocation, then run `cargo build -p schema-core`.
 pub fn generate_rust_modules(out_dir: &Path) -> CrateResult {
     let api_defs_root = concat!(env!("CARGO_MANIFEST_DIR"), "/methods");
 

@@ -89,22 +89,22 @@
 //!  
 //!    - The `server` itself
 //!    - The  global `TRACER`, which handles `log!` and `span!` and uses the global `PROCESSOR` to
-//!     process the data constituting a trace `Span`s and log `Event`s
+//!      process the data constituting a trace `Span`s and log `Event`s
 //!    - The global `PROCESSOR`, which manages the `Storage` set of data structures, holding logs,
-//!     traces (and capture settings) per request.
+//!      traces (and capture settings) per request.
 //!  
 //!  Then, through the request lifecycle, different objects are created and dropped:
 //!  
 //!    - When a request comes in, its headers are processed and a [`Settings`] object is built, this
-//!     object determines, for the request, how logging and tracing are going to be captured: if only
-//!     traces, logs, or both, and which log levels are going to be captured.
+//!      object determines, for the request, how logging and tracing are going to be captured: if only
+//!      traces, logs, or both, and which log levels are going to be captured.
 //!    - Based on the settings, a new `Capturer` is created; a capturer is nothing but an exporter
-//!     wrapped to start capturing / fetch the captures for this particular request.
+//!      wrapped to start capturing / fetch the captures for this particular request.
 //!    - An asynchronous task is spawned to own the storage of telemetry data without needing to share
-//!     memory accross threads. Communication with this task is done through channels. The `Sender`
-//!     part of the channel is kept in a global, so it can be cloned and used by a) the Capturer
-//!     (to start capturing / fetch the captures) or by the tracer's SpanProcessor, to extract
-//!     tracing and logging information that's eventually displayed to the user.
+//!      memory accross threads. Communication with this task is done through channels. The `Sender`
+//!      part of the channel is kept in a global, so it can be cloned and used by a) the Capturer
+//!      (to start capturing / fetch the captures) or by the tracer's SpanProcessor, to extract
+//!      tracing and logging information that's eventually displayed to the user.
 //!  
 //!  Then the capturing process works in this way:
 //!    
@@ -112,29 +112,30 @@
 //!    - It grabs the HTTP headers and builds a `Capture` object **[2]**, which is configured with the settings
 //!      denoted by the `X-capture-telemetry`
 //!    - Now the server tells the `Capturer` to start capturing all the logs and traces occurring on
-//!     the request **[3]** (denoted by a `trace_id`) The `trace_id` is either carried on the `traceparent`
-//!     header or implicitly created on the first span of the request.
+//!      the request **[3]** (denoted by a `trace_id`) The `trace_id` is either carried on the `traceparent`
+//!      header or implicitly created on the first span of the request.
 //!    - The `Capturer` sends a message to the task owning the storage to start capturing **[4]**.
 //!      The tasks creates a new entry in the storage for the given trace_id. Spans without a
-//!     corresponding trace_id in the storage are ignored.
+//!      corresponding trace_id in the storage are ignored.
 //!    - The server dispatches the request and _Somewhere_ else in the code, it is processed **[5]**.
 //!    - There the code logs events and emits traces asynchronously, as part of the processing **[6]**
 //!    - Traces and Logs arrive at the `TRACER`, and get hydrated as SpanData in the `PROCESSOR`
-//!     **[7]**.
+//!      **[7]**.
 //!    - This SpanData is sent through a channel to the task running in parallel, **[8]**.
-//!     The task transforms the SpanData into `TraceSpans` and `LogEvents` depending on the capture
-//!     settings and stores those spans and events in the storage.
+//!      The task transforms the SpanData into `TraceSpans` and `LogEvents` depending on the capture
+//!      settings and stores those spans and events in the storage.
 //!    - When the code that dispatches the request is done it returns a `PrismaResponse` to the
-//!     server **[9]**.
+//!      server **[9]**.
 //!    - Then the server asks the `PROCESSOR` to fetch the captures **[10]**
 //!    - Like before, the `PROCESSOR` sends a message to the task running in parallel,
-//!     to fetch the captures from the `Storage` **[11]**. At that time, although
-//!     that's not represented in the diagram, the captures are deleted from the storage, thus
-//!     freeing any memory used for capturing during the request
+//!      to fetch the captures from the `Storage` **[11]**. At that time, although
+//!      that's not represented in the diagram, the captures are deleted from the storage, thus
+//!      freeing any memory used for capturing during the request
 //!    - Finally, the server sets the `logs` and `traces` extensions in the `PrismaResponse`**[12]**,
-//!     it serializes the extended response in json format and returns it as an HTTP Response
-//!     blob **[13]**.
-//!  
+//!      it serializes the extended response in json format and returns it as an HTTP Response
+//!      blob **[13]**.
+//!
+#![allow(unused_imports, dead_code)]
 pub use self::capturer::Capturer;
 pub use self::settings::Settings;
 pub use tx_ext::TxTraceExt;
@@ -142,7 +143,6 @@ pub use tx_ext::TxTraceExt;
 use self::capturer::Processor;
 use once_cell::sync::Lazy;
 use opentelemetry::{global, sdk, trace};
-use query_engine_metrics::MetricRegistry;
 use tracing::subscriber;
 use tracing_subscriber::{
     filter::filter_fn, layer::Layered, prelude::__tracing_subscriber_SubscriberExt, Layer, Registry,
@@ -158,9 +158,13 @@ pub fn capturer(trace_id: trace::TraceId, settings: Settings) -> Capturer {
 
 /// Adds a capturing layer to the given subscriber and installs the transformed subscriber as the
 /// global, default subscriber
+#[cfg(feature = "metrics")]
 #[allow(clippy::type_complexity)]
 pub fn install_capturing_layer(
-    subscriber: Layered<Option<MetricRegistry>, Layered<Box<dyn Layer<Registry> + Send + Sync>, Registry>>,
+    subscriber: Layered<
+        Option<query_engine_metrics::MetricRegistry>,
+        Layered<Box<dyn Layer<Registry> + Send + Sync>, Registry>,
+    >,
     log_queries: bool,
 ) {
     // set a trace context propagator, so that the trace context is propagated via the

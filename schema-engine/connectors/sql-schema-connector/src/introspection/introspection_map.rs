@@ -7,7 +7,7 @@ use crate::introspection::{
     introspection_pair::RelationFieldDirection, sanitize_datamodel_names,
 };
 use psl::{
-    parser_database::{self, ast, ScalarFieldId},
+    parser_database::{self as db, ScalarFieldId},
     PreviewFeature,
 };
 use relation_names::RelationNames;
@@ -24,15 +24,15 @@ pub(crate) use relation_names::RelationName;
 /// schema.
 #[derive(Default)]
 pub(crate) struct IntrospectionMap<'a> {
-    pub(crate) existing_enums: HashMap<sql::EnumId, ast::EnumId>,
-    pub(crate) existing_models: HashMap<sql::TableId, ast::ModelId>,
-    pub(crate) existing_views: HashMap<sql::ViewId, ast::ModelId>,
-    pub(crate) missing_tables_for_previous_models: HashSet<ast::ModelId>,
-    pub(crate) missing_views_for_previous_models: HashSet<ast::ModelId>,
+    pub(crate) existing_enums: HashMap<sql::EnumId, db::EnumId>,
+    pub(crate) existing_models: HashMap<sql::TableId, db::ModelId>,
+    pub(crate) existing_views: HashMap<sql::ViewId, db::ModelId>,
+    pub(crate) missing_tables_for_previous_models: HashSet<db::ModelId>,
+    pub(crate) missing_views_for_previous_models: HashSet<db::ModelId>,
     pub(crate) existing_model_scalar_fields: HashMap<sql::TableColumnId, ScalarFieldId>,
     pub(crate) existing_view_scalar_fields: HashMap<sql::ViewColumnId, ScalarFieldId>,
-    pub(crate) existing_inline_relations: HashMap<sql::ForeignKeyId, parser_database::RelationId>,
-    pub(crate) existing_m2m_relations: HashMap<sql::TableId, parser_database::ManyToManyRelationId>,
+    pub(crate) existing_inline_relations: HashMap<sql::ForeignKeyId, db::RelationId>,
+    pub(crate) existing_m2m_relations: HashMap<sql::TableId, db::ManyToManyRelationId>,
     pub(crate) relation_names: RelationNames<'a>,
     pub(crate) inline_relation_positions: Vec<(sql::TableId, sql::ForeignKeyId, RelationFieldDirection)>,
     pub(crate) m2m_relation_positions: Vec<(sql::TableId, sql::ForeignKeyId, RelationFieldDirection)>,

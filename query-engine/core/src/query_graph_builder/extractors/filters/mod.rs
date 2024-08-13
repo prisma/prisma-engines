@@ -9,15 +9,10 @@ use crate::{
     query_document::{ParsedInputMap, ParsedInputValue},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{
-    filter::Filter, CompositeCompare, QueryMode, RelationCompare, ScalarCompare, ScalarCondition, ScalarProjection,
-};
 use filter_fold::*;
 use filter_grouping::*;
 use indexmap::IndexMap;
-use prisma_models::{
-    prelude::ParentContainer, CompositeFieldRef, Field, Model, PrismaValue, RelationFieldRef, ScalarFieldRef,
-};
+use query_structure::{prelude::ParentContainer, *};
 use schema::constants::filters;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto, str::FromStr};
 
@@ -78,7 +73,7 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue<'_
     let filters: Vec<Filter> = fields
         .into_iter()
         .map(|sf| {
-            let pv: PrismaValue = input_map.remove(sf.name()).unwrap().try_into()?;
+            let pv: PrismaValue = input_map.swap_remove(sf.name()).unwrap().try_into()?;
             Ok(sf.equals(pv))
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
@@ -198,11 +193,11 @@ where
 /// are merged together to optimize the generated SQL statements.
 /// This is done in three steps (below transformations are using pseudo-code):
 /// 1. We flatten the filter tree.
-/// eg: `Filter(And([ScalarFilter, ScalarFilter], And([ScalarFilter])))` -> `Filter(And([ScalarFilter, ScalarFilter, ScalarFilter]))`
+///    eg: `Filter(And([ScalarFilter, ScalarFilter], And([ScalarFilter])))` -> `Filter(And([ScalarFilter, ScalarFilter, ScalarFilter]))`
 /// 2. We index search filters by their query.
-/// eg: `Filter(And([SearchFilter("query", [FieldA]), SearchFilter("query", [FieldB])]))` -> `{ "query": [FieldA, FieldB] }`
+///    eg: `Filter(And([SearchFilter("query", [FieldA]), SearchFilter("query", [FieldB])]))` -> `{ "query": [FieldA, FieldB] }`
 /// 3. We reconstruct the filter tree and merge the search filters that have the same query along the way
-/// eg: `Filter(And([SearchFilter("query", [FieldA]), SearchFilter("query", [FieldB])]))` -> `Filter(And([SearchFilter("query", [FieldA, FieldB])]))`
+///    eg: `Filter(And([SearchFilter("query", [FieldA]), SearchFilter("query", [FieldB])]))` -> `Filter(And([SearchFilter("query", [FieldA, FieldB])]))`
 fn merge_search_filters(filter: Filter) -> Filter {
     // The filter tree _needs_ to be flattened for the merge to work properly
     let flattened = fold_filter(filter);
@@ -280,7 +275,7 @@ fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue<'_>) -
     match value {
         ParsedInputValue::Single(pv) => Ok(vec![field.equals(pv)]),
         ParsedInputValue::Map(mut filter_map) => {
-            let mode = match filter_map.remove(filters::MODE) {
+            let mode = match filter_map.swap_remove(filters::MODE) {
                 Some(i) => parse_query_mode(i)?,
                 None => QueryMode::Default,
             };
@@ -314,7 +309,7 @@ fn extract_relation_filters(
 
         // Implicit is
         ParsedInputValue::Map(filter_map) => {
-            extract_filter(filter_map, &field.related_model()).map(|filter| vec![field.to_one_related(filter)])
+            extract_filter(filter_map, field.related_model()).map(|filter| vec![field.to_one_related(filter)])
         }
 
         x => Err(QueryGraphBuilderError::InputError(format!(

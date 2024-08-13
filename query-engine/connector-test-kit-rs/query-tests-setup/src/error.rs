@@ -6,6 +6,9 @@ use thiserror::Error;
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
 pub enum TestError {
+    #[error("Handler Error: {0}")]
+    RequestHandlerError(request_handlers::HandlerError),
+
     #[error("Parse error: {0}")]
     ParseError(String),
 
@@ -26,6 +29,9 @@ pub enum TestError {
 
     #[error("Raw execute error: {0}")]
     RawExecute(QuaintError),
+
+    #[error("External process error: {0}")]
+    External(#[from] Box<dyn std::error::Error + Send + Sync>),
 }
 
 impl TestError {

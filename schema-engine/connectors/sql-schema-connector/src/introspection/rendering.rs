@@ -15,26 +15,40 @@ use crate::introspection::datamodel_calculator::DatamodelCalculatorContext;
 use datamodel_renderer as renderer;
 use psl::PreviewFeature;
 use schema_connector::ViewDefinition;
+use std::borrow::Cow;
 
 /// Combines the SQL database schema and an existing PSL schema to a
 /// PSL schema definition string.
-pub(crate) fn to_psl_string(ctx: &DatamodelCalculatorContext<'_>) -> (String, bool, Vec<ViewDefinition>) {
-    let mut rendered = renderer::Datamodel::new();
+pub(crate) fn to_psl_string(
+    introspection_file_name: Cow<'_, str>,
+    ctx: &DatamodelCalculatorContext<'_>,
+) -> (Vec<(String, String)>, bool, Vec<ViewDefinition>) {
+    let mut datamodel = renderer::Datamodel::new();
     let mut views = Vec::new();
 
-    enums::render(ctx, &mut rendered);
-    models::render(ctx, &mut rendered);
+    // Ensures that all previous files are present in the new datamodel, even when empty after re-introspection.
+    for file_id in ctx.previous_schema.db.iter_file_ids() {
+        let file_name = ctx.previous_schema.db.file_name(file_id);
 
-    if ctx.config.preview_features().contains(PreviewFeature::Views) {
-        views.extend(views::render(ctx, &mut rendered));
+        datamodel.create_empty_file(Cow::Borrowed(file_name));
     }
 
-    let psl_string = if ctx.render_config {
-        let config = configuration::render(ctx.config, ctx.sql_schema, ctx.force_namespaces);
-        format!("{config}\n{rendered}")
-    } else {
-        rendered.to_string()
-    };
+    enums::render(introspection_file_name.clone(), ctx, &mut datamodel);
+    models::render(introspection_file_name.clone(), ctx, &mut datamodel);
 
-    (psl::reformat(&psl_string, 2).unwrap(), rendered.is_empty(), views)
+    if ctx.config.preview_features().contains(PreviewFeature::Views) {
+        views.extend(views::render(introspection_file_name, ctx, &mut datamodel));
+    }
+
+    let is_empty = datamodel.is_empty();
+
+    if ctx.render_config {
+        let config = configuration::render(ctx.previous_schema, ctx.sql_schema, ctx.force_namespaces);
+
+        datamodel.set_configuration(config);
+    }
+
+    let sources = datamodel.render();
+
+    (psl::reformat_multiple(sources, 2), is_empty, views)
 }

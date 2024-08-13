@@ -5,7 +5,7 @@ pub(crate) use create::*;
 pub(crate) use update::*;
 
 use super::*;
-use prisma_models::prelude::*;
+use query_structure::prelude::*;
 
 // Todo: This isn't final, this is only the first draft to get structure into the
 // wild cross-dependency waste that was the create/update inputs.

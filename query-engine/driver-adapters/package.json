@@ -1,0 +1,27 @@
+{
+  "private": true,
+  "name": "js",
+  "version": "0.0.2",
+  "description": "",
+  "engines": {
+    "node": ">=16.13",
+    "pnpm": ">=8.6.6 <9"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "pnpm build:prisma && pnpm build:executor",
+    "build:prisma": "pnpm -r --parallel dev",
+    "build:executor": "pnpm -r --filter executor build",
+    "lint": "pnpm -r run lint",
+    "clean": "git clean -dXf -e !query-engine/driver-adapters"
+  },
+  "keywords": [],
+  "author": "",
+  "devDependencies": {
+    "@types/node": "20.12.7",
+    "esbuild": "0.20.2",
+    "tsup": "8.0.2",
+    "tsx": "4.7.2",
+    "typescript": "5.4.5"
+  }
+}

@@ -1,4 +1,4 @@
-use quaint::{prelude::Insert, Value};
+use quaint::{prelude::Insert, ValueType};
 use sql_migration_tests::test_api::*;
 use sql_schema_describer::DefaultValue;
 
@@ -16,7 +16,7 @@ fn changing_a_column_from_optional_to_required_with_a_default_is_safe(api: TestA
     let insert = Insert::multi_into(api.render_table_name("Test"), ["id", "age"])
         .values(("a", 12))
         .values(("b", 22))
-        .values(("c", Value::Int32(None)));
+        .values(("c", ValueType::Int32(None)));
 
     api.query(insert.into());
 

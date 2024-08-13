@@ -4,7 +4,7 @@ use super::{Comment, ConfigBlockProperty, Identifier, Span, WithDocumentation, W
 #[derive(Debug, Clone)]
 pub struct SourceConfig {
     /// Name of this source.
-    pub name: Identifier,
+    pub(crate) name: Identifier,
     /// Top-level configuration properties for this source.
     pub properties: Vec<ConfigBlockProperty>,
     /// The comments for this source block.

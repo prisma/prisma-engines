@@ -98,6 +98,10 @@ impl PostgresFlavour {
                 .unwrap_or(false)
     }
 
+    pub(crate) fn is_postgres(&self) -> bool {
+        self.provider == PostgresProvider::PostgreSql && !self.is_cockroachdb()
+    }
+
     pub(crate) fn schema_name(&self) -> &str {
         self.state.params().map(|p| p.url.schema()).unwrap_or("public")
     }
@@ -214,6 +218,15 @@ impl SqlFlavour for PostgresFlavour {
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>> {
         with_connection(self, move |conn_params, _, conn| {
             conn.query_raw(sql, params, &conn_params.url)
+        })
+    }
+
+    fn parse_raw_query<'a>(
+        &'a mut self,
+        sql: &'a str,
+    ) -> BoxFuture<'a, ConnectorResult<quaint::connector::ParsedRawQuery>> {
+        with_connection(self, move |conn_params, _, conn| {
+            conn.parse_raw_query(sql, &conn_params.url)
         })
     }
 
@@ -430,6 +443,7 @@ impl SqlFlavour for PostgresFlavour {
                 shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await
             }),
             None => {
+                let is_postgres = self.is_postgres();
                 with_connection(self, move |params, _circumstances, main_connection| async move {
                     let shadow_database_name = crate::new_shadow_database_name();
 
@@ -462,8 +476,12 @@ impl SqlFlavour for PostgresFlavour {
                     let ret =
                         shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).await;
 
-                    let drop_database = format!("DROP DATABASE IF EXISTS \"{shadow_database_name}\"");
-                    main_connection.raw_cmd(&drop_database, &params.url).await?;
+                    if is_postgres {
+                        drop_db_try_force(main_connection, &params.url, &shadow_database_name).await?;
+                    } else {
+                        let drop_database = format!("DROP DATABASE IF EXISTS \"{shadow_database_name}\"");
+                        main_connection.raw_cmd(&drop_database, &params.url).await?;
+                    }
 
                     ret
                 })
@@ -480,6 +498,33 @@ impl SqlFlavour for PostgresFlavour {
     fn search_path(&self) -> &str {
         self.schema_name()
     }
+}
+
+/// Drop a database using `WITH (FORCE)` syntax.
+///
+/// When drop database is routed through pgbouncer, the database may still be used in other pooled connections.
+/// In this case, given that we (as a user) know the database will not be used any more, we can forcefully drop
+/// the database. Note that `with (force)` is added in Postgres 13, and therefore we will need to
+/// fallback to the normal drop if it errors with syntax error.
+///
+/// TL;DR,
+/// 1. pg >= 13 -> it works.
+/// 2. pg < 13 -> syntax error on WITH (FORCE), and then fail with db in use if pgbouncer is used.
+async fn drop_db_try_force(conn: &mut Connection, url: &PostgresUrl, database_name: &str) -> ConnectorResult<()> {
+    let drop_database = format!("DROP DATABASE IF EXISTS \"{database_name}\" WITH (FORCE)");
+    if let Err(err) = conn.raw_cmd(&drop_database, url).await {
+        if let Some(msg) = err.message() {
+            if msg.contains("syntax error") {
+                let drop_database_alt = format!("DROP DATABASE IF EXISTS \"{database_name}\"");
+                conn.raw_cmd(&drop_database_alt, url).await?;
+            } else {
+                return Err(err);
+            }
+        } else {
+            return Err(err);
+        }
+    }
+    Ok(())
 }
 
 fn strip_schema_param_from_url(url: &mut Url) {
@@ -592,7 +637,7 @@ where
 
                     let version =
                         schema_exists_result
-                          .get(0)
+                          .first()
                           .and_then(|row| row.at(1).and_then(|ver_str| row.at(2).map(|ver_num| (ver_str, ver_num))))
                           .and_then(|(ver_str,ver_num)| ver_str.to_string().and_then(|version| ver_num.as_integer().map(|version_number| (version, version_number))));
 
@@ -625,7 +670,7 @@ where
                     }
 
                     if let Some(true) = schema_exists_result
-                        .get(0)
+                        .first()
                         .and_then(|row| row.at(0).and_then(|value| value.as_bool()))
                     {
                         return Ok((circumstances, connection))

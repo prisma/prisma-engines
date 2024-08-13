@@ -1,8 +1,8 @@
 //! Write query AST
 use super::{FilteredNestedMutation, FilteredQuery};
-use crate::{RecordQuery, ToGraphviz};
-use connector::{filter::Filter, DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
-use prisma_models::prelude::*;
+use crate::{ReadQuery, RecordQuery, ToGraphviz};
+use connector::{DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
+use query_structure::{prelude::*, Filter};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -25,25 +25,26 @@ impl WriteQuery {
     pub fn inject_result_into_args(&mut self, result: SelectionResult) {
         let model = self.model();
 
-        let args = match self {
-            Self::CreateRecord(ref mut x) => &mut x.args,
-            Self::UpdateRecord(ref mut x) => match x {
-                UpdateRecord::WithExplicitSelection(u) => &mut u.args,
-                UpdateRecord::WithImplicitSelection(u) => &mut u.args,
-                UpdateRecord::WithoutSelection(u) => &mut u.args,
-            },
-            Self::UpdateManyRecords(x) => &mut x.args,
-            _ => return,
+        let inject = |args: &mut WriteArgs| {
+            for (selected_field, value) in result.pairs() {
+                args.insert(
+                    DatasourceFieldName(selected_field.db_name().into_owned()),
+                    (selected_field, value.clone()),
+                )
+            }
+            args.update_datetimes(&model);
         };
 
-        for (selected_field, value) in result {
-            args.insert(
-                DatasourceFieldName(selected_field.db_name().to_owned()),
-                (&selected_field, value),
-            )
-        }
-
-        args.update_datetimes(&model);
+        match self {
+            Self::CreateRecord(ref mut x) => inject(&mut x.args),
+            Self::CreateManyRecords(ref mut x) => x.args.iter_mut().map(inject).collect(),
+            Self::UpdateRecord(ref mut x) => match x {
+                UpdateRecord::WithSelection(u) => inject(&mut u.args),
+                UpdateRecord::WithoutSelection(u) => inject(&mut u.args),
+            },
+            Self::UpdateManyRecords(x) => inject(&mut x.args),
+            _ => (),
+        };
     }
 
     pub fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
@@ -55,30 +56,74 @@ impl WriteQuery {
         }
     }
 
-    pub fn returns(&self, field_selection: &FieldSelection) -> bool {
-        let returns_id = &self.model().primary_identifier() == field_selection;
+    /// Checks whether or not the field selection of this query satisfies the inputted field selection.
+    pub fn satisfies(&self, field_selection: &FieldSelection) -> bool {
+        self.returns()
+            .map(|fs| fs.is_superset_of(field_selection))
+            .unwrap_or(false)
+    }
 
-        // Write operations only return IDs at the moment, so anything different
-        // from the primary ID is automatically not returned.
-        // DeleteMany, Connect and Disconnect do not return anything.
+    /// Returns the field selection of a write query.
+    ///
+    /// Most write operations only return IDs at the moment, so anything different
+    /// from the primary ID is automatically not returned.
+    /// DeleteMany, Connect and Disconnect do not return anything.
+    fn returns(&self) -> Option<FieldSelection> {
+        let returns_id = Some(self.model().primary_identifier());
+
         match self {
-            Self::CreateRecord(_) => returns_id,
-            Self::CreateManyRecords(_) => false,
-            Self::UpdateRecord(UpdateRecord::WithExplicitSelection(ur)) => {
-                ur.selected_fields.is_superset_of(field_selection)
-            }
-            Self::UpdateRecord(UpdateRecord::WithImplicitSelection(ur)) => {
-                ur.selected_fields().is_superset_of(field_selection)
-            }
+            Self::CreateRecord(cr) => Some(cr.selected_fields.clone()),
+            Self::CreateManyRecords(CreateManyRecords {
+                selected_fields: Some(selected_fields),
+                ..
+            }) => Some(selected_fields.fields.clone()),
+            Self::CreateManyRecords(CreateManyRecords {
+                selected_fields: None, ..
+            }) => None,
+            Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => Some(ur.selected_fields.clone()),
             Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => returns_id,
+            Self::DeleteRecord(DeleteRecord {
+                selected_fields: Some(selected_fields),
+                ..
+            }) => Some(selected_fields.fields.clone()),
             Self::DeleteRecord(_) => returns_id,
             Self::UpdateManyRecords(_) => returns_id,
-            Self::DeleteManyRecords(_) => false,
-            Self::ConnectRecords(_) => false,
-            Self::DisconnectRecords(_) => false,
-            Self::ExecuteRaw(_) => false,
-            Self::QueryRaw(_) => false,
+            Self::DeleteManyRecords(_) => None,
+            Self::ConnectRecords(_) => None,
+            Self::DisconnectRecords(_) => None,
+            Self::ExecuteRaw(_) => None,
+            Self::QueryRaw(_) => None,
             Self::Upsert(_) => returns_id,
+        }
+    }
+
+    /// Updates the field selection of the query to satisfy the inputted FieldSelection.
+    pub fn satisfy_dependency(&mut self, fields: FieldSelection) {
+        match self {
+            Self::CreateRecord(cr) => cr.selected_fields.merge_in_place(fields),
+            Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => ur.selected_fields.merge_in_place(fields),
+            Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => (),
+            Self::CreateManyRecords(CreateManyRecords {
+                selected_fields: Some(selected_fields),
+                ..
+            }) => selected_fields.fields.merge_in_place(fields),
+            Self::CreateManyRecords(CreateManyRecords {
+                selected_fields: None, ..
+            }) => (),
+            Self::DeleteRecord(DeleteRecord {
+                selected_fields: Some(selected_fields),
+                ..
+            }) => selected_fields.fields.merge_in_place(fields),
+            Self::DeleteRecord(DeleteRecord {
+                selected_fields: None, ..
+            }) => (),
+            Self::UpdateManyRecords(_) => (),
+            Self::DeleteManyRecords(_) => (),
+            Self::ConnectRecords(_) => (),
+            Self::DisconnectRecords(_) => (),
+            Self::ExecuteRaw(_) => (),
+            Self::QueryRaw(_) => (),
+            Self::Upsert(_) => (),
         }
     }
 
@@ -143,7 +188,13 @@ impl FilteredQuery for WriteQuery {
 impl std::fmt::Display for WriteQuery {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::CreateRecord(q) => write!(f, "CreateRecord(model: {}, args: {:?})", q.model.name(), q.args),
+            Self::CreateRecord(q) => write!(
+                f,
+                "CreateRecord(model: {}, args: {:?}, selected_fields: {:?})",
+                q.model.name(),
+                q.args,
+                q.selected_fields.to_string()
+            ),
             Self::CreateManyRecords(q) => write!(f, "CreateManyRecord(model: {})", q.model.name()),
             Self::UpdateRecord(q) => write!(
                 f,
@@ -176,9 +227,22 @@ impl ToGraphviz for WriteQuery {
     fn to_graphviz(&self) -> String {
         match self {
             Self::CreateRecord(q) => format!("CreateRecord(model: {}, args: {:?})", q.model.name(), q.args),
-            Self::CreateManyRecords(q) => format!("CreateManyRecord(model: {})", q.model.name()),
-            Self::UpdateRecord(q) => format!("UpdateRecord(model: {})", q.model().name(),),
-            Self::DeleteRecord(q) => format!("DeleteRecord: {}, {:?}", q.model.name(), q.record_filter),
+            Self::CreateManyRecords(q) => format!(
+                "CreateManyRecord(model: {}, selected_fields: {:?})",
+                q.model.name(),
+                q.selected_fields
+            ),
+            Self::UpdateRecord(q) => format!(
+                "UpdateRecord(model: {}, selection: {:?})",
+                q.model().name(),
+                q.selected_fields()
+            ),
+            Self::DeleteRecord(q) => format!(
+                "DeleteRecord: {}, {:?}, {:?}",
+                q.model.name(),
+                q.record_filter,
+                q.selected_fields
+            ),
             Self::UpdateManyRecords(q) => format!("UpdateManyRecords(model: {}, args: {:?})", q.model.name(), q.args),
             Self::DeleteManyRecords(q) => format!("DeleteManyRecords: {}", q.model.name()),
             Self::ConnectRecords(_) => "ConnectRecords".to_string(),
@@ -201,31 +265,35 @@ pub struct CreateRecord {
 
 #[derive(Debug, Clone)]
 pub struct CreateManyRecords {
+    pub name: String,
     pub model: Model,
     pub args: Vec<WriteArgs>,
     pub skip_duplicates: bool,
+    /// Fields of created records that client has requested to return.
+    /// `None` if the connector does not support returning the created rows.
+    pub selected_fields: Option<CreateManyRecordsFields>,
+    /// If set to true, connector will perform the operation using multiple bulk `INSERT` queries.
+    /// One query will be issued per a unique set of fields present in the batch. For example, if
+    /// `args` contains records:
+    ///   {a: 1, b: 1}
+    ///   {a: 2, b: 2}
+    ///   {a: 3, b: 3, c: 3}
+    /// Two queries will be issued: one containing first two records and one for the last record.
+    pub split_by_shape: bool,
 }
 
-impl CreateManyRecords {
-    pub fn inject_result_into_all(&mut self, result: SelectionResult) {
-        for (selected_field, value) in result {
-            for args in self.args.iter_mut() {
-                args.insert(
-                    DatasourceFieldName(selected_field.db_name().to_owned()),
-                    (&selected_field, value.clone()),
-                )
-            }
-        }
-    }
+#[derive(Debug, Clone)]
+pub struct CreateManyRecordsFields {
+    pub fields: FieldSelection,
+    pub order: Vec<String>,
+    pub nested: Vec<ReadQuery>,
 }
 
 #[derive(Debug, Clone)]
 #[allow(clippy::enum_variant_names)]
 pub enum UpdateRecord {
-    /// Update with explicitly selected fields that will eventually be serialized as results.
-    WithExplicitSelection(UpdateRecordWithSelection),
-    /// Update with implicit selection set (primary_identifier) that will only be used to fulfill other nodes requirements.
-    WithImplicitSelection(UpdateRecordWithoutSelection),
+    /// Update with explicitly selected fields.
+    WithSelection(UpdateRecordWithSelection),
     /// Update without any selection set. A subsequent read is required to fulfill other nodes requirements.
     WithoutSelection(UpdateRecordWithoutSelection),
 }
@@ -233,48 +301,42 @@ pub enum UpdateRecord {
 impl UpdateRecord {
     pub(crate) fn args(&self) -> &WriteArgs {
         match self {
-            UpdateRecord::WithExplicitSelection(u) => &u.args,
-            UpdateRecord::WithImplicitSelection(u) => &u.args,
+            UpdateRecord::WithSelection(u) => &u.args,
             UpdateRecord::WithoutSelection(u) => &u.args,
         }
     }
 
     pub(crate) fn model(&self) -> &Model {
         match self {
-            UpdateRecord::WithExplicitSelection(u) => &u.model,
-            UpdateRecord::WithImplicitSelection(u) => &u.model,
+            UpdateRecord::WithSelection(u) => &u.model,
             UpdateRecord::WithoutSelection(u) => &u.model,
         }
     }
 
     pub(crate) fn record_filter(&self) -> &RecordFilter {
         match self {
-            UpdateRecord::WithExplicitSelection(u) => &u.record_filter,
-            UpdateRecord::WithImplicitSelection(u) => &u.record_filter,
+            UpdateRecord::WithSelection(u) => &u.record_filter,
             UpdateRecord::WithoutSelection(u) => &u.record_filter,
         }
     }
 
     pub(crate) fn record_filter_mut(&mut self) -> &mut RecordFilter {
         match self {
-            UpdateRecord::WithExplicitSelection(u) => &mut u.record_filter,
-            UpdateRecord::WithImplicitSelection(u) => &mut u.record_filter,
+            UpdateRecord::WithSelection(u) => &mut u.record_filter,
             UpdateRecord::WithoutSelection(u) => &mut u.record_filter,
         }
     }
 
     pub(crate) fn selected_fields(&self) -> Option<FieldSelection> {
         match self {
-            UpdateRecord::WithExplicitSelection(u) => Some(u.selected_fields.clone()),
-            UpdateRecord::WithImplicitSelection(u) => Some(u.selected_fields()),
+            UpdateRecord::WithSelection(u) => Some(u.selected_fields.clone()),
             UpdateRecord::WithoutSelection(_) => None,
         }
     }
 
     pub(crate) fn set_record_filter(&mut self, record_filter: RecordFilter) {
         match self {
-            UpdateRecord::WithExplicitSelection(u) => u.record_filter = record_filter,
-            UpdateRecord::WithImplicitSelection(u) => u.record_filter = record_filter,
+            UpdateRecord::WithSelection(u) => u.record_filter = record_filter,
             UpdateRecord::WithoutSelection(u) => u.record_filter = record_filter,
         }
     }
@@ -297,12 +359,6 @@ pub struct UpdateRecordWithoutSelection {
     pub args: WriteArgs,
 }
 
-impl UpdateRecordWithoutSelection {
-    pub(crate) fn selected_fields(&self) -> FieldSelection {
-        self.model.primary_identifier()
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct UpdateManyRecords {
     pub model: Model,
@@ -312,8 +368,18 @@ pub struct UpdateManyRecords {
 
 #[derive(Debug, Clone)]
 pub struct DeleteRecord {
+    pub name: String,
     pub model: Model,
     pub record_filter: Option<RecordFilter>,
+    /// Fields of the deleted record that client has requested to return.
+    /// `None` if the connector does not support returning the deleted row.
+    pub selected_fields: Option<DeleteRecordFields>,
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteRecordFields {
+    pub fields: FieldSelection,
+    pub order: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -349,8 +415,7 @@ pub struct RawQuery {
 impl FilteredQuery for UpdateRecord {
     fn get_filter(&mut self) -> Option<&mut Filter> {
         match self {
-            UpdateRecord::WithExplicitSelection(u) => Some(&mut u.record_filter.filter),
-            UpdateRecord::WithImplicitSelection(u) => Some(&mut u.record_filter.filter),
+            UpdateRecord::WithSelection(u) => Some(&mut u.record_filter.filter),
             UpdateRecord::WithoutSelection(u) => Some(&mut u.record_filter.filter),
         }
     }

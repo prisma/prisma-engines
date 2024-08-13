@@ -2,13 +2,13 @@ use sql_migration_tests::test_api::*;
 use std::{borrow::Cow, fmt::Write};
 
 /// (source native type, test value to insert, target native type)
-type Case = (&'static str, quaint::Value<'static>, &'static [&'static str]);
+type Case = (&'static str, quaint::ValueType<'static>, &'static [&'static str]);
 type Cases = &'static [Case];
 
 const SAFE_CASTS: Cases = &[
     (
         "BigInt",
-        quaint::Value::Int64(Some(99999999432)),
+        quaint::ValueType::Int64(Some(99999999432)),
         &[
             "Binary(200)",
             "Bit(54)",
@@ -30,7 +30,7 @@ const SAFE_CASTS: Cases = &[
     ),
     (
         "Binary(8)",
-        quaint::Value::Bytes(Some(Cow::Borrowed(b"08088044"))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(b"08088044"))),
         &[
             "Bit(64)",
             "Blob",
@@ -51,7 +51,7 @@ const SAFE_CASTS: Cases = &[
     ),
     (
         "Int",
-        quaint::Value::Int32(Some(i32::MIN)),
+        quaint::ValueType::Int32(Some(i32::MIN)),
         &[
             "BigInt",
             "Char(20)",
@@ -64,7 +64,7 @@ const SAFE_CASTS: Cases = &[
     ),
     (
         "Bit(32)",
-        quaint::Value::Bytes(Some(Cow::Borrowed(b""))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(b""))),
         &[
             "SmallInt",
             "UnsignedSmallInt",
@@ -86,12 +86,12 @@ const SAFE_CASTS: Cases = &[
     ),
     (
         "Blob",
-        quaint::Value::Bytes(Some(Cow::Borrowed(&[0xff]))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(&[0xff]))),
         &["TinyBlob", "MediumBlob", "LongBlob"],
     ),
     (
         "Char(10)",
-        quaint::Value::Text(Some(Cow::Borrowed("1234"))),
+        quaint::ValueType::Text(Some(Cow::Borrowed("1234"))),
         &[
             "Blob",
             "Char(11)",
@@ -107,7 +107,7 @@ const SAFE_CASTS: Cases = &[
     ),
     (
         "Date",
-        quaint::Value::Text(Some(Cow::Borrowed("2020-01-12"))),
+        quaint::ValueType::Text(Some(Cow::Borrowed("2020-01-12"))),
         &[
             "DateTime(0)",
             "Decimal(10,0)",
@@ -131,7 +131,7 @@ const SAFE_CASTS: Cases = &[
     ),
     (
         "DateTime(0)",
-        quaint::Value::Text(Some(Cow::Borrowed("2020-01-08 08:00:00"))),
+        quaint::ValueType::Text(Some(Cow::Borrowed("2020-01-08 08:00:00"))),
         &[
             "BigInt",
             "UnsignedBigInt",
@@ -144,7 +144,7 @@ const SAFE_CASTS: Cases = &[
     ),
     (
         "Double",
-        quaint::Value::Float(Some(3.20)),
+        quaint::ValueType::Float(Some(3.20)),
         &[
             "Float",
             "Bit(64)",
@@ -169,7 +169,7 @@ const SAFE_CASTS: Cases = &[
     ),
     (
         "Float",
-        quaint::Value::Float(Some(3.20)),
+        quaint::ValueType::Float(Some(3.20)),
         &[
             "Double",
             "Bit(32)",
@@ -196,7 +196,7 @@ const SAFE_CASTS: Cases = &[
     ),
     (
         "Json",
-        quaint::Value::Text(Some(Cow::Borrowed("{\"a\":\"b\"}"))),
+        quaint::ValueType::Text(Some(Cow::Borrowed("{\"a\":\"b\"}"))),
         &[
             // To string
             "Binary(10)",
@@ -211,22 +211,22 @@ const SAFE_CASTS: Cases = &[
     ),
     (
         "LongBlob",
-        quaint::Value::Bytes(Some(Cow::Borrowed(&[0xff]))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(&[0xff]))),
         &["TinyBlob", "Blob", "MediumBlob"],
     ),
     (
         "MediumBlob",
-        quaint::Value::Bytes(Some(Cow::Borrowed(&[0xff]))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(&[0xff]))),
         &["TinyBlob", "Blob", "LongBlob"],
     ),
     (
         "TinyBlob",
-        quaint::Value::Bytes(Some(Cow::Borrowed(&[0xff]))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(&[0xff]))),
         &["LongBlob", "Blob", "MediumBlob"],
     ),
     (
         "Time",
-        quaint::Value::Int32(Some(20)),
+        quaint::ValueType::Int32(Some(20)),
         &[
             "VarChar(20)",
             "BigInt",
@@ -238,7 +238,7 @@ const SAFE_CASTS: Cases = &[
     ),
     (
         "Year",
-        quaint::Value::Int32(Some(2000)),
+        quaint::ValueType::Int32(Some(2000)),
         &[
             // To string
             "Binary(10)",
@@ -272,7 +272,7 @@ const SAFE_CASTS: Cases = &[
 const RISKY_CASTS: Cases = &[
     (
         "BigInt",
-        quaint::Value::Int64(Some(100)),
+        quaint::ValueType::Int64(Some(100)),
         &[
             "Int",
             "MediumInt",
@@ -285,30 +285,30 @@ const RISKY_CASTS: Cases = &[
             "UnsignedTinyInt",
         ],
     ),
-    ("BigInt", quaint::Value::Int64(Some(2000)), &["Year"]),
+    ("BigInt", quaint::ValueType::Int64(Some(2000)), &["Year"]),
     (
         "Binary(8)",
-        quaint::Value::Bytes(Some(Cow::Borrowed(b"08088044"))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(b"08088044"))),
         &["Bit(32)", "Int", "UnsignedBigInt", "UnsignedInt", "UnsignedMediumInt"],
     ),
     (
         "Binary(1)",
-        quaint::Value::Bytes(Some(Cow::Borrowed(b"0"))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(b"0"))),
         &["Time(0)", "SmallInt", "TinyInt", "UnsignedSmallInt", "UnsignedTinyInt"],
     ),
     (
         "Binary(4)",
-        quaint::Value::Bytes(Some(Cow::Borrowed(b"2000"))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(b"2000"))),
         &["Year"],
     ),
     (
         "Bit(32)",
-        quaint::Value::Bytes(Some(Cow::Borrowed(b""))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(b""))),
         &["Decimal(10,2)", "Double", "Float"],
     ),
     (
         "Blob",
-        quaint::Value::Bytes(Some(Cow::Borrowed(b"abc"))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(b"abc"))),
         &[
             "Binary(10)",
             "Char(10)",
@@ -322,22 +322,22 @@ const RISKY_CASTS: Cases = &[
     ),
     (
         "Decimal(20,5)",
-        quaint::Value::Text(Some(Cow::Borrowed("350"))),
+        quaint::ValueType::Text(Some(Cow::Borrowed("350"))),
         &["BigInt", "UnsignedBigInt", "Time(0)", "Json"],
     ),
     (
         "Double",
-        quaint::Value::Float(Some(0f32)),
+        quaint::ValueType::Float(Some(0f32)),
         &["Char(40)", "VarBinary(40)", "VarChar(40)"],
     ),
     (
         "Float",
-        quaint::Value::Float(Some(0f32)),
+        quaint::ValueType::Float(Some(0f32)),
         &["Char(40)", "VarBinary(40)", "VarChar(40)"],
     ),
     (
         "LongBlob",
-        quaint::Value::Bytes(Some(Cow::Borrowed(b"abc"))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(b"abc"))),
         &[
             "Binary(10)",
             "Char(10)",
@@ -351,7 +351,7 @@ const RISKY_CASTS: Cases = &[
     ),
     (
         "MediumBlob",
-        quaint::Value::Bytes(Some(Cow::Borrowed(b"abc"))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(b"abc"))),
         &[
             "Binary(10)",
             "Char(10)",
@@ -363,10 +363,10 @@ const RISKY_CASTS: Cases = &[
             "VarChar(20)",
         ],
     ),
-    ("SmallInt", quaint::Value::Int32(Some(1990)), &["Year", "Double"]),
+    ("SmallInt", quaint::ValueType::Int32(Some(1990)), &["Year", "Double"]),
     (
         "TinyBlob",
-        quaint::Value::Bytes(Some(Cow::Borrowed(b"abc"))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(b"abc"))),
         &[
             "Binary(10)",
             "Char(10)",
@@ -380,12 +380,12 @@ const RISKY_CASTS: Cases = &[
     ),
     (
         "Time(0)",
-        quaint::Value::Int32(Some(5002)),
+        quaint::ValueType::Int32(Some(5002)),
         &["Date", "DateTime(0)", "Timestamp(0)"],
     ),
     (
         "Year",
-        quaint::Value::Text(Some(Cow::Borrowed("1999"))),
+        quaint::ValueType::Text(Some(Cow::Borrowed("1999"))),
         &["Decimal(10,0)", "Json"],
     ),
 ];
@@ -393,22 +393,22 @@ const RISKY_CASTS: Cases = &[
 const IMPOSSIBLE_CASTS: Cases = &[
     (
         "BigInt",
-        quaint::Value::Int64(Some(500)),
+        quaint::ValueType::Int64(Some(500)),
         &["Decimal(15,6)", "Date", "DateTime(0)", "Json", "Timestamp(0)"],
     ),
     (
         "Binary(12)",
-        quaint::Value::Bytes(Some(Cow::Borrowed(b"8080008"))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(b"8080008"))),
         &["Date", "DateTime(0)", "Json", "Timestamp(0)"],
     ),
     (
         "Bit(32)",
-        quaint::Value::Bytes(Some(Cow::Borrowed(b""))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(b""))),
         &["Date", "DateTime(0)", "Time(0)", "Timestamp(0)", "Json"],
     ),
     (
         "Blob",
-        quaint::Value::Bytes(Some(Cow::Borrowed(&[0x00]))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(&[0x00]))),
         &[
             "TinyInt",
             "BigInt",
@@ -433,7 +433,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
     ),
     (
         "Date",
-        quaint::Value::Text(Some(Cow::Borrowed("2020-01-12"))),
+        quaint::ValueType::Text(Some(Cow::Borrowed("2020-01-12"))),
         &[
             "TinyInt",
             "UnsignedTinyInt",
@@ -446,7 +446,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
     ),
     (
         "DateTime(0)",
-        quaint::Value::Text(Some(Cow::Borrowed("2020-01-08 08:00:00"))),
+        quaint::ValueType::Text(Some(Cow::Borrowed("2020-01-08 08:00:00"))),
         &[
             "TinyInt",
             "UnsignedTinyInt",
@@ -461,17 +461,17 @@ const IMPOSSIBLE_CASTS: Cases = &[
     ),
     (
         "Double",
-        quaint::Value::Float(Some(3.20)),
+        quaint::ValueType::Float(Some(3.20)),
         &["Binary(10)", "Date", "Timestamp(0)", "DateTime(0)"],
     ),
     (
         "Float",
-        quaint::Value::Float(Some(3.20)),
+        quaint::ValueType::Float(Some(3.20)),
         &["Binary(10)", "Date", "Timestamp(0)", "DateTime(0)"],
     ),
     (
         "Json",
-        quaint::Value::Text(Some(Cow::Borrowed("{\"a\":\"b\"}"))),
+        quaint::ValueType::Text(Some(Cow::Borrowed("{\"a\":\"b\"}"))),
         &[
             // Integer types
             "Bit(64)",
@@ -490,7 +490,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
     ),
     (
         "LongBlob",
-        quaint::Value::Bytes(Some(Cow::Borrowed(&[0x00]))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(&[0x00]))),
         &[
             "TinyInt",
             "BigInt",
@@ -515,7 +515,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
     ),
     (
         "MediumBlob",
-        quaint::Value::Bytes(Some(Cow::Borrowed(&[0x00]))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(&[0x00]))),
         &[
             "TinyInt",
             "BigInt",
@@ -538,10 +538,10 @@ const IMPOSSIBLE_CASTS: Cases = &[
             "Year",
         ],
     ),
-    ("Time(0)", quaint::Value::Int32(Some(0)), &["Json", "Year"]),
+    ("Time(0)", quaint::ValueType::Int32(Some(0)), &["Json", "Year"]),
     (
         "TinyBlob",
-        quaint::Value::Bytes(Some(Cow::Borrowed(&[0x00]))),
+        quaint::ValueType::Bytes(Some(Cow::Borrowed(&[0x00]))),
         &[
             "TinyInt",
             "BigInt",
@@ -566,7 +566,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
     ),
     (
         "Year",
-        quaint::Value::Int32(Some(2001)),
+        quaint::ValueType::Int32(Some(2001)),
         &[
             "TinyInt",
             "UnsignedTinyInt",
@@ -638,7 +638,7 @@ fn colnames_for_cases(cases: Cases) -> Vec<String> {
 
 fn expand_cases<'a, 'b>(
     from_type: &str,
-    test_value: &'a quaint::Value,
+    test_value: &'a quaint::ValueType<'a>,
     (to_types, nullable): (&[&str], bool),
     dm1: &'b mut String,
     dm2: &'b mut String,
@@ -697,8 +697,8 @@ fn filter_from_types(api: &TestApi, cases: Cases) -> Cow<'static, [Case]> {
         return Cow::Owned(
             cases
                 .iter()
+                .filter(|&(ty, _, _)| !type_is_unsupported_mariadb(ty))
                 .cloned()
-                .filter(|(ty, _, _)| !type_is_unsupported_mariadb(ty))
                 .collect(),
         );
     }
@@ -707,8 +707,8 @@ fn filter_from_types(api: &TestApi, cases: Cases) -> Cow<'static, [Case]> {
         return Cow::Owned(
             cases
                 .iter()
+                .filter(|&(ty, _, _)| !type_is_unsupported_mysql_5_6(ty))
                 .cloned()
-                .filter(|(ty, _, _)| !type_is_unsupported_mysql_5_6(ty))
                 .collect(),
         );
     }

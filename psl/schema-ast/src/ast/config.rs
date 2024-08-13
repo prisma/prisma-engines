@@ -1,5 +1,7 @@
 use crate::ast::{Expression, Identifier, Span, WithSpan};
 
+use super::WithIdentifier;
+
 /// A named property in a config block.
 ///
 /// ```ignore
@@ -18,7 +20,7 @@ pub struct ConfigBlockProperty {
     ///     ^^^
     /// }
     /// ```
-    pub name: Identifier,
+    pub(crate) name: Identifier,
     /// The property value.
     ///
     /// ```ignore
@@ -35,5 +37,11 @@ pub struct ConfigBlockProperty {
 impl WithSpan for ConfigBlockProperty {
     fn span(&self) -> Span {
         self.span
+    }
+}
+
+impl WithIdentifier for ConfigBlockProperty {
+    fn identifier(&self) -> &Identifier {
+        &self.name
     }
 }

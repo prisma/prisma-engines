@@ -1,0 +1,10 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["multiSchema", "prismaSchemaFolder"]
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("TEST_DATABASE_URL")
+    schemas  = ["one", "two"]
+}

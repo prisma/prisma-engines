@@ -1,7 +1,7 @@
 use super::*;
 use fmt::Debug;
 use once_cell::sync::Lazy;
-use prisma_models::{prelude::ParentContainer, DefaultKind};
+use query_structure::{prelude::ParentContainer, DefaultKind};
 use std::{borrow::Cow, boxed::Box, fmt};
 
 type InputObjectFields<'a> =
@@ -16,6 +16,7 @@ pub struct InputObjectType<'a> {
 }
 
 impl PartialEq for InputObjectType<'_> {
+    #[allow(unconditional_recursion)]
     fn eq(&self, other: &Self) -> bool {
         self.identifier.eq(&other.identifier)
     }

@@ -1,4 +1,4 @@
-use prisma_models::{Model, ScalarFieldRef};
+use query_structure::{Model, ScalarFieldRef};
 
 /// Attempts to resolve a field name to a compound field.
 pub fn resolve_compound_field(name: &str, model: &Model) -> Option<Vec<ScalarFieldRef>> {

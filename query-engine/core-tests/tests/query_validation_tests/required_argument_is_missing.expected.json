@@ -54,6 +54,13 @@
               "Null"
             ],
             "required": false
+          },
+          {
+            "name": "posts",
+            "typeNames": [
+              "PostListRelationFilter"
+            ],
+            "required": false
           }
         ]
       }

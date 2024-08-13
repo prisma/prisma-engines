@@ -1,0 +1,28 @@
+[
+  {
+    "uri": "file:///path/to/a.prisma",
+    "range": {
+      "start": {
+        "line": 10,
+        "character": 5
+      },
+      "end": {
+        "line": 10,
+        "character": 12
+      }
+    }
+  },
+  {
+    "uri": "file:///path/to/b.prisma",
+    "range": {
+      "start": {
+        "line": 3,
+        "character": 11
+      },
+      "end": {
+        "line": 3,
+        "character": 18
+      }
+    }
+  }
+]

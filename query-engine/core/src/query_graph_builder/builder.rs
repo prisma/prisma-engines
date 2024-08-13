@@ -1,12 +1,30 @@
+use std::{
+    fmt,
+    sync::atomic::{AtomicU32, Ordering},
+};
+
+use chrono::Local;
 use once_cell::sync::Lazy;
-use std::{fmt, fs::File, io::Write};
 
 use super::*;
 use crate::{query_document::*, query_graph::*, schema::*, IrSerializer};
 
-pub static PRISMA_RENDER_DOT_FILE: Lazy<bool> = Lazy::new(|| match std::env::var("PRISMA_RENDER_DOT_FILE") {
-    Ok(enabled) => enabled == *("true") || enabled == *("1"),
-    Err(_) => false,
+static PRISMA_DOT_PATH: Lazy<Option<String>> = Lazy::new(|| {
+    // Query graphs are saved only if `PRISMA_RENDER_DOT_FILE` env variable is set.
+    if !matches!(std::env::var("PRISMA_RENDER_DOT_FILE").as_deref(), Ok("true") | Ok("1")) {
+        return None;
+    }
+    // If `WORKSPACE_ROOT` env variable is defined, we save query graphs there. This ensures that
+    // there is a single central place to store query graphs, no matter which target is running.
+    // If this env variable is not defined, we save query graphs in the current directory.
+    let base_path = std::env::var("WORKSPACE_ROOT")
+        .ok()
+        .filter(|path| !path.is_empty())
+        .unwrap_or(".".into());
+    let time = Local::now().format("%Y-%m-%d %H:%M:%S");
+    let path = format!("{base_path}/.query_graphs/{time}");
+    std::fs::create_dir_all(&path).expect("Could not create directory to store query graphs");
+    Some(path)
 });
 
 pub struct QueryGraphBuilder<'a> {
@@ -46,6 +64,7 @@ impl<'a> QueryGraphBuilder<'a> {
         let mut selections = vec![selection];
         let mut parsed_object = QueryDocumentParser::new(crate::executor::get_request_now()).parse(
             &selections,
+            None,
             &root_object,
             root_object_fields,
             self.query_schema,
@@ -57,6 +76,18 @@ impl<'a> QueryGraphBuilder<'a> {
 
         if field_pair.schema_field.query_info().is_some() {
             let graph = self.dispatch_build(field_pair)?;
+
+            // Used to debug generated graph.
+            if let Some(path) = &*PRISMA_DOT_PATH {
+                static COUNTER: AtomicU32 = AtomicU32::new(1);
+                let current = COUNTER.fetch_add(1, Ordering::Relaxed);
+                std::fs::write(
+                    format!("{}/{}_{}.graphviz", path, current, serializer.key),
+                    graph.to_graphviz(),
+                )
+                .unwrap();
+            }
+
             Ok((graph, serializer))
         } else {
             Err(QueryGraphBuilderError::SchemaError(format!(
@@ -74,15 +105,16 @@ impl<'a> QueryGraphBuilder<'a> {
         let query_schema = self.query_schema;
 
         let mut graph = match (&query_info.tag, query_info.model.map(|id| self.query_schema.internal_data_model.clone().zip(id))) {
-            (QueryTag::FindUnique, Some(m)) => read::find_unique(parsed_field, m).map(Into::into),
-            (QueryTag::FindUniqueOrThrow, Some(m)) => read::find_unique_or_throw(parsed_field, m).map(Into::into),
-            (QueryTag::FindFirst, Some(m)) => read::find_first(parsed_field, m).map(Into::into),
-            (QueryTag::FindFirstOrThrow, Some(m)) => read::find_first_or_throw(parsed_field, m).map(Into::into),
-            (QueryTag::FindMany, Some(m)) => read::find_many(parsed_field, m).map(Into::into),
+            (QueryTag::FindUnique, Some(m)) => read::find_unique(parsed_field, m, query_schema).map(Into::into),
+            (QueryTag::FindUniqueOrThrow, Some(m)) => read::find_unique_or_throw(parsed_field, m, query_schema).map(Into::into),
+            (QueryTag::FindFirst, Some(m)) => read::find_first(parsed_field, m, query_schema).map(Into::into),
+            (QueryTag::FindFirstOrThrow, Some(m)) => read::find_first_or_throw(parsed_field, m, query_schema).map(Into::into),
+            (QueryTag::FindMany, Some(m)) => read::find_many(parsed_field, m, query_schema).map(Into::into),
             (QueryTag::Aggregate, Some(m)) => read::aggregate(parsed_field, m).map(Into::into),
             (QueryTag::GroupBy, Some(m)) => read::group_by(parsed_field, m).map(Into::into),
             (QueryTag::CreateOne, Some(m)) => QueryGraph::root(|g| write::create_record(g, query_schema, m, parsed_field)),
-            (QueryTag::CreateMany, Some(m)) => QueryGraph::root(|g| write::create_many_records(g, query_schema,m, parsed_field)),
+            (QueryTag::CreateMany, Some(m)) => QueryGraph::root(|g| write::create_many_records(g, query_schema, m, false, parsed_field)),
+            (QueryTag::CreateManyAndReturn, Some(m)) => QueryGraph::root(|g| write::create_many_records(g, query_schema, m, true, parsed_field)),
             (QueryTag::UpdateOne, Some(m)) => QueryGraph::root(|g| write::update_record(g, query_schema, m, parsed_field)),
             (QueryTag::UpdateMany, Some(m)) => QueryGraph::root(|g| write::update_many_records(g, query_schema, m, parsed_field)),
             (QueryTag::UpsertOne, Some(m)) => QueryGraph::root(|g| write::upsert_record(g, query_schema, m, parsed_field)),
@@ -98,16 +130,8 @@ impl<'a> QueryGraphBuilder<'a> {
         }?;
 
         // Run final transformations.
-        graph.finalize()?;
+        graph.finalize(self.query_schema.capabilities())?;
         trace!("{}", graph);
-
-        // Used to debug generated graph.
-        if *PRISMA_RENDER_DOT_FILE {
-            let mut f = File::create("graph.dot").unwrap();
-            let output = graph.to_graphviz();
-
-            f.write_all(output.as_bytes()).unwrap();
-        }
 
         Ok(graph)
     }

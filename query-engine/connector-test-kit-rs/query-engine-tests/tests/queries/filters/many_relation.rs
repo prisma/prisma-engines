@@ -276,6 +276,142 @@ mod many_relation {
         Ok(())
     }
 
+    fn schema_2() -> String {
+        let schema = indoc! {
+            r#"
+          model Blog {
+              #id(id, Int, @id)
+              name  String
+              posts Post[]
+          }
+
+          model Post {
+              #id(id, Int, @id)
+
+              blog_id    Int
+              blog       Blog      @relation(fields: [blog_id], references: [id])
+
+              comment Comment?
+          }
+
+          model Comment {
+            #id(id, Int, @id)
+            popularity Int
+
+            postId Int @unique
+            post Post @relation(fields: [postId], references: [id])
+          }
+          "#
+        };
+
+        schema.to_owned()
+    }
+
+    // 2 levels to-many/to-one relation filter, all combinations.
+    #[connector_test(schema(schema_2))]
+    async fn l2_m_1_rel_all(runner: Runner) -> TestResult<()> {
+        // Seed
+        run_query!(
+            &runner,
+            r#"mutation { createOneBlog(data: {
+                id: 1,
+                name: "blog1",
+                posts: {
+                  create: [
+                    { id: 1, comment: { create: { id: 1, popularity: 10 } } },
+                    { id: 2, comment: { create: { id: 2, popularity: 50 } } },
+                    { id: 3, comment: { create: { id: 3, popularity: 100 } } },
+                  ]
+                }
+              }) { id } }
+            "#
+        );
+
+        run_query!(
+            &runner,
+            r#"mutation { createOneBlog(data: {
+              id: 2,
+              name: "blog2",
+              posts: {
+                create: [
+                  { id: 4, comment: { create: { id: 4, popularity: 1000 } } },
+                  { id: 5, comment: { create: { id: 5, popularity: 1000 } } },
+                ]
+              }
+            }) { id } }
+          "#
+        );
+
+        // posts without comment
+        run_query!(
+            &runner,
+            r#"mutation { createOneBlog(data: {
+            id: 3,
+            name: "blog3",
+            posts: {
+              create: [
+                { id: 6 },
+                { id: 7 },
+              ]
+            }
+          }) { id } }
+        "#
+        );
+
+        // blog without posts
+        run_query!(
+            &runner,
+            r#"mutation { createOneBlog(data: { id: 4, name: "blog4" }) { id } } "#
+        );
+
+        // some / is
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { some: { comment: { is: { popularity: { lt: 1000 } } } } } }) { name }}"#),
+          @r###"{"data":{"findManyBlog":[{"name":"blog1"}]}}"###
+        );
+
+        // some / isNot
+        // TODO: Investigate why MongoDB returns a different result
+        match_connector_result!(
+          &runner,
+          r#"query { findManyBlog(where: { posts: { some: { comment: { isNot: { popularity: { gt: 100 } } } } } }) { name }}"#,
+          MongoDb(_) => vec![r#"{"data":{"findManyBlog":[{"name":"blog1"}]}}"#],
+          _ => vec![r#"{"data":{"findManyBlog":[{"name":"blog1"},{"name":"blog3"}]}}"#]
+        );
+
+        // none / is
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { none: { comment: { is: { popularity: { lt: 1000 } } } } } }) { name }}"#),
+          @r###"{"data":{"findManyBlog":[{"name":"blog2"},{"name":"blog3"},{"name":"blog4"}]}}"###
+        );
+
+        // none / isNot
+        // TODO: Investigate why MongoDB returns a different result
+        match_connector_result!(
+          &runner,
+          r#"query { findManyBlog(where: { posts: { none: { comment: { isNot: { popularity: { gt: 100 } } } } } }) { name }}"#,
+          MongoDb(_) => vec![r#"{"data":{"findManyBlog":[{"name":"blog2"},{"name":"blog3"},{"name":"blog4"}]}}"#],
+          _ => vec![r#"{"data":{"findManyBlog":[{"name":"blog2"},{"name":"blog4"}]}}"#]
+        );
+
+        // every / is
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyBlog(where: { posts: { every: { comment: { is: { popularity: { gte: 1000 } } } } } }) { name }}"#),
+          @r###"{"data":{"findManyBlog":[{"name":"blog2"},{"name":"blog4"}]}}"###
+        );
+
+        // every / isNot
+        // TODO: Investigate why MongoDB returns a different result
+        match_connector_result!(
+          &runner,
+          r#"query { findManyBlog(where: { posts: { every: { comment: { isNot: { popularity: { gte: 1000 } } } } } }) { name }}"#,
+          MongoDb(_) => vec![r#"{"data":{"findManyBlog":[{"name":"blog1"},{"name":"blog4"}]}}"#],
+          _ => vec![r#"{"data":{"findManyBlog":[{"name":"blog1"},{"name":"blog3"},{"name":"blog4"}]}}"#]
+        );
+
+        Ok(())
+    }
+
     // Note: Only the original author knows why this is considered crazy.
     #[connector_test]
     async fn crazy_filters(runner: Runner) -> TestResult<()> {
@@ -373,6 +509,71 @@ mod many_relation {
         insta::assert_snapshot!(
             run_query!(&runner, r#"query { findManyAUser(where: { name: { startsWith: "Author2" }, posts: { some: { title: { endsWith: "1" }}}}, orderBy: { id: asc }) { name, posts(orderBy: { id: asc }) { title }}}"#),
             @r###"{"data":{"findManyAUser":[{"name":"Author2","posts":[{"title":"Title1"},{"title":"Title2"}]}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_23742() -> String {
+        let schema = indoc! {
+            r#"model Top {
+                #id(id, Int, @id)
+
+                middleId Int?
+                middle Middle? @relation(fields: [middleId], references: [id])
+
+                #m2m(bottoms, Bottom[], id, Int) 
+              }
+
+              model Middle {
+                #id(id, Int, @id)
+                bottoms Bottom[]
+
+                tops    Top[]
+              }
+
+              model Bottom {
+                #id(id, Int, @id)
+
+                middleId Int?
+                middle Middle?  @relation(fields: [middleId], references: [id])
+
+                #m2m(tops, Top[], id, Int)
+              }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/23742
+    // SQL Server excluded because the m2m fragment does not support onUpdate/onDelete args which are needed.
+    #[connector_test(schema(schema_23742), exclude(SqlServer))]
+    async fn prisma_23742(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+              createOneTop(data: {
+                id: 1,
+                middle: { create: { id: 1, bottoms: { create: { id: 1, tops: { create: { id: 2 } } } } } }
+              }) {
+                id
+            }}"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findUniqueTop(where: { id: 1 }) {
+              middle {
+                bottoms(
+                  where: { tops: { some: { id: 2 } } }
+                ) {
+                  id
+                }
+              }
+            }
+          }
+        "#),
+          @r###"{"data":{"findUniqueTop":{"middle":{"bottoms":[{"id":1}]}}}}"###
         );
 
         Ok(())

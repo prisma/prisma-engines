@@ -1,0 +1,6 @@
+{
+    "connector": "postgres",
+    "version": "pg.js",
+    "driver_adapter": "pg",
+    "external_test_executor": "Napi"
+}

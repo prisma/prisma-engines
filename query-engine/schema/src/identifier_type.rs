@@ -1,5 +1,5 @@
 use crate::{capitalize, constants::ordering, scalar_filter_name};
-use prisma_models::{ast::FieldArity, prelude::*, *};
+use query_structure::{ast::FieldArity, prelude::*, *};
 
 /// Enum used to represent unique schema type names.
 /// It helps deferring the allocation + formatting of strings
@@ -22,6 +22,7 @@ pub enum IdentifierType {
     CompositeUpdateManyInput(CompositeType),
     CompositeUpsertObjectInput(CompositeType),
     CreateManyInput(Model, Option<RelationField>),
+    CreateManyAndReturnOutput(Model),
     CreateOneScalarList(ScalarField),
     Enum(InternalEnum),
     FieldUpdateOperationsInput(bool, String),
@@ -34,6 +35,7 @@ pub enum IdentifierType {
     OrderByRelevanceInput(ParentContainer),
     OrderByToManyAggregateInput(ParentContainer),
     RelationCreateInput(RelationField, RelationField, bool),
+    RelationLoadStrategy,
     RelationUpdateInput(RelationField, RelationField, bool),
     ScalarFieldEnum(Model),
     ScalarFilterInput(Model, bool),
@@ -295,6 +297,9 @@ impl std::fmt::Display for IdentifierType {
                 Some(ref rf) => write!(f, "{}CreateMany{}Input", model.name(), capitalize(rf.name())),
                 _ => write!(f, "{}CreateManyInput", model.name()),
             },
+            IdentifierType::CreateManyAndReturnOutput(model) => {
+                write!(f, "CreateMany{}AndReturnOutputType", model.name())
+            }
             IdentifierType::UncheckedUpdateManyInput(model, related_field) => match related_field {
                 Some(rf) => write!(
                     f,
@@ -304,6 +309,7 @@ impl std::fmt::Display for IdentifierType {
                 ),
                 _ => write!(f, "{}UncheckedUpdateManyInput", model.name()),
             },
+            IdentifierType::RelationLoadStrategy => write!(f, "RelationLoadStrategy"),
         }
     }
 }

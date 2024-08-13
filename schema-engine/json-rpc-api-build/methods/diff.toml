@@ -93,14 +93,14 @@ description = """
 The path to a Prisma schema. The _datasource url_ will be considered, and the
 live database it points to introspected for its schema.
 """
-shape = "SchemaContainer"
+shape = "SchemasWithConfigDir"
 
 [enumShapes.DiffTarget.variants.schemaDatamodel]
 description = """
 The path to a Prisma schema. The contents of the schema itself will be
 considered. This source does not need any database connection.
 """
-shape = "SchemaContainer"
+shape = "SchemasContainer"
 
 [enumShapes.DiffTarget.variants.url]
 description = """

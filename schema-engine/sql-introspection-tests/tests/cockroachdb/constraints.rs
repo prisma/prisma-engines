@@ -57,7 +57,7 @@ async fn aragon_test_cockroachdb(api: &mut TestApi) -> TestResult {
 
 #[test_connector(tags(CockroachDb))]
 async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
-    let raw_sql = indoc! {r#"
+    let raw_sql = indoc! {r"
         CREATE TABLE user_active_security (
             id BIGSERIAL NOT NULL,
             us_login STRING NOT NULL,
@@ -83,7 +83,7 @@ async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
           is_public CHAR(1) NOT NULL DEFAULT 'N',
           CONSTRAINT ck_is_public CHECK (is_public = ANY ARRAY['Y':::STRING::CHAR, 'N':::STRING::CHAR]:::CHAR[])
         );
-    "#};
+    "};
 
     api.raw_cmd(raw_sql).await;
 

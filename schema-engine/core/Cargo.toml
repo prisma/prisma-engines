@@ -4,23 +4,25 @@ name = "schema-core"
 version = "0.1.0"
 
 [dependencies]
-psl.workspace = true
+psl = { workspace = true, features = ["all"] }
 schema-connector = { path = "../connectors/schema-connector" }
 mongodb-schema-connector = { path = "../connectors/mongodb-schema-connector" }
 sql-schema-connector = { path = "../connectors/sql-schema-connector" }
-user-facing-errors = { path = "../../libs/user-facing-errors" }
+user-facing-errors = { path = "../../libs/user-facing-errors", features = [
+    "all-native",
+] }
 
-async-trait = "0.1.17"
-chrono = { version = "0.4", features = ["serde"] }
-enumflags2 = "0.7.7"
+async-trait.workspace = true
+chrono.workspace = true
+enumflags2.workspace = true
 jsonrpc-core = "17.0"
 serde.workspace = true
 serde_json.workspace = true
 tokio.workspace = true
-tracing = "0.1"
+tracing.workspace = true
 tracing-subscriber = "0.3"
 tracing-futures = "0.2"
-url = "2.1.1"
+url.workspace = true
 
 [build-dependencies]
 json-rpc-api-build = { path = "../json-rpc-api-build" }

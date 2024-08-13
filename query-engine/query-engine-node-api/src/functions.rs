@@ -1,7 +1,4 @@
-use crate::error::ApiError;
 use napi_derive::napi;
-use request_handlers::dmmf;
-use std::sync::Arc;
 
 #[derive(serde::Serialize, Clone, Copy)]
 #[napi(object)]
@@ -16,21 +13,6 @@ pub fn version() -> Version {
         commit: env!("GIT_HASH"),
         version: env!("CARGO_PKG_VERSION"),
     }
-}
-
-#[napi]
-pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
-    let mut schema = psl::validate(datamodel_string.into());
-
-    schema
-        .diagnostics
-        .to_result()
-        .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
-
-    let query_schema = query_core::schema::build(Arc::new(schema), true);
-    let dmmf = dmmf::render_dmmf(&query_schema);
-
-    Ok(serde_json::to_string(&dmmf)?)
 }
 
 #[napi]

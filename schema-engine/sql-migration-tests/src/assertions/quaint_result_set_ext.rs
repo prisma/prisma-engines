@@ -1,4 +1,4 @@
-use quaint::{connector::ResultRowRef, prelude::ResultSet, Value};
+use quaint::{connector::ResultRowRef, prelude::ResultSet, Value, ValueType};
 
 pub trait ResultSetExt: Sized {
     fn assert_row_count(self, expected_count: usize) -> Self;
@@ -34,8 +34,8 @@ pub struct RowAssertion<'a>(ResultRowRef<'a>);
 
 impl<'a> RowAssertion<'a> {
     pub fn assert_array_value(self, column_name: &str, expected_value: &[Value<'_>]) -> Self {
-        let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| match col {
-            Value::Array(x) => x.as_ref(),
+        let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| match &col.typed {
+            ValueType::Array(x) => x.as_ref(),
             _ => panic!("as_array"),
         });
 
@@ -87,8 +87,9 @@ impl<'a> RowAssertion<'a> {
     #[track_caller]
     pub fn assert_text_value(self, column_name: &str, expected_value: &str) -> Self {
         let value = self.0.get(column_name).expect("Expected a value, found none");
-        let value_text: &str = match value {
-            Value::Text(val) | Value::Enum(val) => val.as_deref(),
+        let value_text: &str = match &value.typed {
+            ValueType::Text(val) => val.as_deref(),
+            ValueType::Enum(val, _) => val.as_deref(),
             _ => None,
         }
         .expect("Expected a string value");
@@ -103,6 +104,17 @@ impl<'a> RowAssertion<'a> {
 
     pub fn assert_int_value(self, column_name: &str, expected_value: i64) -> Self {
         let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| (*col).as_integer());
+
+        assert!(
+            actual_value == Some(expected_value),
+            "Value assertion failed for {column_name}. Expected: {expected_value:?}, got: {actual_value:?}",
+        );
+
+        self
+    }
+
+    pub fn assert_bytes_value(self, column_name: &str, expected_value: &[u8]) -> Self {
+        let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| (*col).as_bytes());
 
         assert!(
             actual_value == Some(expected_value),

@@ -13,8 +13,8 @@
           "isUnique": false,
           "isId": true,
           "isReadOnly": false,
-          "type": "Int",
           "hasDefaultValue": true,
+          "type": "Int",
           "default": {
             "name": "autoincrement",
             "args": []
@@ -30,8 +30,8 @@
           "isUnique": true,
           "isId": false,
           "isReadOnly": false,
-          "type": "Int",
           "hasDefaultValue": true,
+          "type": "Int",
           "default": {
             "name": "dbgenerated",
             "args": [
@@ -42,11 +42,33 @@
           "isUpdatedAt": false
         }
       ],
-      "isGenerated": false,
       "primaryKey": null,
       "uniqueFields": [],
-      "uniqueIndexes": []
+      "uniqueIndexes": [],
+      "isGenerated": false
     }
   ],
-  "types": []
+  "types": [],
+  "indexes": [
+    {
+      "model": "User",
+      "type": "id",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "id"
+        }
+      ]
+    },
+    {
+      "model": "User",
+      "type": "unique",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "ip"
+        }
+      ]
+    }
+  ]
 }

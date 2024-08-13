@@ -1,8 +1,8 @@
 use super::GQLResponse;
 use crate::{GQLError, PrismaResponse, RequestBody};
+use bigdecimal::BigDecimal;
 use futures::FutureExt;
 use indexmap::IndexMap;
-use prisma_models::{parse_datetime, stringify_datetime, PrismaValue};
 use query_core::{
     constants::custom_types,
     protocol::EngineProtocol,
@@ -11,7 +11,8 @@ use query_core::{
     ArgumentValue, ArgumentValueObject, BatchDocument, BatchDocumentTransaction, CompactedDocument, Operation,
     QueryDocument, QueryExecutor, TxId,
 };
-use std::{collections::HashMap, fmt, panic::AssertUnwindSafe};
+use query_structure::{parse_datetime, stringify_datetime, PrismaValue};
+use std::{collections::HashMap, fmt, panic::AssertUnwindSafe, str::FromStr};
 
 type ArgsToResult = (HashMap<String, ArgumentValue>, IndexMap<String, Item>);
 
@@ -223,20 +224,29 @@ impl<'a> RequestHandler<'a> {
     }
 
     fn compare_args(left: &HashMap<String, ArgumentValue>, right: &HashMap<String, ArgumentValue>) -> bool {
-        left.iter().all(|(key, left_value)| {
-            right
+        let (large, small) = if left.len() > right.len() {
+            (&left, &right)
+        } else {
+            (&right, &left)
+        };
+
+        small.iter().all(|(key, small_value)| {
+            large
                 .get(key)
-                .map_or(false, |right_value| Self::compare_values(left_value, right_value))
+                .map_or(false, |large_value| Self::compare_values(small_value, large_value))
         })
     }
 
     /// Compares two PrismaValues with special comparisons rules needed because user-inputted values are coerced differently than response values.
+    ///
     /// We need this when comparing user-inputted values with query response values in the context of compacted queries.
+    ///
     /// Here are the cases covered:
     /// - DateTime/String: User-input: DateTime / Response: String
     /// - Int/BigInt: User-input: Int / Response: BigInt
     /// - (JSON protocol only) Custom types (eg: { "$type": "BigInt", value: "1" }): User-input: Scalar / Response: Object
     /// - (JSON protocol only) String/Enum: User-input: String / Response: Enum
+    ///
     /// This should likely _not_ be used outside of this specific context.
     fn compare_values(left: &ArgumentValue, right: &ArgumentValue) -> bool {
         match (left, right) {
@@ -258,6 +268,10 @@ impl<'a> RequestHandler<'a> {
                 Some(t1) => Self::compare_values(t1, t2),
                 None => left == right,
             },
+            (ArgumentValue::Scalar(PrismaValue::Float(s1)), ArgumentValue::Scalar(PrismaValue::String(s2)))
+            | (ArgumentValue::Scalar(PrismaValue::String(s2)), ArgumentValue::Scalar(PrismaValue::Float(s1))) => {
+                BigDecimal::from_str(s2).map(|s2| s2 == *s1).unwrap_or(false)
+            }
             (left, right) => left == right,
         }
     }

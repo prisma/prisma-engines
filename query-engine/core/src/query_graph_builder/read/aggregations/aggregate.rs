@@ -1,6 +1,6 @@
 use super::*;
 use crate::{query_document::ParsedField, AggregateRecordsQuery};
-use prisma_models::Model;
+use query_structure::Model;
 
 pub(crate) fn aggregate(field: ParsedField<'_>, model: Model) -> QueryGraphBuilderResult<ReadQuery> {
     let name = field.name;

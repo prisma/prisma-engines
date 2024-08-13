@@ -1,6 +1,6 @@
 use super::*;
 use constants::filters;
-use prisma_models::{prelude::ParentContainer, CompositeFieldRef};
+use query_structure::{prelude::ParentContainer, CompositeFieldRef};
 
 pub(crate) fn scalar_filter_object_type(
     ctx: &'_ QuerySchema,
@@ -113,6 +113,7 @@ pub(crate) fn where_unique_object_type(ctx: &'_ QuerySchema, model: Model) -> In
             .indexes()
             .filter(|idx| idx.is_unique())
             .filter(|index| index.fields().len() > 1)
+            .filter(|index| !index.fields().any(|f| f.is_unsupported()))
             .map(|index| {
                 let fields = index
                     .fields()
@@ -130,6 +131,7 @@ pub(crate) fn where_unique_object_type(ctx: &'_ QuerySchema, model: Model) -> In
             .walk(model.id)
             .primary_key()
             .filter(|pk| pk.fields().len() > 1)
+            .filter(|pk| !pk.fields().any(|f| f.is_unsupported()))
             .map(|pk| {
                 let name = compound_id_field_name(pk);
                 let fields = model.fields().id_fields().unwrap().collect();
@@ -179,7 +181,7 @@ pub(crate) fn where_unique_object_type(ctx: &'_ QuerySchema, model: Model) -> In
         );
         fields.extend(compound_id_field);
 
-        fields.extend(boolean_operators.into_iter());
+        fields.extend(boolean_operators);
         fields.extend(
             rest_fields
                 .into_iter()

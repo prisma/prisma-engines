@@ -1,0 +1,4 @@
+datasource db {
+    provider = "sqlserver"
+    url      = env("DATABASE_URL")
+}

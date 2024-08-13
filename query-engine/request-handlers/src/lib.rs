@@ -10,7 +10,10 @@ mod response;
 
 pub use self::{error::HandlerError, load_executor::load as load_executor};
 pub use handler::*;
-pub use protocols::{graphql::*, json::*, RequestBody};
+pub use load_executor::ConnectorKind;
+#[cfg(feature = "graphql-protocol")]
+pub use protocols::graphql::*;
+pub use protocols::{json::*, RequestBody};
 pub use response::*;
 
 pub type Result<T> = std::result::Result<T, HandlerError>;

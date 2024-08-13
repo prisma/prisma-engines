@@ -1,6 +1,6 @@
 use super::*;
 use constants::*;
-use prisma_models::CompositeFieldRef;
+use query_structure::CompositeFieldRef;
 
 pub(crate) struct CreateDataInputFieldMapper {
     unchecked: bool,

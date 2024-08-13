@@ -1,12 +1,21 @@
+use std::fmt::Display;
+
+use quaint::{prelude::Queryable, single::Quaint};
+
 use super::*;
-use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
+use crate::{datamodel_rendering::SqlDatamodelRenderer, BoxFuture, TestError};
 
 #[derive(Debug, Default, Clone)]
-pub struct SqlServerConnectorTag {
-    version: Option<SqlServerVersion>,
-}
+pub(crate) struct SqlServerConnectorTag;
 
 impl ConnectorTagInterface for SqlServerConnectorTag {
+    fn raw_execute<'a>(&'a self, query: &'a str, connection_url: &'a str) -> BoxFuture<'a, Result<(), TestError>> {
+        Box::pin(async move {
+            let conn = Quaint::new(connection_url).await?;
+            Ok(conn.raw_cmd(query).await?)
+        })
+    }
+
     fn datamodel_provider(&self) -> &'static str {
         "sqlserver"
     }
@@ -15,46 +24,8 @@ impl ConnectorTagInterface for SqlServerConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(
-        &self,
-        database: &str,
-        is_ci: bool,
-        is_multi_schema: bool,
-        isolation_level: Option<&'static str>,
-    ) -> String {
-        let database = if is_multi_schema {
-            format!("database={database};schema=dbo")
-        } else {
-            format!("database=master;schema={database}")
-        };
-
-        let isolation_level = isolation_level.unwrap_or("READ UNCOMMITTED");
-
-        match self.version {
-            Some(SqlServerVersion::V2017) if is_ci => format!("sqlserver://test-db-sqlserver-2017:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
-            Some(SqlServerVersion::V2017) => format!("sqlserver://127.0.0.1:1434;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
-
-            Some(SqlServerVersion::V2019) if is_ci => format!("sqlserver://test-db-sqlserver-2019:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
-            Some(SqlServerVersion::V2019) => format!("sqlserver://127.0.0.1:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
-
-            Some(SqlServerVersion::V2022) if is_ci => format!("sqlserver://test-db-sqlserver-2022:1433;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
-            Some(SqlServerVersion::V2022) => format!("sqlserver://127.0.0.1:1435;{database};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel={isolation_level}"),
-
-            None => unreachable!("A versioned connector must have a concrete version to run."),
-        }
-    }
-
     fn capabilities(&self) -> ConnectorCapabilities {
         psl::builtin_connectors::MSSQL.capabilities()
-    }
-
-    fn as_parse_pair(&self) -> (String, Option<String>) {
-        let version = self.version.as_ref().map(ToString::to_string);
-        ("sqlserver".to_owned(), version)
-    }
-
-    fn is_versioned(&self) -> bool {
-        true
     }
 }
 
@@ -63,46 +34,6 @@ pub enum SqlServerVersion {
     V2017,
     V2019,
     V2022,
-}
-
-impl SqlServerConnectorTag {
-    pub fn new(version: Option<&str>) -> TestResult<Self> {
-        let version = match version {
-            Some(v) => Some(SqlServerVersion::try_from(v)?),
-            None => None,
-        };
-
-        Ok(Self { version })
-    }
-
-    /// Returns all versions of this connector.
-    pub fn all() -> Vec<Self> {
-        vec![
-            Self {
-                version: Some(SqlServerVersion::V2017),
-            },
-            Self {
-                version: Some(SqlServerVersion::V2019),
-            },
-            Self {
-                version: Some(SqlServerVersion::V2022),
-            },
-        ]
-    }
-
-    /// Get a reference to the sql server connector tag's version.
-    pub fn version(&self) -> Option<SqlServerVersion> {
-        self.version
-    }
-}
-
-impl PartialEq for SqlServerConnectorTag {
-    fn eq(&self, other: &Self) -> bool {
-        match (self.version, other.version) {
-            (None, None) | (Some(_), None) | (None, Some(_)) => true,
-            (Some(v1), Some(v2)) => v1 == v2,
-        }
-    }
 }
 
 impl TryFrom<&str> for SqlServerVersion {
@@ -120,13 +51,12 @@ impl TryFrom<&str> for SqlServerVersion {
     }
 }
 
-impl ToString for SqlServerVersion {
-    fn to_string(&self) -> String {
+impl Display for SqlServerVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            SqlServerVersion::V2017 => "2017",
-            SqlServerVersion::V2019 => "2019",
-            SqlServerVersion::V2022 => "2022",
+            SqlServerVersion::V2017 => f.write_str("2017"),
+            SqlServerVersion::V2019 => f.write_str("2019"),
+            SqlServerVersion::V2022 => f.write_str("2022"),
         }
-        .to_owned()
     }
 }

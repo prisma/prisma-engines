@@ -1,2 +1,0 @@
-export TEST_DATABASE_URL="mysql://root:prisma@localhost:33577/test"
-export TEST_SHADOW_DATABASE_URL="mysql://root:prisma@localhost:33578/shadow"

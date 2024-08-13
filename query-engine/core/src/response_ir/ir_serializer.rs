@@ -1,6 +1,6 @@
 use super::{internal::serialize_internal, response::*, *};
 use crate::{CoreError, ExpressionResult, QueryResult};
-use prisma_models::PrismaValue;
+use query_structure::PrismaValue;
 use schema::{OutputField, QuerySchema};
 
 #[derive(Debug)]
@@ -21,8 +21,8 @@ impl<'a> IrSerializer<'a> {
     ) -> crate::Result<ResponseData> {
         let _span = info_span!("prisma:engine:serialize", user_facing = true);
         match result {
-            ExpressionResult::Query(QueryResult::Json(json)) => {
-                Ok(ResponseData::new(self.key.clone(), Item::Json(json)))
+            ExpressionResult::Query(QueryResult::RawJson(json)) => {
+                Ok(ResponseData::new(self.key.clone(), Item::RawJson(json)))
             }
 
             ExpressionResult::Query(r) => {

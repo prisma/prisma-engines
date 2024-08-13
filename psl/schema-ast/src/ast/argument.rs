@@ -58,7 +58,7 @@ impl Display for Argument {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         if let Some(name) = &self.name {
             f.write_str(&name.name)?;
-            f.write_str(":")?;
+            f.write_str(": ")?;
         }
         Display::fmt(&self.value, f)
     }
@@ -67,6 +67,13 @@ impl Display for Argument {
 impl Argument {
     pub fn is_unnamed(&self) -> bool {
         self.name.is_none()
+    }
+
+    pub fn name(&self) -> Option<&str> {
+        match &self.name {
+            Some(ident) => Some(ident.name.as_str()),
+            None => None,
+        }
     }
 }
 

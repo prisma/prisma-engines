@@ -1,4 +1,5 @@
 //! Only Postgres (except CockroachDB) allows SetNull on a non-nullable FK at all, rest fail during migration.
+//! D1 also seems to silently ignore Restrict.
 
 use indoc::indoc;
 use query_engine_tests::*;

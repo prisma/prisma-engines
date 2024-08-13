@@ -1,8 +1,7 @@
 use super::*;
 use crate::{query_ast::*, query_graph::*, ParsedInputValue};
-use connector::Filter;
 use itertools::Itertools;
-use prisma_models::{Model, RelationFieldRef, SelectionResult};
+use query_structure::{Filter, Model, RelationFieldRef, SelectionResult};
 use std::convert::TryInto;
 
 /// Only for x-to-many relations.

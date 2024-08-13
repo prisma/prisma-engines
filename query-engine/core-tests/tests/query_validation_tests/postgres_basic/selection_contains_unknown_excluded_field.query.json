@@ -1,0 +1,10 @@
+{
+  "action": "findMany",
+  "modelName": "User",
+  "query": {
+      "selection": {
+          "id": true,
+          "unknown_field": false
+      }
+  }
+}

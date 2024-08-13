@@ -6,7 +6,9 @@ edition = "2021"
 [dependencies]
 schema-connector = { path = "../connectors/schema-connector" }
 schema-core = { path = "../core" }
-user-facing-errors = { path = "../../libs/user-facing-errors" }
+user-facing-errors = { path = "../../libs/user-facing-errors", features = [
+    "all-native",
+] }
 
 backtrace = "0.3.59"
 base64 = "0.13"
@@ -15,19 +17,24 @@ structopt = "0.3.8"
 serde_json.workspace = true
 serde.workspace = true
 tokio.workspace = true
-tracing = "0.1"
+tracing.workspace = true
 tracing-error = "0.2"
-tracing-subscriber = { version = "0.3", features = [ "fmt", "json", "time", "env-filter" ] }
+tracing-subscriber = { version = "0.3", features = [
+    "fmt",
+    "json",
+    "time",
+    "env-filter",
+] }
 
 [dev-dependencies]
 tempfile = "3.1.0"
 test-setup = { path = "../../libs/test-setup" }
 test-macros = { path = "../../libs/test-macros" }
-url = "2.1.1"
+url.workspace = true
 indoc.workspace = true
-connection-string.workspace = true 
+connection-string.workspace = true
 expect-test = "1.4.0"
-quaint.workspace = true
+quaint = { workspace = true, features = ["all-native"] }
 
 [[bin]]
 name = "schema-engine"

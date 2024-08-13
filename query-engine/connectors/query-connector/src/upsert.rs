@@ -1,5 +1,5 @@
-use crate::{Filter, RecordFilter, WriteArgs};
-use prisma_models::{FieldSelection, Model, ScalarFieldRef};
+use crate::{RecordFilter, WriteArgs};
+use query_structure::{FieldSelection, Filter, Model, ScalarFieldRef};
 
 #[derive(Debug, Clone)]
 pub struct NativeUpsert {

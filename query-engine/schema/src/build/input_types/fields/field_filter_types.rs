@@ -1,7 +1,7 @@
 use super::{field_ref_type::WithFieldRefInputExt, objects::*, *};
 use constants::{aggregations, filters};
-use prisma_models::{CompositeFieldRef, DefaultKind, NativeTypeInstance, PrismaValue};
 use psl::datamodel_connector::ConnectorCapability;
+use query_structure::{CompositeFieldRef, DefaultKind, NativeTypeInstance, PrismaValue};
 
 /// Builds filter types for the given model field.
 pub(crate) fn get_field_filter_types(

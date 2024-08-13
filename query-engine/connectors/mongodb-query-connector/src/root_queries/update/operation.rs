@@ -1,6 +1,7 @@
 use super::{expression, into_expression::IntoUpdateExpression};
-use connector_interface::{FieldPath, Filter};
+use connector_interface::FieldPath;
 use mongodb::bson::{doc, Document};
+use query_structure::Filter;
 
 /// `UpdateOperation` is an intermediary AST used to perform preliminary transformations from a `WriteOperation`.
 /// It is meant to be transformed into an `UpdateExpression`.

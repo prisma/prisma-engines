@@ -474,7 +474,6 @@ fn diagnose_migrations_history_can_detect_edited_migrations(api: TestApi) {
         .assert_applied_migrations(&["initial", "second-migration"]);
 
     let mut file = std::fs::OpenOptions::new()
-        .write(true)
         .append(true)
         .open(initial_migration_path)
         .unwrap();
@@ -532,11 +531,7 @@ fn diagnose_migrations_history_reports_migrations_failing_to_apply_cleanly(api: 
         .send_sync()
         .assert_applied_migrations(&["initial", "second-migration"]);
 
-    let mut file = std::fs::OpenOptions::new()
-        .write(true)
-        .append(true)
-        .open(initial_path)
-        .unwrap();
+    let mut file = std::fs::OpenOptions::new().append(true).open(initial_path).unwrap();
     file.write_all(b"SELECT YOLO;\n").unwrap();
 
     let DiagnoseMigrationHistoryOutput {
@@ -1028,6 +1023,49 @@ fn indexes_on_same_columns_with_different_names_should_work(api: TestApi) {
         .into_output();
 
     assert!(output.drift.is_none());
+}
+
+#[test_connector(exclude(Sqlite, Mssql))]
+fn foreign_keys_on_same_columns_should_work(api: TestApi) {
+    let directory = api.create_migrations_directory();
+
+    let dm = api.datamodel_with_provider(
+        r#"
+        model prisma_bug_1 {
+            id1            BigInt
+            id2            BigInt
+            prisma_bug_2_a prisma_bug_2[] @relation("a")
+            prisma_bug_2_b prisma_bug_2[] @relation("b")
+
+            @@id([id1, id2])
+          }
+
+          model prisma_bug_2 {
+            id BigInt @id
+
+            prisma_bug_1_id1 BigInt
+            prisma_bug_1_id2 BigInt
+
+            prisma_bug_1_a prisma_bug_1  @relation("a", fields: [prisma_bug_1_id1, prisma_bug_1_id2], references: [id1, id2], map: "prisma_bug_1_a_fk")
+            prisma_bug_1_b prisma_bug_1? @relation("b", fields: [prisma_bug_1_id1, prisma_bug_1_id2], references: [id1, id2], map: "prisma_bug_1_b_fk")
+          }
+    "#,
+    );
+
+    api.create_migration("initial", &dm, &directory).send_sync();
+
+    api.apply_migrations(&directory)
+        .send_sync()
+        .assert_applied_migrations(&["initial"]);
+
+    let output = api
+        .diagnose_migration_history(&directory)
+        .opt_in_to_shadow_database(true)
+        .send_sync()
+        .into_output();
+
+    assert!(output.drift.is_none());
+    assert!(output.is_empty());
 }
 
 #[test_connector(tags(Postgres))]

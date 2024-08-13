@@ -71,6 +71,45 @@ fn should_allow_string_ids_with_uuid() {
 }
 
 #[test]
+fn should_allow_string_ids_with_uuid_version_specified() {
+    let dml = indoc! {r#"
+        model ModelA {
+          id String @id @default(uuid(4))
+        }
+
+        model ModelB {
+          id String @id @default(uuid(7))
+        }
+    "#};
+
+    let schema = psl::parse_schema(dml).unwrap();
+
+    {
+        let model = schema.assert_has_model("ModelA");
+
+        model
+            .assert_has_scalar_field("id")
+            .assert_scalar_type(ScalarType::String)
+            .assert_default_value()
+            .assert_uuid();
+
+        model.assert_id_on_fields(&["id"]);
+    }
+
+    {
+        let model = schema.assert_has_model("ModelB");
+
+        model
+            .assert_has_scalar_field("id")
+            .assert_scalar_type(ScalarType::String)
+            .assert_default_value()
+            .assert_uuid();
+
+        model.assert_id_on_fields(&["id"]);
+    }
+}
+
+#[test]
 fn should_allow_string_ids_without_default() {
     let dml = indoc! {r#"
         model Model {

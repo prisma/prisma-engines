@@ -1,0 +1,17 @@
+datasource db {
+    provider     = "mysql"
+    url          = env("DATABASE_URL")
+    relationMode = "foreignKeys"
+}
+
+model Post {
+    id       Int    @id @default(autoincrement())
+    title    String
+    author   User   @relation(fields: [authorId], references: [id], onDelete: <|>)
+    authorId Int
+}
+
+model User {
+    id    Int    @id @default(autoincrement())
+    posts Post[]
+}
