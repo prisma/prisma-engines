@@ -153,8 +153,9 @@ features = [
   "with-serde_json-1",
   "with-bit-vec-0_6",
 ]
-git = "https://github.com/prisma/rust-postgres"
-branch = "pgbouncer-mode"
+# git = "https://github.com/prisma/rust-postgres"
+path = "/Users/flavian/projects/prisma/rust-postgres-prisma/tokio-postgres"
+# branch = "pgbouncer-mode"
 optional = true
 
 [dependencies.postgres-types]
@@ -164,13 +165,15 @@ features = [
   "with-serde_json-1",
   "with-bit-vec-0_6",
 ]
-git = "https://github.com/prisma/rust-postgres"
-branch = "pgbouncer-mode"
+# git = "https://github.com/prisma/rust-postgres"
+path = "/Users/flavian/projects/prisma/rust-postgres-prisma/postgres-types"
+# branch = "pgbouncer-mode"
 optional = true
 
 [dependencies.postgres-native-tls]
-git = "https://github.com/prisma/rust-postgres"
-branch = "pgbouncer-mode"
+# git = "https://github.com/prisma/rust-postgres"
+path = "/Users/flavian/projects/prisma/rust-postgres-prisma/postgres-native-tls"
+# branch = "pgbouncer-mode"
 optional = true
 
 [dependencies.tokio]

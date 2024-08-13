@@ -41,12 +41,14 @@ enum MyFancyEnum {
 pub(crate) const RELATION_SCHEMA: &str = r#"
 model parent {
     id     Int     @id
+    nullable String?
 
     children   child[]
 }
 
 model child {
     id     Int     @id
+    nullable String?
 
     parent_id Int?
     parent  parent?  @relation(fields: [parent_id], references: [id])
