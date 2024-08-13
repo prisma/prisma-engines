@@ -165,6 +165,7 @@ fn unnamed_expr_int(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "1 + 1",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -189,6 +190,7 @@ fn named_expr_int(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "add",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -213,6 +215,7 @@ fn mixed_named_expr_int(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "add",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -237,6 +240,7 @@ fn mixed_unnamed_expr_int(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "`int` + 1",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -261,6 +265,7 @@ fn mixed_expr_cast_int(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "CAST(`int` + 1 as int)",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -285,6 +290,7 @@ fn unnamed_expr_string(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "'hello world'",
                     typ: "string",
+                    nullable: false,
                 },
             ],
         }
@@ -312,10 +318,12 @@ fn unnamed_expr_bool(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "1=1",
                     typ: "int",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "1=0",
                     typ: "int",
+                    nullable: false,
                 },
             ],
         }
@@ -343,14 +351,17 @@ fn unnamed_expr_real(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "1.2",
                     typ: "double",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "2.34567891023",
                     typ: "double",
+                    nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "round(2.345)",
                     typ: "double",
+                    nullable: true,
                 },
             ],
         }
@@ -382,6 +393,7 @@ fn unnamed_expr_blob(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "unhex('537475666673')",
                     typ: "bytes",
+                    nullable: true,
                 },
             ],
         }
@@ -409,6 +421,7 @@ fn unnamed_expr_date(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "date('2025-05-29 14:16:00')",
                     typ: "string",
+                    nullable: true,
                 },
             ],
         }
@@ -436,6 +449,7 @@ fn unnamed_expr_time(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "time('2025-05-29 14:16:00')",
                     typ: "string",
+                    nullable: true,
                 },
             ],
         }
@@ -463,6 +477,7 @@ fn unnamed_expr_datetime(api: TestApi) {
                 IntrospectSqlQueryColumnOutput {
                     name: "datetime('2025-05-29 14:16:00')",
                     typ: "string",
+                    nullable: true,
                 },
             ],
         }
