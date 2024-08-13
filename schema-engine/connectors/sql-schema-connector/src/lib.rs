@@ -384,6 +384,8 @@ impl SchemaConnector for SqlSchemaConnector {
                             .map(ToOwned::to_owned)
                             .unwrap_or_else(|| param.name),
                         documentation: parsed_param.and_then(|p| p.documentation()).map(ToOwned::to_owned),
+                        // Params are nullable by default unless overridden by sql doc.
+                        nullable: parsed_param.and_then(|p| p.nullable()).unwrap_or(false),
                     }
                 })
                 .collect();

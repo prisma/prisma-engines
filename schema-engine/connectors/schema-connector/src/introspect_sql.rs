@@ -33,6 +33,7 @@ pub struct IntrospectSqlQueryParameterOutput {
     pub documentation: Option<String>,
     pub name: String,
     pub typ: String,
+    pub nullable: bool,
 }
 
 #[allow(missing_docs)]
