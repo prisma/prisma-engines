@@ -77,6 +77,11 @@ pub mod filters {
     pub const INSENSITIVE: &str = "insensitive";
     pub const DEFAULT: &str = "default";
 
+    // case-sensitivity json filters
+    pub const CASE: &str = "case";
+    pub const CASE_SENSITIVE: &str = "sensitive";
+    pub const CASE_INSENSITIVE: &str = "insensitive";
+
     // condition filters
     pub const AND: &str = "AND";
     pub const AND_LOWERCASE: &str = "and";

@@ -79,6 +79,14 @@ pub(crate) fn query_mode_enum() -> EnumType {
     )
 }
 
+pub(crate) fn case_enum() -> EnumType {
+    let ident = Identifier::new_prisma("Case");
+    EnumType::string(
+        ident,
+        vec![filters::CASE_SENSITIVE.to_owned(), filters::CASE_INSENSITIVE.to_owned()],
+    )
+}
+
 pub fn itx_isolation_levels(ctx: &'_ QuerySchema) -> Option<EnumType> {
     let ident = Identifier::new_prisma(IdentifierType::TransactionIsolationLevel);
 

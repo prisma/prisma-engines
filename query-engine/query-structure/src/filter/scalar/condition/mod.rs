@@ -34,6 +34,7 @@ pub struct JsonCondition {
     pub condition: Box<ScalarCondition>,
     pub path: Option<JsonFilterPath>,
     pub target_type: Option<JsonTargetType>,
+    pub case: Case,
 }
 
 impl ScalarCondition {
@@ -63,6 +64,7 @@ impl ScalarCondition {
                         condition: Box::new(inverted_cond),
                         path: json_compare.path,
                         target_type: json_compare.target_type,
+                        case: json_compare.case,
                     })
                 }
                 Self::Search(v, fields) => Self::NotSearch(v, fields),

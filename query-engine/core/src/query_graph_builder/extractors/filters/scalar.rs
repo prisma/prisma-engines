@@ -47,10 +47,15 @@ impl<'a> ScalarFilterParser<'a> {
             _ => None,
         };
 
+        let case: Case = match filter_map.swap_remove(filters::CASE) {
+            Some(v) => parse_case(v)?,
+            _ => Case::Sensitive,
+        };
+
         let filters: Vec<Filter> = filter_map
             .into_iter()
             .map(|(name, value)| match self.field().type_identifier() {
-                TypeIdentifier::Json => self.parse_json(&name, value, json_path.clone()),
+                TypeIdentifier::Json => self.parse_json(&name, value, json_path.clone(), case.clone()),
                 _ => self.parse_scalar(&name, value),
             })
             .collect::<QueryGraphBuilderResult<Vec<Vec<_>>>>()?
@@ -192,6 +197,7 @@ impl<'a> ScalarFilterParser<'a> {
         filter_name: &str,
         input: ParsedInputValue<'_>,
         json_path: Option<JsonFilterPath>,
+        case: Case,
     ) -> QueryGraphBuilderResult<Vec<Filter>> {
         let field = self.field();
 
@@ -200,13 +206,17 @@ impl<'a> ScalarFilterParser<'a> {
                 match input {
                     // Support for syntax `{ scalarField: { not: <value> } }` and `{ scalarField: { not: <value> } }`
                     ParsedInputValue::Single(value) => {
-                        let filter =
-                            json_null_enum_filter(value, json_path, |val, path| field.json_not_equals(val, path), true);
+                        let filter = json_null_enum_filter(
+                            value,
+                            json_path,
+                            |val, path| field.json_not_equals(val, path, case.clone()),
+                            true,
+                        );
 
                         Ok(vec![filter])
                     }
                     ParsedInputValue::Map(ref map) if matches!(map.tag, Some(schema::ObjectTag::FieldRefType(_))) => {
-                        let filter = field.json_not_equals(self.as_condition_value(input, false)?, json_path);
+                        let filter = field.json_not_equals(self.as_condition_value(input, false)?, json_path, case);
 
                         Ok(vec![filter])
                     }
@@ -222,7 +232,7 @@ impl<'a> ScalarFilterParser<'a> {
                 let filter = json_null_enum_filter(
                     self.as_condition_value(input, false)?,
                     json_path,
-                    |val, path| field.json_not_equals(val, path),
+                    |val, path| field.json_not_equals(val, path, case.clone()),
                     true,
                 );
 
@@ -233,7 +243,7 @@ impl<'a> ScalarFilterParser<'a> {
                 let filter = json_null_enum_filter(
                     self.as_condition_value(input, false)?,
                     json_path,
-                    |val, path| field.json_equals(val, path),
+                    |val, path| field.json_equals(val, path, case.clone()),
                     false,
                 );
 
@@ -292,7 +302,7 @@ impl<'a> ScalarFilterParser<'a> {
                 let filter = json_null_enum_filter(
                     coerce_json_null(self.as_condition_value(input, false)?),
                     json_path,
-                    |val, path| field.json_not_contains(val, path, JsonTargetType::Array),
+                    |val, path| field.json_not_contains(val, path, JsonTargetType::Array, case.clone()),
                     true,
                 );
 
@@ -303,7 +313,7 @@ impl<'a> ScalarFilterParser<'a> {
                 let filter = json_null_enum_filter(
                     coerce_json_null(self.as_condition_value(input, false)?),
                     json_path,
-                    |val, path| field.json_not_starts_with(val, path, JsonTargetType::Array),
+                    |val, path| field.json_not_starts_with(val, path, JsonTargetType::Array, case.clone()),
                     true,
                 );
 
@@ -314,7 +324,7 @@ impl<'a> ScalarFilterParser<'a> {
                 let filter = json_null_enum_filter(
                     coerce_json_null(self.as_condition_value(input, false)?),
                     json_path,
-                    |val, path| field.json_not_ends_with(val, path, JsonTargetType::Array),
+                    |val, path| field.json_not_ends_with(val, path, JsonTargetType::Array, case.clone()),
                     true,
                 );
 
@@ -325,25 +335,28 @@ impl<'a> ScalarFilterParser<'a> {
                 self.internal_as_condition_value(input, false, &TypeIdentifier::String)?,
                 json_path,
                 JsonTargetType::String,
+                case,
             )]),
 
             filters::STRING_STARTS_WITH if self.reverse() => Ok(vec![field.json_not_starts_with(
                 self.internal_as_condition_value(input, false, &TypeIdentifier::String)?,
                 json_path,
                 JsonTargetType::String,
+                case,
             )]),
 
             filters::STRING_ENDS_WITH if self.reverse() => Ok(vec![field.json_not_ends_with(
                 self.internal_as_condition_value(input, false, &TypeIdentifier::String)?,
                 json_path,
                 JsonTargetType::String,
+                case,
             )]),
 
             filters::ARRAY_CONTAINS => {
                 let filter = json_null_enum_filter(
                     coerce_json_null(self.as_condition_value(input, false)?),
                     json_path,
-                    |val, path| field.json_contains(val, path, JsonTargetType::Array),
+                    |val, path| field.json_contains(val, path, JsonTargetType::Array, case.clone()),
                     true,
                 );
 
@@ -354,7 +367,7 @@ impl<'a> ScalarFilterParser<'a> {
                 let filter = json_null_enum_filter(
                     coerce_json_null(self.as_condition_value(input, false)?),
                     json_path,
-                    |val, path| field.json_starts_with(val, path, JsonTargetType::Array),
+                    |val, path| field.json_starts_with(val, path, JsonTargetType::Array, case.clone()),
                     true,
                 );
 
@@ -365,7 +378,7 @@ impl<'a> ScalarFilterParser<'a> {
                 let filter = json_null_enum_filter(
                     self.as_condition_value(input, false)?,
                     json_path,
-                    |val, path| field.json_ends_with(val, path, JsonTargetType::Array),
+                    |val, path| field.json_ends_with(val, path, JsonTargetType::Array, case.clone()),
                     true,
                 );
 
@@ -376,18 +389,21 @@ impl<'a> ScalarFilterParser<'a> {
                 self.internal_as_condition_value(input, false, &TypeIdentifier::String)?,
                 json_path,
                 JsonTargetType::String,
+                case,
             )]),
 
             filters::STRING_STARTS_WITH => Ok(vec![field.json_starts_with(
                 self.internal_as_condition_value(input, false, &TypeIdentifier::String)?,
                 json_path,
                 JsonTargetType::String,
+                case,
             )]),
 
             filters::STRING_ENDS_WITH => Ok(vec![field.json_ends_with(
                 self.internal_as_condition_value(input, false, &TypeIdentifier::String)?,
                 json_path,
                 JsonTargetType::String,
+                case,
             )]),
 
             _ => Err(QueryGraphBuilderError::InputError(format!(
@@ -609,6 +625,21 @@ fn parse_json_path(input: ParsedInputValue<'_>) -> QueryGraphBuilderResult<JsonF
         }
         _ => unreachable!(),
     }
+}
+
+fn parse_case(input: ParsedInputValue<'_>) -> QueryGraphBuilderResult<Case> {
+    let value: PrismaValue = input.try_into()?;
+    let s = match value {
+        PrismaValue::Enum(s) => s,
+        PrismaValue::String(s) => s,
+        _ => unreachable!(),
+    };
+
+    Ok(match s.as_str() {
+        "sensitive" => Case::Sensitive,
+        "insensitive" => Case::Insensitive,
+        _ => unreachable!(),
+    })
 }
 
 fn coerce_json_null(value: ConditionValue) -> ConditionValue {
