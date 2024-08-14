@@ -58,10 +58,14 @@ shape = "string"
 [recordShapes.sqlQueryParameterOutput.fields.documentation]
 isNullable = true
 shape = "string"
+[recordShapes.sqlQueryParameterOutput.fields.nullable]
+shape = "bool"
 
 [recordShapes.sqlQueryColumnOutput]
 [recordShapes.sqlQueryColumnOutput.fields.name]
 shape = "string"
 [recordShapes.sqlQueryColumnOutput.fields.typ]
 shape = "string"
+[recordShapes.sqlQueryColumnOutput.fields.nullable]
+shape = "bool"
 

@@ -1,4 +1,5 @@
 use psl::parser_database::ScalarType;
+use quaint::prelude::ColumnType;
 use schema_connector::{ConnectorError, ConnectorResult};
 
 #[derive(Debug, Default)]
@@ -44,7 +45,8 @@ impl<'a> ParsedSqlDoc<'a> {
 #[derive(Debug, Default)]
 pub(crate) struct ParsedParameterDoc<'a> {
     alias: Option<&'a str>,
-    typ: Option<ScalarType>,
+    typ: Option<ColumnType>,
+    nullable: Option<bool>,
     position: Option<usize>,
     documentation: Option<&'a str>,
 }
@@ -54,8 +56,12 @@ impl<'a> ParsedParameterDoc<'a> {
         self.alias = name;
     }
 
-    fn set_typ(&mut self, typ: Option<ScalarType>) {
+    fn set_typ(&mut self, typ: Option<ColumnType>) {
         self.typ = typ;
+    }
+
+    fn set_nullable(&mut self, nullable: Option<bool>) {
+        self.nullable = nullable;
     }
 
     fn set_position(&mut self, position: Option<usize>) {
@@ -67,19 +73,27 @@ impl<'a> ParsedParameterDoc<'a> {
     }
 
     fn is_empty(&self) -> bool {
-        self.alias.is_none() && self.position.is_none() && self.typ.is_none() && self.documentation.is_none()
+        self.alias.is_none()
+            && self.position.is_none()
+            && self.typ.is_none()
+            && self.documentation.is_none()
+            && self.nullable.is_none()
     }
 
     pub(crate) fn alias(&self) -> Option<&str> {
         self.alias
     }
 
-    pub(crate) fn typ(&self) -> Option<&str> {
-        self.typ.map(|typ| typ.as_str())
+    pub(crate) fn typ(&self) -> Option<String> {
+        self.typ.map(|typ| typ.to_string())
     }
 
     pub(crate) fn documentation(&self) -> Option<&str> {
         self.documentation
+    }
+
+    pub(crate) fn nullable(&self) -> Option<bool> {
+        self.nullable
     }
 }
 
@@ -97,6 +111,10 @@ impl<'a> Input<'a> {
 
     fn strip_prefix_str(&self, pat: &str) -> Option<Self> {
         self.0.strip_prefix(pat).map(Self)
+    }
+
+    fn strip_suffix_char(&self, pat: char) -> Option<Self> {
+        self.0.strip_suffix(pat).map(Self)
     }
 
     fn starts_with(&self, pat: &str) -> bool {
@@ -155,26 +173,61 @@ fn build_error(input: Input<'_>, msg: &str) -> ConnectorError {
     ConnectorError::from_msg(format!("SQL documentation parsing: {msg} at '{input}'."))
 }
 
-fn parse_typ_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<ScalarType>)> {
+fn parse_typ_nullability(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<bool>)> {
+    if let Some(out) = input.strip_suffix_char('!') {
+        Ok((out, Some(false)))
+    } else if let Some(out) = input.strip_suffix_char('?') {
+        Ok((out, Some(true)))
+    } else {
+        Ok((input, None))
+    }
+}
+
+struct ParsedType {
+    pub(crate) typ: Option<ColumnType>,
+    pub(crate) nullable: Option<bool>,
+}
+
+fn parse_typ_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<ParsedType>)> {
     if let Some(start) = input.find(&['{']) {
         if let Some(end) = input.find(&['}']) {
+            let out = input.move_from(end + 1);
             let typ = input.move_between(start + 1, end);
 
             if typ.is_empty() {
                 return Err(build_error(input, "missing type (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal')"));
             }
 
-            match ScalarType::try_from_str(typ.inner(), false) {
-                Some(st) => {
-                    Ok((input.move_from(end + 1), Some(st)))
-                }
-                None => {
-                    Err(build_error(
-                        input,
-                        &format!("invalid type: '{typ}' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal')"),
-                    ))
-                }
+            let (typ, nullable) = parse_typ_nullability(typ)?;
+
+            if typ.is_empty() {
+                return Ok((out, Some(ParsedType { typ: None, nullable })));
             }
+
+            let st = ScalarType::try_from_str(typ.inner(), false).ok_or_else(|| build_error(
+                input,
+                &format!("invalid type: '{typ}' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal')"),
+            ))?;
+
+            let col_typ = match st {
+                ScalarType::Int => ColumnType::Int32,
+                ScalarType::BigInt => ColumnType::Int64,
+                ScalarType::Float => ColumnType::Float,
+                ScalarType::Boolean => ColumnType::Boolean,
+                ScalarType::String => ColumnType::Text,
+                ScalarType::DateTime => ColumnType::DateTime,
+                ScalarType::Json => ColumnType::Json,
+                ScalarType::Bytes => ColumnType::Bytes,
+                ScalarType::Decimal => ColumnType::Numeric,
+            };
+
+            Ok((
+                out,
+                Some(ParsedType {
+                    typ: Some(col_typ),
+                    nullable,
+                }),
+            ))
         } else {
             Err(build_error(input, "missing closing bracket"))
         }
@@ -240,14 +293,15 @@ fn validate_param(param: &ParsedParameterDoc<'_>, input: Input<'_>) -> Connector
 fn parse_param(param_input: Input<'_>) -> ConnectorResult<ParsedParameterDoc<'_>> {
     let input = param_input.strip_prefix_str("@param").unwrap().trim_start();
 
-    let (input, typ) = parse_typ_opt(input)?;
+    let (input, parsed_typ) = parse_typ_opt(input)?;
     let (input, position) = parse_position_opt(input)?;
     let (input, alias) = parse_alias_opt(input)?;
     let documentation = parse_rest(input)?;
 
     let mut param = ParsedParameterDoc::default();
 
-    param.set_typ(typ);
+    param.set_typ(parsed_typ.as_ref().and_then(|p| p.typ));
+    param.set_nullable(parsed_typ.as_ref().and_then(|p| p.nullable));
     param.set_position(position);
     param.set_alias(alias);
     param.set_documentation(documentation);
@@ -304,6 +358,7 @@ mod tests {
                         "userId",
                     ),
                     typ: None,
+                    nullable: None,
                     position: Some(
                         1,
                     ),
@@ -328,6 +383,7 @@ mod tests {
                         "userId",
                     ),
                     typ: None,
+                    nullable: None,
                     position: Some(
                         1,
                     ),
@@ -354,8 +410,9 @@ mod tests {
                         "userId",
                     ),
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
+                    nullable: None,
                     position: None,
                     documentation: None,
                 },
@@ -378,8 +435,9 @@ mod tests {
                         "userId",
                     ),
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
+                    nullable: None,
                     position: Some(
                         1,
                     ),
@@ -404,8 +462,9 @@ mod tests {
                         "userId",
                     ),
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
+                    nullable: None,
                     position: Some(
                         1,
                     ),
@@ -430,8 +489,9 @@ mod tests {
                 ParsedParameterDoc {
                     alias: None,
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
+                    nullable: None,
                     position: Some(
                         1,
                     ),
@@ -576,8 +636,9 @@ mod tests {
                 ParsedParameterDoc {
                     alias: None,
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
+                    nullable: None,
                     position: Some(
                         1,
                     ),
@@ -602,8 +663,9 @@ mod tests {
                 ParsedParameterDoc {
                     alias: None,
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
+                    nullable: None,
                     position: Some(
                         1,
                     ),
@@ -642,6 +704,134 @@ mod tests {
     }
 
     #[test]
+    fn parse_param_15() {
+        use expect_test::expect;
+
+        let res = parse_param(Input("@param {Int!} $1"));
+
+        let expected = expect![[r#"
+            Ok(
+                ParsedParameterDoc {
+                    alias: None,
+                    typ: Some(
+                        Int32,
+                    ),
+                    nullable: Some(
+                        false,
+                    ),
+                    position: Some(
+                        1,
+                    ),
+                    documentation: None,
+                },
+            )
+        "#]];
+
+        expected.assert_debug_eq(&res);
+    }
+
+    #[test]
+    fn parse_param_16() {
+        use expect_test::expect;
+
+        let res = parse_param(Input("@param {Int?} $1"));
+
+        let expected = expect![[r#"
+            Ok(
+                ParsedParameterDoc {
+                    alias: None,
+                    typ: Some(
+                        Int32,
+                    ),
+                    nullable: Some(
+                        true,
+                    ),
+                    position: Some(
+                        1,
+                    ),
+                    documentation: None,
+                },
+            )
+        "#]];
+
+        expected.assert_debug_eq(&res);
+    }
+
+    #[test]
+    fn parse_param_17() {
+        use expect_test::expect;
+
+        let res = parse_param(Input("@param {Int!?} $1"));
+
+        let expected = expect![[r#"
+            Err(
+                ConnectorErrorImpl {
+                    user_facing_error: None,
+                    message: Some(
+                        "SQL documentation parsing: invalid type: 'Int!' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal') at '{Int!?} $1'.",
+                    ),
+                    source: None,
+                    context: SpanTrace [],
+                }
+                SQL documentation parsing: invalid type: 'Int!' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal') at '{Int!?} $1'.
+                ,
+            )
+        "#]];
+
+        expected.assert_debug_eq(&res);
+    }
+
+    #[test]
+    fn parse_param_18() {
+        use expect_test::expect;
+
+        let res = parse_param(Input("@param {?} $1"));
+
+        let expected = expect![[r#"
+            Ok(
+                ParsedParameterDoc {
+                    alias: None,
+                    typ: None,
+                    nullable: Some(
+                        true,
+                    ),
+                    position: Some(
+                        1,
+                    ),
+                    documentation: None,
+                },
+            )
+        "#]];
+
+        expected.assert_debug_eq(&res);
+    }
+
+    #[test]
+    fn parse_param_19() {
+        use expect_test::expect;
+
+        let res = parse_param(Input("@param {!} $1"));
+
+        let expected = expect![[r#"
+            Ok(
+                ParsedParameterDoc {
+                    alias: None,
+                    typ: None,
+                    nullable: Some(
+                        false,
+                    ),
+                    position: Some(
+                        1,
+                    ),
+                    documentation: None,
+                },
+            )
+        "#]];
+
+        expected.assert_debug_eq(&res);
+    }
+
+    #[test]
     fn parse_sql_1() {
         use expect_test::expect;
 
@@ -654,8 +844,9 @@ mod tests {
                         ParsedParameterDoc {
                             alias: None,
                             typ: Some(
-                                Int,
+                                Int32,
                             ),
+                            nullable: None,
                             position: Some(
                                 1,
                             ),
@@ -694,8 +885,9 @@ mod tests {
                                 "userId",
                             ),
                             typ: Some(
-                                Int,
+                                Int32,
                             ),
+                            nullable: None,
                             position: Some(
                                 1,
                             ),
@@ -708,8 +900,9 @@ mod tests {
                                 "parentId",
                             ),
                             typ: Some(
-                                String,
+                                Text,
                             ),
+                            nullable: None,
                             position: Some(
                                 2,
                             ),

@@ -14,6 +14,17 @@ model model {
     dt      DateTime
 }"#;
 
+pub(crate) const SIMPLE_NULLABLE_SCHEMA: &str = r#"
+model model {
+    int     Int     @id
+    string  String?
+    bigint  BigInt?
+    float   Float?
+    bytes   Bytes?
+    bool    Boolean?
+    dt      DateTime?
+}"#;
+
 pub(crate) const ENUM_SCHEMA: &str = r#"
 model model {
     id     Int     @id
@@ -30,12 +41,14 @@ enum MyFancyEnum {
 pub(crate) const RELATION_SCHEMA: &str = r#"
 model parent {
     id     Int     @id
+    nullable String?
 
     children   child[]
 }
 
 model child {
     id     Int     @id
+    nullable String?
 
     parent_id Int?
     parent  parent?  @relation(fields: [parent_id], references: [id])
