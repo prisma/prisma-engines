@@ -516,10 +516,10 @@ mod json_filters {
             );
         }
 
-        // QueryMode::Insensitive
+        // Case::Insensitive
         let res = run_query!(
             runner,
-            jsonq(&runner, r#"string_contains: "Oo", mode: "insensitive" "#, None)
+            jsonq(&runner, r#"string_contains: "Oo", case: "insensitive" "#, None)
         );
         insta::allow_duplicates! {
             insta::assert_snapshot!(
@@ -568,10 +568,10 @@ mod json_filters {
             );
         }
 
-        // QueryMode::insensitive
+        // Case::insensitive
         let res = run_query!(
             runner,
-            jsonq(&runner, r#"string_starts_with: "FoO", mode: "insensitive" "#, None)
+            jsonq(&runner, r#"string_starts_with: "FoO", case: "insensitive" "#, None)
         );
         insta::allow_duplicates! {
             insta::assert_snapshot!(
@@ -619,10 +619,10 @@ mod json_filters {
             );
         }
 
-        // QueryMode::insensitive
+        // Case::insensitive
         let res = run_query!(
             runner,
-            jsonq(&runner, r#"string_ends_with: "oO", mode: "insensitive" "#, None)
+            jsonq(&runner, r#"string_ends_with: "oO", case: "insensitive" "#, None)
         );
         insta::allow_duplicates! {
             insta::assert_snapshot!(
