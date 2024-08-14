@@ -112,11 +112,11 @@ pub trait ScalarListCompare {
 
 /// Comparison methods for json fields
 pub trait JsonCompare {
-    fn json_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
+    fn json_equals<T>(&self, value: T, path: Option<JsonFilterPath>, case: Case) -> Filter
     where
         T: Into<ConditionValue>;
 
-    fn json_not_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
+    fn json_not_equals<T>(&self, value: T, path: Option<JsonFilterPath>, case: Case) -> Filter
     where
         T: Into<ConditionValue>;
 
@@ -136,27 +136,63 @@ pub trait JsonCompare {
     where
         T: Into<ConditionValue>;
 
-    fn json_contains<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
+    fn json_contains<T>(
+        &self,
+        value: T,
+        path: Option<JsonFilterPath>,
+        target_type: JsonTargetType,
+        case: Case,
+    ) -> Filter
     where
         T: Into<ConditionValue>;
 
-    fn json_not_contains<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
+    fn json_not_contains<T>(
+        &self,
+        value: T,
+        path: Option<JsonFilterPath>,
+        target_type: JsonTargetType,
+        case: Case,
+    ) -> Filter
     where
         T: Into<ConditionValue>;
 
-    fn json_starts_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
+    fn json_starts_with<T>(
+        &self,
+        value: T,
+        path: Option<JsonFilterPath>,
+        target_type: JsonTargetType,
+        case: Case,
+    ) -> Filter
     where
         T: Into<ConditionValue>;
 
-    fn json_not_starts_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
+    fn json_not_starts_with<T>(
+        &self,
+        value: T,
+        path: Option<JsonFilterPath>,
+        target_type: JsonTargetType,
+        case: Case,
+    ) -> Filter
     where
         T: Into<ConditionValue>;
 
-    fn json_ends_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
+    fn json_ends_with<T>(
+        &self,
+        value: T,
+        path: Option<JsonFilterPath>,
+        target_type: JsonTargetType,
+        case: Case,
+    ) -> Filter
     where
         T: Into<ConditionValue>;
 
-    fn json_not_ends_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
+    fn json_not_ends_with<T>(
+        &self,
+        value: T,
+        path: Option<JsonFilterPath>,
+        target_type: JsonTargetType,
+        case: Case,
+    ) -> Filter
     where
         T: Into<ConditionValue>;
 }
