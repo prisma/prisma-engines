@@ -410,7 +410,7 @@ mod tests {
                         "userId",
                     ),
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
                     nullable: None,
                     position: None,
@@ -435,7 +435,7 @@ mod tests {
                         "userId",
                     ),
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
                     nullable: None,
                     position: Some(
@@ -462,7 +462,7 @@ mod tests {
                         "userId",
                     ),
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
                     nullable: None,
                     position: Some(
@@ -489,7 +489,7 @@ mod tests {
                 ParsedParameterDoc {
                     alias: None,
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
                     nullable: None,
                     position: Some(
@@ -636,7 +636,7 @@ mod tests {
                 ParsedParameterDoc {
                     alias: None,
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
                     nullable: None,
                     position: Some(
@@ -663,7 +663,7 @@ mod tests {
                 ParsedParameterDoc {
                     alias: None,
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
                     nullable: None,
                     position: Some(
@@ -714,7 +714,7 @@ mod tests {
                 ParsedParameterDoc {
                     alias: None,
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
                     nullable: Some(
                         false,
@@ -741,7 +741,7 @@ mod tests {
                 ParsedParameterDoc {
                     alias: None,
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
                     nullable: Some(
                         true,
@@ -844,7 +844,7 @@ mod tests {
                         ParsedParameterDoc {
                             alias: None,
                             typ: Some(
-                                Int,
+                                Int32,
                             ),
                             nullable: None,
                             position: Some(
@@ -885,7 +885,7 @@ mod tests {
                                 "userId",
                             ),
                             typ: Some(
-                                Int,
+                                Int32,
                             ),
                             nullable: None,
                             position: Some(
@@ -900,7 +900,7 @@ mod tests {
                                 "parentId",
                             ),
                             typ: Some(
-                                String,
+                                Text,
                             ),
                             nullable: None,
                             position: Some(
