@@ -72,7 +72,11 @@ impl<'a> ParsedParameterDoc<'a> {
     }
 
     fn is_empty(&self) -> bool {
-        self.alias.is_none() && self.position.is_none() && self.typ.is_none() && self.documentation.is_none()
+        self.alias.is_none()
+            && self.position.is_none()
+            && self.typ.is_none()
+            && self.documentation.is_none()
+            && self.nullable.is_none()
     }
 
     pub(crate) fn alias(&self) -> Option<&str> {
@@ -186,6 +190,7 @@ struct ParsedType {
 fn parse_typ_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<ParsedType>)> {
     if let Some(start) = input.find(&['{']) {
         if let Some(end) = input.find(&['}']) {
+            let out = input.move_from(end + 1);
             let typ = input.move_between(start + 1, end);
 
             if typ.is_empty() {
@@ -194,19 +199,22 @@ fn parse_typ_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<ParsedT
 
             let (typ, nullable) = parse_typ_nullability(typ)?;
 
-            let (out, st) = match ScalarType::try_from_str(typ.inner(), false) {
-                Some(st) => {
-                    Ok((input.move_from(end + 1), Some(st)))
-                }
-                None => {
-                    Err(build_error(
-                        input,
-                        &format!("invalid type: '{typ}' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal')"),
-                    ))
-                }
-            }?;
+            if typ.is_empty() {
+                return Ok((out, Some(ParsedType { typ: None, nullable })));
+            }
 
-            Ok((out, Some(ParsedType { typ: st, nullable })))
+            let st = ScalarType::try_from_str(typ.inner(), false).ok_or_else(|| build_error(
+                input,
+                &format!("invalid type: '{typ}' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal')"),
+            ))?;
+
+            Ok((
+                out,
+                Some(ParsedType {
+                    typ: Some(st),
+                    nullable,
+                }),
+            ))
         } else {
             Err(build_error(input, "missing closing bracket"))
         }
@@ -754,6 +762,56 @@ mod tests {
                 }
                 SQL documentation parsing: invalid type: 'Int!' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal') at '{Int!?} $1'.
                 ,
+            )
+        "#]];
+
+        expected.assert_debug_eq(&res);
+    }
+
+    #[test]
+    fn parse_param_18() {
+        use expect_test::expect;
+
+        let res = parse_param(Input("@param {?} $1"));
+
+        let expected = expect![[r#"
+            Ok(
+                ParsedParameterDoc {
+                    alias: None,
+                    typ: None,
+                    nullable: Some(
+                        true,
+                    ),
+                    position: Some(
+                        1,
+                    ),
+                    documentation: None,
+                },
+            )
+        "#]];
+
+        expected.assert_debug_eq(&res);
+    }
+
+    #[test]
+    fn parse_param_19() {
+        use expect_test::expect;
+
+        let res = parse_param(Input("@param {!} $1"));
+
+        let expected = expect![[r#"
+            Ok(
+                ParsedParameterDoc {
+                    alias: None,
+                    typ: None,
+                    nullable: Some(
+                        false,
+                    ),
+                    position: Some(
+                        1,
+                    ),
+                    documentation: None,
+                },
             )
         "#]];
 
