@@ -18,7 +18,7 @@ fn parses_doc_complex(api: TestApi) {
                         "some integer",
                     ),
                     name: "myInt",
-                    typ: "Int",
+                    typ: "int",
                     nullable: false,
                 },
                 IntrospectSqlQueryParameterOutput {
@@ -26,7 +26,7 @@ fn parses_doc_complex(api: TestApi) {
                         "some   string",
                     ),
                     name: "myString",
-                    typ: "String",
+                    typ: "string",
                     nullable: true,
                 },
                 IntrospectSqlQueryParameterOutput {
@@ -72,7 +72,7 @@ fn parses_doc_no_position(api: TestApi) {
                         "some integer",
                     ),
                     name: "myInt",
-                    typ: "String",
+                    typ: "string",
                     nullable: false,
                 },
                 IntrospectSqlQueryParameterOutput {
@@ -121,7 +121,7 @@ fn parses_doc_no_alias(api: TestApi) {
                         "some string",
                     ),
                     name: "text",
-                    typ: "String",
+                    typ: "string",
                     nullable: false,
                 },
             ],

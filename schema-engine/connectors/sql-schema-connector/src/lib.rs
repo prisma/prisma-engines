@@ -377,7 +377,6 @@ impl SchemaConnector for SqlSchemaConnector {
                     IntrospectSqlQueryParameterOutput {
                         typ: parsed_param
                             .and_then(|p| p.typ())
-                            .map(ToOwned::to_owned)
                             .unwrap_or_else(|| param.typ.to_string()),
                         name: parsed_param
                             .and_then(|p| p.alias())

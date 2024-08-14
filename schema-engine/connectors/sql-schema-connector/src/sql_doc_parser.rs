@@ -1,4 +1,5 @@
 use psl::parser_database::ScalarType;
+use quaint::prelude::ColumnType;
 use schema_connector::{ConnectorError, ConnectorResult};
 
 #[derive(Debug, Default)]
@@ -44,7 +45,7 @@ impl<'a> ParsedSqlDoc<'a> {
 #[derive(Debug, Default)]
 pub(crate) struct ParsedParameterDoc<'a> {
     alias: Option<&'a str>,
-    typ: Option<ScalarType>,
+    typ: Option<ColumnType>,
     nullable: Option<bool>,
     position: Option<usize>,
     documentation: Option<&'a str>,
@@ -55,7 +56,7 @@ impl<'a> ParsedParameterDoc<'a> {
         self.alias = name;
     }
 
-    fn set_typ(&mut self, typ: Option<ScalarType>) {
+    fn set_typ(&mut self, typ: Option<ColumnType>) {
         self.typ = typ;
     }
 
@@ -83,8 +84,8 @@ impl<'a> ParsedParameterDoc<'a> {
         self.alias
     }
 
-    pub(crate) fn typ(&self) -> Option<&str> {
-        self.typ.map(|typ| typ.as_str())
+    pub(crate) fn typ(&self) -> Option<String> {
+        self.typ.map(|typ| typ.to_string())
     }
 
     pub(crate) fn documentation(&self) -> Option<&str> {
@@ -183,7 +184,7 @@ fn parse_typ_nullability(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option
 }
 
 struct ParsedType {
-    pub(crate) typ: Option<ScalarType>,
+    pub(crate) typ: Option<ColumnType>,
     pub(crate) nullable: Option<bool>,
 }
 
@@ -208,10 +209,22 @@ fn parse_typ_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<ParsedT
                 &format!("invalid type: '{typ}' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal')"),
             ))?;
 
+            let col_typ = match st {
+                ScalarType::Int => ColumnType::Int32,
+                ScalarType::BigInt => ColumnType::Int64,
+                ScalarType::Float => ColumnType::Float,
+                ScalarType::Boolean => ColumnType::Boolean,
+                ScalarType::String => ColumnType::Text,
+                ScalarType::DateTime => ColumnType::DateTime,
+                ScalarType::Json => ColumnType::Json,
+                ScalarType::Bytes => ColumnType::Bytes,
+                ScalarType::Decimal => ColumnType::Numeric,
+            };
+
             Ok((
                 out,
                 Some(ParsedType {
-                    typ: Some(st),
+                    typ: Some(col_typ),
                     nullable,
                 }),
             ))
