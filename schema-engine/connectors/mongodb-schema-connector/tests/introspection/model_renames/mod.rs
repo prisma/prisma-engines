@@ -4,9 +4,9 @@ use mongodb::bson::doc;
 #[test]
 fn a_model_with_reserved_name() {
     let res = introspect(|db| async move {
-        db.create_collection("PrismaClient", None).await.unwrap();
+        db.create_collection("PrismaClient").await.unwrap();
         db.collection("PrismaClient")
-            .insert_one(doc! {"data": 1}, None)
+            .insert_one(doc! {"data": 1})
             .await
             .unwrap();
 
@@ -29,9 +29,9 @@ fn a_model_with_reserved_name() {
 #[test]
 fn reserved_names_case_sensitivity() {
     let res = introspect(|db| async move {
-        db.create_collection("prismalclient", None).await.unwrap();
+        db.create_collection("prismalclient").await.unwrap();
         db.collection("prismalclient")
-            .insert_one(doc! {"data": 1}, None)
+            .insert_one(doc! {"data": 1})
             .await
             .unwrap();
 

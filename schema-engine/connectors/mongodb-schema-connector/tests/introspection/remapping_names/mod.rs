@@ -4,23 +4,20 @@ use mongodb::bson::doc;
 #[test]
 fn remapping_fields_with_invalid_characters() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
 
         db.collection("A")
-            .insert_one(
-                doc! {
-                    "_a": 1,
-                    "*b": 2,
-                    "?c": 3,
-                    "(d": 4,
-                    ")e": 5,
-                    "/f": 6,
-                    "g a": 7,
-                    "h-a": 8,
-                    "h1": 9,
-                },
-                None,
-            )
+            .insert_one(doc! {
+                "_a": 1,
+                "*b": 2,
+                "?c": 3,
+                "(d": 4,
+                ")e": 5,
+                "/f": 6,
+                "g a": 7,
+                "h-a": 8,
+                "h1": 9,
+            })
             .await?;
 
         Ok(())
@@ -47,8 +44,8 @@ fn remapping_fields_with_invalid_characters() {
 #[test]
 fn remapping_models_with_invalid_characters() {
     let res = introspect(|db| async move {
-        db.create_collection("?A", None).await?;
-        db.create_collection("A b c", None).await?;
+        db.create_collection("?A").await?;
+        db.create_collection("A b c").await?;
 
         Ok(())
     });
@@ -74,14 +71,11 @@ fn remapping_models_with_invalid_characters() {
 fn remapping_composite_fields_with_numbers() {
     let res = introspect(|db| async move {
         db.collection("Outer")
-            .insert_one(
-                doc! {
-                    "inner": {
-                        "1": 1,
-                    },
+            .insert_one(doc! {
+                "inner": {
+                    "1": 1,
                 },
-                None,
-            )
+            })
             .await?;
 
         Ok(())
@@ -115,12 +109,9 @@ fn remapping_composite_fields_with_numbers() {
 fn remapping_model_fields_with_numbers() {
     let res = introspect(|db| async move {
         db.collection("Outer")
-            .insert_one(
-                doc! {
-                    "1": 1,
-                },
-                None,
-            )
+            .insert_one(doc! {
+                "1": 1,
+            })
             .await?;
 
         Ok(())
@@ -150,7 +141,7 @@ fn remapping_model_fields_with_numbers() {
 fn remapping_model_fields_with_numbers_dirty() {
     let res = introspect(|db| async move {
         let docs = vec![doc! {"1": "Musti"}, doc! {"1": 1}];
-        db.collection("Outer").insert_many(docs, None).await.unwrap();
+        db.collection("Outer").insert_many(docs).await.unwrap();
 
         Ok(())
     });

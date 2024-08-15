@@ -26,7 +26,8 @@ impl<'conn> MongoDbTransaction<'conn> {
 
         connection
             .session
-            .start_transaction(options)
+            .start_transaction()
+            .with_options(options)
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 

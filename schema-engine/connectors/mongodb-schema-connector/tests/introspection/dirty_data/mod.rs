@@ -4,11 +4,11 @@ use mongodb::bson::{doc, Bson, DateTime, Timestamp};
 #[test]
 fn explicit_id_field() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"id": 1}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         Ok(())
     });
@@ -27,10 +27,11 @@ fn explicit_id_field() {
 fn mixed_id_types() {
     let res = introspect(|db| async move {
         db.collection("A")
-            .insert_many(
-                vec![doc! { "_id": 12345 }, doc! { "_id": "foo" }, doc! { "foo": false }],
-                None,
-            )
+            .insert_many(vec![
+                doc! { "_id": 12345 },
+                doc! { "_id": "foo" },
+                doc! { "foo": false },
+            ])
             .await
             .unwrap();
 
@@ -51,11 +52,11 @@ fn mixed_id_types() {
 #[test]
 fn mixing_types() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"first": "Musti"}, doc! {"first": 1i32}, doc! {"first": null}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         Ok(())
     });
@@ -83,7 +84,7 @@ fn mixing_types() {
 #[test]
 fn mixing_types_with_the_same_base_type() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
 
         let docs = vec![
@@ -92,7 +93,7 @@ fn mixing_types_with_the_same_base_type() {
             doc! {"first": null},
         ];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         Ok(())
     });

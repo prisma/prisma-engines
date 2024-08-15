@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-mongodb = "2.8.0"
+mongodb.workspace = true
 
 # Remove these when mongo opens up their connection string parsing
 percent-encoding = "2.0.0"

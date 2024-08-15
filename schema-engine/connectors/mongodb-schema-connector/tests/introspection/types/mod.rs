@@ -6,7 +6,7 @@ use mongodb::bson::{doc, oid::ObjectId, Binary, Bson, DateTime, Decimal128, Time
 #[test]
 fn string() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
 
         let docs = vec![
@@ -15,7 +15,7 @@ fn string() {
             doc! {"first": "Lol", "second": "Bar"},
         ];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         Ok(())
     });
@@ -35,7 +35,7 @@ fn string() {
 #[test]
 fn double() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
 
         let docs = vec![
@@ -44,7 +44,7 @@ fn double() {
             doc! {"first": Bson::Double(1.23), "second": Bson::Double(2.23)},
         ];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         Ok(())
     });
@@ -64,7 +64,7 @@ fn double() {
 #[test]
 fn bool() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
 
         let docs = vec![
@@ -73,7 +73,7 @@ fn bool() {
             doc! {"first": true, "second": false},
         ];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         Ok(())
     });
@@ -93,7 +93,7 @@ fn bool() {
 #[test]
 fn int() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
 
         let docs = vec![
@@ -102,7 +102,7 @@ fn int() {
             doc! {"first": Bson::Int32(1), "second": Bson::Int32(1)},
         ];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         Ok(())
     });
@@ -122,7 +122,7 @@ fn int() {
 #[test]
 fn bigint() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
 
         let docs = vec![
@@ -131,7 +131,7 @@ fn bigint() {
             doc! {"first": Bson::Int64(1), "second": Bson::Int64(1)},
         ];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         Ok(())
     });
@@ -151,7 +151,7 @@ fn bigint() {
 #[test]
 fn timestamp() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
 
         let docs = vec![
@@ -171,7 +171,7 @@ fn timestamp() {
             },
         ];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         Ok(())
     });
@@ -191,7 +191,7 @@ fn timestamp() {
 #[test]
 fn binary() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
 
         let bin = Binary {
@@ -216,7 +216,7 @@ fn binary() {
             },
         ];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         Ok(())
     });
@@ -236,7 +236,7 @@ fn binary() {
 #[test]
 fn object_id() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
 
         let docs = vec![
@@ -256,7 +256,7 @@ fn object_id() {
             },
         ];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         Ok(())
     });
@@ -276,7 +276,7 @@ fn object_id() {
 #[test]
 fn date() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
 
         let docs = vec![
@@ -296,7 +296,7 @@ fn date() {
             },
         ];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         Ok(())
     });
@@ -316,7 +316,7 @@ fn date() {
 #[test]
 fn decimal() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
 
         let docs = vec![
@@ -336,7 +336,7 @@ fn decimal() {
             },
         ];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         Ok(())
     });
@@ -356,7 +356,7 @@ fn decimal() {
 #[test]
 fn array() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
 
         let docs = vec![
@@ -376,7 +376,7 @@ fn array() {
             },
         ];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         Ok(())
     });
@@ -396,14 +396,14 @@ fn array() {
 #[test]
 fn deep_array() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
 
         let docs = vec![doc! {
             "first": Bson::Array(vec![Bson::Array(vec![Bson::Int32(1)])]),
         }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         Ok(())
     });
@@ -421,11 +421,11 @@ fn deep_array() {
 #[test]
 fn empty_arrays() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
 
         collection
-            .insert_one(doc! { "data": Bson::Array(Vec::new()) }, None)
+            .insert_one(doc! { "data": Bson::Array(Vec::new()) })
             .await
             .unwrap();
 
@@ -455,10 +455,10 @@ fn empty_arrays() {
 #[test]
 fn unknown_types() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
 
-        collection.insert_one(doc! { "data": Bson::Null }, None).await.unwrap();
+        collection.insert_one(doc! { "data": Bson::Null }).await.unwrap();
 
         Ok(())
     });
