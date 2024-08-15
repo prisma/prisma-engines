@@ -1,5 +1,5 @@
 use crate::{constants::group_by, error::MongoError, join::JoinStage, query_builder::AggregationType, IntoBson};
-use mongodb::bson::{doc, Bson, Document};
+use bson::{doc, Bson, Document};
 use query_structure::*;
 
 #[derive(Debug, Clone)]

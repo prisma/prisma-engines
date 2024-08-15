@@ -3,7 +3,7 @@ use crate::{
     migration::{MongoDbMigration, MongoDbMigrationStep},
     MongoDbSchemaConnector,
 };
-use mongodb::bson::{self, Bson, Document};
+use bson::{self, Bson, Document};
 use schema_connector::{ConnectorResult, Migration, SchemaConnector};
 
 impl MongoDbSchemaConnector {

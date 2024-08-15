@@ -1,5 +1,5 @@
 use crate::{orderby::OrderByData, IntoBson};
-use mongodb::bson::{doc, Document};
+use bson::{doc, Document};
 use query_structure::{OrderBy, SelectionResult, SortOrder};
 
 #[derive(Debug, Clone)]

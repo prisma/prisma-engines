@@ -1,6 +1,6 @@
 use enumflags2::BitFlags;
 use futures::TryStreamExt;
-use mongodb::bson::{self, doc};
+use bson::{self, doc};
 use mongodb_schema_connector::MongoDbSchemaConnector;
 use once_cell::sync::Lazy;
 use psl::{parser_database::SourceFile, PreviewFeature};

@@ -10,13 +10,10 @@ use crate::{
     root_queries::observing,
     vacuum_cursor, BsonTransform, IntoBson,
 };
+use bson::{doc, Document};
 use connector_interface::AggregationSelection;
 use itertools::Itertools;
-use mongodb::{
-    bson::{doc, Document},
-    options::AggregateOptions,
-    ClientSession, Collection,
-};
+use mongodb::{options::AggregateOptions, ClientSession, Collection};
 use query_structure::{FieldSelection, Filter, Model, QueryArguments, ScalarFieldRef, VirtualSelection};
 use std::convert::TryFrom;
 use std::future::IntoFuture;

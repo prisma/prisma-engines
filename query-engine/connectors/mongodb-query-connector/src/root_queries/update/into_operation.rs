@@ -2,7 +2,7 @@ use super::operation::*;
 use crate::*;
 
 use connector_interface::{CompositeWriteOperation, FieldPath, ScalarWriteOperation, WriteOperation};
-use mongodb::bson::doc;
+use bson::doc;
 use query_structure::{Field, PrismaValue};
 
 pub(crate) trait IntoUpdateOperation {

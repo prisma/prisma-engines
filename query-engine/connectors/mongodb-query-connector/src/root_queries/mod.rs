@@ -11,8 +11,8 @@ use crate::{
     error::DecorateErrorWithFieldInformationExtension, output_meta::OutputMetaMapping, value::value_from_bson,
 };
 use futures::Future;
-use mongodb::bson::Bson;
-use mongodb::bson::Document;
+use bson::Bson;
+use bson::Document;
 use query_engine_metrics::{
     histogram, increment_counter, metrics, PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
     PRISMA_DATASOURCE_QUERIES_TOTAL,
