@@ -143,6 +143,11 @@ pub async fn create_records<'conn>(
                 }
             }
 
+            ErrorKind::InsertMany(ref failure) => match failure.write_errors {
+                Some(ref errs) if !errs.iter().any(|err| err.code != 11000) => Ok(num_records - errs.len()),
+                _ => Err(err.into()),
+            },
+
             _ => Err(err.into()),
         },
 
