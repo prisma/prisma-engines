@@ -232,7 +232,7 @@ fn unnamed_expr_int(api: TestApi) {
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
                     name: "1 + 1",
-                    typ: "int",
+                    typ: "bigint",
                     nullable: false,
                 },
             ],
@@ -241,7 +241,10 @@ fn unnamed_expr_int(api: TestApi) {
 
     api.introspect_sql("test_1", "SELECT 1 + 1;")
         .send_sync()
-        .expect_result(expected)
+        .expect_result(expected);
+
+    api.query_raw("SELECT 1 + 1;", &[])
+        .assert_single_row(|row| row.assert_bigint_value("1 + 1", 2));
 }
 
 #[test_connector(tags(Sqlite))]
@@ -257,7 +260,7 @@ fn named_expr_int(api: TestApi) {
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
                     name: "add",
-                    typ: "int",
+                    typ: "bigint",
                     nullable: false,
                 },
             ],
@@ -266,7 +269,10 @@ fn named_expr_int(api: TestApi) {
 
     api.introspect_sql("test_1", "SELECT 1 + 1 as \"add\";")
         .send_sync()
-        .expect_result(expected)
+        .expect_result(expected);
+
+    api.query_raw("SELECT 1 + 1 as \"add\";", &[])
+        .assert_single_row(|row| row.assert_bigint_value("add", 2));
 }
 
 #[test_connector(tags(Sqlite))]
@@ -282,7 +288,7 @@ fn mixed_named_expr_int(api: TestApi) {
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
                     name: "add",
-                    typ: "int",
+                    typ: "bigint",
                     nullable: false,
                 },
             ],
@@ -307,7 +313,7 @@ fn mixed_unnamed_expr_int(api: TestApi) {
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
                     name: "`int` + 1",
-                    typ: "int",
+                    typ: "bigint",
                     nullable: false,
                 },
             ],
@@ -332,7 +338,7 @@ fn mixed_expr_cast_int(api: TestApi) {
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
                     name: "CAST(`int` + 1 as int)",
-                    typ: "int",
+                    typ: "bigint",
                     nullable: false,
                 },
             ],
@@ -385,12 +391,12 @@ fn unnamed_expr_bool(api: TestApi) {
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
                     name: "1=1",
-                    typ: "int",
+                    typ: "bigint",
                     nullable: false,
                 },
                 IntrospectSqlQueryColumnOutput {
                     name: "1=0",
-                    typ: "int",
+                    typ: "bigint",
                     nullable: false,
                 },
             ],

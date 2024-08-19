@@ -113,6 +113,17 @@ impl<'a> RowAssertion<'a> {
         self
     }
 
+    pub fn assert_bigint_value(self, column_name: &str, expected_value: i64) -> Self {
+        let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| (*col).as_i64());
+
+        assert!(
+            actual_value == Some(expected_value),
+            "Value assertion failed for {column_name}. Expected: {expected_value:?}, got: {actual_value:?}",
+        );
+
+        self
+    }
+
     pub fn assert_bytes_value(self, column_name: &str, expected_value: &[u8]) -> Self {
         let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| (*col).as_bytes());
 

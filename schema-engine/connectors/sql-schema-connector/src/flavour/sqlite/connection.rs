@@ -163,7 +163,7 @@ impl ToColumnTypeExt for &SqliteColumn {
             "TEXT" => ColumnType::Text,
             "REAL" => ColumnType::Double,
             "BLOB" => ColumnType::Bytes,
-            "INTEGER" => ColumnType::Int32,
+            "INTEGER" => ColumnType::Int64,
             // Not supported by sqlx-sqlite
             "NUMERIC" => ColumnType::Numeric,
 
