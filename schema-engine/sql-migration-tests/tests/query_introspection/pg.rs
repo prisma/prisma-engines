@@ -352,12 +352,12 @@ mod postgres {
             ConnectorErrorImpl {
                 user_facing_error: None,
                 message: Some(
-                    "Invalid column name '?column?' for index 0. Your SQL query must explicitly alias that column name.",
+                    "Invalid input provided to query: Invalid column name '?column?' for index 0. Your SQL query must explicitly alias that column name.",
                 ),
                 source: None,
                 context: SpanTrace [],
             }
-            Invalid column name '?column?' for index 0. Your SQL query must explicitly alias that column name.
+            Invalid input provided to query: Invalid column name '?column?' for index 0. Your SQL query must explicitly alias that column name.
 
         "#]];
 
@@ -743,12 +743,12 @@ mod crdb {
             ConnectorErrorImpl {
                 user_facing_error: None,
                 message: Some(
-                    "Invalid column name '?column?' for index 0. Your SQL query must explicitly alias that column name.",
+                    "Invalid input provided to query: Invalid column name '?column?' for index 0. Your SQL query must explicitly alias that column name.",
                 ),
                 source: None,
                 context: SpanTrace [],
             }
-            Invalid column name '?column?' for index 0. Your SQL query must explicitly alias that column name.
+            Invalid input provided to query: Invalid column name '?column?' for index 0. Your SQL query must explicitly alias that column name.
 
         "#]];
 
