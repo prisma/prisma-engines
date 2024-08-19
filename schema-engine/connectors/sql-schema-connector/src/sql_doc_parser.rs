@@ -149,11 +149,11 @@ impl<'a> Input<'a> {
         Self(self.0.trim_end())
     }
 
-    fn take_until_pattern_or_eol(&self, pattern: &[char]) -> (Input<'a>, &'a str) {
+    fn take_until_pattern_or_eol(&self, pattern: &[char]) -> (Input<'a>, Input<'a>) {
         if let Some(end) = self.find(pattern) {
-            (self.move_from(end), self.move_to(end).inner())
+            (self.move_from(end), self.move_to(end))
         } else {
-            (self.move_to_end(), self.inner())
+            (self.move_to_end(), *self)
         }
     }
 
@@ -173,35 +173,13 @@ fn build_error(input: Input<'_>, msg: &str) -> ConnectorError {
     ConnectorError::from_msg(format!("SQL documentation parsing: {msg} at '{input}'."))
 }
 
-fn parse_typ_nullability(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<bool>)> {
-    if let Some(out) = input.strip_suffix_char('!') {
-        Ok((out, Some(false)))
-    } else if let Some(out) = input.strip_suffix_char('?') {
-        Ok((out, Some(true)))
-    } else {
-        Ok((input, None))
-    }
-}
-
-struct ParsedType {
-    pub(crate) typ: Option<ColumnType>,
-    pub(crate) nullable: Option<bool>,
-}
-
-fn parse_typ_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<ParsedType>)> {
+fn parse_typ_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<ColumnType>)> {
     if let Some(start) = input.find(&['{']) {
         if let Some(end) = input.find(&['}']) {
-            let out = input.move_from(end + 1);
             let typ = input.move_between(start + 1, end);
 
             if typ.is_empty() {
                 return Err(build_error(input, "missing type (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal')"));
-            }
-
-            let (typ, nullable) = parse_typ_nullability(typ)?;
-
-            if typ.is_empty() {
-                return Ok((out, Some(ParsedType { typ: None, nullable })));
             }
 
             let st = ScalarType::try_from_str(typ.inner(), false).ok_or_else(|| build_error(
@@ -221,13 +199,7 @@ fn parse_typ_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<ParsedT
                 ScalarType::Decimal => ColumnType::Numeric,
             };
 
-            Ok((
-                out,
-                Some(ParsedType {
-                    typ: Some(col_typ),
-                    nullable,
-                }),
-            ))
+            Ok((input.move_from(end + 1), Some(col_typ)))
         } else {
             Err(build_error(input, "missing closing bracket"))
         }
@@ -242,7 +214,7 @@ fn parse_position_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<us
         .strip_prefix_char('$')
         .map(|input| input.take_until_pattern_or_eol(&[':', ' ']))
     {
-        match param_pos.parse::<usize>().map_err(|_| {
+        match param_pos.inner().parse::<usize>().map_err(|_| {
             build_error(
                 input,
                 &format!("invalid position. Expected a number found: {param_pos}"),
@@ -256,15 +228,19 @@ fn parse_position_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<us
     }
 }
 
-fn parse_alias_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<&'_ str>)> {
+fn parse_alias_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<&'_ str>, bool)> {
     if let Some((input, alias)) = input
         .trim_start()
         .strip_prefix_char(':')
         .map(|input| input.take_until_pattern_or_eol(&[' ']))
     {
-        Ok((input, Some(alias)))
+        if let Some(alias) = alias.strip_suffix_char('?') {
+            Ok((input, Some(alias.inner()), true))
+        } else {
+            Ok((input, Some(alias.inner()), false))
+        }
     } else {
-        Ok((input, None))
+        Ok((input, None, false))
     }
 }
 
@@ -293,15 +269,15 @@ fn validate_param(param: &ParsedParameterDoc<'_>, input: Input<'_>) -> Connector
 fn parse_param(param_input: Input<'_>) -> ConnectorResult<ParsedParameterDoc<'_>> {
     let input = param_input.strip_prefix_str("@param").unwrap().trim_start();
 
-    let (input, parsed_typ) = parse_typ_opt(input)?;
+    let (input, typ) = parse_typ_opt(input)?;
     let (input, position) = parse_position_opt(input)?;
-    let (input, alias) = parse_alias_opt(input)?;
+    let (input, alias, nullable) = parse_alias_opt(input)?;
     let documentation = parse_rest(input)?;
 
     let mut param = ParsedParameterDoc::default();
 
-    param.set_typ(parsed_typ.as_ref().and_then(|p| p.typ));
-    param.set_nullable(parsed_typ.as_ref().and_then(|p| p.nullable));
+    param.set_typ(typ);
+    param.set_nullable(nullable.then_some(true));
     param.set_position(position);
     param.set_alias(alias);
     param.set_documentation(documentation);
@@ -707,18 +683,18 @@ mod tests {
     fn parse_param_15() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param {Int!} $1"));
+        let res = parse_param(Input("@param {Int} $1:alias!"));
 
         let expected = expect![[r#"
             Ok(
                 ParsedParameterDoc {
-                    alias: None,
+                    alias: Some(
+                        "alias!",
+                    ),
                     typ: Some(
                         Int32,
                     ),
-                    nullable: Some(
-                        false,
-                    ),
+                    nullable: None,
                     position: Some(
                         1,
                     ),
@@ -734,12 +710,14 @@ mod tests {
     fn parse_param_16() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param {Int?} $1"));
+        let res = parse_param(Input("@param {Int} $1:alias?"));
 
         let expected = expect![[r#"
             Ok(
                 ParsedParameterDoc {
-                    alias: None,
+                    alias: Some(
+                        "alias",
+                    ),
                     typ: Some(
                         Int32,
                     ),
@@ -761,37 +739,17 @@ mod tests {
     fn parse_param_17() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param {Int!?} $1"));
-
-        let expected = expect![[r#"
-            Err(
-                ConnectorErrorImpl {
-                    user_facing_error: None,
-                    message: Some(
-                        "SQL documentation parsing: invalid type: 'Int!' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal') at '{Int!?} $1'.",
-                    ),
-                    source: None,
-                    context: SpanTrace [],
-                }
-                SQL documentation parsing: invalid type: 'Int!' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal') at '{Int!?} $1'.
-                ,
-            )
-        "#]];
-
-        expected.assert_debug_eq(&res);
-    }
-
-    #[test]
-    fn parse_param_18() {
-        use expect_test::expect;
-
-        let res = parse_param(Input("@param {?} $1"));
+        let res = parse_param(Input("@param {Int} $1:alias!?"));
 
         let expected = expect![[r#"
             Ok(
                 ParsedParameterDoc {
-                    alias: None,
-                    typ: None,
+                    alias: Some(
+                        "alias!",
+                    ),
+                    typ: Some(
+                        Int32,
+                    ),
                     nullable: Some(
                         true,
                     ),
@@ -807,18 +765,20 @@ mod tests {
     }
 
     #[test]
-    fn parse_param_19() {
+    fn parse_param_18() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param {!} $1"));
+        let res = parse_param(Input("@param $1:alias?"));
 
         let expected = expect![[r#"
             Ok(
                 ParsedParameterDoc {
-                    alias: None,
+                    alias: Some(
+                        "alias",
+                    ),
                     typ: None,
                     nullable: Some(
-                        false,
+                        true,
                     ),
                     position: Some(
                         1,

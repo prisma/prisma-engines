@@ -8,7 +8,7 @@ fn parses_doc_complex(api: TestApi) {
     let expected = expect![[r#"
         IntrospectSqlQueryOutput {
             name: "test_1",
-            source: "\n       --    @description   some  fancy   query\n  -- @param  {Int}   $1:myInt some integer\n      --   @param   {String?}$2:myString    some   string\n        -- @param {?} $3\n    SELECT int FROM model WHERE int = $1 and string = $2 and float = $3;\n    ",
+            source: "\n       --    @description   some  fancy   query\n  -- @param  {Int}   $1:myInt some integer\n      --   @param   {String}$2:myString?    some   string\n    SELECT int FROM model WHERE int = $1 and string = $2;\n    ",
             documentation: Some(
                 "some  fancy   query",
             ),
@@ -29,12 +29,6 @@ fn parses_doc_complex(api: TestApi) {
                     typ: "string",
                     nullable: true,
                 },
-                IntrospectSqlQueryParameterOutput {
-                    documentation: None,
-                    name: "float8",
-                    typ: "double",
-                    nullable: true,
-                },
             ],
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
@@ -49,9 +43,8 @@ fn parses_doc_complex(api: TestApi) {
     let sql = r#"
        --    @description   some  fancy   query
   -- @param  {Int}   $1:myInt some integer
-      --   @param   {String?}$2:myString    some   string
-        -- @param {?} $3
-    SELECT int FROM model WHERE int = ? and string = ? and float = ?;
+      --   @param   {String}$2:myString?    some   string
+    SELECT int FROM model WHERE int = ? and string = ?;
     "#;
 
     api.introspect_sql("test_1", sql).send_sync().expect_result(expected)
