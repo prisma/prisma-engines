@@ -676,10 +676,7 @@ impl Queryable for PostgreSql {
             let (typ, enum_name) = infer_type(self, col.type_()).await?;
 
             if col.name() == "?column?" {
-                let kind = ErrorKind::InvalidColumnName {
-                    column_idx: idx,
-                    column_name: col.name().to_string(),
-                };
+                let kind = ErrorKind::QueryInvalidInput(format!("Invalid column name '?column?' for index {idx}. Your SQL query must explicitly alias that column name."));
 
                 return Err(Error::builder(kind).build());
             }
