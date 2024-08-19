@@ -672,8 +672,17 @@ impl Queryable for PostgreSql {
 
         let nullables = self.get_nullable_for_columns(&stmt).await?;
 
-        for (col, nullable) in stmt.columns().iter().zip(nullables) {
+        for (idx, (col, nullable)) in stmt.columns().iter().zip(nullables).enumerate() {
             let (typ, enum_name) = infer_type(self, col.type_()).await?;
+
+            if col.name() == "?column?" {
+                let kind = ErrorKind::InvalidColumnName {
+                    column_idx: idx,
+                    column_name: col.name().to_string(),
+                };
+
+                return Err(Error::builder(kind).build());
+            }
 
             columns.push(
                 ParsedRawColumn::new_named(col.name(), typ)

@@ -241,6 +241,9 @@ pub enum ErrorKind {
 
     #[error("External error id#{}", _0)]
     ExternalError(i32),
+
+    #[error("Invalid column name '{column_name}' for index {column_idx}. Your SQL query must explicitly alias that column name.")]
+    InvalidColumnName { column_idx: usize, column_name: String },
 }
 
 #[cfg(not(target_arch = "wasm32"))]

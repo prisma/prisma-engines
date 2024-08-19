@@ -349,24 +349,22 @@ mod postgres {
         api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
         let expected = expect![[r#"
-            IntrospectSqlQueryOutput {
-                name: "test_1",
-                source: "SELECT \"int\" + 1 FROM \"model\";",
-                documentation: None,
-                parameters: [],
-                result_columns: [
-                    IntrospectSqlQueryColumnOutput {
-                        name: "?column?",
-                        typ: "int",
-                        nullable: true,
-                    },
-                ],
+            ConnectorErrorImpl {
+                user_facing_error: None,
+                message: Some(
+                    "Invalid column name '?column?' for index 0. Your SQL query must explicitly alias that column name.",
+                ),
+                source: None,
+                context: SpanTrace [],
             }
+            Invalid column name '?column?' for index 0. Your SQL query must explicitly alias that column name.
+
         "#]];
 
-        api.introspect_sql("test_1", "SELECT \"int\" + 1 FROM \"model\";")
-            .send_sync()
-            .expect_result(expected)
+        expected.assert_debug_eq(
+            &api.introspect_sql("test_1", "SELECT \"int\" + 1 FROM \"model\";")
+                .send_unwrap_err(),
+        );
     }
 
     #[test_connector(tags(Postgres), exclude(CockroachDb))]
@@ -742,24 +740,22 @@ mod crdb {
         api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
         let expected = expect![[r#"
-            IntrospectSqlQueryOutput {
-                name: "test_1",
-                source: "SELECT \"int\" + 1 FROM \"model\";",
-                documentation: None,
-                parameters: [],
-                result_columns: [
-                    IntrospectSqlQueryColumnOutput {
-                        name: "?column?",
-                        typ: "bigint",
-                        nullable: true,
-                    },
-                ],
+            ConnectorErrorImpl {
+                user_facing_error: None,
+                message: Some(
+                    "Invalid column name '?column?' for index 0. Your SQL query must explicitly alias that column name.",
+                ),
+                source: None,
+                context: SpanTrace [],
             }
+            Invalid column name '?column?' for index 0. Your SQL query must explicitly alias that column name.
+
         "#]];
 
-        api.introspect_sql("test_1", "SELECT \"int\" + 1 FROM \"model\";")
-            .send_sync()
-            .expect_result(expected)
+        expected.assert_debug_eq(
+            &api.introspect_sql("test_1", "SELECT \"int\" + 1 FROM \"model\";")
+                .send_unwrap_err(),
+        );
     }
 
     #[test_connector(tags(CockroachDb))]
