@@ -33,6 +33,7 @@ pub struct IntrospectSqlQueryParameterOutput {
     pub documentation: Option<String>,
     pub name: String,
     pub typ: String,
+    pub nullable: bool,
 }
 
 #[allow(missing_docs)]
@@ -40,13 +41,27 @@ pub struct IntrospectSqlQueryParameterOutput {
 pub struct IntrospectSqlQueryColumnOutput {
     pub name: String,
     pub typ: String,
+    pub nullable: bool,
 }
 
 impl From<quaint::connector::ParsedRawColumn> for IntrospectSqlQueryColumnOutput {
     fn from(item: quaint::connector::ParsedRawColumn) -> Self {
+        let (name, nullable) = parse_nullability_override(&item.name);
+
         Self {
-            name: item.name,
+            name: name.to_owned(),
             typ: item.enum_name.unwrap_or_else(|| item.typ.to_string()),
+            nullable: nullable.unwrap_or(item.nullable),
         }
+    }
+}
+
+fn parse_nullability_override(column_name: &str) -> (&str, Option<bool>) {
+    if let Some(stripped) = column_name.strip_suffix('?') {
+        (stripped, Some(true))
+    } else if let Some(stripped) = column_name.strip_suffix('!') {
+        (stripped, Some(false))
+    } else {
+        (column_name, None)
     }
 }
