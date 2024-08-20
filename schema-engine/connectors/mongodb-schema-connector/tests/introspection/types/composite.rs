@@ -1,5 +1,5 @@
 use crate::introspection::test_api::*;
-use mongodb::bson::{doc, oid::ObjectId, Bson};
+use bson::{doc, oid::ObjectId, Bson};
 use schema_connector::CompositeTypeDepth;
 
 #[test]

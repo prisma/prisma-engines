@@ -1,5 +1,5 @@
 use crate::introspection::test_api::*;
-use mongodb::bson::doc;
+use bson::doc;
 
 #[test]
 fn a_model_with_reserved_name() {

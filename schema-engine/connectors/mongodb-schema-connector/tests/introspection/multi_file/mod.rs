@@ -1,5 +1,5 @@
 use crate::introspection::test_api::*;
-use mongodb::bson::doc;
+use bson::doc;
 
 // Composite types
 // reintrospect_removed_model_single_file

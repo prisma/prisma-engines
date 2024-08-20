@@ -7,10 +7,10 @@ mod operation;
 use super::*;
 use crate::*;
 
+use bson::Document;
 use connector_interface::{FieldPath, WriteOperation};
 use into_expression::IntoUpdateExpressions;
 use into_operation::IntoUpdateOperation;
-use mongodb::bson::Document;
 
 pub(crate) trait IntoUpdateDocumentExtension {
     fn into_update_docs(self, field: &Field, path: FieldPath) -> crate::Result<Vec<Document>>;

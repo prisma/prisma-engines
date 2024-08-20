@@ -10,8 +10,8 @@ mod walkers;
 pub use schema::*;
 pub use walkers::*;
 
+use bson::{Bson, Document};
 use futures::stream::TryStreamExt;
-use mongodb::bson::{Bson, Document};
 
 /// Describe the contents of the given database. Only bothers about the schema, meaning the
 /// collection names and indexes created. Does a bit of magic to the indexes, so if having a
@@ -122,7 +122,7 @@ pub async fn describe(client: &mongodb::Client, db_name: &str) -> mongodb::error
 /// Get the version.
 pub async fn version(client: &mongodb::Client, db_name: &str) -> mongodb::error::Result<String> {
     let database = client.database(db_name);
-    use mongodb::bson::doc;
+    use bson::doc;
     let version_cmd = doc! {"buildInfo": 1};
     let res = database.run_command(version_cmd).await?;
     let version = res
