@@ -1,4 +1,5 @@
 use psl::parser_database::ScalarType;
+use quaint::prelude::ColumnType;
 use schema_connector::{ConnectorError, ConnectorResult};
 
 #[derive(Debug, Default)]
@@ -44,7 +45,8 @@ impl<'a> ParsedSqlDoc<'a> {
 #[derive(Debug, Default)]
 pub(crate) struct ParsedParameterDoc<'a> {
     alias: Option<&'a str>,
-    typ: Option<ScalarType>,
+    typ: Option<ColumnType>,
+    nullable: Option<bool>,
     position: Option<usize>,
     documentation: Option<&'a str>,
 }
@@ -54,8 +56,12 @@ impl<'a> ParsedParameterDoc<'a> {
         self.alias = name;
     }
 
-    fn set_typ(&mut self, typ: Option<ScalarType>) {
+    fn set_typ(&mut self, typ: Option<ColumnType>) {
         self.typ = typ;
+    }
+
+    fn set_nullable(&mut self, nullable: Option<bool>) {
+        self.nullable = nullable;
     }
 
     fn set_position(&mut self, position: Option<usize>) {
@@ -67,19 +73,27 @@ impl<'a> ParsedParameterDoc<'a> {
     }
 
     fn is_empty(&self) -> bool {
-        self.alias.is_none() && self.position.is_none() && self.typ.is_none() && self.documentation.is_none()
+        self.alias.is_none()
+            && self.position.is_none()
+            && self.typ.is_none()
+            && self.documentation.is_none()
+            && self.nullable.is_none()
     }
 
     pub(crate) fn alias(&self) -> Option<&str> {
         self.alias
     }
 
-    pub(crate) fn typ(&self) -> Option<&str> {
-        self.typ.map(|typ| typ.as_str())
+    pub(crate) fn typ(&self) -> Option<String> {
+        self.typ.map(|typ| typ.to_string())
     }
 
     pub(crate) fn documentation(&self) -> Option<&str> {
         self.documentation
+    }
+
+    pub(crate) fn nullable(&self) -> Option<bool> {
+        self.nullable
     }
 }
 
@@ -97,6 +111,10 @@ impl<'a> Input<'a> {
 
     fn strip_prefix_str(&self, pat: &str) -> Option<Self> {
         self.0.strip_prefix(pat).map(Self)
+    }
+
+    fn strip_suffix_char(&self, pat: char) -> Option<Self> {
+        self.0.strip_suffix(pat).map(Self)
     }
 
     fn starts_with(&self, pat: &str) -> bool {
@@ -131,11 +149,11 @@ impl<'a> Input<'a> {
         Self(self.0.trim_end())
     }
 
-    fn take_until_pattern_or_eol(&self, pattern: &[char]) -> (Input<'a>, &'a str) {
+    fn take_until_pattern_or_eol(&self, pattern: &[char]) -> (Input<'a>, Input<'a>) {
         if let Some(end) = self.find(pattern) {
-            (self.move_from(end), self.move_to(end).inner())
+            (self.move_from(end), self.move_to(end))
         } else {
-            (self.move_to_end(), self.inner())
+            (self.move_to_end(), *self)
         }
     }
 
@@ -155,7 +173,7 @@ fn build_error(input: Input<'_>, msg: &str) -> ConnectorError {
     ConnectorError::from_msg(format!("SQL documentation parsing: {msg} at '{input}'."))
 }
 
-fn parse_typ_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<ScalarType>)> {
+fn parse_typ_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<ColumnType>)> {
     if let Some(start) = input.find(&['{']) {
         if let Some(end) = input.find(&['}']) {
             let typ = input.move_between(start + 1, end);
@@ -164,17 +182,24 @@ fn parse_typ_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<ScalarT
                 return Err(build_error(input, "missing type (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal')"));
             }
 
-            match ScalarType::try_from_str(typ.inner(), false) {
-                Some(st) => {
-                    Ok((input.move_from(end + 1), Some(st)))
-                }
-                None => {
-                    Err(build_error(
-                        input,
-                        &format!("invalid type: '{typ}' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal')"),
-                    ))
-                }
-            }
+            let st = ScalarType::try_from_str(typ.inner(), false).ok_or_else(|| build_error(
+                input,
+                &format!("invalid type: '{typ}' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal')"),
+            ))?;
+
+            let col_typ = match st {
+                ScalarType::Int => ColumnType::Int32,
+                ScalarType::BigInt => ColumnType::Int64,
+                ScalarType::Float => ColumnType::Float,
+                ScalarType::Boolean => ColumnType::Boolean,
+                ScalarType::String => ColumnType::Text,
+                ScalarType::DateTime => ColumnType::DateTime,
+                ScalarType::Json => ColumnType::Json,
+                ScalarType::Bytes => ColumnType::Bytes,
+                ScalarType::Decimal => ColumnType::Numeric,
+            };
+
+            Ok((input.move_from(end + 1), Some(col_typ)))
         } else {
             Err(build_error(input, "missing closing bracket"))
         }
@@ -189,7 +214,7 @@ fn parse_position_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<us
         .strip_prefix_char('$')
         .map(|input| input.take_until_pattern_or_eol(&[':', ' ']))
     {
-        match param_pos.parse::<usize>().map_err(|_| {
+        match param_pos.inner().parse::<usize>().map_err(|_| {
             build_error(
                 input,
                 &format!("invalid position. Expected a number found: {param_pos}"),
@@ -203,15 +228,19 @@ fn parse_position_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<us
     }
 }
 
-fn parse_alias_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<&'_ str>)> {
+fn parse_alias_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<&'_ str>, bool)> {
     if let Some((input, alias)) = input
         .trim_start()
         .strip_prefix_char(':')
         .map(|input| input.take_until_pattern_or_eol(&[' ']))
     {
-        Ok((input, Some(alias)))
+        if let Some(alias) = alias.strip_suffix_char('?') {
+            Ok((input, Some(alias.inner()), true))
+        } else {
+            Ok((input, Some(alias.inner()), false))
+        }
     } else {
-        Ok((input, None))
+        Ok((input, None, false))
     }
 }
 
@@ -242,12 +271,13 @@ fn parse_param(param_input: Input<'_>) -> ConnectorResult<ParsedParameterDoc<'_>
 
     let (input, typ) = parse_typ_opt(input)?;
     let (input, position) = parse_position_opt(input)?;
-    let (input, alias) = parse_alias_opt(input)?;
+    let (input, alias, nullable) = parse_alias_opt(input)?;
     let documentation = parse_rest(input)?;
 
     let mut param = ParsedParameterDoc::default();
 
     param.set_typ(typ);
+    param.set_nullable(nullable.then_some(true));
     param.set_position(position);
     param.set_alias(alias);
     param.set_documentation(documentation);
@@ -304,6 +334,7 @@ mod tests {
                         "userId",
                     ),
                     typ: None,
+                    nullable: None,
                     position: Some(
                         1,
                     ),
@@ -328,6 +359,7 @@ mod tests {
                         "userId",
                     ),
                     typ: None,
+                    nullable: None,
                     position: Some(
                         1,
                     ),
@@ -354,8 +386,9 @@ mod tests {
                         "userId",
                     ),
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
+                    nullable: None,
                     position: None,
                     documentation: None,
                 },
@@ -378,8 +411,9 @@ mod tests {
                         "userId",
                     ),
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
+                    nullable: None,
                     position: Some(
                         1,
                     ),
@@ -404,8 +438,9 @@ mod tests {
                         "userId",
                     ),
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
+                    nullable: None,
                     position: Some(
                         1,
                     ),
@@ -430,8 +465,9 @@ mod tests {
                 ParsedParameterDoc {
                     alias: None,
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
+                    nullable: None,
                     position: Some(
                         1,
                     ),
@@ -576,8 +612,9 @@ mod tests {
                 ParsedParameterDoc {
                     alias: None,
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
+                    nullable: None,
                     position: Some(
                         1,
                     ),
@@ -602,8 +639,9 @@ mod tests {
                 ParsedParameterDoc {
                     alias: None,
                     typ: Some(
-                        Int,
+                        Int32,
                     ),
+                    nullable: None,
                     position: Some(
                         1,
                     ),
@@ -642,6 +680,118 @@ mod tests {
     }
 
     #[test]
+    fn parse_param_15() {
+        use expect_test::expect;
+
+        let res = parse_param(Input("@param {Int} $1:alias!"));
+
+        let expected = expect![[r#"
+            Ok(
+                ParsedParameterDoc {
+                    alias: Some(
+                        "alias!",
+                    ),
+                    typ: Some(
+                        Int32,
+                    ),
+                    nullable: None,
+                    position: Some(
+                        1,
+                    ),
+                    documentation: None,
+                },
+            )
+        "#]];
+
+        expected.assert_debug_eq(&res);
+    }
+
+    #[test]
+    fn parse_param_16() {
+        use expect_test::expect;
+
+        let res = parse_param(Input("@param {Int} $1:alias?"));
+
+        let expected = expect![[r#"
+            Ok(
+                ParsedParameterDoc {
+                    alias: Some(
+                        "alias",
+                    ),
+                    typ: Some(
+                        Int32,
+                    ),
+                    nullable: Some(
+                        true,
+                    ),
+                    position: Some(
+                        1,
+                    ),
+                    documentation: None,
+                },
+            )
+        "#]];
+
+        expected.assert_debug_eq(&res);
+    }
+
+    #[test]
+    fn parse_param_17() {
+        use expect_test::expect;
+
+        let res = parse_param(Input("@param {Int} $1:alias!?"));
+
+        let expected = expect![[r#"
+            Ok(
+                ParsedParameterDoc {
+                    alias: Some(
+                        "alias!",
+                    ),
+                    typ: Some(
+                        Int32,
+                    ),
+                    nullable: Some(
+                        true,
+                    ),
+                    position: Some(
+                        1,
+                    ),
+                    documentation: None,
+                },
+            )
+        "#]];
+
+        expected.assert_debug_eq(&res);
+    }
+
+    #[test]
+    fn parse_param_18() {
+        use expect_test::expect;
+
+        let res = parse_param(Input("@param $1:alias?"));
+
+        let expected = expect![[r#"
+            Ok(
+                ParsedParameterDoc {
+                    alias: Some(
+                        "alias",
+                    ),
+                    typ: None,
+                    nullable: Some(
+                        true,
+                    ),
+                    position: Some(
+                        1,
+                    ),
+                    documentation: None,
+                },
+            )
+        "#]];
+
+        expected.assert_debug_eq(&res);
+    }
+
+    #[test]
     fn parse_sql_1() {
         use expect_test::expect;
 
@@ -654,8 +804,9 @@ mod tests {
                         ParsedParameterDoc {
                             alias: None,
                             typ: Some(
-                                Int,
+                                Int32,
                             ),
+                            nullable: None,
                             position: Some(
                                 1,
                             ),
@@ -694,8 +845,9 @@ mod tests {
                                 "userId",
                             ),
                             typ: Some(
-                                Int,
+                                Int32,
                             ),
+                            nullable: None,
                             position: Some(
                                 1,
                             ),
@@ -708,8 +860,9 @@ mod tests {
                                 "parentId",
                             ),
                             typ: Some(
-                                String,
+                                Text,
                             ),
+                            nullable: None,
                             position: Some(
                                 2,
                             ),

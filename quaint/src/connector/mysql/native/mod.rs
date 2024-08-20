@@ -16,6 +16,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use lru_cache::LruCache;
+use mysql_async::consts::ColumnFlags;
 use mysql_async::{
     self as my,
     prelude::{Query as _, Queryable as _},
@@ -252,7 +253,10 @@ impl Queryable for Mysql {
             let columns = stmt
                 .columns()
                 .iter()
-                .map(|col| ParsedRawColumn::new_named(col.name_str(), col))
+                .map(|col| {
+                    ParsedRawColumn::new_named(col.name_str(), col)
+                        .is_nullable(!col.flags().contains(ColumnFlags::NOT_NULL_FLAG))
+                })
                 .collect();
             let parameters = stmt
                 .params()
