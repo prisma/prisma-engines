@@ -46,22 +46,22 @@ pub struct IntrospectSqlQueryColumnOutput {
 
 impl From<quaint::connector::ParsedRawColumn> for IntrospectSqlQueryColumnOutput {
     fn from(item: quaint::connector::ParsedRawColumn) -> Self {
-        let (name, nullable) = parse_nullability_override(&item.name);
+        let nullable_override = parse_nullability_override(&item.name);
 
         Self {
-            name: name.to_owned(),
+            name: item.name,
             typ: item.enum_name.unwrap_or_else(|| item.typ.to_string()),
-            nullable: nullable.unwrap_or(item.nullable),
+            nullable: nullable_override.unwrap_or(item.nullable),
         }
     }
 }
 
-fn parse_nullability_override(column_name: &str) -> (&str, Option<bool>) {
-    if let Some(stripped) = column_name.strip_suffix('?') {
-        (stripped, Some(true))
-    } else if let Some(stripped) = column_name.strip_suffix('!') {
-        (stripped, Some(false))
+fn parse_nullability_override(column_name: &str) -> Option<bool> {
+    if column_name.ends_with('?') {
+        Some(true)
+    } else if column_name.ends_with('!') {
+        Some(false)
     } else {
-        (column_name, None)
+        None
     }
 }

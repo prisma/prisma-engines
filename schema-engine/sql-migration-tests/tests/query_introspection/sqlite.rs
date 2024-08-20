@@ -276,6 +276,34 @@ fn named_expr_int(api: TestApi) {
 }
 
 #[test_connector(tags(Sqlite))]
+fn named_expr_int_optional(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "SELECT 1 + 1 as `add?`;",
+            documentation: None,
+            parameters: [],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "add?",
+                    typ: "bigint",
+                    nullable: true,
+                },
+            ],
+        }
+    "#]];
+
+    api.introspect_sql("test_1", "SELECT 1 + 1 as `add?`;")
+        .send_sync()
+        .expect_result(expected);
+
+    api.query_raw("SELECT 1 + 1 as \"add?\";", &[])
+        .assert_single_row(|row| row.assert_bigint_value("add?", 2));
+}
+
+#[test_connector(tags(Sqlite))]
 fn mixed_named_expr_int(api: TestApi) {
     api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
