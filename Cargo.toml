@@ -75,8 +75,8 @@ wasm-rs-dbg = { version = "0.1.2", default-features = false, features = ["consol
 wasm-bindgen-test = { version = "0.3.0" }
 url = { version = "2.5.0" }
 
-bson = { git = "https://github.com/mongodb/bson-rust", branch = "main", features = ["chrono-0_4", "uuid-1"] }
-mongodb = { git = "https://github.com/abr-egn/mongo-rust-driver.git", branch = "RUST-1994/happy-eyeballs" }
+bson = { version = "2.11.0", features = ["chrono-0_4", "uuid-1"] }
+mongodb = { git = "https://github.com/prisma/mongo-rust-driver.git", branch = "RUST-1994/happy-eyeballs" }
 
 [workspace.dependencies.quaint]
 path = "quaint"

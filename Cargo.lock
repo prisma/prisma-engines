@@ -416,7 +416,8 @@ dependencies = [
 [[package]]
 name = "bson"
 version = "2.11.0"
-source = "git+https://github.com/mongodb/bson-rust?branch=main#a72431e4867ec7d5b38faa52860a45da6b183ff3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d8a88e82b9106923b5c4d6edfca9e7db958d4e98a478ec115022e81b9b38e2c8"
 dependencies = [
  "ahash 0.8.7",
  "base64 0.13.1",
@@ -2593,7 +2594,7 @@ dependencies = [
 [[package]]
 name = "mongodb"
 version = "3.0.0"
-source = "git+https://github.com/abr-egn/mongo-rust-driver.git?branch=RUST-1994/happy-eyeballs#a3909ce742c6d3543e102f2e685ac4c0570ccad8"
+source = "git+https://github.com/prisma/mongo-rust-driver.git?branch=RUST-1994/happy-eyeballs#31e0356391a7871bec000ae35fe0edc35582449e"
 dependencies = [
  "async-trait",
  "base64 0.13.1",
@@ -2650,7 +2651,7 @@ dependencies = [
 [[package]]
 name = "mongodb-internal-macros"
 version = "3.0.0"
-source = "git+https://github.com/abr-egn/mongo-rust-driver.git?branch=RUST-1994/happy-eyeballs#a3909ce742c6d3543e102f2e685ac4c0570ccad8"
+source = "git+https://github.com/prisma/mongo-rust-driver.git?branch=RUST-1994/happy-eyeballs#31e0356391a7871bec000ae35fe0edc35582449e"
 dependencies = [
  "proc-macro2",
  "quote",
