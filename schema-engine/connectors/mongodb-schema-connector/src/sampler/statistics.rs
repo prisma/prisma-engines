@@ -12,9 +12,9 @@ use schema_connector::{
 };
 
 use super::field_type::FieldType;
+use bson::{Bson, Document};
 use convert_case::{Case, Casing};
 use datamodel_renderer as renderer;
-use bson::{Bson, Document};
 use mongodb_schema_describer::{CollectionWalker, IndexWalker};
 use once_cell::sync::Lazy;
 use psl::datamodel_connector::constraint_names::ConstraintNames;

@@ -1,8 +1,8 @@
 use super::{into_expression::IntoUpdateExpression, operation};
 
+use bson::{doc, Bson, Document};
 use connector_interface::FieldPath;
 use indexmap::IndexMap;
-use bson::{doc, Bson, Document};
 
 /// `UpdateExpression` is an intermediary AST that's used to represent MongoDB expressions.
 /// It is meant to be transformed into `BSON`.

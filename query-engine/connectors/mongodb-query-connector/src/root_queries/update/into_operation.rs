@@ -1,8 +1,8 @@
 use super::operation::*;
 use crate::*;
 
-use connector_interface::{CompositeWriteOperation, FieldPath, ScalarWriteOperation, WriteOperation};
 use bson::doc;
+use connector_interface::{CompositeWriteOperation, FieldPath, ScalarWriteOperation, WriteOperation};
 use query_structure::{Field, PrismaValue};
 
 pub(crate) trait IntoUpdateOperation {

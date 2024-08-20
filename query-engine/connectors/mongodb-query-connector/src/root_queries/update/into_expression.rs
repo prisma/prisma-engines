@@ -1,8 +1,8 @@
 use super::{expression::*, operation::*};
 use crate::{filter, IntoBson};
 
-use itertools::Itertools;
 use bson::{doc, Bson};
+use itertools::Itertools;
 
 pub(crate) trait IntoUpdateExpression {
     fn into_update_expression(self) -> crate::Result<UpdateExpression>;

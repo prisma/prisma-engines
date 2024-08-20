@@ -10,8 +10,8 @@ mod walkers;
 pub use schema::*;
 pub use walkers::*;
 
-use futures::stream::TryStreamExt;
 use bson::{Bson, Document};
+use futures::stream::TryStreamExt;
 
 /// Describe the contents of the given database. Only bothers about the schema, meaning the
 /// collection names and indexes created. Does a bit of magic to the indexes, so if having a

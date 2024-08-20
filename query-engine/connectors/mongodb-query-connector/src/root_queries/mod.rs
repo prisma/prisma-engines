@@ -10,9 +10,9 @@ use crate::query_strings::QueryString;
 use crate::{
     error::DecorateErrorWithFieldInformationExtension, output_meta::OutputMetaMapping, value::value_from_bson,
 };
-use futures::Future;
 use bson::Bson;
 use bson::Document;
+use futures::Future;
 use query_engine_metrics::{
     histogram, increment_counter, metrics, PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
     PRISMA_DATASOURCE_QUERIES_TOTAL,
