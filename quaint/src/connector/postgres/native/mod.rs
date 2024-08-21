@@ -695,7 +695,19 @@ impl Queryable for PostgreSql {
             parameters.push(ParsedRawParameter::new_named(param.name(), typ).with_enum_name(enum_name));
         }
 
-        Ok(ParsedRawQuery { columns, parameters })
+        let enum_names = self
+            .query_raw("SELECT typname FROM pg_type WHERE typtype = 'e';", &[])
+            .await?
+            .into_iter()
+            .flat_map(|row| row.into_single().ok())
+            .flat_map(|v| v.to_string())
+            .collect::<Vec<_>>();
+
+        Ok(ParsedRawQuery {
+            columns,
+            parameters,
+            enum_names: Some(enum_names),
+        })
     }
 
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {

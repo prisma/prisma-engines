@@ -6,6 +6,13 @@ use super::ColumnType;
 pub struct ParsedRawQuery {
     pub parameters: Vec<ParsedRawParameter>,
     pub columns: Vec<ParsedRawColumn>,
+    pub enum_names: Option<Vec<String>>,
+}
+
+impl ParsedRawQuery {
+    pub fn param_enum_names(&self) -> Vec<&str> {
+        self.parameters.iter().filter_map(|p| p.enum_name.as_deref()).collect()
+    }
 }
 
 #[derive(Debug)]

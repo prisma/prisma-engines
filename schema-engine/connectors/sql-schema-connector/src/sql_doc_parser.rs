@@ -2,10 +2,18 @@ use psl::parser_database::ScalarType;
 use quaint::prelude::ColumnType;
 use schema_connector::{ConnectorError, ConnectorResult};
 
+use crate::sql_renderer::IteratorJoin;
+
 #[derive(Debug, Default)]
 pub(crate) struct ParsedSqlDoc<'a> {
     parameters: Vec<ParsedParameterDoc<'a>>,
     description: Option<&'a str>,
+}
+
+#[derive(Debug)]
+pub enum ParsedParamType<'a> {
+    ColumnType(ColumnType),
+    Enum(&'a str),
 }
 
 impl<'a> ParsedSqlDoc<'a> {
@@ -45,7 +53,7 @@ impl<'a> ParsedSqlDoc<'a> {
 #[derive(Debug, Default)]
 pub(crate) struct ParsedParameterDoc<'a> {
     alias: Option<&'a str>,
-    typ: Option<ColumnType>,
+    typ: Option<ParsedParamType<'a>>,
     nullable: Option<bool>,
     position: Option<usize>,
     documentation: Option<&'a str>,
@@ -56,7 +64,7 @@ impl<'a> ParsedParameterDoc<'a> {
         self.alias = name;
     }
 
-    fn set_typ(&mut self, typ: Option<ColumnType>) {
+    fn set_typ(&mut self, typ: Option<ParsedParamType<'a>>) {
         self.typ = typ;
     }
 
@@ -85,7 +93,10 @@ impl<'a> ParsedParameterDoc<'a> {
     }
 
     pub(crate) fn typ(&self) -> Option<String> {
-        self.typ.map(|typ| typ.to_string())
+        self.typ.as_ref().map(|typ| match typ {
+            ParsedParamType::ColumnType(ct) => ct.to_string(),
+            ParsedParamType::Enum(enm) => enm.to_string(),
+        })
     }
 
     pub(crate) fn documentation(&self) -> Option<&str> {
@@ -173,7 +184,10 @@ fn build_error(input: Input<'_>, msg: &str) -> ConnectorError {
     ConnectorError::from_msg(format!("SQL documentation parsing: {msg} at '{input}'."))
 }
 
-fn parse_typ_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<ColumnType>)> {
+fn parse_typ_opt<'a>(
+    input: Input<'a>,
+    enum_names: &'a [String],
+) -> ConnectorResult<(Input<'a>, Option<ParsedParamType<'a>>)> {
     if let Some(start) = input.find(&['{']) {
         if let Some(end) = input.find(&['}']) {
             let typ = input.move_between(start + 1, end);
@@ -182,24 +196,29 @@ fn parse_typ_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<ColumnT
                 return Err(build_error(input, "missing type (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal')"));
             }
 
-            let st = ScalarType::try_from_str(typ.inner(), false).ok_or_else(|| build_error(
-                input,
-                &format!("invalid type: '{typ}' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal')"),
-            ))?;
+            let parsed_typ = ScalarType::try_from_str(typ.inner(), false)
+                .map(|st| match st {
+                    ScalarType::Int => ColumnType::Int32,
+                    ScalarType::BigInt => ColumnType::Int64,
+                    ScalarType::Float => ColumnType::Float,
+                    ScalarType::Boolean => ColumnType::Boolean,
+                    ScalarType::String => ColumnType::Text,
+                    ScalarType::DateTime => ColumnType::DateTime,
+                    ScalarType::Json => ColumnType::Json,
+                    ScalarType::Bytes => ColumnType::Bytes,
+                    ScalarType::Decimal => ColumnType::Numeric,
+                })
+                .map(ParsedParamType::ColumnType)
+                .or_else(|| {
+                    enum_names.iter().any(|enum_name| *enum_name == typ.inner())
+                        .then(|| ParsedParamType::Enum(typ.inner()))
+                })
+                .ok_or_else(|| build_error(
+                    input,
+                    &format!("invalid type: '{typ}' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal'{})", if enum_names.is_empty() { String::new() } else { format!(" , {}", enum_names.iter().map(|name| format!("'{name}'")).join(", ")) }),
+                ))?;
 
-            let col_typ = match st {
-                ScalarType::Int => ColumnType::Int32,
-                ScalarType::BigInt => ColumnType::Int64,
-                ScalarType::Float => ColumnType::Float,
-                ScalarType::Boolean => ColumnType::Boolean,
-                ScalarType::String => ColumnType::Text,
-                ScalarType::DateTime => ColumnType::DateTime,
-                ScalarType::Json => ColumnType::Json,
-                ScalarType::Bytes => ColumnType::Bytes,
-                ScalarType::Decimal => ColumnType::Numeric,
-            };
-
-            Ok((input.move_from(end + 1), Some(col_typ)))
+            Ok((input.move_from(end + 1), Some(parsed_typ)))
         } else {
             Err(build_error(input, "missing closing bracket"))
         }
@@ -266,10 +285,10 @@ fn validate_param(param: &ParsedParameterDoc<'_>, input: Input<'_>) -> Connector
     Ok(())
 }
 
-fn parse_param(param_input: Input<'_>) -> ConnectorResult<ParsedParameterDoc<'_>> {
+fn parse_param<'a>(param_input: Input<'a>, enum_names: &'a [String]) -> ConnectorResult<ParsedParameterDoc<'a>> {
     let input = param_input.strip_prefix_str("@param").unwrap().trim_start();
 
-    let (input, typ) = parse_typ_opt(input)?;
+    let (input, typ) = parse_typ_opt(input, enum_names)?;
     let (input, position) = parse_position_opt(input)?;
     let (input, alias, nullable) = parse_alias_opt(input)?;
     let documentation = parse_rest(input)?;
@@ -293,7 +312,7 @@ fn parse_description(input: Input<'_>) -> ConnectorResult<Option<&str>> {
     parse_rest(input)
 }
 
-pub(crate) fn parse_sql_doc(sql: &str) -> ConnectorResult<ParsedSqlDoc<'_>> {
+pub(crate) fn parse_sql_doc<'a>(sql: &'a str, enum_names: &'a [String]) -> ConnectorResult<ParsedSqlDoc<'a>> {
     let mut parsed_sql = ParsedSqlDoc::default();
 
     let lines = sql.lines();
@@ -308,7 +327,7 @@ pub(crate) fn parse_sql_doc(sql: &str) -> ConnectorResult<ParsedSqlDoc<'_>> {
                 parsed_sql.set_description(parse_description(input)?);
             } else if input.starts_with("@param") {
                 parsed_sql
-                    .add_parameter(parse_param(input)?)
+                    .add_parameter(parse_param(input, enum_names)?)
                     .map_err(|err| build_error(input, err.message().unwrap()))?;
             }
         }
@@ -325,7 +344,7 @@ mod tests {
     fn parse_param_1() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param $1:userId"));
+        let res = parse_param(Input("@param $1:userId"), &[]);
 
         let expected = expect![[r#"
             Ok(
@@ -350,7 +369,7 @@ mod tests {
     fn parse_param_2() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param $1:userId valid user identifier"));
+        let res = parse_param(Input("@param $1:userId valid user identifier"), &[]);
 
         let expected = expect![[r#"
             Ok(
@@ -377,7 +396,7 @@ mod tests {
     fn parse_param_3() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param {Int} :userId"));
+        let res = parse_param(Input("@param {Int} :userId"), &[]);
 
         let expected = expect![[r#"
             Ok(
@@ -386,7 +405,9 @@ mod tests {
                         "userId",
                     ),
                     typ: Some(
-                        Int32,
+                        ColumnType(
+                            Int32,
+                        ),
                     ),
                     nullable: None,
                     position: None,
@@ -402,7 +423,7 @@ mod tests {
     fn parse_param_4() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param {Int} $1:userId"));
+        let res = parse_param(Input("@param {Int} $1:userId"), &[]);
 
         let expected = expect![[r#"
             Ok(
@@ -411,7 +432,9 @@ mod tests {
                         "userId",
                     ),
                     typ: Some(
-                        Int32,
+                        ColumnType(
+                            Int32,
+                        ),
                     ),
                     nullable: None,
                     position: Some(
@@ -429,7 +452,7 @@ mod tests {
     fn parse_param_5() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param {Int} $1:userId valid user identifier"));
+        let res = parse_param(Input("@param {Int} $1:userId valid user identifier"), &[]);
 
         let expected = expect![[r#"
             Ok(
@@ -438,7 +461,9 @@ mod tests {
                         "userId",
                     ),
                     typ: Some(
-                        Int32,
+                        ColumnType(
+                            Int32,
+                        ),
                     ),
                     nullable: None,
                     position: Some(
@@ -458,14 +483,16 @@ mod tests {
     fn parse_param_6() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param {Int} $1 valid user identifier"));
+        let res = parse_param(Input("@param {Int} $1 valid user identifier"), &[]);
 
         let expected = expect![[r#"
             Ok(
                 ParsedParameterDoc {
                     alias: None,
                     typ: Some(
-                        Int32,
+                        ColumnType(
+                            Int32,
+                        ),
                     ),
                     nullable: None,
                     position: Some(
@@ -485,7 +512,7 @@ mod tests {
     fn parse_param_7() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param {Int} $1f valid user identifier"));
+        let res = parse_param(Input("@param {Int} $1f valid user identifier"), &[]);
 
         let expected = expect![[r#"
             Err(
@@ -509,7 +536,7 @@ mod tests {
     fn parse_param_8() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param {} valid user identifier"));
+        let res = parse_param(Input("@param {} valid user identifier"), &[]);
 
         let expected = expect![[r#"
             Err(
@@ -533,7 +560,7 @@ mod tests {
     fn parse_param_9() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param {Int $1f valid user identifier"));
+        let res = parse_param(Input("@param {Int $1f valid user identifier"), &[]);
 
         let expected = expect![[r#"
             Err(
@@ -557,7 +584,7 @@ mod tests {
     fn parse_param_10() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param {Int} valid user identifier $10"));
+        let res = parse_param(Input("@param {Int} valid user identifier $10"), &[]);
 
         let expected = expect![[r#"
             Err(
@@ -581,7 +608,7 @@ mod tests {
     fn parse_param_11() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param "));
+        let res = parse_param(Input("@param "), &[]);
 
         let expected = expect![[r#"
             Err(
@@ -605,14 +632,16 @@ mod tests {
     fn parse_param_12() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param {Int}$1 some documentation"));
+        let res = parse_param(Input("@param {Int}$1 some documentation"), &[]);
 
         let expected = expect![[r#"
             Ok(
                 ParsedParameterDoc {
                     alias: None,
                     typ: Some(
-                        Int32,
+                        ColumnType(
+                            Int32,
+                        ),
                     ),
                     nullable: None,
                     position: Some(
@@ -632,14 +661,16 @@ mod tests {
     fn parse_param_13() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param      {Int}        $1     some    documentation"));
+        let res = parse_param(Input("@param      {Int}        $1     some    documentation"), &[]);
 
         let expected = expect![[r#"
             Ok(
                 ParsedParameterDoc {
                     alias: None,
                     typ: Some(
-                        Int32,
+                        ColumnType(
+                            Int32,
+                        ),
                     ),
                     nullable: None,
                     position: Some(
@@ -659,7 +690,7 @@ mod tests {
     fn parse_param_14() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param {Unknown}  $1"));
+        let res = parse_param(Input("@param {Unknown}  $1"), &[]);
 
         let expected = expect![[r#"
             Err(
@@ -683,7 +714,7 @@ mod tests {
     fn parse_param_15() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param {Int} $1:alias!"));
+        let res = parse_param(Input("@param {Int} $1:alias!"), &[]);
 
         let expected = expect![[r#"
             Ok(
@@ -692,7 +723,9 @@ mod tests {
                         "alias!",
                     ),
                     typ: Some(
-                        Int32,
+                        ColumnType(
+                            Int32,
+                        ),
                     ),
                     nullable: None,
                     position: Some(
@@ -710,7 +743,7 @@ mod tests {
     fn parse_param_16() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param {Int} $1:alias?"));
+        let res = parse_param(Input("@param {Int} $1:alias?"), &[]);
 
         let expected = expect![[r#"
             Ok(
@@ -719,7 +752,9 @@ mod tests {
                         "alias",
                     ),
                     typ: Some(
-                        Int32,
+                        ColumnType(
+                            Int32,
+                        ),
                     ),
                     nullable: Some(
                         true,
@@ -739,7 +774,7 @@ mod tests {
     fn parse_param_17() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param {Int} $1:alias!?"));
+        let res = parse_param(Input("@param {Int} $1:alias!?"), &[]);
 
         let expected = expect![[r#"
             Ok(
@@ -748,7 +783,9 @@ mod tests {
                         "alias!",
                     ),
                     typ: Some(
-                        Int32,
+                        ColumnType(
+                            Int32,
+                        ),
                     ),
                     nullable: Some(
                         true,
@@ -768,7 +805,7 @@ mod tests {
     fn parse_param_18() {
         use expect_test::expect;
 
-        let res = parse_param(Input("@param $1:alias?"));
+        let res = parse_param(Input("@param $1:alias?"), &[]);
 
         let expected = expect![[r#"
             Ok(
@@ -792,10 +829,97 @@ mod tests {
     }
 
     #[test]
+    fn parse_param_19() {
+        use expect_test::expect;
+
+        let enums = ["MyEnum".to_string()];
+        let res = parse_param(Input("@param {MyEnum} $1:alias?"), &enums);
+
+        let expected = expect![[r#"
+            Ok(
+                ParsedParameterDoc {
+                    alias: Some(
+                        "alias",
+                    ),
+                    typ: Some(
+                        Enum(
+                            "MyEnum",
+                        ),
+                    ),
+                    nullable: Some(
+                        true,
+                    ),
+                    position: Some(
+                        1,
+                    ),
+                    documentation: None,
+                },
+            )
+        "#]];
+
+        expected.assert_debug_eq(&res);
+    }
+
+    #[test]
+    fn parse_param_20() {
+        use expect_test::expect;
+
+        let enums = ["MyEnum".to_string()];
+        let res = parse_param(Input("@param {MyEnum} $12567:alias"), &enums);
+
+        let expected = expect![[r#"
+            Ok(
+                ParsedParameterDoc {
+                    alias: Some(
+                        "alias",
+                    ),
+                    typ: Some(
+                        Enum(
+                            "MyEnum",
+                        ),
+                    ),
+                    nullable: None,
+                    position: Some(
+                        12567,
+                    ),
+                    documentation: None,
+                },
+            )
+        "#]];
+
+        expected.assert_debug_eq(&res);
+    }
+
+    #[test]
+    fn parse_param_21() {
+        use expect_test::expect;
+
+        let enums = ["MyEnum".to_string(), "MyEnum2".to_string()];
+        let res = parse_param(Input("@param {UnknownTyp} $12567:alias"), &enums);
+
+        let expected = expect![[r#"
+            Err(
+                ConnectorErrorImpl {
+                    user_facing_error: None,
+                    message: Some(
+                        "SQL documentation parsing: invalid type: 'UnknownTyp' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal' , 'MyEnum', 'MyEnum2') at '{UnknownTyp} $12567:alias'.",
+                    ),
+                    source: None,
+                    context: SpanTrace [],
+                }
+                SQL documentation parsing: invalid type: 'UnknownTyp' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal' , 'MyEnum', 'MyEnum2') at '{UnknownTyp} $12567:alias'.
+                ,
+            )
+        "#]];
+
+        expected.assert_debug_eq(&res);
+    }
+
+    #[test]
     fn parse_sql_1() {
         use expect_test::expect;
 
-        let res = parse_sql_doc("--   @param      {Int}        $1     some    documentation    ");
+        let res = parse_sql_doc("--   @param      {Int}        $1     some    documentation    ", &[]);
 
         let expected = expect![[r#"
             Ok(
@@ -804,7 +928,9 @@ mod tests {
                         ParsedParameterDoc {
                             alias: None,
                             typ: Some(
-                                Int32,
+                                ColumnType(
+                                    Int32,
+                                ),
                             ),
                             nullable: None,
                             position: Some(
@@ -834,6 +960,7 @@ mod tests {
     SELECT enum FROM "test_introspect_sql"."model"
         WHERE
             id = $1;"#,
+            &[],
         );
 
         let expected = expect![[r#"
@@ -845,7 +972,9 @@ mod tests {
                                 "userId",
                             ),
                             typ: Some(
-                                Int32,
+                                ColumnType(
+                                    Int32,
+                                ),
                             ),
                             nullable: None,
                             position: Some(
@@ -860,7 +989,9 @@ mod tests {
                                 "parentId",
                             ),
                             typ: Some(
-                                Text,
+                                ColumnType(
+                                    Text,
+                                ),
                             ),
                             nullable: None,
                             position: Some(
@@ -890,6 +1021,7 @@ mod tests {
     --   @param   {Int}      $1:userId  valid   user identifier
  --         @param   {String}   $1:parentId  valid   parent identifier
 SELECT enum FROM "test_introspect_sql"."model" WHERE id = $1;"#,
+            &[],
         );
 
         let expected = expect![[r#"
@@ -919,6 +1051,7 @@ SELECT enum FROM "test_introspect_sql"."model" WHERE id = $1;"#,
 --   @param   {Int}      $1:userId  valid   user identifier
 --   @param   {String}   $2:userId  valid   parent identifier
 SELECT enum FROM "test_introspect_sql"."model" WHERE id = $1;"#,
+            &[],
         );
 
         let expected = expect![[r#"
@@ -949,6 +1082,7 @@ SELECT enum FROM "test_introspect_sql"."model" WHERE id = $1;"#,
              * Unhandled multi-line comment
              */
             SELECT enum FROM "test_introspect_sql"."model" WHERE id = $1;"#,
+            &[],
         );
 
         let expected = expect![[r#"

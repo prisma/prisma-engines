@@ -117,7 +117,11 @@ impl Connection {
             })
             .collect();
 
-        Ok(quaint::connector::ParsedRawQuery { columns, parameters })
+        Ok(quaint::connector::ParsedRawQuery {
+            columns,
+            parameters,
+            enum_names: None,
+        })
     }
 }
 

@@ -265,7 +265,11 @@ impl Queryable for Mysql {
                 .map(|(idx, col)| ParsedRawParameter::new_unnamed(idx, col))
                 .collect();
 
-            Ok(ParsedRawQuery { columns, parameters })
+            Ok(ParsedRawQuery {
+                columns,
+                parameters,
+                enum_names: None,
+            })
         })
         .await
     }

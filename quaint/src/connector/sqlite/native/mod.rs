@@ -145,7 +145,11 @@ impl Queryable for Sqlite {
             .map(|col| ParsedRawColumn::new_named(col.name(), col))
             .collect();
 
-        Ok(ParsedRawQuery { columns, parameters })
+        Ok(ParsedRawQuery {
+            columns,
+            parameters,
+            enum_names: None,
+        })
     }
 
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {

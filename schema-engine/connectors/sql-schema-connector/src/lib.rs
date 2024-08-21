@@ -21,6 +21,7 @@ use enumflags2::BitFlags;
 use flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFlavour};
 use migration_pair::MigrationPair;
 use psl::{datamodel_connector::NativeTypeInstance, parser_database::ScalarType, ValidatedSchema};
+use quaint::connector::ParsedRawQuery;
 use schema_connector::{migrations_directory::MigrationDirectory, *};
 use sql_doc_parser::parse_sql_doc;
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
@@ -361,17 +362,21 @@ impl SchemaConnector for SqlSchemaConnector {
         input: IntrospectSqlQueryInput,
     ) -> BoxFuture<'_, ConnectorResult<IntrospectSqlQueryOutput>> {
         Box::pin(async move {
-            let parsed_query = self.flavour.parse_raw_query(&input.source).await?;
+            let ParsedRawQuery {
+                parameters,
+                columns,
+                enum_names,
+            } = self.flavour.parse_raw_query(&input.source).await?;
+            let enum_names = enum_names.unwrap_or_default();
             let sql_source = input.source.clone();
-            let parsed_doc = parse_sql_doc(&sql_source)?;
+            let parsed_doc = parse_sql_doc(&sql_source, enum_names.as_slice())?;
 
-            let parameters = parsed_query
-                .parameters
+            let parameters = parameters
                 .into_iter()
-                .enumerate()
-                .map(|(idx, param)| {
+                .zip(1..)
+                .map(|(param, idx)| {
                     let parsed_param = parsed_doc
-                        .get_param_at(idx + 1)
+                        .get_param_at(idx)
                         .or_else(|| parsed_doc.get_param_by_alias(&param.name));
 
                     IntrospectSqlQueryParameterOutput {
@@ -388,11 +393,7 @@ impl SchemaConnector for SqlSchemaConnector {
                     }
                 })
                 .collect();
-            let columns = parsed_query
-                .columns
-                .into_iter()
-                .map(IntrospectSqlQueryColumnOutput::from)
-                .collect();
+            let columns = columns.into_iter().map(IntrospectSqlQueryColumnOutput::from).collect();
 
             Ok(IntrospectSqlQueryOutput {
                 name: input.name,
