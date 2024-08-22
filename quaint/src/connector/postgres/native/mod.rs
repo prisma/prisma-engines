@@ -423,7 +423,7 @@ impl PostgreSql {
     /// and returns `None` for all others.
     /// All credits go to sqlx: https://github.com/launchbadge/sqlx/blob/a892ebc6e283f443145f92bbc7fce4ae44547331/sqlx-postgres/src/connection/describe.rs#L482
     async fn nullables_from_explain(&self, stmt: &Statement) -> Result<Vec<Option<bool>>, Error> {
-        use explain::{Explain, Plan, visit_plan};
+        use explain::{visit_plan, Explain, Plan};
 
         let mut explain = format!("EXPLAIN (VERBOSE, FORMAT JSON) EXECUTE {}", stmt.name());
         let params_len = stmt.params().len();
