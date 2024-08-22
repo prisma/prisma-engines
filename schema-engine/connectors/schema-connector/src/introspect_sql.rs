@@ -44,8 +44,8 @@ pub struct IntrospectSqlQueryColumnOutput {
     pub nullable: bool,
 }
 
-impl From<quaint::connector::ParsedRawColumn> for IntrospectSqlQueryColumnOutput {
-    fn from(item: quaint::connector::ParsedRawColumn) -> Self {
+impl From<quaint::connector::DescribedColumn> for IntrospectSqlQueryColumnOutput {
+    fn from(item: quaint::connector::DescribedColumn) -> Self {
         let nullable_override = parse_nullability_override(&item.name);
 
         Self {

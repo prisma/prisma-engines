@@ -6,7 +6,7 @@ mod conversion;
 mod error;
 
 pub(crate) use crate::connector::mysql::MysqlUrl;
-use crate::connector::{timeout, ColumnType, IsolationLevel, ParsedRawColumn, ParsedRawParameter, ParsedRawQuery};
+use crate::connector::{timeout, ColumnType, DescribedColumn, DescribedParameter, DescribedQuery, IsolationLevel};
 
 use crate::{
     ast::{Query, Value},
@@ -248,13 +248,13 @@ impl Queryable for Mysql {
         self.query_raw(sql, params).await
     }
 
-    async fn parse_raw_query(&self, sql: &str) -> crate::Result<ParsedRawQuery> {
+    async fn describe_query(&self, sql: &str) -> crate::Result<DescribedQuery> {
         self.prepared(sql, |stmt| async move {
             let columns = stmt
                 .columns()
                 .iter()
                 .map(|col| {
-                    ParsedRawColumn::new_named(col.name_str(), col)
+                    DescribedColumn::new_named(col.name_str(), col)
                         .is_nullable(!col.flags().contains(ColumnFlags::NOT_NULL_FLAG))
                 })
                 .collect();
@@ -262,10 +262,10 @@ impl Queryable for Mysql {
                 .params()
                 .iter()
                 .enumerate()
-                .map(|(idx, col)| ParsedRawParameter::new_unnamed(idx, col))
+                .map(|(idx, col)| DescribedParameter::new_unnamed(idx, col))
                 .collect();
 
-            Ok(ParsedRawQuery {
+            Ok(DescribedQuery {
                 columns,
                 parameters,
                 enum_names: None,

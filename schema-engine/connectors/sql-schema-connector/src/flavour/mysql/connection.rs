@@ -115,14 +115,14 @@ impl Connection {
         self.0.query_raw(sql, params).await.map_err(quaint_err(url))
     }
 
-    pub(super) async fn parse_raw_query(
+    pub(super) async fn describe_query(
         &self,
         sql: &str,
         url: &MysqlUrl,
         circumstances: BitFlags<super::Circumstances>,
-    ) -> ConnectorResult<quaint::connector::ParsedRawQuery> {
-        tracing::debug!(query_type = "parse_raw_query", sql);
-        let mut parsed = self.0.parse_raw_query(sql).await.map_err(quaint_err(url))?;
+    ) -> ConnectorResult<quaint::connector::DescribedQuery> {
+        tracing::debug!(query_type = "describe_query", sql);
+        let mut parsed = self.0.describe_query(sql).await.map_err(quaint_err(url))?;
 
         if circumstances.contains(super::Circumstances::IsMysql56)
             || circumstances.contains(super::Circumstances::IsMysql57)

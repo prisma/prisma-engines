@@ -8,7 +8,7 @@ mod error;
 pub(crate) use crate::connector::postgres::url::PostgresUrl;
 use crate::connector::postgres::url::{Hidden, SslAcceptMode, SslParams};
 use crate::connector::{
-    timeout, ColumnType, IsolationLevel, ParsedRawColumn, ParsedRawParameter, ParsedRawQuery, Transaction,
+    timeout, ColumnType, DescribedColumn, DescribedParameter, DescribedQuery, IsolationLevel, Transaction,
 };
 use crate::error::NativeErrorKind;
 
@@ -644,11 +644,11 @@ impl Queryable for PostgreSql {
         .await
     }
 
-    async fn parse_raw_query(&self, sql: &str) -> crate::Result<ParsedRawQuery> {
+    async fn describe_query(&self, sql: &str) -> crate::Result<DescribedQuery> {
         let stmt = self.fetch_cached(sql, &[]).await?;
 
-        let mut columns: Vec<ParsedRawColumn> = Vec::with_capacity(stmt.columns().len());
-        let mut parameters: Vec<ParsedRawParameter> = Vec::with_capacity(stmt.params().len());
+        let mut columns: Vec<DescribedColumn> = Vec::with_capacity(stmt.columns().len());
+        let mut parameters: Vec<DescribedParameter> = Vec::with_capacity(stmt.params().len());
 
         async fn infer_type(this: &PostgreSql, ty: &PostgresType) -> crate::Result<(ColumnType, Option<String>)> {
             let column_type = ColumnType::from(ty);
@@ -682,7 +682,7 @@ impl Queryable for PostgreSql {
             }
 
             columns.push(
-                ParsedRawColumn::new_named(col.name(), typ)
+                DescribedColumn::new_named(col.name(), typ)
                     .with_enum_name(enum_name)
                     // Make fields nullable by default if we can't infer nullability.
                     .is_nullable(nullable.unwrap_or(true)),
@@ -692,7 +692,7 @@ impl Queryable for PostgreSql {
         for param in stmt.params() {
             let (typ, enum_name) = infer_type(self, param).await?;
 
-            parameters.push(ParsedRawParameter::new_named(param.name(), typ).with_enum_name(enum_name));
+            parameters.push(DescribedParameter::new_named(param.name(), typ).with_enum_name(enum_name));
         }
 
         let enum_names = self
@@ -703,7 +703,7 @@ impl Queryable for PostgreSql {
             .flat_map(|v| v.to_string())
             .collect::<Vec<_>>();
 
-        Ok(ParsedRawQuery {
+        Ok(DescribedQuery {
             columns,
             parameters,
             enum_names: Some(enum_names),

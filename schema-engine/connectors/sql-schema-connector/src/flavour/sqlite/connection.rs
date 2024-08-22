@@ -2,7 +2,7 @@
 
 pub(crate) use quaint::connector::rusqlite;
 
-use quaint::connector::{ColumnType, GetRow, ParsedRawColumn, ParsedRawParameter, ToColumnNames};
+use quaint::connector::{ColumnType, DescribedColumn, DescribedParameter, GetRow, ToColumnNames};
 use schema_connector::{ConnectorError, ConnectorResult};
 use sql_schema_describer::{sqlite as describer, DescriberErrorKind, SqlSchema};
 use sqlx_core::{column::Column, type_info::TypeInfo};
@@ -75,12 +75,12 @@ impl Connection {
         ))
     }
 
-    pub(super) fn parse_raw_query(
+    pub(super) fn describe_query(
         &mut self,
         sql: &str,
         params: &super::Params,
-    ) -> ConnectorResult<quaint::connector::ParsedRawQuery> {
-        tracing::debug!(query_type = "parse_raw_query", sql);
+    ) -> ConnectorResult<quaint::connector::DescribedQuery> {
+        tracing::debug!(query_type = "describe_query", sql);
         // SQLite only provides type information for _declared_ column types. That means any expression will not contain type information.
         // Sqlx works around this by running an `EXPLAIN` query and inferring types by interpreting sqlite bytecode.
         // If you're curious, here's the code: https://github.com/launchbadge/sqlx/blob/16e3f1025ad1e106d1acff05f591b8db62d688e2/sqlx-sqlite/src/connection/explain.rs#L557
@@ -96,9 +96,9 @@ impl Connection {
                     // SQLite parameter names are prefixed with a colon. We remove it here so that the js doc parser can match the names.
                     let name = name.strip_prefix(':').unwrap_or(name);
 
-                    ParsedRawParameter::new_named(name, ColumnType::Unknown)
+                    DescribedParameter::new_named(name, ColumnType::Unknown)
                 }
-                None => ParsedRawParameter::new_unnamed(idx, ColumnType::Unknown),
+                None => DescribedParameter::new_unnamed(idx, ColumnType::Unknown),
             })
             .collect();
         let columns = stmt
@@ -113,11 +113,11 @@ impl Connection {
                     typ => typ,
                 };
 
-                ParsedRawColumn::new_named(col.name(), typ).is_nullable(nullable.unwrap_or(true))
+                DescribedColumn::new_named(col.name(), typ).is_nullable(nullable.unwrap_or(true))
             })
             .collect();
 
-        Ok(quaint::connector::ParsedRawQuery {
+        Ok(quaint::connector::DescribedQuery {
             columns,
             parameters,
             enum_names: None,

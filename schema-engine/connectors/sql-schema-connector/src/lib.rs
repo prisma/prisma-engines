@@ -21,7 +21,7 @@ use enumflags2::BitFlags;
 use flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFlavour};
 use migration_pair::MigrationPair;
 use psl::{datamodel_connector::NativeTypeInstance, parser_database::ScalarType, ValidatedSchema};
-use quaint::connector::ParsedRawQuery;
+use quaint::connector::DescribedQuery;
 use schema_connector::{migrations_directory::MigrationDirectory, *};
 use sql_doc_parser::parse_sql_doc;
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
@@ -362,11 +362,11 @@ impl SchemaConnector for SqlSchemaConnector {
         input: IntrospectSqlQueryInput,
     ) -> BoxFuture<'_, ConnectorResult<IntrospectSqlQueryOutput>> {
         Box::pin(async move {
-            let ParsedRawQuery {
+            let DescribedQuery {
                 parameters,
                 columns,
                 enum_names,
-            } = self.flavour.parse_raw_query(&input.source).await?;
+            } = self.flavour.describe_query(&input.source).await?;
             let enum_names = enum_names.unwrap_or_default();
             let sql_source = input.source.clone();
             let parsed_doc = parse_sql_doc(&sql_source, enum_names.as_slice())?;
