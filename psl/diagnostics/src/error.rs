@@ -183,6 +183,18 @@ impl DatamodelError {
         Self::new(msg, span)
     }
 
+    pub fn new_duplicate_mapped_field_error(
+        enum_name: &str,
+        mapped_field_value: &str,
+        clashing_field_name: &str,
+        container: &'static str,
+        span: Span,
+    ) -> DatamodelError {
+        let msg =
+            format!("`@map`'d value \"{mapped_field_value}\" is already defined on {container} \"{enum_name}\" in field \"{clashing_field_name}\".",);
+        Self::new(msg, span)
+    }
+
     pub fn new_composite_type_duplicate_field_error(type_name: &str, field_name: &str, span: Span) -> DatamodelError {
         let msg = format!(
             "Field \"{}\" is already defined on {} \"{}\".",

@@ -1,0 +1,30 @@
+datasource db {
+    provider = "postgresql"
+    url = env("TEST_DB_URL")
+}
+
+enum FormLanguage {
+  EN_US @map("en/US")
+  IT_IT @map("it/IT")
+  EN_UK
+
+  @@map("form_language")
+}
+
+enum UserKind {
+  ADMIN @map("admin")
+  USER
+
+  @@map("form_language")
+}
+// [1;91merror[0m: [1mAn enum with the same database name is already defined.[0m
+//   [1;94m-->[0m  [4mschema.prisma:14[0m
+// [1;94m   | [0m
+// [1;94m13 | [0m
+// [1;94m14 | [0m[1;91menum UserKind {[0m
+// [1;94m15 | [0m  ADMIN @map("admin")
+// [1;94m16 | [0m  USER
+// [1;94m17 | [0m
+// [1;94m18 | [0m  @@map("form_language")
+// [1;94m19 | [0m}
+// [1;94m   | [0m
