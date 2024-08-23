@@ -353,7 +353,6 @@ pub(crate) fn sanitize_sql(sql: &str) -> String {
     sql.lines()
         .map(|line| line.trim())
         .filter(|line| !line.starts_with("--"))
-        .collect::<Vec<&str>>()
         .join("\n")
 }
 
