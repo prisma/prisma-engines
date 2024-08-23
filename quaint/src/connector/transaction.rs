@@ -108,8 +108,8 @@ impl<'a> Queryable for DefaultTransaction<'a> {
         self.inner.query_raw_typed(sql, params).await
     }
 
-    async fn parse_raw_query(&self, sql: &str) -> crate::Result<ParsedRawQuery> {
-        self.inner.parse_raw_query(sql).await
+    async fn describe_query(&self, sql: &str) -> crate::Result<DescribedQuery> {
+        self.inner.describe_query(sql).await
     }
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
