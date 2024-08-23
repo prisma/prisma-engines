@@ -15,9 +15,6 @@ shape = "string"
 shape = "sqlQueryInput"
 isList = true
 
-[recordShapes.introspectSqlParams.fields.force]
-shape = "bool"
-
 # Result
 
 [recordShapes.introspectSqlResult]

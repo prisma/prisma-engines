@@ -184,6 +184,17 @@ fn build_error(input: Input<'_>, msg: &str) -> ConnectorError {
     ConnectorError::from_msg(format!("SQL documentation parsing: {msg} at '{input}'."))
 }
 
+fn render_enum_names(enum_names: &[String]) -> String {
+    if enum_names.is_empty() {
+        String::new()
+    } else {
+        format!(
+            ", {enum_names}",
+            enum_names = enum_names.iter().map(|name| format!("'{name}'")).join(", ")
+        )
+    }
+}
+
 fn parse_typ_opt<'a>(
     input: Input<'a>,
     enum_names: &'a [String],
@@ -215,7 +226,7 @@ fn parse_typ_opt<'a>(
                 })
                 .ok_or_else(|| build_error(
                     input,
-                    &format!("invalid type: '{typ}' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal'{})", if enum_names.is_empty() { String::new() } else { format!(" , {}", enum_names.iter().map(|name| format!("'{name}'")).join(", ")) }),
+                    &format!("invalid type: '{typ}' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal'{})", render_enum_names(enum_names)),
                 ))?;
 
             Ok((input.move_from(end + 1), Some(parsed_typ)))
@@ -247,19 +258,19 @@ fn parse_position_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<us
     }
 }
 
-fn parse_alias_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<&'_ str>, bool)> {
+fn parse_alias_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<&'_ str>, Option<bool>)> {
     if let Some((input, alias)) = input
         .trim_start()
         .strip_prefix_char(':')
         .map(|input| input.take_until_pattern_or_eol(&[' ']))
     {
         if let Some(alias) = alias.strip_suffix_char('?') {
-            Ok((input, Some(alias.inner()), true))
+            Ok((input, Some(alias.inner()), Some(true)))
         } else {
-            Ok((input, Some(alias.inner()), false))
+            Ok((input, Some(alias.inner()), None))
         }
     } else {
-        Ok((input, None, false))
+        Ok((input, None, None))
     }
 }
 
@@ -296,7 +307,7 @@ fn parse_param<'a>(param_input: Input<'a>, enum_names: &'a [String]) -> Connecto
     let mut param = ParsedParameterDoc::default();
 
     param.set_typ(typ);
-    param.set_nullable(nullable.then_some(true));
+    param.set_nullable(nullable);
     param.set_position(position);
     param.set_alias(alias);
     param.set_documentation(documentation);
@@ -902,12 +913,12 @@ mod tests {
                 ConnectorErrorImpl {
                     user_facing_error: None,
                     message: Some(
-                        "SQL documentation parsing: invalid type: 'UnknownTyp' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal' , 'MyEnum', 'MyEnum2') at '{UnknownTyp} $12567:alias'.",
+                        "SQL documentation parsing: invalid type: 'UnknownTyp' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal', 'MyEnum', 'MyEnum2') at '{UnknownTyp} $12567:alias'.",
                     ),
                     source: None,
                     context: SpanTrace [],
                 }
-                SQL documentation parsing: invalid type: 'UnknownTyp' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal' , 'MyEnum', 'MyEnum2') at '{UnknownTyp} $12567:alias'.
+                SQL documentation parsing: invalid type: 'UnknownTyp' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal', 'MyEnum', 'MyEnum2') at '{UnknownTyp} $12567:alias'.
                 ,
             )
         "#]];

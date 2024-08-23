@@ -595,30 +595,41 @@ impl Queryable for PostgreSql {
         let mut columns: Vec<DescribedColumn> = Vec::with_capacity(stmt.columns().len());
         let mut parameters: Vec<DescribedParameter> = Vec::with_capacity(stmt.params().len());
 
-        async fn infer_type(this: &PostgreSql, ty: &PostgresType) -> crate::Result<(ColumnType, Option<String>)> {
+        let enums_results = self
+            .query_raw("SELECT oid, typname FROM pg_type WHERE typtype = 'e';", &[])
+            .await?;
+
+        fn find_enum_by_oid(enums: &ResultSet, enum_oid: u32) -> Option<&str> {
+            enums.iter().find_map(|row| {
+                let oid = row.get("oid")?.as_i64()?;
+                let name = row.get("typname")?.as_str()?;
+
+                if enum_oid == u32::try_from(oid).unwrap() {
+                    Some(name)
+                } else {
+                    None
+                }
+            })
+        }
+
+        fn resolve_type(ty: &PostgresType, enums: &ResultSet) -> (ColumnType, Option<String>) {
             let column_type = ColumnType::from(ty);
 
             match ty.kind() {
                 PostgresKind::Enum => {
-                    let enum_name = this
-                        .query_raw("SELECT typname FROM pg_type WHERE oid = $1;", &[Value::int64(ty.oid())])
-                        .await?
-                        .into_single()?
-                        .at(0)
-                        .expect("could not find enum name")
-                        .to_string()
-                        .expect("enum name is not a string");
+                    let enum_name = find_enum_by_oid(enums, ty.oid())
+                        .unwrap_or_else(|| panic!("Could not find enum with oid {}", ty.oid()));
 
-                    Ok((column_type, Some(enum_name)))
+                    (column_type, Some(enum_name.to_string()))
                 }
-                _ => Ok((column_type, None)),
+                _ => (column_type, None),
             }
         }
 
         let nullables = self.get_nullable_for_columns(&stmt).await?;
 
         for (idx, (col, nullable)) in stmt.columns().iter().zip(nullables).enumerate() {
-            let (typ, enum_name) = infer_type(self, col.type_()).await?;
+            let (typ, enum_name) = resolve_type(col.type_(), &enums_results);
 
             if col.name() == "?column?" {
                 let kind = ErrorKind::QueryInvalidInput(format!("Invalid column name '?column?' for index {idx}. Your SQL query must explicitly alias that column name."));
@@ -635,17 +646,15 @@ impl Queryable for PostgreSql {
         }
 
         for param in stmt.params() {
-            let (typ, enum_name) = infer_type(self, param).await?;
+            let (typ, enum_name) = resolve_type(param, &enums_results);
 
             parameters.push(DescribedParameter::new_named(param.name(), typ).with_enum_name(enum_name));
         }
 
-        let enum_names = self
-            .query_raw("SELECT typname FROM pg_type WHERE typtype = 'e';", &[])
-            .await?
+        let enum_names = enums_results
             .into_iter()
-            .flat_map(|row| row.into_single().ok())
-            .flat_map(|v| v.to_string())
+            .filter_map(|row| row.take("typname"))
+            .filter_map(|v| v.to_string())
             .collect::<Vec<_>>();
 
         Ok(DescribedQuery {

@@ -137,6 +137,46 @@ fn parses_doc_no_alias(api: TestApi) {
 }
 
 #[test_connector(tags(Postgres))]
+fn parses_doc_enum_name(api: TestApi) {
+    api.schema_push(ENUM_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "\n  -- @param  {MyFancyEnum} $1\n    SELECT * FROM model WHERE id = $1;\n    ",
+            documentation: None,
+            parameters: [
+                IntrospectSqlQueryParameterOutput {
+                    documentation: None,
+                    name: "int4",
+                    typ: "MyFancyEnum",
+                    nullable: false,
+                },
+            ],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "id",
+                    typ: "int",
+                    nullable: false,
+                },
+                IntrospectSqlQueryColumnOutput {
+                    name: "enum",
+                    typ: "MyFancyEnum",
+                    nullable: false,
+                },
+            ],
+        }
+    "#]];
+
+    let sql = r#"
+  -- @param  {MyFancyEnum} $1
+    SELECT * FROM model WHERE id = ?;
+    "#;
+
+    api.introspect_sql("test_1", sql).send_sync().expect_result(expected)
+}
+
+#[test_connector(tags(Postgres))]
 fn invalid_position_fails(api: TestApi) {
     api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
