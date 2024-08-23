@@ -362,11 +362,12 @@ impl SchemaConnector for SqlSchemaConnector {
         input: IntrospectSqlQueryInput,
     ) -> BoxFuture<'_, ConnectorResult<IntrospectSqlQueryOutput>> {
         Box::pin(async move {
+            let sanitized_sql = sanitize_sql(&input.source);
             let DescribedQuery {
                 parameters,
                 columns,
                 enum_names,
-            } = self.flavour.describe_query(&sanitize_sql(&input.source)).await?;
+            } = self.flavour.describe_query(&sanitized_sql).await?;
             let enum_names = enum_names.unwrap_or_default();
             let sql_source = input.source.clone();
             let parsed_doc = parse_sql_doc(&sql_source, enum_names.as_slice())?;
@@ -397,7 +398,7 @@ impl SchemaConnector for SqlSchemaConnector {
 
             Ok(IntrospectSqlQueryOutput {
                 name: input.name,
-                source: input.source,
+                source: sanitized_sql,
                 documentation: parsed_doc.description().map(ToOwned::to_owned),
                 parameters,
                 result_columns: columns,

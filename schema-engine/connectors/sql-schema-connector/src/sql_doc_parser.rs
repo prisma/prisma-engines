@@ -1118,7 +1118,7 @@ SELECT enum FROM "test_introspect_sql"."model" WHERE id = $1;"#,
     }
 
     #[test]
-    fn sanitize_sql_test() {
+    fn sanitize_sql_test_1() {
         use expect_test::expect;
 
         let sql = r#"
