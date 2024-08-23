@@ -2,7 +2,7 @@ use super::utils::*;
 use sql_migration_tests::test_api::*;
 
 #[test_connector(tags(Postgres))]
-fn parses_doc_complex(api: TestApi) {
+fn parses_doc_complex_pg(api: TestApi) {
     api.schema_push(SIMPLE_SCHEMA).send().assert_green();
 
     let expected = expect![[r#"
@@ -45,6 +45,55 @@ fn parses_doc_complex(api: TestApi) {
   -- @param  {Int}   $1:myInt some integer
       --   @param   {String}$2:myString?    some   string
     SELECT int FROM model WHERE int = ? and string = ?;
+    "#;
+
+    api.introspect_sql("test_1", sql).send_sync().expect_result(expected)
+}
+
+#[test_connector(tags(Mysql))]
+fn parses_doc_complex_mysql(api: TestApi) {
+    api.schema_push(SIMPLE_SCHEMA).send().assert_green();
+
+    let expected = expect![[r#"
+        IntrospectSqlQueryOutput {
+            name: "test_1",
+            source: "\n       --    @description   some  fancy   query\n  -- @param  {Int}   $1:myInt some integer\n      --   @param   {String}$2:myString?    some   string\n    SELECT `int` FROM `model` WHERE `int` = ? and `string` = ?;\n    ",
+            documentation: Some(
+                "some  fancy   query",
+            ),
+            parameters: [
+                IntrospectSqlQueryParameterOutput {
+                    documentation: Some(
+                        "some integer",
+                    ),
+                    name: "myInt",
+                    typ: "int",
+                    nullable: false,
+                },
+                IntrospectSqlQueryParameterOutput {
+                    documentation: Some(
+                        "some   string",
+                    ),
+                    name: "myString",
+                    typ: "string",
+                    nullable: true,
+                },
+            ],
+            result_columns: [
+                IntrospectSqlQueryColumnOutput {
+                    name: "int",
+                    typ: "int",
+                    nullable: false,
+                },
+            ],
+        }
+    "#]];
+
+    let sql = r#"
+       --    @description   some  fancy   query
+  -- @param  {Int}   $1:myInt some integer
+      --   @param   {String}$2:myString?    some   string
+    SELECT `int` FROM `model` WHERE `int` = ? and `string` = ?;
     "#;
 
     api.introspect_sql("test_1", sql).send_sync().expect_result(expected)
