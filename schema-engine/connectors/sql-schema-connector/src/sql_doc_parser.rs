@@ -347,6 +347,15 @@ pub(crate) fn parse_sql_doc<'a>(sql: &'a str, enum_names: &'a [String]) -> Conne
     Ok(parsed_sql)
 }
 
+/// Mysql-async poorly parses the sql input to support named parameters, which conflicts with our own syntax for overriding query parameters type and nullability.
+/// This function removes all single-line comments from the sql input to avoid conflicts.
+pub(crate) fn sanitize_sql(sql: &str) -> String {
+    sql.lines()
+        .map(|line| line.trim())
+        .filter(|line| !line.starts_with("--"))
+        .join("\n")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1106,5 +1115,30 @@ SELECT enum FROM "test_introspect_sql"."model" WHERE id = $1;"#,
         "#]];
 
         expected.assert_debug_eq(&res);
+    }
+
+    #[test]
+    fn sanitize_sql_test_1() {
+        use expect_test::expect;
+
+        let sql = r#"
+            -- @description This query returns a user by it's id
+            -- @param {Int} $1:userId valid user identifier
+            -- @param {String} $2:parentId valid parent identifier
+            SELECT enum
+                FROM 
+                        "test_introspect_sql"."model" WHERE id =
+                    $1;
+        "#;
+
+        let expected = expect![[r#"
+
+            SELECT enum
+            FROM
+            "test_introspect_sql"."model" WHERE id =
+            $1;
+        "#]];
+
+        expected.assert_eq(&sanitize_sql(sql));
     }
 }
