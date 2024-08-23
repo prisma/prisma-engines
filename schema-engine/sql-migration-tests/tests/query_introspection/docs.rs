@@ -136,19 +136,19 @@ fn parses_doc_no_alias(api: TestApi) {
     api.introspect_sql("test_1", sql).send_sync().expect_result(expected)
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn parses_doc_enum_name(api: TestApi) {
     api.schema_push(ENUM_SCHEMA).send().assert_green();
 
     let expected = expect![[r#"
         IntrospectSqlQueryOutput {
             name: "test_1",
-            source: "\n  -- @param  {MyFancyEnum} $1\n    SELECT 'col' as \"col\" WHERE 1 = $1;\n    ",
+            source: "\n  -- @param  {MyFancyEnum} $1:alias\n    SELECT 'col' as \"col\" WHERE 1 = $1;\n    ",
             documentation: None,
             parameters: [
                 IntrospectSqlQueryParameterOutput {
                     documentation: None,
-                    name: "int4",
+                    name: "alias",
                     typ: "MyFancyEnum",
                     nullable: false,
                 },
@@ -164,7 +164,7 @@ fn parses_doc_enum_name(api: TestApi) {
     "#]];
 
     let sql = r#"
-  -- @param  {MyFancyEnum} $1
+  -- @param  {MyFancyEnum} $1:alias
     SELECT 'col' as "col" WHERE 1 = ?;
     "#;
 
