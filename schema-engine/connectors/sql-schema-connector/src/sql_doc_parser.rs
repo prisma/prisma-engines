@@ -128,6 +128,10 @@ impl<'a> Input<'a> {
         self.0.strip_suffix(pat).map(Self)
     }
 
+    fn strip_suffix_str(&self, pat: &str) -> Option<Self> {
+        self.0.strip_suffix(pat).map(Self)
+    }
+
     fn starts_with(&self, pat: &str) -> bool {
         self.0.starts_with(pat)
     }
@@ -199,35 +203,37 @@ fn parse_typ_opt<'a>(
     input: Input<'a>,
     enum_names: &'a [String],
 ) -> ConnectorResult<(Input<'a>, Option<ParsedParamType<'a>>)> {
+    fn list_accepted_types(enum_names: &[String]) -> String {
+        format!(
+            "'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal'{}",
+            render_enum_names(enum_names)
+        )
+    }
+
     if let Some(start) = input.find(&['{']) {
         if let Some(end) = input.find(&['}']) {
             let typ = input.move_between(start + 1, end);
 
             if typ.is_empty() {
-                return Err(build_error(input, "missing type (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal')"));
+                return Err(build_error(
+                    input,
+                    &format!("missing type (accepted types are: {})", list_accepted_types(enum_names)),
+                ));
             }
 
-            let parsed_typ = ScalarType::try_from_str(typ.inner(), false)
-                .map(|st| match st {
-                    ScalarType::Int => ColumnType::Int32,
-                    ScalarType::BigInt => ColumnType::Int64,
-                    ScalarType::Float => ColumnType::Float,
-                    ScalarType::Boolean => ColumnType::Boolean,
-                    ScalarType::String => ColumnType::Text,
-                    ScalarType::DateTime => ColumnType::DateTime,
-                    ScalarType::Json => ColumnType::Json,
-                    ScalarType::Bytes => ColumnType::Bytes,
-                    ScalarType::Decimal => ColumnType::Numeric,
-                })
-                .map(ParsedParamType::ColumnType)
-                .or_else(|| {
-                    enum_names.iter().any(|enum_name| *enum_name == typ.inner())
-                        .then(|| ParsedParamType::Enum(typ.inner()))
-                })
-                .ok_or_else(|| build_error(
-                    input,
-                    &format!("invalid type: '{typ}' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal'{})", render_enum_names(enum_names)),
-                ))?;
+            let parsed_typ = typ
+                .strip_suffix_str("[]")
+                .and_then(|typ| parse_typ_name(typ, true, enum_names))
+                .or_else(|| parse_typ_name(typ, false, enum_names))
+                .ok_or_else(|| {
+                    build_error(
+                        input,
+                        &format!(
+                            "invalid type: '{typ}' (accepted types are: {})",
+                            list_accepted_types(enum_names)
+                        ),
+                    )
+                })?;
 
             Ok((input.move_from(end + 1), Some(parsed_typ)))
         } else {
@@ -236,6 +242,38 @@ fn parse_typ_opt<'a>(
     } else {
         Ok((input, None))
     }
+}
+
+fn parse_typ_name<'a>(typ: Input<'a>, list: bool, enum_names: &[String]) -> Option<ParsedParamType<'a>> {
+    ScalarType::try_from_str(typ.inner(), false)
+        .map(|st| match (st, list) {
+            (ScalarType::Int, false) => ColumnType::Int32,
+            (ScalarType::BigInt, false) => ColumnType::Int64,
+            (ScalarType::Float, false) => ColumnType::Float,
+            (ScalarType::Boolean, false) => ColumnType::Boolean,
+            (ScalarType::String, false) => ColumnType::Text,
+            (ScalarType::DateTime, false) => ColumnType::DateTime,
+            (ScalarType::Json, false) => ColumnType::Json,
+            (ScalarType::Bytes, false) => ColumnType::Bytes,
+            (ScalarType::Decimal, false) => ColumnType::Numeric,
+
+            (ScalarType::Int, true) => ColumnType::Int32Array,
+            (ScalarType::BigInt, true) => ColumnType::Int64Array,
+            (ScalarType::Float, true) => ColumnType::FloatArray,
+            (ScalarType::Boolean, true) => ColumnType::BooleanArray,
+            (ScalarType::String, true) => ColumnType::TextArray,
+            (ScalarType::DateTime, true) => ColumnType::DateTimeArray,
+            (ScalarType::Json, true) => ColumnType::JsonArray,
+            (ScalarType::Bytes, true) => ColumnType::BytesArray,
+            (ScalarType::Decimal, true) => ColumnType::NumericArray,
+        })
+        .map(ParsedParamType::ColumnType)
+        .or_else(|| {
+            enum_names
+                .iter()
+                .any(|enum_name| *enum_name == typ.inner())
+                .then(|| ParsedParamType::Enum(typ.inner()))
+        })
 }
 
 fn parse_position_opt(input: Input<'_>) -> ConnectorResult<(Input<'_>, Option<usize>)> {
@@ -919,6 +957,57 @@ mod tests {
                     context: SpanTrace [],
                 }
                 SQL documentation parsing: invalid type: 'UnknownTyp' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal', 'MyEnum', 'MyEnum2') at '{UnknownTyp} $12567:alias'.
+                ,
+            )
+        "#]];
+
+        expected.assert_debug_eq(&res);
+    }
+
+    #[test]
+    fn parse_param_22() {
+        use expect_test::expect;
+
+        let res = parse_param(Input("@param {Int[]} $12"), &[]);
+
+        let expected = expect![[r#"
+            Ok(
+                ParsedParameterDoc {
+                    alias: None,
+                    typ: Some(
+                        ColumnType(
+                            Int32Array,
+                        ),
+                    ),
+                    nullable: None,
+                    position: Some(
+                        12,
+                    ),
+                    documentation: None,
+                },
+            )
+        "#]];
+
+        expected.assert_debug_eq(&res);
+    }
+
+    #[test]
+    fn parse_param_23() {
+        use expect_test::expect;
+
+        let res = parse_param(Input("@param {Unknown[]} $12"), &[]);
+
+        let expected = expect![[r#"
+            Err(
+                ConnectorErrorImpl {
+                    user_facing_error: None,
+                    message: Some(
+                        "SQL documentation parsing: invalid type: 'Unknown[]' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal') at '{Unknown[]} $12'.",
+                    ),
+                    source: None,
+                    context: SpanTrace [],
+                }
+                SQL documentation parsing: invalid type: 'Unknown[]' (accepted types are: 'Int', 'BigInt', 'Float', 'Boolean', 'String', 'DateTime', 'Json', 'Bytes', 'Decimal') at '{Unknown[]} $12'.
                 ,
             )
         "#]];
