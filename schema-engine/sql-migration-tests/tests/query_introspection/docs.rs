@@ -143,7 +143,7 @@ fn parses_doc_enum_name(api: TestApi) {
     let expected = expect![[r#"
         IntrospectSqlQueryOutput {
             name: "test_1",
-            source: "\n  -- @param  {MyFancyEnum} $1\n    SELECT 1 as \"col\" WHERE 1 = $1;\n    ",
+            source: "\n  -- @param  {MyFancyEnum} $1\n    SELECT 'col' as \"col\" WHERE 1 = $1;\n    ",
             documentation: None,
             parameters: [
                 IntrospectSqlQueryParameterOutput {
@@ -156,7 +156,7 @@ fn parses_doc_enum_name(api: TestApi) {
             result_columns: [
                 IntrospectSqlQueryColumnOutput {
                     name: "col",
-                    typ: "int",
+                    typ: "string",
                     nullable: true,
                 },
             ],
@@ -165,7 +165,7 @@ fn parses_doc_enum_name(api: TestApi) {
 
     let sql = r#"
   -- @param  {MyFancyEnum} $1
-    SELECT 1 as "col" WHERE 1 = ?;
+    SELECT 'col' as "col" WHERE 1 = ?;
     "#;
 
     api.introspect_sql("test_1", sql).send_sync().expect_result(expected)
