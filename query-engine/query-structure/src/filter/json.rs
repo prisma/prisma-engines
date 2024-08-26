@@ -7,12 +7,6 @@ pub enum JsonTargetType {
     Array,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Case {
-    Sensitive,
-    Insensitive,
-}
-
 #[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub enum JsonFilterPath {
     String(String),
@@ -20,13 +14,7 @@ pub enum JsonFilterPath {
 }
 
 impl JsonCompare for ScalarFieldRef {
-    fn json_contains<T>(
-        &self,
-        value: T,
-        path: Option<JsonFilterPath>,
-        target_type: JsonTargetType,
-        case: Case,
-    ) -> Filter
+    fn json_contains<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
         T: Into<ConditionValue>,
     {
@@ -35,20 +23,13 @@ impl JsonCompare for ScalarFieldRef {
                 condition: Box::new(ScalarCondition::Contains(value.into())),
                 path,
                 target_type: Some(target_type),
-                case,
             }),
             projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
 
-    fn json_not_contains<T>(
-        &self,
-        value: T,
-        path: Option<JsonFilterPath>,
-        target_type: JsonTargetType,
-        case: Case,
-    ) -> Filter
+    fn json_not_contains<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
         T: Into<ConditionValue>,
     {
@@ -57,20 +38,13 @@ impl JsonCompare for ScalarFieldRef {
                 condition: Box::new(ScalarCondition::NotContains(value.into())),
                 path,
                 target_type: Some(target_type),
-                case,
             }),
             projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
 
-    fn json_starts_with<T>(
-        &self,
-        value: T,
-        path: Option<JsonFilterPath>,
-        target_type: JsonTargetType,
-        case: Case,
-    ) -> Filter
+    fn json_starts_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
         T: Into<ConditionValue>,
     {
@@ -79,20 +53,13 @@ impl JsonCompare for ScalarFieldRef {
                 condition: Box::new(ScalarCondition::StartsWith(value.into())),
                 path,
                 target_type: Some(target_type),
-                case,
             }),
             projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
 
-    fn json_not_starts_with<T>(
-        &self,
-        value: T,
-        path: Option<JsonFilterPath>,
-        target_type: JsonTargetType,
-        case: Case,
-    ) -> Filter
+    fn json_not_starts_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
         T: Into<ConditionValue>,
     {
@@ -101,20 +68,13 @@ impl JsonCompare for ScalarFieldRef {
                 condition: Box::new(ScalarCondition::NotStartsWith(value.into())),
                 path,
                 target_type: Some(target_type),
-                case,
             }),
             projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
 
-    fn json_ends_with<T>(
-        &self,
-        value: T,
-        path: Option<JsonFilterPath>,
-        target_type: JsonTargetType,
-        case: Case,
-    ) -> Filter
+    fn json_ends_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
         T: Into<ConditionValue>,
     {
@@ -123,20 +83,13 @@ impl JsonCompare for ScalarFieldRef {
                 condition: Box::new(ScalarCondition::EndsWith(value.into())),
                 path,
                 target_type: Some(target_type),
-                case,
             }),
             projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
 
-    fn json_not_ends_with<T>(
-        &self,
-        value: T,
-        path: Option<JsonFilterPath>,
-        target_type: JsonTargetType,
-        case: Case,
-    ) -> Filter
+    fn json_not_ends_with<T>(&self, value: T, path: Option<JsonFilterPath>, target_type: JsonTargetType) -> Filter
     where
         T: Into<ConditionValue>,
     {
@@ -145,14 +98,13 @@ impl JsonCompare for ScalarFieldRef {
                 condition: Box::new(ScalarCondition::NotEndsWith(value.into())),
                 path,
                 target_type: Some(target_type),
-                case,
             }),
             projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
 
-    fn json_equals<T>(&self, value: T, path: Option<JsonFilterPath>, case: Case) -> Filter
+    fn json_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
     where
         T: Into<ConditionValue>,
     {
@@ -161,14 +113,13 @@ impl JsonCompare for ScalarFieldRef {
                 condition: Box::new(ScalarCondition::Equals(value.into())),
                 path,
                 target_type: None,
-                case,
             }),
             projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
         })
     }
 
-    fn json_not_equals<T>(&self, value: T, path: Option<JsonFilterPath>, case: Case) -> Filter
+    fn json_not_equals<T>(&self, value: T, path: Option<JsonFilterPath>) -> Filter
     where
         T: Into<ConditionValue>,
     {
@@ -177,7 +128,6 @@ impl JsonCompare for ScalarFieldRef {
                 condition: Box::new(ScalarCondition::NotEquals(value.into())),
                 path,
                 target_type: None,
-                case,
             }),
             projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
@@ -193,7 +143,6 @@ impl JsonCompare for ScalarFieldRef {
                 condition: Box::new(ScalarCondition::LessThan(value.into())),
                 path,
                 target_type: None,
-                case: Case::Sensitive,
             }),
             projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
@@ -209,7 +158,6 @@ impl JsonCompare for ScalarFieldRef {
                 condition: Box::new(ScalarCondition::LessThanOrEquals(value.into())),
                 path,
                 target_type: None,
-                case: Case::Sensitive,
             }),
             projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
@@ -225,7 +173,6 @@ impl JsonCompare for ScalarFieldRef {
                 condition: Box::new(ScalarCondition::GreaterThan(value.into())),
                 path,
                 target_type: None,
-                case: Case::Sensitive,
             }),
             projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
@@ -241,7 +188,6 @@ impl JsonCompare for ScalarFieldRef {
                 condition: Box::new(ScalarCondition::GreaterThanOrEquals(value.into())),
                 path,
                 target_type: None,
-                case: Case::Sensitive,
             }),
             projection: ScalarProjection::Single(self.clone()),
             mode: QueryMode::Default,
