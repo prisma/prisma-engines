@@ -1261,13 +1261,6 @@ trait JsonFilterExt {
     ) -> Expression<'static>;
 }
 
-// TODO: case type
-// #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-// pub enum Case {
-//     Sensitive,
-//     Insensitive,
-// }
-
 impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
     fn json_contains(
         self,
