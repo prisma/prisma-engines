@@ -69,6 +69,7 @@ jobs:
           (
             github.event.pull_request.author_association == 'OWNER' ||
             github.event.pull_request.author_association == 'MEMBER' ||
+            github.event.pull_request.author_association == 'CONTRIBUTOR' ||
             github.event.pull_request.author_association == 'COLLABORATOR'
           )
         run: |
