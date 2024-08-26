@@ -1,5 +1,5 @@
 use crate::introspection::test_api::*;
-use mongodb::bson::doc;
+use bson::doc;
 
 // Composite types
 // reintrospect_removed_model_single_file
@@ -677,22 +677,19 @@ fn reintrospect_empty_multi_file() {
 
 async fn seed_model(name: &str, api: &TestApi) -> Result<(), mongodb::error::Error> {
     let db = &api.db;
-    db.create_collection(name, None).await?;
+    db.create_collection(name).await?;
     let collection = db.collection(name);
-    collection.insert_many(vec![doc! {"name": "John"}], None).await.unwrap();
+    collection.insert_many(vec![doc! {"name": "John"}]).await.unwrap();
 
     Ok(())
 }
 
 async fn seed_composite(name: &str, api: &TestApi) -> Result<(), mongodb::error::Error> {
     let db = &api.db;
-    db.create_collection(name, None).await?;
+    db.create_collection(name).await?;
     let collection = db.collection(name);
     collection
-        .insert_many(
-            vec![doc! {"identity": { "firstName": "John", "lastName": "Doe" }}],
-            None,
-        )
+        .insert_many(vec![doc! {"identity": { "firstName": "John", "lastName": "Doe" }}])
         .await
         .unwrap();
 

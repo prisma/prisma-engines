@@ -6,7 +6,7 @@ use super::conversion;
 use crate::send_future::UnsafeFuture;
 use async_trait::async_trait;
 use futures::Future;
-use quaint::connector::{ExternalConnectionInfo, ExternalConnector, ParsedRawQuery};
+use quaint::connector::{DescribedQuery, ExternalConnectionInfo, ExternalConnector};
 use quaint::{
     connector::{metrics, IsolationLevel, Transaction},
     error::{Error, ErrorKind},
@@ -94,8 +94,8 @@ impl QuaintQueryable for JsBaseQueryable {
         self.query_raw(sql, params).await
     }
 
-    async fn parse_raw_query(&self, sql: &str) -> quaint::Result<ParsedRawQuery> {
-        self.parse_raw_query(sql).await
+    async fn describe_query(&self, sql: &str) -> quaint::Result<DescribedQuery> {
+        self.describe_query(sql).await
     }
 
     async fn execute(&self, q: QuaintQuery<'_>) -> quaint::Result<u64> {
@@ -264,8 +264,8 @@ impl QuaintQueryable for JsQueryable {
         self.inner.query_raw_typed(sql, params).await
     }
 
-    async fn parse_raw_query(&self, sql: &str) -> quaint::Result<ParsedRawQuery> {
-        self.inner.parse_raw_query(sql).await
+    async fn describe_query(&self, sql: &str) -> quaint::Result<DescribedQuery> {
+        self.inner.describe_query(sql).await
     }
 
     async fn execute(&self, q: QuaintQuery<'_>) -> quaint::Result<u64> {

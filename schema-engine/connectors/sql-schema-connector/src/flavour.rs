@@ -175,10 +175,10 @@ pub(crate) trait SqlFlavour:
         self.describe_schema(namespaces)
     }
 
-    fn parse_raw_query<'a>(
+    fn describe_query<'a>(
         &'a mut self,
         sql: &'a str,
-    ) -> BoxFuture<'a, ConnectorResult<quaint::connector::ParsedRawQuery>>;
+    ) -> BoxFuture<'a, ConnectorResult<quaint::connector::DescribedQuery>>;
 
     fn load_migrations_table(
         &mut self,
