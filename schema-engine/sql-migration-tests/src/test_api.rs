@@ -166,29 +166,51 @@ impl TestApi {
         IntrospectSql::new(&mut self.connector, name, sanitized)
     }
 
+    // Replaces `?` with the appropriate positional parameter syntax for the current database.
     pub fn sanitize_sql(&self, sql: &str) -> String {
         let mut counter = 1;
-        let mut sql = sql.to_string();
 
         if self.is_mysql() || self.is_mariadb() || self.is_sqlite() {
-            return sql;
+            return sql.to_string();
         }
 
-        while let Some(idx) = sql.find('?') {
-            let replacer = if self.is_postgres() || self.is_cockroach() {
-                format!("${}", counter)
-            } else if self.is_mssql() {
-                format!("@P{}", counter)
+        let mut out = String::with_capacity(sql.len());
+        let mut lines = sql.lines().peekable();
+
+        while let Some(line) = lines.next() {
+            // Avoid replacing query params in comments
+            if line.trim_start().starts_with("--") {
+                out.push_str(line);
+
+                if lines.peek().is_some() {
+                    out.push('\n');
+                }
             } else {
-                unimplemented!()
-            };
+                let mut line = line.to_string();
 
-            sql.replace_range(idx..idx + 1, &replacer);
+                while let Some(idx) = line.find('?') {
+                    let replacer = if self.is_postgres() || self.is_cockroach() {
+                        format!("${}", counter)
+                    } else if self.is_mssql() {
+                        format!("@P{}", counter)
+                    } else {
+                        unimplemented!()
+                    };
 
-            counter += 1;
+                    line.replace_range(idx..idx + 1, &replacer);
+
+                    counter += 1;
+                }
+
+                out.push_str(&line);
+
+                if lines.peek().is_some() {
+                    out.push('\n');
+                }
+            }
         }
 
-        sql
+        out
     }
 
     /// Returns true only when testing on MSSQL.

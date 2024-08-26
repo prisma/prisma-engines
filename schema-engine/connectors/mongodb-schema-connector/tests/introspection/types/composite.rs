@@ -1,5 +1,5 @@
 use crate::introspection::test_api::*;
-use mongodb::bson::{doc, oid::ObjectId, Bson};
+use bson::{doc, oid::ObjectId, Bson};
 use schema_connector::CompositeTypeDepth;
 
 #[test]
@@ -10,7 +10,7 @@ fn singular() {
             doc! { "name": "Naukio", "address": { "street": "Meowstrasse", "number": 123, "knock": true }},
         ];
 
-        db.collection("Cat").insert_many(docs, None).await?;
+        db.collection("Cat").insert_many(docs).await?;
 
         Ok(())
     });
@@ -41,7 +41,7 @@ fn dirty_data() {
             doc! { "name": "Bob", "address": { "street": "Kantstrasse", "number": "123" }},
         ];
 
-        db.collection("Cat").insert_many(docs, None).await?;
+        db.collection("Cat").insert_many(docs).await?;
 
         Ok(())
     });
@@ -80,7 +80,7 @@ fn array() {
             { "title": "Hello, world!", "content": "Like, whatever...", "published": true },
         ]}];
 
-        db.collection("Blog").insert_many(docs, None).await?;
+        db.collection("Blog").insert_many(docs).await?;
 
         Ok(())
     });
@@ -110,7 +110,7 @@ fn deep_array() {
             [{ "title": "Hello, world!", "content": "Like, whatever...", "published": true }],
         ]}];
 
-        db.collection("Blog").insert_many(docs, None).await?;
+        db.collection("Blog").insert_many(docs).await?;
 
         Ok(())
     });
@@ -137,7 +137,7 @@ fn nullability() {
             doc! {"first": {"foo": 1}, "second": {"foo": 1}},
         ];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         Ok(())
     });
@@ -173,7 +173,7 @@ fn unsupported() {
             vec![doc! { "dataType": "Code", "data": { "code": Bson::JavaScriptCode("let a = 1 + 1;".to_string()) }}];
 
         db.collection("FrontendEngineerWritesBackendCode")
-            .insert_many(docs, None)
+            .insert_many(docs)
             .await?;
 
         Ok(())
@@ -198,7 +198,7 @@ fn unsupported() {
 fn underscores_in_names() {
     let res = introspect(|db| async move {
         let docs = vec![doc! { "name": "Musti", "home_address": { "street": "Meowstrasse", "number": 123 }}];
-        db.collection("Cat").insert_many(docs, None).await?;
+        db.collection("Cat").insert_many(docs).await?;
         Ok(())
     });
 
@@ -222,7 +222,7 @@ fn underscores_in_names() {
 fn depth_none() {
     let res = introspect_depth(CompositeTypeDepth::None, |db| async move {
         let docs = vec![doc! { "name": "Musti", "home_address": { "street": "Meowstrasse", "number": 123 }}];
-        db.collection("Cat").insert_many(docs, None).await?;
+        db.collection("Cat").insert_many(docs).await?;
         Ok(())
     });
 
@@ -241,7 +241,7 @@ fn depth_none() {
 fn depth_none_level_1_array() {
     let res = introspect_depth(CompositeTypeDepth::None, |db| async move {
         let docs = vec![doc! { "name": "Musti", "home_address": [{ "street": "Meowstrasse", "number": 123 }]}];
-        db.collection("Cat").insert_many(docs, None).await?;
+        db.collection("Cat").insert_many(docs).await?;
         Ok(())
     });
 
@@ -260,7 +260,7 @@ fn depth_none_level_1_array() {
 fn depth_1_level_1() {
     let res = introspect_depth(CompositeTypeDepth::Level(1), |db| async move {
         let docs = vec![doc! { "name": "Musti", "home_address": { "street": "Meowstrasse", "number": 123 }}];
-        db.collection("Cat").insert_many(docs, None).await?;
+        db.collection("Cat").insert_many(docs).await?;
         Ok(())
     });
 
@@ -286,7 +286,7 @@ fn depth_1_level_2() {
         let docs = vec![
             doc! { "name": "Musti", "home_address": { "street": "Meowstrasse", "number": 123, "data": { "something": "other" } } },
         ];
-        db.collection("Cat").insert_many(docs, None).await?;
+        db.collection("Cat").insert_many(docs).await?;
         Ok(())
     });
 
@@ -313,7 +313,7 @@ fn depth_1_level_2_array() {
         let docs = vec![
             doc! { "name": "Musti", "home_address": [{ "street": "Meowstrasse", "number": 123, "data": [{ "something": "other" }] }] },
         ];
-        db.collection("Cat").insert_many(docs, None).await?;
+        db.collection("Cat").insert_many(docs).await?;
         Ok(())
     });
 
@@ -340,7 +340,7 @@ fn depth_2_level_2_array() {
         let docs = vec![
             doc! { "name": "Musti", "home_address": [{ "street": "Meowstrasse", "number": 123, "data": [{ "something": "other" }] }] },
         ];
-        db.collection("Cat").insert_many(docs, None).await?;
+        db.collection("Cat").insert_many(docs).await?;
         Ok(())
     });
 
@@ -369,10 +369,10 @@ fn depth_2_level_2_array() {
 fn name_clashes() {
     let res = introspect(|db| async move {
         let docs = vec![doc! { "name": "Musti", "address": { "street": "Meowstrasse", "number": 123 }}];
-        db.collection("Cat").insert_many(docs, None).await?;
+        db.collection("Cat").insert_many(docs).await?;
 
         let docs = vec![doc! { "knock": false, "number": 420, "street": "Meowstrasse" }];
-        db.collection("CatAddress").insert_many(docs, None).await?;
+        db.collection("CatAddress").insert_many(docs).await?;
 
         Ok(())
     });
@@ -407,7 +407,7 @@ fn non_id_object_ids() {
             doc! { "non_id_object_id": Bson::ObjectId(ObjectId::new()), "data": {"non_id_object_id": Bson::ObjectId(ObjectId::new())}},
         ];
 
-        db.collection("Test").insert_many(docs, None).await?;
+        db.collection("Test").insert_many(docs).await?;
 
         Ok(())
     });
@@ -432,7 +432,7 @@ fn fields_named_id_in_composite() {
     let res = introspect(|db| async move {
         let docs = vec![doc! {"id": "test","data": {"id": "test"}, "data2": {"_id": "test", "id": "test"}}];
 
-        db.collection("Test").insert_many(docs, None).await?;
+        db.collection("Test").insert_many(docs).await?;
 
         Ok(())
     });
@@ -463,7 +463,7 @@ fn do_not_create_empty_types() {
     let res = introspect(|db| async move {
         let docs = vec![doc! { "data": {} }, doc! {}];
 
-        db.collection("Test").insert_many(docs, None).await?;
+        db.collection("Test").insert_many(docs).await?;
 
         Ok(())
     });
@@ -492,7 +492,7 @@ fn do_not_create_empty_types() {
 fn do_not_spam_empty_type_warnings() {
     let res = introspect(|db| async move {
         let docs = vec![doc! { "data": {} }, doc! {}, doc! { "data": {} }, doc! { "data": {} }];
-        db.collection("Test").insert_many(docs, None).await?;
+        db.collection("Test").insert_many(docs).await?;
 
         Ok(())
     });
@@ -522,7 +522,7 @@ fn do_not_create_empty_types_in_types() {
     let res = introspect(|db| async move {
         let docs = vec![doc! { "tost": { "data": {} } }];
 
-        db.collection("Test").insert_many(docs, None).await?;
+        db.collection("Test").insert_many(docs).await?;
 
         Ok(())
     });
@@ -557,7 +557,7 @@ fn no_empty_type_warnings_when_depth_is_reached() {
     let res = introspect_depth(depth, |db| async move {
         let docs = vec![doc! { "data": {} }, doc! {}];
 
-        db.collection("Test").insert_many(docs, None).await?;
+        db.collection("Test").insert_many(docs).await?;
 
         Ok(())
     });
@@ -584,7 +584,7 @@ fn kanji() {
             doc! { "name": "Naukio", "推荐点RichText": { "street": "Meowstrasse", "number": 123, "knock": true }},
         ];
 
-        db.collection("TheCollectionName").insert_many(docs, None).await?;
+        db.collection("TheCollectionName").insert_many(docs).await?;
 
         Ok(())
     });

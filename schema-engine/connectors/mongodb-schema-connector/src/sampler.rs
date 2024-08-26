@@ -49,7 +49,8 @@ pub(super) async fn sample(
 
         let mut documents = database
             .collection::<Document>(collection.name())
-            .aggregate(vec![doc! { "$sample": { "size": SAMPLE_SIZE } }], Some(options))
+            .aggregate(vec![doc! { "$sample": { "size": SAMPLE_SIZE } }])
+            .with_options(options)
             .await?;
 
         while let Some(document) = documents.try_next().await? {

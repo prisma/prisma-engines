@@ -62,10 +62,18 @@ impl ResultRow {
         }
     }
 
-    /// Take a value with the given column name from the row. Usage
+    /// Get a value with the given column name from the row. Usage
     /// documentation in [ResultRowRef](struct.ResultRowRef.html).
     pub fn get(&self, name: &str) -> Option<&Value<'static>> {
         self.columns.iter().position(|c| c == name).map(|idx| &self.values[idx])
+    }
+
+    /// Take a value with the given column name from the row.
+    pub fn take(mut self, name: &str) -> Option<Value<'static>> {
+        self.columns
+            .iter()
+            .position(|c| c == name)
+            .map(|idx| self.values.remove(idx))
     }
 
     /// Make a referring [ResultRowRef](struct.ResultRowRef.html).

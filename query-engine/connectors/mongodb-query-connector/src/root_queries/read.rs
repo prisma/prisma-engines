@@ -5,6 +5,7 @@ use crate::{
 };
 use mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
 use query_structure::*;
+use std::future::IntoFuture;
 use tracing::{info_span, Instrument};
 
 /// Finds a single record. Joins are not required at the moment because the selector is always a unique one.
@@ -126,7 +127,10 @@ pub async fn get_related_m2m_record_ids<'conn>(
     let find_options = FindOptions::builder().projection(projection.clone()).build();
 
     let cursor = observing(&query_string_builder, || {
-        coll.find_with_session(filter.clone(), Some(find_options), session)
+        coll.find(filter.clone())
+            .with_options(find_options)
+            .session(&mut *session)
+            .into_future()
     })
     .await?;
     let docs = vacuum_cursor(cursor, session).await?;

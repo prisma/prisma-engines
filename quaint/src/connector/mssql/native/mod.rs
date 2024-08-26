@@ -6,7 +6,7 @@ mod conversion;
 mod error;
 
 pub(crate) use crate::connector::mssql::MssqlUrl;
-use crate::connector::{timeout, IsolationLevel, ParsedRawQuery, Transaction, TransactionOptions};
+use crate::connector::{timeout, DescribedQuery, IsolationLevel, Transaction, TransactionOptions};
 
 use crate::{
     ast::{Query, Value},
@@ -183,8 +183,8 @@ impl Queryable for Mssql {
         self.query_raw(sql, params).await
     }
 
-    async fn parse_raw_query(&self, _sql: &str) -> crate::Result<ParsedRawQuery> {
-        unimplemented!("SQL Server support for raw query parsing is not implemented yet.")
+    async fn describe_query(&self, _sql: &str) -> crate::Result<DescribedQuery> {
+        unimplemented!("SQL Server does not support describe_query yet.")
     }
 
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {

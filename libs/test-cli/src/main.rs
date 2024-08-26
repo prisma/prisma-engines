@@ -212,7 +212,6 @@ async fn main() -> anyhow::Result<()> {
                         .first_datasource()
                         .load_url(|key| std::env::var(key).ok())
                         .unwrap(),
-                    force: false,
                     queries: vec![SqlQueryInput {
                         name: "query".to_string(),
                         source: query_str,

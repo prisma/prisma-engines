@@ -15,9 +15,6 @@ shape = "string"
 shape = "sqlQueryInput"
 isList = true
 
-[recordShapes.introspectSqlParams.fields.force]
-shape = "bool"
-
 # Result
 
 [recordShapes.introspectSqlResult]
@@ -58,10 +55,14 @@ shape = "string"
 [recordShapes.sqlQueryParameterOutput.fields.documentation]
 isNullable = true
 shape = "string"
+[recordShapes.sqlQueryParameterOutput.fields.nullable]
+shape = "bool"
 
 [recordShapes.sqlQueryColumnOutput]
 [recordShapes.sqlQueryColumnOutput.fields.name]
 shape = "string"
 [recordShapes.sqlQueryColumnOutput.fields.typ]
 shape = "string"
+[recordShapes.sqlQueryColumnOutput.fields.nullable]
+shape = "bool"
 

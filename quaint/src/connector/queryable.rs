@@ -1,4 +1,4 @@
-use super::{IsolationLevel, ParsedRawQuery, ResultSet, Transaction};
+use super::{DescribedQuery, IsolationLevel, ResultSet, Transaction};
 use crate::ast::*;
 use async_trait::async_trait;
 
@@ -58,7 +58,7 @@ pub trait Queryable: Send + Sync {
     async fn version(&self) -> crate::Result<Option<String>>;
 
     /// Prepares a statement and returns type information.
-    async fn parse_raw_query(&self, sql: &str) -> crate::Result<ParsedRawQuery>;
+    async fn describe_query(&self, sql: &str) -> crate::Result<DescribedQuery>;
 
     /// Returns false, if connection is considered to not be in a working state.
     fn is_healthy(&self) -> bool;

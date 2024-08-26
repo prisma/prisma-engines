@@ -3,26 +3,34 @@ use std::borrow::Cow;
 use super::ColumnType;
 
 #[derive(Debug)]
-pub struct ParsedRawQuery {
-    pub parameters: Vec<ParsedRawParameter>,
-    pub columns: Vec<ParsedRawColumn>,
+pub struct DescribedQuery {
+    pub parameters: Vec<DescribedParameter>,
+    pub columns: Vec<DescribedColumn>,
+    pub enum_names: Option<Vec<String>>,
+}
+
+impl DescribedQuery {
+    pub fn param_enum_names(&self) -> Vec<&str> {
+        self.parameters.iter().filter_map(|p| p.enum_name.as_deref()).collect()
+    }
 }
 
 #[derive(Debug)]
-pub struct ParsedRawParameter {
+pub struct DescribedParameter {
     pub name: String,
     pub typ: ColumnType,
     pub enum_name: Option<String>,
 }
 
 #[derive(Debug)]
-pub struct ParsedRawColumn {
+pub struct DescribedColumn {
     pub name: String,
     pub typ: ColumnType,
+    pub nullable: bool,
     pub enum_name: Option<String>,
 }
 
-impl ParsedRawParameter {
+impl DescribedParameter {
     pub fn new_named<'a>(name: impl Into<Cow<'a, str>>, typ: impl Into<ColumnType>) -> Self {
         let name: Cow<'_, str> = name.into();
 
@@ -52,7 +60,7 @@ impl ParsedRawParameter {
     }
 }
 
-impl ParsedRawColumn {
+impl DescribedColumn {
     pub fn new_named<'a>(name: impl Into<Cow<'a, str>>, typ: impl Into<ColumnType>) -> Self {
         let name: Cow<'_, str> = name.into();
 
@@ -60,6 +68,7 @@ impl ParsedRawColumn {
             name: name.into_owned(),
             typ: typ.into(),
             enum_name: None,
+            nullable: false,
         }
     }
 
@@ -68,11 +77,17 @@ impl ParsedRawColumn {
             name: format!("_{idx}"),
             typ: typ.into(),
             enum_name: None,
+            nullable: false,
         }
     }
 
     pub fn with_enum_name(mut self, enum_name: Option<String>) -> Self {
         self.enum_name = enum_name;
+        self
+    }
+
+    pub fn is_nullable(mut self, nullable: bool) -> Self {
+        self.nullable = nullable;
         self
     }
 }
