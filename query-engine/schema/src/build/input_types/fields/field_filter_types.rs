@@ -443,16 +443,14 @@ fn json_filters(ctx: &'_ QuerySchema) -> impl Iterator<Item = InputField<'_>> {
     };
     let string_with_field_ref_input = InputType::string().with_field_ref_input();
     let json_with_field_ref_input = InputType::json().with_field_ref_input();
-    let case_enum_type = InputType::enum_type(case_enum()).with_field_ref_input();
+    let mode_enum_type = InputType::enum_type(query_mode_enum()).with_field_ref_input();
 
     let mut base = vec![
         simple_input_field(filters::PATH, path_type, None).optional(),
         input_field(
-            filters::CASE,
-            case_enum_type,
-            Some(DefaultKind::Single(PrismaValue::Enum(
-                filters::CASE_SENSITIVE.to_owned(),
-            ))),
+            filters::MODE,
+            mode_enum_type,
+            Some(DefaultKind::Single(PrismaValue::Enum(filters::DEFAULT.to_owned()))),
         )
         .optional(),
         input_field(filters::STRING_CONTAINS, string_with_field_ref_input.clone(), None).optional(),

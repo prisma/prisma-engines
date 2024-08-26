@@ -709,7 +709,6 @@ fn convert_json_filter(
         path,
         condition,
         target_type,
-        case,
     } = json_condition;
     let (expr_json, expr_string): (Expression, Expression) = match path {
         Some(JsonFilterPath::String(path)) => (
@@ -725,13 +724,19 @@ fn convert_json_filter(
 
     let condition: Expression = match *condition {
         ScalarCondition::Contains(value) => {
-            (expr_json, expr_string).json_contains(field, value, target_type.unwrap(), case, reverse, alias, ctx)
+            (expr_json, expr_string).json_contains(field, value, target_type.unwrap(), query_mode, reverse, alias, ctx)
         }
-        ScalarCondition::StartsWith(value) => {
-            (expr_json, expr_string).json_starts_with(field, value, target_type.unwrap(), case, reverse, alias, ctx)
-        }
+        ScalarCondition::StartsWith(value) => (expr_json, expr_string).json_starts_with(
+            field,
+            value,
+            target_type.unwrap(),
+            query_mode,
+            reverse,
+            alias,
+            ctx,
+        ),
         ScalarCondition::EndsWith(value) => {
-            (expr_json, expr_string).json_ends_with(field, value, target_type.unwrap(), case, reverse, alias, ctx)
+            (expr_json, expr_string).json_ends_with(field, value, target_type.unwrap(), query_mode, reverse, alias, ctx)
         }
         ScalarCondition::GreaterThan(value) => {
             let gt = expr_json
@@ -1227,7 +1232,7 @@ trait JsonFilterExt {
         field: &ScalarFieldRef,
         value: ConditionValue,
         target_type: JsonTargetType,
-        case: Case,
+        query_mode: QueryMode,
         reverse: bool,
         alias: Option<Alias>,
         ctx: &Context<'_>,
@@ -1238,7 +1243,7 @@ trait JsonFilterExt {
         field: &ScalarFieldRef,
         value: ConditionValue,
         target_type: JsonTargetType,
-        case: Case,
+        query_mode: QueryMode,
         reverse: bool,
         alias: Option<Alias>,
         ctx: &Context<'_>,
@@ -1249,12 +1254,19 @@ trait JsonFilterExt {
         field: &ScalarFieldRef,
         value: ConditionValue,
         target_type: JsonTargetType,
-        case: Case,
+        query_mode: QueryMode,
         reverse: bool,
         alias: Option<Alias>,
         ctx: &Context<'_>,
     ) -> Expression<'static>;
 }
+
+// TODO: case type
+// #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+// pub enum Case {
+//     Sensitive,
+//     Insensitive,
+// }
 
 impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
     fn json_contains(
@@ -1262,7 +1274,7 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
         field: &ScalarFieldRef,
         value: ConditionValue,
         target_type: JsonTargetType,
-        case: Case,
+        query_mode: QueryMode,
         reverse: bool,
         alias: Option<Alias>,
         ctx: &Context<'_>,
@@ -1272,9 +1284,9 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
         match (value, target_type) {
             // string_contains (value)
             (ConditionValue::Value(value), JsonTargetType::String) => {
-                let contains = match case {
-                    Case::Sensitive => expr_string.like(format!("%{value}%")),
-                    Case::Insensitive => Expression::from(lower(expr_string)).like(lower(format!("%{value}%"))),
+                let contains = match query_mode {
+                    QueryMode::Default => expr_string.like(format!("%{value}%")),
+                    QueryMode::Insensitive => Expression::from(lower(expr_string)).like(lower(format!("%{value}%"))),
                 };
 
                 if reverse {
@@ -1297,21 +1309,21 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
             }
             // string_contains (ref)
             (ConditionValue::FieldRef(field_ref), JsonTargetType::String) => {
-                let contains = match case {
-                    Case::Sensitive => expr_string.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
-                        Value::text("%").raw().into(),
-                        field_ref.aliased_col(alias, ctx).into(),
-                        Value::text("%").raw().into(),
-                    ])),
-                    Case::Insensitive => Expression::from(lower(expr_string)).like(lower(quaint::ast::concat::<
-                        '_,
-                        Expression<'_>,
-                    >(vec![
-                        Value::text("%").raw().into(),
-                        field_ref.aliased_col(alias, ctx).into(),
-                        Value::text("%").raw().into(),
-                    ]))),
-                };
+                let contains =
+                    match query_mode {
+                        QueryMode::Default => expr_string.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
+                            Value::text("%").raw().into(),
+                            field_ref.aliased_col(alias, ctx).into(),
+                            Value::text("%").raw().into(),
+                        ])),
+                        QueryMode::Insensitive => Expression::from(lower(expr_string)).like(lower(
+                            quaint::ast::concat::<'_, Expression<'_>>(vec![
+                                Value::text("%").raw().into(),
+                                field_ref.aliased_col(alias, ctx).into(),
+                                Value::text("%").raw().into(),
+                            ]),
+                        )),
+                    };
 
                 if reverse {
                     contains.or(expr_json.json_type_not_equals(JsonType::String)).into()
@@ -1339,7 +1351,7 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
         field: &ScalarFieldRef,
         value: ConditionValue,
         target_type: JsonTargetType,
-        case: Case,
+        query_mode: QueryMode,
         reverse: bool,
         alias: Option<Alias>,
         ctx: &Context<'_>,
@@ -1348,9 +1360,9 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
         match (value, target_type) {
             // string_starts_with (value)
             (ConditionValue::Value(value), JsonTargetType::String) => {
-                let starts_with = match case {
-                    Case::Sensitive => expr_string.like(format!("{value}%")),
-                    Case::Insensitive => Expression::from(lower(expr_string)).like(lower(format!("{value}%"))),
+                let starts_with = match query_mode {
+                    QueryMode::Default => expr_string.like(format!("{value}%")),
+                    QueryMode::Insensitive => Expression::from(lower(expr_string)).like(lower(format!("{value}%"))),
                 };
 
                 if reverse {
@@ -1371,12 +1383,12 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
             }
             // string_starts_with (ref)
             (ConditionValue::FieldRef(field_ref), JsonTargetType::String) => {
-                let starts_with = match case {
-                    Case::Sensitive => expr_string.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
+                let starts_with = match query_mode {
+                    QueryMode::Default => expr_string.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                         field_ref.aliased_col(alias, ctx).into(),
                         Value::text("%").raw().into(),
                     ])),
-                    Case::Insensitive => {
+                    QueryMode::Insensitive => {
                         Expression::from(lower(expr_string)).like(lower(quaint::ast::concat::<'_, Expression<'_>>(
                             vec![field_ref.aliased_col(alias, ctx).into(), Value::text("%").raw().into()],
                         )))
@@ -1409,7 +1421,7 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
         field: &ScalarFieldRef,
         value: ConditionValue,
         target_type: JsonTargetType,
-        case: Case,
+        query_mode: QueryMode,
         reverse: bool,
         alias: Option<Alias>,
         ctx: &Context<'_>,
@@ -1419,9 +1431,9 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
         match (value, target_type) {
             // string_ends_with (value)
             (ConditionValue::Value(value), JsonTargetType::String) => {
-                let ends_with = match case {
-                    Case::Sensitive => expr_string.like(format!("%{value}")),
-                    Case::Insensitive => Expression::from(lower(expr_string)).like(lower(format!("%{value}"))),
+                let ends_with = match query_mode {
+                    QueryMode::Default => expr_string.like(format!("%{value}")),
+                    QueryMode::Insensitive => Expression::from(lower(expr_string)).like(lower(format!("%{value}"))),
                 };
 
                 if reverse {
@@ -1442,12 +1454,12 @@ impl JsonFilterExt for (Expression<'static>, Expression<'static>) {
             }
             // string_ends_with (ref)
             (ConditionValue::FieldRef(field_ref), JsonTargetType::String) => {
-                let ends_with = match case {
-                    Case::Sensitive => expr_string.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
+                let ends_with = match query_mode {
+                    QueryMode::Default => expr_string.like(quaint::ast::concat::<'_, Expression<'_>>(vec![
                         Value::text("%").raw().into(),
                         field_ref.aliased_col(alias, ctx).into(),
                     ])),
-                    Case::Insensitive => {
+                    QueryMode::Insensitive => {
                         Expression::from(lower(expr_string)).like(lower(quaint::ast::concat::<'_, Expression<'_>>(
                             vec![Value::text("%").raw().into(), field_ref.aliased_col(alias, ctx).into()],
                         )))
