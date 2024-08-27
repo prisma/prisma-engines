@@ -41,6 +41,10 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
+      - name: install kerberos dependencies on Ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y libkrb5-dev
+
       - name: compile ${{ matrix.crate }}
         shell: bash
         env:
