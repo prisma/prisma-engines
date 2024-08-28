@@ -40,10 +40,7 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: install kerberos dependencies on Ubuntu
-        if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get update && sudo apt-get install -y libkrb5-dev
+      - uses: ./.github/workflows/include/kerberos-setup
 
       - name: compile ${{ matrix.crate }}
         shell: bash

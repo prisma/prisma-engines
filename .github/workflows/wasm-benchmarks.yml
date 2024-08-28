@@ -28,6 +28,8 @@ jobs:
 
       - uses: ./.github/workflows/include/rust-wasm-setup
 
+      - uses: ./.github/workflows/include/kerberos-setup
+
       - name: "Setup Node.js"
         uses: actions/setup-node@v4
 

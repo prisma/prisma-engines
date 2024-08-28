@@ -1,0 +1,12 @@
+name: Kerberos deps
+description: Install the libkrb5-dev package on Ubuntu. This is required by tiberius when integrated-auth-gssapi is enabled.
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install libkrb5-dev
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        apt update
+        apt install -y libkrb5-dev

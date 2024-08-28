@@ -29,6 +29,7 @@ jobs:
         with:
           components: clippy
           targets: wasm32-unknown-unknown
+      - uses: ./.github/workflows/include/kerberos-setup
       # Check the whole workspace with clippy for the native compilation
       # target, and query-engine-wasm and dependencies for wasm32-unknown-unknown.
       # Note that `--all-targets` is unrelated to `--target` as in target platform,
