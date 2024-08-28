@@ -7,6 +7,4 @@ runs:
     - name: Install libkrb5-dev
       if: runner.os == 'Linux'
       shell: bash
-      run: |
-        apt update
-        apt install -y libkrb5-dev
+      run: sudo apt update && sudo apt install -y libkrb5-dev
