@@ -615,6 +615,30 @@ mod many_relation {
           @r###"{"data":{"createOneContact":{"id":"contact1","identities":[{"id":"identity1","subscriptions":[{"id":"subscription1","audienceId":"audience1"},{"id":"subscription2","audienceId":"audience2"}]}]}}}"###
         );
 
+        // Find contacts that include identities whose subscriptions have `optedOutAt = null` and include audiences with `deletedAt = null``
+        insta::assert_snapshot!(
+          run_query!(
+              &runner,
+              r#"query {
+                findManyContact(orderBy: { id: asc }) {
+                  id,
+                  identities(orderBy: { id: asc }) {
+                    id,
+                    subscriptions(orderBy: { id: asc }, where: { optedOutAt: null, audience: { deletedAt: null } }) {
+                      id,
+                      identityId,
+                      audience {
+                        id,
+                        deletedAt
+                      }
+                    }
+                  }
+                }
+              }"#
+          ),
+          @r###"{"data":{"findManyContact":[{"id":"contact1","identities":[{"id":"identity1","subscriptions":[{"id":"subscription1","identityId":"identity1","audience":{"id":"audience1","deletedAt":null}},{"id":"subscription2","identityId":"identity1","audience":{"id":"audience2","deletedAt":null}}]}]}]}}"###
+        );
+
         Ok(())
     }
 
