@@ -30,7 +30,7 @@ impl Display for TxOpRequest {
 
 #[derive(Debug)]
 pub enum TxOpResponse {
-    Begin(crate::Result<()>),
+    Begin(()),
     Committed(crate::Result<i32>),
     RolledBack(crate::Result<i32>),
     Single(crate::Result<ResponseData>),
