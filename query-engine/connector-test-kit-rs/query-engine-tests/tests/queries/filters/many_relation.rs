@@ -635,6 +635,58 @@ mod many_relation {
 
         Ok(())
     }
+
+    fn schema_25104() -> String {
+        let schema = indoc! {
+            r#"
+                model A {
+                  #id(id, String, @id)
+                  bs  B[]
+                }
+
+                model B {
+                  #id(id, String, @id)
+                  a   A   @relation(fields: [aId], references: [id])
+                  aId String
+
+                  cs  C[]
+                }
+
+                model C {
+                  #id(id, String, @id)
+                  name String
+                  bs B[]
+                }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_25104))]
+    async fn prisma_25104(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+            run_query!(
+                &runner,
+                r#"
+                query {
+                  findManyA {
+                    bs(where: {
+                      cs: {
+                        every: {
+                          name: { equals: "a" }
+                        }
+                      }
+                    }) {
+                      id
+                    }
+                  }
+                }
+                "#
+            ),
+            @r###"{"data":{"findManyA":[]}}"###
+        );
+
         Ok(())
     }
 
