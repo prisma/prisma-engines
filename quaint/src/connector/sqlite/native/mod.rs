@@ -193,7 +193,11 @@ impl Queryable for Sqlite {
         // `BEGIN IMMEDIATE` avoids possible `SQLITE_BUSY_SNAPSHOT` that arise when another connection jumps ahead in line.
         //  The BEGIN IMMEDIATE command goes ahead and starts a write transaction, and thus blocks all other writers.
         // If the BEGIN IMMEDIATE operation succeeds, then no subsequent operations in that transaction will ever fail with an SQLITE_BUSY error.
-        let ret = if depth > 1 { savepoint_stmt } else { "BEGIN IMMEDIATE".to_string() };
+        let ret = if depth > 1 {
+            savepoint_stmt
+        } else {
+            "BEGIN IMMEDIATE".to_string()
+        };
 
         return ret;
     }

@@ -160,7 +160,7 @@ impl Queryable for JsTransaction {
 
     fn requires_isolation_first(&self) -> bool {
         self.inner.requires_isolation_first()
-    } 
+    }
 
     async fn begin_statement(&self, depth: i32) -> String {
         self.inner.begin_statement(depth).await
