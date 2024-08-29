@@ -615,6 +615,26 @@ mod many_relation {
           @r###"{"data":{"createOneContact":{"id":"contact1","identities":[{"id":"identity1","subscriptions":[{"id":"subscription1","audienceId":"audience1"},{"id":"subscription2","audienceId":"audience2"}]}]}}}"###
         );
 
+        insta::assert_snapshot!(
+            run_query!(
+                &runner,
+                r#"query {
+                    findManyContact {
+                        identities {
+                            subscriptions(where: { audience: { deletedAt: { equals: null } } }) {
+                                audience {
+                                    id
+                                }
+                            }
+                        }
+                    }
+                }"#
+            ),
+            @r###"{"data":{"findManyContact":[{"identities":[{"subscriptions":[{"audience":{"id":"audience1"}},{"audience":{"id":"audience2"}}]}]}]}}"###
+        );
+
+        Ok(())
+    }
         Ok(())
     }
 
