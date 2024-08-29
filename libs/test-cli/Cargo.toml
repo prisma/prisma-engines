@@ -18,3 +18,6 @@ tracing.workspace = true
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-error = "0.2"
 async-trait.workspace = true
+
+[build-dependencies]
+build-utils.path = "../build-utils"

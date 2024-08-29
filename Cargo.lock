@@ -445,6 +445,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "build-utils"
+version = "0.1.0"
+
+[[package]]
 name = "bumpalo"
 version = "3.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3544,6 +3548,7 @@ dependencies = [
 name = "prisma-fmt"
 version = "0.1.0"
 dependencies = [
+ "build-utils",
  "colored",
  "dissimilar",
  "dmmf",
@@ -3913,6 +3918,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "base64 0.13.1",
+ "build-utils",
  "connection-string",
  "enumflags2",
  "graphql-parser",
@@ -3947,6 +3953,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "build-utils",
  "cbindgen",
  "chrono",
  "connection-string",
@@ -4025,6 +4032,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "build-utils",
  "connection-string",
  "driver-adapters",
  "futures",
@@ -4087,6 +4095,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "build-utils",
  "connection-string",
  "driver-adapters",
  "futures",
@@ -4795,6 +4804,7 @@ version = "0.1.0"
 dependencies = [
  "backtrace",
  "base64 0.13.1",
+ "build-utils",
  "connection-string",
  "expect-test",
  "indoc 2.0.3",
@@ -5570,6 +5580,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "build-utils",
  "colored",
  "dmmf",
  "enumflags2",

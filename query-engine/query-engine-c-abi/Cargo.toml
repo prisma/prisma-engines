@@ -46,3 +46,4 @@ once_cell = "1.19.0"
 
 [build-dependencies]
 cbindgen = "0.24.0"
+build-utils.path = "../../libs/build-utils"

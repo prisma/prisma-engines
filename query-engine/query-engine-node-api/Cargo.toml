@@ -56,3 +56,4 @@ query-engine-metrics = { path = "../metrics" }
 
 [build-dependencies]
 napi-build = "1"
+build-utils.path = "../../libs/build-utils"
