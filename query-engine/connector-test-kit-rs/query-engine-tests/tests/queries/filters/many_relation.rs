@@ -517,19 +517,19 @@ mod many_relation {
     fn schema_25103() -> String {
         let schema = indoc! {
             r#"model Contact {
-            id         String      @id @default(cuid())
+            #id(id, String, @id)
             identities Identity[]
           }
 
           model Identity {
-            id              String         @id @default(cuid())
+            #id(id, String, @id)
             contactId       String
             contact         Contact        @relation(fields: [contactId], references: [id])
             subscriptions   Subscription[]
           }
 
           model Subscription {
-            id          String    @id @default(cuid())
+            #id(id, String, @id)
             identityId  String
             audienceId  String
             optedOutAt  DateTime?
@@ -538,7 +538,7 @@ mod many_relation {
           }
 
           model Audience {
-            id         String     @id @default(cuid())
+            #id(id, String, @id)
             deletedAt  DateTime?
             subscriptions Subscription[]
           }"#
