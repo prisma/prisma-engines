@@ -698,7 +698,7 @@ mod many_relation {
                 middleId Int?
                 middle Middle? @relation(fields: [middleId], references: [id])
 
-                #m2m(bottoms, Bottom[], id, Int) 
+                #m2m(bottoms, Bottom[], id, Int)
               }
 
               model Middle {
@@ -750,6 +750,71 @@ mod many_relation {
           }
         "#),
           @r###"{"data":{"findUniqueTop":{"middle":{"bottoms":[{"id":1}]}}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_nested_some_filter_m2m_different_pk() -> String {
+        let schema = indoc! {
+            r#"
+            model Top {
+                #id(topId, Int, @id)
+
+                relatedMiddleId Int?
+                middle          Middle? @relation(fields: [relatedMiddleId], references: [middleId])
+
+                #m2m(bottoms, Bottom[], bottomId, Int)
+            }
+
+            model Middle {
+                #id(middleId, Int, @id)
+
+                bottoms Bottom[]
+                tops    Top[]
+            }
+
+            model Bottom {
+                #id(bottomId, Int, @id)
+
+                relatedMiddleId Int?
+                middle          Middle?  @relation(fields: [relatedMiddleId], references: [middleId])
+
+                #m2m(tops, Top[], topId, Int)
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_nested_some_filter_m2m_different_pk), exclude(SqlServer))]
+    async fn nested_some_filter_m2m_different_pk(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+              createOneTop(data: {
+                topId: 1,
+                middle: { create: { middleId: 1, bottoms: { create: { bottomId: 1, tops: { create: { topId: 2 } } } } } }
+              }) {
+                topId
+            }}"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findUniqueTop(where: { topId: 1 }) {
+              middle {
+                bottoms(
+                  where: { tops: { some: { topId: 2 } } }
+                ) {
+                  bottomId
+                }
+              }
+            }
+          }
+        "#),
+          @r###"{"data":{"findUniqueTop":{"middle":{"bottoms":[{"bottomId":1}]}}}}"###
         );
 
         Ok(())
