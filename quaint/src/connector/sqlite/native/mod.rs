@@ -215,11 +215,11 @@ impl Queryable for Sqlite {
         let savepoint_stmt = format!("ROLLBACK TO savepoint{}", depth);
         let ret = if depth > 1 {
             savepoint_stmt
+        } else {
             "ROLLBACK".to_string()
         };
 
         return ret;
->>>>>>> 50096754c4d (feat: add support for nested transaction rollbacks via savepoints in sql)
     }
 }
 
