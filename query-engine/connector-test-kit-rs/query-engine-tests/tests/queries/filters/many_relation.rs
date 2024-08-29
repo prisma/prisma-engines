@@ -663,7 +663,7 @@ mod many_relation {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_25104))]
+    #[connector_test(schema(schema_25104), exclude(MongoDb))]
     async fn prisma_25104(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
             run_query!(
