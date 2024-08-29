@@ -67,7 +67,7 @@ impl<'a> ITXServer<'a> {
                 RunState::Continue
             }
             TxOpRequestMsg::Begin => {
-                let __ = self.begin().await;
+                let _result = self.begin().await;
                 let _ = op.respond_to.send(TxOpResponse::Begin(()));
                 RunState::Continue
             }
