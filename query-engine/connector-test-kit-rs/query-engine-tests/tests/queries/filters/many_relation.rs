@@ -514,6 +514,110 @@ mod many_relation {
         Ok(())
     }
 
+    fn schema_25103() -> String {
+        let schema = indoc! {
+            r#"model Contact {
+            id         String      @id @default(cuid())
+            identities Identity[]
+          }
+
+          model Identity {
+            id              String         @id @default(cuid())
+            contactId       String
+            contact         Contact        @relation(fields: [contactId], references: [id])
+            subscriptions   Subscription[]
+          }
+
+          model Subscription {
+            id          String    @id @default(cuid())
+            identityId  String
+            audienceId  String
+            optedOutAt  DateTime?
+            audience    Audience  @relation(fields: [audienceId], references: [id])
+            identity    Identity  @relation(fields: [identityId], references: [id])
+          }
+
+          model Audience {
+            id         String     @id @default(cuid())
+            deletedAt  DateTime?
+            subscriptions Subscription[]
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/25103
+    // SQL Server excluded because the m2m fragment does not support onUpdate/onDelete args which are needed.
+    #[connector_test(schema(schema_25103), exclude(SqlServer))]
+    async fn prisma_25103(runner: Runner) -> TestResult<()> {
+        // Create some sample audiences
+        run_query!(
+            &runner,
+            r#"mutation {
+              createOneAudience(data: {
+                id: "audience1",
+                deletedAt: null
+              }) {
+                id
+            }}"#
+        );
+        run_query!(
+            &runner,
+            r#"mutation {
+              createOneAudience(data: {
+                id: "audience2",
+                deletedAt: null
+              }) {
+                id
+            }}"#
+        );
+
+        // Create a contact with identities and subscriptions
+        insta::assert_snapshot!(
+          run_query!(
+              &runner,
+              r#"mutation {
+              createOneContact(data: {
+                id: "contact1",
+                identities: {
+                  create: [
+                    {
+                      id: "identity1",
+                      subscriptions: {
+                        create: [
+                          {
+                            id: "subscription1",
+                            audienceId: "audience1",
+                            optedOutAt: null
+                          },
+                          {
+                            id: "subscription2",
+                            audienceId: "audience2",
+                            optedOutAt: null
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }) {
+                id,
+                identities (orderBy: { id: asc }) {
+                  id,
+                  subscriptions (orderBy: { id: asc }) {
+                    id,
+                    audienceId
+                  }
+                }
+            }}"#
+          ),
+          @r###"{"data":{"createOneContact":{"id":"contact1","identities":[{"id":"identity1","subscriptions":[{"id":"subscription1","audienceId":"audience1"},{"id":"subscription2","audienceId":"audience2"}]}]}}}"###
+        );
+
+        Ok(())
+    }
+
     fn schema_23742() -> String {
         let schema = indoc! {
             r#"model Top {
