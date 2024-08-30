@@ -555,82 +555,86 @@ mod many_relation {
         run_query!(
             &runner,
             r#"mutation {
-              createOneAudience(data: {
-                id: "audience1",
-                deletedAt: null
-              }) {
-                id
-            }}"#
+                  createOneAudience(data: {
+                    id: "audience1",
+                    deletedAt: null
+                  }) {
+                    id
+                }}"#
         );
         run_query!(
             &runner,
             r#"mutation {
-              createOneAudience(data: {
-                id: "audience2",
-                deletedAt: null
-              }) {
-                id
-            }}"#
+                  createOneAudience(data: {
+                    id: "audience2",
+                    deletedAt: null
+                  }) {
+                    id
+                }}"#
         );
-
         // Create a contact with identities and subscriptions
         insta::assert_snapshot!(
           run_query!(
               &runner,
               r#"mutation {
-              createOneContact(data: {
-                id: "contact1",
-                identities: {
-                  create: [
-                    {
-                      id: "identity1",
-                      subscriptions: {
-                        create: [
-                          {
-                            id: "subscription1",
-                            audienceId: "audience1",
-                            optedOutAt: null
-                          },
-                          {
-                            id: "subscription2",
-                            audienceId: "audience2",
-                            optedOutAt: null
+                  createOneContact(data: {
+                    id: "contact1",
+                    identities: {
+                      create: [
+                        {
+                          id: "identity1",
+                          subscriptions: {
+                            create: [
+                              {
+                                id: "subscription1",
+                                audienceId: "audience1",
+                                optedOutAt: null
+                              },
+                              {
+                                id: "subscription2",
+                                audienceId: "audience2",
+                                optedOutAt: null
+                              }
+                            ]
                           }
-                        ]
+                        }
+                      ]
+                    }
+                  }) {
+                    id,
+                    identities (orderBy: { id: asc }) {
+                      id,
+                      subscriptions (orderBy: { id: asc }) {
+                        id,
+                        audienceId
                       }
                     }
-                  ]
-                }
-              }) {
-                id,
-                identities (orderBy: { id: asc }) {
-                  id,
-                  subscriptions (orderBy: { id: asc }) {
-                    id,
-                    audienceId
-                  }
-                }
-            }}"#
+                }}"#
           ),
           @r###"{"data":{"createOneContact":{"id":"contact1","identities":[{"id":"identity1","subscriptions":[{"id":"subscription1","audienceId":"audience1"},{"id":"subscription2","audienceId":"audience2"}]}]}}}"###
         );
-
+        // Find contacts that include identities whose subscriptions have `optedOutAt = null` and include audiences with `deletedAt = null``
         insta::assert_snapshot!(
-            run_query!(
-                &runner,
-                r#"query {
-                    findManyContact {
-                        identities {
-                            subscriptions(where: { audience: { deletedAt: { equals: null } } }) {
-                                audience {
-                                    id
-                                }
-                            }
+          run_query!(
+              &runner,
+              r#"query {
+                    findManyContact(orderBy: { id: asc }) {
+                      id,
+                      identities(orderBy: { id: asc }) {
+                        id,
+                        subscriptions(orderBy: { id: asc }, where: { optedOutAt: null, audience: { deletedAt: null } }) {
+                          id,
+                          identityId,
+                          audience {
+                            id,
+                            deletedAt
+                          }
                         }
+                      }
                     }
-                }"#
-            ),
-            @r###"{"data":{"findManyContact":[{"identities":[{"subscriptions":[{"audience":{"id":"audience1"}},{"audience":{"id":"audience2"}}]}]}]}}"###
+                  }"#
+          ),
+          @r###"{"data":{"findManyContact":[{"id":"contact1","identities":[{"id":"identity1","subscriptions":[{"id":"subscription1","identityId":"identity1","audience":{"id":"audience1","deletedAt":null}},{"id":"subscription2","identityId":"identity1","audience":{"id":"audience2","deletedAt":null}}]}]}]}}"###
         );
 
         Ok(())
