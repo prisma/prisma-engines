@@ -3966,6 +3966,7 @@ dependencies = [
  "query-connector",
  "query-core",
  "query-engine-common",
+ "query-engine-metrics",
  "query-structure",
  "request-handlers",
  "rusqlite",

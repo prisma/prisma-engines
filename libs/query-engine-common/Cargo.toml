@@ -3,6 +3,12 @@ name = "query-engine-common"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+metrics = [
+    "query-core/metrics",
+    "query-engine-metrics"
+]
+
 [dependencies]
 thiserror = "1"
 url.workspace = true
@@ -21,7 +27,7 @@ tracing-opentelemetry = "0.17.3"
 opentelemetry = { version = "0.17" }
 
 [target.'cfg(all(not(target_arch = "wasm32")))'.dependencies]
-query-engine-metrics = { path = "../../query-engine/metrics" }
+query-engine-metrics = { path = "../../query-engine/metrics", optional = true }
 napi.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
