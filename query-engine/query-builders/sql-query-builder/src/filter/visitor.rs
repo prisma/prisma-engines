@@ -1227,6 +1227,7 @@ fn convert_pvs<'a>(fields: &[ScalarFieldRef], values: Vec<PrismaValue>, ctx: &Co
 }
 
 trait JsonFilterExt {
+    #[allow(clippy::too_many_arguments)]
     fn json_contains(
         self,
         field: &ScalarFieldRef,
@@ -1238,6 +1239,7 @@ trait JsonFilterExt {
         ctx: &Context<'_>,
     ) -> Expression<'static>;
 
+    #[allow(clippy::too_many_arguments)]
     fn json_starts_with(
         self,
         field: &ScalarFieldRef,
@@ -1249,6 +1251,7 @@ trait JsonFilterExt {
         ctx: &Context<'_>,
     ) -> Expression<'static>;
 
+    #[allow(clippy::too_many_arguments)]
     fn json_ends_with(
         self,
         field: &ScalarFieldRef,
