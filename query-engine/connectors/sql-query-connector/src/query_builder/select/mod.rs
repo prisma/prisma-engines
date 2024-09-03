@@ -648,20 +648,13 @@ fn extract_filter_scalars(f: &Filter) -> Vec<ScalarFieldRef> {
         Filter::Scalar(x) => x.scalar_fields().into_iter().map(ToOwned::to_owned).collect(),
         Filter::ScalarList(x) => vec![x.field.clone()],
         Filter::OneRelationIsNull(x) => join_fields(&x.field),
-        Filter::Relation(x) => vec![join_fields(&x.field), extract_filter_scalars(&x.nested_filter)]
-            .into_iter()
-            .flatten()
-            .collect(),
+        Filter::Relation(x) => join_fields(&x.field),
         _ => Vec::new(),
     }
 }
 
 fn join_fields(rf: &RelationField) -> Vec<ScalarFieldRef> {
-    if rf.is_inlined_on_enclosing_model() {
-        rf.scalar_fields()
-    } else {
-        rf.related_field().referenced_fields()
-    }
+    rf.linking_fields().as_scalar_fields().unwrap_or_default()
 }
 
 fn join_alias_name(rf: &RelationField) -> String {
