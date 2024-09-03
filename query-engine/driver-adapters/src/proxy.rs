@@ -100,10 +100,10 @@ impl DriverProxy {
         .await
     }
 
-    pub async fn transaction_context(&self) -> quaint::Result<Box<JsTransactionContext>> {
+    pub async fn transaction_context(&self) -> quaint::Result<JsTransactionContext> {
         let ctx = self.transaction_context.call_as_async(()).await?;
 
-        Ok(Box::new(ctx))
+        Ok(ctx)
     }
 }
 
