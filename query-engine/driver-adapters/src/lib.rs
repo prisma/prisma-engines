@@ -52,7 +52,7 @@ pub(crate) use transaction::JsTransaction;
 pub use wasm::JsObjectExtern as JsObject;
 
 #[cfg(not(target_arch = "wasm32"))]
-pub use napi::JsObject;
+pub use ::napi::JsObject;
 
 #[cfg(not(target_arch = "wasm32"))]
 pub mod napi;
@@ -113,18 +113,18 @@ mod arch {
 
 #[cfg(not(target_arch = "wasm32"))]
 mod arch {
-    pub(crate) use napi::JsString;
+    pub(crate) use ::napi::JsString;
 
     pub(crate) fn get_named_property<T>(object: &::napi::JsObject, name: &str) -> JsResult<T>
     where
-        T: napi::bindgen_prelude::FromNapiValue,
+        T: ::napi::bindgen_prelude::FromNapiValue,
     {
         object.get_named_property(name)
     }
 
     pub(crate) fn get_optional_named_property<T>(object: &::napi::JsObject, name: &str) -> JsResult<Option<T>>
     where
-        T: napi::bindgen_prelude::FromNapiValue,
+        T: ::napi::bindgen_prelude::FromNapiValue,
     {
         if has_named_property(object, name)? {
             Ok(Some(get_named_property(object, name)?))
@@ -145,7 +145,7 @@ mod arch {
         value
     }
 
-    pub(crate) type JsResult<T> = napi::Result<T>;
+    pub(crate) type JsResult<T> = ::napi::Result<T>;
 }
 
 pub(crate) use arch::*;
