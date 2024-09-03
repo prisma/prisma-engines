@@ -210,7 +210,7 @@ impl super::wasm::FromJsValue for JsTransaction {
 /// Implementing unsafe `from_napi_value` allows retrieving a threadsafe `JsTransaction` in `DriverProxy`
 /// while keeping derived futures `Send`.
 #[cfg(not(target_arch = "wasm32"))]
-impl ::napi::bindgen_prelude::FromNapiValue for JsTransaction {
+impl napi::bindgen_prelude::FromNapiValue for JsTransaction {
     unsafe fn from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> JsResult<Self> {
         let object = JsObject::from_napi_value(env, napi_val)?;
         let common_proxy = CommonProxy::new(&object)?;
@@ -237,7 +237,7 @@ impl super::wasm::FromJsValue for JsTransactionContext {
 /// Implementing unsafe `from_napi_value` allows retrieving a threadsafe `JsTransactionContext` in `DriverProxy`
 /// while keeping derived futures `Send`.
 #[cfg(not(target_arch = "wasm32"))]
-impl ::napi::bindgen_prelude::FromNapiValue for JsTransactionContext {
+impl napi::bindgen_prelude::FromNapiValue for JsTransactionContext {
     unsafe fn from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> JsResult<Self> {
         let object = JsObject::from_napi_value(env, napi_val)?;
         let common_proxy = CommonProxy::new(&object)?;
