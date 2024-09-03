@@ -125,7 +125,7 @@ impl TransactionContextProxy {
         Ok(Box::new(tx))
     }
 
-    pub fn start_transaction(&self) -> UnsafeFuture<impl Future<Output = quaint::Result<Box<JsTransaction>>> + '_> {
+    pub fn start_transaction(&self) -> impl Future<Output = quaint::Result<Box<JsTransaction>>> + '_ {
         UnsafeFuture(self.start_transaction_inner())
     }
 }

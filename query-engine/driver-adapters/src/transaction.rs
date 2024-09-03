@@ -24,7 +24,7 @@ impl JsTransactionContext {
         Self { inner, tx_ctx_proxy }
     }
 
-    pub fn start_transaction(&self) -> UnsafeFuture<impl Future<Output = quaint::Result<Box<JsTransaction>>> + '_> {
+    pub fn start_transaction(&self) -> impl Future<Output = quaint::Result<Box<JsTransaction>>> + '_ {
         UnsafeFuture(self.tx_ctx_proxy.start_transaction())
     }
 }
