@@ -773,3 +773,53 @@ fn dbgenerated_on_generated_unsupported_columns_is_idempotent(api: TestApi) {
 
     api.schema_push(schema).send().assert_green().assert_no_steps();
 }
+
+// https://github.com/prisma/prisma/issues/24331
+#[test_connector(tags(Postgres))]
+fn remove_map_from_id(api: TestApi) {
+    let schema_1 = r#"
+        datasource db {
+          provider = "postgresql"
+          url = env("DATABASE_URL")
+        }
+
+        model Fruits {
+          id Int @id(map:"custom_name")
+          name String @db.VarChar
+        }
+    "#;
+
+    let schema_2 = r#"
+        datasource db {
+          provider = "postgresql"
+          url = env("DATABASE_URL")
+        }
+
+        model Fruits {
+          id Int @id()
+          name String
+        }
+    "#;
+
+    let migration = api.connector_diff(
+        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_1))]),
+        DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_2))]),
+        None,
+    );
+
+    let expected_migration = expect![[r#"
+        -- AlterTable
+        ALTER TABLE "Fruits" RENAME CONSTRAINT "custom_name" TO "Fruits_pkey";
+        ALTER TABLE "Fruits" ALTER COLUMN "name" SET DATA TYPE TEXT;
+    "#]];
+
+    expected_migration.assert_eq(&migration);
+
+    api.schema_push(schema_1).send().assert_green();
+    api.schema_push(schema_1).send().assert_green().assert_no_steps();
+    api.schema_push(schema_2)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+    api.schema_push(schema_2).send().assert_green().assert_no_steps();
+}
