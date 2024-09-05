@@ -88,7 +88,6 @@ features!(
 pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
         Deno
-         | DriverAdapters
          | FullTextIndex
          | FullTextSearch
          | Metrics
@@ -109,6 +108,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | ConnectOrCreate
         | CreateMany
         | DataProxy
+        | DriverAdapters
         | Distinct
         | ExtendedIndexes
         | ExtendedWhereUnique
