@@ -4,7 +4,7 @@ use enumflags2::BitFlags;
 use indoc::indoc;
 use psl::PreviewFeature;
 use quaint::{
-    connector::{self, tokio_postgres::error::ErrorPosition, PostgresUrl},
+    connector::{self, tokio_postgres::error::ErrorPosition, MakeTlsConnectorManager, PostgresUrl},
     prelude::{ConnectionInfo, NativeConnectionInfo, Queryable},
 };
 use schema_connector::{ConnectorError, ConnectorResult, Namespaces};
@@ -22,8 +22,9 @@ impl Connection {
                 details: err.to_string(),
             })
         })?;
+        let tls_manager = MakeTlsConnectorManager::new(url.clone());
 
-        let quaint = connector::PostgreSql::new(url.clone())
+        let quaint = connector::PostgreSql::new(url.clone(), &tls_manager)
             .await
             .map_err(quaint_err(&url))?;
 
