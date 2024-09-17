@@ -4,9 +4,12 @@ use crate::{
     error::{Error, ErrorKind},
 };
 use async_trait::async_trait;
-use futures::lock::Mutex;
 use metrics::{decrement_gauge, increment_gauge};
-use std::{fmt, str::FromStr, sync::Arc};
+use std::{
+    fmt,
+    str::FromStr,
+    sync::{Arc, Mutex},
+};
 
 extern crate metrics as metrics;
 
@@ -31,9 +34,6 @@ pub(crate) struct TransactionOptions {
 
     /// Whether or not to put the isolation level `SET` before or after the `BEGIN`.
     pub(crate) isolation_first: bool,
-
-    /// The depth of the transaction, used to determine the nested transaction statements.
-    pub depth: Arc<Mutex<i32>>,
 }
 
 /// A default representation of an SQL database transaction. If not commited, a
@@ -53,7 +53,7 @@ impl<'a> DefaultTransaction<'a> {
     ) -> crate::Result<DefaultTransaction<'a>> {
         let mut this = Self {
             inner,
-            depth: tx_opts.depth,
+            depth: Arc::new(Mutex::new(0)),
         };
 
         if tx_opts.isolation_first {
@@ -81,14 +81,13 @@ impl<'a> Transaction for DefaultTransaction<'a> {
     async fn begin(&mut self) -> crate::Result<()> {
         increment_gauge!("prisma_client_queries_active", 1.0);
 
-        let mut depth_guard = self.depth.lock().await;
+        let current_depth = {
+            let mut depth = self.depth.lock().unwrap();
+            *depth += 1;
+            *depth
+        };
 
-        // Modify the depth value through the MutexGuard
-        *depth_guard += 1;
-
-        let st_depth = *depth_guard;
-
-        let begin_statement = self.inner.begin_statement(st_depth).await;
+        let begin_statement = self.inner.begin_statement(current_depth).await;
 
         self.inner.raw_cmd(&begin_statement).await?;
 
@@ -99,36 +98,49 @@ impl<'a> Transaction for DefaultTransaction<'a> {
     async fn commit(&mut self) -> crate::Result<i32> {
         decrement_gauge!("prisma_client_queries_active", 1.0);
 
-        let mut depth_guard = self.depth.lock().await;
+        // Lock the mutex and get the depth value
+        let depth_val = {
+            let depth = self.depth.lock().unwrap();
+            *depth
+        };
 
-        let st_depth = *depth_guard;
-
-        let commit_statement = self.inner.commit_statement(st_depth).await;
-
+        // Perform the asynchronous operation without holding the lock
+        let commit_statement = self.inner.commit_statement(depth_val).await;
         self.inner.raw_cmd(&commit_statement).await?;
 
-        // Modify the depth value through the MutexGuard
-        *depth_guard -= 1;
+        // Lock the mutex again to modify the depth
+        let new_depth = {
+            let mut depth = self.depth.lock().unwrap();
+            *depth -= 1;
+            *depth
+        };
 
-        Ok(*depth_guard)
+        Ok(new_depth)
     }
 
     /// Rolls back the changes to the database.
     async fn rollback(&mut self) -> crate::Result<i32> {
         decrement_gauge!("prisma_client_queries_active", 1.0);
 
-        let mut depth_guard = self.depth.lock().await;
+        // Lock the mutex and get the depth value
+        let depth_val = {
+            let depth = self.depth.lock().unwrap();
+            *depth
+        };
 
-        let st_depth = *depth_guard;
-
-        let rollback_statement = self.inner.rollback_statement(st_depth).await;
+        // Perform the asynchronous operation without holding the lock
+        let rollback_statement = self.inner.rollback_statement(depth_val).await;
 
         self.inner.raw_cmd(&rollback_statement).await?;
 
-        // Modify the depth value through the MutexGuard
-        *depth_guard -= 1;
+        // Lock the mutex again to modify the depth
+        let new_depth = {
+            let mut depth = self.depth.lock().unwrap();
+            *depth -= 1;
+            *depth
+        };
 
-        Ok(*depth_guard)
+        Ok(new_depth)
     }
 
     fn as_queryable(&self) -> &dyn Queryable {
@@ -240,11 +252,10 @@ impl FromStr for IsolationLevel {
     }
 }
 impl TransactionOptions {
-    pub fn new(isolation_level: Option<IsolationLevel>, isolation_first: bool, depth: Arc<Mutex<i32>>) -> Self {
+    pub fn new(isolation_level: Option<IsolationLevel>, isolation_first: bool) -> Self {
         Self {
             isolation_level,
             isolation_first,
-            depth,
         }
     }
 }

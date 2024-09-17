@@ -18,10 +18,7 @@ use futures::lock::Mutex;
 use std::{
     convert::TryFrom,
     future::Future,
-    sync::{
-        atomic::{AtomicBool, Ordering},
-        Arc,
-    },
+    sync::atomic::{AtomicBool, Ordering},
     time::Duration,
 };
 use tiberius::*;
@@ -48,11 +45,7 @@ impl TransactionCapable for Mssql {
             .or(self.url.query_params.transaction_isolation_level)
             .or(Some(SQL_SERVER_DEFAULT_ISOLATION));
 
-        let opts = TransactionOptions::new(
-            isolation,
-            self.requires_isolation_first(),
-            self.transaction_depth.clone(),
-        );
+        let opts = TransactionOptions::new(isolation, self.requires_isolation_first());
 
         Ok(Box::new(DefaultTransaction::new(self, opts).await?))
     }
@@ -65,7 +58,6 @@ pub struct Mssql {
     url: MssqlUrl,
     socket_timeout: Option<Duration>,
     is_healthy: AtomicBool,
-    transaction_depth: Arc<Mutex<i32>>,
 }
 
 impl Mssql {
@@ -97,7 +89,6 @@ impl Mssql {
             url,
             socket_timeout,
             is_healthy: AtomicBool::new(true),
-            transaction_depth: Arc::new(Mutex::new(0)),
         };
 
         if let Some(isolation) = this.url.transaction_isolation_level() {

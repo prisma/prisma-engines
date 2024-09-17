@@ -17,7 +17,7 @@ use crate::{
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
-use std::{convert::TryFrom, sync::Arc};
+use std::convert::TryFrom;
 use tokio::sync::Mutex;
 
 /// The underlying sqlite driver. Only available with the `expose-drivers` Cargo feature.
@@ -27,7 +27,6 @@ pub use rusqlite;
 /// A connector interface for the SQLite database
 pub struct Sqlite {
     pub(crate) client: Mutex<rusqlite::Connection>,
-    transaction_depth: Arc<futures::lock::Mutex<i32>>,
 }
 
 impl TryFrom<&str> for Sqlite {
@@ -65,10 +64,7 @@ impl TryFrom<&str> for Sqlite {
 
         let client = Mutex::new(conn);
 
-        Ok(Sqlite {
-            client,
-            transaction_depth: Arc::new(futures::lock::Mutex::new(0)),
-        })
+        Ok(Sqlite { client })
     }
 }
 
@@ -83,7 +79,6 @@ impl Sqlite {
 
         Ok(Sqlite {
             client: Mutex::new(client),
-            transaction_depth: Arc::new(futures::lock::Mutex::new(0)),
         })
     }
 

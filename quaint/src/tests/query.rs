@@ -76,18 +76,19 @@ async fn transactions(api: &mut dyn TestApi) -> crate::Result<()> {
     assert_eq!(Value::int32(10), res[0]);
 
     // Check that nested transactions are also rolled back, even at multiple levels deep
-    let mut tx_inner = api.conn().start_transaction(None).await?;
+    tx.begin().await?;
     let inner_insert1 = Insert::single_into(&table).value("value", 20);
     let inner_rows_affected1 = tx.execute(inner_insert1.into()).await?;
     assert_eq!(1, inner_rows_affected1);
 
-    let mut tx_inner2 = api.conn().start_transaction(None).await?;
+    // Open another nested transaction
+    tx.begin().await?;
     let inner_insert2 = Insert::single_into(&table).value("value", 20);
     let inner_rows_affected2 = tx.execute(inner_insert2.into()).await?;
     assert_eq!(1, inner_rows_affected2);
-    tx_inner2.commit().await?;
+    tx.commit().await?;
 
-    tx_inner.commit().await?;
+    tx.commit().await?;
 
     tx.rollback().await?;
 

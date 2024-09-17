@@ -5,7 +5,7 @@ use crate::JsObject;
 use super::conversion;
 use crate::send_future::UnsafeFuture;
 use async_trait::async_trait;
-use futures::{lock::Mutex, Future};
+use futures::Future;
 use quaint::connector::{DescribedQuery, ExternalConnectionInfo, ExternalConnector};
 use quaint::{
     connector::{metrics, IsolationLevel, Transaction},
@@ -13,7 +13,6 @@ use quaint::{
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
 };
-use std::sync::Arc;
 use tracing::{info_span, Instrument};
 
 /// A JsQueryable adapts a Proxy to implement quaint's Queryable interface. It has the
@@ -228,7 +227,6 @@ impl JsBaseQueryable {
 pub struct JsQueryable {
     inner: JsBaseQueryable,
     driver_proxy: DriverProxy,
-    pub transaction_depth: Arc<Mutex<i32>>,
 }
 
 impl std::fmt::Display for JsQueryable {
@@ -324,33 +322,28 @@ impl JsQueryable {
         }
 
         // 3. Spawn a transaction from the context.
-        let tx = tx_ctx.start_transaction().await?;
+        let mut tx = tx_ctx.start_transaction().await?;
 
-        {
-            let mut depth_guard = tx.depth.lock().await;
-            *depth_guard += 1;
+        tx.depth += 1;
 
-            let st_depth = *depth_guard;
+        let begin_stmt = tx.begin_statement(tx.depth).await;
+        let tx_opts = tx.options();
 
-            let begin_stmt = tx.begin_statement(st_depth).await;
-            let tx_opts = tx.options();
-
-            if tx_opts.use_phantom_query {
-                let begin_stmt = JsBaseQueryable::phantom_query_message(&begin_stmt);
-                tx.raw_phantom_cmd(begin_stmt.as_str()).await?;
-            } else {
-                tx.raw_cmd(&begin_stmt).await?;
-            }
-
-            // 4. Set the isolation level (if specified) if we didn't do it before.
-            if !requires_isolation_first {
-                if let Some(isolation) = isolation {
-                    tx.set_tx_isolation_level(isolation).await?;
-                }
-            }
-
-            self.server_reset_query(tx.as_ref()).await?;
+        if tx_opts.use_phantom_query {
+            let begin_stmt = JsBaseQueryable::phantom_query_message(&begin_stmt);
+            tx.raw_phantom_cmd(begin_stmt.as_str()).await?;
+        } else {
+            tx.raw_cmd(&begin_stmt).await?;
         }
+
+        // 4. Set the isolation level (if specified) if we didn't do it before.
+        if !requires_isolation_first {
+            if let Some(isolation) = isolation {
+                tx.set_tx_isolation_level(isolation).await?;
+            }
+        }
+
+        self.server_reset_query(tx.as_ref()).await?;
 
         Ok(tx)
     }
@@ -373,6 +366,5 @@ pub fn from_js(driver: JsObject) -> JsQueryable {
     JsQueryable {
         inner: JsBaseQueryable::new(common),
         driver_proxy,
-        transaction_depth: Arc::new(futures::lock::Mutex::new(0)),
     }
 }

@@ -10,15 +10,12 @@ use crate::{
     error::Error,
 };
 use async_trait::async_trait;
-use futures::lock::Mutex;
 use mobc::{Connection as MobcPooled, Manager};
-use std::sync::Arc;
 
 /// A connection from the pool. Implements
 /// [Queryable](connector/trait.Queryable.html).
 pub struct PooledConnection {
     pub(crate) inner: MobcPooled<QuaintManager>,
-    pub transaction_depth: Arc<Mutex<i32>>,
 }
 
 impl_default_TransactionCapable!(PooledConnection);

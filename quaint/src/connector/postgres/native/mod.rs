@@ -33,10 +33,7 @@ use std::{
     fmt::{Debug, Display},
     fs,
     future::Future,
-    sync::{
-        atomic::{AtomicBool, Ordering},
-        Arc,
-    },
+    sync::atomic::{AtomicBool, Ordering},
     time::Duration,
 };
 use tokio_postgres::{config::ChannelBinding, Client, Config, Statement};
@@ -64,7 +61,6 @@ pub struct PostgreSql {
     is_healthy: AtomicBool,
     is_cockroachdb: bool,
     is_materialize: bool,
-    transaction_depth: Arc<Mutex<i32>>,
 }
 
 /// Key uniquely representing an SQL statement in the prepared statements cache.
@@ -293,7 +289,6 @@ impl PostgreSql {
             is_healthy: AtomicBool::new(true),
             is_cockroachdb,
             is_materialize,
-            transaction_depth: Arc::new(Mutex::new(0)),
         })
     }
 

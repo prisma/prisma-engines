@@ -5,7 +5,6 @@ use crate::{
     connector::{self, impl_default_TransactionCapable, ConnectionInfo, IsolationLevel, Queryable, TransactionCapable},
 };
 use async_trait::async_trait;
-use futures::lock::Mutex;
 use std::{fmt, sync::Arc};
 
 #[cfg(feature = "sqlite-native")]
@@ -19,7 +18,6 @@ use crate::connector::NativeConnectionInfo;
 pub struct Quaint {
     inner: Arc<dyn Queryable>,
     connection_info: Arc<ConnectionInfo>,
-    transaction_depth: Arc<Mutex<i32>>,
 }
 
 impl fmt::Debug for Quaint {
@@ -167,11 +165,7 @@ impl Quaint {
         let connection_info = Arc::new(ConnectionInfo::from_url(url_str)?);
         Self::log_start(&connection_info);
 
-        Ok(Self {
-            inner,
-            connection_info,
-            transaction_depth: Arc::new(Mutex::new(0)),
-        })
+        Ok(Self { inner, connection_info })
     }
 
     #[cfg(feature = "sqlite-native")]
@@ -184,7 +178,6 @@ impl Quaint {
             connection_info: Arc::new(ConnectionInfo::Native(NativeConnectionInfo::InMemorySqlite {
                 db_name: DEFAULT_SQLITE_DATABASE.to_owned(),
             })),
-            transaction_depth: Arc::new(Mutex::new(0)),
         })
     }
 

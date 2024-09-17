@@ -148,11 +148,7 @@ macro_rules! impl_default_TransactionCapable {
                 &'a self,
                 isolation: Option<IsolationLevel>,
             ) -> crate::Result<Box<dyn crate::connector::Transaction + 'a>> {
-                let opts = crate::connector::TransactionOptions::new(
-                    isolation,
-                    self.requires_isolation_first(),
-                    self.transaction_depth.clone(),
-                );
+                let opts = crate::connector::TransactionOptions::new(isolation, self.requires_isolation_first());
 
                 Ok(Box::new(
                     crate::connector::DefaultTransaction::new(self, opts).await?,

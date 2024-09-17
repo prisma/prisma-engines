@@ -23,10 +23,7 @@ use mysql_async::{
 };
 use std::{
     future::Future,
-    sync::{
-        atomic::{AtomicBool, Ordering},
-        Arc,
-    },
+    sync::atomic::{AtomicBool, Ordering},
     time::Duration,
 };
 use tokio::sync::Mutex;
@@ -79,7 +76,6 @@ pub struct Mysql {
     socket_timeout: Option<Duration>,
     is_healthy: AtomicBool,
     statement_cache: Mutex<LruCache<String, my::Statement>>,
-    transaction_depth: Arc<futures::lock::Mutex<i32>>,
 }
 
 impl Mysql {
@@ -93,7 +89,6 @@ impl Mysql {
             statement_cache: Mutex::new(url.cache()),
             url,
             is_healthy: AtomicBool::new(true),
-            transaction_depth: Arc::new(futures::lock::Mutex::new(0)),
         })
     }
 
