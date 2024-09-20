@@ -35,6 +35,7 @@ opentelemetry-otlp = { version = "0.10", features = ["tls", "tls-roots"] }
 query-engine-metrics = { path = "../metrics" }
 
 user-facing-errors = { path = "../../libs/user-facing-errors" }
+telemetry = { path = "../../libs/telemetry", features = ["metrics"] }
 
 [dev-dependencies]
 serial_test = "*"
