@@ -1,48 +1,59 @@
-use crate::CoreError;
-use connector::Transaction;
-use crosstarget_utils::time::ElapsedTimeCounter;
+use derive_more::Display;
+use opentelemetry::trace::{SpanId, TraceId};
 use serde::Deserialize;
-use std::fmt::Display;
-use tokio::time::Duration;
 
-mod actor_manager;
-mod actors;
+use telemetry::helpers::TraceParent;
+
 mod error;
-mod messages;
+mod manager;
+mod transaction;
 
 pub use error::*;
 
-pub(crate) use actor_manager::*;
-pub(crate) use actors::*;
-pub(crate) use messages::*;
+pub(crate) use manager::*;
+pub(crate) use transaction::*;
 
-/// How Interactive Transactions work
-/// The Interactive Transactions (iTx) follow an actor model design. Where each iTx is created in its own process.
-/// When a prisma client requests to start a new transaction, the Transaction Actor Manager spawns a new ITXServer. The ITXServer runs in its own
-/// process and waits for messages to arrive via its receive channel to process.
-/// The Transaction Actor Manager will also create an ITXClient and add it to hashmap managed by an RwLock. The ITXClient is the only way to communicate
-/// with the ITXServer.
-///
-/// Once Prisma Client receives the iTx Id it can perform database operations using that iTx id. When an operation request is received by the
-/// TransactionActorManager, it looks for the client in the hashmap and passes the operation to the client. The ITXClient sends a message to the
-/// ITXServer and waits for a response. The ITXServer will then perform the operation and return the result. The ITXServer will perform one
-/// operation at a time. All other operations will sit in the message queue waiting to be processed.
-///
-/// The ITXServer will handle all messages until:
-/// - It transitions state, e.g "rollback" or "commit"
-/// - It exceeds its timeout, in which case the iTx is rolledback and the connection to the database is closed.
-///
-/// Once the ITXServer is done handling messages from the iTx Client, it sends a last message to the Background Client list Actor to say that it is completed and then shuts down.
-/// The Background Client list Actor removes the client from the list of active clients and keeps in cache the iTx id of the closed transaction.
-///
-/// We keep a list of closed transactions so that if any further messages are received for this iTx id,
-/// the TransactionActorManager can reply with a helpful error message which explains that no operation can be performed on a closed transaction
-/// rather than an error message stating that the transaction does not exist.
-
-#[derive(Debug, Clone, Hash, Eq, PartialEq, Deserialize)]
+#[derive(Debug, Clone, Hash, Eq, PartialEq, Deserialize, Display)]
+#[display(fmt = "{}", _0)]
 pub struct TxId(String);
 
-const MINIMUM_TX_ID_LENGTH: usize = 24;
+impl TxId {
+    /// This method, as well as `as_span_id`, are intentionally private because it is very easy to
+    /// misuse them. Both are used to provide deterministic trace_id and span_id derived from the
+    /// transaction id. Both rely on the fact that transaction id is a valid cuid.
+    fn as_trace_id(&self) -> TraceId {
+        let mut buffer = [0; 16];
+        let tx_id = self.0.as_bytes();
+        let len = tx_id.len();
+
+        // The first byte of CUID is always letter 'c'. Next 8 bytes after that represent timestamp
+        // in milliseconds. Next 4 bytes after that represent the counter.
+        // We take last 4 bytes of the timestamp and combine it with the counter.
+        buffer[0..8].copy_from_slice(&tx_id[(1 + 4)..(1 + 4 + 8)]);
+        // Last 8 bytes of cuid are totally random.
+        buffer[8..].copy_from_slice(&tx_id[len - 8..]);
+
+        TraceId::from_bytes(buffer)
+    }
+
+    fn as_span_id(&self) -> SpanId {
+        let mut buffer = [0; 8];
+        let tx_id = self.0.as_bytes();
+        let len = tx_id.len();
+
+        // Last 8 bytes of cuid are totally random.
+        buffer[..].copy_from_slice(&tx_id[len - 8..]);
+
+        SpanId::from_bytes(buffer)
+    }
+
+    /// Creates new artificial `TraceParent`. The span corresponding to this traceparent is never
+    /// emitted. Same transaction id is guaranteed to have traceparent with the same trace_id and
+    /// span_id.
+    pub fn as_traceparent(&self) -> TraceParent {
+        TraceParent::new_unsafe(self.as_trace_id(), self.as_span_id())
+    }
+}
 
 impl Default for TxId {
     fn default() -> Self {
@@ -56,9 +67,11 @@ where
     T: Into<String>,
 {
     fn from(s: T) -> Self {
+        const MINIMUM_TX_ID_LENGTH: usize = 24;
+
         let contents = s.into();
         // This postcondition is to ensure that the TxId is long enough as to be able to derive
-        // a TraceId from it.
+        // a TraceId from it. See `TxTraceExt` trait for more details.
         assert!(
             contents.len() >= MINIMUM_TX_ID_LENGTH,
             "minimum length for a TxId ({}) is {}, but was {}",
@@ -70,56 +83,28 @@ where
     }
 }
 
-impl Display for TxId {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        Display::fmt(&self.0, f)
-    }
-}
+#[cfg(test)]
+mod test {
+    use super::*;
 
-pub enum CachedTx<'a> {
-    Open(Box<dyn Transaction + 'a>),
-    Committed,
-    RolledBack,
-    Expired,
-}
+    #[test]
+    fn test_txid_into_traceid() {
+        let fixture = vec![
+            ("clct0q6ma0000rb04768tiqbj", "71366d6130303030373638746971626a"),
+            // counter changed, trace id changed:
+            ("clct0q6ma0002rb04cpa6zkmx", "71366d6130303032637061367a6b6d78"),
+            // fingerprint changed, trace id did not change, as that chunk is ignored:
+            ("clct0q6ma00020000cpa6zkmx", "71366d6130303032637061367a6b6d78"),
+            // first 5 bytes changed, trace id did not change, as that chunk is ignored:
+            ("00000q6ma00020000cpa6zkmx", "71366d6130303032637061367a6b6d78"),
+            // 6 th byte changed, trace id changed, as that chunk is part of the lsb of the timestamp
+            ("0000006ma00020000cpa6zkmx", "30366d6130303032637061367a6b6d78"),
+        ];
 
-impl Display for CachedTx<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            CachedTx::Open(_) => f.write_str("Open"),
-            CachedTx::Committed => f.write_str("Committed"),
-            CachedTx::RolledBack => f.write_str("Rolled back"),
-            CachedTx::Expired => f.write_str("Expired"),
+        for (txid, expected_trace_id) in fixture {
+            let txid: TxId = txid.into();
+            let trace_id: opentelemetry::trace::TraceId = txid.as_trace_id();
+            assert_eq!(trace_id.to_string(), expected_trace_id);
         }
     }
-}
-
-impl<'a> CachedTx<'a> {
-    /// Requires this cached TX to be `Open`, else an error will be raised that it is no longer valid.
-    pub(crate) fn as_open(&mut self) -> crate::Result<&mut Box<dyn Transaction + 'a>> {
-        if let Self::Open(ref mut otx) = self {
-            Ok(otx)
-        } else {
-            let reason = format!("Transaction is no longer valid. Last state: '{self}'");
-            Err(CoreError::from(TransactionError::Closed { reason }))
-        }
-    }
-
-    pub(crate) fn to_closed(&self, start_time: ElapsedTimeCounter, timeout: Duration) -> Option<ClosedTx> {
-        match self {
-            CachedTx::Open(_) => None,
-            CachedTx::Committed => Some(ClosedTx::Committed),
-            CachedTx::RolledBack => Some(ClosedTx::RolledBack),
-            CachedTx::Expired => Some(ClosedTx::Expired { start_time, timeout }),
-        }
-    }
-}
-
-pub(crate) enum ClosedTx {
-    Committed,
-    RolledBack,
-    Expired {
-        start_time: ElapsedTimeCounter,
-        timeout: Duration,
-    },
 }
