@@ -1,44 +1,32 @@
 [package]
 edition = "2021"
-name = "query-core"
+name = "telemetry"
 version = "0.1.0"
 
 [features]
-metrics = ["query-engine-metrics"]
-graphql-protocol = []
+metrics = ["dep:query-engine-metrics"]
 
 [dependencies]
 async-trait.workspace = true
-bigdecimal = "0.3"
-chrono.workspace = true
-connection-string.workspace = true
-connector = { path = "../connectors/query-connector", package = "query-connector" }
 crossbeam-channel = "0.5.6"
 psl.workspace = true
 futures = "0.3"
 indexmap.workspace = true
 itertools.workspace = true
 once_cell = "1"
-petgraph = "0.4"
-query-structure = { path = "../query-structure", features = [
-    "default_generators",
-] }
 opentelemetry = { version = "0.17.0", features = ["rt-tokio", "serialize"] }
-query-engine-metrics = { path = "../metrics", optional = true }
 serde.workspace = true
 serde_json.workspace = true
 thiserror = "1.0"
-tokio = { version = "1", features = ["macros", "time"] }
+tokio = { version = "1.0", features = ["macros", "time"] }
 tracing = { workspace = true, features = ["attributes"] }
 tracing-futures = "0.2"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-opentelemetry = "0.17.4"
-user-facing-errors = { path = "../../libs/user-facing-errors" }
 uuid.workspace = true
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
-schema = { path = "../schema" }
-crosstarget-utils = { path = "../../libs/crosstarget-utils" }
-telemetry = { path = "../../libs/telemetry" }
+crosstarget-utils = { path = "../crosstarget-utils" }
 lru = "0.7.7"
 enumflags2.workspace = true
 derive_more = "0.99.17"
+query-engine-metrics = { path = "../../query-engine/metrics", optional = true }
