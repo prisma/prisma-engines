@@ -62,6 +62,7 @@ jobs:
         database:
           - name: mssql_2017
             url: "sqlserver://localhost:1434;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
+            ubuntu: "20.04"
           - name: mssql_2019
             url: "sqlserver://localhost:1433;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
           - name: mssql_2022
@@ -104,7 +105,7 @@ jobs:
             is_vitess: true
             single_threaded: true
 
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-${{ matrix.database.ubuntu || 'latest' }}"
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rust-lang/setup-rust-toolchain@v1
