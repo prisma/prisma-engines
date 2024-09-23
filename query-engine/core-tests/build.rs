@@ -1,7 +1,7 @@
 use std::{env, fs, io::Write as _, path};
 
-const QUERY_VALIDATIONS_ROOT_DIR: &str = "tests/query_validation_tests";
 const CARGO_MANIFEST_DIR: &str = env!("CARGO_MANIFEST_DIR");
+const QUERY_VALIDATIONS_ROOT_DIR: &str = "tests/query_validation_tests";
 const TEST_NAME_SUFFIX: &str = ".query.json";
 
 fn main() {
