@@ -1,3 +1,4 @@
+use regex::Regex;
 use std::fmt::{Display, Formatter};
 
 use crate::error::{DatabaseConstraint, Error, ErrorKind, Name};
@@ -28,8 +29,17 @@ impl Display for PostgresError {
     }
 }
 
+fn extract_fk_constraint_name(message: &str) -> Option<String> {
+    let re = Regex::new(r#"foreign key constraint "([^"]+)""#).unwrap();
+    re.captures(message)
+        .and_then(|caps| caps.get(1).map(|m| m.as_str().to_string()))
+}
+
 impl From<PostgresError> for Error {
     fn from(value: PostgresError) -> Self {
+        // println!("PostgresError: {:?}", value);
+        // panic!("PostgresError.code: {:?}", value.code.as_str());
+
         match value.code.as_str() {
             "22001" => {
                 let mut builder = Error::builder(ErrorKind::LengthMismatch {
@@ -89,12 +99,8 @@ impl From<PostgresError> for Error {
                     builder.build()
                 }
                 None => {
-                    let constraint = value
-                        .message
-                        .split_whitespace()
-                        .nth(10)
-                        .and_then(|s| s.split('"').nth(1))
-                        .map(ToString::to_string)
+                    // `value.message` looks like `update on table "Child" violates foreign key constraint "Child_parent_id_fkey"`
+                    let constraint = extract_fk_constraint_name(value.message.as_str())
                         .map(DatabaseConstraint::Index)
                         .unwrap_or(DatabaseConstraint::CannotParse);
 
