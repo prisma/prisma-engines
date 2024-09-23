@@ -35,7 +35,6 @@ jobs:
         partition: ["1/4", "2/4", "3/4", "4/4"]
 
     env:
-      CI: "true"
       LOG_LEVEL: "info"
       LOG_QUERIES: "y"
       RUST_LOG_FORMAT: "devel"
