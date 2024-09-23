@@ -14,7 +14,7 @@ mod prisma_24072 {
             model Child {
                 #id(id, Int, @id)
                 parent_id Int?    @default(2) @unique
-                parent    Parent? @relation(fields: [parent_id], references: [id], onDelete: SetDefault)
+                parent    Parent? @relation(fields: [parent_id], references: [id], onDelete: NoAction)
             }"#
         };
 
