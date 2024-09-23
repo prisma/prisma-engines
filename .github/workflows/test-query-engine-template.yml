@@ -14,7 +14,7 @@ on:
         required: true
       ubuntu:
         type: string
-        required: true
+        default: 'latest'
       single_threaded:
         type: boolean
         default: false
