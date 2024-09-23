@@ -80,7 +80,7 @@ mod one2one_req {
             runner,
             "mutation { deleteOneParent(where: { id: 1 }) { id }}",
             2003,
-            "Foreign key constraint failed"
+            "Foreign key constraint violated"
         );
 
         Ok(())
@@ -293,7 +293,7 @@ mod one2many_req {
             runner,
             "mutation { deleteOneParent(where: { id: 1 }) { id }}",
             2003,
-            "Foreign key constraint failed"
+            "Foreign key constraint violated"
         );
 
         Ok(())
@@ -397,7 +397,7 @@ mod one2many_opt {
             runner,
             "mutation { deleteOneParent(where: { id: 1 }) { id }}",
             2003,
-            "Foreign key constraint failed"
+            "Foreign key constraint violated"
         );
 
         Ok(())
