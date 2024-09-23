@@ -37,9 +37,6 @@ fn extract_fk_constraint_name(message: &str) -> Option<String> {
 
 impl From<PostgresError> for Error {
     fn from(value: PostgresError) -> Self {
-        // println!("PostgresError: {:?}", value);
-        // panic!("PostgresError.code: {:?}", value.code.as_str());
-
         match value.code.as_str() {
             "22001" => {
                 let mut builder = Error::builder(ErrorKind::LengthMismatch {
