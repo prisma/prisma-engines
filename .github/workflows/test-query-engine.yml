@@ -122,8 +122,10 @@ jobs:
         database:
           - name: "mssql_2022"
             version: "2022"
+            ubuntu: "latest"
           - name: "mssql_2019"
             version: "2019"
+            ubuntu: "latest"
           - name: "mssql_2017"
             version: "2017"
             ubuntu: "20.04"
