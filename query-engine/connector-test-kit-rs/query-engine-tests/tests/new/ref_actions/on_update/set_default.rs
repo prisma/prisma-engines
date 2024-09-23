@@ -79,7 +79,7 @@ mod one2one_req {
             &runner,
             r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
             2003,
-            "Foreign key constraint failed on the field"
+            "Foreign key constraint failed"
         );
 
         Ok(())
@@ -182,7 +182,7 @@ mod one2one_opt {
             &runner,
             r#"mutation { updateOneParent(where: { id: 1 } data: { uniq: "u1" }) { id }}"#,
             2003,
-            "Foreign key constraint failed on the field"
+            "Foreign key constraint failed"
         );
 
         Ok(())
@@ -287,7 +287,7 @@ mod one2many_req {
             &runner,
             r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
             2003,
-            "Foreign key constraint failed on the field"
+            "Foreign key constraint failed"
         );
 
         Ok(())
@@ -390,7 +390,7 @@ mod one2many_opt {
             &runner,
             r#"mutation { updateOneParent(where: { id: 1 }, data: { uniq: "u1" }) { id }}"#,
             2003,
-            "Foreign key constraint failed on the field"
+            "Foreign key constraint failed"
         );
 
         Ok(())
