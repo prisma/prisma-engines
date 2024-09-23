@@ -255,13 +255,13 @@ impl SqlFlavour for SqliteFlavour {
         ready(with_connection(&mut self.state, |_, conn| conn.query_raw(sql, params)))
     }
 
-    fn parse_raw_query<'a>(
+    fn describe_query<'a>(
         &'a mut self,
         sql: &'a str,
-    ) -> BoxFuture<'a, ConnectorResult<quaint::connector::ParsedRawQuery>> {
-        tracing::debug!(sql, query_type = "parse_raw_query");
+    ) -> BoxFuture<'a, ConnectorResult<quaint::connector::DescribedQuery>> {
+        tracing::debug!(sql, query_type = "describe_query");
         ready(with_connection(&mut self.state, |params, conn| {
-            conn.parse_raw_query(sql, params)
+            conn.describe_query(sql, params)
         }))
     }
 

@@ -81,7 +81,8 @@ features!(
     ReactNative,
     PrismaSchemaFolder,
     OmitApi,
-    TypedSql
+    TypedSql,
+    StrictUndefinedChecks
 );
 
 /// Generator preview features (alphabetically sorted)
@@ -100,6 +101,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | RelationJoins
          | OmitApi
          | PrismaSchemaFolder
+         | StrictUndefinedChecks
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations

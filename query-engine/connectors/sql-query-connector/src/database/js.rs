@@ -90,8 +90,8 @@ impl QuaintQueryable for DriverAdapter {
         self.connector.query_raw_typed(sql, params).await
     }
 
-    async fn parse_raw_query(&self, sql: &str) -> quaint::Result<quaint::connector::ParsedRawQuery> {
-        self.connector.parse_raw_query(sql).await
+    async fn describe_query(&self, sql: &str) -> quaint::Result<quaint::connector::DescribedQuery> {
+        self.connector.describe_query(sql).await
     }
 
     async fn execute(&self, q: Query<'_>) -> quaint::Result<u64> {

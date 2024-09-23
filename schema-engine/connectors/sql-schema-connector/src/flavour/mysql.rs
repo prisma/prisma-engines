@@ -406,12 +406,12 @@ impl SqlFlavour for MysqlFlavour {
         self.database_name()
     }
 
-    fn parse_raw_query<'a>(
+    fn describe_query<'a>(
         &'a mut self,
         sql: &'a str,
-    ) -> BoxFuture<'a, ConnectorResult<quaint::connector::ParsedRawQuery>> {
+    ) -> BoxFuture<'a, ConnectorResult<quaint::connector::DescribedQuery>> {
         with_connection(&mut self.state, move |conn_params, circumstances, conn| {
-            conn.parse_raw_query(sql, &conn_params.url, circumstances)
+            conn.describe_query(sql, &conn_params.url, circumstances)
         })
     }
 }

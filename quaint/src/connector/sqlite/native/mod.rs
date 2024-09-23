@@ -5,8 +5,8 @@ mod column_type;
 mod conversion;
 mod error;
 
-use crate::connector::{sqlite::params::SqliteParams, ColumnType, ParsedRawQuery};
-use crate::connector::{IsolationLevel, ParsedRawColumn, ParsedRawParameter};
+use crate::connector::IsolationLevel;
+use crate::connector::{sqlite::params::SqliteParams, ColumnType, DescribedQuery};
 
 pub use rusqlite::{params_from_iter, version as sqlite_version};
 
@@ -124,28 +124,8 @@ impl Queryable for Sqlite {
         self.query_raw(sql, params).await
     }
 
-    async fn parse_raw_query(&self, sql: &str) -> crate::Result<ParsedRawQuery> {
-        let conn = self.client.lock().await;
-        let stmt = conn.prepare_cached(sql)?;
-
-        let parameters = (1..=stmt.parameter_count())
-            .map(|idx| match stmt.parameter_name(idx) {
-                Some(name) => {
-                    // SQLite parameter names are prefixed with a colon. We remove it here so that the js doc parser can match the names.
-                    let name = name.strip_prefix(':').unwrap_or(name);
-
-                    ParsedRawParameter::new_named(name, ColumnType::Unknown)
-                }
-                None => ParsedRawParameter::new_unnamed(idx, ColumnType::Unknown),
-            })
-            .collect();
-        let columns = stmt
-            .columns()
-            .iter()
-            .map(|col| ParsedRawColumn::new_named(col.name(), col))
-            .collect();
-
-        Ok(ParsedRawQuery { columns, parameters })
+    async fn describe_query(&self, _sql: &str) -> crate::Result<DescribedQuery> {
+        unimplemented!("SQLite describe_query is implemented in the schema engine.")
     }
 
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {

@@ -502,11 +502,11 @@ impl SqlFlavour for MssqlFlavour {
         self.schema_name()
     }
 
-    fn parse_raw_query<'a>(
+    fn describe_query<'a>(
         &'a mut self,
         _sql: &str,
-    ) -> BoxFuture<'a, ConnectorResult<quaint::connector::ParsedRawQuery>> {
-        unimplemented!("SQL Server support for raw query parsing is not implemented yet.")
+    ) -> BoxFuture<'a, ConnectorResult<quaint::connector::DescribedQuery>> {
+        unimplemented!("SQL Server does not support describe_query yet.")
     }
 }
 
