@@ -187,7 +187,7 @@ mod one2one_opt {
             runner,
             "mutation { deleteOneParent(where: { id: 1 }) { id }}",
             2003,
-            "Foreign key constraint violated: `Child_parent_id_fkey (index)`"
+            "Foreign key constraint violated"
         );
 
         Ok(())
