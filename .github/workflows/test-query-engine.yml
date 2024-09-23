@@ -132,6 +132,7 @@ jobs:
     with:
       name: ${{ matrix.database.name }}
       version: ${{ matrix.database.version }}
+      ubuntu: ${{ matrix.database.ubuntu }}
       connector: "sqlserver"
       relation_load_strategy: '["query"]'
 
