@@ -12,9 +12,6 @@ on:
       version:
         type: string
         required: true
-      ubuntu:
-        type: string
-        required: true
       single_threaded:
         type: boolean
         default: false
@@ -49,7 +46,7 @@ jobs:
       PRISMA_ENGINE_PROTOCOL: ${{ matrix.engine_protocol }}
       PRISMA_RELATION_LOAD_STRATEGY: ${{ matrix.relation_load_strategy }}
 
-    runs-on: ubuntu-${{ inputs.ubuntu }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rust-lang/setup-rust-toolchain@v1
