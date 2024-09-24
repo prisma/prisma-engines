@@ -51,7 +51,7 @@ where
                 .or_else(|| panic_payload.downcast_ref::<String>().map(|s| s.to_owned()))
                 .unwrap_or_default();
 
-            panic!("Error: '{}'", res)
+            panic!("Error: '{}'", res);
         }
     }
 }
