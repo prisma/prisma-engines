@@ -65,6 +65,7 @@ napi = { version = "2.15.1", default-features = false, features = [
 napi-derive = "2.15.0"
 js-sys = { version = "0.3" }
 rand = { version = "0.8" }
+regex = { version = "1", features = ["std"] }
 serde_repr = { version = "0.1.17" }
 serde-wasm-bindgen = { version = "0.5" }
 tracing = { version = "0.1" }
