@@ -3801,6 +3801,7 @@ dependencies = [
  "postgres-types",
  "quaint-test-macros",
  "quaint-test-setup",
+ "regex",
  "rusqlite",
  "serde",
  "serde_json",
@@ -4390,9 +4391,9 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.10.3"
+version = "1.10.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b62dbe01f0b06f9d8dc7d49e05a0785f153b00b2c227856282f671e0318c9b15"
+checksum = "4219d74c6b67a3654a9fbebc4b419e22126d13d2f3c4a07ee0cb61ff79a79619"
 dependencies = [
  "aho-corasick 1.0.3",
  "memchr",
@@ -6123,7 +6124,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "97fee6b57c6a41524a810daee9286c02d7752c4253064d0b05472833a438f675"
 dependencies = [
  "cfg-if",
- "rand 0.3.23",
+ "rand 0.8.5",
  "static_assertions",
 ]
 
