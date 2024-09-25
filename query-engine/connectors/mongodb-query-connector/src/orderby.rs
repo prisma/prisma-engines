@@ -1,6 +1,6 @@
 use crate::join::JoinStage;
+use bson::{doc, Document};
 use itertools::Itertools;
-use mongodb::bson::{doc, Document};
 use query_structure::{OrderBy, OrderByHop, OrderByToManyAggregation, SortOrder};
 use std::{fmt::Display, iter};
 

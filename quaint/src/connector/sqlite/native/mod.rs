@@ -6,7 +6,7 @@ mod conversion;
 mod error;
 
 use crate::connector::IsolationLevel;
-use crate::connector::{sqlite::params::SqliteParams, ColumnType};
+use crate::connector::{sqlite::params::SqliteParams, ColumnType, DescribedQuery};
 
 pub use rusqlite::{params_from_iter, version as sqlite_version, LoadExtensionGuard};
 
@@ -147,6 +147,10 @@ impl Queryable for Sqlite {
 
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         self.query_raw(sql, params).await
+    }
+
+    async fn describe_query(&self, _sql: &str) -> crate::Result<DescribedQuery> {
+        unimplemented!("SQLite describe_query is implemented in the schema engine.")
     }
 
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {

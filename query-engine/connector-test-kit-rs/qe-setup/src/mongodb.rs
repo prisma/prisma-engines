@@ -10,11 +10,12 @@ pub(crate) async fn mongo_setup(schema: &str, url: &str) -> ConnectorResult<()> 
 
     client
         .database(&db_name)
-        .drop(Some(
+        .drop()
+        .with_options(
             mongodb::options::DropDatabaseOptions::builder()
                 .write_concern(mongodb::options::WriteConcern::builder().journal(true).build())
                 .build(),
-        ))
+        )
         .await
         .unwrap();
 
@@ -24,7 +25,7 @@ pub(crate) async fn mongo_setup(schema: &str, url: &str) -> ConnectorResult<()> 
     for model in parsed_schema.db.walk_models() {
         client
             .database(&db_name)
-            .create_collection(model.database_name(), None)
+            .create_collection(model.database_name())
             .await
             .unwrap();
     }

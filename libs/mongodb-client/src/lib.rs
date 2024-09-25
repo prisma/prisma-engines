@@ -12,12 +12,12 @@ use mongodb::{
 /// A wrapper to create a new MongoDB client. Please remove me when we do not
 /// need special setup anymore for this.
 pub async fn create(connection_string: impl AsRef<str>) -> Result<Client, Error> {
-    let mut options = if cfg!(target_os = "windows") {
-        ClientOptions::parse_with_resolver_config(connection_string, ResolverConfig::cloudflare()).await?
-    } else {
-        ClientOptions::parse(connection_string).await?
-    };
+    let mut connection_string_parser = ClientOptions::parse(connection_string.as_ref());
+    if cfg!(target_os = "windows") {
+        connection_string_parser = connection_string_parser.resolver_config(ResolverConfig::cloudflare());
+    }
 
+    let mut options = connection_string_parser.await?;
     options.driver_info = Some(DriverInfo::builder().name("Prisma").build());
 
     Ok(Client::with_options(options)?)

@@ -40,6 +40,8 @@ pub enum ColumnType {
     DateArray,
     TimeArray,
 
+    Null,
+
     Unknown,
 }
 
@@ -86,6 +88,7 @@ impl std::fmt::Display for ColumnType {
             ColumnType::Geometry => write!(f, "geometry"),
             ColumnType::Geography => write!(f, "geography"),
 
+            ColumnType::Null => write!(f, "null"),
             ColumnType::Unknown => write!(f, "unknown"),
         }
     }

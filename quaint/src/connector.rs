@@ -12,6 +12,7 @@
 mod column_type;
 mod connection_info;
 
+mod describe;
 pub mod external;
 pub mod metrics;
 #[cfg(native)]
@@ -31,6 +32,7 @@ pub use connection_info::*;
 #[cfg(native)]
 pub use native::*;
 
+pub use describe::*;
 pub use external::*;
 pub use queryable::*;
 pub use transaction::*;

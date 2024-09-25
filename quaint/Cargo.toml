@@ -68,6 +68,7 @@ futures = "0.3"
 url.workspace = true
 hex = "0.4"
 itertools.workspace = true
+regex.workspace = true
 
 either = { version = "1.6" }
 base64 = { version = "0.12.3" }
@@ -95,7 +96,7 @@ paste = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 quaint-test-macros = { path = "quaint-test-macros" }
 quaint-test-setup = { path = "quaint-test-setup" }
-tokio = { version = "1.0", features = ["macros", "time"] }
+tokio = { version = "1", features = ["macros", "time"] }
 expect-test = "1"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies.getrandom]
@@ -113,9 +114,7 @@ optional = true
 branch = "vendored-openssl"
 
 [dependencies.rusqlite]
-# git = "https://github.com/rusqlite/rusqlite"
-# rev = "714ce2e17117b2d46485aa12479f8e1802b78ba0"
-version = "0.29"
+version = "0.31"
 features = ["chrono", "column_decltype", "load_extension"]
 optional = true
 

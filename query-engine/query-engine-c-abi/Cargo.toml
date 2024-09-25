@@ -25,7 +25,7 @@ chrono.workspace = true
 quaint = { path = "../../quaint", default-features = false, features = [
   "sqlite",
 ] }
-rusqlite = "0.29"
+rusqlite = "0.31"
 uuid.workspace = true
 thiserror = "1"
 connection-string.workspace = true
@@ -46,3 +46,4 @@ once_cell = "1.19.0"
 
 [build-dependencies]
 cbindgen = "0.24.0"
+build-utils.path = "../../libs/build-utils"

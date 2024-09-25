@@ -209,6 +209,10 @@ impl Queryable for Quaint {
         self.inner.query_raw_typed(sql, params).await
     }
 
+    async fn describe_query(&self, sql: &str) -> crate::Result<connector::DescribedQuery> {
+        self.inner.describe_query(sql).await
+    }
+
     async fn execute(&self, q: ast::Query<'_>) -> crate::Result<u64> {
         self.inner.execute(q).await
     }

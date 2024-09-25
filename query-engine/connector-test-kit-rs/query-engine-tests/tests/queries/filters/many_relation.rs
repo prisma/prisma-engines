@@ -514,6 +514,316 @@ mod many_relation {
         Ok(())
     }
 
+    fn schema_25103() -> String {
+        let schema = indoc! {
+            r#"model Contact {
+            #id(id, String, @id)
+            identities Identity[]
+          }
+
+          model Identity {
+            #id(id, String, @id)
+            contactId       String
+            contact         Contact        @relation(fields: [contactId], references: [id])
+            subscriptions   Subscription[]
+          }
+
+          model Subscription {
+            #id(id, String, @id)
+            identityId  String
+            audienceId  String
+            optedOutAt  DateTime?
+            audience    Audience  @relation(fields: [audienceId], references: [id])
+            identity    Identity  @relation(fields: [identityId], references: [id])
+          }
+
+          model Audience {
+            #id(id, String, @id)
+            deletedAt  DateTime?
+            subscriptions Subscription[]
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/25103
+    // SQL Server excluded because the m2m fragment does not support onUpdate/onDelete args which are needed.
+    #[connector_test(schema(schema_25103), exclude(SqlServer))]
+    async fn prisma_25103(runner: Runner) -> TestResult<()> {
+        // Create some sample audiences
+        run_query!(
+            &runner,
+            r#"mutation {
+                  createOneAudience(data: {
+                    id: "audience1",
+                    deletedAt: null
+                  }) {
+                    id
+                }}"#
+        );
+        run_query!(
+            &runner,
+            r#"mutation {
+                  createOneAudience(data: {
+                    id: "audience2",
+                    deletedAt: null
+                  }) {
+                    id
+                }}"#
+        );
+        // Create a contact with identities and subscriptions
+        insta::assert_snapshot!(
+          run_query!(
+              &runner,
+              r#"mutation {
+                  createOneContact(data: {
+                    id: "contact1",
+                    identities: {
+                      create: [
+                        {
+                          id: "identity1",
+                          subscriptions: {
+                            create: [
+                              {
+                                id: "subscription1",
+                                audienceId: "audience1",
+                                optedOutAt: null
+                              },
+                              {
+                                id: "subscription2",
+                                audienceId: "audience2",
+                                optedOutAt: null
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }) {
+                    id,
+                    identities (orderBy: { id: asc }) {
+                      id,
+                      subscriptions (orderBy: { id: asc }) {
+                        id,
+                        audienceId
+                      }
+                    }
+                }}"#
+          ),
+          @r###"{"data":{"createOneContact":{"id":"contact1","identities":[{"id":"identity1","subscriptions":[{"id":"subscription1","audienceId":"audience1"},{"id":"subscription2","audienceId":"audience2"}]}]}}}"###
+        );
+        // Find contacts that include identities whose subscriptions have `optedOutAt = null` and include audiences with `deletedAt = null``
+        insta::assert_snapshot!(
+          run_query!(
+              &runner,
+              r#"query {
+                    findManyContact(orderBy: { id: asc }) {
+                      id,
+                      identities(orderBy: { id: asc }) {
+                        id,
+                        subscriptions(orderBy: { id: asc }, where: { optedOutAt: null, audience: { deletedAt: null } }) {
+                          id,
+                          identityId,
+                          audience {
+                            id,
+                            deletedAt
+                          }
+                        }
+                      }
+                    }
+                  }"#
+          ),
+          @r###"{"data":{"findManyContact":[{"id":"contact1","identities":[{"id":"identity1","subscriptions":[{"id":"subscription1","identityId":"identity1","audience":{"id":"audience1","deletedAt":null}},{"id":"subscription2","identityId":"identity1","audience":{"id":"audience2","deletedAt":null}}]}]}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_25104() -> String {
+        let schema = indoc! {
+            r#"
+                model A {
+                  #id(id, String, @id)
+                  bs  B[]
+                }
+
+                model B {
+                  #id(id, String, @id)
+                  a   A   @relation(fields: [aId], references: [id])
+                  aId String
+
+                  cs  C[]
+                }
+
+                model C {
+                  #id(id, String, @id)
+                  name String
+                  bs B[]
+                }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_25104), exclude(MongoDb))]
+    async fn prisma_25104(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+            run_query!(
+                &runner,
+                r#"
+                query {
+                  findManyA {
+                    bs(where: {
+                      cs: {
+                        every: {
+                          name: { equals: "a" }
+                        }
+                      }
+                    }) {
+                      id
+                    }
+                  }
+                }
+                "#
+            ),
+            @r###"{"data":{"findManyA":[]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_23742() -> String {
+        let schema = indoc! {
+            r#"model Top {
+                #id(id, Int, @id)
+
+                middleId Int?
+                middle Middle? @relation(fields: [middleId], references: [id])
+
+                #m2m(bottoms, Bottom[], id, Int)
+              }
+
+              model Middle {
+                #id(id, Int, @id)
+                bottoms Bottom[]
+
+                tops    Top[]
+              }
+
+              model Bottom {
+                #id(id, Int, @id)
+
+                middleId Int?
+                middle Middle?  @relation(fields: [middleId], references: [id])
+
+                #m2m(tops, Top[], id, Int)
+              }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/23742
+    // SQL Server excluded because the m2m fragment does not support onUpdate/onDelete args which are needed.
+    #[connector_test(schema(schema_23742), exclude(SqlServer))]
+    async fn prisma_23742(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+              createOneTop(data: {
+                id: 1,
+                middle: { create: { id: 1, bottoms: { create: { id: 1, tops: { create: { id: 2 } } } } } }
+              }) {
+                id
+            }}"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findUniqueTop(where: { id: 1 }) {
+              middle {
+                bottoms(
+                  where: { tops: { some: { id: 2 } } }
+                ) {
+                  id
+                }
+              }
+            }
+          }
+        "#),
+          @r###"{"data":{"findUniqueTop":{"middle":{"bottoms":[{"id":1}]}}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_nested_some_filter_m2m_different_pk() -> String {
+        let schema = indoc! {
+            r#"
+            model Top {
+                #id(topId, Int, @id)
+
+                relatedMiddleId Int?
+                middle          Middle? @relation(fields: [relatedMiddleId], references: [middleId])
+
+                #m2m(bottoms, Bottom[], bottomId, Int)
+            }
+
+            model Middle {
+                #id(middleId, Int, @id)
+
+                bottoms Bottom[]
+                tops    Top[]
+            }
+
+            model Bottom {
+                #id(bottomId, Int, @id)
+
+                relatedMiddleId Int?
+                middle          Middle?  @relation(fields: [relatedMiddleId], references: [middleId])
+
+                #m2m(tops, Top[], topId, Int)
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_nested_some_filter_m2m_different_pk), exclude(SqlServer))]
+    async fn nested_some_filter_m2m_different_pk(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+              createOneTop(data: {
+                topId: 1,
+                middle: { create: { middleId: 1, bottoms: { create: { bottomId: 1, tops: { create: { topId: 2 } } } } } }
+              }) {
+                topId
+            }}"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findUniqueTop(where: { topId: 1 }) {
+              middle {
+                bottoms(
+                  where: { tops: { some: { topId: 2 } } }
+                ) {
+                  bottomId
+                }
+              }
+            }
+          }
+        "#),
+          @r###"{"data":{"findUniqueTop":{"middle":{"bottoms":[{"bottomId":1}]}}}}"###
+        );
+
+        Ok(())
+    }
+
     async fn test_data(runner: &Runner) -> TestResult<()> {
         runner
             .query(indoc! { r#"

@@ -221,6 +221,15 @@ impl SqlFlavour for PostgresFlavour {
         })
     }
 
+    fn describe_query<'a>(
+        &'a mut self,
+        sql: &'a str,
+    ) -> BoxFuture<'a, ConnectorResult<quaint::connector::DescribedQuery>> {
+        with_connection(self, move |conn_params, _, conn| {
+            conn.describe_query(sql, &conn_params.url)
+        })
+    }
+
     fn apply_migration_script<'a>(
         &'a mut self,
         migration_name: &'a str,

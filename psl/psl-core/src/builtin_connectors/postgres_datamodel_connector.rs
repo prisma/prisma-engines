@@ -341,7 +341,7 @@ impl Connector for PostgresDatamodelConnector {
             DoublePrecision => ScalarType::Float,
             // Decimal
             Decimal(_) => ScalarType::Decimal,
-            Money => ScalarType::Float,
+            Money => ScalarType::Decimal,
             // DateTime
             Timestamp(_) => ScalarType::DateTime,
             Timestamptz(_) => ScalarType::DateTime,

@@ -16,6 +16,6 @@ serde_json.workspace = true
 tokio.workspace = true
 
 connection-string = "*"
-mongodb = "2.8.0"
+mongodb.workspace = true
 url.workspace = true
 once_cell = "1.17.0"

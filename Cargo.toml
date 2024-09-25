@@ -41,7 +41,7 @@ enumflags2 = { version = "0.7", features = ["serde"] }
 psl = { path = "./psl/psl" }
 serde_json = { version = "1", features = ["float_roundtrip", "preserve_order", "raw_value"] }
 serde = { version = "1", features = ["derive"] }
-tokio = { version = "1.25", features = [
+tokio = { version = "1", features = [
   "rt-multi-thread",
   "macros",
   "sync",
@@ -65,6 +65,7 @@ napi = { version = "2.15.1", default-features = false, features = [
 napi-derive = "2.15.0"
 js-sys = { version = "0.3" }
 rand = { version = "0.8" }
+regex = { version = "1", features = ["std"] }
 serde_repr = { version = "0.1.17" }
 serde-wasm-bindgen = { version = "0.5" }
 tracing = { version = "0.1" }
@@ -74,6 +75,9 @@ wasm-bindgen-futures = { version = "0.4" }
 wasm-rs-dbg = { version = "0.1.2", default-features = false, features = ["console-error"] }
 wasm-bindgen-test = { version = "0.3.0" }
 url = { version = "2.5.0" }
+
+bson = { version = "2.11.0", features = ["chrono-0_4", "uuid-1"] }
+mongodb = { git = "https://github.com/prisma/mongo-rust-driver.git", branch = "RUST-1994/happy-eyeballs" }
 
 [workspace.dependencies.quaint]
 path = "quaint"

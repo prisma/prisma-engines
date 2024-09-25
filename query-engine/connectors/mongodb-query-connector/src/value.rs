@@ -4,9 +4,9 @@ use crate::{
     IntoBson, MongoError,
 };
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
+use bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Document, Timestamp};
 use chrono::{TimeZone, Utc};
 use itertools::Itertools;
-use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Document, Timestamp};
 use psl::builtin_connectors::MongoDbType;
 use query_structure::{
     CompositeFieldRef, Field, GeometryFormat, PrismaValue, RelationFieldRef, ScalarFieldRef, SelectedField,

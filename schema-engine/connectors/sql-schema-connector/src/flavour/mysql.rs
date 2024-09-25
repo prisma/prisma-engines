@@ -405,6 +405,15 @@ impl SqlFlavour for MysqlFlavour {
     fn search_path(&self) -> &str {
         self.database_name()
     }
+
+    fn describe_query<'a>(
+        &'a mut self,
+        sql: &'a str,
+    ) -> BoxFuture<'a, ConnectorResult<quaint::connector::DescribedQuery>> {
+        with_connection(&mut self.state, move |conn_params, circumstances, conn| {
+            conn.describe_query(sql, &conn_params.url, circumstances)
+        })
+    }
 }
 
 #[enumflags2::bitflags]

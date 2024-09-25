@@ -44,14 +44,14 @@ impl From<DirEntry> for MigrationDirectory {
 #[derive(Debug, Clone)]
 pub struct MigrationRecord {
     /// A unique, randomly generated identifier.
-    pub id: String,
+    pub _id: String,
     /// The timestamp at which the migration completed *successfully*.
     pub finished_at: Option<Timestamp>,
     /// The name of the migration, i.e. the name of migration directory
     /// containing the migration script.
     pub migration_name: String,
     /// The time the migration started being applied.
-    pub started_at: Timestamp,
+    pub _started_at: Timestamp,
     /// The time the migration failed
     pub failed_at: Option<Timestamp>,
 }
@@ -142,9 +142,9 @@ pub fn list_migrations(database_filename: &Path) -> Result<Vec<MigrationRecord>>
         let failed_at: Option<Timestamp> = row.get(4).unwrap();
 
         entries.push(MigrationRecord {
-            id,
+            _id: id,
             migration_name,
-            started_at,
+            _started_at: started_at,
             finished_at,
             failed_at,
         });
