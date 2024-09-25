@@ -51,8 +51,7 @@ pub struct ItxManager {
 
 impl ItxManager {
     pub fn new() -> Self {
-        let transactions: Arc<RwLock<HashMap<TxId, Arc<RwLock<InteractiveTransaction>>>>> =
-            Arc::new(RwLock::new(HashMap::default()));
+        let transactions = Arc::new(RwLock::new(HashMap::<_, Arc<RwLock<InteractiveTransaction>>>::default()));
         let closed_txs = Arc::new(RwLock::new(LruCache::new(*CLOSED_TX_CACHE_SIZE)));
         let (timeout_sender, mut timeout_receiver) = unbounded_channel();
 
