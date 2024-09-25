@@ -12,7 +12,7 @@ pub fn trace_parent_to_string(context: &SpanContext) -> String {
     format!("traceparent='00-{trace_id:032x}-{span_id:016x}-01'")
 }
 
-pub trait SqlTraceComment: Sized {
+pub trait SqlTraceComment {
     fn append_trace(self, span: &Span) -> Self;
     fn add_traceparent(self, traceparent: Option<TraceParent>) -> Self;
 }
