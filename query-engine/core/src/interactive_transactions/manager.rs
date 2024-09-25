@@ -20,7 +20,7 @@ pub static CLOSED_TX_CACHE_SIZE: Lazy<usize> = Lazy::new(|| match std::env::var(
     Err(_) => 100,
 });
 
-pub struct ITXManager {
+pub struct ItxManager {
     /// Stores all current transactions (some of them might be already committed/expired/rolled back).
     ///
     /// There are two tiers of locks here:
@@ -49,7 +49,7 @@ pub struct ITXManager {
     timeout_sender: UnboundedSender<TxId>,
 }
 
-impl ITXManager {
+impl ItxManager {
     pub fn new() -> Self {
         let transactions: Arc<RwLock<HashMap<TxId, Arc<RwLock<InteractiveTransaction>>>>> =
             Arc::new(RwLock::new(HashMap::default()));
@@ -59,7 +59,7 @@ impl ITXManager {
         // This task rollbacks and removes any open transactions with expired timeouts from the
         // `self.transactions`. It also removes any closed transactions to avoid `self.transactions`
         // growing infinitely in size over time.
-        // Note that this task automatically exits when all transactions finish and the `ITXManager`
+        // Note that this task automatically exits when all transactions finish and the `ItxManager`
         // is dropped, because that causes the `timeout_receiver` to become closed.
         crosstarget_utils::task::spawn({
             let transactions = transactions.clone();
