@@ -29,11 +29,16 @@ pub static SHOW_ALL_TRACES: Lazy<bool> = Lazy::new(|| match std::env::var("PRISM
 pub struct TraceParent {
     trace_id: TraceId,
     span_id: SpanId,
+    sampled: bool,
 }
 
 impl TraceParent {
-    pub fn new_unsafe(trace_id: TraceId, span_id: SpanId) -> Self {
-        Self { trace_id, span_id }
+    pub fn new_unsafe(trace_id: TraceId, span_id: SpanId, sampled: bool) -> Self {
+        Self {
+            trace_id,
+            span_id,
+            sampled,
+        }
     }
 
     pub fn from_remote_context(context: &opentelemetry::Context) -> Option<Self> {
@@ -44,6 +49,7 @@ impl TraceParent {
             Some(Self {
                 trace_id: span_context.trace_id(),
                 span_id: span_context.span_id(),
+                sampled: span_context.is_sampled(),
             })
         } else {
             None
@@ -52,6 +58,10 @@ impl TraceParent {
 
     pub fn trace_id(&self) -> TraceId {
         self.trace_id
+    }
+
+    pub fn sampled(&self) -> bool {
+        self.sampled
     }
 
     /// Returns a remote `opentelemetry::Context`. By "remote" we mean that it wasn't emitted in the

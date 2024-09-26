@@ -51,7 +51,7 @@ impl TxId {
     /// emitted. Same transaction id is guaranteed to have traceparent with the same trace_id and
     /// span_id.
     pub fn as_traceparent(&self) -> TraceParent {
-        TraceParent::new_unsafe(self.as_trace_id(), self.as_span_id())
+        TraceParent::new_unsafe(self.as_trace_id(), self.as_span_id(), false)
     }
 }
 
