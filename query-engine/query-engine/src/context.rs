@@ -13,6 +13,7 @@ use query_engine_metrics::MetricRegistry;
 use request_handlers::{load_executor, ConnectorKind};
 use std::{env, fmt, sync::Arc};
 use tracing::Instrument;
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// Prisma request context containing all immutable state of the process.
 /// There is usually only one context initialized per process.
@@ -119,7 +120,11 @@ pub async fn setup(opts: &PrismaOpt, metrics: Option<MetricRegistry>) -> PrismaR
     let protocol = opts.engine_protocol();
     config.validate_that_one_datasource_is_provided()?;
 
-    let span = tracing::info_span!("prisma:engine:connect");
+    let span = tracing::info_span!("prisma:engine:connect", user_facing = true);
+    if let Some(trace_context) = opts.trace_context.as_ref() {
+        let parent_context = telemetry::helpers::restore_remote_context_from_json_str(trace_context);
+        span.set_parent(parent_context);
+    }
 
     let mut features = EnabledFeatures::from(opts);
 
