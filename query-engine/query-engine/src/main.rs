@@ -1,8 +1,5 @@
 #![allow(clippy::upper_case_acronyms)]
 
-#[macro_use]
-extern crate tracing;
-
 use query_engine::cli::CliCommand;
 use query_engine::context;
 use query_engine::error::PrismaError;
@@ -18,7 +15,7 @@ type AnyError = Box<dyn Error + Send + Sync + 'static>;
 #[tokio::main]
 async fn main() -> Result<(), AnyError> {
     return main().await.map_err(|err| {
-        info!("Encountered error during initialization:");
+        tracing::info!("Encountered error during initialization:");
         err.render_as_json().expect("error rendering");
         process::exit(1)
     });
