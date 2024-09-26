@@ -96,6 +96,7 @@ fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
         enable_telemetry_in_response: false,
         dataproxy_metric_override: false,
         engine_protocol: None,
+        trace_context: None,
     };
 
     let cli_cmd = CliCommand::from_opt(&prisma_opt)?.unwrap();
