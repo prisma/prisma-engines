@@ -103,18 +103,12 @@ impl PrismaContext {
     }
 }
 
-pub async fn setup(
-    opts: &PrismaOpt,
-    install_logger: bool,
-    metrics: Option<MetricRegistry>,
-) -> PrismaResult<Arc<PrismaContext>> {
+pub async fn setup(opts: &PrismaOpt, metrics: Option<MetricRegistry>) -> PrismaResult<Arc<PrismaContext>> {
     let metrics = metrics.unwrap_or_default();
 
-    if install_logger {
-        Logger::new("prisma-engine-http", Some(metrics.clone()), opts)
-            .install()
-            .unwrap();
-    }
+    Logger::new("prisma-engine-http", Some(metrics.clone()), opts)
+        .install()
+        .unwrap();
 
     if opts.enable_metrics || opts.dataproxy_metric_override {
         metric_setup();

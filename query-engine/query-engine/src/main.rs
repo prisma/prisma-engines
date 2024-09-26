@@ -25,7 +25,7 @@ async fn main() -> Result<(), AnyError> {
         match CliCommand::from_opt(&opts)? {
             Some(cmd) => cmd.execute().await?,
             None => {
-                let cx = context::setup(&opts, true, None).await?;
+                let cx = context::setup(&opts, None).await?;
                 set_panic_hook(opts.log_format());
                 server::listen(cx, &opts).await?;
             }
