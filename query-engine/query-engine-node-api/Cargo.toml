@@ -54,6 +54,8 @@ tokio.workspace = true
 futures = "0.3"
 query-engine-metrics = { path = "../metrics" }
 
+mimalloc = "0.1.43"
+
 [build-dependencies]
 napi-build = "1"
 build-utils.path = "../../libs/build-utils"
