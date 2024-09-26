@@ -33,15 +33,11 @@ pub struct TraceParent {
 }
 
 impl TraceParent {
-    pub fn new_unsafe(trace_id: TraceId, span_id: SpanId, sampled: bool) -> Self {
+    pub fn new_unsafe(trace_id: TraceId, span_id: SpanId, flags: TraceFlags) -> Self {
         Self {
             trace_id,
             span_id,
-            flags: if sampled {
-                TraceFlags::SAMPLED
-            } else {
-                TraceFlags::default()
-            },
+            flags,
         }
     }
 
