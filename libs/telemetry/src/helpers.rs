@@ -2,7 +2,7 @@ use super::models::TraceSpan;
 use derive_more::Display;
 use once_cell::sync::Lazy;
 use opentelemetry::sdk::export::trace::SpanData;
-use opentelemetry::trace::{SpanId, TraceContextExt, TraceId};
+use opentelemetry::trace::{SpanId, TraceContextExt, TraceFlags, TraceId};
 use serde_json::{json, Value};
 use std::collections::HashMap;
 use tracing::Metadata;
@@ -25,11 +25,11 @@ pub static SHOW_ALL_TRACES: Lazy<bool> = Lazy::new(|| match std::env::var("PRISM
 #[derive(Display, Copy, Clone)]
 // This conforms with https://www.w3.org/TR/trace-context/#traceparent-header-field-values. Accelerate
 // relies on this behaviour.
-#[display(fmt = "00-{trace_id:032x}-{span_id:016x}-01")]
+#[display(fmt = "00-{trace_id:032x}-{span_id:016x}-{flags:02x}")]
 pub struct TraceParent {
     trace_id: TraceId,
     span_id: SpanId,
-    sampled: bool,
+    flags: TraceFlags,
 }
 
 impl TraceParent {
@@ -37,7 +37,11 @@ impl TraceParent {
         Self {
             trace_id,
             span_id,
-            sampled,
+            flags: if sampled {
+                TraceFlags::SAMPLED
+            } else {
+                TraceFlags::default()
+            },
         }
     }
 
@@ -49,7 +53,7 @@ impl TraceParent {
             Some(Self {
                 trace_id: span_context.trace_id(),
                 span_id: span_context.span_id(),
-                sampled: span_context.is_sampled(),
+                flags: span_context.trace_flags(),
             })
         } else {
             None
@@ -61,7 +65,7 @@ impl TraceParent {
     }
 
     pub fn sampled(&self) -> bool {
-        self.sampled
+        self.flags.is_sampled()
     }
 
     /// Returns a remote `opentelemetry::Context`. By "remote" we mean that it wasn't emitted in the
