@@ -1,5 +1,5 @@
 use derive_more::Display;
-use opentelemetry::trace::{SpanId, TraceId};
+use opentelemetry::trace::{SpanId, TraceFlags, TraceId};
 use serde::Deserialize;
 
 use telemetry::helpers::TraceParent;
@@ -51,7 +51,7 @@ impl TxId {
     /// emitted. Same transaction id is guaranteed to have traceparent with the same trace_id and
     /// span_id.
     pub fn as_traceparent(&self) -> TraceParent {
-        TraceParent::new_unsafe(self.as_trace_id(), self.as_span_id(), false)
+        TraceParent::new_unsafe(self.as_trace_id(), self.as_span_id(), TraceFlags::default())
     }
 }
 
