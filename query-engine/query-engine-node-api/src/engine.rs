@@ -76,7 +76,7 @@ impl QueryEngine {
             This usually happens when the javascript object passed to the constructor is missing 
             properties for the ConstructorOptions fields that must have some value.
             
-            If you set some of these in javascript trough environment variables, make sure there are
+            If you set some of these in javascript through environment variables, make sure there are
             values for data_model, log_level, and any field that is not Option<T>
             "###,
         );
