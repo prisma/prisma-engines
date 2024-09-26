@@ -79,6 +79,7 @@ futures = "0.3"
 url.workspace = true
 hex = "0.4"
 itertools.workspace = true
+regex.workspace = true
 
 either = { version = "1.6" }
 base64 = { version = "0.12.3" }

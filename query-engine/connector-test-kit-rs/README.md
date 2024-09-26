@@ -83,7 +83,7 @@ drivers the code that actually communicates with the databases. See [`adapter-*`
 To run tests through a driver adapters, you should also configure the following environment variables:
 
 * `DRIVER_ADAPTER`: tells the test executor to use a particular driver adapter. Set to `neon`, `planetscale` or any other supported adapter.
-* `DRIVER_ADAPTER_CONFIG`: a json string with the configuration for the driver adapter. This is adapter specific. See the [github workflow for driver adapter tests](.github/workflows/query-engine-driver-adapters.yml) for examples on how to configure the driver adapters.
+* `DRIVER_ADAPTER_CONFIG`: a json string with the configuration for the driver adapter. This is adapter specific. See the [GitHub workflow for driver adapter tests](.github/workflows/query-engine-driver-adapters.yml) for examples on how to configure the driver adapters.
 * `ENGINE`: can be used to run either `wasm` or `napi` or `c-abi` version of the engine.
 
 Example:
@@ -339,7 +339,7 @@ run_query!(
 
 **Accepting a snapshot update will replace, directly in your code, the expected output in the assertion.**
 
-If you dislike the interactive view, you can also run `cargo insta accept` to automatically accept all snapshots and then use your git diff to check if everything is as intented.
+If you dislike the interactive view, you can also run `cargo insta accept` to automatically accept all snapshots and then use your git diff to check if everything is as intended.
 
 ##### Without `cargo-insta`
 
