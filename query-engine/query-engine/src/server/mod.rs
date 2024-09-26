@@ -112,7 +112,8 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
 
     let headers = req.headers();
     let tx_id = try_get_transaction_id(headers);
-    let (span, traceparent, capturer) = setup_telemetry(headers, &tx_id).await;
+    let (span, traceparent, capturer) =
+        setup_telemetry(info_span!("prisma:engine:query", user_facing = true), headers, &tx_id).await;
 
     let buffer = hyper::body::to_bytes(req.into_body()).await?;
     let request_body = RequestBody::try_from_slice(buffer.as_ref(), cx.engine_protocol());
@@ -228,7 +229,12 @@ async fn transaction_start_handler(cx: Arc<PrismaContext>, req: Request<Body>) -
     let mut tx_opts: TransactionOptions = serde_json::from_slice(full_body.as_ref()).unwrap();
     let tx_id = Some(tx_opts.with_new_transaction_id());
 
-    let (span, _traceparent, capturer) = setup_telemetry(&headers, &tx_id).await;
+    let (span, _traceparent, capturer) = setup_telemetry(
+        info_span!("prisma:engine:start_transaction", user_facing = true),
+        &headers,
+        &tx_id,
+    )
+    .await;
 
     let result = cx
         .executor
@@ -258,7 +264,12 @@ async fn transaction_commit_handler(
     req: Request<Body>,
     tx_id: TxId,
 ) -> Result<Response<Body>, hyper::Error> {
-    let (span, _traceparent, capturer) = setup_telemetry(req.headers(), &Some(tx_id.clone())).await;
+    let (span, _traceparent, capturer) = setup_telemetry(
+        info_span!("prisma:engine:commit_transaction", user_facing = true),
+        req.headers(),
+        &Some(tx_id.clone()),
+    )
+    .await;
 
     let result = cx.executor.commit_tx(tx_id).instrument(span).await;
 
@@ -274,7 +285,12 @@ async fn transaction_rollback_handler(
     req: Request<Body>,
     tx_id: TxId,
 ) -> Result<Response<Body>, hyper::Error> {
-    let (span, _traceparent, capturer) = setup_telemetry(req.headers(), &Some(tx_id.clone())).await;
+    let (span, _traceparent, capturer) = setup_telemetry(
+        info_span!("prisma:engine:rollback_transaction", user_facing = true),
+        req.headers(),
+        &Some(tx_id.clone()),
+    )
+    .await;
 
     let result = cx.executor.rollback_tx(tx_id).instrument(span).await;
 
@@ -355,7 +371,11 @@ fn err_to_http_resp(
     build_json_response(status, &err)
 }
 
-async fn setup_telemetry(headers: &HeaderMap, tx_id: &Option<TxId>) -> (Span, Option<TraceParent>, Capturer) {
+async fn setup_telemetry(
+    span: Span,
+    headers: &HeaderMap,
+    tx_id: &Option<TxId>,
+) -> (Span, Option<TraceParent>, Capturer) {
     let capture_settings = {
         let settings = headers
             .get("X-capture-telemetry")
@@ -377,7 +397,6 @@ async fn setup_telemetry(headers: &HeaderMap, tx_id: &Option<TxId>) -> (Span, Op
         }
     };
 
-    let span = info_span!("prisma:engine", user_facing = true);
     let traceparent = if let Some(parent_context) = parent_context {
         let requester_traceparent = TraceParent::from_remote_context(&parent_context);
         span.set_parent(parent_context);
