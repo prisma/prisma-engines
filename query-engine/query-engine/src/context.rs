@@ -50,7 +50,8 @@ impl PrismaContext {
             // Construct query schema
             schema::build(arced_schema, enabled_features.contains(Feature::RawQueries))
         });
-        let executor_fut = tokio::spawn(async move {
+
+        let executor_fut = async move {
             let config = &arced_schema_2.configuration;
             let preview_features = config.preview_features();
 
@@ -75,10 +76,10 @@ impl PrismaContext {
             let db_version = conn.version().await;
 
             PrismaResult::<_>::Ok((executor, db_version))
-        });
+        };
 
         let (query_schema, executor_with_db_version) = tokio::join!(query_schema_fut, executor_fut);
-        let (executor, db_version) = executor_with_db_version.unwrap()?;
+        let (executor, db_version) = executor_with_db_version?;
 
         let query_schema = query_schema.unwrap().with_db_version_supports_join_strategy(
             relation_load_strategy::db_version_supports_joins_strategy(db_version)?,
