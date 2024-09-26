@@ -34,7 +34,11 @@ macro_rules! sql_trace {
 
             // Temporary method to pass the traceid in an operation
             fn add_traceparent(self, traceparent: Option<TraceParent>) -> Self {
-                if let Some(traceparent) = traceparent {
+                let Some(traceparent) = traceparent else {
+                    return self;
+                };
+
+                if traceparent.sampled() {
                     self.comment(format!("traceparent='{}'", traceparent))
                 } else {
                     self
