@@ -39,7 +39,7 @@ macro_rules! sql_trace {
                 };
 
                 if traceparent.sampled() {
-                    self.comment(format!("traceparent='{}'", traceparent))
+                    self.comment(format!("traceparent='{traceparent}'"))
                 } else {
                     self
                 }
