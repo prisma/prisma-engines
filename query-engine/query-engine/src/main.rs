@@ -29,7 +29,7 @@ async fn main() -> Result<(), AnyError> {
         match CliCommand::from_opt(&opts)? {
             Some(cmd) => cmd.execute().await?,
             None => {
-                let span = tracing::info_span!("prisma:engine:connect");
+                let span = tracing::info_span!("prisma:engine:setup");
                 let cx = context::setup(&opts, true, None).instrument(span).await?;
                 set_panic_hook(opts.log_format());
                 server::listen(cx, &opts).await?;
