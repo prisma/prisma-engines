@@ -63,7 +63,15 @@ impl PrismaContext {
             let url = datasource.load_url(|key| env::var(key).ok())?;
             // Load executor
             let executor = load_executor(ConnectorKind::Rust { url, datasource }, preview_features).await?;
-            let conn = executor.primary_connector().get_connection().await?;
+            let connector = executor.primary_connector();
+
+            let conn_span = tracing::info_span!(
+                "prisma:engine:connection",
+                user_facing = true,
+                "db.type" = connector.name(),
+            );
+
+            let conn = connector.get_connection().instrument(conn_span).await?;
             let db_version = conn.version().await;
 
             PrismaResult::<_>::Ok((executor, db_version))
