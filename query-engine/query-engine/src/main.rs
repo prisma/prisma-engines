@@ -8,7 +8,6 @@ use query_engine::server;
 use query_engine::LogFormat;
 use std::{error::Error, process};
 use structopt::StructOpt;
-use tracing::Instrument;
 
 type AnyError = Box<dyn Error + Send + Sync + 'static>;
 
@@ -26,8 +25,7 @@ async fn main() -> Result<(), AnyError> {
         match CliCommand::from_opt(&opts)? {
             Some(cmd) => cmd.execute().await?,
             None => {
-                let span = tracing::info_span!("prisma:engine:setup");
-                let cx = context::setup(&opts, true, None).instrument(span).await?;
+                let cx = context::setup(&opts, true, None).await?;
                 set_panic_hook(opts.log_format());
                 server::listen(cx, &opts).await?;
             }
