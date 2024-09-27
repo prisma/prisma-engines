@@ -90,10 +90,10 @@ impl TransactionOptions {
 
     /// Generates a new transaction id before the transaction is started and returns a modified version
     /// of self with the new predefined_id set.
-    pub fn with_new_transaction_id(&mut self) -> TxId {
+    pub fn with_new_transaction_id(mut self) -> Self {
         let tx_id = TxId::default();
         self.new_tx_id = Some(tx_id.clone());
-        tx_id
+        self
     }
 }
 #[cfg_attr(target_arch = "wasm32", async_trait(?Send))]
