@@ -226,7 +226,12 @@ async fn transaction_start_handler(cx: Arc<PrismaContext>, req: Request<Body>) -
 
     let body_start = req.into_body();
     let full_body = hyper::body::to_bytes(body_start).await?;
-    let mut tx_opts: TransactionOptions = serde_json::from_slice(full_body.as_ref()).unwrap();
+    let Ok(mut tx_opts): Result<TransactionOptions, _> = serde_json::from_slice(full_body.as_ref()) else {
+        return Ok(Response::builder()
+            .status(StatusCode::BAD_REQUEST)
+            .body(Body::from("Invalid transaction options"))
+            .unwrap());
+    };
     let tx_id = Some(tx_opts.with_new_transaction_id());
 
     let (span, _traceparent, capturer) = setup_telemetry(
