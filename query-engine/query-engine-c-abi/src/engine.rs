@@ -203,7 +203,7 @@ impl QueryEngine {
 
         let trace_string = get_cstr_safe(trace).expect("Connect trace is missing");
 
-        let span = tracing::info_span!("prisma:engine:connect");
+        let span = tracing::info_span!("prisma:engine:connect", user_facing = true);
         let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace_string);
         span.set_parent(parent_context);
 
@@ -320,7 +320,7 @@ impl QueryEngine {
         let trace = get_cstr_safe(trace_str).expect("Trace is needed");
         let dispatcher = self.logger.dispatcher();
         async {
-            let span = tracing::info_span!("prisma:engine:disconnect");
+            let span = tracing::info_span!("prisma:engine:disconnect", user_facing = true);
             let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
             span.set_parent(parent_context);
 
