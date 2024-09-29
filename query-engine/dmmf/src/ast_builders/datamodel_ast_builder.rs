@@ -94,6 +94,9 @@ fn composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker<'_>) ->
         is_id: false,
         is_read_only: false,
         has_default_value: field.default_value().is_some(),
+        native_type: field
+            .raw_native_type()
+            .map(|(_, name, args, ..)| (name.to_string(), args.iter().cloned().collect())),
         default: field
             .default_value()
             .map(|dv| default_value_to_serde(&dml_default_kind(dv, field.scalar_type()))),
@@ -195,6 +198,9 @@ fn scalar_field_to_dmmf(field: walkers::ScalarFieldWalker<'_>) -> Field {
             ScalarFieldType::BuiltInScalar(st) => st.as_str().to_owned(),
             ScalarFieldType::Unsupported(_) => unreachable!(),
         },
+        native_type: field
+            .raw_native_type()
+            .map(|(_, name, args, ..)| (name.to_string(), args.iter().cloned().collect())),
         default: field
             .default_value()
             .map(|dv| default_value_to_serde(&dml_default_kind(dv.value(), field.scalar_type()))),
@@ -221,6 +227,7 @@ fn relation_field_to_dmmf(field: walkers::RelationFieldWalker<'_>) -> Field {
         is_read_only: false,
         has_default_value: false,
         field_type: field.related_model().name().to_owned(),
+        native_type: None,
         default: None,
         relation_name: Some(field.relation_name().to_string()),
         relation_from_fields: Some(
