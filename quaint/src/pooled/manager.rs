@@ -3,7 +3,7 @@ use crate::connector::MssqlUrl;
 #[cfg(feature = "mysql-native")]
 use crate::connector::MysqlUrl;
 #[cfg(feature = "postgresql-native")]
-use crate::connector::{PostgresUrl, MakeTlsConnectorManager};
+use crate::connector::{MakeTlsConnectorManager, PostgresUrl};
 use crate::{
     ast,
     connector::{self, impl_default_TransactionCapable, IsolationLevel, Queryable, Transaction, TransactionCapable},
@@ -85,7 +85,10 @@ pub enum QuaintManager {
     Mysql { url: MysqlUrl },
 
     #[cfg(feature = "postgresql")]
-    Postgres { url: PostgresUrl, tls_manager: MakeTlsConnectorManager },
+    Postgres {
+        url: PostgresUrl,
+        tls_manager: MakeTlsConnectorManager,
+    },
 
     #[cfg(feature = "sqlite")]
     Sqlite { url: String, db_name: String },

@@ -312,7 +312,11 @@ impl Builder {
             url.set_flavour(flavour);
         }
 
-        if let QuaintManager::Postgres { ref mut url, tls_manager: _ } = self.manager {
+        if let QuaintManager::Postgres {
+            ref mut url,
+            tls_manager: _,
+        } = self.manager
+        {
             url.set_flavour(flavour);
         }
     }

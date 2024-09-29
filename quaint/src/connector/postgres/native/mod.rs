@@ -25,7 +25,6 @@ use column_type::PGColumnType;
 use futures::{future::FutureExt, lock::Mutex};
 use lru_cache::LruCache;
 use native_tls::{Certificate, Identity, TlsConnector};
-use tokio::sync::OnceCell;
 use postgres_native_tls::MakeTlsConnector;
 use postgres_types::{Kind as PostgresKind, Type as PostgresType};
 use std::hash::{DefaultHasher, Hash, Hasher};
@@ -37,6 +36,7 @@ use std::{
     sync::atomic::{AtomicBool, Ordering},
     time::Duration,
 };
+use tokio::sync::OnceCell;
 use tokio_postgres::{config::ChannelBinding, Client, Config, Statement};
 
 /// The underlying postgres driver. Only available with the `expose-drivers`
@@ -905,28 +905,31 @@ impl MakeTlsConnectorManager {
     }
 
     pub async fn get_connector(&self) -> crate::Result<MakeTlsConnector> {
-        self.connector.get_or_try_init(|| async {
-            let mut tls_builder = TlsConnector::builder();
+        self.connector
+            .get_or_try_init(|| async {
+                let mut tls_builder = TlsConnector::builder();
 
-            {
-                let ssl_params = self.url.ssl_params();
-                let auth = ssl_params.to_owned().into_auth().await?;
+                {
+                    let ssl_params = self.url.ssl_params();
+                    let auth = ssl_params.to_owned().into_auth().await?;
 
-                if let Some(certificate) = auth.certificate.0 {
-                    tls_builder.add_root_certificate(certificate);
+                    if let Some(certificate) = auth.certificate.0 {
+                        tls_builder.add_root_certificate(certificate);
+                    }
+
+                    tls_builder.danger_accept_invalid_certs(auth.ssl_accept_mode == SslAcceptMode::AcceptInvalidCerts);
+
+                    if let Some(identity) = auth.identity.0 {
+                        tls_builder.identity(identity);
+                    }
                 }
 
-                tls_builder.danger_accept_invalid_certs(auth.ssl_accept_mode == SslAcceptMode::AcceptInvalidCerts);
+                let tls_connector = MakeTlsConnector::new(tls_builder.build()?);
 
-                if let Some(identity) = auth.identity.0 {
-                    tls_builder.identity(identity);
-                }
-            }
-
-            let tls_connector = MakeTlsConnector::new(tls_builder.build()?);
-
-            Ok(tls_connector)
-        }).await.map(Clone::clone)
+                Ok(tls_connector)
+            })
+            .await
+            .cloned()
     }
 }
 
