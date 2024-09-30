@@ -122,10 +122,10 @@ impl QueryDocumentParser {
         )
         .and_then(move |arguments| {
             if !selection.nested_selections().is_empty() && schema_field.field_type().is_scalar() {
-                return Err(ValidationError::selection_set_on_scalar(
+                Err(ValidationError::selection_set_on_scalar(
                     selection.name().to_string(),
                     selection_path.segments(),
-                ));
+                ))
             } else {
                 // If the output type of the field is an object type of any form, validate the sub selection as well.
                 let nested_fields = schema_field.field_type().as_object_type().map(|obj| {

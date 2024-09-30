@@ -20,6 +20,7 @@ pub fn test_tracing_subscriber(log_config: String, metrics: MetricRegistry, log_
 }
 
 /// This is a temporary implementation detail for `tracing` logs in tests.
+///
 /// Instead of going through `std::io::stderr`, it goes through the specific
 /// local stderr handle used by `eprintln` and `dbg`, allowing logs to appear in
 /// specific test outputs for readability.

@@ -205,6 +205,7 @@ pub fn validate(validate_params: String) -> Result<(), String> {
 }
 
 /// Given a list of Prisma schema files (and their locations), returns the merged schema.
+///
 /// This is useful for `@prisma/client` generation, where the client needs a single - potentially large - schema,
 /// while still allowing the user to split their schema copies into multiple files.
 /// Internally, it uses `[validate]`.

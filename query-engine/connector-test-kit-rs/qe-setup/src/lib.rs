@@ -60,6 +60,7 @@ fn parse_configuration(datamodel: &str) -> ConnectorResult<(Datasource, String, 
 }
 
 /// Database setup for connector-test-kit-rs with Driver Adapters.
+///
 /// If the external driver adapter requires a migration by means of the JavaScript runtime
 /// (rather than just the Schema Engine), this function will call [`ExternalInitializer::init_with_migration`].
 /// Otherwise, it will call [`ExternalInitializer::init`], and then proceed with the standard

@@ -8,7 +8,7 @@ use crate::{
     },
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
-use psl::builtin_connectors::{CockroachType, PostgresType, geometry::GeometryParams};
+use psl::builtin_connectors::{geometry::GeometryParams, CockroachType, PostgresType};
 use sql_ddl::{
     postgres::{self as ddl, PostgresIdentifier},
     IndexColumn, SortOrder,

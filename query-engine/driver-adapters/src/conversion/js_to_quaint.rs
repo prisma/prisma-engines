@@ -285,7 +285,6 @@ pub fn js_value_to_quaint(
         ColumnType::UuidArray => js_array_to_quaint(ColumnType::Uuid, json_value, column_name),
 
         // TODO@geometry: Probably need to add geometry value handling here
-
         unimplemented => {
             todo!("support column type {:?} in column {}", unimplemented, column_name)
         }

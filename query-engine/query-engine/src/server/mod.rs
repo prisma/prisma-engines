@@ -227,10 +227,7 @@ async fn metrics_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
     // block and buffer request until the request has completed
     let full_body = hyper::body::to_bytes(body_start).await?;
 
-    let global_labels: HashMap<String, String> = match serde_json::from_slice(full_body.as_ref()) {
-        Ok(map) => map,
-        Err(_e) => HashMap::new(),
-    };
+    let global_labels: HashMap<String, String> = serde_json::from_slice(full_body.as_ref()).unwrap_or_default();
 
     let response = if requested_json {
         let metrics = cx.metrics.to_json(global_labels);

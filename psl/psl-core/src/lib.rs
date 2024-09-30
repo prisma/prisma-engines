@@ -111,6 +111,7 @@ pub fn validate_multi_file(files: &[(String, SourceFile)], connectors: Connector
 }
 
 /// Retrieves a Prisma schema without validating it.
+///
 /// You should only use this method when actually validating the schema is too expensive
 /// computationally or in terms of bundle size (e.g., for `query-engine-wasm`).
 pub fn parse_without_validation(file: SourceFile, connectors: ConnectorRegistry<'_>) -> ValidatedSchema {
