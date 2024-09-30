@@ -15,6 +15,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -28,6 +29,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -41,6 +43,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -54,6 +57,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Profile",
+          "nativeType": null,
           "relationName": "ProfileToUser",
           "relationFromFields": [],
           "relationToFields": [],
@@ -80,6 +84,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -93,6 +98,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -106,6 +112,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "User",
+          "nativeType": null,
           "relationName": "ProfileToUser",
           "relationFromFields": [
             "userId"
@@ -126,6 +133,7 @@
           "isReadOnly": true,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -149,6 +157,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -162,6 +171,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -175,6 +185,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -188,6 +199,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         }
