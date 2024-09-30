@@ -155,7 +155,6 @@ impl TransactionProxy {
     }
 
     pub fn begin(&self) -> UnsafeFuture<impl Future<Output = quaint::Result<()>> + '_> {
-        self.closed.store(true, Ordering::Relaxed);
         UnsafeFuture(self.begin.call_as_async(()))
     }
 
