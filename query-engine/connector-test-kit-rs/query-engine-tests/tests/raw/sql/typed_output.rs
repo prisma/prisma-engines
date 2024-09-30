@@ -444,7 +444,7 @@ mod typed_output {
     async fn geometry_type_mysql(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, fmt_query_raw(r#"SELECT POINT(1, 1);"#, vec![])),
-          @r###"{"data":{"queryRaw":{"columns":["POINT(1, 1)"],"types":["geometry"],"rows":[["POINT(1 1)"]}}}"###
+          @r###"{"data":{"queryRaw":{"columns":["POINT(1, 1)"],"types":["geometry"],"rows":[["POINT(1 1)"]]}}}"###
         );
 
         Ok(())
