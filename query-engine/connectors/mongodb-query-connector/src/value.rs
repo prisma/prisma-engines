@@ -199,6 +199,16 @@ impl IntoBson for (&MongoDbType, PrismaValue) {
                 })?
             }
 
+            // Geometry
+            (MongoDbType::Json, PrismaValue::GeoJson(json)) => {
+                let val: Value = serde_json::from_str(&json)?;
+
+                Bson::try_from(val).map_err(|_| MongoError::ConversionError {
+                    from: "Stringified GeoJSON".to_owned(),
+                    to: "Mongo BSON (extJSON)".to_owned(),
+                })?
+            }
+
             // Unhandled conversions
             (mdb_type, p_val) => {
                 return Err(MongoError::ConversionError {
@@ -271,7 +281,7 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
             (TypeIdentifier::Geometry(GeometryFormat::GeoJSON), PrismaValue::GeoJson(json)) => {
                 let val: Value = serde_json::from_str(&json)?;
                 Bson::try_from(val).map_err(|_| MongoError::ConversionError {
-                    from: "Stringified JSON".to_owned(),
+                    from: "Stringified GeoJSON".to_owned(),
                     to: "Mongo BSON (extJSON)".to_owned(),
                 })?
             }
