@@ -43,7 +43,7 @@ impl<'conn> Transaction for MongoDbTransaction<'conn> {
         Ok(())
     }
 
-    async fn commit(&mut self) -> connector_interface::Result<i32> {
+    async fn commit(&mut self) -> connector_interface::Result<u32> {
         decrement_gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 1.0);
 
         utils::commit_with_retry(&mut self.connection.session)
@@ -53,7 +53,7 @@ impl<'conn> Transaction for MongoDbTransaction<'conn> {
         Ok(0)
     }
 
-    async fn rollback(&mut self) -> connector_interface::Result<i32> {
+    async fn rollback(&mut self) -> connector_interface::Result<u32> {
         decrement_gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 1.0);
 
         self.connection

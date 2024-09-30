@@ -1,4 +1,4 @@
-use std::future::Future;
+use std::{borrow::Cow, future::Future};
 
 use async_trait::async_trait;
 use metrics::decrement_gauge;
@@ -86,7 +86,7 @@ impl Queryable for JsTransactionContext {
 pub(crate) struct JsTransaction {
     tx_proxy: TransactionProxy,
     inner: JsBaseQueryable,
-    pub depth: i32,
+    pub depth: u32,
 }
 
 impl JsTransaction {
@@ -116,7 +116,7 @@ impl QuaintTransaction for JsTransaction {
 
         self.depth += 1;
 
-        let begin_stmt = self.begin_statement(self.depth).await;
+        let begin_stmt = self.begin_statement(self.depth);
 
         if self.options().use_phantom_query {
             let commit_stmt = JsBaseQueryable::phantom_query_message(&begin_stmt);
@@ -129,11 +129,11 @@ impl QuaintTransaction for JsTransaction {
 
         UnsafeFuture(self.tx_proxy.begin()).await
     }
-    async fn commit(&mut self) -> quaint::Result<i32> {
+    async fn commit(&mut self) -> quaint::Result<u32> {
         // increment of this gauge is done in DriverProxy::startTransaction
         decrement_gauge!("prisma_client_queries_active", 1.0);
 
-        let commit_stmt = self.commit_statement(self.depth).await;
+        let commit_stmt = self.commit_statement(self.depth);
 
         if self.options().use_phantom_query {
             let commit_stmt = JsBaseQueryable::phantom_query_message(&commit_stmt);
@@ -150,11 +150,11 @@ impl QuaintTransaction for JsTransaction {
         Ok(self.depth)
     }
 
-    async fn rollback(&mut self) -> quaint::Result<i32> {
+    async fn rollback(&mut self) -> quaint::Result<u32> {
         // increment of this gauge is done in DriverProxy::startTransaction
         decrement_gauge!("prisma_client_queries_active", 1.0);
 
-        let rollback_stmt = self.rollback_statement(self.depth).await;
+        let rollback_stmt = self.rollback_statement(self.depth);
 
         if self.options().use_phantom_query {
             let rollback_stmt = JsBaseQueryable::phantom_query_message(&rollback_stmt);
@@ -226,16 +226,16 @@ impl Queryable for JsTransaction {
         self.inner.requires_isolation_first()
     }
 
-    async fn begin_statement(&self, depth: i32) -> String {
-        self.inner.begin_statement(depth).await
+    fn begin_statement(&self, depth: u32) -> Cow<'static, str> {
+        self.inner.begin_statement(depth)
     }
 
-    async fn commit_statement(&self, depth: i32) -> String {
-        self.inner.commit_statement(depth).await
+    fn commit_statement(&self, depth: u32) -> Cow<'static, str> {
+        self.inner.commit_statement(depth)
     }
 
-    async fn rollback_statement(&self, depth: i32) -> String {
-        self.inner.rollback_statement(depth).await
+    fn rollback_statement(&self, depth: u32) -> Cow<'static, str> {
+        self.inner.rollback_statement(depth)
     }
 }
 

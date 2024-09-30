@@ -31,8 +31,8 @@ impl Display for TxOpRequest {
 #[derive(Debug)]
 pub enum TxOpResponse {
     Begin(()),
-    Committed(crate::Result<i32>),
-    RolledBack(crate::Result<i32>),
+    Committed(crate::Result<u32>),
+    RolledBack(crate::Result<u32>),
     Single(crate::Result<ResponseData>),
     Batch(crate::Result<Vec<crate::Result<ResponseData>>>),
 }

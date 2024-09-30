@@ -15,6 +15,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use futures::lock::Mutex;
+use std::borrow::Cow;
 use std::{
     convert::TryFrom,
     future::Future,
@@ -242,40 +243,32 @@ impl Queryable for Mssql {
     }
 
     /// Statement to begin a transaction
-    async fn begin_statement(&self, depth: i32) -> String {
-        let savepoint_stmt = format!("SAVE TRANSACTION savepoint{}", depth);
-        let ret = if depth > 1 {
-            savepoint_stmt
+    fn begin_statement(&self, depth: u32) -> Cow<'static, str> {
+        if depth > 1 {
+            Cow::Owned(format!("SAVE TRANSACTION savepoint{depth}"))
         } else {
-            "BEGIN TRAN".to_string()
-        };
-
-        return ret;
+            Cow::Borrowed("BEGIN TRAN")
+        }
     }
 
     /// Statement to commit a transaction
-    async fn commit_statement(&self, depth: i32) -> String {
+    fn commit_statement(&self, depth: u32) -> Cow<'static, str> {
         // MSSQL doesn't have a "RELEASE SAVEPOINT" equivalent, so in a nested
         // transaction we just continue onwards
-        let ret = if depth > 1 {
-            " ".to_string()
+        if depth > 1 {
+            Cow::Owned("".to_string())
         } else {
-            "COMMIT".to_string()
-        };
-
-        return ret;
+            Cow::Borrowed("COMMIT")
+        }
     }
 
     /// Statement to rollback a transaction
-    async fn rollback_statement(&self, depth: i32) -> String {
-        let savepoint_stmt = format!("ROLLBACK TRANSACTION savepoint{}", depth);
-        let ret = if depth > 1 {
-            savepoint_stmt
+    fn rollback_statement(&self, depth: u32) -> Cow<'static, str> {
+        if depth > 1 {
+            Cow::Owned(format!("ROLLBACK TRANSACTION savepoint{depth}"))
         } else {
-            "ROLLBACK".to_string()
-        };
-
-        return ret;
+            Cow::Borrowed("ROLLBACK")
+        }
     }
 
     fn requires_isolation_first(&self) -> bool {

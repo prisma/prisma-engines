@@ -152,7 +152,7 @@ impl<'a> ITXServer<'a> {
         Ok(())
     }
 
-    pub(crate) async fn commit(&mut self) -> crate::Result<i32> {
+    pub(crate) async fn commit(&mut self) -> crate::Result<u32> {
         if let CachedTx::Open(_) = self.cached_tx {
             let open_tx = self.cached_tx.as_open()?;
             trace!("[{}] committing.", self.id.to_string());
@@ -166,7 +166,7 @@ impl<'a> ITXServer<'a> {
         Ok(0)
     }
 
-    pub(crate) async fn rollback(&mut self, was_timeout: bool) -> crate::Result<i32> {
+    pub(crate) async fn rollback(&mut self, was_timeout: bool) -> crate::Result<u32> {
         debug!("[{}] rolling back, was timed out = {was_timeout}", self.name());
         if let CachedTx::Open(_) = self.cached_tx {
             let open_tx = self.cached_tx.as_open()?;
@@ -201,7 +201,7 @@ impl ITXClient {
         Ok(())
     }
 
-    pub(crate) async fn commit(&self) -> crate::Result<i32> {
+    pub(crate) async fn commit(&self) -> crate::Result<u32> {
         let msg = self.send_and_receive(TxOpRequestMsg::Commit).await?;
 
         if let TxOpResponse::Committed(resp) = msg {
@@ -212,7 +212,7 @@ impl ITXClient {
         }
     }
 
-    pub(crate) async fn rollback(&self) -> crate::Result<i32> {
+    pub(crate) async fn rollback(&self) -> crate::Result<u32> {
         let msg = self.send_and_receive(TxOpRequestMsg::Rollback).await?;
 
         if let TxOpResponse::RolledBack(resp) = msg {

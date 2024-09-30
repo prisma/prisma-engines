@@ -21,6 +21,7 @@ use mysql_async::{
     self as my,
     prelude::{Query as _, Queryable as _},
 };
+use std::borrow::Cow;
 use std::{
     future::Future,
     sync::atomic::{AtomicBool, Ordering},
@@ -347,34 +348,29 @@ impl Queryable for Mysql {
     }
 
     /// Statement to begin a transaction
-    async fn begin_statement(&self, depth: i32) -> String {
-        let savepoint_stmt = format!("SAVEPOINT savepoint{}", depth);
-        let ret = if depth > 1 { savepoint_stmt } else { "BEGIN".to_string() };
-
-        return ret;
+    fn begin_statement(&self, depth: u32) -> Cow<'static, str> {
+        if depth > 1 {
+            Cow::Owned(format!("SAVEPOINT savepoint{depth}"))
+        } else {
+            Cow::Borrowed("BEGIN")
+        }
     }
 
     /// Statement to commit a transaction
-    async fn commit_statement(&self, depth: i32) -> String {
-        let savepoint_stmt = format!("RELEASE SAVEPOINT savepoint{}", depth);
-        let ret = if depth > 1 {
-            savepoint_stmt
+    fn commit_statement(&self, depth: u32) -> Cow<'static, str> {
+        if depth > 1 {
+            Cow::Owned(format!("RELEASE SAVEPOINT savepoint{depth}"))
         } else {
-            "COMMIT".to_string()
-        };
-
-        return ret;
+            Cow::Borrowed("COMMIT")
+        }
     }
 
     /// Statement to rollback a transaction
-    async fn rollback_statement(&self, depth: i32) -> String {
-        let savepoint_stmt = format!("ROLLBACK TO savepoint{}", depth);
-        let ret = if depth > 1 {
-            savepoint_stmt
+    fn rollback_statement(&self, depth: u32) -> Cow<'static, str> {
+        if depth > 1 {
+            Cow::Owned(format!("ROLLBACK TO savepoint{depth}"))
         } else {
-            "ROLLBACK".to_string()
-        };
-
-        return ret;
+            Cow::Borrowed("ROLLBACK")
+        }
     }
 }

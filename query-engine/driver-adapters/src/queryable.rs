@@ -326,7 +326,7 @@ impl JsQueryable {
 
         tx.depth += 1;
 
-        let begin_stmt = tx.begin_statement(tx.depth).await;
+        let begin_stmt = tx.begin_statement(tx.depth);
         let tx_opts = tx.options();
 
         if tx_opts.use_phantom_query {

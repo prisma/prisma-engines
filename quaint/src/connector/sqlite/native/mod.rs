@@ -17,6 +17,7 @@ use crate::{
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
+use std::borrow::Cow;
 use std::convert::TryFrom;
 use tokio::sync::Mutex;
 
@@ -182,43 +183,34 @@ impl Queryable for Sqlite {
     }
 
     /// Statement to begin a transaction
-    async fn begin_statement(&self, depth: i32) -> String {
-        let savepoint_stmt = format!("SAVEPOINT savepoint{}", depth);
+    fn begin_statement(&self, depth: u32) -> Cow<'static, str> {
         // From https://sqlite.org/isolation.html:
         // `BEGIN IMMEDIATE` avoids possible `SQLITE_BUSY_SNAPSHOT` that arise when another connection jumps ahead in line.
         //  The BEGIN IMMEDIATE command goes ahead and starts a write transaction, and thus blocks all other writers.
         // If the BEGIN IMMEDIATE operation succeeds, then no subsequent operations in that transaction will ever fail with an SQLITE_BUSY error.
-        let ret = if depth > 1 {
-            savepoint_stmt
+        if depth > 1 {
+            Cow::Owned(format!("SAVEPOINT savepoint{depth}"))
         } else {
-            "BEGIN IMMEDIATE".to_string()
-        };
-
-        return ret;
+            Cow::Borrowed("BEGIN IMMEDIATE")
+        }
     }
 
     /// Statement to commit a transaction
-    async fn commit_statement(&self, depth: i32) -> String {
-        let savepoint_stmt = format!("RELEASE SAVEPOINT savepoint{}", depth);
-        let ret = if depth > 1 {
-            savepoint_stmt
+    fn commit_statement(&self, depth: u32) -> Cow<'static, str> {
+        if depth > 1 {
+            Cow::Owned(format!("RELEASE SAVEPOINT savepoint{depth}"))
         } else {
-            "COMMIT".to_string()
-        };
-
-        return ret;
+            Cow::Borrowed("COMMIT")
+        }
     }
 
     /// Statement to rollback a transaction
-    async fn rollback_statement(&self, depth: i32) -> String {
-        let savepoint_stmt = format!("ROLLBACK TO savepoint{}", depth);
-        let ret = if depth > 1 {
-            savepoint_stmt
+    fn rollback_statement(&self, depth: u32) -> Cow<'static, str> {
+        if depth > 1 {
+            Cow::Owned(format!("ROLLBACK TO savepoint{depth}"))
         } else {
-            "ROLLBACK".to_string()
-        };
-
-        return ret;
+            Cow::Borrowed("ROLLBACK")
+        }
     }
 }
 

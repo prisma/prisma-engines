@@ -5,7 +5,7 @@ use crate::{
     connector::{self, impl_default_TransactionCapable, ConnectionInfo, IsolationLevel, Queryable, TransactionCapable},
 };
 use async_trait::async_trait;
-use std::{fmt, sync::Arc};
+use std::{borrow::Cow, fmt, sync::Arc};
 
 #[cfg(feature = "sqlite-native")]
 use std::convert::TryFrom;
@@ -237,16 +237,16 @@ impl Queryable for Quaint {
         self.inner.is_healthy()
     }
 
-    async fn begin_statement(&self, depth: i32) -> String {
-        self.inner.begin_statement(depth).await
+    fn begin_statement(&self, depth: u32) -> Cow<'static, str> {
+        self.inner.begin_statement(depth)
     }
 
-    async fn commit_statement(&self, depth: i32) -> String {
-        self.inner.commit_statement(depth).await
+    fn commit_statement(&self, depth: u32) -> Cow<'static, str> {
+        self.inner.commit_statement(depth)
     }
 
-    async fn rollback_statement(&self, depth: i32) -> String {
-        self.inner.rollback_statement(depth).await
+    fn rollback_statement(&self, depth: u32) -> Cow<'static, str> {
+        self.inner.rollback_statement(depth)
     }
 
     async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> crate::Result<()> {

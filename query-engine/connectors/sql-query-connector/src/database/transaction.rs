@@ -44,14 +44,14 @@ impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
         .await
     }
 
-    async fn commit(&mut self) -> connector::Result<i32> {
+    async fn commit(&mut self) -> connector::Result<u32> {
         catch(&self.connection_info, async {
             self.inner.commit().await.map_err(SqlError::from)
         })
         .await
     }
 
-    async fn rollback(&mut self) -> connector::Result<i32> {
+    async fn rollback(&mut self) -> connector::Result<u32> {
         catch(&self.connection_info, async {
             let res = self.inner.rollback().await.map_err(SqlError::from);
 
