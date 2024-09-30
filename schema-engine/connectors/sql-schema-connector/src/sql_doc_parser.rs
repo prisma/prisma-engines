@@ -218,6 +218,8 @@ fn parse_typ_opt<'a>(
                     ScalarType::Json => ColumnType::Json,
                     ScalarType::Bytes => ColumnType::Bytes,
                     ScalarType::Decimal => ColumnType::Numeric,
+                    ScalarType::GeoJson | ScalarType::Geometry => ColumnType::Geometry,
+                    
                 })
                 .map(ParsedParamType::ColumnType)
                 .or_else(|| {

@@ -40,6 +40,8 @@ pub enum JSArgType {
     Date,
     /// A time value.
     Time,
+    /// A geometry value.
+    Geometry,
 }
 
 impl core::fmt::Display for JSArgType {
@@ -63,6 +65,7 @@ impl core::fmt::Display for JSArgType {
             JSArgType::DateTime => "DateTime",
             JSArgType::Date => "Date",
             JSArgType::Time => "Time",
+            JSArgType::Geometry => "Geometry",
         };
 
         write!(f, "{}", s)
@@ -89,5 +92,6 @@ pub fn value_to_js_arg_type(value: &quaint::Value) -> JSArgType {
         quaint::ValueType::DateTime(_) => JSArgType::DateTime,
         quaint::ValueType::Date(_) => JSArgType::Date,
         quaint::ValueType::Time(_) => JSArgType::Time,
+        quaint::ValueType::Geometry(_) | quaint::ValueType::Geography(_) => JSArgType::Geometry,
     }
 }
