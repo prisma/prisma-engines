@@ -15,7 +15,7 @@ extern crate metrics as metrics;
 
 #[async_trait]
 pub trait Transaction: Queryable {
-    /// Commit the changes to the database and consume the transaction.
+    /// Start a new transaction or nested transaction via savepoint.
     async fn begin(&mut self) -> crate::Result<()>;
 
     /// Commit the changes to the database and consume the transaction.
