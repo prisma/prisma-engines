@@ -15,6 +15,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "Int",
+          "nativeType": null,
           "default": {
             "name": "autoincrement",
             "args": []
@@ -32,6 +33,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "Int",
+          "nativeType": null,
           "default": {
             "name": "dbgenerated",
             "args": [

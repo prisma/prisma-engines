@@ -34,6 +34,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -47,6 +48,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "DateTime",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -60,6 +62,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -74,6 +77,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -87,6 +91,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Post",
+          "nativeType": null,
           "relationName": "author",
           "relationFromFields": [],
           "relationToFields": [],
@@ -103,6 +108,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Profile",
+          "nativeType": null,
           "relationName": "ProfileToUser",
           "relationFromFields": [],
           "relationToFields": [],
@@ -129,6 +135,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -142,6 +149,7 @@
           "isReadOnly": true,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -155,6 +163,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "User",
+          "nativeType": null,
           "relationName": "ProfileToUser",
           "relationFromFields": [
             "userId"
@@ -175,6 +184,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -198,6 +208,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -211,6 +222,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "DateTime",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -224,6 +236,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "DateTime",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -237,6 +250,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "String",
+          "nativeType": null,
           "default": "Default-Title",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -251,6 +265,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "Boolean",
+          "nativeType": null,
           "default": false,
           "isGenerated": false,
           "isUpdatedAt": false
@@ -265,6 +280,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "Boolean",
+          "nativeType": null,
           "default": false,
           "isGenerated": false,
           "isUpdatedAt": false
@@ -279,6 +295,7 @@
           "isReadOnly": true,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -292,6 +309,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "User",
+          "nativeType": null,
           "relationName": "author",
           "relationFromFields": [
             "authorId"
@@ -312,6 +330,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "PostToCategory",
+          "nativeType": null,
           "relationName": "PostToPostToCategory",
           "relationFromFields": [],
           "relationToFields": [],
@@ -344,6 +363,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -357,6 +377,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -370,6 +391,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "PostToCategory",
+          "nativeType": null,
           "relationName": "CategoryToPostToCategory",
           "relationFromFields": [],
           "relationToFields": [],
@@ -386,6 +408,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "CategoryEnum",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -409,6 +432,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -422,6 +446,7 @@
           "isReadOnly": true,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -435,6 +460,7 @@
           "isReadOnly": true,
           "hasDefaultValue": false,
           "type": "DateTime",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -448,6 +474,7 @@
           "isReadOnly": true,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -461,6 +488,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Post",
+          "nativeType": null,
           "relationName": "PostToPostToCategory",
           "relationFromFields": [
             "postTitle",
@@ -483,6 +511,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Category",
+          "nativeType": null,
           "relationName": "CategoryToPostToCategory",
           "relationFromFields": [
             "categoryId"
@@ -526,6 +555,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -539,6 +569,7 @@
           "isReadOnly": true,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -552,6 +583,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "B",
+          "nativeType": null,
           "relationName": "AToB",
           "relationFromFields": [
             "bId"
@@ -582,6 +614,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -595,6 +628,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "A",
+          "nativeType": null,
           "relationName": "AToB",
           "relationFromFields": [],
           "relationToFields": [],
@@ -621,6 +655,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -634,6 +669,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -647,6 +683,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -660,6 +697,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -702,6 +740,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -715,6 +754,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         }
