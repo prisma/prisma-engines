@@ -181,6 +181,8 @@ impl ColumnType {
             ColumnType::Numeric
         } else if value.is_text() {
             ColumnType::Text
+        } else if value.is_geometry() {
+            ColumnType::Geometry
         } else {
             ColumnType::Unknown
         }
