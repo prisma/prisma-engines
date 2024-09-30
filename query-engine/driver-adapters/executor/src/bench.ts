@@ -47,7 +47,6 @@ async function main(): Promise<void> {
   const { recorder, replayer, recordings } = recording(withErrorCapturing);
 
   // We exercise the queries recording them
-  // @ts-ignore
   await recordQueries(recorder, datamodel, prismaQueries);
 
   // Dump recordings if requested
@@ -60,7 +59,6 @@ async function main(): Promise<void> {
   // Then we benchmark the execution of the queries but instead of hitting the DB
   // we fetch results from the recordings, thus isolating the performance
   // of the engine + driver adapter code from that of the DB IO.
-  // @ts-ignore
   await benchMarkQueries(replayer, datamodel, prismaQueries);
 }
 
