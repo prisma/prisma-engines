@@ -1290,7 +1290,7 @@ fn all_postgis_column_types_must_work(api: TestApi) {
                 DatabaseExtension {
                     name: "postgis",
                     schema: "prisma-tests",
-                    version: "3.4.2",
+                    version: "3.4.3",
                     relocatable: false,
                 },
             ],
