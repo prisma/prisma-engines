@@ -101,12 +101,12 @@ mod geometry_filter_spec {
         Ok(())
     }
 
-    #[connector_test(schema(schema), exclude(Postgres, Sqlite(3, "libsql.js")))]
+    #[connector_test(schema(schema), exclude(Postgres, Sqlite(3, "cfd1", "libsql.js", "libsql.js.wasm")))]
     async fn basic_where(runner: Runner) -> TestResult<()> {
         basic_where_test(runner).await
     }
 
-    #[connector_test(schema(schema), exclude(Postgres, Sqlite(3, "libsql.js")))]
+    #[connector_test(schema(schema), exclude(Postgres, Sqlite(3, "cfd1", "libsql.js", "libsql.js.wasm")))]
     async fn where_shorthands(runner: Runner) -> TestResult<()> {
         where_shorthands_test(runner).await
     }
@@ -115,7 +115,7 @@ mod geometry_filter_spec {
     // see discussion here: https://github.com/prisma/prisma-engines/pull/4208#issuecomment-1828997865
     #[connector_test(
         schema(schema),
-        exclude(Postgres, Sqlite(3, "libsql.js"), MySQL("mariadb")),
+        exclude(Postgres, Sqlite(3, "cfd1", "libsql.js", "libsql.js.wasm"), MySQL("mariadb")),
         capabilities(GeometryFiltering)
     )]
     async fn geometric_comparison_filters(runner: Runner) -> TestResult<()> {
