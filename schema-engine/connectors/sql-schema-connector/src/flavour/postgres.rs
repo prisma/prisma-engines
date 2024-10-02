@@ -6,11 +6,7 @@ use crate::SqlFlavour;
 use enumflags2::BitFlags;
 use indoc::indoc;
 use once_cell::sync::Lazy;
-use quaint::{
-    connector::{PostgresUrl, PostgresWebSocketUrl},
-    prelude::NativeConnectionInfo,
-    Value,
-};
+use quaint::{connector::PostgresUrl, prelude::NativeConnectionInfo, Value};
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
 };
@@ -33,11 +29,8 @@ SET enable_experimental_alter_column_type_general = true;
 
 type State = super::State<Params, (BitFlags<Circumstances>, Connection)>;
 
-#[derive(Clone)]
-enum MigratePostgresUrl {
-    Native(PostgresUrl),
-    WebSocket(PostgresWebSocketUrl),
-}
+#[derive(Debug, Clone)]
+struct MigratePostgresUrl(PostgresUrl);
 
 static MIGRATE_WS_BASE_URL: Lazy<Cow<'static, str>> = Lazy::new(|| {
     std::env::var("PRISMA_SCHEMA_ENGINE_WS_BASE_URL")
@@ -50,7 +43,7 @@ impl MigratePostgresUrl {
     const API_KEY_PARAM: &'static str = "apiKey";
 
     fn new(url: Url) -> ConnectorResult<Self> {
-        if url.scheme() == Self::WEBSOCKET_SCHEME {
+        let postgres_url = if url.scheme() == Self::WEBSOCKET_SCHEME {
             let mut ws_url = Url::from_str(&MIGRATE_WS_BASE_URL).map_err(ConnectorError::url_parse_error)?;
             ws_url.set_path(url.path());
             let Some((_, api_key)) = url.query_pairs().find(|(name, _)| name == Self::API_KEY_PARAM) else {
@@ -58,48 +51,34 @@ impl MigratePostgresUrl {
                     "Required `apiKey` query string parameter was not provided in a connection URL",
                 ));
             };
-            Ok(Self::WebSocket(PostgresWebSocketUrl::new(ws_url, api_key.into_owned())))
+            PostgresUrl::new_websocket(ws_url, api_key.into_owned()).map_err(ConnectorError::url_parse_error)?
         } else {
-            let postgres_url = PostgresUrl::new(url).map_err(ConnectorError::url_parse_error)?;
-            Ok(Self::Native(postgres_url))
-        }
+            PostgresUrl::new_native(url).map_err(ConnectorError::url_parse_error)?
+        };
+
+        Ok(Self(postgres_url))
     }
 
     pub(super) fn host(&self) -> &str {
-        match self {
-            MigratePostgresUrl::Native(native_url) => native_url.host(),
-            MigratePostgresUrl::WebSocket(ws_url) => ws_url.host(),
-        }
+        self.0.host()
     }
 
     pub(super) fn port(&self) -> u16 {
-        match self {
-            MigratePostgresUrl::Native(native_url) => native_url.port(),
-            MigratePostgresUrl::WebSocket(ws_url) => ws_url.port(),
-        }
+        self.0.port()
     }
 
     pub(super) fn dbname(&self) -> &str {
-        match self {
-            MigratePostgresUrl::Native(native_url) => native_url.dbname(),
-            MigratePostgresUrl::WebSocket(ws_url) => ws_url.dbname(),
-        }
+        self.0.dbname()
     }
 
     pub(super) fn schema(&self) -> &str {
-        match self {
-            MigratePostgresUrl::Native(native_url) => native_url.schema(),
-            MigratePostgresUrl::WebSocket(_) => "public",
-        }
+        self.0.schema()
     }
 }
 
 impl From<MigratePostgresUrl> for NativeConnectionInfo {
     fn from(value: MigratePostgresUrl) -> Self {
-        match value {
-            MigratePostgresUrl::Native(url) => NativeConnectionInfo::Postgres(url),
-            MigratePostgresUrl::WebSocket(url) => NativeConnectionInfo::PostgresWs(url),
-        }
+        NativeConnectionInfo::Postgres(value.0)
     }
 }
 
@@ -178,13 +157,7 @@ impl PostgresFlavour {
     }
 
     pub(crate) fn schema_name(&self) -> &str {
-        self.state
-            .params()
-            .and_then(|p| match &p.url {
-                MigratePostgresUrl::Native(url) => Some(url.schema()),
-                MigratePostgresUrl::WebSocket(_) => None,
-            })
-            .unwrap_or("public")
+        self.state.params().map(|p| p.url.schema()).unwrap_or("public")
     }
 }
 
@@ -632,7 +605,7 @@ async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<(Connection
 
     for database_name in CANDIDATE_DEFAULT_DATABASES {
         url.set_path(&format!("/{database_name}"));
-        let postgres_url = MigratePostgresUrl::Native(PostgresUrl::new(url.clone()).unwrap());
+        let postgres_url = MigratePostgresUrl(PostgresUrl::new_native(url.clone()).unwrap());
         match Connection::new(url.clone()).await {
             // If the database does not exist, try the next one.
             Err(err) => match &err.error_code() {

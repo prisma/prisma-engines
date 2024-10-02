@@ -148,7 +148,7 @@ impl Quaint {
             }
             #[cfg(feature = "postgresql-native")]
             s if s.starts_with("postgres") || s.starts_with("postgresql") => {
-                let url = connector::PostgresUrl::new(url::Url::parse(s)?)?;
+                let url = connector::PostgresNativeUrl::new(url::Url::parse(s)?)?;
                 let psql = connector::PostgreSql::new(url).await?;
                 Arc::new(psql) as Arc<dyn Queryable>
             }

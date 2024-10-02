@@ -7,7 +7,7 @@ mod error;
 mod explain;
 mod websocket;
 
-pub(crate) use crate::connector::postgres::url::PostgresUrl;
+pub(crate) use crate::connector::postgres::url::PostgresNativeUrl;
 use crate::connector::postgres::url::{Hidden, SslAcceptMode, SslParams};
 use crate::connector::{
     timeout, ColumnType, DescribedColumn, DescribedParameter, DescribedQuery, IsolationLevel, Transaction,
@@ -164,7 +164,7 @@ impl SslParams {
     }
 }
 
-impl PostgresUrl {
+impl PostgresNativeUrl {
     pub(crate) fn cache(&self) -> StatementCache {
         if self.query_params.pg_bouncer {
             StatementCache::new(0)
@@ -232,7 +232,7 @@ impl PostgresUrl {
 
 impl PostgreSql {
     /// Create a new connection to the database.
-    pub async fn new(url: PostgresUrl) -> crate::Result<Self> {
+    pub async fn new(url: PostgresNativeUrl) -> crate::Result<Self> {
         let config = url.to_config();
 
         let mut tls_builder = TlsConnector::builder();
@@ -941,7 +941,7 @@ mod tests {
             let mut url = Url::parse(&CONN_STR).unwrap();
             url.query_pairs_mut().append_pair("schema", schema_name);
 
-            let mut pg_url = PostgresUrl::new(url).unwrap();
+            let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Postgres);
 
             let client = PostgreSql::new(pg_url).await.unwrap();
@@ -993,7 +993,7 @@ mod tests {
             url.query_pairs_mut().append_pair("schema", schema_name);
             url.query_pairs_mut().append_pair("pbbouncer", "true");
 
-            let mut pg_url = PostgresUrl::new(url).unwrap();
+            let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Postgres);
 
             let client = PostgreSql::new(pg_url).await.unwrap();
@@ -1044,7 +1044,7 @@ mod tests {
             let mut url = Url::parse(&CRDB_CONN_STR).unwrap();
             url.query_pairs_mut().append_pair("schema", schema_name);
 
-            let mut pg_url = PostgresUrl::new(url).unwrap();
+            let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Cockroach);
 
             let client = PostgreSql::new(pg_url).await.unwrap();
@@ -1095,7 +1095,7 @@ mod tests {
             let mut url = Url::parse(&CONN_STR).unwrap();
             url.query_pairs_mut().append_pair("schema", schema_name);
 
-            let mut pg_url = PostgresUrl::new(url).unwrap();
+            let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Unknown);
 
             let client = PostgreSql::new(pg_url).await.unwrap();
@@ -1146,7 +1146,7 @@ mod tests {
             let mut url = Url::parse(&CONN_STR).unwrap();
             url.query_pairs_mut().append_pair("schema", schema_name);
 
-            let mut pg_url = PostgresUrl::new(url).unwrap();
+            let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Unknown);
 
             let client = PostgreSql::new(pg_url).await.unwrap();

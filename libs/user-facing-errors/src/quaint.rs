@@ -59,14 +59,6 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
                     database_port: url.port(),
                 }))
             }
-            #[cfg(feature = "postgresql-native")]
-            ConnectionInfo::Native(NativeConnectionInfo::PostgresWs(url)) => {
-                Some(KnownError::new(common::DatabaseDoesNotExist::Postgres {
-                    database_name: db_name.to_string(),
-                    database_host: url.host().to_owned(),
-                    database_port: url.port(),
-                }))
-            }
             #[cfg(feature = "mysql-native")]
             ConnectionInfo::Native(NativeConnectionInfo::Mysql(url)) => {
                 Some(KnownError::new(common::DatabaseDoesNotExist::Mysql {
@@ -95,12 +87,6 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
                     database_name: format!("{}.{}", url.dbname(), url.schema()),
                 }))
             }
-            ConnectionInfo::Native(NativeConnectionInfo::PostgresWs(url)) => {
-                Some(KnownError::new(common::DatabaseAccessDenied {
-                    database_user: "".to_owned(),
-                    database_name: url.dbname().to_owned(),
-                }))
-            }
             ConnectionInfo::Native(NativeConnectionInfo::Mysql(url)) => {
                 Some(KnownError::new(common::DatabaseAccessDenied {
                     database_user: url.username().into_owned(),
@@ -115,14 +101,6 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
         (ErrorKind::DatabaseAlreadyExists { db_name }, _) => match connection_info {
             #[cfg(feature = "postgresql-native")]
             ConnectionInfo::Native(NativeConnectionInfo::Postgres(url)) => {
-                Some(KnownError::new(common::DatabaseAlreadyExists {
-                    database_name: format!("{db_name}"),
-                    database_host: url.host().to_owned(),
-                    database_port: url.port(),
-                }))
-            }
-            #[cfg(feature = "postgresql-native")]
-            ConnectionInfo::Native(NativeConnectionInfo::PostgresWs(url)) => {
                 Some(KnownError::new(common::DatabaseAlreadyExists {
                     database_name: format!("{db_name}"),
                     database_host: url.host().to_owned(),
@@ -274,13 +252,6 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
         (ErrorKind::Native(native_error_kind), _) => match (native_error_kind, connection_info) {
             #[cfg(feature = "postgresql-native")]
             (NativeErrorKind::ConnectionError(_), ConnectionInfo::Native(NativeConnectionInfo::Postgres(url))) => {
-                Some(KnownError::new(common::DatabaseNotReachable {
-                    database_port: url.port(),
-                    database_host: url.host().to_owned(),
-                }))
-            }
-            #[cfg(feature = "postgresql-native")]
-            (NativeErrorKind::ConnectionError(_), ConnectionInfo::Native(NativeConnectionInfo::PostgresWs(url))) => {
                 Some(KnownError::new(common::DatabaseNotReachable {
                     database_port: url.port(),
                     database_host: url.host().to_owned(),
