@@ -144,12 +144,6 @@ impl Connector for SqliteDatamodelConnector {
             }
             SQLiteType::Geometry(Some(g)) if g.srid < -1 => errors
                 .push_error(error.new_argument_m_out_of_range_error("SRID must be superior or equal to -1.", span)),
-            SQLiteType::Geometry(Some(g)) if g.type_.is_extended() => {
-                errors.push_error(error.new_argument_m_out_of_range_error(
-                    &format!("{} isn't supported for the current connector.", g.type_),
-                    span,
-                ))
-            }
             _ => (),
         }
     }

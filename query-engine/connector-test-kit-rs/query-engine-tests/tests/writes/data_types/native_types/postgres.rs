@@ -571,62 +571,6 @@ mod postgres {
         Ok(())
     }
 
-    fn schema_extra_geometry() -> String {
-        let schema = indoc! {
-            r#"model Model {
-            @@schema("test")
-            #id(id, String, @id, @default(cuid()))
-            geometry_triangle       Geometry @test.Geometry(Triangle)
-            geometry_circularstring Geometry @test.Geometry(CircularString)
-            geometry_compoundcurve  Geometry @test.Geometry(CompoundCurve)
-            geometry_curvepolygon   Geometry @test.Geometry(CurvePolygon)
-            geometry_multicurve     Geometry @test.Geometry(MultiCurve)
-            geometry_multisurface   Geometry @test.Geometry(MultiSurface)
-            geometry_polyhedral     Geometry @test.Geometry(PolyhedralSurfaceZ)
-            geometry_tin            Geometry @test.Geometry(Tin)
-          }"#
-        };
-
-        schema.to_owned()
-    }
-
-    // "PostGIS extra geometry types" should "work"
-    #[connector_test(
-        only(Postgres("16-postgis")),
-        schema(schema_extra_geometry),
-        db_schemas("public", "test")
-    )]
-    async fn native_extra_geometry(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-          createOneModel(
-            data: {
-              geometry_triangle: "TRIANGLE((0 0,1 1,2 0,0 0))"
-              geometry_circularstring: "CIRCULARSTRING(0 0,4 0,4 4,0 4,0 0)"
-              geometry_compoundcurve: "COMPOUNDCURVE(CIRCULARSTRING(0 0,1 1,1 0),(1 0,0 1))"
-              geometry_curvepolygon: "CURVEPOLYGON(CIRCULARSTRING(0 0,4 0,4 4,0 4,0 0),(1 1,3 3,3 1,1 1))"
-              geometry_multicurve: "MULTICURVE((0 0,5 5),CIRCULARSTRING(4 0,4 4,8 4))"
-              geometry_multisurface: "MULTISURFACE(CURVEPOLYGON(CIRCULARSTRING(0 0,4 0,4 4,0 4,0 0),(1 1,3 3,3 1,1 1)),((10 10,14 12,11 10,10 10),(11 11,11.5 11,11 11.5,11 11)))"
-              geometry_polyhedral:"POLYHEDRALSURFACE(((0 0 0,1 0 0,0 1 0,0 0 1,0 0 0)))"
-              geometry_tin: "TIN(((80 130,50 160,80 70,80 130)),((50 160,10 190,10 70,50 160)),((80 70,50 160,10 70,80 70)),((120 160,120 190,50 160,120 160)),((120 190,10 190,50 160,120 190)))"
-            }
-          ) {
-            geometry_triangle
-            geometry_circularstring
-            geometry_compoundcurve
-            geometry_curvepolygon
-            geometry_multicurve
-            geometry_multisurface
-            geometry_polyhedral
-            geometry_tin
-          }
-        }"#),
-            @r###"{"data":{"createOneModel":{"geometry_triangle":"TRIANGLE((0 0,1 1,2 0,0 0))","geometry_circularstring":"CIRCULARSTRING(0 0,4 0,4 4,0 4,0 0)","geometry_compoundcurve":"COMPOUNDCURVE(CIRCULARSTRING(0 0,1 1,1 0),(1 0,0 1))","geometry_curvepolygon":"CURVEPOLYGON(CIRCULARSTRING(0 0,4 0,4 4,0 4,0 0),(1 1,3 3,3 1,1 1))","geometry_multicurve":"MULTICURVE((0 0,5 5),CIRCULARSTRING(4 0,4 4,8 4))","geometry_multisurface":"MULTISURFACE(CURVEPOLYGON(CIRCULARSTRING(0 0,4 0,4 4,0 4,0 0),(1 1,3 3,3 1,1 1)),((10 10,14 12,11 10,10 10),(11 11,11.5 11,11 11.5,11 11)))","geometry_polyhedral":"POLYHEDRALSURFACE(((0 0 0,1 0 0,0 1 0,0 0 1,0 0 0)))","geometry_tin":"TIN(((80 130,50 160,80 70,80 130)),((50 160,10 190,10 70,50 160)),((80 70,50 160,10 70,80 70)),((120 160,120 190,50 160,120 160)),((120 190,10 190,50 160,120 190)))"}}}"###
-        );
-
-        Ok(())
-    }
-
     fn schema_geojson_geometry() -> String {
         let schema = indoc! {
             r#"model Model {

@@ -228,11 +228,6 @@ impl Connector for CockroachDatamodelConnector {
             {
                 errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
             }
-            CockroachType::Geometry(Some(g)) | CockroachType::Geography(Some(g)) if g.type_.is_extended() => errors
-                .push_error(error.new_argument_m_out_of_range_error(
-                    &format!("{} isn't supported for the current connector.", g.type_),
-                    span,
-                )),
             CockroachType::Geometry(Some(g)) | CockroachType::Geography(Some(g))
                 if *scalar_type == ScalarType::GeoJson && !g.type_.is_geojson_compatible() =>
             {
