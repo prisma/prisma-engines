@@ -3,7 +3,7 @@ use crate::connector::MssqlUrl;
 #[cfg(feature = "mysql")]
 use crate::connector::MysqlUrl;
 #[cfg(feature = "postgresql")]
-use crate::connector::{PostgresUrl, PostgresWebSocketUrl};
+use crate::connector::PostgresUrl;
 
 /// General information about a SQL connection, provided by native Rust drivers.
 #[cfg(not(target_arch = "wasm32"))]
@@ -12,8 +12,6 @@ pub enum NativeConnectionInfo {
     /// A PostgreSQL connection URL.
     #[cfg(feature = "postgresql")]
     Postgres(PostgresUrl),
-    #[cfg(feature = "postgresql")]
-    PostgresWs(PostgresWebSocketUrl),
     /// A MySQL connection URL.
     #[cfg(feature = "mysql")]
     Mysql(MysqlUrl),

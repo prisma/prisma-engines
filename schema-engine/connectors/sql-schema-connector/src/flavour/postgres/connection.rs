@@ -4,7 +4,7 @@ use enumflags2::BitFlags;
 use indoc::indoc;
 use psl::PreviewFeature;
 use quaint::{
-    connector::{self, tokio_postgres::error::ErrorPosition},
+    connector::{self, tokio_postgres::error::ErrorPosition, PostgresUrl},
     prelude::{ConnectionInfo, Queryable},
 };
 use schema_connector::{ConnectorError, ConnectorResult, Namespaces};
@@ -21,11 +21,11 @@ impl Connection {
     pub(super) async fn new(url: url::Url) -> ConnectorResult<Connection> {
         let url = MigratePostgresUrl::new(url)?;
 
-        let quaint = match url {
-            MigratePostgresUrl::Native(ref native_url) => connector::PostgreSql::new(native_url.clone())
+        let quaint = match url.0 {
+            PostgresUrl::Native(ref native_url) => connector::PostgreSql::new(native_url.as_ref().clone())
                 .await
                 .map_err(quaint_err(&url))?,
-            MigratePostgresUrl::WebSocket(ref ws_url) => connector::PostgreSql::new_with_websocket(ws_url.clone())
+            PostgresUrl::WebSocket(ref ws_url) => connector::PostgreSql::new_with_websocket(ws_url.clone())
                 .await
                 .map_err(quaint_err(&url))?,
         };

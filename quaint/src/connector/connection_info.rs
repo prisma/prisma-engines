@@ -37,6 +37,8 @@ impl ConnectionInfo {
     /// database.
     #[cfg(not(target_arch = "wasm32"))]
     pub fn from_url(url_str: &str) -> crate::Result<Self> {
+        use super::PostgresUrl;
+
         let url_result: Result<Url, _> = url_str.parse();
 
         // Non-URL database strings are interpreted as SQLite file paths.
@@ -84,7 +86,8 @@ impl ConnectionInfo {
             }
             #[cfg(feature = "postgresql")]
             SqlFamily::Postgres => Ok(ConnectionInfo::Native(NativeConnectionInfo::Postgres(
-                PostgresUrl::new(url)?,
+                // TODO
+                PostgresUrl::new_native(url)?,
             ))),
             #[allow(unreachable_patterns)]
             _ => unreachable!(),
@@ -98,8 +101,6 @@ impl ConnectionInfo {
             ConnectionInfo::Native(info) => match info {
                 #[cfg(feature = "postgresql")]
                 NativeConnectionInfo::Postgres(url) => Some(url.dbname()),
-                #[cfg(feature = "postgresql")]
-                NativeConnectionInfo::PostgresWs(url) => Some(url.dbname()),
                 #[cfg(feature = "mysql")]
                 NativeConnectionInfo::Mysql(url) => Some(url.dbname()),
                 #[cfg(feature = "mssql")]
@@ -122,8 +123,6 @@ impl ConnectionInfo {
             ConnectionInfo::Native(info) => match info {
                 #[cfg(feature = "postgresql")]
                 NativeConnectionInfo::Postgres(url) => url.schema(),
-                #[cfg(feature = "postgresql")]
-                NativeConnectionInfo::PostgresWs(_) => "public",
                 #[cfg(feature = "mysql")]
                 NativeConnectionInfo::Mysql(url) => url.dbname(),
                 #[cfg(feature = "mssql")]
@@ -144,8 +143,6 @@ impl ConnectionInfo {
             ConnectionInfo::Native(info) => match info {
                 #[cfg(feature = "postgresql")]
                 NativeConnectionInfo::Postgres(url) => url.host(),
-                #[cfg(feature = "postgresql")]
-                NativeConnectionInfo::PostgresWs(url) => url.host(),
                 #[cfg(feature = "mysql")]
                 NativeConnectionInfo::Mysql(url) => url.host(),
                 #[cfg(feature = "mssql")]
@@ -165,8 +162,6 @@ impl ConnectionInfo {
             ConnectionInfo::Native(info) => match info {
                 #[cfg(feature = "postgresql")]
                 NativeConnectionInfo::Postgres(url) => Some(url.username()),
-                #[cfg(feature = "postgresql")]
-                NativeConnectionInfo::PostgresWs(_) => None,
                 #[cfg(feature = "mysql")]
                 NativeConnectionInfo::Mysql(url) => Some(url.username()),
                 #[cfg(feature = "mssql")]
@@ -184,7 +179,7 @@ impl ConnectionInfo {
             #[cfg(not(target_arch = "wasm32"))]
             ConnectionInfo::Native(info) => match info {
                 #[cfg(feature = "postgresql")]
-                NativeConnectionInfo::Postgres(_) | NativeConnectionInfo::PostgresWs(_) => None,
+                NativeConnectionInfo::Postgres(_) => None,
                 #[cfg(feature = "mysql")]
                 NativeConnectionInfo::Mysql(_) => None,
                 #[cfg(feature = "mssql")]
@@ -217,7 +212,7 @@ impl ConnectionInfo {
             #[cfg(not(target_arch = "wasm32"))]
             ConnectionInfo::Native(info) => match info {
                 #[cfg(feature = "postgresql")]
-                NativeConnectionInfo::Postgres(_) | NativeConnectionInfo::PostgresWs(_) => SqlFamily::Postgres,
+                NativeConnectionInfo::Postgres(_) => SqlFamily::Postgres,
                 #[cfg(feature = "mysql")]
                 NativeConnectionInfo::Mysql(_) => SqlFamily::Mysql,
                 #[cfg(feature = "mssql")]
@@ -236,8 +231,6 @@ impl ConnectionInfo {
             ConnectionInfo::Native(info) => match info {
                 #[cfg(feature = "postgresql")]
                 NativeConnectionInfo::Postgres(url) => Some(url.port()),
-                #[cfg(feature = "postgresql")]
-                NativeConnectionInfo::PostgresWs(url) => Some(url.port()),
                 #[cfg(feature = "mysql")]
                 NativeConnectionInfo::Mysql(url) => Some(url.port()),
                 #[cfg(feature = "mssql")]
@@ -253,7 +246,7 @@ impl ConnectionInfo {
     pub fn pg_bouncer(&self) -> bool {
         match self {
             #[cfg(all(not(target_arch = "wasm32"), feature = "postgresql"))]
-            ConnectionInfo::Native(NativeConnectionInfo::Postgres(url)) => url.pg_bouncer(),
+            ConnectionInfo::Native(NativeConnectionInfo::Postgres(PostgresUrl::Native(url))) => url.pg_bouncer(),
             _ => false,
         }
     }
@@ -266,8 +259,6 @@ impl ConnectionInfo {
             ConnectionInfo::Native(info) => match info {
                 #[cfg(feature = "postgresql")]
                 NativeConnectionInfo::Postgres(url) => format!("{}:{}", url.host(), url.port()),
-                #[cfg(feature = "postgresql")]
-                NativeConnectionInfo::PostgresWs(url) => format!("{}:{}", url.host(), url.port()),
                 #[cfg(feature = "mysql")]
                 NativeConnectionInfo::Mysql(url) => format!("{}:{}", url.host(), url.port()),
                 #[cfg(feature = "mssql")]
