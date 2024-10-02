@@ -37,8 +37,6 @@ impl ConnectionInfo {
     /// database.
     #[cfg(not(target_arch = "wasm32"))]
     pub fn from_url(url_str: &str) -> crate::Result<Self> {
-        use super::PostgresUrl;
-
         let url_result: Result<Url, _> = url_str.parse();
 
         // Non-URL database strings are interpreted as SQLite file paths.
@@ -86,8 +84,7 @@ impl ConnectionInfo {
             }
             #[cfg(feature = "postgresql")]
             SqlFamily::Postgres => Ok(ConnectionInfo::Native(NativeConnectionInfo::Postgres(
-                // TODO
-                PostgresUrl::new_native(url)?,
+                super::PostgresUrl::new_native(url)?,
             ))),
             #[allow(unreachable_patterns)]
             _ => unreachable!(),
