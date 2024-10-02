@@ -3,7 +3,7 @@ use crate::{executor::get_engine_protocol, schema::*};
 use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use core::fmt;
-use geojson::GeoJson;
+use geojson::Geometry;
 use indexmap::{IndexMap, IndexSet};
 use query_structure::{DefaultKind, PrismaValue, ValueGeneratorFn};
 use std::{borrow::Cow, convert::TryFrom, rc::Rc, str::FromStr};
@@ -544,8 +544,8 @@ impl QueryDocumentParser {
         Ok(PrismaValue::List(prisma_values))
     }
 
-    fn parse_geojson(&self, selection_path: &Path, argument_path: &Path, s: &str) -> QueryParserResult<GeoJson> {
-        s.parse::<GeoJson>().map_err(|err| {
+    fn parse_geojson(&self, selection_path: &Path, argument_path: &Path, s: &str) -> QueryParserResult<Geometry> {
+        s.parse::<Geometry>().map_err(|err| {
             ValidationError::invalid_argument_value(
                 selection_path.segments(),
                 argument_path.segments(),

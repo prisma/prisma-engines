@@ -187,6 +187,7 @@ impl<'a> Serialize for SerializedValue<'a> {
             ValueType::DateTime(value) => value.map(|value| value.to_rfc3339()).serialize(serializer),
             ValueType::Date(value) => value.serialize(serializer),
             ValueType::Time(value) => value.serialize(serializer),
+            // TODO@geometry
             ValueType::Geometry(_value) => todo!("Don't know how to serialize Geometry yet"),
             ValueType::Geography(_value) => todo!("Don't know how to serialize Geography yet"),
         }
