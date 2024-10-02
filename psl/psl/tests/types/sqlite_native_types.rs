@@ -165,30 +165,6 @@ fn should_fail_on_geometry_when_extra_geometry_type() {
           geom_21 Geometry @db.Geometry(PolyhedralSurfaceZ, 4326)
           geom_22 Geometry @db.Geometry(PolyhedralSurfaceM, 4326)
           geom_23 Geometry @db.Geometry(PolyhedralSurfaceZM, 4326)
-          geog_00 Geometry @db.Geography(CircularString, 4326)
-          geog_01 Geometry @db.Geography(CircularStringZ, 4326)
-          geog_02 Geometry @db.Geography(CircularStringM, 4326)
-          geog_03 Geometry @db.Geography(CircularStringZM, 4326)
-          geog_04 Geometry @db.Geography(CompoundCurve, 4326)
-          geog_05 Geometry @db.Geography(CompoundCurveZ, 4326)
-          geog_06 Geometry @db.Geography(CompoundCurveM, 4326)
-          geog_07 Geometry @db.Geography(CompoundCurveZM, 4326)
-          geog_08 Geometry @db.Geography(CurvePolygon, 4326)
-          geog_09 Geometry @db.Geography(CurvePolygonZ, 4326)
-          geog_10 Geometry @db.Geography(CurvePolygonM, 4326)
-          geog_11 Geometry @db.Geography(CurvePolygonZM, 4326)
-          geog_12 Geometry @db.Geography(MultiCurve, 4326)
-          geog_13 Geometry @db.Geography(MultiCurveZ, 4326)
-          geog_14 Geometry @db.Geography(MultiCurveM, 4326)
-          geog_15 Geometry @db.Geography(MultiCurveZM, 4326)
-          geog_16 Geometry @db.Geography(MultiSurface, 4326)
-          geog_17 Geometry @db.Geography(MultiSurfaceZ, 4326)
-          geog_18 Geometry @db.Geography(MultiSurfaceM, 4326)
-          geog_19 Geometry @db.Geography(MultiSurfaceZM, 4326)
-          geog_20 Geometry @db.Geography(PolyhedralSurface, 4326)
-          geog_21 Geometry @db.Geography(PolyhedralSurfaceZ, 4326)
-          geog_22 Geometry @db.Geography(PolyhedralSurfaceM, 4326)
-          geog_23 Geometry @db.Geography(PolyhedralSurfaceZM, 4326)
         }
     "#};
 
@@ -337,149 +313,31 @@ fn should_fail_on_geometry_when_extra_geometry_type() {
         [1;94m30 | [0m  geom_22 Geometry @db.Geometry(PolyhedralSurfaceM, 4326)
         [1;94m31 | [0m  geom_23 Geometry [1;91m@db.Geometry(PolyhedralSurfaceZM, 4326)[0m
         [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn should_fail_on_geography() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "sqlite"
+          url = "file:test.db"
+        }
+
+        model User {
+          id  Int       @id
+          geog Geometry @db.Geography
+        }
+    "#};
+
+    let expectation = expect![[r#"
         [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:32[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
-        [1;94m31 | [0m  geom_23 Geometry @db.Geometry(PolyhedralSurfaceZM, 4326)
-        [1;94m32 | [0m  geog_00 Geometry [1;91m@db.Geography(CircularString, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:33[0m
-        [1;94m   | [0m
-        [1;94m32 | [0m  geog_00 Geometry @db.Geography(CircularString, 4326)
-        [1;94m33 | [0m  geog_01 Geometry [1;91m@db.Geography(CircularStringZ, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:34[0m
-        [1;94m   | [0m
-        [1;94m33 | [0m  geog_01 Geometry @db.Geography(CircularStringZ, 4326)
-        [1;94m34 | [0m  geog_02 Geometry [1;91m@db.Geography(CircularStringM, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:35[0m
-        [1;94m   | [0m
-        [1;94m34 | [0m  geog_02 Geometry @db.Geography(CircularStringM, 4326)
-        [1;94m35 | [0m  geog_03 Geometry [1;91m@db.Geography(CircularStringZM, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:36[0m
-        [1;94m   | [0m
-        [1;94m35 | [0m  geog_03 Geometry @db.Geography(CircularStringZM, 4326)
-        [1;94m36 | [0m  geog_04 Geometry [1;91m@db.Geography(CompoundCurve, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:37[0m
-        [1;94m   | [0m
-        [1;94m36 | [0m  geog_04 Geometry @db.Geography(CompoundCurve, 4326)
-        [1;94m37 | [0m  geog_05 Geometry [1;91m@db.Geography(CompoundCurveZ, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:38[0m
-        [1;94m   | [0m
-        [1;94m37 | [0m  geog_05 Geometry @db.Geography(CompoundCurveZ, 4326)
-        [1;94m38 | [0m  geog_06 Geometry [1;91m@db.Geography(CompoundCurveM, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:39[0m
-        [1;94m   | [0m
-        [1;94m38 | [0m  geog_06 Geometry @db.Geography(CompoundCurveM, 4326)
-        [1;94m39 | [0m  geog_07 Geometry [1;91m@db.Geography(CompoundCurveZM, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:40[0m
-        [1;94m   | [0m
-        [1;94m39 | [0m  geog_07 Geometry @db.Geography(CompoundCurveZM, 4326)
-        [1;94m40 | [0m  geog_08 Geometry [1;91m@db.Geography(CurvePolygon, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:41[0m
-        [1;94m   | [0m
-        [1;94m40 | [0m  geog_08 Geometry @db.Geography(CurvePolygon, 4326)
-        [1;94m41 | [0m  geog_09 Geometry [1;91m@db.Geography(CurvePolygonZ, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:42[0m
-        [1;94m   | [0m
-        [1;94m41 | [0m  geog_09 Geometry @db.Geography(CurvePolygonZ, 4326)
-        [1;94m42 | [0m  geog_10 Geometry [1;91m@db.Geography(CurvePolygonM, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:43[0m
-        [1;94m   | [0m
-        [1;94m42 | [0m  geog_10 Geometry @db.Geography(CurvePolygonM, 4326)
-        [1;94m43 | [0m  geog_11 Geometry [1;91m@db.Geography(CurvePolygonZM, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:44[0m
-        [1;94m   | [0m
-        [1;94m43 | [0m  geog_11 Geometry @db.Geography(CurvePolygonZM, 4326)
-        [1;94m44 | [0m  geog_12 Geometry [1;91m@db.Geography(MultiCurve, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:45[0m
-        [1;94m   | [0m
-        [1;94m44 | [0m  geog_12 Geometry @db.Geography(MultiCurve, 4326)
-        [1;94m45 | [0m  geog_13 Geometry [1;91m@db.Geography(MultiCurveZ, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:46[0m
-        [1;94m   | [0m
-        [1;94m45 | [0m  geog_13 Geometry @db.Geography(MultiCurveZ, 4326)
-        [1;94m46 | [0m  geog_14 Geometry [1;91m@db.Geography(MultiCurveM, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:47[0m
-        [1;94m   | [0m
-        [1;94m46 | [0m  geog_14 Geometry @db.Geography(MultiCurveM, 4326)
-        [1;94m47 | [0m  geog_15 Geometry [1;91m@db.Geography(MultiCurveZM, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:48[0m
-        [1;94m   | [0m
-        [1;94m47 | [0m  geog_15 Geometry @db.Geography(MultiCurveZM, 4326)
-        [1;94m48 | [0m  geog_16 Geometry [1;91m@db.Geography(MultiSurface, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:49[0m
-        [1;94m   | [0m
-        [1;94m48 | [0m  geog_16 Geometry @db.Geography(MultiSurface, 4326)
-        [1;94m49 | [0m  geog_17 Geometry [1;91m@db.Geography(MultiSurfaceZ, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:50[0m
-        [1;94m   | [0m
-        [1;94m49 | [0m  geog_17 Geometry @db.Geography(MultiSurfaceZ, 4326)
-        [1;94m50 | [0m  geog_18 Geometry [1;91m@db.Geography(MultiSurfaceM, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:51[0m
-        [1;94m   | [0m
-        [1;94m50 | [0m  geog_18 Geometry @db.Geography(MultiSurfaceM, 4326)
-        [1;94m51 | [0m  geog_19 Geometry [1;91m@db.Geography(MultiSurfaceZM, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:52[0m
-        [1;94m   | [0m
-        [1;94m51 | [0m  geog_19 Geometry @db.Geography(MultiSurfaceZM, 4326)
-        [1;94m52 | [0m  geog_20 Geometry [1;91m@db.Geography(PolyhedralSurface, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:53[0m
-        [1;94m   | [0m
-        [1;94m52 | [0m  geog_20 Geometry @db.Geography(PolyhedralSurface, 4326)
-        [1;94m53 | [0m  geog_21 Geometry [1;91m@db.Geography(PolyhedralSurfaceZ, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:54[0m
-        [1;94m   | [0m
-        [1;94m53 | [0m  geog_21 Geometry @db.Geography(PolyhedralSurfaceZ, 4326)
-        [1;94m54 | [0m  geog_22 Geometry [1;91m@db.Geography(PolyhedralSurfaceM, 4326)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mNative type Geography is not supported for sqlite connector.[0m
-          [1;94m-->[0m  [4mschema.prisma:55[0m
-        [1;94m   | [0m
-        [1;94m54 | [0m  geog_22 Geometry @db.Geography(PolyhedralSurfaceM, 4326)
-        [1;94m55 | [0m  geog_23 Geometry [1;91m@db.Geography(PolyhedralSurfaceZM, 4326)[0m
+        [1;94m 7 | [0m  id  Int       @id
+        [1;94m 8 | [0m  geog Geometry [1;91m@db.Geography[0m
         [1;94m   | [0m
     "#]];
 
