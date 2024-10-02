@@ -171,7 +171,7 @@ impl SqlRenderer for SqliteFlavour {
                     "SELECT RecoverGeometryColumn('{table_name}', '{column_name}', {srid}, '{type_}', '{dims}');",
                     srid = geom.srid,
                     type_ = geom.type_.as_2d(),
-                    dims = geom.type_.dimensions(),
+                    dims = geom.type_.dimension(),
                 )
                 .unwrap();
                 result

@@ -475,7 +475,10 @@ mod geometry_create {
         schema.to_owned()
     }
 
-    #[connector_test(schema(geometry_opt), exclude(Postgres, Sqlite(3, "cfd1", "libsql.js", "libsql.js.wasm")))]
+    #[connector_test(
+        schema(geometry_opt),
+        exclude(Postgres, Sqlite(3, "cfd1", "libsql.js", "libsql.js.wasm"))
+    )]
     async fn create_geometry(runner: Runner) -> TestResult<()> {
         create_geometry_test(runner).await
     }

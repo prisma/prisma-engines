@@ -54,7 +54,7 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, SQLiteType)] = &[
         ScalarType::GeoJson,
         SQLiteType::Geometry(Some(GeometryParams {
             type_: GeometryType::Geometry,
-            srid: 4326,
+            srid: 0,
         })),
     ),
 ];
@@ -129,12 +129,22 @@ impl Connector for SqliteDatamodelConnector {
         let error = self.native_instance_error(native_type_instance);
 
         match native_type {
-            SQLiteType::Geometry(Some(g)) if *scalar_type == ScalarType::GeoJson && g.srid != 4326 => {
+            SQLiteType::Geometry(Some(g))
+                if *scalar_type == ScalarType::GeoJson && !g.type_.is_geojson_compatible() =>
+            {
+                errors.push_error(
+                    error.new_argument_m_out_of_range_error(
+                        &format!("{} isn't compatible with GeoJson.", g.type_),
+                        span,
+                    ),
+                )
+            }
+            SQLiteType::Geometry(Some(g)) if *scalar_type == ScalarType::GeoJson && !matches!(g.srid, 0 | 4326) => {
                 errors.push_error(error.new_argument_m_out_of_range_error("GeoJson SRID must be 4326.", span))
             }
             SQLiteType::Geometry(Some(g)) if g.srid < -1 => errors
                 .push_error(error.new_argument_m_out_of_range_error("SRID must be superior or equal to -1.", span)),
-            SQLiteType::Geometry(Some(g)) if g.type_.is_extra() => {
+            SQLiteType::Geometry(Some(g)) if g.type_.is_extended() => {
                 errors.push_error(error.new_argument_m_out_of_range_error(
                     &format!("{} isn't supported for the current connector.", g.type_),
                     span,

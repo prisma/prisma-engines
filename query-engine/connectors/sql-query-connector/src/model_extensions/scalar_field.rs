@@ -57,20 +57,27 @@ impl ScalarFieldExt for ScalarField {
             (PrismaValue::Bytes(b), _) => Value::bytes(b),
             (PrismaValue::Object(_), _) => unimplemented!(),
             (PrismaValue::GeoJson(s), _) => {
-                let geometry = GeometryValue {
-                    wkt: GeoJson(&s).to_wkt().unwrap(),
-                    srid: 4326,
-                };
+                // GeoJSON string should have been validated before
+                let wkt = GeoJson(&s).to_wkt().unwrap();
                 match self.type_family() {
-                    TypeFamily::Geography(_) => Value::geography(geometry),
-                    _ => Value::geometry(geometry),
+                    TypeFamily::Geography(srid) => Value::geography(GeometryValue {
+                        wkt,
+                        srid: srid.unwrap_or(0),
+                    }),
+                    TypeFamily::Geometry(srid) => Value::geometry(GeometryValue {
+                        wkt,
+                        srid: srid.unwrap_or(0),
+                    }),
+                    _ => unreachable!(),
                 }
             }
             (PrismaValue::Geometry(s), _) => {
+                // EWKT string should have been validated before
                 let geometry = GeometryValue::from_str(&s).unwrap();
                 match self.type_family() {
                     TypeFamily::Geography(_) => Value::geography(geometry),
-                    _ => Value::geometry(geometry),
+                    TypeFamily::Geometry(_) => Value::geometry(geometry),
+                    _ => unreachable!(),
                 }
             }
             (PrismaValue::Null, ident) => match ident {

@@ -84,21 +84,45 @@ pub enum GeometryType {
     TriangleZM = 3017,
 }
 
+#[derive(Debug, Default, Clone, Copy, PartialEq, PartialOrd)]
+pub enum GeometryDimension {
+    #[default]
+    XY,
+    XYZ,
+    XYM,
+    XYZM,
+}
+
+impl fmt::Display for GeometryDimension {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::XY => write!(f, "XY"),
+            Self::XYZ => write!(f, "XYZ"),
+            Self::XYM => write!(f, "XYM"),
+            Self::XYZM => write!(f, "XYZM"),
+        }
+    }
+}
+
 impl GeometryType {
-    pub fn is_extra(&self) -> bool {
+    pub fn is_extended(&self) -> bool {
         self.as_2d() > Self::GeometryCollection
+    }
+
+    pub fn is_geojson_compatible(&self) -> bool {
+        !self.is_extended() && self.dimension() <= &GeometryDimension::XYZ
     }
 
     pub fn as_2d(&self) -> Self {
         Self::try_from(*self as u32 % 1000).unwrap()
     }
 
-    pub fn dimensions(&self) -> &'static str {
+    pub fn dimension(&self) -> &'static GeometryDimension {
         match *self as u32 / 1000 {
-            0 => "XY",
-            1 => "XYZ",
-            2 => "XYM",
-            3 => "XYZM",
+            0 => &GeometryDimension::XY,
+            1 => &GeometryDimension::XYZ,
+            2 => &GeometryDimension::XYM,
+            3 => &GeometryDimension::XYZM,
             _ => unreachable!(),
         }
     }

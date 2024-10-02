@@ -91,7 +91,6 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
     (ScalarType::Bytes, MySqlType::LongBlob),
     (ScalarType::Json, MySqlType::Json),
     (ScalarType::Geometry, MySqlType::Geometry(None)),
-    // TODO@geometry In MYSQL8+, ideally we'd set the default SRID to 4326
     (ScalarType::GeoJson, MySqlType::Geometry(None)),
 ];
 
@@ -241,9 +240,8 @@ impl Connector for MySqlDatamodelConnector {
             | MultiLineString(Some(srid))
             | MultiPolygon(Some(srid))
             | GeometryCollection(Some(srid))
-                if *scalar_type == ScalarType::GeoJson && *srid != 4326 =>
+                if *scalar_type == ScalarType::GeoJson && !matches!(*srid, 0 | 4326) =>
             {
-                // TODO@geometry MySQL <8 doesn't support SRID parameter, is there a way to catch this here ?
                 errors.push_error(error.new_argument_m_out_of_range_error("GeoJson SRID must be 4326.", span))
             }
             Bit(n) if *n > 1 && matches!(scalar_type, ScalarType::Boolean) => {

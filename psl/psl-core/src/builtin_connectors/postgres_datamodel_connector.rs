@@ -107,7 +107,7 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
         ScalarType::GeoJson,
         PostgresType::Geometry(Some(GeometryParams {
             type_: GeometryType::Geometry,
-            srid: 4326,
+            srid: 0,
         })),
     ),
 ];
@@ -408,7 +408,9 @@ impl Connector for PostgresDatamodelConnector {
             Timestamp(Some(p)) | Timestamptz(Some(p)) | Time(Some(p)) | Timetz(Some(p)) if *p > 6 => {
                 errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
             }
-            Geometry(Some(g)) | Geography(Some(g)) if *scalar_type == ScalarType::GeoJson && g.type_.is_extra() => {
+            Geometry(Some(g)) | Geography(Some(g))
+                if *scalar_type == ScalarType::GeoJson && !g.type_.is_geojson_compatible() =>
+            {
                 errors.push_error(
                     error.new_argument_m_out_of_range_error(
                         &format!("{} isn't compatible with GeoJson.", g.type_),
@@ -416,7 +418,9 @@ impl Connector for PostgresDatamodelConnector {
                     ),
                 )
             }
-            Geometry(Some(g)) | Geography(Some(g)) if *scalar_type == ScalarType::GeoJson && g.srid != 4326 => {
+            Geometry(Some(g)) | Geography(Some(g))
+                if *scalar_type == ScalarType::GeoJson && !matches!(g.srid, 0 | 4326) =>
+            {
                 errors.push_error(error.new_argument_m_out_of_range_error("GeoJson SRID must be 4326.", span))
             }
             Geometry(Some(g)) | Geography(Some(g)) if g.srid < 0 || g.srid > 999000 => {

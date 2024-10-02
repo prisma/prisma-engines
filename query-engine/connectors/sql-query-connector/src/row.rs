@@ -303,8 +303,8 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             // the ewkt string back to geojson. However, per specification, GeoJSON geometries
             // can only be represented with EPSG:4326 projection. Plus WKT can represent more
             // spatial types than GeoJSON can, so this operation may fail.
-            ValueType::Text(Some(ref ewkt)) => match ewkt.starts_with("SRID=4326;") {
-                true => WktStr(&ewkt[10..])
+            ValueType::Text(Some(ref ewkt)) => match ewkt.starts_with("SRID=0;") || ewkt.starts_with("SRID=4326;") {
+                true => WktStr(&ewkt[ewkt.find(";").unwrap() + 1..])
                     .to_json()
                     .map(PrismaValue::GeoJson)
                     .map_err(|_| create_error(&p_value))?,
