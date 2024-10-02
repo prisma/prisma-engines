@@ -5,6 +5,7 @@ pub(crate) mod column_type;
 mod conversion;
 mod error;
 mod explain;
+mod websocket;
 
 pub(crate) use crate::connector::postgres::url::PostgresUrl;
 use crate::connector::postgres::url::{Hidden, SslAcceptMode, SslParams};
@@ -37,11 +38,14 @@ use std::{
     time::Duration,
 };
 use tokio_postgres::{config::ChannelBinding, Client, Config, Statement};
+use websocket::connect_via_websocket;
 
 /// The underlying postgres driver. Only available with the `expose-drivers`
 /// Cargo feature.
 #[cfg(feature = "expose-drivers")]
 pub use tokio_postgres;
+
+use super::PostgresWebSocketUrl;
 
 struct PostgresClient(Client);
 
@@ -289,6 +293,21 @@ impl PostgreSql {
             is_healthy: AtomicBool::new(true),
             is_cockroachdb,
             is_materialize,
+        })
+    }
+
+    /// Create a new websocket connection to managed database
+    pub async fn new_with_websocket(url: PostgresWebSocketUrl) -> crate::Result<Self> {
+        let client = connect_via_websocket(url).await?;
+
+        Ok(Self {
+            client: PostgresClient(client),
+            socket_timeout: None,
+            pg_bouncer: false,
+            statement_cache: Mutex::new(StatementCache::new(0)),
+            is_healthy: AtomicBool::new(true),
+            is_cockroachdb: false,
+            is_materialize: false,
         })
     }
 

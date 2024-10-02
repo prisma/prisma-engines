@@ -126,10 +126,7 @@ impl PostgresUrl {
 
     /// Name of the database connected. Defaults to `postgres`.
     pub fn dbname(&self) -> &str {
-        match self.url.path_segments() {
-            Some(mut segments) => segments.next().unwrap_or("postgres"),
-            None => "postgres",
-        }
+        dbname(&self.url)
     }
 
     /// The percent-decoded database password.
@@ -431,6 +428,40 @@ pub(crate) struct PostgresUrlQueryParams {
     pub(crate) ssl_mode: SslMode,
 }
 
+#[derive(Debug, Clone)]
+pub struct PostgresWebSocketUrl {
+    pub(crate) url: Url,
+    pub(crate) api_key: String,
+}
+
+impl PostgresWebSocketUrl {
+    pub fn new(url: Url, api_key: String) -> Self {
+        Self { url, api_key }
+    }
+
+    pub fn api_key(&self) -> &str {
+        &self.api_key
+    }
+
+    pub fn host(&self) -> &str {
+        self.url.host_str().unwrap_or("localhost")
+    }
+
+    pub fn port(&self) -> u16 {
+        self.url.port().unwrap_or(80)
+    }
+
+    pub fn dbname(&self) -> &str {
+        dbname(&self.url)
+    }
+}
+
+fn dbname(url: &Url) -> &str {
+    match url.path_segments() {
+        Some(mut segments) => segments.next().unwrap_or("postgres"),
+        None => "postgres",
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;

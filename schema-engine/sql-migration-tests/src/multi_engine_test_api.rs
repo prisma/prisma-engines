@@ -196,7 +196,7 @@ impl TestApi {
         };
 
         let mut connector = match &connection_info {
-            ConnectionInfo::Native(NativeConnectionInfo::Postgres(_)) => {
+            ConnectionInfo::Native(NativeConnectionInfo::Postgres(_) | NativeConnectionInfo::PostgresWs(_)) => {
                 if self.args.provider() == "cockroachdb" {
                     SqlSchemaConnector::new_cockroach()
                 } else {
