@@ -51,10 +51,10 @@ impl MigratePostgresUrl {
                     "Required `apiKey` query string parameter was not provided in a connection URL",
                 ));
             };
-            PostgresUrl::new_websocket(ws_url, api_key.into_owned()).map_err(ConnectorError::url_parse_error)?
+            PostgresUrl::new_websocket(ws_url, api_key.into_owned())
         } else {
-            PostgresUrl::new_native(url).map_err(ConnectorError::url_parse_error)?
-        };
+            PostgresUrl::new_native(url)
+        }.map_err(ConnectorError::url_parse_error)?;
 
         Ok(Self(postgres_url))
     }
