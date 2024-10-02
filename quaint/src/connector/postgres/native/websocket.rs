@@ -2,7 +2,12 @@ use std::str::FromStr;
 
 use async_tungstenite::{
     tokio::connect_async,
-    tungstenite::{self, client::IntoClientRequest, http::HeaderValue, Error as TungsteniteError},
+    tungstenite::{
+        self,
+        client::IntoClientRequest,
+        http::{HeaderValue, StatusCode},
+        Error as TungsteniteError,
+    },
 };
 use futures::FutureExt;
 use tokio_postgres::{Client, Config, NoTls};
@@ -10,7 +15,7 @@ use ws_stream_tungstenite::WsStream;
 
 use crate::{
     connector::PostgresWebSocketUrl,
-    error::{self, Error, ErrorKind, NativeErrorKind},
+    error::{self, Error, ErrorKind, Name, NativeErrorKind},
 };
 
 const CONNECTION_PARAMS_HEADER: &str = "Prisma-Connection-Parameters";
@@ -59,6 +64,12 @@ impl From<TungsteniteError> for error::Error {
             TungsteniteError::Tls(tls_error) => Error::builder(ErrorKind::Native(NativeErrorKind::TlsError {
                 message: tls_error.to_string(),
             })),
+
+            TungsteniteError::Http(response) if response.status() == StatusCode::UNAUTHORIZED => {
+                Error::builder(ErrorKind::DatabaseAccessDenied {
+                    db_name: Name::Unavailable,
+                })
+            }
 
             _ => Error::builder(ErrorKind::Native(NativeErrorKind::ConnectionError(Box::new(value)))),
         };
