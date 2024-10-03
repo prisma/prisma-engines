@@ -72,7 +72,7 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                 ValueType::Geometry(g) | ValueType::Geography(g) => match g {
                     None => None,
                     Some(ref g) => {
-                        let res = WktStr(&g.wkt).to_mysql_wkb(Some(g.srid)).map(my::Value::Bytes);
+                        let res = WktStr(&g.wkt).to_mysql_wkb(g.srid).map(my::Value::Bytes);
 
                         if res.is_err() {
                             let msg = "Couldn't convert value `{g}` into EWKB.";

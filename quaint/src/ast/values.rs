@@ -40,14 +40,14 @@ where
 #[derive(Debug, Clone, Eq, PartialEq, Hash, PartialOrd, Ord)]
 pub struct GeometryValue {
     pub wkt: String,
-    pub srid: i32,
+    pub srid: Option<i32>,
 }
 
 impl Display for GeometryValue {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self.srid {
-            0 => (),
-            srid => write!(f, "SRID={};", srid)?,
+            None | Some(0) => (),
+            Some(srid) => write!(f, "SRID={};", srid)?,
         }
         f.write_str(&self.wkt)
     }
@@ -61,11 +61,11 @@ impl FromStr for GeometryValue {
         EWKT_REGEX
             .captures(s)
             .map(|capture| {
-                let srid = match capture.name("srid").map(|v| v.as_str().parse::<i32>()) {
-                    None => Ok(0),
-                    Some(Ok(srid)) => Ok(srid),
-                    Some(Err(_)) => Err(Error::builder(ErrorKind::conversion("Invalid EWKT SRID")).build()),
-                }?;
+                let srid = capture
+                    .name("srid")
+                    .map(|v| v.as_str().parse::<i32>())
+                    .transpose()
+                    .map_err(|_| Error::builder(ErrorKind::conversion("Invalid EWKT SRID")).build())?;
                 let wkt = capture.name("geometry").map(|v| v.as_str()).unwrap().to_string();
                 Ok(GeometryValue { srid, wkt })
             })

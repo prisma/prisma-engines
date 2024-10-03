@@ -196,10 +196,10 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             // TODO@geometry: find a way to avoid cloning
             ValueType::Geometry(g) => g
                 .as_ref()
-                .map(|g| self.visit_function(geom_from_text(g.wkt.clone().raw(), g.srid.raw(), false))),
+                .map(|g| self.visit_function(geom_from_text(g.wkt.clone(), g.srid, false))),
             ValueType::Geography(g) => g
                 .as_ref()
-                .map(|g| self.visit_function(geom_from_text(g.wkt.clone().raw(), g.srid.raw(), true))),
+                .map(|g| self.visit_function(geom_from_text(g.wkt.clone(), g.srid, true))),
         };
 
         match res {
@@ -728,8 +728,10 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     fn visit_geom_from_text(&mut self, geom: GeomFromText<'a>) -> visitor::Result {
         self.surround_with("ST_GeomFromText(", ")", |ref mut s| {
             s.visit_expression(*geom.wkt_expression)?;
-            s.write(",")?;
-            s.visit_expression(*geom.srid_expression)?;
+            if let Some(srid_expression) = geom.srid_expression {
+                s.write(",")?;
+                s.visit_expression(*srid_expression)?;
+            }
             Ok(())
         })
     }

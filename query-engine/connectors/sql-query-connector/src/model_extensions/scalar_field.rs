@@ -58,14 +58,8 @@ impl ScalarFieldExt for ScalarField {
                 // GeoJSON string should have been validated before
                 let wkt = GeoJson(&s).to_wkt().unwrap();
                 match self.type_family() {
-                    TypeFamily::Geography(srid) => Value::geography(GeometryValue {
-                        wkt,
-                        srid: srid.unwrap_or(0),
-                    }),
-                    TypeFamily::Geometry(srid) => Value::geometry(GeometryValue {
-                        wkt,
-                        srid: srid.unwrap_or(0),
-                    }),
+                    TypeFamily::Geography(srid) => Value::geography(GeometryValue { wkt, srid }),
+                    TypeFamily::Geometry(srid) => Value::geometry(GeometryValue { wkt, srid }),
                     _ => unreachable!(),
                 }
             }

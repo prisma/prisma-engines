@@ -424,10 +424,10 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             // TODO@geometry: find a way to avoid cloning
             ValueType::Geometry(g) => g
                 .as_ref()
-                .map(|g| self.visit_function(geom_from_text(g.wkt.clone().raw(), g.srid.raw(), false))),
+                .map(|g| self.visit_function(geom_from_text(g.wkt.clone(), g.srid, false))),
             ValueType::Geography(g) => g
                 .as_ref()
-                .map(|g| self.visit_function(geom_from_text(g.wkt.clone().raw(), g.srid.raw(), true))),
+                .map(|g| self.visit_function(geom_from_text(g.wkt.clone(), g.srid, true))),
         };
 
         match res {
@@ -839,8 +839,11 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         self.write(if geom.geography { "geography" } else { "geometry" })?;
         self.surround_with("::STGeomFromText(", ")", |ref mut s| {
             s.visit_expression(*geom.wkt_expression)?;
-            s.write(",")?;
-            s.visit_expression(*geom.srid_expression)?;
+            if geom.geography {
+                s.visit_expression(*geom.srid_expression.unwrap_or_else(|| Box::new(4326.into())))?;
+            } else {
+                s.visit_expression(*geom.srid_expression.unwrap_or_else(|| Box::new(0.into())))?;
+            }
             Ok(())
         })
     }

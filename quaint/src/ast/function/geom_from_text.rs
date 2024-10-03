@@ -5,7 +5,7 @@ use crate::ast::Expression;
 #[derive(Debug, Clone, PartialEq)]
 pub struct GeomFromText<'a> {
     pub(crate) wkt_expression: Box<Expression<'a>>,
-    pub(crate) srid_expression: Box<Expression<'a>>,
+    pub(crate) srid_expression: Option<Box<Expression<'a>>>,
     pub(crate) geography: bool,
 }
 
@@ -26,14 +26,14 @@ pub struct GeomFromText<'a> {
 /// # Ok(())
 /// # }
 /// ```
-pub fn geom_from_text<'a, G, S>(wkt_expression: G, srid_expression: S, geography: bool) -> Function<'a>
+pub fn geom_from_text<'a, G, S>(wkt_expression: G, srid_expression: Option<S>, geography: bool) -> Function<'a>
 where
     G: Into<Expression<'a>>,
     S: Into<Expression<'a>>,
 {
     let fun = GeomFromText {
         wkt_expression: Box::new(wkt_expression.into()),
-        srid_expression: Box::new(srid_expression.into()),
+        srid_expression: srid_expression.map(|s| Box::new(s.into())),
         geography,
     };
 
