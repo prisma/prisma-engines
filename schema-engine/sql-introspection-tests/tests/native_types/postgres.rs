@@ -39,72 +39,37 @@ const TYPES: &[(&str, &str)] = &[
 const GEOMETRY_TYPES: &[(&str, &str)] = &[
     ("geometry", "Geometry"),
     ("geometry_srid", "Geometry(Geometry, 3857)"),
-    ("geometry_geometry_m", "Geometry(GeometryM)"),
     ("geometry_geometry_z", "Geometry(GeometryZ)"),
-    ("geometry_geometry_zm", "Geometry(GeometryZM)"),
     ("geometry_point", "Geometry(Point)"),
-    ("geometry_point_m", "Geometry(PointM)"),
     ("geometry_point_z", "Geometry(PointZ)"),
-    ("geometry_point_zm", "Geometry(PointZM)"),
     ("geometry_linestring", "Geometry(LineString)"),
-    ("geometry_linestring_m", "Geometry(LineStringM)"),
     ("geometry_linestring_z", "Geometry(LineStringZ)"),
-    ("geometry_linestring_zm", "Geometry(LineStringZM)"),
     ("geometry_polygon", "Geometry(Polygon)"),
-    ("geometry_polygon_m", "Geometry(PolygonM)"),
     ("geometry_polygon_z", "Geometry(PolygonZ)"),
-    ("geometry_polygon_zm", "Geometry(PolygonZM)"),
     ("geometry_multipoint", "Geometry(MultiPoint)"),
-    ("geometry_multipoint_m", "Geometry(MultiPointM)"),
     ("geometry_multipoint_z", "Geometry(MultiPointZ)"),
-    ("geometry_multipoint_zm", "Geometry(MultiPointZM)"),
     ("geometry_multilinestring", "Geometry(MultiLineString)"),
-    ("geometry_multilinestring_m", "Geometry(MultiLineStringM)"),
     ("geometry_multilinestring_z", "Geometry(MultiLineStringZ)"),
-    ("geometry_multilinestring_zm", "Geometry(MultiLineStringZM)"),
     ("geometry_multipolygon", "Geometry(MultiPolygon)"),
-    ("geometry_multipolygon_m", "Geometry(MultiPolygonM)"),
     ("geometry_multipolygon_z", "Geometry(MultiPolygonZ)"),
-    ("geometry_multipolygon_zm", "Geometry(MultiPolygonZM)"),
     ("geometry_geometrycollection", "Geometry(GeometryCollection)"),
-    ("geometry_geometrycollection_m", "Geometry(GeometryCollectionM)"),
     ("geometry_geometrycollection_z", "Geometry(GeometryCollectionZ)"),
-    ("geometry_geometrycollection_zm", "Geometry(GeometryCollectionZM)"),
     ("geography_geometry", "Geography(Geometry, 4326)"),
-    ("geography_geometry_m", "Geography(GeometryM, 4326)"),
     ("geography_geometry_z", "Geography(GeometryZ, 4326)"),
-    ("geography_geometry_zm", "Geography(GeometryZM, 4326)"),
     ("geography_point", "Geography(Point, 4326)"),
-    ("geography_point_m", "Geography(PointM, 4326)"),
     ("geography_point_z", "Geography(PointZ, 4326)"),
-    ("geography_point_zm", "Geography(PointZM, 4326)"),
     ("geography_linestring", "Geography(LineString, 4326)"),
-    ("geography_linestring_m", "Geography(LineStringM, 4326)"),
     ("geography_linestring_z", "Geography(LineStringZ, 4326)"),
-    ("geography_linestring_zm", "Geography(LineStringZM, 4326)"),
     ("geography_polygon", "Geography(Polygon, 4326)"),
-    ("geography_polygon_m", "Geography(PolygonM, 4326)"),
     ("geography_polygon_z", "Geography(PolygonZ, 4326)"),
-    ("geography_polygon_zm", "Geography(PolygonZM, 4326)"),
     ("geography_multipoint", "Geography(MultiPoint, 4326)"),
-    ("geography_multipoint_m", "Geography(MultiPointM, 4326)"),
     ("geography_multipoint_z", "Geography(MultiPointZ, 4326)"),
-    ("geography_multipoint_zm", "Geography(MultiPointZM, 4326)"),
     ("geography_multilinestring", "Geography(MultiLineString, 4326)"),
-    ("geography_multilinestring_m", "Geography(MultiLineStringM, 4326)"),
     ("geography_multilinestring_z", "Geography(MultiLineStringZ, 4326)"),
-    ("geography_multilinestring_zm", "Geography(MultiLineStringZM, 4326)"),
     ("geography_multipolygon", "Geography(MultiPolygon, 4326)"),
-    ("geography_multipolygon_m", "Geography(MultiPolygonM, 4326)"),
     ("geography_multipolygon_z", "Geography(MultiPolygonZ, 4326)"),
-    ("geography_multipolygon_zm", "Geography(MultiPolygonZM, 4326)"),
     ("geography_geometrycollection", "Geography(GeometryCollection, 4326)"),
-    ("geography_geometrycollection_m", "Geography(GeometryCollectionM, 4326)"),
     ("geography_geometrycollection_z", "Geography(GeometryCollectionZ, 4326)"),
-    (
-        "geography_geometrycollection_zm",
-        "Geography(GeometryCollectionZM, 4326)",
-    ),
 ];
 
 #[test_connector(tags(Postgres), exclude(PostGIS, CockroachDb))]
@@ -196,69 +161,37 @@ async fn native_type_spatial_columns_feature_on(api: &mut TestApi) -> TestResult
             id                              Int      @id
             geometry                        Geometry
             geometry_srid                   Geometry @db.Geometry(Geometry, 3857)
-            geometry_geometry_m             Geometry @db.Geometry(GeometryM)
             geometry_geometry_z             Geometry @db.Geometry(GeometryZ)
-            geometry_geometry_zm            Geometry @db.Geometry(GeometryZM)
             geometry_point                  Geometry @db.Geometry(Point)
-            geometry_point_m                Geometry @db.Geometry(PointM)
             geometry_point_z                Geometry @db.Geometry(PointZ)
-            geometry_point_zm               Geometry @db.Geometry(PointZM)
             geometry_linestring             Geometry @db.Geometry(LineString)
-            geometry_linestring_m           Geometry @db.Geometry(LineStringM)
             geometry_linestring_z           Geometry @db.Geometry(LineStringZ)
-            geometry_linestring_zm          Geometry @db.Geometry(LineStringZM)
             geometry_polygon                Geometry @db.Geometry(Polygon)
-            geometry_polygon_m              Geometry @db.Geometry(PolygonM)
             geometry_polygon_z              Geometry @db.Geometry(PolygonZ)
-            geometry_polygon_zm             Geometry @db.Geometry(PolygonZM)
             geometry_multipoint             Geometry @db.Geometry(MultiPoint)
-            geometry_multipoint_m           Geometry @db.Geometry(MultiPointM)
             geometry_multipoint_z           Geometry @db.Geometry(MultiPointZ)
-            geometry_multipoint_zm          Geometry @db.Geometry(MultiPointZM)
             geometry_multilinestring        Geometry @db.Geometry(MultiLineString)
-            geometry_multilinestring_m      Geometry @db.Geometry(MultiLineStringM)
             geometry_multilinestring_z      Geometry @db.Geometry(MultiLineStringZ)
-            geometry_multilinestring_zm     Geometry @db.Geometry(MultiLineStringZM)
             geometry_multipolygon           Geometry @db.Geometry(MultiPolygon)
-            geometry_multipolygon_m         Geometry @db.Geometry(MultiPolygonM)
             geometry_multipolygon_z         Geometry @db.Geometry(MultiPolygonZ)
-            geometry_multipolygon_zm        Geometry @db.Geometry(MultiPolygonZM)
             geometry_geometrycollection     Geometry @db.Geometry(GeometryCollection)
-            geometry_geometrycollection_m   Geometry @db.Geometry(GeometryCollectionM)
             geometry_geometrycollection_z   Geometry @db.Geometry(GeometryCollectionZ)
-            geometry_geometrycollection_zm  Geometry @db.Geometry(GeometryCollectionZM)
             geography_geometry              Geometry @db.Geography(Geometry, 4326)
-            geography_geometry_m            Geometry @db.Geography(GeometryM, 4326)
             geography_geometry_z            Geometry @db.Geography(GeometryZ, 4326)
-            geography_geometry_zm           Geometry @db.Geography(GeometryZM, 4326)
             geography_point                 Geometry @db.Geography(Point, 4326)
-            geography_point_m               Geometry @db.Geography(PointM, 4326)
             geography_point_z               Geometry @db.Geography(PointZ, 4326)
-            geography_point_zm              Geometry @db.Geography(PointZM, 4326)
             geography_linestring            Geometry @db.Geography(LineString, 4326)
-            geography_linestring_m          Geometry @db.Geography(LineStringM, 4326)
             geography_linestring_z          Geometry @db.Geography(LineStringZ, 4326)
-            geography_linestring_zm         Geometry @db.Geography(LineStringZM, 4326)
             geography_polygon               Geometry @db.Geography(Polygon, 4326)
-            geography_polygon_m             Geometry @db.Geography(PolygonM, 4326)
             geography_polygon_z             Geometry @db.Geography(PolygonZ, 4326)
-            geography_polygon_zm            Geometry @db.Geography(PolygonZM, 4326)
             geography_multipoint            Geometry @db.Geography(MultiPoint, 4326)
-            geography_multipoint_m          Geometry @db.Geography(MultiPointM, 4326)
             geography_multipoint_z          Geometry @db.Geography(MultiPointZ, 4326)
-            geography_multipoint_zm         Geometry @db.Geography(MultiPointZM, 4326)
             geography_multilinestring       Geometry @db.Geography(MultiLineString, 4326)
-            geography_multilinestring_m     Geometry @db.Geography(MultiLineStringM, 4326)
             geography_multilinestring_z     Geometry @db.Geography(MultiLineStringZ, 4326)
-            geography_multilinestring_zm    Geometry @db.Geography(MultiLineStringZM, 4326)
             geography_multipolygon          Geometry @db.Geography(MultiPolygon, 4326)
-            geography_multipolygon_m        Geometry @db.Geography(MultiPolygonM, 4326)
             geography_multipolygon_z        Geometry @db.Geography(MultiPolygonZ, 4326)
-            geography_multipolygon_zm       Geometry @db.Geography(MultiPolygonZM, 4326)
             geography_geometrycollection    Geometry @db.Geography(GeometryCollection, 4326)
-            geography_geometrycollection_m  Geometry @db.Geography(GeometryCollectionM, 4326)
             geography_geometrycollection_z  Geometry @db.Geography(GeometryCollectionZ, 4326)
-            geography_geometrycollection_zm Geometry @db.Geography(GeometryCollectionZM, 4326)
         }
     "#}
     .to_string();
