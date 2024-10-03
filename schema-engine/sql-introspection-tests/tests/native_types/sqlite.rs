@@ -24,7 +24,7 @@ async fn native_spatial_type_columns_feature_on(api: &mut TestApi) -> TestResult
             AddGeometryColumn('User', 'multipolygon_xy', 4326, 'MULTIPOLYGON', 'XY', 0),
             AddGeometryColumn('User', 'multipolygon_xyz', 4326, 'MULTIPOLYGON', 'XYZ', 0),
             AddGeometryColumn('User', 'geometrycollection_xy', 4326, 'GEOMETRYCOLLECTION', 'XY', 0),
-            AddGeometryColumn('User', 'geometrycollection_xyz', 4326, 'GEOMETRYCOLLECTION', 'XYZ', 0),
+            AddGeometryColumn('User', 'geometrycollection_xyz', 4326, 'GEOMETRYCOLLECTION', 'XYZ', 0);
    "#};
 
     api.raw_cmd(setup).await;
