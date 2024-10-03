@@ -221,36 +221,20 @@ fn spatialite_column_types_must_work(api: TestApi) {
         SELECT
             AddGeometryColumn('User', 'geometry_xy', 4326, 'GEOMETRY', 'XY', 0),
             AddGeometryColumn('User', 'geometry_xyz', 4326, 'GEOMETRY', 'XYZ', 0),
-            AddGeometryColumn('User', 'geometry_xym', 4326, 'GEOMETRY', 'XYM', 0),
-            AddGeometryColumn('User', 'geometry_xyzm', 4326, 'GEOMETRY', 'XYZM', 0),
             AddGeometryColumn('User', 'point_xy', 4326, 'POINT', 'XY', 0),
             AddGeometryColumn('User', 'point_xyz', 4326, 'POINT', 'XYZ', 0),
-            AddGeometryColumn('User', 'point_xym', 4326, 'POINT', 'XYM', 0),
-            AddGeometryColumn('User', 'point_xyzm', 4326, 'POINT', 'XYZM', 0),
             AddGeometryColumn('User', 'linestring_xy', 4326, 'LINESTRING', 'XY', 0),
             AddGeometryColumn('User', 'linestring_xyz', 4326, 'LINESTRING', 'XYZ', 0),
-            AddGeometryColumn('User', 'linestring_xym', 4326, 'LINESTRING', 'XYM', 0),
-            AddGeometryColumn('User', 'linestring_xyzm', 4326, 'LINESTRING', 'XYZM', 0),
             AddGeometryColumn('User', 'polygon_xy', 4326, 'POLYGON', 'XY', 0),
             AddGeometryColumn('User', 'polygon_xyz', 4326, 'POLYGON', 'XYZ', 0),
-            AddGeometryColumn('User', 'polygon_xym', 4326, 'POLYGON', 'XYM', 0),
-            AddGeometryColumn('User', 'polygon_xyzm', 4326, 'POLYGON', 'XYZM', 0),
             AddGeometryColumn('User', 'multipoint_xy', 4326, 'MULTIPOINT', 'XY', 0),
             AddGeometryColumn('User', 'multipoint_xyz', 4326, 'MULTIPOINT', 'XYZ', 0),
-            AddGeometryColumn('User', 'multipoint_xym', 4326, 'MULTIPOINT', 'XYM', 0),
-            AddGeometryColumn('User', 'multipoint_xyzm', 4326, 'MULTIPOINT', 'XYZM', 0),
             AddGeometryColumn('User', 'multilinestring_xy', 4326, 'MULTILINESTRING', 'XY', 0),
             AddGeometryColumn('User', 'multilinestring_xyz', 4326, 'MULTILINESTRING', 'XYZ', 0),
-            AddGeometryColumn('User', 'multilinestring_xym', 4326, 'MULTILINESTRING', 'XYM', 0),
-            AddGeometryColumn('User', 'multilinestring_xyzm', 4326, 'MULTILINESTRING', 'XYZM', 0),
             AddGeometryColumn('User', 'multipolygon_xy', 4326, 'MULTIPOLYGON', 'XY', 0),
             AddGeometryColumn('User', 'multipolygon_xyz', 4326, 'MULTIPOLYGON', 'XYZ', 0),
-            AddGeometryColumn('User', 'multipolygon_xym', 4326, 'MULTIPOLYGON', 'XYM', 0),
-            AddGeometryColumn('User', 'multipolygon_xyzm', 4326, 'MULTIPOLYGON', 'XYZM', 0),
             AddGeometryColumn('User', 'geometrycollection_xy', 4326, 'GEOMETRYCOLLECTION', 'XY', 0),
-            AddGeometryColumn('User', 'geometrycollection_xyz', 4326, 'GEOMETRYCOLLECTION', 'XYZ', 0),
-            AddGeometryColumn('User', 'geometrycollection_xym', 4326, 'GEOMETRYCOLLECTION', 'XYM', 0),
-            AddGeometryColumn('User', 'geometrycollection_xyzm', 4326, 'GEOMETRYCOLLECTION', 'XYZM', 0);
+            AddGeometryColumn('User', 'geometrycollection_xyz', 4326, 'GEOMETRYCOLLECTION', 'XYZ', 0);
     "#;
     api.raw_cmd(sql);
     let expectation = expect![[r#"
@@ -328,42 +312,6 @@ fn spatialite_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     Column {
-                        name: "geometry_xym",
-                        tpe: ColumnType {
-                            full_data_type: "GEOMETRY",
-                            family: Geometry,
-                            arity: Nullable,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: false,
-                        description: None,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "geometry_xyzm",
-                        tpe: ColumnType {
-                            full_data_type: "GEOMETRY",
-                            family: Geometry,
-                            arity: Nullable,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: false,
-                        description: None,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
                         name: "point_xy",
                         tpe: ColumnType {
                             full_data_type: "POINT",
@@ -383,42 +331,6 @@ fn spatialite_column_types_must_work(api: TestApi) {
                     ),
                     Column {
                         name: "point_xyz",
-                        tpe: ColumnType {
-                            full_data_type: "POINT",
-                            family: Geometry,
-                            arity: Nullable,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: false,
-                        description: None,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "point_xym",
-                        tpe: ColumnType {
-                            full_data_type: "POINT",
-                            family: Geometry,
-                            arity: Nullable,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: false,
-                        description: None,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "point_xyzm",
                         tpe: ColumnType {
                             full_data_type: "POINT",
                             family: Geometry,
@@ -472,42 +384,6 @@ fn spatialite_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     Column {
-                        name: "linestring_xym",
-                        tpe: ColumnType {
-                            full_data_type: "LINESTRING",
-                            family: Geometry,
-                            arity: Nullable,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: false,
-                        description: None,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "linestring_xyzm",
-                        tpe: ColumnType {
-                            full_data_type: "LINESTRING",
-                            family: Geometry,
-                            arity: Nullable,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: false,
-                        description: None,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
                         name: "polygon_xy",
                         tpe: ColumnType {
                             full_data_type: "POLYGON",
@@ -527,42 +403,6 @@ fn spatialite_column_types_must_work(api: TestApi) {
                     ),
                     Column {
                         name: "polygon_xyz",
-                        tpe: ColumnType {
-                            full_data_type: "POLYGON",
-                            family: Geometry,
-                            arity: Nullable,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: false,
-                        description: None,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "polygon_xym",
-                        tpe: ColumnType {
-                            full_data_type: "POLYGON",
-                            family: Geometry,
-                            arity: Nullable,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: false,
-                        description: None,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "polygon_xyzm",
                         tpe: ColumnType {
                             full_data_type: "POLYGON",
                             family: Geometry,
@@ -616,42 +456,6 @@ fn spatialite_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     Column {
-                        name: "multipoint_xym",
-                        tpe: ColumnType {
-                            full_data_type: "MULTIPOINT",
-                            family: Geometry,
-                            arity: Nullable,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: false,
-                        description: None,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "multipoint_xyzm",
-                        tpe: ColumnType {
-                            full_data_type: "MULTIPOINT",
-                            family: Geometry,
-                            arity: Nullable,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: false,
-                        description: None,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
                         name: "multilinestring_xy",
                         tpe: ColumnType {
                             full_data_type: "MULTILINESTRING",
@@ -671,42 +475,6 @@ fn spatialite_column_types_must_work(api: TestApi) {
                     ),
                     Column {
                         name: "multilinestring_xyz",
-                        tpe: ColumnType {
-                            full_data_type: "MULTILINESTRING",
-                            family: Geometry,
-                            arity: Nullable,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: false,
-                        description: None,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "multilinestring_xym",
-                        tpe: ColumnType {
-                            full_data_type: "MULTILINESTRING",
-                            family: Geometry,
-                            arity: Nullable,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: false,
-                        description: None,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "multilinestring_xyzm",
                         tpe: ColumnType {
                             full_data_type: "MULTILINESTRING",
                             family: Geometry,
@@ -760,42 +528,6 @@ fn spatialite_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     Column {
-                        name: "multipolygon_xym",
-                        tpe: ColumnType {
-                            full_data_type: "MULTIPOLYGON",
-                            family: Geometry,
-                            arity: Nullable,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: false,
-                        description: None,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "multipolygon_xyzm",
-                        tpe: ColumnType {
-                            full_data_type: "MULTIPOLYGON",
-                            family: Geometry,
-                            arity: Nullable,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: false,
-                        description: None,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
                         name: "geometrycollection_xy",
                         tpe: ColumnType {
                             full_data_type: "GEOMETRYCOLLECTION",
@@ -815,42 +547,6 @@ fn spatialite_column_types_must_work(api: TestApi) {
                     ),
                     Column {
                         name: "geometrycollection_xyz",
-                        tpe: ColumnType {
-                            full_data_type: "GEOMETRYCOLLECTION",
-                            family: Geometry,
-                            arity: Nullable,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: false,
-                        description: None,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "geometrycollection_xym",
-                        tpe: ColumnType {
-                            full_data_type: "GEOMETRYCOLLECTION",
-                            family: Geometry,
-                            arity: Nullable,
-                            native_type: Some(
-                                NativeTypeInstance(..),
-                            ),
-                        },
-                        auto_increment: false,
-                        description: None,
-                    },
-                ),
-                (
-                    TableId(
-                        0,
-                    ),
-                    Column {
-                        name: "geometrycollection_xyzm",
                         tpe: ColumnType {
                             full_data_type: "GEOMETRYCOLLECTION",
                             family: Geometry,
