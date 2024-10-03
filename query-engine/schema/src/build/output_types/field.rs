@@ -1,6 +1,6 @@
 use super::*;
 use input_types::fields::arguments;
-use query_structure::{CompositeFieldRef, GeometryFormat, ScalarFieldRef};
+use query_structure::{CompositeFieldRef, ScalarFieldRef};
 
 pub(crate) fn map_output_field(ctx: &'_ QuerySchema, model_field: ModelField) -> OutputField<'_> {
     let cloned_model_field = model_field.clone();
@@ -34,8 +34,7 @@ pub(crate) fn map_scalar_output_type<'a>(ctx: &'a QuerySchema, typ: &TypeIdentif
         TypeIdentifier::Boolean => OutputType::boolean(),
         TypeIdentifier::Enum(e) => OutputType::enum_type(map_schema_enum_type(ctx, *e)),
         TypeIdentifier::Json => OutputType::json(),
-        TypeIdentifier::Geometry(GeometryFormat::GeoJSON) => OutputType::geojson_geometry(),
-        TypeIdentifier::Geometry(GeometryFormat::EWKT) => OutputType::ewkt_geometry(),
+        TypeIdentifier::Geometry => OutputType::geojson(),
         TypeIdentifier::DateTime => OutputType::date_time(),
         TypeIdentifier::UUID => OutputType::uuid(),
         TypeIdentifier::Int => OutputType::int(),

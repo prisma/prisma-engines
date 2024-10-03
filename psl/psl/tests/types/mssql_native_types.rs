@@ -213,11 +213,11 @@ fn geometry_type_should_fail_on_unique() {
         }
 
         model User {
-          id   Int   @id
-          geom GeoJson @db.Geometry
-          geog GeoJson @db.Geometry
+          id Int      @id
+          a  Geometry @db.Geometry
+          b  Geometry @db.Geometry
 
-          @@unique([geom, geog])
+          @@unique([a, b])
         }
     "#};
 
@@ -226,7 +226,7 @@ fn geometry_type_should_fail_on_unique() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@unique([geom, geog])[0m
+        [1;94m11 | [0m  [1;91m@@unique([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -242,11 +242,11 @@ fn geography_type_should_fail_on_unique() {
         }
 
         model User {
-          id   Int     @id
-          geom GeoJson @db.Geography
-          geog GeoJson @db.Geography
+          id Int      @id
+          a  Geometry @db.Geography
+          b  Geometry @db.Geography
 
-          @@unique([geom, geog])
+          @@unique([a, b])
         }
     "#};
 
@@ -255,7 +255,7 @@ fn geography_type_should_fail_on_unique() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@unique([geom, geog])[0m
+        [1;94m11 | [0m  [1;91m@@unique([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -474,11 +474,11 @@ fn geometry_type_should_fail_on_index() {
         }
 
         model User {
-          id        Int   @id
-          firstName GeoJson @db.Geometry
-          lastName  GeoJson @db.Geometry
+          id Int      @id
+          a  Geometry @db.Geometry
+          b  Geometry @db.Geometry
 
-          @@index([firstName, lastName])
+          @@index([a, b])
         }
     "#};
 
@@ -487,7 +487,7 @@ fn geometry_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -503,11 +503,11 @@ fn geography_type_should_fail_on_index() {
         }
 
         model User {
-          id        Int   @id
-          firstName GeoJson @db.Geography
-          lastName  GeoJson @db.Geography
+          id Int   @id
+          a  Geometry @db.Geography
+          b  Geometry @db.Geography
 
-          @@index([firstName, lastName])
+          @@index([a, b])
         }
     "#};
 
@@ -516,7 +516,7 @@ fn geography_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -728,10 +728,10 @@ fn geometry_type_should_fail_on_id() {
         }
 
         model User {
-          firstName GeoJson @db.Geometry
-          lastName  GeoJson @db.Geometry
+          a Geometry @db.Geometry
+          b Geometry @db.Geometry
 
-          @@id([firstName, lastName])
+          @@id([a, b])
         }
     "#};
 
@@ -740,7 +740,7 @@ fn geometry_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -756,10 +756,10 @@ fn geography_type_should_fail_on_id() {
         }
 
         model User {
-          firstName GeoJson @db.Geography
-          lastName  GeoJson @db.Geography
+          a  Geometry @db.Geography
+          b  Geometry @db.Geography
 
-          @@id([firstName, lastName])
+          @@id([a, b])
         }
     "#};
 
@@ -768,7 +768,7 @@ fn geography_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -1082,10 +1082,8 @@ mod test_type_mapping {
     test_type!(ntext(("String @db.NText", MsSqlType::NText)));
     test_type!(image(("Bytes @db.Image", MsSqlType::Image)));
     test_type!(xml(("String @db.Xml", MsSqlType::Xml)));
-    test_type!(geojsongeometry(("GeoJson @db.Geometry", MsSqlType::Geometry)));
-    test_type!(geojsongeography(("GeoJson @db.Geography", MsSqlType::Geography)));
-    test_type!(ewktgeometry(("Geometry @db.Geometry", MsSqlType::Geometry)));
-    test_type!(ewktgeography(("Geometry @db.Geography", MsSqlType::Geography)));
+    test_type!(geometry(("Geometry @db.Geometry", MsSqlType::Geometry)));
+    test_type!(geography(("Geometry @db.Geography", MsSqlType::Geography)));
 
     test_type!(datetimeoffset((
         "DateTime @db.DateTimeOffset",

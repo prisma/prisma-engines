@@ -473,11 +473,11 @@ fn geometry_type_should_fail_on_index() {
         }
 
         model User {
-          id        Int   @id
-          firstName GeoJson @db.Geometry
-          lastName  GeoJson @db.Geometry
+          id Int   @id
+          a  Geometry @db.Geometry
+          b  Geometry @db.Geometry
 
-          @@index([firstName, lastName])
+          @@index([a, b])
         }
     "#};
 
@@ -486,7 +486,7 @@ fn geometry_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -502,11 +502,11 @@ fn point_type_should_fail_on_index() {
         }
 
         model User {
-          id        Int   @id
-          firstName GeoJson @db.Point
-          lastName  GeoJson @db.Point
+          id Int   @id
+          a  Geometry @db.Point
+          b  Geometry @db.Point
 
-          @@index([firstName, lastName])
+          @@index([a, b])
         }
     "#};
 
@@ -515,7 +515,7 @@ fn point_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -531,11 +531,11 @@ fn linestring_type_should_fail_on_index() {
         }
 
         model User {
-          id        Int   @id
-          firstName GeoJson @db.LineString
-          lastName  GeoJson @db.LineString
+          id Int   @id
+          a  Geometry @db.LineString
+          b  Geometry @db.LineString
 
-          @@index([firstName, lastName])
+          @@index([a, b])
         }
     "#};
 
@@ -544,7 +544,7 @@ fn linestring_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -560,11 +560,11 @@ fn polygon_type_should_fail_on_index() {
         }
 
         model User {
-          id        Int   @id
-          firstName GeoJson @db.Polygon
-          lastName  GeoJson @db.Polygon
+          id Int   @id
+          a  Geometry @db.Polygon
+          b  Geometry @db.Polygon
 
-          @@index([firstName, lastName])
+          @@index([a, b])
         }
     "#};
 
@@ -573,7 +573,7 @@ fn polygon_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -589,11 +589,11 @@ fn multipoint_type_should_fail_on_index() {
         }
 
         model User {
-          id        Int   @id
-          firstName GeoJson @db.MultiPoint
-          lastName  GeoJson @db.MultiPoint
+          id Int   @id
+          a  Geometry @db.MultiPoint
+          b  Geometry @db.MultiPoint
 
-          @@index([firstName, lastName])
+          @@index([a, b])
         }
     "#};
 
@@ -602,7 +602,7 @@ fn multipoint_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -618,11 +618,11 @@ fn multilinestring_type_should_fail_on_index() {
         }
 
         model User {
-          id        Int   @id
-          firstName GeoJson @db.MultiLineString
-          lastName  GeoJson @db.MultiLineString
+          id Int   @id
+          a  Geometry @db.MultiLineString
+          b  Geometry @db.MultiLineString
 
-          @@index([firstName, lastName])
+          @@index([a, b])
         }
     "#};
 
@@ -631,7 +631,7 @@ fn multilinestring_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -647,11 +647,11 @@ fn multipolygon_type_should_fail_on_index() {
         }
 
         model User {
-          id        Int   @id
-          firstName GeoJson @db.MultiPolygon
-          lastName  GeoJson @db.MultiPolygon
+          id Int   @id
+          a  Geometry @db.MultiPolygon
+          b  Geometry @db.MultiPolygon
 
-          @@index([firstName, lastName])
+          @@index([a, b])
         }
     "#};
 
@@ -660,7 +660,7 @@ fn multipolygon_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -676,11 +676,11 @@ fn geometrycollection_type_should_fail_on_index() {
         }
 
         model User {
-          id        Int   @id
-          firstName GeoJson @db.GeometryCollection
-          lastName  GeoJson @db.GeometryCollection
+          id Int   @id
+          a  Geometry @db.GeometryCollection
+          b  Geometry @db.GeometryCollection
 
-          @@index([firstName, lastName])
+          @@index([a, b])
         }
     "#};
 
@@ -689,7 +689,7 @@ fn geometrycollection_type_should_fail_on_index() {
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
         [1;94m10 | [0m
-        [1;94m11 | [0m  [1;91m@@index([firstName, lastName])[0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -929,10 +929,10 @@ fn geometry_type_should_fail_on_id() {
         }
 
         model User {
-          firstName GeoJson @db.Geometry
-          lastName  GeoJson @db.Geometry
+          a Geometry @db.Geometry
+          b Geometry @db.Geometry
 
-          @@id([firstName, lastName])
+          @@id([a, b])
         }
     "#};
 
@@ -941,7 +941,7 @@ fn geometry_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -957,10 +957,10 @@ fn point_type_should_fail_on_id() {
         }
 
         model User {
-          firstName GeoJson @db.Point
-          lastName  GeoJson @db.Point
+          a Geometry @db.Point
+          b Geometry @db.Point
 
-          @@id([firstName, lastName])
+          @@id([a, b])
         }
     "#};
 
@@ -969,7 +969,7 @@ fn point_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -985,10 +985,10 @@ fn linestring_type_should_fail_on_id() {
         }
 
         model User {
-          firstName GeoJson @db.LineString
-          lastName  GeoJson @db.LineString
+          a Geometry @db.LineString
+          b Geometry @db.LineString
 
-          @@id([firstName, lastName])
+          @@id([a, b])
         }
     "#};
 
@@ -997,7 +997,7 @@ fn linestring_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -1013,10 +1013,10 @@ fn polygon_type_should_fail_on_id() {
         }
 
         model User {
-          firstName GeoJson @db.Polygon
-          lastName  GeoJson @db.Polygon
+          a Geometry @db.Polygon
+          b Geometry @db.Polygon
 
-          @@id([firstName, lastName])
+          @@id([a, b])
         }
     "#};
 
@@ -1025,7 +1025,7 @@ fn polygon_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -1041,10 +1041,10 @@ fn multipoint_type_should_fail_on_id() {
         }
 
         model User {
-          firstName GeoJson @db.MultiPoint
-          lastName  GeoJson @db.MultiPoint
+          a Geometry @db.MultiPoint
+          b Geometry @db.MultiPoint
 
-          @@id([firstName, lastName])
+          @@id([a, b])
         }
     "#};
 
@@ -1053,7 +1053,7 @@ fn multipoint_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -1069,10 +1069,10 @@ fn multilinestring_type_should_fail_on_id() {
         }
 
         model User {
-          firstName GeoJson @db.MultiLineString
-          lastName  GeoJson @db.MultiLineString
+          a Geometry @db.MultiLineString
+          b Geometry @db.MultiLineString
 
-          @@id([firstName, lastName])
+          @@id([a, b])
         }
     "#};
 
@@ -1081,7 +1081,7 @@ fn multilinestring_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -1097,10 +1097,10 @@ fn multipolygon_type_should_fail_on_id() {
         }
 
         model User {
-          firstName GeoJson @db.MultiPolygon
-          lastName  GeoJson @db.MultiPolygon
+          a Geometry @db.MultiPolygon
+          b Geometry @db.MultiPolygon
 
-          @@id([firstName, lastName])
+          @@id([a, b])
         }
     "#};
 
@@ -1109,7 +1109,7 @@ fn multipolygon_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -1125,10 +1125,10 @@ fn geometrycollection_type_should_fail_on_id() {
         }
 
         model User {
-          firstName GeoJson @db.GeometryCollection
-          lastName  GeoJson @db.GeometryCollection
+          a Geometry @db.GeometryCollection
+          b Geometry @db.GeometryCollection
 
-          @@id([firstName, lastName])
+          @@id([a, b])
         }
     "#};
 
@@ -1137,82 +1137,7 @@ fn geometrycollection_type_should_fail_on_id() {
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m
-        [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
-        [1;94m   | [0m
-    "#]];
-
-    expect_error(schema, &expectation);
-}
-
-#[test]
-fn geojson_type_should_fail_on_invalid_srid() {
-    let schema = indoc! {r#"
-        datasource db {
-          provider = "mysql"
-          url      = env("DATABASE_URL")
-        }
-
-        model User {
-          id   Int     @id
-          geom1 GeoJson @db.Geometry(3857)
-          geom2 GeoJson @db.Point(3857)
-          geom3 GeoJson @db.LineString(3857)
-          geom4 GeoJson @db.Polygon(3857)
-          geom5 GeoJson @db.MultiPoint(3857)
-          geom6 GeoJson @db.MultiLineString(3857)
-          geom7 GeoJson @db.MultiPolygon(3857)
-          geom8 GeoJson @db.GeometryCollection(3857)
-        }
-    "#};
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mArgument M is out of range for native type `Geometry(3857)` of MySQL: GeoJson SRID must be 4326.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
-        [1;94m   | [0m
-        [1;94m 7 | [0m  id   Int     @id
-        [1;94m 8 | [0m  geom1 GeoJson [1;91m@db.Geometry(3857)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mArgument M is out of range for native type `Point(3857)` of MySQL: GeoJson SRID must be 4326.[0m
-          [1;94m-->[0m  [4mschema.prisma:9[0m
-        [1;94m   | [0m
-        [1;94m 8 | [0m  geom1 GeoJson @db.Geometry(3857)
-        [1;94m 9 | [0m  geom2 GeoJson [1;91m@db.Point(3857)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mArgument M is out of range for native type `LineString(3857)` of MySQL: GeoJson SRID must be 4326.[0m
-          [1;94m-->[0m  [4mschema.prisma:10[0m
-        [1;94m   | [0m
-        [1;94m 9 | [0m  geom2 GeoJson @db.Point(3857)
-        [1;94m10 | [0m  geom3 GeoJson [1;91m@db.LineString(3857)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mArgument M is out of range for native type `Polygon(3857)` of MySQL: GeoJson SRID must be 4326.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
-        [1;94m   | [0m
-        [1;94m10 | [0m  geom3 GeoJson @db.LineString(3857)
-        [1;94m11 | [0m  geom4 GeoJson [1;91m@db.Polygon(3857)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mArgument M is out of range for native type `MultiPoint(3857)` of MySQL: GeoJson SRID must be 4326.[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
-        [1;94m   | [0m
-        [1;94m11 | [0m  geom4 GeoJson @db.Polygon(3857)
-        [1;94m12 | [0m  geom5 GeoJson [1;91m@db.MultiPoint(3857)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mArgument M is out of range for native type `MultiLineString(3857)` of MySQL: GeoJson SRID must be 4326.[0m
-          [1;94m-->[0m  [4mschema.prisma:13[0m
-        [1;94m   | [0m
-        [1;94m12 | [0m  geom5 GeoJson @db.MultiPoint(3857)
-        [1;94m13 | [0m  geom6 GeoJson [1;91m@db.MultiLineString(3857)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mArgument M is out of range for native type `MultiPolygon(3857)` of MySQL: GeoJson SRID must be 4326.[0m
-          [1;94m-->[0m  [4mschema.prisma:14[0m
-        [1;94m   | [0m
-        [1;94m13 | [0m  geom6 GeoJson @db.MultiLineString(3857)
-        [1;94m14 | [0m  geom7 GeoJson [1;91m@db.MultiPolygon(3857)[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mArgument M is out of range for native type `GeometryCollection(3857)` of MySQL: GeoJson SRID must be 4326.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m  geom7 GeoJson @db.MultiPolygon(3857)
-        [1;94m15 | [0m  geom8 GeoJson [1;91m@db.GeometryCollection(3857)[0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
         [1;94m   | [0m
     "#]];
 

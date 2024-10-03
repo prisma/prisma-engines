@@ -10,7 +10,7 @@ fn parse_scalar_types() {
         age          Int
         isPro        Boolean
         averageGrade Float
-        location     GeoJson
+        location     Geometry
     }
     "#;
 
@@ -35,7 +35,7 @@ fn parse_scalar_types() {
 
     user_model
         .assert_has_scalar_field("location")
-        .assert_scalar_type(ScalarType::GeoJson);
+        .assert_scalar_type(ScalarType::Geometry);
 }
 
 #[test]

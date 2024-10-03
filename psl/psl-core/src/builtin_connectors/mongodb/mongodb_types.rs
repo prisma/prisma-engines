@@ -16,7 +16,7 @@ crate::native_type_definition! {
     Int -> Int,
     Timestamp -> DateTime,
     Long -> Int | BigInt,
-    Json -> Json | GeoJson,
+    Json -> Json | Geometry,
     // Deprecated:
     // DbPointer
     // Undefined
@@ -42,7 +42,7 @@ static DEFAULT_MAPPING: Lazy<HashMap<ScalarType, MongoDbType>> = Lazy::new(|| {
         (ScalarType::DateTime, MongoDbType::Date),
         (ScalarType::Bytes, MongoDbType::BinData),
         (ScalarType::Json, MongoDbType::Json),
-        (ScalarType::GeoJson, MongoDbType::Json),
+        (ScalarType::Geometry, MongoDbType::Json),
     ]
     .into_iter()
     .collect()

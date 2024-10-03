@@ -24,6 +24,6 @@ crate::native_type_definition! {
     Timetz(Option<u32>) -> DateTime,
     Uuid -> String,
     VarBit(Option<u32>) -> String,
-    Geometry(Option<GeometryParams>) -> Geometry | GeoJson,
-    Geography(Option<GeometryParams>) -> Geometry | GeoJson,
+    Geometry(Option<GeometryParams>) -> Geometry,
+    Geography(Option<GeometryParams>) -> Geometry,
 }

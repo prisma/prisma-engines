@@ -810,8 +810,7 @@ fn convert_prisma_value_graphql_protocol(
         (ScalarType::DateTime, PrismaValue::DateTime(dt)) => PrismaValue::DateTime(dt),
         (ScalarType::UUID, PrismaValue::Uuid(u)) => PrismaValue::Uuid(u),
         (ScalarType::Bytes, PrismaValue::Bytes(b)) => PrismaValue::Bytes(b),
-        (ScalarType::Geometry, PrismaValue::Geometry(s)) => PrismaValue::Geometry(s),
-        (ScalarType::GeoJson, PrismaValue::GeoJson(s)) => PrismaValue::GeoJson(s),
+        (ScalarType::Geometry, PrismaValue::GeoJson(s)) => PrismaValue::GeoJson(s),
 
         // The Decimal type doesn't have a corresponding PrismaValue variant. We need to serialize it
         // to String so that client can deserialize it as Decimal again.
@@ -855,10 +854,7 @@ fn convert_prisma_value_json_protocol(
         (ScalarType::Bytes, PrismaValue::Bytes(x)) => {
             custom_types::make_object(custom_types::BYTES, PrismaValue::Bytes(x))
         }
-        (ScalarType::Geometry, PrismaValue::Geometry(x)) => {
-            custom_types::make_object(custom_types::EWKT_GEOMETRY, PrismaValue::Geometry(x))
-        }
-        (ScalarType::GeoJson, PrismaValue::GeoJson(x)) => {
+        (ScalarType::Geometry, PrismaValue::GeoJson(x)) => {
             custom_types::make_object(custom_types::GEOJSON, PrismaValue::GeoJson(x))
         }
 

@@ -18,9 +18,9 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     AnyId |
     AutoIncrement |
     CompoundIds |
-    EwktGeometry |
-    GeoJsonGeometry |
+    Geometry |
     GeometryRawRead |
+    GeometryGeoJsonIO |
     GeometryFiltering |
     GeometryExtraDims |
     SqlQueryRaw |
@@ -42,22 +42,13 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     CreateManyWriteableAutoIncId
 });
 
-const SCALAR_TYPE_DEFAULTS: &[(ScalarType, SQLiteType)] = &[
-    (
-        ScalarType::Geometry,
-        SQLiteType::Geometry(Some(GeometryParams {
-            type_: GeometryType::Geometry,
-            srid: 0,
-        })),
-    ),
-    (
-        ScalarType::GeoJson,
-        SQLiteType::Geometry(Some(GeometryParams {
-            type_: GeometryType::Geometry,
-            srid: 0,
-        })),
-    ),
-];
+const SCALAR_TYPE_DEFAULTS: &[(ScalarType, SQLiteType)] = &[(
+    ScalarType::Geometry,
+    SQLiteType::Geometry(Some(GeometryParams {
+        type_: GeometryType::Geometry,
+        srid: 0,
+    })),
+)];
 
 pub struct SqliteDatamodelConnector;
 
@@ -121,7 +112,7 @@ impl Connector for SqliteDatamodelConnector {
     fn validate_native_type_arguments(
         &self,
         native_type_instance: &NativeTypeInstance,
-        scalar_type: &ScalarType,
+        _scalar_type: &ScalarType,
         span: Span,
         errors: &mut Diagnostics,
     ) {
@@ -129,19 +120,6 @@ impl Connector for SqliteDatamodelConnector {
         let error = self.native_instance_error(native_type_instance);
 
         match native_type {
-            SQLiteType::Geometry(Some(g))
-                if *scalar_type == ScalarType::GeoJson && !g.type_.is_geojson_compatible() =>
-            {
-                errors.push_error(
-                    error.new_argument_m_out_of_range_error(
-                        &format!("{} isn't compatible with GeoJson.", g.type_),
-                        span,
-                    ),
-                )
-            }
-            SQLiteType::Geometry(Some(g)) if *scalar_type == ScalarType::GeoJson && !matches!(g.srid, 0 | 4326) => {
-                errors.push_error(error.new_argument_m_out_of_range_error("GeoJson SRID must be 4326.", span))
-            }
             SQLiteType::Geometry(Some(g)) if g.srid < -1 => errors
                 .push_error(error.new_argument_m_out_of_range_error("SRID must be superior or equal to -1.", span)),
             _ => (),

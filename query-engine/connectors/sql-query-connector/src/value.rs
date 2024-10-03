@@ -100,7 +100,7 @@ pub fn to_prisma_value<'a, T: Into<ValueType<'a>>>(qv: T) -> crate::Result<Prism
             .unwrap_or(PrismaValue::Null),
 
         ValueType::Geometry(s) | ValueType::Geography(s) => s
-            .map(|s| PrismaValue::Geometry(s.to_string()))
+            .map(|s| PrismaValue::GeoJson(s.to_string()))
             .unwrap_or(PrismaValue::Null),
     };
 

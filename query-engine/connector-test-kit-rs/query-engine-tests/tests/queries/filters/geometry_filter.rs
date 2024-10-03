@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(capabilities(GeoJsonGeometry))]
+#[test_suite(capabilities(Geometry))]
 mod geometry_filter_spec {
     use query_engine_tests::run_query;
 
@@ -9,7 +9,7 @@ mod geometry_filter_spec {
             r#"
               model TestModel {
                 #id(id, Int, @id)
-                geom GeoJson?
+                geom Geometry?
               }
             "#
         };
@@ -23,7 +23,7 @@ mod geometry_filter_spec {
             model TestModel {
               @@schema("test")
               #id(id, Int, @id)
-              geom GeoJson?
+              geom Geometry?
             }
           "#
         };

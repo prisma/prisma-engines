@@ -28,6 +28,6 @@ crate::native_type_definition! {
     Xml -> String,
     Json -> Json,
     JsonB -> Json,
-    Geometry(Option<GeometryParams>) -> Geometry | GeoJson,
-    Geography(Option<GeometryParams>) -> Geometry | GeoJson,
+    Geometry(Option<GeometryParams>) -> Geometry,
+    Geography(Option<GeometryParams>) -> Geometry,
 }

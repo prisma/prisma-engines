@@ -266,7 +266,7 @@ impl ScalarFieldType {
 
     /// True if the field's type is Geometry.
     pub fn is_geometry(self) -> bool {
-        matches!(self, Self::BuiltInScalar(ScalarType::Geometry | ScalarType::GeoJson))
+        matches!(self, Self::BuiltInScalar(ScalarType::Geometry))
     }
 }
 
@@ -1453,7 +1453,6 @@ pub enum ScalarType {
     Bytes,
     Decimal,
     Geometry,
-    GeoJson,
 }
 
 impl ScalarType {
@@ -1470,7 +1469,6 @@ impl ScalarType {
             ScalarType::Bytes => "Bytes",
             ScalarType::Decimal => "Decimal",
             ScalarType::Geometry => "Geometry",
-            ScalarType::GeoJson => "GeoJson",
         }
     }
 
@@ -1492,7 +1490,6 @@ impl ScalarType {
                 "json" => Some(ScalarType::Json),
                 "bytes" => Some(ScalarType::Bytes),
                 "decimal" => Some(ScalarType::Decimal),
-                "geojson" => Some(ScalarType::GeoJson),
                 "geometry" => Some(ScalarType::Geometry),
                 _ => None,
             },
@@ -1506,7 +1503,6 @@ impl ScalarType {
                 "Json" => Some(ScalarType::Json),
                 "Bytes" => Some(ScalarType::Bytes),
                 "Decimal" => Some(ScalarType::Decimal),
-                "GeoJson" => Some(ScalarType::GeoJson),
                 "Geometry" => Some(ScalarType::Geometry),
                 _ => None,
             },

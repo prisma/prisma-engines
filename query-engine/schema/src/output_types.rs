@@ -77,12 +77,8 @@ impl<'a> OutputType<'a> {
         InnerOutputType::Scalar(ScalarType::Bytes)
     }
 
-    pub(crate) fn ewkt_geometry() -> InnerOutputType<'a> {
+    pub(crate) fn geojson() -> InnerOutputType<'a> {
         InnerOutputType::Scalar(ScalarType::Geometry)
-    }
-
-    pub(crate) fn geojson_geometry() -> InnerOutputType<'a> {
-        InnerOutputType::Scalar(ScalarType::GeoJson)
     }
 
     /// Attempts to recurse through the type until an object type is found.

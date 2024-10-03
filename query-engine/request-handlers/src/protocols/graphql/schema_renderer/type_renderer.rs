@@ -47,7 +47,6 @@ impl<'a> GqlTypeRenderer<'a> {
                     ScalarType::UUID => "UUID",
                     ScalarType::JsonList => "Json",
                     ScalarType::Bytes => "Bytes",
-                    ScalarType::GeoJson => "GeoJson",
                     ScalarType::Geometry => "Geometry",
                     ScalarType::Null => unreachable!("Null types should not be picked for GQL rendering."),
                 };
@@ -87,7 +86,6 @@ impl<'a> GqlTypeRenderer<'a> {
                     ScalarType::UUID => "UUID",
                     ScalarType::JsonList => "Json",
                     ScalarType::Bytes => "Bytes",
-                    ScalarType::GeoJson => "GeoJson",
                     ScalarType::Geometry => "Geometry",
                     ScalarType::Null => unreachable!("Null types should not be picked for GQL rendering."),
                 };

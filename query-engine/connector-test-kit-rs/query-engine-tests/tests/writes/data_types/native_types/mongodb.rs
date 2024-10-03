@@ -17,7 +17,7 @@ mod mongodb {
                 bool Boolean  @test.Bool
                 bin     Bytes @test.BinData
                 bin_oid Bytes @test.ObjectId
-                geom GeoJson
+                geom Geometry
             }"#
         };
 

@@ -223,12 +223,8 @@ pub trait Connector: Send + Sync {
         }
     }
 
-    fn supports_ewkt_geometry_format(&self) -> bool {
-        self.capabilities().contains(ConnectorCapability::EwktGeometry)
-    }
-
-    fn supports_geojson_geometry_format(&self) -> bool {
-        self.capabilities().contains(ConnectorCapability::GeoJsonGeometry)
+    fn supports_geometry_type(&self) -> bool {
+        self.capabilities().contains(ConnectorCapability::Geometry)
     }
 
     fn supports_raw_geometry_read(&self) -> bool {

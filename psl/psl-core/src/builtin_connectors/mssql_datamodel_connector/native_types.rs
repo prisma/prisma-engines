@@ -104,6 +104,6 @@ crate::native_type_definition! {
     /// GUID, which is UUID but Microsoft invented them so they have their own
     /// term for it.
     UniqueIdentifier -> String,
-    Geometry -> Geometry | GeoJson,
-    Geography -> Geometry | GeoJson,
+    Geometry -> Geometry,
+    Geography -> Geometry,
 }

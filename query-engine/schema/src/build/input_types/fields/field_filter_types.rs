@@ -267,7 +267,7 @@ fn full_scalar_filter_type(
             // Inclusion filters are tricky because SQL Server doesn't allow direct equality check between geometries
             // so IN ( ... ) filters won't work either. The equality filters are hacked in Quaint, where they are
             // converted to .STEquals() expressions
-            TypeIdentifier::Geometry(_) => geometric_filters(ctx, mapped_scalar_type.clone())
+            TypeIdentifier::Geometry => geometric_filters(ctx, mapped_scalar_type.clone())
                 .chain(equality_filters(mapped_scalar_type.clone(), nullable))
                 .collect(),
 

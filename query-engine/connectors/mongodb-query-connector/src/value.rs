@@ -9,8 +9,7 @@ use chrono::{TimeZone, Utc};
 use itertools::Itertools;
 use psl::builtin_connectors::MongoDbType;
 use query_structure::{
-    CompositeFieldRef, Field, GeometryFormat, PrismaValue, RelationFieldRef, ScalarFieldRef, SelectedField,
-    TypeIdentifier,
+    CompositeFieldRef, Field, PrismaValue, RelationFieldRef, ScalarFieldRef, SelectedField, TypeIdentifier,
 };
 use serde_json::Value;
 use std::{convert::TryFrom, fmt::Display};
@@ -278,7 +277,7 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
             }
 
             // Geometry
-            (TypeIdentifier::Geometry(GeometryFormat::GeoJSON), PrismaValue::GeoJson(json)) => {
+            (TypeIdentifier::Geometry, PrismaValue::GeoJson(json)) => {
                 let val: Value = serde_json::from_str(&json)?;
                 Bson::try_from(val).map_err(|_| MongoError::ConversionError {
                     from: "Stringified GeoJSON".to_owned(),
@@ -398,7 +397,8 @@ fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<Prism
         (TypeIdentifier::Json, bson) => PrismaValue::Json(serde_json::to_string(&bson.into_relaxed_extjson())?),
 
         // Geometry
-        (TypeIdentifier::Geometry(GeometryFormat::GeoJSON), bson @ Bson::Document(_)) => {
+        (TypeIdentifier::Geometry, bson @ Bson::Document(_)) => {
+            // TODO@geometry: should we do validation with crate geojson here instead ?
             PrismaValue::GeoJson(serde_json::to_string(&bson.into_relaxed_extjson())?)
         }
 

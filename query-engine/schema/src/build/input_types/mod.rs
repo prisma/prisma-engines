@@ -3,7 +3,7 @@ pub(crate) mod objects;
 
 use super::*;
 use fields::*;
-use query_structure::{GeometryFormat, ScalarFieldRef};
+use query_structure::ScalarFieldRef;
 
 fn map_scalar_input_type_for_field<'a>(ctx: &'a QuerySchema, field: &ScalarFieldRef) -> InputType<'a> {
     map_scalar_input_type(ctx, field.type_identifier(), field.is_list())
@@ -19,8 +19,7 @@ fn map_scalar_input_type(ctx: &'_ QuerySchema, typ: TypeIdentifier, list: bool) 
         TypeIdentifier::UUID => InputType::uuid(),
         TypeIdentifier::DateTime => InputType::date_time(),
         TypeIdentifier::Json => InputType::json(),
-        TypeIdentifier::Geometry(GeometryFormat::GeoJSON) => InputType::geojson_geometry(),
-        TypeIdentifier::Geometry(GeometryFormat::EWKT) => InputType::ewkt_geometry(),
+        TypeIdentifier::Geometry => InputType::geojson(),
         TypeIdentifier::Enum(id) => InputType::enum_type(map_schema_enum_type(ctx, id)),
         TypeIdentifier::Bytes => InputType::bytes(),
         TypeIdentifier::BigInt => InputType::bigint(),

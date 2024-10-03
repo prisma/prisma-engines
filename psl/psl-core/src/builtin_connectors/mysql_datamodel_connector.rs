@@ -37,10 +37,10 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     Enums |
     EnumArrayPush |
     Json |
-    EwktGeometry |
-    GeoJsonGeometry |
+    Geometry |
     GeometryRawRead |
     GeometryFiltering |
+    GeometryGeoJsonIO |
     AutoIncrementAllowedOnNonId |
     RelationFieldsInArbitraryOrder |
     CreateMany |
@@ -91,7 +91,6 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
     (ScalarType::Bytes, MySqlType::LongBlob),
     (ScalarType::Json, MySqlType::Json),
     (ScalarType::Geometry, MySqlType::Geometry(None)),
-    (ScalarType::GeoJson, MySqlType::Geometry(None)),
 ];
 
 impl Connector for MySqlDatamodelConnector {
@@ -231,18 +230,6 @@ impl Connector for MySqlDatamodelConnector {
             }
             VarChar(length) if *length > 65535 => {
                 errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 65,535.", span))
-            }
-            Geometry(Some(srid))
-            | Point(Some(srid))
-            | LineString(Some(srid))
-            | Polygon(Some(srid))
-            | MultiPoint(Some(srid))
-            | MultiLineString(Some(srid))
-            | MultiPolygon(Some(srid))
-            | GeometryCollection(Some(srid))
-                if *scalar_type == ScalarType::GeoJson && !matches!(*srid, 0 | 4326) =>
-            {
-                errors.push_error(error.new_argument_m_out_of_range_error("GeoJson SRID must be 4326.", span))
             }
             Bit(n) if *n > 1 && matches!(scalar_type, ScalarType::Boolean) => {
                 errors.push_error(error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean.", span))

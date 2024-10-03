@@ -64,7 +64,7 @@ impl ScalarField {
     }
 
     pub fn is_geometry(&self) -> bool {
-        matches!(self.type_identifier(), TypeIdentifier::Geometry(_))
+        matches!(self.type_identifier(), TypeIdentifier::Geometry)
     }
 
     pub fn container(&self) -> ParentContainer {

@@ -425,7 +425,7 @@ mod mapped_create {
     }
 }
 
-#[test_suite(capabilities(GeoJsonGeometry))]
+#[test_suite(capabilities(Geometry))]
 mod geometry_create {
     use query_engine_tests::run_query;
 
@@ -456,7 +456,7 @@ mod geometry_create {
         let schema = indoc! {
             r#"model TestModel {
               #id(id, Int, @id)
-              geometry GeoJson?
+              geometry Geometry?
           }"#
         };
 
@@ -468,7 +468,7 @@ mod geometry_create {
             r#"model TestModel {
               @@schema("test")
               #id(id, Int, @id)
-              geometry GeoJson?
+              geometry Geometry?
           }"#
         };
 

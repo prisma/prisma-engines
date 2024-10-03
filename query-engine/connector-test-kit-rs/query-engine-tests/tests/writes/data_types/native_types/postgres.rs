@@ -347,7 +347,7 @@ mod postgres {
         Ok(())
     }
 
-    fn schema_ewkt_geometry() -> String {
+    fn schema_geometry() -> String {
         let schema = indoc! {
             r#"model Model {
             @@schema("test")
@@ -369,234 +369,10 @@ mod postgres {
     // "PostGIS common geometry types" should "work"
     #[connector_test(
         only(Postgres("16-postgis"), CockroachDb),
-        schema(schema_ewkt_geometry),
+        schema(schema_geometry),
         db_schemas("public", "test")
     )]
-    async fn native_ewkt_geometry(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-          createOneModel(
-            data: {
-              geometry: "POINT(1 2)"
-              geometry_point: "POINT(1 2)"
-              geometry_line: "LINESTRING(1 2,3 4)"
-              geometry_poly: "POLYGON((1 2,3 4,5 6,1 2))"
-              geometry_multipoint: "MULTIPOINT(1 2)"
-              geometry_multiline: "MULTILINESTRING((1 2,3 4))"
-              geometry_multipoly: "MULTIPOLYGON(((1 2,3 4,5 6,1 2)))"
-              geometry_collection: "GEOMETRYCOLLECTION(POINT(1 2))"
-            }
-          ) {
-            geometry
-            geometry_point
-            geometry_line
-            geometry_poly
-            geometry_multipoint
-            geometry_multiline
-            geometry_multipoly
-            geometry_collection
-          }
-        }"#),
-            @r###"{"data":{"createOneModel":{"geometry":"POINT(1 2)","geometry_point":"POINT(1 2)","geometry_line":"LINESTRING(1 2,3 4)","geometry_poly":"POLYGON((1 2,3 4,5 6,1 2))","geometry_multipoint":"MULTIPOINT(1 2)","geometry_multiline":"MULTILINESTRING((1 2,3 4))","geometry_multipoly":"MULTIPOLYGON(((1 2,3 4,5 6,1 2)))","geometry_collection":"GEOMETRYCOLLECTION(POINT(1 2))"}}}"###
-        );
-
-        Ok(())
-    }
-
-    fn schema_ewkt_geometry_srid() -> String {
-        let schema = indoc! {
-            r#"model Model {
-            @@schema("test")
-            #id(id, String, @id, @default(cuid()))
-            geometry             Geometry @test.Geometry(Geometry, 3857)
-            geometry_point       Geometry @test.Geometry(Point, 3857)
-            geometry_line        Geometry @test.Geometry(LineString, 3857)
-            geometry_poly        Geometry @test.Geometry(Polygon, 3857)
-            geometry_multipoint  Geometry @test.Geometry(MultiPoint, 3857)
-            geometry_multiline   Geometry @test.Geometry(MultiLineString, 3857)
-            geometry_multipoly   Geometry @test.Geometry(MultiPolygon, 3857)
-            geometry_collection  Geometry @test.Geometry(GeometryCollection, 3857)
-          }"#
-        };
-
-        schema.to_owned()
-    }
-
-    // "PostGIS common geometry types with srid" should "work"
-    #[connector_test(
-        only(Postgres("16-postgis"), CockroachDb),
-        schema(schema_ewkt_geometry_srid),
-        db_schemas("public", "test")
-    )]
-    async fn native_geometry_srid(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-          createOneModel(
-            data: {
-              geometry: "SRID=3857;POINT(1 2)"
-              geometry_point: "SRID=3857;POINT(1 2)"
-              geometry_line: "SRID=3857;LINESTRING(1 2,3 4)"
-              geometry_poly: "SRID=3857;POLYGON((1 2,3 4,5 6,1 2))"
-              geometry_multipoint: "SRID=3857;MULTIPOINT(1 2)"
-              geometry_multiline: "SRID=3857;MULTILINESTRING((1 2,3 4))"
-              geometry_multipoly: "SRID=3857;MULTIPOLYGON(((1 2,3 4,5 6,1 2)))"
-              geometry_collection: "SRID=3857;GEOMETRYCOLLECTION(POINT(1 2))"
-            }
-          ) {
-            geometry
-            geometry_point
-            geometry_line
-            geometry_poly
-            geometry_multipoint
-            geometry_multiline
-            geometry_multipoly
-            geometry_collection
-          }
-        }"#),
-            @r###"{"data":{"createOneModel":{"geometry":"SRID=3857;POINT(1 2)","geometry_point":"SRID=3857;POINT(1 2)","geometry_line":"SRID=3857;LINESTRING(1 2,3 4)","geometry_poly":"SRID=3857;POLYGON((1 2,3 4,5 6,1 2))","geometry_multipoint":"SRID=3857;MULTIPOINT(1 2)","geometry_multiline":"SRID=3857;MULTILINESTRING((1 2,3 4))","geometry_multipoly":"SRID=3857;MULTIPOLYGON(((1 2,3 4,5 6,1 2)))","geometry_collection":"SRID=3857;GEOMETRYCOLLECTION(POINT(1 2))"}}}"###
-        );
-
-        Ok(())
-    }
-
-    fn schema_ewkt_geography() -> String {
-        let schema = indoc! {
-            r#"model Model {
-            @@schema("test")
-            #id(id, String, @id, @default(cuid()))
-            geography            Geometry @test.Geography(Geometry)
-            geography_point      Geometry @test.Geography(Point)
-            geography_line       Geometry @test.Geography(LineString)
-            geography_poly       Geometry @test.Geography(Polygon)
-            geography_multipoint Geometry @test.Geography(MultiPoint)
-            geography_multiline  Geometry @test.Geography(MultiLineString)
-            geography_multipoly  Geometry @test.Geography(MultiPolygon)
-            geography_collection Geometry @test.Geography(GeometryCollection)
-          }"#
-        };
-
-        schema.to_owned()
-    }
-
-    // "PostGIS common geography types" should "work"
-    #[connector_test(
-        only(Postgres("16-postgis"), CockroachDb),
-        schema(schema_ewkt_geography),
-        db_schemas("public", "test")
-    )]
-    async fn native_ewkt_geography(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-          createOneModel(
-            data: {
-              geography: "SRID=4326;POINT(1 2)"
-              geography_point: "SRID=4326;POINT(1 2)"
-              geography_line: "SRID=4326;LINESTRING(1 2,3 4)"
-              geography_poly: "SRID=4326;POLYGON((1 2,3 4,5 6,1 2))"
-              geography_multipoint: "SRID=4326;MULTIPOINT(1 2)"
-              geography_multiline: "SRID=4326;MULTILINESTRING((1 2,3 4))"
-              geography_multipoly: "SRID=4326;MULTIPOLYGON(((1 2,3 4,5 6,1 2)))"
-              geography_collection: "SRID=4326;GEOMETRYCOLLECTION(POINT(1 2))"
-            }
-          ) {
-            geography
-            geography_point
-            geography_line
-            geography_poly
-            geography_multipoint
-            geography_multiline
-            geography_multipoly
-            geography_collection
-          }
-        }"#),
-            @r###"{"data":{"createOneModel":{"geography":"SRID=4326;POINT(1 2)","geography_point":"SRID=4326;POINT(1 2)","geography_line":"SRID=4326;LINESTRING(1 2,3 4)","geography_poly":"SRID=4326;POLYGON((1 2,3 4,5 6,1 2))","geography_multipoint":"SRID=4326;MULTIPOINT(1 2)","geography_multiline":"SRID=4326;MULTILINESTRING((1 2,3 4))","geography_multipoly":"SRID=4326;MULTIPOLYGON(((1 2,3 4,5 6,1 2)))","geography_collection":"SRID=4326;GEOMETRYCOLLECTION(POINT(1 2))"}}}"###
-        );
-
-        Ok(())
-    }
-
-    fn schema_ewkt_geography_srid() -> String {
-        let schema = indoc! {
-            r#"model Model {
-            @@schema("test")
-            #id(id, String, @id, @default(cuid()))
-            geography            Geometry @test.Geography(Geometry, 9000)
-            geography_point      Geometry @test.Geography(Point, 9000)
-            geography_line       Geometry @test.Geography(LineString, 9000)
-            geography_poly       Geometry @test.Geography(Polygon, 9000)
-            geography_multipoint Geometry @test.Geography(MultiPoint, 9000)
-            geography_multiline  Geometry @test.Geography(MultiLineString, 9000)
-            geography_multipoly  Geometry @test.Geography(MultiPolygon, 9000)
-            geography_collection Geometry @test.Geography(GeometryCollection, 9000)
-          }"#
-        };
-
-        schema.to_owned()
-    }
-
-    // "PostGIS common geography types with srid" should "work"
-    #[connector_test(
-        only(Postgres("16-postgis"), CockroachDb),
-        schema(schema_ewkt_geography_srid),
-        db_schemas("public", "test")
-    )]
-    async fn native_ewkt_geography_srid(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-          createOneModel(
-            data: {
-              geography: "SRID=9000;POINT(1 2)"
-              geography_point: "SRID=9000;POINT(1 2)"
-              geography_line: "SRID=9000;LINESTRING(1 2,3 4)"
-              geography_poly: "SRID=9000;POLYGON((1 2,3 4,5 6,1 2))"
-              geography_multipoint: "SRID=9000;MULTIPOINT(1 2)"
-              geography_multiline: "SRID=9000;MULTILINESTRING((1 2,3 4))"
-              geography_multipoly: "SRID=9000;MULTIPOLYGON(((1 2,3 4,5 6,1 2)))"
-              geography_collection: "SRID=9000;GEOMETRYCOLLECTION(POINT(1 2))"
-            }
-          ) {
-            geography
-            geography_point
-            geography_line
-            geography_poly
-            geography_multipoint
-            geography_multiline
-            geography_multipoly
-            geography_collection
-          }
-        }"#),
-            @r###"{"data":{"createOneModel":{"geography":"SRID=9000;POINT(1 2)","geography_point":"SRID=9000;POINT(1 2)","geography_line":"SRID=9000;LINESTRING(1 2,3 4)","geography_poly":"SRID=9000;POLYGON((1 2,3 4,5 6,1 2))","geography_multipoint":"SRID=9000;MULTIPOINT(1 2)","geography_multiline":"SRID=9000;MULTILINESTRING((1 2,3 4))","geography_multipoly":"SRID=9000;MULTIPOLYGON(((1 2,3 4,5 6,1 2)))","geography_collection":"SRID=9000;GEOMETRYCOLLECTION(POINT(1 2))"}}}"###
-        );
-
-        Ok(())
-    }
-
-    fn schema_geojson_geometry() -> String {
-        let schema = indoc! {
-            r#"model Model {
-            @@schema("test")
-            #id(id, String, @id, @default(cuid()))
-            geometry             GeoJson @test.Geometry(Geometry, 4326)
-            geometry_point       GeoJson @test.Geometry(Point, 4326)
-            geometry_line        GeoJson @test.Geometry(LineString, 4326)
-            geometry_poly        GeoJson @test.Geometry(Polygon, 4326)
-            geometry_multipoint  GeoJson @test.Geometry(MultiPoint, 4326)
-            geometry_multiline   GeoJson @test.Geometry(MultiLineString, 4326)
-            geometry_multipoly   GeoJson @test.Geometry(MultiPolygon, 4326)
-            geometry_collection  GeoJson @test.Geometry(GeometryCollection, 4326)
-          }"#
-        };
-
-        schema.to_owned()
-    }
-
-    // "PostGIS common geometry types" should "work" with GeoJSON
-    #[connector_test(
-        only(Postgres("16-postgis"), CockroachDb),
-        schema(schema_geojson_geometry),
-        db_schemas("public", "test")
-    )]
-    async fn native_geojson_geometry(runner: Runner) -> TestResult<()> {
+    async fn native_geometry(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
           createOneModel(
@@ -621,38 +397,94 @@ mod postgres {
             geometry_collection
           }
         }"#),
-        @r###"{"data":{"createOneModel":{"geometry":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geometry_point":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geometry_line":"{\"type\": \"LineString\", \"coordinates\": [[1,2],[3,4]]}","geometry_poly":"{\"type\": \"Polygon\", \"coordinates\": [[[1,2],[3,4],[5,6],[1,2]]]}","geometry_multipoint":"{\"type\": \"MultiPoint\", \"coordinates\": [[1,2]]}","geometry_multiline":"{\"type\": \"MultiLineString\", \"coordinates\": [[[1,2],[3,4]]]}","geometry_multipoly":"{\"type\": \"MultiPolygon\", \"coordinates\": [[[[1,2],[3,4],[5,6],[1,2]]]]}","geometry_collection":"{\"type\": \"GeometryCollection\", \"geometries\": [{\"type\": \"Point\", \"coordinates\": [1,2]}]}"}}}"###
+            @r###"{"data":{"createOneModel":{"geometry":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geometry_point":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geometry_line":"{\"type\": \"LineString\", \"coordinates\": [[1,2],[3,4]]}","geometry_poly":"{\"type\": \"Polygon\", \"coordinates\": [[[1,2],[3,4],[5,6],[1,2]]]}","geometry_multipoint":"{\"type\": \"MultiPoint\", \"coordinates\": [[1,2]]}","geometry_multiline":"{\"type\": \"MultiLineString\", \"coordinates\": [[[1,2],[3,4]]]}","geometry_multipoly":"{\"type\": \"MultiPolygon\", \"coordinates\": [[[[1,2],[3,4],[5,6],[1,2]]]]}","geometry_collection":"{\"type\": \"GeometryCollection\", \"geometries\": [{\"type\": \"Point\", \"coordinates\": [1,2]}]}"}}}"###
         );
 
         Ok(())
     }
 
-    fn schema_geojson_geography() -> String {
+    fn schema_geometry_srid() -> String {
         let schema = indoc! {
             r#"model Model {
             @@schema("test")
             #id(id, String, @id, @default(cuid()))
-            geography             GeoJson @test.Geography(Geometry, 4326)
-            geography_point       GeoJson @test.Geography(Point, 4326)
-            geography_line        GeoJson @test.Geography(LineString, 4326)
-            geography_poly        GeoJson @test.Geography(Polygon, 4326)
-            geography_multipoint  GeoJson @test.Geography(MultiPoint, 4326)
-            geography_multiline   GeoJson @test.Geography(MultiLineString, 4326)
-            geography_multipoly   GeoJson @test.Geography(MultiPolygon, 4326)
-            geography_collection  GeoJson @test.Geography(GeometryCollection, 4326)
+            geometry             Geometry @test.Geometry(Geometry, 3857)
+            geometry_point       Geometry @test.Geometry(Point, 3857)
+            geometry_line        Geometry @test.Geometry(LineString, 3857)
+            geometry_poly        Geometry @test.Geometry(Polygon, 3857)
+            geometry_multipoint  Geometry @test.Geometry(MultiPoint, 3857)
+            geometry_multiline   Geometry @test.Geometry(MultiLineString, 3857)
+            geometry_multipoly   Geometry @test.Geometry(MultiPolygon, 3857)
+            geometry_collection  Geometry @test.Geometry(GeometryCollection, 3857)
           }"#
         };
 
         schema.to_owned()
     }
 
-    // "PostGIS common geometry types" should "work" with GeoJSON
+    // "PostGIS common geometry types with srid" should "work"
     #[connector_test(
         only(Postgres("16-postgis"), CockroachDb),
-        schema(schema_geojson_geography),
+        schema(schema_geometry_srid),
         db_schemas("public", "test")
     )]
-    async fn native_geojson_geography(runner: Runner) -> TestResult<()> {
+    async fn native_geometry_srid(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+          createOneModel(
+            data: {
+              geometry: "{\"type\":\"Point\",\"coordinates\":[1,2]}"
+              geometry_point: "{\"type\":\"Point\",\"coordinates\":[1,2]}"
+              geometry_line: "{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}"
+              geometry_poly: "{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}"
+              geometry_multipoint: "{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}"
+              geometry_multiline: "{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}"
+              geometry_multipoly: "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}"
+              geometry_collection: "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"
+            }
+          ) {
+            geometry
+            geometry_point
+            geometry_line
+            geometry_poly
+            geometry_multipoint
+            geometry_multiline
+            geometry_multipoly
+            geometry_collection
+          }
+        }"#),
+            @r###"{"data":{"createOneModel":{"geometry":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geometry_point":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geometry_line":"{\"type\": \"LineString\", \"coordinates\": [[1,2],[3,4]]}","geometry_poly":"{\"type\": \"Polygon\", \"coordinates\": [[[1,2],[3,4],[5,6],[1,2]]]}","geometry_multipoint":"{\"type\": \"MultiPoint\", \"coordinates\": [[1,2]]}","geometry_multiline":"{\"type\": \"MultiLineString\", \"coordinates\": [[[1,2],[3,4]]]}","geometry_multipoly":"{\"type\": \"MultiPolygon\", \"coordinates\": [[[[1,2],[3,4],[5,6],[1,2]]]]}","geometry_collection":"{\"type\": \"GeometryCollection\", \"geometries\": [{\"type\": \"Point\", \"coordinates\": [1,2]}]}"}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_geography() -> String {
+        let schema = indoc! {
+            r#"model Model {
+            @@schema("test")
+            #id(id, String, @id, @default(cuid()))
+            geography            Geometry @test.Geography(Geometry)
+            geography_point      Geometry @test.Geography(Point)
+            geography_line       Geometry @test.Geography(LineString)
+            geography_poly       Geometry @test.Geography(Polygon)
+            geography_multipoint Geometry @test.Geography(MultiPoint)
+            geography_multiline  Geometry @test.Geography(MultiLineString)
+            geography_multipoly  Geometry @test.Geography(MultiPolygon)
+            geography_collection Geometry @test.Geography(GeometryCollection)
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "PostGIS common geography types" should "work"
+    #[connector_test(
+        only(Postgres("16-postgis"), CockroachDb),
+        schema(schema_geography),
+        db_schemas("public", "test")
+    )]
+    async fn native_geography(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
           createOneModel(
@@ -677,7 +509,63 @@ mod postgres {
             geography_collection
           }
         }"#),
-        @r###"{"data":{"createOneModel":{"geography":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geography_point":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geography_line":"{\"type\": \"LineString\", \"coordinates\": [[1,2],[3,4]]}","geography_poly":"{\"type\": \"Polygon\", \"coordinates\": [[[1,2],[3,4],[5,6],[1,2]]]}","geography_multipoint":"{\"type\": \"MultiPoint\", \"coordinates\": [[1,2]]}","geography_multiline":"{\"type\": \"MultiLineString\", \"coordinates\": [[[1,2],[3,4]]]}","geography_multipoly":"{\"type\": \"MultiPolygon\", \"coordinates\": [[[[1,2],[3,4],[5,6],[1,2]]]]}","geography_collection":"{\"type\": \"GeometryCollection\", \"geometries\": [{\"type\": \"Point\", \"coordinates\": [1,2]}]}"}}}"###
+            @r###"{"data":{"createOneModel":{"geography":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geography_point":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geography_line":"{\"type\": \"LineString\", \"coordinates\": [[1,2],[3,4]]}","geography_poly":"{\"type\": \"Polygon\", \"coordinates\": [[[1,2],[3,4],[5,6],[1,2]]]}","geography_multipoint":"{\"type\": \"MultiPoint\", \"coordinates\": [[1,2]]}","geography_multiline":"{\"type\": \"MultiLineString\", \"coordinates\": [[[1,2],[3,4]]]}","geography_multipoly":"{\"type\": \"MultiPolygon\", \"coordinates\": [[[[1,2],[3,4],[5,6],[1,2]]]]}","geography_collection":"{\"type\": \"GeometryCollection\", \"geometries\": [{\"type\": \"Point\", \"coordinates\": [1,2]}]}"}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_geography_srid() -> String {
+        let schema = indoc! {
+            r#"model Model {
+            @@schema("test")
+            #id(id, String, @id, @default(cuid()))
+            geography            Geometry @test.Geography(Geometry, 9000)
+            geography_point      Geometry @test.Geography(Point, 9000)
+            geography_line       Geometry @test.Geography(LineString, 9000)
+            geography_poly       Geometry @test.Geography(Polygon, 9000)
+            geography_multipoint Geometry @test.Geography(MultiPoint, 9000)
+            geography_multiline  Geometry @test.Geography(MultiLineString, 9000)
+            geography_multipoly  Geometry @test.Geography(MultiPolygon, 9000)
+            geography_collection Geometry @test.Geography(GeometryCollection, 9000)
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "PostGIS common geography types with srid" should "work"
+    #[connector_test(
+        only(Postgres("16-postgis"), CockroachDb),
+        schema(schema_geography_srid),
+        db_schemas("public", "test")
+    )]
+    async fn native_geography_srid(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+          createOneModel(
+            data: {
+              geography: "{\"type\":\"Point\",\"coordinates\":[1,2]}"
+              geography_point: "{\"type\":\"Point\",\"coordinates\":[1,2]}"
+              geography_line: "{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}"
+              geography_poly: "{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}"
+              geography_multipoint: "{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}"
+              geography_multiline: "{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}"
+              geography_multipoly: "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}"
+              geography_collection: "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"
+            }
+          ) {
+            geography
+            geography_point
+            geography_line
+            geography_poly
+            geography_multipoint
+            geography_multiline
+            geography_multipoly
+            geography_collection
+          }
+        }"#),
+            @r###"{"data":{"createOneModel":{"geography":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geography_point":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geography_line":"{\"type\": \"LineString\", \"coordinates\": [[1,2],[3,4]]}","geography_poly":"{\"type\": \"Polygon\", \"coordinates\": [[[1,2],[3,4],[5,6],[1,2]]]}","geography_multipoint":"{\"type\": \"MultiPoint\", \"coordinates\": [[1,2]]}","geography_multiline":"{\"type\": \"MultiLineString\", \"coordinates\": [[[1,2],[3,4]]]}","geography_multipoly":"{\"type\": \"MultiPolygon\", \"coordinates\": [[[[1,2],[3,4],[5,6],[1,2]]]]}","geography_collection":"{\"type\": \"GeometryCollection\", \"geometries\": [{\"type\": \"Point\", \"coordinates\": [1,2]}]}"}}}"###
         );
 
         Ok(())

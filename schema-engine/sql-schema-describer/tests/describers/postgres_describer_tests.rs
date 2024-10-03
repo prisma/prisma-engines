@@ -1173,7 +1173,7 @@ fn all_postgis_column_types_must_work(api: TestApi) {
             geography_collection        GEOGRAPHY(GEOMETRYCOLLECTION, 9000),
             geography_collection_z      GEOGRAPHY(GEOMETRYCOLLECTIONZ, 9000),
             geography_collection_m      GEOGRAPHY(GEOMETRYCOLLECTIONM, 9000),
-            geography_collection_zm     GEOGRAPHY(GEOMETRYCOLLECTIONZM, 9000),
+            geography_collection_zm     GEOGRAPHY(GEOMETRYCOLLECTIONZM, 9000)
         );
     "#;
     api.raw_cmd(sql);

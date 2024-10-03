@@ -311,9 +311,17 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         }
     }
 
+    /// MySQL geometries *must* be handled in raw binary form to prevent it from swapping longitude and latitude
     fn visit_parameterized(&mut self, value: Value<'a>) -> visitor::Result {
-        self.add_parameter(value);
-        self.parameter_substitution()
+        match value.typed {
+            ValueType::Enum(Some(variant), name) => self.visit_parameterized_enum(variant, name),
+            ValueType::EnumArray(Some(variants), name) => self.visit_parameterized_enum_array(variants, name),
+            ValueType::Text(txt) => self.visit_parameterized_text(txt, value.native_column_type),
+            _ => {
+                self.add_parameter(value);
+                self.parameter_substitution()
+            }
+        }
     }
 
     fn parameter_substitution(&mut self) -> visitor::Result {

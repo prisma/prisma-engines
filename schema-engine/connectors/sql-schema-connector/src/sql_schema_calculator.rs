@@ -456,7 +456,6 @@ fn push_column_for_builtin_scalar_type(
         ScalarType::Decimal => sql::ColumnTypeFamily::Decimal,
         ScalarType::BigInt => sql::ColumnTypeFamily::BigInt,
         ScalarType::Geometry => sql::ColumnTypeFamily::Geometry,
-        ScalarType::GeoJson => sql::ColumnTypeFamily::Geometry,
     };
 
     let native_type = field

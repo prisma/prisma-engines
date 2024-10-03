@@ -46,9 +46,9 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     Json |
     JsonFiltering |
     JsonFilteringArrayPath |
-    EwktGeometry |
-    GeoJsonGeometry |
+    Geometry |
     GeometryRawRead |
+    GeometryGeoJsonIO |
     GeometryFiltering |
     GeometryExtraDims |
     GeometryExtraTypes |
@@ -87,13 +87,6 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
     (ScalarType::Json, CockroachType::JsonB),
     (
         ScalarType::Geometry,
-        CockroachType::Geometry(Some(GeometryParams {
-            type_: GeometryType::Geometry,
-            srid: 0,
-        })),
-    ),
-    (
-        ScalarType::GeoJson,
         CockroachType::Geometry(Some(GeometryParams {
             type_: GeometryType::Geometry,
             srid: 0,
@@ -200,7 +193,7 @@ impl Connector for CockroachDatamodelConnector {
     fn validate_native_type_arguments(
         &self,
         native_type_instance: &NativeTypeInstance,
-        scalar_type: &ScalarType,
+        _scalar_type: &ScalarType,
         span: ast::Span,
         errors: &mut Diagnostics,
     ) {
@@ -227,21 +220,6 @@ impl Connector for CockroachDatamodelConnector {
                 if *p > 6 =>
             {
                 errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
-            }
-            CockroachType::Geometry(Some(g)) | CockroachType::Geography(Some(g))
-                if *scalar_type == ScalarType::GeoJson && !g.type_.is_geojson_compatible() =>
-            {
-                errors.push_error(
-                    error.new_argument_m_out_of_range_error(
-                        &format!("{} isn't compatible with GeoJson.", g.type_),
-                        span,
-                    ),
-                )
-            }
-            CockroachType::Geometry(Some(g)) | CockroachType::Geography(Some(g))
-                if *scalar_type == ScalarType::GeoJson && !matches!(g.srid, 0 | 4326) =>
-            {
-                errors.push_error(error.new_argument_m_out_of_range_error("GeoJson SRID must be 4326.", span))
             }
             CockroachType::Geometry(Some(g)) | CockroachType::Geography(Some(g)) if g.srid < 0 || g.srid > 999000 => {
                 errors.push_error(error.new_argument_m_out_of_range_error("SRID must be between 0 and 999000.", span))

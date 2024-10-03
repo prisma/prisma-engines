@@ -26,8 +26,7 @@ const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
 ];
 
 const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
-    EwktGeometry |
-    GeoJsonGeometry |
+    Geometry |
     GeometryFiltering |
     AnyId |
     AutoIncrement |
@@ -78,7 +77,6 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MsSqlType)] = &[
         MsSqlType::NVarChar(Some(MsSqlTypeParameter::Number(1000))),
     ),
     (ScalarType::Geometry, MsSqlType::Geometry),
-    (ScalarType::GeoJson, MsSqlType::Geometry),
 ];
 
 impl Connector for MsSqlDatamodelConnector {

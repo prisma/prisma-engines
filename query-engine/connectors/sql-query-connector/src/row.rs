@@ -5,7 +5,7 @@ use connector_interface::{coerce_null_to_zero_value, AggregationResult, Aggregat
 use geozero::wkt::WktStr;
 use geozero::ToJson;
 use quaint::{connector::ResultRow, Value, ValueType};
-use query_structure::{ConversionFailure, FieldArity, GeometryFormat, PrismaValue, Record, TypeIdentifier};
+use query_structure::{ConversionFailure, FieldArity, PrismaValue, Record, TypeIdentifier};
 use std::{io, str::FromStr};
 use uuid::Uuid;
 
@@ -289,35 +289,25 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             ValueType::Bytes(Some(bytes)) => PrismaValue::Bytes(bytes.into()),
             _ => return Err(create_error(&p_value)),
         },
-        TypeIdentifier::Geometry(GeometryFormat::EWKT) => match p_value.typed {
+        TypeIdentifier::Geometry => match p_value.typed {
             value if value.is_null() => PrismaValue::Null,
-            ValueType::Text(Some(ewkt)) => match ewkt.starts_with("SRID=0;") {
-                true => PrismaValue::Geometry(ewkt[7..].into()),
-                false => PrismaValue::Geometry(ewkt.into()),
-            },
-            _ => return Err(create_error(&p_value)),
-        },
-        TypeIdentifier::Geometry(GeometryFormat::GeoJSON) => match p_value.typed {
-            value if value.is_null() => PrismaValue::Null,
-            // MySQL @<=5.7 and MSSQL cannot return geometry as GeoJSON, so we must serialize
-            // the ewkt string back to geojson. However, per specification, GeoJSON geometries
-            // can only be represented with EPSG:4326 projection. Plus WKT can represent more
-            // spatial types than GeoJSON can, so this operation may fail.
+            // MSSQL 5.6 and SQL Server cannot return geometry as GeoJSON, so for consistency's
+            // sake Quaint will return EWKT for all vendors. We must then serialize the EWKT
+            // string back to geojson. WKT can represent more spatial types than GeoJSON, so
+            // this operation may fail.
+            // For now, we'll just discard the SRID, but ideally we should include it in the
+            // resulting GeoJSON, in case it is different than 4326
             ValueType::Text(Some(ref ewkt)) => {
-                let wkt_start = if !ewkt.starts_with("SRID=") {
-                    Ok(0)
-                } else if ewkt.starts_with("SRID=0;") {
-                    Ok(7)
-                } else if ewkt.starts_with("SRID=4326;") {
-                    Ok(10)
+                let wkt_start = if ewkt.starts_with("SRID=") {
+                    ewkt.find(';').map(|i| i + 1).unwrap_or(0)
                 } else {
-                    Err(create_error(&p_value))
-                }?;
+                    0
+                };
                 WktStr(&ewkt[wkt_start..])
                     .to_json()
                     .map(PrismaValue::GeoJson)
                     .map_err(|_| create_error(&p_value))?
-            },
+            }
             _ => return Err(create_error(&p_value)),
         },
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),

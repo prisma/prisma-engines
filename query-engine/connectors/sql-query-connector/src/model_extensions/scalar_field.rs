@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use crate::context::Context;
 use chrono::Utc;
 use geozero::{geojson::GeoJson, ToWkt};
@@ -71,15 +69,6 @@ impl ScalarFieldExt for ScalarField {
                     _ => unreachable!(),
                 }
             }
-            (PrismaValue::Geometry(s), _) => {
-                // EWKT string should have been validated before
-                let geometry = GeometryValue::from_str(&s).unwrap();
-                match self.type_family() {
-                    TypeFamily::Geography(_) => Value::geography(geometry),
-                    TypeFamily::Geometry(_) => Value::geometry(geometry),
-                    _ => unreachable!(),
-                }
-            }
             (PrismaValue::Null, ident) => match ident {
                 TypeIdentifier::String => Value::null_text(),
                 TypeIdentifier::Float => Value::null_numeric(),
@@ -101,7 +90,7 @@ impl ScalarFieldExt for ScalarField {
                 TypeIdentifier::Int => Value::null_int32(),
                 TypeIdentifier::BigInt => Value::null_int64(),
                 TypeIdentifier::Bytes => Value::null_bytes(),
-                TypeIdentifier::Geometry(_) => Value::null_geometry(),
+                TypeIdentifier::Geometry => Value::null_geometry(),
                 TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
             },
         };
@@ -132,7 +121,7 @@ impl ScalarFieldExt for ScalarField {
             TypeIdentifier::Json => TypeFamily::Text(Some(TypeDataLength::Maximum)),
             TypeIdentifier::DateTime => TypeFamily::DateTime,
             TypeIdentifier::Bytes => TypeFamily::Text(parse_scalar_length(self)),
-            TypeIdentifier::Geometry(_) => {
+            TypeIdentifier::Geometry => {
                 let type_info = self.native_type().map(|nt| {
                     let name = nt.name();
                     let srid = match nt.args().as_slice() {
@@ -170,7 +159,7 @@ pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
         PrismaValue::Bytes(b) => Value::bytes(b),
         // TODO@geom: Fix this when we know how to cast GeoJSON to an appropriate DB value
         PrismaValue::GeoJson(s) => Value::json(serde_json::from_str(&s).unwrap()),
-        PrismaValue::Geometry(s) => Value::geometry(GeometryValue::from_str(&s).unwrap()),
+        // PrismaValue::Geometry(s) => Value::geometry(GeometryValue::from_str(&s).unwrap()),
         PrismaValue::Null => Value::null_int32(), // Can't tell which type the null is supposed to be.
         PrismaValue::Object(_) => unimplemented!(),
     }

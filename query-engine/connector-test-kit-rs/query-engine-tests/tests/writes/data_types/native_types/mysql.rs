@@ -431,69 +431,18 @@ mod mysql {
         Ok(())
     }
 
-    fn schema_ewkt_geometry_types() -> String {
-        let schema = indoc! {
-            r#"model Model {
-            #id(id, String, @id, @default(cuid()))
-            geometry    Geometry @test.Geometry
-            point       Geometry @test.Point
-            line        Geometry @test.LineString
-            poly        Geometry @test.Polygon
-            multipoint  Geometry @test.MultiPoint
-            multiline   Geometry @test.MultiLineString
-            multipoly   Geometry @test.MultiPolygon
-            collection  Geometry @test.GeometryCollection
-          }"#
-        };
-
-        schema.to_owned()
-    }
-
-    // "MySQL native spatial types" should "work"
-    #[connector_test(schema(schema_ewkt_geometry_types))]
-    async fn native_ewkt_geometry_types(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            createOneModel(
-              data: {
-                geometry: "POINT(1 2)"
-                point: "POINT(1 2)"
-                line: "LINESTRING(1 2,3 4)"
-                poly: "POLYGON((1 2,3 4,5 6,1 2))"
-                multipoint: "MULTIPOINT(1 2)"
-                multiline: "MULTILINESTRING((1 2,3 4))"
-                multipoly: "MULTIPOLYGON(((1 2,3 4,5 6,1 2)))"
-                collection: "GEOMETRYCOLLECTION(POINT(1 2))"
-              }
-            ) {
-              geometry,
-              point
-              line
-              poly
-              multipoint
-              multiline
-              multipoly
-              collection
-            }
-          }"#),
-          @r###"{"data":{"createOneModel":{"geometry":"POINT(1 2)","point":"POINT(1 2)","line":"LINESTRING(1 2,3 4)","poly":"POLYGON((1 2,3 4,5 6,1 2))","multipoint":"MULTIPOINT(1 2)","multiline":"MULTILINESTRING((1 2,3 4))","multipoly":"MULTIPOLYGON(((1 2,3 4,5 6,1 2)))","collection":"GEOMETRYCOLLECTION(POINT(1 2))"}}}"###
-        );
-
-        Ok(())
-    }
-
-    fn schema_geojson_geometry_types() -> String {
+    fn schema_geometry_types() -> String {
         let schema = indoc! {
             r#"model Model {
           #id(id, String, @id, @default(cuid()))
-          geometry    GeoJson @test.Geometry
-          point       GeoJson @test.Point
-          line        GeoJson @test.LineString
-          poly        GeoJson @test.Polygon
-          multipoint  GeoJson @test.MultiPoint
-          multiline   GeoJson @test.MultiLineString
-          multipoly   GeoJson @test.MultiPolygon
-          collection  GeoJson @test.GeometryCollection
+          geometry   Geometry @test.Geometry
+          point      Geometry @test.Point
+          line       Geometry @test.LineString
+          poly       Geometry @test.Polygon
+          multipoint Geometry @test.MultiPoint
+          multiline  Geometry @test.MultiLineString
+          multipoly  Geometry @test.MultiPolygon
+          collection Geometry @test.GeometryCollection
         }"#
         };
 
@@ -501,20 +450,20 @@ mod mysql {
     }
 
     // "MySQL native spatial types" should "work"
-    #[connector_test(schema(schema_geojson_geometry_types))]
-    async fn native_geojson_geometry_types(runner: Runner) -> TestResult<()> {
+    #[connector_test(schema(schema_geometry_types))]
+    async fn native_geometry_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
           createOneModel(
             data: {
-              geometry: "{\"type\":\"Point\",\"coordinates\":[1,2]}"
-              point: "{\"type\":\"Point\",\"coordinates\":[1,2]}"
-              line: "{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}"
-              poly: "{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}"
-              multipoint: "{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}"
-              multiline: "{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}"
-              multipoly: "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}"
-              collection: "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"
+              geometry: "{\"type\": \"Point\", \"coordinates\" :[1,2]}"
+              point: "{\"type\": \"Point\", \"coordinates\" :[1,2]}"
+              line: "{\"type\": \"LineString\", \"coordinates\" :[[1,2],[3,4]]}"
+              poly: "{\"type\": \"Polygon\", \"coordinates\" :[[[1,2],[3,4],[5,6],[1,2]]]}"
+              multipoint: "{\"type\": \"MultiPoint\", \"coordinates\" :[[1,2]]}"
+              multiline: "{\"type\": \"MultiLineString\", \"coordinates\" :[[[1,2],[3,4]]]}"
+              multipoly: "{\"type\": \"MultiPolygon\", \"coordinates\" :[[[[1,2],[3,4],[5,6],[1,2]]]]}"
+              collection: "{\"type\": \"GeometryCollection\",\"geometries\" :[{\"type\": \"Point\", \"coordinates\" :[1,2]}]}"
             }
           ) {
             geometry,
@@ -536,66 +485,15 @@ mod mysql {
     fn schema_geometry_srid_types() -> String {
         let schema = indoc! {
             r#"model Model {
-            #id(id, String, @id, @default(cuid()))
-            geometry    Geometry @test.Geometry(4326)
-            point       Geometry @test.Point(4326)
-            line        Geometry @test.LineString(4326)
-            poly        Geometry @test.Polygon(4326)
-            multipoint  Geometry @test.MultiPoint(4326)
-            multiline   Geometry @test.MultiLineString(4326)
-            multipoly   Geometry @test.MultiPolygon(4326)
-            collection  Geometry @test.GeometryCollection(4326)
-          }"#
-        };
-
-        schema.to_owned()
-    }
-
-    // "MySQL native spatial srid types" should "work"
-    #[connector_test(only(MySQL(8)), schema(schema_geometry_srid_types))]
-    async fn native_geometry_srid_types(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            createOneModel(
-              data: {
-                geometry: "SRID=4326;POINT(1 2)"
-                point: "SRID=4326;POINT(1 2)"
-                line: "SRID=4326;LINESTRING(1 2,3 4)"
-                poly: "SRID=4326;POLYGON((1 2,3 4,5 6,1 2))"
-                multipoint: "SRID=4326;MULTIPOINT(1 2)"
-                multiline: "SRID=4326;MULTILINESTRING((1 2,3 4))"
-                multipoly: "SRID=4326;MULTIPOLYGON(((1 2,3 4,5 6,1 2)))"
-                collection: "SRID=4326;GEOMETRYCOLLECTION(POINT(1 2))"
-              }
-            ) {
-              geometry
-              point
-              line
-              poly
-              multipoint
-              multiline
-              multipoly
-              collection
-            }
-          }"#),
-          @r###"{"data":{"createOneModel":{"geometry":"SRID=4326;POINT(1 2)","point":"SRID=4326;POINT(1 2)","line":"SRID=4326;LINESTRING(1 2,3 4)","poly":"SRID=4326;POLYGON((1 2,3 4,5 6,1 2))","multipoint":"SRID=4326;MULTIPOINT(1 2)","multiline":"SRID=4326;MULTILINESTRING((1 2,3 4))","multipoly":"SRID=4326;MULTIPOLYGON(((1 2,3 4,5 6,1 2)))","collection":"SRID=4326;GEOMETRYCOLLECTION(POINT(1 2))"}}}"###
-        );
-
-        Ok(())
-    }
-
-    fn schema_geojson_srid_geometry_types() -> String {
-        let schema = indoc! {
-            r#"model Model {
           #id(id, String, @id, @default(cuid()))
-          geometry    GeoJson @test.Geometry(4326)
-          point       GeoJson @test.Point(4326)
-          line        GeoJson @test.LineString(4326)
-          poly        GeoJson @test.Polygon(4326)
-          multipoint  GeoJson @test.MultiPoint(4326)
-          multiline   GeoJson @test.MultiLineString(4326)
-          multipoly   GeoJson @test.MultiPolygon(4326)
-          collection  GeoJson @test.GeometryCollection(4326)
+          geometry   Geometry @test.Geometry(3857)
+          point      Geometry @test.Point(3857)
+          line       Geometry @test.LineString(3857)
+          poly       Geometry @test.Polygon(3857)
+          multipoint Geometry @test.MultiPoint(3857)
+          multiline  Geometry @test.MultiLineString(3857)
+          multipoly  Geometry @test.MultiPolygon(3857)
+          collection Geometry @test.GeometryCollection(3857)
         }"#
         };
 
@@ -603,20 +501,20 @@ mod mysql {
     }
 
     // "MySQL native spatial types" should "work"
-    #[connector_test(only(MySQL(8)), schema(schema_geojson_srid_geometry_types))]
-    async fn native_geojson_srid_geometry_types(runner: Runner) -> TestResult<()> {
+    #[connector_test(only(MySQL(8)), schema(schema_geometry_srid_types))]
+    async fn native_geometry_srid_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
           createOneModel(
             data: {
-              geometry: "{\"type\":\"Point\",\"coordinates\":[1,2]}"
-              point: "{\"type\":\"Point\",\"coordinates\":[1,2]}"
-              line: "{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}"
-              poly: "{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}"
-              multipoint: "{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}"
-              multiline: "{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}"
-              multipoly: "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}"
-              collection: "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"
+              geometry: "{\"type\": \"Point\", \"coordinates\" :[1,2]}"
+              point: "{\"type\": \"Point\", \"coordinates\" :[1,2]}"
+              line: "{\"type\": \"LineString\", \"coordinates\" :[[1,2],[3,4]]}"
+              poly: "{\"type\": \"Polygon\", \"coordinates\" :[[[1,2],[3,4],[5,6],[1,2]]]}"
+              multipoint: "{\"type\": \"MultiPoint\", \"coordinates\" :[[1,2]]}"
+              multiline: "{\"type\": \"MultiLineString\", \"coordinates\" :[[[1,2],[3,4]]]}"
+              multipoly: "{\"type\": \"MultiPolygon\", \"coordinates\" :[[[[1,2],[3,4],[5,6],[1,2]]]]}"
+              collection: "{\"type\": \"GeometryCollection\",\"geometries\" :[{\"type\": \"Point\", \"coordinates\" :[1,2]}]}"
             }
           ) {
             geometry,

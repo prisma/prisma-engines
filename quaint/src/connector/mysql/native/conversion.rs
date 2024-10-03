@@ -69,13 +69,23 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                         dt.timestamp_subsec_micros(),
                     )
                 }),
-                ValueType::Geometry(g) | ValueType::Geography(g) => g.as_ref().map(|g| {
-                    // TODO@geometry: Improve WKB serialization error handling
-                    WktStr(&g.wkt)
-                        .to_mysql_wkb(Some(g.srid))
-                        .map(my::Value::Bytes)
-                        .unwrap_or_else(|_| panic!("Couldn't convert value `{g}` into EWKB."))
-                }),
+                ValueType::Geometry(g) | ValueType::Geography(g) => match g {
+                    None => None,
+                    Some(ref g) => {
+                        let res = WktStr(&g.wkt).to_mysql_wkb(Some(g.srid)).map(my::Value::Bytes);
+
+                        if res.is_err() {
+                            let msg = "Couldn't convert value `{g}` into EWKB.";
+                            let kind = ErrorKind::conversion(msg);
+
+                            let mut builder = Error::builder(kind);
+                            builder.set_original_message(msg);
+
+                            return Err(builder.build());
+                        }
+                        Some(res.unwrap())
+                    }
+                },
             };
 
             match res {

@@ -372,8 +372,7 @@ impl QueryDocumentParser {
             (PrismaValue::Bytes(bytes), ScalarType::Bytes) => Ok(PrismaValue::Bytes(bytes)),
             (PrismaValue::BigInt(b_int), ScalarType::BigInt) => Ok(PrismaValue::BigInt(b_int)),
             (PrismaValue::DateTime(s), ScalarType::DateTime) => Ok(PrismaValue::DateTime(s)),
-            (PrismaValue::GeoJson(s), ScalarType::GeoJson) => Ok(PrismaValue::GeoJson(s)),
-            (PrismaValue::Geometry(s), ScalarType::Geometry) => Ok(PrismaValue::Geometry(s)),
+            (PrismaValue::GeoJson(s), ScalarType::Geometry) => Ok(PrismaValue::GeoJson(s)),
             (PrismaValue::Null, ScalarType::Null) => Ok(PrismaValue::Null),
 
             // String coercion matchers
@@ -389,16 +388,12 @@ impl QueryDocumentParser {
             (PrismaValue::String(s), ScalarType::Json) => Ok(PrismaValue::Json(
                 self.parse_json(selection_path, argument_path, &s).map(|_| s)?,
             )),
+            (PrismaValue::Json(s) | PrismaValue::String(s), ScalarType::Geometry) => Ok(PrismaValue::GeoJson(
+                self.parse_geojson(selection_path, argument_path, &s).map(|_| s)?,
+            )),
             (PrismaValue::String(s), ScalarType::DateTime) => self
                 .parse_datetime(selection_path, argument_path, s.as_str())
                 .map(PrismaValue::DateTime),
-
-            // WKT imput can hardly be validated, since all database vendors wkt dialect
-            // differ in subtle ways that make them incompatible.
-            (PrismaValue::String(s), ScalarType::Geometry) => Ok(PrismaValue::Geometry(s)),
-            (PrismaValue::Json(s) | PrismaValue::String(s), ScalarType::GeoJson) => Ok(PrismaValue::GeoJson(
-                self.parse_geojson(selection_path, argument_path, &s).map(|_| s)?,
-            )),
 
             // Int coercion matchers
             (PrismaValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
@@ -925,7 +920,6 @@ pub(crate) mod conversions {
             }
             PrismaValue::Json(_) => "JSON".to_string(),
             PrismaValue::GeoJson(_) => "GeoJSON".to_string(),
-            PrismaValue::Geometry(_) => "EWKTGeometry".to_string(),
             PrismaValue::Object(_) => "Object".to_string(),
             PrismaValue::Null => "Null".to_string(),
             PrismaValue::DateTime(_) => "DateTime".to_string(),
