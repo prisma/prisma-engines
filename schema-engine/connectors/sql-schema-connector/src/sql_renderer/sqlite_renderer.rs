@@ -150,7 +150,7 @@ impl SqlRenderer for SqliteFlavour {
         if create_geometries.is_empty() {
             create_table.to_string()
         } else {
-            create_table.to_string() + "\n;" + &create_geometries
+            create_table.to_string() + ";\n" + &create_geometries
         }
     }
 

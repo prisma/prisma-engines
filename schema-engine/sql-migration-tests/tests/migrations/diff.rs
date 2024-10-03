@@ -822,11 +822,19 @@ fn from_multi_file_schema_datasource_to_url(mut api: TestApi) {
 
     api.diff(input).unwrap();
 
-    let expected_printed_messages = expect![[r#"
-        [
-            "-- DropTable\nPRAGMA foreign_keys=off;\nDROP TABLE \"cows\";\nPRAGMA foreign_keys=on;\n\n-- CreateTable\nCREATE TABLE \"cats\" (\n    \"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n    \"meows\" BOOLEAN DEFAULT true\n);\n",
-        ]
-    "#]];
+    let expected_printed_messages = if api.tags().contains(test_setup::Tags::Spatialite) {
+        expect![[r#"
+            [
+                "-- DropTable\nPRAGMA foreign_keys=off;\nSELECT DropTable(NULL, 'cows');\nPRAGMA foreign_keys=on;\n\n-- CreateTable\nCREATE TABLE \"cats\" (\n    \"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n    \"meows\" BOOLEAN DEFAULT true\n);\n",
+            ]
+        "#]]
+    } else {
+        expect![[r#"
+            [
+                "-- DropTable\nPRAGMA foreign_keys=off;\nDROP TABLE \"cows\";\nPRAGMA foreign_keys=on;\n\n-- CreateTable\nCREATE TABLE \"cats\" (\n    \"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n    \"meows\" BOOLEAN DEFAULT true\n);\n",
+            ]
+        "#]]
+    };
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
 }
 
@@ -888,11 +896,19 @@ fn from_multi_file_schema_datamodel_to_url(mut api: TestApi) {
 
     api.diff(input).unwrap();
 
-    let expected_printed_messages = expect![[r#"
-        [
-            "-- DropTable\nPRAGMA foreign_keys=off;\nDROP TABLE \"cows\";\nPRAGMA foreign_keys=on;\n\n-- DropTable\nPRAGMA foreign_keys=off;\nDROP TABLE \"dogs\";\nPRAGMA foreign_keys=on;\n\n-- CreateTable\nCREATE TABLE \"cats\" (\n    \"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n    \"meows\" BOOLEAN DEFAULT true\n);\n",
-        ]
-    "#]];
+    let expected_printed_messages = if api.tags().contains(test_setup::Tags::Spatialite) {
+        expect![[r#"
+            [
+                "-- DropTable\nPRAGMA foreign_keys=off;\nSELECT DropTable(NULL, 'cows');\nPRAGMA foreign_keys=on;\n\n-- DropTable\nPRAGMA foreign_keys=off;\nSELECT DropTable(NULL, 'dogs');\nPRAGMA foreign_keys=on;\n\n-- CreateTable\nCREATE TABLE \"cats\" (\n    \"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n    \"meows\" BOOLEAN DEFAULT true\n);\n",
+            ]
+        "#]]
+    } else {
+        expect![[r#"
+            [
+                "-- DropTable\nPRAGMA foreign_keys=off;\nDROP TABLE \"cows\";\nPRAGMA foreign_keys=on;\n\n-- DropTable\nPRAGMA foreign_keys=off;\nDROP TABLE \"dogs\";\nPRAGMA foreign_keys=on;\n\n-- CreateTable\nCREATE TABLE \"cats\" (\n    \"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n    \"meows\" BOOLEAN DEFAULT true\n);\n",
+            ]
+        "#]]
+    };
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
 }
 
