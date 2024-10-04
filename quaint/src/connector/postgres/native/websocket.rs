@@ -10,8 +10,8 @@ use async_tungstenite::{
     },
 };
 use futures::FutureExt;
-use postgres_native_tls::{MakeTlsConnector, TlsConnector};
-use tokio_postgres::{Client, Config, NoTls};
+use postgres_native_tls::TlsConnector;
+use tokio_postgres::{Client, Config};
 use ws_stream_tungstenite::WsStream;
 
 use crate::{
@@ -22,7 +22,6 @@ use crate::{
 const CONNECTION_PARAMS_HEADER: &str = "Prisma-Connection-Parameters";
 
 pub(crate) async fn connect_via_websocket(url: PostgresWebSocketUrl) -> crate::Result<Client> {
-    let host = url.host().to_owned();
     let (ws_stream, response) = connect_async(url).await.inspect_err(|e| {
         eprintln!("{}", e);
     })?;
@@ -40,8 +39,7 @@ pub(crate) async fn connect_via_websocket(url: PostgresWebSocketUrl) -> crate::R
     let config = Config::from_str(connection_params)?;
     let ws_byte_stream = WsStream::new(ws_stream);
 
-    let native_tls = native_tls::TlsConnector::new()?;
-    let tls = TlsConnector::new(native_tls, &host);
+    let tls = TlsConnector::new(native_tls::TlsConnector::new()?, "TODO");
     let (client, connection) = config.connect_raw(ws_byte_stream, tls).await?;
     tokio::spawn(connection.map(|r| match r {
         Ok(_) => (),
