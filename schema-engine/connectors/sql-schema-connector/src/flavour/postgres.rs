@@ -35,7 +35,7 @@ struct MigratePostgresUrl(PostgresUrl);
 static MIGRATE_WS_BASE_URL: Lazy<Cow<'static, str>> = Lazy::new(|| {
     std::env::var("PRISMA_SCHEMA_ENGINE_WS_BASE_URL")
         .map(Cow::Owned)
-        .unwrap_or_else(|_| Cow::Borrowed("wss://migrations.prisma.io"))
+        .unwrap_or_else(|_| Cow::Borrowed("wss://migrations.prisma-data.net/websocket"))
 });
 
 impl MigratePostgresUrl {
@@ -44,8 +44,7 @@ impl MigratePostgresUrl {
 
     fn new(url: Url) -> ConnectorResult<Self> {
         let postgres_url = if url.scheme() == Self::WEBSOCKET_SCHEME {
-            let mut ws_url = Url::from_str(&MIGRATE_WS_BASE_URL).map_err(ConnectorError::url_parse_error)?;
-            ws_url.set_path(url.path());
+            let ws_url = Url::from_str(&MIGRATE_WS_BASE_URL).map_err(ConnectorError::url_parse_error)?;
             let Some((_, api_key)) = url.query_pairs().find(|(name, _)| name == Self::API_KEY_PARAM) else {
                 return Err(ConnectorError::url_parse_error(
                     "Required `apiKey` query string parameter was not provided in a connection URL",

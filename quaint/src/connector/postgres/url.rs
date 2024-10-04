@@ -81,7 +81,7 @@ impl PostgresUrl {
     pub fn dbname(&self) -> &str {
         match self {
             Self::Native(url) => url.dbname(),
-            Self::WebSocket(url) => url.dbname(),
+            Self::WebSocket(_) => "postgres",
         }
     }
 
@@ -184,7 +184,10 @@ impl PostgresNativeUrl {
 
     /// Name of the database connected. Defaults to `postgres`.
     pub fn dbname(&self) -> &str {
-        dbname(&self.url)
+        match self.url.path_segments() {
+            Some(mut segments) => segments.next().unwrap_or("postgres"),
+            None => "postgres",
+        }
     }
 
     /// The percent-decoded database password.
@@ -508,18 +511,8 @@ impl PostgresWebSocketUrl {
     pub fn port(&self) -> u16 {
         self.url.port().unwrap_or(80)
     }
-
-    pub fn dbname(&self) -> &str {
-        dbname(&self.url)
-    }
 }
 
-fn dbname(url: &Url) -> &str {
-    match url.path_segments() {
-        Some(mut segments) => segments.next().unwrap_or("postgres"),
-        None => "postgres",
-    }
-}
 #[cfg(test)]
 mod tests {
     use super::*;
