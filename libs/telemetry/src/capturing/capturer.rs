@@ -106,7 +106,7 @@ impl SpanProcessor for Processor {
     /// mongo / relational, the information to build this kind of log event is logged diffeerently in
     /// the server.
     ///
-    /// In the case of the of relational databaes --queried through sql_query_connector and eventually
+    /// In the case of the of relational database --queried through sql_query_connector and eventually
     /// through quaint, a trace span describes the query-- `TraceSpan::represents_query_event`
     /// determines if a span represents a query event.
     ///
