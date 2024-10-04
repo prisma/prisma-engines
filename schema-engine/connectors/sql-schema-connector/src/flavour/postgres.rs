@@ -40,14 +40,14 @@ static MIGRATE_WS_BASE_URL: Lazy<Cow<'static, str>> = Lazy::new(|| {
 
 impl MigratePostgresUrl {
     const WEBSOCKET_SCHEME: &'static str = "prisma+postgres";
-    const API_KEY_PARAM: &'static str = "apiKey";
+    const API_KEY_PARAM: &'static str = "api_key";
 
     fn new(url: Url) -> ConnectorResult<Self> {
         let postgres_url = if url.scheme() == Self::WEBSOCKET_SCHEME {
             let ws_url = Url::from_str(&MIGRATE_WS_BASE_URL).map_err(ConnectorError::url_parse_error)?;
             let Some((_, api_key)) = url.query_pairs().find(|(name, _)| name == Self::API_KEY_PARAM) else {
                 return Err(ConnectorError::url_parse_error(
-                    "Required `apiKey` query string parameter was not provided in a connection URL",
+                    "Required `api_key` query string parameter was not provided in a connection URL",
                 ));
             };
             PostgresUrl::new_websocket(ws_url, api_key.into_owned())

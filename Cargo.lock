@@ -173,8 +173,10 @@ dependencies = [
  "futures-io",
  "futures-util",
  "log",
+ "native-tls",
  "pin-project-lite",
  "tokio",
+ "tokio-native-tls",
  "tungstenite",
 ]
 
@@ -6177,6 +6179,7 @@ dependencies = [
  "http 1.1.0",
  "httparse",
  "log",
+ "native-tls",
  "rand 0.8.5",
  "sha1",
  "thiserror",

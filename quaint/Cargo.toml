@@ -120,7 +120,7 @@ optional = true
 
 [dependencies.async-tungstenite]
 version = "0.28.0"
-features = ["tokio-runtime"]
+features = ["tokio-runtime", "tokio-native-tls"]
 optional = true
 
 [dependencies.byteorder]
