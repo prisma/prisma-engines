@@ -54,7 +54,8 @@ impl MigratePostgresUrl {
             PostgresUrl::new_websocket(ws_url, api_key.into_owned())
         } else {
             PostgresUrl::new_native(url)
-        }.map_err(ConnectorError::url_parse_error)?;
+        }
+        .map_err(ConnectorError::url_parse_error)?;
 
         Ok(Self(postgres_url))
     }
