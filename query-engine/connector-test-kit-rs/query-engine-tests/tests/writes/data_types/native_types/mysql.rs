@@ -452,9 +452,9 @@ mod mysql {
     // "MySQL native spatial types" should "work"
     #[connector_test(only(MySQL(5.7, 8, "mariadb")), schema(schema_geometry_types))]
     async fn native_geometry_types(runner: Runner) -> TestResult<()> {
-      match_connector_result!(
-        &runner,
-        r#"mutation {
+        match_connector_result!(
+          &runner,
+          r#"mutation {
           createOneModel(
             data: {
               geometry: "{\"type\":\"Point\",\"coordinates\" :[1,2]}"
@@ -477,11 +477,11 @@ mod mysql {
             collection
           }
         }"#,
-        MySql(Some(MySqlVersion::V8)) => r###"{"data":{"createOneModel":{"geometry":"{\"coordinates\":[1.0,2.0],\"type\":\"Point\"}","point":"{\"coordinates\":[1.0,2.0],\"type\":\"Point\"}","line":"{\"coordinates\":[[1.0,2.0],[3.0,4.0]],\"type\":\"LineString\"}","poly":"{\"coordinates\":[[[1.0,2.0],[3.0,4.0],[5.0,6.0],[1.0,2.0]]],\"type\":\"Polygon\"}","multipoint":"{\"coordinates\":[[1.0,2.0]],\"type\":\"MultiPoint\"}","multiline":"{\"coordinates\":[[[1.0,2.0],[3.0,4.0]]],\"type\":\"MultiLineString\"}","multipoly":"{\"coordinates\":[[[[1.0,2.0],[3.0,4.0],[5.0,6.0],[1.0,2.0]]]],\"type\":\"MultiPolygon\"}","collection":"{\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1.0,2.0]}],\"type\":\"GeometryCollection\"}"}}}"###,
-        _ => r###"{"data":{"createOneModel":{"geometry":"{\"coordinates\":[1,2],\"type\":\"Point\"}","point":"{\"coordinates\":[1,2],\"type\":\"Point\"}","line":"{\"coordinates\":[[1,2],[3,4]],\"type\":\"LineString\"}","poly":"{\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]],\"type\":\"Polygon\"}","multipoint":"{\"coordinates\":[[1,2]],\"type\":\"MultiPoint\"}","multiline":"{\"coordinates\":[[[1,2],[3,4]]],\"type\":\"MultiLineString\"}","multipoly":"{\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]],\"type\":\"MultiPolygon\"}","collection":"{\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}],\"type\":\"GeometryCollection\"}"}}}"###
-      );
+          MySql(Some(MySqlVersion::V8)) => r###"{"data":{"createOneModel":{"geometry":"{\"coordinates\":[1.0,2.0],\"type\":\"Point\"}","point":"{\"coordinates\":[1.0,2.0],\"type\":\"Point\"}","line":"{\"coordinates\":[[1.0,2.0],[3.0,4.0]],\"type\":\"LineString\"}","poly":"{\"coordinates\":[[[1.0,2.0],[3.0,4.0],[5.0,6.0],[1.0,2.0]]],\"type\":\"Polygon\"}","multipoint":"{\"coordinates\":[[1.0,2.0]],\"type\":\"MultiPoint\"}","multiline":"{\"coordinates\":[[[1.0,2.0],[3.0,4.0]]],\"type\":\"MultiLineString\"}","multipoly":"{\"coordinates\":[[[[1.0,2.0],[3.0,4.0],[5.0,6.0],[1.0,2.0]]]],\"type\":\"MultiPolygon\"}","collection":"{\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1.0,2.0]}],\"type\":\"GeometryCollection\"}"}}}"###,
+          _ => r###"{"data":{"createOneModel":{"geometry":"{\"coordinates\":[1,2],\"type\":\"Point\"}","point":"{\"coordinates\":[1,2],\"type\":\"Point\"}","line":"{\"coordinates\":[[1,2],[3,4]],\"type\":\"LineString\"}","poly":"{\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]],\"type\":\"Polygon\"}","multipoint":"{\"coordinates\":[[1,2]],\"type\":\"MultiPoint\"}","multiline":"{\"coordinates\":[[[1,2],[3,4]]],\"type\":\"MultiLineString\"}","multipoly":"{\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]],\"type\":\"MultiPolygon\"}","collection":"{\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}],\"type\":\"GeometryCollection\"}"}}}"###
+        );
 
-      Ok(())
+        Ok(())
     }
 
     fn schema_geometry_srid_types() -> String {
