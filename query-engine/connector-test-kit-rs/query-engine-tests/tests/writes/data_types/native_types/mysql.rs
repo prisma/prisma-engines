@@ -450,10 +450,11 @@ mod mysql {
     }
 
     // "MySQL native spatial types" should "work"
-    #[connector_test(exclude(MySQL(5.6)), schema(schema_geometry_types))]
+    #[connector_test(only(MySQL(5.7, 8, "mariadb")), schema(schema_geometry_types))]
     async fn native_geometry_types(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
+      match_connector_result!(
+        &runner,
+        r#"mutation {
           createOneModel(
             data: {
               geometry: "{\"type\":\"Point\",\"coordinates\" :[1,2]}"
@@ -475,11 +476,12 @@ mod mysql {
             multipoly
             collection
           }
-        }"#),
-          @r###"{"data":{"createOneModel":{"geometry":"{\"coordinates\":[1,2],\"type\":\"Point\"}","point":"{\"coordinates\":[1,2],\"type\":\"Point\"}","line":"{\"coordinates\":[[1,2],[3,4]],\"type\":\"LineString\"}","poly":"{\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]],\"type\":\"Polygon\"}","multipoint":"{\"coordinates\":[[1,2]],\"type\":\"MultiPoint\"}","multiline":"{\"coordinates\":[[[1,2],[3,4]]],\"type\":\"MultiLineString\"}","multipoly":"{\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]],\"type\":\"MultiPolygon\"}","collection":"{\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}],\"type\":\"GeometryCollection\"}"}}}"###
-        );
+        }"#,
+        MySql(Some(MySqlVersion::V8)) => r###"{"data":{"createOneModel":{"geometry":"{\"coordinates\":[1.0,2.0],\"type\":\"Point\"}","point":"{\"coordinates\":[1.0,2.0],\"type\":\"Point\"}","line":"{\"coordinates\":[[1.0,2.0],[3.0,4.0]],\"type\":\"LineString\"}","poly":"{\"coordinates\":[[[1.0,2.0],[3.0,4.0],[5.0,6.0],[1.0,2.0]]],\"type\":\"Polygon\"}","multipoint":"{\"coordinates\":[[1.0,2.0]],\"type\":\"MultiPoint\"}","multiline":"{\"coordinates\":[[[1.0,2.0],[3.0,4.0]]],\"type\":\"MultiLineString\"}","multipoly":"{\"coordinates\":[[[[1.0,2.0],[3.0,4.0],[5.0,6.0],[1.0,2.0]]]],\"type\":\"MultiPolygon\"}","collection":"{\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1.0,2.0]}],\"type\":\"GeometryCollection\"}"}}}"###,
+        _ => r###"{"data":{"createOneModel":{"geometry":"{\"coordinates\":[1,2],\"type\":\"Point\"}","point":"{\"coordinates\":[1,2],\"type\":\"Point\"}","line":"{\"coordinates\":[[1,2],[3,4]],\"type\":\"LineString\"}","poly":"{\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]],\"type\":\"Polygon\"}","multipoint":"{\"coordinates\":[[1,2]],\"type\":\"MultiPoint\"}","multiline":"{\"coordinates\":[[[1,2],[3,4]]],\"type\":\"MultiLineString\"}","multipoly":"{\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]],\"type\":\"MultiPolygon\"}","collection":"{\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}],\"type\":\"GeometryCollection\"}"}}}"###
+      );
 
-        Ok(())
+      Ok(())
     }
 
     fn schema_geometry_srid_types() -> String {
@@ -507,14 +509,14 @@ mod mysql {
           run_query!(&runner, r#"mutation {
           createOneModel(
             data: {
-              geometry: "{\"type\":\"Point\",\"coordinates\" :[1,2]}"
-              point: "{\"type\":\"Point\",\"coordinates\" :[1,2]}"
-              line: "{\"type\":\"LineString\",\"coordinates\" :[[1,2],[3,4]]}"
-              poly: "{\"type\":\"Polygon\",\"coordinates\" :[[[1,2],[3,4],[5,6],[1,2]]]}"
-              multipoint: "{\"type\":\"MultiPoint\",\"coordinates\" :[[1,2]]}"
-              multiline: "{\"type\":\"MultiLineString\",\"coordinates\" :[[[1,2],[3,4]]]}"
-              multipoly: "{\"type\":\"MultiPolygon\",\"coordinates\" :[[[[1,2],[3,4],[5,6],[1,2]]]]}"
-              collection: "{\"type\":\"GeometryCollection\",\"geometries\" :[{\"type\":\"Point\",\"coordinates\" :[1,2]}]}"
+              geometry: "{\"type\":\"Point\",\"coordinates\" :[1,2],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              point: "{\"type\":\"Point\",\"coordinates\" :[1,2],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              line: "{\"type\":\"LineString\",\"coordinates\" :[[1,2],[3,4]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              poly: "{\"type\":\"Polygon\",\"coordinates\" :[[[1,2],[3,4],[5,6],[1,2]]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              multipoint: "{\"type\":\"MultiPoint\",\"coordinates\" :[[1,2]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              multiline: "{\"type\":\"MultiLineString\",\"coordinates\" :[[[1,2],[3,4]]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              multipoly: "{\"type\":\"MultiPolygon\",\"coordinates\" :[[[[1,2],[3,4],[5,6],[1,2]]]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              collection: "{\"type\":\"GeometryCollection\",\"geometries\" :[{\"type\":\"Point\",\"coordinates\" :[1,2]}],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
             }
           ) {
             geometry,
@@ -527,7 +529,7 @@ mod mysql {
             collection
           }
         }"#),
-          @r###"{"data":{"createOneModel":{"geometry":"{\"type\":\"Point\",\"coordinates\":[1,2]}","point":"{\"type\":\"Point\",\"coordinates\":[1,2]}","line":"{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}","poly":"{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}","multipoint":"{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}","multiline":"{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}","multipoly":"{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}","collection":"{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"}}}"###
+          @r###"{"data":{"createOneModel":{"geometry":"{\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"type\":\"Point\",\"coordinates\":[1.0,2.0]}","point":"{\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"type\":\"Point\",\"coordinates\":[1.0,2.0]}","line":"{\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"type\":\"LineString\",\"coordinates\":[[1.0,2.0],[3.0,4.0]]}","poly":"{\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"type\":\"Polygon\",\"coordinates\":[[[1.0,2.0],[3.0,4.0],[5.0,6.0],[1.0,2.0]]]}","multipoint":"{\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"type\":\"MultiPoint\",\"coordinates\":[[1.0,2.0]]}","multiline":"{\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"type\":\"MultiLineString\",\"coordinates\":[[[1.0,2.0],[3.0,4.0]]]}","multipoly":"{\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"type\":\"MultiPolygon\",\"coordinates\":[[[[1.0,2.0],[3.0,4.0],[5.0,6.0],[1.0,2.0]]]]}","collection":"{\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1.0,2.0]}]}"}}}"###
         );
 
         Ok(())

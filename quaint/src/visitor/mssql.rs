@@ -38,8 +38,7 @@ fn get_geojson_srid(geom: &geojson::Geometry) -> Option<i32> {
 }
 
 fn get_wkt_srid_from_geojson(geometry: &geojson::Geometry) -> crate::Result<(String, i32)> {
-    let srid = get_geojson_srid(geometry)
-        .ok_or_else(|| Error::builder(ErrorKind::QueryInvalidInput("Invalid SRID in GeoJSON CRS".into())).build())?;
+    let srid = get_geojson_srid(geometry).unwrap_or(4326);
     let wkt = geozero::geojson::GeoJsonString(geometry.to_string()).to_wkt()?;
     Ok((wkt, srid))
 }
