@@ -460,7 +460,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             }),
             ValueType::Geography(geojson) => geojson.map(|g| {
                 let (wkt, srid) = get_wkt_srid_from_geojson(&g)?;
-                self.visit_function(geom_from_text(wkt.raw(), Some(srid.raw()), false))
+                self.visit_function(geom_from_text(wkt.raw(), Some(srid.raw()), true))
             }),
         };
 
@@ -1469,7 +1469,7 @@ mod tests {
     fn test_raw_geometry() {
         let geom = r#"{"type": "Point", "coordinates": [1, 2]}"#.parse::<geojson::Geometry>().unwrap();
         let (sql, params) = Mssql::build(Select::default().value(Value::geometry(geom).raw())).unwrap();
-        assert_eq!("SELECT geometry::STGeomFromText('POINT(1 2)',0)", sql);
+        assert_eq!("SELECT geometry::STGeomFromText('POINT(1 2)',4326)", sql);
         assert!(params.is_empty());
     }
 

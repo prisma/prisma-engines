@@ -435,7 +435,8 @@ mod geometry_create {
           &runner,
           r#"mutation { createOneTestModel(data: { id: 1, geometry: "{\"type\":\"Point\",\"coordinates\":[1,2]}" }) { geometry }}"#,
           // MongoDB excludes undefined fields
-          MySql(_) => vec![r#"{"data":{"createOneTestModel":{"geometry":"{\"coordinates\":[1,2],\"type\":\"Point\"}"}}}"#],
+          MySql(Some(MySqlVersion::V8)) => vec![r#"{"data":{"createOneTestModel":{"geometry":"{\"coordinates\":[1.0,2.0],\"type\":\"Point\"}"}}}"#],
+          MySql(Some(MySqlVersion::V5_7)) => vec![r#"{"data":{"createOneTestModel":{"geometry":"{\"coordinates\":[1,2],\"type\":\"Point\"}"}}}"#],
           _ => vec![r#"{"data":{"createOneTestModel":{"geometry":"{\"type\":\"Point\",\"coordinates\":[1,2]}"}}}"#]
         );
 
