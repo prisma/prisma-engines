@@ -7,6 +7,7 @@ mod cursor_condition;
 mod database;
 mod error;
 mod filter;
+mod geometry;
 mod join_utils;
 mod model_extensions;
 mod nested_aggregations;

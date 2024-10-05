@@ -1,12 +1,13 @@
-use crate::context::Context;
+use crate::{context::Context, geometry::get_geometry_crs};
 use chrono::Utc;
-use geozero::{geojson::GeoJson, ToWkt};
+use geojson::Geometry;
 use prisma_value::PrismaValue;
 use quaint::{
-    ast::{EnumName, GeometryValue, Value, ValueType},
+    ast::{EnumName, Value, ValueType},
     prelude::{EnumVariant, TypeDataLength, TypeFamily},
 };
 use query_structure::{ScalarField, TypeIdentifier};
+use serde_json::json;
 
 pub(crate) trait ScalarFieldExt {
     fn value<'a>(&self, pv: PrismaValue, ctx: &Context<'_>) -> Value<'a>;
@@ -55,11 +56,31 @@ impl ScalarFieldExt for ScalarField {
             (PrismaValue::Bytes(b), _) => Value::bytes(b),
             (PrismaValue::Object(_), _) => unimplemented!(),
             (PrismaValue::GeoJson(s), _) => {
-                // GeoJSON string should have been validated before
-                let wkt = GeoJson(&s).to_wkt().unwrap();
-                match self.type_family() {
-                    TypeFamily::Geography(srid) => Value::geography(GeometryValue { wkt, srid }),
-                    TypeFamily::Geometry(srid) => Value::geometry(GeometryValue { wkt, srid }),
+                let mut geometry = s.parse::<Geometry>().unwrap();
+                let column_type = self.type_family();
+                let column_srid = match column_type {
+                    TypeFamily::Geography(srid) => srid,
+                    TypeFamily::Geometry(srid) => srid,
+                    _ => unreachable!(),
+                };
+                // To facilitate geometry insertion, We manually set the GeoJSON CRS field
+                // to the column constrained SRID if the latter is set to 4326 (the default)
+                // or "unknown" (0 or -1). If there is no contraint at all, set it to 4326
+                // anyway for conistency's sake, and also because SQL Server requires one
+                // in order to create a geometry
+                let geometry_crs = geometry.foreign_members.as_ref().and_then(|m| get_geometry_crs(m));
+                if geometry_crs.is_none() && matches!(column_srid, None | Some(-1 | 0 | 4326)) {
+                    let srid = column_srid.unwrap_or(4326);
+                    let mut m = serde_json::Map::new();
+                    m.insert(
+                        "crs".to_string(),
+                        json!({"type": "name", "properties": {"name": format!("EPSG:{srid}")}}),
+                    );
+                    geometry.foreign_members = Some(m);
+                };
+                match column_type {
+                    TypeFamily::Geography(_) => Value::geography(geometry),
+                    TypeFamily::Geometry(_) => Value::geometry(geometry),
                     _ => unreachable!(),
                 }
             }
@@ -120,7 +141,7 @@ impl ScalarFieldExt for ScalarField {
                     let name = nt.name();
                     let srid = match nt.args().as_slice() {
                         [srid] => srid.parse::<i32>().ok(),
-                        [_, srid] => srid.parse::<i32>().ok(),
+                        [_type, srid] => srid.parse::<i32>().ok(),
                         _ => None,
                     };
                     (name, srid)

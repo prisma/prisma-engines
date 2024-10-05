@@ -17,7 +17,9 @@ mod search;
 mod sum;
 mod upper;
 
+mod geom_as_geojson;
 mod geom_as_text;
+mod geom_from_geojson;
 mod geom_from_text;
 
 mod uuid;
@@ -41,7 +43,9 @@ pub use search::*;
 pub use sum::*;
 pub use upper::*;
 
+pub use geom_as_geojson::*;
 pub use geom_as_text::*;
+pub use geom_from_geojson::*;
 pub use geom_from_text::*;
 
 pub use self::uuid::*;
@@ -67,7 +71,10 @@ impl<'a> Function<'a> {
         )
     }
     pub fn returns_geometry(&self) -> bool {
-        matches!(self.typ_, FunctionType::GeomFromText(_))
+        matches!(
+            self.typ_,
+            FunctionType::GeomFromText(_) | FunctionType::GeomFromGeoJson(_)
+        )
     }
 }
 
@@ -99,6 +106,8 @@ pub(crate) enum FunctionType<'a> {
     Uuid,
     GeomAsText(GeomAsText<'a>),
     GeomFromText(GeomFromText<'a>),
+    GeomAsGeoJson(GeomAsGeoJson<'a>),
+    GeomFromGeoJson(GeomFromGeoJson<'a>),
 }
 
 impl<'a> Aliasable<'a> for Function<'a> {
@@ -146,3 +155,4 @@ function!(
 );
 
 function!(GeomAsText, GeomFromText);
+function!(GeomAsGeoJson, GeomFromGeoJson);

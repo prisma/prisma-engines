@@ -298,6 +298,12 @@ impl From<serde_json::Error> for Error {
     }
 }
 
+impl From<geozero::error::GeozeroError> for Error {
+    fn from(_: geozero::error::GeozeroError) -> Self {
+        Self::builder(ErrorKind::conversion("Malformed GeoJSON data.")).build()
+    }
+}
+
 impl From<std::fmt::Error> for Error {
     fn from(_: std::fmt::Error) -> Self {
         Self::builder(ErrorKind::conversion("Problems writing AST into a query string.")).build()

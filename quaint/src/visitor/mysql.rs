@@ -193,13 +193,12 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
             ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
             ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
-            // TODO@geometry: find a way to avoid cloning
             ValueType::Geometry(g) => g
                 .as_ref()
-                .map(|g| self.visit_function(geom_from_text(g.wkt.clone().raw(), g.srid.map(IntoRaw::raw), false))),
+                .map(|g| self.visit_function(geom_from_geojson(g.to_string().raw()))),
             ValueType::Geography(g) => g
                 .as_ref()
-                .map(|g| self.visit_function(geom_from_text(g.wkt.clone().raw(), g.srid.map(IntoRaw::raw), true))),
+                .map(|g| self.visit_function(geom_from_geojson(g.to_string().raw()))),
         };
 
         match res {
@@ -308,19 +307,6 @@ impl<'a> Visitor<'a> for Mysql<'a> {
                 self.visit_select(*select)
             }
             SelectQuery::Union(union) => self.visit_union(*union),
-        }
-    }
-
-    /// MySQL geometries *must* be handled in raw binary form to prevent it from swapping longitude and latitude
-    fn visit_parameterized(&mut self, value: Value<'a>) -> visitor::Result {
-        match value.typed {
-            ValueType::Enum(Some(variant), name) => self.visit_parameterized_enum(variant, name),
-            ValueType::EnumArray(Some(variants), name) => self.visit_parameterized_enum_array(variants, name),
-            ValueType::Text(txt) => self.visit_parameterized_text(txt, value.native_column_type),
-            _ => {
-                self.add_parameter(value);
-                self.parameter_substitution()
-            }
         }
     }
 
@@ -735,6 +721,20 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             Ok(())
         })
     }
+
+    fn visit_geom_as_geojson(&mut self, geom: GeomAsGeoJson<'a>) -> visitor::Result {
+        self.surround_with("ST_AsGeoJSON(", ")", |s| {
+            s.visit_expression(*geom.expression)?;
+            s.write(", 15, 2")?;
+            Ok(())
+        })
+    }
+
+    fn visit_geom_from_geojson(&mut self, geom: GeomFromGeoJson<'a>) -> visitor::Result {
+        self.surround_with("ST_GeomFromGeoJSON(", ")", |ref mut s| {
+            s.visit_expression(*geom.expression)
+        })
+    }
 }
 
 fn get_target_table<'a>(query: &Query<'a>) -> Option<Table<'a>> {
@@ -748,7 +748,6 @@ fn get_target_table<'a>(query: &Query<'a>) -> Option<Table<'a>> {
 #[cfg(test)]
 mod tests {
     use crate::visitor::*;
-    use std::str::FromStr;
 
     fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
     where
@@ -933,21 +932,23 @@ mod tests {
 
     #[test]
     fn test_raw_geometry() {
-        let (sql, params) = Mysql::build(
-            Select::default().value(Value::geometry(GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap()).raw()),
-        )
-        .unwrap();
-        assert_eq!("SELECT ST_GeomFromText('POINT(0 0)',4326)", sql);
+        let geom = r#"{"type": "Point", "coordinates": [1, 2]}"#.parse::<geojson::Geometry>().unwrap();
+        let (sql, params) = Mysql::build(Select::default().value(Value::geometry(geom).raw())).unwrap();
+        assert_eq!(
+            r#"SELECT ST_GeomFromGeoJSON('{"type":"Point","coordinates":[1,2]}')"#,
+            sql
+        );
         assert!(params.is_empty());
     }
 
     #[test]
     fn test_raw_geography() {
-        let (sql, params) = Mysql::build(
-            Select::default().value(Value::geography(GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap()).raw()),
-        )
-        .unwrap();
-        assert_eq!("SELECT ST_GeomFromText('POINT(0 0)',4326)", sql);
+        let geom = r#"{"type": "Point", "coordinates": [1, 2]}"#.parse::<geojson::Geometry>().unwrap();
+        let (sql, params) = Mysql::build(Select::default().value(Value::geography(geom).raw())).unwrap();
+        assert_eq!(
+            r#"SELECT ST_GeomFromGeoJSON('{"type":"Point","coordinates":[1,2]}')"#,
+            sql
+        );
         assert!(params.is_empty());
     }
 

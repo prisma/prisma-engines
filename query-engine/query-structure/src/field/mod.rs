@@ -190,6 +190,11 @@ impl TypeIdentifier {
     pub fn is_json(&self) -> bool {
         matches!(self, Self::Json)
     }
+
+    /// Returns `true` if the type identifier is [`Geometry`].
+    pub fn is_geometry(&self) -> bool {
+        matches!(self, Self::Geometry)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]

@@ -51,11 +51,7 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     JsonFilteringAlphanumeric |
     JsonFilteringAlphanumericFieldRef |
     Geometry |
-    GeometryRawRead |
-    GeometryGeoJsonIO |
     GeometryFiltering |
-    GeometryExtraDims |
-    GeometryExtraTypes |
     MultiSchema |
     NamedForeignKeys |
     NamedPrimaryKeys |

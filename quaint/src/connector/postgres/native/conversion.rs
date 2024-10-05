@@ -15,7 +15,6 @@ use bytes::BytesMut;
 use chrono::{DateTime, NaiveDateTime, Utc};
 
 pub(crate) use decimal::DecimalWrapper;
-use geozero::{wkb::Ewkb, ToWkt};
 use postgres_types::{FromSql, ToSql, WrongType};
 use std::{borrow::Cow, convert::TryFrom, error::Error as StdError};
 use tokio_postgres::{
@@ -105,18 +104,6 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
             }
         })
         .collect()
-}
-
-struct EwktString(pub String);
-
-impl<'a> FromSql<'a> for EwktString {
-    fn from_sql(_ty: &PostgresType, raw: &'a [u8]) -> Result<EwktString, Box<dyn std::error::Error + Sync + Send>> {
-        Ok(Ewkb(raw.to_owned()).to_ewkt(None).map(EwktString)?)
-    }
-
-    fn accepts(ty: &PostgresType) -> bool {
-        matches!(ty.name(), "geometry" | "geography")
-    }
 }
 
 struct XmlString(pub String);
@@ -682,13 +669,6 @@ impl GetRow for PostgresRow {
                         }
                     }
                 }?,
-                PGColumnType::Unknown(_) if matches!(pg_ty.name(), "geometry" | "geography") => {
-                    let val: Option<EwktString> = row.try_get(i)?;
-                    match val {
-                        Some(ewkt) => ValueType::Text(Some(ewkt.0.into())),
-                        None => ValueType::Text(None),
-                    }
-                }
                 PGColumnType::Unknown(v) => match row.try_get(i) {
                     Ok(Some(val)) => {
                         let val: String = val;

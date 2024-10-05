@@ -40,6 +40,8 @@ pub struct Column<'a> {
     pub(crate) is_enum: bool,
     /// Whether the column is a (scalar) list.
     pub(crate) is_list: bool,
+    /// Whether the column is a geometry.
+    pub(crate) is_geometry: bool,
     /// Whether the column is part of a SELECT or RETURNING clause.
     pub(crate) is_selected: bool,
 }
@@ -108,6 +110,12 @@ impl<'a> Column<'a> {
     /// Sets whether the column points to an scalar list.
     pub fn set_is_list(mut self, is_list: bool) -> Self {
         self.is_list = is_list;
+        self
+    }
+
+    /// Sets whether the column points to an geometry type.
+    pub fn set_is_geometry(mut self, is_geometry: bool) -> Self {
+        self.is_geometry = is_geometry;
         self
     }
 

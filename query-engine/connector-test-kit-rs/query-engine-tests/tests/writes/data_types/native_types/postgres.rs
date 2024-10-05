@@ -397,7 +397,7 @@ mod postgres {
             geometry_collection
           }
         }"#),
-            @r###"{"data":{"createOneModel":{"geometry":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geometry_point":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geometry_line":"{\"type\": \"LineString\", \"coordinates\": [[1,2],[3,4]]}","geometry_poly":"{\"type\": \"Polygon\", \"coordinates\": [[[1,2],[3,4],[5,6],[1,2]]]}","geometry_multipoint":"{\"type\": \"MultiPoint\", \"coordinates\": [[1,2]]}","geometry_multiline":"{\"type\": \"MultiLineString\", \"coordinates\": [[[1,2],[3,4]]]}","geometry_multipoly":"{\"type\": \"MultiPolygon\", \"coordinates\": [[[[1,2],[3,4],[5,6],[1,2]]]]}","geometry_collection":"{\"type\": \"GeometryCollection\", \"geometries\": [{\"type\": \"Point\", \"coordinates\": [1,2]}]}"}}}"###
+            @r###"{"data":{"createOneModel":{"geometry":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geometry_point":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geometry_line":"{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}","geometry_poly":"{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}","geometry_multipoint":"{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}","geometry_multiline":"{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}","geometry_multipoly":"{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}","geometry_collection":"{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"}}}"###
         );
 
         Ok(())
@@ -428,19 +428,20 @@ mod postgres {
         schema(schema_geometry_srid),
         db_schemas("public", "test")
     )]
+
     async fn native_geometry_srid(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
           createOneModel(
             data: {
-              geometry: "{\"type\":\"Point\",\"coordinates\":[1,2]}"
-              geometry_point: "{\"type\":\"Point\",\"coordinates\":[1,2]}"
-              geometry_line: "{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}"
-              geometry_poly: "{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}"
-              geometry_multipoint: "{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}"
-              geometry_multiline: "{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}"
-              geometry_multipoly: "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}"
-              geometry_collection: "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"
+              geometry: "{\"type\":\"Point\",\"coordinates\":[1,2],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              geometry_point: "{\"type\":\"Point\",\"coordinates\":[1,2],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              geometry_line: "{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              geometry_poly: "{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              geometry_multipoint: "{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              geometry_multiline: "{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              geometry_multipoly: "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              geometry_collection: "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
             }
           ) {
             geometry
@@ -453,7 +454,7 @@ mod postgres {
             geometry_collection
           }
         }"#),
-            @r###"{"data":{"createOneModel":{"geometry":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geometry_point":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geometry_line":"{\"type\": \"LineString\", \"coordinates\": [[1,2],[3,4]]}","geometry_poly":"{\"type\": \"Polygon\", \"coordinates\": [[[1,2],[3,4],[5,6],[1,2]]]}","geometry_multipoint":"{\"type\": \"MultiPoint\", \"coordinates\": [[1,2]]}","geometry_multiline":"{\"type\": \"MultiLineString\", \"coordinates\": [[[1,2],[3,4]]]}","geometry_multipoly":"{\"type\": \"MultiPolygon\", \"coordinates\": [[[[1,2],[3,4],[5,6],[1,2]]]]}","geometry_collection":"{\"type\": \"GeometryCollection\", \"geometries\": [{\"type\": \"Point\", \"coordinates\": [1,2]}]}"}}}"###
+            @r###"{"data":{"createOneModel":{"geometry":"{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"coordinates\":[1,2]}","geometry_point":"{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"coordinates\":[1,2]}","geometry_line":"{\"type\":\"LineString\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"coordinates\":[[1,2],[3,4]]}","geometry_poly":"{\"type\":\"Polygon\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}","geometry_multipoint":"{\"type\":\"MultiPoint\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"coordinates\":[[1,2]]}","geometry_multiline":"{\"type\":\"MultiLineString\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"coordinates\":[[[1,2],[3,4]]]}","geometry_multipoly":"{\"type\":\"MultiPolygon\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}","geometry_collection":"{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"}}}"###
         );
 
         Ok(())
@@ -509,7 +510,7 @@ mod postgres {
             geography_collection
           }
         }"#),
-            @r###"{"data":{"createOneModel":{"geography":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geography_point":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geography_line":"{\"type\": \"LineString\", \"coordinates\": [[1,2],[3,4]]}","geography_poly":"{\"type\": \"Polygon\", \"coordinates\": [[[1,2],[3,4],[5,6],[1,2]]]}","geography_multipoint":"{\"type\": \"MultiPoint\", \"coordinates\": [[1,2]]}","geography_multiline":"{\"type\": \"MultiLineString\", \"coordinates\": [[[1,2],[3,4]]]}","geography_multipoly":"{\"type\": \"MultiPolygon\", \"coordinates\": [[[[1,2],[3,4],[5,6],[1,2]]]]}","geography_collection":"{\"type\": \"GeometryCollection\", \"geometries\": [{\"type\": \"Point\", \"coordinates\": [1,2]}]}"}}}"###
+            @r###"{"data":{"createOneModel":{"geography":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geography_point":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geography_line":"{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}","geography_poly":"{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}","geography_multipoint":"{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}","geography_multiline":"{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}","geography_multipoly":"{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}","geography_collection":"{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"}}}"###
         );
 
         Ok(())
@@ -545,14 +546,14 @@ mod postgres {
           run_query!(&runner, r#"mutation {
           createOneModel(
             data: {
-              geography: "{\"type\":\"Point\",\"coordinates\":[1,2]}"
-              geography_point: "{\"type\":\"Point\",\"coordinates\":[1,2]}"
-              geography_line: "{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}"
-              geography_poly: "{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}"
-              geography_multipoint: "{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}"
-              geography_multiline: "{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}"
-              geography_multipoly: "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}"
-              geography_collection: "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"
+              geography: "{\"type\":\"Point\",\"coordinates\":[1,2],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}}}"
+              geography_point: "{\"type\":\"Point\",\"coordinates\":[1,2],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}}}"
+              geography_line: "{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}}}"
+              geography_poly: "{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}}}"
+              geography_multipoint: "{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}}}"
+              geography_multiline: "{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}}}"
+              geography_multipoly: "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}}}"
+              geography_collection: "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}}}"
             }
           ) {
             geography
@@ -565,7 +566,7 @@ mod postgres {
             geography_collection
           }
         }"#),
-            @r###"{"data":{"createOneModel":{"geography":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geography_point":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geography_line":"{\"type\": \"LineString\", \"coordinates\": [[1,2],[3,4]]}","geography_poly":"{\"type\": \"Polygon\", \"coordinates\": [[[1,2],[3,4],[5,6],[1,2]]]}","geography_multipoint":"{\"type\": \"MultiPoint\", \"coordinates\": [[1,2]]}","geography_multiline":"{\"type\": \"MultiLineString\", \"coordinates\": [[[1,2],[3,4]]]}","geography_multipoly":"{\"type\": \"MultiPolygon\", \"coordinates\": [[[[1,2],[3,4],[5,6],[1,2]]]]}","geography_collection":"{\"type\": \"GeometryCollection\", \"geometries\": [{\"type\": \"Point\", \"coordinates\": [1,2]}]}"}}}"###
+            @r###"{"data":{"createOneModel":{"geography":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geography_point":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geography_line":"{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}","geography_poly":"{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}","geography_multipoint":"{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}","geography_multiline":"{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}","geography_multipoly":"{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}","geography_collection":"{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"}}}"###
         );
 
         Ok(())

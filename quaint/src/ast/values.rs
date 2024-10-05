@@ -5,7 +5,7 @@ use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 
 use serde_json::{Number, Value as JsonValue};
-use std::fmt::{Display, Formatter};
+use std::fmt::Display;
 use std::{
     borrow::{Borrow, Cow},
     convert::TryFrom,
@@ -13,9 +13,6 @@ use std::{
     str::FromStr,
 };
 use uuid::Uuid;
-
-use once_cell::sync::Lazy;
-use regex::Regex;
 
 /// A value written to the query as-is without parameterization.
 #[derive(Debug, Clone, PartialEq)]
@@ -34,42 +31,6 @@ where
 {
     fn raw(self) -> Raw<'a> {
         Raw(self.into())
-    }
-}
-
-#[derive(Debug, Clone, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub struct GeometryValue {
-    pub wkt: String,
-    pub srid: Option<i32>,
-}
-
-impl Display for GeometryValue {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self.srid {
-            None | Some(0) => (),
-            Some(srid) => write!(f, "SRID={};", srid)?,
-        }
-        f.write_str(&self.wkt)
-    }
-}
-
-impl FromStr for GeometryValue {
-    type Err = Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        static EWKT_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"^(SRID=(?P<srid>\d+);)?(?P<geometry>.+)$").unwrap());
-        EWKT_REGEX
-            .captures(s)
-            .map(|capture| {
-                let srid = capture
-                    .name("srid")
-                    .map(|v| v.as_str().parse::<i32>())
-                    .transpose()
-                    .map_err(|_| Error::builder(ErrorKind::conversion("Invalid EWKT SRID")).build())?;
-                let wkt = capture.name("geometry").map(|v| v.as_str()).unwrap().to_string();
-                Ok(GeometryValue { srid, wkt })
-            })
-            .ok_or_else(|| Error::builder(ErrorKind::conversion("Invalid EWKT string")).build())?
     }
 }
 
@@ -265,18 +226,12 @@ impl<'a> Value<'a> {
     }
 
     /// Creates a new geometry value.
-    pub fn geometry<T>(value: T) -> Self
-    where
-        T: Into<GeometryValue>,
-    {
+    pub fn geometry(value: geojson::Geometry) -> Self {
         ValueType::geometry(value).into_value()
     }
 
-    /// Creates a new geography value.
-    pub fn geography<T>(value: T) -> Self
-    where
-        T: Into<GeometryValue>,
-    {
+    /// Creates a new geometry value.
+    pub fn geography(value: geojson::Geometry) -> Self {
         ValueType::geography(value).into_value()
     }
 
@@ -606,9 +561,9 @@ pub enum ValueType<'a> {
     /// A JSON value.
     Json(Option<serde_json::Value>),
     /// A Geometry value.
-    Geometry(Option<GeometryValue>),
+    Geometry(Option<geojson::Geometry>),
     /// A Geography value.
-    Geography(Option<GeometryValue>),
+    Geography(Option<geojson::Geometry>),
     /// A XML value.
     Xml(Option<Cow<'a, str>>),
     /// An UUID value.
@@ -893,20 +848,14 @@ impl<'a> ValueType<'a> {
         Self::Json(Some(value))
     }
 
-    /// Creates a new geometry value.
-    pub fn geometry<T>(value: T) -> Self
-    where
-        T: Into<GeometryValue>,
-    {
-        Self::Geometry(Some(value.into()))
+    /// Creates a new GeoJSON geometry value.
+    pub(crate) fn geometry(value: geojson::Geometry) -> Self {
+        Self::Geometry(Some(value))
     }
 
-    /// Creates a new geometry value.
-    pub fn geography<T>(value: T) -> Self
-    where
-        T: Into<GeometryValue>,
-    {
-        Self::Geography(Some(value.into()))
+    /// Creates a new GeoJSON geography value.
+    pub(crate) fn geography(value: geojson::Geometry) -> Self {
+        Self::Geography(Some(value))
     }
 
     /// Creates a new XML value.

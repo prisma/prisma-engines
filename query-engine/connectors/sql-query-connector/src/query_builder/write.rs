@@ -31,7 +31,6 @@ pub(crate) fn create_record(
             insert.value(db_name.to_owned(), field.value(value, ctx))
         });
 
-    // TODO@geometry: Should we call geom_as_text in returning statement too ?
     Insert::from(insert)
         .returning(selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true)))
         .append_trace(&Span::current())

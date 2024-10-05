@@ -56,11 +56,7 @@ capabilities!(
     ImplicitManyToManyRelation,
     MultiSchema,
     Geometry,
-    GeometryGeoJsonIO,
-    GeometryRawRead,
     GeometryFiltering,
-    GeometryExtraDims,
-    GeometryExtraTypes,
     //Start of ME/IE only capabilities
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,

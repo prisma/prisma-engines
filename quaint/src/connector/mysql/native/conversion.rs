@@ -4,7 +4,6 @@ use crate::{
     error::{Error, ErrorKind},
 };
 use chrono::{DateTime, Datelike, NaiveDate, NaiveDateTime, NaiveTime, Timelike, Utc};
-use geozero::{wkb::MySQLWkb, wkt::WktStr, ToWkb, ToWkt};
 use mysql_async::{
     self as my,
     consts::{ColumnFlags, ColumnType},
@@ -69,23 +68,8 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                         dt.timestamp_subsec_micros(),
                     )
                 }),
-                ValueType::Geometry(g) | ValueType::Geography(g) => match g {
-                    None => None,
-                    Some(ref g) => {
-                        let res = WktStr(&g.wkt).to_mysql_wkb(g.srid).map(my::Value::Bytes);
-
-                        if res.is_err() {
-                            let msg = "Couldn't convert value `{g}` into EWKB.";
-                            let kind = ErrorKind::conversion(msg);
-
-                            let mut builder = Error::builder(kind);
-                            builder.set_original_message(msg);
-
-                            return Err(builder.build());
-                        }
-                        Some(res.unwrap())
-                    }
-                },
+                ValueType::Geometry(_) => panic!("Cannot handle raw Geometry"),
+                ValueType::Geography(_) => panic!("Cannot handle raw Geography"),
             };
 
             match res {
@@ -282,14 +266,6 @@ impl TakeRow for my::Row {
                     [0] => Value::boolean(false),
                     _ => Value::boolean(true),
                 },
-                my::Value::Bytes(b) if column.is_geometry() => {
-                    MySQLWkb(b).to_ewkt(None).map(Value::text).map_err(|_| {
-                        let msg = "Could not convert geometry blob to Ewkt";
-                        let kind = ErrorKind::conversion(msg);
-
-                        Error::builder(kind).build()
-                    })?
-                }
                 // https://dev.mysql.com/doc/internals/en/character-set.html
                 my::Value::Bytes(b) if column.character_set() == 63 => Value::bytes(b),
                 my::Value::Bytes(s) => Value::text(String::from_utf8(s)?),

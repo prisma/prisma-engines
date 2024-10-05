@@ -16,22 +16,19 @@ pub struct Sqlite<'a> {
 }
 
 impl<'a> Sqlite<'a> {
-    fn returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
+    fn visit_returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
         if let Some(returning) = returning {
             if !returning.is_empty() {
-                let values_len = returning.len();
+                let values = returning
+                    .into_iter()
+                    .map(|mut r| {
+                        let name = r.name.clone();
+                        r.table = None;
+                        r.alias(name).into()
+                    })
+                    .collect();
                 self.write(" RETURNING ")?;
-
-                for (i, column) in returning.into_iter().enumerate() {
-                    // Workaround for SQLite parsing bug
-                    // https://sqlite.org/forum/info/6c141f151fa5c444db257eb4d95c302b70bfe5515901cf987e83ed8ebd434c49?t=h
-                    self.surround_with_backticks(&column.name)?;
-                    self.write(" AS ")?;
-                    self.surround_with_backticks(&column.name)?;
-                    if i < (values_len - 1) {
-                        self.write(", ")?;
-                    }
-                }
+                self.visit_columns(values)?;
             }
         }
         Ok(())
@@ -140,13 +137,12 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
             ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
             ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
-            // TODO@geometry: find a way to avoid cloning
             ValueType::Geometry(g) => g
                 .as_ref()
-                .map(|g| self.visit_function(geom_from_text(g.wkt.clone().raw(), g.srid.map(IntoRaw::raw), false))),
+                .map(|g| self.visit_function(geom_from_geojson(g.to_string().raw()))),
             ValueType::Geography(g) => g
                 .as_ref()
-                .map(|g| self.visit_function(geom_from_text(g.wkt.clone().raw(), g.srid.map(IntoRaw::raw), true))),
+                .map(|g| self.visit_function(geom_from_geojson(g.to_string().raw()))),
         };
 
         match res {
@@ -228,7 +224,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             self.visit_upsert(update)?;
         }
 
-        self.returning(insert.returning)?;
+        self.visit_returning(insert.returning)?;
 
         if let Some(comment) = insert.comment {
             self.write(" ")?;
@@ -450,7 +446,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             self.visit_conditions(conditions)?;
         }
 
-        self.returning(delete.returning)?;
+        self.visit_returning(delete.returning)?;
 
         if let Some(comment) = delete.comment {
             self.write(" ")?;
@@ -485,7 +481,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             self.visit_conditions(conditions)?;
         }
 
-        self.returning(update.returning)?;
+        self.visit_returning(update.returning)?;
 
         if let Some(comment) = update.comment {
             self.write(" ")?;
@@ -509,12 +505,25 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             Ok(())
         })
     }
+
+    fn visit_geom_as_geojson(&mut self, geom: GeomAsGeoJson<'a>) -> visitor::Result {
+        self.surround_with("AsGeoJSON(", ")", |s| {
+            s.visit_expression(*geom.expression)?;
+            s.write(", 15, 2")?;
+            Ok(())
+        })
+    }
+
+    fn visit_geom_from_geojson(&mut self, geom: GeomFromGeoJson<'a>) -> visitor::Result {
+        self.surround_with("GeomFromGeoJSON(", ")", |ref mut s| {
+            s.visit_expression(*geom.expression)
+        })
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::{val, visitor::*};
-    use std::str::FromStr;
 
     fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
     where
@@ -1067,17 +1076,23 @@ mod tests {
 
     #[test]
     fn test_raw_geometry() {
-        let geom = GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap();
-        let (sql, params) = Postgres::build(Select::default().value(Value::geometry(geom).raw())).unwrap();
-        assert_eq!("SELECT ST_GeomFromText('POINT(0 0)',4326)", sql);
+        let geom = r#"{"type": "Point", "coordinates": [1, 2]}"#.parse::<geojson::Geometry>().unwrap();
+        let (sql, params) = Sqlite::build(Select::default().value(Value::geometry(geom).raw())).unwrap();
+        assert_eq!(
+            r#"SELECT ST_GeomFromGeoJSON('{"type":"Point","coordinates":[1,2]}')"#,
+            sql
+        );
         assert!(params.is_empty());
     }
 
     #[test]
     fn test_raw_geography() {
-        let geom = GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap();
-        let (sql, params) = Postgres::build(Select::default().value(Value::geography(geom).raw())).unwrap();
-        assert_eq!("SELECT ST_GeomFromText('POINT(0 0)',4326)", sql);
+        let geom = r#"{"type": "Point", "coordinates": [1, 2]}"#.parse::<geojson::Geometry>().unwrap();
+        let (sql, params) = Sqlite::build(Select::default().value(Value::geography(geom).raw())).unwrap();
+        assert_eq!(
+            r#"SELECT ST_GeomFromGeoJSON('{"type":"Point","coordinates":[1,2]}')"#,
+            sql
+        );
         assert!(params.is_empty());
     }
 

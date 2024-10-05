@@ -56,7 +56,7 @@ pub use types::{
 
 /// ParserDatabase is a container for a Schema AST, together with information
 /// gathered during schema validation.
-/// 
+///
 /// Each validation step enriches the
 /// database with information that can be used to work with the schema, without
 /// changing the AST. Instantiating with `ParserDatabase::new()` will perform a

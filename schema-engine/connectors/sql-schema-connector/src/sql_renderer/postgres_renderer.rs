@@ -658,7 +658,6 @@ fn render_decimal_args(input: Option<(u32, u32)>) -> String {
 fn render_geometry_arg(input: Option<GeometryParams>) -> String {
     match input {
         None => "".to_string(),
-        Some(GeometryParams { type_, srid: 0 }) => format!("({type_})"),
         Some(GeometryParams { type_, srid }) => format!("({type_}, {srid})"),
     }
 }

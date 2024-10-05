@@ -433,10 +433,9 @@ mod geometry_create {
         // TODO@geometry: ideally, make geojson generation consistent with SQL connectors
         match_connector_result!(
           &runner,
-          r#"mutation { createOneTestModel(data: { id: 1, geometry: "{\"type\": \"Point\", \"coordinates\": [1,2]}" }) { geometry }}"#,
+          r#"mutation { createOneTestModel(data: { id: 1, geometry: "{\"type\":\"Point\",\"coordinates\":[1,2]}" }) { geometry }}"#,
           // MongoDB excludes undefined fields
-          MongoDb(_) => vec![r#"{"data":{"createOneTestModel":{"geometry":"{\"type\":\"Point\",\"coordinates\":[1,2]}"}}}"#],
-          _ => vec![r#"{"data":{"createOneTestModel":{"geometry":"{\"type\": \"Point\", \"coordinates\": [1,2]}"}}}"#]
+          _ => vec![r#"{"data":{"createOneTestModel":{"geometry":"{\"type\":\"Point\",\"coordinates\":[1,2]}"}}}"#]
         );
 
         insta::assert_snapshot!(

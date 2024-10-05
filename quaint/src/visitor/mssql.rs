@@ -1,3 +1,5 @@
+use geozero::ToWkt;
+
 use super::{NativeColumnType, Visitor};
 #[cfg(any(feature = "postgresql", feature = "mysql"))]
 use crate::prelude::{JsonArrayAgg, JsonBuildObject, JsonExtract, JsonType, JsonUnquote};
@@ -18,6 +20,28 @@ pub struct Mssql<'a> {
     query: String,
     parameters: Vec<Value<'a>>,
     order_by_set: bool,
+}
+
+fn get_geometry_srid(geom: &geojson::Geometry) -> Option<i32> {
+    geom.foreign_members
+        .as_ref()?
+        .get("crs")?
+        .as_object()?
+        .get("properties")?
+        .as_object()?
+        .get("name")?
+        .as_str()?
+        .rsplit_once(":")?
+        .1
+        .parse()
+        .ok()
+}
+
+fn geojson_to_wkt_srid(geometry: &geojson::Geometry) -> crate::Result<(String, i32)> {
+    let srid = get_geometry_srid(geometry)
+        .ok_or_else(|| Error::builder(ErrorKind::QueryInvalidInput("Invalid SRID in GeoJSON CRS".into())).build())?;
+    let wkt = geozero::geojson::GeoJsonString(geometry.to_string()).to_wkt()?;
+    Ok((wkt, srid))
 }
 
 impl<'a> Mssql<'a> {
@@ -253,6 +277,16 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         }
     }
 
+    fn visit_parameterized_geometry(&mut self, geometry: geojson::Geometry) -> visitor::Result {
+        let (wkt, srid) = geojson_to_wkt_srid(&geometry)?;
+        self.visit_function(geom_from_text(wkt, Some(srid), false))
+    }
+
+    fn visit_parameterized_geography(&mut self, geometry: geojson::Geometry) -> visitor::Result {
+        let (wkt, srid) = geojson_to_wkt_srid(&geometry)?;
+        self.visit_function(geom_from_text(wkt, Some(srid), true))
+    }
+
     /// A point to modify an incoming query to make it compatible with the
     /// SQL Server.
     fn compatibility_modifications(&self, query: Query<'a>) -> Query<'a> {
@@ -421,13 +455,8 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             // Style 3 is keep all whitespace + internal DTD processing:
             // https://docs.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?redirectedfrom=MSDN&view=sql-server-ver15#xml-styles
             ValueType::Xml(cow) => cow.map(|cow| self.write(format!("CONVERT(XML, N'{cow}', 3)"))),
-            // TODO@geometry: find a way to avoid cloning
-            ValueType::Geometry(g) => g
-                .as_ref()
-                .map(|g| self.visit_function(geom_from_text(g.wkt.clone().raw(), g.srid.map(IntoRaw::raw), false))),
-            ValueType::Geography(g) => g
-                .as_ref()
-                .map(|g| self.visit_function(geom_from_text(g.wkt.clone().raw(), g.srid.map(IntoRaw::raw), true))),
+            ValueType::Geometry(geojson) => geojson.map(|g| self.visit_function(geom_from_geojson(g.to_string()))),
+            ValueType::Geography(geojson) => geojson.map(|g| self.visit_function(geom_from_geojson(g.to_string()))),
         };
 
         match res {
@@ -816,6 +845,11 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         unimplemented!("JSON filtering is not yet supported on MSSQL")
     }
 
+    fn visit_geometry_column(&mut self, column: Column<'a>) -> visitor::Result {
+        // SQL Server does not support GeoJSON, so we return EWKT instead
+        self.visit_function(geom_as_text(column))
+    }
+
     fn visit_geom_as_text(&mut self, geom: GeomAsText<'a>) -> visitor::Result {
         self.write("CASE WHEN ")?;
         self.visit_expression(*geom.expression.clone())?;
@@ -858,7 +892,6 @@ mod tests {
         visitor::{Mssql, Visitor},
     };
     use indoc::indoc;
-    use std::str::FromStr;
 
     fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
     where
@@ -1429,17 +1462,17 @@ mod tests {
 
     #[test]
     fn test_raw_geometry() {
-        let geom = GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap();
+        let geom = r#"{"type": "Point", "coordinates": [1, 2]}"#.parse::<geojson::Geometry>().unwrap();
         let (sql, params) = Mssql::build(Select::default().value(Value::geometry(geom).raw())).unwrap();
-        assert_eq!("SELECT geometry::STGeomFromText('POINT(0 0)',4326)", sql);
+        assert_eq!("SELECT geometry::STGeomFromText('POINT(1 2)',0)", sql);
         assert!(params.is_empty());
     }
 
     #[test]
     fn test_raw_geography() {
-        let geom = GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap();
+        let geom = r#"{"type": "Point", "coordinates": [1, 2]}"#.parse::<geojson::Geometry>().unwrap();
         let (sql, params) = Mssql::build(Select::default().value(Value::geography(geom).raw())).unwrap();
-        assert_eq!("SELECT geography::STGeomFromText('POINT(0 0)',4326)", sql);
+        assert_eq!("SELECT geography::STGeomFromText('POINT(1 2)',4326)", sql);
         assert!(params.is_empty());
     }
 

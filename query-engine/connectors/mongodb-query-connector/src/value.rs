@@ -398,7 +398,6 @@ fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<Prism
 
         // Geometry
         (TypeIdentifier::Geometry, bson @ Bson::Document(_)) => {
-            // TODO@geometry: should we do validation with crate geojson here instead ?
             PrismaValue::GeoJson(serde_json::to_string(&bson.into_relaxed_extjson())?)
         }
 

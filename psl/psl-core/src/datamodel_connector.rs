@@ -227,10 +227,6 @@ pub trait Connector: Send + Sync {
         self.capabilities().contains(ConnectorCapability::Geometry)
     }
 
-    fn supports_raw_geometry_read(&self) -> bool {
-        self.capabilities().contains(ConnectorCapability::GeometryRawRead)
-    }
-
     fn supported_index_types(&self) -> BitFlags<IndexAlgorithm> {
         IndexAlgorithm::BTree.into()
     }

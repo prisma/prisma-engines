@@ -139,24 +139,28 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
     /// A database column identifier
     fn visit_column(&mut self, column: Column<'a>) -> visitor::Result {
-        match column.table {
-            Some(table) => {
-                self.visit_table(table, false)?;
-                self.write(".")?;
-                self.delimited_identifiers(&[&*column.name])?;
-            }
-            _ => self.delimited_identifiers(&[&*column.name])?,
-        };
-
-        if column.is_enum && column.is_selected {
-            if column.is_list {
-                self.write("::text[]")?;
-            } else {
-                self.write("::text")?;
+        let alias = column.alias.clone();
+        if column.is_geometry && column.is_selected {
+            self.visit_geometry_column(column)?;
+        } else {
+            match column.table {
+                Some(table) => {
+                    self.visit_table(table, false)?;
+                    self.write(".")?;
+                    self.delimited_identifiers(&[&*column.name])?;
+                }
+                _ => self.delimited_identifiers(&[&*column.name])?,
+            };
+            if column.is_enum && column.is_selected {
+                if column.is_list {
+                    self.write("::text[]")?;
+                } else {
+                    self.write("::text")?;
+                }
             }
         }
 
-        if let Some(alias) = column.alias {
+        if let Some(alias) = alias {
             self.write(" AS ")?;
             self.delimited_identifiers(&[&*alias])?;
         }
@@ -257,13 +261,12 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
             ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
             ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
-            // TODO@geometry: find a way to avoid cloning
             ValueType::Geometry(g) => g
                 .as_ref()
-                .map(|g| self.visit_function(geom_from_text(g.wkt.clone().raw(), g.srid.map(IntoRaw::raw), false))),
+                .map(|g| self.visit_function(geom_from_geojson(g.to_string().raw()))),
             ValueType::Geography(g) => g
                 .as_ref()
-                .map(|g| self.visit_function(geom_from_text(g.wkt.clone().raw(), g.srid.map(IntoRaw::raw), true))),
+                .map(|g| self.visit_function(geom_from_geojson(g.to_string().raw()))),
         };
 
         match res {
@@ -799,12 +802,25 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             Ok(())
         })
     }
+
+    fn visit_geom_as_geojson(&mut self, geom: GeomAsGeoJson<'a>) -> visitor::Result {
+        self.surround_with("ST_AsGeoJSON(", ")", |s| {
+            s.visit_expression(*geom.expression)?;
+            s.write(", 15")?;
+            Ok(())
+        })
+    }
+
+    fn visit_geom_from_geojson(&mut self, geom: GeomFromGeoJson<'a>) -> visitor::Result {
+        self.surround_with("ST_GeomFromGeoJSON(", ")", |ref mut s| {
+            s.visit_expression(*geom.expression)
+        })
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::visitor::*;
-    use std::str::FromStr;
 
     fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
     where
@@ -1219,17 +1235,23 @@ mod tests {
 
     #[test]
     fn test_raw_geometry() {
-        let geom = GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap();
+        let geom = r#"{"type": "Point", "coordinates": [1, 2]}"#.parse::<geojson::Geometry>().unwrap();
         let (sql, params) = Postgres::build(Select::default().value(Value::geometry(geom).raw())).unwrap();
-        assert_eq!("SELECT ST_GeomFromText('POINT(0 0)',4326)", sql);
+        assert_eq!(
+            r#"SELECT ST_GeomFromGeoJSON('{"type":"Point","coordinates":[1,2]}')"#,
+            sql
+        );
         assert!(params.is_empty());
     }
 
     #[test]
     fn test_raw_geography() {
-        let geom = GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap();
+        let geom = r#"{"type": "Point", "coordinates": [1, 2]}"#.parse::<geojson::Geometry>().unwrap();
         let (sql, params) = Postgres::build(Select::default().value(Value::geography(geom).raw())).unwrap();
-        assert_eq!("SELECT ST_GeomFromText('POINT(0 0)',4326)", sql);
+        assert_eq!(
+            r#"SELECT ST_GeomFromGeoJSON('{"type":"Point","coordinates":[1,2]}')"#,
+            sql
+        );
         assert!(params.is_empty());
     }
 

@@ -141,6 +141,14 @@ pub trait Visitor<'a> {
 
     fn visit_geom_from_text(&mut self, geom: GeomFromText<'a>) -> Result;
 
+    fn visit_geom_as_geojson(&mut self, _geom: GeomAsGeoJson<'a>) -> Result {
+        unimplemented!("GeomAsGeoJson not supported for the underlying database.")
+    }
+
+    fn visit_geom_from_geojson(&mut self, _geom: GeomFromGeoJson<'a>) -> Result {
+        unimplemented!("GeomFromGeoJson not supported for the underlying database.")
+    }
+
     fn visit_geometry_type_equals(&mut self, left: Expression<'a>, right: GeometryType<'a>, not: bool) -> Result;
 
     fn visit_geometry_empty(&mut self, left: Expression<'a>, not: bool) -> Result {
@@ -217,14 +225,22 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
+    fn visit_parameterized_geometry(&mut self, geometry: geojson::Geometry) -> Result {
+        self.visit_function(geom_from_geojson(geometry.to_string()))
+    }
+
+    fn visit_parameterized_geography(&mut self, geometry: geojson::Geometry) -> Result {
+        self.visit_function(geom_from_geojson(geometry.to_string()))
+    }
+
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: Value<'a>) -> Result {
         match value.typed {
             ValueType::Enum(Some(variant), name) => self.visit_parameterized_enum(variant, name),
             ValueType::EnumArray(Some(variants), name) => self.visit_parameterized_enum_array(variants, name),
             ValueType::Text(txt) => self.visit_parameterized_text(txt, value.native_column_type),
-            ValueType::Geometry(Some(geom)) => self.visit_function(geom_from_text(geom.wkt, geom.srid, false)),
-            ValueType::Geography(Some(geom)) => self.visit_function(geom_from_text(geom.wkt, geom.srid, true)),
+            ValueType::Geometry(Some(geometry)) => self.visit_parameterized_geometry(geometry),
+            ValueType::Geography(Some(geometry)) => self.visit_parameterized_geometry(geometry),
             ValueType::Geometry(None) | ValueType::Geography(None) => self.write("NULL"),
             _ => {
                 self.add_parameter(value);
@@ -722,18 +738,29 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
+    fn visit_geometry_column(&mut self, mut column: Column<'a>) -> Result {
+        column.alias = None;
+        column.is_selected = false;
+        self.visit_function(geom_as_geojson(column))
+    }
+
     /// A database column identifier
     fn visit_column(&mut self, column: Column<'a>) -> Result {
-        match column.table {
-            Some(table) => {
-                self.visit_table(table, false)?;
-                self.write(".")?;
-                self.delimited_identifiers(&[&*column.name])?;
-            }
-            _ => self.delimited_identifiers(&[&*column.name])?,
-        };
+        let alias = column.alias.clone();
+        if column.is_geometry && column.is_selected {
+            self.visit_geometry_column(column)?;
+        } else {
+            match column.table {
+                Some(table) => {
+                    self.visit_table(table, false)?;
+                    self.write(".")?;
+                    self.delimited_identifiers(&[&*column.name])?;
+                }
+                _ => self.delimited_identifiers(&[&*column.name])?,
+            };
+        }
 
-        if let Some(alias) = column.alias {
+        if let Some(alias) = alias {
             self.write(" AS ")?;
             self.delimited_identifiers(&[&*alias])?;
         }
@@ -1195,6 +1222,12 @@ pub trait Visitor<'a> {
             }
             FunctionType::GeomFromText(geom) => {
                 self.visit_geom_from_text(geom)?;
+            }
+            FunctionType::GeomAsGeoJson(geom) => {
+                self.visit_geom_as_geojson(geom)?;
+            }
+            FunctionType::GeomFromGeoJson(geom) => {
+                self.visit_geom_from_geojson(geom)?;
             }
         };
 

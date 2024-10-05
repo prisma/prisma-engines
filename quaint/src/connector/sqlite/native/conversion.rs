@@ -9,7 +9,6 @@ use crate::{
     error::{Error, ErrorKind},
 };
 
-use geozero::{wkb::SpatiaLiteWkb, ToWkt};
 use rusqlite::{
     types::{Null, ToSql, ToSqlOutput, ValueRef},
     Column, Error as RusqlError, Row as SqliteRow, Rows as SqliteRows,
@@ -238,15 +237,6 @@ impl<'a> GetRow for SqliteRow<'a> {
                             })
                     })?
                 }
-                ValueRef::Blob(bytes) if column.is_geometry() => SpatiaLiteWkb(bytes.to_vec())
-                    .to_ewkt(None)
-                    .map(Value::text)
-                    .map_err(|_| {
-                        let builder = Error::builder(ErrorKind::ConversionError(
-                            "Failed to read contents of SQLite geometry column as WKT".into(),
-                        ));
-                        builder.build()
-                    })?,
                 ValueRef::Text(bytes) => Value::text(String::from_utf8(bytes.to_vec())?),
                 ValueRef::Blob(bytes) => Value::bytes(bytes.to_owned()),
             };

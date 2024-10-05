@@ -456,14 +456,14 @@ mod mysql {
           run_query!(&runner, r#"mutation {
           createOneModel(
             data: {
-              geometry: "{\"type\": \"Point\", \"coordinates\" :[1,2]}"
-              point: "{\"type\": \"Point\", \"coordinates\" :[1,2]}"
-              line: "{\"type\": \"LineString\", \"coordinates\" :[[1,2],[3,4]]}"
-              poly: "{\"type\": \"Polygon\", \"coordinates\" :[[[1,2],[3,4],[5,6],[1,2]]]}"
-              multipoint: "{\"type\": \"MultiPoint\", \"coordinates\" :[[1,2]]}"
-              multiline: "{\"type\": \"MultiLineString\", \"coordinates\" :[[[1,2],[3,4]]]}"
-              multipoly: "{\"type\": \"MultiPolygon\", \"coordinates\" :[[[[1,2],[3,4],[5,6],[1,2]]]]}"
-              collection: "{\"type\": \"GeometryCollection\",\"geometries\" :[{\"type\": \"Point\", \"coordinates\" :[1,2]}]}"
+              geometry: "{\"type\":\"Point\",\"coordinates\" :[1,2]}"
+              point: "{\"type\":\"Point\",\"coordinates\" :[1,2]}"
+              line: "{\"type\":\"LineString\",\"coordinates\" :[[1,2],[3,4]]}"
+              poly: "{\"type\":\"Polygon\",\"coordinates\" :[[[1,2],[3,4],[5,6],[1,2]]]}"
+              multipoint: "{\"type\":\"MultiPoint\",\"coordinates\" :[[1,2]]}"
+              multiline: "{\"type\":\"MultiLineString\",\"coordinates\" :[[[1,2],[3,4]]]}"
+              multipoly: "{\"type\":\"MultiPolygon\",\"coordinates\" :[[[[1,2],[3,4],[5,6],[1,2]]]]}"
+              collection: "{\"type\":\"GeometryCollection\",\"geometries\" :[{\"type\":\"Point\",\"coordinates\" :[1,2]}]}"
             }
           ) {
             geometry,
@@ -476,7 +476,7 @@ mod mysql {
             collection
           }
         }"#),
-          @r###"{"data":{"createOneModel":{"geometry":"{\"type\": \"Point\", \"coordinates\": [1,2]}","point":"{\"type\": \"Point\", \"coordinates\": [1,2]}","line":"{\"type\": \"LineString\", \"coordinates\": [[1,2],[3,4]]}","poly":"{\"type\": \"Polygon\", \"coordinates\": [[[1,2],[3,4],[5,6],[1,2]]]}","multipoint":"{\"type\": \"MultiPoint\", \"coordinates\": [[1,2]]}","multiline":"{\"type\": \"MultiLineString\", \"coordinates\": [[[1,2],[3,4]]]}","multipoly":"{\"type\": \"MultiPolygon\", \"coordinates\": [[[[1,2],[3,4],[5,6],[1,2]]]]}","collection":"{\"type\": \"GeometryCollection\", \"geometries\": [{\"type\": \"Point\", \"coordinates\": [1,2]}]}"}}}"###
+          @r###"{"data":{"createOneModel":{"geometry":"{\"coordinates\":[1,2],\"type\":\"Point\"}","point":"{\"coordinates\":[1,2],\"type\":\"Point\"}","line":"{\"coordinates\":[[1,2],[3,4]],\"type\":\"LineString\"}","poly":"{\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]],\"type\":\"Polygon\"}","multipoint":"{\"coordinates\":[[1,2]],\"type\":\"MultiPoint\"}","multiline":"{\"coordinates\":[[[1,2],[3,4]]],\"type\":\"MultiLineString\"}","multipoly":"{\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]],\"type\":\"MultiPolygon\"}","collection":"{\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}],\"type\":\"GeometryCollection\"}"}}}"###
         );
 
         Ok(())
@@ -507,14 +507,14 @@ mod mysql {
           run_query!(&runner, r#"mutation {
           createOneModel(
             data: {
-              geometry: "{\"type\": \"Point\", \"coordinates\" :[1,2]}"
-              point: "{\"type\": \"Point\", \"coordinates\" :[1,2]}"
-              line: "{\"type\": \"LineString\", \"coordinates\" :[[1,2],[3,4]]}"
-              poly: "{\"type\": \"Polygon\", \"coordinates\" :[[[1,2],[3,4],[5,6],[1,2]]]}"
-              multipoint: "{\"type\": \"MultiPoint\", \"coordinates\" :[[1,2]]}"
-              multiline: "{\"type\": \"MultiLineString\", \"coordinates\" :[[[1,2],[3,4]]]}"
-              multipoly: "{\"type\": \"MultiPolygon\", \"coordinates\" :[[[[1,2],[3,4],[5,6],[1,2]]]]}"
-              collection: "{\"type\": \"GeometryCollection\",\"geometries\" :[{\"type\": \"Point\", \"coordinates\" :[1,2]}]}"
+              geometry: "{\"type\":\"Point\",\"coordinates\" :[1,2]}"
+              point: "{\"type\":\"Point\",\"coordinates\" :[1,2]}"
+              line: "{\"type\":\"LineString\",\"coordinates\" :[[1,2],[3,4]]}"
+              poly: "{\"type\":\"Polygon\",\"coordinates\" :[[[1,2],[3,4],[5,6],[1,2]]]}"
+              multipoint: "{\"type\":\"MultiPoint\",\"coordinates\" :[[1,2]]}"
+              multiline: "{\"type\":\"MultiLineString\",\"coordinates\" :[[[1,2],[3,4]]]}"
+              multipoly: "{\"type\":\"MultiPolygon\",\"coordinates\" :[[[[1,2],[3,4],[5,6],[1,2]]]]}"
+              collection: "{\"type\":\"GeometryCollection\",\"geometries\" :[{\"type\":\"Point\",\"coordinates\" :[1,2]}]}"
             }
           ) {
             geometry,
@@ -527,7 +527,7 @@ mod mysql {
             collection
           }
         }"#),
-          @r###"{"data":{"createOneModel":{"geometry":"{\"type\": \"Point\", \"coordinates\": [1,2]}","point":"{\"type\": \"Point\", \"coordinates\": [1,2]}","line":"{\"type\": \"LineString\", \"coordinates\": [[1,2],[3,4]]}","poly":"{\"type\": \"Polygon\", \"coordinates\": [[[1,2],[3,4],[5,6],[1,2]]]}","multipoint":"{\"type\": \"MultiPoint\", \"coordinates\": [[1,2]]}","multiline":"{\"type\": \"MultiLineString\", \"coordinates\": [[[1,2],[3,4]]]}","multipoly":"{\"type\": \"MultiPolygon\", \"coordinates\": [[[[1,2],[3,4],[5,6],[1,2]]]]}","collection":"{\"type\": \"GeometryCollection\", \"geometries\": [{\"type\": \"Point\", \"coordinates\": [1,2]}]}"}}}"###
+          @r###"{"data":{"createOneModel":{"geometry":"{\"type\":\"Point\",\"coordinates\":[1,2]}","point":"{\"type\":\"Point\",\"coordinates\":[1,2]}","line":"{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}","poly":"{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}","multipoint":"{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}","multiline":"{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}","multipoly":"{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}","collection":"{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"}}}"###
         );
 
         Ok(())

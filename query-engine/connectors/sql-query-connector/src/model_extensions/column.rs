@@ -99,6 +99,7 @@ impl AsColumn for ScalarField {
             .native_column_type(self.native_type().map(|nt| nt.name()))
             .set_is_enum(self.type_identifier().is_enum())
             .set_is_list(self.is_list())
+            .set_is_geometry(self.type_identifier().is_geometry())
             .default(quaint::ast::DefaultValue::Generated)
     }
 }

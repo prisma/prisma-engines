@@ -139,6 +139,11 @@ impl crate::datamodel_connector::NativeTypeArguments for GeometryParams {
     const REQUIRED_ARGUMENTS_COUNT: usize = 2;
 
     fn from_parts(parts: &[String]) -> Option<Self> {
+        // GeometryParams is used in Postgres, Cockroach and SQlite. For the three of them,
+        // the database type for the primsa Geometry type is db.Geometry(Geometry, 0).
+        // We don't want to force the users to think about what SRID they should choose
+        // in case they're only interested in setting the geometry type, so in such
+        // case we manually set the SRID to 0 here.
         match parts {
             [geom] => GeometryType::from_str(geom).ok().map(|ty| Self { type_: ty, srid: 0 }),
             [geom, srid] => GeometryType::from_str(geom)
@@ -149,9 +154,6 @@ impl crate::datamodel_connector::NativeTypeArguments for GeometryParams {
     }
 
     fn to_parts(&self) -> Vec<String> {
-        match self.srid {
-            0 => vec![self.type_.to_string()],
-            srid => vec![self.type_.to_string(), srid.to_string()],
-        }
+        vec![self.type_.to_string(), self.srid.to_string()]
     }
 }
