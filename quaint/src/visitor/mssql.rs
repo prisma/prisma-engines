@@ -22,7 +22,7 @@ pub struct Mssql<'a> {
     order_by_set: bool,
 }
 
-fn get_geometry_srid(geom: &geojson::Geometry) -> Option<i32> {
+fn get_geojson_srid(geom: &geojson::Geometry) -> Option<i32> {
     geom.foreign_members
         .as_ref()?
         .get("crs")?
@@ -37,8 +37,8 @@ fn get_geometry_srid(geom: &geojson::Geometry) -> Option<i32> {
         .ok()
 }
 
-fn geojson_to_wkt_srid(geometry: &geojson::Geometry) -> crate::Result<(String, i32)> {
-    let srid = get_geometry_srid(geometry)
+fn get_wkt_srid_from_geojson(geometry: &geojson::Geometry) -> crate::Result<(String, i32)> {
+    let srid = get_geojson_srid(geometry)
         .ok_or_else(|| Error::builder(ErrorKind::QueryInvalidInput("Invalid SRID in GeoJSON CRS".into())).build())?;
     let wkt = geozero::geojson::GeoJsonString(geometry.to_string()).to_wkt()?;
     Ok((wkt, srid))
@@ -278,12 +278,12 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     }
 
     fn visit_parameterized_geometry(&mut self, geometry: geojson::Geometry) -> visitor::Result {
-        let (wkt, srid) = geojson_to_wkt_srid(&geometry)?;
+        let (wkt, srid) = get_wkt_srid_from_geojson(&geometry)?;
         self.visit_function(geom_from_text(wkt, Some(srid), false))
     }
 
     fn visit_parameterized_geography(&mut self, geometry: geojson::Geometry) -> visitor::Result {
-        let (wkt, srid) = geojson_to_wkt_srid(&geometry)?;
+        let (wkt, srid) = get_wkt_srid_from_geojson(&geometry)?;
         self.visit_function(geom_from_text(wkt, Some(srid), true))
     }
 
@@ -455,8 +455,14 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             // Style 3 is keep all whitespace + internal DTD processing:
             // https://docs.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?redirectedfrom=MSDN&view=sql-server-ver15#xml-styles
             ValueType::Xml(cow) => cow.map(|cow| self.write(format!("CONVERT(XML, N'{cow}', 3)"))),
-            ValueType::Geometry(geojson) => geojson.map(|g| self.visit_function(geom_from_geojson(g.to_string()))),
-            ValueType::Geography(geojson) => geojson.map(|g| self.visit_function(geom_from_geojson(g.to_string()))),
+            ValueType::Geometry(geojson) => geojson.map(|g| {
+                let (wkt, srid) = get_wkt_srid_from_geojson(&g)?;
+                self.visit_function(geom_from_text(wkt.raw(), Some(srid.raw()), false))
+            }),
+            ValueType::Geography(geojson) => geojson.map(|g| {
+                let (wkt, srid) = get_wkt_srid_from_geojson(&g)?;
+                self.visit_function(geom_from_text(wkt.raw(), Some(srid.raw()), false))
+            }),
         };
 
         match res {

@@ -240,7 +240,7 @@ pub trait Visitor<'a> {
             ValueType::EnumArray(Some(variants), name) => self.visit_parameterized_enum_array(variants, name),
             ValueType::Text(txt) => self.visit_parameterized_text(txt, value.native_column_type),
             ValueType::Geometry(Some(geometry)) => self.visit_parameterized_geometry(geometry),
-            ValueType::Geography(Some(geometry)) => self.visit_parameterized_geometry(geometry),
+            ValueType::Geography(Some(geography)) => self.visit_parameterized_geography(geography),
             ValueType::Geometry(None) | ValueType::Geography(None) => self.write("NULL"),
             _ => {
                 self.add_parameter(value);

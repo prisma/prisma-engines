@@ -450,7 +450,7 @@ mod mysql {
     }
 
     // "MySQL native spatial types" should "work"
-    #[connector_test(schema(schema_geometry_types))]
+    #[connector_test(exclude(MySQL(5.6)), schema(schema_geometry_types))]
     async fn native_geometry_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {

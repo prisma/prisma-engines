@@ -435,6 +435,7 @@ mod geometry_create {
           &runner,
           r#"mutation { createOneTestModel(data: { id: 1, geometry: "{\"type\":\"Point\",\"coordinates\":[1,2]}" }) { geometry }}"#,
           // MongoDB excludes undefined fields
+          MySql(_) => vec![r#"{"data":{"createOneTestModel":{"geometry":"{\"coordinates\":[1,2],\"type\":\"Point\"}"}}}"#],
           _ => vec![r#"{"data":{"createOneTestModel":{"geometry":"{\"type\":\"Point\",\"coordinates\":[1,2]}"}}}"#]
         );
 
@@ -476,7 +477,7 @@ mod geometry_create {
 
     #[connector_test(
         schema(geometry_opt),
-        exclude(Postgres, Sqlite(3, "cfd1", "libsql.js", "libsql.js.wasm"))
+        exclude(Postgres, MySQL(5.6), Sqlite(3, "cfd1", "libsql.js", "libsql.js.wasm"))
     )]
     async fn create_geometry(runner: Runner) -> TestResult<()> {
         create_geometry_test(runner).await

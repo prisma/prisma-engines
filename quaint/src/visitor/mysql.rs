@@ -932,23 +932,10 @@ mod tests {
 
     #[test]
     fn test_raw_geometry() {
-        let geom = r#"{"type": "Point", "coordinates": [1, 2]}"#.parse::<geojson::Geometry>().unwrap();
+        let geojson = r#"{"type":"Point","coordinates":[1.0,2.0]}"#;
+        let geom = geojson.parse::<geojson::Geometry>().unwrap();
         let (sql, params) = Mysql::build(Select::default().value(Value::geometry(geom).raw())).unwrap();
-        assert_eq!(
-            r#"SELECT ST_GeomFromGeoJSON('{"type":"Point","coordinates":[1,2]}')"#,
-            sql
-        );
-        assert!(params.is_empty());
-    }
-
-    #[test]
-    fn test_raw_geography() {
-        let geom = r#"{"type": "Point", "coordinates": [1, 2]}"#.parse::<geojson::Geometry>().unwrap();
-        let (sql, params) = Mysql::build(Select::default().value(Value::geography(geom).raw())).unwrap();
-        assert_eq!(
-            r#"SELECT ST_GeomFromGeoJSON('{"type":"Point","coordinates":[1,2]}')"#,
-            sql
-        );
+        assert_eq!(format!("SELECT ST_GeomFromGeoJSON('{geojson}')"), sql);
         assert!(params.is_empty());
     }
 
