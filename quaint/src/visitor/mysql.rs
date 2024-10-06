@@ -120,6 +120,15 @@ impl<'a> Mysql<'a> {
             _ => self.visit_expression(expr),
         }
     }
+
+    fn visit_geometry_from_geojson<E>(&mut self, geometry: E) -> visitor::Result
+    where
+        E: Into<Expression<'a>>,
+    {
+        self.surround_with("ST_GeomFromGeoJSON(", ")", |ref mut s| {
+            s.visit_expression(geometry.into())
+        })
+    }
 }
 
 impl<'a> Visitor<'a> for Mysql<'a> {
@@ -195,10 +204,10 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
             ValueType::Geometry(g) => g
                 .as_ref()
-                .map(|g| self.visit_function(geom_from_geojson(g.to_string().raw()))),
+                .map(|g| self.visit_geometry_from_geojson(g.to_string().raw())),
             ValueType::Geography(g) => g
                 .as_ref()
-                .map(|g| self.visit_function(geom_from_geojson(g.to_string().raw()))),
+                .map(|g| self.visit_geometry_from_geojson(g.to_string().raw())),
         };
 
         match res {
@@ -699,41 +708,23 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    fn visit_geom_as_text(&mut self, geom: GeomAsText<'a>) -> visitor::Result {
-        self.surround_with("CONCAT(", ")", |ref mut s| {
-            s.write("'SRID=',")?;
-            s.surround_with("ST_SRID(", ")", |ref mut s| {
-                s.visit_expression(*geom.expression.clone())
-            })?;
-            s.write(",';',")?;
-            s.surround_with("ST_AsText(", ")", |ref mut s| s.visit_expression(*geom.expression))?;
-            Ok(())
-        })
-    }
-
-    fn visit_geom_from_text(&mut self, geom: GeomFromText<'a>) -> visitor::Result {
-        self.surround_with("ST_GeomFromText(", ")", |ref mut s| {
-            s.visit_expression(*geom.wkt_expression)?;
-            if let Some(srid_expression) = geom.srid_expression {
-                s.write(",")?;
-                s.visit_expression(*srid_expression)?;
-            }
-            Ok(())
-        })
-    }
-
-    fn visit_geom_as_geojson(&mut self, geom: GeomAsGeoJson<'a>) -> visitor::Result {
+    fn visit_geometry_column(&mut self, column: Column<'a>) -> visitor::Result {
         self.surround_with("ST_AsGeoJSON(", ")", |s| {
-            s.visit_expression(*geom.expression)?;
+            s.visit_column(column.clone().into_bare_with_table())?;
             s.write(", 15, 2")?;
             Ok(())
+        })?;
+        self.visit_alias(column.alias)
+    }
+
+    fn visit_parameterized_geometry(&mut self, geometry: geojson::Geometry) -> visitor::Result {
+        self.surround_with("ST_GeomFromGeoJSON(", ")", |ref mut s| {
+            s.visit_expression(geometry.to_string().into())
         })
     }
 
-    fn visit_geom_from_geojson(&mut self, geom: GeomFromGeoJson<'a>) -> visitor::Result {
-        self.surround_with("ST_GeomFromGeoJSON(", ")", |ref mut s| {
-            s.visit_expression(*geom.expression)
-        })
+    fn visit_parameterized_geography(&mut self, geometry: geojson::Geometry) -> visitor::Result {
+        self.visit_parameterized_geometry(geometry)
     }
 }
 

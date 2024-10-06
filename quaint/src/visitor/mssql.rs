@@ -6,6 +6,7 @@ use crate::prelude::{JsonArrayAgg, JsonBuildObject, JsonExtract, JsonType, JsonU
 use crate::{
     ast::*,
     error::{Error, ErrorKind},
+    geometry::get_geometry_srid,
     prelude::{Aliasable, Average, Query},
     visitor, Value, ValueType,
 };
@@ -22,23 +23,8 @@ pub struct Mssql<'a> {
     order_by_set: bool,
 }
 
-fn get_geojson_srid(geom: &geojson::Geometry) -> Option<i32> {
-    geom.foreign_members
-        .as_ref()?
-        .get("crs")?
-        .as_object()?
-        .get("properties")?
-        .as_object()?
-        .get("name")?
-        .as_str()?
-        .rsplit_once(":")?
-        .1
-        .parse()
-        .ok()
-}
-
 fn get_wkt_srid_from_geojson(geometry: &geojson::Geometry) -> crate::Result<(String, i32)> {
-    let srid = get_geojson_srid(geometry).unwrap_or(4326);
+    let srid = get_geometry_srid(geometry).unwrap_or(4326);
     let wkt = geozero::geojson::GeoJsonString(geometry.to_string()).to_wkt()?;
     Ok((wkt, srid))
 }
@@ -212,6 +198,20 @@ impl<'a> Mssql<'a> {
         self.surround_with(".STEquals(", ")", |s| s.visit_expression(right))?;
         self.write(if not { " = 0" } else { " = 1" })
     }
+
+    fn visit_geometry_from_wkt_srid<G, S>(&mut self, wkt: G, srid: S, geography: bool) -> visitor::Result
+    where
+        G: Into<Expression<'a>>,
+        S: Into<Expression<'a>>,
+    {
+        self.write(if geography { "geography" } else { "geometry" })?;
+        self.surround_with("::STGeomFromText(", ")", |ref mut s| {
+            s.visit_expression(wkt.into())?;
+            s.write(",")?;
+            s.visit_expression(srid.into())?;
+            Ok(())
+        })
+    }
 }
 
 impl<'a> Visitor<'a> for Mssql<'a> {
@@ -278,12 +278,12 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
     fn visit_parameterized_geometry(&mut self, geometry: geojson::Geometry) -> visitor::Result {
         let (wkt, srid) = get_wkt_srid_from_geojson(&geometry)?;
-        self.visit_function(geom_from_text(wkt, Some(srid), false))
+        self.visit_geometry_from_wkt_srid(wkt, srid, false)
     }
 
     fn visit_parameterized_geography(&mut self, geometry: geojson::Geometry) -> visitor::Result {
         let (wkt, srid) = get_wkt_srid_from_geojson(&geometry)?;
-        self.visit_function(geom_from_text(wkt, Some(srid), true))
+        self.visit_geometry_from_wkt_srid(wkt, srid, true)
     }
 
     /// A point to modify an incoming query to make it compatible with the
@@ -456,11 +456,11 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             ValueType::Xml(cow) => cow.map(|cow| self.write(format!("CONVERT(XML, N'{cow}', 3)"))),
             ValueType::Geometry(geojson) => geojson.map(|g| {
                 let (wkt, srid) = get_wkt_srid_from_geojson(&g)?;
-                self.visit_function(geom_from_text(wkt.raw(), Some(srid.raw()), false))
+                self.visit_geometry_from_wkt_srid(wkt.raw(), srid.raw(), false)
             }),
             ValueType::Geography(geojson) => geojson.map(|g| {
                 let (wkt, srid) = get_wkt_srid_from_geojson(&g)?;
-                self.visit_function(geom_from_text(wkt.raw(), Some(srid.raw()), true))
+                self.visit_geometry_from_wkt_srid(wkt.raw(), srid.raw(), true)
             }),
         };
 
@@ -852,40 +852,20 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
     fn visit_geometry_column(&mut self, column: Column<'a>) -> visitor::Result {
         // SQL Server does not support GeoJSON, so we return EWKT instead
-        self.visit_function(geom_as_text(column))
-    }
-
-    fn visit_geom_as_text(&mut self, geom: GeomAsText<'a>) -> visitor::Result {
+        let column = column.into_bare_with_table();
         self.write("CASE WHEN ")?;
-        self.visit_expression(*geom.expression.clone())?;
+        self.visit_column(column.clone())?;
         self.write("IS NULL THEN NULL ELSE ")?;
         self.surround_with("CONCAT(", ")", |ref mut s| {
             s.write("'SRID=',")?;
-            s.surround_with("(", ").STSrid", |ref mut s| {
-                s.visit_expression(*geom.expression.clone())
-            })?;
+            s.surround_with("(", ").STSrid", |ref mut s| s.visit_column(column.clone()))?;
             s.write(",';',")?;
-            s.surround_with("CAST(", " AS VARCHAR(MAX))", |ref mut s| {
-                s.visit_expression(*geom.expression)
-            })?;
+            s.surround_with("CAST(", " AS VARCHAR(MAX))", |ref mut s| s.visit_column(column.clone()))?;
             Ok(())
         })?;
         self.write("END")?;
+        self.visit_alias(column.alias)?;
         Ok(())
-    }
-
-    fn visit_geom_from_text(&mut self, geom: GeomFromText<'a>) -> visitor::Result {
-        self.write(if geom.geography { "geography" } else { "geometry" })?;
-        self.surround_with("::STGeomFromText(", ")", |ref mut s| {
-            s.visit_expression(*geom.wkt_expression)?;
-            s.write(",")?;
-            if geom.geography {
-                s.visit_expression(*geom.srid_expression.unwrap_or_else(|| Box::new(4326.into())))?;
-            } else {
-                s.visit_expression(*geom.srid_expression.unwrap_or_else(|| Box::new(0.into())))?;
-            }
-            Ok(())
-        })
     }
 }
 

@@ -66,7 +66,7 @@ impl ScalarFieldExt for ScalarField {
                 // To facilitate geometry insertion, We manually set the GeoJSON CRS field
                 // to the column constrained SRID if the latter is set to 4326 (the default)
                 // or "unknown" (0 or -1). If there is no contraint at all, set it to 4326
-                // anyway for conistency's sake, and also because SQL Server requires one
+                // anyway for consistency's sake, and also because SQL Server requires one
                 // in order to create a geometry
                 let geometry_crs = geometry.foreign_members.as_ref().and_then(|m| get_geometry_crs(m));
                 if geometry_crs.is_none() && matches!(column_srid, None | Some(-1 | 0 | 4326)) {

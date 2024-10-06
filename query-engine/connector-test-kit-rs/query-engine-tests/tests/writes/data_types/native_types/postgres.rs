@@ -542,8 +542,9 @@ mod postgres {
         db_schemas("public", "test")
     )]
     async fn native_geography_srid(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
+        match_connector_result!(
+          &runner,
+          r#"mutation {
           createOneModel(
             data: {
               geography: "{\"type\":\"Point\",\"coordinates\":[1,2],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}}}"
@@ -565,8 +566,9 @@ mod postgres {
             geography_multipoly
             geography_collection
           }
-        }"#),
-            @r###"{"data":{"createOneModel":{"geography":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geography_point":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geography_line":"{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}","geography_poly":"{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}","geography_multipoint":"{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}","geography_multiline":"{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}","geography_multipoly":"{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}","geography_collection":"{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"}}}"###
+        }"#,
+          CockroachDb(_) => r###"{"data":{"createOneModel":{"geography":"{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}},\"coordinates\":[1,2]}","geography_point":"{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}},\"coordinates\":[1,2]}","geography_line":"{\"type\":\"LineString\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}},\"coordinates\":[[1,2],[3,4]]}","geography_poly":"{\"type\":\"Polygon\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}},\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}","geography_multipoint":"{\"type\":\"MultiPoint\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}},\"coordinates\":[[1,2]]}","geography_multiline":"{\"type\":\"MultiLineString\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}},\"coordinates\":[[[1,2],[3,4]]]}","geography_multipoly":"{\"type\":\"MultiPolygon\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}},\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}","geography_collection":"{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}},\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"}}}"###,
+          _ => r###"{"data":{"createOneModel":{"geography":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geography_point":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geography_line":"{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}","geography_poly":"{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}","geography_multipoint":"{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}","geography_multiline":"{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}","geography_multipoly":"{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}","geography_collection":"{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"}}}"###
         );
 
         Ok(())

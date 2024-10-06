@@ -258,7 +258,6 @@ impl<'a> ExpressionKind<'a> {
                 ..
             })) => true,
             Self::Column(c) if c.is_geometry => true,
-            Self::Function(f) => f.returns_geometry(),
             Self::Value(expr) => expr.is_geometry_expr(),
             _ => false,
         }

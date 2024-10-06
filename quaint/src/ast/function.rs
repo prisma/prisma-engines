@@ -17,11 +17,6 @@ mod search;
 mod sum;
 mod upper;
 
-mod geom_as_geojson;
-mod geom_as_text;
-mod geom_from_geojson;
-mod geom_from_text;
-
 mod uuid;
 
 pub use aggregate_to_string::*;
@@ -43,11 +38,6 @@ pub use search::*;
 pub use sum::*;
 pub use upper::*;
 
-pub use geom_as_geojson::*;
-pub use geom_as_text::*;
-pub use geom_from_geojson::*;
-pub use geom_from_text::*;
-
 pub use self::uuid::*;
 
 use super::{Aliasable, Expression};
@@ -68,12 +58,6 @@ impl<'a> Function<'a> {
                 | FunctionType::JsonExtract(_)
                 | FunctionType::JsonExtractLastArrayElem(_)
                 | FunctionType::JsonExtractFirstArrayElem(_)
-        )
-    }
-    pub fn returns_geometry(&self) -> bool {
-        matches!(
-            self.typ_,
-            FunctionType::GeomFromText(_) | FunctionType::GeomFromGeoJson(_)
         )
     }
 }
@@ -104,10 +88,6 @@ pub(crate) enum FunctionType<'a> {
     UuidToBin,
     UuidToBinSwapped,
     Uuid,
-    GeomAsText(GeomAsText<'a>),
-    GeomFromText(GeomFromText<'a>),
-    GeomAsGeoJson(GeomAsGeoJson<'a>),
-    GeomFromGeoJson(GeomFromGeoJson<'a>),
 }
 
 impl<'a> Aliasable<'a> for Function<'a> {
@@ -153,6 +133,3 @@ function!(
     Coalesce,
     Concat
 );
-
-function!(GeomAsText, GeomFromText);
-function!(GeomAsGeoJson, GeomFromGeoJson);

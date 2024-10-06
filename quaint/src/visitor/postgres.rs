@@ -1,5 +1,6 @@
 use crate::{
     ast::*,
+    geometry::get_geometry_srid,
     visitor::{self, Visitor},
 };
 use itertools::Itertools;
@@ -42,6 +43,39 @@ impl<'a> Postgres<'a> {
             }
         }
         Ok(())
+    }
+
+    fn visit_geometry_from_geojson<G, S>(&mut self, geometry: G, srid: Option<S>) -> visitor::Result
+    where
+        G: Into<Expression<'a>>,
+        S: Into<Expression<'a>>,
+    {
+        // We shouldn't have to do that but are forced to because CockroachDb doesn't parse the CRS information
+        // from the geojson string like PostGIS does. (https://github.com/cockroachdb/cockroach/issues/132046)
+
+        if let Some(srid) = srid {
+            self.surround_with("ST_SetSRID(", ")", |s| {
+                s.visit_geometry(geometry.into())?;
+                s.write(",")?;
+                s.visit_expression(srid.into())?;
+                Ok(())
+            })
+        } else {
+            self.visit_geometry(geometry.into())
+        }
+    }
+
+    fn visit_geography_from_geojson<G, S>(&mut self, geometry: G, srid: Option<S>) -> visitor::Result
+    where
+        G: Into<Expression<'a>>,
+        S: Into<Expression<'a>>,
+    {
+        self.visit_geometry_from_geojson(geometry, srid)?;
+        self.write("::geography")
+    }
+
+    fn visit_geometry(&mut self, geometry: Expression<'a>) -> visitor::Result {
+        self.surround_with("ST_GeomFromGeoJSON(", ")", |ref mut s| s.visit_expression(geometry))
     }
 }
 
@@ -139,28 +173,27 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
     /// A database column identifier
     fn visit_column(&mut self, column: Column<'a>) -> visitor::Result {
-        let alias = column.alias.clone();
         if column.is_geometry && column.is_selected {
-            self.visit_geometry_column(column)?;
-        } else {
-            match column.table {
-                Some(table) => {
-                    self.visit_table(table, false)?;
-                    self.write(".")?;
-                    self.delimited_identifiers(&[&*column.name])?;
-                }
-                _ => self.delimited_identifiers(&[&*column.name])?,
-            };
-            if column.is_enum && column.is_selected {
-                if column.is_list {
-                    self.write("::text[]")?;
-                } else {
-                    self.write("::text")?;
-                }
+            return self.visit_geometry_column(column);
+        }
+
+        match column.table {
+            Some(table) => {
+                self.visit_table(table, false)?;
+                self.write(".")?;
+                self.delimited_identifiers(&[&*column.name])?;
+            }
+            _ => self.delimited_identifiers(&[&*column.name])?,
+        };
+        if column.is_enum && column.is_selected {
+            if column.is_list {
+                self.write("::text[]")?;
+            } else {
+                self.write("::text")?;
             }
         }
 
-        if let Some(alias) = alias {
+        if let Some(alias) = column.alias {
             self.write(" AS ")?;
             self.delimited_identifiers(&[&*alias])?;
         }
@@ -261,12 +294,14 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             ValueType::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
             ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
             ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
-            ValueType::Geometry(g) => g
-                .as_ref()
-                .map(|g| self.visit_function(geom_from_geojson(g.to_string().raw()))),
-            ValueType::Geography(g) => g
-                .as_ref()
-                .map(|g| self.visit_function(geom_from_geojson(g.to_string().raw()))),
+            ValueType::Geometry(geometry) => geometry.as_ref().map(|geometry| {
+                let srid = get_geometry_srid(geometry);
+                self.visit_geometry_from_geojson(geometry.to_string().raw(), srid.map(IntoRaw::raw))
+            }),
+            ValueType::Geography(geometry) => geometry.as_ref().map(|geometry| {
+                let srid = get_geometry_srid(geometry);
+                self.visit_geography_from_geojson(geometry.to_string().raw(), srid.map(IntoRaw::raw))
+            }),
         };
 
         match res {
@@ -788,33 +823,32 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    fn visit_geom_as_text(&mut self, geom: GeomAsText<'a>) -> visitor::Result {
-        self.surround_with("ST_AsEWKT(", ")", |s| s.visit_expression(*geom.expression))
-    }
-
-    fn visit_geom_from_text(&mut self, geom: GeomFromText<'a>) -> visitor::Result {
-        self.surround_with("ST_GeomFromText(", ")", |ref mut s| {
-            s.visit_expression(*geom.wkt_expression)?;
-            if let Some(srid_expression) = geom.srid_expression {
-                s.write(",")?;
-                s.visit_expression(*srid_expression)?;
-            }
-            Ok(())
-        })
-    }
-
-    fn visit_geom_as_geojson(&mut self, geom: GeomAsGeoJson<'a>) -> visitor::Result {
+    fn visit_geometry_column(&mut self, column: Column<'a>) -> visitor::Result {
         self.surround_with("ST_AsGeoJSON(", ")", |s| {
-            s.visit_expression(*geom.expression)?;
-            s.write(", 15")?;
+            s.visit_column(column.clone().into_bare_with_table())?;
+            s.write(", 15, 8")?;
+            Ok(())
+        })?;
+        self.visit_alias(column.alias)?;
+
+        Ok(())
+    }
+
+    fn visit_parameterized_geometry(&mut self, geometry: geojson::Geometry) -> visitor::Result {
+        let srid = get_geometry_srid(&geometry);
+        self.surround_with("ST_SetSRID(", ")", |s| {
+            s.visit_geometry_from_geojson(geometry.to_string(), srid)?;
+            s.write(",")?;
+            s.visit_expression(srid.into())?;
             Ok(())
         })
     }
 
-    fn visit_geom_from_geojson(&mut self, geom: GeomFromGeoJson<'a>) -> visitor::Result {
-        self.surround_with("ST_GeomFromGeoJSON(", ")", |ref mut s| {
-            s.visit_expression(*geom.expression)
-        })
+    fn visit_parameterized_geography(&mut self, geometry: geojson::Geometry) -> visitor::Result {
+        self.visit_parameterized_geometry(geometry)?;
+        self.write("::geography")?;
+
+        Ok(())
     }
 }
 
@@ -1235,10 +1269,20 @@ mod tests {
 
     #[test]
     fn test_raw_geometry() {
-        let geojson = r#"{"type":"Point","coordinates":[1.0,2.0]}"#;
+        let geojson =
+            r#"{"type":"Point","coordinates":[1.0,2.0],"crs":{"type":"name","properties":{"name":"EPSG:3857"}}}"#;
         let geom = geojson.parse::<geojson::Geometry>().unwrap();
         let (sql, params) = Postgres::build(Select::default().value(Value::geometry(geom).raw())).unwrap();
-        assert_eq!(format!("SELECT ST_GeomFromGeoJSON('{geojson}')"), sql);
+        assert_eq!(format!("SELECT ST_SetSRID(ST_GeomFromGeoJSON('{geojson}'),3857)"), sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_geography() {
+        let geojson = r#"{"type":"Point","coordinates":[1.0,2.0]}"#;
+        let geom = geojson.parse::<geojson::Geometry>().unwrap();
+        let (sql, params) = Postgres::build(Select::default().value(Value::geography(geom).raw())).unwrap();
+        assert_eq!(format!("SELECT ST_GeomFromGeoJSON('{geojson}')::geography"), sql);
         assert!(params.is_empty());
     }
 

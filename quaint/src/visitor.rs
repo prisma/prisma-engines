@@ -137,18 +137,6 @@ pub trait Visitor<'a> {
 
     fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> Result;
 
-    fn visit_geom_as_text(&mut self, geom: GeomAsText<'a>) -> Result;
-
-    fn visit_geom_from_text(&mut self, geom: GeomFromText<'a>) -> Result;
-
-    fn visit_geom_as_geojson(&mut self, _geom: GeomAsGeoJson<'a>) -> Result {
-        unimplemented!("GeomAsGeoJson not supported for the underlying database.")
-    }
-
-    fn visit_geom_from_geojson(&mut self, _geom: GeomFromGeoJson<'a>) -> Result {
-        unimplemented!("GeomFromGeoJson not supported for the underlying database.")
-    }
-
     fn visit_geometry_type_equals(&mut self, left: Expression<'a>, right: GeometryType<'a>, not: bool) -> Result;
 
     fn visit_geometry_empty(&mut self, left: Expression<'a>, not: bool) -> Result {
@@ -225,13 +213,9 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
-    fn visit_parameterized_geometry(&mut self, geometry: geojson::Geometry) -> Result {
-        self.visit_function(geom_from_geojson(geometry.to_string()))
-    }
+    fn visit_parameterized_geometry(&mut self, geometry: geojson::Geometry) -> Result;
 
-    fn visit_parameterized_geography(&mut self, geometry: geojson::Geometry) -> Result {
-        self.visit_function(geom_from_geojson(geometry.to_string()))
-    }
+    fn visit_parameterized_geography(&mut self, geometry: geojson::Geometry) -> Result;
 
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: Value<'a>) -> Result {
@@ -680,12 +664,14 @@ pub trait Visitor<'a> {
             ExpressionKind::Default => self.write("DEFAULT")?,
         }
 
-        if let Some(alias) = value.alias {
-            self.write(" AS ")?;
+        self.visit_alias(value.alias)
+    }
 
+    fn visit_alias(&mut self, alias: Option<Cow<'a, str>>) -> Result {
+        if let Some(alias) = alias {
+            self.write(" AS ")?;
             self.delimited_identifiers(&[&*alias])?;
         };
-
         Ok(())
     }
 
@@ -728,42 +714,30 @@ pub trait Visitor<'a> {
         };
 
         if include_alias {
-            if let Some(alias) = table.alias {
-                self.write(" AS ")?;
-
-                self.delimited_identifiers(&[&*alias])?;
-            };
+            self.visit_alias(table.alias)?;
         }
 
         Ok(())
     }
 
-    fn visit_geometry_column(&mut self, mut column: Column<'a>) -> Result {
-        column.alias = None;
-        column.is_selected = false;
-        self.visit_function(geom_as_geojson(column))
-    }
+    fn visit_geometry_column(&mut self, column: Column<'a>) -> Result;
 
     /// A database column identifier
     fn visit_column(&mut self, column: Column<'a>) -> Result {
-        let alias = column.alias.clone();
         if column.is_geometry && column.is_selected {
-            self.visit_geometry_column(column)?;
-        } else {
-            match column.table {
-                Some(table) => {
-                    self.visit_table(table, false)?;
-                    self.write(".")?;
-                    self.delimited_identifiers(&[&*column.name])?;
-                }
-                _ => self.delimited_identifiers(&[&*column.name])?,
-            };
+            return self.visit_geometry_column(column);
         }
 
-        if let Some(alias) = alias {
-            self.write(" AS ")?;
-            self.delimited_identifiers(&[&*alias])?;
-        }
+        match column.table {
+            Some(table) => {
+                self.visit_table(table, false)?;
+                self.write(".")?;
+                self.delimited_identifiers(&[&*column.name])?;
+            }
+            _ => self.delimited_identifiers(&[&*column.name])?,
+        };
+
+        self.visit_alias(column.alias)?;
 
         Ok(())
     }
@@ -1216,18 +1190,6 @@ pub trait Visitor<'a> {
             }
             FunctionType::JsonBuildObject(build_obj) => {
                 self.visit_json_build_object(build_obj)?;
-            }
-            FunctionType::GeomAsText(geom) => {
-                self.visit_geom_as_text(geom)?;
-            }
-            FunctionType::GeomFromText(geom) => {
-                self.visit_geom_from_text(geom)?;
-            }
-            FunctionType::GeomAsGeoJson(geom) => {
-                self.visit_geom_as_geojson(geom)?;
-            }
-            FunctionType::GeomFromGeoJson(geom) => {
-                self.visit_geom_from_geojson(geom)?;
             }
         };
 

@@ -86,6 +86,14 @@ impl<'a> Column<'a> {
         }
     }
 
+    pub(crate) fn into_bare_with_table(self) -> Self {
+        Self {
+            name: self.name,
+            table: self.table,
+            ..Default::default()
+        }
+    }
+
     /// Sets the default value for the column.
     pub fn default<V>(mut self, value: V) -> Self
     where
