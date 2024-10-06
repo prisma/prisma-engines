@@ -390,7 +390,7 @@ mod sql_server {
               geog
             }
           }"#),
-          @r###"{"data":{"createOneModel":{"xml":"<meow>purr</meow>","uuid":"ab309dfd-d041-4110-b162-75d7b95fe989","geom":"{\"type\": \"Point\", \"coordinates\": [1,2]}","geog":"{\"type\": \"Point\", \"coordinates\": [1,2]}"}}}"###
+          @r###"{"data":{"createOneModel":{"xml":"<meow>purr</meow>","uuid":"ab309dfd-d041-4110-b162-75d7b95fe989","geom":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geog":"{\"type\":\"Point\",\"coordinates\":[1,2]}"}}}"###
         );
 
         Ok(())
