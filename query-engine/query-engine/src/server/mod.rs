@@ -14,7 +14,7 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Instant;
 use telemetry::capturing::Capturer;
-use telemetry::helpers::TraceParent;
+use telemetry::helpers::{TraceParent, TraceParentExtractor};
 use tracing::{Instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
@@ -409,18 +409,36 @@ async fn setup_telemetry(
         let requester_traceparent = TraceParent::from_remote_context(&parent_context);
         span.set_parent(parent_context);
         requester_traceparent
-    } else if let Some(tx_id) = &tx_id {
-        // Note: we don't set transaction traceparent as a parent for `prisma:engine` span.
-        // A span that represents transaction traceparent is completely artificial and it's never
-        // emitted. Thus, setting it as a parent to a valid span would produce a broken trace. The
-        // only reason why we construct this artificial traceparent is to correlate logs from
-        // different operations within the same transaction. For the same reason we don't construct
-        // this artificial traceparent if capturing logs and traces is disabled.
-        if capture_settings.is_enabled() {
-            Some(tx_id.as_traceparent())
-        } else {
-            None
-        }
+    } else if capture_settings.is_enabled() {
+        // If tracing is disabled on the client but capturing the logs is enabled, we construct an
+        // artificial traceparent. Although the span corresponding to this traceparent doesn't
+        // actually exist, it is okay because no spans will be returned to the client in this case
+        // anyway, so they don't have to be valid. The reason we need this is because capturing the
+        // logs requires a trace ID to correlate the events with. This is not the right design: it
+        // seems to be based on the wrong idea that trace ID uniquely identifies a request (which
+        // is not the case in reality), and it is prone to race conditions and losing spans and
+        // logs when there are multiple concurrent Prisma operations in a single trace. Ironically,
+        // this makes log capturing more reliable in the code path with the fake traceparent hack
+        // than when a real traceparent is present. The drawback is that the fake traceparent leaks
+        // to the query logs. We could of course add a custom flag to `TraceParent` to indicate
+        // that it is synthetic (we can't use the sampled trace flag for it as it would prevent it
+        // from being processed by the `SpanProcessor`) and check it when adding the traceparent
+        // comment if we wanted a quick fix for that, but this problem existed for as long as
+        // capturing was implemented, and the `DataProxyEngine` works around it by stripping the
+        // phony traceparent comments before emitting the logs on the `PrismaClient` instance. So
+        // instead, we will fix the root cause of the problem by reworking the capturer to collect
+        // all spans and events which have the `span` created above as an ancestor and not rely on
+        // trace IDs at all. This will happen in a follow-up PR as part of Tracing GA work.
+        //
+        // TODO: for now, while this mechanism exists, just generate a random traceparent
+        // unconditionally, we already shouldn't need the transaction IDs here anymore even in the
+        // case of transactions.
+        let traceparent = tx_id.clone().unwrap_or_default().as_traceparent();
+        let context = opentelemetry::global::get_text_map_propagator(|propagator| {
+            propagator.extract(&TraceParentExtractor::new(traceparent))
+        });
+        span.set_parent(context);
+        Some(traceparent)
     } else {
         None
     };

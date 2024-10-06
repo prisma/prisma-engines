@@ -1,6 +1,7 @@
 use super::models::TraceSpan;
 use derive_more::Display;
 use once_cell::sync::Lazy;
+use opentelemetry::propagation::Extractor;
 use opentelemetry::sdk::export::trace::SpanData;
 use opentelemetry::trace::{SpanId, TraceContextExt, TraceFlags, TraceId};
 use serde_json::{json, Value};
@@ -72,6 +73,30 @@ impl TraceParent {
         let mut extractor = HashMap::new();
         extractor.insert("traceparent".to_string(), self.to_string());
         opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&extractor))
+    }
+}
+
+/// An extractor to use with `TraceContextPropagator`. It allows to avoid creating a full `HashMap`
+/// to convert a `TraceParent` to a `Context`.
+pub struct TraceParentExtractor(String);
+
+impl TraceParentExtractor {
+    pub fn new(traceparent: TraceParent) -> Self {
+        Self(traceparent.to_string())
+    }
+}
+
+impl Extractor for TraceParentExtractor {
+    fn get(&self, key: &str) -> Option<&str> {
+        if key == "traceparent" {
+            Some(&self.0)
+        } else {
+            None
+        }
+    }
+
+    fn keys(&self) -> Vec<&str> {
+        vec!["traceparent"]
     }
 }
 
