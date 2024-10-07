@@ -156,7 +156,7 @@ pub use manager::*;
 use crate::error::NativeErrorKind;
 
 use crate::{
-    connector::{ConnectionInfo, MakeTlsConnectorManager},
+    connector::ConnectionInfo,
     error::{Error, ErrorKind},
 };
 use mobc::Pool;
@@ -425,7 +425,7 @@ impl Quaint {
                 let max_connection_lifetime = url.max_connection_lifetime();
                 let max_idle_connection_lifetime = url.max_idle_connection_lifetime();
 
-                let tls_manager = MakeTlsConnectorManager::new(url.clone());
+                let tls_manager = crate::connector::MakeTlsConnectorManager::new(url.clone());
                 let manager = QuaintManager::Postgres { url, tls_manager };
                 let mut builder = Builder::new(s, manager)?;
 
