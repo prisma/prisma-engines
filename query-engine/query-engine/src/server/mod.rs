@@ -14,7 +14,7 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Instant;
 use telemetry::capturing::Capturer;
-use telemetry::helpers::{TraceParent, TraceParentExtractor};
+use telemetry::helpers::TraceParent;
 use tracing::{Instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
@@ -426,10 +426,7 @@ async fn setup_telemetry(span: Span, headers: &HeaderMap) -> (Span, Option<Trace
             #[allow(deprecated)]
             TraceParent::new_random()
         };
-        let context = opentelemetry::global::get_text_map_propagator(|propagator| {
-            propagator.extract(&TraceParentExtractor::new(traceparent))
-        });
-        span.set_parent(context);
+        span.set_parent(traceparent.to_remote_context());
         Some(traceparent)
     } else {
         None
