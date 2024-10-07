@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 pub fn get_geometry_srid(geom: &geojson::Geometry) -> Option<i32> {
     geom.foreign_members
         .as_ref()?
