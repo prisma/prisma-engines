@@ -839,7 +839,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         self.surround_with("ST_SetSRID(", ")", |s| {
             s.visit_geometry_from_geojson(geometry.to_string(), srid)?;
             s.write(",")?;
-            s.visit_expression(srid.into())?;
+            s.visit_parameterized(srid.into())?;
             Ok(())
         })
     }

@@ -640,8 +640,8 @@ impl<'a> fmt::Display for ValueType<'a> {
             ValueType::DateTime(val) => val.map(|v| write!(f, "\"{v}\"")),
             ValueType::Date(val) => val.map(|v| write!(f, "\"{v}\"")),
             ValueType::Time(val) => val.map(|v| write!(f, "\"{v}\"")),
-            ValueType::Geometry(val) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
-            ValueType::Geography(val) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
+            ValueType::Geometry(val) => val.as_ref().map(|v| write!(f, "{v}")),
+            ValueType::Geography(val) => val.as_ref().map(|v| write!(f, "{v}")),
         };
 
         match res {
@@ -700,8 +700,8 @@ impl<'a> From<ValueType<'a>> for serde_json::Value {
             ValueType::DateTime(dt) => dt.map(|dt| serde_json::Value::String(dt.to_rfc3339())),
             ValueType::Date(date) => date.map(|date| serde_json::Value::String(format!("{date}"))),
             ValueType::Time(time) => time.map(|time| serde_json::Value::String(format!("{time}"))),
-            ValueType::Geometry(g) => g.map(|g| serde_json::Value::String(g.to_string())),
-            ValueType::Geography(g) => g.map(|g| serde_json::Value::String(g.to_string())),
+            ValueType::Geometry(g) => g.map(|g| geojson::GeoJson::Geometry(g).into()),
+            ValueType::Geography(g) => g.map(|g| geojson::GeoJson::Geometry(g).into()),
         };
 
         match res {

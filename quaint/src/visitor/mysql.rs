@@ -719,7 +719,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
     fn visit_parameterized_geometry(&mut self, geometry: geojson::Geometry) -> visitor::Result {
         self.surround_with("ST_GeomFromGeoJSON(", ")", |ref mut s| {
-            s.visit_expression(geometry.to_string().into())
+            s.visit_parameterized(geometry.to_string().into())
         })
     }
 
