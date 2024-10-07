@@ -113,7 +113,7 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
     let headers = req.headers();
     let tx_id = try_get_transaction_id(headers);
     let (span, traceparent, capturer) =
-        setup_telemetry(info_span!("prisma:engine:query", user_facing = true), headers, &tx_id).await;
+        setup_telemetry(info_span!("prisma:engine:query", user_facing = true), headers).await;
 
     let buffer = hyper::body::to_bytes(req.into_body()).await?;
     let request_body = RequestBody::try_from_slice(buffer.as_ref(), cx.engine_protocol());
@@ -240,7 +240,6 @@ async fn transaction_start_handler(cx: Arc<PrismaContext>, req: Request<Body>) -
     let (span, _traceparent, capturer) = setup_telemetry(
         info_span!("prisma:engine:start_transaction", user_facing = true),
         &headers,
-        &tx_opts.new_tx_id,
     )
     .await;
 
@@ -275,7 +274,6 @@ async fn transaction_commit_handler(
     let (span, _traceparent, capturer) = setup_telemetry(
         info_span!("prisma:engine:commit_transaction", user_facing = true),
         req.headers(),
-        &Some(tx_id.clone()),
     )
     .await;
 
@@ -296,7 +294,6 @@ async fn transaction_rollback_handler(
     let (span, _traceparent, capturer) = setup_telemetry(
         info_span!("prisma:engine:rollback_transaction", user_facing = true),
         req.headers(),
-        &Some(tx_id.clone()),
     )
     .await;
 
@@ -379,11 +376,7 @@ fn err_to_http_resp(
     build_json_response(status, &err)
 }
 
-async fn setup_telemetry(
-    span: Span,
-    headers: &HeaderMap,
-    tx_id: &Option<TxId>,
-) -> (Span, Option<TraceParent>, Capturer) {
+async fn setup_telemetry(span: Span, headers: &HeaderMap) -> (Span, Option<TraceParent>, Capturer) {
     let capture_settings = {
         let settings = headers
             .get("X-capture-telemetry")
@@ -429,11 +422,10 @@ async fn setup_telemetry(
         // instead, we will fix the root cause of the problem by reworking the capturer to collect
         // all spans and events which have the `span` created above as an ancestor and not rely on
         // trace IDs at all. This will happen in a follow-up PR as part of Tracing GA work.
-        //
-        // TODO: for now, while this mechanism exists, just generate a random traceparent
-        // unconditionally, we already shouldn't need the transaction IDs here anymore even in the
-        // case of transactions.
-        let traceparent = tx_id.clone().unwrap_or_default().as_traceparent();
+        let traceparent = {
+            #[allow(deprecated)]
+            TraceParent::new_random()
+        };
         let context = opentelemetry::global::get_text_map_propagator(|propagator| {
             propagator.extract(&TraceParentExtractor::new(traceparent))
         });

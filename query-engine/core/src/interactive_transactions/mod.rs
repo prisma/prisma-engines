@@ -1,8 +1,5 @@
 use derive_more::Display;
-use opentelemetry::trace::{SpanId, TraceFlags, TraceId};
 use serde::Deserialize;
-
-use telemetry::helpers::TraceParent;
 
 mod error;
 mod manager;
@@ -16,44 +13,6 @@ pub(crate) use transaction::*;
 #[derive(Debug, Clone, Hash, Eq, PartialEq, Deserialize, Display)]
 #[display(fmt = "{}", _0)]
 pub struct TxId(String);
-
-impl TxId {
-    /// This method, as well as `as_span_id`, are intentionally private because it is very easy to
-    /// misuse them. Both are used to provide deterministic trace_id and span_id derived from the
-    /// transaction id. Both rely on the fact that transaction id is a valid cuid.
-    fn as_trace_id(&self) -> TraceId {
-        let mut buffer = [0; 16];
-        let tx_id = self.0.as_bytes();
-        let len = tx_id.len();
-
-        // The first byte of CUID is always letter 'c'. Next 8 bytes after that represent timestamp
-        // in milliseconds. Next 4 bytes after that represent the counter.
-        // We take last 4 bytes of the timestamp and combine it with the counter.
-        buffer[0..8].copy_from_slice(&tx_id[(1 + 4)..(1 + 4 + 8)]);
-        // Last 8 bytes of cuid are totally random.
-        buffer[8..].copy_from_slice(&tx_id[len - 8..]);
-
-        TraceId::from_bytes(buffer)
-    }
-
-    fn as_span_id(&self) -> SpanId {
-        let mut buffer = [0; 8];
-        let tx_id = self.0.as_bytes();
-        let len = tx_id.len();
-
-        // Last 8 bytes of cuid are totally random.
-        buffer[..].copy_from_slice(&tx_id[len - 8..]);
-
-        SpanId::from_bytes(buffer)
-    }
-
-    /// Creates new artificial `TraceParent`. The span corresponding to this traceparent is never
-    /// emitted. Same transaction id is guaranteed to have traceparent with the same trace_id and
-    /// span_id.
-    pub fn as_traceparent(&self) -> TraceParent {
-        TraceParent::new_unsafe(self.as_trace_id(), self.as_span_id(), TraceFlags::SAMPLED)
-    }
-}
 
 impl Default for TxId {
     fn default() -> Self {
@@ -80,31 +39,5 @@ where
             contents.len()
         );
         Self(contents)
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn test_txid_into_traceid() {
-        let fixture = vec![
-            ("clct0q6ma0000rb04768tiqbj", "71366d6130303030373638746971626a"),
-            // counter changed, trace id changed:
-            ("clct0q6ma0002rb04cpa6zkmx", "71366d6130303032637061367a6b6d78"),
-            // fingerprint changed, trace id did not change, as that chunk is ignored:
-            ("clct0q6ma00020000cpa6zkmx", "71366d6130303032637061367a6b6d78"),
-            // first 5 bytes changed, trace id did not change, as that chunk is ignored:
-            ("00000q6ma00020000cpa6zkmx", "71366d6130303032637061367a6b6d78"),
-            // 6 th byte changed, trace id changed, as that chunk is part of the lsb of the timestamp
-            ("0000006ma00020000cpa6zkmx", "30366d6130303032637061367a6b6d78"),
-        ];
-
-        for (txid, expected_trace_id) in fixture {
-            let txid: TxId = txid.into();
-            let trace_id: opentelemetry::trace::TraceId = txid.as_trace_id();
-            assert_eq!(trace_id.to_string(), expected_trace_id);
-        }
     }
 }
