@@ -15,14 +15,14 @@ pub(super) struct Connection(Mutex<rusqlite::Connection>);
 impl Connection {
     pub(super) fn new(params: &super::Params) -> ConnectorResult<Self> {
         let conn = rusqlite::Connection::open(&params.file_path).map_err(convert_error)?;
-        load_spatialite(&conn).unwrap();
+        load_spatialite(&conn).map_err(|e| ConnectorError::from_msg(e.to_string()))?;
         Ok(Connection(Mutex::new(conn)))
     }
 
-    pub(super) fn new_in_memory() -> Self {
+    pub(super) fn new_in_memory() -> ConnectorResult<Self> {
         let conn = rusqlite::Connection::open_in_memory().unwrap();
-        load_spatialite(&conn).unwrap();
-        Connection(Mutex::new(conn))
+        load_spatialite(&conn).map_err(|e| ConnectorError::from_msg(e.to_string()))?;
+        Ok(Connection(Mutex::new(conn)))
     }
 
     pub(super) async fn describe_schema(&mut self) -> ConnectorResult<SqlSchema> {

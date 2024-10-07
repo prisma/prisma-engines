@@ -367,7 +367,7 @@ impl SqlFlavour for SqliteFlavour {
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         Box::pin(async move {
             tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
-            let mut shadow_db_conn = Connection::new_in_memory();
+            let mut shadow_db_conn = Connection::new_in_memory()?;
             for migration in migrations {
                 let script = migration.read_migration_script()?;
 
