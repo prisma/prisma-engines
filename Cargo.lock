@@ -1700,24 +1700,11 @@ dependencies = [
 
 [[package]]
 name = "geozero"
-version = "0.10.0"
+version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "937818b9c084b253f929b5f5dbe050e744331d94ceb0a908b08873bcb2da3066"
+checksum = "e5f28f34864745eb2f123c990c6ffd92c1584bd39439b3f27ff2a0f4ea5b309b"
 dependencies = [
  "geo-types",
- "geojson",
- "log",
- "serde_json",
- "thiserror",
- "wkt",
-]
-
-[[package]]
-name = "geozero"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4b1b9a1eeae9ad09e12ec50243956105184b26440f81f978cd3aae009b214d4d"
-dependencies = [
  "geojson",
  "log",
  "serde_json",
@@ -3851,7 +3838,7 @@ dependencies = [
  "expect-test",
  "futures",
  "geojson",
- "geozero 0.11.0",
+ "geozero",
  "getrandom 0.2.11",
  "hex",
  "indoc 0.3.6",
@@ -5333,7 +5320,7 @@ dependencies = [
  "expect-test",
  "futures",
  "geojson",
- "geozero 0.10.0",
+ "geozero",
  "itertools 0.12.0",
  "once_cell",
  "opentelemetry",
@@ -5343,7 +5330,6 @@ dependencies = [
  "query-connector",
  "query-structure",
  "rand 0.8.5",
- "regex",
  "serde",
  "serde_json",
  "thiserror",
@@ -6853,9 +6839,9 @@ dependencies = [
 
 [[package]]
 name = "wkt"
-version = "0.10.3"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3c2252781f8927974e8ba6a67c965a759a2b88ea2b1825f6862426bbb1c8f41"
+checksum = "296937617013271141d1145d9c05861f5ed3b1bc4297e81c692aa3cff9270a9c"
 dependencies = [
  "geo-types",
  "log",

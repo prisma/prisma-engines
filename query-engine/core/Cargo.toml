@@ -40,4 +40,4 @@ schema = { path = "../schema" }
 crosstarget-utils = { path = "../../libs/crosstarget-utils" }
 lru = "0.7.7"
 enumflags2.workspace = true
-geojson = { version = "0.24.1", default-features = false }
+geojson.workspace = true

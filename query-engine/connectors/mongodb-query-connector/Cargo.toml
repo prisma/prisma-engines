@@ -23,7 +23,7 @@ indexmap.workspace = true
 query-engine-metrics = { path = "../../metrics" }
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
 derive_more = "0.99.17"
-geojson = { version = "0.24.1", default-features = false }
+geojson.workspace = true
 
 [dependencies.query-structure]
 path = "../../query-structure"

@@ -84,9 +84,8 @@ sqlformat = { version = "0.2.3", optional = true }
 uuid.workspace = true
 crosstarget-utils = { path = "../libs/crosstarget-utils" }
 concat-idents = "1.1.5"
-once_cell = "1.3"
-geozero = { version = "0.11.0", default-features = false, features = ["with-wkt", "with-geojson"] }
-geojson = { version = "0.24.1", default-features = false }
+geozero.workspace = true
+geojson.workspace = true
 
 [dev-dependencies]
 once_cell = "1.3"
