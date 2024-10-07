@@ -68,12 +68,12 @@ impl TraceParent {
 
     /// Returns a remote `opentelemetry::Context`. By "remote" we mean that it wasn't emitted in the
     /// current process.
-    pub fn as_remote_context(&self) -> opentelemetry::Context {
+    pub fn to_remote_context(&self) -> opentelemetry::Context {
         // This relies on the fact that global text map propagator was installed that
         // can handle `traceparent` field (for example, `TraceContextPropagator`).
-        let mut extractor = HashMap::new();
-        extractor.insert("traceparent".to_string(), self.to_string());
-        opentelemetry::global::get_text_map_propagator(|propagator| propagator.extract(&extractor))
+        opentelemetry::global::get_text_map_propagator(|propagator| {
+            propagator.extract(&TraceParentExtractor::new(self))
+        })
     }
 }
 
@@ -82,7 +82,7 @@ impl TraceParent {
 pub struct TraceParentExtractor(String);
 
 impl TraceParentExtractor {
-    pub fn new(traceparent: TraceParent) -> Self {
+    pub fn new(traceparent: &TraceParent) -> Self {
         Self(traceparent.to_string())
     }
 }
