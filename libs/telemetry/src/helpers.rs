@@ -49,6 +49,7 @@ impl TraceParent {
         }
     }
 
+    // TODO(aqrln): remove this method once the log capturing doesn't rely on trace IDs anymore
     #[deprecated = "this must only be used to create an artificial traceparent for log capturing when tracing is disabled on the client"]
     pub fn new_random() -> Self {
         Self {
