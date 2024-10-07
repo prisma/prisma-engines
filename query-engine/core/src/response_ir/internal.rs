@@ -855,7 +855,7 @@ fn convert_prisma_value_json_protocol(
             custom_types::make_object(custom_types::BYTES, PrismaValue::Bytes(x))
         }
         (ScalarType::Geometry, PrismaValue::GeoJson(x)) => {
-            custom_types::make_object(custom_types::GEOJSON, PrismaValue::GeoJson(x))
+            custom_types::make_object(custom_types::JSON, PrismaValue::GeoJson(x))
         }
 
         // Identity matchers

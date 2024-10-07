@@ -9,8 +9,6 @@ pub mod custom_types {
     pub const DECIMAL: &str = "Decimal";
     pub const BYTES: &str = "Bytes";
     pub const JSON: &str = "Json";
-    pub const EWKT_GEOMETRY: &str = "Geometry";
-    pub const GEOJSON: &str = "GeoJson";
     pub const ENUM: &str = "Enum";
     pub const FIELD_REF: &str = "FieldRef";
     pub const RAW: &str = "Raw";
