@@ -2740,6 +2740,7 @@ dependencies = [
  "cuid",
  "derive_more",
  "futures",
+ "geojson",
  "indexmap 2.2.2",
  "itertools 0.12.0",
  "mongodb",
