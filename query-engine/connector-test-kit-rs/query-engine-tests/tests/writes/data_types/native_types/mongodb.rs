@@ -54,7 +54,7 @@ mod mongodb {
                 geom
             }
           }"#),
-          @r###"{"data":{"createOneTestModel":{"int":2147483647,"long":32767,"bInt":"9223372036854775807","float":3.1234,"oid":"61e1425609c85b5e01817cc5","str":"test","bool":true,"bin":"dGVzdA==","bin_oid":"YeUuxAwj5igGOSD0","geom":"{\"type\":\"Point\",\"coordinates\":[0,0]}"}}}"###
+          @r###"{"data":{"createOneTestModel":{"int":2147483647,"long":32767,"bInt":"9223372036854775807","float":3.1234,"oid":"61e1425609c85b5e01817cc5","str":"test","bool":true,"bin":"dGVzdA==","bin_oid":"YeUuxAwj5igGOSD0","geom":"{\"type\":\"Point\",\"coordinates\":[0.0,0.0]}"}}}"###
         );
 
         Ok(())
