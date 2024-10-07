@@ -223,10 +223,6 @@ pub trait Connector: Send + Sync {
         }
     }
 
-    fn supports_geometry_type(&self) -> bool {
-        self.capabilities().contains(ConnectorCapability::Geometry)
-    }
-
     fn supported_index_types(&self) -> BitFlags<IndexAlgorithm> {
         IndexAlgorithm::BTree.into()
     }

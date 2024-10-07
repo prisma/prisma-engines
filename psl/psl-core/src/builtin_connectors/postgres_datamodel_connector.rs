@@ -50,8 +50,6 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     JsonFilteringArrayPath |
     JsonFilteringAlphanumeric |
     JsonFilteringAlphanumericFieldRef |
-    Geometry |
-    GeometryFiltering |
     MultiSchema |
     NamedForeignKeys |
     NamedPrimaryKeys |

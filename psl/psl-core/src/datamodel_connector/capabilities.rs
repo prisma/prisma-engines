@@ -6,7 +6,7 @@ macro_rules! capabilities {
     ($( $variant:ident $(,)? ),*) => {
         #[derive(Debug, Clone, Copy, PartialEq)]
         #[enumflags2::bitflags]
-        #[repr(u128)]
+        #[repr(u64)]
         pub enum ConnectorCapability {
             $(
                 $variant,
@@ -55,8 +55,6 @@ capabilities!(
     TwoWayEmbeddedManyToManyRelation,
     ImplicitManyToManyRelation,
     MultiSchema,
-    Geometry,
-    GeometryFiltering,
     //Start of ME/IE only capabilities
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,

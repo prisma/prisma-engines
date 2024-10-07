@@ -2,7 +2,6 @@
 #![deny(rust_2018_idioms, unsafe_code)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 #![allow(incomplete_features)]
-#![feature(repr128)]
 
 pub mod builtin_connectors;
 pub mod datamodel_connector;

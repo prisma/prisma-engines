@@ -83,7 +83,7 @@ macro_rules! reachable_only_with_capability {
 #[inline(always)]
 #[allow(dead_code)] // not used if more than one connector is built
 const fn check_comptime_capability(capabilities: ConnectorCapabilities, cap: ConnectorCapability) -> bool {
-    (capabilities.bits_c() & (cap as u128)) > 0
+    (capabilities.bits_c() & (cap as u64)) > 0
 }
 
 #[inline(always)]

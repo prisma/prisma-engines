@@ -46,8 +46,6 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     Json |
     JsonFiltering |
     JsonFilteringArrayPath |
-    Geometry |
-    GeometryFiltering |
     NamedPrimaryKeys |
     NamedForeignKeys |
     SqlQueryRaw |

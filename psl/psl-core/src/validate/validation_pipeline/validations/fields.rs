@@ -298,22 +298,6 @@ pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<
             }
         }
 
-        ScalarFieldType::BuiltInScalar(ScalarType::Geometry) => {
-            if !ctx.connector.supports_geometry_type() {
-                ctx.push_error(DatamodelError::new_field_validation_error(
-                    &format!(
-                        "Field `{}` in {container} `{}` can't be of type Geometry. The current connector does not support the Geometry type.",
-                        field.name(),
-                        field.model().name(),
-                    ),
-                    container,
-                    field.model().name(),
-                    field.name(),
-                    field.ast_field().span(),
-                ));
-            }
-        }
-
         _ => (),
     }
 

@@ -17,7 +17,6 @@ use std::result::Result as StdResult;
 
 const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
     Json |
-    Geometry |
     Enums |
     EnumArrayPush |
     RelationFieldsInArbitraryOrder |

@@ -425,7 +425,7 @@ mod mapped_create {
     }
 }
 
-#[test_suite(capabilities(Geometry))]
+#[test_suite]
 mod geometry_create {
     use query_engine_tests::run_query;
 

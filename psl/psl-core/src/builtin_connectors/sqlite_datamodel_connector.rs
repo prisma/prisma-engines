@@ -18,8 +18,6 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     AnyId |
     AutoIncrement |
     CompoundIds |
-    Geometry |
-    GeometryFiltering |
     SqlQueryRaw |
     RelationFieldsInArbitraryOrder |
     UpdateableId |

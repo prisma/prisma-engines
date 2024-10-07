@@ -25,7 +25,6 @@ impl Connector for EmptyDatamodelConnector {
             CompoundIds |
             Enums |
             Json |
-            Geometry |
             ImplicitManyToManyRelation
         })
     }

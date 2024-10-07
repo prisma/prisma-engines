@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(capabilities(Geometry))]
+#[test_suite]
 mod geometry_filter_spec {
     use query_engine_tests::run_query;
 
@@ -119,8 +119,7 @@ mod geometry_filter_spec {
 
     #[connector_test(
         schema(schema),
-        exclude(Postgres, Sqlite(3, "cfd1", "libsql.js", "libsql.js.wasm"), MySQL(5.6)),
-        capabilities(GeometryFiltering)
+        exclude(Postgres, Sqlite(3, "cfd1", "libsql.js", "libsql.js.wasm"), MySQL(5.6), MongoDb)
     )]
     async fn geometric_comparison_filters(runner: Runner) -> TestResult<()> {
         geometric_comparison_filters_test(runner).await

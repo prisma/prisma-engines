@@ -26,8 +26,6 @@ const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
 ];
 
 const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
-    Geometry |
-    GeometryFiltering |
     AnyId |
     AutoIncrement |
     AutoIncrementAllowedOnNonId |

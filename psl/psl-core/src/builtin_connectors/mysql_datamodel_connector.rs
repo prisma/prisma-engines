@@ -37,8 +37,6 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     Enums |
     EnumArrayPush |
     Json |
-    Geometry |
-    GeometryFiltering |
     AutoIncrementAllowedOnNonId |
     RelationFieldsInArbitraryOrder |
     CreateMany |
