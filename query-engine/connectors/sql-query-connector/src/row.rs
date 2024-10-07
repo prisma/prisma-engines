@@ -2,7 +2,7 @@ use crate::{column_metadata::ColumnMetadata, error::SqlError, geometry::trim_red
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
-use geozero::{wkt::WktStr, ToJson};
+use geozero::{wkt::Wkt, ToJson};
 use quaint::{connector::ResultRow, Value, ValueType};
 use query_structure::{ConversionFailure, FieldArity, PrismaValue, Record, TypeIdentifier};
 use serde_json::json;
@@ -305,7 +305,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
                 // and return an EWKT string instead. We differentiate the two by checking the first character.
                 let (srid, wkt) = geom.split_once(";").unwrap();
                 let srid = &srid[5..];
-                let mut geojson = WktStr(wkt)
+                let mut geojson = Wkt(wkt)
                     .to_json()
                     .map_err(|_| create_error(&p_value))?
                     .parse::<serde_json::Value>()?;
