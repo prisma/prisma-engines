@@ -127,7 +127,6 @@ jobs:
             version: "2019"
           - name: "mssql_2017"
             version: "2017"
-            ubuntu: "20.04"
     uses: ./.github/workflows/test-query-engine-template.yml
     name: mssql ${{ matrix.database.version }}
     with:
