@@ -34,14 +34,6 @@ pub struct TraceParent {
 }
 
 impl TraceParent {
-    pub fn new_unsafe(trace_id: TraceId, span_id: SpanId, flags: TraceFlags) -> Self {
-        Self {
-            trace_id,
-            span_id,
-            flags,
-        }
-    }
-
     pub fn from_remote_context(context: &opentelemetry::Context) -> Option<Self> {
         let span = context.span();
         let span_context = span.span_context();
@@ -54,6 +46,15 @@ impl TraceParent {
             })
         } else {
             None
+        }
+    }
+
+    #[deprecated = "this must only be used to create an artificial traceparent for log capturing when tracing is disabled on the client"]
+    pub fn new_random() -> Self {
+        Self {
+            trace_id: TraceId::from_bytes(rand::random()),
+            span_id: SpanId::from_bytes(rand::random()),
+            flags: TraceFlags::SAMPLED,
         }
     }
 
