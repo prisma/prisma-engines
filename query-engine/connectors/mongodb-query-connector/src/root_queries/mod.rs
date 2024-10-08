@@ -69,8 +69,7 @@ where
     // TODO prisma/team-orm#136: fix log subscription.
     let query_string = builder.build();
     // NOTE: `params` is a part of the interface for query logs.
-    let params: Vec<i32> = vec![];
-    debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %query_string, params = ?params, duration_ms = elapsed);
+    debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %query_string, params = "[]", duration_ms = elapsed);
 
     res
 }
