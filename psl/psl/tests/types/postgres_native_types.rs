@@ -243,7 +243,7 @@ fn postgis_specific_native_types_are_valid() {
 
         model NativeTypesTest {
           id      Int      @id
-          geom_01 Geometry @db.Geometry(Geometry, 4326)
+          geom_01 Geometry
           geom_02 Geometry @db.Geometry(GeometryZ, 4326)
           geom_03 Geometry @db.Geometry(Point, 4326)
           geom_04 Geometry @db.Geometry(PointZ, 4326)

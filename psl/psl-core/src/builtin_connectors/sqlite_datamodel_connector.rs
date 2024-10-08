@@ -11,7 +11,7 @@ use crate::{
 };
 use enumflags2::BitFlags;
 
-use super::geometry::{GeometryParams, GeometryType};
+use super::geometry::GeometryParams;
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalKeyIndex];
 pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
@@ -39,10 +39,7 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, SQLiteType)] = &[(
     ScalarType::Geometry,
-    SQLiteType::Geometry(Some(GeometryParams {
-        type_: GeometryType::Geometry,
-        srid: 0,
-    })),
+    SQLiteType::Geometry(Some(GeometryParams::default())),
 )];
 
 pub struct SqliteDatamodelConnector;

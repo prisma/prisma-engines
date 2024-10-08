@@ -1,11 +1,11 @@
-use crate::{column_metadata::ColumnMetadata, error::SqlError, geometry::trim_redundent_crs, value::to_prisma_value};
+use crate::{column_metadata::ColumnMetadata, error::SqlError, value::to_prisma_value};
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
 use geozero::{wkt::Wkt, ToJson};
 use quaint::{connector::ResultRow, Value, ValueType};
 use query_structure::{ConversionFailure, FieldArity, PrismaValue, Record, TypeIdentifier};
-use serde_json::json;
+use serde_json::{json, Map, Value as JsonValue};
 use std::{io, str::FromStr};
 use uuid::Uuid;
 
@@ -374,6 +374,23 @@ pub(crate) fn big_decimal_to_i64(dec: BigDecimal, to: &'static str) -> Result<i6
     dec.normalized()
         .to_i64()
         .ok_or_else(|| SqlError::from(ConversionFailure::new(format!("BigDecimal({dec})"), to)))
+}
+
+pub(crate) fn get_geometry_crs(geojson: &Map<String, JsonValue>) -> Option<&str> {
+    geojson
+        .get("crs")?
+        .as_object()?
+        .get("properties")?
+        .as_object()?
+        .get("name")?
+        .as_str()
+}
+
+pub(crate) fn trim_redundent_crs(geojson: &mut Map<String, JsonValue>) {
+    let crs = get_geometry_crs(geojson);
+    if matches!(crs, Some("EPSG:4326")) {
+        geojson.remove("crs");
+    };
 }
 
 #[cfg(test)]

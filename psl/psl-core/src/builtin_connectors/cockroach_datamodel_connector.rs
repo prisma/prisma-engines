@@ -23,10 +23,7 @@ use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
 use std::borrow::Cow;
 
-use super::{
-    completions,
-    geometry::{GeometryParams, GeometryType},
-};
+use super::{completions, geometry::GeometryParams};
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey];
 
@@ -81,10 +78,7 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
     (ScalarType::Json, CockroachType::JsonB),
     (
         ScalarType::Geometry,
-        CockroachType::Geometry(Some(GeometryParams {
-            type_: GeometryType::Geometry,
-            srid: 0,
-        })),
+        CockroachType::Geometry(Some(GeometryParams::default())),
     ),
 ];
 

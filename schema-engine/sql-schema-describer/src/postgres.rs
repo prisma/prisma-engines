@@ -989,13 +989,12 @@ impl<'a> SqlSchemaDescriber<'a> {
             let geom_type = capture
                 .name("type")
                 .map(|t| GeometryType::from_str(t.as_str()))
-                .unwrap_or(Ok(GeometryType::default()));
-            let is_cockroach = circumstances.contains(Circumstances::Cockroach);
+                .unwrap_or(Ok(GeometryType::Geometry));
             let is_geography = capture.name("class").map(|c| c.as_str() == "geography").unwrap();
             let srid = capture
                 .name("srid")
                 .map(|v| v.as_str().parse::<i32>())
-                .unwrap_or(Ok(if is_geography && !is_cockroach { 4326 } else { 0 }));
+                .unwrap_or(Ok(if is_geography { 4326 } else { 0 }));
             match (geom_type, srid) {
                 (Ok(type_), Ok(srid)) => Some(GeometryParams { type_, srid }),
                 _ => None,

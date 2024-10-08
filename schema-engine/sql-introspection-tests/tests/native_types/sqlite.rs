@@ -32,7 +32,7 @@ async fn native_spatial_type_columns_feature_on(api: &mut TestApi) -> TestResult
     let expectation = expect![[r#"
         model User {
           id                     Int       @id @default(autoincrement())
-          geometry_xy            Geometry? @db.Geometry(Geometry, 4326)
+          geometry_xy            Geometry?
           geometry_xyz           Geometry? @db.Geometry(GeometryZ, 4326)
           point_xy               Geometry? @db.Geometry(Point, 4326)
           point_xyz              Geometry? @db.Geometry(PointZ, 4326)

@@ -20,8 +20,8 @@ pub enum TypeFamily {
     Boolean,
     Uuid,
     DateTime,
-    Geometry(Option<i32>),
-    Geography(Option<i32>),
+    Geometry,
+    Geography,
     Decimal(Option<(u8, u8)>),
     Bytes(Option<TypeDataLength>),
 }

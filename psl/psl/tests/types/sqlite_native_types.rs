@@ -11,7 +11,7 @@ fn sqlite_specific_native_types_are_valid() {
 
         model NativeTypesTest {
           id        Int      @id
-          geomcol1  Geometry @db.Geometry(Geometry, 4326)
+          geomcol1  Geometry
           geomcol2  Geometry @db.Geometry(GeometryZ, 4326)
           geomcol3  Geometry @db.Geometry(Point, 4326)
           geomcol4  Geometry @db.Geometry(PointZ, 4326)

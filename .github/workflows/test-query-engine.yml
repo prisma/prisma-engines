@@ -143,8 +143,8 @@ jobs:
         database:
           - name: "sqlite"
             version: "3"
-          # - name: "spatialite"
-          #   version: "3-spatialite"
+          - name: "spatialite"
+            version: "3-spatialite"
     uses: ./.github/workflows/test-query-engine-template.yml
     name: sqlite ${{ matrix.database.version }}
     with:

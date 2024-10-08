@@ -19,10 +19,7 @@ use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFo
 use std::{borrow::Cow, collections::HashMap};
 use PostgresType::*;
 
-use super::{
-    completions,
-    geometry::{GeometryParams, GeometryType},
-};
+use super::{completions, geometry::GeometryParams};
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
     ConstraintScope::GlobalPrimaryKeyKeyIndex,
@@ -92,10 +89,7 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
     (ScalarType::Json, PostgresType::JsonB),
     (
         ScalarType::Geometry,
-        PostgresType::Geometry(Some(GeometryParams {
-            type_: GeometryType::Geometry,
-            srid: 0,
-        })),
+        PostgresType::Geometry(Some(GeometryParams::default())),
     ),
 ];
 

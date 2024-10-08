@@ -1,15 +1,23 @@
 use std::{fmt, str::FromStr};
 
-#[derive(Debug, Default, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct GeometryParams {
     pub type_: GeometryType,
     pub srid: i32,
 }
 
+impl GeometryParams {
+    pub const fn default() -> Self {
+        Self {
+            type_: GeometryType::Geometry,
+            srid: 4326,
+        }
+    }
+}
+
 #[repr(u32)]
-#[derive(Debug, Default, Clone, Copy, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub enum GeometryType {
-    #[default]
     Geometry = 0,
     Point = 1,
     LineString = 2,
@@ -140,12 +148,14 @@ impl crate::datamodel_connector::NativeTypeArguments for GeometryParams {
 
     fn from_parts(parts: &[String]) -> Option<Self> {
         // GeometryParams is used in Postgres, Cockroach and SQlite. For the three of them,
-        // the database type for the primsa Geometry type is db.Geometry(Geometry, 0).
+        // the database type for the primsa Geometry type is db.Geometry(Geometry, 4326).
         // We don't want to force the users to think about what SRID they should choose
         // in case they're only interested in setting the geometry type, so in such
-        // case we manually set the SRID to 0 here.
+        // case we manually set the SRID to 4326 here.
         match parts {
-            [geom] => GeometryType::from_str(geom).ok().map(|ty| Self { type_: ty, srid: 0 }),
+            [geom] => GeometryType::from_str(geom)
+                .ok()
+                .map(|ty| Self { type_: ty, srid: 4326 }),
             [geom, srid] => GeometryType::from_str(geom)
                 .ok()
                 .and_then(|ty| srid.parse().ok().map(|srid| Self { type_: ty, srid })),

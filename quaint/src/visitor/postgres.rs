@@ -51,18 +51,17 @@ impl<'a> Postgres<'a> {
         S: Into<Expression<'a>>,
     {
         // We shouldn't have to do that but are forced to because CockroachDb doesn't parse the CRS information
-        // from the geojson string like PostGIS does. (https://github.com/cockroachdb/cockroach/issues/132046)
+        // from the geojson string like PostGIS does. (https://github.com/cockroachdb/cockroach/issues/132046).
+        // Also, older versions of PostGIS don't set the resulting geometry SRID to 4326 by default.
 
-        if let Some(srid) = srid {
-            self.surround_with("ST_SetSRID(", ")", |s| {
-                s.visit_geometry(geometry.into())?;
-                s.write(",")?;
-                s.visit_expression(srid.into())?;
-                Ok(())
-            })
-        } else {
-            self.visit_geometry(geometry.into())
-        }
+        self.surround_with("ST_SetSRID(", ")", |s| {
+            s.surround_with("ST_GeomFromGeoJSON(", ")", |ref mut s| {
+                s.visit_expression(geometry.into())
+            })?;
+            s.write(",")?;
+            s.visit_expression(srid.map(Into::into).unwrap_or(4326.into()))?;
+            Ok(())
+        })
     }
 
     fn visit_geography_from_geojson<G, S>(&mut self, geometry: G, srid: Option<S>) -> visitor::Result
@@ -72,10 +71,6 @@ impl<'a> Postgres<'a> {
     {
         self.visit_geometry_from_geojson(geometry, srid)?;
         self.write("::geography")
-    }
-
-    fn visit_geometry(&mut self, geometry: Expression<'a>) -> visitor::Result {
-        self.surround_with("ST_GeomFromGeoJSON(", ")", |ref mut s| s.visit_expression(geometry))
     }
 }
 
@@ -836,12 +831,9 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 
     fn visit_parameterized_geometry(&mut self, geometry: geojson::Geometry) -> visitor::Result {
         let srid = get_geometry_srid(&geometry);
-        self.surround_with("ST_SetSRID(", ")", |s| {
-            s.visit_geometry_from_geojson(geometry.to_string(), srid)?;
-            s.write(",")?;
-            s.visit_parameterized(srid.into())?;
-            Ok(())
-        })
+        self.visit_geometry_from_geojson(geometry.to_string(), srid)?;
+
+        Ok(())
     }
 
     fn visit_parameterized_geography(&mut self, geometry: geojson::Geometry) -> visitor::Result {
@@ -1282,7 +1274,10 @@ mod tests {
         let geojson = r#"{"type":"Point","coordinates":[1.0,2.0]}"#;
         let geom = geojson.parse::<geojson::Geometry>().unwrap();
         let (sql, params) = Postgres::build(Select::default().value(Value::geography(geom).raw())).unwrap();
-        assert_eq!(format!("SELECT ST_GeomFromGeoJSON('{geojson}')::geography"), sql);
+        assert_eq!(
+            format!("SELECT ST_SetSRID(ST_GeomFromGeoJSON('{geojson}'),4326)::geography"),
+            sql
+        );
         assert!(params.is_empty());
     }
 

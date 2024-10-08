@@ -80,8 +80,8 @@ impl<'a> Mssql<'a> {
             TypeFamily::Boolean => self.write("BIT"),
             TypeFamily::Uuid => self.write("UNIQUEIDENTIFIER"),
             TypeFamily::DateTime => self.write("DATETIMEOFFSET"),
-            TypeFamily::Geometry(_) => self.write("GEOMETRY"),
-            TypeFamily::Geography(_) => self.write("GEOGRAPHY"),
+            TypeFamily::Geometry => self.write("GEOMETRY"),
+            TypeFamily::Geography => self.write("GEOGRAPHY"),
             TypeFamily::Bytes(len) => {
                 self.write("VARBINARY(")?;
                 match len {

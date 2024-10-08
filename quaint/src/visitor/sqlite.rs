@@ -1,6 +1,7 @@
 use crate::{
     ast::*,
     error::{Error, ErrorKind},
+    geometry::get_geometry_srid,
     visitor::{self, Visitor},
 };
 
@@ -34,11 +35,20 @@ impl<'a> Sqlite<'a> {
         Ok(())
     }
 
-    fn visit_geometry_from_geojson<G>(&mut self, geometry: G) -> visitor::Result
+    fn visit_geometry_from_geojson<G, S>(&mut self, geometry: G, srid: Option<S>) -> visitor::Result
     where
         G: Into<Expression<'a>>,
+        S: Into<Expression<'a>>,
     {
-        self.surround_with("GeomFromGeoJSON(", ")", |ref mut s| s.visit_expression(geometry.into()))
+        // This is required since contrary to other vendors, Spatialite GeomFromGeoJSON
+        // doesn't return a geometry with SRID=4326 but with SRID=-1.
+
+        self.surround_with("SetSRID(", ")", |s| {
+            s.surround_with("GeomFromGeoJSON(", ")", |ref mut s| s.visit_expression(geometry.into()))?;
+            s.write(",")?;
+            s.visit_expression(srid.map(Into::into).unwrap_or(4326.into()))?;
+            Ok(())
+        })
     }
 }
 
@@ -144,12 +154,14 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
             ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
             ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
-            ValueType::Geometry(g) => g
-                .as_ref()
-                .map(|g| self.visit_geometry_from_geojson(g.to_string().raw())),
-            ValueType::Geography(g) => g
-                .as_ref()
-                .map(|g| self.visit_geometry_from_geojson(g.to_string().raw())),
+            ValueType::Geometry(geometry) => geometry.as_ref().map(|geometry| {
+                let srid = get_geometry_srid(geometry);
+                self.visit_geometry_from_geojson(geometry.to_string().raw(), srid.map(IntoRaw::raw))
+            }),
+            ValueType::Geography(geometry) => geometry.as_ref().map(|geometry| {
+                let srid = get_geometry_srid(geometry);
+                self.visit_geometry_from_geojson(geometry.to_string().raw(), srid.map(IntoRaw::raw))
+            }),
         };
 
         match res {
@@ -508,11 +520,12 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     }
 
     fn visit_parameterized_geometry(&mut self, geometry: geojson::Geometry) -> visitor::Result {
-        self.visit_geometry_from_geojson(geometry.to_string())
+        let srid = get_geometry_srid(&geometry);
+        self.visit_geometry_from_geojson(geometry.to_string(), srid)
     }
 
     fn visit_parameterized_geography(&mut self, geometry: geojson::Geometry) -> visitor::Result {
-        self.visit_geometry_from_geojson(geometry.to_string())
+        self.visit_parameterized_geometry(geometry)
     }
 }
 
@@ -1074,7 +1087,7 @@ mod tests {
         let geojson = r#"{"type":"Point","coordinates":[1.0,2.0]}"#;
         let geom = geojson.parse::<geojson::Geometry>().unwrap();
         let (sql, params) = Sqlite::build(Select::default().value(Value::geometry(geom).raw())).unwrap();
-        assert_eq!(format!("SELECT GeomFromGeoJSON('{geojson}')"), sql);
+        assert_eq!(format!("SELECT SetSRID(GeomFromGeoJSON('{geojson}'),4326)"), sql);
         assert!(params.is_empty());
     }
 

@@ -1,4 +1,4 @@
-use crate::{context::Context, geometry::get_geometry_crs};
+use crate::context::Context;
 use chrono::Utc;
 use geojson::Geometry;
 use prisma_value::PrismaValue;
@@ -7,7 +7,6 @@ use quaint::{
     prelude::{EnumVariant, TypeDataLength, TypeFamily},
 };
 use query_structure::{ScalarField, TypeIdentifier};
-use serde_json::json;
 
 pub(crate) trait ScalarFieldExt {
     fn value<'a>(&self, pv: PrismaValue, ctx: &Context<'_>) -> Value<'a>;
@@ -56,31 +55,10 @@ impl ScalarFieldExt for ScalarField {
             (PrismaValue::Bytes(b), _) => Value::bytes(b),
             (PrismaValue::Object(_), _) => unimplemented!(),
             (PrismaValue::GeoJson(s), _) => {
-                let mut geometry = s.parse::<Geometry>().unwrap();
-                let column_type = self.type_family();
-                let column_srid = match column_type {
-                    TypeFamily::Geography(srid) => srid,
-                    TypeFamily::Geometry(srid) => srid,
-                    _ => unreachable!(),
-                };
-                // To facilitate geometry insertion, We manually set the GeoJSON CRS field
-                // to the column constrained SRID if the latter is set to 4326 (the default)
-                // or "unknown" (0 or -1). If there is no contraint at all, set it to 4326
-                // anyway for consistency's sake, and also because SQL Server requires one
-                // in order to create a geometry
-                let geometry_crs = geometry.foreign_members.as_ref().and_then(|m| get_geometry_crs(m));
-                if geometry_crs.is_none() && matches!(column_srid, None | Some(-1 | 0 | 4326)) {
-                    let srid = column_srid.unwrap_or(4326);
-                    let mut m = serde_json::Map::new();
-                    m.insert(
-                        "crs".to_string(),
-                        json!({"type": "name", "properties": {"name": format!("EPSG:{srid}")}}),
-                    );
-                    geometry.foreign_members = Some(m);
-                };
-                match column_type {
-                    TypeFamily::Geography(_) => Value::geography(geometry),
-                    TypeFamily::Geometry(_) => Value::geometry(geometry),
+                let geometry = s.parse::<Geometry>().unwrap();
+                match self.type_family() {
+                    TypeFamily::Geography => Value::geography(geometry),
+                    TypeFamily::Geometry => Value::geometry(geometry),
                     _ => unreachable!(),
                 }
             }
@@ -137,19 +115,10 @@ impl ScalarFieldExt for ScalarField {
             TypeIdentifier::DateTime => TypeFamily::DateTime,
             TypeIdentifier::Bytes => TypeFamily::Text(parse_scalar_length(self)),
             TypeIdentifier::Geometry => {
-                let type_info = self.native_type().map(|nt| {
-                    let name = nt.name();
-                    let srid = match nt.args().as_slice() {
-                        [srid] => srid.parse::<i32>().ok(),
-                        [_type, srid] => srid.parse::<i32>().ok(),
-                        _ => None,
-                    };
-                    (name, srid)
-                });
-                match type_info {
-                    Some(("Geography", srid)) => TypeFamily::Geography(srid),
-                    Some((_, srid)) => TypeFamily::Geometry(srid),
-                    _ => TypeFamily::Geometry(None),
+                let type_name = self.native_type().map(|nt| nt.name());
+                match type_name {
+                    Some("Geography") => TypeFamily::Geography,
+                    _ => TypeFamily::Geometry,
                 }
             }
             TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),

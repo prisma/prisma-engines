@@ -403,14 +403,15 @@ async fn push_columns(
         let column_type = row.get_expect_string("type");
         let geometry_info = geometry_columns.get(&(table_name.to_lowercase(), column_name.to_lowercase()));
         let tpe = if let Some((type_, srid)) = geometry_info {
+            let params = GeometryParams {
+                type_: *type_,
+                srid: *srid,
+            };
             ColumnType {
                 full_data_type: column_type,
                 family: ColumnTypeFamily::Geometry,
                 arity,
-                native_type: Some(NativeTypeInstance::new(SQLiteType::Geometry(Some(GeometryParams {
-                    type_: *type_,
-                    srid: *srid,
-                })))),
+                native_type: Some(NativeTypeInstance::new(SQLiteType::Geometry(Some(params)))),
             }
         } else {
             get_column_type(column_type, arity)
