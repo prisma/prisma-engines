@@ -411,7 +411,7 @@ async fn push_columns(
                 full_data_type: column_type,
                 family: ColumnTypeFamily::Geometry,
                 arity,
-                native_type: Some(NativeTypeInstance::new(SQLiteType::Geometry(Some(params)))),
+                native_type: Some(NativeTypeInstance::new(SQLiteType::Geometry(params))),
             }
         } else {
             get_column_type(column_type, arity)

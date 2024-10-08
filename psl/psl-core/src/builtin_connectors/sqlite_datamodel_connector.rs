@@ -37,10 +37,8 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     CreateManyWriteableAutoIncId
 });
 
-const SCALAR_TYPE_DEFAULTS: &[(ScalarType, SQLiteType)] = &[(
-    ScalarType::Geometry,
-    SQLiteType::Geometry(Some(GeometryParams::default())),
-)];
+const SCALAR_TYPE_DEFAULTS: &[(ScalarType, SQLiteType)] =
+    &[(ScalarType::Geometry, SQLiteType::Geometry(GeometryParams::default()))];
 
 pub struct SqliteDatamodelConnector;
 
@@ -112,7 +110,7 @@ impl Connector for SqliteDatamodelConnector {
         let error = self.native_instance_error(native_type_instance);
 
         match native_type {
-            SQLiteType::Geometry(Some(g)) if g.srid < -1 => errors
+            SQLiteType::Geometry(g) if g.srid < -1 => errors
                 .push_error(error.new_argument_m_out_of_range_error("SRID must be superior or equal to -1.", span)),
             _ => (),
         }

@@ -165,7 +165,6 @@ impl SqlRenderer for SqliteFlavour {
             .fold(String::new(), |mut result, col| {
                 let column_name = col.name();
                 let SQLiteType::Geometry(geom) = col.column_native_type().unwrap();
-                let geom = geom.expect("Couldn't get geometry column type informations");
                 writeln!(
                     result,
                     "SELECT RecoverGeometryColumn('{table_name}', '{column_name}', {srid}, '{type_}', '{dims}');",
