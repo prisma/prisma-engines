@@ -68,7 +68,7 @@ where
     let span = info_span!(
         "prisma:engine:db_query",
         user_facing = true,
-        "db.statement" = query_string.clone()
+        "db.statement" = %query_string.clone()
     );
 
     let start = Instant::now();
@@ -80,7 +80,7 @@ where
 
     // TODO prisma/team-orm#136: fix log subscription.
     // NOTE: `params` is a part of the interface for query logs.
-    debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = query_string, params = "[]", duration_ms = elapsed);
+    debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %query_string, params = %"[]", duration_ms = elapsed);
 
     res
 }
