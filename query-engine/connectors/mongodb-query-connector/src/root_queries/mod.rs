@@ -60,10 +60,15 @@ where
     F: FnOnce() -> U + 'a,
     U: Future<Output = mongodb::error::Result<T>>,
 {
+    // TODO: build the string lazily in the Display impl so it doesn't have to be built if neither
+    // logs nor traces are enabled. This is tricky because whatever we store in the span has to be
+    // 'static, and all `QueryString` implementations aren't, so this requires some refactoring.
+    let query_string = builder.build();
+
     let span = info_span!(
         "prisma:engine:db_query",
         user_facing = true,
-        "db.statement" = builder.build()
+        "db.statement" = query_string.clone()
     );
 
     let start = Instant::now();
@@ -74,7 +79,6 @@ where
     increment_counter!(PRISMA_DATASOURCE_QUERIES_TOTAL);
 
     // TODO prisma/team-orm#136: fix log subscription.
-    let query_string = builder.build();
     // NOTE: `params` is a part of the interface for query logs.
     debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %query_string, params = "[]", duration_ms = elapsed);
 
