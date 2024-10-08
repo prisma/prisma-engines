@@ -19,7 +19,8 @@ use query_engine_metrics::{
 };
 use query_structure::*;
 use std::time::Instant;
-use tracing::debug;
+use tracing::{debug, info_span};
+use tracing_futures::Instrument;
 
 /// Transforms a document to a `Record`, fields ordered as defined in `fields`.
 fn document_to_record(mut doc: Document, fields: &[String], meta_mapping: &OutputMetaMapping) -> crate::Result<Record> {
@@ -59,8 +60,14 @@ where
     F: FnOnce() -> U + 'a,
     U: Future<Output = mongodb::error::Result<T>>,
 {
+    let span = info_span!(
+        "prisma:engine:db_query",
+        user_facing = true,
+        "db.statement" = builder.build()
+    );
+
     let start = Instant::now();
-    let res = f().await;
+    let res = f().instrument(span).await;
     let elapsed = start.elapsed().as_millis() as f64;
 
     histogram!(PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, elapsed);

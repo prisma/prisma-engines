@@ -6,7 +6,6 @@ use crate::{
 use mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
 use query_structure::*;
 use std::future::IntoFuture;
-use tracing::{info_span, Instrument};
 
 /// Finds a single record. Joins are not required at the moment because the selector is always a unique one.
 pub async fn get_single_record<'conn>(
@@ -18,12 +17,6 @@ pub async fn get_single_record<'conn>(
 ) -> crate::Result<Option<SingleRecord>> {
     let coll = database.collection(model.db_name());
 
-    let span = info_span!(
-        "prisma:engine:db_query",
-        user_facing = true,
-        "db.statement" = &format_args!("db.{}.findOne(*)", coll.name())
-    );
-
     let meta_mapping = output_meta::from_selected_fields(selected_fields);
     let query_arguments: QueryArguments = (model.clone(), filter.clone()).into();
     let query = MongoReadQueryBuilder::from_args(query_arguments)?
@@ -31,7 +24,7 @@ pub async fn get_single_record<'conn>(
         .with_virtual_fields(selected_fields.virtuals())?
         .build()?;
 
-    let docs = query.execute(coll, session).instrument(span).await?;
+    let docs = query.execute(coll, session).await?;
 
     if docs.is_empty() {
         Ok(None)
@@ -60,12 +53,6 @@ pub async fn get_many_records<'conn>(
 ) -> crate::Result<ManyRecords> {
     let coll = database.collection(model.db_name());
 
-    let span = info_span!(
-        "prisma:engine:db_query",
-        user_facing = true,
-        "db.statement" = &format_args!("db.{}.findMany(*)", coll.name())
-    );
-
     let reverse_order = query_arguments.take.map(|t| t < 0).unwrap_or(false);
     let field_names: Vec<_> = selected_fields.db_names().collect();
 
@@ -81,7 +68,7 @@ pub async fn get_many_records<'conn>(
         .with_virtual_fields(selected_fields.virtuals())?
         .build()?;
 
-    let docs = query.execute(coll, session).instrument(span).await?;
+    let docs = query.execute(coll, session).await?;
     for doc in docs {
         let record = document_to_record(doc, &field_names, &meta_mapping)?;
         records.push(record)
