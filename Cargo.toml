@@ -64,6 +64,7 @@ napi = { version = "2.15.1", default-features = false, features = [
   "serde-json",
 ] }
 napi-derive = "2.15.0"
+metrics = "0.23.0"
 js-sys = { version = "0.3" }
 rand = { version = "0.8" }
 regex = { version = "1", features = ["std"] }

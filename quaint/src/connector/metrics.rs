@@ -53,9 +53,9 @@ where
         trace_query(query, params, result, &start);
     }
 
-    histogram!(format!("{tag}.query.time"), start.elapsed_time());
-    histogram!("prisma_datasource_queries_duration_histogram_ms", start.elapsed_time());
-    increment_counter!("prisma_datasource_queries_total");
+    histogram!(format!("{tag}.query.time")).record(start.elapsed_time());
+    histogram!("prisma_datasource_queries_duration_histogram_ms").record(start.elapsed_time());
+    counter!("prisma_datasource_queries_total").increment(1);
 
     res
 }
@@ -81,7 +81,7 @@ where
         result,
     );
 
-    histogram!("pool.check_out", start.elapsed_time());
+    histogram!("pool.check_out").record(start.elapsed_time());
 
     res
 }
