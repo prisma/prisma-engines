@@ -45,7 +45,7 @@ impl<'a> Postgres<'a> {
         Ok(())
     }
 
-    fn visit_geometry_from_geojson<G, S>(&mut self, geometry: G, srid: Option<S>) -> visitor::Result
+    fn visit_geometry_from_geojson<G, S>(&mut self, geometry: G, srid: S) -> visitor::Result
     where
         G: Into<Expression<'a>>,
         S: Into<Expression<'a>>,
@@ -59,12 +59,12 @@ impl<'a> Postgres<'a> {
                 s.visit_expression(geometry.into())
             })?;
             s.write(",")?;
-            s.visit_expression(srid.map(Into::into).unwrap_or(4326.into()))?;
+            s.visit_expression(srid.into())?;
             Ok(())
         })
     }
 
-    fn visit_geography_from_geojson<G, S>(&mut self, geometry: G, srid: Option<S>) -> visitor::Result
+    fn visit_geography_from_geojson<G, S>(&mut self, geometry: G, srid: S) -> visitor::Result
     where
         G: Into<Expression<'a>>,
         S: Into<Expression<'a>>,
@@ -290,12 +290,12 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
             ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
             ValueType::Geometry(geometry) => geometry.as_ref().map(|geometry| {
-                let srid = get_geometry_srid(geometry);
-                self.visit_geometry_from_geojson(geometry.to_string().raw(), srid.map(IntoRaw::raw))
+                let srid = get_geometry_srid(geometry).unwrap_or(4326);
+                self.visit_geometry_from_geojson(geometry.to_string().raw(), srid.raw())
             }),
             ValueType::Geography(geometry) => geometry.as_ref().map(|geometry| {
-                let srid = get_geometry_srid(geometry);
-                self.visit_geography_from_geojson(geometry.to_string().raw(), srid.map(IntoRaw::raw))
+                let srid = get_geometry_srid(geometry).unwrap_or(4326);
+                self.visit_geography_from_geojson(geometry.to_string().raw(), srid.raw())
             }),
         };
 
