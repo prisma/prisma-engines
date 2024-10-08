@@ -45,16 +45,16 @@ fn should_fail_on_geometry_when_invalid_geometry_type() {
 
         model Blog {
           id   Int      @id
-          geom Geometry @db.Geometry(Invalid)
+          geom Geometry @db.Geometry(Invalid, 0)
         }
     "#};
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mExpected a geometry type and an optional srid, but found (Invalid).[0m
+        [1;91merror[0m: [1mExpected a geometry type and an srid, but found (Invalid, 0).[0m
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id   Int      @id
-        [1;94m 8 | [0m  geom Geometry [1;91m@db.Geometry(Invalid)[0m
+        [1;94m 8 | [0m  geom Geometry [1;91m@db.Geometry(Invalid, 0)[0m
         [1;94m   | [0m
     "#]];
 

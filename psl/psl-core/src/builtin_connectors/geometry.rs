@@ -142,23 +142,16 @@ impl fmt::Display for GeometryType {
 }
 
 impl crate::datamodel_connector::NativeTypeArguments for GeometryParams {
-    const DESCRIPTION: &'static str = "a geometry type and an optional srid";
+    const DESCRIPTION: &'static str = "a geometry type and an srid";
     const OPTIONAL_ARGUMENTS_COUNT: usize = 0;
     const REQUIRED_ARGUMENTS_COUNT: usize = 2;
 
     fn from_parts(parts: &[String]) -> Option<Self> {
-        // GeometryParams is used in Postgres, Cockroach and SQlite. For the three of them,
-        // the database type for the primsa Geometry type is db.Geometry(Geometry, 4326).
-        // We don't want to force the users to think about what SRID they should choose
-        // in case they're only interested in setting the geometry type, so in such
-        // case we manually set the SRID to 4326 here.
         match parts {
-            [geom] => GeometryType::from_str(geom)
-                .ok()
-                .map(|ty| Self { type_: ty, srid: 4326 }),
-            [geom, srid] => GeometryType::from_str(geom)
-                .ok()
-                .and_then(|ty| srid.parse().ok().map(|srid| Self { type_: ty, srid })),
+            [geom, srid] => Some(Self {
+                type_: GeometryType::from_str(geom).ok()?,
+                srid: srid.parse().ok()?,
+            }),
             _ => None,
         }
     }
