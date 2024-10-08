@@ -66,7 +66,6 @@ where
     histogram!(PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, elapsed);
     increment_counter!(PRISMA_DATASOURCE_QUERIES_TOTAL);
 
-    // TODO: emit tracing event only when "debug" level query logs are enabled.
     // TODO prisma/team-orm#136: fix log subscription.
     let query_string = builder.build();
     // NOTE: `params` is a part of the interface for query logs.
