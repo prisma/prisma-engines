@@ -352,14 +352,14 @@ mod postgres {
             r#"model Model {
             @@schema("test")
             #id(id, String, @id, @default(cuid()))
-            geometry             Geometry @test.Geometry(Geometry)
-            geometry_point       Geometry @test.Geometry(Point)
-            geometry_line        Geometry @test.Geometry(LineString)
-            geometry_poly        Geometry @test.Geometry(Polygon)
-            geometry_multipoint  Geometry @test.Geometry(MultiPoint)
-            geometry_multiline   Geometry @test.Geometry(MultiLineString)
-            geometry_multipoly   Geometry @test.Geometry(MultiPolygon)
-            geometry_collection  Geometry @test.Geometry(GeometryCollection)
+            geometry             Geometry @test.Geometry(Geometry, 4326)
+            geometry_point       Geometry @test.Geometry(Point, 4326)
+            geometry_line        Geometry @test.Geometry(LineString, 4326)
+            geometry_poly        Geometry @test.Geometry(Polygon, 4326)
+            geometry_multipoint  Geometry @test.Geometry(MultiPoint, 4326)
+            geometry_multiline   Geometry @test.Geometry(MultiLineString, 4326)
+            geometry_multipoly   Geometry @test.Geometry(MultiPolygon, 4326)
+            geometry_collection  Geometry @test.Geometry(GeometryCollection, 4326)
           }"#
         };
 
@@ -465,14 +465,14 @@ mod postgres {
             r#"model Model {
             @@schema("test")
             #id(id, String, @id, @default(cuid()))
-            geography            Geometry @test.Geography(Geometry)
-            geography_point      Geometry @test.Geography(Point)
-            geography_line       Geometry @test.Geography(LineString)
-            geography_poly       Geometry @test.Geography(Polygon)
-            geography_multipoint Geometry @test.Geography(MultiPoint)
-            geography_multiline  Geometry @test.Geography(MultiLineString)
-            geography_multipoly  Geometry @test.Geography(MultiPolygon)
-            geography_collection Geometry @test.Geography(GeometryCollection)
+            geography            Geometry @test.Geography(Geometry, 4326)
+            geography_point      Geometry @test.Geography(Point, 4326)
+            geography_line       Geometry @test.Geography(LineString, 4326)
+            geography_poly       Geometry @test.Geography(Polygon, 4326)
+            geography_multipoint Geometry @test.Geography(MultiPoint, 4326)
+            geography_multiline  Geometry @test.Geography(MultiLineString, 4326)
+            geography_multipoly  Geometry @test.Geography(MultiPolygon, 4326)
+            geography_collection Geometry @test.Geography(GeometryCollection, 4326)
           }"#
         };
 

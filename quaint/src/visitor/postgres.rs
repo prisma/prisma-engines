@@ -830,7 +830,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     }
 
     fn visit_parameterized_geometry(&mut self, geometry: geojson::Geometry) -> visitor::Result {
-        let srid = get_geometry_srid(&geometry);
+        let srid = get_geometry_srid(&geometry).unwrap_or(4326);
         self.visit_geometry_from_geojson(geometry.to_string(), srid)?;
 
         Ok(())
