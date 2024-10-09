@@ -248,6 +248,15 @@ impl ConnectionInfo {
         }
     }
 
+    /// Whether the rdsproxy mode is enabled.
+    pub fn rds_proxy(&self) -> bool {
+        match self {
+            #[cfg(all(not(target_arch = "wasm32"), feature = "postgresql"))]
+            ConnectionInfo::Native(NativeConnectionInfo::Postgres(url)) => url.rds_proxy(),
+            _ => false,
+        }
+    }
+
     /// A string describing the database location, meant for error messages. It will be the host
     /// and port on MySQL/Postgres, and the file path on SQLite.
     pub fn database_location(&self) -> String {

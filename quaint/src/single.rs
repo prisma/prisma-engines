@@ -189,9 +189,9 @@ impl Quaint {
     #[cfg(native)]
     fn log_start(info: &ConnectionInfo) {
         let family = info.sql_family();
-        let pg_bouncer = if info.pg_bouncer() { " in PgBouncer mode" } else { "" };
+        let suffix = if info.pg_bouncer() { " in PgBouncer mode" } else if info.rds_proxy() { " in RDS Proxy mode" } else { "" };
 
-        tracing::info!("Starting a {} connection{}.", family, pg_bouncer);
+        tracing::info!("Starting a {} connection{}.", family, suffix);
     }
 }
 

@@ -162,6 +162,11 @@ impl PostgresUrl {
         self.query_params.pg_bouncer
     }
 
+    /// Whether the rdsproxy mode is enabled.
+    pub fn rds_proxy(&self) -> bool {
+        self.query_params.rds_proxy
+    }
+
     /// The connection timeout.
     pub fn connect_timeout(&self) -> Option<Duration> {
         self.query_params.connect_timeout
@@ -225,6 +230,7 @@ impl PostgresUrl {
         let mut connect_timeout = Some(Duration::from_secs(5));
         let mut pool_timeout = Some(Duration::from_secs(10));
         let mut pg_bouncer = false;
+        let mut rds_proxy = false;
         let mut statement_cache_size = 100;
         let mut max_connection_lifetime = None;
         let mut max_idle_connection_lifetime = Some(Duration::from_secs(300));
@@ -234,6 +240,11 @@ impl PostgresUrl {
             match k.as_ref() {
                 "pgbouncer" => {
                     pg_bouncer = v
+                        .parse()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+                }
+                "rdsproxy" => {
+                    rds_proxy = v
                         .parse()
                         .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
                 }
@@ -382,6 +393,7 @@ impl PostgresUrl {
             pool_timeout,
             socket_timeout,
             pg_bouncer,
+            rds_proxy,
             statement_cache_size,
             max_connection_lifetime,
             max_idle_connection_lifetime,
@@ -414,6 +426,7 @@ pub(crate) struct PostgresUrlQueryParams {
     pub(crate) connection_limit: Option<usize>,
     pub(crate) schema: Option<String>,
     pub(crate) pg_bouncer: bool,
+    pub(crate) rds_proxy: bool,
     pub(crate) host: Option<String>,
     pub(crate) socket_timeout: Option<Duration>,
     pub(crate) connect_timeout: Option<Duration>,

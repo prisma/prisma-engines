@@ -341,13 +341,13 @@ impl Builder {
 
     fn log_start(info: &ConnectionInfo, connection_limit: usize) {
         let family = info.sql_family();
-        let pg_bouncer = if info.pg_bouncer() { " in PgBouncer mode" } else { "" };
+        let suffix = if info.pg_bouncer() { " in PgBouncer mode" } else if info.rds_proxy() { " in RDS Proxy mode" } else { "" };
 
         tracing::info!(
             "Starting a {} pool with {} connections{}.",
             family,
             connection_limit,
-            pg_bouncer
+            suffix
         );
     }
 }
