@@ -38,6 +38,7 @@ pub fn parse_id(field: &str, json: &serde_json::Value, path: &[&str], meta: &str
 }
 
 /// Parses the JSON result of mutation sent to the Query Engine in order to extract the generated compound ids.
+///
 /// Returns a string that's already formatted to be included in another query. eg:
 /// { "id_1_id_2": { id_1: "my_fancy_id_1", id_2: "my_fancy_id_2" } }
 pub fn parse_compound_id(

@@ -20,6 +20,8 @@ pub enum TypeFamily {
     Boolean,
     Uuid,
     DateTime,
+    Geometry,
+    Geography,
     Decimal(Option<(u8, u8)>),
     Bytes(Option<TypeDataLength>),
 }
@@ -29,15 +31,17 @@ pub enum TypeFamily {
 pub struct Column<'a> {
     pub name: Cow<'a, str>,
     pub(crate) table: Option<Table<'a>>,
-    pub(crate) alias: Option<Cow<'a, str>>,
+    pub alias: Option<Cow<'a, str>>,
     pub(crate) default: Option<DefaultValue<'a>>,
-    pub(crate) type_family: Option<TypeFamily>,
+    pub type_family: Option<TypeFamily>,
     /// The underlying native type of the column.
     pub(crate) native_type: Option<NativeColumnType<'a>>,
     /// Whether the column is an enum.
     pub(crate) is_enum: bool,
     /// Whether the column is a (scalar) list.
     pub(crate) is_list: bool,
+    /// Whether the column is a geometry.
+    pub(crate) is_geometry: bool,
     /// Whether the column is part of a SELECT or RETURNING clause.
     pub(crate) is_selected: bool,
 }
@@ -82,6 +86,14 @@ impl<'a> Column<'a> {
         }
     }
 
+    pub(crate) fn into_bare_with_table(self) -> Self {
+        Self {
+            name: self.name,
+            table: self.table,
+            ..Default::default()
+        }
+    }
+
     /// Sets the default value for the column.
     pub fn default<V>(mut self, value: V) -> Self
     where
@@ -106,6 +118,12 @@ impl<'a> Column<'a> {
     /// Sets whether the column points to an scalar list.
     pub fn set_is_list(mut self, is_list: bool) -> Self {
         self.is_list = is_list;
+        self
+    }
+
+    /// Sets whether the column points to an geometry type.
+    pub fn set_is_geometry(mut self, is_geometry: bool) -> Self {
+        self.is_geometry = is_geometry;
         self
     }
 

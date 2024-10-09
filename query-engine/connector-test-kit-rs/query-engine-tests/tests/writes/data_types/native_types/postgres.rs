@@ -346,4 +346,231 @@ mod postgres {
 
         Ok(())
     }
+
+    fn schema_geometry() -> String {
+        let schema = indoc! {
+            r#"model Model {
+            @@schema("test")
+            #id(id, String, @id, @default(cuid()))
+            geometry             Geometry @test.Geometry(Geometry, 4326)
+            geometry_point       Geometry @test.Geometry(Point, 4326)
+            geometry_line        Geometry @test.Geometry(LineString, 4326)
+            geometry_poly        Geometry @test.Geometry(Polygon, 4326)
+            geometry_multipoint  Geometry @test.Geometry(MultiPoint, 4326)
+            geometry_multiline   Geometry @test.Geometry(MultiLineString, 4326)
+            geometry_multipoly   Geometry @test.Geometry(MultiPolygon, 4326)
+            geometry_collection  Geometry @test.Geometry(GeometryCollection, 4326)
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "PostGIS common geometry types" should "work"
+    #[connector_test(
+        only(Postgres("16-postgis"), CockroachDb),
+        schema(schema_geometry),
+        db_schemas("public", "test")
+    )]
+    async fn native_geometry(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+          createOneModel(
+            data: {
+              geometry: "{\"type\":\"Point\",\"coordinates\":[1,2]}"
+              geometry_point: "{\"type\":\"Point\",\"coordinates\":[1,2]}"
+              geometry_line: "{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}"
+              geometry_poly: "{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}"
+              geometry_multipoint: "{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}"
+              geometry_multiline: "{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}"
+              geometry_multipoly: "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}"
+              geometry_collection: "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"
+            }
+          ) {
+            geometry
+            geometry_point
+            geometry_line
+            geometry_poly
+            geometry_multipoint
+            geometry_multiline
+            geometry_multipoly
+            geometry_collection
+          }
+        }"#),
+            @r###"{"data":{"createOneModel":{"geometry":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geometry_point":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geometry_line":"{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}","geometry_poly":"{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}","geometry_multipoint":"{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}","geometry_multiline":"{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}","geometry_multipoly":"{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}","geometry_collection":"{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_geometry_srid() -> String {
+        let schema = indoc! {
+            r#"model Model {
+            @@schema("test")
+            #id(id, String, @id, @default(cuid()))
+            geometry             Geometry @test.Geometry(Geometry, 3857)
+            geometry_point       Geometry @test.Geometry(Point, 3857)
+            geometry_line        Geometry @test.Geometry(LineString, 3857)
+            geometry_poly        Geometry @test.Geometry(Polygon, 3857)
+            geometry_multipoint  Geometry @test.Geometry(MultiPoint, 3857)
+            geometry_multiline   Geometry @test.Geometry(MultiLineString, 3857)
+            geometry_multipoly   Geometry @test.Geometry(MultiPolygon, 3857)
+            geometry_collection  Geometry @test.Geometry(GeometryCollection, 3857)
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "PostGIS common geometry types with srid" should "work"
+    #[connector_test(
+        only(Postgres("16-postgis"), CockroachDb),
+        schema(schema_geometry_srid),
+        db_schemas("public", "test")
+    )]
+
+    async fn native_geometry_srid(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+          createOneModel(
+            data: {
+              geometry: "{\"type\":\"Point\",\"coordinates\":[1,2],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              geometry_point: "{\"type\":\"Point\",\"coordinates\":[1,2],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              geometry_line: "{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              geometry_poly: "{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              geometry_multipoint: "{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              geometry_multiline: "{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              geometry_multipoly: "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+              geometry_collection: "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}}}"
+            }
+          ) {
+            geometry
+            geometry_point
+            geometry_line
+            geometry_poly
+            geometry_multipoint
+            geometry_multiline
+            geometry_multipoly
+            geometry_collection
+          }
+        }"#),
+            @r###"{"data":{"createOneModel":{"geometry":"{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"coordinates\":[1,2]}","geometry_point":"{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"coordinates\":[1,2]}","geometry_line":"{\"type\":\"LineString\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"coordinates\":[[1,2],[3,4]]}","geometry_poly":"{\"type\":\"Polygon\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}","geometry_multipoint":"{\"type\":\"MultiPoint\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"coordinates\":[[1,2]]}","geometry_multiline":"{\"type\":\"MultiLineString\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"coordinates\":[[[1,2],[3,4]]]}","geometry_multipoly":"{\"type\":\"MultiPolygon\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}","geometry_collection":"{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:3857\"}},\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_geography() -> String {
+        let schema = indoc! {
+            r#"model Model {
+            @@schema("test")
+            #id(id, String, @id, @default(cuid()))
+            geography            Geometry @test.Geography(Geometry, 4326)
+            geography_point      Geometry @test.Geography(Point, 4326)
+            geography_line       Geometry @test.Geography(LineString, 4326)
+            geography_poly       Geometry @test.Geography(Polygon, 4326)
+            geography_multipoint Geometry @test.Geography(MultiPoint, 4326)
+            geography_multiline  Geometry @test.Geography(MultiLineString, 4326)
+            geography_multipoly  Geometry @test.Geography(MultiPolygon, 4326)
+            geography_collection Geometry @test.Geography(GeometryCollection, 4326)
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "PostGIS common geography types" should "work"
+    #[connector_test(
+        only(Postgres("16-postgis"), CockroachDb),
+        schema(schema_geography),
+        db_schemas("public", "test")
+    )]
+    async fn native_geography(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+          createOneModel(
+            data: {
+              geography: "{\"type\":\"Point\",\"coordinates\":[1,2]}"
+              geography_point: "{\"type\":\"Point\",\"coordinates\":[1,2]}"
+              geography_line: "{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}"
+              geography_poly: "{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}"
+              geography_multipoint: "{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}"
+              geography_multiline: "{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}"
+              geography_multipoly: "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}"
+              geography_collection: "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"
+            }
+          ) {
+            geography
+            geography_point
+            geography_line
+            geography_poly
+            geography_multipoint
+            geography_multiline
+            geography_multipoly
+            geography_collection
+          }
+        }"#),
+            @r###"{"data":{"createOneModel":{"geography":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geography_point":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geography_line":"{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}","geography_poly":"{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}","geography_multipoint":"{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}","geography_multiline":"{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}","geography_multipoly":"{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}","geography_collection":"{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn schema_geography_srid() -> String {
+        let schema = indoc! {
+            r#"model Model {
+            @@schema("test")
+            #id(id, String, @id, @default(cuid()))
+            geography            Geometry @test.Geography(Geometry, 9000)
+            geography_point      Geometry @test.Geography(Point, 9000)
+            geography_line       Geometry @test.Geography(LineString, 9000)
+            geography_poly       Geometry @test.Geography(Polygon, 9000)
+            geography_multipoint Geometry @test.Geography(MultiPoint, 9000)
+            geography_multiline  Geometry @test.Geography(MultiLineString, 9000)
+            geography_multipoly  Geometry @test.Geography(MultiPolygon, 9000)
+            geography_collection Geometry @test.Geography(GeometryCollection, 9000)
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "PostGIS common geography types with srid" should "work"
+    #[connector_test(
+        only(Postgres("16-postgis"), CockroachDb),
+        schema(schema_geography_srid),
+        db_schemas("public", "test")
+    )]
+    async fn native_geography_srid(runner: Runner) -> TestResult<()> {
+        match_connector_result!(
+          &runner,
+          r#"mutation {
+          createOneModel(
+            data: {
+              geography: "{\"type\":\"Point\",\"coordinates\":[1,2],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}}}"
+              geography_point: "{\"type\":\"Point\",\"coordinates\":[1,2],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}}}"
+              geography_line: "{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}}}"
+              geography_poly: "{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}}}"
+              geography_multipoint: "{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}}}"
+              geography_multiline: "{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}}}"
+              geography_multipoly: "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}}}"
+              geography_collection: "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}],\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}}}"
+            }
+          ) {
+            geography
+            geography_point
+            geography_line
+            geography_poly
+            geography_multipoint
+            geography_multiline
+            geography_multipoly
+            geography_collection
+          }
+        }"#,
+          CockroachDb(_) => r###"{"data":{"createOneModel":{"geography":"{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}},\"coordinates\":[1,2]}","geography_point":"{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}},\"coordinates\":[1,2]}","geography_line":"{\"type\":\"LineString\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}},\"coordinates\":[[1,2],[3,4]]}","geography_poly":"{\"type\":\"Polygon\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}},\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}","geography_multipoint":"{\"type\":\"MultiPoint\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}},\"coordinates\":[[1,2]]}","geography_multiline":"{\"type\":\"MultiLineString\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}},\"coordinates\":[[[1,2],[3,4]]]}","geography_multipoly":"{\"type\":\"MultiPolygon\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}},\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}","geography_collection":"{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:9000\"}},\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"}}}"###,
+          _ => r###"{"data":{"createOneModel":{"geography":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geography_point":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geography_line":"{\"type\":\"LineString\",\"coordinates\":[[1,2],[3,4]]}","geography_poly":"{\"type\":\"Polygon\",\"coordinates\":[[[1,2],[3,4],[5,6],[1,2]]]}","geography_multipoint":"{\"type\":\"MultiPoint\",\"coordinates\":[[1,2]]}","geography_multiline":"{\"type\":\"MultiLineString\",\"coordinates\":[[[1,2],[3,4]]]}","geography_multipoly":"{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1,2],[3,4],[5,6],[1,2]]]]}","geography_collection":"{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1,2]}]}"}}}"###
+        );
+
+        Ok(())
+    }
 }

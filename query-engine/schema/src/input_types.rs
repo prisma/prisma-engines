@@ -271,6 +271,10 @@ impl<'a> InputType<'a> {
         InputType::Scalar(ScalarType::Bytes)
     }
 
+    pub(crate) fn geojson() -> InputType<'a> {
+        InputType::Scalar(ScalarType::Geometry)
+    }
+
     pub(crate) fn null() -> InputType<'a> {
         InputType::Scalar(ScalarType::Null)
     }

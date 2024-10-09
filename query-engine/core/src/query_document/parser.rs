@@ -3,6 +3,7 @@ use crate::{executor::get_engine_protocol, schema::*};
 use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use core::fmt;
+use geojson::Geometry;
 use indexmap::{IndexMap, IndexSet};
 use query_structure::{DefaultKind, PrismaValue, ValueGeneratorFn};
 use std::{borrow::Cow, convert::TryFrom, rc::Rc, str::FromStr};
@@ -121,10 +122,10 @@ impl QueryDocumentParser {
         )
         .and_then(move |arguments| {
             if !selection.nested_selections().is_empty() && schema_field.field_type().is_scalar() {
-                return Err(ValidationError::selection_set_on_scalar(
+                Err(ValidationError::selection_set_on_scalar(
                     selection.name().to_string(),
                     selection_path.segments(),
-                ));
+                ))
             } else {
                 // If the output type of the field is an object type of any form, validate the sub selection as well.
                 let nested_fields = schema_field.field_type().as_object_type().map(|obj| {
@@ -371,6 +372,7 @@ impl QueryDocumentParser {
             (PrismaValue::Bytes(bytes), ScalarType::Bytes) => Ok(PrismaValue::Bytes(bytes)),
             (PrismaValue::BigInt(b_int), ScalarType::BigInt) => Ok(PrismaValue::BigInt(b_int)),
             (PrismaValue::DateTime(s), ScalarType::DateTime) => Ok(PrismaValue::DateTime(s)),
+            (PrismaValue::GeoJson(s), ScalarType::Geometry) => Ok(PrismaValue::GeoJson(s)),
             (PrismaValue::Null, ScalarType::Null) => Ok(PrismaValue::Null),
 
             // String coercion matchers
@@ -385,6 +387,9 @@ impl QueryDocumentParser {
                 .map(PrismaValue::Uuid),
             (PrismaValue::String(s), ScalarType::Json) => Ok(PrismaValue::Json(
                 self.parse_json(selection_path, argument_path, &s).map(|_| s)?,
+            )),
+            (PrismaValue::Json(s) | PrismaValue::String(s), ScalarType::Geometry) => Ok(PrismaValue::GeoJson(
+                self.parse_geojson(selection_path, argument_path, &s).map(|_| s)?,
             )),
             (PrismaValue::String(s), ScalarType::DateTime) => self
                 .parse_datetime(selection_path, argument_path, s.as_str())
@@ -532,6 +537,18 @@ impl QueryDocumentParser {
         }
 
         Ok(PrismaValue::List(prisma_values))
+    }
+
+    fn parse_geojson(&self, selection_path: &Path, argument_path: &Path, s: &str) -> QueryParserResult<Geometry> {
+        s.parse::<Geometry>().map_err(|err| {
+            ValidationError::invalid_argument_value(
+                selection_path.segments(),
+                argument_path.segments(),
+                s.to_string(),
+                "GeoJSON String",
+                Some(Box::new(err)),
+            )
+        })
     }
 
     fn parse_json(&self, selection_path: &Path, argument_path: &Path, s: &str) -> QueryParserResult<serde_json::Value> {
@@ -902,6 +919,7 @@ pub(crate) mod conversions {
                 format!("({})", itertools::join(v.iter().map(prisma_value_to_type_name), ", "))
             }
             PrismaValue::Json(_) => "JSON".to_string(),
+            PrismaValue::GeoJson(_) => "GeoJSON".to_string(),
             PrismaValue::Object(_) => "Object".to_string(),
             PrismaValue::Null => "Null".to_string(),
             PrismaValue::DateTime(_) => "DateTime".to_string(),

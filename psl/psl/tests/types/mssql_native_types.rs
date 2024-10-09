@@ -205,6 +205,64 @@ fn image_type_should_fail_on_unique() {
 }
 
 #[test]
+fn geometry_type_should_fail_on_unique() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "sqlserver"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          id Int      @id
+          a  Geometry @db.Geometry
+          b  Geometry @db.Geometry
+
+          @@unique([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mNative type `Geometry` cannot be unique in SQL Server.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m
+        [1;94m11 | [0m  [1;91m@@unique([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn geography_type_should_fail_on_unique() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "sqlserver"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          id Int      @id
+          a  Geometry @db.Geography
+          b  Geometry @db.Geography
+
+          @@unique([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mNative type `Geography` cannot be unique in SQL Server.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m
+        [1;94m11 | [0m  [1;91m@@unique([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
 fn text_type_should_fail_on_index() {
     let schema = indoc! {r#"
         datasource db {
@@ -408,6 +466,64 @@ fn image_type_should_fail_on_index() {
 }
 
 #[test]
+fn geometry_type_should_fail_on_index() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "sqlserver"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          id Int      @id
+          a  Geometry @db.Geometry
+          b  Geometry @db.Geometry
+
+          @@index([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mYou cannot define an index on fields with native type `Geometry` of SQL Server.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn geography_type_should_fail_on_index() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "sqlserver"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          id Int   @id
+          a  Geometry @db.Geography
+          b  Geometry @db.Geography
+
+          @@index([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mYou cannot define an index on fields with native type `Geography` of SQL Server.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
 fn text_type_should_fail_on_id() {
     let schema = indoc! {r#"
         datasource db {
@@ -597,6 +713,62 @@ fn image_type_should_fail_on_id() {
         [1;94m   | [0m
         [1;94m 9 | [0m
         [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn geometry_type_should_fail_on_id() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "sqlserver"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          a Geometry @db.Geometry
+          b Geometry @db.Geometry
+
+          @@id([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mNative type `Geometry` of SQL Server cannot be used on a field that is `@id` or `@@id`.[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
+        [1;94m   | [0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn geography_type_should_fail_on_id() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "sqlserver"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          a  Geometry @db.Geography
+          b  Geometry @db.Geography
+
+          @@id([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mNative type `Geography` of SQL Server cannot be used on a field that is `@id` or `@@id`.[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
+        [1;94m   | [0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
         [1;94m   | [0m
     "#]];
 
@@ -910,6 +1082,8 @@ mod test_type_mapping {
     test_type!(ntext(("String @db.NText", MsSqlType::NText)));
     test_type!(image(("Bytes @db.Image", MsSqlType::Image)));
     test_type!(xml(("String @db.Xml", MsSqlType::Xml)));
+    test_type!(geometry(("Geometry @db.Geometry", MsSqlType::Geometry)));
+    test_type!(geography(("Geometry @db.Geography", MsSqlType::Geography)));
 
     test_type!(datetimeoffset((
         "DateTime @db.DateTimeOffset",

@@ -148,6 +148,7 @@ pub enum TypeIdentifier {
     Json,
     DateTime,
     Bytes,
+    Geometry,
     Unsupported,
 }
 
@@ -175,6 +176,7 @@ impl TypeIdentifier {
             TypeIdentifier::Json => "Json".into(),
             TypeIdentifier::DateTime => "DateTime".into(),
             TypeIdentifier::Bytes => "Bytes".into(),
+            TypeIdentifier::Geometry => "Geometry".into(),
             TypeIdentifier::Unsupported => "Unsupported".into(),
         }
     }
@@ -187,6 +189,11 @@ impl TypeIdentifier {
     /// Returns `true` if the type identifier is [`Json`].
     pub fn is_json(&self) -> bool {
         matches!(self, Self::Json)
+    }
+
+    /// Returns `true` if the type identifier is [`Geometry`].
+    pub fn is_geometry(&self) -> bool {
+        matches!(self, Self::Geometry)
     }
 }
 
@@ -253,6 +260,7 @@ impl From<ScalarType> for TypeIdentifier {
             ScalarType::Json => Self::Json,
             ScalarType::Decimal => Self::Decimal,
             ScalarType::Bytes => Self::Bytes,
+            ScalarType::Geometry => Self::Geometry,
         }
     }
 }

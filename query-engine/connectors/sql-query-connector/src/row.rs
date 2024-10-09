@@ -2,8 +2,10 @@ use crate::{column_metadata::ColumnMetadata, error::SqlError, value::to_prisma_v
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
+use geozero::{wkt::Wkt, ToJson};
 use quaint::{connector::ResultRow, Value, ValueType};
 use query_structure::{ConversionFailure, FieldArity, PrismaValue, Record, TypeIdentifier};
+use serde_json::{json, Map, Value as JsonValue};
 use std::{io, str::FromStr};
 use uuid::Uuid;
 
@@ -287,6 +289,34 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             ValueType::Bytes(Some(bytes)) => PrismaValue::Bytes(bytes.into()),
             _ => return Err(create_error(&p_value)),
         },
+        TypeIdentifier::Geometry => match p_value.typed {
+            value if value.is_null() => PrismaValue::Null,
+            ValueType::Json(Some(mut geojson)) => {
+                geojson.as_object_mut().map(trim_redundent_crs);
+                PrismaValue::GeoJson(geojson.to_string())
+            }
+            ValueType::Text(Some(ref geom)) if geom.starts_with("{") => {
+                let mut geojson = geom.parse::<serde_json::Value>()?;
+                geojson.as_object_mut().map(trim_redundent_crs);
+                PrismaValue::GeoJson(geojson.to_string())
+            }
+            ValueType::Text(Some(ref geom)) => {
+                // SQlite and Postgres return GeoJSON as strings. SQL Server cannot return geometry as GeoJSON,
+                // and return an EWKT string instead. We differentiate the two by checking the first character.
+                let (srid, wkt) = geom.split_once(";").unwrap();
+                let srid = &srid[5..];
+                let mut geojson = Wkt(wkt)
+                    .to_json()
+                    .map_err(|_| create_error(&p_value))?
+                    .parse::<serde_json::Value>()?;
+                if !matches!(srid, "0" | "4326") {
+                    let crs = json!({"type": "name", "properties": {"name": format!("EPSG:{srid}")}});
+                    geojson.as_object_mut().map(|g| g.insert("crs".to_string(), crs));
+                }
+                PrismaValue::GeoJson(geojson.to_string())
+            }
+            _ => return Err(create_error(&p_value)),
+        },
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
     })
 }
@@ -344,6 +374,23 @@ pub(crate) fn big_decimal_to_i64(dec: BigDecimal, to: &'static str) -> Result<i6
     dec.normalized()
         .to_i64()
         .ok_or_else(|| SqlError::from(ConversionFailure::new(format!("BigDecimal({dec})"), to)))
+}
+
+pub(crate) fn get_geometry_crs(geojson: &Map<String, JsonValue>) -> Option<&str> {
+    geojson
+        .get("crs")?
+        .as_object()?
+        .get("properties")?
+        .as_object()?
+        .get("name")?
+        .as_str()
+}
+
+pub(crate) fn trim_redundent_crs(geojson: &mut Map<String, JsonValue>) {
+    let crs = get_geometry_crs(geojson);
+    if matches!(crs, Some("EPSG:4326")) {
+        geojson.remove("crs");
+    };
 }
 
 #[cfg(test)]

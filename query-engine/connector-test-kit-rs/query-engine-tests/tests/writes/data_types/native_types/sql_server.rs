@@ -361,8 +361,10 @@ mod sql_server {
         let schema = indoc! {
             r#"model Model {
               #id(id, String, @id, @default(cuid()))
-              xml  String  @test.Xml
-              uuid String  @test.UniqueIdentifier
+              xml  String   @test.Xml
+              uuid String   @test.UniqueIdentifier
+              geom Geometry @test.Geometry
+              geog Geometry @test.Geography
             }"#
         };
 
@@ -378,13 +380,17 @@ mod sql_server {
               data: {
                 xml: "<meow>purr</meow>"
                 uuid: "ab309dfd-d041-4110-b162-75d7b95fe989"
+                geom: "{\"type\": \"Point\", \"coordinates\": [1,2]}"
+                geog: "{\"type\": \"Point\", \"coordinates\": [1,2]}"
               }
             ) {
               xml
               uuid
+              geom
+              geog
             }
           }"#),
-          @r###"{"data":{"createOneModel":{"xml":"<meow>purr</meow>","uuid":"ab309dfd-d041-4110-b162-75d7b95fe989"}}}"###
+          @r###"{"data":{"createOneModel":{"xml":"<meow>purr</meow>","uuid":"ab309dfd-d041-4110-b162-75d7b95fe989","geom":"{\"type\":\"Point\",\"coordinates\":[1,2]}","geog":"{\"type\":\"Point\",\"coordinates\":[1,2]}"}}}"###
         );
 
         Ok(())

@@ -113,6 +113,12 @@ pub(crate) fn connection_string(
                 Some(PostgresVersion::V15) if is_ci => {
                     format!("postgresql://postgres:prisma@test-db-postgres-15:5432/{database}")
                 }
+                Some(PostgresVersion::V16) if is_ci => {
+                    format!("postgresql://postgres:prisma@test-db-postgres-15:5432/{database}")
+                }
+                Some(PostgresVersion::V16PostGIS) if is_ci => {
+                    format!("postgresql://postgres:prisma@test-db-postgres-15:5432/{database}")
+                }
                 Some(PostgresVersion::PgBouncer) if is_ci => {
                     format!("postgresql://postgres:prisma@test-db-pgbouncer:6432/{database}&pgbouncer=true")
                 }
@@ -131,6 +137,7 @@ pub(crate) fn connection_string(
                 Some(PostgresVersion::V14) => format!("postgresql://postgres:prisma@127.0.0.1:5437/{database}"),
                 Some(PostgresVersion::V15) => format!("postgresql://postgres:prisma@127.0.0.1:5438/{database}"),
                 Some(PostgresVersion::V16) => format!("postgresql://postgres:prisma@127.0.0.1:5439/{database}"),
+                Some(PostgresVersion::V16PostGIS) => format!("postgresql://postgres:prisma@127.0.0.1:5440/{database}"),
                 Some(PostgresVersion::PgBouncer) => {
                     format!("postgresql://postgres:prisma@127.0.0.1:6432/db?{database}&pgbouncer=true")
                 }
@@ -175,12 +182,20 @@ pub(crate) fn connection_string(
             }
             None => unreachable!("A versioned connector must have a concrete version to run."),
         },
-        ConnectorVersion::Sqlite(_) => {
+        ConnectorVersion::Sqlite(version) => {
             let workspace_root = std::env::var("WORKSPACE_ROOT")
                 .unwrap_or_else(|_| ".".to_owned())
                 .trim_end_matches('/')
                 .to_owned();
 
+            let spatialite_path = std::env::var("SPATIALITE_PATH");
+            match (version, spatialite_path) {
+                (Some(SqliteVersion::V3Spatialite), Err(_)) => {
+                    panic!("SPATIALITE_PATH env var should be set for version 3-spatialite")
+                }
+                (None, _) => unreachable!("A versioned connector must have a concrete version to run."),
+                (_, _) => (),
+            };
             format!("file://{workspace_root}/db/{database}.db")
         }
         ConnectorVersion::CockroachDb(v) => {

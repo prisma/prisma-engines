@@ -2,7 +2,7 @@
 
 pub(crate) use quaint::connector::rusqlite;
 
-use quaint::connector::{ColumnType, DescribedColumn, DescribedParameter, GetRow, ToColumnNames};
+use quaint::connector::{load_spatialite, ColumnType, DescribedColumn, DescribedParameter, GetRow, ToColumnNames};
 use schema_connector::{ConnectorError, ConnectorResult};
 use sql_schema_describer::{sqlite as describer, DescriberErrorKind, SqlSchema};
 use sqlx_core::{column::Column, type_info::TypeInfo};
@@ -14,13 +14,15 @@ pub(super) struct Connection(Mutex<rusqlite::Connection>);
 
 impl Connection {
     pub(super) fn new(params: &super::Params) -> ConnectorResult<Self> {
-        Ok(Connection(Mutex::new(
-            rusqlite::Connection::open(&params.file_path).map_err(convert_error)?,
-        )))
+        let conn = rusqlite::Connection::open(&params.file_path).map_err(convert_error)?;
+        load_spatialite(&conn).map_err(|e| ConnectorError::from_msg(e.to_string()))?;
+        Ok(Connection(Mutex::new(conn)))
     }
 
-    pub(super) fn new_in_memory() -> Self {
-        Connection(Mutex::new(rusqlite::Connection::open_in_memory().unwrap()))
+    pub(super) fn new_in_memory() -> ConnectorResult<Self> {
+        let conn = rusqlite::Connection::open_in_memory().unwrap();
+        load_spatialite(&conn).map_err(|e| ConnectorError::from_msg(e.to_string()))?;
+        Ok(Connection(Mutex::new(conn)))
     }
 
     pub(super) async fn describe_schema(&mut self) -> ConnectorResult<SqlSchema> {

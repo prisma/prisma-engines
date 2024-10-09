@@ -225,6 +225,16 @@ impl<'a> Value<'a> {
         ValueType::xml(value).into_value()
     }
 
+    /// Creates a new geometry value.
+    pub fn geometry(value: geojson::Geometry) -> Self {
+        ValueType::geometry(value).into_value()
+    }
+
+    /// Creates a new geometry value.
+    pub fn geography(value: geojson::Geometry) -> Self {
+        ValueType::geography(value).into_value()
+    }
+
     /// `true` if the `Value` is null.
     pub fn is_null(&self) -> bool {
         self.typed.is_null()
@@ -488,6 +498,10 @@ impl<'a> Value<'a> {
     pub fn null_time() -> Self {
         ValueType::Time(None).into()
     }
+
+    pub fn null_geometry() -> Self {
+        ValueType::Geometry(None).into()
+    }
 }
 
 impl<'a> Display for Value<'a> {
@@ -546,6 +560,10 @@ pub enum ValueType<'a> {
     Numeric(Option<BigDecimal>),
     /// A JSON value.
     Json(Option<serde_json::Value>),
+    /// A Geometry value.
+    Geometry(Option<geojson::Geometry>),
+    /// A Geography value.
+    Geography(Option<geojson::Geometry>),
     /// A XML value.
     Xml(Option<Cow<'a, str>>),
     /// An UUID value.
@@ -622,6 +640,8 @@ impl<'a> fmt::Display for ValueType<'a> {
             ValueType::DateTime(val) => val.map(|v| write!(f, "\"{v}\"")),
             ValueType::Date(val) => val.map(|v| write!(f, "\"{v}\"")),
             ValueType::Time(val) => val.map(|v| write!(f, "\"{v}\"")),
+            ValueType::Geometry(val) => val.as_ref().map(|v| write!(f, "{v}")),
+            ValueType::Geography(val) => val.as_ref().map(|v| write!(f, "{v}")),
         };
 
         match res {
@@ -680,6 +700,8 @@ impl<'a> From<ValueType<'a>> for serde_json::Value {
             ValueType::DateTime(dt) => dt.map(|dt| serde_json::Value::String(dt.to_rfc3339())),
             ValueType::Date(date) => date.map(|date| serde_json::Value::String(format!("{date}"))),
             ValueType::Time(time) => time.map(|time| serde_json::Value::String(format!("{time}"))),
+            ValueType::Geometry(g) => g.map(|g| geojson::GeoJson::Geometry(g).into()),
+            ValueType::Geography(g) => g.map(|g| geojson::GeoJson::Geometry(g).into()),
         };
 
         match res {
@@ -826,6 +848,16 @@ impl<'a> ValueType<'a> {
         Self::Json(Some(value))
     }
 
+    /// Creates a new GeoJSON geometry value.
+    pub(crate) fn geometry(value: geojson::Geometry) -> Self {
+        Self::Geometry(Some(value))
+    }
+
+    /// Creates a new GeoJSON geography value.
+    pub(crate) fn geography(value: geojson::Geometry) -> Self {
+        Self::Geography(Some(value))
+    }
+
     /// Creates a new XML value.
     pub(crate) fn xml<T>(value: T) -> Self
     where
@@ -855,6 +887,8 @@ impl<'a> ValueType<'a> {
             Self::Date(d) => d.is_none(),
             Self::Time(t) => t.is_none(),
             Self::Json(json) => json.is_none(),
+            Self::Geometry(geom) => geom.is_none(),
+            Self::Geography(geom) => geom.is_none(),
         }
     }
 

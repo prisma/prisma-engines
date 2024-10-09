@@ -60,7 +60,7 @@ fn postgres_many_namespaces(api: TestApi) {
         .assert_namespace("three");
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
+#[test_connector(tags(Postgres), exclude(PostGIS, CockroachDb))]
 fn views_can_be_described(api: TestApi) {
     let full_sql = r#"
         CREATE TABLE a (a_id int);
@@ -78,7 +78,7 @@ fn views_can_be_described(api: TestApi) {
     assert_eq!(expected_sql, view.definition.unwrap());
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
+#[test_connector(tags(Postgres), exclude(PostGIS, CockroachDb))]
 fn all_postgres_column_types_must_work(api: TestApi) {
     let sql = r#"
         CREATE TABLE "User" (
@@ -1096,6 +1096,137 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     name: "plpgsql",
                     schema: "pg_catalog",
                     version: "1.0",
+                    relocatable: false,
+                },
+            ],
+        }
+    "#]];
+    expected_ext.assert_debug_eq(&ext);
+}
+
+#[test_connector(tags(PostGIS), exclude(CockroachDb))]
+fn all_postgis_column_types_must_work(api: TestApi) {
+    let sql = r#"
+        CREATE EXTENSION IF NOT EXISTS postgis;
+
+        CREATE TABLE "Spatial" (
+            geometry_geometry           GEOMETRY(GEOMETRY, 3857),
+            geometry_geometry_z         GEOMETRY(GEOMETRYZ, 3857),
+            geometry_geometry_m         GEOMETRY(GEOMETRYM, 3857),
+            geometry_geometry_zm        GEOMETRY(GEOMETRYZM, 3857),
+            geometry_point              GEOMETRY(POINT, 3857),
+            geometry_point_z            GEOMETRY(POINTZ, 3857),
+            geometry_point_m            GEOMETRY(POINTM, 3857),
+            geometry_point_zm           GEOMETRY(POINTZM, 3857),
+            geometry_line               GEOMETRY(LINESTRING, 3857),
+            geometry_line_z             GEOMETRY(LINESTRINGZ, 3857),
+            geometry_line_m             GEOMETRY(LINESTRINGM, 3857),
+            geometry_line_zm            GEOMETRY(LINESTRINGZM, 3857),
+            geometry_polygon            GEOMETRY(POLYGON, 3857),
+            geometry_polygon_z          GEOMETRY(POLYGONZ, 3857),
+            geometry_polygon_m          GEOMETRY(POLYGONM, 3857),
+            geometry_polygon_zm         GEOMETRY(POLYGONZM, 3857),
+            geometry_multipoint         GEOMETRY(MULTIPOINT, 3857),
+            geometry_multipoint_z       GEOMETRY(MULTIPOINTZ, 3857),
+            geometry_multipoint_m       GEOMETRY(MULTIPOINTM, 3857),
+            geometry_multipoint_zm      GEOMETRY(MULTIPOINTZM, 3857),
+            geometry_multiline          GEOMETRY(MULTILINESTRING, 3857),
+            geometry_multiline_z        GEOMETRY(MULTILINESTRINGZ, 3857),
+            geometry_multiline_m        GEOMETRY(MULTILINESTRINGM, 3857),
+            geometry_multiline_zm       GEOMETRY(MULTILINESTRINGZM, 3857),
+            geometry_multipolygon       GEOMETRY(MULTIPOLYGON, 3857),
+            geometry_multipolygon_z     GEOMETRY(MULTIPOLYGONZ, 3857),
+            geometry_multipolygon_m     GEOMETRY(MULTIPOLYGONM, 3857),
+            geometry_multipolygon_zm    GEOMETRY(MULTIPOLYGONZM, 3857),
+            geometry_collection         GEOMETRY(GEOMETRYCOLLECTION, 3857),
+            geometry_collection_z       GEOMETRY(GEOMETRYCOLLECTIONZ, 3857),
+            geometry_collection_m       GEOMETRY(GEOMETRYCOLLECTIONM, 3857),
+            geometry_collection_zm      GEOMETRY(GEOMETRYCOLLECTIONZM, 3857),
+            geography_geometry          GEOGRAPHY(GEOMETRY, 9000),
+            geography_geometry_z        GEOGRAPHY(GEOMETRYZ, 9000),
+            geography_geometry_m        GEOGRAPHY(GEOMETRYM, 9000),
+            geography_geometry_zm       GEOGRAPHY(GEOMETRYZM, 9000),
+            geography_point             GEOGRAPHY(POINT, 9000),
+            geography_point_z           GEOGRAPHY(POINTZ, 9000),
+            geography_point_m           GEOGRAPHY(POINTM, 9000),
+            geography_point_zm          GEOGRAPHY(POINTZM, 9000),
+            geography_line              GEOGRAPHY(LINESTRING, 9000),
+            geography_line_z            GEOGRAPHY(LINESTRINGZ, 9000),
+            geography_line_m            GEOGRAPHY(LINESTRINGM, 9000),
+            geography_line_zm           GEOGRAPHY(LINESTRINGZM, 9000),
+            geography_polygon           GEOGRAPHY(POLYGON, 9000),
+            geography_polygon_z         GEOGRAPHY(POLYGONZ, 9000),
+            geography_polygon_m         GEOGRAPHY(POLYGONM, 9000),
+            geography_polygon_zm        GEOGRAPHY(POLYGONZM, 9000),
+            geography_multipoint        GEOGRAPHY(MULTIPOINT, 9000),
+            geography_multipoint_z      GEOGRAPHY(MULTIPOINTZ, 9000),
+            geography_multipoint_m      GEOGRAPHY(MULTIPOINTM, 9000),
+            geography_multipoint_zm     GEOGRAPHY(MULTIPOINTZM, 9000),
+            geography_multiline         GEOGRAPHY(MULTILINESTRING, 9000),
+            geography_multiline_z       GEOGRAPHY(MULTILINESTRINGZ, 9000),
+            geography_multiline_m       GEOGRAPHY(MULTILINESTRINGM, 9000),
+            geography_multiline_zm      GEOGRAPHY(MULTILINESTRINGZM, 9000),
+            geography_multipolygon      GEOGRAPHY(MULTIPOLYGON, 9000),
+            geography_multipolygon_z    GEOGRAPHY(MULTIPOLYGONZ, 9000),
+            geography_multipolygon_m    GEOGRAPHY(MULTIPOLYGONM, 9000),
+            geography_multipolygon_zm   GEOGRAPHY(MULTIPOLYGONZM, 9000),
+            geography_collection        GEOGRAPHY(GEOMETRYCOLLECTION, 9000),
+            geography_collection_z      GEOGRAPHY(GEOMETRYCOLLECTIONZ, 9000),
+            geography_collection_m      GEOGRAPHY(GEOMETRYCOLLECTIONM, 9000),
+            geography_collection_zm     GEOGRAPHY(GEOMETRYCOLLECTIONZM, 9000)
+        );
+    "#;
+    api.raw_cmd(sql);
+    // TODO@geometry: FIXME! The shema returned contains EVERY PostGIS functions / procedures, tables, views etc
+    // It is massive. Is there a way to strip it so we can make this test work ?
+    // let expectation = expect![[r#""#]];
+    // api.expect_schema(expectation);
+
+    if api.connector_tags().contains(Tags::Postgres9) {
+        return; // sequence max values work differently on postgres 9
+    }
+
+    let result = api.describe();
+    let ext = extract_ext(&result);
+    let expected_ext = expect![[r#"
+        PostgresSchemaExt {
+            opclasses: [],
+            indexes: [
+                (
+                    IndexId(
+                        0,
+                    ),
+                    BTree,
+                ),
+            ],
+            expression_indexes: [],
+            index_null_position: {},
+            constraint_options: {
+                Index(
+                    IndexId(
+                        0,
+                    ),
+                ): BitFlags<ConstraintOption> {
+                    bits: 0b0,
+                },
+            },
+            table_options: [
+                {},
+                {},
+            ],
+            exclude_constraints: [],
+            sequences: [],
+            extensions: [
+                DatabaseExtension {
+                    name: "plpgsql",
+                    schema: "pg_catalog",
+                    version: "1.0",
+                    relocatable: false,
+                },
+                DatabaseExtension {
+                    name: "postgis",
+                    schema: "prisma-tests",
+                    version: "3.4.3",
                     relocatable: false,
                 },
             ],

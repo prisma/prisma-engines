@@ -63,6 +63,10 @@ impl ScalarField {
         self.type_identifier().is_numeric()
     }
 
+    pub fn is_geometry(&self) -> bool {
+        self.type_identifier().is_geometry()
+    }
+
     pub fn container(&self) -> ParentContainer {
         match self.id {
             ScalarFieldId::InModel(id) => self.dm.find_model_by_id(self.dm.walk(id).model().id).into(),
@@ -296,6 +300,7 @@ pub fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<Sca
 
             DefaultKind::Single(PrismaValue::List(values))
         }
+        // TODO@geometry: Add geometry default value handling
         other => unreachable!("{:?}", other),
     }
 }

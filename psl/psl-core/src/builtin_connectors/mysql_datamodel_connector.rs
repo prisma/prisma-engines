@@ -24,6 +24,14 @@ const TINY_TEXT_TYPE_NAME: &str = "TinyText";
 const TEXT_TYPE_NAME: &str = "Text";
 const MEDIUM_TEXT_TYPE_NAME: &str = "MediumText";
 const LONG_TEXT_TYPE_NAME: &str = "LongText";
+const GEOMETRY_TYPE_NAME: &str = "Geometry";
+const POINT_TYPE_NAME: &str = "Point";
+const LINESTRING_TYPE_NAME: &str = "LineString";
+const POLYGON_TYPE_NAME: &str = "Polygon";
+const MULTIPOINT_TYPE_NAME: &str = "MultiPoint";
+const MULTILINESTRING_TYPE_NAME: &str = "MultiLineString";
+const MULTIPOLYGON_TYPE_NAME: &str = "MultiPolygon";
+const GEOMETRYCOLLECTION_TYPE_NAME: &str = "GeometryCollection";
 
 pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
     Enums |
@@ -78,6 +86,7 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
     (ScalarType::DateTime, MySqlType::DateTime(Some(3))),
     (ScalarType::Bytes, MySqlType::LongBlob),
     (ScalarType::Json, MySqlType::Json),
+    (ScalarType::Geometry, MySqlType::Geometry(None)),
 ];
 
 impl Connector for MySqlDatamodelConnector {
@@ -148,6 +157,15 @@ impl Connector for MySqlDatamodelConnector {
             Blob => ScalarType::Bytes,
             MediumBlob => ScalarType::Bytes,
             Bit(_) => ScalarType::Bytes,
+            //Geometry
+            Geometry(_) => ScalarType::Geometry,
+            Point(_) => ScalarType::Geometry,
+            LineString(_) => ScalarType::Geometry,
+            Polygon(_) => ScalarType::Geometry,
+            MultiPoint(_) => ScalarType::Geometry,
+            MultiLineString(_) => ScalarType::Geometry,
+            MultiPolygon(_) => ScalarType::Geometry,
+            GeometryCollection(_) => ScalarType::Geometry,
             //Missing from docs
             UnsignedInt => ScalarType::Int,
             UnsignedSmallInt => ScalarType::Int,

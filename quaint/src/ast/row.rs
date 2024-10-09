@@ -1,4 +1,4 @@
-use super::compare::JsonType;
+use super::compare::{GeometryType, JsonType};
 use crate::ast::{Comparable, Compare, Expression};
 use std::borrow::Cow;
 
@@ -352,6 +352,80 @@ impl<'a> Comparable<'a> for Row<'a> {
         let value: Expression<'a> = self.into();
 
         value.json_type_not_equals(json_type)
+    }
+
+    #[allow(clippy::wrong_self_convention)]
+    fn geometry_is_empty(self) -> Compare<'a> {
+        let value: Expression<'a> = self.into();
+        value.geometry_is_empty()
+    }
+
+    #[allow(clippy::wrong_self_convention)]
+    fn geometry_is_not_empty(self) -> Compare<'a> {
+        let value: Expression<'a> = self.into();
+        value.geometry_is_not_empty()
+    }
+
+    #[allow(clippy::wrong_self_convention)]
+    fn geometry_is_valid(self) -> Compare<'a> {
+        let value: Expression<'a> = self.into();
+        value.geometry_is_valid()
+    }
+
+    #[allow(clippy::wrong_self_convention)]
+    fn geometry_is_not_valid(self) -> Compare<'a> {
+        let value: Expression<'a> = self.into();
+        value.geometry_is_not_valid()
+    }
+
+    fn geometry_within<T>(self, geom: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let value: Expression<'a> = self.into();
+        value.geometry_within(geom)
+    }
+
+    fn geometry_not_within<T>(self, geom: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let value: Expression<'a> = self.into();
+        value.geometry_not_within(geom)
+    }
+
+    fn geometry_intersects<T>(self, geom: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let value: Expression<'a> = self.into();
+        value.geometry_intersects(geom)
+    }
+
+    fn geometry_not_intersects<T>(self, geom: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let value: Expression<'a> = self.into();
+        value.geometry_not_intersects(geom)
+    }
+
+    fn geometry_type_equals<T>(self, geometry_type: T) -> Compare<'a>
+    where
+        T: Into<GeometryType<'a>>,
+    {
+        let value: Expression<'a> = self.into();
+
+        value.geometry_type_equals(geometry_type)
+    }
+
+    fn geometry_type_not_equals<T>(self, geometry_type: T) -> Compare<'a>
+    where
+        T: Into<GeometryType<'a>>,
+    {
+        let value: Expression<'a> = self.into();
+
+        value.geometry_type_not_equals(geometry_type)
     }
 
     fn matches<T>(self, query: T) -> Compare<'a>

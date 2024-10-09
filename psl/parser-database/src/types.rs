@@ -263,6 +263,11 @@ impl ScalarFieldType {
     pub fn is_decimal(self) -> bool {
         matches!(self, Self::BuiltInScalar(ScalarType::Decimal))
     }
+
+    /// True if the field's type is Geometry.
+    pub fn is_geometry(self) -> bool {
+        matches!(self, Self::BuiltInScalar(ScalarType::Geometry))
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -424,9 +429,9 @@ impl IndexAlgorithm {
         match self {
             IndexAlgorithm::BTree => true,
             IndexAlgorithm::Hash => true,
-            IndexAlgorithm::Gist => r#type.is_string(),
-            IndexAlgorithm::Gin => r#type.is_json() || field.ast_field().arity.is_list(),
-            IndexAlgorithm::SpGist => r#type.is_string(),
+            IndexAlgorithm::Gist => r#type.is_string() || r#type.is_geometry(),
+            IndexAlgorithm::Gin => r#type.is_json() || r#type.is_geometry() || field.ast_field().arity.is_list(),
+            IndexAlgorithm::SpGist => r#type.is_string() || r#type.is_geometry(),
             IndexAlgorithm::Brin => {
                 r#type.is_string()
                     || r#type.is_bytes()
@@ -435,6 +440,7 @@ impl IndexAlgorithm {
                     || r#type.is_int()
                     || r#type.is_bigint()
                     || r#type.is_decimal()
+                    || r#type.is_geometry()
             }
         }
     }
@@ -1267,6 +1273,7 @@ pub enum OperatorClass {
     /// - `<= (uuid,uuid)`
     /// - `>= (uuid,uuid)`
     UuidMinMaxMultiOps,
+    // TODO@geometry: Define operator classes
 }
 
 impl OperatorClass {
@@ -1445,6 +1452,7 @@ pub enum ScalarType {
     Json,
     Bytes,
     Decimal,
+    Geometry,
 }
 
 impl ScalarType {
@@ -1460,6 +1468,7 @@ impl ScalarType {
             ScalarType::Json => "Json",
             ScalarType::Bytes => "Bytes",
             ScalarType::Decimal => "Decimal",
+            ScalarType::Geometry => "Geometry",
         }
     }
 
@@ -1481,6 +1490,7 @@ impl ScalarType {
                 "json" => Some(ScalarType::Json),
                 "bytes" => Some(ScalarType::Bytes),
                 "decimal" => Some(ScalarType::Decimal),
+                "geometry" => Some(ScalarType::Geometry),
                 _ => None,
             },
             _ => match s {
@@ -1493,6 +1503,7 @@ impl ScalarType {
                 "Json" => Some(ScalarType::Json),
                 "Bytes" => Some(ScalarType::Bytes),
                 "Decimal" => Some(ScalarType::Decimal),
+                "Geometry" => Some(ScalarType::Geometry),
                 _ => None,
             },
         }

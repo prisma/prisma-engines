@@ -8,7 +8,7 @@ mod error;
 use crate::connector::IsolationLevel;
 use crate::connector::{sqlite::params::SqliteParams, ColumnType, DescribedQuery};
 
-pub use rusqlite::{params_from_iter, version as sqlite_version};
+pub use rusqlite::{params_from_iter, version as sqlite_version, LoadExtensionGuard};
 
 use crate::{
     ast::{Query, Value},
@@ -27,6 +27,28 @@ pub use rusqlite;
 /// A connector interface for the SQLite database
 pub struct Sqlite {
     pub(crate) client: Mutex<rusqlite::Connection>,
+}
+
+pub fn load_spatialite(conn: &rusqlite::Connection) -> crate::Result<()> {
+    // Loading Spatialite here isn't ideal, but needed because it has to be
+    // done for every new pooled connection..?
+    if let Ok(spatialite_path) = std::env::var("SPATIALITE_PATH") {
+        if !spatialite_path.is_empty() {
+            unsafe {
+                let _guard = LoadExtensionGuard::new(conn)?;
+                conn.load_extension(spatialite_path, None)?;
+            }
+            return match conn.query_row("SELECT CheckSpatialMetaData()", [], |r| r.get(0))? {
+                0 => match conn.query_row("SELECT InitSpatialMetaData(1, 'WGS84_ONLY')", [], |r| r.get(0))? {
+                    1 => Ok(()),
+                    _ => Err(Error::builder(ErrorKind::QueryError("Failed to load Spatialite".into())).build()),
+                },
+                3 => Ok(()),
+                _ => Err(Error::builder(ErrorKind::QueryError("Invalid Spatialite State".into())).build()),
+            };
+        }
+    }
+    Ok(())
 }
 
 impl TryFrom<&str> for Sqlite {
@@ -58,6 +80,8 @@ impl TryFrom<&str> for Sqlite {
                 | rusqlite::OpenFlags::SQLITE_OPEN_URI,
         )?;
 
+        load_spatialite(&conn)?;
+
         if let Some(timeout) = params.socket_timeout {
             conn.busy_timeout(timeout)?;
         };
@@ -76,6 +100,7 @@ impl Sqlite {
     /// Open a new SQLite database in memory.
     pub fn new_in_memory() -> crate::Result<Sqlite> {
         let client = rusqlite::Connection::open_in_memory()?;
+        load_spatialite(&client)?;
 
         Ok(Sqlite {
             client: Mutex::new(client),

@@ -21,6 +21,14 @@ const NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION: &[&str] = &[
     super::TINY_BLOB_TYPE_NAME,
     super::MEDIUM_BLOB_TYPE_NAME,
     super::LONG_BLOB_TYPE_NAME,
+    super::GEOMETRY_TYPE_NAME,
+    super::POINT_TYPE_NAME,
+    super::LINESTRING_TYPE_NAME,
+    super::POLYGON_TYPE_NAME,
+    super::MULTIPOINT_TYPE_NAME,
+    super::MULTILINESTRING_TYPE_NAME,
+    super::MULTIPOLYGON_TYPE_NAME,
+    super::GEOMETRYCOLLECTION_TYPE_NAME,
 ];
 
 pub(crate) fn field_types_can_be_used_in_an_index(

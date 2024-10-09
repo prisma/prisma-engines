@@ -1,3 +1,5 @@
+use crate::builtin_connectors::geometry::GeometryParams;
+
 crate::native_type_definition! {
     CockroachType;
     Bit(Option<u32>) -> String,
@@ -22,4 +24,6 @@ crate::native_type_definition! {
     Timetz(Option<u32>) -> DateTime,
     Uuid -> String,
     VarBit(Option<u32>) -> String,
+    Geometry(Option<GeometryParams>) -> Geometry,
+    Geography(Option<GeometryParams>) -> Geometry,
 }

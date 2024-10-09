@@ -11,9 +11,8 @@ mod providers;
 mod sqlite;
 
 pub use schema_core::schema_connector::ConnectorError;
-use sqlite::sqlite_setup;
 
-use self::{cockroachdb::*, mongodb::*, mssql::*, mysql::*, postgres::*};
+use self::{cockroachdb::*, mongodb::*, mssql::*, mysql::*, postgres::*, sqlite::*};
 use driver_adapters::DriverAdapter;
 use enumflags2::BitFlags;
 use providers::Provider;
@@ -61,6 +60,7 @@ fn parse_configuration(datamodel: &str) -> ConnectorResult<(Datasource, String, 
 }
 
 /// Database setup for connector-test-kit-rs with Driver Adapters.
+///
 /// If the external driver adapter requires a migration by means of the JavaScript runtime
 /// (rather than just the Schema Engine), this function will call [`ExternalInitializer::init_with_migration`].
 /// Otherwise, it will call [`ExternalInitializer::init`], and then proceed with the standard

@@ -6,10 +6,11 @@ use crate::{
 };
 use indoc::formatdoc;
 use once_cell::sync::Lazy;
+use psl::builtin_connectors::SQLiteType;
 use regex::Regex;
 use sql_ddl::sqlite as ddl;
 use sql_schema_describer::{walkers::*, *};
-use std::borrow::Cow;
+use std::{borrow::Cow, fmt::Write};
 
 impl SqlRenderer for SqliteFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
@@ -141,7 +142,39 @@ impl SqlRenderer for SqliteFlavour {
                 .map(|c| c.map(|c| c.name().into()).collect());
         }
 
-        create_table.to_string()
+        let create_geometries = if self.has_spatialite() {
+            self.render_create_geometry_columns(table, table_name)
+        } else {
+            "".to_string()
+        };
+        if create_geometries.is_empty() {
+            create_table.to_string()
+        } else {
+            create_table.to_string() + ";\n" + &create_geometries
+        }
+    }
+
+    fn render_create_geometry_columns(&self, table: TableWalker<'_>, table_name: QuotedWithPrefix<&str>) -> String {
+        // TODO@geometry: RecoverGeometryColumn doesn't error, it returns 1 on success and 0 on failure
+        // Is that sufficient to signal failure to the migration script or do we need special handing ?
+        let table_name = table_name.to_string();
+        let table_name = &table_name[1..table_name.len() - 1]; // Because we need it as an unqoted string
+        table
+            .columns()
+            .filter(|c| c.column_type_family().is_geometry())
+            .fold(String::new(), |mut result, col| {
+                let column_name = col.name();
+                let SQLiteType::Geometry(geom) = col.column_native_type().unwrap();
+                writeln!(
+                    result,
+                    "SELECT RecoverGeometryColumn('{table_name}', '{column_name}', {srid}, '{type_}', '{dims}');",
+                    srid = geom.srid,
+                    type_ = geom.type_.as_2d(),
+                    dims = geom.type_.dimension(),
+                )
+                .unwrap();
+                result
+            })
     }
 
     fn render_drop_enum(&self, _: EnumWalker<'_>) -> Vec<String> {
@@ -173,8 +206,12 @@ impl SqlRenderer for SqliteFlavour {
                 stmt.push_str("PRAGMA foreign_keys=off");
             });
             step.render_statement(&mut |stmt| {
-                stmt.push_str("DROP TABLE ");
-                stmt.push_display(&Quoted::sqlite_ident(table_name));
+                if self.has_spatialite() {
+                    stmt.push_str(&format!("SELECT DropTable(NULL, '{}')", table_name));
+                } else {
+                    stmt.push_str("DROP TABLE ");
+                    stmt.push_display(&Quoted::sqlite_ident(table_name));
+                }
             });
             step.render_statement(&mut |stmt| {
                 stmt.push_str("PRAGMA foreign_keys=on");
@@ -205,13 +242,12 @@ impl SqlRenderer for SqliteFlavour {
 
             copy_current_table_into_new_table(&mut result, redefine_table, tables, &temporary_table_name);
 
-            result.push(format!(r#"DROP TABLE "{}""#, tables.previous.name()));
-
-            result.push(format!(
-                r#"ALTER TABLE "{old_name}" RENAME TO "{new_name}""#,
-                old_name = temporary_table_name,
-                new_name = tables.next.name(),
-            ));
+            if self.has_spatialite() {
+                result.push(format!("SELECT DropTable(NULL, '{}')", tables.previous.name()));
+            } else {
+                result.push(format!(r#"DROP TABLE "{}""#, tables.previous.name()));
+            }
+            result.push(self.render_rename_table(None, &temporary_table_name, tables.next.name()));
 
             for index in tables.next.indexes().filter(|idx| !idx.is_primary_key()) {
                 result.push(self.render_create_index(index));
@@ -237,7 +273,11 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_rename_table(&self, _namespace: Option<&str>, name: &str, new_name: &str) -> String {
-        format!(r#"ALTER TABLE "{name}" RENAME TO "{new_name}""#)
+        if self.has_spatialite() {
+            format!("SELECT RenameTable(NULL, '{name}', '{new_name}')")
+        } else {
+            format!(r#"ALTER TABLE "{name}" RENAME TO "{new_name}""#)
+        }
     }
 
     fn render_drop_view(&self, view: ViewWalker<'_>) -> String {
@@ -263,6 +303,8 @@ fn render_column_type(t: &ColumnType) -> &str {
         ColumnTypeFamily::BigInt => "BIGINT",
         ColumnTypeFamily::String => "TEXT",
         ColumnTypeFamily::Binary => "BLOB",
+        // TODO@geometry: Ideally, render 2D native geometry type instead (not necessary)
+        ColumnTypeFamily::Geometry => "GEOMETRY",
         ColumnTypeFamily::Json => unreachable!("ColumnTypeFamily::Json on SQLite"),
         ColumnTypeFamily::Enum(_) => unreachable!("ColumnTypeFamily::Enum on SQLite"),
         ColumnTypeFamily::Uuid => unimplemented!("ColumnTypeFamily::Uuid on SQLite"),

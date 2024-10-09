@@ -66,6 +66,11 @@ pub(crate) trait SqlRenderer {
     /// Render a table creation with the provided table name.
     fn render_create_table_as(&self, table: TableWalker<'_>, table_name: QuotedWithPrefix<&str>) -> String;
 
+    /// Render geometry columns creation (Spatialite only)
+    fn render_create_geometry_columns(&self, _table: TableWalker<'_>, _table_name: QuotedWithPrefix<&str>) -> String {
+        unreachable!("unreachable render_create_geometry_columns")
+    }
+
     fn render_drop_and_recreate_index(&self, _indexes: MigrationPair<IndexWalker<'_>>) -> Vec<String> {
         unreachable!("unreachable render_drop_and_recreate_index")
     }

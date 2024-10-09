@@ -20,6 +20,23 @@ pub(crate) struct SqliteFlavour {
     state: State,
 }
 
+impl SqliteFlavour {
+    pub(crate) fn has_spatialite(&self) -> bool {
+        // TODO@geometry: How can we set this more safely at instanciation ?
+        // Ideally, we'd want to check if the library can be loaded successfully
+        // e.g. by checking if `SELECT spatialite_version()` returns something.
+        // But we might also want to check if a database has had tables and triggers
+        // created by spatialite even though the user doesn't set SPATIALITE_PATH
+        // because operations not taking those into account might results in a
+        // invalid database state (not tested)
+        if let Ok(spatialite_path) = std::env::var("SPATIALITE_PATH") {
+            !spatialite_path.is_empty()
+        } else {
+            false
+        }
+    }
+}
+
 impl Default for SqliteFlavour {
     fn default() -> Self {
         SqliteFlavour { state: State::Initial }
@@ -347,10 +364,10 @@ impl SqlFlavour for SqliteFlavour {
         migrations: &'a [MigrationDirectory],
         _shadow_database_connection_string: Option<String>,
         _namespaces: Option<Namespaces>,
-    ) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
+    ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         Box::pin(async move {
             tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
-            let mut shadow_db_conn = Connection::new_in_memory();
+            let mut shadow_db_conn = Connection::new_in_memory()?;
             for migration in migrations {
                 let script = migration.read_migration_script()?;
 

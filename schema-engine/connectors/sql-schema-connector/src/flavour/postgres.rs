@@ -580,6 +580,7 @@ pub(crate) enum Circumstances {
     IsCockroachDb,
     CockroachWithPostgresNativeTypes, // FIXME: we should really break and remove this
     CanPartitionTables,
+    HasPostGIS,
 }
 
 fn disable_postgres_statement_cache(url: &mut Url) -> ConnectorResult<()> {
@@ -667,6 +668,10 @@ where
                         None => {
                             tracing::warn!("Could not determine the version of the database.")
                         }
+                    }
+
+                    if let Ok(_postgis_version) = connection.query_raw("SELECT PostGIS_version();", &[], &params.url).await {
+                        circumstances |= Circumstances::HasPostGIS;
                     }
 
                     if let Some(true) = schema_exists_result

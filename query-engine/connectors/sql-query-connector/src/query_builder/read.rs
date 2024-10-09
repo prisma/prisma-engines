@@ -188,6 +188,7 @@ pub(crate) fn aggregate(
             AggregationSelection::Field(field) => select.column(
                 Column::from(field.db_name().to_owned())
                     .set_is_enum(field.type_identifier().is_enum())
+                    .set_is_geometry(field.type_identifier().is_geometry())
                     .set_is_selected(true),
             ),
 

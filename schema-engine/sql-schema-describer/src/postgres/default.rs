@@ -94,7 +94,8 @@ pub(super) fn get_default_value(default_string: &str, tpe: &ColumnType) -> Optio
 
 fn parser_for_family(family: &ColumnTypeFamily) -> &'static dyn Fn(&mut Parser<'_>) -> Option<DefaultValue> {
     match family {
-        ColumnTypeFamily::String | ColumnTypeFamily::Json => &parse_string_default,
+        // TODO@geometry: Is this safe ?
+        ColumnTypeFamily::String | ColumnTypeFamily::Json | ColumnTypeFamily::Geometry => &parse_string_default,
         ColumnTypeFamily::Int | ColumnTypeFamily::BigInt => &parse_int_default,
         ColumnTypeFamily::Enum(_) => &parse_enum_default,
         ColumnTypeFamily::Float | ColumnTypeFamily::Decimal => &parse_float_default,

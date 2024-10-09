@@ -74,6 +74,7 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MsSqlType)] = &[
         ScalarType::Json,
         MsSqlType::NVarChar(Some(MsSqlTypeParameter::Number(1000))),
     ),
+    (ScalarType::Geometry, MsSqlType::Geometry),
 ];
 
 impl Connector for MsSqlDatamodelConnector {
@@ -139,6 +140,9 @@ impl Connector for MsSqlDatamodelConnector {
             VarBinary(_) => ScalarType::Bytes,
             Image => ScalarType::Bytes,
             Bit => ScalarType::Bytes,
+            //Geometry
+            Geometry => ScalarType::Geometry,
+            Geography => ScalarType::Geometry,
         }
     }
 
@@ -303,5 +307,7 @@ pub(crate) fn heap_allocated_types() -> &'static [MsSqlType] {
         VarBinary(Some(Max)),
         VarChar(Some(Max)),
         NVarChar(Some(Max)),
+        Geometry,
+        Geography,
     ]
 }

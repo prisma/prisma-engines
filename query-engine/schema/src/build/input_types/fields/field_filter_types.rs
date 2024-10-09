@@ -264,6 +264,13 @@ fn full_scalar_filter_type(
                 .chain(inclusion_filters(ctx, mapped_scalar_type.clone(), nullable))
                 .collect(),
 
+            // Inclusion filters are tricky because SQL Server doesn't allow direct equality check between geometries
+            // so IN ( ... ) filters won't work either. The equality filters are hacked in Quaint, where they are
+            // converted to .STEquals() expressions
+            TypeIdentifier::Geometry => geometric_filters(ctx, mapped_scalar_type.clone())
+                .chain(equality_filters(mapped_scalar_type.clone(), nullable))
+                .collect(),
+
             TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
         };
 
@@ -458,6 +465,15 @@ fn json_filters(ctx: &'_ QuerySchema) -> impl Iterator<Item = InputField<'_>> {
         input_field(filters::ARRAY_ENDS_WITH, json_with_field_ref_input, None)
             .optional()
             .nullable(),
+    ]
+    .into_iter()
+}
+
+fn geometric_filters<'a>(_ctx: &'a QuerySchema, mapped_type: InputType<'a>) -> impl Iterator<Item = InputField<'a>> {
+    let field_types = mapped_type.with_field_ref_input();
+    vec![
+        input_field(filters::GEO_WITHIN, field_types.clone(), None).optional(),
+        input_field(filters::GEO_INTERSECTS, field_types.clone(), None).optional(),
     ]
     .into_iter()
 }

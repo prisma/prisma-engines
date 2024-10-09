@@ -1,6 +1,7 @@
 //! Namespaces are used in conjunction with the MultiSchema preview feature.
 
 /// A nonempty set of namespaces.
+///
 /// It is assumed that the namespaces are unique.
 /// It is often passed around an Option<Namespaces> for when
 /// the namespaces cannot be inferred, or when the MultiSchema preview

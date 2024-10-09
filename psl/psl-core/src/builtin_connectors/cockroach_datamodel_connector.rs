@@ -23,7 +23,7 @@ use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
 use std::borrow::Cow;
 
-use super::completions;
+use super::{completions, geometry::GeometryParams};
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey];
 
@@ -76,6 +76,10 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
     (ScalarType::DateTime, CockroachType::Timestamp(Some(3))),
     (ScalarType::Bytes, CockroachType::Bytes),
     (ScalarType::Json, CockroachType::JsonB),
+    (
+        ScalarType::Geometry,
+        CockroachType::Geometry(Some(GeometryParams::default())),
+    ),
 ];
 
 pub(crate) struct CockroachDatamodelConnector;
@@ -141,6 +145,9 @@ impl Connector for CockroachDatamodelConnector {
             CockroachType::JsonB => ScalarType::Json,
             // Bytes
             CockroachType::Bytes => ScalarType::Bytes,
+            // Geometry
+            CockroachType::Geometry(_) => ScalarType::Geometry,
+            CockroachType::Geography(_) => ScalarType::Geometry,
         }
     }
 
@@ -201,6 +208,9 @@ impl Connector for CockroachDatamodelConnector {
                 if *p > 6 =>
             {
                 errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
+            }
+            CockroachType::Geometry(Some(g)) | CockroachType::Geography(Some(g)) if g.srid < 0 || g.srid > 999000 => {
+                errors.push_error(error.new_argument_m_out_of_range_error("SRID must be between 0 and 999000.", span))
             }
             _ => (),
         }

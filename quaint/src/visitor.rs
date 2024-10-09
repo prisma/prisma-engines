@@ -137,6 +137,44 @@ pub trait Visitor<'a> {
 
     fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> Result;
 
+    fn visit_geometry_type_equals(&mut self, left: Expression<'a>, right: GeometryType<'a>, not: bool) -> Result;
+
+    fn visit_geometry_empty(&mut self, left: Expression<'a>, not: bool) -> Result {
+        if not {
+            self.write("NOT ")?;
+        }
+        self.surround_with("ST_IsEmpty(", ")", |s| s.visit_expression(left))
+    }
+
+    fn visit_geometry_valid(&mut self, left: Expression<'a>, not: bool) -> Result {
+        if not {
+            self.write("NOT ")?;
+        }
+        self.surround_with("ST_IsValid(", ")", |s| s.visit_expression(left))
+    }
+
+    fn visit_geometry_within(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result {
+        if not {
+            self.write("NOT ")?;
+        }
+        self.surround_with("ST_Within(", ")", |s| {
+            s.visit_expression(left)?;
+            s.write(",")?;
+            s.visit_expression(right)
+        })
+    }
+
+    fn visit_geometry_intersects(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> Result {
+        if not {
+            self.write("NOT ")?;
+        }
+        self.surround_with("ST_Intersects(", ")", |s| {
+            s.visit_expression(left)?;
+            s.write(",")?;
+            s.visit_expression(right)
+        })
+    }
+
     fn visit_text_search(&mut self, text_search: TextSearch<'a>) -> Result;
 
     fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>, not: bool) -> Result;
@@ -175,12 +213,19 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
+    fn visit_parameterized_geometry(&mut self, geometry: geojson::Geometry) -> Result;
+
+    fn visit_parameterized_geography(&mut self, geometry: geojson::Geometry) -> Result;
+
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: Value<'a>) -> Result {
         match value.typed {
             ValueType::Enum(Some(variant), name) => self.visit_parameterized_enum(variant, name),
             ValueType::EnumArray(Some(variants), name) => self.visit_parameterized_enum_array(variants, name),
             ValueType::Text(txt) => self.visit_parameterized_text(txt, value.native_column_type),
+            ValueType::Geometry(Some(geometry)) => self.visit_parameterized_geometry(geometry),
+            ValueType::Geography(Some(geography)) => self.visit_parameterized_geography(geography),
+            ValueType::Geometry(None) | ValueType::Geography(None) => self.write("NULL"),
             _ => {
                 self.add_parameter(value);
                 self.parameter_substitution()
@@ -619,12 +664,14 @@ pub trait Visitor<'a> {
             ExpressionKind::Default => self.write("DEFAULT")?,
         }
 
-        if let Some(alias) = value.alias {
-            self.write(" AS ")?;
+        self.visit_alias(value.alias)
+    }
 
+    fn visit_alias(&mut self, alias: Option<Cow<'a, str>>) -> Result {
+        if let Some(alias) = alias {
+            self.write(" AS ")?;
             self.delimited_identifiers(&[&*alias])?;
         };
-
         Ok(())
     }
 
@@ -667,18 +714,20 @@ pub trait Visitor<'a> {
         };
 
         if include_alias {
-            if let Some(alias) = table.alias {
-                self.write(" AS ")?;
-
-                self.delimited_identifiers(&[&*alias])?;
-            };
+            self.visit_alias(table.alias)?;
         }
 
         Ok(())
     }
 
+    fn visit_geometry_column(&mut self, column: Column<'a>) -> Result;
+
     /// A database column identifier
     fn visit_column(&mut self, column: Column<'a>) -> Result {
+        if column.is_geometry && column.is_selected {
+            return self.visit_geometry_column(column);
+        }
+
         match column.table {
             Some(table) => {
                 self.visit_table(table, false)?;
@@ -688,10 +737,7 @@ pub trait Visitor<'a> {
             _ => self.delimited_identifiers(&[&*column.name])?,
         };
 
-        if let Some(alias) = column.alias {
-            self.write(" AS ")?;
-            self.delimited_identifiers(&[&*alias])?;
-        }
+        self.visit_alias(column.alias)?;
 
         Ok(())
     }
@@ -980,6 +1026,22 @@ pub trait Visitor<'a> {
                 JsonCompare::ArrayNotContains(left, right) => self.visit_json_array_contains(*left, *right, true),
                 JsonCompare::TypeEquals(left, json_type) => self.visit_json_type_equals(*left, json_type, false),
                 JsonCompare::TypeNotEquals(left, json_type) => self.visit_json_type_equals(*left, json_type, true),
+            },
+            Compare::GeometryCompare(geom_compare) => match geom_compare {
+                GeometryCompare::Empty(left) => self.visit_geometry_empty(*left, false),
+                GeometryCompare::NotEmpty(left) => self.visit_geometry_empty(*left, true),
+                GeometryCompare::Valid(left) => self.visit_geometry_valid(*left, false),
+                GeometryCompare::NotValid(left) => self.visit_geometry_valid(*left, true),
+                GeometryCompare::Within(left, right) => self.visit_geometry_within(*left, *right, false),
+                GeometryCompare::NotWithin(left, right) => self.visit_geometry_within(*left, *right, true),
+                GeometryCompare::Intersects(left, right) => self.visit_geometry_intersects(*left, *right, false),
+                GeometryCompare::NotIntersects(left, right) => self.visit_geometry_intersects(*left, *right, true),
+                GeometryCompare::TypeEquals(left, geom_type) => {
+                    self.visit_geometry_type_equals(*left, geom_type, false)
+                }
+                GeometryCompare::TypeNotEquals(left, geom_type) => {
+                    self.visit_geometry_type_equals(*left, geom_type, true)
+                }
             },
             Compare::Matches(left, right) => self.visit_matches(*left, right, false),
             Compare::NotMatches(left, right) => self.visit_matches(*left, right, true),

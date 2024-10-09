@@ -1,3 +1,5 @@
+use crate::builtin_connectors::geometry::GeometryParams;
+
 crate::native_type_definition! {
     PostgresType;
     SmallInt -> Int,
@@ -26,4 +28,6 @@ crate::native_type_definition! {
     Xml -> String,
     Json -> Json,
     JsonB -> Json,
+    Geometry(Option<GeometryParams>) -> Geometry,
+    Geography(Option<GeometryParams>) -> Geometry,
 }

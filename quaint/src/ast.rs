@@ -31,7 +31,7 @@ mod update;
 mod values;
 
 pub use column::{Column, DefaultValue, TypeDataLength, TypeFamily};
-pub use compare::{Comparable, Compare, JsonCompare, JsonType};
+pub use compare::{Comparable, Compare, GeometryCompare, GeometryType, JsonCompare, JsonType};
 pub use conditions::ConditionTree;
 pub use conjunctive::Conjunctive;
 pub use cte::{CommonTableExpression, IntoCommonTableExpression};

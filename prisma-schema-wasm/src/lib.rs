@@ -124,6 +124,7 @@ pub fn references(schema: String, params: String) -> String {
 }
 
 /// This api is modelled on an LSP [hover request](https://github.com/microsoft/language-server-protocol/blob/gh-pages/_specifications/specification-3-16.md#hover-request-leftwards_arrow_with_hook).
+///
 /// Input and output are both JSON, the request being a `HoverParams` object
 /// and the response being a `Hover` object.
 #[wasm_bindgen]

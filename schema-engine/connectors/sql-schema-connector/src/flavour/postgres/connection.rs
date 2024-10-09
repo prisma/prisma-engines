@@ -86,6 +86,10 @@ impl Connection {
             describer_circumstances |= describer::Circumstances::Cockroach;
         }
 
+        if circumstances.contains(super::Circumstances::HasPostGIS) {
+            describer_circumstances |= describer::Circumstances::HasPostGIS;
+        }
+
         if circumstances.contains(super::Circumstances::CockroachWithPostgresNativeTypes) {
             describer_circumstances |= describer::Circumstances::CockroachWithPostgresNativeTypes;
         }

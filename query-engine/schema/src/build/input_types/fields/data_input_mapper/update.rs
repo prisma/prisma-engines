@@ -39,6 +39,8 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
                 ))
             }
             TypeIdentifier::Json => map_scalar_input_type_for_field(ctx, &sf),
+            // TODO@geometry: Is this the right way ?
+            TypeIdentifier::Geometry => map_scalar_input_type_for_field(ctx, &sf),
             TypeIdentifier::DateTime => {
                 InputType::object(update_operations_object_type(ctx, "DateTime", sf.clone(), false))
             }

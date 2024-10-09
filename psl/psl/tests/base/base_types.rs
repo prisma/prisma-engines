@@ -10,6 +10,7 @@ fn parse_scalar_types() {
         age          Int
         isPro        Boolean
         averageGrade Float
+        location     Geometry
     }
     "#;
 
@@ -31,6 +32,10 @@ fn parse_scalar_types() {
     user_model
         .assert_has_scalar_field("averageGrade")
         .assert_scalar_type(ScalarType::Float);
+
+    user_model
+        .assert_has_scalar_field("location")
+        .assert_scalar_type(ScalarType::Geometry);
 }
 
 #[test]

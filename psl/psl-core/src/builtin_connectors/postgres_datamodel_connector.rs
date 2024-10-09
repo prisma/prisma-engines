@@ -19,7 +19,7 @@ use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFo
 use std::{borrow::Cow, collections::HashMap};
 use PostgresType::*;
 
-use super::completions;
+use super::{completions, geometry::GeometryParams};
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
     ConstraintScope::GlobalPrimaryKeyKeyIndex,
@@ -87,6 +87,10 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
     (ScalarType::DateTime, PostgresType::Timestamp(Some(3))),
     (ScalarType::Bytes, PostgresType::ByteA),
     (ScalarType::Json, PostgresType::JsonB),
+    (
+        ScalarType::Geometry,
+        PostgresType::Geometry(Some(GeometryParams::default())),
+    ),
 ];
 
 /// Postgres-specific properties in the datasource block.
@@ -330,6 +334,9 @@ impl Connector for PostgresDatamodelConnector {
             JsonB => ScalarType::Json,
             // Bytes
             ByteA => ScalarType::Bytes,
+            // Geometry
+            Geometry(_) => ScalarType::Geometry,
+            Geography(_) => ScalarType::Geometry,
         }
     }
 
@@ -381,6 +388,9 @@ impl Connector for PostgresDatamodelConnector {
             }
             Timestamp(Some(p)) | Timestamptz(Some(p)) | Time(Some(p)) | Timetz(Some(p)) if *p > 6 => {
                 errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
+            }
+            Geometry(Some(g)) | Geography(Some(g)) if g.srid < 0 || g.srid > 999000 => {
+                errors.push_error(error.new_argument_m_out_of_range_error("SRID must be between 0 and 999000.", span))
             }
             _ => (),
         }
@@ -620,6 +630,7 @@ impl Connector for PostgresDatamodelConnector {
     }
 }
 
+// TODO@geometry: Add index operator classes
 fn allowed_index_operator_classes(algo: IndexAlgorithm, field: walkers::ScalarFieldWalker<'_>) -> Vec<OperatorClass> {
     let scalar_type = field.scalar_type();
     let native_type = field.raw_native_type().map(|t| t.1);

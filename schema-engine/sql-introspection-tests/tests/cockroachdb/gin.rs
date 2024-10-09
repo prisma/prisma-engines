@@ -21,8 +21,8 @@ async fn gin_unsupported_type(api: &mut TestApi) -> TestResult {
 
     let expected = expect![[r#"
         model A {
-          id   BigInt                  @id @default(autoincrement())
-          data Unsupported("geometry")
+          id   BigInt   @id @default(autoincrement())
+          data Geometry @db.Geometry(Geometry, 0)
 
           @@index([data], type: Gin)
         }

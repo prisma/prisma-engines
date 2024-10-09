@@ -90,7 +90,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
 
         self.get_constraints(&table_names, &mut sql_schema).await?;
 
-        Self::get_all_columns(&table_names, self.conn, schema, &mut sql_schema, &flavour).await?;
+        self.get_all_columns(&table_names, schema, &mut sql_schema, &flavour)
+            .await?;
         push_foreign_keys(schema, &table_names, &mut sql_schema, self.conn).await?;
         push_indexes(&table_names, schema, &mut sql_schema, self.conn).await?;
 
@@ -359,8 +360,8 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     async fn get_all_columns(
+        &self,
         table_ids: &IndexMap<String, TableId>,
-        conn: &dyn Queryable,
         schema_name: &str,
         sql_schema: &mut SqlSchema,
         flavour: &Flavour,
@@ -368,7 +369,14 @@ impl<'a> SqlSchemaDescriber<'a> {
         // We alias all the columns because MySQL column names are case-insensitive in queries, but the
         // information schema column names became upper-case in MySQL 8, causing the code fetching
         // the result values by column name below to fail.
-        let sql = "
+        let sql_geometry_srid_column = if self.supports_srid_constraints() {
+            "srs_id"
+        } else {
+            "NULL"
+        };
+
+        let sql = format!(
+            "
             SELECT
                 column_name column_name,
                 data_type data_type,
@@ -376,20 +384,22 @@ impl<'a> SqlSchemaDescriber<'a> {
                 character_maximum_length character_maximum_length,
                 numeric_precision numeric_precision,
                 numeric_scale numeric_scale,
+                {sql_geometry_srid_column} geometry_srid,
                 datetime_precision datetime_precision,
                 column_default column_default,
                 is_nullable is_nullable,
                 extra extra,
                 table_name table_name,
-                IF(column_comment = '', NULL, column_comment) AS column_comment
+                NULLIF(column_comment, '') AS column_comment
             FROM information_schema.columns
             WHERE table_schema = ?
             ORDER BY ordinal_position
-        ";
+        "
+        );
 
         let mut table_defaults = Vec::new();
         let mut view_defaults = Vec::new();
-        let rows = conn.query_raw(sql, &[schema_name.into()]).await?;
+        let rows = self.conn.query_raw(&sql, &[schema_name.into()]).await?;
 
         for col in rows {
             trace!("Got column: {col:?}");
@@ -425,6 +435,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let time_precision = col.get_u32("datetime_precision");
             let numeric_precision = col.get_u32("numeric_precision");
             let numeric_scale = col.get_u32("numeric_scale");
+            let geometry_srid = col.get_u32("geometry_srid");
 
             let precision = Precision {
                 character_maximum_length,
@@ -437,9 +448,9 @@ impl<'a> SqlSchemaDescriber<'a> {
 
             let tpe = Self::get_column_type(
                 (&table_name, &name),
-                &data_type,
-                &full_data_type,
+                (&data_type, &full_data_type),
                 precision,
+                geometry_srid,
                 arity,
                 default_value,
                 sql_schema,
@@ -511,6 +522,10 @@ impl<'a> SqlSchemaDescriber<'a> {
                                 false => DefaultValue::db_generated(default_string),
                             },
                             ColumnTypeFamily::Json => match default_expression {
+                                true => Self::dbgenerated_expression(&default_string),
+                                false => DefaultValue::db_generated(default_string),
+                            },
+                            ColumnTypeFamily::Geometry => match default_expression {
                                 true => Self::dbgenerated_expression(&default_string),
                                 false => DefaultValue::db_generated(default_string),
                             },
@@ -604,9 +619,9 @@ impl<'a> SqlSchemaDescriber<'a> {
 
     fn get_column_type(
         (table, column_name): (&str, &str),
-        data_type: &str,
-        full_data_type: &str,
+        (data_type, full_data_type): (&str, &str),
         precision: Precision,
+        geometry_srid: Option<u32>,
         arity: ColumnArity,
         default: Option<&Value<'_>>,
         sql_schema: &mut SqlSchema,
@@ -712,14 +727,20 @@ impl<'a> SqlSchemaDescriber<'a> {
             "mediumblob" => (ColumnTypeFamily::Binary, Some(MySqlType::MediumBlob)),
             "longblob" => (ColumnTypeFamily::Binary, Some(MySqlType::LongBlob)),
             //spatial
-            "geometry" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
-            "point" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
-            "linestring" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
-            "polygon" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
-            "multipoint" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
-            "multilinestring" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
-            "multipolygon" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
-            "geometrycollection" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
+            "geometry" => (ColumnTypeFamily::Geometry, Some(MySqlType::Geometry(geometry_srid))),
+            "point" => (ColumnTypeFamily::Geometry, Some(MySqlType::Point(geometry_srid))),
+            "linestring" => (ColumnTypeFamily::Geometry, Some(MySqlType::LineString(geometry_srid))),
+            "polygon" => (ColumnTypeFamily::Geometry, Some(MySqlType::Polygon(geometry_srid))),
+            "multipoint" => (ColumnTypeFamily::Geometry, Some(MySqlType::MultiPoint(geometry_srid))),
+            "multilinestring" => (
+                ColumnTypeFamily::Geometry,
+                Some(MySqlType::MultiLineString(geometry_srid)),
+            ),
+            "multipolygon" => (ColumnTypeFamily::Geometry, Some(MySqlType::MultiPolygon(geometry_srid))),
+            "geometrycollection" | "geomcollection" => (
+                ColumnTypeFamily::Geometry,
+                Some(MySqlType::GeometryCollection(geometry_srid)),
+            ),
             _ => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
         };
 
@@ -808,6 +829,14 @@ impl<'a> SqlSchemaDescriber<'a> {
     /// Tests whether the current database supports check constraints
     fn supports_check_constraints(&self) -> bool {
         self.circumstances.contains(Circumstances::CheckConstraints)
+    }
+
+    /// Tests whether the current database supports geometry SRID constraints
+    fn supports_srid_constraints(&self) -> bool {
+        // Only MySQL 8 and above supports geometry SRIDs constraints
+        !self
+            .circumstances
+            .intersects(Circumstances::MySql56 | Circumstances::MySql57 | Circumstances::MariaDb)
     }
 }
 

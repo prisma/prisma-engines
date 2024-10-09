@@ -1,6 +1,7 @@
 use crate::{
     ast::*,
     error::{Error, ErrorKind},
+    geometry::get_geometry_srid,
     visitor::{self, Visitor},
 };
 
@@ -16,25 +17,38 @@ pub struct Sqlite<'a> {
 }
 
 impl<'a> Sqlite<'a> {
-    fn returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
+    fn visit_returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
         if let Some(returning) = returning {
             if !returning.is_empty() {
-                let values_len = returning.len();
+                let values = returning
+                    .into_iter()
+                    .map(|mut r| {
+                        let name = r.name.clone();
+                        r.table = None;
+                        r.alias(name).into()
+                    })
+                    .collect();
                 self.write(" RETURNING ")?;
-
-                for (i, column) in returning.into_iter().enumerate() {
-                    // Workaround for SQLite parsing bug
-                    // https://sqlite.org/forum/info/6c141f151fa5c444db257eb4d95c302b70bfe5515901cf987e83ed8ebd434c49?t=h
-                    self.surround_with_backticks(&column.name)?;
-                    self.write(" AS ")?;
-                    self.surround_with_backticks(&column.name)?;
-                    if i < (values_len - 1) {
-                        self.write(", ")?;
-                    }
-                }
+                self.visit_columns(values)?;
             }
         }
         Ok(())
+    }
+
+    fn visit_geometry_from_geojson<G, S>(&mut self, geometry: G, srid: S) -> visitor::Result
+    where
+        G: Into<Expression<'a>>,
+        S: Into<Expression<'a>>,
+    {
+        // This is required since contrary to other vendors, Spatialite GeomFromGeoJSON
+        // doesn't return a geometry with SRID=4326 but with SRID=-1.
+
+        self.surround_with("SetSRID(", ")", |s| {
+            s.surround_with("GeomFromGeoJSON(", ")", |ref mut s| s.visit_expression(geometry.into()))?;
+            s.write(",")?;
+            s.visit_expression(srid.into())?;
+            Ok(())
+        })
     }
 }
 
@@ -140,6 +154,14 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
             ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
             ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
+            ValueType::Geometry(geometry) => geometry.as_ref().map(|geometry| {
+                let srid = get_geometry_srid(geometry).unwrap_or(4326);
+                self.visit_geometry_from_geojson(geometry.to_string().raw(), srid.raw())
+            }),
+            ValueType::Geography(geometry) => geometry.as_ref().map(|geometry| {
+                let srid = get_geometry_srid(geometry).unwrap_or(4326);
+                self.visit_geometry_from_geojson(geometry.to_string().raw(), srid.raw())
+            }),
         };
 
         match res {
@@ -221,7 +243,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             self.visit_upsert(update)?;
         }
 
-        self.returning(insert.returning)?;
+        self.visit_returning(insert.returning)?;
 
         if let Some(comment) = insert.comment {
             self.write(" ")?;
@@ -231,12 +253,12 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         Ok(())
     }
 
-    fn parameter_substitution(&mut self) -> visitor::Result {
-        self.write("?")
-    }
-
     fn add_parameter(&mut self, value: Value<'a>) {
         self.parameters.push(value);
+    }
+
+    fn parameter_substitution(&mut self) -> visitor::Result {
+        self.write("?")
     }
 
     fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> visitor::Result {
@@ -280,6 +302,50 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             }
             Ok(())
         })
+    }
+
+    fn visit_geometry_within(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
+        self.surround_with("ST_Within(", ")", |s| {
+            s.visit_expression(left)?;
+            s.write(",")?;
+            s.visit_expression(right)
+        })?;
+        self.write(if not { " != 1" } else { " = 1" })?;
+        Ok(())
+    }
+
+    fn visit_geometry_intersects(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
+        self.surround_with("ST_Intersects(", ")", |s| {
+            s.visit_expression(left)?;
+            s.write(",")?;
+            s.visit_expression(right)
+        })?;
+        self.write(if not { " != 1" } else { " = 1" })?;
+        Ok(())
+    }
+
+    fn visit_geometry_type_equals(
+        &mut self,
+        left: Expression<'a>,
+        geom_type: GeometryType<'a>,
+        not: bool,
+    ) -> visitor::Result {
+        self.write("ST_GeometryType")?;
+        self.surround_with("(", ")", |s| s.visit_expression(left.clone()))?;
+
+        if not {
+            self.write(" != ")?;
+        } else {
+            self.write(" = ")?;
+        }
+
+        match geom_type {
+            GeometryType::ColumnRef(column) => {
+                self.write("ST_GeometryType")?;
+                self.surround_with("(", ")", |s| s.visit_column(*column))
+            }
+            _ => self.visit_expression(Value::text(geom_type.to_string().to_uppercase()).into()),
+        }
     }
 
     fn visit_json_extract(&mut self, _json_extract: JsonExtract<'a>) -> visitor::Result {
@@ -399,7 +465,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             self.visit_conditions(conditions)?;
         }
 
-        self.returning(delete.returning)?;
+        self.visit_returning(delete.returning)?;
 
         if let Some(comment) = delete.comment {
             self.write(" ")?;
@@ -434,7 +500,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             self.visit_conditions(conditions)?;
         }
 
-        self.returning(update.returning)?;
+        self.visit_returning(update.returning)?;
 
         if let Some(comment) = update.comment {
             self.write(" ")?;
@@ -442,6 +508,24 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         }
 
         Ok(())
+    }
+
+    fn visit_geometry_column(&mut self, column: Column<'a>) -> visitor::Result {
+        self.surround_with("AsGeoJSON(", ")", |s| {
+            s.visit_column(column.clone().into_bare_with_table())?;
+            s.write(", 15, 2")?;
+            Ok(())
+        })?;
+        self.visit_alias(column.alias)
+    }
+
+    fn visit_parameterized_geometry(&mut self, geometry: geojson::Geometry) -> visitor::Result {
+        let srid = get_geometry_srid(&geometry).unwrap_or(4326);
+        self.visit_geometry_from_geojson(geometry.to_string(), srid)
+    }
+
+    fn visit_parameterized_geography(&mut self, geometry: geojson::Geometry) -> visitor::Result {
+        self.visit_parameterized_geometry(geometry)
     }
 }
 
@@ -995,6 +1079,15 @@ mod tests {
         let (sql, params) = Sqlite::build(Select::default().value(dt.raw())).unwrap();
 
         assert_eq!(format!("SELECT '{}'", dt.to_rfc3339(),), sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_geometry() {
+        let geojson = r#"{"type":"Point","coordinates":[1.0,2.0]}"#;
+        let geom = geojson.parse::<geojson::Geometry>().unwrap();
+        let (sql, params) = Sqlite::build(Select::default().value(Value::geometry(geom).raw())).unwrap();
+        assert_eq!(format!("SELECT SetSRID(GeomFromGeoJSON('{geojson}'),4326)"), sql);
         assert!(params.is_empty());
     }
 

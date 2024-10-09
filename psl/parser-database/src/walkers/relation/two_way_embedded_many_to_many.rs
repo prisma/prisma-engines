@@ -3,9 +3,11 @@ use crate::{
     walkers::{ModelWalker, RelationFieldWalker, RelationWalker},
 };
 
-/// Describes an explicit m:n relation between two models. Both sides define
-/// `fields` which must be a single array scalar field, and `references` that
-/// should point to a single scalar field on the referenced model.
+/// Describes an explicit m:n relation between two models.
+///
+/// Both sides define `fields` which must be a single array scalar field,
+/// and `references` that should point to a single scalar field on the
+/// referenced model.
 #[derive(Copy, Clone)]
 pub struct TwoWayEmbeddedManyToManyRelationWalker<'db>(pub(super) RelationWalker<'db>);
 

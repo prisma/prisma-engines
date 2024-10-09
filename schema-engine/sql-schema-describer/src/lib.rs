@@ -652,6 +652,8 @@ pub enum ColumnTypeFamily {
     Binary,
     /// JSON types.
     Json,
+    /// Geometry types.
+    Geometry,
     /// UUID types.
     Uuid,
     ///Enum
@@ -694,6 +696,10 @@ impl ColumnTypeFamily {
 
     pub fn is_string(&self) -> bool {
         matches!(self, ColumnTypeFamily::String)
+    }
+
+    pub fn is_geometry(&self) -> bool {
+        matches!(self, ColumnTypeFamily::Geometry)
     }
 
     pub fn is_unsupported(&self) -> bool {

@@ -7,12 +7,27 @@ use crate::{
 };
 use either::Either;
 use indexmap::IndexMap;
+use psl::{
+    builtin_connectors::{
+        geometry::{GeometryParams, GeometryType},
+        SQLiteType,
+    },
+    datamodel_connector::NativeTypeInstance,
+};
 use quaint::{
     ast::{Value, ValueType},
     connector::{ColumnType as QuaintColumnType, GetRow, ToColumnNames},
     prelude::ResultRow,
 };
-use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto, fmt::Debug, path::Path};
+use regex::RegexSet;
+use std::{
+    any::type_name,
+    borrow::Cow,
+    collections::{BTreeMap, HashMap},
+    convert::TryInto,
+    fmt::Debug,
+    path::Path,
+};
 use tracing::trace;
 
 #[async_trait::async_trait]
@@ -112,8 +127,9 @@ impl<'a> SqlSchemaDescriber<'a> {
             .filter_map(|(name, id)| id.left().map(|id| (name.as_str(), id)))
             .collect();
 
+        let geometry_columns = get_geometry_columns(self.conn).await;
         for (container_name, container_id) in &container_ids {
-            push_columns(container_name, *container_id, &mut schema, self.conn).await?;
+            push_columns(container_name, *container_id, &geometry_columns, &mut schema, self.conn).await?;
 
             if let Either::Left(table_id) = container_id {
                 push_indexes(container_name, *table_id, &mut schema, self.conn).await?;
@@ -326,9 +342,47 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 }
 
+async fn get_geometry_columns(conn: &(dyn Connection + Send + Sync)) -> HashMap<(String, String), (GeometryType, i32)> {
+    let sql = r#"
+        SELECT
+            f_table_name,
+            f_geometry_column,
+            geometry_type,
+            srid
+        FROM
+            geometry_columns
+    "#;
+    let result_set = conn.query_raw(sql, &[]).await;
+    if result_set.is_err() {
+        return HashMap::new();
+    }
+    result_set
+        .unwrap()
+        .into_iter()
+        .map(|row| {
+            (
+                (
+                    row.get_expect_string("f_table_name"),
+                    row.get_expect_string("f_geometry_column"),
+                ),
+                (
+                    // Unwrapping is safe since Spatialite validates the geometry type
+                    u32::try_from(row.get_expect_i64("geometry_type"))
+                        .unwrap()
+                        .try_into()
+                        .unwrap(),
+                    // Unwrapping is safe since Spatialite validates the SRID against the EPSG database
+                    row.get_expect_i64("srid").try_into().unwrap(),
+                ),
+            )
+        })
+        .collect()
+}
+
 async fn push_columns(
     table_name: &str,
     container_id: Either<TableId, ViewId>,
+    geometry_columns: &HashMap<(String, String), (GeometryType, i32)>,
     schema: &mut SqlSchema,
     conn: &(dyn Connection + Send + Sync),
 ) -> DescriberResult<()> {
@@ -345,7 +399,23 @@ async fn push_columns(
             ColumnArity::Nullable
         };
 
-        let tpe = get_column_type(row.get_expect_string("type"), arity);
+        let column_name = row.get_expect_string("name");
+        let column_type = row.get_expect_string("type");
+        let geometry_info = geometry_columns.get(&(table_name.to_lowercase(), column_name.to_lowercase()));
+        let tpe = if let Some((type_, srid)) = geometry_info {
+            let params = GeometryParams {
+                type_: *type_,
+                srid: *srid,
+            };
+            ColumnType {
+                full_data_type: column_type,
+                family: ColumnTypeFamily::Geometry,
+                arity,
+                native_type: Some(NativeTypeInstance::new(SQLiteType::Geometry(params))),
+            }
+        } else {
+            get_column_type(column_type, arity)
+        };
 
         let default = match row.get("dflt_value") {
             None => None,
@@ -393,6 +463,7 @@ async fn push_columns(
                             }
                             _ => DefaultValue::db_generated(default_string),
                         },
+                        ColumnTypeFamily::Geometry => DefaultValue::db_generated(default_string),
                         ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
                         ColumnTypeFamily::Json => DefaultValue::db_generated(default_string),
                         ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
@@ -610,7 +681,7 @@ fn unquote_sqlite_string_default(s: &str) -> Cow<'_, str> {
 
 /// Returns whether a table is one of the SQLite system tables or a Cloudflare D1 specific table.
 fn is_table_ignored(table_name: &str) -> bool {
-    SQLITE_IGNORED_TABLES.iter().any(|table| table_name == *table)
+    SQLITE_IGNORED_TABLES.iter().any(|table| table_name == *table) || SPATIALITE_IGNORED_TABLES.is_match(table_name)
 }
 
 /// See https://www.sqlite.org/fileformat2.html
@@ -627,3 +698,83 @@ const SQLITE_IGNORED_TABLES: &[&str] = &[
     // This is the default but can be configured by the user
     "d1_migrations",
 ];
+
+/// See https://www.sqlite.org/fileformat2.html
+pub static SPATIALITE_IGNORED_TABLES: Lazy<RegexSet> = Lazy::new(|| {
+    RegexSet::new([
+        "^sqlite_sequence$",
+        "^sqlite_stat1$",
+        "^sqlite_stat2$",
+        "^sqlite_stat3$",
+        "^sqlite_stat4$",
+        "^data_licenses$",
+        // Spatialite generated table and views
+        "^ElementaryGeometries$",
+        "^geometry_columns$",
+        "^geometry_columns_auth$",
+        "^geometry_columns_field_infos$",
+        "^geometry_columns_statistics$",
+        "^geometry_columns_time$",
+        "^geom_cols_ref_sys$",
+        "^idx_ISO_metadata_geometry$",
+        "^idx_ISO_metadata_geometry_node$",
+        "^idx_ISO_metadata_geometry_parent$",
+        "^idx_ISO_metadata_geometry_rowid$",
+        "^ISO_metadata$",
+        "^ISO_metadata_reference$",
+        "^ISO_metadata_view$",
+        "^KNN$",
+        "^KNN2$",
+        "^networks$",
+        "^raster_coverages$",
+        "^raster_coverages_keyword$",
+        "^raster_coverages_ref_sys$",
+        "^raster_coverages_srid$",
+        "^rl2map_configurations$",
+        "^rl2map_configurations_view$",
+        "^SE_external_graphics$",
+        "^SE_external_graphics_view$",
+        "^SE_fonts$",
+        "^SE_fonts_view$",
+        "^SE_raster_styled_layers$",
+        "^SE_raster_styled_layers_view$",
+        "^SE_raster_styles$",
+        "^SE_raster_styles_view$",
+        "^SE_vector_styled_layers$",
+        "^SE_vector_styled_layers_view$",
+        "^SE_vector_styles$",
+        "^SE_vector_styles_view$",
+        "^SpatialIndex$",
+        "^spatialite_history$",
+        "^spatial_ref_sys$",
+        "^spatial_ref_sys_all$",
+        "^spatial_ref_sys_aux$",
+        "^sql_statements_log$",
+        "^stored_procedures$",
+        "^stored_variables$",
+        "^topologies$",
+        "^vector_coverages$",
+        "^vector_coverages_keyword$",
+        "^vector_coverages_ref_sys$",
+        "^vector_coverages_srid$",
+        "^vector_layers$",
+        "^vector_layers_auth$",
+        "^vector_layers_field_infos$",
+        "^vector_layers_statistics$",
+        "^views_geometry_columns$",
+        "^views_geometry_columns_auth$",
+        "^views_geometry_columns_field_infos$",
+        "^views_geometry_columns_statistics$",
+        "^virts_geometry_collection$",
+        "^virts_geometry_collectionm$",
+        "^virts_geometry_columns$",
+        "^virts_geometry_columns_auth$",
+        "^virts_geometry_columns_field_infos$",
+        "^virts_geometry_columns_statistics$",
+        "^wms_getcapabilities$",
+        "^wms_getmap$",
+        "^wms_ref_sys$",
+        "^wms_settings$",
+    ])
+    .unwrap()
+});

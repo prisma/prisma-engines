@@ -661,6 +661,14 @@ fn postgres_native_type_change_riskyness(previous: &PostgresType, next: &Postgre
                 VarChar(_) | Char(_) => RiskyCast,
                 _ => NotCastable,
             },
+            Geometry(_) => match next {
+                Geography(_) | Text | Json | VarChar(_) | Char(_) => RiskyCast,
+                _ => NotCastable,
+            },
+            Geography(_) => match next {
+                Geometry(_) | Text | Json | VarChar(_) | Char(_) => RiskyCast,
+                _ => NotCastable,
+            },
         })
     };
 

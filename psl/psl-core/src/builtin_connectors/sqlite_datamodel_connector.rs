@@ -1,14 +1,18 @@
+mod native_types;
+pub use native_types::SQLiteType;
+
 use crate::{
     datamodel_connector::{
         Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance,
     },
-    diagnostics::{DatamodelError, Diagnostics, Span},
+    diagnostics::{Diagnostics, Span},
     parser_database::{ReferentialAction, ScalarType},
 };
 use enumflags2::BitFlags;
 
-const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[];
+use super::geometry::GeometryParams;
+
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalKeyIndex];
 pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
     AnyId |
@@ -32,6 +36,9 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     CreateMany |
     CreateManyWriteableAutoIncId
 });
+
+const SCALAR_TYPE_DEFAULTS: &[(ScalarType, SQLiteType)] =
+    &[(ScalarType::Geometry, SQLiteType::Geometry(GeometryParams::default()))];
 
 pub struct SqliteDatamodelConnector;
 
@@ -64,24 +71,53 @@ impl Connector for SqliteDatamodelConnector {
         Restrict | SetNull | Cascade
     }
 
-    fn scalar_type_for_native_type(&self, _native_type: &NativeTypeInstance) -> ScalarType {
-        unreachable!("No native types on Sqlite");
+    fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
+        let native_type: &SQLiteType = native_type.downcast_ref();
+        match native_type {
+            SQLiteType::Geometry(_) => ScalarType::Geometry,
+        }
     }
 
-    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
-        None
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> Option<NativeTypeInstance> {
+        SCALAR_TYPE_DEFAULTS
+            .iter()
+            .find(|(st, _)| st == scalar_type)
+            .map(|(_, native_type)| native_type)
+            .map(|nt| NativeTypeInstance::new::<SQLiteType>(*nt))
+        // .unwrap_or(NativeTypeInstance::new(()))
     }
 
     fn native_type_is_default_for_scalar_type(
         &self,
-        _native_type: &NativeTypeInstance,
-        _scalar_type: &ScalarType,
+        native_type: &NativeTypeInstance,
+        scalar_type: &ScalarType,
     ) -> bool {
-        false
+        let native_type: &SQLiteType = native_type.downcast_ref();
+
+        SCALAR_TYPE_DEFAULTS
+            .iter()
+            .any(|(st, nt)| scalar_type == st && native_type == nt)
     }
 
-    fn native_type_to_parts(&self, _native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
-        unreachable!()
+    fn validate_native_type_arguments(
+        &self,
+        native_type_instance: &NativeTypeInstance,
+        _scalar_type: &ScalarType,
+        span: Span,
+        errors: &mut Diagnostics,
+    ) {
+        let native_type: &SQLiteType = native_type_instance.downcast_ref();
+        let error = self.native_instance_error(native_type_instance);
+
+        match native_type {
+            SQLiteType::Geometry(g) if g.srid < -1 => errors
+                .push_error(error.new_argument_m_out_of_range_error("SRID must be superior or equal to -1.", span)),
+            _ => (),
+        }
+    }
+
+    fn native_type_to_parts(&self, native_type: &NativeTypeInstance) -> (&'static str, Vec<String>) {
+        native_type.downcast_ref::<SQLiteType>().to_parts()
     }
 
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
@@ -89,21 +125,17 @@ impl Connector for SqliteDatamodelConnector {
     }
 
     fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
-        NATIVE_TYPE_CONSTRUCTORS
+        native_types::CONSTRUCTORS
     }
 
     fn parse_native_type(
         &self,
-        _name: &str,
-        _args: &[String],
+        name: &str,
+        args: &[String],
         span: Span,
         diagnostics: &mut Diagnostics,
     ) -> Option<NativeTypeInstance> {
-        diagnostics.push_error(DatamodelError::new_native_types_not_supported(
-            self.name().to_owned(),
-            span,
-        ));
-        None
+        SQLiteType::from_parts(name, args, span, diagnostics).map(NativeTypeInstance::new::<SQLiteType>)
     }
 
     fn validate_url(&self, url: &str) -> Result<(), String> {

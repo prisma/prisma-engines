@@ -8,7 +8,7 @@ use mysql_async::{
     self as my,
     consts::{ColumnFlags, ColumnType},
 };
-use std::convert::TryFrom;
+use std::{convert::TryFrom, vec};
 
 pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
     if params.is_empty() {
@@ -68,6 +68,8 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                         dt.timestamp_subsec_micros(),
                     )
                 }),
+                ValueType::Geometry(_) => panic!("Cannot handle raw Geometry"),
+                ValueType::Geography(_) => panic!("Cannot handle raw Geography"),
             };
 
             match res {
@@ -196,6 +198,10 @@ impl TypeIdentifier for &my::Column {
 
     fn is_json(&self) -> bool {
         self.column_type() == ColumnType::MYSQL_TYPE_JSON
+    }
+
+    fn is_geometry(&self) -> bool {
+        self.column_type() == ColumnType::MYSQL_TYPE_GEOMETRY
     }
 
     fn is_enum(&self) -> bool {
@@ -335,6 +341,7 @@ impl TakeRow for my::Row {
                     t if t.is_time() => Value::null_time(),
                     t if t.is_date() => Value::null_date(),
                     t if t.is_json() => Value::null_json(),
+                    t if t.is_geometry() => Value::null_geometry(),
                     typ => {
                         let msg = format!("Value of type {typ:?} is not supported with the current configuration");
 

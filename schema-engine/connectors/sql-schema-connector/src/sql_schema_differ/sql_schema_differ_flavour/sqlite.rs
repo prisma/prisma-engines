@@ -3,7 +3,8 @@ use crate::{
     flavour::SqliteFlavour, migration_pair::MigrationPair, sql_schema_differ::column::ColumnTypeChange,
     sql_schema_differ::differ_database::DifferDatabase,
 };
-use sql_schema_describer::{walkers::TableColumnWalker, ColumnTypeFamily};
+
+use sql_schema_describer::{sqlite::SPATIALITE_IGNORED_TABLES, walkers::TableColumnWalker, ColumnTypeFamily};
 
 impl SqlSchemaDifferFlavour for SqliteFlavour {
     fn can_rename_foreign_key(&self) -> bool {
@@ -61,5 +62,13 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
 
     fn has_unnamed_foreign_keys(&self) -> bool {
         true
+    }
+
+    fn table_should_be_ignored(&self, table_name: &str) -> bool {
+        SPATIALITE_IGNORED_TABLES.is_match(table_name)
+    }
+
+    fn view_should_be_ignored(&self, view_name: &str) -> bool {
+        SPATIALITE_IGNORED_TABLES.is_match(view_name)
     }
 }

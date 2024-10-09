@@ -1,4 +1,4 @@
-use crate::{logging, mssql, mysql, postgres, Capabilities, Tags};
+use crate::{logging, mssql, mysql, postgres, sqlite, Capabilities, Tags};
 use enumflags2::BitFlags;
 use once_cell::sync::Lazy;
 use quaint::single::Quaint;
@@ -41,7 +41,7 @@ static DB_UNDER_TEST: Lazy<Result<DbUnderTest, String>> = Lazy::new(|| {
     match prefix {
         "file" | "sqlite" => Ok(DbUnderTest {
             database_url,
-            tags: Tags::Sqlite.into(),
+            tags: sqlite::get_sqlite_tags()?,
             capabilities: Capabilities::CreateDatabase.into(),
             provider: "sqlite",
             shadow_database_url,

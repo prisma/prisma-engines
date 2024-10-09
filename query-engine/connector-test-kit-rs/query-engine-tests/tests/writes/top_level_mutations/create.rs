@@ -424,3 +424,73 @@ mod mapped_create {
         Ok(())
     }
 }
+
+#[test_suite]
+mod geometry_create {
+    use query_engine_tests::run_query;
+
+    async fn create_geometry_test(runner: Runner) -> TestResult<()> {
+        // TODO@geometry: ideally, make geojson generation consistent with SQL connectors
+        match_connector_result!(
+          &runner,
+          r#"mutation { createOneTestModel(data: { id: 1, geometry: "{\"type\":\"Point\",\"coordinates\":[1,2]}" }) { geometry }}"#,
+          // MongoDB excludes undefined fields
+          MySql(Some(MySqlVersion::V8) | None) | Vitess(_) => vec![r#"{"data":{"createOneTestModel":{"geometry":"{\"coordinates\":[1.0,2.0],\"type\":\"Point\"}"}}}"#],
+          MySql(Some(MySqlVersion::V5_7)) => vec![r#"{"data":{"createOneTestModel":{"geometry":"{\"coordinates\":[1,2],\"type\":\"Point\"}"}}}"#],
+          MongoDb(_) => vec![r#"{"data":{"createOneTestModel":{"geometry":"{\"type\":\"Point\",\"coordinates\":[1.0,2.0]}"}}}"#],
+          _ => vec![r#"{"data":{"createOneTestModel":{"geometry":"{\"type\":\"Point\",\"coordinates\":[1,2]}"}}}"#]
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 2, geometry: null }) { geometry }}"#),
+          @r###"{"data":{"createOneTestModel":{"geometry":null}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 3 }) { geometry }}"#),
+          @r###"{"data":{"createOneTestModel":{"geometry":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn geometry_opt() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+              #id(id, Int, @id)
+              geometry Geometry?
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    fn geometry_opt_postgres() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+              @@schema("test")
+              #id(id, Int, @id)
+              geometry Geometry?
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(
+        schema(geometry_opt),
+        exclude(Postgres, MySQL(5.6), Sqlite(3, "cfd1", "libsql.js", "libsql.js.wasm"))
+    )]
+    async fn create_geometry(runner: Runner) -> TestResult<()> {
+        create_geometry_test(runner).await
+    }
+
+    #[connector_test(
+        schema(geometry_opt_postgres),
+        db_schemas("public", "test"),
+        only(Postgres("16-postgis"))
+    )]
+    async fn create_geometry_postgres(runner: Runner) -> TestResult<()> {
+        create_geometry_test(runner).await
+    }
+}

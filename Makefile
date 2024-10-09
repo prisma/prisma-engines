@@ -136,6 +136,11 @@ start-sqlite:
 dev-sqlite:
 	cp $(CONFIG_PATH)/sqlite $(CONFIG_FILE)
 
+start-spatialite:
+
+dev-spatialite:
+	cp $(CONFIG_PATH)/spatialite $(CONFIG_FILE)
+
 dev-react-native:
 	cp $(CONFIG_PATH)/react-native $(CONFIG_FILE)
 
@@ -247,6 +252,12 @@ start-postgres16:
 
 dev-postgres16: start-postgres16
 	cp $(CONFIG_PATH)/postgres16 $(CONFIG_FILE)
+
+start-postgis16:
+	docker compose -f docker-compose.yml up -d --remove-orphans postgis16
+
+dev-postgis16: start-postgis16
+	cp $(CONFIG_PATH)/postgis16 $(CONFIG_FILE)
 
 start-cockroach_23_1:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans cockroach_23_1

@@ -211,6 +211,179 @@ fn all_cockroach_column_types_must_work(api: TestApi) {
 }
 
 #[test_connector(tags(CockroachDb))]
+fn all_postgis_column_types_must_work(api: TestApi) {
+    let migration = r#"
+        CREATE TABLE "Spatial" (
+            geometry_geometry           GEOMETRY(GEOMETRY, 3857),
+            geometry_geometry_z         GEOMETRY(GEOMETRYZ, 3857),
+            geometry_point              GEOMETRY(POINT, 3857),
+            geometry_point_z            GEOMETRY(POINTZ, 3857),
+            geometry_line               GEOMETRY(LINESTRING, 3857),
+            geometry_line_z             GEOMETRY(LINESTRINGZ, 3857),
+            geometry_polygon            GEOMETRY(POLYGON, 3857),
+            geometry_polygon_z          GEOMETRY(POLYGONZ, 3857),
+            geometry_multipoint         GEOMETRY(MULTIPOINT, 3857),
+            geometry_multipoint_z       GEOMETRY(MULTIPOINTZ, 3857),
+            geometry_multiline          GEOMETRY(MULTILINESTRING, 3857),
+            geometry_multiline_z        GEOMETRY(MULTILINESTRINGZ, 3857),
+            geometry_multipolygon       GEOMETRY(MULTIPOLYGON, 3857),
+            geometry_multipolygon_z     GEOMETRY(MULTIPOLYGONZ, 3857),
+            geometry_collection         GEOMETRY(GEOMETRYCOLLECTION, 3857),
+            geometry_collection_z       GEOMETRY(GEOMETRYCOLLECTIONZ, 3857),
+            geography_geometry          GEOGRAPHY(GEOMETRY, 9000),
+            geography_geometry_z        GEOGRAPHY(GEOMETRYZ, 9000),
+            geography_point             GEOGRAPHY(POINT, 9000),
+            geography_point_z           GEOGRAPHY(POINTZ, 9000),
+            geography_line              GEOGRAPHY(LINESTRING, 9000),
+            geography_line_z            GEOGRAPHY(LINESTRINGZ, 9000),
+            geography_polygon           GEOGRAPHY(POLYGON, 9000),
+            geography_polygon_z         GEOGRAPHY(POLYGONZ, 9000),
+            geography_multipoint        GEOGRAPHY(MULTIPOINT, 9000),
+            geography_multipoint_z      GEOGRAPHY(MULTIPOINTZ, 9000),
+            geography_multiline         GEOGRAPHY(MULTILINESTRING, 9000),
+            geography_multiline_z       GEOGRAPHY(MULTILINESTRINGZ, 9000),
+            geography_multipolygon      GEOGRAPHY(MULTIPOLYGON, 9000),
+            geography_multipolygon_z    GEOGRAPHY(MULTIPOLYGONZ, 9000),
+            geography_collection        GEOGRAPHY(GEOMETRYCOLLECTION, 9000),
+            geography_collection_z      GEOGRAPHY(GEOMETRYCOLLECTIONZ, 9000)
+        );
+        "#;
+
+    api.raw_cmd(migration);
+
+    api.describe().assert_table("Spatial", |t| {
+        t.assert_column("geometry_geometry", |c| {
+            c.assert_full_data_type("geometry")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geometry_geometry_z", |c| {
+            c.assert_full_data_type("geometry")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geometry_point", |c| {
+            c.assert_full_data_type("geometry")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geometry_point_z", |c| {
+            c.assert_full_data_type("geometry")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geometry_line", |c| {
+            c.assert_full_data_type("geometry")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geometry_line_z", |c| {
+            c.assert_full_data_type("geometry")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geometry_polygon", |c| {
+            c.assert_full_data_type("geometry")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geometry_polygon_z", |c| {
+            c.assert_full_data_type("geometry")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geometry_multipoint", |c| {
+            c.assert_full_data_type("geometry")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geometry_multipoint_z", |c| {
+            c.assert_full_data_type("geometry")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geometry_multiline", |c| {
+            c.assert_full_data_type("geometry")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geometry_multiline_z", |c| {
+            c.assert_full_data_type("geometry")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geometry_multipolygon", |c| {
+            c.assert_full_data_type("geometry")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geometry_multipolygon_z", |c| {
+            c.assert_full_data_type("geometry")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geometry_collection", |c| {
+            c.assert_full_data_type("geometry")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geometry_collection_z", |c| {
+            c.assert_full_data_type("geometry")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geography_geometry", |c| {
+            c.assert_full_data_type("geography")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geography_geometry_z", |c| {
+            c.assert_full_data_type("geography")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geography_point", |c| {
+            c.assert_full_data_type("geography")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geography_point_z", |c| {
+            c.assert_full_data_type("geography")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geography_line", |c| {
+            c.assert_full_data_type("geography")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geography_line_z", |c| {
+            c.assert_full_data_type("geography")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geography_polygon", |c| {
+            c.assert_full_data_type("geography")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geography_polygon_z", |c| {
+            c.assert_full_data_type("geography")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geography_multipoint", |c| {
+            c.assert_full_data_type("geography")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geography_multipoint_z", |c| {
+            c.assert_full_data_type("geography")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geography_multiline", |c| {
+            c.assert_full_data_type("geography")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geography_multiline_z", |c| {
+            c.assert_full_data_type("geography")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geography_multipolygon", |c| {
+            c.assert_full_data_type("geography")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geography_multipolygon_z", |c| {
+            c.assert_full_data_type("geography")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geography_collection", |c| {
+            c.assert_full_data_type("geography")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+        .assert_column("geography_collection_z", |c| {
+            c.assert_full_data_type("geography")
+                .assert_column_type_family(ColumnTypeFamily::Geometry)
+        })
+    });
+}
+
+#[test_connector(tags(CockroachDb))]
 fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
     let schema = format!(
         r##"

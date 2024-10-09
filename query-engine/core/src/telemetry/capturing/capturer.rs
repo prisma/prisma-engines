@@ -9,6 +9,7 @@ use opentelemetry::{
 };
 
 /// Capturer determines, based on a set of settings and a trace id, how capturing is going to be handled.
+///
 /// Generally, both the trace id and the settings will be derived from request headers. Thus, a new
 /// value of this enum is created per request.
 #[derive(Debug, Clone)]

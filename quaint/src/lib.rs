@@ -130,3 +130,5 @@ pub mod visitor;
 pub use ast::{Value, ValueType};
 
 pub type Result<T> = std::result::Result<T, error::Error>;
+
+mod geometry;

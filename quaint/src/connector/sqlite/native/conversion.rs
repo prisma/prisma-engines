@@ -118,6 +118,20 @@ impl TypeIdentifier for &Column<'_> {
         matches!(self.decl_type(), Some("BOOLEAN") | Some("boolean"))
     }
 
+    fn is_geometry(&self) -> bool {
+        match self.decl_type() {
+            Some(n) if n.eq_ignore_ascii_case("GEOMETRY") => true,
+            Some(n) if n.eq_ignore_ascii_case("POINT") => true,
+            Some(n) if n.eq_ignore_ascii_case("LINESTRING") => true,
+            Some(n) if n.eq_ignore_ascii_case("POLYGON") => true,
+            Some(n) if n.eq_ignore_ascii_case("MULTIPOINT") => true,
+            Some(n) if n.eq_ignore_ascii_case("MULTILINESTRING") => true,
+            Some(n) if n.eq_ignore_ascii_case("MULTIPOLYGON") => true,
+            Some(n) if n.eq_ignore_ascii_case("GEOMETRYCOLLECTION") => true,
+            _ => false,
+        }
+    }
+
     fn is_json(&self) -> bool {
         false
     }
@@ -148,6 +162,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                     c if c.is_datetime() => Value::null_datetime(),
                     c if c.is_date() => Value::null_date(),
                     c if c.is_bool() => Value::null_boolean(),
+                    c if c.is_geometry() => Value::null_geometry(),
                     c => match c.decl_type() {
                         Some(n) => {
                             let msg = format!("Value {n} not supported");
@@ -288,6 +303,8 @@ impl<'a> ToSql for Value<'a> {
                     date.and_hms_opt(time.hour(), time.minute(), time.second())
                 })
                 .map(|dt| ToSqlOutput::from(dt.and_utc().timestamp_millis())),
+            ValueType::Geometry(_) => panic!("Cannot handle raw Geometry"),
+            ValueType::Geography(_) => panic!("Cannot handle raw Geography"),
         };
 
         match value {

@@ -82,16 +82,16 @@ impl TestApi {
         match self.sql_family() {
             SqlFamily::Postgres => {
                 use postgres::Circumstances;
-                sql_schema_describer::postgres::SqlSchemaDescriber::new(
-                    &self.database,
-                    if self.tags.contains(Tags::CockroachDb) {
-                        Circumstances::Cockroach.into()
-                    } else {
-                        Default::default()
-                    },
-                )
-                .describe(schemas)
-                .await
+                let mut circumstances: BitFlags<Circumstances> = Default::default();
+                if self.tags.contains(Tags::CockroachDb) {
+                    circumstances |= Circumstances::Cockroach
+                };
+                if self.tags.contains(Tags::PostGIS) {
+                    circumstances |= Circumstances::HasPostGIS
+                };
+                sql_schema_describer::postgres::SqlSchemaDescriber::new(&self.database, circumstances)
+                    .describe(schemas)
+                    .await
             }
             SqlFamily::Sqlite => {
                 sql_schema_describer::sqlite::SqlSchemaDescriber::new(&self.database)

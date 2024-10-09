@@ -36,7 +36,43 @@ const TYPES: &[(&str, &str)] = &[
     ("inet", "Inet"),
 ];
 
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
+const GEOMETRY_TYPES: &[(&str, &str)] = &[
+    ("geometry_default", "Geometry(Geometry, 4326)"),
+    ("geometry_srid", "Geometry(Geometry, 3857)"),
+    ("geometry_geometry_z", "Geometry(GeometryZ)"),
+    ("geometry_point", "Geometry(Point)"),
+    ("geometry_point_z", "Geometry(PointZ)"),
+    ("geometry_linestring", "Geometry(LineString)"),
+    ("geometry_linestring_z", "Geometry(LineStringZ)"),
+    ("geometry_polygon", "Geometry(Polygon)"),
+    ("geometry_polygon_z", "Geometry(PolygonZ)"),
+    ("geometry_multipoint", "Geometry(MultiPoint)"),
+    ("geometry_multipoint_z", "Geometry(MultiPointZ)"),
+    ("geometry_multilinestring", "Geometry(MultiLineString)"),
+    ("geometry_multilinestring_z", "Geometry(MultiLineStringZ)"),
+    ("geometry_multipolygon", "Geometry(MultiPolygon)"),
+    ("geometry_multipolygon_z", "Geometry(MultiPolygonZ)"),
+    ("geometry_geometrycollection", "Geometry(GeometryCollection)"),
+    ("geometry_geometrycollection_z", "Geometry(GeometryCollectionZ)"),
+    ("geography_geometry", "Geography(Geometry, 9000)"),
+    ("geography_geometry_z", "Geography(GeometryZ, 9000)"),
+    ("geography_point", "Geography(Point, 9000)"),
+    ("geography_point_z", "Geography(PointZ, 9000)"),
+    ("geography_linestring", "Geography(LineString, 9000)"),
+    ("geography_linestring_z", "Geography(LineStringZ, 9000)"),
+    ("geography_polygon", "Geography(Polygon, 9000)"),
+    ("geography_polygon_z", "Geography(PolygonZ, 9000)"),
+    ("geography_multipoint", "Geography(MultiPoint, 9000)"),
+    ("geography_multipoint_z", "Geography(MultiPointZ, 9000)"),
+    ("geography_multilinestring", "Geography(MultiLineString, 9000)"),
+    ("geography_multilinestring_z", "Geography(MultiLineStringZ, 9000)"),
+    ("geography_multipolygon", "Geography(MultiPolygon, 9000)"),
+    ("geography_multipolygon_z", "Geography(MultiPolygonZ, 9000)"),
+    ("geography_geometrycollection", "Geography(GeometryCollection, 9000)"),
+    ("geography_geometrycollection_z", "Geography(GeometryCollectionZ, 9000)"),
+];
+
+#[test_connector(tags(Postgres), exclude(PostGIS, CockroachDb))]
 async fn native_type_columns_feature_on(api: &mut TestApi) -> TestResult {
     let columns: Vec<String> = TYPES
         .iter()
@@ -100,7 +136,93 @@ async fn native_type_columns_feature_on(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
+#[test_connector(tags(PostGIS))]
+async fn native_type_spatial_columns_feature_on(api: &mut TestApi) -> TestResult {
+    api.raw_cmd("CREATE EXTENSION IF NOT EXISTS postgis").await;
+
+    let columns: Vec<String> = GEOMETRY_TYPES
+        .iter()
+        .map(|(name, db_type)| format!("\"{name}\" {db_type} Not Null"))
+        .collect();
+
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("Spatial", move |t| {
+                t.inject_custom("id Integer Primary Key");
+                for column in &columns {
+                    t.inject_custom(column);
+                }
+            });
+        })
+        .await?;
+
+    let mut types = indoc! {r#"
+         model Spatial {
+            id                              Int      @id
+            geometry_default                Geometry
+            geometry_srid                   Geometry @db.Geometry(Geometry, 3857)
+            geometry_geometry_z             Geometry @db.Geometry(GeometryZ, 0)
+            geometry_point                  Geometry @db.Geometry(Point, 0)
+            geometry_point_z                Geometry @db.Geometry(PointZ, 0)
+            geometry_linestring             Geometry @db.Geometry(LineString, 0)
+            geometry_linestring_z           Geometry @db.Geometry(LineStringZ, 0)
+            geometry_polygon                Geometry @db.Geometry(Polygon, 0)
+            geometry_polygon_z              Geometry @db.Geometry(PolygonZ, 0)
+            geometry_multipoint             Geometry @db.Geometry(MultiPoint, 0)
+            geometry_multipoint_z           Geometry @db.Geometry(MultiPointZ, 0)
+            geometry_multilinestring        Geometry @db.Geometry(MultiLineString, 0)
+            geometry_multilinestring_z      Geometry @db.Geometry(MultiLineStringZ, 0)
+            geometry_multipolygon           Geometry @db.Geometry(MultiPolygon, 0)
+            geometry_multipolygon_z         Geometry @db.Geometry(MultiPolygonZ, 0)
+            geometry_geometrycollection     Geometry @db.Geometry(GeometryCollection, 0)
+            geometry_geometrycollection_z   Geometry @db.Geometry(GeometryCollectionZ, 0)
+            geography_geometry              Geometry @db.Geography(Geometry, 9000)
+            geography_geometry_z            Geometry @db.Geography(GeometryZ, 9000)
+            geography_point                 Geometry @db.Geography(Point, 9000)
+            geography_point_z               Geometry @db.Geography(PointZ, 9000)
+            geography_linestring            Geometry @db.Geography(LineString, 9000)
+            geography_linestring_z          Geometry @db.Geography(LineStringZ, 9000)
+            geography_polygon               Geometry @db.Geography(Polygon, 9000)
+            geography_polygon_z             Geometry @db.Geography(PolygonZ, 9000)
+            geography_multipoint            Geometry @db.Geography(MultiPoint, 9000)
+            geography_multipoint_z          Geometry @db.Geography(MultiPointZ, 9000)
+            geography_multilinestring       Geometry @db.Geography(MultiLineString, 9000)
+            geography_multilinestring_z     Geometry @db.Geography(MultiLineStringZ, 9000)
+            geography_multipolygon          Geometry @db.Geography(MultiPolygon, 9000)
+            geography_multipolygon_z        Geometry @db.Geography(MultiPolygonZ, 9000)
+            geography_geometrycollection    Geometry @db.Geography(GeometryCollection, 9000)
+            geography_geometrycollection_z  Geometry @db.Geography(GeometryCollectionZ, 9000)
+        }
+    "#}
+    .to_string();
+
+    // TODO@geometry: shouldn't spatial_ref_sys be ignored here ?
+    if !api.is_cockroach() {
+        types += indoc!(
+            r#"
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+        model spatial_ref_sys {
+          srid      Int     @id
+          auth_name String? @db.VarChar(256)
+          auth_srid Int?
+          srtext    String? @db.VarChar(2048)
+          proj4text String? @db.VarChar(2048)
+        }
+    "#
+        );
+    }
+
+    let result = api.introspect().await?;
+
+    println!("EXPECTATION: \n {types:#}");
+    println!("RESULT: \n {result:#}");
+
+    api.assert_eq_datamodels(&types, &result);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(PostGIS, CockroachDb))]
 async fn native_type_array_columns_feature_on(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {

@@ -514,6 +514,8 @@ fn render_column_type(column: sql::TableColumnWalker<'_>) -> Cow<'static, str> {
         MsSqlType::VarBinary(len) => format!("VARBINARY{len}", len = format_type_param(*len)).into(),
         MsSqlType::Image => "IMAGE".into(),
         MsSqlType::Xml => "XML".into(),
+        MsSqlType::Geometry => "GEOMETRY".into(),
+        MsSqlType::Geography => "GEOGRAPHY".into(),
         MsSqlType::UniqueIdentifier => "UNIQUEIDENTIFIER".into(),
     }
 }

@@ -91,6 +91,8 @@ jobs:
             url: "postgresql://postgres:prisma@localhost:5438"
           - name: postgres16
             url: "postgresql://postgres:prisma@localhost:5439"
+          - name: postgis16
+            url: 'postgresql://postgres:prisma@localhost:5440'
           - name: cockroach_23_1
             url: "postgresql://prisma@localhost:26260"
           - name: cockroach_22_2
@@ -99,6 +101,8 @@ jobs:
             url: "postgresql://prisma@localhost:26257"
           - name: sqlite
             url: sqlite
+          # - name: spatialite
+          #   url: sqlite
           - name: vitess_8_0
             url: "mysql://root:prisma@localhost:33807/test"
             shadow_database_url: "mysql://root:prisma@localhost:33808/shadow"
@@ -124,6 +128,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Install Spatialite
+        if: ${{ matrix.database.name == 'spatialite' }}
+        run: sudo apt install -y libsqlite3-mod-spatialite && echo "SPATIALITE_PATH=mod_spatialite" >> $GITHUB_ENV
+  
       - name: "Start ${{ matrix.database.name }}"
         run: make start-${{ matrix.database.name }}
 

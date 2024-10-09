@@ -31,6 +31,7 @@ impl ConnectorTagInterface for SqliteConnectorTag {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SqliteVersion {
     V3,
+    V3Spatialite,
     ReactNative,
     LibsqlJsNapi,
     LibsqlJsWasm,
@@ -42,6 +43,7 @@ impl Display for SqliteVersion {
         match self {
             SqliteVersion::ReactNative => f.write_str("react-native"),
             SqliteVersion::V3 => f.write_str("3"),
+            SqliteVersion::V3Spatialite => f.write_str("3-spatialite"),
             SqliteVersion::LibsqlJsNapi => f.write_str("libsql.js"),
             SqliteVersion::LibsqlJsWasm => f.write_str("libsql.js.wasm"),
             SqliteVersion::CloudflareD1 => f.write_str("cfd1"),
@@ -55,6 +57,7 @@ impl TryFrom<&str> for SqliteVersion {
     fn try_from(s: &str) -> Result<Self, Self::Error> {
         let version = match s {
             "3" => Self::V3,
+            "3-spatialite" => Self::V3Spatialite,
             "libsql.js" => Self::LibsqlJsNapi,
             "libsql.js.wasm" => Self::LibsqlJsWasm,
             "react-native" => Self::ReactNative,

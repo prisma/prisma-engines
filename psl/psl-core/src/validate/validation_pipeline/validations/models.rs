@@ -226,12 +226,12 @@ pub(crate) fn primary_key_connector_specific(model: ModelWalker<'_>, ctx: &mut C
     }
 
     if primary_key.fields().len() > 1 && !ctx.has_capability(ConnectorCapability::CompoundIds) {
-        return ctx.push_error(DatamodelError::new_model_validation_error(
+        ctx.push_error(DatamodelError::new_model_validation_error(
             "The current connector does not support compound ids.",
             container_type,
             model.name(),
             primary_key.ast_attribute().span,
-        ));
+        ))
     }
 }
 

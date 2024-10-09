@@ -12,7 +12,7 @@ use query_structure::{
     CompositeFieldRef, Field, PrismaValue, RelationFieldRef, ScalarFieldRef, SelectedField, TypeIdentifier,
 };
 use serde_json::Value;
-use std::{convert::TryFrom, fmt::Display};
+use std::{convert::TryFrom, fmt::Display, str::FromStr};
 
 /// Transforms a `PrismaValue` of a specific selected field into the BSON mapping as prescribed by
 /// the native types or as defined by the default `TypeIdentifier` to BSON mapping.
@@ -198,6 +198,17 @@ impl IntoBson for (&MongoDbType, PrismaValue) {
                 })?
             }
 
+            // Geometry
+            (MongoDbType::Json, PrismaValue::GeoJson(json)) => {
+                let geometry = geojson::Geometry::from_str(&json)?;
+                let val: Value = geojson::GeoJson::Geometry(geometry).into();
+
+                Bson::try_from(val).map_err(|_| MongoError::ConversionError {
+                    from: "Stringified GeoJSON".to_owned(),
+                    to: "Mongo BSON (extJSON)".to_owned(),
+                })?
+            }
+
             // Unhandled conversions
             (mdb_type, p_val) => {
                 return Err(MongoError::ConversionError {
@@ -262,6 +273,16 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
                 let val: Value = serde_json::from_str(&json)?;
                 Bson::try_from(val).map_err(|_| MongoError::ConversionError {
                     from: "Stringified JSON".to_owned(),
+                    to: "Mongo BSON (extJSON)".to_owned(),
+                })?
+            }
+
+            // Geometry
+            (TypeIdentifier::Geometry, PrismaValue::GeoJson(json)) => {
+                let geometry = geojson::Geometry::from_str(&json)?;
+                let val: Value = geojson::GeoJson::Geometry(geometry).into();
+                Bson::try_from(val).map_err(|_| MongoError::ConversionError {
+                    from: "Stringified GeoJSON".to_owned(),
                     to: "Mongo BSON (extJSON)".to_owned(),
                 })?
             }
@@ -376,6 +397,11 @@ fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<Prism
 
         // Json
         (TypeIdentifier::Json, bson) => PrismaValue::Json(serde_json::to_string(&bson.into_relaxed_extjson())?),
+
+        // Geometry
+        (TypeIdentifier::Geometry, bson @ Bson::Document(_)) => {
+            PrismaValue::GeoJson(serde_json::to_string(&bson.into_relaxed_extjson())?)
+        }
 
         (ident, bson) => {
             return Err(MongoError::ConversionError {

@@ -1,0 +1,3 @@
+{
+    "connector": "sqlite",
+    "version": "3-spatialite"}

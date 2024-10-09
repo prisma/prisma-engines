@@ -71,6 +71,10 @@ jobs:
       - name: "Start ${{ inputs.name }} (${{ matrix.engine_protocol }})"
         run: make start-${{ inputs.name }}
 
+      - name: Install Spatialite
+        if: ${{ inputs.name == 'spatialite' }}
+        run: sudo apt install -y libsqlite3-mod-spatialite && echo "SPATIALITE_PATH=mod_spatialite" >> $GITHUB_ENV
+
       - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=1
         if: ${{ inputs.single_threaded }}
         env:

@@ -52,6 +52,8 @@ opentelemetry = { version = "0.17", features = ["tokio"] }
 tracing-opentelemetry = "0.17.3"
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
 quaint.workspace = true
+geojson.workspace = true
+geozero.workspace = true
 
 [dev-dependencies]
 expect-test = "1"

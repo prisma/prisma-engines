@@ -48,6 +48,9 @@ pub enum MongoError {
     JsonError(#[from] serde_json::Error),
 
     #[error("{0}")]
+    GeoJsonError(#[from] geojson::Error),
+
+    #[error("{0}")]
     BsonDeserializationError(#[from] bson::de::Error),
 
     #[error("Missing required argument: '{}'.", argument)]
@@ -94,6 +97,7 @@ impl MongoError {
             MongoError::UnhandledConversionError(err) => ConnectorError::from_kind(ErrorKind::ConversionError(err)),
             MongoError::UuidError(err) => ConnectorError::from_kind(ErrorKind::ConversionError(err.into())),
             MongoError::JsonError(err) => ConnectorError::from_kind(ErrorKind::ConversionError(err.into())),
+            MongoError::GeoJsonError(err) => ConnectorError::from_kind(ErrorKind::ConversionError(err.into())),
             MongoError::BsonDeserializationError(err) => {
                 ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
             }

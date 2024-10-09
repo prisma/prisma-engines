@@ -21,6 +21,8 @@ pub enum ColumnType {
     Date,
     Time,
     Enum,
+    Geometry,
+    Geography,
 
     Int32Array,
     Int64Array,
@@ -83,6 +85,8 @@ impl std::fmt::Display for ColumnType {
             ColumnType::DateTimeArray => write!(f, "datetime-array"),
             ColumnType::DateArray => write!(f, "date-array"),
             ColumnType::TimeArray => write!(f, "time-array"),
+            ColumnType::Geometry => write!(f, "geometry"),
+            ColumnType::Geography => write!(f, "geography"),
 
             ColumnType::Null => write!(f, "null"),
             ColumnType::Unknown => write!(f, "unknown"),
@@ -116,6 +120,8 @@ impl From<&ValueType<'_>> for ColumnType {
             ValueType::DateTime(_) => ColumnType::DateTime,
             ValueType::Date(_) => ColumnType::Date,
             ValueType::Time(_) => ColumnType::Time,
+            ValueType::Geometry(_) => ColumnType::Geometry,
+            ValueType::Geography(_) => ColumnType::Geography,
             ValueType::Array(Some(vals)) if !vals.is_empty() => match &vals[0].typed {
                 ValueType::Int32(_) => ColumnType::Int32Array,
                 ValueType::Int64(_) => ColumnType::Int64Array,
@@ -135,6 +141,8 @@ impl From<&ValueType<'_>> for ColumnType {
                 ValueType::Time(_) => ColumnType::TimeArray,
                 ValueType::Array(_) => ColumnType::Unknown,
                 ValueType::EnumArray(_, _) => ColumnType::Unknown,
+                ValueType::Geometry(_) => unimplemented!("Geometry arrays are not supported"),
+                ValueType::Geography(_) => unimplemented!("Geography arrays are not supported"),
             },
             ValueType::Array(_) => ColumnType::Unknown,
         }
@@ -173,6 +181,8 @@ impl ColumnType {
             ColumnType::Numeric
         } else if value.is_text() {
             ColumnType::Text
+        } else if value.is_geometry() {
+            ColumnType::Geometry
         } else {
             ColumnType::Unknown
         }

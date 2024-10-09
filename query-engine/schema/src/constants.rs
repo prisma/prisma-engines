@@ -107,6 +107,10 @@ pub mod filters {
     pub const STRING_STARTS_WITH: &str = "string_starts_with";
     pub const STRING_ENDS_WITH: &str = "string_ends_with";
     pub const JSON_TYPE: &str = "json_type";
+
+    // geometry filters
+    pub const GEO_WITHIN: &str = "geoWithin";
+    pub const GEO_INTERSECTS: &str = "geoIntersects";
 }
 
 pub mod aggregations {

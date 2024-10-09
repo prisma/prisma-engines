@@ -1,0 +1,1 @@
+export TEST_DATABASE_URL="postgresql://postgres:prisma@localhost:5440"

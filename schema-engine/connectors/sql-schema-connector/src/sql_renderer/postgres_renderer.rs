@@ -8,7 +8,7 @@ use crate::{
     },
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
-use psl::builtin_connectors::{CockroachType, PostgresType};
+use psl::builtin_connectors::{geometry::GeometryParams, CockroachType, PostgresType};
 use sql_ddl::{
     postgres::{self as ddl, PostgresIdentifier},
     IndexColumn, SortOrder,
@@ -587,6 +587,8 @@ fn render_column_type_postgres(col: TableColumnWalker<'_>) -> Cow<'static, str> 
         PostgresType::Xml => "XML".into(),
         PostgresType::Json => "JSON".into(),
         PostgresType::JsonB => "JSONB".into(),
+        PostgresType::Geometry(geom) => format!("GEOMETRY{}", render_geometry_arg(*geom)).into(),
+        PostgresType::Geography(geom) => format!("GEOGRAPHY{}", render_geometry_arg(*geom)).into(),
     };
 
     if t.arity.is_list() {
@@ -628,6 +630,8 @@ fn render_column_type_cockroachdb(col: TableColumnWalker<'_>) -> Cow<'static, st
         CockroachType::VarBit(length) => format!("VARBIT{}", render_optional_args(*length)).into(),
         CockroachType::Uuid => "UUID".into(),
         CockroachType::JsonB => "JSONB".into(),
+        CockroachType::Geometry(geom) => format!("GEOMETRY{}", render_geometry_arg(*geom)).into(),
+        CockroachType::Geography(geom) => format!("GEOGRAPHY{}", render_geometry_arg(*geom)).into(),
     };
 
     if t.arity.is_list() {
@@ -648,6 +652,13 @@ fn render_decimal_args(input: Option<(u32, u32)>) -> String {
     match input {
         None => "".to_string(),
         Some((precision, scale)) => format!("({precision},{scale})"),
+    }
+}
+
+fn render_geometry_arg(input: Option<GeometryParams>) -> String {
+    match input {
+        None => "".to_string(),
+        Some(GeometryParams { type_, srid }) => format!("({type_}, {srid})"),
     }
 }
 

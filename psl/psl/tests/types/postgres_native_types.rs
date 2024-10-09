@@ -232,3 +232,51 @@ fn xml_should_work_with_string_scalar_type() {
         .assert_has_scalar_field("dec")
         .assert_native_type(datamodel.connector, &PostgresType::Xml);
 }
+
+#[test]
+fn postgis_specific_native_types_are_valid() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "postgres"
+          url = env("TEST_DATABASE_URL")
+        }
+
+        model NativeTypesTest {
+          id      Int      @id
+          geom_01 Geometry
+          geom_02 Geometry @db.Geometry(GeometryZ, 4326)
+          geom_03 Geometry @db.Geometry(Point, 4326)
+          geom_04 Geometry @db.Geometry(PointZ, 4326)
+          geom_05 Geometry @db.Geometry(LineString, 4326)
+          geom_06 Geometry @db.Geometry(LineStringZ, 4326)
+          geom_07 Geometry @db.Geometry(Polygon, 4326)
+          geom_08 Geometry @db.Geometry(PolygonZ, 4326)
+          geom_09 Geometry @db.Geometry(MultiPoint, 4326)
+          geom_10 Geometry @db.Geometry(MultiPointZ, 4326)
+          geom_11 Geometry @db.Geometry(MultiLineString, 4326)
+          geom_12 Geometry @db.Geometry(MultiLineStringZ, 4326)
+          geom_13 Geometry @db.Geometry(MultiPolygon, 4326)
+          geom_14 Geometry @db.Geometry(MultiPolygonZ, 4326)
+          geom_15 Geometry @db.Geometry(GeometryCollection, 4326)
+          geom_16 Geometry @db.Geometry(GeometryCollectionZ, 4326)
+          geog_01 Geometry @db.Geography(Geometry, 4326)
+          geog_02 Geometry @db.Geography(GeometryZ, 4326)
+          geog_03 Geometry @db.Geography(Point, 4326)
+          geog_04 Geometry @db.Geography(PointZ, 4326)
+          geog_05 Geometry @db.Geography(LineString, 4326)
+          geog_06 Geometry @db.Geography(LineStringZ, 4326)
+          geog_07 Geometry @db.Geography(Polygon, 4326)
+          geog_08 Geometry @db.Geography(PolygonZ, 4326)
+          geog_09 Geometry @db.Geography(MultiPoint, 4326)
+          geog_10 Geometry @db.Geography(MultiPointZ, 4326)
+          geog_11 Geometry @db.Geography(MultiLineString, 4326)
+          geog_12 Geometry @db.Geography(MultiLineStringZ, 4326)
+          geog_13 Geometry @db.Geography(MultiPolygon, 4326)
+          geog_14 Geometry @db.Geography(MultiPolygonZ, 4326)
+          geog_15 Geometry @db.Geography(GeometryCollection, 4326)
+          geog_16 Geometry @db.Geography(GeometryCollectionZ, 4326)
+        }
+    "#};
+
+    psl::parse_schema(schema).unwrap();
+}

@@ -11,6 +11,7 @@ pub(crate) trait TypeIdentifier {
     fn is_bytes(&self) -> bool;
     fn is_bool(&self) -> bool;
     fn is_json(&self) -> bool;
+    fn is_geometry(&self) -> bool;
     fn is_enum(&self) -> bool;
     fn is_null(&self) -> bool;
 }

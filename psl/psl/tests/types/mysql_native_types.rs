@@ -465,6 +465,238 @@ fn tinyblob_type_should_fail_on_index() {
 }
 
 #[test]
+fn geometry_type_should_fail_on_index() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          id Int   @id
+          a  Geometry @db.Geometry
+          b  Geometry @db.Geometry
+
+          @@index([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mYou cannot define an index on fields with native type `Geometry` of MySQL. Please use the `length` argument to the field in the index definition to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn point_type_should_fail_on_index() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          id Int   @id
+          a  Geometry @db.Point
+          b  Geometry @db.Point
+
+          @@index([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mYou cannot define an index on fields with native type `Point` of MySQL. Please use the `length` argument to the field in the index definition to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn linestring_type_should_fail_on_index() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          id Int   @id
+          a  Geometry @db.LineString
+          b  Geometry @db.LineString
+
+          @@index([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mYou cannot define an index on fields with native type `LineString` of MySQL. Please use the `length` argument to the field in the index definition to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn polygon_type_should_fail_on_index() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          id Int   @id
+          a  Geometry @db.Polygon
+          b  Geometry @db.Polygon
+
+          @@index([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mYou cannot define an index on fields with native type `Polygon` of MySQL. Please use the `length` argument to the field in the index definition to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn multipoint_type_should_fail_on_index() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          id Int   @id
+          a  Geometry @db.MultiPoint
+          b  Geometry @db.MultiPoint
+
+          @@index([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mYou cannot define an index on fields with native type `MultiPoint` of MySQL. Please use the `length` argument to the field in the index definition to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn multilinestring_type_should_fail_on_index() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          id Int   @id
+          a  Geometry @db.MultiLineString
+          b  Geometry @db.MultiLineString
+
+          @@index([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mYou cannot define an index on fields with native type `MultiLineString` of MySQL. Please use the `length` argument to the field in the index definition to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn multipolygon_type_should_fail_on_index() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          id Int   @id
+          a  Geometry @db.MultiPolygon
+          b  Geometry @db.MultiPolygon
+
+          @@index([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mYou cannot define an index on fields with native type `MultiPolygon` of MySQL. Please use the `length` argument to the field in the index definition to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn geometrycollection_type_should_fail_on_index() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          id Int   @id
+          a  Geometry @db.GeometryCollection
+          b  Geometry @db.GeometryCollection
+
+          @@index([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mYou cannot define an index on fields with native type `GeometryCollection` of MySQL. Please use the `length` argument to the field in the index definition to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m
+        [1;94m11 | [0m  [1;91m@@index([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
 fn text_type_should_fail_on_id() {
     let schema = indoc! {r#"
         datasource db {
@@ -682,6 +914,230 @@ fn tinyblob_type_should_fail_on_id() {
         [1;94m   | [0m
         [1;94m 9 | [0m
         [1;94m10 | [0m  [1;91m@@id([firstName, lastName])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn geometry_type_should_fail_on_id() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          a Geometry @db.Geometry
+          b Geometry @db.Geometry
+
+          @@id([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mNative type `Geometry` of MySQL cannot be used on a field that is `@id` or `@@id`. Please use the `length` argument to the field in the index definition to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
+        [1;94m   | [0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn point_type_should_fail_on_id() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          a Geometry @db.Point
+          b Geometry @db.Point
+
+          @@id([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mNative type `Point` of MySQL cannot be used on a field that is `@id` or `@@id`. Please use the `length` argument to the field in the index definition to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
+        [1;94m   | [0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn linestring_type_should_fail_on_id() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          a Geometry @db.LineString
+          b Geometry @db.LineString
+
+          @@id([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mNative type `LineString` of MySQL cannot be used on a field that is `@id` or `@@id`. Please use the `length` argument to the field in the index definition to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
+        [1;94m   | [0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn polygon_type_should_fail_on_id() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          a Geometry @db.Polygon
+          b Geometry @db.Polygon
+
+          @@id([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mNative type `Polygon` of MySQL cannot be used on a field that is `@id` or `@@id`. Please use the `length` argument to the field in the index definition to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
+        [1;94m   | [0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn multipoint_type_should_fail_on_id() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          a Geometry @db.MultiPoint
+          b Geometry @db.MultiPoint
+
+          @@id([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mNative type `MultiPoint` of MySQL cannot be used on a field that is `@id` or `@@id`. Please use the `length` argument to the field in the index definition to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
+        [1;94m   | [0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn multilinestring_type_should_fail_on_id() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          a Geometry @db.MultiLineString
+          b Geometry @db.MultiLineString
+
+          @@id([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mNative type `MultiLineString` of MySQL cannot be used on a field that is `@id` or `@@id`. Please use the `length` argument to the field in the index definition to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
+        [1;94m   | [0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn multipolygon_type_should_fail_on_id() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          a Geometry @db.MultiPolygon
+          b Geometry @db.MultiPolygon
+
+          @@id([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mNative type `MultiPolygon` of MySQL cannot be used on a field that is `@id` or `@@id`. Please use the `length` argument to the field in the index definition to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
+        [1;94m   | [0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expect_error(schema, &expectation);
+}
+
+#[test]
+fn geometrycollection_type_should_fail_on_id() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model User {
+          a Geometry @db.GeometryCollection
+          b Geometry @db.GeometryCollection
+
+          @@id([a, b])
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mNative type `GeometryCollection` of MySQL cannot be used on a field that is `@id` or `@@id`. Please use the `length` argument to the field in the index definition to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:10[0m
+        [1;94m   | [0m
+        [1;94m 9 | [0m
+        [1;94m10 | [0m  [1;91m@@id([a, b])[0m
         [1;94m   | [0m
     "#]];
 

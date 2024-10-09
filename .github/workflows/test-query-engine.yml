@@ -40,6 +40,8 @@ jobs:
             version: "10"
           - name: "postgres9"
             version: "9"
+          - name: 'postgis16'
+            version: '16-postgis'
     uses: ./.github/workflows/test-query-engine-template.yml
     name: postgres ${{ matrix.database.version }}
     with:
@@ -81,7 +83,6 @@ jobs:
       matrix:
         database:
           - name: "cockroach_23_1"
-            connector: "cockroachdb"
             version: "23.1"
           - name: "cockroach_22_2"
             version: "22.2"
@@ -137,11 +138,19 @@ jobs:
       relation_load_strategy: '["query"]'
 
   sqlite:
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - name: "sqlite"
+            version: "3"
+          # - name: "spatialite"
+          #   version: "3-spatialite"
     uses: ./.github/workflows/test-query-engine-template.yml
-    name: sqlite
+    name: sqlite ${{ matrix.database.version }}
     with:
-      name: "sqlite"
-      version: 3
+      name: ${{ matrix.database.name }}
+      version: ${{ matrix.database.version }}
       connector: "sqlite"
       relation_load_strategy: '["query"]'
   

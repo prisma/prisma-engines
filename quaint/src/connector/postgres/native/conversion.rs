@@ -57,6 +57,8 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                 ValueType::DateTime(_) => PostgresType::TIMESTAMPTZ,
                 ValueType::Date(_) => PostgresType::TIMESTAMP,
                 ValueType::Time(_) => PostgresType::TIME,
+                ValueType::Geometry(_) => PostgresType::BYTEA,
+                ValueType::Geography(_) => PostgresType::BYTEA,
                 ValueType::Array(ref arr) => {
                     let arr = arr.as_ref().unwrap();
 
@@ -93,6 +95,8 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                         ValueType::DateTime(_) => PostgresType::TIMESTAMPTZ_ARRAY,
                         ValueType::Date(_) => PostgresType::TIMESTAMP_ARRAY,
                         ValueType::Time(_) => PostgresType::TIME_ARRAY,
+                        ValueType::Geometry(_) => PostgresType::BYTEA,
+                        ValueType::Geography(_) => PostgresType::BYTEA,
                         // In the case of nested arrays, we let PG infer the type
                         ValueType::Array(_) => PostgresType::UNKNOWN,
                     }
@@ -975,6 +979,8 @@ impl<'a> ToSql for Value<'a> {
                 Ok(result)
             }),
             (ValueType::DateTime(value), _) => value.map(|value| value.naive_utc().to_sql(ty, out)),
+            (ValueType::Geometry(_), _) => panic!("Cannot handle raw Geometry"),
+            (ValueType::Geography(_), _) => panic!("Cannot handle raw Geography"),
         };
 
         match res {

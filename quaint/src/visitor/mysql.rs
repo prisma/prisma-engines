@@ -120,6 +120,15 @@ impl<'a> Mysql<'a> {
             _ => self.visit_expression(expr),
         }
     }
+
+    fn visit_geometry_from_geojson<E>(&mut self, geometry: E) -> visitor::Result
+    where
+        E: Into<Expression<'a>>,
+    {
+        self.surround_with("ST_GeomFromGeoJSON(", ")", |ref mut s| {
+            s.visit_expression(geometry.into())
+        })
+    }
 }
 
 impl<'a> Visitor<'a> for Mysql<'a> {
@@ -193,6 +202,12 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
             ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
             ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
+            ValueType::Geometry(g) => g
+                .as_ref()
+                .map(|g| self.visit_geometry_from_geojson(g.to_string().raw())),
+            ValueType::Geography(g) => g
+                .as_ref()
+                .map(|g| self.visit_geometry_from_geojson(g.to_string().raw())),
         };
 
         match res {
@@ -491,6 +506,32 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         self.write(")")
     }
 
+    fn visit_geometry_type_equals(
+        &mut self,
+        left: Expression<'a>,
+        geom_type: GeometryType<'a>,
+        not: bool,
+    ) -> visitor::Result {
+        self.write("ST_GeometryType")?;
+        self.surround_with("(", ")", |s| s.visit_expression(left.clone()))?;
+
+        if not {
+            self.write(" != ")?;
+        } else {
+            self.write(" = ")?;
+        }
+
+        match geom_type {
+            GeometryType::ColumnRef(column) => {
+                self.write("ST_GeometryType")?;
+                self.surround_with("(", ")", |s| s.visit_column(*column))
+            }
+            _ => self.visit_expression(Value::text(geom_type.to_string().to_uppercase()).into()),
+        }?;
+
+        Ok(())
+    }
+
     fn visit_greater_than(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         self.visit_numeric_comparison(left, right, ">")?;
 
@@ -665,6 +706,25 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         }
 
         Ok(())
+    }
+
+    fn visit_geometry_column(&mut self, column: Column<'a>) -> visitor::Result {
+        self.surround_with("ST_AsGeoJSON(", ")", |s| {
+            s.visit_column(column.clone().into_bare_with_table())?;
+            s.write(", 15, 2")?;
+            Ok(())
+        })?;
+        self.visit_alias(column.alias)
+    }
+
+    fn visit_parameterized_geometry(&mut self, geometry: geojson::Geometry) -> visitor::Result {
+        self.surround_with("ST_GeomFromGeoJSON(", ")", |ref mut s| {
+            s.visit_parameterized(geometry.to_string().into())
+        })
+    }
+
+    fn visit_parameterized_geography(&mut self, geometry: geojson::Geometry) -> visitor::Result {
+        self.visit_parameterized_geometry(geometry)
     }
 }
 
@@ -858,6 +918,15 @@ mod tests {
     fn test_raw_char() {
         let (sql, params) = Mysql::build(Select::default().value(ValueType::character('a').raw())).unwrap();
         assert_eq!("SELECT 'a'", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_geometry() {
+        let geojson = r#"{"type":"Point","coordinates":[1.0,2.0]}"#;
+        let geom = geojson.parse::<geojson::Geometry>().unwrap();
+        let (sql, params) = Mysql::build(Select::default().value(Value::geometry(geom).raw())).unwrap();
+        assert_eq!(format!("SELECT ST_GeomFromGeoJSON('{geojson}')"), sql);
         assert!(params.is_empty());
     }
 

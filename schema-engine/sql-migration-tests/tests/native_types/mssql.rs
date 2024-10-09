@@ -1875,6 +1875,8 @@ static TYPE_MAPS: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
     maps.insert("Image", "Bytes");
     maps.insert("Xml", "String");
     maps.insert("UniqueIdentifier", "String");
+    maps.insert("Geometry", "Geometry");
+    maps.insert("Geography", "Geometry");
 
     maps
 });

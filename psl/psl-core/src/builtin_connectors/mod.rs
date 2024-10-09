@@ -1,6 +1,7 @@
 #[cfg(feature = "cockroachdb")]
 pub mod cockroach_datamodel_connector;
 pub mod completions;
+pub mod geometry;
 
 #[cfg(feature = "cockroachdb")]
 pub use cockroach_datamodel_connector::CockroachType;
@@ -12,6 +13,8 @@ pub use mssql_datamodel_connector::{MsSqlType, MsSqlTypeParameter};
 pub use mysql_datamodel_connector::MySqlType;
 #[cfg(feature = "postgresql")]
 pub use postgres_datamodel_connector::{PostgresDatasourceProperties, PostgresType};
+#[cfg(feature = "sqlite")]
+pub use sqlite_datamodel_connector::SQLiteType;
 
 mod capabilities_support;
 #[cfg(feature = "mongodb")]

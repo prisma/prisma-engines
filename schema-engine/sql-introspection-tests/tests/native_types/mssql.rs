@@ -34,6 +34,8 @@ const TYPES: &[(&str, &str)] = &[
     ("image", "Image"),
     ("text", "Text"),
     ("ntext", "NText"),
+    ("geom", "Geometry"),
+    ("geog", "Geography"),
 ];
 
 #[test_connector(tags(Mssql))]
@@ -88,6 +90,8 @@ async fn native_type_columns_feature_on(api: &mut TestApi) -> TestResult {
           image       Bytes    @db.Image
           text        String   @db.Text
           ntext       String   @db.NText
+          geom        Geometry
+          geog        Geometry @db.Geography
         }
     "#};
 
