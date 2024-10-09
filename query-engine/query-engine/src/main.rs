@@ -3,6 +3,7 @@
 #[macro_use]
 extern crate tracing;
 
+use mimalloc::MiMalloc;
 use query_engine::cli::CliCommand;
 use query_engine::context;
 use query_engine::error::PrismaError;
@@ -12,6 +13,9 @@ use query_engine::LogFormat;
 use std::{error::Error, process};
 use structopt::StructOpt;
 use tracing::Instrument;
+
+#[global_allocator]
+static GLOBAL: MiMalloc = MiMalloc;
 
 type AnyError = Box<dyn Error + Send + Sync + 'static>;
 
