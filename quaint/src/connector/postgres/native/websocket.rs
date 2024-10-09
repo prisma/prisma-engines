@@ -27,7 +27,6 @@ pub(crate) async fn connect_via_websocket(url: PostgresWebSocketUrl) -> crate::R
 
     let connection_params = require_header_value(response.headers(), CONNECTION_PARAMS_HEADER)?;
     let db_host = require_header_value(response.headers(), HOST_HEADER)?;
-    dbg!(&connection_params);
 
     let config = Config::from_str(connection_params)?;
     let ws_byte_stream = WsStream::new(ws_stream);
