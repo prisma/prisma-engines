@@ -23,15 +23,9 @@ const CONNECTION_PARAMS_HEADER: &str = "Prisma-Connection-Parameters";
 const HOST_HEADER: &str = "Prisma-Db-Host";
 
 pub(crate) async fn connect_via_websocket(url: PostgresWebSocketUrl) -> crate::Result<Client> {
-    let (ws_stream, response) = connect_async(url).await.inspect_err(|e| {
-        dbg!(&e);
-        if let TungsteniteError::Http(response) = e  {
-           dbg!(String::from_utf8(response.body().clone().unwrap()).unwrap());
-        }
-    })?;
+    let (ws_stream, response) = connect_async(url).await?;
 
     let connection_params = require_header_value(response.headers(), CONNECTION_PARAMS_HEADER)?;
-    dbg!(&connection_params);
     let db_host = require_header_value(response.headers(), HOST_HEADER)?;
     dbg!(&connection_params);
 
