@@ -51,10 +51,9 @@ impl ScalarFieldExt for ScalarField {
             (PrismaValue::BigInt(i), _) => i.into(),
             (PrismaValue::Uuid(u), _) => u.to_string().into(),
             (PrismaValue::List(l), _) => Value::array(l.into_iter().map(|x| self.value(x, ctx))),
-            (PrismaValue::Json(s), _) => Value::json(serde_json::from_str::<serde_json::Value>(&s).unwrap()),
             (PrismaValue::Bytes(b), _) => Value::bytes(b),
             (PrismaValue::Object(_), _) => unimplemented!(),
-            (PrismaValue::GeoJson(s), _) => {
+            (PrismaValue::Json(s), TypeIdentifier::Geometry) => {
                 let geometry = s.parse::<Geometry>().unwrap();
                 match self.type_family() {
                     TypeFamily::Geography => Value::geography(geometry),
@@ -62,6 +61,7 @@ impl ScalarFieldExt for ScalarField {
                     _ => unreachable!(),
                 }
             }
+            (PrismaValue::Json(s), _) => Value::json(serde_json::from_str::<serde_json::Value>(&s).unwrap()),
             (PrismaValue::Null, ident) => match ident {
                 TypeIdentifier::String => Value::null_text(),
                 TypeIdentifier::Float => Value::null_numeric(),
@@ -141,9 +141,6 @@ pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
         PrismaValue::List(l) => Value::array(l.into_iter().map(convert_lossy)),
         PrismaValue::Json(s) => Value::json(serde_json::from_str(&s).unwrap()),
         PrismaValue::Bytes(b) => Value::bytes(b),
-        // TODO@geom: Fix this when we know how to cast GeoJSON to an appropriate DB value
-        PrismaValue::GeoJson(s) => Value::json(serde_json::from_str(&s).unwrap()),
-        // PrismaValue::Geometry(s) => Value::geometry(GeometryValue::from_str(&s).unwrap()),
         PrismaValue::Null => Value::null_int32(), // Can't tell which type the null is supposed to be.
         PrismaValue::Object(_) => unimplemented!(),
     }

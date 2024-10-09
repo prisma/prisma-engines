@@ -293,12 +293,12 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             value if value.is_null() => PrismaValue::Null,
             ValueType::Json(Some(mut geojson)) => {
                 geojson.as_object_mut().map(trim_redundent_crs);
-                PrismaValue::GeoJson(geojson.to_string())
+                PrismaValue::Json(geojson.to_string())
             }
             ValueType::Text(Some(ref geom)) if geom.starts_with("{") => {
                 let mut geojson = geom.parse::<serde_json::Value>()?;
                 geojson.as_object_mut().map(trim_redundent_crs);
-                PrismaValue::GeoJson(geojson.to_string())
+                PrismaValue::Json(geojson.to_string())
             }
             ValueType::Text(Some(ref geom)) => {
                 // SQlite and Postgres return GeoJSON as strings. SQL Server cannot return geometry as GeoJSON,
@@ -313,7 +313,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
                     let crs = json!({"type": "name", "properties": {"name": format!("EPSG:{srid}")}});
                     geojson.as_object_mut().map(|g| g.insert("crs".to_string(), crs));
                 }
-                PrismaValue::GeoJson(geojson.to_string())
+                PrismaValue::Json(geojson.to_string())
             }
             _ => return Err(create_error(&p_value)),
         },

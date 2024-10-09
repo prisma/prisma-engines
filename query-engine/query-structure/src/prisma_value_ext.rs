@@ -23,7 +23,7 @@ impl PrismaValueExtensions for PrismaValue {
             (val @ PrismaValue::BigInt(_), TypeIdentifier::BigInt) => val,
             (val @ PrismaValue::Bytes(_), TypeIdentifier::Bytes) => val,
             (val @ PrismaValue::Json(_), TypeIdentifier::Json) => val,
-            (val @ PrismaValue::GeoJson(_), TypeIdentifier::Geometry) => val,
+            (val @ PrismaValue::Json(_), TypeIdentifier::Geometry) => val,
 
             // Valid String coercions
             (PrismaValue::Int(i), TypeIdentifier::String) => PrismaValue::String(format!("{i}")),

@@ -99,9 +99,9 @@ pub fn to_prisma_value<'a, T: Into<ValueType<'a>>>(qv: T) -> crate::Result<Prism
             .map(|s| PrismaValue::String(s.into_owned()))
             .unwrap_or(PrismaValue::Null),
 
-        ValueType::Geometry(s) | ValueType::Geography(s) => s
-            .map(|s| PrismaValue::GeoJson(s.to_string()))
-            .unwrap_or(PrismaValue::Null),
+        ValueType::Geometry(s) | ValueType::Geography(s) => {
+            s.map(|s| PrismaValue::Json(s.to_string())).unwrap_or(PrismaValue::Null)
+        }
     };
 
     Ok(val)

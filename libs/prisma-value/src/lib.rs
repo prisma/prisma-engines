@@ -28,7 +28,6 @@ pub enum PrismaValue {
     Uuid(Uuid),
     List(PrismaListValue),
     Json(String),
-    GeoJson(String),
 
     /// A collections of key-value pairs constituting an object.
     #[serde(serialize_with = "serialize_object")]
@@ -331,7 +330,6 @@ impl fmt::Display for PrismaValue {
             PrismaValue::Null => "null".fmt(f),
             PrismaValue::Uuid(x) => x.fmt(f),
             PrismaValue::Json(x) => x.fmt(f),
-            PrismaValue::GeoJson(x) => x.fmt(f),
             PrismaValue::BigInt(x) => x.fmt(f),
             PrismaValue::List(x) => {
                 let as_string = format!("{x:?}");

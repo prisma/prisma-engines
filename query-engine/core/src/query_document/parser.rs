@@ -372,7 +372,7 @@ impl QueryDocumentParser {
             (PrismaValue::Bytes(bytes), ScalarType::Bytes) => Ok(PrismaValue::Bytes(bytes)),
             (PrismaValue::BigInt(b_int), ScalarType::BigInt) => Ok(PrismaValue::BigInt(b_int)),
             (PrismaValue::DateTime(s), ScalarType::DateTime) => Ok(PrismaValue::DateTime(s)),
-            (PrismaValue::GeoJson(s), ScalarType::Geometry) => Ok(PrismaValue::GeoJson(s)),
+            (PrismaValue::Json(s), ScalarType::Geometry) => Ok(PrismaValue::Json(s)),
             (PrismaValue::Null, ScalarType::Null) => Ok(PrismaValue::Null),
 
             // String coercion matchers
@@ -388,7 +388,7 @@ impl QueryDocumentParser {
             (PrismaValue::String(s), ScalarType::Json) => Ok(PrismaValue::Json(
                 self.parse_json(selection_path, argument_path, &s).map(|_| s)?,
             )),
-            (PrismaValue::Json(s) | PrismaValue::String(s), ScalarType::Geometry) => Ok(PrismaValue::GeoJson(
+            (PrismaValue::String(s), ScalarType::Geometry) => Ok(PrismaValue::Json(
                 self.parse_geojson(selection_path, argument_path, &s).map(|_| s)?,
             )),
             (PrismaValue::String(s), ScalarType::DateTime) => self
@@ -919,7 +919,6 @@ pub(crate) mod conversions {
                 format!("({})", itertools::join(v.iter().map(prisma_value_to_type_name), ", "))
             }
             PrismaValue::Json(_) => "JSON".to_string(),
-            PrismaValue::GeoJson(_) => "GeoJSON".to_string(),
             PrismaValue::Object(_) => "Object".to_string(),
             PrismaValue::Null => "Null".to_string(),
             PrismaValue::DateTime(_) => "DateTime".to_string(),
