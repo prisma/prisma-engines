@@ -43,7 +43,7 @@ pub(crate) async fn connect_via_websocket(url: PostgresWebSocketUrl) -> crate::R
     tokio::spawn(connection.map(|r| match r {
         Ok(_) => (),
         Err(e) => {
-            tracing::error!("Error in PostgreSQL connection: {:?}", e);
+            tracing::error!("Error in PostgreSQL WebSocket connection: {:?}", e);
         }
     }));
     Ok(client)
