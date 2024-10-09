@@ -18,6 +18,7 @@ use query_engine_metrics::{
     PRISMA_DATASOURCE_QUERIES_TOTAL,
 };
 use query_structure::*;
+use std::sync::Arc;
 use std::time::Instant;
 use tracing::{debug, info_span};
 use tracing_futures::Instrument;
@@ -63,12 +64,12 @@ where
     // TODO: build the string lazily in the Display impl so it doesn't have to be built if neither
     // logs nor traces are enabled. This is tricky because whatever we store in the span has to be
     // 'static, and all `QueryString` implementations aren't, so this requires some refactoring.
-    let query_string = builder.build();
+    let query_string: Arc<str> = builder.build().into();
 
     let span = info_span!(
         "prisma:engine:db_query",
         user_facing = true,
-        "db.statement" = %query_string.clone()
+        "db.statement" = %Arc::clone(&query_string)
     );
 
     let start = Instant::now();
