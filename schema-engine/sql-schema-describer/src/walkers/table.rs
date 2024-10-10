@@ -118,6 +118,14 @@ impl<'a> TableWalker<'a> {
             .is_ok()
     }
 
+    /// Returns whether two tables have same properties, belong to the same table, but have different name.
+    pub fn is_renamed_table(self, other: TableWalker<'_>) -> bool {
+        self.name() != other.name()
+            && self.table().namespace_id == other.table().namespace_id
+            && self.table().properties == other.table().properties
+            && self.primary_key().unwrap().name() == other.primary_key().unwrap().name()
+    }
+
     /// The check constraint names for the table.
     pub fn check_constraints(self) -> impl ExactSizeIterator<Item = &'a str> {
         let low = self.schema.check_constraints.partition_point(|(id, _)| *id < self.id);
