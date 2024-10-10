@@ -1,0 +1,19 @@
+datasource db {
+    provider = "postgresql"
+    url = env("TEST_DB_URL")
+}
+
+enum FormLanguage {
+  EN_US @map("en/US")
+  IT_IT @map("it/IT")
+  EN_UK
+
+  @@map("form_language")
+}
+
+enum UserKind {
+  ADMIN @map("admin")
+  USER
+
+  @@map("user_kind")
+}
