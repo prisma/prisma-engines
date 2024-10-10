@@ -34,7 +34,7 @@ pub(crate) fn map_scalar_output_type<'a>(ctx: &'a QuerySchema, typ: &TypeIdentif
         TypeIdentifier::Boolean => OutputType::boolean(),
         TypeIdentifier::Enum(e) => OutputType::enum_type(map_schema_enum_type(ctx, *e)),
         TypeIdentifier::Json => OutputType::json(),
-        TypeIdentifier::Geometry => OutputType::geojson(),
+        TypeIdentifier::Geometry => OutputType::geometry(),
         TypeIdentifier::DateTime => OutputType::date_time(),
         TypeIdentifier::UUID => OutputType::uuid(),
         TypeIdentifier::Int => OutputType::int(),

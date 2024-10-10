@@ -19,7 +19,7 @@ fn map_scalar_input_type(ctx: &'_ QuerySchema, typ: TypeIdentifier, list: bool) 
         TypeIdentifier::UUID => InputType::uuid(),
         TypeIdentifier::DateTime => InputType::date_time(),
         TypeIdentifier::Json => InputType::json(),
-        TypeIdentifier::Geometry => InputType::geojson(),
+        TypeIdentifier::Geometry => InputType::geometry(),
         TypeIdentifier::Enum(id) => InputType::enum_type(map_schema_enum_type(ctx, id)),
         TypeIdentifier::Bytes => InputType::bytes(),
         TypeIdentifier::BigInt => InputType::bigint(),

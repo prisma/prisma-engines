@@ -77,7 +77,7 @@ impl<'a> OutputType<'a> {
         InnerOutputType::Scalar(ScalarType::Bytes)
     }
 
-    pub(crate) fn geojson() -> InnerOutputType<'a> {
+    pub(crate) fn geometry() -> InnerOutputType<'a> {
         InnerOutputType::Scalar(ScalarType::Geometry)
     }
 
