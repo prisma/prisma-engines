@@ -21,6 +21,7 @@ extern "C" {
 
 }
 
+#[derive(Clone, Copy)]
 pub struct ElapsedTimeCounter {
     start_time: f64,
 }

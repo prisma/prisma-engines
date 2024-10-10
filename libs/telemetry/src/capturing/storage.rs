@@ -1,5 +1,5 @@
 use super::settings::Settings;
-use crate::telemetry::models;
+use crate::models;
 
 #[derive(Debug, Default)]
 pub struct Storage {
