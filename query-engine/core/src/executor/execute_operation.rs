@@ -32,7 +32,7 @@ pub async fn execute_single_operation(
     let result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id).await;
 
     #[cfg(feature = "metrics")]
-    histogram!(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,).record(operation_timer.elapsed_time());
+    histogram!(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS).record(operation_timer.elapsed_time());
 
     result
 }
@@ -55,7 +55,7 @@ pub async fn execute_many_operations(
         let result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).await;
 
         #[cfg(feature = "metrics")]
-        histogram!(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,).record(operation_timer.elapsed_time());
+        histogram!(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS).record(operation_timer.elapsed_time());
 
         match result {
             Ok(result) => results.push(Ok(result)),
@@ -170,7 +170,7 @@ async fn execute_self_contained(
     };
 
     #[cfg(feature = "metrics")]
-    histogram!(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,).record(operation_timer.elapsed_time());
+    histogram!(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS).record(operation_timer.elapsed_time());
 
     result
 }
