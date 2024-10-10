@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "mssql-native")]
 use crate::connector::MssqlUrl;
 #[cfg(feature = "mysql-native")]
@@ -66,8 +68,16 @@ impl Queryable for PooledConnection {
         self.inner.server_reset_query(tx).await
     }
 
-    fn begin_statement(&self) -> &'static str {
-        self.inner.begin_statement()
+    fn begin_statement(&self, depth: u32) -> Cow<'static, str> {
+        self.inner.begin_statement(depth)
+    }
+
+    fn commit_statement(&self, depth: u32) -> Cow<'static, str> {
+        self.inner.commit_statement(depth)
+    }
+
+    fn rollback_statement(&self, depth: u32) -> Cow<'static, str> {
+        self.inner.rollback_statement(depth)
     }
 
     async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> crate::Result<()> {
