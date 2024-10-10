@@ -1,13 +1,13 @@
-use super::{Span, WithSpan};
+use super::{Span, WithName, WithSpan};
 use diagnostics::FileId;
 
 /// An identifier.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Identifier {
     /// The identifier contents.
-    pub name: String,
+    pub(crate) name: String,
     /// The span of the AST node.
-    pub span: Span,
+    pub(crate) span: Span,
 }
 
 impl Identifier {
@@ -16,6 +16,12 @@ impl Identifier {
             name: pair.as_str().to_owned(),
             span: (file_id, pair.as_span()).into(),
         }
+    }
+}
+
+impl WithName for Identifier {
+    fn name(&self) -> &str {
+        &self.name
     }
 }
 

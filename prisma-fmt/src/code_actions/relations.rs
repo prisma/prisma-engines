@@ -1,7 +1,10 @@
 use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, TextEdit, WorkspaceEdit};
-use psl::parser_database::{
-    ast::WithSpan,
-    walkers::{CompleteInlineRelationWalker, InlineRelationWalker, RelationFieldWalker},
+use psl::{
+    parser_database::{
+        ast::WithSpan,
+        walkers::{CompleteInlineRelationWalker, InlineRelationWalker, RelationFieldWalker},
+    },
+    schema_ast::ast::WithAttributes,
 };
 use std::collections::HashMap;
 
@@ -471,7 +474,7 @@ pub(super) fn add_index_for_relation_fields(
         &attribute,
         relation.model().indentation(),
         relation.model().newline(),
-        &relation.model().ast_model().attributes,
+        relation.model().ast_model().attributes(),
     );
 
     let range = super::range_after_span(relation.model().ast_model().span(), context.initiating_file_source());

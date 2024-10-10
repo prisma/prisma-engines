@@ -54,7 +54,7 @@ pub struct Model {
     ///   ^^^^^^^^^^^^
     /// }
     /// ```
-    pub attributes: Vec<Attribute>,
+    pub(crate) attributes: Vec<Attribute>,
     /// The documentation for this model.
     ///
     /// ```ignore
