@@ -3,7 +3,6 @@ use crate::{constants::*, output_meta, query_builder::MongoReadQueryBuilder, val
 use connector_interface::*;
 use mongodb::{bson::Document, ClientSession, Database};
 use query_structure::{prelude::*, Filter, QueryArguments};
-use tracing::{info_span, Instrument};
 
 pub async fn aggregate<'conn>(
     database: &Database,
@@ -17,17 +16,11 @@ pub async fn aggregate<'conn>(
     let is_group_by = !group_by.is_empty();
     let coll = database.collection(model.db_name());
 
-    let span = info_span!(
-        "prisma:engine:db_query",
-        user_facing = true,
-        "db.statement" = &format_args!("db.{}.aggregate(*)", coll.name())
-    );
-
     let query = MongoReadQueryBuilder::from_args(query_arguments)?
         .with_groupings(group_by, &selections, having)?
         .build()?;
 
-    let docs = query.execute(coll, session).instrument(span).await?;
+    let docs = query.execute(coll, session).await?;
 
     if is_group_by && docs.is_empty() {
         Ok(vec![])
