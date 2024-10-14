@@ -27,18 +27,28 @@ pub struct RegExpError {
     pub message: String,
 }
 
-#[derive(PartialEq)]
-pub enum RegExpFlags {
-    IgnoreCase,
-    Multiline,
+impl Display for RegExpError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Regular expression error: {}", self.message)
+    }
 }
 
-impl From<RegExpFlags> for String {
-    fn from(flags: RegExpFlags) -> Self {
-        match flags {
-            RegExpFlags::IgnoreCase => "i",
-            RegExpFlags::Multiline => "m",
+impl std::error::Error for RegExpError {}
+
+/// Test-relevant connector capabilities.
+#[enumflags2::bitflags]
+#[derive(Copy, Clone, Debug, PartialEq)]
+#[repr(u8)]
+pub enum RegExpFlags {
+    IgnoreCase = 0b0001,
+    Multiline = 0b0010,
+}
+
+impl RegExpFlags {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::IgnoreCase => "i",
+            Self::Multiline => "m",
         }
-        .to_string()
     }
 }

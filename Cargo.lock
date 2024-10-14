@@ -923,6 +923,7 @@ dependencies = [
 name = "crosstarget-utils"
 version = "0.1.0"
 dependencies = [
+ "enumflags2",
  "futures",
  "js-sys",
  "pin-project",
@@ -3832,6 +3833,7 @@ dependencies = [
  "connection-string",
  "crosstarget-utils",
  "either",
+ "enumflags2",
  "expect-test",
  "futures",
  "getrandom 0.2.11",

@@ -1,3 +1,4 @@
+use enumflags2::BitFlags;
 use regex::{Regex as NativeRegex, RegexBuilder};
 
 use crate::common::{RegExpError, RegExpFlags};
@@ -7,14 +8,14 @@ pub struct RegExp {
 }
 
 impl RegExp {
-    pub fn new(pattern: &str, flags: Vec<RegExpFlags>) -> Result<Self, RegExpError> {
+    pub fn new(pattern: &str, flags: BitFlags<RegExpFlags>) -> Result<Self, RegExpError> {
         let mut builder = RegexBuilder::new(pattern);
 
-        if flags.contains(&RegExpFlags::Multiline) {
+        if flags.contains(RegExpFlags::Multiline) {
             builder.multi_line(true);
         }
 
-        if flags.contains(&RegExpFlags::IgnoreCase) {
+        if flags.contains(RegExpFlags::IgnoreCase) {
             builder.case_insensitive(true);
         }
 
@@ -30,7 +31,7 @@ impl RegExp {
         self.inner.captures(message).map(|captures| {
             captures
                 .iter()
-                .flat_map(|capture| capture.map(|cap| cap.as_str().to_string()))
+                .flat_map(|capture| capture.map(|cap| cap.as_str().to_owned()))
                 .collect()
         })
     }
