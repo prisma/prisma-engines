@@ -44,6 +44,7 @@ pub(crate) fn get_field_filter_types(
                 include_aggregates,
             ))];
 
+            // TODO@geometry: Add TypeIdentifier::Geometry case here ?
             if sf.type_identifier() != TypeIdentifier::Json {
                 types.push(map_scalar_input_type_for_field(ctx, &sf)); // Scalar equality shorthand
             }

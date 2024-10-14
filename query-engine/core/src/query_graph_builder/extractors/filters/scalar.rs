@@ -50,6 +50,7 @@ impl<'a> ScalarFilterParser<'a> {
         let filters: Vec<Filter> = filter_map
             .into_iter()
             .map(|(name, value)| match self.field().type_identifier() {
+                // TODO@geometry: should we add TypeIdentifier::Geometry here ?
                 TypeIdentifier::Json => self.parse_json(&name, value, json_path.clone()),
                 _ => self.parse_scalar(&name, value),
             })

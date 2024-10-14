@@ -290,6 +290,7 @@ pub fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<Sca
             Some(ScalarType::Json) => DefaultKind::Single(PrismaValue::Json(v.parse().unwrap())),
             Some(ScalarType::Decimal) => DefaultKind::Single(PrismaValue::Float(v.parse().unwrap())),
             Some(ScalarType::Bytes) => DefaultKind::Single(PrismaValue::Bytes(prisma_value::decode_bytes(v).unwrap())),
+            // TODO@geometry: Add geometry case here ?
             other => unreachable!("{:?}", other),
         },
         ast::Expression::Array(values, _) => {
