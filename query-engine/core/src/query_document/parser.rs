@@ -253,10 +253,19 @@ impl QueryDocumentParser {
                 // This is an early catch-all.
                 // We do not get into this catch-all _if_ the value is already Json, if it's a FieldRef or if it's an Enum.
                 // We don't because they've already been desambiguified at the procotol adapter level.
-                (value, InputType::<'a>::Scalar(ScalarType::Json | ScalarType::Geometry))
+                (value, InputType::<'a>::Scalar(ScalarType::Json))
                     if value.should_be_parsed_as_json() && get_engine_protocol().is_json() =>
                 {
                     return Ok(ParsedInputValue::Single(self.to_json(
+                        &selection_path,
+                        &argument_path,
+                        &value,
+                    )?))
+                }
+                (value, InputType::<'a>::Scalar(ScalarType::Geometry))
+                    if value.should_be_parsed_as_json() && get_engine_protocol().is_json() =>
+                {
+                    return Ok(ParsedInputValue::Single(self.to_geojson(
                         &selection_path,
                         &argument_path,
                         &value,
@@ -372,8 +381,12 @@ impl QueryDocumentParser {
             (PrismaValue::Bytes(bytes), ScalarType::Bytes) => Ok(PrismaValue::Bytes(bytes)),
             (PrismaValue::BigInt(b_int), ScalarType::BigInt) => Ok(PrismaValue::BigInt(b_int)),
             (PrismaValue::DateTime(s), ScalarType::DateTime) => Ok(PrismaValue::DateTime(s)),
-            (PrismaValue::Json(s), ScalarType::Geometry) => Ok(PrismaValue::Json(s)),
             (PrismaValue::Null, ScalarType::Null) => Ok(PrismaValue::Null),
+
+            // Geometry validation
+            (PrismaValue::Json(s) | PrismaValue::String(s), ScalarType::Geometry) => Ok(PrismaValue::Json(
+                self.parse_geojson(selection_path, argument_path, &s).map(|_| s)?,
+            )),
 
             // String coercion matchers
             (PrismaValue::String(s), ScalarType::JsonList) => {
@@ -387,9 +400,6 @@ impl QueryDocumentParser {
                 .map(PrismaValue::Uuid),
             (PrismaValue::String(s), ScalarType::Json) => Ok(PrismaValue::Json(
                 self.parse_json(selection_path, argument_path, &s).map(|_| s)?,
-            )),
-            (PrismaValue::String(s), ScalarType::Geometry) => Ok(PrismaValue::Json(
-                self.parse_geojson(selection_path, argument_path, &s).map(|_| s)?,
             )),
             (PrismaValue::String(s), ScalarType::DateTime) => self
                 .parse_datetime(selection_path, argument_path, s.as_str())
@@ -576,6 +586,28 @@ impl QueryDocumentParser {
                     argument_path.segments(),
                     format!("{value:?}"),
                     "JSON String",
+                    Some(Box::new(err)),
+                )
+            })
+            .map(PrismaValue::Json)
+    }
+
+    fn to_geojson(
+        &self,
+        selection_path: &Path,
+        argument_path: &Path,
+        value: &ArgumentValue,
+    ) -> QueryParserResult<PrismaValue> {
+        serde_json::to_value(&value)
+            .map_err(geojson::Error::from)
+            .and_then(Geometry::try_from)
+            .map(|geom| Geometry::to_string(&geom))
+            .map_err(|err| {
+                ValidationError::invalid_argument_value(
+                    selection_path.segments(),
+                    argument_path.segments(),
+                    format!("{value:?}"),
+                    "GeoJSON String",
                     Some(Box::new(err)),
                 )
             })
