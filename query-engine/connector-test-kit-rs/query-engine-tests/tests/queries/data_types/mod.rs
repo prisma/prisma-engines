@@ -5,6 +5,7 @@ mod datetime;
 mod decimal;
 mod enum_type;
 mod float;
+mod geometry;
 mod int;
 mod json;
 mod native;
