@@ -598,7 +598,7 @@ impl QueryDocumentParser {
         argument_path: &Path,
         value: &ArgumentValue,
     ) -> QueryParserResult<PrismaValue> {
-        serde_json::to_value(&value)
+        serde_json::to_value(value)
             .map_err(geojson::Error::from)
             .and_then(Geometry::try_from)
             .map(|geom| Geometry::to_string(&geom))
