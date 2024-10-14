@@ -30,9 +30,7 @@ impl RegExp {
         self.inner.captures(message).map(|captures| {
             captures
                 .iter()
-                .map(|capture| capture.and_then(|cap| Some(cap.as_str().to_string())))
-                .filter(|capture| capture.is_some())
-                .map(|capture| capture.unwrap())
+                .flat_map(|capture| capture.map(|cap| cap.as_str().to_string()))
                 .collect()
         })
     }
