@@ -1,28 +1,6 @@
 use std::fmt::Display;
 
 #[derive(Debug)]
-pub struct SpawnError;
-
-impl Display for SpawnError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Failed to spawn a future")
-    }
-}
-
-impl std::error::Error for SpawnError {}
-
-#[derive(Debug)]
-pub struct TimeoutError;
-
-impl Display for TimeoutError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Operation timed out")
-    }
-}
-
-impl std::error::Error for TimeoutError {}
-
-#[derive(Debug)]
 pub struct RegExpError {
     pub message: String,
 }
@@ -51,4 +29,14 @@ impl RegExpFlags {
             Self::Multiline => "m",
         }
     }
+}
+
+pub trait RegExpCompat {
+    /// Searches for the first match of this regex in the haystack given, and if found,
+    /// returns not only the overall match but also the matches of each capture group in the regex.
+    /// If no match is found, then None is returned.
+    fn captures(&self, message: &str) -> Option<Vec<String>>;
+
+    /// Tests if the regex matches the input string.
+    fn test(&self, message: &str) -> bool;
 }

@@ -7,7 +7,7 @@ use std::time::Duration;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 
-use crate::common::TimeoutError;
+use crate::common::timeout::TimeoutError;
 
 #[wasm_bindgen]
 extern "C" {

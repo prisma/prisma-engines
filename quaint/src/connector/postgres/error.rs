@@ -1,4 +1,4 @@
-use crosstarget_utils::regex::RegExp;
+use crosstarget_utils::{regex::RegExp, RegExpCompat};
 use enumflags2::BitFlags;
 use std::fmt::{Display, Formatter};
 

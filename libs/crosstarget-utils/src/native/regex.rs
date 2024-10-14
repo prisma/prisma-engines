@@ -1,7 +1,7 @@
 use enumflags2::BitFlags;
 use regex::{Regex as NativeRegex, RegexBuilder};
 
-use crate::common::{RegExpError, RegExpFlags};
+use crate::common::regex::{RegExpCompat, RegExpError, RegExpFlags};
 
 pub struct RegExp {
     inner: NativeRegex,
@@ -23,11 +23,10 @@ impl RegExp {
 
         Ok(Self { inner })
     }
+}
 
-    /// Searches for the first match of this regex in the haystack given, and if found,
-    /// returns not only the overall match but also the matches of each capture group in the regex.
-    /// If no match is found, then None is returned.
-    pub fn captures(&self, message: &str) -> Option<Vec<String>> {
+impl RegExpCompat for RegExp {
+    fn captures(&self, message: &str) -> Option<Vec<String>> {
         self.inner.captures(message).map(|captures| {
             captures
                 .iter()
@@ -36,8 +35,7 @@ impl RegExp {
         })
     }
 
-    /// Tests if the regex matches the input string.
-    pub fn test(&self, message: &str) -> bool {
+    fn test(&self, message: &str) -> bool {
         self.inner.is_match(message)
     }
 }
