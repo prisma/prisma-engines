@@ -13,7 +13,7 @@ impl Display for RegExpError {
 
 impl std::error::Error for RegExpError {}
 
-/// Test-relevant connector capabilities.
+/// Flag modifiers for regular expressions.
 #[enumflags2::bitflags]
 #[derive(Copy, Clone, Debug, PartialEq)]
 #[repr(u8)]
