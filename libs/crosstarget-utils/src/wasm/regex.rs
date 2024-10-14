@@ -23,12 +23,12 @@ impl RegExp {
     /// If no match is found, then None is returned.
     pub fn captures(&self, message: &str) -> Option<Vec<String>> {
         let matches = self.inner.exec(message);
-        matches.and_then(|matches| {
+        matches.map(|matches| {
             let mut captures = Vec::new();
             for i in 0..matches.length() {
                 captures.push(matches.get(i).as_string().unwrap());
             }
-            Some(captures)
+            captures
         })
     }
 
