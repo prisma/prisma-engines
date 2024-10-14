@@ -17,3 +17,4 @@ pin-project = "1"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tokio.workspace = true
+regex.workspace = true

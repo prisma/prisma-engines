@@ -926,6 +926,7 @@ dependencies = [
  "futures",
  "js-sys",
  "pin-project",
+ "regex",
  "tokio",
  "wasm-bindgen",
  "wasm-bindgen-futures",

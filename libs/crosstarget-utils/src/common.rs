@@ -21,3 +21,24 @@ impl Display for TimeoutError {
 }
 
 impl std::error::Error for TimeoutError {}
+
+#[derive(Debug)]
+pub struct RegExpError {
+    pub message: String,
+}
+
+#[derive(PartialEq)]
+pub enum RegExpFlags {
+    IgnoreCase,
+    Multiline,
+}
+
+impl From<RegExpFlags> for String {
+    fn from(flags: RegExpFlags) -> Self {
+        match flags {
+            RegExpFlags::IgnoreCase => "i",
+            RegExpFlags::Multiline => "m",
+        }
+        .to_string()
+    }
+}
