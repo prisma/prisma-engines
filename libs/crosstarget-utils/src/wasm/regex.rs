@@ -22,18 +22,13 @@ impl RegExp {
 
 impl RegExpCompat for RegExp {
     fn captures(&self, message: &str) -> Option<Vec<String>> {
-        let matches = self.inner.exec(message);
-        matches.map(|matches| {
-            let mut captures: Vec<String> = Vec::new();
-            for i in 0..matches.length() {
-                let match_value = matches.get(i);
-
-                // We keep the same number of captures as the number of groups in the regex pattern,
-                // but we guarantee that the captures are always strings.
-                let capture: String = match_value.try_into().ok().unwrap_or_default();
-                captures.push(capture);
-            }
-            captures
+        self.inner.exec(message).map(|matches| {
+            // We keep the same number of captures as the number of groups in the regex pattern,
+            // but we guarantee that the captures are always strings.
+            matches
+                .iter()
+                .map(|match_value| match_value.try_into().ok().unwrap_or_default())
+                .collect()
         })
     }
 
