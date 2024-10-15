@@ -28,9 +28,12 @@ impl RegExpCompat for RegExp {
             for i in 0..matches.length() {
                 let match_value = matches.get(i);
 
-                // `match_value` may be `undefined`.
+                // We keep the same number of captures as the number of groups in the regex pattern,
+                // but we guarantee that the captures are always strings.
                 if match_value.is_string() {
                     captures.push(match_value.as_string().unwrap());
+                } else {
+                    captures.push(String::new());
                 }
             }
             captures
