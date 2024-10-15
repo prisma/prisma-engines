@@ -2355,6 +2355,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "libmimalloc-sys"
+version = "0.1.39"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "23aa6811d3bd4deb8a84dde645f943476d13b248d818edcf8ce0b2f37f036b44"
+dependencies = [
+ "cc",
+ "libc",
+]
+
+[[package]]
 name = "libsqlite3-sys"
 version = "0.28.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2583,6 +2593,15 @@ dependencies = [
  "parking_lot 0.11.2",
  "quanta",
  "sketches-ddsketch",
+]
+
+[[package]]
+name = "mimalloc"
+version = "0.1.43"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "68914350ae34959d83f732418d51e2427a794055d0b9529f48259ac07af65633"
+dependencies = [
+ "libmimalloc-sys",
 ]
 
 [[package]]
@@ -3980,6 +3999,7 @@ dependencies = [
  "graphql-parser",
  "hyper",
  "indoc 2.0.3",
+ "mimalloc",
  "mongodb-query-connector",
  "opentelemetry",
  "opentelemetry-otlp",
@@ -4092,6 +4112,7 @@ dependencies = [
  "connection-string",
  "driver-adapters",
  "futures",
+ "mimalloc",
  "napi",
  "napi-build",
  "napi-derive",
