@@ -1,12 +1,7 @@
-use std::fmt::Display;
+use derive_more::Display;
 
-#[derive(Debug)]
+#[derive(Debug, Display)]
+#[display(fmt = "Operation timed out")]
 pub struct TimeoutError;
-
-impl Display for TimeoutError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Operation timed out")
-    }
-}
 
 impl std::error::Error for TimeoutError {}

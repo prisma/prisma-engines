@@ -1,12 +1,8 @@
-use std::fmt::Display;
+use derive_more::Display;
 
-#[derive(Debug)]
+#[derive(Debug, Display)]
+#[display(fmt = "Failed to spawn a future")]
+
 pub struct SpawnError;
-
-impl Display for SpawnError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Failed to spawn a future")
-    }
-}
 
 impl std::error::Error for SpawnError {}
