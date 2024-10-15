@@ -923,6 +923,7 @@ dependencies = [
 name = "crosstarget-utils"
 version = "0.1.0"
 dependencies = [
+ "derive_more",
  "enumflags2",
  "futures",
  "js-sys",
