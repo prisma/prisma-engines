@@ -1,14 +1,9 @@
-use std::fmt::Display;
+use derive_more::Display;
 
-#[derive(Debug)]
+#[derive(Debug, Display)]
+#[display("Regular expression error: {message}")]
 pub struct RegExpError {
     pub message: String,
-}
-
-impl Display for RegExpError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Regular expression error: {}", self.message)
-    }
 }
 
 impl std::error::Error for RegExpError {}
