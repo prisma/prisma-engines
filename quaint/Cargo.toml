@@ -82,6 +82,7 @@ url.workspace = true
 hex = "0.4"
 itertools.workspace = true
 regex.workspace = true
+enumflags2.workspace = true
 
 either = { version = "1.6" }
 base64 = { version = "0.12.3" }
