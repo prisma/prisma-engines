@@ -3,7 +3,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use crate::common::TimeoutError;
+use crate::common::timeout::TimeoutError;
 
 pub struct ElapsedTimeCounter {
     instant: Instant,

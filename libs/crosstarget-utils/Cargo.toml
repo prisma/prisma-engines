@@ -6,6 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+derive_more.workspace = true
+enumflags2.workspace = true
 futures = "0.3"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
@@ -17,3 +19,4 @@ pin-project = "1"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tokio.workspace = true
+regex.workspace = true
