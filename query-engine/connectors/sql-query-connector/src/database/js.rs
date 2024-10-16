@@ -52,6 +52,7 @@ impl Connector for Js {
             SqlFamily::Postgres => "postgresql",
             SqlFamily::Mysql => "mysql",
             SqlFamily::Sqlite => "sqlite",
+            #[cfg(not(target_arch = "wasm32"))]
             _ => "js",
         }
     }
