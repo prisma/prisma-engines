@@ -27,10 +27,9 @@ pub use rusqlite;
 /// A connector interface for the SQLite database
 pub struct Sqlite {
     pub(crate) client: Mutex<rusqlite::Connection>,
-    system_name: &'static str,
 }
 
-const SYSTEM_NAME: &str = "sqlite";
+const DB_SYSTEM_NAME: &str = "sqlite";
 
 impl TryFrom<&str> for Sqlite {
     type Error = Error;
@@ -67,10 +66,7 @@ impl TryFrom<&str> for Sqlite {
 
         let client = Mutex::new(conn);
 
-        Ok(Sqlite {
-            client,
-            system_name: SYSTEM_NAME,
-        })
+        Ok(Sqlite { client })
     }
 }
 
@@ -85,7 +81,6 @@ impl Sqlite {
 
         Ok(Sqlite {
             client: Mutex::new(client),
-            system_name: SYSTEM_NAME,
         })
     }
 
@@ -107,7 +102,7 @@ impl Queryable for Sqlite {
     }
 
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
-        metrics::query("sqlite.query_raw", self.system_name, sql, params, move || async move {
+        metrics::query("sqlite.query_raw", DB_SYSTEM_NAME, sql, params, move || async move {
             let client = self.client.lock().await;
 
             let mut stmt = client.prepare_cached(sql)?;
@@ -141,7 +136,7 @@ impl Queryable for Sqlite {
     }
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
-        metrics::query("sqlite.query_raw", self.system_name, sql, params, move || async move {
+        metrics::query("sqlite.query_raw", DB_SYSTEM_NAME, sql, params, move || async move {
             let client = self.client.lock().await;
             let mut stmt = client.prepare_cached(sql)?;
             let res = u64::try_from(stmt.execute(params_from_iter(params.iter()))?)?;
@@ -156,7 +151,7 @@ impl Queryable for Sqlite {
     }
 
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
-        metrics::query("sqlite.raw_cmd", self.system_name, cmd, &[], move || async move {
+        metrics::query("sqlite.raw_cmd", DB_SYSTEM_NAME, cmd, &[], move || async move {
             let client = self.client.lock().await;
             client.execute_batch(cmd)?;
             Ok(())

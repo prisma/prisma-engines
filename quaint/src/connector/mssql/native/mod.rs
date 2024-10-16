@@ -30,7 +30,7 @@ use tokio_util::compat::{Compat, TokioAsyncWriteCompatExt};
 pub use tiberius;
 
 static SQL_SERVER_DEFAULT_ISOLATION: IsolationLevel = IsolationLevel::ReadCommitted;
-const SYSTEM_NAME: &str = "mssql";
+const DB_SYSTEM_NAME: &str = "mssql";
 
 #[async_trait]
 impl TransactionCapable for Mssql {
@@ -61,7 +61,6 @@ pub struct Mssql {
     url: MssqlUrl,
     socket_timeout: Option<Duration>,
     is_healthy: AtomicBool,
-    system_name: &'static str,
 }
 
 impl Mssql {
@@ -93,7 +92,6 @@ impl Mssql {
             url,
             socket_timeout,
             is_healthy: AtomicBool::new(true),
-            system_name: SYSTEM_NAME,
         };
 
         if let Some(isolation) = this.url.transaction_isolation_level() {
@@ -133,7 +131,7 @@ impl Queryable for Mssql {
     }
 
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
-        metrics::query("mssql.query_raw", self.system_name, sql, params, move || async move {
+        metrics::query("mssql.query_raw", DB_SYSTEM_NAME, sql, params, move || async move {
             let mut client = self.client.lock().await;
 
             let mut query = tiberius::Query::new(sql);
@@ -196,7 +194,7 @@ impl Queryable for Mssql {
     }
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
-        metrics::query("mssql.execute_raw", self.system_name, sql, params, move || async move {
+        metrics::query("mssql.execute_raw", DB_SYSTEM_NAME, sql, params, move || async move {
             let mut query = tiberius::Query::new(sql);
 
             for param in params {
@@ -216,7 +214,7 @@ impl Queryable for Mssql {
     }
 
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
-        metrics::query("mssql.raw_cmd", self.system_name, cmd, &[], move || async move {
+        metrics::query("mssql.raw_cmd", DB_SYSTEM_NAME, cmd, &[], move || async move {
             let mut client = self.client.lock().await;
             self.perform_io(client.simple_query(cmd)).await?.into_results().await?;
             Ok(())
