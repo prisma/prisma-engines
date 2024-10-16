@@ -7,7 +7,7 @@ use std::{
     time::{Duration, SystemTime},
 };
 
-const ACCEPT_ATTRIBUTES: &[&str] = &["db.statement", "itx_id", "db.type"];
+const ACCEPT_ATTRIBUTES: &[&str] = &["db.system", "db.statement", "itx_id", "db.type"];
 
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct TraceSpan {

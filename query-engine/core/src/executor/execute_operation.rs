@@ -87,7 +87,9 @@ pub async fn execute_single_self_contained<C: Connector + Send + Sync>(
     let conn_span = info_span!(
         "prisma:engine:connection",
         user_facing = true,
-        "db.type" = connector.name()
+        // TODO: consider removing `db.type`
+        "db.type" = connector.name(),
+        "db.system" = connector.system_name(),
     );
     let conn = connector.get_connection().instrument(conn_span).await?;
 
@@ -120,7 +122,7 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
         let conn_span = info_span!(
             "prisma:engine:connection",
             user_facing = true,
-            "db.type" = connector.name(),
+            "db.system" = connector.system_name(),
         );
         let conn = connector.get_connection().instrument(conn_span).await?;
 

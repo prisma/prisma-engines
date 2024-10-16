@@ -99,7 +99,14 @@ impl JsTransaction {
 
     pub async fn raw_phantom_cmd(&self, cmd: &str) -> quaint::Result<()> {
         let params = &[];
-        quaint::connector::metrics::query("js.raw_phantom_cmd", cmd, params, move || async move { Ok(()) }).await
+        quaint::connector::metrics::query(
+            "js.raw_phantom_cmd",
+            self.inner.system_name,
+            cmd,
+            params,
+            move || async move { Ok(()) },
+        )
+        .await
     }
 }
 

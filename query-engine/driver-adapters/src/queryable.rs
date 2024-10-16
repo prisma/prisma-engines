@@ -15,6 +15,17 @@ use quaint::{
 };
 use tracing::{info_span, Instrument};
 
+static SYSTEM_NAME: &'static str = if cfg!(feature = "mysql") {
+    "mysql"
+} else if cfg!(feature = "postgresql") {
+    "postgresql"
+} else if cfg!(feature = "sqlite") {
+    "sqlite"
+} else {
+    // compile_error!("No database feature enabled")
+    ""
+};
+
 /// A JsQueryable adapts a Proxy to implement quaint's Queryable interface. It has the
 /// responsibility of transforming inputs and outputs of `query` and `execute` methods from quaint
 /// types to types that can be translated into javascript and viceversa. This is to let the rest of
@@ -30,12 +41,17 @@ use tracing::{info_span, Instrument};
 pub(crate) struct JsBaseQueryable {
     pub(crate) proxy: CommonProxy,
     pub provider: AdapterFlavour,
+    pub(crate) system_name: &'static str,
 }
 
 impl JsBaseQueryable {
     pub(crate) fn new(proxy: CommonProxy) -> Self {
         let provider: AdapterFlavour = proxy.provider.parse().unwrap();
-        Self { proxy, provider }
+        Self {
+            proxy,
+            provider,
+            system_name: SYSTEM_NAME,
+        }
     }
 
     /// visit a quaint query AST according to the provider of the JS connector
@@ -84,7 +100,7 @@ impl QuaintQueryable for JsBaseQueryable {
     }
 
     async fn query_raw(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<ResultSet> {
-        metrics::query("js.query_raw", sql, params, move || async move {
+        metrics::query("js.query_raw", self.system_name, sql, params, move || async move {
             self.do_query_raw(sql, params).await
         })
         .await
@@ -104,7 +120,7 @@ impl QuaintQueryable for JsBaseQueryable {
     }
 
     async fn execute_raw(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<u64> {
-        metrics::query("js.execute_raw", sql, params, move || async move {
+        metrics::query("js.execute_raw", self.system_name, sql, params, move || async move {
             self.do_execute_raw(sql, params).await
         })
         .await
@@ -116,7 +132,7 @@ impl QuaintQueryable for JsBaseQueryable {
 
     async fn raw_cmd(&self, cmd: &str) -> quaint::Result<()> {
         let params = &[];
-        metrics::query("js.raw_cmd", cmd, params, move || async move {
+        metrics::query("js.raw_cmd", self.system_name, cmd, params, move || async move {
             self.do_execute_raw(cmd, params).await?;
             Ok(())
         })
@@ -174,7 +190,8 @@ impl JsBaseQueryable {
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
         let query = self.build_query(sql, params).instrument(serialization_span).await?;
 
-        let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
+        let sql_span =
+            info_span!("js:query:sql", user_facing = true, "db.system" = %self.system_name, "db.statement" = %sql);
         let result_set = self.proxy.query_raw(query).instrument(sql_span).await?;
 
         let len = result_set.len();
@@ -196,7 +213,8 @@ impl JsBaseQueryable {
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
         let query = self.build_query(sql, params).instrument(serialization_span).await?;
 
-        let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
+        let sql_span =
+            info_span!("js:query:sql", user_facing = true, "db.system" = %self.system_name, "db.statement" = %sql);
         let affected_rows = self.proxy.execute_raw(query).instrument(sql_span).await?;
 
         Ok(affected_rows as u64)

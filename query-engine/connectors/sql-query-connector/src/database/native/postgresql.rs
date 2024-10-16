@@ -13,6 +13,7 @@ pub struct PostgreSql {
     pool: Quaint,
     connection_info: ConnectionInfo,
     features: psl::PreviewFeatures,
+    flavour: PostgresFlavour,
 }
 
 impl PostgreSql {
@@ -60,6 +61,7 @@ impl FromSource for PostgreSql {
             pool,
             connection_info,
             features,
+            flavour,
         })
     }
 }
@@ -77,6 +79,13 @@ impl Connector for PostgreSql {
 
     fn name(&self) -> &'static str {
         "postgres"
+    }
+
+    fn system_name(&self) -> &'static str {
+        match self.flavour {
+            PostgresFlavour::Postgres | PostgresFlavour::Unknown => "postgresql",
+            PostgresFlavour::Cockroach => "cockroachdb",
+        }
     }
 
     fn should_retry_on_transient_error(&self) -> bool {

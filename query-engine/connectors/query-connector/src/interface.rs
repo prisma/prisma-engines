@@ -12,6 +12,15 @@ pub trait Connector {
     /// Returns the name of the connector.
     fn name(&self) -> &'static str;
 
+    /// The database system name, as per the OTEL spec.
+    /// In most cases, this is the same as the connector's name.
+    /// Reference:
+    /// - https://opentelemetry.io/docs/specs/semconv/database/sql/
+    /// - https://opentelemetry.io/docs/specs/semconv/database/mongodb/
+    fn system_name(&self) -> &'static str {
+        self.name()
+    }
+
     /// Returns whether a connector should retry an entire transaction when that transaction failed during its execution
     /// because of a transient transaction error. Note: This is specific to MongoDB for now.
     fn should_retry_on_transient_error(&self) -> bool;
