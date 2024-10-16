@@ -28,8 +28,11 @@ pub enum AdapterFlavour {
 impl AdapterFlavour {
     pub fn db_system_name(&self) -> &'static str {
         match self {
+            #[cfg(feature = "mysql")]
             Self::Mysql => "mysql",
+            #[cfg(feature = "postgresql")]
             Self::Postgres => "postgresql",
+            #[cfg(feature = "sqlite")]
             Self::Sqlite => "sqlite",
         }
     }
