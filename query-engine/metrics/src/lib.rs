@@ -38,7 +38,7 @@ use std::collections::HashMap;
 use std::sync::Once;
 
 pub extern crate metrics;
-pub use metrics::{describe_counter, describe_gauge, describe_histogram, gauge, histogram, counter};
+pub use metrics::{counter, describe_counter, describe_gauge, describe_histogram, gauge, histogram};
 
 // Metrics that we emit from the engines, third party metrics emitted by libraries and that we rename are omitted.
 pub const PRISMA_CLIENT_QUERIES_TOTAL: &str = "prisma_client_queries_total"; // counter

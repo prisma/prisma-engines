@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
-use metrics::{KeyName, Metadata, SharedString};
 use metrics::{Counter, CounterFn, Gauge, GaugeFn, Histogram, HistogramFn, Key, Recorder, Unit};
+use metrics::{KeyName, Metadata, SharedString};
 use tracing::trace;
 
 use super::common::KeyLabels;
