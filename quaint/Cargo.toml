@@ -92,7 +92,7 @@ serde_json.workspace = true
 native-tls = { version = "0.2", optional = true }
 bit-vec = { version = "0.6.1", optional = true }
 bytes = { version = "1.0", optional = true }
-mobc = { git="https://github.com/SevInf/mobc.git", branch = "metrics-guards", optional = true }
+mobc = { git="https://github.com/importcjj/mobc.git", branch = "main", optional = true }
 serde = { version = "1.0" }
 sqlformat = { version = "0.2.3", optional = true }
 uuid.workspace = true

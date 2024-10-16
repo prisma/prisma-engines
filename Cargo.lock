@@ -2609,8 +2609,8 @@ dependencies = [
 
 [[package]]
 name = "mobc"
-version = "0.8.4"
-source = "git+https://github.com/SevInf/mobc.git?branch=metrics-guards#da80095bc4e6777991f5e20328008e91f1c03573"
+version = "0.8.5"
+source = "git+https://github.com/importcjj/mobc.git?branch=main#4c05a47515623b5b6afbbb280ac8153089b6775e"
 dependencies = [
  "async-trait",
  "futures-channel",
