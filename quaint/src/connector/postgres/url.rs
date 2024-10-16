@@ -498,7 +498,11 @@ pub struct PostgresWebSocketUrl {
 
 impl PostgresWebSocketUrl {
     pub fn new(url: Url, api_key: String) -> Self {
-        Self { url, api_key, db_name: None }
+        Self {
+            url,
+            api_key,
+            db_name: None,
+        }
     }
 
     pub fn override_db_name(&mut self, name: String) {
@@ -514,7 +518,7 @@ impl PostgresWebSocketUrl {
     }
 
     pub fn overriden_db_name(&self) -> Option<&str> {
-        self.db_name.as_ref().map(|s| s.as_str())
+        self.db_name.as_deref()
     }
 
     pub fn host(&self) -> &str {

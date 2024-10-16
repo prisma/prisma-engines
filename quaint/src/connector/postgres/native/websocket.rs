@@ -31,7 +31,7 @@ pub(crate) async fn connect_via_websocket(url: PostgresWebSocketUrl) -> crate::R
 
     let mut config = Config::from_str(connection_params)?;
     if let Some(db_name) = db_name {
-       config.dbname(&db_name);
+        config.dbname(&db_name);
     }
     let ws_byte_stream = WsStream::new(ws_stream);
 
