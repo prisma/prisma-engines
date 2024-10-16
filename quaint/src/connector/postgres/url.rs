@@ -81,7 +81,7 @@ impl PostgresUrl {
     pub fn dbname(&self) -> &str {
         match self {
             Self::Native(url) => url.dbname(),
-            Self::WebSocket(_) => "postgres",
+            Self::WebSocket(url) => url.dbname(),
         }
     }
 
@@ -493,15 +493,28 @@ pub(crate) struct PostgresUrlQueryParams {
 pub struct PostgresWebSocketUrl {
     pub(crate) url: Url,
     pub(crate) api_key: String,
+    pub(crate) db_name: Option<String>,
 }
 
 impl PostgresWebSocketUrl {
     pub fn new(url: Url, api_key: String) -> Self {
-        Self { url, api_key }
+        Self { url, api_key, db_name: None }
+    }
+
+    pub fn override_db_name(&mut self, name: String) {
+        self.db_name = Some(name)
     }
 
     pub fn api_key(&self) -> &str {
         &self.api_key
+    }
+
+    pub fn dbname(&self) -> &str {
+        self.overriden_db_name().unwrap_or("postgres")
+    }
+
+    pub fn overriden_db_name(&self) -> Option<&str> {
+        self.db_name.as_ref().map(|s| s.as_str())
     }
 
     pub fn host(&self) -> &str {

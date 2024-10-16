@@ -6,7 +6,11 @@ use crate::SqlFlavour;
 use enumflags2::BitFlags;
 use indoc::indoc;
 use once_cell::sync::Lazy;
-use quaint::{connector::PostgresUrl, prelude::NativeConnectionInfo, Value};
+use quaint::{
+    connector::{PostgresUrl, PostgresWebSocketUrl},
+    prelude::NativeConnectionInfo,
+    Value,
+};
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
 };
@@ -41,6 +45,7 @@ static MIGRATE_WS_BASE_URL: Lazy<Cow<'static, str>> = Lazy::new(|| {
 impl MigratePostgresUrl {
     const WEBSOCKET_SCHEME: &'static str = "prisma+postgres";
     const API_KEY_PARAM: &'static str = "api_key";
+    const DBNAME_PARAM: &'static str = "dbname";
 
     fn new(url: Url) -> ConnectorResult<Self> {
         let postgres_url = if url.scheme() == Self::WEBSOCKET_SCHEME {
@@ -50,7 +55,14 @@ impl MigratePostgresUrl {
                     "Required `api_key` query string parameter was not provided in a connection URL",
                 ));
             };
-            PostgresUrl::new_websocket(ws_url, api_key.into_owned())
+
+            let dbname_override = url.query_pairs().find(|(name, _)| name == Self::DBNAME_PARAM);
+            let mut ws_url = PostgresWebSocketUrl::new(ws_url, api_key.into_owned());
+            if let Some((_, dbname_override)) = dbname_override {
+                ws_url.override_db_name(dbname_override.into_owned());
+            }
+
+            Ok(PostgresUrl::WebSocket(ws_url))
         } else {
             PostgresUrl::new_native(url)
         }
@@ -514,7 +526,14 @@ impl SqlFlavour for PostgresFlavour {
                         .connection_string
                         .parse()
                         .map_err(ConnectorError::url_parse_error)?;
-                    shadow_database_url.set_path(&format!("/{shadow_database_name}"));
+
+                    if shadow_database_url.scheme() == MigratePostgresUrl::WEBSOCKET_SCHEME {
+                        shadow_database_url
+                            .query_pairs_mut()
+                            .append_pair(MigratePostgresUrl::DBNAME_PARAM, &shadow_database_name);
+                    } else {
+                        shadow_database_url.set_path(&format!("/{shadow_database_name}"));
+                    }
                     let shadow_db_params = ConnectorParams {
                         connection_string: shadow_database_url.to_string(),
                         preview_features: params.connector_params.preview_features,
