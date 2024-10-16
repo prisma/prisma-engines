@@ -25,6 +25,16 @@ pub enum AdapterFlavour {
     Sqlite,
 }
 
+impl AdapterFlavour {
+    pub fn db_system_name(&self) -> &'static str {
+        match self {
+            Self::Mysql => "mysql",
+            Self::Postgres => "postgresql",
+            Self::Sqlite => "sqlite",
+        }
+    }
+}
+
 impl FromStr for AdapterFlavour {
     type Err = String;
 

@@ -15,17 +15,6 @@ use quaint::{
 };
 use tracing::{info_span, Instrument};
 
-static SYSTEM_NAME: &'static str = if cfg!(feature = "mysql") {
-    "mysql"
-} else if cfg!(feature = "postgresql") {
-    "postgresql"
-} else if cfg!(feature = "sqlite") {
-    "sqlite"
-} else {
-    // compile_error!("No database feature enabled")
-    ""
-};
-
 /// A JsQueryable adapts a Proxy to implement quaint's Queryable interface. It has the
 /// responsibility of transforming inputs and outputs of `query` and `execute` methods from quaint
 /// types to types that can be translated into javascript and viceversa. This is to let the rest of
@@ -47,10 +36,11 @@ pub(crate) struct JsBaseQueryable {
 impl JsBaseQueryable {
     pub(crate) fn new(proxy: CommonProxy) -> Self {
         let provider: AdapterFlavour = proxy.provider.parse().unwrap();
+        let system_name = provider.db_system_name();
         Self {
             proxy,
             provider,
-            system_name: SYSTEM_NAME,
+            system_name,
         }
     }
 
