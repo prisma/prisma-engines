@@ -49,9 +49,9 @@ impl Connector for Js {
 
     fn name(&self) -> &'static str {
         match self.connection_info.sql_family() {
-            Some(SqlFamily::Postgres) => "postgresql",
-            Some(SqlFamily::Mysql) => "mysql",
-            Some(SqlFamily::Sqlite) => "sqlite",
+            SqlFamily::Postgres => "postgresql",
+            SqlFamily::Mysql => "mysql",
+            SqlFamily::Sqlite => "sqlite",
             _ => "js",
         }
     }
