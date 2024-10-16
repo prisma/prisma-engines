@@ -23,7 +23,7 @@ use std::time::Instant;
 use tracing::{debug, info_span};
 use tracing_futures::Instrument;
 
-const SYSTEM_NAME: &'static str = "mongodb";
+const SYSTEM_NAME: &str = "mongodb";
 
 /// Transforms a document to a `Record`, fields ordered as defined in `fields`.
 fn document_to_record(mut doc: Document, fields: &[String], meta_mapping: &OutputMetaMapping) -> crate::Result<Record> {

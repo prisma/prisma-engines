@@ -68,7 +68,7 @@ impl MysqlUrl {
     }
 }
 
-const SYSTEM_NAME: &'static str = "mysql";
+const SYSTEM_NAME: &str = "mysql";
 
 /// A connector interface for the MySQL database.
 #[derive(Debug)]
