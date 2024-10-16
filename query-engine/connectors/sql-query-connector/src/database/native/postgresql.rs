@@ -78,10 +78,6 @@ impl Connector for PostgreSql {
     }
 
     fn name(&self) -> &'static str {
-        "postgres"
-    }
-
-    fn system_name(&self) -> &'static str {
         match self.flavour {
             PostgresFlavour::Postgres | PostgresFlavour::Unknown => "postgresql",
             PostgresFlavour::Cockroach => "cockroachdb",
