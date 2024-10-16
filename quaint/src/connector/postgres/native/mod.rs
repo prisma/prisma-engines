@@ -5,8 +5,9 @@ pub(crate) mod column_type;
 mod conversion;
 mod error;
 mod explain;
+mod websocket;
 
-pub(crate) use crate::connector::postgres::url::PostgresUrl;
+pub(crate) use crate::connector::postgres::url::PostgresNativeUrl;
 use crate::connector::postgres::url::{Hidden, SslAcceptMode, SslParams};
 use crate::connector::{
     timeout, ColumnType, DescribedColumn, DescribedParameter, DescribedQuery, IsolationLevel, Transaction,
@@ -38,11 +39,14 @@ use std::{
 };
 use tokio::sync::OnceCell;
 use tokio_postgres::{config::ChannelBinding, Client, Config, Statement};
+use websocket::connect_via_websocket;
 
 /// The underlying postgres driver. Only available with the `expose-drivers`
 /// Cargo feature.
 #[cfg(feature = "expose-drivers")]
 pub use tokio_postgres;
+
+use super::PostgresWebSocketUrl;
 
 struct PostgresClient(Client);
 
@@ -161,7 +165,7 @@ impl SslParams {
     }
 }
 
-impl PostgresUrl {
+impl PostgresNativeUrl {
     pub(crate) fn cache(&self) -> StatementCache {
         if self.query_params.pg_bouncer {
             StatementCache::new(0)
@@ -229,7 +233,7 @@ impl PostgresUrl {
 
 impl PostgreSql {
     /// Create a new connection to the database.
-    pub async fn new(url: PostgresUrl, tls_manager: &MakeTlsConnectorManager) -> crate::Result<Self> {
+    pub async fn new(url: PostgresNativeUrl, tls_manager: &MakeTlsConnectorManager) -> crate::Result<Self> {
         let config = url.to_config();
 
         let tls = tls_manager.get_connector().await?;
@@ -273,6 +277,21 @@ impl PostgreSql {
             is_healthy: AtomicBool::new(true),
             is_cockroachdb,
             is_materialize,
+        })
+    }
+
+    /// Create a new websocket connection to managed database
+    pub async fn new_with_websocket(url: PostgresWebSocketUrl) -> crate::Result<Self> {
+        let client = connect_via_websocket(url).await?;
+
+        Ok(Self {
+            client: PostgresClient(client),
+            socket_timeout: None,
+            pg_bouncer: false,
+            statement_cache: Mutex::new(StatementCache::new(0)),
+            is_healthy: AtomicBool::new(true),
+            is_cockroachdb: false,
+            is_materialize: false,
         })
     }
 
@@ -892,12 +911,12 @@ fn is_safe_identifier(ident: &str) -> bool {
 }
 
 pub struct MakeTlsConnectorManager {
-    url: PostgresUrl,
+    url: PostgresNativeUrl,
     connector: OnceCell<MakeTlsConnector>,
 }
 
 impl MakeTlsConnectorManager {
-    pub fn new(url: PostgresUrl) -> Self {
+    pub fn new(url: PostgresNativeUrl) -> Self {
         MakeTlsConnectorManager {
             url,
             connector: OnceCell::new(),
@@ -948,7 +967,7 @@ mod tests {
             let mut url = Url::parse(&CONN_STR).unwrap();
             url.query_pairs_mut().append_pair("schema", schema_name);
 
-            let mut pg_url = PostgresUrl::new(url).unwrap();
+            let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Postgres);
 
             let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
@@ -1002,7 +1021,7 @@ mod tests {
             url.query_pairs_mut().append_pair("schema", schema_name);
             url.query_pairs_mut().append_pair("pbbouncer", "true");
 
-            let mut pg_url = PostgresUrl::new(url).unwrap();
+            let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Postgres);
 
             let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
@@ -1055,7 +1074,7 @@ mod tests {
             let mut url = Url::parse(&CRDB_CONN_STR).unwrap();
             url.query_pairs_mut().append_pair("schema", schema_name);
 
-            let mut pg_url = PostgresUrl::new(url).unwrap();
+            let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Cockroach);
 
             let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
@@ -1108,7 +1127,7 @@ mod tests {
             let mut url = Url::parse(&CONN_STR).unwrap();
             url.query_pairs_mut().append_pair("schema", schema_name);
 
-            let mut pg_url = PostgresUrl::new(url).unwrap();
+            let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Unknown);
 
             let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
@@ -1161,7 +1180,7 @@ mod tests {
             let mut url = Url::parse(&CONN_STR).unwrap();
             url.query_pairs_mut().append_pair("schema", schema_name);
 
-            let mut pg_url = PostgresUrl::new(url).unwrap();
+            let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Unknown);
 
             let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());

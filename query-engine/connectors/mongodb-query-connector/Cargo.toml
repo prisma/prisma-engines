@@ -22,7 +22,7 @@ uuid.workspace = true
 indexmap.workspace = true
 query-engine-metrics = { path = "../../metrics" }
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
-derive_more = "0.99.17"
+derive_more.workspace = true
 
 [dependencies.query-structure]
 path = "../../query-structure"

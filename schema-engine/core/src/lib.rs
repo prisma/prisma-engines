@@ -41,7 +41,7 @@ fn connector_for_connection_string(
     preview_features: BitFlags<PreviewFeature>,
 ) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
     match connection_string.split(':').next() {
-        Some("postgres") | Some("postgresql") => {
+        Some("postgres") | Some("postgresql") | Some("prisma+postgres") => {
             let params = ConnectorParams {
                 connection_string,
                 preview_features,

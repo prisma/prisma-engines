@@ -1,4 +1,5 @@
-use regex::Regex;
+use crosstarget_utils::{regex::RegExp, RegExpCompat};
+use enumflags2::BitFlags;
 use std::fmt::{Display, Formatter};
 
 use crate::error::{DatabaseConstraint, Error, ErrorKind, Name};
@@ -30,9 +31,8 @@ impl Display for PostgresError {
 }
 
 fn extract_fk_constraint_name(message: &str) -> Option<String> {
-    let re = Regex::new(r#"foreign key constraint "([^"]+)""#).unwrap();
-    re.captures(message)
-        .and_then(|caps| caps.get(1).map(|m| m.as_str().to_string()))
+    let re = RegExp::new(r#"foreign key constraint "([^"]+)""#, BitFlags::empty()).unwrap();
+    re.captures(message).and_then(|caps| caps.get(1).cloned())
 }
 
 impl From<PostgresError> for Error {
