@@ -81,8 +81,8 @@ mod prisma_11750 {
                     createOneUser(
                         data: {{
                             id: {id},
-                            first_name: "Alice",
-                            last_name: "Margatroid",
+                            first_name: "{email}",
+                            last_name: "{email}",
                             email: "{email}"
                         }}
                     ) {{ id }}
