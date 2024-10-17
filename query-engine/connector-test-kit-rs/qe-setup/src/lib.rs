@@ -65,14 +65,11 @@ fn parse_configuration(datamodel: &str) -> ConnectorResult<(Datasource, String, 
 /// (rather than just the Schema Engine), this function will call [`ExternalInitializer::init_with_migration`].
 /// Otherwise, it will call [`ExternalInitializer::init`], and then proceed with the standard
 /// setup based on the Schema Engine.
-pub async fn setup_external<'a, EI>(
+pub async fn setup_external<'a>(
     driver_adapter: DriverAdapter,
-    initializer: EI,
+    initializer: impl ExternalInitializer<'a>,
     db_schemas: &[&str],
-) -> ConnectorResult<InitResult>
-where
-    EI: ExternalInitializer<'a> + ?Sized,
-{
+) -> ConnectorResult<InitResult> {
     let prisma_schema = initializer.datamodel();
     let (source, url, _preview_features) = parse_configuration(prisma_schema)?;
 
