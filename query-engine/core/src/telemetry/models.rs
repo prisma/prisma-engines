@@ -1,4 +1,4 @@
-use opentelemetry::{sdk::export::trace::SpanData, KeyValue, Value};
+use opentelemetry::{sdk::export::trace::SpanData, Key, KeyValue, Value};
 use serde::Serialize;
 use serde_json::json;
 use std::{
@@ -7,7 +7,15 @@ use std::{
     time::{Duration, SystemTime},
 };
 
-const ACCEPT_ATTRIBUTES: &[&str] = &["db.system", "db.statement", "itx_id"];
+const ACCEPT_ATTRIBUTES: &[&str] = &["db.system", "db.statement", "itx_id", "otel.kind"];
+
+#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
+pub enum OtelKind {
+    #[serde(rename = "client")]
+    Client,
+    #[serde(rename = "internal")]
+    Internal,
+}
 
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct TraceSpan {
@@ -23,6 +31,7 @@ pub struct TraceSpan {
     pub(super) events: Vec<Event>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(super) links: Vec<Link>,
+    pub(super) otel_kind: OtelKind,
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
@@ -39,6 +48,14 @@ impl TraceSpan {
 
 impl From<SpanData> for TraceSpan {
     fn from(span: SpanData) -> Self {
+        let otel_kind = match span.attributes.get(&Key::from_static_str("otel.kind")) {
+            Some(Value::String(kind)) => match kind {
+                Cow::Borrowed("client") => OtelKind::Client,
+                _ => OtelKind::Internal,
+            },
+            _ => OtelKind::Internal,
+        };
+
         let attributes: HashMap<String, serde_json::Value> =
             span.attributes
                 .iter()
@@ -105,6 +122,7 @@ impl From<SpanData> for TraceSpan {
             attributes,
             links,
             events,
+            otel_kind,
         }
     }
 }
