@@ -15,7 +15,7 @@ use serde::Deserialize;
 use serde_json::json;
 use std::{collections::HashMap, future::Future, marker::PhantomData, panic::AssertUnwindSafe, sync::Arc};
 use tokio::sync::RwLock;
-use tracing::{field, instrument::WithSubscriber, Instrument, Span};
+use tracing::{field, instrument::WithSubscriber, Instrument};
 use tracing_subscriber::filter::LevelFilter;
 use user_facing_errors::Error;
 
@@ -319,12 +319,7 @@ impl QueryEngine {
 
             let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
 
-            let span = if tx_id.is_none() {
-                tracing::info_span!("prisma:engine", user_facing = true)
-            } else {
-                Span::none()
-            };
-
+            let span = tracing::info_span!("prisma:engine", user_facing = true);
             let trace_id = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
             async move {
