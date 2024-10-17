@@ -23,6 +23,8 @@ use std::time::Instant;
 use tracing::{debug, info_span};
 use tracing_futures::Instrument;
 
+const SYSTEM_NAME: &str = "mongodb";
+
 /// Transforms a document to a `Record`, fields ordered as defined in `fields`.
 fn document_to_record(mut doc: Document, fields: &[String], meta_mapping: &OutputMetaMapping) -> crate::Result<Record> {
     let mut values: Vec<PrismaValue> = Vec::with_capacity(fields.len());
@@ -69,7 +71,9 @@ where
     let span = info_span!(
         "prisma:engine:db_query",
         user_facing = true,
-        "db.statement" = %Arc::clone(&query_string)
+        "db.system" = SYSTEM_NAME,
+        "db.statement" = %Arc::clone(&query_string),
+        "otel.kind" = %"client"
     );
 
     let start = Instant::now();

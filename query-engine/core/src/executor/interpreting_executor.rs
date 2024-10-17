@@ -102,7 +102,7 @@ where
             let conn_span = info_span!(
                 "prisma:engine:connection",
                 user_facing = true,
-                "db.type" = self.connector.name(),
+                "db.system" = self.connector.name(),
             );
             let mut conn = self.connector.get_connection().instrument(conn_span).await?;
             let mut tx = conn.start_transaction(transaction.isolation_level()).await?;
@@ -162,7 +162,7 @@ where
             let conn_span = info_span!(
                 "prisma:engine:connection",
                 user_facing = true,
-                "db.type" = self.connector.name()
+                "db.system" = self.connector.name()
             );
             let conn = crosstarget_utils::time::timeout(
                 Duration::from_millis(tx_opts.max_acquisition_millis),

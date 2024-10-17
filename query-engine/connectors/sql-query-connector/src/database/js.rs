@@ -48,7 +48,16 @@ impl Connector for Js {
     }
 
     fn name(&self) -> &'static str {
-        "js"
+        match self.connection_info.sql_family() {
+            #[cfg(feature = "postgresql")]
+            SqlFamily::Postgres => "postgresql",
+            #[cfg(feature = "mysql")]
+            SqlFamily::Mysql => "mysql",
+            #[cfg(feature = "sqlite")]
+            SqlFamily::Sqlite => "sqlite",
+            #[cfg(feature = "mssql")]
+            SqlFamily::Mssql => "mssql",
+        }
     }
 
     fn should_retry_on_transient_error(&self) -> bool {
