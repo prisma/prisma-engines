@@ -144,7 +144,10 @@ use once_cell::sync::Lazy;
 use opentelemetry::{global, sdk, trace};
 use tracing::subscriber;
 use tracing_subscriber::{
-    filter::filter_fn, layer::Layered, prelude::__tracing_subscriber_SubscriberExt, Layer, Registry,
+    filter::filter_fn,
+    layer::{Layered, SubscriberExt},
+    registry::LookupSpan,
+    Layer, Registry,
 };
 
 static PROCESSOR: Lazy<capturer::Processor> = Lazy::new(Processor::default);
@@ -158,12 +161,8 @@ pub fn capturer(trace_id: trace::TraceId, settings: Settings) -> Capturer {
 /// Adds a capturing layer to the given subscriber and installs the transformed subscriber as the
 /// global, default subscriber
 #[cfg(feature = "metrics")]
-#[allow(clippy::type_complexity)]
 pub fn install_capturing_layer(
-    subscriber: Layered<
-        Option<query_engine_metrics::MetricRegistry>,
-        Layered<Box<dyn Layer<Registry> + Send + Sync>, Registry>,
-    >,
+    subscriber: impl SubscriberExt + for<'a> LookupSpan<'a> + Send + Sync + 'static,
     log_queries: bool,
 ) {
     // set a trace context propagator, so that the trace context is propagated via the
