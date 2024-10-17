@@ -8,7 +8,7 @@ use opentelemetry::{
     },
     trace::TracerProvider,
 };
-use query_core::telemetry;
+
 use std::io::{stdout, Stdout};
 use std::{fmt::Debug, io::Write};
 
