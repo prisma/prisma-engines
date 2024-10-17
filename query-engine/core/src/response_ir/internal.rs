@@ -874,14 +874,22 @@ fn convert_prisma_value_json_protocol(
 }
 
 fn convert_enum(value: PrismaValue, dbt: &DatabaseEnumType) -> crate::Result<Item> {
+    let not_found_err = |s: String| {
+        Err(CoreError::SerializationError(format!(
+            "Value '{}' not found in enum '{}'",
+            s,
+            dbt.identifier().name()
+        )))
+    };
+
     match value {
-        PrismaValue::String(s) | PrismaValue::Enum(s) => match dbt.map_output_value(&s) {
+        PrismaValue::Enum(s) => match dbt.value_for(s.as_str()) {
             Some(inum) => Ok(Item::Value(inum)),
-            None => Err(CoreError::SerializationError(format!(
-                "Value '{}' not found in enum '{}'",
-                s,
-                dbt.identifier().name()
-            ))),
+            None => not_found_err(s),
+        },
+        PrismaValue::String(s) => match dbt.map_output_value(&s) {
+            Some(inum) => Ok(Item::Value(inum)),
+            None => not_found_err(s),
         },
 
         val => Err(CoreError::SerializationError(format!(
