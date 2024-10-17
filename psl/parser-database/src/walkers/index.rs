@@ -81,8 +81,8 @@ impl<'db> IndexWalker<'db> {
             .arguments
             .arguments
             .iter()
-            .find(|arg| match &arg.name {
-                Some(ident) if ident.name.is_empty() || ident.name == "fields" => true,
+            .find(|arg| match arg.name() {
+                Some(name) if name.is_empty() || name == "fields" => true,
                 None => true,
                 Some(_) => false,
             })

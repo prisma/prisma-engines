@@ -153,13 +153,13 @@ fn push_inline_relation_missing_arguments(
         let extra_args = extra_args.join(", ");
 
         let (prefix, suffix, position) = if relation_attribute.arguments.arguments.is_empty() {
-            ("(", ")", relation_attribute.span.end)
+            ("(", ")", relation_attribute.span().end)
         } else {
-            (", ", "", relation_attribute.span.end - 1)
+            (", ", "", relation_attribute.span().end - 1)
         };
 
         ctx.add_missing_bit(
-            relation_attribute.span.file_id,
+            relation_attribute.span().file_id,
             MissingBit {
                 position,
                 content: format!("{prefix}{extra_args}{suffix}"),
