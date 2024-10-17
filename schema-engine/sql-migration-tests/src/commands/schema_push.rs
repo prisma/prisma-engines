@@ -102,13 +102,11 @@ impl SchemaPushAssertion {
     }
 
     pub fn print_context(&self) {
-        match &self.context {
-            Some(context) => println!("Test failure with context <{}>", context.red()),
-            None => {}
+        if let Some(context) = &self.context {
+            println!("Test failure with context <{}>", context.red())
         }
-        match &self.description {
-            Some(description) => println!("{}: {}", "Description".bold(), description.italic()),
-            None => {}
+        if let Some(description) = &self.description {
+            println!("{}: {}", "Description".bold(), description.italic())
         }
     }
 
