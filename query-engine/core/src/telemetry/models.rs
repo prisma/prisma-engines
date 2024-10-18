@@ -7,7 +7,22 @@ use std::{
     time::{Duration, SystemTime},
 };
 
-const ACCEPT_ATTRIBUTES: &[&str] = &["db.statement", "itx_id", "db.type"];
+const ACCEPT_ATTRIBUTES: &[&str] = &[
+    "db.system",
+    "db.statement",
+    "db.collection.name",
+    "db.operation.name",
+    "itx_id",
+    "otel.kind",
+];
+
+#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
+pub enum OtelKind {
+    #[serde(rename = "client")]
+    Client,
+    #[serde(rename = "internal")]
+    Internal,
+}
 
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct TraceSpan {
@@ -23,6 +38,7 @@ pub struct TraceSpan {
     pub(super) events: Vec<Event>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(super) links: Vec<Link>,
+    pub(super) kind: OtelKind,
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
@@ -39,6 +55,11 @@ impl TraceSpan {
 
 impl From<SpanData> for TraceSpan {
     fn from(span: SpanData) -> Self {
+        let kind = match span.span_kind {
+            opentelemetry::trace::SpanKind::Client => OtelKind::Client,
+            _ => OtelKind::Internal,
+        };
+
         let attributes: HashMap<String, serde_json::Value> =
             span.attributes
                 .iter()
@@ -105,6 +126,7 @@ impl From<SpanData> for TraceSpan {
             attributes,
             links,
             events,
+            kind,
         }
     }
 }
