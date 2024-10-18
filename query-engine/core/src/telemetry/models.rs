@@ -49,10 +49,7 @@ impl TraceSpan {
 impl From<SpanData> for TraceSpan {
     fn from(span: SpanData) -> Self {
         let otel_kind = match span.attributes.get(&Key::from_static_str("otel.kind")) {
-            Some(Value::String(kind)) => match kind {
-                Cow::Borrowed("client") => OtelKind::Client,
-                _ => OtelKind::Internal,
-            },
+            Some(Value::String(Cow::Borrowed("client"))) => OtelKind::Client,
             _ => OtelKind::Internal,
         };
 
