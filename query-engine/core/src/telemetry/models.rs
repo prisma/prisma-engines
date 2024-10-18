@@ -7,7 +7,14 @@ use std::{
     time::{Duration, SystemTime},
 };
 
-const ACCEPT_ATTRIBUTES: &[&str] = &["db.system", "db.statement", "itx_id", "otel.kind"];
+const ACCEPT_ATTRIBUTES: &[&str] = &[
+    "db.system",
+    "db.statement",
+    "db.collection.name",
+    "db.operation.name",
+    "itx_id",
+    "otel.kind",
+];
 
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 pub enum OtelKind {

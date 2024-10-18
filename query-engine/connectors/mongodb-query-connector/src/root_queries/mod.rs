@@ -73,6 +73,8 @@ where
         user_facing = true,
         "db.system" = SYSTEM_NAME,
         "db.statement" = %Arc::clone(&query_string),
+        "db.collection.name" = %builder.collection().unwrap_or_else(|| "raw"),
+        "db.operation.name" = builder.query_type(),
         "otel.kind" = "client"
     );
 
