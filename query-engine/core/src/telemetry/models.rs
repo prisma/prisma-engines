@@ -1,4 +1,4 @@
-use opentelemetry::{sdk::export::trace::SpanData, Key, KeyValue, Value};
+use opentelemetry::{sdk::export::trace::SpanData, KeyValue, Value};
 use serde::Serialize;
 use serde_json::json;
 use std::{
@@ -38,7 +38,7 @@ pub struct TraceSpan {
     pub(super) events: Vec<Event>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(super) links: Vec<Link>,
-    pub(super) otel_kind: OtelKind,
+    pub(super) kind: OtelKind,
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
@@ -55,8 +55,8 @@ impl TraceSpan {
 
 impl From<SpanData> for TraceSpan {
     fn from(span: SpanData) -> Self {
-        let otel_kind = match span.attributes.get(&Key::from_static_str("otel.kind")) {
-            Some(Value::String(Cow::Borrowed("client"))) => OtelKind::Client,
+        let kind = match span.span_kind {
+            opentelemetry::trace::SpanKind::Client => OtelKind::Client,
             _ => OtelKind::Internal,
         };
 
@@ -126,7 +126,7 @@ impl From<SpanData> for TraceSpan {
             attributes,
             links,
             events,
-            otel_kind,
+            kind,
         }
     }
 }
