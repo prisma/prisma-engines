@@ -73,10 +73,13 @@ where
         user_facing = true,
         "db.system" = SYSTEM_NAME,
         "db.statement" = %Arc::clone(&query_string),
-        "db.collection.name" = %builder.collection().unwrap_or_else(|| "raw"),
         "db.operation.name" = builder.query_type(),
         "otel.kind" = "client"
     );
+    
+    if let Some(coll) = builder.collection() {
+        span.record("db.collection.name", coll);
+    }
 
     let start = Instant::now();
     let res = f().instrument(span).await;
