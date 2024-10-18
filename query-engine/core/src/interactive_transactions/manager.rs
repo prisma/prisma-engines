@@ -8,7 +8,7 @@ use telemetry::helpers::TraceParent;
 use tokio::{
     sync::{
         mpsc::{unbounded_channel, UnboundedSender},
-        RwLock,
+        Mutex, RwLock,
     },
     time::Duration,
 };
@@ -38,7 +38,7 @@ pub struct ItxManager {
     /// immediately removed by the background task from the common hashmap. In this case, either
     /// our operation will be first or the background cleanup task will be first. Both cases are
     /// an acceptable outcome.
-    transactions: Arc<RwLock<HashMap<TxId, Arc<RwLock<InteractiveTransaction>>>>>,
+    transactions: Arc<RwLock<HashMap<TxId, Arc<Mutex<InteractiveTransaction>>>>>,
 
     /// Cache of closed transactions. We keep the last N closed transactions in memory to
     /// return better error messages if operations are performed on closed transactions.
@@ -51,7 +51,7 @@ pub struct ItxManager {
 
 impl ItxManager {
     pub fn new() -> Self {
-        let transactions = Arc::new(RwLock::new(HashMap::<_, Arc<RwLock<InteractiveTransaction>>>::default()));
+        let transactions = Arc::new(RwLock::new(HashMap::<_, Arc<Mutex<InteractiveTransaction>>>::default()));
         let closed_txs = Arc::new(RwLock::new(LruCache::new(*CLOSED_TX_CACHE_SIZE)));
         let (timeout_sender, mut timeout_receiver) = unbounded_channel();
 
@@ -72,7 +72,7 @@ impl ItxManager {
                             continue;
                         }
                     };
-                    let mut transaction = transaction_entry.write().await;
+                    let mut transaction = transaction_entry.lock().await;
 
                     // If transaction was already committed, rollback will error.
                     let _ = transaction.rollback(true).await;
@@ -118,7 +118,7 @@ impl ItxManager {
         self.transactions
             .write()
             .await
-            .insert(tx_id, Arc::new(RwLock::new(transaction)));
+            .insert(tx_id, Arc::new(Mutex::new(transaction)));
         Ok(())
     }
 
@@ -126,7 +126,7 @@ impl ItxManager {
         &self,
         tx_id: &TxId,
         from_operation: &str,
-    ) -> crate::Result<Arc<RwLock<InteractiveTransaction>>> {
+    ) -> crate::Result<Arc<Mutex<InteractiveTransaction>>> {
         if let Some(transaction) = self.transactions.read().await.get(tx_id) {
             Ok(transaction.clone())
         } else {
@@ -149,7 +149,7 @@ impl ItxManager {
     ) -> crate::Result<ResponseData> {
         self.get_transaction(tx_id, "query")
             .await?
-            .write()
+            .lock()
             .await
             .execute_single(&operation, traceparent)
             .await
@@ -163,7 +163,7 @@ impl ItxManager {
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         self.get_transaction(tx_id, "batch query")
             .await?
-            .write()
+            .lock()
             .await
             .execute_batch(&operations, traceparent)
             .await
@@ -172,7 +172,7 @@ impl ItxManager {
     pub async fn commit_tx(&self, tx_id: &TxId) -> crate::Result<()> {
         self.get_transaction(tx_id, "commit")
             .await?
-            .write()
+            .lock()
             .await
             .commit()
             .await
@@ -181,7 +181,7 @@ impl ItxManager {
     pub async fn rollback_tx(&self, tx_id: &TxId) -> crate::Result<()> {
         self.get_transaction(tx_id, "rollback")
             .await?
-            .write()
+            .lock()
             .await
             .rollback(false)
             .await
