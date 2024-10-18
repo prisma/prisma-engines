@@ -61,8 +61,8 @@ impl ItxManager {
         // Note that this task automatically exits when all transactions finish and the `ItxManager`
         // is dropped, because that causes the `timeout_receiver` to become closed.
         crosstarget_utils::task::spawn({
-            let transactions = transactions.clone();
-            let closed_txs = closed_txs.clone();
+            let transactions = Arc::clone(&transactions);
+            let closed_txs = Arc::clone(&closed_txs);
             async move {
                 while let Some(tx_id) = timeout_receiver.recv().await {
                     let transaction_entry = match transactions.write().await.remove(&tx_id) {
