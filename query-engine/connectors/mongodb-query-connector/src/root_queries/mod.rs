@@ -73,7 +73,7 @@ where
         user_facing = true,
         "db.system" = SYSTEM_NAME,
         "db.statement" = %Arc::clone(&query_string),
-        "otel.kind" = %"client"
+        "otel.kind" = "client"
     );
 
     let start = Instant::now();

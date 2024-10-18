@@ -16,7 +16,7 @@ where
     U: Future<Output = crate::Result<T>>,
 {
     let span =
-        info_span!("quaint:query", "db.system" = %db_system_name, "db.statement" = %query, "otel.kind" = %"client");
+        info_span!("quaint:query", "db.system" = %db_system_name, "db.statement" = %query, "otel.kind" = "client");
     do_query(tag, query, params, f).instrument(span).await
 }
 

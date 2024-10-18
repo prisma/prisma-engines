@@ -180,7 +180,7 @@ impl JsBaseQueryable {
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
         let query = self.build_query(sql, params).instrument(serialization_span).await?;
 
-        let sql_span = info_span!("js:query:sql", user_facing = true, "db.system" = %self.system_name, "db.statement" = %sql, "otel.kind" = %"client");
+        let sql_span = info_span!("js:query:sql", user_facing = true, "db.system" = %self.system_name, "db.statement" = %sql, "otel.kind" = "client");
         let result_set = self.proxy.query_raw(query).instrument(sql_span).await?;
 
         let len = result_set.len();
@@ -202,7 +202,7 @@ impl JsBaseQueryable {
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
         let query = self.build_query(sql, params).instrument(serialization_span).await?;
 
-        let sql_span = info_span!("js:query:sql", user_facing = true, "db.system" = %self.system_name, "db.statement" = %sql, "otel.kind" = %"client");
+        let sql_span = info_span!("js:query:sql", user_facing = true, "db.system" = %self.system_name, "db.statement" = %sql, "otel.kind" = "client");
         let affected_rows = self.proxy.execute_raw(query).instrument(sql_span).await?;
 
         Ok(affected_rows as u64)
