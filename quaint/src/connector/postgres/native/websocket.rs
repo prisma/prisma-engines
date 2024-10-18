@@ -23,12 +23,16 @@ const CONNECTION_PARAMS_HEADER: &str = "Prisma-Connection-Parameters";
 const HOST_HEADER: &str = "Prisma-Db-Host";
 
 pub(crate) async fn connect_via_websocket(url: PostgresWebSocketUrl) -> crate::Result<Client> {
+    let db_name = url.overriden_db_name().map(ToOwned::to_owned);
     let (ws_stream, response) = connect_async(url).await?;
 
     let connection_params = require_header_value(response.headers(), CONNECTION_PARAMS_HEADER)?;
     let db_host = require_header_value(response.headers(), HOST_HEADER)?;
 
-    let config = Config::from_str(connection_params)?;
+    let mut config = Config::from_str(connection_params)?;
+    if let Some(db_name) = db_name {
+        config.dbname(&db_name);
+    }
     let ws_byte_stream = WsStream::new(ws_stream);
 
     let tls = TlsConnector::new(native_tls::TlsConnector::new()?, db_host);
