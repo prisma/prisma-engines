@@ -170,12 +170,7 @@ impl ItxManager {
     }
 
     pub async fn commit_tx(&self, tx_id: &TxId) -> crate::Result<()> {
-        self.get_transaction(tx_id, "commit")
-            .await?
-            .lock()
-            .await
-            .commit()
-            .await
+        self.get_transaction(tx_id, "commit").await?.lock().await.commit().await
     }
 
     pub async fn rollback_tx(&self, tx_id: &TxId) -> crate::Result<()> {
