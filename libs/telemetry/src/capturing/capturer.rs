@@ -29,6 +29,20 @@ impl Capturer {
 
         Self::Disabled
     }
+
+    pub async fn try_start_capturing(&self) {
+        if let Capturer::Enabled(capturer) = self {
+            capturer.start_capturing().await
+        }
+    }
+
+    pub async fn try_fetch_captures(&self) -> Option<Storage> {
+        if let Capturer::Enabled(capturer) = self {
+            capturer.fetch_captures().await
+        } else {
+            None
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -92,7 +106,7 @@ impl SpanProcessor for Processor {
     /// mongo / relational, the information to build this kind of log event is logged diffeerently in
     /// the server.
     ///
-    /// In the case of the of relational databaes --queried through sql_query_connector and eventually
+    /// In the case of the of relational database --queried through sql_query_connector and eventually
     /// through quaint, a trace span describes the query-- `TraceSpan::represents_query_event`
     /// determines if a span represents a query event.
     ///

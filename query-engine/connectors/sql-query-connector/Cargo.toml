@@ -66,6 +66,9 @@ path = "../../query-structure"
 [dependencies.prisma-value]
 path = "../../../libs/prisma-value"
 
+[dependencies.telemetry]
+path = "../../../libs/telemetry"
+
 [dependencies.chrono]
 features = ["serde"]
 version = "0.4"

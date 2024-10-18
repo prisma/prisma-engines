@@ -13,6 +13,7 @@ use query_engine_metrics::MetricRegistry;
 use request_handlers::{load_executor, ConnectorKind};
 use std::{env, fmt, sync::Arc};
 use tracing::Instrument;
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// Prisma request context containing all immutable state of the process.
 /// There is usually only one context initialized per process.
@@ -49,7 +50,8 @@ impl PrismaContext {
             // Construct query schema
             schema::build(arced_schema, enabled_features.contains(Feature::RawQueries))
         });
-        let executor_fut = tokio::spawn(async move {
+
+        let executor_fut = async move {
             let config = &arced_schema_2.configuration;
             let preview_features = config.preview_features();
 
@@ -62,14 +64,22 @@ impl PrismaContext {
             let url = datasource.load_url(|key| env::var(key).ok())?;
             // Load executor
             let executor = load_executor(ConnectorKind::Rust { url, datasource }, preview_features).await?;
-            let conn = executor.primary_connector().get_connection().await?;
+            let connector = executor.primary_connector();
+
+            let conn_span = tracing::info_span!(
+                "prisma:engine:connection",
+                user_facing = true,
+                "db.type" = connector.name(),
+            );
+
+            let conn = connector.get_connection().instrument(conn_span).await?;
             let db_version = conn.version().await;
 
             PrismaResult::<_>::Ok((executor, db_version))
-        });
+        };
 
         let (query_schema, executor_with_db_version) = tokio::join!(query_schema_fut, executor_fut);
-        let (executor, db_version) = executor_with_db_version.unwrap()?;
+        let (executor, db_version) = executor_with_db_version?;
 
         let query_schema = query_schema.unwrap().with_db_version_supports_join_strategy(
             relation_load_strategy::db_version_supports_joins_strategy(db_version)?,
@@ -103,18 +113,12 @@ impl PrismaContext {
     }
 }
 
-pub async fn setup(
-    opts: &PrismaOpt,
-    install_logger: bool,
-    metrics: Option<MetricRegistry>,
-) -> PrismaResult<Arc<PrismaContext>> {
+pub async fn setup(opts: &PrismaOpt, metrics: Option<MetricRegistry>) -> PrismaResult<Arc<PrismaContext>> {
     let metrics = metrics.unwrap_or_default();
 
-    if install_logger {
-        Logger::new("prisma-engine-http", Some(metrics.clone()), opts)
-            .install()
-            .unwrap();
-    }
+    Logger::new("prisma-engine-http", Some(metrics.clone()), opts)
+        .install()
+        .unwrap();
 
     if opts.enable_metrics || opts.dataproxy_metric_override {
         metric_setup();
@@ -125,7 +129,11 @@ pub async fn setup(
     let protocol = opts.engine_protocol();
     config.validate_that_one_datasource_is_provided()?;
 
-    let span = tracing::info_span!("prisma:engine:connect");
+    let span = tracing::info_span!("prisma:engine:connect", user_facing = true);
+    if let Some(trace_context) = opts.trace_context.as_ref() {
+        let parent_context = telemetry::helpers::restore_remote_context_from_json_str(trace_context);
+        span.set_parent(parent_context);
+    }
 
     let mut features = EnabledFeatures::from(opts);
 

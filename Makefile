@@ -67,6 +67,10 @@ build-qe-wasm-gz: build-qe-wasm
         gzip -knc $$provider/query_engine_bg.wasm > $$provider.gz; \
     done;
 
+integrate-qe-wasm:
+	cd query-engine/query-engine-wasm && \
+	./build.sh $(QE_WASM_VERSION) ../prisma/packages/client/node_modules/@prisma/query-engine-wasm
+
 build-schema-wasm:
 	@printf '%s\n' "🛠️  Building the Rust crate"
 	cargo build --profile $(PROFILE) --target=wasm32-unknown-unknown -p prisma-schema-build

@@ -119,6 +119,11 @@ pub struct PrismaOpt {
     #[structopt(long, env = "PRISMA_ENGINE_PROTOCOL")]
     pub engine_protocol: Option<String>,
 
+    /// The trace context (https://www.w3.org/TR/trace-context) for the engine initialization
+    /// as a JSON object with properties corresponding to the headers (e.g. `traceparent`).
+    #[structopt(long, env)]
+    pub trace_context: Option<String>,
+
     #[structopt(subcommand)]
     pub subcommand: Option<Subcommand>,
 }

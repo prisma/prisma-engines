@@ -8,7 +8,6 @@ use opentelemetry::{
     },
     trace::{TraceError, TracerProvider},
 };
-use query_core::telemetry;
 use std::fmt::{self, Debug};
 
 /// Pipeline builder

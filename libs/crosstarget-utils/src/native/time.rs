@@ -5,6 +5,7 @@ use std::{
 
 use crate::common::timeout::TimeoutError;
 
+#[derive(Clone, Copy)]
 pub struct ElapsedTimeCounter {
     instant: Instant,
 }
