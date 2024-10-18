@@ -17,6 +17,7 @@ connector = { path = "../connectors/query-connector", package = "query-connector
 enumflags2.workspace = true
 psl = { workspace = true, features = ["all"] }
 graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
+mimalloc = "0.1.43"
 mongodb-connector = { path = "../connectors/mongodb-query-connector", optional = true, package = "mongodb-query-connector" }
 query-core = { path = "../core", features = ["metrics"] }
 request-handlers = { path = "../request-handlers", features = ["all"] }
