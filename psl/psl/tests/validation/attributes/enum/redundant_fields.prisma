@@ -1,0 +1,30 @@
+datasource db {
+    provider = "postgresql"
+    url = env("TEST_DB_URL")
+}
+
+enum FormLanguage {
+  EN_US
+  IT_IT
+  IT_IT
+}
+
+enum UserKind {
+  ADMIN
+  ADMIN
+  USER
+}
+// [1;91merror[0m: [1mValue "IT_IT" is already defined on enum "FormLanguage".[0m
+//   [1;94m-->[0m  [4mschema.prisma:9[0m
+// [1;94m   | [0m
+// [1;94m 8 | [0m  IT_IT
+// [1;94m 9 | [0m  [1;91mIT_IT[0m
+// [1;94m10 | [0m}
+// [1;94m   | [0m
+// [1;91merror[0m: [1mValue "ADMIN" is already defined on enum "UserKind".[0m
+//   [1;94m-->[0m  [4mschema.prisma:14[0m
+// [1;94m   | [0m
+// [1;94m13 | [0m  ADMIN
+// [1;94m14 | [0m  [1;91mADMIN[0m
+// [1;94m15 | [0m  USER
+// [1;94m   | [0m
