@@ -2,7 +2,7 @@ use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand};
 use psl::{
     diagnostics::Span,
     parser_database::walkers::{EnumWalker, ModelWalker},
-    schema_ast::ast::WithSpan,
+    schema_ast::ast::{WithAttributes, WithSpan},
 };
 
 use super::CodeActionsContext;
@@ -42,7 +42,7 @@ pub(super) fn add_schema_block_attribute_model(
         "schema()",
         model.indentation(),
         model.newline(),
-        &model.ast_model().attributes,
+        model.ast_model().attributes(),
     );
 
     let Ok(edit) = super::create_text_edit(

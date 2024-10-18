@@ -29,7 +29,7 @@ pub struct Field {
     /// name String @id @default("lol")
     ///             ^^^^^^^^^^^^^^^^^^^
     /// ```
-    pub attributes: Vec<Attribute>,
+    pub(crate) attributes: Vec<Attribute>,
     /// The comments for this field.
     ///
     /// ```ignore

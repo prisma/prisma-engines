@@ -109,7 +109,7 @@ pub(super) fn same_length_in_referencing_and_referenced(relation: InlineRelation
         (Some(fields), Some(references)) if fields.len() != references.len() => {
             ctx.push_error(DatamodelError::new_validation_error(
                 "You must specify the same number of fields in `fields` and `references`.",
-                relation_field.relation_attribute().unwrap().span,
+                relation_field.relation_attribute().unwrap().span(),
             ));
         }
         _ => (),

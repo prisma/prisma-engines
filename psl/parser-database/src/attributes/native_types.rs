@@ -1,3 +1,5 @@
+use schema_ast::ast::WithSpan;
+
 use crate::{ast, context::Context, ScalarFieldId, StringId};
 
 pub(super) fn visit_model_field_native_type_attribute(
@@ -10,7 +12,7 @@ pub(super) fn visit_model_field_native_type_attribute(
     let args = &attr.arguments;
     let args: Vec<String> = args.arguments.iter().map(|arg| arg.value.to_string()).collect();
 
-    ctx.types[id].native_type = Some((datasource_name, type_name, args, attr.span))
+    ctx.types[id].native_type = Some((datasource_name, type_name, args, attr.span()))
 }
 
 pub(super) fn visit_composite_type_field_native_type_attribute(
@@ -24,6 +26,6 @@ pub(super) fn visit_composite_type_field_native_type_attribute(
     let args: Vec<String> = args.arguments.iter().map(|arg| arg.value.to_string()).collect();
 
     if let Some(composite_type_field) = ctx.types.composite_type_fields.get_mut(&id) {
-        composite_type_field.native_type = Some((datasource_name, type_name, args, attr.span))
+        composite_type_field.native_type = Some((datasource_name, type_name, args, attr.span()))
     }
 }

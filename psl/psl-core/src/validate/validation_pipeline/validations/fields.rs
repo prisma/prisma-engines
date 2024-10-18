@@ -229,7 +229,7 @@ pub(super) fn validate_default_value(field: ScalarFieldWalker<'_>, ctx: &mut Con
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             msg,
             "@default",
-            default_attribute.unwrap().span,
+            default_attribute.unwrap().span(),
         ));
     }
 

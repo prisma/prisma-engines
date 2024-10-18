@@ -267,7 +267,7 @@ fn find_where_used_for_native_type<'ast>(
         Box::new(fields.filter_map(move |field| {
             field
                 .1
-                .attributes
+                .attributes()
                 .iter()
                 .find(|attr| extract_ds_from_native_type(attr.name()) == Some(name))
                 .map(|attr| attr.identifier().span())
@@ -289,7 +289,7 @@ fn find_where_used_as_field_type<'ast>(
     fn get_relevent_identifiers<'a>(fields: impl Iterator<Item = (FieldId, &'a Field)>, name: &str) -> Vec<Span> {
         fields
             .filter_map(|(_id, field)| match &field.field_type {
-                FieldType::Supported(id) if id.name == name => Some(id.span()),
+                FieldType::Supported(id) if id.name() == name => Some(id.span()),
                 _ => None,
             })
             .collect()

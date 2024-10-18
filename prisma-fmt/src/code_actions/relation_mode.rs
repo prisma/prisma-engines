@@ -1,7 +1,7 @@
 use lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand};
 use psl::{
     parser_database::walkers::CompleteInlineRelationWalker,
-    schema_ast::ast::{SourceConfig, WithIdentifier, WithName},
+    schema_ast::ast::{SourceConfig, WithIdentifier, WithName, WithSpan},
 };
 
 use super::CodeActionsContext;
@@ -24,7 +24,7 @@ pub(crate) fn edit_referential_integrity(
         context.initiating_file_source(),
         "relationMode".to_owned(),
         false,
-        prop.identifier().span,
+        prop.identifier().span(),
     ) else {
         return;
     };
