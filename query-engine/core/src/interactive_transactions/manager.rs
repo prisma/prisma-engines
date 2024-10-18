@@ -128,7 +128,7 @@ impl ItxManager {
         from_operation: &str,
     ) -> crate::Result<Arc<Mutex<InteractiveTransaction>>> {
         if let Some(transaction) = self.transactions.read().await.get(tx_id) {
-            Ok(transaction.clone())
+            Ok(Arc::clone(transaction))
         } else {
             Err(if let Some(closed_tx) = self.closed_txs.read().await.peek(tx_id) {
                 TransactionError::Closed {
