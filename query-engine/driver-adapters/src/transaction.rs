@@ -101,7 +101,7 @@ impl JsTransaction {
         let params = &[];
         quaint::connector::metrics::query(
             "js.raw_phantom_cmd",
-            self.inner.system_name,
+            self.inner.db_system_name,
             cmd,
             params,
             move || async move { Ok(()) },

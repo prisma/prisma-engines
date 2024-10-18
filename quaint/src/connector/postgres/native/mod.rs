@@ -68,7 +68,7 @@ pub struct PostgreSql {
     is_healthy: AtomicBool,
     is_cockroachdb: bool,
     is_materialize: bool,
-    system_name: &'static str,
+    db_system_name: &'static str,
 }
 
 /// Key uniquely representing an SQL statement in the prepared statements cache.
@@ -303,7 +303,7 @@ impl PostgreSql {
             is_healthy: AtomicBool::new(true),
             is_cockroachdb,
             is_materialize,
-            system_name,
+            db_system_name: system_name,
         })
     }
 
@@ -319,7 +319,7 @@ impl PostgreSql {
             is_healthy: AtomicBool::new(true),
             is_cockroachdb: false,
             is_materialize: false,
-            system_name: SYSTEM_NAME_POSTGRESQL,
+            db_system_name: SYSTEM_NAME_POSTGRESQL,
         })
     }
 
@@ -553,7 +553,7 @@ impl Queryable for PostgreSql {
 
         metrics::query(
             "postgres.query_raw",
-            self.system_name,
+            self.db_system_name,
             sql,
             params,
             move || async move {
@@ -595,7 +595,7 @@ impl Queryable for PostgreSql {
 
         metrics::query(
             "postgres.query_raw",
-            self.system_name,
+            self.db_system_name,
             sql,
             params,
             move || async move {
@@ -718,7 +718,7 @@ impl Queryable for PostgreSql {
 
         metrics::query(
             "postgres.execute_raw",
-            self.system_name,
+            self.db_system_name,
             sql,
             params,
             move || async move {
@@ -748,7 +748,7 @@ impl Queryable for PostgreSql {
 
         metrics::query(
             "postgres.execute_raw",
-            self.system_name,
+            self.db_system_name,
             sql,
             params,
             move || async move {
@@ -774,7 +774,7 @@ impl Queryable for PostgreSql {
     }
 
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
-        metrics::query("postgres.raw_cmd", self.system_name, cmd, &[], move || async move {
+        metrics::query("postgres.raw_cmd", self.db_system_name, cmd, &[], move || async move {
             self.perform_io(self.client.0.simple_query(cmd)).await?;
             Ok(())
         })
