@@ -15,25 +15,29 @@ pub struct DatabaseCreationFailed {
     code = "P3001",
     message = "Migration possible with destructive changes and possible data loss: {destructive_details}"
 )]
+#[allow(dead_code)]
 pub struct DestructiveMigrationDetected {
     pub destructive_details: String,
 }
 
+/// No longer used.
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P3002",
     message = "The attempted migration was rolled back: {database_error}"
 )]
+#[allow(dead_code)]
 struct MigrationRollback {
     pub database_error: String,
 }
 
-// No longer used.
+/// No longer used.
 #[derive(Debug, SimpleUserFacingError)]
 #[user_facing(
     code = "P3003",
     message = "The format of migrations changed, the saved migrations are no longer valid. To solve this problem, please follow the steps at: https://pris.ly/d/migrate"
 )]
+#[allow(dead_code)]
 pub struct DatabaseMigrationFormatChanged;
 
 #[derive(Debug, UserFacingError, Serialize)]
