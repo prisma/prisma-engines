@@ -19,6 +19,11 @@ use tracing::Span;
 use tracing_futures::Instrument;
 use tracing_futures::WithSubscriber;
 
+#[cfg(not(feature = "metrics"))]
+use crate::metrics::MetricsInstrumentationStub;
+#[cfg(feature = "metrics")]
+use query_engine_metrics::WithMetricsInstrumentation;
+
 #[cfg(feature = "metrics")]
 use crate::telemetry::helpers::set_span_link_from_traceparent;
 
@@ -264,7 +269,6 @@ pub(crate) async fn spawn_itx_actor(
     let span = Span::current();
     let tx_id_str = tx_id.to_string();
     span.record("itx_id", tx_id_str.as_str());
-    let dispatcher = crate::get_current_dispatcher();
 
     let (tx_to_server, rx_from_client) = channel::<TxOpRequest>(channel_size);
     let client = ITXClient {
@@ -334,7 +338,8 @@ pub(crate) async fn spawn_itx_actor(
             trace!("[{}] has stopped with {}", server.id.to_string(), server.cached_tx);
         })
         .instrument(span)
-        .with_subscriber(dispatcher),
+        .with_current_subscriber()
+        .with_current_recorder(),
     );
 
     open_transaction_rcv.await.unwrap()?;
