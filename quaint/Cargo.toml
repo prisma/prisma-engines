@@ -76,7 +76,7 @@ tracing-core = "0.1"
 async-trait.workspace = true
 thiserror = "1.0"
 num_cpus = "1.12"
-metrics = "0.18"
+metrics.workspace = true
 futures = "0.3"
 url.workspace = true
 hex = "0.4"
@@ -92,7 +92,7 @@ serde_json.workspace = true
 native-tls = { version = "0.2", optional = true }
 bit-vec = { version = "0.6.1", optional = true }
 bytes = { version = "1.0", optional = true }
-mobc = { version = "0.8", optional = true }
+mobc = { version = "0.8.5", optional = true }
 serde = { version = "1.0" }
 sqlformat = { version = "0.2.3", optional = true }
 uuid.workspace = true

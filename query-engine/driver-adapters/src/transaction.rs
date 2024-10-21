@@ -1,7 +1,7 @@
 use std::future::Future;
 
 use async_trait::async_trait;
-use metrics::decrement_gauge;
+use metrics::gauge;
 use quaint::{
     connector::{DescribedQuery, IsolationLevel, Transaction as QuaintTransaction},
     prelude::{Query as QuaintQuery, Queryable, ResultSet},
@@ -107,7 +107,7 @@ impl JsTransaction {
 impl QuaintTransaction for JsTransaction {
     async fn commit(&self) -> quaint::Result<()> {
         // increment of this gauge is done in DriverProxy::startTransaction
-        decrement_gauge!("prisma_client_queries_active", 1.0);
+        gauge!("prisma_client_queries_active").decrement(1.0);
 
         let commit_stmt = "COMMIT";
 
@@ -123,7 +123,7 @@ impl QuaintTransaction for JsTransaction {
 
     async fn rollback(&self) -> quaint::Result<()> {
         // increment of this gauge is done in DriverProxy::startTransaction
-        decrement_gauge!("prisma_client_queries_active", 1.0);
+        gauge!("prisma_client_queries_active").decrement(1.0);
 
         let rollback_stmt = "ROLLBACK";
 

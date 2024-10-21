@@ -4,7 +4,7 @@ use crate::{
     error::{Error, ErrorKind},
 };
 use async_trait::async_trait;
-use metrics::{decrement_gauge, increment_gauge};
+use metrics::gauge;
 use std::{fmt, str::FromStr};
 
 extern crate metrics as metrics;
@@ -62,7 +62,7 @@ impl<'a> DefaultTransaction<'a> {
 
         inner.server_reset_query(&this).await?;
 
-        increment_gauge!("prisma_client_queries_active", 1.0);
+        gauge!("prisma_client_queries_active").increment(1.0);
         Ok(this)
     }
 }
@@ -71,7 +71,7 @@ impl<'a> DefaultTransaction<'a> {
 impl<'a> Transaction for DefaultTransaction<'a> {
     /// Commit the changes to the database and consume the transaction.
     async fn commit(&self) -> crate::Result<()> {
-        decrement_gauge!("prisma_client_queries_active", 1.0);
+        gauge!("prisma_client_queries_active").decrement(1.0);
         self.inner.raw_cmd("COMMIT").await?;
 
         Ok(())
@@ -79,7 +79,7 @@ impl<'a> Transaction for DefaultTransaction<'a> {
 
     /// Rolls back the changes to the database.
     async fn rollback(&self) -> crate::Result<()> {
-        decrement_gauge!("prisma_client_queries_active", 1.0);
+        gauge!("prisma_client_queries_active").decrement(1.0);
         self.inner.raw_cmd("ROLLBACK").await?;
 
         Ok(())
