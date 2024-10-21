@@ -6,7 +6,7 @@ use tracing_subscriber::{prelude::*, Layer};
 
 use crate::LogEmit;
 
-pub fn test_tracing_subscriber(log_config: String, metrics: MetricRegistry, log_tx: LogEmit) -> impl Subscriber {
+pub fn test_tracing_subscriber(log_config: String, log_tx: LogEmit) -> impl Subscriber {
     let filter = telemetry_helpers::env_filter(true, telemetry_helpers::QueryEngineLogLevel::Override(log_config));
 
     let fmt_layer = tracing_subscriber::fmt::layer()
@@ -15,7 +15,6 @@ pub fn test_tracing_subscriber(log_config: String, metrics: MetricRegistry, log_
 
     tracing_subscriber::registry()
         .with(fmt_layer.boxed())
-        .with(metrics.boxed())
         .with(ErrorLayer::default())
 }
 

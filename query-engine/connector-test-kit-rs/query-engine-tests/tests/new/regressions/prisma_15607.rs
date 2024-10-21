@@ -4,6 +4,7 @@
 //! actors to allow test to continue even if one query is blocking.
 
 use indoc::indoc;
+use query_engine_metrics::MetricsFutureExt;
 use query_engine_tests::{
     query_core::TxId, render_test_datamodel, setup_metrics, test_tracing_subscriber, LogEmit, QueryResult, Runner,
     TestError, TestLogCapture, TestResult, WithSubscriber, CONFIG, ENV_LOG_LEVEL,
@@ -50,13 +51,11 @@ impl Actor {
     /// Spawns a new query engine to the runtime.
     pub async fn spawn() -> TestResult<Self> {
         let (log_capture, log_tx) = TestLogCapture::new();
-        async fn with_logs<T>(fut: impl Future<Output = T>, log_tx: LogEmit) -> T {
-            fut.with_subscriber(test_tracing_subscriber(
-                ENV_LOG_LEVEL.to_string(),
-                setup_metrics(),
-                log_tx,
-            ))
-            .await
+        async fn with_observability<T>(fut: impl Future<Output = T>, log_tx: LogEmit) -> T {
+            let (_, recorder) = setup_metrics();
+            fut.with_subscriber(test_tracing_subscriber(ENV_LOG_LEVEL.to_string(), log_tx))
+                .with_recorder(recorder.into())
+                .await
         }
 
         let (query_sender, mut query_receiver) = mpsc::channel(100);
@@ -79,15 +78,15 @@ impl Actor {
             while let Some(message) = query_receiver.recv().await {
                 match message {
                     Message::Query(query) => {
-                        let result = with_logs(runner.query(query), log_tx.clone()).await;
+                        let result = with_observability(runner.query(query), log_tx.clone()).await;
                         response_sender.send(Response::Query(result)).await.unwrap();
                     }
                     Message::BeginTransaction => {
-                        let response = with_logs(runner.start_tx(10000, 10000, None), log_tx.clone()).await;
+                        let response = with_observability(runner.start_tx(10000, 10000, None), log_tx.clone()).await;
                         response_sender.send(Response::Tx(response)).await.unwrap();
                     }
                     Message::RollbackTransaction(tx_id) => {
-                        let response = with_logs(runner.rollback_tx(tx_id), log_tx.clone()).await?;
+                        let response = with_observability(runner.rollback_tx(tx_id), log_tx.clone()).await?;
                         response_sender.send(Response::Rollback(response)).await.unwrap();
                     }
                     Message::SetActiveTx(tx_id) => {

@@ -27,18 +27,20 @@ const METRIC_DESCRIPTION: &str = "description";
 
 mod common;
 mod formatters;
+mod instrument;
 mod recorder;
 mod registry;
 
 use once_cell::sync::Lazy;
-use recorder::*;
-pub use registry::MetricRegistry;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::sync::Once;
 
-pub extern crate metrics;
-pub use metrics::{counter, describe_counter, describe_gauge, describe_histogram, gauge, histogram};
+pub use metrics::{self, counter, describe_counter, describe_gauge, describe_histogram, gauge, histogram};
+
+pub use instrument::*;
+pub use recorder::MetricRecorder;
+pub use registry::MetricRegistry;
 
 // Metrics that we emit from the engines, third party metrics emitted by libraries and that we rename are omitted.
 pub const PRISMA_CLIENT_QUERIES_TOTAL: &str = "prisma_client_queries_total"; // counter
@@ -91,19 +93,19 @@ static METRIC_RENAMES: Lazy<HashMap<&'static str, (&'static str, &'static str)>>
     ])
 });
 
-pub fn setup() {
-    set_recorder();
-    initialize_metrics();
-}
+// pub fn setup() {
+//     set_global_recorder();
+//     initialize_metrics();
+// }
 
-static METRIC_RECORDER: Once = Once::new();
+// static METRIC_RECORDER: Once = Once::new();
 
-fn set_recorder() {
-    METRIC_RECORDER.call_once(|| metrics::set_global_recorder(MetricRecorder).unwrap());
-}
+// fn set_global_recorder() {
+//      METRIC_RECORDER.call_once(|| metrics::set_global_recorder(MetricRecorder).unwrap());
+// }
 
 /// Initialize metrics descriptions and values
-pub fn initialize_metrics() {
+pub(crate) fn initialize_metrics() {
     initialize_metrics_descriptions();
     initialize_metrics_values();
 }
@@ -169,6 +171,7 @@ mod tests {
     use metrics::{describe_counter, describe_gauge, describe_histogram, gauge, histogram};
     use serde_json::json;
     use std::collections::HashMap;
+    use std::sync::Arc;
     use std::time::Duration;
     use tracing::instrument::WithSubscriber;
     use tracing::{trace, Dispatch};
@@ -178,7 +181,7 @@ mod tests {
     use tokio::runtime::Runtime;
 
     static RT: Lazy<Runtime> = Lazy::new(|| {
-        set_recorder();
+        set_global_recorder();
         Runtime::new().unwrap()
     });
 
@@ -201,8 +204,8 @@ mod tests {
     fn test_counters() {
         RT.block_on(async {
             let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
                 let counter1 = counter!("test_counter");
                 counter1.increment(1);
                 counter!("test_counter").increment(1);
@@ -220,7 +223,7 @@ mod tests {
                 let val3 = metrics.counter_value("test_counter").unwrap();
                 assert_eq!(val3, 5);
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder.into())
             .await;
         });
     }
@@ -228,9 +231,9 @@ mod tests {
     #[test]
     fn test_gauges() {
         RT.block_on(async {
-            let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
+            let metrics = (MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec()));
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
                 let gauge1 = gauge!("test_gauge");
                 gauge1.increment(1.0);
                 gauge!("test_gauge").increment(1.0);
@@ -253,7 +256,7 @@ mod tests {
                 let val4 = metrics.gauge_value("test_gauge").unwrap();
                 assert_eq!(val4, 3.0);
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder.into())
             .await;
         });
     }
@@ -262,8 +265,8 @@ mod tests {
     fn test_no_panic_and_ignore_other_traces() {
         RT.block_on(async {
             let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
                 trace!("a fake trace");
 
                 gauge!("test_gauge").set(1.0);
@@ -274,7 +277,7 @@ mod tests {
                 assert_eq!(1.0, metrics.gauge_value("test_gauge").unwrap());
                 assert_eq!(1, metrics.counter_value("test_counter").unwrap());
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder.into())
             .await;
         });
     }
@@ -283,15 +286,15 @@ mod tests {
     fn test_ignore_non_accepted_metrics() {
         RT.block_on(async {
             let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
                 gauge!("not_accepted").set(1.0);
                 gauge!("test_gauge").set(1.0);
 
                 assert_eq!(1.0, metrics.gauge_value("test_gauge").unwrap());
                 assert_eq!(None, metrics.gauge_value("not_accepted"));
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder.into())
             .await;
         });
     }
@@ -300,8 +303,8 @@ mod tests {
     fn test_histograms() {
         RT.block_on(async {
             let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
                 let hist = histogram!("test_histogram");
                 hist.record(Duration::from_millis(9));
 
@@ -328,7 +331,7 @@ mod tests {
 
                 assert_eq!(hist.buckets(), expected);
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder.into())
             .await;
         });
     }
@@ -337,8 +340,8 @@ mod tests {
     fn test_set_and_read_descriptions() {
         RT.block_on(async {
             let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
                 describe_counter!("test_counter", "This is a counter");
 
                 let descriptions = metrics.get_descriptions();
@@ -359,7 +362,7 @@ mod tests {
                 let description = descriptions.get("test_histogram").unwrap();
                 assert_eq!("This is a hist", description);
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder.into())
             .await;
         });
     }
@@ -368,8 +371,8 @@ mod tests {
     fn test_to_json() {
         RT.block_on(async {
             let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
                 let empty = json!({
                     "counters": [],
                     "gauges": [],
@@ -440,7 +443,7 @@ mod tests {
 
                 assert_eq!(json, expected);
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder.into())
             .await;
         });
     }
@@ -449,8 +452,8 @@ mod tests {
     fn test_global_and_metric_labels() {
         RT.block_on(async {
             let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
                 let hist = histogram!("test_histogram", "label" => "one", "two" => "another");
                 hist.record(Duration::from_millis(9));
 
@@ -483,7 +486,7 @@ mod tests {
                 });
                 assert_eq!(expected, json);
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder.into())
             .await;
         });
     }
@@ -492,8 +495,8 @@ mod tests {
     fn test_prometheus_format() {
         RT.block_on(async {
             let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
                 counter!("counter_1", "label" => "one").absolute(4);
                 describe_counter!("counter_2", "this is a description for counter 2");
                 counter!("counter_2", "label" => "one", "another_label" => "two").absolute(2);
@@ -566,7 +569,7 @@ mod tests {
 
                 snapshot.assert_eq(&prometheus);
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder.into())
             .await;
         });
     }

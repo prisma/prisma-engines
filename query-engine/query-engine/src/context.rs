@@ -111,9 +111,7 @@ pub async fn setup(
     let metrics = metrics.unwrap_or_default();
 
     if install_logger {
-        Logger::new("prisma-engine-http", Some(metrics.clone()), opts)
-            .install()
-            .unwrap();
+        Logger::new("prisma-engine-http", opts).install().unwrap();
     }
 
     if opts.enable_metrics || opts.dataproxy_metric_override {
