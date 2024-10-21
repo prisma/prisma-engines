@@ -1,14 +1,15 @@
-# rustup target add x86_64-apple-ios # intel simulator
-# rustup target add aarch64-apple-ios # actual iOS
-# rustup target add aarch64-apple-ios-sim # arm simulator
+# rustup target add x86_64-apple-ios         # intel simulator
+# rustup target add aarch64-apple-ios        # actual iOS
+# rustup target add aarch64-apple-ios-macabi # Mac Catalyst
+# rustup target add aarch64-apple-ios-sim    # arm simulator
 
-# rustup target add aarch64-linux-android # Android arm 64 bits
-# rustup target add x86_64-linux-android # Intel 64 bits emulator
-# rustup target add armv7-linux-androideabi # Android arm 32 bits
-# rustup target add i686-linux-android # Intel 32 bits emulator
+# rustup target add aarch64-linux-android    # Android arm 64 bits
+# rustup target add x86_64-linux-android     # Intel 64 bits emulator
+# rustup target add armv7-linux-androideabi  # Android arm 32 bits
+# rustup target add i686-linux-android       # Intel 32 bits emulator
 
 ARCH_IOS_SIM = aarch64-apple-ios-sim
-ARCHS_IOS = x86_64-apple-ios aarch64-apple-ios aarch64-apple-ios-sim
+ARCHS_IOS = x86_64-apple-ios aarch64-apple-ios aarch64-apple-ios-macabi aarch64-apple-ios-sim
 ARCHS_ANDROID = aarch64-linux-android armv7-linux-androideabi x86_64-linux-android i686-linux-android
 LIB = libquery_engine.a
 XCFRAMEWORK = QueryEngine.xcframework
@@ -54,8 +55,8 @@ sim-release: clean
 	xcodebuild -create-xcframework -library ../../target/$(ARCH_IOS_SIM)/release/libquery_engine.a -headers include -output ios/$(XCFRAMEWORK)
 
 $(ARCHS_IOS): %:
-	cargo build -p query-engine-c-abi --release --target $@ 
+	cargo +nightly build -Z build-std -p query-engine-c-abi --release --target $@
 
 $(XCFRAMEWORK): $(ARCHS_IOS)
 	lipo -create $(wildcard ../../target/x86_64-apple-ios/release/$(LIB)) $(wildcard ../../target/aarch64-apple-ios-sim/release/$(LIB)) -output simulator_fat/libquery_engine.a
-	xcodebuild -create-xcframework -library $(wildcard ../../target/aarch64-apple-ios/release/$(LIB)) -headers include -library simulator_fat/libquery_engine.a -headers include -output ios/$@
+	xcodebuild -create-xcframework -library $(wildcard ../../target/aarch64-apple-ios/release/$(LIB)) -headers include -library $(wildcard ../../target/aarch64-apple-ios-macabi/release/$(LIB)) -headers include -library simulator_fat/libquery_engine.a -headers include -output ios/$@
