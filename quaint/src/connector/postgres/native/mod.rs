@@ -55,8 +55,8 @@ impl Debug for PostgresClient {
     }
 }
 
-const SYSTEM_NAME_POSTGRESQL: &str = "postgresql";
-const SYSTEM_NAME_COCKROACHDB: &str = "cockroachdb";
+const DB_SYSTEM_NAME_POSTGRESQL: &str = "postgresql";
+const DB_SYSTEM_NAME_COCKROACHDB: &str = "cockroachdb";
 
 /// A connector interface for the PostgreSQL database.
 #[derive(Debug)]
@@ -289,10 +289,10 @@ impl PostgreSql {
             }
         }
 
-        let system_name = if is_cockroachdb {
-            SYSTEM_NAME_COCKROACHDB
+        let db_system_name = if is_cockroachdb {
+            DB_SYSTEM_NAME_COCKROACHDB
         } else {
-            SYSTEM_NAME_POSTGRESQL
+            DB_SYSTEM_NAME_POSTGRESQL
         };
 
         Ok(Self {
@@ -303,7 +303,7 @@ impl PostgreSql {
             is_healthy: AtomicBool::new(true),
             is_cockroachdb,
             is_materialize,
-            db_system_name: system_name,
+            db_system_name,
         })
     }
 
@@ -319,7 +319,7 @@ impl PostgreSql {
             is_healthy: AtomicBool::new(true),
             is_cockroachdb: false,
             is_materialize: false,
-            db_system_name: SYSTEM_NAME_POSTGRESQL,
+            db_system_name: DB_SYSTEM_NAME_POSTGRESQL,
         })
     }
 

@@ -13,11 +13,10 @@ const ACCEPT_ATTRIBUTES: &[&str] = &[
     "db.collection.name",
     "db.operation.name",
     "itx_id",
-    "otel.kind",
 ];
 
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
-pub enum OtelKind {
+pub enum SpanKind {
     #[serde(rename = "client")]
     Client,
     #[serde(rename = "internal")]
@@ -38,7 +37,7 @@ pub struct TraceSpan {
     pub(super) events: Vec<Event>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(super) links: Vec<Link>,
-    pub(super) kind: OtelKind,
+    pub(super) kind: SpanKind,
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
@@ -56,8 +55,8 @@ impl TraceSpan {
 impl From<SpanData> for TraceSpan {
     fn from(span: SpanData) -> Self {
         let kind = match span.span_kind {
-            opentelemetry::trace::SpanKind::Client => OtelKind::Client,
-            _ => OtelKind::Internal,
+            opentelemetry::trace::SpanKind::Client => SpanKind::Client,
+            _ => SpanKind::Internal,
         };
 
         let attributes: HashMap<String, serde_json::Value> =
