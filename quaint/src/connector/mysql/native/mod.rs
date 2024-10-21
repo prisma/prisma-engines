@@ -68,6 +68,8 @@ impl MysqlUrl {
     }
 }
 
+const DB_SYSTEM_NAME: &str = "mysql";
+
 /// A connector interface for the MySQL database.
 #[derive(Debug)]
 pub struct Mysql {
@@ -195,7 +197,7 @@ impl Queryable for Mysql {
     }
 
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
-        metrics::query("mysql.query_raw", sql, params, move || async move {
+        metrics::query("mysql.query_raw", DB_SYSTEM_NAME, sql, params, move || async move {
             self.prepared(sql, |stmt| async move {
                 let mut conn = self.conn.lock().await;
                 let rows: Vec<my::Row> = conn.exec(&stmt, conversion::conv_params(params)?).await?;
@@ -280,7 +282,7 @@ impl Queryable for Mysql {
     }
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
-        metrics::query("mysql.execute_raw", sql, params, move || async move {
+        metrics::query("mysql.execute_raw", DB_SYSTEM_NAME, sql, params, move || async move {
             self.prepared(sql, |stmt| async move {
                 let mut conn = self.conn.lock().await;
                 conn.exec_drop(stmt, conversion::conv_params(params)?).await?;
@@ -297,7 +299,7 @@ impl Queryable for Mysql {
     }
 
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
-        metrics::query("mysql.raw_cmd", cmd, &[], move || async move {
+        metrics::query("mysql.raw_cmd", DB_SYSTEM_NAME, cmd, &[], move || async move {
             self.perform_io(|| async move {
                 let mut conn = self.conn.lock().await;
                 let mut result = cmd.run(&mut *conn).await?;

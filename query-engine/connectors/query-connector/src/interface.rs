@@ -9,7 +9,10 @@ pub trait Connector {
     /// Returns a connection to a data source.
     async fn get_connection(&self) -> crate::Result<Box<dyn Connection + Send + Sync>>;
 
-    /// Returns the name of the connector.
+    /// Returns the database system name, as per the OTEL spec.
+    /// Reference:
+    /// - https://opentelemetry.io/docs/specs/semconv/database/sql/
+    /// - https://opentelemetry.io/docs/specs/semconv/database/mongodb/
     fn name(&self) -> &'static str;
 
     /// Returns whether a connector should retry an entire transaction when that transaction failed during its execution

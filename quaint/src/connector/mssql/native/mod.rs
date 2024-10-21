@@ -30,6 +30,7 @@ use tokio_util::compat::{Compat, TokioAsyncWriteCompatExt};
 pub use tiberius;
 
 static SQL_SERVER_DEFAULT_ISOLATION: IsolationLevel = IsolationLevel::ReadCommitted;
+const DB_SYSTEM_NAME: &str = "mssql";
 
 #[async_trait]
 impl TransactionCapable for Mssql {
@@ -130,7 +131,7 @@ impl Queryable for Mssql {
     }
 
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
-        metrics::query("mssql.query_raw", sql, params, move || async move {
+        metrics::query("mssql.query_raw", DB_SYSTEM_NAME, sql, params, move || async move {
             let mut client = self.client.lock().await;
 
             let mut query = tiberius::Query::new(sql);
@@ -193,7 +194,7 @@ impl Queryable for Mssql {
     }
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
-        metrics::query("mssql.execute_raw", sql, params, move || async move {
+        metrics::query("mssql.execute_raw", DB_SYSTEM_NAME, sql, params, move || async move {
             let mut query = tiberius::Query::new(sql);
 
             for param in params {
@@ -213,7 +214,7 @@ impl Queryable for Mssql {
     }
 
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
-        metrics::query("mssql.raw_cmd", cmd, &[], move || async move {
+        metrics::query("mssql.raw_cmd", DB_SYSTEM_NAME, cmd, &[], move || async move {
             let mut client = self.client.lock().await;
             self.perform_io(client.simple_query(cmd)).await?.into_results().await?;
             Ok(())

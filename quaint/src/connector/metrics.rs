@@ -4,12 +4,19 @@ use crate::ast::{Params, Value};
 use crosstarget_utils::time::ElapsedTimeCounter;
 use std::future::Future;
 
-pub async fn query<'a, F, T, U>(tag: &'static str, query: &'a str, params: &'a [Value<'_>], f: F) -> crate::Result<T>
+pub async fn query<'a, F, T, U>(
+    tag: &'static str,
+    db_system_name: &'static str,
+    query: &'a str,
+    params: &'a [Value<'_>],
+    f: F,
+) -> crate::Result<T>
 where
     F: FnOnce() -> U + 'a,
     U: Future<Output = crate::Result<T>>,
 {
-    let span = info_span!("quaint:query", "db.statement" = %query);
+    let span =
+        info_span!("quaint:query", "db.system" = db_system_name, "db.statement" = %query, "otel.kind" = "client");
     do_query(tag, query, params, f).instrument(span).await
 }
 
