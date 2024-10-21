@@ -1,0 +1,15 @@
+name: bindgen setup
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install libclang
+      shell: bash
+      run: sudo apt update && sudo apt-get install -y libclang1
+
+    - uses: cargo-bins/cargo-binstall@main
+
+    - name: Install bindgen
+      shell: bash
+      run: |
+        cargo binstall -y bindgen-cli@0.69.5
