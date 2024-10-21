@@ -26,8 +26,6 @@ jobs:
         with:
           ref: ${{ inputs.commit }}
 
-      - uses: ./.github/workflows/include/bindgen-setup
-
       - uses: actions/cache@v4
         with:
           path: |
@@ -70,8 +68,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.commit }}
-
-      - uses: ./.github/workflows/include/bindgen-setup
 
       - uses: actions/cache@v4
         with:
