@@ -10,9 +10,12 @@ use connector::{Connection, ConnectionLike, Connector};
 use crosstarget_utils::time::ElapsedTimeCounter;
 use futures::future;
 
+#[cfg(not(feature = "metrics"))]
+use crate::metrics::MetricsInstrumentationStub;
 #[cfg(feature = "metrics")]
 use query_engine_metrics::{
-    counter, histogram, PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
+    counter, histogram, WithMetricsInstrumentation, PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
+    PRISMA_CLIENT_QUERIES_TOTAL,
 };
 
 use schema::{QuerySchema, QuerySchemaRef};
@@ -106,7 +109,6 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
 ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
     let mut futures = Vec::with_capacity(operations.len());
 
-    let dispatcher = crate::get_current_dispatcher();
     for op in operations {
         #[cfg(feature = "metrics")]
         counter!(PRISMA_CLIENT_QUERIES_TOTAL).increment(1);
@@ -130,7 +132,8 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
                     trace_id.clone(),
                 ),
             )
-            .with_subscriber(dispatcher.clone()),
+            .with_current_subscriber()
+            .with_current_recorder(),
         ));
     }
 
