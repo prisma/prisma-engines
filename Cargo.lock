@@ -2725,7 +2725,8 @@ checksum = "c9be0862c1b3f26a88803c4a49de6889c10e608b3ee9344e6ef5b45fb37ad3d1"
 [[package]]
 name = "mobc"
 version = "0.8.5"
-source = "git+https://github.com/importcjj/mobc.git?branch=main#4c05a47515623b5b6afbbb280ac8153089b6775e"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "316a7d198b51958a0ab57248bf5f42d8409551203cb3c821d5925819a8d5415f"
 dependencies = [
  "async-trait",
  "futures-channel",
