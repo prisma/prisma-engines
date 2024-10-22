@@ -59,6 +59,7 @@ pub struct EngineBuilder {
 pub struct ConnectedEngineNative {
     pub config_dir: PathBuf,
     pub env: HashMap<String, String>,
+    #[cfg(feature = "metrics")]
     pub metrics: Option<query_engine_metrics::MetricRegistry>,
 }
 

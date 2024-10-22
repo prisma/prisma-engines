@@ -27,6 +27,10 @@ mysql = [
     "psl/mysql",
     "request-handlers/mysql",
 ]
+metrics = [
+#    "query-core/metrics",
+#    "query-engine-common/metrics"
+]
 
 [dependencies]
 
