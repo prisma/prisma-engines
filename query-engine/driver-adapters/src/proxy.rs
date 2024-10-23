@@ -7,7 +7,7 @@ use crate::{
 use crate::{send_future::UnsafeFuture, transaction::JsTransactionContext};
 
 use futures::Future;
-use metrics::increment_gauge;
+use metrics::gauge;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
@@ -121,7 +121,7 @@ impl TransactionContextProxy {
         // Previously, it was done in JsTransaction::new, similar to the native Transaction.
         // However, correct Dispatcher is lost there and increment does not register, so we moved
         // it here instead.
-        increment_gauge!("prisma_client_queries_active", 1.0);
+        gauge!("prisma_client_queries_active").increment(1.0);
         Ok(Box::new(tx))
     }
 
