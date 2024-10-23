@@ -19,29 +19,21 @@
 //! * At the moment, with the Histogram we only support one type of bucket which is a bucket for timings in milliseconds.
 //!
 
-const METRIC_TARGET: &str = "qe_metrics";
-const METRIC_COUNTER: &str = "counter";
-const METRIC_GAUGE: &str = "gauge";
-const METRIC_HISTOGRAM: &str = "histogram";
-const METRIC_DESCRIPTION: &str = "description";
-
 mod common;
 mod formatters;
+mod instrument;
 mod recorder;
 mod registry;
 
 use once_cell::sync::Lazy;
-use recorder::*;
-pub use registry::MetricRegistry;
 use serde::Deserialize;
 use std::collections::HashMap;
-use std::sync::Once;
 
-pub extern crate metrics;
-pub use metrics::{
-    absolute_counter, decrement_gauge, describe_counter, describe_gauge, describe_histogram, gauge, histogram,
-    increment_counter, increment_gauge,
-};
+pub use metrics::{self, counter, describe_counter, describe_gauge, describe_histogram, gauge, histogram};
+
+pub use instrument::*;
+pub use recorder::MetricRecorder;
+pub use registry::MetricRegistry;
 
 // Metrics that we emit from the engines, third party metrics emitted by libraries and that we rename are omitted.
 pub const PRISMA_CLIENT_QUERIES_TOTAL: &str = "prisma_client_queries_total"; // counter
@@ -94,21 +86,8 @@ static METRIC_RENAMES: Lazy<HashMap<&'static str, (&'static str, &'static str)>>
     ])
 });
 
-pub fn setup() {
-    set_recorder();
-    initialize_metrics();
-}
-
-static METRIC_RECORDER: Once = Once::new();
-
-fn set_recorder() {
-    METRIC_RECORDER.call_once(|| {
-        metrics::set_boxed_recorder(Box::new(MetricRecorder)).unwrap();
-    });
-}
-
 /// Initialize metrics descriptions and values
-pub fn initialize_metrics() {
+pub(crate) fn initialize_metrics() {
     initialize_metrics_descriptions();
     initialize_metrics_values();
 }
@@ -145,15 +124,15 @@ fn initialize_metrics_descriptions() {
 /// Histograms are excluded, as their initialization will alter the histogram values.
 /// (i.e. histograms don't have a neutral value, like counters or gauges)
 fn initialize_metrics_values() {
-    absolute_counter!(PRISMA_CLIENT_QUERIES_TOTAL, 0);
-    absolute_counter!(PRISMA_DATASOURCE_QUERIES_TOTAL, 0);
-    gauge!(PRISMA_CLIENT_QUERIES_ACTIVE, 0.0);
-    absolute_counter!(MOBC_POOL_CONNECTIONS_OPENED_TOTAL, 0);
-    absolute_counter!(MOBC_POOL_CONNECTIONS_CLOSED_TOTAL, 0);
-    gauge!(MOBC_POOL_CONNECTIONS_OPEN, 0.0);
-    gauge!(MOBC_POOL_CONNECTIONS_BUSY, 0.0);
-    gauge!(MOBC_POOL_CONNECTIONS_IDLE, 0.0);
-    gauge!(MOBC_POOL_WAIT_COUNT, 0.0);
+    counter!(PRISMA_CLIENT_QUERIES_TOTAL).absolute(0);
+    counter!(PRISMA_DATASOURCE_QUERIES_TOTAL).absolute(0);
+    gauge!(PRISMA_CLIENT_QUERIES_ACTIVE).set(0.0);
+    counter!(MOBC_POOL_CONNECTIONS_OPENED_TOTAL).absolute(0);
+    counter!(MOBC_POOL_CONNECTIONS_CLOSED_TOTAL).absolute(0);
+    gauge!(MOBC_POOL_CONNECTIONS_OPEN).set(0.0);
+    gauge!(MOBC_POOL_CONNECTIONS_BUSY).set(0.0);
+    gauge!(MOBC_POOL_CONNECTIONS_IDLE).set(0.0);
+    gauge!(MOBC_POOL_WAIT_COUNT).set(0.0);
 }
 
 // At the moment the histogram is only used for timings. So the bounds are hard coded here
@@ -171,24 +150,16 @@ pub enum MetricFormat {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use metrics::{
-        absolute_counter, decrement_gauge, describe_counter, describe_gauge, describe_histogram, gauge, histogram,
-        increment_counter, increment_gauge, register_counter, register_gauge, register_histogram,
-    };
+    use metrics::{describe_counter, describe_gauge, describe_histogram, gauge, histogram};
     use serde_json::json;
     use std::collections::HashMap;
     use std::time::Duration;
-    use tracing::instrument::WithSubscriber;
-    use tracing::{trace, Dispatch};
-    use tracing_subscriber::layer::SubscriberExt;
+    use tracing::trace;
 
     use once_cell::sync::Lazy;
     use tokio::runtime::Runtime;
 
-    static RT: Lazy<Runtime> = Lazy::new(|| {
-        set_recorder();
-        Runtime::new().unwrap()
-    });
+    static RT: Lazy<Runtime> = Lazy::new(|| Runtime::new().unwrap());
 
     const TESTING_ACCEPT_LIST: &[&str] = &[
         "test_counter",
@@ -209,14 +180,14 @@ mod tests {
     fn test_counters() {
         RT.block_on(async {
             let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
-                let counter1 = register_counter!("test_counter");
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
+                let counter1 = counter!("test_counter");
                 counter1.increment(1);
-                increment_counter!("test_counter");
-                increment_counter!("test_counter");
+                counter!("test_counter").increment(1);
+                counter!("test_counter").increment(1);
 
-                increment_counter!("another_counter");
+                counter!("another_counter").increment(1);
 
                 let val = metrics.counter_value("test_counter").unwrap();
                 assert_eq!(val, 3);
@@ -224,11 +195,11 @@ mod tests {
                 let val2 = metrics.counter_value("another_counter").unwrap();
                 assert_eq!(val2, 1);
 
-                absolute_counter!("test_counter", 5);
+                counter!("test_counter").absolute(5);
                 let val3 = metrics.counter_value("test_counter").unwrap();
                 assert_eq!(val3, 5);
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder)
             .await;
         });
     }
@@ -237,13 +208,13 @@ mod tests {
     fn test_gauges() {
         RT.block_on(async {
             let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
-                let gauge1 = register_gauge!("test_gauge");
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
+                let gauge1 = gauge!("test_gauge");
                 gauge1.increment(1.0);
-                increment_gauge!("test_gauge", 1.0);
-                increment_gauge!("test_gauge", 1.0);
-                increment_gauge!("another_gauge", 1.0);
+                gauge!("test_gauge").increment(1.0);
+                gauge!("test_gauge").increment(1.0);
+                gauge!("another_gauge").increment(1.0);
 
                 let val = metrics.gauge_value("test_gauge").unwrap();
                 assert_eq!(val, 3.0);
@@ -253,15 +224,15 @@ mod tests {
 
                 assert_eq!(None, metrics.counter_value("test_gauge"));
 
-                gauge!("test_gauge", 5.0);
+                gauge!("test_gauge").set(5.0);
                 let val3 = metrics.gauge_value("test_gauge").unwrap();
                 assert_eq!(val3, 5.0);
 
-                decrement_gauge!("test_gauge", 2.0);
+                gauge!("test_gauge").decrement(2.0);
                 let val4 = metrics.gauge_value("test_gauge").unwrap();
                 assert_eq!(val4, 3.0);
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder)
             .await;
         });
     }
@@ -270,19 +241,19 @@ mod tests {
     fn test_no_panic_and_ignore_other_traces() {
         RT.block_on(async {
             let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
                 trace!("a fake trace");
 
-                increment_gauge!("test_gauge", 1.0);
-                increment_counter!("test_counter");
+                gauge!("test_gauge").set(1.0);
+                counter!("test_counter").increment(1);
 
                 trace!("another fake trace");
 
                 assert_eq!(1.0, metrics.gauge_value("test_gauge").unwrap());
                 assert_eq!(1, metrics.counter_value("test_counter").unwrap());
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder)
             .await;
         });
     }
@@ -291,15 +262,15 @@ mod tests {
     fn test_ignore_non_accepted_metrics() {
         RT.block_on(async {
             let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
-                increment_gauge!("not_accepted", 1.0);
-                increment_gauge!("test_gauge", 1.0);
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
+                gauge!("not_accepted").set(1.0);
+                gauge!("test_gauge").set(1.0);
 
                 assert_eq!(1.0, metrics.gauge_value("test_gauge").unwrap());
                 assert_eq!(None, metrics.gauge_value("not_accepted"));
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder)
             .await;
         });
     }
@@ -308,17 +279,17 @@ mod tests {
     fn test_histograms() {
         RT.block_on(async {
             let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
-                let hist = register_histogram!("test_histogram");
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
+                let hist = histogram!("test_histogram");
                 hist.record(Duration::from_millis(9));
 
-                histogram!("test_histogram", Duration::from_millis(100));
-                histogram!("test_histogram", Duration::from_millis(1));
+                histogram!("test_histogram").record(Duration::from_millis(100));
+                histogram!("test_histogram").record(Duration::from_millis(1));
 
-                histogram!("test_histogram", Duration::from_millis(1999));
-                histogram!("test_histogram", Duration::from_millis(3999));
-                histogram!("test_histogram", Duration::from_millis(610));
+                histogram!("test_histogram").record(Duration::from_millis(1999));
+                histogram!("test_histogram").record(Duration::from_millis(3999));
+                histogram!("test_histogram").record(Duration::from_millis(610));
 
                 let hist = metrics.histogram_values("test_histogram").unwrap();
                 let expected: Vec<(f64, u64)> = Vec::from([
@@ -336,7 +307,7 @@ mod tests {
 
                 assert_eq!(hist.buckets(), expected);
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder)
             .await;
         });
     }
@@ -345,8 +316,8 @@ mod tests {
     fn test_set_and_read_descriptions() {
         RT.block_on(async {
             let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
                 describe_counter!("test_counter", "This is a counter");
 
                 let descriptions = metrics.get_descriptions();
@@ -367,7 +338,7 @@ mod tests {
                 let description = descriptions.get("test_histogram").unwrap();
                 assert_eq!("This is a hist", description);
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder)
             .await;
         });
     }
@@ -376,8 +347,8 @@ mod tests {
     fn test_to_json() {
         RT.block_on(async {
             let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
                 let empty = json!({
                     "counters": [],
                     "gauges": [],
@@ -386,21 +357,21 @@ mod tests {
 
                 assert_eq!(metrics.to_json(Default::default()), empty);
 
-                absolute_counter!("counter_1", 4, "label" => "one");
+                counter!("counter_1", "label" => "one").absolute(4);
                 describe_counter!("counter_2", "this is a description for counter 2");
-                absolute_counter!("counter_2", 2, "label" => "one", "another_label" => "two");
+                counter!("counter_2", "label" => "one", "another_label" => "two").absolute(2);
 
                 describe_gauge!("gauge_1", "a description for gauge 1");
-                gauge!("gauge_1", 7.0);
-                gauge!("gauge_2", 3.0, "label" => "three");
+                gauge!("gauge_1").set(7.0);
+                gauge!("gauge_2", "label" => "three").set(3.0);
 
                 describe_histogram!("histogram_1", "a description for histogram");
-                let hist = register_histogram!("histogram_1", "label" => "one", "hist_two" => "two");
+                let hist = histogram!("histogram_1", "label" => "one", "hist_two" => "two");
                 hist.record(Duration::from_millis(9));
 
-                histogram!("histogram_2", Duration::from_millis(9));
-                histogram!("histogram_2", Duration::from_millis(1000));
-                histogram!("histogram_2", Duration::from_millis(40));
+                histogram!("histogram_2").record(Duration::from_millis(9));
+                histogram!("histogram_2").record(Duration::from_millis(1000));
+                histogram!("histogram_2").record(Duration::from_millis(40));
 
                 let json = metrics.to_json(Default::default());
                 let expected = json!({
@@ -448,7 +419,7 @@ mod tests {
 
                 assert_eq!(json, expected);
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder)
             .await;
         });
     }
@@ -457,12 +428,12 @@ mod tests {
     fn test_global_and_metric_labels() {
         RT.block_on(async {
             let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
-                let hist = register_histogram!("test_histogram", "label" => "one", "two" => "another");
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
+                let hist = histogram!("test_histogram", "label" => "one", "two" => "another");
                 hist.record(Duration::from_millis(9));
 
-                absolute_counter!("counter_1", 1);
+                counter!("counter_1").absolute(1);
 
                 let mut global_labels: HashMap<String, String> = HashMap::new();
                 global_labels.insert("global_one".to_string(), "one".to_string());
@@ -491,7 +462,7 @@ mod tests {
                 });
                 assert_eq!(expected, json);
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder)
             .await;
         });
     }
@@ -500,21 +471,21 @@ mod tests {
     fn test_prometheus_format() {
         RT.block_on(async {
             let metrics = MetricRegistry::new_with_accept_list(TESTING_ACCEPT_LIST.to_vec());
-            let dispatch = Dispatch::new(tracing_subscriber::Registry::default().with(metrics.clone()));
-            async {
-                absolute_counter!("counter_1", 4, "label" => "one");
+            let recorder = MetricRecorder::new(metrics.clone());
+            async move {
+                counter!("counter_1", "label" => "one").absolute(4);
                 describe_counter!("counter_2", "this is a description for counter 2");
-                absolute_counter!("counter_2", 2, "label" => "one", "another_label" => "two");
+                counter!("counter_2", "label" => "one", "another_label" => "two").absolute(2);
 
                 describe_gauge!("gauge_1", "a description for gauge 1");
-                gauge!("gauge_1", 7.0);
-                gauge!("gauge_2", 3.0, "label" => "three");
+                gauge!("gauge_1").set(7.0);
+                gauge!("gauge_2", "label" => "three").set(3.0);
 
                 describe_histogram!("histogram_1", "a description for histogram");
-                let hist = register_histogram!("histogram_1", "label" => "one", "hist_two" => "two");
+                let hist = histogram!("histogram_1", "label" => "one", "hist_two" => "two");
                 hist.record(Duration::from_millis(9));
 
-                histogram!("histogram_2", Duration::from_millis(1000));
+                histogram!("histogram_2").record(Duration::from_millis(1000));
 
                 let mut global_labels: HashMap<String, String> = HashMap::new();
                 global_labels.insert("global_two".to_string(), "two".to_string());
@@ -574,7 +545,7 @@ mod tests {
 
                 snapshot.assert_eq(&prometheus);
             }
-            .with_subscriber(dispatch)
+            .with_recorder(recorder)
             .await;
         });
     }

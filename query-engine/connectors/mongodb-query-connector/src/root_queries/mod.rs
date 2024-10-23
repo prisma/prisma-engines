@@ -14,8 +14,7 @@ use bson::Bson;
 use bson::Document;
 use futures::Future;
 use query_engine_metrics::{
-    histogram, increment_counter, metrics, PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
-    PRISMA_DATASOURCE_QUERIES_TOTAL,
+    counter, histogram, PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, PRISMA_DATASOURCE_QUERIES_TOTAL,
 };
 use query_structure::*;
 use std::sync::Arc;
@@ -85,8 +84,8 @@ where
     let res = f().instrument(span).await;
     let elapsed = start.elapsed().as_millis() as f64;
 
-    histogram!(PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, elapsed);
-    increment_counter!(PRISMA_DATASOURCE_QUERIES_TOTAL);
+    histogram!(PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS).record(elapsed);
+    counter!(PRISMA_DATASOURCE_QUERIES_TOTAL).increment(1);
 
     // TODO prisma/team-orm#136: fix log subscription.
     // NOTE: `params` is a part of the interface for query logs.
