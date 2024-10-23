@@ -11,18 +11,27 @@ use pin_project::pin_project;
 use crate::MetricRecorder;
 
 thread_local! {
+    /// The current metric recorder temporarily set on the current thread while polling a future.
+    ///
+    /// See the description of `GLOBAL_RECORDER` in [`crate::recorder`] module for more
+    /// information.
     static CURRENT_RECORDER: RefCell<Option<MetricRecorder>> = const { RefCell::new(None) };
 }
 
 /// Instruments a type with a metrics recorder.
 ///
-/// The instrumentation logic is currently only implemented for futures, but it can be extended to
-/// support streams, sinks, and other types in the future when needed.
+/// The instrumentation logic is currently only implemented for futures, but it could be extended
+/// to support streams, sinks, and other types later if needed. Right now we only need it to be
+/// able to set the initial recorder in the Node-API engine methods and forward the recorder to
+/// spawned tokio tasks; in other words, to instrument the top-level future of each task.
 pub trait WithMetricsInstrumentation: Sized {
+    /// Instruments the type with a [`MetricRecorder`].
     fn with_recorder(self, recorder: MetricRecorder) -> WithRecorder<Self> {
         WithRecorder { inner: self, recorder }
     }
 
+    /// Instruments the type with an [`MetricRecorder`] if it is a `Some` or returns `self` as is
+    /// if the `recorder` is a `None`.
     fn with_optional_recorder(self, recorder: Option<MetricRecorder>) -> Either<WithRecorder<Self>, Self> {
         match recorder {
             Some(recorder) => Either::Left(self.with_recorder(recorder)),
@@ -30,6 +39,9 @@ pub trait WithMetricsInstrumentation: Sized {
         }
     }
 
+    /// Instruments the type with the current [`MetricRecorder`] from the parent context on this
+    /// thread, or the default global recorder otherwise. If neither is set, then `self` is
+    /// returned as is.
     fn with_current_recorder(self) -> Either<WithRecorder<Self>, Self> {
         CURRENT_RECORDER.with_borrow(|recorder| {
             let recorder = recorder.clone().or_else(crate::recorder::global_recorder);
