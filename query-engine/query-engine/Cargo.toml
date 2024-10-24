@@ -40,6 +40,7 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 serial_test = "*"
 quaint.workspace = true
 indoc.workspace = true
+indexmap.workspace = true
 
 [build-dependencies]
 build-utils.path = "../../libs/build-utils"

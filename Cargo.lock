@@ -3870,6 +3870,7 @@ dependencies = [
  "enumflags2",
  "graphql-parser",
  "hyper",
+ "indexmap 2.2.2",
  "indoc 2.0.3",
  "mongodb-query-connector",
  "opentelemetry",
