@@ -59,7 +59,7 @@ impl<T> WithMetricsInstrumentation for T {}
 /// the previous recorder on the stack.
 ///
 /// Similar logic can be implemented for cases where `T` is another async primitive like a stream
-/// or a sink, or any other type where such instrumentation makes sense (e.g. function).
+/// or a sink, or any other type where such instrumentation makes sense (e.g. a function).
 #[pin_project]
 pub struct WithRecorder<T> {
     #[pin]
