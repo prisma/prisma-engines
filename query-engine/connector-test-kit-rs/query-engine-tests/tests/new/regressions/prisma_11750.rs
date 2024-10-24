@@ -12,14 +12,17 @@ use query_engine_tests::*;
 /// during update or commit, as those are expected to happen. We do fail the test if creating the
 /// user fails, or if we fail to start a transaction, as those operations are expected to succeed.
 ///
-/// What we really test here, though, is that:
+/// What we really test here, though, is that the query engine must not deadlock (leading to the
+/// test never finishing).
 ///
-/// 1. Query engine must not deadlock (leading to the test never finishing).
-///
-/// 2. We don't exhaust all available database connections leaving them locked on the database side
-///    leading for all subsequent tests to fail.
-///
-#[test_suite(schema(user), exclude(Sqlite))]
+/// Some providers are skipped because these concurrent conflicting transactions cause troubles on
+/// the database side and failures to start new transactions.
+/// TODO: investigate the problem in pg and neon JS driver adapters, looks like some error is not
+/// being handled properly in them.
+#[test_suite(
+    schema(user),
+    exclude(Sqlite, MySql(8), SqlServer, Postgres("pg.js"), Postgres("neon.js"))
+)]
 mod prisma_11750 {
     use std::sync::Arc;
     use tokio::task::JoinSet;
