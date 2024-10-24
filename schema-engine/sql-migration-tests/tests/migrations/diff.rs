@@ -7,6 +7,95 @@ use schema_core::{
 use sql_migration_tests::{test_api::*, utils::to_schema_containers};
 use std::sync::Arc;
 
+#[test_connector(tags(Sqlite, Mysql, Postgres, CockroachDb, Mssql))]
+fn from_unique_index_to_without(mut api: TestApi) {
+    let tempdir = tempfile::tempdir().unwrap();
+    let host = Arc::new(TestConnectorHost::default());
+
+    api.connector.set_host(host.clone());
+
+    let from_schema = api.datamodel_with_provider(
+        r#"
+            model Post {
+                id       Int    @id
+                title    String
+                author   User?  @relation(fields: [authorId], references: [id])
+                authorId Int?   @unique
+                //              ^^^^^^^ this will be removed later
+            }
+
+            model User {
+                id    Int     @id
+                name  String?
+                posts Post[]
+            }
+        "#,
+    );
+
+    let to_schema = api.datamodel_with_provider(
+        r#"
+            model Post {
+                id       Int    @id
+                title    String
+                author   User?  @relation(fields: [authorId], references: [id])
+                authorId Int?
+            }
+
+            model User {
+                id    Int     @id
+                name  String?
+                posts Post[]
+            }
+        "#,
+    );
+
+    let from_file = write_file_to_tmp(&from_schema, &tempdir, "from");
+    let to_file = write_file_to_tmp(&to_schema, &tempdir, "to");
+
+    api.diff(DiffParams {
+        exit_code: None,
+        from: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: from_file.to_string_lossy().into_owned(),
+                content: from_schema.to_string(),
+            }],
+        }),
+        shadow_database_url: None,
+        to: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: to_file.to_string_lossy().into_owned(),
+                content: to_schema.to_string(),
+            }],
+        }),
+        script: true,
+    })
+    .unwrap();
+
+    let expected_printed_messages = if api.is_mysql() {
+        expect![[r#"
+            [
+                "-- DropIndex\nDROP INDEX `Post_authorId_key` ON `Post`;\n",
+            ]
+        "#]]
+    } else if api.is_sqlite() || api.is_postgres() || api.is_cockroach() {
+        expect![[r#"
+            [
+                "-- DropIndex\nDROP INDEX \"Post_authorId_key\";\n",
+            ]
+        "#]]
+    } else if api.is_mssql() {
+        expect![[r#"
+            [
+                "BEGIN TRY\n\nBEGIN TRAN;\n\n-- DropIndex\nDROP INDEX [Post_authorId_key] ON [dbo].[Post];\n\nCOMMIT TRAN;\n\nEND TRY\nBEGIN CATCH\n\nIF @@TRANCOUNT > 0\nBEGIN\n    ROLLBACK TRAN;\nEND;\nTHROW\n\nEND CATCH\n",
+            ]
+        "#]]
+    } else {
+        unreachable!()
+    };
+
+    expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
+}
+
 #[test_connector(tags(Sqlite))]
 fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
     // We should get a postgres diff.
