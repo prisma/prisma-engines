@@ -63,7 +63,7 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
         SchemaPosition::TopLevel => None,
 
         // --- Block Names ---
-        SchemaPosition::Model(model_id, ModelPosition::Name(name)) => {
+        SchemaPosition::Model(model_id, ModelPosition::Name(name, _)) => {
             let model = ctx.db.walk((ctx.initiating_file_id, model_id)).ast_model();
             let variant = if model.is_view() { "view" } else { "model" };
 
@@ -74,17 +74,17 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
                 None,
             ))
         }
-        SchemaPosition::Enum(enum_id, EnumPosition::Name(name)) => {
+        SchemaPosition::Enum(enum_id, EnumPosition::Name(name, _)) => {
             let enm = ctx.db.walk((ctx.initiating_file_id, enum_id)).ast_enum();
             Some(hover_enum(enm, name))
         }
-        SchemaPosition::CompositeType(ct_id, CompositeTypePosition::Name(name)) => {
+        SchemaPosition::CompositeType(ct_id, CompositeTypePosition::Name(name, _)) => {
             let ct = ctx.db.walk((ctx.initiating_file_id, ct_id)).ast_composite_type();
             Some(hover_composite(ct, name))
         }
 
         // --- Block Field Names ---
-        SchemaPosition::Model(model_id, ModelPosition::Field(field_id, FieldPosition::Name(name))) => {
+        SchemaPosition::Model(model_id, ModelPosition::Field(field_id, FieldPosition::Name(name, _))) => {
             let field = ctx
                 .db
                 .walk((ctx.initiating_file_id, model_id))
@@ -98,7 +98,7 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
                 None,
             ))
         }
-        SchemaPosition::CompositeType(ct_id, CompositeTypePosition::Field(field_id, FieldPosition::Name(name))) => {
+        SchemaPosition::CompositeType(ct_id, CompositeTypePosition::Field(field_id, FieldPosition::Name(name, _))) => {
             let field = ctx.db.walk((ctx.initiating_file_id, ct_id)).field(field_id).ast_field();
 
             Some(format_hover_content(
@@ -108,7 +108,7 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
                 None,
             ))
         }
-        SchemaPosition::Enum(enm_id, EnumPosition::Value(value_id, EnumValuePosition::Name(name))) => {
+        SchemaPosition::Enum(enm_id, EnumPosition::Value(value_id, EnumValuePosition::Name(name, _))) => {
             let value = ctx
                 .db
                 .walk((ctx.initiating_file_id, enm_id))
@@ -124,7 +124,7 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
         }
 
         // --- Block Field Types ---
-        SchemaPosition::Model(model_id, ModelPosition::Field(field_id, FieldPosition::Type(name))) => {
+        SchemaPosition::Model(model_id, ModelPosition::Field(field_id, FieldPosition::Type(name, _))) => {
             let initiating_field = &ctx.db.walk((ctx.initiating_file_id, model_id)).field(field_id);
 
             initiating_field.refine().and_then(|field| match field {
@@ -158,7 +158,7 @@ fn hover(ctx: HoverContext<'_>) -> Option<Hover> {
             })
         }
 
-        SchemaPosition::CompositeType(ct_id, CompositeTypePosition::Field(field_id, FieldPosition::Type(_))) => {
+        SchemaPosition::CompositeType(ct_id, CompositeTypePosition::Field(field_id, FieldPosition::Type(_, _))) => {
             let field = &ctx.db.walk((ctx.initiating_file_id, ct_id)).field(field_id);
             match field.r#type() {
                 psl::parser_database::ScalarFieldType::CompositeType(_) => {
