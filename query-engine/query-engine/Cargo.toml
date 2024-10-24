@@ -38,6 +38,7 @@ telemetry = { path = "../../libs/telemetry" }
 serial_test = "*"
 quaint.workspace = true
 indoc.workspace = true
+indexmap.workspace = true
 
 [build-dependencies]
 build-utils.path = "../../libs/build-utils"
