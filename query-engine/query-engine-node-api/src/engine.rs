@@ -9,7 +9,7 @@ use query_engine_common::engine::{
     map_known_error, stringify_env_values, ConnectedEngine, ConnectedEngineNative, ConstructorOptions,
     ConstructorOptionsNative, EngineBuilder, EngineBuilderNative, Inner,
 };
-use query_engine_metrics::MetricFormat;
+use query_engine_metrics::{MetricFormat, WithMetricsInstrumentation};
 use request_handlers::{load_executor, render_graphql_schema, ConnectorKind, RequestBody, RequestHandler};
 use serde::Deserialize;
 use serde_json::json;
@@ -151,21 +151,6 @@ impl QueryEngine {
         let log_level = log_level.parse::<LevelFilter>().unwrap();
         let logger = Logger::new(log_queries, log_level, log_callback, enable_metrics, enable_tracing);
 
-        // Describe metrics adds all the descriptions and default values for our metrics
-        // this needs to run once our metrics pipeline has been configured and it needs to
-        // use the correct logging subscriber(our dispatch) so that the metrics recorder recieves
-        // it
-        if enable_metrics {
-            napi_env.execute_tokio_future(
-                async {
-                    query_engine_metrics::initialize_metrics();
-                    Ok(())
-                }
-                .with_subscriber(logger.dispatcher()),
-                |&mut _env, _data| Ok(()),
-            )?;
-        }
-
         Ok(Self {
             connector_mode,
             inner: RwLock::new(Inner::Builder(builder)),
@@ -177,6 +162,7 @@ impl QueryEngine {
     #[napi]
     pub async fn connect(&self, trace: String) -> napi::Result<()> {
         let dispatcher = self.logger.dispatcher();
+        let recorder = self.logger.recorder();
 
         async_panic_to_js_error(async {
             let span = tracing::info_span!("prisma:engine:connect", user_facing = true);
@@ -271,6 +257,7 @@ impl QueryEngine {
             Ok(())
         })
         .with_subscriber(dispatcher)
+        .with_optional_recorder(recorder)
         .await?;
 
         Ok(())
@@ -280,6 +267,7 @@ impl QueryEngine {
     #[napi]
     pub async fn disconnect(&self, trace: String) -> napi::Result<()> {
         let dispatcher = self.logger.dispatcher();
+        let recorder = self.logger.recorder();
 
         async_panic_to_js_error(async {
             let span = tracing::info_span!("prisma:engine:disconnect", user_facing = true);
@@ -309,6 +297,7 @@ impl QueryEngine {
             .await
         })
         .with_subscriber(dispatcher)
+        .with_optional_recorder(recorder)
         .await
     }
 
@@ -316,6 +305,7 @@ impl QueryEngine {
     #[napi]
     pub async fn query(&self, body: String, trace: String, tx_id: Option<String>) -> napi::Result<String> {
         let dispatcher = self.logger.dispatcher();
+        let recorder = self.logger.recorder();
 
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
@@ -339,6 +329,7 @@ impl QueryEngine {
             .await
         })
         .with_subscriber(dispatcher)
+        .with_optional_recorder(recorder)
         .await
     }
 
@@ -346,6 +337,7 @@ impl QueryEngine {
     #[napi]
     pub async fn start_transaction(&self, input: String, trace: String) -> napi::Result<String> {
         let dispatcher = self.logger.dispatcher();
+        let recorder = self.logger.recorder();
 
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
@@ -370,6 +362,7 @@ impl QueryEngine {
             .await
         })
         .with_subscriber(dispatcher)
+        .with_optional_recorder(recorder)
         .await
     }
 
@@ -381,6 +374,7 @@ impl QueryEngine {
             let engine = inner.as_engine()?;
 
             let dispatcher = self.logger.dispatcher();
+            let recorder = self.logger.recorder();
 
             async move {
                 let span = tracing::info_span!("prisma:engine:commit_transaction", user_facing = true);
@@ -393,6 +387,7 @@ impl QueryEngine {
                 }
             }
             .with_subscriber(dispatcher)
+            .with_optional_recorder(recorder)
             .await
         })
         .await
@@ -406,6 +401,7 @@ impl QueryEngine {
             let engine = inner.as_engine()?;
 
             let dispatcher = self.logger.dispatcher();
+            let recorder = self.logger.recorder();
 
             async move {
                 let span = tracing::info_span!("prisma:engine:rollback_transaction", user_facing = true);
@@ -418,6 +414,7 @@ impl QueryEngine {
                 }
             }
             .with_subscriber(dispatcher)
+            .with_optional_recorder(recorder)
             .await
         })
         .await
@@ -426,17 +423,25 @@ impl QueryEngine {
     /// Loads the query schema. Only available when connected.
     #[napi]
     pub async fn sdl_schema(&self) -> napi::Result<String> {
+        let dispatcher = self.logger.dispatcher();
+        let recorder = self.logger.recorder();
+
         async_panic_to_js_error(async move {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
 
             Ok(render_graphql_schema(engine.query_schema()))
         })
+        .with_subscriber(dispatcher)
+        .with_optional_recorder(recorder)
         .await
     }
 
     #[napi]
     pub async fn metrics(&self, json_options: String) -> napi::Result<String> {
+        let dispatcher = self.logger.dispatcher();
+        let recorder = self.logger.recorder();
+
         async_panic_to_js_error(async move {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
@@ -457,6 +462,8 @@ impl QueryEngine {
                 .into())
             }
         })
+        .with_subscriber(dispatcher)
+        .with_optional_recorder(recorder)
         .await
     }
 }

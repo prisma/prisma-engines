@@ -8,8 +8,7 @@ use query_core::{
     schema::{self, QuerySchemaRef},
     QueryExecutor,
 };
-use query_engine_metrics::setup as metric_setup;
-use query_engine_metrics::MetricRegistry;
+use query_engine_metrics::{MetricRecorder, MetricRegistry};
 use request_handlers::{load_executor, ConnectorKind};
 use std::{env, fmt, sync::Arc};
 use tracing::Instrument;
@@ -113,16 +112,18 @@ impl PrismaContext {
     }
 }
 
-pub async fn setup(opts: &PrismaOpt, metrics: Option<MetricRegistry>) -> PrismaResult<Arc<PrismaContext>> {
-    let metrics = metrics.unwrap_or_default();
+pub async fn setup(opts: &PrismaOpt) -> PrismaResult<Arc<PrismaContext>> {
+    Logger::new("prisma-engine-http", opts).install().unwrap();
 
-    Logger::new("prisma-engine-http", Some(metrics.clone()), opts)
-        .install()
-        .unwrap();
-
-    if opts.enable_metrics || opts.dataproxy_metric_override {
-        metric_setup();
-    }
+    let metrics = if opts.enable_metrics || opts.dataproxy_metric_override {
+        let metrics = MetricRegistry::new();
+        let recorder = MetricRecorder::new(metrics.clone());
+        recorder.install_globally().expect("setup must be called only once");
+        recorder.init_prisma_metrics();
+        Some(metrics)
+    } else {
+        None
+    };
 
     let datamodel = opts.schema(false)?;
     let config = &datamodel.configuration;
@@ -141,7 +142,7 @@ pub async fn setup(opts: &PrismaOpt, metrics: Option<MetricRegistry>) -> PrismaR
         features |= Feature::Metrics
     }
 
-    let cx = PrismaContext::new(datamodel, protocol, features, Some(metrics))
+    let cx = PrismaContext::new(datamodel, protocol, features, metrics)
         .instrument(span)
         .await?;
 

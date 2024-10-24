@@ -22,7 +22,7 @@ user-facing-errors.workspace = true
 prisma-value = { path = "../../../libs/prisma-value" }
 query-engine-metrics = { path = "../../metrics"}
 once_cell = "1.15.0"
-futures = "0.3"
+futures.workspace = true
 paste = "1.0.14"
 
 [dev-dependencies]

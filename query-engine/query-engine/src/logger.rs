@@ -3,7 +3,6 @@ use opentelemetry::{
     KeyValue,
 };
 use opentelemetry_otlp::WithExportConfig;
-use query_engine_metrics::MetricRegistry;
 use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
 use tracing_subscriber::{filter::filter_fn, layer::SubscriberExt, Layer};
 
@@ -18,7 +17,6 @@ pub(crate) struct Logger {
     log_format: LogFormat,
     log_queries: bool,
     tracing_config: TracingConfig,
-    metrics: Option<MetricRegistry>,
 }
 
 // TracingConfig specifies how tracing will be exposed by the logger facility
@@ -37,7 +35,7 @@ enum TracingConfig {
 
 impl Logger {
     /// Initialize a new global logger installer.
-    pub fn new(service_name: &'static str, metrics: Option<MetricRegistry>, opts: &PrismaOpt) -> Self {
+    pub fn new(service_name: &'static str, opts: &PrismaOpt) -> Self {
         let enable_telemetry = opts.enable_open_telemetry;
         let enable_capturing = opts.enable_telemetry_in_response;
         let endpoint = if opts.open_telemetry_endpoint.is_empty() {
@@ -57,7 +55,6 @@ impl Logger {
             service_name,
             log_format: opts.log_format(),
             log_queries: opts.log_queries(),
-            metrics,
             tracing_config,
         }
     }
@@ -80,9 +77,7 @@ impl Logger {
             }
         };
 
-        let subscriber = tracing_subscriber::registry()
-            .with(fmt_layer)
-            .with(self.metrics.clone());
+        let subscriber = tracing_subscriber::registry().with(fmt_layer);
 
         match self.tracing_config {
             TracingConfig::Captured => {

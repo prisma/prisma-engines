@@ -26,6 +26,7 @@ pub use connector::{
 mod error;
 mod interactive_transactions;
 mod interpreter;
+mod metrics;
 mod query_ast;
 mod query_graph;
 mod result_ast;

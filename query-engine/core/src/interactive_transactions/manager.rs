@@ -12,6 +12,12 @@ use tokio::{
     },
     time::Duration,
 };
+use tracing_futures::WithSubscriber;
+
+#[cfg(not(feature = "metrics"))]
+use crate::metrics::MetricsInstrumentationStub;
+#[cfg(feature = "metrics")]
+use query_engine_metrics::WithMetricsInstrumentation;
 
 use super::{TransactionError, TxId};
 
@@ -84,6 +90,8 @@ impl ItxManager {
                     closed_txs.write().await.put(tx_id, closed_tx);
                 }
             }
+            .with_current_subscriber()
+            .with_current_recorder()
         });
 
         Self {
