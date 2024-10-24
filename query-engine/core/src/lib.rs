@@ -3,6 +3,7 @@
 #[macro_use]
 extern crate tracing;
 
+pub mod compiler;
 pub mod constants;
 pub mod executor;
 pub mod protocol;
