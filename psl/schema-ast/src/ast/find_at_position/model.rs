@@ -1,4 +1,4 @@
-use super::{AttributePosition, FieldPosition, WithName, WithSpan};
+use super::{AttributePosition, FieldPosition, WithIdentifier, WithName, WithSpan};
 
 use crate::ast::{self};
 
@@ -40,7 +40,7 @@ pub enum ModelPosition<'ast> {
 
 impl<'ast> ModelPosition<'ast> {
     pub(crate) fn new(model: &'ast ast::Model, position: usize) -> Self {
-        if model.name.span.contains(position) {
+        if model.identifier().span().contains(position) {
             return ModelPosition::Name(model.name());
         }
 
@@ -52,7 +52,7 @@ impl<'ast> ModelPosition<'ast> {
 
         for (attr_id, attr) in model.attributes.iter().enumerate() {
             if attr.span().contains(position) {
-                return ModelPosition::ModelAttribute(&attr.name.name, attr_id, AttributePosition::new(attr, position));
+                return ModelPosition::ModelAttribute(attr.name(), attr_id, AttributePosition::new(attr, position));
             }
         }
 

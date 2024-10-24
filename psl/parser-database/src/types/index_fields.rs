@@ -1,3 +1,5 @@
+use schema_ast::ast::WithSpan;
+
 use crate::{ast, coerce, types::SortOrder, DatamodelError};
 
 pub(crate) enum OperatorClass<'a> {
@@ -62,29 +64,28 @@ pub(crate) fn coerce_field_array_with_args<'a>(
 }
 
 fn field_args<'a>(args: &'a [ast::Argument], diagnostics: &mut diagnostics::Diagnostics) -> FieldArguments<'a> {
-    let sort_order = args
-        .iter()
-        .find(|arg| arg.name.as_ref().map(|n| n.name.as_str()) == Some("sort"))
-        .and_then(|arg| match coerce::constant(&arg.value, diagnostics) {
+    let sort_order = args.iter().find(|arg| arg.name() == Some("sort")).and_then(|arg| {
+        match coerce::constant(&arg.value, diagnostics) {
             Some("Asc") => Some(SortOrder::Asc),
             Some("Desc") => Some(SortOrder::Desc),
             Some(_) => {
-                diagnostics.push_error(DatamodelError::new_parser_error("Asc, Desc".to_owned(), arg.span));
+                diagnostics.push_error(DatamodelError::new_parser_error("Asc, Desc".to_owned(), arg.span()));
                 None
             }
             None => None,
-        });
+        }
+    });
 
     let length = args
         .iter()
-        .find(|arg| arg.name.as_ref().map(|n| n.name.as_str()) == Some("length"))
+        .find(|arg| arg.name() == Some("length"))
         .and_then(|arg| coerce::integer(&arg.value, diagnostics))
         .filter(|i| *i >= 0)
         .map(|i| i as u32);
 
     let operator_class = args
         .iter()
-        .find(|arg| arg.name.as_ref().map(|n| n.name.as_str()) == Some("ops"))
+        .find(|arg| arg.name() == Some("ops"))
         .and_then(|arg| match &arg.value {
             ast::Expression::ConstantValue(s, span) => match s.as_str() {
                 // gist
@@ -184,7 +185,10 @@ fn field_args<'a>(args: &'a [ast::Argument], diagnostics: &mut diagnostics::Diag
                 _ => panic!(),
             },
             _ => {
-                diagnostics.push_error(DatamodelError::new_parser_error("operator class".to_owned(), arg.span));
+                diagnostics.push_error(DatamodelError::new_parser_error(
+                    "operator class".to_owned(),
+                    arg.span(),
+                ));
                 None
             }
         });

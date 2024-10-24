@@ -568,7 +568,7 @@ fn model_unique(data: &mut ModelAttributes, model_id: crate::ModelId, ctx: &mut 
         };
 
         if let Some(name) = name {
-            validate_client_name(current_attribute.span, ast_model.name(), name, "@@unique", ctx);
+            validate_client_name(current_attribute.span(), ast_model.name(), name, "@@unique", ctx);
         }
 
         mapped_name
@@ -595,7 +595,7 @@ fn common_index_validations(
         }
     };
 
-    match resolve_field_array_with_args(fields, current_attribute.span, model_id, resolving, ctx) {
+    match resolve_field_array_with_args(fields, current_attribute.span(), model_id, resolving, ctx) {
         Ok(fields) => {
             index_data.fields = fields;
         }
@@ -625,7 +625,7 @@ fn common_index_validations(
                         fields.join(", "),
                     );
                     let model_name = ctx.asts[model_id].name();
-                    DatamodelError::new_model_validation_error(message, "model", model_name, current_attribute.span)
+                    DatamodelError::new_model_validation_error(message, "model", model_name, current_attribute.span())
                 });
             }
 
@@ -668,7 +668,7 @@ fn common_index_validations(
                     ),
                     "model",
                     ctx.asts[model_id].name(),
-                    current_attribute.span,
+                    current_attribute.span(),
                 ));
             }
         }
@@ -681,7 +681,7 @@ fn visit_relation(model_id: crate::ModelId, relation_field_id: RelationFieldId, 
     ctx.types[relation_field_id].relation_attribute = Some(ctx.current_attribute_id().1);
 
     if let Some(fields) = ctx.visit_optional_arg("fields") {
-        let fields = match resolve_field_array_without_args(fields, attr.span, model_id, ctx) {
+        let fields = match resolve_field_array_without_args(fields, attr.span(), model_id, ctx) {
             Ok(fields) => fields,
             Err(FieldResolutionError::AlreadyDealtWith) => Vec::new(),
             Err(FieldResolutionError::ProblematicFields {
@@ -722,7 +722,7 @@ fn visit_relation(model_id: crate::ModelId, relation_field_id: RelationFieldId, 
     if let Some(references) = ctx.visit_optional_arg("references") {
         let references = match resolve_field_array_without_args(
             references,
-            attr.span,
+            attr.span(),
             ctx.types[relation_field_id].referenced_model,
             ctx,
         ) {
@@ -745,7 +745,7 @@ fn visit_relation(model_id: crate::ModelId, relation_field_id: RelationFieldId, 
                         "The argument `references` must refer only to existing fields in the related model `{model_name}`. The following fields do not exist in the related model: {field_names}",
                     );
 
-                    ctx.push_error(DatamodelError::new_validation_error(&msg, attr.span));
+                    ctx.push_error(DatamodelError::new_validation_error(&msg, attr.span()));
                 }
 
                 if !relation_fields.is_empty() {
@@ -754,7 +754,7 @@ fn visit_relation(model_id: crate::ModelId, relation_field_id: RelationFieldId, 
                         ctx.asts[ctx.types[relation_field_id].referenced_model].name(),
                         relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", "),
                     );
-                    ctx.push_error(DatamodelError::new_validation_error(&msg, attr.span));
+                    ctx.push_error(DatamodelError::new_validation_error(&msg, attr.span()));
                 }
 
                 Vec::new()

@@ -51,11 +51,11 @@ pub(crate) fn field_types_can_be_used_in_an_index(
         let error = if index.is_unique() {
             connector
                 .native_instance_error(&native_type)
-                .new_incompatible_native_type_with_unique(LENGTH_GUIDE, index.ast_attribute().span)
+                .new_incompatible_native_type_with_unique(LENGTH_GUIDE, index.ast_attribute().span())
         } else {
             connector
                 .native_instance_error(&native_type)
-                .new_incompatible_native_type_with_index(LENGTH_GUIDE, index.ast_attribute().span)
+                .new_incompatible_native_type_with_index(LENGTH_GUIDE, index.ast_attribute().span())
         };
 
         errors.push_error(error);
@@ -84,7 +84,7 @@ pub(crate) fn field_types_can_be_used_in_a_primary_key(
             continue;
         }
 
-        let span = primary_key.ast_attribute().span;
+        let span = primary_key.ast_attribute().span();
 
         let error = connector
             .native_instance_error(&native_type)

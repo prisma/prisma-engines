@@ -19,7 +19,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: crate::ModelId, 
 
     let resolving = FieldResolvingSetup::OnlyTopLevel;
 
-    let resolved_fields = match resolve_field_array_with_args(fields, attr.span, model_id, resolving, ctx) {
+    let resolved_fields = match resolve_field_array_with_args(fields, attr.span(), model_id, resolving, ctx) {
         Ok(fields) => fields,
         Err(FieldResolutionError::AlreadyDealtWith) => return,
         Err(FieldResolutionError::ProblematicFields {
@@ -61,7 +61,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: crate::ModelId, 
                     &msg,
                     "model",
                     ctx.asts[model_id].name(),
-                    attr.span,
+                    attr.span(),
                 ));
             }
 
@@ -105,7 +105,7 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: crate::ModelId, 
             ),
             "model",
             ast_model.name(),
-            attr.span,
+            attr.span(),
         ))
     }
 
@@ -222,7 +222,7 @@ pub(super) fn validate_id_field_arities(
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "Fields that are marked as id must be required.",
             "@id",
-            ctx.asts[pk.source_attribute].span,
+            ctx.asts[pk.source_attribute].span(),
         ))
     }
 }
