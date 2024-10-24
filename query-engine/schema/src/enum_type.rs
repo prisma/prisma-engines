@@ -75,6 +75,14 @@ impl DatabaseEnumType {
         &self.identifier
     }
 
+    pub fn value_for(&self, name: &str) -> Option<PrismaValue> {
+        self.internal_enum
+            .walker()
+            .values()
+            .find(|ev| ev.database_name() == name)
+            .map(|v| PrismaValue::Enum(v.database_name().to_owned()))
+    }
+
     pub fn map_input_value(&self, val: &str) -> Option<PrismaValue> {
         Some(PrismaValue::Enum(
             self.internal_enum

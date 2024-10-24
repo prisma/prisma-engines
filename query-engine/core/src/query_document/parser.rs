@@ -632,7 +632,7 @@ impl QueryDocumentParser {
         };
 
         match typ {
-            EnumType::Database(db) => match db.map_input_value(&raw) {
+            EnumType::Database(db) => match db.value_for(raw.as_str()) {
                 Some(value) => Ok(ParsedInputValue::Single(value)),
                 None => err(&db.identifier().name()),
             },
