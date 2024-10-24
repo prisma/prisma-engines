@@ -13,13 +13,15 @@ use crate::MetricRegistry;
 /// `metrics` crate has the state on its own. It allows setting the global recorder, it allows
 /// overriding it for a duration of an async closure, and it allows borrowing the current recorder
 /// for a short while. We, however, can't use this in our async instrumentation because we need the
-/// current recorder to be `Send + 'static` to be able to store it in a future. The solution to
-/// this is to maintain our own state in parallel. The APIs exposed by the crate guarantee that the
-/// state is in sync.
+/// current recorder to be `Send + 'static` to be able to store it in a future that would be usable
+/// in a work-stealing runtime, especially since we need to be able to instrument the futures
+/// spawned as tasks. The solution to this is to maintain our own state in parallel.
 ///
-/// Using `metrics::set_global_recorder` or `metrics::with_local_recorder` in user code is safe and
-/// won't lead to any issues (even if the new recorder isn't the [`MetricRecorder`] from this
-/// crate), however we won't know about any new local recorders on the stack, and calling
+/// The APIs exposed by the crate guarantee that the state we modify on our side is updated on the
+/// `metrics` side as well. Using `metrics::set_global_recorder` or `metrics::with_local_recorder`
+/// in user code won't be detected by us but is safe and won't lead to any issues (even if the new
+/// recorder isn't the [`MetricRecorder`] from this crate), we just won't know about any new local
+/// recorders on the stack, and calling
 /// [`crate::WithMetricsInstrumentation::with_current_recorder`] will re-use the last
 /// [`MetricRecorder`] known to us.
 static GLOBAL_RECORDER: OnceLock<Option<MetricRecorder>> = const { OnceLock::new() };
