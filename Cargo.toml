@@ -38,6 +38,7 @@ members = [
 [workspace.dependencies]
 async-trait = { version = "0.1.77" }
 enumflags2 = { version = "0.7", features = ["serde"] }
+futures = "0.3"
 psl = { path = "./psl/psl" }
 serde_json = { version = "1", features = ["float_roundtrip", "preserve_order", "raw_value"] }
 serde = { version = "1", features = ["derive"] }
@@ -66,6 +67,7 @@ napi = { version = "2.15.1", default-features = false, features = [
 napi-derive = "2.15.0"
 metrics = "0.23.0"
 js-sys = { version = "0.3" }
+pin-project = "1"
 rand = { version = "0.8" }
 regex = { version = "1", features = ["std"] }
 serde_repr = { version = "0.1.17" }

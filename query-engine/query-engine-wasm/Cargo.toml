@@ -58,7 +58,7 @@ thiserror = "1"
 url.workspace = true
 serde.workspace = true
 tokio = { version = "1", features = ["macros", "sync", "io-util", "time"] }
-futures = "0.3"
+futures.workspace = true
 
 tracing.workspace = true
 tracing-subscriber = { version = "0.3" }

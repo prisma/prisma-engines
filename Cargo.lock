@@ -3959,12 +3959,15 @@ dependencies = [
 name = "query-engine-metrics"
 version = "0.1.0"
 dependencies = [
+ "derive_more",
  "expect-test",
+ "futures",
  "metrics",
  "metrics-exporter-prometheus",
  "metrics-util",
  "once_cell",
  "parking_lot",
+ "pin-project",
  "serde",
  "serde_json",
  "tokio",
