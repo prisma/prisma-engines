@@ -4,20 +4,21 @@ use connector::{error::ConnectorError, ConnectionLike};
 use futures::future::{BoxFuture, FutureExt};
 use psl::can_support_relation_load_strategy;
 use query_structure::{ManyRecords, RelationLoadStrategy, RelationSelection};
+use telemetry::helpers::TraceParent;
 use user_facing_errors::KnownError;
 
 pub(crate) fn execute<'conn>(
     tx: &'conn mut dyn ConnectionLike,
     query: ReadQuery,
     parent_result: Option<&'conn ManyRecords>,
-    trace_id: Option<String>,
+    traceparent: Option<TraceParent>,
 ) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
         match query {
-            ReadQuery::RecordQuery(q) => read_one(tx, q, trace_id).await,
-            ReadQuery::ManyRecordsQuery(q) => read_many(tx, q, trace_id).await,
-            ReadQuery::RelatedRecordsQuery(q) => read_related(tx, q, parent_result, trace_id).await,
-            ReadQuery::AggregateRecordsQuery(q) => aggregate(tx, q, trace_id).await,
+            ReadQuery::RecordQuery(q) => read_one(tx, q, traceparent).await,
+            ReadQuery::ManyRecordsQuery(q) => read_many(tx, q, traceparent).await,
+            ReadQuery::RelatedRecordsQuery(q) => read_related(tx, q, parent_result, traceparent).await,
+            ReadQuery::AggregateRecordsQuery(q) => aggregate(tx, q, traceparent).await,
         }
     };
 
@@ -28,7 +29,7 @@ pub(crate) fn execute<'conn>(
 fn read_one(
     tx: &mut dyn ConnectionLike,
     query: RecordQuery,
-    trace_id: Option<String>,
+    traceparent: Option<TraceParent>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
     let fut = async move {
         let model = query.model;
@@ -39,7 +40,7 @@ fn read_one(
                 &filter,
                 &query.selected_fields,
                 query.relation_load_strategy,
-                trace_id,
+                traceparent,
             )
             .await?;
 
@@ -97,18 +98,18 @@ fn read_one(
 fn read_many(
     tx: &mut dyn ConnectionLike,
     query: ManyRecordsQuery,
-    trace_id: Option<String>,
+    traceparent: Option<TraceParent>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
     match query.relation_load_strategy {
-        RelationLoadStrategy::Join => read_many_by_joins(tx, query, trace_id),
-        RelationLoadStrategy::Query => read_many_by_queries(tx, query, trace_id),
+        RelationLoadStrategy::Join => read_many_by_joins(tx, query, traceparent),
+        RelationLoadStrategy::Query => read_many_by_queries(tx, query, traceparent),
     }
 }
 
 fn read_many_by_queries(
     tx: &mut dyn ConnectionLike,
     mut query: ManyRecordsQuery,
-    trace_id: Option<String>,
+    traceparent: Option<TraceParent>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
     let processor = if query.args.requires_inmemory_processing() {
         Some(InMemoryRecordProcessor::new_from_query_args(&mut query.args))
@@ -123,7 +124,7 @@ fn read_many_by_queries(
                 query.args.clone(),
                 &query.selected_fields,
                 query.relation_load_strategy,
-                trace_id,
+                traceparent,
             )
             .await?;
 
@@ -156,7 +157,7 @@ fn read_many_by_queries(
 fn read_many_by_joins(
     tx: &mut dyn ConnectionLike,
     query: ManyRecordsQuery,
-    trace_id: Option<String>,
+    traceparent: Option<TraceParent>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
     if !can_support_relation_load_strategy() {
         unreachable!()
@@ -168,7 +169,7 @@ fn read_many_by_joins(
                 query.args.clone(),
                 &query.selected_fields,
                 query.relation_load_strategy,
-                trace_id,
+                traceparent,
             )
             .await?;
 
@@ -209,13 +210,13 @@ fn read_related<'conn>(
     tx: &'conn mut dyn ConnectionLike,
     mut query: RelatedRecordsQuery,
     parent_result: Option<&'conn ManyRecords>,
-    trace_id: Option<String>,
+    traceparent: Option<TraceParent>,
 ) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
         let relation = query.parent_field.relation();
 
         let records = if relation.is_many_to_many() {
-            nested_read::m2m(tx, &mut query, parent_result, trace_id).await?
+            nested_read::m2m(tx, &mut query, parent_result, traceparent).await?
         } else {
             nested_read::one2m(
                 tx,
@@ -224,7 +225,7 @@ fn read_related<'conn>(
                 parent_result,
                 query.args.clone(),
                 &query.selected_fields,
-                trace_id,
+                traceparent,
             )
             .await?
         };
@@ -248,7 +249,7 @@ fn read_related<'conn>(
 async fn aggregate(
     tx: &mut dyn ConnectionLike,
     query: AggregateRecordsQuery,
-    trace_id: Option<String>,
+    traceparent: Option<TraceParent>,
 ) -> InterpretationResult<QueryResult> {
     let selection_order = query.selection_order;
 
@@ -259,7 +260,7 @@ async fn aggregate(
             query.selectors,
             query.group_by,
             query.having,
-            trace_id,
+            traceparent,
         )
         .await?;
 
