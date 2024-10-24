@@ -128,6 +128,7 @@ macro_rules! tx_timeout {
             .checked_sub($self.start_time.elapsed_time())
             .unwrap_or(Duration::ZERO);
         tokio::select! {
+            biased;
             _ = crosstarget_utils::time::sleep(remaining_time) => {
                 let _ = $self.rollback(true).await;
                 Err(TransactionError::Closed {
