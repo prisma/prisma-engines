@@ -47,6 +47,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: ./.github/workflows/include/kerberos-setup
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         continue-on-error: true
