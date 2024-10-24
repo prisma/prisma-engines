@@ -52,6 +52,14 @@ pub trait WithMetricsInstrumentation: Sized {
 
 impl<T> WithMetricsInstrumentation for T {}
 
+/// A type instrumented with a metric recorder.
+///
+/// If `T` is a `Future`, then `WithRecorder<T>` is also a `Future`. When polled, it temporarily
+/// sets the local metric recorder for the duration of polling the inner future, and then restores
+/// the previous recorder on the stack.
+///
+/// Similar logic can be implemented for cases where `T` is another async primitive like a stream
+/// or a sink, or any other type where such instrumentation makes sense (e.g. function).
 #[pin_project]
 pub struct WithRecorder<T> {
     #[pin]
