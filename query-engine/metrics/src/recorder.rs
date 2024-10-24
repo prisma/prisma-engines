@@ -42,8 +42,8 @@ pub(crate) fn global_recorder() -> Option<MetricRecorder> {
 /// [`MetricRegistry`].
 ///
 /// To provide an analogy, `MetricRecorder` to `MetricRegistry` is what `Dispatch` is to
-/// `Subscriber` in `tracing`. Just like `Dispatch`, it acts like a handle to the registry, is
-/// cheaply clonable with reference-counting semantics, and can be passed around.
+/// `Subscriber` in `tracing`. Just like `Dispatch`, it acts like a handle to the registry and is
+/// cheaply clonable with reference-counting semantics.
 #[derive(Clone)]
 pub struct MetricRecorder {
     registry: MetricRegistry,
