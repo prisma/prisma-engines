@@ -227,7 +227,7 @@ impl QueryEngine {
                     let conn_span = tracing::info_span!(
                         "prisma:engine:connection",
                         user_facing = true,
-                        "db.type" = connector.name(),
+                        "db.system" = connector.name(),
                     );
 
                     let conn = connector.get_connection().instrument(conn_span).await?;

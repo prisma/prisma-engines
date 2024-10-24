@@ -5,14 +5,14 @@ use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
 use opentelemetry::trace::{TraceContextExt, TraceId};
 use opentelemetry::{global, propagation::Extractor};
-use query_core::{ExtendedTransactionUserFacingError, TransactionOptions, TxId};
+use query_core::{ExtendedUserFacingError, TransactionOptions, TxId};
 use request_handlers::{dmmf, render_graphql_schema, RequestBody, RequestHandler};
 use serde::Serialize;
 use serde_json::json;
 use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use telemetry::capturing::Capturer;
 use telemetry::helpers::TraceParent;
 use tracing::{Instrument, Span};
@@ -115,21 +115,25 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
     let (span, traceparent, capturer) =
         setup_telemetry(info_span!("prisma:engine:query", user_facing = true), headers).await;
 
+    let query_timeout = query_timeout(headers);
+
     let buffer = hyper::body::to_bytes(req.into_body()).await?;
     let request_body = RequestBody::try_from_slice(buffer.as_ref(), cx.engine_protocol());
 
-    match request_body {
-        Ok(body) => {
-            let handler = RequestHandler::new(cx.executor(), cx.query_schema(), cx.engine_protocol());
-            let mut result = handler.handle(body, tx_id, traceparent).instrument(span).await;
+    let capture_config = &capture_config;
+    let work = async move {
+        match serialized_body {
+            Ok(body) => {
+                let handler = RequestHandler::new(cx.executor(), cx.query_schema(), cx.engine_protocol());
+                let mut result = handler.handle(body, tx_id, traceparent).instrument(span).await;
 
-            if let telemetry::capturing::Capturer::Enabled(capturer) = &capturer {
-                let telemetry = capturer.fetch_captures().await;
-                if let Some(telemetry) = telemetry {
-                    result.set_extension("traces".to_owned(), json!(telemetry.traces));
-                    result.set_extension("logs".to_owned(), json!(telemetry.logs));
+                if let telemetry::capturing::Capturer::Enabled(capturer) = capture_config {
+                    let telemetry = capturer.fetch_captures().await;
+                    if let Some(telemetry) = telemetry {
+                        result.set_extension("traces".to_owned(), json!(telemetry.traces));
+                        result.set_extension("logs".to_owned(), json!(telemetry.logs));
+                    }
                 }
-            }
 
             let res = build_json_response(StatusCode::OK, &result);
 
@@ -145,7 +149,35 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
 
             let res = build_json_response(StatusCode::UNPROCESSABLE_ENTITY, &ufe);
 
-            Ok(res)
+                Ok(res)
+            }
+        }
+    };
+
+    let query_timeout_fut = async {
+        match query_timeout {
+            Some(timeout) => tokio::time::sleep(timeout).await,
+            // Never return if timeout isn't set.
+            None => std::future::pending().await,
+        }
+    };
+
+    tokio::select! {
+        _ = query_timeout_fut => {
+            let captured_telemetry = if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+                capturer.fetch_captures().await
+            } else {
+                None
+            };
+
+            // Note: this relies on the fact that client will rollback the transaction after the
+            // error. If the client continues using this transaction (and later commits it), data
+            // corruption might happen because some write queries (but not all of them) might be
+            // already executed by the database before the timeout is fired.
+            Ok(err_to_http_resp(query_core::CoreError::QueryTimeout, captured_telemetry))
+        }
+        result = work => {
+            result
         }
     }
 }
@@ -172,10 +204,7 @@ async fn metrics_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
     // block and buffer request until the request has completed
     let full_body = hyper::body::to_bytes(body_start).await?;
 
-    let global_labels: HashMap<String, String> = match serde_json::from_slice(full_body.as_ref()) {
-        Ok(map) => map,
-        Err(_e) => HashMap::new(),
-    };
+    let global_labels: HashMap<String, String> = serde_json::from_slice(full_body.as_ref()).unwrap_or_default();
 
     let response = if requested_json {
         let metrics = cx.metrics.to_json(global_labels);
@@ -363,11 +392,13 @@ fn err_to_http_resp(
             query_core::TransactionError::Unknown { reason: _ } => StatusCode::INTERNAL_SERVER_ERROR,
         },
 
+        query_core::CoreError::QueryTimeout => StatusCode::REQUEST_TIMEOUT,
+
         // All other errors are treated as 500s, most of these paths should never be hit, only connector errors may occur.
         _ => StatusCode::INTERNAL_SERVER_ERROR,
     };
 
-    let mut err: ExtendedTransactionUserFacingError = err.into();
+    let mut err: ExtendedUserFacingError = err.into();
     if let Some(telemetry) = captured_telemetry {
         err.set_extension("traces".to_owned(), json!(telemetry.traces));
         err.set_extension("logs".to_owned(), json!(telemetry.logs));
@@ -448,6 +479,14 @@ fn try_get_transaction_id(headers: &HeaderMap) -> Option<TxId> {
         .get("X-transaction-id")
         .and_then(|h| h.to_str().ok())
         .map(TxId::from)
+}
+
+fn query_timeout(headers: &HeaderMap) -> Option<Duration> {
+    headers
+        .get("X-query-timeout")
+        .and_then(|h| h.to_str().ok())
+        .and_then(|value| value.parse::<u64>().ok())
+        .map(Duration::from_millis)
 }
 
 fn build_json_response<T>(status_code: StatusCode, value: &T) -> Response<Body>
