@@ -46,18 +46,12 @@ pub(crate) fn global_recorder() -> Option<MetricRecorder> {
 /// cheaply clonable with reference-counting semantics, and can be passed around.
 #[derive(Clone)]
 pub struct MetricRecorder {
-    inner: Arc<Inner>,
-}
-
-struct Inner {
     registry: MetricRegistry,
 }
 
 impl MetricRecorder {
     pub fn new(registry: MetricRegistry) -> Self {
-        Self {
-            inner: Arc::new(Inner { registry }),
-        }
+        Self { registry }
     }
 
     /// Convenience method to call [`Self::init_prisma_metrics`] immediately after creating the
@@ -94,7 +88,7 @@ impl MetricRecorder {
     }
 
     fn record_in_registry(&self, visitor: &MetricVisitor) {
-        self.inner.registry.record(visitor);
+        self.registry.record(visitor);
     }
 }
 
@@ -112,15 +106,15 @@ impl Recorder for MetricRecorder {
     }
 
     fn register_counter(&self, key: &Key, _metadata: &Metadata<'_>) -> Counter {
-        Counter::from_arc(Arc::new(MetricHandle::new(key.clone(), self.inner.registry.clone())))
+        Counter::from_arc(Arc::new(MetricHandle::new(key.clone(), self.registry.clone())))
     }
 
     fn register_gauge(&self, key: &Key, _metadata: &Metadata<'_>) -> Gauge {
-        Gauge::from_arc(Arc::new(MetricHandle::new(key.clone(), self.inner.registry.clone())))
+        Gauge::from_arc(Arc::new(MetricHandle::new(key.clone(), self.registry.clone())))
     }
 
     fn register_histogram(&self, key: &Key, _metadata: &Metadata<'_>) -> Histogram {
-        Histogram::from_arc(Arc::new(MetricHandle::new(key.clone(), self.inner.registry.clone())))
+        Histogram::from_arc(Arc::new(MetricHandle::new(key.clone(), self.registry.clone())))
     }
 }
 
