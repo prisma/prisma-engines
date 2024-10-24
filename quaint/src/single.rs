@@ -150,8 +150,7 @@ impl Quaint {
             s if s.starts_with("postgres") || s.starts_with("postgresql") => {
                 let url = connector::PostgresNativeUrl::new(url::Url::parse(s)?)?;
                 let tls_manager = connector::MakeTlsConnectorManager::new(url.clone());
-                let psql = connector::PostgreSql::new(url, &tls_manager
-                ).await?;
+                let psql = connector::PostgreSql::new(url, &tls_manager).await?;
                 Arc::new(psql) as Arc<dyn Queryable>
             }
             #[cfg(feature = "mssql-native")]

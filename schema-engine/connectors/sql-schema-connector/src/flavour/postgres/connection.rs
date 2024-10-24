@@ -20,15 +20,13 @@ pub(super) struct Connection(connector::PostgreSql);
 impl Connection {
     pub(super) async fn new(url: url::Url) -> ConnectorResult<Connection> {
         let url = MigratePostgresUrl::new(url)?;
-        
+
         let quaint = match url.0 {
             PostgresUrl::Native(ref native_url) => {
                 let tls_manager = MakeTlsConnectorManager::new(native_url.as_ref().clone());
                 connector::PostgreSql::new(native_url.as_ref().clone(), &tls_manager).await
-            },
-            PostgresUrl::WebSocket(ref ws_url) => {
-                connector::PostgreSql::new_with_websocket(ws_url.clone()).await
             }
+            PostgresUrl::WebSocket(ref ws_url) => connector::PostgreSql::new_with_websocket(ws_url.clone()).await,
         }
         .map_err(quaint_err(&url))?;
 
