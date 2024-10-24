@@ -47,6 +47,7 @@ pub enum PrismaValue {
 
     #[serde(serialize_with = "serialize_bytes")]
     Bytes(Vec<u8>),
+    // Placeholder(TypeIdentifier),
 }
 
 /// Stringify a date to the following format
