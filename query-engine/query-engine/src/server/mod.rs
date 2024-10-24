@@ -112,7 +112,7 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
 
     let headers = req.headers();
     let tx_id = try_get_transaction_id(headers);
-    let (span, traceparent, capturer) =
+    let (span, traceparent, ref capturer) =
         setup_telemetry(info_span!("prisma:engine:query", user_facing = true), headers).await;
 
     let query_timeout = query_timeout(headers);
@@ -120,14 +120,13 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
     let buffer = hyper::body::to_bytes(req.into_body()).await?;
     let request_body = RequestBody::try_from_slice(buffer.as_ref(), cx.engine_protocol());
 
-    let capture_config = &capture_config;
     let work = async move {
-        match serialized_body {
+        match request_body {
             Ok(body) => {
                 let handler = RequestHandler::new(cx.executor(), cx.query_schema(), cx.engine_protocol());
                 let mut result = handler.handle(body, tx_id, traceparent).instrument(span).await;
 
-                if let telemetry::capturing::Capturer::Enabled(capturer) = capture_config {
+                if let telemetry::capturing::Capturer::Enabled(capturer) = capturer {
                     let telemetry = capturer.fetch_captures().await;
                     if let Some(telemetry) = telemetry {
                         result.set_extension("traces".to_owned(), json!(telemetry.traces));
@@ -135,19 +134,19 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
                     }
                 }
 
-            let res = build_json_response(StatusCode::OK, &result);
+                let res = build_json_response(StatusCode::OK, &result);
 
-            Ok(res)
-        }
-        Err(e) => {
-            let ufe: user_facing_errors::Error = request_handlers::HandlerError::query_conversion(format!(
-                "Error parsing {:?} query. Ensure that engine protocol of the client and the engine matches. {}",
-                cx.engine_protocol(),
-                e
-            ))
-            .into();
+                Ok(res)
+            }
+            Err(e) => {
+                let ufe: user_facing_errors::Error = request_handlers::HandlerError::query_conversion(format!(
+                    "Error parsing {:?} query. Ensure that engine protocol of the client and the engine matches. {}",
+                    cx.engine_protocol(),
+                    e
+                ))
+                .into();
 
-            let res = build_json_response(StatusCode::UNPROCESSABLE_ENTITY, &ufe);
+                let res = build_json_response(StatusCode::UNPROCESSABLE_ENTITY, &ufe);
 
                 Ok(res)
             }
@@ -164,7 +163,7 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
 
     tokio::select! {
         _ = query_timeout_fut => {
-            let captured_telemetry = if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+            let captured_telemetry = if let telemetry::capturing::Capturer::Enabled(capturer) = capturer {
                 capturer.fetch_captures().await
             } else {
                 None
