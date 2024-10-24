@@ -12,7 +12,7 @@ use futures::future;
 
 #[cfg(feature = "metrics")]
 use query_engine_metrics::{
-    histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
+    counter, histogram, PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
 };
 
 use schema::{QuerySchema, QuerySchemaRef};
@@ -32,10 +32,7 @@ pub async fn execute_single_operation(
     let result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id).await;
 
     #[cfg(feature = "metrics")]
-    histogram!(
-        PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
-        operation_timer.elapsed_time()
-    );
+    histogram!(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS).record(operation_timer.elapsed_time());
 
     result
 }
@@ -58,10 +55,7 @@ pub async fn execute_many_operations(
         let result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).await;
 
         #[cfg(feature = "metrics")]
-        histogram!(
-            PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
-            operation_timer.elapsed_time()
-        );
+        histogram!(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS).record(operation_timer.elapsed_time());
 
         match result {
             Ok(result) => results.push(Ok(result)),
@@ -115,7 +109,7 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
     let dispatcher = crate::get_current_dispatcher();
     for op in operations {
         #[cfg(feature = "metrics")]
-        increment_counter!(PRISMA_CLIENT_QUERIES_TOTAL);
+        counter!(PRISMA_CLIENT_QUERIES_TOTAL).increment(1);
 
         let conn_span = info_span!(
             "prisma:engine:connection",
@@ -176,10 +170,7 @@ async fn execute_self_contained(
     };
 
     #[cfg(feature = "metrics")]
-    histogram!(
-        PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
-        operation_timer.elapsed_time()
-    );
+    histogram!(PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS).record(operation_timer.elapsed_time());
 
     result
 }
@@ -281,7 +272,7 @@ async fn execute_on<'a>(
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
     #[cfg(feature = "metrics")]
-    increment_counter!(PRISMA_CLIENT_QUERIES_TOTAL);
+    counter!(PRISMA_CLIENT_QUERIES_TOTAL).increment(1);
 
     let interpreter = QueryInterpreter::new(conn);
     QueryPipeline::new(graph, interpreter, serializer)

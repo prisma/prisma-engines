@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
-use metrics::KeyName;
 use metrics::{Counter, CounterFn, Gauge, GaugeFn, Histogram, HistogramFn, Key, Recorder, Unit};
+use metrics::{KeyName, Metadata, SharedString};
 use tracing::trace;
 
 use super::common::KeyLabels;
@@ -22,27 +22,27 @@ impl MetricRecorder {
 }
 
 impl Recorder for MetricRecorder {
-    fn describe_counter(&self, key_name: KeyName, _unit: Option<Unit>, description: &'static str) {
-        self.register_description(key_name.as_str(), description);
+    fn describe_counter(&self, key_name: KeyName, _unit: Option<Unit>, description: SharedString) {
+        self.register_description(key_name.as_str(), &description);
     }
 
-    fn describe_gauge(&self, key_name: KeyName, _unit: Option<Unit>, description: &'static str) {
-        self.register_description(key_name.as_str(), description);
+    fn describe_gauge(&self, key_name: KeyName, _unit: Option<Unit>, description: SharedString) {
+        self.register_description(key_name.as_str(), &description);
     }
 
-    fn describe_histogram(&self, key_name: KeyName, _unit: Option<Unit>, description: &'static str) {
-        self.register_description(key_name.as_str(), description);
+    fn describe_histogram(&self, key_name: KeyName, _unit: Option<Unit>, description: SharedString) {
+        self.register_description(key_name.as_str(), &description);
     }
 
-    fn register_counter(&self, key: &Key) -> Counter {
+    fn register_counter(&self, key: &Key, _metadata: &Metadata<'_>) -> Counter {
         Counter::from_arc(Arc::new(MetricHandle(key.clone())))
     }
 
-    fn register_gauge(&self, key: &Key) -> Gauge {
+    fn register_gauge(&self, key: &Key, _metadata: &Metadata<'_>) -> Gauge {
         Gauge::from_arc(Arc::new(MetricHandle(key.clone())))
     }
 
-    fn register_histogram(&self, key: &Key) -> Histogram {
+    fn register_histogram(&self, key: &Key, _metadata: &Metadata<'_>) -> Histogram {
         Histogram::from_arc(Arc::new(MetricHandle(key.clone())))
     }
 }
