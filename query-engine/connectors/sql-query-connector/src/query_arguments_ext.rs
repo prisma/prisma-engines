@@ -1,6 +1,6 @@
 use query_structure::QueryArguments;
 
-pub(crate) trait QueryArgumentsExt {
+pub trait QueryArgumentsExt {
     /// If we need to take rows before a cursor position, then we need to reverse the order in SQL.
     fn needs_reversed_order(&self) -> bool;
 
