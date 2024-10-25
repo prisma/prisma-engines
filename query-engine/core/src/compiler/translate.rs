@@ -1,3 +1,6 @@
+mod query;
+
+use query::translate_query;
 use thiserror::Error;
 
 use crate::{EdgeRef, Node, NodeRef, Query, QueryGraph};
@@ -8,6 +11,9 @@ use super::expression::{Binding, Expression};
 pub enum TranslateError {
     #[error("node {0} has no content")]
     NodeContentEmpty(String),
+
+    #[error("{0}")]
+    QuaintError(#[from] quaint::error::Error),
 }
 
 pub type TranslateResult<T> = Result<T, TranslateError>;
@@ -57,7 +63,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .try_into()
             .expect("current node must be query");
 
-        unimplemented!()
+        translate_query(query)
     }
 
     fn process_children(&mut self) -> TranslateResult<Vec<Expression>> {

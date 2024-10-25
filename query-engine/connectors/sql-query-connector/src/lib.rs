@@ -2,17 +2,17 @@
 #![deny(unsafe_code)]
 
 mod column_metadata;
-mod context;
+pub mod context;
 mod cursor_condition;
 mod database;
 mod error;
 mod filter;
 mod join_utils;
-mod model_extensions;
+pub mod model_extensions;
 mod nested_aggregations;
 mod ordering;
 mod query_arguments_ext;
-mod query_builder;
+pub mod query_builder;
 mod query_ext;
 mod row;
 mod ser_raw;
