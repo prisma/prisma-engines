@@ -37,20 +37,24 @@ impl Expression {
 
         match self {
             Self::Seq(exprs) => {
+                writeln!(f, "{indent}{{")?;
                 for expr in exprs {
-                    expr.display(f, level)?;
-                    write!(f, ";\n")?;
+                    expr.display(f, level + 1)?;
+                    writeln!(f, ";")?;
                 }
+                write!(f, "{indent}}}")?;
             }
             Self::Get { name } => {
                 write!(f, "{indent}get {name}")?;
             }
             Self::Let { bindings, expr } => {
-                write!(f, "{indent}let\n")?;
-                for binding in bindings {
-                    write!(f, "{indent}  {binding},\n")?;
+                writeln!(f, "{indent}let")?;
+                for Binding { name, expr } in bindings {
+                    writeln!(f, "{indent}  {name} =")?;
+                    expr.display(f, level + 2)?;
+                    writeln!(f, ";")?;
                 }
-                write!(f, "{indent}in\n")?;
+                writeln!(f, "{indent}in")?;
                 expr.display(f, level + 1)?;
             }
             Self::GetFirstNonEmpty { names } => {
@@ -60,7 +64,7 @@ impl Expression {
                 }
             }
             Self::Query { sql, params } => {
-                write!(f, "{indent}query {{{sql}}}\" with {params:?}")?;
+                write!(f, "{indent}query {{\n{indent}  {sql}\n{indent}}} with {params:?}")?;
             }
         }
         Ok(())
