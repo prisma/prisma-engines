@@ -32,7 +32,7 @@ impl From<Vec<Column<'static>>> for ColumnIterator {
     }
 }
 
-pub(crate) trait AsColumns {
+pub trait AsColumns {
     fn as_columns(&self, ctx: &Context<'_>) -> ColumnIterator;
 }
 
@@ -48,7 +48,7 @@ impl AsColumns for ModelProjection {
     }
 }
 
-pub(crate) trait AsColumn {
+pub trait AsColumn {
     fn as_column(&self, ctx: &Context<'_>) -> Column<'static>;
 }
 
