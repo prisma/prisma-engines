@@ -12,7 +12,7 @@ mod limit;
 pub mod model_extensions;
 mod nested_aggregations;
 mod ordering;
-mod query_arguments_ext;
+pub mod query_arguments_ext;
 pub mod query_builder;
 mod query_ext;
 mod row;
@@ -22,6 +22,8 @@ mod value;
 
 use self::{column_metadata::*, context::Context, query_ext::QueryExt, row::*};
 use quaint::prelude::Queryable;
+
+pub use database::operations::write::generate_insert_statements;
 
 pub use database::FromSource;
 #[cfg(feature = "driver-adapters")]
