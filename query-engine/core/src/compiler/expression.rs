@@ -18,6 +18,12 @@ pub struct DbQuery {
     pub params: Vec<PrismaValue>,
 }
 
+impl DbQuery {
+    pub fn new(query: String, params: Vec<PrismaValue>) -> Self {
+        Self { query, params }
+    }
+}
+
 #[derive(Debug)]
 pub enum Expression {
     Seq(Vec<Expression>),
