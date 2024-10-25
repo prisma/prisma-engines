@@ -5,8 +5,7 @@ use query_core::{query_graph_builder::QueryGraphBuilder, schema::QueryTag, Query
 use request_handlers::{Action, FieldQuery, JsonBody, JsonSingleQuery, RequestBody, SelectionSet, SelectionSetValue};
 
 pub fn main() -> anyhow::Result<()> {
-    let schema_path = std::env::var("PRISMA_DML_PATH")?;
-    let schema_string = std::fs::read_to_string(schema_path)?;
+    let schema_string = include_str!("./schema.prisma");
     let schema = psl::validate(schema_string.into());
 
     if schema.diagnostics.has_errors() {
