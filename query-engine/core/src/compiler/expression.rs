@@ -6,6 +6,12 @@ pub struct Binding {
     pub expr: Expression,
 }
 
+impl Binding {
+    pub fn new(name: String, expr: Expression) -> Self {
+        Self { name, expr }
+    }
+}
+
 impl std::fmt::Display for Binding {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{} = {}", self.name, self.expr)
@@ -26,19 +32,35 @@ impl DbQuery {
 
 #[derive(Debug)]
 pub enum Expression {
+    /// Sequence of statements.
     Seq(Vec<Expression>),
-    Get {
-        name: String,
-    },
+
+    /// Get binding value.
+    Get { name: String },
+
+    /// A lexical scope with let-bindings.
     Let {
         bindings: Vec<Binding>,
         expr: Box<Expression>,
     },
-    GetFirstNonEmpty {
-        names: Vec<String>,
-    },
-    ReadQuery(DbQuery),
-    WriteQuery(DbQuery),
+
+    /// Gets the first non-empty value from a list of bindings.
+    GetFirstNonEmpty { names: Vec<String> },
+
+    /// A database query that returns data.
+    Query(DbQuery),
+
+    /// A database query that returns the number of affected rows.
+    Execute(DbQuery),
+
+    /// Reverses the result of an expression in memory.
+    Reverse(Box<Expression>),
+
+    /// Sums a list of scalars returned by the expressions.
+    Sum(Vec<Expression>),
+
+    /// Concatenates a list of lists.
+    Concat(Vec<Expression>),
 }
 
 impl Expression {
@@ -54,9 +76,11 @@ impl Expression {
                 }
                 write!(f, "{indent}}}")?;
             }
+
             Self::Get { name } => {
                 write!(f, "{indent}get {name}")?;
             }
+
             Self::Let { bindings, expr } => {
                 writeln!(f, "{indent}let")?;
                 for Binding { name, expr } in bindings {
@@ -67,15 +91,29 @@ impl Expression {
                 writeln!(f, "{indent}in")?;
                 expr.display(f, level + 1)?;
             }
+
             Self::GetFirstNonEmpty { names } => {
                 write!(f, "{indent}getFirstNonEmpty")?;
                 for name in names {
                     write!(f, " {}", name)?;
                 }
             }
-            Self::ReadQuery(query) => self.display_query("readQuery", query, f, level)?,
-            Self::WriteQuery(query) => self.display_query("writeQuery", query, f, level)?,
+
+            Self::Query(query) => self.display_query("query", query, f, level)?,
+
+            Self::Execute(query) => self.display_query("execute", query, f, level)?,
+
+            Self::Reverse(expr) => {
+                writeln!(f, "{indent}reverse (")?;
+                expr.display(f, level + 1)?;
+                write!(f, "{indent})")?;
+            }
+
+            Self::Sum(exprs) => self.display_function("sum", exprs, f, level)?,
+
+            Self::Concat(exprs) => self.display_function("concat", exprs, f, level)?,
         }
+
         Ok(())
     }
 
@@ -89,6 +127,22 @@ impl Expression {
         let indent = "  ".repeat(level);
         let DbQuery { query, params } = db_query;
         write!(f, "{indent}{op} {{\n{indent}  {query}\n{indent}}} with {params:?}")
+    }
+
+    fn display_function(
+        &self,
+        name: &str,
+        args: &[Expression],
+        f: &mut std::fmt::Formatter<'_>,
+        level: usize,
+    ) -> std::fmt::Result {
+        let indent = "  ".repeat(level);
+        write!(f, "{indent}{name} (")?;
+        for arg in args {
+            arg.display(f, level + 1)?;
+            writeln!(f, ",")?;
+        }
+        write!(f, ")")
     }
 }
 
