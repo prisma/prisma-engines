@@ -36,7 +36,7 @@ pub fn main() -> anyhow::Result<()> {
 
     let (graph, _serializer) = QueryGraphBuilder::new(&query_schema).build(query)?;
 
-    println!("{}", graph.to_string());
+    println!("{graph}");
 
     let expr = query_core::compiler::translate(graph)?;
 
