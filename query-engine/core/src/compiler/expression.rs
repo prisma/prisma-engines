@@ -13,6 +13,12 @@ impl std::fmt::Display for Binding {
 }
 
 #[derive(Debug)]
+pub struct DbQuery {
+    pub query: String,
+    pub params: Vec<PrismaValue>,
+}
+
+#[derive(Debug)]
 pub enum Expression {
     Seq(Vec<Expression>),
     Get {
@@ -25,10 +31,8 @@ pub enum Expression {
     GetFirstNonEmpty {
         names: Vec<String>,
     },
-    Query {
-        sql: String,
-        params: Vec<PrismaValue>,
-    },
+    ReadQuery(DbQuery),
+    WriteQuery(DbQuery),
 }
 
 impl Expression {
@@ -63,11 +67,22 @@ impl Expression {
                     write!(f, " {}", name)?;
                 }
             }
-            Self::Query { sql, params } => {
-                write!(f, "{indent}query {{\n{indent}  {sql}\n{indent}}} with {params:?}")?;
-            }
+            Self::ReadQuery(query) => self.display_query("readQuery", query, f, level)?,
+            Self::WriteQuery(query) => self.display_query("writeQuery", query, f, level)?,
         }
         Ok(())
+    }
+
+    fn display_query(
+        &self,
+        op: &str,
+        db_query: &DbQuery,
+        f: &mut std::fmt::Formatter<'_>,
+        level: usize,
+    ) -> std::fmt::Result {
+        let indent = "  ".repeat(level);
+        let DbQuery { query, params } = db_query;
+        write!(f, "{indent}{op} {{\n{indent}  {query}\n{indent}}} with {params:?}")
     }
 }
 
