@@ -1,0 +1,74 @@
+use query_structure::PrismaValue;
+
+#[derive(Debug)]
+pub struct Binding {
+    pub name: String,
+    pub expr: Expression,
+}
+
+impl std::fmt::Display for Binding {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} = {}", self.name, self.expr)
+    }
+}
+
+#[derive(Debug)]
+pub enum Expression {
+    Seq(Vec<Expression>),
+    Get {
+        name: String,
+    },
+    Let {
+        bindings: Vec<Binding>,
+        expr: Box<Expression>,
+    },
+    GetFirstNonEmpty {
+        names: Vec<String>,
+    },
+    Query {
+        sql: String,
+        params: Vec<PrismaValue>,
+    },
+}
+
+impl Expression {
+    fn display(&self, f: &mut std::fmt::Formatter<'_>, level: usize) -> std::fmt::Result {
+        let indent = "  ".repeat(level);
+
+        match self {
+            Self::Seq(exprs) => {
+                for expr in exprs {
+                    expr.display(f, level)?;
+                    write!(f, ";\n")?;
+                }
+            }
+            Self::Get { name } => {
+                write!(f, "{indent}get {name}")?;
+            }
+            Self::Let { bindings, expr } => {
+                write!(f, "{indent}let\n")?;
+                for binding in bindings {
+                    write!(f, "{indent}  {binding},\n")?;
+                }
+                write!(f, "{indent}in\n")?;
+                expr.display(f, level + 1)?;
+            }
+            Self::GetFirstNonEmpty { names } => {
+                write!(f, "{indent}getFirstNonEmpty")?;
+                for name in names {
+                    write!(f, " {}", name)?;
+                }
+            }
+            Self::Query { sql, params } => {
+                write!(f, "{indent}query {{{sql}}}\" with {params:?}")?;
+            }
+        }
+        Ok(())
+    }
+}
+
+impl std::fmt::Display for Expression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.display(f, 0)
+    }
+}

@@ -39,9 +39,9 @@ pub fn main() -> anyhow::Result<()> {
 
     println!("{}", graph.to_string());
 
-    let expr = query_core::compiler::translate(graph);
+    let expr = query_core::compiler::translate(graph)?;
 
-    println!("{expr:?}");
+    println!("{expr}");
 
     Ok(())
 }

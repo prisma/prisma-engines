@@ -1,13 +1,4 @@
-use query_structure::SelectionResult;
+pub mod expression;
+pub mod translate;
 
-use crate::QueryGraph;
-
-#[derive(Debug)]
-pub enum Expression {
-    Sequence(Vec<Expression>),
-    Query { sql: String, params: SelectionResult },
-}
-
-pub fn translate(mut graph: QueryGraph) -> Expression {
-    unimplemented!()
-}
+pub use translate::translate;
