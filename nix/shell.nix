@@ -23,6 +23,7 @@ in
       wabt
       wasm-bindgen-cli
       wasm-pack
+      zlib
     ];
 
     inputsFrom = [ self'.packages.prisma-engines ];
