@@ -207,7 +207,7 @@ fn collect_affected_fields(args: &[WriteArgs], model: &Model) -> HashSet<ScalarF
 
 /// Generates a list of insert statements to execute. If `selected_fields` is set, insert statements
 /// will return the specified columns of inserted rows.
-fn generate_insert_statements(
+pub fn generate_insert_statements(
     model: &Model,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
