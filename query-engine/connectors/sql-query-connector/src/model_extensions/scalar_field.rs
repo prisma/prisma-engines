@@ -154,7 +154,7 @@ fn convert_placeholder_type_to_var_type(pt: &PlaceholderType) -> VarType {
         PlaceholderType::Boolean => VarType::Boolean,
         PlaceholderType::Decimal => VarType::Numeric,
         PlaceholderType::Date => VarType::DateTime,
-        PlaceholderType::Array(t) => VarType::Array(Box::new(convert_placeholder_type_to_var_type(&*t))),
+        PlaceholderType::Array(t) => VarType::Array(Box::new(convert_placeholder_type_to_var_type(t))),
         PlaceholderType::Object => VarType::Json,
         PlaceholderType::Bytes => VarType::Bytes,
     }
