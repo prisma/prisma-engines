@@ -81,7 +81,7 @@ impl std::fmt::Display for PlaceholderType {
             PlaceholderType::Boolean => write!(f, "Boolean"),
             PlaceholderType::Decimal => write!(f, "Decimal"),
             PlaceholderType::Date => write!(f, "Date"),
-            PlaceholderType::Array(t) => write!(f, "Array<{}>", t),
+            PlaceholderType::Array(t) => write!(f, "Array<{t}>"),
             PlaceholderType::Object => write!(f, "Object"),
             PlaceholderType::Bytes => write!(f, "Bytes"),
         }
