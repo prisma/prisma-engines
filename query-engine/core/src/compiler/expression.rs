@@ -32,7 +32,7 @@ impl DbQuery {
 
 #[derive(Debug)]
 pub enum Expression {
-    /// Sequence of statements.
+    /// Sequence of statements. The whole sequence evaluates to the result of the last expression.
     Seq(Vec<Expression>),
 
     /// Get binding value.
