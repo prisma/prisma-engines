@@ -120,7 +120,7 @@ fn var_type_to_prisma_type(vt: &quaint::ast::VarType) -> prisma_value::Placehold
         quaint::ast::VarType::Bytes => prisma_value::PlaceholderType::Bytes,
         quaint::ast::VarType::Boolean => prisma_value::PlaceholderType::Boolean,
         quaint::ast::VarType::Char => prisma_value::PlaceholderType::String,
-        quaint::ast::VarType::Array(t) => prisma_value::PlaceholderType::Array(Box::new(var_type_to_prisma_type(&*t))),
+        quaint::ast::VarType::Array(t) => prisma_value::PlaceholderType::Array(Box::new(var_type_to_prisma_type(t))),
         quaint::ast::VarType::Numeric => prisma_value::PlaceholderType::Decimal,
         quaint::ast::VarType::Json => prisma_value::PlaceholderType::Object,
         quaint::ast::VarType::Xml => prisma_value::PlaceholderType::String,
