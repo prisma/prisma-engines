@@ -30,6 +30,7 @@ pub fn translate(mut graph: QueryGraph) -> TranslateResult<Expression> {
 struct NodeTranslator<'a, 'b> {
     graph: &'a mut QueryGraph,
     node: NodeRef,
+    #[allow(dead_code)]
     parent_edges: &'b [EdgeRef],
 }
 
@@ -66,6 +67,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         translate_query(query)
     }
 
+    #[allow(dead_code)]
     fn process_children(&mut self) -> TranslateResult<Vec<Expression>> {
         let mut child_pairs = self.graph.direct_child_pairs(&self.node);
 
@@ -110,6 +112,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         Ok(expressions)
     }
 
+    #[allow(dead_code)]
     fn fold_result_scopes(&mut self, result_subgraphs: Vec<(EdgeRef, NodeRef)>) -> TranslateResult<Expression> {
         // if the subgraphs all point to the same result node, we fold them in sequence
         // if not, we can separate them with a getfirstnonempty
