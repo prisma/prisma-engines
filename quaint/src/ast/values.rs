@@ -225,6 +225,11 @@ impl<'a> Value<'a> {
         ValueType::xml(value).into_value()
     }
 
+    /// Creates a new variable.
+    pub fn var(name: impl Into<Cow<'a, str>>, ty: VarType) -> Self {
+        ValueType::var(name, ty).into_value()
+    }
+
     /// `true` if the `Value` is null.
     pub fn is_null(&self) -> bool {
         self.typed.is_null()
@@ -553,6 +558,59 @@ pub enum ValueType<'a> {
     Date(Option<NaiveDate>),
     /// A time value.
     Time(Option<NaiveTime>),
+    /// A variable that doesn't have a value assigned yet.
+    Var(Cow<'a, str>, VarType),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum VarType {
+    Unknown,
+    Int32,
+    Int64,
+    Float,
+    Double,
+    Text,
+    Enum,
+    Bytes,
+    Boolean,
+    Char,
+    Array(Box<VarType>),
+    Numeric,
+    Json,
+    Xml,
+    Uuid,
+    DateTime,
+    Date,
+    Time,
+}
+
+impl fmt::Display for VarType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            VarType::Unknown => write!(f, "Unknown"),
+            VarType::Int32 => write!(f, "Int32"),
+            VarType::Int64 => write!(f, "Int64"),
+            VarType::Float => write!(f, "Float"),
+            VarType::Double => write!(f, "Double"),
+            VarType::Text => write!(f, "Text"),
+            VarType::Enum => write!(f, "Enum"),
+            VarType::Bytes => write!(f, "Bytes"),
+            VarType::Boolean => write!(f, "Boolean"),
+            VarType::Char => write!(f, "Char"),
+            VarType::Array(t) => {
+                write!(f, "Array<")?;
+                t.fmt(f)?;
+                write!(f, ">")
+            }
+            VarType::Numeric => write!(f, "Numeric"),
+            VarType::Json => write!(f, "Json"),
+            VarType::Xml => write!(f, "Xml"),
+            VarType::Uuid => write!(f, "Uuid"),
+            VarType::DateTime => write!(f, "DateTime"),
+            VarType::Date => write!(f, "Date"),
+            VarType::Time => write!(f, "Time"),
+        }
+    }
 }
 
 pub(crate) struct Params<'a>(pub(crate) &'a [Value<'a>]);
@@ -619,6 +677,7 @@ impl fmt::Display for ValueType<'_> {
             ValueType::DateTime(val) => val.map(|v| write!(f, "\"{v}\"")),
             ValueType::Date(val) => val.map(|v| write!(f, "\"{v}\"")),
             ValueType::Time(val) => val.map(|v| write!(f, "\"{v}\"")),
+            ValueType::Var(name, ty) => Some(write!(f, "${name} as {ty}")),
         };
 
         match res {
@@ -677,6 +736,7 @@ impl<'a> From<ValueType<'a>> for serde_json::Value {
             ValueType::DateTime(dt) => dt.map(|dt| serde_json::Value::String(dt.to_rfc3339())),
             ValueType::Date(date) => date.map(|date| serde_json::Value::String(format!("{date}"))),
             ValueType::Time(time) => time.map(|time| serde_json::Value::String(format!("{time}"))),
+            ValueType::Var(_, _) => todo!(),
         };
 
         match res {
@@ -830,6 +890,11 @@ impl<'a> ValueType<'a> {
         Self::Xml(Some(value.into()))
     }
 
+    /// Creates a new variable.
+    pub fn var(name: impl Into<Cow<'a, str>>, ty: VarType) -> Self {
+        Self::Var(name.into(), ty)
+    }
+
     /// `true` if the `Value` is null.
     pub fn is_null(&self) -> bool {
         match self {
@@ -851,6 +916,7 @@ impl<'a> ValueType<'a> {
             Self::Date(d) => d.is_none(),
             Self::Time(t) => t.is_none(),
             Self::Json(json) => json.is_none(),
+            Self::Var(_, _) => false,
         }
     }
 

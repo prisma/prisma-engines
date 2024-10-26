@@ -68,6 +68,10 @@ pub fn conv_params(params: &[Value<'_>]) -> crate::Result<my::Params> {
                         dt.timestamp_subsec_micros(),
                     )
                 }),
+
+                ValueType::Var(name, _) => {
+                    Err(Error::builder(ErrorKind::RanQueryWithVarParam(name.clone().into_owned())).build())?
+                }
             };
 
             match res {

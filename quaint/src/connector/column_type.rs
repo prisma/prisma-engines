@@ -1,7 +1,7 @@
 #[cfg(not(target_arch = "wasm32"))]
 use super::TypeIdentifier;
 
-use crate::{Value, ValueType};
+use crate::{ast::VarType, Value, ValueType};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ColumnType {
@@ -99,23 +99,24 @@ impl From<&Value<'_>> for ColumnType {
 impl From<&ValueType<'_>> for ColumnType {
     fn from(value: &ValueType) -> Self {
         match value {
-            ValueType::Int32(_) => ColumnType::Int32,
-            ValueType::Int64(_) => ColumnType::Int64,
-            ValueType::Float(_) => ColumnType::Float,
-            ValueType::Double(_) => ColumnType::Double,
-            ValueType::Text(_) => ColumnType::Text,
-            ValueType::Enum(_, _) => ColumnType::Enum,
+            ValueType::Int32(_) | ValueType::Var(_, VarType::Int32) => ColumnType::Int32,
+            ValueType::Int64(_) | ValueType::Var(_, VarType::Int64) => ColumnType::Int64,
+            ValueType::Float(_) | ValueType::Var(_, VarType::Float) => ColumnType::Float,
+            ValueType::Double(_) | ValueType::Var(_, VarType::Double) => ColumnType::Double,
+            ValueType::Text(_) | ValueType::Var(_, VarType::Text) => ColumnType::Text,
+            ValueType::Enum(_, _) | ValueType::Var(_, VarType::Enum) => ColumnType::Enum,
             ValueType::EnumArray(_, _) => ColumnType::TextArray,
-            ValueType::Bytes(_) => ColumnType::Bytes,
-            ValueType::Boolean(_) => ColumnType::Boolean,
-            ValueType::Char(_) => ColumnType::Char,
-            ValueType::Numeric(_) => ColumnType::Numeric,
-            ValueType::Json(_) => ColumnType::Json,
-            ValueType::Xml(_) => ColumnType::Xml,
-            ValueType::Uuid(_) => ColumnType::Uuid,
-            ValueType::DateTime(_) => ColumnType::DateTime,
-            ValueType::Date(_) => ColumnType::Date,
-            ValueType::Time(_) => ColumnType::Time,
+            ValueType::Var(_, VarType::Array(vt)) if **vt == VarType::Enum => ColumnType::TextArray,
+            ValueType::Bytes(_) | ValueType::Var(_, VarType::Bytes) => ColumnType::Bytes,
+            ValueType::Boolean(_) | ValueType::Var(_, VarType::Boolean) => ColumnType::Boolean,
+            ValueType::Char(_) | ValueType::Var(_, VarType::Char) => ColumnType::Char,
+            ValueType::Numeric(_) | ValueType::Var(_, VarType::Numeric) => ColumnType::Numeric,
+            ValueType::Json(_) | ValueType::Var(_, VarType::Json) => ColumnType::Json,
+            ValueType::Xml(_) | ValueType::Var(_, VarType::Xml) => ColumnType::Xml,
+            ValueType::Uuid(_) | ValueType::Var(_, VarType::Uuid) => ColumnType::Uuid,
+            ValueType::DateTime(_) | ValueType::Var(_, VarType::DateTime) => ColumnType::DateTime,
+            ValueType::Date(_) | ValueType::Var(_, VarType::Date) => ColumnType::Date,
+            ValueType::Time(_) | ValueType::Var(_, VarType::Time) => ColumnType::Time,
             ValueType::Array(Some(vals)) if !vals.is_empty() => match &vals[0].typed {
                 ValueType::Int32(_) => ColumnType::Int32Array,
                 ValueType::Int64(_) => ColumnType::Int64Array,
@@ -135,8 +136,30 @@ impl From<&ValueType<'_>> for ColumnType {
                 ValueType::Time(_) => ColumnType::TimeArray,
                 ValueType::Array(_) => ColumnType::Unknown,
                 ValueType::EnumArray(_, _) => ColumnType::Unknown,
+                ValueType::Var(_, _) => ColumnType::Unknown,
             },
             ValueType::Array(_) => ColumnType::Unknown,
+            ValueType::Var(_, VarType::Unknown) => ColumnType::Unknown,
+            ValueType::Var(_, VarType::Array(vt)) => match **vt {
+                VarType::Int32 => ColumnType::Int32Array,
+                VarType::Int64 => ColumnType::Int64Array,
+                VarType::Float => ColumnType::FloatArray,
+                VarType::Double => ColumnType::DoubleArray,
+                VarType::Text => ColumnType::TextArray,
+                VarType::Enum => ColumnType::TextArray,
+                VarType::Bytes => ColumnType::BytesArray,
+                VarType::Boolean => ColumnType::BooleanArray,
+                VarType::Char => ColumnType::CharArray,
+                VarType::Numeric => ColumnType::NumericArray,
+                VarType::Json => ColumnType::JsonArray,
+                VarType::Xml => ColumnType::TextArray,
+                VarType::Uuid => ColumnType::UuidArray,
+                VarType::DateTime => ColumnType::DateTimeArray,
+                VarType::Date => ColumnType::DateArray,
+                VarType::Time => ColumnType::TimeArray,
+                VarType::Unknown => ColumnType::Unknown,
+                VarType::Array(_) => ColumnType::Unknown,
+            },
         }
     }
 }

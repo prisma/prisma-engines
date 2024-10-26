@@ -187,6 +187,7 @@ impl Serialize for SerializedValue<'_> {
             ValueType::DateTime(value) => value.map(|value| value.to_rfc3339()).serialize(serializer),
             ValueType::Date(value) => value.serialize(serializer),
             ValueType::Time(value) => value.serialize(serializer),
+            ValueType::Var(_, _) => unreachable!(),
         }
     }
 }
