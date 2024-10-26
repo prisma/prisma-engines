@@ -82,7 +82,7 @@ fn var_type_to_placeholder_type(vt: &VarType) -> PlaceholderType {
         VarType::Bytes => PlaceholderType::Bytes,
         VarType::Boolean => PlaceholderType::Boolean,
         VarType::Char => PlaceholderType::String,
-        VarType::Array(t) => PlaceholderType::Array(Box::new(var_type_to_placeholder_type(&*t))),
+        VarType::Array(t) => PlaceholderType::Array(Box::new(var_type_to_placeholder_type(t))),
         VarType::Numeric => PlaceholderType::Float,
         VarType::Json => PlaceholderType::Object,
         VarType::Xml => PlaceholderType::String,
