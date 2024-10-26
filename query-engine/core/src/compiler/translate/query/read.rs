@@ -65,10 +65,10 @@ pub(crate) fn translate_read_query(query: ReadQuery, ctx: &Context<'_>) -> Trans
     })
 }
 
-fn build_read_m2m_query(query: RelatedRecordsQuery, ctx: &Context<'_>) -> TranslateResult<Expression> {
+fn build_read_m2m_query(_query: RelatedRecordsQuery, _ctx: &Context<'_>) -> TranslateResult<Expression> {
     todo!()
 }
 
-fn build_read_one2m_query(query: RelatedRecordsQuery, ctx: &Context<'_>) -> TranslateResult<Expression> {
+fn build_read_one2m_query(_query: RelatedRecordsQuery, _ctx: &Context<'_>) -> TranslateResult<Expression> {
     todo!()
 }
