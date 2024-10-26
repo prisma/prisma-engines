@@ -1,6 +1,7 @@
 use query_structure::PrismaValue;
+use serde::Serialize;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Binding {
     pub name: String,
     pub expr: Expression,
@@ -18,7 +19,7 @@ impl std::fmt::Display for Binding {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct DbQuery {
     pub query: String,
     pub params: Vec<PrismaValue>,
@@ -30,7 +31,8 @@ impl DbQuery {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
+#[serde(tag = "type", content = "args")]
 pub enum Expression {
     /// Sequence of statements. The whole sequence evaluates to the result of the last expression.
     Seq(Vec<Expression>),

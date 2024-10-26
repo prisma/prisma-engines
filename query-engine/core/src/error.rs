@@ -1,4 +1,4 @@
-use crate::{InterpreterError, QueryGraphBuilderError, RelationViolation, TransactionError};
+use crate::{compiler::CompileError, InterpreterError, QueryGraphBuilderError, RelationViolation, TransactionError};
 use connector::error::ConnectorError;
 use query_structure::DomainError;
 use thiserror::Error;
@@ -67,6 +67,9 @@ pub enum CoreError {
 
     #[error("Query timed out")]
     QueryTimeout,
+
+    #[error("Error compiling a query: {0}")]
+    CompileError(#[from] CompileError),
 }
 
 impl CoreError {
