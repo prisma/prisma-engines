@@ -47,10 +47,45 @@ pub enum PrismaValue {
 
     #[serde(serialize_with = "serialize_bytes")]
     Bytes(Vec<u8>),
-    // Placeholder {
-    //     name: String,
-    //     r#type: Type,
-    // }
+
+    #[serde(serialize_with = "serialize_placeholder")]
+    Placeholder {
+        name: String,
+        r#type: PlaceholderType,
+    },
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
+pub enum PlaceholderType {
+    Any,
+    String,
+    Int,
+    BigInt,
+    Float,
+    Boolean,
+    Decimal,
+    Date,
+    Array(Box<PlaceholderType>),
+    Object,
+    Bytes,
+}
+
+impl std::fmt::Display for PlaceholderType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            PlaceholderType::Any => write!(f, "Any"),
+            PlaceholderType::String => write!(f, "String"),
+            PlaceholderType::Int => write!(f, "Int"),
+            PlaceholderType::BigInt => write!(f, "BigInt"),
+            PlaceholderType::Float => write!(f, "Float"),
+            PlaceholderType::Boolean => write!(f, "Boolean"),
+            PlaceholderType::Decimal => write!(f, "Decimal"),
+            PlaceholderType::Date => write!(f, "Date"),
+            PlaceholderType::Array(t) => write!(f, "Array<{}>", t),
+            PlaceholderType::Object => write!(f, "Object"),
+            PlaceholderType::Bytes => write!(f, "Bytes"),
+        }
+    }
 }
 
 /// Stringify a date to the following format
@@ -111,6 +146,7 @@ impl TryFrom<serde_json::Value> for PrismaValue {
 
                     Ok(PrismaValue::DateTime(date))
                 }
+
                 Some("bigint") => {
                     let value = obj
                         .get("prisma__value")
@@ -121,6 +157,7 @@ impl TryFrom<serde_json::Value> for PrismaValue {
                         .map(PrismaValue::BigInt)
                         .map_err(|_| ConversionFailure::new("JSON bigint value", "PrismaValue"))
                 }
+
                 Some("decimal") => {
                     let value = obj
                         .get("prisma__value")
@@ -131,6 +168,7 @@ impl TryFrom<serde_json::Value> for PrismaValue {
                         .map(PrismaValue::Float)
                         .map_err(|_| ConversionFailure::new("JSON decimal value", "PrismaValue"))
                 }
+
                 Some("bytes") => {
                     let value = obj
                         .get("prisma__value")
@@ -138,6 +176,19 @@ impl TryFrom<serde_json::Value> for PrismaValue {
                         .ok_or_else(|| ConversionFailure::new("JSON bytes value", "PrismaValue"))?;
 
                     decode_bytes(value).map(PrismaValue::Bytes)
+                }
+
+                Some("param") => {
+                    let name = obj
+                        .get("prisma__value")
+                        .and_then(|v| v.as_str())
+                        .ok_or_else(|| ConversionFailure::new("JSON param value", "PrismaValue"))?
+                        .to_owned();
+
+                    Ok(PrismaValue::Placeholder {
+                        name,
+                        r#type: PlaceholderType::Any,
+                    })
                 }
 
                 _ => Ok(PrismaValue::Json(serde_json::to_string(&obj).unwrap())),
@@ -197,6 +248,19 @@ where
     for (k, v) in obj {
         map.serialize_entry(k, v)?;
     }
+
+    map.end()
+}
+
+fn serialize_placeholder<S>(name: &str, r#type: &PlaceholderType, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let mut map = serializer.serialize_map(Some(3))?;
+
+    map.serialize_entry("prisma__type", "param")?;
+    map.serialize_entry("prisma__value", name)?;
+    map.serialize_entry("prisma__paramType", r#type)?;
 
     map.end()
 }
@@ -349,6 +413,7 @@ impl fmt::Display for PrismaValue {
 
                 write!(f, "{{ {joined} }}")
             }
+            PrismaValue::Placeholder { name, r#type } => write!(f, "var({name}: {type})"),
         }
     }
 }

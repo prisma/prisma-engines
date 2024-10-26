@@ -6,7 +6,7 @@ use query_core::{
     schema::{ObjectType, OutputField, QuerySchema},
     ArgumentValue, Operation, Selection,
 };
-use query_structure::{decode_bytes, parse_datetime, prelude::ParentContainer, Field};
+use query_structure::{decode_bytes, parse_datetime, prelude::ParentContainer, Field, PlaceholderType, PrismaValue};
 use serde_json::Value as JsonValue;
 use std::str::FromStr;
 
@@ -243,6 +243,20 @@ impl<'a> JsonProtocolAdapter<'a> {
 
                     Ok(ArgumentValue::FieldRef(values))
                 }
+                Some(custom_types::PARAM) => {
+                    let name = obj
+                        .get(custom_types::VALUE)
+                        .and_then(|v| v.as_str())
+                        .ok_or_else(build_err)?
+                        .to_owned();
+
+                    let placeholder = PrismaValue::Placeholder {
+                        name,
+                        r#type: PlaceholderType::Any,
+                    };
+
+                    Ok(ArgumentValue::Scalar(placeholder))
+                }
                 _ => {
                     let values = obj
                         .into_iter()
@@ -421,12 +435,12 @@ mod tests {
           generator client {
             provider        = "prisma-client-js"
           }
-          
+
           datasource db {
             provider = "mongodb"
             url      = "mongodb://"
           }
-          
+
           model User {
             id String @id @map("_id")
             name String?
@@ -441,7 +455,7 @@ mod tests {
           model Post {
             id String @id @map("_id")
             title String
-            userId String 
+            userId String
             user User @relation(fields: [userId], references: [id])
           }
 
@@ -1391,28 +1405,28 @@ mod tests {
           generator client {
             provider        = "prisma-client-js"
           }
-          
+
           datasource db {
             provider = "mongodb"
             url      = "mongodb://"
           }
-          
+
           model Comment {
             id String @id @default(auto()) @map("_id") @db.ObjectId
-          
+
             country String?
             content CommentContent
           }
-          
+
           type CommentContent {
             text    String
             upvotes CommentContentUpvotes[]
           }
-          
+
           type CommentContentUpvotes {
             vote   Boolean
             userId String
-          }          
+          }
         "#;
         let mut schema = psl::validate(schema_str.into());
 
@@ -1532,21 +1546,21 @@ mod tests {
           generator client {
             provider        = "prisma-client-js"
           }
-          
+
           datasource db {
             provider = "mongodb"
             url      = "mongodb://"
           }
-          
+
           model List {
             id String @id @default(auto()) @map("_id") @db.ObjectId
             head ListNode?
           }
-          
+
           type ListNode  {
             value Int
-            next ListNode? 
-          }        
+            next ListNode?
+          }
         "#;
         let mut schema = psl::validate(schema_str.into());
 
@@ -1586,24 +1600,24 @@ mod tests {
           generator client {
             provider        = "prisma-client-js"
           }
-          
+
           datasource db {
             provider = "mongodb"
             url      = "mongodb://"
           }
-          
+
           model User {
             id String @id @default(auto()) @map("_id") @db.ObjectId
-          
+
             billingAddress Address
             shippingAddress Address
           }
-          
+
           type Address {
             number Int
             street String
             zipCode Int
-          }        
+          }
         "#;
         let mut schema = psl::validate(schema_str.into());
 
@@ -1675,28 +1689,28 @@ mod tests {
           generator client {
             provider        = "prisma-client-js"
           }
-          
+
           datasource db {
             provider = "mongodb"
             url      = "mongodb://"
           }
-          
+
           model User {
             id         String    @id @default(auto()) @map("_id") @db.ObjectId
             billingAddress Address
             shippingAddress Address
           }
-          
+
           type Address {
             streetAddress StreetAddress
             zipCode String
             city String
           }
-          
+
           type StreetAddress {
             streetName String
             houseNumber String
-          }       
+          }
         "#;
         let mut schema = psl::validate(schema_str.into());
 

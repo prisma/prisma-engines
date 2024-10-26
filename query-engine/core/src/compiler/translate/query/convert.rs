@@ -1,6 +1,7 @@
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
-use query_structure::PrismaValue;
+use quaint::ast::VarType;
+use query_structure::{PlaceholderType, PrismaValue};
 
 pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>) -> PrismaValue {
     match value.typed {
@@ -62,5 +63,32 @@ pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>) -> PrismaVa
             PrismaValue::DateTime(dt.into())
         }
         quaint::ValueType::Time(None) => PrismaValue::Null,
+        quaint::ValueType::Var(name, vt) => PrismaValue::Placeholder {
+            name: name.into_owned(),
+            r#type: var_type_to_placeholder_type(&vt),
+        },
+    }
+}
+
+fn var_type_to_placeholder_type(vt: &VarType) -> PlaceholderType {
+    match vt {
+        VarType::Unknown => PlaceholderType::Any,
+        VarType::Int32 => PlaceholderType::Int,
+        VarType::Int64 => PlaceholderType::BigInt,
+        VarType::Float => PlaceholderType::Float,
+        VarType::Double => PlaceholderType::Float,
+        VarType::Text => PlaceholderType::String,
+        VarType::Enum => PlaceholderType::String,
+        VarType::Bytes => PlaceholderType::Bytes,
+        VarType::Boolean => PlaceholderType::Boolean,
+        VarType::Char => PlaceholderType::String,
+        VarType::Array(t) => PlaceholderType::Array(Box::new(var_type_to_placeholder_type(&*t))),
+        VarType::Numeric => PlaceholderType::Float,
+        VarType::Json => PlaceholderType::Object,
+        VarType::Xml => PlaceholderType::String,
+        VarType::Uuid => PlaceholderType::String,
+        VarType::DateTime => PlaceholderType::Date,
+        VarType::Date => PlaceholderType::Date,
+        VarType::Time => PlaceholderType::Date,
     }
 }
