@@ -1,4 +1,7 @@
-use crate::ast::{Value, ValueType};
+use crate::{
+    ast::{Value, ValueType},
+    error::{Error, ErrorKind},
+};
 
 use bigdecimal::BigDecimal;
 use std::{borrow::Cow, convert::TryFrom};
@@ -25,6 +28,12 @@ impl<'a> IntoSql<'a> for &'a Value<'a> {
             ValueType::DateTime(val) => val.into_sql(),
             ValueType::Date(val) => val.into_sql(),
             ValueType::Time(val) => val.into_sql(),
+            ValueType::Var(name, _) => {
+                panic!(
+                    "conversion error: {:?}",
+                    Error::builder(ErrorKind::RanQueryWithVarParam(name.clone().into_owned())).build()
+                )
+            }
         }
     }
 }

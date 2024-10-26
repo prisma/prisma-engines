@@ -367,6 +367,8 @@ impl From<quaint::error::Error> for SqlError {
             e @ QuaintKind::DatabaseAlreadyExists { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::InvalidConnectionArguments => SqlError::ConnectionError(e),
             e @ QuaintKind::SocketTimeout => SqlError::ConnectionError(e),
+            e @ QuaintKind::VarAsRawValue { .. } => SqlError::ConversionError(e.into()),
+            e @ QuaintKind::RanQueryWithVarParam { .. } => SqlError::ConversionError(e.into()),
         }
     }
 }

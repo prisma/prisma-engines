@@ -1,8 +1,8 @@
 use crate::context::Context;
 use chrono::Utc;
-use prisma_value::PrismaValue;
+use prisma_value::{PlaceholderType, PrismaValue};
 use quaint::{
-    ast::{EnumName, Value, ValueType},
+    ast::{EnumName, Value, ValueType, VarType},
     prelude::{EnumVariant, TypeDataLength, TypeFamily},
 };
 use query_structure::{ScalarField, TypeIdentifier};
@@ -74,7 +74,21 @@ impl ScalarFieldExt for ScalarField {
                 TypeIdentifier::Int => Value::null_int32(),
                 TypeIdentifier::BigInt => Value::null_int64(),
                 TypeIdentifier::Bytes => Value::null_bytes(),
-                TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
+                TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach this path"),
+            },
+            (PrismaValue::Placeholder { name, .. }, ident) => match ident {
+                TypeIdentifier::String => Value::var(name, VarType::Text),
+                TypeIdentifier::Int => Value::var(name, VarType::Int32),
+                TypeIdentifier::BigInt => Value::var(name, VarType::Int64),
+                TypeIdentifier::Float => Value::var(name, VarType::Numeric),
+                TypeIdentifier::Decimal => Value::var(name, VarType::Numeric),
+                TypeIdentifier::Boolean => Value::var(name, VarType::Boolean),
+                TypeIdentifier::Enum(_) => Value::var(name, VarType::Enum),
+                TypeIdentifier::UUID => Value::var(name, VarType::Uuid),
+                TypeIdentifier::Json => Value::var(name, VarType::Json),
+                TypeIdentifier::DateTime => Value::var(name, VarType::DateTime),
+                TypeIdentifier::Bytes => Value::var(name, VarType::Bytes),
+                TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach this path"),
             },
         };
 
@@ -126,6 +140,23 @@ pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
         PrismaValue::Bytes(b) => Value::bytes(b),
         PrismaValue::Null => Value::null_int32(), // Can't tell which type the null is supposed to be.
         PrismaValue::Object(_) => unimplemented!(),
+        PrismaValue::Placeholder { name, r#type } => Value::var(name, convert_placeholder_type_to_var_type(&r#type)),
+    }
+}
+
+fn convert_placeholder_type_to_var_type(pt: &PlaceholderType) -> VarType {
+    match pt {
+        PlaceholderType::Any => VarType::Unknown,
+        PlaceholderType::String => VarType::Text,
+        PlaceholderType::Int => VarType::Int32,
+        PlaceholderType::BigInt => VarType::Int64,
+        PlaceholderType::Float => VarType::Numeric,
+        PlaceholderType::Boolean => VarType::Boolean,
+        PlaceholderType::Decimal => VarType::Numeric,
+        PlaceholderType::Date => VarType::DateTime,
+        PlaceholderType::Array(t) => VarType::Array(Box::new(convert_placeholder_type_to_var_type(&*t))),
+        PlaceholderType::Object => VarType::Json,
+        PlaceholderType::Bytes => VarType::Bytes,
     }
 }
 
