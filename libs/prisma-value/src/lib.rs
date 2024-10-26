@@ -8,6 +8,7 @@ use chrono::prelude::*;
 use serde::de::Unexpected;
 use serde::ser::SerializeMap;
 use serde::{ser::Serializer, Deserialize, Deserializer, Serialize};
+use serde_json::json;
 use std::{convert::TryFrom, fmt, str::FromStr};
 use uuid::Uuid;
 
@@ -256,11 +257,16 @@ fn serialize_placeholder<S>(name: &str, r#type: &PlaceholderType, serializer: S)
 where
     S: Serializer,
 {
-    let mut map = serializer.serialize_map(Some(3))?;
+    let mut map = serializer.serialize_map(Some(2))?;
 
     map.serialize_entry("prisma__type", "param")?;
-    map.serialize_entry("prisma__value", name)?;
-    map.serialize_entry("prisma__paramType", r#type)?;
+    map.serialize_entry(
+        "prisma__value",
+        &json!({
+            "name": name,
+            "type": r#type.to_string(),
+        }),
+    )?;
 
     map.end()
 }
