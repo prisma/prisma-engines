@@ -280,7 +280,7 @@ jobs:
         # See https://github.com/crazy-max/ghaction-import-gpg/releases
         # v6 -> 01dd5d3ca463c7f10f7f4f7b4f177225ac661ee4
         # For security reasons, we should pin the version of the action
-        uses: crazy-max/ghaction-import-gpg@01dd5d3ca463c7f10f7f4f7b4f177225ac661ee4
+        uses: crazy-max/ghaction-import-gpg@cb9bde2e2525e640591a934b1fd28eef1dcaf5e5
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.GPG_KEY_PASSPHRASE }}
