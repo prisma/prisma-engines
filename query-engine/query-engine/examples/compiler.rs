@@ -19,7 +19,19 @@ pub fn main() -> anyhow::Result<()> {
         model_name: Some("User".into()),
         action: Action::new(QueryTag::FindMany),
         query: FieldQuery {
-            arguments: None,
+            arguments: Some({
+                let mut map = IndexMap::new();
+                map.insert(
+                    "where".into(),
+                    serde_json::json!({
+                        "email": {
+                            "$type": "Param",
+                            "value": "userEmail",
+                        }
+                    }),
+                );
+                map
+            }),
             selection: SelectionSet::new({
                 let mut map = IndexMap::new();
                 map.insert("$scalars".into(), SelectionSetValue::Shorthand(true));

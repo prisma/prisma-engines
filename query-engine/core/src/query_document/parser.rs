@@ -232,6 +232,10 @@ impl QueryDocumentParser {
         possible_input_types: &[InputType<'a>],
         query_schema: &'a QuerySchema,
     ) -> QueryParserResult<ParsedInputValue<'a>> {
+        if let ArgumentValue::Scalar(pv @ PrismaValue::Placeholder { .. }) = &value {
+            return Ok(ParsedInputValue::Single(pv.clone()));
+        }
+
         let mut failures = Vec::new();
 
         macro_rules! try_this {
@@ -908,6 +912,7 @@ pub(crate) mod conversions {
             PrismaValue::Float(_) => "Float".to_string(),
             PrismaValue::BigInt(_) => "BigInt".to_string(),
             PrismaValue::Bytes(_) => "Bytes".to_string(),
+            PrismaValue::Placeholder { r#type, .. } => r#type.to_string(),
         }
     }
 
