@@ -180,15 +180,20 @@ impl TryFrom<serde_json::Value> for PrismaValue {
                 }
 
                 Some("param") => {
-                    let name = obj
+                    let obj = obj
                         .get("prisma__value")
+                        .and_then(|v| v.as_object())
+                        .ok_or_else(|| ConversionFailure::new("JSON param value", "PrismaValue"))?;
+
+                    let name = obj
+                        .get("name")
                         .and_then(|v| v.as_str())
-                        .ok_or_else(|| ConversionFailure::new("JSON param value", "PrismaValue"))?
+                        .ok_or_else(|| ConversionFailure::new("param name", "JSON param value"))?
                         .to_owned();
 
                     Ok(PrismaValue::Placeholder {
                         name,
-                        r#type: PlaceholderType::Any,
+                        r#type: PlaceholderType::Any, // parsing the type is not implemented yet
                     })
                 }
 
