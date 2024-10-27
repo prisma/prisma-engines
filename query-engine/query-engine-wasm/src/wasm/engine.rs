@@ -359,4 +359,28 @@ impl QueryEngine {
         .with_subscriber(dispatcher)
         .await
     }
+
+    #[wasm_bindgen]
+    pub async fn compile(
+        &self,
+        request: String,
+        _human_readable: bool, // ignored on wasm to not compile it in
+    ) -> Result<String, wasm_bindgen::JsError> {
+        let dispatcher = self.logger.dispatcher();
+
+        async {
+            let inner = self.inner.read().await;
+            let engine = inner.as_engine()?;
+
+            let request = RequestBody::try_from_str(&request, engine.engine_protocol())?;
+            let query_doc = request
+                .into_doc(engine.query_schema())
+                .map_err(|err| napi::Error::from_reason(err.to_string()))?;
+
+            let plan = query_core::compiler::compile(engine.query_schema(), query_doc).map_err(ApiError::from)?;
+            Ok(serde_json::to_string(&plan)?)
+        }
+        .with_subscriber(dispatcher)
+        .await
+    }
 }
