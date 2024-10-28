@@ -232,6 +232,7 @@ impl QueryDocumentParser {
         possible_input_types: &[InputType<'a>],
         query_schema: &'a QuerySchema,
     ) -> QueryParserResult<ParsedInputValue<'a>> {
+        // TODO: we disabled generating Param explicitly in the query schema for now
         if let ArgumentValue::Scalar(pv @ PrismaValue::Placeholder { .. }) = &value {
             return Ok(ParsedInputValue::Single(pv.clone()));
         }
@@ -414,6 +415,8 @@ impl QueryDocumentParser {
 
             // UUID coercion matchers
             (PrismaValue::Uuid(uuid), ScalarType::String) => Ok(PrismaValue::String(uuid.to_string())),
+
+            (pv @ PrismaValue::Placeholder { .. }, ScalarType::Param) => Ok(pv),
 
             // All other combinations are value type mismatches.
             (_, _) => Err(ValidationError::invalid_argument_type(
