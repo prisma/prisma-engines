@@ -18,11 +18,8 @@ use crate::{
 use super::TranslateResult;
 
 pub(crate) fn translate_query(query: Query) -> TranslateResult<Expression> {
-    let connection_info = ConnectionInfo::External(ExternalConnectionInfo::new(
-        SqlFamily::Postgres,
-        "public".to_owned(),
-        None,
-    ));
+    let connection_info =
+        ConnectionInfo::External(ExternalConnectionInfo::new(SqlFamily::Sqlite, "main".to_owned(), None));
 
     let ctx = Context::new(&connection_info, None);
 
