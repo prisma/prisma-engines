@@ -15,6 +15,11 @@ pub fn main() -> anyhow::Result<()> {
     let schema = Arc::new(schema);
     let query_schema = Arc::new(query_core::schema::build(schema, true));
 
+    // prisma.user.findMany({
+    //     where: {
+    //         email: Prisma.Param("userEmail")
+    //     }
+    // })
     let request = RequestBody::Json(JsonBody::Single(JsonSingleQuery {
         model_name: Some("User".into()),
         action: Action::new(QueryTag::FindMany),
