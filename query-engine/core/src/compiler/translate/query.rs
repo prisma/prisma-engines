@@ -30,7 +30,7 @@ pub(crate) fn translate_query(query: Query) -> TranslateResult<Expression> {
 }
 
 fn build_db_query<'a>(query: impl Into<quaint::ast::Query<'a>>) -> TranslateResult<DbQuery> {
-    let (sql, params) = quaint::visitor::Postgres::build(query)?;
+    let (sql, params) = quaint::visitor::Sqlite::build(query)?;
     let params = params
         .into_iter()
         .map(convert::quaint_value_to_prisma_value)
