@@ -14,7 +14,7 @@ itertools.workspace = true
 graphql-parser = { git = "https://github.com/prisma/graphql-parser", optional = true }
 serde.workspace = true
 serde_json.workspace = true
-futures = "0.3"
+futures.workspace = true
 indexmap.workspace = true
 bigdecimal = "0.3"
 thiserror = "1"

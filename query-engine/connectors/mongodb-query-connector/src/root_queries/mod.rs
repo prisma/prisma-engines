@@ -14,14 +14,15 @@ use bson::Bson;
 use bson::Document;
 use futures::Future;
 use query_engine_metrics::{
-    histogram, increment_counter, metrics, PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
-    PRISMA_DATASOURCE_QUERIES_TOTAL,
+    counter, histogram, PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, PRISMA_DATASOURCE_QUERIES_TOTAL,
 };
 use query_structure::*;
 use std::sync::Arc;
 use std::time::Instant;
 use tracing::{debug, info_span};
 use tracing_futures::Instrument;
+
+const DB_SYSTEM_NAME: &str = "mongodb";
 
 /// Transforms a document to a `Record`, fields ordered as defined in `fields`.
 fn document_to_record(mut doc: Document, fields: &[String], meta_mapping: &OutputMetaMapping) -> crate::Result<Record> {
@@ -69,15 +70,22 @@ where
     let span = info_span!(
         "prisma:engine:db_query",
         user_facing = true,
-        "db.statement" = %Arc::clone(&query_string)
+        "db.system" = DB_SYSTEM_NAME,
+        "db.statement" = %Arc::clone(&query_string),
+        "db.operation.name" = builder.query_type(),
+        "otel.kind" = "client"
     );
+
+    if let Some(coll) = builder.collection() {
+        span.record("db.collection.name", coll);
+    }
 
     let start = Instant::now();
     let res = f().instrument(span).await;
     let elapsed = start.elapsed().as_millis() as f64;
 
-    histogram!(PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, elapsed);
-    increment_counter!(PRISMA_DATASOURCE_QUERIES_TOTAL);
+    histogram!(PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS).record(elapsed);
+    counter!(PRISMA_DATASOURCE_QUERIES_TOTAL).increment(1);
 
     // TODO prisma/team-orm#136: fix log subscription.
     // NOTE: `params` is a part of the interface for query logs.
