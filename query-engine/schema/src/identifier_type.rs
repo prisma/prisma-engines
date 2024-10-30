@@ -186,7 +186,12 @@ impl std::fmt::Display for IdentifierType {
             IdentifierType::ToOneRelationFilterInput(related_model, arity) => {
                 let nullable = if arity.is_optional() { "Nullable" } else { "" };
 
-                write!(f, "{}{}RelationFilter", capitalize(related_model.name()), nullable)
+                write!(
+                    f,
+                    "{}{}ScalarRelationFilter",
+                    capitalize(related_model.name()),
+                    nullable
+                )
             }
             IdentifierType::ToOneCompositeFilterInput(ct, arity) => {
                 let nullable = if arity.is_optional() { "Nullable" } else { "" };
