@@ -30,12 +30,18 @@ use tracing::{info_span, Instrument};
 pub(crate) struct JsBaseQueryable {
     pub(crate) proxy: CommonProxy,
     pub provider: AdapterFlavour,
+    pub(crate) db_system_name: &'static str,
 }
 
 impl JsBaseQueryable {
     pub(crate) fn new(proxy: CommonProxy) -> Self {
         let provider: AdapterFlavour = proxy.provider.parse().unwrap();
-        Self { proxy, provider }
+        let db_system_name = provider.db_system_name();
+        Self {
+            proxy,
+            provider,
+            db_system_name,
+        }
     }
 
     /// visit a quaint query AST according to the provider of the JS connector
@@ -84,7 +90,7 @@ impl QuaintQueryable for JsBaseQueryable {
     }
 
     async fn query_raw(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<ResultSet> {
-        metrics::query("js.query_raw", sql, params, move || async move {
+        metrics::query("js.query_raw", self.db_system_name, sql, params, move || async move {
             self.do_query_raw(sql, params).await
         })
         .await
@@ -104,7 +110,7 @@ impl QuaintQueryable for JsBaseQueryable {
     }
 
     async fn execute_raw(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<u64> {
-        metrics::query("js.execute_raw", sql, params, move || async move {
+        metrics::query("js.execute_raw", self.db_system_name, sql, params, move || async move {
             self.do_execute_raw(sql, params).await
         })
         .await
@@ -116,7 +122,7 @@ impl QuaintQueryable for JsBaseQueryable {
 
     async fn raw_cmd(&self, cmd: &str) -> quaint::Result<()> {
         let params = &[];
-        metrics::query("js.raw_cmd", cmd, params, move || async move {
+        metrics::query("js.raw_cmd", self.db_system_name, cmd, params, move || async move {
             self.do_execute_raw(cmd, params).await?;
             Ok(())
         })
@@ -174,7 +180,7 @@ impl JsBaseQueryable {
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
         let query = self.build_query(sql, params).instrument(serialization_span).await?;
 
-        let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
+        let sql_span = info_span!("js:query:sql", user_facing = true, "db.system" = %self.db_system_name, "db.statement" = %sql, "otel.kind" = "client");
         let result_set = self.proxy.query_raw(query).instrument(sql_span).await?;
 
         let len = result_set.len();
@@ -196,7 +202,7 @@ impl JsBaseQueryable {
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
         let query = self.build_query(sql, params).instrument(serialization_span).await?;
 
-        let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
+        let sql_span = info_span!("js:query:sql", user_facing = true, "db.system" = %self.db_system_name, "db.statement" = %sql, "otel.kind" = "client");
         let affected_rows = self.proxy.execute_raw(query).instrument(sql_span).await?;
 
         Ok(affected_rows as u64)

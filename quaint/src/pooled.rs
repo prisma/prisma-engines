@@ -314,7 +314,7 @@ impl Builder {
             url.set_flavour(flavour);
         }
 
-        if let QuaintManager::Postgres { ref mut url } = self.manager {
+        if let QuaintManager::Postgres { ref mut url, .. } = self.manager {
             url.set_flavour(flavour);
         }
     }
@@ -423,7 +423,8 @@ impl Quaint {
                 let max_connection_lifetime = url.max_connection_lifetime();
                 let max_idle_connection_lifetime = url.max_idle_connection_lifetime();
 
-                let manager = QuaintManager::Postgres { url };
+                let tls_manager = crate::connector::MakeTlsConnectorManager::new(url.clone());
+                let manager = QuaintManager::Postgres { url, tls_manager };
                 let mut builder = Builder::new(s, manager)?;
 
                 if let Some(limit) = connection_limit {

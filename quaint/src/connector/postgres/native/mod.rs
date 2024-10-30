@@ -37,6 +37,7 @@ use std::{
     sync::atomic::{AtomicBool, Ordering},
     time::Duration,
 };
+use tokio::sync::OnceCell;
 use tokio_postgres::{config::ChannelBinding, Client, Config, Statement};
 use websocket::connect_via_websocket;
 
@@ -55,6 +56,9 @@ impl Debug for PostgresClient {
     }
 }
 
+const DB_SYSTEM_NAME_POSTGRESQL: &str = "postgresql";
+const DB_SYSTEM_NAME_COCKROACHDB: &str = "cockroachdb";
+
 /// A connector interface for the PostgreSQL database.
 #[derive(Debug)]
 pub struct PostgreSql {
@@ -65,6 +69,7 @@ pub struct PostgreSql {
     is_healthy: AtomicBool,
     is_cockroachdb: bool,
     is_materialize: bool,
+    db_system_name: &'static str,
 }
 
 /// Key uniquely representing an SQL statement in the prepared statements cache.
@@ -232,27 +237,10 @@ impl PostgresNativeUrl {
 
 impl PostgreSql {
     /// Create a new connection to the database.
-    pub async fn new(url: PostgresNativeUrl) -> crate::Result<Self> {
+    pub async fn new(url: PostgresNativeUrl, tls_manager: &MakeTlsConnectorManager) -> crate::Result<Self> {
         let config = url.to_config();
 
-        let mut tls_builder = TlsConnector::builder();
-
-        {
-            let ssl_params = url.ssl_params();
-            let auth = ssl_params.to_owned().into_auth().await?;
-
-            if let Some(certificate) = auth.certificate.0 {
-                tls_builder.add_root_certificate(certificate);
-            }
-
-            tls_builder.danger_accept_invalid_certs(auth.ssl_accept_mode == SslAcceptMode::AcceptInvalidCerts);
-
-            if let Some(identity) = auth.identity.0 {
-                tls_builder.identity(identity);
-            }
-        }
-
-        let tls = MakeTlsConnector::new(tls_builder.build()?);
+        let tls = tls_manager.get_connector().await?;
         let (client, conn) = timeout::connect(url.connect_timeout(), config.connect(tls)).await?;
 
         let is_cockroachdb = conn.parameter("crdb_version").is_some();
@@ -285,6 +273,12 @@ impl PostgreSql {
             }
         }
 
+        let db_system_name = if is_cockroachdb {
+            DB_SYSTEM_NAME_COCKROACHDB
+        } else {
+            DB_SYSTEM_NAME_POSTGRESQL
+        };
+
         Ok(Self {
             client: PostgresClient(client),
             socket_timeout: url.query_params.socket_timeout,
@@ -293,6 +287,7 @@ impl PostgreSql {
             is_healthy: AtomicBool::new(true),
             is_cockroachdb,
             is_materialize,
+            db_system_name,
         })
     }
 
@@ -308,6 +303,7 @@ impl PostgreSql {
             is_healthy: AtomicBool::new(true),
             is_cockroachdb: false,
             is_materialize: false,
+            db_system_name: DB_SYSTEM_NAME_POSTGRESQL,
         })
     }
 
@@ -539,72 +535,84 @@ impl Queryable for PostgreSql {
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         self.check_bind_variables_len(params)?;
 
-        metrics::query("postgres.query_raw", sql, params, move || async move {
-            let stmt = self.fetch_cached(sql, &[]).await?;
+        metrics::query(
+            "postgres.query_raw",
+            self.db_system_name,
+            sql,
+            params,
+            move || async move {
+                let stmt = self.fetch_cached(sql, &[]).await?;
 
-            if stmt.params().len() != params.len() {
-                let kind = ErrorKind::IncorrectNumberOfParameters {
-                    expected: stmt.params().len(),
-                    actual: params.len(),
-                };
+                if stmt.params().len() != params.len() {
+                    let kind = ErrorKind::IncorrectNumberOfParameters {
+                        expected: stmt.params().len(),
+                        actual: params.len(),
+                    };
 
-                return Err(Error::builder(kind).build());
-            }
+                    return Err(Error::builder(kind).build());
+                }
 
-            let rows = self
-                .perform_io(self.client.0.query(&stmt, conversion::conv_params(params).as_slice()))
-                .await?;
+                let rows = self
+                    .perform_io(self.client.0.query(&stmt, conversion::conv_params(params).as_slice()))
+                    .await?;
 
-            let col_types = stmt
-                .columns()
-                .iter()
-                .map(|c| PGColumnType::from_pg_type(c.type_()))
-                .map(ColumnType::from)
-                .collect::<Vec<_>>();
-            let mut result = ResultSet::new(stmt.to_column_names(), col_types, Vec::new());
+                let col_types = stmt
+                    .columns()
+                    .iter()
+                    .map(|c| PGColumnType::from_pg_type(c.type_()))
+                    .map(ColumnType::from)
+                    .collect::<Vec<_>>();
+                let mut result = ResultSet::new(stmt.to_column_names(), col_types, Vec::new());
 
-            for row in rows {
-                result.rows.push(row.get_result_row()?);
-            }
+                for row in rows {
+                    result.rows.push(row.get_result_row()?);
+                }
 
-            Ok(result)
-        })
+                Ok(result)
+            },
+        )
         .await
     }
 
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         self.check_bind_variables_len(params)?;
 
-        metrics::query("postgres.query_raw", sql, params, move || async move {
-            let stmt = self.fetch_cached(sql, params).await?;
+        metrics::query(
+            "postgres.query_raw",
+            self.db_system_name,
+            sql,
+            params,
+            move || async move {
+                let stmt = self.fetch_cached(sql, params).await?;
 
-            if stmt.params().len() != params.len() {
-                let kind = ErrorKind::IncorrectNumberOfParameters {
-                    expected: stmt.params().len(),
-                    actual: params.len(),
-                };
+                if stmt.params().len() != params.len() {
+                    let kind = ErrorKind::IncorrectNumberOfParameters {
+                        expected: stmt.params().len(),
+                        actual: params.len(),
+                    };
 
-                return Err(Error::builder(kind).build());
-            }
+                    return Err(Error::builder(kind).build());
+                }
 
-            let col_types = stmt
-                .columns()
-                .iter()
-                .map(|c| PGColumnType::from_pg_type(c.type_()))
-                .map(ColumnType::from)
-                .collect::<Vec<_>>();
-            let rows = self
-                .perform_io(self.client.0.query(&stmt, conversion::conv_params(params).as_slice()))
-                .await?;
+                let col_types = stmt
+                    .columns()
+                    .iter()
+                    .map(|c| PGColumnType::from_pg_type(c.type_()))
+                    .map(ColumnType::from)
+                    .collect::<Vec<_>>();
+                let rows = self
+                    .perform_io(self.client.0.query(&stmt, conversion::conv_params(params).as_slice()))
+                    .await?;
 
-            let mut result = ResultSet::new(stmt.to_column_names(), col_types, Vec::new());
+                let mut result = ResultSet::new(stmt.to_column_names(), col_types, Vec::new());
 
-            for row in rows {
-                result.rows.push(row.get_result_row()?);
-            }
+                for row in rows {
+                    result.rows.push(row.get_result_row()?);
+                }
 
-            Ok(result)
-        })
+                Ok(result)
+            },
+        )
         .await
     }
 
@@ -692,53 +700,65 @@ impl Queryable for PostgreSql {
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         self.check_bind_variables_len(params)?;
 
-        metrics::query("postgres.execute_raw", sql, params, move || async move {
-            let stmt = self.fetch_cached(sql, &[]).await?;
+        metrics::query(
+            "postgres.execute_raw",
+            self.db_system_name,
+            sql,
+            params,
+            move || async move {
+                let stmt = self.fetch_cached(sql, &[]).await?;
 
-            if stmt.params().len() != params.len() {
-                let kind = ErrorKind::IncorrectNumberOfParameters {
-                    expected: stmt.params().len(),
-                    actual: params.len(),
-                };
+                if stmt.params().len() != params.len() {
+                    let kind = ErrorKind::IncorrectNumberOfParameters {
+                        expected: stmt.params().len(),
+                        actual: params.len(),
+                    };
 
-                return Err(Error::builder(kind).build());
-            }
+                    return Err(Error::builder(kind).build());
+                }
 
-            let changes = self
-                .perform_io(self.client.0.execute(&stmt, conversion::conv_params(params).as_slice()))
-                .await?;
+                let changes = self
+                    .perform_io(self.client.0.execute(&stmt, conversion::conv_params(params).as_slice()))
+                    .await?;
 
-            Ok(changes)
-        })
+                Ok(changes)
+            },
+        )
         .await
     }
 
     async fn execute_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         self.check_bind_variables_len(params)?;
 
-        metrics::query("postgres.execute_raw", sql, params, move || async move {
-            let stmt = self.fetch_cached(sql, params).await?;
+        metrics::query(
+            "postgres.execute_raw",
+            self.db_system_name,
+            sql,
+            params,
+            move || async move {
+                let stmt = self.fetch_cached(sql, params).await?;
 
-            if stmt.params().len() != params.len() {
-                let kind = ErrorKind::IncorrectNumberOfParameters {
-                    expected: stmt.params().len(),
-                    actual: params.len(),
-                };
+                if stmt.params().len() != params.len() {
+                    let kind = ErrorKind::IncorrectNumberOfParameters {
+                        expected: stmt.params().len(),
+                        actual: params.len(),
+                    };
 
-                return Err(Error::builder(kind).build());
-            }
+                    return Err(Error::builder(kind).build());
+                }
 
-            let changes = self
-                .perform_io(self.client.0.execute(&stmt, conversion::conv_params(params).as_slice()))
-                .await?;
+                let changes = self
+                    .perform_io(self.client.0.execute(&stmt, conversion::conv_params(params).as_slice()))
+                    .await?;
 
-            Ok(changes)
-        })
+                Ok(changes)
+            },
+        )
         .await
     }
 
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
-        metrics::query("postgres.raw_cmd", cmd, &[], move || async move {
+        metrics::query("postgres.raw_cmd", self.db_system_name, cmd, &[], move || async move {
             self.perform_io(self.client.0.simple_query(cmd)).await?;
             Ok(())
         })
@@ -926,6 +946,48 @@ fn is_safe_identifier(ident: &str) -> bool {
     true
 }
 
+pub struct MakeTlsConnectorManager {
+    url: PostgresNativeUrl,
+    connector: OnceCell<MakeTlsConnector>,
+}
+
+impl MakeTlsConnectorManager {
+    pub fn new(url: PostgresNativeUrl) -> Self {
+        MakeTlsConnectorManager {
+            url,
+            connector: OnceCell::new(),
+        }
+    }
+
+    pub async fn get_connector(&self) -> crate::Result<MakeTlsConnector> {
+        self.connector
+            .get_or_try_init(|| async {
+                let mut tls_builder = TlsConnector::builder();
+
+                {
+                    let ssl_params = self.url.ssl_params();
+                    let auth = ssl_params.to_owned().into_auth().await?;
+
+                    if let Some(certificate) = auth.certificate.0 {
+                        tls_builder.add_root_certificate(certificate);
+                    }
+
+                    tls_builder.danger_accept_invalid_certs(auth.ssl_accept_mode == SslAcceptMode::AcceptInvalidCerts);
+
+                    if let Some(identity) = auth.identity.0 {
+                        tls_builder.identity(identity);
+                    }
+                }
+
+                let tls_connector = MakeTlsConnector::new(tls_builder.build()?);
+
+                Ok(tls_connector)
+            })
+            .await
+            .cloned()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -944,7 +1006,9 @@ mod tests {
             let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Postgres);
 
-            let client = PostgreSql::new(pg_url).await.unwrap();
+            let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
+
+            let client = PostgreSql::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
@@ -996,7 +1060,9 @@ mod tests {
             let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Postgres);
 
-            let client = PostgreSql::new(pg_url).await.unwrap();
+            let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
+
+            let client = PostgreSql::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
@@ -1047,7 +1113,9 @@ mod tests {
             let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Cockroach);
 
-            let client = PostgreSql::new(pg_url).await.unwrap();
+            let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
+
+            let client = PostgreSql::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
@@ -1098,7 +1166,9 @@ mod tests {
             let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Unknown);
 
-            let client = PostgreSql::new(pg_url).await.unwrap();
+            let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
+
+            let client = PostgreSql::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
@@ -1149,7 +1219,9 @@ mod tests {
             let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Unknown);
 
-            let client = PostgreSql::new(pg_url).await.unwrap();
+            let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
+
+            let client = PostgreSql::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();

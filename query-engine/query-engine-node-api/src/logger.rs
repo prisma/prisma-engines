@@ -2,7 +2,7 @@ use core::fmt;
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction, ThreadsafeFunctionCallMode};
 use query_core::telemetry;
 use query_engine_common::logger::StringCallback;
-use query_engine_metrics::MetricRegistry;
+use query_engine_metrics::{MetricRecorder, MetricRegistry};
 use serde_json::Value;
 use std::{collections::BTreeMap, fmt::Display};
 use tracing::{
@@ -21,6 +21,7 @@ pub(crate) type LogCallback = ThreadsafeFunction<String, ErrorStrategy::Fatal>;
 pub(crate) struct Logger {
     dispatcher: Dispatch,
     metrics: Option<MetricRegistry>,
+    recorder: Option<MetricRecorder>,
 }
 
 impl Logger {
@@ -63,16 +64,27 @@ impl Logger {
 
         let layer = log_callback.with_filter(filters);
 
-        let metrics = if enable_metrics {
-            query_engine_metrics::setup();
-            Some(MetricRegistry::new())
+        let (metrics, recorder) = if enable_metrics {
+            let registry = MetricRegistry::new();
+            let recorder = MetricRecorder::new(registry.clone()).with_initialized_prisma_metrics();
+
+            // FIXME: we attempt to install the recorder globally because some of the mobc metrics
+            // are being modified outside of the async context with active local metric recorder,
+            // causing them to be lost. This workaround ensures we have a global fallback for that
+            // case, but installing the global recorder will only work for the first engine
+            // instance, so the metrics will still be inconsistent if there are multiple
+            // PrismaClient instances in the app. We need to fix this to be able to GA metrics.
+            _ = recorder.install_globally();
+
+            (Some(registry), Some(recorder))
         } else {
-            None
+            (None, None)
         };
 
         Self {
-            dispatcher: Dispatch::new(Registry::default().with(telemetry).with(layer).with(metrics.clone())),
+            dispatcher: Dispatch::new(Registry::default().with(telemetry).with(layer)),
             metrics,
+            recorder,
         }
     }
 
@@ -82,6 +94,10 @@ impl Logger {
 
     pub fn metrics(&self) -> Option<MetricRegistry> {
         self.metrics.clone()
+    }
+
+    pub fn recorder(&self) -> Option<MetricRecorder> {
+        self.recorder.clone()
     }
 }
 
