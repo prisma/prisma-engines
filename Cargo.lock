@@ -2478,6 +2478,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "metrics-guards"
+version = "0.1.0"
+dependencies = [
+ "metrics",
+]
+
+[[package]]
 name = "metrics-util"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3735,6 +3742,7 @@ dependencies = [
  "itertools 0.12.0",
  "lru-cache",
  "metrics",
+ "metrics-guards",
  "mobc",
  "mysql_async",
  "names 0.11.0",
