@@ -169,7 +169,7 @@ features = [
   "with-bit-vec-0_6",
 ]
 git = "https://github.com/prisma/rust-postgres"
-branch = "pgbouncer-mode"
+rev = "6916c17"
 optional = true
 
 [dependencies.postgres-types]
@@ -180,12 +180,12 @@ features = [
   "with-bit-vec-0_6",
 ]
 git = "https://github.com/prisma/rust-postgres"
-branch = "pgbouncer-mode"
+rev = "6916c17"
 optional = true
 
 [dependencies.postgres-native-tls]
 git = "https://github.com/prisma/rust-postgres"
-branch = "pgbouncer-mode"
+rev = "6916c17"
 optional = true
 
 [dependencies.tokio]
