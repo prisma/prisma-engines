@@ -25,12 +25,12 @@ const FIRST_CLASS_PROPERTIES: &[&str] = &[PROVIDER_KEY, OUTPUT_KEY, BINARY_TARGE
 pub(crate) fn load_generators_from_ast(
     ast_schema: &ast::SchemaAst,
     diagnostics: &mut Diagnostics,
-    connector_provider: &str,
+    feature_map_with_provider: &FeatureMapWithProvider<'_>,
 ) -> Vec<Generator> {
     let mut generators: Vec<Generator> = Vec::new();
 
     for gen in ast_schema.generators() {
-        if let Some(generator) = lift_generator(gen, diagnostics, connector_provider) {
+        if let Some(generator) = lift_generator(gen, diagnostics, feature_map_with_provider) {
             generators.push(generator);
         }
     }
@@ -41,7 +41,7 @@ pub(crate) fn load_generators_from_ast(
 fn lift_generator<'a>(
     ast_generator: &ast::GeneratorConfig,
     diagnostics: &mut Diagnostics,
-    connector_provider: &'a str,
+    feature_map_with_provider: &FeatureMapWithProvider<'_>,
 ) -> Option<Generator> {
     let generator_name = ast_generator.name.name.as_str();
     let args: HashMap<_, &Expression> = ast_generator
@@ -96,8 +96,6 @@ fn lift_generator<'a>(
         .get(BINARY_TARGETS_KEY)
         .and_then(|arg| coerce_array(arg, &StringFromEnvVar::coerce, diagnostics))
         .unwrap_or_default();
-
-    let feature_map_with_provider = FeatureMapWithProvider::<'a>::new(connector_provider);
 
     // for compatibility reasons we still accept the old experimental key
     let preview_features = args

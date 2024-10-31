@@ -176,8 +176,13 @@ fn validate_configuration(
     // We need to know the active provider to determine which features are active.
     // This was originally introduced because the `fullTextSearch` preview feature will hit GA stage
     // one connector at a time (Prisma 6 GAs it for MySQL, other connectors may follow in future releases).
-    let active_provider = datasources[0].active_provider;
-    let generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics, active_provider);
+    let feature_map_with_provider = datasources
+        .get(0)
+        .map(|ds| ds.active_provider)
+        .map(FeatureMapWithProvider::new)
+        .unwrap_or_else(|| ALL_PREVIEW_FEATURES);
+
+    let generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics, &feature_map_with_provider);
 
     Configuration::new(generators, datasources, diagnostics.warnings().to_owned())
 }
