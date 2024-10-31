@@ -139,9 +139,9 @@ fn lift_generator<'a>(
     })
 }
 
-fn parse_and_validate_preview_features<'a>(
+fn parse_and_validate_preview_features(
     preview_features: Vec<&str>,
-    feature_map_with_provider: &FeatureMapWithProvider<'a>,
+    feature_map_with_provider: &FeatureMapWithProvider<'_>,
     span: ast::Span,
     diagnostics: &mut Diagnostics,
 ) -> BitFlags<PreviewFeature> {
