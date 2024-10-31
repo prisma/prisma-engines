@@ -177,7 +177,7 @@ fn validate_configuration(
     // This was originally introduced because the `fullTextSearch` preview feature will hit GA stage
     // one connector at a time (Prisma 6 GAs it for MySQL, other connectors may follow in future releases).
     let feature_map_with_provider = datasources
-        .get(0)
+        .first()
         .map(|ds| ds.active_provider)
         .map(FeatureMapWithProvider::new)
         .unwrap_or_else(|| ALL_PREVIEW_FEATURES);

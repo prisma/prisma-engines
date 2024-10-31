@@ -38,7 +38,7 @@ pub(crate) fn load_generators_from_ast(
     generators
 }
 
-fn lift_generator<'a>(
+fn lift_generator(
     ast_generator: &ast::GeneratorConfig,
     diagnostics: &mut Diagnostics,
     feature_map_with_provider: &FeatureMapWithProvider<'_>,
@@ -101,7 +101,7 @@ fn lift_generator<'a>(
     let preview_features = args
         .get(PREVIEW_FEATURES_KEY)
         .and_then(|v| coerce_array(v, &coerce::string, diagnostics).map(|arr| (arr, v.span())))
-        .map(|(arr, span)| parse_and_validate_preview_features(arr, &feature_map_with_provider, span, diagnostics));
+        .map(|(arr, span)| parse_and_validate_preview_features(arr, feature_map_with_provider, span, diagnostics));
 
     for prop in &ast_generator.properties {
         let is_first_class_prop = FIRST_CLASS_PROPERTIES.iter().any(|k| *k == prop.name());
