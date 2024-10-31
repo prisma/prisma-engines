@@ -362,33 +362,6 @@ fn hash_index_doesnt_work_on_sqlserver() {
 }
 
 #[test]
-fn fulltext_index_no_preview_feature() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id
-          a String
-          b String
-
-          @@fulltext([a, b])
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = parse_unwrap_err(&schema);
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@fulltext": You must enable `fullTextIndex` preview feature to be able to define a @@fulltext index.[0m
-          [1;94m-->[0m  [4mschema.prisma:16[0m
-        [1;94m   | [0m
-        [1;94m15 | [0m
-        [1;94m16 | [0m  [1;91m@@fulltext([a, b])[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
 fn hash_index_doesnt_work_on_mysql() {
     let dml = indoc! {r#"
         model A {
