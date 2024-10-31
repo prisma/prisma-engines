@@ -606,7 +606,7 @@ mod tests {
                           "isNullable": false,
                           "inputTypes": [
                             {
-                              "type": "BRelationFilter",
+                              "type": "BScalarRelationFilter",
                               "namespace": "prisma",
                               "location": "inputObjectTypes",
                               "isList": false
@@ -764,7 +764,7 @@ mod tests {
                           "isNullable": false,
                           "inputTypes": [
                             {
-                              "type": "BRelationFilter",
+                              "type": "BScalarRelationFilter",
                               "namespace": "prisma",
                               "location": "inputObjectTypes",
                               "isList": false
@@ -1037,7 +1037,7 @@ mod tests {
                           "isNullable": true,
                           "inputTypes": [
                             {
-                              "type": "ANullableRelationFilter",
+                              "type": "ANullableScalarRelationFilter",
                               "namespace": "prisma",
                               "location": "inputObjectTypes",
                               "isList": false
@@ -1174,7 +1174,7 @@ mod tests {
                           "isNullable": true,
                           "inputTypes": [
                             {
-                              "type": "ANullableRelationFilter",
+                              "type": "ANullableScalarRelationFilter",
                               "namespace": "prisma",
                               "location": "inputObjectTypes",
                               "isList": false
@@ -2037,7 +2037,7 @@ mod tests {
                       ]
                     },
                     {
-                      "name": "BRelationFilter",
+                      "name": "BScalarRelationFilter",
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -2436,7 +2436,7 @@ mod tests {
                       ]
                     },
                     {
-                      "name": "ANullableRelationFilter",
+                      "name": "ANullableScalarRelationFilter",
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
