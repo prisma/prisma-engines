@@ -86,12 +86,11 @@ features!(
 );
 
 /// Generator preview features (alphabetically sorted)
-pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
+const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
         Deno
          | DriverAdapters
-         | FullTextIndex
-         | FullTextSearch
+         | FullTextSearch // it's actually GA for "mysql" only!
          | Metrics
          | MultiSchema
          | NativeDistinct
@@ -117,6 +116,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | FieldReference
         | FilteredRelationCount
         | FilterJson
+        | FullTextIndex
         | GroupBy
         | ImprovedQueryRaw
         | InteractiveTransactions
@@ -152,21 +152,40 @@ pub struct FeatureMap {
     hidden: PreviewFeatures,
 }
 
-impl FeatureMap {
-    pub const fn active_features(&self) -> PreviewFeatures {
-        self.active
+pub struct FeatureMapWithProvider<'a> {
+    provider: &'a str,
+    feature_map: FeatureMap,
+}
+
+impl<'a> FeatureMapWithProvider<'a> {
+    pub fn new(connector_provider: &'a str) -> FeatureMapWithProvider<'a> {
+        Self {
+            provider: connector_provider,
+            feature_map: ALL_PREVIEW_FEATURES,
+        }
+    }
+
+    pub fn active_features(&self) -> PreviewFeatures {
+        if matches!(self.provider, "mysql") {
+            self.feature_map.active & !enumflags2::BitFlags::from_flag(PreviewFeature::FullTextSearch)
+        } else {
+            self.feature_map.active
+        }
     }
 
     pub const fn hidden_features(&self) -> PreviewFeatures {
-        self.hidden
+        self.feature_map.hidden
     }
 
     pub(crate) fn is_valid(&self, flag: PreviewFeature) -> bool {
-        (self.active | self.hidden).contains(flag)
+        (self.active_features() | self.feature_map.hidden).contains(flag)
     }
 
     pub(crate) fn is_deprecated(&self, flag: PreviewFeature) -> bool {
-        self.deprecated.contains(flag)
+        if matches!((self.provider, flag), ("mysql", PreviewFeature::FullTextSearch)) {
+            return true;
+        }
+        self.feature_map.deprecated.contains(flag)
     }
 }
 

@@ -87,23 +87,6 @@ pub(crate) fn field_length_prefix_supported(index: IndexWalker<'_>, ctx: &mut Co
     }
 }
 
-/// `@@fulltext` attribute is not available without `fullTextIndex` preview feature.
-pub(crate) fn fulltext_index_preview_feature_enabled(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx.preview_features.contains(PreviewFeature::FullTextIndex) {
-        return;
-    }
-
-    if index.is_fulltext() {
-        let message = "You must enable `fullTextIndex` preview feature to be able to define a @@fulltext index.";
-
-        ctx.push_error(DatamodelError::new_attribute_validation_error(
-            message,
-            index.attribute_name(),
-            index.ast_attribute().span,
-        ));
-    }
-}
-
 /// `@@fulltext` should only be available if we support it in the database.
 pub(crate) fn fulltext_index_supported(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
     if ctx.has_capability(ConnectorCapability::FullTextIndex) {

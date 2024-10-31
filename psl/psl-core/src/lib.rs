@@ -18,7 +18,7 @@ mod validate;
 use std::sync::Arc;
 
 pub use crate::{
-    common::{PreviewFeature, PreviewFeatures, ALL_PREVIEW_FEATURES},
+    common::{FeatureMapWithProvider, PreviewFeature, PreviewFeatures},
     configuration::{
         Configuration, Datasource, DatasourceConnectorData, Generator, GeneratorConfigValue, StringFromEnvVar,
     },
@@ -171,8 +171,13 @@ fn validate_configuration(
     diagnostics: &mut Diagnostics,
     connectors: ConnectorRegistry<'_>,
 ) -> Configuration {
-    let generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics);
     let datasources = datasource_loader::load_datasources_from_ast(schema_ast, diagnostics, connectors);
+
+    // We need to know the active provider to determine which features are active.
+    // This was originally introduced because the `fullTextSearch` preview feature will hit GA stage
+    // one connector at a time (Prisma 6 GAs it for MySQL, other connectors may follow in future releases).
+    let active_provider = datasources[0].active_provider;
+    let generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics, active_provider);
 
     Configuration::new(generators, datasources, diagnostics.warnings().to_owned())
 }
