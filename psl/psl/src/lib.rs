@@ -27,6 +27,7 @@ pub use psl_core::{
     PreviewFeatures,
     StringFromEnvVar,
     ValidatedSchema,
+    ALL_PREVIEW_FEATURES,
 };
 
 /// The implementation of the CLI getConfig() utility and its JSON format.

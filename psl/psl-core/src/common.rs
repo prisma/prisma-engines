@@ -2,4 +2,4 @@
 
 mod preview_features;
 
-pub use self::preview_features::{FeatureMapWithProvider, PreviewFeature, PreviewFeatures};
+pub use self::preview_features::{FeatureMapWithProvider, PreviewFeature, PreviewFeatures, ALL_PREVIEW_FEATURES};

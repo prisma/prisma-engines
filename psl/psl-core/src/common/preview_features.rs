@@ -86,7 +86,7 @@ features!(
 );
 
 /// Generator preview features (alphabetically sorted)
-const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
+const PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
         Deno
          | DriverAdapters
@@ -152,16 +152,22 @@ pub struct FeatureMap {
     hidden: PreviewFeatures,
 }
 
+#[derive(Debug)]
 pub struct FeatureMapWithProvider<'a> {
     provider: &'a str,
     feature_map: FeatureMap,
 }
 
+/// The default feature map with an unknown provider.
+/// This is used for convenience in `prisma/language-tools`, which needs the list of all available preview features
+/// before a provider is necessarily known.
+pub const ALL_PREVIEW_FEATURES: FeatureMapWithProvider<'static> = FeatureMapWithProvider::new("<default>");
+
 impl<'a> FeatureMapWithProvider<'a> {
-    pub fn new(connector_provider: &'a str) -> FeatureMapWithProvider<'a> {
+    pub const fn new(connector_provider: &'a str) -> FeatureMapWithProvider<'a> {
         Self {
             provider: connector_provider,
-            feature_map: ALL_PREVIEW_FEATURES,
+            feature_map: PREVIEW_FEATURES,
         }
     }
 

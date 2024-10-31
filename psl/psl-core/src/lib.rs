@@ -18,7 +18,7 @@ mod validate;
 use std::sync::Arc;
 
 pub use crate::{
-    common::{FeatureMapWithProvider, PreviewFeature, PreviewFeatures},
+    common::{FeatureMapWithProvider, PreviewFeature, PreviewFeatures, ALL_PREVIEW_FEATURES},
     configuration::{
         Configuration, Datasource, DatasourceConnectorData, Generator, GeneratorConfigValue, StringFromEnvVar,
     },
