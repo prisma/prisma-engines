@@ -97,7 +97,6 @@ fn lift_generator<'a>(
         .and_then(|arg| coerce_array(arg, &StringFromEnvVar::coerce, diagnostics))
         .unwrap_or_default();
 
-    // create FeatureMap from provider
     let feature_map_with_provider = FeatureMapWithProvider::<'a>::new(connector_provider);
 
     // for compatibility reasons we still accept the old experimental key
