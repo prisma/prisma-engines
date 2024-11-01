@@ -8,13 +8,13 @@ use crate::{
     ENGINE_PROTOCOL,
 };
 use colored::Colorize;
+use prisma_metrics::MetricRegistry;
 use query_core::{
     protocol::EngineProtocol,
     relation_load_strategy,
     schema::{self, QuerySchemaRef},
     QueryExecutor, TransactionOptions, TxId,
 };
-use query_engine_metrics::MetricRegistry;
 use request_handlers::{
     BatchTransactionOption, ConnectorKind, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
     RequestBody, RequestHandler,

@@ -1,5 +1,8 @@
-//! Query Engine Metrics
-//! This crate is responsible for capturing and recording metrics in the Query Engine.
+//! # Prisma Metrics
+//!
+//! This crate is responsible for capturing and recording metrics in the Query Engine and its
+//! dependencies.
+//!
 //! Metrics is broken into two parts, `MetricsRecorder` and `MetricsRegistry`, and uses our tracing framework to communicate.
 //! An example best explains this system.
 //! When the engine boots up, the `MetricRegistry` is added to our tracing as a layer and The MetricRecorder is
@@ -30,6 +33,7 @@ use serde::Deserialize;
 use std::collections::HashMap;
 
 pub use metrics::{self, counter, describe_counter, describe_gauge, describe_histogram, gauge, histogram};
+pub use metrics_guards as guards;
 
 pub use instrument::*;
 pub use recorder::MetricRecorder;

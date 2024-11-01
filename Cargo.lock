@@ -350,7 +350,7 @@ dependencies = [
  "enumflags2",
  "indoc 2.0.3",
  "insta",
- "query-engine-metrics",
+ "prisma-metrics",
  "query-engine-tests",
  "query-tests-setup",
  "regex",
@@ -2639,10 +2639,10 @@ dependencies = [
  "mongodb",
  "mongodb-client",
  "pretty_assertions",
+ "prisma-metrics",
  "prisma-value",
  "psl",
  "query-connector",
- "query-engine-metrics",
  "query-structure",
  "rand 0.8.5",
  "regex",
@@ -3516,6 +3516,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "prisma-metrics"
+version = "0.1.0"
+dependencies = [
+ "derive_more",
+ "expect-test",
+ "futures",
+ "metrics",
+ "metrics-exporter-prometheus",
+ "metrics-guards",
+ "metrics-util",
+ "once_cell",
+ "parking_lot",
+ "pin-project",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "tracing-futures",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "prisma-schema-build"
 version = "0.1.0"
 dependencies = [
@@ -3849,9 +3871,9 @@ dependencies = [
  "once_cell",
  "opentelemetry",
  "petgraph 0.4.13",
+ "prisma-metrics",
  "psl",
  "query-connector",
- "query-engine-metrics",
  "query-structure",
  "schema",
  "serde",
@@ -3882,11 +3904,11 @@ dependencies = [
  "mongodb-query-connector",
  "opentelemetry",
  "opentelemetry-otlp",
+ "prisma-metrics",
  "psl",
  "quaint",
  "query-connector",
  "query-core",
- "query-engine-metrics",
  "request-handlers",
  "serde",
  "serde_json",
@@ -3946,10 +3968,10 @@ dependencies = [
  "connection-string",
  "napi",
  "opentelemetry",
+ "prisma-metrics",
  "psl",
  "query-connector",
  "query-core",
- "query-engine-metrics",
  "serde",
  "serde_json",
  "thiserror",
@@ -3961,27 +3983,6 @@ dependencies = [
  "url",
  "user-facing-errors",
  "wasm-bindgen",
-]
-
-[[package]]
-name = "query-engine-metrics"
-version = "0.1.0"
-dependencies = [
- "derive_more",
- "expect-test",
- "futures",
- "metrics",
- "metrics-exporter-prometheus",
- "metrics-util",
- "once_cell",
- "parking_lot",
- "pin-project",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
- "tracing-futures",
- "tracing-subscriber",
 ]
 
 [[package]]
@@ -3998,12 +3999,12 @@ dependencies = [
  "napi-build",
  "napi-derive",
  "opentelemetry",
+ "prisma-metrics",
  "psl",
  "quaint",
  "query-connector",
  "query-core",
  "query-engine-common",
- "query-engine-metrics",
  "query-structure",
  "request-handlers",
  "serde",
@@ -4034,9 +4035,9 @@ dependencies = [
  "itertools 0.12.0",
  "once_cell",
  "paste",
+ "prisma-metrics",
  "prisma-value",
  "psl",
- "query-engine-metrics",
  "query-test-macros",
  "query-tests-setup",
  "serde_json",
@@ -4126,12 +4127,12 @@ dependencies = [
  "nom",
  "once_cell",
  "parse-hyperlinks",
+ "prisma-metrics",
  "psl",
  "qe-setup",
  "quaint",
  "query-core",
  "query-engine",
- "query-engine-metrics",
  "query-structure",
  "regex",
  "request-handlers",

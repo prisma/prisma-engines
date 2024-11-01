@@ -52,7 +52,7 @@ opentelemetry = { version = "0.17" }
 quaint.workspace = true
 tokio.workspace = true
 futures.workspace = true
-query-engine-metrics = { path = "../metrics" }
+prisma-metrics.path = "../../libs/metrics"
 
 [build-dependencies]
 napi-build = "1"

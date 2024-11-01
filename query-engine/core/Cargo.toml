@@ -4,7 +4,7 @@ name = "query-core"
 version = "0.1.0"
 
 [features]
-metrics = ["query-engine-metrics"]
+metrics = ["prisma-metrics"]
 graphql-protocol = []
 
 [dependencies]
@@ -24,7 +24,7 @@ query-structure = { path = "../query-structure", features = [
     "default_generators",
 ] }
 opentelemetry = { version = "0.17.0", features = ["rt-tokio", "serialize"] }
-query-engine-metrics = { path = "../metrics", optional = true }
+prisma-metrics = { path = "../../libs/metrics", optional = true }
 serde.workspace = true
 serde_json.workspace = true
 thiserror = "1.0"
