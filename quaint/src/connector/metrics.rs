@@ -1,3 +1,4 @@
+use prisma_metrics::{counter, histogram};
 use tracing::{info_span, Instrument};
 
 use crate::ast::{Params, Value};
