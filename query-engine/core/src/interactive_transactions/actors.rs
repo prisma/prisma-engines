@@ -22,7 +22,7 @@ use tracing_futures::WithSubscriber;
 #[cfg(not(feature = "metrics"))]
 use crate::metrics::MetricsInstrumentationStub;
 #[cfg(feature = "metrics")]
-use query_engine_metrics::WithMetricsInstrumentation;
+use prisma_metrics::WithMetricsInstrumentation;
 
 #[cfg(feature = "metrics")]
 use crate::telemetry::helpers::set_span_link_from_traceparent;

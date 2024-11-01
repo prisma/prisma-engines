@@ -1,7 +1,7 @@
 use std::{fmt, str::FromStr};
 
 use async_trait::async_trait;
-use metrics_guards::GaugeGuard;
+use prisma_metrics::guards::GaugeGuard;
 
 use super::*;
 use crate::{

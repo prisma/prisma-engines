@@ -13,7 +13,7 @@ use futures::future;
 #[cfg(not(feature = "metrics"))]
 use crate::metrics::MetricsInstrumentationStub;
 #[cfg(feature = "metrics")]
-use query_engine_metrics::{
+use prisma_metrics::{
     counter, histogram, WithMetricsInstrumentation, PRISMA_CLIENT_QUERIES_DURATION_HISTOGRAM_MS,
     PRISMA_CLIENT_QUERIES_TOTAL,
 };

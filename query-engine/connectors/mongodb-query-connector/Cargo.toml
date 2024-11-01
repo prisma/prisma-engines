@@ -17,10 +17,10 @@ serde_json.workspace = true
 thiserror = "1.0"
 tokio.workspace = true
 tracing.workspace = true
-tracing-futures = "0.2"
+tracing-futures.workspace = true
 uuid.workspace = true
 indexmap.workspace = true
-query-engine-metrics = { path = "../../metrics" }
+prisma-metrics.path = "../../../libs/metrics"
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
 derive_more.workspace = true
 
