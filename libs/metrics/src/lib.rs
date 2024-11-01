@@ -28,12 +28,13 @@ mod instrument;
 mod recorder;
 mod registry;
 
+pub mod guards;
+
 use once_cell::sync::Lazy;
 use serde::Deserialize;
 use std::collections::HashMap;
 
 pub use metrics::{self, counter, describe_counter, describe_gauge, describe_histogram, gauge, histogram};
-pub use metrics_guards as guards;
 
 pub use instrument::*;
 pub use recorder::MetricRecorder;

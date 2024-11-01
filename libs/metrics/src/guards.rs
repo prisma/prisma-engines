@@ -1,6 +1,6 @@
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use metrics::gauge;
+use crate::gauge;
 
 pub struct GaugeGuard {
     name: &'static str,

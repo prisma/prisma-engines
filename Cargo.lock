@@ -2478,13 +2478,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "metrics-guards"
-version = "0.1.0"
-dependencies = [
- "metrics",
-]
-
-[[package]]
 name = "metrics-util"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3524,7 +3517,6 @@ dependencies = [
  "futures",
  "metrics",
  "metrics-exporter-prometheus",
- "metrics-guards",
  "metrics-util",
  "once_cell",
  "parking_lot",
