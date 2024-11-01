@@ -1,6 +1,7 @@
 use crate::features::{EnabledFeatures, Feature};
 use crate::{logger::Logger, opt::PrismaOpt};
 use crate::{PrismaError, PrismaResult};
+use prisma_metrics::{MetricRecorder, MetricRegistry};
 use psl::PreviewFeature;
 use query_core::{
     protocol::EngineProtocol,
@@ -8,7 +9,6 @@ use query_core::{
     schema::{self, QuerySchemaRef},
     QueryExecutor,
 };
-use query_engine_metrics::{MetricRecorder, MetricRegistry};
 use request_handlers::{load_executor, ConnectorKind};
 use std::{env, fmt, sync::Arc};
 use tracing::Instrument;

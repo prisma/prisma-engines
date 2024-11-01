@@ -1,8 +1,8 @@
 use core::fmt;
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction, ThreadsafeFunctionCallMode};
+use prisma_metrics::{MetricRecorder, MetricRegistry};
 use query_core::telemetry;
 use query_engine_common::logger::StringCallback;
-use query_engine_metrics::{MetricRecorder, MetricRegistry};
 use serde_json::Value;
 use std::{collections::BTreeMap, fmt::Display};
 use tracing::{
@@ -67,15 +67,6 @@ impl Logger {
         let (metrics, recorder) = if enable_metrics {
             let registry = MetricRegistry::new();
             let recorder = MetricRecorder::new(registry.clone()).with_initialized_prisma_metrics();
-
-            // FIXME: we attempt to install the recorder globally because some of the mobc metrics
-            // are being modified outside of the async context with active local metric recorder,
-            // causing them to be lost. This workaround ensures we have a global fallback for that
-            // case, but installing the global recorder will only work for the first engine
-            // instance, so the metrics will still be inconsistent if there are multiple
-            // PrismaClient instances in the app. We need to fix this to be able to GA metrics.
-            _ = recorder.install_globally();
-
             (Some(registry), Some(recorder))
         } else {
             (None, None)

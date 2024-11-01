@@ -9,9 +9,7 @@ use query_engine_tests::test_suite;
     )
 )]
 mod metrics {
-    use query_engine_metrics::{
-        PRISMA_CLIENT_QUERIES_ACTIVE, PRISMA_CLIENT_QUERIES_TOTAL, PRISMA_DATASOURCE_QUERIES_TOTAL,
-    };
+    use prisma_metrics::{PRISMA_CLIENT_QUERIES_ACTIVE, PRISMA_CLIENT_QUERIES_TOTAL, PRISMA_DATASOURCE_QUERIES_TOTAL};
     use query_engine_tests::ConnectorVersion::*;
     use query_engine_tests::*;
 

@@ -11,7 +11,7 @@ query-test-macros = { path = "../query-test-macros" }
 query-tests-setup = { path = "../query-tests-setup" }
 indoc.workspace = true
 tracing.workspace = true
-tracing-futures = "0.2"
+tracing-futures.workspace = true
 colored = "2"
 chrono.workspace = true
 psl.workspace = true
@@ -20,7 +20,7 @@ uuid.workspace = true
 tokio.workspace = true
 user-facing-errors.workspace = true
 prisma-value = { path = "../../../libs/prisma-value" }
-query-engine-metrics = { path = "../../metrics"}
+prisma-metrics.path = "../../../libs/metrics"
 once_cell = "1.15.0"
 futures.workspace = true
 paste = "1.0.14"
