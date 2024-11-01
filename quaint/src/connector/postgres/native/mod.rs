@@ -729,15 +729,8 @@ impl Queryable for PostgreSql {
                     .collect();
 
                 let changes = self
-                    .perform_io(self.client.0.query_typed_raw::<&(dyn ToSql + Sync), _>(
-                        sql,
-                        params_with_types.as_slice().iter()
-                            .map(|(v, t)| (*v, t.clone()))
-                            .collect::<Vec<_>>()
-                    ))
-                    .await?
-                    .rows_affected()
-                    .unwrap_or(0);
+                    .perform_io(self.client.0.execute_typed(sql, params_with_types.as_slice()))
+                    .await?;
 
                 Ok(changes)
             },
@@ -763,15 +756,8 @@ impl Queryable for PostgreSql {
                     .collect();
 
                 let changes = self
-                    .perform_io(self.client.0.query_typed_raw::<&(dyn ToSql + Sync), _>(
-                        sql,
-                        params_with_types.as_slice().iter()
-                            .map(|(v, t)| (*v, t.clone()))
-                            .collect::<Vec<_>>()
-                    ))
-                    .await?
-                    .rows_affected()
-                    .unwrap_or(0);
+                    .perform_io(self.client.0.execute_typed(sql, params_with_types.as_slice()))
+                    .await?;
 
                 Ok(changes)
             },
