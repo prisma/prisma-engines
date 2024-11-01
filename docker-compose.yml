@@ -4,7 +4,7 @@ services:
     image: prismagraphql/cockroachdb-custom:23.1@sha256:c5a97355d56a7692ed34d835dfd8e3663d642219ea90736658a24840ea26862d
     restart: unless-stopped
     command: |
-      start-single-node --insecure
+      cockroach start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost
     ports:
       - '26260:26257'
     networks:
@@ -13,7 +13,8 @@ services:
   cockroach_22_2:
     image: prismagraphql/cockroachdb-custom:22.2
     restart: unless-stopped
-    command: start-single-node --insecure
+    command: |
+      cockroach start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost
     ports:
       - '26259:26257'
     networks:
@@ -22,7 +23,8 @@ services:
   cockroach_22_1_0:
     image: prismagraphql/cockroachdb-custom:22.1.0
     restart: unless-stopped
-    command: start-single-node --insecure
+    command: |
+      cockroach start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost
     ports:
       - '26257:26257'
     networks:
@@ -31,7 +33,8 @@ services:
   cockroach_21_2_0_patched:
     image: prismagraphql/cockroachdb-custom:21.2.0-patched
     restart: unless-stopped
-    command: start-single-node --insecure
+    command: |
+      cockroach start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost
     ports:
       - '26258:26257'
     networks:

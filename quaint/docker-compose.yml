@@ -69,7 +69,8 @@ services:
   cockroach_22_2:
     image: prismagraphql/cockroachdb-custom:22.2
     restart: unless-stopped
-    command: start-single-node --insecure
+    command: |
+      cockroach start-single-node --insecure --store=type=mem,size=0.25 --advertise-addr=localhost
     ports:
       - '26259:26257'
     networks:
