@@ -11,7 +11,9 @@ use async_tungstenite::{
 };
 use futures::FutureExt;
 use postgres_native_tls::TlsConnector;
+use prisma_metrics::WithMetricsInstrumentation;
 use tokio_postgres::{Client, Config};
+use tracing_futures::WithSubscriber;
 use ws_stream_tungstenite::WsStream;
 
 use crate::{
@@ -37,12 +39,16 @@ pub(crate) async fn connect_via_websocket(url: PostgresWebSocketUrl) -> crate::R
 
     let tls = TlsConnector::new(native_tls::TlsConnector::new()?, db_host);
     let (client, connection) = config.connect_raw(ws_byte_stream, tls).await?;
-    tokio::spawn(connection.map(|r| match r {
-        Ok(_) => (),
-        Err(e) => {
-            tracing::error!("Error in PostgreSQL WebSocket connection: {:?}", e);
-        }
-    }));
+    tokio::spawn(
+        connection
+            .map(|r| {
+                if let Err(e) = r {
+                    tracing::error!("Error in PostgreSQL WebSocket connection: {e:?}");
+                }
+            })
+            .with_current_subscriber()
+            .with_current_recorder(),
+    );
     Ok(client)
 }
 

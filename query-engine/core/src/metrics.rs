@@ -1,4 +1,4 @@
-/// When the `metrics` feature is disabled, we don't compile the `query-engine-metrics` crate and
+/// When the `metrics` feature is disabled, we don't compile the `prisma-metrics` crate and
 /// thus can't use the metrics instrumentation. To avoid the boilerplate of putting every
 /// `with_current_recorder` call behind `#[cfg]`, we use this stub trait that does nothing but
 /// allows the code that relies on `WithMetricsInstrumentation` trait to be in scope compile.

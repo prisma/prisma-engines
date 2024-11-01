@@ -7,7 +7,7 @@ use crate::{
 use crate::{send_future::UnsafeFuture, transaction::JsTransactionContext};
 
 use futures::Future;
-use metrics::gauge;
+use prisma_metrics::gauge;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Proxy is a struct wrapping a javascript object that exhibits basic primitives for

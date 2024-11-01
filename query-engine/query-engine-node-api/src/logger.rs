@@ -1,8 +1,8 @@
 use core::fmt;
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction, ThreadsafeFunctionCallMode};
+use prisma_metrics::{MetricRecorder, MetricRegistry};
 use query_core::telemetry;
 use query_engine_common::logger::StringCallback;
-use query_engine_metrics::{MetricRecorder, MetricRegistry};
 use serde_json::Value;
 use std::{collections::BTreeMap, fmt::Display};
 use tracing::{
