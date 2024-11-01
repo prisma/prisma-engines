@@ -71,6 +71,7 @@ regex = { version = "1", features = ["std"] }
 serde_repr = { version = "0.1.17" }
 serde-wasm-bindgen = { version = "0.5" }
 tracing = { version = "0.1" }
+tracing-futures = "0.2"
 tsify = { version = "0.4.5" }
 wasm-bindgen = { version = "0.2.93" }
 wasm-bindgen-futures = { version = "0.4" }

@@ -11,7 +11,7 @@ query-test-macros = { path = "../query-test-macros" }
 query-tests-setup = { path = "../query-tests-setup" }
 indoc.workspace = true
 tracing.workspace = true
-tracing-futures = "0.2"
+tracing-futures.workspace = true
 colored = "2"
 chrono.workspace = true
 psl.workspace = true

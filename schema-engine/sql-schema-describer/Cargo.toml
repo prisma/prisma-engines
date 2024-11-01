@@ -18,7 +18,7 @@ regex.workspace = true
 serde.workspace = true
 tracing.workspace = true
 tracing-error = "0.2"
-tracing-futures = "0.2"
+tracing-futures.workspace = true
 quaint = { workspace = true, features = [
     "all-native",
     "pooled",
