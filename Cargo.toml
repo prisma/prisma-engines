@@ -58,12 +58,12 @@ indoc = "2.0.1"
 indexmap = { version = "2.2.2", features = ["serde"] }
 itertools = "0.12"
 connection-string = "0.2"
-napi = { version = "2.15.1", default-features = false, features = [
+napi = { version = "2.16.13", default-features = false, features = [
   "napi8",
   "tokio_rt",
   "serde-json",
 ] }
-napi-derive = "2.15.0"
+napi-derive = "2.16.12"
 js-sys = { version = "0.3" }
 pin-project = "1"
 rand = { version = "0.8" }
