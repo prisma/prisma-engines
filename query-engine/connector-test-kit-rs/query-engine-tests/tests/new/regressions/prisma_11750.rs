@@ -19,6 +19,10 @@ use query_engine_tests::*;
 /// the database side and failures to start new transactions.
 /// TODO: investigate the problem in pg and neon JS driver adapters, looks like some error is not
 /// being handled properly in them.
+///
+/// For an example of an equivalent test that passes on all databases where the transactions don't
+/// conflict and don't cause issues on the database side, see the `high_concurrency` test in the
+/// `new::interactive_tx::interactive_tx` test suite.
 #[test_suite(
     schema(user),
     exclude(Sqlite, MySql(8), SqlServer, Postgres("pg.js"), Postgres("neon.js"))
