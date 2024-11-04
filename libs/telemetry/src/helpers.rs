@@ -141,13 +141,13 @@ pub fn env_filter(log_queries: bool, qe_log_level: QueryEngineLogLevel) -> EnvFi
         .add_directive("hyper=error".parse().unwrap())
         .add_directive("tower=error".parse().unwrap());
 
-    if let Some(level) = qe_log_level.level() {
+    if let Some(ref level) = qe_log_level.level() {
         filter = filter
-            .add_directive(format!("query_engine={}", &level).parse().unwrap())
-            .add_directive(format!("query_core={}", &level).parse().unwrap())
-            .add_directive(format!("query_connector={}", &level).parse().unwrap())
-            .add_directive(format!("sql_query_connector={}", &level).parse().unwrap())
-            .add_directive(format!("mongodb_query_connector={}", &level).parse().unwrap());
+            .add_directive(format!("query_engine={}", level).parse().unwrap())
+            .add_directive(format!("query_core={}", level).parse().unwrap())
+            .add_directive(format!("query_connector={}", level).parse().unwrap())
+            .add_directive(format!("sql_query_connector={}", level).parse().unwrap())
+            .add_directive(format!("mongodb_query_connector={}", level).parse().unwrap());
     }
 
     if log_queries {
