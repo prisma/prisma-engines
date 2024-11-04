@@ -71,11 +71,11 @@ impl QueryEngine {
             native,
         } = napi_env.from_js_value(options).expect(
             r###"
-            Failed to deserialize constructor options. 
-            
-            This usually happens when the javascript object passed to the constructor is missing 
+            Failed to deserialize constructor options.
+
+            This usually happens when the javascript object passed to the constructor is missing
             properties for the ConstructorOptions fields that must have some value.
-            
+
             If you set some of these in javascript through environment variables, make sure there are
             values for data_model, log_level, and any field that is not Option<T>
             "###,
@@ -326,6 +326,35 @@ impl QueryEngine {
             }
             .instrument(span)
             .await
+        })
+        .with_subscriber(dispatcher)
+        .with_optional_recorder(recorder)
+        .await
+    }
+
+    #[napi]
+    pub async fn compile(&self, request: String, human_readable: bool) -> napi::Result<String> {
+        let dispatcher = self.logger.dispatcher();
+        let recorder = self.logger.recorder();
+
+        async_panic_to_js_error(async {
+            let inner = self.inner.read().await;
+            let engine = inner.as_engine()?;
+
+            let request = RequestBody::try_from_str(&request, engine.engine_protocol())?;
+            let query_doc = request
+                .into_doc(engine.query_schema())
+                .map_err(|err| napi::Error::from_reason(err.to_string()))?;
+
+            let plan = query_core::compiler::compile(engine.query_schema(), query_doc).map_err(ApiError::from)?;
+
+            let response = if human_readable {
+                plan.to_string()
+            } else {
+                serde_json::to_string(&plan)?
+            };
+
+            Ok(response)
         })
         .with_subscriber(dispatcher)
         .with_optional_recorder(recorder)

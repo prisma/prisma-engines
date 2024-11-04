@@ -8,7 +8,7 @@ use quaint::ast::*;
 use query_structure::*;
 use tracing::Span;
 
-pub(crate) trait SelectDefinition {
+pub trait SelectDefinition {
     fn into_select<'a>(
         self,
         _: &Model,
@@ -124,7 +124,7 @@ impl SelectDefinition for QueryArguments {
     }
 }
 
-pub(crate) fn get_records<'a, T>(
+pub fn get_records<'a, T>(
     model: &Model,
     columns: impl Iterator<Item = Column<'static>>,
     virtual_selections: impl IntoIterator<Item = &'a VirtualSelection>,

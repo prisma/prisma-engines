@@ -288,6 +288,10 @@ impl<'a> ToSql for Value<'a> {
                     date.and_hms_opt(time.hour(), time.minute(), time.second())
                 })
                 .map(|dt| ToSqlOutput::from(dt.and_utc().timestamp_millis())),
+
+            ValueType::Var(name, _) => Err(RusqlError::ToSqlConversionFailure(Box::new(
+                Error::builder(ErrorKind::RanQueryWithVarParam(name.clone().into_owned())).build(),
+            )))?,
         };
 
         match value {

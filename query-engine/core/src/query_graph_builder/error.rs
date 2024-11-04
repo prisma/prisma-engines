@@ -43,6 +43,14 @@ pub enum QueryGraphBuilderError {
     QueryGraphError(QueryGraphError),
 }
 
+impl std::fmt::Display for QueryGraphBuilderError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Debug::fmt(self, f)
+    }
+}
+
+impl std::error::Error for QueryGraphBuilderError {}
+
 #[derive(Debug)]
 pub struct RelationViolation {
     pub(crate) relation_name: String,

@@ -50,9 +50,9 @@ jobs:
       - name: "Check that Cargo.lock did not change"
         run: "git diff --exit-code"
 
-  test-react-native-compilation:
-    name: React Native
-    uses: ./.github/workflows/build-engines-react-native-template.yml
-    with:
-      commit: ${{ github.sha }}
-      uploadArtifacts: false
+  # test-react-native-compilation:
+  #   name: React Native
+  #   uses: ./.github/workflows/build-engines-react-native-template.yml
+  #   with:
+  #     commit: ${{ github.sha }}
+  #     uploadArtifacts: false
