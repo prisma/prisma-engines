@@ -2,6 +2,7 @@ use crate::{error::ApiError, logger::Logger};
 use futures::FutureExt;
 use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
+use prisma_metrics::{MetricFormat, WithMetricsInstrumentation};
 use psl::PreviewFeature;
 use quaint::connector::ExternalConnector;
 use query_core::{protocol::EngineProtocol, relation_load_strategy, schema, TransactionOptions, TxId};
@@ -9,7 +10,6 @@ use query_engine_common::engine::{
     map_known_error, stringify_env_values, ConnectedEngine, ConnectedEngineNative, ConstructorOptions,
     ConstructorOptionsNative, EngineBuilder, EngineBuilderNative, Inner,
 };
-use query_engine_metrics::{MetricFormat, WithMetricsInstrumentation};
 use request_handlers::{load_executor, render_graphql_schema, ConnectorKind, RequestBody, RequestHandler};
 use serde::Deserialize;
 use serde_json::json;

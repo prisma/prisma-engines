@@ -46,14 +46,14 @@ serde.workspace = true
 
 tracing.workspace = true
 tracing-subscriber = { version = "0.3" }
-tracing-futures = "0.2"
+tracing-futures.workspace = true
 tracing-opentelemetry = "0.17.3"
 opentelemetry = { version = "0.17" }
 
 quaint.workspace = true
 tokio.workspace = true
 futures.workspace = true
-query-engine-metrics = { path = "../metrics" }
+prisma-metrics.path = "../../libs/metrics"
 
 [build-dependencies]
 napi-build = "1"

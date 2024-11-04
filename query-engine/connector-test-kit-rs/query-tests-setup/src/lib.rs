@@ -22,8 +22,8 @@ pub use templating::*;
 
 use colored::Colorize;
 use once_cell::sync::Lazy;
+use prisma_metrics::{MetricRecorder, MetricRegistry, WithMetricsInstrumentation};
 use psl::datamodel_connector::ConnectorCapabilities;
-use query_engine_metrics::{MetricRecorder, MetricRegistry, WithMetricsInstrumentation};
 use std::future::Future;
 use tokio::runtime::Builder;
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};

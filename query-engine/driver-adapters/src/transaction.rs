@@ -1,7 +1,7 @@
 use std::future::Future;
 
 use async_trait::async_trait;
-use metrics::gauge;
+use prisma_metrics::gauge;
 use quaint::{
     connector::{DescribedQuery, IsolationLevel, Transaction as QuaintTransaction},
     prelude::{Query as QuaintQuery, Queryable, ResultSet},

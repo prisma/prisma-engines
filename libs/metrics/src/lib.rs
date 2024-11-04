@@ -1,5 +1,8 @@
-//! Query Engine Metrics
-//! This crate is responsible for capturing and recording metrics in the Query Engine.
+//! # Prisma Metrics
+//!
+//! This crate is responsible for capturing and recording metrics in the Query Engine and its
+//! dependencies.
+//!
 //! Metrics is broken into two parts, `MetricsRecorder` and `MetricsRegistry`, and uses our tracing framework to communicate.
 //! An example best explains this system.
 //! When the engine boots up, the `MetricRegistry` is added to our tracing as a layer and The MetricRecorder is
@@ -24,6 +27,8 @@ mod formatters;
 mod instrument;
 mod recorder;
 mod registry;
+
+pub mod guards;
 
 use once_cell::sync::Lazy;
 use serde::Deserialize;

@@ -17,7 +17,7 @@ use tracing_futures::WithSubscriber;
 #[cfg(not(feature = "metrics"))]
 use crate::metrics::MetricsInstrumentationStub;
 #[cfg(feature = "metrics")]
-use query_engine_metrics::WithMetricsInstrumentation;
+use prisma_metrics::WithMetricsInstrumentation;
 
 use super::{TransactionError, TxId};
 

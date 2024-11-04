@@ -28,16 +28,18 @@ use lru_cache::LruCache;
 use native_tls::{Certificate, Identity, TlsConnector};
 use postgres_native_tls::MakeTlsConnector;
 use postgres_types::{Kind as PostgresKind, Type as PostgresType};
+use prisma_metrics::WithMetricsInstrumentation;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::{
-    borrow::Borrow,
     fmt::{Debug, Display},
     fs,
     future::Future,
     sync::atomic::{AtomicBool, Ordering},
     time::Duration,
 };
+use tokio::sync::OnceCell;
 use tokio_postgres::{config::ChannelBinding, Client, Config, Statement};
+use tracing_futures::WithSubscriber;
 use websocket::connect_via_websocket;
 
 /// The underlying postgres driver. Only available with the `expose-drivers`
@@ -205,8 +207,8 @@ impl PostgresNativeUrl {
     pub(crate) fn to_config(&self) -> Config {
         let mut config = Config::new();
 
-        config.user(self.username().borrow());
-        config.password(self.password().borrow() as &str);
+        config.user(self.username().as_ref());
+        config.password(self.password().as_ref());
         config.host(self.host());
         config.port(self.port());
         config.dbname(self.dbname());
@@ -236,38 +238,24 @@ impl PostgresNativeUrl {
 
 impl PostgreSql {
     /// Create a new connection to the database.
-    pub async fn new(url: PostgresNativeUrl) -> crate::Result<Self> {
+    pub async fn new(url: PostgresNativeUrl, tls_manager: &MakeTlsConnectorManager) -> crate::Result<Self> {
         let config = url.to_config();
 
-        let mut tls_builder = TlsConnector::builder();
-
-        {
-            let ssl_params = url.ssl_params();
-            let auth = ssl_params.to_owned().into_auth().await?;
-
-            if let Some(certificate) = auth.certificate.0 {
-                tls_builder.add_root_certificate(certificate);
-            }
-
-            tls_builder.danger_accept_invalid_certs(auth.ssl_accept_mode == SslAcceptMode::AcceptInvalidCerts);
-
-            if let Some(identity) = auth.identity.0 {
-                tls_builder.identity(identity);
-            }
-        }
-
-        let tls = MakeTlsConnector::new(tls_builder.build()?);
+        let tls = tls_manager.get_connector().await?;
         let (client, conn) = timeout::connect(url.connect_timeout(), config.connect(tls)).await?;
 
         let is_cockroachdb = conn.parameter("crdb_version").is_some();
         let is_materialize = conn.parameter("mz_version").is_some();
 
-        tokio::spawn(conn.map(|r| match r {
-            Ok(_) => (),
-            Err(e) => {
-                tracing::error!("Error in PostgreSQL connection: {:?}", e);
-            }
-        }));
+        tokio::spawn(
+            conn.map(|r| {
+                if let Err(e) = r {
+                    tracing::error!("Error in PostgreSQL connection: {e:?}");
+                }
+            })
+            .with_current_subscriber()
+            .with_current_recorder(),
+        );
 
         // On Postgres, we set the SEARCH_PATH and client-encoding through client connection parameters to save a network roundtrip on connection.
         // We can't always do it for CockroachDB because it does not expect quotes for unsafe identifiers (https://github.com/cockroachdb/cockroach/issues/101328), which might change once the issue is fixed.
@@ -962,6 +950,48 @@ fn is_safe_identifier(ident: &str) -> bool {
     true
 }
 
+pub struct MakeTlsConnectorManager {
+    url: PostgresNativeUrl,
+    connector: OnceCell<MakeTlsConnector>,
+}
+
+impl MakeTlsConnectorManager {
+    pub fn new(url: PostgresNativeUrl) -> Self {
+        MakeTlsConnectorManager {
+            url,
+            connector: OnceCell::new(),
+        }
+    }
+
+    pub async fn get_connector(&self) -> crate::Result<MakeTlsConnector> {
+        self.connector
+            .get_or_try_init(|| async {
+                let mut tls_builder = TlsConnector::builder();
+
+                {
+                    let ssl_params = self.url.ssl_params();
+                    let auth = ssl_params.to_owned().into_auth().await?;
+
+                    if let Some(certificate) = auth.certificate.0 {
+                        tls_builder.add_root_certificate(certificate);
+                    }
+
+                    tls_builder.danger_accept_invalid_certs(auth.ssl_accept_mode == SslAcceptMode::AcceptInvalidCerts);
+
+                    if let Some(identity) = auth.identity.0 {
+                        tls_builder.identity(identity);
+                    }
+                }
+
+                let tls_connector = MakeTlsConnector::new(tls_builder.build()?);
+
+                Ok(tls_connector)
+            })
+            .await
+            .cloned()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -980,7 +1010,9 @@ mod tests {
             let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Postgres);
 
-            let client = PostgreSql::new(pg_url).await.unwrap();
+            let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
+
+            let client = PostgreSql::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
@@ -1032,7 +1064,9 @@ mod tests {
             let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Postgres);
 
-            let client = PostgreSql::new(pg_url).await.unwrap();
+            let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
+
+            let client = PostgreSql::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
@@ -1083,7 +1117,9 @@ mod tests {
             let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Cockroach);
 
-            let client = PostgreSql::new(pg_url).await.unwrap();
+            let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
+
+            let client = PostgreSql::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
@@ -1134,7 +1170,9 @@ mod tests {
             let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Unknown);
 
-            let client = PostgreSql::new(pg_url).await.unwrap();
+            let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
+
+            let client = PostgreSql::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
@@ -1185,7 +1223,9 @@ mod tests {
             let mut pg_url = PostgresNativeUrl::new(url).unwrap();
             pg_url.set_flavour(PostgresFlavour::Unknown);
 
-            let client = PostgreSql::new(pg_url).await.unwrap();
+            let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
+
+            let client = PostgreSql::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();

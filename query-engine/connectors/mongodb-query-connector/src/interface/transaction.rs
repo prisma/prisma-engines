@@ -1,17 +1,20 @@
+use std::collections::HashMap;
+
+use connector_interface::{ConnectionLike, ReadOperations, Transaction, UpdateType, WriteOperations};
+use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
+use prisma_metrics::{guards::GaugeGuard, PRISMA_CLIENT_QUERIES_ACTIVE};
+use query_structure::{RelationLoadStrategy, SelectionResult};
+use telemetry::helpers::TraceParent;
+
 use super::*;
 use crate::{
     error::MongoError,
     root_queries::{aggregate, read, write},
 };
-use connector_interface::{ConnectionLike, ReadOperations, Transaction, UpdateType, WriteOperations};
-use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
-use query_engine_metrics::{gauge, PRISMA_CLIENT_QUERIES_ACTIVE};
-use query_structure::{RelationLoadStrategy, SelectionResult};
-use std::collections::HashMap;
-use telemetry::helpers::TraceParent;
 
 pub struct MongoDbTransaction<'conn> {
     connection: &'conn mut MongoDbConnection,
+    gauge: GaugeGuard,
 }
 
 impl<'conn> ConnectionLike for MongoDbTransaction<'conn> {}
@@ -32,16 +35,17 @@ impl<'conn> MongoDbTransaction<'conn> {
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 
-        gauge!(PRISMA_CLIENT_QUERIES_ACTIVE).increment(1.0);
-
-        Ok(Self { connection })
+        Ok(Self {
+            connection,
+            gauge: GaugeGuard::increment(PRISMA_CLIENT_QUERIES_ACTIVE),
+        })
     }
 }
 
 #[async_trait]
 impl<'conn> Transaction for MongoDbTransaction<'conn> {
     async fn commit(&mut self) -> connector_interface::Result<()> {
-        gauge!(PRISMA_CLIENT_QUERIES_ACTIVE).decrement(1.0);
+        self.gauge.decrement();
 
         utils::commit_with_retry(&mut self.connection.session)
             .await
@@ -51,7 +55,7 @@ impl<'conn> Transaction for MongoDbTransaction<'conn> {
     }
 
     async fn rollback(&mut self) -> connector_interface::Result<()> {
-        gauge!(PRISMA_CLIENT_QUERIES_ACTIVE).decrement(1.0);
+        self.gauge.decrement();
 
         self.connection
             .session

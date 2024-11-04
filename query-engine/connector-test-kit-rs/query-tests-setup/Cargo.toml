@@ -23,7 +23,7 @@ itertools.workspace = true
 regex.workspace = true
 serde.workspace = true
 tracing.workspace = true
-tracing-futures = "0.2"
+tracing-futures.workspace = true
 tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
 tracing-error = "0.2"
 colored = "2"
@@ -31,7 +31,7 @@ indoc.workspace = true
 enumflags2.workspace = true
 hyper = { version = "0.14", features = ["full"] }
 indexmap.workspace = true
-query-engine-metrics = { path = "../../metrics" }
+prisma-metrics.path = "../../../libs/metrics"
 quaint.workspace = true
 jsonrpc-core = "17"
 insta = "1.7.1"

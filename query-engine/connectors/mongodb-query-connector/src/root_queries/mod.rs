@@ -13,7 +13,7 @@ use crate::{
 use bson::Bson;
 use bson::Document;
 use futures::Future;
-use query_engine_metrics::{
+use prisma_metrics::{
     counter, histogram, PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, PRISMA_DATASOURCE_QUERIES_TOTAL,
 };
 use query_structure::*;

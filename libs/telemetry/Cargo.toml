@@ -4,7 +4,7 @@ name = "telemetry"
 version = "0.1.0"
 
 [features]
-metrics = ["dep:query-engine-metrics"]
+metrics = ["dep:prisma-metrics"]
 
 [dependencies]
 async-trait.workspace = true
@@ -30,4 +30,4 @@ crosstarget-utils = { path = "../crosstarget-utils" }
 lru = "0.7.7"
 enumflags2.workspace = true
 derive_more = "0.99.17"
-query-engine-metrics = { path = "../../query-engine/metrics", optional = true }
+prisma-metrics = { path = "../metrics", optional = true }

@@ -1,16 +1,21 @@
+use std::future::Future;
+
+use async_trait::async_trait;
+use mobc::{Connection as MobcPooled, Manager};
+use prisma_metrics::WithMetricsInstrumentation;
+use tracing_futures::WithSubscriber;
+
 #[cfg(feature = "mssql-native")]
 use crate::connector::MssqlUrl;
 #[cfg(feature = "mysql-native")]
 use crate::connector::MysqlUrl;
 #[cfg(feature = "postgresql-native")]
-use crate::connector::PostgresNativeUrl;
+use crate::connector::{MakeTlsConnectorManager, PostgresNativeUrl};
 use crate::{
     ast,
     connector::{self, impl_default_TransactionCapable, IsolationLevel, Queryable, Transaction, TransactionCapable},
     error::Error,
 };
-use async_trait::async_trait;
-use mobc::{Connection as MobcPooled, Manager};
 
 /// A connection from the pool. Implements
 /// [Queryable](connector/trait.Queryable.html).
@@ -85,7 +90,10 @@ pub enum QuaintManager {
     Mysql { url: MysqlUrl },
 
     #[cfg(feature = "postgresql")]
-    Postgres { url: PostgresNativeUrl },
+    Postgres {
+        url: PostgresNativeUrl,
+        tls_manager: MakeTlsConnectorManager,
+    },
 
     #[cfg(feature = "sqlite")]
     Sqlite { url: String, db_name: String },
@@ -117,9 +125,9 @@ impl Manager for QuaintManager {
             }
 
             #[cfg(feature = "postgresql-native")]
-            QuaintManager::Postgres { url } => {
+            QuaintManager::Postgres { url, tls_manager } => {
                 use crate::connector::PostgreSql;
-                Ok(Box::new(PostgreSql::new(url.clone()).await?) as Self::Connection)
+                Ok(Box::new(PostgreSql::new(url.clone(), tls_manager).await?) as Self::Connection)
             }
 
             #[cfg(feature = "mssql-native")]
@@ -142,6 +150,14 @@ impl Manager for QuaintManager {
 
     fn validate(&self, conn: &mut Self::Connection) -> bool {
         conn.is_healthy()
+    }
+
+    fn spawn_task<T>(&self, task: T)
+    where
+        T: Future + Send + 'static,
+        T::Output: Send + 'static,
+    {
+        tokio::spawn(task.with_current_subscriber().with_current_recorder());
     }
 }
 
