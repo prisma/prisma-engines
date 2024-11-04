@@ -62,7 +62,7 @@ futures.workspace = true
 
 tracing.workspace = true
 tracing-subscriber = { version = "0.3" }
-tracing-futures = "0.2"
+tracing-futures.workspace = true
 tracing-opentelemetry = "0.17.3"
 opentelemetry = { version = "0.17" }
 

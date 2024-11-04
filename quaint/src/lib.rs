@@ -110,11 +110,8 @@ compile_error!("one of 'sqlite', 'postgresql', 'mysql' or 'mssql' features must 
 #[macro_use]
 mod macros;
 
-#[macro_use]
-extern crate metrics;
-
-pub extern crate bigdecimal;
-pub extern crate chrono;
+pub use bigdecimal;
+pub use chrono;
 
 pub mod ast;
 pub mod connector;
