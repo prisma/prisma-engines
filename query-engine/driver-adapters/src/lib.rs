@@ -117,14 +117,14 @@ mod arch {
 
     pub(crate) fn get_named_property<T>(object: &::napi::JsObject, name: &str) -> JsResult<T>
     where
-        T: ::napi::bindgen_prelude::FromNapiValue,
+        T: ::napi::bindgen_prelude::FromNapiValue + ::napi::bindgen_prelude::ValidateNapiValue,
     {
         object.get_named_property(name)
     }
 
     pub(crate) fn get_optional_named_property<T>(object: &::napi::JsObject, name: &str) -> JsResult<Option<T>>
     where
-        T: ::napi::bindgen_prelude::FromNapiValue,
+        T: ::napi::bindgen_prelude::FromNapiValue + ::napi::bindgen_prelude::ValidateNapiValue,
     {
         if has_named_property(object, name)? {
             Ok(Some(get_named_property(object, name)?))
