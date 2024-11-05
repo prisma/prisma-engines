@@ -41,6 +41,7 @@ in
     ] ++ lib.optionals stdenv.isDarwin [
       perl # required to build openssl
       darwin.apple_sdk.frameworks.Security
+      darwin.apple_sdk.frameworks.SystemConfiguration
       iconv
     ];
 
