@@ -313,7 +313,7 @@ impl QueryEngine {
 
             let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
 
-            let span = tracing::info_span!("prisma:engine:query", user_facing = true);
+            let span = tracing::info_span!("prisma:engine", user_facing = true);
             let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
             let traceparent = TraceParent::from_remote_context(&parent_context);
             span.set_parent(parent_context);
