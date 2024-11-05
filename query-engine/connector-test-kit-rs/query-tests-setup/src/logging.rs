@@ -1,4 +1,4 @@
-use query_core::telemetry::helpers as telemetry_helpers;
+use telemetry::helpers as telemetry_helpers;
 use tracing::Subscriber;
 use tracing_error::ErrorLayer;
 use tracing_subscriber::{prelude::*, Layer};

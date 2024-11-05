@@ -1,5 +1,5 @@
 use core::fmt;
-use query_core::telemetry;
+
 use query_engine_common::logger::StringCallback;
 use serde_json::Value;
 use std::sync::Arc;
