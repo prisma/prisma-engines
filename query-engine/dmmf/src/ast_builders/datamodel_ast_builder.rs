@@ -96,7 +96,7 @@ fn composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker<'_>) ->
         has_default_value: field.default_value().is_some(),
         native_type: field
             .raw_native_type()
-            .map(|(_, name, args, ..)| (name.to_string(), args.iter().cloned().collect())),
+            .map(|(_, name, args, ..)| (name.to_string(), args.to_vec())),
         default: field
             .default_value()
             .map(|dv| default_value_to_serde(&dml_default_kind(dv, field.scalar_type()))),
@@ -200,7 +200,7 @@ fn scalar_field_to_dmmf(field: walkers::ScalarFieldWalker<'_>) -> Field {
         },
         native_type: field
             .raw_native_type()
-            .map(|(_, name, args, ..)| (name.to_string(), args.iter().cloned().collect())),
+            .map(|(_, name, args, ..)| (name.to_string(), args.to_vec())),
         default: field
             .default_value()
             .map(|dv| default_value_to_serde(&dml_default_kind(dv.value(), field.scalar_type()))),
