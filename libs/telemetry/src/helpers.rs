@@ -14,7 +14,7 @@ pub static SHOW_ALL_TRACES: Lazy<bool> = Lazy::new(|| match std::env::var("PRISM
     Err(_) => false,
 });
 
-/// Traceparent is a remote span. It is identified by trace_id and span_id.
+/// `TraceParent` is a remote span. It is identified by `trace_id` and `span_id`.
 ///
 /// By "remote" we mean that this span was not emitted in the current process. In real life, it is
 /// either:
