@@ -23,6 +23,7 @@
     {
       "name": "User",
       "dbName": "user",
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -118,6 +119,7 @@
     {
       "name": "Profile",
       "dbName": "profile",
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -187,6 +189,7 @@
     {
       "name": "Post",
       "dbName": "post",
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -333,6 +336,7 @@
     {
       "name": "Category",
       "dbName": "category",
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -398,6 +402,7 @@
     {
       "name": "PostToCategory",
       "dbName": "post_to_category",
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -515,6 +520,7 @@
     {
       "name": "A",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -571,6 +577,7 @@
     {
       "name": "B",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -610,6 +617,7 @@
     {
       "name": "NamedCompounds",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "a",
@@ -691,6 +699,7 @@
     {
       "name": "MappedSingles",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "a",

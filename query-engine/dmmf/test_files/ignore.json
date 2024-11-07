@@ -4,6 +4,7 @@
     {
       "name": "User",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "id",
