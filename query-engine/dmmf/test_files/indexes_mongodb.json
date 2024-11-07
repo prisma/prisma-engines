@@ -4,6 +4,7 @@
     {
       "name": "Post",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -76,6 +77,7 @@
     {
       "name": "Comment",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "userId",

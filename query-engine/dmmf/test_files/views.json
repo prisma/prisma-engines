@@ -4,6 +4,7 @@
     {
       "name": "User",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -73,6 +74,7 @@
     {
       "name": "Profile",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -146,6 +148,7 @@
     {
       "name": "UserInfo",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "id",

@@ -64,6 +64,8 @@ pub struct Function {
 pub struct Model {
     pub name: String,
     pub db_name: Option<String>,
+    pub schema: Option<String>,
+
     pub fields: Vec<Field>,
     pub primary_key: Option<PrimaryKey>,
     pub unique_fields: Vec<Vec<String>>,
