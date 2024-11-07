@@ -373,6 +373,7 @@ mod tests {
                   {
                     "name": "A",
                     "dbName": null,
+                    "schema": null,
                     "fields": [
                       {
                         "name": "id",
@@ -429,6 +430,7 @@ mod tests {
                   {
                     "name": "B",
                     "dbName": null,
+                    "schema": null,
                     "fields": [
                       {
                         "name": "id",
