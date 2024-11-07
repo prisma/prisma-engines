@@ -4,6 +4,7 @@
     {
       "name": "Example",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -40,6 +41,7 @@
     {
       "name": "Post",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "title",
