@@ -59,7 +59,7 @@ indexmap = { version = "2.2.2", features = ["serde"] }
 itertools = "0.12"
 connection-string = "0.2"
 napi = { version = "2.16.13", default-features = false, features = [
-  "napi8",
+  "napi9",
   "tokio_rt",
   "serde-json",
 ] }
