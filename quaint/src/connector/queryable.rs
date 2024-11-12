@@ -1,9 +1,7 @@
 use super::{DescribedQuery, ExternalConnector, IsolationLevel, ResultSet, Transaction};
-use std::borrow::Cow;
-
-use super::{DescribedQuery, IsolationLevel, ResultSet, Transaction};
 use crate::ast::*;
 use async_trait::async_trait;
+use std::borrow::Cow;
 
 pub trait GetRow {
     fn get_result_row(&self) -> crate::Result<Vec<Value<'static>>>;
@@ -98,30 +96,23 @@ pub trait Queryable: Send + Sync {
     }
 
     /// Statement to begin a transaction
-    fn begin_statement(&self, depth: u32) -> Cow<'static, str> {
-        if depth > 1 {
-            Cow::Owned(format!("SAVEPOINT savepoint{depth}"))
-        } else {
-            Cow::Borrowed("BEGIN")
-        }
+    fn begin_statement(&self) -> &'static str {
+        "BEGIN"
     }
 
-    /// Statement to commit a transaction
-    fn commit_statement(&self, depth: u32) -> Cow<'static, str> {
-        if depth > 1 {
-            Cow::Owned(format!("RELEASE SAVEPOINT savepoint{depth}"))
-        } else {
-            Cow::Borrowed("COMMIT")
-        }
+    /// Statement to create a savepoint in a transaction
+    fn create_savepoint_statement(&self, depth: u32) -> Cow<'static, str> {
+        Cow::Owned(format!("SAVEPOINT savepoint{depth}"))
     }
 
-    /// Statement to rollback a transaction
-    fn rollback_statement(&self, depth: u32) -> Cow<'static, str> {
-        if depth > 1 {
-            Cow::Owned(format!("ROLLBACK TO SAVEPOINT savepoint{depth}"))
-        } else {
-            Cow::Borrowed("ROLLBACK")
-        }
+    /// Statement to release a savepoint in a transaction
+    fn release_savepoint_statement(&self, depth: u32) -> Cow<'static, str> {
+        Cow::Owned(format!("RELEASE SAVEPOINT savepoint{depth}"))
+    }
+
+    /// Statement to rollback to a savepoint in a transaction
+    fn rollback_to_savepoint_statement(&self, depth: u32) -> Cow<'static, str> {
+        Cow::Owned(format!("ROLLBACK TO SAVEPOINT savepoint{depth}"))
     }
 
     /// Sets the transaction isolation level to given value.

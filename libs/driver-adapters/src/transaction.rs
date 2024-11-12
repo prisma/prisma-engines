@@ -13,7 +13,7 @@ use crate::{proxy::CommonProxy, queryable::JsBaseQueryable, send_future::UnsafeF
 
 // Wrapper around JS transaction objects that implements Queryable
 // and quaint::Transaction. Can be used in place of quaint transaction,
-// but delegates most operations to JS
+// but delegates most operations to JS.
 pub(crate) struct JsTransaction {
     tx_proxy: TransactionProxy,
     inner: JsBaseQueryable,
@@ -22,11 +22,7 @@ pub(crate) struct JsTransaction {
 
 impl JsTransaction {
     pub(crate) fn new(inner: JsBaseQueryable, tx_proxy: TransactionProxy) -> Self {
-        Self {
-            inner,
-            tx_proxy,
-            depth: 0,
-        }
+        Self { inner, tx_proxy, depth: 0 }
     }
 
     pub fn options(&self) -> &TransactionOptions {
@@ -41,61 +37,108 @@ impl JsTransaction {
 
 #[async_trait]
 impl QuaintTransaction for JsTransaction {
+    fn depth(&self) -> u32 {
+        self.depth
+    }
+
     async fn begin(&mut self) -> quaint::Result<()> {
-        self.depth += 1;
-        let begin_stmt = self.begin_statement(self.depth);
+        if self.depth > 0 {
+            // Starting a nested transaction uses savepoints.
+            return self.create_savepoint().await;
+        }
 
-        let begin_res = if self.options().use_phantom_query {
-            let phantom = JsBaseQueryable::phantom_query_message(begin_stmt.as_ref());
-            self.raw_phantom_cmd(phantom.as_str()).await
+        self.depth = 1;
+        let begin_stmt = self.begin_statement();
+
+        if self.options().use_phantom_query {
+            let phantom = JsBaseQueryable::phantom_query_message(begin_stmt);
+            self.raw_phantom_cmd(phantom.as_str()).await?;
         } else {
-            self.inner.raw_cmd(begin_stmt.as_ref()).await
-        };
-
-        if let Err(err) = begin_res {
-            // Keep depth consistent with the underlying driver if we failed to begin.
-            self.depth -= 1;
-            return Err(err);
+            self.inner.raw_cmd(begin_stmt).await?;
         }
 
         UnsafeFuture(self.tx_proxy.begin()).await?;
         Ok(())
     }
 
-    async fn commit(&mut self) -> quaint::Result<u32> {
-        let commit_stmt = self.commit_statement(self.depth);
+    async fn commit(&mut self) -> quaint::Result<()> {
+        if self.depth > 1 {
+            return self.release_savepoint().await;
+        }
+
+        let commit_stmt = "COMMIT";
 
         if self.options().use_phantom_query {
-            let phantom = JsBaseQueryable::phantom_query_message(commit_stmt.as_ref());
+            let phantom = JsBaseQueryable::phantom_query_message(commit_stmt);
             self.raw_phantom_cmd(phantom.as_str()).await?;
         } else {
-            self.inner.raw_cmd(commit_stmt.as_ref()).await?;
+            self.inner.raw_cmd(commit_stmt).await?;
         }
 
         UnsafeFuture(self.tx_proxy.commit()).await?;
 
-        // Modify the depth value
-        self.depth -= 1;
-
-        Ok(self.depth)
+        self.depth = 0;
+        Ok(())
     }
 
-    async fn rollback(&mut self) -> quaint::Result<u32> {
-        let rollback_stmt = self.rollback_statement(self.depth);
+    async fn rollback(&mut self) -> quaint::Result<()> {
+        if self.depth > 1 {
+            return self.rollback_to_savepoint().await;
+        }
+
+        let rollback_stmt = "ROLLBACK";
 
         if self.options().use_phantom_query {
-            let phantom = JsBaseQueryable::phantom_query_message(rollback_stmt.as_ref());
+            let phantom = JsBaseQueryable::phantom_query_message(rollback_stmt);
             self.raw_phantom_cmd(phantom.as_str()).await?;
         } else {
-            self.inner.raw_cmd(rollback_stmt.as_ref()).await?;
+            self.inner.raw_cmd(rollback_stmt).await?;
         }
 
         UnsafeFuture(self.tx_proxy.rollback()).await?;
 
-        // Modify the depth value
-        self.depth -= 1;
+        self.depth = 0;
+        Ok(())
+    }
 
-        Ok(self.depth)
+    async fn create_savepoint(&mut self) -> quaint::Result<()> {
+        self.depth += 1;
+
+        let stmt = self.create_savepoint_statement(self.depth);
+        if self.options().use_phantom_query {
+            let phantom = JsBaseQueryable::phantom_query_message(stmt.as_ref());
+            self.raw_phantom_cmd(phantom.as_str()).await?;
+        } else {
+            self.inner.raw_cmd(stmt.as_ref()).await?;
+        }
+
+        Ok(())
+    }
+
+    async fn release_savepoint(&mut self) -> quaint::Result<()> {
+        let stmt = self.release_savepoint_statement(self.depth);
+        if self.options().use_phantom_query {
+            let phantom = JsBaseQueryable::phantom_query_message(stmt.as_ref());
+            self.raw_phantom_cmd(phantom.as_str()).await?;
+        } else {
+            self.inner.raw_cmd(stmt.as_ref()).await?;
+        }
+
+        self.depth -= 1;
+        Ok(())
+    }
+
+    async fn rollback_to_savepoint(&mut self) -> quaint::Result<()> {
+        let stmt = self.rollback_to_savepoint_statement(self.depth);
+        if self.options().use_phantom_query {
+            let phantom = JsBaseQueryable::phantom_query_message(stmt.as_ref());
+            self.raw_phantom_cmd(phantom.as_str()).await?;
+        } else {
+            self.inner.raw_cmd(stmt.as_ref()).await?;
+        }
+
+        self.depth -= 1;
+        Ok(())
     }
 
     fn as_queryable(&self) -> &dyn Queryable {
@@ -153,19 +196,24 @@ impl Queryable for JsTransaction {
         self.inner.requires_isolation_first()
     }
 
-    fn begin_statement(&self, depth: u32) -> Cow<'static, str> {
-        self.inner.begin_statement(depth)
+    fn begin_statement(&self) -> &'static str {
+        self.inner.begin_statement()
     }
 
-    fn commit_statement(&self, depth: u32) -> Cow<'static, str> {
-        self.inner.commit_statement(depth)
+    fn create_savepoint_statement(&self, depth: u32) -> Cow<'static, str> {
+        self.inner.create_savepoint_statement(depth)
     }
 
-    fn rollback_statement(&self, depth: u32) -> Cow<'static, str> {
-        self.inner.rollback_statement(depth)
+    fn release_savepoint_statement(&self, depth: u32) -> Cow<'static, str> {
+        self.inner.release_savepoint_statement(depth)
+    }
+
+    fn rollback_to_savepoint_statement(&self, depth: u32) -> Cow<'static, str> {
+        self.inner.rollback_to_savepoint_statement(depth)
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 impl super::wasm::FromJsValue for JsTransaction {
     fn from_js_value(value: wasm_bindgen::prelude::JsValue) -> JsResult<Self> {
         use wasm_bindgen::JsCast;
@@ -178,3 +226,17 @@ impl super::wasm::FromJsValue for JsTransaction {
         Ok(Self::new(base, tx_proxy))
     }
 }
+
+/// Implementing unsafe `from_napi_value` allows retrieving a threadsafe `JsTransaction` in `DriverProxy`
+/// while keeping derived futures `Send`.
+#[cfg(not(target_arch = "wasm32"))]
+impl ::napi::bindgen_prelude::FromNapiValue for JsTransaction {
+    unsafe fn from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> JsResult<Self> {
+        let object = JsObject::from_napi_value(env, napi_val)?;
+        let common_proxy = CommonProxy::new(&object)?;
+        let tx_proxy = TransactionProxy::new(&object)?;
+
+        Ok(Self::new(JsBaseQueryable::new(common_proxy), tx_proxy))
+    }
+}
+

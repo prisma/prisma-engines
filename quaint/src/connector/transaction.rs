@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use prisma_metrics::guards::GaugeGuard;
 
 use super::*;
 use crate::{
@@ -13,14 +14,25 @@ use std::{
 
 #[async_trait]
 pub trait Transaction: Queryable {
+    fn depth(&self) -> u32;
+
     /// Start a new transaction or nested transaction via savepoint.
     async fn begin(&mut self) -> crate::Result<()>;
 
     /// Commit the changes to the database and consume the transaction.
-    async fn commit(&mut self) -> crate::Result<u32>;
+    async fn commit(&mut self) -> crate::Result<()>;
 
     /// Rolls back the changes to the database.
-    async fn rollback(&mut self) -> crate::Result<u32>;
+    async fn rollback(&mut self) -> crate::Result<()>;
+
+    /// Creates a savepoint in the transaction.
+    async fn create_savepoint(&mut self) -> crate::Result<()>;
+
+    /// Releases a savepoint in the transaction.
+    async fn release_savepoint(&mut self) -> crate::Result<()>;
+
+    /// Rolls back to a savepoint in the transaction.
+    async fn rollback_to_savepoint(&mut self) -> crate::Result<()>;
 
     /// workaround for lack of upcasting between traits https://github.com/rust-lang/rust/issues/65991
     fn as_queryable(&self) -> &dyn Queryable;
@@ -63,6 +75,7 @@ impl TransactionOptions {
 pub struct DefaultTransaction<'a> {
     pub inner: &'a dyn Queryable,
     pub depth: Arc<Mutex<u32>>,
+    gauge: GaugeGuard,
 }
 
 #[cfg_attr(
@@ -87,21 +100,22 @@ impl<'a> DefaultTransaction<'a> {
     ) -> crate::Result<DefaultTransaction<'a>> {
         let mut this = Self {
             inner,
+            gauge: GaugeGuard::increment("prisma_client_queries_active"),
             depth: Arc::new(Mutex::new(0)),
         };
 
-        if tx_opts.isolation_first
-            && let Some(isolation) = tx_opts.isolation_level
-        {
-            inner.set_tx_isolation_level(isolation).await?;
+        if tx_opts.isolation_first {
+            if let Some(isolation) = tx_opts.isolation_level {
+                inner.set_tx_isolation_level(isolation).await?;
+            }
         }
 
         this.begin().await?;
 
-        if !tx_opts.isolation_first
-            && let Some(isolation) = tx_opts.isolation_level
-        {
-            inner.set_tx_isolation_level(isolation).await?;
+        if !tx_opts.isolation_first {
+            if let Some(isolation) = tx_opts.isolation_level {
+                inner.set_tx_isolation_level(isolation).await?;
+            }
         }
 
         inner.server_reset_query(&this).await?;
@@ -112,63 +126,101 @@ impl<'a> DefaultTransaction<'a> {
 
 #[async_trait]
 impl Transaction for DefaultTransaction<'_> {
+    fn depth(&self) -> u32 {
+        *self.depth.lock().unwrap()
+    }
+
     async fn begin(&mut self) -> crate::Result<()> {
+        // Lock the mutex in its own scope to ensure it's dropped before the await.
+        {
+            let mut depth = self.depth.lock().unwrap();
+            *depth += 1;
+        }
+
+        let begin_statement = self.inner.begin_statement();
+        self.inner.raw_cmd(begin_statement).await?;
+
+        Ok(())
+    }
+
+    /// Commit the changes to the database and consume the transaction.
+    async fn commit(&mut self) -> crate::Result<()> {
+        self.inner.raw_cmd("COMMIT").await?;
+
+        let mut depth = self.depth.lock().unwrap();
+        *depth -= 1;
+
+        self.gauge.decrement();
+
+        Ok(())
+    }
+
+    /// Rolls back the changes to the database.
+    async fn rollback(&mut self) -> crate::Result<()> {
+        self.inner.raw_cmd("ROLLBACK").await?;
+
+        let mut depth = self.depth.lock().unwrap();
+        *depth -= 1;
+
+        self.gauge.decrement();
+
+        Ok(())
+    }
+
+    /// Creates a savepoint in the transaction.
+    async fn create_savepoint(&mut self) -> crate::Result<()> {
         let current_depth = {
             let mut depth = self.depth.lock().unwrap();
             *depth += 1;
             *depth
         };
 
-        let begin_statement = self.inner.begin_statement(current_depth);
-
-        self.inner.raw_cmd(&begin_statement).await?;
+        let stmt = self.inner.create_savepoint_statement(current_depth);
+        self.inner.raw_cmd(stmt.as_ref()).await?;
 
         Ok(())
     }
 
-    /// Commit the changes to the database and consume the transaction.
-    async fn commit(&mut self) -> crate::Result<u32> {
-        // Lock the mutex and get the depth value
+    /// Releases a savepoint in the transaction.
+    async fn release_savepoint(&mut self) -> crate::Result<()> {
         let depth_val = {
             let depth = self.depth.lock().unwrap();
             *depth
         };
 
-        // Perform the asynchronous operation without holding the lock
-        let commit_statement = self.inner.commit_statement(depth_val);
-        self.inner.raw_cmd(&commit_statement).await?;
+        if depth_val == 0 {
+            panic!("No savepoint to release in transaction, make sure to call create_savepoint before release_savepoint");
+        }
 
-        // Lock the mutex again to modify the depth
-        let new_depth = {
-            let mut depth = self.depth.lock().unwrap();
-            *depth -= 1;
-            *depth
-        };
+        let stmt = self.inner.release_savepoint_statement(depth_val);
+        self.inner.raw_cmd(stmt.as_ref()).await?;
 
-        Ok(new_depth)
+        let mut depth = self.depth.lock().unwrap();
+        *depth -= 1;
+
+        Ok(())
     }
 
-    /// Rolls back the changes to the database.
-    async fn rollback(&mut self) -> crate::Result<u32> {
-        // Lock the mutex and get the depth value
+    /// Rolls back to a savepoint in the transaction.
+    async fn rollback_to_savepoint(&mut self) -> crate::Result<()> {
         let depth_val = {
             let depth = self.depth.lock().unwrap();
             *depth
         };
 
-        // Perform the asynchronous operation without holding the lock
-        let rollback_statement = self.inner.rollback_statement(depth_val);
+        if depth_val == 0 {
+            panic!(
+                "No savepoint to rollback to in transaction, make sure to call create_savepoint before rollback_to_savepoint"
+            );
+        }
 
-        self.inner.raw_cmd(&rollback_statement).await?;
+        let stmt = self.inner.rollback_to_savepoint_statement(depth_val);
+        self.inner.raw_cmd(stmt.as_ref()).await?;
 
-        // Lock the mutex again to modify the depth
-        let new_depth = {
-            let mut depth = self.depth.lock().unwrap();
-            *depth -= 1;
-            *depth
-        };
+        let mut depth = self.depth.lock().unwrap();
+        *depth -= 1;
 
-        Ok(new_depth)
+        Ok(())
     }
 
     fn as_queryable(&self) -> &dyn Queryable {
@@ -241,7 +293,6 @@ impl Queryable for DefaultTransaction<'_> {
 /// [Postgres documentation]: https://www.postgresql.org/docs/current/sql-set-transaction.html
 /// [MySQL documentation]: https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-isolation-levels.html
 /// [SQLite documentation]: https://www.sqlite.org/isolation.html
-///
 pub enum IsolationLevel {
     ReadUncommitted,
     ReadCommitted,
@@ -279,3 +330,4 @@ impl FromStr for IsolationLevel {
         }
     }
 }
+

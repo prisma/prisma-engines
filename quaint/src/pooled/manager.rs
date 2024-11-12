@@ -2,7 +2,6 @@ use std::future::Future;
 
 use async_trait::async_trait;
 use mobc::{Connection as MobcPooled, Manager};
-use std::borrow::Cow;
 use tracing_futures::WithSubscriber;
 
 #[cfg(feature = "mssql-native")]
@@ -79,16 +78,8 @@ impl Queryable for PooledConnection {
         self.inner.server_reset_query(tx).await
     }
 
-    fn begin_statement(&self, depth: u32) -> Cow<'static, str> {
-        self.inner.begin_statement(depth)
-    }
-
-    fn commit_statement(&self, depth: u32) -> Cow<'static, str> {
-        self.inner.commit_statement(depth)
-    }
-
-    fn rollback_statement(&self, depth: u32) -> Cow<'static, str> {
-        self.inner.rollback_statement(depth)
+    fn begin_statement(&self) -> &'static str {
+        self.inner.begin_statement()
     }
 
     async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> crate::Result<()> {
