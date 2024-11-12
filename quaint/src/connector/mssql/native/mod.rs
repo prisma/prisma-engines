@@ -244,32 +244,24 @@ impl Queryable for Mssql {
     }
 
     /// Statement to begin a transaction
-    fn begin_statement(&self, depth: u32) -> Cow<'static, str> {
-        if depth > 1 {
-            Cow::Owned(format!("SAVE TRANSACTION savepoint{depth}"))
-        } else {
-            Cow::Borrowed("BEGIN TRAN")
-        }
+    fn begin_statement(&self) -> &'static str {
+        "BEGIN TRAN"
     }
 
-    /// Statement to commit a transaction
-    fn commit_statement(&self, depth: u32) -> Cow<'static, str> {
-        // MSSQL doesn't have a "RELEASE SAVEPOINT" equivalent, so in a nested
-        // transaction we just continue onwards
-        if depth > 1 {
-            Cow::Owned("".to_string())
-        } else {
-            Cow::Borrowed("COMMIT")
-        }
+    /// Statement to create a savepoint
+    fn create_savepoint_statement(&self, depth: u32) -> Cow<'static, str> {
+        Cow::Owned(format!("SAVE TRANSACTION savepoint{depth}"))
     }
 
-    /// Statement to rollback a transaction
-    fn rollback_statement(&self, depth: u32) -> Cow<'static, str> {
-        if depth > 1 {
-            Cow::Owned(format!("ROLLBACK TRANSACTION savepoint{depth}"))
-        } else {
-            Cow::Borrowed("ROLLBACK")
-        }
+    // MSSQL doesn't have a "RELEASE SAVEPOINT" equivalent, so in a nested
+    // transaction we just continue onwards
+    fn release_savepoint_statement(&self, _depth: u32) -> Cow<'static, str> {
+        Cow::Owned("".to_string())
+    }
+
+    /// Statement to rollback to a savepoint
+    fn rollback_to_savepoint_statement(&self, depth: u32) -> Cow<'static, str> {
+        Cow::Owned(format!("ROLLBACK TRANSACTION savepoint{depth}"))
     }
 
     fn requires_isolation_first(&self) -> bool {

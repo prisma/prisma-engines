@@ -197,6 +197,13 @@ impl InteractiveTransaction {
         })
     }
 
+    pub fn depth(&mut self) -> u32 {
+        match self.state.as_open("depth") {
+            Ok(state) => state.depth(),
+            Err(_) => 0,
+        }
+    }
+
     pub async fn begin(&mut self) -> crate::Result<()> {
         tx_timeout!(self, "begin", async {
             let name = self.name();
@@ -223,9 +230,7 @@ impl InteractiveTransaction {
             match conn.commit().instrument(span).await {
                 Ok(depth) => {
                     debug!(?depth, ?name, "transaction committed");
-                    if depth == 0 {
-                        self.state = TransactionState::Committed;
-                    }
+                    self.state = TransactionState::Committed;
                     Ok(())
                 }
                 Err(err) => {
@@ -240,7 +245,7 @@ impl InteractiveTransaction {
         })
     }
 
-    pub async fn rollback(&mut self, was_timeout: bool) -> crate::Result<u32> {
+    pub async fn rollback(&mut self, was_timeout: bool) -> crate::Result<()> {
         let name = self.name();
         let conn = self.state.as_open("rollback")?;
         let span = info_span!("prisma:engine:itx_rollback");
@@ -260,6 +265,58 @@ impl InteractiveTransaction {
             };
         } else {
             self.state = TransactionState::RolledBack;
+        }
+
+        result.map_err(<_>::into)
+    }
+
+    pub async fn create_savepoint(&mut self) -> crate::Result<()> {
+        tx_timeout!(self, "create savepoint", async {
+            let name = self.name();
+            let conn = self.state.as_open("create_savepoint")?;
+            let span = info_span!("prisma:engine:itx_create_savepoint", user_facing = true);
+
+            if let Err(err) = conn.create_savepoint().instrument(span).await {
+                error!(?err, ?name, "transaction failed to create savepoint");
+                let _ = self.rollback(false).await;
+                Err(err.into())
+            } else {
+                debug!(?name, "savepoint created");
+                Ok(())
+            }
+        })
+    }
+
+    pub async fn release_savepoint(&mut self) -> crate::Result<()> {
+        tx_timeout!(self, "release savepoint", async {
+            let name = self.name();
+            let conn = self.state.as_open("release_savepoint")?;
+            let span = info_span!("prisma:engine:itx_release_savepoint", user_facing = true);
+
+            match conn.release_savepoint().instrument(span).await {
+                Ok(()) => {
+                    debug!(?name, "savepoint released");
+                    Ok(())
+                }
+                Err(err) => {
+                    error!(?err, ?name, "transaction failed to release savepoint");
+                    let _ = self.rollback(false).await;
+                    Err(err.into())
+                }
+            }
+        })
+    }
+
+    pub async fn rollback_to_savepoint(&mut self) -> crate::Result<()> {
+        let name = self.name();
+        let conn = self.state.as_open("rollback_to_savepoint")?;
+        let span = info_span!("prisma:engine:itx_rollback_to_savepoint", user_facing = true);
+
+        let result = conn.rollback_to_savepoint().instrument(span).await;
+        if let Err(err) = &result {
+            error!(?err, ?name, "transaction failed to roll back to savepoint");
+        } else {
+            debug!(?name, "transaction rolled back to savepoint");
         }
 
         result.map_err(<_>::into)
