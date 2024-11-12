@@ -118,5 +118,5 @@ pub trait TransactionManager {
     async fn commit_tx(&self, tx_id: TxId) -> crate::Result<()>;
 
     /// Rolls back a transaction.
-    async fn rollback_tx(&self, tx_id: TxId) -> crate::Result<u32>;
+    async fn rollback_tx(&self, tx_id: TxId) -> crate::Result<()>;
 }
