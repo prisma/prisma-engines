@@ -112,7 +112,14 @@ impl ItxManager {
         // Only create a client if there is no client for this transaction yet.
         // otherwise, begin a new transaction/savepoint for the existing client.
         if self.transactions.read().await.contains_key(&tx_id) {
-            let _ = self.get_transaction(&tx_id, "begin").await?.lock().await.begin().await;
+            let transaction_entry = self.get_transaction(&tx_id, "begin").await?;
+            let mut tx = transaction_entry.lock().await;
+            // If the transaction is already open, we need to create a savepoint.
+            if tx.depth() > 0 {
+                tx.create_savepoint().await?;
+            } else {
+                tx.begin().await?;
+            }
         } else {
             // This task notifies the task spawned in `new()` method that the timeout for this
             // transaction has expired.
@@ -184,15 +191,24 @@ impl ItxManager {
     }
 
     pub async fn commit_tx(&self, tx_id: &TxId) -> crate::Result<()> {
-        self.get_transaction(tx_id, "commit").await?.lock().await.commit().await
+        let transaction_entry = self.get_transaction(tx_id, "commit").await?;
+        let mut tx = transaction_entry.lock().await;
+        let depth = tx.depth();
+        if depth > 1 {
+            tx.release_savepoint().await
+        } else {
+            tx.commit().await
+        }
     }
 
-    pub async fn rollback_tx(&self, tx_id: &TxId) -> crate::Result<u32> {
-        self.get_transaction(tx_id, "rollback")
-            .await?
-            .lock()
-            .await
-            .rollback(false)
-            .await
+    pub async fn rollback_tx(&self, tx_id: &TxId) -> crate::Result<()> {
+        let transaction_entry = self.get_transaction(tx_id, "rollback").await?;
+        let mut tx = transaction_entry.lock().await;
+        let depth = tx.depth();
+        if depth > 1 {
+            tx.rollback_to_savepoint().await
+        } else {
+            tx.rollback(false).await
+        }
     }
 }
