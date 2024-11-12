@@ -48,17 +48,17 @@ impl Transaction for MongoDbTransaction<'_> {
         Ok(())
     }
 
-    async fn commit(&mut self) -> connector_interface::Result<u32> {
+    async fn commit(&mut self) -> connector_interface::Result<()> {
         self.gauge.decrement();
 
         utils::commit_with_retry(&mut self.connection.session)
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 
-        Ok(0)
+        Ok(())
     }
 
-    async fn rollback(&mut self) -> connector_interface::Result<u32> {
+    async fn rollback(&mut self) -> connector_interface::Result<()> {
         self.gauge.decrement();
 
         self.connection
@@ -67,7 +67,24 @@ impl Transaction for MongoDbTransaction<'_> {
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 
-        Ok(0)
+        Ok(())
+    }
+
+    fn depth(&self) -> u32 {
+        0
+    }
+
+    /// MongoDB does not support savepoints/nested transactions.
+    async fn create_savepoint(&mut self) -> connector_interface::Result<()> {
+        Err(MongoError::Unsupported("MongoDB does not support savepoints".into()).into_connector_error())
+    }
+
+    async fn release_savepoint(&mut self) -> connector_interface::Result<()> {
+        Err(MongoError::Unsupported("MongoDB does not support savepoints".into()).into_connector_error())
+    }
+
+    async fn rollback_to_savepoint(&mut self) -> connector_interface::Result<()> {
+        Err(MongoError::Unsupported("MongoDB does not support savepoints".into()).into_connector_error())
     }
 
     async fn version(&self) -> Option<String> {
