@@ -50,10 +50,13 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           echo "Pull Request: ${{ github.event.pull_request.number }}"
-          echo "Repository Owner: $${{ github.repository_owner }}"
+          echo "Repository Owner: ${{ github.repository_owner }}"
           echo "Pull Request Author: ${{ github.actor }}"
           echo "Pull Request Author Association: ${{ github.event.pull_request.author_association }}"
-          # echo "Commit message:${{ steps.commit-msg.outputs.commit-msg }}"
+          cat <<END_OF_COMMIT_MESSAGE
+          Commit message:
+          ${{ steps.commit-msg.outputs.commit-msg }}
+          END_OF_COMMIT_MESSAGE
           echo "Commit message contains [integration]: ${{ contains(steps.commit-msg.outputs.commit-msg, '[integration]') }}"
 
       - name: 'Check if commit message conatains `[integration]` and the PR author has permissions to trigger the workflow'
