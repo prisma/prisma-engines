@@ -4,8 +4,8 @@ use enumflags2::BitFlags;
 use indoc::indoc;
 use psl::PreviewFeature;
 use quaint::{
-    connector::{self, tokio_postgres::error::ErrorPosition, PostgresUrl},
-    prelude::{ConnectionInfo, NativeConnectionInfo, Queryable},
+    connector::{self, tokio_postgres::error::ErrorPosition, MakeTlsConnectorManager, PostgresUrl},
+    prelude::{ConnectionInfo, Queryable},
 };
 use schema_connector::{ConnectorError, ConnectorResult, Namespaces};
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
@@ -13,19 +13,22 @@ use user_facing_errors::{schema_engine::ApplyMigrationError, schema_engine::Data
 
 use crate::sql_renderer::IteratorJoin;
 
+use super::MigratePostgresUrl;
+
 pub(super) struct Connection(connector::PostgreSql);
 
 impl Connection {
     pub(super) async fn new(url: url::Url) -> ConnectorResult<Connection> {
-        let url = PostgresUrl::new(url).map_err(|err| {
-            ConnectorError::user_facing(user_facing_errors::common::InvalidConnectionString {
-                details: err.to_string(),
-            })
-        })?;
+        let url = MigratePostgresUrl::new(url)?;
 
-        let quaint = connector::PostgreSql::new(url.clone())
-            .await
-            .map_err(quaint_err(&url))?;
+        let quaint = match url.0 {
+            PostgresUrl::Native(ref native_url) => {
+                let tls_manager = MakeTlsConnectorManager::new(native_url.as_ref().clone());
+                connector::PostgreSql::new(native_url.as_ref().clone(), &tls_manager).await
+            }
+            PostgresUrl::WebSocket(ref ws_url) => connector::PostgreSql::new_with_websocket(ws_url.clone()).await,
+        }
+        .map_err(quaint_err(&url))?;
 
         let version = quaint.version().await.map_err(quaint_err(&url))?;
 
@@ -116,12 +119,12 @@ impl Connection {
         Ok(schema)
     }
 
-    pub(super) async fn raw_cmd(&mut self, sql: &str, url: &PostgresUrl) -> ConnectorResult<()> {
+    pub(super) async fn raw_cmd(&mut self, sql: &str, url: &MigratePostgresUrl) -> ConnectorResult<()> {
         tracing::debug!(query_type = "raw_cmd", sql);
         self.0.raw_cmd(sql).await.map_err(quaint_err(url))
     }
 
-    pub(super) async fn version(&mut self, url: &PostgresUrl) -> ConnectorResult<Option<String>> {
+    pub(super) async fn version(&mut self, url: &MigratePostgresUrl) -> ConnectorResult<Option<String>> {
         tracing::debug!(query_type = "version");
         self.0.version().await.map_err(quaint_err(url))
     }
@@ -129,7 +132,7 @@ impl Connection {
     pub(super) async fn query(
         &mut self,
         query: quaint::ast::Query<'_>,
-        url: &PostgresUrl,
+        url: &MigratePostgresUrl,
     ) -> ConnectorResult<quaint::prelude::ResultSet> {
         use quaint::visitor::Visitor;
         let (sql, params) = quaint::visitor::Postgres::build(query).unwrap();
@@ -140,7 +143,7 @@ impl Connection {
         &self,
         sql: &str,
         params: &[quaint::prelude::Value<'_>],
-        url: &PostgresUrl,
+        url: &MigratePostgresUrl,
     ) -> ConnectorResult<quaint::prelude::ResultSet> {
         tracing::debug!(query_type = "query_raw", sql, ?params);
         self.0.query_raw(sql, params).await.map_err(quaint_err(url))
@@ -149,7 +152,7 @@ impl Connection {
     pub(super) async fn describe_query(
         &self,
         sql: &str,
-        url: &PostgresUrl,
+        url: &MigratePostgresUrl,
     ) -> ConnectorResult<quaint::connector::DescribedQuery> {
         tracing::debug!(query_type = "describe_query", sql);
         self.0.describe_query(sql).await.map_err(quaint_err(url))
@@ -237,11 +240,6 @@ fn normalize_sql_schema(schema: &mut SqlSchema, preview_features: BitFlags<Previ
     }
 }
 
-fn quaint_err(url: &PostgresUrl) -> impl (Fn(quaint::error::Error) -> ConnectorError) + '_ {
-    |err| {
-        crate::flavour::quaint_error_to_connector_error(
-            err,
-            &ConnectionInfo::Native(NativeConnectionInfo::Postgres(url.clone())),
-        )
-    }
+fn quaint_err(url: &MigratePostgresUrl) -> impl (Fn(quaint::error::Error) -> ConnectorError) + '_ {
+    |err| crate::flavour::quaint_error_to_connector_error(err, &ConnectionInfo::Native(url.clone().into()))
 }

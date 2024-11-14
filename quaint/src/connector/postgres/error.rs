@@ -1,3 +1,5 @@
+use crosstarget_utils::{regex::RegExp, RegExpCompat};
+use enumflags2::BitFlags;
 use std::fmt::{Display, Formatter};
 
 use crate::error::{DatabaseConstraint, Error, ErrorKind, Name};
@@ -26,6 +28,11 @@ impl Display for PostgresError {
         }
         Ok(())
     }
+}
+
+fn extract_fk_constraint_name(message: &str) -> Option<String> {
+    let re = RegExp::new(r#"foreign key constraint "([^"]+)""#, BitFlags::empty()).unwrap();
+    re.captures(message).and_then(|caps| caps.get(1).cloned())
 }
 
 impl From<PostgresError> for Error {
@@ -89,12 +96,8 @@ impl From<PostgresError> for Error {
                     builder.build()
                 }
                 None => {
-                    let constraint = value
-                        .message
-                        .split_whitespace()
-                        .nth(10)
-                        .and_then(|s| s.split('"').nth(1))
-                        .map(ToString::to_string)
+                    // `value.message` looks like `update on table "Child" violates foreign key constraint "Child_parent_id_fkey"`
+                    let constraint = extract_fk_constraint_name(value.message.as_str())
                         .map(DatabaseConstraint::Index)
                         .unwrap_or(DatabaseConstraint::CannotParse);
 

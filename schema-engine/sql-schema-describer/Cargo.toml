@@ -14,11 +14,11 @@ enumflags2.workspace = true
 indexmap.workspace = true
 indoc.workspace = true
 once_cell = "1.3"
-regex = "1.2"
+regex.workspace = true
 serde.workspace = true
 tracing.workspace = true
 tracing-error = "0.2"
-tracing-futures = "0.2"
+tracing-futures.workspace = true
 quaint = { workspace = true, features = [
     "all-native",
     "pooled",
