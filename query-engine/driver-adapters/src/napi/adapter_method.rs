@@ -79,3 +79,24 @@ where
         Self::from_threadsafe_function(threadsafe_fn, env)
     }
 }
+
+impl<ArgType, ReturnType> ValidateNapiValue for AdapterMethod<ArgType, ReturnType>
+where
+    ArgType: ToNapiValue + 'static,
+    ReturnType: FromNapiValue + 'static,
+{
+}
+
+impl<ArgType, ReturnType> TypeName for AdapterMethod<ArgType, ReturnType>
+where
+    ArgType: ToNapiValue + 'static,
+    ReturnType: FromNapiValue + 'static,
+{
+    fn type_name() -> &'static str {
+        "AdapterMethod"
+    }
+
+    fn value_type() -> ValueType {
+        ValueType::Function
+    }
+}

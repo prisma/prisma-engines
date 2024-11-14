@@ -28,9 +28,9 @@ use lru_cache::LruCache;
 use native_tls::{Certificate, Identity, TlsConnector};
 use postgres_native_tls::MakeTlsConnector;
 use postgres_types::{Kind as PostgresKind, Type as PostgresType};
+use prisma_metrics::WithMetricsInstrumentation;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::{
-    borrow::Borrow,
     fmt::{Debug, Display},
     fs,
     future::Future,
@@ -39,6 +39,7 @@ use std::{
 };
 use tokio::sync::OnceCell;
 use tokio_postgres::{config::ChannelBinding, Client, Config, Statement};
+use tracing_futures::WithSubscriber;
 use websocket::connect_via_websocket;
 
 /// The underlying postgres driver. Only available with the `expose-drivers`
@@ -206,8 +207,8 @@ impl PostgresNativeUrl {
     pub(crate) fn to_config(&self) -> Config {
         let mut config = Config::new();
 
-        config.user(self.username().borrow());
-        config.password(self.password().borrow() as &str);
+        config.user(self.username().as_ref());
+        config.password(self.password().as_ref());
         config.host(self.host());
         config.port(self.port());
         config.dbname(self.dbname());
@@ -246,12 +247,15 @@ impl PostgreSql {
         let is_cockroachdb = conn.parameter("crdb_version").is_some();
         let is_materialize = conn.parameter("mz_version").is_some();
 
-        tokio::spawn(conn.map(|r| match r {
-            Ok(_) => (),
-            Err(e) => {
-                tracing::error!("Error in PostgreSQL connection: {:?}", e);
-            }
-        }));
+        tokio::spawn(
+            conn.map(|r| {
+                if let Err(e) = r {
+                    tracing::error!("Error in PostgreSQL connection: {e:?}");
+                }
+            })
+            .with_current_subscriber()
+            .with_current_recorder(),
+        );
 
         // On Postgres, we set the SEARCH_PATH and client-encoding through client connection parameters to save a network roundtrip on connection.
         // We can't always do it for CockroachDB because it does not expect quotes for unsafe identifiers (https://github.com/cockroachdb/cockroach/issues/101328), which might change once the issue is fixed.

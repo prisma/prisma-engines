@@ -350,7 +350,7 @@ dependencies = [
  "enumflags2",
  "indoc 2.0.3",
  "insta",
- "query-engine-metrics",
+ "prisma-metrics",
  "query-engine-tests",
  "query-tests-setup",
  "regex",
@@ -1208,11 +1208,11 @@ dependencies = [
  "expect-test",
  "futures",
  "js-sys",
- "metrics",
  "napi",
  "napi-derive",
  "once_cell",
  "pin-project",
+ "prisma-metrics",
  "quaint",
  "serde",
  "serde-wasm-bindgen",
@@ -1239,70 +1239,6 @@ name = "encode_unicode"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a357d28ed41a50f9c765dbfe56cbc04a64e53e5fc58ba79fbc34c10ef3df831f"
-
-[[package]]
-name = "encoding"
-version = "0.2.33"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6b0d943856b990d12d3b55b359144ff341533e516d94098b1d3fc1ac666d36ec"
-dependencies = [
- "encoding-index-japanese",
- "encoding-index-korean",
- "encoding-index-simpchinese",
- "encoding-index-singlebyte",
- "encoding-index-tradchinese",
-]
-
-[[package]]
-name = "encoding-index-japanese"
-version = "1.20141219.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04e8b2ff42e9a05335dbf8b5c6f7567e5591d0d916ccef4e0b1710d32a0d0c91"
-dependencies = [
- "encoding_index_tests",
-]
-
-[[package]]
-name = "encoding-index-korean"
-version = "1.20141219.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4dc33fb8e6bcba213fe2f14275f0963fd16f0a02c878e3095ecfdf5bee529d81"
-dependencies = [
- "encoding_index_tests",
-]
-
-[[package]]
-name = "encoding-index-simpchinese"
-version = "1.20141219.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d87a7194909b9118fc707194baa434a4e3b0fb6a5a757c73c3adb07aa25031f7"
-dependencies = [
- "encoding_index_tests",
-]
-
-[[package]]
-name = "encoding-index-singlebyte"
-version = "1.20141219.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3351d5acffb224af9ca265f435b859c7c01537c0849754d3db3fdf2bfe2ae84a"
-dependencies = [
- "encoding_index_tests",
-]
-
-[[package]]
-name = "encoding-index-tradchinese"
-version = "1.20141219.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd0e20d5688ce3cab59eb3ef3a2083a5c77bf496cb798dc6fcdb75f323890c18"
-dependencies = [
- "encoding_index_tests",
-]
-
-[[package]]
-name = "encoding_index_tests"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a246d82be1c9d791c5dfde9a2bd045fc3cbba3fa2b11ad558f27d01712f00569"
 
 [[package]]
 name = "encoding_rs"
@@ -2478,13 +2414,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "metrics-guards"
-version = "0.1.0"
-dependencies = [
- "metrics",
-]
-
-[[package]]
 name = "metrics-util"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2639,15 +2568,16 @@ dependencies = [
  "mongodb",
  "mongodb-client",
  "pretty_assertions",
+ "prisma-metrics",
  "prisma-value",
  "psl",
  "query-connector",
- "query-engine-metrics",
  "query-structure",
  "rand 0.8.5",
  "regex",
  "serde",
  "serde_json",
+ "telemetry",
  "thiserror",
  "tokio",
  "tracing",
@@ -2801,9 +2731,9 @@ dependencies = [
 
 [[package]]
 name = "napi"
-version = "2.15.1"
+version = "2.16.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "43792514b0c95c5beec42996da0c1b39265b02b75c97baa82d163d3ef55cbfa7"
+checksum = "214f07a80874bb96a8433b3cdfc84980d56c7b02e1a0d7ba4ba0db5cef785e2b"
 dependencies = [
  "bitflags 2.4.0",
  "ctor",
@@ -2823,9 +2753,9 @@ checksum = "ebd4419172727423cf30351406c54f6cc1b354a2cfb4f1dba3e6cd07f6d5522b"
 
 [[package]]
 name = "napi-derive"
-version = "2.15.0"
+version = "2.16.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7622f0dbe0968af2dacdd64870eee6dee94f93c989c841f1ad8f300cf1abd514"
+checksum = "17435f7a00bfdab20b0c27d9c56f58f6499e418252253081bfff448099da31d1"
 dependencies = [
  "cfg-if",
  "convert_case 0.6.0",
@@ -2837,9 +2767,9 @@ dependencies = [
 
 [[package]]
 name = "napi-derive-backend"
-version = "1.0.59"
+version = "1.0.74"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ec514d65fce18a959be55e7f683ac89c6cb850fb59b09e25ab777fd5a4a8d9e"
+checksum = "967c485e00f0bf3b1bdbe510a38a4606919cf1d34d9a37ad41f25a81aa077abe"
 dependencies = [
  "convert_case 0.6.0",
  "once_cell",
@@ -2852,9 +2782,9 @@ dependencies = [
 
 [[package]]
 name = "napi-sys"
-version = "2.3.0"
+version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2503fa6af34dc83fb74888df8b22afe933b58d37daf7d80424b1c60c68196b8b"
+checksum = "427802e8ec3a734331fec1035594a210ce1ff4dc5bc1950530920ab717964ea3"
 dependencies = [
  "libloading 0.8.1",
 ]
@@ -3184,7 +3114,7 @@ checksum = "93f00c865fe7cabf650081affecd3871070f26767e7b2070a3ffae14c654b447"
 dependencies = [
  "cfg-if",
  "libc",
- "redox_syscall",
+ "redox_syscall 0.3.5",
  "smallvec",
  "windows-targets 0.48.1",
 ]
@@ -3417,7 +3347,7 @@ checksum = "cc9c68a3f6da06753e9335d63e27f6b9754dd1920d941135b7ea8224f141adb2"
 [[package]]
 name = "postgres-native-tls"
 version = "0.5.0"
-source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#54a490bc6afa315abb9867304fb67e8b12a8fbf3"
+source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#c62b9928d402685e152161907e8480603c29ef65"
 dependencies = [
  "native-tls",
  "tokio",
@@ -3427,10 +3357,10 @@ dependencies = [
 
 [[package]]
 name = "postgres-protocol"
-version = "0.6.4"
-source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#54a490bc6afa315abb9867304fb67e8b12a8fbf3"
+version = "0.6.7"
+source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#c62b9928d402685e152161907e8480603c29ef65"
 dependencies = [
- "base64 0.13.1",
+ "base64 0.22.1",
  "byteorder",
  "bytes",
  "fallible-iterator 0.2.0",
@@ -3444,8 +3374,8 @@ dependencies = [
 
 [[package]]
 name = "postgres-types"
-version = "0.2.4"
-source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#54a490bc6afa315abb9867304fb67e8b12a8fbf3"
+version = "0.2.8"
+source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#c62b9928d402685e152161907e8480603c29ef65"
 dependencies = [
  "bit-vec",
  "bytes",
@@ -3513,6 +3443,27 @@ dependencies = [
  "serde",
  "serde_json",
  "structopt",
+]
+
+[[package]]
+name = "prisma-metrics"
+version = "0.1.0"
+dependencies = [
+ "derive_more",
+ "expect-test",
+ "futures",
+ "metrics",
+ "metrics-exporter-prometheus",
+ "metrics-util",
+ "once_cell",
+ "parking_lot",
+ "pin-project",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "tracing-futures",
+ "tracing-subscriber",
 ]
 
 [[package]]
@@ -3741,8 +3692,6 @@ dependencies = [
  "indoc 0.3.6",
  "itertools 0.12.0",
  "lru-cache",
- "metrics",
- "metrics-guards",
  "mobc",
  "mysql_async",
  "names 0.11.0",
@@ -3753,6 +3702,7 @@ dependencies = [
  "percent-encoding",
  "postgres-native-tls",
  "postgres-types",
+ "prisma-metrics",
  "quaint-test-macros",
  "quaint-test-setup",
  "regex",
@@ -3766,7 +3716,7 @@ dependencies = [
  "tokio-postgres",
  "tokio-util 0.7.8",
  "tracing",
- "tracing-core",
+ "tracing-futures",
  "url",
  "uuid",
  "ws_stream_tungstenite",
@@ -3825,6 +3775,7 @@ dependencies = [
  "query-structure",
  "serde",
  "serde_json",
+ "telemetry",
  "thiserror",
  "user-facing-errors",
  "uuid",
@@ -3841,6 +3792,7 @@ dependencies = [
  "crossbeam-channel",
  "crosstarget-utils",
  "cuid",
+ "derive_more",
  "enumflags2",
  "futures",
  "indexmap 2.2.2",
@@ -3849,13 +3801,14 @@ dependencies = [
  "once_cell",
  "opentelemetry",
  "petgraph 0.4.13",
+ "prisma-metrics",
  "psl",
  "query-connector",
- "query-engine-metrics",
  "query-structure",
  "schema",
  "serde",
  "serde_json",
+ "telemetry",
  "thiserror",
  "tokio",
  "tracing",
@@ -3882,17 +3835,18 @@ dependencies = [
  "mongodb-query-connector",
  "opentelemetry",
  "opentelemetry-otlp",
+ "prisma-metrics",
  "psl",
  "quaint",
  "query-connector",
  "query-core",
- "query-engine-metrics",
  "request-handlers",
  "serde",
  "serde_json",
  "serial_test",
  "sql-query-connector",
  "structopt",
+ "telemetry",
  "thiserror",
  "tokio",
  "tracing",
@@ -3927,6 +3881,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sql-query-connector",
+ "telemetry",
  "thiserror",
  "tokio",
  "tracing",
@@ -3946,12 +3901,13 @@ dependencies = [
  "connection-string",
  "napi",
  "opentelemetry",
+ "prisma-metrics",
  "psl",
  "query-connector",
  "query-core",
- "query-engine-metrics",
  "serde",
  "serde_json",
+ "telemetry",
  "thiserror",
  "tracing",
  "tracing-futures",
@@ -3961,27 +3917,6 @@ dependencies = [
  "url",
  "user-facing-errors",
  "wasm-bindgen",
-]
-
-[[package]]
-name = "query-engine-metrics"
-version = "0.1.0"
-dependencies = [
- "derive_more",
- "expect-test",
- "futures",
- "metrics",
- "metrics-exporter-prometheus",
- "metrics-util",
- "once_cell",
- "parking_lot",
- "pin-project",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
- "tracing-futures",
- "tracing-subscriber",
 ]
 
 [[package]]
@@ -3998,17 +3933,18 @@ dependencies = [
  "napi-build",
  "napi-derive",
  "opentelemetry",
+ "prisma-metrics",
  "psl",
  "quaint",
  "query-connector",
  "query-core",
  "query-engine-common",
- "query-engine-metrics",
  "query-structure",
  "request-handlers",
  "serde",
  "serde_json",
  "sql-query-connector",
+ "telemetry",
  "thiserror",
  "tokio",
  "tracing",
@@ -4034,9 +3970,9 @@ dependencies = [
  "itertools 0.12.0",
  "once_cell",
  "paste",
+ "prisma-metrics",
  "prisma-value",
  "psl",
- "query-engine-metrics",
  "query-test-macros",
  "query-tests-setup",
  "serde_json",
@@ -4070,6 +4006,7 @@ dependencies = [
  "serde-wasm-bindgen",
  "serde_json",
  "sql-query-connector",
+ "telemetry",
  "thiserror",
  "tokio",
  "tracing",
@@ -4126,12 +4063,12 @@ dependencies = [
  "nom",
  "once_cell",
  "parse-hyperlinks",
+ "prisma-metrics",
  "psl",
  "qe-setup",
  "quaint",
  "query-core",
  "query-engine",
- "query-engine-metrics",
  "query-structure",
  "regex",
  "request-handlers",
@@ -4139,6 +4076,7 @@ dependencies = [
  "serde_json",
  "sql-query-connector",
  "strip-ansi-escapes",
+ "telemetry",
  "thiserror",
  "tokio",
  "tracing",
@@ -4338,6 +4276,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "redox_syscall"
+version = "0.5.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b6dfecf2c74bce2466cabf93f6664d6998a69eb21e39f4207930065b27b771f"
+dependencies = [
+ "bitflags 2.4.0",
+]
+
+[[package]]
 name = "regex"
 version = "1.10.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4414,6 +4361,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sql-query-connector",
+ "telemetry",
  "thiserror",
  "tracing",
  "url",
@@ -5221,6 +5169,7 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "serde_json",
+ "telemetry",
  "thiserror",
  "tokio",
  "tracing",
@@ -5502,6 +5451,36 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
+name = "telemetry"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "crossbeam-channel",
+ "crosstarget-utils",
+ "cuid",
+ "derive_more",
+ "enumflags2",
+ "futures",
+ "indexmap 2.2.2",
+ "itertools 0.12.0",
+ "lru 0.7.8",
+ "once_cell",
+ "opentelemetry",
+ "prisma-metrics",
+ "psl",
+ "rand 0.8.5",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "tracing-futures",
+ "tracing-opentelemetry",
+ "tracing-subscriber",
+ "uuid",
+]
+
+[[package]]
 name = "tempfile"
 version = "3.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5509,7 +5488,7 @@ checksum = "dc02fddf48964c42031a0b3fe0428320ecf3a73c401040fc0096f97794310651"
 dependencies = [
  "cfg-if",
  "fastrand",
- "redox_syscall",
+ "redox_syscall 0.3.5",
  "rustix",
  "windows-sys 0.48.0",
 ]
@@ -5616,9 +5595,9 @@ dependencies = [
 
 [[package]]
 name = "tiberius"
-version = "0.11.8"
+version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "091052ba8f20c1e14f85913a5242a663a09d17ff4c0137b9b1f0735cb3c5dabc"
+checksum = "a1446cb4198848d1562301a3340424b4f425ef79f35ef9ee034769a9dd92c10d"
 dependencies = [
  "async-native-tls",
  "async-trait",
@@ -5628,10 +5607,8 @@ dependencies = [
  "bytes",
  "chrono",
  "connection-string",
- "encoding",
+ "encoding_rs",
  "enumflags2",
- "futures",
- "futures-sink",
  "futures-util",
  "num-traits",
  "once_cell",
@@ -5754,8 +5731,8 @@ dependencies = [
 
 [[package]]
 name = "tokio-postgres"
-version = "0.7.7"
-source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#54a490bc6afa315abb9867304fb67e8b12a8fbf3"
+version = "0.7.12"
+source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#c62b9928d402685e152161907e8480603c29ef65"
 dependencies = [
  "async-trait",
  "byteorder",
@@ -5770,9 +5747,11 @@ dependencies = [
  "pin-project-lite",
  "postgres-protocol",
  "postgres-types",
+ "rand 0.8.5",
  "socket2 0.5.7",
  "tokio",
  "tokio-util 0.7.8",
+ "whoami",
 ]
 
 [[package]]
@@ -6346,6 +6325,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9c8d87e72b64a3b4db28d11ce29237c246188f4f51057d65a7eab63b7987e423"
 
 [[package]]
+name = "wasite"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b8dad83b4f25e74f184f64c43b150b91efe7647395b42289f38e50566d82855b"
+
+[[package]]
 name = "wasm-bindgen"
 version = "0.2.93"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6467,6 +6452,17 @@ dependencies = [
  "either",
  "libc",
  "once_cell",
+]
+
+[[package]]
+name = "whoami"
+version = "1.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "372d5b87f58ec45c384ba03563b03544dc5fadc3983e434b286913f5b4a9bb6d"
+dependencies = [
+ "redox_syscall 0.5.7",
+ "wasite",
+ "web-sys",
 ]
 
 [[package]]

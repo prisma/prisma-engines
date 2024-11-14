@@ -4,7 +4,7 @@
 //! actors to allow test to continue even if one query is blocking.
 
 use indoc::indoc;
-use query_engine_metrics::{MetricRecorder, WithMetricsInstrumentation};
+use prisma_metrics::{MetricRecorder, WithMetricsInstrumentation};
 use query_engine_tests::{
     query_core::TxId, render_test_datamodel, setup_metrics, test_tracing_subscriber, LogEmit, QueryResult, Runner,
     TestError, TestLogCapture, TestResult, WithSubscriber, CONFIG, ENV_LOG_LEVEL,

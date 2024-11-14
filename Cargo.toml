@@ -20,7 +20,6 @@ members = [
   "query-engine/black-box-tests",
   "query-engine/dmmf",
   "query-engine/driver-adapters",
-  "query-engine/metrics",
   "query-engine/query-structure",
   "query-engine/query-engine",
   "query-engine/query-engine-node-api",
@@ -59,13 +58,12 @@ indoc = "2.0.1"
 indexmap = { version = "2.2.2", features = ["serde"] }
 itertools = "0.12"
 connection-string = "0.2"
-napi = { version = "2.15.1", default-features = false, features = [
-  "napi8",
+napi = { version = "2.16.13", default-features = false, features = [
+  "napi9",
   "tokio_rt",
   "serde-json",
 ] }
-napi-derive = "2.15.0"
-metrics = "0.23.0"
+napi-derive = "2.16.12"
 js-sys = { version = "0.3" }
 pin-project = "1"
 rand = { version = "0.8" }
@@ -73,6 +71,7 @@ regex = { version = "1", features = ["std"] }
 serde_repr = { version = "0.1.17" }
 serde-wasm-bindgen = { version = "0.5" }
 tracing = { version = "0.1" }
+tracing-futures = "0.2"
 tsify = { version = "0.4.5" }
 wasm-bindgen = { version = "0.2.93" }
 wasm-bindgen-futures = { version = "0.4" }

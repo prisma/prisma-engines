@@ -72,12 +72,11 @@ fmt-sql = ["sqlformat"]
 connection-string = "0.2"
 percent-encoding = "2"
 tracing.workspace = true
-tracing-core = "0.1"
+tracing-futures.workspace = true
 async-trait.workspace = true
 thiserror = "1.0"
 num_cpus = "1.12"
-metrics.workspace = true
-metrics-guards.path = "../libs/metrics-guards"
+prisma-metrics.path = "../libs/metrics"
 futures.workspace = true
 url.workspace = true
 hex = "0.4"
@@ -141,12 +140,12 @@ features = ["chrono", "column_decltype"]
 optional = true
 
 [target.'cfg(not(any(target_os = "macos", target_os = "ios")))'.dependencies.tiberius]
-version = "0.11.8"
+version = "0.12.3"
 optional = true
 features = ["sql-browser-tokio", "chrono", "bigdecimal"]
 
 [target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies.tiberius]
-version = "0.11.8"
+version = "0.12.3"
 optional = true
 default-features = false
 features = [

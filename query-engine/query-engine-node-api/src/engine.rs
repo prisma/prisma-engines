@@ -2,20 +2,22 @@ use crate::{error::ApiError, logger::Logger};
 use futures::FutureExt;
 use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
+use prisma_metrics::{MetricFormat, WithMetricsInstrumentation};
 use psl::PreviewFeature;
 use quaint::connector::ExternalConnector;
-use query_core::{protocol::EngineProtocol, relation_load_strategy, schema, telemetry, TransactionOptions, TxId};
+use query_core::{protocol::EngineProtocol, relation_load_strategy, schema, TransactionOptions, TxId};
 use query_engine_common::engine::{
     map_known_error, stringify_env_values, ConnectedEngine, ConnectedEngineNative, ConstructorOptions,
     ConstructorOptionsNative, EngineBuilder, EngineBuilderNative, Inner,
 };
-use query_engine_metrics::{MetricFormat, WithMetricsInstrumentation};
 use request_handlers::{load_executor, render_graphql_schema, ConnectorKind, RequestBody, RequestHandler};
 use serde::Deserialize;
 use serde_json::json;
 use std::{collections::HashMap, future::Future, marker::PhantomData, panic::AssertUnwindSafe, sync::Arc};
+use telemetry::helpers::TraceParent;
 use tokio::sync::RwLock;
-use tracing::{field, instrument::WithSubscriber, Instrument, Span};
+use tracing::{instrument::WithSubscriber, Instrument};
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 use tracing_subscriber::filter::LevelFilter;
 use user_facing_errors::Error;
 
@@ -71,11 +73,11 @@ impl QueryEngine {
             native,
         } = napi_env.from_js_value(options).expect(
             r###"
-            Failed to deserialize constructor options. 
-            
-            This usually happens when the javascript object passed to the constructor is missing 
+            Failed to deserialize constructor options.
+
+            This usually happens when the javascript object passed to the constructor is missing
             properties for the ConstructorOptions fields that must have some value.
-            
+
             If you set some of these in javascript through environment variables, make sure there are
             values for data_model, log_level, and any field that is not Option<T>
             "###,
@@ -163,8 +165,9 @@ impl QueryEngine {
         let recorder = self.logger.recorder();
 
         async_panic_to_js_error(async {
-            let span = tracing::info_span!("prisma:engine:connect");
-            let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+            let span = tracing::info_span!("prisma:engine:connect", user_facing = true);
+            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
+            span.set_parent(parent_context);
 
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
@@ -267,8 +270,9 @@ impl QueryEngine {
         let recorder = self.logger.recorder();
 
         async_panic_to_js_error(async {
-            let span = tracing::info_span!("prisma:engine:disconnect");
-            let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+            let span = tracing::info_span!("prisma:engine:disconnect", user_facing = true);
+            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
+            span.set_parent(parent_context);
 
             // TODO: when using Node Drivers, we need to call Driver::close() here.
 
@@ -309,17 +313,14 @@ impl QueryEngine {
 
             let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
 
-            let span = if tx_id.is_none() {
-                tracing::info_span!("prisma:engine", user_facing = true)
-            } else {
-                Span::none()
-            };
-
-            let trace_id = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+            let span = tracing::info_span!("prisma:engine", user_facing = true);
+            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
+            let traceparent = TraceParent::from_remote_context(&parent_context);
+            span.set_parent(parent_context);
 
             async move {
                 let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
-                let response = handler.handle(query, tx_id.map(TxId::from), trace_id).await;
+                let response = handler.handle(query, tx_id.map(TxId::from), traceparent).await;
 
                 let serde_span = tracing::info_span!("prisma:engine:response_json_serialization", user_facing = true);
                 Ok(serde_span.in_scope(|| serde_json::to_string(&response))?)
@@ -335,38 +336,39 @@ impl QueryEngine {
     /// If connected, attempts to start a transaction in the core and returns its ID.
     #[napi]
     pub async fn start_transaction(&self, input: String, trace: String) -> napi::Result<String> {
+        let dispatcher = self.logger.dispatcher();
+        let recorder = self.logger.recorder();
+
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
+            let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
 
-            let dispatcher = self.logger.dispatcher();
-            let recorder = self.logger.recorder();
+            let span = tracing::info_span!("prisma:engine:start_transaction", user_facing = true);
+            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
+            span.set_parent(parent_context);
 
             async move {
-                let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
-                telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
-
-                let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
                 match engine
                     .executor()
                     .start_tx(engine.query_schema().clone(), engine.engine_protocol(), tx_opts)
-                    .instrument(span)
                     .await
                 {
                     Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
                     Err(err) => Ok(map_known_error(err)?),
                 }
             }
-            .with_subscriber(dispatcher)
-            .with_optional_recorder(recorder)
+            .instrument(span)
             .await
         })
+        .with_subscriber(dispatcher)
+        .with_optional_recorder(recorder)
         .await
     }
 
     /// If connected, attempts to commit a transaction with id `tx_id` in the core.
     #[napi]
-    pub async fn commit_transaction(&self, tx_id: String, _trace: String) -> napi::Result<String> {
+    pub async fn commit_transaction(&self, tx_id: String, trace: String) -> napi::Result<String> {
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
@@ -375,7 +377,11 @@ impl QueryEngine {
             let recorder = self.logger.recorder();
 
             async move {
-                match engine.executor().commit_tx(TxId::from(tx_id)).await {
+                let span = tracing::info_span!("prisma:engine:commit_transaction", user_facing = true);
+                let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
+                span.set_parent(parent_context);
+
+                match engine.executor().commit_tx(TxId::from(tx_id)).instrument(span).await {
                     Ok(_) => Ok("{}".to_string()),
                     Err(err) => Ok(map_known_error(err)?),
                 }
@@ -389,7 +395,7 @@ impl QueryEngine {
 
     /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
     #[napi]
-    pub async fn rollback_transaction(&self, tx_id: String, _trace: String) -> napi::Result<String> {
+    pub async fn rollback_transaction(&self, tx_id: String, trace: String) -> napi::Result<String> {
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
@@ -398,7 +404,11 @@ impl QueryEngine {
             let recorder = self.logger.recorder();
 
             async move {
-                match engine.executor().rollback_tx(TxId::from(tx_id)).await {
+                let span = tracing::info_span!("prisma:engine:rollback_transaction", user_facing = true);
+                let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
+                span.set_parent(parent_context);
+
+                match engine.executor().rollback_tx(TxId::from(tx_id)).instrument(span).await {
                     Ok(_) => Ok("{}".to_string()),
                     Err(err) => Ok(map_known_error(err)?),
                 }

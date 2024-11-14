@@ -122,7 +122,7 @@ mod smoke_tests {
             assert_eq!(metrics.matches("# TYPE prisma_datasource_queries_duration_histogram_ms histogram").count(), 1);
 
             // Check that exist as many metrics as being accepted
-            let accepted_metric_count = query_engine_metrics::ACCEPT_LIST.len();
+            let accepted_metric_count = prisma_metrics::ACCEPT_LIST.len();
             let displayed_metric_count = metrics.matches("# TYPE").count();
             let non_prisma_metric_count = displayed_metric_count - metrics.matches("# TYPE prisma").count();
 
