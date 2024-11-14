@@ -17,7 +17,9 @@
           "type": "String",
           "nativeType": [
             "VarChar",
-            ["300"]
+            [
+              "300"
+            ]
           ],
           "isGenerated": false,
           "isUpdatedAt": false
@@ -34,7 +36,9 @@
           "type": "String",
           "nativeType": [
             "VarChar",
-            ["3000"]
+            [
+              "3000"
+            ]
           ],
           "isGenerated": false,
           "isUpdatedAt": false
@@ -51,7 +55,9 @@
           "type": "String",
           "nativeType": [
             "VarChar",
-            ["3000"]
+            [
+              "3000"
+            ]
           ],
           "isGenerated": false,
           "isUpdatedAt": false
