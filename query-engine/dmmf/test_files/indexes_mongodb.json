@@ -16,7 +16,10 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
-          "nativeType": ["ObjectId", []],
+          "nativeType": [
+            "ObjectId",
+            []
+          ],
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -84,7 +87,10 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
-          "nativeType": ["ObjectId", []]
+          "nativeType": [
+            "ObjectId",
+            []
+          ]
         },
         {
           "name": "content",
