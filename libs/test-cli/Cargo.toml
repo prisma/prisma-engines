@@ -7,14 +7,17 @@ edition = "2021"
 anyhow = "1.0.26"
 colored = "2"
 structopt = "0.3.8"
-enumflags2 = "0.7"
+enumflags2.workspace = true
 dmmf = { path = "../../query-engine/dmmf" }
 schema-core = { path = "../../schema-engine/core" }
 schema-connector = { path = "../../schema-engine/connectors/schema-connector" }
 psl.workspace = true
 tokio.workspace = true
-serde_json = { version = "1.0", features = ["float_roundtrip"] }
-tracing = "0.1"
+serde_json.workspace = true
+tracing.workspace = true
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-error = "0.2"
-async-trait = "0.1.52"
+async-trait.workspace = true
+
+[build-dependencies]
+build-utils.path = "../build-utils"

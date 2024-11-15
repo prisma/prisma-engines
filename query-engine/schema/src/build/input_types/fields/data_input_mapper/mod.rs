@@ -5,14 +5,14 @@ pub(crate) use create::*;
 pub(crate) use update::*;
 
 use super::*;
-use prisma_models::prelude::*;
+use query_structure::prelude::*;
 
 // Todo: This isn't final, this is only the first draft to get structure into the
 // wild cross-dependency waste that was the create/update inputs.
 pub(crate) trait DataInputFieldMapper {
-    fn map_all(&self, ctx: &mut BuilderContext<'_>, fields: &[Field]) -> Vec<InputField> {
+    fn map_all<'a>(&self, ctx: &'a QuerySchema, fields: impl Iterator<Item = Field>) -> Vec<InputField<'a>> {
         fields
-            .iter()
+            .into_iter()
             .map(|field| match field {
                 Field::Scalar(sf) if sf.is_list() => self.map_scalar_list(ctx, sf),
                 Field::Scalar(sf) => self.map_scalar(ctx, sf),
@@ -22,11 +22,11 @@ pub(crate) trait DataInputFieldMapper {
             .collect()
     }
 
-    fn map_scalar(&self, ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) -> InputField;
+    fn map_scalar<'a>(&self, ctx: &'a QuerySchema, sf: ScalarFieldRef) -> InputField<'a>;
 
-    fn map_scalar_list(&self, ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) -> InputField;
+    fn map_scalar_list<'a>(&self, ctx: &'a QuerySchema, sf: ScalarFieldRef) -> InputField<'a>;
 
-    fn map_relation(&self, ctx: &mut BuilderContext<'_>, rf: &RelationFieldRef) -> InputField;
+    fn map_relation<'a>(&self, ctx: &'a QuerySchema, rf: RelationFieldRef) -> InputField<'a>;
 
-    fn map_composite(&self, ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputField;
+    fn map_composite<'a>(&self, ctx: &'a QuerySchema, cf: CompositeFieldRef) -> InputField<'a>;
 }

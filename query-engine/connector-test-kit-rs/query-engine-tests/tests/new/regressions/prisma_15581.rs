@@ -36,6 +36,7 @@ mod prisma_15581 {
             runner,
             r#"mutation { createOnetest(data: { reference: 3 }) { reference created_at other } }"#
         );
+
         Ok(())
     }
 
@@ -45,6 +46,7 @@ mod prisma_15581 {
             runner,
             r#"mutation { createOnetest2(data: { reference: 3 }) { reference updated_at other } }"#
         );
+
         Ok(())
     }
 
@@ -63,16 +65,11 @@ mod prisma_15581 {
 
     #[connector_test(only(Postgres), schema(pg_schema))]
     async fn create_one_model_with_low_precision_datetime_in_id(runner: Runner) -> TestResult<()> {
-        let result = runner
-            .query(r#"mutation { createOnetest(data: { reference: 3 }) { reference created_at other } }"#)
-            .await?
-            .to_string_pretty();
-
-        // This is a test that confirms the current behaviour. Ideally, the create mutation above
-        // should work.
-        assert!(
-            result.contains("\"error\": \"Query createOnetest is required to return data, but found no record(s).\"")
+        run_query!(
+            runner,
+            r#"mutation { createOnetest(data: { reference: 3 }) { reference created_at other } }"#
         );
+
         Ok(())
     }
 

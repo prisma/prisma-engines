@@ -1,0 +1,82 @@
+name: "QE: integration template"
+run-name: ${{ inputs.connector }}
+on:
+  workflow_call:
+    inputs:
+      name:
+        type: string
+        required: true
+      connector:
+        type: string
+        required: true
+      version:
+        type: string
+        required: true
+      ubuntu:
+        type: string
+        default: 'latest'
+      single_threaded:
+        type: boolean
+        default: false
+      relation_load_strategy:
+        type: string
+        default: '["join", "query"]'
+
+
+jobs:
+  rust-query-engine-tests:
+    name: "${{ matrix.engine_protocol }} ${{ matrix.relation_load_strategy }} ${{ matrix.partition }}"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        engine_protocol: [graphql, json]
+        relation_load_strategy: ${{ fromJson(inputs.relation_load_strategy) }}
+        partition: ["1/4", "2/4", "3/4", "4/4"]
+
+    env:
+      LOG_LEVEL: "info"
+      LOG_QUERIES: "y"
+      RUST_LOG_FORMAT: "devel"
+      RUST_BACKTRACE: "1"
+      CLICOLOR_FORCE: "1"
+      CLOSED_TX_CLEANUP: "2"
+      SIMPLE_TEST_MODE: "1"
+      QUERY_BATCH_SIZE: "10"
+      TEST_RUNNER: "direct"
+      TEST_CONNECTOR: ${{ inputs.connector }}
+      TEST_CONNECTOR_VERSION: ${{ inputs.version }}
+      PRISMA_ENGINE_PROTOCOL: ${{ matrix.engine_protocol }}
+      PRISMA_RELATION_LOAD_STRATEGY: ${{ matrix.relation_load_strategy }}
+
+    runs-on: "ubuntu-20.04"
+    # TODO: Replace with the following once `prisma@5.20.0` is released.
+    # runs-on: "ubuntu-${{ inputs.ubuntu }}"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: taiki-e/install-action@nextest
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        continue-on-error: true
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        if: "${{ env.DOCKERHUB_USERNAME != '' && env.DOCKERHUB_TOKEN != '' }}"
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: "Start ${{ inputs.name }} (${{ matrix.engine_protocol }})"
+        run: make start-${{ inputs.name }}
+
+      - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=1
+        if: ${{ inputs.single_threaded }}
+        env:
+          CLICOLOR_FORCE: 1
+
+      - run: export WORKSPACE_ROOT=$(pwd) && cargo nextest run -p query-engine-tests --partition hash:${{ matrix.partition }} --test-threads=8
+        if: ${{ !inputs.single_threaded }}
+        env:
+          CLICOLOR_FORCE: 1

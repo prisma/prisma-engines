@@ -2,7 +2,7 @@ use std::fmt;
 
 /// Capitalizes first character.
 /// Assumes 1-byte characters.
-pub fn capitalize(s: &str) -> impl fmt::Display + '_ {
+pub(crate) fn capitalize(s: &str) -> impl fmt::Display + '_ {
     struct Capitalized<'a>(&'a str);
 
     impl fmt::Display for Capitalized<'_> {
@@ -26,7 +26,13 @@ pub fn capitalize(s: &str) -> impl fmt::Display + '_ {
 }
 
 /// Compute the name of a scalar filter input.
-pub fn scalar_filter_name(typ: &str, list: bool, nullable: bool, nested: bool, include_aggregates: bool) -> String {
+pub(crate) fn scalar_filter_name(
+    typ: &str,
+    list: bool,
+    nullable: bool,
+    nested: bool,
+    include_aggregates: bool,
+) -> String {
     let list = if list { "List" } else { "" };
     let nullable = if nullable { "Nullable" } else { "" };
     let nested = if nested { "Nested" } else { "" };

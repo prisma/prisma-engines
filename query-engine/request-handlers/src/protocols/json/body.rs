@@ -21,15 +21,16 @@ impl JsonBody {
         let _span = info_span!("prisma:engine:into_doc").entered();
         match self {
             JsonBody::Single(query) => {
-                let operation = JsonProtocolAdapter::convert_single(query, query_schema)?;
+                let operation = JsonProtocolAdapter::new(query_schema).convert_single(query)?;
 
                 Ok(QueryDocument::Single(operation))
             }
             JsonBody::Batch(query) => {
+                let mut protocol_adapter = JsonProtocolAdapter::new(query_schema);
                 let operations: crate::Result<Vec<Operation>> = query
                     .batch
                     .into_iter()
-                    .map(|single_query| JsonProtocolAdapter::convert_single(single_query, query_schema))
+                    .map(|single_query| protocol_adapter.convert_single(single_query))
                     .collect();
 
                 let transaction = if let Some(opts) = query.transaction {
@@ -126,8 +127,15 @@ impl SelectionSet {
         key == ALL_COMPOSITES
     }
 
-    pub fn selection(self) -> Vec<(String, SelectionSetValue)> {
-        self.0.into_iter().filter(|(_, v)| v.is_selected()).collect::<Vec<_>>()
+    pub fn get_excluded_keys(&self) -> Vec<String> {
+        self.0
+            .iter()
+            .filter_map(|(k, v)| (!v.is_selected()).then_some(k.to_owned()))
+            .collect()
+    }
+
+    pub(crate) fn into_selection(self) -> impl Iterator<Item = (String, SelectionSetValue)> {
+        self.0.into_iter()
     }
 }
 

@@ -1,0 +1,31 @@
+name: Generate cargo docs & engines size
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish-to-gh-pages:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v27
+        with:
+          # we need internet access for the moment
+          extra_nix_config: |
+            sandbox = false
+
+      - run: |
+          git config user.email "prismabots@gmail.com"
+          git config user.name "prisma-bot"
+
+      - name: Publish engines size to gh-pages branch
+        run: nix run .#publish-engine-size

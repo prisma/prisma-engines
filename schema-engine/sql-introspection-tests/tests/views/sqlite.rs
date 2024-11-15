@@ -33,7 +33,7 @@ async fn basic_view_intro(api: &mut TestApi) -> TestResult {
           last_name  String?
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view Schwuser {
           id         Int?
           first_name String?
@@ -131,7 +131,7 @@ async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
           val Int? @default(2)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view B {
           id  Int?
           val Int?

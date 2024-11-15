@@ -4,20 +4,22 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-psl.workspace = true
+psl = { workspace = true, features = ["all"] }
 schema-core = { path = "../core" }
 sql-schema-connector = { path = "../connectors/sql-schema-connector" }
 sql-schema-describer = { path = "../sql-schema-describer" }
-user-facing-errors = { path = "../../libs/user-facing-errors" }
+user-facing-errors = { path = "../../libs/user-facing-errors", features = [
+    "all-native",
+] }
 test-macros = { path = "../../libs/test-macros" }
 test-setup = { path = "../../libs/test-setup" }
 prisma-value = { path = "../../libs/prisma-value" }
 
 bigdecimal = "0.3"
-chrono = "0.4.15"
+chrono.workspace = true
 colored = "2"
 connection-string.workspace = true
-enumflags2 = "0.7"
+enumflags2.workspace = true
 expect-test = "1.1.0"
 indoc.workspace = true
 jsonrpc-core = "17.0.0"
@@ -27,7 +29,10 @@ serde.workspace = true
 serde_json.workspace = true
 tempfile = "3.1.0"
 tokio.workspace = true
-tracing = "0.1"
-tracing-futures = "0.2"
-url = "2.1.1"
-quaint.workspace = true
+tracing.workspace = true
+tracing-futures.workspace = true
+url.workspace = true
+quaint = { workspace = true, features = ["all-native"] }
+
+[dev-dependencies]
+paste = "1"

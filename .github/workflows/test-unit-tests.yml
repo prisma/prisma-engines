@@ -1,0 +1,43 @@
+name: "All crates: unit tests"
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths-ignore:
+      - ".github/**"
+      - "!.github/workflows/test-unit-tests.yml"
+      - ".buildkite/**"
+      - "*.md"
+      - "LICENSE"
+      - "CODEOWNERS"
+      - "renovate.json"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - run: |
+          cargo test --workspace --all-features \
+                --exclude=quaint \
+                --exclude=query-engine \
+                --exclude=query-engine-node-api \
+                --exclude=black-box-tests \
+                --exclude=query-engine-tests \
+                --exclude=sql-migration-tests \
+                --exclude=schema-engine-cli \
+                --exclude=sql-schema-describer \
+                --exclude=sql-introspection-tests \
+                --exclude=mongodb-schema-connector
+        env:
+          CLICOLOR_FORCE: 1

@@ -1,23 +1,22 @@
 use super::*;
 
 #[derive(Debug)]
-pub enum GqlObjectRenderer {
-    Input(InputObjectTypeId),
-    Output(OutputObjectTypeId),
+pub enum GqlObjectRenderer<'a> {
+    Input(InputObjectType<'a>),
+    Output(ObjectType<'a>),
 }
 
-impl Renderer for GqlObjectRenderer {
+impl<'a> Renderer for GqlObjectRenderer<'a> {
     fn render(&self, ctx: &mut RenderContext) -> String {
         match &self {
-            GqlObjectRenderer::Input(input) => self.render_input_object(*input, ctx),
-            GqlObjectRenderer::Output(output) => self.render_output_object(&ctx.query_schema.db[*output], ctx),
+            GqlObjectRenderer::Input(input) => self.render_input_object(input, ctx),
+            GqlObjectRenderer::Output(output) => self.render_output_object(output, ctx),
         }
     }
 }
 
-impl GqlObjectRenderer {
-    fn render_input_object(&self, input_object: InputObjectTypeId, ctx: &mut RenderContext) -> String {
-        let input_object = &ctx.query_schema.db[input_object];
+impl<'a> GqlObjectRenderer<'a> {
+    fn render_input_object(&self, input_object: &InputObjectType<'a>, ctx: &mut RenderContext) -> String {
         if ctx.already_rendered(&input_object.identifier.name()) {
             return "".into();
         } else {
@@ -48,12 +47,12 @@ impl GqlObjectRenderer {
         rendered
     }
 
-    fn render_output_object(&self, output_object: &ObjectType, ctx: &mut RenderContext) -> String {
-        if ctx.already_rendered(&output_object.identifier.name()) {
+    fn render_output_object(&self, output_object: &ObjectType<'a>, ctx: &mut RenderContext) -> String {
+        if ctx.already_rendered(&output_object.name()) {
             return "".into();
         } else {
             // This short circuits recursive processing for fields.
-            ctx.mark_as_rendered(output_object.identifier.name())
+            ctx.mark_as_rendered(output_object.name())
         }
 
         let fields = output_object.get_fields();
@@ -68,11 +67,7 @@ impl GqlObjectRenderer {
             .map(|f| format!("{}{}", ctx.indent(), f))
             .collect();
 
-        let rendered = format!(
-            "type {} {{\n{}\n}}",
-            output_object.identifier.name(),
-            indented.join("\n")
-        );
+        let rendered = format!("type {} {{\n{}\n}}", output_object.name(), indented.join("\n"));
 
         ctx.add_output(rendered.clone());
 

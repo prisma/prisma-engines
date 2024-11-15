@@ -23,17 +23,22 @@ mod transformers;
 
 pub use argument_value::{ArgumentValue, ArgumentValueObject};
 pub use operation::Operation;
-pub use selection::{In, Selection, SelectionArgument, SelectionSet};
+pub use selection::{Exclusion, In, Selection, SelectionArgument, SelectionSet};
 
 pub(crate) use parse_ast::*;
 pub(crate) use parser::*;
 
-use crate::query_graph_builder::resolve_compound_field;
-use prisma_models::ModelRef;
-use schema::constants::*;
-use schema::QuerySchemaRef;
+use crate::{
+    query_ast::{QueryOption, QueryOptions},
+    query_graph_builder::resolve_compound_field,
+};
+use itertools::Itertools;
+use query_structure::Model;
+use schema::{constants::*, QuerySchema};
 use std::collections::HashMap;
 use user_facing_errors::query_engine::validation::ValidationError;
+
+use self::selection::QueryFilters;
 
 pub(crate) type QueryParserResult<T> = std::result::Result<T, ValidationError>;
 
@@ -69,24 +74,25 @@ impl BatchDocument {
     /// Those filters are:
     /// - non scalar filters (ie: relation filters, boolean operators...)
     /// - any scalar filters that is not `EQUALS`
-    fn invalid_compact_filter(op: &Operation, schema: &QuerySchemaRef) -> bool {
+    /// - nativetypes (citext)
+    fn invalid_compact_filter(op: &Operation, schema: &QuerySchema) -> bool {
         if !op.is_find_unique(schema) {
             return true;
         }
 
         let where_obj = op.as_read().unwrap().arguments()[0].1.clone().into_object().unwrap();
         let field = schema.find_query_field(op.name()).unwrap();
-        let model = field.model().unwrap();
+        let model = schema.internal_data_model.clone().zip(field.model().unwrap());
 
         where_obj.iter().any(|(key, val)| match val {
             // If it's a compound, then it's still considered as scalar
-            ArgumentValue::Object(_) if resolve_compound_field(key, model).is_some() => false,
+            ArgumentValue::Object(_) if resolve_compound_field(key, &model).is_some() => false,
             // Otherwise, we just look for a scalar field inside the model. If it's not one, then we break.
             val => match model.fields().find_from_scalar(key) {
-                Ok(_) => match val {
+                Ok(sf) => match val {
                     // Consider scalar _only_ if the filter object contains "equals". eg: `{ scalar_field: { equals: 1 } }`
                     ArgumentValue::Object(obj) => !obj.contains_key(filters::EQUALS),
-                    _ => false,
+                    _ => !sf.can_be_compacted(),
                 },
                 Err(_) => true,
             },
@@ -94,7 +100,7 @@ impl BatchDocument {
     }
 
     /// Checks whether a BatchDocument can be compacted.
-    fn can_compact(&self, schema: &QuerySchemaRef) -> bool {
+    fn can_compact(&self, schema: &QuerySchema) -> bool {
         match self {
             Self::Multi(operations, _) => match operations.split_first() {
                 Some((first, rest)) if first.is_find_unique(schema) => {
@@ -123,7 +129,7 @@ impl BatchDocument {
         }
     }
 
-    pub fn compact(self, schema: &QuerySchemaRef) -> Self {
+    pub fn compact(self, schema: &QuerySchema) -> Self {
         match self {
             Self::Multi(operations, _) if self.can_compact(schema) => {
                 Self::Compact(CompactedDocument::from_operations(operations, schema))
@@ -160,12 +166,21 @@ pub struct CompactedDocument {
     pub nested_selection: Vec<String>,
     pub operation: Operation,
     pub keys: Vec<String>,
+    pub original_query_options: crate::QueryOptions,
     name: String,
 }
 
 impl CompactedDocument {
+    pub fn throw_on_empty(&self) -> bool {
+        self.original_query_options.contains(QueryOption::ThrowOnEmpty)
+    }
+
     pub fn single_name(&self) -> String {
-        format!("findUnique{}", self.name)
+        if self.throw_on_empty() {
+            format!("findUnique{}OrThrow", self.name)
+        } else {
+            format!("findUnique{}", self.name)
+        }
     }
 
     pub fn plural_name(&self) -> String {
@@ -173,9 +188,9 @@ impl CompactedDocument {
     }
 
     /// Here be the dragons. Ay caramba!
-    pub fn from_operations(ops: Vec<Operation>, schema: &QuerySchemaRef) -> Self {
+    pub fn from_operations(ops: Vec<Operation>, schema: &QuerySchema) -> Self {
         let field = schema.find_query_field(ops.first().unwrap().name()).unwrap();
-        let model = field.model().unwrap();
+        let model = schema.internal_data_model.clone().zip(field.model().unwrap());
         // Unpack all read queries (an enum) into a collection of selections.
         // We already took care earlier that all operations here must be reads.
         let selections: Vec<Selection> = ops
@@ -188,7 +203,12 @@ impl CompactedDocument {
             // The name of the query should be findManyX if the first query
             // here is findUniqueX. We took care earlier the queries are all the
             // same. Otherwise we fail hard here.
-            let mut builder = Selection::with_name(selections[0].name().replacen("findUnique", "findMany", 1));
+            let mut builder = Selection::with_name(
+                selections[0]
+                    .name()
+                    .replacen("findUnique", "findMany", 1)
+                    .trim_end_matches("OrThrow"),
+            );
 
             // Take the nested selection set from the first query. We took care
             // earlier that all the nested selections are the same in every
@@ -197,21 +217,21 @@ impl CompactedDocument {
 
             // The query arguments are extracted here. Combine all query
             // arguments from the different queries into a one large argument.
-            let selection_set = selections.iter().fold(SelectionSet::new(), |mut acc, selection| {
-                // findUnique always has only one argument. We know it must be an object, otherwise this will panic.
-                let where_obj = selection.arguments()[0]
-                    .1
-                    .clone()
-                    .into_object()
-                    .expect("Trying to compact a selection with non-object argument");
-                let filters = extract_filter(where_obj, model);
+            let query_filters = selections
+                .iter()
+                .map(|selection| {
+                    // findUnique always has only one argument. We know it must be an object, otherwise this will panic.
+                    let where_obj = selection.arguments()[0]
+                        .1
+                        .clone()
+                        .into_object()
+                        .expect("Trying to compact a selection with non-object argument");
+                    let filters = extract_filter(where_obj, &model);
 
-                for (field, filter) in filters {
-                    acc = acc.push(field, filter);
-                }
-
-                acc
-            });
+                    QueryFilters::new(filters)
+                })
+                .collect();
+            let selection_set = SelectionSet::new(query_filters);
 
             // We must select all unique fields in the query so we can
             // match the right response back to the right request later on.
@@ -240,7 +260,17 @@ impl CompactedDocument {
             .collect();
 
         // Saving the stub of the query name for later use.
-        let name = selections[0].name().replacen("findUnique", "", 1);
+        let name = selections[0]
+            .name()
+            .replacen("findUnique", "", 1)
+            .trim_end_matches("OrThrow")
+            .to_string();
+
+        let original_query_options = if selections[0].name().ends_with("OrThrow") {
+            QueryOptions::from(QueryOption::ThrowOnEmpty)
+        } else {
+            QueryOptions::none()
+        };
 
         // Convert the selections into a map of arguments. This defines the
         // response order and how we fetch the right data from the response set.
@@ -248,27 +278,32 @@ impl CompactedDocument {
             .into_iter()
             .map(|mut sel| {
                 let where_obj = sel.pop_argument().unwrap().1.into_object().unwrap();
-                let filter_map: HashMap<String, ArgumentValue> = extract_filter(where_obj, model).into_iter().collect();
+                let filter_map: HashMap<String, ArgumentValue> =
+                    extract_filter(where_obj, &model).into_iter().collect();
 
                 filter_map
             })
             .collect();
 
         // Gets the argument keys for later mapping.
-        let keys: Vec<_> = arguments[0]
+        let keys: Vec<_> = arguments
             .iter()
-            .flat_map(|pair| match pair {
-                (_, ArgumentValue::Object(obj)) => obj.keys().map(ToOwned::to_owned).collect(),
-                (key, _) => vec![key.to_owned()],
+            .flat_map(|map| {
+                map.iter().flat_map(|(key, value)| match value {
+                    ArgumentValue::Object(obj) => obj.keys().map(ToOwned::to_owned).collect::<Vec<_>>(),
+                    _ => vec![key.to_owned()],
+                })
             })
+            .unique()
             .collect();
 
         Self {
+            operation: Operation::Read(selection),
             name,
             arguments,
             nested_selection,
             keys,
-            operation: Operation::Read(selection),
+            original_query_options,
         }
     }
 }
@@ -282,7 +317,7 @@ impl CompactedDocument {
 /// Furthermore, this list is used to match the results of the findMany query back to the original findUnique queries.
 /// Consequently, we only extract EQUALS filters or else we would have to manually implement other filters.
 /// This is a limitation that _could_ technically be lifted but that's not worth it for now.
-fn extract_filter(where_obj: ArgumentValueObject, model: &ModelRef) -> Vec<SelectionArgument> {
+fn extract_filter(where_obj: ArgumentValueObject, model: &Model) -> Vec<SelectionArgument> {
     where_obj
         .into_iter()
         .flat_map(|(key, val)| match val {

@@ -2,15 +2,14 @@ pub(crate) mod fields;
 pub(crate) mod objects;
 
 use super::*;
-use crate::*;
 use fields::*;
-use prisma_models::ScalarFieldRef;
+use query_structure::ScalarFieldRef;
 
-fn map_scalar_input_type_for_field(ctx: &mut BuilderContext<'_>, field: &ScalarFieldRef) -> InputType {
-    map_scalar_input_type(ctx, &field.type_identifier(), field.is_list())
+fn map_scalar_input_type_for_field<'a>(ctx: &'a QuerySchema, field: &ScalarFieldRef) -> InputType<'a> {
+    map_scalar_input_type(ctx, field.type_identifier(), field.is_list())
 }
 
-fn map_scalar_input_type(ctx: &mut BuilderContext<'_>, typ: &TypeIdentifier, list: bool) -> InputType {
+fn map_scalar_input_type(ctx: &'_ QuerySchema, typ: TypeIdentifier, list: bool) -> InputType<'_> {
     let typ = match typ {
         TypeIdentifier::String => InputType::string(),
         TypeIdentifier::Int => InputType::int(),
@@ -20,8 +19,7 @@ fn map_scalar_input_type(ctx: &mut BuilderContext<'_>, typ: &TypeIdentifier, lis
         TypeIdentifier::UUID => InputType::uuid(),
         TypeIdentifier::DateTime => InputType::date_time(),
         TypeIdentifier::Json => InputType::json(),
-        TypeIdentifier::Enum(id) => InputType::enum_type(map_schema_enum_type(ctx, *id)),
-        TypeIdentifier::Xml => InputType::xml(),
+        TypeIdentifier::Enum(id) => InputType::enum_type(map_schema_enum_type(ctx, id)),
         TypeIdentifier::Bytes => InputType::bytes(),
         TypeIdentifier::BigInt => InputType::bigint(),
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
@@ -36,14 +34,14 @@ fn map_scalar_input_type(ctx: &mut BuilderContext<'_>, typ: &TypeIdentifier, lis
 
 /// Convenience function to return [object_type, list_object_type]
 /// (shorthand + full type) if the field is a list.
-pub(crate) fn list_union_object_type(input: InputObjectTypeId, as_list: bool) -> Vec<InputType> {
+pub(crate) fn list_union_object_type(input: InputObjectType<'_>, as_list: bool) -> Vec<InputType<'_>> {
     let input_type = InputType::object(input);
     list_union_type(input_type, as_list)
 }
 
 /// Convenience function to return [input_type, list_input_type]
 /// (shorthand + full type) if the field is a list.
-pub(crate) fn list_union_type(input_type: InputType, as_list: bool) -> Vec<InputType> {
+pub(crate) fn list_union_type(input_type: InputType<'_>, as_list: bool) -> Vec<InputType<'_>> {
     if as_list {
         vec![input_type.clone(), InputType::list(input_type)]
     } else {

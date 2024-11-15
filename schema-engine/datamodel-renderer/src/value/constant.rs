@@ -6,7 +6,7 @@ pub struct Constant<T: fmt::Display>(pub(crate) T);
 
 impl<'a> Clone for Constant<&'a str> {
     fn clone(&self) -> Self {
-        Constant(self.0)
+        *self
     }
 }
 

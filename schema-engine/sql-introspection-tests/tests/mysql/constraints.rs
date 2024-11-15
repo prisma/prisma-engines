@@ -4,7 +4,7 @@ use indoc::indoc;
 use sql_introspection_tests::test_api::*;
 use test_macros::test_connector;
 
-// Note: MySQL 5.6 ad 5.7 do not support check constraints, so this test is only run on MySQL 8.0.
+// Note: MySQL 5.6 and 5.7 do not support check constraints, so this test is only run on MySQL 8.0.
 #[test_connector(tags(Mysql8), exclude(Vitess))]
 async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
@@ -56,7 +56,7 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
+        These constraints are not supported by Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
           - Model: "t1", constraint: "c1_nonzero"
           - Model: "t1", constraint: "c2_positive"
           - Model: "t1", constraint: "t1_chk_1"

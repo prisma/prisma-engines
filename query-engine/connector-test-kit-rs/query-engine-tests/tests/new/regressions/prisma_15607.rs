@@ -4,10 +4,10 @@
 //! actors to allow test to continue even if one query is blocking.
 
 use indoc::indoc;
+use prisma_metrics::{MetricRecorder, WithMetricsInstrumentation};
 use query_engine_tests::{
-    query_core::TxId, render_test_datamodel, setup_metrics, setup_project, test_tracing_subscriber, ConnectorTag,
-    LogEmit, QueryResult, Runner, TestError, TestLogCapture, TestResult, TryFrom, WithSubscriber, CONFIG,
-    ENV_LOG_LEVEL,
+    query_core::TxId, render_test_datamodel, setup_metrics, test_tracing_subscriber, LogEmit, QueryResult, Runner,
+    TestError, TestLogCapture, TestResult, WithSubscriber, CONFIG, ENV_LOG_LEVEL,
 };
 use std::future::Future;
 use tokio::sync::mpsc;
@@ -51,19 +51,17 @@ impl Actor {
     /// Spawns a new query engine to the runtime.
     pub async fn spawn() -> TestResult<Self> {
         let (log_capture, log_tx) = TestLogCapture::new();
-        async fn with_logs<T>(fut: impl Future<Output = T>, log_tx: LogEmit) -> T {
-            fut.with_subscriber(test_tracing_subscriber(
-                ENV_LOG_LEVEL.to_string(),
-                setup_metrics(),
-                log_tx,
-            ))
-            .await
+        let (metrics, recorder) = setup_metrics();
+
+        async fn with_observability<T>(fut: impl Future<Output = T>, log_tx: LogEmit, recorder: MetricRecorder) -> T {
+            fut.with_subscriber(test_tracing_subscriber(ENV_LOG_LEVEL.to_string(), log_tx))
+                .with_recorder(recorder)
+                .await
         }
 
         let (query_sender, mut query_receiver) = mpsc::channel(100);
         let (response_sender, response_receiver) = mpsc::channel(100);
-
-        let tag = ConnectorTag::try_from(("sqlserver", None))?;
+        let (tag, version) = query_tests_setup::CONFIG.test_connector()?;
 
         let datamodel = render_test_datamodel(
             "sql_server_deadlocks_test",
@@ -71,26 +69,28 @@ impl Actor {
             &[],
             None,
             &[],
+            &[],
             Some("READ COMMITTED"),
         );
 
-        setup_project(&datamodel, &[]).await?;
-
-        let mut runner = Runner::load(datamodel, tag, setup_metrics(), log_capture).await?;
+        let mut runner = Runner::load(datamodel, &[], version, tag, None, metrics, log_capture).await?;
 
         tokio::spawn(async move {
             while let Some(message) = query_receiver.recv().await {
                 match message {
                     Message::Query(query) => {
-                        let result = with_logs(runner.query(query), log_tx.clone()).await;
+                        let result = with_observability(runner.query(query), log_tx.clone(), recorder.clone()).await;
                         response_sender.send(Response::Query(result)).await.unwrap();
                     }
                     Message::BeginTransaction => {
-                        let response = with_logs(runner.start_tx(10000, 10000, None), log_tx.clone()).await;
+                        let response =
+                            with_observability(runner.start_tx(10000, 10000, None), log_tx.clone(), recorder.clone())
+                                .await;
                         response_sender.send(Response::Tx(response)).await.unwrap();
                     }
                     Message::RollbackTransaction(tx_id) => {
-                        let response = with_logs(runner.rollback_tx(tx_id), log_tx.clone()).await?;
+                        let response =
+                            with_observability(runner.rollback_tx(tx_id), log_tx.clone(), recorder.clone()).await?;
                         response_sender.send(Response::Rollback(response)).await.unwrap();
                     }
                     Message::SetActiveTx(tx_id) => {

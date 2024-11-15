@@ -3,74 +3,64 @@ use constants::args;
 use psl::datamodel_connector::ConnectorCapability;
 
 pub(crate) fn update_one_input_types(
-    ctx: &mut BuilderContext<'_>,
-    model: &ModelRef,
-    parent_field: Option<&RelationFieldRef>,
-) -> Vec<InputType> {
-    let checked_input = InputType::object(checked_update_one_input_type(ctx, model, parent_field));
+    ctx: &'_ QuerySchema,
+    model: Model,
+    parent_field: Option<RelationFieldRef>,
+) -> Vec<InputType<'_>> {
+    let checked_input = InputType::object(checked_update_one_input_type(ctx, model.clone(), parent_field.clone()));
     let unchecked_input = InputType::object(unchecked_update_one_input_type(ctx, model, parent_field));
 
-    // If the inputs are equal, only use one.
-    if checked_input == unchecked_input {
-        vec![checked_input]
-    } else {
-        vec![checked_input, unchecked_input]
-    }
+    vec![checked_input, unchecked_input]
 }
 
 /// Builds "<x>UpdateInput" input object type.
 fn checked_update_one_input_type(
-    ctx: &mut BuilderContext<'_>,
-    model: &ModelRef,
-    parent_field: Option<&RelationFieldRef>,
-) -> InputObjectTypeId {
+    ctx: &'_ QuerySchema,
+    model: Model,
+    parent_field: Option<RelationFieldRef>,
+) -> InputObjectType<'_> {
     let ident = Identifier::new_prisma(IdentifierType::CheckedUpdateOneInput(
         model.clone(),
-        parent_field.map(|pf| pf.related_field()),
+        parent_field.as_ref().map(|pf| pf.related_field()),
     ));
 
-    return_cached_input!(ctx, &ident);
-
-    let input_object = init_input_object_type(ident.clone());
-    let id = ctx.cache_input_type(ident, input_object);
-
-    let filtered_fields = filter_checked_update_fields(ctx, model, parent_field);
-    let field_mapper = UpdateDataInputFieldMapper::new_checked();
-    let input_fields = field_mapper.map_all(ctx, &filtered_fields);
-    ctx.db[id].set_fields(input_fields);
-    id
+    let mut input_object = init_input_object_type(ident);
+    input_object.set_fields(move || {
+        let mut filtered_fields = filter_checked_update_fields(ctx, &model, parent_field.as_ref());
+        let field_mapper = UpdateDataInputFieldMapper::new_checked();
+        field_mapper.map_all(ctx, &mut filtered_fields)
+    });
+    input_object
 }
 
 /// Builds "<x>UncheckedUpdateInput" input object type.
 fn unchecked_update_one_input_type(
-    ctx: &mut BuilderContext<'_>,
-    model: &ModelRef,
-    parent_field: Option<&RelationFieldRef>,
-) -> InputObjectTypeId {
+    ctx: &'_ QuerySchema,
+    model: Model,
+    parent_field: Option<RelationFieldRef>,
+) -> InputObjectType<'_> {
     let ident = Identifier::new_prisma(IdentifierType::UncheckedUpdateOneInput(
         model.clone(),
-        parent_field.map(|pf| pf.related_field()),
+        parent_field.as_ref().map(|pf| pf.related_field()),
     ));
 
-    return_cached_input!(ctx, &ident);
+    let mut input_object = init_input_object_type(ident);
+    input_object.set_fields(move || {
+        let mut filtered_fields = filter_unchecked_update_fields(ctx, &model, parent_field.as_ref());
+        let field_mapper = UpdateDataInputFieldMapper::new_unchecked();
+        field_mapper.map_all(ctx, &mut filtered_fields)
+    });
 
-    let input_object = init_input_object_type(ident.clone());
-    let id = ctx.cache_input_type(ident, input_object);
-
-    let filtered_fields = filter_unchecked_update_fields(ctx, model, parent_field);
-    let field_mapper = UpdateDataInputFieldMapper::new_unchecked();
-    let input_fields = field_mapper.map_all(ctx, &filtered_fields);
-    ctx.db[id].set_fields(input_fields);
-    id
+    input_object
 }
 
 /// Filters the given model's fields down to the allowed ones for checked update.
-pub(super) fn filter_checked_update_fields(
-    ctx: &BuilderContext<'_>,
-    model: &ModelRef,
-    parent_field: Option<&RelationFieldRef>,
-) -> Vec<ModelField> {
-    model.fields().filter_all(|field| {
+pub(super) fn filter_checked_update_fields<'a>(
+    ctx: &'a QuerySchema,
+    model: &'a Model,
+    parent_field: Option<&'a RelationFieldRef>,
+) -> impl Iterator<Item = ModelField> + 'a {
+    model.fields().filter_all(move |field| {
         match field {
             ModelField::Scalar(sf) => {
                 // We forbid updating auto-increment integer unique fields as this can create problems with the
@@ -108,11 +98,11 @@ pub(super) fn filter_checked_update_fields(
 }
 
 /// Filters the given model's fields down to the allowed ones for unchecked update.
-pub(super) fn filter_unchecked_update_fields(
-    ctx: &mut BuilderContext<'_>,
-    model: &ModelRef,
-    parent_field: Option<&RelationFieldRef>,
-) -> Vec<ModelField> {
+pub(super) fn filter_unchecked_update_fields<'a>(
+    ctx: &'a QuerySchema,
+    model: &'a Model,
+    parent_field: Option<&'a RelationFieldRef>,
+) -> impl Iterator<Item = ModelField> + 'a {
     let linking_fields = if let Some(parent_field) = parent_field {
         let child_field = parent_field.related_field();
         if child_field.is_inlined_on_enclosing_model() {
@@ -129,7 +119,7 @@ pub(super) fn filter_unchecked_update_fields(
 
     let fields = model.fields();
     let id_fields = fields.id_fields();
-    model.fields().filter_all(|field| match field {
+    model.fields().filter_all(move |field| match field {
         // 1) In principle, all scalars are writable for unchecked inputs. However, it still doesn't make any sense to be able to write the scalars that
         // link the model to the parent record in case of a nested unchecked create, as this would introduce complexities we don't want to deal with right now.
         // 2) Exclude @@id or @id fields if not updatable
@@ -168,55 +158,47 @@ pub(super) fn filter_unchecked_update_fields(
 
 /// Builds "<x>UpdateWithWhereUniqueNestedInput" / "<x>UpdateWithWhereUniqueWithout<y>Input" input object types.
 /// Simple combination object of "where" and "data".
-pub(crate) fn update_one_where_combination_object(
-    ctx: &mut BuilderContext<'_>,
-    update_types: Vec<InputType>,
+pub(crate) fn update_one_where_combination_object<'a>(
+    ctx: &'a QuerySchema,
+    update_types: Vec<InputType<'a>>,
     parent_field: &RelationFieldRef,
-) -> InputObjectTypeId {
+) -> InputObjectType<'a> {
     let ident = Identifier::new_prisma(IdentifierType::UpdateOneWhereCombinationInput(
         parent_field.related_field(),
     ));
 
-    return_cached_input!(ctx, &ident);
-
     let related_model = parent_field.related_model();
-    let where_input_object = filter_objects::where_unique_object_type(ctx, &related_model);
+    let where_input_object = filter_objects::where_unique_object_type(ctx, related_model);
 
-    let input_object = init_input_object_type(ident.clone());
-    let id = ctx.cache_input_type(ident, input_object);
-
-    let fields = vec![
-        input_field(ctx, args::WHERE, InputType::object(where_input_object), None),
-        input_field(ctx, args::DATA, update_types, None),
-    ];
-
-    ctx.db[id].set_fields(fields);
-    id
+    let mut input_object = init_input_object_type(ident);
+    input_object.set_fields(move || {
+        vec![
+            simple_input_field(args::WHERE, InputType::object(where_input_object.clone()), None),
+            input_field(args::DATA, update_types.clone(), None),
+        ]
+    });
+    input_object
 }
 
 /// Builds "<x>UpdateWithWhereUniqueWithout<y>Input" input object types.
 /// Simple combination object of "where" and "data" for to-one relations.
-pub(crate) fn update_to_one_rel_where_combination_object(
-    ctx: &mut BuilderContext<'_>,
-    update_types: impl IntoIterator<Item = InputType>,
-    parent_field: &RelationFieldRef,
-) -> InputObjectTypeId {
+pub(crate) fn update_to_one_rel_where_combination_object<'a>(
+    ctx: &'a QuerySchema,
+    update_types: Vec<InputType<'a>>,
+    parent_field: RelationFieldRef,
+) -> InputObjectType<'a> {
     let ident = Identifier::new_prisma(IdentifierType::UpdateToOneRelWhereCombinationInput(
         parent_field.related_field(),
     ));
 
-    return_cached_input!(ctx, &ident);
-
-    let mut input_object = init_input_object_type(ident.clone());
+    let mut input_object = init_input_object_type(ident);
     input_object.set_tag(ObjectTag::NestedToOneUpdateEnvelope);
-    let id = ctx.cache_input_type(ident, input_object);
-
-    let related_model = parent_field.related_model();
-    let fields = vec![
-        arguments::where_argument(ctx, &related_model),
-        input_field(ctx, args::DATA, update_types, None),
-    ];
-
-    ctx.db[id].set_fields(fields);
-    id
+    input_object.set_fields(move || {
+        let related_model = parent_field.related_model();
+        vec![
+            arguments::where_argument(ctx, &related_model),
+            input_field(args::DATA, update_types.clone(), None),
+        ]
+    });
+    input_object
 }

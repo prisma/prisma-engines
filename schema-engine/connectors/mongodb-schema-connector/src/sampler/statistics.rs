@@ -8,18 +8,19 @@ use renderer::{
 };
 use schema_connector::{
     warnings::{ModelAndField, ModelAndFieldAndType, TypeAndField, TypeAndFieldAndType},
-    CompositeTypeDepth, Warnings,
+    CompositeTypeDepth, IntrospectionContext, Warnings,
 };
 
 use super::field_type::FieldType;
+use bson::{Bson, Document};
 use convert_case::{Case, Casing};
 use datamodel_renderer as renderer;
-use mongodb::bson::{Bson, Document};
 use mongodb_schema_describer::{CollectionWalker, IndexWalker};
 use once_cell::sync::Lazy;
 use psl::datamodel_connector::constraint_names::ConstraintNames;
 use regex::Regex;
 use std::{
+    borrow::Cow,
     cmp::Ordering,
     collections::{BTreeMap, HashMap, HashSet},
     fmt,
@@ -121,7 +122,7 @@ impl<'a> Statistics<'a> {
 
     pub(super) fn render(
         &'a self,
-        datasource: &'a psl::Datasource,
+        ctx: &'a IntrospectionContext,
         rendered: &mut renderer::Datamodel<'a>,
         warnings: &mut Warnings,
     ) {
@@ -153,13 +154,18 @@ impl<'a> Statistics<'a> {
                         let comment = "This collection uses a JSON Schema defined in the database, which requires additional setup for migrations. Visit https://pris.ly/d/mongodb-json-schema for more info.";
                         model.documentation(comment)
                     }
+
+                    if walker.is_capped() {
+                        let comment = "This model is a capped collection, which is not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections";
+                        model.documentation(comment)
+                    }
                 }
 
                 if !doc_count.has_id {
                     let mut field = renderer::datamodel::Field::new("id", "String");
 
                     field.map("_id");
-                    field.native_type(&datasource.name, "ObjectId", Vec::new());
+                    field.native_type(&ctx.datasource().name, "ObjectId", Vec::new());
                     field.default(renderer::datamodel::DefaultValue::function(Function::new("auto")));
                     field.id(IdFieldDefinition::new());
 
@@ -280,7 +286,7 @@ impl<'a> Statistics<'a> {
             }
 
             if let Some(native_type) = field_type.native_type() {
-                field.native_type(&datasource.name, native_type.to_string(), Vec::new());
+                field.native_type(&ctx.datasource().name, native_type.to_string(), Vec::new());
             }
 
             if field_type.is_array() {
@@ -405,12 +411,22 @@ impl<'a> Statistics<'a> {
             }
         }
 
-        for (_, r#type) in types {
-            rendered.push_composite_type(r#type);
+        for (ct_name, r#type) in types {
+            let file_name = match ctx.previous_schema().db.find_composite_type(ct_name) {
+                Some(walker) => Cow::Borrowed(ctx.previous_schema().db.file_name(walker.file_id())),
+                None => ctx.introspection_file_path(),
+            };
+
+            rendered.push_composite_type(file_name, r#type);
         }
 
-        for (_, model) in models.into_iter() {
-            rendered.push_model(model);
+        for (model_name, model) in models.into_iter() {
+            let file_name = match ctx.previous_schema().db.find_model(model_name) {
+                Some(walker) => Cow::Borrowed(ctx.previous_schema().db.file_name(walker.file_id())),
+                None => ctx.introspection_file_path(),
+            };
+
+            rendered.push_model(file_name, model);
         }
     }
 
@@ -507,7 +523,7 @@ impl<'a> Statistics<'a> {
 
                     let type_name = format!("{container_name}_{field}").to_case(Case::Pascal);
                     let type_name = sanitize_string(&type_name).unwrap_or(type_name);
-                    container_name = type_name.clone();
+                    container_name.clone_from(&type_name);
 
                     if let Some(sampler) = self.samples.get_mut(&key) {
                         let has_composites = sampler.types.iter().any(|t| t.0.has_documents());
@@ -525,7 +541,7 @@ impl<'a> Statistics<'a> {
                         sampler.types.insert(FieldType::Document(type_name.clone()), 1);
 
                         let key = Name::CompositeType(type_name);
-                        self.models.entry(key).or_insert_with(Default::default);
+                        self.models.entry(key).or_default();
 
                         sampler
                     } else {
@@ -564,7 +580,7 @@ impl<'a> Statistics<'a> {
 
     /// Track a collection as prisma model.
     pub(super) fn track_model(&mut self, model: &str, collection: CollectionWalker<'a>) {
-        let mut model = self.models.entry(Name::Model(model.to_string())).or_default();
+        let model = self.models.entry(Name::Model(model.to_string())).or_default();
         model.collection_walker = Some(collection);
     }
 

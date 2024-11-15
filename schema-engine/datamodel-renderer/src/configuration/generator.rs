@@ -1,4 +1,4 @@
-use crate::value::{Array, Documentation, Env, Text};
+use crate::value::{Array, Documentation, Env, Text, Value};
 use psl::PreviewFeature;
 use std::{borrow::Cow, fmt};
 
@@ -11,7 +11,7 @@ pub struct Generator<'a> {
     preview_features: Option<Array<Text<PreviewFeature>>>,
     binary_targets: Array<Env<'a>>,
     documentation: Option<Documentation<'a>>,
-    config: Vec<(&'a str, Text<&'a str>)>,
+    config: Vec<(&'a str, Value<'a>)>,
 }
 
 impl<'a> Generator<'a> {
@@ -85,8 +85,7 @@ impl<'a> Generator<'a> {
         self.documentation = Some(Documentation(docs.into()));
     }
 
-    /// Add a custom config value to the block. For now we support any
-    /// key/value pairs, and the value must be text.
+    /// Add a custom config value to the block.
     ///
     /// ```ignore
     /// generator js {
@@ -96,8 +95,8 @@ impl<'a> Generator<'a> {
     /// //^^^^^^ key
     /// }
     /// ```
-    pub fn push_config_value(&mut self, key: &'a str, val: &'a str) {
-        self.config.push((key, Text(val)));
+    pub fn push_config_value(&mut self, key: &'a str, val: impl Into<Value<'a>>) {
+        self.config.push((key, val.into()));
     }
 
     /// Create a rendering from a PSL generator.
@@ -109,11 +108,7 @@ impl<'a> Generator<'a> {
 
         let binary_targets: Vec<Env<'_>> = psl_gen.binary_targets.iter().map(Env::from).collect();
 
-        let config = psl_gen
-            .config
-            .iter()
-            .map(|(k, v)| (k.as_str(), Text(v.as_str())))
-            .collect();
+        let config = psl_gen.config.iter().map(|(k, v)| (k.as_str(), v.into())).collect();
 
         Self {
             name: &psl_gen.name,
@@ -179,6 +174,20 @@ mod tests {
         generator.push_config_value("customValue", "meow");
         generator.push_config_value("otherValue", "purr");
 
+        generator.push_config_value("customFeatures", vec![Value::from("enums"), Value::from("models")]);
+        generator.push_config_value(
+            "afterGenerate",
+            vec![
+                Value::from("lambda"),
+                Vec::<Value>::new().into(),
+                vec![
+                    Value::from("print"),
+                    vec![Value::from("quote"), Value::from("done!")].into(),
+                ]
+                .into(),
+            ],
+        );
+
         let expected = expect![[r#"
             /// Here comes the sun.
             ///
@@ -191,6 +200,8 @@ mod tests {
               binaryTargets   = [env("BINARY TARGET")]
               customValue     = "meow"
               otherValue      = "purr"
+              customFeatures  = ["enums", "models"]
+              afterGenerate   = ["lambda", [], ["print", ["quote", "done!"]]]
             }
         "#]];
 

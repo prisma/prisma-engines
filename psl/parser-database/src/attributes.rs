@@ -23,12 +23,16 @@ pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
         visit_relation_field_attributes(rfid, ctx);
     }
 
-    for top in ctx.ast.iter_tops() {
+    for top in ctx.iter_tops() {
         match top {
-            (ast::TopId::Model(model_id), ast::Top::Model(_)) => resolve_model_attributes(model_id, ctx),
-            (ast::TopId::Enum(enum_id), ast::Top::Enum(ast_enum)) => resolve_enum_attributes(enum_id, ast_enum, ctx),
-            (ast::TopId::CompositeType(ctid), ast::Top::CompositeType(ct)) => {
-                resolve_composite_type_attributes(ctid, ct, ctx)
+            ((file_id, ast::TopId::Model(model_id)), ast::Top::Model(_)) => {
+                resolve_model_attributes((file_id, model_id), ctx)
+            }
+            ((file_id, ast::TopId::Enum(enum_id)), ast::Top::Enum(ast_enum)) => {
+                resolve_enum_attributes((file_id, enum_id), ast_enum, ctx)
+            }
+            ((file_id, ast::TopId::CompositeType(ctid)), ast::Top::CompositeType(ct)) => {
+                resolve_composite_type_attributes((file_id, ctid), ct, ctx)
             }
             _ => (),
         }
@@ -36,14 +40,19 @@ pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
 }
 
 fn resolve_composite_type_attributes<'db>(
-    ctid: ast::CompositeTypeId,
+    ctid: crate::CompositeTypeId,
     ct: &'db ast::CompositeType,
     ctx: &mut Context<'db>,
 ) {
     for (field_id, field) in ct.iter_fields() {
-        let CompositeTypeField { r#type, .. } = ctx.types.composite_type_fields[&(ctid, field_id)];
+        let CompositeTypeField { r#type, .. } =
+            if let Some(val) = ctx.types.composite_type_fields.get(&(ctid, field_id)) {
+                val.clone()
+            } else {
+                continue;
+            };
 
-        ctx.visit_attributes((ctid, field_id).into());
+        ctx.visit_attributes((ctid.0, (ctid.1, field_id)));
 
         if let ScalarFieldType::BuiltInScalar(_scalar_type) = r#type {
             // native type attributes
@@ -52,7 +61,7 @@ fn resolve_composite_type_attributes<'db>(
                     (ctid, field_id),
                     datasource_name,
                     type_name,
-                    &ctx.ast[args],
+                    &ctx.asts[args],
                     ctx,
                 )
             }
@@ -74,17 +83,16 @@ fn resolve_composite_type_attributes<'db>(
     }
 }
 
-fn resolve_enum_attributes<'db>(enum_id: ast::EnumId, ast_enum: &'db ast::Enum, ctx: &mut Context<'db>) {
+fn resolve_enum_attributes<'db>(enum_id: crate::EnumId, ast_enum: &'db ast::Enum, ctx: &mut Context<'db>) {
     let mut enum_attributes = EnumAttributes::default();
 
-    for value_idx in 0..ast_enum.values.len() {
-        ctx.visit_attributes((enum_id, value_idx as u32).into());
+    for (value_id, _) in ast_enum.iter_values() {
+        ctx.visit_attributes((enum_id.0, (enum_id.1, value_id)));
         // @map
         if ctx.visit_optional_single_attr("map") {
             if let Some(mapped_name) = map::visit_map_attribute(ctx) {
-                enum_attributes.mapped_values.insert(value_idx as u32, mapped_name);
-                ctx.mapped_enum_value_names
-                    .insert((enum_id, mapped_name), value_idx as u32);
+                enum_attributes.mapped_values.insert(value_id, mapped_name);
+                ctx.mapped_enum_value_names.insert((enum_id, mapped_name), value_id);
             }
             ctx.validate_visited_arguments();
         }
@@ -93,7 +101,7 @@ fn resolve_enum_attributes<'db>(enum_id: ast::EnumId, ast_enum: &'db ast::Enum, 
 
     // Now validate the enum attributes.
 
-    ctx.visit_attributes(enum_id.into());
+    ctx.visit_attributes(enum_id);
 
     // @@map
     if ctx.visit_optional_single_attr("map") {
@@ -114,7 +122,7 @@ fn resolve_enum_attributes<'db>(enum_id: ast::EnumId, ast_enum: &'db ast::Enum, 
     ctx.validate_visited_attributes();
 }
 
-fn resolve_model_attributes(model_id: ast::ModelId, ctx: &mut Context<'_>) {
+fn resolve_model_attributes(model_id: crate::ModelId, ctx: &mut Context<'_>) {
     let mut model_attributes = ModelAttributes::default();
 
     // First resolve all the attributes defined on fields **in isolation**.
@@ -123,7 +131,7 @@ fn resolve_model_attributes(model_id: ast::ModelId, ctx: &mut Context<'_>) {
     }
 
     // Resolve all the attributes defined on the model itself **in isolation**.
-    ctx.visit_attributes(model_id.into());
+    ctx.visit_attributes(model_id);
 
     // @@ignore
     if ctx.visit_optional_single_attr("ignore") {
@@ -185,7 +193,7 @@ fn visit_scalar_field_attributes(
         r#type,
         ..
     } = ctx.types[scalar_field_id];
-    let ast_model = &ctx.ast[model_id];
+    let ast_model = &ctx.asts[model_id];
     let ast_field = &ast_model[field_id];
     ctx.visit_scalar_field_attributes(model_id, field_id);
 
@@ -240,7 +248,7 @@ fn visit_scalar_field_attributes(
     if let ScalarFieldType::BuiltInScalar(_scalar_type) = r#type {
         // native type attributes
         if let Some((datasource_name, type_name, attribute_id)) = ctx.visit_datasource_scoped() {
-            let attribute = &ctx.ast[attribute_id];
+            let attribute = &ctx.asts[attribute_id];
             native_types::visit_model_field_native_type_attribute(
                 scalar_field_id,
                 datasource_name,
@@ -297,7 +305,7 @@ fn visit_field_unique(scalar_field_id: ScalarFieldId, model_data: &mut ModelAttr
 
     let attribute_id = ctx.current_attribute_id();
     model_data.ast_indexes.push((
-        attribute_id,
+        attribute_id.1,
         IndexAttribute {
             r#type: IndexType::Unique,
             fields: vec![FieldWithArgs {
@@ -316,8 +324,8 @@ fn visit_field_unique(scalar_field_id: ScalarFieldId, model_data: &mut ModelAttr
 
 fn visit_relation_field_attributes(rfid: RelationFieldId, ctx: &mut Context<'_>) {
     let RelationField { model_id, field_id, .. } = ctx.types[rfid];
-    let ast_field = &ctx.ast[model_id][field_id];
-    ctx.visit_attributes((model_id, field_id).into());
+    let ast_field = &ctx.asts[model_id][field_id];
+    ctx.visit_attributes((model_id.0, (model_id.1, field_id)));
 
     // @relation
     // Relation attributes are not required at this stage.
@@ -364,7 +372,7 @@ fn visit_relation_field_attributes(rfid: RelationFieldId, ctx: &mut Context<'_>)
 
         for underlying_field in ctx.types[rfid].fields.iter().flatten() {
             let ScalarField { model_id, field_id, .. } = ctx.types[*underlying_field];
-            suggested_fields.push(ctx.ast[model_id][field_id].name());
+            suggested_fields.push(ctx.asts[model_id][field_id].name());
         }
 
         let suggestion = match suggested_fields.len() {
@@ -391,7 +399,7 @@ fn visit_relation_field_attributes(rfid: RelationFieldId, ctx: &mut Context<'_>)
     ctx.validate_visited_attributes();
 }
 
-fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes, ctx: &mut Context<'_>) {
+fn visit_model_ignore(model_id: crate::ModelId, model_data: &mut ModelAttributes, ctx: &mut Context<'_>) {
     let ignored_field_errors: Vec<_> = ctx
         .types
         .range_model_scalar_fields(model_id)
@@ -400,7 +408,7 @@ fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes, 
             DatamodelError::new_attribute_validation_error(
                 "Fields on an already ignored Model do not need an `@ignore` annotation.",
                 "@ignore",
-                ctx.ast[sf.model_id][sf.field_id].span(),
+                ctx.asts[sf.model_id][sf.field_id].span(),
             )
         })
         .collect();
@@ -413,7 +421,7 @@ fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes, 
 }
 
 /// Validate @@fulltext on models
-fn model_fulltext(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Context<'_>) {
+fn model_fulltext(data: &mut ModelAttributes, model_id: crate::ModelId, ctx: &mut Context<'_>) {
     let mut index_attribute = IndexAttribute {
         r#type: IndexType::Fulltext,
         ..Default::default()
@@ -440,11 +448,11 @@ fn model_fulltext(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut 
 
     index_attribute.mapped_name = mapped_name;
 
-    data.ast_indexes.push((ctx.current_attribute_id(), index_attribute));
+    data.ast_indexes.push((ctx.current_attribute_id().1, index_attribute));
 }
 
 /// Validate @@index on models.
-fn model_index(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Context<'_>) {
+fn model_index(data: &mut ModelAttributes, model_id: crate::ModelId, ctx: &mut Context<'_>) {
     let mut index_attribute = IndexAttribute {
         r#type: IndexType::Normal,
         ..Default::default()
@@ -514,11 +522,11 @@ fn model_index(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Con
     index_attribute.algorithm = algo;
     index_attribute.clustered = validate_clustering_setting(ctx);
 
-    data.ast_indexes.push((ctx.current_attribute_id(), index_attribute));
+    data.ast_indexes.push((ctx.current_attribute_id().1, index_attribute));
 }
 
 /// Validate @@unique on models.
-fn model_unique(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Context<'_>) {
+fn model_unique(data: &mut ModelAttributes, model_id: crate::ModelId, ctx: &mut Context<'_>) {
     let mut index_attribute = IndexAttribute {
         r#type: IndexType::Unique,
         ..Default::default()
@@ -533,7 +541,7 @@ fn model_unique(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Co
 
     let current_attribute = ctx.current_attribute();
     let current_attribute_id = ctx.current_attribute_id();
-    let ast_model = &ctx.ast[model_id];
+    let ast_model = &ctx.asts[model_id];
     let name = get_name_argument(ctx);
 
     let mapped_name = {
@@ -570,12 +578,12 @@ fn model_unique(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Co
     index_attribute.mapped_name = mapped_name;
     index_attribute.clustered = validate_clustering_setting(ctx);
 
-    data.ast_indexes.push((current_attribute_id, index_attribute));
+    data.ast_indexes.push((current_attribute_id.1, index_attribute));
 }
 
 fn common_index_validations(
     index_data: &mut IndexAttribute,
-    model_id: ast::ModelId,
+    model_id: crate::ModelId,
     resolving: FieldResolvingSetup,
     ctx: &mut Context<'_>,
 ) {
@@ -599,9 +607,9 @@ fn common_index_validations(
             if !unresolvable_fields.is_empty() {
                 let fields = unresolvable_fields
                     .iter()
-                    .map(|(top_id, field_name)| match top_id {
+                    .map(|((file_id, top_id), field_name)| match top_id {
                         ast::TopId::CompositeType(ctid) => {
-                            let composite_type = &ctx.ast[*ctid].name();
+                            let composite_type = &ctx.asts[(*file_id, *ctid)].name();
 
                             Cow::from(format!("{field_name} in type {composite_type}"))
                         }
@@ -616,7 +624,7 @@ fn common_index_validations(
                         if index_data.is_unique() { "unique " } else { "" },
                         fields.join(", "),
                     );
-                    let model_name = ctx.ast[model_id].name();
+                    let model_name = ctx.asts[model_id].name();
                     DatamodelError::new_model_validation_error(message, "model", model_name, current_attribute.span)
                 });
             }
@@ -625,18 +633,19 @@ fn common_index_validations(
                 let mut suggested_fields = Vec::new();
 
                 for (_, field_id) in &relation_fields {
-                    let fields = ctx
+                    let Some(rf) = ctx
                         .types
                         .range_model_relation_fields(model_id)
                         .find(|(_, rf)| rf.field_id == *field_id)
-                        .unwrap()
-                        .1
-                        .fields
-                        .iter()
-                        .flatten();
+                    else {
+                        continue;
+                    };
+
+                    let fields = rf.1.fields.iter().flatten();
+
                     for underlying_field in fields {
                         let ScalarField { model_id, field_id, .. } = ctx.types[*underlying_field];
-                        suggested_fields.push(ctx.ast[model_id][field_id].name());
+                        suggested_fields.push(ctx.asts[model_id][field_id].name());
                     }
                 }
 
@@ -658,7 +667,7 @@ fn common_index_validations(
                         suggestion = suggestion
                     ),
                     "model",
-                    ctx.ast[model_id].name(),
+                    ctx.asts[model_id].name(),
                     current_attribute.span,
                 ));
             }
@@ -667,9 +676,9 @@ fn common_index_validations(
 }
 
 /// @relation validation for relation fields.
-fn visit_relation(model_id: ast::ModelId, relation_field_id: RelationFieldId, ctx: &mut Context<'_>) {
+fn visit_relation(model_id: crate::ModelId, relation_field_id: RelationFieldId, ctx: &mut Context<'_>) {
     let attr = ctx.current_attribute();
-    ctx.types[relation_field_id].relation_attribute = Some(ctx.current_attribute_id());
+    ctx.types[relation_field_id].relation_attribute = Some(ctx.current_attribute_id().1);
 
     if let Some(fields) = ctx.visit_optional_arg("fields") {
         let fields = match resolve_field_array_without_args(fields, attr.span, model_id, ctx) {
@@ -724,7 +733,7 @@ fn visit_relation(model_id: ast::ModelId, relation_field_id: RelationFieldId, ct
                 unknown_fields,
             }) => {
                 if !unknown_fields.is_empty() {
-                    let model_name = ctx.ast[ctx.types[relation_field_id].referenced_model].name();
+                    let model_name = ctx.asts[ctx.types[relation_field_id].referenced_model].name();
 
                     let field_names = unknown_fields
                         .into_iter()
@@ -742,7 +751,7 @@ fn visit_relation(model_id: ast::ModelId, relation_field_id: RelationFieldId, ct
                 if !relation_fields.is_empty() {
                     let msg = format!(
                         "The argument `references` must refer only to scalar fields in the related model `{}`. But it is referencing the following relation fields: {}",
-                        ctx.ast[ctx.types[relation_field_id].referenced_model].name(),
+                        ctx.asts[ctx.types[relation_field_id].referenced_model].name(),
                         relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", "),
                     );
                     ctx.push_error(DatamodelError::new_validation_error(&msg, attr.span));
@@ -806,7 +815,7 @@ enum FieldResolutionError<'ast> {
     AlreadyDealtWith,
     ProblematicFields {
         /// Fields that do not exist on the model.
-        unknown_fields: Vec<(ast::TopId, &'ast str)>,
+        unknown_fields: Vec<(crate::TopId, &'ast str)>,
         /// Fields that exist on the model but are relation fields.
         relation_fields: Vec<(&'ast ast::Field, ast::FieldId)>,
     },
@@ -818,9 +827,10 @@ enum FieldResolutionError<'ast> {
 fn resolve_field_array_without_args<'db>(
     values: &'db ast::Expression,
     attribute_span: ast::Span,
-    model_id: ast::ModelId,
+    model_id: crate::ModelId,
     ctx: &mut Context<'db>,
 ) -> Result<Vec<ScalarFieldId>, FieldResolutionError<'db>> {
+    let file_id = model_id.0;
     let constant_array = match coerce_array(values, &coerce::constant, ctx.diagnostics) {
         Some(values) => values,
         None => {
@@ -831,11 +841,11 @@ fn resolve_field_array_without_args<'db>(
     let mut field_ids: Vec<ScalarFieldId> = Vec::with_capacity(constant_array.len());
     let mut unknown_fields = Vec::new();
     let mut relation_fields = Vec::new();
-    let ast_model = &ctx.ast[model_id];
+    let ast_model = &ctx.asts[model_id];
 
     for field_name in constant_array {
         if field_name.contains('.') {
-            unknown_fields.push((ast::TopId::Model(model_id), field_name));
+            unknown_fields.push(((file_id, ast::TopId::Model(model_id.1)), field_name));
             continue;
         }
 
@@ -843,7 +853,7 @@ fn resolve_field_array_without_args<'db>(
         let field_id = if let Some(field_id) = ctx.find_model_field(model_id, field_name) {
             field_id
         } else {
-            unknown_fields.push((ast::TopId::Model(model_id), field_name));
+            unknown_fields.push(((file_id, ast::TopId::Model(model_id.1)), field_name));
             continue;
         };
 
@@ -851,7 +861,7 @@ fn resolve_field_array_without_args<'db>(
         let sfid = if let Some(sfid) = ctx.types.find_model_scalar_field(model_id, field_id) {
             sfid
         } else {
-            relation_fields.push((&ctx.ast[model_id][field_id], field_id));
+            relation_fields.push((&ctx.asts[model_id][field_id], field_id));
             continue;
         };
 
@@ -900,10 +910,11 @@ impl FieldResolvingSetup {
 fn resolve_field_array_with_args<'db>(
     values: &'db ast::Expression,
     attribute_span: ast::Span,
-    model_id: ast::ModelId,
+    model_id: crate::ModelId,
     resolving: FieldResolvingSetup,
     ctx: &mut Context<'db>,
 ) -> Result<Vec<FieldWithArgs>, FieldResolutionError<'db>> {
+    let file_id = model_id.0;
     let constant_array = match crate::types::index_fields::coerce_field_array_with_args(values, ctx.diagnostics) {
         Some(values) => values,
         None => return Err(FieldResolutionError::AlreadyDealtWith),
@@ -913,12 +924,12 @@ fn resolve_field_array_with_args<'db>(
     let mut unknown_fields = Vec::new();
     let mut relation_fields = Vec::new();
 
-    let ast_model = &ctx.ast[model_id];
+    let ast_model = &ctx.asts[model_id];
 
     'fields: for attrs in &constant_array {
         let path = if attrs.field_name.contains('.') {
             if !resolving.follow_composites() {
-                unknown_fields.push((ast::TopId::Model(model_id), attrs.field_name));
+                unknown_fields.push(((file_id, ast::TopId::Model(model_id.1)), attrs.field_name));
                 continue 'fields;
             }
 
@@ -930,7 +941,7 @@ fn resolve_field_array_with_args<'db>(
                     let field_id = match ctx.find_model_field(model_id, field_shard) {
                         Some(field_id) => field_id,
                         None => {
-                            unknown_fields.push((ast::TopId::Model(model_id), field_shard));
+                            unknown_fields.push(((file_id, ast::TopId::Model(model_id.1)), field_shard));
                             continue 'fields;
                         }
                     };
@@ -938,14 +949,14 @@ fn resolve_field_array_with_args<'db>(
                     let sfid = if let Some(sfid) = ctx.types.find_model_scalar_field(model_id, field_id) {
                         sfid
                     } else {
-                        relation_fields.push((&ctx.ast[model_id][field_id], field_id));
+                        relation_fields.push((&ctx.asts[model_id][field_id], field_id));
                         continue 'fields;
                     };
 
                     match &ctx.types[sfid].r#type {
                         ScalarFieldType::CompositeType(ctid) => (IndexFieldPath::new(sfid), ctid),
                         _ => {
-                            unknown_fields.push((ast::TopId::Model(model_id), attrs.field_name));
+                            unknown_fields.push(((file_id, ast::TopId::Model(model_id.1)), attrs.field_name));
                             continue 'fields;
                         }
                     }
@@ -961,7 +972,7 @@ fn resolve_field_array_with_args<'db>(
                 let field_id = match ctx.find_composite_type_field(*next_type, field_shard) {
                     Some(field_id) => field_id,
                     None => {
-                        unknown_fields.push((ast::TopId::CompositeType(*next_type), field_shard));
+                        unknown_fields.push(((next_type.0, ast::TopId::CompositeType(next_type.1)), field_shard));
                         continue 'fields;
                     }
                 };
@@ -973,7 +984,7 @@ fn resolve_field_array_with_args<'db>(
                         next_type = ctid;
                     }
                     _ if i < field_count - 1 => {
-                        unknown_fields.push((ast::TopId::Model(model_id), attrs.field_name));
+                        unknown_fields.push(((model_id.0, ast::TopId::Model(model_id.1)), attrs.field_name));
                         continue 'fields;
                     }
                     _ => (),
@@ -986,12 +997,12 @@ fn resolve_field_array_with_args<'db>(
             match ctx.types.find_model_scalar_field(model_id, field_id) {
                 Some(sfid) => IndexFieldPath::new(sfid),
                 None => {
-                    relation_fields.push((&ctx.ast[model_id][field_id], field_id));
+                    relation_fields.push((&ctx.asts[model_id][field_id], field_id));
                     continue;
                 }
             }
         } else {
-            unknown_fields.push((ast::TopId::Model(model_id), attrs.field_name));
+            unknown_fields.push(((model_id.0, ast::TopId::Model(model_id.1)), attrs.field_name));
             continue;
         };
 
@@ -1000,8 +1011,8 @@ fn resolve_field_array_with_args<'db>(
             let path_str = match path.field_in_index() {
                 either::Either::Left(_) => Cow::from(attrs.field_name),
                 either::Either::Right((ctid, field_id)) => {
-                    let field_name = &ctx.ast[ctid][field_id].name();
-                    let composite_type = &ctx.ast[ctid].name();
+                    let field_name = &ctx.asts[ctid][field_id].name();
+                    let composite_type = &ctx.asts[ctid].name();
 
                     Cow::from(format!("{field_name} in type {composite_type}"))
                 }

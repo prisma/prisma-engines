@@ -37,7 +37,7 @@ async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
           last_name  String? @db.VarChar(255)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view B {
           id         Int
           first_name String  @db.VarChar(255)
@@ -62,7 +62,7 @@ async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
     let expected = expect![[r#"
         *** WARNING ***
 
-        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
+        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
           - "B"
     "#]];
 
@@ -90,7 +90,7 @@ async fn simple_view_with_cte(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view A {
           bar Int
 
@@ -171,7 +171,7 @@ async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
           A            A       @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "Profile_User_fkey")
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view AB {
           id           Int
           name         String  @db.VarChar(511)
@@ -443,7 +443,7 @@ async fn views_cannot_have_default_values(api: &mut TestApi) -> TestResult {
           val Int? @default(2)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view B {
           id  Int
           val Int?

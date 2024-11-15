@@ -16,8 +16,8 @@
       {
         "name": "orderBy",
         "typeNames": [
-          "UserOrderByWithRelationAndSearchRelevanceInput[]",
-          "UserOrderByWithRelationAndSearchRelevanceInput"
+          "UserOrderByWithRelationInput[]",
+          "UserOrderByWithRelationInput"
         ]
       },
       {
@@ -41,7 +41,14 @@
       {
         "name": "distinct",
         "typeNames": [
+          "UserScalarFieldEnum",
           "UserScalarFieldEnum[]"
+        ]
+      },
+      {
+        "name": "relationLoadStrategy",
+        "typeNames": [
+          "RelationLoadStrategy"
         ]
       }
     ],

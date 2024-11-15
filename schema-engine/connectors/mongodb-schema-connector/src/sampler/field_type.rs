@@ -1,5 +1,5 @@
 use super::statistics::Name;
-use mongodb::bson::Bson;
+use bson::Bson;
 use std::fmt;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]

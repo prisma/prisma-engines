@@ -1,4 +1,4 @@
-use migration_engine_tests::test_api::*;
+use sql_migration_tests::test_api::*;
 
 #[test_connector(tags(Vitess))]
 fn dropping_mutually_referencing_tables_works(api: TestApi) {
@@ -16,7 +16,7 @@ fn dropping_mutually_referencing_tables_works(api: TestApi) {
     model B {
         id Int @id
         a_id Int
-        ba A @relation("BtoA", fields: [a_id], references: [id])
+        ba A @relation("BtoA", fields: [a_id], references: [id], onUpdate: NoAction)
         c_id Int
         bc C @relation("BtoC", fields: [c_id], references: [id])
         a  A[] @relation("AtoB")
@@ -26,9 +26,9 @@ fn dropping_mutually_referencing_tables_works(api: TestApi) {
     model C {
         id Int @id
         a_id Int
-        ca A @relation("CtoA", fields: [a_id], references: [id])
+        ca A @relation("CtoA", fields: [a_id], references: [id], onUpdate: NoAction)
         b_id Int
-        cb B @relation("CtoB", fields: [b_id], references: [id])
+        cb B @relation("CtoB", fields: [b_id], references: [id], onUpdate: NoAction)
         b  B[] @relation("BtoC")
         a  A[] @relation("AtoC")
     }

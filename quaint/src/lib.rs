@@ -104,35 +104,26 @@
 //! # }
 //! ```
 
-#![cfg_attr(feature = "docs", feature(doc_cfg))]
-
 #[cfg(not(any(feature = "sqlite", feature = "postgresql", feature = "mysql", feature = "mssql")))]
 compile_error!("one of 'sqlite', 'postgresql', 'mysql' or 'mssql' features must be enabled");
 
 #[macro_use]
 mod macros;
 
-#[macro_use]
-extern crate metrics;
-
-#[cfg(feature = "bigdecimal")]
-extern crate bigdecimal_ as bigdecimal;
+pub use bigdecimal;
+pub use chrono;
 
 pub mod ast;
 pub mod connector;
 pub mod error;
 #[cfg(feature = "pooled")]
-#[cfg_attr(feature = "docs", doc(cfg(pooled)))]
 pub mod pooled;
 pub mod prelude;
-#[cfg(feature = "serde-support")]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "serde-support")))]
-pub mod serde;
 pub mod single;
 #[cfg(test)]
 mod tests;
 pub mod visitor;
 
-pub use ast::Value;
+pub use ast::{Value, ValueType};
 
 pub type Result<T> = std::result::Result<T, error::Error>;

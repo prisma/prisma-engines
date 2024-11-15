@@ -3,7 +3,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use prisma_models::RelationFieldRef;
+use query_structure::RelationFieldRef;
 
 /// Only for many to many relations.
 ///
@@ -33,7 +33,7 @@ use prisma_models::RelationFieldRef;
 /// └─▶│     Connect     │
 ///    └─────────────────┘
 /// ```
-pub fn connect_records_node(
+pub(crate) fn connect_records_node(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
     child_node: &NodeRef,

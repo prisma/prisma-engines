@@ -14,11 +14,6 @@ impl<'a> TableWalker<'a> {
         self.columns().find(|column| column.name() == column_name)
     }
 
-    /// Get a column in the table, by name.
-    pub fn column_case_insensitive(self, column_name: &str) -> Option<TableColumnWalker<'a>> {
-        self.columns().find(|column| column.name() == column_name)
-    }
-
     fn columns_range(self) -> Range<usize> {
         super::range_for_key(&self.schema.table_columns, self.id, |(tid, _)| *tid)
     }

@@ -1,25 +1,26 @@
 use super::catch;
 use crate::{database::operations::*, Context, SqlError};
 use async_trait::async_trait;
-use connector::{ConnectionLike, RelAggregationSelection};
+use connector::ConnectionLike;
 use connector_interface::{
-    self as connector, filter::Filter, AggregationRow, AggregationSelection, QueryArguments, ReadOperations,
-    RecordFilter, Transaction, WriteArgs, WriteOperations,
+    self as connector, AggregationRow, AggregationSelection, ReadOperations, RecordFilter, Transaction, WriteArgs,
+    WriteOperations,
 };
-use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
 use quaint::prelude::ConnectionInfo;
+use query_structure::{prelude::*, Filter, QueryArguments, RelationLoadStrategy, SelectionResult};
 use std::collections::HashMap;
+use telemetry::helpers::TraceParent;
 
 pub struct SqlConnectorTransaction<'tx> {
-    inner: quaint::connector::Transaction<'tx>,
+    inner: Box<dyn quaint::connector::Transaction + 'tx>,
     connection_info: ConnectionInfo,
     features: psl::PreviewFeatures,
 }
 
 impl<'tx> SqlConnectorTransaction<'tx> {
     pub fn new(
-        tx: quaint::connector::Transaction<'tx>,
+        tx: Box<dyn quaint::connector::Transaction + 'tx>,
         connection_info: &ConnectionInfo,
         features: psl::PreviewFeatures,
     ) -> Self {
@@ -38,14 +39,14 @@ impl<'tx> ConnectionLike for SqlConnectorTransaction<'tx> {}
 #[async_trait]
 impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
     async fn commit(&mut self) -> connector::Result<()> {
-        catch(self.connection_info.clone(), async move {
+        catch(&self.connection_info, async {
             self.inner.commit().await.map_err(SqlError::from)
         })
         .await
     }
 
     async fn rollback(&mut self) -> connector::Result<()> {
-        catch(self.connection_info.clone(), async move {
+        catch(&self.connection_info, async {
             let res = self.inner.rollback().await.map_err(SqlError::from);
 
             match res {
@@ -54,6 +55,10 @@ impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
             }
         })
         .await
+    }
+
+    async fn version(&self) -> Option<String> {
+        self.connection_info.version().map(|v| v.to_string())
     }
 
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {
@@ -65,47 +70,47 @@ impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
 impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
     async fn get_single_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         filter: &Filter,
         selected_fields: &FieldSelection,
-        aggr_selections: &[RelAggregationSelection],
-        trace_id: Option<String>,
+        relation_load_strategy: RelationLoadStrategy,
+        traceparent: Option<TraceParent>,
     ) -> connector::Result<Option<SingleRecord>> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        let ctx = Context::new(&self.connection_info, traceparent);
+        catch(
+            &self.connection_info,
             read::get_single_record(
-                &self.inner,
+                self.inner.as_queryable(),
                 model,
                 filter,
-                &selected_fields.into(),
-                aggr_selections,
+                selected_fields,
+                relation_load_strategy,
                 &ctx,
-            )
-            .await
-        })
+            ),
+        )
         .await
     }
 
     async fn get_many_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
-        aggr_selections: &[RelAggregationSelection],
-        trace_id: Option<String>,
+        relation_load_strategy: RelationLoadStrategy,
+        traceparent: Option<TraceParent>,
     ) -> connector::Result<ManyRecords> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+        let ctx = Context::new(&self.connection_info, traceparent);
+        catch(
+            &self.connection_info,
             read::get_many_records(
-                &self.inner,
+                self.inner.as_queryable(),
                 model,
                 query_arguments,
-                &selected_fields.into(),
-                aggr_selections,
+                selected_fields,
+                relation_load_strategy,
                 &ctx,
-            )
-            .await
-        })
+            ),
+        )
         .await
     }
 
@@ -113,28 +118,37 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         &mut self,
         from_field: &RelationFieldRef,
         from_record_ids: &[SelectionResult],
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> connector::Result<Vec<(SelectionResult, SelectionResult)>> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids, &ctx).await
+        let ctx = Context::new(&self.connection_info, traceparent);
+        catch(&self.connection_info, async {
+            read::get_related_m2m_record_ids(self.inner.as_queryable(), from_field, from_record_ids, &ctx).await
         })
         .await
     }
 
     async fn aggregate_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: QueryArguments,
         selections: Vec<AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
         having: Option<Filter>,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> connector::Result<Vec<AggregationRow>> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            read::aggregate(&self.inner, model, query_arguments, selections, group_by, having, &ctx).await
-        })
+        let ctx = Context::new(&self.connection_info, traceparent);
+        catch(
+            &self.connection_info,
+            read::aggregate(
+                self.inner.as_queryable(),
+                model,
+                query_arguments,
+                selections,
+                group_by,
+                having,
+                &ctx,
+            ),
+        )
         .await
     }
 }
@@ -143,81 +157,138 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
 impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
     async fn create_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: WriteArgs,
-        trace_id: Option<String>,
-    ) -> connector::Result<SelectionResult> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::create_record(&self.inner, &self.connection_info.sql_family(), model, args, &ctx).await
-        })
+        selected_fields: FieldSelection,
+        traceparent: Option<TraceParent>,
+    ) -> connector::Result<SingleRecord> {
+        let ctx = Context::new(&self.connection_info, traceparent);
+        catch(
+            &self.connection_info,
+            write::create_record(
+                self.inner.as_queryable(),
+                &self.connection_info.sql_family(),
+                model,
+                args,
+                selected_fields,
+                &ctx,
+            ),
+        )
         .await
     }
 
     async fn create_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> connector::Result<usize> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::create_records(&self.inner, model, args, skip_duplicates, &ctx).await
-        })
+        let ctx = Context::new(&self.connection_info, traceparent);
+        catch(
+            &self.connection_info,
+            write::create_records_count(self.inner.as_queryable(), model, args, skip_duplicates, &ctx),
+        )
+        .await
+    }
+
+    async fn create_records_returning(
+        &mut self,
+        model: &Model,
+        args: Vec<WriteArgs>,
+        skip_duplicates: bool,
+        selected_fields: FieldSelection,
+        traceparent: Option<TraceParent>,
+    ) -> connector::Result<ManyRecords> {
+        let ctx = Context::new(&self.connection_info, traceparent);
+        catch(
+            &self.connection_info,
+            write::create_records_returning(
+                self.inner.as_queryable(),
+                model,
+                args,
+                skip_duplicates,
+                selected_fields,
+                &ctx,
+            ),
+        )
         .await
     }
 
     async fn update_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> connector::Result<usize> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::update_records(&self.inner, model, record_filter, args, &ctx).await
-        })
+        let ctx = Context::new(&self.connection_info, traceparent);
+        catch(
+            &self.connection_info,
+            write::update_records(self.inner.as_queryable(), model, record_filter, args, &ctx),
+        )
         .await
     }
 
     async fn update_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
-        trace_id: Option<String>,
-    ) -> connector::Result<Option<SelectionResult>> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            let mut res = write::update_record(&self.inner, model, record_filter, args, &ctx).await?;
-            Ok(res.pop())
-        })
+        selected_fields: Option<FieldSelection>,
+        traceparent: Option<TraceParent>,
+    ) -> connector::Result<Option<SingleRecord>> {
+        let ctx = Context::new(&self.connection_info, traceparent);
+        catch(
+            &self.connection_info,
+            write::update_record(
+                self.inner.as_queryable(),
+                model,
+                record_filter,
+                args,
+                selected_fields,
+                &ctx,
+            ),
+        )
         .await
     }
 
     async fn delete_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> connector::Result<usize> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::delete_records(&self.inner, model, record_filter, &ctx).await
+        catch(&self.connection_info, async {
+            let ctx = Context::new(&self.connection_info, traceparent);
+            write::delete_records(self.inner.as_queryable(), model, record_filter, &ctx).await
         })
+        .await
+    }
+
+    async fn delete_record(
+        &mut self,
+        model: &Model,
+        record_filter: RecordFilter,
+        selected_fields: FieldSelection,
+        traceparent: Option<TraceParent>,
+    ) -> connector::Result<SingleRecord> {
+        let ctx = Context::new(&self.connection_info, traceparent);
+        catch(
+            &self.connection_info,
+            write::delete_record(self.inner.as_queryable(), model, record_filter, selected_fields, &ctx),
+        )
         .await
     }
 
     async fn native_upsert_record(
         &mut self,
         upsert: connector_interface::NativeUpsert,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> connector::Result<SingleRecord> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            upsert::native_upsert(&self.inner, upsert, &ctx).await
+        catch(&self.connection_info, async {
+            let ctx = Context::new(&self.connection_info, traceparent);
+            upsert::native_upsert(self.inner.as_queryable(), upsert, &ctx).await
         })
         .await
     }
@@ -227,11 +298,11 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         field: &RelationFieldRef,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> connector::Result<()> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::m2m_connect(&self.inner, field, parent_id, child_ids, &ctx).await
+        catch(&self.connection_info, async {
+            let ctx = Context::new(&self.connection_info, traceparent);
+            write::m2m_connect(self.inner.as_queryable(), field, parent_id, child_ids, &ctx).await
         })
         .await
     }
@@ -241,31 +312,34 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         field: &RelationFieldRef,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> connector::Result<()> {
-        catch(self.connection_info.clone(), async move {
-            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::m2m_disconnect(&self.inner, field, parent_id, child_ids, &ctx).await
-        })
+        let ctx = Context::new(&self.connection_info, traceparent);
+        catch(
+            &self.connection_info,
+            write::m2m_disconnect(self.inner.as_queryable(), field, parent_id, child_ids, &ctx),
+        )
         .await
     }
 
     async fn execute_raw(&mut self, inputs: HashMap<String, PrismaValue>) -> connector::Result<usize> {
-        catch(self.connection_info.clone(), async move {
-            write::execute_raw(&self.inner, self.features, inputs).await
-        })
+        catch(
+            &self.connection_info,
+            write::execute_raw(self.inner.as_queryable(), self.features, inputs),
+        )
         .await
     }
 
     async fn query_raw(
         &mut self,
-        _model: Option<&ModelRef>,
+        _model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         _query_type: Option<String>,
-    ) -> connector::Result<serde_json::Value> {
-        catch(self.connection_info.clone(), async move {
-            write::query_raw(&self.inner, inputs).await
-        })
+    ) -> connector::Result<RawJson> {
+        catch(
+            &self.connection_info,
+            write::query_raw(self.inner.as_queryable(), inputs),
+        )
         .await
     }
 }

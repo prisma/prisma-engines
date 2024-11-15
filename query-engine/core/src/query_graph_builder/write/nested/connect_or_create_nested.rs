@@ -4,8 +4,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     Computation, ParsedInputMap, ParsedInputValue,
 };
-use connector::{Filter, IntoFilter};
-use prisma_models::{ModelRef, RelationFieldRef, SelectionResult};
+use query_structure::{Filter, IntoFilter, Model, RelationFieldRef, SelectionResult};
 use schema::constants::args;
 use std::convert::TryInto;
 
@@ -15,11 +14,11 @@ use std::convert::TryInto;
 /// Information on the graph shapes can be found on the individual handlers.
 pub(crate) fn nested_connect_or_create(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: &ModelRef,
+    value: ParsedInputValue<'_>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
     let values = utils::coerce_vec(value);
@@ -27,7 +26,7 @@ pub(crate) fn nested_connect_or_create(
     if relation.is_many_to_many() {
         handle_many_to_many(
             graph,
-            connector_ctx,
+            query_schema,
             parent_node,
             parent_relation_field,
             values,
@@ -36,7 +35,7 @@ pub(crate) fn nested_connect_or_create(
     } else if relation.is_one_to_many() {
         handle_one_to_many(
             graph,
-            connector_ctx,
+            query_schema,
             parent_node,
             parent_relation_field,
             values,
@@ -45,7 +44,7 @@ pub(crate) fn nested_connect_or_create(
     } else {
         handle_one_to_one(
             graph,
-            connector_ctx,
+            query_schema,
             parent_node,
             parent_relation_field,
             values,
@@ -90,20 +89,20 @@ pub(crate) fn nested_connect_or_create(
 /// ```
 fn handle_many_to_many(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    values: Vec<ParsedInputValue>,
-    child_model: &ModelRef,
+    values: Vec<ParsedInputValue<'_>>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     for value in values {
-        let mut value: ParsedInputMap = value.try_into()?;
+        let mut value: ParsedInputMap<'_> = value.try_into()?;
 
-        let where_arg = value.remove(args::WHERE).unwrap();
-        let where_map: ParsedInputMap = where_arg.try_into()?;
+        let where_arg = value.swap_remove(args::WHERE).unwrap();
+        let where_map: ParsedInputMap<'_> = where_arg.try_into()?;
 
-        let create_arg = value.remove(args::CREATE).unwrap();
-        let create_map: ParsedInputMap = create_arg.try_into()?;
+        let create_arg = value.swap_remove(args::CREATE).unwrap();
+        let create_map: ParsedInputMap<'_> = create_arg.try_into()?;
 
         let filter = extract_unique_filter(where_map, child_model)?;
         let read_node = graph.create_node(utils::read_ids_infallible(
@@ -112,7 +111,7 @@ fn handle_many_to_many(
             filter,
         ));
 
-        let create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_map)?;
+        let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)?;
         let if_node = graph.create_node(Flow::default_if());
 
         let connect_exists_node =
@@ -147,16 +146,16 @@ fn handle_many_to_many(
 /// Dispatcher for one-to-many relations.
 fn handle_one_to_many(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    values: Vec<ParsedInputValue>,
-    child_model: &ModelRef,
+    values: Vec<ParsedInputValue<'_>>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     if parent_relation_field.is_inlined_on_enclosing_model() {
         one_to_many_inlined_parent(
             graph,
-            connector_ctx,
+            query_schema,
             parent_node,
             parent_relation_field,
             values,
@@ -165,7 +164,7 @@ fn handle_one_to_many(
     } else {
         one_to_many_inlined_child(
             graph,
-            connector_ctx,
+            query_schema,
             parent_node,
             parent_relation_field,
             values,
@@ -177,27 +176,27 @@ fn handle_one_to_many(
 /// Dispatcher for one-to-one relations.
 fn handle_one_to_one(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    mut values: Vec<ParsedInputValue>,
-    child_model: &ModelRef,
+    mut values: Vec<ParsedInputValue<'_>>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let value = values.pop().unwrap();
-    let mut value: ParsedInputMap = value.try_into()?;
+    let mut value: ParsedInputMap<'_> = value.try_into()?;
 
-    let where_arg = value.remove(args::WHERE).unwrap();
-    let where_map: ParsedInputMap = where_arg.try_into()?;
+    let where_arg = value.swap_remove(args::WHERE).unwrap();
+    let where_map: ParsedInputMap<'_> = where_arg.try_into()?;
 
-    let create_arg = value.remove(args::CREATE).unwrap();
-    let create_data: ParsedInputMap = create_arg.try_into()?;
+    let create_arg = value.swap_remove(args::CREATE).unwrap();
+    let create_data: ParsedInputMap<'_> = create_arg.try_into()?;
 
     let filter = extract_unique_filter(where_map, child_model)?;
 
     if parent_relation_field.is_inlined_on_enclosing_model() {
         one_to_one_inlined_parent(
             graph,
-            connector_ctx,
+            query_schema,
             parent_node,
             parent_relation_field,
             filter,
@@ -207,7 +206,7 @@ fn handle_one_to_one(
     } else {
         one_to_one_inlined_child(
             graph,
-            connector_ctx,
+            query_schema,
             parent_node,
             parent_relation_field,
             filter,
@@ -248,23 +247,23 @@ fn handle_one_to_one(
 /// ```
 fn one_to_many_inlined_child(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    values: Vec<ParsedInputValue>,
-    child_model: &ModelRef,
+    values: Vec<ParsedInputValue<'_>>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     for value in values {
         let parent_link = parent_relation_field.linking_fields();
         let child_link = parent_relation_field.related_field().linking_fields();
 
-        let mut value: ParsedInputMap = value.try_into()?;
+        let mut value: ParsedInputMap<'_> = value.try_into()?;
 
-        let where_arg = value.remove(args::WHERE).unwrap();
-        let where_map: ParsedInputMap = where_arg.try_into()?;
+        let where_arg = value.swap_remove(args::WHERE).unwrap();
+        let where_map: ParsedInputMap<'_> = where_arg.try_into()?;
 
-        let create_arg = value.remove(args::CREATE).unwrap();
-        let create_map: ParsedInputMap = create_arg.try_into()?;
+        let create_arg = value.swap_remove(args::CREATE).unwrap();
+        let create_map: ParsedInputMap<'_> = create_arg.try_into()?;
 
         let filter = extract_unique_filter(where_map, child_model)?;
         let read_node = graph.create_node(utils::read_ids_infallible(
@@ -275,7 +274,7 @@ fn one_to_many_inlined_child(
 
         let if_node = graph.create_node(Flow::default_if());
         let update_child_node = utils::update_records_node_placeholder(graph, filter, child_model.clone());
-        let create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_map)?;
+        let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)?;
 
         graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
         graph.create_edge(&if_node, &update_child_node, QueryGraphDependency::Then)?;
@@ -387,23 +386,23 @@ fn one_to_many_inlined_child(
 ///    └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
 fn one_to_many_inlined_parent(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    mut values: Vec<ParsedInputValue>,
-    child_model: &ModelRef,
+    mut values: Vec<ParsedInputValue<'_>>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let parent_link = parent_relation_field.linking_fields();
     let child_link = parent_relation_field.related_field().linking_fields();
 
     let value = values.pop().unwrap();
-    let mut value: ParsedInputMap = value.try_into()?;
+    let mut value: ParsedInputMap<'_> = value.try_into()?;
 
-    let where_arg = value.remove(args::WHERE).unwrap();
-    let where_map: ParsedInputMap = where_arg.try_into()?;
+    let where_arg = value.swap_remove(args::WHERE).unwrap();
+    let where_map: ParsedInputMap<'_> = where_arg.try_into()?;
 
-    let create_arg = value.remove(args::CREATE).unwrap();
-    let create_map: ParsedInputMap = create_arg.try_into()?;
+    let create_arg = value.swap_remove(args::CREATE).unwrap();
+    let create_map: ParsedInputMap<'_> = create_arg.try_into()?;
 
     let filter = extract_unique_filter(where_map, child_model)?;
     let read_node = graph.create_node(utils::read_ids_infallible(
@@ -416,7 +415,7 @@ fn one_to_many_inlined_parent(
     graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
 
     let if_node = graph.create_node(Flow::default_if());
-    let create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_map)?;
+    let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)?;
     let return_existing = graph.create_node(Flow::Return(None));
     let return_create = graph.create_node(Flow::Return(None));
 
@@ -558,12 +557,12 @@ fn one_to_many_inlined_parent(
 /// and updating the record with the injection beforehand prevents that check. Instead, we need an additional update.
 fn one_to_one_inlined_parent(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
-    create_data: ParsedInputMap,
-    child_model: &ModelRef,
+    create_data: ParsedInputMap<'_>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let parent_link = parent_relation_field.linking_fields();
     let child_link = parent_relation_field.related_field().linking_fields();
@@ -578,7 +577,7 @@ fn one_to_one_inlined_parent(
     graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
 
     let if_node = graph.create_node(Flow::default_if());
-    let create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_data)?;
+    let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_data)?;
     let return_existing = graph.create_node(Flow::Return(None));
     let return_create = graph.create_node(Flow::Return(None));
 
@@ -775,12 +774,12 @@ fn one_to_one_inlined_parent(
 /// but they're never build at the same time (denoted by the dashed boxes).
 fn one_to_one_inlined_child(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
-    create_data: ParsedInputMap,
-    child_model: &ModelRef,
+    create_data: ParsedInputMap<'_>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let child_model_identifier = child_model.primary_identifier();
     let parent_link = parent_relation_field.linking_fields();
@@ -797,7 +796,7 @@ fn one_to_one_inlined_child(
     graph.create_edge(&parent_node, &read_new_child_node, QueryGraphDependency::ExecutionOrder)?;
 
     let if_node = graph.create_node(Flow::default_if());
-    let create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_data)?;
+    let create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_data)?;
 
     // Edge: Read new child -> if node
     graph.create_edge(

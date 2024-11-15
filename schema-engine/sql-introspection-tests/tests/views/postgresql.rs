@@ -38,7 +38,8 @@ async fn preview_feature_is_required(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("views"))]
+// See next test after this one for PostgreSQL 16
+#[test_connector(tags(Postgres), exclude(Postgres16), exclude(CockroachDb), preview_features("views"))]
 async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE "User" (
@@ -70,7 +71,7 @@ async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
           last_name  String? @db.VarChar(255)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view Schwuser {
           id         Int?
           first_name String? @db.VarChar(255)
@@ -95,7 +96,81 @@ async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
     let expected = expect![[r#"
         *** WARNING ***
 
-        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
+        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
+          - "Schwuser"
+    "#]];
+    api.expect_warnings(&expected).await;
+
+    Ok(())
+}
+
+// PostgreSQL 16 only
+// the expect_view_definition is slightly different than for previous versions
+#[test_connector(tags(Postgres16), preview_features("views"))]
+async fn simple_view_from_one_table_postgres16(api: &mut TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE "User" (
+            id SERIAL PRIMARY KEY,
+            first_name VARCHAR(255) NOT NULL,
+            last_name VARCHAR(255) NULL
+        );
+
+        CREATE VIEW "Schwuser" AS
+            SELECT id, first_name, last_name FROM "User";
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["views"]
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model User {
+          id         Int     @id @default(autoincrement())
+          first_name String  @db.VarChar(255)
+          last_name  String? @db.VarChar(255)
+        }
+
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+        view Schwuser {
+          id         Int?
+          first_name String? @db.VarChar(255)
+          last_name  String? @db.VarChar(255)
+
+          @@ignore
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    // For Postgres <16 it looks like this:
+    // SELECT
+    //   "User".id,
+    //   "User".first_name,
+    //   "User".last_name
+    // FROM
+    //   "User";
+    let expected = expect![[r#"
+        SELECT
+          id,
+          first_name,
+          last_name
+        FROM
+          "User";"#]];
+
+    api.expect_view_definition("Schwuser", &expected).await;
+
+    let expected = expect![[r#"
+        *** WARNING ***
+
+        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
           - "Schwuser"
     "#]];
     api.expect_warnings(&expected).await;
@@ -153,7 +228,7 @@ async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
           Profile    Profile?
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view Schwuser {
           id           Int?
           name         String?
@@ -684,7 +759,7 @@ async fn reserved_name_gets_mapped(api: &mut TestApi) -> TestResult {
         }
 
         /// This view has been renamed to 'Renamedif' during introspection, because the original name 'if' is reserved.
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view Renamedif {
           id Int?
 
@@ -724,10 +799,10 @@ async fn unsupported_types_trigger_a_warning(api: &mut TestApi) -> TestResult {
     let expected = expect![[r#"
         *** WARNING ***
 
-        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
+        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
           - "A"
 
-        These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
+        These fields are not supported by Prisma Client, because Prisma currently does not support their types:
           - View: "A", field: "vector", original data type: "tsvector"
     "#]];
 
@@ -833,7 +908,7 @@ async fn schema_is_introspected(api: &mut TestApi) -> TestResult {
           schemas  = ["public"]
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view A {
           id Int?
 
@@ -873,7 +948,7 @@ async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view A {
           id Int? @default(3)
 
@@ -945,7 +1020,7 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view A {
           foo Int?
 
@@ -963,7 +1038,7 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
         These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
           - View: "A", field(s): ["1"]
 
-        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
+        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
           - "A"
     "#]];
 
@@ -1006,7 +1081,7 @@ async fn dupes_are_renamed(api: &mut TestApi) -> TestResult {
           @@schema("private")
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view public_A {
           id Int?
 
@@ -1021,10 +1096,10 @@ async fn dupes_are_renamed(api: &mut TestApi) -> TestResult {
     let expected = expect![[r#"
         *** WARNING ***
 
-        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
+        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
           - "public_A"
 
-        These items were renamed due to their names being duplicates in the Prisma Schema Language:
+        These items were renamed due to their names being duplicates in the Prisma schema:
           - Type: "model", name: "private_A"
           - Type: "view", name: "public_A"
     "#]];
@@ -1085,7 +1160,7 @@ async fn ignore_docs_only_added_once(api: &mut TestApi) -> TestResult {
     api.raw_cmd(setup).await;
 
     let input_dm = indoc! {r#"
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view A {
           id Int?
 
@@ -1094,7 +1169,7 @@ async fn ignore_docs_only_added_once(api: &mut TestApi) -> TestResult {
     "#};
 
     let expectation = expect![[r#"
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view A {
           id Int?
 

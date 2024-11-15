@@ -5,26 +5,27 @@ version = "0.1.0"
 
 [dependencies]
 anyhow = "1.0"
-async-trait = "0.1"
+async-trait.workspace = true
 bigdecimal = "0.3"
-# bson = {version = "1.1.0", features = ["decimal128"]}
-futures = "0.3"
-itertools = "0.10"
-mongodb = "2.3.0"
-bson = { version = "2.4.0", features = ["chrono-0_4", "uuid-1"] }
-rand = "0.7"
-regex = "1"
-serde_json = { version = "1.0", features = ["float_roundtrip"] }
+futures.workspace = true
+itertools.workspace = true
+mongodb.workspace = true
+bson.workspace = true
+rand.workspace = true
+regex.workspace = true
+serde_json.workspace = true
 thiserror = "1.0"
 tokio.workspace = true
-tracing = "0.1"
-tracing-futures = "0.2"
+tracing.workspace = true
+tracing-futures.workspace = true
 uuid.workspace = true
-indexmap = "1.7"
-query-engine-metrics = {path = "../../metrics"}
+indexmap.workspace = true
+prisma-metrics.path = "../../../libs/metrics"
+cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
+derive_more.workspace = true
 
-[dependencies.prisma-models]
-path = "../../prisma-models"
+[dependencies.query-structure]
+path = "../../query-structure"
 
 [dependencies.mongodb-client]
 path = "../../../libs/mongodb-client"
@@ -36,6 +37,9 @@ path = "../query-connector"
 [dependencies.prisma-value]
 path = "../../../libs/prisma-value"
 
+[dependencies.telemetry]
+path = "../../../libs/telemetry"
+
 [dependencies.chrono]
 features = ["serde"]
 version = "0.4"
@@ -46,9 +50,9 @@ workspace = true
 [dependencies.serde]
 workspace = true
 
-[dependencies.cuid]
-version = "1.2"
-
 [dependencies.user-facing-errors]
 features = ["sql"]
 workspace = true
+
+[dev-dependencies]
+pretty_assertions = "1.4.0"

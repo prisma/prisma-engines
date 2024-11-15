@@ -4,12 +4,12 @@ use schema_core::schema_connector::{ConnectorError, ConnectorResult};
 use url::Url;
 
 pub(crate) async fn cockroach_setup(url: String, prisma_schema: &str) -> ConnectorResult<()> {
-    let mut url = Url::parse(&url).map_err(ConnectorError::url_parse_error)?;
-    let mut quaint_url = quaint::connector::PostgresUrl::new(url.clone()).unwrap();
+    let mut parsed_url = Url::parse(&url).map_err(ConnectorError::url_parse_error)?;
+    let mut quaint_url = quaint::connector::PostgresNativeUrl::new(parsed_url.clone()).unwrap();
     quaint_url.set_flavour(PostgresFlavour::Cockroach);
 
     let db_name = quaint_url.dbname();
-    let conn = create_admin_conn(&mut url).await?;
+    let conn = create_admin_conn(&mut parsed_url).await?;
 
     let query = format!(
         r#"
@@ -20,11 +20,9 @@ pub(crate) async fn cockroach_setup(url: String, prisma_schema: &str) -> Connect
 
     conn.raw_cmd(&query).await.unwrap();
 
-    crate::diff_and_apply(prisma_schema).await;
-
-    drop_db_when_thread_exits(url, db_name);
-
-    Ok(())
+    drop_db_when_thread_exits(parsed_url, db_name);
+    let mut connector = sql_schema_connector::SqlSchemaConnector::new_cockroach();
+    crate::diff_and_apply(prisma_schema, url, &mut connector).await
 }
 
 async fn create_admin_conn(url: &mut Url) -> ConnectorResult<Quaint> {
@@ -69,7 +67,7 @@ fn drop_db_when_thread_exits(admin_url: Url, db_name: &str) {
     }
 
     thread_local! {
-        static NOTIFIER: RefCell<Option<Notifier>> = RefCell::new(None);
+        static NOTIFIER: RefCell<Option<Notifier>> = const { RefCell::new(None) };
     }
 
     NOTIFIER.with(move |cell| {

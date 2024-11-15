@@ -5,31 +5,32 @@ pub use index::*;
 pub use result_row::*;
 
 use crate::{ast::Value, error::*};
+use serde_json::Map;
 use std::sync::Arc;
 
-#[cfg(feature = "json")]
-use serde_json::Map;
+use super::ColumnType;
 
 /// Encapsulates a set of results and their respective column names.
 #[derive(Debug, Default)]
 pub struct ResultSet {
     pub(crate) columns: Arc<Vec<String>>,
+    pub(crate) types: Vec<ColumnType>,
     pub(crate) rows: Vec<Vec<Value<'static>>>,
     pub(crate) last_insert_id: Option<u64>,
 }
 
 impl ResultSet {
     /// Creates a new instance, bound to the given column names and result rows.
-    pub fn new(names: Vec<String>, rows: Vec<Vec<Value<'static>>>) -> Self {
+    pub fn new(names: Vec<String>, types: Vec<ColumnType>, rows: Vec<Vec<Value<'static>>>) -> Self {
         Self {
             columns: Arc::new(names),
+            types,
             rows,
             last_insert_id: None,
         }
     }
 
-    #[cfg(any(feature = "sqlite", feature = "mysql"))]
-    pub(crate) fn set_last_insert_id(&mut self, id: u64) {
+    pub fn set_last_insert_id(&mut self, id: u64) {
         self.last_insert_id = Some(id);
     }
 
@@ -64,6 +65,7 @@ impl ResultSet {
         self.rows.get(index).map(|row| ResultRowRef {
             columns: Arc::clone(&self.columns),
             values: row,
+            types: self.types.clone(),
         })
     }
 
@@ -74,15 +76,28 @@ impl ResultSet {
             None => Err(Error::builder(ErrorKind::NotFound).build()),
         }
     }
+
+    pub fn iter(&self) -> ResultSetIterator<'_> {
+        ResultSetIterator {
+            columns: self.columns.clone(),
+            types: self.types.clone(),
+            internal_iterator: self.rows.iter(),
+        }
+    }
+
+    pub fn types(&self) -> &[ColumnType] {
+        &self.types
+    }
 }
 
 impl IntoIterator for ResultSet {
     type Item = ResultRow;
-    type IntoIter = ResultSetIterator;
+    type IntoIter = ResultSetIntoIterator;
 
     fn into_iter(self) -> Self::IntoIter {
-        ResultSetIterator {
+        ResultSetIntoIterator {
             columns: self.columns,
+            types: self.types.clone(),
             internal_iterator: self.rows.into_iter(),
         }
     }
@@ -90,12 +105,13 @@ impl IntoIterator for ResultSet {
 
 /// Thin iterator for ResultSet rows.
 /// Might become lazy one day.
-pub struct ResultSetIterator {
+pub struct ResultSetIntoIterator {
     pub(crate) columns: Arc<Vec<String>>,
+    pub(crate) types: Vec<ColumnType>,
     pub(crate) internal_iterator: std::vec::IntoIter<Vec<Value<'static>>>,
 }
 
-impl Iterator for ResultSetIterator {
+impl Iterator for ResultSetIntoIterator {
     type Item = ResultRow;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -103,14 +119,34 @@ impl Iterator for ResultSetIterator {
             Some(row) => Some(ResultRow {
                 columns: Arc::clone(&self.columns),
                 values: row,
+                types: self.types.clone(),
             }),
             None => None,
         }
     }
 }
 
-#[cfg(feature = "json")]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "json")))]
+pub struct ResultSetIterator<'a> {
+    pub(crate) columns: Arc<Vec<String>>,
+    pub(crate) types: Vec<ColumnType>,
+    pub(crate) internal_iterator: std::slice::Iter<'a, Vec<Value<'static>>>,
+}
+
+impl<'a> Iterator for ResultSetIterator<'a> {
+    type Item = ResultRowRef<'a>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.internal_iterator.next() {
+            Some(row) => Some(ResultRowRef {
+                columns: Arc::clone(&self.columns),
+                values: row,
+                types: self.types.clone(),
+            }),
+            None => None,
+        }
+    }
+}
+
 impl From<ResultSet> for serde_json::Value {
     fn from(result_set: ResultSet) -> Self {
         let columns: Vec<String> = result_set.columns().iter().map(ToString::to_string).collect();

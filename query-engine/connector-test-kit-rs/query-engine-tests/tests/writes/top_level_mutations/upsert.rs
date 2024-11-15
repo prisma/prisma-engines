@@ -396,6 +396,35 @@ mod upsert {
         Ok(())
     }
 
+    #[connector_test(schema(schema), relation_mode = "prisma")]
+    async fn upsert_called_twice_does_nothing(runner: Runner) -> TestResult<()> {
+        assert_eq!(count_todo(&runner).await?, 0);
+
+        const MUTATION: &str = r#"mutation {
+            upsertOneTodo(
+                where: {id: 1}
+                create: {
+                    id: 1,
+                    title: "title"
+                    alias: "alias"
+                }
+                update: {
+                title: { set: "title" }
+                }
+            ){
+                id
+              title
+            }
+        }"#;
+
+        insta::assert_snapshot!(run_query!(&runner, MUTATION), @r#"{"data":{"upsertOneTodo":{"id":1,"title":"title"}}}"#);
+        insta::assert_snapshot!(run_query!(&runner, MUTATION), @r#"{"data":{"upsertOneTodo":{"id":1,"title":"title"}}}"#);
+
+        assert_eq!(count_todo(&runner).await?, 1);
+
+        Ok(())
+    }
+
     fn schema_number() -> String {
         let schema = indoc! {
             r#"model TestModel {

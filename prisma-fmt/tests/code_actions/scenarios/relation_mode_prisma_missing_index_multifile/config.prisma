@@ -1,0 +1,10 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["prismaSchemaFolder"]
+}
+
+datasource db {
+    provider     = "mysql"
+    url          = env("TEST_DATABASE_URL")
+    relationMode = "prisma"
+}

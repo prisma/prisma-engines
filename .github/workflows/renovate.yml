@@ -1,0 +1,14 @@
+name: "Validate renovate.json"
+on:
+  pull_request:
+    paths:
+      - "renovate.json"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: suzuki-shunsuke/github-action-renovate-config-validator@v1.0.1
+        with:
+          strict: "false"

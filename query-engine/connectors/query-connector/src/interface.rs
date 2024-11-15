@@ -1,15 +1,19 @@
-use crate::{coerce_null_to_zero_value, Filter, NativeUpsert, QueryArguments, WriteArgs};
+use crate::{NativeUpsert, WriteArgs};
 use async_trait::async_trait;
-use prisma_models::{ast::FieldArity, *};
 use prisma_value::PrismaValue;
+use query_structure::{ast::FieldArity, *};
 use std::collections::HashMap;
+use telemetry::helpers::TraceParent;
 
 #[async_trait]
 pub trait Connector {
     /// Returns a connection to a data source.
     async fn get_connection(&self) -> crate::Result<Box<dyn Connection + Send + Sync>>;
 
-    /// Returns the name of the connector.
+    /// Returns the database system name, as per the OTEL spec.
+    /// Reference:
+    /// - https://opentelemetry.io/docs/specs/semconv/database/sql/
+    /// - https://opentelemetry.io/docs/specs/semconv/database/mongodb/
     fn name(&self) -> &'static str;
 
     /// Returns whether a connector should retry an entire transaction when that transaction failed during its execution
@@ -24,6 +28,8 @@ pub trait Connection: ConnectionLike {
         isolation_level: Option<String>,
     ) -> crate::Result<Box<dyn Transaction + 'a>>;
 
+    async fn version(&self) -> Option<String>;
+
     /// Explicit upcast.
     fn as_connection_like(&mut self) -> &mut dyn ConnectionLike;
 }
@@ -32,6 +38,8 @@ pub trait Connection: ConnectionLike {
 pub trait Transaction: ConnectionLike {
     async fn commit(&mut self) -> crate::Result<()>;
     async fn rollback(&mut self) -> crate::Result<()>;
+
+    async fn version(&self) -> Option<String>;
 
     /// Explicit upcast of self reference. Rusts current vtable layout doesn't allow for an upcast if
     /// `trait A`, `trait B: A`, so that `Box<dyn B> as Box<dyn A>` works. This is a simple, explicit workaround.
@@ -153,7 +161,7 @@ impl AggregationSelection {
             .map(|f| {
                 (
                     f.db_name().to_owned(),
-                    fixed_type.clone().unwrap_or_else(|| f.type_identifier()),
+                    fixed_type.unwrap_or_else(|| f.type_identifier()),
                     FieldArity::Required,
                 )
             })
@@ -176,47 +184,6 @@ pub enum AggregationResult {
     Max(ScalarFieldRef, PrismaValue),
 }
 
-#[derive(Debug, Clone)]
-pub enum RelAggregationSelection {
-    // Always a count(*) for now
-    Count(RelationFieldRef, Option<Filter>),
-}
-
-pub type RelAggregationRow = Vec<RelAggregationResult>;
-
-#[derive(Debug, Clone)]
-pub enum RelAggregationResult {
-    Count(RelationFieldRef, PrismaValue),
-}
-
-impl RelAggregationSelection {
-    pub fn db_alias(&self) -> String {
-        match self {
-            RelAggregationSelection::Count(rf, _) => {
-                format!("_aggr_count_{}", rf.name())
-            }
-        }
-    }
-
-    pub fn field_name(&self) -> &str {
-        match self {
-            RelAggregationSelection::Count(rf, _) => rf.name(),
-        }
-    }
-
-    pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
-        match self {
-            RelAggregationSelection::Count(_, _) => (TypeIdentifier::Int, FieldArity::Required),
-        }
-    }
-
-    pub fn into_result(self, val: PrismaValue) -> RelAggregationResult {
-        match self {
-            RelAggregationSelection::Count(rf, _) => RelAggregationResult::Count(rf, coerce_null_to_zero_value(val)),
-        }
-    }
-}
-
 #[async_trait]
 pub trait ReadOperations {
     /// Gets a single record or `None` back from the database.
@@ -227,11 +194,11 @@ pub trait ReadOperations {
     /// - The `FieldSelection` defines the values to be returned.
     async fn get_single_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         filter: &Filter,
         selected_fields: &FieldSelection,
-        aggregation_selections: &[RelAggregationSelection],
-        trace_id: Option<String>,
+        relation_load_strategy: RelationLoadStrategy,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<Option<SingleRecord>>;
 
     /// Gets multiple records from the database.
@@ -242,11 +209,11 @@ pub trait ReadOperations {
     ///   to be returned as a projection of fields of the model it queries.
     async fn get_many_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
-        aggregation_selections: &[RelAggregationSelection],
-        trace_id: Option<String>,
+        relation_load_strategy: RelationLoadStrategy,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<ManyRecords>;
 
     /// Retrieves pairs of IDs that belong together from a intermediate join
@@ -260,7 +227,7 @@ pub trait ReadOperations {
         &mut self,
         from_field: &RelationFieldRef,
         from_record_ids: &[SelectionResult],
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<Vec<(SelectionResult, SelectionResult)>>;
 
     /// Aggregates records for a specific model based on the given selections.
@@ -270,12 +237,12 @@ pub trait ReadOperations {
     /// `having` can only be a scalar filter. Relation elements can be safely ignored.
     async fn aggregate_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: QueryArguments,
         selections: Vec<AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
         having: Option<Filter>,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<Vec<AggregationRow>>;
 }
 
@@ -284,55 +251,82 @@ pub trait WriteOperations {
     /// Insert a single record to the database.
     async fn create_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: WriteArgs,
-        trace_id: Option<String>,
-    ) -> crate::Result<SelectionResult>;
+        selected_fields: FieldSelection,
+        traceparent: Option<TraceParent>,
+    ) -> crate::Result<SingleRecord>;
 
     /// Inserts many records at once into the database.
     async fn create_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<usize>;
+
+    /// Inserts many records at once into the database and returns their
+    /// selected fields.
+    /// This method should not be used if the connector does not support
+    /// returning created rows.
+    async fn create_records_returning(
+        &mut self,
+        model: &Model,
+        args: Vec<WriteArgs>,
+        skip_duplicates: bool,
+        selected_fields: FieldSelection,
+        traceparent: Option<TraceParent>,
+    ) -> crate::Result<ManyRecords>;
 
     /// Update records in the `Model` with the given `WriteArgs` filtered by the
     /// `Filter`.
     async fn update_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<usize>;
 
     /// Update record in the `Model` with the given `WriteArgs` filtered by the
     /// `Filter`.
     async fn update_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
-        trace_id: Option<String>,
-    ) -> crate::Result<Option<SelectionResult>>;
+        selected_fields: Option<FieldSelection>,
+        traceparent: Option<TraceParent>,
+    ) -> crate::Result<Option<SingleRecord>>;
 
     /// Native upsert
     /// Use the connectors native upsert to upsert the `Model`
     async fn native_upsert_record(
         &mut self,
         upsert: NativeUpsert,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<SingleRecord>;
 
     /// Delete records in the `Model` with the given `Filter`.
     async fn delete_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<usize>;
+
+    /// Delete single record in the `Model` with the given `Filter` and returns
+    /// selected fields of the deleted record.
+    /// This method should not be used if the connector does not support returning
+    /// deleted rows.
+    async fn delete_record(
+        &mut self,
+        model: &Model,
+        record_filter: RecordFilter,
+        selected_fields: FieldSelection,
+        traceparent: Option<TraceParent>,
+    ) -> crate::Result<SingleRecord>;
 
     // We plan to remove the methods below in the future. We want emulate them with the ones above. Those should suffice.
 
@@ -342,7 +336,7 @@ pub trait WriteOperations {
         field: &RelationFieldRef,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<()>;
 
     /// Disconnect the children from the parent (m2m relation only).
@@ -351,7 +345,7 @@ pub trait WriteOperations {
         field: &RelationFieldRef,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<()>;
 
     /// Execute the raw query in the database as-is.
@@ -366,8 +360,8 @@ pub trait WriteOperations {
     /// Returns resulting rows as JSON.
     async fn query_raw(
         &mut self,
-        model: Option<&ModelRef>,
+        model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         query_type: Option<String>,
-    ) -> crate::Result<serde_json::Value>;
+    ) -> crate::Result<RawJson>;
 }

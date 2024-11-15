@@ -1,19 +1,46 @@
 use std::{env, fs, io::Write as _, path};
 
 const VALIDATIONS_ROOT_DIR: &str = "tests/validation";
-const REFORMAT_ROOT_DIR: &str = "tests/reformatter";
+const REFORMAT_SINGLE_FILE_ROOT_DIR: &str = "tests/reformatter";
+const REFORMAT_MULTI_FILE_ROOT_DIR: &str = "tests/reformatter_multi_file";
 const CARGO_MANIFEST_DIR: &str = env!("CARGO_MANIFEST_DIR");
 
 fn main() {
     build_validation_tests();
-    build_reformat_tests();
+    build_reformat_single_file_tests();
+    build_reformat_multi_file_tests();
 }
 
-fn build_reformat_tests() {
-    println!("cargo:rerun-if-changed={REFORMAT_ROOT_DIR}");
+fn build_reformat_multi_file_tests() {
+    println!("cargo:rerun-if-changed={REFORMAT_MULTI_FILE_ROOT_DIR}");
+    let schema_dirs_to_reformat = fs::read_dir(format!("{CARGO_MANIFEST_DIR}/{REFORMAT_MULTI_FILE_ROOT_DIR}"))
+        .unwrap()
+        .map(Result::unwrap)
+        .filter_map(|entry| {
+            let name = entry.file_name();
+            let name = name.to_str().unwrap();
+            if name == "." || name == ".." || name.ends_with(".reformatted") {
+                None
+            } else {
+                Some(name.trim_start_matches('/').to_owned())
+            }
+        });
+    let mut out_file = out_file("reformat_multi_file_tests.rs");
+    for schema_dir in schema_dirs_to_reformat {
+        let test_name = test_name(&schema_dir);
+        writeln!(
+            out_file,
+            "#[test] fn {test_name}() {{ run_reformat_multi_file_test(\"{schema_dir}\"); }}"
+        )
+        .unwrap();
+    }
+}
+
+fn build_reformat_single_file_tests() {
+    println!("cargo:rerun-if-changed={REFORMAT_SINGLE_FILE_ROOT_DIR}");
 
     let mut all_schemas = Vec::new();
-    find_all_schemas("", &mut all_schemas, REFORMAT_ROOT_DIR);
+    find_all_schemas("", &mut all_schemas, REFORMAT_SINGLE_FILE_ROOT_DIR);
 
     let mut out_file = out_file("reformat_tests.rs");
     let schemas_to_reformat = all_schemas.iter().filter(|name| !name.ends_with(".reformatted.prisma"));

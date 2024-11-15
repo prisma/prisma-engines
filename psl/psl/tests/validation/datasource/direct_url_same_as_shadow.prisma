@@ -1,0 +1,19 @@
+datasource testds {
+    provider = "mysql"
+    url = "mysql://testurl"
+    directUrl = "mysql://testurl"
+    shadowDatabaseUrl = "mysql://testurl"
+}
+
+// [1;91merror[0m: [1mshadowDatabaseUrl is the same as directUrl for datasource "testds". Please specify a different database as shadow database to avoid data loss.[0m
+//   [1;94m-->[0m  [4mschema.prisma:4[0m
+// [1;94m   | [0m
+// [1;94m 3 | [0m    url = "mysql://testurl"
+// [1;94m 4 | [0m    directUrl = [1;91m"mysql://testurl"[0m
+// [1;94m   | [0m
+// [1;91merror[0m: [1mshadowDatabaseUrl is the same as url for datasource "testds". Please specify a different database as shadow database to avoid data loss.[0m
+//   [1;94m-->[0m  [4mschema.prisma:3[0m
+// [1;94m   | [0m
+// [1;94m 2 | [0m    provider = "mysql"
+// [1;94m 3 | [0m    url = [1;91m"mysql://testurl"[0m
+// [1;94m   | [0m

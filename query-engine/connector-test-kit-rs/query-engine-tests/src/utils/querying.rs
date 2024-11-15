@@ -14,7 +14,7 @@ macro_rules! match_connector_result {
 
         let connector = $runner.connector_version();
 
-        let mut results = match connector {
+        let mut results = match &connector {
             $(
                 $( $matcher )|+ $( if $pred )? => $result
             ),*
@@ -31,6 +31,28 @@ macro_rules! match_connector_result {
             true,
             "Query result: {query_result} is not part of the expected results: {results:?} for connector {connector}",
         );
+    };
+}
+
+#[macro_export]
+macro_rules! assert_connector_error {
+    ($runner:expr, $q:expr, $code:expr, $( $($matcher:pat_param)|+ $( if $pred:expr )? => $msg:expr ),*) => {
+        use query_tests_setup::*;
+        use query_tests_setup::ConnectorVersion::*;
+
+        let connector = $runner.connector_version();
+
+        let mut results = match &connector {
+            $(
+                $( $matcher )|+ $( if $pred )? => $msg.to_string()
+            ),*
+        };
+
+        if results.len() == 0 {
+            panic!("No assertion failure defined for connector {connector}.");
+        }
+
+        $runner.query($q).await?.assert_failure($code, Some(results));
     };
 }
 
@@ -113,5 +135,18 @@ macro_rules! retry {
 
             break res;
         }
+    }};
+}
+
+#[macro_export]
+macro_rules! with_id_excess {
+    ($runner:expr, $query_template:expr) => {{
+        let max_bind_values = $runner
+            .max_bind_values()
+            .expect("Test expected to run only for relational databases.");
+
+        let cycle = |argn: usize| (argn % 10 + 1).to_string();
+        let id_list = (0..=max_bind_values).map(cycle).collect::<Vec<_>>().join(",");
+        $query_template.replace(":id_list:", &id_list)
     }};
 }

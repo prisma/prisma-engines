@@ -16,7 +16,11 @@ use psl::{
     builtin_connectors::{CockroachType, PostgresType},
     datamodel_connector::NativeTypeInstance,
 };
-use quaint::{connector::ResultRow, prelude::Queryable, Value::Array};
+use quaint::{
+    connector::ResultRow,
+    prelude::{Queryable, ResultSet},
+    Value,
+};
 use regex::Regex;
 use std::{
     any::type_name,
@@ -143,10 +147,31 @@ pub enum ConstraintOption {
     Deferrable,
 }
 
+#[enumflags2::bitflags]
+#[derive(Clone, Copy, Debug)]
+#[repr(u8)]
+pub enum IndexType {
+    Include,
+    Expression,
+    Regular,
+}
+
+impl From<Option<&str>> for IndexType {
+    fn from(s: Option<&str>) -> Self {
+        match s {
+            Some("INCLUDE") => Self::Include,
+            Some("EXPRESSION") => Self::Expression,
+            _ => Self::Regular,
+        }
+    }
+}
+
 #[derive(Default, Debug)]
 pub struct PostgresSchemaExt {
     pub opclasses: Vec<(IndexColumnId, SQLOperatorClass)>,
     pub indexes: Vec<(IndexId, SqlIndexAlgorithm)>,
+    pub expression_indexes: Vec<(TableId, String)>,
+    pub include_indexes: Vec<(TableId, String)>,
     pub index_null_position: HashMap<IndexColumnId, IndexNullPosition>,
     pub constraint_options: HashMap<Constraint, BitFlags<ConstraintOption>>,
     pub table_options: Vec<BTreeMap<String, String>>,
@@ -661,13 +686,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             WHERE n.nspname = ANY ( $1 )
         "#;
 
-        let rows = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
 
         let mut procedures = Vec::with_capacity(rows.len());
 
@@ -689,10 +708,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_namespaces(&self, sql_schema: &mut SqlSchema, namespaces: &[&str]) -> DescriberResult<()> {
         let sql = include_str!("postgres/namespaces_query.sql");
 
-        let rows = self
-            .conn
-            .query_raw(sql, &[Array(Some(namespaces.iter().map(|s| (*s).into()).collect()))])
-            .await?;
+        let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
 
         let names = rows.into_iter().map(|row| (row.get_expect_string("namespace_name")));
 
@@ -716,13 +732,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let namespaces = &sql_schema.namespaces;
 
-        let rows = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
 
         let mut names = Vec::with_capacity(rows.len());
 
@@ -817,21 +827,14 @@ impl<'a> SqlSchemaDescriber<'a> {
                 views.viewname AS view_name,
                 views.definition AS view_sql,
                 views.schemaname AS namespace,
-                description.description AS description
+                obj_description(class.oid, 'pg_class') AS description
             FROM pg_catalog.pg_views views
             INNER JOIN pg_catalog.pg_namespace ns ON views.schemaname = ns.nspname
             INNER JOIN pg_catalog.pg_class class ON class.relnamespace = ns.oid AND class.relname = views.viewname
-            LEFT JOIN pg_catalog.pg_description description ON description.objoid = class.oid AND description.objsubid = 0
             WHERE schemaname = ANY ( $1 )
         "#};
 
-        let result_set = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let result_set = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
 
         for row in result_set.into_iter() {
             let name = row.get_expect_string("view_name");
@@ -877,7 +880,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 info.is_nullable,
                 info.is_identity,
                 info.character_maximum_length,
-                description.description
+                col_description(att.attrelid, ordinal_position) AS description
             FROM information_schema.columns info
             JOIN pg_attribute att ON att.attname = info.column_name
             JOIN (
@@ -885,23 +888,17 @@ impl<'a> SqlSchemaDescriber<'a> {
                  FROM pg_class
                  JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
                  AND pg_namespace.nspname = ANY ( $1 )
+                 WHERE reltype > 0
                 ) as oid on oid.oid = att.attrelid 
                   AND relname = info.table_name
                   AND namespace = info.table_schema
             LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum AND table_schema = namespace
-            LEFT OUTER JOIN pg_description description ON description.objoid = att.attrelid AND description.objsubid = ordinal_position
             WHERE table_schema = ANY ( $1 ) {is_visible_clause}
             ORDER BY namespace, table_name, ordinal_position;
         "#
         );
 
-        let rows = self
-            .conn
-            .query_raw(
-                sql.as_str(),
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql.as_str(), &[Value::array(namespaces)]).await?;
 
         for col in rows {
             let namespace = col.get_expect_string("namespace");
@@ -1004,7 +1001,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         let (character_maximum_length, numeric_precision, numeric_scale, time_precision) =
             if matches!(col.get_expect_string("data_type").as_str(), "ARRAY") {
                 fn get_single(formatted_type: &str) -> Option<u32> {
-                    static SINGLE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([0-9]*)\).*\[\]$"#).unwrap());
+                    static SINGLE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r".*\(([0-9]*)\).*\[\]$").unwrap());
 
                     SINGLE_REGEX
                         .captures(formatted_type)
@@ -1014,7 +1011,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
                 fn get_dual(formatted_type: &str) -> (Option<u32>, Option<u32>) {
                     static DUAL_REGEX: Lazy<Regex> =
-                        Lazy::new(|| Regex::new(r#"numeric\(([0-9]*),([0-9]*)\)\[\]$"#).unwrap());
+                        Lazy::new(|| Regex::new(r"numeric\(([0-9]*),([0-9]*)\)\[\]$").unwrap());
                     let first = DUAL_REGEX
                         .captures(formatted_type)
                         .and_then(|cap| cap.get(1).and_then(|precision| precision.as_str().parse().ok()));
@@ -1140,13 +1137,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         // One foreign key with multiple columns will be represented here as several
         // rows with the same ID.
-        let result_set = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let result_set = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
 
         for row in result_set.into_iter() {
             trace!("Got description FK row {:?}", row);
@@ -1253,13 +1244,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         let namespaces = &sql_schema.namespaces;
         let sql = include_str!("postgres/constraints_query.sql");
 
-        let rows = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
 
         for row in rows {
             let namespace = row.get_expect_string("namespace");
@@ -1297,130 +1282,48 @@ impl<'a> SqlSchemaDescriber<'a> {
     ) -> DescriberResult<()> {
         let namespaces = &sql_schema.namespaces;
         let sql = include_str!("postgres/indexes_query.sql");
-        let rows = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
-        let mut current_index: Option<IndexId> = None;
+        let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
 
-        for row in rows {
-            let namespace = row.get_expect_string("namespace");
-            let table_name = row.get_expect_string("table_name");
-            let table_id: TableId = match table_ids.get(&(namespace, table_name)) {
-                Some(id) => *id,
-                None => continue,
-            };
+        // let mut result_rows = Vec::new();
+        // let mut index_rows = rows.into_iter().peekable();
 
-            let column_name = row.get_expect_string("column_name");
-            let column_id = match sql_schema.walk(table_id).column(&column_name) {
-                Some(col) => col.id,
-                _ => continue,
-            };
-
-            let index_name = row.get_expect_string("index_name");
-            let is_unique = row.get_expect_bool("is_unique");
-            let is_primary_key = row.get_expect_bool("is_primary_key");
-            let column_index = row.get_expect_i64("column_index");
-            let index_algo = row.get_expect_string("index_algo");
-
-            let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
-                "ASC" => SQLSortOrder::Asc,
-                "DESC" => SQLSortOrder::Desc,
-                misc => panic!("Unexpected sort order `{misc}`, collation should be ASC, DESC or Null"),
-            });
-
-            let algorithm = if self.is_cockroach() {
-                match index_algo.as_str() {
-                    "inverted" => SqlIndexAlgorithm::Gin,
-                    _ => SqlIndexAlgorithm::BTree,
-                }
-            } else {
-                match index_algo.as_str() {
-                    "btree" => SqlIndexAlgorithm::BTree,
-                    "hash" => SqlIndexAlgorithm::Hash,
-                    "gist" => SqlIndexAlgorithm::Gist,
-                    "gin" => SqlIndexAlgorithm::Gin,
-                    "spgist" => SqlIndexAlgorithm::SpGist,
-                    "brin" => SqlIndexAlgorithm::Brin,
-                    other => {
-                        tracing::warn!("Unknown index algorithm on {index_name}: {other}");
-                        SqlIndexAlgorithm::BTree
-                    }
-                }
-            };
-
-            if column_index == 0 {
-                // new index!
-                let index_id = if is_primary_key {
-                    sql_schema.push_primary_key(table_id, index_name)
-                } else if is_unique {
-                    sql_schema.push_unique_constraint(table_id, index_name)
-                } else {
-                    sql_schema.push_index(table_id, index_name)
-                };
-
-                if is_primary_key || is_unique {
-                    let mut constraint_options = BitFlags::empty();
-
-                    if let Some(true) = row.get_bool("condeferrable") {
-                        constraint_options |= ConstraintOption::Deferrable;
-                    }
-
-                    if let Some(true) = row.get_bool("condeferred") {
-                        constraint_options |= ConstraintOption::Deferred;
-                    }
-
-                    pg_ext
-                        .constraint_options
-                        .insert(Constraint::Index(index_id), constraint_options);
-                }
-
-                current_index = Some(index_id);
-            }
-
-            let index_id = current_index.unwrap();
-            let operator_class = if !matches!(algorithm, SqlIndexAlgorithm::BTree | SqlIndexAlgorithm::Hash) {
-                row.get_string("opclass")
-                    .map(|c| (c, row.get_bool("opcdefault").unwrap_or_default()))
-                    .map(|(c, is_default)| SQLOperatorClass {
-                        kind: SQLOperatorClassKind::from(c.as_str()),
-                        is_default,
-                    })
-            } else {
-                None
-            };
-
-            let index_field_id = sql_schema.push_index_column(IndexColumn {
-                index_id,
-                column_id,
-                sort_order,
-                length: None,
-            });
-
-            pg_ext.indexes.push((index_id, algorithm));
-
-            // only enable nulls first/last on Postgres
-            if !self.is_cockroach() && algorithm == SqlIndexAlgorithm::BTree && !is_primary_key {
-                let nulls_first = row.get_expect_bool("nulls_first");
-
-                let position = if nulls_first {
-                    IndexNullPosition::First
-                } else {
-                    IndexNullPosition::Last
-                };
-
-                pg_ext.index_null_position.insert(index_field_id, position);
-            }
-
-            if let Some(opclass) = operator_class {
-                pg_ext.opclasses.push((index_field_id, opclass));
-            }
-        }
+        index_from_row(rows, table_ids, sql_schema, pg_ext, self.circumstances);
 
         Ok(())
+
+        // loop {
+        //     result_rows.clear();
+        //     group_next_index(&mut result_rows, &mut index_rows);
+
+        //     if result_rows.is_empty() {
+        //         return Ok(());
+        //     }
+
+        //     // * EXPRESSION, INCLUDE indexes
+        //     let row = result_rows.first().unwrap();
+        //     let namespace = row.get_expect_string("namespace");
+        //     let table_name = row.get_expect_string("table_name");
+        //     let table_id: TableId = match table_ids.get(&(namespace, table_name)) {
+        //         Some(id) => *id,
+        //         None => continue,
+        //     };
+        //     let index_name = row.get_expect_string("index_name");
+
+        //     let index_type = IndexType::from(row.get_string("index_type").as_deref());
+        //     match index_type {
+        //         IndexType::Expression => {
+        //             pg_ext.expression_indexes.push((table_id, index_name));
+        //         }
+        //         IndexType::Include => {
+        //             pg_ext.include_indexes.push((table_id, index_name));
+        //         }
+        //         _ => {
+        //             index_from_row(result_rows.drain(..), table_ids, sql_schema, pg_ext, self.circumstances);
+        //         }
+        //     }
+
+        //     continue;
+        // }
     }
 
     async fn get_sequences(&self, sql_schema: &SqlSchema, postgres_ext: &mut PostgresSchemaExt) -> DescriberResult<()> {
@@ -1459,13 +1362,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             "#
         };
 
-        let rows = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
         let sequences = rows.into_iter().map(|seq| Sequence {
             namespace_id: sql_schema
                 .get_namespace_id(&seq.get_expect_string("namespace"))
@@ -1488,21 +1385,18 @@ impl<'a> SqlSchemaDescriber<'a> {
         let namespaces = &sql_schema.namespaces;
 
         let sql = "
-            SELECT t.typname as name, e.enumlabel as value, n.nspname as namespace, d.description
+            SELECT
+                t.typname AS name,
+                e.enumlabel AS value,
+                n.nspname AS namespace,
+                obj_description(t.oid, 'pg_type') AS description
             FROM pg_type t
             JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
-            LEFT OUTER JOIN pg_description d ON d.objoid = t.oid
             WHERE n.nspname = ANY ( $1 )
             ORDER BY e.enumsortorder";
 
-        let rows = self
-            .conn
-            .query_raw(
-                sql,
-                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
-            )
-            .await?;
+        let rows = self.conn.query_raw(sql, &[Value::array(namespaces)]).await?;
         let mut enum_values: BTreeMap<(NamespaceId, String, Option<String>), Vec<String>> = BTreeMap::new();
 
         for row in rows.into_iter() {
@@ -1512,9 +1406,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let description = row.get_string("description");
             let namespace_id = sql_schema.get_namespace_id(&namespace).unwrap();
 
-            let values = enum_values
-                .entry((namespace_id, name, description))
-                .or_insert_with(Vec::new);
+            let values = enum_values.entry((namespace_id, name, description)).or_default();
 
             values.push(value);
         }
@@ -1528,6 +1420,174 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         Ok(())
+    }
+}
+
+fn supported_index_type(
+    current_index: &mut Option<IndexId>,
+    index_name: String,
+    row: ResultRow,
+    table_id: TableId,
+    sql_schema: &mut SqlSchema,
+    pg_ext: &mut PostgresSchemaExt,
+    circumstances: BitFlags<Circumstances>,
+) {
+    let column_name = row.get_expect_string("column_name");
+
+    let column_id = match sql_schema.walk(table_id).column(&column_name) {
+        Some(col) => col.id,
+        _ => return,
+    };
+
+    let is_unique = row.get_expect_bool("is_unique");
+    let is_primary_key = row.get_expect_bool("is_primary_key");
+    let column_index = row.get_expect_i64("column_index");
+    let index_algo = row.get_expect_string("index_algo");
+
+    let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
+        "ASC" => SQLSortOrder::Asc,
+        "DESC" => SQLSortOrder::Desc,
+        misc => panic!("Unexpected sort order `{misc}`, collation should be ASC, DESC or Null"),
+    });
+
+    let algorithm = if circumstances.contains(Circumstances::Cockroach) {
+        match index_algo.as_str() {
+            "inverted" => SqlIndexAlgorithm::Gin,
+            _ => SqlIndexAlgorithm::BTree,
+        }
+    } else {
+        match index_algo.as_str() {
+            "btree" => SqlIndexAlgorithm::BTree,
+            "hash" => SqlIndexAlgorithm::Hash,
+            "gist" => SqlIndexAlgorithm::Gist,
+            "gin" => SqlIndexAlgorithm::Gin,
+            "spgist" => SqlIndexAlgorithm::SpGist,
+            "brin" => SqlIndexAlgorithm::Brin,
+            other => {
+                tracing::warn!("Unknown index algorithm on {index_name}: {other}");
+                SqlIndexAlgorithm::BTree
+            }
+        }
+    };
+
+    // * Note: Expression Indexes can have 1 & 2
+    if column_index == 0 {
+        // new index!
+        let index_id = if is_primary_key {
+            sql_schema.push_primary_key(table_id, index_name)
+        } else if is_unique {
+            sql_schema.push_unique_constraint(table_id, index_name)
+        } else {
+            sql_schema.push_index(table_id, index_name)
+        };
+
+        if is_primary_key || is_unique {
+            let mut constraint_options = BitFlags::empty();
+
+            if let Some(true) = row.get_bool("condeferrable") {
+                constraint_options |= ConstraintOption::Deferrable;
+            }
+
+            if let Some(true) = row.get_bool("condeferred") {
+                constraint_options |= ConstraintOption::Deferred;
+            }
+
+            pg_ext
+                .constraint_options
+                .insert(Constraint::Index(index_id), constraint_options);
+        }
+
+        *current_index = Some(index_id);
+    }
+
+    let index_id = current_index.unwrap();
+    let operator_class = if !matches!(algorithm, SqlIndexAlgorithm::BTree | SqlIndexAlgorithm::Hash) {
+        row.get_string("opclass")
+            .map(|c| (c, row.get_bool("opcdefault").unwrap_or_default()))
+            .map(|(c, is_default)| SQLOperatorClass {
+                kind: SQLOperatorClassKind::from(c.as_str()),
+                is_default,
+            })
+    } else {
+        None
+    };
+
+    let index_field_id = sql_schema.push_index_column(IndexColumn {
+        index_id,
+        column_id,
+        sort_order,
+        length: None,
+    });
+
+    pg_ext.indexes.push((index_id, algorithm));
+
+    // only enable nulls first/last on Postgres
+    if !circumstances.contains(Circumstances::Cockroach) && algorithm == SqlIndexAlgorithm::BTree && !is_primary_key {
+        let nulls_first = row.get_expect_bool("nulls_first");
+
+        let position = if nulls_first {
+            IndexNullPosition::First
+        } else {
+            IndexNullPosition::Last
+        };
+
+        pg_ext.index_null_position.insert(index_field_id, position);
+    }
+
+    if let Some(opclass) = operator_class {
+        pg_ext.opclasses.push((index_field_id, opclass));
+    }
+}
+
+fn index_from_row(
+    rows: ResultSet,
+    table_ids: &IndexMap<(String, String), TableId>,
+    sql_schema: &mut SqlSchema,
+    pg_ext: &mut PostgresSchemaExt,
+    circumstances: BitFlags<Circumstances>,
+) {
+    // This tracks multi-indexes (e.g., `@@index([category, price])` in the case of normal index types)
+    let mut current_index = None;
+
+    for row in rows.into_iter() {
+        let namespace = row.get_expect_string("namespace");
+        let table_name = row.get_expect_string("table_name");
+        let table_id: TableId = match table_ids.get(&(namespace, table_name)) {
+            Some(id) => *id,
+            None => continue,
+        };
+
+        let index_name = row.get_expect_string("index_name");
+
+        let index_type = IndexType::from(row.get_string("index_type").as_deref());
+        match index_type {
+            IndexType::Expression => {
+                pg_ext.expression_indexes.push((table_id, index_name));
+            }
+            IndexType::Include => {
+                pg_ext.include_indexes.push((table_id, index_name.clone()));
+                supported_index_type(
+                    &mut current_index,
+                    index_name,
+                    row,
+                    table_id,
+                    sql_schema,
+                    pg_ext,
+                    circumstances,
+                );
+            }
+            _ => {
+                supported_index_type(
+                    &mut current_index,
+                    index_name,
+                    row,
+                    table_id,
+                    sql_schema,
+                    pg_ext,
+                    circumstances,
+                );
+            }
+        };
     }
 }
 

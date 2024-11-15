@@ -28,31 +28,31 @@ mod relation_filter {
         // The following assertions simply ensures that all those queries are running fine and thus that the referenced fields are properly aliased to the joins.
         run_query!(
             runner,
-            r#"{ findManyTestModel(where: { child: { string1: { gt: { _ref: "string2" } } } }) { id } }"#
+            r#"{ findManyTestModel(where: { child: { string1: { gt: { _ref: "string2", _container: "Child" } } } }) { id } }"#
         );
         run_query!(
             runner,
-            r#"{ findManyTestModel(where: { child: { string1: { gte: { _ref: "string2" } } } }) { id } }"#
+            r#"{ findManyTestModel(where: { child: { string1: { gte: { _ref: "string2", _container: "Child" } } } }) { id } }"#
         );
         run_query!(
             runner,
-            r#"{ findManyTestModel(where: { child: { string1: { lt: { _ref: "string2" } } } }) { id } }"#
+            r#"{ findManyTestModel(where: { child: { string1: { lt: { _ref: "string2", _container: "Child" } } } }) { id } }"#
         );
         run_query!(
             runner,
-            r#"{ findManyTestModel(where: { child: { string1: { lte: { _ref: "string2" } } } }) { id } }"#
+            r#"{ findManyTestModel(where: { child: { string1: { lte: { _ref: "string2", _container: "Child" } } } }) { id } }"#
         );
         run_query!(
             runner,
-            r#"{ findManyTestModel(where: { child: { string1: { contains: { _ref: "string2" } } } }) { id } }"#
+            r#"{ findManyTestModel(where: { child: { string1: { contains: { _ref: "string2", _container: "Child" } } } }) { id } }"#
         );
         run_query!(
             runner,
-            r#"{ findManyTestModel(where: { child: { string1: { startsWith: { _ref: "string2" } } } }) { id } }"#
+            r#"{ findManyTestModel(where: { child: { string1: { startsWith: { _ref: "string2", _container: "Child" } } } }) { id } }"#
         );
         run_query!(
             runner,
-            r#"{ findManyTestModel(where: { child: { string1: { endsWith: { _ref: "string2" } } } }) { id } }"#
+            r#"{ findManyTestModel(where: { child: { string1: { endsWith: { _ref: "string2", _container: "Child" } } } }) { id } }"#
         );
 
         Ok(())
@@ -83,19 +83,19 @@ mod relation_filter {
         // The following assertions simply ensures that all those queries are running fine and thus that the referenced fields are properly aliased to the joins.
         run_query!(
             runner,
-            r#"{ findManyTestModel(where: { child: { string1: { in: { _ref: "string2" } } } }) { id } }"#
+            r#"{ findManyTestModel(where: { child: { string1: { in: { _ref: "string2", _container: "Child" } } } }) { id } }"#
         );
         run_query!(
             runner,
-            r#"{ findManyTestModel(where: { child: { string1: { notIn: { _ref: "string2" } } } }) { id } }"#
+            r#"{ findManyTestModel(where: { child: { string1: { notIn: { _ref: "string2", _container: "Child" } } } }) { id } }"#
         );
         run_query!(
             runner,
-            r#"{ findManyTestModel(where: { child: { string2: { hasSome: { _ref: "string2" } } } }) { id } }"#
+            r#"{ findManyTestModel(where: { child: { string2: { hasSome: { _ref: "string2", _container: "Child" } } } }) { id } }"#
         );
         run_query!(
             runner,
-            r#"{ findManyTestModel(where: { child: { string2: { hasEvery: { _ref: "string2" } } } }) { id } }"#
+            r#"{ findManyTestModel(where: { child: { string2: { hasEvery: { _ref: "string2", _container: "Child" } } } }) { id } }"#
         );
 
         Ok(())
@@ -133,7 +133,7 @@ mod relation_filter {
         .await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { child: { string1: { equals: { _ref: "string2" } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { child: { string1: { equals: { _ref: "string2", _container: "Child" } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
@@ -164,17 +164,17 @@ mod relation_filter {
         create_to_many_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { children: { some: { string1: { equals: { _ref: "string2" } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { children: { some: { string1: { equals: { _ref: "string2", _container: "Child" } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { children: { none: { string1: { equals: { _ref: "string2" } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { children: { none: { string1: { equals: { _ref: "string2", _container: "Child" } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { children: { every: { string1: { equals: { _ref: "string2" } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { children: { every: { string1: { equals: { _ref: "string2", _container: "Child" } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
@@ -204,17 +204,17 @@ mod relation_filter {
         create_to_many_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { children: { some: { string1: { equals: { _ref: "string2" } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { children: { some: { string1: { equals: { _ref: "string2", _container: "Child" } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { children: { none: { string1: { equals: { _ref: "string2" } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { children: { none: { string1: { equals: { _ref: "string2", _container: "Child" } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { children: { every: { string1: { equals: { _ref: "string2" } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { children: { every: { string1: { equals: { _ref: "string2", _container: "Child" } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
@@ -290,7 +290,7 @@ mod relation_filter {
             toMany: {
               some: {
                 toOne: {
-                  string1: { equals: { _ref: "string2" } }
+                  string1: { equals: { _ref: "string2", _container: "ToOne" } }
                 }
               }
             }

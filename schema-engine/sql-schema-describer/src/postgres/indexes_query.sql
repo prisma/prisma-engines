@@ -5,15 +5,16 @@ WITH rawindex AS (
         indisunique,
         indisprimary,
         indnkeyatts,
+        indnatts,
         unnest(indkey) AS indkeyid,
         generate_subscripts(indkey, 1) AS indkeyidx,
         unnest(indclass) AS indclass,
-        unnest(indoption) AS indoption
-    FROM pg_index
+        unnest(indoption) AS indoption,
+        pg_get_expr(indexprs, indrelid) AS index_expression
+    FROM pg_index -- https://www.postgresql.org/docs/current/catalog-pg-index.html
     WHERE
-        indpred IS NULL
-        AND array_position(indkey::int2[], 0::int2) IS NULL
-        AND NOT indisexclusion
+        indpred IS NULL -- filter out partial indexes
+        AND NOT indisexclusion -- filter out exclusion constraints
 ),
 indexes_info AS (
 	SELECT
@@ -23,14 +24,19 @@ indexes_info AS (
 	    rawindex.indrelid, 
         rawindex.indexrelid,
         rawindex.indnkeyatts,
+        rawindex.indnatts,
         rawindex.indkeyidx,
 	    columninfo.attname AS column_name,
-	    columninfo.attnum
+	    columninfo.attnum,
+        rawindex.index_expression
 	FROM rawindex
 	INNER JOIN pg_class AS tableinfo ON tableinfo.oid = rawindex.indrelid
 	INNER JOIN pg_class AS indexinfo ON indexinfo.oid = rawindex.indexrelid
 	INNER JOIN pg_namespace AS schemainfo ON schemainfo.oid = tableinfo.relnamespace
-	INNER JOIN pg_attribute AS columninfo
+    -- You may wonder, why `LEFT JOIN` here?
+    -- Expression Indexes are generally defined without `column_info` - they do not refer to a specific column, as they contain an expression.
+    -- Due to this, we need to update the query to handle indexes where column_info is nullable, otherwise we lose expression indexes in our result set.
+	LEFT JOIN pg_attribute AS columninfo
 	    ON columninfo.attrelid = tableinfo.oid
 	    AND columninfo.attnum = rawindex.indkeyid
 	INNER JOIN pg_indexes
@@ -45,10 +51,12 @@ indexes_info_filtered AS (
 		indrelid,
 		indexrelid,
 		indnkeyatts,
+        indnatts,
 		indkeyidx,
 		column_name,
 		attnum,
-		row_num
+		row_num,
+        index_expression
 	FROM (
 		SELECT *,
 		ROW_NUMBER() OVER (PARTITION BY namespace, index_name, table_name, indrelid, indexrelid, indnkeyatts, indkeyidx ORDER BY attnum) AS row_num
@@ -63,7 +71,13 @@ SELECT DISTINCT
     indexes_info_filtered.namespace,
     indexes_info_filtered.index_name,
     indexes_info_filtered.table_name,
-    indexes_info_filtered.column_name,
+    CASE
+        WHEN indexes_info_filtered.indnatts > indexes_info_filtered.indnkeyatts THEN 'INCLUDE'
+        WHEN indexes_info_filtered.index_expression IS NOT NULL THEN 'EXPRESSION'
+        ELSE 'REGULAR'
+    END AS index_type,
+    indexes_info_filtered.column_name, -- NULL in the case of expression indexes
+    indexes_info_filtered.index_expression, -- NULL unless `index_type == 'expression'`
     rawindex.indisunique AS is_unique,
     rawindex.indisprimary AS is_primary_key,
     indexes_info_filtered.indkeyidx AS column_index,
@@ -85,15 +99,16 @@ INNER JOIN pg_class AS tableinfo ON tableinfo.oid = indexes_info_filtered.indrel
 INNER JOIN pg_class AS indexinfo ON indexinfo.oid = indexes_info_filtered.indexrelid
 INNER JOIN pg_namespace AS schemainfo ON schemainfo.oid = tableinfo.relnamespace
 INNER JOIN rawindex
-	ON rawindex.indrelid = indexes_info_filtered.indrelid
-	AND rawindex.indexrelid = indexes_info_filtered.indexrelid
-	AND rawindex.indkeyidx = indexes_info_filtered.indkeyidx
-INNER JOIN pg_attribute AS columninfo
+    ON rawindex.indrelid = indexes_info_filtered.indrelid
+    AND rawindex.indexrelid = indexes_info_filtered.indexrelid
+    AND rawindex.indkeyidx = indexes_info_filtered.indkeyidx
+-- You may wonder, why `LEFT JOIN` here? Same reason as above.
+LEFT JOIN pg_attribute AS columninfo
     ON columninfo.attrelid = tableinfo.oid
     AND columninfo.attnum = rawindex.indkeyid
 INNER JOIN pg_indexes
-	ON pg_indexes.schemaname = schemainfo.nspname
-	AND pg_indexes.indexname = indexinfo.relname
+    ON pg_indexes.schemaname = schemainfo.nspname
+    AND pg_indexes.indexname = indexinfo.relname
 INNER JOIN pg_am AS indexaccess ON indexaccess.oid = indexinfo.relam
 LEFT JOIN pg_opclass AS opclass -- left join because crdb has no opclasses
     ON opclass.oid = rawindex.indclass

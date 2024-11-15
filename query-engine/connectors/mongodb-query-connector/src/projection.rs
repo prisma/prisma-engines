@@ -1,6 +1,6 @@
 use crate::IntoBson;
-use mongodb::bson::{Bson, Document};
-use prisma_models::{FieldSelection, SelectedField};
+use bson::{Bson, Document};
+use query_structure::{FieldSelection, SelectedField};
 
 /// Used as projection document for Mongo queries.
 impl IntoBson for FieldSelection {
@@ -15,17 +15,21 @@ impl IntoBson for FieldSelection {
 fn path_prefixed_selection(doc: &mut Document, parent_paths: Vec<String>, selections: Vec<SelectedField>) {
     for field in selections {
         match field {
-            prisma_models::SelectedField::Scalar(sf) => {
+            query_structure::SelectedField::Scalar(sf) => {
                 let mut parent_paths = parent_paths.clone();
                 parent_paths.push(sf.db_name().to_owned());
                 doc.insert(parent_paths.join("."), Bson::Int32(1));
             }
 
-            prisma_models::SelectedField::Composite(cs) => {
+            query_structure::SelectedField::Composite(cs) => {
                 let mut parent_paths = parent_paths.clone();
                 parent_paths.push(cs.field.db_name().to_owned());
                 path_prefixed_selection(doc, parent_paths, cs.selections);
             }
+
+            query_structure::SelectedField::Relation(_) => unreachable!(),
+
+            query_structure::SelectedField::Virtual(_) => {}
         }
     }
 }

@@ -54,9 +54,33 @@ mod failure {
     async fn unknown_field_name_fails(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            r#"{ findManyTestModel(where: { id: { equals: { _ref: "unknown" } } }) { id } }"#,
+            r#"{ findManyTestModel(where: { id: { equals: { _ref: "unknown", _container: "TestModel" } } }) { id } }"#,
             2019,
             "The referenced scalar field TestModel.unknown does not exist."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn fields_of_different_models_fails(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            runner,
+            r#"{ findManyTestModel(where: { id: { equals: { _ref: "testId", _container: "Child" } } }) { id } }"#,
+            2019,
+            "Expected a referenced scalar field of model TestModel, but found a field of model Child."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(setup::mixed_composite_types), capabilities(CompositeTypes))]
+    async fn fields_of_different_container_fails(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            runner,
+            r#"query { findManyTestModel(where: { id: { equals: { _ref: "string", _container: "Composite" } } }) { id }}"#,
+            2019,
+            "Expected a referenced scalar field of model TestModel, but found a field of composite type Composite."
         );
 
         Ok(())
@@ -66,7 +90,7 @@ mod failure {
     async fn relation_field_name_fails(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            r#"{ findManyTestModel(where: { id: { equals: { _ref: "children" } } }) { id } }"#,
+            r#"{ findManyTestModel(where: { id: { equals: { _ref: "children", _container: "TestModel" } } }) { id } }"#,
             2019,
             "Expected a referenced scalar field TestModel.children but found a relation field."
         );
@@ -79,7 +103,7 @@ mod failure {
         // Simple scalar filter
         assert_error!(
             runner,
-            r#"{ findManyTestModel(where: { id: { equals: { _ref: "str" } } }) { id } }"#,
+            r#"{ findManyTestModel(where: { id: { equals: { _ref: "str", _container: "TestModel" } } }) { id } }"#,
             2019,
             "Expected a referenced scalar field of type Int but found TestModel.str of type String."
         );
@@ -87,7 +111,7 @@ mod failure {
         // Through a relation filter
         assert_error!(
             runner,
-            r#"{ findManyTestModel(where: { children: { some: { id: { equals: { _ref: "str" } } } } }) { id } }"#,
+            r#"{ findManyTestModel(where: { children: { some: { id: { equals: { _ref: "str", _container: "Child" } } } } }) { id } }"#,
             2019,
             "Expected a referenced scalar field of type Int but found Child.str of type String."
         );
@@ -100,7 +124,7 @@ mod failure {
         // Simple scalar filter
         assert_error!(
             runner,
-            r#"{ findManyTestModel(where: { str: { equals: { _ref: "str_list" } } }) { id } }"#,
+            r#"{ findManyTestModel(where: { str: { equals: { _ref: "str_list", _container: "TestModel" } } }) { id } }"#,
             2019,
             "Expected a referenced scalar field of type String but found TestModel.str_list of type String[]."
         );
@@ -108,7 +132,7 @@ mod failure {
         // Through a relation filter
         assert_error!(
             runner,
-            r#"{ findManyTestModel(where: { children: { some: { str: { equals: { _ref: "str_list" } } } } }) { id } }"#,
+            r#"{ findManyTestModel(where: { children: { some: { str: { equals: { _ref: "str_list", _container: "Child" } } } } }) { id } }"#,
             2019,
             "Expected a referenced scalar field of type String but found Child.str_list of type String[]."
         );
@@ -123,14 +147,14 @@ mod failure {
     async fn field_ref_inclusion_filter_fails(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            r#"{ findManyTestModel(where: { str: { in: { _ref: "smth" } } }) { id } }"#,
+            r#"{ findManyTestModel(where: { str: { in: { _ref: "smth", _container: "TestModel" } } }) { id } }"#,
             2009,
             "Invalid argument type"
         );
 
         assert_error!(
             runner,
-            r#"{ findManyTestModel(where: { str: { notIn: { _ref: "smth" } } }) { id } }"#,
+            r#"{ findManyTestModel(where: { str: { notIn: { _ref: "smth", _container: "TestModel" } } }) { id } }"#,
             2009,
             "Invalid argument type"
         );
@@ -142,7 +166,7 @@ mod failure {
     async fn field_ref_in_having_must_be_selected(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            r#"query { groupByTestModel(by: [int], having: { int: { _count: { equals: { _ref: "int_2" } } } }) { int }}"#,
+            r#"query { groupByTestModel(by: [int], having: { int: { _count: { equals: { _ref: "int_2", _container: "TestModel" } } } }) { int }}"#,
             2019,
             ""
         );
@@ -155,13 +179,13 @@ mod failure {
         // assert that referencing an Int field for the count of a string field works
         run_query!(
             &runner,
-            r#"query { groupByTestModel(by: [string, int], having: { string: { _count: { equals: { _ref: "int" } } } }) { string, int }}"#
+            r#"query { groupByTestModel(by: [string, int], having: { string: { _count: { equals: { _ref: "int", _container: "TestModel" } } } }) { string, int }}"#
         );
 
         // assert that the count of a String field expect the referenced field to be of type Int
         assert_error!(
             runner,
-            r#"query { groupByTestModel(by: [string, int], having: { string: { _count: { equals: { _ref: "string" } } } }) { id }}"#,
+            r#"query { groupByTestModel(by: [string, int], having: { string: { _count: { equals: { _ref: "string", _container: "TestModel" } } } }) { id }}"#,
             2019,
             "Expected a referenced scalar field of type Int but found TestModel.string of type String."
         );
@@ -173,39 +197,39 @@ mod failure {
     async fn json_string_expect_string_field_ref(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            r#"query { findManyTestModel(where: { json: { string_contains: { _ref: "json" } } }) { id }}"#,
+            r#"query { findManyTestModel(where: { json: { string_contains: { _ref: "json", _container: "TestModel" } } }) { id }}"#,
             2019,
             "Expected a referenced scalar field of type String but found TestModel.json of type Json."
         );
         assert_error!(
             runner,
-            r#"query { findManyTestModel(where: { NOT: { json: { string_contains: { _ref: "json" } } } }) { id }}"#,
-            2019,
-            "Expected a referenced scalar field of type String but found TestModel.json of type Json."
-        );
-
-        assert_error!(
-            runner,
-            r#"query { findManyTestModel(where: { json: { string_ends_with: { _ref: "json" } } }) { id }}"#,
-            2019,
-            "Expected a referenced scalar field of type String but found TestModel.json of type Json."
-        );
-        assert_error!(
-            runner,
-            r#"query { findManyTestModel(where: { NOT: { json: { string_ends_with: { _ref: "json" } } } }) { id }}"#,
+            r#"query { findManyTestModel(where: { NOT: { json: { string_contains: { _ref: "json", _container: "TestModel" } } } }) { id }}"#,
             2019,
             "Expected a referenced scalar field of type String but found TestModel.json of type Json."
         );
 
         assert_error!(
             runner,
-            r#"query { findManyTestModel(where: { json: { string_starts_with: { _ref: "json" } } }) { id }}"#,
+            r#"query { findManyTestModel(where: { json: { string_ends_with: { _ref: "json", _container: "TestModel" } } }) { id }}"#,
             2019,
             "Expected a referenced scalar field of type String but found TestModel.json of type Json."
         );
         assert_error!(
             runner,
-            r#"query { findManyTestModel(where: { NOT: { json: { string_starts_with: { _ref: "json" } } } }) { id }}"#,
+            r#"query { findManyTestModel(where: { NOT: { json: { string_ends_with: { _ref: "json", _container: "TestModel" } } } }) { id }}"#,
+            2019,
+            "Expected a referenced scalar field of type String but found TestModel.json of type Json."
+        );
+
+        assert_error!(
+            runner,
+            r#"query { findManyTestModel(where: { json: { string_starts_with: { _ref: "json", _container: "TestModel" } } }) { id }}"#,
+            2019,
+            "Expected a referenced scalar field of type String but found TestModel.json of type Json."
+        );
+        assert_error!(
+            runner,
+            r#"query { findManyTestModel(where: { NOT: { json: { string_starts_with: { _ref: "json", _container: "TestModel" } } } }) { id }}"#,
             2019,
             "Expected a referenced scalar field of type String but found TestModel.json of type Json."
         );
@@ -217,7 +241,7 @@ mod failure {
     async fn referencing_composite_field_fails(runner: Runner) -> TestResult<()> {
         assert_error!(
             runner,
-            r#"query { findManyTestModel(where: { comp: { equals: { _ref: "comp" } } }) { id }}"#,
+            r#"query { findManyTestModel(where: { comp: { equals: { _ref: "comp", _container: "TestModel" } } }) { id }}"#,
             2009,
             "Unable to match input value to any allowed input type for the field"
         );
@@ -229,12 +253,25 @@ mod failure {
     /// we can't make it work both for MySQL and MariaDB without making MariaDB its own connector.
     #[connector_test(schema(schemas::json), only(MySql(5.7, 8, "mariadb")))]
     async fn alphanumeric_json_filter_fails(runner: Runner) -> TestResult<()> {
-        assert_error!(
-            runner,
-            r#"query { findManyTestModel(where: { json: { gt: { _ref: "json" } } }) { id }}"#,
-            2009,
-            "Invalid argument type"
-        );
+        let res = match runner.protocol() {
+            EngineProtocol::Graphql => runner.query(r#"query { findManyTestModel(where: { json: { gt: { _ref: "json", _container: "TestModel" } } }) { id }}"#).await?,
+            EngineProtocol::Json => runner.query_json(r#"{
+                "modelName": "TestModel",
+                "action": "findMany",
+                "query": {
+                    "arguments": {
+                        "where": {
+                            "json": { "gt": { "$type": "FieldRef", "value": { "_ref": "json", "_container": "TestModel" } } }
+                        }
+                    },
+                    "selection": {
+                        "id": true
+                    }
+                }
+            }"#).await?,
+        };
+
+        res.assert_failure(2009, Some("Invalid argument type".to_owned()));
 
         Ok(())
     }

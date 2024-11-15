@@ -19,7 +19,7 @@ pub(super) fn scalar_field(
     sfid: ScalarFieldId,
     ast_model: &ast::Model,
     ast_field: &ast::Field,
-    model_id: ast::ModelId,
+    model_id: crate::ModelId,
     field_id: ast::FieldId,
     ctx: &mut Context<'_>,
 ) {
@@ -71,7 +71,7 @@ pub(super) fn scalar_field(
 pub(super) fn composite_type_field(
     ct: &ast::CompositeType,
     ast_field: &ast::Field,
-    ctid: ast::CompositeTypeId,
+    ctid: crate::CompositeTypeId,
     field_id: ast::FieldId,
     ctx: &mut Context<'_>,
 ) {
@@ -81,7 +81,7 @@ pub(super) fn composite_type_field(
     };
 
     {
-        let mut field = ctx.types.composite_type_fields.get_mut(&(ctid, field_id)).unwrap();
+        let field = ctx.types.composite_type_fields.get_mut(&(ctid, field_id)).unwrap();
         field.mapped_name = Some(mapped_name_id);
     }
 

@@ -1,10 +1,20 @@
-use super::*;
-use crate::SqlDatamodelRenderer;
+use std::fmt::Display;
 
-#[derive(Debug, Default, Clone, PartialEq)]
+use super::*;
+use crate::{BoxFuture, SqlDatamodelRenderer};
+use quaint::{prelude::Queryable, single::Quaint};
+
+#[derive(Debug, Default)]
 pub struct SqliteConnectorTag;
 
 impl ConnectorTagInterface for SqliteConnectorTag {
+    fn raw_execute<'a>(&'a self, query: &'a str, connection_url: &'a str) -> BoxFuture<'a, Result<(), TestError>> {
+        Box::pin(async move {
+            let conn = Quaint::new(connection_url).await?;
+            Ok(conn.raw_cmd(query).await?)
+        })
+    }
+
     fn datamodel_provider(&self) -> &'static str {
         "sqlite"
     }
@@ -13,41 +23,44 @@ impl ConnectorTagInterface for SqliteConnectorTag {
         Box::new(SqlDatamodelRenderer::new())
     }
 
-    fn connection_string(
-        &self,
-        database: &str,
-        _is_ci: bool,
-        _is_multi_schema: bool,
-        _: Option<&'static str>,
-    ) -> String {
-        let workspace_root = std::env::var("WORKSPACE_ROOT")
-            .unwrap_or_else(|_| ".".to_owned())
-            .trim_end_matches('/')
-            .to_owned();
-
-        format!("file://{workspace_root}/db/{database}.db")
-    }
-
     fn capabilities(&self) -> ConnectorCapabilities {
         psl::builtin_connectors::SQLITE.capabilities()
     }
+}
 
-    fn as_parse_pair(&self) -> (String, Option<String>) {
-        ("sqlite".to_owned(), None)
-    }
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum SqliteVersion {
+    V3,
+    ReactNative,
+    LibsqlJsNapi,
+    LibsqlJsWasm,
+    CloudflareD1,
+}
 
-    fn is_versioned(&self) -> bool {
-        false
+impl Display for SqliteVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            SqliteVersion::ReactNative => f.write_str("react-native"),
+            SqliteVersion::V3 => f.write_str("3"),
+            SqliteVersion::LibsqlJsNapi => f.write_str("libsql.js"),
+            SqliteVersion::LibsqlJsWasm => f.write_str("libsql.js.wasm"),
+            SqliteVersion::CloudflareD1 => f.write_str("cfd1"),
+        }
     }
 }
 
-impl SqliteConnectorTag {
-    pub fn new() -> Self {
-        Self
-    }
+impl TryFrom<&str> for SqliteVersion {
+    type Error = TestError;
 
-    /// Returns all versions of this connector.
-    pub fn all() -> Vec<Self> {
-        vec![Self::new()]
+    fn try_from(s: &str) -> Result<Self, Self::Error> {
+        let version = match s {
+            "3" => Self::V3,
+            "libsql.js" => Self::LibsqlJsNapi,
+            "libsql.js.wasm" => Self::LibsqlJsWasm,
+            "react-native" => Self::ReactNative,
+            "cfd1" => Self::CloudflareD1,
+            _ => return Err(TestError::parse_error(format!("Unknown SQLite version `{s}`"))),
+        };
+        Ok(version)
     }
 }

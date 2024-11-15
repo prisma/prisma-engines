@@ -11,7 +11,7 @@ pub(crate) fn calculate(datamodel: &ValidatedSchema) -> MongoSchema {
     let mut schema = MongoSchema::default();
 
     for model in datamodel.db.walk_models() {
-        let collection_id = schema.push_collection(model.database_name().to_owned(), false);
+        let collection_id = schema.push_collection(model.database_name().to_owned(), false, false);
 
         for index in model.indexes() {
             let name = index.constraint_name(MONGODB);

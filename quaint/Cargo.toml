@@ -23,23 +23,16 @@ resolver = "2"
 features = ["docs", "all"]
 
 [features]
-default = []
 docs = []
 # Expose the underlying database drivers when a connector is enabled. This is a
 # way to access database-specific methods when you need extra control.
 expose-drivers = []
 
-all = [
-  "chrono",
-  "json",
-  "mssql",
-  "mysql",
-  "pooled",
-  "postgresql",
-  "serde-support",
-  "sqlite",
-  "uuid",
-  "bigdecimal",
+all-native = [
+  "postgresql-native",
+  "mysql-native",
+  "mssql-native",
+  "sqlite-native",
 ]
 
 vendored-openssl = [
@@ -47,7 +40,8 @@ vendored-openssl = [
   "mysql_async/vendored-openssl",
 ]
 
-postgresql = [
+postgresql-native = [
+  "postgresql",
   "native-tls",
   "tokio-postgres",
   "postgres-types",
@@ -57,41 +51,53 @@ postgresql = [
   "bit-vec",
   "lru-cache",
   "byteorder",
+  "dep:ws_stream_tungstenite",
+  "dep:async-tungstenite"
 ]
+postgresql = []
 
-json = ["serde_json", "base64"]
-mssql = ["tiberius", "uuid", "chrono", "tokio-util", "tokio/time", "tokio/net", "either"]
-mysql = ["mysql_async", "tokio/time", "lru-cache"]
+mssql-native = ["mssql", "tiberius", "tokio-util", "tokio/time", "tokio/net"]
+mssql = []
+
+mysql-native = ["mysql", "mysql_async", "tokio/time", "lru-cache"]
+mysql = ["chrono/std"]
+
 pooled = ["mobc"]
-serde-support = ["serde", "chrono/serde"]
-sqlite = ["rusqlite", "libsqlite3-sys", "tokio/sync"]
-bigdecimal = ["bigdecimal_"]
+sqlite-native = ["sqlite", "rusqlite/bundled", "tokio/sync"]
+sqlite = []
+
 fmt-sql = ["sqlformat"]
 
 [dependencies]
 connection-string = "0.2"
 percent-encoding = "2"
-tracing-core = "0.1"
-async-trait = "0.1"
+tracing.workspace = true
+tracing-futures.workspace = true
+async-trait.workspace = true
 thiserror = "1.0"
 num_cpus = "1.12"
-metrics = "0.18"
-tracing = "0.1"
-futures = "0.3"
-url = "2.1"
+prisma-metrics.path = "../libs/metrics"
+futures.workspace = true
+url.workspace = true
 hex = "0.4"
+itertools.workspace = true
+regex.workspace = true
+enumflags2.workspace = true
 
-either = { version = "1.6", optional = true }
-base64 = { version = "0.12.3", optional = true }
-chrono = { version = "0.4", optional = true, default-features = false }
+either = { version = "1.6" }
+base64 = { version = "0.12.3" }
+chrono.workspace = true
 lru-cache = { version = "0.1", optional = true }
-serde_json = { version = "1.0.48", optional = true, features = ["float_roundtrip"] }
+serde_json.workspace = true
 native-tls = { version = "0.2", optional = true }
 bit-vec = { version = "0.6.1", optional = true }
 bytes = { version = "1.0", optional = true }
-mobc = { version = "0.8", optional = true }
-serde = { version = "1.0", optional = true }
-sqlformat = { version = "0.2.0", optional = true }
+mobc = { version = "0.8.5", optional = true }
+serde = { version = "1.0" }
+sqlformat = { version = "0.2.3", optional = true }
+uuid.workspace = true
+crosstarget-utils = { path = "../libs/crosstarget-utils" }
+concat-idents = "1.1.5"
 
 [dev-dependencies]
 once_cell = "1.3"
@@ -99,10 +105,24 @@ indoc = "0.3"
 names = "0.11"
 paste = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-test-macros = { path = "test-macros" }
-test-setup = { path = "test-setup" }
-uuid = { version = "1", features = ["v4"] }
-tokio = { version = "1.0", features = ["rt-multi-thread", "macros", "time"] }
+quaint-test-macros = { path = "quaint-test-macros" }
+quaint-test-setup = { path = "quaint-test-setup" }
+tokio = { version = "1", features = ["macros", "time"] }
+expect-test = "1"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.getrandom]
+version = "0.2"
+features = ["js"]
+
+[dependencies.ws_stream_tungstenite]
+version = "0.14.0"
+features = ["tokio_io"]
+optional = true
+
+[dependencies.async-tungstenite]
+version = "0.28.0"
+features = ["tokio-runtime", "tokio-native-tls"]
+optional = true
 
 [dependencies.byteorder]
 default-features = false
@@ -115,44 +135,49 @@ optional = true
 branch = "vendored-openssl"
 
 [dependencies.rusqlite]
-version = "0.25"
-features = ["chrono", "bundled", "column_decltype"]
-optional = true
-
-[dependencies.libsqlite3-sys]
-version = "0.22"
-default-features = false
-features = ["bundled"]
+version = "0.31"
+features = ["chrono", "column_decltype"]
 optional = true
 
 [target.'cfg(not(any(target_os = "macos", target_os = "ios")))'.dependencies.tiberius]
-version = "0.11.6"
+version = "0.12.3"
 optional = true
 features = ["sql-browser-tokio", "chrono", "bigdecimal"]
 
 [target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies.tiberius]
-version = "0.11.2"
+version = "0.12.3"
 optional = true
 default-features = false
-features = ["sql-browser-tokio", "vendored-openssl", "chrono", "bigdecimal", "tds73", "winauth"]
+features = [
+  "sql-browser-tokio",
+  "vendored-openssl",
+  "chrono",
+  "bigdecimal",
+  "tds73",
+  "winauth",
+]
 
-[dependencies.bigdecimal_]
+[dependencies.bigdecimal]
 version = "0.3"
-optional = true
-package = "bigdecimal"
-
-[dependencies.uuid]
-version = "1"
-optional = true
 
 [dependencies.tokio-postgres]
-features = ["with-uuid-1", "with-chrono-0_4", "with-serde_json-1", "with-bit-vec-0_6"]
+features = [
+  "with-uuid-1",
+  "with-chrono-0_4",
+  "with-serde_json-1",
+  "with-bit-vec-0_6",
+]
 git = "https://github.com/prisma/rust-postgres"
 branch = "pgbouncer-mode"
 optional = true
 
 [dependencies.postgres-types]
-features = ["with-uuid-1", "with-chrono-0_4", "with-serde_json-1", "with-bit-vec-0_6"]
+features = [
+  "with-uuid-1",
+  "with-chrono-0_4",
+  "with-serde_json-1",
+  "with-bit-vec-0_6",
+]
 git = "https://github.com/prisma/rust-postgres"
 branch = "pgbouncer-mode"
 optional = true
@@ -168,6 +193,9 @@ features = ["rt-multi-thread", "macros", "sync"]
 optional = true
 
 [dependencies.tokio-util]
-version = "0.6"
+version = "0.7"
 features = ["compat"]
 optional = true
+
+[build-dependencies]
+cfg_aliases = "0.2.1"

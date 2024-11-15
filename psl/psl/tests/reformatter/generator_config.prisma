@@ -1,0 +1,14 @@
+generator custom {
+  provider = "my-custom-provider"
+
+  // Built-in properties
+  output = "./generated"
+  previewFeatures = ["jsonProtocol"]
+  binaryTargets = ["haiku"]
+
+  // Custom properties
+  customName = "client"
+  customVersion = 1
+  customFeatures = ["gc", "timers"]
+  customProgram = ["defn", "handler", [], ["ring-bell"]]
+}

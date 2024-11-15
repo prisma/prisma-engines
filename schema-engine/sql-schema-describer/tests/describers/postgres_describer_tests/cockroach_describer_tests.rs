@@ -525,6 +525,7 @@ fn cockroachdb_22_2_sequences_must_work(api: TestApi) {
         PostgresSchemaExt {
             opclasses: [],
             indexes: [],
+            expression_indexes: [],
             index_null_position: {},
             constraint_options: {},
             table_options: [],

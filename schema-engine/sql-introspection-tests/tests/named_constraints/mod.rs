@@ -167,7 +167,7 @@ async fn introspecting_non_default_index_names_works(api: &mut TestApi) -> TestR
         .await?;
 
     let expected = expect![[r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model Compound {
           a Int
           b Int
@@ -176,7 +176,7 @@ async fn introspecting_non_default_index_names_works(api: &mut TestApi) -> TestR
           @@ignore
         }
 
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model Single {
           id Int @default(autoincrement())
 
@@ -208,7 +208,7 @@ async fn introspecting_default_index_names_works(api: &mut TestApi) -> TestResul
         .await?;
 
     let expected = expect![[r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model Compound {
           a Int
           b Int
@@ -217,7 +217,7 @@ async fn introspecting_default_index_names_works(api: &mut TestApi) -> TestResul
           @@ignore
         }
 
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model Single {
           id Int @default(autoincrement())
 

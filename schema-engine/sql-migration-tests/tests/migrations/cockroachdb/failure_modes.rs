@@ -1,6 +1,6 @@
 use sql_migration_tests::test_api::*;
 
-#[test_connector(tags(CockroachDb))]
+#[test_connector(tags(CockroachDb), exclude(CockroachDb231))]
 fn failing_migration_after_migration_dropping_data(api: TestApi) {
     let migrations = &[
         r#"
@@ -27,7 +27,7 @@ fn failing_migration_after_migration_dropping_data(api: TestApi) {
         "#,
     ];
     let dir = write_migrations(migrations);
-    let err = api.apply_migrations(&dir).send_unwrap_err().to_string();
+    let err = api.apply_migrations(&dir).send_unwrap_err();
     let expectation = expect![[r#"
         A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
 
@@ -39,17 +39,11 @@ fn failing_migration_after_migration_dropping_data(api: TestApi) {
         ERROR: column "is_good_dog" does not exist
 
         DbError { severity: "ERROR", parsed_severity: Some(Error), code: SqlState(E42703), message: "column \"is_good_dog\" does not exist", detail: None, hint: None, position: None, where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some("column_resolver.go"), line: Some(196), routine: Some("NewUndefinedColumnError") }
-
-           0: sql_schema_connector::apply_migration::apply_script
-                   with [3mmigration_name[0m[2m=[0m"  2"
-                     at schema-engine/connectors/sql-schema-connector/src/apply_migration.rs:106
-           1: schema_core::commands::apply_migrations::Applying migration
-                   with [3mmigration_name[0m[2m=[0m"  2"
-                     at schema-engine/core/src/commands/apply_migrations.rs:91"#]];
-    expectation.assert_eq(&err);
+    "#]];
+    expectation.assert_eq(err.message().unwrap());
 }
 
-#[test_connector(tags(CockroachDb))]
+#[test_connector(tags(CockroachDb), exclude(CockroachDb231))]
 fn failing_step_in_migration_dropping_data(api: TestApi) {
     let migrations = &[
         r#"
@@ -74,7 +68,7 @@ fn failing_step_in_migration_dropping_data(api: TestApi) {
         "#,
     ];
     let dir = write_migrations(migrations);
-    let err = api.apply_migrations(&dir).send_unwrap_err().to_string();
+    let err = api.apply_migrations(&dir).send_unwrap_err();
     let expectation = expect![[r#"
         A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
 
@@ -86,17 +80,12 @@ fn failing_step_in_migration_dropping_data(api: TestApi) {
         ERROR: column "is_good_dog" does not exist
 
         DbError { severity: "ERROR", parsed_severity: Some(Error), code: SqlState(E42703), message: "column \"is_good_dog\" does not exist", detail: None, hint: None, position: None, where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some("column_resolver.go"), line: Some(196), routine: Some("NewUndefinedColumnError") }
-
-           0: sql_schema_connector::apply_migration::apply_script
-                   with [3mmigration_name[0m[2m=[0m"  1"
-                     at schema-engine/connectors/sql-schema-connector/src/apply_migration.rs:106
-           1: schema_core::commands::apply_migrations::Applying migration
-                   with [3mmigration_name[0m[2m=[0m"  1"
-                     at schema-engine/core/src/commands/apply_migrations.rs:91"#]];
-    expectation.assert_eq(&err);
+    "#]];
+    expectation.assert_eq(err.message().unwrap());
 }
 
-#[test_connector(tags(CockroachDb))]
+// Skipped on CRDB 23.1 because of https://github.com/prisma/prisma/issues/20851
+#[test_connector(tags(CockroachDb), exclude(CockroachDb231))]
 fn multiple_alter_tables_in_one_migration_works(api: TestApi) {
     let migrations = &[
         r#"
@@ -170,7 +159,7 @@ fn multiple_alter_tables_in_multiple_migration_works(api: TestApi) {
     api.apply_migrations(&dir).send_sync();
 }
 
-#[test_connector(tags(CockroachDb))]
+#[test_connector(tags(CockroachDb), exclude(CockroachDb231))]
 fn syntax_errors_return_error_position(api: TestApi) {
     let migrations = &[r#"
             CREATE TABLE "Dog" (
@@ -180,7 +169,7 @@ fn syntax_errors_return_error_position(api: TestApi) {
             );
         "#];
     let dir = write_migrations(migrations);
-    let err = api.apply_migrations(&dir).send_unwrap_err().to_string();
+    let err = api.apply_migrations(&dir).send_unwrap_err();
     let expectation = expect![[r#"
         A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
 
@@ -199,14 +188,8 @@ fn syntax_errors_return_error_position(api: TestApi) {
         HINT: try \h CREATE TABLE
 
         DbError { severity: "ERROR", parsed_severity: Some(Error), code: SqlState(E42601), message: "at or near \"is_good_dog\": syntax error", detail: Some("source SQL:\nCREATE TABLE \"Dog\" (\n                id              SERIAL PRIMARY KEY,\n                name            TEXT NOT NULL\n                is_good_dog     BOOLEAN NOT NULL DEFAULT TRUE\n                ^"), hint: Some("try \\h CREATE TABLE"), position: None, where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some("lexer.go"), line: Some(271), routine: Some("Error") }
-
-           0: sql_schema_connector::apply_migration::apply_script
-                   with [3mmigration_name[0m[2m=[0m"  0"
-                     at schema-engine/connectors/sql-schema-connector/src/apply_migration.rs:106
-           1: schema_core::commands::apply_migrations::Applying migration
-                   with [3mmigration_name[0m[2m=[0m"  0"
-                     at schema-engine/core/src/commands/apply_migrations.rs:91"#]];
-    expectation.assert_eq(&err);
+    "#]];
+    expectation.assert_eq(err.message().unwrap());
 }
 
 fn write_migrations(migrations: &[&str]) -> tempfile::TempDir {

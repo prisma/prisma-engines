@@ -1,108 +1,69 @@
 use super::*;
-use input_types::fields::{arguments, input_fields};
-use mutations::{create_many, create_one};
-use prisma_models::{DefaultKind, PrismaValue};
+use input_types::fields::arguments;
+use mutations::{create_many, create_many_and_return, create_one};
 use psl::datamodel_connector::ConnectorCapability;
+use query_structure::{DefaultKind, PrismaValue};
 
 /// Builds the root `Mutation` type.
-pub(crate) fn build(ctx: &mut BuilderContext<'_>) -> OutputObjectTypeId {
-    let mut fields = Vec::with_capacity(ctx.internal_data_model.schema.db.models_count());
+pub(crate) fn mutation_fields(ctx: &QuerySchema) -> Vec<FieldFn> {
+    let mut fields: Vec<FieldFn> = Vec::with_capacity(ctx.internal_data_model.schema.db.models_count() * 2);
+
+    macro_rules! field {
+        ($f:ident, $model_var:expr) => {{
+            let model = $model_var.clone();
+            fields.push(Box::new(move |ctx| $f(ctx, model.clone())));
+        }};
+    }
 
     for model in ctx.internal_data_model.models() {
         if model.supports_create_operation() {
-            fields.push(create_one(ctx, &model));
+            field!(create_one, model);
 
-            append_opt(&mut fields, upsert_item_field(ctx, &model));
-            append_opt(&mut fields, create_many(ctx, &model));
+            field!(upsert_item_field, model);
+
+            if ctx.has_capability(ConnectorCapability::CreateMany) {
+                field!(create_many, model);
+
+                if ctx.has_capability(ConnectorCapability::InsertReturning) {
+                    field!(create_many_and_return, model);
+                }
+            }
         }
 
-        append_opt(&mut fields, delete_item_field(ctx, &model));
-        append_opt(&mut fields, update_item_field(ctx, &model));
+        field!(delete_item_field, model);
+        field!(update_item_field, model);
 
-        fields.push(update_many_field(ctx, &model));
-        fields.push(delete_many_field(ctx, &model));
+        field!(update_many_field, model);
+        field!(delete_many_field, model);
     }
 
-    create_nested_inputs(ctx);
-
     if ctx.enable_raw_queries && ctx.has_capability(ConnectorCapability::SqlQueryRaw) {
-        fields.push(create_execute_raw_field(ctx));
-        fields.push(create_query_raw_field(ctx));
+        fields.push(Box::new(|_| create_execute_raw_field()));
+        fields.push(Box::new(|_| create_query_raw_field()));
     }
 
     if ctx.enable_raw_queries && ctx.has_capability(ConnectorCapability::MongoDbQueryRaw) {
-        fields.push(create_mongodb_run_command_raw(ctx));
+        fields.push(Box::new(|_| create_mongodb_run_command_raw()));
     }
 
-    let ident = Identifier::new_prisma("Mutation".to_owned());
-    ctx.db.push_output_object_type(object_type(ident, fields, None))
+    fields
 }
 
-// implementation note: these need to be in the same function, because these vecs interact: the create inputs will enqueue update inputs, and vice versa.
-fn create_nested_inputs(ctx: &mut BuilderContext<'_>) {
-    let mut nested_create_inputs_queue = std::mem::take(&mut ctx.nested_create_inputs_queue);
-    let mut nested_update_inputs_queue = std::mem::take(&mut ctx.nested_update_inputs_queue);
-
-    while !(nested_create_inputs_queue.is_empty() && nested_update_inputs_queue.is_empty()) {
-        // Create inputs.
-        for (input_object, rf) in nested_create_inputs_queue.drain(..) {
-            let mut fields = vec![];
-
-            if rf.related_model().supports_create_operation() {
-                fields.push(input_fields::nested_create_one_input_field(ctx, &rf));
-
-                append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));
-                append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
-            }
-
-            fields.push(input_fields::nested_connect_input_field(ctx, &rf));
-            ctx.db[input_object].set_fields(fields);
-        }
-
-        // Update inputs.
-        for (input_object, rf) in nested_update_inputs_queue.drain(..) {
-            let mut fields = vec![];
-
-            if rf.related_model().supports_create_operation() {
-                fields.push(input_fields::nested_create_one_input_field(ctx, &rf));
-
-                append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));
-                append_opt(&mut fields, input_fields::nested_upsert_field(ctx, &rf));
-                append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
-            }
-
-            append_opt(&mut fields, input_fields::nested_set_input_field(ctx, &rf));
-            append_opt(&mut fields, input_fields::nested_disconnect_input_field(ctx, &rf));
-            append_opt(&mut fields, input_fields::nested_delete_input_field(ctx, &rf));
-
-            fields.push(input_fields::nested_connect_input_field(ctx, &rf));
-            fields.push(input_fields::nested_update_input_field(ctx, &rf));
-
-            append_opt(&mut fields, input_fields::nested_update_many_field(ctx, &rf));
-            append_opt(&mut fields, input_fields::nested_delete_many_field(ctx, &rf));
-
-            ctx.db[input_object].set_fields(fields);
-        }
-
-        std::mem::swap(&mut nested_create_inputs_queue, &mut ctx.nested_create_inputs_queue);
-        std::mem::swap(&mut nested_update_inputs_queue, &mut ctx.nested_update_inputs_queue);
-    }
-}
-
-fn create_execute_raw_field(ctx: &mut BuilderContext<'_>) -> OutputField {
+fn create_execute_raw_field<'a>() -> OutputField<'a> {
     field(
         "executeRaw",
-        vec![
-            input_field(ctx, "query", InputType::string(), None),
-            input_field(
-                ctx,
-                "parameters",
-                InputType::json_list(),
-                Some(DefaultKind::Single(PrismaValue::String("[]".into()))),
-            )
-            .optional(),
-        ],
-        OutputType::json(),
+        || {
+            vec![
+                input_field("query", vec![InputType::string()], None),
+                input_field(
+                    "parameters",
+                    vec![InputType::json_list()],
+                    Some(DefaultKind::Single(PrismaValue::String("[]".into()))),
+                )
+                .optional(),
+            ]
+        },
+        OutputType::non_list(OutputType::json()),
         Some(QueryInfo {
             tag: QueryTag::ExecuteRaw,
             model: None,
@@ -110,20 +71,21 @@ fn create_execute_raw_field(ctx: &mut BuilderContext<'_>) -> OutputField {
     )
 }
 
-fn create_query_raw_field(ctx: &mut BuilderContext<'_>) -> OutputField {
+fn create_query_raw_field<'a>() -> OutputField<'a> {
     field(
         "queryRaw",
-        vec![
-            input_field(ctx, "query", InputType::string(), None),
-            input_field(
-                ctx,
-                "parameters",
-                InputType::json_list(),
-                Some(DefaultKind::Single(PrismaValue::String("[]".into()))),
-            )
-            .optional(),
-        ],
-        OutputType::json(),
+        || {
+            vec![
+                simple_input_field("query", InputType::string(), None),
+                simple_input_field(
+                    "parameters",
+                    InputType::json_list(),
+                    Some(DefaultKind::Single(PrismaValue::String("[]".into()))),
+                )
+                .optional(),
+            ]
+        },
+        OutputType::non_list(OutputType::json()),
         Some(QueryInfo {
             tag: QueryTag::QueryRaw,
             model: None,
@@ -131,11 +93,11 @@ fn create_query_raw_field(ctx: &mut BuilderContext<'_>) -> OutputField {
     )
 }
 
-fn create_mongodb_run_command_raw(ctx: &mut BuilderContext<'_>) -> OutputField {
+fn create_mongodb_run_command_raw<'a>() -> OutputField<'a> {
     field(
         "runCommandRaw",
-        vec![input_field(ctx, "command", InputType::json(), None)],
-        OutputType::json(),
+        || vec![simple_input_field("command", InputType::json(), None)],
+        OutputType::non_list(OutputType::json()),
         Some(QueryInfo {
             tag: QueryTag::RunCommandRaw,
             model: None,
@@ -144,86 +106,81 @@ fn create_mongodb_run_command_raw(ctx: &mut BuilderContext<'_>) -> OutputField {
 }
 
 /// Builds a delete mutation field (e.g. deleteUser) for given model.
-fn delete_item_field(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Option<OutputField> {
-    arguments::delete_one_arguments(ctx, model).map(|args| {
-        let field_name = format!("deleteOne{}", model.name());
-
-        field(
-            field_name,
-            args,
-            OutputType::object(objects::model::map_type(ctx, model)),
-            Some(QueryInfo {
-                model: Some(model.clone()),
-                tag: QueryTag::DeleteOne,
-            }),
-        )
-        .nullable()
-    })
+fn delete_item_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
+    let cloned_model = model.clone();
+    let model_id = model.id;
+    field(
+        format!("deleteOne{}", model.name()),
+        move || arguments::delete_one_arguments(ctx, cloned_model),
+        OutputType::object(objects::model::model_object_type(ctx, model)),
+        Some(QueryInfo {
+            model: Some(model_id),
+            tag: QueryTag::DeleteOne,
+        }),
+    )
+    .nullable()
 }
 
 /// Builds a delete many mutation field (e.g. deleteManyUsers) for given model.
-fn delete_many_field(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> OutputField {
-    let arguments = arguments::delete_many_arguments(ctx, model);
+fn delete_many_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
     let field_name = format!("deleteMany{}", model.name());
+    let cloned_model = model.clone();
 
     field(
         field_name,
-        arguments,
-        OutputType::object(objects::affected_records_object_type(ctx)),
+        move || arguments::delete_many_arguments(ctx, cloned_model),
+        OutputType::object(objects::affected_records_object_type()),
         Some(QueryInfo {
-            model: Some(model.clone()),
+            model: Some(model.id),
             tag: QueryTag::DeleteMany,
         }),
     )
 }
 
 /// Builds an update mutation field (e.g. updateUser) for given model.
-fn update_item_field(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Option<OutputField> {
-    arguments::update_one_arguments(ctx, model).map(|args| {
-        let field_name = format!("updateOne{}", model.name());
-
-        field(
-            field_name,
-            args,
-            OutputType::object(objects::model::map_type(ctx, model)),
-            Some(QueryInfo {
-                model: Some(model.clone()),
-                tag: QueryTag::UpdateOne,
-            }),
-        )
-        .nullable()
-    })
+fn update_item_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
+    let field_name = format!("updateOne{}", model.name());
+    let model_id = model.id;
+    let cloned_model = model.clone();
+    field(
+        field_name,
+        move || arguments::update_one_arguments(ctx, model),
+        OutputType::object(objects::model::model_object_type(ctx, cloned_model)),
+        Some(QueryInfo {
+            model: Some(model_id),
+            tag: QueryTag::UpdateOne,
+        }),
+    )
+    .nullable()
 }
 
 /// Builds an update many mutation field (e.g. updateManyUsers) for given model.
-fn update_many_field(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> OutputField {
-    let arguments = arguments::update_many_arguments(ctx, model);
+fn update_many_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
     let field_name = format!("updateMany{}", model.name());
+    let cloned_model = model.clone();
 
     field(
         field_name,
-        arguments,
-        OutputType::object(objects::affected_records_object_type(ctx)),
+        move || arguments::update_many_arguments(ctx, cloned_model),
+        OutputType::object(objects::affected_records_object_type()),
         Some(QueryInfo {
-            model: Some(model.clone()),
+            model: Some(model.id),
             tag: QueryTag::UpdateMany,
         }),
     )
 }
 
 /// Builds an upsert mutation field (e.g. upsertUser) for given model.
-fn upsert_item_field(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Option<OutputField> {
-    arguments::upsert_arguments(ctx, model).map(|args| {
-        let field_name = format!("upsertOne{}", model.name());
-
-        field(
-            field_name,
-            args,
-            OutputType::object(objects::model::map_type(ctx, model)),
-            Some(QueryInfo {
-                model: Some(model.clone()),
-                tag: QueryTag::UpsertOne,
-            }),
-        )
-    })
+fn upsert_item_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
+    let cloned_model = model.clone();
+    let model_id = model.id;
+    field(
+        format!("upsertOne{}", model.name()),
+        move || arguments::upsert_arguments(ctx, model),
+        OutputType::object(objects::model::model_object_type(ctx, cloned_model)),
+        Some(QueryInfo {
+            model: Some(model_id),
+            tag: QueryTag::UpsertOne,
+        }),
+    )
 }

@@ -4,15 +4,15 @@ use std::collections::HashMap;
 use url::Url;
 
 pub(crate) async fn postgres_setup(url: String, prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResult<()> {
-    let mut url = Url::parse(&url).map_err(ConnectorError::url_parse_error)?;
-    let mut quaint_url = quaint::connector::PostgresUrl::new(url.clone()).unwrap();
+    let mut parsed_url = Url::parse(&url).map_err(ConnectorError::url_parse_error)?;
+    let mut quaint_url = quaint::connector::PostgresNativeUrl::new(parsed_url.clone()).unwrap();
     quaint_url.set_flavour(PostgresFlavour::Postgres);
 
     let (db_name, schema) = (quaint_url.dbname(), quaint_url.schema());
 
     if !db_schemas.is_empty() {
-        strip_schema_param_from_url(&mut url);
-        let conn = create_postgres_admin_conn(url.clone()).await?;
+        strip_schema_param_from_url(&mut parsed_url);
+        let conn = create_postgres_admin_conn(parsed_url.clone()).await?;
 
         let query = format!("DROP DATABASE \"{db_name}\"");
         conn.raw_cmd(&query).await.ok();
@@ -20,16 +20,16 @@ pub(crate) async fn postgres_setup(url: String, prisma_schema: &str, db_schemas:
         let query = format!("CREATE DATABASE \"{db_name}\"");
         conn.raw_cmd(&query).await.ok();
     } else {
-        strip_schema_param_from_url(&mut url);
-        let conn = create_postgres_admin_conn(url.clone()).await?;
+        strip_schema_param_from_url(&mut parsed_url);
+        let conn = create_postgres_admin_conn(parsed_url.clone()).await?;
 
         let query = format!("CREATE DATABASE \"{db_name}\"");
         conn.raw_cmd(&query).await.ok();
 
         // Now create the schema
-        url.set_path(&format!("/{db_name}"));
+        parsed_url.set_path(&format!("/{db_name}"));
 
-        let conn = Quaint::new(url.as_ref()).await.unwrap();
+        let conn = Quaint::new(parsed_url.as_ref()).await.unwrap();
 
         let drop_and_recreate_schema =
             format!("DROP SCHEMA IF EXISTS \"{schema}\" CASCADE;\nCREATE SCHEMA \"{schema}\";");
@@ -38,8 +38,8 @@ pub(crate) async fn postgres_setup(url: String, prisma_schema: &str, db_schemas:
             .map_err(|e| ConnectorError::from_source(e, ""))?;
     }
 
-    crate::diff_and_apply(prisma_schema).await;
-    Ok(())
+    let mut connector = sql_schema_connector::SqlSchemaConnector::new_postgres();
+    crate::diff_and_apply(prisma_schema, url, &mut connector).await
 }
 
 pub(crate) async fn postgres_teardown(url: &str, db_schemas: &[&str]) -> ConnectorResult<()> {

@@ -1,4 +1,4 @@
-use mongodb::bson::Bson;
+use bson::Bson;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::BTreeMap,
@@ -21,6 +21,7 @@ pub struct IndexId(usize);
 pub struct CollectionData {
     pub(crate) name: String,
     pub(crate) has_schema: bool,
+    pub(crate) is_capped: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -48,8 +49,8 @@ impl IndexData {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
 /// All the information we can scrape per index.
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IndexData {
     /// The name of the index.
     pub name: String,
@@ -61,8 +62,8 @@ pub struct IndexData {
     pub collection_id: CollectionId,
 }
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 /// All the possible information we should scrape out from a MongoDB database.
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct MongoSchema {
     collections: Vec<CollectionData>,
     indexes: Vec<IndexData>,
@@ -71,8 +72,12 @@ pub struct MongoSchema {
 
 impl MongoSchema {
     /// Add a collection to the schema.
-    pub fn push_collection(&mut self, name: String, has_schema: bool) -> CollectionId {
-        self.collections.push(CollectionData { name, has_schema });
+    pub fn push_collection(&mut self, name: String, has_schema: bool, is_capped: bool) -> CollectionId {
+        self.collections.push(CollectionData {
+            name,
+            has_schema,
+            is_capped,
+        });
         CollectionId(self.collections.len() - 1)
     }
 

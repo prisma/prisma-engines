@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use either::Either::{Left, Right};
 use psl::datamodel_connector::Connector;
 use psl::diagnostics::DatamodelWarning;
-use psl::parser_database::{walkers, IndexAlgorithm, OperatorClass, ReferentialAction, ScalarType, SortOrder};
+use psl::parser_database::{walkers, IndexAlgorithm, ModelId, OperatorClass, ReferentialAction, ScalarType, SortOrder};
 use psl::schema_ast::ast::WithDocumentation;
 use psl::schema_ast::ast::{self, FieldArity};
 use psl::{Diagnostics, StringFromEnvVar};
@@ -67,7 +67,7 @@ pub(crate) trait CompositeFieldAssert {
 
 pub(crate) trait RelationFieldAssert {
     fn assert_ignored(&self, ignored: bool) -> &Self;
-    fn assert_relation_to(&self, model_id: ast::ModelId) -> &Self;
+    fn assert_relation_to(&self, model_id: ModelId) -> &Self;
     fn assert_relation_delete_strategy(&self, action: ReferentialAction) -> &Self;
     fn assert_relation_update_strategy(&self, action: ReferentialAction) -> &Self;
 }
@@ -151,7 +151,7 @@ impl<'a> DatamodelAssert<'a> for psl::ValidatedSchema {
 
 impl<'a> RelationFieldAssert for walkers::RelationFieldWalker<'a> {
     #[track_caller]
-    fn assert_relation_to(&self, model_id: ast::ModelId) -> &Self {
+    fn assert_relation_to(&self, model_id: ModelId) -> &Self {
         assert!(self.references_model(model_id));
         self
     }
@@ -631,9 +631,7 @@ impl DefaultValueAssert for ast::Expression {
 
     #[track_caller]
     fn assert_uuid(&self) -> &Self {
-        assert!(
-            matches!(self, ast::Expression::Function(name, args, _) if name == "uuid" && args.arguments.is_empty())
-        );
+        assert!(matches!(self, ast::Expression::Function(name, _, _) if name == "uuid"));
 
         self
     }

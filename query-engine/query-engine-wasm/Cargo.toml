@@ -1,0 +1,77 @@
+[package]
+name = "query-engine-wasm"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+doc = false
+crate-type = ["cdylib"]
+name = "query_engine_wasm"
+
+[features]
+sqlite = [
+    "driver-adapters/sqlite",
+    "sql-connector/sqlite",
+    "psl/sqlite",
+    "request-handlers/sqlite",
+]
+postgresql = [
+    "driver-adapters/postgresql",
+    "sql-connector/postgresql",
+    "psl/postgresql",
+    "request-handlers/postgresql",
+]
+mysql = [
+    "driver-adapters/mysql",
+    "sql-connector/mysql",
+    "psl/mysql",
+    "request-handlers/mysql",
+]
+
+[dependencies]
+
+query-connector = { path = "../connectors/query-connector" }
+query-engine-common = { path = "../../libs/query-engine-common" }
+anyhow = "1"
+async-trait.workspace = true
+user-facing-errors = { path = "../../libs/user-facing-errors" }
+psl.workspace = true
+query-structure = { path = "../query-structure" }
+sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
+request-handlers = { path = "../request-handlers", default-features = false, features = [
+    "sql",
+    "driver-adapters",
+] }
+query-core = { path = "../core" }
+driver-adapters = { path = "../driver-adapters" }
+telemetry = { path = "../../libs/telemetry" }
+quaint.workspace = true
+connection-string.workspace = true
+js-sys.workspace = true
+serde-wasm-bindgen.workspace = true
+serde_json.workspace = true
+tsify.workspace = true
+wasm-bindgen.workspace = true
+wasm-bindgen-futures.workspace = true
+wasm-rs-dbg.workspace = true
+
+thiserror = "1"
+url.workspace = true
+serde.workspace = true
+tokio = { version = "1", features = ["macros", "sync", "io-util", "time"] }
+futures.workspace = true
+
+tracing.workspace = true
+tracing-subscriber = { version = "0.3" }
+tracing-futures.workspace = true
+tracing-opentelemetry = "0.17.3"
+opentelemetry = { version = "0.17" }
+
+[build-dependencies]
+build-utils.path = "../../libs/build-utils"
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false # use wasm-opt explicitly in `./build.sh`
+
+[package.metadata.wasm-pack.profile.profiling]
+wasm-opt = false # use wasm-opt explicitly in `./build.sh`

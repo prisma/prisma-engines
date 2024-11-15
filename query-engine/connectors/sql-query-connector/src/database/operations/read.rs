@@ -1,75 +1,211 @@
+#[cfg(feature = "relation_joins")]
+mod coerce;
+#[cfg(feature = "relation_joins")]
+mod process;
+
 use crate::{
     column_metadata,
     model_extensions::*,
     query_arguments_ext::QueryArgumentsExt,
     query_builder::{self, read},
-    Context, QueryExt, SqlError,
+    Context, QueryExt, Queryable, SqlError,
 };
+
 use connector_interface::*;
 use futures::stream::{FuturesUnordered, StreamExt};
-use prisma_models::*;
 use quaint::ast::*;
+use query_structure::*;
 
 pub(crate) async fn get_single_record(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
+    conn: &dyn Queryable,
+    model: &Model,
     filter: &Filter,
-    selected_fields: &ModelProjection,
-    aggr_selections: &[RelAggregationSelection],
+    selected_fields: &FieldSelection,
+    relation_load_strategy: RelationLoadStrategy,
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SingleRecord>> {
-    let query = read::get_records(model, selected_fields.as_columns(ctx), aggr_selections, filter, ctx);
+    match relation_load_strategy {
+        #[cfg(feature = "relation_joins")]
+        RelationLoadStrategy::Join => get_single_record_joins(conn, model, filter, selected_fields, ctx).await,
+        #[cfg(not(feature = "relation_joins"))]
+        RelationLoadStrategy::Join => unreachable!(),
+        RelationLoadStrategy::Query => get_single_record_wo_joins(conn, model, filter, selected_fields, ctx).await,
+    }
+}
 
-    let mut field_names: Vec<_> = selected_fields.db_names().collect();
-    let mut aggr_field_names: Vec<_> = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
+#[cfg(feature = "relation_joins")]
+async fn get_single_record_joins(
+    conn: &dyn Queryable,
+    model: &Model,
+    filter: &Filter,
+    selected_fields: &FieldSelection,
+    ctx: &Context<'_>,
+) -> crate::Result<Option<SingleRecord>> {
+    use coerce::coerce_record_with_json_relation;
 
-    field_names.append(&mut aggr_field_names);
+    let selected_fields = selected_fields.to_virtuals_last();
+    let field_names: Vec<_> = selected_fields.prisma_names_grouping_virtuals().collect();
+    let idents = selected_fields.type_identifiers_with_arities_grouping_virtuals();
 
-    let mut idents = selected_fields.type_identifiers_with_arities();
-    let mut aggr_idents = aggr_selections
-        .iter()
-        .map(|aggr_sel| aggr_sel.type_identifier_with_arity())
-        .collect();
+    let indexes = get_selection_indexes(
+        selected_fields.relations().collect(),
+        selected_fields.virtuals().collect(),
+        &field_names,
+    );
 
-    idents.append(&mut aggr_idents);
+    let query = query_builder::select::SelectBuilder::build(
+        QueryArguments::from((model.clone(), filter.clone())),
+        &selected_fields,
+        ctx,
+    );
 
-    let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
+    let mut record = execute_find_one(conn, query, &idents, &field_names, ctx).await?;
 
-    let record = (match conn.find(query, meta.as_slice(), ctx).await {
-        Ok(result) => Ok(Some(result)),
-        Err(_e @ SqlError::RecordNotFoundForWhere(_)) => Ok(None),
-        Err(_e @ SqlError::RecordDoesNotExist) => Ok(None),
-        Err(e) => Err(e),
-    })?
-    .map(Record::from)
-    .map(|record| SingleRecord { record, field_names });
+    if let Some(record) = record.as_mut() {
+        coerce_record_with_json_relation(record, &indexes)?;
+    };
+
+    Ok(record.map(|record| SingleRecord { record, field_names }))
+}
+
+async fn get_single_record_wo_joins(
+    conn: &dyn Queryable,
+    model: &Model,
+    filter: &Filter,
+    selected_fields: &FieldSelection,
+    ctx: &Context<'_>,
+) -> crate::Result<Option<SingleRecord>> {
+    let selected_fields = selected_fields.without_relations().into_virtuals_last();
+
+    let query = read::get_records(
+        model,
+        ModelProjection::from(&selected_fields)
+            .as_columns(ctx)
+            .mark_all_selected(),
+        selected_fields.virtuals(),
+        filter,
+        ctx,
+    );
+
+    let field_names: Vec<_> = selected_fields.db_names().collect();
+
+    let idents = selected_fields.type_identifiers_with_arities();
+
+    let record = execute_find_one(conn, query, &idents, &field_names, ctx)
+        .await?
+        .map(|record| SingleRecord { record, field_names });
 
     Ok(record)
 }
 
+async fn execute_find_one(
+    conn: &dyn Queryable,
+    query: Select<'_>,
+    idents: &[(TypeIdentifier, FieldArity)],
+    field_names: &[String],
+    ctx: &Context<'_>,
+) -> crate::Result<Option<Record>> {
+    let meta = column_metadata::create(field_names, idents);
+
+    let row = (match conn.find(query, meta.as_slice(), ctx).await {
+        Ok(result) => Ok(Some(result)),
+        Err(_e @ SqlError::RecordNotFoundForWhere(_)) => Ok(None),
+        Err(_e @ SqlError::RecordDoesNotExist { .. }) => Ok(None),
+        Err(e) => Err(e),
+    })?
+    .map(Record::from);
+
+    Ok(row)
+}
+
 pub(crate) async fn get_many_records(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
-    mut query_arguments: QueryArguments,
-    selected_fields: &ModelProjection,
-    aggr_selections: &[RelAggregationSelection],
+    conn: &dyn Queryable,
+    model: &Model,
+    query_arguments: QueryArguments,
+    selected_fields: &FieldSelection,
+    relation_load_strategy: RelationLoadStrategy,
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
+    match relation_load_strategy {
+        #[cfg(feature = "relation_joins")]
+        RelationLoadStrategy::Join => get_many_records_joins(conn, model, query_arguments, selected_fields, ctx).await,
+        #[cfg(not(feature = "relation_joins"))]
+        RelationLoadStrategy::Join => unreachable!(),
+        RelationLoadStrategy::Query => {
+            get_many_records_wo_joins(conn, model, query_arguments, selected_fields, ctx).await
+        }
+    }
+}
+
+#[cfg(feature = "relation_joins")]
+async fn get_many_records_joins(
+    conn: &dyn Queryable,
+    _model: &Model,
+    query_arguments: QueryArguments,
+    selected_fields: &FieldSelection,
+    ctx: &Context<'_>,
+) -> crate::Result<ManyRecords> {
+    use coerce::coerce_record_with_json_relation;
+    use std::borrow::Cow;
+
+    let selected_fields = selected_fields.to_virtuals_last();
+    let field_names: Vec<_> = selected_fields.prisma_names_grouping_virtuals().collect();
+    let idents = selected_fields.type_identifiers_with_arities_grouping_virtuals();
+    let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
+
+    let indexes = get_selection_indexes(
+        selected_fields.relations().collect(),
+        selected_fields.virtuals().collect(),
+        &field_names,
+    );
+
+    let mut records = ManyRecords::new(field_names.clone());
+
+    if let Some(0) = query_arguments.take {
+        return Ok(records);
+    };
+
+    match ctx.max_bind_values {
+        Some(chunk_size) if query_arguments.should_batch(chunk_size) => {
+            return Err(SqlError::QueryParameterLimitExceeded(
+                "Joined queries cannot be split into multiple queries.".to_string(),
+            ));
+        }
+        _ => (),
+    };
+
+    let query = query_builder::select::SelectBuilder::build(query_arguments.clone(), &selected_fields, ctx);
+
+    for item in conn.filter(query.into(), meta.as_slice(), ctx).await?.into_iter() {
+        let mut record = Record::from(item);
+
+        // Coerces json values to prisma values
+        coerce_record_with_json_relation(&mut record, &indexes)?;
+
+        records.push(record)
+    }
+
+    if query_arguments.needs_inmemory_processing_with_joins() {
+        records.records = process::InMemoryProcessorForJoins::new(&query_arguments, records.records)
+            .process(|record| Some((Cow::Borrowed(record), Cow::Borrowed(&records.field_names))))
+            .collect();
+    }
+
+    Ok(records)
+}
+
+async fn get_many_records_wo_joins(
+    conn: &dyn Queryable,
+    model: &Model,
+    mut query_arguments: QueryArguments,
+    selected_fields: &FieldSelection,
+    ctx: &Context<'_>,
+) -> crate::Result<ManyRecords> {
+    let selected_fields = selected_fields.without_relations().into_virtuals_last();
     let reversed = query_arguments.needs_reversed_order();
 
-    let mut field_names: Vec<_> = selected_fields.db_names().collect();
-    let mut aggr_field_names: Vec<_> = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
-
-    field_names.append(&mut aggr_field_names);
-
-    let mut aggr_idents = aggr_selections
-        .iter()
-        .map(|aggr_sel| aggr_sel.type_identifier_with_arity())
-        .collect();
-
-    let mut idents = selected_fields.type_identifiers_with_arities();
-
-    idents.append(&mut aggr_idents);
+    let field_names: Vec<_> = selected_fields.db_names().collect();
+    let idents = selected_fields.type_identifiers_with_arities();
 
     let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
     let mut records = ManyRecords::new(field_names.clone());
@@ -104,7 +240,15 @@ pub(crate) async fn get_many_records(
             let mut futures = FuturesUnordered::new();
 
             for args in batches.into_iter() {
-                let query = read::get_records(model, selected_fields.as_columns(ctx), aggr_selections, args, ctx);
+                let query = read::get_records(
+                    model,
+                    ModelProjection::from(&selected_fields)
+                        .as_columns(ctx)
+                        .mark_all_selected(),
+                    selected_fields.virtuals(),
+                    args,
+                    ctx,
+                );
 
                 futures.push(conn.filter(query.into(), meta.as_slice(), ctx));
             }
@@ -116,14 +260,16 @@ pub(crate) async fn get_many_records(
             }
 
             if !order.is_empty() {
-                records.order_by(&order)
+                records.order_by(&order, reversed)
             }
         }
         _ => {
             let query = read::get_records(
                 model,
-                selected_fields.as_columns(ctx),
-                aggr_selections,
+                ModelProjection::from(&selected_fields)
+                    .as_columns(ctx)
+                    .mark_all_selected(),
+                selected_fields.virtuals(),
                 query_arguments,
                 ctx,
             );
@@ -142,7 +288,7 @@ pub(crate) async fn get_many_records(
 }
 
 pub(crate) async fn get_related_m2m_record_ids(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     from_field: &RelationFieldRef,
     from_record_ids: &[SelectionResult],
     ctx: &Context<'_>,
@@ -166,7 +312,7 @@ pub(crate) async fn get_related_m2m_record_ids(
 
     // [DTODO] To verify: We might need chunked fetch here (too many parameters in the query).
     let select = Select::from_table(table)
-        .so_that(query_builder::conditions(&from_columns, from_record_ids))
+        .so_that(query_builder::in_conditions(&from_columns, from_record_ids, ctx))
         .columns(from_columns.into_iter().chain(to_columns.into_iter()));
 
     let parent_model_id = from_field.model().primary_identifier();
@@ -211,8 +357,8 @@ pub(crate) async fn get_related_m2m_record_ids(
 }
 
 pub(crate) async fn aggregate(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
+    conn: &dyn Queryable,
+    model: &Model,
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
     group_by: Vec<ScalarFieldRef>,
@@ -229,8 +375,8 @@ pub(crate) async fn aggregate(
 }
 
 async fn plain_aggregate(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
+    conn: &dyn Queryable,
+    model: &Model,
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
     ctx: &Context<'_>,
@@ -254,8 +400,8 @@ async fn plain_aggregate(
 }
 
 async fn group_by_aggregate(
-    conn: &dyn QueryExt,
-    model: &ModelRef,
+    conn: &dyn Queryable,
+    model: &Model,
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
     group_by: Vec<ScalarFieldRef>,
@@ -277,4 +423,32 @@ async fn group_by_aggregate(
         .into_iter()
         .map(|row| row.into_aggregation_results(&selections))
         .collect())
+}
+
+/// Find the indexes of the relation records and the virtual selection objects to traverse a set of
+/// records faster when coercing JSON values.
+#[cfg(feature = "relation_joins")]
+fn get_selection_indexes<'a>(
+    relations: Vec<&'a RelationSelection>,
+    virtuals: Vec<&'a VirtualSelection>,
+    field_names: &'a [String],
+) -> Vec<(usize, coerce::IndexedSelection<'a>)> {
+    use coerce::IndexedSelection;
+
+    field_names
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, field_name)| {
+            relations
+                .iter()
+                .find_map(|rs| (rs.field.name() == field_name).then_some(IndexedSelection::Relation(rs)))
+                .or_else(|| {
+                    virtuals.iter().find_map(|vs| {
+                        let obj_name = vs.serialized_name().0;
+                        (obj_name == field_name).then_some(IndexedSelection::Virtual(obj_name))
+                    })
+                })
+                .map(|indexed_selection| (idx, indexed_selection))
+        })
+        .collect()
 }

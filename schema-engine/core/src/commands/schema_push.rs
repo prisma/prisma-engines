@@ -1,35 +1,19 @@
-use crate::{json_rpc::types::*, parse_schema, CoreResult};
-use psl::parser_database::SourceFile;
+use crate::{json_rpc::types::*, parse_schema_multi, CoreResult, SchemaContainerExt};
 use schema_connector::{ConnectorError, DiffTarget, SchemaConnector};
-use std::sync::Arc;
 use tracing_futures::Instrument;
 
 /// Command to bring the local database in sync with the prisma schema, without
 /// interacting with the migrations directory nor the migrations table.
 pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConnector) -> CoreResult<SchemaPushOutput> {
-    let source = SourceFile::new_allocated(Arc::from(input.schema.into_boxed_str()));
-    let datamodel = parse_schema(source.clone())?;
+    let sources = input.schema.to_psl_input();
+    let datamodel = parse_schema_multi(&sources)?;
 
     if let Some(err) = connector.check_database_version_compatibility(&datamodel) {
         return Err(ConnectorError::user_facing(err));
     };
 
-    // FIXME: The reason we connect here is that some relevant bits of information about the
-    // database used in diffing come from connecting to the database and reading its version.
-    // Concretely: with a schema with `provider = "postgresql"` and a connection string for a
-    // CockroachDb database, `connector` here doesn't have context yet on the database and
-    // generates a SqlSchema with PostgreSQL native types, instead of CockroachDB native types.
-    //
-    // So depending on the order in which `from` and `to` schemas are constructed, the type of the
-    // native types could be inconsistent between `from` and `to`. As of this comment, the only
-    // case we are aware of is users using a postgres Prisma schema with a cockroachdb database.
-    //
-    // We should consider requiring using `provider = "cockroachdb"` with cockroach databases (and
-    // disallow `provider = "postgresql"`).
-    connector.ensure_connection_validity().await?;
-
     let to = connector
-        .database_schema_from_diff_target(DiffTarget::Datamodel(source), None, None)
+        .database_schema_from_diff_target(DiffTarget::Datamodel(sources), None, None)
         .instrument(tracing::info_span!("Calculate `to`"))
         .await?;
 

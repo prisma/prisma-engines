@@ -68,10 +68,7 @@ pub struct UniqueKeyViolation {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(
-    code = "P2003",
-    message = "Foreign key constraint failed on the field: `{field_name}`"
-)]
+#[user_facing(code = "P2003", message = "Foreign key constraint violated: `{field_name}`")]
 pub struct ForeignKeyViolation {
     /// Field name from one model from Prisma schema
     pub field_name: String,
@@ -327,4 +324,17 @@ pub struct TransactionWriteConflict {}
 pub struct DatabaseAssertionViolation {
     /// Database error returned by the underlying connector driver.
     pub database_error: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2036", message = "Error in external connector (id {id})")]
+pub struct ExternalError {
+    /// id of the error in external system, which would allow to retrieve it later
+    pub id: i32,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2037", message = "Too many database connections opened: {message}")]
+pub struct TooManyConnections {
+    pub message: String,
 }

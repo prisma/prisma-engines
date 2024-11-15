@@ -2,7 +2,7 @@
 
 use quaint::{
     connector::{self, MssqlUrl},
-    prelude::{ConnectionInfo, Queryable},
+    prelude::{ConnectionInfo, NativeConnectionInfo, Queryable},
 };
 use schema_connector::{ConnectorError, ConnectorResult, Namespaces};
 use sql_schema_describer::{mssql as describer, DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
@@ -104,5 +104,10 @@ fn quaint_err(params: &super::Params) -> impl (Fn(quaint::error::Error) -> Conne
 }
 
 fn quaint_err_url(url: &MssqlUrl) -> impl (Fn(quaint::error::Error) -> ConnectorError) + '_ {
-    |err| crate::flavour::quaint_error_to_connector_error(err, &ConnectionInfo::Mssql(url.clone()))
+    |err| {
+        crate::flavour::quaint_error_to_connector_error(
+            err,
+            &ConnectionInfo::Native(NativeConnectionInfo::Mssql(url.clone())),
+        )
+    }
 }

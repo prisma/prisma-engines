@@ -44,11 +44,11 @@ pub(crate) struct RenderContext<'a> {
 
     /// The child objects to render next. Rendering is considered complete when
     /// this is empty.
-    next_pass: Vec<Box<dyn Renderer + 'a>>,
+    next_pass: Vec<Box<dyn Renderer<'a> + 'a>>,
 }
 
 impl<'a> RenderContext<'a> {
-    pub fn new(query_schema: &'a QuerySchema) -> Self {
+    fn new(query_schema: &'a QuerySchema) -> Self {
         RenderContext {
             query_schema,
             schema: Default::default(),
@@ -58,19 +58,19 @@ impl<'a> RenderContext<'a> {
         }
     }
 
-    pub fn finalize(self) -> (DmmfSchema, DmmfOperationMappings) {
+    fn finalize(self) -> (DmmfSchema, DmmfOperationMappings) {
         (self.schema, self.mappings)
     }
 
-    pub fn already_rendered(&self, cache_key: &Identifier) -> bool {
+    fn already_rendered(&self, cache_key: &Identifier) -> bool {
         self.rendered.contains(cache_key)
     }
 
-    pub fn mark_as_rendered(&mut self, cache_key: Identifier) {
+    fn mark_as_rendered(&mut self, cache_key: Identifier) {
         self.rendered.insert(cache_key);
     }
 
-    pub fn add_enum(&mut self, identifier: Identifier, dmmf_enum: DmmfEnum) {
+    fn add_enum(&mut self, identifier: Identifier, dmmf_enum: DmmfEnum) {
         // Enums from the namespace
         match self.schema.enum_types.entry(identifier.namespace().to_owned()) {
             Entry::Occupied(mut v) => v.get_mut().push(dmmf_enum),
@@ -82,7 +82,7 @@ impl<'a> RenderContext<'a> {
         self.mark_as_rendered(identifier);
     }
 
-    pub fn add_input_type(&mut self, identifier: Identifier, input_type: DmmfInputType) {
+    fn add_input_type(&mut self, identifier: Identifier, input_type: DmmfInputType) {
         // Input types from the namespace
         match self.schema.input_object_types.entry(identifier.namespace().to_owned()) {
             Entry::Occupied(mut v) => v.get_mut().push(input_type),
@@ -94,7 +94,7 @@ impl<'a> RenderContext<'a> {
         self.mark_as_rendered(identifier);
     }
 
-    pub fn add_output_type(&mut self, identifier: Identifier, output_type: DmmfOutputType) {
+    fn add_output_type(&mut self, identifier: Identifier, output_type: DmmfOutputType) {
         // Output types from the namespace
         match self.schema.output_object_types.entry(identifier.namespace().to_owned()) {
             Entry::Occupied(mut v) => v.get_mut().push(output_type),
@@ -106,7 +106,7 @@ impl<'a> RenderContext<'a> {
         self.mark_as_rendered(identifier);
     }
 
-    pub fn add_field_ref_type(&mut self, identifier: Identifier, ref_type: DmmfFieldRefType) {
+    fn add_field_ref_type(&mut self, identifier: Identifier, ref_type: DmmfFieldRefType) {
         // Field ref types from the namespace
         match self.schema.field_ref_types.entry(identifier.namespace().to_owned()) {
             Entry::Occupied(mut v) => v.get_mut().push(ref_type),
@@ -120,7 +120,8 @@ impl<'a> RenderContext<'a> {
 
     pub(crate) fn add_mapping(&mut self, name: String, operation: Option<&QueryInfo>) {
         if let Some(info) = operation {
-            if let Some(ref model) = info.model {
+            if let Some(model) = info.model {
+                let model = self.query_schema.internal_data_model.walk(model);
                 let model_name = model.name();
                 let tag_str = info.tag.to_string();
                 let model_op = self
@@ -149,7 +150,7 @@ impl<'a> RenderContext<'a> {
         }
     }
 
-    fn mark_to_be_rendered(&mut self, into_renderer: &dyn AsRenderer<'a>) {
+    fn mark_to_be_rendered(&mut self, into_renderer: &(impl AsRenderer<'a> + 'a)) {
         if !into_renderer.is_already_rendered(self) {
             let renderer: Box<dyn Renderer> = into_renderer.as_renderer();
             self.next_pass.push(renderer)
@@ -157,19 +158,19 @@ impl<'a> RenderContext<'a> {
     }
 }
 
-pub(crate) trait Renderer {
-    fn render(&self, ctx: &mut RenderContext);
+pub(crate) trait Renderer<'a> {
+    fn render(&self, ctx: &mut RenderContext<'a>);
 }
 
 trait AsRenderer<'a> {
-    fn as_renderer(&self) -> Box<dyn Renderer + 'a>;
+    fn as_renderer(&self) -> Box<dyn Renderer<'a> + 'a>;
 
     /// Returns whether the item still needs to be rendered.
     fn is_already_rendered(&self, ctx: &RenderContext<'_>) -> bool;
 }
 
 impl<'a> AsRenderer<'a> for &'a QuerySchema {
-    fn as_renderer(&self) -> Box<dyn Renderer + 'a> {
+    fn as_renderer(&self) -> Box<dyn Renderer<'a> + 'a> {
         Box::new(DmmfSchemaRenderer::new(self))
     }
 
@@ -178,9 +179,9 @@ impl<'a> AsRenderer<'a> for &'a QuerySchema {
     }
 }
 
-impl<'a> AsRenderer<'a> for &'a EnumType {
-    fn as_renderer(&self) -> Box<dyn Renderer> {
-        Box::new(DmmfEnumRenderer::new(self))
+impl<'a> AsRenderer<'a> for EnumType {
+    fn as_renderer(&self) -> Box<dyn Renderer<'a> + 'a> {
+        Box::new(DmmfEnumRenderer::new(self.clone()))
     }
 
     fn is_already_rendered(&self, ctx: &RenderContext) -> bool {
@@ -188,22 +189,22 @@ impl<'a> AsRenderer<'a> for &'a EnumType {
     }
 }
 
-impl AsRenderer<'_> for InputObjectTypeId {
-    fn as_renderer(&self) -> Box<dyn Renderer> {
-        Box::new(DmmfObjectRenderer::Input(*self))
+impl<'a> AsRenderer<'a> for InputObjectType<'a> {
+    fn as_renderer(&self) -> Box<dyn Renderer<'a> + 'a> {
+        Box::new(DmmfObjectRenderer::Input(self.clone()))
     }
 
     fn is_already_rendered(&self, ctx: &RenderContext) -> bool {
-        ctx.already_rendered(&ctx.query_schema.db[*self].identifier)
+        ctx.already_rendered(&self.identifier)
     }
 }
 
-impl AsRenderer<'_> for OutputObjectTypeId {
-    fn as_renderer(&self) -> Box<dyn Renderer> {
-        Box::new(DmmfObjectRenderer::Output(*self))
+impl<'a> AsRenderer<'a> for ObjectType<'a> {
+    fn as_renderer(&self) -> Box<dyn Renderer<'a> + 'a> {
+        Box::new(DmmfObjectRenderer::Output(self.clone()))
     }
 
     fn is_already_rendered(&self, ctx: &RenderContext) -> bool {
-        ctx.already_rendered(&ctx.query_schema.db[*self].identifier)
+        ctx.already_rendered(self.identifier())
     }
 }

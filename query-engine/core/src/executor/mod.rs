@@ -14,6 +14,7 @@ mod request_context;
 pub use self::{execute_operation::*, interpreting_executor::InterpretingExecutor};
 
 pub(crate) use request_context::*;
+use telemetry::helpers::TraceParent;
 
 use crate::{
     protocol::EngineProtocol, query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef,
@@ -21,10 +22,10 @@ use crate::{
 };
 use async_trait::async_trait;
 use connector::Connector;
-use serde::Deserialize;
-use tracing::Dispatch;
+use serde::{Deserialize, Serialize};
 
-#[async_trait]
+#[cfg_attr(target_arch = "wasm32", async_trait(?Send))]
+#[cfg_attr(not(target_arch = "wasm32"), async_trait)]
 pub trait QueryExecutor: TransactionManager {
     /// Executes a single operation and returns its result.
     /// Implementers must honor the passed transaction ID and execute the operation on the transaction identified
@@ -34,7 +35,7 @@ pub trait QueryExecutor: TransactionManager {
         tx_id: Option<TxId>,
         operation: Operation,
         query_schema: QuerySchemaRef,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
         engine_protocol: EngineProtocol,
     ) -> crate::Result<ResponseData>;
 
@@ -50,21 +51,21 @@ pub trait QueryExecutor: TransactionManager {
         operations: Vec<Operation>,
         transaction: Option<BatchDocumentTransaction>,
         query_schema: QuerySchemaRef,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
         engine_protocol: EngineProtocol,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>>;
 
     fn primary_connector(&self) -> &(dyn Connector + Send + Sync);
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TransactionOptions {
     /// Maximum wait time for tx acquisition in milliseconds.
-    #[serde(rename(deserialize = "max_wait"))]
+    #[serde(rename = "max_wait")]
     pub max_acquisition_millis: u64,
 
     /// Time in milliseconds after which the transaction rolls back automatically.
-    #[serde(rename(deserialize = "timeout"))]
+    #[serde(rename = "timeout")]
     pub valid_for_millis: u64,
 
     /// Isolation level to use for the transaction.
@@ -72,7 +73,7 @@ pub struct TransactionOptions {
 
     /// An optional pre-defined transaction id. Some value might be provided in case we want to generate
     /// a new id at the beginning of the transaction
-    #[serde(skip_deserializing)]
+    #[serde(skip)]
     pub new_tx_id: Option<TxId>,
 }
 
@@ -88,13 +89,14 @@ impl TransactionOptions {
 
     /// Generates a new transaction id before the transaction is started and returns a modified version
     /// of self with the new predefined_id set.
-    pub fn with_new_transaction_id(&mut self) -> TxId {
-        let tx_id: TxId = Default::default();
+    pub fn with_new_transaction_id(mut self) -> Self {
+        let tx_id = TxId::default();
         self.new_tx_id = Some(tx_id.clone());
-        tx_id
+        self
     }
 }
-#[async_trait]
+#[cfg_attr(target_arch = "wasm32", async_trait(?Send))]
+#[cfg_attr(not(target_arch = "wasm32"), async_trait)]
 pub trait TransactionManager {
     /// Starts a new transaction.
     /// Returns ID of newly opened transaction.
@@ -113,21 +115,4 @@ pub trait TransactionManager {
 
     /// Rolls back a transaction.
     async fn rollback_tx(&self, tx_id: TxId) -> crate::Result<()>;
-}
-
-// With the node-api when a future is spawned in a new thread `tokio:spawn` it will not
-// use the current dispatcher and its logs will not be captured anymore. We can use this
-// method to get the current dispatcher and combine it with `with_subscriber`
-// let dispatcher = get_current_dispatcher();
-// tokio::spawn(async {
-//      my_async_ops.await
-// }.with_subscriber(dispatcher));
-//
-//
-// Finally, this can be replaced with with_current_collector
-// https://github.com/tokio-rs/tracing/blob/master/tracing-futures/src/lib.rs#L234
-// once this is in a release
-
-pub fn get_current_dispatcher() -> Dispatch {
-    tracing::dispatcher::get_default(|current| current.clone())
 }

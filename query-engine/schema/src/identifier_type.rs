@@ -1,13 +1,18 @@
-use crate::{capitalize, scalar_filter_name};
-use prisma_models::{ast::FieldArity, prelude::*, *};
+use crate::{capitalize, constants::ordering, scalar_filter_name};
+use query_structure::{ast::FieldArity, prelude::*, *};
 
 /// Enum used to represent unique schema type names.
 /// It helps deferring the allocation + formatting of strings
 /// during the initialization of the schema, which proved to be very costly on large schemas.
 #[derive(PartialEq, Eq, Hash, Debug, Clone)]
 pub enum IdentifierType {
+    SortOrder,
+    AffectedRowsOutput,
+    Query,
+    Mutation,
     CheckedCreateInput(Model, Option<RelationField>),
     CheckedUpdateManyInput(Model),
+    UncheckedUpdateManyInput(Model, Option<RelationField>),
     CheckedUpdateOneInput(Model, Option<RelationField>),
     CompositeCreateEnvelopeInput(CompositeType, FieldArity),
     CompositeCreateInput(CompositeType),
@@ -17,6 +22,7 @@ pub enum IdentifierType {
     CompositeUpdateManyInput(CompositeType),
     CompositeUpsertObjectInput(CompositeType),
     CreateManyInput(Model, Option<RelationField>),
+    CreateManyAndReturnOutput(Model),
     CreateOneScalarList(ScalarField),
     Enum(InternalEnum),
     FieldUpdateOperationsInput(bool, String),
@@ -29,6 +35,7 @@ pub enum IdentifierType {
     OrderByRelevanceInput(ParentContainer),
     OrderByToManyAggregateInput(ParentContainer),
     RelationCreateInput(RelationField, RelationField, bool),
+    RelationLoadStrategy,
     RelationUpdateInput(RelationField, RelationField, bool),
     ScalarFieldEnum(Model),
     ScalarFilterInput(Model, bool),
@@ -37,7 +44,7 @@ pub enum IdentifierType {
     ToManyCompositeFilterInput(CompositeType),
     ToManyRelationFilterInput(Model),
     ToOneCompositeFilterInput(CompositeType, FieldArity),
-    ToOneRelationFilterInput(Model),
+    ToOneRelationFilterInput(Model, FieldArity),
     TransactionIsolationLevel,
     UncheckedCreateInput(Model, Option<RelationField>),
     UncheckedUpdateOneInput(Model, Option<RelationField>),
@@ -46,27 +53,31 @@ pub enum IdentifierType {
     UpdateToOneRelWhereCombinationInput(RelationField),
     WhereInput(ParentContainer),
     WhereUniqueInput(Model),
-    // Raw string identifier. Used when deferring the allocation + formatting is not worth it.
     Raw(String),
 }
 
 impl std::fmt::Display for IdentifierType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let name = match self {
-            IdentifierType::Model(model) => model.name().to_string(),
-            IdentifierType::Enum(enum_id) => enum_id.name().to_owned(),
+        match self {
+            IdentifierType::Raw(s) => f.write_str(s),
+            IdentifierType::AffectedRowsOutput => f.write_str("AffectedRowsOutput"),
+            IdentifierType::SortOrder => f.write_str(ordering::SORT_ORDER),
+            IdentifierType::Query => f.write_str("Query"),
+            IdentifierType::Mutation => f.write_str("Mutation"),
+            IdentifierType::Model(model) => f.write_str(model.name()),
+            IdentifierType::Enum(enum_id) => f.write_str(enum_id.name()),
             IdentifierType::ScalarFieldEnum(model) => {
-                format!("{}ScalarFieldEnum", capitalize(model.name()))
+                write!(f, "{}ScalarFieldEnum", capitalize(model.name()))
             }
             IdentifierType::OrderByRelevanceFieldEnum(container) => {
-                format!("{}OrderByRelevanceFieldEnum", container.name())
+                write!(f, "{}OrderByRelevanceFieldEnum", container.name())
             }
-            IdentifierType::TransactionIsolationLevel => "TransactionIsolationLevel".to_string(),
+            IdentifierType::TransactionIsolationLevel => f.write_str("TransactionIsolationLevel"),
             IdentifierType::OrderByInput(container, suffix) => {
-                format!("{}OrderBy{}Input", container.name(), suffix)
+                write!(f, "{}OrderBy{}Input", container.name(), suffix)
             }
             IdentifierType::OrderByAggregateInput(container, suffix) => {
-                format!("{}{}OrderByAggregateInput", container.name(), suffix)
+                write!(f, "{}{}OrderByAggregateInput", container.name(), suffix)
             }
             IdentifierType::OrderByToManyAggregateInput(container) => {
                 let container_type = match container {
@@ -74,20 +85,20 @@ impl std::fmt::Display for IdentifierType {
                     ParentContainer::CompositeType(_) => "Composite",
                 };
 
-                format!("{}OrderBy{}AggregateInput", container.name(), container_type)
+                write!(f, "{}OrderBy{}AggregateInput", container.name(), container_type)
             }
             IdentifierType::OrderByRelevanceInput(container) => {
-                format!("{}OrderByRelevanceInput", container.name())
+                write!(f, "{}OrderByRelevanceInput", container.name())
             }
             IdentifierType::CreateOneScalarList(sf) => {
-                format!("{}Create{}Input", sf.container().name(), sf.name())
+                write!(f, "{}Create{}Input", sf.container().name(), sf.name())
             }
             IdentifierType::FieldUpdateOperationsInput(nullable, prefix) => {
                 // Different names are required to construct and cache different objects.
                 // - "Nullable" affects the `set` operation (`set` is nullable)
                 let nullable = if *nullable { "Nullable" } else { "" };
 
-                format!("{nullable}{prefix}FieldUpdateOperationsInput")
+                write!(f, "{nullable}{prefix}FieldUpdateOperationsInput")
             }
             IdentifierType::RelationCreateInput(parent_field, related_field, unchecked) => {
                 let related_model = related_field.model();
@@ -99,7 +110,8 @@ impl std::fmt::Display for IdentifierType {
                 };
                 let unchecked_part = if *unchecked { "Unchecked" } else { "" };
 
-                format!(
+                write!(
+                    f,
                     "{}{}Create{}Without{}Input",
                     related_model.name(),
                     unchecked_part,
@@ -116,13 +128,13 @@ impl std::fmt::Display for IdentifierType {
                     ""
                 };
 
-                format!("{}{}CreateEnvelopeInput", ct.name(), arity)
+                write!(f, "{}{}CreateEnvelopeInput", ct.name(), arity)
             }
             IdentifierType::CompositeCreateInput(ct) => {
-                format!("{}CreateInput", ct.name())
+                write!(f, "{}CreateInput", ct.name())
             }
             IdentifierType::ScalarListUpdateInput(sf) => {
-                format!("{}Update{}Input", sf.container().name(), sf.name())
+                write!(f, "{}Update{}Input", sf.container().name(), sf.name())
             }
             IdentifierType::RelationUpdateInput(parent_field, related_field, unchecked) => {
                 let related_model = related_field.model();
@@ -136,7 +148,8 @@ impl std::fmt::Display for IdentifierType {
 
                 let unchecked_part = if *unchecked { "Unchecked" } else { "" };
 
-                format!(
+                write!(
+                    f,
                     "{}{}Update{}Without{}NestedInput",
                     related_model.name(),
                     unchecked_part,
@@ -153,64 +166,72 @@ impl std::fmt::Display for IdentifierType {
                     ""
                 };
 
-                format!("{}{}UpdateEnvelopeInput", ct.name(), arity)
+                write!(f, "{}{}UpdateEnvelopeInput", ct.name(), arity)
             }
             IdentifierType::CompositeUpdateInput(ct) => {
-                format!("{}UpdateInput", ct.name())
+                write!(f, "{}UpdateInput", ct.name())
             }
             IdentifierType::CompositeUpsertObjectInput(ct) => {
-                format!("{}UpsertInput", ct.name())
+                write!(f, "{}UpsertInput", ct.name())
             }
             IdentifierType::CompositeUpdateManyInput(ct) => {
-                format!("{}UpdateManyInput", ct.name())
+                write!(f, "{}UpdateManyInput", ct.name())
             }
             IdentifierType::CompositeDeleteManyInput(ct) => {
-                format!("{}DeleteManyInput", ct.name())
+                write!(f, "{}DeleteManyInput", ct.name())
             }
             IdentifierType::ToManyRelationFilterInput(related_model) => {
-                format!("{}ListRelationFilter", capitalize(related_model.name()))
+                write!(f, "{}ListRelationFilter", capitalize(related_model.name()))
             }
-            IdentifierType::ToOneRelationFilterInput(related_model) => {
-                format!("{}RelationFilter", capitalize(related_model.name()))
+            IdentifierType::ToOneRelationFilterInput(related_model, arity) => {
+                let nullable = if arity.is_optional() { "Nullable" } else { "" };
+
+                write!(f, "{}{}RelationFilter", capitalize(related_model.name()), nullable)
             }
             IdentifierType::ToOneCompositeFilterInput(ct, arity) => {
                 let nullable = if arity.is_optional() { "Nullable" } else { "" };
 
-                format!("{}{}CompositeFilter", capitalize(ct.name()), nullable)
+                write!(f, "{}{}CompositeFilter", capitalize(ct.name()), nullable)
             }
             IdentifierType::ToManyCompositeFilterInput(ct) => {
-                format!("{}CompositeListFilter", capitalize(ct.name()))
+                write!(f, "{}CompositeListFilter", capitalize(ct.name()))
             }
-            IdentifierType::ScalarListFilterInput(type_identifier, required) => scalar_filter_name(
+            IdentifierType::ScalarListFilterInput(type_identifier, required) => f.write_str(&scalar_filter_name(
                 &type_identifier.id.type_name(&type_identifier.dm.schema),
                 true,
                 !required,
                 false,
                 false,
-            ),
+            )),
             IdentifierType::ScalarFilterInput(model, includes_aggregate) => {
                 let aggregate = if *includes_aggregate { "WithAggregates" } else { "" };
 
-                format!("{}ScalarWhere{}Input", model.name(), aggregate)
+                write!(f, "{}ScalarWhere{}Input", model.name(), aggregate)
             }
             IdentifierType::WhereInput(container) => {
-                format!("{}WhereInput", container.name())
+                write!(f, "{}WhereInput", container.name())
             }
             IdentifierType::WhereUniqueInput(model) => {
-                format!("{}WhereUniqueInput", model.name())
+                write!(f, "{}WhereUniqueInput", model.name())
             }
             IdentifierType::CheckedUpdateOneInput(model, related_field) => match related_field {
-                Some(f) => format!("{}UpdateWithout{}Input", model.name(), capitalize(f.name())),
-                _ => format!("{}UpdateInput", model.name()),
+                Some(field) => write!(f, "{}UpdateWithout{}Input", model.name(), capitalize(field.name())),
+                _ => write!(f, "{}UpdateInput", model.name()),
             },
             IdentifierType::UncheckedUpdateOneInput(model, related_field) => match related_field {
-                Some(f) => format!("{}UncheckedUpdateWithout{}Input", model.name(), capitalize(f.name())),
-                _ => format!("{}UncheckedUpdateInput", model.name()),
+                Some(field) => write!(
+                    f,
+                    "{}UncheckedUpdateWithout{}Input",
+                    model.name(),
+                    capitalize(field.name())
+                ),
+                _ => write!(f, "{}UncheckedUpdateInput", model.name()),
             },
             IdentifierType::UpdateOneWhereCombinationInput(related_field) => {
                 let related_model = related_field.model();
 
-                format!(
+                write!(
+                    f,
                     "{}UpdateWithWhereUniqueWithout{}Input",
                     related_model.name(),
                     capitalize(related_field.name())
@@ -219,19 +240,21 @@ impl std::fmt::Display for IdentifierType {
             IdentifierType::UpdateToOneRelWhereCombinationInput(related_field) => {
                 let related_model = related_field.model();
 
-                format!(
+                write!(
+                    f,
                     "{}UpdateToOneWithWhereWithout{}Input",
                     related_model.name(),
                     capitalize(related_field.name())
                 )
             }
             IdentifierType::CheckedUpdateManyInput(model) => {
-                format!("{}UpdateManyMutationInput", model.name())
+                write!(f, "{}UpdateManyMutationInput", model.name())
             }
             IdentifierType::UpdateManyWhereCombinationInput(related_field) => {
                 let related_model = related_field.model();
 
-                format!(
+                write!(
+                    f,
                     "{}UpdateManyWithWhereWithout{}Input",
                     related_model.name(),
                     capitalize(related_field.name())
@@ -240,7 +263,8 @@ impl std::fmt::Display for IdentifierType {
             IdentifierType::NestedUpsertManyInput(related_field) => {
                 let related_model = related_field.model();
 
-                format!(
+                write!(
+                    f,
                     "{}UpsertWithWhereUniqueWithout{}Input",
                     related_model.name(),
                     capitalize(related_field.name())
@@ -249,28 +273,44 @@ impl std::fmt::Display for IdentifierType {
             IdentifierType::NestedUpsertOneInput(related_field) => {
                 let related_model = related_field.model();
 
-                format!(
+                write!(
+                    f,
                     "{}UpsertWithout{}Input",
                     related_model.name(),
                     capitalize(related_field.name())
                 )
             }
             IdentifierType::CheckedCreateInput(model, related_field) => match related_field {
-                Some(ref rf) => format!("{}CreateWithout{}Input", model.name(), capitalize(rf.name())),
-                _ => format!("{}CreateInput", model.name()),
+                Some(ref rf) => write!(f, "{}CreateWithout{}Input", model.name(), capitalize(rf.name())),
+                _ => write!(f, "{}CreateInput", model.name()),
             },
             IdentifierType::UncheckedCreateInput(model, related_field) => match related_field {
-                Some(ref rf) => format!("{}UncheckedCreateWithout{}Input", model.name(), capitalize(rf.name())),
-                _ => format!("{}UncheckedCreateInput", model.name()),
+                Some(ref rf) => write!(
+                    f,
+                    "{}UncheckedCreateWithout{}Input",
+                    model.name(),
+                    capitalize(rf.name())
+                ),
+                _ => write!(f, "{}UncheckedCreateInput", model.name()),
             },
             IdentifierType::CreateManyInput(model, related_field) => match related_field {
-                Some(ref rf) => format!("{}CreateMany{}Input", model.name(), capitalize(rf.name())),
-                _ => format!("{}CreateManyInput", model.name()),
+                Some(ref rf) => write!(f, "{}CreateMany{}Input", model.name(), capitalize(rf.name())),
+                _ => write!(f, "{}CreateManyInput", model.name()),
             },
-            IdentifierType::Raw(name) => name.to_string(),
-        };
-
-        f.write_str(&name)
+            IdentifierType::CreateManyAndReturnOutput(model) => {
+                write!(f, "CreateMany{}AndReturnOutputType", model.name())
+            }
+            IdentifierType::UncheckedUpdateManyInput(model, related_field) => match related_field {
+                Some(rf) => write!(
+                    f,
+                    "{}UncheckedUpdateManyWithout{}Input",
+                    model.name(),
+                    capitalize(rf.name())
+                ),
+                _ => write!(f, "{}UncheckedUpdateManyInput", model.name()),
+            },
+            IdentifierType::RelationLoadStrategy => write!(f, "RelationLoadStrategy"),
+        }
     }
 }
 

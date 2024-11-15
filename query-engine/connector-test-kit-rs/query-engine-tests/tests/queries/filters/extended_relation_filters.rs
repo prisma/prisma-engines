@@ -368,7 +368,7 @@ mod ext_rel_filters {
         test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { some: { OR:[{ MediaType: {is: { Name: { equals: "MediaType1" }}}}, { Genre: { is: { Name: { equals: "Genre2" }}}}]}}}) { Title }}"#),
+          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { some: { OR:[{ MediaType: {is: { Name: { equals: "MediaType1" }}}}, { Genre: { is: { Name: { equals: "Genre2" }}}}]}}}, orderBy: { Title: asc }) { Title }}"#),
           @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
         );
 
@@ -507,7 +507,7 @@ mod ext_rel_filters {
         test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findManyGenre(where: { Tracks: { some: {} }}) { Name }}"#),
+          run_query!(&runner, r#"{ findManyGenre(where: { Tracks: { some: {} }}, orderBy: { Name: asc }) { Name }}"#),
           @r###"{"data":{"findManyGenre":[{"Name":"Genre1"},{"Name":"Genre2"},{"Name":"Genre3"}]}}"###
         );
 

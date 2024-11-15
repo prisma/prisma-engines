@@ -1,4 +1,5 @@
 //! SQL Server doesn't support Restrict.
+//! D1 seems to silently ignore Restrict.
 
 use indoc::indoc;
 use query_engine_tests::*;
@@ -254,7 +255,6 @@ mod one2many_req {
         Ok(())
     }
 
-    /// Updating the parent succeeds if no child is connected or if the linking fields aren't part of the update payload.
     #[connector_test]
     async fn update_parent(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
@@ -377,7 +377,6 @@ mod one2many_opt {
         Ok(())
     }
 
-    /// Updating the parent succeeds if no child is connected or if the linking fields aren't part of the update payload.
     #[connector_test]
     async fn update_parent(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;

@@ -1,5 +1,6 @@
 use crate::{
-    datamodel_connector::{Connector, RelationMode},
+    builtin_connectors::has_capability,
+    datamodel_connector::{Connector, ConnectorCapability, RelationMode},
     Datasource, PreviewFeature,
 };
 use diagnostics::{DatamodelError, DatamodelWarning, Diagnostics};
@@ -28,5 +29,9 @@ impl Context<'_> {
     /// Pure convenience method. Forwards to Diagnostics::push_warning().
     pub(super) fn push_warning(&mut self, warning: DatamodelWarning) {
         self.diagnostics.push_warning(warning);
+    }
+
+    pub(super) fn has_capability(&self, capability: ConnectorCapability) -> bool {
+        has_capability(self.connector, capability)
     }
 }

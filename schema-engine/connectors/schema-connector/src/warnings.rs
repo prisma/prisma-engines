@@ -57,10 +57,6 @@ fn display_list<T: Ord>(
 /// the user.
 #[derive(Debug, Default, PartialEq)]
 pub struct Warnings {
-    /// Fields that are using Prisma 1 UUID defaults.
-    pub prisma_1_uuid_defaults: Vec<ModelAndField>,
-    /// Fields that are using Prisma 1 CUID defaults.
-    pub prisma_1_cuid_defaults: Vec<ModelAndField>,
     /// Fields having an empty name.
     pub fields_with_empty_names_in_model: Vec<ModelAndField>,
     /// Fields having an empty name.
@@ -118,6 +114,10 @@ pub struct Warnings {
     pub row_level_ttl: Vec<Model>,
     /// Warn about non-default unique deferring setup
     pub non_default_deferring: Vec<ModelAndConstraint>,
+    /// Warning about Expression Indexes.
+    pub expression_indexes: Vec<ModelAndConstraint>,
+    /// Warning about Include Indexes.
+    pub include_indexes: Vec<ModelAndConstraint>,
     /// Warn about comments
     pub objects_with_comments: Vec<Object>,
     /// Warn about fields which point to an empty type.
@@ -134,6 +134,8 @@ pub struct Warnings {
     pub undecided_types_in_types: Vec<TypeAndFieldAndType>,
     /// Warning about JSONSchema on a model.
     pub json_schema_defined: Vec<Model>,
+    /// Warning about JSONSchema on a model.
+    pub capped_collection: Vec<Model>,
 }
 
 impl Warnings {
@@ -145,11 +147,6 @@ impl Warnings {
     /// True if we have no warnings
     pub fn is_empty(&self) -> bool {
         self == &Self::default()
-    }
-
-    /// True, if the datamodel has Prisma 1 style defaults
-    pub fn uses_prisma_1_defaults(&self) -> bool {
-        !self.prisma_1_uuid_defaults.is_empty() || !self.prisma_1_cuid_defaults.is_empty()
     }
 }
 
@@ -187,18 +184,6 @@ impl fmt::Display for Warnings {
             f.write_str("\n")?;
             fmt::Display::fmt(&GroupBy(items), f)
         }
-
-        render_warnings(
-            "These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1:",
-            &self.prisma_1_uuid_defaults,
-            f,
-        )?;
-
-        render_warnings(
-            "These id fields had a `@default(cuid())` added because we believe the schema was created by Prisma 1:",
-            &self.prisma_1_cuid_defaults,
-            f,
-        )?;
 
         render_warnings_grouped(
             "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
@@ -243,13 +228,13 @@ impl fmt::Display for Warnings {
         )?;
 
         render_warnings(
-            "The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client:",
+            "The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client:",
             &self.models_without_identifiers,
             f
         )?;
 
         render_warnings(
-            "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers",
+            "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers",
             &self.views_without_identifiers,
             f
         )?;
@@ -267,19 +252,19 @@ impl fmt::Display for Warnings {
         )?;
 
         render_warnings(
-            "These fields are not supported by the Prisma Client, because Prisma currently does not support their types:",
+            "These fields are not supported by Prisma Client, because Prisma currently does not support their types:",
             &self.unsupported_types_in_model,
             f,
         )?;
 
         render_warnings(
-            "These fields are not supported by the Prisma Client, because Prisma currently does not support their types:",
+            "These fields are not supported by Prisma Client, because Prisma currently does not support their types:",
             &self.unsupported_types_in_view,
             f,
         )?;
 
         render_warnings(
-            "These fields are not supported by the Prisma Client, because Prisma currently does not support their types:",
+            "These fields are not supported by Prisma Client, because Prisma currently does not support their types:",
             &self.unsupported_types_in_type,
             f,
         )?;
@@ -315,7 +300,7 @@ impl fmt::Display for Warnings {
         )?;
 
         render_warnings(
-            "These items were renamed due to their names being duplicates in the Prisma Schema Language:",
+            "These items were renamed due to their names being duplicates in the Prisma schema:",
             &self.duplicate_names,
             f,
         )?;
@@ -345,13 +330,13 @@ impl fmt::Display for Warnings {
         )?;
 
         render_warnings(
-            "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints",
+            "These constraints are not supported by Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints",
             &self.check_constraints,
             f,
         )?;
 
         render_warnings(
-            "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/exclusion-constraints",
+            "These constraints are not supported by Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/exclusion-constraints",
             &self.exclusion_constraints,
             f,
         )?;
@@ -413,6 +398,24 @@ impl fmt::Display for Warnings {
         render_warnings(
             "The following models have a JSON Schema defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/mongodb-json-schema",
             &self.json_schema_defined,
+            f
+        )?;
+
+        render_warnings(
+            "The following models are capped collections, which are not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections",
+            &self.capped_collection,
+            f
+        )?;
+
+        render_warnings(
+            "These indexes are not supported by Prisma Client, because Prisma currently does not fully support include indexes. Read more: https://pris.ly/d/include-indexes",
+            &self.include_indexes,
+            f
+        )?;
+
+        render_warnings(
+            "These indexes are not supported by Prisma Client, because Prisma currently does not fully support expression indexes. Read more: https://pris.ly/d/expression-indexes",
+            &self.expression_indexes,
             f
         )?;
 

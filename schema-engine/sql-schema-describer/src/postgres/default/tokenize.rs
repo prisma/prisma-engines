@@ -18,7 +18,7 @@ pub(super) enum Token {
     Identifier,
     UnterminatedStringLiteral,
     Whitespace,
-    BadToken,
+    Unknown,
 }
 
 pub(super) fn tokenize(default_string: &str) -> Vec<(Token, u32)> {
@@ -43,7 +43,7 @@ pub(super) fn tokenize(default_string: &str) -> Vec<(Token, u32)> {
                     out.push((Token::CastOperator, start))
                 }
                 None | Some(_) => {
-                    out.push((Token::BadToken, start));
+                    out.push((Token::Unknown, start));
                     return out;
                 }
             },
@@ -164,7 +164,7 @@ pub(super) fn tokenize(default_string: &str) -> Vec<(Token, u32)> {
                     }
                 }
             },
-            Some((start, _)) => out.push((Token::BadToken, start)),
+            Some((start, _)) => out.push((Token::Unknown, start)),
         }
     }
 }

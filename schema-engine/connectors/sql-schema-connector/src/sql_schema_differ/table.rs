@@ -1,8 +1,10 @@
+use std::collections::HashSet;
+
 use super::{differ_database::DifferDatabase, foreign_keys_match};
 use crate::{flavour::SqlFlavour, migration_pair::MigrationPair};
 use sql_schema_describer::{
     walkers::{ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker},
-    TableId,
+    ForeignKeyId, TableId,
 };
 
 pub(crate) struct TableDiffer<'a, 'b> {
@@ -67,10 +69,16 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
     }
 
     pub(crate) fn foreign_key_pairs(&self) -> impl Iterator<Item = MigrationPair<ForeignKeyWalker<'schema>>> + '_ {
+        let mut seen_foreign_keys: HashSet<ForeignKeyId> = HashSet::new();
+
         self.previous_foreign_keys().filter_map(move |previous_fk| {
             self.next_foreign_keys()
+                .filter(|next_fk| !seen_foreign_keys.contains(&next_fk.id))
                 .find(move |next_fk| foreign_keys_match(MigrationPair::new(&previous_fk, next_fk), self.db))
-                .map(move |next_fk| MigrationPair::new(previous_fk, next_fk))
+                .map(|next_fk| {
+                    seen_foreign_keys.insert(next_fk.id);
+                    MigrationPair::new(previous_fk, next_fk)
+                })
         })
     }
 

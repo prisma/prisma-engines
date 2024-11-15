@@ -1,28 +1,26 @@
 use super::*;
 use crate::query_document::{ParsedInputMap, ParsedInputValue};
 use connector::{DatasourceFieldName, WriteArgs, WriteOperation};
-use prisma_models::{
-    CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef, TypeIdentifier,
-};
+use query_structure::{CompositeFieldRef, Field, Model, PrismaValue, RelationFieldRef, ScalarFieldRef, TypeIdentifier};
 use schema::constants::{args, json_null, operations};
-use std::convert::TryInto;
+use std::{borrow::Cow, convert::TryInto};
 
 #[derive(Debug)]
-pub struct WriteArgsParser {
-    pub args: WriteArgs,
-    pub nested: Vec<(RelationFieldRef, ParsedInputMap)>,
+pub struct WriteArgsParser<'a> {
+    pub(crate) args: WriteArgs,
+    pub(crate) nested: Vec<(RelationFieldRef, ParsedInputMap<'a>)>,
 }
 
-impl WriteArgsParser {
+impl<'a> WriteArgsParser<'a> {
     /// Creates a new set of WriteArgsParser. Expects the parsed input map from the respective data key, not the enclosing map.
     /// E.g.: { data: { THIS MAP } } from the `data` argument of a write query.
-    pub fn from(model: &ModelRef, data_map: ParsedInputMap) -> QueryGraphBuilderResult<Self> {
+    pub(crate) fn from(model: &Model, data_map: ParsedInputMap<'a>) -> QueryGraphBuilderResult<Self> {
         data_map.into_iter().try_fold(
             WriteArgsParser {
                 args: WriteArgs::new_empty(crate::executor::get_request_now()),
                 nested: Default::default(),
             },
-            |mut args, (k, v): (String, ParsedInputValue)| {
+            |mut args, (k, v): (Cow<'_, str>, ParsedInputValue<'_>)| {
                 let field = model.fields().find_from_all(&k).unwrap();
 
                 match field {
@@ -53,9 +51,15 @@ impl WriteArgsParser {
             },
         )
     }
+
+    pub(crate) fn has_nested_operation(model: &Model, data_map: &ParsedInputMap<'a>) -> bool {
+        data_map
+            .iter()
+            .any(|(field_name, _)| model.fields().find_from_relation_fields(field_name).is_ok())
+    }
 }
 
-fn parse_scalar(sf: &ScalarFieldRef, v: ParsedInputValue) -> Result<WriteOperation, QueryGraphBuilderError> {
+fn parse_scalar(sf: &ScalarFieldRef, v: ParsedInputValue<'_>) -> Result<WriteOperation, QueryGraphBuilderError> {
     match v {
         ParsedInputValue::Single(PrismaValue::Enum(e)) if sf.type_identifier() == TypeIdentifier::Json => {
             let val = match e.as_str() {
@@ -71,7 +75,7 @@ fn parse_scalar(sf: &ScalarFieldRef, v: ParsedInputValue) -> Result<WriteOperati
             let (operation, value) = map.into_iter().next().unwrap();
             let value: PrismaValue = value.try_into()?;
 
-            let write_op = match operation.as_str() {
+            let write_op = match operation.as_ref() {
                 operations::SET => WriteOperation::scalar_set(value),
                 operations::UNSET => WriteOperation::scalar_unset(*value.as_boolean().unwrap()),
                 operations::INCREMENT => WriteOperation::scalar_add(value),
@@ -87,7 +91,7 @@ fn parse_scalar(sf: &ScalarFieldRef, v: ParsedInputValue) -> Result<WriteOperati
     }
 }
 
-fn parse_scalar_list(v: ParsedInputValue) -> QueryGraphBuilderResult<WriteOperation> {
+fn parse_scalar_list(v: ParsedInputValue<'_>) -> QueryGraphBuilderResult<WriteOperation> {
     match v {
         ParsedInputValue::List(_) => {
             let set_value: PrismaValue = v.try_into()?;
@@ -101,7 +105,7 @@ fn parse_scalar_list(v: ParsedInputValue) -> QueryGraphBuilderResult<WriteOperat
 
 fn parse_composite_writes(
     cf: &CompositeFieldRef,
-    v: ParsedInputValue,
+    v: ParsedInputValue<'_>,
     path: &mut Vec<DatasourceFieldName>,
 ) -> QueryGraphBuilderResult<WriteOperation> {
     match v {
@@ -133,12 +137,12 @@ fn parse_composite_writes(
 
 fn parse_composite_envelope(
     cf: &CompositeFieldRef,
-    envelope: ParsedInputMap,
+    envelope: ParsedInputMap<'_>,
     path: &mut Vec<DatasourceFieldName>,
 ) -> QueryGraphBuilderResult<WriteOperation> {
     let (op, value) = envelope.into_iter().next().unwrap();
 
-    let write_op = match op.as_str() {
+    let write_op = match op.as_ref() {
         // Everything in a set operation can only be plain values, no more nested operations.
         operations::SET => WriteOperation::composite_set(value.try_into()?),
         operations::PUSH => WriteOperation::composite_push(value.try_into()?),
@@ -155,13 +159,13 @@ fn parse_composite_envelope(
 
 fn parse_composite_update_many(
     cf: &CompositeFieldRef,
-    mut value: ParsedInputMap,
+    mut value: ParsedInputMap<'_>,
     path: &mut [DatasourceFieldName],
 ) -> QueryGraphBuilderResult<WriteOperation> {
-    let where_map: ParsedInputMap = value.remove(args::WHERE).unwrap().try_into()?;
+    let where_map: ParsedInputMap<'_> = value.swap_remove(args::WHERE).unwrap().try_into()?;
     let filter = extract_filter(where_map, cf.typ())?;
 
-    let update_map: ParsedInputMap = value.remove(args::DATA).unwrap().try_into()?;
+    let update_map: ParsedInputMap<'_> = value.swap_remove(args::DATA).unwrap().try_into()?;
     let update = parse_composite_updates(cf, update_map, path)?
         .try_into_composite()
         .unwrap();
@@ -171,9 +175,9 @@ fn parse_composite_update_many(
 
 fn parse_composite_delete_many(
     cf: &CompositeFieldRef,
-    mut value: ParsedInputMap,
+    mut value: ParsedInputMap<'_>,
 ) -> QueryGraphBuilderResult<WriteOperation> {
-    let where_map: ParsedInputMap = value.remove(args::WHERE).unwrap().try_into()?;
+    let where_map: ParsedInputMap<'_> = value.swap_remove(args::WHERE).unwrap().try_into()?;
     let filter = extract_filter(where_map, cf.typ())?;
 
     Ok(WriteOperation::composite_delete_many(filter))
@@ -181,12 +185,12 @@ fn parse_composite_delete_many(
 
 fn parse_composite_upsert(
     cf: &CompositeFieldRef,
-    mut value: ParsedInputMap,
+    mut value: ParsedInputMap<'_>,
     path: &mut Vec<DatasourceFieldName>,
 ) -> QueryGraphBuilderResult<WriteOperation> {
-    let set = value.remove(operations::SET).unwrap();
+    let set = value.swap_remove(operations::SET).unwrap();
     let set = parse_composite_writes(cf, set, path)?.try_into_composite().unwrap();
-    let update: ParsedInputMap = value.remove(operations::UPDATE).unwrap().try_into()?;
+    let update: ParsedInputMap<'_> = value.swap_remove(operations::UPDATE).unwrap().try_into()?;
     let update = parse_composite_updates(cf, update, path)?.try_into_composite().unwrap();
 
     Ok(WriteOperation::composite_upsert(set, update))
@@ -200,7 +204,7 @@ fn parse_composite_unset(pv: PrismaValue) -> WriteOperation {
 
 fn parse_composite_updates(
     cf: &CompositeFieldRef,
-    map: ParsedInputMap,
+    map: ParsedInputMap<'_>,
     path: &mut [DatasourceFieldName],
 ) -> QueryGraphBuilderResult<WriteOperation> {
     let mut writes = vec![];
@@ -228,11 +232,11 @@ fn parse_composite_updates(
     Ok(WriteOperation::composite_update(writes))
 }
 
-fn extract_scalar_list_ops(map: ParsedInputMap) -> QueryGraphBuilderResult<WriteOperation> {
+fn extract_scalar_list_ops(map: ParsedInputMap<'_>) -> QueryGraphBuilderResult<WriteOperation> {
     let (operation, value) = map.into_iter().next().unwrap();
     let pv: PrismaValue = value.try_into()?;
 
-    match operation.as_str() {
+    match operation.as_ref() {
         operations::SET => Ok(WriteOperation::scalar_set(pv)),
         operations::PUSH => Ok(WriteOperation::scalar_add(pv)),
         _ => unreachable!("Invalid scalar list operation"),

@@ -1,5 +1,5 @@
 use crate::protocol::EngineProtocol;
-use prisma_models::PrismaValue;
+use query_structure::PrismaValue;
 
 #[derive(Debug)]
 struct RequestContext {
@@ -18,14 +18,15 @@ tokio::task_local! {
 ///
 /// If we had a query context we carry for the entire lifetime of the query, it would belong there.
 pub(crate) fn get_request_now() -> PrismaValue {
-    // FIXME: we want to bypass task locals if this code is executed outside of a tokio context. As
-    // of this writing, it happens only in the query validation test suite.
-    //
-    // Eventually, this will go away when we have a plain query context reference we pass around.
-    if tokio::runtime::Handle::try_current().is_err() {
-        return PrismaValue::DateTime(chrono::Utc::now().into());
-    }
-    REQUEST_CONTEXT.with(|rc| rc.request_now.clone())
+    REQUEST_CONTEXT.try_with(|rc| rc.request_now.clone()).unwrap_or_else(|_|
+            // Task local might not be set in some cases.
+            // At the moment of writing, this happens only in query validation test suite.
+            // In that case, we want to fall back to realtime value. On the other hand, if task local is
+            // set, we want to use it, even if we are not running inside of tokio runtime (for example, 
+            // in WASM case)
+            //
+            // Eventually, this will go away when we have a plain query context reference we pass around.
+            PrismaValue::DateTime(chrono::Utc::now().into()))
 }
 
 /// The engine protocol used for the whole duration of a request.

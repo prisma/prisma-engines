@@ -1,14 +1,14 @@
 //! Prisma read query AST
 use super::FilteredQuery;
 use crate::ToGraphviz;
-use connector::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
+use connector::AggregationSelection;
 use enumflags2::BitFlags;
-use prisma_models::prelude::*;
+use query_structure::{prelude::*, Filter, QueryArguments, RelationLoadStrategy};
 use std::fmt::Display;
 
 #[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone)]
-pub(crate) enum ReadQuery {
+pub enum ReadQuery {
     RecordQuery(RecordQuery),
     ManyRecordsQuery(ManyRecordsQuery),
     RelatedRecordsQuery(RelatedRecordsQuery),
@@ -16,22 +16,52 @@ pub(crate) enum ReadQuery {
 }
 
 impl ReadQuery {
-    /// Checks whether or not this query returns a specific set of fields from the underlying data source model.
-    pub fn returns(&self, field_selection: &FieldSelection) -> bool {
+    /// Checks whether or not the field selection of this query satisfies the inputted field selection.
+    pub fn satisfies(&self, expected: &FieldSelection) -> bool {
+        self.returns().map(|sel| sel.is_superset_of(expected)).unwrap_or(false)
+    }
+
+    /// Returns the field selection of a read query.
+    fn returns(&self) -> Option<&FieldSelection> {
         match self {
-            ReadQuery::RecordQuery(x) => x.selected_fields.is_superset_of(field_selection),
-            ReadQuery::ManyRecordsQuery(x) => x.selected_fields.is_superset_of(field_selection),
-            ReadQuery::RelatedRecordsQuery(x) => x.selected_fields.is_superset_of(field_selection),
-            ReadQuery::AggregateRecordsQuery(_x) => false,
+            ReadQuery::RecordQuery(x) => Some(&x.selected_fields),
+            ReadQuery::ManyRecordsQuery(x) => Some(&x.selected_fields),
+            ReadQuery::RelatedRecordsQuery(x) => Some(&x.selected_fields),
+            ReadQuery::AggregateRecordsQuery(_x) => None,
         }
     }
 
-    pub fn model(&self) -> ModelRef {
+    /// Updates the field selection of the query to satisfy the inputted FieldSelection.
+    pub fn satisfy_dependency(&mut self, field_selection: FieldSelection) {
+        match self {
+            ReadQuery::RecordQuery(x) => {
+                x.selected_fields.merge_in_place(field_selection);
+            }
+            ReadQuery::ManyRecordsQuery(x) => {
+                x.selected_fields.merge_in_place(field_selection);
+            }
+            ReadQuery::RelatedRecordsQuery(x) => {
+                x.selected_fields.merge_in_place(field_selection);
+            }
+            ReadQuery::AggregateRecordsQuery(_) => (),
+        }
+    }
+
+    pub fn model(&self) -> Model {
         match self {
             ReadQuery::RecordQuery(x) => x.model.clone(),
             ReadQuery::ManyRecordsQuery(x) => x.model.clone(),
             ReadQuery::RelatedRecordsQuery(x) => x.parent_field.related_field().model(),
             ReadQuery::AggregateRecordsQuery(x) => x.model.clone(),
+        }
+    }
+
+    pub(crate) fn has_cursor(&self) -> bool {
+        match self {
+            ReadQuery::RecordQuery(_) => false,
+            ReadQuery::ManyRecordsQuery(q) => q.args.cursor.is_some() || q.nested.iter().any(|q| q.has_cursor()),
+            ReadQuery::RelatedRecordsQuery(q) => q.args.cursor.is_some() || q.nested.iter().any(|q| q.has_cursor()),
+            ReadQuery::AggregateRecordsQuery(_) => false,
         }
     }
 }
@@ -72,7 +102,7 @@ impl Display for ReadQuery {
             ),
             Self::RelatedRecordsQuery(q) => write!(
                 f,
-                "RelatedRecordsQuery(name: '{}', parent model: '{}', parent relation field: {}, selection: {})",
+                "RelatedRecordsQuery(name: '{}', parent model: '{}', parent relation field: '{}', selection: {})",
                 q.name,
                 q.parent_field.model().name(),
                 q.parent_field.name(),
@@ -144,26 +174,28 @@ impl QueryOptions {
 pub struct RecordQuery {
     pub name: String,
     pub alias: Option<String>,
-    pub model: ModelRef,
+    pub model: Model,
     pub filter: Option<Filter>,
+    // TODO: split into `user_selection` and `full_selection` and get rid of `selection_order`
     pub selected_fields: FieldSelection,
     pub(crate) nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
-    pub aggregation_selections: Vec<RelAggregationSelection>,
     pub options: QueryOptions,
+    pub relation_load_strategy: RelationLoadStrategy,
 }
 
 #[derive(Debug, Clone)]
 pub struct ManyRecordsQuery {
     pub name: String,
     pub alias: Option<String>,
-    pub model: ModelRef,
+    pub model: Model,
     pub args: QueryArguments,
+    // TODO: split into `user_selection` and `full_selection` and get rid of `selection_order`
     pub selected_fields: FieldSelection,
     pub(crate) nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
-    pub aggregation_selections: Vec<RelAggregationSelection>,
     pub options: QueryOptions,
+    pub relation_load_strategy: RelationLoadStrategy,
 }
 
 #[derive(Debug, Clone)]
@@ -172,21 +204,26 @@ pub struct RelatedRecordsQuery {
     pub alias: Option<String>,
     pub parent_field: RelationFieldRef,
     pub args: QueryArguments,
+    // TODO: split into `user_selection` and `full_selection` and get rid of `selection_order`
     pub selected_fields: FieldSelection,
-    pub(crate) nested: Vec<ReadQuery>,
+    pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
-    pub aggregation_selections: Vec<RelAggregationSelection>,
-
     /// Fields and values of the parent to satisfy the relation query without
     /// relying on the parent result passed by the interpreter.
     pub parent_results: Option<Vec<SelectionResult>>,
+}
+
+impl RelatedRecordsQuery {
+    pub fn has_cursor(&self) -> bool {
+        self.args.cursor.is_some() || self.nested.iter().any(|q| q.has_cursor())
+    }
 }
 
 #[derive(Debug, Clone)]
 pub struct AggregateRecordsQuery {
     pub name: String,
     pub alias: Option<String>,
-    pub model: ModelRef,
+    pub model: Model,
     pub selection_order: Vec<(String, Option<Vec<String>>)>,
     pub args: QueryArguments,
     pub selectors: Vec<AggregationSelection>,

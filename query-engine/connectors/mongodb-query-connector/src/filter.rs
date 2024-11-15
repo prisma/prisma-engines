@@ -1,11 +1,6 @@
 use crate::{constants::group_by, error::MongoError, join::JoinStage, query_builder::AggregationType, IntoBson};
-use connector_interface::{
-    AggregationFilter, CompositeCondition, CompositeFilter, ConditionListValue, ConditionValue, Filter,
-    OneRelationIsNullFilter, QueryMode, RelationFilter, ScalarCompare, ScalarCondition, ScalarFilter, ScalarListFilter,
-    ScalarProjection,
-};
-use mongodb::bson::{doc, Bson, Document};
-use prisma_models::{CompositeFieldRef, PrismaValue, ScalarFieldRef, TypeIdentifier};
+use bson::{doc, Bson, Document};
+use query_structure::*;
 
 #[derive(Debug, Clone)]
 pub(crate) enum MongoFilter {
@@ -81,11 +76,15 @@ impl MongoFilterVisitor {
 
             Filter::Not(filters) if self.invert() => {
                 self.flip_invert();
-                self.visit_boolean_operator("$or", filters, false)?
+                let result = self.visit_boolean_operator("$or", filters, false)?;
+                self.flip_invert();
+                result
             }
             Filter::Not(filters) => {
                 self.flip_invert();
-                self.visit_boolean_operator("$and", filters, true)?
+                let result = self.visit_boolean_operator("$and", filters, true)?;
+                self.flip_invert();
+                result
             }
             Filter::Scalar(sf) => self.visit_scalar_filter(sf)?,
             Filter::Empty => MongoFilter::Scalar(doc! {}),
@@ -132,9 +131,9 @@ impl MongoFilterVisitor {
 
     fn visit_scalar_filter(&self, filter: ScalarFilter) -> crate::Result<MongoFilter> {
         let field = match filter.projection {
-            connector_interface::ScalarProjection::Single(sf) => sf,
-            connector_interface::ScalarProjection::Compound(mut c) if c.len() == 1 => c.pop().unwrap(),
-            connector_interface::ScalarProjection::Compound(_) => {
+            ScalarProjection::Single(sf) => sf,
+            ScalarProjection::Compound(mut c) if c.len() == 1 => c.pop().unwrap(),
+            ScalarProjection::Compound(_) => {
                 unreachable!(
                     "Multi-field compound filter case hit when it should have been folded into normal filters previously."
                 )
@@ -189,42 +188,61 @@ impl MongoFilterVisitor {
             // Todo: The nested list unpack looks like a bug somewhere.
             //       Likely join code mistakenly repacks a list into a list of PrismaValue somewhere in the core.
             ScalarCondition::In(vals) => match vals {
-                ConditionListValue::List(vals) => match vals.split_first() {
-                    // List is list of lists, we need to flatten.
-                    Some((PrismaValue::List(_), _)) => {
-                        let mut bson_values = Vec::with_capacity(vals.len());
+                ConditionListValue::List(values) => {
+                    let mut equalities = Vec::with_capacity(values.len());
 
-                        for pv in vals {
-                            if let PrismaValue::List(inner) = pv {
-                                bson_values.extend(
-                                    inner
-                                        .into_iter()
-                                        .map(|val| self.coerce_to_bson_for_filter(field, val))
-                                        .collect::<crate::Result<Vec<_>>>()?,
-                                )
-                            }
+                    for value in values {
+                        // List is list of lists, we need to flatten.
+                        // This flattening behaviour does not affect user queries because Prisma does
+                        // not support storing arrays as values inside a field. It is possible to have
+                        // a 1-dimensional array field, but not 2 dimensional. Thus, we never have
+                        // user queries which have arrays in the argument of `in` operator. If we
+                        // encounter such case, then this query was produced internally and we can
+                        // safely flatten it.
+                        if let PrismaValue::List(list) = value {
+                            equalities.extend(
+                                list.into_iter()
+                                    .map(|value| {
+                                        let value = self.coerce_to_bson_for_filter(field, value)?;
+                                        Ok(doc! { "$eq": [&field_name, value] })
+                                    })
+                                    .collect::<crate::Result<Vec<_>>>()?,
+                            );
+                        } else {
+                            let value = self.coerce_to_bson_for_filter(field, value)?;
+                            equalities.push(doc! { "$eq": [&field_name, value] })
                         }
+                    }
 
-                        doc! { "$in": [&field_name, bson_values] }
-                    }
-                    _ => {
-                        doc! { "$in": [&field_name, self.coerce_to_bson_for_filter(field, PrismaValue::List(vals))?] }
-                    }
-                },
+                    // Previously, `$in` operator was used instead of a tree of `$or` + `$eq` operators.
+                    // At the moment of writing, MongoDB does not optimise aggregation version of `$in`
+                    // operator to use indexes, leading to significant performance problems. Until this
+                    // is fixed, we rely on `$eq` operator which does have index optimisation implemented.
+                    doc! { "$or": equalities }
+                }
                 ConditionListValue::FieldRef(field_ref) => {
+                    // In this context, `field_ref` refers to an array field, so we actually need an `$in` operator.
                     doc! { "$in": [&field_name, coerce_as_array(self.prefixed_field_ref(&field_ref)?)] }
                 }
             },
             ScalarCondition::NotIn(vals) => match vals {
                 ConditionListValue::List(vals) => {
-                    let bson_values = vals
+                    let equalities = vals
                         .into_iter()
-                        .map(|val| self.coerce_to_bson_for_filter(field, val))
+                        .map(|value| {
+                            let value = self.coerce_to_bson_for_filter(field, value)?;
+                            Ok(doc! { "$ne": [&field_name, value] })
+                        })
                         .collect::<crate::Result<Vec<_>>>()?;
 
-                    doc! { "$not": { "$in": [&field_name, bson_values] } }
+                    // Previously, `$not` + `$in` operators were used instead of a tree of `$and` + `$ne` operators.
+                    // At the moment of writing, MongoDB does not optimise aggregation version of `$in`
+                    // operator to use indexes, leading to significant performance problems. Until this
+                    // is fixed, we rely on `$ne` operator which does have index optimisation implemented.
+                    doc! { "$and": equalities }
                 }
                 ConditionListValue::FieldRef(field_ref) => {
+                    // In this context, `field_ref` refers to an array field, so we actually need an `$in` operator.
                     doc! { "$not": { "$in": [&field_name, coerce_as_array(self.prefixed_field_ref(&field_ref)?)] } }
                 }
             },
@@ -417,7 +435,7 @@ impl MongoFilterVisitor {
         let field_ref = filter.as_field_ref().cloned();
 
         let filter_doc = match filter.condition {
-            connector_interface::ScalarListCondition::Contains(val) => {
+            ScalarListCondition::Contains(val) => {
                 let bson = match val {
                     ConditionValue::Value(value) => (field, value).into_bson()?,
                     ConditionValue::FieldRef(field_ref) => self.prefixed_field_ref(&field_ref)?,
@@ -426,11 +444,11 @@ impl MongoFilterVisitor {
                 doc! { "$in": [bson, coerce_as_array(&field_name)] }
             }
 
-            connector_interface::ScalarListCondition::ContainsEvery(vals) if vals.is_empty() => {
+            ScalarListCondition::ContainsEvery(vals) if vals.is_empty() => {
                 // Empty hasEvery: Return all records.
                 render_stub_condition(true)
             }
-            connector_interface::ScalarListCondition::ContainsEvery(ConditionListValue::List(vals)) => {
+            ScalarListCondition::ContainsEvery(ConditionListValue::List(vals)) => {
                 let ins = vals
                     .into_iter()
                     .map(|val| {
@@ -442,20 +460,18 @@ impl MongoFilterVisitor {
 
                 doc! { "$and": ins }
             }
-            connector_interface::ScalarListCondition::ContainsEvery(ConditionListValue::FieldRef(field_ref)) => {
-                render_every(
-                    &field_name,
-                    "elem",
-                    doc! { "$in": ["$$elem", coerce_as_array((self.prefix(), &field_ref).into_bson()?)] },
-                    true,
-                )
-            }
+            ScalarListCondition::ContainsEvery(ConditionListValue::FieldRef(field_ref)) => render_every(
+                &field_name,
+                "elem",
+                doc! { "$in": ["$$elem", coerce_as_array((self.prefix(), &field_ref).into_bson()?)] },
+                true,
+            ),
 
-            connector_interface::ScalarListCondition::ContainsSome(vals) if vals.is_empty() => {
+            ScalarListCondition::ContainsSome(vals) if vals.is_empty() => {
                 // Empty hasSome: Return no records.
                 render_stub_condition(false)
             }
-            connector_interface::ScalarListCondition::ContainsSome(ConditionListValue::List(vals)) => {
+            ScalarListCondition::ContainsSome(ConditionListValue::List(vals)) => {
                 let ins = vals
                     .into_iter()
                     .map(|val| {
@@ -467,19 +483,17 @@ impl MongoFilterVisitor {
 
                 doc! { "$or": ins }
             }
-            connector_interface::ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) => {
-                render_some(
-                    &field_name,
-                    "elem",
-                    doc! { "$in": ["$$elem", coerce_as_array((self.prefix(), &field_ref).into_bson()?)] },
-                    true,
-                )
-            }
+            ScalarListCondition::ContainsSome(ConditionListValue::FieldRef(field_ref)) => render_some(
+                &field_name,
+                "elem",
+                doc! { "$in": ["$$elem", coerce_as_array((self.prefix(), &field_ref).into_bson()?)] },
+                true,
+            ),
 
-            connector_interface::ScalarListCondition::IsEmpty(true) => {
+            ScalarListCondition::IsEmpty(true) => {
                 doc! { "$eq": [render_size(&field_name, true), 0] }
             }
-            connector_interface::ScalarListCondition::IsEmpty(false) => {
+            ScalarListCondition::IsEmpty(false) => {
                 doc! { "$gt": [render_size(&field_name, true), 0] }
             }
         };
@@ -653,21 +667,21 @@ impl MongoFilterVisitor {
         let mut join_stage = JoinStage::new(from_field);
 
         let filter_doc = match filter.condition {
-            connector_interface::RelationCondition::EveryRelatedRecord => {
+            RelationCondition::EveryRelatedRecord => {
                 let (every, nested_joins) = render_every_from_filter(&field_name, nested_filter, false, false)?;
 
                 join_stage.extend_nested(nested_joins);
 
                 every
             }
-            connector_interface::RelationCondition::AtLeastOneRelatedRecord => {
+            RelationCondition::AtLeastOneRelatedRecord => {
                 let (some, nested_joins) = render_some_from_filter(&field_name, nested_filter, false, false)?;
 
                 join_stage.extend_nested(nested_joins);
 
                 some
             }
-            connector_interface::RelationCondition::NoRelatedRecord if is_to_one => {
+            RelationCondition::NoRelatedRecord if is_to_one => {
                 if is_empty_filter {
                     // Doesn't need coercing the array since joins always return arrays
                     doc! { "$eq": [render_size(&field_name, false), 0] }
@@ -688,7 +702,7 @@ impl MongoFilterVisitor {
                     }
                 }
             }
-            connector_interface::RelationCondition::NoRelatedRecord => {
+            RelationCondition::NoRelatedRecord => {
                 if is_empty_filter {
                     // Doesn't need coercing the array since joins always return arrays
                     doc! { "$eq": [render_size(&field_name, false), 0] }
@@ -700,7 +714,7 @@ impl MongoFilterVisitor {
                     none
                 }
             }
-            connector_interface::RelationCondition::ToOneRelatedRecord => {
+            RelationCondition::ToOneRelatedRecord => {
                 // To-ones are coerced to single-element arrays via the join.
                 // We render an "every" expression on that array to ensure that the predicate is matched.
                 let (every, nested_joins) = render_every_from_filter(&field_name, nested_filter, false, false)?;

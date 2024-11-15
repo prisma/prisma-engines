@@ -1,0 +1,8 @@
+/// multi line
+/// commennttt
+model Foo {
+    id     Int  @id
+    bar    Bar  @relation(fields: [bar_id], references: [id], onUpdate: SetDefault)
+    bar_id Int  @unique
+    t      Test
+}

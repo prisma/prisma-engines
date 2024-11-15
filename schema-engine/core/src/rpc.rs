@@ -1,11 +1,22 @@
 use crate::{json_rpc::method_names::*, CoreError, CoreResult, GenericApi};
 use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
+use psl::SourceFile;
 use std::sync::Arc;
 
-/// Initialize a JSON-RPC ready migration engine API.
-pub fn rpc_api(prisma_schema: Option<String>, host: Arc<dyn schema_connector::ConnectorHost>) -> IoHandler {
+/// Initialize a JSON-RPC ready schema engine API.
+pub fn rpc_api(
+    initial_datamodels: Option<Vec<(String, String)>>,
+    host: Arc<dyn schema_connector::ConnectorHost>,
+) -> IoHandler {
     let mut io_handler = IoHandler::default();
-    let api = Arc::new(crate::state::EngineState::new(prisma_schema, Some(host)));
+    let initial_datamodels = initial_datamodels.map(|schemas| {
+        schemas
+            .into_iter()
+            .map(|(name, schema)| (name, SourceFile::from(schema)))
+            .collect()
+    });
+
+    let api = Arc::new(crate::state::EngineState::new(initial_datamodels, Some(host)));
 
     for cmd in METHOD_NAMES {
         let api = api.clone();
@@ -23,7 +34,6 @@ async fn run_command(
     cmd: &str,
     params: Params,
 ) -> Result<serde_json::Value, JsonRpcError> {
-    tracing::debug!(?cmd, "running the command");
     match cmd {
         APPLY_MIGRATIONS => render(executor.apply_migrations(params.parse()?).await),
         CREATE_DATABASE => render(executor.create_database(params.parse()?).await),
@@ -35,8 +45,9 @@ async fn run_command(
         DIAGNOSE_MIGRATION_HISTORY => render(executor.diagnose_migration_history(params.parse()?).await),
         ENSURE_CONNECTION_VALIDITY => render(executor.ensure_connection_validity(params.parse()?).await),
         EVALUATE_DATA_LOSS => render(executor.evaluate_data_loss(params.parse()?).await),
-        GET_DATABASE_VERSION => render(executor.version().await),
+        GET_DATABASE_VERSION => render(executor.version(params.parse()?).await),
         INTROSPECT => render(executor.introspect(params.parse()?).await),
+        INTROSPECT_SQL => render(executor.introspect_sql(params.parse()?).await),
         LIST_MIGRATION_DIRECTORIES => render(executor.list_migration_directories(params.parse()?).await),
         MARK_MIGRATION_APPLIED => render(executor.mark_migration_applied(params.parse()?).await),
         MARK_MIGRATION_ROLLED_BACK => render(executor.mark_migration_rolled_back(params.parse()?).await),
@@ -54,7 +65,7 @@ fn render(result: CoreResult<impl serde::Serialize>) -> jsonrpc_core::Result<jso
 }
 
 fn render_jsonrpc_error(crate_error: CoreError) -> JsonRpcError {
-    serde_json::to_value(&crate_error.to_user_facing())
+    serde_json::to_value(crate_error.to_user_facing())
         .map(|data| JsonRpcError {
             // We separate the JSON-RPC error code (defined by the JSON-RPC spec) from the
             // prisma error code, which is located in `data`.

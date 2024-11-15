@@ -14,6 +14,6 @@ fn nice_warning_for_deprecated_generator_preview_feature() {
 
     res.warnings.assert_is(DatamodelWarning::new_feature_deprecated(
         "middlewares",
-        Span::new(88, 103),
+        Span::new(88, 103, psl_core::parser_database::FileId::ZERO),
     ));
 }

@@ -1,10 +1,19 @@
 use crate::{model_extensions::ScalarFieldExt, Context};
 use itertools::Itertools;
-use prisma_models::{Field, ModelProjection, RelationField, ScalarField};
-use quaint::ast::{Column, Row};
+use quaint::ast::Column;
+use query_structure::{Field, ModelProjection, RelationField, ScalarField};
 
 pub struct ColumnIterator {
     inner: Box<dyn Iterator<Item = Column<'static>> + 'static>,
+}
+
+impl ColumnIterator {
+    /// Sets all columns as selected. This is a hack that we use to help the Postgres SQL visitor cast enum columns to text to avoid some driver roundtrips otherwise needed to resolve enum types.
+    pub fn mark_all_selected(self) -> Self {
+        ColumnIterator {
+            inner: Box::new(self.inner.map(|c| c.set_is_selected(true))),
+        }
+    }
 }
 
 impl Iterator for ColumnIterator {
@@ -23,10 +32,6 @@ impl From<Vec<Column<'static>>> for ColumnIterator {
     }
 }
 
-pub(crate) trait AsRow {
-    fn as_row(&self, ctx: &Context<'_>) -> Row<'static>;
-}
-
 pub(crate) trait AsColumns {
     fn as_columns(&self, ctx: &Context<'_>) -> ColumnIterator;
 }
@@ -40,13 +45,6 @@ impl AsColumns for ModelProjection {
             .collect();
 
         ColumnIterator::from(cols)
-    }
-}
-
-impl AsRow for ModelProjection {
-    fn as_row(&self, ctx: &Context<'_>) -> Row<'static> {
-        let cols: Vec<Column<'static>> = self.as_columns(ctx).collect();
-        Row::from(cols)
     }
 }
 
@@ -96,7 +94,11 @@ impl AsColumn for ScalarField {
         let full_table_name = super::table::db_name_with_schema(&self.container().as_model().unwrap(), ctx);
         let col = self.db_name().to_string();
 
-        let column = Column::from((full_table_name, col)).type_family(self.type_family());
-        column.default(quaint::ast::DefaultValue::Generated)
+        Column::from((full_table_name, col))
+            .type_family(self.type_family())
+            .native_column_type(self.native_type().map(|nt| nt.name()))
+            .set_is_enum(self.type_identifier().is_enum())
+            .set_is_list(self.is_list())
+            .default(quaint::ast::DefaultValue::Generated)
     }
 }

@@ -161,7 +161,7 @@ pub(crate) trait SqlFlavour:
         SqlSchema::default()
     }
 
-    /// Check a connection to make sure it is usable by the migration engine.
+    /// Check a connection to make sure it is usable by the schema engine.
     /// This can include some set up on the database, like ensuring that the
     /// schema we connect to exists.
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
@@ -174,6 +174,11 @@ pub(crate) trait SqlFlavour:
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
         self.describe_schema(namespaces)
     }
+
+    fn describe_query<'a>(
+        &'a mut self,
+        sql: &'a str,
+    ) -> BoxFuture<'a, ConnectorResult<quaint::connector::DescribedQuery>>;
 
     fn load_migrations_table(
         &mut self,

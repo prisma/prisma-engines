@@ -1,0 +1,6 @@
+{
+    "connector": "sqlite",
+    "version": "libsql.js",
+    "driver_adapter": "libsql",
+    "external_test_executor": "Napi"
+}

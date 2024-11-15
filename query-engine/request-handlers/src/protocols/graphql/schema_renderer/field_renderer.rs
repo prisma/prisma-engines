@@ -2,11 +2,11 @@ use super::*;
 
 #[derive(Debug)]
 pub(crate) enum GqlFieldRenderer<'a> {
-    Input(&'a InputField),
-    Output(&'a OutputField),
+    Input(InputField<'a>),
+    Output(OutputField<'a>),
 }
 
-impl Renderer for GqlFieldRenderer<'_> {
+impl<'a> Renderer for GqlFieldRenderer<'a> {
     fn render(&self, ctx: &mut RenderContext) -> String {
         match self {
             GqlFieldRenderer::Input(input) => self.render_input_field(input, ctx),
@@ -15,18 +15,16 @@ impl Renderer for GqlFieldRenderer<'_> {
     }
 }
 
-impl GqlFieldRenderer<'_> {
-    fn render_input_field(&self, input_field: &InputField, ctx: &mut RenderContext) -> String {
-        let rendered_type = pick_input_type(input_field.field_types(ctx.query_schema))
-            .as_renderer()
-            .render(ctx);
-        let required = if input_field.is_required { "!" } else { "" };
+impl<'a> GqlFieldRenderer<'a> {
+    fn render_input_field(&self, input_field: &InputField<'a>, ctx: &mut RenderContext) -> String {
+        let rendered_type = pick_input_type(input_field.field_types()).as_renderer().render(ctx);
+        let required = if input_field.is_required() { "!" } else { "" };
 
         format!("{}: {}{}", input_field.name, rendered_type, required)
     }
 
-    fn render_output_field(&self, field: &OutputField, ctx: &mut RenderContext) -> String {
-        let rendered_args = self.render_arguments(&field.arguments, ctx);
+    fn render_output_field(&self, field: &OutputField<'a>, ctx: &mut RenderContext) -> String {
+        let rendered_args = self.render_arguments(field.arguments().iter(), ctx);
         let rendered_args = if rendered_args.is_empty() {
             "".into()
         } else if rendered_args.len() > 1 {
@@ -45,13 +43,17 @@ impl GqlFieldRenderer<'_> {
             format!("({})", rendered_args.join(", "))
         };
 
-        let rendered_type = field.field_type.as_renderer().render(ctx);
+        let rendered_type = field.field_type().as_renderer().render(ctx);
         let bang = if !field.is_nullable { "!" } else { "" };
-        format!("{}{}: {}{}", field.name, rendered_args, rendered_type, bang)
+        format!("{}{}: {}{}", field.name(), rendered_args, rendered_type, bang)
     }
 
-    fn render_arguments(&self, args: &[InputField], ctx: &mut RenderContext) -> Vec<String> {
-        let mut output = Vec::with_capacity(args.len());
+    fn render_arguments<'b>(
+        &'b self,
+        args: impl Iterator<Item = &'b InputField<'a>>,
+        ctx: &mut RenderContext,
+    ) -> Vec<String> {
+        let mut output = Vec::new();
 
         for arg in args {
             output.push(self.render_argument(arg, ctx))
@@ -60,11 +62,9 @@ impl GqlFieldRenderer<'_> {
         output
     }
 
-    fn render_argument(&self, arg: &InputField, ctx: &mut RenderContext) -> String {
-        let rendered_type = pick_input_type(arg.field_types(ctx.query_schema))
-            .as_renderer()
-            .render(ctx);
-        let required = if arg.is_required { "!" } else { "" };
+    fn render_argument(&self, arg: &InputField<'a>, ctx: &mut RenderContext) -> String {
+        let rendered_type = pick_input_type(arg.field_types()).as_renderer().render(ctx);
+        let required = if arg.is_required() { "!" } else { "" };
 
         format!("{}: {}{}", arg.name, rendered_type, required)
     }
@@ -75,7 +75,7 @@ impl GqlFieldRenderer<'_> {
 ///
 /// Important: This doesn't really affect the functionality of the QE,
 ///            it's only serving the playground used for ad-hoc debugging.
-fn pick_input_type(candidates: &[InputType]) -> &InputType {
+fn pick_input_type<'a, 'b>(candidates: &'b [InputType<'a>]) -> &'b InputType<'a> {
     candidates
         .iter()
         .reduce(|prev, next| match (prev, next) {

@@ -1,14 +1,15 @@
 use crate::{InterpreterError, QueryGraphBuilderError, RelationViolation, TransactionError};
 use connector::error::ConnectorError;
-use prisma_models::DomainError;
+use query_structure::DomainError;
 use thiserror::Error;
 use user_facing_errors::UnknownError;
+
+use crate::response_ir::{Item, Map};
 
 #[derive(Debug, Error)]
 #[error(
     "Error converting field \"{field}\" of expected non-nullable type \"{expected_type}\", found incompatible value of \"{found}\"."
 )]
-
 pub struct FieldConversionError {
     pub field: String,
     pub expected_type: String,
@@ -16,7 +17,7 @@ pub struct FieldConversionError {
 }
 
 impl FieldConversionError {
-    pub fn create(field: String, expected_type: String, found: String) -> CoreError {
+    pub(crate) fn create(field: String, expected_type: String, found: String) -> CoreError {
         CoreError::FieldConversionError(Self {
             field,
             expected_type,
@@ -63,6 +64,9 @@ pub enum CoreError {
 
     #[error("Error in batch request {request_idx}: {error}")]
     BatchError { request_idx: usize, error: Box<CoreError> },
+
+    #[error("Query timed out")]
+    QueryTimeout,
 }
 
 impl CoreError {
@@ -225,6 +229,30 @@ impl From<CoreError> for user_facing_errors::Error {
             }
 
             _ => UnknownError::new(&err).into(),
+        }
+    }
+}
+
+#[derive(Debug, serde::Serialize, PartialEq)]
+pub struct ExtendedUserFacingError {
+    #[serde(flatten)]
+    user_facing_error: user_facing_errors::Error,
+
+    #[serde(skip_serializing_if = "indexmap::IndexMap::is_empty")]
+    extensions: Map,
+}
+
+impl ExtendedUserFacingError {
+    pub fn set_extension(&mut self, key: String, val: serde_json::Value) {
+        self.extensions.entry(key).or_insert(Item::Json(val));
+    }
+}
+
+impl From<CoreError> for ExtendedUserFacingError {
+    fn from(error: CoreError) -> Self {
+        ExtendedUserFacingError {
+            user_facing_error: error.into(),
+            extensions: Default::default(),
         }
     }
 }

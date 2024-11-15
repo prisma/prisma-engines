@@ -1,9 +1,8 @@
 use indoc::{formatdoc, indoc};
 use psl::PreviewFeature;
 use schema_core::{
-    commands::apply_migrations,
-    commands::create_migration,
-    json_rpc::types::{ApplyMigrationsInput, CreateMigrationInput},
+    commands::{apply_migrations, create_migration},
+    json_rpc::types::{ApplyMigrationsInput, CreateMigrationInput, SchemasContainer},
     schema_connector::{ConnectorParams, SchemaConnector},
 };
 use sql_schema_connector::SqlSchemaConnector;
@@ -1374,7 +1373,8 @@ fn multi_schema_tests(_api: TestApi) {
 async fn migration_with_shadow_database() {
     let conn_str = std::env::var("TEST_DATABASE_URL").unwrap();
 
-    if !conn_str.starts_with("postgres") || conn_str.contains("localhost:2625") {
+    let is_cockroach = conn_str.contains("localhost:2625") || conn_str.contains("localhost:26260");
+    if !conn_str.starts_with("postgres") || is_cockroach {
         return;
     }
 
@@ -1452,7 +1452,12 @@ async fn migration_with_shadow_database() {
 
     let migration = CreateMigrationInput {
         migrations_directory_path: migrations_directory.path().to_str().unwrap().to_owned(),
-        prisma_schema: dm.clone(),
+        schema: SchemasContainer {
+            files: vec![SchemaContainer {
+                path: "schema.prisma".to_string(),
+                content: dm.clone(),
+            }],
+        },
         draft: false,
         migration_name: "init".to_string(),
     };

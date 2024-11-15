@@ -145,7 +145,7 @@ mod insensitive {
           r#"query { findManyTestModel(where: { str: { gte: "aÆB", mode: insensitive } }) { str }}"#,
           MongoDb(_) => vec![r#"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"bar"},{"str":"aÆB"},{"str":"AÆB"},{"str":"aæB"}]}}"#],
           // Cockroach, https://github.com/cockroachdb/cockroach/issues/71313
-          CockroachDb => vec![r#"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"bar"},{"str":"aÆB"},{"str":"AÆB"},{"str":"aæB"}]}}"#],
+          CockroachDb(_) => vec![r#"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"bar"},{"str":"aÆB"},{"str":"AÆB"},{"str":"aæB"}]}}"#],
           _ => vec![r#"{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"bar"},{"str":"aÆB"},{"str":"AÆB"},{"str":"aæB"},{"str":"aB"}]}}"#]
         );
 
@@ -154,7 +154,7 @@ mod insensitive {
           r#"query { findManyTestModel(where: { str: { lt: "aÆB", mode: insensitive } }) { str }}"#,
           MongoDb(_) => vec![r#"{"data":{"findManyTestModel":[{"str":"A"},{"str":"aB"}]}}"#],
           // https://github.com/cockroachdb/cockroach/issues/71313
-          CockroachDb => vec![r#"{"data":{"findManyTestModel":[{"str":"A"},{"str":"aB"}]}}"#],
+          CockroachDb(_) => vec![r#"{"data":{"findManyTestModel":[{"str":"A"},{"str":"aB"}]}}"#],
           _ =>  vec![r#"{"data":{"findManyTestModel":[{"str":"A"}]}}"#]
         );
 

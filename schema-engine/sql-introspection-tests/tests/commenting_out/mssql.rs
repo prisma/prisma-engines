@@ -22,7 +22,7 @@ async fn a_table_without_uniques_should_ignore(api: &mut TestApi) -> TestResult 
         .await?;
 
     let expected = expect![[r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model Post {
           id      Int
           user_id Int

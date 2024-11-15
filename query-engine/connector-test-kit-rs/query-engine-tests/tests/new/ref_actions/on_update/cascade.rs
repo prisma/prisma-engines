@@ -1,3 +1,4 @@
+//! D1 seems to silently ignore Cascade.
 use query_engine_tests::*;
 
 #[test_suite(suite = "cascade_onU_1to1_req", schema(required), relation_mode = "prisma")]
@@ -169,7 +170,6 @@ mod one2one_opt {
         schema.to_owned()
     }
 
-    // Updating the parent updates the child FK as well.
     #[connector_test(schema(optional))]
     async fn update_parent_cascade(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(

@@ -137,9 +137,9 @@ mod update {
         insta::assert_snapshot!(
           run_query!(&runner, r#"query {
             findManyTestModel(
-              where: { AND: [{updatedAt_w_default: { gt: { _ref: "createdAt" } }},
-                             {updatedAt_wo_default: { gt: { _ref: "createdAt" } }},
-                             {updatedAt_wo_default: { equals: { _ref: "updatedAt_w_default" } }}
+              where: { AND: [{updatedAt_w_default: { gt: { _ref: "createdAt", _container: "TestModel" } }},
+                             {updatedAt_wo_default: { gt: { _ref: "createdAt", _container: "TestModel" } }},
+                             {updatedAt_wo_default: { equals: { _ref: "updatedAt_w_default", _container: "TestModel" } }}
                      ]}
             ) {
               id
@@ -181,6 +181,30 @@ mod update {
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findManyTestModel { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(schema_1))]
+    async fn update_noop(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, optString: "hello" }"#).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneTestModel(
+              where: { id: 1 }
+              data: {}
+            ) {
+              id
+              optString
+              optInt
+              optFloat
+              optBoolean
+              optDateTime
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"id":1,"optString":"hello","optInt":null,"optFloat":null,"optBoolean":null,"optDateTime":null}}}"###
         );
 
         Ok(())
@@ -740,21 +764,6 @@ mod json_update {
 
     #[connector_test(capabilities(AdvancedJsonNullability))]
     async fn update_json_errors(runner: Runner) -> TestResult<()> {
-        // On the JSON protocol, this succeeds because `null` is serialized as JSON.
-        // It doesn't matter since the client does _not_ allow to send null values, but only DbNull or JsonNull.
-        if runner.protocol().is_graphql() {
-            assert_error!(
-                &runner,
-                r#"mutation {
-                  updateOneTestModel(where: { id: 1 }, data: { json: null }) {
-                    json
-                  }
-                }"#,
-                2009,
-                "A value is required but not set"
-            );
-        }
-
         assert_error!(
             &runner,
             r#"mutation {

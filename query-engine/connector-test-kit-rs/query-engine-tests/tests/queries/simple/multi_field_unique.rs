@@ -176,7 +176,7 @@ mod multi_field_unique {
         schema.to_owned()
     }
 
-    #[connector_test(schema(many_unique_fields), exclude(MySQL))]
+    #[connector_test(schema(many_unique_fields), exclude(MySQL, Vitess))]
     async fn ludicrous_fields(runner: Runner) -> TestResult<()> {
         create_user(
             &runner,

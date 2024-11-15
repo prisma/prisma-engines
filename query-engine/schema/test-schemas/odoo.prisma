@@ -3562,6 +3562,4 @@ model wizard_ir_model_menu_create {
 }
 
 
-// introspectionSchemaVersion: NonPrisma 
-
 

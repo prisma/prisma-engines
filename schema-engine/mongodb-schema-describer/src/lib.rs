@@ -10,8 +10,8 @@ mod walkers;
 pub use schema::*;
 pub use walkers::*;
 
+use bson::{Bson, Document};
 use futures::stream::TryStreamExt;
-use mongodb::bson::{Bson, Document};
 
 /// Describe the contents of the given database. Only bothers about the schema, meaning the
 /// collection names and indexes created. Does a bit of magic to the indexes, so if having a
@@ -22,17 +22,30 @@ use mongodb::bson::{Bson, Document};
 pub async fn describe(client: &mongodb::Client, db_name: &str) -> mongodb::error::Result<MongoSchema> {
     let mut schema = MongoSchema::default();
     let database = client.database(db_name);
-    let mut cursor = database.list_collections(None, None).await?;
+    let mut cursor = database.list_collections().await?;
 
     while let Some(collection) = cursor.try_next().await? {
         let collection_name = collection.name;
         let options = collection.options;
+        let collection_type = collection.collection_type;
         let has_schema = options.validator.is_some();
+        let is_capped = options.capped.is_some();
+
+        // We need to skip views, we do not support introspecting them yet.
+        if collection_type == mongodb::results::CollectionType::View {
+            continue;
+        }
+
+        // We need to skip system collections, they are only used by MongoDB internally.
+        // https://www.mongodb.com/docs/manual/reference/system-collections/
+        if collection_type == mongodb::results::CollectionType::Collection && collection_name.starts_with("system.") {
+            continue;
+        }
 
         let collection = database.collection::<Document>(&collection_name);
-        let collection_id = schema.push_collection(collection_name, has_schema);
+        let collection_id = schema.push_collection(collection_name, has_schema, is_capped);
 
-        let mut indexes_cursor = collection.list_indexes(None).await?;
+        let mut indexes_cursor = collection.list_indexes().await?;
 
         while let Some(index) = indexes_cursor.try_next().await? {
             let options = index.options.unwrap_or_default();
@@ -109,9 +122,9 @@ pub async fn describe(client: &mongodb::Client, db_name: &str) -> mongodb::error
 /// Get the version.
 pub async fn version(client: &mongodb::Client, db_name: &str) -> mongodb::error::Result<String> {
     let database = client.database(db_name);
-    use mongodb::bson::doc;
+    use bson::doc;
     let version_cmd = doc! {"buildInfo": 1};
-    let res = database.run_command(version_cmd, None).await?;
+    let res = database.run_command(version_cmd).await?;
     let version = res
         .get("versionArray")
         .unwrap()

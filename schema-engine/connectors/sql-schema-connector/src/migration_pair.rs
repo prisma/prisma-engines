@@ -1,6 +1,8 @@
 use crate::SqlDatabaseSchema;
 use sql_schema_describer::{walkers::Walker, SqlSchema};
 
+/// A pair of items that can exist in two schemas: previous is the item in the previous / old
+/// schema, next is the item in the next / new schema.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct MigrationPair<T> {
     pub previous: T,
@@ -27,7 +29,7 @@ impl<T> MigrationPair<T> {
     {
         f(&self.previous)
             .into_iter()
-            .zip(f(&self.next).into_iter())
+            .zip(f(&self.next))
             .map(MigrationPair::from)
     }
 

@@ -1,19 +1,44 @@
 mod connection;
-mod mssql;
-mod mysql;
-mod postgresql;
-mod sqlite;
+#[cfg(feature = "driver-adapters")]
+mod js;
 mod transaction;
+
+#[cfg(any(
+    feature = "mssql-native",
+    feature = "mysql-native",
+    feature = "postgresql-native",
+    feature = "sqlite-native"
+))]
+pub(crate) mod native {
+    #[cfg(feature = "mssql")]
+    pub(crate) mod mssql;
+    #[cfg(feature = "mysql")]
+    pub(crate) mod mysql;
+    #[cfg(feature = "postgresql")]
+    pub(crate) mod postgresql;
+    #[cfg(feature = "sqlite")]
+    pub(crate) mod sqlite;
+}
 
 pub(crate) mod operations;
 
 use async_trait::async_trait;
 use connector_interface::{error::ConnectorError, Connector};
 
-pub use mssql::*;
-pub use mysql::*;
-pub use postgresql::*;
-pub use sqlite::*;
+#[cfg(feature = "driver-adapters")]
+pub use js::*;
+
+#[cfg(feature = "mssql-native")]
+pub use native::mssql::*;
+
+#[cfg(feature = "mysql-native")]
+pub use native::mysql::*;
+
+#[cfg(feature = "postgresql-native")]
+pub use native::postgresql::*;
+
+#[cfg(feature = "sqlite-native")]
+pub use native::sqlite::*;
 
 #[async_trait]
 pub trait FromSource {
@@ -36,12 +61,10 @@ pub trait FromSource {
         Self: Connector + Sized;
 }
 
+#[inline]
 async fn catch<O>(
-    connection_info: quaint::prelude::ConnectionInfo,
+    connection_info: &quaint::prelude::ConnectionInfo,
     fut: impl std::future::Future<Output = Result<O, crate::SqlError>>,
 ) -> Result<O, ConnectorError> {
-    match fut.await {
-        Ok(o) => Ok(o),
-        Err(err) => Err(err.into_connector_error(&connection_info)),
-    }
+    fut.await.map_err(|err| err.into_connector_error(connection_info))
 }

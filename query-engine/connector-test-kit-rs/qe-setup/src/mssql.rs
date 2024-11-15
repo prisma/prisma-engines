@@ -19,7 +19,6 @@ pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_schemas: &[
             "#
         );
         conn.raw_cmd(&sql).await.unwrap();
-        conn.raw_cmd(&format!("USE [{db_name}];")).await.unwrap();
     } else {
         let api = schema_core::schema_api(Some(prisma_schema.to_owned()), None)?;
         api.reset().await.ok();
@@ -40,7 +39,6 @@ pub(crate) async fn mssql_setup(url: String, prisma_schema: &str, db_schemas: &[
             .unwrap();
     }
 
-    // 2. create the database schema for given Prisma schema
-    crate::diff_and_apply(prisma_schema).await;
-    Ok(())
+    let mut connector = sql_schema_connector::SqlSchemaConnector::new_mssql();
+    crate::diff_and_apply(prisma_schema, url, &mut connector).await
 }

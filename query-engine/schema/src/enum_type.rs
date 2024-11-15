@@ -1,5 +1,5 @@
 use super::*;
-use prisma_models::{InternalEnum, PrismaValue, ScalarFieldRef};
+use query_structure::{InternalEnum, PrismaValue, ScalarFieldRef};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum EnumType {

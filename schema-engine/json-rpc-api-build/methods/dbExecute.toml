@@ -6,14 +6,6 @@ defined on all connectors.
 requestShape = "DbExecuteParams"
 responseShape = "DbExecuteResult"
 
-[recordShapes.SchemaContainer]
-description = "An object with a `schema` field."
-fields.schema.shape = "string"
-
-[recordShapes.UrlContainer]
-description = "An object with a `url` field."
-fields.url.shape = "string"
-
 [recordShapes.DbExecuteParams]
 description = "The type of params accepted by dbExecute."
 fields.datasourceType.description = "The location of the live database to connect to."
@@ -26,7 +18,8 @@ description = "The type of results returned by dbExecute."
 
 [enumShapes.DbExecuteDatasourceType]
 description = "The location of the live database to connect to."
-variants.schema.description = "Path to the Prisma schema file to take the datasource URL from."
-variants.schema.shape = "SchemaContainer"
+variants.schema.description = "Prisma schema files and content to take the datasource URL from."
+variants.schema.shape = "SchemasWithConfigDir"
+
 variants.url.description = "The URL of the database to run the command on."
 variants.url.shape = "UrlContainer"

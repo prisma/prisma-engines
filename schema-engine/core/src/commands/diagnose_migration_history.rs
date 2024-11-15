@@ -61,7 +61,7 @@ impl DiagnoseMigrationHistoryOutput {
 }
 
 /// Read the contents of the migrations directory and the migrations table, and
-/// returns their relative statuses. At this stage, the migration engine only
+/// returns their relative statuses. At this stage, the schema engine only
 /// reads, it does not write to the dev database nor the migrations directory.
 pub async fn diagnose_migration_history(
     input: DiagnoseMigrationHistoryInput,

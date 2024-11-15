@@ -2,12 +2,16 @@ use crate::error::{Error, ErrorKind};
 use futures::Future;
 use std::time::Duration;
 
+#[cfg(native)]
 pub async fn connect<T, F, E>(duration: Option<Duration>, f: F) -> crate::Result<T>
 where
     F: Future<Output = std::result::Result<T, E>>,
     E: Into<Error>,
 {
-    timeout(duration, f, || Error::builder(ErrorKind::ConnectTimeout).build()).await
+    timeout(duration, f, || {
+        Error::builder(ErrorKind::Native(crate::error::NativeErrorKind::ConnectTimeout)).build()
+    })
+    .await
 }
 
 pub async fn socket<T, F, E>(duration: Option<Duration>, f: F) -> crate::Result<T>

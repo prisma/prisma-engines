@@ -5,8 +5,7 @@ pub use read::*;
 pub use write::*;
 
 use crate::ToGraphviz;
-use connector::filter::Filter;
-use prisma_models::{FieldSelection, ModelRef, SelectionResult};
+use query_structure::{FieldSelection, Filter, Model, SelectionResult};
 
 #[derive(Debug, Clone)]
 #[allow(clippy::large_enum_variant)]
@@ -16,18 +15,37 @@ pub(crate) enum Query {
 }
 
 impl Query {
-    pub(crate) fn returns(&self, fields: &FieldSelection) -> bool {
+    pub(crate) fn satisfies(&self, fields: &FieldSelection) -> bool {
         match self {
-            Self::Read(rq) => rq.returns(fields),
-            Self::Write(wq) => wq.returns(fields),
+            Self::Read(rq) => rq.satisfies(fields),
+            Self::Write(wq) => wq.satisfies(fields),
         }
     }
 
-    pub(crate) fn model(&self) -> ModelRef {
+    pub(crate) fn satisfy_dependency(&mut self, fields: FieldSelection) {
+        match self {
+            Self::Read(rq) => rq.satisfy_dependency(fields),
+            Self::Write(wq) => wq.satisfy_dependency(fields),
+        }
+    }
+
+    pub(crate) fn model(&self) -> Model {
         match self {
             Self::Read(rq) => rq.model(),
             Self::Write(wq) => wq.model(),
         }
+    }
+
+    pub(crate) fn is_update_one(&self) -> bool {
+        matches!(self, Query::Write(WriteQuery::UpdateRecord(_)))
+    }
+
+    pub(crate) fn is_create_one(&self) -> bool {
+        matches!(self, Query::Write(WriteQuery::CreateRecord(_)))
+    }
+
+    pub(crate) fn is_delete_one(&self) -> bool {
+        matches!(self, Query::Write(WriteQuery::CreateRecord(_)))
     }
 }
 

@@ -1,0 +1,31 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../node_modules/.prisma/client"
+  previewFeatures = []
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = "file:dev.db"
+}
+
+/// User model comment
+model User {
+  id    String  @id @map("_id")
+  email String  @unique
+  age   Int
+  /// name comment
+  name  String?
+  post Post
+
+}
+
+/// Post comment
+type Post {
+  /// published comment
+  published Boolean
+  title     String
+  content   String?
+  /// authorId comment
+  authorId  String?
+}

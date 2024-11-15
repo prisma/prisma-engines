@@ -15,47 +15,24 @@ pub struct ViewDefinition {
 #[derive(Debug)]
 pub struct IntrospectionResult {
     /// Datamodel
-    pub data_model: String,
+    pub datamodels: Vec<(String, String)>,
     /// The introspected data model is empty
     pub is_empty: bool,
     /// Introspection warnings
     pub warnings: Option<String>,
-    /// Inferred Prisma version
-    pub version: Version,
     /// The database view definitions. None if preview feature
     /// is not enabled.
     pub views: Option<Vec<ViewDefinition>>,
 }
 
-/// The output type from introspection.
-#[derive(Debug, Deserialize, Serialize)]
-pub struct IntrospectionResultOutput {
-    /// Datamodel
-    pub datamodel: String,
-    /// warnings
-    pub warnings: Option<String>,
-    /// version
-    pub version: Version,
-    /// views
-    pub views: Option<Vec<ViewDefinition>>,
-}
+impl IntrospectionResult {
+    /// Consumes the result and returns the first datamodel in the introspection result.
+    pub fn into_single_datamodel(mut self) -> String {
+        self.datamodels.remove(0).1
+    }
 
-/// The inferred Prisma version.
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
-pub enum Version {
-    /// Not a Prisma database.
-    NonPrisma,
-    /// Maybe a Prisma 1.0 database.
-    Prisma1,
-    /// Maybe a Prisma 1.1 database.
-    Prisma11,
-    /// Maybe a Prisma 2 database.
-    Prisma2,
-}
-
-impl Version {
-    /// Is the database a Prisma 1.0 or 1.1 database.
-    pub fn is_prisma1(self) -> bool {
-        matches!(self, Self::Prisma1 | Self::Prisma11)
+    /// Returns the first datamodel in the introspection result.
+    pub fn single_datamodel(&self) -> &str {
+        &self.datamodels[0].1
     }
 }

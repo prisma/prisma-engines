@@ -3,9 +3,8 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue, Query, WriteQuery,
 };
-use connector::{Filter, RelationCompare};
 use itertools::Itertools;
-use prisma_models::{ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
+use query_structure::{Filter, Model, PrismaValue, RelationCompare, RelationFieldRef, SelectionResult};
 use std::convert::TryInto;
 
 /// Handles nested disconnect cases.
@@ -16,8 +15,8 @@ pub fn nested_disconnect(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: &ModelRef,
+    value: ParsedInputValue<'_>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
@@ -25,8 +24,8 @@ pub fn nested_disconnect(
         // Build all filters upfront.
         let filters: Vec<Filter> = utils::coerce_vec(value)
             .into_iter()
-            .map(|value: ParsedInputValue| {
-                let value: ParsedInputMap = value.try_into()?;
+            .map(|value: ParsedInputValue<'_>| {
+                let value: ParsedInputMap<'_> = value.try_into()?;
                 extract_unique_filter(value, child_model)
             })
             .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
@@ -38,14 +37,14 @@ pub fn nested_disconnect(
     } else {
         let filter: Filter = if relation.is_one_to_one() {
             // One-to-one relations can simply specify if they want to disconnect the child or not as a bool.
-            if let ParsedInputValue::Single(PrismaValue::Boolean(should_delete)) = value {
-                if !should_delete {
+            if let ParsedInputValue::Single(PrismaValue::Boolean(should_disconnect)) = value {
+                if !should_disconnect {
                     return Ok(());
                 }
 
                 Filter::empty()
             } else {
-                let value: ParsedInputMap = value.try_into()?;
+                let value: ParsedInputMap<'_> = value.try_into()?;
 
                 extract_filter(value, child_model)?
             }
@@ -55,8 +54,8 @@ pub fn nested_disconnect(
             if parent_relation_field.is_list() {
                 let filters = utils::coerce_vec(value)
                     .into_iter()
-                    .map(|value: ParsedInputValue| {
-                        let value: ParsedInputMap = value.try_into()?;
+                    .map(|value: ParsedInputValue<'_>| {
+                        let value: ParsedInputMap<'_> = value.try_into()?;
                         extract_unique_filter(value, child_model)
                     })
                     .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
@@ -171,7 +170,7 @@ fn handle_one_to_x(
             let parent_model = parent_relation_field.model();
             let extractor_model_id = parent_model.primary_identifier();
             let null_record_id = SelectionResult::from(&parent_relation_field.linking_fields());
-            // If the relation is inlined on the parent and a filter is applied on the child then it means the update will be done on the parent table.
+            // If the relation is inlined on the parent and a filter is applied on the child then update is done on the parent table.
             // Therefore, the filter applied on the child needs to be converted to a "relational" filter so that the connector renders the adequate SQL to join the Child table.
             let filter = if !filter.is_empty() {
                 parent_relation_field.to_one_related(filter)

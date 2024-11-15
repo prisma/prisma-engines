@@ -1022,6 +1022,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     BTree,
                 ),
             ],
+            expression_indexes: [],
             index_null_position: {},
             constraint_options: {
                 Index(
@@ -1206,6 +1207,7 @@ fn postgres_sequences_must_work(api: TestApi) {
         PostgresSchemaExt {
             opclasses: [],
             indexes: [],
+            expression_indexes: [],
             index_null_position: {},
             constraint_options: {},
             table_options: [],
@@ -1240,7 +1242,7 @@ fn postgres_sequences_must_work(api: TestApi) {
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
-    let schema = r##"
+    let schema = r#"
         CREATE TABLE "indexes_test" (
             id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
@@ -1249,7 +1251,7 @@ fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi
 
         CREATE UNIQUE INDEX "my_idx" ON "indexes_test" (name, age);
         CREATE INDEX "my_idx2" ON "indexes_test" (age, name);
-    "##;
+    "#;
     api.raw_cmd(schema);
 
     let schema = api.describe();
@@ -1804,6 +1806,7 @@ fn extensions_are_described_correctly(api: TestApi) {
         PostgresSchemaExt {
             opclasses: [],
             indexes: [],
+            expression_indexes: [],
             index_null_position: {},
             constraint_options: {},
             table_options: [],

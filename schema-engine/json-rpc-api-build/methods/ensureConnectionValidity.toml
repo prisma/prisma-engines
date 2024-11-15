@@ -1,6 +1,6 @@
 [methods.ensureConnectionValidity]
 description = """
-Make sure the migration engine can connect to the database from the Prisma schema.
+Make sure the schema engine can connect to the database from the Prisma schema.
 """
 requestShape = "EnsureConnectionValidityParams"
 responseShape = "EnsureConnectionValidityResult"

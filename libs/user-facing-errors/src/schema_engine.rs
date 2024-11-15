@@ -9,30 +9,35 @@ pub struct DatabaseCreationFailed {
 }
 
 /// [spec](https://github.com/prisma/specs/tree/master/errors#p3001-destructive-migration-detected)
+/// No longer used.
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P3001",
-    message = "Migration possible with destructive changes and possible data loss: {migration_engine_destructive_details}"
+    message = "Migration possible with destructive changes and possible data loss: {destructive_details}"
 )]
+#[allow(dead_code)]
 pub struct DestructiveMigrationDetected {
-    pub migration_engine_destructive_details: String,
+    pub destructive_details: String,
 }
 
+/// No longer used.
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P3002",
     message = "The attempted migration was rolled back: {database_error}"
 )]
+#[allow(dead_code)]
 struct MigrationRollback {
     pub database_error: String,
 }
 
-// No longer used.
+/// No longer used.
 #[derive(Debug, SimpleUserFacingError)]
 #[user_facing(
     code = "P3003",
     message = "The format of migrations changed, the saved migrations are no longer valid. To solve this problem, please follow the steps at: https://pris.ly/d/migrate"
 )]
+#[allow(dead_code)]
 pub struct DatabaseMigrationFormatChanged;
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -91,7 +96,7 @@ impl crate::UserFacingError for PreviewFeaturesBlocked {
         let blocked: Vec<_> = self.features.iter().map(|s| format!("`{s}`")).collect();
 
         format!(
-            "Some of the requested preview features are not yet allowed in migration engine. Please remove them from your data model before using migrations. (blocked: {list_of_blocked_features})",
+            "Some of the requested preview features are not yet allowed in schema engine. Please remove them from your data model before using migrations. (blocked: {list_of_blocked_features})",
             list_of_blocked_features = blocked.join(", "),
         )
     }
@@ -234,16 +239,26 @@ pub struct ApplyMigrationError {
     pub database_error: String,
 }
 
-#[derive(Debug, Serialize, UserFacingError)]
-#[user_facing(
-    code = "P3019",
-    message = "The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml, `{expected_provider}`. Please remove your current migration directory and start a new migration history with prisma migrate dev. Read more: https://pris.ly/d/migrate-provider-switch"
-)]
+#[derive(Debug, Serialize)]
 pub struct ProviderSwitchedError {
     /// The provider specified in the schema.
     pub provider: String,
     /// The provider from migrate.lock
     pub expected_provider: String,
+}
+
+impl crate::UserFacingError for ProviderSwitchedError {
+    const ERROR_CODE: &'static str = "P3019";
+
+    fn message(&self) -> String {
+        let provider = &self.provider;
+        let expected_provider = &self.expected_provider;
+
+        match (provider.as_str(), expected_provider.as_str()) {
+            ("cockroachdb", "postgresql") => format!("The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml, `{expected_provider}`. Check out the following documentation for how to resolve this: https://pris.ly/d/cockroachdb-postgresql-provider"),
+            _ => format!("The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml, `{expected_provider}`. Please remove your current migration directory and start a new migration history with prisma migrate dev. Read more: https://pris.ly/d/migrate-provider-switch")
+        }
+    }
 }
 
 #[derive(Debug, SimpleUserFacingError)]

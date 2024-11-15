@@ -46,7 +46,7 @@ async fn aragon_test_cockroachdb(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
+        These constraints are not supported by Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
           - Model: "tokens", constraint: "tokens_token_scope_check"
     "#]];
 
@@ -57,7 +57,7 @@ async fn aragon_test_cockroachdb(api: &mut TestApi) -> TestResult {
 
 #[test_connector(tags(CockroachDb))]
 async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
-    let raw_sql = indoc! {r#"
+    let raw_sql = indoc! {r"
         CREATE TABLE user_active_security (
             id BIGSERIAL NOT NULL,
             us_login STRING NOT NULL,
@@ -83,7 +83,7 @@ async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
           is_public CHAR(1) NOT NULL DEFAULT 'N',
           CONSTRAINT ck_is_public CHECK (is_public = ANY ARRAY['Y':::STRING::CHAR, 'N':::STRING::CHAR]:::CHAR[])
         );
-    "#};
+    "};
 
     api.raw_cmd(raw_sql).await;
 
@@ -124,7 +124,7 @@ async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
+        These constraints are not supported by Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
           - Model: "todo_list", constraint: "ck_is_public"
           - Model: "user_active_security", constraint: "user_active_security_action_check"
           - Model: "user_active_security", constraint: "user_active_security_ledger_check"

@@ -13,7 +13,8 @@ async fn full_text_functions_filtered_out(api: &mut TestApi) -> TestResult {
     api.database().raw_cmd(&create_table).await?;
     api.database().raw_cmd(&create_idx).await?;
 
-    let expected = expect![[r#"
+    let schema = expect![[r#"
+        /// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
         model A {
           id   Int    @id @default(autoincrement())
           data String
@@ -21,7 +22,16 @@ async fn full_text_functions_filtered_out(api: &mut TestApi) -> TestResult {
     "#]];
 
     let result = api.introspect_dml().await?;
-    expected.assert_eq(&result);
+    schema.assert_eq(&result);
+
+    let warnings = expect![[r#"
+        *** WARNING ***
+
+        These indexes are not supported by Prisma Client, because Prisma currently does not fully support expression indexes. Read more: https://pris.ly/d/expression-indexes
+          - Model: "A", constraint: "A_data_idx"
+    "#]];
+
+    api.expect_warnings(&warnings).await;
 
     Ok(())
 }

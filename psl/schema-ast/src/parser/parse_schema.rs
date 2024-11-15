@@ -3,11 +3,11 @@ use super::{
     parse_source_and_generator::parse_config_block, parse_view::parse_view, PrismaDatamodelParser, Rule,
 };
 use crate::ast::*;
-use diagnostics::{DatamodelError, Diagnostics};
+use diagnostics::{DatamodelError, Diagnostics, FileId};
 use pest::Parser;
 
 /// Parse a PSL string and return its AST.
-pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics) -> SchemaAst {
+pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics, file_id: FileId) -> SchemaAst {
     let datamodel_result = PrismaDatamodelParser::parse(Rule::schema, datamodel_string);
 
     match datamodel_result {
@@ -24,26 +24,26 @@ pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics) -> Sc
 
                         match keyword.as_rule() {
                             Rule::TYPE_KEYWORD => {
-                                top_level_definitions.push(Top::CompositeType(parse_composite_type(current, pending_block_comment.take(), diagnostics)))
+                                top_level_definitions.push(Top::CompositeType(parse_composite_type(current, pending_block_comment.take(), diagnostics, file_id)))
                             }
                             Rule::MODEL_KEYWORD => {
-                                top_level_definitions.push(Top::Model(parse_model(current, pending_block_comment.take(), diagnostics)))
+                                top_level_definitions.push(Top::Model(parse_model(current, pending_block_comment.take(), diagnostics, file_id)))
                             }
                             Rule::VIEW_KEYWORD => {
-                                top_level_definitions.push(Top::Model(parse_view(current, pending_block_comment.take(), diagnostics)))
+                                top_level_definitions.push(Top::Model(parse_view(current, pending_block_comment.take(), diagnostics, file_id)))
                             }
                             _ => unreachable!(),
                         }
 
                     },
-                    Rule::enum_declaration => top_level_definitions.push(Top::Enum(parse_enum(current,pending_block_comment.take(),  diagnostics))),
+                    Rule::enum_declaration => top_level_definitions.push(Top::Enum(parse_enum(current,pending_block_comment.take(),  diagnostics, file_id))),
                     Rule::config_block => {
-                        top_level_definitions.push(parse_config_block(current, diagnostics));
+                        top_level_definitions.push(parse_config_block(current, diagnostics, file_id));
                     },
                     Rule::type_alias => {
                         let error = DatamodelError::new_validation_error(
                             "Invalid type definition. Please check the documentation in https://pris.ly/d/composite-types",
-                            current.as_span().into()
+                            (file_id, current.as_span()).into()
                         );
 
                         diagnostics.push_error(error);
@@ -62,12 +62,12 @@ pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics) -> Sc
                     Rule::EOI => {}
                     Rule::CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
                         "This line is invalid. It does not start with any known Prisma schema keyword.",
-                        current.as_span().into(),
+                        (file_id, current.as_span()).into(),
                     )),
                     // TODO: Add view when we want it to be more visible as a feature.
                     Rule::arbitrary_block => diagnostics.push_error(DatamodelError::new_validation_error(
                         "This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include \'model\', \'enum\', \'type\', \'datasource\' and \'generator\'.",
-                        current.as_span().into(),
+                        (file_id, current.as_span()).into(),
                     )),
                     Rule::empty_lines => (),
                     _ => unreachable!(),
@@ -89,7 +89,7 @@ pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics) -> Sc
                 _ => panic!("Could not construct parsing error. This should never happend."),
             };
 
-            diagnostics.push_error(DatamodelError::new_parser_error(expected, location.into()));
+            diagnostics.push_error(DatamodelError::new_parser_error(expected, (file_id, location).into()));
 
             SchemaAst { tops: Vec::new() }
         }

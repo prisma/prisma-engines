@@ -1,12 +1,15 @@
 mod constraints;
 mod gin;
 
+use std::path::PathBuf;
+
 use indoc::indoc;
-use schema_connector::{CompositeTypeDepth, IntrospectionContext, SchemaConnector};
+use schema_connector::{CompositeTypeDepth, ConnectorParams, IntrospectionContext, SchemaConnector};
 use sql_introspection_tests::test_api::*;
+use sql_schema_connector::SqlSchemaConnector;
 
 #[test_connector(tags(CockroachDb))]
-async fn introspecting_cockroach_db_with_postgres_provider(api: TestApi) {
+async fn introspecting_cockroach_db_with_postgres_provider_fails(api: TestApi) {
     let setup = r#"
         CREATE TABLE "myTable" (
             id   INTEGER PRIMARY KEY,
@@ -28,8 +31,26 @@ async fn introspecting_cockroach_db_with_postgres_provider(api: TestApi) {
     api.raw_cmd(setup).await;
 
     let schema = psl::parse_schema(schema).unwrap();
-    let ctx = IntrospectionContext::new_config_only(schema, CompositeTypeDepth::Infinite, None);
-    api.api.introspect(&ctx).await.unwrap();
+    let ctx = IntrospectionContext::new_config_only(schema, CompositeTypeDepth::Infinite, None, PathBuf::new());
+
+    // Instantiate the schema connector manually for this test because `TestApi`
+    // chooses the provider type based on the current database under test and
+    // not on the `provider` field in the schema.
+    let mut engine = SqlSchemaConnector::new_postgres();
+    let params = ConnectorParams {
+        connection_string: api.connection_string().to_owned(),
+        preview_features: api.preview_features(),
+        shadow_database_connection_string: None,
+    };
+    engine.set_params(params).unwrap();
+
+    let err = engine.introspect(&ctx).await.unwrap_err().to_string();
+
+    let expected_err = expect![[r#"
+        You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.
+    "#]];
+
+    expected_err.assert_eq(&err);
 }
 
 #[test_connector(tags(CockroachDb))]

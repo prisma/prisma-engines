@@ -18,7 +18,7 @@ async fn a_table_without_uniques_should_ignore(api: &mut TestApi) -> TestResult 
         .await?;
 
     let expected = expect![[r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model Post {
           id      Int
           user_id Int
@@ -56,7 +56,7 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &mut Te
         .await?;
 
     let expected = expect![[r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model Post {
           id      Int
           user_ip Int
@@ -94,7 +94,7 @@ async fn unsupported_type_keeps_its_usages_cockroach(api: &mut TestApi) -> TestR
     let expected = expect![[r#"
         *** WARNING ***
 
-        These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
+        These fields are not supported by Prisma Client, because Prisma currently does not support their types:
           - Model: "Test", field: "broken", original data type: "geometry"
           - Model: "Test", field: "broken2", original data type: "geography"
     "#]];

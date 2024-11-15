@@ -53,136 +53,76 @@ mod typed_output {
           @r###"
         {
           "data": {
-            "queryRaw": [
-              {
-                "id": {
-                  "prisma__type": "int",
-                  "prisma__value": 1
-                },
-                "string": {
-                  "prisma__type": "string",
-                  "prisma__value": "str"
-                },
-                "int": {
-                  "prisma__type": "int",
-                  "prisma__value": 42
-                },
-                "bInt": {
-                  "prisma__type": "bigint",
-                  "prisma__value": "9223372036854775807"
-                },
-                "float": {
-                  "prisma__type": "double",
-                  "prisma__value": 1.5432
-                },
-                "bytes": {
-                  "prisma__type": "bytes",
-                  "prisma__value": "AQID"
-                },
-                "bool": {
-                  "prisma__type": "bool",
-                  "prisma__value": true
-                },
-                "dt": {
-                  "prisma__type": "datetime",
-                  "prisma__value": "1900-10-10T01:10:10.001+00:00"
-                },
-                "dec": {
-                  "prisma__type": "decimal",
-                  "prisma__value": "123.4567891"
-                },
-                "json": {
-                  "prisma__type": "json",
-                  "prisma__value": {
+            "queryRaw": {
+              "columns": [
+                "id",
+                "string",
+                "int",
+                "bInt",
+                "float",
+                "bytes",
+                "bool",
+                "dt",
+                "dec",
+                "json",
+                "string_list",
+                "bInt_list"
+              ],
+              "types": [
+                "int",
+                "string",
+                "int",
+                "bigint",
+                "double",
+                "bytes",
+                "bool",
+                "datetime",
+                "decimal",
+                "json",
+                "string-array",
+                "bigint-array"
+              ],
+              "rows": [
+                [
+                  1,
+                  "str",
+                  42,
+                  "9223372036854775807",
+                  1.5432,
+                  "AQID",
+                  true,
+                  "1900-10-10T01:10:10.001+00:00",
+                  "123.4567891",
+                  {
                     "a": "b"
-                  }
-                },
-                "string_list": {
-                  "prisma__type": "array",
-                  "prisma__value": [
-                    {
-                      "prisma__type": "string",
-                      "prisma__value": "1"
-                    },
-                    {
-                      "prisma__type": "string",
-                      "prisma__value": "a"
-                    },
-                    {
-                      "prisma__type": "string",
-                      "prisma__value": "2"
-                    },
-                    {
-                      "prisma__type": "string",
-                      "prisma__value": "123123213"
-                    }
+                  },
+                  [
+                    "1",
+                    "a",
+                    "2",
+                    "123123213"
+                  ],
+                  [
+                    "-9223372036854775808",
+                    "9223372036854775807"
                   ]
-                },
-                "bInt_list": {
-                  "prisma__type": "array",
-                  "prisma__value": [
-                    {
-                      "prisma__type": "bigint",
-                      "prisma__value": "-9223372036854775808"
-                    },
-                    {
-                      "prisma__type": "bigint",
-                      "prisma__value": "9223372036854775807"
-                    }
-                  ]
-                }
-              },
-              {
-                "id": {
-                  "prisma__type": "int",
-                  "prisma__value": 2
-                },
-                "string": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "int": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bInt": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "float": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bytes": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bool": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "dt": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "dec": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "json": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "string_list": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bInt_list": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                }
-              }
-            ]
+                ],
+                [
+                  2,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null
+                ]
+              ]
+            }
           }
         }
         "###
@@ -190,7 +130,7 @@ mod typed_output {
 
         insta::assert_snapshot!(
           run_query!(&runner, fmt_query_raw(r#"SELECT 1 + 1;"#, vec![])),
-          @r###"{"data":{"queryRaw":[{"?column?":{"prisma__type":"int","prisma__value":2}}]}}"###
+          @r###"{"data":{"queryRaw":{"columns":["?column?"],"types":["int"],"rows":[[2]]}}}"###
         );
 
         Ok(())
@@ -240,94 +180,60 @@ mod typed_output {
           @r###"
         {
           "data": {
-            "queryRaw": [
-              {
-                "id": {
-                  "prisma__type": "int",
-                  "prisma__value": 1
-                },
-                "string": {
-                  "prisma__type": "string",
-                  "prisma__value": "str"
-                },
-                "int": {
-                  "prisma__type": "int",
-                  "prisma__value": 42
-                },
-                "bInt": {
-                  "prisma__type": "bigint",
-                  "prisma__value": "9223372036854775807"
-                },
-                "float": {
-                  "prisma__type": "double",
-                  "prisma__value": 1.5432
-                },
-                "bytes": {
-                  "prisma__type": "bytes",
-                  "prisma__value": "AQID"
-                },
-                "bool": {
-                  "prisma__type": "int",
-                  "prisma__value": 1
-                },
-                "dt": {
-                  "prisma__type": "datetime",
-                  "prisma__value": "1900-10-10T01:10:10.001+00:00"
-                },
-                "dec": {
-                  "prisma__type": "decimal",
-                  "prisma__value": "123.4567891"
-                },
-                "json": {
-                  "prisma__type": "json",
-                  "prisma__value": {
+            "queryRaw": {
+              "columns": [
+                "id",
+                "string",
+                "int",
+                "bInt",
+                "float",
+                "bytes",
+                "bool",
+                "dt",
+                "dec",
+                "json"
+              ],
+              "types": [
+                "int",
+                "string",
+                "int",
+                "bigint",
+                "double",
+                "bytes",
+                "int",
+                "datetime",
+                "decimal",
+                "json"
+              ],
+              "rows": [
+                [
+                  1,
+                  "str",
+                  42,
+                  "9223372036854775807",
+                  1.5432,
+                  "AQID",
+                  1,
+                  "1900-10-10T01:10:10.001+00:00",
+                  "123.4567891",
+                  {
                     "a": "b"
                   }
-                }
-              },
-              {
-                "id": {
-                  "prisma__type": "int",
-                  "prisma__value": 2
-                },
-                "string": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "int": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bInt": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "float": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bytes": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bool": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "dt": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "dec": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "json": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                }
-              }
-            ]
+                ],
+                [
+                  2,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null
+                ]
+              ]
+            }
           }
         }
         "###
@@ -335,7 +241,7 @@ mod typed_output {
 
         insta::assert_snapshot!(
           run_query!(&runner, fmt_query_raw(r#"SELECT 1 + 1;"#, vec![])),
-          @r###"{"data":{"queryRaw":[{"1 + 1":{"prisma__type":"bigint","prisma__value":"2"}}]}}"###
+          @r###"{"data":{"queryRaw":{"columns":["1 + 1"],"types":["bigint"],"rows":[["2"]]}}}"###
         );
 
         Ok(())
@@ -366,92 +272,58 @@ mod typed_output {
           @r###"
         {
           "data": {
-            "queryRaw": [
-              {
-                "id": {
-                  "prisma__type": "int",
-                  "prisma__value": 1
-                },
-                "string": {
-                  "prisma__type": "string",
-                  "prisma__value": "str"
-                },
-                "int": {
-                  "prisma__type": "int",
-                  "prisma__value": 42
-                },
-                "bInt": {
-                  "prisma__type": "bigint",
-                  "prisma__value": "9223372036854775807"
-                },
-                "float": {
-                  "prisma__type": "double",
-                  "prisma__value": 1.5432
-                },
-                "bytes": {
-                  "prisma__type": "bytes",
-                  "prisma__value": "AQID"
-                },
-                "bool": {
-                  "prisma__type": "int",
-                  "prisma__value": 1
-                },
-                "dt": {
-                  "prisma__type": "datetime",
-                  "prisma__value": "1900-10-10T01:10:10.001+00:00"
-                },
-                "dec": {
-                  "prisma__type": "decimal",
-                  "prisma__value": "123.4567891"
-                },
-                "json": {
-                  "prisma__type": "string",
-                  "prisma__value": "{\"a\":\"b\"}"
-                }
-              },
-              {
-                "id": {
-                  "prisma__type": "int",
-                  "prisma__value": 2
-                },
-                "string": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "int": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bInt": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "float": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bytes": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bool": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "dt": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "dec": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "json": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                }
-              }
-            ]
+            "queryRaw": {
+              "columns": [
+                "id",
+                "string",
+                "int",
+                "bInt",
+                "float",
+                "bytes",
+                "bool",
+                "dt",
+                "dec",
+                "json"
+              ],
+              "types": [
+                "int",
+                "string",
+                "int",
+                "bigint",
+                "double",
+                "bytes",
+                "int",
+                "datetime",
+                "decimal",
+                "string"
+              ],
+              "rows": [
+                [
+                  1,
+                  "str",
+                  42,
+                  "9223372036854775807",
+                  1.5432,
+                  "AQID",
+                  1,
+                  "1900-10-10T01:10:10.001+00:00",
+                  "123.4567891",
+                  "{\"a\":\"b\"}"
+                ],
+                [
+                  2,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null
+                ]
+              ]
+            }
           }
         }
         "###
@@ -459,7 +331,7 @@ mod typed_output {
 
         insta::assert_snapshot!(
           run_query!(&runner, fmt_query_raw(r#"SELECT 1 + 1;"#, vec![])),
-          @r###"{"data":{"queryRaw":[{"1 + 1":{"prisma__type":"int","prisma__value":2}}]}}"###
+          @r###"{"data":{"queryRaw":{"columns":["1 + 1"],"types":["int"],"rows":[[2]]}}}"###
         );
 
         Ok(())
@@ -483,7 +355,7 @@ mod typed_output {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_sqlite), only(Sqlite))]
+    #[connector_test(schema(schema_sqlite), only(Sqlite), exclude(Sqlite("cfd1")))]
     async fn all_scalars_sqlite(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,
@@ -507,84 +379,54 @@ mod typed_output {
           @r###"
         {
           "data": {
-            "queryRaw": [
-              {
-                "id": {
-                  "prisma__type": "int",
-                  "prisma__value": 1
-                },
-                "string": {
-                  "prisma__type": "string",
-                  "prisma__value": "str"
-                },
-                "int": {
-                  "prisma__type": "int",
-                  "prisma__value": 42
-                },
-                "bInt": {
-                  "prisma__type": "bigint",
-                  "prisma__value": "9223372036854775807"
-                },
-                "float": {
-                  "prisma__type": "double",
-                  "prisma__value": 1.5432
-                },
-                "bytes": {
-                  "prisma__type": "bytes",
-                  "prisma__value": "AQID"
-                },
-                "bool": {
-                  "prisma__type": "bool",
-                  "prisma__value": true
-                },
-                "dt": {
-                  "prisma__type": "datetime",
-                  "prisma__value": "1900-10-10T01:10:10.001+00:00"
-                },
-                "dec": {
-                  "prisma__type": "decimal",
-                  "prisma__value": "123.4567891"
-                }
-              },
-              {
-                "id": {
-                  "prisma__type": "int",
-                  "prisma__value": 2
-                },
-                "string": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "int": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bInt": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "float": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bytes": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "bool": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "dt": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                },
-                "dec": {
-                  "prisma__type": "null",
-                  "prisma__value": null
-                }
-              }
-            ]
+            "queryRaw": {
+              "columns": [
+                "id",
+                "string",
+                "int",
+                "bInt",
+                "float",
+                "bytes",
+                "bool",
+                "dt",
+                "dec"
+              ],
+              "types": [
+                "int",
+                "string",
+                "int",
+                "bigint",
+                "double",
+                "bytes",
+                "bool",
+                "datetime",
+                "decimal"
+              ],
+              "rows": [
+                [
+                  1,
+                  "str",
+                  42,
+                  "9223372036854775807",
+                  1.5432,
+                  "AQID",
+                  true,
+                  "1900-10-10T01:10:10.001+00:00",
+                  "123.4567891"
+                ],
+                [
+                  2,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null
+                ]
+              ]
+            }
           }
         }
         "###
@@ -592,7 +434,41 @@ mod typed_output {
 
         insta::assert_snapshot!(
           run_query!(&runner, fmt_query_raw(r#"SELECT 1 + 1;"#, vec![])),
-          @r###"{"data":{"queryRaw":[{"1 + 1":{"prisma__type":"bigint","prisma__value":"2"}}]}}"###
+          @r###"{"data":{"queryRaw":{"columns":["1 + 1"],"types":["bigint"],"rows":[["2"]]}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(generic), only(Mysql))]
+    async fn unknown_type_mysql(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, fmt_query_raw(r#"SELECT POINT(1, 1);"#, vec![])),
+          @r###"{"data":{"queryRaw":{"columns":["POINT(1, 1)"],"types":["bytes"],"rows":[["AAAAAAEBAAAAAAAAAAAA8D8AAAAAAADwPw=="]]}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(generic), only(Postgres))]
+    async fn unknown_type_pg(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            &runner,
+            fmt_query_raw(r#"SELECT POINT(1, 1);"#, vec![]),
+            2010,
+            "Failed to deserialize column of type 'point'"
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(generic), only(SqlServer))]
+    async fn unknown_type_mssql(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            &runner,
+            fmt_query_raw(r#"SELECT geometry::Parse('POINT(3 4 7 2.5)');"#, vec![]),
+            2010,
+            "not yet implemented for Udt"
         );
 
         Ok(())

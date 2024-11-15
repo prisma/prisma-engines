@@ -164,7 +164,7 @@ pub(crate) struct ColumnChanges {
 
 impl PartialOrd for ColumnChanges {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.changes.bits().partial_cmp(&other.changes.bits())
+        Some(self.cmp(other))
     }
 }
 

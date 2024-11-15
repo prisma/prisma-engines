@@ -10,7 +10,7 @@ jobs:
     env:
       RUSTFLAGS: "-Dwarnings"
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
         with:
             components: clippy
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
         with:
           components: rustfmt
@@ -46,13 +46,13 @@ jobs:
         features:
           - "--lib --features=all"
           - "--lib --no-default-features --features=sqlite"
-          - "--lib --no-default-features --features=sqlite --features=chrono --features=json --features=uuid --features=pooled --features=serde-support --features=bigdecimal"
+          - "--lib --no-default-features --features=sqlite --features=pooled"
           - "--lib --no-default-features --features=postgresql"
-          - "--lib --no-default-features --features=postgresql --features=chrono --features=json --features=uuid --features=pooled --features=serde-support --features=bigdecimal"
+          - "--lib --no-default-features --features=postgresql --features=pooled"
           - "--lib --no-default-features --features=mysql"
-          - "--lib --no-default-features --features=mysql --features=chrono --features=json --features=uuid --features=pooled --features=serde-support --features=bigdecimal"
+          - "--lib --no-default-features --features=mysql --features=pooled"
           - "--lib --no-default-features --features=mssql"
-          - "--lib --no-default-features --features=mssql --features=chrono --features=json --features=uuid --features=pooled --features=serde-support --features=bigdecimal"
+          - "--lib --no-default-features --features=mssql --features=pooled"
           - "--doc --features=all"
     env:
       TEST_MYSQL: "mysql://root:prisma@localhost:3306/prisma"
@@ -64,14 +64,14 @@ jobs:
       RUSTFLAGS: "-Dwarnings"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
@@ -80,10 +80,10 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ matrix.features }}
 
       - name: Start Databases
-        run: docker-compose -f docker-compose.yml up -d
+        run: docker compose -f docker-compose.yml up -d
 
       - name: Sleep for 20s
-        uses: juliangruber/sleep-action@v1
+        uses: juliangruber/sleep-action@v2
         with:
           time: 20s
 
@@ -96,12 +96,12 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry

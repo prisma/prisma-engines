@@ -1,0 +1,5 @@
+{   
+    "action": "createOne",
+    "modelName": "Post",
+    "query": { "arguments": {}, "selection": { "$scalars": true } }
+}

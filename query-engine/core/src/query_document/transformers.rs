@@ -7,14 +7,14 @@
 use super::*;
 use bigdecimal::ToPrimitive;
 use chrono::prelude::*;
-use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
+use query_structure::{OrderBy, PrismaValue, RelationLoadStrategy, ScalarFieldRef};
 use std::convert::TryInto;
 use user_facing_errors::query_engine::validation::ValidationError;
 
-impl TryFrom<ParsedInputValue> for PrismaValue {
+impl<'a> TryFrom<ParsedInputValue<'a>> for PrismaValue {
     type Error = ValidationError;
 
-    fn try_from(value: ParsedInputValue) -> QueryParserResult<PrismaValue> {
+    fn try_from(value: ParsedInputValue<'a>) -> QueryParserResult<PrismaValue> {
         match value {
             ParsedInputValue::Single(val) => Ok(val),
             ParsedInputValue::List(values) => values
@@ -25,7 +25,7 @@ impl TryFrom<ParsedInputValue> for PrismaValue {
 
             ParsedInputValue::Map(map) => Ok(PrismaValue::Object(
                 map.into_iter()
-                    .map(|(k, v)| Ok((k, v.try_into()?)))
+                    .map(|(k, v)| Ok((k.into_owned(), v.try_into()?)))
                     .collect::<QueryParserResult<Vec<_>>>()?,
             )),
 
@@ -36,10 +36,10 @@ impl TryFrom<ParsedInputValue> for PrismaValue {
     }
 }
 
-impl TryFrom<ParsedInputValue> for ParsedInputMap {
+impl<'a> TryFrom<ParsedInputValue<'a>> for ParsedInputMap<'a> {
     type Error = ValidationError;
 
-    fn try_from(value: ParsedInputValue) -> QueryParserResult<ParsedInputMap> {
+    fn try_from(value: ParsedInputValue<'a>) -> QueryParserResult<ParsedInputMap<'a>> {
         match value {
             ParsedInputValue::Map(val) => Ok(val),
             v => Err(ValidationError::unexpected_runtime_error(format!(
@@ -49,10 +49,10 @@ impl TryFrom<ParsedInputValue> for ParsedInputMap {
     }
 }
 
-impl TryFrom<ParsedInputValue> for Option<ParsedInputMap> {
+impl<'a> TryFrom<ParsedInputValue<'a>> for Option<ParsedInputMap<'a>> {
     type Error = ValidationError;
 
-    fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<ParsedInputMap>> {
+    fn try_from(value: ParsedInputValue<'a>) -> QueryParserResult<Option<ParsedInputMap<'a>>> {
         match value {
             ParsedInputValue::Single(PrismaValue::Null) => Ok(None),
             ParsedInputValue::Map(val) => Ok(Some(val)),
@@ -63,10 +63,10 @@ impl TryFrom<ParsedInputValue> for Option<ParsedInputMap> {
     }
 }
 
-impl TryFrom<ParsedInputValue> for ParsedInputList {
+impl<'a> TryFrom<ParsedInputValue<'a>> for ParsedInputList<'a> {
     type Error = ValidationError;
 
-    fn try_from(value: ParsedInputValue) -> QueryParserResult<Vec<ParsedInputValue>> {
+    fn try_from(value: ParsedInputValue<'a>) -> QueryParserResult<Vec<ParsedInputValue<'a>>> {
         match value {
             ParsedInputValue::List(vals) => Ok(vals),
             v => Err(ValidationError::unexpected_runtime_error(format!(
@@ -76,10 +76,10 @@ impl TryFrom<ParsedInputValue> for ParsedInputList {
     }
 }
 
-impl TryFrom<ParsedInputValue> for Vec<PrismaValue> {
+impl<'a> TryFrom<ParsedInputValue<'a>> for Vec<PrismaValue> {
     type Error = ValidationError;
 
-    fn try_from(value: ParsedInputValue) -> QueryParserResult<Vec<PrismaValue>> {
+    fn try_from(value: ParsedInputValue<'a>) -> QueryParserResult<Vec<PrismaValue>> {
         match value {
             ParsedInputValue::List(vals) => vals
                 .into_iter()
@@ -92,10 +92,10 @@ impl TryFrom<ParsedInputValue> for Vec<PrismaValue> {
     }
 }
 
-impl TryFrom<ParsedInputValue> for Option<String> {
+impl<'a> TryFrom<ParsedInputValue<'a>> for Option<String> {
     type Error = ValidationError;
 
-    fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<String>> {
+    fn try_from(value: ParsedInputValue<'a>) -> QueryParserResult<Option<String>> {
         let prisma_value = PrismaValue::try_from(value)?;
 
         match prisma_value {
@@ -109,10 +109,10 @@ impl TryFrom<ParsedInputValue> for Option<String> {
     }
 }
 
-impl TryFrom<ParsedInputValue> for OrderBy {
+impl<'a> TryFrom<ParsedInputValue<'a>> for OrderBy {
     type Error = ValidationError;
 
-    fn try_from(value: ParsedInputValue) -> QueryParserResult<OrderBy> {
+    fn try_from(value: ParsedInputValue<'a>) -> QueryParserResult<OrderBy> {
         match value {
             ParsedInputValue::OrderBy(ord) => Ok(ord),
             v => Err(ValidationError::unexpected_runtime_error(format!(
@@ -122,10 +122,10 @@ impl TryFrom<ParsedInputValue> for OrderBy {
     }
 }
 
-impl TryFrom<ParsedInputValue> for ScalarFieldRef {
+impl<'a> TryFrom<ParsedInputValue<'a>> for ScalarFieldRef {
     type Error = ValidationError;
 
-    fn try_from(value: ParsedInputValue) -> QueryParserResult<ScalarFieldRef> {
+    fn try_from(value: ParsedInputValue<'a>) -> QueryParserResult<ScalarFieldRef> {
         match value {
             ParsedInputValue::ScalarField(f) => Ok(f),
             v => Err(ValidationError::unexpected_runtime_error(format!(
@@ -135,10 +135,10 @@ impl TryFrom<ParsedInputValue> for ScalarFieldRef {
     }
 }
 
-impl TryFrom<ParsedInputValue> for Option<f64> {
+impl<'a> TryFrom<ParsedInputValue<'a>> for Option<f64> {
     type Error = ValidationError;
 
-    fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<f64>> {
+    fn try_from(value: ParsedInputValue<'a>) -> QueryParserResult<Option<f64>> {
         let prisma_value = PrismaValue::try_from(value)?;
 
         match prisma_value {
@@ -151,10 +151,10 @@ impl TryFrom<ParsedInputValue> for Option<f64> {
     }
 }
 
-impl TryFrom<ParsedInputValue> for Option<bool> {
+impl<'a> TryFrom<ParsedInputValue<'a>> for Option<bool> {
     type Error = ValidationError;
 
-    fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<bool>> {
+    fn try_from(value: ParsedInputValue<'a>) -> QueryParserResult<Option<bool>> {
         let prisma_value = PrismaValue::try_from(value)?;
 
         match prisma_value {
@@ -167,10 +167,10 @@ impl TryFrom<ParsedInputValue> for Option<bool> {
     }
 }
 
-impl TryFrom<ParsedInputValue> for Option<DateTime<FixedOffset>> {
+impl<'a> TryFrom<ParsedInputValue<'a>> for Option<DateTime<FixedOffset>> {
     type Error = ValidationError;
 
-    fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<DateTime<FixedOffset>>> {
+    fn try_from(value: ParsedInputValue<'a>) -> QueryParserResult<Option<DateTime<FixedOffset>>> {
         let prisma_value = PrismaValue::try_from(value)?;
 
         match prisma_value {
@@ -183,10 +183,10 @@ impl TryFrom<ParsedInputValue> for Option<DateTime<FixedOffset>> {
     }
 }
 
-impl TryFrom<ParsedInputValue> for Option<i64> {
+impl<'a> TryFrom<ParsedInputValue<'a>> for Option<i64> {
     type Error = ValidationError;
 
-    fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<i64>> {
+    fn try_from(value: ParsedInputValue<'a>) -> QueryParserResult<Option<i64>> {
         let prisma_value = PrismaValue::try_from(value)?;
 
         match prisma_value {
@@ -199,16 +199,32 @@ impl TryFrom<ParsedInputValue> for Option<i64> {
     }
 }
 
-impl TryFrom<ParsedInputValue> for bool {
+impl<'a> TryFrom<ParsedInputValue<'a>> for bool {
     type Error = ValidationError;
 
-    fn try_from(value: ParsedInputValue) -> QueryParserResult<bool> {
+    fn try_from(value: ParsedInputValue<'a>) -> QueryParserResult<bool> {
         let prisma_value = PrismaValue::try_from(value)?;
 
         match prisma_value {
             PrismaValue::Boolean(b) => Ok(b),
             v => Err(ValidationError::unexpected_runtime_error(format!(
                 "Attempted conversion of non-boolean Prisma value type ({v:?}) into bool failed."
+            ))),
+        }
+    }
+}
+
+impl<'a> TryFrom<ParsedInputValue<'a>> for RelationLoadStrategy {
+    type Error = ValidationError;
+
+    fn try_from(value: ParsedInputValue<'a>) -> QueryParserResult<RelationLoadStrategy> {
+        let prisma_value = PrismaValue::try_from(value)?;
+
+        match prisma_value {
+            PrismaValue::Enum(e) if e == load_strategy::JOIN => Ok(RelationLoadStrategy::Join),
+            PrismaValue::Enum(e) if e == load_strategy::QUERY => Ok(RelationLoadStrategy::Query),
+            v => Err(ValidationError::unexpected_runtime_error(format!(
+                "Attempted conversion of ParsedInputValue ({v:?}) into relation load strategy enum value failed."
             ))),
         }
     }

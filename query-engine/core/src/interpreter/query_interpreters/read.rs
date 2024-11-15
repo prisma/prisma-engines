@@ -1,26 +1,24 @@
-use super::*;
+use super::{inmemory_record_processor::InMemoryRecordProcessor, *};
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{
-    self, error::ConnectorError, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection,
-};
+use connector::{error::ConnectorError, ConnectionLike};
 use futures::future::{BoxFuture, FutureExt};
-use inmemory_record_processor::InMemoryRecordProcessor;
-use prisma_models::ManyRecords;
-use std::collections::HashMap;
+use psl::can_support_relation_load_strategy;
+use query_structure::{ManyRecords, RelationLoadStrategy, RelationSelection};
+use telemetry::helpers::TraceParent;
 use user_facing_errors::KnownError;
 
 pub(crate) fn execute<'conn>(
     tx: &'conn mut dyn ConnectionLike,
     query: ReadQuery,
     parent_result: Option<&'conn ManyRecords>,
-    trace_id: Option<String>,
+    traceparent: Option<TraceParent>,
 ) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
         match query {
-            ReadQuery::RecordQuery(q) => read_one(tx, q, trace_id).await,
-            ReadQuery::ManyRecordsQuery(q) => read_many(tx, q, trace_id).await,
-            ReadQuery::RelatedRecordsQuery(q) => read_related(tx, q, parent_result, trace_id).await,
-            ReadQuery::AggregateRecordsQuery(q) => aggregate(tx, q, trace_id).await,
+            ReadQuery::RecordQuery(q) => read_one(tx, q, traceparent).await,
+            ReadQuery::ManyRecordsQuery(q) => read_many(tx, q, traceparent).await,
+            ReadQuery::RelatedRecordsQuery(q) => read_related(tx, q, parent_result, traceparent).await,
+            ReadQuery::AggregateRecordsQuery(q) => aggregate(tx, q, traceparent).await,
         }
     };
 
@@ -31,51 +29,60 @@ pub(crate) fn execute<'conn>(
 fn read_one(
     tx: &mut dyn ConnectionLike,
     query: RecordQuery,
-    trace_id: Option<String>,
+    traceparent: Option<TraceParent>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
     let fut = async move {
         let model = query.model;
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
-        let scalars = tx
+        let record = tx
             .get_single_record(
                 &model,
                 &filter,
                 &query.selected_fields,
-                &query.aggregation_selections,
-                trace_id,
+                query.relation_load_strategy,
+                traceparent,
             )
             .await?;
 
-        match scalars {
-            Some(record) => {
-                let scalars: ManyRecords = record.into();
-                let (scalars, aggregation_rows) =
-                    extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
-                let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
+        match record {
+            Some(record) if query.relation_load_strategy.is_query() => {
+                let records = record.into();
+                let nested = process_nested(tx, query.nested, Some(&records)).await?;
 
                 Ok(RecordSelection {
                     name: query.name,
                     fields: query.selection_order,
-                    scalars,
+                    records,
                     nested,
-                    query_arguments: QueryArguments::new(model.clone()),
                     model,
-                    aggregation_rows,
+                    virtual_fields: query.selected_fields.virtuals_owned(),
+                }
+                .into())
+            }
+            Some(record) => {
+                let records: ManyRecords = record.into();
+
+                Ok(RecordSelectionWithRelations {
+                    name: query.name,
+                    model,
+                    fields: query.selection_order,
+                    virtuals: query.selected_fields.virtuals_owned(),
+                    records,
+                    nested: build_relation_record_selection(query.selected_fields.relations()),
                 }
                 .into())
             }
 
             None if query.options.contains(QueryOption::ThrowOnEmpty) => record_not_found(),
 
-            None => Ok(QueryResult::RecordSelection(Box::new(RecordSelection {
+            None => Ok(QueryResult::RecordSelection(Some(Box::new(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
-                scalars: ManyRecords::default(),
+                records: ManyRecords::default(),
                 nested: vec![],
-                query_arguments: QueryArguments::new(model.clone()),
                 model,
-                aggregation_rows: None,
-            }))),
+                virtual_fields: query.selected_fields.virtuals_owned(),
+            })))),
         }
     };
 
@@ -90,8 +97,19 @@ fn read_one(
 /// -> Unstable cursors can't reliably be fetched by the underlying datasource, so we need to process part of it in-memory.
 fn read_many(
     tx: &mut dyn ConnectionLike,
+    query: ManyRecordsQuery,
+    traceparent: Option<TraceParent>,
+) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
+    match query.relation_load_strategy {
+        RelationLoadStrategy::Join => read_many_by_joins(tx, query, traceparent),
+        RelationLoadStrategy::Query => read_many_by_queries(tx, query, traceparent),
+    }
+}
+
+fn read_many_by_queries(
+    tx: &mut dyn ConnectionLike,
     mut query: ManyRecordsQuery,
-    trace_id: Option<String>,
+    traceparent: Option<TraceParent>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
     let processor = if query.args.requires_inmemory_processing() {
         Some(InMemoryRecordProcessor::new_from_query_args(&mut query.args))
@@ -100,36 +118,34 @@ fn read_many(
     };
 
     let fut = async move {
-        let scalars = tx
+        let records = tx
             .get_many_records(
                 &query.model,
                 query.args.clone(),
                 &query.selected_fields,
-                &query.aggregation_selections,
-                trace_id,
+                query.relation_load_strategy,
+                traceparent,
             )
             .await?;
 
-        let scalars = if let Some(p) = processor {
-            p.apply(scalars)
+        let records = if let Some(p) = processor {
+            p.apply(records)
         } else {
-            scalars
+            records
         };
 
-        let (scalars, aggregation_rows) = extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
-
-        if scalars.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
+        if records.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
             record_not_found()
         } else {
-            let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
+            let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&records)).await?;
+
             Ok(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
-                scalars,
+                records,
                 nested,
-                query_arguments: query.args,
                 model: query.model,
-                aggregation_rows,
+                virtual_fields: query.selected_fields.virtuals_owned(),
             }
             .into())
         }
@@ -138,19 +154,69 @@ fn read_many(
     fut.boxed()
 }
 
+fn read_many_by_joins(
+    tx: &mut dyn ConnectionLike,
+    query: ManyRecordsQuery,
+    traceparent: Option<TraceParent>,
+) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
+    if !can_support_relation_load_strategy() {
+        unreachable!()
+    }
+    let fut = async move {
+        let result = tx
+            .get_many_records(
+                &query.model,
+                query.args.clone(),
+                &query.selected_fields,
+                query.relation_load_strategy,
+                traceparent,
+            )
+            .await?;
+
+        if result.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
+            record_not_found()
+        } else {
+            Ok(RecordSelectionWithRelations {
+                name: query.name,
+                fields: query.selection_order,
+                virtuals: query.selected_fields.virtuals_owned(),
+                records: result,
+                nested: build_relation_record_selection(query.selected_fields.relations()),
+                model: query.model,
+            }
+            .into())
+        }
+    };
+
+    fut.boxed()
+}
+
+fn build_relation_record_selection<'a>(
+    selections: impl Iterator<Item = &'a RelationSelection>,
+) -> Vec<RelationRecordSelection> {
+    selections
+        .map(|rq| RelationRecordSelection {
+            name: rq.field.name().to_owned(),
+            fields: rq.result_fields.clone(),
+            virtuals: rq.virtuals().cloned().collect(),
+            model: rq.field.related_model(),
+            nested: build_relation_record_selection(rq.relations()),
+        })
+        .collect()
+}
+
 /// Queries related records for a set of parent IDs.
 fn read_related<'conn>(
     tx: &'conn mut dyn ConnectionLike,
     mut query: RelatedRecordsQuery,
     parent_result: Option<&'conn ManyRecords>,
-    trace_id: Option<String>,
+    traceparent: Option<TraceParent>,
 ) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
         let relation = query.parent_field.relation();
-        let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
 
-        let (scalars, aggregation_rows) = if relation.is_many_to_many() {
-            nested_read::m2m(tx, &query, parent_result, processor, trace_id).await?
+        let records = if relation.is_many_to_many() {
+            nested_read::m2m(tx, &mut query, parent_result, traceparent).await?
         } else {
             nested_read::one2m(
                 tx,
@@ -159,23 +225,20 @@ fn read_related<'conn>(
                 parent_result,
                 query.args.clone(),
                 &query.selected_fields,
-                query.aggregation_selections,
-                processor,
-                trace_id,
+                traceparent,
             )
             .await?
         };
         let model = query.parent_field.related_model();
-        let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
+        let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&records)).await?;
 
         Ok(RecordSelection {
             name: query.name,
             fields: query.selection_order,
-            scalars,
+            records,
             nested,
-            query_arguments: query.args,
             model,
-            aggregation_rows,
+            virtual_fields: query.selected_fields.virtuals_owned(),
         }
         .into())
     };
@@ -186,7 +249,7 @@ fn read_related<'conn>(
 async fn aggregate(
     tx: &mut dyn ConnectionLike,
     query: AggregateRecordsQuery,
-    trace_id: Option<String>,
+    traceparent: Option<TraceParent>,
 ) -> InterpretationResult<QueryResult> {
     let selection_order = query.selection_order;
 
@@ -197,7 +260,7 @@ async fn aggregate(
             query.selectors,
             query.group_by,
             query.having,
-            trace_id,
+            traceparent,
         )
         .await?;
 
@@ -207,7 +270,7 @@ async fn aggregate(
     }))
 }
 
-fn process_nested<'conn>(
+pub(crate) fn process_nested<'conn>(
     tx: &'conn mut dyn ConnectionLike,
     nested: Vec<ReadQuery>,
     parent_result: Option<&'conn ManyRecords>,
@@ -234,68 +297,15 @@ fn process_nested<'conn>(
     fut.boxed()
 }
 
-/// Removes the relation aggregation data from the database result and collect it into some RelAggregationRow
-/// Explanation: Relation aggregations on a findMany are selected from an output object type. eg:
-/// findManyX { _count { rel_1, rel 2 } }
-/// Output object types are typically used for selecting relations, so they're are queried in a different request
-/// In the case of relation aggregations though, we query that data along side the request sent for the base model ("X" in the query above)
-/// This means the SQL result we get back from the database contains additional aggregation data that needs to be remapped according to the schema
-/// This function takes care of removing the aggregation data from the database result and collects it separately
-/// so that it can be serialized separately later according to the schema
-pub(crate) fn extract_aggregation_rows_from_scalars(
-    mut scalars: ManyRecords,
-    aggr_selections: Vec<RelAggregationSelection>,
-) -> (ManyRecords, Option<Vec<RelAggregationRow>>) {
-    if aggr_selections.is_empty() {
-        return (scalars, None);
-    }
-
-    let aggr_field_names: HashMap<String, &RelAggregationSelection> = aggr_selections
-        .iter()
-        .map(|aggr_sel| (aggr_sel.db_alias(), aggr_sel))
-        .collect();
-
-    let indexes_to_remove: Vec<_> = scalars
-        .field_names
-        .iter()
-        .enumerate()
-        .filter_map(|(i, field_name)| aggr_field_names.get(field_name).map(|aggr_sel| (i, *aggr_sel)))
-        .collect();
-
-    let mut aggregation_rows: Vec<RelAggregationRow> = vec![];
-
-    for (n_record_removed, (index_to_remove, aggr_sel)) in indexes_to_remove.into_iter().enumerate() {
-        let index_to_remove = index_to_remove - n_record_removed;
-
-        // Remove all aggr field names
-        scalars.field_names.remove(index_to_remove);
-
-        // Remove and collect all aggr prisma values
-        for (r_index, record) in scalars.records.iter_mut().enumerate() {
-            let val = record.values.remove(index_to_remove);
-            let aggr_result = aggr_sel.clone().into_result(val);
-
-            // Group the aggregation results by record
-            match aggregation_rows.get_mut(r_index) {
-                Some(inner_vec) => inner_vec.push(aggr_result),
-                None => aggregation_rows.push(vec![aggr_result]),
-            }
-        }
-    }
-
-    (scalars, Some(aggregation_rows))
-}
-
 // Custom error built for findXOrThrow queries, when a record is not found and it needs to throw an error
 #[inline]
 fn record_not_found() -> InterpretationResult<QueryResult> {
+    let cause = String::from("Expected a record, found none.");
     Err(ConnectorError {
         user_facing_error: Some(KnownError::new(
-            user_facing_errors::query_engine::RecordRequiredButNotFound {
-                cause: "Expected a record, found none.".to_owned(),
-            },
+            user_facing_errors::query_engine::RecordRequiredButNotFound { cause: cause.clone() },
         )),
-        kind: connector::error::ErrorKind::RecordDoesNotExist,
+        kind: connector::error::ErrorKind::RecordDoesNotExist { cause },
         transient: false,
     }
     .into())

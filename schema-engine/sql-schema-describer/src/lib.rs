@@ -20,11 +20,10 @@ pub use self::{
     ids::*,
     walkers::*,
 };
-use enumflags2::{BitFlag, BitFlags};
+pub use either::Either;
 pub use prisma_value::PrismaValue;
 
-pub use either::Either;
-
+use enumflags2::{BitFlag, BitFlags};
 use once_cell::sync::Lazy;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -826,8 +825,8 @@ pub enum DefaultKind {
 }
 
 impl DefaultValue {
-    pub fn db_generated(val: impl Into<String>) -> Self {
-        Self::new(DefaultKind::DbGenerated(Some(val.into())))
+    pub fn db_generated<S: Into<String>>(val: impl Into<Option<S>>) -> Self {
+        Self::new(DefaultKind::DbGenerated(val.into().map(Into::into)))
     }
 
     pub fn constraint_name(&self) -> Option<&str> {

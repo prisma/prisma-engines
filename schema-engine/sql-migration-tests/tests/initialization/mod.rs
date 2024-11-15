@@ -1,4 +1,4 @@
-use schema_core::schema_api;
+use schema_core::{json_rpc::types::SchemasContainer, schema_api};
 use sql_migration_tests::{multi_engine_test_api::*, test_api::SchemaContainer};
 use test_macros::test_connector;
 use url::Url;
@@ -44,10 +44,12 @@ fn connecting_to_a_postgres_database_with_missing_schema_creates_it(api: TestApi
 
         url.set_query(Some(new_qs.trim_end_matches('&')));
 
+        let provider = api.provider();
+
         let schema = format!(
             r#"
                 datasource db {{
-                    provider = "postgresql"
+                    provider = "{provider}"
                     url = "{url}"
                 }}
                 "#
@@ -56,7 +58,12 @@ fn connecting_to_a_postgres_database_with_missing_schema_creates_it(api: TestApi
         let me = schema_api(Some(schema.clone()), None).unwrap();
         tok(
             me.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
-                datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer { schema }),
+                datasource: schema_core::json_rpc::types::DatasourceParam::Schema(SchemasContainer {
+                    files: vec![SchemaContainer {
+                        path: "schema.prisma".to_string(),
+                        content: schema,
+                    }],
+                }),
             }),
         )
         .unwrap();
@@ -81,4 +88,34 @@ fn connecting_to_a_postgres_database_with_missing_schema_creates_it(api: TestApi
 
         assert!(schema_exists)
     }
+}
+
+#[test_connector(exclude(Sqlite))]
+fn ipv6_addresses_are_supported_in_connection_strings(api: TestApi) {
+    let url = api.connection_string().replace("localhost", "[::1]");
+    assert!(url.contains("[::1]"));
+
+    let provider = api.provider();
+
+    let schema = format!(
+        r#"
+        datasource db {{
+            provider = "{provider}"
+            url = "{url}"
+        }}
+        "#
+    );
+
+    let engine = schema_api(Some(schema.clone()), None).unwrap();
+    tok(
+        engine.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
+            datasource: schema_core::json_rpc::types::DatasourceParam::Schema(SchemasContainer {
+                files: vec![SchemaContainer {
+                    path: "schema.prisma".to_string(),
+                    content: schema,
+                }],
+            }),
+        }),
+    )
+    .unwrap();
 }

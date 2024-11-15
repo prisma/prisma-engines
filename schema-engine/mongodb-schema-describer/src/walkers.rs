@@ -35,9 +35,14 @@ impl<'schema> CollectionWalker<'schema> {
         }
     }
 
-    /// Checks whether JSONSchema is defined
+    /// Checks whether JSONSchema is defined.
     pub fn has_schema(self) -> bool {
         self.get().has_schema
+    }
+
+    /// Checks whether the collection is capped.
+    pub fn is_capped(self) -> bool {
+        self.get().is_capped
     }
 }
 

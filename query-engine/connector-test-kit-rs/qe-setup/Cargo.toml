@@ -8,12 +8,14 @@ psl.workspace = true
 quaint.workspace = true
 mongodb-client = { path = "../../../libs/mongodb-client" }
 schema-core = { path = "../../../schema-engine/core" }
+sql-schema-connector = { path = "../../../schema-engine/connectors/sql-schema-connector" }
 test-setup = { path = "../../../libs/test-setup" }
+enumflags2.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
 
-parking_lot = { version = "0.12", features = ["send_guard"] }
 connection-string = "*"
-enumflags2 = "*"
-mongodb = "2.3.0"
-tempfile = "3.3.0"
-url = "2"
+mongodb.workspace = true
+url.workspace = true
 once_cell = "1.17.0"

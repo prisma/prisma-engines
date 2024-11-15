@@ -1,17 +1,25 @@
-//! A container to manage 0 or more migration connectors, based on request contents.
+//! A container to manage 0 or more schema connectors, based on request contents.
 //!
-//! Why this rather than using connectors directly? We must be able to use the migration engine
+//! Why this rather than using connectors directly? We must be able to use the schema engine
 //! without a valid schema or database connection for commands like createDatabase and diff.
 
-use crate::{api::GenericApi, commands, json_rpc::types::*, CoreError, CoreResult};
+use crate::{
+    api::GenericApi, commands, json_rpc::types::*, parse_configuration_multi, CoreError, CoreResult, SchemaContainerExt,
+};
 use enumflags2::BitFlags;
 use psl::{parser_database::SourceFile, PreviewFeature};
-use schema_connector::{ConnectorError, ConnectorHost, Namespaces, SchemaConnector};
-use std::{collections::HashMap, future::Future, path::Path, pin::Pin, sync::Arc};
+use schema_connector::{ConnectorError, ConnectorHost, IntrospectionResult, Namespaces, SchemaConnector};
+use std::{
+    collections::HashMap,
+    future::Future,
+    path::{Path, PathBuf},
+    pin::Pin,
+    sync::Arc,
+};
 use tokio::sync::{mpsc, Mutex};
 use tracing_futures::Instrument;
 
-/// The container for the state of the migration engine. It can contain one or more connectors
+/// The container for the state of the schema engine. It can contain one or more connectors
 /// corresponding to a database to be reached or that we are already connected to.
 ///
 /// The general mechanism is that we match a single url or prisma schema to a single connector in
@@ -27,7 +35,27 @@ pub(crate) struct EngineState {
     // - a full schema
     //
     // To a channel leading to a spawned MigrationConnector.
-    connectors: Mutex<HashMap<String, mpsc::Sender<ErasedConnectorRequest>>>,
+    connectors: Mutex<HashMap<ConnectorRequestType, mpsc::Sender<ErasedConnectorRequest>>>,
+}
+
+impl EngineState {
+    fn get_url_from_schemas(&self, container: &SchemasWithConfigDir) -> CoreResult<String> {
+        let sources = container.to_psl_input();
+        let (datasource, url, _, _) = parse_configuration_multi(&sources)?;
+
+        Ok(psl::set_config_dir(
+            datasource.active_connector.flavour(),
+            std::path::Path::new(&container.config_dir),
+            &url,
+        )
+        .into_owned())
+    }
+}
+
+#[derive(Debug, Eq, Hash, PartialEq)]
+enum ConnectorRequestType {
+    Schema(Vec<(String, SourceFile)>),
+    Url(String),
 }
 
 /// A request from the core to a connector, in the form of an async closure.
@@ -41,9 +69,12 @@ type ErasedConnectorRequest = Box<
 >;
 
 impl EngineState {
-    pub(crate) fn new(initial_datamodel: Option<String>, host: Option<Arc<dyn ConnectorHost>>) -> Self {
+    pub(crate) fn new(
+        initial_datamodels: Option<Vec<(String, SourceFile)>>,
+        host: Option<Arc<dyn ConnectorHost>>,
+    ) -> Self {
         EngineState {
-            initial_datamodel: initial_datamodel.map(|s| psl::validate(s.into())),
+            initial_datamodel: initial_datamodels.as_deref().map(psl::validate_multi_file),
             host: host.unwrap_or_else(|| Arc::new(schema_connector::EmptyHost)),
             connectors: Default::default(),
         }
@@ -59,20 +90,9 @@ impl EngineState {
             })
     }
 
-    async fn with_connector_from_schema_path<O: Send + 'static>(
-        &self,
-        path: &str,
-        f: ConnectorRequest<O>,
-    ) -> CoreResult<O> {
-        let config_dir = std::path::Path::new(path).parent();
-        let schema = std::fs::read_to_string(path)
-            .map_err(|err| ConnectorError::from_source(err, "Falied to read Prisma schema."))?;
-        self.with_connector_for_schema(&schema, config_dir, f).await
-    }
-
     async fn with_connector_for_schema<O: Send + 'static>(
         &self,
-        schema: &str,
+        schemas: Vec<(String, SourceFile)>,
         config_dir: Option<&Path>,
         f: ConnectorRequest<O>,
     ) -> CoreResult<O> {
@@ -83,18 +103,20 @@ impl EngineState {
                 response_sender
                     .send(output)
                     .map_err(|_| ())
-                    .expect("failed to send back response in migration-engine state");
+                    .expect("failed to send back response in schema-engine state");
             })
         });
 
         let mut connectors = self.connectors.lock().await;
-        match connectors.get(schema) {
+
+        match connectors.get(&ConnectorRequestType::Schema(schemas.clone())) {
             Some(request_sender) => match request_sender.send(erased).await {
                 Ok(()) => (),
                 Err(_) => return Err(ConnectorError::from_msg("tokio mpsc send error".to_owned())),
             },
             None => {
-                let mut connector = crate::schema_to_connector(schema, config_dir)?;
+                let mut connector = crate::schema_to_connector(&schemas, config_dir)?;
+
                 connector.set_host(self.host.clone());
                 let (erased_sender, mut erased_receiver) = mpsc::channel::<ErasedConnectorRequest>(12);
                 tokio::spawn(async move {
@@ -106,7 +128,7 @@ impl EngineState {
                     Ok(()) => (),
                     Err(_) => return Err(ConnectorError::from_msg("erased sender send error".to_owned())),
                 };
-                connectors.insert(schema.to_owned(), erased_sender);
+                connectors.insert(ConnectorRequestType::Schema(schemas), erased_sender);
             }
         }
 
@@ -121,12 +143,12 @@ impl EngineState {
                 response_sender
                     .send(output)
                     .map_err(|_| ())
-                    .expect("failed to send back response in migration-engine state");
+                    .expect("failed to send back response in schema-engine state");
             })
         });
 
         let mut connectors = self.connectors.lock().await;
-        match connectors.get(&url) {
+        match connectors.get(&ConnectorRequestType::Url(url.clone())) {
             Some(request_sender) => match request_sender.send(erased).await {
                 Ok(()) => (),
                 Err(_) => return Err(ConnectorError::from_msg("tokio mpsc send error".to_owned())),
@@ -134,6 +156,7 @@ impl EngineState {
             None => {
                 let mut connector = crate::connector_for_connection_string(url.clone(), None, BitFlags::default())?;
                 connector.set_host(self.host.clone());
+
                 let (erased_sender, mut erased_receiver) = mpsc::channel::<ErasedConnectorRequest>(12);
                 tokio::spawn(async move {
                     while let Some(req) = erased_receiver.recv().await {
@@ -144,7 +167,8 @@ impl EngineState {
                     Ok(()) => (),
                     Err(_) => return Err(ConnectorError::from_msg("erased sender send error".to_owned())),
                 };
-                connectors.insert(url, erased_sender);
+
+                connectors.insert(ConnectorRequestType::Url(url), erased_sender);
             }
         }
 
@@ -153,39 +177,44 @@ impl EngineState {
 
     async fn with_connector_from_datasource_param<O: Send + 'static>(
         &self,
-        param: &DatasourceParam,
+        param: DatasourceParam,
         f: ConnectorRequest<O>,
     ) -> CoreResult<O> {
         match param {
-            DatasourceParam::ConnectionString(UrlContainer { url }) => {
-                self.with_connector_for_url(url.clone(), f).await
-            }
-            DatasourceParam::SchemaPath(PathContainer { path }) => self.with_connector_from_schema_path(path, f).await,
-            DatasourceParam::SchemaString(SchemaContainer { schema }) => {
-                self.with_connector_for_schema(schema, None, f).await
-            }
+            DatasourceParam::ConnectionString(UrlContainer { url }) => self.with_connector_for_url(url, f).await,
+            DatasourceParam::Schema(schemas) => self.with_connector_for_schema(schemas.to_psl_input(), None, f).await,
         }
     }
 
-    async fn with_default_connector<O: Send + 'static>(&self, f: ConnectorRequest<O>) -> CoreResult<O>
+    async fn with_default_connector<O>(&self, f: ConnectorRequest<O>) -> CoreResult<O>
     where
         O: Sized + Send + 'static,
     {
         let schema = if let Some(initial_datamodel) = &self.initial_datamodel {
             initial_datamodel
         } else {
-            return Err(ConnectorError::from_msg("Missing --datamodel".to_owned()));
+            return Err(ConnectorError::from_msg("Missing --datamodels".to_owned()));
         };
 
-        self.with_connector_for_schema(schema.db.source(), None, f).await
+        let schemas = schema
+            .db
+            .iter_file_sources()
+            .map(|(name, content)| (name.to_string(), content.clone()))
+            .collect::<Vec<_>>();
+
+        self.with_connector_for_schema(schemas, None, f).await
     }
 }
 
 #[async_trait::async_trait]
 impl GenericApi for EngineState {
-    async fn version(&self) -> CoreResult<String> {
-        self.with_default_connector(Box::new(|connector| connector.version()))
-            .await
+    async fn version(&self, params: Option<GetDatabaseVersionInput>) -> CoreResult<String> {
+        let f: ConnectorRequest<String> = Box::new(|connector| connector.version());
+
+        match params {
+            Some(params) => self.with_connector_from_datasource_param(params.datasource, f).await,
+            None => self.with_default_connector(f).await,
+        }
     }
 
     async fn apply_migrations(&self, input: ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput> {
@@ -202,7 +231,7 @@ impl GenericApi for EngineState {
 
     async fn create_database(&self, params: CreateDatabaseParams) -> CoreResult<CreateDatabaseResult> {
         self.with_connector_from_datasource_param(
-            &params.datasource,
+            params.datasource,
             Box::new(|connector| {
                 Box::pin(async move {
                     let database_name = SchemaConnector::create_database(connector).await?;
@@ -226,28 +255,9 @@ impl GenericApi for EngineState {
     }
 
     async fn db_execute(&self, params: DbExecuteParams) -> CoreResult<()> {
-        use std::io::Read;
-
         let url: String = match &params.datasource_type {
             DbExecuteDatasourceType::Url(UrlContainer { url }) => url.clone(),
-            DbExecuteDatasourceType::Schema(SchemaContainer { schema: file_path }) => {
-                let mut schema_file = std::fs::File::open(file_path)
-                    .map_err(|err| ConnectorError::from_source(err, "Opening Prisma schema file."))?;
-                let mut schema_string = String::new();
-                schema_file
-                    .read_to_string(&mut schema_string)
-                    .map_err(|err| ConnectorError::from_source(err, "Reading Prisma schema file."))?;
-                let (datasource, url, _, _) = crate::parse_configuration(&schema_string)?;
-                std::path::Path::new(file_path)
-                    .parent()
-                    .map(|config_dir| {
-                        datasource
-                            .active_connector
-                            .set_config_dir(config_dir, &url)
-                            .into_owned()
-                    })
-                    .unwrap_or(url)
-            }
+            DbExecuteDatasourceType::Schema(schemas) => self.get_url_from_schemas(schemas)?,
         };
 
         self.with_connector_for_url(url, Box::new(move |connector| connector.db_execute(params.script)))
@@ -299,7 +309,7 @@ impl GenericApi for EngineState {
         params: EnsureConnectionValidityParams,
     ) -> CoreResult<EnsureConnectionValidityResult> {
         self.with_connector_from_datasource_param(
-            &params.datasource,
+            params.datasource,
             Box::new(|connector| {
                 Box::pin(async move {
                     SchemaConnector::ensure_connection_validity(connector).await?;
@@ -319,21 +329,30 @@ impl GenericApi for EngineState {
 
     async fn introspect(&self, params: IntrospectParams) -> CoreResult<IntrospectResult> {
         tracing::info!("{:?}", params.schema);
-        let source_file = SourceFile::new_allocated(Arc::from(params.schema.clone().into_boxed_str()));
+        let source_files = params.schema.to_psl_input();
 
-        let has_some_namespaces = params.schemas.is_some();
+        let has_some_namespaces = params.namespaces.is_some();
         let composite_type_depth = From::from(params.composite_type_depth);
 
         let ctx = if params.force {
-            let previous_schema = psl::validate(source_file);
+            let previous_schema = psl::validate_multi_file(&source_files);
+
             schema_connector::IntrospectionContext::new_config_only(
                 previous_schema,
                 composite_type_depth,
-                params.schemas,
+                params.namespaces,
+                PathBuf::new().join(&params.base_directory_path),
             )
         } else {
-            let previous_schema = psl::parse_schema(source_file).map_err(ConnectorError::new_schema_parser_error)?;
-            schema_connector::IntrospectionContext::new(previous_schema, composite_type_depth, params.schemas)
+            let previous_schema =
+                psl::parse_schema_multi(&source_files).map_err(ConnectorError::new_schema_parser_error)?;
+
+            schema_connector::IntrospectionContext::new(
+                previous_schema,
+                composite_type_depth,
+                params.namespaces,
+                PathBuf::new().join(&params.base_directory_path),
+            )
         };
 
         if !ctx
@@ -349,16 +368,21 @@ impl GenericApi for EngineState {
         }
 
         self.with_connector_for_schema(
-            &params.schema,
+            source_files,
             None,
             Box::new(move |connector| {
                 Box::pin(async move {
-                    let result = connector.introspect(&ctx).await?;
+                    let IntrospectionResult {
+                        datamodels,
+                        views,
+                        warnings,
+                        is_empty,
+                    } = connector.introspect(&ctx).await?;
 
-                    if result.is_empty {
+                    if is_empty {
                         Err(ConnectorError::into_introspection_result_empty_error())
                     } else {
-                        let views = result.views.map(|v| {
+                        let views = views.map(|v| {
                             v.into_iter()
                                 .map(|view| IntrospectionView {
                                     schema: view.schema,
@@ -369,12 +393,59 @@ impl GenericApi for EngineState {
                         });
 
                         Ok(IntrospectResult {
-                            datamodel: result.data_model,
-                            version: format!("{:?}", result.version),
+                            schema: SchemasContainer {
+                                files: datamodels
+                                    .into_iter()
+                                    .map(|(path, content)| SchemaContainer { path, content })
+                                    .collect(),
+                            },
                             views,
-                            warnings: result.warnings,
+                            warnings,
                         })
                     }
+                })
+            }),
+        )
+        .await
+    }
+
+    async fn introspect_sql(&self, params: IntrospectSqlParams) -> CoreResult<IntrospectSqlResult> {
+        self.with_connector_for_url(
+            params.url.clone(),
+            Box::new(move |conn| {
+                Box::pin(async move {
+                    let res = crate::commands::introspect_sql(params, conn).await?;
+
+                    Ok(IntrospectSqlResult {
+                        queries: res
+                            .queries
+                            .into_iter()
+                            .map(|q| SqlQueryOutput {
+                                name: q.name,
+                                source: q.source,
+                                documentation: q.documentation,
+                                parameters: q
+                                    .parameters
+                                    .into_iter()
+                                    .map(|p| SqlQueryParameterOutput {
+                                        name: p.name,
+                                        typ: p.typ,
+                                        documentation: p.documentation,
+                                        nullable: p.nullable,
+                                    })
+                                    .collect(),
+                                result_columns: q
+                                    .result_columns
+                                    .into_iter()
+                                    .map(|c| SqlQueryColumnOutput {
+                                        name: c.name,
+                                        typ: c.typ,
+                                        nullable: c.nullable,
+                                    })
+                                    .collect(),
+                            })
+                            .collect(),
+                    })
                 })
             }),
         )

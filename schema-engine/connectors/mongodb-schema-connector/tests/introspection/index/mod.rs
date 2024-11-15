@@ -9,11 +9,11 @@ use schema_connector::CompositeTypeDepth;
 #[test]
 fn single_column_normal_index() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "age": 9}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -22,7 +22,7 @@ fn single_column_normal_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -43,11 +43,11 @@ fn single_column_normal_index() {
 #[test]
 fn single_column_composite_index() {
     let res = introspect(|db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti", "address": { "number": 27 } }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -56,7 +56,7 @@ fn single_column_composite_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -81,11 +81,11 @@ fn single_column_composite_index() {
 #[test]
 fn single_column_composite_array_index() {
     let res = introspect(|db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti", "addresses": [ { "number": 27 }, { "number": 28 } ] }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -94,7 +94,7 @@ fn single_column_composite_array_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -119,11 +119,11 @@ fn single_column_composite_array_index() {
 #[test]
 fn single_column_deep_composite_index() {
     let res = introspect(|db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti", "address": { "special": { "number": 27 } } }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -132,7 +132,7 @@ fn single_column_deep_composite_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -161,11 +161,11 @@ fn single_column_deep_composite_index() {
 #[test]
 fn single_column_descending_index() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "age": 9}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -174,7 +174,7 @@ fn single_column_descending_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -195,11 +195,11 @@ fn single_column_descending_index() {
 #[test]
 fn single_column_descending_composite_index() {
     let res = introspect(|db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti", "address": { "number": 27 }}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -208,7 +208,7 @@ fn single_column_descending_composite_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -233,11 +233,11 @@ fn single_column_descending_composite_index() {
 #[test]
 fn single_column_fulltext_index() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "age": 9}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -246,7 +246,7 @@ fn single_column_fulltext_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -267,11 +267,11 @@ fn single_column_fulltext_index() {
 #[test]
 fn single_column_fulltext_composite_index() {
     let res = introspect(|db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti", "address": { "street": "Meowallee" }}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -280,7 +280,7 @@ fn single_column_fulltext_composite_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -305,12 +305,12 @@ fn single_column_fulltext_composite_index() {
 #[test]
 fn single_array_column_fulltext_composite_index() {
     let res = introspect(|db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs =
             vec![doc! {"name": "Musti", "addresses": [ { "street": "Meowallee" }, { "street": "Purrstrasse" } ] }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -319,7 +319,7 @@ fn single_array_column_fulltext_composite_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -344,11 +344,11 @@ fn single_array_column_fulltext_composite_index() {
 #[test]
 fn multi_column_fulltext_index() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "title": "cat", "age": 9}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -357,7 +357,7 @@ fn multi_column_fulltext_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -379,11 +379,11 @@ fn multi_column_fulltext_index() {
 #[test]
 fn multi_column_fulltext_composite_index() {
     let res = introspect(|db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti", "address": { "street": "Meowallee", "city": "Derplin" } }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -392,7 +392,7 @@ fn multi_column_fulltext_composite_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -418,11 +418,11 @@ fn multi_column_fulltext_composite_index() {
 #[test]
 fn multi_column_fulltext_index_with_desc_in_end() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "title": "cat", "age": 9}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -431,7 +431,7 @@ fn multi_column_fulltext_index_with_desc_in_end() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -453,11 +453,11 @@ fn multi_column_fulltext_index_with_desc_in_end() {
 #[test]
 fn multi_column_fulltext_composite_index_with_desc_in_end() {
     let res = introspect(|db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti", "address": { "street": "Meowallee", "number": 69 }}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -466,7 +466,7 @@ fn multi_column_fulltext_composite_index_with_desc_in_end() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -492,11 +492,11 @@ fn multi_column_fulltext_composite_index_with_desc_in_end() {
 #[test]
 fn multi_column_fulltext_index_with_desc_in_beginning() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "title": "cat", "age": 9}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -505,7 +505,7 @@ fn multi_column_fulltext_index_with_desc_in_beginning() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -527,11 +527,11 @@ fn multi_column_fulltext_index_with_desc_in_beginning() {
 #[test]
 fn multi_column_fulltext_composite_index_with_desc_in_beginning() {
     let res = introspect(|db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti", "address": { "street": "Meowallee", "number": 69 }}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -540,7 +540,7 @@ fn multi_column_fulltext_composite_index_with_desc_in_beginning() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -566,11 +566,11 @@ fn multi_column_fulltext_composite_index_with_desc_in_beginning() {
 #[test]
 fn multi_column_fulltext_index_with_asc_in_end() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "title": "cat", "age": 9}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -579,7 +579,7 @@ fn multi_column_fulltext_index_with_asc_in_end() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -601,11 +601,11 @@ fn multi_column_fulltext_index_with_asc_in_end() {
 #[test]
 fn multi_column_fulltext_index_with_asc_in_beginning() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "title": "cat", "age": 9}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -614,7 +614,7 @@ fn multi_column_fulltext_index_with_asc_in_beginning() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -636,12 +636,12 @@ fn multi_column_fulltext_index_with_asc_in_beginning() {
 #[test]
 fn multi_column_fulltext_index_with_asc_in_beginning_desc_in_end() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
 
         let collection = db.collection("A");
         let docs = vec![doc! { "name": "Musti", "title": "cat", "age": 9, "weight": 5 }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder()
             .unique(Some(false))
@@ -653,7 +653,7 @@ fn multi_column_fulltext_index_with_asc_in_beginning_desc_in_end() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -678,11 +678,11 @@ fn fultext_index_without_preview_flag() {
     let depth = CompositeTypeDepth::Infinite;
 
     let res = introspect_features(depth, Default::default(), |db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "age": 9}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -691,7 +691,7 @@ fn fultext_index_without_preview_flag() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -712,11 +712,11 @@ fn fultext_composite_index_without_preview_flag() {
     let depth = CompositeTypeDepth::Infinite;
 
     let res = introspect_features(depth, Default::default(), |db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti", "address": { "street": "Meowallee" } }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -725,7 +725,7 @@ fn fultext_composite_index_without_preview_flag() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -748,11 +748,11 @@ fn fultext_composite_index_without_preview_flag() {
 #[test]
 fn index_pointing_to_a_renamed_field() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "_age": 9}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -761,7 +761,7 @@ fn index_pointing_to_a_renamed_field() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -782,11 +782,11 @@ fn index_pointing_to_a_renamed_field() {
 #[test]
 fn composite_index_pointing_to_a_renamed_field() {
     let res = introspect(|db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! { "name": "Musti", "info": { "_age": 9} }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -795,7 +795,7 @@ fn composite_index_pointing_to_a_renamed_field() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -820,11 +820,11 @@ fn composite_index_pointing_to_a_renamed_field() {
 #[test]
 fn single_column_normal_index_default_name() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "age": 9}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder()
             .unique(Some(false))
@@ -836,7 +836,7 @@ fn single_column_normal_index_default_name() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -857,11 +857,11 @@ fn single_column_normal_index_default_name() {
 #[test]
 fn single_column_normal_composite_index_default_name() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "info": { "age": 9} }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder()
             .unique(Some(false))
@@ -873,7 +873,7 @@ fn single_column_normal_composite_index_default_name() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -898,11 +898,11 @@ fn single_column_normal_composite_index_default_name() {
 #[test]
 fn multi_column_normal_index() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "age": 9}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -911,7 +911,7 @@ fn multi_column_normal_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -932,11 +932,11 @@ fn multi_column_normal_index() {
 #[test]
 fn single_column_unique_index() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "age": 9}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(true)).build();
 
@@ -945,7 +945,7 @@ fn single_column_unique_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -964,11 +964,11 @@ fn single_column_unique_index() {
 #[test]
 fn single_column_unique_composite_index() {
     let res = introspect(|db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti", "info": { "age": 9 } }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(true)).build();
 
@@ -977,7 +977,7 @@ fn single_column_unique_composite_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1002,11 +1002,11 @@ fn single_column_unique_composite_index() {
 #[test]
 fn single_array_column_unique_composite_index() {
     let res = introspect(|db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti", "infos": [ { "age": 9 }, { "age": 10 } ] }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(true)).build();
 
@@ -1015,7 +1015,7 @@ fn single_array_column_unique_composite_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1040,11 +1040,11 @@ fn single_array_column_unique_composite_index() {
 #[test]
 fn single_column_unique_index_default_name() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "age": 9}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder()
             .unique(Some(true))
@@ -1056,7 +1056,7 @@ fn single_column_unique_index_default_name() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1075,11 +1075,11 @@ fn single_column_unique_index_default_name() {
 #[test]
 fn single_column_unique_composite_index_default_name() {
     let res = introspect(|db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti", "info": { "age": 9 } }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder()
             .unique(Some(true))
@@ -1091,7 +1091,7 @@ fn single_column_unique_composite_index_default_name() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1116,11 +1116,11 @@ fn single_column_unique_composite_index_default_name() {
 #[test]
 fn multi_column_unique_index() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "age": 9}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(true)).build();
 
@@ -1129,7 +1129,7 @@ fn multi_column_unique_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1150,11 +1150,11 @@ fn multi_column_unique_index() {
 #[test]
 fn multi_column_unique_composite_index() {
     let res = introspect(|db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti", "info": { "age": 9 } }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(true)).build();
 
@@ -1163,7 +1163,7 @@ fn multi_column_unique_composite_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1188,11 +1188,11 @@ fn multi_column_unique_composite_index() {
 #[test]
 fn unsupported_types_in_a_unique_index() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"data": Bson::JavaScriptCode("let a = 1 + 1;".to_string())}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(true)).build();
 
@@ -1201,7 +1201,7 @@ fn unsupported_types_in_a_unique_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1219,11 +1219,11 @@ fn unsupported_types_in_a_unique_index() {
 #[test]
 fn unsupported_types_in_an_index() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"data": Bson::JavaScriptCode("let a = 1 + 1;".to_string())}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -1232,7 +1232,7 @@ fn unsupported_types_in_an_index() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1251,7 +1251,7 @@ fn unsupported_types_in_an_index() {
     let expect = expect![[r#"
         *** WARNING ***
 
-        These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
+        These fields are not supported by Prisma Client, because Prisma currently does not support their types:
           - Model: "A", field: "data", original data type: "JavaScriptCode"
     "#]];
 
@@ -1261,11 +1261,11 @@ fn unsupported_types_in_an_index() {
 #[test]
 fn partial_indices_should_be_ignored() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "age": 9}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder()
             .unique(Some(false))
@@ -1277,7 +1277,7 @@ fn partial_indices_should_be_ignored() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1296,11 +1296,11 @@ fn partial_indices_should_be_ignored() {
 #[test]
 fn partial_composite_indices_should_be_ignored() {
     let res = introspect(|db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti", "info": { "age": 9 }}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder()
             .unique(Some(false))
@@ -1312,7 +1312,7 @@ fn partial_composite_indices_should_be_ignored() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1335,11 +1335,11 @@ fn partial_composite_indices_should_be_ignored() {
 #[test]
 fn index_pointing_to_non_existing_field_should_add_the_field() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti"}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -1348,7 +1348,7 @@ fn index_pointing_to_non_existing_field_should_add_the_field() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1379,11 +1379,11 @@ fn index_pointing_to_non_existing_field_should_add_the_field() {
 #[test]
 fn index_pointing_to_non_existing_composite_field_should_add_the_field_and_type() {
     let res = introspect(|db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti"}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -1392,7 +1392,7 @@ fn index_pointing_to_non_existing_composite_field_should_add_the_field_and_type(
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1431,11 +1431,11 @@ fn index_pointing_to_non_existing_composite_field_should_add_the_field_and_type(
 #[test]
 fn deep_index_pointing_to_non_existing_composite_field_should_add_the_field_and_type() {
     let res = introspect(|db| async move {
-        db.create_collection("Cat", None).await?;
+        db.create_collection("Cat").await?;
         let collection = db.collection("Cat");
         let docs = vec![doc! {"name": "Musti"}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -1444,7 +1444,7 @@ fn deep_index_pointing_to_non_existing_composite_field_should_add_the_field_and_
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1489,11 +1489,11 @@ fn deep_index_pointing_to_non_existing_composite_field_should_add_the_field_and_
 #[test]
 fn index_pointing_to_mapped_non_existing_field_should_add_the_mapped_field() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti"}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -1502,7 +1502,7 @@ fn index_pointing_to_mapped_non_existing_field_should_add_the_mapped_field() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1533,11 +1533,11 @@ fn index_pointing_to_mapped_non_existing_field_should_add_the_mapped_field() {
 #[test]
 fn composite_index_pointing_to_mapped_non_existing_field_should_add_the_mapped_field() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti"}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -1546,7 +1546,7 @@ fn composite_index_pointing_to_mapped_non_existing_field_should_add_the_mapped_f
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1585,11 +1585,11 @@ fn composite_index_pointing_to_mapped_non_existing_field_should_add_the_mapped_f
 #[test]
 fn compound_index_pointing_to_non_existing_field_should_add_the_field() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti"}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -1598,7 +1598,7 @@ fn compound_index_pointing_to_non_existing_field_should_add_the_field() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1632,11 +1632,11 @@ fn compound_index_pointing_to_non_existing_field_should_add_the_field() {
 #[test]
 fn composite_index_with_one_existing_field_should_add_missing_stuff_only() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "info": { "age": 9 } }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -1645,7 +1645,7 @@ fn composite_index_with_one_existing_field_should_add_missing_stuff_only() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1681,11 +1681,11 @@ fn composite_index_with_one_existing_field_should_add_missing_stuff_only() {
 #[test]
 fn deep_composite_index_with_one_existing_field_should_add_missing_stuff_only() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "info": { "age": 9 } }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -1694,7 +1694,7 @@ fn deep_composite_index_with_one_existing_field_should_add_missing_stuff_only() 
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1736,11 +1736,11 @@ fn deep_composite_index_with_one_existing_field_should_add_missing_stuff_only() 
 #[test]
 fn deep_composite_index_with_one_existing_field_should_add_missing_stuff_only_2() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "info": { "special": { "age": 9 } } }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -1749,7 +1749,7 @@ fn deep_composite_index_with_one_existing_field_should_add_missing_stuff_only_2(
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1789,11 +1789,11 @@ fn deep_composite_index_with_one_existing_field_should_add_missing_stuff_only_2(
 #[test]
 fn deep_composite_index_should_add_missing_stuff_in_different_layers() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! { "name": "Musti" }];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -1802,7 +1802,7 @@ fn deep_composite_index_should_add_missing_stuff_in_different_layers() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1850,11 +1850,11 @@ fn deep_composite_index_should_add_missing_stuff_in_different_layers() {
 #[test]
 fn compound_index_with_one_existing_field_pointing_to_non_existing_field_should_add_the_field() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti", "age": 9}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(false)).build();
 
@@ -1863,7 +1863,7 @@ fn compound_index_with_one_existing_field_pointing_to_non_existing_field_should_
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1895,11 +1895,11 @@ fn compound_index_with_one_existing_field_pointing_to_non_existing_field_should_
 #[test]
 fn unique_index_pointing_to_non_existing_field_should_add_the_field() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti"}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(true)).build();
 
@@ -1908,7 +1908,7 @@ fn unique_index_pointing_to_non_existing_field_should_add_the_field() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1937,11 +1937,11 @@ fn unique_index_pointing_to_non_existing_field_should_add_the_field() {
 #[test]
 fn fulltext_index_pointing_to_non_existing_field_should_add_the_field() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection("A");
         let docs = vec![doc! {"name": "Musti"}];
 
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         let options = IndexOptions::builder().unique(Some(true)).build();
 
@@ -1950,7 +1950,7 @@ fn fulltext_index_pointing_to_non_existing_field_should_add_the_field() {
             .options(Some(options))
             .build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -1979,20 +1979,20 @@ fn fulltext_index_pointing_to_non_existing_field_should_add_the_field() {
 #[test]
 fn composite_type_index_without_corresponding_data_should_not_crash() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection::<mongodb::bson::Document>("A");
 
         let model = IndexModel::builder().keys(doc! { "foo": 1 }).build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         let model = IndexModel::builder().keys(doc! { "foo.bar": 1 }).build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         let model = IndexModel::builder().keys(doc! { "foo.baz.quux": 1 }).build();
 
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         Ok(())
     });
@@ -2027,14 +2027,14 @@ fn composite_type_index_without_corresponding_data_should_not_crash() {
 #[test]
 fn composite_type_index_with_non_composite_fields_in_the_middle_should_not_crash() {
     let res = introspect(|db| async move {
-        db.create_collection("A", None).await?;
+        db.create_collection("A").await?;
         let collection = db.collection::<mongodb::bson::Document>("A");
 
         let model = IndexModel::builder().keys(doc! { "a.b.c": 1 }).build();
-        collection.create_index(model, None).await?;
+        collection.create_index(model).await?;
 
         let docs = vec![doc! { "a": { "b": 1, "d": { "c": 1 } } }];
-        collection.insert_many(docs, None).await.unwrap();
+        collection.insert_many(docs).await.unwrap();
 
         Ok(())
     });

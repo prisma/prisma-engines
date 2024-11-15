@@ -1,13 +1,18 @@
+use schema_ast::ast::WithSpan;
+
 use crate::{
     configuration::StringFromEnvVar,
     datamodel_connector::{Connector, ConnectorCapabilities, RelationMode},
     diagnostics::{DatamodelError, Diagnostics, Span},
+    set_config_dir,
 };
 use std::{any::Any, borrow::Cow, path::Path};
 
 /// a `datasource` from the prisma schema.
 pub struct Datasource {
     pub name: String,
+    /// Span of the whole datasource block (including `datasource` keyword and braces)
+    pub span: Span,
     /// The provider string
     pub provider: String,
     /// The provider that was selected as active from all specified providers
@@ -103,7 +108,8 @@ impl Datasource {
                 let s = indoc::formatdoc! {"
                     {err_str}
 
-                    To use a URL with protocol `prisma://` the Data Proxy must be enabled via `prisma generate --data-proxy`.
+                    To use a URL with protocol `prisma://`, you need to either enable Accelerate or the Data Proxy.
+                    Enable Accelerate via `prisma generate --accelerate` or the Data Proxy via `prisma generate --data-proxy.`
 
                     More information about Data Proxy: https://pris.ly/d/data-proxy
                 "};
@@ -207,7 +213,7 @@ impl Datasource {
     {
         //CHECKUP
         let url = self.load_url(env)?;
-        let url = self.active_connector.set_config_dir(config_dir, &url);
+        let url = set_config_dir(self.active_connector.flavour(), config_dir, &url);
 
         Ok(url.into_owned())
     }
@@ -267,6 +273,12 @@ impl Datasource {
 
     pub fn schemas_defined(&self) -> bool {
         self.schemas_span.is_some()
+    }
+}
+
+impl WithSpan for Datasource {
+    fn span(&self) -> Span {
+        self.span
     }
 }
 

@@ -61,11 +61,13 @@ fn criterion_benchmark(c: &mut Criterion) {
 fn validate_and_plan(query: &str, schema: &QuerySchema) {
     fn validate_and_plan_impl(query: &str, schema: &QuerySchema) {
         let json_request: JsonSingleQuery = serde_json::from_str(query).unwrap();
-        let operation = request_handlers::JsonProtocolAdapter::convert_single(json_request, &schema).unwrap();
-        QueryGraphBuilder::new(&schema).build(operation).unwrap();
+        let mut adapter = request_handlers::JsonProtocolAdapter::new(schema);
+        let operation = adapter.convert_single(json_request).unwrap();
+        QueryGraphBuilder::new(schema).build(operation).unwrap();
     }
 
-    black_box(validate_and_plan_impl(query, schema))
+    validate_and_plan_impl(query, schema);
+    black_box(())
 }
 
 criterion_group!(benches, criterion_benchmark);

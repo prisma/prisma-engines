@@ -1,0 +1,41 @@
+[
+  {
+    "title": "Add schema to schemas",
+    "kind": "quickfix",
+    "diagnostics": [
+      {
+        "range": {
+          "start": {
+            "line": 3,
+            "character": 13
+          },
+          "end": {
+            "line": 3,
+            "character": 19
+          }
+        },
+        "severity": 1,
+        "message": "This schema is not defined in the datasource. Read more on `@@schema` at https://pris.ly/d/multi-schema"
+      }
+    ],
+    "edit": {
+      "changes": {
+        "file:///path/to/datasource.prisma": [
+          {
+            "range": {
+              "start": {
+                "line": 3,
+                "character": 27
+              },
+              "end": {
+                "line": 3,
+                "character": 28
+              }
+            },
+            "newText": "\", \"base\""
+          }
+        ]
+      }
+    }
+  }
+]

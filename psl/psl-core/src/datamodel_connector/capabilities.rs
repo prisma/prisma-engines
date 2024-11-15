@@ -70,10 +70,11 @@ capabilities!(
     MultipleFullTextAttributesPerModel,
     ClusteringSetting,
     // Start of query-engine-only Capabilities
-    EnumArrayPush,
+    EnumArrayPush, // implies the ScalarList capability. Necessary, as CockroachDB supports pushing to a list of scalars, but not to the particular case of an enum list. See https://github.com/cockroachdb/cockroach/issues/71388
     InsensitiveFilters,
     CreateMany,
     CreateManyWriteableAutoIncId,
+    SupportsDefaultInInsert, // This capability is set if connector supports using `DEFAULT` instead of a value in the list of `INSERT` arguments.
     WritableAutoincField,
     CreateSkipDuplicates,
     UpdateableId,
@@ -86,6 +87,7 @@ capabilities!(
     AnyId, // Any (or combination of) uniques and not only id fields can constitute an id for a model.
     SqlQueryRaw,
     MongoDbQueryRaw,
+    FullTextSearch,
     FullTextSearchWithoutIndex,
     FullTextSearchWithIndex,
     AdvancedJsonNullability,    // Connector distinguishes between their null type and JSON null.
@@ -93,13 +95,22 @@ capabilities!(
     DecimalType,                // Connector supports Prisma Decimal type.
     BackwardCompatibleQueryRaw, // Temporary SQLite specific capability. Should be removed once https://github.com/prisma/prisma/issues/12784 is fixed,
     OrderByNullsFirstLast,      // Connector supports ORDER BY NULLS LAST/FIRST
+    FilteredInlineChildNestedToOneDisconnect, // Connector supports a filtered nested disconnect on both sides of a to-one relation.
     // Block of isolation levels.
     SupportsTxIsolationReadUncommitted,
     SupportsTxIsolationReadCommitted,
     SupportsTxIsolationRepeatableRead,
     SupportsTxIsolationSerializable,
     SupportsTxIsolationSnapshot,
-    NativeUpsert
+    NativeUpsert,
+    InsertReturning,
+    UpdateReturning,
+    RowIn,                                  // Connector supports (a, b) IN (c, d) expression.
+    DistinctOn,                             // Connector supports DB-level distinct (e.g. postgres)
+    DeleteReturning,                        // Connector supports deleting records and returning them in one operation.
+    SupportsFiltersOnRelationsWithoutJoins, // Connector supports rendering filters on relation fields without joins.
+    LateralJoin,                            // Connector supports lateral joins to resolve relations.
+    CorrelatedSubqueries,                   // Connector supports correlated subqueries to resolve relations.
 );
 
 /// Contains all capabilities that the connector is able to serve.

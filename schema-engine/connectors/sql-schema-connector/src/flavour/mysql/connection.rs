@@ -7,7 +7,7 @@ use quaint::{
         mysql_async::{self as my, prelude::Query},
         MysqlUrl,
     },
-    prelude::{ConnectionInfo, Queryable},
+    prelude::{ColumnType, ConnectionInfo, NativeConnectionInfo, Queryable},
 };
 use schema_connector::{ConnectorError, ConnectorResult};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema};
@@ -50,6 +50,21 @@ impl Connection {
 
         if circumstances.contains(super::Circumstances::IsMysql57) {
             describer_circumstances |= describer::Circumstances::MySql57;
+        }
+
+        if circumstances.contains(super::Circumstances::CheckConstraints)
+            && !describer_circumstances.intersects(
+                describer::Circumstances::MySql56
+                    | describer::Circumstances::MySql57
+                    | describer::Circumstances::MariaDb,
+            )
+        {
+            // MySQL 8.0.16 and above supports check constraints.
+            // MySQL 5.6 and 5.7 do not have a CHECK_CONSTRAINTS table we can query.
+            // MariaDB, although it supports check constraints, adds them unexpectedly.
+            // E.g., MariaDB 10 adds the `json_valid(\`Priv\`)` check constraint on every JSON column;
+            // this creates a noisy, unexpected diff when comparing the introspected schema with the prisma schema.
+            describer_circumstances |= describer::Circumstances::CheckConstraints;
         }
 
         let mut schema = sql_schema_describer::mysql::SqlSchemaDescriber::new(&self.0, describer_circumstances)
@@ -98,6 +113,30 @@ impl Connection {
     ) -> ConnectorResult<quaint::prelude::ResultSet> {
         tracing::debug!(query_type = "query_raw", sql, ?params);
         self.0.query_raw(sql, params).await.map_err(quaint_err(url))
+    }
+
+    pub(super) async fn describe_query(
+        &self,
+        sql: &str,
+        url: &MysqlUrl,
+        circumstances: BitFlags<super::Circumstances>,
+    ) -> ConnectorResult<quaint::connector::DescribedQuery> {
+        tracing::debug!(query_type = "describe_query", sql);
+        let mut parsed = self.0.describe_query(sql).await.map_err(quaint_err(url))?;
+
+        if circumstances.contains(super::Circumstances::IsMysql56)
+            || circumstances.contains(super::Circumstances::IsMysql57)
+        {
+            parsed.parameters = parsed
+                .parameters
+                .into_iter()
+                .map(|p| p.set_typ(ColumnType::Unknown))
+                .collect();
+
+            return Ok(parsed);
+        }
+
+        Ok(parsed)
     }
 
     pub(super) async fn apply_migration_script(
@@ -160,7 +199,12 @@ impl Connection {
 }
 
 fn quaint_err(url: &MysqlUrl) -> impl (Fn(quaint::error::Error) -> ConnectorError) + '_ {
-    |err| crate::flavour::quaint_error_to_connector_error(err, &ConnectionInfo::Mysql(url.clone()))
+    |err| {
+        crate::flavour::quaint_error_to_connector_error(
+            err,
+            &ConnectionInfo::Native(NativeConnectionInfo::Mysql(url.clone())),
+        )
+    }
 }
 
 fn convert_server_error(circumstances: BitFlags<super::Circumstances>, error: &my::Error) -> Option<KnownError> {

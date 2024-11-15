@@ -1,18 +1,20 @@
 use super::*;
-use prisma_models::{prelude::ParentContainer, ScalarFieldRef};
+use query_structure::{prelude::ParentContainer, ScalarField};
 
 pub(crate) mod group_by;
 pub(crate) mod plain;
 
-fn field_avg_output_type(ctx: &mut BuilderContext<'_>, field: &ScalarFieldRef) -> OutputType {
+fn field_avg_output_type(ctx: &'_ QuerySchema, field: ScalarField) -> OutputType<'_> {
     match field.type_identifier() {
-        TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float => OutputType::float(),
-        TypeIdentifier::Decimal => OutputType::decimal(),
+        TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float => {
+            OutputType::non_list(OutputType::float())
+        }
+        TypeIdentifier::Decimal => OutputType::non_list(OutputType::decimal()),
         _ => field::map_scalar_output_type_for_field(ctx, field),
     }
 }
 
-pub fn collect_non_list_nor_json_fields(container: &ParentContainer) -> Vec<ScalarFieldRef> {
+pub(crate) fn collect_non_list_nor_json_fields(container: &ParentContainer) -> Vec<ScalarField> {
     container
         .fields()
         .into_iter()
@@ -23,7 +25,7 @@ pub fn collect_non_list_nor_json_fields(container: &ParentContainer) -> Vec<Scal
         .collect()
 }
 
-pub fn collect_numeric_fields(container: &ParentContainer) -> Vec<ScalarFieldRef> {
+pub(crate) fn collect_numeric_fields(container: &ParentContainer) -> Vec<ScalarField> {
     container
         .fields()
         .into_iter()
@@ -36,18 +38,18 @@ pub fn collect_numeric_fields(container: &ParentContainer) -> Vec<ScalarFieldRef
 
 /// Returns an aggregation field with given name if the passed fields contains any fields.
 /// Field types inside the object type of the field are determined by the passed mapper fn.
-fn aggregation_field<F, G>(
-    ctx: &mut BuilderContext<'_>,
+fn aggregation_field<'a, F, G>(
+    ctx: &'a QuerySchema,
     name: &str,
-    model: &ModelRef,
-    fields: Vec<ScalarFieldRef>,
+    model: &Model,
+    fields: Vec<ScalarField>,
     type_mapper: F,
     object_mapper: G,
     is_count: bool,
-) -> Option<OutputField>
+) -> Option<OutputField<'a>>
 where
-    F: Fn(&mut BuilderContext<'_>, &ScalarFieldRef) -> OutputType,
-    G: Fn(ObjectType) -> ObjectType,
+    F: Fn(&'a QuerySchema, ScalarField) -> OutputType<'a> + Send + Sync + 'static,
+    G: Fn(ObjectType<'a>) -> ObjectType<'a>,
 {
     if fields.is_empty() {
         None
@@ -56,45 +58,43 @@ where
             ctx,
             model,
             name.trim_start_matches('_'),
-            &fields,
+            fields,
             type_mapper,
             object_mapper,
             is_count,
         ));
 
-        Some(field(name, vec![], object_type, None).nullable())
+        Some(field_no_arguments(name.to_owned(), object_type, None).nullable())
     }
 }
 
 /// Maps the object type for aggregations that operate on a field level.
-fn map_field_aggregation_object<F, G>(
-    ctx: &mut BuilderContext<'_>,
-    model: &ModelRef,
+fn map_field_aggregation_object<'a, F, G>(
+    ctx: &'a QuerySchema,
+    model: &Model,
     suffix: &str,
-    fields: &[ScalarFieldRef],
+    fields: Vec<ScalarField>,
     type_mapper: F,
     object_mapper: G,
     is_count: bool,
-) -> OutputObjectTypeId
+) -> ObjectType<'a>
 where
-    F: Fn(&mut BuilderContext<'_>, &ScalarFieldRef) -> OutputType,
-    G: Fn(ObjectType) -> ObjectType,
+    F: Fn(&'a QuerySchema, ScalarField) -> OutputType<'a> + Send + Sync + 'static,
+    G: Fn(ObjectType<'a>) -> ObjectType<'a>,
 {
     let ident = Identifier::new_prisma(format!(
         "{}{}AggregateOutputType",
         capitalize(model.name()),
         capitalize(suffix)
     ));
-    return_cached_output!(ctx, &ident);
 
-    // Non-numerical fields are always set as nullable
-    // This is because when there's no data, doing aggregation on them will return NULL
-    let fields: Vec<OutputField> = fields
-        .iter()
-        .map(|sf| field(sf.name(), vec![], type_mapper(ctx, sf), None).nullable_if(!is_count))
-        .collect();
-
-    let object = object_mapper(object_type(ident.clone(), fields, None));
-
-    ctx.cache_output_type(ident, object)
+    object_mapper(ObjectType::new(ident, move || {
+        // Non-numerical fields are always set as nullable
+        // This is because when there's no data, doing aggregation on them will return NULL
+        fields
+            .clone()
+            .into_iter()
+            .map(|sf| field_no_arguments(sf.name().to_owned(), type_mapper(ctx, sf), None).nullable_if(!is_count))
+            .collect()
+    }))
 }

@@ -1,8 +1,8 @@
 use crate::join::JoinStage;
+use bson::{doc, Document};
 use itertools::Itertools;
-use mongodb::bson::{doc, Document};
-use prisma_models::{OrderBy, OrderByHop, OrderByToManyAggregation, SortOrder};
-use std::iter;
+use query_structure::{OrderBy, OrderByHop, OrderByToManyAggregation, SortOrder};
+use std::{fmt::Display, iter};
 
 #[derive(Debug)]
 pub(crate) struct OrderByData {
@@ -176,9 +176,9 @@ pub(crate) struct OrderByPrefix {
     parts: Vec<String>,
 }
 
-impl ToString for OrderByPrefix {
-    fn to_string(&self) -> String {
-        self.parts.join(".")
+impl Display for OrderByPrefix {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.parts.join("."))
     }
 }
 
@@ -188,7 +188,7 @@ impl OrderByPrefix {
     }
 
     pub(crate) fn first(&self) -> Option<&String> {
-        self.parts.get(0)
+        self.parts.first()
     }
 }
 
@@ -230,11 +230,11 @@ impl OrderByBuilder {
                 // Can only be scalar aggregations for groupBy, ToMany aggregations are not supported yet.
                 if let OrderBy::ScalarAggregation(order_by_aggr) = &data.order_by {
                     let prefix = match order_by_aggr.sort_aggregation {
-                        prisma_models::SortAggregation::Count => "count",
-                        prisma_models::SortAggregation::Avg => "avg",
-                        prisma_models::SortAggregation::Sum => "sum",
-                        prisma_models::SortAggregation::Min => "min",
-                        prisma_models::SortAggregation::Max => "max",
+                        query_structure::SortAggregation::Count => "count",
+                        query_structure::SortAggregation::Avg => "avg",
+                        query_structure::SortAggregation::Sum => "sum",
+                        query_structure::SortAggregation::Min => "min",
+                        query_structure::SortAggregation::Max => "max",
                     };
 
                     format!("{}_{}", prefix, data.scalar_field_name())
@@ -258,7 +258,7 @@ impl OrderByBuilder {
             if let OrderBy::ToManyAggregation(order_by_aggregate) = &data.order_by {
                 if !order_by_aggregate.path.is_empty() {
                     match order_by_aggregate.sort_aggregation {
-                        prisma_models::SortAggregation::Count => {
+                        query_structure::SortAggregation::Count => {
                             if let Some(clone_to) = data.prefix.as_ref().and_then(|x| x.clone_to.clone()) {
                                 order_aggregate_proj_doc.push(doc! { "$addFields": { clone_to.clone(): { "$size": { "$ifNull": [format!("${}", data.full_reference_path(false)), []] } } } });
                                 field_name = clone_to; // Todo: Just a hack right now, this whole function needs love.

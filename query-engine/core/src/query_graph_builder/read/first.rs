@@ -1,15 +1,24 @@
-use prisma_models::ModelRef;
+use query_structure::Model;
+use schema::QuerySchema;
 
 use super::*;
 use crate::ParsedField;
 
-pub(crate) fn find_first(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
-    let many_query = many::find_many(field, model)?;
+pub(crate) fn find_first(
+    field: ParsedField<'_>,
+    model: Model,
+    query_schema: &QuerySchema,
+) -> QueryGraphBuilderResult<ReadQuery> {
+    let many_query = many::find_many(field, model, query_schema)?;
     try_limit_to_one(many_query)
 }
 
-pub(crate) fn find_first_or_throw(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
-    let many_query = many::find_many_or_throw(field, model)?;
+pub(crate) fn find_first_or_throw(
+    field: ParsedField<'_>,
+    model: Model,
+    query_schema: &QuerySchema,
+) -> QueryGraphBuilderResult<ReadQuery> {
+    let many_query = many::find_many_or_throw(field, model, query_schema)?;
     try_limit_to_one(many_query)
 }
 

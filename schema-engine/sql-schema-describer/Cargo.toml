@@ -5,21 +5,26 @@ version = "0.1.0"
 
 [dependencies]
 prisma-value = { path = "../../libs/prisma-value" }
-psl.workspace = true
+psl = { workspace = true, features = ["all"] }
 
-async-trait = "0.1.17"
+either = "1.8.0"
+async-trait.workspace = true
 bigdecimal = "0.3"
-enumflags2 = { version = "0.7", features = ["serde"] }
-indexmap = { version = "1.9.1", default_features = false }
+enumflags2.workspace = true
+indexmap.workspace = true
 indoc.workspace = true
 once_cell = "1.3"
-regex = "1.2"
+regex.workspace = true
 serde.workspace = true
-tracing = "0.1"
+tracing.workspace = true
 tracing-error = "0.2"
-tracing-futures = "0.2"
-quaint.workspace = true
-either = "1.8.0"
+tracing-futures.workspace = true
+quaint = { workspace = true, features = [
+    "all-native",
+    "pooled",
+    "expose-drivers",
+    "fmt-sql",
+] }
 
 [dev-dependencies]
 expect-test = "1.2.2"

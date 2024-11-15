@@ -4,6 +4,7 @@ requestShape = "getDatabaseVersionInput"
 responseShape = "getDatabaseVersionOutput"
 
 [recordShapes.getDatabaseVersionInput]
+fields.datasource.shape = "DatasourceParam"
 
 [recordShapes.getDatabaseVersionOutput.fields.version]
 shape = "string"

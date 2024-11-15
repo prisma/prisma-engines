@@ -1,7 +1,7 @@
 use bigdecimal::BigDecimal;
 use chrono::{DateTime, FixedOffset};
 use indexmap::IndexMap;
-use prisma_models::PrismaValue;
+use query_structure::PrismaValue;
 use serde::Serialize;
 
 pub type ArgumentValueObject = IndexMap<String, ArgumentValue>;
@@ -14,6 +14,7 @@ pub enum ArgumentValue {
     Scalar(PrismaValue),
     Object(ArgumentValueObject),
     List(Vec<ArgumentValue>),
+    Raw(serde_json::Value),
     FieldRef(ArgumentValueObject),
 }
 
@@ -46,6 +47,10 @@ impl ArgumentValue {
         Self::Scalar(PrismaValue::Json(str))
     }
 
+    pub fn raw(value: serde_json::Value) -> Self {
+        Self::Raw(value)
+    }
+
     pub fn bytes(bytes: Vec<u8>) -> Self {
         Self::Scalar(PrismaValue::Bytes(bytes))
     }
@@ -73,9 +78,10 @@ impl ArgumentValue {
         }
     }
 
-    pub fn should_be_parsed_as_json(&self) -> bool {
+    pub(crate) fn should_be_parsed_as_json(&self) -> bool {
         match self {
             ArgumentValue::Object(_) => true,
+            ArgumentValue::Raw(_) => true,
             ArgumentValue::List(l) => l.iter().all(|v| v.should_be_parsed_as_json()),
             ArgumentValue::Scalar(pv) => !matches!(pv, PrismaValue::Enum(_) | PrismaValue::Json(_)),
             ArgumentValue::FieldRef(_) => false,

@@ -1,7 +1,7 @@
 #![deny(rust_2018_idioms, unsafe_code)]
-#![allow(clippy::derive_partial_eq_without_eq)]
 
 mod commands;
+mod json_rpc_stdio;
 mod logger;
 
 use schema_connector::{BoxFuture, ConnectorHost, ConnectorResult};
@@ -13,10 +13,10 @@ use structopt::StructOpt;
 /// server over stdio.
 #[derive(Debug, StructOpt)]
 #[structopt(version = env!("GIT_HASH"))]
-struct MigrationEngineCli {
-    /// Path to the datamodel
+struct SchemaEngineCli {
+    /// List of paths to the Prisma schema files.
     #[structopt(short = "d", long, name = "FILE")]
-    datamodel: Option<String>,
+    datamodels: Option<Vec<String>>,
     #[structopt(subcommand)]
     cli_subcommand: Option<SubCommand>,
 }
@@ -33,12 +33,12 @@ async fn main() {
     set_panic_hook();
     logger::init_logger();
 
-    let input = MigrationEngineCli::from_args();
+    let input = SchemaEngineCli::from_args();
 
     match input.cli_subcommand {
-        None => start_engine(input.datamodel.as_deref()).await,
+        None => start_engine(input.datamodels).await,
         Some(SubCommand::Cli(cli_command)) => {
-            tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine CLI");
+            tracing::info!(git_hash = env!("GIT_HASH"), "Starting schema engine CLI");
             cli_command.run().await;
         }
     }
@@ -91,30 +91,35 @@ impl ConnectorHost for JsonRpcHost {
     }
 }
 
-async fn start_engine(datamodel_location: Option<&str>) {
+async fn start_engine(datamodel_locations: Option<Vec<String>>) {
     use std::io::Read as _;
 
-    tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine RPC server",);
+    tracing::info!(git_hash = env!("GIT_HASH"), "Starting schema engine RPC server",);
 
-    let datamodel = datamodel_location.map(|location| {
-        let mut file = match std::fs::File::open(location) {
-            Ok(file) => file,
-            Err(e) => panic!("Error opening datamodel file in `{location}`: {e}"),
-        };
+    let datamodel_locations = datamodel_locations.map(|datamodel_locations| {
+        datamodel_locations
+            .into_iter()
+            .map(|location| {
+                let mut file = match std::fs::File::open(&location) {
+                    Ok(file) => file,
+                    Err(e) => panic!("Error opening datamodel file in `{location}`: {e}"),
+                };
 
-        let mut datamodel = String::new();
+                let mut datamodel = String::new();
 
-        if let Err(e) = file.read_to_string(&mut datamodel) {
-            panic!("Error reading datamodel file `{location}`: {e}");
-        };
+                if let Err(e) = file.read_to_string(&mut datamodel) {
+                    panic!("Error reading datamodel file `{location}`: {e}");
+                };
 
-        datamodel
+                (location, datamodel)
+            })
+            .collect::<Vec<_>>()
     });
 
     let (client, adapter) = json_rpc_stdio::new_client();
     let host = JsonRpcHost { client };
 
-    let api = rpc_api(datamodel, Arc::new(host));
+    let api = rpc_api(datamodel_locations, Arc::new(host));
     // Block the thread and handle IO in async until EOF.
     json_rpc_stdio::run_with_client(&api, adapter).await.unwrap();
 }

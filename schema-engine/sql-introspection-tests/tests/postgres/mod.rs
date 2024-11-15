@@ -91,6 +91,7 @@ async fn pg_xml_indexes_are_skipped(api: &mut TestApi) -> TestResult {
     api.database().raw_cmd(&create_primary).await?;
 
     let dm = indoc! {r#"
+        /// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
         model xml_test {
           id   Int @id @default(autoincrement())
           data String? @db.Xml
@@ -393,7 +394,7 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
           val String? @db.VarChar(20)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
         view b {
           val String? @db.VarChar(20)
@@ -413,7 +414,7 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         *** WARNING ***
 
-        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
+        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
           - "b"
 
         These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments
@@ -434,7 +435,7 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
           val String? @db.VarChar(20)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         /// This view is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
         view b {
           /// This field is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -458,7 +459,7 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
           val String? @db.VarChar(20)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         /// This view is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
         view b {
           /// This field is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments

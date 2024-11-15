@@ -2,8 +2,8 @@ use super::TestApi;
 use crate::{connector::Queryable, single::Quaint};
 use names::Generator;
 use once_cell::sync::Lazy;
+use quaint_test_setup::Tags;
 use std::env;
-use test_setup::Tags;
 
 pub static CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_MYSQL").expect("TEST_MYSQL env var"));
 pub static CONN_STR8: Lazy<String> = Lazy::new(|| env::var("TEST_MYSQL8").expect("TEST_MYSQL8 env var"));

@@ -21,17 +21,17 @@ mod decimal_filter {
         test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { equals: { _ref: "dec" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { equals: { _ref: "dec", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { equals: { _ref: "dec2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { equals: { _ref: "dec2", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { AND: { dec: { not: { equals: { _ref: "dec2" } } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { AND: { dec: { not: { equals: { _ref: "dec2", _container: "TestModel" } } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -44,81 +44,81 @@ mod decimal_filter {
 
         // Gt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { gt: { _ref: "dec" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { gt: { _ref: "dec", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec2: { gt: { _ref: "dec" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec2: { gt: { _ref: "dec", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // Not gt => lte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { not: { gt: { _ref: "dec" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { not: { gt: { _ref: "dec", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { not: { gt: { _ref: "dec2" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { not: { gt: { _ref: "dec2", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Gte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { gte: { _ref: "dec" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { gte: { _ref: "dec", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec2: { gte: { _ref: "dec" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec2: { gte: { _ref: "dec", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Not gte => lt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { not: { gte: { _ref: "dec" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { not: { gte: { _ref: "dec", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { not: { gte: { _ref: "dec2" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { not: { gte: { _ref: "dec2", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // Lt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { lt: { _ref: "dec" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { lt: { _ref: "dec", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { lt: { _ref: "dec2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { lt: { _ref: "dec2", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // Not lt => gte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { not: { lt: { _ref: "dec" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { not: { lt: { _ref: "dec", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec2: { not: { lt: { _ref: "dec" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec2: { not: { lt: { _ref: "dec", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Lte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { lte: { _ref: "dec" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { lte: { _ref: "dec", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { lte: { _ref: "dec2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { lte: { _ref: "dec2", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Not lte => gt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { not: { lte: { _ref: "dec" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { not: { lte: { _ref: "dec", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec2: { not: { lte: { _ref: "dec" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec2: { not: { lte: { _ref: "dec", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -143,17 +143,17 @@ mod decimal_filter {
         test_list_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { in: { _ref: "dec_list" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { in: { _ref: "dec_list", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { notIn: { _ref: "dec_list" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { notIn: { _ref: "dec_list", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { not: { in: { _ref: "dec_list" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec: { not: { in: { _ref: "dec_list", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -166,53 +166,53 @@ mod decimal_filter {
 
         // has
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec_list: { has: { _ref: "dec" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec_list: { has: { _ref: "dec", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         // not has
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { dec_list: { has: { _ref: "dec" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { dec_list: { has: { _ref: "dec", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // hasSome
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec_list: { hasSome: { _ref: "dec_list" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec_list: { hasSome: { _ref: "dec_list", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec_list: { hasSome: { _ref: "dec_list2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec_list: { hasSome: { _ref: "dec_list2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // not hasSome
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { dec_list: { hasSome: { _ref: "dec_list" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { dec_list: { hasSome: { _ref: "dec_list", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { dec_list: { hasSome: { _ref: "dec_list2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { dec_list: { hasSome: { _ref: "dec_list2", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
 
         // hasEvery
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec_list: { hasEvery: { _ref: "dec_list" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec_list: { hasEvery: { _ref: "dec_list", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { dec_list: { hasEvery: { _ref: "dec_list2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { dec_list: { hasEvery: { _ref: "dec_list2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         // not hasEvery
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { dec_list: { hasEvery: { _ref: "dec_list" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { dec_list: { hasEvery: { _ref: "dec_list", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { dec_list: { hasEvery: { _ref: "dec_list2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { dec_list: { hasEvery: { _ref: "dec_list2", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 

@@ -1,13 +1,25 @@
+use std::{fmt, str::FromStr};
+
+use async_trait::async_trait;
+use prisma_metrics::guards::GaugeGuard;
+
 use super::*;
 use crate::{
     ast::*,
     error::{Error, ErrorKind},
 };
-use async_trait::async_trait;
-use metrics::{decrement_gauge, increment_gauge};
-use std::{fmt, str::FromStr};
 
-extern crate metrics as metrics;
+#[async_trait]
+pub trait Transaction: Queryable {
+    /// Commit the changes to the database and consume the transaction.
+    async fn commit(&self) -> crate::Result<()>;
+
+    /// Rolls back the changes to the database.
+    async fn rollback(&self) -> crate::Result<()>;
+
+    /// workaround for lack of upcasting between traits https://github.com/rust-lang/rust/issues/65991
+    fn as_queryable(&self) -> &dyn Queryable;
+}
 
 pub(crate) struct TransactionOptions {
     /// The isolation level to use.
@@ -17,22 +29,26 @@ pub(crate) struct TransactionOptions {
     pub(crate) isolation_first: bool,
 }
 
-/// A representation of an SQL database transaction. If not commited, a
+/// A default representation of an SQL database transaction. If not commited, a
 /// transaction will be rolled back by default when dropped.
 ///
 /// Currently does not support nesting, so starting a new transaction using the
 /// transaction object will panic.
-pub struct Transaction<'a> {
-    pub(crate) inner: &'a dyn Queryable,
+pub struct DefaultTransaction<'a> {
+    pub inner: &'a dyn Queryable,
+    gauge: GaugeGuard,
 }
 
-impl<'a> Transaction<'a> {
+impl<'a> DefaultTransaction<'a> {
     pub(crate) async fn new(
         inner: &'a dyn Queryable,
         begin_stmt: &str,
         tx_opts: TransactionOptions,
-    ) -> crate::Result<Transaction<'a>> {
-        let this = Self { inner };
+    ) -> crate::Result<DefaultTransaction<'a>> {
+        let this = Self {
+            inner,
+            gauge: GaugeGuard::increment("prisma_client_queries_active"),
+        };
 
         if tx_opts.isolation_first {
             if let Some(isolation) = tx_opts.isolation_level {
@@ -50,29 +66,35 @@ impl<'a> Transaction<'a> {
 
         inner.server_reset_query(&this).await?;
 
-        increment_gauge!("prisma_client_queries_active", 1.0);
         Ok(this)
     }
+}
 
+#[async_trait]
+impl<'a> Transaction for DefaultTransaction<'a> {
     /// Commit the changes to the database and consume the transaction.
-    pub async fn commit(&self) -> crate::Result<()> {
-        decrement_gauge!("prisma_client_queries_active", 1.0);
+    async fn commit(&self) -> crate::Result<()> {
+        self.gauge.decrement();
         self.inner.raw_cmd("COMMIT").await?;
 
         Ok(())
     }
 
     /// Rolls back the changes to the database.
-    pub async fn rollback(&self) -> crate::Result<()> {
-        decrement_gauge!("prisma_client_queries_active", 1.0);
+    async fn rollback(&self) -> crate::Result<()> {
+        self.gauge.decrement();
         self.inner.raw_cmd("ROLLBACK").await?;
 
         Ok(())
     }
+
+    fn as_queryable(&self) -> &dyn Queryable {
+        self
+    }
 }
 
 #[async_trait]
-impl<'a> Queryable for Transaction<'a> {
+impl<'a> Queryable for DefaultTransaction<'a> {
     async fn query(&self, q: Query<'_>) -> crate::Result<ResultSet> {
         self.inner.query(q).await
     }
@@ -87,6 +109,10 @@ impl<'a> Queryable for Transaction<'a> {
 
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         self.inner.query_raw_typed(sql, params).await
+    }
+
+    async fn describe_query(&self, sql: &str) -> crate::Result<DescribedQuery> {
+        self.inner.describe_query(sql).await
     }
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
@@ -171,7 +197,7 @@ impl FromStr for IsolationLevel {
     }
 }
 impl TransactionOptions {
-    pub(crate) fn new(isolation_level: Option<IsolationLevel>, isolation_first: bool) -> Self {
+    pub fn new(isolation_level: Option<IsolationLevel>, isolation_first: bool) -> Self {
         Self {
             isolation_level,
             isolation_first,

@@ -1,29 +1,25 @@
 use super::*;
 
 #[derive(Debug)]
-pub(crate) enum DmmfObjectRenderer {
-    Input(InputObjectTypeId),
-    Output(OutputObjectTypeId),
+pub(crate) enum DmmfObjectRenderer<'a> {
+    Input(InputObjectType<'a>),
+    Output(ObjectType<'a>),
 }
 
-impl Renderer for DmmfObjectRenderer {
-    fn render(&self, ctx: &mut RenderContext) {
+impl<'a> Renderer<'a> for DmmfObjectRenderer<'a> {
+    fn render(&self, ctx: &mut RenderContext<'a>) {
         match &self {
-            DmmfObjectRenderer::Input(input) => {
-                let input_object = &ctx.query_schema.db[*input];
-
-                match &input_object.tag {
-                    Some(ObjectTag::FieldRefType(_)) => self.render_field_ref_type(input_object, ctx),
-                    _ => self.render_input_object(input_object, ctx),
-                }
-            }
-            DmmfObjectRenderer::Output(output) => self.render_output_object(&ctx.query_schema.db[*output], ctx),
+            DmmfObjectRenderer::Input(input_object) => match input_object.tag() {
+                Some(ObjectTag::FieldRefType(_)) => self.render_field_ref_type(input_object, ctx),
+                _ => self.render_input_object(input_object, ctx),
+            },
+            DmmfObjectRenderer::Output(output) => self.render_output_object(output, ctx),
         }
     }
 }
 
-impl DmmfObjectRenderer {
-    fn render_input_object(&self, input_object: &InputObjectType, ctx: &mut RenderContext) {
+impl<'a> DmmfObjectRenderer<'a> {
+    fn render_input_object(&self, input_object: &InputObjectType<'a>, ctx: &mut RenderContext<'a>) {
         if ctx.already_rendered(&input_object.identifier) {
             return;
         }
@@ -38,7 +34,7 @@ impl DmmfObjectRenderer {
             rendered_fields.push(render_input_field(field, ctx));
         }
 
-        let meta = input_object.tag.as_ref().and_then(|tag| match tag {
+        let meta = input_object.tag().and_then(|tag| match tag {
             ObjectTag::WhereInputType(container) => Some(DmmfInputTypeMeta {
                 source: Some(container.name()),
             }),
@@ -50,7 +46,11 @@ impl DmmfObjectRenderer {
             constraints: DmmfInputTypeConstraints {
                 max_num_fields: input_object.constraints.max_num_fields,
                 min_num_fields: input_object.constraints.min_num_fields,
-                fields: input_object.constraints.fields.as_ref().cloned(),
+                fields: input_object
+                    .constraints
+                    .fields
+                    .as_ref()
+                    .map(|f| f.iter().map(|s| s.clone().into_owned()).collect()),
             },
             fields: rendered_fields,
             meta,
@@ -59,7 +59,7 @@ impl DmmfObjectRenderer {
         ctx.add_input_type(input_object.identifier.clone(), input_type);
     }
 
-    fn render_field_ref_type(&self, input_object: &InputObjectType, ctx: &mut RenderContext) {
+    fn render_field_ref_type(&self, input_object: &InputObjectType<'a>, ctx: &mut RenderContext<'a>) {
         if ctx.already_rendered(&input_object.identifier) {
             return;
         }
@@ -74,7 +74,7 @@ impl DmmfObjectRenderer {
             rendered_fields.push(render_input_field(field, ctx));
         }
 
-        let allow_type = match &input_object.tag {
+        let allow_type = match input_object.tag() {
             Some(ObjectTag::FieldRefType(input_type)) => input_type,
             _ => unreachable!(),
         };
@@ -88,13 +88,13 @@ impl DmmfObjectRenderer {
         ctx.add_field_ref_type(input_object.identifier.clone(), field_ref_type);
     }
 
-    fn render_output_object(&self, output_object: &ObjectType, ctx: &mut RenderContext) {
-        if ctx.already_rendered(&output_object.identifier) {
+    fn render_output_object(&self, output_object: &ObjectType<'a>, ctx: &mut RenderContext<'a>) {
+        if ctx.already_rendered(output_object.identifier()) {
             return;
         }
 
         // This will prevent the type and its fields to be re-rendered.
-        ctx.mark_as_rendered(output_object.identifier.clone());
+        ctx.mark_as_rendered(output_object.identifier().clone());
 
         let fields = output_object.get_fields();
         let mut rendered_fields: Vec<DmmfOutputField> = Vec::with_capacity(fields.len());
@@ -104,10 +104,10 @@ impl DmmfObjectRenderer {
         }
 
         let output_type = DmmfOutputType {
-            name: output_object.identifier.name(),
+            name: output_object.name(),
             fields: rendered_fields,
         };
 
-        ctx.add_output_type(output_object.identifier.clone(), output_type);
+        ctx.add_output_type(output_object.identifier().clone(), output_type);
     }
 }

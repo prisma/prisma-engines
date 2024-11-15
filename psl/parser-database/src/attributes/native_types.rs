@@ -14,7 +14,7 @@ pub(super) fn visit_model_field_native_type_attribute(
 }
 
 pub(super) fn visit_composite_type_field_native_type_attribute(
-    id: (ast::CompositeTypeId, ast::FieldId),
+    id: (crate::CompositeTypeId, ast::FieldId),
     datasource_name: StringId,
     type_name: StringId,
     attr: &ast::Attribute,
@@ -23,6 +23,7 @@ pub(super) fn visit_composite_type_field_native_type_attribute(
     let args = &attr.arguments;
     let args: Vec<String> = args.arguments.iter().map(|arg| arg.value.to_string()).collect();
 
-    let mut composite_type_field = ctx.types.composite_type_fields.get_mut(&id).unwrap();
-    composite_type_field.native_type = Some((datasource_name, type_name, args, attr.span))
+    if let Some(composite_type_field) = ctx.types.composite_type_fields.get_mut(&id) {
+        composite_type_field.native_type = Some((datasource_name, type_name, args, attr.span))
+    }
 }

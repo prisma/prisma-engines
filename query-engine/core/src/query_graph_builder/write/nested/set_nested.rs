@@ -1,8 +1,7 @@
 use super::*;
 use crate::{query_ast::*, query_graph::*, ParsedInputValue};
-use connector::Filter;
 use itertools::Itertools;
-use prisma_models::{ModelRef, RelationFieldRef, SelectionResult};
+use query_structure::{Filter, Model, RelationFieldRef, SelectionResult};
 use std::convert::TryInto;
 
 /// Only for x-to-many relations.
@@ -14,16 +13,16 @@ pub fn nested_set(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: &ModelRef,
+    value: ParsedInputValue<'_>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
     // Build all filters upfront.
     let filters: Vec<Filter> = utils::coerce_vec(value)
         .into_iter()
-        .map(|value: ParsedInputValue| {
-            let value: ParsedInputMap = value.try_into()?;
+        .map(|value: ParsedInputValue<'_>| {
+            let value: ParsedInputMap<'_> = value.try_into()?;
             extract_unique_filter(value, child_model)
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?

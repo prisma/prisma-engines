@@ -1,8 +1,8 @@
 use super::*;
 use crate::{query_document::ParsedField, AggregateRecordsQuery};
-use prisma_models::ModelRef;
+use query_structure::Model;
 
-pub(crate) fn aggregate(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
+pub(crate) fn aggregate(field: ParsedField<'_>, model: Model) -> QueryGraphBuilderResult<ReadQuery> {
     let name = field.name;
     let alias = field.alias;
     let model = model;

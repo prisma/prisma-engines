@@ -1,10 +1,11 @@
+use schema_core::json_rpc::types::SchemasContainer;
 use sql_migration_tests::test_api::*;
 
 #[test]
 fn introspect_partition_tables() {
     // Postgres9 does not support partition tables, and Postgres10 does not support primary keys on
     // partition tables.
-    let test_db = test_setup::only!(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15 ; exclude: CockroachDb);
+    let test_db = test_setup::only!(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15, Postgres16 ; exclude: CockroachDb);
     let (_, url_str) = tok(test_setup::postgres::create_postgres_database(
         test_db.url(),
         "postgres_introspect_partition_tables",
@@ -53,8 +54,14 @@ ALTER TABLE blocks
     let result = tok(me.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema,
-        schemas: None,
+        schema: SchemasContainer {
+            files: vec![SchemaContainer {
+                path: "schema.prisma".to_string(),
+                content: schema,
+            }],
+        },
+        base_directory_path: "/".to_string(),
+        namespaces: None,
     }))
     .unwrap();
 
@@ -77,14 +84,14 @@ model blocks {{
 "#,
         url_str
     );
-    pretty_assertions::assert_eq!(expected, result.datamodel.as_str());
+    pretty_assertions::assert_eq!(expected, result.schema.files.first().unwrap().content.as_str());
 }
 
 #[test]
 fn inherited_table_regression_fix() {
     // Postgres9 does not support partition tables, and Postgres10 does not support primary keys on
     // partition tables.
-    let test_db = test_setup::only!(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15 ; exclude: CockroachDb);
+    let test_db = test_setup::only!(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15, Postgres16 ; exclude: CockroachDb);
     let (_, url_str) = tok(test_setup::postgres::create_postgres_database(
         test_db.url(),
         "inherited_table_regression_fix",
@@ -123,8 +130,14 @@ CREATE TABLE capitals (
     let result = tok(me.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema,
-        schemas: None,
+        schema: SchemasContainer {
+            files: vec![SchemaContainer {
+                path: "schema.prisma".to_string(),
+                content: schema,
+            }],
+        },
+        base_directory_path: "/".to_string(),
+        namespaces: None,
     }))
     .unwrap();
 
@@ -150,12 +163,12 @@ model cities {{
 "#,
         url_str
     );
-    pretty_assertions::assert_eq!(expected, result.datamodel.as_str());
+    pretty_assertions::assert_eq!(expected, result.schema.files.first().unwrap().content.as_str());
 }
 
 #[test]
 fn inherited_table_detect_primary_key() {
-    let test_db = test_setup::only!(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15 ; exclude: CockroachDb);
+    let test_db = test_setup::only!(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15, Postgres16 ; exclude: CockroachDb);
     let (_, url_str) = tok(test_setup::postgres::create_postgres_database(
         test_db.url(),
         "inherited_table_detect_primary_key",
@@ -194,8 +207,14 @@ CREATE TABLE capitals (
     let result = tok(me.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
-        schema,
-        schemas: None,
+        schema: SchemasContainer {
+            files: vec![SchemaContainer {
+                path: "schema.prisma".to_string(),
+                content: schema,
+            }],
+        },
+        base_directory_path: "/".to_string(),
+        namespaces: None,
     }))
     .unwrap();
 
@@ -205,7 +224,7 @@ CREATE TABLE capitals (
   url      = "{}"
 }}
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model capitals {{
   name       String
   population Float?  @db.Real
@@ -224,5 +243,5 @@ model cities {{
 "#,
         url_str
     );
-    pretty_assertions::assert_eq!(expected, result.datamodel.as_str());
+    pretty_assertions::assert_eq!(expected, result.schema.files.first().unwrap().content.as_str());
 }

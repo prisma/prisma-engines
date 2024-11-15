@@ -1,0 +1,9 @@
+{
+    "connector": "vitess",
+    "version": "planetscale.js",
+    "driver_adapter": "planetscale",
+    "driver_adapter_config": {
+        "proxy_url": "http://root:root@127.0.0.1:8085"
+    },
+    "external_test_executor": "Napi"
+}

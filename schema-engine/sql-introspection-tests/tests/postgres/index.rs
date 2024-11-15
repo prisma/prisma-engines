@@ -38,6 +38,7 @@ async fn include_indexes_should_not_introspect_included_column(api: &mut TestApi
           url      = "env(TEST_DATABASE_URL)"
         }
 
+        /// This model contains an include index which requires additional setup for migrations. Visit https://pris.ly/d/include-indexes for more info.
         model foo {
           id   Int @id
           val  Int
@@ -56,6 +57,15 @@ async fn include_indexes_should_not_introspect_included_column(api: &mut TestApi
     "#]];
 
     api.expect_datamodel(&schema).await;
+
+    let warnings = expect![[r#"
+        *** WARNING ***
+
+        These indexes are not supported by Prisma Client, because Prisma currently does not fully support include indexes. Read more: https://pris.ly/d/include-indexes
+          - Model: "foo", constraint: "foo_idx"
+    "#]];
+
+    api.expect_warnings(&warnings).await;
 
     Ok(())
 }

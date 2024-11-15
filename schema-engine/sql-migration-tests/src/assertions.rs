@@ -20,10 +20,6 @@ use sql_schema_describer::{
 };
 use test_setup::{BitFlags, Tags};
 
-pub trait SqlSchemaExt {
-    fn assert_table<'a>(&'a self, table_name: &str) -> TableAssertion<'a>;
-}
-
 pub struct SchemaAssertion {
     schema: SqlSchema,
     context: Option<&'static str>,
@@ -195,13 +191,11 @@ impl SchemaAssertion {
     }
 
     fn print_context(&self) {
-        match &self.context {
-            Some(context) => println!("Test failure with context <{}>", context.red()),
-            None => {}
+        if let Some(context) = &self.context {
+            println!("Test failure with context <{}>", context.red())
         }
-        match &self.description {
-            Some(description) => println!("{}: {}", "Description".bold(), description.italic()),
-            None => {}
+        if let Some(description) = &self.description {
+            println!("{}: {}", "Description".bold(), description.italic())
         }
     }
 
@@ -329,13 +323,11 @@ pub struct TableAssertion<'a> {
 
 impl<'a> TableAssertion<'a> {
     fn print_context(&self) {
-        match &self.context {
-            Some(context) => println!("Test failure with context <{}>", context.red()),
-            None => {}
+        if let Some(context) = &self.context {
+            println!("Test failure with context <{}>", context.red())
         }
-        match &self.description {
-            Some(description) => println!("{}: {}", "Description".bold(), description.italic()),
-            None => {}
+        if let Some(description) = &self.description {
+            println!("{}: {}", "Description".bold(), description.italic())
         }
     }
 

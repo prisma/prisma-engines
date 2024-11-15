@@ -1,9 +1,9 @@
 use core::fmt;
-use query_core::telemetry;
-use query_engine_metrics::MetricRegistry;
+use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction, ThreadsafeFunctionCallMode};
+use prisma_metrics::{MetricRecorder, MetricRegistry};
+use query_engine_common::logger::StringCallback;
 use serde_json::Value;
-use std::collections::BTreeMap;
-use std::sync::Arc;
+use std::{collections::BTreeMap, fmt::Display};
 use tracing::{
     field::{Field, Visit},
     level_filters::LevelFilter,
@@ -15,11 +15,12 @@ use tracing_subscriber::{
     Layer, Registry,
 };
 
-use crate::log_callback::LogCallback;
+pub(crate) type LogCallback = ThreadsafeFunction<String, ErrorStrategy::Fatal>;
 
 pub(crate) struct Logger {
     dispatcher: Dispatch,
     metrics: Option<MetricRegistry>,
+    recorder: Option<MetricRecorder>,
 }
 
 impl Logger {
@@ -47,9 +48,10 @@ impl Logger {
             FilterExt::boxed(log_level)
         };
 
-        let log_callback_arc = Arc::new(log_callback);
+        let log_callback = CallbackLayer::new(log_callback);
+
         let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
-        let tracer = crate::tracer::new_pipeline().install_simple(Arc::clone(&log_callback_arc));
+        let tracer = super::tracer::new_pipeline().install_simple(Box::new(log_callback.clone()));
         let telemetry = if enable_tracing {
             let telemetry = tracing_opentelemetry::layer()
                 .with_tracer(tracer)
@@ -59,18 +61,20 @@ impl Logger {
             None
         };
 
-        let layer = CallbackLayer::new(log_callback_arc).with_filter(filters);
+        let layer = log_callback.with_filter(filters);
 
-        let metrics = if enable_metrics {
-            query_engine_metrics::setup();
-            Some(MetricRegistry::new())
+        let (metrics, recorder) = if enable_metrics {
+            let registry = MetricRegistry::new();
+            let recorder = MetricRecorder::new(registry.clone()).with_initialized_prisma_metrics();
+            (Some(registry), Some(recorder))
         } else {
-            None
+            (None, None)
         };
 
         Self {
-            dispatcher: Dispatch::new(Registry::default().with(telemetry).with(layer).with(metrics.clone())),
+            dispatcher: Dispatch::new(Registry::default().with(telemetry).with(layer)),
             metrics,
+            recorder,
         }
     }
 
@@ -80,6 +84,10 @@ impl Logger {
 
     pub fn metrics(&self) -> Option<MetricRegistry> {
         self.metrics.clone()
+    }
+
+    pub fn recorder(&self) -> Option<MetricRecorder> {
+        self.recorder.clone()
     }
 }
 
@@ -129,19 +137,32 @@ impl<'a> Visit for JsonVisitor<'a> {
     }
 }
 
-impl<'a> ToString for JsonVisitor<'a> {
-    fn to_string(&self) -> String {
-        serde_json::to_string(&self.values).unwrap()
+impl<'a> Display for JsonVisitor<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&serde_json::to_string(&self.values).unwrap())
     }
 }
 
+#[derive(Clone)]
 pub(crate) struct CallbackLayer {
-    callback: Arc<LogCallback>,
+    callback: LogCallback,
 }
 
 impl CallbackLayer {
-    pub fn new(callback: Arc<LogCallback>) -> Self {
+    pub fn new(callback: LogCallback) -> Self {
         CallbackLayer { callback }
+    }
+}
+
+impl StringCallback for CallbackLayer {
+    fn call(&self, message: String) -> Result<(), String> {
+        let status = self.callback.call(message, ThreadsafeFunctionCallMode::Blocking);
+
+        if status != napi::Status::Ok {
+            Err(format!("Could not call JS callback: {}", status))
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -151,6 +172,6 @@ impl<S: Subscriber> Layer<S> for CallbackLayer {
         let mut visitor = JsonVisitor::new(event.metadata().level(), event.metadata().target());
         event.record(&mut visitor);
 
-        let _ = self.callback.call(visitor.to_string());
+        let _ = self.call(visitor.to_string());
     }
 }

@@ -4,9 +4,8 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue, QueryResult,
 };
-use connector::{Filter, IntoFilter};
 use itertools::Itertools;
-use prisma_models::{ModelRef, RelationFieldRef};
+use query_structure::{Filter, IntoFilter, Model, RelationFieldRef};
 use std::convert::TryInto;
 
 /// Handles nested connect cases.
@@ -17,16 +16,16 @@ pub fn nested_connect(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: &ModelRef,
+    value: ParsedInputValue<'_>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
     // Build all filters upfront.
     let filters: Vec<Filter> = utils::coerce_vec(value)
         .into_iter()
-        .map(|value: ParsedInputValue| {
-            let value: ParsedInputMap = value.try_into()?;
+        .map(|value: ParsedInputValue<'_>| {
+            let value: ParsedInputMap<'_> = value.try_into()?;
             extract_unique_filter(value, child_model)
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
@@ -77,7 +76,7 @@ fn handle_many_to_many(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let expected_connects = filter.size();
     let child_read_query = utils::read_ids_infallible(child_model.clone(), child_model.primary_identifier(), filter);
@@ -155,7 +154,7 @@ fn handle_one_to_many(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     child_filter: Filter,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let parent_link = parent_relation_field.linking_fields();
     let child_link = parent_relation_field.related_field().linking_fields();
@@ -328,7 +327,7 @@ fn handle_one_to_many(
 /// - Parent gets injected with a child on x, because that's what the connect is supposed to do.
 /// - The update runs, the relation is updated.
 /// - Now the check runs, because it's dependent on the parent's ID... but the check finds an existing child and fails...
-/// ... because we just updated the relation.
+///   ... because we just updated the relation.
 ///
 /// This is why we need to have an extra update at the end if it's inlined on the parent and a non-create.
 fn handle_one_to_one(
@@ -336,7 +335,7 @@ fn handle_one_to_one(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let parent_is_create = utils::node_is_create(graph, &parent_node);
     let child_relation_field = parent_relation_field.related_field();
@@ -364,7 +363,7 @@ fn handle_one_to_one_parent_update(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let child_linking_fields = parent_relation_field.related_field().linking_fields();
 
@@ -535,7 +534,7 @@ fn handle_one_to_one_parent_create(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let parent_linking_fields = parent_relation_field.linking_fields();
     let child_linking_fields = parent_relation_field.related_field().linking_fields();

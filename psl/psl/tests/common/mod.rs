@@ -4,7 +4,7 @@ pub(crate) use ::indoc::{formatdoc, indoc};
 pub(crate) use asserts::*;
 pub(crate) use expect_test::expect;
 
-use psl::Configuration;
+use psl::{parse_configuration_multi_file, Configuration, SourceFile};
 
 pub(crate) fn reformat(input: &str) -> String {
     psl::reformat(input, 2).unwrap_or_else(|| input.to_owned())
@@ -33,6 +33,15 @@ pub(crate) fn parse_configuration(datamodel_string: &str) -> Configuration {
                 errs.to_pretty_string("", datamodel_string)
             )
         }
+    }
+}
+
+#[track_caller]
+pub(crate) fn render_datasources(datamodel_string: &str) -> String {
+    let src = SourceFile::new_allocated(datamodel_string.to_owned().into_boxed_str().into());
+    match parse_configuration_multi_file(&[("schema.prisma".into(), src)]) {
+        Ok((files, config)) => psl::get_config::render_sources_to_json(&config.datasources, &files),
+        Err((files, errors)) => panic!("Schema parsing failed:\n\n{}", files.render_diagnostics(&errors)),
     }
 }
 

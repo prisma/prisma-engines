@@ -1,51 +1,42 @@
+use crate::filter::FilterBuilder;
+use crate::ser_raw::SerializedResultSet;
 use crate::{
     column_metadata, error::*, model_extensions::*, sql_trace::trace_parent_to_string, sql_trace::SqlTraceComment,
-    value_ext::IntoTypedJsonExtension, AliasedCondition, ColumnMetadata, Context, SqlRow, ToSqlRow,
+    ColumnMetadata, Context, SqlRow, ToSqlRow,
 };
 use async_trait::async_trait;
-use connector_interface::{filter::Filter, RecordFilter};
+use connector_interface::RecordFilter;
 use futures::future::FutureExt;
 use itertools::Itertools;
 use opentelemetry::trace::TraceContextExt;
 use opentelemetry::trace::TraceFlags;
-use prisma_models::*;
-use quaint::{
-    ast::*,
-    connector::{self, Queryable},
-    pooled::PooledConnection,
-};
-use serde_json::{Map, Value};
+use quaint::{ast::*, connector::Queryable};
+use query_structure::*;
 use std::{collections::HashMap, panic::AssertUnwindSafe};
 use tracing::{info_span, Span};
 use tracing_futures::Instrument;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
-impl<'t> QueryExt for connector::Transaction<'t> {}
-impl QueryExt for PooledConnection {}
-
-/// An extension trait for Quaint's `Queryable`, offering certain Prisma-centric
-/// database operations on top of `Queryable`.
 #[async_trait]
-pub(crate) trait QueryExt: Queryable + Send + Sync {
-    /// Filter and map the resulting types with the given identifiers.
+impl<Q: Queryable + ?Sized> QueryExt for Q {
     async fn filter(
         &self,
         q: Query<'_>,
         idents: &[ColumnMetadata<'_>],
         ctx: &Context<'_>,
     ) -> crate::Result<Vec<SqlRow>> {
-        let span = info_span!("filter read query");
+        let span = info_span!("prisma:engine:filter_read_query");
 
         let otel_ctx = span.context();
         let span_ref = otel_ctx.span();
         let span_ctx = span_ref.span_context();
 
-        let q = match (q, ctx.trace_id) {
+        let q = match (q, ctx.traceparent) {
             (Query::Select(x), _) if span_ctx.trace_flags() == TraceFlags::SAMPLED => {
                 Query::Select(Box::from(x.comment(trace_parent_to_string(span_ctx))))
             }
             // This is part of the required changes to pass a traceid
-            (Query::Select(x), trace_id) => Query::Select(Box::from(x.add_trace_id(trace_id))),
+            (Query::Select(x), traceparent) => Query::Select(Box::from(x.add_traceparent(traceparent))),
             (q, _) => q,
         };
 
@@ -60,12 +51,10 @@ pub(crate) trait QueryExt: Queryable + Send + Sync {
         Ok(sql_rows)
     }
 
-    /// Execute a singular SQL query in the database, returning an arbitrary
-    /// JSON `Value` as a result.
     async fn raw_json<'a>(
         &'a self,
         mut inputs: HashMap<String, PrismaValue>,
-    ) -> std::result::Result<Value, crate::error::RawError> {
+    ) -> std::result::Result<RawJson, crate::error::RawError> {
         // Unwrapping query & params is safe since it's already passed the query parsing stage
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
@@ -73,28 +62,11 @@ pub(crate) trait QueryExt: Queryable + Send + Sync {
         let result_set = AssertUnwindSafe(self.query_raw_typed(&query, &params))
             .catch_unwind()
             .await??;
+        let raw_json = RawJson::try_new(SerializedResultSet(result_set))?;
 
-        // `query_raw` does not return column names in `ResultSet` when a call to a stored procedure is done
-        let columns: Vec<String> = result_set.columns().iter().map(ToString::to_string).collect();
-        let mut result = Vec::new();
-
-        for row in result_set.into_iter() {
-            let mut object = Map::new();
-
-            for (idx, p_value) in row.into_iter().enumerate() {
-                let column_name = columns.get(idx).unwrap_or(&format!("f{idx}")).clone();
-
-                object.insert(column_name, p_value.as_typed_json());
-            }
-
-            result.push(Value::Object(object));
-        }
-
-        Ok(Value::Array(result))
+        Ok(raw_json)
     }
 
-    /// Execute a singular SQL query in the database, returning the number of
-    /// affected rows.
     async fn raw_count<'a>(
         &'a self,
         mut inputs: HashMap<String, PrismaValue>,
@@ -111,20 +83,19 @@ pub(crate) trait QueryExt: Queryable + Send + Sync {
         Ok(changes as usize)
     }
 
-    /// Select one row from the database.
     async fn find(&self, q: Select<'_>, meta: &[ColumnMetadata<'_>], ctx: &Context<'_>) -> crate::Result<SqlRow> {
         self.filter(q.limit(1).into(), meta, ctx)
             .await?
             .into_iter()
             .next()
-            .ok_or(SqlError::RecordDoesNotExist)
+            .ok_or(SqlError::RecordDoesNotExist {
+                cause: "Filter returned no results".to_owned(),
+            })
     }
 
-    /// Process the record filter and either return directly with precomputed values,
-    /// or fetch IDs from the database.
     async fn filter_selectors(
         &self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         ctx: &Context<'_>,
     ) -> crate::Result<Vec<SelectionResult>> {
@@ -135,21 +106,21 @@ pub(crate) trait QueryExt: Queryable + Send + Sync {
         }
     }
 
-    /// Read the all columns as a (primary) identifier.
     async fn filter_ids(
         &self,
-        model: &ModelRef,
+        model: &Model,
         filter: Filter,
         ctx: &Context<'_>,
     ) -> crate::Result<Vec<SelectionResult>> {
         let model_id: ModelProjection = model.primary_identifier().into();
         let id_cols: Vec<Column<'static>> = model_id.as_columns(ctx).collect();
+        let condition = FilterBuilder::without_top_level_joins().visit_filter(filter, ctx);
 
         let select = Select::from_table(model.as_table(ctx))
             .columns(id_cols)
             .append_trace(&Span::current())
-            .add_trace_id(ctx.trace_id)
-            .so_that(filter.aliased_condition_from(None, false, ctx));
+            .add_traceparent(ctx.traceparent)
+            .so_that(condition);
 
         self.select_ids(select, model_id, ctx).await
     }
@@ -185,4 +156,55 @@ pub(crate) trait QueryExt: Queryable + Send + Sync {
 
         Ok(result)
     }
+}
+
+/// An extension trait for Quaint's `Queryable`, offering certain Prisma-centric
+/// database operations on top of `Queryable`.
+#[async_trait]
+pub(crate) trait QueryExt {
+    /// Filter and map the resulting types with the given identifiers.
+    async fn filter(
+        &self,
+        q: Query<'_>,
+        idents: &[ColumnMetadata<'_>],
+        ctx: &Context<'_>,
+    ) -> crate::Result<Vec<SqlRow>>;
+
+    /// Execute a singular SQL query in the database, returning an arbitrary
+    /// JSON `Value` as a result.
+    async fn raw_json<'a>(
+        &'a self,
+        mut inputs: HashMap<String, PrismaValue>,
+    ) -> std::result::Result<RawJson, crate::error::RawError>;
+
+    /// Execute a singular SQL query in the database, returning the number of
+    /// affected rows.
+    async fn raw_count<'a>(
+        &'a self,
+        mut inputs: HashMap<String, PrismaValue>,
+        _features: psl::PreviewFeatures,
+    ) -> std::result::Result<usize, crate::error::RawError>;
+
+    /// Select one row from the database.
+    async fn find(&self, q: Select<'_>, meta: &[ColumnMetadata<'_>], ctx: &Context<'_>) -> crate::Result<SqlRow>;
+
+    /// Process the record filter and either return directly with precomputed values,
+    /// or fetch IDs from the database.
+    async fn filter_selectors(
+        &self,
+        model: &Model,
+        record_filter: RecordFilter,
+        ctx: &Context<'_>,
+    ) -> crate::Result<Vec<SelectionResult>>;
+
+    /// Read the all columns as a (primary) identifier.
+    async fn filter_ids(&self, model: &Model, filter: Filter, ctx: &Context<'_>)
+        -> crate::Result<Vec<SelectionResult>>;
+
+    async fn select_ids(
+        &self,
+        select: Select<'_>,
+        model_id: ModelProjection,
+        ctx: &Context<'_>,
+    ) -> crate::Result<Vec<SelectionResult>>;
 }

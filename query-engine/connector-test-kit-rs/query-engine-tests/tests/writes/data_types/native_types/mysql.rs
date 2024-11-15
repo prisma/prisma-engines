@@ -198,6 +198,35 @@ mod mysql {
         Ok(())
     }
 
+    fn schema_decimal_vitess() -> String {
+        let schema = indoc! {
+            r#"model Model {
+            #id(id, String, @id, @default(cuid()))
+            decLarge Decimal @test.Decimal(20, 10)
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(only(Vitess), schema(schema_decimal_vitess))]
+    async fn native_decimal_vitess_precision(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            createOneModel(
+              data: {
+                decLarge: "131603421.38724228"
+              }
+            ) {
+              decLarge
+            }
+          }"#),
+          @r###"{"data":{"createOneModel":{"decLarge":"131603421.38724228"}}}"###
+        );
+
+        Ok(())
+    }
+
     fn schema_string() -> String {
         let schema = indoc! {
             r#"model Model {

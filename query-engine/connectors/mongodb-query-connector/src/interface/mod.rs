@@ -12,8 +12,8 @@ use connector_interface::{
 };
 use futures::Future;
 use mongodb::Client;
-use prisma_models::prelude::*;
 use psl::Datasource;
+use query_structure::prelude::*;
 
 use crate::error::MongoError;
 
@@ -60,7 +60,7 @@ impl Connector for MongoDb {
     ) -> connector_interface::Result<Box<dyn connector_interface::Connection + Send + Sync>> {
         let session = self
             .client
-            .start_session(None)
+            .start_session()
             .await
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 

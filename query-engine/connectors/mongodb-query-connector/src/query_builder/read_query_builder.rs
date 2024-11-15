@@ -10,15 +10,13 @@ use crate::{
     root_queries::observing,
     vacuum_cursor, BsonTransform, IntoBson,
 };
-use connector_interface::{AggregationSelection, Filter, QueryArguments, RelAggregationSelection};
+use bson::{doc, Document};
+use connector_interface::AggregationSelection;
 use itertools::Itertools;
-use mongodb::{
-    bson::{doc, Document},
-    options::AggregateOptions,
-    ClientSession, Collection,
-};
-use prisma_models::{FieldSelection, ModelRef, ScalarFieldRef};
+use mongodb::{options::AggregateOptions, ClientSession, Collection};
+use query_structure::{FieldSelection, Filter, Model, QueryArguments, ScalarFieldRef, VirtualSelection};
 use std::convert::TryFrom;
+use std::future::IntoFuture;
 
 // Mongo Driver broke usage of the simple API, can't be used by us anymore.
 // As such the read query will always be based on aggregation pipeline
@@ -36,8 +34,12 @@ impl ReadQuery {
     ) -> crate::Result<Vec<Document>> {
         let opts = AggregateOptions::builder().allow_disk_use(true).build();
         let query_string_builder = Aggregate::new(&self.stages, on_collection.name());
-        let cursor = observing(Some(&query_string_builder), || {
-            on_collection.aggregate_with_session(self.stages.clone(), opts, with_session)
+        let cursor = observing(&query_string_builder, || {
+            on_collection
+                .aggregate(self.stages.clone())
+                .with_options(opts)
+                .session(&mut *with_session)
+                .into_future()
         })
         .await?;
 
@@ -48,7 +50,7 @@ impl ReadQuery {
 /// Translated query arguments ready to use in mongo find or aggregation queries.
 #[derive(Debug)]
 pub(crate) struct MongoReadQueryBuilder {
-    pub(crate) model: ModelRef,
+    pub(crate) model: Model,
 
     /// Pre-join, "normal" filters.
     pub(crate) query: Option<Document>,
@@ -102,7 +104,7 @@ pub(crate) struct MongoReadQueryBuilder {
 }
 
 impl MongoReadQueryBuilder {
-    pub fn new(model: ModelRef) -> Self {
+    pub fn new(model: Model) -> Self {
         Self {
             model,
             query: None,
@@ -355,13 +357,13 @@ impl MongoReadQueryBuilder {
     }
 
     /// Adds the necessary joins and the associated selections to the projection
-    pub fn with_aggregation_selections(
+    pub fn with_virtual_fields<'a>(
         mut self,
-        aggregation_selections: &[RelAggregationSelection],
+        virtual_selections: impl Iterator<Item = &'a VirtualSelection>,
     ) -> crate::Result<Self> {
-        for aggr in aggregation_selections {
+        for aggr in virtual_selections {
             let join = match aggr {
-                RelAggregationSelection::Count(rf, filter) => {
+                VirtualSelection::RelationCount(rf, filter) => {
                     let filter = filter
                         .as_ref()
                         .map(|f| MongoFilterVisitor::new(FilterPrefix::default(), false).visit(f.clone()))

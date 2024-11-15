@@ -36,6 +36,45 @@ fn dropping_a_table_with_rows_should_warn(api: TestApi) {
 }
 
 #[test_connector]
+fn dropping_a_table_with_rows_multi_file_should_warn(api: TestApi) {
+    let schema_a = r#"
+        model Cat {
+            id String @id @default(cuid())
+        }
+    "#;
+    let schema_b = r#"
+        model Dog {
+            id String @id @default(cuid())
+        }
+    "#;
+
+    api.schema_push_w_datasource_multi_file(&[("a.prisma", schema_a), ("b.prisma", schema_b)])
+        .send()
+        .assert_green();
+
+    api.query(
+        Insert::single_into(api.render_table_name("Cat"))
+            .value("id", "test")
+            .into(),
+    );
+    api.query(
+        Insert::single_into(api.render_table_name("Dog"))
+            .value("id", "test")
+            .into(),
+    );
+
+    let warn = format!(
+        "You are about to drop the `{}` table, which is not empty (1 rows).",
+        api.normalize_identifier("Dog")
+    );
+
+    api.schema_push_w_datasource_multi_file(&[("a.prisma", schema_a)])
+        .send()
+        .assert_warnings(&[warn.into()])
+        .assert_no_steps();
+}
+
+#[test_connector]
 fn dropping_a_column_with_non_null_values_should_warn(api: TestApi) {
     let dm = r#"
         model Test {
@@ -334,7 +373,7 @@ fn changing_a_column_from_optional_to_required_is_unexecutable(api: TestApi) {
     let insert = Insert::multi_into(api.render_table_name("Test"), ["id", "age"])
         .values(("a", 12))
         .values(("b", 22))
-        .values(("c", Value::Int32(None)));
+        .values(("c", ValueType::Int32(None)));
 
     api.query(insert.into());
 
@@ -756,10 +795,9 @@ fn set_default_current_timestamp_on_existing_column_works(api: TestApi) {
 
     api.schema_push_w_datasource(dm1).send().assert_green();
 
-    let insert = Insert::single_into(api.render_table_name("User")).value("id", 5).value(
-        "created_at",
-        Value::DateTime(Some("2020-06-15T14:50:00Z".parse().unwrap())),
-    );
+    let insert = Insert::single_into(api.render_table_name("User"))
+        .value("id", 5)
+        .value("created_at", Value::datetime("2020-06-15T14:50:00Z".parse().unwrap()));
     api.query(insert.into());
 
     let dm2 = r#"
