@@ -1,7 +1,7 @@
 use std::time::{Duration, Instant};
 
 use mongodb::{
-    error::{Result, TRANSIENT_TRANSACTION_ERROR, UNKNOWN_TRANSACTION_COMMIT_RESULT},
+    error::{CommandError, ErrorKind, Result, TRANSIENT_TRANSACTION_ERROR, UNKNOWN_TRANSACTION_COMMIT_RESULT},
     ClientSession,
 };
 
@@ -14,9 +14,15 @@ pub async fn commit_with_retry(session: &mut ClientSession) -> Result<()> {
     let timeout = Instant::now();
 
     while let Err(err) = session.commit_transaction().await {
-        if (err.contains_label(UNKNOWN_TRANSACTION_COMMIT_RESULT) || err.contains_label(TRANSIENT_TRANSACTION_ERROR))
-            && timeout.elapsed() < MAX_TX_TIMEOUT_COMMIT_RETRY_LIMIT
-        {
+        // For some reason, MongoDB adds `TRANSIENT_TRANSACTION_ERROR` to errors about aborted
+        // transactions. Since transaction will not become less aborted in the future, we handle
+        // this case separately.
+        let is_aborted = matches!(err.kind.as_ref(), ErrorKind::Command(CommandError { code: 251, .. }));
+        let is_in_unknown_state = err.contains_label(UNKNOWN_TRANSACTION_COMMIT_RESULT);
+        let is_transient = err.contains_label(TRANSIENT_TRANSACTION_ERROR);
+        let is_retryable = !is_aborted && (is_in_unknown_state || is_transient);
+
+        if is_retryable && timeout.elapsed() < MAX_TX_TIMEOUT_COMMIT_RETRY_LIMIT {
             tokio::time::sleep(TX_RETRY_BACKOFF).await;
             continue;
         } else {

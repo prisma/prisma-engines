@@ -8,19 +8,23 @@ use crate::{ast::Value, error::*};
 use serde_json::Map;
 use std::sync::Arc;
 
+use super::ColumnType;
+
 /// Encapsulates a set of results and their respective column names.
 #[derive(Debug, Default)]
 pub struct ResultSet {
     pub(crate) columns: Arc<Vec<String>>,
+    pub(crate) types: Vec<ColumnType>,
     pub(crate) rows: Vec<Vec<Value<'static>>>,
     pub(crate) last_insert_id: Option<u64>,
 }
 
 impl ResultSet {
     /// Creates a new instance, bound to the given column names and result rows.
-    pub fn new(names: Vec<String>, rows: Vec<Vec<Value<'static>>>) -> Self {
+    pub fn new(names: Vec<String>, types: Vec<ColumnType>, rows: Vec<Vec<Value<'static>>>) -> Self {
         Self {
             columns: Arc::new(names),
+            types,
             rows,
             last_insert_id: None,
         }
@@ -61,6 +65,7 @@ impl ResultSet {
         self.rows.get(index).map(|row| ResultRowRef {
             columns: Arc::clone(&self.columns),
             values: row,
+            types: self.types.clone(),
         })
     }
 
@@ -75,8 +80,13 @@ impl ResultSet {
     pub fn iter(&self) -> ResultSetIterator<'_> {
         ResultSetIterator {
             columns: self.columns.clone(),
+            types: self.types.clone(),
             internal_iterator: self.rows.iter(),
         }
+    }
+
+    pub fn types(&self) -> &[ColumnType] {
+        &self.types
     }
 }
 
@@ -87,6 +97,7 @@ impl IntoIterator for ResultSet {
     fn into_iter(self) -> Self::IntoIter {
         ResultSetIntoIterator {
             columns: self.columns,
+            types: self.types.clone(),
             internal_iterator: self.rows.into_iter(),
         }
     }
@@ -96,6 +107,7 @@ impl IntoIterator for ResultSet {
 /// Might become lazy one day.
 pub struct ResultSetIntoIterator {
     pub(crate) columns: Arc<Vec<String>>,
+    pub(crate) types: Vec<ColumnType>,
     pub(crate) internal_iterator: std::vec::IntoIter<Vec<Value<'static>>>,
 }
 
@@ -107,6 +119,7 @@ impl Iterator for ResultSetIntoIterator {
             Some(row) => Some(ResultRow {
                 columns: Arc::clone(&self.columns),
                 values: row,
+                types: self.types.clone(),
             }),
             None => None,
         }
@@ -115,6 +128,7 @@ impl Iterator for ResultSetIntoIterator {
 
 pub struct ResultSetIterator<'a> {
     pub(crate) columns: Arc<Vec<String>>,
+    pub(crate) types: Vec<ColumnType>,
     pub(crate) internal_iterator: std::slice::Iter<'a, Vec<Value<'static>>>,
 }
 
@@ -126,6 +140,7 @@ impl<'a> Iterator for ResultSetIterator<'a> {
             Some(row) => Some(ResultRowRef {
                 columns: Arc::clone(&self.columns),
                 values: row,
+                types: self.types.clone(),
             }),
             None => None,
         }

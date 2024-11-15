@@ -3,19 +3,19 @@ use crate::features::Feature;
 use crate::{opt::PrismaOpt, PrismaResult};
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
-use opentelemetry::trace::TraceContextExt;
+use opentelemetry::trace::{TraceContextExt, TraceId};
 use opentelemetry::{global, propagation::Extractor};
-use query_core::helpers::*;
-use query_core::telemetry::capturing::TxTraceExt;
-use query_core::{telemetry, ExtendedTransactionUserFacingError, TransactionOptions, TxId};
+use query_core::{ExtendedUserFacingError, TransactionOptions, TxId};
 use request_handlers::{dmmf, render_graphql_schema, RequestBody, RequestHandler};
 use serde::Serialize;
 use serde_json::json;
 use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
-use std::time::Instant;
-use tracing::{field, Instrument, Span};
+use std::time::{Duration, Instant};
+use telemetry::capturing::Capturer;
+use telemetry::helpers::TraceParent;
+use tracing::{Instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// Starts up the graphql query engine server
@@ -111,71 +111,22 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
     }
 
     let headers = req.headers();
-    let capture_settings = capture_settings(headers);
+    let tx_id = try_get_transaction_id(headers);
+    let (span, traceparent, ref capturer) =
+        setup_telemetry(info_span!("prisma:engine:query", user_facing = true), headers).await;
 
-    let tx_id = transaction_id(headers);
-    let tracing_cx = get_parent_span_context(headers);
+    let query_timeout = query_timeout(headers);
 
-    let span = if tx_id.is_none() {
-        let span = info_span!("prisma:engine", user_facing = true);
-        span.set_parent(tracing_cx);
-        span
-    } else {
-        Span::none()
-    };
-
-    let mut traceparent = traceparent(headers);
-    let mut trace_id = get_trace_id_from_traceparent(traceparent.as_deref());
-
-    if traceparent.is_none() {
-        // If telemetry needs to be captured, we use the span trace_id to correlate the logs happening
-        // during the different operations within a transaction. The trace_id is propagated in the
-        // traceparent header, but if it's not present, we need to synthetically create one for the
-        // transaction. This is needed, in case the client is interested in capturing logs and not
-        // traces, because:
-        //  - The client won't send a traceparent header
-        //  - A transaction initial span is created here (prisma:engine:itx_runner) and stored in the
-        //    ITXServer for that transaction
-        //  - When a query comes in, the graphql handler process it, but we need to tell the capturer
-        //    to start capturing logs, and for that we need a trace_id. There are two places were we
-        //    could get that information from:
-        //      - First, it's the traceparent, but the client didn't send it, because they are only
-        //      interested in logs.
-        //      - Second, it's the root span for the transaction, but it's not in scope but instead
-        //      stored in the ITXServer, in a different tokio task.
-        //
-        // For the above reasons, we need to create a trace_id that we can predict and use accross the
-        // different operations happening within a transaction. So we do it by converting the tx_id
-        // into a trace_id, leaning on the fact that the tx_id has more entropy, and there's no
-        // information loss.
-        if capture_settings.logs_enabled() && tx_id.is_some() {
-            let tx_id = tx_id.clone().unwrap();
-            traceparent = Some(tx_id.as_traceparent());
-            trace_id = tx_id.into_trace_id();
-        } else {
-            // this is the root span, and we are in a single operation.
-            traceparent = Some(get_trace_parent_from_span(&span));
-            trace_id = get_trace_id_from_span(&span);
-        }
-    }
-    let capture_config = telemetry::capturing::capturer(trace_id, capture_settings);
-
-    if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
-        capturer.start_capturing().await;
-    }
-
-    let body_start = req.into_body();
-    // block and buffer request until the request has completed
-    let full_body = hyper::body::to_bytes(body_start).await?;
-    let serialized_body = RequestBody::try_from_slice(full_body.as_ref(), cx.engine_protocol());
+    let buffer = hyper::body::to_bytes(req.into_body()).await?;
+    let request_body = RequestBody::try_from_slice(buffer.as_ref(), cx.engine_protocol());
 
     let work = async move {
-        match serialized_body {
+        match request_body {
             Ok(body) => {
                 let handler = RequestHandler::new(cx.executor(), cx.query_schema(), cx.engine_protocol());
                 let mut result = handler.handle(body, tx_id, traceparent).instrument(span).await;
 
-                if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+                if let telemetry::capturing::Capturer::Enabled(capturer) = capturer {
                     let telemetry = capturer.fetch_captures().await;
                     if let Some(telemetry) = telemetry {
                         result.set_extension("traces".to_owned(), json!(telemetry.traces));
@@ -202,7 +153,32 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
         }
     };
 
-    work.await
+    let query_timeout_fut = async {
+        match query_timeout {
+            Some(timeout) => tokio::time::sleep(timeout).await,
+            // Never return if timeout isn't set.
+            None => std::future::pending().await,
+        }
+    };
+
+    tokio::select! {
+        _ = query_timeout_fut => {
+            let captured_telemetry = if let telemetry::capturing::Capturer::Enabled(capturer) = capturer {
+                capturer.fetch_captures().await
+            } else {
+                None
+            };
+
+            // Note: this relies on the fact that client will rollback the transaction after the
+            // error. If the client continues using this transaction (and later commits it), data
+            // corruption might happen because some write queries (but not all of them) might be
+            // already executed by the database before the timeout is fired.
+            Ok(err_to_http_resp(query_core::CoreError::QueryTimeout, captured_telemetry))
+        }
+        result = work => {
+            result
+        }
+    }
 }
 
 /// Expose the GraphQL playground if enabled.
@@ -227,10 +203,7 @@ async fn metrics_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
     // block and buffer request until the request has completed
     let full_body = hyper::body::to_bytes(body_start).await?;
 
-    let global_labels: HashMap<String, String> = match serde_json::from_slice(full_body.as_ref()) {
-        Ok(map) => map,
-        Err(_e) => HashMap::new(),
-    };
+    let global_labels: HashMap<String, String> = serde_json::from_slice(full_body.as_ref()).unwrap_or_default();
 
     let response = if requested_json {
         let metrics = cx.metrics.to_json(global_labels);
@@ -281,46 +254,22 @@ async fn transaction_start_handler(cx: Arc<PrismaContext>, req: Request<Body>) -
 
     let body_start = req.into_body();
     let full_body = hyper::body::to_bytes(body_start).await?;
-    let mut tx_opts: TransactionOptions = serde_json::from_slice(full_body.as_ref()).unwrap();
-    let tx_id = tx_opts.with_new_transaction_id();
 
-    // This is the span we use to instrument the execution of a transaction. This span will be open
-    // during the tx execution, and held in the ITXServer for that transaction (see ITXServer])
-    let span = info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
+    let tx_opts = match serde_json::from_slice::<TransactionOptions>(full_body.as_ref()) {
+        Ok(opts) => opts.with_new_transaction_id(),
+        Err(_) => {
+            return Ok(Response::builder()
+                .status(StatusCode::BAD_REQUEST)
+                .body(Body::from("Invalid transaction options"))
+                .unwrap())
+        }
+    };
 
-    // If telemetry needs to be captured, we use the span trace_id to correlate the logs happening
-    // during the different operations within a transaction. The trace_id is propagated in the
-    // traceparent header, but if it's not present, we need to synthetically create one for the
-    // transaction. This is needed, in case the client is interested in capturing logs and not
-    // traces, because:
-    //  - The client won't send a traceparent header
-    //  - A transaction initial span is created here (prisma:engine:itx_runner) and stored in the
-    //    ITXServer for that transaction
-    //  - When a query comes in, the graphql handler process it, but we need to tell the capturer
-    //    to start capturing logs, and for that we need a trace_id. There are two places were we
-    //    could get that information from:
-    //      - First, it's the traceparent, but the client didn't send it, because they are only
-    //      interested in logs.
-    //      - Second, it's the root span for the transaction, but it's not in scope but instead
-    //      stored in the ITXServer, in a different tokio task.
-    //
-    // For the above reasons, we need to create a trace_id that we can predict and use accross the
-    // different operations happening within a transaction. So we do it by converting the tx_id
-    // into a trace_id, leaning on the fact that the tx_id has more entropy, and there's no
-    // information loss.
-    let capture_settings = capture_settings(&headers);
-    let traceparent = traceparent(&headers);
-    if traceparent.is_none() && capture_settings.logs_enabled() {
-        span.set_parent(tx_id.into_trace_context())
-    } else {
-        span.set_parent(get_parent_span_context(&headers))
-    }
-    let trace_id = span.context().span().span_context().trace_id();
-    let capture_config = telemetry::capturing::capturer(trace_id, capture_settings);
-
-    if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
-        capturer.start_capturing().await;
-    }
+    let (span, _traceparent, capturer) = setup_telemetry(
+        info_span!("prisma:engine:start_transaction", user_facing = true),
+        &headers,
+    )
+    .await;
 
     let result = cx
         .executor
@@ -328,12 +277,7 @@ async fn transaction_start_handler(cx: Arc<PrismaContext>, req: Request<Body>) -
         .instrument(span)
         .await;
 
-    let telemetry = if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
-        capturer.fetch_captures().await
-    } else {
-        None
-    };
-
+    let telemetry = capturer.try_fetch_captures().await;
     match result {
         Ok(tx_id) => {
             let result = if let Some(telemetry) = telemetry {
@@ -355,20 +299,15 @@ async fn transaction_commit_handler(
     req: Request<Body>,
     tx_id: TxId,
 ) -> Result<Response<Body>, hyper::Error> {
-    let capture_config = capture_config(req.headers(), tx_id.clone());
+    let (span, _traceparent, capturer) = setup_telemetry(
+        info_span!("prisma:engine:commit_transaction", user_facing = true),
+        req.headers(),
+    )
+    .await;
 
-    if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
-        capturer.start_capturing().await;
-    }
+    let result = cx.executor.commit_tx(tx_id).instrument(span).await;
 
-    let result = cx.executor.commit_tx(tx_id).await;
-
-    let telemetry = if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
-        capturer.fetch_captures().await
-    } else {
-        None
-    };
-
+    let telemetry = capturer.try_fetch_captures().await;
     match result {
         Ok(_) => Ok(empty_json_to_http_resp(telemetry)),
         Err(err) => Ok(err_to_http_resp(err, telemetry)),
@@ -380,20 +319,15 @@ async fn transaction_rollback_handler(
     req: Request<Body>,
     tx_id: TxId,
 ) -> Result<Response<Body>, hyper::Error> {
-    let capture_config = capture_config(req.headers(), tx_id.clone());
+    let (span, _traceparent, capturer) = setup_telemetry(
+        info_span!("prisma:engine:rollback_transaction", user_facing = true),
+        req.headers(),
+    )
+    .await;
 
-    if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
-        capturer.start_capturing().await;
-    }
+    let result = cx.executor.rollback_tx(tx_id).instrument(span).await;
 
-    let result = cx.executor.rollback_tx(tx_id).await;
-
-    let telemetry = if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
-        capturer.fetch_captures().await
-    } else {
-        None
-    };
-
+    let telemetry = capturer.try_fetch_captures().await;
     match result {
         Ok(_) => Ok(empty_json_to_http_resp(telemetry)),
         Err(err) => Ok(err_to_http_resp(err, telemetry)),
@@ -457,11 +391,13 @@ fn err_to_http_resp(
             query_core::TransactionError::Unknown { reason: _ } => StatusCode::INTERNAL_SERVER_ERROR,
         },
 
+        query_core::CoreError::QueryTimeout => StatusCode::REQUEST_TIMEOUT,
+
         // All other errors are treated as 500s, most of these paths should never be hit, only connector errors may occur.
         _ => StatusCode::INTERNAL_SERVER_ERROR,
     };
 
-    let mut err: ExtendedTransactionUserFacingError = err.into();
+    let mut err: ExtendedUserFacingError = err.into();
     if let Some(telemetry) = captured_telemetry {
         err.set_extension("traces".to_owned(), json!(telemetry.traces));
         err.set_extension("logs".to_owned(), json!(telemetry.logs));
@@ -470,57 +406,86 @@ fn err_to_http_resp(
     build_json_response(status, &err)
 }
 
-fn capture_config(headers: &HeaderMap, tx_id: TxId) -> telemetry::capturing::Capturer {
-    let capture_settings = capture_settings(headers);
-    let mut traceparent = traceparent(headers);
-
-    if traceparent.is_none() && capture_settings.is_enabled() {
-        traceparent = Some(tx_id.as_traceparent())
-    }
-
-    let trace_id = get_trace_id_from_traceparent(traceparent.as_deref());
-
-    telemetry::capturing::capturer(trace_id, capture_settings)
-}
-
-#[allow(clippy::bind_instead_of_map)]
-fn capture_settings(headers: &HeaderMap) -> telemetry::capturing::Settings {
-    const CAPTURE_TELEMETRY_HEADER: &str = "X-capture-telemetry";
-    let s = if let Some(hv) = headers.get(CAPTURE_TELEMETRY_HEADER) {
-        hv.to_str().unwrap_or("")
-    } else {
-        ""
+async fn setup_telemetry(span: Span, headers: &HeaderMap) -> (Span, Option<TraceParent>, Capturer) {
+    let capture_settings = {
+        let settings = headers
+            .get("X-capture-telemetry")
+            .and_then(|value| value.to_str().ok())
+            .unwrap_or_default();
+        telemetry::capturing::Settings::from(settings)
     };
 
-    telemetry::capturing::Settings::from(s)
+    // Parse parent trace_id and span_id from `traceparent` header and attach them to the current
+    // context. Internally, this relies on the fact that global text map propagator was installed that
+    // can handle `traceparent` header (for example, `TraceContextPropagator`).
+    let parent_context = {
+        let extractor = HeaderExtractor(headers);
+        let context = global::get_text_map_propagator(|propagator| propagator.extract(&extractor));
+        if context.span().span_context().is_valid() {
+            Some(context)
+        } else {
+            None
+        }
+    };
+
+    let traceparent = if let Some(parent_context) = parent_context {
+        let requester_traceparent = TraceParent::from_remote_context(&parent_context);
+        span.set_parent(parent_context);
+        requester_traceparent
+    } else if capture_settings.is_enabled() {
+        // If tracing is disabled on the client but capturing the logs is enabled, we construct an
+        // artificial traceparent. Although the span corresponding to this traceparent doesn't
+        // actually exist, it is okay because no spans will be returned to the client in this case
+        // anyway, so they don't have to be valid. The reason we need this is because capturing the
+        // logs requires a trace ID to correlate the events with. This is not the right design: it
+        // seems to be based on the wrong idea that trace ID uniquely identifies a request (which
+        // is not the case in reality), and it is prone to race conditions and losing spans and
+        // logs when there are multiple concurrent Prisma operations in a single trace. Ironically,
+        // this makes log capturing more reliable in the code path with the fake traceparent hack
+        // than when a real traceparent is present. The drawback is that the fake traceparent leaks
+        // to the query logs. We could of course add a custom flag to `TraceParent` to indicate
+        // that it is synthetic (we can't use the sampled trace flag for it as it would prevent it
+        // from being processed by the `SpanProcessor`) and check it when adding the traceparent
+        // comment if we wanted a quick fix for that, but this problem existed for as long as
+        // capturing was implemented, and the `DataProxyEngine` works around it by stripping the
+        // phony traceparent comments before emitting the logs on the `PrismaClient` instance. So
+        // instead, we will fix the root cause of the problem by reworking the capturer to collect
+        // all spans and events which have the `span` created above as an ancestor and not rely on
+        // trace IDs at all. This will happen in a follow-up PR as part of Tracing GA work.
+        let traceparent = {
+            #[allow(deprecated)]
+            TraceParent::new_random()
+        };
+        span.set_parent(traceparent.to_remote_context());
+        Some(traceparent)
+    } else {
+        None
+    };
+
+    let trace_id = traceparent
+        .as_ref()
+        .map(TraceParent::trace_id)
+        .unwrap_or(TraceId::INVALID);
+
+    let capturer = telemetry::capturing::capturer(trace_id, capture_settings);
+    capturer.try_start_capturing().await;
+
+    (span, traceparent, capturer)
 }
 
-fn traceparent(headers: &HeaderMap) -> Option<String> {
-    const TRACEPARENT_HEADER: &str = "traceparent";
-
-    let value = headers
-        .get(TRACEPARENT_HEADER)
-        .and_then(|h| h.to_str().ok())
-        .map(|s| s.to_owned());
-
-    let is_valid_traceparent = |s: &String| s.split_terminator('-').count() >= 4;
-
-    value.filter(is_valid_traceparent)
-}
-
-fn transaction_id(headers: &HeaderMap) -> Option<TxId> {
-    const TRANSACTION_ID_HEADER: &str = "X-transaction-id";
+fn try_get_transaction_id(headers: &HeaderMap) -> Option<TxId> {
     headers
-        .get(TRANSACTION_ID_HEADER)
+        .get("X-transaction-id")
         .and_then(|h| h.to_str().ok())
         .map(TxId::from)
 }
 
-/// If the client sends us a trace and span id, extracting a new context if the
-/// headers are set. If not, returns current context.
-fn get_parent_span_context(headers: &HeaderMap) -> opentelemetry::Context {
-    let extractor = HeaderExtractor(headers);
-    global::get_text_map_propagator(|propagator| propagator.extract(&extractor))
+fn query_timeout(headers: &HeaderMap) -> Option<Duration> {
+    headers
+        .get("X-query-timeout")
+        .and_then(|h| h.to_str().ok())
+        .and_then(|value| value.parse::<u64>().ok())
+        .map(Duration::from_millis)
 }
 
 fn build_json_response<T>(status_code: StatusCode, value: &T) -> Response<Body>

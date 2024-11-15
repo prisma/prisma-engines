@@ -355,7 +355,7 @@ mod create_many {
     // LibSQL & co are ignored because they don't support metrics
     #[connector_test(schema(schema_7), only(Sqlite("3")))]
     async fn create_many_by_shape_counter_1(runner: Runner) -> TestResult<()> {
-        use query_engine_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
+        use prisma_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
 
         // Generated queries:
         // INSERT INTO `main`.`Test` (`opt`, `req`) VALUES (null, ?), (?, ?) params=[1,2,2]
@@ -397,7 +397,7 @@ mod create_many {
     // LibSQL & co are ignored because they don't support metrics
     #[connector_test(schema(schema_7), only(Sqlite("3")))]
     async fn create_many_by_shape_counter_2(runner: Runner) -> TestResult<()> {
-        use query_engine_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
+        use prisma_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
 
         // Generated queries:
         // INSERT INTO `main`.`Test` ( `opt_default_static`, `req_default_static`, `opt`, `req` ) VALUES (?, ?, null, ?), (?, ?, null, ?), (?, ?, null, ?) params=[1,1,1,2,1,2,1,3,3]
@@ -436,7 +436,7 @@ mod create_many {
     // LibSQL & co are ignored because they don't support metrics
     #[connector_test(schema(schema_7), only(Sqlite("3")))]
     async fn create_many_by_shape_counter_3(runner: Runner) -> TestResult<()> {
-        use query_engine_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
+        use prisma_metrics::PRISMA_DATASOURCE_QUERIES_TOTAL;
 
         // Generated queries:
         // INSERT INTO `main`.`Test` ( `req_default_static`, `req`, `opt_default`, `opt_default_static` ) VALUES (?, ?, ?, ?) params=[1,6,3,1]

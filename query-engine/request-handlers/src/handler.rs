@@ -13,6 +13,7 @@ use query_core::{
 };
 use query_structure::{parse_datetime, stringify_datetime, PrismaValue};
 use std::{collections::HashMap, fmt, panic::AssertUnwindSafe, str::FromStr};
+use telemetry::helpers::TraceParent;
 
 type ArgsToResult = (HashMap<String, ArgumentValue>, IndexMap<String, Item>);
 
@@ -41,24 +42,34 @@ impl<'a> RequestHandler<'a> {
         }
     }
 
-    pub async fn handle(&self, body: RequestBody, tx_id: Option<TxId>, trace_id: Option<String>) -> PrismaResponse {
+    pub async fn handle(
+        &self,
+        body: RequestBody,
+        tx_id: Option<TxId>,
+        traceparent: Option<TraceParent>,
+    ) -> PrismaResponse {
         tracing::debug!("Incoming GraphQL query: {:?}", &body);
 
         match body.into_doc(self.query_schema) {
-            Ok(QueryDocument::Single(query)) => self.handle_single(query, tx_id, trace_id).await,
+            Ok(QueryDocument::Single(query)) => self.handle_single(query, tx_id, traceparent).await,
             Ok(QueryDocument::Multi(batch)) => match batch.compact(self.query_schema) {
                 BatchDocument::Multi(batch, transaction) => {
-                    self.handle_batch(batch, transaction, tx_id, trace_id).await
+                    self.handle_batch(batch, transaction, tx_id, traceparent).await
                 }
-                BatchDocument::Compact(compacted) => self.handle_compacted(compacted, tx_id, trace_id).await,
+                BatchDocument::Compact(compacted) => self.handle_compacted(compacted, tx_id, traceparent).await,
             },
 
             Err(err) => PrismaResponse::Single(GQLError::from_handler_error(err).into()),
         }
     }
 
-    async fn handle_single(&self, query: Operation, tx_id: Option<TxId>, trace_id: Option<String>) -> PrismaResponse {
-        let gql_response = match AssertUnwindSafe(self.handle_request(query, tx_id, trace_id))
+    async fn handle_single(
+        &self,
+        query: Operation,
+        tx_id: Option<TxId>,
+        traceparent: Option<TraceParent>,
+    ) -> PrismaResponse {
+        let gql_response = match AssertUnwindSafe(self.handle_request(query, tx_id, traceparent))
             .catch_unwind()
             .await
         {
@@ -75,14 +86,14 @@ impl<'a> RequestHandler<'a> {
         queries: Vec<Operation>,
         transaction: Option<BatchDocumentTransaction>,
         tx_id: Option<TxId>,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> PrismaResponse {
         match AssertUnwindSafe(self.executor.execute_all(
             tx_id,
             queries,
             transaction,
             self.query_schema.clone(),
-            trace_id,
+            traceparent,
             self.engine_protocol,
         ))
         .catch_unwind()
@@ -108,7 +119,7 @@ impl<'a> RequestHandler<'a> {
         &self,
         document: CompactedDocument,
         tx_id: Option<TxId>,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> PrismaResponse {
         let plural_name = document.plural_name();
         let singular_name = document.single_name();
@@ -117,7 +128,7 @@ impl<'a> RequestHandler<'a> {
         let arguments = document.arguments;
         let nested_selection = document.nested_selection;
 
-        match AssertUnwindSafe(self.handle_request(document.operation, tx_id, trace_id))
+        match AssertUnwindSafe(self.handle_request(document.operation, tx_id, traceparent))
             .catch_unwind()
             .await
         {
@@ -200,14 +211,14 @@ impl<'a> RequestHandler<'a> {
         &self,
         query_doc: Operation,
         tx_id: Option<TxId>,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> query_core::Result<ResponseData> {
         self.executor
             .execute(
                 tx_id,
                 query_doc,
                 self.query_schema.clone(),
-                trace_id,
+                traceparent,
                 self.engine_protocol,
             )
             .await
@@ -224,20 +235,29 @@ impl<'a> RequestHandler<'a> {
     }
 
     fn compare_args(left: &HashMap<String, ArgumentValue>, right: &HashMap<String, ArgumentValue>) -> bool {
-        left.iter().all(|(key, left_value)| {
-            right
+        let (large, small) = if left.len() > right.len() {
+            (&left, &right)
+        } else {
+            (&right, &left)
+        };
+
+        small.iter().all(|(key, small_value)| {
+            large
                 .get(key)
-                .map_or(false, |right_value| Self::compare_values(left_value, right_value))
+                .map_or(false, |large_value| Self::compare_values(small_value, large_value))
         })
     }
 
     /// Compares two PrismaValues with special comparisons rules needed because user-inputted values are coerced differently than response values.
+    ///
     /// We need this when comparing user-inputted values with query response values in the context of compacted queries.
+    ///
     /// Here are the cases covered:
     /// - DateTime/String: User-input: DateTime / Response: String
     /// - Int/BigInt: User-input: Int / Response: BigInt
     /// - (JSON protocol only) Custom types (eg: { "$type": "BigInt", value: "1" }): User-input: Scalar / Response: Object
     /// - (JSON protocol only) String/Enum: User-input: String / Response: Enum
+    ///
     /// This should likely _not_ be used outside of this specific context.
     fn compare_values(left: &ArgumentValue, right: &ArgumentValue) -> bool {
         match (left, right) {

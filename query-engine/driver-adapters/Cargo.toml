@@ -10,21 +10,20 @@ postgresql = ["quaint/postgresql"]
 
 [dependencies]
 async-trait.workspace = true
+futures.workspace = true
 once_cell = "1.15"
+prisma-metrics.path = "../../libs/metrics"
 serde.workspace = true
 serde_json.workspace = true
 tracing.workspace = true
 tracing-core = "0.1"
-metrics = "0.18"
 uuid.workspace = true
-pin-project = "1"
+pin-project.workspace = true
 serde_repr.workspace = true
-
-futures = "0.3"
 
 [dev-dependencies]
 expect-test = "1"
-tokio = { version = "1.0", features = ["macros", "time", "sync"] }
+tokio = { version = "1", features = ["macros", "time", "sync"] }
 wasm-rs-dbg.workspace = true
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]

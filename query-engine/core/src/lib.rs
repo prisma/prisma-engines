@@ -10,13 +10,11 @@ pub mod query_document;
 pub mod query_graph_builder;
 pub mod relation_load_strategy;
 pub mod response_ir;
-pub mod telemetry;
 
-pub use self::telemetry::*;
 pub use self::{
-    error::{CoreError, FieldConversionError},
+    error::{CoreError, ExtendedUserFacingError, FieldConversionError},
     executor::{QueryExecutor, TransactionOptions},
-    interactive_transactions::{ExtendedTransactionUserFacingError, TransactionError, TxId},
+    interactive_transactions::{TransactionError, TxId},
     query_document::*,
 };
 
@@ -28,6 +26,7 @@ pub use connector::{
 mod error;
 mod interactive_transactions;
 mod interpreter;
+mod metrics;
 mod query_ast;
 mod query_graph;
 mod result_ast;

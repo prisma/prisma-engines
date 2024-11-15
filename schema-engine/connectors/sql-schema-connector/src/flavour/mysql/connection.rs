@@ -7,7 +7,7 @@ use quaint::{
         mysql_async::{self as my, prelude::Query},
         MysqlUrl,
     },
-    prelude::{ConnectionInfo, NativeConnectionInfo, Queryable},
+    prelude::{ColumnType, ConnectionInfo, NativeConnectionInfo, Queryable},
 };
 use schema_connector::{ConnectorError, ConnectorResult};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema};
@@ -113,6 +113,30 @@ impl Connection {
     ) -> ConnectorResult<quaint::prelude::ResultSet> {
         tracing::debug!(query_type = "query_raw", sql, ?params);
         self.0.query_raw(sql, params).await.map_err(quaint_err(url))
+    }
+
+    pub(super) async fn describe_query(
+        &self,
+        sql: &str,
+        url: &MysqlUrl,
+        circumstances: BitFlags<super::Circumstances>,
+    ) -> ConnectorResult<quaint::connector::DescribedQuery> {
+        tracing::debug!(query_type = "describe_query", sql);
+        let mut parsed = self.0.describe_query(sql).await.map_err(quaint_err(url))?;
+
+        if circumstances.contains(super::Circumstances::IsMysql56)
+            || circumstances.contains(super::Circumstances::IsMysql57)
+        {
+            parsed.parameters = parsed
+                .parameters
+                .into_iter()
+                .map(|p| p.set_typ(ColumnType::Unknown))
+                .collect();
+
+            return Ok(parsed);
+        }
+
+        Ok(parsed)
     }
 
     pub(super) async fn apply_migration_script(

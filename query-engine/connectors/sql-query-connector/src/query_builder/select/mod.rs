@@ -654,11 +654,7 @@ fn extract_filter_scalars(f: &Filter) -> Vec<ScalarFieldRef> {
 }
 
 fn join_fields(rf: &RelationField) -> Vec<ScalarFieldRef> {
-    if rf.is_inlined_on_enclosing_model() {
-        rf.scalar_fields()
-    } else {
-        rf.related_field().referenced_fields()
-    }
+    rf.linking_fields().as_scalar_fields().unwrap_or_default()
 }
 
 fn join_alias_name(rf: &RelationField) -> String {

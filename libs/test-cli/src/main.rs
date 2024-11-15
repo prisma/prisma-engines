@@ -4,6 +4,7 @@ mod diagnose_migration_history;
 
 use anyhow::Context;
 use colored::Colorize;
+use psl::parse_configuration;
 use schema_connector::BoxFuture;
 use schema_core::json_rpc::types::*;
 use std::{fmt, fs::File, io::Read, str::FromStr, sync::Arc};
@@ -23,6 +24,17 @@ enum Command {
         /// How many layers of composite types we introspect before switching to Json.
         #[structopt(long)]
         composite_type_depth: Option<isize>,
+    },
+    /// Parse SQL queries and returns type information.
+    IntrospectSql {
+        /// URL of the database to introspect.
+        #[structopt(long)]
+        url: Option<String>,
+        /// Path to the schema file to introspect for.
+        #[structopt(long = "file-path")]
+        file_path: Option<String>,
+        /// The SQL query to introspect.
+        query_file_path: String,
     },
     /// Generate DMMF from a schema, or directly from a database URL.
     Dmmf(DmmfCommand),
@@ -184,25 +196,38 @@ async fn main() -> anyhow::Result<()> {
         Command::Dmmf(cmd) => generate_dmmf(&cmd).await?,
         Command::SchemaPush(cmd) => schema_push(&cmd).await?,
         Command::MigrateDiff(cmd) => migrate_diff(&cmd).await?,
+        Command::IntrospectSql {
+            url,
+            file_path,
+            query_file_path,
+        } => {
+            let schema = schema_from_args(url.as_deref(), file_path.as_deref())?;
+            let config = parse_configuration(&schema).unwrap();
+            let api = schema_core::schema_api(Some(schema.clone()), None)?;
+            let query_str = std::fs::read_to_string(query_file_path)?;
+
+            let res = api
+                .introspect_sql(IntrospectSqlParams {
+                    url: config
+                        .first_datasource()
+                        .load_url(|key| std::env::var(key).ok())
+                        .unwrap(),
+                    queries: vec![SqlQueryInput {
+                        name: "query".to_string(),
+                        source: query_str,
+                    }],
+                })
+                .await
+                .map_err(|err| anyhow::anyhow!("{err:?}"))?;
+
+            println!("{}", serde_json::to_string_pretty(&res).unwrap());
+        }
         Command::Introspect {
             url,
             file_path,
             composite_type_depth,
         } => {
-            if url.as_ref().xor(file_path.as_ref()).is_none() {
-                anyhow::bail!(
-                    "{}",
-                    "Exactly one of --url or --file-path must be provided".bold().red()
-                );
-            }
-
-            let schema = if let Some(file_path) = &file_path {
-                read_datamodel_from_file(file_path)?
-            } else if let Some(url) = &url {
-                minimal_schema_from_url(url)?
-            } else {
-                unreachable!()
-            };
+            let schema = schema_from_args(url.as_deref(), file_path.as_deref())?;
 
             let base_directory_path = file_path
                 .as_ref()
@@ -290,6 +315,20 @@ async fn main() -> anyhow::Result<()> {
     }
 
     Ok(())
+}
+
+fn schema_from_args(url: Option<&str>, file_path: Option<&str>) -> anyhow::Result<String> {
+    if let Some(url) = url {
+        let schema = minimal_schema_from_url(url)?;
+
+        Ok(schema)
+    } else if let Some(file_path) = file_path {
+        let schema = read_datamodel_from_file(file_path)?;
+
+        Ok(schema)
+    } else {
+        anyhow::bail!("Please provide one of --url or --file-path")
+    }
 }
 
 fn read_datamodel_from_file(path: &str) -> std::io::Result<String> {

@@ -8,6 +8,7 @@ thiserror = "1"
 url.workspace = true
 query-connector = { path = "../../query-engine/connectors/query-connector" }
 query-core = { path = "../../query-engine/core" }
+telemetry = { path = "../telemetry" }
 user-facing-errors = { path = "../user-facing-errors" }
 serde_json.workspace = true
 serde.workspace = true
@@ -16,12 +17,12 @@ psl.workspace = true
 async-trait.workspace = true
 tracing.workspace = true
 tracing-subscriber = { version = "0.3" }
-tracing-futures = "0.2"
+tracing-futures.workspace = true
 tracing-opentelemetry = "0.17.3"
 opentelemetry = { version = "0.17" }
 
 [target.'cfg(all(not(target_arch = "wasm32")))'.dependencies]
-query-engine-metrics = { path = "../../query-engine/metrics" }
+prisma-metrics.path = "../metrics"
 napi.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]

@@ -1,5 +1,5 @@
 use crate::filter::MongoFilter;
-use mongodb::bson::{doc, Document};
+use bson::{doc, Document};
 use query_structure::{walkers, RelationFieldRef, ScalarFieldRef};
 
 /// A join stage describes a tree of joins and nested joins to be performed on a collection.

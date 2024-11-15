@@ -16,8 +16,8 @@ use mongodb::{
     ClientSession, Collection, Database,
 };
 use query_structure::{Model, PrismaValue, SelectionResult};
+use std::future::IntoFuture;
 use std::{collections::HashMap, convert::TryInto};
-use tracing::{info_span, Instrument};
 use update::IntoUpdateDocumentExtension;
 
 /// Create a single record to the database resulting in a
@@ -29,12 +29,6 @@ pub async fn create_record<'conn>(
     mut args: WriteArgs,
 ) -> crate::Result<SingleRecord> {
     let coll = database.collection::<Document>(model.db_name());
-
-    let span = info_span!(
-        "prisma:engine:db_query",
-        user_facing = true,
-        "db.statement" = &format_args!("db.{}.insertOne(*)", coll.name())
-    );
 
     let id_field = pick_singular_id(model);
 
@@ -65,9 +59,7 @@ pub async fn create_record<'conn>(
     }
 
     let query_builder = InsertOne::new(&doc, coll.name());
-    let insert_result = observing(&query_builder, || coll.insert_one_with_session(&doc, None, session))
-        .instrument(span)
-        .await?;
+    let insert_result = observing(&query_builder, || coll.insert_one(&doc).session(session).into_future()).await?;
     let id_value = value_from_bson(insert_result.inserted_id, &id_meta)?;
 
     Ok(SingleRecord {
@@ -84,12 +76,6 @@ pub async fn create_records<'conn>(
     skip_duplicates: bool,
 ) -> crate::Result<usize> {
     let coll = database.collection::<Document>(model.db_name());
-
-    let span = info_span!(
-        "prisma:engine:db_query",
-        user_facing = true,
-        "db.statement" = &format_args!("db.{}.insertMany(*)", coll.name())
-    );
 
     let num_records = args.len();
     let fields: Vec<_> = model.fields().non_relational();
@@ -123,14 +109,25 @@ pub async fn create_records<'conn>(
     let query_string_builder = InsertMany::new(&docs, coll.name(), ordered);
     let docs_iter = docs.iter();
     let insert = observing(&query_string_builder, || {
-        coll.insert_many_with_session(docs_iter, options, session)
-    })
-    .instrument(span);
+        coll.insert_many(docs_iter)
+            .with_options(options)
+            .session(session)
+            .into_future()
+    });
 
     match insert.await {
         Ok(insert_result) => Ok(insert_result.inserted_ids.len()),
         Err(err) if skip_duplicates => match err.kind.as_ref() {
-            ErrorKind::BulkWrite(ref failure) => match failure.write_errors {
+            ErrorKind::BulkWrite(ref failure) => {
+                let errs = &failure.write_errors;
+                if !errs.iter().any(|(_, err)| err.code != 11000) {
+                    Ok(num_records - errs.len())
+                } else {
+                    Err(err.into())
+                }
+            }
+
+            ErrorKind::InsertMany(ref failure) => match failure.write_errors {
                 Some(ref errs) if !errs.iter().any(|err| err.code != 11000) => Ok(num_records - errs.len()),
                 _ => Err(err.into()),
             },
@@ -171,18 +168,12 @@ pub async fn update_records<'conn>(
             .collect::<crate::Result<Vec<_>>>()?
     } else {
         let filter = MongoFilterVisitor::new(FilterPrefix::default(), false).visit(record_filter.filter)?;
-        find_ids(database, coll.clone(), session, model, filter).await?
+        find_ids(coll.clone(), session, model, filter).await?
     };
 
     if ids.is_empty() {
         return Ok(vec![]);
     }
-
-    let span = info_span!(
-        "prisma:engine:db_query",
-        user_facing = true,
-        "db.statement" = &format_args!("db.{}.updateMany(*)", coll.name())
-    );
 
     let filter = doc! { id_field.db_name(): { "$in": ids.clone() } };
     let fields: Vec<_> = model
@@ -205,9 +196,10 @@ pub async fn update_records<'conn>(
     if !update_docs.is_empty() {
         let query_string_builder = UpdateMany::new(&filter, &update_docs, coll.name());
         let res = observing(&query_string_builder, || {
-            coll.update_many_with_session(filter.clone(), update_docs.clone(), None, session)
+            coll.update_many(filter.clone(), update_docs.clone())
+                .session(session)
+                .into_future()
         })
-        .instrument(span)
         .await?;
 
         // It's important we check the `matched_count` and not the `modified_count` here.
@@ -251,25 +243,18 @@ pub async fn delete_records<'conn>(
             .collect::<crate::Result<Vec<_>>>()?
     } else {
         let filter = MongoFilterVisitor::new(FilterPrefix::default(), false).visit(record_filter.filter)?;
-        find_ids(database, coll.clone(), session, model, filter).await?
+        find_ids(coll.clone(), session, model, filter).await?
     };
 
     if ids.is_empty() {
         return Ok(0);
     }
 
-    let span = info_span!(
-        "prisma:engine:db_query",
-        user_facing = true,
-        "db.statement" = &format_args!("db.{}.deleteMany(*)", coll.name())
-    );
-
     let filter = doc! { id_field.db_name(): { "$in": ids } };
     let query_string_builder = DeleteMany::new(&filter, coll.name());
     let delete_result = observing(&query_string_builder, || {
-        coll.delete_many_with_session(filter.clone(), None, session)
+        coll.delete_many(filter.clone()).session(session).into_future()
     })
-    .instrument(span)
     .await?;
 
     Ok(delete_result.deleted_count as usize)
@@ -297,16 +282,10 @@ pub async fn delete_record<'conn>(
         "$expr": filter,
     };
 
-    let span = info_span!(
-        "prisma:engine:db_query",
-        user_facing = true,
-        "db.statement" = &format_args!("db.{}.findAndModify(*)", coll.name())
-    );
     let query_string_builder = DeleteOne::new(&filter, coll.name());
     let document = observing(&query_string_builder, || {
-        coll.find_one_and_delete_with_session(filter.clone(), None, session)
+        coll.find_one_and_delete(filter.clone()).session(session).into_future()
     })
-    .instrument(span)
     .await?
     .ok_or(MongoError::RecordDoesNotExist {
         cause: "Record to delete does not exist.".to_owned(),
@@ -320,20 +299,11 @@ pub async fn delete_record<'conn>(
 
 /// Retrives document ids based on the given filter.
 async fn find_ids(
-    database: &Database,
     collection: Collection<Document>,
     session: &mut ClientSession,
     model: &Model,
     filter: MongoFilter,
 ) -> crate::Result<Vec<Bson>> {
-    let coll = database.collection::<Document>(model.db_name());
-
-    let span = info_span!(
-        "prisma:engine:db_query",
-        user_facing = true,
-        "db.statement" = &format_args!("db.{}.findMany(*)", coll.name())
-    );
-
     let id_field = model.primary_identifier();
     let mut builder = MongoReadQueryBuilder::new(model.clone());
 
@@ -348,7 +318,7 @@ async fn find_ids(
 
     let builder = builder.with_model_projection(id_field)?;
     let query = builder.build()?;
-    let docs = query.execute(collection, session).instrument(span).await?;
+    let docs = query.execute(collection, session).await?;
     let ids = docs.into_iter().map(|mut doc| doc.remove("_id").unwrap()).collect();
 
     Ok(ids)
@@ -394,7 +364,10 @@ pub async fn m2m_connect<'conn>(
     let query_string_builder = UpdateOne::new(&parent_filter, &parent_update, parent_coll.name());
 
     observing(&query_string_builder, || {
-        parent_coll.update_one_with_session(parent_filter.clone(), parent_update.clone(), None, session)
+        parent_coll
+            .update_one(parent_filter.clone(), parent_update.clone())
+            .session(&mut *session)
+            .into_future()
     })
     .await?;
 
@@ -415,7 +388,10 @@ pub async fn m2m_connect<'conn>(
     let child_updates = vec![child_update.clone()];
     let query_string_builder = UpdateMany::new(&child_filter, &child_updates, child_coll.name());
     observing(&query_string_builder, || {
-        child_coll.update_many_with_session(child_filter.clone(), child_update.clone(), None, session)
+        child_coll
+            .update_many(child_filter.clone(), child_update.clone())
+            .session(&mut *session)
+            .into_future()
     })
     .await?;
 
@@ -460,7 +436,10 @@ pub async fn m2m_disconnect<'conn>(
     // First update the parent and remove all child IDs to the m:n scalar field.
     let query_string_builder = UpdateOne::new(&parent_filter, &parent_update, parent_coll.name());
     observing(&query_string_builder, || {
-        parent_coll.update_one_with_session(parent_filter.clone(), parent_update.clone(), None, session)
+        parent_coll
+            .update_one(parent_filter.clone(), parent_update.clone())
+            .session(&mut *session)
+            .into_future()
     })
     .await?;
 
@@ -482,7 +461,10 @@ pub async fn m2m_disconnect<'conn>(
     let child_updates = vec![child_update.clone()];
     let query_string_builder = UpdateMany::new(&child_filter, &child_updates, child_coll.name());
     observing(&query_string_builder, || {
-        child_coll.update_many_with_session(child_filter.clone(), child_update, None, session)
+        child_coll
+            .update_many(child_filter.clone(), child_update)
+            .session(session)
+            .into_future()
     })
     .await?;
 
@@ -506,13 +488,6 @@ pub async fn query_raw<'conn>(
     inputs: HashMap<String, PrismaValue>,
     query_type: Option<String>,
 ) -> crate::Result<RawJson> {
-    let db_statement = get_raw_db_statement(&query_type, &model, database);
-    let span = info_span!(
-        "prisma:engine:db_query",
-        user_facing = true,
-        "db.statement" = &&db_statement.as_str()
-    );
-
     let mongo_command = MongoCommand::from_raw_query(model, inputs, query_type)?;
 
     async {
@@ -520,7 +495,7 @@ pub async fn query_raw<'conn>(
             MongoCommand::Raw { cmd } => {
                 let query_string_builder = RunCommand::new(&cmd);
                 let mut result = observing(&query_string_builder, || {
-                    database.run_command_with_session(cmd.clone(), None, session)
+                    database.run_command(cmd.clone()).session(session).into_future()
                 })
                 .await?;
 
@@ -547,7 +522,10 @@ pub async fn query_raw<'conn>(
                             .unwrap_or_default();
                         let query_string_builder = Find::new(&unwrapped_filter, &projection, coll.name());
                         let cursor = observing(&query_string_builder, || {
-                            coll.find_with_session(filter, options, session)
+                            coll.find(filter.unwrap_or_default())
+                                .with_options(options)
+                                .session(&mut *session)
+                                .into_future()
                         })
                         .await?;
 
@@ -556,7 +534,10 @@ pub async fn query_raw<'conn>(
                     MongoOperation::Aggregate(pipeline, options) => {
                         let query_string_builder = Aggregate::new(&pipeline, coll.name());
                         let cursor = observing(&query_string_builder, || {
-                            coll.aggregate_with_session(pipeline.clone(), options, session)
+                            coll.aggregate(pipeline.clone())
+                                .with_options(options)
+                                .session(&mut *session)
+                                .into_future()
                         })
                         .await?;
 
@@ -568,17 +549,5 @@ pub async fn query_raw<'conn>(
 
         Ok(RawJson::try_new(json_result)?)
     }
-    .instrument(span)
     .await
-}
-
-fn get_raw_db_statement(query_type: &Option<String>, model: &Option<&Model>, database: &Database) -> String {
-    match (query_type.as_deref(), model) {
-        (Some("findRaw"), Some(m)) => format!("db.{}.findRaw(*)", database.collection::<Document>(m.db_name()).name()),
-        (Some("aggregateRaw"), Some(m)) => format!(
-            "db.{}.aggregateRaw(*)",
-            database.collection::<Document>(m.db_name()).name()
-        ),
-        _ => "db.runCommandRaw(*)".to_string(),
-    }
 }

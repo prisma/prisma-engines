@@ -254,12 +254,12 @@ mod scalar_list {
               "types": [
                 "int",
                 "string-array",
-                "unknown-array",
-                "unknown-array",
-                "unknown-array",
-                "unknown-array",
-                "unknown-array",
-                "unknown-array"
+                "int-array",
+                "bigint-array",
+                "double-array",
+                "bytes-array",
+                "bool-array",
+                "datetime-array"
               ],
               "rows": [
                 [
@@ -332,13 +332,13 @@ mod scalar_list {
               ],
               "types": [
                 "int",
-                "unknown-array",
-                "unknown-array",
-                "unknown-array",
-                "unknown-array",
-                "unknown-array",
-                "unknown-array",
-                "unknown-array"
+                "string-array",
+                "int-array",
+                "bigint-array",
+                "double-array",
+                "bytes-array",
+                "bool-array",
+                "datetime-array"
               ],
               "rows": [
                 [

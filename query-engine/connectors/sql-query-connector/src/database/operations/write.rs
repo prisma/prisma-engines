@@ -18,7 +18,6 @@ use std::borrow::Cow;
 use std::{
     collections::{HashMap, HashSet},
     ops::Deref,
-    usize,
 };
 use user_facing_errors::query_engine::DatabaseConstraint;
 
@@ -73,7 +72,7 @@ async fn generate_id(
 
     // db generate values only if needed
     if need_select {
-        let pk_select = id_select.add_trace_id(ctx.trace_id);
+        let pk_select = id_select.add_traceparent(ctx.traceparent);
         let pk_result = conn.query(pk_select.into()).await?;
         let result = try_convert(&(id_field.into()), pk_result)?;
 

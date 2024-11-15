@@ -7,23 +7,22 @@ version = "0.1.0"
 anyhow = "1.0"
 async-trait.workspace = true
 bigdecimal = "0.3"
-# bson = {version = "1.1.0", features = ["decimal128"]}
-futures = "0.3"
+futures.workspace = true
 itertools.workspace = true
-mongodb = "2.8.0"
-bson = { version = "2.4.0", features = ["chrono-0_4", "uuid-1"] }
+mongodb.workspace = true
+bson.workspace = true
 rand.workspace = true
-regex = "1"
+regex.workspace = true
 serde_json.workspace = true
 thiserror = "1.0"
 tokio.workspace = true
 tracing.workspace = true
-tracing-futures = "0.2"
+tracing-futures.workspace = true
 uuid.workspace = true
 indexmap.workspace = true
-query-engine-metrics = { path = "../../metrics" }
+prisma-metrics.path = "../../../libs/metrics"
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
-derive_more = "0.99.17"
+derive_more.workspace = true
 
 [dependencies.query-structure]
 path = "../../query-structure"
@@ -37,6 +36,9 @@ path = "../query-connector"
 
 [dependencies.prisma-value]
 path = "../../../libs/prisma-value"
+
+[dependencies.telemetry]
+path = "../../../libs/telemetry"
 
 [dependencies.chrono]
 features = ["serde"]

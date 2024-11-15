@@ -13,7 +13,7 @@ use crate::AdapterResult;
 /// - Automatically unrefs the function so it won't hold off event loop
 /// - Awaits for returned Promise
 /// - Unpacks JS `Result` type into Rust `Result` type and converts the error
-/// into `quaint::Error`.
+///   into `quaint::Error`.
 /// - Catches panics and converts them to `quaint:Error`
 pub(crate) struct AdapterMethod<ArgType, ReturnType>
 where
@@ -77,5 +77,26 @@ where
         let env = Env::from_raw(napi_env);
         let threadsafe_fn = ThreadsafeFunction::from_napi_value(napi_env, napi_val)?;
         Self::from_threadsafe_function(threadsafe_fn, env)
+    }
+}
+
+impl<ArgType, ReturnType> ValidateNapiValue for AdapterMethod<ArgType, ReturnType>
+where
+    ArgType: ToNapiValue + 'static,
+    ReturnType: FromNapiValue + 'static,
+{
+}
+
+impl<ArgType, ReturnType> TypeName for AdapterMethod<ArgType, ReturnType>
+where
+    ArgType: ToNapiValue + 'static,
+    ReturnType: FromNapiValue + 'static,
+{
+    fn type_name() -> &'static str {
+        "AdapterMethod"
+    }
+
+    fn value_type() -> ValueType {
+        ValueType::Function
     }
 }
