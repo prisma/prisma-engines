@@ -47,7 +47,9 @@
           "type": "String",
           "default": {
             "name": "cuid",
-            "args": []
+            "args": [
+              2
+            ]
           },
           "isGenerated": false,
           "isUpdatedAt": false

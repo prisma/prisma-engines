@@ -183,11 +183,19 @@ impl ValueGenerator {
     }
 
     pub fn new_cuid(version: u8) -> Self {
-        ValueGenerator::new(format!("cuid({version})"), vec![]).unwrap()
+        ValueGenerator::new(
+            format!("cuid"),
+            vec![(Some(format!("{version}")), PrismaValue::Int(version as i64))],
+        )
+        .unwrap()
     }
 
     pub fn new_uuid(version: u8) -> Self {
-        ValueGenerator::new(format!("uuid({version})"), vec![]).unwrap()
+        ValueGenerator::new(
+            format!("uuid"),
+            vec![(Some(format!("{version}")), PrismaValue::Int(version as i64))],
+        )
+        .unwrap()
     }
 
     pub fn new_nanoid(length: Option<u8>) -> Self {
