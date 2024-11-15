@@ -370,6 +370,7 @@ mod tests {
         assert!(!cuid_default.is_now());
     }
 
+    #[test]
     fn default_value_is_cuidv2() {
         let cuid_default = DefaultValue::new_expression(ValueGenerator::new_cuid(2));
 
