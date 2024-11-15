@@ -21,7 +21,7 @@ serde_json.workspace = true
 thiserror = "1.0"
 tokio = { version = "1.0", features = ["macros", "time"] }
 tracing = { workspace = true, features = ["attributes"] }
-tracing-futures = "0.2"
+tracing-futures.workspace = true
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-opentelemetry = "0.17.4"
 uuid.workspace = true
