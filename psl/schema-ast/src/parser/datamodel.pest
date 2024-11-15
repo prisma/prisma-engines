@@ -131,7 +131,7 @@ doc_content = @{ (!NEWLINE ~ ANY)* }
 // shared building blocks
 // ######################################
 unicode_alphanumeric = { LETTER | ASCII_DIGIT }
-identifier = @{ character ~ ( "_" | "-" | character)* }
+identifier = @{ unicode_alphanumeric ~ ( "_" | "-" | unicode_alphanumeric)* }
 path = @{ identifier ~ ("." ~ path?)* }
 
 
