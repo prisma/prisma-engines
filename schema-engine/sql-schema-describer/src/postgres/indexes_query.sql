@@ -1,26 +1,66 @@
 WITH rawindex AS (
     SELECT
+        tableinfo.oid,
+        schemainfo.nspname AS namespace,
+	    indexinfo.relname AS index_name,
+	    tableinfo.relname AS table_name,
         indrelid, 
         indexrelid,
         indisunique,
         indisprimary,
-        indnkeyatts,
-        indnatts,
+        -- `indnkeyatts` was introduced in Postgres 11.
+        -- It's the number of key columns in the index, not counting any included columns
+        CASE
+        	WHEN has_indnkeyatts
+        	THEN indnkeyatts::text::int2
+        	ELSE tableinfo.relnatts
+        END AS indnkeyatts,
+        -- `indnatts` was introduced in Postgres 11.
+        -- It's the total number of columns in the index
+        CASE
+        	WHEN has_indnatts
+        	THEN indnatts::text::int2
+        	ELSE tableinfo.relnatts
+        END AS indnatts,
         unnest(indkey) AS indkeyid,
         generate_subscripts(indkey, 1) AS indkeyidx,
         unnest(indclass) AS indclass,
         unnest(indoption) AS indoption,
         pg_get_expr(indexprs, indrelid) AS index_expression
     FROM pg_index -- https://www.postgresql.org/docs/current/catalog-pg-index.html
+ 	INNER JOIN pg_class AS tableinfo ON tableinfo.oid = pg_index.indrelid
+	INNER JOIN pg_class AS indexinfo ON indexinfo.oid = pg_index.indexrelid
+	INNER JOIN pg_namespace AS schemainfo ON schemainfo.oid = tableinfo.relnamespace
+	INNER JOIN pg_indexes
+		ON pg_indexes.schemaname = schemainfo.nspname
+		AND pg_indexes.indexname = indexinfo.relname
+    -- Provide `pg_catalog.pg_index.indnkeyatts` if available
+    CROSS JOIN (
+	   SELECT EXISTS (
+	        SELECT FROM information_schema.columns 
+	        WHERE table_schema = 'pg_catalog'
+		  	    AND table_name = 'pg_index'
+		        AND column_name = 'indnkeyatts'
+	        ) AS has_indnkeyatts
+	   ) indnkeyatts
+	-- Provide `pg_catalog.pg_index.indnatts` if available
+    CROSS JOIN (
+	   SELECT EXISTS (
+	        SELECT FROM information_schema.columns 
+	        WHERE table_schema = 'pg_catalog'
+	      	    AND table_name = 'pg_index'
+	      	    AND column_name = 'indnatts'
+	        ) AS has_indnatts
+	   ) indnatts
     WHERE
         indpred IS NULL -- filter out partial indexes
         AND NOT indisexclusion -- filter out exclusion constraints
 ),
 indexes_info AS (
 	SELECT
-		schemainfo.nspname AS namespace,
-	    indexinfo.relname AS index_name,
-	    tableinfo.relname AS table_name,
+		rawindex.namespace,
+	    rawindex.index_name,
+	    rawindex.table_name,
 	    rawindex.indrelid, 
         rawindex.indexrelid,
         rawindex.indnkeyatts,
@@ -30,18 +70,12 @@ indexes_info AS (
 	    columninfo.attnum,
         rawindex.index_expression
 	FROM rawindex
-	INNER JOIN pg_class AS tableinfo ON tableinfo.oid = rawindex.indrelid
-	INNER JOIN pg_class AS indexinfo ON indexinfo.oid = rawindex.indexrelid
-	INNER JOIN pg_namespace AS schemainfo ON schemainfo.oid = tableinfo.relnamespace
     -- You may wonder, why `LEFT JOIN` here?
     -- Expression Indexes are generally defined without `column_info` - they do not refer to a specific column, as they contain an expression.
     -- Due to this, we need to update the query to handle indexes where column_info is nullable, otherwise we lose expression indexes in our result set.
 	LEFT JOIN pg_attribute AS columninfo
-	    ON columninfo.attrelid = tableinfo.oid
+	    ON columninfo.attrelid = rawindex.oid
 	    AND columninfo.attnum = rawindex.indkeyid
-	INNER JOIN pg_indexes
-		ON pg_indexes.schemaname = schemainfo.nspname
-		AND pg_indexes.indexname = indexinfo.relname
 ),
 indexes_info_filtered AS (
 	SELECT

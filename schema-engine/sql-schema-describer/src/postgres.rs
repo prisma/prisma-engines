@@ -171,6 +171,7 @@ pub struct PostgresSchemaExt {
     pub opclasses: Vec<(IndexColumnId, SQLOperatorClass)>,
     pub indexes: Vec<(IndexId, SqlIndexAlgorithm)>,
     pub expression_indexes: Vec<(TableId, String)>,
+    /// Supported since PostgreSQL 11.
     pub include_indexes: Vec<(TableId, String)>,
     pub index_null_position: HashMap<IndexColumnId, IndexNullPosition>,
     pub constraint_options: HashMap<Constraint, BitFlags<ConstraintOption>>,
