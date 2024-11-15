@@ -258,8 +258,8 @@ pub enum ValueGeneratorFn {
 impl ValueGeneratorFn {
     fn new(name: &str) -> std::result::Result<Self, String> {
         match name {
-            "cuid" | "cuid(2)" => Ok(Self::Cuid(2)),
-            "cuid(1)" => Ok(Self::Cuid(1)),
+            "cuid" | "cuid(1)" => Ok(Self::Cuid(1)),
+            "cuid(2)" => Ok(Self::Cuid(2)),
             "uuid" | "uuid(4)" => Ok(Self::Uuid(4)),
             "uuid(7)" => Ok(Self::Uuid(7)),
             "now" => Ok(Self::Now),
