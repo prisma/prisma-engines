@@ -1023,6 +1023,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 ),
             ],
             expression_indexes: [],
+            include_indexes: [],
             index_null_position: {},
             constraint_options: {
                 Index(
@@ -1208,6 +1209,7 @@ fn postgres_sequences_must_work(api: TestApi) {
             opclasses: [],
             indexes: [],
             expression_indexes: [],
+            include_indexes: [],
             index_null_position: {},
             constraint_options: {},
             table_options: [],
@@ -1807,6 +1809,7 @@ fn extensions_are_described_correctly(api: TestApi) {
             opclasses: [],
             indexes: [],
             expression_indexes: [],
+            include_indexes: [],
             index_null_position: {},
             constraint_options: {},
             table_options: [],
