@@ -14,8 +14,8 @@ pub(crate) enum DefaultKind<'a> {
     Sequence(&'a sql::postgres::Sequence),
     DbGenerated(Option<&'a str>),
     Autoincrement,
-    Uuid,
-    Cuid,
+    Uuid(Option<u8>),
+    Cuid(Option<u8>),
     Nanoid(Option<u8>),
     Now,
     String(&'a str),
@@ -116,8 +116,24 @@ impl<'a> DefaultValuePair<'a> {
             },
 
             (None, sql::ColumnTypeFamily::String | sql::ColumnTypeFamily::Uuid) => match self.previous {
-                Some(previous) if previous.is_cuid() => Some(DefaultKind::Cuid),
-                Some(previous) if previous.is_uuid() => Some(DefaultKind::Uuid),
+                Some(previous) if previous.is_cuid() => {
+                    let version = previous.value().as_function().and_then(|(_, args, _)| {
+                        args.arguments
+                            .first()
+                            .map(|arg| arg.value.as_numeric_value().unwrap().0.parse::<u8>().unwrap())
+                    });
+
+                    Some(DefaultKind::Cuid(version))
+                }
+                Some(previous) if previous.is_uuid() => {
+                    let version = previous.value().as_function().and_then(|(_, args, _)| {
+                        args.arguments
+                            .first()
+                            .map(|arg| arg.value.as_numeric_value().unwrap().0.parse::<u8>().unwrap())
+                    });
+
+                    Some(DefaultKind::Uuid(version))
+                }
                 Some(previous) if previous.is_nanoid() => {
                     let length = previous.value().as_function().and_then(|(_, args, _)| {
                         args.arguments

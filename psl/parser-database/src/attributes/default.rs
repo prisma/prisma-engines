@@ -2,6 +2,7 @@ use crate::{
     ast::{self, WithName},
     coerce,
     context::Context,
+    generators::{CUID_SUPPORTED_VERSIONS, UUID_SUPPORTED_VERSIONS},
     types::{DefaultAttribute, ScalarFieldType, ScalarType},
     DatamodelError, ScalarFieldId, StringId,
 };
@@ -197,10 +198,10 @@ fn validate_model_builtin_scalar_type_default(
             validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
         }
         (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_CUID => {
-            validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
+            validate_uid_int_args(funcname, &funcargs.arguments, &CUID_SUPPORTED_VERSIONS, accept, ctx)
         }
         (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_UUID => {
-            validate_uuid_args(&funcargs.arguments, accept, ctx)
+            validate_uid_int_args(funcname, &funcargs.arguments, &UUID_SUPPORTED_VERSIONS, accept, ctx)
         }
         (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_NANOID => {
             validate_nanoid_args(&funcargs.arguments, accept, ctx)
@@ -244,10 +245,10 @@ fn validate_composite_builtin_scalar_type_default(
     match (scalar_type, value) {
         // Functions
         (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_CUID => {
-            validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
+            validate_uid_int_args(funcname, &funcargs.arguments, &CUID_SUPPORTED_VERSIONS, accept, ctx)
         }
         (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_UUID => {
-            validate_uuid_args(&funcargs.arguments, accept, ctx)
+            validate_uid_int_args(funcname, &funcargs.arguments, &UUID_SUPPORTED_VERSIONS, accept, ctx)
         }
         (ScalarType::DateTime, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_NOW => {
             validate_empty_function_args(FN_NOW, &funcargs.arguments, accept, ctx)
@@ -381,18 +382,38 @@ fn validate_dbgenerated_args(args: &[ast::Argument], accept: AcceptFn<'_>, ctx: 
     }
 }
 
-fn validate_uuid_args(args: &[ast::Argument], accept: AcceptFn<'_>, ctx: &mut Context<'_>) {
-    let mut bail = || ctx.push_attribute_validation_error("`uuid()` takes a single Int argument.");
+fn format_valid_values<const N: usize>(valid_values: &[u8; N]) -> String {
+    match valid_values.len() {
+        0 => String::new(),
+        1 => valid_values[0].to_string(),
+        2 => format!("{} or {}", valid_values[0], valid_values[1]),
+        _ => {
+            let (last, rest) = valid_values.split_last().unwrap();
+            let rest_str = rest.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(", ");
+            format!("{}, or {}", rest_str, last)
+        }
+    }
+}
+
+fn validate_uid_int_args<const N: usize>(
+    fn_name: &str,
+    args: &[ast::Argument],
+    valid_values: &[u8; N],
+    accept: AcceptFn<'_>,
+    ctx: &mut Context<'_>,
+) {
+    let mut bail = || ctx.push_attribute_validation_error(&format!("`{fn_name}()` takes a single Int argument."));
 
     if args.len() > 1 {
         bail()
     }
 
     match args.first().map(|arg| &arg.value) {
-        Some(ast::Expression::NumericValue(val, _)) if ![4u8, 7u8].contains(&val.parse::<u8>().unwrap()) => {
-            ctx.push_attribute_validation_error(
-                "`uuid()` takes either no argument, or a single integer argument which is either 4 or 7.",
-            );
+        Some(ast::Expression::NumericValue(val, _)) if !valid_values.contains(&val.parse::<u8>().unwrap()) => {
+            let valid_values_str = format_valid_values(&valid_values);
+            ctx.push_attribute_validation_error(&format!(
+                "`{fn_name}()` takes either no argument, or a single integer argument which is either {valid_values_str}.",
+            ));
         }
         None | Some(ast::Expression::NumericValue(_, _)) => accept(ctx),
         _ => bail(),

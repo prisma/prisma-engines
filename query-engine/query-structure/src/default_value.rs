@@ -182,8 +182,8 @@ impl ValueGenerator {
         ValueGenerator::new("now".to_owned(), vec![]).unwrap()
     }
 
-    pub fn new_cuid() -> Self {
-        ValueGenerator::new("cuid".to_owned(), vec![]).unwrap()
+    pub fn new_cuid(version: u8) -> Self {
+        ValueGenerator::new(format!("cuid({version})"), vec![]).unwrap()
     }
 
     pub fn new_uuid(version: u8) -> Self {
@@ -239,7 +239,7 @@ impl ValueGenerator {
 #[derive(Clone, Copy, PartialEq)]
 pub enum ValueGeneratorFn {
     Uuid(u8),
-    Cuid,
+    Cuid(u8),
     Nanoid(Option<u8>),
     Now,
     Autoincrement,
@@ -250,7 +250,8 @@ pub enum ValueGeneratorFn {
 impl ValueGeneratorFn {
     fn new(name: &str) -> std::result::Result<Self, String> {
         match name {
-            "cuid" => Ok(Self::Cuid),
+            "cuid" | "cuid(2)" => Ok(Self::Cuid(2)),
+            "cuid(1)" => Ok(Self::Cuid(1)),
             "uuid" | "uuid(4)" => Ok(Self::Uuid(4)),
             "uuid(7)" => Ok(Self::Uuid(7)),
             "now" => Ok(Self::Now),
@@ -267,7 +268,7 @@ impl ValueGeneratorFn {
     fn invoke(&self) -> Option<PrismaValue> {
         match self {
             Self::Uuid(version) => Some(Self::generate_uuid(*version)),
-            Self::Cuid => Some(Self::generate_cuid()),
+            Self::Cuid(version) => Some(Self::generate_cuid(*version)),
             Self::Nanoid(length) => Some(Self::generate_nanoid(length)),
             Self::Now => Some(Self::generate_now()),
             Self::Autoincrement => None,
@@ -277,9 +278,13 @@ impl ValueGeneratorFn {
     }
 
     #[cfg(feature = "default_generators")]
-    fn generate_cuid() -> PrismaValue {
-        #[allow(deprecated)]
-        PrismaValue::String(cuid::cuid().unwrap())
+    fn generate_cuid(version: u8) -> PrismaValue {
+        PrismaValue::String(match version {
+            #[allow(deprecated)]
+            1 => cuid::cuid().unwrap(),
+            2 => cuid::cuid2(),
+            _ => panic!("Unknown `cuid` version: {}", version),
+        })
     }
 
     #[cfg(feature = "default_generators")]
@@ -358,8 +363,15 @@ mod tests {
     }
 
     #[test]
-    fn default_value_is_cuid() {
-        let cuid_default = DefaultValue::new_expression(ValueGenerator::new_cuid());
+    fn default_value_is_cuidv1() {
+        let cuid_default = DefaultValue::new_expression(ValueGenerator::new_cuid(1));
+
+        assert!(cuid_default.is_cuid());
+        assert!(!cuid_default.is_now());
+    }
+
+    fn default_value_is_cuidv2() {
+        let cuid_default = DefaultValue::new_expression(ValueGenerator::new_cuid(2));
 
         assert!(cuid_default.is_cuid());
         assert!(!cuid_default.is_now());
