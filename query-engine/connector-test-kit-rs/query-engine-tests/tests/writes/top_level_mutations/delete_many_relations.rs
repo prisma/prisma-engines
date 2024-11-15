@@ -16,7 +16,7 @@ mod delete_many_rels {
     // On D1, this fails with:
     //
     // ```diff
-    // - {"data":{"deleteManyParent":{"count":1}}}
+    // - {"data":{"deleteManyParent":{"count":2}}}
     // + {"data":{"deleteManyParent":{"count":3}}}
     // ```
     async fn p1_c1(runner: &Runner, _t: &DatamodelWithParams) -> TestResult<()> {

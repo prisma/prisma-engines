@@ -1,7 +1,6 @@
 use core::fmt;
-use query_core::telemetry;
+
 use query_engine_common::logger::StringCallback;
-// use query_engine_metrics::MetricRegistry;
 use serde_json::Value;
 use std::sync::Arc;
 use std::{collections::BTreeMap, fmt::Display};
@@ -20,7 +19,6 @@ pub(crate) type LogCallback = Box<dyn Fn(String) + Send + Sync + 'static>;
 
 pub(crate) struct Logger {
     dispatcher: Dispatch,
-    // metrics: Option<MetricRegistry>,
 }
 
 impl Logger {
@@ -58,26 +56,14 @@ impl Logger {
 
         let layer = CallbackLayer::new(log_callback).with_filter(filters);
 
-        // let metrics = if enable_metrics {
-        //     query_engine_metrics::setup();
-        //     Some(MetricRegistry::new())
-        // } else {
-        //     None
-        // };
-
         Self {
             dispatcher: Dispatch::new(Registry::default().with(telemetry).with(layer)),
-            // metrics,
         }
     }
 
     pub fn dispatcher(&self) -> Dispatch {
         self.dispatcher.clone()
     }
-
-    // pub fn metrics(&self) -> Option<MetricRegistry> {
-    //     self.metrics.clone()
-    // }
 }
 
 pub struct JsonVisitor<'a> {

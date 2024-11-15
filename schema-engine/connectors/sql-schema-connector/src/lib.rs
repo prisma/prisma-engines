@@ -9,6 +9,7 @@ mod flavour;
 mod introspection;
 mod migration_pair;
 mod sql_destructive_change_checker;
+mod sql_doc_parser;
 mod sql_migration;
 mod sql_migration_persistence;
 mod sql_renderer;
@@ -19,8 +20,10 @@ use database_schema::SqlDatabaseSchema;
 use enumflags2::BitFlags;
 use flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFlavour};
 use migration_pair::MigrationPair;
-use psl::ValidatedSchema;
+use psl::{datamodel_connector::NativeTypeInstance, parser_database::ScalarType, ValidatedSchema};
+use quaint::connector::DescribedQuery;
 use schema_connector::{migrations_directory::MigrationDirectory, *};
+use sql_doc_parser::{parse_sql_doc, sanitize_sql};
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer as sql;
 use std::{future, sync::Arc};
@@ -148,6 +151,13 @@ impl SqlSchemaConnector {
             DiffTarget::Database => self.flavour.describe_schema(namespaces).await.map(From::from),
             DiffTarget::Empty => Ok(self.flavour.empty_database_schema().into()),
         }
+    }
+
+    /// Returns the native types that can be used to represent the given scalar type.
+    pub fn scalar_type_for_native_type(&self, native_type: &NativeTypeInstance) -> ScalarType {
+        self.flavour
+            .datamodel_connector()
+            .scalar_type_for_native_type(native_type)
     }
 }
 
@@ -345,6 +355,55 @@ impl SchemaConnector for SqlSchemaConnector {
                 .map(|nw| String::from(nw.name()))
                 .collect::<Vec<String>>(),
         )
+    }
+
+    fn introspect_sql(
+        &mut self,
+        input: IntrospectSqlQueryInput,
+    ) -> BoxFuture<'_, ConnectorResult<IntrospectSqlQueryOutput>> {
+        Box::pin(async move {
+            let sanitized_sql = sanitize_sql(&input.source);
+            let DescribedQuery {
+                parameters,
+                columns,
+                enum_names,
+            } = self.flavour.describe_query(&sanitized_sql).await?;
+            let enum_names = enum_names.unwrap_or_default();
+            let sql_source = input.source.clone();
+            let parsed_doc = parse_sql_doc(&sql_source, enum_names.as_slice())?;
+
+            let parameters = parameters
+                .into_iter()
+                .zip(1..)
+                .map(|(param, idx)| {
+                    let parsed_param = parsed_doc
+                        .get_param_at(idx)
+                        .or_else(|| parsed_doc.get_param_by_alias(&param.name));
+
+                    IntrospectSqlQueryParameterOutput {
+                        typ: parsed_param
+                            .and_then(|p| p.typ())
+                            .unwrap_or_else(|| param.typ.to_string()),
+                        name: parsed_param
+                            .and_then(|p| p.alias())
+                            .map(ToOwned::to_owned)
+                            .unwrap_or_else(|| param.name),
+                        documentation: parsed_param.and_then(|p| p.documentation()).map(ToOwned::to_owned),
+                        // Params are required by default unless overridden by sql doc.
+                        nullable: parsed_param.and_then(|p| p.nullable()).unwrap_or(false),
+                    }
+                })
+                .collect();
+            let columns = columns.into_iter().map(IntrospectSqlQueryColumnOutput::from).collect();
+
+            Ok(IntrospectSqlQueryOutput {
+                name: input.name,
+                source: sanitized_sql,
+                documentation: parsed_doc.description().map(ToOwned::to_owned),
+                parameters,
+                result_columns: columns,
+            })
+        })
     }
 }
 

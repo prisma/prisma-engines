@@ -1,4 +1,4 @@
-use super::{IsolationLevel, ResultSet, Transaction};
+use super::{DescribedQuery, IsolationLevel, ResultSet, Transaction};
 use crate::ast::*;
 use async_trait::async_trait;
 
@@ -56,6 +56,9 @@ pub trait Queryable: Send + Sync {
     /// example. The version string is returned directly without any form of
     /// parsing or normalization.
     async fn version(&self) -> crate::Result<Option<String>>;
+
+    /// Prepares a statement and returns type information.
+    async fn describe_query(&self, sql: &str) -> crate::Result<DescribedQuery>;
 
     /// Returns false, if connection is considered to not be in a working state.
     fn is_healthy(&self) -> bool;

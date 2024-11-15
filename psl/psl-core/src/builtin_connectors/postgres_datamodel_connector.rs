@@ -318,7 +318,7 @@ impl Connector for PostgresDatamodelConnector {
             DoublePrecision => ScalarType::Float,
             // Decimal
             Decimal(_) => ScalarType::Decimal,
-            Money => ScalarType::Float,
+            Money => ScalarType::Decimal,
             // DateTime
             Timestamp(_) => ScalarType::DateTime,
             Timestamptz(_) => ScalarType::DateTime,
@@ -463,7 +463,10 @@ impl Connector for PostgresDatamodelConnector {
     }
 
     fn validate_url(&self, url: &str) -> Result<(), String> {
-        if !url.starts_with("postgres://") && !url.starts_with("postgresql://") {
+        if !url.starts_with("postgres://")
+            && !url.starts_with("postgresql://")
+            && !url.starts_with("prisma+postgres://")
+        {
             return Err("must start with the protocol `postgresql://` or `postgres://`.".to_owned());
         }
 

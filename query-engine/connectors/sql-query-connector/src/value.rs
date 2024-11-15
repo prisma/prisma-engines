@@ -70,7 +70,7 @@ pub fn to_prisma_value<'a, T: Into<ValueType<'a>>>(qv: T) -> crate::Result<Prism
 
         ValueType::Date(d) => d
             .map(|d| {
-                let dt = DateTime::<Utc>::from_utc(d.and_hms_opt(0, 0, 0).unwrap(), Utc);
+                let dt = DateTime::<Utc>::from_naive_utc_and_offset(d.and_hms_opt(0, 0, 0).unwrap(), Utc);
                 PrismaValue::DateTime(dt.into())
             })
             .unwrap_or(PrismaValue::Null),
@@ -78,7 +78,7 @@ pub fn to_prisma_value<'a, T: Into<ValueType<'a>>>(qv: T) -> crate::Result<Prism
         ValueType::Time(t) => t
             .map(|t| {
                 let d = NaiveDate::from_ymd_opt(1970, 1, 1).unwrap();
-                let dt = DateTime::<Utc>::from_utc(d.and_time(t), Utc);
+                let dt = DateTime::<Utc>::from_naive_utc_and_offset(d.and_time(t), Utc);
                 PrismaValue::DateTime(dt.into())
             })
             .unwrap_or(PrismaValue::Null),

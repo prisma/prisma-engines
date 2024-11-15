@@ -1,8 +1,8 @@
 use super::expression::*;
 use crate::IntoBson;
 
+use bson::{doc, Bson, Document};
 use itertools::Itertools;
-use mongodb::bson::{doc, Bson, Document};
 
 impl IntoBson for Set {
     fn into_bson(self) -> crate::Result<Bson> {

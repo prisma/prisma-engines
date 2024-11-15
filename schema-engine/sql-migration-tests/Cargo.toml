@@ -30,6 +30,9 @@ serde_json.workspace = true
 tempfile = "3.1.0"
 tokio.workspace = true
 tracing.workspace = true
-tracing-futures = "0.2"
+tracing-futures.workspace = true
 url.workspace = true
 quaint = { workspace = true, features = ["all-native"] }
+
+[dev-dependencies]
+paste = "1"

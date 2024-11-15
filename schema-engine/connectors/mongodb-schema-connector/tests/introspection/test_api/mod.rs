@@ -71,8 +71,6 @@ impl From<IntrospectionResult> for TestMultiResult {
 }
 
 pub struct TestApi {
-    pub connection_string: String,
-    pub database_name: String,
     pub db: Database,
     pub features: BitFlags<PreviewFeature>,
     pub connector: MongoDbSchemaConnector,
@@ -122,8 +120,6 @@ where
         let connector = MongoDbSchemaConnector::new(params);
 
         let api = TestApi {
-            connection_string,
-            database_name,
             db: database.clone(),
             features: preview_features,
             connector,
@@ -131,7 +127,7 @@ where
 
         let res = setup(api).await;
 
-        database.drop(None).await.unwrap();
+        database.drop().await.unwrap();
 
         res
     })

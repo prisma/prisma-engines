@@ -1,5 +1,6 @@
 use crate::{
     ast::Value,
+    connector::ColumnType,
     error::{Error, ErrorKind},
 };
 use std::sync::Arc;
@@ -9,6 +10,7 @@ use std::sync::Arc;
 #[derive(Debug, PartialEq)]
 pub struct ResultRow {
     pub(crate) columns: Arc<Vec<String>>,
+    pub(crate) types: Vec<ColumnType>,
     pub(crate) values: Vec<Value<'static>>,
 }
 
@@ -38,6 +40,7 @@ impl IntoIterator for ResultRow {
 #[derive(Debug, PartialEq)]
 pub struct ResultRowRef<'a> {
     pub(crate) columns: Arc<Vec<String>>,
+    pub(crate) types: Vec<ColumnType>,
     pub(crate) values: &'a Vec<Value<'static>>,
 }
 
@@ -59,10 +62,18 @@ impl ResultRow {
         }
     }
 
-    /// Take a value with the given column name from the row. Usage
+    /// Get a value with the given column name from the row. Usage
     /// documentation in [ResultRowRef](struct.ResultRowRef.html).
     pub fn get(&self, name: &str) -> Option<&Value<'static>> {
         self.columns.iter().position(|c| c == name).map(|idx| &self.values[idx])
+    }
+
+    /// Take a value with the given column name from the row.
+    pub fn take(mut self, name: &str) -> Option<Value<'static>> {
+        self.columns
+            .iter()
+            .position(|c| c == name)
+            .map(|idx| self.values.remove(idx))
     }
 
     /// Make a referring [ResultRowRef](struct.ResultRowRef.html).
@@ -70,6 +81,7 @@ impl ResultRow {
         ResultRowRef {
             columns: Arc::clone(&self.columns),
             values: &self.values,
+            types: self.types.clone(),
         }
     }
 

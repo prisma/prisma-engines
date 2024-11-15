@@ -6,14 +6,17 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-futures = "0.3"
+derive_more.workspace = true
+enumflags2.workspace = true
+futures.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 js-sys.workspace = true
 wasm-bindgen.workspace = true
 wasm-bindgen-futures.workspace = true
-tokio = { version = "1.25", features = ["macros", "sync"] }
-pin-project = "1"
+tokio = { version = "1", features = ["macros", "sync"] }
+pin-project.workspace = true
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tokio.workspace = true
+regex.workspace = true

@@ -5,7 +5,7 @@ use url::Url;
 
 pub(crate) async fn cockroach_setup(url: String, prisma_schema: &str) -> ConnectorResult<()> {
     let mut parsed_url = Url::parse(&url).map_err(ConnectorError::url_parse_error)?;
-    let mut quaint_url = quaint::connector::PostgresUrl::new(parsed_url.clone()).unwrap();
+    let mut quaint_url = quaint::connector::PostgresNativeUrl::new(parsed_url.clone()).unwrap();
     quaint_url.set_flavour(PostgresFlavour::Cockroach);
 
     let db_name = quaint_url.dbname();

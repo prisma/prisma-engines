@@ -1,7 +1,7 @@
 use crate::constants::*;
 
+use bson::{doc, Bson, Document};
 use connector_interface::AggregationSelection;
-use mongodb::bson::{doc, Bson, Document};
 use query_structure::{AggregationFilter, Filter, ScalarFieldRef};
 use std::collections::HashSet;
 

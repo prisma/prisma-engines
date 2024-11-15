@@ -47,6 +47,7 @@ async fn run_command(
         EVALUATE_DATA_LOSS => render(executor.evaluate_data_loss(params.parse()?).await),
         GET_DATABASE_VERSION => render(executor.version(params.parse()?).await),
         INTROSPECT => render(executor.introspect(params.parse()?).await),
+        INTROSPECT_SQL => render(executor.introspect_sql(params.parse()?).await),
         LIST_MIGRATION_DIRECTORIES => render(executor.list_migration_directories(params.parse()?).await),
         MARK_MIGRATION_APPLIED => render(executor.mark_migration_applied(params.parse()?).await),
         MARK_MIGRATION_ROLLED_BACK => render(executor.mark_migration_rolled_back(params.parse()?).await),
@@ -64,7 +65,7 @@ fn render(result: CoreResult<impl serde::Serialize>) -> jsonrpc_core::Result<jso
 }
 
 fn render_jsonrpc_error(crate_error: CoreError) -> JsonRpcError {
-    serde_json::to_value(&crate_error.to_user_facing())
+    serde_json::to_value(crate_error.to_user_facing())
         .map(|data| JsonRpcError {
             // We separate the JSON-RPC error code (defined by the JSON-RPC spec) from the
             // prisma error code, which is located in `data`.

@@ -3,13 +3,17 @@ use async_trait::async_trait;
 use prisma_value::PrismaValue;
 use query_structure::{ast::FieldArity, *};
 use std::collections::HashMap;
+use telemetry::helpers::TraceParent;
 
 #[async_trait]
 pub trait Connector {
     /// Returns a connection to a data source.
     async fn get_connection(&self) -> crate::Result<Box<dyn Connection + Send + Sync>>;
 
-    /// Returns the name of the connector.
+    /// Returns the database system name, as per the OTEL spec.
+    /// Reference:
+    /// - https://opentelemetry.io/docs/specs/semconv/database/sql/
+    /// - https://opentelemetry.io/docs/specs/semconv/database/mongodb/
     fn name(&self) -> &'static str;
 
     /// Returns whether a connector should retry an entire transaction when that transaction failed during its execution
@@ -194,7 +198,7 @@ pub trait ReadOperations {
         filter: &Filter,
         selected_fields: &FieldSelection,
         relation_load_strategy: RelationLoadStrategy,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<Option<SingleRecord>>;
 
     /// Gets multiple records from the database.
@@ -209,7 +213,7 @@ pub trait ReadOperations {
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
         relation_load_strategy: RelationLoadStrategy,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<ManyRecords>;
 
     /// Retrieves pairs of IDs that belong together from a intermediate join
@@ -223,7 +227,7 @@ pub trait ReadOperations {
         &mut self,
         from_field: &RelationFieldRef,
         from_record_ids: &[SelectionResult],
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<Vec<(SelectionResult, SelectionResult)>>;
 
     /// Aggregates records for a specific model based on the given selections.
@@ -238,7 +242,7 @@ pub trait ReadOperations {
         selections: Vec<AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
         having: Option<Filter>,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<Vec<AggregationRow>>;
 }
 
@@ -250,7 +254,7 @@ pub trait WriteOperations {
         model: &Model,
         args: WriteArgs,
         selected_fields: FieldSelection,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<SingleRecord>;
 
     /// Inserts many records at once into the database.
@@ -259,7 +263,7 @@ pub trait WriteOperations {
         model: &Model,
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<usize>;
 
     /// Inserts many records at once into the database and returns their
@@ -272,7 +276,7 @@ pub trait WriteOperations {
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
         selected_fields: FieldSelection,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<ManyRecords>;
 
     /// Update records in the `Model` with the given `WriteArgs` filtered by the
@@ -282,7 +286,7 @@ pub trait WriteOperations {
         model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<usize>;
 
     /// Update record in the `Model` with the given `WriteArgs` filtered by the
@@ -293,7 +297,7 @@ pub trait WriteOperations {
         record_filter: RecordFilter,
         args: WriteArgs,
         selected_fields: Option<FieldSelection>,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<Option<SingleRecord>>;
 
     /// Native upsert
@@ -301,7 +305,7 @@ pub trait WriteOperations {
     async fn native_upsert_record(
         &mut self,
         upsert: NativeUpsert,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<SingleRecord>;
 
     /// Delete records in the `Model` with the given `Filter`.
@@ -309,7 +313,7 @@ pub trait WriteOperations {
         &mut self,
         model: &Model,
         record_filter: RecordFilter,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<usize>;
 
     /// Delete single record in the `Model` with the given `Filter` and returns
@@ -321,7 +325,7 @@ pub trait WriteOperations {
         model: &Model,
         record_filter: RecordFilter,
         selected_fields: FieldSelection,
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<SingleRecord>;
 
     // We plan to remove the methods below in the future. We want emulate them with the ones above. Those should suffice.
@@ -332,7 +336,7 @@ pub trait WriteOperations {
         field: &RelationFieldRef,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<()>;
 
     /// Disconnect the children from the parent (m2m relation only).
@@ -341,7 +345,7 @@ pub trait WriteOperations {
         field: &RelationFieldRef,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
-        trace_id: Option<String>,
+        traceparent: Option<TraceParent>,
     ) -> crate::Result<()>;
 
     /// Execute the raw query in the database as-is.
