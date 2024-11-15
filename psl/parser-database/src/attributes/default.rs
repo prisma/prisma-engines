@@ -410,7 +410,7 @@ fn validate_uid_int_args<const N: usize>(
 
     match args.first().map(|arg| &arg.value) {
         Some(ast::Expression::NumericValue(val, _)) if !valid_values.contains(&val.parse::<u8>().unwrap()) => {
-            let valid_values_str = format_valid_values(&valid_values);
+            let valid_values_str = format_valid_values(valid_values);
             ctx.push_attribute_validation_error(&format!(
                 "`{fn_name}()` takes either no argument, or a single integer argument which is either {valid_values_str}.",
             ));
