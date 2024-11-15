@@ -5493,7 +5493,6 @@ dependencies = [
  "lru 0.7.8",
  "once_cell",
  "opentelemetry",
- "prisma-metrics",
  "psl",
  "rand 0.8.5",
  "serde",
