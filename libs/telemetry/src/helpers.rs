@@ -133,7 +133,6 @@ impl QueryEngineLogLevel {
 #[rustfmt::skip]
 pub fn env_filter(log_queries: bool, qe_log_level: QueryEngineLogLevel) -> EnvFilter {
     let mut filter = EnvFilter::from_default_env()
-        .add_directive("tide=error".parse().unwrap())
         .add_directive("tonic=error".parse().unwrap())
         .add_directive("h2=error".parse().unwrap())
         .add_directive("hyper=error".parse().unwrap())
