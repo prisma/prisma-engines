@@ -2,11 +2,11 @@ use std::marker::PhantomData;
 
 use tracing::{
     span::{Attributes, Id},
-    Subscriber,
+    Dispatch, Subscriber,
 };
 use tracing_subscriber::{layer::Context, registry::LookupSpan, Layer};
 
-use crate::helpers::TraceParent;
+use super::traceparent::TraceParent;
 
 pub fn layer<S>() -> CapturingLayer<S>
 where
@@ -17,6 +17,22 @@ where
 
 pub struct CapturingLayer<S> {
     _registry: PhantomData<S>,
+    get_context: WithContext,
+}
+
+/// We can't easily downcast `Subscriber` to a specific layer type without knowing the concrete
+/// type of `S`. This function remembers the type of the subscriber so we have something else
+/// non-generic to downcast to in `SpanExt`.
+///
+/// This is a common and idiomatic pattern in the `tracing` ecosystem, see for example:
+/// - https://github.com/tokio-rs/tracing/blob/2ea8f8cc509300f193811a63f7270cfcaa81bc22/tracing-error/src/layer.rs#L29-L34
+/// - https://github.com/tokio-rs/tracing-opentelemetry/blob/f6fc075fe0095ee9a7363c8b67818d160f869c48/src/layer.rs#L79-L87
+pub(crate) struct WithContext(fn(&Dispatch, &Id, &mut dyn FnMut(&mut Option<TraceParent>)));
+
+impl WithContext {
+    pub(crate) fn with_context(&self, dispatch: &Dispatch, id: &Id, mut f: impl FnMut(&mut Option<TraceParent>)) {
+        (self.0)(dispatch, id, &mut f)
+    }
 }
 
 impl<S> Default for CapturingLayer<S>
@@ -33,7 +49,30 @@ where
     S: Subscriber + for<'a> LookupSpan<'a>,
 {
     pub fn new() -> Self {
-        Self { _registry: PhantomData }
+        Self {
+            _registry: PhantomData,
+            get_context: WithContext(Self::get_context),
+        }
+    }
+
+    fn get_context(dispatch: &Dispatch, id: &Id, f: &mut dyn FnMut(&mut Option<TraceParent>)) {
+        let registry = dispatch
+            .downcast_ref::<S>()
+            .expect("dispatch should be related to a subscriber with the expected type");
+
+        let span = registry
+            .span(id)
+            .expect("registry should have a span with the specified ID");
+
+        let mut extensions = span.extensions_mut();
+
+        if let Some(trace_parent) = extensions.get_mut::<Option<TraceParent>>() {
+            f(trace_parent);
+        } else {
+            let mut new_trace_parent = None;
+            f(&mut new_trace_parent);
+            extensions.insert(new_trace_parent);
+        }
     }
 }
 
