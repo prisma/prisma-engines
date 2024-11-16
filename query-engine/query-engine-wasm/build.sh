@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Call this script as `./build.sh <npm_version>`
 set -euo pipefail
 
@@ -57,7 +57,7 @@ build() {
     local CARGO_TARGET_DIR
     CARGO_TARGET_DIR=$(cargo metadata --format-version 1 | jq -r .target_directory)
     echo "🔨 Building $CONNECTOR"
-    RUSTFLAGS="-Zlocation-detail=none" CARGO_PROFILE_RELEASE_OPT_LEVEL="z" cargo build \
+    RUSTFLAGS="-Zlocation-detail=none -Zshare-generics=y" CARGO_PROFILE_RELEASE_OPT_LEVEL="z" cargo build \
         -p query-engine-wasm \
         --profile "$WASM_BUILD_PROFILE" \
         --features "$CONNECTOR" \
