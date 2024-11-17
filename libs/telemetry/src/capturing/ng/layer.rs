@@ -90,18 +90,23 @@ where
             .next()
             .expect("span scope always includes at least the span we requested the scope for");
 
-        let Some(trace_parent) = root.extensions().get::<TraceParent>().cloned() else {
-            // we don't want to collect traces not originating from client requests
-            return;
-        };
+        // let Some(trace_parent) = root.extensions().get::<TraceParent>().cloned() else {
+        //     // we don't want to collect traces not originating from client requests
+        //     return;
+        // };
 
-        if !trace_parent.sampled() {
-            return;
-        }
+        let trace_parent = root.extensions().get::<Option<TraceParent>>().cloned().flatten();
 
-        for span in span_scope {
-            span.extensions_mut().insert(trace_parent);
-            dbg!(span.id().into_u64(), span.name());
+        if let Some(trace_parent) = trace_parent {
+            // if !trace_parent.sampled() {
+            //     return;
+            // }
+
+            for span in span_scope {
+                // span.extensions_mut().insert(trace_parent);
+                span.extensions_mut().insert(Some(trace_parent));
+                dbg!(span.id().into_u64(), span.name());
+            }
         }
     }
 

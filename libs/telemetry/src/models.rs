@@ -28,11 +28,11 @@ pub struct TraceSpan {
     pub(super) trace_id: String,
     pub(super) span_id: String,
     pub(super) parent_span_id: String,
-    pub(super) name: String,
+    pub(super) name: Cow<'static, str>,
     pub(super) start_time: HrTime,
     pub(super) end_time: HrTime,
     #[serde(skip_serializing_if = "HashMap::is_empty")]
-    pub(super) attributes: HashMap<String, serde_json::Value>,
+    pub(super) attributes: HashMap<Cow<'static, str>, serde_json::Value>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(super) events: Vec<Event>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -59,12 +59,12 @@ impl From<SpanData> for TraceSpan {
             _ => SpanKind::Internal,
         };
 
-        let attributes: HashMap<String, serde_json::Value> =
+        let attributes: HashMap<Cow<'static, str>, serde_json::Value> =
             span.attributes
                 .iter()
                 .fold(HashMap::default(), |mut map, (key, value)| {
                     if ACCEPT_ATTRIBUTES.contains(&key.as_str()) {
-                        map.insert(key.to_string(), to_json_value(value));
+                        map.insert(key.to_string().into(), to_json_value(value));
                     }
 
                     map
@@ -119,7 +119,7 @@ impl From<SpanData> for TraceSpan {
             span_id,
             trace_id: span.span_context.trace_id().to_string(),
             parent_span_id: span.parent_span_id.to_string(),
-            name: name.into_owned(),
+            name,
             start_time: hr_start_time,
             end_time: hr_end_time,
             attributes,
