@@ -1,3 +1,10 @@
+use std::future::Future;
+
+use async_trait::async_trait;
+use mobc::{Connection as MobcPooled, Manager};
+use prisma_metrics::WithMetricsInstrumentation;
+use tracing_futures::WithSubscriber;
+
 #[cfg(feature = "mssql-native")]
 use crate::connector::MssqlUrl;
 #[cfg(feature = "mysql-native")]
@@ -9,8 +16,6 @@ use crate::{
     connector::{self, impl_default_TransactionCapable, IsolationLevel, Queryable, Transaction, TransactionCapable},
     error::Error,
 };
-use async_trait::async_trait;
-use mobc::{Connection as MobcPooled, Manager};
 
 /// A connection from the pool. Implements
 /// [Queryable](connector/trait.Queryable.html).
@@ -145,6 +150,14 @@ impl Manager for QuaintManager {
 
     fn validate(&self, conn: &mut Self::Connection) -> bool {
         conn.is_healthy()
+    }
+
+    fn spawn_task<T>(&self, task: T)
+    where
+        T: Future + Send + 'static,
+        T::Output: Send + 'static,
+    {
+        tokio::spawn(task.with_current_subscriber().with_current_recorder());
     }
 }
 

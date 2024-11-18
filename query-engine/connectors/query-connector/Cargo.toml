@@ -17,3 +17,4 @@ thiserror = "1.0"
 user-facing-errors = {path = "../../../libs/user-facing-errors", features = ["sql"]}
 uuid.workspace = true
 indexmap.workspace = true
+telemetry = {path = "../../../libs/telemetry"}

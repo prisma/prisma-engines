@@ -24,6 +24,7 @@ request-handlers = { path = "../request-handlers", features = ["all"] }
 query-connector = { path = "../connectors/query-connector" }
 query-engine-common = { path = "../../libs/query-engine-common" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
+telemetry = { path = "../../libs/telemetry" }
 psl = { workspace = true, features = ["all"] }
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector", features = [
     "all-native",
@@ -45,14 +46,14 @@ serde.workspace = true
 
 tracing.workspace = true
 tracing-subscriber = { version = "0.3" }
-tracing-futures = "0.2"
+tracing-futures.workspace = true
 tracing-opentelemetry = "0.17.3"
 opentelemetry = { version = "0.17" }
 
 quaint.workspace = true
 tokio.workspace = true
 futures.workspace = true
-query-engine-metrics = { path = "../metrics" }
+prisma-metrics.path = "../../libs/metrics"
 
 [build-dependencies]
 napi-build = "1"
