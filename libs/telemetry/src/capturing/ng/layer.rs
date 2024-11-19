@@ -319,7 +319,11 @@ mod tests {
 
         assert_ron_snapshot!(
             spans,
-            { ".*" => redact_id(), ".*[].**" => redact_id(), ".*[].attributes" => insta::sorted_redaction() },
+            {
+                ".*" => redact_id(),
+                ".*[].**" => redact_id(),
+                ".*[].attributes" => insta::sorted_redaction()
+            },
             @r#"
         {
           SpanId(1): [
