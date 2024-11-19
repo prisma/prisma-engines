@@ -1,12 +1,23 @@
 use std::marker::PhantomData;
 
+use tokio::time::Instant;
 use tracing::{
+    field,
     span::{Attributes, Id},
     Dispatch, Subscriber,
 };
-use tracing_subscriber::{layer::Context, registry::LookupSpan, Layer};
+use tracing_subscriber::{
+    layer::Context,
+    registry::{LookupSpan, SpanRef},
+    Layer,
+};
 
-use super::traceparent::TraceParent;
+use crate::models::SpanKind;
+
+use super::{collector::SpanBuilder, traceparent::TraceParent};
+
+const SPAN_NAME_FIELD: &str = "otel.name";
+const SPAN_KIND_FIELD: &str = "otel.kind";
 
 pub fn layer<S>() -> CapturingLayer<S>
 where
@@ -17,22 +28,6 @@ where
 
 pub struct CapturingLayer<S> {
     _registry: PhantomData<S>,
-    get_context: WithContext,
-}
-
-/// We can't easily downcast `Subscriber` to a specific layer type without knowing the concrete
-/// type of `S`. This function remembers the type of the subscriber so we have something else
-/// non-generic to downcast to in `SpanExt`.
-///
-/// This is a common and idiomatic pattern in the `tracing` ecosystem, see for example:
-/// - https://github.com/tokio-rs/tracing/blob/2ea8f8cc509300f193811a63f7270cfcaa81bc22/tracing-error/src/layer.rs#L29-L34
-/// - https://github.com/tokio-rs/tracing-opentelemetry/blob/f6fc075fe0095ee9a7363c8b67818d160f869c48/src/layer.rs#L79-L87
-pub(crate) struct WithContext(fn(&Dispatch, &Id, &mut dyn FnMut(&mut Option<TraceParent>)));
-
-impl WithContext {
-    pub(crate) fn with_context(&self, dispatch: &Dispatch, id: &Id, mut f: impl FnMut(&mut Option<TraceParent>)) {
-        (self.0)(dispatch, id, &mut f)
-    }
 }
 
 impl<S> Default for CapturingLayer<S>
@@ -49,30 +44,16 @@ where
     S: Subscriber + for<'a> LookupSpan<'a>,
 {
     pub fn new() -> Self {
-        Self {
-            _registry: PhantomData,
-            get_context: WithContext(Self::get_context),
-        }
+        Self { _registry: PhantomData }
     }
 
-    fn get_context(dispatch: &Dispatch, id: &Id, f: &mut dyn FnMut(&mut Option<TraceParent>)) {
-        let registry = dispatch
-            .downcast_ref::<S>()
-            .expect("dispatch should be related to a subscriber with the expected type");
+    fn root_span_checked<'a>(id: &Id, ctx: &'a Context<'a, S>) -> Option<SpanRef<'a, S>> {
+        ctx.span_scope(id)?.from_root().next()
+    }
 
-        let span = registry
-            .span(id)
-            .expect("registry should have a span with the specified ID");
-
-        let mut extensions = span.extensions_mut();
-
-        if let Some(trace_parent) = extensions.get_mut::<Option<TraceParent>>() {
-            f(trace_parent);
-        } else {
-            let mut new_trace_parent = None;
-            f(&mut new_trace_parent);
-            extensions.insert(new_trace_parent);
-        }
+    fn root_span<'a>(id: &Id, ctx: &'a Context<'a, S>) -> SpanRef<'a, S> {
+        Self::root_span_checked(id, ctx)
+            .expect("span scope must exist in the current subscriber and include at least the requested span ID")
     }
 }
 
@@ -81,33 +62,10 @@ where
     S: Subscriber + for<'a> LookupSpan<'a>,
 {
     fn on_new_span(&self, attrs: &Attributes<'_>, id: &Id, ctx: Context<'_, S>) {
-        let Some(span_scope) = ctx.span_scope(id) else {
-            return;
-        };
+        let Some(span) = ctx.span(id) else { return };
+        let span_builder = SpanBuilder::new(span.name(), id.to_owned(), Instant::now(), attrs.fields().len());
 
-        let mut span_scope = span_scope.from_root();
-        let root = span_scope
-            .next()
-            .expect("span scope always includes at least the span we requested the scope for");
-
-        // let Some(trace_parent) = root.extensions().get::<TraceParent>().cloned() else {
-        //     // we don't want to collect traces not originating from client requests
-        //     return;
-        // };
-
-        let trace_parent = root.extensions().get::<Option<TraceParent>>().cloned().flatten();
-
-        if let Some(trace_parent) = trace_parent {
-            // if !trace_parent.sampled() {
-            //     return;
-            // }
-
-            for span in span_scope {
-                // span.extensions_mut().insert(trace_parent);
-                span.extensions_mut().insert(Some(trace_parent));
-                dbg!(span.id().into_u64(), span.name());
-            }
-        }
+        span.extensions_mut().insert(span_builder);
     }
 
     fn on_record(&self, _span: &Id, _values: &tracing::span::Record<'_>, _ctx: Context<'_, S>) {}
@@ -127,4 +85,44 @@ where
     fn on_close(&self, _id: Id, _ctx: Context<'_, S>) {}
 
     fn on_id_change(&self, _old: &Id, _new: &Id, _ctx: Context<'_, S>) {}
+}
+
+struct SpanAttributeVisitor<'a> {
+    span_builder: &'a mut SpanBuilder,
+}
+
+impl<'a> SpanAttributeVisitor<'a> {
+    fn new(span_builder: &'a mut SpanBuilder) -> Self {
+        Self { span_builder }
+    }
+}
+
+impl<'a> field::Visit for SpanAttributeVisitor<'a> {
+    fn record_f64(&mut self, field: &field::Field, value: f64) {
+        self.span_builder.insert_attribute(field.name(), value.into())
+    }
+
+    fn record_i64(&mut self, field: &field::Field, value: i64) {
+        self.span_builder.insert_attribute(field.name(), value.into())
+    }
+
+    fn record_u64(&mut self, field: &field::Field, value: u64) {
+        self.span_builder.insert_attribute(field.name(), value.into())
+    }
+
+    fn record_bool(&mut self, field: &field::Field, value: bool) {
+        self.span_builder.insert_attribute(field.name(), value.into())
+    }
+
+    fn record_str(&mut self, field: &field::Field, value: &str) {
+        match field.name() {
+            SPAN_NAME_FIELD => self.span_builder.set_name(value.to_owned().into()),
+            SPAN_KIND_FIELD => self.span_builder.set_kind(value.parse().unwrap_or(SpanKind::Internal)),
+            _ => self.span_builder.insert_attribute(field.name(), value.into()),
+        }
+    }
+
+    fn record_debug(&mut self, field: &field::Field, value: &dyn std::fmt::Debug) {
+        self.record_str(field, &format!("{:?}", value))
+    }
 }
