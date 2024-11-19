@@ -68,7 +68,7 @@ where
 {
     fn on_new_span(&self, attrs: &Attributes<'_>, id: &Id, ctx: Context<'_, S>) {
         let span = Self::require_span(id, &ctx);
-        let mut span_builder = SpanBuilder::new(span.name(), id.to_owned(), Instant::now(), attrs.fields().len());
+        let mut span_builder = SpanBuilder::new(span.name(), id, Instant::now(), attrs.fields().len());
 
         attrs.record(&mut SpanAttributeVisitor::new(&mut span_builder));
 
@@ -89,7 +89,7 @@ where
         let mut extensions = span.extensions_mut();
 
         if let Some(span_builder) = extensions.get_mut::<SpanBuilder>() {
-            span_builder.add_link(follows.to_owned());
+            span_builder.add_link(follows.into());
         }
     }
 
@@ -101,17 +101,18 @@ where
 
     fn on_close(&self, id: Id, ctx: Context<'_, S>) {
         let span = Self::require_span(&id, &ctx);
-        let mut extensions = span.extensions_mut();
 
-        if let Some(span_builder) = extensions.remove::<SpanBuilder>() {
-            let end_time = Instant::now();
-            let parent_id = span.parent().map(|parent| parent.id());
-            let collected_span = span_builder.end(parent_id, end_time);
+        let Some(span_builder) = span.extensions_mut().remove::<SpanBuilder>() else {
+            return;
+        };
 
-            let trace_id = Self::root_span(&id, &ctx).id();
+        let end_time = Instant::now();
+        let parent_id = span.parent().map(|parent| parent.id());
+        let collected_span = span_builder.end(parent_id, end_time);
 
-            self.collector.add_span(trace_id, collected_span);
-        }
+        let trace_id = Self::root_span(&id, &ctx).id();
+
+        self.collector.add_span(trace_id.into(), collected_span);
     }
 }
 
@@ -152,5 +153,225 @@ impl<'a> field::Visit for SpanAttributeVisitor<'a> {
 
     fn record_debug(&mut self, field: &field::Field, value: &dyn std::fmt::Debug) {
         self.record_str(field, &format!("{:?}", value))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::capturing::ng::collector::{CollectedSpan, SpanId};
+
+    use super::*;
+
+    use std::cell::RefCell;
+    use std::collections::{BTreeMap, HashMap};
+    use std::sync::atomic::{AtomicU64, Ordering};
+    use std::sync::{Arc, LazyLock, Mutex};
+    use std::time::Duration;
+
+    use assert_ron_snapshot;
+    use insta::internals::{Content, Redaction};
+    use tracing::{info_span, span, Level};
+    use tracing_subscriber::layer::SubscriberExt;
+    use tracing_subscriber::Registry;
+
+    #[derive(Debug, Default, Clone)]
+    struct TestCollector {
+        spans: Arc<Mutex<BTreeMap<SpanId, Vec<CollectedSpan>>>>,
+    }
+
+    impl TestCollector {
+        fn new() -> Self {
+            Self::default()
+        }
+
+        fn get_spans(&self) -> BTreeMap<SpanId, Vec<CollectedSpan>> {
+            self.spans.lock().unwrap().clone()
+        }
+    }
+
+    impl Collector for TestCollector {
+        fn add_span(&self, trace_id: SpanId, span: CollectedSpan) {
+            let mut spans = self.spans.lock().unwrap();
+            spans.entry(trace_id).or_default().push(span);
+        }
+    }
+
+    fn redact_id() -> Redaction {
+        thread_local! {
+            static SPAN_ID_TO_SEQUENTIAL_ID: RefCell<HashMap<u64, u64>> = <_>::default();
+            static NEXT_ID: RefCell<u64> = const { RefCell::new(1) };
+        }
+
+        insta::dynamic_redaction(|value, _path| match value {
+            Content::NewtypeStruct("SpanId", ref nested) => match **nested {
+                Content::U64(original_id) => SPAN_ID_TO_SEQUENTIAL_ID.with_borrow_mut(|map| {
+                    let id = map.entry(original_id).or_insert_with(|| {
+                        NEXT_ID.with_borrow_mut(|next_id| {
+                            let id = *next_id;
+                            *next_id += 1;
+                            id
+                        })
+                    });
+                    Content::NewtypeStruct("SpanId", Box::new(Content::U64(*id)))
+                }),
+                _ => value,
+            },
+            _ => value,
+        })
+    }
+
+    #[test]
+    fn test_basic_span_collection() {
+        let collector = TestCollector::new();
+        let subscriber = Registry::default().with(layer(collector.clone()));
+
+        tracing::subscriber::with_default(subscriber, || {
+            let span = info_span!("test_span", otel.kind = "client");
+            let _guard = span.enter();
+        });
+
+        let spans = collector.get_spans();
+
+        assert_ron_snapshot!(
+            spans,
+            { ".*" => redact_id(), ".*[].**" => redact_id() },
+            @r#"
+        {
+          SpanId(1): [
+            CollectedSpan(
+              id: SpanId(1),
+              parent_id: None,
+              name: "test_span",
+              attributes: {},
+              kind: client,
+              links: [],
+            ),
+          ],
+        }
+        "#
+        );
+    }
+
+    #[test]
+    fn test_nested_spans() {
+        let collector = TestCollector::new();
+        let subscriber = Registry::default().with(layer(collector.clone()));
+
+        tracing::subscriber::with_default(subscriber, || {
+            let parent = info_span!("parent_span");
+            let _parent_guard = parent.enter();
+
+            {
+                let child = info_span!("child_span", otel.kind = "internal");
+                let _child_guard = child.enter();
+                std::thread::sleep(Duration::from_millis(10));
+            }
+        });
+
+        let spans = collector.get_spans();
+
+        assert_ron_snapshot!(
+            spans,
+            { ".*" => redact_id(), ".*[].**" => redact_id() },
+            @r#"
+        {
+          SpanId(1): [
+            CollectedSpan(
+              id: SpanId(2),
+              parent_id: Some(SpanId(274877906945)),
+              name: "child_span",
+              attributes: {},
+              kind: internal,
+              links: [],
+            ),
+            CollectedSpan(
+              id: SpanId(1),
+              parent_id: None,
+              name: "parent_span",
+              attributes: {},
+              kind: internal,
+              links: [],
+            ),
+          ],
+        }
+        "#
+        );
+    }
+
+    #[test]
+    fn test_span_attributes() {
+        let collector = TestCollector::new();
+        let subscriber = Registry::default().with(layer(collector.clone()));
+
+        tracing::subscriber::with_default(subscriber, || {
+            let span = info_span!(
+                "attribute_span",
+                otel.kind = "client",
+                string_attr = "value",
+                bool_attr = true,
+                int_attr = 42,
+                float_attr = 3.5
+            );
+            let _guard = span.enter();
+        });
+
+        let spans = collector.get_spans();
+
+        assert_ron_snapshot!(
+            spans,
+            { ".*" => redact_id(), ".*[].**" => redact_id() },
+            @r#"
+        {
+          SpanId(1): [
+            CollectedSpan(
+              id: SpanId(1),
+              parent_id: None,
+              name: "attribute_span",
+              attributes: {
+                "string_attr": "value",
+                "bool_attr": true,
+                "int_attr": 42,
+                "float_attr": 3.5,
+              },
+              kind: client,
+              links: [],
+            ),
+          ],
+        }
+        "#
+        );
+    }
+
+    #[test]
+    fn test_span_updates() {
+        let collector = TestCollector::new();
+        let subscriber = Registry::default().with(layer(collector.clone()));
+
+        tracing::subscriber::with_default(subscriber, || {
+            let span = info_span!("updated_span", otel.kind = "client");
+            span.record("dynamic_attr", "added_later");
+            let _guard = span.enter();
+        });
+
+        let spans = collector.get_spans();
+
+        assert_ron_snapshot!(
+            spans,
+            { ".*" => redact_id(), ".*[].**" => redact_id() },
+            @r#"
+        {
+          SpanId(1): [
+            CollectedSpan(
+              id: SpanId(1),
+              parent_id: None,
+              name: "updated_span",
+              attributes: {},
+              kind: client,
+              links: [],
+            ),
+          ],
+        }
+        "#
+        );
     }
 }
