@@ -50,7 +50,7 @@ tracing-futures.workspace = true
 uuid.workspace = true
 opentelemetry = { version = "0.17", features = ["tokio"] }
 tracing-opentelemetry = "0.17.3"
-cuid = { git = "https://github.com/prisma/cuid-rust", branch = "wasm32-support" }
+cuid.workspace = true
 quaint.workspace = true
 
 [dev-dependencies]

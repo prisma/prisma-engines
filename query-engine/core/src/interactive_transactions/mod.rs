@@ -16,8 +16,7 @@ pub struct TxId(String);
 
 impl Default for TxId {
     fn default() -> Self {
-        #[allow(deprecated)]
-        Self(cuid::cuid().unwrap())
+        Self(cuid::cuid1().unwrap())
     }
 }
 
