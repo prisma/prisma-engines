@@ -319,7 +319,7 @@ mod tests {
 
         assert_ron_snapshot!(
             spans,
-            { ".*" => redact_id(), ".*[].**" => redact_id() },
+            { ".*" => redact_id(), ".*[].**" => redact_id(), ".*[].attributes" => insta::sorted_redaction() },
             @r#"
         {
           SpanId(1): [
@@ -328,10 +328,10 @@ mod tests {
               parent_id: None,
               name: "attribute_span",
               attributes: {
-                "string_attr": "value",
                 "bool_attr": true,
-                "int_attr": 42,
                 "float_attr": 3.5,
+                "int_attr": 42,
+                "string_attr": "value",
               },
               kind: client,
               links: [],
