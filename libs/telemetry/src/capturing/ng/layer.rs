@@ -168,7 +168,7 @@ mod tests {
     use std::sync::{Arc, LazyLock, Mutex};
     use std::time::Duration;
 
-    use assert_ron_snapshot;
+    use insta::assert_ron_snapshot;
     use insta::internals::{Content, Redaction};
     use tracing::{info_span, span, Level};
     use tracing_subscriber::layer::SubscriberExt;
