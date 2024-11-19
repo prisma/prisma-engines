@@ -14,66 +14,83 @@ use tracing_subscriber::{
 
 use crate::models::SpanKind;
 
-use super::{collector::SpanBuilder, traceparent::TraceParent};
+use super::{
+    collector::{Collector, Exporter, SpanBuilder},
+    traceparent::TraceParent,
+};
 
 const SPAN_NAME_FIELD: &str = "otel.name";
 const SPAN_KIND_FIELD: &str = "otel.kind";
 
-pub fn layer<S>() -> CapturingLayer<S>
+pub fn layer<S, C>(collector: C) -> CapturingLayer<S, C>
 where
     S: Subscriber + for<'a> LookupSpan<'a>,
+    C: Collector + 'static,
 {
-    CapturingLayer::default()
+    CapturingLayer::new(collector)
 }
 
-pub struct CapturingLayer<S> {
+pub struct CapturingLayer<S, C> {
     _registry: PhantomData<S>,
+    collector: C,
 }
 
-impl<S> Default for CapturingLayer<S>
+impl<S, C> CapturingLayer<S, C>
 where
     S: Subscriber + for<'a> LookupSpan<'a>,
+    C: Collector + 'static,
 {
-    fn default() -> Self {
-        CapturingLayer::new()
-    }
-}
-
-impl<S> CapturingLayer<S>
-where
-    S: Subscriber + for<'a> LookupSpan<'a>,
-{
-    pub fn new() -> Self {
-        Self { _registry: PhantomData }
+    pub fn new(collector: C) -> Self {
+        Self {
+            _registry: PhantomData,
+            collector,
+        }
     }
 
-    fn root_span_checked<'a>(id: &Id, ctx: &'a Context<'a, S>) -> Option<SpanRef<'a, S>> {
+    fn require_span<'a>(id: &Id, ctx: &'a Context<'_, S>) -> SpanRef<'a, S> {
+        ctx.span(id).expect("span must exist in the registry, this is a bug")
+    }
+
+    fn root_span_checked<'a>(id: &Id, ctx: &'a Context<'_, S>) -> Option<SpanRef<'a, S>> {
         ctx.span_scope(id)?.from_root().next()
     }
 
-    fn root_span<'a>(id: &Id, ctx: &'a Context<'a, S>) -> SpanRef<'a, S> {
+    fn root_span<'a>(id: &Id, ctx: &'a Context<'_, S>) -> SpanRef<'a, S> {
         Self::root_span_checked(id, ctx)
-            .expect("span scope must exist in the current subscriber and include at least the requested span ID")
+            .expect("span scope must exist in the registry and include at least the requested span ID")
     }
 }
 
-impl<S> Layer<S> for CapturingLayer<S>
+impl<S, C> Layer<S> for CapturingLayer<S, C>
 where
     S: Subscriber + for<'a> LookupSpan<'a>,
+    C: Collector + 'static,
 {
     fn on_new_span(&self, attrs: &Attributes<'_>, id: &Id, ctx: Context<'_, S>) {
-        let Some(span) = ctx.span(id) else { return };
-        let span_builder = SpanBuilder::new(span.name(), id.to_owned(), Instant::now(), attrs.fields().len());
+        let span = Self::require_span(id, &ctx);
+        let mut span_builder = SpanBuilder::new(span.name(), id.to_owned(), Instant::now(), attrs.fields().len());
+
+        attrs.record(&mut SpanAttributeVisitor::new(&mut span_builder));
 
         span.extensions_mut().insert(span_builder);
     }
 
-    fn on_record(&self, _span: &Id, _values: &tracing::span::Record<'_>, _ctx: Context<'_, S>) {}
+    fn on_record(&self, span: &Id, values: &tracing::span::Record<'_>, ctx: Context<'_, S>) {
+        let span = Self::require_span(span, &ctx);
+        let mut extensions = span.extensions_mut();
 
-    fn on_follows_from(&self, _span: &Id, _follows: &Id, _ctx: Context<'_, S>) {}
+        if let Some(span_builder) = extensions.get_mut::<SpanBuilder>() {
+            values.record(&mut SpanAttributeVisitor::new(span_builder));
+        }
+    }
 
-    fn event_enabled(&self, _event: &tracing::Event<'_>, _ctx: Context<'_, S>) -> bool {
-        true
+    fn on_follows_from(&self, span: &Id, follows: &Id, ctx: Context<'_, S>) {
+        let span = Self::require_span(span, &ctx);
+        let mut extensions = span.extensions_mut();
+
+        if let Some(span_builder) = extensions.get_mut::<SpanBuilder>() {
+            span_builder.add_link(follows.to_owned());
+        }
     }
 
     fn on_event(&self, _event: &tracing::Event<'_>, _ctx: Context<'_, S>) {}
@@ -82,9 +99,20 @@ where
 
     fn on_exit(&self, _id: &Id, _ctx: Context<'_, S>) {}
 
-    fn on_close(&self, _id: Id, _ctx: Context<'_, S>) {}
+    fn on_close(&self, id: Id, ctx: Context<'_, S>) {
+        let span = Self::require_span(&id, &ctx);
+        let mut extensions = span.extensions_mut();
 
-    fn on_id_change(&self, _old: &Id, _new: &Id, _ctx: Context<'_, S>) {}
+        if let Some(span_builder) = extensions.remove::<SpanBuilder>() {
+            let end_time = Instant::now();
+            let parent_id = span.parent().map(|parent| parent.id());
+            let collected_span = span_builder.end(parent_id, end_time);
+
+            let trace_id = Self::root_span(&id, &ctx).id();
+
+            self.collector.add_span(trace_id, collected_span);
+        }
+    }
 }
 
 struct SpanAttributeVisitor<'a> {
