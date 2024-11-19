@@ -374,7 +374,9 @@ mod tests {
               id: SpanId(1),
               parent_id: None,
               name: "updated_span",
-              attributes: {},
+              attributes: {
+                "dynamic_attr": "added_later",
+              },
               kind: client,
               links: [],
             ),
