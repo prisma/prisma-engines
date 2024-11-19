@@ -130,8 +130,10 @@ doc_content = @{ (!NEWLINE ~ ANY)* }
 // ######################################
 // shared building blocks
 // ######################################
-identifier = @{ ASCII_ALPHANUMERIC ~ ( "_" | "-" | ASCII_ALPHANUMERIC)* }
+unicode_alphanumeric = { LETTER | ASCII_DIGIT }
+identifier = @{ unicode_alphanumeric ~ ( "_" | "-" | unicode_alphanumeric)* }
 path = @{ identifier ~ ("." ~ path?)* }
+
 
 WHITESPACE = _{ SPACE_SEPARATOR | "\t" } // tabs are also whitespace
 NEWLINE = _{ "\n" | "\r\n" | "\r" }
