@@ -269,7 +269,6 @@ mod tests {
             {
                 let child = info_span!("child_span", otel.kind = "internal");
                 let _child_guard = child.enter();
-                std::thread::sleep(Duration::from_millis(10));
             }
         });
 
