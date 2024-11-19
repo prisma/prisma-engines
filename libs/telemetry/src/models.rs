@@ -4,6 +4,7 @@ use serde_json::json;
 use std::{
     borrow::Cow,
     collections::HashMap,
+    str::FromStr,
     time::{Duration, SystemTime},
 };
 
@@ -15,12 +16,46 @@ const ACCEPT_ATTRIBUTES: &[&str] = &[
     "itx_id",
 ];
 
+#[derive(Serialize, Debug, Clone, Copy)]
+pub enum LogLevel {
+    Trace,
+    Debug,
+    Info,
+    Warn,
+    Error,
+    Query,
+}
+
+impl From<tracing::Level> for LogLevel {
+    fn from(value: tracing::Level) -> Self {
+        match value {
+            tracing::Level::TRACE => LogLevel::Trace,
+            tracing::Level::DEBUG => LogLevel::Debug,
+            tracing::Level::INFO => LogLevel::Info,
+            tracing::Level::WARN => LogLevel::Warn,
+            tracing::Level::ERROR => LogLevel::Error,
+        }
+    }
+}
+
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 pub enum SpanKind {
     #[serde(rename = "client")]
     Client,
     #[serde(rename = "internal")]
     Internal,
+}
+
+impl FromStr for SpanKind {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "client" => Ok(SpanKind::Client),
+            "internal" => Ok(SpanKind::Internal),
+            _ => Err(()),
+        }
+    }
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
