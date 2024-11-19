@@ -357,8 +357,12 @@ mod tests {
         let subscriber = Registry::default().with(layer(collector.clone()));
 
         tracing::subscriber::with_default(subscriber, || {
-            let span = info_span!("updated_span", otel.kind = "client");
-            span.record("dynamic_attr", "added_later");
+            let span = info_span!(
+                "updated_span",
+                otel.kind = "client",
+                dynamic_attr = tracing::field::Empty
+            );
+            span.record("dynamic_attr", "added later");
             let _guard = span.enter();
         });
 
@@ -375,7 +379,7 @@ mod tests {
               parent_id: None,
               name: "updated_span",
               attributes: {
-                "dynamic_attr": "added_later",
+                "dynamic_attr": "added later",
               },
               kind: client,
               links: [],
