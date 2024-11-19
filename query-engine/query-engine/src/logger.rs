@@ -106,7 +106,9 @@ impl Logger {
                 let telemetry_layer = tracing_opentelemetry::layer()
                     .with_tracer(tracer)
                     .with_filter(is_user_trace);
-                let subscriber = subscriber.with(telemetry_layer).with(telemetry::capturing::ng::layer());
+                let subscriber = subscriber.with(telemetry_layer).with(telemetry::capturing::ng::layer(
+                    telemetry::capturing::ng::Exporter::new(),
+                ));
                 subscriber::set_global_default(subscriber)?;
             }
             TracingConfig::Disabled => {

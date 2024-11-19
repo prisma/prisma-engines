@@ -5,7 +5,8 @@ use tracing::{span::Id, Level};
 
 use crate::models::{HrTime, SpanKind, TraceSpan};
 
-pub(crate) struct CollectedSpan {
+#[derive(Debug)]
+pub struct CollectedSpan {
     id: Id,
     parent_id: Option<Id>,
     name: Cow<'static, str>,
@@ -39,16 +40,20 @@ impl SpanBuilder {
         }
     }
 
-    pub fn insert_attribute(&mut self, key: &'static str, value: serde_json::Value) {
-        self.attributes.insert(key, value);
+    pub fn set_name(&mut self, name: Cow<'static, str>) {
+        self.name = name;
     }
 
     pub fn set_kind(&mut self, kind: SpanKind) {
         self.kind = Some(kind);
     }
 
-    pub fn set_name(&mut self, name: Cow<'static, str>) {
-        self.name = name;
+    pub fn insert_attribute(&mut self, key: &'static str, value: serde_json::Value) {
+        self.attributes.insert(key, value);
+    }
+
+    pub fn add_link(&mut self, link: Id) {
+        self.links.push(link);
     }
 
     pub fn end(self, parent_id: Option<Id>, end_time: Instant) -> CollectedSpan {
@@ -65,6 +70,7 @@ impl SpanBuilder {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct CollectedEvent {
     name: &'static str,
     level: Level,
@@ -72,6 +78,26 @@ pub(crate) struct CollectedEvent {
     attributes: HashMap<&'static str, serde_json::Value>,
 }
 
-pub struct Collector {}
+pub trait Collector {
+    fn add_span(&self, trace: Id, span: CollectedSpan);
+}
 
-impl Collector {}
+pub struct Exporter {}
+
+impl Exporter {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
+impl Default for Exporter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Collector for Exporter {
+    fn add_span(&self, _trace: Id, _span: CollectedSpan) {
+        todo!()
+    }
+}
