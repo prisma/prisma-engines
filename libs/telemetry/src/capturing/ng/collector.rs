@@ -22,7 +22,7 @@ impl From<tracing::span::Id> for SpanId {
 }
 
 #[derive(Debug, Clone)]
-#[cfg_attr(test, derive(serde::Serialize))]
+#[cfg_attr(test, derive(Serialize))]
 pub struct CollectedSpan {
     id: SpanId,
     parent_id: Option<SpanId>,
