@@ -153,7 +153,7 @@ pub struct ValueGenerator {
 
 impl ValueGenerator {
     pub fn new(name: String, args: Vec<(Option<String>, PrismaValue)>) -> Result<Self, String> {
-        let generator = ValueGeneratorFn::new(name.as_ref())?;
+        let generator = ValueGeneratorFn::new(name.as_ref(), args.as_ref())?;
 
         Ok(ValueGenerator { name, args, generator })
     }
@@ -256,12 +256,16 @@ pub enum ValueGeneratorFn {
 }
 
 impl ValueGeneratorFn {
-    fn new(name: &str) -> std::result::Result<Self, String> {
+    fn new(name: &str, args: &Vec<(Option<String>, PrismaValue)>) -> std::result::Result<Self, String> {
         match name {
-            "cuid" | "cuid(1)" => Ok(Self::Cuid(1)),
-            "cuid(2)" => Ok(Self::Cuid(2)),
-            "uuid" | "uuid(4)" => Ok(Self::Uuid(4)),
-            "uuid(7)" => Ok(Self::Uuid(7)),
+            "cuid" => match args[..] {
+                [(_, PrismaValue::Int(version))] => Ok(Self::Cuid(version as u8)),
+                _ => unreachable!(),
+            },
+            "uuid" => match args[..] {
+                [(_, PrismaValue::Int(version))] => Ok(Self::Uuid(version as u8)),
+                _ => unreachable!(),
+            },
             "now" => Ok(Self::Now),
             "autoincrement" => Ok(Self::Autoincrement),
             "sequence" => Ok(Self::Autoincrement),
