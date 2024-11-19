@@ -389,4 +389,36 @@ mod tests {
         "#
         );
     }
+
+    #[test]
+    fn test_renamed_span() {
+        let collector = TestCollector::new();
+        let subscriber = Registry::default().with(layer(collector.clone()));
+
+        tracing::subscriber::with_default(subscriber, || {
+            let span = info_span!("renamed_span", otel.name = "new_name");
+            let _guard = span.enter();
+        });
+
+        let spans = collector.get_spans();
+
+        assert_ron_snapshot!(
+            spans,
+            { ".*" => redact_id(), ".*[].**" => redact_id() },
+            @r#"
+        {
+          SpanId(1): [
+            CollectedSpan(
+              id: SpanId(1),
+              parent_id: None,
+              name: "new_name",
+              attributes: {},
+              kind: internal,
+              links: [],
+            ),
+          ],
+        }
+        "#
+        );
+    }
 }
