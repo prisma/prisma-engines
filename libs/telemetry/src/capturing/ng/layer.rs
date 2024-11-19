@@ -421,4 +421,53 @@ mod tests {
         "#
         );
     }
+
+    #[test]
+    fn test_follows_from() {
+        let collector = TestCollector::new();
+        let subscriber = Registry::default().with(layer(collector.clone()));
+
+        tracing::subscriber::with_default(subscriber, || {
+            let span1 = info_span!("span1");
+            let span2 = info_span!("span2");
+            span2.follows_from(span1.id());
+        });
+
+        let spans = collector.get_spans();
+
+        assert_ron_snapshot!(
+            spans,
+            {
+                ".*" => redact_id(),
+                ".*[].**" => redact_id(),
+                ".*[].links[]" => redact_id(),
+            },
+            @r#"
+        {
+          SpanId(1): [
+            CollectedSpan(
+              id: SpanId(1),
+              parent_id: None,
+              name: "span1",
+              attributes: {},
+              kind: internal,
+              links: [],
+            ),
+          ],
+          SpanId(2): [
+            CollectedSpan(
+              id: SpanId(2),
+              parent_id: None,
+              name: "span2",
+              attributes: {},
+              kind: internal,
+              links: [
+                SpanId(1),
+              ],
+            ),
+          ],
+        }
+        "#
+        );
+    }
 }
