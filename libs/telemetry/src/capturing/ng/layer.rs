@@ -202,22 +202,27 @@ mod tests {
             static NEXT_ID: RefCell<u64> = const { RefCell::new(1) };
         }
 
-        insta::dynamic_redaction(|value, _path| match value {
-            Content::NewtypeStruct("SpanId", ref nested) => match **nested {
-                Content::U64(original_id) => SPAN_ID_TO_SEQUENTIAL_ID.with_borrow_mut(|map| {
-                    let id = map.entry(original_id).or_insert_with(|| {
-                        NEXT_ID.with_borrow_mut(|next_id| {
-                            let id = *next_id;
-                            *next_id += 1;
-                            id
-                        })
-                    });
-                    Content::NewtypeStruct("SpanId", Box::new(Content::U64(*id)))
-                }),
+        fn redact_recursive(value: Content) -> Content {
+            match value {
+                Content::NewtypeStruct("SpanId", ref nested) => match **nested {
+                    Content::U64(original_id) => SPAN_ID_TO_SEQUENTIAL_ID.with_borrow_mut(|map| {
+                        let id = map.entry(original_id).or_insert_with(|| {
+                            NEXT_ID.with_borrow_mut(|next_id| {
+                                let id = *next_id;
+                                *next_id += 1;
+                                id
+                            })
+                        });
+                        Content::NewtypeStruct("SpanId", Box::new(Content::U64(*id)))
+                    }),
+                    _ => value,
+                },
+                Content::Some(nested) => Content::Some(Box::new(redact_recursive(*nested))),
                 _ => value,
-            },
-            _ => value,
-        })
+            }
+        }
+
+        insta::dynamic_redaction(|value, _path| redact_recursive(value))
     }
 
     #[test]
@@ -278,7 +283,7 @@ mod tests {
           SpanId(1): [
             CollectedSpan(
               id: SpanId(2),
-              parent_id: Some(SpanId(274877906945)),
+              parent_id: Some(SpanId(1)),
               name: "child_span",
               attributes: {},
               kind: internal,
