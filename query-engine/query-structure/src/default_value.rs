@@ -256,7 +256,7 @@ pub enum ValueGeneratorFn {
 }
 
 impl ValueGeneratorFn {
-    fn new(name: &str, args: &Vec<(Option<String>, PrismaValue)>) -> std::result::Result<Self, String> {
+    fn new(name: &str, args: &[(Option<String>, PrismaValue)]) -> std::result::Result<Self, String> {
         match name {
             "cuid" => match args[..] {
                 [(_, PrismaValue::Int(version))] => Ok(Self::Cuid(version as u8)),

@@ -161,7 +161,7 @@ mod uuid_create_graphql {
 
         // Validate that this is a valid CUIDv2 value
         {
-            assert_eq!(cuid::is_cuid2(cuid.as_str()), true);
+            assert!(cuid::is_cuid2(cuid.as_str()));
         }
 
         // Test findMany
