@@ -636,9 +636,7 @@ impl DefaultValueAssert for ast::Expression {
 
     #[track_caller]
     fn assert_cuid(&self) -> &Self {
-        assert!(
-            matches!(self, ast::Expression::Function(name, _, _) if name == "cuid")
-        );
+        assert!(matches!(self, ast::Expression::Function(name, _, _) if name == "cuid"));
 
         self
     }
