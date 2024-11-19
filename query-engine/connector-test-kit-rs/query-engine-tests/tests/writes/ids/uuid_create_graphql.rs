@@ -69,7 +69,7 @@ mod uuid_create_graphql {
         Ok(())
     }
 
-    fn schema_3() -> String {
+    fn schema_uuid_7() -> String {
         let schema = indoc! {
             r#"model Todo {
               #id(id, String, @id, @default(uuid(7)))
@@ -81,7 +81,7 @@ mod uuid_create_graphql {
     }
 
     // "Creating an item with an id field of model UUIDv7 and retrieving it" should "work"
-    #[connector_test(schema(schema_3))]
+    #[connector_test(schema(schema_uuid_7))]
     async fn create_uuid_v7_and_retrieve_it_should_work(runner: Runner) -> TestResult<()> {
         let res = run_query_json!(
             &runner,
@@ -126,6 +126,64 @@ mod uuid_create_graphql {
             assert_eq!(str, uuid);
         } else {
             panic!("Expected UUID but got something else.");
+        }
+
+        Ok(())
+    }
+
+    fn schema_cuid_2() -> String {
+        let schema = indoc! {
+            r#"model Todo {
+              #id(id, String, @id, @default(cuid(2)))
+              title String
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "Creating an item with an id field of model CUIDv2 and retrieving it" should "work"
+    #[connector_test(schema(schema_cuid_2))]
+    async fn create_cuid_v2_and_retrieve_it_should_work(runner: Runner) -> TestResult<()> {
+        let res = run_query_json!(
+            &runner,
+            r#"mutation {
+          createOneTodo(data: { title: "the title" }){
+            id
+          }
+        }"#
+        );
+
+        let cuid = match &res["data"]["createOneTodo"]["id"] {
+            serde_json::Value::String(str) => str,
+            _ => unreachable!(),
+        };
+
+        // Validate that this is a valid CUIDv2 value
+        {
+            assert_eq!(cuid::is_cuid2(cuid.as_str()), true);
+        }
+
+        // Test findMany
+        let res = run_query_json!(
+            &runner,
+            r#"query { findManyTodo(where: { title: "the title" }) { id }}"#
+        );
+        if let serde_json::Value::String(str) = &res["data"]["findManyTodo"][0]["id"] {
+            assert_eq!(str, cuid);
+        } else {
+            panic!("Expected CUID but got something else.");
+        }
+
+        // Test findUnique
+        let res = run_query_json!(
+            &runner,
+            format!(r#"query {{ findUniqueTodo(where: {{ id: "{}" }}) {{ id }} }}"#, cuid)
+        );
+        if let serde_json::Value::String(str) = &res["data"]["findUniqueTodo"]["id"] {
+            assert_eq!(str, cuid);
+        } else {
+            panic!("Expected CUID but got something else.");
         }
 
         Ok(())
