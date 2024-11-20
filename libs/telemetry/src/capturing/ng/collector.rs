@@ -6,12 +6,27 @@ use tracing::Level;
 
 use crate::models::{LogLevel, SpanKind, TraceSpan};
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+struct SerializableNonZeroU64(NonZeroU64);
+
+impl Serialize for SerializableNonZeroU64 {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        // Serialize as string to preserve full u64 precision in JavaScript. Otherwise values
+        // larger than 2^53 - 1 will be parsed as floats on the client side, making it possible for
+        // IDs to collide.
+        self.0.to_string().serialize(serializer)
+    }
+}
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
-pub struct SpanId(NonZeroU64);
+pub struct SpanId(SerializableNonZeroU64);
 
 impl From<&tracing::span::Id> for SpanId {
     fn from(id: &tracing::span::Id) -> Self {
-        Self(id.into_non_zero_u64())
+        Self(SerializableNonZeroU64(id.into_non_zero_u64()))
     }
 }
 

@@ -285,15 +285,15 @@ mod tests {
     /// IDs (as libtest runs every test in its own thread).
     fn redact_id() -> Redaction {
         thread_local! {
-            static SPAN_ID_TO_SEQUENTIAL_ID: RefCell<HashMap<u64, u64>> = <_>::default();
+            static SPAN_ID_TO_SEQUENTIAL_ID: RefCell<HashMap<String, u64>> = <_>::default();
             static NEXT_ID: RefCell<u64> = const { RefCell::new(1) };
         }
 
         fn redact_recursive(value: Content) -> Content {
             match value {
                 Content::NewtypeStruct("SpanId", ref nested) => match **nested {
-                    Content::U64(original_id) => SPAN_ID_TO_SEQUENTIAL_ID.with_borrow_mut(|map| {
-                        let id = map.entry(original_id).or_insert_with(|| {
+                    Content::String(ref original_id) => SPAN_ID_TO_SEQUENTIAL_ID.with_borrow_mut(|map| {
+                        let id = map.entry(original_id.clone()).or_insert_with(|| {
                             NEXT_ID.with_borrow_mut(|next_id| {
                                 let id = *next_id;
                                 *next_id += 1;
