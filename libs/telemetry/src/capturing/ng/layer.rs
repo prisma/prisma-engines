@@ -12,7 +12,7 @@ use tracing_subscriber::{
     Layer,
 };
 
-use crate::models::SpanKind;
+use crate::models::{LogLevel, SpanKind};
 
 use super::{
     collector::{CollectedEvent, Collector, EventBuilder, Exporter, SpanBuilder},
@@ -21,6 +21,7 @@ use super::{
 
 const SPAN_NAME_FIELD: &str = "otel.name";
 const SPAN_KIND_FIELD: &str = "otel.kind";
+const EVENT_LEVEL_FIELD: &str = "item_type";
 
 pub fn layer<S, C>(collector: C) -> CapturingLayer<S, C>
 where
@@ -106,14 +107,14 @@ where
 
         let root = Self::root_span(&parent, &ctx).id();
 
-        let event_builder = EventBuilder::new(
+        let mut event_builder = EventBuilder::new(
             event.metadata().name(),
-            *event.metadata().level(),
+            event.metadata().level().into(),
             Instant::now(),
             event.metadata().fields().len(),
         );
 
-        // TODO: record attributes
+        event.record(&mut EventAttributeVisitor::new(&mut event_builder));
 
         self.collector.add_event(root.into(), event_builder.build());
     }
@@ -175,6 +176,45 @@ impl<'a> field::Visit for SpanAttributeVisitor<'a> {
     }
 }
 
+struct EventAttributeVisitor<'a> {
+    event_builder: &'a mut EventBuilder,
+}
+
+impl<'a> EventAttributeVisitor<'a> {
+    fn new(event_builder: &'a mut EventBuilder) -> Self {
+        Self { event_builder }
+    }
+}
+
+impl<'a> field::Visit for EventAttributeVisitor<'a> {
+    fn record_f64(&mut self, field: &field::Field, value: f64) {
+        self.event_builder.insert_attribute(field.name(), value.into())
+    }
+
+    fn record_i64(&mut self, field: &field::Field, value: i64) {
+        self.event_builder.insert_attribute(field.name(), value.into())
+    }
+
+    fn record_u64(&mut self, field: &field::Field, value: u64) {
+        self.event_builder.insert_attribute(field.name(), value.into())
+    }
+
+    fn record_bool(&mut self, field: &field::Field, value: bool) {
+        self.event_builder.insert_attribute(field.name(), value.into())
+    }
+
+    fn record_str(&mut self, field: &field::Field, value: &str) {
+        match field.name() {
+            EVENT_LEVEL_FIELD => self.event_builder.set_level(value.parse().unwrap_or(LogLevel::Trace)),
+            _ => self.event_builder.insert_attribute(field.name(), value.into()),
+        }
+    }
+
+    fn record_debug(&mut self, field: &field::Field, value: &dyn std::fmt::Debug) {
+        self.record_str(field, &format!("{:?}", value))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::capturing::ng::collector::{CollectedSpan, SpanId};
@@ -196,6 +236,7 @@ mod tests {
     #[derive(Debug, Default, Clone)]
     struct TestCollector {
         spans: Arc<Mutex<BTreeMap<SpanId, Vec<CollectedSpan>>>>,
+        events: Arc<Mutex<BTreeMap<SpanId, Vec<CollectedEvent>>>>,
     }
 
     impl TestCollector {
@@ -203,8 +244,12 @@ mod tests {
             Self::default()
         }
 
-        fn get_spans(&self) -> BTreeMap<SpanId, Vec<CollectedSpan>> {
+        fn spans(&self) -> BTreeMap<SpanId, Vec<CollectedSpan>> {
             self.spans.lock().unwrap().clone()
+        }
+
+        fn events(&self) -> BTreeMap<SpanId, Vec<CollectedEvent>> {
+            self.events.lock().unwrap().clone()
         }
     }
 
@@ -215,7 +260,8 @@ mod tests {
         }
 
         fn add_event(&self, trace_id: SpanId, event: CollectedEvent) {
-            todo!()
+            let mut events = self.events.lock().unwrap();
+            events.entry(trace_id).or_default().push(event);
         }
     }
 
@@ -258,7 +304,7 @@ mod tests {
             let _guard = span.enter();
         });
 
-        let spans = collector.get_spans();
+        let spans = collector.spans();
 
         assert_ron_snapshot!(
             spans,
@@ -295,7 +341,7 @@ mod tests {
             }
         });
 
-        let spans = collector.get_spans();
+        let spans = collector.spans();
 
         assert_ron_snapshot!(
             spans,
@@ -342,7 +388,7 @@ mod tests {
             let _guard = span.enter();
         });
 
-        let spans = collector.get_spans();
+        let spans = collector.spans();
 
         assert_ron_snapshot!(
             spans,
@@ -388,7 +434,7 @@ mod tests {
             let _guard = span.enter();
         });
 
-        let spans = collector.get_spans();
+        let spans = collector.spans();
 
         assert_ron_snapshot!(
             spans,
@@ -422,7 +468,7 @@ mod tests {
             let _guard = span.enter();
         });
 
-        let spans = collector.get_spans();
+        let spans = collector.spans();
 
         assert_ron_snapshot!(
             spans,
@@ -455,7 +501,7 @@ mod tests {
             span2.follows_from(span1.id());
         });
 
-        let spans = collector.get_spans();
+        let spans = collector.spans();
 
         assert_ron_snapshot!(
             spans,
@@ -486,6 +532,206 @@ mod tests {
               links: [
                 SpanId(1),
               ],
+            ),
+          ],
+        }
+        "#
+        );
+    }
+
+    #[test]
+    fn test_basic_event() {
+        let collector = TestCollector::new();
+        let subscriber = Registry::default().with(layer(collector.clone()));
+
+        tracing::subscriber::with_default(subscriber, || {
+            let span = info_span!("test_span");
+            let _guard = span.enter();
+
+            tracing::info!(name: "event", "test event");
+        });
+
+        let events = collector.events();
+
+        assert_ron_snapshot!(
+            events,
+            { ".*" => redact_id(), ".*[].**" => redact_id() },
+            @r#"
+        {
+          SpanId(1): [
+            CollectedEvent(
+              name: "event",
+              level: Info,
+              attributes: {
+                "message": "test event",
+              },
+            ),
+          ],
+        }
+        "#
+        );
+    }
+
+    #[test]
+    fn test_event_with_attributes() {
+        let collector = TestCollector::new();
+        let subscriber = Registry::default().with(layer(collector.clone()));
+
+        tracing::subscriber::with_default(subscriber, || {
+            let span = info_span!("test_span");
+            let _guard = span.enter();
+
+            tracing::info!(
+                name: "event",
+                string_attr = "value",
+                bool_attr = true,
+                int_attr = 42,
+                float_attr = 3.5,
+                "test event",
+            );
+        });
+
+        let events = collector.events();
+
+        assert_ron_snapshot!(
+            events,
+            {
+                ".*" => redact_id(),
+                ".*[].**" => redact_id(),
+                ".*[].attributes" => insta::sorted_redaction()
+            },
+            @r#"
+        {
+          SpanId(1): [
+            CollectedEvent(
+              name: "event",
+              level: Info,
+              attributes: {
+                "bool_attr": true,
+                "float_attr": 3.5,
+                "int_attr": 42,
+                "message": "test event",
+                "string_attr": "value",
+              },
+            ),
+          ],
+        }
+        "#
+        );
+    }
+
+    #[test]
+    fn test_events_in_nested_spans() {
+        let collector = TestCollector::new();
+        let subscriber = Registry::default().with(layer(collector.clone()));
+
+        tracing::subscriber::with_default(subscriber, || {
+            let parent = info_span!("parent_span");
+            let _parent_guard = parent.enter();
+            tracing::info!(name: "event1", "parent event");
+
+            {
+                let child = info_span!("child_span");
+                let _child_guard = child.enter();
+                tracing::info!(name: "event2", "child event");
+            }
+        });
+
+        let events = collector.events();
+
+        assert_ron_snapshot!(
+            events,
+            { ".*" => redact_id(), ".*[].**" => redact_id() },
+            @r#"
+        {
+          SpanId(1): [
+            CollectedEvent(
+              name: "event1",
+              level: Info,
+              attributes: {
+                "message": "parent event",
+              },
+            ),
+            CollectedEvent(
+              name: "event2",
+              level: Info,
+              attributes: {
+                "message": "child event",
+              },
+            ),
+          ],
+        }
+        "#
+        );
+    }
+
+    #[test]
+    fn test_event_levels() {
+        let collector = TestCollector::new();
+        let subscriber = Registry::default().with(layer(collector.clone()));
+
+        tracing::subscriber::with_default(subscriber, || {
+            let span = info_span!("test_span");
+            let _guard = span.enter();
+
+            tracing::error!(name: "event1", "error event");
+            tracing::warn!(name: "event2", "warn event");
+            tracing::info!(name: "event3", "info event");
+            tracing::debug!(name: "event4", "debug event");
+            tracing::trace!(name: "event5", "trace event");
+
+            tracing::info!(name: "event6", item_type = "query", "query event");
+        });
+
+        let events = collector.events();
+
+        assert_ron_snapshot!(
+            events,
+            { ".*" => redact_id(), ".*[].**" => redact_id() },
+            @r#"
+        {
+          SpanId(1): [
+            CollectedEvent(
+              name: "event1",
+              level: Error,
+              attributes: {
+                "message": "error event",
+              },
+            ),
+            CollectedEvent(
+              name: "event2",
+              level: Warn,
+              attributes: {
+                "message": "warn event",
+              },
+            ),
+            CollectedEvent(
+              name: "event3",
+              level: Info,
+              attributes: {
+                "message": "info event",
+              },
+            ),
+            CollectedEvent(
+              name: "event4",
+              level: Debug,
+              attributes: {
+                "message": "debug event",
+              },
+            ),
+            CollectedEvent(
+              name: "event5",
+              level: Trace,
+              attributes: {
+                "message": "trace event",
+              },
+            ),
+            CollectedEvent(
+              name: "event6",
+              level: Query,
+              attributes: {
+                "message": "query event",
+              },
             ),
           ],
         }
