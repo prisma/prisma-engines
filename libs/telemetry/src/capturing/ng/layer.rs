@@ -23,6 +23,7 @@ const SPAN_NAME_FIELD: &str = "otel.name";
 const SPAN_KIND_FIELD: &str = "otel.kind";
 const EVENT_LEVEL_FIELD: &str = "item_type";
 
+/// Creates a new [`CapturingLayer`].
 pub fn layer<S, C>(collector: C) -> CapturingLayer<S, C>
 where
     S: Subscriber + for<'a> LookupSpan<'a>,
@@ -31,6 +32,19 @@ where
     CapturingLayer::new(collector)
 }
 
+/// A [`Layer`] that captures spans and events and forwards them to a [`Collector`].
+///
+/// This layer supports certain transformations based on the attributes of spans and events:
+///
+/// - The `otel.name` attribute is used to rename spans.
+/// - The `otel.kind` attribute is used to set the OpenTelemetry kind of a span.
+/// - The `item_type` attribute is used to override the level of an event (this is used for our
+///   artificial "query" level).
+///
+/// Only events nested within spans are captured here. The reason for this is because we only need
+/// to use the capturing mechanism for events to enable logs in response for Accelerate, and events
+/// without parent spans cannot be associated with any specific client request. When the client has
+/// direct access to the engine, all logs are sent directly in real time instead.
 pub struct CapturingLayer<S, C> {
     _registry: PhantomData<S>,
     collector: C,
@@ -266,6 +280,9 @@ mod tests {
         }
     }
 
+    /// Redacts span IDs to make snapshots stable. Mappings from original span IDs to redacted IDs
+    /// are stored in a thread-local hash map, which ensures each test gets their own namespace of
+    /// IDs (as libtest runs every test in its own thread).
     fn redact_id() -> Redaction {
         thread_local! {
             static SPAN_ID_TO_SEQUENTIAL_ID: RefCell<HashMap<u64, u64>> = <_>::default();
