@@ -15,7 +15,7 @@ use tracing_subscriber::{
 use crate::models::SpanKind;
 
 use super::{
-    collector::{Collector, Exporter, SpanBuilder},
+    collector::{CollectedEvent, Collector, EventBuilder, Exporter, SpanBuilder},
     traceparent::TraceParent,
 };
 
@@ -93,11 +93,30 @@ where
         }
     }
 
-    fn on_event(&self, _event: &tracing::Event<'_>, _ctx: Context<'_, S>) {}
+    fn on_event(&self, event: &tracing::Event<'_>, ctx: Context<'_, S>) {
+        let Some(parent) = event.parent().cloned().or_else(|| {
+            event
+                .is_contextual()
+                .then(|| ctx.current_span().id().cloned())
+                .flatten()
+        }) else {
+            // Events without a parent span are not collected.
+            return;
+        };
 
-    fn on_enter(&self, _id: &Id, _ctx: Context<'_, S>) {}
+        let root = Self::root_span(&parent, &ctx).id();
 
-    fn on_exit(&self, _id: &Id, _ctx: Context<'_, S>) {}
+        let event_builder = EventBuilder::new(
+            event.metadata().name(),
+            *event.metadata().level(),
+            Instant::now(),
+            event.metadata().fields().len(),
+        );
+
+        // TODO: record attributes
+
+        self.collector.add_event(root.into(), event_builder.build());
+    }
 
     fn on_close(&self, id: Id, ctx: Context<'_, S>) {
         let span = Self::require_span(&id, &ctx);
@@ -193,6 +212,10 @@ mod tests {
         fn add_span(&self, trace_id: SpanId, span: CollectedSpan) {
             let mut spans = self.spans.lock().unwrap();
             spans.entry(trace_id).or_default().push(span);
+        }
+
+        fn add_event(&self, trace_id: SpanId, event: CollectedEvent) {
+            todo!()
         }
     }
 
