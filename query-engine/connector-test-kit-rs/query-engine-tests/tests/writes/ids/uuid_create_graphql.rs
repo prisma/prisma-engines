@@ -131,6 +131,64 @@ mod uuid_create_graphql {
         Ok(())
     }
 
+    fn schema_cuid_1() -> String {
+        let schema = indoc! {
+            r#"model Todo {
+              #id(id, String, @id, @default(cuid(1)))
+              title String
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "Creating an item with an id field of model CUIDv1 and retrieving it" should "work"
+    #[connector_test(schema(schema_cuid_1))]
+    async fn create_cuid_v1_and_retrieve_it_should_work(runner: Runner) -> TestResult<()> {
+        let res = run_query_json!(
+            &runner,
+            r#"mutation {
+          createOneTodo(data: { title: "the title" }){
+            id
+          }
+        }"#
+        );
+
+        let cuid = match &res["data"]["createOneTodo"]["id"] {
+            serde_json::Value::String(str) => str,
+            _ => unreachable!(),
+        };
+
+        // Validate that this is a valid CUIDv1 value
+        {
+            assert!(cuid::is_cuid1(cuid.as_str()));
+        }
+
+        // Test findMany
+        let res = run_query_json!(
+            &runner,
+            r#"query { findManyTodo(where: { title: "the title" }) { id }}"#
+        );
+        if let serde_json::Value::String(str) = &res["data"]["findManyTodo"][0]["id"] {
+            assert_eq!(str, cuid);
+        } else {
+            panic!("Expected CUID but got something else.");
+        }
+
+        // Test findUnique
+        let res = run_query_json!(
+            &runner,
+            format!(r#"query {{ findUniqueTodo(where: {{ id: "{}" }}) {{ id }} }}"#, cuid)
+        );
+        if let serde_json::Value::String(str) = &res["data"]["findUniqueTodo"]["id"] {
+            assert_eq!(str, cuid);
+        } else {
+            panic!("Expected CUID but got something else.");
+        }
+
+        Ok(())
+    }
+
     fn schema_cuid_2() -> String {
         let schema = indoc! {
             r#"model Todo {
