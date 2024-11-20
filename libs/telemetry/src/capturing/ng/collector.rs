@@ -4,7 +4,7 @@ use serde::Serialize;
 use tokio::time::Instant;
 use tracing::Level;
 
-use crate::models::{HrTime, SpanKind, TraceSpan};
+use crate::models::{LogLevel, SpanKind, TraceSpan};
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
 pub struct SpanId(NonZeroU64);
@@ -90,22 +90,24 @@ impl SpanBuilder {
 }
 
 #[derive(Debug, Clone)]
+#[cfg_attr(test, derive(Serialize))]
 pub struct CollectedEvent {
     name: &'static str,
-    level: Level,
+    level: LogLevel,
+    #[cfg_attr(test, serde(skip_serializing))]
     timestamp: Instant,
     attributes: HashMap<&'static str, serde_json::Value>,
 }
 
 pub(crate) struct EventBuilder {
     name: &'static str,
-    level: Level,
+    level: LogLevel,
     timestamp: Instant,
     attributes: HashMap<&'static str, serde_json::Value>,
 }
 
 impl EventBuilder {
-    pub fn new(name: &'static str, level: Level, timestamp: Instant, attrs_size_hint: usize) -> Self {
+    pub fn new(name: &'static str, level: LogLevel, timestamp: Instant, attrs_size_hint: usize) -> Self {
         Self {
             name,
             level,
@@ -116,6 +118,10 @@ impl EventBuilder {
 
     pub fn insert_attribute(&mut self, key: &'static str, value: serde_json::Value) {
         self.attributes.insert(key, value);
+    }
+
+    pub fn set_level(&mut self, level: LogLevel) {
+        self.level = level;
     }
 
     pub fn build(self) -> CollectedEvent {
