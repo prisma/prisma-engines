@@ -1,6 +1,6 @@
 use std::{borrow::Cow, collections::HashMap, num::NonZeroU64, sync::Arc};
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tokio::time::Instant;
 use tracing::Level;
 
@@ -18,6 +18,19 @@ impl Serialize for SerializableNonZeroU64 {
         // larger than 2^53 - 1 will be parsed as floats on the client side, making it possible for
         // IDs to collide.
         self.0.to_string().serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for SerializableNonZeroU64 {
+    fn deserialize<D>(deserializer: D) -> Result<SerializableNonZeroU64, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        let value = value.parse().map_err(serde::de::Error::custom)?;
+        Ok(SerializableNonZeroU64(
+            NonZeroU64::new(value).ok_or_else(|| serde::de::Error::custom("value must be non-zero"))?,
+        ))
     }
 }
 
