@@ -108,6 +108,7 @@ where
         let root = Self::root_span(&parent, &ctx).id();
 
         let mut event_builder = EventBuilder::new(
+            parent.into(),
             event.metadata().name(),
             event.metadata().level().into(),
             Instant::now(),
@@ -560,6 +561,7 @@ mod tests {
         {
           SpanId(1): [
             CollectedEvent(
+              span_id: SpanId(1),
               name: "event",
               level: Info,
               attributes: {
@@ -604,6 +606,7 @@ mod tests {
         {
           SpanId(1): [
             CollectedEvent(
+              span_id: SpanId(1),
               name: "event",
               level: Info,
               attributes: {
@@ -646,6 +649,7 @@ mod tests {
         {
           SpanId(1): [
             CollectedEvent(
+              span_id: SpanId(1),
               name: "event1",
               level: Info,
               attributes: {
@@ -653,6 +657,7 @@ mod tests {
               },
             ),
             CollectedEvent(
+              span_id: SpanId(2),
               name: "event2",
               level: Info,
               attributes: {
@@ -692,6 +697,7 @@ mod tests {
         {
           SpanId(1): [
             CollectedEvent(
+              span_id: SpanId(1),
               name: "event1",
               level: Error,
               attributes: {
@@ -699,6 +705,7 @@ mod tests {
               },
             ),
             CollectedEvent(
+              span_id: SpanId(1),
               name: "event2",
               level: Warn,
               attributes: {
@@ -706,6 +713,7 @@ mod tests {
               },
             ),
             CollectedEvent(
+              span_id: SpanId(1),
               name: "event3",
               level: Info,
               attributes: {
@@ -713,6 +721,7 @@ mod tests {
               },
             ),
             CollectedEvent(
+              span_id: SpanId(1),
               name: "event4",
               level: Debug,
               attributes: {
@@ -720,6 +729,7 @@ mod tests {
               },
             ),
             CollectedEvent(
+              span_id: SpanId(1),
               name: "event5",
               level: Trace,
               attributes: {
@@ -727,6 +737,7 @@ mod tests {
               },
             ),
             CollectedEvent(
+              span_id: SpanId(1),
               name: "event6",
               level: Query,
               attributes: {
