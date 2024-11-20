@@ -92,6 +92,7 @@ impl SpanBuilder {
 #[derive(Debug, Clone)]
 #[cfg_attr(test, derive(Serialize))]
 pub struct CollectedEvent {
+    span_id: SpanId,
     name: &'static str,
     level: LogLevel,
     #[cfg_attr(test, serde(skip_serializing))]
@@ -100,6 +101,7 @@ pub struct CollectedEvent {
 }
 
 pub(crate) struct EventBuilder {
+    span_id: SpanId,
     name: &'static str,
     level: LogLevel,
     timestamp: Instant,
@@ -107,8 +109,15 @@ pub(crate) struct EventBuilder {
 }
 
 impl EventBuilder {
-    pub fn new(name: &'static str, level: LogLevel, timestamp: Instant, attrs_size_hint: usize) -> Self {
+    pub fn new(
+        span_id: SpanId,
+        name: &'static str,
+        level: LogLevel,
+        timestamp: Instant,
+        attrs_size_hint: usize,
+    ) -> Self {
         Self {
+            span_id,
             name,
             level,
             timestamp,
@@ -126,6 +135,7 @@ impl EventBuilder {
 
     pub fn build(self) -> CollectedEvent {
         CollectedEvent {
+            span_id: self.span_id,
             name: self.name,
             level: self.level,
             timestamp: self.timestamp,
