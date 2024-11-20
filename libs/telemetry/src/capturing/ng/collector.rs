@@ -1,4 +1,4 @@
-use std::{borrow::Cow, collections::HashMap, num::NonZeroU64};
+use std::{borrow::Cow, collections::HashMap, num::NonZeroU64, sync::Arc};
 
 use serde::Serialize;
 use tokio::time::Instant;
@@ -149,11 +149,16 @@ pub trait Collector {
     fn add_event(&self, trace: SpanId, event: CollectedEvent);
 }
 
-pub struct Exporter {}
+#[derive(Clone)]
+pub struct Exporter(Arc<ExporterInner>);
+
+struct ExporterInner {
+    tasks: HashMap<SpanId, ()>,
+}
 
 impl Exporter {
     pub fn new() -> Self {
-        Self {}
+        Self(Arc::new(ExporterInner { tasks: HashMap::new() }))
     }
 }
 
