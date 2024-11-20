@@ -1,12 +1,14 @@
 use std::{borrow::Cow, collections::HashMap, num::NonZeroU64, sync::Arc};
 
+use derive_more::Display;
 use serde::{Deserialize, Serialize};
 use tokio::time::Instant;
 use tracing::Level;
 
 use crate::models::{LogLevel, SpanKind, TraceSpan};
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Display, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[display(fmt = "{}", _0)]
 struct SerializableNonZeroU64(NonZeroU64);
 
 impl Serialize for SerializableNonZeroU64 {
@@ -17,7 +19,7 @@ impl Serialize for SerializableNonZeroU64 {
         // Serialize as string to preserve full u64 precision in JavaScript. Otherwise values
         // larger than 2^53 - 1 will be parsed as floats on the client side, making it possible for
         // IDs to collide.
-        self.0.to_string().serialize(serializer)
+        self.to_string().serialize(serializer)
     }
 }
 
@@ -34,6 +36,35 @@ impl<'de> Deserialize<'de> for SerializableNonZeroU64 {
     }
 }
 
+#[derive(Debug, Display, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[display(fmt = "{}", _0)]
+struct SerializableU64(u64);
+
+impl Serialize for SerializableU64 {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        // Serialize as string to preserve full u64 precision in JavaScript. Otherwise values
+        // larger than 2^53 - 1 will be parsed as floats on the client side, making it possible for
+        // IDs to collide.
+        self.to_string().serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for SerializableU64 {
+    fn deserialize<D>(deserializer: D) -> Result<SerializableU64, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        let value = value.parse().map_err(serde::de::Error::custom)?;
+        Ok(SerializableU64(value))
+    }
+}
+
+/// A unique identifier for a span. It maps directly to [`tracing::span::Id`] assigned by
+/// [`tracing_subscriber::registry::Registry`].
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
 pub struct SpanId(SerializableNonZeroU64);
 
@@ -48,6 +79,22 @@ impl From<tracing::span::Id> for SpanId {
         Self::from(&id)
     }
 }
+
+/// A unique identifier for an engine trace, representing a tree of spans. These internal traces *do
+/// not* correspond to OpenTelemetry traces defined by [`crate::capturing::ng::traceparent::TraceParent`].
+/// One OpenTelemetry trace may contain multiple Prisma Client operations, each of them leading to
+/// one or more engine requests. Since engine traces map 1:1 to requests to the engine, we call
+/// these trace IDs "request IDs" to disambiguate and avoid confusion.
+///
+/// We don't use IDs of the root spans themselves for this purpose because span IDs are only
+/// guaranteed to be unique among the spans active at the same time. They may be reused after a
+/// span is closed, so they are not historically unique. We store the collected spans and events
+/// for some short time after the spans are closed until the client requests them, so we need
+/// request IDs that are guaranteed to be unique for a very long period of time (although they
+/// still don't necessarily have to be unique for the whole lifetime of the process).
+pub struct RequestId(SerializableU64);
+
+impl RequestId {}
 
 #[derive(Debug, Clone)]
 #[cfg_attr(test, derive(Serialize))]
