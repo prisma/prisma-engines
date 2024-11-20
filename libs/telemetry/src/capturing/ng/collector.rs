@@ -90,15 +90,47 @@ impl SpanBuilder {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct CollectedEvent {
+pub struct CollectedEvent {
     name: &'static str,
     level: Level,
     timestamp: Instant,
     attributes: HashMap<&'static str, serde_json::Value>,
 }
 
+pub(crate) struct EventBuilder {
+    name: &'static str,
+    level: Level,
+    timestamp: Instant,
+    attributes: HashMap<&'static str, serde_json::Value>,
+}
+
+impl EventBuilder {
+    pub fn new(name: &'static str, level: Level, timestamp: Instant, attrs_size_hint: usize) -> Self {
+        Self {
+            name,
+            level,
+            timestamp,
+            attributes: HashMap::with_capacity(attrs_size_hint),
+        }
+    }
+
+    pub fn insert_attribute(&mut self, key: &'static str, value: serde_json::Value) {
+        self.attributes.insert(key, value);
+    }
+
+    pub fn build(self) -> CollectedEvent {
+        CollectedEvent {
+            name: self.name,
+            level: self.level,
+            timestamp: self.timestamp,
+            attributes: self.attributes,
+        }
+    }
+}
+
 pub trait Collector {
     fn add_span(&self, trace: SpanId, span: CollectedSpan);
+    fn add_event(&self, trace: SpanId, event: CollectedEvent);
 }
 
 pub struct Exporter {}
@@ -117,6 +149,10 @@ impl Default for Exporter {
 
 impl Collector for Exporter {
     fn add_span(&self, _trace: SpanId, _span: CollectedSpan) {
+        todo!()
+    }
+
+    fn add_event(&self, _trace: SpanId, _event: CollectedEvent) {
         todo!()
     }
 }
