@@ -102,7 +102,7 @@ impl RequestId {
         self.0.into_u64()
     }
 
-    pub fn from_u64(value: u64) -> Option<Self> {
+    pub(crate) fn from_u64(value: u64) -> Option<Self> {
         SerializableNonZeroU64::from_u64(value).map(Self)
     }
 }
