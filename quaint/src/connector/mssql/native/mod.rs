@@ -1,15 +1,16 @@
 //! Definitions for the MSSQL connector.
 //! This module is not compatible with wasm32-* targets.
 //! This module is only available with the `mssql-native` feature.
+mod column_type;
 mod conversion;
 mod error;
 
 pub(crate) use crate::connector::mssql::MssqlUrl;
-use crate::connector::{timeout, IsolationLevel, Transaction, TransactionOptions};
+use crate::connector::{timeout, DescribedQuery, IsolationLevel, Transaction, TransactionOptions};
 
 use crate::{
     ast::{Query, Value},
-    connector::{metrics, queryable::*, DefaultTransaction, ResultSet},
+    connector::{metrics, queryable::*, ColumnType as QuaintColumnType, DefaultTransaction, ResultSet},
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
@@ -29,6 +30,7 @@ use tokio_util::compat::{Compat, TokioAsyncWriteCompatExt};
 pub use tiberius;
 
 static SQL_SERVER_DEFAULT_ISOLATION: IsolationLevel = IsolationLevel::ReadCommitted;
+const DB_SYSTEM_NAME: &str = "mssql";
 
 #[async_trait]
 impl TransactionCapable for Mssql {
@@ -129,7 +131,7 @@ impl Queryable for Mssql {
     }
 
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
-        metrics::query("mssql.query_raw", sql, params, move || async move {
+        metrics::query("mssql.query_raw", DB_SYSTEM_NAME, sql, params, move || async move {
             let mut client = self.client.lock().await;
 
             let mut query = tiberius::Query::new(sql);
@@ -144,12 +146,21 @@ impl Queryable for Mssql {
                 Some(rows) => {
                     let mut columns_set = false;
                     let mut columns = Vec::new();
+
+                    let mut types_set = false;
+                    let mut types = Vec::new();
+
                     let mut result_rows = Vec::with_capacity(rows.len());
 
                     for row in rows.into_iter() {
                         if !columns_set {
                             columns = row.columns().iter().map(|c| c.name().to_string()).collect();
                             columns_set = true;
+                        }
+
+                        if !types_set {
+                            types = row.columns().iter().map(QuaintColumnType::from).collect();
+                            types_set = true;
                         }
 
                         let mut values: Vec<Value<'_>> = Vec::with_capacity(row.len());
@@ -161,9 +172,9 @@ impl Queryable for Mssql {
                         result_rows.push(values);
                     }
 
-                    Ok(ResultSet::new(columns, result_rows))
+                    Ok(ResultSet::new(columns, types, result_rows))
                 }
-                None => Ok(ResultSet::new(Vec::new(), Vec::new())),
+                None => Ok(ResultSet::new(Vec::new(), Vec::new(), Vec::new())),
             }
         })
         .await
@@ -173,13 +184,17 @@ impl Queryable for Mssql {
         self.query_raw(sql, params).await
     }
 
+    async fn describe_query(&self, _sql: &str) -> crate::Result<DescribedQuery> {
+        unimplemented!("SQL Server does not support describe_query yet.")
+    }
+
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
         let (sql, params) = visitor::Mssql::build(q)?;
         self.execute_raw(&sql, &params[..]).await
     }
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
-        metrics::query("mssql.execute_raw", sql, params, move || async move {
+        metrics::query("mssql.execute_raw", DB_SYSTEM_NAME, sql, params, move || async move {
             let mut query = tiberius::Query::new(sql);
 
             for param in params {
@@ -199,7 +214,7 @@ impl Queryable for Mssql {
     }
 
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
-        metrics::query("mssql.raw_cmd", cmd, &[], move || async move {
+        metrics::query("mssql.raw_cmd", DB_SYSTEM_NAME, cmd, &[], move || async move {
             let mut client = self.client.lock().await;
             self.perform_io(client.simple_query(cmd)).await?.into_results().await?;
             Ok(())

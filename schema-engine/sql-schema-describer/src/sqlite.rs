@@ -9,7 +9,7 @@ use either::Either;
 use indexmap::IndexMap;
 use quaint::{
     ast::{Value, ValueType},
-    connector::{GetRow, ToColumnNames},
+    connector::{ColumnType as QuaintColumnType, GetRow, ToColumnNames},
     prelude::ResultRow,
 };
 use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto, fmt::Debug, path::Path};
@@ -33,6 +33,7 @@ impl Connection for std::sync::Mutex<quaint::connector::rusqlite::Connection> {
     ) -> quaint::Result<quaint::prelude::ResultSet> {
         let conn = self.lock().unwrap();
         let mut stmt = conn.prepare_cached(sql)?;
+        let column_types = stmt.columns().iter().map(QuaintColumnType::from).collect::<Vec<_>>();
         let mut rows = stmt.query(quaint::connector::rusqlite::params_from_iter(params.iter()))?;
         let column_names = rows.to_column_names();
         let mut converted_rows = Vec::new();
@@ -40,7 +41,11 @@ impl Connection for std::sync::Mutex<quaint::connector::rusqlite::Connection> {
             converted_rows.push(row.get_result_row().unwrap());
         }
 
-        Ok(quaint::prelude::ResultSet::new(column_names, converted_rows))
+        Ok(quaint::prelude::ResultSet::new(
+            column_names,
+            column_types,
+            converted_rows,
+        ))
     }
 }
 

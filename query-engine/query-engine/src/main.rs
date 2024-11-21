@@ -1,8 +1,5 @@
 #![allow(clippy::upper_case_acronyms)]
 
-#[macro_use]
-extern crate tracing;
-
 use query_engine::cli::CliCommand;
 use query_engine::context;
 use query_engine::error::PrismaError;
@@ -11,14 +8,13 @@ use query_engine::server;
 use query_engine::LogFormat;
 use std::{error::Error, process};
 use structopt::StructOpt;
-use tracing::Instrument;
 
 type AnyError = Box<dyn Error + Send + Sync + 'static>;
 
 #[tokio::main]
 async fn main() -> Result<(), AnyError> {
     return main().await.map_err(|err| {
-        info!("Encountered error during initialization:");
+        tracing::info!("Encountered error during initialization:");
         err.render_as_json().expect("error rendering");
         process::exit(1)
     });
@@ -29,8 +25,7 @@ async fn main() -> Result<(), AnyError> {
         match CliCommand::from_opt(&opts)? {
             Some(cmd) => cmd.execute().await?,
             None => {
-                let span = tracing::info_span!("prisma:engine:connect");
-                let cx = context::setup(&opts, true, None).instrument(span).await?;
+                let cx = context::setup(&opts).await?;
                 set_panic_hook(opts.log_format());
                 server::listen(cx, &opts).await?;
             }

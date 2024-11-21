@@ -244,8 +244,15 @@ pub fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<Sca
         ast::Expression::Function(funcname, _args, _) if funcname == "sequence" => {
             DefaultKind::Expression(ValueGenerator::new_sequence(Vec::new()))
         }
-        ast::Expression::Function(funcname, _args, _) if funcname == "uuid" => {
-            DefaultKind::Expression(ValueGenerator::new_uuid())
+        ast::Expression::Function(funcname, args, _) if funcname == "uuid" => {
+            let version = args
+                .arguments
+                .first()
+                .and_then(|arg| arg.value.as_numeric_value())
+                .map(|(val, _)| val.parse::<u8>().unwrap())
+                .unwrap_or(4);
+
+            DefaultKind::Expression(ValueGenerator::new_uuid(version))
         }
         ast::Expression::Function(funcname, _args, _) if funcname == "cuid" => {
             DefaultKind::Expression(ValueGenerator::new_cuid())

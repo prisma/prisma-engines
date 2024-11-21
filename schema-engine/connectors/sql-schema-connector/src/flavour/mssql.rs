@@ -501,6 +501,13 @@ impl SqlFlavour for MssqlFlavour {
     fn search_path(&self) -> &str {
         self.schema_name()
     }
+
+    fn describe_query<'a>(
+        &'a mut self,
+        _sql: &str,
+    ) -> BoxFuture<'a, ConnectorResult<quaint::connector::DescribedQuery>> {
+        unimplemented!("SQL Server does not support describe_query yet.")
+    }
 }
 
 fn with_connection<'a, O, F, C>(state: &'a mut State, f: C) -> BoxFuture<'a, ConnectorResult<O>>

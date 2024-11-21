@@ -48,7 +48,16 @@ impl Connector for Js {
     }
 
     fn name(&self) -> &'static str {
-        "js"
+        match self.connection_info.sql_family() {
+            #[cfg(feature = "postgresql")]
+            SqlFamily::Postgres => "postgresql",
+            #[cfg(feature = "mysql")]
+            SqlFamily::Mysql => "mysql",
+            #[cfg(feature = "sqlite")]
+            SqlFamily::Sqlite => "sqlite",
+            #[cfg(feature = "mssql")]
+            SqlFamily::Mssql => "mssql",
+        }
     }
 
     fn should_retry_on_transient_error(&self) -> bool {
@@ -88,6 +97,10 @@ impl QuaintQueryable for DriverAdapter {
 
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<quaint::prelude::ResultSet> {
         self.connector.query_raw_typed(sql, params).await
+    }
+
+    async fn describe_query(&self, sql: &str) -> quaint::Result<quaint::connector::DescribedQuery> {
+        self.connector.describe_query(sql).await
     }
 
     async fn execute(&self, q: Query<'_>) -> quaint::Result<u64> {

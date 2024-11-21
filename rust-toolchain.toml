@@ -1,5 +1,5 @@
 [toolchain]
-channel = "1.78.0"
+channel = "1.82.0"
 components = ["clippy", "rustfmt", "rust-src"]
 targets = [
     # WASM target for serverless and edge environments.
@@ -17,5 +17,6 @@ targets = [
     # Server targets we support.
     "x86_64-unknown-linux-musl",
     "aarch64-unknown-linux-gnu",
-    "aarch64-unknown-linux-musl"
+    "aarch64-unknown-linux-musl",
+    "aarch64-apple-darwin"
 ]

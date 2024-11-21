@@ -48,11 +48,12 @@ impl Client {
 
     pub(crate) async fn drop_database(&self) -> ConnectorResult<()> {
         self.database()
-            .drop(Some(
+            .drop()
+            .with_options(
                 mongodb::options::DropDatabaseOptions::builder()
                     .write_concern(WriteConcern::builder().journal(true).build())
                     .build(),
-            ))
+            )
             .await
             .map_err(mongo_error_to_connector_error)
     }

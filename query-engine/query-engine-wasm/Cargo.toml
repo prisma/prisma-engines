@@ -44,6 +44,7 @@ request-handlers = { path = "../request-handlers", default-features = false, fea
 ] }
 query-core = { path = "../core" }
 driver-adapters = { path = "../driver-adapters" }
+telemetry = { path = "../../libs/telemetry" }
 quaint.workspace = true
 connection-string.workspace = true
 js-sys.workspace = true
@@ -57,14 +58,17 @@ wasm-rs-dbg.workspace = true
 thiserror = "1"
 url.workspace = true
 serde.workspace = true
-tokio = { version = "1.25", features = ["macros", "sync", "io-util", "time"] }
-futures = "0.3"
+tokio = { version = "1", features = ["macros", "sync", "io-util", "time"] }
+futures.workspace = true
 
 tracing.workspace = true
 tracing-subscriber = { version = "0.3" }
-tracing-futures = "0.2"
+tracing-futures.workspace = true
 tracing-opentelemetry = "0.17.3"
 opentelemetry = { version = "0.17" }
+
+[build-dependencies]
+build-utils.path = "../../libs/build-utils"
 
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = false # use wasm-opt explicitly in `./build.sh`

@@ -60,6 +60,28 @@ mod tests {
     use expect_test::expect;
 
     #[test]
+    fn validate_non_ascii_identifiers() {
+        let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("DBURL")
+        }
+
+        model Lööps {
+            id Int @id
+            läderlappen Boolean
+        }
+        "#;
+
+        let request = json!({
+            "prismaSchema": schema,
+        });
+
+        let response = validate(&request.to_string());
+        assert!(response.is_ok())
+    }
+
+    #[test]
     fn validate_invalid_schema_with_colors() {
         let schema = r#"
             generator js {

@@ -215,6 +215,13 @@ impl SchemaConnector for MongoDbSchemaConnector {
     fn extract_namespaces(&self, _schema: &DatabaseSchema) -> Option<Namespaces> {
         None
     }
+
+    fn introspect_sql(
+        &mut self,
+        _input: IntrospectSqlQueryInput,
+    ) -> BoxFuture<'_, ConnectorResult<IntrospectSqlQueryOutput>> {
+        unreachable!()
+    }
 }
 
 fn unsupported_command_error() -> ConnectorError {

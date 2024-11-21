@@ -20,7 +20,6 @@ members = [
   "query-engine/black-box-tests",
   "query-engine/dmmf",
   "query-engine/driver-adapters",
-  "query-engine/metrics",
   "query-engine/query-structure",
   "query-engine/query-engine",
   "query-engine/query-engine-node-api",
@@ -38,10 +37,11 @@ members = [
 [workspace.dependencies]
 async-trait = { version = "0.1.77" }
 enumflags2 = { version = "0.7", features = ["serde"] }
+futures = "0.3"
 psl = { path = "./psl/psl" }
 serde_json = { version = "1", features = ["float_roundtrip", "preserve_order", "raw_value"] }
 serde = { version = "1", features = ["derive"] }
-tokio = { version = "1.25", features = [
+tokio = { version = "1", features = [
   "rt-multi-thread",
   "macros",
   "sync",
@@ -51,29 +51,36 @@ tokio = { version = "1.25", features = [
   "time",
 ] }
 chrono = { version = "0.4.38", features = ["serde"] }
+derive_more = "0.99.17"
 user-facing-errors = { path = "./libs/user-facing-errors" }
-uuid = { version = "1", features = ["serde", "v4"] }
+uuid = { version = "1", features = ["serde", "v4", "v7", "js"] }
 indoc = "2.0.1"
 indexmap = { version = "2.2.2", features = ["serde"] }
 itertools = "0.12"
 connection-string = "0.2"
-napi = { version = "2.15.1", default-features = false, features = [
-  "napi8",
+napi = { version = "2.16.13", default-features = false, features = [
+  "napi9",
   "tokio_rt",
   "serde-json",
 ] }
-napi-derive = "2.15.0"
+napi-derive = "2.16.12"
 js-sys = { version = "0.3" }
+pin-project = "1"
 rand = { version = "0.8" }
+regex = { version = "1", features = ["std"] }
 serde_repr = { version = "0.1.17" }
 serde-wasm-bindgen = { version = "0.5" }
 tracing = { version = "0.1" }
+tracing-futures = "0.2"
 tsify = { version = "0.4.5" }
-wasm-bindgen = { version = "0.2.92" }
+wasm-bindgen = { version = "0.2.93" }
 wasm-bindgen-futures = { version = "0.4" }
 wasm-rs-dbg = { version = "0.1.2", default-features = false, features = ["console-error"] }
 wasm-bindgen-test = { version = "0.3.0" }
 url = { version = "2.5.0" }
+
+bson = { version = "2.11.0", features = ["chrono-0_4", "uuid-1"] }
+mongodb = { git = "https://github.com/prisma/mongo-rust-driver.git", branch = "RUST-1994/happy-eyeballs" }
 
 [workspace.dependencies.quaint]
 path = "quaint"
