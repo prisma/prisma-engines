@@ -2,10 +2,7 @@ use std::{
     borrow::Cow,
     collections::HashMap,
     num::NonZeroU64,
-    sync::{
-        atomic::{AtomicU64, Ordering},
-        Arc,
-    },
+    sync::atomic::{AtomicU64, Ordering},
 };
 
 use derive_more::Display;
@@ -252,33 +249,4 @@ impl EventBuilder {
 pub trait Collector {
     fn add_span(&self, trace: RequestId, span: CollectedSpan);
     fn add_event(&self, trace: RequestId, event: CollectedEvent);
-}
-
-#[derive(Clone)]
-pub struct Exporter(Arc<ExporterInner>);
-
-struct ExporterInner {
-    tasks: HashMap<SpanId, ()>,
-}
-
-impl Exporter {
-    pub fn new() -> Self {
-        Self(Arc::new(ExporterInner { tasks: HashMap::new() }))
-    }
-}
-
-impl Default for Exporter {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Collector for Exporter {
-    fn add_span(&self, _trace: RequestId, _span: CollectedSpan) {
-        todo!()
-    }
-
-    fn add_event(&self, _trace: RequestId, _event: CollectedEvent) {
-        todo!()
-    }
 }
