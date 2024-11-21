@@ -3,6 +3,7 @@ use std::{
     collections::HashMap,
     num::NonZeroU64,
     sync::atomic::{AtomicU64, Ordering},
+    time::{Duration, SystemTime},
 };
 
 use derive_more::Display;
@@ -116,37 +117,39 @@ impl Default for RequestId {
 #[derive(Debug, Clone)]
 #[cfg_attr(test, derive(Serialize))]
 pub struct CollectedSpan {
-    id: SpanId,
-    parent_id: Option<SpanId>,
-    name: Cow<'static, str>,
+    pub(crate) id: SpanId,
+    pub(crate) parent_id: Option<SpanId>,
+    pub(crate) name: Cow<'static, str>,
     #[cfg_attr(test, serde(skip_serializing))]
-    start_time: Instant,
+    pub(crate) start_time: SystemTime,
     #[cfg_attr(test, serde(skip_serializing))]
-    end_time: Instant,
-    attributes: HashMap<&'static str, serde_json::Value>,
-    kind: SpanKind,
-    links: Vec<SpanId>,
+    pub(crate) duration: Duration,
+    pub(crate) attributes: HashMap<&'static str, serde_json::Value>,
+    pub(crate) kind: SpanKind,
+    pub(crate) links: Vec<SpanId>,
 }
 
 pub(crate) struct SpanBuilder {
     request_id: Option<RequestId>,
     id: SpanId,
     name: Cow<'static, str>,
-    start_time: Instant,
-    end_time: Option<Instant>,
+    // we store both the wall clock time and a monotonically increasing instant to
+    // be resilient against clock changes between the start and end of the span
+    start_time: SystemTime,
+    start_instant: Instant,
     attributes: HashMap<&'static str, serde_json::Value>,
     kind: Option<SpanKind>,
     links: Vec<SpanId>,
 }
 
 impl SpanBuilder {
-    pub fn new(name: &'static str, id: impl Into<SpanId>, start_time: Instant, attrs_size_hint: usize) -> Self {
+    pub fn new(name: &'static str, id: impl Into<SpanId>, attrs_size_hint: usize) -> Self {
         Self {
             request_id: None,
             id: id.into(),
             name: name.into(),
-            start_time,
-            end_time: None,
+            start_time: SystemTime::now(),
+            start_instant: Instant::now(),
             attributes: HashMap::with_capacity(attrs_size_hint),
             kind: None,
             links: Vec::new(),
@@ -177,13 +180,13 @@ impl SpanBuilder {
         self.links.push(link);
     }
 
-    pub fn end(self, parent_id: Option<impl Into<SpanId>>, end_time: Instant) -> CollectedSpan {
+    pub fn end(self, parent_id: Option<impl Into<SpanId>>) -> CollectedSpan {
         CollectedSpan {
             id: self.id,
             parent_id: parent_id.map(Into::into),
             name: self.name,
             start_time: self.start_time,
-            end_time,
+            duration: self.start_instant.elapsed(),
             attributes: self.attributes,
             kind: self.kind.unwrap_or(SpanKind::Internal),
             links: self.links,
@@ -194,35 +197,29 @@ impl SpanBuilder {
 #[derive(Debug, Clone)]
 #[cfg_attr(test, derive(Serialize))]
 pub struct CollectedEvent {
-    span_id: SpanId,
-    name: &'static str,
-    level: LogLevel,
+    pub(crate) span_id: SpanId,
+    pub(crate) name: &'static str,
+    pub(crate) level: LogLevel,
     #[cfg_attr(test, serde(skip_serializing))]
-    timestamp: Instant,
-    attributes: HashMap<&'static str, serde_json::Value>,
+    pub(crate) timestamp: SystemTime,
+    pub(crate) attributes: HashMap<&'static str, serde_json::Value>,
 }
 
 pub(crate) struct EventBuilder {
     span_id: SpanId,
     name: &'static str,
     level: LogLevel,
-    timestamp: Instant,
+    timestamp: SystemTime,
     attributes: HashMap<&'static str, serde_json::Value>,
 }
 
 impl EventBuilder {
-    pub fn new(
-        span_id: SpanId,
-        name: &'static str,
-        level: LogLevel,
-        timestamp: Instant,
-        attrs_size_hint: usize,
-    ) -> Self {
+    pub fn new(span_id: SpanId, name: &'static str, level: LogLevel, attrs_size_hint: usize) -> Self {
         Self {
             span_id,
             name,
             level,
-            timestamp,
+            timestamp: SystemTime::now(),
             attributes: HashMap::with_capacity(attrs_size_hint),
         }
     }
