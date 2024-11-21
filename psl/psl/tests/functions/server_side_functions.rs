@@ -34,7 +34,7 @@ fn correctly_handle_server_side_cuid_function() {
         .assert_has_scalar_field("someId")
         .assert_scalar_type(ScalarType::String)
         .assert_default_value()
-        .assert_cuid_version(1);
+        .assert_cuid();
 }
 
 #[test]
@@ -52,5 +52,5 @@ fn correctly_handle_server_side_uuid_function() {
         .assert_has_scalar_field("someId")
         .assert_scalar_type(ScalarType::String)
         .assert_default_value()
-        .assert_uuid_version(4);
+        .assert_uuid();
 }
