@@ -113,7 +113,7 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
     let headers = req.headers();
     let tx_id = try_get_transaction_id(headers);
     let (span, traceparent, ref capturer) =
-        setup_telemetry(info_span!("prisma:engine", user_facing = true), headers).await;
+        setup_telemetry(info_span!("prisma:engine:query", user_facing = true), headers).await;
 
     let query_timeout = query_timeout(headers);
 
