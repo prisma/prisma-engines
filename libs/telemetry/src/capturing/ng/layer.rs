@@ -15,10 +15,11 @@ use tracing_subscriber::{
 use crate::models::{LogLevel, SpanKind};
 
 use super::{
-    collector::{CollectedEvent, Collector, EventBuilder, Exporter, SpanBuilder},
+    collector::{CollectedEvent, Collector, EventBuilder, Exporter, RequestId, SpanBuilder},
     traceparent::TraceParent,
 };
 
+const REQUEST_ID_FIELD: &str = "request_id";
 const SPAN_NAME_FIELD: &str = "otel.name";
 const SPAN_KIND_FIELD: &str = "otel.kind";
 const EVENT_LEVEL_FIELD: &str = "item_type";
@@ -85,6 +86,13 @@ where
         let span = Self::require_span(id, &ctx);
         let mut span_builder = SpanBuilder::new(span.name(), id, Instant::now(), attrs.fields().len());
 
+        if let Some(request_id) = span
+            .parent()
+            .and_then(|parent| parent.extensions().get::<SpanBuilder>().and_then(|sb| sb.request_id()))
+        {
+            span_builder.set_request_id(request_id);
+        }
+
         attrs.record(&mut SpanAttributeVisitor::new(&mut span_builder));
 
         span.extensions_mut().insert(span_builder);
@@ -119,7 +127,13 @@ where
             return;
         };
 
-        let root = Self::root_span(&parent, &ctx).id();
+        let Some(request_id) = Self::root_span(&parent, &ctx)
+            .extensions()
+            .get::<SpanBuilder>()
+            .and_then(|sb| sb.request_id())
+        else {
+            return;
+        };
 
         let mut event_builder = EventBuilder::new(
             parent.into(),
@@ -131,7 +145,7 @@ where
 
         event.record(&mut EventAttributeVisitor::new(&mut event_builder));
 
-        self.collector.add_event(root.into(), event_builder.build());
+        self.collector.add_event(request_id, event_builder.build());
     }
 
     fn on_close(&self, id: Id, ctx: Context<'_, S>) {
@@ -141,13 +155,15 @@ where
             return;
         };
 
+        let Some(request_id) = span_builder.request_id() else {
+            return;
+        };
+
         let end_time = Instant::now();
         let parent_id = span.parent().map(|parent| parent.id());
         let collected_span = span_builder.end(parent_id, end_time);
 
-        let trace_id = Self::root_span(&id, &ctx).id();
-
-        self.collector.add_span(trace_id.into(), collected_span);
+        self.collector.add_span(request_id, collected_span);
     }
 }
 
@@ -171,7 +187,10 @@ impl<'a> field::Visit for SpanAttributeVisitor<'a> {
     }
 
     fn record_u64(&mut self, field: &field::Field, value: u64) {
-        self.span_builder.insert_attribute(field.name(), value.into())
+        match field.name() {
+            REQUEST_ID_FIELD => self.span_builder.set_request_id(value.into()),
+            _ => self.span_builder.insert_attribute(field.name(), value.into()),
+        }
     }
 
     fn record_bool(&mut self, field: &field::Field, value: bool) {
@@ -232,7 +251,7 @@ impl<'a> field::Visit for EventAttributeVisitor<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::capturing::ng::collector::{CollectedSpan, SpanId};
+    use crate::capturing::ng::collector::{CollectedSpan, RequestId, SpanId};
 
     use super::*;
 
@@ -240,6 +259,7 @@ mod tests {
     use std::collections::{BTreeMap, HashMap};
     use std::sync::atomic::{AtomicU64, Ordering};
     use std::sync::{Arc, LazyLock, Mutex};
+    use std::thread::LocalKey;
     use std::time::Duration;
 
     use insta::assert_ron_snapshot;
@@ -250,8 +270,8 @@ mod tests {
 
     #[derive(Debug, Default, Clone)]
     struct TestCollector {
-        spans: Arc<Mutex<BTreeMap<SpanId, Vec<CollectedSpan>>>>,
-        events: Arc<Mutex<BTreeMap<SpanId, Vec<CollectedEvent>>>>,
+        spans: Arc<Mutex<BTreeMap<RequestId, Vec<CollectedSpan>>>>,
+        events: Arc<Mutex<BTreeMap<RequestId, Vec<CollectedEvent>>>>,
     }
 
     impl TestCollector {
@@ -259,49 +279,73 @@ mod tests {
             Self::default()
         }
 
-        fn spans(&self) -> BTreeMap<SpanId, Vec<CollectedSpan>> {
+        fn spans(&self) -> BTreeMap<RequestId, Vec<CollectedSpan>> {
             self.spans.lock().unwrap().clone()
         }
 
-        fn events(&self) -> BTreeMap<SpanId, Vec<CollectedEvent>> {
+        fn events(&self) -> BTreeMap<RequestId, Vec<CollectedEvent>> {
             self.events.lock().unwrap().clone()
         }
     }
 
     impl Collector for TestCollector {
-        fn add_span(&self, trace_id: SpanId, span: CollectedSpan) {
+        fn add_span(&self, trace_id: RequestId, span: CollectedSpan) {
             let mut spans = self.spans.lock().unwrap();
             spans.entry(trace_id).or_default().push(span);
         }
 
-        fn add_event(&self, trace_id: SpanId, event: CollectedEvent) {
+        fn add_event(&self, trace_id: RequestId, event: CollectedEvent) {
             let mut events = self.events.lock().unwrap();
             events.entry(trace_id).or_default().push(event);
         }
     }
 
-    /// Redacts span IDs to make snapshots stable. Mappings from original span IDs to redacted IDs
-    /// are stored in a thread-local hash map, which ensures each test gets their own namespace of
-    /// IDs (as libtest runs every test in its own thread).
+    /// Redacts span and request IDs to make snapshots stable. Mappings from original IDs to
+    /// redacted IDs are stored in a thread-local hash maps, which ensures each test gets their own
+    /// namespace of IDs (as libtest runs every test in its own thread).
     fn redact_id() -> Redaction {
-        thread_local! {
-            static SPAN_ID_TO_SEQUENTIAL_ID: RefCell<HashMap<String, u64>> = <_>::default();
-            static NEXT_ID: RefCell<u64> = const { RefCell::new(1) };
+        fn redacted_id(
+            struct_name: &'static str,
+            original_id: &str,
+            map: &'static LocalKey<RefCell<HashMap<String, u64>>>,
+            next_id: &'static LocalKey<RefCell<u64>>,
+        ) -> Content {
+            let id = map.with_borrow_mut(|map| {
+                *map.entry(original_id.to_owned()).or_insert_with(|| {
+                    next_id.with_borrow_mut(|next_id| {
+                        let id = *next_id;
+                        *next_id += 1;
+                        id
+                    })
+                })
+            });
+            Content::NewtypeStruct(struct_name, Box::new(Content::U64(id)))
+        }
+
+        fn redacted_span_id(original_id: &str) -> Content {
+            thread_local! {
+                static SPAN_ID_TO_SEQUENTIAL_ID: RefCell<HashMap<String, u64>> = <_>::default();
+                static NEXT_ID: RefCell<u64> = const { RefCell::new(1) };
+            }
+            redacted_id("SpanId", original_id, &SPAN_ID_TO_SEQUENTIAL_ID, &NEXT_ID)
+        }
+
+        fn redacted_request_id(original_id: &str) -> Content {
+            thread_local! {
+                static REQUEST_ID_TO_SEQUENTIAL_ID: RefCell<HashMap<String, u64>> = <_>::default();
+                static NEXT_ID: RefCell<u64> = const { RefCell::new(1) };
+            }
+            redacted_id("RequestId", original_id, &REQUEST_ID_TO_SEQUENTIAL_ID, &NEXT_ID)
         }
 
         fn redact_recursive(value: Content) -> Content {
             match value {
-                Content::NewtypeStruct("SpanId", ref nested) => match **nested {
-                    Content::String(ref original_id) => SPAN_ID_TO_SEQUENTIAL_ID.with_borrow_mut(|map| {
-                        let id = map.entry(original_id.clone()).or_insert_with(|| {
-                            NEXT_ID.with_borrow_mut(|next_id| {
-                                let id = *next_id;
-                                *next_id += 1;
-                                id
-                            })
-                        });
-                        Content::NewtypeStruct("SpanId", Box::new(Content::U64(*id)))
-                    }),
+                Content::NewtypeStruct(name @ ("SpanId" | "RequestId"), ref nested) => match **nested {
+                    Content::String(ref original_id) => match name {
+                        "SpanId" => redacted_span_id(original_id),
+                        "RequestId" => redacted_request_id(original_id),
+                        _ => unreachable!(),
+                    },
                     _ => value,
                 },
                 Content::Some(nested) => Content::Some(Box::new(redact_recursive(*nested))),
@@ -318,8 +362,12 @@ mod tests {
         let subscriber = Registry::default().with(layer(collector.clone()));
 
         tracing::subscriber::with_default(subscriber, || {
-            let span = info_span!("test_span", otel.kind = "client");
-            let _guard = span.enter();
+            let _guard = info_span!(
+                "test_span",
+                request_id = RequestId::next().into_u64(),
+                otel.kind = "client"
+            )
+            .entered();
         });
 
         let spans = collector.spans();
@@ -329,7 +377,7 @@ mod tests {
             { ".*" => redact_id(), ".*[].**" => redact_id() },
             @r#"
         {
-          SpanId(1): [
+          RequestId(1): [
             CollectedSpan(
               id: SpanId(1),
               parent_id: None,
@@ -350,12 +398,11 @@ mod tests {
         let subscriber = Registry::default().with(layer(collector.clone()));
 
         tracing::subscriber::with_default(subscriber, || {
-            let parent = info_span!("parent_span");
-            let _parent_guard = parent.enter();
+            let _parent_guard = info_span!("parent_span", request_id = RequestId::next().into_u64()).entered();
 
             {
-                let child = info_span!("child_span", otel.kind = "internal");
-                let _child_guard = child.enter();
+                let _child_guard = info_span!("child_span").entered();
+                let _grandchild_guard = info_span!("grandchild_span").entered();
             }
         });
 
@@ -366,17 +413,25 @@ mod tests {
             { ".*" => redact_id(), ".*[].**" => redact_id() },
             @r#"
         {
-          SpanId(1): [
+          RequestId(1): [
+            CollectedSpan(
+              id: SpanId(1),
+              parent_id: Some(SpanId(2)),
+              name: "grandchild_span",
+              attributes: {},
+              kind: internal,
+              links: [],
+            ),
             CollectedSpan(
               id: SpanId(2),
-              parent_id: Some(SpanId(1)),
+              parent_id: Some(SpanId(3)),
               name: "child_span",
               attributes: {},
               kind: internal,
               links: [],
             ),
             CollectedSpan(
-              id: SpanId(1),
+              id: SpanId(3),
               parent_id: None,
               name: "parent_span",
               attributes: {},
@@ -395,15 +450,16 @@ mod tests {
         let subscriber = Registry::default().with(layer(collector.clone()));
 
         tracing::subscriber::with_default(subscriber, || {
-            let span = info_span!(
+            let _guard = info_span!(
                 "attribute_span",
+                request_id = RequestId::next().into_u64(),
                 otel.kind = "client",
                 string_attr = "value",
                 bool_attr = true,
                 int_attr = 42,
                 float_attr = 3.5
-            );
-            let _guard = span.enter();
+            )
+            .entered();
         });
 
         let spans = collector.spans();
@@ -417,7 +473,7 @@ mod tests {
             },
             @r#"
         {
-          SpanId(1): [
+          RequestId(1): [
             CollectedSpan(
               id: SpanId(1),
               parent_id: None,
@@ -445,6 +501,7 @@ mod tests {
         tracing::subscriber::with_default(subscriber, || {
             let span = info_span!(
                 "updated_span",
+                request_id = RequestId::next().into_u64(),
                 otel.kind = "client",
                 dynamic_attr = tracing::field::Empty
             );
@@ -459,7 +516,7 @@ mod tests {
             { ".*" => redact_id(), ".*[].**" => redact_id() },
             @r#"
         {
-          SpanId(1): [
+          RequestId(1): [
             CollectedSpan(
               id: SpanId(1),
               parent_id: None,
@@ -482,8 +539,12 @@ mod tests {
         let subscriber = Registry::default().with(layer(collector.clone()));
 
         tracing::subscriber::with_default(subscriber, || {
-            let span = info_span!("renamed_span", otel.name = "new_name");
-            let _guard = span.enter();
+            let _guard = info_span!(
+                "renamed_span",
+                request_id = RequestId::next().into_u64(),
+                otel.name = "new_name"
+            )
+            .entered();
         });
 
         let spans = collector.spans();
@@ -493,7 +554,7 @@ mod tests {
             { ".*" => redact_id(), ".*[].**" => redact_id() },
             @r#"
         {
-          SpanId(1): [
+          RequestId(1): [
             CollectedSpan(
               id: SpanId(1),
               parent_id: None,
@@ -514,6 +575,7 @@ mod tests {
         let subscriber = Registry::default().with(layer(collector.clone()));
 
         tracing::subscriber::with_default(subscriber, || {
+            let _scope = info_span!("parent_span", request_id = RequestId::next().into_u64()).entered();
             let span1 = info_span!("span1");
             let span2 = info_span!("span2");
             span2.follows_from(span1.id());
@@ -530,26 +592,32 @@ mod tests {
             },
             @r#"
         {
-          SpanId(1): [
+          RequestId(1): [
             CollectedSpan(
               id: SpanId(1),
-              parent_id: None,
+              parent_id: Some(SpanId(2)),
+              name: "span2",
+              attributes: {},
+              kind: internal,
+              links: [
+                SpanId(3),
+              ],
+            ),
+            CollectedSpan(
+              id: SpanId(3),
+              parent_id: Some(SpanId(2)),
               name: "span1",
               attributes: {},
               kind: internal,
               links: [],
             ),
-          ],
-          SpanId(2): [
             CollectedSpan(
               id: SpanId(2),
               parent_id: None,
-              name: "span2",
+              name: "parent_span",
               attributes: {},
               kind: internal,
-              links: [
-                SpanId(1),
-              ],
+              links: [],
             ),
           ],
         }
@@ -563,9 +631,7 @@ mod tests {
         let subscriber = Registry::default().with(layer(collector.clone()));
 
         tracing::subscriber::with_default(subscriber, || {
-            let span = info_span!("test_span");
-            let _guard = span.enter();
-
+            let _guard = info_span!("test_span", request_id = RequestId::next().into_u64()).entered();
             tracing::info!(name: "event", "test event");
         });
 
@@ -576,7 +642,7 @@ mod tests {
             { ".*" => redact_id(), ".*[].**" => redact_id() },
             @r#"
         {
-          SpanId(1): [
+          RequestId(1): [
             CollectedEvent(
               span_id: SpanId(1),
               name: "event",
@@ -597,8 +663,7 @@ mod tests {
         let subscriber = Registry::default().with(layer(collector.clone()));
 
         tracing::subscriber::with_default(subscriber, || {
-            let span = info_span!("test_span");
-            let _guard = span.enter();
+            let _guard = info_span!("test_span", request_id = RequestId::next().into_u64()).entered();
 
             tracing::info!(
                 name: "event",
@@ -621,7 +686,7 @@ mod tests {
             },
             @r#"
         {
-          SpanId(1): [
+          RequestId(1): [
             CollectedEvent(
               span_id: SpanId(1),
               name: "event",
@@ -646,8 +711,7 @@ mod tests {
         let subscriber = Registry::default().with(layer(collector.clone()));
 
         tracing::subscriber::with_default(subscriber, || {
-            let parent = info_span!("parent_span");
-            let _parent_guard = parent.enter();
+            let _parent_guard = info_span!("parent_span", request_id = RequestId::next().into_u64()).entered();
             tracing::info!(name: "event1", "parent event");
 
             {
@@ -664,7 +728,7 @@ mod tests {
             { ".*" => redact_id(), ".*[].**" => redact_id() },
             @r#"
         {
-          SpanId(1): [
+          RequestId(1): [
             CollectedEvent(
               span_id: SpanId(1),
               name: "event1",
@@ -693,8 +757,7 @@ mod tests {
         let subscriber = Registry::default().with(layer(collector.clone()));
 
         tracing::subscriber::with_default(subscriber, || {
-            let span = info_span!("test_span");
-            let _guard = span.enter();
+            let _guard = info_span!("test_span", request_id = RequestId::next().into_u64()).entered();
 
             tracing::error!(name: "event1", "error event");
             tracing::warn!(name: "event2", "warn event");
@@ -712,7 +775,7 @@ mod tests {
             { ".*" => redact_id(), ".*[].**" => redact_id() },
             @r#"
         {
-          SpanId(1): [
+          RequestId(1): [
             CollectedEvent(
               span_id: SpanId(1),
               name: "event1",
