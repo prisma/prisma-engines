@@ -48,7 +48,7 @@
           "default": {
             "name": "cuid",
             "args": [
-              2
+              1
             ]
           },
           "isGenerated": false,
@@ -148,6 +148,42 @@
           },
           "isGenerated": false,
           "isUpdatedAt": false
+        },
+        {
+          "name": "someNanoid",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": true,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": true,
+          "type": "String",
+          "default": {
+            "name": "nanoid",
+            "args": []
+          },
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "someNanoidLen6",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": true,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": true,
+          "type": "String",
+          "default": {
+            "name": "nanoid",
+            "args": [
+              6
+            ]
+          },
+          "isGenerated": false,
+          "isUpdatedAt": false
         }
       ],
       "primaryKey": null,
@@ -225,6 +261,26 @@
       "fields": [
         {
           "name": "someUuid7"
+        }
+      ]
+    },
+    {
+      "model": "User",
+      "type": "unique",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "someNanoid"
+        }
+      ]
+    },
+    {
+      "model": "User",
+      "type": "unique",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "someNanoidLen6"
         }
       ]
     }

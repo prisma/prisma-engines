@@ -183,30 +183,20 @@ impl ValueGenerator {
     }
 
     pub fn new_cuid(version: u8) -> Self {
-        ValueGenerator::new(
-            "cuid".to_owned(),
-            vec![(Some(version.to_string()), PrismaValue::Int(version as i64))],
-        )
-        .unwrap()
+        ValueGenerator::new("cuid".to_owned(), vec![(None, PrismaValue::Int(version as i64))]).unwrap()
     }
 
     pub fn new_uuid(version: u8) -> Self {
-        ValueGenerator::new(
-            "uuid".to_owned(),
-            vec![(Some(version.to_string()), PrismaValue::Int(version as i64))],
-        )
-        .unwrap()
+        ValueGenerator::new("uuid".to_owned(), vec![(None, PrismaValue::Int(version as i64))]).unwrap()
     }
 
     pub fn new_nanoid(length: Option<u8>) -> Self {
+        let name = "nanoid".to_owned();
+
         if let Some(length) = length {
-            ValueGenerator::new(
-                format!("nanoid({length})"),
-                vec![(None, PrismaValue::Int(length.into()))],
-            )
-            .unwrap()
+            ValueGenerator::new(name, vec![(None, PrismaValue::Int(length.into()))]).unwrap()
         } else {
-            ValueGenerator::new("nanoid()".to_owned(), vec![]).unwrap()
+            ValueGenerator::new(name, vec![]).unwrap()
         }
     }
 
@@ -266,12 +256,15 @@ impl ValueGeneratorFn {
                 [(_, PrismaValue::Int(version))] => Ok(Self::Uuid(version as u8)),
                 _ => unreachable!(),
             },
+            "nanoid" => match args[..] {
+                [(_, PrismaValue::Int(length))] => Ok(Self::Nanoid(Some(length as u8))),
+                _ => Ok(Self::Nanoid(None)),
+            },
             "now" => Ok(Self::Now),
             "autoincrement" => Ok(Self::Autoincrement),
             "sequence" => Ok(Self::Autoincrement),
             "dbgenerated" => Ok(Self::DbGenerated),
             "auto" => Ok(Self::Auto),
-            name if name.starts_with("nanoid(") => Ok(Self::Nanoid(name[7..name.len() - 1].parse::<u8>().ok())),
             _ => Err(format!("The function {name} is not a known function.")),
         }
     }
