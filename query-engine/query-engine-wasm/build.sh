@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Call this script as `./build.sh <npm_version>`
 set -euo pipefail
 
