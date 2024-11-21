@@ -1,7 +1,7 @@
 {
   "engines": {
-    "node": ">=16.13",
-    "pnpm": ">=8.6.6 <9"
+    "node": ">=18.18",
+    "pnpm": ">=8.6.6"
   },
   "name": "executor",
   "version": "0.0.1",
@@ -37,7 +37,7 @@
     "query-engine-wasm-latest": "npm:@prisma/query-engine-wasm@latest",
     "ts-pattern": "5.1.1",
     "undici": "6.13.0",
-    "wrangler": "3.50.0",
+    "wrangler": "3.88.0",
     "ws": "8.16.0"
   },
   "devDependencies": {
