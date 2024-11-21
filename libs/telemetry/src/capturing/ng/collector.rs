@@ -20,6 +20,16 @@ use crate::models::{LogLevel, SpanKind, TraceSpan};
 #[repr(transparent)]
 struct SerializableNonZeroU64(NonZeroU64);
 
+impl SerializableNonZeroU64 {
+    pub fn into_u64(self) -> u64 {
+        self.0.get()
+    }
+
+    pub fn from_u64(value: u64) -> Option<Self> {
+        NonZeroU64::new(value).map(Self)
+    }
+}
+
 impl Serialize for SerializableNonZeroU64 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -42,34 +52,6 @@ impl<'de> Deserialize<'de> for SerializableNonZeroU64 {
         Ok(SerializableNonZeroU64(
             NonZeroU64::new(value).ok_or_else(|| serde::de::Error::custom("value must be non-zero"))?,
         ))
-    }
-}
-
-#[derive(Debug, Display, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[display(fmt = "{}", _0)]
-#[repr(transparent)]
-struct SerializableU64(u64);
-
-impl Serialize for SerializableU64 {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        // Serialize as string to preserve full u64 precision in JavaScript. Otherwise values
-        // larger than 2^53 - 1 will be parsed as floats on the client side, making it possible for
-        // IDs to collide.
-        self.to_string().serialize(serializer)
-    }
-}
-
-impl<'de> Deserialize<'de> for SerializableU64 {
-    fn deserialize<D>(deserializer: D) -> Result<SerializableU64, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let value = String::deserialize(deserializer)?;
-        let value = value.parse().map_err(serde::de::Error::custom)?;
-        Ok(SerializableU64(value))
     }
 }
 
@@ -105,28 +87,32 @@ impl From<tracing::span::Id> for SpanId {
 /// still don't necessarily have to be unique for the whole lifetime of the process).
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
 #[repr(transparent)]
-pub struct RequestId(SerializableU64);
+pub struct RequestId(SerializableNonZeroU64);
 
 impl RequestId {
     pub fn next() -> Self {
         static NEXT_ID: AtomicU64 = AtomicU64::new(1);
-        Self(SerializableU64(NEXT_ID.fetch_add(1, Ordering::Relaxed)))
+
+        let mut id = 0;
+        while id == 0 {
+            id = NEXT_ID.fetch_add(1, Ordering::Relaxed);
+        }
+
+        Self(SerializableNonZeroU64(NonZeroU64::new(id).unwrap()))
     }
 
     pub fn into_u64(self) -> u64 {
-        self.0 .0
+        self.0.into_u64()
+    }
+
+    pub fn from_u64(value: u64) -> Option<Self> {
+        SerializableNonZeroU64::from_u64(value).map(Self)
     }
 }
 
 impl Default for RequestId {
     fn default() -> Self {
         Self::next()
-    }
-}
-
-impl From<u64> for RequestId {
-    fn from(id: u64) -> Self {
-        Self(SerializableU64(id))
     }
 }
 
