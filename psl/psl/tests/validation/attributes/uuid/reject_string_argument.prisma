@@ -4,7 +4,7 @@ datasource db {
 }
 
 model Category {
-  id String @id @default(nanoid("asdf"))
+  id String @id @default(uuid("asdf"))
 }
 // [1;91merror[0m: [1mError parsing attribute "@default": `nanoid()` takes a single Int argument.[0m
 //   [1;94m-->[0m  [4mschema.prisma:7[0m
