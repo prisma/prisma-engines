@@ -3153,6 +3153,7 @@ dependencies = [
  "either",
  "enumflags2",
  "indexmap 2.2.2",
+ "itertools 0.12.0",
  "rustc-hash",
  "schema-ast",
 ]

@@ -388,8 +388,10 @@ fn format_valid_values<const N: usize>(valid_values: &[u8; N]) -> String {
         1 => valid_values[0].to_string(),
         2 => format!("{} or {}", valid_values[0], valid_values[1]),
         _ => {
+            use itertools::Itertools as _;
+
             let (last, rest) = valid_values.split_last().unwrap();
-            let rest_str = rest.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(", ");
+            let rest_str = rest.iter().map(|v| v.to_string()).join(", ");
             format!("{}, or {}", rest_str, last)
         }
     }
