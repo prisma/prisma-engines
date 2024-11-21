@@ -15,7 +15,7 @@ use tracing_subscriber::{
 use crate::models::{LogLevel, SpanKind};
 
 use super::{
-    collector::{CollectedEvent, Collector, EventBuilder, Exporter, RequestId, SpanBuilder},
+    collector::{CollectedEvent, Collector, EventBuilder, RequestId, SpanBuilder},
     traceparent::TraceParent,
 };
 
