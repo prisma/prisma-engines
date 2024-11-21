@@ -188,7 +188,11 @@ impl<'a> field::Visit for SpanAttributeVisitor<'a> {
 
     fn record_u64(&mut self, field: &field::Field, value: u64) {
         match field.name() {
-            REQUEST_ID_FIELD => self.span_builder.set_request_id(value.into()),
+            REQUEST_ID_FIELD => {
+                if let Some(request_id) = RequestId::from_u64(value) {
+                    self.span_builder.set_request_id(request_id);
+                }
+            }
             _ => self.span_builder.insert_attribute(field.name(), value.into()),
         }
     }
