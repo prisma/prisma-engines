@@ -296,7 +296,7 @@ fn default_value_to_serde(dv: &DefaultKind) -> serde_json::Value {
     match dv {
         DefaultKind::Single(value) => prisma_value_to_serde(&value.clone()),
         DefaultKind::Expression(vg) => {
-            let args: Vec<_> = vg.args().iter().map(|(_, v)| v.clone()).collect();
+            let args: Vec<_> = vg.args().to_vec();
             function_to_serde(vg.name(), &args)
         }
     }
