@@ -1,4 +1,12 @@
-use std::{borrow::Cow, collections::HashMap, num::NonZeroU64, sync::Arc};
+use std::{
+    borrow::Cow,
+    collections::HashMap,
+    num::NonZeroU64,
+    sync::{
+        atomic::{AtomicU64, Ordering},
+        Arc,
+    },
+};
 
 use derive_more::Display;
 use serde::{Deserialize, Serialize};
@@ -92,9 +100,31 @@ impl From<tracing::span::Id> for SpanId {
 /// for some short time after the spans are closed until the client requests them, so we need
 /// request IDs that are guaranteed to be unique for a very long period of time (although they
 /// still don't necessarily have to be unique for the whole lifetime of the process).
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
 pub struct RequestId(SerializableU64);
 
-impl RequestId {}
+impl RequestId {
+    pub fn next() -> Self {
+        static NEXT_ID: AtomicU64 = AtomicU64::new(1);
+        Self(SerializableU64(NEXT_ID.fetch_add(1, Ordering::Relaxed)))
+    }
+
+    pub fn into_u64(self) -> u64 {
+        self.0 .0
+    }
+}
+
+impl Default for RequestId {
+    fn default() -> Self {
+        Self::next()
+    }
+}
+
+impl From<u64> for RequestId {
+    fn from(id: u64) -> Self {
+        Self(SerializableU64(id))
+    }
+}
 
 #[derive(Debug, Clone)]
 #[cfg_attr(test, derive(Serialize))]
@@ -112,6 +142,7 @@ pub struct CollectedSpan {
 }
 
 pub(crate) struct SpanBuilder {
+    request_id: Option<RequestId>,
     id: SpanId,
     name: Cow<'static, str>,
     start_time: Instant,
@@ -124,6 +155,7 @@ pub(crate) struct SpanBuilder {
 impl SpanBuilder {
     pub fn new(name: &'static str, id: impl Into<SpanId>, start_time: Instant, attrs_size_hint: usize) -> Self {
         Self {
+            request_id: None,
             id: id.into(),
             name: name.into(),
             start_time,
@@ -132,6 +164,14 @@ impl SpanBuilder {
             kind: None,
             links: Vec::new(),
         }
+    }
+
+    pub fn request_id(&self) -> Option<RequestId> {
+        self.request_id
+    }
+
+    pub fn set_request_id(&mut self, request_id: RequestId) {
+        self.request_id = Some(request_id);
     }
 
     pub fn set_name(&mut self, name: Cow<'static, str>) {
@@ -220,8 +260,8 @@ impl EventBuilder {
 }
 
 pub trait Collector {
-    fn add_span(&self, trace: SpanId, span: CollectedSpan);
-    fn add_event(&self, trace: SpanId, event: CollectedEvent);
+    fn add_span(&self, trace: RequestId, span: CollectedSpan);
+    fn add_event(&self, trace: RequestId, event: CollectedEvent);
 }
 
 #[derive(Clone)]
@@ -244,11 +284,11 @@ impl Default for Exporter {
 }
 
 impl Collector for Exporter {
-    fn add_span(&self, _trace: SpanId, _span: CollectedSpan) {
+    fn add_span(&self, _trace: RequestId, _span: CollectedSpan) {
         todo!()
     }
 
-    fn add_event(&self, _trace: SpanId, _event: CollectedEvent) {
+    fn add_event(&self, _trace: RequestId, _event: CollectedEvent) {
         todo!()
     }
 }
