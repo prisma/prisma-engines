@@ -8,13 +8,14 @@ psl.workspace = true
 query-structure = { path = "../query-structure" }
 query-core = { path = "../core" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
+telemetry = { path = "../../libs/telemetry" }
 quaint.workspace = true
 dmmf_crate = { path = "../dmmf", package = "dmmf" }
 itertools.workspace = true
 graphql-parser = { git = "https://github.com/prisma/graphql-parser", optional = true }
 serde.workspace = true
 serde_json.workspace = true
-futures = "0.3"
+futures.workspace = true
 indexmap.workspace = true
 bigdecimal = "0.3"
 thiserror = "1"

@@ -307,12 +307,14 @@ impl Builder {
     /// - Defaults to `PostgresFlavour::Unknown`.
     #[cfg(feature = "postgresql-native")]
     pub fn set_postgres_flavour(&mut self, flavour: crate::connector::PostgresFlavour) {
-        use crate::connector::NativeConnectionInfo;
-        if let ConnectionInfo::Native(NativeConnectionInfo::Postgres(ref mut url)) = self.connection_info {
+        use crate::connector::{NativeConnectionInfo, PostgresUrl};
+        if let ConnectionInfo::Native(NativeConnectionInfo::Postgres(PostgresUrl::Native(ref mut url))) =
+            self.connection_info
+        {
             url.set_flavour(flavour);
         }
 
-        if let QuaintManager::Postgres { ref mut url } = self.manager {
+        if let QuaintManager::Postgres { ref mut url, .. } = self.manager {
             url.set_flavour(flavour);
         }
     }
@@ -415,13 +417,14 @@ impl Quaint {
             }
             #[cfg(feature = "postgresql")]
             s if s.starts_with("postgres") || s.starts_with("postgresql") => {
-                let url = crate::connector::PostgresUrl::new(url::Url::parse(s)?)?;
+                let url = crate::connector::PostgresNativeUrl::new(url::Url::parse(s)?)?;
                 let connection_limit = url.connection_limit();
                 let pool_timeout = url.pool_timeout();
                 let max_connection_lifetime = url.max_connection_lifetime();
                 let max_idle_connection_lifetime = url.max_idle_connection_lifetime();
 
-                let manager = QuaintManager::Postgres { url };
+                let tls_manager = crate::connector::MakeTlsConnectorManager::new(url.clone());
+                let manager = QuaintManager::Postgres { url, tls_manager };
                 let mut builder = Builder::new(s, manager)?;
 
                 if let Some(limit) = connection_limit {

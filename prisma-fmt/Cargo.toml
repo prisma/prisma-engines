@@ -22,6 +22,9 @@ dissimilar = "1.0.3"
 once_cell = "1.9.0"
 expect-test = "1"
 
+[build-dependencies]
+build-utils.path = "../libs/build-utils"
+
 [features]
 # sigh please don't ask :(
 vendored-openssl = []

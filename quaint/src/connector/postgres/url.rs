@@ -63,16 +63,74 @@ impl PostgresFlavour {
     }
 }
 
+#[derive(Debug, Clone)]
+pub enum PostgresUrl {
+    Native(Box<PostgresNativeUrl>),
+    WebSocket(PostgresWebSocketUrl),
+}
+
+impl PostgresUrl {
+    pub fn new_native(url: Url) -> Result<Self, Error> {
+        Ok(Self::Native(Box::new(PostgresNativeUrl::new(url)?)))
+    }
+
+    pub fn new_websocket(url: Url, api_key: String) -> Result<Self, Error> {
+        Ok(Self::WebSocket(PostgresWebSocketUrl::new(url, api_key)))
+    }
+
+    pub fn dbname(&self) -> &str {
+        match self {
+            Self::Native(url) => url.dbname(),
+            Self::WebSocket(url) => url.dbname(),
+        }
+    }
+
+    pub fn host(&self) -> &str {
+        match self {
+            Self::Native(native_url) => native_url.host(),
+            Self::WebSocket(ws_url) => ws_url.host(),
+        }
+    }
+
+    pub fn port(&self) -> u16 {
+        match self {
+            Self::Native(native_url) => native_url.port(),
+            Self::WebSocket(ws_url) => ws_url.port(),
+        }
+    }
+
+    pub fn username(&self) -> Cow<'_, str> {
+        match self {
+            Self::Native(native_url) => native_url.username(),
+            Self::WebSocket(_) => Cow::Borrowed(""),
+        }
+    }
+
+    pub fn schema(&self) -> &str {
+        match self {
+            Self::Native(native_url) => native_url.schema(),
+            Self::WebSocket(_) => "public",
+        }
+    }
+
+    pub fn socket_timeout(&self) -> Option<Duration> {
+        match self {
+            Self::Native(native_url) => native_url.socket_timeout(),
+            Self::WebSocket(_) => None,
+        }
+    }
+}
+
 /// Wraps a connection url and exposes the parsing logic used by Quaint,
 /// including default values.
 #[derive(Debug, Clone)]
-pub struct PostgresUrl {
+pub struct PostgresNativeUrl {
     pub(crate) url: Url,
     pub(crate) query_params: PostgresUrlQueryParams,
     pub(crate) flavour: PostgresFlavour,
 }
 
-impl PostgresUrl {
+impl PostgresNativeUrl {
     /// Parse `Url` to `PostgresUrl`. Returns error for mistyped connection
     /// parameters.
     pub fn new(url: Url) -> Result<Self, Error> {
@@ -431,6 +489,47 @@ pub(crate) struct PostgresUrlQueryParams {
     pub(crate) ssl_mode: SslMode,
 }
 
+#[derive(Debug, Clone)]
+pub struct PostgresWebSocketUrl {
+    pub(crate) url: Url,
+    pub(crate) api_key: String,
+    pub(crate) db_name: Option<String>,
+}
+
+impl PostgresWebSocketUrl {
+    pub fn new(url: Url, api_key: String) -> Self {
+        Self {
+            url,
+            api_key,
+            db_name: None,
+        }
+    }
+
+    pub fn override_db_name(&mut self, name: String) {
+        self.db_name = Some(name)
+    }
+
+    pub fn api_key(&self) -> &str {
+        &self.api_key
+    }
+
+    pub fn dbname(&self) -> &str {
+        self.overriden_db_name().unwrap_or("postgres")
+    }
+
+    pub fn overriden_db_name(&self) -> Option<&str> {
+        self.db_name.as_deref()
+    }
+
+    pub fn host(&self) -> &str {
+        self.url.host_str().unwrap_or("localhost")
+    }
+
+    pub fn port(&self) -> u16 {
+        self.url.port().unwrap_or(80)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -442,14 +541,15 @@ mod tests {
 
     #[test]
     fn should_parse_socket_url() {
-        let url = PostgresUrl::new(Url::parse("postgresql:///dbname?host=/var/run/psql.sock").unwrap()).unwrap();
+        let url = PostgresNativeUrl::new(Url::parse("postgresql:///dbname?host=/var/run/psql.sock").unwrap()).unwrap();
         assert_eq!("dbname", url.dbname());
         assert_eq!("/var/run/psql.sock", url.host());
     }
 
     #[test]
     fn should_parse_escaped_url() {
-        let url = PostgresUrl::new(Url::parse("postgresql:///dbname?host=%2Fvar%2Frun%2Fpostgresql").unwrap()).unwrap();
+        let url =
+            PostgresNativeUrl::new(Url::parse("postgresql:///dbname?host=%2Fvar%2Frun%2Fpostgresql").unwrap()).unwrap();
         assert_eq!("dbname", url.dbname());
         assert_eq!("/var/run/postgresql", url.host());
     }
@@ -457,63 +557,69 @@ mod tests {
     #[test]
     fn should_allow_changing_of_cache_size() {
         let url =
-            PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?statement_cache_size=420").unwrap()).unwrap();
+            PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo?statement_cache_size=420").unwrap())
+                .unwrap();
         assert_eq!(420, url.cache().capacity());
     }
 
     #[test]
     fn should_have_default_cache_size() {
-        let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo").unwrap()).unwrap();
+        let url = PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo").unwrap()).unwrap();
         assert_eq!(100, url.cache().capacity());
     }
 
     #[test]
     fn should_have_application_name() {
-        let url =
-            PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?application_name=test").unwrap()).unwrap();
+        let url = PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo?application_name=test").unwrap())
+            .unwrap();
         assert_eq!(Some("test"), url.application_name());
     }
 
     #[test]
     fn should_have_channel_binding() {
         let url =
-            PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?channel_binding=require").unwrap()).unwrap();
+            PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo?channel_binding=require").unwrap())
+                .unwrap();
         assert_eq!(ChannelBinding::Require, url.channel_binding());
     }
 
     #[test]
     fn should_have_default_channel_binding() {
         let url =
-            PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?channel_binding=invalid").unwrap()).unwrap();
+            PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo?channel_binding=invalid").unwrap())
+                .unwrap();
         assert_eq!(ChannelBinding::Prefer, url.channel_binding());
 
-        let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo").unwrap()).unwrap();
+        let url = PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo").unwrap()).unwrap();
         assert_eq!(ChannelBinding::Prefer, url.channel_binding());
     }
 
     #[test]
     fn should_not_enable_caching_with_pgbouncer() {
-        let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?pgbouncer=true").unwrap()).unwrap();
+        let url =
+            PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo?pgbouncer=true").unwrap()).unwrap();
         assert_eq!(0, url.cache().capacity());
     }
 
     #[test]
     fn should_parse_default_host() {
-        let url = PostgresUrl::new(Url::parse("postgresql:///dbname").unwrap()).unwrap();
+        let url = PostgresNativeUrl::new(Url::parse("postgresql:///dbname").unwrap()).unwrap();
         assert_eq!("dbname", url.dbname());
         assert_eq!("localhost", url.host());
     }
 
     #[test]
     fn should_parse_ipv6_host() {
-        let url = PostgresUrl::new(Url::parse("postgresql://[2001:db8:1234::ffff]:5432/dbname").unwrap()).unwrap();
+        let url =
+            PostgresNativeUrl::new(Url::parse("postgresql://[2001:db8:1234::ffff]:5432/dbname").unwrap()).unwrap();
         assert_eq!("2001:db8:1234::ffff", url.host());
     }
 
     #[test]
     fn should_handle_options_field() {
-        let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432?options=--cluster%3Dmy_cluster").unwrap())
-            .unwrap();
+        let url =
+            PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432?options=--cluster%3Dmy_cluster").unwrap())
+                .unwrap();
 
         assert_eq!("--cluster=my_cluster", url.options().unwrap());
     }
@@ -600,7 +706,7 @@ mod tests {
         url.query_pairs_mut().append_pair("schema", "hello");
         url.query_pairs_mut().append_pair("pgbouncer", "true");
 
-        let mut pg_url = PostgresUrl::new(url).unwrap();
+        let mut pg_url = PostgresNativeUrl::new(url).unwrap();
         pg_url.set_flavour(PostgresFlavour::Postgres);
 
         let config = pg_url.to_config();
@@ -616,7 +722,7 @@ mod tests {
         let mut url = Url::parse(&CONN_STR).unwrap();
         url.query_pairs_mut().append_pair("schema", "hello");
 
-        let mut pg_url = PostgresUrl::new(url).unwrap();
+        let mut pg_url = PostgresNativeUrl::new(url).unwrap();
         pg_url.set_flavour(PostgresFlavour::Postgres);
 
         let config = pg_url.to_config();
@@ -630,7 +736,7 @@ mod tests {
         let mut url = Url::parse(&CONN_STR).unwrap();
         url.query_pairs_mut().append_pair("schema", "hello");
 
-        let mut pg_url = PostgresUrl::new(url).unwrap();
+        let mut pg_url = PostgresNativeUrl::new(url).unwrap();
         pg_url.set_flavour(PostgresFlavour::Cockroach);
 
         let config = pg_url.to_config();
@@ -644,7 +750,7 @@ mod tests {
         let mut url = Url::parse(&CONN_STR).unwrap();
         url.query_pairs_mut().append_pair("schema", "HeLLo");
 
-        let mut pg_url = PostgresUrl::new(url).unwrap();
+        let mut pg_url = PostgresNativeUrl::new(url).unwrap();
         pg_url.set_flavour(PostgresFlavour::Cockroach);
 
         let config = pg_url.to_config();

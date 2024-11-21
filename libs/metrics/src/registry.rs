@@ -1,11 +1,7 @@
-use super::formatters::metrics_to_json;
-use super::{
-    common::{KeyLabels, Metric, MetricAction, MetricType, MetricValue, Snapshot},
-    formatters::metrics_to_prometheus,
-};
-use super::{
-    ACCEPT_LIST, HISTOGRAM_BOUNDS, METRIC_COUNTER, METRIC_DESCRIPTION, METRIC_GAUGE, METRIC_HISTOGRAM, METRIC_TARGET,
-};
+use std::collections::HashMap;
+use std::fmt;
+use std::sync::{atomic::Ordering, Arc};
+
 use metrics::{CounterFn, GaugeFn, HistogramFn, Key};
 use metrics_util::{
     registry::{GenerationalAtomicStorage, GenerationalStorage, Registry},
@@ -13,15 +9,13 @@ use metrics_util::{
 };
 use parking_lot::RwLock;
 use serde_json::Value;
-use std::collections::HashMap;
-use std::fmt;
-use std::sync::atomic::Ordering;
-use std::sync::Arc;
-use tracing::{
-    field::{Field, Visit},
-    Subscriber,
+
+use super::formatters::metrics_to_json;
+use super::{
+    common::{Metric, MetricAction, MetricType, MetricValue, Snapshot},
+    formatters::metrics_to_prometheus,
 };
-use tracing_subscriber::Layer;
+use super::{ACCEPT_LIST, HISTOGRAM_BOUNDS};
 
 struct Inner {
     descriptions: RwLock<HashMap<String, String>>,
@@ -46,7 +40,7 @@ pub struct MetricRegistry {
 
 impl fmt::Debug for MetricRegistry {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Metric Registry")
+        write!(f, "MetricRegistry {{ .. }}")
     }
 }
 
@@ -68,12 +62,14 @@ impl MetricRegistry {
         }
     }
 
-    fn record(&self, metric: &MetricVisitor) {
-        match metric.metric_type {
-            MetricType::Counter => self.handle_counter(metric),
-            MetricType::Gauge => self.handle_gauge(metric),
-            MetricType::Histogram => self.handle_histogram(metric),
-            MetricType::Description => self.handle_description(metric),
+    pub(crate) fn record(&self, metric: &MetricVisitor) {
+        if self.is_accepted_metric(metric) {
+            match metric.metric_type {
+                MetricType::Counter => self.handle_counter(metric),
+                MetricType::Gauge => self.handle_gauge(metric),
+                MetricType::Histogram => self.handle_histogram(metric),
+                MetricType::Description => self.handle_description(metric),
+            }
         }
     }
 
@@ -223,80 +219,8 @@ impl MetricRegistry {
 }
 
 #[derive(Debug)]
-struct MetricVisitor {
-    metric_type: MetricType,
-    action: MetricAction,
-    name: Key,
-}
-
-impl MetricVisitor {
-    pub fn new() -> Self {
-        Self {
-            metric_type: MetricType::Description,
-            action: MetricAction::Absolute(0),
-            name: Key::from_name(""),
-        }
-    }
-}
-
-impl Visit for MetricVisitor {
-    fn record_debug(&mut self, _field: &Field, _value: &dyn std::fmt::Debug) {}
-
-    fn record_f64(&mut self, field: &Field, value: f64) {
-        match field.name() {
-            "gauge_inc" => self.action = MetricAction::GaugeInc(value),
-            "gauge_dec" => self.action = MetricAction::GaugeDec(value),
-            "gauge_set" => self.action = MetricAction::GaugeSet(value),
-            "hist_record" => self.action = MetricAction::HistRecord(value),
-            _ => (),
-        }
-    }
-
-    fn record_i64(&mut self, field: &Field, value: i64) {
-        match field.name() {
-            "increment" => self.action = MetricAction::Increment(value as u64),
-            "absolute" => self.action = MetricAction::Absolute(value as u64),
-            _ => (),
-        }
-    }
-
-    fn record_u64(&mut self, field: &Field, value: u64) {
-        match field.name() {
-            "increment" => self.action = MetricAction::Increment(value),
-            "absolute" => self.action = MetricAction::Absolute(value),
-            _ => (),
-        }
-    }
-
-    fn record_str(&mut self, field: &Field, value: &str) {
-        match (field.name(), value) {
-            ("metric_type", METRIC_COUNTER) => self.metric_type = MetricType::Counter,
-            ("metric_type", METRIC_GAUGE) => self.metric_type = MetricType::Gauge,
-            ("metric_type", METRIC_HISTOGRAM) => self.metric_type = MetricType::Histogram,
-            ("metric_type", METRIC_DESCRIPTION) => self.metric_type = MetricType::Description,
-            ("name", _) => self.name = Key::from_name(value.to_string()),
-            ("key_labels", _) => {
-                let key_labels: KeyLabels = serde_json::from_str(value).unwrap();
-                self.name = key_labels.into();
-            }
-            (METRIC_DESCRIPTION, _) => self.action = MetricAction::Description(value.to_string()),
-            _ => (),
-        }
-    }
-}
-
-// A tracing layer for receiving metric trace events and storing them in the registry.
-impl<S: Subscriber> Layer<S> for MetricRegistry {
-    fn on_event(&self, event: &tracing::Event<'_>, _ctx: tracing_subscriber::layer::Context<'_, S>) {
-        if event.metadata().target() != METRIC_TARGET {
-            return;
-        }
-
-        let mut visitor = MetricVisitor::new();
-        event.record(&mut visitor);
-
-        if self.is_accepted_metric(&visitor) {
-            self.record(&visitor);
-        }
-    }
+pub(crate) struct MetricVisitor {
+    pub(crate) metric_type: MetricType,
+    pub(crate) action: MetricAction,
+    pub(crate) name: Key,
 }

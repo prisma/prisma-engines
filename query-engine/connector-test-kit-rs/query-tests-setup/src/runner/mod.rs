@@ -8,13 +8,13 @@ use crate::{
     ENGINE_PROTOCOL,
 };
 use colored::Colorize;
+use prisma_metrics::MetricRegistry;
 use query_core::{
     protocol::EngineProtocol,
     relation_load_strategy,
     schema::{self, QuerySchemaRef},
     QueryExecutor, TransactionOptions, TxId,
 };
-use query_engine_metrics::MetricRegistry;
 use request_handlers::{
     BatchTransactionOption, ConnectorKind, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
     RequestBody, RequestHandler,
@@ -306,7 +306,15 @@ impl Runner {
         })
     }
 
-    pub async fn query<T>(&self, query: T) -> TestResult<QueryResult>
+    pub async fn query(&self, query: impl Into<String>) -> TestResult<QueryResult> {
+        self.query_with_maybe_tx_id(self.current_tx_id.as_ref(), query).await
+    }
+
+    pub async fn query_in_tx(&self, tx_id: &TxId, query: impl Into<String>) -> TestResult<QueryResult> {
+        self.query_with_maybe_tx_id(Some(tx_id), query).await
+    }
+
+    async fn query_with_maybe_tx_id<T>(&self, tx_id: Option<&TxId>, query: T) -> TestResult<QueryResult>
     where
         T: Into<String>,
     {
@@ -316,7 +324,7 @@ impl Runner {
             RunnerExecutor::Builtin(e) => e,
             RunnerExecutor::External(external) => match JsonRequest::from_graphql(&query, self.query_schema()) {
                 Ok(json_query) => {
-                    let mut response = external.query(json_query, self.current_tx_id.as_ref()).await?;
+                    let mut response = external.query(json_query, tx_id).await?;
                     response.detag();
                     return Ok(response);
                 }
@@ -353,7 +361,7 @@ impl Runner {
             }
         };
 
-        let response = handler.handle(request_body, self.current_tx_id.clone(), None).await;
+        let response = handler.handle(request_body, tx_id.cloned(), None).await;
 
         let result: QueryResult = match self.protocol {
             EngineProtocol::Json => JsonResponse::from_graphql(response).into(),

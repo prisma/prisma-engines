@@ -13,13 +13,16 @@ use crate::{
 use bson::Bson;
 use bson::Document;
 use futures::Future;
-use query_engine_metrics::{
-    histogram, increment_counter, metrics, PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
-    PRISMA_DATASOURCE_QUERIES_TOTAL,
+use prisma_metrics::{
+    counter, histogram, PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, PRISMA_DATASOURCE_QUERIES_TOTAL,
 };
 use query_structure::*;
+use std::sync::Arc;
 use std::time::Instant;
-use tracing::debug;
+use tracing::{debug, info_span};
+use tracing_futures::Instrument;
+
+const DB_SYSTEM_NAME: &str = "mongodb";
 
 /// Transforms a document to a `Record`, fields ordered as defined in `fields`.
 fn document_to_record(mut doc: Document, fields: &[String], meta_mapping: &OutputMetaMapping) -> crate::Result<Record> {
@@ -59,19 +62,34 @@ where
     F: FnOnce() -> U + 'a,
     U: Future<Output = mongodb::error::Result<T>>,
 {
+    // TODO: build the string lazily in the Display impl so it doesn't have to be built if neither
+    // logs nor traces are enabled. This is tricky because whatever we store in the span has to be
+    // 'static, and all `QueryString` implementations aren't, so this requires some refactoring.
+    let query_string: Arc<str> = builder.build().into();
+
+    let span = info_span!(
+        "prisma:engine:db_query",
+        user_facing = true,
+        "db.system" = DB_SYSTEM_NAME,
+        "db.statement" = %Arc::clone(&query_string),
+        "db.operation.name" = builder.query_type(),
+        "otel.kind" = "client"
+    );
+
+    if let Some(coll) = builder.collection() {
+        span.record("db.collection.name", coll);
+    }
+
     let start = Instant::now();
-    let res = f().await;
+    let res = f().instrument(span).await;
     let elapsed = start.elapsed().as_millis() as f64;
 
-    histogram!(PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS, elapsed);
-    increment_counter!(PRISMA_DATASOURCE_QUERIES_TOTAL);
+    histogram!(PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS).record(elapsed);
+    counter!(PRISMA_DATASOURCE_QUERIES_TOTAL).increment(1);
 
-    // TODO: emit tracing event only when "debug" level query logs are enabled.
     // TODO prisma/team-orm#136: fix log subscription.
-    let query_string = builder.build();
     // NOTE: `params` is a part of the interface for query logs.
-    let params: Vec<i32> = vec![];
-    debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %query_string, params = ?params, duration_ms = elapsed);
+    debug!(target: "mongodb_query_connector::query", item_type = "query", is_query = true, query = %query_string, params = %"[]", duration_ms = elapsed);
 
     res
 }

@@ -22,10 +22,9 @@ pub use templating::*;
 
 use colored::Colorize;
 use once_cell::sync::Lazy;
+use prisma_metrics::{MetricRecorder, MetricRegistry, WithMetricsInstrumentation};
 use psl::datamodel_connector::ConnectorCapabilities;
-use query_engine_metrics::MetricRegistry;
 use std::future::Future;
-use std::sync::Once;
 use tokio::runtime::Builder;
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 use tracing_futures::WithSubscriber;
@@ -61,14 +60,10 @@ fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
         .block_on(fut)
 }
 
-static METRIC_RECORDER: Once = Once::new();
-
-pub fn setup_metrics() -> MetricRegistry {
+pub fn setup_metrics() -> (MetricRegistry, MetricRecorder) {
     let metrics = MetricRegistry::new();
-    METRIC_RECORDER.call_once(|| {
-        query_engine_metrics::setup();
-    });
-    metrics
+    let recorder = MetricRecorder::new(metrics.clone()).with_initialized_prisma_metrics();
+    (metrics, recorder)
 }
 
 /// Taken from Reddit. Enables taking an async function pointer which takes references as param
@@ -161,8 +156,7 @@ fn run_relation_link_test_impl(
 
             let datamodel = render_test_datamodel(&test_db_name, template, &[], None, Default::default(), Default::default(), None);
             let (connector_tag, version) = CONFIG.test_connector().unwrap();
-            let metrics = setup_metrics();
-            let metrics_for_subscriber = metrics.clone();
+            let (metrics, recorder) = setup_metrics();
             let (log_capture, log_tx) = TestLogCapture::new();
 
             run_with_tokio(
@@ -176,9 +170,8 @@ fn run_relation_link_test_impl(
 
                     test_fn(&runner, &dm).with_subscriber(test_tracing_subscriber(
                         ENV_LOG_LEVEL.to_string(),
-                        metrics_for_subscriber,
                         log_tx,
-                    ))
+                    )).with_recorder(recorder)
                     .await.unwrap();
 
                     teardown_project(&datamodel, Default::default(), runner.schema_id())
@@ -275,8 +268,7 @@ fn run_connector_test_impl(
         None,
     );
     let (connector_tag, version) = CONFIG.test_connector().unwrap();
-    let metrics = crate::setup_metrics();
-    let metrics_for_subscriber = metrics.clone();
+    let (metrics, recorder) = crate::setup_metrics();
 
     let (log_capture, log_tx) = TestLogCapture::new();
 
@@ -297,11 +289,8 @@ fn run_connector_test_impl(
         let schema_id = runner.schema_id();
 
         if let Err(err) = test_fn(runner)
-            .with_subscriber(test_tracing_subscriber(
-                ENV_LOG_LEVEL.to_string(),
-                metrics_for_subscriber,
-                log_tx,
-            ))
+            .with_subscriber(test_tracing_subscriber(ENV_LOG_LEVEL.to_string(), log_tx))
+            .with_recorder(recorder)
             .await
         {
             panic!("💥 Test failed due to an error: {err:?}");
