@@ -17,6 +17,7 @@ use crate::models::{LogLevel, SpanKind, TraceSpan};
 
 #[derive(Debug, Display, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[display(fmt = "{}", _0)]
+#[repr(transparent)]
 struct SerializableNonZeroU64(NonZeroU64);
 
 impl Serialize for SerializableNonZeroU64 {
@@ -46,6 +47,7 @@ impl<'de> Deserialize<'de> for SerializableNonZeroU64 {
 
 #[derive(Debug, Display, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[display(fmt = "{}", _0)]
+#[repr(transparent)]
 struct SerializableU64(u64);
 
 impl Serialize for SerializableU64 {
@@ -74,6 +76,7 @@ impl<'de> Deserialize<'de> for SerializableU64 {
 /// A unique identifier for a span. It maps directly to [`tracing::span::Id`] assigned by
 /// [`tracing_subscriber::registry::Registry`].
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[repr(transparent)]
 pub struct SpanId(SerializableNonZeroU64);
 
 impl From<&tracing::span::Id> for SpanId {
@@ -101,6 +104,7 @@ impl From<tracing::span::Id> for SpanId {
 /// request IDs that are guaranteed to be unique for a very long period of time (although they
 /// still don't necessarily have to be unique for the whole lifetime of the process).
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[repr(transparent)]
 pub struct RequestId(SerializableU64);
 
 impl RequestId {
