@@ -649,10 +649,10 @@ impl DefaultValueAssert for ast::Expression {
             if let ast::Expression::NumericValue(actual, _) = &args.arguments[0].value {
                 assert_eq!(actual, &format!("{version}"));
             } else {
-                panic!("Expected a numeric value for the version.");
+                panic!("Expected a numeric value for the `cuid()` version.");
             }
         } else {
-            unreachable!();
+            panic!("Expected `cuid()` to be a function, got {}", &self);
         }
 
         self
@@ -671,12 +671,12 @@ impl DefaultValueAssert for ast::Expression {
 
         if let ast::Expression::Function(_, args, _) = self {
             if let ast::Expression::NumericValue(actual, _) = &args.arguments[0].value {
-                assert_eq!(actual, &format!("{version}"));
+                assert_eq!(actual, &version.to_string());
             } else {
-                panic!("Expected a numeric value for the version.");
+                panic!("Expected a numeric value for the `uuid()` version.");
             }
         } else {
-            unreachable!();
+            panic!("Expected `cuid()` to be a function, got {}", &self);
         }
 
         self

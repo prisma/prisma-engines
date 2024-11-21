@@ -185,7 +185,7 @@ impl ValueGenerator {
     pub fn new_cuid(version: u8) -> Self {
         ValueGenerator::new(
             "cuid".to_owned(),
-            vec![(Some(format!("{version}")), PrismaValue::Int(version as i64))],
+            vec![(Some(version.to_string()), PrismaValue::Int(version as i64))],
         )
         .unwrap()
     }
@@ -193,7 +193,7 @@ impl ValueGenerator {
     pub fn new_uuid(version: u8) -> Self {
         ValueGenerator::new(
             "uuid".to_owned(),
-            vec![(Some(format!("{version}")), PrismaValue::Int(version as i64))],
+            vec![(Some(version.to_string()), PrismaValue::Int(version as i64))],
         )
         .unwrap()
     }
