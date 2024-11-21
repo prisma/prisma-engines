@@ -10,15 +10,14 @@ prisma-value = { path = "../../libs/prisma-value" }
 bigdecimal = "0.3"
 thiserror = "1.0"
 
-getrandom = { version = "0.2" }
+getrandom = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
 cuid = { workspace = true, optional = true }
 nanoid = { version = "0.4.0", optional = true }
 chrono.workspace = true
 
-[target.'cfg(target_arch = "wasm32")'.dependencies.getrandom]
-version = "0.2"
-features = ["js"]
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { workspace = true, features = ["js"] }
 
 [features]
 # Support for generating default UUID, CUID, nanoid and datetime values.
