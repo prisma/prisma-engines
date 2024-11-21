@@ -1,6 +1,5 @@
 use std::marker::PhantomData;
 
-use tokio::time::Instant;
 use tracing::{
     field,
     span::{Attributes, Id},
@@ -66,15 +65,6 @@ where
     fn require_span<'a>(id: &Id, ctx: &'a Context<'_, S>) -> SpanRef<'a, S> {
         ctx.span(id).expect("span must exist in the registry, this is a bug")
     }
-
-    fn root_span_checked<'a>(id: &Id, ctx: &'a Context<'_, S>) -> Option<SpanRef<'a, S>> {
-        ctx.span_scope(id)?.from_root().next()
-    }
-
-    fn root_span<'a>(id: &Id, ctx: &'a Context<'_, S>) -> SpanRef<'a, S> {
-        Self::root_span_checked(id, ctx)
-            .expect("span scope must exist in the registry and include at least the requested span ID")
-    }
 }
 
 impl<S, C> Layer<S> for CapturingLayer<S, C>
@@ -84,7 +74,7 @@ where
 {
     fn on_new_span(&self, attrs: &Attributes<'_>, id: &Id, ctx: Context<'_, S>) {
         let span = Self::require_span(id, &ctx);
-        let mut span_builder = SpanBuilder::new(span.name(), id, Instant::now(), attrs.fields().len());
+        let mut span_builder = SpanBuilder::new(span.name(), id, attrs.fields().len());
 
         if let Some(request_id) = span
             .parent()
@@ -127,7 +117,7 @@ where
             return;
         };
 
-        let Some(request_id) = Self::root_span(&parent, &ctx)
+        let Some(request_id) = Self::require_span(&parent, &ctx)
             .extensions()
             .get::<SpanBuilder>()
             .and_then(|sb| sb.request_id())
@@ -139,7 +129,6 @@ where
             parent.into(),
             event.metadata().name(),
             event.metadata().level().into(),
-            Instant::now(),
             event.metadata().fields().len(),
         );
 
@@ -159,9 +148,8 @@ where
             return;
         };
 
-        let end_time = Instant::now();
         let parent_id = span.parent().map(|parent| parent.id());
-        let collected_span = span_builder.end(parent_id, end_time);
+        let collected_span = span_builder.end(parent_id);
 
         self.collector.add_span(request_id, collected_span);
     }
