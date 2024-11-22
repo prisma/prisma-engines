@@ -1,5 +1,6 @@
-use std::{borrow::Cow, collections::HashMap, sync::Arc};
+use std::{borrow::Cow, collections::HashMap, str::FromStr, sync::Arc};
 
+use enumflags2::{bitflags, BitFlags};
 use serde::Serialize;
 use tokio::sync::{mpsc, oneshot, Mutex, RwLock};
 
@@ -63,6 +64,47 @@ impl From<CollectedEvent> for ExportedEvent {
 pub struct Trace {
     pub spans: Vec<ExportedSpan>,
     pub events: Vec<ExportedEvent>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[bitflags]
+#[repr(u8)]
+pub enum CaptureTarget {
+    TraceEvents,
+    DebugEvents,
+    InfoEvents,
+    WarnEvents,
+    ErrorEvents,
+    QueryEvents,
+    Spans,
+}
+
+impl From<LogLevel> for CaptureTarget {
+    fn from(value: LogLevel) -> Self {
+        match value {
+            LogLevel::Trace => Self::TraceEvents,
+            LogLevel::Debug => Self::DebugEvents,
+            LogLevel::Info => Self::InfoEvents,
+            LogLevel::Warn => Self::WarnEvents,
+            LogLevel::Error => Self::ErrorEvents,
+            LogLevel::Query => Self::QueryEvents,
+        }
+    }
+}
+
+impl FromStr for CaptureTarget {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "tracing" => Ok(Self::Spans),
+            _ => Ok(s.parse::<LogLevel>()?.into()),
+        }
+    }
+}
+
+pub struct CaptureSettings {
+    targets: BitFlags<CaptureTarget>,
 }
 
 #[derive(Clone)]
