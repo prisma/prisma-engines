@@ -25,7 +25,7 @@ pub use crate::{
     reformat::{reformat, reformat_multiple, reformat_validated_schema_into_single},
 };
 pub use diagnostics;
-pub use parser_database::{self, is_reserved_type_name};
+pub use parser_database::{self, generators, is_reserved_type_name};
 pub use schema_ast;
 pub use set_config_dir::set_config_dir;
 

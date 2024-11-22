@@ -296,7 +296,7 @@ fn default_value_to_serde(dv: &DefaultKind) -> serde_json::Value {
     match dv {
         DefaultKind::Single(value) => prisma_value_to_serde(&value.clone()),
         DefaultKind::Expression(vg) => {
-            let args: Vec<_> = vg.args().iter().map(|(_, v)| v.clone()).collect();
+            let args: Vec<_> = vg.args().to_vec();
             function_to_serde(vg.name(), &args)
         }
     }
@@ -310,7 +310,7 @@ fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
         PrismaValue::Float(val) => {
             serde_json::Value::Number(serde_json::Number::from_f64(val.to_f64().unwrap()).unwrap())
         }
-        PrismaValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
+        PrismaValue::Int(val) => serde_json::Value::Number(serde_json::Number::from(*val)),
         PrismaValue::BigInt(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),
         PrismaValue::Null => serde_json::Value::Null,
