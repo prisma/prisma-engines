@@ -1,3 +1,5 @@
+use schema_ast::ast::WithSpan;
+
 use super::{PostgresExtension, PostgresExtensions};
 use crate::{
     datamodel_connector::EXTENSIONS_KEY,
@@ -48,23 +50,23 @@ fn filter_args<'a>(
     let mut dups = HashSet::new();
 
     args.iter()
-        .filter_map(|arg| match arg.name.as_ref() {
-            Some(name) if dups.contains(name.name.as_str()) => {
+        .filter_map(|arg| match arg.name() {
+            Some(name) if dups.contains(name) => {
                 diagnostics.push_error(DatamodelError::new_validation_error(
-                    &format!("The argument `{}` can only be defined once", name.name),
-                    arg.span,
+                    &format!("The argument `{}` can only be defined once", name),
+                    arg.span(),
                 ));
 
                 None
             }
             Some(name) => {
-                dups.insert(name.name.as_str());
-                Some((name.name.as_str(), (arg.span, coerce::string(&arg.value, diagnostics))))
+                dups.insert(name);
+                Some((name, (arg.span(), coerce::string(&arg.value, diagnostics))))
             }
             None => {
                 diagnostics.push_error(DatamodelError::new_validation_error(
                     "The argument must have a name",
-                    arg.span,
+                    arg.span(),
                 ));
 
                 None

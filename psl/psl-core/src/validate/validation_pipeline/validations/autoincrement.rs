@@ -21,7 +21,7 @@ pub(super) fn validate_auto_increment(model: ModelWalker<'_>, ctx: &mut Context<
             ctx.push_error(DatamodelError::new_attribute_validation_error(
                 msg,
                 "@default",
-                field.default_attribute().unwrap().span,
+                field.default_attribute().unwrap().span(),
             ));
         }
 

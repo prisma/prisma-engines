@@ -51,7 +51,7 @@ pub(super) fn add_missing_opposite_relation(
 
     let name_arg = field
         .ast_field()
-        .attributes
+        .attributes()
         .iter()
         .find(|attr| attr.name() == "relation")
         .and_then(|attr| attr.arguments.arguments.iter().find(|arg| arg.value.is_string()));

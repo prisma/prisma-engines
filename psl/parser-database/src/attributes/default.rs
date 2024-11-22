@@ -1,3 +1,5 @@
+use schema_ast::ast::WithSpan;
+
 use crate::{
     ast::{self, WithName},
     coerce,
@@ -339,7 +341,7 @@ fn validate_default_value_on_composite_type(
         "Defaults on fields of type composite are not supported. Please remove the `@default` attribute.",
         ct_name,
         ast_field.name(),
-        attr.span,
+        attr.span(),
     ));
 }
 

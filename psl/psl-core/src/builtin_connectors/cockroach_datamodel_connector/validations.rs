@@ -1,3 +1,5 @@
+use schema_ast::ast::WithSpan;
+
 use crate::{
     diagnostics::{DatamodelError, Diagnostics},
     parser_database::{
@@ -25,7 +27,7 @@ pub(super) fn inverted_index_validations(index: IndexWalker<'_>, errors: &mut Di
             errors.push_error(DatamodelError::new_attribute_validation_error(
                 msg,
                 index.attribute_name(),
-                index.ast_attribute().span,
+                index.ast_attribute().span(),
             ));
 
             return;
@@ -38,7 +40,7 @@ pub(super) fn inverted_index_validations(index: IndexWalker<'_>, errors: &mut Di
             errors.push_error(DatamodelError::new_attribute_validation_error(
                 &msg,
                 index.attribute_name(),
-                index.ast_attribute().span,
+                index.ast_attribute().span(),
             ));
         }
 
@@ -47,7 +49,7 @@ pub(super) fn inverted_index_validations(index: IndexWalker<'_>, errors: &mut Di
             errors.push_error(DatamodelError::new_attribute_validation_error(
                 msg,
                 index.attribute_name(),
-                index.ast_attribute().span,
+                index.ast_attribute().span(),
             ));
         }
     }
@@ -63,7 +65,7 @@ pub(super) fn autoincrement_validations(model: ModelWalker<'_>, errors: &mut Dia
         errors.push_error(DatamodelError::new_attribute_validation_error(
             "The `autoincrement()` default function is defined only on BigInt fields on CockroachDB. Use sequence() if you want an autoincrementing Int field.",
             "default",
-            default_value.ast_attribute().span,
+            default_value.ast_attribute().span(),
         ));
     }
 }

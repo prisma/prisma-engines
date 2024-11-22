@@ -112,7 +112,7 @@ pub(super) fn validate_default_value(field: CompositeTypeFieldWalker<'_>, ctx: &
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "A `map` argument for the default value of a field on a composite type is not allowed. Consider removing it.",
             "@default",
-            default_attribute.unwrap().span,
+            default_attribute.unwrap().span(),
         ));
     }
 

@@ -5,7 +5,7 @@ use crate::{
     ast, interner::StringInterner, names::Names, relations::Relations, types::Types, DatamodelError, Diagnostics,
     InFile, StringId,
 };
-use schema_ast::ast::{EnumValueId, Expression, WithName};
+use schema_ast::ast::{EnumValueId, Expression, WithIdentifier, WithName, WithSpan};
 use std::collections::{HashMap, HashSet};
 
 /// Validation context. This is an implementation detail of ParserDatabase. It
@@ -88,8 +88,11 @@ impl<'db> Context<'db> {
     pub(crate) fn push_attribute_validation_error(&mut self, message: &str) {
         let attribute = self.current_attribute();
 
-        let err =
-            DatamodelError::new_attribute_validation_error(message, &format!("@{}", attribute.name()), attribute.span);
+        let err = DatamodelError::new_attribute_validation_error(
+            message,
+            &format!("@{}", attribute.name()),
+            attribute.span(),
+        );
         self.push_error(err);
     }
 
@@ -142,7 +145,7 @@ impl<'db> Context<'db> {
     /// purely positional.
     pub(crate) fn visit_datasource_scoped(&mut self) -> Option<(StringId, StringId, crate::AttributeId)> {
         let attrs = iter_attributes(self.attributes.attributes.as_ref(), self.asts)
-            .filter(|(_, attr)| attr.name.name.contains('.'));
+            .filter(|(_, attr)| attr.name().contains('.'));
         let mut native_type_attr = None;
         let diagnostics = &mut self.diagnostics;
 
@@ -150,7 +153,7 @@ impl<'db> Context<'db> {
         for (attr_idx, attr) in attrs {
             assert!(self.attributes.unused_attributes.remove(&attr_idx));
 
-            match attr.name.name.split_once('.') {
+            match attr.name().split_once('.') {
                 None => unreachable!(),
                 Some((datasource_name, attr_name)) => {
                     let ds = self.interner.intern(datasource_name);
@@ -158,7 +161,7 @@ impl<'db> Context<'db> {
                     if native_type_attr.replace((ds, attr_idx, attr_name)).is_some() {
                         diagnostics.push_error(DatamodelError::new_duplicate_attribute_error(
                             datasource_name,
-                            attr.span,
+                            attr.span(),
                         ));
                     }
                 }
@@ -176,7 +179,7 @@ impl<'db> Context<'db> {
     #[must_use]
     pub(crate) fn visit_optional_single_attr(&mut self, name: &'static str) -> bool {
         let mut attrs =
-            iter_attributes(self.attributes.attributes.as_ref(), self.asts).filter(|(_, a)| a.name.name == name);
+            iter_attributes(self.attributes.attributes.as_ref(), self.asts).filter(|(_, a)| a.name() == name);
         let (first_idx, first) = match attrs.next() {
             Some(first) => first,
             None => return false,
@@ -185,12 +188,9 @@ impl<'db> Context<'db> {
 
         if attrs.next().is_some() {
             for (idx, attr) in
-                iter_attributes(self.attributes.attributes.as_ref(), self.asts).filter(|(_, a)| a.name.name == name)
+                iter_attributes(self.attributes.attributes.as_ref(), self.asts).filter(|(_, a)| a.name() == name)
             {
-                diagnostics.push_error(DatamodelError::new_duplicate_attribute_error(
-                    &attr.name.name,
-                    attr.span,
-                ));
+                diagnostics.push_error(DatamodelError::new_duplicate_attribute_error(attr.name(), attr.span()));
                 assert!(self.attributes.unused_attributes.remove(&idx));
             }
 
@@ -210,7 +210,7 @@ impl<'db> Context<'db> {
 
         while !has_valid_attribute {
             let first_attr = iter_attributes(self.attributes.attributes.as_ref(), self.asts)
-                .filter(|(_, attr)| attr.name.name == name)
+                .filter(|(_, attr)| attr.name() == name)
                 .find(|(attr_id, _)| self.attributes.unused_attributes.contains(attr_id));
             let (attr_id, attr) = if let Some(first_attr) = first_attr {
                 first_attr
@@ -243,11 +243,11 @@ impl<'db> Context<'db> {
             }
             (Some(arg_idx), Some(_)) => {
                 let arg = self.arg_at(arg_idx);
-                Err(DatamodelError::new_duplicate_default_argument_error(name, arg.span))
+                Err(DatamodelError::new_duplicate_default_argument_error(name, arg.span()))
             }
             (None, None) => Err(DatamodelError::new_argument_not_found_error(
                 name,
-                self.current_attribute().span,
+                self.current_attribute().span(),
             )),
         }
     }
@@ -279,7 +279,7 @@ impl<'db> Context<'db> {
         let diagnostics = &mut self.diagnostics;
         for arg_idx in self.attributes.args.values() {
             let arg = &attr.arguments.arguments[*arg_idx];
-            diagnostics.push_error(DatamodelError::new_unused_argument_error(arg.span));
+            diagnostics.push_error(DatamodelError::new_unused_argument_error(arg.span()));
         }
 
         self.discard_arguments();
@@ -296,8 +296,8 @@ impl<'db> Context<'db> {
         for attribute_id in &self.attributes.unused_attributes {
             let attribute = &self.asts[*attribute_id];
             diagnostics.push_error(DatamodelError::new_attribute_not_known_error(
-                &attribute.name.name,
-                attribute.span,
+                attribute.name(),
+                attribute.span(),
             ))
         }
 
@@ -360,9 +360,9 @@ impl<'db> Context<'db> {
             for args in all_arguments_lists {
                 for arg in &args.empty_arguments {
                     self.push_error(DatamodelError::new_attribute_validation_error(
-                        &format!("The `{}` argument is missing a value.", arg.name.name),
+                        &format!("The `{}` argument is missing a value.", arg.name()),
                         &format!("@{}", attribute.name()),
-                        arg.name.span,
+                        arg.identifier().span(),
                     ));
                     is_reasonably_valid = false;
                 }
@@ -381,9 +381,9 @@ impl<'db> Context<'db> {
 
                         for arg in args.empty_arguments.iter() {
                             self.push_error(DatamodelError::new_attribute_validation_error(
-                                &format!("The `{}` argument is missing a value.", arg.name.name),
+                                &format!("The `{}` argument is missing a value.", arg.name()),
                                 &format!("@@{}", attribute.name()),
-                                arg.name.span,
+                                arg.identifier().span(),
                             ));
                         }
                     }
@@ -410,7 +410,7 @@ impl<'db> Context<'db> {
         let mut unnamed_arguments = Vec::new();
 
         for (arg_idx, arg) in arguments.arguments.iter().enumerate() {
-            let arg_name = arg.name.as_ref().map(|name| self.interner.intern(&name.name));
+            let arg_name = arg.name().map(|name| self.interner.intern(name));
             if let Some(existing_argument) = self.attributes.args.insert(arg_name, arg_idx) {
                 if arg.is_unnamed() {
                     if unnamed_arguments.is_empty() {
@@ -421,8 +421,8 @@ impl<'db> Context<'db> {
                     unnamed_arguments.push(arg.value.to_string())
                 } else {
                     self.push_error(DatamodelError::new_duplicate_argument_error(
-                        &arg.name.as_ref().unwrap().name,
-                        arg.span,
+                        arg.name().unwrap(),
+                        arg.span(),
                     ));
                 }
             }

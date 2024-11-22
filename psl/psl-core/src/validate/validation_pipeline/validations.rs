@@ -18,6 +18,7 @@ use crate::datamodel_connector::ConnectorCapability;
 use super::context::Context;
 use names::Names;
 use parser_database::walkers::RefinedRelationWalker;
+use schema_ast::ast::WithSpan;
 
 pub(super) fn validate(ctx: &mut Context<'_>) {
     let names = Names::new(ctx);
@@ -73,7 +74,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
 
         if let Some(pk) = model.primary_key() {
             for field_attribute in pk.scalar_field_attributes() {
-                let span = pk.ast_attribute().span;
+                let span = pk.ast_attribute().span();
                 let attribute = (pk.attribute_name(), span);
                 fields::validate_length_used_with_correct_types(field_attribute, attribute, ctx);
             }
@@ -128,7 +129,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
             indexes::composite_type_in_compound_unique_index(index, ctx);
 
             for field_attribute in index.scalar_field_attributes() {
-                let span = index.ast_attribute().span;
+                let span = index.ast_attribute().span();
                 let attribute = (index.attribute_name(), span);
 
                 fields::validate_length_used_with_correct_types(field_attribute, attribute, ctx);

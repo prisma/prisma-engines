@@ -111,7 +111,7 @@ impl WithDocumentation for Enum {
 #[derive(Debug, Clone)]
 pub struct EnumValue {
     /// The name of the enum value as it will be exposed by the api.
-    pub name: Identifier,
+    pub(crate) name: Identifier,
     /// The attributes of this value.
     ///
     /// ```ignore

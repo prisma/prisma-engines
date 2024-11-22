@@ -46,14 +46,14 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                 validate_attribute_identifiers(ast_enum, ctx);
 
                 for value in &ast_enum.values {
-                    validate_identifier(&value.name, "Enum Value", ctx);
+                    validate_identifier(value.identifier(), "Enum Value", ctx);
                     validate_attribute_identifiers(value, ctx);
 
-                    if !tmp_names.insert(&value.name.name) {
+                    if !tmp_names.insert(value.name()) {
                         ctx.push_error(DatamodelError::new_duplicate_enum_value_error(
                             ast_enum.name(),
-                            &value.name.name,
-                            value.span,
+                            value.name(),
+                            value.span(),
                         ))
                     }
                 }
@@ -79,7 +79,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                             model.name(),
                             field.name(),
                             "view",
-                            field.identifier().span,
+                            field.identifier().span(),
                         ))
                     }
                 }
@@ -105,7 +105,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                             model.name(),
                             field.name(),
                             "model",
-                            field.identifier().span,
+                            field.identifier().span(),
                         ))
                     }
                 }
@@ -168,13 +168,16 @@ fn duplicate_top_error(existing: &ast::Top, duplicate: &ast::Top) -> DatamodelEr
         duplicate.name(),
         duplicate.get_type(),
         existing.get_type(),
-        duplicate.identifier().span,
+        duplicate.identifier().span(),
     )
 }
 
 fn assert_is_not_a_reserved_scalar_type(ident: &ast::Identifier, ctx: &mut Context<'_>) {
-    if ScalarType::try_from_str(&ident.name, false).is_some() {
-        ctx.push_error(DatamodelError::new_reserved_scalar_type_error(&ident.name, ident.span));
+    if ScalarType::try_from_str(ident.name(), false).is_some() {
+        ctx.push_error(DatamodelError::new_reserved_scalar_type_error(
+            ident.name(),
+            ident.span(),
+        ));
     }
 }
 
@@ -190,7 +193,7 @@ fn check_for_duplicate_properties<'a>(
             ctx.push_error(DatamodelError::new_duplicate_config_key_error(
                 &format!("{} \"{}\"", top.get_type(), top.name()),
                 arg.name(),
-                arg.identifier().span,
+                arg.identifier().span(),
             ));
         }
     }
@@ -198,25 +201,25 @@ fn check_for_duplicate_properties<'a>(
 
 fn validate_attribute_identifiers(with_attrs: &dyn WithAttributes, ctx: &mut Context<'_>) {
     for attribute in with_attrs.attributes() {
-        validate_identifier(&attribute.name, "Attribute", ctx);
+        validate_identifier(attribute.identifier(), "Attribute", ctx);
     }
 }
 
 fn validate_identifier(ident: &ast::Identifier, schema_item: &str, ctx: &mut Context<'_>) {
-    if ident.name.is_empty() {
+    if ident.name().is_empty() {
         ctx.push_error(DatamodelError::new_validation_error(
             &format!("The name of a {schema_item} must not be empty."),
-            ident.span,
+            ident.span(),
         ))
-    } else if ident.name.chars().next().unwrap().is_numeric() {
+    } else if ident.name().chars().next().unwrap().is_numeric() {
         ctx.push_error(DatamodelError::new_validation_error(
             &format!("The name of a {schema_item} must not start with a number."),
-            ident.span,
+            ident.span(),
         ))
-    } else if ident.name.contains('-') {
+    } else if ident.name().contains('-') {
         ctx.push_error(DatamodelError::new_validation_error(
             &format!("The character `-` is not allowed in {schema_item} names."),
-            ident.span,
+            ident.span(),
         ))
     }
 }
