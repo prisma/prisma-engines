@@ -1,12 +1,14 @@
-use opentelemetry::{sdk::export::trace::SpanData, KeyValue, Value};
-use serde::Serialize;
-use serde_json::json;
 use std::{
     borrow::Cow,
     collections::HashMap,
     str::FromStr,
     time::{Duration, SystemTime},
 };
+
+use enumflags2::bitflags;
+use opentelemetry::{sdk::export::trace::SpanData, KeyValue, Value};
+use serde::Serialize;
+use serde_json::json;
 
 const ACCEPT_ATTRIBUTES: &[&str] = &[
     "db.system",
@@ -16,7 +18,9 @@ const ACCEPT_ATTRIBUTES: &[&str] = &[
     "itx_id",
 ];
 
-#[derive(Serialize, Debug, Clone, Copy)]
+#[derive(Serialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[bitflags]
+#[repr(u8)]
 pub enum LogLevel {
     Trace,
     Debug,
