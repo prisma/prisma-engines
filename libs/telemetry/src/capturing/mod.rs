@@ -189,7 +189,7 @@ pub fn install_capturing_layer(
     // decorate the given subscriber (more layers were added before this one) with the telemetry layer
     let subscriber = subscriber
         .with(telemetry_layer)
-        .with(ng::layer(ng::collector::Exporter::new()));
+        .with(ng::layer(ng::exporter::Exporter::new()));
     // and finally set the subscriber as the global, default subscriber
     subscriber::set_global_default(subscriber).unwrap();
 }
