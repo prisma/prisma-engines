@@ -95,6 +95,15 @@ impl<'a> TableWalker<'a> {
         self.primary_key_columns().map(|cols| cols.len()).unwrap_or(0)
     }
 
+    /// Is the table an implicit many-to-many relation?
+    pub fn is_implicit_m2m(self) -> bool {
+        if self.columns().count() != 2 {
+            return false;
+        }
+
+        self.column("A").is_some() && self.column("B").is_some()
+    }
+
     /// Is the table a partition table?
     pub fn is_partition(self) -> bool {
         self.table().properties.contains(TableProperties::IsPartition)

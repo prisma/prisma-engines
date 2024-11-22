@@ -83,6 +83,9 @@ impl Connection {
         namespaces: Option<Namespaces>,
     ) -> ConnectorResult<SqlSchema> {
         use sql_schema_describer::{postgres as describer, DescriberErrorKind, SqlSchemaDescriberBackend};
+
+        // TODO: `sql_schema_connector::flavour::postgres::Circumstances` and `sql_schema_describer::Circumstances` are identitcal.
+        // What follows is a redundant and confusing mapping.
         let mut describer_circumstances: BitFlags<describer::Circumstances> = Default::default();
 
         if circumstances.contains(super::Circumstances::IsCockroachDb) {
@@ -95,6 +98,10 @@ impl Connection {
 
         if circumstances.contains(super::Circumstances::CanPartitionTables) {
             describer_circumstances |= describer::Circumstances::CanPartitionTables;
+        }
+
+        if circumstances.contains(super::Circumstances::CanReplicateLogically) {
+            describer_circumstances |= describer::Circumstances::CanReplicateLogically;
         }
 
         let namespaces_vec = Namespaces::to_vec(namespaces, String::from(params.url.schema()));

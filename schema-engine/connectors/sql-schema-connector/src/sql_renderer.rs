@@ -70,6 +70,10 @@ pub(crate) trait SqlRenderer {
         unreachable!("unreachable render_drop_and_recreate_index")
     }
 
+    fn refine_implicit_many_to_many_table(&self, _table_name: &str, _index_name: &str) -> String {
+        unreachable!("unreachable refine_implicit_many_to_many_table")
+    }
+
     /// Render a `DropEnum` step.
     fn render_drop_enum(&self, dropped_enum: EnumWalker<'_>) -> Vec<String>;
 

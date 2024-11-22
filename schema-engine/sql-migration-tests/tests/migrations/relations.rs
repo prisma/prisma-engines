@@ -968,6 +968,7 @@ fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
     };
 }
 
+// TODO: fails on Postgres
 #[test_connector]
 fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: TestApi) {
     // test case for https://github.com/prisma/lift/issues/148

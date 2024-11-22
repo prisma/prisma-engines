@@ -149,11 +149,17 @@ impl PostgresFlavour {
         }
     }
 
-    fn circumstances(&self) -> Option<BitFlags<Circumstances>> {
+    pub(crate) fn circumstances(&self) -> Option<BitFlags<Circumstances>> {
         match &self.state {
             State::Initial | State::WithParams(_) => None,
             State::Connected(_, (circ, _)) => Some(*circ),
         }
+    }
+
+    pub(crate) fn can_replicate_logically(&self) -> bool {
+        self.circumstances()
+            .map(|c| c.contains(Circumstances::CanReplicateLogically))
+            .unwrap_or(false)
     }
 
     pub(crate) fn is_cockroachdb(&self) -> bool {
@@ -657,6 +663,7 @@ pub(crate) enum Circumstances {
     IsCockroachDb,
     CockroachWithPostgresNativeTypes, // FIXME: we should really break and remove this
     CanPartitionTables,
+    CanReplicateLogically,
 }
 
 fn disable_postgres_statement_cache(url: &mut Url) -> ConnectorResult<()> {
@@ -675,6 +682,48 @@ fn disable_postgres_statement_cache(url: &mut Url) -> ConnectorResult<()> {
     if !url.query_pairs().any(|(k, _)| k == "statement_cache_size") {
         url.query_pairs_mut().append_pair("statement_cache_size", "0");
     }
+    Ok(())
+}
+
+fn infer_circumstances(
+    circumstances: &mut BitFlags<Circumstances, u8>,
+    provider: PostgresProvider,
+    version: Option<(String, i64)>,
+) -> ConnectorResult<()> {
+    match version {
+        Some((version, version_num)) => {
+            let db_is_cockroach = version.contains("CockroachDB");
+
+            if db_is_cockroach {
+                if provider == PostgresProvider::PostgreSql {
+                    let msg = "You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.";
+
+                    return Err(ConnectorError::from_msg(msg.to_owned()));
+                }
+
+                *circumstances |= Circumstances::IsCockroachDb;
+                return Ok(());
+            }
+
+            if provider == PostgresProvider::CockroachDb {
+                let msg = "You are trying to connect to a PostgreSQL database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.";
+
+                return Err(ConnectorError::from_msg(msg.to_owned()));
+            }
+
+            if version_num >= 100000 {
+                // https://www.postgresql.org/docs/10/ddl-partitioning.html
+                *circumstances |= Circumstances::CanPartitionTables;
+
+                // https://www.postgresql.org/docs/10/logical-replication.html
+                *circumstances |= Circumstances::CanReplicateLogically;
+            }
+        }
+        None => {
+            tracing::warn!("Could not determine the version of the database.");
+        }
+    };
+
     Ok(())
 }
 
@@ -718,32 +767,10 @@ where
                           .and_then(|row| row.at(1).and_then(|ver_str| row.at(2).map(|ver_num| (ver_str, ver_num))))
                           .and_then(|(ver_str,ver_num)| ver_str.to_string().and_then(|version| ver_num.as_integer().map(|version_number| (version, version_number))));
 
-                    match version {
-                        Some((version, version_num)) => {
-                            let db_is_cockroach = version.contains("CockroachDB");
+                    infer_circumstances(&mut circumstances, provider, version)?;
 
-                            if db_is_cockroach && provider == PostgresProvider::PostgreSql  {
-                                let msg = "You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.";
-
-                                return Err(ConnectorError::from_msg(msg.to_owned()));
-                            }
-
-                            if !db_is_cockroach && provider == PostgresProvider::CockroachDb {
-                                let msg = "You are trying to connect to a PostgreSQL database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.";
-
-                                return Err(ConnectorError::from_msg(msg.to_owned()));
-                            }
-
-                            if db_is_cockroach {
-                                circumstances |= Circumstances::IsCockroachDb;
-                                connection.raw_cmd(COCKROACHDB_PRELUDE, &params.url).await?;
-                            } else if version_num >= 100000 {
-                                circumstances |= Circumstances:: CanPartitionTables;
-                            }
-                        }
-                        None => {
-                            tracing::warn!("Could not determine the version of the database.")
-                        }
+                    if circumstances.contains(Circumstances::IsCockroachDb) {
+                        connection.raw_cmd(COCKROACHDB_PRELUDE, &params.url).await?;
                     }
 
                     if let Some(true) = schema_exists_result

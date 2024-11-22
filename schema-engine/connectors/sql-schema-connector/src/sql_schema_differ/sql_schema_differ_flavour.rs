@@ -53,6 +53,14 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// Push AlterExtension steps.
     fn push_extension_steps(&self, _steps: &mut Vec<SqlMigrationStep>, _db: &DifferDatabase<'_>) {}
 
+    /// Push implicit many-to-many relation refinement steps.
+    fn push_implicit_many_to_many_refinement_steps(
+        &self,
+        _steps: &mut Vec<SqlMigrationStep>,
+        _db: &DifferDatabase<'_>,
+    ) {
+    }
+
     /// Define database-specific extension modules.
     fn define_extensions(&self, _db: &mut DifferDatabase<'_>) {}
 
@@ -106,6 +114,11 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// is dropped.
     fn should_drop_foreign_keys_from_dropped_tables(&self) -> bool {
         true
+    }
+
+    /// Whether the implicit many-to-many tables should be refined with further steps.
+    fn should_refine_implicit_many_to_many_tables(&self) -> bool {
+        false
     }
 
     /// Whether to skip diffing JSON defaults.

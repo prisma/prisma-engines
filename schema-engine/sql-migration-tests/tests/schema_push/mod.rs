@@ -370,6 +370,7 @@ fn duplicate_constraint_names_across_models_work_on_mysql(api: TestApi) {
     api.schema_push_w_datasource(plain_dm).send().assert_green();
 }
 
+// TODO: fails on Postgres
 #[test_connector(tags(Postgres))]
 fn implicit_relations_indices_are_not_renamed_unnecessarily(api: TestApi) {
     let dm = api.datamodel_with_provider(

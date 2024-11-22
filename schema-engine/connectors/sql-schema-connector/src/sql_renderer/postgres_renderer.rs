@@ -408,7 +408,12 @@ impl SqlRenderer for PostgresFlavour {
             String::new()
         };
 
-        format!("CREATE TABLE {table_name} (\n{columns}{pk}\n)")
+        let refinement_str = match table.is_implicit_m2m() {
+            true => "-- Implicitly many-to-many\n",
+            false => "",
+        };
+
+        format!("{}CREATE TABLE {table_name} (\n{columns}{pk}\n)", refinement_str)
     }
 
     fn render_drop_enum(&self, dropped_enum: EnumWalker<'_>) -> Vec<String> {
@@ -503,6 +508,10 @@ impl SqlRenderer for PostgresFlavour {
             for fk in tables.next.foreign_keys() {
                 result.push(self.render_add_foreign_key(fk));
             }
+
+            if tables.next.is_implicit_m2m() {
+                result.push(format!("-- {} is implicitly many-to-many", &tables.next.name()));
+            }
         }
 
         result
@@ -527,6 +536,11 @@ impl SqlRenderer for PostgresFlavour {
             previous = self.quote(fks.previous.constraint_name().unwrap()),
             next = self.quote(fks.next.constraint_name().unwrap()),
         )
+    }
+
+    fn refine_implicit_many_to_many_table(&self, table_name: &str, index_name: &str) -> String {
+        // `REPLICA IDENTITY`: https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-REPLICA-IDENTITY
+        format!(r#"ALTER TABLE {table_name} REPLICA IDENTITY USING INDEX {index_name}"#,)
     }
 }
 

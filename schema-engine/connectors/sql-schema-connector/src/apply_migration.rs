@@ -145,6 +145,12 @@ fn render_raw_sql(
             renderer.render_drop_table(table.namespace(), table.name())
         }
         SqlMigrationStep::RedefineIndex { index } => renderer.render_drop_and_recreate_index(schemas.walk(*index)),
+        SqlMigrationStep::ImplicitManyToManyRefinement { index, table_id } => {
+            vec![renderer.refine_implicit_many_to_many_table(
+                schemas.next.walk(*table_id).name(),
+                schemas.next.walk(*index).name(),
+            )]
+        }
         SqlMigrationStep::AddForeignKey { foreign_key_id } => {
             let foreign_key = schemas.next.walk(*foreign_key_id);
             vec![renderer.render_add_foreign_key(foreign_key)]

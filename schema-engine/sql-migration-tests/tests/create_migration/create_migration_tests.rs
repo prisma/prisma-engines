@@ -3,6 +3,77 @@
 use indoc::indoc;
 use sql_migration_tests::test_api::*;
 
+#[test_connector(tags(Postgres), exclude(Postgres9))]
+fn create_migration_with_implicit_m2m_has_logical_replication(api: TestApi) {
+    let dm = api.datamodel_with_provider(
+        r#"
+        model User {
+            id      String @id @unique
+            taskIds Task[]
+        }
+
+        model Task {
+            id      String @id @unique
+            userIds User[]
+        }
+    "#,
+    );
+
+    let dir = api.create_migrations_directory();
+
+    api.create_migration("create-implicit-m2m", &dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(1)
+        .assert_migration("create-implicit-m2m", move |migration| {
+            let expected_script = {
+                expect![[r#"
+                    -- CreateTable
+                    CREATE TABLE "User" (
+                        "id" TEXT NOT NULL,
+
+                        CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+                    );
+
+                    -- CreateTable
+                    CREATE TABLE "Task" (
+                        "id" TEXT NOT NULL,
+
+                        CONSTRAINT "Task_pkey" PRIMARY KEY ("id")
+                    );
+
+                    -- CreateTable
+                    -- Implicitly many-to-many
+                    CREATE TABLE "_TaskToUser" (
+                        "A" TEXT NOT NULL,
+                        "B" TEXT NOT NULL
+                    );
+
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "User_id_key" ON "User"("id");
+
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "Task_id_key" ON "Task"("id");
+
+                    -- CreateIndex
+                    CREATE UNIQUE INDEX "_TaskToUser_AB_unique" ON "_TaskToUser"("A", "B");
+
+                    -- CreateIndex
+                    CREATE INDEX "_TaskToUser_B_index" ON "_TaskToUser"("B");
+
+                    -- AddForeignKey
+                    ALTER TABLE "_TaskToUser" ADD CONSTRAINT "_TaskToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "Task"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+                    -- AddForeignKey
+                    ALTER TABLE "_TaskToUser" ADD CONSTRAINT "_TaskToUser_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+                    -- ImplicitManyToManyRefinement
+                    ALTER TABLE _TaskToUser REPLICA IDENTITY USING INDEX _TaskToUser_AB_unique;
+                "#]]
+            };
+            migration.expect_contents(expected_script)
+        });
+}
+
 #[test_connector]
 fn basic_create_migration_works(api: TestApi) {
     let dm = api.datamodel_with_provider(

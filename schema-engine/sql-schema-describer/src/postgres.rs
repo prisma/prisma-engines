@@ -109,6 +109,7 @@ pub enum Circumstances {
     Cockroach,
     CockroachWithPostgresNativeTypes, // TODO: this is a temporary workaround
     CanPartitionTables,
+    CanReplicateLogically,
 }
 
 pub struct SqlSchemaDescriber<'a> {

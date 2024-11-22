@@ -55,6 +55,7 @@ impl SqlMigration {
             RedefinedTable,
             ChangedEnum,
             ChangedTable,
+            AlterManyToManyTable,
         }
 
         // (sort key, item name, step index)
@@ -158,6 +159,10 @@ impl SqlMigration {
                         idx,
                     ));
                 }
+                SqlMigrationStep::ImplicitManyToManyRefinement { table_id, .. } => {
+                    let table = self.schemas().next.walk(*table_id).name();
+                    drift_items.insert((DriftType::AlterManyToManyTable, table, idx));
+                }
                 SqlMigrationStep::CreateExtension(create_extension) => {
                     let ext: &PostgresSchemaExt = self.schemas().next.downcast_connector_data();
                     let extension = ext.get_extension(create_extension.id);
@@ -197,6 +202,11 @@ impl SqlMigration {
                     DriftType::RemovedView => out.push_str("\n[-] Removed views\n"),
                     DriftType::RedefinedTable => {
                         out.push_str("\n[*] Redefined table `");
+                        out.push_str(item_name);
+                        out.push_str("`\n")
+                    }
+                    DriftType::AlterManyToManyTable => {
+                        out.push_str("\n[*] Altered many-to-many table `");
                         out.push_str(item_name);
                         out.push_str("`\n")
                     }
@@ -348,6 +358,11 @@ impl SqlMigration {
                     out.push_str("  - ");
                     out.push_str(self.schemas().next.walk(*table_id).name());
                     out.push('\n');
+                }
+                SqlMigrationStep::ImplicitManyToManyRefinement { table_id, .. } => {
+                    out.push_str("  [*] Refined implicit many-to-many table `");
+                    out.push_str(self.schemas().next.walk(*table_id).name());
+                    out.push_str("`\n");
                 }
                 SqlMigrationStep::RedefineTables(_) => {}
                 SqlMigrationStep::RenameForeignKey { foreign_key_id } => {
@@ -503,6 +518,10 @@ pub(crate) enum SqlMigrationStep {
     RedefineIndex {
         index: MigrationPair<IndexId>,
     },
+    ImplicitManyToManyRefinement {
+        table_id: TableId,
+        index: IndexId,
+    },
 }
 
 impl SqlMigrationStep {
@@ -523,6 +542,7 @@ impl SqlMigrationStep {
             SqlMigrationStep::DropTable { .. } => "DropTable",
             SqlMigrationStep::DropUserDefinedType(_) => "DropUserDefinedType",
             SqlMigrationStep::DropView(_) => "DropView",
+            SqlMigrationStep::ImplicitManyToManyRefinement { .. } => "ImplicitManyToManyRefinement",
             SqlMigrationStep::RedefineIndex { .. } => "RedefineIndex",
             SqlMigrationStep::RedefineTables { .. } => "RedefineTables",
             SqlMigrationStep::RenameForeignKey { .. } => "RenameForeignKey",

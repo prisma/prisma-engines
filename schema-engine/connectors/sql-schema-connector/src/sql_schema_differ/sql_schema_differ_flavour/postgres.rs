@@ -36,6 +36,10 @@ static POSTGIS_TABLES_OR_VIEWS: Lazy<RegexSet> = Lazy::new(|| {
 static EXTENSION_VIEWS: Lazy<RegexSet> = Lazy::new(|| RegexSet::new(["(?i)^pg_buffercache$"]).unwrap());
 
 impl SqlSchemaDifferFlavour for PostgresFlavour {
+    fn should_refine_implicit_many_to_many_tables(&self) -> bool {
+        self.can_replicate_logically()
+    }
+
     fn can_alter_primary_keys(&self) -> bool {
         self.is_cockroachdb()
     }
@@ -95,6 +99,30 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         for enm in db.dropped_enums() {
             steps.push(SqlMigrationStep::DropEnum(enm.id))
         }
+    }
+
+    fn push_implicit_many_to_many_refinement_steps(&self, steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {
+        // This stuff should only be applied if something changed in the schema.
+
+        // if self.is_cockroachdb() {
+        //     return;
+        // }
+
+        // let implicit_many_to_many_tables = db.table_pairs().map(|differ| differ.tables).filter_map(|table| {
+        //     if table.next.is_implicit_m2m() {
+        //         Some(table)
+        //     } else {
+        //         None
+        //     }
+        // });
+
+        // for table in implicit_many_to_many_tables {
+        //     let index = table.next.indexes().find(|idx| idx.is_unique()).unwrap().id;
+        //     let table_id = table.next.id;
+
+        //     println!("  steps++");
+        //     steps.push(SqlMigrationStep::ImplicitManyToManyRefinement { index, table_id });
+        // }
     }
 
     fn push_alter_sequence_steps(&self, steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {

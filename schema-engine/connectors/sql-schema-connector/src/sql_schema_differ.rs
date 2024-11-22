@@ -39,6 +39,7 @@ pub(crate) fn calculate_steps(
 
     flavour.push_enum_steps(&mut steps, &db);
     flavour.push_alter_sequence_steps(&mut steps, &db);
+    flavour.push_implicit_many_to_many_refinement_steps(&mut steps, &db);
 
     steps.sort();
 
@@ -55,12 +56,14 @@ fn push_created_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
     for table in db.created_tables() {
         steps.push(SqlMigrationStep::CreateTable { table_id: table.id });
 
+        // Initial `-- AddForeignKey` steps
         if db.flavour.should_push_foreign_keys_from_created_tables() {
             for fk in table.foreign_keys() {
                 steps.push(SqlMigrationStep::AddForeignKey { foreign_key_id: fk.id });
             }
         }
 
+        // Initial `-- CreateIndex` steps
         if db.flavour.should_create_indexes_from_created_tables() {
             let create_indexes_from_created_tables = table
                 .indexes()
@@ -72,6 +75,20 @@ fn push_created_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
                 });
 
             steps.extend(create_indexes_from_created_tables);
+        }
+
+        // Initial `-- ImplicitManyToManyRefinement` steps
+        if db.flavour.should_refine_implicit_many_to_many_tables() && table.is_implicit_m2m() {
+            let index = table
+                .indexes()
+                .find(|index| index.columns().len() == 2)
+                .expect("Implicit many-to-many tables must have a two-column index")
+                .id;
+
+            steps.push(SqlMigrationStep::ImplicitManyToManyRefinement {
+                table_id: table.id,
+                index,
+            });
         }
     }
 }
@@ -529,13 +546,7 @@ fn next_column_has_virtual_default(column_id: TableColumnId, db: &DifferDatabase
 }
 
 fn is_prisma_implicit_m2m_fk(fk: ForeignKeyWalker<'_>) -> bool {
-    let table = fk.table();
-
-    if table.columns().count() != 2 {
-        return false;
-    }
-
-    table.column("A").is_some() && table.column("B").is_some()
+    fk.table().is_implicit_m2m()
 }
 
 fn all_match<T: PartialEq>(a: &mut dyn ExactSizeIterator<Item = T>, b: &mut dyn ExactSizeIterator<Item = T>) -> bool {
