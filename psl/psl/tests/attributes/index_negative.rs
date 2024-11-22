@@ -362,33 +362,6 @@ fn hash_index_doesnt_work_on_sqlserver() {
 }
 
 #[test]
-fn fulltext_index_no_preview_feature() {
-    let dml = indoc! {r#"
-        model A {
-          id Int @id
-          a String
-          b String
-
-          @@fulltext([a, b])
-        }
-    "#};
-
-    let schema = with_header(dml, Provider::Mysql, &[]);
-    let error = parse_unwrap_err(&schema);
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@@fulltext": You must enable `fullTextIndex` preview feature to be able to define a @@fulltext index.[0m
-          [1;94m-->[0m  [4mschema.prisma:16[0m
-        [1;94m   | [0m
-        [1;94m15 | [0m
-        [1;94m16 | [0m  [1;91m@@fulltext([a, b])[0m
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error)
-}
-
-#[test]
 fn hash_index_doesnt_work_on_mysql() {
     let dml = indoc! {r#"
         model A {
@@ -426,7 +399,7 @@ fn fulltext_index_length_attribute() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["fullTextIndex"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
@@ -479,7 +452,7 @@ fn fulltext_index_sort_attribute() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["fullTextIndex"]);
+    let schema = with_header(dml, Provider::Mysql, &[]);
     let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
@@ -532,7 +505,7 @@ fn fulltext_index_postgres() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &["fullTextIndex"]);
+    let schema = with_header(dml, Provider::Postgres, &[]);
     let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
@@ -559,7 +532,7 @@ fn fulltext_index_sql_server() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &["fullTextIndex"]);
+    let schema = with_header(dml, Provider::SqlServer, &[]);
     let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
@@ -586,7 +559,7 @@ fn fulltext_index_sqlite() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Sqlite, &["fullTextIndex"]);
+    let schema = with_header(dml, Provider::Sqlite, &[]);
     let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
@@ -616,7 +589,7 @@ fn only_one_fulltext_index_allowed_per_model_in_mongo() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["fullTextIndex"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
@@ -651,7 +624,7 @@ fn fulltext_index_fields_must_follow_each_other_in_mongo() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["fullTextIndex"]);
+    let schema = with_header(dml, Provider::Mongo, &[]);
     let error = parse_unwrap_err(&schema);
 
     let expectation = expect![[r#"
@@ -670,8 +643,7 @@ fn fulltext_index_fields_must_follow_each_other_in_mongo() {
 fn index_without_fields_must_error() {
     let schema = r#"
         generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["fullTextIndex"]
+          provider = "prisma-client-js"
         }
 
         datasource db {

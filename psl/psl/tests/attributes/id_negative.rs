@@ -1004,8 +1004,7 @@ fn length_argument_does_not_work_with_int() {
 fn empty_fields_must_error() {
     let schema = r#"
         generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["fullTextIndex"]
+          provider = "prisma-client-js"
         }
 
         datasource db {

@@ -221,7 +221,7 @@ async fn a_table_with_descending_unique(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), preview_features("fullTextIndex"))]
+#[test_connector(tags(Mysql))]
 async fn a_table_with_fulltext_index(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
@@ -250,7 +250,7 @@ async fn a_table_with_fulltext_index(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), preview_features("fullTextIndex"))]
+#[test_connector(tags(Mysql))]
 async fn a_table_with_fulltext_index_with_custom_name(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
