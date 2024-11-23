@@ -67,6 +67,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "String",
+          "nativeType": null,
           "default": {
             "name": "cuid",
             "args": [
@@ -86,6 +87,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "String",
+          "nativeType": null,
           "default": {
             "name": "cuid",
             "args": [
@@ -105,6 +107,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "String",
+          "nativeType": null,
           "default": {
             "name": "uuid",
             "args": [
@@ -124,6 +127,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "String",
+          "nativeType": null,
           "default": {
             "name": "uuid",
             "args": [
@@ -143,6 +147,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "String",
+          "nativeType": null,
           "default": {
             "name": "uuid",
             "args": [
@@ -162,6 +167,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "String",
+          "nativeType": null,
           "default": {
             "name": "nanoid",
             "args": []
@@ -179,6 +185,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "String",
+          "nativeType": null,
           "default": {
             "name": "nanoid",
             "args": [
