@@ -2,7 +2,10 @@ use std::{borrow::Cow, collections::HashMap, str::FromStr, sync::Arc};
 
 use enumflags2::{bitflags, BitFlags};
 use serde::Serialize;
-use tokio::sync::{mpsc, oneshot, Mutex, RwLock};
+use tokio::sync::{
+    mpsc::{self, UnboundedSender},
+    oneshot,
+};
 
 use crate::models::{HrTime, LogLevel, SpanKind};
 
@@ -111,39 +114,56 @@ pub struct CaptureSettings {
 pub struct Exporter(Arc<Inner>);
 
 struct Inner {
-    // We use fine-grained locking here to avoid contention. On any operations with the existing
-    // traces, the outer lock should only be held for a tiny amount of time to clone the inner Arc.
-    traces: RwLock<HashMap<RequestId, Arc<Mutex<Trace>>>>,
+    tx: UnboundedSender<Message>,
+}
+
+enum Message {
+    StartCapturing(RequestId),
+    StopCapturing(RequestId, oneshot::Sender<Option<Trace>>),
+    AddSpan(RequestId, CollectedSpan),
+    AddEvent(RequestId, CollectedEvent),
 }
 
 impl Exporter {
     pub fn new() -> Self {
-        Self(Arc::new(Inner {
-            traces: RwLock::new(HashMap::new()),
-        }))
+        let (tx, mut rx) = mpsc::unbounded_channel();
+
+        crosstarget_utils::task::spawn(async move {
+            while let Some(msg) = rx.recv().await {
+                match msg {
+                    Message::StartCapturing(request_id) => {}
+                    Message::StopCapturing(request_id, tx) => {
+                        let _ = tx.send(None);
+                    }
+                    Message::AddSpan(request_id, span) => {}
+                    Message::AddEvent(request_id, event) => {}
+                }
+            }
+        });
+
+        Self(Arc::new(Inner { tx }))
     }
 
     pub async fn start_capturing(&self) -> RequestId {
         let request_id = RequestId::next();
 
-        self.0.traces.write().await.insert(
-            request_id,
-            Arc::new(Mutex::new(Trace {
-                spans: Vec::new(),
-                events: Vec::new(),
-            })),
-        );
+        self.0
+            .tx
+            .send(Message::StartCapturing(request_id))
+            .expect("capturer task dropped the receiver");
 
         request_id
     }
 
     pub async fn stop_capturing(&self, request_id: RequestId) -> Option<Trace> {
-        let trace = self.0.traces.write().await.remove(&request_id)?;
+        let (tx, rx) = oneshot::channel();
 
-        Some(match Arc::try_unwrap(trace) {
-            Ok(trace) => trace.into_inner(),
-            Err(trace) => trace.lock().await.clone(),
-        })
+        self.0
+            .tx
+            .send(Message::StopCapturing(request_id, tx))
+            .expect("capturer task dropped the receiver");
+
+        rx.await.expect("capturer task dropped the sender")
     }
 }
 
@@ -155,28 +175,16 @@ impl Default for Exporter {
 
 impl Collector for Exporter {
     fn add_span(&self, trace: RequestId, span: CollectedSpan) {
-        let inner = Arc::clone(&self.0);
-
-        tokio::spawn(async move {
-            let trace = inner.traces.read().await.get(&trace).cloned();
-
-            if let Some(trace) = trace {
-                let span = span.into();
-                trace.lock().await.spans.push(span);
-            }
-        });
+        self.0
+            .tx
+            .send(Message::AddSpan(trace, span))
+            .expect("capturer task dropped the receiver");
     }
 
     fn add_event(&self, trace: RequestId, event: CollectedEvent) {
-        let inner = Arc::clone(&self.0);
-
-        tokio::spawn(async move {
-            let trace = inner.traces.read().await.get(&trace).cloned();
-
-            if let Some(trace) = trace {
-                let event = event.into();
-                trace.lock().await.events.push(event);
-            }
-        });
+        self.0
+            .tx
+            .send(Message::AddEvent(trace, event))
+            .expect("capturer task dropped the receiver");
     }
 }
