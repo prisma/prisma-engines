@@ -33,11 +33,9 @@ impl Client {
     }
 
     pub(crate) async fn describe(&self) -> ConnectorResult<MongoSchema> {
-        let mut schema = mongodb_schema_describer::describe(&self.inner, &self.db_name)
+        let schema = mongodb_schema_describer::describe(&self.inner, &self.db_name)
             .await
             .map_err(mongo_error_to_connector_error)?;
-
-        schema.remove_fulltext_indexes();
 
         Ok(schema)
     }
