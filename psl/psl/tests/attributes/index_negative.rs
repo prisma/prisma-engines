@@ -664,22 +664,22 @@ fn index_without_fields_must_error() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@index": The list of fields in an index cannot be empty. Please specify at least one field.[0m
-          [1;94m-->[0m  [4mschema.prisma:18[0m
-        [1;94m   | [0m
-        [1;94m17 | [0m          @@fulltext(fields:[], map: "a")
-        [1;94m18 | [0m          [1;91m@@index(fields: [ ], map: "b")[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@@unique": The list of fields in an index cannot be empty. Please specify at least one field.[0m
-          [1;94m-->[0m  [4mschema.prisma:19[0m
-        [1;94m   | [0m
-        [1;94m18 | [0m          @@index(fields: [ ], map: "b")
-        [1;94m19 | [0m          [1;91m@@unique(fields: [])[0m
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@@fulltext": The list of fields in an index cannot be empty. Please specify at least one field.[0m
           [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
-        [1;94m16 | [0m
-        [1;94m17 | [0m          [1;91m@@fulltext(fields:[], map: "a")[0m
+        [1;94m16 | [0m          @@fulltext(fields:[], map: "a")
+        [1;94m17 | [0m          [1;91m@@index(fields: [ ], map: "b")[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": The list of fields in an index cannot be empty. Please specify at least one field.[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
+        [1;94m   | [0m
+        [1;94m17 | [0m          @@index(fields: [ ], map: "b")
+        [1;94m18 | [0m          [1;91m@@unique(fields: [])[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@@fulltext": The list of fields in an index cannot be empty. Please specify at least one field.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m
+        [1;94m16 | [0m          [1;91m@@fulltext(fields:[], map: "a")[0m
         [1;94m   | [0m
     "#]];
 
