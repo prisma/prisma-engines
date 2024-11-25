@@ -938,31 +938,45 @@ dependencies = [
 
 [[package]]
 name = "cuid"
-version = "1.3.2"
-source = "git+https://github.com/prisma/cuid-rust?branch=wasm32-support#ccfd958c224c79758c2527a0bca9efcd71790a19"
+version = "1.3.3"
+source = "git+https://github.com/prisma/cuid-rust?branch=v1.3.3-wasm32-unknown-unknown#dc68c4f47a3dbcd511f605135ac7c948775a3ab9"
 dependencies = [
- "base36",
- "cuid-util",
+ "cuid1",
  "cuid2",
  "getrandom 0.2.11",
- "js-sys",
- "num",
- "once_cell",
- "rand 0.8.5",
- "sha3",
 ]
 
 [[package]]
 name = "cuid-util"
+version = "0.1.1"
+source = "git+https://github.com/prisma/cuid-rust?branch=v1.3.3-wasm32-unknown-unknown#dc68c4f47a3dbcd511f605135ac7c948775a3ab9"
+dependencies = [
+ "js-sys",
+ "web-time",
+]
+
+[[package]]
+name = "cuid1"
 version = "0.1.0"
-source = "git+https://github.com/prisma/cuid-rust?branch=wasm32-support#ccfd958c224c79758c2527a0bca9efcd71790a19"
+source = "git+https://github.com/prisma/cuid-rust?branch=v1.3.3-wasm32-unknown-unknown#dc68c4f47a3dbcd511f605135ac7c948775a3ab9"
+dependencies = [
+ "base36",
+ "cuid-util",
+ "getrandom 0.2.11",
+ "hostname 0.4.0",
+ "num",
+ "once_cell",
+ "rand 0.8.5",
+ "uuid",
+]
 
 [[package]]
 name = "cuid2"
-version = "0.1.2"
-source = "git+https://github.com/prisma/cuid-rust?branch=wasm32-support#ccfd958c224c79758c2527a0bca9efcd71790a19"
+version = "0.1.3"
+source = "git+https://github.com/prisma/cuid-rust?branch=v1.3.3-wasm32-unknown-unknown#dc68c4f47a3dbcd511f605135ac7c948775a3ab9"
 dependencies = [
  "cuid-util",
+ "getrandom 0.2.11",
  "num",
  "rand 0.8.5",
  "sha3",
@@ -1829,6 +1843,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "hostname"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f9c7c7c8ac16c798734b8a24560c1362120597c40d5e1459f09498f8f6c8f2ba"
+dependencies = [
+ "cfg-if",
+ "libc",
+ "windows 0.52.0",
+]
+
+[[package]]
 name = "html-escape"
 version = "0.2.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1942,7 +1967,7 @@ dependencies = [
  "iana-time-zone-haiku",
  "js-sys",
  "wasm-bindgen",
- "windows",
+ "windows 0.48.0",
 ]
 
 [[package]]
@@ -2102,9 +2127,9 @@ checksum = "af150ab688ff2122fcef229be89cb50dd66af9e01a4ff320cc137eecc9bacc38"
 
 [[package]]
 name = "js-sys"
-version = "0.3.65"
+version = "0.3.70"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "54c0c35952f67de54bb584e9fd912b3023117cbafc0a77d8f3dee1fb5f572fe8"
+checksum = "1868808506b929d7b0cfa8f75951347aa71bb21144b7791bae35d9bccfcfe37a"
 dependencies = [
  "wasm-bindgen",
 ]
@@ -2560,7 +2585,6 @@ dependencies = [
  "bigdecimal",
  "bson",
  "chrono",
- "cuid",
  "derive_more",
  "futures",
  "indexmap 2.2.2",
@@ -3139,6 +3163,7 @@ dependencies = [
  "either",
  "enumflags2",
  "indexmap 2.2.2",
+ "itertools 0.12.0",
  "rustc-hash",
  "schema-ast",
 ]
@@ -3963,6 +3988,7 @@ dependencies = [
  "base64 0.13.1",
  "chrono",
  "colored",
+ "cuid",
  "enumflags2",
  "futures",
  "indoc 2.0.3",
@@ -4411,7 +4437,7 @@ version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "52e44394d2086d010551b14b53b1f24e31647570cd1deb0379e2c21b329aba00"
 dependencies = [
- "hostname",
+ "hostname 0.3.1",
  "quick-error",
 ]
 
@@ -6428,6 +6454,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "web-time"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a6580f308b1fad9207618087a65c04e7a10bc77e02c8e84e9b00dd4b12fa0bb"
+dependencies = [
+ "js-sys",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "webpki"
 version = "0.21.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6522,6 +6558,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e686886bc078bc1b0b600cac0147aadb815089b6e4da64016cbd754b6342700f"
 dependencies = [
  "windows-targets 0.48.1",
+]
+
+[[package]]
+name = "windows"
+version = "0.52.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e48a53791691ab099e5e2ad123536d0fff50652600abaf43bbf952894110d0be"
+dependencies = [
+ "windows-core",
+ "windows-targets 0.52.0",
+]
+
+[[package]]
+name = "windows-core"
+version = "0.52.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "33ab640c8d7e35bf8ba19b884ba838ceb4fba93a4e8c65a9059d08afcfc683d9"
+dependencies = [
+ "windows-targets 0.52.0",
 ]
 
 [[package]]

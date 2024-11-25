@@ -32,6 +32,7 @@ mod attributes;
 mod coerce_expression;
 mod context;
 mod files;
+pub mod generators;
 mod ids;
 mod interner;
 mod names;
