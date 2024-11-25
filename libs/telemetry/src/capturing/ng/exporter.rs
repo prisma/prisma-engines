@@ -110,8 +110,17 @@ pub struct CaptureSettings {
     targets: BitFlags<CaptureTarget>,
 }
 
+enum Message {
+    StartCapturing(RequestId),
+    StopCapturing(RequestId, oneshot::Sender<Option<Trace>>),
+    AddSpan(RequestId, CollectedSpan),
+    AddEvent(RequestId, CollectedEvent),
+}
+
 #[derive(Clone)]
-pub struct Exporter(Arc<Inner>);
+pub struct Exporter {
+    tx: UnboundedSender<Message>,
+}
 
 impl Debug for Exporter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -123,17 +132,6 @@ impl Default for Exporter {
     fn default() -> Self {
         Self::new()
     }
-}
-
-struct Inner {
-    tx: UnboundedSender<Message>,
-}
-
-enum Message {
-    StartCapturing(RequestId),
-    StopCapturing(RequestId, oneshot::Sender<Option<Trace>>),
-    AddSpan(RequestId, CollectedSpan),
-    AddEvent(RequestId, CollectedEvent),
 }
 
 impl Exporter {
@@ -168,28 +166,28 @@ impl Exporter {
             }
         });
 
-        Self(Arc::new(Inner { tx }))
+        Self { tx }
     }
 
     pub async fn start_capturing(&self) -> RequestId {
         let request_id = RequestId::next();
-        _ = self.0.tx.send(Message::StartCapturing(request_id));
+        _ = self.tx.send(Message::StartCapturing(request_id));
         request_id
     }
 
     pub async fn stop_capturing(&self, request_id: RequestId) -> Option<Trace> {
         let (tx, rx) = oneshot::channel();
-        _ = self.0.tx.send(Message::StopCapturing(request_id, tx));
+        _ = self.tx.send(Message::StopCapturing(request_id, tx));
         rx.await.expect("capturer task dropped the sender")
     }
 }
 
 impl Collector for Exporter {
     fn add_span(&self, trace: RequestId, span: CollectedSpan) {
-        _ = self.0.tx.send(Message::AddSpan(trace, span));
+        _ = self.tx.send(Message::AddSpan(trace, span));
     }
 
     fn add_event(&self, trace: RequestId, event: CollectedEvent) {
-        _ = self.0.tx.send(Message::AddEvent(trace, event));
+        _ = self.tx.send(Message::AddEvent(trace, event));
     }
 }
