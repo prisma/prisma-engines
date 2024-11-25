@@ -1,6 +1,7 @@
 use crate::{ast, parent_container::ParentContainer, prelude::*, DefaultKind, NativeTypeInstance, ValueGenerator};
 use chrono::{DateTime, FixedOffset};
 use psl::{
+    generators::{DEFAULT_CUID_VERSION, DEFAULT_UUID_VERSION},
     parser_database::{self as db, walkers, ScalarFieldType, ScalarType},
     schema_ast::ast::FieldArity,
 };
@@ -250,12 +251,18 @@ pub fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<Sca
                 .first()
                 .and_then(|arg| arg.value.as_numeric_value())
                 .map(|(val, _)| val.parse::<u8>().unwrap())
-                .unwrap_or(4);
+                .unwrap_or(DEFAULT_UUID_VERSION);
 
             DefaultKind::Expression(ValueGenerator::new_uuid(version))
         }
-        ast::Expression::Function(funcname, _args, _) if funcname == "cuid" => {
-            DefaultKind::Expression(ValueGenerator::new_cuid())
+        ast::Expression::Function(funcname, args, _) if funcname == "cuid" => {
+            let version = args
+                .arguments
+                .first()
+                .and_then(|arg| arg.value.as_numeric_value())
+                .map(|(val, _)| val.parse::<u8>().unwrap())
+                .unwrap_or(DEFAULT_CUID_VERSION);
+            DefaultKind::Expression(ValueGenerator::new_cuid(version))
         }
         ast::Expression::Function(funcname, args, _) if funcname == "nanoid" => {
             DefaultKind::Expression(ValueGenerator::new_nanoid(
