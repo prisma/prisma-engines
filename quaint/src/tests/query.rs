@@ -115,6 +115,32 @@ async fn transactions_with_isolation_works(api: &mut dyn TestApi) -> crate::Resu
     Ok(())
 }
 
+#[test_each_connector(tags("mssql"))]
+async fn mssql_transaction_isolation_level(api: &mut dyn TestApi) -> crate::Result<()> {
+    // For Mssql, the isolation level is set on the connection and lives until it's changed.
+    // We need to test that the isolation level set per transaction is ignored.
+    let table = api.create_temp_table("id int, value int").await?;
+
+    // The connection default is "READ COMMITTED"
+    let conn = api.conn();
+
+    // Start a transaction with the default isolation level of "READ COMMITTED"
+    // and insert a row, but do not commit the transaction
+    let tx_a = conn.start_transaction(None).await?;
+    let insert = Insert::single_into(&table).value("value", 3).value("id", 4);
+    let rows_affected = tx_a.execute(insert.into()).await?;
+    assert_eq!(1, rows_affected);
+
+    // Start a transaction with an explicit isolation level of "READ UNCOMMITTED", which would ordinarily allow you to read
+    // rows that have been added but not committed.
+    let tx_b = conn.start_transaction(Some(IsolationLevel::ReadUncommitted)).await?;
+    let res = tx_b.query(Select::from_table(&table).into()).await?;
+
+    // The query should return an empty result set because the isolation level is set on the connection
+    assert_eq!(0, res.len());
+    Ok(())
+}
+
 // SQLite only supports serializable.
 #[test_each_connector(tags("sqlite"))]
 async fn sqlite_serializable_tx(api: &mut dyn TestApi) -> crate::Result<()> {
