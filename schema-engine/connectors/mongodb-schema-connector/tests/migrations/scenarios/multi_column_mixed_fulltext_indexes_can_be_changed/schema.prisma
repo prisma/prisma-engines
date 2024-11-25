@@ -4,8 +4,7 @@ datasource db {
 }
 
 generator js {
-  provider        = "prisma-client-js"
-  previewFeatures = ["fullTextIndex"]
+  provider = "prisma-client-js"
 }
 
 model User {
