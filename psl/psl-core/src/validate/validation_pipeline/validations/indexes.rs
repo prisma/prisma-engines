@@ -3,7 +3,6 @@ use crate::{
     datamodel_connector::{walker_ext_traits::*, ConnectorCapability},
     diagnostics::DatamodelError,
     validate::validation_pipeline::context::Context,
-    PreviewFeature,
 };
 use itertools::Itertools;
 use parser_database::{walkers::IndexWalker, IndexAlgorithm};
@@ -87,23 +86,6 @@ pub(crate) fn field_length_prefix_supported(index: IndexWalker<'_>, ctx: &mut Co
     }
 }
 
-/// `@@fulltext` attribute is not available without `fullTextIndex` preview feature.
-pub(crate) fn fulltext_index_preview_feature_enabled(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if ctx.preview_features.contains(PreviewFeature::FullTextIndex) {
-        return;
-    }
-
-    if index.is_fulltext() {
-        let message = "You must enable `fullTextIndex` preview feature to be able to define a @@fulltext index.";
-
-        ctx.push_error(DatamodelError::new_attribute_validation_error(
-            message,
-            index.attribute_name(),
-            index.ast_attribute().span,
-        ));
-    }
-}
-
 /// `@@fulltext` should only be available if we support it in the database.
 pub(crate) fn fulltext_index_supported(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
     if ctx.has_capability(ConnectorCapability::FullTextIndex) {
@@ -123,10 +105,6 @@ pub(crate) fn fulltext_index_supported(index: IndexWalker<'_>, ctx: &mut Context
 
 /// `@@fulltext` index columns should not define `length` argument.
 pub(crate) fn fulltext_columns_should_not_define_length(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(PreviewFeature::FullTextIndex) {
-        return;
-    }
-
     if !ctx.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
@@ -148,10 +126,6 @@ pub(crate) fn fulltext_columns_should_not_define_length(index: IndexWalker<'_>, 
 
 /// Only MongoDB supports sort order in a fulltext index.
 pub(crate) fn fulltext_column_sort_is_supported(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(PreviewFeature::FullTextIndex) {
-        return;
-    }
-
     if !ctx.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
@@ -181,10 +155,6 @@ pub(crate) fn fulltext_column_sort_is_supported(index: IndexWalker<'_>, ctx: &mu
 /// @@fulltext([a(sort: Asc), b, c(sort: Asc), d])
 /// ```
 pub(crate) fn fulltext_text_columns_should_be_bundled_together(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(PreviewFeature::FullTextIndex) {
-        return;
-    }
-
     if !ctx.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }
