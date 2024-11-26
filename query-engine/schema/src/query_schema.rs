@@ -105,8 +105,11 @@ impl QuerySchema {
     }
 
     pub(crate) fn can_full_text_search(&self) -> bool {
-        // TODO: add connector-specific `self.has_native_feature(ConnectorCapability::NativeFullTextSearch)` in conjunction with the next bool.
-        self.has_capability(ConnectorCapability::NativeFullTextSearch)
+        self.connector
+            .native_full_text_search_preview_feature()
+            .map(|feature| self.has_feature(feature))
+            .unwrap_or(true)
+            && self.has_capability(ConnectorCapability::NativeFullTextSearch)
     }
 
     /// Returns whether the loaded connector supports the join strategy.
