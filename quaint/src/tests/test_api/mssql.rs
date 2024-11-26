@@ -21,6 +21,10 @@ impl<'a> MsSql<'a> {
         let names = Generator::default();
         let conn = Quaint::new(&CONN_STR).await?;
 
+        // snapshot isolation enables us to test isolation levels easily
+        conn.raw_cmd(&format!("ALTER DATABASE tempdb SET ALLOW_SNAPSHOT_ISOLATION ON",))
+            .await?;
+
         Ok(Self { names, conn })
     }
 }

@@ -117,27 +117,29 @@ async fn transactions_with_isolation_works(api: &mut dyn TestApi) -> crate::Resu
 
 #[test_each_connector(tags("mssql"))]
 async fn mssql_transaction_isolation_level(api: &mut dyn TestApi) -> crate::Result<()> {
-    // For Mssql, the isolation level is set on the connection and lives until it's changed.
-    // We need to test that the isolation level set per transaction is ignored.
     let table = api.create_temp_table("id int, value int").await?;
 
-    // The connection default is "READ COMMITTED"
-    let conn = api.conn();
-
-    // Start a transaction with the default isolation level of "READ COMMITTED"
-    // and insert a row, but do not commit the transaction
-    let tx_a = conn.start_transaction(None).await?;
+    let conn_a = api.conn();
+    // Start a transaction with the default isolation level, which in tests is
+    // set to READ UNCOMMITED via the DB url and insert a row, but do not commit the transaction
+    let tx_a = conn_a.start_transaction(None).await?;
     let insert = Insert::single_into(&table).value("value", 3).value("id", 4);
     let rows_affected = tx_a.execute(insert.into()).await?;
     assert_eq!(1, rows_affected);
 
-    // Start a transaction with an explicit isolation level of "READ UNCOMMITTED", which would ordinarily allow you to read
-    // rows that have been added but not committed.
-    let tx_b = conn.start_transaction(Some(IsolationLevel::ReadUncommitted)).await?;
+    let conn_b = api.create_additional_connection().await?;
+    // Start a transaction that explicitly sets the isolation level to "SNAPSHOT" and query the table
+    // expecting to see the old state.
+    let tx_b = conn_b.start_transaction(Some(IsolationLevel::Snapshot)).await?;
     let res = tx_b.query(Select::from_table(&table).into()).await?;
-
-    // The query should return an empty result set because the isolation level is set on the connection
     assert_eq!(0, res.len());
+
+    // Start a transaction without an explicit isolation level, it should be run with the default
+    // again, which is set to READ UNCOMMITED here.
+    let tx_c = conn_b.start_transaction(None).await?;
+    let res = tx_c.query(Select::from_table(&table).into()).await?;
+    assert_eq!(1, res.len());
+
     Ok(())
 }
 
