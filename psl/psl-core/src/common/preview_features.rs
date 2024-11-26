@@ -116,7 +116,7 @@ pub(crate) enum RenamedFeature {
 }
 
 #[derive(Debug, Clone)]
-pub struct FeatureMap {
+struct FeatureMap {
     /// Valid, visible features.
     active: PreviewFeatures,
 
