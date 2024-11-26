@@ -39,8 +39,8 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     CreateSkipDuplicates |
     Enums |
     EnumArrayPush |
-    FullTextSearch |
-    FullTextSearchWithoutIndex |
+    NativeFullTextSearch |
+    NativeFullTextSearchWithoutIndex |
     InsensitiveFilters |
     Json |
     JsonFiltering |

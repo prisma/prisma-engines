@@ -53,6 +53,7 @@ features!(
     FilterJson,
     FullTextIndex,
     FullTextSearch,
+    NativeFullTextSearchPostgres,
     GroupBy,
     ImprovedQueryRaw,
     InteractiveTransactions,
@@ -90,7 +91,6 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
         Deno
          | DriverAdapters
-         | FullTextSearch
          | Metrics
          | MultiSchema
          | NativeDistinct
@@ -117,6 +117,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | FilteredRelationCount
         | FilterJson
         | FullTextIndex
+        | FullTextSearch
         | GroupBy
         | ImprovedQueryRaw
         | InteractiveTransactions
@@ -136,7 +137,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | TransactionApi
         | UncheckedScalarInputs
     }),
-    hidden: enumflags2::make_bitflags!(PreviewFeature::{ReactNative | TypedSql}),
+    hidden: enumflags2::make_bitflags!(PreviewFeature::{ReactNative | TypedSql | NativeFullTextSearchPostgres}),
 };
 
 #[derive(Debug)]
