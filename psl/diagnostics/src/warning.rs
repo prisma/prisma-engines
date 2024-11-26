@@ -41,7 +41,7 @@ impl DatamodelWarning {
     }
 
     pub fn new_preview_feature_renamed_for_provider(
-        provider: &'static str,
+        provider: &str,
         deprecated_feature: &str,
         renamed_feature: impl Display,
         prisly_link_endpoint: &str,

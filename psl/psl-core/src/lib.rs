@@ -176,7 +176,7 @@ fn validate_configuration(
     // We need to know the active provider to determine which features are active.
     // This was originally introduced because the `fullTextSearch` preview feature will hit GA stage
     // one connector at a time (Prisma 6 GAs it for MySQL, other connectors may follow in future releases).
-    let feature_map_with_provider: FeatureMapWithProvider = datasources
+    let feature_map_with_provider: FeatureMapWithProvider<'_> = datasources
         .first()
         .map(|ds| Some(ds.active_provider))
         .map(FeatureMapWithProvider::new)

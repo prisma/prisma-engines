@@ -25,7 +25,7 @@ const FIRST_CLASS_PROPERTIES: &[&str] = &[PROVIDER_KEY, OUTPUT_KEY, BINARY_TARGE
 pub(crate) fn load_generators_from_ast(
     ast_schema: &ast::SchemaAst,
     diagnostics: &mut Diagnostics,
-    feature_map_with_provider: &FeatureMapWithProvider,
+    feature_map_with_provider: &FeatureMapWithProvider<'_>,
 ) -> Vec<Generator> {
     let mut generators: Vec<Generator> = Vec::new();
 
@@ -41,7 +41,7 @@ pub(crate) fn load_generators_from_ast(
 fn lift_generator(
     ast_generator: &ast::GeneratorConfig,
     diagnostics: &mut Diagnostics,
-    feature_map_with_provider: &FeatureMapWithProvider,
+    feature_map_with_provider: &FeatureMapWithProvider<'_>,
 ) -> Option<Generator> {
     let generator_name = ast_generator.name.name.as_str();
     let args: HashMap<_, &Expression> = ast_generator
@@ -140,7 +140,7 @@ fn lift_generator(
 
 fn parse_and_validate_preview_features(
     preview_features: Vec<&str>,
-    feature_map_with_provider: &FeatureMapWithProvider,
+    feature_map_with_provider: &FeatureMapWithProvider<'_>,
     span: ast::Span,
     diagnostics: &mut Diagnostics,
 ) -> BitFlags<PreviewFeature> {

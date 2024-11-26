@@ -89,12 +89,12 @@ features!(
 );
 
 #[derive(Copy, Clone, Debug, PartialOrd, Ord, PartialEq, Eq)]
-struct RenamedFeatureKey {
+struct RenamedFeatureKey<'a> {
     /// The old, deprecated preview feature that was renamed.
     pub from: PreviewFeature,
 
     /// The provider that the feature was renamed for.
-    pub provider: Option<&'static str>,
+    pub provider: Option<&'a str>,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -107,9 +107,9 @@ pub(crate) struct RenamedFeatureValue {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) enum RenamedFeature {
+pub(crate) enum RenamedFeature<'a> {
     /// The preview feature was renamed for a specific provider.
-    ForProvider((&'static str, RenamedFeatureValue)),
+    ForProvider((&'a str, RenamedFeatureValue)),
 
     /// The preview feature was renamed for all providers.
     AllProviders(RenamedFeatureValue),
@@ -127,7 +127,7 @@ struct FeatureMap {
     deprecated: PreviewFeatures,
 
     /// History of renamed deprecated features.
-    renamed: BTreeMap<RenamedFeatureKey, RenamedFeatureValue>,
+    renamed: BTreeMap<RenamedFeatureKey<'static>, RenamedFeatureValue>,
 
     /// Hidden preview features are valid features, but are not propagated into the tooling
     /// (as autocomplete or similar) or into error messages (eg. showing a list of valid features).
@@ -135,18 +135,19 @@ struct FeatureMap {
 }
 
 #[derive(Debug, Clone)]
-pub struct FeatureMapWithProvider {
-    provider: Option<&'static str>,
+pub struct FeatureMapWithProvider<'a> {
+    provider: Option<&'a str>,
     feature_map: FeatureMap,
 }
 
 /// The default feature map with an unknown provider.
 /// This is used for convenience in `prisma/language-tools`, which needs the list of all available preview features
 /// before a provider is necessarily known.
-pub static ALL_PREVIEW_FEATURES: LazyLock<FeatureMapWithProvider> = LazyLock::new(|| FeatureMapWithProvider::new(None));
+pub static ALL_PREVIEW_FEATURES: LazyLock<FeatureMapWithProvider<'static>> =
+    LazyLock::new(|| FeatureMapWithProvider::new(None));
 
-impl FeatureMapWithProvider {
-    pub fn new(connector_provider: Option<&'static str>) -> FeatureMapWithProvider {
+impl<'a> FeatureMapWithProvider<'a> {
+    pub fn new(connector_provider: Option<&'a str>) -> FeatureMapWithProvider<'a> {
         // Generator preview features (alphabetically sorted)
         let feature_map: FeatureMap = FeatureMap {
             active: enumflags2::make_bitflags!(PreviewFeature::{
@@ -252,12 +253,12 @@ impl FeatureMapWithProvider {
     }
 
     /// Was the given preview feature deprecated and renamed?
-    pub(crate) fn is_renamed(&self, flag: PreviewFeature) -> Option<RenamedFeature> {
+    pub(crate) fn is_renamed(&'a self, flag: PreviewFeature) -> Option<RenamedFeature<'a>> {
         // Check for a renamed feature specific to the provider. This is only possible if a provider is not None.
         let provider_specific = self.provider.and_then(|provider| {
             self.feature_map
                 .renamed
-                .get(&RenamedFeatureKey {
+                .get(&RenamedFeatureKey::<'a> {
                     from: flag,
                     provider: Some(provider),
                 })
@@ -268,7 +269,7 @@ impl FeatureMapWithProvider {
         provider_specific.or_else(|| {
             self.feature_map
                 .renamed
-                .get(&RenamedFeatureKey {
+                .get(&RenamedFeatureKey::<'a> {
                     from: flag,
                     provider: None,
                 })
