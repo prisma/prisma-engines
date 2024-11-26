@@ -89,7 +89,7 @@ impl ConnectorError {
                 },
             )),
 
-            ErrorKind::NativeMissingFullTextSearchIndex => Some(KnownError::new(
+            ErrorKind::MissingNativeFullTextSearchIndex => Some(KnownError::new(
                 user_facing_errors::query_engine::MissingNativeFullTextSearchIndex {},
             )),
             ErrorKind::TransactionAborted { message } => Some(KnownError::new(
@@ -271,7 +271,7 @@ pub enum ErrorKind {
     QueryParameterLimitExceeded(String),
 
     #[error("Cannot find a fulltext index to use for the native search")]
-    NativeMissingFullTextSearchIndex,
+    MissingNativeFullTextSearchIndex,
 
     #[error("Replica Set required for Transactions")]
     MongoReplicaSetRequired,
