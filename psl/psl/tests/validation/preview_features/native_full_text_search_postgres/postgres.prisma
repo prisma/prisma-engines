@@ -1,0 +1,16 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["nativeFullTextSearchPostgres"]
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model Blog {
+  id      Int    @unique
+  content String
+  title   String
+  @@index([content, title])
+}
