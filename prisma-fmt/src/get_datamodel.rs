@@ -63,6 +63,7 @@ mod tests {
                 {
                   "name": "User",
                   "dbName": null,
+                  "schema": null,
                   "fields": [
                     {
                       "name": "id",
@@ -122,6 +123,7 @@ mod tests {
                 {
                   "name": "Post",
                   "dbName": null,
+                  "schema": null,
                   "fields": [
                     {
                       "name": "id",
