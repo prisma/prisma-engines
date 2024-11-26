@@ -4,7 +4,6 @@ use crate::{
     diagnostics::DatamodelError,
     parser_database::ast::{WithName, WithSpan},
     validate::validation_pipeline::context::Context,
-    PreviewFeature,
 };
 use parser_database::walkers::{ModelWalker, PrimaryKeyWalker};
 use std::{borrow::Cow, collections::HashMap};
@@ -175,10 +174,6 @@ pub(crate) fn primary_key_sort_order_supported(model: ModelWalker<'_>, ctx: &mut
 }
 
 pub(crate) fn only_one_fulltext_attribute_allowed(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
-    if !ctx.preview_features.contains(PreviewFeature::FullTextIndex) {
-        return;
-    }
-
     if !ctx.has_capability(ConnectorCapability::FullTextIndex) {
         return;
     }

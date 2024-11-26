@@ -83,7 +83,9 @@ pub(crate) trait DefaultValueAssert {
     fn assert_bytes(&self, val: &[u8]) -> &Self;
     fn assert_now(&self) -> &Self;
     fn assert_cuid(&self) -> &Self;
+    fn assert_cuid_version(&self, version: u8) -> &Self;
     fn assert_uuid(&self) -> &Self;
+    fn assert_uuid_version(&self, version: u8) -> &Self;
     fn assert_dbgenerated(&self, val: &str) -> &Self;
     fn assert_mapped_name(&self, val: &str) -> &Self;
 }
@@ -434,8 +436,20 @@ impl<'a> DefaultValueAssert for walkers::DefaultValueWalker<'a> {
     }
 
     #[track_caller]
+    fn assert_cuid_version(&self, version: u8) -> &Self {
+        self.value().assert_cuid_version(version);
+        self
+    }
+
+    #[track_caller]
     fn assert_uuid(&self) -> &Self {
         self.value().assert_uuid();
+        self
+    }
+
+    #[track_caller]
+    fn assert_uuid_version(&self, version: u8) -> &Self {
+        self.value().assert_uuid_version(version);
         self
     }
 
@@ -622,9 +636,24 @@ impl DefaultValueAssert for ast::Expression {
 
     #[track_caller]
     fn assert_cuid(&self) -> &Self {
-        assert!(
-            matches!(self, ast::Expression::Function(name, args, _) if name == "cuid" && args.arguments.is_empty())
-        );
+        assert!(matches!(self, ast::Expression::Function(name, _, _) if name == "cuid"));
+
+        self
+    }
+
+    #[track_caller]
+    fn assert_cuid_version(&self, version: u8) -> &Self {
+        self.assert_cuid();
+
+        if let ast::Expression::Function(_, args, _) = self {
+            if let ast::Expression::NumericValue(actual, _) = &args.arguments[0].value {
+                assert_eq!(actual, &format!("{version}"));
+            } else {
+                panic!("Expected a numeric value for the `cuid()` version.");
+            }
+        } else {
+            panic!("Expected `cuid()` to be a function, got {}", &self);
+        }
 
         self
     }
@@ -632,6 +661,23 @@ impl DefaultValueAssert for ast::Expression {
     #[track_caller]
     fn assert_uuid(&self) -> &Self {
         assert!(matches!(self, ast::Expression::Function(name, _, _) if name == "uuid"));
+
+        self
+    }
+
+    #[track_caller]
+    fn assert_uuid_version(&self, version: u8) -> &Self {
+        self.assert_uuid();
+
+        if let ast::Expression::Function(_, args, _) = self {
+            if let ast::Expression::NumericValue(actual, _) = &args.arguments[0].value {
+                assert_eq!(actual, &version.to_string());
+            } else {
+                panic!("Expected a numeric value for the `uuid()` version.");
+            }
+        } else {
+            panic!("Expected `cuid()` to be a function, got {}", &self);
+        }
 
         self
     }

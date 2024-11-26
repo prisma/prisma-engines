@@ -221,7 +221,7 @@ async fn a_table_with_descending_unique(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), preview_features("fullTextIndex"))]
+#[test_connector(tags(Mysql))]
 async fn a_table_with_fulltext_index(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
@@ -250,7 +250,7 @@ async fn a_table_with_fulltext_index(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), preview_features("fullTextIndex"))]
+#[test_connector(tags(Mysql))]
 async fn a_table_with_fulltext_index_with_custom_name(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
@@ -271,35 +271,6 @@ async fn a_table_with_fulltext_index_with_custom_name(api: &mut TestApi) -> Test
           b  String @db.Text
 
           @@fulltext([a, b], map: "custom_name")
-        }
-    "#]];
-
-    expected.assert_eq(&api.introspect_dml().await?);
-
-    Ok(())
-}
-
-#[test_connector(tags(Mysql))]
-async fn a_table_with_fulltext_index_without_preview_flag(api: &mut TestApi) -> TestResult {
-    let setup = indoc! {r#"
-        CREATE TABLE `A` (
-            `id` INT          PRIMARY KEY,
-            `a`  VARCHAR(255) NOT NULL,
-            `b`  TEXT         NOT NULL
-        );
-
-        CREATE FULLTEXT INDEX A_a_b_idx ON `A` (a, b);
-    "#};
-
-    api.raw_cmd(setup).await;
-
-    let expected = expect![[r#"
-        model A {
-          id Int    @id
-          a  String @db.VarChar(255)
-          b  String @db.Text
-
-          @@index([a, b])
         }
     "#]];
 

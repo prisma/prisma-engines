@@ -48,8 +48,6 @@ graph.dot
 
 prisma-schema-wasm/nodejs
 
-# Ignore pnpm-lock.yaml
-query-engine/driver-adapters/pnpm-lock.yaml
 package-lock.json
 
 # Useful for local wasm32-* development

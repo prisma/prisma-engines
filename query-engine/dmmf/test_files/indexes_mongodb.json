@@ -16,6 +16,10 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": [
+            "ObjectId",
+            []
+          ],
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -29,6 +33,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -42,6 +47,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -55,6 +61,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Comment",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -79,7 +86,11 @@
           "isId": false,
           "isReadOnly": false,
           "hasDefaultValue": false,
-          "type": "String"
+          "type": "String",
+          "nativeType": [
+            "ObjectId",
+            []
+          ]
         },
         {
           "name": "content",
@@ -90,7 +101,8 @@
           "isId": false,
           "isReadOnly": false,
           "hasDefaultValue": false,
-          "type": "String"
+          "type": "String",
+          "nativeType": null
         }
       ],
       "primaryKey": null,

@@ -94,6 +94,9 @@ fn composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker<'_>) ->
         is_id: false,
         is_read_only: false,
         has_default_value: field.default_value().is_some(),
+        native_type: field
+            .raw_native_type()
+            .map(|(_, name, args, ..)| (name.to_string(), args.to_vec())),
         default: field
             .default_value()
             .map(|dv| default_value_to_serde(&dml_default_kind(dv, field.scalar_type()))),
@@ -195,6 +198,9 @@ fn scalar_field_to_dmmf(field: walkers::ScalarFieldWalker<'_>) -> Field {
             ScalarFieldType::BuiltInScalar(st) => st.as_str().to_owned(),
             ScalarFieldType::Unsupported(_) => unreachable!(),
         },
+        native_type: field
+            .raw_native_type()
+            .map(|(_, name, args, ..)| (name.to_string(), args.to_vec())),
         default: field
             .default_value()
             .map(|dv| default_value_to_serde(&dml_default_kind(dv.value(), field.scalar_type()))),
@@ -221,6 +227,7 @@ fn relation_field_to_dmmf(field: walkers::RelationFieldWalker<'_>) -> Field {
         is_read_only: false,
         has_default_value: false,
         field_type: field.related_model().name().to_owned(),
+        native_type: None,
         default: None,
         relation_name: Some(field.relation_name().to_string()),
         relation_from_fields: Some(
@@ -296,7 +303,7 @@ fn default_value_to_serde(dv: &DefaultKind) -> serde_json::Value {
     match dv {
         DefaultKind::Single(value) => prisma_value_to_serde(&value.clone()),
         DefaultKind::Expression(vg) => {
-            let args: Vec<_> = vg.args().iter().map(|(_, v)| v.clone()).collect();
+            let args: Vec<_> = vg.args().to_vec();
             function_to_serde(vg.name(), &args)
         }
     }
@@ -310,7 +317,7 @@ fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
         PrismaValue::Float(val) => {
             serde_json::Value::Number(serde_json::Number::from_f64(val.to_f64().unwrap()).unwrap())
         }
-        PrismaValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
+        PrismaValue::Int(val) => serde_json::Value::Number(serde_json::Number::from(*val)),
         PrismaValue::BigInt(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),
         PrismaValue::Null => serde_json::Value::Null,
