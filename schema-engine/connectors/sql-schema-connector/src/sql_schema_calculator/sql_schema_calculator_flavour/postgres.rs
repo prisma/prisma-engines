@@ -162,6 +162,10 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             .describer_schema
             .set_connector_data(Box::new(postgres_ext));
     }
+
+    fn uses_pk_in_m2m_join_table(&self) -> bool {
+        true
+    }
 }
 
 fn convert_opclass(opclass: OperatorClass, algo: Option<IndexAlgorithm>) -> sql::postgres::SQLOperatorClass {
