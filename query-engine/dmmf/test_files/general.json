@@ -23,6 +23,7 @@
     {
       "name": "User",
       "dbName": "user",
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -34,6 +35,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -47,6 +49,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "DateTime",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -60,6 +63,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -74,6 +78,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -87,6 +92,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Post",
+          "nativeType": null,
           "relationName": "author",
           "relationFromFields": [],
           "relationToFields": [],
@@ -103,6 +109,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Profile",
+          "nativeType": null,
           "relationName": "ProfileToUser",
           "relationFromFields": [],
           "relationToFields": [],
@@ -118,6 +125,7 @@
     {
       "name": "Profile",
       "dbName": "profile",
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -129,6 +137,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -142,6 +151,7 @@
           "isReadOnly": true,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -155,6 +165,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "User",
+          "nativeType": null,
           "relationName": "ProfileToUser",
           "relationFromFields": [
             "userId"
@@ -175,6 +186,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -187,6 +199,7 @@
     {
       "name": "Post",
       "dbName": "post",
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -198,6 +211,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -211,6 +225,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "DateTime",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -224,6 +239,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "DateTime",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -237,6 +253,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "String",
+          "nativeType": null,
           "default": "Default-Title",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -251,6 +268,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "Boolean",
+          "nativeType": null,
           "default": false,
           "isGenerated": false,
           "isUpdatedAt": false
@@ -265,6 +283,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "Boolean",
+          "nativeType": null,
           "default": false,
           "isGenerated": false,
           "isUpdatedAt": false
@@ -279,6 +298,7 @@
           "isReadOnly": true,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -292,6 +312,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "User",
+          "nativeType": null,
           "relationName": "author",
           "relationFromFields": [
             "authorId"
@@ -312,6 +333,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "PostToCategory",
+          "nativeType": null,
           "relationName": "PostToPostToCategory",
           "relationFromFields": [],
           "relationToFields": [],
@@ -333,6 +355,7 @@
     {
       "name": "Category",
       "dbName": "category",
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -344,6 +367,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -357,6 +381,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -370,6 +395,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "PostToCategory",
+          "nativeType": null,
           "relationName": "CategoryToPostToCategory",
           "relationFromFields": [],
           "relationToFields": [],
@@ -386,6 +412,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "CategoryEnum",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -398,6 +425,7 @@
     {
       "name": "PostToCategory",
       "dbName": "post_to_category",
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -409,6 +437,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -422,6 +451,7 @@
           "isReadOnly": true,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -435,6 +465,7 @@
           "isReadOnly": true,
           "hasDefaultValue": false,
           "type": "DateTime",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -448,6 +479,7 @@
           "isReadOnly": true,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -461,6 +493,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Post",
+          "nativeType": null,
           "relationName": "PostToPostToCategory",
           "relationFromFields": [
             "postTitle",
@@ -483,6 +516,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Category",
+          "nativeType": null,
           "relationName": "CategoryToPostToCategory",
           "relationFromFields": [
             "categoryId"
@@ -515,6 +549,7 @@
     {
       "name": "A",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -526,6 +561,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -539,6 +575,7 @@
           "isReadOnly": true,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -552,6 +589,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "B",
+          "nativeType": null,
           "relationName": "AToB",
           "relationFromFields": [
             "bId"
@@ -571,6 +609,7 @@
     {
       "name": "B",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -582,6 +621,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -595,6 +635,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "A",
+          "nativeType": null,
           "relationName": "AToB",
           "relationFromFields": [],
           "relationToFields": [],
@@ -610,6 +651,7 @@
     {
       "name": "NamedCompounds",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "a",
@@ -621,6 +663,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -634,6 +677,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -647,6 +691,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -660,6 +705,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -691,6 +737,7 @@
     {
       "name": "MappedSingles",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "a",
@@ -702,6 +749,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -715,6 +763,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         }

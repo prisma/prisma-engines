@@ -373,6 +373,7 @@ mod tests {
                   {
                     "name": "A",
                     "dbName": null,
+                    "schema": null,
                     "fields": [
                       {
                         "name": "id",
@@ -384,6 +385,7 @@ mod tests {
                         "isReadOnly": false,
                         "hasDefaultValue": false,
                         "type": "String",
+                        "nativeType": null,
                         "isGenerated": false,
                         "isUpdatedAt": false
                       },
@@ -397,6 +399,7 @@ mod tests {
                         "isReadOnly": true,
                         "hasDefaultValue": false,
                         "type": "String",
+                        "nativeType": null,
                         "isGenerated": false,
                         "isUpdatedAt": false
                       },
@@ -410,6 +413,7 @@ mod tests {
                         "isReadOnly": false,
                         "hasDefaultValue": false,
                         "type": "B",
+                        "nativeType": null,
                         "relationName": "AToB",
                         "relationFromFields": [
                           "b_id"
@@ -429,6 +433,7 @@ mod tests {
                   {
                     "name": "B",
                     "dbName": null,
+                    "schema": null,
                     "fields": [
                       {
                         "name": "id",
@@ -440,6 +445,7 @@ mod tests {
                         "isReadOnly": false,
                         "hasDefaultValue": false,
                         "type": "String",
+                        "nativeType": null,
                         "isGenerated": false,
                         "isUpdatedAt": false
                       },
@@ -453,6 +459,7 @@ mod tests {
                         "isReadOnly": false,
                         "hasDefaultValue": false,
                         "type": "A",
+                        "nativeType": null,
                         "relationName": "AToB",
                         "relationFromFields": [],
                         "relationToFields": [],

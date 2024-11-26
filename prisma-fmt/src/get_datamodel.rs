@@ -63,6 +63,7 @@ mod tests {
                 {
                   "name": "User",
                   "dbName": null,
+                  "schema": null,
                   "fields": [
                     {
                       "name": "id",
@@ -74,6 +75,7 @@ mod tests {
                       "isReadOnly": false,
                       "hasDefaultValue": true,
                       "type": "Int",
+                      "nativeType": null,
                       "default": {
                         "name": "autoincrement",
                         "args": []
@@ -91,6 +93,7 @@ mod tests {
                       "isReadOnly": false,
                       "hasDefaultValue": false,
                       "type": "String",
+                      "nativeType": null,
                       "isGenerated": false,
                       "isUpdatedAt": false
                     },
@@ -104,6 +107,7 @@ mod tests {
                       "isReadOnly": false,
                       "hasDefaultValue": false,
                       "type": "Post",
+                      "nativeType": null,
                       "relationName": "PostToUser",
                       "relationFromFields": [],
                       "relationToFields": [],
@@ -119,6 +123,7 @@ mod tests {
                 {
                   "name": "Post",
                   "dbName": null,
+                  "schema": null,
                   "fields": [
                     {
                       "name": "id",
@@ -130,6 +135,7 @@ mod tests {
                       "isReadOnly": false,
                       "hasDefaultValue": true,
                       "type": "Int",
+                      "nativeType": null,
                       "default": {
                         "name": "autoincrement",
                         "args": []
@@ -147,6 +153,7 @@ mod tests {
                       "isReadOnly": false,
                       "hasDefaultValue": false,
                       "type": "String",
+                      "nativeType": null,
                       "isGenerated": false,
                       "isUpdatedAt": false
                     },
@@ -160,6 +167,7 @@ mod tests {
                       "isReadOnly": false,
                       "hasDefaultValue": false,
                       "type": "User",
+                      "nativeType": null,
                       "relationName": "PostToUser",
                       "relationFromFields": [
                         "authorId"
@@ -180,6 +188,7 @@ mod tests {
                       "isReadOnly": true,
                       "hasDefaultValue": false,
                       "type": "Int",
+                      "nativeType": null,
                       "isGenerated": false,
                       "isUpdatedAt": false
                     }
