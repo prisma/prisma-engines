@@ -15,6 +15,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -28,6 +29,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "DateTime",
+          "nativeType": null,
           "default": {
             "name": "now",
             "args": []
@@ -45,6 +47,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "String",
+          "nativeType": null,
           "default": {
             "name": "cuid",
             "args": [
@@ -64,6 +67,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "String",
+          "nativeType": null,
           "default": {
             "name": "cuid",
             "args": [
@@ -83,6 +87,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "String",
+          "nativeType": null,
           "default": {
             "name": "cuid",
             "args": [
@@ -102,6 +107,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "String",
+          "nativeType": null,
           "default": {
             "name": "uuid",
             "args": [
@@ -121,6 +127,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "String",
+          "nativeType": null,
           "default": {
             "name": "uuid",
             "args": [
@@ -140,6 +147,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "String",
+          "nativeType": null,
           "default": {
             "name": "uuid",
             "args": [
@@ -159,6 +167,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "String",
+          "nativeType": null,
           "default": {
             "name": "nanoid",
             "args": []
@@ -176,6 +185,7 @@
           "isReadOnly": false,
           "hasDefaultValue": true,
           "type": "String",
+          "nativeType": null,
           "default": {
             "name": "nanoid",
             "args": [
