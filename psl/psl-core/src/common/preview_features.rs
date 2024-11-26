@@ -252,7 +252,7 @@ impl FeatureMapWithProvider {
     }
 
     /// Was the given preview feature deprecated and renamed?
-    pub(crate) fn is_renamed<'f>(&self, flag: PreviewFeature) -> Option<RenamedFeature> {
+    pub(crate) fn is_renamed(&self, flag: PreviewFeature) -> Option<RenamedFeature> {
         // Check for a renamed feature specific to the provider. This is only possible if a provider is not None.
         let provider_specific = self.provider.and_then(|provider| {
             self.feature_map
@@ -261,7 +261,7 @@ impl FeatureMapWithProvider {
                     from: flag,
                     provider: Some(provider),
                 })
-                .map(|renamed| RenamedFeature::ForProvider((provider, renamed.clone())))
+                .map(|renamed| RenamedFeature::ForProvider((provider, *renamed)))
         });
 
         // Fallback to provider-independent renamed feature
@@ -272,7 +272,7 @@ impl FeatureMapWithProvider {
                     from: flag,
                     provider: None,
                 })
-                .map(|renamed| RenamedFeature::AllProviders(renamed.clone()))
+                .map(|renamed| RenamedFeature::AllProviders(*renamed))
         })
     }
 }

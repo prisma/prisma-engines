@@ -179,7 +179,7 @@ fn validate_configuration(
     let feature_map_with_provider: FeatureMapWithProvider = datasources
         .first()
         .map(|ds| Some(ds.active_provider))
-        .map(|provider| FeatureMapWithProvider::new(provider))
+        .map(FeatureMapWithProvider::new)
         .unwrap_or_else(|| (*ALL_PREVIEW_FEATURES).clone());
 
     let generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics, &feature_map_with_provider);
