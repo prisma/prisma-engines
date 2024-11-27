@@ -40,8 +40,12 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
 
     fn push_connector_data(&self, _context: &mut super::Context<'_>) {}
 
-    // TODO: this should be an enum
-    fn uses_pk_in_m2m_join_table(&self) -> bool {
-        false
+    fn m2m_join_table_constraint(&self) -> JoinTableUniquenessConstraint {
+        JoinTableUniquenessConstraint::UniqueIndex
     }
+}
+
+pub(crate) enum JoinTableUniquenessConstraint {
+    PrimaryKey,
+    UniqueIndex,
 }

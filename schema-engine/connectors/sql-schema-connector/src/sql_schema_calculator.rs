@@ -1,5 +1,6 @@
 mod sql_schema_calculator_flavour;
 
+use sql_schema_calculator_flavour::JoinTableUniquenessConstraint;
 pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 
 use crate::{flavour::SqlFlavour, SqlDatabaseSchema};
@@ -263,20 +264,21 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
 
         // Unique index or PK on AB
         {
-            let index_id = if ctx.flavour.uses_pk_in_m2m_join_table() {
-                let constraint_name = format!(
-                    "{}_AB_pkey",
-                    table_name.chars().take(max_identifier_length - 8).collect::<String>()
-                );
-
-                ctx.schema.describer_schema.push_primary_key(table_id, constraint_name)
-            } else {
-                let index_name = format!(
-                    "{}_AB_unique",
-                    table_name.chars().take(max_identifier_length - 10).collect::<String>()
-                );
-
-                ctx.schema.describer_schema.push_unique_constraint(table_id, index_name)
+            let index_id = match ctx.flavour.m2m_join_table_constraint() {
+                JoinTableUniquenessConstraint::PrimaryKey => {
+                    let constraint_name = format!(
+                        "{}_AB_pkey",
+                        table_name.chars().take(max_identifier_length - 8).collect::<String>()
+                    );
+                    ctx.schema.describer_schema.push_primary_key(table_id, constraint_name)
+                }
+                JoinTableUniquenessConstraint::UniqueIndex => {
+                    let index_name = format!(
+                        "{}_AB_unique",
+                        table_name.chars().take(max_identifier_length - 10).collect::<String>()
+                    );
+                    ctx.schema.describer_schema.push_unique_constraint(table_id, index_name)
+                }
             };
 
             ctx.schema.describer_schema.push_index_column(sql::IndexColumn {
