@@ -96,6 +96,230 @@ fn from_unique_index_to_without(mut api: TestApi) {
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
 }
 
+#[test_connector(tags(Sqlite, Mysql, Postgres, CockroachDb, Mssql))]
+fn from_unique_index_to_pk(mut api: TestApi) {
+    let tempdir = tempfile::tempdir().unwrap();
+    let host = Arc::new(TestConnectorHost::default());
+
+    api.connector.set_host(host.clone());
+
+    let from_schema = api.datamodel_with_provider(
+        r#"
+            model A {
+                id    Int     @unique
+                name  String?
+                links C[]
+            }
+
+            model B {
+                id    Int     @unique
+                name  String?
+                links C[]
+            }
+
+            model C {
+                a_id Int
+                b_id Int
+                a    A   @relation(fields: [a_id], references: [id])
+                b    B   @relation(fields: [b_id], references: [id])
+
+                @@unique([a_id, b_id])
+            }
+        "#,
+    );
+
+    let to_schema = api.datamodel_with_provider(
+        r#"
+            model A {
+                id    Int     @id
+                name  String?
+                links C[]
+            }
+
+            model B {
+                id    Int     @id
+                name  String?
+                links C[]
+            }
+
+            model C {
+                a_id Int
+                b_id Int
+                a    A   @relation(fields: [a_id], references: [id])
+                b    B   @relation(fields: [b_id], references: [id])
+
+                @@id([a_id, b_id])
+            }
+        "#,
+    );
+
+    let from_file = write_file_to_tmp(&from_schema, &tempdir, "from");
+    let to_file = write_file_to_tmp(&to_schema, &tempdir, "to");
+
+    api.diff(DiffParams {
+        exit_code: None,
+        from: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: from_file.to_string_lossy().into_owned(),
+                content: from_schema.to_string(),
+            }],
+        }),
+        shadow_database_url: None,
+        to: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: to_file.to_string_lossy().into_owned(),
+                content: to_schema.to_string(),
+            }],
+        }),
+        script: true,
+    })
+    .unwrap();
+
+    let expected_printed_messages = if api.is_mysql() {
+        expect![[r#"
+            [
+                [
+                    "-- DropIndex",
+                    "DROP INDEX `A_id_key` ON `A`;",
+                    "",
+                    "-- DropIndex",
+                    "DROP INDEX `B_id_key` ON `B`;",
+                    "",
+                    "-- DropIndex",
+                    "DROP INDEX `C_a_id_b_id_key` ON `C`;",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE `A` ADD PRIMARY KEY (`id`);",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE `B` ADD PRIMARY KEY (`id`);",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE `C` ADD PRIMARY KEY (`a_id`, `b_id`);",
+                    "",
+                ],
+            ]
+        "#]]
+    } else if api.is_postgres() || api.is_cockroach() {
+        expect![[r#"
+            [
+                [
+                    "-- DropIndex",
+                    "DROP INDEX \"A_id_key\";",
+                    "",
+                    "-- DropIndex",
+                    "DROP INDEX \"B_id_key\";",
+                    "",
+                    "-- DropIndex",
+                    "DROP INDEX \"C_a_id_b_id_key\";",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE \"A\" ADD CONSTRAINT \"A_pkey\" PRIMARY KEY (\"id\");",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE \"B\" ADD CONSTRAINT \"B_pkey\" PRIMARY KEY (\"id\");",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE \"C\" ADD CONSTRAINT \"C_pkey\" PRIMARY KEY (\"a_id\", \"b_id\");",
+                    "",
+                ],
+            ]
+        "#]]
+    } else if api.is_mssql() {
+        expect![[r#"
+            [
+                [
+                    "BEGIN TRY",
+                    "",
+                    "BEGIN TRAN;",
+                    "",
+                    "-- DropIndex",
+                    "DROP INDEX [A_id_key] ON [dbo].[A];",
+                    "",
+                    "-- DropIndex",
+                    "DROP INDEX [B_id_key] ON [dbo].[B];",
+                    "",
+                    "-- DropIndex",
+                    "DROP INDEX [C_a_id_b_id_key] ON [dbo].[C];",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE [dbo].[A] ADD CONSTRAINT A_pkey PRIMARY KEY CLUSTERED ([id]);",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE [dbo].[B] ADD CONSTRAINT B_pkey PRIMARY KEY CLUSTERED ([id]);",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE [dbo].[C] ADD CONSTRAINT C_pkey PRIMARY KEY CLUSTERED ([a_id],[b_id]);",
+                    "",
+                    "COMMIT TRAN;",
+                    "",
+                    "END TRY",
+                    "BEGIN CATCH",
+                    "",
+                    "IF @@TRANCOUNT > 0",
+                    "BEGIN",
+                    "    ROLLBACK TRAN;",
+                    "END;",
+                    "THROW",
+                    "",
+                    "END CATCH",
+                    "",
+                ],
+            ]
+        "#]]
+    } else if api.is_sqlite() {
+        expect![[r#"
+            [
+                [
+                    "-- RedefineTables",
+                    "PRAGMA defer_foreign_keys=ON;",
+                    "PRAGMA foreign_keys=OFF;",
+                    "CREATE TABLE \"new_A\" (",
+                    "    \"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,",
+                    "    \"name\" TEXT",
+                    ");",
+                    "INSERT INTO \"new_A\" (\"id\", \"name\") SELECT \"id\", \"name\" FROM \"A\";",
+                    "DROP TABLE \"A\";",
+                    "ALTER TABLE \"new_A\" RENAME TO \"A\";",
+                    "CREATE TABLE \"new_B\" (",
+                    "    \"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,",
+                    "    \"name\" TEXT",
+                    ");",
+                    "INSERT INTO \"new_B\" (\"id\", \"name\") SELECT \"id\", \"name\" FROM \"B\";",
+                    "DROP TABLE \"B\";",
+                    "ALTER TABLE \"new_B\" RENAME TO \"B\";",
+                    "CREATE TABLE \"new_C\" (",
+                    "    \"a_id\" INTEGER NOT NULL,",
+                    "    \"b_id\" INTEGER NOT NULL,",
+                    "",
+                    "    PRIMARY KEY (\"a_id\", \"b_id\"),",
+                    "    CONSTRAINT \"C_a_id_fkey\" FOREIGN KEY (\"a_id\") REFERENCES \"A\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE,",
+                    "    CONSTRAINT \"C_b_id_fkey\" FOREIGN KEY (\"b_id\") REFERENCES \"B\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE",
+                    ");",
+                    "INSERT INTO \"new_C\" (\"a_id\", \"b_id\") SELECT \"a_id\", \"b_id\" FROM \"C\";",
+                    "DROP TABLE \"C\";",
+                    "ALTER TABLE \"new_C\" RENAME TO \"C\";",
+                    "PRAGMA foreign_keys=ON;",
+                    "PRAGMA defer_foreign_keys=OFF;",
+                    "",
+                ],
+            ]
+        "#]]
+    } else {
+        unreachable!()
+    };
+
+    expected_printed_messages.assert_debug_eq(
+        &host
+            .printed_messages
+            .lock()
+            .unwrap()
+            .iter()
+            .map(|msg| msg.split('\n').map(<_>::to_owned).collect())
+            .collect::<Vec<Vec<_>>>(),
+    );
+}
+
 #[test_connector(tags(Sqlite))]
 fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
     // We should get a postgres diff.
