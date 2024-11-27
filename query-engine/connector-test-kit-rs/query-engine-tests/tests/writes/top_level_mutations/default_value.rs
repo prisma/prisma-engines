@@ -185,7 +185,7 @@ mod default_value {
               name
             }
           }"#),
-          @r###"{"data":{"createOneUser":{"name":"Spiderman"}}}"###
+          @r###"{"data":{"createOneUser":{"name":"Peter Parker"}}}"###
         );
 
         insta::assert_snapshot!(
@@ -200,7 +200,7 @@ mod default_value {
               name
             }
           }"#),
-          @r###"{"data":{"createOneUser":{"name":"Superman"}}}"###
+          @r###"{"data":{"createOneUser":{"name":"Clark Kent"}}}"###
         );
 
         insta::assert_snapshot!(
@@ -210,7 +210,7 @@ mod default_value {
               age
             }
           }"#),
-          @r###"{"data":{"findUniqueUser":{"name":"Superman","age":32}}}"###
+          @r###"{"data":{"findUniqueUser":{"name":"Clark Kent","age":32}}}"###
         );
 
         insta::assert_snapshot!(
@@ -225,7 +225,7 @@ mod default_value {
               age
             }
           }"#),
-          @r###"{"data":{"findManyUser":[{"name":"Spiderman","age":21},{"name":"Superman","age":32}]}}"###
+          @r###"{"data":{"findManyUser":[{"name":"Peter Parker","age":21},{"name":"Clark Kent","age":32}]}}"###
         );
 
         Ok(())
