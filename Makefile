@@ -67,6 +67,10 @@ build-qe-wasm-gz: build-qe-wasm
         gzip -knc $$provider/query_engine_bg.wasm > $$provider.gz; \
     done;
 
+integrate-qe-wasm:
+	cd query-engine/query-engine-wasm && \
+	./build.sh $(QE_WASM_VERSION) ../prisma/packages/client/node_modules/@prisma/query-engine-wasm
+
 build-schema-wasm:
 	@printf '%s\n' "🛠️  Building the Rust crate"
 	cargo build --profile $(PROFILE) --target=wasm32-unknown-unknown -p prisma-schema-build
@@ -353,6 +357,9 @@ start-mongodb_5:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans mongo5
 
 dev-mongodb_5: start-mongodb_5
+	cp $(CONFIG_PATH)/mongodb5 $(CONFIG_FILE)
+
+dev-mongodb_5_single: start-mongodb5-single
 	cp $(CONFIG_PATH)/mongodb5 $(CONFIG_FILE)
 
 dev-mongodb_4_2: start-mongodb_4_2

@@ -674,7 +674,7 @@ fn multi_column_fulltext_index_with_asc_in_beginning_desc_in_end() {
 }
 
 #[test]
-fn fultext_index_without_preview_flag() {
+fn fultext_index() {
     let depth = CompositeTypeDepth::Infinite;
 
     let res = introspect_features(depth, Default::default(), |db| async move {
@@ -701,6 +701,8 @@ fn fultext_index_without_preview_flag() {
           id   String @id @default(auto()) @map("_id") @db.ObjectId
           age  Int
           name String
+
+          @@fulltext([name], map: "name_\"text\"")
         }
     "#]];
 
@@ -708,7 +710,7 @@ fn fultext_index_without_preview_flag() {
 }
 
 #[test]
-fn fultext_composite_index_without_preview_flag() {
+fn fultext_composite_index() {
     let depth = CompositeTypeDepth::Infinite;
 
     let res = introspect_features(depth, Default::default(), |db| async move {
@@ -739,6 +741,8 @@ fn fultext_composite_index_without_preview_flag() {
           id      String     @id @default(auto()) @map("_id") @db.ObjectId
           address CatAddress
           name    String
+
+          @@fulltext([address.street], map: "address.street_\"text\"")
         }
     "#]];
 

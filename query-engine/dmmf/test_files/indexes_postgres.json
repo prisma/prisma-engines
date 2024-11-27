@@ -4,6 +4,7 @@
     {
       "name": "Example",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "id",
@@ -15,6 +16,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Int",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -28,6 +30,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "Json",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         }

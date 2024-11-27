@@ -81,7 +81,7 @@ fn simple_composite_fulltext() {
         }
     "#};
 
-    psl::parse_schema(with_header(schema, crate::Provider::Mongo, &["fullTextIndex"]))
+    psl::parse_schema(with_header(schema, crate::Provider::Mongo, &[]))
         .unwrap()
         .assert_has_model("B")
         .assert_fulltext_on_fields(&["field"]);
@@ -171,7 +171,7 @@ fn reformat() {
         }
     "#};
 
-    let datamodel = with_header(schema, crate::Provider::Mongo, &["fullTextIndex"]);
+    let datamodel = with_header(schema, crate::Provider::Mongo, &[]);
     let result = psl::reformat(&datamodel, 2).unwrap_or_else(|| datamodel.to_owned());
 
     let expected = expect![[r#"
@@ -181,8 +181,7 @@ fn reformat() {
         }
 
         generator client {
-          provider        = "prisma-client-js"
-          previewFeatures = ["fullTextIndex"]
+          provider = "prisma-client-js"
         }
 
         type A {

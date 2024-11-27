@@ -158,7 +158,7 @@ fn mssql_apply_migrations_error_output(api: TestApi) {
         .split_terminator("   0: ")
         .next()
         .unwrap()
-        .trim_end_matches(|c| c == '\n' || c == ' ');
+        .trim_end_matches(['\n', ' ']);
 
     expectation.assert_eq(first_segment)
 }

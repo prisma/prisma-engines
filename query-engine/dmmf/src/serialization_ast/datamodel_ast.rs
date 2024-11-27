@@ -25,6 +25,8 @@ pub struct Field {
     #[serde(rename = "type")]
     pub field_type: String,
 
+    pub native_type: Option<(String, Vec<String>)>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default: Option<serde_json::Value>,
 
@@ -62,6 +64,8 @@ pub struct Function {
 pub struct Model {
     pub name: String,
     pub db_name: Option<String>,
+    pub schema: Option<String>,
+
     pub fields: Vec<Field>,
     pub primary_key: Option<PrimaryKey>,
     pub unique_fields: Vec<Vec<String>>,

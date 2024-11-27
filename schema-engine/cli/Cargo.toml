@@ -36,6 +36,9 @@ connection-string.workspace = true
 expect-test = "1.4.0"
 quaint = { workspace = true, features = ["all-native"] }
 
+[build-dependencies]
+build-utils.path = "../../libs/build-utils"
+
 [[bin]]
 name = "schema-engine"
 path = "src/main.rs"

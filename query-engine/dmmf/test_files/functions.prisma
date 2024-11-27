@@ -1,5 +1,12 @@
 model User {
-  id        Int      @id
-  createdAt DateTime @default(now())
-  someId    String   @default(cuid()) @unique
+  id             Int      @id
+  createdAt      DateTime @default(now())
+  someCuid       String   @default(cuid())    @unique
+  someCuid1      String   @default(cuid(1))   @unique
+  someCuid2      String   @default(cuid(2))   @unique
+  someUuid       String   @default(uuid())    @unique
+  someUuid4      String   @default(uuid(4))   @unique
+  someUuid7      String   @default(uuid(7))   @unique
+  someNanoid     String   @default(nanoid())  @unique
+  someNanoidLen6 String   @default(nanoid(6)) @unique
 }

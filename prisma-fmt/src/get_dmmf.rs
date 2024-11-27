@@ -373,6 +373,7 @@ mod tests {
                   {
                     "name": "A",
                     "dbName": null,
+                    "schema": null,
                     "fields": [
                       {
                         "name": "id",
@@ -384,6 +385,7 @@ mod tests {
                         "isReadOnly": false,
                         "hasDefaultValue": false,
                         "type": "String",
+                        "nativeType": null,
                         "isGenerated": false,
                         "isUpdatedAt": false
                       },
@@ -397,6 +399,7 @@ mod tests {
                         "isReadOnly": true,
                         "hasDefaultValue": false,
                         "type": "String",
+                        "nativeType": null,
                         "isGenerated": false,
                         "isUpdatedAt": false
                       },
@@ -410,6 +413,7 @@ mod tests {
                         "isReadOnly": false,
                         "hasDefaultValue": false,
                         "type": "B",
+                        "nativeType": null,
                         "relationName": "AToB",
                         "relationFromFields": [
                           "b_id"
@@ -429,6 +433,7 @@ mod tests {
                   {
                     "name": "B",
                     "dbName": null,
+                    "schema": null,
                     "fields": [
                       {
                         "name": "id",
@@ -440,6 +445,7 @@ mod tests {
                         "isReadOnly": false,
                         "hasDefaultValue": false,
                         "type": "String",
+                        "nativeType": null,
                         "isGenerated": false,
                         "isUpdatedAt": false
                       },
@@ -453,6 +459,7 @@ mod tests {
                         "isReadOnly": false,
                         "hasDefaultValue": false,
                         "type": "A",
+                        "nativeType": null,
                         "relationName": "AToB",
                         "relationFromFields": [],
                         "relationToFields": [],
@@ -606,7 +613,7 @@ mod tests {
                           "isNullable": false,
                           "inputTypes": [
                             {
-                              "type": "BRelationFilter",
+                              "type": "BScalarRelationFilter",
                               "namespace": "prisma",
                               "location": "inputObjectTypes",
                               "isList": false
@@ -764,7 +771,7 @@ mod tests {
                           "isNullable": false,
                           "inputTypes": [
                             {
-                              "type": "BRelationFilter",
+                              "type": "BScalarRelationFilter",
                               "namespace": "prisma",
                               "location": "inputObjectTypes",
                               "isList": false
@@ -1037,7 +1044,7 @@ mod tests {
                           "isNullable": true,
                           "inputTypes": [
                             {
-                              "type": "ANullableRelationFilter",
+                              "type": "ANullableScalarRelationFilter",
                               "namespace": "prisma",
                               "location": "inputObjectTypes",
                               "isList": false
@@ -1174,7 +1181,7 @@ mod tests {
                           "isNullable": true,
                           "inputTypes": [
                             {
-                              "type": "ANullableRelationFilter",
+                              "type": "ANullableScalarRelationFilter",
                               "namespace": "prisma",
                               "location": "inputObjectTypes",
                               "isList": false
@@ -2037,7 +2044,7 @@ mod tests {
                       ]
                     },
                     {
-                      "name": "BRelationFilter",
+                      "name": "BScalarRelationFilter",
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null
@@ -2436,7 +2443,7 @@ mod tests {
                       ]
                     },
                     {
-                      "name": "ANullableRelationFilter",
+                      "name": "ANullableScalarRelationFilter",
                       "constraints": {
                         "maxNumFields": null,
                         "minNumFields": null

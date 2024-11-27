@@ -1,7 +1,7 @@
 use futures::TryFutureExt;
 use std::future::Future;
 
-use crate::common::SpawnError;
+use crate::common::spawn::SpawnError;
 
 pub fn spawn_if_possible<F>(future: F) -> impl Future<Output = Result<F::Output, SpawnError>>
 where

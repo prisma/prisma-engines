@@ -68,10 +68,7 @@ pub struct UniqueKeyViolation {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(
-    code = "P2003",
-    message = "Foreign key constraint failed on the field: `{field_name}`"
-)]
+#[user_facing(code = "P2003", message = "Foreign key constraint violated: `{field_name}`")]
 pub struct ForeignKeyViolation {
     /// Field name from one model from Prisma schema
     pub field_name: String,

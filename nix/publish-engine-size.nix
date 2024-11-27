@@ -22,11 +22,14 @@ let
   craneLib = (flakeInputs.crane.mkLib pkgs).overrideToolchain rustToolchain;
   deps = craneLib.vendorCargoDeps { inherit src; };
   libSuffix = stdenv.hostPlatform.extensions.sharedLibrary;
+  fakeGitHash = "0000000000000000000000000000000000000000";
 in
 {
   packages.prisma-engines = stdenv.mkDerivation {
     name = "prisma-engines";
     inherit src;
+
+    GIT_HASH = "${fakeGitHash}";
 
     buildInputs = [ pkgs.openssl.out ];
     nativeBuildInputs = with pkgs; [
@@ -38,6 +41,7 @@ in
     ] ++ lib.optionals stdenv.isDarwin [
       perl # required to build openssl
       darwin.apple_sdk.frameworks.Security
+      darwin.apple_sdk.frameworks.SystemConfiguration
       iconv
     ];
 
@@ -68,6 +72,8 @@ in
       inherit src;
       inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs configurePhase dontStrip;
 
+      GIT_HASH = "${fakeGitHash}";
+
       buildPhase = "cargo build --profile=${profile} --bin=test-cli";
 
       installPhase = ''
@@ -84,6 +90,8 @@ in
       name = "query-engine-bin";
       inherit src;
       inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs configurePhase dontStrip;
+
+      GIT_HASH = "${fakeGitHash}";
 
       buildPhase = "cargo build --profile=${profile} --bin=query-engine";
 
@@ -104,6 +112,8 @@ in
       name = "query-engine-bin-and-lib";
       inherit src;
       inherit (self'.packages.prisma-engines) buildInputs nativeBuildInputs configurePhase dontStrip;
+
+      GIT_HASH = "${fakeGitHash}";
 
       buildPhase = ''
         cargo build --profile=${profile} --bin=query-engine
@@ -133,6 +143,8 @@ in
       name = "query-engine-wasm-gz";
       inherit src;
       buildInputs = with pkgs; [ iconv ];
+
+      GIT_HASH = "${fakeGitHash}";
 
       buildPhase = ''
       export HOME=$(mktemp -dt wasm-engine-home-XXXX)

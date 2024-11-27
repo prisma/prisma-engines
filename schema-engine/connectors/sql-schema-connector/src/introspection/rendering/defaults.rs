@@ -45,8 +45,24 @@ pub(crate) fn render(default: DefaultValuePair<'_>) -> Option<renderer::DefaultV
                 Some(renderer::DefaultValue::function(fun))
             }
             DefaultKind::Autoincrement => Some(renderer::DefaultValue::function(Function::new("autoincrement"))),
-            DefaultKind::Uuid => Some(renderer::DefaultValue::function(Function::new("uuid"))),
-            DefaultKind::Cuid => Some(renderer::DefaultValue::function(Function::new("cuid"))),
+            DefaultKind::Uuid(version) => {
+                let mut fun = Function::new("uuid");
+
+                if let Some(version) = version {
+                    fun.push_param(Value::from(Constant::from(version)));
+                }
+
+                Some(renderer::DefaultValue::function(fun))
+            }
+            DefaultKind::Cuid(version) => {
+                let mut fun = Function::new("cuid");
+
+                if let Some(version) = version {
+                    fun.push_param(Value::from(Constant::from(version)));
+                }
+
+                Some(renderer::DefaultValue::function(fun))
+            }
             DefaultKind::Nanoid(length) => {
                 let mut fun = Function::new("nanoid");
 

@@ -84,7 +84,7 @@ impl ConnectionInfo {
             }
             #[cfg(feature = "postgresql")]
             SqlFamily::Postgres => Ok(ConnectionInfo::Native(NativeConnectionInfo::Postgres(
-                PostgresUrl::new(url)?,
+                super::PostgresUrl::new_native(url)?,
             ))),
             #[allow(unreachable_patterns)]
             _ => unreachable!(),
@@ -243,7 +243,7 @@ impl ConnectionInfo {
     pub fn pg_bouncer(&self) -> bool {
         match self {
             #[cfg(all(not(target_arch = "wasm32"), feature = "postgresql"))]
-            ConnectionInfo::Native(NativeConnectionInfo::Postgres(url)) => url.pg_bouncer(),
+            ConnectionInfo::Native(NativeConnectionInfo::Postgres(PostgresUrl::Native(url))) => url.pg_bouncer(),
             _ => false,
         }
     }

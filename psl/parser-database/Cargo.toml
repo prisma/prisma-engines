@@ -8,5 +8,6 @@ diagnostics = { path = "../diagnostics" }
 schema-ast = { path = "../schema-ast" }
 indexmap.workspace = true
 enumflags2.workspace = true
+itertools.workspace = true
 either = "1.6.1"
 rustc-hash = "1.1.0"

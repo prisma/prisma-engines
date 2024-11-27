@@ -944,8 +944,7 @@ fn reformatting_extended_indexes_works() {
 fn reformatting_with_empty_indexes() {
     let schema = r#"
         generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["fullTextIndex"]
+          provider = "prisma-client-js"
         }
 
         datasource db {
@@ -966,8 +965,7 @@ fn reformatting_with_empty_indexes() {
 
     let expected = expect![[r#"
         generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["fullTextIndex"]
+          provider = "prisma-client-js"
         }
 
         datasource db {

@@ -337,6 +337,32 @@ fn uuid_fields_must_work() {
     model
         .assert_scalar_field("id")
         .assert_type_identifier(TypeIdentifier::String);
+
+    let datamodel = convert(
+        r#"
+            model Test {
+                id String @id @default(uuid(4))
+            }
+        "#,
+    );
+
+    let model = datamodel.assert_model("Test");
+    model
+        .assert_scalar_field("id")
+        .assert_type_identifier(TypeIdentifier::String);
+
+    let datamodel = convert(
+        r#"
+            model Test {
+                id String @id @default(uuid(7))
+            }
+        "#,
+    );
+
+    let model = datamodel.assert_model("Test");
+    model
+        .assert_scalar_field("id")
+        .assert_type_identifier(TypeIdentifier::String);
 }
 
 #[test]
@@ -345,6 +371,32 @@ fn cuid_fields_must_work() {
         r#"
             model Test {
                 id String @id @default(cuid())
+            }
+        "#,
+    );
+
+    let model = datamodel.assert_model("Test");
+    model
+        .assert_scalar_field("id")
+        .assert_type_identifier(TypeIdentifier::String);
+
+    let datamodel = convert(
+        r#"
+            model Test {
+                id String @id @default(cuid(1))
+            }
+        "#,
+    );
+
+    let model = datamodel.assert_model("Test");
+    model
+        .assert_scalar_field("id")
+        .assert_type_identifier(TypeIdentifier::String);
+
+    let datamodel = convert(
+        r#"
+            model Test {
+                id String @id @default(cuid(2))
             }
         "#,
     );

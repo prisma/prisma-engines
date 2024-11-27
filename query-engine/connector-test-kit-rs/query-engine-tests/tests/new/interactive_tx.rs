@@ -3,6 +3,8 @@ use std::borrow::Cow;
 
 #[test_suite(schema(generic), exclude(Sqlite("cfd1")))]
 mod interactive_tx {
+    use std::time::{Duration, Instant};
+
     use query_engine_tests::*;
     use tokio::time;
 
@@ -213,7 +215,7 @@ mod interactive_tx {
         Ok(())
     }
 
-    #[connector_test(exclude(Vitess("planetscale.js.wasm"), Sqlite("cfd1")))]
+    #[connector_test(exclude(Sqlite("cfd1")))]
     async fn batch_queries_failure(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
         let tx_id = runner.start_tx(5000, 5000, None).await?;
@@ -231,7 +233,9 @@ mod interactive_tx {
         let batch_results = runner.batch(queries, false, None).await?;
         batch_results.assert_failure(2002, None);
 
+        let now = Instant::now();
         let res = runner.commit_tx(tx_id.clone()).await?;
+        assert!(now.elapsed() <= Duration::from_millis(5000));
 
         if matches!(runner.connector_version(), ConnectorVersion::MongoDb(_)) {
             assert!(res.is_err());
@@ -256,7 +260,7 @@ mod interactive_tx {
         Ok(())
     }
 
-    #[connector_test(exclude(Vitess("planetscale.js.wasm")))]
+    #[connector_test]
     async fn tx_expiration_failure_cycle(mut runner: Runner) -> TestResult<()> {
         // Tx expires after one seconds.
         let tx_id = runner.start_tx(5000, 1000, None).await?;
@@ -570,13 +574,13 @@ mod interactive_tx {
 
 #[test_suite(schema(generic), exclude(Sqlite("cfd1")))]
 mod itx_isolation {
+    use std::sync::Arc;
+
     use query_engine_tests::*;
+    use tokio::task::JoinSet;
 
     // All (SQL) connectors support serializable.
-    // However, there's a bug in the PlanetScale driver adapter:
-    // "Transaction characteristics can't be changed while a transaction is in progress
-    // (errno 1568) (sqlstate 25001) during query: SET TRANSACTION ISOLATION LEVEL SERIALIZABLE"
-    #[connector_test(exclude(MongoDb, Vitess("planetscale.js", "planetscale.js.wasm"), Sqlite("cfd1")))]
+    #[connector_test(exclude(MongoDb, Sqlite("cfd1")))]
     async fn basic_serializable(mut runner: Runner) -> TestResult<()> {
         let tx_id = runner.start_tx(5000, 5000, Some("Serializable".to_owned())).await?;
         runner.set_active_tx(tx_id.clone());
@@ -598,9 +602,7 @@ mod itx_isolation {
         Ok(())
     }
 
-    // On PlanetScale, this fails with:
-    // `InteractiveTransactionError("Error in connector: Error querying the database: Server error: `ERROR 25001 (1568): Transaction characteristics can't be changed while a transaction is in progress'")`
-    #[connector_test(exclude(MongoDb, Vitess("planetscale.js", "planetscale.js.wasm"), Sqlite("cfd1")))]
+    #[connector_test(exclude(MongoDb, Sqlite("cfd1")))]
     async fn casing_doesnt_matter(mut runner: Runner) -> TestResult<()> {
         let tx_id = runner.start_tx(5000, 5000, Some("sErIaLiZaBlE".to_owned())).await?;
         runner.set_active_tx(tx_id.clone());
@@ -651,6 +653,47 @@ mod itx_isolation {
                 "Unsupported connector feature: Mongo does not support setting transaction isolation levels"
             )),
         };
+
+        Ok(())
+    }
+
+    #[connector_test(exclude(Sqlite))]
+    async fn high_concurrency(runner: Runner) -> TestResult<()> {
+        let runner = Arc::new(runner);
+        let mut set = JoinSet::<TestResult<()>>::new();
+
+        for i in 1..=20 {
+            set.spawn({
+                let runner = Arc::clone(&runner);
+                async move {
+                    let tx_id = runner.start_tx(5000, 5000, None).await?;
+
+                    runner
+                        .query_in_tx(
+                            &tx_id,
+                            format!(
+                                r#"mutation {{
+                                    createOneTestModel(
+                                        data: {{
+                                            id: {i}
+                                        }}
+                                    ) {{ id }}
+                                }}"#
+                            ),
+                        )
+                        .await?
+                        .assert_success();
+
+                    runner.commit_tx(tx_id).await?.expect("commit must succeed");
+
+                    Ok(())
+                }
+            });
+        }
+
+        while let Some(handle) = set.join_next().await {
+            handle.expect("task panicked or canceled")?;
+        }
 
         Ok(())
     }
