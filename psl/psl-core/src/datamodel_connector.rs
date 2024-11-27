@@ -59,6 +59,11 @@ pub trait Connector: Send + Sync {
     /// The static list of capabilities for the connector.
     fn capabilities(&self) -> ConnectorCapabilities;
 
+    /// The connector-specific name of the `fullTextSearch` preview feature.
+    fn native_full_text_search_preview_feature(&self) -> Option<PreviewFeature> {
+        None
+    }
+
     /// The maximum length of constraint names in bytes. Connectors without a
     /// limit should return usize::MAX.
     fn max_identifier_length(&self) -> usize;

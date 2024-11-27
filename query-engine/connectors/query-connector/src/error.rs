@@ -89,8 +89,8 @@ impl ConnectorError {
                 },
             )),
 
-            ErrorKind::MissingFullTextSearchIndex => Some(KnownError::new(
-                user_facing_errors::query_engine::MissingFullTextSearchIndex {},
+            ErrorKind::MissingNativeFullTextSearchIndex => Some(KnownError::new(
+                user_facing_errors::query_engine::MissingNativeFullTextSearchIndex {},
             )),
             ErrorKind::TransactionAborted { message } => Some(KnownError::new(
                 user_facing_errors::query_engine::InteractiveTransactionError { error: message.clone() },
@@ -270,8 +270,8 @@ pub enum ErrorKind {
     #[error("The query parameter limit supported by your database is exceeded: {0}.")]
     QueryParameterLimitExceeded(String),
 
-    #[error("Cannot find a fulltext index to use for the search")]
-    MissingFullTextSearchIndex,
+    #[error("Cannot find a fulltext index to use for the native search")]
+    MissingNativeFullTextSearchIndex,
 
     #[error("Replica Set required for Transactions")]
     MongoReplicaSetRequired,

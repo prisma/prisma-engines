@@ -490,7 +490,7 @@ async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
     Ok(())
 }
 
-#[test_suite(schema(schema), capabilities(FullTextSearchWithoutIndex))]
+#[test_suite(schema(schema), capabilities(NativeFullTextSearchWithoutIndex))]
 mod order_by_relevance_without_index {
     use indoc::indoc;
 
@@ -572,7 +572,7 @@ mod order_by_relevance_without_index {
     }
 }
 
-#[test_suite(schema(schema), capabilities(FullTextSearchWithIndex))]
+#[test_suite(schema(schema), capabilities(NativeFullTextSearchWithIndex))]
 mod order_by_relevance_with_index {
     use indoc::indoc;
 
