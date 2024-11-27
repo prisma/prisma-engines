@@ -21,6 +21,7 @@ pub trait Transaction: Queryable {
     fn as_queryable(&self) -> &dyn Queryable;
 }
 
+#[cfg(any(feature = "mssql-native", feature = "postgresql-native", feature = "mysql-native"))]
 pub(crate) struct TransactionOptions {
     /// The isolation level to use.
     pub(crate) isolation_level: Option<IsolationLevel>,
@@ -28,6 +29,17 @@ pub(crate) struct TransactionOptions {
     /// Whether or not to put the isolation level `SET` before or after the `BEGIN`.
     pub(crate) isolation_first: bool,
 }
+
+#[cfg(any(feature = "mssql-native", feature = "postgresql-native", feature = "mysql-native"))]
+impl TransactionOptions {
+    pub fn new(isolation_level: Option<IsolationLevel>, isolation_first: bool) -> Self {
+        Self {
+            isolation_level,
+            isolation_first,
+        }
+    }
+}
+
 
 /// A default representation of an SQL database transaction. If not commited, a
 /// transaction will be rolled back by default when dropped.
@@ -40,6 +52,7 @@ pub struct DefaultTransaction<'a> {
 }
 
 impl<'a> DefaultTransaction<'a> {
+    #[cfg(any(feature = "mssql-native", feature = "postgresql-native", feature = "mysql-native"))]
     pub(crate) async fn new(
         inner: &'a dyn Queryable,
         begin_stmt: &str,
@@ -193,14 +206,6 @@ impl FromStr for IsolationLevel {
                 let kind = ErrorKind::conversion(format!("Invalid isolation level `{s}`"));
                 Err(Error::builder(kind).build())
             }
-        }
-    }
-}
-impl TransactionOptions {
-    pub fn new(isolation_level: Option<IsolationLevel>, isolation_first: bool) -> Self {
-        Self {
-            isolation_level,
-            isolation_first,
         }
     }
 }

@@ -112,6 +112,7 @@ pub trait TransactionCapable: Queryable {
     ) -> crate::Result<Box<dyn Transaction + 'a>>;
 }
 
+#[cfg(any(feature = "mssql-native", feature = "postgresql-native", feature = "mysql-native"))]
 macro_rules! impl_default_TransactionCapable {
     ($t:ty) => {
         #[async_trait]
@@ -130,4 +131,5 @@ macro_rules! impl_default_TransactionCapable {
     };
 }
 
+#[cfg(any(feature = "mssql-native", feature = "postgresql-native", feature = "mysql-native"))]
 pub(crate) use impl_default_TransactionCapable;
