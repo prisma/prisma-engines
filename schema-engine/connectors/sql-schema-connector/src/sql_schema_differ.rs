@@ -40,7 +40,7 @@ pub(crate) fn calculate_steps(
     flavour.push_enum_steps(&mut steps, &db);
     flavour.push_alter_sequence_steps(&mut steps, &db);
 
-    steps.sort();
+    sort_migration_steps(&mut steps, &db);
 
     steps
 }
@@ -540,4 +540,82 @@ fn is_prisma_implicit_m2m_fk(fk: ForeignKeyWalker<'_>) -> bool {
 
 fn all_match<T: PartialEq>(a: &mut dyn ExactSizeIterator<Item = T>, b: &mut dyn ExactSizeIterator<Item = T>) -> bool {
     a.len() == b.len() && a.zip(b).all(|(a, b)| a == b)
+}
+
+fn sort_migration_steps(steps: &mut [SqlMigrationStep], db: &DifferDatabase<'_>) {
+    dbg!(&steps);
+    steps.sort_by(|a, b| match (a, b) {
+        // TODO: does this define a total order???
+        (SqlMigrationStep::DropIndex { index_id }, SqlMigrationStep::AlterTable(alter_table)) => {
+            if move_drop_unique_index_after_creating_pk(db, *index_id, alter_table) {
+                std::cmp::Ordering::Greater
+            } else {
+                a.cmp(b)
+            }
+        }
+        _ => a.cmp(b),
+    });
+}
+
+fn move_drop_unique_index_after_creating_pk(
+    db: &DifferDatabase<'_>,
+    index_id: IndexId,
+    alter_table: &AlterTable,
+) -> bool {
+    let index = db.schemas.previous.describer_schema.walk(index_id);
+    dbg!(index.column_names().collect::<Vec<_>>());
+
+    if !index.is_unique() {
+        return false;
+    }
+
+    if alter_table.table_ids.previous != index.table().id {
+        return false;
+    }
+
+    if db
+        .schemas
+        .previous
+        .describer_schema
+        .walk(alter_table.table_ids.previous)
+        .primary_key()
+        .is_some()
+    {
+        return false;
+    }
+
+    let Some(pk_columns) = db
+        .schemas
+        .next
+        .describer_schema
+        .walk(alter_table.table_ids.next)
+        .primary_key_columns()
+    else {
+        return false;
+    };
+
+    if !all_match(&mut index.column_names(), &mut pk_columns.map(|col| col.name())) {
+        return false;
+    }
+
+    let added_pk_in_this_alter_stmt = alter_table
+        .changes
+        .iter()
+        .any(|change| matches!(change, TableChange::AddPrimaryKey));
+
+    if !added_pk_in_this_alter_stmt {
+        return false;
+    }
+
+    let dropped_index_column_in_this_alter_stmt = alter_table.changes.iter().any(|change| match change {
+        TableChange::DropColumn { column_id } => index.contains_column(*column_id),
+        TableChange::DropAndRecreateColumn { column_id, .. } => index.contains_column(column_id.previous),
+        _ => false,
+    });
+
+    if dropped_index_column_in_this_alter_stmt {
+        return false;
+    }
+
+    true
 }
