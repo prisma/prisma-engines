@@ -975,3 +975,81 @@ fn changing_normal_index_to_a_fulltext_index(api: TestApi) {
         table.assert_index_on_columns(&["a", "b"], |index| index.assert_is_fulltext())
     });
 }
+
+#[test_connector]
+fn changing_unique_to_pk_works(api: TestApi) {
+    let dm1 = indoc! {r#"
+        model A {
+            id    Int     @unique
+            name  String?
+            links C[]
+        }
+
+        model B {
+            id    Int     @unique
+            name  String?
+            links C[]
+        }
+
+        model C {
+            a_id Int
+            b_id Int
+            a    A   @relation(fields: [a_id], references: [id])
+            b    B   @relation(fields: [b_id], references: [id])
+
+            @@unique([a_id, b_id])
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+
+    api.assert_schema()
+        .assert_table("A", |table| {
+            table.assert_index_on_columns(&["id"], |index| index.assert_is_unique())
+        })
+        .assert_table("B", |table| {
+            table.assert_index_on_columns(&["id"], |index| index.assert_is_unique())
+        })
+        .assert_table("C", |table| {
+            table.assert_index_on_columns(&["a_id", "b_id"], |index| index.assert_is_unique())
+        });
+
+    let dm2 = indoc! {r#"
+        model A {
+            id    Int     @id
+            name  String?
+            links C[]
+        }
+
+        model B {
+            id    Int     @id
+            name  String?
+            links C[]
+        }
+
+        model C {
+            a_id Int
+            b_id Int
+            a    A   @relation(fields: [a_id], references: [id])
+            b    B   @relation(fields: [b_id], references: [id])
+
+            @@id([a_id, b_id])
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm2).send().assert_green();
+
+    api.assert_schema()
+        .assert_table("A", |table| {
+            table.assert_indexes_count(1);
+            table.assert_pk(|pk| pk.assert_columns(&["id"]))
+        })
+        .assert_table("B", |table| {
+            table.assert_indexes_count(1);
+            table.assert_pk(|pk| pk.assert_columns(&["id"]))
+        })
+        .assert_table("C", |table| {
+            table.assert_indexes_count(1);
+            table.assert_pk(|pk| pk.assert_columns(&["a_id", "b_id"]))
+        });
+}
