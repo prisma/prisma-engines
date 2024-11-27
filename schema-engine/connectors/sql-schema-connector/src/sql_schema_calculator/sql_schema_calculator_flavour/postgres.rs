@@ -164,7 +164,11 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
     }
 
     fn m2m_join_table_constraint(&self) -> JoinTableUniquenessConstraint {
-        JoinTableUniquenessConstraint::PrimaryKey
+        if self.is_cockroachdb() {
+            JoinTableUniquenessConstraint::UniqueIndex
+        } else {
+            JoinTableUniquenessConstraint::PrimaryKey
+        }
     }
 }
 
