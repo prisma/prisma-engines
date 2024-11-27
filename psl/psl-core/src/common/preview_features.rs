@@ -269,7 +269,7 @@ impl<'a> FeatureMapWithProvider<'a> {
         provider_specific.or_else(|| {
             self.feature_map
                 .renamed
-                .get(&RenamedFeatureKey::<'a> {
+                .get(&RenamedFeatureKey {
                     from: flag,
                     provider: None,
                 })
