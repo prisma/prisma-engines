@@ -1024,7 +1024,7 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: Te
         if api.is_postgres() {
             table.assert_pk(|pk| {
                 pk.assert_columns(&["A", "B"])
-                    .assert_constraint_name("_ProfileToSkill_AB_pk")
+                    .assert_constraint_name("_ProfileToSkill_AB_pkey")
             })
         } else {
             table.assert_index_on_columns(&["A", "B"], |idx| {
