@@ -14,7 +14,7 @@ model Blog {
   title   String
   @@index([content, title])
 }
-// [1;93mwarning[0m: [1mOn `provider = "postgresql"`, preview feature "fullTextSearch" has been renamed as "nativeFullTextSearchPostgres". Learn more at https://pris.ly/d/native-fts-postgres.[0m
+// [1;93mwarning[0m: [1mOn `provider = "postgresql"`, preview feature "fullTextSearch" has been renamed as "fullTextSearchPostgres". Learn more at https://pris.ly/d/native-fts-postgres.[0m
 //   [1;94m-->[0m  [4mschema.prisma:3[0m
 // [1;94m   | [0m
 // [1;94m 2 | [0m  provider        = "prisma-client-js"

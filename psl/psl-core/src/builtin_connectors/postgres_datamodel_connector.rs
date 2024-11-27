@@ -268,7 +268,7 @@ impl Connector for PostgresDatamodelConnector {
 
     /// The connector-specific name of the `fullTextSearch` preview feature.
     fn native_full_text_search_preview_feature(&self) -> Option<PreviewFeature> {
-        Some(PreviewFeature::NativeFullTextSearchPostgres)
+        Some(PreviewFeature::FullTextSearchPostgres)
     }
 
     /// The maximum length of postgres identifiers, in bytes.

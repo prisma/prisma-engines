@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["nativeFullTextSearchPostgres"]
+  previewFeatures = ["fullTextSearchPostgres"]
 }
 
 datasource db {
@@ -14,9 +14,9 @@ model Blog {
   title   String
   @@fulltext([content, title])
 }
-// [1;91merror[0m: [1mThe preview feature "nativeFullTextSearchPostgres" is not known. Expected one of: deno, driverAdapters, metrics, multiSchema, nativeDistinct, postgresqlExtensions, tracing, views, relationJoins, prismaSchemaFolder, omitApi, strictUndefinedChecks[0m
+// [1;91merror[0m: [1mThe preview feature "fullTextSearchPostgres" is not known. Expected one of: deno, driverAdapters, metrics, multiSchema, nativeDistinct, postgresqlExtensions, tracing, views, relationJoins, prismaSchemaFolder, omitApi, strictUndefinedChecks[0m
 //   [1;94m-->[0m  [4mschema.prisma:3[0m
 // [1;94m   | [0m
 // [1;94m 2 | [0m  provider        = "prisma-client-js"
-// [1;94m 3 | [0m  previewFeatures = [1;91m["nativeFullTextSearchPostgres"][0m
+// [1;94m 3 | [0m  previewFeatures = [1;91m["fullTextSearchPostgres"][0m
 // [1;94m   | [0m

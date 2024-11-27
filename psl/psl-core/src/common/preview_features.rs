@@ -55,7 +55,7 @@ features!(
     FilterJson,
     FullTextIndex,
     FullTextSearch,
-    NativeFullTextSearchPostgres,
+    FullTextSearchPostgres,
     GroupBy,
     ImprovedQueryRaw,
     InteractiveTransactions,
@@ -169,7 +169,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                 (
                     "postgresql",
                     enumflags2::make_bitflags!(PreviewFeature::{
-                        NativeFullTextSearchPostgres
+                        FullTextSearchPostgres
                     }),
                 ),
             ]),
@@ -181,7 +181,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                         provider: Some("postgresql"),
                     },
                     RenamedFeatureValue {
-                        to: PreviewFeature::NativeFullTextSearchPostgres,
+                        to: PreviewFeature::FullTextSearchPostgres,
                         prisly_link_endpoint: "native-fts-postgres",
                     },
                 ),
