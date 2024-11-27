@@ -265,8 +265,8 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
         {
             let index_id = if ctx.flavour.uses_pk_in_m2m_join_table() {
                 let constraint_name = format!(
-                    "{}_AB_pk",
-                    table_name.chars().take(max_identifier_length - 6).collect::<String>()
+                    "{}_AB_pkey",
+                    table_name.chars().take(max_identifier_length - 8).collect::<String>()
                 );
 
                 ctx.schema.describer_schema.push_primary_key(table_id, constraint_name)
