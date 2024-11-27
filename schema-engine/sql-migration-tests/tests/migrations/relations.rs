@@ -992,7 +992,7 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: Te
 
     api.schema_push_w_datasource(dm_1).send().assert_green();
     api.assert_schema().assert_table("_ProfileToSkill", |t| {
-        if api.is_postgres() {
+        if api.is_postgres() && !api.is_cockroach() {
             t.assert_pk(|pk| pk.assert_columns(&["A", "B"]))
         } else {
             t.assert_index_on_columns(&["A", "B"], |idx| idx.assert_is_unique())
@@ -1021,7 +1021,7 @@ fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: Te
 
     api.schema_push_w_datasource(dm_2).send().assert_green();
     api.assert_schema().assert_table("_ProfileToSkill", |table| {
-        if api.is_postgres() {
+        if api.is_postgres() && !api.is_cockroach() {
             table.assert_pk(|pk| {
                 pk.assert_columns(&["A", "B"])
                     .assert_constraint_name("_ProfileToSkill_AB_pkey")
