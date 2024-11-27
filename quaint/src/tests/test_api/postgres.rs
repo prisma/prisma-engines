@@ -87,6 +87,10 @@ impl<'a> TestApi for PostgreSql<'a> {
         Quaint::new(&CONN_STR).await
     }
 
+    fn create_pool(&self) -> crate::Result<crate::pooled::Quaint> {
+        Ok(crate::pooled::Quaint::builder(&CONN_STR)?.build())
+    }
+
     fn unique_constraint(&mut self, column: &str) -> String {
         format!("UNIQUE({column})")
     }

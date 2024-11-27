@@ -2,7 +2,7 @@
 
 use crate::{
     ast,
-    connector::{self, impl_default_TransactionCapable, ConnectionInfo, IsolationLevel, Queryable, TransactionCapable},
+    connector::{self, ConnectionInfo, IsolationLevel, Queryable, TransactionCapable},
 };
 use async_trait::async_trait;
 use std::{fmt, sync::Arc};
@@ -16,7 +16,7 @@ use crate::connector::NativeConnectionInfo;
 /// The main entry point and an abstraction over a database connection.
 #[derive(Clone)]
 pub struct Quaint {
-    inner: Arc<dyn Queryable>,
+    inner: Arc<dyn TransactionCapable>,
     connection_info: Arc<ConnectionInfo>,
 }
 
@@ -26,7 +26,15 @@ impl fmt::Debug for Quaint {
     }
 }
 
-impl_default_TransactionCapable!(Quaint);
+#[async_trait]
+impl TransactionCapable for Quaint {
+    async fn start_transaction<'a>(
+        &'a self,
+        isolation: Option<IsolationLevel>,
+    ) -> crate::Result<Box<dyn connector::Transaction + 'a>> {
+        self.inner.start_transaction(isolation).await
+    }
+}
 
 impl Quaint {
     /// Create a new connection to the database. The connection string
@@ -137,28 +145,28 @@ impl Quaint {
                 let params = connector::SqliteParams::try_from(s)?;
                 let sqlite = connector::Sqlite::new(&params.file_path)?;
 
-                Arc::new(sqlite) as Arc<dyn Queryable>
+                Arc::new(sqlite) as Arc<dyn TransactionCapable>
             }
             #[cfg(feature = "mysql-native")]
             s if s.starts_with("mysql") => {
                 let url = connector::MysqlUrl::new(url::Url::parse(s)?)?;
                 let mysql = connector::Mysql::new(url).await?;
 
-                Arc::new(mysql) as Arc<dyn Queryable>
+                Arc::new(mysql) as Arc<dyn TransactionCapable>
             }
             #[cfg(feature = "postgresql-native")]
             s if s.starts_with("postgres") || s.starts_with("postgresql") => {
                 let url = connector::PostgresNativeUrl::new(url::Url::parse(s)?)?;
                 let tls_manager = connector::MakeTlsConnectorManager::new(url.clone());
                 let psql = connector::PostgreSql::new(url, &tls_manager).await?;
-                Arc::new(psql) as Arc<dyn Queryable>
+                Arc::new(psql) as Arc<dyn TransactionCapable>
             }
             #[cfg(feature = "mssql-native")]
             s if s.starts_with("jdbc:sqlserver") | s.starts_with("sqlserver") => {
                 let url = connector::MssqlUrl::new(s)?;
                 let psql = connector::Mssql::new(url).await?;
 
-                Arc::new(psql) as Arc<dyn Queryable>
+                Arc::new(psql) as Arc<dyn TransactionCapable>
             }
             _ => unimplemented!("Supported url schemes: file or sqlite, mysql, postgresql or jdbc:sqlserver."),
         };

@@ -21,6 +21,10 @@ impl<'a> MsSql<'a> {
         let names = Generator::default();
         let conn = Quaint::new(&CONN_STR).await?;
 
+        // snapshot isolation enables us to test isolation levels easily
+        conn.raw_cmd("ALTER DATABASE tempdb SET ALLOW_SNAPSHOT_ISOLATION ON")
+            .await?;
+
         Ok(Self { names, conn })
     }
 }
@@ -74,6 +78,10 @@ impl<'a> TestApi for MsSql<'a> {
 
     async fn create_additional_connection(&self) -> crate::Result<Quaint> {
         Quaint::new(&CONN_STR).await
+    }
+
+    fn create_pool(&self) -> crate::Result<crate::pooled::Quaint> {
+        Ok(crate::pooled::Quaint::builder(&CONN_STR)?.build())
     }
 
     fn render_create_table(&mut self, table_name: &str, columns: &str) -> (String, String) {

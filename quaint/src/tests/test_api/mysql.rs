@@ -129,6 +129,10 @@ impl<'a> TestApi for MySql<'a> {
         Quaint::new(&self.conn_str).await
     }
 
+    fn create_pool(&self) -> crate::Result<crate::pooled::Quaint> {
+        Ok(crate::pooled::Quaint::builder(&CONN_STR)?.build())
+    }
+
     fn unique_constraint(&mut self, column: &str) -> String {
         format!("UNIQUE({column})")
     }
