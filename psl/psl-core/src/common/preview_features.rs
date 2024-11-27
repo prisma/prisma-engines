@@ -1,5 +1,5 @@
 use serde::{Serialize, Serializer};
-use std::collections::BTreeMap;
+use std::collections::HashMap;
 use std::fmt;
 use std::sync::LazyLock;
 
@@ -10,7 +10,7 @@ macro_rules! features {
     ($( $variant:ident $(,)? ),*) => {
         #[enumflags2::bitflags]
         #[repr(u64)]
-        #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+        #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
         pub enum PreviewFeature {
             $( $variant,)*
         }
@@ -88,7 +88,7 @@ features!(
     StrictUndefinedChecks
 );
 
-#[derive(Copy, Clone, Debug, PartialOrd, Ord, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 struct RenamedFeatureKey<'a> {
     /// The old, deprecated preview feature that was renamed.
     pub from: PreviewFeature,
@@ -121,13 +121,13 @@ struct FeatureMap {
     active: PreviewFeatures,
 
     /// Valid, but connector-specific features that are only visible on matching provider key.
-    native: BTreeMap<&'static str, PreviewFeatures>,
+    native: HashMap<&'static str, PreviewFeatures>,
 
     /// Deprecated features.
     deprecated: PreviewFeatures,
 
     /// History of renamed deprecated features.
-    renamed: BTreeMap<RenamedFeatureKey<'static>, RenamedFeatureValue>,
+    renamed: HashMap<RenamedFeatureKey<'static>, RenamedFeatureValue>,
 
     /// Hidden preview features are valid features, but are not propagated into the tooling
     /// (as autocomplete or similar) or into error messages (eg. showing a list of valid features).
@@ -164,7 +164,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                  | Tracing
                  | Views
             }),
-            native: BTreeMap::from([
+            native: HashMap::from([
                 #[cfg(feature = "postgresql")]
                 (
                     "postgresql",
@@ -173,7 +173,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                     }),
                 ),
             ]),
-            renamed: BTreeMap::from([
+            renamed: HashMap::from([
                 #[cfg(feature = "postgresql")]
                 (
                     RenamedFeatureKey {
@@ -253,12 +253,12 @@ impl<'a> FeatureMapWithProvider<'a> {
     }
 
     /// Was the given preview feature deprecated and renamed?
-    pub(crate) fn is_renamed(&'a self, flag: PreviewFeature) -> Option<RenamedFeature<'a>> {
+    pub(crate) fn is_renamed(&self, flag: PreviewFeature) -> Option<RenamedFeature<'a>> {
         // Check for a renamed feature specific to the provider. This is only possible if a provider is not None.
         let provider_specific = self.provider.and_then(|provider| {
             self.feature_map
                 .renamed
-                .get(&RenamedFeatureKey::<'a> {
+                .get(&RenamedFeatureKey {
                     from: flag,
                     provider: Some(provider),
                 })
