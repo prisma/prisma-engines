@@ -40,7 +40,6 @@ impl TransactionOptions {
     }
 }
 
-
 /// A default representation of an SQL database transaction. If not commited, a
 /// transaction will be rolled back by default when dropped.
 ///
