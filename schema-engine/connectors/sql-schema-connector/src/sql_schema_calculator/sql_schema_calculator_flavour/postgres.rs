@@ -1,4 +1,4 @@
-use super::{super::Context, SqlSchemaCalculatorFlavour};
+use super::{super::Context, JoinTableUniquenessConstraint, SqlSchemaCalculatorFlavour};
 use crate::flavour::{PostgresFlavour, SqlFlavour};
 use either::Either;
 use psl::{
@@ -163,8 +163,8 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             .set_connector_data(Box::new(postgres_ext));
     }
 
-    fn uses_pk_in_m2m_join_table(&self) -> bool {
-        true
+    fn m2m_join_table_constraint(&self) -> JoinTableUniquenessConstraint {
+        JoinTableUniquenessConstraint::PrimaryKey
     }
 }
 
