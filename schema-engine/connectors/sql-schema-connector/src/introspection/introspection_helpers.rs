@@ -1,7 +1,7 @@
 //! Small utility functions.
 
 use sql::walkers::TableWalker;
-use sql_schema_describer::{self as sql, IndexType};
+use sql_schema_describer::{self as sql, IndexColumnWalker, IndexType};
 use std::cmp;
 
 /// This function implements the reverse behaviour of the `Ord` implementation for `Option`: it
@@ -56,7 +56,7 @@ pub(crate) fn is_relay_table(table: TableWalker<'_>) -> bool {
 }
 
 /// If a relation defines a Prisma many to many relation.
-pub(crate) fn is_prisma_m_to_n_relation(table: TableWalker<'_>) -> bool {
+pub(crate) fn is_prisma_m_to_n_relation(table: TableWalker<'_>, pk_allowed: bool) -> bool {
     fn is_a(column: &str) -> bool {
         column.eq_ignore_ascii_case("a")
     }
@@ -65,9 +65,16 @@ pub(crate) fn is_prisma_m_to_n_relation(table: TableWalker<'_>) -> bool {
         column.eq_ignore_ascii_case("b")
     }
 
+    fn index_columns_match<'a>(mut columns: impl ExactSizeIterator<Item = IndexColumnWalker<'a>>) -> bool {
+        columns.len() == 2
+            && is_a(columns.next().unwrap().as_column().name())
+            && is_b(columns.next().unwrap().as_column().name())
+    }
+
     let mut fks = table.foreign_keys();
     let first_fk = fks.next();
     let second_fk = fks.next();
+
     let a_b_match = || {
         let first_fk = first_fk.unwrap();
         let second_fk = second_fk.unwrap();
@@ -80,14 +87,13 @@ pub(crate) fn is_prisma_m_to_n_relation(table: TableWalker<'_>) -> bool {
                 && is_b(first_fk_col)
                 && is_a(second_fk_col))
     };
+
     table.name().starts_with('_')
-        //UNIQUE INDEX [A,B]
-        && table.indexes().any(|i| {
-            i.columns().len() == 2
-                && is_a(i.columns().next().unwrap().as_column().name())
-                && is_b(i.columns().nth(1).unwrap().as_column().name())
+        // UNIQUE INDEX (A, B) or PRIMARY KEY (A, B)
+        && (table.indexes().any(|i| {
+            index_columns_match(i.columns())
                 && i.is_unique()
-        })
+        }) || pk_allowed && table.primary_key_columns().map(index_columns_match).unwrap_or(false))
     //INDEX [B]
     && table
         .indexes()
