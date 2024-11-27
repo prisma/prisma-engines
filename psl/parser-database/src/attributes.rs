@@ -91,11 +91,9 @@ fn resolve_enum_attributes<'db>(enum_id: crate::EnumId, ast_enum: &'db ast::Enum
 
         // @map
         if ctx.visit_optional_single_attr("map") {
-            map::enum_value(ast_enum, value, enum_id, value_id, ctx);
-            // if let Some(mapped_name) = map::visit_map_attribute(ctx) {
-            //     enum_attributes.mapped_values.insert(value_id, mapped_name);
-            //     ctx.mapped_enum_value_names.insert((enum_id, mapped_name), value_id);
-            // }
+            if let Some(mapped_name_id) = map::enum_value(ast_enum, value, enum_id, value_id, ctx) {
+                enum_attributes.mapped_values.insert(value_id, mapped_name_id);
+            }
             ctx.validate_visited_arguments();
         }
         ctx.validate_visited_attributes();

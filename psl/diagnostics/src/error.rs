@@ -191,7 +191,7 @@ impl DatamodelError {
         span: Span,
     ) -> DatamodelError {
         let msg =
-            format!("`@map`'d value \"{mapped_field_value}\" is already defined on {container} \"{enum_name}\" in field \"{clashing_field_name}\".",);
+            format!("`@map`'d value \"{mapped_field_value}\" of field \"{clashing_field_name}\" is already defined on {container} \"{enum_name}\" .",);
         Self::new(msg, span)
     }
 

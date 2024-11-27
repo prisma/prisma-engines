@@ -253,7 +253,7 @@ fn fail_on_duplicate_field_with_map() {
     "#};
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mField "otherName" is already defined on model "User".[0m
+        [1;91merror[0m: [1m`@map`'d value "firstName" of field "otherName" is already defined on model "User" .[0m
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m  firstName String
@@ -359,7 +359,7 @@ fn fail_on_duplicate_mapped_field_name() {
     "#};
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mField "lastName" is already defined on model "User".[0m
+        [1;91merror[0m: [1m`@map`'d value "thename" of field "lastName" is already defined on model "User" .[0m
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m  firstName String @map("thename")

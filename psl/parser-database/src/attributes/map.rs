@@ -37,10 +37,9 @@ pub(super) fn scalar_field(
         .insert((model_id, mapped_name_id), field_id)
         .is_some()
     {
-        // TODO: throw a new `DatamodelError::new_duplicate_mapped_field_error` instead
-        ctx.push_error(DatamodelError::new_duplicate_field_error(
+        ctx.push_error(DatamodelError::new_duplicate_mapped_field_error(
             ast_model.name(),
-            // TODO: replace with `&ctx[mapped_name_id])` instead.
+            &ctx[mapped_name_id],
             ast_field.name(),
             if ast_model.is_view() { "view" } else { "model" },
             ast_field.span(),
@@ -63,8 +62,9 @@ pub(super) fn scalar_field(
             Some(_) => {}
         }
 
-        ctx.push_error(DatamodelError::new_duplicate_field_error(
+        ctx.push_error(DatamodelError::new_duplicate_mapped_field_error(
             ast_model.name(),
+            &ctx[mapped_name_id],
             ast_field.name(),
             if ast_model.is_view() { "view" } else { "model" },
             ast_field.span(),
@@ -78,10 +78,10 @@ pub(super) fn enum_value(
     enum_id: crate::EnumId,
     value_id: ast::EnumValueId,
     ctx: &mut Context<'_>,
-) {
+) -> Option<StringId> {
     let mapped_name_id = match visit_map_attribute(ctx) {
-        Some(name) => name,
-        None => return,
+        Some(string_id) => string_id,
+        None => return None,
     };
 
     if let Some(clashing_enum_id) = ctx.mapped_enum_value_names.insert((enum_id, mapped_name_id), value_id) {
@@ -89,12 +89,14 @@ pub(super) fn enum_value(
 
         ctx.push_error(DatamodelError::new_duplicate_mapped_field_error(
             ast_enum.name(),
-            ctx.interner.get(mapped_name_id).unwrap(),
+            &ctx[mapped_name_id],
             clashing_enum_key,
             "enum",
             enum_value.span(),
         ));
     }
+
+    Some(mapped_name_id)
 }
 
 pub(super) fn composite_type_field(

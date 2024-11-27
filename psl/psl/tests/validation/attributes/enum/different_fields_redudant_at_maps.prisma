@@ -8,7 +8,7 @@ enum FormLanguage {
   IT_IT @map("it/IT")
   EN_UK @map("en/US")
 }
-// [1;91merror[0m: [1m`@map`'d value "en/US" is already defined on enum "FormLanguage" in field "EN_US".[0m
+// [1;91merror[0m: [1m`@map`'d value "en/US" of field "EN_US" is already defined on enum "FormLanguage" .[0m
 //   [1;94m-->[0m  [4mschema.prisma:9[0m
 // [1;94m   | [0m
 // [1;94m 8 | [0m  IT_IT @map("it/IT")
