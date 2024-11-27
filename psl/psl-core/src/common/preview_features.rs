@@ -182,7 +182,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                     },
                     RenamedFeatureValue {
                         to: PreviewFeature::FullTextSearchPostgres,
-                        prisly_link_endpoint: "native-fts-postgres",
+                        prisly_link_endpoint: "fts-postgres",
                     },
                 ),
             ]),
