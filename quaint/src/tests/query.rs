@@ -121,24 +121,30 @@ async fn mssql_transaction_isolation_level(api: &mut dyn TestApi) -> crate::Resu
 
     let conn_a = api.conn();
     // Start a transaction with the default isolation level, which in tests is
-    // set to READ UNCOMMITED via the DB url and insert a row, but do not commit the transaction
+    // set to READ UNCOMMITED via the DB url and insert a row, but do not commit the transaction.
     let tx_a = conn_a.start_transaction(None).await?;
     let insert = Insert::single_into(&table).value("value", 3).value("id", 4);
     let rows_affected = tx_a.execute(insert.into()).await?;
     assert_eq!(1, rows_affected);
 
-    let conn_b = api.create_additional_connection().await?;
-    // Start a transaction that explicitly sets the isolation level to "SNAPSHOT" and query the table
-    // expecting to see the old state.
-    let tx_b = conn_b.start_transaction(Some(IsolationLevel::Snapshot)).await?;
-    let res = tx_b.query(Select::from_table(&table).into()).await?;
-    assert_eq!(0, res.len());
+    // We want to verify that pooled connection behaves the same way, so we test both cases.
+    let pool = api.create_pool()?;
+    for conn_b in [
+        Box::new(pool.check_out().await?) as Box<dyn TransactionCapable>,
+        Box::new(api.create_additional_connection().await?),
+    ] {
+        // Start a transaction that explicitly sets the isolation level to SNAPSHOT and query the table
+        // expecting to see the old state.
+        let tx_b = conn_b.start_transaction(Some(IsolationLevel::Snapshot)).await?;
+        let res = tx_b.query(Select::from_table(&table).into()).await?;
+        assert_eq!(0, res.len());
 
-    // Start a transaction without an explicit isolation level, it should be run with the default
-    // again, which is set to READ UNCOMMITED here.
-    let tx_c = conn_b.start_transaction(None).await?;
-    let res = tx_c.query(Select::from_table(&table).into()).await?;
-    assert_eq!(1, res.len());
+        // Start a transaction without an explicit isolation level, it should be run with the default
+        // again, which is set to READ UNCOMMITED here.
+        let tx_c = conn_b.start_transaction(None).await?;
+        let res = tx_c.query(Select::from_table(&table).into()).await?;
+        assert_eq!(1, res.len());
+    }
 
     Ok(())
 }
