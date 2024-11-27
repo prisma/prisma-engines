@@ -35,7 +35,7 @@ impl DatamodelWarning {
         span: Span,
     ) -> DatamodelWarning {
         let message = format!(
-                "Preview feature \"{deprecated_feature}\" has been renamed as \"{renamed_feature}\". Learn more at https://pris.ly/d/{prisly_link_endpoint}."
+                "Preview feature \"{deprecated_feature}\" has been renamed to \"{renamed_feature}\". Learn more at https://pris.ly/d/{prisly_link_endpoint}."
             );
         Self::new(message, span)
     }
@@ -48,7 +48,7 @@ impl DatamodelWarning {
         span: Span,
     ) -> DatamodelWarning {
         let message = format!(
-                "On `provider = \"{provider}\"`, preview feature \"{deprecated_feature}\" has been renamed as \"{renamed_feature}\". Learn more at https://pris.ly/d/{prisly_link_endpoint}."
+                "On `provider = \"{provider}\"`, preview feature \"{deprecated_feature}\" has been renamed to \"{renamed_feature}\". Learn more at https://pris.ly/d/{prisly_link_endpoint}."
             );
         Self::new(message, span)
     }
