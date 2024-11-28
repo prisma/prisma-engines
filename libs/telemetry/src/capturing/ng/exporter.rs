@@ -191,3 +191,84 @@ impl Collector for Exporter {
         _ = self.tx.send(Message::AddEvent(trace, event));
     }
 }
+#[cfg(test)]
+mod tests {
+    use std::time::{Duration, SystemTime};
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_export_capture_cycle() {
+        let exporter = Exporter::new();
+        let request_id = exporter.start_capturing().await;
+
+        let span = CollectedSpan {
+            id: tracing::span::Id::from_u64(1).into(),
+            parent_id: None,
+            name: "test_span".into(),
+            start_time: SystemTime::UNIX_EPOCH.into(),
+            duration: Duration::from_secs(1).into(),
+            kind: SpanKind::Internal,
+            attributes: HashMap::new(),
+            links: Vec::new(),
+        };
+
+        let event = CollectedEvent {
+            span_id: span.id,
+            name: "test_event",
+            level: LogLevel::Info,
+            timestamp: SystemTime::UNIX_EPOCH.into(),
+            attributes: HashMap::new(),
+        };
+
+        exporter.add_span(request_id, span.clone());
+        exporter.add_event(request_id, event.clone());
+
+        let trace = exporter.stop_capturing(request_id).await.unwrap();
+
+        insta::assert_ron_snapshot!(trace, @r#"
+        Trace(
+          spans: [
+            ExportedSpan(
+              id: SpanId("1"),
+              parentId: None,
+              name: "test_span",
+              startTime: HrTime(0, 0),
+              endTime: HrTime(1, 0),
+              kind: internal,
+            ),
+          ],
+          events: [
+            ExportedEvent(
+              spanId: SpanId("1"),
+              name: "test_event",
+              level: Info,
+              timestamp: HrTime(0, 0),
+              attributes: {},
+            ),
+          ],
+        )
+        "#);
+    }
+
+    #[test]
+    fn test_capture_target_from_log_level() {
+        assert_eq!(CaptureTarget::from(LogLevel::Trace), CaptureTarget::TraceEvents);
+        assert_eq!(CaptureTarget::from(LogLevel::Debug), CaptureTarget::DebugEvents);
+        assert_eq!(CaptureTarget::from(LogLevel::Info), CaptureTarget::InfoEvents);
+        assert_eq!(CaptureTarget::from(LogLevel::Warn), CaptureTarget::WarnEvents);
+        assert_eq!(CaptureTarget::from(LogLevel::Error), CaptureTarget::ErrorEvents);
+        assert_eq!(CaptureTarget::from(LogLevel::Query), CaptureTarget::QueryEvents);
+    }
+
+    #[test]
+    fn test_capture_target_from_str() {
+        assert_eq!("tracing".parse::<CaptureTarget>().unwrap(), CaptureTarget::Spans);
+        assert_eq!("trace".parse::<CaptureTarget>().unwrap(), CaptureTarget::TraceEvents);
+        assert_eq!("debug".parse::<CaptureTarget>().unwrap(), CaptureTarget::DebugEvents);
+        assert_eq!("info".parse::<CaptureTarget>().unwrap(), CaptureTarget::InfoEvents);
+        assert_eq!("warn".parse::<CaptureTarget>().unwrap(), CaptureTarget::WarnEvents);
+        assert_eq!("error".parse::<CaptureTarget>().unwrap(), CaptureTarget::ErrorEvents);
+        assert_eq!("query".parse::<CaptureTarget>().unwrap(), CaptureTarget::QueryEvents);
+    }
+}
