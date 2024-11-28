@@ -266,9 +266,10 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
         {
             let index_id = match ctx.flavour.m2m_join_table_constraint() {
                 JoinTableUniquenessConstraint::PrimaryKey => {
+                    const SUFFIX: &str = "_AB_pkey";
                     let constraint_name = format!(
-                        "{}_AB_pkey",
-                        table_name.chars().take(max_identifier_length - 8).collect::<String>()
+                        "{}{SUFFIX}",
+                        table_name.chars().take(max_identifier_length - SUFFIX.len()).collect::<String>()
                     );
                     ctx.schema.describer_schema.push_primary_key(table_id, constraint_name)
                 }
