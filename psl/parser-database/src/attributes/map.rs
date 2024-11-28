@@ -79,10 +79,7 @@ pub(super) fn enum_value(
     value_id: ast::EnumValueId,
     ctx: &mut Context<'_>,
 ) -> Option<StringId> {
-    let mapped_name_id = match visit_map_attribute(ctx) {
-        Some(string_id) => string_id,
-        None => return None,
-    };
+    let mapped_name_id = visit_map_attribute(ctx)?;
 
     if let Some(clashing_enum_id) = ctx.mapped_enum_value_names.insert((enum_id, mapped_name_id), value_id) {
         let clashing_enum_key = ast_enum[clashing_enum_id].name();
