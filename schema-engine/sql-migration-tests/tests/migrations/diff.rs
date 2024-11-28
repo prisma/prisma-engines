@@ -108,22 +108,18 @@ fn from_unique_index_to_pk(mut api: TestApi) {
             model A {
                 id    Int     @unique
                 name  String?
-                links C[]
             }
 
             model B {
-                id    Int     @unique
-                name  String?
-                links C[]
+                x Int
+                y Int
+
+                @@unique([x, y])
             }
 
             model C {
-                a_id Int
-                b_id Int
-                a    A   @relation(fields: [a_id], references: [id])
-                b    B   @relation(fields: [b_id], references: [id])
-
-                @@unique([a_id, b_id])
+                id        Int @id
+                secondary Int @unique
             }
         "#,
     );
@@ -132,23 +128,20 @@ fn from_unique_index_to_pk(mut api: TestApi) {
         r#"
             model A {
                 id    Int     @id
-                name  String?
-                links C[]
             }
 
             model B {
-                id    Int     @id
-                name  String?
-                links C[]
+                x Int
+                y Int
+
+                @@id([x, y])
             }
 
+            // Dropping the unique index on `secondary` will not be reordered
+            // so it will appear before the modifications on A and B in the migration.
             model C {
-                a_id Int
-                b_id Int
-                a    A   @relation(fields: [a_id], references: [id])
-                b    B   @relation(fields: [b_id], references: [id])
-
-                @@id([a_id, b_id])
+                id        Int @id
+                secondary Int
             }
         "#,
     );
@@ -180,22 +173,20 @@ fn from_unique_index_to_pk(mut api: TestApi) {
             [
                 [
                     "-- DropIndex",
+                    "DROP INDEX `C_secondary_key` ON `C`;",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE `A` DROP COLUMN `name`,",
+                    "    ADD PRIMARY KEY (`id`);",
+                    "",
+                    "-- DropIndex",
                     "DROP INDEX `A_id_key` ON `A`;",
                     "",
+                    "-- AlterTable",
+                    "ALTER TABLE `B` ADD PRIMARY KEY (`x`, `y`);",
+                    "",
                     "-- DropIndex",
-                    "DROP INDEX `B_id_key` ON `B`;",
-                    "",
-                    "-- DropIndex",
-                    "DROP INDEX `C_a_id_b_id_key` ON `C`;",
-                    "",
-                    "-- AlterTable",
-                    "ALTER TABLE `A` ADD PRIMARY KEY (`id`);",
-                    "",
-                    "-- AlterTable",
-                    "ALTER TABLE `B` ADD PRIMARY KEY (`id`);",
-                    "",
-                    "-- AlterTable",
-                    "ALTER TABLE `C` ADD PRIMARY KEY (`a_id`, `b_id`);",
+                    "DROP INDEX `B_x_y_key` ON `B`;",
                     "",
                 ],
             ]
@@ -205,22 +196,20 @@ fn from_unique_index_to_pk(mut api: TestApi) {
             [
                 [
                     "-- DropIndex",
+                    "DROP INDEX \"C_secondary_key\";",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE \"A\" DROP COLUMN \"name\",",
+                    "ADD CONSTRAINT \"A_pkey\" PRIMARY KEY (\"id\");",
+                    "",
+                    "-- DropIndex",
                     "DROP INDEX \"A_id_key\";",
                     "",
+                    "-- AlterTable",
+                    "ALTER TABLE \"B\" ADD CONSTRAINT \"B_pkey\" PRIMARY KEY (\"x\", \"y\");",
+                    "",
                     "-- DropIndex",
-                    "DROP INDEX \"B_id_key\";",
-                    "",
-                    "-- DropIndex",
-                    "DROP INDEX \"C_a_id_b_id_key\";",
-                    "",
-                    "-- AlterTable",
-                    "ALTER TABLE \"A\" ADD CONSTRAINT \"A_pkey\" PRIMARY KEY (\"id\");",
-                    "",
-                    "-- AlterTable",
-                    "ALTER TABLE \"B\" ADD CONSTRAINT \"B_pkey\" PRIMARY KEY (\"id\");",
-                    "",
-                    "-- AlterTable",
-                    "ALTER TABLE \"C\" ADD CONSTRAINT \"C_pkey\" PRIMARY KEY (\"a_id\", \"b_id\");",
+                    "DROP INDEX \"B_x_y_key\";",
                     "",
                 ],
             ]
@@ -234,22 +223,20 @@ fn from_unique_index_to_pk(mut api: TestApi) {
                     "BEGIN TRAN;",
                     "",
                     "-- DropIndex",
-                    "DROP INDEX [A_id_key] ON [dbo].[A];",
-                    "",
-                    "-- DropIndex",
-                    "DROP INDEX [B_id_key] ON [dbo].[B];",
-                    "",
-                    "-- DropIndex",
-                    "DROP INDEX [C_a_id_b_id_key] ON [dbo].[C];",
+                    "DROP INDEX [C_secondary_key] ON [dbo].[C];",
                     "",
                     "-- AlterTable",
+                    "ALTER TABLE [dbo].[A] DROP COLUMN [name];",
                     "ALTER TABLE [dbo].[A] ADD CONSTRAINT A_pkey PRIMARY KEY CLUSTERED ([id]);",
                     "",
-                    "-- AlterTable",
-                    "ALTER TABLE [dbo].[B] ADD CONSTRAINT B_pkey PRIMARY KEY CLUSTERED ([id]);",
+                    "-- DropIndex",
+                    "DROP INDEX [A_id_key] ON [dbo].[A];",
                     "",
                     "-- AlterTable",
-                    "ALTER TABLE [dbo].[C] ADD CONSTRAINT C_pkey PRIMARY KEY CLUSTERED ([a_id],[b_id]);",
+                    "ALTER TABLE [dbo].[B] ADD CONSTRAINT B_pkey PRIMARY KEY CLUSTERED ([x],[y]);",
+                    "",
+                    "-- DropIndex",
+                    "DROP INDEX [B_x_y_key] ON [dbo].[B];",
                     "",
                     "COMMIT TRAN;",
                     "",
@@ -271,34 +258,27 @@ fn from_unique_index_to_pk(mut api: TestApi) {
         expect![[r#"
             [
                 [
+                    "-- DropIndex",
+                    "DROP INDEX \"C_secondary_key\";",
+                    "",
                     "-- RedefineTables",
                     "PRAGMA defer_foreign_keys=ON;",
                     "PRAGMA foreign_keys=OFF;",
                     "CREATE TABLE \"new_A\" (",
-                    "    \"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,",
-                    "    \"name\" TEXT",
+                    "    \"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT",
                     ");",
-                    "INSERT INTO \"new_A\" (\"id\", \"name\") SELECT \"id\", \"name\" FROM \"A\";",
+                    "INSERT INTO \"new_A\" (\"id\") SELECT \"id\" FROM \"A\";",
                     "DROP TABLE \"A\";",
                     "ALTER TABLE \"new_A\" RENAME TO \"A\";",
                     "CREATE TABLE \"new_B\" (",
-                    "    \"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,",
-                    "    \"name\" TEXT",
+                    "    \"x\" INTEGER NOT NULL,",
+                    "    \"y\" INTEGER NOT NULL,",
+                    "",
+                    "    PRIMARY KEY (\"x\", \"y\")",
                     ");",
-                    "INSERT INTO \"new_B\" (\"id\", \"name\") SELECT \"id\", \"name\" FROM \"B\";",
+                    "INSERT INTO \"new_B\" (\"x\", \"y\") SELECT \"x\", \"y\" FROM \"B\";",
                     "DROP TABLE \"B\";",
                     "ALTER TABLE \"new_B\" RENAME TO \"B\";",
-                    "CREATE TABLE \"new_C\" (",
-                    "    \"a_id\" INTEGER NOT NULL,",
-                    "    \"b_id\" INTEGER NOT NULL,",
-                    "",
-                    "    PRIMARY KEY (\"a_id\", \"b_id\"),",
-                    "    CONSTRAINT \"C_a_id_fkey\" FOREIGN KEY (\"a_id\") REFERENCES \"A\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE,",
-                    "    CONSTRAINT \"C_b_id_fkey\" FOREIGN KEY (\"b_id\") REFERENCES \"B\" (\"id\") ON DELETE RESTRICT ON UPDATE CASCADE",
-                    ");",
-                    "INSERT INTO \"new_C\" (\"a_id\", \"b_id\") SELECT \"a_id\", \"b_id\" FROM \"C\";",
-                    "DROP TABLE \"C\";",
-                    "ALTER TABLE \"new_C\" RENAME TO \"C\";",
                     "PRAGMA foreign_keys=ON;",
                     "PRAGMA defer_foreign_keys=OFF;",
                     "",
