@@ -16,7 +16,7 @@ impl ConnectorTagInterface for PostgresConnectorTag {
     }
 
     fn datamodel_provider(&self) -> &'static str {
-        "postgres"
+        "postgresql"
     }
 
     fn datamodel_renderer(&self) -> Box<dyn DatamodelRenderer> {

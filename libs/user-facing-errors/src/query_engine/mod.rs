@@ -282,9 +282,9 @@ pub struct QueryParameterLimitExceeded {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2030",
-    message = "Cannot find a fulltext index to use for the search, try adding a @@fulltext([Fields...]) to your schema"
+    message = "Cannot find a fulltext index to use for the native search, try adding a @@fulltext([Fields...]) to your schema"
 )]
-pub struct MissingFullTextSearchIndex {}
+pub struct MissingNativeFullTextSearchIndex {}
 
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(

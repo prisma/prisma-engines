@@ -22,6 +22,7 @@ pub use psl_core::{
     ConnectorRegistry,
     Datasource,
     DatasourceConnectorData,
+    FeatureMapWithProvider,
     Generator,
     GeneratorConfigValue,
     PreviewFeature,

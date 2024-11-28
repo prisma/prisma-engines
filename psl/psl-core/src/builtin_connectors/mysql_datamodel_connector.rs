@@ -47,8 +47,8 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     AdvancedJsonNullability |
     IndexColumnLengthPrefixing |
     FullTextIndex |
-    FullTextSearch |
-    FullTextSearchWithIndex |
+    NativeFullTextSearch |
+    NativeFullTextSearchWithIndex |
     MultipleFullTextAttributesPerModel |
     ImplicitManyToManyRelation |
     DecimalType |

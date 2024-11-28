@@ -35,5 +35,6 @@ pub trait TestApi {
     fn autogen_id(&self, name: &str) -> String;
     fn conn(&self) -> &crate::single::Quaint;
     async fn create_additional_connection(&self) -> crate::Result<crate::single::Quaint>;
+    fn create_pool(&self) -> crate::Result<crate::pooled::Quaint>;
     fn get_name(&mut self) -> String;
 }

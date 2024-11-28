@@ -355,7 +355,7 @@ impl FilterVisitorExt for FilterVisitor {
     fn visit_scalar_filter(&mut self, filter: ScalarFilter, ctx: &Context<'_>) -> ConditionTree<'static> {
         match filter.condition {
             ScalarCondition::Search(_, _) | ScalarCondition::NotSearch(_, _) => {
-                reachable_only_with_capability!(ConnectorCapability::FullTextSearch);
+                reachable_only_with_capability!(ConnectorCapability::NativeFullTextSearch);
                 let mut projections = match filter.condition.clone() {
                     ScalarCondition::Search(_, proj) => proj,
                     ScalarCondition::NotSearch(_, proj) => proj,
@@ -958,7 +958,7 @@ fn default_scalar_filter(
             comparable.not_equals(Expression::from(field_ref.aliased_col(alias, ctx)).all())
         }
         ScalarCondition::Search(value, _) => {
-            reachable_only_with_capability!(ConnectorCapability::FullTextSearch);
+            reachable_only_with_capability!(ConnectorCapability::NativeFullTextSearch);
             let query: String = value
                 .into_value()
                 .unwrap()
@@ -968,7 +968,7 @@ fn default_scalar_filter(
             comparable.matches(query)
         }
         ScalarCondition::NotSearch(value, _) => {
-            reachable_only_with_capability!(ConnectorCapability::FullTextSearch);
+            reachable_only_with_capability!(ConnectorCapability::NativeFullTextSearch);
             let query: String = value
                 .into_value()
                 .unwrap()
@@ -1140,7 +1140,7 @@ fn insensitive_scalar_filter(
             comparable.compare_raw("NOT ILIKE", Expression::from(field_ref.aliased_col(alias, ctx)).all())
         }
         ScalarCondition::Search(value, _) => {
-            reachable_only_with_capability!(ConnectorCapability::FullTextSearch);
+            reachable_only_with_capability!(ConnectorCapability::NativeFullTextSearch);
             let query: String = value
                 .into_value()
                 .unwrap()
@@ -1150,7 +1150,7 @@ fn insensitive_scalar_filter(
             comparable.matches(query)
         }
         ScalarCondition::NotSearch(value, _) => {
-            reachable_only_with_capability!(ConnectorCapability::FullTextSearch);
+            reachable_only_with_capability!(ConnectorCapability::NativeFullTextSearch);
             let query: String = value
                 .into_value()
                 .unwrap()
