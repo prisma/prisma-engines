@@ -315,7 +315,7 @@ fn push_alter_primary_key(differ: &TableDiffer<'_, '_>, steps: &mut Vec<SqlMigra
         _ => return,
     };
 
-    if all_match(&mut previous.column_names(), &mut next.column_names()) {
+    if all_match(previous.column_names(), next.column_names()) {
         return;
     }
 
@@ -538,7 +538,7 @@ fn is_prisma_implicit_m2m_fk(fk: ForeignKeyWalker<'_>) -> bool {
     table.column("A").is_some() && table.column("B").is_some()
 }
 
-fn all_match<T: PartialEq>(a: &mut dyn ExactSizeIterator<Item = T>, b: &mut dyn ExactSizeIterator<Item = T>) -> bool {
+fn all_match<T: PartialEq>(a: impl ExactSizeIterator<Item = T>, b: impl ExactSizeIterator<Item = T>) -> bool {
     a.len() == b.len() && a.zip(b).all(|(a, b)| a == b)
 }
 
@@ -613,8 +613,8 @@ fn apply_partial_order_permutations(steps: &mut Vec<SqlMigrationStep>, db: &Diff
                 let table = db.schemas.next.describer_schema.walk(alter_table.table_ids.next);
                 table.primary_key().is_some()
                     && all_match(
-                        &mut index.column_names(),
-                        &mut table.primary_key_columns().unwrap().map(|col| col.name()),
+                        index.column_names(),
+                        table.primary_key_columns().unwrap().map(|col| col.name()),
                     )
             })
             .map(|(i, _)| i)
