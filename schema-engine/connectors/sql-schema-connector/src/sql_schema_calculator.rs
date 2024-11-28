@@ -269,14 +269,21 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
                     const SUFFIX: &str = "_AB_pkey";
                     let constraint_name = format!(
                         "{}{SUFFIX}",
-                        table_name.chars().take(max_identifier_length - SUFFIX.len()).collect::<String>()
+                        table_name
+                            .chars()
+                            .take(max_identifier_length - SUFFIX.len())
+                            .collect::<String>()
                     );
                     ctx.schema.describer_schema.push_primary_key(table_id, constraint_name)
                 }
                 JoinTableUniquenessConstraint::UniqueIndex => {
+                    const SUFFIX: &str = "_AB_unique";
                     let index_name = format!(
-                        "{}_AB_unique",
-                        table_name.chars().take(max_identifier_length - 10).collect::<String>()
+                        "{}{SUFFIX}",
+                        table_name
+                            .chars()
+                            .take(max_identifier_length - SUFFIX.len())
+                            .collect::<String>()
                     );
                     ctx.schema.describer_schema.push_unique_constraint(table_id, index_name)
                 }
