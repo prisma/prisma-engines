@@ -191,7 +191,7 @@ fn from_unique_index_to_pk(mut api: TestApi) {
                 ],
             ]
         "#]]
-    } else if api.is_postgres() || api.is_cockroach() {
+    } else if api.is_postgres() && !api.is_cockroach() {
         expect![[r#"
             [
                 [
@@ -201,6 +201,29 @@ fn from_unique_index_to_pk(mut api: TestApi) {
                     "-- AlterTable",
                     "ALTER TABLE \"A\" DROP COLUMN \"name\",",
                     "ADD CONSTRAINT \"A_pkey\" PRIMARY KEY (\"id\");",
+                    "",
+                    "-- DropIndex",
+                    "DROP INDEX \"A_id_key\";",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE \"B\" ADD CONSTRAINT \"B_pkey\" PRIMARY KEY (\"x\", \"y\");",
+                    "",
+                    "-- DropIndex",
+                    "DROP INDEX \"B_x_y_key\";",
+                    "",
+                ],
+            ]
+        "#]]
+    } else if api.is_cockroach() {
+        expect![[r#"
+            [
+                [
+                    "-- DropIndex",
+                    "DROP INDEX \"C_secondary_key\";",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE \"A\" DROP COLUMN \"name\";",
+                    "ALTER TABLE \"A\" ADD CONSTRAINT \"A_pkey\" PRIMARY KEY (\"id\");",
                     "",
                     "-- DropIndex",
                     "DROP INDEX \"A_id_key\";",
