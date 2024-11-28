@@ -106,8 +106,8 @@ fn from_unique_index_to_pk(mut api: TestApi) {
     let from_schema = api.datamodel_with_provider(
         r#"
             model A {
-                id    Int     @unique
-                name  String?
+                id   Int     @unique
+                name String?
             }
 
             model B {
@@ -127,7 +127,7 @@ fn from_unique_index_to_pk(mut api: TestApi) {
     let to_schema = api.datamodel_with_provider(
         r#"
             model A {
-                id    Int     @id
+                id Int @id
             }
 
             model B {
