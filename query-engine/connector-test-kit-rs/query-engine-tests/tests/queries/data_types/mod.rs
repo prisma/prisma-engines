@@ -4,6 +4,7 @@ mod bytes;
 mod datetime;
 mod decimal;
 mod enum_type;
+mod enum_type_mapped;
 mod float;
 mod int;
 mod json;
