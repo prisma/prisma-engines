@@ -1,4 +1,4 @@
-use super::{super::Context, SqlSchemaCalculatorFlavour};
+use super::{super::Context, JoinTableUniquenessConstraint, SqlSchemaCalculatorFlavour};
 use crate::flavour::{PostgresFlavour, SqlFlavour};
 use either::Either;
 use psl::{
@@ -161,6 +161,14 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             .schema
             .describer_schema
             .set_connector_data(Box::new(postgres_ext));
+    }
+
+    fn m2m_join_table_constraint(&self) -> JoinTableUniquenessConstraint {
+        if self.is_cockroachdb() {
+            JoinTableUniquenessConstraint::UniqueIndex
+        } else {
+            JoinTableUniquenessConstraint::PrimaryKey
+        }
     }
 }
 

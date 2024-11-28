@@ -44,7 +44,7 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
             differ.next.column_type_family_as_enum(),
         ) {
             (Some(previous_enum), Some(next_enum)) => {
-                if all_match(&mut previous_enum.values(), &mut next_enum.values()) {
+                if all_match(previous_enum.values(), next_enum.values()) {
                     return None;
                 }
 
