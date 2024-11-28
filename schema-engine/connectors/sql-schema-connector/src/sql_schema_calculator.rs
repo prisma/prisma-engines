@@ -13,7 +13,7 @@ use psl::{
     },
     ValidatedSchema,
 };
-use sql_schema_describer::{self as sql, PrismaValue};
+use sql_schema_describer::{self as sql, PrismaValue, SqlSchema};
 use std::collections::HashMap;
 
 pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn SqlFlavour) -> SqlDatabaseSchema {
@@ -264,30 +264,21 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
 
         // Unique index or PK on AB
         {
-            let index_id = match ctx.flavour.m2m_join_table_constraint() {
-                JoinTableUniquenessConstraint::PrimaryKey => {
-                    const SUFFIX: &str = "_AB_pkey";
-                    let constraint_name = format!(
-                        "{}{SUFFIX}",
-                        table_name
-                            .chars()
-                            .take(max_identifier_length - SUFFIX.len())
-                            .collect::<String>()
-                    );
-                    ctx.schema.describer_schema.push_primary_key(table_id, constraint_name)
-                }
-                JoinTableUniquenessConstraint::UniqueIndex => {
-                    const SUFFIX: &str = "_AB_unique";
-                    let index_name = format!(
-                        "{}{SUFFIX}",
-                        table_name
-                            .chars()
-                            .take(max_identifier_length - SUFFIX.len())
-                            .collect::<String>()
-                    );
-                    ctx.schema.describer_schema.push_unique_constraint(table_id, index_name)
-                }
-            };
+            let (constraint_suffix, push_constraint): (_, fn(_, _, _) -> _) =
+                match ctx.flavour.m2m_join_table_constraint() {
+                    JoinTableUniquenessConstraint::PrimaryKey => ("_AB_pkey", SqlSchema::push_primary_key),
+                    JoinTableUniquenessConstraint::UniqueIndex => ("_AB_unique", SqlSchema::push_unique_constraint),
+                };
+
+            let constraint_name = format!(
+                "{}{constraint_suffix}",
+                table_name
+                    .chars()
+                    .take(max_identifier_length - constraint_suffix.len())
+                    .collect::<String>()
+            );
+
+            let index_id = push_constraint(&mut ctx.schema.describer_schema, table_id, constraint_name);
 
             ctx.schema.describer_schema.push_index_column(sql::IndexColumn {
                 index_id,
