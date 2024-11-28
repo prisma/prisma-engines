@@ -16,7 +16,7 @@ use crate::{
     SqlFlavour,
 };
 use column::ColumnTypeChange;
-use sql_schema_describer::{walkers::ForeignKeyWalker, IndexId, TableColumnId};
+use sql_schema_describer::{walkers::ForeignKeyWalker, IndexId, TableColumnId, Walker};
 use std::{borrow::Cow, collections::HashSet};
 use table::TableDiffer;
 
@@ -542,80 +542,97 @@ fn all_match<T: PartialEq>(a: &mut dyn ExactSizeIterator<Item = T>, b: &mut dyn 
     a.len() == b.len() && a.zip(b).all(|(a, b)| a == b)
 }
 
-fn sort_migration_steps(steps: &mut [SqlMigrationStep], db: &DifferDatabase<'_>) {
-    dbg!(&steps);
-    steps.sort_by(|a, b| match (a, b) {
-        // TODO: does this define a total order???
-        (SqlMigrationStep::DropIndex { index_id }, SqlMigrationStep::AlterTable(alter_table)) => {
-            if move_drop_unique_index_after_creating_pk(db, *index_id, alter_table) {
-                std::cmp::Ordering::Greater
-            } else {
-                a.cmp(b)
-            }
-        }
-        _ => a.cmp(b),
-    });
+fn sort_migration_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {
+    // We can't merge these two steps into `sort_by` because sorting algorithms require total order
+    // relation, but the dependency between dropped unique index and creating a corresponding
+    // primary key is a preorder. Moreover, the binary relation defined as the composition of
+    // custom logic for `(SqlMigrationStep::DropIndex, SqlMigrationStep::AlterTable)` pairs and
+    // `a.cmp(b)` for everything else doesn't appear to be even transitive (due to the existing
+    // automatically derived total order relation between `SqlMigrationStep`s). If we need more
+    // complex ordering logic in the future, we should consider defining a partial order on
+    // `SqlMigrationStep` where only the pairs for which order actually matters are ordered,
+    // building a graph from the steps and topologically sorting it.
+    steps.sort();
+    apply_partial_order_permutations(steps, db);
 }
 
-fn move_drop_unique_index_after_creating_pk(
-    db: &DifferDatabase<'_>,
-    index_id: IndexId,
-    alter_table: &AlterTable,
-) -> bool {
-    let index = db.schemas.previous.describer_schema.walk(index_id);
-    dbg!(index.column_names().collect::<Vec<_>>());
+fn apply_partial_order_permutations(steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {
+    fn find_dropped_unique_index<'a>(
+        steps: &[SqlMigrationStep],
+        seen_elements: &mut usize,
+        db: &DifferDatabase<'a>,
+    ) -> Option<Walker<'a, IndexId>> {
+        for step in steps {
+            *seen_elements += 1;
 
-    if !index.is_unique() {
-        return false;
+            if let SqlMigrationStep::DropIndex { index_id } = step {
+                let index = db.schemas.previous.describer_schema.walk(*index_id);
+
+                // We're interested in dropped unique indexes in tables that didn't have a primary
+                // key defined.
+                if index.is_unique() && index.table().primary_key().is_none() {
+                    return Some(index);
+                }
+            }
+        }
+
+        None
     }
 
-    if alter_table.table_ids.previous != index.table().id {
-        return false;
+    fn find_matching_created_pk_step<'a>(
+        steps: &[SqlMigrationStep],
+        index: Walker<'a, IndexId>,
+        db: &DifferDatabase<'a>,
+    ) -> Option<usize> {
+        steps
+            .iter()
+            .enumerate()
+            .filter_map(|(i, step)| match step {
+                SqlMigrationStep::AlterTable(alter_table) => Some((i, alter_table)),
+                _ => None,
+            })
+            .filter(|(_, alter_table)| alter_table.table_ids.previous == index.table().id)
+            // We're only interested in `AlterTable` steps that create a primary key.
+            .filter(|(_, alter_table)| {
+                alter_table
+                    .changes
+                    .iter()
+                    .any(|change| matches!(change, TableChange::AddPrimaryKey))
+            })
+            // This `AlterTable` step must not have dropped or recreated any columns from the
+            // unique index we were looking at.
+            .filter(|(_, alter_table)| {
+                alter_table.changes.iter().all(|change| match change {
+                    TableChange::DropColumn { column_id } => !index.contains_column(*column_id),
+                    TableChange::DropAndRecreateColumn { column_id, .. } => !index.contains_column(column_id.previous),
+                    _ => true,
+                })
+            })
+            // The primary key must be created on the same columns as the unique index.
+            .find(|(_, alter_table)| {
+                let table = db.schemas.next.describer_schema.walk(alter_table.table_ids.next);
+                table.primary_key().is_some()
+                    && all_match(
+                        &mut index.column_names(),
+                        &mut table.primary_key_columns().unwrap().map(|col| col.name()),
+                    )
+            })
+            .map(|(i, _)| i)
     }
 
-    if db
-        .schemas
-        .previous
-        .describer_schema
-        .walk(alter_table.table_ids.previous)
-        .primary_key()
-        .is_some()
-    {
-        return false;
+    let mut i = 0;
+
+    while let Some(index) = find_dropped_unique_index(&steps[i..], &mut i, db) {
+        let index_pos = i - 1;
+
+        if let Some(alter_table_offset) = find_matching_created_pk_step(&steps[i..], index, db) {
+            let alter_table_pos = i + alter_table_offset;
+            let drop_index_step = steps.remove(index_pos);
+            steps.insert(alter_table_pos, drop_index_step);
+
+            // We need to adjust the index so we don't skip the element following the `DropIndex`
+            // step we just moved, as the following elements were shifted left by one.
+            i -= 1;
+        }
     }
-
-    let Some(pk_columns) = db
-        .schemas
-        .next
-        .describer_schema
-        .walk(alter_table.table_ids.next)
-        .primary_key_columns()
-    else {
-        return false;
-    };
-
-    if !all_match(&mut index.column_names(), &mut pk_columns.map(|col| col.name())) {
-        return false;
-    }
-
-    let added_pk_in_this_alter_stmt = alter_table
-        .changes
-        .iter()
-        .any(|change| matches!(change, TableChange::AddPrimaryKey));
-
-    if !added_pk_in_this_alter_stmt {
-        return false;
-    }
-
-    let dropped_index_column_in_this_alter_stmt = alter_table.changes.iter().any(|change| match change {
-        TableChange::DropColumn { column_id } => index.contains_column(*column_id),
-        TableChange::DropAndRecreateColumn { column_id, .. } => index.contains_column(column_id.previous),
-        _ => false,
-    });
-
-    if dropped_index_column_in_this_alter_stmt {
-        return false;
-    }
-
-    true
 }
