@@ -67,8 +67,10 @@ pub(crate) fn is_prisma_m_to_n_relation(table: TableWalker<'_>, pk_allowed: bool
 
     fn index_columns_match<'a>(mut columns: impl ExactSizeIterator<Item = IndexColumnWalker<'a>>) -> bool {
         columns.len() == 2
-            && is_a(columns.next().unwrap().as_column().name())
-            && is_b(columns.next().unwrap().as_column().name())
+            && match (columns.next(), columns.next()) {
+                (Some(a), Some(b)) => is_a(a.name()) && is_b(b.name()),
+                _ => false,
+            }
     }
 
     let mut fks = table.foreign_keys();
