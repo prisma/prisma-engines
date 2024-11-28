@@ -48,11 +48,10 @@ model shirataki {
 // -- CreateTable
 // CREATE TABLE "roots"."_shiratakiTozoodles" (
 //     "A" INTEGER NOT NULL,
-//     "B" INTEGER NOT NULL
-// );
+//     "B" INTEGER NOT NULL,
 // 
-// -- CreateIndex
-// CREATE UNIQUE INDEX "_shiratakiTozoodles_AB_unique" ON "roots"."_shiratakiTozoodles"("A", "B");
+//     CONSTRAINT "_shiratakiTozoodles_AB_pkey" PRIMARY KEY ("A","B")
+// );
 // 
 // -- CreateIndex
 // CREATE INDEX "_shiratakiTozoodles_B_index" ON "roots"."_shiratakiTozoodles"("B");

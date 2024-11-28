@@ -96,6 +96,210 @@ fn from_unique_index_to_without(mut api: TestApi) {
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
 }
 
+#[test_connector]
+fn from_unique_index_to_pk(mut api: TestApi) {
+    let tempdir = tempfile::tempdir().unwrap();
+    let host = Arc::new(TestConnectorHost::default());
+
+    api.connector.set_host(host.clone());
+
+    let from_schema = api.datamodel_with_provider(
+        r#"
+            model A {
+                id   Int     @unique
+                name String?
+            }
+
+            model B {
+                x Int
+                y Int
+
+                @@unique([x, y])
+            }
+
+            model C {
+                id        Int @id
+                secondary Int @unique
+            }
+        "#,
+    );
+
+    let to_schema = api.datamodel_with_provider(
+        r#"
+            model A {
+                id Int @id
+            }
+
+            model B {
+                x Int
+                y Int
+
+                @@id([x, y])
+            }
+
+            // Dropping the unique index on `secondary` will not be reordered
+            // so it will appear before the modifications on A and B in the migration.
+            model C {
+                id        Int @id
+                secondary Int
+            }
+        "#,
+    );
+
+    let from_file = write_file_to_tmp(&from_schema, &tempdir, "from");
+    let to_file = write_file_to_tmp(&to_schema, &tempdir, "to");
+
+    api.diff(DiffParams {
+        exit_code: None,
+        from: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: from_file.to_string_lossy().into_owned(),
+                content: from_schema.to_string(),
+            }],
+        }),
+        shadow_database_url: None,
+        to: DiffTarget::SchemaDatamodel(SchemasContainer {
+            files: vec![SchemaContainer {
+                path: to_file.to_string_lossy().into_owned(),
+                content: to_schema.to_string(),
+            }],
+        }),
+        script: true,
+    })
+    .unwrap();
+
+    let expected_printed_messages = if api.is_mysql() {
+        expect![[r#"
+            [
+                [
+                    "-- DropIndex",
+                    "DROP INDEX `C_secondary_key` ON `C`;",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE `A` DROP COLUMN `name`,",
+                    "    ADD PRIMARY KEY (`id`);",
+                    "",
+                    "-- DropIndex",
+                    "DROP INDEX `A_id_key` ON `A`;",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE `B` ADD PRIMARY KEY (`x`, `y`);",
+                    "",
+                    "-- DropIndex",
+                    "DROP INDEX `B_x_y_key` ON `B`;",
+                    "",
+                ],
+            ]
+        "#]]
+    } else if api.is_postgres() || api.is_cockroach() {
+        expect![[r#"
+            [
+                [
+                    "-- DropIndex",
+                    "DROP INDEX \"C_secondary_key\";",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE \"A\" DROP COLUMN \"name\",",
+                    "ADD CONSTRAINT \"A_pkey\" PRIMARY KEY (\"id\");",
+                    "",
+                    "-- DropIndex",
+                    "DROP INDEX \"A_id_key\";",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE \"B\" ADD CONSTRAINT \"B_pkey\" PRIMARY KEY (\"x\", \"y\");",
+                    "",
+                    "-- DropIndex",
+                    "DROP INDEX \"B_x_y_key\";",
+                    "",
+                ],
+            ]
+        "#]]
+    } else if api.is_mssql() {
+        expect![[r#"
+            [
+                [
+                    "BEGIN TRY",
+                    "",
+                    "BEGIN TRAN;",
+                    "",
+                    "-- DropIndex",
+                    "DROP INDEX [C_secondary_key] ON [dbo].[C];",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE [dbo].[A] DROP COLUMN [name];",
+                    "ALTER TABLE [dbo].[A] ADD CONSTRAINT A_pkey PRIMARY KEY CLUSTERED ([id]);",
+                    "",
+                    "-- DropIndex",
+                    "DROP INDEX [A_id_key] ON [dbo].[A];",
+                    "",
+                    "-- AlterTable",
+                    "ALTER TABLE [dbo].[B] ADD CONSTRAINT B_pkey PRIMARY KEY CLUSTERED ([x],[y]);",
+                    "",
+                    "-- DropIndex",
+                    "DROP INDEX [B_x_y_key] ON [dbo].[B];",
+                    "",
+                    "COMMIT TRAN;",
+                    "",
+                    "END TRY",
+                    "BEGIN CATCH",
+                    "",
+                    "IF @@TRANCOUNT > 0",
+                    "BEGIN",
+                    "    ROLLBACK TRAN;",
+                    "END;",
+                    "THROW",
+                    "",
+                    "END CATCH",
+                    "",
+                ],
+            ]
+        "#]]
+    } else if api.is_sqlite() {
+        expect![[r#"
+            [
+                [
+                    "-- DropIndex",
+                    "DROP INDEX \"C_secondary_key\";",
+                    "",
+                    "-- RedefineTables",
+                    "PRAGMA defer_foreign_keys=ON;",
+                    "PRAGMA foreign_keys=OFF;",
+                    "CREATE TABLE \"new_A\" (",
+                    "    \"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT",
+                    ");",
+                    "INSERT INTO \"new_A\" (\"id\") SELECT \"id\" FROM \"A\";",
+                    "DROP TABLE \"A\";",
+                    "ALTER TABLE \"new_A\" RENAME TO \"A\";",
+                    "CREATE TABLE \"new_B\" (",
+                    "    \"x\" INTEGER NOT NULL,",
+                    "    \"y\" INTEGER NOT NULL,",
+                    "",
+                    "    PRIMARY KEY (\"x\", \"y\")",
+                    ");",
+                    "INSERT INTO \"new_B\" (\"x\", \"y\") SELECT \"x\", \"y\" FROM \"B\";",
+                    "DROP TABLE \"B\";",
+                    "ALTER TABLE \"new_B\" RENAME TO \"B\";",
+                    "PRAGMA foreign_keys=ON;",
+                    "PRAGMA defer_foreign_keys=OFF;",
+                    "",
+                ],
+            ]
+        "#]]
+    } else {
+        unreachable!()
+    };
+
+    expected_printed_messages.assert_debug_eq(
+        &host
+            .printed_messages
+            .lock()
+            .unwrap()
+            .iter()
+            .map(|msg| msg.split('\n').map(<_>::to_owned).collect())
+            .collect::<Vec<Vec<_>>>(),
+    );
+}
+
 #[test_connector(tags(Sqlite))]
 fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
     // We should get a postgres diff.
