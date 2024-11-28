@@ -1018,10 +1018,6 @@ fn changing_unique_to_pk_works(api: TestApi) {
     api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema()
-        .assert_table("A", |table| {
-            table.assert_pk(|pk| pk.assert_columns(&["id"]))
-        })
-        .assert_table("B", |table| {
-            table.assert_pk(|pk| pk.assert_columns(&["x", "y"]))
-        });
+        .assert_table("A", |table| table.assert_pk(|pk| pk.assert_columns(&["id"])))
+        .assert_table("B", |table| table.assert_pk(|pk| pk.assert_columns(&["x", "y"])));
 }
