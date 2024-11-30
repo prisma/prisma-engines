@@ -8,7 +8,7 @@ pub struct Over<'a> {
     pub(crate) partitioning: Vec<Column<'a>>,
 }
 
-impl<'a> Over<'a> {
+impl Over<'_> {
     pub fn is_empty(&self) -> bool {
         self.ordering.is_empty() && self.partitioning.is_empty()
     }

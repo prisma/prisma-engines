@@ -9,7 +9,7 @@ use crate::{
 #[derive(Debug)]
 pub struct Relation<'a>(FieldAttribute<'a>);
 
-impl<'a> Default for Relation<'a> {
+impl Default for Relation<'_> {
     fn default() -> Self {
         Self::new()
     }
@@ -92,7 +92,7 @@ impl<'a> Relation<'a> {
     }
 }
 
-impl<'a> fmt::Display for Relation<'a> {
+impl fmt::Display for Relation<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
     }

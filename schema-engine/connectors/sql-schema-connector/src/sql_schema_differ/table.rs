@@ -12,7 +12,7 @@ pub(crate) struct TableDiffer<'a, 'b> {
     pub(crate) db: &'b DifferDatabase<'a>,
 }
 
-impl<'schema, 'b> TableDiffer<'schema, 'b> {
+impl<'schema> TableDiffer<'schema, '_> {
     pub(crate) fn column_pairs(&self) -> impl Iterator<Item = MigrationPair<TableColumnWalker<'schema>>> + '_ {
         self.db
             .column_pairs(self.tables.map(|t| t.id))

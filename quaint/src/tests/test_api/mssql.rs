@@ -30,7 +30,7 @@ impl<'a> MsSql<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> TestApi for MsSql<'a> {
+impl TestApi for MsSql<'_> {
     fn system(&self) -> &'static str {
         "mssql"
     }

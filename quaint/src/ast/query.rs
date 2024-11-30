@@ -24,7 +24,7 @@ where
     }
 }
 
-impl<'a> Query<'a> {
+impl Query<'_> {
     pub fn is_select(&self) -> bool {
         matches!(self, Query::Select(_))
     }

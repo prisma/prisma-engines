@@ -11,7 +11,7 @@ pub struct DmmfEnumRenderer {
     enum_type: EnumType,
 }
 
-impl<'a> Renderer<'a> for DmmfEnumRenderer {
+impl Renderer<'_> for DmmfEnumRenderer {
     fn render(&self, ctx: &mut RenderContext) {
         let ident = self.enum_type.identifier();
         if ctx.already_rendered(ident) {

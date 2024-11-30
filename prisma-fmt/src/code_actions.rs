@@ -23,7 +23,7 @@ use crate::LSPContext;
 
 pub(super) type CodeActionsContext<'a> = LSPContext<'a, CodeActionParams>;
 
-impl<'a> CodeActionsContext<'a> {
+impl CodeActionsContext<'_> {
     pub(super) fn diagnostics(&self) -> &[Diagnostic] {
         &self.params.context.diagnostics
     }

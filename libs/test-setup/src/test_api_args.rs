@@ -221,7 +221,7 @@ pub struct DatasourceBlock<'a> {
     preview_features: &'static [&'static str],
 }
 
-impl<'a> DatasourceBlock<'a> {
+impl DatasourceBlock<'_> {
     pub fn url(&self) -> &str {
         self.url
     }

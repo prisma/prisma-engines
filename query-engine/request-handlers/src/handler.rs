@@ -23,7 +23,7 @@ pub struct RequestHandler<'a> {
     engine_protocol: EngineProtocol,
 }
 
-impl<'a> fmt::Debug for RequestHandler<'a> {
+impl fmt::Debug for RequestHandler<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("RequestHandler").finish()
     }

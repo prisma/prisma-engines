@@ -58,7 +58,6 @@ impl<'a> Expression<'a> {
     }
 
     #[allow(dead_code)]
-
     pub(crate) fn is_json_value(&self) -> bool {
         match &self.kind {
             ExpressionKind::Parameterized(Value {
@@ -72,7 +71,6 @@ impl<'a> Expression<'a> {
     }
 
     #[allow(dead_code)]
-
     pub(crate) fn into_json_value(self) -> Option<serde_json::Value> {
         match self.kind {
             ExpressionKind::Parameterized(Value {
@@ -223,7 +221,7 @@ pub enum ExpressionKind<'a> {
     Default,
 }
 
-impl<'a> ExpressionKind<'a> {
+impl ExpressionKind<'_> {
     pub(crate) fn is_xml_value(&self) -> bool {
         match self {
             Self::Parameterized(Value {

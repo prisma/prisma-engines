@@ -298,7 +298,6 @@ pub struct MongoReplicaSetRequired {}
     code = "P2032",
     message = "Error converting field \"{field}\" of expected non-nullable type \"{expected_type}\", found incompatible value of \"{found}\"."
 )]
-
 pub struct MissingFieldsInModel {
     pub field: String,
     pub expected_type: String,
@@ -307,7 +306,6 @@ pub struct MissingFieldsInModel {
 
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(code = "P2033", message = "{details}")]
-
 pub struct ValueFitError {
     pub details: String,
 }

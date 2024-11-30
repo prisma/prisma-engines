@@ -142,7 +142,7 @@ fn to_postgres(decimal: &BigDecimal) -> crate::Result<PostgresDecimal<Vec<i16>>>
     })
 }
 
-impl<'a> FromSql<'a> for DecimalWrapper {
+impl FromSql<'_> for DecimalWrapper {
     // Decimals are represented as follows:
     // Header:
     //  u16 numGroups

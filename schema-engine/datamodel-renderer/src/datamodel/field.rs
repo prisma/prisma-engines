@@ -225,7 +225,7 @@ impl<'a> Field<'a> {
     }
 }
 
-impl<'a> fmt::Display for Field<'a> {
+impl fmt::Display for Field<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(ref docs) = self.documentation {
             docs.fmt(f)?;
