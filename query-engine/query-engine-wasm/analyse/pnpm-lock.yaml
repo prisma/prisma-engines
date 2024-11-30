@@ -12,8 +12,8 @@ importers:
         specifier: 10.9.2
         version: 10.9.2(@types/node@20.10.8)(typescript@5.7.2)
       tsx:
-        specifier: 4.15.1
-        version: 4.15.1
+        specifier: 4.15.9
+        version: 4.15.9
       typescript:
         specifier: 5.7.2
         version: 5.7.2
@@ -239,8 +239,8 @@ packages:
       '@swc/wasm':
         optional: true
 
-  tsx@4.15.1:
-    resolution: {integrity: sha512-k/6h17jA1KfUR7SpcteOa880zGmF56s8gMIcSqUR5avyNFi9nlCEKpMiHLrzrqyARGr52A/JablmGey1DEWbCA==}
+  tsx@4.15.9:
+    resolution: {integrity: sha512-OEw8VSS5Ug88pj3YhOic1Zmg+mKOuJOcBdpxl402C0D4TjRxu/LTIrr+slbc8nKQA+b7YC9SoHTZAEeQQPBwFw==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -420,7 +420,7 @@ snapshots:
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
 
-  tsx@4.15.1:
+  tsx@4.15.9:
     dependencies:
       esbuild: 0.21.5
       get-tsconfig: 4.7.5
