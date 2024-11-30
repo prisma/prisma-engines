@@ -1,5 +1,6 @@
 #![allow(clippy::upper_case_acronyms)]
 
+use jemallocator::Jemalloc;
 use query_engine::cli::CliCommand;
 use query_engine::context;
 use query_engine::error::PrismaError;
@@ -8,6 +9,9 @@ use query_engine::server;
 use query_engine::LogFormat;
 use std::{error::Error, process};
 use structopt::StructOpt;
+
+#[global_allocator]
+static GLOBAL: Jemalloc = Jemalloc;
 
 type AnyError = Box<dyn Error + Send + Sync + 'static>;
 
