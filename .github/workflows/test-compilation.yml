@@ -40,6 +40,7 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - uses: ./.github/workflows/include/kerberos-setup
 
       - name: compile ${{ matrix.crate }}
         shell: bash
