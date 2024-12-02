@@ -1,4 +1,4 @@
-mod select_different_key_type {
+mod select_different_key_types {
     use indoc::indoc;
     use query_engine_tests::*;
 
@@ -172,7 +172,6 @@ mod select_different_key_type {
 
     #[test_suite(schema(schema))]
     mod datetime_in_schema {
-
         fn schema() -> String {
             let schema = indoc! {
                 r#"
