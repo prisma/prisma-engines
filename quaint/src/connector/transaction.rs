@@ -9,7 +9,7 @@ use crate::{
 use std::{
     fmt,
     str::FromStr,
-    sync::{Arc, Mutex},
+    sync::atomic::{AtomicU32, Ordering},
 };
 
 #[async_trait]
@@ -74,7 +74,7 @@ impl TransactionOptions {
 /// transaction object will panic.
 pub struct DefaultTransaction<'a> {
     pub inner: &'a dyn Queryable,
-    pub depth: Arc<Mutex<u32>>,
+    pub depth: AtomicU32,
     gauge: GaugeGuard,
 }
 
@@ -101,7 +101,7 @@ impl<'a> DefaultTransaction<'a> {
         let mut this = Self {
             inner,
             gauge: GaugeGuard::increment("prisma_client_queries_active"),
-            depth: Arc::new(Mutex::new(0)),
+            depth: AtomicU32::new(0),
         };
 
         if tx_opts.isolation_first {
@@ -127,15 +127,11 @@ impl<'a> DefaultTransaction<'a> {
 #[async_trait]
 impl Transaction for DefaultTransaction<'_> {
     fn depth(&self) -> u32 {
-        *self.depth.lock().unwrap()
+        self.depth.load(Ordering::SeqCst)
     }
 
     async fn begin(&mut self) -> crate::Result<()> {
-        // Lock the mutex in it's own scope to ensure its dropped before the await
-        {
-            let mut depth = self.depth.lock().unwrap();
-            *depth += 1;
-        }
+        self.depth.fetch_add(1, Ordering::SeqCst);
 
         let begin_statement = self.inner.begin_statement();
 
@@ -149,9 +145,7 @@ impl Transaction for DefaultTransaction<'_> {
         // Perform the asynchronous operation without holding the lock
         self.inner.raw_cmd("COMMIT").await?;
 
-        // Lock the mutex to modify the depth
-        let mut depth = self.depth.lock().unwrap();
-        *depth -= 1;
+        self.depth.fetch_sub(1, Ordering::SeqCst);
 
         self.gauge.decrement();
 
@@ -162,9 +156,7 @@ impl Transaction for DefaultTransaction<'_> {
     async fn rollback(&mut self) -> crate::Result<()> {
         self.inner.raw_cmd("ROLLBACK").await?;
 
-        // Lock the mutex to modify the depth
-        let mut depth = self.depth.lock().unwrap();
-        *depth -= 1;
+        self.depth.fetch_sub(1, Ordering::SeqCst);
 
         self.gauge.decrement();
 
@@ -173,13 +165,11 @@ impl Transaction for DefaultTransaction<'_> {
 
     /// Creates a savepoint in the transaction
     async fn create_savepoint(&mut self) -> crate::Result<()> {
-        let current_depth = {
-            let mut depth = self.depth.lock().unwrap();
-            *depth += 1;
-            *depth
-        };
+        let current_depth = self.depth.load(Ordering::SeqCst);
+        let new_depth = current_depth + 1;
+        self.depth.store(new_depth, Ordering::SeqCst);
 
-        let create_savepoint_statement = self.inner.create_savepoint_statement(current_depth);
+        let create_savepoint_statement = self.inner.create_savepoint_statement(new_depth);
         self.inner.raw_cmd(&create_savepoint_statement).await?;
         Ok(())
     }
@@ -187,10 +177,7 @@ impl Transaction for DefaultTransaction<'_> {
     /// Releases a savepoint in the transaction
     async fn release_savepoint(&mut self) -> crate::Result<()> {
         // Lock the mutex and get the depth value
-        let depth_val = {
-            let depth = self.depth.lock().unwrap();
-            *depth
-        };
+        let depth_val = self.depth.load(Ordering::SeqCst);
 
         if depth_val == 0 {
             panic!(
@@ -202,19 +189,14 @@ impl Transaction for DefaultTransaction<'_> {
         let release_savepoint_statement = self.inner.release_savepoint_statement(depth_val);
         self.inner.raw_cmd(&release_savepoint_statement).await?;
 
-        // Lock the mutex again to modify the depth
-        let mut depth = self.depth.lock().unwrap();
-        *depth -= 1;
+        self.depth.fetch_sub(1, Ordering::SeqCst);
 
         Ok(())
     }
 
     /// Rollback to savepoint in the transaction
     async fn rollback_to_savepoint(&mut self) -> crate::Result<()> {
-        let depth_val = {
-            let depth = self.depth.lock().unwrap();
-            *depth
-        };
+        let depth_val = self.depth.load(Ordering::SeqCst);
 
         if depth_val == 0 {
             panic!(
@@ -225,9 +207,7 @@ impl Transaction for DefaultTransaction<'_> {
         let rollback_to_savepoint_statement = self.inner.rollback_to_savepoint_statement(depth_val);
         self.inner.raw_cmd(&rollback_to_savepoint_statement).await?;
 
-        // Lock the mutex again to modify the depth
-        let mut depth = self.depth.lock().unwrap();
-        *depth -= 1;
+        self.depth.fetch_sub(1, Ordering::SeqCst);
 
         Ok(())
     }
