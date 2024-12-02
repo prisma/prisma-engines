@@ -60,6 +60,15 @@ pub struct DefaultTransaction<'a> {
     gauge: GaugeGuard,
 }
 
+#[cfg_attr(
+    not(any(
+        feature = "sqlite-native",
+        feature = "mssql-native",
+        feature = "postgresql-native",
+        feature = "mysql-native"
+    )),
+    allow(clippy::needless_lifetimes)
+)]
 impl<'a> DefaultTransaction<'a> {
     #[cfg(any(
         feature = "sqlite-native",

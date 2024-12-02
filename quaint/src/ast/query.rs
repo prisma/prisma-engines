@@ -53,6 +53,7 @@ pub enum SelectQuery<'a> {
     Union(Box<Union<'a>>),
 }
 
+#[cfg_attr(not(feature = "mssql"), allow(clippy::needless_lifetimes))]
 impl<'a> SelectQuery<'a> {
     /// Finds all named values or columns from the selection.
     pub fn named_selection(&self) -> Vec<String> {
