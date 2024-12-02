@@ -1,4 +1,7 @@
-use std::future::Future;
+use std::{
+    future::Future,
+    sync::atomic::{AtomicU32, Ordering},
+};
 
 use async_trait::async_trait;
 use prisma_metrics::gauge;
@@ -86,7 +89,7 @@ impl Queryable for JsTransactionContext {
 pub(crate) struct JsTransaction {
     tx_proxy: TransactionProxy,
     inner: JsBaseQueryable,
-    pub depth: u32,
+    pub depth: AtomicU32,
 }
 
 impl JsTransaction {
@@ -94,7 +97,7 @@ impl JsTransaction {
         Self {
             inner,
             tx_proxy,
-            depth: 0,
+            depth: AtomicU32::new(0),
         }
     }
 
@@ -113,19 +116,23 @@ impl JsTransaction {
         )
         .await
     }
+
+    pub fn increment_depth(&self) {
+        self.depth.fetch_add(1, Ordering::SeqCst);
+    }
 }
 
 #[async_trait]
 impl QuaintTransaction for JsTransaction {
     fn depth(&self) -> u32 {
-        self.depth
+        self.depth.load(Ordering::SeqCst)
     }
 
-    async fn begin(&mut self) -> quaint::Result<()> {
+    async fn begin(&self) -> quaint::Result<()> {
         // increment of this gauge is done in DriverProxy::startTransaction
         gauge!("prisma_client_queries_active").decrement(1.0);
 
-        self.depth += 1;
+        self.depth.fetch_add(1, Ordering::SeqCst);
 
         let begin_stmt = self.begin_statement();
 
@@ -139,7 +146,7 @@ impl QuaintTransaction for JsTransaction {
         UnsafeFuture(self.tx_proxy.begin()).await
     }
 
-    async fn commit(&mut self) -> quaint::Result<()> {
+    async fn commit(&self) -> quaint::Result<()> {
         // increment of this gauge is done in DriverProxy::startTransaction
         gauge!("prisma_client_queries_active").decrement(1.0);
 
@@ -155,12 +162,12 @@ impl QuaintTransaction for JsTransaction {
         let _ = UnsafeFuture(self.tx_proxy.commit()).await;
 
         // Modify the depth value
-        self.depth -= 1;
+        self.depth.fetch_sub(1, Ordering::SeqCst);
 
         Ok(())
     }
 
-    async fn rollback(&mut self) -> quaint::Result<()> {
+    async fn rollback(&self) -> quaint::Result<()> {
         // increment of this gauge is done in DriverProxy::startTransaction
         gauge!("prisma_client_queries_active").decrement(1.0);
 
@@ -176,15 +183,17 @@ impl QuaintTransaction for JsTransaction {
         let _ = UnsafeFuture(self.tx_proxy.rollback()).await;
 
         // Modify the depth value
-        self.depth -= 1;
+        self.depth.fetch_sub(1, Ordering::SeqCst);
 
         Ok(())
     }
 
-    async fn create_savepoint(&mut self) -> quaint::Result<()> {
-        self.depth += 1;
+    async fn create_savepoint(&self) -> quaint::Result<()> {
+        let current_depth = self.depth.load(Ordering::SeqCst);
+        let new_depth = current_depth + 1;
+        self.depth.store(new_depth, Ordering::SeqCst);
 
-        let create_savepoint_statement = self.create_savepoint_statement(self.depth);
+        let create_savepoint_statement = self.create_savepoint_statement(new_depth);
         if self.options().use_phantom_query {
             let create_savepoint_statement = JsBaseQueryable::phantom_query_message(&create_savepoint_statement);
             self.raw_phantom_cmd(create_savepoint_statement.as_str()).await?;
@@ -195,8 +204,9 @@ impl QuaintTransaction for JsTransaction {
         Ok(())
     }
 
-    async fn release_savepoint(&mut self) -> quaint::Result<()> {
-        let release_savepoint_statement = self.release_savepoint_statement(self.depth);
+    async fn release_savepoint(&self) -> quaint::Result<()> {
+        let depth_val = self.depth.load(Ordering::SeqCst);
+        let release_savepoint_statement = self.release_savepoint_statement(depth_val);
         if self.options().use_phantom_query {
             let release_savepoint_statement = JsBaseQueryable::phantom_query_message(&release_savepoint_statement);
             self.raw_phantom_cmd(release_savepoint_statement.as_str()).await?;
@@ -205,13 +215,14 @@ impl QuaintTransaction for JsTransaction {
         }
 
         // Modify the depth value
-        self.depth -= 1;
+        self.depth.fetch_sub(1, Ordering::SeqCst);
 
         Ok(())
     }
 
-    async fn rollback_to_savepoint(&mut self) -> quaint::Result<()> {
-        let rollback_to_savepoint_statement = self.rollback_to_savepoint_statement(self.depth);
+    async fn rollback_to_savepoint(&self) -> quaint::Result<()> {
+        let depth_val = self.depth.load(Ordering::SeqCst);
+        let rollback_to_savepoint_statement = self.rollback_to_savepoint_statement(depth_val);
         if self.options().use_phantom_query {
             let rollback_to_savepoint_statement =
                 JsBaseQueryable::phantom_query_message(&rollback_to_savepoint_statement);
@@ -221,7 +232,7 @@ impl QuaintTransaction for JsTransaction {
         }
 
         // Modify the depth value
-        self.depth -= 1;
+        self.depth.fetch_sub(1, Ordering::SeqCst);
 
         Ok(())
     }

@@ -65,7 +65,7 @@ async fn select_star_from(api: &mut dyn TestApi) -> crate::Result<()> {
 async fn transactions(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("value int").await?;
 
-    let mut tx = api.conn().start_transaction(None).await?;
+    let tx = api.conn().start_transaction(None).await?;
     let insert = Insert::single_into(&table).value("value", 10);
 
     let rows_affected = tx.execute(insert.into()).await?;
