@@ -370,9 +370,9 @@ impl JsQueryable {
         }
 
         // 3. Spawn a transaction from the context.
-        let mut tx = tx_ctx.start_transaction().await?;
+        let tx = tx_ctx.start_transaction().await?;
 
-        tx.depth += 1;
+        tx.increment_depth();
 
         let begin_stmt = tx.begin_statement();
         let tx_opts = tx.options();

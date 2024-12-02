@@ -17,22 +17,22 @@ pub trait Transaction: Queryable {
     fn depth(&self) -> u32;
 
     /// Start a new transaction or nested transaction via savepoint.
-    async fn begin(&mut self) -> crate::Result<()>;
+    async fn begin(&self) -> crate::Result<()>;
 
     /// Commit the changes to the database and consume the transaction.
-    async fn commit(&mut self) -> crate::Result<()>;
+    async fn commit(&self) -> crate::Result<()>;
 
     /// Rolls back the changes to the database.
-    async fn rollback(&mut self) -> crate::Result<()>;
+    async fn rollback(&self) -> crate::Result<()>;
 
     /// Creates a savepoint in the transaction.
-    async fn create_savepoint(&mut self) -> crate::Result<()>;
+    async fn create_savepoint(&self) -> crate::Result<()>;
 
     /// Releases a savepoint in the transaction.
-    async fn release_savepoint(&mut self) -> crate::Result<()>;
+    async fn release_savepoint(&self) -> crate::Result<()>;
 
     /// Rolls back to a savepoint in the transaction.
-    async fn rollback_to_savepoint(&mut self) -> crate::Result<()>;
+    async fn rollback_to_savepoint(&self) -> crate::Result<()>;
 
     /// workaround for lack of upcasting between traits https://github.com/rust-lang/rust/issues/65991
     fn as_queryable(&self) -> &dyn Queryable;
@@ -98,7 +98,7 @@ impl<'a> DefaultTransaction<'a> {
         inner: &'a dyn Queryable,
         tx_opts: TransactionOptions,
     ) -> crate::Result<DefaultTransaction<'a>> {
-        let mut this = Self {
+        let this = Self {
             inner,
             gauge: GaugeGuard::increment("prisma_client_queries_active"),
             depth: AtomicU32::new(0),
@@ -130,7 +130,7 @@ impl Transaction for DefaultTransaction<'_> {
         self.depth.load(Ordering::SeqCst)
     }
 
-    async fn begin(&mut self) -> crate::Result<()> {
+    async fn begin(&self) -> crate::Result<()> {
         self.depth.fetch_add(1, Ordering::SeqCst);
 
         let begin_statement = self.inner.begin_statement();
@@ -141,7 +141,7 @@ impl Transaction for DefaultTransaction<'_> {
     }
 
     /// Commit the changes to the database and consume the transaction.
-    async fn commit(&mut self) -> crate::Result<()> {
+    async fn commit(&self) -> crate::Result<()> {
         // Perform the asynchronous operation without holding the lock
         self.inner.raw_cmd("COMMIT").await?;
 
@@ -153,7 +153,7 @@ impl Transaction for DefaultTransaction<'_> {
     }
 
     /// Rolls back the changes to the database.
-    async fn rollback(&mut self) -> crate::Result<()> {
+    async fn rollback(&self) -> crate::Result<()> {
         self.inner.raw_cmd("ROLLBACK").await?;
 
         self.depth.fetch_sub(1, Ordering::SeqCst);
@@ -164,7 +164,7 @@ impl Transaction for DefaultTransaction<'_> {
     }
 
     /// Creates a savepoint in the transaction
-    async fn create_savepoint(&mut self) -> crate::Result<()> {
+    async fn create_savepoint(&self) -> crate::Result<()> {
         let current_depth = self.depth.load(Ordering::SeqCst);
         let new_depth = current_depth + 1;
         self.depth.store(new_depth, Ordering::SeqCst);
@@ -175,8 +175,7 @@ impl Transaction for DefaultTransaction<'_> {
     }
 
     /// Releases a savepoint in the transaction
-    async fn release_savepoint(&mut self) -> crate::Result<()> {
-        // Lock the mutex and get the depth value
+    async fn release_savepoint(&self) -> crate::Result<()> {
         let depth_val = self.depth.load(Ordering::SeqCst);
 
         if depth_val == 0 {
@@ -195,7 +194,7 @@ impl Transaction for DefaultTransaction<'_> {
     }
 
     /// Rollback to savepoint in the transaction
-    async fn rollback_to_savepoint(&mut self) -> crate::Result<()> {
+    async fn rollback_to_savepoint(&self) -> crate::Result<()> {
         let depth_val = self.depth.load(Ordering::SeqCst);
 
         if depth_val == 0 {
