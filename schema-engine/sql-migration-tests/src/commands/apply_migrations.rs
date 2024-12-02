@@ -66,7 +66,7 @@ impl std::fmt::Debug for ApplyMigrationsAssertion<'_> {
     }
 }
 
-impl<'a> ApplyMigrationsAssertion<'a> {
+impl ApplyMigrationsAssertion<'_> {
     #[track_caller]
     pub fn assert_applied_migrations(self, names: &[&str]) -> Self {
         let found_names: Vec<&str> = self

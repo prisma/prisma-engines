@@ -55,7 +55,7 @@ impl<'a> CompositeType<'a> {
     }
 }
 
-impl<'a> fmt::Display for CompositeType<'a> {
+impl fmt::Display for CompositeType<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(ref docs) = self.documentation {
             docs.fmt(f)?;

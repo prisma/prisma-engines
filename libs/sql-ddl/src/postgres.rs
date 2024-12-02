@@ -324,7 +324,7 @@ pub struct CreateEnum<'a> {
     pub variants: Vec<Cow<'a, str>>,
 }
 
-impl<'a> Display for CreateEnum<'a> {
+impl Display for CreateEnum<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "CREATE TYPE {enum_name} AS ENUM (", enum_name = self.enum_name)?;
         self.variants.iter().map(|s| StrLit(s)).join(", ", f)?;
@@ -349,7 +349,7 @@ pub struct CreateIndex<'a> {
     pub using: Option<IndexAlgorithm>,
 }
 
-impl<'a> Display for CreateIndex<'a> {
+impl Display for CreateIndex<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let using = match self.using {
             Some(IndexAlgorithm::Hash) => " USING HASH ",

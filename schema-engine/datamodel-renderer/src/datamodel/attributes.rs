@@ -37,7 +37,7 @@ impl<'a> FieldAttribute<'a> {
     }
 }
 
-impl<'a> fmt::Display for FieldAttribute<'a> {
+impl fmt::Display for FieldAttribute<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("@")?;
 
@@ -70,7 +70,7 @@ impl<'a> BlockAttribute<'a> {
     }
 }
 
-impl<'a> fmt::Display for BlockAttribute<'a> {
+impl fmt::Display for BlockAttribute<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("@@")?;
         self.0.fmt(f)?;

@@ -73,6 +73,7 @@ impl<'a> From<Column<'a>> for JsonType<'a> {
     }
 }
 
+#[cfg_attr(not(feature = "mssql"), allow(clippy::needless_lifetimes))]
 impl<'a> Compare<'a> {
     /// Finds a possible `(a,y) IN (SELECT x,z FROM B)`, takes the select out and
     /// converts the comparison into `a IN (SELECT x FROM cte_n where z = y)`.
@@ -740,7 +741,7 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(params, vec![Value::from("chicken")]);
     ///
-    /// # Ok(())    
+    /// # Ok(())
     /// # }
     /// ```
     fn matches<T>(self, query: T) -> Compare<'a>
@@ -763,7 +764,7 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(params, vec![Value::from("chicken")]);
     ///
-    /// # Ok(())    
+    /// # Ok(())
     /// # }
     /// ```
     fn not_matches<T>(self, query: T) -> Compare<'a>

@@ -27,7 +27,7 @@ impl<'a> PostgreSql<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> TestApi for PostgreSql<'a> {
+impl TestApi for PostgreSql<'_> {
     fn system(&self) -> &'static str {
         "postgres"
     }

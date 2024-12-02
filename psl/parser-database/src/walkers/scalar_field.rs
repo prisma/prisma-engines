@@ -165,7 +165,7 @@ impl<'db> ScalarFieldWalker<'db> {
     }
 }
 
-impl<'db> fmt::Display for ScalarFieldWalker<'db> {
+impl fmt::Display for ScalarFieldWalker<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.name())
     }

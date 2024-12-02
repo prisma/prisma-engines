@@ -30,7 +30,6 @@ impl ConstraintNames {
     /// excl for an Exclusion constraint
     /// seq for sequences
     ///
-
     pub fn primary_key_name(table_name: &str, connector: &dyn Connector) -> String {
         let suffix = "_pkey";
         let limit = connector.max_identifier_length();

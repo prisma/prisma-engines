@@ -23,7 +23,7 @@ impl<'a> Sqlite<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> TestApi for Sqlite<'a> {
+impl TestApi for Sqlite<'_> {
     fn system(&self) -> &'static str {
         "sqlite"
     }

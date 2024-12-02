@@ -50,7 +50,7 @@ pub struct Function<'a> {
     pub(crate) alias: Option<Cow<'a, str>>,
 }
 
-impl<'a> Function<'a> {
+impl Function<'_> {
     pub fn returns_json(&self) -> bool {
         matches!(
             self.typ_,

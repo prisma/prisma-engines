@@ -36,7 +36,7 @@ impl<'a> From<&'a StringFromEnvVar> for Env<'a> {
     }
 }
 
-impl<'a> fmt::Display for Env<'a> {
+impl fmt::Display for Env<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Env::FromVar(var) => {

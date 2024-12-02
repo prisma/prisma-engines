@@ -60,7 +60,7 @@ pub struct JsonVisitor<'a> {
     values: BTreeMap<&'a str, Value>,
 }
 
-impl<'a> JsonVisitor<'a> {
+impl JsonVisitor<'_> {
     pub fn new(level: &Level, target: &str) -> Self {
         let mut values = BTreeMap::new();
         values.insert("level", serde_json::Value::from(level.to_string()));
@@ -72,7 +72,7 @@ impl<'a> JsonVisitor<'a> {
     }
 }
 
-impl<'a> Visit for JsonVisitor<'a> {
+impl Visit for JsonVisitor<'_> {
     fn record_debug(&mut self, field: &Field, value: &dyn fmt::Debug) {
         match field.name() {
             name if name.starts_with("r#") => {
@@ -102,7 +102,7 @@ impl<'a> Visit for JsonVisitor<'a> {
     }
 }
 
-impl<'a> std::fmt::Display for JsonVisitor<'a> {
+impl std::fmt::Display for JsonVisitor<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(&serde_json::to_string(&self.values).unwrap())
     }
