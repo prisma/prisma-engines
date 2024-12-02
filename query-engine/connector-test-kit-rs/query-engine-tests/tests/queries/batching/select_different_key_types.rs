@@ -44,12 +44,12 @@ mod float_in_schema {
                     createOneFloatEntity(data: { Id: 1, Text: "A" }) {
                       Text
                     }
-                  }"#,
+               }"#,
             r#"mutation entity {
                     createOneFloatEntity(data: { Id: 2, Text: "B" }) {
                       Text
                     }
-                  }"#,
+               }"#,
         ] {
             runner.query(mutation).await?.assert_success();
         }
@@ -100,12 +100,12 @@ mod bigint_in_schema {
                     createOneBigIntEntity(data: { Id: 1, Text: "A" }) {
                       Text
                     }
-                  }"#,
+               }"#,
             r#"mutation entity {
                     createOneBigIntEntity(data: { Id: 2, Text: "B" }) {
                       Text
                     }
-                }"#,
+               }"#,
         ] {
             runner.query(mutation).await?.assert_success();
         }
@@ -156,12 +156,12 @@ mod decimal_in_schema {
                     createOneDecimalEntity(data: { Id: 1, Text: "A" }) {
                       Text
                     }
-                  }"#,
+               }"#,
             r#"mutation entity {
                     createOneDecimalEntity(data: { Id: 2, Text: "B" }) {
                       Text
                     }
-                }"#,
+               }"#,
         ] {
             runner.query(mutation).await?.assert_success();
         }
@@ -212,12 +212,12 @@ mod datetime_in_schema {
                     createOneDateTimeEntity(data: { Id: "2020-01-01T00:00:00Z", Text: "A" }) {
                       Text
                     }
-                }"#,
+               }"#,
             r#"mutation entity {
                     createOneDateTimeEntity(data: { Id: "2020-01-02T00:00:00Z", Text: "B" }) {
                       Text
                     }
-                }"#,
+               }"#,
         ] {
             runner.query(mutation).await?.assert_success();
         }
