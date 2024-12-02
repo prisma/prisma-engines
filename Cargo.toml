@@ -76,14 +76,13 @@ tracing = { version = "0.1" }
 tracing-futures = "0.2"
 tsify = { version = "0.4.5" }
 
-# version for `wasm-bindgen@0.2.93`, see:
-# https://github.com/rustwasm/wasm-bindgen/pull/4072/
-js-sys = { version = "0.3.70" } 
-
-wasm-bindgen = { version = "0.2.93" }
-wasm-bindgen-futures = { version = "0.4" }
+# version for `wasm-bindgen@0.2.95`, see https://github.com/rustwasm/wasm-bindgen/blob/0.2.95/crates/js-sys/Cargo.toml
+js-sys = { version = "0.3.72" }
+wasm-bindgen = { version = "=0.2.95" }
+wasm-bindgen-futures = { version = "0.4.45" }
 wasm-rs-dbg = { version = "0.1.2", default-features = false, features = ["console-error"] }
-wasm-bindgen-test = { version = "0.3.0" }
+wasm-bindgen-test = { version = "0.3.45" }
+
 url = { version = "2.5.0" }
 
 bson = { version = "2.11.0", features = ["chrono-0_4", "uuid-1"] }
