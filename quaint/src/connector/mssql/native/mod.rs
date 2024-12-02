@@ -256,7 +256,7 @@ impl Queryable for Mssql {
     // MSSQL doesn't have a "RELEASE SAVEPOINT" equivalent, so in a nested
     // transaction we just continue onwards
     fn release_savepoint_statement(&self, _depth: u32) -> Cow<'static, str> {
-        Cow::Owned("".to_string())
+        Cow::Borrowed("")
     }
 
     /// Statement to rollback to a savepoint
