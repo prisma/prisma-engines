@@ -854,14 +854,13 @@ fn removal_index_length_prefix_should_not_happen_without_preview_feature(api: Te
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
 
-#[test_connector(tags(Mysql), preview_features("fullTextIndex"))]
+#[test_connector(tags(Mysql))]
 fn fulltext_index(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
 
         generator client {{
           provider = "prisma-client-js"
-          previewFeatures = ["fullTextIndex"]
         }}
 
         model A {{
@@ -880,7 +879,7 @@ fn fulltext_index(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Mysql), preview_features("fullTextIndex"))]
+#[test_connector(tags(Mysql))]
 fn fulltext_index_with_map(api: TestApi) {
     let dm = indoc! {r#"
         datasource db {
@@ -890,7 +889,6 @@ fn fulltext_index_with_map(api: TestApi) {
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["fullTextIndex"]
         }
 
         model A {
@@ -910,33 +908,6 @@ fn fulltext_index_with_map(api: TestApi) {
 }
 
 #[test_connector(tags(Mysql))]
-fn do_not_overwrite_fulltext_index_without_preview_feature(api: TestApi) {
-    let sql = indoc! {r#"
-        CREATE TABLE `A` (
-            id INT PRIMARY KEY,
-            a VARCHAR(255) NOT NULL,
-            b VARCHAR(255) NOT NULL
-        );
-
-        CREATE FULLTEXT INDEX `A_a_b_idx` ON `A` (a, b);
-    "#};
-
-    api.raw_cmd(sql);
-
-    let dm = indoc! {r#"
-        model A {
-          id Int    @id
-          a  String @db.VarChar(255)
-          b  String @db.VarChar(255)
-
-          @@index([a, b])
-        }
-    "#};
-
-    api.schema_push_w_datasource(dm).send().assert_no_steps();
-}
-
-#[test_connector(tags(Mysql), preview_features("fullTextIndex"))]
 fn adding_fulltext_index_to_an_existing_column(api: TestApi) {
     let dm = indoc! {r#"
         model A {
@@ -968,7 +939,7 @@ fn adding_fulltext_index_to_an_existing_column(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Mysql), exclude(Mysql56), preview_features("fullTextIndex"))]
+#[test_connector(tags(Mysql), exclude(Mysql56))]
 fn changing_normal_index_to_a_fulltext_index(api: TestApi) {
     let dm = indoc! {r#"
         model A {
@@ -1003,4 +974,50 @@ fn changing_normal_index_to_a_fulltext_index(api: TestApi) {
         table.assert_indexes_count(1);
         table.assert_index_on_columns(&["a", "b"], |index| index.assert_is_fulltext())
     });
+}
+
+#[test_connector]
+fn changing_unique_to_pk_works(api: TestApi) {
+    let dm1 = indoc! {r#"
+        model A {
+            id   Int     @unique
+            name String?
+        }
+
+        model B {
+            x Int
+            y Int
+
+            @@unique([x, y])
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+
+    api.assert_schema()
+        .assert_table("A", |table| {
+            table.assert_index_on_columns(&["id"], |index| index.assert_is_unique())
+        })
+        .assert_table("B", |table| {
+            table.assert_index_on_columns(&["x", "y"], |index| index.assert_is_unique())
+        });
+
+    let dm2 = indoc! {r#"
+        model A {
+            id Int @id
+        }
+
+        model B {
+            x Int
+            y Int
+
+            @@id([x, y])
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm2).send().assert_green();
+
+    api.assert_schema()
+        .assert_table("A", |table| table.assert_pk(|pk| pk.assert_columns(&["id"])))
+        .assert_table("B", |table| table.assert_pk(|pk| pk.assert_columns(&["x", "y"])));
 }

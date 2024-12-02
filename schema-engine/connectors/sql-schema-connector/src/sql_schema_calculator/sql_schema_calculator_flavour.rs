@@ -39,4 +39,13 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
     }
 
     fn push_connector_data(&self, _context: &mut super::Context<'_>) {}
+
+    fn m2m_join_table_constraint(&self) -> JoinTableUniquenessConstraint {
+        JoinTableUniquenessConstraint::UniqueIndex
+    }
+}
+
+pub(crate) enum JoinTableUniquenessConstraint {
+    PrimaryKey,
+    UniqueIndex,
 }

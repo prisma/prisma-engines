@@ -108,7 +108,7 @@ impl<'a> DatamodelCalculatorContext<'a> {
             .table_walkers()
             .filter(|table| !is_old_migration_table(*table))
             .filter(|table| !is_new_migration_table(*table))
-            .filter(|table| !is_prisma_m_to_n_relation(*table))
+            .filter(|table| !is_prisma_m_to_n_relation(*table, self.flavour.uses_pk_in_m2m_join_tables(self)))
             .filter(|table| !is_relay_table(*table))
             .map(move |next| {
                 let previous = self.existing_model(next.id);

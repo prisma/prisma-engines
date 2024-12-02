@@ -4,6 +4,7 @@
     {
       "name": "Post",
       "dbName": null,
+      "schema": null,
       "fields": [
         {
           "name": "title",
@@ -15,6 +16,12 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": [
+            "VarChar",
+            [
+              "300"
+            ]
+          ],
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -28,6 +35,12 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": [
+            "VarChar",
+            [
+              "3000"
+            ]
+          ],
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -41,6 +54,12 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": [
+            "VarChar",
+            [
+              "3000"
+            ]
+          ],
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -54,6 +73,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "String",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -67,6 +87,7 @@
           "isReadOnly": false,
           "hasDefaultValue": false,
           "type": "DateTime",
+          "nativeType": null,
           "isGenerated": false,
           "isUpdatedAt": false
         }

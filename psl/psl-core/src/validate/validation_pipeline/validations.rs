@@ -116,7 +116,6 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
             indexes::field_length_prefix_supported(index, ctx);
             indexes::index_algorithm_is_supported(index, ctx);
             indexes::hash_index_must_not_use_sort_param(index, ctx);
-            indexes::fulltext_index_preview_feature_enabled(index, ctx);
             indexes::fulltext_index_supported(index, ctx);
             indexes::fulltext_columns_should_not_define_length(index, ctx);
             indexes::fulltext_column_sort_is_supported(index, ctx);

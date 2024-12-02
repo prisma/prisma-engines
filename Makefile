@@ -359,6 +359,9 @@ start-mongodb_5:
 dev-mongodb_5: start-mongodb_5
 	cp $(CONFIG_PATH)/mongodb5 $(CONFIG_FILE)
 
+dev-mongodb_5_single: start-mongodb5-single
+	cp $(CONFIG_PATH)/mongodb5 $(CONFIG_FILE)
+
 dev-mongodb_4_2: start-mongodb_4_2
 	cp $(CONFIG_PATH)/mongodb42 $(CONFIG_FILE)
 
