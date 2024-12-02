@@ -17,22 +17,22 @@ pub trait Transaction: Queryable {
     fn depth(&self) -> u32;
 
     /// Start a new transaction or nested transaction via savepoint.
-    async fn begin(&mut self) -> crate::Result<()>;
+    async fn begin(&self) -> crate::Result<()>;
 
     /// Commit the changes to the database and consume the transaction.
-    async fn commit(&mut self) -> crate::Result<()>;
+    async fn commit(&self) -> crate::Result<()>;
 
     /// Rolls back the changes to the database.
-    async fn rollback(&mut self) -> crate::Result<()>;
+    async fn rollback(&self) -> crate::Result<()>;
 
     /// Creates a savepoint in the transaction.
-    async fn create_savepoint(&mut self) -> crate::Result<()>;
+    async fn create_savepoint(&self) -> crate::Result<()>;
 
     /// Releases a savepoint in the transaction.
-    async fn release_savepoint(&mut self) -> crate::Result<()>;
+    async fn release_savepoint(&self) -> crate::Result<()>;
 
     /// Rolls back to a savepoint in the transaction.
-    async fn rollback_to_savepoint(&mut self) -> crate::Result<()>;
+    async fn rollback_to_savepoint(&self) -> crate::Result<()>;
 
     /// workaround for lack of upcasting between traits https://github.com/rust-lang/rust/issues/65991
     fn as_queryable(&self) -> &dyn Queryable;
@@ -98,7 +98,7 @@ impl<'a> DefaultTransaction<'a> {
         inner: &'a dyn Queryable,
         tx_opts: TransactionOptions,
     ) -> crate::Result<DefaultTransaction<'a>> {
-        let mut this = Self {
+        let this = Self {
             inner,
             gauge: GaugeGuard::increment("prisma_client_queries_active"),
             depth: AtomicU32::new(0),
@@ -130,7 +130,7 @@ impl Transaction for DefaultTransaction<'_> {
         self.depth.load(Ordering::SeqCst)
     }
 
-    async fn begin(&mut self) -> crate::Result<()> {
+    async fn begin(&self) -> crate::Result<()> {
         self.depth.fetch_add(1, Ordering::SeqCst);
 
         let begin_statement = self.inner.begin_statement();
@@ -140,43 +140,45 @@ impl Transaction for DefaultTransaction<'_> {
     }
 
     /// Commit the changes to the database and consume the transaction.
-    async fn commit(&mut self) -> crate::Result<()> {
+    async fn commit(&self) -> crate::Result<()> {
         self.inner.raw_cmd("COMMIT").await?;
 
         self.depth.fetch_sub(1, Ordering::SeqCst);
-
         self.gauge.decrement();
 
         Ok(())
     }
 
     /// Rolls back the changes to the database.
-    async fn rollback(&mut self) -> crate::Result<()> {
+    async fn rollback(&self) -> crate::Result<()> {
         self.inner.raw_cmd("ROLLBACK").await?;
 
         self.depth.fetch_sub(1, Ordering::SeqCst);
-
         self.gauge.decrement();
 
         Ok(())
     }
 
     /// Creates a savepoint in the transaction.
-    async fn create_savepoint(&mut self) -> crate::Result<()> {
-        self.depth.fetch_add(1, Ordering::SeqCst);
+    async fn create_savepoint(&self) -> crate::Result<()> {
+        let current_depth = self.depth.load(Ordering::SeqCst);
+        let new_depth = current_depth + 1;
+        self.depth.store(new_depth, Ordering::SeqCst);
 
-        let depth = self.depth.load(Ordering::SeqCst);
-        let stmt = self.inner.create_savepoint_statement(depth);
+        let stmt = self.inner.create_savepoint_statement(new_depth);
         self.inner.raw_cmd(stmt.as_ref()).await?;
+
         Ok(())
     }
 
     /// Releases a savepoint in the transaction.
-    async fn release_savepoint(&mut self) -> crate::Result<()> {
+    async fn release_savepoint(&self) -> crate::Result<()> {
         let depth_val = self.depth.load(Ordering::SeqCst);
 
         if depth_val == 0 {
-            panic!("No savepoint to release in transaction, make sure to call create_savepoint before release_savepoint");
+            panic!(
+                "No savepoint to release in transaction, make sure to call create_savepoint before release_savepoint"
+            );
         }
 
         let stmt = self.inner.release_savepoint_statement(depth_val);
@@ -188,7 +190,7 @@ impl Transaction for DefaultTransaction<'_> {
     }
 
     /// Rolls back to a savepoint in the transaction.
-    async fn rollback_to_savepoint(&mut self) -> crate::Result<()> {
+    async fn rollback_to_savepoint(&self) -> crate::Result<()> {
         let depth_val = self.depth.load(Ordering::SeqCst);
 
         if depth_val == 0 {
@@ -312,3 +314,4 @@ impl FromStr for IsolationLevel {
         }
     }
 }
+

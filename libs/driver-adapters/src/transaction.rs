@@ -1,4 +1,7 @@
-use std::borrow::Cow;
+use std::{
+    borrow::Cow,
+    sync::atomic::{AtomicU32, Ordering},
+};
 
 use async_trait::async_trait;
 use quaint::{
@@ -8,21 +11,24 @@ use quaint::{
 };
 
 use crate::proxy::{TransactionOptions, TransactionProxy};
-use crate::{JsObject, JsResult};
 use crate::{proxy::CommonProxy, queryable::JsBaseQueryable, send_future::UnsafeFuture};
+use crate::{JsObject, JsResult};
 
-// Wrapper around JS transaction objects that implements Queryable
-// and quaint::Transaction. Can be used in place of quaint transaction,
-// but delegates most operations to JS.
+// Wrapper around JS transaction objects that implements Queryable and quaint::Transaction.
+// It delegates the underlying transaction lifecycle to the JS driver adapter.
 pub(crate) struct JsTransaction {
     tx_proxy: TransactionProxy,
     inner: JsBaseQueryable,
-    depth: u32,
+    pub depth: AtomicU32,
 }
 
 impl JsTransaction {
     pub(crate) fn new(inner: JsBaseQueryable, tx_proxy: TransactionProxy) -> Self {
-        Self { inner, tx_proxy, depth: 0 }
+        Self {
+            inner,
+            tx_proxy,
+            depth: AtomicU32::new(0),
+        }
     }
 
     pub fn options(&self) -> &TransactionOptions {
@@ -33,21 +39,21 @@ impl JsTransaction {
         let params = &[];
         quaint::connector::trace::query(self.inner.db_system_name, cmd, params, move || async move { Ok(()) }).await
     }
+
+    pub fn increment_depth(&self) {
+        self.depth.fetch_add(1, Ordering::SeqCst);
+    }
 }
 
 #[async_trait]
 impl QuaintTransaction for JsTransaction {
     fn depth(&self) -> u32 {
-        self.depth
+        self.depth.load(Ordering::SeqCst)
     }
 
-    async fn begin(&mut self) -> quaint::Result<()> {
-        if self.depth > 0 {
-            // Starting a nested transaction uses savepoints.
-            return self.create_savepoint().await;
-        }
+    async fn begin(&self) -> quaint::Result<()> {
+        self.depth.fetch_add(1, Ordering::SeqCst);
 
-        self.depth = 1;
         let begin_stmt = self.begin_statement();
 
         if self.options().use_phantom_query {
@@ -61,11 +67,7 @@ impl QuaintTransaction for JsTransaction {
         Ok(())
     }
 
-    async fn commit(&mut self) -> quaint::Result<()> {
-        if self.depth > 1 {
-            return self.release_savepoint().await;
-        }
-
+    async fn commit(&self) -> quaint::Result<()> {
         let commit_stmt = "COMMIT";
 
         if self.options().use_phantom_query {
@@ -77,15 +79,11 @@ impl QuaintTransaction for JsTransaction {
 
         UnsafeFuture(self.tx_proxy.commit()).await?;
 
-        self.depth = 0;
+        self.depth.fetch_sub(1, Ordering::SeqCst);
         Ok(())
     }
 
-    async fn rollback(&mut self) -> quaint::Result<()> {
-        if self.depth > 1 {
-            return self.rollback_to_savepoint().await;
-        }
-
+    async fn rollback(&self) -> quaint::Result<()> {
         let rollback_stmt = "ROLLBACK";
 
         if self.options().use_phantom_query {
@@ -97,14 +95,16 @@ impl QuaintTransaction for JsTransaction {
 
         UnsafeFuture(self.tx_proxy.rollback()).await?;
 
-        self.depth = 0;
+        self.depth.fetch_sub(1, Ordering::SeqCst);
         Ok(())
     }
 
-    async fn create_savepoint(&mut self) -> quaint::Result<()> {
-        self.depth += 1;
+    async fn create_savepoint(&self) -> quaint::Result<()> {
+        let current_depth = self.depth.load(Ordering::SeqCst);
+        let new_depth = current_depth + 1;
+        self.depth.store(new_depth, Ordering::SeqCst);
 
-        let stmt = self.create_savepoint_statement(self.depth);
+        let stmt = self.create_savepoint_statement(new_depth);
         if self.options().use_phantom_query {
             let phantom = JsBaseQueryable::phantom_query_message(stmt.as_ref());
             self.raw_phantom_cmd(phantom.as_str()).await?;
@@ -115,8 +115,10 @@ impl QuaintTransaction for JsTransaction {
         Ok(())
     }
 
-    async fn release_savepoint(&mut self) -> quaint::Result<()> {
-        let stmt = self.release_savepoint_statement(self.depth);
+    async fn release_savepoint(&self) -> quaint::Result<()> {
+        let depth_val = self.depth.load(Ordering::SeqCst);
+
+        let stmt = self.release_savepoint_statement(depth_val);
         if self.options().use_phantom_query {
             let phantom = JsBaseQueryable::phantom_query_message(stmt.as_ref());
             self.raw_phantom_cmd(phantom.as_str()).await?;
@@ -124,12 +126,14 @@ impl QuaintTransaction for JsTransaction {
             self.inner.raw_cmd(stmt.as_ref()).await?;
         }
 
-        self.depth -= 1;
+        self.depth.fetch_sub(1, Ordering::SeqCst);
         Ok(())
     }
 
-    async fn rollback_to_savepoint(&mut self) -> quaint::Result<()> {
-        let stmt = self.rollback_to_savepoint_statement(self.depth);
+    async fn rollback_to_savepoint(&self) -> quaint::Result<()> {
+        let depth_val = self.depth.load(Ordering::SeqCst);
+
+        let stmt = self.rollback_to_savepoint_statement(depth_val);
         if self.options().use_phantom_query {
             let phantom = JsBaseQueryable::phantom_query_message(stmt.as_ref());
             self.raw_phantom_cmd(phantom.as_str()).await?;
@@ -137,7 +141,7 @@ impl QuaintTransaction for JsTransaction {
             self.inner.raw_cmd(stmt.as_ref()).await?;
         }
 
-        self.depth -= 1;
+        self.depth.fetch_sub(1, Ordering::SeqCst);
         Ok(())
     }
 
