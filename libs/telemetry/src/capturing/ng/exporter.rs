@@ -64,9 +64,23 @@ impl From<CollectedEvent> for ExportedEvent {
 }
 
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct Trace {
+pub struct TraceData {
     pub spans: Vec<ExportedSpan>,
     pub events: Vec<ExportedEvent>,
+}
+
+struct Trace {
+    data: TraceData,
+    settings: CaptureSettings,
+}
+
+impl Trace {
+    fn new(settings: CaptureSettings) -> Self {
+        Self {
+            data: TraceData::default(),
+            settings,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -110,9 +124,34 @@ pub struct CaptureSettings {
     targets: BitFlags<CaptureTarget>,
 }
 
+impl CaptureSettings {
+    pub fn new(targets: BitFlags<CaptureTarget>) -> Self {
+        Self { targets }
+    }
+
+    pub fn filter(&self, target: CaptureTarget) -> bool {
+        self.targets.contains(target)
+    }
+}
+
+impl FromStr for CaptureSettings {
+    type Err = ();
+
+    fn from_str(targets: &str) -> Result<Self, Self::Err> {
+        let mut flags = BitFlags::empty();
+
+        for target in targets.split(',') {
+            let target = target.trim();
+            flags |= target.parse::<CaptureTarget>()?;
+        }
+
+        Ok(CaptureSettings::new(flags))
+    }
+}
+
 enum Message {
-    StartCapturing(RequestId),
-    StopCapturing(RequestId, oneshot::Sender<Option<Trace>>),
+    StartCapturing(RequestId, CaptureSettings),
+    StopCapturing(RequestId, oneshot::Sender<Option<TraceData>>),
     AddSpan(RequestId, CollectedSpan),
     AddEvent(RequestId, CollectedEvent),
 }
@@ -143,23 +182,27 @@ impl Exporter {
 
             while let Some(msg) = rx.recv().await {
                 match msg {
-                    Message::StartCapturing(request_id) => {
-                        traces.insert(request_id, Trace::default());
+                    Message::StartCapturing(request_id, settings) => {
+                        traces.insert(request_id, Trace::new(settings));
                     }
 
                     Message::StopCapturing(request_id, tx) => {
-                        _ = tx.send(traces.remove(&request_id));
+                        _ = tx.send(traces.remove(&request_id).map(|trace| trace.data));
                     }
 
                     Message::AddSpan(request_id, span) => {
                         if let Some(trace) = traces.get_mut(&request_id) {
-                            trace.spans.push(span.into());
+                            if trace.settings.filter(CaptureTarget::Spans) {
+                                trace.data.spans.push(span.into());
+                            }
                         }
                     }
 
                     Message::AddEvent(request_id, event) => {
                         if let Some(trace) = traces.get_mut(&request_id) {
-                            trace.events.push(event.into());
+                            if trace.settings.filter(event.level.into()) {
+                                trace.data.events.push(event.into());
+                            }
                         }
                     }
                 }
@@ -169,13 +212,13 @@ impl Exporter {
         Self { tx }
     }
 
-    pub async fn start_capturing(&self) -> RequestId {
+    pub async fn start_capturing(&self, settings: CaptureSettings) -> RequestId {
         let request_id = RequestId::next();
-        _ = self.tx.send(Message::StartCapturing(request_id));
+        _ = self.tx.send(Message::StartCapturing(request_id, settings));
         request_id
     }
 
-    pub async fn stop_capturing(&self, request_id: RequestId) -> Option<Trace> {
+    pub async fn stop_capturing(&self, request_id: RequestId) -> Option<TraceData> {
         let (tx, rx) = oneshot::channel();
         _ = self.tx.send(Message::StopCapturing(request_id, tx));
         rx.await.expect("capturer task dropped the sender")
@@ -197,10 +240,63 @@ mod tests {
 
     use super::*;
 
+    use enumflags2::make_bitflags;
+
+    use CaptureTarget::*;
+
+    fn capture_all() -> CaptureSettings {
+        CaptureSettings::new(Spans | TraceEvents | DebugEvents | InfoEvents | WarnEvents | ErrorEvents | QueryEvents)
+    }
+
+    fn capture_events() -> CaptureSettings {
+        CaptureSettings::new(TraceEvents | DebugEvents | InfoEvents | WarnEvents | ErrorEvents | QueryEvents)
+    }
+
+    fn capture_spans() -> CaptureSettings {
+        CaptureSettings::new(Spans.into())
+    }
+
+    #[test]
+    fn test_capture_settings_from_str() {
+        assert_eq!(
+            "tracing".parse::<CaptureSettings>().unwrap().targets,
+            BitFlags::from_flag(Spans)
+        );
+        assert_eq!(
+            "trace".parse::<CaptureSettings>().unwrap().targets,
+            BitFlags::from_flag(TraceEvents)
+        );
+        assert_eq!(
+            "debug".parse::<CaptureSettings>().unwrap().targets,
+            BitFlags::from_flag(DebugEvents)
+        );
+        assert_eq!(
+            "info".parse::<CaptureSettings>().unwrap().targets,
+            BitFlags::from_flag(InfoEvents)
+        );
+        assert_eq!(
+            "warn".parse::<CaptureSettings>().unwrap().targets,
+            BitFlags::from_flag(WarnEvents)
+        );
+        assert_eq!(
+            "error".parse::<CaptureSettings>().unwrap().targets,
+            BitFlags::from_flag(ErrorEvents)
+        );
+        assert_eq!(
+            "query".parse::<CaptureSettings>().unwrap().targets,
+            BitFlags::from_flag(QueryEvents)
+        );
+
+        let all = "tracing,trace,debug,info,warn,error,query"
+            .parse::<CaptureSettings>()
+            .unwrap();
+        assert_eq!(all.targets, capture_all().targets);
+    }
+
     #[tokio::test]
     async fn test_export_capture_cycle() {
         let exporter = Exporter::new();
-        let request_id = exporter.start_capturing().await;
+        let request_id = exporter.start_capturing(capture_all()).await;
 
         let span = CollectedSpan {
             id: tracing::span::Id::from_u64(1).into(),
@@ -227,7 +323,7 @@ mod tests {
         let trace = exporter.stop_capturing(request_id).await.unwrap();
 
         insta::assert_ron_snapshot!(trace, @r#"
-        Trace(
+        TraceData(
           spans: [
             ExportedSpan(
               id: SpanId("1"),
@@ -251,24 +347,49 @@ mod tests {
         "#);
     }
 
-    #[test]
-    fn test_capture_target_from_log_level() {
-        assert_eq!(CaptureTarget::from(LogLevel::Trace), CaptureTarget::TraceEvents);
-        assert_eq!(CaptureTarget::from(LogLevel::Debug), CaptureTarget::DebugEvents);
-        assert_eq!(CaptureTarget::from(LogLevel::Info), CaptureTarget::InfoEvents);
-        assert_eq!(CaptureTarget::from(LogLevel::Warn), CaptureTarget::WarnEvents);
-        assert_eq!(CaptureTarget::from(LogLevel::Error), CaptureTarget::ErrorEvents);
-        assert_eq!(CaptureTarget::from(LogLevel::Query), CaptureTarget::QueryEvents);
-    }
+    #[tokio::test]
+    async fn test_export_capture_cycle_with_ignored() {
+        let exporter = Exporter::new();
+        let request_id = exporter.start_capturing(capture_spans()).await;
 
-    #[test]
-    fn test_capture_target_from_str() {
-        assert_eq!("tracing".parse::<CaptureTarget>().unwrap(), CaptureTarget::Spans);
-        assert_eq!("trace".parse::<CaptureTarget>().unwrap(), CaptureTarget::TraceEvents);
-        assert_eq!("debug".parse::<CaptureTarget>().unwrap(), CaptureTarget::DebugEvents);
-        assert_eq!("info".parse::<CaptureTarget>().unwrap(), CaptureTarget::InfoEvents);
-        assert_eq!("warn".parse::<CaptureTarget>().unwrap(), CaptureTarget::WarnEvents);
-        assert_eq!("error".parse::<CaptureTarget>().unwrap(), CaptureTarget::ErrorEvents);
-        assert_eq!("query".parse::<CaptureTarget>().unwrap(), CaptureTarget::QueryEvents);
+        let span = CollectedSpan {
+            id: tracing::span::Id::from_u64(1).into(),
+            parent_id: None,
+            name: "test_span".into(),
+            start_time: SystemTime::UNIX_EPOCH.into(),
+            duration: Duration::from_secs(1).into(),
+            kind: SpanKind::Internal,
+            attributes: HashMap::new(),
+            links: Vec::new(),
+        };
+
+        let event = CollectedEvent {
+            span_id: span.id,
+            name: "test_event",
+            level: LogLevel::Info,
+            timestamp: SystemTime::UNIX_EPOCH.into(),
+            attributes: HashMap::new(),
+        };
+
+        exporter.add_span(request_id, span.clone());
+        exporter.add_event(request_id, event.clone());
+
+        let trace = exporter.stop_capturing(request_id).await.unwrap();
+
+        insta::assert_ron_snapshot!(trace, @r#"
+        TraceData(
+          spans: [
+            ExportedSpan(
+              id: SpanId("1"),
+              parentId: None,
+              name: "test_span",
+              startTime: HrTime(0, 0),
+              endTime: HrTime(1, 0),
+              kind: internal,
+            ),
+          ],
+          events: [],
+        )
+        "#);
     }
 }
