@@ -368,13 +368,15 @@ fn push_dropped_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
 
     for table in db.non_redefined_table_pairs() {
         for index in table.dropped_indexes() {
-            // MySQL requires an index on the referencing columns of every foreign key. The database
-            // will reuse a user-defined index if it exists, as long as the foreign key columns appear
-            // as the leftmost columns of the index. It's also possible for a single index to be
-            // used for more than one foreign key. We therefore have to find all such foreign keys
-            // and drop them before dropping the index and recreate them afterwards.
-            // For details see 'Conditions and Restrictions' at 'https://dev.mysql.com/doc/refman/8.0/en/create-table-foreign-keys.html'.
             if db.flavour.should_recreate_fks_covered_by_deleted_indexes() {
+                // MySQL requires an index on the referencing columns of every foreign key. The database
+                // will reuse a user-defined index if it exists, as long as the foreign key columns appear
+                // as the leftmost columns of the index. It's also possible for a single index to be
+                // used for more than one foreign key. We therefore have to find all such foreign keys
+                // and drop them before dropping the index and recreate them afterwards.
+                //
+                // For details see 'Conditions and Restrictions' at 'https://dev.mysql.com/doc/refman/8.0/en/create-table-foreign-keys.html'.
+
                 let mut covered_fks = index::get_fks_covered_by_index(table.previous(), index)
                     .map(|fk| (fk.id, fk))
                     .collect::<HashMap<_, _>>();
@@ -384,9 +386,11 @@ fn push_dropped_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
                     covered_fks.remove(&dropped.id);
                 }
 
-                // An edge case: if it looks like a normal index that has gone missing and it
-                // precisely matches the columns of a foreign key, we assume it is the underlying
-                // index created for the foreign key and we do not drop it.
+                // An edge case: if it looks like a normal index that has gone missing from the
+                // schema file and it precisely matches the columns of a foreign key, we assume it
+                // to be the index used for the foreign key and we do not drop it.
+                // This prevents us from dropping and re-creating the FK index when the schema file
+                // has not changed.
                 if index.is_normal()
                     && covered_fks
                         .values()
