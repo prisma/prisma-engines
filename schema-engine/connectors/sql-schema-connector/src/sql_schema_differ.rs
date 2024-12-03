@@ -388,7 +388,7 @@ fn push_dropped_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
 
                 // An edge case: if it looks like a normal index that has gone missing from the
                 // schema file and it precisely matches the columns of a foreign key, we assume it
-                // to be the index used for the foreign key and we do not drop it.
+                // to be the index created for the foreign key and we do not drop it.
                 // This prevents us from dropping and re-creating the FK index when the schema file
                 // has not changed.
                 if index.is_normal()
