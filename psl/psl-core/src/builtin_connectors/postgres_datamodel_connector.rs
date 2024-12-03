@@ -487,7 +487,7 @@ impl Connector for PostgresDatamodelConnector {
         match position {
             ast::SchemaPosition::Model(
                 _,
-                ast::ModelPosition::ModelAttribute("index", _, ast::AttributePosition::Argument("type")),
+                ast::ModelPosition::ModelAttribute("index", _, ast::AttributePosition::Argument("type", _)),
             ) => {
                 for index_type in self.supported_index_types() {
                     completions.items.push(CompletionItem {
@@ -503,7 +503,7 @@ impl Connector for PostgresDatamodelConnector {
                 ast::ModelPosition::ModelAttribute(
                     "index",
                     attr_id,
-                    ast::AttributePosition::FunctionArgument(field_name, "ops", _),
+                    ast::AttributePosition::FunctionArgument(field_name, "ops", _, _),
                 ),
             ) => {
                 // let's not care about composite field indices yet
