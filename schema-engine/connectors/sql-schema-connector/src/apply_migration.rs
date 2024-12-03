@@ -159,9 +159,7 @@ fn render_raw_sql(
             index_id,
             from_drop_and_recreate: _,
         } => vec![renderer.render_create_index(schemas.next.walk(*index_id))],
-        SqlMigrationStep::DropIndex { index_id } => {
-            vec![renderer.render_drop_index(schemas.previous.walk(*index_id))]
-        }
+        SqlMigrationStep::DropIndex { index_id } => vec![renderer.render_drop_index(schemas.previous.walk(*index_id))],
         SqlMigrationStep::RenameIndex { index } => renderer.render_rename_index(schemas.walk(*index)),
         SqlMigrationStep::DropView(drop_view) => {
             let view = schemas.previous.walk(drop_view.view_id);
