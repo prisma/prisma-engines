@@ -17,10 +17,7 @@ use crate::{
 };
 use column::ColumnTypeChange;
 use sql_schema_describer::{walkers::ForeignKeyWalker, IndexId, TableColumnId, Walker};
-use std::{
-    borrow::Cow,
-    collections::{HashMap, HashSet},
-};
+use std::{borrow::Cow, collections::HashSet};
 use table::TableDiffer;
 
 pub(crate) fn calculate_steps(
@@ -365,8 +362,11 @@ fn push_created_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
 
 fn push_dropped_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {
     let mut drop_indexes = HashSet::new();
+    let mut recreate_fkeys = HashSet::new();
 
     for table in db.non_redefined_table_pairs() {
+        let dropped_fkeys = table.dropped_foreign_keys().map(|fk| fk.id).collect::<HashSet<_>>();
+
         for index in table.dropped_indexes() {
             if db.flavour.should_recreate_fks_covered_by_deleted_indexes() {
                 // MySQL requires an index on the referencing columns of every foreign key. The database
@@ -375,16 +375,11 @@ fn push_dropped_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
                 // used for more than one foreign key. We therefore have to find all such foreign keys
                 // and drop them before dropping the index and recreate them afterwards.
                 //
-                // For details see 'Conditions and Restrictions' at 'https://dev.mysql.com/doc/refman/8.0/en/create-table-foreign-keys.html'.
-
-                let mut covered_fks = index::get_fks_covered_by_index(table.previous(), index)
-                    .map(|fk| (fk.id, fk))
-                    .collect::<HashMap<_, _>>();
-
-                // We do not care about foreign keys that are meant to be dropped anyway.
-                for dropped in table.dropped_foreign_keys() {
-                    covered_fks.remove(&dropped.id);
-                }
+                // For details see 'https://dev.mysql.com/doc/refman/8.0/en/create-table-foreign-keys.html#foreign-key-restrictions'.
+                let covered_fks = index::get_fks_covered_by_index(table.previous(), index)
+                    // We do not care about foreign keys that are meant to be dropped anyway.
+                    .filter(|fk| !dropped_fkeys.contains(&fk.id))
+                    .collect::<Vec<_>>();
 
                 // An edge case: if it looks like a normal index that has gone missing from the
                 // schema file and it precisely matches the columns of a foreign key, we assume it
@@ -393,20 +388,13 @@ fn push_dropped_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
                 // has not changed.
                 if index.is_normal()
                     && covered_fks
-                        .values()
+                        .iter()
                         .any(|fk| fk.constrained_columns().len() == index.columns().len())
                 {
                     continue;
                 }
 
-                for &fk_to_recreate in covered_fks.keys() {
-                    steps.push(SqlMigrationStep::DropForeignKey {
-                        foreign_key_id: fk_to_recreate,
-                    });
-                    steps.push(SqlMigrationStep::AddForeignKey {
-                        foreign_key_id: fk_to_recreate,
-                    });
-                }
+                recreate_fkeys.extend(covered_fks.iter().map(|fk| fk.id));
             }
 
             drop_indexes.insert(index.id);
@@ -425,6 +413,12 @@ fn push_dropped_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
 
     for index_id in drop_indexes.into_iter() {
         steps.push(SqlMigrationStep::DropIndex { index_id })
+    }
+
+    for foreign_key_id in recreate_fkeys.into_iter() {
+        steps.push(SqlMigrationStep::DropForeignKey { foreign_key_id });
+        // Due to re-ordering this will execute after the DropIndex step.
+        steps.push(SqlMigrationStep::AddForeignKey { foreign_key_id });
     }
 }
 

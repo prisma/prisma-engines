@@ -71,7 +71,13 @@ fn from_unique_index_to_without(mut api: TestApi) {
     })
     .unwrap();
 
-    let expected_printed_messages = if api.is_mysql() {
+    let expected_printed_messages = if api.is_vitess() {
+        expect![[r#"
+            [
+                "-- DropIndex\nDROP INDEX `Post_authorId_key` ON `Post`;\n",
+            ]
+            "#]]
+    } else if api.is_mysql() {
         // MySQL requires dropping the foreign key before dropping the index.
         expect![[r#"
             [
