@@ -9,9 +9,8 @@ use std::{
 use derive_more::Display;
 use serde::{Deserialize, Serialize};
 use tokio::time::Instant;
-use tracing::Level;
 
-use crate::models::{LogLevel, SpanKind, TraceSpan};
+use crate::models::{LogLevel, SpanKind};
 
 #[derive(Debug, Display, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[display(fmt = "{}", _0)]
