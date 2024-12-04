@@ -1,4 +1,4 @@
-use std::{borrow::Cow, collections::HashMap, fmt::Debug, str::FromStr, sync::Arc};
+use std::{borrow::Cow, collections::HashMap, fmt::Debug, str::FromStr};
 
 use enumflags2::{bitflags, BitFlags};
 use serde::Serialize;
@@ -120,13 +120,20 @@ impl FromStr for CaptureTarget {
     }
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct CaptureSettings {
     targets: BitFlags<CaptureTarget>,
 }
 
 impl CaptureSettings {
-    pub fn new(targets: BitFlags<CaptureTarget>) -> Self {
-        Self { targets }
+    pub fn new(targets: impl Into<BitFlags<CaptureTarget>>) -> Self {
+        Self {
+            targets: targets.into(),
+        }
+    }
+
+    pub fn none() -> Self {
+        Self::new(BitFlags::empty())
     }
 
     pub fn filter(&self, target: CaptureTarget) -> bool {
@@ -212,8 +219,7 @@ impl Exporter {
         Self { tx }
     }
 
-    pub async fn start_capturing(&self, settings: CaptureSettings) -> RequestId {
-        let request_id = RequestId::next();
+    pub async fn start_capturing(&self, request_id: RequestId, settings: CaptureSettings) -> RequestId {
         _ = self.tx.send(Message::StartCapturing(request_id, settings));
         request_id
     }
@@ -240,20 +246,14 @@ mod tests {
 
     use super::*;
 
-    use enumflags2::make_bitflags;
-
     use CaptureTarget::*;
 
     fn capture_all() -> CaptureSettings {
         CaptureSettings::new(Spans | TraceEvents | DebugEvents | InfoEvents | WarnEvents | ErrorEvents | QueryEvents)
     }
 
-    fn capture_events() -> CaptureSettings {
-        CaptureSettings::new(TraceEvents | DebugEvents | InfoEvents | WarnEvents | ErrorEvents | QueryEvents)
-    }
-
     fn capture_spans() -> CaptureSettings {
-        CaptureSettings::new(Spans.into())
+        CaptureSettings::new(Spans)
     }
 
     #[test]
@@ -296,7 +296,7 @@ mod tests {
     #[tokio::test]
     async fn test_export_capture_cycle() {
         let exporter = Exporter::new();
-        let request_id = exporter.start_capturing(capture_all()).await;
+        let request_id = exporter.start_capturing(RequestId::next(), capture_all()).await;
 
         let span = CollectedSpan {
             id: tracing::span::Id::from_u64(1).into(),
@@ -350,7 +350,7 @@ mod tests {
     #[tokio::test]
     async fn test_export_capture_cycle_with_ignored() {
         let exporter = Exporter::new();
-        let request_id = exporter.start_capturing(capture_spans()).await;
+        let request_id = exporter.start_capturing(RequestId::next(), capture_spans()).await;
 
         let span = CollectedSpan {
             id: tracing::span::Id::from_u64(1).into(),

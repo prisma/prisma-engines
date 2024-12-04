@@ -135,22 +135,17 @@
 //!      it serializes the extended response in json format and returns it as an HTTP Response
 //!      blob **[13]**.
 //!
-#![allow(unused_imports, dead_code)]
+use std::sync::LazyLock;
+
 pub use self::capturer::Capturer;
 pub use self::settings::Settings;
 
 use self::capturer::Processor;
-use once_cell::sync::Lazy;
 use opentelemetry::{global, sdk, trace};
 use tracing::subscriber;
-use tracing_subscriber::{
-    filter::filter_fn,
-    layer::{Layered, SubscriberExt},
-    registry::LookupSpan,
-    Layer, Registry,
-};
+use tracing_subscriber::{filter::filter_fn, layer::SubscriberExt, registry::LookupSpan, Layer};
 
-static PROCESSOR: Lazy<capturer::Processor> = Lazy::new(Processor::default);
+static PROCESSOR: LazyLock<capturer::Processor> = LazyLock::new(Processor::default);
 
 /// Creates a new capturer, which is configured to export traces and log events happening during a
 /// particular request
