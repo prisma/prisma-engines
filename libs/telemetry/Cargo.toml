@@ -13,7 +13,6 @@ psl.workspace = true
 futures = "0.3"
 indexmap.workspace = true
 itertools.workspace = true
-once_cell = "1"
 opentelemetry = { version = "0.17.0", features = ["rt-tokio", "serialize"] }
 rand.workspace = true
 serde.workspace = true

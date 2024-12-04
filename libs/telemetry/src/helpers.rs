@@ -1,104 +1,17 @@
 use super::models::TraceSpan;
-use derive_more::Display;
-use once_cell::sync::Lazy;
-use opentelemetry::propagation::Extractor;
 use opentelemetry::sdk::export::trace::SpanData;
-use opentelemetry::trace::{SpanId, TraceContextExt, TraceFlags, TraceId};
 use serde_json::{json, Value};
 use std::collections::HashMap;
+use std::sync::LazyLock;
 use tracing::Metadata;
 use tracing_subscriber::EnvFilter;
 
-pub static SHOW_ALL_TRACES: Lazy<bool> = Lazy::new(|| match std::env::var("PRISMA_SHOW_ALL_TRACES") {
+pub static SHOW_ALL_TRACES: LazyLock<bool> = LazyLock::new(|| match std::env::var("PRISMA_SHOW_ALL_TRACES") {
     Ok(enabled) => enabled.eq_ignore_ascii_case("true"),
     Err(_) => false,
 });
 
-/// `TraceParent` is a remote span. It is identified by `trace_id` and `span_id`.
-///
-/// By "remote" we mean that this span was not emitted in the current process. In real life, it is
-/// either:
-///  - Emitted by the JS part of the Prisma ORM. This is true both for Accelerate (where the Rust
-///    part is deployed as a server) and for the ORM (where the Rust part is a shared library)
-///  - Never emitted at all. This happens when the `TraceParent` is created artificially from `TxId`
-///    (see `TxId::as_traceparent`). In this case, `TraceParent` is used only to correlate logs
-///    from different transaction operations - it is never used as a part of the trace
-#[derive(Display, Copy, Clone)]
-// This conforms with https://www.w3.org/TR/trace-context/#traceparent-header-field-values. Accelerate
-// relies on this behaviour.
-#[display(fmt = "00-{trace_id:032x}-{span_id:016x}-{flags:02x}")]
-pub struct TraceParent {
-    trace_id: TraceId,
-    span_id: SpanId,
-    flags: TraceFlags,
-}
-
-impl TraceParent {
-    pub fn from_remote_context(context: &opentelemetry::Context) -> Option<Self> {
-        let span = context.span();
-        let span_context = span.span_context();
-
-        if span_context.is_valid() {
-            Some(Self {
-                trace_id: span_context.trace_id(),
-                span_id: span_context.span_id(),
-                flags: span_context.trace_flags(),
-            })
-        } else {
-            None
-        }
-    }
-
-    pub fn new_random() -> Self {
-        Self {
-            trace_id: TraceId::from_bytes(rand::random()),
-            span_id: SpanId::from_bytes(rand::random()),
-            flags: TraceFlags::SAMPLED,
-        }
-    }
-
-    pub fn trace_id(&self) -> TraceId {
-        self.trace_id
-    }
-
-    pub fn sampled(&self) -> bool {
-        self.flags.is_sampled()
-    }
-
-    /// Returns a remote `opentelemetry::Context`. By "remote" we mean that it wasn't emitted in the
-    /// current process.
-    pub fn to_remote_context(&self) -> opentelemetry::Context {
-        // This relies on the fact that global text map propagator was installed that
-        // can handle `traceparent` field (for example, `TraceContextPropagator`).
-        opentelemetry::global::get_text_map_propagator(|propagator| {
-            propagator.extract(&TraceParentExtractor::new(self))
-        })
-    }
-}
-
-/// An extractor to use with `TraceContextPropagator`. It allows to avoid creating a full `HashMap`
-/// to convert a `TraceParent` to a `Context`.
-pub struct TraceParentExtractor(String);
-
-impl TraceParentExtractor {
-    pub fn new(traceparent: &TraceParent) -> Self {
-        Self(traceparent.to_string())
-    }
-}
-
-impl Extractor for TraceParentExtractor {
-    fn get(&self, key: &str) -> Option<&str> {
-        if key == "traceparent" {
-            Some(&self.0)
-        } else {
-            None
-        }
-    }
-
-    fn keys(&self) -> Vec<&str> {
-        vec!["traceparent"]
-    }
-}
+pub use crate::capturing::ng::traceparent::TraceParent;
 
 pub fn spans_to_json(spans: Vec<SpanData>) -> String {
     let json_spans: Vec<Value> = spans.into_iter().map(|span| json!(TraceSpan::from(span))).collect();
@@ -130,7 +43,6 @@ impl QueryEngineLogLevel {
     }
 }
 
-#[rustfmt::skip]
 pub fn env_filter(log_queries: bool, qe_log_level: QueryEngineLogLevel) -> EnvFilter {
     let mut filter = EnvFilter::from_default_env()
         .add_directive("tonic=error".parse().unwrap())
@@ -150,7 +62,7 @@ pub fn env_filter(log_queries: bool, qe_log_level: QueryEngineLogLevel) -> EnvFi
     if log_queries {
         filter = filter
             .add_directive("quaint[{is_query}]=trace".parse().unwrap())
-            .add_directive("mongodb_query_connector=debug".parse().unwrap());
+            .add_directive("mongodb_query_connector[{is_query}]=debug".parse().unwrap());
     }
 
     filter

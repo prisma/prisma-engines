@@ -130,8 +130,7 @@ impl SpanProcessor for Processor {
 mod task {
     use super::*;
     use crossbeam_channel::*;
-    use once_cell::sync::Lazy;
-    use std::collections::HashMap;
+    use std::{collections::HashMap, sync::LazyLock};
     use tokio::sync::oneshot;
 
     const VALID_QUERY_ATTRS: [&str; 4] = ["query", "params", "target", "duration_ms"];
@@ -182,7 +181,7 @@ mod task {
         FetchCaptures(TraceId, oneshot::Sender<Storage>),
     }
 
-    static SENDER: Lazy<Sender<CaptureOp>> = Lazy::new(|| {
+    static SENDER: LazyLock<Sender<CaptureOp>> = LazyLock::new(|| {
         let (sender, receiver) = unbounded();
 
         std::thread::spawn(move || {

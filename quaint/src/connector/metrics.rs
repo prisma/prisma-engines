@@ -20,7 +20,8 @@ where
         "quaint:query",
         "db.system" = db_system_name,
         "db.statement" = %QueryForTracing(query),
-        "otel.kind" = "client"
+        "otel.kind" = "client",
+        user_facing = true,
     );
     do_query(tag, query, params, f).instrument(span).await
 }

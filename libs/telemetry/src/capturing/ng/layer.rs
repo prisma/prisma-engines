@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 use tracing::{
     field,
     span::{Attributes, Id},
-    Dispatch, Subscriber,
+    Subscriber,
 };
 use tracing_subscriber::{
     layer::Context,
@@ -13,10 +13,7 @@ use tracing_subscriber::{
 
 use crate::models::{LogLevel, SpanKind};
 
-use super::{
-    collector::{CollectedEvent, Collector, EventBuilder, RequestId, SpanBuilder},
-    traceparent::TraceParent,
-};
+use super::collector::{Collector, EventBuilder, RequestId, SpanBuilder};
 
 const REQUEST_ID_FIELD: &str = "request_id";
 const SPAN_NAME_FIELD: &str = "otel.name";
@@ -243,20 +240,18 @@ impl<'a> field::Visit for EventAttributeVisitor<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::capturing::ng::collector::{CollectedSpan, RequestId, SpanId};
+    use crate::capturing::ng::collector::{CollectedEvent, CollectedSpan, RequestId};
 
     use super::*;
 
     use std::cell::RefCell;
     use std::collections::{BTreeMap, HashMap};
-    use std::sync::atomic::{AtomicU64, Ordering};
-    use std::sync::{Arc, LazyLock, Mutex};
+    use std::sync::{Arc, Mutex};
     use std::thread::LocalKey;
-    use std::time::Duration;
 
     use insta::assert_ron_snapshot;
     use insta::internals::{Content, Redaction};
-    use tracing::{info_span, span, Level};
+    use tracing::info_span;
     use tracing_subscriber::layer::SubscriberExt;
     use tracing_subscriber::Registry;
 
