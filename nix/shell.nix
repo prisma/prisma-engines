@@ -13,7 +13,7 @@ in
 
       nodejs_20
       nodejs_20.pkgs.typescript-language-server
-      pnpm_8
+      pnpm_9
 
       binaryen
       cargo-insta
