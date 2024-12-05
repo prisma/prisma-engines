@@ -975,3 +975,49 @@ fn changing_normal_index_to_a_fulltext_index(api: TestApi) {
         table.assert_index_on_columns(&["a", "b"], |index| index.assert_is_fulltext())
     });
 }
+
+#[test_connector]
+fn changing_unique_to_pk_works(api: TestApi) {
+    let dm1 = indoc! {r#"
+        model A {
+            id   Int     @unique
+            name String?
+        }
+
+        model B {
+            x Int
+            y Int
+
+            @@unique([x, y])
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+
+    api.assert_schema()
+        .assert_table("A", |table| {
+            table.assert_index_on_columns(&["id"], |index| index.assert_is_unique())
+        })
+        .assert_table("B", |table| {
+            table.assert_index_on_columns(&["x", "y"], |index| index.assert_is_unique())
+        });
+
+    let dm2 = indoc! {r#"
+        model A {
+            id Int @id
+        }
+
+        model B {
+            x Int
+            y Int
+
+            @@id([x, y])
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm2).send().assert_green();
+
+    api.assert_schema()
+        .assert_table("A", |table| table.assert_pk(|pk| pk.assert_columns(&["id"])))
+        .assert_table("B", |table| table.assert_pk(|pk| pk.assert_columns(&["x", "y"])));
+}

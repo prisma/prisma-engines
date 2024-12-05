@@ -358,7 +358,7 @@ fn handle_debug_headers(req: &Request<Body>) -> Response<Body> {
 
 struct HeaderExtractor<'a>(&'a HeaderMap);
 
-impl<'a> Extractor for HeaderExtractor<'a> {
+impl Extractor for HeaderExtractor<'_> {
     fn get(&self, key: &str) -> Option<&str> {
         self.0.get(key).and_then(|hv| hv.to_str().ok())
     }

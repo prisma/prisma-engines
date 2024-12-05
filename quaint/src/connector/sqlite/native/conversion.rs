@@ -130,7 +130,7 @@ impl TypeIdentifier for &Column<'_> {
     }
 }
 
-impl<'a> GetRow for SqliteRow<'a> {
+impl GetRow for SqliteRow<'_> {
     fn get_result_row(&self) -> crate::Result<Vec<Value<'static>>> {
         let statement = self.as_ref();
         let mut row = Vec::with_capacity(statement.columns().len());
@@ -233,7 +233,7 @@ impl<'a> GetRow for SqliteRow<'a> {
     }
 }
 
-impl<'a> ToColumnNames for SqliteRows<'a> {
+impl ToColumnNames for SqliteRows<'_> {
     fn to_column_names(&self) -> Vec<String> {
         match self.as_ref() {
             Some(statement) => statement.column_names().into_iter().map(|c| c.into()).collect(),
@@ -242,7 +242,7 @@ impl<'a> ToColumnNames for SqliteRows<'a> {
     }
 }
 
-impl<'a> ToSql for Value<'a> {
+impl ToSql for Value<'_> {
     fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
         let value = match &self.typed {
             ValueType::Int32(integer) => integer.map(ToSqlOutput::from),

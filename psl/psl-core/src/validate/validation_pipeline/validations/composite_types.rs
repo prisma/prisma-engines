@@ -142,7 +142,7 @@ impl<'db> CompositeTypePath<'db> {
     }
 }
 
-impl<'db> fmt::Display for CompositeTypePath<'db> {
+impl fmt::Display for CompositeTypePath<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut traversed = vec![self.current];
         let mut this = self;

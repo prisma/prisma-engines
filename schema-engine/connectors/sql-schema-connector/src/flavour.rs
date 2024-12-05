@@ -258,7 +258,7 @@ pub(crate) trait SqlFlavour:
         &'a mut self,
         sql: &'a str,
         params: &'a [quaint::prelude::Value<'a>],
-    ) -> BoxFuture<'_, ConnectorResult<quaint::prelude::ResultSet>>;
+    ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>>;
 
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>>;
 

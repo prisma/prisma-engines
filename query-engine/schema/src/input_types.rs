@@ -195,7 +195,7 @@ pub enum InputType<'a> {
     Object(InputObjectType<'a>),
 }
 
-impl<'a> PartialEq for InputType<'a> {
+impl PartialEq for InputType<'_> {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (InputType::Scalar(st), InputType::Scalar(ost)) => st.eq(ost),
@@ -207,7 +207,7 @@ impl<'a> PartialEq for InputType<'a> {
     }
 }
 
-impl<'a> Debug for InputType<'a> {
+impl Debug for InputType<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Object(obj) => write!(f, "Object({obj:?})"),

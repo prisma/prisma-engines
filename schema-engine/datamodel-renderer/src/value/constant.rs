@@ -4,27 +4,27 @@ use std::{borrow::Cow, fmt};
 #[derive(Debug)]
 pub struct Constant<T: fmt::Display>(pub(crate) T);
 
-impl<'a> Clone for Constant<&'a str> {
+impl Clone for Constant<&str> {
     fn clone(&self) -> Self {
         *self
     }
 }
 
-impl<'a> Clone for Constant<Cow<'a, str>> {
+impl Clone for Constant<Cow<'_, str>> {
     fn clone(&self) -> Self {
         Constant(self.0.clone())
     }
 }
 
-impl<'a> Copy for Constant<&'a str> {}
+impl Copy for Constant<&str> {}
 
-impl<'a> AsRef<str> for Constant<&'a str> {
+impl AsRef<str> for Constant<&str> {
     fn as_ref(&self) -> &str {
         self.0
     }
 }
 
-impl<'a> AsRef<str> for Constant<Cow<'a, str>> {
+impl AsRef<str> for Constant<Cow<'_, str>> {
     fn as_ref(&self) -> &str {
         self.0.as_ref()
     }

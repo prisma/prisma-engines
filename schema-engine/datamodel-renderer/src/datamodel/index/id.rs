@@ -58,7 +58,7 @@ impl<'a> IdDefinition<'a> {
     }
 }
 
-impl<'a> fmt::Display for IdDefinition<'a> {
+impl fmt::Display for IdDefinition<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
     }
@@ -120,13 +120,13 @@ impl<'a> IdFieldDefinition<'a> {
     }
 }
 
-impl<'a> Default for IdFieldDefinition<'a> {
+impl Default for IdFieldDefinition<'_> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<'a> fmt::Display for IdFieldDefinition<'a> {
+impl fmt::Display for IdFieldDefinition<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
     }

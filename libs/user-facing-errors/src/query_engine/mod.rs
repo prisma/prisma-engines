@@ -282,9 +282,9 @@ pub struct QueryParameterLimitExceeded {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2030",
-    message = "Cannot find a fulltext index to use for the search, try adding a @@fulltext([Fields...]) to your schema"
+    message = "Cannot find a fulltext index to use for the native search, try adding a @@fulltext([Fields...]) to your schema"
 )]
-pub struct MissingFullTextSearchIndex {}
+pub struct MissingNativeFullTextSearchIndex {}
 
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
@@ -298,7 +298,6 @@ pub struct MongoReplicaSetRequired {}
     code = "P2032",
     message = "Error converting field \"{field}\" of expected non-nullable type \"{expected_type}\", found incompatible value of \"{found}\"."
 )]
-
 pub struct MissingFieldsInModel {
     pub field: String,
     pub expected_type: String,
@@ -307,7 +306,6 @@ pub struct MissingFieldsInModel {
 
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(code = "P2033", message = "{details}")]
-
 pub struct ValueFitError {
     pub details: String,
 }

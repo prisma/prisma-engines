@@ -13,7 +13,7 @@ use crate::connector::MysqlUrl;
 use crate::connector::{MakeTlsConnectorManager, PostgresNativeUrl};
 use crate::{
     ast,
-    connector::{self, impl_default_TransactionCapable, IsolationLevel, Queryable, Transaction, TransactionCapable},
+    connector::{self, IsolationLevel, Queryable, Transaction, TransactionCapable},
     error::Error,
 };
 
@@ -23,7 +23,15 @@ pub struct PooledConnection {
     pub(crate) inner: MobcPooled<QuaintManager>,
 }
 
-impl_default_TransactionCapable!(PooledConnection);
+#[async_trait]
+impl TransactionCapable for PooledConnection {
+    async fn start_transaction<'a>(
+        &'a self,
+        isolation: Option<IsolationLevel>,
+    ) -> crate::Result<Box<dyn Transaction + 'a>> {
+        self.inner.start_transaction(isolation).await
+    }
+}
 
 #[async_trait]
 impl Queryable for PooledConnection {
@@ -104,7 +112,7 @@ pub enum QuaintManager {
 
 #[async_trait]
 impl Manager for QuaintManager {
-    type Connection = Box<dyn Queryable>;
+    type Connection = Box<dyn TransactionCapable>;
     type Error = Error;
 
     async fn connect(&self) -> crate::Result<Self::Connection> {

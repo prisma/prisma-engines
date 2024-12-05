@@ -25,7 +25,7 @@ impl<'db> Fields<'db> {
     }
 }
 
-impl<'db> fmt::Display for Fields<'db> {
+impl fmt::Display for Fields<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut fields = self
             .fields

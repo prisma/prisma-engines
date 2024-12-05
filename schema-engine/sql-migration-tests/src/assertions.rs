@@ -295,7 +295,7 @@ impl SchemaAssertion {
 
 pub struct EnumAssertion<'a>(sql::EnumWalker<'a>);
 
-impl<'a> EnumAssertion<'a> {
+impl EnumAssertion<'_> {
     pub fn assert_namespace(self, namespace: &'static str) -> Self {
         assert_eq!(self.0.namespace(), Some(namespace));
         self
@@ -517,7 +517,7 @@ pub struct ColumnAssertion<'a> {
     column: TableColumnWalker<'a>,
 }
 
-impl<'a> ColumnAssertion<'a> {
+impl ColumnAssertion<'_> {
     pub fn assert_auto_increments(self) -> Self {
         assert!(
             self.column.is_autoincrement(),
@@ -795,7 +795,7 @@ pub struct PrimaryKeyAssertion<'a> {
     tags: BitFlags<Tags>,
 }
 
-impl<'a> PrimaryKeyAssertion<'a> {
+impl PrimaryKeyAssertion<'_> {
     pub fn assert_columns(self, column_names: &[&str]) -> Self {
         assert_eq!(&self.pk.column_names().collect::<Vec<_>>(), column_names);
 
@@ -875,7 +875,7 @@ pub struct ForeignKeyAssertion<'a> {
     tags: BitFlags<Tags>,
 }
 
-impl<'a> ForeignKeyAssertion<'a> {
+impl ForeignKeyAssertion<'_> {
     #[track_caller]
     pub fn assert_references(self, table: &str, columns: &[&str]) -> Self {
         assert!(
@@ -925,7 +925,7 @@ pub struct IndexAssertion<'a> {
     tags: BitFlags<Tags>,
 }
 
-impl<'a> IndexAssertion<'a> {
+impl IndexAssertion<'_> {
     #[track_caller]
     pub fn assert_name(self, name: &str) -> Self {
         assert_eq!(self.index.name(), name);
@@ -1018,7 +1018,7 @@ pub struct PostgresExtensionAssertion<'a> {
     extension: ExtensionWalker<'a>,
 }
 
-impl<'a> PostgresExtensionAssertion<'a> {
+impl PostgresExtensionAssertion<'_> {
     pub fn assert_schema(self, expected_schema: &str) -> Self {
         assert_eq!(
             self.extension.schema(), expected_schema,

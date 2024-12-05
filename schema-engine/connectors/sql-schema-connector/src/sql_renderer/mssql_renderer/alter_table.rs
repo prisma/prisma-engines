@@ -51,7 +51,7 @@ struct AlterTableConstructor<'a> {
     column_mods: Vec<String>,
 }
 
-impl<'a> AlterTableConstructor<'a> {
+impl AlterTableConstructor<'_> {
     fn into_statements(mut self) -> Vec<String> {
         for change in self.changes {
             match change {

@@ -151,7 +151,7 @@ impl<'a> DatamodelAssert<'a> for psl::ValidatedSchema {
     }
 }
 
-impl<'a> RelationFieldAssert for walkers::RelationFieldWalker<'a> {
+impl RelationFieldAssert for walkers::RelationFieldWalker<'_> {
     #[track_caller]
     fn assert_relation_to(&self, model_id: ModelId) -> &Self {
         assert!(self.references_model(model_id));
@@ -263,7 +263,7 @@ impl<'a> ModelAssert<'a> for walkers::ModelWalker<'a> {
     }
 }
 
-impl<'a> ScalarFieldAssert for walkers::ScalarFieldWalker<'a> {
+impl ScalarFieldAssert for walkers::ScalarFieldWalker<'_> {
     #[track_caller]
     fn assert_ignored(&self, ignored: bool) -> &Self {
         assert_eq!(self.is_ignored(), ignored);
@@ -374,7 +374,7 @@ impl<'a> ScalarFieldAssert for walkers::ScalarFieldWalker<'a> {
     }
 }
 
-impl<'a> DefaultValueAssert for walkers::DefaultValueWalker<'a> {
+impl DefaultValueAssert for walkers::DefaultValueWalker<'_> {
     #[track_caller]
     fn assert_autoincrement(&self) -> &Self {
         self.value().assert_autoincrement();
@@ -466,7 +466,7 @@ impl<'a> DefaultValueAssert for walkers::DefaultValueWalker<'a> {
     }
 }
 
-impl<'a> IndexAssert for walkers::IndexWalker<'a> {
+impl IndexAssert for walkers::IndexWalker<'_> {
     #[track_caller]
     fn assert_field(&self, name: &str) -> walkers::ScalarFieldAttributeWalker<'_> {
         self.scalar_field_attributes()
@@ -504,7 +504,7 @@ impl<'a> IndexAssert for walkers::IndexWalker<'a> {
     }
 }
 
-impl<'a> IndexFieldAssert for walkers::ScalarFieldAttributeWalker<'a> {
+impl IndexFieldAssert for walkers::ScalarFieldAttributeWalker<'_> {
     #[track_caller]
     fn assert_descending(&self) -> &Self {
         assert_eq!(Some(SortOrder::Desc), self.sort_order());
@@ -539,7 +539,7 @@ impl<'a> TypeAssert<'a> for walkers::CompositeTypeWalker<'a> {
     }
 }
 
-impl<'a> CompositeFieldAssert for walkers::CompositeTypeFieldWalker<'a> {
+impl CompositeFieldAssert for walkers::CompositeTypeFieldWalker<'_> {
     #[track_caller]
     fn assert_scalar_type(&self, t: ScalarType) -> &Self {
         assert_eq!(Some(t), self.scalar_type());
@@ -701,7 +701,7 @@ impl DefaultValueAssert for ast::Expression {
     }
 }
 
-impl<'a> IndexAssert for walkers::PrimaryKeyWalker<'a> {
+impl IndexAssert for walkers::PrimaryKeyWalker<'_> {
     #[track_caller]
     fn assert_field(&self, name: &str) -> walkers::ScalarFieldAttributeWalker<'_> {
         self.scalar_field_attributes()

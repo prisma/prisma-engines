@@ -5,7 +5,7 @@ pub(crate) enum OperatorClass<'a> {
     Raw(&'a str),
 }
 
-impl<'a> From<crate::OperatorClass> for OperatorClass<'a> {
+impl From<crate::OperatorClass> for OperatorClass<'_> {
     fn from(inner: crate::OperatorClass) -> Self {
         Self::Constant(inner)
     }

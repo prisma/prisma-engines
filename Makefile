@@ -83,7 +83,9 @@ build-schema-wasm:
 
 # Emulate pedantic CI compilation.
 pedantic:
-	RUSTFLAGS="-D warnings" cargo fmt -- --check && RUSTFLAGS="-D warnings" cargo clippy --all-targets
+	RUSTFLAGS="-D warnings" cargo fmt -- --check
+	RUSTFLAGS="-D warnings" cargo clippy --all-features --all-targets
+	RUSTFLAGS="-D warnings" cargo clippy --all-features --all-targets -p query-engine-wasm -p prisma-schema-build --target wasm32-unknown-unknown
 
 release:
 	cargo build --release
@@ -391,7 +393,7 @@ test-driver-adapter-planetscale-wasm: test-planetscale-wasm
 # Local dev commands #
 ######################
 
-measure-qe-wasm: build-qe-wasm-gz	
+measure-qe-wasm: build-qe-wasm-gz
 	@cd query-engine/query-engine-wasm/pkg; \
 	for provider in postgresql mysql sqlite; do \
 		echo "$${provider}_size=$$(cat $$provider/query_engine_bg.wasm | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \

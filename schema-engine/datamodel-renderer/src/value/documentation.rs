@@ -18,7 +18,7 @@ impl<'a> Documentation<'a> {
     }
 }
 
-impl<'a> fmt::Display for Documentation<'a> {
+impl fmt::Display for Documentation<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for line in self.0.split('\n') {
             f.write_str("///")?;

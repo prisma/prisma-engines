@@ -39,8 +39,8 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     CreateSkipDuplicates |
     Enums |
     EnumArrayPush |
-    FullTextSearch |
-    FullTextSearchWithoutIndex |
+    NativeFullTextSearch |
+    NativeFullTextSearchWithoutIndex |
     InsensitiveFilters |
     Json |
     JsonFiltering |
@@ -264,6 +264,11 @@ impl Connector for PostgresDatamodelConnector {
 
     fn capabilities(&self) -> ConnectorCapabilities {
         CAPABILITIES
+    }
+
+    /// The connector-specific name of the `fullTextSearch` preview feature.
+    fn native_full_text_search_preview_feature(&self) -> Option<PreviewFeature> {
+        Some(PreviewFeature::FullTextSearchPostgres)
     }
 
     /// The maximum length of postgres identifiers, in bytes.

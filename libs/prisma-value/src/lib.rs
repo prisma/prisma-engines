@@ -199,7 +199,7 @@ where
 
 struct BigDecimalVisitor;
 
-impl<'de> serde::de::Visitor<'de> for BigDecimalVisitor {
+impl serde::de::Visitor<'_> for BigDecimalVisitor {
     type Value = BigDecimal;
 
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {

@@ -122,7 +122,7 @@ impl<'a> Generator<'a> {
     }
 }
 
-impl<'a> fmt::Display for Generator<'a> {
+impl fmt::Display for Generator<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(ref doc) = self.documentation {
             doc.fmt(f)?;

@@ -153,7 +153,7 @@ pub(crate) struct QueryInterpreter<'conn> {
     log: Vec<String>,
 }
 
-impl<'conn> fmt::Debug for QueryInterpreter<'conn> {
+impl fmt::Debug for QueryInterpreter<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("QueryInterpreter").finish()
     }

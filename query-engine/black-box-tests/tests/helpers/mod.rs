@@ -9,7 +9,7 @@ where
     struct Cleaner<'a> {
         p: &'a mut std::process::Child,
     }
-    impl<'a> Drop for Cleaner<'a> {
+    impl Drop for Cleaner<'_> {
         fn drop(&mut self) {
             self.p.kill().expect("Failed to kill process");
         }

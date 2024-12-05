@@ -335,7 +335,7 @@ pub struct ForeignKeyAssertion<'a> {
     fk: ForeignKeyWalker<'a>,
 }
 
-impl<'a> ForeignKeyAssertion<'a> {
+impl ForeignKeyAssertion<'_> {
     pub fn assert_references(&self, table: &str, columns: &[&str]) -> &Self {
         assert_eq!(self.fk.referenced_table().name(), table);
         let referenced_columns = self.fk.referenced_columns();

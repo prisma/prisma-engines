@@ -7,7 +7,7 @@ use itertools::Itertools;
 use mongodb::Database;
 use mongodb_schema_connector::MongoDbSchemaConnector;
 use once_cell::sync::Lazy;
-use psl::PreviewFeature;
+use psl::{FeatureMapWithProvider, PreviewFeature};
 use schema_connector::{
     CompositeTypeDepth, ConnectorParams, IntrospectionContext, IntrospectionResult, SchemaConnector,
 };
@@ -177,7 +177,9 @@ where
     F: FnOnce(Database) -> U,
     U: Future<Output = mongodb::error::Result<()>>,
 {
-    let enabled_preview_features = BitFlags::all();
+    let feature_map_with_provider = FeatureMapWithProvider::new(Some("mongodb"));
+    let enabled_preview_features = feature_map_with_provider.active_features();
+
     introspect_features(composite_type_depth, enabled_preview_features, init_database)
 }
 

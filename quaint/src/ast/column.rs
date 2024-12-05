@@ -51,7 +51,7 @@ pub enum DefaultValue<'a> {
     Generated,
 }
 
-impl<'a> Default for DefaultValue<'a> {
+impl Default for DefaultValue<'_> {
     fn default() -> Self {
         Self::Generated
     }
@@ -66,7 +66,7 @@ where
     }
 }
 
-impl<'a> PartialEq for Column<'a> {
+impl PartialEq for Column<'_> {
     fn eq(&self, other: &Column) -> bool {
         self.name == other.name && self.table == other.table
     }
@@ -209,7 +209,7 @@ impl<'a, 'b> From<&'a &'b str> for Column<'b> {
     }
 }
 
-impl<'a> From<String> for Column<'a> {
+impl From<String> for Column<'_> {
     fn from(s: String) -> Self {
         Column {
             name: s.into(),
