@@ -4,6 +4,7 @@ use prisma_metrics::{MetricRecorder, MetricRegistry};
 use query_engine_common::logger::StringCallback;
 use serde_json::Value;
 use std::{collections::BTreeMap, fmt::Display};
+use telemetry::capturing::ng::Exporter;
 use tracing::{
     field::{Field, Visit},
     level_filters::LevelFilter,
@@ -21,6 +22,7 @@ pub(crate) struct Logger {
     dispatcher: Dispatch,
     metrics: Option<MetricRegistry>,
     recorder: Option<MetricRecorder>,
+    exporter: Exporter,
 }
 
 impl Logger {
@@ -50,16 +52,12 @@ impl Logger {
 
         let log_callback = CallbackLayer::new(log_callback);
 
-        let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
-        let tracer = super::tracer::new_pipeline().install_simple(Box::new(log_callback.clone()));
-        let telemetry = if enable_tracing {
-            let telemetry = tracing_opentelemetry::layer()
-                .with_tracer(tracer)
-                .with_filter(is_user_trace);
-            Some(telemetry)
-        } else {
-            None
-        };
+        let exporter = Exporter::new();
+
+        let telemetry = enable_tracing.then(|| {
+            telemetry::capturing::ng::layer(exporter.clone())
+                .with_filter(telemetry::capturing::ng::filter::user_facing_spans())
+        });
 
         let layer = log_callback.with_filter(filters);
 
@@ -75,6 +73,7 @@ impl Logger {
             dispatcher: Dispatch::new(Registry::default().with(telemetry).with(layer)),
             metrics,
             recorder,
+            exporter,
         }
     }
 
@@ -88,6 +87,10 @@ impl Logger {
 
     pub fn recorder(&self) -> Option<MetricRecorder> {
         self.recorder.clone()
+    }
+
+    pub fn exporter(&self) -> Exporter {
+        self.exporter.clone()
     }
 }
 

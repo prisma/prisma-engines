@@ -155,5 +155,5 @@ pub fn stringify_env_values(origin: serde_json::Value) -> crate::Result<HashMap<
         Value::Array(_) => "Expected an object for the env constructor parameter, got an array.",
     };
 
-    Err(ApiError::JsonDecode(msg.to_string()))
+    Err(ApiError::Decode(msg.to_string()))
 }
