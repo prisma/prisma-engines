@@ -1,4 +1,4 @@
-use crate::{context::PrismaContext, features::Feature};
+use crate::{context::PrismaContext, features::Feature, logger::Logger};
 use enumflags2::make_bitflags;
 use indoc::{formatdoc, indoc};
 use query_core::protocol::EngineProtocol;
@@ -35,7 +35,7 @@ async fn connection_string_problems_give_a_nice_error() {
 
         let features = make_bitflags!(Feature::{ RawQueries });
 
-        let error = PrismaContext::new(dml, EngineProtocol::Graphql, features, None)
+        let error = PrismaContext::new(dml, EngineProtocol::Graphql, features, None, Logger::default())
             .await
             .unwrap_err();
 
