@@ -6,15 +6,21 @@ use prisma_metrics::{MetricFormat, WithMetricsInstrumentation};
 use psl::PreviewFeature;
 use quaint::connector::ExternalConnector;
 use query_core::{protocol::EngineProtocol, relation_load_strategy, schema, TransactionOptions, TxId};
-use query_engine_common::engine::{
-    map_known_error, stringify_env_values, ConnectedEngine, ConnectedEngineNative, ConstructorOptions,
-    ConstructorOptionsNative, EngineBuilder, EngineBuilderNative, Inner,
+use query_engine_common::{
+    engine::{
+        map_known_error, stringify_env_values, ConnectedEngine, ConnectedEngineNative, ConstructorOptions,
+        ConstructorOptionsNative, EngineBuilder, EngineBuilderNative, Inner,
+    },
+    tracer::start_trace,
 };
 use request_handlers::{load_executor, render_graphql_schema, ConnectorKind, RequestBody, RequestHandler};
 use serde::Deserialize;
 use serde_json::json;
 use std::{collections::HashMap, future::Future, marker::PhantomData, panic::AssertUnwindSafe, sync::Arc};
-use telemetry::helpers::TraceParent;
+use telemetry::{
+    capturing::ng::{collector::RequestId, exporter::TraceData},
+    helpers::TraceParent,
+};
 use tokio::sync::RwLock;
 use tracing::{instrument::WithSubscriber, Instrument};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
@@ -314,13 +320,13 @@ impl QueryEngine {
             let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
 
             let span = tracing::info_span!("prisma:engine:query", user_facing = true);
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            let traceparent = TraceParent::from_remote_context(&parent_context);
-            span.set_parent(parent_context);
+            let (request_id, trace_parent) = start_trace(&trace, &span, &self.logger.exporter()).await;
 
             async move {
                 let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
-                let response = handler.handle(query, tx_id.map(TxId::from), traceparent).await;
+                let mut response = handler.handle(query, tx_id.map(TxId::from), trace_parent).await;
+
+                response.set_extension("request_id".to_owned(), json!(request_id));
 
                 let serde_span = tracing::info_span!("prisma:engine:response_json_serialization", user_facing = true);
                 Ok(serde_span.in_scope(|| serde_json::to_string(&response))?)
@@ -330,6 +336,28 @@ impl QueryEngine {
         })
         .with_subscriber(dispatcher)
         .with_optional_recorder(recorder)
+        .await
+    }
+
+    /// Fetch the spans associated with a [`RequestId`]
+    #[napi]
+    pub async fn trace(&self, request_id: String) -> napi::Result<Option<String>> {
+        let request_id = request_id
+            .parse::<RequestId>()
+            .map_err(|err| ApiError::Decode(err.to_string()))?;
+
+        async_panic_to_js_error(async {
+            Ok(self
+                .logger
+                .exporter()
+                .stop_capturing(request_id)
+                .await
+                .as_ref()
+                .map(serde_json::to_string)
+                .transpose()?)
+        })
+        .with_subscriber(self.logger.dispatcher())
+        .with_optional_recorder(self.logger.recorder())
         .await
     }
 

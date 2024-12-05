@@ -2,6 +2,7 @@ use std::{
     borrow::Cow,
     collections::HashMap,
     num::NonZeroU64,
+    str::FromStr,
     sync::atomic::{AtomicU64, Ordering},
     time::{Duration, SystemTime},
 };
@@ -36,6 +37,25 @@ impl Serialize for SerializableNonZeroU64 {
         // larger than 2^53 - 1 will be parsed as floats on the client side, making it possible for
         // IDs to collide.
         self.to_string().serialize(serializer)
+    }
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum SerializableNonZeroU64Error {
+    #[error("failed to parse string as u64: {0}")]
+    ParseError(#[from] std::num::ParseIntError),
+    #[error("value must be non-zero")]
+    ZeroError,
+}
+
+impl FromStr for SerializableNonZeroU64 {
+    type Err = SerializableNonZeroU64Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let value = s.parse::<u64>()?;
+        NonZeroU64::new(value)
+            .map(Self)
+            .ok_or(SerializableNonZeroU64Error::ZeroError)
     }
 }
 
@@ -110,6 +130,14 @@ impl RequestId {
 impl Default for RequestId {
     fn default() -> Self {
         Self::next()
+    }
+}
+
+impl FromStr for RequestId {
+    type Err = SerializableNonZeroU64Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        SerializableNonZeroU64::from_str(s).map(Self)
     }
 }
 

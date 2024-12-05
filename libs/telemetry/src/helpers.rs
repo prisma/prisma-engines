@@ -77,11 +77,5 @@ pub fn user_facing_span_only_filter(meta: &Metadata<'_>) -> bool {
         return true;
     }
 
-    if meta.fields().iter().any(|f| f.name() == "user_facing") {
-        return true;
-    }
-
-    // spans describing a quaint query.
-    // TODO: should this span be made user_facing in quaint?
-    meta.target() == "quaint::connector::metrics" && meta.name() == "quaint:query"
+    meta.fields().iter().any(|f| f.name() == "user_facing")
 }
