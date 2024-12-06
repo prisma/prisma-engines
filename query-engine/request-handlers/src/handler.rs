@@ -13,7 +13,7 @@ use query_core::{
 };
 use query_structure::{parse_datetime, stringify_datetime, PrismaValue};
 use std::{collections::HashMap, fmt, panic::AssertUnwindSafe, str::FromStr};
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 
 type ArgsToResult = (HashMap<String, ArgumentValue>, IndexMap<String, Item>);
 

@@ -8,7 +8,7 @@ use crate::{
 use connector::{Connection, Transaction};
 use crosstarget_utils::time::ElapsedTimeCounter;
 use schema::QuerySchemaRef;
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 use tokio::time::Duration;
 use tracing::Span;
 use tracing_futures::Instrument;

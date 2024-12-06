@@ -8,7 +8,7 @@ use connector::ConnectionLike;
 use futures::future::BoxFuture;
 use query_structure::prelude::*;
 use std::{collections::HashMap, fmt};
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 use tracing::Instrument;
 
 #[derive(Debug, Clone)]

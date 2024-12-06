@@ -7,9 +7,10 @@ use tokio::sync::{
     oneshot,
 };
 
-use crate::models::{HrTime, LogLevel, SpanKind};
-
-use super::collector::{CollectedEvent, CollectedSpan, Collector, RequestId, SpanId};
+use crate::collector::{CollectedEvent, CollectedSpan, Collector};
+use crate::id::{RequestId, SpanId};
+use crate::models::{LogLevel, SpanKind};
+use crate::time::HrTime;
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]

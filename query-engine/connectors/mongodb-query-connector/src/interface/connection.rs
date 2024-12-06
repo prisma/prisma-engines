@@ -11,7 +11,7 @@ use connector_interface::{
 use mongodb::{ClientSession, Database};
 use query_structure::{prelude::*, RelationLoadStrategy, SelectionResult};
 use std::collections::HashMap;
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 
 pub struct MongoDbConnection {
     /// The session to use for operations.
