@@ -4,8 +4,8 @@
   "version": "0.0.2",
   "description": "",
   "engines": {
-    "node": ">=16.13",
-    "pnpm": ">=8.6.6 <9"
+    "node": ">=18.18",
+    "pnpm": "^9.14.2"
   },
   "license": "Apache-2.0",
   "scripts": {
