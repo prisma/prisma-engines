@@ -129,12 +129,13 @@ in
     })
     { profile = "release"; };
 
-  packages.build-engine-wasm = pkgs.writeShellApplication { 
+  packages.build-engine-wasm = pkgs.writeShellApplication {
     name = "build-engine-wasm";
       runtimeInputs = with pkgs; [ git rustup wasm-bindgen-cli binaryen jq iconv ];
-      text = ''            
-      cd query-engine/query-engine-wasm        
-      WASM_BUILD_PROFILE=release ./build.sh "$1" "$2"
+      text = ''
+        cd query-engine/query-engine-wasm
+        sed -i '1s|.*|#!${pkgs.bash}/bin/bash|' ./build.sh
+        WASM_BUILD_PROFILE=release ./build.sh "$1" "$2"
       '';
   };
 
@@ -148,9 +149,9 @@ in
 
       buildPhase = ''
       export HOME=$(mktemp -dt wasm-engine-home-XXXX)
-      
+
       OUT_FOLDER=$(mktemp -dt wasm-engine-out-XXXX)
-      ${self'.packages.build-engine-wasm}/bin/build-engine-wasm "0.0.0" "$OUT_FOLDER" 
+      ${self'.packages.build-engine-wasm}/bin/build-engine-wasm "0.0.0" "$OUT_FOLDER"
 
       for provider in "postgresql" "mysql" "sqlite"; do
         gzip -ckn "$OUT_FOLDER/$provider/query_engine_bg.wasm" > "query-engine-$provider.wasm.gz"
@@ -172,15 +173,15 @@ in
     pkgs.writeShellApplication {
       name = "export-query-engine-wasm";
       runtimeInputs = with pkgs; [ jq ];
-      text = ''              
+      text = ''
         OUT_VERSION="$1"
         OUT_FOLDER="$2"
 
         mkdir -p "$OUT_FOLDER"
         ${self'.packages.build-engine-wasm}/bin/build-engine-wasm "$OUT_VERSION" "$OUT_FOLDER"
         chmod -R +rw "$OUT_FOLDER"
-        mv "$OUT_FOLDER/package.json" "$OUT_FOLDER/package.json.bak"         
-        jq --arg new_version "$OUT_VERSION" '.version = $new_version' "$OUT_FOLDER/package.json.bak" > "$OUT_FOLDER/package.json"        
+        mv "$OUT_FOLDER/package.json" "$OUT_FOLDER/package.json.bak"
+        jq --arg new_version "$OUT_VERSION" '.version = $new_version' "$OUT_FOLDER/package.json.bak" > "$OUT_FOLDER/package.json"
       '';
     };
 
