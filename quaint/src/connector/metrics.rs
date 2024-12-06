@@ -3,7 +3,7 @@ use tracing::{info_span, Instrument};
 
 use crate::ast::{Params, Value};
 use crosstarget_utils::time::ElapsedTimeCounter;
-use std::future::Future;
+use std::{fmt, future::Future};
 
 pub async fn query<'a, F, T, U>(
     tag: &'static str,
@@ -16,8 +16,12 @@ where
     F: FnOnce() -> U + 'a,
     U: Future<Output = crate::Result<T>>,
 {
-    let span =
-        info_span!("quaint:query", "db.system" = db_system_name, "db.statement" = %query, "otel.kind" = "client");
+    let span = info_span!(
+        "quaint:query",
+        "db.system" = db_system_name,
+        "db.statement" = %QueryForTracing(query),
+        "otel.kind" = "client"
+    );
     do_query(tag, query, params, f).instrument(span).await
 }
 
@@ -96,4 +100,17 @@ fn trace_query<'a>(query: &'a str, params: &'a [Value<'_>], result: &str, start:
         is_query = true,
         duration_ms = start.elapsed_time().as_millis() as u64,
     );
+}
+
+struct QueryForTracing<'a>(&'a str);
+
+impl fmt::Display for QueryForTracing<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let query = self
+            .0
+            .split_once("/* traceparent=")
+            .map_or(self.0, |(prefix, _)| prefix)
+            .trim();
+        write!(f, "{query}")
+    }
 }
