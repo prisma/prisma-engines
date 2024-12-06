@@ -17,13 +17,7 @@ use request_handlers::{load_executor, render_graphql_schema, ConnectorKind, Requ
 use serde::Deserialize;
 use serde_json::json;
 use std::{collections::HashMap, future::Future, marker::PhantomData, panic::AssertUnwindSafe, sync::Arc};
-use telemetry::{
-    capturing::ng::{collector::RequestId, exporter::TraceData},
-    helpers::TraceParent,
-};
-use tokio::sync::RwLock;
-use tracing::{instrument::WithSubscriber, Instrument};
-use tracing_opentelemetry::OpenTelemetrySpanExt;
+use telemetry::{tokio::sync::RwLock; tracing::{iuse tracing_opentelemetry::OpenTelemetrySpanExt;
 use tracing_subscriber::filter::LevelFilter;
 use user_facing_errors::Error;
 

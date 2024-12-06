@@ -1,4 +1,4 @@
-use telemetry::capturing::ng::{filter, Exporter};
+use telemetry::{filter, Exporter};
 use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
 use tracing_subscriber::{layer::SubscriberExt, Layer};
 
@@ -76,19 +76,17 @@ impl Logger {
 
         match self.tracing_config {
             TracingConfig::LogsAndTracesInResponse => {
-                let subscriber = subscriber.with(
-                    telemetry::capturing::ng::layer(self.exporter.clone())
-                        .with_filter(filter::EnvFilterBuilder::new().log_queries(self.log_queries).build())
-                        .with_filter(filter::user_facing_spans_and_events()),
-                );
+                let subscriber = subscriber
+                    .with(
+                        telemetry::layer(self.exporter.clone())
+                            .with_filter(filter::EnvFilterBuilder::new().log_queries(self.log_queries).build()),
+                    )
+                    .with(telemetry::layer(self.exporter.clone()).with_filter(filter::user_facing_spans()));
                 subscriber::set_global_default(subscriber)?;
             }
             TracingConfig::StdoutLogsAndRetainedTraces => {
-                let subscriber = subscriber.with(
-                    telemetry::capturing::ng::layer(self.exporter.clone())
-                        .with_filter(filter::EnvFilterBuilder::new().log_queries(self.log_queries).build())
-                        .with_filter(filter::user_facing_spans()),
-                );
+                let subscriber =
+                    subscriber.with(telemetry::layer(self.exporter.clone()).with_filter(filter::user_facing_spans()));
                 subscriber::set_global_default(subscriber)?;
             }
             TracingConfig::StdoutLogsOnly => {

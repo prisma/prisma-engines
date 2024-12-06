@@ -9,7 +9,7 @@ use crate::{
 use async_trait::async_trait;
 use connector::Connector;
 use schema::QuerySchemaRef;
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 use tokio::time::Duration;
 use tracing_futures::Instrument;
 
