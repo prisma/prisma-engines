@@ -405,7 +405,7 @@ build-driver-adapters-kit: build-driver-adapters
 
 build-driver-adapters: ensure-prisma-present
 	@echo "Building driver adapters..."
-	@cd ../prisma && pnpm --filter "*adapter*" i
+	@cd ../prisma && pnpm i
 	@echo "Driver adapters build completed.";
 
 ensure-prisma-present:
