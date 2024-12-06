@@ -20,10 +20,6 @@ pub fn user_facing_spans<S>() -> impl Filter<S> {
     filter_fn(|meta| is_user_facing_span(meta))
 }
 
-pub fn events<S>() -> impl Filter<S> {
-    filter_fn(|meta| meta.is_event())
-}
-
 pub enum QueryEngineLogLevel<'a> {
     FromEnv,
     Override(&'a str),
