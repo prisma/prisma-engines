@@ -411,13 +411,16 @@ fn validate_uid_int_args<const N: usize>(
     }
 
     match args.first().map(|arg| &arg.value) {
-        Some(ast::Expression::NumericValue(val, _)) if !valid_values.contains(&val.parse::<u8>().unwrap()) => {
-            let valid_values_str = format_valid_values(valid_values);
-            ctx.push_attribute_validation_error(&format!(
-                "`{fn_name}()` takes either no argument, or a single integer argument which is either {valid_values_str}.",
-            ));
-        }
-        None | Some(ast::Expression::NumericValue(_, _)) => accept(ctx),
+        Some(ast::Expression::NumericValue(val, _)) => match val.parse::<u8>().ok() {
+            Some(val) if valid_values.contains(&val) => accept(ctx),
+            _ => {
+                let valid_values_str = format_valid_values(valid_values);
+                ctx.push_attribute_validation_error(&format!(
+                        "`{fn_name}()` takes either no argument, or a single integer argument which is either {valid_values_str}.",
+                    ));
+            }
+        },
+        None => accept(ctx),
         _ => bail(),
     }
 }
@@ -430,12 +433,15 @@ fn validate_nanoid_args(args: &[ast::Argument], accept: AcceptFn<'_>, ctx: &mut 
     }
 
     match args.first().map(|arg| &arg.value) {
-        Some(ast::Expression::NumericValue(val, _)) if val.parse::<u8>().unwrap() < 2 => {
-            ctx.push_attribute_validation_error(
-                "`nanoid()` takes either no argument, or a single integer argument >= 2.",
-            );
-        }
-        None | Some(ast::Expression::NumericValue(_, _)) => accept(ctx),
+        Some(ast::Expression::NumericValue(val, _)) => match val.parse::<u8>().ok() {
+            Some(val) if val >= 2 => accept(ctx),
+            _ => {
+                ctx.push_attribute_validation_error(
+                    "`nanoid()` takes either no argument, or a single integer argument between 2 and 255.",
+                );
+            }
+        },
+        None => accept(ctx),
         _ => bail(),
     }
 }
