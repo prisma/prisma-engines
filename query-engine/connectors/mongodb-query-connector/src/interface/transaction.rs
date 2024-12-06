@@ -44,6 +44,10 @@ impl<'conn> MongoDbTransaction<'conn> {
 
 #[async_trait]
 impl Transaction for MongoDbTransaction<'_> {
+    async fn begin(&mut self) -> connector_interface::Result<()> {
+        Ok(())
+    }
+
     async fn commit(&mut self) -> connector_interface::Result<()> {
         self.gauge.decrement();
 
@@ -64,6 +68,23 @@ impl Transaction for MongoDbTransaction<'_> {
             .map_err(|err| MongoError::from(err).into_connector_error())?;
 
         Ok(())
+    }
+
+    fn depth(&self) -> u32 {
+        0
+    }
+
+    /// MongoDB does not support savepoints/nested transactions.
+    async fn create_savepoint(&mut self) -> connector_interface::Result<()> {
+        Err(MongoError::Unsupported("MongoDB does not support savepoints".into()).into_connector_error())
+    }
+
+    async fn release_savepoint(&mut self) -> connector_interface::Result<()> {
+        Err(MongoError::Unsupported("MongoDB does not support savepoints".into()).into_connector_error())
+    }
+
+    async fn rollback_to_savepoint(&mut self) -> connector_interface::Result<()> {
+        Err(MongoError::Unsupported("MongoDB does not support savepoints".into()).into_connector_error())
     }
 
     async fn version(&self) -> Option<String> {
