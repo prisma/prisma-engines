@@ -253,7 +253,6 @@ mod tests {
     use insta::assert_ron_snapshot;
     use insta::internals::{Content, Redaction};
     use tracing::info_span;
-    use tracing_subscriber::filter::filter_fn;
     use tracing_subscriber::layer::SubscriberExt;
     use tracing_subscriber::Registry;
 
@@ -816,77 +815,6 @@ mod tests {
           ],
         }
         "#
-        );
-    }
-    #[test]
-    fn test_tmp_delete_later() {
-        let collector = TestCollector::new();
-
-        let events_layer =
-            layer(collector.clone()).with_filter(tracing_subscriber::filter::EnvFilter::new("[{user_facing=true}]"));
-
-        let subscriber = Registry::default().with(events_layer);
-
-        tracing::subscriber::with_default(subscriber, || {
-            let span = info_span!(
-                "test_span",
-                request_id = RequestId::next().into_u64(),
-                user_facing = true
-            );
-            let _guard = span.enter();
-
-            tracing::info!(name: "event1", "test event 1");
-            tracing::info!(name: "event2", "test event 2");
-        });
-
-        let spans = collector.spans();
-        let events = collector.events();
-
-        assert_ron_snapshot!(
-            spans,
-            { ".*" => redact_id(), ".*[].**" => redact_id() },
-            @r#"
-    {
-      RequestId(1): [
-        CollectedSpan(
-          id: SpanId(1),
-          parent_id: None,
-          name: "test_span",
-          attributes: {},
-          kind: internal,
-          links: [],
-        ),
-      ],
-    }
-    "#
-        );
-        return;
-
-        assert_ron_snapshot!(
-            events,
-            { ".*" => redact_id(), ".*[].**" => redact_id() },
-            @r#"
-    {
-      RequestId(1): [
-        CollectedEvent(
-          span_id: SpanId(1),
-          name: "event1",
-          level: Info,
-          attributes: {
-            "message": "test event 1",
-          },
-        ),
-        CollectedEvent(
-          span_id: SpanId(1),
-          name: "event2",
-          level: Info,
-          attributes: {
-            "message": "test event 2",
-          },
-        ),
-      ],
-    }
-    "#
         );
     }
 }
