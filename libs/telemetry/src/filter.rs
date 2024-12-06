@@ -16,12 +16,12 @@ fn is_user_facing_span(meta: &Metadata<'_>) -> bool {
     meta.is_span() && meta.fields().iter().any(|f| f.name() == "user_facing")
 }
 
-pub fn user_facing_spans_and_events<S>() -> impl Filter<S> {
-    filter_fn(|meta| is_user_facing_span(meta) || meta.is_event())
-}
-
 pub fn user_facing_spans<S>() -> impl Filter<S> {
     filter_fn(|meta| is_user_facing_span(meta))
+}
+
+pub fn events<S>() -> impl Filter<S> {
+    filter_fn(|meta| meta.is_event())
 }
 
 pub enum QueryEngineLogLevel<'a> {

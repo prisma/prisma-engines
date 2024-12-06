@@ -4,7 +4,7 @@ use lru::LruCache;
 use once_cell::sync::Lazy;
 use schema::QuerySchemaRef;
 use std::{collections::HashMap, sync::Arc};
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 use tokio::{
     sync::{
         mpsc::{unbounded_channel, UnboundedSender},

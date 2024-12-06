@@ -15,7 +15,7 @@ use quaint::{
 };
 use query_structure::{prelude::*, Filter, QueryArguments, RelationLoadStrategy, SelectionResult};
 use std::{collections::HashMap, str::FromStr};
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 
 pub(crate) struct SqlConnection<C> {
     inner: C,

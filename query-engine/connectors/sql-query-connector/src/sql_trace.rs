@@ -1,6 +1,6 @@
 use opentelemetry::trace::{SpanContext, TraceContextExt, TraceFlags};
 use quaint::ast::{Delete, Insert, Select, Update};
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 use tracing::Span;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 

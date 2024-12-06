@@ -7,14 +7,7 @@ version = "0.1.0"
 metrics = []
 
 [dependencies]
-async-trait.workspace = true
-crossbeam-channel = "0.5.6"
-psl.workspace = true
-futures = "0.3"
-indexmap.workspace = true
-itertools.workspace = true
 opentelemetry = { version = "0.17.0", features = ["rt-tokio", "serialize"] }
-rand.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror = "1.0"
@@ -23,10 +16,7 @@ tracing = { workspace = true, features = ["attributes"] }
 tracing-futures.workspace = true
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-opentelemetry = "0.17.4"
-uuid.workspace = true
-cuid.workspace = true
 crosstarget-utils = { path = "../crosstarget-utils" }
-lru = "0.7.7"
 enumflags2.workspace = true
 derive_more.workspace = true
 

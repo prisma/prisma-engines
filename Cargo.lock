@@ -5492,20 +5492,11 @@ checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 name = "telemetry"
 version = "0.1.0"
 dependencies = [
- "async-trait",
- "crossbeam-channel",
  "crosstarget-utils",
- "cuid",
  "derive_more",
  "enumflags2",
- "futures",
- "indexmap 2.2.2",
  "insta",
- "itertools 0.12.0",
- "lru 0.7.8",
  "opentelemetry",
- "psl",
- "rand 0.8.5",
  "serde",
  "serde_json",
  "thiserror",
@@ -5514,7 +5505,6 @@ dependencies = [
  "tracing-futures",
  "tracing-opentelemetry",
  "tracing-subscriber",
- "uuid",
 ]
 
 [[package]]

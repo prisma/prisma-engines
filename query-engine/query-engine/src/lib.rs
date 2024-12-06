@@ -7,7 +7,6 @@ pub mod features;
 pub mod logger;
 pub mod opt;
 pub mod server;
-pub mod tracer;
 
 use error::PrismaError;
 
