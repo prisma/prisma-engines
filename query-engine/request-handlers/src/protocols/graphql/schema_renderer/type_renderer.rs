@@ -6,7 +6,7 @@ pub enum GqlTypeRenderer<'a> {
     Output(OutputType<'a>),
 }
 
-impl<'a> Renderer for GqlTypeRenderer<'a> {
+impl Renderer for GqlTypeRenderer<'_> {
     fn render(&self, ctx: &mut RenderContext) -> String {
         match self {
             GqlTypeRenderer::Input(i) => self.render_input_type(i, ctx),

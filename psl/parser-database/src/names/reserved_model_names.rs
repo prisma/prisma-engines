@@ -44,6 +44,8 @@ pub(crate) fn validate_enum_name(ast_enum: &ast::Enum, diagnostics: &mut Diagnos
 const RESERVED_NAMES: &[&str] = &[
     "PrismaClient",
     // JavaScript keywords
+    "async",
+    "await",
     "break",
     "case",
     "catch",
@@ -83,6 +85,7 @@ const RESERVED_NAMES: &[&str] = &[
     "true",
     "try",
     "typeof",
+    "using",
     "var",
     "void",
     "while",

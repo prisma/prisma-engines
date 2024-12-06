@@ -136,7 +136,6 @@ impl From<ResponseData> for GQLResponse {
 }
 
 /// GQLBatchResponse converters
-
 impl GQLBatchResponse {
     pub fn insert_responses(&mut self, responses: Vec<GQLResponse>) {
         responses.into_iter().for_each(|response| {

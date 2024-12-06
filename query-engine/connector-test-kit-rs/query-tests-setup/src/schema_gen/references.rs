@@ -14,7 +14,7 @@ pub enum RelationReference<'a> {
     NoRef,
 }
 
-impl<'a> RelationReference<'a> {
+impl RelationReference<'_> {
     pub fn render(&self) -> String {
         match self {
             RelationReference::SimpleChildId(rf) => self.render_simple_child_id(rf),

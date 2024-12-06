@@ -66,7 +66,7 @@ pub(crate) fn simple_input_field<'a>(
     name: impl Into<std::borrow::Cow<'a, str>>,
     field_type: InputType<'a>,
     default_value: Option<DefaultKind>,
-) -> InputField<'_> {
+) -> InputField<'a> {
     input_field(name, vec![field_type], default_value)
 }
 

@@ -6,7 +6,7 @@ pub(crate) enum GqlFieldRenderer<'a> {
     Output(OutputField<'a>),
 }
 
-impl<'a> Renderer for GqlFieldRenderer<'a> {
+impl Renderer for GqlFieldRenderer<'_> {
     fn render(&self, ctx: &mut RenderContext) -> String {
         match self {
             GqlFieldRenderer::Input(input) => self.render_input_field(input, ctx),

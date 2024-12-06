@@ -1,0 +1,22 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Blog {
+  id      Int    @unique
+  content String
+  title   String
+  @@fulltext([content, title])
+}
+// [1;93mwarning[0m: [1mPreview feature "fullTextSearch" is deprecated. The functionality can be used without specifying it as a preview feature.[0m
+//   [1;94m-->[0m  [4mschema.prisma:3[0m
+// [1;94m   | [0m
+// [1;94m 2 | [0m  provider        = "prisma-client-js"
+// [1;94m 3 | [0m  previewFeatures = [1;93m["fullTextSearch"][0m
+// [1;94m   | [0m

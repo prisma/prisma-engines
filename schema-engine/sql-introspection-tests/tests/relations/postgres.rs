@@ -218,7 +218,7 @@ async fn name_ambiguity_with_a_scalar_field(api: &mut TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn a_prisma_many_to_many_relation(api: &mut TestApi) -> TestResult {
+async fn legacy_prisma_many_to_many_relation(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE "User" (
             id SERIAL PRIMARY KEY
@@ -237,6 +237,56 @@ async fn a_prisma_many_to_many_relation(api: &mut TestApi) -> TestResult {
 
         CREATE UNIQUE INDEX test ON "_PostToUser" ("A", "B");
         CREATE INDEX test2 ON "_PostToUser" ("B");
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model Post {
+          id   Int    @id @default(autoincrement())
+          User User[]
+        }
+
+        model User {
+          id   Int    @id @default(autoincrement())
+          Post Post[]
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn new_prisma_many_to_many_relation(api: &mut TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE "User" (
+            id SERIAL PRIMARY KEY
+        );
+
+        CREATE TABLE "Post" (
+            id SERIAL PRIMARY KEY
+        );
+
+        CREATE TABLE "_PostToUser" (
+            "A" INT NOT NULL,
+            "B" INT NOT NULL,
+            CONSTRAINT "_PostToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "Post"(id),
+            CONSTRAINT "_PostToUser_B_fkey" FOREIGN KEY ("B") REFERENCES "User"(id),
+            CONSTRAINT "_PostToUser_AB_pkey" PRIMARY KEY ("A", "B")
+        );
+
+        CREATE INDEX test ON "_PostToUser" ("B");
     "#};
 
     api.raw_cmd(setup).await;

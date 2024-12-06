@@ -138,6 +138,14 @@ impl QueryResult {
         serde_json::to_string_pretty(&self.response).unwrap()
     }
 
+    pub fn into_data(self) -> Vec<serde_json::Value> {
+        match self.response {
+            Response::Single(res) => vec![res.data],
+            Response::Multi(res) => res.batch_result.into_iter().map(|res| res.data).collect(),
+            Response::Error(_) => vec![],
+        }
+    }
+
     /// Transform a JSON protocol response to a GraphQL protocol response, by removing the type
     /// tags.
     pub(crate) fn detag(&mut self) {

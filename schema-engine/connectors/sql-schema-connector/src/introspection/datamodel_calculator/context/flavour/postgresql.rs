@@ -96,4 +96,8 @@ impl super::IntrospectionFlavour for PostgresIntrospectionFlavour {
         let pg_ext: &PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
         pg_ext.uses_exclude_constraint(table.id)
     }
+
+    fn uses_pk_in_m2m_join_tables(&self, ctx: &DatamodelCalculatorContext<'_>) -> bool {
+        !ctx.is_cockroach()
+    }
 }

@@ -258,7 +258,7 @@ pub(crate) trait SqlFlavour:
         &'a mut self,
         sql: &'a str,
         params: &'a [quaint::prelude::Value<'a>],
-    ) -> BoxFuture<'_, ConnectorResult<quaint::prelude::ResultSet>>;
+    ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>>;
 
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>>;
 
@@ -309,11 +309,6 @@ fn validate_connection_infos_do_not_match(previous: &str, next: &str) -> Connect
 
 /// Remove all usage of non-enabled preview feature elements from the SqlSchema.
 fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<PreviewFeature>) {
-    // Remove this when the feature is GA
-    if !preview_features.contains(PreviewFeature::FullTextIndex) {
-        sql_schema.make_fulltext_indexes_normal();
-    }
-
     if !preview_features.contains(PreviewFeature::MultiSchema) {
         sql_schema.clear_namespaces();
     }

@@ -23,7 +23,7 @@ impl<'a> Sqlite<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> TestApi for Sqlite<'a> {
+impl TestApi for Sqlite<'_> {
     fn system(&self) -> &'static str {
         "sqlite"
     }
@@ -81,6 +81,10 @@ impl<'a> TestApi for Sqlite<'a> {
 
     async fn create_additional_connection(&self) -> crate::Result<Quaint> {
         Quaint::new(CONN_STR).await
+    }
+
+    fn create_pool(&self) -> crate::Result<crate::pooled::Quaint> {
+        Ok(crate::pooled::Quaint::builder(CONN_STR)?.build())
     }
 
     fn unique_constraint(&mut self, column: &str) -> String {

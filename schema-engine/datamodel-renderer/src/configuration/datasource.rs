@@ -137,7 +137,7 @@ impl<'a> Datasource<'a> {
     }
 }
 
-impl<'a> fmt::Display for Datasource<'a> {
+impl fmt::Display for Datasource<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(ref doc) = self.documentation {
             doc.fmt(f)?;

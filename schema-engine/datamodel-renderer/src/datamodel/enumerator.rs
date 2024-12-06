@@ -74,7 +74,7 @@ impl<'a> From<&'a str> for EnumVariant<'a> {
     }
 }
 
-impl<'a> fmt::Display for EnumVariant<'a> {
+impl fmt::Display for EnumVariant<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(ref docs) = self.documentation {
             docs.fmt(f)?;
@@ -184,7 +184,7 @@ impl<'a> Enum<'a> {
     }
 }
 
-impl<'a> fmt::Display for Enum<'a> {
+impl fmt::Display for Enum<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(doc) = &self.documentation {
             doc.fmt(f)?;

@@ -50,7 +50,7 @@ impl LineWriteable for Renderer {
     }
 }
 
-impl<'a> LineWriteable for &'a mut String {
+impl LineWriteable for &mut String {
     fn write(&mut self, param: &str) {
         self.push_str(param);
     }

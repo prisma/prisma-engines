@@ -49,7 +49,7 @@ impl OrderByBuilder {
                 }
                 OrderBy::ToManyAggregation(order_by) => self.build_order_aggr_rel(order_by, needs_reversed_order, ctx),
                 OrderBy::Relevance(order_by) => {
-                    reachable_only_with_capability!(ConnectorCapability::FullTextSearch);
+                    reachable_only_with_capability!(ConnectorCapability::NativeFullTextSearch);
                     self.build_order_relevance(order_by, needs_reversed_order, ctx)
                 }
             })

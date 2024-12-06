@@ -82,7 +82,7 @@ impl std::fmt::Debug for CreateMigrationAssertion<'_> {
     }
 }
 
-impl<'a> CreateMigrationAssertion<'a> {
+impl CreateMigrationAssertion<'_> {
     /// Assert that there are `expected_count` migrations in the migrations directory.
     #[tracing::instrument(skip(self))]
     #[track_caller]

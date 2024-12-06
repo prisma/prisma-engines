@@ -23,7 +23,7 @@ pub struct RequestHandler<'a> {
     engine_protocol: EngineProtocol,
 }
 
-impl<'a> fmt::Debug for RequestHandler<'a> {
+impl fmt::Debug for RequestHandler<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("RequestHandler").finish()
     }
@@ -255,6 +255,8 @@ impl<'a> RequestHandler<'a> {
     /// Here are the cases covered:
     /// - DateTime/String: User-input: DateTime / Response: String
     /// - Int/BigInt: User-input: Int / Response: BigInt
+    /// - Int/Float: User-input: Int / Response: Float
+    /// - Int/Decimal: User-input: Int / Response: String
     /// - (JSON protocol only) Custom types (eg: { "$type": "BigInt", value: "1" }): User-input: Scalar / Response: Object
     /// - (JSON protocol only) String/Enum: User-input: String / Response: Enum
     ///
@@ -267,6 +269,14 @@ impl<'a> RequestHandler<'a> {
                     .map(|t1| &t1 == t2)
                     .unwrap_or_else(|_| t1 == stringify_datetime(t2).as_str())
             }
+            (
+                ArgumentValue::Scalar(PrismaValue::Int(i1) | PrismaValue::BigInt(i1)),
+                ArgumentValue::Scalar(PrismaValue::Float(i2)),
+            )
+            | (
+                ArgumentValue::Scalar(PrismaValue::Float(i2)),
+                ArgumentValue::Scalar(PrismaValue::Int(i1) | PrismaValue::BigInt(i1)),
+            ) => BigDecimal::from(*i1) == *i2,
             (ArgumentValue::Scalar(PrismaValue::Int(i1)), ArgumentValue::Scalar(PrismaValue::BigInt(i2)))
             | (ArgumentValue::Scalar(PrismaValue::BigInt(i2)), ArgumentValue::Scalar(PrismaValue::Int(i1))) => {
                 *i1 == *i2
@@ -279,6 +289,16 @@ impl<'a> RequestHandler<'a> {
                 Some(t1) => Self::compare_values(t1, t2),
                 None => left == right,
             },
+            (
+                ArgumentValue::Scalar(PrismaValue::Int(s1) | PrismaValue::BigInt(s1)),
+                ArgumentValue::Scalar(PrismaValue::String(s2)),
+            )
+            | (
+                ArgumentValue::Scalar(PrismaValue::String(s2)),
+                ArgumentValue::Scalar(PrismaValue::Int(s1) | PrismaValue::BigInt(s1)),
+            ) => BigDecimal::from_str(s2)
+                .map(|s2| s2 == BigDecimal::from(*s1))
+                .unwrap_or(false),
             (ArgumentValue::Scalar(PrismaValue::Float(s1)), ArgumentValue::Scalar(PrismaValue::String(s2)))
             | (ArgumentValue::Scalar(PrismaValue::String(s2)), ArgumentValue::Scalar(PrismaValue::Float(s1))) => {
                 BigDecimal::from_str(s2).map(|s2| s2 == *s1).unwrap_or(false)

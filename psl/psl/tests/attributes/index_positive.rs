@@ -304,7 +304,7 @@ fn mysql_fulltext_index() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Mysql, &["fullTextIndex"]))
+    psl::parse_schema(with_header(dml, Provider::Mysql, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_fulltext_on_fields(&["a", "b"]);
@@ -322,7 +322,7 @@ fn mysql_fulltext_index_map() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Mysql, &["fullTextIndex"]))
+    psl::parse_schema(with_header(dml, Provider::Mysql, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_fulltext_on_fields(&["a", "b"])
@@ -341,7 +341,7 @@ fn fulltext_index_mongodb() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Mongo, &["fullTextIndex"]))
+    psl::parse_schema(with_header(dml, Provider::Mongo, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_fulltext_on_fields(&["a", "b"]);
@@ -380,7 +380,7 @@ fn fulltext_index_sort_mongodb() {
         }
     "#};
 
-    psl::parse_schema(with_header(dml, Provider::Mongo, &["fullTextIndex"]))
+    psl::parse_schema(with_header(dml, Provider::Mongo, &[]))
         .unwrap()
         .assert_has_model("A")
         .assert_fulltext_on_fields(&["a", "b"])
@@ -403,7 +403,7 @@ fn multiple_fulltext_indexes_allowed_per_model_in_mysql() {
         }
     "#};
 
-    let schema = psl::parse_schema(with_header(dml, Provider::Mysql, &["fullTextIndex"])).unwrap();
+    let schema = psl::parse_schema(with_header(dml, Provider::Mysql, &[])).unwrap();
     let a = schema.assert_has_model("A");
 
     a.assert_fulltext_on_fields(&["a", "b"]);

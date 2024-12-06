@@ -61,7 +61,7 @@ impl<'a> Configuration<'a> {
     }
 }
 
-impl<'a> fmt::Display for Configuration<'a> {
+impl fmt::Display for Configuration<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for (_, generators) in self.generators.iter() {
             for generator in generators {
