@@ -20,7 +20,7 @@ use std::{
     ptr::null_mut,
     sync::Arc,
 };
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 use tokio::{
     runtime::{self, Runtime},
     sync::RwLock,

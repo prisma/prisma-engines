@@ -43,12 +43,11 @@ impl Logger {
         let log_callback = Arc::new(log_callback);
         let callback_layer = Box::new(CallbackLayer::new(Arc::clone(&log_callback)));
 
-        let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
         let tracer = crate::tracer::new_pipeline().install_simple(callback_layer);
         let telemetry = if enable_tracing {
             let telemetry = tracing_opentelemetry::layer()
                 .with_tracer(tracer)
-                .with_filter(is_user_trace);
+                .with_filter(telemetry::filter::user_facing_spans());
             Some(telemetry)
         } else {
             None
