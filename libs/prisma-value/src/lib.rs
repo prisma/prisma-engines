@@ -73,6 +73,10 @@ pub fn decode_bytes(s: impl AsRef<[u8]>) -> PrismaValueResult<Vec<u8>> {
     base64::decode(s).map_err(|_| ConversionFailure::new("base64 encoded bytes", "PrismaValue::Bytes"))
 }
 
+pub fn parse_decimal(str: &str) -> std::result::Result<BigDecimal, bigdecimal::ParseBigDecimalError> {
+    BigDecimal::from_str(str).map(|bd| bd.normalized())
+}
+
 impl TryFrom<serde_json::Value> for PrismaValue {
     type Error = crate::error::ConversionFailure;
 
