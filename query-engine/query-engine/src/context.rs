@@ -27,6 +27,8 @@ pub struct PrismaContext {
     pub(crate) engine_protocol: EngineProtocol,
     /// Enabled features
     pub(crate) enabled_features: EnabledFeatures,
+    /// Logging and tracing facility
+    pub(crate) logger: Logger,
 }
 
 impl fmt::Debug for PrismaContext {
@@ -41,6 +43,7 @@ impl PrismaContext {
         protocol: EngineProtocol,
         enabled_features: EnabledFeatures,
         metrics: Option<MetricRegistry>,
+        logger: Logger,
     ) -> PrismaResult<PrismaContext> {
         let arced_schema = Arc::new(schema);
         let arced_schema_2 = Arc::clone(&arced_schema);
@@ -90,6 +93,7 @@ impl PrismaContext {
             metrics: metrics.unwrap_or_default(),
             engine_protocol: protocol,
             enabled_features,
+            logger,
         };
 
         Ok(context)
@@ -113,7 +117,7 @@ impl PrismaContext {
 }
 
 pub async fn setup(opts: &PrismaOpt) -> PrismaResult<Arc<PrismaContext>> {
-    Logger::new("prisma-engine-http", opts).install().unwrap();
+    let logger = Logger::new(opts).install().expect("failed to install the logger");
 
     let metrics = if opts.enable_metrics || opts.dataproxy_metric_override {
         let metrics = MetricRegistry::new();
@@ -142,7 +146,7 @@ pub async fn setup(opts: &PrismaOpt) -> PrismaResult<Arc<PrismaContext>> {
         features |= Feature::Metrics
     }
 
-    let cx = PrismaContext::new(datamodel, protocol, features, metrics)
+    let cx = PrismaContext::new(datamodel, protocol, features, metrics, logger)
         .instrument(span)
         .await?;
 

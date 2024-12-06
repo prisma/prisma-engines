@@ -20,7 +20,7 @@ use prisma_metrics::{
 
 use schema::{QuerySchema, QuerySchemaRef};
 use std::time::Duration;
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 use tracing::Instrument;
 use tracing_futures::WithSubscriber;
 

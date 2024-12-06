@@ -20,7 +20,7 @@ use request_handlers::ConnectorKind;
 use request_handlers::{load_executor, RequestBody, RequestHandler};
 use serde_json::json;
 use std::{marker::PhantomData, sync::Arc};
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 use tokio::sync::RwLock;
 use tracing::{instrument::WithSubscriber, Instrument, Level};
 use tracing_opentelemetry::OpenTelemetrySpanExt;

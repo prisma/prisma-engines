@@ -1,6 +1,7 @@
 use crate::{
     context::PrismaContext,
     features::{EnabledFeatures, Feature},
+    logger::Logger,
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
@@ -129,7 +130,14 @@ impl CliCommand {
         if request.enable_raw_queries {
             features |= Feature::RawQueries
         }
-        let cx = PrismaContext::new(request.schema, request.engine_protocol, features, None).await?;
+        let cx = PrismaContext::new(
+            request.schema,
+            request.engine_protocol,
+            features,
+            None,
+            Logger::default().install().unwrap(),
+        )
+        .await?;
 
         let cx = Arc::new(cx);
 
