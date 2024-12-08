@@ -9,6 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: suzuki-shunsuke/github-action-renovate-config-validator@v1.1.0
+      - uses: suzuki-shunsuke/github-action-renovate-config-validator@v1.1.1
         with:
           strict: "false"
