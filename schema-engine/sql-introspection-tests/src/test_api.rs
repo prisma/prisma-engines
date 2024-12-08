@@ -90,14 +90,6 @@ impl TestApi {
         } else if tags.contains(Tags::CockroachDb) {
             let (_, q, cs) = args.create_postgres_database().await;
 
-            q.raw_cmd(
-                r#"
-                SET default_int_size = 4;
-                "#,
-            )
-            .await
-            .unwrap();
-
             let mut me = SqlSchemaConnector::new_cockroach();
 
             let params = ConnectorParams {
@@ -146,6 +138,21 @@ impl TestApi {
             preview_features,
             namespaces,
         }
+    }
+
+    // Call this function when you want the SQL `INT` type to always be mapped to the PSL `Int` type.
+    // On CockroachDB, for instance, `INT` is an alias to `INT8` (rather than `INT4`), which would
+    // normally be mapped to `BigInt` in PSL.
+    // This method is especially useful when testing the same assertions against multiple database providers.
+    pub async fn normalise_int_type(&self) -> Result<()> {
+        if self.is_cockroach() {
+            self.database
+                .raw_cmd("SET default_int_size = 4")
+                .await
+                .expect("Failed to alias INT to INT4 on CockroachDB");
+        }
+
+        Ok(())
     }
 
     pub fn connection_string(&self) -> &str {
