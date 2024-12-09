@@ -77,7 +77,8 @@ async fn create_many(
             .create_records_returning(&q.model, q.args, q.skip_duplicates, selected_fields.fields, traceparent)
             .await?;
 
-        let nested: Vec<QueryResult> = super::read::process_nested(tx, selected_fields.nested, Some(&records)).await?;
+        let nested: Vec<QueryResult> =
+            super::read::process_nested(tx, selected_fields.nested, Some(&records), traceparent).await?;
 
         let selection = RecordSelection {
             name: q.name,
@@ -149,7 +150,7 @@ async fn create_many_split_by_shape(
         };
 
         let nested: Vec<QueryResult> =
-            super::read::process_nested(tx, selected_fields.nested.clone(), Some(&records)).await?;
+            super::read::process_nested(tx, selected_fields.nested.clone(), Some(&records), traceparent).await?;
 
         let selection = RecordSelection {
             name: q.name,

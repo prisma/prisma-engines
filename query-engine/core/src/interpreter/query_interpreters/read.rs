@@ -47,7 +47,7 @@ fn read_one(
         match record {
             Some(record) if query.relation_load_strategy.is_query() => {
                 let records = record.into();
-                let nested = process_nested(tx, query.nested, Some(&records)).await?;
+                let nested = process_nested(tx, query.nested, Some(&records), traceparent).await?;
 
                 Ok(RecordSelection {
                     name: query.name,
@@ -137,7 +137,7 @@ fn read_many_by_queries(
         if records.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
             record_not_found()
         } else {
-            let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&records)).await?;
+            let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&records), traceparent).await?;
 
             Ok(RecordSelection {
                 name: query.name,
@@ -230,7 +230,7 @@ fn read_related<'conn>(
             .await?
         };
         let model = query.parent_field.related_model();
-        let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&records)).await?;
+        let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&records), traceparent).await?;
 
         Ok(RecordSelection {
             name: query.name,
@@ -274,6 +274,7 @@ pub(crate) fn process_nested<'conn>(
     tx: &'conn mut dyn ConnectionLike,
     nested: Vec<ReadQuery>,
     parent_result: Option<&'conn ManyRecords>,
+    traceparent: Option<TraceParent>,
 ) -> BoxFuture<'conn, InterpretationResult<Vec<QueryResult>>> {
     let fut = async move {
         let results = if matches!(parent_result, Some(parent_records) if parent_records.records.is_empty()) {
@@ -284,7 +285,7 @@ pub(crate) fn process_nested<'conn>(
             let mut nested_results = Vec::with_capacity(nested.len());
 
             for query in nested {
-                let result = execute(tx, query, parent_result, None).await?;
+                let result = execute(tx, query, parent_result, traceparent).await?;
                 nested_results.push(result);
             }
 
