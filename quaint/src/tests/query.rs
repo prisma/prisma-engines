@@ -3660,7 +3660,7 @@ async fn traceparent_inside_of_query_isnt_stripped_from_log(api: &mut dyn TestAp
         .await?
         .into_single()?;
     let expected = format!(
-        r#"{{db.system="{}" db.statement=SELECT ? otel.kind="client"}}"#,
+        r#"{{db.system="{}" db.statement=SELECT /* traceparent=1 */ 1 otel.kind="client"}}"#,
         api.system()
     );
     logs_contain(&expected);
