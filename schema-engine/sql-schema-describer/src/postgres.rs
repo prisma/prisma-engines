@@ -527,7 +527,7 @@ impl AsRef<str> for SQLOperatorClassKind {
 }
 
 #[async_trait::async_trait]
-impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
+impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     async fn list_databases(&self) -> DescriberResult<Vec<String>> {
         Ok(self.get_databases().await?)
     }

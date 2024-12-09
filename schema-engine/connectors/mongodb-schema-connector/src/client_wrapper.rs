@@ -9,11 +9,10 @@ use schema_connector::{ConnectorError, ConnectorResult};
 pub struct Client {
     inner: mongodb::Client,
     db_name: String,
-    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl Client {
-    pub async fn connect(connection_str: &str, preview_features: BitFlags<PreviewFeature>) -> ConnectorResult<Client> {
+    pub async fn connect(connection_str: &str, _preview_features: BitFlags<PreviewFeature>) -> ConnectorResult<Client> {
         let MongoConnectionString { database, .. } = connection_str.parse().map_err(ConnectorError::url_parse_error)?;
 
         let inner = mongodb_client::create(connection_str)
@@ -26,7 +25,6 @@ impl Client {
         Ok(Client {
             inner,
             db_name: database,
-            preview_features,
         })
     }
 
@@ -35,13 +33,9 @@ impl Client {
     }
 
     pub(crate) async fn describe(&self) -> ConnectorResult<MongoSchema> {
-        let mut schema = mongodb_schema_describer::describe(&self.inner, &self.db_name)
+        let schema = mongodb_schema_describer::describe(&self.inner, &self.db_name)
             .await
             .map_err(mongo_error_to_connector_error)?;
-
-        if !self.preview_features.contains(PreviewFeature::FullTextIndex) {
-            schema.remove_fulltext_indexes();
-        }
 
         Ok(schema)
     }

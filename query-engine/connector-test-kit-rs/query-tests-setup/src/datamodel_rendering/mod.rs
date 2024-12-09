@@ -12,7 +12,7 @@ use crate::{
 use indoc::indoc;
 use itertools::Itertools;
 use once_cell::sync::Lazy;
-use psl::ALL_PREVIEW_FEATURES;
+use psl::FeatureMapWithProvider;
 use regex::Regex;
 
 /// Test configuration, loaded once at runtime.
@@ -42,7 +42,7 @@ pub fn render_test_datamodel(
     isolation_level: Option<&'static str>,
 ) -> String {
     let (tag, version) = CONFIG.test_connector().unwrap();
-    let preview_features = render_preview_features(excluded_features);
+    let preview_features = render_preview_features(tag.datamodel_provider(), excluded_features);
 
     let is_multi_schema = !db_schemas.is_empty();
 
@@ -93,13 +93,14 @@ fn process_template(template: String, renderer: Box<dyn DatamodelRenderer>) -> S
     })
 }
 
-fn render_preview_features(excluded_features: &[&str]) -> String {
+fn render_preview_features(provider: &str, excluded_features: &[&str]) -> String {
     let excluded_features: Vec<_> = excluded_features.iter().map(|f| format!(r#""{f}""#)).collect();
+    let feature_map_with_provider = FeatureMapWithProvider::new(Some(provider));
 
-    ALL_PREVIEW_FEATURES
+    feature_map_with_provider
         .active_features()
         .iter()
-        .chain(ALL_PREVIEW_FEATURES.hidden_features())
+        .chain(feature_map_with_provider.hidden_features())
         .map(|f| format!(r#""{f}""#))
         .filter(|f| !excluded_features.contains(f))
         .join(", ")

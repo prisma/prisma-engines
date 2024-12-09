@@ -27,7 +27,7 @@ impl<'a> PostgreSql<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> TestApi for PostgreSql<'a> {
+impl TestApi for PostgreSql<'_> {
     fn system(&self) -> &'static str {
         "postgres"
     }
@@ -85,6 +85,10 @@ impl<'a> TestApi for PostgreSql<'a> {
 
     async fn create_additional_connection(&self) -> crate::Result<Quaint> {
         Quaint::new(&CONN_STR).await
+    }
+
+    fn create_pool(&self) -> crate::Result<crate::pooled::Quaint> {
+        Ok(crate::pooled::Quaint::builder(&CONN_STR)?.build())
     }
 
     fn unique_constraint(&mut self, column: &str) -> String {

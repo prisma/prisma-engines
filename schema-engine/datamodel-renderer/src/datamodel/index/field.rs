@@ -93,7 +93,7 @@ impl<'a> From<IndexFieldInput<'a>> for Function<'a> {
 #[derive(Debug)]
 pub struct UniqueFieldAttribute<'a>(FieldAttribute<'a>);
 
-impl<'a> Default for UniqueFieldAttribute<'a> {
+impl Default for UniqueFieldAttribute<'_> {
     fn default() -> Self {
         Self(FieldAttribute::new(Function::new("unique")))
     }
@@ -141,7 +141,7 @@ impl<'a> UniqueFieldAttribute<'a> {
     }
 }
 
-impl<'a> fmt::Display for UniqueFieldAttribute<'a> {
+impl fmt::Display for UniqueFieldAttribute<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
     }

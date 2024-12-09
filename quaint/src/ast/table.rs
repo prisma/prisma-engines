@@ -33,7 +33,7 @@ pub struct Table<'a> {
     pub(crate) index_definitions: Vec<IndexDefinition<'a>>,
 }
 
-impl<'a> PartialEq for Table<'a> {
+impl PartialEq for Table<'_> {
     fn eq(&self, other: &Table) -> bool {
         self.typ == other.typ && self.database == other.database
     }
@@ -419,7 +419,7 @@ impl<'a> From<(&'a String, &'a String)> for Table<'a> {
     }
 }
 
-impl<'a> From<String> for Table<'a> {
+impl From<String> for Table<'_> {
     fn from(s: String) -> Self {
         Table {
             typ: TableType::Table(s.into()),

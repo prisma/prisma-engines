@@ -1004,8 +1004,7 @@ fn length_argument_does_not_work_with_int() {
 fn empty_fields_must_error() {
     let schema = r#"
         generator js {
-          provider        = "prisma-client-js"
-          previewFeatures = ["fullTextIndex"]
+          provider = "prisma-client-js"
         }
 
         datasource db {
@@ -1022,10 +1021,10 @@ fn empty_fields_must_error() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@@id": The list of fields in an `@@id()` attribute cannot be empty. Please specify at least one field.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m14 | [0m          name        String @db.VarChar(255)
-        [1;94m15 | [0m          [1;91m@@id([])[0m
+        [1;94m13 | [0m          name        String @db.VarChar(255)
+        [1;94m14 | [0m          [1;91m@@id([])[0m
         [1;94m   | [0m
     "#]];
 

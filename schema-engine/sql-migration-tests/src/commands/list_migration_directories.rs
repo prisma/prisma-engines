@@ -44,7 +44,7 @@ impl std::fmt::Debug for ListMigrationDirectoriesAssertion<'_> {
     }
 }
 
-impl<'a> ListMigrationDirectoriesAssertion<'a> {
+impl ListMigrationDirectoriesAssertion<'_> {
     #[track_caller]
     pub fn assert_listed_directories(self, names: &[&str]) -> Self {
         let found_names: Vec<&str> = self.output.migrations.iter().map(|name| &name[15..]).collect();

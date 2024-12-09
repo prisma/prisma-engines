@@ -118,8 +118,8 @@ pub(crate) trait SqlSchemaDifferFlavour {
         true
     }
 
-    /// Whether indexes matching a foreign key should be skipped.
-    fn should_skip_fk_indexes(&self) -> bool {
+    /// Whether foreign keys should be recreated when they are covered by deleted indexes.
+    fn should_recreate_fks_covered_by_deleted_indexes(&self) -> bool {
         false
     }
 

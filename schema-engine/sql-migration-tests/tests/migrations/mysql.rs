@@ -1,7 +1,8 @@
 #![allow(dead_code)]
 
 use indoc::indoc;
-use schema_core::json_rpc::types::*;
+use psl::SourceFile;
+use schema_core::{json_rpc::types::*, schema_connector};
 use sql_migration_tests::test_api::*;
 use std::fmt::Write as _;
 
@@ -633,4 +634,195 @@ fn bigint_defaults_work(api: TestApi) {
 
     api.schema_push(schema).send().assert_green();
     api.schema_push(schema).send().assert_green().assert_no_steps();
+}
+
+#[test_connector(tags(Mysql), exclude(Vitess))]
+fn foreign_keys_covered_by_deleted_index_are_recreated(api: TestApi) {
+    let schema_a = r#"
+        model User {
+            id Int @id
+            transactions Transaction[]
+        }
+
+        model Account {
+            userId Int
+            id Int
+            transactions Transaction[]
+            @@id([userId, id])
+        }
+
+        model Transaction {
+            id Int @id
+            userId Int
+            accountId Int
+
+            user User @relation(fields: [userId], references: [id])
+            account Account @relation(fields: [userId, accountId], references: [userId, id])
+            @@unique([userId, accountId])
+        //  ^^^
+        //  We want to delete this index, MySQL will put a regular index back in its place
+        //  when we recreate the foreign key.
+        }
+    "#;
+
+    api.schema_push_w_datasource(schema_a).send();
+
+    api.assert_schema().assert_table("Transaction", |table| {
+        table
+            .assert_foreign_keys_count(2)
+            .assert_fk_on_columns(&["userId"], |fk| fk.assert_references("User", &["id"]))
+            .assert_fk_on_columns(&["userId", "accountId"], |fk| {
+                fk.assert_references("Account", &["userId", "id"])
+            })
+            .assert_indexes_count(1)
+            .assert_index_on_columns(&["userId", "accountId"], |idx| idx.assert_is_unique())
+    });
+
+    let schema_b = r#"
+        model User {
+            id Int @id
+            transactions Transaction[]
+        }
+
+        model Account {
+            userId Int
+            id Int
+            transactions Transaction[]
+            @@id([userId, id])
+        }
+
+        model Transaction {
+            id Int @id
+            userId Int
+            accountId Int
+
+            user User @relation(fields: [userId], references: [id])
+            account Account @relation(fields: [userId, accountId], references: [userId, id])
+        }
+    "#;
+
+    api.schema_push_w_datasource(schema_b)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+
+    api.assert_schema().assert_table("Transaction", |table| {
+        table
+            .assert_foreign_keys_count(2)
+            .assert_fk_on_columns(&["userId"], |fk| fk.assert_references("User", &["id"]))
+            .assert_fk_on_columns(&["userId", "accountId"], |fk| {
+                fk.assert_references("Account", &["userId", "id"])
+            })
+            .assert_indexes_count(1)
+            .assert_index_on_columns(&["userId", "accountId"], |idx| idx.assert_is_not_unique())
+    });
+
+    let diff = api.connector_diff(
+        schema_connector::DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_a))]),
+        schema_connector::DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_b))]),
+        None,
+    );
+    expect![[r#"
+        -- DropForeignKey
+        ALTER TABLE `Transaction` DROP FOREIGN KEY `Transaction_userId_fkey`;
+
+        -- DropForeignKey
+        ALTER TABLE `Transaction` DROP FOREIGN KEY `Transaction_userId_accountId_fkey`;
+
+        -- DropIndex
+        DROP INDEX `Transaction_userId_accountId_key` ON `Transaction`;
+
+        -- AddForeignKey
+        ALTER TABLE `Transaction` ADD CONSTRAINT `Transaction_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+        -- AddForeignKey
+        ALTER TABLE `Transaction` ADD CONSTRAINT `Transaction_userId_accountId_fkey` FOREIGN KEY (`userId`, `accountId`) REFERENCES `Account`(`userId`, `id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+    "#]].assert_eq(&diff);
+}
+
+#[test_connector(tags(Mysql), exclude(Vitess))]
+fn foreign_keys_covered_by_deleted_index_are_also_deleted(api: TestApi) {
+    let schema_a = r#"
+        model User {
+            id Int @id
+            transactions Transaction[]
+        }
+
+        model Account {
+            userId Int
+            id Int
+            transactions Transaction[]
+            @@id([userId, id])
+        }
+
+        model Transaction {
+            id Int @id
+            userId Int
+            accountId Int
+
+            user User @relation(fields: [userId], references: [id])
+            account Account @relation(fields: [userId, accountId], references: [userId, id])
+            @@unique([userId, accountId])
+        //  ^^^
+        //  We will delete both the index and the foreign keys. The migration should only
+        //  contain DROP statements.
+        }
+    "#;
+
+    api.schema_push_w_datasource(schema_a).send();
+
+    api.assert_schema().assert_table("Transaction", |table| {
+        table
+            .assert_foreign_keys_count(2)
+            .assert_fk_on_columns(&["userId"], |fk| fk.assert_references("User", &["id"]))
+            .assert_fk_on_columns(&["userId", "accountId"], |fk| {
+                fk.assert_references("Account", &["userId", "id"])
+            })
+            .assert_indexes_count(1)
+            .assert_index_on_columns(&["userId", "accountId"], |idx| idx.assert_is_unique())
+    });
+
+    let schema_b = r#"
+        model User {
+            id Int @id
+        }
+
+        model Account {
+            userId Int
+            id Int
+            @@id([userId, id])
+        }
+
+        model Transaction {
+            id Int @id
+            userId Int
+            accountId Int
+        }
+    "#;
+
+    api.schema_push_w_datasource(schema_b)
+        .send()
+        .assert_green()
+        .assert_has_executed_steps();
+
+    api.assert_schema().assert_table("Transaction", |table| {
+        table.assert_foreign_keys_count(0).assert_indexes_count(0)
+    });
+
+    let diff = api.connector_diff(
+        schema_connector::DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_a))]),
+        schema_connector::DiffTarget::Datamodel(vec![("schema.prisma".to_string(), SourceFile::new_static(schema_b))]),
+        None,
+    );
+    expect![[r#"
+        -- DropForeignKey
+        ALTER TABLE `Transaction` DROP FOREIGN KEY `Transaction_userId_fkey`;
+
+        -- DropForeignKey
+        ALTER TABLE `Transaction` DROP FOREIGN KEY `Transaction_userId_accountId_fkey`;
+
+        -- DropIndex
+        DROP INDEX `Transaction_userId_accountId_key` ON `Transaction`;
+    "#]]
+    .assert_eq(&diff);
 }

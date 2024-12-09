@@ -310,7 +310,7 @@ impl TestApi {
         MarkMigrationRolledBack::new(&mut self.connector, migration_name.into())
     }
 
-    pub fn migration_persistence<'a>(&'a mut self) -> &mut (dyn MigrationPersistence + 'a) {
+    pub fn migration_persistence<'a>(&'a mut self) -> &'a mut (dyn MigrationPersistence + 'a) {
         &mut self.connector
     }
 

@@ -37,7 +37,7 @@ pub enum Value<'a> {
     IndexOps(IndexOps<'a>),
 }
 
-impl<'a> fmt::Debug for Value<'a> {
+impl fmt::Debug for Value<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Value::Text(t) => f.debug_tuple("Text").field(t).finish(),
@@ -59,7 +59,7 @@ impl<'a> From<IndexOps<'a>> for Value<'a> {
     }
 }
 
-impl<'a, T> From<Constant<T>> for Value<'a>
+impl<T> From<Constant<T>> for Value<'_>
 where
     T: fmt::Display,
 {
@@ -68,7 +68,7 @@ where
     }
 }
 
-impl<'a> From<Vec<u8>> for Value<'a> {
+impl From<Vec<u8>> for Value<'_> {
     fn from(bytes: Vec<u8>) -> Self {
         let display = Base64Display::with_config(&bytes, base64::STANDARD).to_string();
         Self::Text(Text::new(display))
@@ -133,7 +133,7 @@ impl<'a> FromIterator<Value<'a>> for Value<'a> {
     }
 }
 
-impl<'a> fmt::Display for Value<'a> {
+impl fmt::Display for Value<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Value::Text(val) => {

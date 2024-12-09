@@ -61,7 +61,7 @@ impl std::fmt::Debug for EvaluateDataLossAssertion<'_> {
     }
 }
 
-impl<'a> EvaluateDataLossAssertion<'a> {
+impl EvaluateDataLossAssertion<'_> {
     #[track_caller]
     pub fn assert_steps_count(self, count: u32) -> Self {
         assert!(

@@ -39,6 +39,11 @@ impl<'a> IndexWalker<'a> {
         matches!(self.get().tpe, IndexType::Unique)
     }
 
+    /// Is this index a normal index?
+    pub fn is_normal(self) -> bool {
+        matches!(self.get().tpe, IndexType::Normal)
+    }
+
     /// The name of the index.
     pub fn name(self) -> &'a str {
         &self.get().index_name

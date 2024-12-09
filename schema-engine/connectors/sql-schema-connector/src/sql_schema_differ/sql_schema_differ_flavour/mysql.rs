@@ -44,7 +44,7 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
             differ.next.column_type_family_as_enum(),
         ) {
             (Some(previous_enum), Some(next_enum)) => {
-                if all_match(&mut previous_enum.values(), &mut next_enum.values()) {
+                if all_match(previous_enum.values(), next_enum.values()) {
                     return None;
                 }
 
@@ -91,7 +91,7 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
         true
     }
 
-    fn should_skip_fk_indexes(&self) -> bool {
+    fn should_recreate_fks_covered_by_deleted_indexes(&self) -> bool {
         true
     }
 

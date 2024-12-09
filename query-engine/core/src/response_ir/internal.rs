@@ -312,7 +312,7 @@ enum SerializedFieldWithRelations<'a, 'b> {
     VirtualsGroup(&'a str, Vec<&'a VirtualSelection>),
 }
 
-impl<'a, 'b> SerializedFieldWithRelations<'a, 'b> {
+impl SerializedFieldWithRelations<'_, '_> {
     fn name(&self) -> &str {
         match self {
             Self::Model(f, _) => f.name(),

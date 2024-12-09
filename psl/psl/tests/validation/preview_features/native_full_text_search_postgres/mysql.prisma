@@ -1,0 +1,22 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Blog {
+  id      Int    @unique
+  content String
+  title   String
+  @@fulltext([content, title])
+}
+// [1;91merror[0m: [1mThe preview feature "fullTextSearchPostgres" is not known. Expected one of: deno, driverAdapters, metrics, multiSchema, nativeDistinct, postgresqlExtensions, tracing, views, relationJoins, prismaSchemaFolder, omitApi, strictUndefinedChecks[0m
+//   [1;94m-->[0m  [4mschema.prisma:3[0m
+// [1;94m   | [0m
+// [1;94m 2 | [0m  provider        = "prisma-client-js"
+// [1;94m 3 | [0m  previewFeatures = [1;91m["fullTextSearchPostgres"][0m
+// [1;94m   | [0m

@@ -64,7 +64,7 @@ impl<'a> IndexDefinition<'a> {
     }
 }
 
-impl<'a> fmt::Display for IndexDefinition<'a> {
+impl fmt::Display for IndexDefinition<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
     }
@@ -102,7 +102,7 @@ impl<'a> IndexOps<'a> {
     }
 }
 
-impl<'a> fmt::Display for IndexOps<'a> {
+impl fmt::Display for IndexOps<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self.0 {
             InnerOps::Managed(ref s) => f.write_str(s),

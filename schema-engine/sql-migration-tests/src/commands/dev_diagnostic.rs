@@ -54,7 +54,7 @@ impl std::fmt::Debug for DevDiagnosticAssertions<'_> {
     }
 }
 
-impl<'a> DevDiagnosticAssertions<'a> {
+impl DevDiagnosticAssertions<'_> {
     pub fn into_output(self) -> DevDiagnosticOutput {
         self.output
     }
