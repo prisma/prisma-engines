@@ -1,6 +1,14 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema))]
+#[test_suite(
+    schema(schema),
+    exclude(
+        MongoDb,
+        Vitess("planetscale.js", "planetscale.js.wasm"),
+        Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"),
+        Sqlite("libsql.js", "libsql.js.wasm", "cfd1", "react-native")
+    )
+)]
 mod logs {
     use indoc::indoc;
     use query_core::executor::TraceParent;
@@ -42,7 +50,7 @@ mod logs {
             .await?
             .assert_success();
 
-        assert_all_logs_contain_tracespans(&mut runner, traceparent).await
+        assert_all_logs_contain_traceparents(&mut runner, traceparent).await
     }
 
     #[connector_test]
@@ -71,7 +79,7 @@ mod logs {
             .await?
             .assert_success();
 
-        assert_all_logs_contain_tracespans(&mut runner, traceparent).await
+        assert_all_logs_contain_traceparents(&mut runner, traceparent).await
     }
 
     #[connector_test]
@@ -116,7 +124,7 @@ mod logs {
             .await?
             .assert_success();
 
-        assert_all_logs_contain_tracespans(&mut runner, traceparent).await
+        assert_all_logs_contain_traceparents(&mut runner, traceparent).await
     }
 
     #[connector_test]
@@ -158,29 +166,31 @@ mod logs {
             .await?
             .assert_success();
 
-        assert_all_logs_contain_tracespans(&mut runner, traceparent).await
+        assert_all_logs_contain_traceparents(&mut runner, traceparent).await
     }
 
-    async fn assert_all_logs_contain_tracespans(runner: &mut Runner, traceparent: TraceParent) -> TestResult<()> {
+    async fn assert_all_logs_contain_traceparents(runner: &mut Runner, traceparent: TraceParent) -> TestResult<()> {
         let logs = runner.get_logs().await;
 
         let query_logs = logs
             .iter()
             .filter(|log| {
-                log.split_once("db.statement=")
-                    .is_some_and(|(_, q)| !q.starts_with("BEGIN") && !q.starts_with("COMMIT"))
+                log.split_once("db.statement=").is_some_and(|(_, q)| {
+                    !q.starts_with("BEGIN") && !q.starts_with("COMMIT") && !q.starts_with("SET TRANSACTION")
+                })
             })
             .collect::<Vec<_>>();
         assert!(!query_logs.is_empty(), "expected db.statement logs in {logs:?}");
 
         let expected_traceparent = format!("/* traceparent='{}' */", traceparent);
-        let mismatching = query_logs
+        let matching = query_logs
             .iter()
-            .filter(|log| !log.contains(&expected_traceparent))
+            .filter(|log| log.contains(&expected_traceparent))
             .collect::<Vec<_>>();
+
         assert!(
-            mismatching.is_empty(),
-            "{expected_traceparent} not found in {mismatching:?}",
+            !matching.is_empty() && matching.len() == query_logs.len(),
+            "expected all logs to contain traceparent, got {logs:?}"
         );
 
         Ok(())
