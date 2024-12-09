@@ -3645,7 +3645,7 @@ async fn traceparent_is_stripped_from_the_log(api: &mut dyn TestApi) -> crate::R
         .query_raw("SELECT 1 /* traceparent=1 */", &[])
         .await?
         .into_single()?;
-    let expected = format!(r#"db.statement=SELECT 1 otel.kind="client""#);
+    let expected = r#"db.statement=SELECT 1 otel.kind="client""#.to_owned();
     assert!(logs_contain(&expected), "expected logs to contain '{expected}'");
 
     Ok(())
@@ -3658,7 +3658,7 @@ async fn traceparent_inside_of_query_isnt_stripped_from_log(api: &mut dyn TestAp
         .query_raw("SELECT /* traceparent=1 */ 1", &[])
         .await?
         .into_single()?;
-    let expected = format!(r#"db.statement=SELECT /* traceparent=1 */ 1 otel.kind="client""#,);
+    let expected = r#"db.statement=SELECT /* traceparent=1 */ 1 otel.kind="client""#.to_owned();
     assert!(logs_contain(&expected), "expected logs to contain '{expected}'");
 
     Ok(())
