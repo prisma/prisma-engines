@@ -1,6 +1,6 @@
 use crate::{error::ApiError, logger::Logger};
 use futures::FutureExt;
-use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsObject, JsUnknown};
+use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsBigInt, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
 use prisma_metrics::{MetricFormat, WithMetricsInstrumentation};
 use psl::PreviewFeature;
@@ -17,7 +17,9 @@ use request_handlers::{load_executor, render_graphql_schema, ConnectorKind, Requ
 use serde::Deserialize;
 use serde_json::json;
 use std::{collections::HashMap, future::Future, marker::PhantomData, panic::AssertUnwindSafe, sync::Arc};
-use telemetry::{tokio::sync::RwLock; tracing::{iuse tracing_opentelemetry::OpenTelemetrySpanExt;
+use telemetry::RequestId;
+use tokio::sync::RwLock;
+use tracing_futures::{Instrument, WithSubscriber};
 use tracing_subscriber::filter::LevelFilter;
 use user_facing_errors::Error;
 
@@ -160,14 +162,14 @@ impl QueryEngine {
 
     /// Connect to the database, allow queries to be run.
     #[napi]
-    pub async fn connect(&self, trace: String) -> napi::Result<()> {
+    pub async fn connect(&self, trace: String, request_id: JsBigInt) -> napi::Result<()> {
+        let request_id = bigint_to_request_id(request_id)?;
         let dispatcher = self.logger.dispatcher();
         let recorder = self.logger.recorder();
 
         async_panic_to_js_error(async {
             let span = tracing::info_span!("prisma:engine:connect", user_facing = true);
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            span.set_parent(parent_context);
+            start_trace(request_id, &trace, &span, &self.logger.exporter()).await;
 
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
@@ -265,14 +267,14 @@ impl QueryEngine {
 
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
     #[napi]
-    pub async fn disconnect(&self, trace: String) -> napi::Result<()> {
+    pub async fn disconnect(&self, trace: String, request_id: JsBigInt) -> napi::Result<()> {
+        let request_id = bigint_to_request_id(request_id)?;
         let dispatcher = self.logger.dispatcher();
         let recorder = self.logger.recorder();
 
         async_panic_to_js_error(async {
             let span = tracing::info_span!("prisma:engine:disconnect", user_facing = true);
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            span.set_parent(parent_context);
+            start_trace(request_id, &trace, &span, &self.logger.exporter());
 
             // TODO: when using Node Drivers, we need to call Driver::close() here.
 
@@ -303,7 +305,14 @@ impl QueryEngine {
 
     /// If connected, sends a query to the core and returns the response.
     #[napi]
-    pub async fn query(&self, body: String, trace: String, tx_id: Option<String>) -> napi::Result<String> {
+    pub async fn query(
+        &self,
+        body: String,
+        trace: String,
+        tx_id: Option<String>,
+        request_id: JsBigInt,
+    ) -> napi::Result<String> {
+        let request_id = bigint_to_request_id(request_id)?;
         let dispatcher = self.logger.dispatcher();
         let recorder = self.logger.recorder();
 
@@ -314,7 +323,7 @@ impl QueryEngine {
             let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
 
             let span = tracing::info_span!("prisma:engine:query", user_facing = true);
-            let (request_id, trace_parent) = start_trace(&trace, &span, &self.logger.exporter()).await;
+            let trace_parent = start_trace(request_id, &trace, &span, &self.logger.exporter()).await;
 
             async move {
                 let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
@@ -335,10 +344,8 @@ impl QueryEngine {
 
     /// Fetch the spans associated with a [`RequestId`]
     #[napi]
-    pub async fn trace(&self, request_id: String) -> napi::Result<Option<String>> {
-        let request_id = request_id
-            .parse::<RequestId>()
-            .map_err(|err| ApiError::Decode(err.to_string()))?;
+    pub async fn trace(&self, request_id: JsBigInt) -> napi::Result<Option<String>> {
+        let request_id = bigint_to_request_id(request_id)?;
 
         async_panic_to_js_error(async {
             Ok(self
@@ -357,7 +364,8 @@ impl QueryEngine {
 
     /// If connected, attempts to start a transaction in the core and returns its ID.
     #[napi]
-    pub async fn start_transaction(&self, input: String, trace: String) -> napi::Result<String> {
+    pub async fn start_transaction(&self, input: String, trace: String, request_id: JsBigInt) -> napi::Result<String> {
+        let request_id = bigint_to_request_id(request_id)?;
         let dispatcher = self.logger.dispatcher();
         let recorder = self.logger.recorder();
 
@@ -367,8 +375,7 @@ impl QueryEngine {
             let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
 
             let span = tracing::info_span!("prisma:engine:start_transaction", user_facing = true);
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            span.set_parent(parent_context);
+            start_trace(request_id, &trace, &span, &self.logger.exporter());
 
             async move {
                 match engine
@@ -390,7 +397,9 @@ impl QueryEngine {
 
     /// If connected, attempts to commit a transaction with id `tx_id` in the core.
     #[napi]
-    pub async fn commit_transaction(&self, tx_id: String, trace: String) -> napi::Result<String> {
+    pub async fn commit_transaction(&self, tx_id: String, trace: String, request_id: JsBigInt) -> napi::Result<String> {
+        let request_id = bigint_to_request_id(request_id)?;
+
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
@@ -400,8 +409,7 @@ impl QueryEngine {
 
             async move {
                 let span = tracing::info_span!("prisma:engine:commit_transaction", user_facing = true);
-                let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-                span.set_parent(parent_context);
+                start_trace(request_id, &trace, &span, &self.logger.exporter());
 
                 match engine.executor().commit_tx(TxId::from(tx_id)).instrument(span).await {
                     Ok(_) => Ok("{}".to_string()),
@@ -417,7 +425,14 @@ impl QueryEngine {
 
     /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
     #[napi]
-    pub async fn rollback_transaction(&self, tx_id: String, trace: String) -> napi::Result<String> {
+    pub async fn rollback_transaction(
+        &self,
+        tx_id: String,
+        trace: String,
+        request_id: JsBigInt,
+    ) -> napi::Result<String> {
+        let request_id = bigint_to_request_id(request_id)?;
+
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
@@ -427,8 +442,7 @@ impl QueryEngine {
 
             async move {
                 let span = tracing::info_span!("prisma:engine:rollback_transaction", user_facing = true);
-                let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-                span.set_parent(parent_context);
+                start_trace(request_id, &trace, &span, &self.logger.exporter());
 
                 match engine.executor().rollback_tx(TxId::from(tx_id)).instrument(span).await {
                     Ok(_) => Ok("{}".to_string()),
@@ -501,4 +515,15 @@ where
             None => Err(napi::Error::from_reason("PANIC: unknown panic".to_string())),
         },
     }
+}
+
+fn bigint_to_request_id(id: JsBigInt) -> napi::Result<RequestId> {
+    let (id, lossless) = id.get_u64()?;
+
+    if !lossless {
+        return Err(ApiError::Decode("request id must fit into u64".into()).into());
+    }
+
+    Ok(RequestId::from_u64(id)
+        .ok_or_else(|| -> napi::Error { ApiError::Decode("invalid request id".into()).into() })?)
 }
