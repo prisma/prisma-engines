@@ -35,7 +35,7 @@ mod logs {
                 r#"{
                     findManyModelA {
                       id
-                      bs { id }
+                      bs { id, str1 }
                     }
                 }"#,
             )
@@ -64,7 +64,7 @@ mod logs {
                       }
                     }
                   }) {
-                    bs { id }
+                    bs { id, str1 }
                   }
                 }"#,
             )
@@ -109,7 +109,7 @@ mod logs {
                       }
                     }
                   ) {
-                    bs { id }
+                    bs { id, str1 }
                   }
                 }"#,
             )
@@ -151,7 +151,7 @@ mod logs {
                       }
                     }
                   ) {
-                    bs { id }
+                    bs { id, str1 }
                   }
                 }"#,
             )
