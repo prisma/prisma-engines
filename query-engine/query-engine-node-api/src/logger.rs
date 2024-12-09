@@ -4,7 +4,7 @@ use prisma_metrics::{MetricRecorder, MetricRegistry};
 use query_engine_common::logger::StringCallback;
 use serde_json::Value;
 use std::{collections::BTreeMap, fmt::Display};
-use telemetry::capturing::ng::Exporter;
+use telemetry::Exporter;
 use tracing::{
     field::{Field, Visit},
     level_filters::LevelFilter,
@@ -54,10 +54,8 @@ impl Logger {
 
         let exporter = Exporter::new();
 
-        let telemetry = enable_tracing.then(|| {
-            telemetry::capturing::ng::layer(exporter.clone())
-                .with_filter(telemetry::capturing::ng::filter::user_facing_spans())
-        });
+        let telemetry = enable_tracing
+            .then(|| telemetry::layer(exporter.clone()).with_filter(telemetry::filter::user_facing_spans()));
 
         let layer = log_callback.with_filter(filters);
 

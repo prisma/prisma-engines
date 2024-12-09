@@ -3,6 +3,12 @@ use std::str::FromStr;
 use enumflags2::bitflags;
 use serde::Serialize;
 
+/// Log levels in Prisma Client work differently than log levels in `tracing`:
+/// enabling a level does not necessarily enable levels above it: in Accelerate,
+/// the client specifies the explicit list of log levels it wants to receive per
+/// each query. Additionally, Prisma has a `Query` log level. Technically, they
+/// aren't really levels in a traditional sense, since they don't have a
+/// hierarchy and order relation, but rather categories.
 #[derive(Serialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[bitflags]
 #[repr(u8)]
@@ -49,6 +55,8 @@ impl FromStr for LogLevel {
     }
 }
 
+/// Corresponds to span kinds in OpenTelemetry. Only two kinds are currently
+/// used in Prisma, so this enum can be expanded if needed.
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 pub enum SpanKind {
     #[serde(rename = "client")]

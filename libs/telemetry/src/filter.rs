@@ -17,7 +17,7 @@ fn is_user_facing_span(meta: &Metadata<'_>) -> bool {
 }
 
 pub fn user_facing_spans<S>() -> impl Filter<S> {
-    filter_fn(|meta| is_user_facing_span(meta))
+    filter_fn(is_user_facing_span)
 }
 
 pub enum QueryEngineLogLevel<'a> {
@@ -77,5 +77,11 @@ impl<'a> EnvFilterBuilder<'a> {
         }
 
         filter
+    }
+}
+
+impl Default for EnvFilterBuilder<'_> {
+    fn default() -> Self {
+        Self::new()
     }
 }
