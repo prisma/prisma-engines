@@ -109,7 +109,16 @@ impl fmt::Display for QueryForTracing<'_> {
         let query = self
             .0
             .split_once("/* traceparent=")
-            .map_or(self.0, |(prefix, _)| prefix)
+            .map_or(self.0, |(str, remainder)| {
+                if remainder
+                    .split_once("*/")
+                    .is_some_and(|(_, suffix)| suffix.trim_end().is_empty())
+                {
+                    str
+                } else {
+                    self.0
+                }
+            })
             .trim();
         write!(f, "{query}")
     }

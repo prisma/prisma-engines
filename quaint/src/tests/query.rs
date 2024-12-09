@@ -3640,9 +3640,25 @@ async fn overflowing_int_errors_out(api: &mut dyn TestApi) -> crate::Result<()> 
 
 #[test_each_connector]
 #[traced_test]
-async fn queries_are_logged(api: &mut dyn TestApi) -> crate::Result<()> {
+async fn queries_are_logged_without_traceparent(api: &mut dyn TestApi) -> crate::Result<()> {
     let select = Select::default().value("foo");
     api.conn().select(select).await?.into_single()?;
+    let expected = format!(
+        r#"{{db.system="{}" db.statement=SELECT ? otel.kind="client"}}"#,
+        api.system()
+    );
+    logs_contain(&expected);
+
+    Ok(())
+}
+
+#[test_each_connector]
+#[traced_test]
+async fn traceparent_inside_of_query_isnt_stripped_from_log(api: &mut dyn TestApi) -> crate::Result<()> {
+    api.conn()
+        .query_raw("SELECT /* traceparent=1 */ 1", &[])
+        .await?
+        .into_single()?;
     let expected = format!(
         r#"{{db.system="{}" db.statement=SELECT ? otel.kind="client"}}"#,
         api.system()
