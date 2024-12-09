@@ -303,8 +303,8 @@ mod tests {
             id: tracing::span::Id::from_u64(1).into(),
             parent_id: None,
             name: "test_span".into(),
-            start_time: SystemTime::UNIX_EPOCH.into(),
-            duration: Duration::from_secs(1).into(),
+            start_time: SystemTime::UNIX_EPOCH,
+            duration: Duration::from_secs(1),
             kind: SpanKind::Internal,
             attributes: HashMap::new(),
             links: Vec::new(),
@@ -314,7 +314,7 @@ mod tests {
             span_id: span.id,
             name: "test_event",
             level: LogLevel::Info,
-            timestamp: SystemTime::UNIX_EPOCH.into(),
+            timestamp: SystemTime::UNIX_EPOCH,
             attributes: HashMap::new(),
         };
 
@@ -357,8 +357,8 @@ mod tests {
             id: tracing::span::Id::from_u64(1).into(),
             parent_id: None,
             name: "test_span".into(),
-            start_time: SystemTime::UNIX_EPOCH.into(),
-            duration: Duration::from_secs(1).into(),
+            start_time: SystemTime::UNIX_EPOCH,
+            duration: Duration::from_secs(1),
             kind: SpanKind::Internal,
             attributes: HashMap::new(),
             links: Vec::new(),
@@ -368,7 +368,7 @@ mod tests {
             span_id: span.id,
             name: "test_event",
             level: LogLevel::Info,
-            timestamp: SystemTime::UNIX_EPOCH.into(),
+            timestamp: SystemTime::UNIX_EPOCH,
             attributes: HashMap::new(),
         };
 

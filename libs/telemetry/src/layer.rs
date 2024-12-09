@@ -162,7 +162,7 @@ impl<'a> SpanAttributeVisitor<'a> {
     }
 }
 
-impl<'a> field::Visit for SpanAttributeVisitor<'a> {
+impl field::Visit for SpanAttributeVisitor<'_> {
     fn record_f64(&mut self, field: &field::Field, value: f64) {
         self.span_builder.insert_attribute(field.name(), value.into())
     }
@@ -209,7 +209,7 @@ impl<'a> EventAttributeVisitor<'a> {
     }
 }
 
-impl<'a> field::Visit for EventAttributeVisitor<'a> {
+impl field::Visit for EventAttributeVisitor<'_> {
     fn record_f64(&mut self, field: &field::Field, value: f64) {
         self.event_builder.insert_attribute(field.name(), value.into())
     }
