@@ -16,8 +16,7 @@ where
     F: FnOnce() -> U + 'a,
     U: Future<Output = crate::Result<T>>,
 {
-    let span =
-        info_span!("quaint:query", "db.system" = db_system_name, "db.statement" = %query, "otel.kind" = "client");
+    let span = info_span!("quaint:query", "db.system" = db_system_name, "db.statement" = %query, "otel.kind" = "client", user_facing = true);
     do_query(tag, query, params, f).instrument(span).await
 }
 
@@ -77,7 +76,6 @@ where
     tracing::trace!(
         message = "Fetched a connection from the pool",
         duration_ms = start.elapsed_time().as_millis() as u64,
-        item_type = "query",
         is_query = true,
         result,
     );

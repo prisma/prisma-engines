@@ -4,7 +4,7 @@ use connector::{error::ConnectorError, ConnectionLike};
 use futures::future::{BoxFuture, FutureExt};
 use psl::can_support_relation_load_strategy;
 use query_structure::{ManyRecords, RelationLoadStrategy, RelationSelection};
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 use user_facing_errors::KnownError;
 
 pub(crate) fn execute<'conn>(

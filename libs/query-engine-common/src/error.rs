@@ -24,7 +24,7 @@ pub enum ApiError {
     NotConnected,
 
     #[error("{}", _0)]
-    JsonDecode(String),
+    Decode(String),
 }
 
 impl From<ApiError> for user_facing_errors::Error {
@@ -89,7 +89,7 @@ impl From<connection_string::Error> for ApiError {
 
 impl From<serde_json::Error> for ApiError {
     fn from(e: serde_json::Error) -> Self {
-        Self::JsonDecode(format!("{e}"))
+        Self::Decode(format!("{e}"))
     }
 }
 
