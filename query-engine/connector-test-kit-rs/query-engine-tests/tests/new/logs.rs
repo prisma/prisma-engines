@@ -171,7 +171,7 @@ mod logs {
                     .is_some_and(|(_, q)| !q.starts_with("BEGIN") && !q.starts_with("COMMIT"))
             })
             .collect::<Vec<_>>();
-        assert!(query_logs.len() > 0, "expected db.statement logs in {logs:?}");
+        assert!(!query_logs.is_empty(), "expected db.statement logs in {logs:?}");
 
         let expected_traceparent = format!("/* traceparent='{}' */", traceparent);
         let mismatching = query_logs
