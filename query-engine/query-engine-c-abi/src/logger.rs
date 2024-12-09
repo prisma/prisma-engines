@@ -4,6 +4,7 @@ use query_engine_common::logger::StringCallback;
 use serde_json::Value;
 use std::sync::Arc;
 use std::{collections::BTreeMap, fmt::Display};
+use telemetry::Exporter;
 use tracing::{
     field::{Field, Visit},
     level_filters::LevelFilter,
@@ -19,6 +20,7 @@ pub(crate) type LogCallback = Box<dyn Fn(String) + Send + Sync + 'static>;
 
 pub(crate) struct Logger {
     dispatcher: Dispatch,
+    exporter: Exporter,
 }
 
 impl Logger {
@@ -40,28 +42,25 @@ impl Logger {
             FilterExt::boxed(log_level)
         };
 
-        let log_callback = Arc::new(log_callback);
-        let callback_layer = Box::new(CallbackLayer::new(Arc::clone(&log_callback)));
+        let layer = CallbackLayer::new(Arc::new(log_callback)).with_filter(filters);
 
-        let tracer = crate::tracer::new_pipeline().install_simple(callback_layer);
-        let telemetry = if enable_tracing {
-            let telemetry = tracing_opentelemetry::layer()
-                .with_tracer(tracer)
-                .with_filter(telemetry::filter::user_facing_spans());
-            Some(telemetry)
-        } else {
-            None
-        };
+        let exporter = Exporter::new();
 
-        let layer = CallbackLayer::new(log_callback).with_filter(filters);
+        let telemetry = enable_tracing
+            .then(|| telemetry::layer(exporter.clone()).with_filter(telemetry::filter::user_facing_spans()));
 
         Self {
             dispatcher: Dispatch::new(Registry::default().with(telemetry).with(layer)),
+            exporter,
         }
     }
 
     pub fn dispatcher(&self) -> Dispatch {
         self.dispatcher.clone()
+    }
+
+    pub fn exporter(&self) -> Exporter {
+        self.exporter.clone()
     }
 }
 
