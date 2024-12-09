@@ -5,17 +5,23 @@ use telemetry::{
 };
 use tracing::Span;
 
+use crate::error::ApiError;
+
 #[derive(Deserialize)]
 struct TraceContext<'a> {
     traceparent: Option<&'a str>,
 }
 
 pub async fn start_trace(
-    request_id: RequestId,
+    request_id: &str,
     trace_context: &str,
     span: &Span,
     exporter: &Exporter,
-) -> Option<TraceParent> {
+) -> Result<Option<TraceParent>, ApiError> {
+    let request_id = request_id
+        .parse::<RequestId>()
+        .map_err(|_| ApiError::Decode("invalid request id".into()))?;
+
     span.record("request_id", request_id.into_u64());
 
     let traceparent = serde_json::from_str::<TraceContext>(trace_context)
@@ -29,5 +35,5 @@ pub async fn start_trace(
             .await;
     }
 
-    traceparent
+    Ok(traceparent)
 }
