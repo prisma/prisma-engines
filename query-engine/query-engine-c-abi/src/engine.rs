@@ -715,7 +715,7 @@ pub unsafe extern "C" fn prisma_trace(
     error_string_ptr: *mut *mut c_char,
 ) -> *const c_char {
     let query_engine: Box<QueryEngine> = Box::from_raw(qe);
-    let result = RUNTIME.block_on(async { query_engine.trace(request_id).await });
+    let result = RUNTIME.block_on(query_engine.trace(request_id));
     std::mem::forget(query_engine);
     match result {
         Ok(Some(trace)) => {
