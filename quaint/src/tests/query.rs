@@ -3647,7 +3647,7 @@ async fn queries_are_logged_without_traceparent(api: &mut dyn TestApi) -> crate:
         r#"{{db.system="{}" db.statement=SELECT ? otel.kind="client"}}"#,
         api.system()
     );
-    logs_contain(&expected);
+    assert!(logs_contain(&expected), "expected logs to contain '{expected}'");
 
     Ok(())
 }
@@ -3663,7 +3663,7 @@ async fn traceparent_inside_of_query_isnt_stripped_from_log(api: &mut dyn TestAp
         r#"{{db.system="{}" db.statement=SELECT /* traceparent=1 */ 1 otel.kind="client"}}"#,
         api.system()
     );
-    logs_contain(&expected);
+    assert!(logs_contain(&expected), "expected logs to contain '{expected}'");
 
     Ok(())
 }
