@@ -38,6 +38,17 @@ impl ConnectionLike for SqlConnectorTransaction<'_> {}
 
 #[async_trait]
 impl Transaction for SqlConnectorTransaction<'_> {
+    fn depth(&self) -> u32 {
+        self.inner.depth()
+    }
+
+    async fn begin(&mut self) -> connector::Result<()> {
+        catch(&self.connection_info, async {
+            self.inner.begin().await.map_err(SqlError::from)
+        })
+        .await
+    }
+
     async fn commit(&mut self) -> connector::Result<()> {
         catch(&self.connection_info, async {
             self.inner.commit().await.map_err(SqlError::from)
@@ -53,6 +64,27 @@ impl Transaction for SqlConnectorTransaction<'_> {
                 Err(SqlError::TransactionAlreadyClosed(_)) | Err(SqlError::RollbackWithoutBegin) => Ok(()),
                 _ => res,
             }
+        })
+        .await
+    }
+
+    async fn create_savepoint(&mut self) -> connector::Result<()> {
+        catch(&self.connection_info, async {
+            self.inner.create_savepoint().await.map_err(SqlError::from)
+        })
+        .await
+    }
+
+    async fn release_savepoint(&mut self) -> connector::Result<()> {
+        catch(&self.connection_info, async {
+            self.inner.release_savepoint().await.map_err(SqlError::from)
+        })
+        .await
+    }
+
+    async fn rollback_to_savepoint(&mut self) -> connector::Result<()> {
+        catch(&self.connection_info, async {
+            self.inner.rollback_to_savepoint().await.map_err(SqlError::from)
         })
         .await
     }
