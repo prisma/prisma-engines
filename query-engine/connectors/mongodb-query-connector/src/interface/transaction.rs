@@ -4,7 +4,7 @@ use connector_interface::{ConnectionLike, ReadOperations, Transaction, UpdateTyp
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
 use prisma_metrics::{guards::GaugeGuard, PRISMA_CLIENT_QUERIES_ACTIVE};
 use query_structure::{RelationLoadStrategy, SelectionResult};
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 
 use super::*;
 use crate::{
