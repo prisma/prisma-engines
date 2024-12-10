@@ -101,6 +101,7 @@ pub enum QuaintManager {
     Postgres {
         url: PostgresNativeUrl,
         tls_manager: MakeTlsConnectorManager,
+        is_tracing_enabled: bool,
     },
 
     #[cfg(feature = "sqlite")]
@@ -133,9 +134,23 @@ impl Manager for QuaintManager {
             }
 
             #[cfg(feature = "postgresql-native")]
-            QuaintManager::Postgres { url, tls_manager } => {
+            QuaintManager::Postgres {
+                url,
+                tls_manager,
+                is_tracing_enabled: false,
+            } => {
                 use crate::connector::PostgreSql;
-                Ok(Box::new(PostgreSql::new(url.clone(), tls_manager).await?) as Self::Connection)
+                Ok(Box::new(<PostgreSql>::new(url.clone(), tls_manager).await?) as Self::Connection)
+            }
+
+            #[cfg(feature = "postgresql-native")]
+            QuaintManager::Postgres {
+                url,
+                tls_manager,
+                is_tracing_enabled: true,
+            } => {
+                use crate::connector::PostgreSqlForTracing;
+                Ok(Box::new(PostgreSqlForTracing::new(url.clone(), tls_manager).await?) as Self::Connection)
             }
 
             #[cfg(feature = "mssql-native")]

@@ -559,13 +559,13 @@ mod tests {
         let url =
             PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo?statement_cache_size=420").unwrap())
                 .unwrap();
-        assert_eq!(420, url.cache().capacity());
+        assert_eq!(420, url.cache_settings().capacity);
     }
 
     #[test]
     fn should_have_default_cache_size() {
         let url = PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo").unwrap()).unwrap();
-        assert_eq!(100, url.cache().capacity());
+        assert_eq!(100, url.cache_settings().capacity);
     }
 
     #[test]
@@ -598,7 +598,7 @@ mod tests {
     fn should_not_enable_caching_with_pgbouncer() {
         let url =
             PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo?pgbouncer=true").unwrap()).unwrap();
-        assert_eq!(0, url.cache().capacity());
+        assert_eq!(0, url.cache_settings().capacity());
     }
 
     #[test]
