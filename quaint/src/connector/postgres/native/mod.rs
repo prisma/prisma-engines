@@ -471,24 +471,18 @@ where
                         .await?,
                 );
 
-                if let Some(first) = rows.next().await {
-                    let first = first?;
-                    let types = first
-                        .columns()
-                        .iter()
-                        .map(|c| PGColumnType::from_pg_type(c.type_()))
-                        .map(ColumnType::from)
-                        .collect::<Vec<_>>();
-                    let names = first.columns().iter().map(|c| c.name().to_string()).collect::<Vec<_>>();
-                    let mut result = ResultSet::new(names, types, vec![first.get_result_row()?]);
+                let types = query
+                    .columns()
+                    .map(|c| PGColumnType::from_pg_type(&c))
+                    .map(ColumnType::from)
+                    .collect::<Vec<_>>();
+                let names = query.columns().map(|c| c.name().to_string()).collect::<Vec<_>>();
+                let mut result = ResultSet::new(names, types, Vec::new());
 
-                    while let Some(row) = rows.next().await {
-                        result.rows.push(row?.get_result_row()?);
-                    }
-                    return Ok(result);
+                while let Some(row) = rows.next().await {
+                    result.rows.push(row?.get_result_row()?);
                 }
-
-                Ok(ResultSet::new(vec![], vec![], vec![]))
+                Ok(result)
             },
         )
         .await

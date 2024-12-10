@@ -2,11 +2,12 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use postgres_types::{BorrowToSql, Type};
-use tokio_postgres::{Client, Error, RowStream, Statement};
+use tokio_postgres::{Client, Column, Error, RowStream, Statement};
 
 #[async_trait]
 pub trait IsQuery: Send {
-    fn params(&self) -> &[Type];
+    fn params(&self) -> impl ExactSizeIterator<Item = Type> + '_;
+    fn columns(&self) -> impl ExactSizeIterator<Item = Type> + '_;
 
     async fn dispatch<Args>(&self, client: &Client, args: Args) -> Result<RowStream, Error>
     where
@@ -17,9 +18,12 @@ pub trait IsQuery: Send {
 
 #[async_trait]
 impl IsQuery for Statement {
-    #[inline]
-    fn params(&self) -> &[Type] {
-        self.params()
+    fn params(&self) -> impl ExactSizeIterator<Item = Type> + '_ {
+        self.params().iter().cloned()
+    }
+
+    fn columns(&self) -> impl ExactSizeIterator<Item = Type> + '_ {
+        self.columns().iter().map(Column::type_).cloned()
     }
 
     #[inline]
@@ -36,14 +40,18 @@ impl IsQuery for Statement {
 #[derive(Debug, Clone)]
 pub struct TypedQuery {
     pub(super) sql: Arc<str>,
-    pub(super) types: Arc<[Type]>,
+    pub(super) params: Arc<[Type]>,
+    pub(super) columns: Arc<[Type]>,
 }
 
 #[async_trait]
 impl IsQuery for TypedQuery {
-    #[inline]
-    fn params(&self) -> &[Type] {
-        &self.types
+    fn params(&self) -> impl ExactSizeIterator<Item = Type> + '_ {
+        self.params.iter().cloned()
+    }
+
+    fn columns(&self) -> impl ExactSizeIterator<Item = Type> + '_ {
+        self.columns.iter().cloned()
     }
 
     #[inline]
@@ -54,7 +62,7 @@ impl IsQuery for TypedQuery {
         Args::IntoIter: ExactSizeIterator + Send,
     {
         client
-            .query_typed_raw(&self.sql, args.into_iter().zip(self.types.iter().cloned()))
+            .query_typed_raw(&self.sql, args.into_iter().zip(self.params.iter().cloned()))
             .await
     }
 }

@@ -32,7 +32,7 @@ impl QueryCache for NoopPreparedStatementCache {
 
 impl From<CacheSettings> for NoopPreparedStatementCache {
     fn from(_: CacheSettings) -> Self {
-        Self::default()
+        Self
     }
 }
 
@@ -97,7 +97,8 @@ impl QueryCache for LruTracingCache {
                 let stmt = client.prepare_typed(sql, types).await?;
                 let query = TypedQuery {
                     sql: sql.into(),
-                    types: stmt.params().iter().cloned().collect(),
+                    params: stmt.params().iter().cloned().collect(),
+                    columns: stmt.columns().iter().map(|c| c.type_().clone()).collect(),
                 };
                 self.cache.insert(sql_without_traceparent, types, query.clone()).await;
                 Ok(query)
