@@ -1,4 +1,7 @@
-use std::hash::{BuildHasher, Hash, RandomState};
+use std::{
+    hash::{BuildHasher, Hash, RandomState},
+    sync::Arc,
+};
 
 use async_trait::async_trait;
 use futures::lock::Mutex;
@@ -73,7 +76,7 @@ impl From<CacheSettings> for LruPreparedStatementCache {
 
 #[derive(Debug)]
 pub struct LruTracingCache {
-    cache: InnerLruCache<TypedQuery>,
+    cache: InnerLruCache<Arc<TypedQuery>>,
 }
 
 impl LruTracingCache {
@@ -86,20 +89,21 @@ impl LruTracingCache {
 
 #[async_trait]
 impl QueryCache for LruTracingCache {
-    type Query = TypedQuery;
+    type Query = Arc<TypedQuery>;
 
-    async fn get_by_query(&self, client: &Client, sql: &str, types: &[Type]) -> Result<TypedQuery, Error> {
+    async fn get_by_query(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Arc<TypedQuery>, Error> {
         let sql_without_traceparent = strip_query_traceparent(sql);
 
         match self.cache.get(sql_without_traceparent, types).await {
             Some(query) => Ok(query),
             None => {
                 let stmt = client.prepare_typed(sql, types).await?;
-                let query = TypedQuery {
+                let query = Arc::new(TypedQuery {
                     sql: sql.into(),
-                    params: stmt.params().iter().cloned().collect(),
-                    columns: stmt.columns().iter().map(|c| c.type_().clone()).collect(),
-                };
+                    param_types: stmt.params().to_vec(),
+                    column_names: stmt.columns().iter().map(|c| c.name().to_owned()).collect(),
+                    column_types: stmt.columns().iter().map(|c| c.type_().clone()).collect(),
+                });
                 self.cache.insert(sql_without_traceparent, types, query.clone()).await;
                 Ok(query)
             }

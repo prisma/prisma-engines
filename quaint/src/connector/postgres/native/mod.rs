@@ -457,9 +457,9 @@ where
             move || async move {
                 let query = self.queries_cache.get_by_query(&self.client.0, sql, types).await?;
 
-                if query.params().len() != params.len() {
+                if query.param_types().len() != params.len() {
                     let kind = ErrorKind::IncorrectNumberOfParameters {
-                        expected: query.params().len(),
+                        expected: query.param_types().len(),
                         actual: params.len(),
                     };
 
@@ -472,11 +472,11 @@ where
                 );
 
                 let types = query
-                    .columns()
-                    .map(|c| PGColumnType::from_pg_type(&c))
+                    .column_types()
+                    .map(PGColumnType::from_pg_type)
                     .map(ColumnType::from)
                     .collect::<Vec<_>>();
-                let names = query.columns().map(|c| c.name().to_string()).collect::<Vec<_>>();
+                let names = query.column_names().map(|name| name.to_string()).collect::<Vec<_>>();
                 let mut result = ResultSet::new(names, types, Vec::new());
 
                 while let Some(row) = rows.next().await {
