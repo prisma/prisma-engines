@@ -97,7 +97,7 @@ impl QueryCache for LruTracingCache {
                 let stmt = client.prepare_typed(sql, types).await?;
                 let query = TypedQuery {
                     sql: sql.into(),
-                    types: stmt.columns().iter().map(|c| c.type_().clone()).collect(),
+                    types: stmt.params().iter().cloned().collect(),
                 };
                 self.cache.insert(sql_without_traceparent, types, query.clone()).await;
                 Ok(query)
