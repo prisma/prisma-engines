@@ -27,12 +27,14 @@ pub async fn start_trace(
     let traceparent = serde_json::from_str::<TraceContext>(trace_context)
         .ok()
         .and_then(|tc| tc.traceparent)
-        .and_then(|tp| tp.parse().ok());
+        .and_then(|tp| tp.parse::<TraceParent>().ok());
 
-    if traceparent.is_some() {
-        exporter
-            .start_capturing(request_id, CaptureSettings::new(CaptureTarget::Spans))
-            .await;
+    if let Some(traceparent) = traceparent {
+        if traceparent.sampled() {
+            exporter
+                .start_capturing(request_id, CaptureSettings::new(CaptureTarget::Spans))
+                .await;
+        }
     }
 
     Ok(traceparent)
