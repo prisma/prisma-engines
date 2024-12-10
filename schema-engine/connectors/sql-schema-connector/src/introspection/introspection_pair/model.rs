@@ -89,6 +89,22 @@ impl<'a> ModelPair<'a> {
         indexes.into_iter().flatten()
     }
 
+    pub(crate) fn include_indexes(self) -> impl Iterator<Item = &'a str> {
+        let mut indexes = None;
+        if self.context.sql_family().is_postgres() {
+            let data: &PostgresSchemaExt = self.context.sql_schema.downcast_connector_data();
+
+            indexes = Some(
+                data.include_indexes
+                    .iter()
+                    .filter(move |(table_id, _idx)| *table_id == self.next.id)
+                    .map(|(_table_id, idx)| idx.as_str()),
+            );
+        }
+
+        indexes.into_iter().flatten()
+    }
+
     /// True, if we add a new model with row level security enabled.
     pub(crate) fn adds_row_level_security(self) -> bool {
         self.previous.is_none() && self.has_row_level_security()
