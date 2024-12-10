@@ -108,10 +108,10 @@ mod decimal {
             id: 1,
             child: { create: {
                 id: 1,
-                float: 1.1,
-                dfloat: 2.2,
-                decFloat: 3.1234,
-                money: 3.51,
+                float: 1.23456789101112131415161718192,
+                dfloat: 1.23456789101112131415161718192,
+                decFloat: 1.23456789101112131415161718192,
+                money: 1.23456789101112131415161718192,
             }}
         }"#,
         )
@@ -119,7 +119,12 @@ mod decimal {
 
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findManyParent { id child { float dfloat decFloat money } } }"#),
-          @r###"{"data":{"findManyParent":[{"id":1,"child":{"float":1.1,"dfloat":2.2,"decFloat":"3.1","money":"3.51"}}]}}"###
+          @r###"{"data":{"findManyParent":[{"id":1,"child":{"float":1.2345679,"dfloat":1.234567891011121,"decFloat":"1.2","money":"1.23"}}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyChild { float dfloat decFloat money } }"#),
+          @r###"{"data":{"findManyChild":[{"float":1.2345679,"dfloat":1.234567891011121,"decFloat":"1.2","money":"1.23"}]}}"###
         );
 
         Ok(())
