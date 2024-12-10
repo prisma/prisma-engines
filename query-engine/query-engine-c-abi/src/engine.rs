@@ -16,6 +16,7 @@ use serde_json::json;
 use std::{
     env,
     ffi::{c_char, c_int, CStr, CString},
+    mem::ManuallyDrop,
     path::{Path, PathBuf},
     ptr::null_mut,
     sync::Arc,
@@ -714,9 +715,8 @@ pub unsafe extern "C" fn prisma_trace(
     request_id: *const c_char,
     error_string_ptr: *mut *mut c_char,
 ) -> *const c_char {
-    let query_engine: Box<QueryEngine> = Box::from_raw(qe);
+    let query_engine = ManuallyDrop::new(Box::<QueryEngine>::from_raw(qe));
     let result = RUNTIME.block_on(query_engine.trace(request_id));
-    std::mem::forget(query_engine);
     match result {
         Ok(Some(trace)) => {
             *error_string_ptr = std::ptr::null_mut();
@@ -728,7 +728,7 @@ pub unsafe extern "C" fn prisma_trace(
         }
         Err(err) => {
             let error_string = CString::new(err.to_string()).unwrap();
-            *error_string_ptr = error_string.into_raw() as *mut c_char;
+            *error_string_ptr = error_string.into_raw();
             std::ptr::null()
         }
     }
