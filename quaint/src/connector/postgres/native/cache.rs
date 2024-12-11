@@ -98,10 +98,10 @@ impl From<CacheSettings> for PreparedStatementLruCache {
 
 /// An LRU cache that creates and stores query type information rather than prepared statements.
 /// Queries are identified by their content with tracing information removed (which makes it
-/// possible to cache them at all) and returned as instances of [`TypedQuery`]. The caching
-/// behavior is implemented in [`get_query`](Self::get_query), while statements returned from
-/// [`get_statement`](Self::get_statement) are always freshly prepared, because statements cannot
-/// be re-used when tracing information is present.
+/// possible to cache traced queries at all) and returned as instances of [`TypedQuery`]. The
+/// caching behavior is implemented in [`get_query`](Self::get_query), while statements returned
+/// from [`get_statement`](Self::get_statement) are always freshly prepared, because statements
+/// cannot be re-used when tracing information is present.
 #[derive(Debug)]
 pub struct TracingLruCache {
     cache: InnerLruCache<Arc<QueryMetadata>>,
