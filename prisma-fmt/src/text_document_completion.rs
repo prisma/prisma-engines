@@ -95,7 +95,7 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
             _model_id,
             ast::ModelPosition::Field(
                 _,
-                ast::FieldPosition::Attribute("relation", _, AttributePosition::Argument(attr_name)),
+                ast::FieldPosition::Attribute("relation", _, AttributePosition::Argument(attr_name, _)),
             ),
         ) if attr_name == "onDelete" || attr_name == "onUpdate" => {
             for referential_action in ctx.connector().referential_actions(&relation_mode).iter() {
@@ -107,7 +107,7 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
             _model_id,
             ast::ModelPosition::Field(
                 _,
-                ast::FieldPosition::Attribute("relation", _, AttributePosition::ArgumentValue(attr_name, value)),
+                ast::FieldPosition::Attribute("relation", _, AttributePosition::ArgumentValue(attr_name, value, _)),
             ),
         ) => {
             if let Some(attr_name) = attr_name {
@@ -163,17 +163,17 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
 
         ast::SchemaPosition::DataSource(
             _source_id,
-            ast::SourcePosition::Property("url", ast::PropertyPosition::FunctionValue("env")),
+            ast::SourcePosition::Property("url", ast::PropertyPosition::FunctionValue("env", _)),
         ) => datasource::url_env_db_completion(completion_list, "url", ctx),
 
         ast::SchemaPosition::DataSource(
             _source_id,
-            ast::SourcePosition::Property("directUrl", ast::PropertyPosition::FunctionValue("env")),
+            ast::SourcePosition::Property("directUrl", ast::PropertyPosition::FunctionValue("env", _)),
         ) => datasource::url_env_db_completion(completion_list, "directUrl", ctx),
 
         ast::SchemaPosition::DataSource(
             _source_id,
-            ast::SourcePosition::Property("shadowDatabaseUrl", ast::PropertyPosition::FunctionValue("env")),
+            ast::SourcePosition::Property("shadowDatabaseUrl", ast::PropertyPosition::FunctionValue("env", _)),
         ) => datasource::url_env_db_completion(completion_list, "shadowDatabaseUrl", ctx),
 
         ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Property("url", _))
