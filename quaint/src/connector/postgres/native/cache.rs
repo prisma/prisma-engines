@@ -315,7 +315,7 @@ mod tests {
             let q2 = cache.get_query(&client, sql, &types).await.unwrap();
             assert!(
                 Arc::ptr_eq(&q1.metadata, &q2.metadata),
-                "stmt1 and stmt2 should re-use the same metadata"
+                "q1 and q2 should re-use the same metadata"
             );
 
             // replace our cached query with a new one going over the capacity
@@ -325,7 +325,7 @@ mod tests {
             let q3 = cache.get_query(&client, sql, &types).await.unwrap();
             assert!(
                 !Arc::ptr_eq(&q1.metadata, &q3.metadata),
-                "stmt1 and stmt3 should not re-use the same metadata"
+                "q1 and q3 should not re-use the same metadata"
             );
         })
         .await;
@@ -347,7 +347,7 @@ mod tests {
 
             assert!(
                 Arc::ptr_eq(&q1.metadata, &q2.metadata),
-                "stmt1 and stmt2 should re-use the same metadata"
+                "q1 and q2 should re-use the same metadata"
             );
         })
         .await;
