@@ -110,8 +110,16 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
 
     let headers = req.headers();
     let tx_id = try_get_transaction_id(headers);
-    let (span, request_id, traceparent) =
-        setup_telemetry(&cx, info_span!("prisma:engine:query", user_facing = true), headers).await;
+    let (span, request_id, traceparent) = setup_telemetry(
+        &cx,
+        info_span!(
+            "prisma:engine:query",
+            user_facing = true,
+            request_id = tracing::field::Empty,
+        ),
+        headers,
+    )
+    .await;
 
     let query_timeout = query_timeout(headers);
 
@@ -273,7 +281,11 @@ async fn transaction_start_handler(cx: Arc<PrismaContext>, req: Request<Body>) -
 
     let (span, request_id, _traceparent) = setup_telemetry(
         &cx,
-        info_span!("prisma:engine:start_transaction", user_facing = true),
+        info_span!(
+            "prisma:engine:start_transaction",
+            user_facing = true,
+            request_id = tracing::field::Empty,
+        ),
         &headers,
     )
     .await;
@@ -320,7 +332,11 @@ async fn transaction_commit_handler(
 ) -> Result<Response<Body>, hyper::Error> {
     let (span, request_id, _traceparent) = setup_telemetry(
         &cx,
-        info_span!("prisma:engine:commit_transaction", user_facing = true),
+        info_span!(
+            "prisma:engine:commit_transaction",
+            user_facing = true,
+            request_id = tracing::field::Empty,
+        ),
         req.headers(),
     )
     .await;
@@ -346,7 +362,11 @@ async fn transaction_rollback_handler(
 ) -> Result<Response<Body>, hyper::Error> {
     let (span, request_id, _traceparent) = setup_telemetry(
         &cx,
-        info_span!("prisma:engine:rollback_transaction", user_facing = true),
+        info_span!(
+            "prisma:engine:rollback_transaction",
+            user_facing = true,
+            request_id = tracing::field::Empty,
+        ),
         req.headers(),
     )
     .await;
