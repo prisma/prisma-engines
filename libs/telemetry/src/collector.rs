@@ -157,6 +157,10 @@ pub trait Collector {
 /// [`CollectedEvent`]. Instead, those attributes are filtered out before they
 /// are even passed to the collector and are never stored anywhere except the
 /// original [`tracing::Span`].
+///
+/// The magic attributes used by the `CapturingLayer` itself (i.e. `request_id`
+/// and `otel.*`) are not collected as attributes and thus don't need to be
+/// explicitly filtered out.
 pub trait AllowAttribute {
     fn allow_on_span(name: &'static str) -> bool;
     fn allow_on_event(name: &'static str) -> bool;
