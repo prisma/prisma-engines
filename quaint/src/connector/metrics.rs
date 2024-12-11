@@ -111,7 +111,7 @@ impl fmt::Display for QueryForTracing<'_> {
 }
 
 pub(super) fn strip_query_traceparent(query: &str) -> &str {
-    query.split_once("/* traceparent=").map_or(query, |(str, remainder)| {
+    query.rsplit_once("/* traceparent=").map_or(query, |(str, remainder)| {
         if remainder
             .split_once("*/")
             .is_some_and(|(_, suffix)| suffix.trim_end().is_empty())
