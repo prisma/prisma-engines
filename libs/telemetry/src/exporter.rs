@@ -221,26 +221,38 @@ impl Exporter {
     }
 
     pub async fn start_capturing(&self, request_id: RequestId, settings: CaptureSettings) -> RequestId {
-        _ = self.tx.send(Message::StartCapturing(request_id, settings));
+        self.tx
+            .send(Message::StartCapturing(request_id, settings))
+            .expect("capturer task panicked");
+
         request_id
     }
 
     pub async fn stop_capturing(&self, request_id: RequestId) -> Option<TraceData> {
         let (tx, rx) = oneshot::channel();
-        _ = self.tx.send(Message::StopCapturing(request_id, tx));
+
+        self.tx
+            .send(Message::StopCapturing(request_id, tx))
+            .expect("capturer task panicked");
+
         rx.await.expect("capturer task dropped the sender")
     }
 }
 
 impl Collector for Exporter {
     fn add_span(&self, trace: RequestId, span: CollectedSpan) {
-        _ = self.tx.send(Message::AddSpan(trace, span));
+        self.tx
+            .send(Message::AddSpan(trace, span))
+            .expect("capturer task panicked");
     }
 
     fn add_event(&self, trace: RequestId, event: CollectedEvent) {
-        _ = self.tx.send(Message::AddEvent(trace, event));
+        self.tx
+            .send(Message::AddEvent(trace, event))
+            .expect("capturer task panicked");
     }
 }
+
 #[cfg(test)]
 mod tests {
     use std::time::{Duration, SystemTime};
