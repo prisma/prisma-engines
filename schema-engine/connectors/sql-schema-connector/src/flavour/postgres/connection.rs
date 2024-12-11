@@ -15,7 +15,7 @@ use crate::sql_renderer::IteratorJoin;
 
 use super::MigratePostgresUrl;
 
-pub(super) struct Connection(connector::PostgreSql);
+pub(super) struct Connection(connector::PostgreSqlWithNoCache);
 
 impl Connection {
     pub(super) async fn new(url: url::Url) -> ConnectorResult<Connection> {
@@ -24,7 +24,7 @@ impl Connection {
         let quaint = match url.0 {
             PostgresUrl::Native(ref native_url) => {
                 let tls_manager = MakeTlsConnectorManager::new(native_url.as_ref().clone());
-                connector::PostgreSql::new(native_url.as_ref().clone(), &tls_manager).await
+                connector::PostgreSqlWithNoCache::new(native_url.as_ref().clone(), &tls_manager).await
             }
             PostgresUrl::WebSocket(ref ws_url) => connector::PostgreSql::new_with_websocket(ws_url.clone()).await,
         }

@@ -6,6 +6,7 @@ use connector_interface::{
     Connection, Connector,
 };
 use psl::builtin_connectors::COCKROACH;
+use psl::PreviewFeature;
 use quaint::{connector::PostgresFlavour, pooled::Quaint, prelude::ConnectionInfo};
 use std::time::Duration;
 
@@ -40,7 +41,7 @@ impl FromSource for PostgreSql {
             })
         })?;
 
-        let mut builder = Quaint::builder(url)
+        let mut builder = Quaint::builder_with_tracing(url, features.contains(PreviewFeature::Tracing))
             .map_err(SqlError::from)
             .map_err(|sql_error| sql_error.into_connector_error(&err_conn_info))?;
 
