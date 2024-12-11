@@ -356,7 +356,7 @@ impl Builder {
 
 impl Quaint {
     /// Creates a new builder for a Quaint connection pool with the given
-    /// connection string and tracing flag.
+    /// connection string and a tracing flag.
     /// See the [module level documentation] for details.
     pub fn builder_with_tracing(
         url_str: &str,

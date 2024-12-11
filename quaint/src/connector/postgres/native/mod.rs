@@ -34,7 +34,7 @@ use native_tls::{Certificate, Identity, TlsConnector};
 use postgres_native_tls::MakeTlsConnector;
 use postgres_types::{Kind as PostgresKind, Type as PostgresType};
 use prisma_metrics::WithMetricsInstrumentation;
-use query::IsQuery;
+use query::PreparedQuery;
 use std::{
     fmt::{Debug, Display},
     fs,

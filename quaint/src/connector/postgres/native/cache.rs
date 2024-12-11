@@ -11,13 +11,13 @@ use tokio_postgres::{Client, Error, Statement};
 
 use crate::connector::metrics::strip_query_traceparent;
 
-use super::query::{IsQuery, TypedQuery};
+use super::query::{PreparedQuery, TypedQuery};
 
-/// Types that can be used as a cache for queries.
+/// Types that can be used as a cache for prepared queries.
 #[async_trait]
 pub trait QueryCache: From<CacheSettings> + Send + Sync {
-    /// The type of the query that is returned by the cache.
-    type Query: IsQuery;
+    /// The type of query that is returned by the cache.
+    type Query: PreparedQuery;
 
     /// Retrieves a query from the cache or prepares and caches it if it's not present.
     async fn get_by_query(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Self::Query, Error>;
@@ -80,8 +80,8 @@ impl From<CacheSettings> for LruPreparedStatementCache {
     }
 }
 
-/// An LRU cache that creates and stores type information relevant to each query, keyed by queries
-/// with tracing information removed.
+/// An LRU cache that creates and stores type information relevant to each query, with keys being
+/// stripped of any tracing information.
 ///
 /// Returns [`TypedQuery`] instances, rather than [`Statement`], because prepared statements cannot
 /// be re-used when the tracing information is attached to them.

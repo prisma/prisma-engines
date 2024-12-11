@@ -5,9 +5,9 @@ use postgres_types::{BorrowToSql, Type};
 use tokio_postgres::{Client, Error, RowStream, Statement};
 
 /// Types that can be dispatched to the database as a query and carry the necessary type
-/// information about its parameters and columns.
+/// information about its parameters and columns to interpret the results.
 #[async_trait]
-pub trait IsQuery: Send {
+pub trait PreparedQuery: Send {
     fn param_types(&self) -> impl ExactSizeIterator<Item = &Type> + '_;
     fn column_names(&self) -> impl ExactSizeIterator<Item = &str> + '_;
     fn column_types(&self) -> impl ExactSizeIterator<Item = &Type> + '_;
@@ -20,7 +20,7 @@ pub trait IsQuery: Send {
 }
 
 #[async_trait]
-impl IsQuery for Statement {
+impl PreparedQuery for Statement {
     fn param_types(&self) -> impl ExactSizeIterator<Item = &Type> + '_ {
         self.params().iter()
     }
@@ -43,7 +43,7 @@ impl IsQuery for Statement {
     }
 }
 
-/// A query combined with the type information necessary to run and interpret it.
+/// A query combined with the relevant type information about its parameters and columns.
 #[derive(Debug)]
 pub struct TypedQuery {
     pub(super) sql: String,
@@ -53,7 +53,7 @@ pub struct TypedQuery {
 }
 
 #[async_trait]
-impl IsQuery for TypedQuery {
+impl PreparedQuery for TypedQuery {
     fn param_types(&self) -> impl ExactSizeIterator<Item = &Type> + '_ {
         self.param_types.iter()
     }
@@ -79,7 +79,7 @@ impl IsQuery for TypedQuery {
 }
 
 #[async_trait]
-impl<A: IsQuery + Sync> IsQuery for Arc<A> {
+impl<A: PreparedQuery + Sync> PreparedQuery for Arc<A> {
     #[inline]
     fn param_types(&self) -> impl ExactSizeIterator<Item = &Type> + '_ {
         self.as_ref().param_types()
