@@ -50,14 +50,12 @@ impl Logger {
             FilterExt::boxed(log_level)
         };
 
-        let log_callback = CallbackLayer::new(log_callback);
+        let log_layer = CallbackLayer::new(log_callback).with_filter(filters);
 
         let exporter = Exporter::new();
 
-        let telemetry = enable_tracing
+        let tracing_layer = enable_tracing
             .then(|| telemetry::layer(exporter.clone()).with_filter(telemetry::filter::user_facing_spans()));
-
-        let layer = log_callback.with_filter(filters);
 
         let (metrics, recorder) = if enable_metrics {
             let registry = MetricRegistry::new();
@@ -68,7 +66,7 @@ impl Logger {
         };
 
         Self {
-            dispatcher: Dispatch::new(Registry::default().with(telemetry).with(layer)),
+            dispatcher: Dispatch::new(Registry::default().with(tracing_layer).with(log_layer)),
             metrics,
             recorder,
             exporter,
