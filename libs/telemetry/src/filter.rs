@@ -8,6 +8,10 @@ pub static SHOW_ALL_TRACES: LazyLock<bool> = LazyLock::new(|| {
         .unwrap_or(false)
 });
 
+pub fn events<S>() -> impl Filter<S> {
+    filter_fn(|meta| meta.is_event())
+}
+
 pub fn user_facing_spans<S>() -> impl Filter<S> {
     filter_fn(|meta| {
         if !meta.is_span() {

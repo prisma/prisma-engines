@@ -134,17 +134,11 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
                     let handler = RequestHandler::new(cx.executor(), cx.query_schema(), cx.engine_protocol());
                     let mut result = handler.handle(body, tx_id, traceparent).instrument(span).await;
 
-                    match cx.logger.tracing_config() {
-                        TracingConfig::LogsAndTracesInResponse => {
-                            if let Some(trace) = cx.logger.exporter().stop_capturing(request_id).await {
-                                result.set_extension("traces".to_owned(), json!(trace.spans));
-                                result.set_extension("logs".to_owned(), json!(trace.events));
-                            }
+                    if cx.logger.tracing_config().should_capture() {
+                        if let Some(trace) = cx.logger.exporter().stop_capturing(request_id).await {
+                            result.set_extension("traces".to_owned(), json!(trace.spans));
+                            result.set_extension("logs".to_owned(), json!(trace.events));
                         }
-                        TracingConfig::StdoutLogsAndRetainedTraces => {
-                            result.set_extension("request_id".to_owned(), json!(request_id));
-                        }
-                        TracingConfig::StdoutLogsOnly => {}
                     }
 
                     let res = build_json_response(StatusCode::OK, &result);
@@ -457,7 +451,7 @@ async fn setup_telemetry(
             .unwrap_or_default()
             .parse::<CaptureSettings>()
             .unwrap_or_default(),
-        TracingConfig::StdoutLogsAndRetainedTraces => CaptureSettings::new(CaptureTarget::Spans),
+        TracingConfig::StdoutLogsAndTracesInResponse => CaptureSettings::new(CaptureTarget::Spans),
         TracingConfig::StdoutLogsOnly => CaptureSettings::none(),
     };
 

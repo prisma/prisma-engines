@@ -21,8 +21,8 @@ pub(crate) enum TracingConfig {
     /// Logs and spans will be captured in memory and exposed in the response.
     LogsAndTracesInResponse,
     /// Logs will be printed to standard output, spans will be captured and
-    /// retained in memory until requested by the client.
-    StdoutLogsAndRetainedTraces,
+    /// exposed in the response.
+    StdoutLogsAndTracesInResponse,
     // Logs will be printed to standard output, tracing is disabled.
     StdoutLogsOnly,
 }
@@ -31,7 +31,7 @@ impl TracingConfig {
     pub fn should_capture(&self) -> bool {
         matches!(
             self,
-            TracingConfig::LogsAndTracesInResponse | TracingConfig::StdoutLogsAndRetainedTraces
+            TracingConfig::LogsAndTracesInResponse | TracingConfig::StdoutLogsAndTracesInResponse
         )
     }
 }
@@ -44,7 +44,7 @@ impl Logger {
 
         let tracing_config = match (enable_telemetry, enable_capturing) {
             (_, true) => TracingConfig::LogsAndTracesInResponse,
-            (true, false) => TracingConfig::StdoutLogsAndRetainedTraces,
+            (true, false) => TracingConfig::StdoutLogsAndTracesInResponse,
             (false, false) => TracingConfig::StdoutLogsOnly,
         };
 
@@ -76,17 +76,14 @@ impl Logger {
 
         match self.tracing_config {
             TracingConfig::LogsAndTracesInResponse => {
-                let subscriber = subscriber.with(
-                    telemetry::layer(self.exporter.clone()).with_filter(
-                        filter::EnvFilterBuilder::new()
-                            .log_queries(self.log_queries)
-                            .build()
-                            .or(filter::user_facing_spans()),
+                let subscriber = subscriber.with(telemetry::layer(self.exporter.clone()).with_filter(
+                    filter::user_facing_spans().or(
+                        filter::events().and(filter::EnvFilterBuilder::new().log_queries(self.log_queries).build()),
                     ),
-                );
+                ));
                 subscriber::set_global_default(subscriber)?;
             }
-            TracingConfig::StdoutLogsAndRetainedTraces => {
+            TracingConfig::StdoutLogsAndTracesInResponse => {
                 let subscriber =
                     subscriber.with(telemetry::layer(self.exporter.clone()).with_filter(filter::user_facing_spans()));
                 subscriber::set_global_default(subscriber)?;
