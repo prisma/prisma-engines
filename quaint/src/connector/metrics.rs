@@ -21,6 +21,7 @@ where
         "db.system" = db_system_name,
         "db.statement" = %QueryForTracing(query),
         "otel.kind" = "client",
+        "otel.name" = "prisma:engine:db_query",
         user_facing = true,
     );
     do_query(tag, query, params, f).instrument(span).await
