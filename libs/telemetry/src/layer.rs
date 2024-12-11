@@ -11,7 +11,7 @@ use tracing_subscriber::{
     Layer,
 };
 
-use crate::collector::{Collector, EventBuilder, SpanBuilder};
+use crate::collector::{AllowAttribute, Collector, EventBuilder, SpanBuilder};
 use crate::id::RequestId;
 use crate::models::{LogLevel, SpanKind};
 
@@ -80,7 +80,9 @@ where
             span_builder.set_request_id(request_id);
         }
 
-        attrs.record(&mut SpanAttributeVisitor::new(&mut span_builder));
+        attrs.record(&mut SpanAttributeVisitor::<'_, C::AttributeFilter>::new(
+            &mut span_builder,
+        ));
 
         span.extensions_mut().insert(span_builder);
     }
@@ -90,7 +92,7 @@ where
         let mut extensions = span.extensions_mut();
 
         if let Some(span_builder) = extensions.get_mut::<SpanBuilder>() {
-            values.record(&mut SpanAttributeVisitor::new(span_builder));
+            values.record(&mut SpanAttributeVisitor::<'_, C::AttributeFilter>::new(span_builder));
         }
     }
 
@@ -129,7 +131,9 @@ where
             event.metadata().fields().len(),
         );
 
-        event.record(&mut EventAttributeVisitor::new(&mut event_builder));
+        event.record(&mut EventAttributeVisitor::<'_, C::AttributeFilter>::new(
+            &mut event_builder,
+        ));
 
         self.collector.add_event(request_id, event_builder.build());
     }
@@ -152,23 +156,31 @@ where
     }
 }
 
-struct SpanAttributeVisitor<'a> {
+struct SpanAttributeVisitor<'a, F> {
     span_builder: &'a mut SpanBuilder,
+    _filter: PhantomData<F>,
 }
 
-impl<'a> SpanAttributeVisitor<'a> {
+impl<'a, F> SpanAttributeVisitor<'a, F> {
     fn new(span_builder: &'a mut SpanBuilder) -> Self {
-        Self { span_builder }
+        Self {
+            span_builder,
+            _filter: PhantomData,
+        }
     }
 }
 
-impl field::Visit for SpanAttributeVisitor<'_> {
+impl<F: AllowAttribute> field::Visit for SpanAttributeVisitor<'_, F> {
     fn record_f64(&mut self, field: &field::Field, value: f64) {
-        self.span_builder.insert_attribute(field.name(), value.into())
+        if F::allow_on_span(field.name()) {
+            self.span_builder.insert_attribute(field.name(), value.into())
+        }
     }
 
     fn record_i64(&mut self, field: &field::Field, value: i64) {
-        self.span_builder.insert_attribute(field.name(), value.into())
+        if F::allow_on_span(field.name()) {
+            self.span_builder.insert_attribute(field.name(), value.into())
+        }
     }
 
     fn record_u64(&mut self, field: &field::Field, value: u64) {
@@ -178,69 +190,99 @@ impl field::Visit for SpanAttributeVisitor<'_> {
                     self.span_builder.set_request_id(request_id);
                 }
             }
-            _ => self.span_builder.insert_attribute(field.name(), value.into()),
+            _ => {
+                if F::allow_on_event(field.name()) {
+                    self.span_builder.insert_attribute(field.name(), value.into())
+                }
+            }
         }
     }
 
     fn record_bool(&mut self, field: &field::Field, value: bool) {
-        self.span_builder.insert_attribute(field.name(), value.into())
+        if F::allow_on_span(field.name()) {
+            self.span_builder.insert_attribute(field.name(), value.into())
+        }
     }
 
     fn record_str(&mut self, field: &field::Field, value: &str) {
         match field.name() {
             SPAN_NAME_FIELD => self.span_builder.set_name(value.to_owned().into()),
             SPAN_KIND_FIELD => self.span_builder.set_kind(value.parse().unwrap_or(SpanKind::Internal)),
-            _ => self.span_builder.insert_attribute(field.name(), value.into()),
+            _ => {
+                if F::allow_on_span(field.name()) {
+                    self.span_builder.insert_attribute(field.name(), value.into())
+                }
+            }
         }
     }
 
     fn record_debug(&mut self, field: &field::Field, value: &dyn std::fmt::Debug) {
-        self.record_str(field, &format!("{:?}", value))
+        if F::allow_on_span(field.name()) {
+            self.record_str(field, &format!("{:?}", value))
+        }
     }
 }
 
-struct EventAttributeVisitor<'a> {
+struct EventAttributeVisitor<'a, F> {
     event_builder: &'a mut EventBuilder,
+    _filter: PhantomData<F>,
 }
 
-impl<'a> EventAttributeVisitor<'a> {
+impl<'a, F> EventAttributeVisitor<'a, F> {
     fn new(event_builder: &'a mut EventBuilder) -> Self {
-        Self { event_builder }
+        Self {
+            event_builder,
+            _filter: PhantomData,
+        }
     }
 }
 
-impl field::Visit for EventAttributeVisitor<'_> {
+impl<F: AllowAttribute> field::Visit for EventAttributeVisitor<'_, F> {
     fn record_f64(&mut self, field: &field::Field, value: f64) {
-        self.event_builder.insert_attribute(field.name(), value.into())
+        if F::allow_on_event(field.name()) {
+            self.event_builder.insert_attribute(field.name(), value.into())
+        }
     }
 
     fn record_i64(&mut self, field: &field::Field, value: i64) {
-        self.event_builder.insert_attribute(field.name(), value.into())
+        if F::allow_on_event(field.name()) {
+            self.event_builder.insert_attribute(field.name(), value.into())
+        }
     }
 
     fn record_u64(&mut self, field: &field::Field, value: u64) {
-        self.event_builder.insert_attribute(field.name(), value.into())
+        if F::allow_on_event(field.name()) {
+            self.event_builder.insert_attribute(field.name(), value.into())
+        }
     }
 
     fn record_bool(&mut self, field: &field::Field, value: bool) {
-        self.event_builder.insert_attribute(field.name(), value.into())
+        if F::allow_on_event(field.name()) {
+            self.event_builder.insert_attribute(field.name(), value.into())
+        }
     }
 
     fn record_str(&mut self, field: &field::Field, value: &str) {
         match field.name() {
             EVENT_LEVEL_FIELD => self.event_builder.set_level(value.parse().unwrap_or(LogLevel::Trace)),
-            _ => self.event_builder.insert_attribute(field.name(), value.into()),
+            _ => {
+                if F::allow_on_event(field.name()) {
+                    self.event_builder.insert_attribute(field.name(), value.into())
+                }
+            }
         }
     }
 
     fn record_debug(&mut self, field: &field::Field, value: &dyn std::fmt::Debug) {
-        self.record_str(field, &format!("{:?}", value))
+        if F::allow_on_event(field.name()) {
+            self.record_str(field, &format!("{:?}", value))
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::collector::{CollectedEvent, CollectedSpan};
+    use crate::collector::{AllowAttribute, CollectedEvent, CollectedSpan};
     use crate::id::RequestId;
 
     use super::*;
@@ -277,6 +319,8 @@ mod tests {
     }
 
     impl Collector for TestCollector {
+        type AttributeFilter = TestAttributeFilter;
+
         fn add_span(&self, trace_id: RequestId, span: CollectedSpan) {
             let mut spans = self.spans.lock().unwrap();
             spans.entry(trace_id).or_default().push(span);
@@ -285,6 +329,18 @@ mod tests {
         fn add_event(&self, trace_id: RequestId, event: CollectedEvent) {
             let mut events = self.events.lock().unwrap();
             events.entry(trace_id).or_default().push(event);
+        }
+    }
+
+    struct TestAttributeFilter;
+
+    impl AllowAttribute for TestAttributeFilter {
+        fn allow_on_span(name: &'static str) -> bool {
+            name != "test_ignored_span_attr"
+        }
+
+        fn allow_on_event(name: &'static str) -> bool {
+            name != "test_ignored_event_attr"
         }
     }
 
@@ -843,6 +899,73 @@ mod tests {
               level: Query,
               attributes: {
                 "message": "query event",
+              },
+            ),
+          ],
+        }
+        "#
+        );
+    }
+
+    #[test]
+    fn test_ignored_attributes() {
+        let collector = TestCollector::new();
+        let subscriber = Registry::default().with(layer(collector.clone()));
+
+        tracing::subscriber::with_default(subscriber, || {
+            let _guard = info_span!(
+                "test_span",
+                request_id = RequestId::next().into_u64(),
+                test_ignored_span_attr = "ignored",
+                kept_attr = "kept"
+            )
+            .entered();
+
+            tracing::info!(
+                name: "event",
+                test_ignored_event_attr = "ignored",
+                kept_attr = "kept",
+                "test event"
+            );
+        });
+
+        let spans = collector.spans();
+        let events = collector.events();
+
+        assert_ron_snapshot!(
+            spans,
+            { ".*" => redact_id(), ".*[].**" => redact_id() },
+            @r#"
+        {
+          RequestId(1): [
+            CollectedSpan(
+              id: SpanId(1),
+              parent_id: None,
+              name: "test_span",
+              attributes: {
+                "kept_attr": "kept",
+              },
+              kind: internal,
+              links: [],
+            ),
+          ],
+        }
+        "#
+        );
+
+        assert_ron_snapshot!(
+            events,
+            { ".*" => redact_id(), ".*[].**" => redact_id() },
+            @r#"
+        {
+          RequestId(1): [
+            CollectedEvent(
+              span_id: SpanId(1),
+              name: "event",
+              level: Info,
+              attributes: {
+                "message": "test event",
+                "kept_attr": "kept",
               },
             ),
           ],

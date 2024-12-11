@@ -140,7 +140,36 @@ impl EventBuilder {
     }
 }
 
+/// A trait for collecting spans and events from [`CapturingLayer`][crate::layer::CapturingLayer].
 pub trait Collector {
+    type AttributeFilter: AllowAttribute;
     fn add_span(&self, trace: RequestId, span: CollectedSpan);
     fn add_event(&self, trace: RequestId, event: CollectedEvent);
+}
+
+/// Filters span and event attributes based on the attribute name.
+///
+/// This trait is used by the [`CapturingLayer`][crate::layer::CapturingLayer]
+/// as an associated type on the [`Collector`]. This way the collector can
+/// define which attributes should be kept and which should be filtered out but
+/// it doesn't have to implement the filtering in `add_span` and `add_event`
+/// methods and remove any attributes from [`CollectedSpan`] and
+/// [`CollectedEvent`]. Instead, those attributes are filtered out before they
+/// are even passed to the collector and are never stored anywhere except the
+/// original [`tracing::Span`].
+pub trait AllowAttribute {
+    fn allow_on_span(name: &'static str) -> bool;
+    fn allow_on_event(name: &'static str) -> bool;
+}
+
+pub struct DefaultAttributeFilter;
+
+impl AllowAttribute for DefaultAttributeFilter {
+    fn allow_on_span(_name: &'static str) -> bool {
+        true
+    }
+
+    fn allow_on_event(_name: &'static str) -> bool {
+        true
+    }
 }

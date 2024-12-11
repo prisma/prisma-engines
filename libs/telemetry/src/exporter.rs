@@ -7,7 +7,7 @@ use tokio::sync::{
     oneshot,
 };
 
-use crate::collector::{CollectedEvent, CollectedSpan, Collector};
+use crate::collector::{AllowAttribute, CollectedEvent, CollectedSpan, Collector};
 use crate::id::{RequestId, SpanId};
 use crate::models::{LogLevel, SpanKind};
 use crate::time::HrTime;
@@ -240,6 +240,8 @@ impl Exporter {
 }
 
 impl Collector for Exporter {
+    type AttributeFilter = InternalAttributesFilter;
+
     fn add_span(&self, trace: RequestId, span: CollectedSpan) {
         self.tx
             .send(Message::AddSpan(trace, span))
@@ -250,6 +252,18 @@ impl Collector for Exporter {
         self.tx
             .send(Message::AddEvent(trace, event))
             .expect("capturer task panicked");
+    }
+}
+
+pub struct InternalAttributesFilter;
+
+impl AllowAttribute for InternalAttributesFilter {
+    fn allow_on_span(name: &'static str) -> bool {
+        name != "user_facing"
+    }
+
+    fn allow_on_event(_name: &'static str) -> bool {
+        true
     }
 }
 
