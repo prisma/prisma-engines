@@ -132,6 +132,8 @@ fn push_altered_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
 
         // Order matters.
         let mut changes = Vec::new();
+        renamed_table(&table, &mut changes);
+
         if let Some(change) = dropped_primary_key(&table) {
             changes.push(change)
         }
@@ -303,6 +305,12 @@ fn renamed_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
         .transpose()
         .filter(|names| names.previous != names.next)
         .map(|_| TableChange::RenamePrimaryKey)
+}
+
+fn renamed_table(differ: &TableDiffer<'_, '_>, changes: &mut Vec<TableChange>) {
+    if differ.tables.previous.is_renamed_table(differ.tables.next) {
+        changes.push(TableChange::RenameTo)
+    }
 }
 
 fn push_alter_primary_key(differ: &TableDiffer<'_, '_>, steps: &mut Vec<SqlMigrationStep>) {
