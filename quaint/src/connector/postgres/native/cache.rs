@@ -11,16 +11,16 @@ use tokio_postgres::{Client, Error, Statement};
 
 use crate::connector::metrics::strip_query_traceparent;
 
-use super::query::{PreparedQuery, TypedQuery};
+use super::query::{PreparedQuery, QueryMetadata, TypedQuery};
 
 /// Types that can be used as a cache for prepared queries and statements.
 #[async_trait]
 pub trait QueryCache: From<CacheSettings> + Send + Sync {
     /// The type that is returned when a prepared query is requested from the cache.
-    type Query: PreparedQuery;
+    type Query<'a>: PreparedQuery;
 
     /// Retrieve a prepared query.
-    async fn get_query(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Self::Query, Error>;
+    async fn get_query<'a>(&self, client: &Client, sql: &'a str, types: &[Type]) -> Result<Self::Query<'a>, Error>;
 
     /// Retrieve a prepared statement.
     ///
@@ -36,10 +36,10 @@ pub struct NoOpCache;
 
 #[async_trait]
 impl QueryCache for NoOpCache {
-    type Query = Statement;
+    type Query<'a> = Statement;
 
     #[inline]
-    async fn get_query(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Statement, Error> {
+    async fn get_query<'a>(&self, client: &Client, sql: &'a str, types: &[Type]) -> Result<Statement, Error> {
         self.get_statement(client, sql, types).await
     }
 
@@ -55,7 +55,7 @@ impl From<CacheSettings> for NoOpCache {
     }
 }
 
-/// An LRU cache that creates a prepared statement for every newly requested query.
+/// An LRU cache that creates a prepared statement for every query that is not in the cache.
 #[derive(Debug)]
 pub struct PreparedStatementLruCache {
     cache: InnerLruCache<Statement>,
@@ -71,10 +71,10 @@ impl PreparedStatementLruCache {
 
 #[async_trait]
 impl QueryCache for PreparedStatementLruCache {
-    type Query = Statement;
+    type Query<'a> = Statement;
 
     #[inline]
-    async fn get_query(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Statement, Error> {
+    async fn get_query<'a>(&self, client: &Client, sql: &'a str, types: &[Type]) -> Result<Statement, Error> {
         self.get_statement(client, sql, types).await
     }
 
@@ -96,15 +96,15 @@ impl From<CacheSettings> for PreparedStatementLruCache {
     }
 }
 
-/// An LRU cache that creates and stores type information relevant to queries as instances of
-/// [`TypedQuery`]. Queries are identified by their content with tracing information removed
-/// (which makes it possible to cache them at all). The caching behavior is implemented in
-/// [`get_query`](Self::get_query), while statements returned by
+/// An LRU cache that creates and stores query type information rather than prepared statements.
+/// Queries are identified by their content with tracing information removed (which makes it
+/// possible to cache them at all) and returned as instances of [`TypedQuery`]. The caching
+/// behavior is implemented in [`get_query`](Self::get_query), while statements returned from
 /// [`get_statement`](Self::get_statement) are always freshly prepared, because statements cannot
 /// be re-used when tracing information is present.
 #[derive(Debug)]
 pub struct TracingLruCache {
-    cache: InnerLruCache<Arc<TypedQuery>>,
+    cache: InnerLruCache<Arc<QueryMetadata>>,
 }
 
 impl TracingLruCache {
@@ -117,20 +117,21 @@ impl TracingLruCache {
 
 #[async_trait]
 impl QueryCache for TracingLruCache {
-    type Query = Arc<TypedQuery>;
+    type Query<'a> = TypedQuery<'a>;
 
-    async fn get_query(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Arc<TypedQuery>, Error> {
+    async fn get_query<'a>(&self, client: &Client, sql: &'a str, types: &[Type]) -> Result<TypedQuery<'a>, Error> {
         let sql_without_traceparent = strip_query_traceparent(sql);
 
-        match self.cache.get(sql_without_traceparent, types).await {
-            Some(query) => Ok(query),
+        let metadata = match self.cache.get(sql_without_traceparent, types).await {
+            Some(metadata) => metadata,
             None => {
-                let stmt = client.prepare_typed(sql, types).await?;
-                let query = Arc::new(TypedQuery::from_statement(sql, &stmt));
-                self.cache.insert(sql_without_traceparent, types, query.clone()).await;
-                Ok(query)
+                let stmt = client.prepare_typed(sql_without_traceparent, types).await?;
+                let metdata = Arc::new(QueryMetadata::from(&stmt));
+                self.cache.insert(sql_without_traceparent, types, metdata.clone()).await;
+                metdata
             }
-        }
+        };
+        Ok(TypedQuery::from_sql_and_metadata(sql, metadata))
     }
 
     async fn get_statement(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Statement, Error> {
@@ -310,18 +311,21 @@ mod tests {
             let sql = "SELECT $1";
             let types = [Type::INT4];
 
-            let stmt1 = cache.get_query(&client, sql, &types).await.unwrap();
-            let stmt2 = cache.get_query(&client, sql, &types).await.unwrap();
-            assert!(Arc::ptr_eq(&stmt1, &stmt2), "stmt1 and stmt2 should be the same Arc");
+            let q1 = cache.get_query(&client, sql, &types).await.unwrap();
+            let q2 = cache.get_query(&client, sql, &types).await.unwrap();
+            assert!(
+                std::ptr::eq(q1.metadata(), q2.metadata()),
+                "stmt1 and stmt2 should re-use the same metadata"
+            );
 
             // replace our cached query with a new one going over the capacity
             cache.get_query(&client, sql, &[Type::INT8]).await.unwrap();
 
             // the old query should be evicted from the cache
-            let stmt3 = cache.get_query(&client, sql, &types).await.unwrap();
+            let q3 = cache.get_query(&client, sql, &types).await.unwrap();
             assert!(
-                !Arc::ptr_eq(&stmt1, &stmt3),
-                "stmt1 and stmt3 should not be the same Arc"
+                !std::ptr::eq(q1.metadata(), q3.metadata()),
+                "stmt1 and stmt3 should not re-use the same metadata"
             );
         })
         .await;
@@ -335,9 +339,15 @@ mod tests {
             let sql2 = "SELECT $1 /* traceparent=00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-02 */";
             let types = [Type::INT4];
 
-            let stmt1 = cache.get_query(&client, sql1, &types).await.unwrap();
-            let stmt2 = cache.get_query(&client, sql2, &types).await.unwrap();
-            assert!(Arc::ptr_eq(&stmt1, &stmt2), "stmt1 and stmt2 should be the same Arc");
+            let q1 = cache.get_query(&client, sql1, &types).await.unwrap();
+            assert_eq!(q1.query(), sql1);
+            let q2 = cache.get_query(&client, sql2, &types).await.unwrap();
+            assert_eq!(q2.query(), sql2);
+
+            assert!(
+                std::ptr::eq(q1.metadata(), q2.metadata()),
+                "stmt1 and stmt2 should re-use the same metadata"
+            );
         })
         .await;
     }
@@ -349,9 +359,9 @@ mod tests {
             let sql = "SELECT $1";
             let types = [Type::INT4];
 
-            let stmt1 = cache.get_statement(&client, sql, &types).await.unwrap();
-            let stmt2 = cache.get_statement(&client, sql, &types).await.unwrap();
-            assert_ne!(stmt1.name(), stmt2.name());
+            let q1 = cache.get_statement(&client, sql, &types).await.unwrap();
+            let q2 = cache.get_statement(&client, sql, &types).await.unwrap();
+            assert_ne!(q1.name(), q2.name());
         })
         .await;
     }
