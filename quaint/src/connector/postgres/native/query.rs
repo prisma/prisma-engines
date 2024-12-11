@@ -4,6 +4,8 @@ use async_trait::async_trait;
 use postgres_types::{BorrowToSql, Type};
 use tokio_postgres::{Client, Error, RowStream, Statement};
 
+/// Types that can be dispatched to the database as a query and carry the necessary type
+/// information about its parameters and columns.
 #[async_trait]
 pub trait IsQuery: Send {
     fn param_types(&self) -> impl ExactSizeIterator<Item = &Type> + '_;
@@ -31,7 +33,6 @@ impl IsQuery for Statement {
         self.columns().iter().map(|c| c.type_())
     }
 
-    #[inline]
     async fn dispatch<Args>(&self, client: &Client, args: Args) -> Result<RowStream, Error>
     where
         Args: IntoIterator + Send,
@@ -42,6 +43,7 @@ impl IsQuery for Statement {
     }
 }
 
+/// A query combined with the type information necessary to run and interpret it.
 #[derive(Debug)]
 pub struct TypedQuery {
     pub(super) sql: String,
@@ -64,7 +66,6 @@ impl IsQuery for TypedQuery {
         self.column_types.iter()
     }
 
-    #[inline]
     async fn dispatch<Args>(&self, client: &Client, args: Args) -> Result<RowStream, Error>
     where
         Args: IntoIterator + Send,
@@ -79,18 +80,22 @@ impl IsQuery for TypedQuery {
 
 #[async_trait]
 impl<A: IsQuery + Sync> IsQuery for Arc<A> {
+    #[inline]
     fn param_types(&self) -> impl ExactSizeIterator<Item = &Type> + '_ {
         self.as_ref().param_types()
     }
 
+    #[inline]
     fn column_names(&self) -> impl ExactSizeIterator<Item = &str> + '_ {
         self.as_ref().column_names()
     }
 
+    #[inline]
     fn column_types(&self) -> impl ExactSizeIterator<Item = &Type> + '_ {
         self.as_ref().column_types()
     }
 
+    #[inline]
     async fn dispatch<Args>(&self, client: &Client, args: Args) -> Result<RowStream, Error>
     where
         Args: IntoIterator + Send,

@@ -355,7 +355,13 @@ impl Builder {
 }
 
 impl Quaint {
-    pub fn builder_with_tracing(url_str: &str, is_tracing_enabled: bool) -> crate::Result<Builder> {
+    /// Creates a new builder for a Quaint connection pool with the given
+    /// connection string and tracing flag.
+    /// See the [module level documentation] for details.
+    pub fn builder_with_tracing(
+        url_str: &str,
+        #[allow(unused_variables)] is_tracing_enabled: bool,
+    ) -> crate::Result<Builder> {
         match url_str {
             #[cfg(feature = "sqlite")]
             s if s.starts_with("file") => {

@@ -66,6 +66,10 @@ const DB_SYSTEM_NAME_POSTGRESQL: &str = "postgresql";
 const DB_SYSTEM_NAME_COCKROACHDB: &str = "cockroachdb";
 
 /// A connector interface for the PostgreSQL database.
+///
+/// # Type parameters
+/// - `QueriesCache`: The cache used for queries that do not necessitate prepared statements.
+/// - `StmtsCache`: The cache used for prepared statements.
 #[derive(Debug)]
 pub struct PostgreSql<QueriesCache, StmtsCache> {
     client: PostgresClient,
@@ -79,8 +83,15 @@ pub struct PostgreSql<QueriesCache, StmtsCache> {
     db_system_name: &'static str,
 }
 
+/// A Postgres client with the default caching strategy, which involves storing everything as
+/// prepared statements in an LRU cache.
 pub type PostgreSqlWithDefaultCache = PostgreSql<LruPreparedStatementCache, LruPreparedStatementCache>;
+
+/// A Postgres client which executes all queries as prepared statements without caching.
 pub type PostgreSqlWithNoCache = PostgreSql<NoopPreparedStatementCache, NoopPreparedStatementCache>;
+
+/// A Postgres client with a caching strategy dedicated to query tracing, which involves storing
+/// query type information in a dedicated LRU cache and not re-using any prepared statements.
 pub type PostgreSqlWithTracingCache = PostgreSql<LruTracingCache, NoopPreparedStatementCache>;
 
 #[derive(Debug)]

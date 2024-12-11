@@ -13,13 +13,18 @@ use crate::connector::metrics::strip_query_traceparent;
 
 use super::query::{IsQuery, TypedQuery};
 
+/// Types that can be used as a cache for queries.
 #[async_trait]
 pub trait QueryCache: From<CacheSettings> + Send + Sync {
+    /// The type of the query that is returned by the cache.
     type Query: IsQuery;
 
+    /// Retrieves a query from the cache or prepares and caches it if it's not present.
     async fn get_by_query(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Self::Query, Error>;
 }
 
+/// A no-op cache that creates a new prepared statement for each query.
+/// Useful when we don't need caching.
 #[derive(Debug, Default)]
 pub struct NoopPreparedStatementCache;
 
@@ -39,6 +44,7 @@ impl From<CacheSettings> for NoopPreparedStatementCache {
     }
 }
 
+/// An LRU cache that creates and stores prepared statements.
 #[derive(Debug)]
 pub struct LruPreparedStatementCache {
     cache: InnerLruCache<Statement>,
@@ -74,6 +80,11 @@ impl From<CacheSettings> for LruPreparedStatementCache {
     }
 }
 
+/// An LRU cache that creates and stores type information relevant to each query, keyed by queries
+/// with tracing information removed.
+///
+/// Returns [`TypedQuery`] instances, rather than [`Statement`], because prepared statements cannot
+/// be re-used when the tracing information is attached to them.
 #[derive(Debug)]
 pub struct LruTracingCache {
     cache: InnerLruCache<Arc<TypedQuery>>,
@@ -117,6 +128,7 @@ impl From<CacheSettings> for LruTracingCache {
     }
 }
 
+/// Settings related to query caching.
 #[derive(Debug)]
 pub struct CacheSettings {
     pub capacity: usize,
