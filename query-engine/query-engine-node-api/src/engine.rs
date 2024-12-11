@@ -167,7 +167,11 @@ impl QueryEngine {
         let exporter = self.logger.exporter();
 
         async_panic_to_js_error(async {
-            let span = tracing::info_span!("prisma:engine:connect", user_facing = true);
+            let span = tracing::info_span!(
+                "prisma:engine:connect",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
             start_trace(&request_id, &trace, &span, &exporter).await?;
 
             let mut inner = self.inner.write().await;
@@ -272,7 +276,11 @@ impl QueryEngine {
         let exporter = self.logger.exporter();
 
         async_panic_to_js_error(async {
-            let span = tracing::info_span!("prisma:engine:disconnect", user_facing = true);
+            let span = tracing::info_span!(
+                "prisma:engine:disconnect",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
             start_trace(&request_id, &trace, &span, &exporter).await?;
 
             // TODO: when using Node Drivers, we need to call Driver::close() here.
@@ -321,7 +329,11 @@ impl QueryEngine {
 
             let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
 
-            let span = tracing::info_span!("prisma:engine:query", user_facing = true);
+            let span = tracing::info_span!(
+                "prisma:engine:query",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
             let trace_parent = start_trace(&request_id, &trace, &span, &exporter).await?;
 
             async move {
@@ -375,7 +387,11 @@ impl QueryEngine {
             let engine = inner.as_engine()?;
             let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
 
-            let span = tracing::info_span!("prisma:engine:start_transaction", user_facing = true);
+            let span = tracing::info_span!(
+                "prisma:engine:start_transaction",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
             start_trace(&request_id, &trace, &span, &exporter).await?;
 
             async move {
@@ -408,7 +424,11 @@ impl QueryEngine {
             let exporter = self.logger.exporter();
 
             async move {
-                let span = tracing::info_span!("prisma:engine:commit_transaction", user_facing = true);
+                let span = tracing::info_span!(
+                    "prisma:engine:commit_transaction",
+                    user_facing = true,
+                    request_id = tracing::field::Empty,
+                );
                 start_trace(&request_id, &trace, &span, &exporter).await?;
 
                 match engine.executor().commit_tx(TxId::from(tx_id)).instrument(span).await {
@@ -435,7 +455,11 @@ impl QueryEngine {
             let exporter = self.logger.exporter();
 
             async move {
-                let span = tracing::info_span!("prisma:engine:rollback_transaction", user_facing = true);
+                let span = tracing::info_span!(
+                    "prisma:engine:rollback_transaction",
+                    user_facing = true,
+                    request_id = tracing::field::Empty,
+                );
                 start_trace(&request_id, &trace, &span, &exporter).await?;
 
                 match engine.executor().rollback_tx(TxId::from(tx_id)).instrument(span).await {

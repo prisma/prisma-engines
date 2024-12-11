@@ -381,6 +381,39 @@ mod tests {
     }
 
     #[test]
+    fn test_dynamic_request_id() {
+        let collector = TestCollector::new();
+        let subscriber = Registry::default().with(layer(collector.clone()));
+
+        tracing::subscriber::with_default(subscriber, || {
+            let span = info_span!("test_span", request_id = tracing::field::Empty);
+            span.record("request_id", RequestId::next().into_u64());
+            let _guard = span.enter();
+        });
+
+        let spans = collector.spans();
+
+        assert_ron_snapshot!(
+            spans,
+            { ".*" => redact_id(), ".*[].**" => redact_id() },
+            @r#"
+        {
+          RequestId(1): [
+            CollectedSpan(
+              id: SpanId(1),
+              parent_id: None,
+              name: "test_span",
+              attributes: {},
+              kind: internal,
+              links: [],
+            ),
+          ],
+        }
+        "#
+        );
+    }
+
+    #[test]
     fn test_nested_spans() {
         let collector = TestCollector::new();
         let subscriber = Registry::default().with(layer(collector.clone()));
