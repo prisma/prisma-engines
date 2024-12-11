@@ -26,7 +26,7 @@ use crate::{
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
-use cache::{CacheSettings, LruPreparedStatementCache, LruTracingCache, NoopPreparedStatementCache, QueryCache};
+use cache::{CacheSettings, NoOpCache, PreparedStatementLruCache, QueryCache, TracingLruCache};
 use column_type::PGColumnType;
 use futures::future::FutureExt;
 use futures::StreamExt;
@@ -68,15 +68,13 @@ const DB_SYSTEM_NAME_COCKROACHDB: &str = "cockroachdb";
 /// A connector interface for the PostgreSQL database.
 ///
 /// # Type parameters
-/// - `QueriesCache`: The cache used for queries that do not necessitate prepared statements.
-/// - `StmtsCache`: The cache used for prepared statements.
+/// - `Cache`: The cache used for prepared queries.
 #[derive(Debug)]
-pub struct PostgreSql<QueriesCache, StmtsCache> {
+pub struct PostgreSql<Cache> {
     client: PostgresClient,
     pg_bouncer: bool,
     socket_timeout: Option<Duration>,
-    queries_cache: QueriesCache,
-    stmts_cache: StmtsCache,
+    cache: Cache,
     is_healthy: AtomicBool,
     is_cockroachdb: bool,
     is_materialize: bool,
@@ -85,16 +83,16 @@ pub struct PostgreSql<QueriesCache, StmtsCache> {
 
 /// A [`PostgreSql`] interface with the default caching strategy, which involves storing all
 /// queries as prepared statements in an LRU cache.
-pub type PostgreSqlWithDefaultCache = PostgreSql<LruPreparedStatementCache, LruPreparedStatementCache>;
+pub type PostgreSqlWithDefaultCache = PostgreSql<PreparedStatementLruCache>;
 
 /// A [`PostgreSql`] interface which executes all queries as prepared statements without caching
 /// them.
-pub type PostgreSqlWithNoCache = PostgreSql<NoopPreparedStatementCache, NoopPreparedStatementCache>;
+pub type PostgreSqlWithNoCache = PostgreSql<NoOpCache>;
 
 /// A [`PostgreSql`] interface with the tracing caching strategy, which involves storing query
 /// type information in a dedicated LRU cache for applicable queries and not re-using any prepared
 /// statements.
-pub type PostgreSqlWithTracingCache = PostgreSql<LruTracingCache, NoopPreparedStatementCache>;
+pub type PostgreSqlWithTracingCache = PostgreSql<TracingLruCache>;
 
 #[derive(Debug)]
 struct SslAuth {
@@ -240,8 +238,7 @@ impl PostgreSqlWithNoCache {
             client: PostgresClient(client),
             socket_timeout: None,
             pg_bouncer: false,
-            queries_cache: NoopPreparedStatementCache,
-            stmts_cache: NoopPreparedStatementCache,
+            cache: NoOpCache,
             is_healthy: AtomicBool::new(true),
             is_cockroachdb: false,
             is_materialize: false,
@@ -250,11 +247,7 @@ impl PostgreSqlWithNoCache {
     }
 }
 
-impl<QueriesCache, StmtsCache> PostgreSql<QueriesCache, StmtsCache>
-where
-    QueriesCache: QueryCache,
-    StmtsCache: QueryCache<Query = Statement>,
-{
+impl<Cache: QueryCache> PostgreSql<Cache> {
     /// Create a new connection to the database.
     pub async fn new(url: PostgresNativeUrl, tls_manager: &MakeTlsConnectorManager) -> crate::Result<Self> {
         let config = url.to_config();
@@ -305,8 +298,7 @@ where
             client: PostgresClient(client),
             socket_timeout: url.query_params.socket_timeout,
             pg_bouncer: url.query_params.pg_bouncer,
-            queries_cache: url.cache_settings().into(),
-            stmts_cache: url.cache_settings().into(),
+            cache: url.cache_settings().into(),
             is_healthy: AtomicBool::new(true),
             is_cockroachdb,
             is_materialize,
@@ -470,7 +462,7 @@ where
             sql,
             params,
             move || async move {
-                let query = self.queries_cache.get_by_query(&self.client.0, sql, types).await?;
+                let query = self.cache.get_query(&self.client.0, sql, types).await?;
 
                 if query.param_types().len() != params.len() {
                     let kind = ErrorKind::IncorrectNumberOfParameters {
@@ -542,11 +534,7 @@ impl Display for SetSearchPath<'_> {
 }
 
 #[async_trait]
-impl<QueriesCache, StmtsCache> TransactionCapable for PostgreSql<QueriesCache, StmtsCache>
-where
-    QueriesCache: QueryCache,
-    StmtsCache: QueryCache<Query = Statement>,
-{
+impl<Cache: QueryCache> TransactionCapable for PostgreSql<Cache> {
     async fn start_transaction<'a>(
         &'a self,
         isolation: Option<IsolationLevel>,
@@ -560,11 +548,7 @@ where
 }
 
 #[async_trait]
-impl<QueriesCache, StmtsCache> Queryable for PostgreSql<QueriesCache, StmtsCache>
-where
-    QueriesCache: QueryCache,
-    StmtsCache: QueryCache<Query = Statement>,
-{
+impl<Cache: QueryCache> Queryable for PostgreSql<Cache> {
     async fn query(&self, q: Query<'_>) -> crate::Result<ResultSet> {
         let (sql, params) = visitor::Postgres::build(q)?;
 
@@ -581,7 +565,7 @@ where
     }
 
     async fn describe_query(&self, sql: &str) -> crate::Result<DescribedQuery> {
-        let stmt = self.stmts_cache.get_by_query(&self.client.0, sql, &[]).await?;
+        let stmt = self.cache.get_statement(&self.client.0, sql, &[]).await?;
 
         let mut columns: Vec<DescribedColumn> = Vec::with_capacity(stmt.columns().len());
         let mut parameters: Vec<DescribedParameter> = Vec::with_capacity(stmt.params().len());
@@ -670,7 +654,7 @@ where
             sql,
             params,
             move || async move {
-                let stmt = self.stmts_cache.get_by_query(&self.client.0, sql, &[]).await?;
+                let stmt = self.cache.get_statement(&self.client.0, sql, &[]).await?;
 
                 if stmt.params().len() != params.len() {
                     let kind = ErrorKind::IncorrectNumberOfParameters {
@@ -701,7 +685,7 @@ where
             params,
             move || async move {
                 let types = conversion::params_to_types(params);
-                let stmt = self.stmts_cache.get_by_query(&self.client.0, sql, &types).await?;
+                let stmt = self.cache.get_statement(&self.client.0, sql, &types).await?;
 
                 if stmt.params().len() != params.len() {
                     let kind = ErrorKind::IncorrectNumberOfParameters {

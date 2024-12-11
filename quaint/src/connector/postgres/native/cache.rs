@@ -13,44 +13,55 @@ use crate::connector::metrics::strip_query_traceparent;
 
 use super::query::{PreparedQuery, TypedQuery};
 
-/// Types that can be used as a cache for prepared queries.
+/// Types that can be used as a cache for prepared queries and statements.
 #[async_trait]
 pub trait QueryCache: From<CacheSettings> + Send + Sync {
-    /// The type of query that is returned by the cache.
+    /// The type that is returned when a prepared query is requested from the cache.
     type Query: PreparedQuery;
 
-    /// Retrieve a prepared query from the cache or prepare and cache one if it's not present.
-    async fn get_by_query(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Self::Query, Error>;
+    /// Retrieve a prepared query.
+    async fn get_query(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Self::Query, Error>;
+
+    /// Retrieve a prepared statement.
+    ///
+    /// This is useful in scenarios that require direct access to a prepared statement,
+    /// e.g. describing a query.
+    async fn get_statement(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Statement, Error>;
 }
 
-/// A no-op cache that creates a new prepared statement for each query.
+/// A no-op cache that creates a new prepared statement for every requested query.
 /// Useful when we don't need caching.
 #[derive(Debug, Default)]
-pub struct NoopPreparedStatementCache;
+pub struct NoOpCache;
 
 #[async_trait]
-impl QueryCache for NoopPreparedStatementCache {
+impl QueryCache for NoOpCache {
     type Query = Statement;
 
     #[inline]
-    async fn get_by_query(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Statement, Error> {
+    async fn get_query(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Statement, Error> {
+        self.get_statement(client, sql, types).await
+    }
+
+    #[inline]
+    async fn get_statement(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Statement, Error> {
         client.prepare_typed(sql, types).await
     }
 }
 
-impl From<CacheSettings> for NoopPreparedStatementCache {
+impl From<CacheSettings> for NoOpCache {
     fn from(_: CacheSettings) -> Self {
         Self
     }
 }
 
-/// An LRU cache that creates and stores prepared statements.
+/// An LRU cache that creates a prepared statement for every newly requested query.
 #[derive(Debug)]
-pub struct LruPreparedStatementCache {
+pub struct PreparedStatementLruCache {
     cache: InnerLruCache<Statement>,
 }
 
-impl LruPreparedStatementCache {
+impl PreparedStatementLruCache {
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
             cache: InnerLruCache::with_capacity(capacity),
@@ -59,10 +70,15 @@ impl LruPreparedStatementCache {
 }
 
 #[async_trait]
-impl QueryCache for LruPreparedStatementCache {
+impl QueryCache for PreparedStatementLruCache {
     type Query = Statement;
 
-    async fn get_by_query(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Statement, Error> {
+    #[inline]
+    async fn get_query(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Statement, Error> {
+        self.get_statement(client, sql, types).await
+    }
+
+    async fn get_statement(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Statement, Error> {
         match self.cache.get(sql, types).await {
             Some(statement) => Ok(statement),
             None => {
@@ -74,23 +90,24 @@ impl QueryCache for LruPreparedStatementCache {
     }
 }
 
-impl From<CacheSettings> for LruPreparedStatementCache {
+impl From<CacheSettings> for PreparedStatementLruCache {
     fn from(settings: CacheSettings) -> Self {
         Self::with_capacity(settings.capacity)
     }
 }
 
-/// An LRU cache that creates and stores type information relevant to each query, with keys being
-/// stripped of any tracing information.
-///
-/// Returns [`TypedQuery`] instances, rather than [`Statement`], because prepared statements cannot
-/// be re-used when the tracing information is attached to them.
+/// An LRU cache that creates and stores type information relevant to queries as instances of
+/// [`TypedQuery`]. Queries are identified by their content with tracing information removed
+/// (which makes it possible to cache them at all). The caching behavior is implemented in
+/// [`get_query`](Self::get_query), while statements returned by
+/// [`get_statement`](Self::get_statement) are always freshly prepared, because statements cannot
+/// be re-used when tracing information is present.
 #[derive(Debug)]
-pub struct LruTracingCache {
+pub struct TracingLruCache {
     cache: InnerLruCache<Arc<TypedQuery>>,
 }
 
-impl LruTracingCache {
+impl TracingLruCache {
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
             cache: InnerLruCache::with_capacity(capacity),
@@ -99,10 +116,10 @@ impl LruTracingCache {
 }
 
 #[async_trait]
-impl QueryCache for LruTracingCache {
+impl QueryCache for TracingLruCache {
     type Query = Arc<TypedQuery>;
 
-    async fn get_by_query(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Arc<TypedQuery>, Error> {
+    async fn get_query(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Arc<TypedQuery>, Error> {
         let sql_without_traceparent = strip_query_traceparent(sql);
 
         match self.cache.get(sql_without_traceparent, types).await {
@@ -115,9 +132,13 @@ impl QueryCache for LruTracingCache {
             }
         }
     }
+
+    async fn get_statement(&self, client: &Client, sql: &str, types: &[Type]) -> Result<Statement, Error> {
+        client.prepare_typed(sql, types).await
+    }
 }
 
-impl From<CacheSettings> for LruTracingCache {
+impl From<CacheSettings> for TracingLruCache {
     fn from(settings: CacheSettings) -> Self {
         Self::with_capacity(settings.capacity)
     }
@@ -170,6 +191,7 @@ impl<V> InnerLruCache<V> {
         let stored = cache.len();
 
         let key = QueryKey::new(&self.state, sql, types);
+        // we call `get_mut` because LRU requires mutable access for lookups
         match cache.get_mut(&key) {
             Some(value) => {
                 tracing::trace!(
@@ -212,56 +234,91 @@ mod tests {
     use url::Url;
 
     #[tokio::test]
-    async fn noop_prepared_statement_cache_prepares_new_statements_every_time() {
+    async fn noop_cache_returns_new_queries_every_time() {
         run_with_client(|client| async move {
-            let cache = NoopPreparedStatementCache;
+            let cache = NoOpCache;
             let sql = "SELECT $1";
             let types = [Type::INT4];
 
-            let stmt1 = cache.get_by_query(&client, sql, &types).await.unwrap();
-            let stmt2 = cache.get_by_query(&client, sql, &types).await.unwrap();
+            let stmt1 = cache.get_query(&client, sql, &types).await.unwrap();
+            let stmt2 = cache.get_query(&client, sql, &types).await.unwrap();
             assert_ne!(stmt1.name(), stmt2.name());
         })
         .await;
     }
 
     #[tokio::test]
-    async fn lru_prepared_statement_cache_reuses_statements_within_capacity() {
+    async fn noop_cache_returns_new_statements_every_time() {
         run_with_client(|client| async move {
-            let cache = LruPreparedStatementCache::with_capacity(1);
+            let cache = NoOpCache;
             let sql = "SELECT $1";
             let types = [Type::INT4];
 
-            let stmt1 = cache.get_by_query(&client, sql, &types).await.unwrap();
-            let stmt2 = cache.get_by_query(&client, sql, &types).await.unwrap();
+            let stmt1 = cache.get_statement(&client, sql, &types).await.unwrap();
+            let stmt2 = cache.get_statement(&client, sql, &types).await.unwrap();
+            assert_ne!(stmt1.name(), stmt2.name());
+        })
+        .await;
+    }
+
+    #[tokio::test]
+    async fn prepared_statement_lru_cache_reuses_queries_within_capacity() {
+        run_with_client(|client| async move {
+            let cache = PreparedStatementLruCache::with_capacity(1);
+            let sql = "SELECT $1";
+            let types = [Type::INT4];
+
+            let stmt1 = cache.get_query(&client, sql, &types).await.unwrap();
+            let stmt2 = cache.get_query(&client, sql, &types).await.unwrap();
             assert_eq!(stmt1.name(), stmt2.name());
 
             // replace our cached statement with a new one going over the capacity
-            cache.get_by_query(&client, sql, &[Type::INT8]).await.unwrap();
+            cache.get_query(&client, sql, &[Type::INT8]).await.unwrap();
 
             // the old statement should be evicted from the cache
-            let stmt3 = cache.get_by_query(&client, sql, &types).await.unwrap();
+            let stmt3 = cache.get_query(&client, sql, &types).await.unwrap();
             assert_ne!(stmt1.name(), stmt3.name());
         })
         .await;
     }
 
     #[tokio::test]
-    async fn tracing_cache_reuses_queries_within_capacity() {
+    async fn prepared_statement_lru_cache_reuses_statements_within_capacity() {
         run_with_client(|client| async move {
-            let cache = LruTracingCache::with_capacity(1);
+            let cache = PreparedStatementLruCache::with_capacity(1);
             let sql = "SELECT $1";
             let types = [Type::INT4];
 
-            let stmt1 = cache.get_by_query(&client, sql, &types).await.unwrap();
-            let stmt2 = cache.get_by_query(&client, sql, &types).await.unwrap();
+            let stmt1 = cache.get_statement(&client, sql, &types).await.unwrap();
+            let stmt2 = cache.get_statement(&client, sql, &types).await.unwrap();
+            assert_eq!(stmt1.name(), stmt2.name());
+
+            // replace our cached statement with a new one going over the capacity
+            cache.get_statement(&client, sql, &[Type::INT8]).await.unwrap();
+
+            // the old statement should be evicted from the cache
+            let stmt3 = cache.get_statement(&client, sql, &types).await.unwrap();
+            assert_ne!(stmt1.name(), stmt3.name());
+        })
+        .await;
+    }
+
+    #[tokio::test]
+    async fn tracing_lru_cache_reuses_queries_within_capacity() {
+        run_with_client(|client| async move {
+            let cache = TracingLruCache::with_capacity(1);
+            let sql = "SELECT $1";
+            let types = [Type::INT4];
+
+            let stmt1 = cache.get_query(&client, sql, &types).await.unwrap();
+            let stmt2 = cache.get_query(&client, sql, &types).await.unwrap();
             assert!(Arc::ptr_eq(&stmt1, &stmt2), "stmt1 and stmt2 should be the same Arc");
 
             // replace our cached query with a new one going over the capacity
-            cache.get_by_query(&client, sql, &[Type::INT8]).await.unwrap();
+            cache.get_query(&client, sql, &[Type::INT8]).await.unwrap();
 
             // the old query should be evicted from the cache
-            let stmt3 = cache.get_by_query(&client, sql, &types).await.unwrap();
+            let stmt3 = cache.get_query(&client, sql, &types).await.unwrap();
             assert!(
                 !Arc::ptr_eq(&stmt1, &stmt3),
                 "stmt1 and stmt3 should not be the same Arc"
@@ -271,16 +328,30 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn tracing_cache_reuses_queries_with_different_traceparent() {
+    async fn tracing_lru_cache_reuses_queries_with_different_traceparent() {
         run_with_client(|client| async move {
-            let cache = LruTracingCache::with_capacity(1);
+            let cache = TracingLruCache::with_capacity(1);
             let sql1 = "SELECT $1 /* traceparent=00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01 */";
             let sql2 = "SELECT $1 /* traceparent=00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-02 */";
             let types = [Type::INT4];
 
-            let stmt1 = cache.get_by_query(&client, sql1, &types).await.unwrap();
-            let stmt2 = cache.get_by_query(&client, sql2, &types).await.unwrap();
+            let stmt1 = cache.get_query(&client, sql1, &types).await.unwrap();
+            let stmt2 = cache.get_query(&client, sql2, &types).await.unwrap();
             assert!(Arc::ptr_eq(&stmt1, &stmt2), "stmt1 and stmt2 should be the same Arc");
+        })
+        .await;
+    }
+
+    #[tokio::test]
+    async fn tracing_lru_cache_returns_new_statements_every_time() {
+        run_with_client(|client| async move {
+            let cache = TracingLruCache::with_capacity(1);
+            let sql = "SELECT $1";
+            let types = [Type::INT4];
+
+            let stmt1 = cache.get_statement(&client, sql, &types).await.unwrap();
+            let stmt2 = cache.get_statement(&client, sql, &types).await.unwrap();
+            assert_ne!(stmt1.name(), stmt2.name());
         })
         .await;
     }
