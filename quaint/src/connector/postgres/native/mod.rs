@@ -83,15 +83,17 @@ pub struct PostgreSql<QueriesCache, StmtsCache> {
     db_system_name: &'static str,
 }
 
-/// A Postgres client with the default caching strategy, which involves storing everything as
-/// prepared statements in an LRU cache.
+/// A [`PostgreSql`] interface with the default caching strategy, which involves storing all
+/// queries as prepared statements in an LRU cache.
 pub type PostgreSqlWithDefaultCache = PostgreSql<LruPreparedStatementCache, LruPreparedStatementCache>;
 
-/// A Postgres client which executes all queries as prepared statements without caching.
+/// A [`PostgreSql`] interface which executes all queries as prepared statements without caching
+/// them.
 pub type PostgreSqlWithNoCache = PostgreSql<NoopPreparedStatementCache, NoopPreparedStatementCache>;
 
-/// A Postgres client with a caching strategy dedicated to query tracing, which involves storing
-/// query type information in a dedicated LRU cache and not re-using any prepared statements.
+/// A [`PostgreSql`] interface with the tracing caching strategy, which involves storing query
+/// type information in a dedicated LRU cache for applicable queries and not re-using any prepared
+/// statements.
 pub type PostgreSqlWithTracingCache = PostgreSql<LruTracingCache, NoopPreparedStatementCache>;
 
 #[derive(Debug)]

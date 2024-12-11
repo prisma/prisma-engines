@@ -46,10 +46,22 @@ impl PreparedQuery for Statement {
 /// A query combined with the relevant type information about its parameters and columns.
 #[derive(Debug)]
 pub struct TypedQuery {
-    pub(super) sql: String,
-    pub(super) param_types: Vec<Type>,
-    pub(super) column_names: Vec<String>,
-    pub(super) column_types: Vec<Type>,
+    sql: String,
+    param_types: Vec<Type>,
+    column_names: Vec<String>,
+    column_types: Vec<Type>,
+}
+
+impl TypedQuery {
+    /// Create a new typed query from a SQL string and a statement.
+    pub fn from_statement(sql: impl Into<String>, statement: &Statement) -> Self {
+        Self {
+            sql: sql.into(),
+            param_types: statement.params().to_vec(),
+            column_names: statement.columns().iter().map(|c| c.name().to_owned()).collect(),
+            column_types: statement.columns().iter().map(|c| c.type_().clone()).collect(),
+        }
+    }
 }
 
 #[async_trait]
@@ -103,5 +115,105 @@ impl<A: PreparedQuery + Sync> PreparedQuery for Arc<A> {
         Args::IntoIter: ExactSizeIterator + Send,
     {
         self.as_ref().dispatch(client, args).await
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use std::future::Future;
+
+    pub(crate) use crate::connector::postgres::url::PostgresNativeUrl;
+    use crate::{
+        connector::{MakeTlsConnectorManager, PostgresFlavour},
+        tests::test_api::postgres::CONN_STR,
+    };
+    use url::Url;
+
+    #[tokio::test]
+    async fn typed_query_matches_statement_and_dispatches() {
+        run_with_client(|client| async move {
+            let query = "SELECT $1";
+            let stmt = client.prepare_typed(query, &[Type::INT4]).await.unwrap();
+            let typed = TypedQuery::from_statement(query, &stmt);
+
+            assert_eq!(typed.param_types().cloned().collect::<Vec<_>>(), stmt.params());
+            assert_eq!(
+                typed.column_names().collect::<Vec<_>>(),
+                stmt.columns().iter().map(|c| c.name()).collect::<Vec<_>>()
+            );
+            assert_eq!(
+                typed.column_types().collect::<Vec<_>>(),
+                stmt.columns().iter().map(|c| c.type_()).collect::<Vec<_>>()
+            );
+
+            let result = typed.dispatch(&client, &[&1i32]).await;
+            assert!(result.is_ok(), "{:?}", result.err());
+        })
+        .await;
+    }
+
+    #[tokio::test]
+    async fn statement_trait_methods_match_statement_and_dispatch() {
+        run_with_client(|client| async move {
+            let query = "SELECT $1";
+            let stmt = client.prepare_typed(query, &[Type::INT4]).await.unwrap();
+
+            assert_eq!(stmt.param_types().cloned().collect::<Vec<_>>(), stmt.params());
+            assert_eq!(
+                stmt.column_names().collect::<Vec<_>>(),
+                stmt.columns().iter().map(|c| c.name()).collect::<Vec<_>>()
+            );
+            assert_eq!(
+                stmt.column_types().collect::<Vec<_>>(),
+                stmt.columns().iter().map(|c| c.type_()).collect::<Vec<_>>()
+            );
+
+            let result = stmt.dispatch(&client, &[&1i32]).await;
+            assert!(result.is_ok(), "{:?}", result.err());
+        })
+        .await;
+    }
+
+    #[tokio::test]
+    async fn arc_trait_methods_match_statement_and_dispatch() {
+        run_with_client(|client| async move {
+            let query = "SELECT $1";
+            let stmt = Arc::new(client.prepare_typed(query, &[Type::INT4]).await.unwrap());
+
+            assert_eq!(stmt.param_types().cloned().collect::<Vec<_>>(), stmt.params());
+            assert_eq!(
+                stmt.column_names().collect::<Vec<_>>(),
+                stmt.columns().iter().map(|c| c.name()).collect::<Vec<_>>()
+            );
+            assert_eq!(
+                stmt.column_types().collect::<Vec<_>>(),
+                stmt.columns().iter().map(|c| c.type_()).collect::<Vec<_>>()
+            );
+
+            let result = stmt.dispatch(&client, &[&1i32]).await;
+            assert!(result.is_ok(), "{:?}", result.err());
+        })
+        .await;
+    }
+
+    async fn run_with_client<Func, Fut>(test: Func)
+    where
+        Func: FnOnce(Client) -> Fut,
+        Fut: Future<Output = ()>,
+    {
+        let url = Url::parse(&CONN_STR).unwrap();
+        let mut pg_url = PostgresNativeUrl::new(url).unwrap();
+        pg_url.set_flavour(PostgresFlavour::Postgres);
+
+        let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
+        let tls = tls_manager.get_connector().await.unwrap();
+
+        let (client, conn) = pg_url.to_config().connect(tls).await.unwrap();
+
+        let set = tokio::task::LocalSet::new();
+        set.spawn_local(conn);
+        set.run_until(test(client)).await
     }
 }
