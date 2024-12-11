@@ -308,7 +308,7 @@ services:
     tmpfs: /var/lib/mariadb
 
   vitess-test-8_0:
-    image: vitess/vttestserver:mysql80@sha256:53a2d2f58ecf8e6cf984c725612f7651c4fc7ac9bc7d198dbd9964d50e28b9a2
+    image: vitess/vttestserver:mysql80@sha256:eb07521a9df280ea1551e2c3432dbef65fb421b055610b04d84538f3aa10f2f8
     restart: unless-stopped
     ports:
       - 33807:33807
@@ -328,7 +328,7 @@ services:
       retries: 20
 
   vitess-shadow-8_0:
-    image: vitess/vttestserver:mysql80@sha256:53a2d2f58ecf8e6cf984c725612f7651c4fc7ac9bc7d198dbd9964d50e28b9a2
+    image: vitess/vttestserver:mysql80@sha256:eb07521a9df280ea1551e2c3432dbef65fb421b055610b04d84538f3aa10f2f8
     restart: unless-stopped
     ports:
       - 33808:33807
