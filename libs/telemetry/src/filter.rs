@@ -1,6 +1,5 @@
 use std::{borrow::Cow, sync::LazyLock};
 
-use tracing::Metadata;
 use tracing_subscriber::{filter::filter_fn, layer::Filter, EnvFilter};
 
 pub static SHOW_ALL_TRACES: LazyLock<bool> = LazyLock::new(|| {
@@ -9,15 +8,13 @@ pub static SHOW_ALL_TRACES: LazyLock<bool> = LazyLock::new(|| {
         .unwrap_or(false)
 });
 
-fn is_user_facing_span(meta: &Metadata<'_>) -> bool {
-    if *SHOW_ALL_TRACES {
-        return true;
-    }
-    meta.is_span() && meta.fields().iter().any(|f| f.name() == "user_facing")
-}
-
 pub fn user_facing_spans<S>() -> impl Filter<S> {
-    filter_fn(is_user_facing_span)
+    filter_fn(|meta| {
+        if !meta.is_span() {
+            return false;
+        }
+        *SHOW_ALL_TRACES || meta.fields().iter().any(|f| f.name() == "user_facing")
+    })
 }
 
 pub enum QueryEngineLogLevel<'a> {
