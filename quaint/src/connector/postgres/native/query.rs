@@ -46,8 +46,8 @@ impl PreparedQuery for Statement {
 /// A query combined with the relevant type information about its parameters and columns.
 #[derive(Debug)]
 pub struct TypedQuery<'a> {
-    sql: &'a str,
-    metadata: Arc<QueryMetadata>,
+    pub(super) sql: &'a str,
+    pub(super) metadata: Arc<QueryMetadata>,
 }
 
 impl<'a> TypedQuery<'a> {
@@ -57,16 +57,6 @@ impl<'a> TypedQuery<'a> {
             sql,
             metadata: metadata.into(),
         }
-    }
-
-    /// Get the SQL string of the query.
-    pub fn query(&self) -> &'a str {
-        self.sql
-    }
-
-    /// Get the metadata associated with the query.
-    pub fn metadata(&self) -> &QueryMetadata {
-        &self.metadata
     }
 }
 

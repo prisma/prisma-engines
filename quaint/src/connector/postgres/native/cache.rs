@@ -314,7 +314,7 @@ mod tests {
             let q1 = cache.get_query(&client, sql, &types).await.unwrap();
             let q2 = cache.get_query(&client, sql, &types).await.unwrap();
             assert!(
-                std::ptr::eq(q1.metadata(), q2.metadata()),
+                Arc::ptr_eq(&q1.metadata, &q2.metadata),
                 "stmt1 and stmt2 should re-use the same metadata"
             );
 
@@ -324,7 +324,7 @@ mod tests {
             // the old query should be evicted from the cache
             let q3 = cache.get_query(&client, sql, &types).await.unwrap();
             assert!(
-                !std::ptr::eq(q1.metadata(), q3.metadata()),
+                !Arc::ptr_eq(&q1.metadata, &q3.metadata),
                 "stmt1 and stmt3 should not re-use the same metadata"
             );
         })
@@ -340,12 +340,13 @@ mod tests {
             let types = [Type::INT4];
 
             let q1 = cache.get_query(&client, sql1, &types).await.unwrap();
-            assert_eq!(q1.query(), sql1);
+            assert_eq!(q1.sql, sql1);
             let q2 = cache.get_query(&client, sql2, &types).await.unwrap();
-            assert_eq!(q2.query(), sql2);
+            // the requested query traceparent should be preserved
+            assert_eq!(q2.sql, sql2);
 
             assert!(
-                std::ptr::eq(q1.metadata(), q2.metadata()),
+                Arc::ptr_eq(&q1.metadata, &q2.metadata),
                 "stmt1 and stmt2 should re-use the same metadata"
             );
         })
