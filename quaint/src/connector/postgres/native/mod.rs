@@ -67,7 +67,7 @@ const DB_SYSTEM_NAME_COCKROACHDB: &str = "cockroachdb";
 
 /// A connector interface for the PostgreSQL database.
 #[derive(Debug)]
-pub struct PostgreSql<QueriesCache = LruPreparedStatementCache, StmtsCache = LruPreparedStatementCache> {
+pub struct PostgreSql<QueriesCache, StmtsCache> {
     client: PostgresClient,
     pg_bouncer: bool,
     socket_timeout: Option<Duration>,
@@ -79,7 +79,9 @@ pub struct PostgreSql<QueriesCache = LruPreparedStatementCache, StmtsCache = Lru
     db_system_name: &'static str,
 }
 
-pub type PostgreSqlForTracing = PostgreSql<LruTracingCache, NoopPreparedStatementCache>;
+pub type PostgreSqlWithDefaultCache = PostgreSql<LruPreparedStatementCache, LruPreparedStatementCache>;
+pub type PostgreSqlWithNoCache = PostgreSql<NoopPreparedStatementCache, NoopPreparedStatementCache>;
+pub type PostgreSqlWithTracingCache = PostgreSql<LruTracingCache, NoopPreparedStatementCache>;
 
 #[derive(Debug)]
 struct SslAuth {
@@ -216,7 +218,7 @@ impl PostgresNativeUrl {
     }
 }
 
-impl PostgreSql<LruPreparedStatementCache, LruPreparedStatementCache> {
+impl PostgreSqlWithNoCache {
     /// Create a new websocket connection to managed database
     pub async fn new_with_websocket(url: PostgresWebSocketUrl) -> crate::Result<Self> {
         let client = connect_via_websocket(url).await?;
@@ -225,8 +227,8 @@ impl PostgreSql<LruPreparedStatementCache, LruPreparedStatementCache> {
             client: PostgresClient(client),
             socket_timeout: None,
             pg_bouncer: false,
-            queries_cache: LruPreparedStatementCache::with_capacity(0),
-            stmts_cache: LruPreparedStatementCache::with_capacity(0),
+            queries_cache: NoopPreparedStatementCache,
+            stmts_cache: NoopPreparedStatementCache,
             is_healthy: AtomicBool::new(true),
             is_cockroachdb: false,
             is_materialize: false,
@@ -958,7 +960,7 @@ mod tests {
 
             let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
 
-            let client = PostgreSql::new(pg_url, &tls_manager).await.unwrap();
+            let client = PostgreSqlWithDefaultCache::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
@@ -1012,7 +1014,7 @@ mod tests {
 
             let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
 
-            let client = PostgreSql::new(pg_url, &tls_manager).await.unwrap();
+            let client = PostgreSqlWithDefaultCache::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
@@ -1065,7 +1067,7 @@ mod tests {
 
             let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
 
-            let client = PostgreSql::new(pg_url, &tls_manager).await.unwrap();
+            let client = PostgreSqlWithDefaultCache::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
@@ -1118,7 +1120,7 @@ mod tests {
 
             let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
 
-            let client = PostgreSql::new(pg_url, &tls_manager).await.unwrap();
+            let client = PostgreSqlWithDefaultCache::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();
@@ -1171,7 +1173,7 @@ mod tests {
 
             let tls_manager = MakeTlsConnectorManager::new(pg_url.clone());
 
-            let client = PostgreSql::new(pg_url, &tls_manager).await.unwrap();
+            let client = PostgreSqlWithDefaultCache::new(pg_url, &tls_manager).await.unwrap();
 
             let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
             let row = result_set.first().unwrap();

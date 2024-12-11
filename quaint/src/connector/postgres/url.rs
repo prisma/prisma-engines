@@ -598,7 +598,7 @@ mod tests {
     fn should_not_enable_caching_with_pgbouncer() {
         let url =
             PostgresNativeUrl::new(Url::parse("postgresql:///localhost:5432/foo?pgbouncer=true").unwrap()).unwrap();
-        assert_eq!(0, url.cache_settings().capacity());
+        assert_eq!(0, url.cache_settings().capacity);
     }
 
     #[test]

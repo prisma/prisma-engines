@@ -139,8 +139,8 @@ impl Manager for QuaintManager {
                 tls_manager,
                 is_tracing_enabled: false,
             } => {
-                use crate::connector::PostgreSql;
-                Ok(Box::new(<PostgreSql>::new(url.clone(), tls_manager).await?) as Self::Connection)
+                use crate::connector::PostgreSqlWithDefaultCache;
+                Ok(Box::new(PostgreSqlWithDefaultCache::new(url.clone(), tls_manager).await?) as Self::Connection)
             }
 
             #[cfg(feature = "postgresql-native")]
@@ -149,8 +149,8 @@ impl Manager for QuaintManager {
                 tls_manager,
                 is_tracing_enabled: true,
             } => {
-                use crate::connector::PostgreSqlForTracing;
-                Ok(Box::new(PostgreSqlForTracing::new(url.clone(), tls_manager).await?) as Self::Connection)
+                use crate::connector::PostgreSqlWithTracingCache;
+                Ok(Box::new(PostgreSqlWithTracingCache::new(url.clone(), tls_manager).await?) as Self::Connection)
             }
 
             #[cfg(feature = "mssql-native")]
