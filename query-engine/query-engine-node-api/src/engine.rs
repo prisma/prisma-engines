@@ -353,28 +353,6 @@ impl QueryEngine {
         .await
     }
 
-    /// Fetch the spans associated with a [`RequestId`]
-    #[napi]
-    pub async fn trace(&self, request_id: String) -> napi::Result<Option<String>> {
-        async_panic_to_js_error(async {
-            let request_id = request_id
-                .parse()
-                .map_err(|_| ApiError::Decode("invalid request id".into()))?;
-
-            let exporter = self.logger.exporter();
-
-            Ok(exporter
-                .stop_capturing(request_id)
-                .await
-                .as_ref()
-                .map(serde_json::to_string)
-                .transpose()?)
-        })
-        .with_subscriber(self.logger.dispatcher())
-        .with_optional_recorder(self.logger.recorder())
-        .await
-    }
-
     /// If connected, attempts to start a transaction in the core and returns its ID.
     #[napi]
     pub async fn start_transaction(&self, input: String, trace: String, request_id: String) -> napi::Result<String> {
@@ -518,6 +496,28 @@ impl QueryEngine {
         })
         .with_subscriber(dispatcher)
         .with_optional_recorder(recorder)
+        .await
+    }
+
+    /// Fetch the spans associated with a [`RequestId`]
+    #[napi]
+    pub async fn trace(&self, request_id: String) -> napi::Result<Option<String>> {
+        async_panic_to_js_error(async {
+            let request_id = request_id
+                .parse()
+                .map_err(|_| ApiError::Decode("invalid request id".into()))?;
+
+            let exporter = self.logger.exporter();
+
+            Ok(exporter
+                .stop_capturing(request_id)
+                .await
+                .as_ref()
+                .map(serde_json::to_string)
+                .transpose()?)
+        })
+        .with_subscriber(self.logger.dispatcher())
+        .with_optional_recorder(self.logger.recorder())
         .await
     }
 }

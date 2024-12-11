@@ -1,21 +1,18 @@
 use crate::filter::FilterBuilder;
 use crate::ser_raw::SerializedResultSet;
 use crate::{
-    column_metadata, error::*, model_extensions::*, sql_trace::trace_parent_to_string, sql_trace::SqlTraceComment,
-    ColumnMetadata, Context, SqlRow, ToSqlRow,
+    column_metadata, error::*, model_extensions::*, sql_trace::SqlTraceComment, ColumnMetadata, Context, SqlRow,
+    ToSqlRow,
 };
 use async_trait::async_trait;
 use connector_interface::RecordFilter;
 use futures::future::FutureExt;
 use itertools::Itertools;
-use opentelemetry::trace::TraceContextExt;
-use opentelemetry::trace::TraceFlags;
 use quaint::{ast::*, connector::Queryable};
 use query_structure::*;
 use std::{collections::HashMap, panic::AssertUnwindSafe};
-use tracing::{info_span, Span};
+use tracing::info_span;
 use tracing_futures::Instrument;
-use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 #[async_trait]
 impl<Q: Queryable + ?Sized> QueryExt for Q {
@@ -27,17 +24,9 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
     ) -> crate::Result<Vec<SqlRow>> {
         let span = info_span!("prisma:engine:filter_read_query");
 
-        let otel_ctx = span.context();
-        let span_ref = otel_ctx.span();
-        let span_ctx = span_ref.span_context();
-
-        let q = match (q, ctx.traceparent) {
-            (Query::Select(x), _) if span_ctx.trace_flags() == TraceFlags::SAMPLED => {
-                Query::Select(Box::from(x.comment(trace_parent_to_string(span_ctx))))
-            }
-            // This is part of the required changes to pass a traceid
-            (Query::Select(x), traceparent) => Query::Select(Box::from(x.add_traceparent(traceparent))),
-            (q, _) => q,
+        let q = match q {
+            Query::Select(x) => Query::Select(Box::from(x.add_traceparent(ctx.traceparent))),
+            q => q,
         };
 
         let result_set = self.query(q).instrument(span).await?;
@@ -118,7 +107,6 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
 
         let select = Select::from_table(model.as_table(ctx))
             .columns(id_cols)
-            .append_trace(&Span::current())
             .add_traceparent(ctx.traceparent)
             .so_that(condition);
 

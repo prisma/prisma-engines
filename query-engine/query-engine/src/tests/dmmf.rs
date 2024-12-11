@@ -92,11 +92,9 @@ fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
         unix_path: None,
         subcommand: Some(Subcommand::Cli(CliOpt::Dmmf)),
         enable_open_telemetry: false,
-        open_telemetry_endpoint: String::new(),
         enable_telemetry_in_response: false,
         dataproxy_metric_override: false,
         engine_protocol: None,
-        trace_context: None,
     };
 
     let cli_cmd = CliCommand::from_opt(&prisma_opt)?.unwrap();
