@@ -121,11 +121,17 @@ trailing_comma = @{ "," }
 // ######################################
 // Comments and Documentation Comments
 // ######################################
-comment_block = ${ ((doc_comment | comment) ~ NEWLINE?)+ }
-trailing_comment = ${ doc_comment | comment }
+comment_block = ${ ((doc_comment | comment | multi_line_comment) ~ NEWLINE?)+ }
+trailing_comment = ${ doc_comment | comment | multi_line_comment }
 doc_comment = { WHITESPACE* ~ "///" ~ doc_content }
 comment = { WHITESPACE* ~ (!"///") ~ "//" ~ doc_content }
 doc_content = @{ (!NEWLINE ~ ANY)* }
+multi_line_comment = {
+    WHITESPACE*
+    ~ "/*"
+    ~ (!"*/" ~ ANY)*  // Match any characters until the closing */
+    ~ "*/"
+}
 
 // ######################################
 // shared building blocks
