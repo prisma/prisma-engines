@@ -186,7 +186,6 @@ impl JsBaseQueryable {
 
         let sql_span = info_span!(
             "prisma:engine:js:query:sql",
-            "otel.name" = "prisma:engine:db_query",
             "otel.kind" = "client",
             "db.system" = %self.db_system_name,
             "db.query.text" = %sql,
@@ -224,7 +223,6 @@ impl JsBaseQueryable {
 
         let sql_span = info_span!(
             "prisma:engine:js:query:sql",
-            "otel.name" = "prisma:engine:db_query",
             "otel.kind" = "client",
             "db.system" = %self.db_system_name,
             "db.query.text" = %sql,
