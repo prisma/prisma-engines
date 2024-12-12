@@ -59,7 +59,7 @@ impl<'a> EnvFilterBuilder<'a> {
     }
 
     pub fn build(self) -> EnvFilter {
-        let level = self.log_level.level().unwrap_or("error".into());
+        let level = self.log_level.level().unwrap_or("info".into());
 
         let mut filter = EnvFilter::from_default_env()
             .add_directive("h2=error".parse().unwrap())
