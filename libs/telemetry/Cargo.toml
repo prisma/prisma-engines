@@ -4,7 +4,7 @@ name = "telemetry"
 version = "0.1.0"
 
 [dependencies]
-ahash = { version = "0.8.11", features = ["serde"] }
+ahash = "0.8.11"
 rand.workspace = true
 serde.workspace = true
 serde_json.workspace = true

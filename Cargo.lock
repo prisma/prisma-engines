@@ -37,7 +37,6 @@ dependencies = [
  "cfg-if",
  "getrandom 0.2.11",
  "once_cell",
- "serde",
  "version_check",
  "zerocopy",
 ]
