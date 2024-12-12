@@ -71,7 +71,7 @@ where
         "prisma:engine:db_query",
         user_facing = true,
         "db.system" = DB_SYSTEM_NAME,
-        "db.statement" = %Arc::clone(&query_string),
+        "db.query.text" = %Arc::clone(&query_string),
         "db.operation.name" = builder.query_type(),
         "otel.kind" = "client"
     );

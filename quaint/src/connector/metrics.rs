@@ -19,7 +19,7 @@ where
     let span = info_span!(
         "quaint:query",
         "db.system" = db_system_name,
-        "db.statement" = %QueryForTracing(query),
+        "db.query.text" = %QueryForTracing(query),
         "otel.kind" = "client",
         "otel.name" = "prisma:engine:db_query",
         user_facing = true,
