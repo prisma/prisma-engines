@@ -955,7 +955,11 @@ mod tests {
 
         assert_ron_snapshot!(
             events,
-            { ".*" => redact_id(), ".*[].**" => redact_id() },
+            {
+                ".*" => redact_id(),
+                ".*[].**" => redact_id(),
+                ".*[].attributes" => insta::sorted_redaction()
+            },
             @r#"
         {
           RequestId(1): [
@@ -964,8 +968,8 @@ mod tests {
               name: "event",
               level: Info,
               attributes: {
-                "message": "test event",
                 "kept_attr": "kept",
+                "message": "test event",
               },
             ),
           ],
