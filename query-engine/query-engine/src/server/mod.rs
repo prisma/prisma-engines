@@ -172,7 +172,7 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
 
     tokio::select! {
         _ = query_timeout_fut => {
-            let captured_telemetry = if matches!(cx.logger.tracing_config(), TracingConfig::LogsAndTracesInResponse) {
+            let captured_telemetry = if cx.logger.tracing_config().should_capture() {
                 cx.logger.exporter().stop_capturing(request_id).await
             } else {
                 None
