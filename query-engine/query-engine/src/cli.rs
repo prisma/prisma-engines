@@ -9,6 +9,7 @@ use psl::parser_database::Files;
 use query_core::{protocol::EngineProtocol, schema};
 use request_handlers::{dmmf, RequestBody, RequestHandler};
 use std::{env, sync::Arc};
+use telemetry::RequestId;
 
 pub struct ExecuteRequest {
     query: String,
@@ -136,6 +137,7 @@ impl CliCommand {
             features,
             None,
             Logger::default().install().unwrap(),
+            RequestId::next(),
         )
         .await?;
 

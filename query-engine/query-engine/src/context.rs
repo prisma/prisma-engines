@@ -11,6 +11,8 @@ use query_core::{
 };
 use request_handlers::{load_executor, ConnectorKind};
 use std::{env, fmt, sync::Arc};
+use telemetry::exporter::{CaptureSettings, CaptureTarget};
+use telemetry::RequestId;
 use tracing::Instrument;
 
 /// Prisma request context containing all immutable state of the process.
@@ -28,6 +30,8 @@ pub struct PrismaContext {
     pub(crate) enabled_features: EnabledFeatures,
     /// Logging and tracing facility
     pub(crate) logger: Logger,
+    /// Artificial request ID used for capturing the spans during startup.
+    pub(crate) boot_request_id: RequestId,
 }
 
 impl fmt::Debug for PrismaContext {
@@ -43,6 +47,7 @@ impl PrismaContext {
         enabled_features: EnabledFeatures,
         metrics: Option<MetricRegistry>,
         logger: Logger,
+        boot_request_id: RequestId,
     ) -> PrismaResult<PrismaContext> {
         let arced_schema = Arc::new(schema);
         let arced_schema_2 = Arc::clone(&arced_schema);
@@ -93,6 +98,7 @@ impl PrismaContext {
             engine_protocol: protocol,
             enabled_features,
             logger,
+            boot_request_id,
         };
 
         Ok(context)
@@ -133,7 +139,20 @@ pub async fn setup(opts: &PrismaOpt) -> PrismaResult<Arc<PrismaContext>> {
     let protocol = opts.engine_protocol();
     config.validate_that_one_datasource_is_provided()?;
 
-    let span = tracing::info_span!("prisma:engine:connect", user_facing = true, request_id = 1u64);
+    let initial_request_id = RequestId::next();
+
+    if logger.tracing_config().should_capture() {
+        logger
+            .exporter()
+            .start_capturing(initial_request_id, CaptureSettings::new(CaptureTarget::Spans))
+            .await;
+    }
+
+    let span = tracing::info_span!(
+        "prisma:engine:connect",
+        user_facing = true,
+        request_id = initial_request_id.into_u64(),
+    );
 
     let mut features = EnabledFeatures::from(opts);
 
@@ -141,7 +160,7 @@ pub async fn setup(opts: &PrismaOpt) -> PrismaResult<Arc<PrismaContext>> {
         features |= Feature::Metrics
     }
 
-    let cx = PrismaContext::new(datamodel, protocol, features, metrics, logger)
+    let cx = PrismaContext::new(datamodel, protocol, features, metrics, logger, initial_request_id)
         .instrument(span)
         .await?;
 

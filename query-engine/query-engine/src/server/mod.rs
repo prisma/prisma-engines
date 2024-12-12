@@ -88,6 +88,12 @@ pub(crate) async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result
 
             build_json_response(StatusCode::OK, &body)
         }
+
+        (&Method::GET, "/boot_trace") => {
+            let trace = cx.logger.exporter().stop_capturing(cx.boot_request_id).await;
+            build_json_response(StatusCode::OK, &trace)
+        }
+
         _ => Response::builder()
             .status(StatusCode::NOT_FOUND)
             .body(Body::empty())
