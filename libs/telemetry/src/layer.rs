@@ -170,15 +170,15 @@ impl<'a, F> SpanAttributeVisitor<'a, F> {
     }
 }
 
-impl<F: AllowAttribute> field::Visit for SpanAttributeVisitor<'_, F> {
+impl<Filter: AllowAttribute> field::Visit for SpanAttributeVisitor<'_, Filter> {
     fn record_f64(&mut self, field: &field::Field, value: f64) {
-        if F::allow_on_span(field.name()) {
+        if Filter::allow_on_span(field.name()) {
             self.span_builder.insert_attribute(field.name(), value.into())
         }
     }
 
     fn record_i64(&mut self, field: &field::Field, value: i64) {
-        if F::allow_on_span(field.name()) {
+        if Filter::allow_on_span(field.name()) {
             self.span_builder.insert_attribute(field.name(), value.into())
         }
     }
@@ -191,7 +191,7 @@ impl<F: AllowAttribute> field::Visit for SpanAttributeVisitor<'_, F> {
                 }
             }
             _ => {
-                if F::allow_on_event(field.name()) {
+                if Filter::allow_on_event(field.name()) {
                     self.span_builder.insert_attribute(field.name(), value.into())
                 }
             }
@@ -199,7 +199,7 @@ impl<F: AllowAttribute> field::Visit for SpanAttributeVisitor<'_, F> {
     }
 
     fn record_bool(&mut self, field: &field::Field, value: bool) {
-        if F::allow_on_span(field.name()) {
+        if Filter::allow_on_span(field.name()) {
             self.span_builder.insert_attribute(field.name(), value.into())
         }
     }
@@ -209,7 +209,7 @@ impl<F: AllowAttribute> field::Visit for SpanAttributeVisitor<'_, F> {
             SPAN_NAME_FIELD => self.span_builder.set_name(value.to_owned().into()),
             SPAN_KIND_FIELD => self.span_builder.set_kind(value.parse().unwrap_or(SpanKind::Internal)),
             _ => {
-                if F::allow_on_span(field.name()) {
+                if Filter::allow_on_span(field.name()) {
                     self.span_builder.insert_attribute(field.name(), value.into())
                 }
             }
@@ -217,7 +217,7 @@ impl<F: AllowAttribute> field::Visit for SpanAttributeVisitor<'_, F> {
     }
 
     fn record_debug(&mut self, field: &field::Field, value: &dyn std::fmt::Debug) {
-        if F::allow_on_span(field.name()) {
+        if Filter::allow_on_span(field.name()) {
             self.record_str(field, &format!("{:?}", value))
         }
     }
@@ -237,27 +237,27 @@ impl<'a, F> EventAttributeVisitor<'a, F> {
     }
 }
 
-impl<F: AllowAttribute> field::Visit for EventAttributeVisitor<'_, F> {
+impl<Filter: AllowAttribute> field::Visit for EventAttributeVisitor<'_, Filter> {
     fn record_f64(&mut self, field: &field::Field, value: f64) {
-        if F::allow_on_event(field.name()) {
+        if Filter::allow_on_event(field.name()) {
             self.event_builder.insert_attribute(field.name(), value.into())
         }
     }
 
     fn record_i64(&mut self, field: &field::Field, value: i64) {
-        if F::allow_on_event(field.name()) {
+        if Filter::allow_on_event(field.name()) {
             self.event_builder.insert_attribute(field.name(), value.into())
         }
     }
 
     fn record_u64(&mut self, field: &field::Field, value: u64) {
-        if F::allow_on_event(field.name()) {
+        if Filter::allow_on_event(field.name()) {
             self.event_builder.insert_attribute(field.name(), value.into())
         }
     }
 
     fn record_bool(&mut self, field: &field::Field, value: bool) {
-        if F::allow_on_event(field.name()) {
+        if Filter::allow_on_event(field.name()) {
             self.event_builder.insert_attribute(field.name(), value.into())
         }
     }
@@ -266,7 +266,7 @@ impl<F: AllowAttribute> field::Visit for EventAttributeVisitor<'_, F> {
         match field.name() {
             EVENT_LEVEL_FIELD => self.event_builder.set_level(value.parse().unwrap_or(LogLevel::Trace)),
             _ => {
-                if F::allow_on_event(field.name()) {
+                if Filter::allow_on_event(field.name()) {
                     self.event_builder.insert_attribute(field.name(), value.into())
                 }
             }
@@ -274,7 +274,7 @@ impl<F: AllowAttribute> field::Visit for EventAttributeVisitor<'_, F> {
     }
 
     fn record_debug(&mut self, field: &field::Field, value: &dyn std::fmt::Debug) {
-        if F::allow_on_event(field.name()) {
+        if Filter::allow_on_event(field.name()) {
             self.record_str(field, &format!("{:?}", value))
         }
     }
