@@ -18,6 +18,16 @@ impl TraceParent {
     pub fn sampled(&self) -> bool {
         self.flags.sampled()
     }
+
+    /// Generates a random `TraceParent`. This is useful in some tests.
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn new_random() -> Self {
+        Self {
+            trace_id: TraceId(rand::random()),
+            span_id: SpanId(rand::random()),
+            flags: TraceFlags::SAMPLED,
+        }
+    }
 }
 
 impl FromStr for TraceParent {
@@ -93,6 +103,9 @@ pub struct TraceFlags(u8);
 parseable_from_hex!(TraceFlags, u8);
 
 impl TraceFlags {
+    #[cfg(not(target_arch = "wasm32"))]
+    const SAMPLED: Self = Self(1);
+
     pub fn sampled(&self) -> bool {
         self.0 & 1 == 1
     }

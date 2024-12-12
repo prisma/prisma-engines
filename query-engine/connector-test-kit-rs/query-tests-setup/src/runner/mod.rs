@@ -2,7 +2,7 @@ mod json_adapter;
 
 pub use json_adapter::*;
 use serde::{Deserialize, Serialize};
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 
 use crate::{
     executor_process_request, ConnectorTag, ConnectorVersion, QueryResult, TestError, TestLogCapture, TestResult,
