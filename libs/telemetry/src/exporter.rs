@@ -1,5 +1,6 @@
-use std::{borrow::Cow, collections::HashMap, fmt::Debug, str::FromStr};
+use std::{borrow::Cow, fmt::Debug, str::FromStr};
 
+use ahash::{HashMap, HashMapExt};
 use enumflags2::{bitflags, BitFlags};
 use serde::Serialize;
 use tokio::sync::{

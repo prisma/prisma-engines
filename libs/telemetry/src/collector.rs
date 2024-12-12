@@ -1,9 +1,9 @@
 use std::{
     borrow::Cow,
-    collections::HashMap,
     time::{Duration, SystemTime},
 };
 
+use ahash::{HashMap, HashMapExt};
 #[cfg(test)]
 use serde::Serialize;
 use tokio::time::Instant;
