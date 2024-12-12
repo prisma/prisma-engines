@@ -265,7 +265,7 @@ mod tests {
     #[tokio::test]
     async fn prepared_statement_lru_cache_reuses_queries_within_capacity() {
         run_with_client(|client| async move {
-            let cache = PreparedStatementLruCache::with_capacity(1);
+            let cache = PreparedStatementLruCache::with_capacity(3);
             let sql = "SELECT $1";
             let types = [Type::INT4];
 
@@ -273,10 +273,12 @@ mod tests {
             let stmt2 = cache.get_query(&client, sql, &types).await.unwrap();
             assert_eq!(stmt1.name(), stmt2.name());
 
-            // replace our cached statement with a new one going over the capacity
-            cache.get_query(&client, sql, &[Type::INT8]).await.unwrap();
+            // fill the cache with different types, causing the first query to be evicted
+            for typ in [Type::INT8, Type::INT4_ARRAY, Type::INT8_ARRAY] {
+                cache.get_query(&client, sql, &[typ]).await.unwrap();
+            }
 
-            // the old statement should be evicted from the cache
+            // the old statement should be re-created
             let stmt3 = cache.get_query(&client, sql, &types).await.unwrap();
             assert_ne!(stmt1.name(), stmt3.name());
         })
@@ -286,7 +288,7 @@ mod tests {
     #[tokio::test]
     async fn prepared_statement_lru_cache_reuses_statements_within_capacity() {
         run_with_client(|client| async move {
-            let cache = PreparedStatementLruCache::with_capacity(1);
+            let cache = PreparedStatementLruCache::with_capacity(3);
             let sql = "SELECT $1";
             let types = [Type::INT4];
 
@@ -294,10 +296,12 @@ mod tests {
             let stmt2 = cache.get_statement(&client, sql, &types).await.unwrap();
             assert_eq!(stmt1.name(), stmt2.name());
 
-            // replace our cached statement with a new one going over the capacity
-            cache.get_statement(&client, sql, &[Type::INT8]).await.unwrap();
+            // fill the cache with different types, causing the first query to be evicted
+            for typ in [Type::INT8, Type::INT4_ARRAY, Type::INT8_ARRAY] {
+                cache.get_query(&client, sql, &[typ]).await.unwrap();
+            }
 
-            // the old statement should be evicted from the cache
+            // the old statement should be re-created
             let stmt3 = cache.get_statement(&client, sql, &types).await.unwrap();
             assert_ne!(stmt1.name(), stmt3.name());
         })
@@ -307,7 +311,7 @@ mod tests {
     #[tokio::test]
     async fn tracing_lru_cache_reuses_queries_within_capacity() {
         run_with_client(|client| async move {
-            let cache = TracingLruCache::with_capacity(1);
+            let cache = TracingLruCache::with_capacity(3);
             let sql = "SELECT $1";
             let types = [Type::INT4];
 
@@ -318,10 +322,12 @@ mod tests {
                 "q1 and q2 should re-use the same metadata"
             );
 
-            // replace our cached query with a new one going over the capacity
-            cache.get_query(&client, sql, &[Type::INT8]).await.unwrap();
+            // fill the cache with different types, causing the first query to be evicted
+            for typ in [Type::INT8, Type::INT4_ARRAY, Type::INT8_ARRAY] {
+                cache.get_query(&client, sql, &[typ]).await.unwrap();
+            }
 
-            // the old query should be evicted from the cache
+            // the old query should be re-created
             let q3 = cache.get_query(&client, sql, &types).await.unwrap();
             assert!(
                 !Arc::ptr_eq(&q1.metadata, &q3.metadata),
