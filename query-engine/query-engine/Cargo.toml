@@ -32,7 +32,7 @@ tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
 prisma-metrics.path = "../../libs/metrics"
 
 user-facing-errors = { path = "../../libs/user-facing-errors" }
-telemetry = { path = "../../libs/telemetry", features = ["metrics"] }
+telemetry = { path = "../../libs/telemetry" }
 
 [dev-dependencies]
 serial_test = "*"
