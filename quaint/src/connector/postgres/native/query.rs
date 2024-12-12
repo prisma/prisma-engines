@@ -51,7 +51,7 @@ pub struct TypedQuery<'a> {
 }
 
 impl<'a> TypedQuery<'a> {
-    /// Create a new typed query from a SQL string and a statement.
+    /// Create a new typed query from an SQL string and metadata.
     pub fn from_sql_and_metadata(sql: &'a str, metadata: impl Into<Arc<QueryMetadata>>) -> Self {
         Self {
             sql,
