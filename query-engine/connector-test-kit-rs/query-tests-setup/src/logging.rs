@@ -7,6 +7,7 @@ use crate::LogEmit;
 pub fn test_tracing_subscriber(log_config: String, log_tx: LogEmit) -> impl Subscriber {
     let filter = telemetry::filter::EnvFilterBuilder::new()
         .with_log_level(&log_config)
+        .log_queries(true)
         .build();
 
     let fmt_layer = tracing_subscriber::fmt::layer()
