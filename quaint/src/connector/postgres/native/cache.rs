@@ -126,9 +126,11 @@ impl QueryCache for TracingLruCache {
             Some(metadata) => metadata,
             None => {
                 let stmt = client.prepare_typed(sql_without_traceparent, types).await?;
-                let metdata = Arc::new(QueryMetadata::from(&stmt));
-                self.cache.insert(sql_without_traceparent, types, metdata.clone()).await;
-                metdata
+                let metadata = Arc::new(QueryMetadata::from(&stmt));
+                self.cache
+                    .insert(sql_without_traceparent, types, metadata.clone())
+                    .await;
+                metadata
             }
         };
         Ok(TypedQuery::from_sql_and_metadata(sql, metadata))
