@@ -8,9 +8,9 @@ use tokio_postgres::{Client, Error, RowStream, Statement};
 /// information about its parameters and columns to interpret the results.
 #[async_trait]
 pub trait PreparedQuery: Send {
-    fn param_types(&self) -> impl ExactSizeIterator<Item = &Type> + '_;
-    fn column_names(&self) -> impl ExactSizeIterator<Item = &str> + '_;
-    fn column_types(&self) -> impl ExactSizeIterator<Item = &Type> + '_;
+    fn param_types(&self) -> impl ExactSizeIterator<Item = &Type>;
+    fn column_names(&self) -> impl ExactSizeIterator<Item = &str>;
+    fn column_types(&self) -> impl ExactSizeIterator<Item = &Type>;
 
     async fn dispatch<Args>(&self, client: &Client, args: Args) -> Result<RowStream, Error>
     where
@@ -21,15 +21,15 @@ pub trait PreparedQuery: Send {
 
 #[async_trait]
 impl PreparedQuery for Statement {
-    fn param_types(&self) -> impl ExactSizeIterator<Item = &Type> + '_ {
+    fn param_types(&self) -> impl ExactSizeIterator<Item = &Type> {
         self.params().iter()
     }
 
-    fn column_names(&self) -> impl ExactSizeIterator<Item = &str> + '_ {
+    fn column_names(&self) -> impl ExactSizeIterator<Item = &str> {
         self.columns().iter().map(|c| c.name())
     }
 
-    fn column_types(&self) -> impl ExactSizeIterator<Item = &Type> + '_ {
+    fn column_types(&self) -> impl ExactSizeIterator<Item = &Type> {
         self.columns().iter().map(|c| c.type_())
     }
 
@@ -62,15 +62,15 @@ impl<'a> TypedQuery<'a> {
 
 #[async_trait]
 impl<'a> PreparedQuery for TypedQuery<'a> {
-    fn param_types(&self) -> impl ExactSizeIterator<Item = &Type> + '_ {
+    fn param_types(&self) -> impl ExactSizeIterator<Item = &Type> {
         self.metadata.param_types.iter()
     }
 
-    fn column_names(&self) -> impl ExactSizeIterator<Item = &str> + '_ {
+    fn column_names(&self) -> impl ExactSizeIterator<Item = &str> {
         self.metadata.column_names.iter().map(|s| s.as_str())
     }
 
-    fn column_types(&self) -> impl ExactSizeIterator<Item = &Type> + '_ {
+    fn column_types(&self) -> impl ExactSizeIterator<Item = &Type> {
         self.metadata.column_types.iter()
     }
 
