@@ -17,6 +17,7 @@ use crate::{
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
+use std::borrow::Cow;
 use std::convert::TryFrom;
 use tokio::sync::Mutex;
 
@@ -183,12 +184,28 @@ impl Queryable for Sqlite {
         false
     }
 
+    /// Statement to begin a transaction
     fn begin_statement(&self) -> &'static str {
         // From https://sqlite.org/isolation.html:
         // `BEGIN IMMEDIATE` avoids possible `SQLITE_BUSY_SNAPSHOT` that arise when another connection jumps ahead in line.
         //  The BEGIN IMMEDIATE command goes ahead and starts a write transaction, and thus blocks all other writers.
         // If the BEGIN IMMEDIATE operation succeeds, then no subsequent operations in that transaction will ever fail with an SQLITE_BUSY error.
         "BEGIN IMMEDIATE"
+    }
+
+    /// Statement to create a savepoint
+    fn create_savepoint_statement(&self, depth: u32) -> Cow<'static, str> {
+        Cow::Owned(format!("SAVEPOINT savepoint{depth}"))
+    }
+
+    /// Statement to release a savepoint
+    fn release_savepoint_statement(&self, depth: u32) -> Cow<'static, str> {
+        Cow::Owned(format!("RELEASE SAVEPOINT savepoint{depth}"))
+    }
+
+    /// Statement to rollback to a savepoint
+    fn rollback_to_savepoint_statement(&self, depth: u32) -> Cow<'static, str> {
+        Cow::Owned(format!("ROLLBACK TO savepoint{depth}"))
     }
 }
 
