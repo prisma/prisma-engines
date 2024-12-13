@@ -71,10 +71,17 @@ fn from_unique_index_to_without(mut api: TestApi) {
     })
     .unwrap();
 
-    let expected_printed_messages = if api.is_mysql() {
+    let expected_printed_messages = if api.is_vitess() {
         expect![[r#"
             [
                 "-- DropIndex\nDROP INDEX `Post_authorId_key` ON `Post`;\n",
+            ]
+            "#]]
+    } else if api.is_mysql() {
+        // MySQL requires dropping the foreign key before dropping the index.
+        expect![[r#"
+            [
+                "-- DropForeignKey\nALTER TABLE `Post` DROP FOREIGN KEY `Post_authorId_fkey`;\n\n-- DropIndex\nDROP INDEX `Post_authorId_key` ON `Post`;\n\n-- AddForeignKey\nALTER TABLE `Post` ADD CONSTRAINT `Post_authorId_fkey` FOREIGN KEY (`authorId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;\n",
             ]
         "#]]
     } else if api.is_sqlite() || api.is_postgres() || api.is_cockroach() {
@@ -1138,7 +1145,7 @@ fn from_multi_file_schema_datamodel_to_url(mut api: TestApi) {
                   provider = "sqlite"
                   url = "{}"
               }}
-    
+
               model cows {{
                 id Int @id
                 meows Boolean

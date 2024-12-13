@@ -91,7 +91,7 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
         true
     }
 
-    fn should_skip_fk_indexes(&self) -> bool {
+    fn should_recreate_fks_covered_by_deleted_indexes(&self) -> bool {
         true
     }
 
