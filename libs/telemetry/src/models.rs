@@ -10,6 +10,7 @@ use serde::Serialize;
 /// aren't really levels in a traditional sense, since they don't have a
 /// hierarchy and order relation, but rather categories.
 #[derive(Serialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 #[bitflags]
 #[repr(u8)]
 pub enum LogLevel {

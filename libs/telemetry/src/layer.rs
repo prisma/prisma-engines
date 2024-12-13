@@ -723,7 +723,7 @@ mod tests {
             CollectedEvent(
               span_id: SpanId(1),
               target: "telemetry::layer::tests",
-              level: Info,
+              level: info,
               attributes: {
                 "message": "test event",
               },
@@ -767,7 +767,7 @@ mod tests {
             CollectedEvent(
               span_id: SpanId(1),
               target: "telemetry::layer::tests",
-              level: Info,
+              level: info,
               attributes: {
                 "bool_attr": true,
                 "float_attr": 3.5,
@@ -809,7 +809,7 @@ mod tests {
             CollectedEvent(
               span_id: SpanId(1),
               target: "telemetry::layer::tests",
-              level: Info,
+              level: info,
               attributes: {
                 "message": "parent event",
               },
@@ -817,7 +817,7 @@ mod tests {
             CollectedEvent(
               span_id: SpanId(2),
               target: "telemetry::layer::tests",
-              level: Info,
+              level: info,
               attributes: {
                 "message": "child event",
               },
@@ -856,7 +856,7 @@ mod tests {
             CollectedEvent(
               span_id: SpanId(1),
               target: "telemetry::layer::tests",
-              level: Error,
+              level: error,
               attributes: {
                 "message": "error event",
               },
@@ -864,7 +864,7 @@ mod tests {
             CollectedEvent(
               span_id: SpanId(1),
               target: "telemetry::layer::tests",
-              level: Warn,
+              level: warn,
               attributes: {
                 "message": "warn event",
               },
@@ -872,7 +872,7 @@ mod tests {
             CollectedEvent(
               span_id: SpanId(1),
               target: "telemetry::layer::tests",
-              level: Info,
+              level: info,
               attributes: {
                 "message": "info event",
               },
@@ -880,7 +880,7 @@ mod tests {
             CollectedEvent(
               span_id: SpanId(1),
               target: "telemetry::layer::tests",
-              level: Debug,
+              level: debug,
               attributes: {
                 "message": "debug event",
               },
@@ -888,7 +888,7 @@ mod tests {
             CollectedEvent(
               span_id: SpanId(1),
               target: "telemetry::layer::tests",
-              level: Trace,
+              level: trace,
               attributes: {
                 "message": "trace event",
               },
@@ -896,7 +896,7 @@ mod tests {
             CollectedEvent(
               span_id: SpanId(1),
               target: "telemetry::layer::tests",
-              level: Query,
+              level: query,
               attributes: {
                 "message": "query event",
               },
@@ -961,7 +961,7 @@ mod tests {
             CollectedEvent(
               span_id: SpanId(1),
               target: "telemetry::layer::tests",
-              level: Info,
+              level: info,
               attributes: {
                 "kept_attr": "kept",
                 "message": "test event",

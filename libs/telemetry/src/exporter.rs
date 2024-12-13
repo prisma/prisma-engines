@@ -366,7 +366,7 @@ mod tests {
             ExportedEvent(
               spanId: SpanId("1"),
               target: "test_event",
-              level: Info,
+              level: info,
               timestamp: HrTime(0, 0),
               attributes: {},
             ),
