@@ -4,9 +4,9 @@ use std::{
 };
 
 use async_trait::async_trait;
-use futures::lock::Mutex;
 use lru_cache::LruCache;
 use postgres_types::Type;
+use tokio::sync::Mutex;
 use tokio_postgres::{Client, Error, Statement};
 
 use crate::connector::metrics::strip_query_traceparent;
