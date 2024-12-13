@@ -126,7 +126,7 @@ where
 
         let mut event_builder = EventBuilder::new(
             parent.into(),
-            event.metadata().name(),
+            event.metadata().target(),
             event.metadata().level().into(),
             event.metadata().fields().len(),
         );
@@ -709,7 +709,7 @@ mod tests {
 
         tracing::subscriber::with_default(subscriber, || {
             let _guard = info_span!("test_span", request_id = RequestId::next().into_u64()).entered();
-            tracing::info!(name: "event", "test event");
+            tracing::info!("test event");
         });
 
         let events = collector.events();
@@ -722,7 +722,7 @@ mod tests {
           RequestId(1): [
             CollectedEvent(
               span_id: SpanId(1),
-              name: "event",
+              target: "telemetry::layer::tests",
               level: Info,
               attributes: {
                 "message": "test event",
@@ -766,7 +766,7 @@ mod tests {
           RequestId(1): [
             CollectedEvent(
               span_id: SpanId(1),
-              name: "event",
+              target: "telemetry::layer::tests",
               level: Info,
               attributes: {
                 "bool_attr": true,
@@ -789,12 +789,12 @@ mod tests {
 
         tracing::subscriber::with_default(subscriber, || {
             let _parent_guard = info_span!("parent_span", request_id = RequestId::next().into_u64()).entered();
-            tracing::info!(name: "event1", "parent event");
+            tracing::info!("parent event");
 
             {
                 let child = info_span!("child_span");
                 let _child_guard = child.enter();
-                tracing::info!(name: "event2", "child event");
+                tracing::info!("child event");
             }
         });
 
@@ -808,7 +808,7 @@ mod tests {
           RequestId(1): [
             CollectedEvent(
               span_id: SpanId(1),
-              name: "event1",
+              target: "telemetry::layer::tests",
               level: Info,
               attributes: {
                 "message": "parent event",
@@ -816,7 +816,7 @@ mod tests {
             ),
             CollectedEvent(
               span_id: SpanId(2),
-              name: "event2",
+              target: "telemetry::layer::tests",
               level: Info,
               attributes: {
                 "message": "child event",
@@ -836,13 +836,13 @@ mod tests {
         tracing::subscriber::with_default(subscriber, || {
             let _guard = info_span!("test_span", request_id = RequestId::next().into_u64()).entered();
 
-            tracing::error!(name: "event1", "error event");
-            tracing::warn!(name: "event2", "warn event");
-            tracing::info!(name: "event3", "info event");
-            tracing::debug!(name: "event4", "debug event");
-            tracing::trace!(name: "event5", "trace event");
+            tracing::error!("error event");
+            tracing::warn!("warn event");
+            tracing::info!("info event");
+            tracing::debug!("debug event");
+            tracing::trace!("trace event");
 
-            tracing::info!(name: "event6", item_type = "query", "query event");
+            tracing::info!(item_type = "query", "query event");
         });
 
         let events = collector.events();
@@ -855,7 +855,7 @@ mod tests {
           RequestId(1): [
             CollectedEvent(
               span_id: SpanId(1),
-              name: "event1",
+              target: "telemetry::layer::tests",
               level: Error,
               attributes: {
                 "message": "error event",
@@ -863,7 +863,7 @@ mod tests {
             ),
             CollectedEvent(
               span_id: SpanId(1),
-              name: "event2",
+              target: "telemetry::layer::tests",
               level: Warn,
               attributes: {
                 "message": "warn event",
@@ -871,7 +871,7 @@ mod tests {
             ),
             CollectedEvent(
               span_id: SpanId(1),
-              name: "event3",
+              target: "telemetry::layer::tests",
               level: Info,
               attributes: {
                 "message": "info event",
@@ -879,7 +879,7 @@ mod tests {
             ),
             CollectedEvent(
               span_id: SpanId(1),
-              name: "event4",
+              target: "telemetry::layer::tests",
               level: Debug,
               attributes: {
                 "message": "debug event",
@@ -887,7 +887,7 @@ mod tests {
             ),
             CollectedEvent(
               span_id: SpanId(1),
-              name: "event5",
+              target: "telemetry::layer::tests",
               level: Trace,
               attributes: {
                 "message": "trace event",
@@ -895,7 +895,7 @@ mod tests {
             ),
             CollectedEvent(
               span_id: SpanId(1),
-              name: "event6",
+              target: "telemetry::layer::tests",
               level: Query,
               attributes: {
                 "message": "query event",
@@ -921,12 +921,7 @@ mod tests {
             )
             .entered();
 
-            tracing::info!(
-                name: "event",
-                test_ignored_event_attr = "ignored",
-                kept_attr = "kept",
-                "test event"
-            );
+            tracing::info!(test_ignored_event_attr = "ignored", kept_attr = "kept", "test event");
         });
 
         let spans = collector.spans();
@@ -965,7 +960,7 @@ mod tests {
           RequestId(1): [
             CollectedEvent(
               span_id: SpanId(1),
-              name: "event",
+              target: "telemetry::layer::tests",
               level: Info,
               attributes: {
                 "kept_attr": "kept",

@@ -47,7 +47,7 @@ impl From<CollectedSpan> for ExportedSpan {
 #[serde(rename_all = "camelCase")]
 pub struct ExportedEvent {
     span_id: SpanId,
-    name: &'static str,
+    target: &'static str,
     level: LogLevel,
     timestamp: HrTime,
     attributes: HashMap<&'static str, serde_json::Value>,
@@ -57,7 +57,7 @@ impl From<CollectedEvent> for ExportedEvent {
     fn from(event: CollectedEvent) -> Self {
         Self {
             span_id: event.span_id,
-            name: event.name,
+            target: event.target,
             level: event.level,
             timestamp: event.timestamp.into(),
             attributes: event.attributes,
@@ -339,7 +339,7 @@ mod tests {
 
         let event = CollectedEvent {
             span_id: span.id,
-            name: "test_event",
+            target: "test_event",
             level: LogLevel::Info,
             timestamp: SystemTime::UNIX_EPOCH,
             attributes: HashMap::new(),
@@ -365,7 +365,7 @@ mod tests {
           events: [
             ExportedEvent(
               spanId: SpanId("1"),
-              name: "test_event",
+              target: "test_event",
               level: Info,
               timestamp: HrTime(0, 0),
               attributes: {},
@@ -393,7 +393,7 @@ mod tests {
 
         let event = CollectedEvent {
             span_id: span.id,
-            name: "test_event",
+            target: "test_event",
             level: LogLevel::Info,
             timestamp: SystemTime::UNIX_EPOCH,
             attributes: HashMap::new(),
@@ -410,7 +410,7 @@ mod tests {
             ExportedSpan(
               id: SpanId("1"),
               parentId: None,
-              name: "test_span",
+              target: "test_span",
               startTime: HrTime(0, 0),
               endTime: HrTime(1, 0),
               kind: internal,

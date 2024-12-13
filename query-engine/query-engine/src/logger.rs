@@ -76,11 +76,12 @@ impl Logger {
 
         match self.tracing_config {
             TracingConfig::LogsAndTracesInResponse => {
-                let subscriber = subscriber.with(telemetry::layer(self.exporter.clone()).with_filter(
-                    filter::user_facing_spans().or(
-                        filter::events().and(filter::EnvFilterBuilder::new().log_queries(self.log_queries).build()),
+                let subscriber = subscriber.with(
+                    telemetry::layer(self.exporter.clone()).with_filter(
+                        filter::user_facing_spans()
+                            .or(filter::events().and(filter::EnvFilterBuilder::new().log_queries(true).build())),
                     ),
-                ));
+                );
                 subscriber::set_global_default(subscriber)?;
             }
             TracingConfig::StdoutLogsAndTracesInResponse => {

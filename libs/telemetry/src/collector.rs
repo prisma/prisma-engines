@@ -95,7 +95,7 @@ impl SpanBuilder {
 #[cfg_attr(test, derive(Serialize))]
 pub struct CollectedEvent {
     pub(crate) span_id: SpanId,
-    pub(crate) name: &'static str,
+    pub(crate) target: &'static str,
     pub(crate) level: LogLevel,
     #[cfg_attr(test, serde(skip_serializing))]
     pub(crate) timestamp: SystemTime,
@@ -104,17 +104,17 @@ pub struct CollectedEvent {
 
 pub(crate) struct EventBuilder {
     span_id: SpanId,
-    name: &'static str,
+    target: &'static str,
     level: LogLevel,
     timestamp: SystemTime,
     attributes: HashMap<&'static str, serde_json::Value>,
 }
 
 impl EventBuilder {
-    pub fn new(span_id: SpanId, name: &'static str, level: LogLevel, attrs_size_hint: usize) -> Self {
+    pub fn new(span_id: SpanId, target: &'static str, level: LogLevel, attrs_size_hint: usize) -> Self {
         Self {
             span_id,
-            name,
+            target,
             level,
             timestamp: SystemTime::now(),
             attributes: HashMap::with_capacity(attrs_size_hint),
@@ -132,7 +132,7 @@ impl EventBuilder {
     pub fn build(self) -> CollectedEvent {
         CollectedEvent {
             span_id: self.span_id,
-            name: self.name,
+            target: self.target,
             level: self.level,
             timestamp: self.timestamp,
             attributes: self.attributes,
