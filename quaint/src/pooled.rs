@@ -356,10 +356,12 @@ impl Builder {
 
 impl Quaint {
     /// Creates a new builder for a Quaint connection pool with the given
-    /// connection string. See the [module level documentation] for details.
-    ///
-    /// [module level documentation]: index.html
-    pub fn builder(url_str: &str) -> crate::Result<Builder> {
+    /// connection string and a tracing flag.
+    /// See the [module level documentation] for details.
+    pub fn builder_with_tracing(
+        url_str: &str,
+        #[allow(unused_variables)] is_tracing_enabled: bool,
+    ) -> crate::Result<Builder> {
         match url_str {
             #[cfg(feature = "sqlite")]
             s if s.starts_with("file") => {
@@ -424,7 +426,11 @@ impl Quaint {
                 let max_idle_connection_lifetime = url.max_idle_connection_lifetime();
 
                 let tls_manager = crate::connector::MakeTlsConnectorManager::new(url.clone());
-                let manager = QuaintManager::Postgres { url, tls_manager };
+                let manager = QuaintManager::Postgres {
+                    url,
+                    tls_manager,
+                    is_tracing_enabled,
+                };
                 let mut builder = Builder::new(s, manager)?;
 
                 if let Some(limit) = connection_limit {
@@ -476,6 +482,14 @@ impl Quaint {
             }
             _ => unimplemented!("Supported url schemes: file or sqlite, mysql, postgres or postgresql."),
         }
+    }
+
+    /// Creates a new builder for a Quaint connection pool with the given
+    /// connection string. See the [module level documentation] for details.
+    ///
+    /// [module level documentation]: index.html
+    pub fn builder(url_str: &str) -> crate::Result<Builder> {
+        Self::builder_with_tracing(url_str, false)
     }
 
     /// The number of connections in the pool.
