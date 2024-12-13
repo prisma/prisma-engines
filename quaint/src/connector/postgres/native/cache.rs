@@ -198,7 +198,7 @@ impl<V> InnerLruCache<V> {
         match cache.get_mut(&key) {
             Some(value) => {
                 tracing::trace!(
-                    message = "CACHE HIT!",
+                    message = "query cache hit",
                     query = sql,
                     capacity = capacity,
                     stored = stored,
@@ -207,7 +207,7 @@ impl<V> InnerLruCache<V> {
             }
             None => {
                 tracing::trace!(
-                    message = "CACHE MISS!",
+                    message = "query cache miss",
                     query = sql,
                     capacity = capacity,
                     stored = stored,
