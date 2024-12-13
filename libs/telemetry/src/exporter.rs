@@ -410,7 +410,7 @@ mod tests {
             ExportedSpan(
               id: SpanId("1"),
               parentId: None,
-              target: "test_span",
+              name: "test_span",
               startTime: HrTime(0, 0),
               endTime: HrTime(1, 0),
               kind: internal,
