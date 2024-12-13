@@ -1,5 +1,5 @@
 use std::{
-    hash::{BuildHasher, Hash, RandomState},
+    hash::{BuildHasher, Hash, Hasher, RandomState},
     sync::Arc,
 };
 
@@ -155,32 +155,24 @@ pub struct CacheSettings {
 
 /// Key uniquely representing an SQL statement in the prepared statements cache.
 #[derive(Debug, PartialEq, Eq, Hash)]
-struct QueryKey {
-    /// Hash of a string with SQL query.
-    sql: u64,
-    /// Combined hash of types for all parameters from the query.
-    types_hash: u64,
-}
+struct QueryKey(u64);
 
 impl QueryKey {
     fn new<S: BuildHasher>(st: &S, sql: &str, params: &[Type]) -> Self {
-        Self {
-            sql: st.hash_one(sql),
-            types_hash: st.hash_one(params),
-        }
+        Self(st.hash_one((sql, params)))
     }
 }
 
 #[derive(Debug)]
 struct InnerLruCache<V> {
-    cache: Mutex<LruCache<QueryKey, V>>,
+    cache: Mutex<LruCache<QueryKey, V, NoOpHasherBuilder>>,
     state: RandomState,
 }
 
 impl<V> InnerLruCache<V> {
     fn with_capacity(capacity: usize) -> Self {
         Self {
-            cache: Mutex::new(LruCache::new(capacity)),
+            cache: Mutex::new(LruCache::with_hasher(capacity, NoOpHasherBuilder)),
             state: RandomState::new(),
         }
     }
@@ -220,6 +212,34 @@ impl<V> InnerLruCache<V> {
     pub async fn insert(&self, sql: &str, types: &[Type], value: V) {
         let key = QueryKey::new(&self.state, sql, types);
         self.cache.lock().await.insert(key, value);
+    }
+}
+
+struct NoOpHasherBuilder;
+
+impl BuildHasher for NoOpHasherBuilder {
+    type Hasher = NoOpHasher;
+
+    fn build_hasher(&self) -> Self::Hasher {
+        NoOpHasher(None)
+    }
+}
+
+/// A hasher that expects to be called with a single u64 and returns it as the hash.
+struct NoOpHasher(Option<u64>);
+
+impl Hasher for NoOpHasher {
+    fn finish(&self) -> u64 {
+        self.0.expect("NoopHasher should have been called with a single u64")
+    }
+
+    fn write(&mut self, _bytes: &[u8]) {
+        panic!("NoopHasher should only be called with u64")
+    }
+
+    fn write_u64(&mut self, i: u64) {
+        assert!(self.0.is_none(), "NoopHasher should only be called once");
+        self.0 = Some(i);
     }
 }
 
@@ -373,6 +393,18 @@ mod tests {
             assert_ne!(q1.name(), q2.name());
         })
         .await;
+    }
+
+    #[test]
+    fn noop_hasher_returns_the_same_hash_the_input() {
+        assert_eq!(NoOpHasherBuilder.hash_one(0xdeadc0deu64), 0xdeadc0de);
+        assert_eq!(NoOpHasherBuilder.hash_one(0xcafeu64), 0xcafe);
+    }
+
+    #[test]
+    #[should_panic(expected = "NoopHasher should only be called with u64")]
+    fn noop_hasher_doesnt_accept_non_u64_input() {
+        NoOpHasherBuilder.hash_one("hello");
     }
 
     async fn run_with_client<Func, Fut>(test: Func)
