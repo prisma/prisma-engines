@@ -14,6 +14,7 @@ import * as prismaPg from "@prisma/adapter-pg";
 import { bindAdapter, DriverAdapter } from "@prisma/driver-adapter-utils";
 
 import { recording } from "./recording";
+import { nextRequestId } from "./requestId";
 import prismaQueries from "../bench/queries.json";
 
 import { run, bench, group, baseline } from "mitata";
@@ -70,19 +71,19 @@ async function recordQueries(
   // Different engines might have made different SQL queries to complete the same Prisma Query,
   // so we record the results of all engines for the benchmarking phase.
   const napi = await initQeNapiCurrent(adapter, datamodel);
-  await napi.connect("");
+  await napi.connect("", nextRequestId());
   const wasmCurrent = await initQeWasmCurrent(adapter, datamodel);
-  await wasmCurrent.connect("");
+  await wasmCurrent.connect("", nextRequestId());
   const wasmBaseline = await initQeWasmBaseLine(adapter, datamodel);
-  await wasmBaseline.connect("");
+  await wasmBaseline.connect("", nextRequestId());
   const wasmLatest = await initQeWasmLatest(adapter, datamodel);
-  await wasmLatest.connect("");
+  await wasmLatest.connect("", nextRequestId());
 
   try {
     for (const qe of [napi, wasmCurrent, wasmBaseline, wasmLatest]) {
       for (const prismaQuery of prismaQueries) {
         const { description, query } = prismaQuery;
-        const res = await qe.query(JSON.stringify(query), "", undefined);
+        const res = await qe.query(JSON.stringify(query), "", undefined, nextRequestId());
         console.log(res[9]);
 
         const errors = JSON.parse(res).errors;
@@ -94,10 +95,10 @@ async function recordQueries(
       }
     }
   } finally {
-    await napi.disconnect("");
-    await wasmCurrent.disconnect("");
-    await wasmBaseline.disconnect("");
-    await wasmLatest.disconnect("");
+    await napi.disconnect("", nextRequestId());
+    await wasmCurrent.disconnect("", nextRequestId());
+    await wasmBaseline.disconnect("", nextRequestId());
+    await wasmLatest.disconnect("", nextRequestId());
   }
 }
 
@@ -107,13 +108,13 @@ async function benchMarkQueries(
   prismaQueries: any
 ) {
   const napi = await initQeNapiCurrent(adapter, datamodel);
-  await napi.connect("");
+  await napi.connect("", nextRequestId());
   const wasmCurrent = await initQeWasmCurrent(adapter, datamodel);
-  await wasmCurrent.connect("");
+  await wasmCurrent.connect("", nextRequestId());
   const wasmBaseline = await initQeWasmBaseLine(adapter, datamodel);
-  await wasmBaseline.connect("");
+  await wasmBaseline.connect("", nextRequestId());
   const wasmLatest = await initQeWasmLatest(adapter, datamodel);
-  await wasmLatest.connect("");
+  await wasmLatest.connect("", nextRequestId());
 
   for (const prismaQuery of prismaQueries) {
     const { description, query } = prismaQuery;
@@ -126,7 +127,7 @@ async function benchMarkQueries(
     };
 
     for (const [engineName, engine] of Object.entries(engines)) {
-      const res = await engine.query(JSON.stringify(query), "", undefined);
+      const res = await engine.query(JSON.stringify(query), "", undefined, nextRequestId());
       const errors = JSON.parse(res).errors;
       if (errors != null && errors.length > 0) {
         throw new Error(
@@ -149,20 +150,20 @@ async function benchMarkQueries(
         bench(
           "Web Assembly: Baseline",
           async () =>
-            await wasmBaseline.query(jsonQuery, irrelevantTraceId, noTx)
+            await wasmBaseline.query(jsonQuery, irrelevantTraceId, noTx, nextRequestId())
         );
         bench(
           "Web Assembly: Latest",
-          async () => await wasmLatest.query(jsonQuery, irrelevantTraceId, noTx)
+          async () => await wasmLatest.query(jsonQuery, irrelevantTraceId, noTx, nextRequestId())
         );
         baseline(
           "Web Assembly: Current",
           async () =>
-            await wasmCurrent.query(jsonQuery, irrelevantTraceId, noTx)
+            await wasmCurrent.query(jsonQuery, irrelevantTraceId, noTx, nextRequestId())
         );
         bench(
           "Node API: Current",
-          async () => await napi.query(jsonQuery, irrelevantTraceId, noTx)
+          async () => await napi.query(jsonQuery, irrelevantTraceId, noTx, nextRequestId())
         );
       });
     }
@@ -172,10 +173,10 @@ async function benchMarkQueries(
       collect: true,
     });
   } finally {
-    await napi.disconnect("");
-    await wasmCurrent.disconnect("");
-    await wasmBaseline.disconnect("");
-    await wasmLatest.disconnect("");
+    await napi.disconnect("", nextRequestId());
+    await wasmCurrent.disconnect("", nextRequestId());
+    await wasmBaseline.disconnect("", nextRequestId());
+    await wasmLatest.disconnect("", nextRequestId());
   }
 }
 

@@ -5,12 +5,12 @@ import * as path from "node:path";
 import { __dirname } from './utils'
 
 export interface QueryEngine {
-  connect(trace: string): Promise<void>;
-  disconnect(trace: string): Promise<void>;
-  query(body: string, trace: string, tx_id?: string | null): Promise<string>;
-  startTransaction(input: string, trace: string): Promise<string>;
-  commitTransaction(tx_id: string, trace: string): Promise<string>;
-  rollbackTransaction(tx_id: string, trace: string): Promise<string>;
+  connect(trace: string, requestId: string): Promise<void>;
+  disconnect(trace: string, requestId: string): Promise<void>;
+  query(body: string, trace: string, tx_id: string | undefined, requestId: string): Promise<string>;
+  startTransaction(input: string, trace: string, requestId: string): Promise<string>;
+  commitTransaction(tx_id: string, trace: string, requestId: string): Promise<string>;
+  rollbackTransaction(tx_id: string, trace: string, requestId: string): Promise<string>;
 }
 
 export type QueryLogCallback = (log: string) => void;
