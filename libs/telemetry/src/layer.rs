@@ -59,6 +59,7 @@ where
         }
     }
 
+    #[track_caller]
     fn require_span<'a>(id: &Id, ctx: &'a Context<'_, S>) -> SpanRef<'a, S> {
         ctx.span(id).expect("span must exist in the registry, this is a bug")
     }
@@ -106,26 +107,21 @@ where
     }
 
     fn on_event(&self, event: &tracing::Event<'_>, ctx: Context<'_, S>) {
-        let Some(parent) = event.parent().cloned().or_else(|| {
-            event
-                .is_contextual()
-                .then(|| ctx.current_span().id().cloned())
-                .flatten()
-        }) else {
+        let Some(parent) = event
+            .parent()
+            .and_then(|id| ctx.span(id))
+            .or_else(|| event.is_contextual().then(|| ctx.lookup_current()).flatten())
+        else {
             // Events without a parent span are not collected.
             return;
         };
 
-        let Some(request_id) = Self::require_span(&parent, &ctx)
-            .extensions()
-            .get::<SpanBuilder>()
-            .and_then(|sb| sb.request_id())
-        else {
+        let Some(request_id) = parent.extensions().get::<SpanBuilder>().and_then(|sb| sb.request_id()) else {
             return;
         };
 
         let mut event_builder = EventBuilder::new(
-            parent.into(),
+            parent.id().into(),
             event.metadata().target(),
             event.metadata().level().into(),
             event.metadata().fields().len(),
