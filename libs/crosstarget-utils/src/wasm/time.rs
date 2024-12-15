@@ -1,9 +1,11 @@
 // `clippy::empty_docs` is required because of the `wasm-bindgen` crate.
 #![allow(clippy::empty_docs)]
 
-use js_sys::{Date, Function, Promise, Reflect};
 use std::future::Future;
 use std::time::Duration;
+
+use derive_more::Display;
+use js_sys::{Date, Function, Promise, Reflect};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 
@@ -35,6 +37,45 @@ impl ElapsedTimeCounter {
         Duration::from_millis((self.start_time - now()) as u64)
     }
 }
+
+#[derive(Copy, Clone, Debug)]
+pub struct SystemTime(Duration);
+
+impl SystemTime {
+    pub const UNIX_EPOCH: Self = Self(Duration::ZERO);
+
+    pub fn now() -> Self {
+        let ms = Date::now() as i64;
+        let ms = ms.try_into().expect("negative timestamps are not supported");
+        Self(Duration::from_millis(ms))
+    }
+
+    pub fn duration_since(&self, other: Self) -> Result<Duration, SystemTimeError> {
+        self.0
+            .checked_sub(other.0)
+            .ok_or_else(|| SystemTimeError(other.0 - self.0))
+    }
+}
+
+impl std::ops::Add<Duration> for SystemTime {
+    type Output = Self;
+
+    fn add(self, rhs: Duration) -> SystemTime {
+        Self(self.0 + rhs)
+    }
+}
+
+#[derive(Clone, Debug, Display)]
+#[display(fmt = "second time provided was later than self")]
+pub struct SystemTimeError(Duration);
+
+impl SystemTimeError {
+    pub fn duration(&self) -> Duration {
+        self.0
+    }
+}
+
+impl std::error::Error for SystemTimeError {}
 
 pub async fn sleep(duration: Duration) {
     let _ = JsFuture::from(Promise::new(&mut |resolve, _reject| {

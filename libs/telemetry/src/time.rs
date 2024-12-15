@@ -1,4 +1,5 @@
-use std::time::{Duration, SystemTime};
+use crosstarget_utils::time::SystemTime;
+use std::time::Duration;
 
 use serde::Serialize;
 

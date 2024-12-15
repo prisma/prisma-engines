@@ -1,12 +1,9 @@
-use std::{
-    borrow::Cow,
-    time::{Duration, SystemTime},
-};
+use std::{borrow::Cow, time::Duration};
 
 use ahash::{HashMap, HashMapExt};
+use crosstarget_utils::time::{ElapsedTimeCounter, SystemTime};
 #[cfg(test)]
 use serde::Serialize;
-use tokio::time::Instant;
 
 use crate::id::{RequestId, SpanId};
 use crate::models::{LogLevel, SpanKind};
@@ -30,10 +27,10 @@ pub(crate) struct SpanBuilder {
     request_id: Option<RequestId>,
     id: SpanId,
     name: Cow<'static, str>,
-    // we store both the wall clock time and a monotonically increasing instant to
+    // we store both the wall clock time and a monotonically increasing counter to
     // be resilient against clock changes between the start and end of the span
     start_time: SystemTime,
-    start_instant: Instant,
+    elapsed: ElapsedTimeCounter,
     attributes: HashMap<&'static str, serde_json::Value>,
     kind: Option<SpanKind>,
     links: Vec<SpanId>,
@@ -46,7 +43,7 @@ impl SpanBuilder {
             id: id.into(),
             name: name.into(),
             start_time: SystemTime::now(),
-            start_instant: Instant::now(),
+            elapsed: ElapsedTimeCounter::start(),
             attributes: HashMap::with_capacity(attrs_size_hint),
             kind: None,
             links: Vec::new(),
@@ -83,7 +80,7 @@ impl SpanBuilder {
             parent_id: parent_id.map(Into::into),
             name: self.name,
             start_time: self.start_time,
-            duration: self.start_instant.elapsed(),
+            duration: self.elapsed.elapsed_time(),
             attributes: self.attributes,
             kind: self.kind.unwrap_or(SpanKind::Internal),
             links: self.links,
