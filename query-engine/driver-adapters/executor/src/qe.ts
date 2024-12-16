@@ -51,6 +51,7 @@ export function queryEngineOptions(datamodel: string) {
     logQueries: true,
     env: process.env,
     ignoreEnvVarErrors: false,
+    enableTracing: true,
   };
 }
 

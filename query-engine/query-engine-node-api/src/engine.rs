@@ -71,6 +71,7 @@ impl QueryEngine {
             datamodel,
             log_level,
             log_queries,
+            enable_tracing,
             native,
         } = napi_env.from_js_value(options).expect(
             r###"
@@ -140,12 +141,12 @@ impl QueryEngine {
             .map_err(|errors| ApiError::conversion(errors, schema.db.source_assert_single()))?;
 
         let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
-        let enable_tracing = config.preview_features().contains(PreviewFeature::Tracing);
         let engine_protocol = engine_protocol.unwrap_or(EngineProtocol::Json);
 
         let builder = EngineBuilder {
             schema: Arc::new(schema),
             engine_protocol,
+            enable_tracing,
             native: EngineBuilderNative { config_dir, env },
         };
 
@@ -212,7 +213,7 @@ impl QueryEngine {
                             _phantom: PhantomData,
                         },
                     };
-                    let executor = load_executor(connector_kind, preview_features).await?;
+                    let executor = load_executor(connector_kind, preview_features, builder.enable_tracing).await?;
                     let connector = executor.primary_connector();
 
                     let conn_span = tracing::info_span!(
@@ -247,6 +248,7 @@ impl QueryEngine {
                     query_schema: Arc::new(query_schema),
                     executor,
                     engine_protocol: builder.engine_protocol,
+                    tracing_enabled: builder.enable_tracing,
                     native: ConnectedEngineNative {
                         config_dir: builder.native.config_dir.clone(),
                         env: builder.native.env.clone(),
@@ -292,6 +294,7 @@ impl QueryEngine {
                 let builder = EngineBuilder {
                     schema: engine.schema.clone(),
                     engine_protocol: engine.engine_protocol(),
+                    enable_tracing: engine.tracing_enabled(),
                     native: EngineBuilderNative {
                         config_dir: engine.native.config_dir.clone(),
                         env: engine.native.env.clone(),

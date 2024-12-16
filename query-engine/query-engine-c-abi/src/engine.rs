@@ -72,6 +72,7 @@ pub struct ConstructorOptions {
     base_path: *const c_char,
     log_level: *const c_char,
     log_queries: bool,
+    enable_tracing: bool,
     datasource_overrides: *const c_char,
     env: *const c_char,
     ignore_env_var_errors: bool,
@@ -175,6 +176,7 @@ impl QueryEngine {
         let builder = EngineBuilder {
             schema: Arc::new(schema),
             engine_protocol,
+            enable_tracing: constructor_options.enable_tracing,
             native: EngineBuilderNative { config_dir, env },
         };
 
@@ -184,7 +186,7 @@ impl QueryEngine {
             constructor_options.log_queries,
             log_level,
             Box::new(log_callback),
-            false,
+            constructor_options.enable_tracing,
         );
 
         Ok(Self {
@@ -238,7 +240,7 @@ impl QueryEngine {
                     datasource: data_source,
                 };
 
-                let executor = load_executor(connector_kind, preview_features).await?;
+                let executor = load_executor(connector_kind, preview_features, builder.enable_tracing).await?;
                 let connector = executor.primary_connector();
 
                 let conn_span = tracing::info_span!(
@@ -267,6 +269,7 @@ impl QueryEngine {
                 query_schema: Arc::new(query_schema.unwrap()),
                 executor: executor?,
                 engine_protocol: builder.engine_protocol,
+                tracing_enabled: builder.enable_tracing,
                 native: ConnectedEngineNative {
                     config_dir: builder.native.config_dir.clone(),
                     env: builder.native.env.clone(),
@@ -346,6 +349,7 @@ impl QueryEngine {
                 let builder = EngineBuilder {
                     schema: engine.schema.clone(),
                     engine_protocol: engine.engine_protocol(),
+                    enable_tracing: engine.tracing_enabled(),
                     native: EngineBuilderNative {
                         config_dir: engine.native.config_dir.clone(),
                         env: engine.native.env.clone(),

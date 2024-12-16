@@ -390,11 +390,15 @@ impl Quaint {
             }
             #[cfg(feature = "mysql")]
             s if s.starts_with("mysql") => {
-                let url = crate::connector::MysqlUrl::new(url::Url::parse(s)?)?;
+                let mut url = crate::connector::MysqlUrl::new(url::Url::parse(s)?)?;
                 let connection_limit = url.connection_limit();
                 let pool_timeout = url.pool_timeout();
                 let max_connection_lifetime = url.max_connection_lifetime();
                 let max_idle_connection_lifetime = url.max_idle_connection_lifetime();
+
+                if is_tracing_enabled {
+                    url.query_params.statement_cache_size = 0;
+                }
 
                 let manager = QuaintManager::Mysql { url };
                 let mut builder = Builder::new(s, manager)?;
