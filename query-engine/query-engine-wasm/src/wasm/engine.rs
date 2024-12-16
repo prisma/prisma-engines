@@ -332,6 +332,7 @@ impl QueryEngine {
         Err(ApiError::configuration("Metrics is not enabled in Wasm.").into())
     }
 
+    /// Fetch the spans associated with a [`RequestId`]
     #[wasm_bindgen]
     pub async fn trace(&self, request_id: String) -> Result<Option<String>, wasm_bindgen::JsError> {
         let dispatcher = self.logger.dispatcher();

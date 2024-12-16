@@ -512,6 +512,7 @@ impl QueryEngine {
         .await
     }
 
+    /// Fetch the spans associated with a [`RequestId`]
     pub async fn trace(&self, request_id: *const c_char) -> Result<Option<String>> {
         let request_id = get_cstr_safe(request_id).expect("request id must not be null");
 
