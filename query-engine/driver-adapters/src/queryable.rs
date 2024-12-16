@@ -179,7 +179,7 @@ impl JsBaseQueryable {
         let serialization_span = info_span!(
             "prisma:engine:js:query:args",
             "otel.kind" = "client",
-            "db.query.params.count" = params.len(),
+            "prisma.query.params.count" = params.len(),
             user_facing = true,
         );
         let query = self.build_query(sql, params).instrument(serialization_span).await?;
