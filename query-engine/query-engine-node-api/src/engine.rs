@@ -338,7 +338,7 @@ impl QueryEngine {
 
             async move {
                 let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
-                let mut response = handler.handle(query, tx_id.map(TxId::from), trace_parent).await;
+                let response = handler.handle(query, tx_id.map(TxId::from), trace_parent).await;
 
                 let serde_span = tracing::info_span!("prisma:engine:response_json_serialization", user_facing = true);
                 Ok(serde_span.in_scope(|| serde_json::to_string(&response))?)
