@@ -1,6 +1,7 @@
 pub mod collector;
 pub mod exporter;
 pub mod filter;
+pub mod formatting;
 pub mod id;
 pub mod layer;
 pub mod models;
