@@ -7,7 +7,7 @@ pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {
             Ok(double) => JSArg::from(JsonValue::from(double)),
             Err(_) => JSArg::from(JsonValue::from(value.clone())),
         },
-        quaint::ValueType::Json(Some(s)) => JSArg::Value(s.to_owned()),
+        quaint::ValueType::Json(Some(s)) => JSArg::Value(JsonValue::String(serde_json::to_string(s)?)),
         quaint::ValueType::Bytes(Some(bytes)) => JSArg::Buffer(bytes.to_vec()),
         quaint::ValueType::Int32(Some(value)) => JSArg::SafeInt(*value),
         quaint::ValueType::Array(Some(ref items)) => JSArg::Array(
