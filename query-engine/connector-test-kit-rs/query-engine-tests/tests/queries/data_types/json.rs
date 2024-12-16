@@ -75,7 +75,7 @@ mod json {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findManyTestModel":[{"json":{"$type":"Json","value":"{}"}},{"json":{"$type":"Json","value":"{\"a\":\"b\"}"}},{"json":{"$type":"Json","value":"1"}},{"json":{"$type":"Json","value":"\"hello\""}},{"json":{"$type":"Json","value":"[1,\"a\",{\"b\":true}]"}}]}}"###
+                  @r###"{"data":{"findManyTestModel":[{"json":{"$type":"Json","value":"{}"}},{"json":{"$type":"Json","value":"{\"a\":\"b\"}"}},{"json":{"$type":"Json","value":"1"}}{"json":{"$type":"Json","value":"1.5"}},{"json":{"$type":"Json","value":"\"hello\""}},{"json":{"$type":"Json","value":"[1,\"a\",{\"b\":true}]"}}]}}"###
                 );
             }
         }

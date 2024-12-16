@@ -109,35 +109,6 @@ fn unique_index_names_support() {
 }
 
 #[test]
-fn json_support() {
-    let dml = indoc! {r#"
-        datasource db {
-          provider = "sqlite"
-          url = "file:test.db"
-        }
-
-        model User {
-          id   Int @id
-          data Json
-        }
-    "#};
-
-    let error = parse_unwrap_err(dml);
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating field `data` in model `User`: Field `data` in model `User` can't be of type Json. The current connector does not support the Json type.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
-        [1;94m   | [0m
-        [1;94m 7 | [0m  id   Int @id
-        [1;94m 8 | [0m  [1;91mdata Json[0m
-        [1;94m 9 | [0m}
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error);
-}
-
-#[test]
 fn non_unique_relation_criteria_support() {
     let dml = indoc! {r#"
         datasource db {
