@@ -367,7 +367,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 
     #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
-        self.visit_expression(*extract.expr.clone())?;
+        self.visit_expression(*extract.expr)?;
         self.write("->")?;
         self.visit_parameterized(Value::text("$[#-1]"))
     }
