@@ -23,6 +23,7 @@ pub enum ConnectorKind<'a> {
 pub async fn load(
     connector_kind: ConnectorKind<'_>,
     features: PreviewFeatures,
+    #[allow(unused_variables)] tracing_enabled: bool,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync + 'static>> {
     match connector_kind {
         #[cfg(not(feature = "driver-adapters"))]
@@ -44,17 +45,17 @@ pub async fn load(
 
             match datasource.active_provider {
                 #[cfg(feature = "sqlite-native")]
-                p if SQLITE.is_provider(p) => native::sqlite(datasource, &url, features).await,
+                p if SQLITE.is_provider(p) => native::sqlite(datasource, &url, features, tracing_enabled).await,
                 #[cfg(feature = "mysql-native")]
-                p if MYSQL.is_provider(p) => native::mysql(datasource, &url, features).await,
+                p if MYSQL.is_provider(p) => native::mysql(datasource, &url, features, tracing_enabled).await,
                 #[cfg(feature = "postgresql-native")]
-                p if POSTGRES.is_provider(p) => native::postgres(datasource, &url, features).await,
+                p if POSTGRES.is_provider(p) => native::postgres(datasource, &url, features, tracing_enabled).await,
                 #[cfg(feature = "mssql-native")]
-                p if MSSQL.is_provider(p) => native::mssql(datasource, &url, features).await,
+                p if MSSQL.is_provider(p) => native::mssql(datasource, &url, features, tracing_enabled).await,
                 #[cfg(feature = "cockroachdb-native")]
-                p if COCKROACH.is_provider(p) => native::postgres(datasource, &url, features).await,
+                p if COCKROACH.is_provider(p) => native::postgres(datasource, &url, features, tracing_enabled).await,
                 #[cfg(feature = "mongodb")]
-                p if MONGODB.is_provider(p) => native::mongodb(datasource, &url, features).await,
+                p if MONGODB.is_provider(p) => native::mongodb(datasource, &url, features, tracing_enabled).await,
 
                 x => Err(query_core::CoreError::ConfigurationError(format!(
                     "Unsupported connector type: {x}"
@@ -85,9 +86,10 @@ mod native {
         source: &Datasource,
         url: &str,
         features: PreviewFeatures,
+        tracing_enabled: bool,
     ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
         trace!("Loading SQLite query connector...");
-        let sqlite = Sqlite::from_source(source, url, features).await?;
+        let sqlite = Sqlite::from_source(source, url, features, tracing_enabled).await?;
         trace!("Loaded SQLite query connector.");
         Ok(executor_for(sqlite, false))
     }
@@ -97,10 +99,11 @@ mod native {
         source: &Datasource,
         url: &str,
         features: PreviewFeatures,
+        tracing_enabled: bool,
     ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
         trace!("Loading Postgres query connector...");
         let database_str = url;
-        let psql = PostgreSql::from_source(source, url, features).await?;
+        let psql = PostgreSql::from_source(source, url, features, tracing_enabled).await?;
 
         let url = Url::parse(database_str).map_err(|err| {
             query_core::CoreError::ConfigurationError(format!("Error parsing connection string: {err}"))
@@ -120,8 +123,9 @@ mod native {
         source: &Datasource,
         url: &str,
         features: PreviewFeatures,
+        tracing_enabled: bool,
     ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
-        let mysql = Mysql::from_source(source, url, features).await?;
+        let mysql = Mysql::from_source(source, url, features, tracing_enabled).await?;
         trace!("Loaded MySQL query connector.");
         Ok(executor_for(mysql, false))
     }
@@ -131,9 +135,10 @@ mod native {
         source: &Datasource,
         url: &str,
         features: PreviewFeatures,
+        tracing_enabled: bool,
     ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
         trace!("Loading SQL Server query connector...");
-        let mssql = Mssql::from_source(source, url, features).await?;
+        let mssql = Mssql::from_source(source, url, features, tracing_enabled).await?;
         trace!("Loaded SQL Server query connector.");
         Ok(executor_for(mssql, false))
     }
@@ -143,6 +148,7 @@ mod native {
         source: &Datasource,
         url: &str,
         _features: PreviewFeatures,
+        _tracing_enabled: bool,
     ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
         use mongodb_query_connector::MongoDb;
 

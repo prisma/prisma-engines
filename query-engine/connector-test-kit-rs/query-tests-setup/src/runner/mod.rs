@@ -265,6 +265,7 @@ impl Runner {
                         datasource,
                     },
                     schema.configuration.preview_features(),
+                    true,
                 )
                 .await?;
                 let connector = query_executor.primary_connector();

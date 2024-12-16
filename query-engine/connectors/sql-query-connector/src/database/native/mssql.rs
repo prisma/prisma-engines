@@ -29,6 +29,7 @@ impl FromSource for Mssql {
         _source: &Datasource,
         url: &str,
         features: PreviewFeatures,
+        _tracing_enabled: bool,
     ) -> connector_interface::Result<Self> {
         let database_str = url;
 
