@@ -51,7 +51,7 @@ mod test {
             ),
             (
                 ValueType::Json(Some(serde_json::json!({"a": 1}))),
-                JSArg::Value(serde_json::json!({"a": 1})),
+                JSArg::Value(Value::String("{\"a\":1}".to_string())),
             ),
             (
                 ValueType::Json(None),
