@@ -222,7 +222,8 @@ impl QueryEngine {
                     .instrument(span)
                     .await;
 
-                Ok(serde_json::to_string(&response)?)
+                let serde_span = tracing::info_span!("prisma:engine:response_json_serialization", user_facing = true);
+                Ok(serde_span.in_scope(|| serde_json::to_string(&response))?)
             }
             .await
         }
