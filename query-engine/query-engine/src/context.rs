@@ -57,6 +57,8 @@ impl PrismaContext {
             schema::build(arced_schema, enabled_features.contains(Feature::RawQueries))
         });
 
+        let enable_tracing = logger.tracing_config().should_capture();
+
         let executor_fut = async move {
             let config = &arced_schema_2.configuration;
             let preview_features = config.preview_features();
@@ -68,8 +70,15 @@ impl PrismaContext {
                 .ok_or_else(|| PrismaError::ConfigurationError("No valid data source found".into()))?;
 
             let url = datasource.load_url(|key| env::var(key).ok())?;
+
             // Load executor
-            let executor = load_executor(ConnectorKind::Rust { url, datasource }, preview_features).await?;
+            let executor = load_executor(
+                ConnectorKind::Rust { url, datasource },
+                preview_features,
+                enable_tracing,
+            )
+            .await?;
+
             let connector = executor.primary_connector();
 
             let conn_span = tracing::info_span!(

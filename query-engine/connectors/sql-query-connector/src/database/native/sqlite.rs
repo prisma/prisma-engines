@@ -36,6 +36,7 @@ impl FromSource for Sqlite {
         _source: &psl::Datasource,
         url: &str,
         features: psl::PreviewFeatures,
+        _tracing_enabled: bool,
     ) -> connector_interface::Result<Sqlite> {
         let database_str = url;
 

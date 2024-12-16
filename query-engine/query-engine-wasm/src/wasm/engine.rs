@@ -7,7 +7,7 @@ use crate::{
 };
 use driver_adapters::JsObject;
 use js_sys::Function as JsFunction;
-use psl::{ConnectorRegistry, PreviewFeature};
+use psl::ConnectorRegistry;
 use quaint::connector::ExternalConnector;
 use query_core::{
     protocol::EngineProtocol,
@@ -60,6 +60,7 @@ impl QueryEngine {
             datamodel,
             log_level,
             log_queries,
+            enable_tracing,
         } = options;
 
         // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
@@ -67,16 +68,12 @@ impl QueryEngine {
 
         let js_queryable = Arc::new(driver_adapters::from_js(adapter));
 
-        let enable_tracing = schema
-            .configuration
-            .preview_features()
-            .contains(PreviewFeature::Tracing);
-
         let engine_protocol = EngineProtocol::Json;
 
         let builder = EngineBuilder {
             schema: Arc::new(schema),
             engine_protocol,
+            enable_tracing,
         };
 
         let log_level = log_level.parse::<LevelFilter>().unwrap_or(Level::INFO.into());
@@ -116,6 +113,7 @@ impl QueryEngine {
                         _phantom: PhantomData,
                     },
                     preview_features,
+                    builder.enable_tracing,
                 )
                 .await?;
                 let connector = executor.primary_connector();
@@ -142,6 +140,7 @@ impl QueryEngine {
                     query_schema: Arc::new(query_schema),
                     executor,
                     engine_protocol: builder.engine_protocol,
+                    tracing_enabled: builder.enable_tracing,
                 }) as crate::Result<ConnectedEngine>
             }
             .instrument(span)
@@ -176,6 +175,7 @@ impl QueryEngine {
                 let builder = EngineBuilder {
                     schema: engine.schema.clone(),
                     engine_protocol: engine.engine_protocol(),
+                    enable_tracing: engine.tracing_enabled(),
                 };
 
                 *inner = Inner::Builder(builder);

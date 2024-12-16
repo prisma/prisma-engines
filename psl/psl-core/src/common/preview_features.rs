@@ -161,7 +161,6 @@ impl<'a> FeatureMapWithProvider<'a> {
                  | PrismaSchemaFolder
                  | RelationJoins
                  | StrictUndefinedChecks
-                 | Tracing
                  | Views
             }),
             native: HashMap::from([
@@ -218,6 +217,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                 | ReferentialActions
                 | ReferentialIntegrity
                 | SelectRelationCount
+                | Tracing
                 | TransactionApi
                 | UncheckedScalarInputs
             }),
