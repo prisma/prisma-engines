@@ -248,17 +248,22 @@ impl QueryEngine {
                 user_facing = true,
                 request_id = tracing::field::Empty,
             );
+
             start_trace(&request_id, &trace, &span, &exporter).await?;
 
-            let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
-            match engine
-                .executor()
-                .start_tx(engine.query_schema().clone(), engine.engine_protocol(), tx_opts)
-                .await
-            {
-                Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
-                Err(err) => Ok(map_known_error(err)?),
+            async move {
+                let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
+                match engine
+                    .executor()
+                    .start_tx(engine.query_schema().clone(), engine.engine_protocol(), tx_opts)
+                    .await
+                {
+                    Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
+                    Err(err) => Ok(map_known_error(err)?),
+                }
             }
+            .instrument(span)
+            .await
         }
         .with_subscriber(dispatcher)
         .await
@@ -284,9 +289,10 @@ impl QueryEngine {
                 user_facing = true,
                 request_id = tracing::field::Empty
             );
+
             start_trace(&request_id, &trace, &span, &exporter).await?;
 
-            match engine.executor().commit_tx(TxId::from(tx_id)).await {
+            match engine.executor().commit_tx(TxId::from(tx_id)).instrument(span).await {
                 Ok(_) => Ok("{}".to_string()),
                 Err(err) => Ok(map_known_error(err)?),
             }
@@ -315,9 +321,10 @@ impl QueryEngine {
                 user_facing = true,
                 request_id = tracing::field::Empty,
             );
+
             start_trace(&request_id, &trace, &span, &exporter).await?;
 
-            match engine.executor().rollback_tx(TxId::from(tx_id)).await {
+            match engine.executor().rollback_tx(TxId::from(tx_id)).instrument(span).await {
                 Ok(_) => Ok("{}".to_string()),
                 Err(err) => Ok(map_known_error(err)?),
             }
