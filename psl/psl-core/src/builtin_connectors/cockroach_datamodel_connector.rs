@@ -43,9 +43,9 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     Json |
     JsonFiltering |
     JsonFilteringArrayPath |
+    JsonArrayContains |
     NamedPrimaryKeys |
     NamedForeignKeys |
-    SqlQueryRaw |
     RelationFieldsInArbitraryOrder |
     ScalarLists |
     UpdateableId |

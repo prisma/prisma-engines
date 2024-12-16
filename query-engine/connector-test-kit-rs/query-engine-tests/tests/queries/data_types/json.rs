@@ -55,7 +55,7 @@ mod json {
 
                 insta::assert_snapshot!(
                   res,
-                  @r###"{"data":{"findManyTestModel":[{"json":"{}"},{"json":"{\"a\":\"b\"}"},{"json":"1"},{"json":"\"hello\""},{"json":"[1,\"a\",{\"b\":true}]"}]}}"###
+                  @r###"{"data":{"findManyTestModel":[{"json":"{}"},{"json":"{\"a\":\"b\"}"},{"json":"1"},{"json":"1.5"},{"json":"\"hello\""},{"json":"[1,\"a\",{\"b\":true}]"}]}}"###
                 );
             }
             query_engine_tests::EngineProtocol::Json => {
@@ -223,7 +223,7 @@ mod json {
 
                 child Child?
             }
-            
+
             model Child {
                 #id(id, Int, @id)
                 json_list Json[]
@@ -267,8 +267,9 @@ mod json {
         create_row(runner, r#"{ id: 1, json: "{}" }"#).await?;
         create_row(runner, r#"{ id: 2, json: "{\"a\":\"b\"}" }"#).await?;
         create_row(runner, r#"{ id: 3, json: "1" }"#).await?;
-        create_row(runner, r#"{ id: 4, json: "\"hello\"" }"#).await?;
-        create_row(runner, r#"{ id: 5, json: "[1, \"a\", {\"b\": true}]" }"#).await?;
+        create_row(runner, r#"{ id: 4, json: "1.5" }"#).await?;
+        create_row(runner, r#"{ id: 5, json: "\"hello\"" }"#).await?;
+        create_row(runner, r#"{ id: 6, json: "[1, \"a\", {\"b\": true}]" }"#).await?;
 
         Ok(())
     }

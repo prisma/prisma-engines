@@ -282,8 +282,21 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         })
     }
 
-    fn visit_json_extract(&mut self, _json_extract: JsonExtract<'a>) -> visitor::Result {
-        unimplemented!("JSON filtering is not yet supported on SQLite")
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
+    fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> visitor::Result {
+        self.visit_expression(*json_extract.column)?;
+
+        if json_extract.extract_as_string {
+            self.write("->>")?;
+        } else {
+            self.write("->")?;
+        }
+        match json_extract.path.clone() {
+            JsonPath::Array(_) => panic!("JSON path array notation is not supported for SQlite"),
+            JsonPath::String(path) => self.visit_parameterized(Value::text(path))?,
+        }
+
+        Ok(())
     }
 
     fn visit_json_array_contains(
@@ -292,11 +305,47 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         _right: Expression<'a>,
         _not: bool,
     ) -> visitor::Result {
-        unimplemented!("JSON filtering is not yet supported on SQLite")
+        unimplemented!("JSON contains is not supported on SQLite")
     }
 
-    fn visit_json_type_equals(&mut self, _left: Expression<'a>, _json_type: JsonType, _not: bool) -> visitor::Result {
-        unimplemented!("JSON_TYPE is not yet supported on SQLite")
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
+    fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType<'a>, not: bool) -> visitor::Result {
+        self.write("(")?;
+        self.write("JSON_TYPE")?;
+        self.surround_with("(", ")", |s| s.visit_expression(left.clone()))?;
+
+        if not {
+            self.write(" != ")?;
+        } else {
+            self.write(" = ")?;
+        }
+
+        match json_type {
+            JsonType::Array => self.visit_expression(Expression::from(Value::text("array")))?,
+            JsonType::Boolean => {
+                self.visit_expression(Expression::from(Value::text("true")))?;
+                self.write(" OR JSON_TYPE")?;
+                self.surround_with("(", ")", |s| s.visit_expression(left))?;
+                self.write(" = ")?;
+                self.visit_expression(Expression::from(Value::text("false")))?;
+            }
+            JsonType::Number => {
+                self.visit_expression(Expression::from(Value::text("integer")))?;
+                self.write(" OR JSON_TYPE")?;
+                self.surround_with("(", ")", |s| s.visit_expression(left.clone()))?;
+                self.write(" = ")?;
+                self.visit_expression(Expression::from(Value::text("real")))?;
+            }
+            JsonType::Object => self.visit_expression(Expression::from(Value::text("object")))?,
+            JsonType::String => self.visit_expression(Expression::from(Value::text("text")))?,
+            JsonType::Null => self.visit_expression(Expression::from(Value::text("null")))?,
+            JsonType::ColumnRef(column) => {
+                self.write("JSON_TYPE")?;
+                self.surround_with("(", ")", |s| s.visit_column(*column))?;
+            }
+        }
+
+        self.write(")")
     }
 
     fn visit_text_search(&mut self, _text_search: crate::prelude::TextSearch<'a>) -> visitor::Result {
@@ -316,24 +365,57 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         unimplemented!("Full-text search is not yet supported on SQLite")
     }
 
-    fn visit_json_extract_last_array_item(&mut self, _extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
-        unimplemented!("JSON filtering is not yet supported on SQLite")
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
+    fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
+        self.visit_expression(*extract.expr.clone())?;
+        self.write("->")?;
+        self.visit_parameterized(Value::text("$[#-1]"))
     }
 
-    fn visit_json_extract_first_array_item(&mut self, _extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
-        unimplemented!("JSON filtering is not yet supported on SQLite")
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
+    fn visit_json_extract_first_array_item(&mut self, extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
+        self.visit_expression(*extract.expr)?;
+        self.write("->")?;
+        self.visit_parameterized(Value::text("$[0]"))
     }
 
-    fn visit_json_unquote(&mut self, _json_unquote: JsonUnquote<'a>) -> visitor::Result {
-        unimplemented!("JSON filtering is not yet supported on SQLite")
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
+    fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> visitor::Result {
+        self.write("JSONB_EXTRACT(")?;
+        self.visit_expression(*json_unquote.expr)?;
+        self.write(", ")?;
+        self.visit_parameterized(Value::text("$"))?;
+        self.write(")")
     }
 
-    fn visit_json_array_agg(&mut self, _array_agg: JsonArrayAgg<'a>) -> visitor::Result {
-        unimplemented!("JSON_AGG is not yet supported on SQLite")
+    #[cfg(feature = "sqlite")]
+    fn visit_json_array_agg(&mut self, array_agg: JsonArrayAgg<'a>) -> visitor::Result {
+        self.write("JSONB_GROUP_ARRAY")?;
+        self.surround_with("(", ")", |s| s.visit_expression(*array_agg.expr))?;
+
+        Ok(())
     }
 
-    fn visit_json_build_object(&mut self, _build_obj: JsonBuildObject<'a>) -> visitor::Result {
-        unimplemented!("JSON_BUILD_OBJECT is not yet supported on SQLite")
+    #[cfg(feature = "sqlite")]
+    fn visit_json_build_object(&mut self, build_obj: JsonBuildObject<'a>) -> visitor::Result {
+        let len = build_obj.exprs.len();
+
+        self.write("JSONB_OBJECT")?;
+        self.surround_with("(", ")", |s| {
+            for (i, (name, expr)) in build_obj.exprs.into_iter().enumerate() {
+                s.visit_raw_value(Value::text(name))?;
+                s.write(", ")?;
+                s.visit_expression(expr)?;
+
+                if i < (len - 1) {
+                    s.write(", ")?;
+                }
+            }
+
+            Ok(())
+        })?;
+
+        Ok(())
     }
 
     fn visit_ordering(&mut self, ordering: Ordering<'a>) -> visitor::Result {

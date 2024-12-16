@@ -1,7 +1,7 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(capabilities(SqlQueryRaw))]
+#[test_suite(exclude(MongoDb))]
 mod typed_output {
     use query_engine_tests::{fmt_query_raw, run_query, run_query_pretty};
 
