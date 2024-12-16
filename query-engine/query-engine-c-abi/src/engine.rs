@@ -16,23 +16,22 @@ use serde_json::json;
 use std::{
     env,
     ffi::{c_char, c_int, CStr, CString},
+    mem::ManuallyDrop,
     path::{Path, PathBuf},
     ptr::null_mut,
     sync::Arc,
 };
-use telemetry::helpers::TraceParent;
 use tokio::{
     runtime::{self, Runtime},
     sync::RwLock,
 };
 use tracing::{instrument::WithSubscriber, level_filters::LevelFilter, Instrument};
-use tracing_opentelemetry::OpenTelemetrySpanExt;
 
-use query_engine_common::Result;
 use query_engine_common::{
     engine::{stringify_env_values, ConnectedEngine, ConnectedEngineNative, EngineBuilder, EngineBuilderNative, Inner},
     error::ApiError,
 };
+use query_engine_common::{tracer::start_trace, Result};
 use request_handlers::ConnectorKind;
 
 // The query engine code is async by nature, however the C API does not function with async functions
@@ -196,16 +195,20 @@ impl QueryEngine {
         })
     }
 
-    pub async fn connect(&self, trace: *const c_char) -> Result<()> {
+    pub async fn connect(&self, trace: *const c_char, request_id: *const c_char) -> Result<()> {
         if let Some(base_path) = self.base_path.as_ref() {
             env::set_current_dir(Path::new(&base_path)).expect("Could not change directory");
         }
 
         let trace_string = get_cstr_safe(trace).expect("Connect trace is missing");
+        let request_id = get_cstr_safe(request_id).expect("request id must not be null");
 
-        let span = tracing::info_span!("prisma:engine:connect", user_facing = true);
-        let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace_string);
-        span.set_parent(parent_context);
+        let span = tracing::info_span!(
+            "prisma:engine:connect",
+            user_facing = true,
+            request_id = tracing::field::Empty,
+        );
+        start_trace(&request_id, &trace_string, &span, &self.logger.exporter()).await?;
 
         let mut inner = self.inner.write().await;
         let builder = inner.as_builder()?;
@@ -283,8 +286,10 @@ impl QueryEngine {
         body_str: *const c_char,
         trace_str: *const c_char,
         tx_id_str: *const c_char,
+        request_id: *const c_char,
     ) -> Result<String> {
         let dispatcher = self.logger.dispatcher();
+        let exporter = self.logger.exporter();
 
         async move {
             let inner = self.inner.read().await;
@@ -293,13 +298,16 @@ impl QueryEngine {
             let body = get_cstr_safe(body_str).expect("Prisma engine execute body is missing");
             let tx_id = get_cstr_safe(tx_id_str);
             let trace = get_cstr_safe(trace_str).expect("Trace is needed");
+            let request_id = get_cstr_safe(request_id).expect("request id must not be null");
 
             let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
 
-            let span = tracing::info_span!("prisma:engine:query", user_facing = true);
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            let traceparent = TraceParent::from_remote_context(&parent_context);
-            span.set_parent(parent_context);
+            let span = tracing::info_span!(
+                "prisma:engine:query",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
+            let traceparent = start_trace(&request_id, &trace, &span, &exporter).await?;
 
             async move {
                 let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
@@ -316,13 +324,20 @@ impl QueryEngine {
     }
 
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
-    pub async fn disconnect(&self, trace_str: *const c_char) -> Result<()> {
+    pub async fn disconnect(&self, trace_str: *const c_char, request_id: *const c_char) -> Result<()> {
         let trace = get_cstr_safe(trace_str).expect("Trace is needed");
+        let request_id = get_cstr_safe(request_id).expect("request id must not be null");
+
         let dispatcher = self.logger.dispatcher();
+        let exporter = self.logger.exporter();
+
         async {
-            let span = tracing::info_span!("prisma:engine:disconnect", user_facing = true);
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            span.set_parent(parent_context);
+            let span = tracing::info_span!(
+                "prisma:engine:disconnect",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
+            start_trace(&request_id, &trace, &span, &exporter).await?;
 
             async {
                 let mut inner = self.inner.write().await;
@@ -390,18 +405,29 @@ impl QueryEngine {
     }
 
     /// If connected, attempts to start a transaction in the core and returns its ID.
-    pub async fn start_transaction(&self, input_str: *const c_char, trace_str: *const c_char) -> Result<String> {
+    pub async fn start_transaction(
+        &self,
+        input_str: *const c_char,
+        trace_str: *const c_char,
+        request_id: *const c_char,
+    ) -> Result<String> {
         let input = get_cstr_safe(input_str).expect("Input string missing");
         let trace = get_cstr_safe(trace_str).expect("trace is required in transactions");
+        let request_id = get_cstr_safe(request_id).expect("request id must not be null");
+
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
 
         let dispatcher = self.logger.dispatcher();
+        let exporter = self.logger.exporter();
 
         async move {
-            let span = tracing::info_span!("prisma:engine:start_transaction", user_facing = true);
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            span.set_parent(parent_context);
+            let span = tracing::info_span!(
+                "prisma:engine:start_transaction",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
+            start_trace(&request_id, &trace, &span, &exporter).await?;
 
             let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
             match engine
@@ -419,18 +445,29 @@ impl QueryEngine {
     }
 
     // If connected, attempts to commit a transaction with id `tx_id` in the core.
-    pub async fn commit_transaction(&self, tx_id_str: *const c_char, trace: *const c_char) -> Result<String> {
+    pub async fn commit_transaction(
+        &self,
+        tx_id_str: *const c_char,
+        trace: *const c_char,
+        request_id: *const c_char,
+    ) -> Result<String> {
         let tx_id = get_cstr_safe(tx_id_str).expect("Input string missing");
         let trace = get_cstr_safe(trace).expect("trace is required in transactions");
+        let request_id = get_cstr_safe(request_id).expect("request id must not be null");
+
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
 
         let dispatcher = self.logger.dispatcher();
+        let exporter = self.logger.exporter();
 
         async move {
-            let span = tracing::info_span!("prisma:engine:commit_transaction", user_facing = true);
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            span.set_parent(parent_context);
+            let span = tracing::info_span!(
+                "prisma:engine:commit_transaction",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
+            start_trace(&request_id, &trace, &span, &exporter).await?;
 
             match engine.executor().commit_tx(TxId::from(tx_id)).instrument(span).await {
                 Ok(_) => Ok("{}".to_string()),
@@ -442,23 +479,59 @@ impl QueryEngine {
     }
 
     // If connected, attempts to roll back a transaction with id `tx_id` in the core.
-    pub async fn rollback_transaction(&self, tx_id_str: *const c_char, trace: *const c_char) -> Result<String> {
+    pub async fn rollback_transaction(
+        &self,
+        tx_id_str: *const c_char,
+        trace: *const c_char,
+        request_id: *const c_char,
+    ) -> Result<String> {
         let tx_id = get_cstr_safe(tx_id_str).expect("Input string missing");
         let trace = get_cstr_safe(trace).expect("trace is required in transactions");
+        let request_id = get_cstr_safe(request_id).expect("request id must not be null");
+
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
 
         let dispatcher = self.logger.dispatcher();
+        let exporter = self.logger.exporter();
 
         async move {
-            let span = tracing::info_span!("prisma:engine:rollback_transaction", user_facing = true);
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            span.set_parent(parent_context);
+            let span = tracing::info_span!(
+                "prisma:engine:rollback_transaction",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
+            start_trace(&request_id, &trace, &span, &exporter).await?;
 
             match engine.executor().rollback_tx(TxId::from(tx_id)).await {
                 Ok(_) => Ok("{}".to_string()),
                 Err(err) => Ok(map_known_error(err)?),
             }
+        }
+        .with_subscriber(dispatcher)
+        .await
+    }
+
+    /// Fetch the spans associated with a [`RequestId`]
+    pub async fn trace(&self, request_id: *const c_char) -> Result<Option<String>> {
+        let request_id = get_cstr_safe(request_id).expect("request id must not be null");
+
+        let dispatcher = self.logger.dispatcher();
+        let exporter = self.logger.exporter();
+
+        async move {
+            let request_id = request_id
+                .parse()
+                .map_err(|_| ApiError::Decode("invalid request id".into()))?;
+
+            let trace = exporter
+                .stop_capturing(request_id)
+                .await
+                .as_ref()
+                .map(serde_json::to_string)
+                .transpose()?;
+
+            Ok(trace)
         }
         .with_subscriber(dispatcher)
         .await
@@ -513,10 +586,11 @@ pub unsafe extern "C" fn prisma_create(
 pub unsafe extern "C" fn prisma_connect(
     qe: *mut QueryEngine,
     trace: *const c_char,
+    request_id: *const c_char,
     error_string_ptr: *mut *mut c_char,
 ) -> c_int {
     let query_engine: Box<QueryEngine> = Box::from_raw(qe);
-    let result = RUNTIME.block_on(async { query_engine.connect(trace).await });
+    let result = RUNTIME.block_on(async { query_engine.connect(trace, request_id).await });
 
     match result {
         Ok(_engine) => {
@@ -543,10 +617,11 @@ pub unsafe extern "C" fn prisma_query(
     body_str: *const c_char,
     header_str: *const c_char,
     tx_id_str: *const c_char,
+    request_id: *const c_char,
     error_string_ptr: *mut *mut c_char,
 ) -> *const c_char {
     let query_engine: Box<QueryEngine> = Box::from_raw(qe);
-    let result = RUNTIME.block_on(async { query_engine.query(body_str, header_str, tx_id_str).await });
+    let result = RUNTIME.block_on(async { query_engine.query(body_str, header_str, tx_id_str, request_id).await });
     match result {
         Ok(query_result) => {
             std::mem::forget(query_engine);
@@ -572,9 +647,14 @@ pub unsafe extern "C" fn prisma_start_transaction(
     qe: *mut QueryEngine,
     options_str: *const c_char,
     header_str: *const c_char,
+    request_id: *const c_char,
 ) -> *const c_char {
     let query_engine: Box<QueryEngine> = Box::from_raw(qe);
-    let result = RUNTIME.block_on(async { query_engine.start_transaction(options_str, header_str).await });
+    let result = RUNTIME.block_on(async {
+        query_engine
+            .start_transaction(options_str, header_str, request_id)
+            .await
+    });
     match result {
         Ok(query_result) => {
             std::mem::forget(query_engine);
@@ -595,9 +675,10 @@ pub unsafe extern "C" fn prisma_commit_transaction(
     qe: *mut QueryEngine,
     tx_id_str: *const c_char,
     header_str: *const c_char,
+    request_id: *const c_char,
 ) -> *const c_char {
     let query_engine: Box<QueryEngine> = Box::from_raw(qe);
-    let result = RUNTIME.block_on(async { query_engine.commit_transaction(tx_id_str, header_str).await });
+    let result = RUNTIME.block_on(async { query_engine.commit_transaction(tx_id_str, header_str, request_id).await });
     std::mem::forget(query_engine);
     match result {
         Ok(query_result) => CString::new(query_result).unwrap().into_raw(),
@@ -613,9 +694,14 @@ pub unsafe extern "C" fn prisma_rollback_transaction(
     qe: *mut QueryEngine,
     tx_id_str: *const c_char,
     header_str: *const c_char,
+    request_id: *const c_char,
 ) -> *const c_char {
     let query_engine: Box<QueryEngine> = Box::from_raw(qe);
-    let result = RUNTIME.block_on(async { query_engine.rollback_transaction(tx_id_str, header_str).await });
+    let result = RUNTIME.block_on(async {
+        query_engine
+            .rollback_transaction(tx_id_str, header_str, request_id)
+            .await
+    });
     std::mem::forget(query_engine);
     match result {
         Ok(query_result) => CString::new(query_result).unwrap().into_raw(),
@@ -627,13 +713,49 @@ pub unsafe extern "C" fn prisma_rollback_transaction(
 ///
 /// The calling context needs to pass a valid pointer that will store the reference to the error string
 #[no_mangle]
-pub unsafe extern "C" fn prisma_disconnect(qe: *mut QueryEngine, header_str: *const c_char) -> c_int {
+pub unsafe extern "C" fn prisma_disconnect(
+    qe: *mut QueryEngine,
+    header_str: *const c_char,
+    request_id: *const c_char,
+) -> c_int {
     let query_engine: Box<QueryEngine> = Box::from_raw(qe);
-    let result = RUNTIME.block_on(async { query_engine.disconnect(header_str).await });
+    let result = RUNTIME.block_on(async { query_engine.disconnect(header_str, request_id).await });
     std::mem::forget(query_engine);
     match result {
         Ok(_) => PRISMA_OK,
         Err(_err) => PRISMA_UNKNOWN_ERROR,
+    }
+}
+
+/// Returns the trace data for a given request ID as a JSON string.
+/// If the request is not found, it will return null.
+///
+/// # Safety
+///
+/// The caller must pass a pointer to a location to store the pointer to the error string in.
+/// If it is not null, the caller is responsible for deallocating the string.
+#[no_mangle]
+pub unsafe extern "C" fn prisma_trace(
+    qe: *mut QueryEngine,
+    request_id: *const c_char,
+    error_string_ptr: *mut *mut c_char,
+) -> *const c_char {
+    let query_engine = ManuallyDrop::new(Box::<QueryEngine>::from_raw(qe));
+    let result = RUNTIME.block_on(query_engine.trace(request_id));
+    match result {
+        Ok(Some(trace)) => {
+            *error_string_ptr = std::ptr::null_mut();
+            CString::new(trace).unwrap().into_raw()
+        }
+        Ok(None) => {
+            *error_string_ptr = std::ptr::null_mut();
+            std::ptr::null()
+        }
+        Err(err) => {
+            let error_string = CString::new(err.to_string()).unwrap();
+            *error_string_ptr = error_string.into_raw();
+            std::ptr::null()
+        }
     }
 }
 

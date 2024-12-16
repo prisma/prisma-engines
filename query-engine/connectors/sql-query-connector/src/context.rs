@@ -1,5 +1,5 @@
 use quaint::prelude::ConnectionInfo;
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 
 pub(super) struct Context<'a> {
     connection_info: &'a ConnectionInfo,

@@ -7,7 +7,7 @@ use crate::{
 };
 use connector::{ConnectionLike, DatasourceFieldName, NativeUpsert, WriteArgs};
 use query_structure::{ManyRecords, Model, RawJson};
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 
 pub(crate) async fn execute(
     tx: &mut dyn ConnectionLike,

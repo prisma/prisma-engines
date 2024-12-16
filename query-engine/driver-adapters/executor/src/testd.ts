@@ -15,6 +15,7 @@ import { NeonWsManager } from "./driver-adapters-manager/neon.ws";
 import { LibSQLManager } from "./driver-adapters-manager/libsql";
 import { PlanetScaleManager } from "./driver-adapters-manager/planetscale";
 import { D1Manager } from "./driver-adapters-manager/d1";
+import { nextRequestId } from "./requestId";
 import { createRNEngineConnector } from "./rn";
 
 if (!global.crypto) {
@@ -127,7 +128,7 @@ async function handleRequest(
         schema,
         logCallback,
       });
-      await engine.connect("");
+      await engine.connect("", nextRequestId());
 
       state[schemaId] = {
         engine,
@@ -149,7 +150,7 @@ async function handleRequest(
       debug("Got `query`", params);
       const { query, schemaId, txId } = params;
       const engine = state[schemaId].engine;
-      const result = await engine.query(JSON.stringify(query), "", txId);
+      const result = await engine.query(JSON.stringify(query), "", txId ?? undefined, nextRequestId());
 
       const parsedResult = JSON.parse(result);
       if (parsedResult.errors) {
@@ -182,7 +183,8 @@ async function handleRequest(
       const { schemaId, options } = params;
       const result = await state[schemaId].engine.startTransaction(
         JSON.stringify(options),
-        ""
+        "",
+        nextRequestId(),
       );
       return JSON.parse(result);
     }
@@ -190,7 +192,7 @@ async function handleRequest(
     case "commitTx": {
       debug("Got `commitTx", params);
       const { schemaId, txId } = params;
-      const result = await state[schemaId].engine.commitTransaction(txId, "{}");
+      const result = await state[schemaId].engine.commitTransaction(txId, "{}", nextRequestId());
       return JSON.parse(result);
     }
 
@@ -199,7 +201,8 @@ async function handleRequest(
       const { schemaId, txId } = params;
       const result = await state[schemaId].engine.rollbackTransaction(
         txId,
-        "{}"
+        "{}",
+        nextRequestId(),
       );
       return JSON.parse(result);
     }
@@ -207,7 +210,7 @@ async function handleRequest(
       debug("Got `teardown", params);
       const { schemaId } = params;
 
-      await state[schemaId].engine.disconnect("");
+      await state[schemaId].engine.disconnect("", nextRequestId());
       await state[schemaId].driverAdapterManager.teardown();
       delete state[schemaId];
 

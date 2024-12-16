@@ -13,7 +13,7 @@ anyhow = "1"
 async-trait = "0.1"
 query-core = { path = "../core" }
 request-handlers = { path = "../request-handlers", features = [
-  "sqlite-native",
+    "sqlite-native",
 ] }
 query-connector = { path = "../connectors/query-connector" }
 query-engine-common = { path = "../../libs/query-engine-common" }
@@ -24,7 +24,7 @@ sql-connector = { path = "../connectors/sql-query-connector", package = "sql-que
 query-structure = { path = "../query-structure" }
 chrono.workspace = true
 quaint = { path = "../../quaint", default-features = false, features = [
-  "sqlite",
+    "sqlite",
 ] }
 rusqlite = "0.31"
 uuid.workspace = true
@@ -38,8 +38,6 @@ indoc.workspace = true
 tracing = "0.1"
 tracing-subscriber = { version = "0.3" }
 tracing-futures.workspace = true
-tracing-opentelemetry = "0.17.3"
-opentelemetry = { version = "0.17" }
 
 tokio.workspace = true
 futures.workspace = true

@@ -55,7 +55,6 @@ published on our fabulous repo page.
   - Make sure direnv is [hooked](https://direnv.net/docs/hook.html) into your shell
   - Alternatively: Load the defined environment in `./.envrc` manually in your
     shell.
-- **For m1 users**: Install [Protocol Buffers](https://grpc.io/docs/protoc-installation/)
 
 Note for nix users: it should be enough to `direnv allow`.
 **How to build:**
@@ -279,7 +278,7 @@ The journey through the pipeline is the same as a commit on the `main` branch.
 This end to end will take minimum ~1h20 to complete, but is completely automated :robot:
 
 Notes:
-- tests and publishing workflows are run in parallel in both `prisma/prisma-engines` and `prisma/prisma` repositories. So, it is possible that the engines would be published and only then test suite will 
+- tests and publishing workflows are run in parallel in both `prisma/prisma-engines` and `prisma/prisma` repositories. So, it is possible that the engines would be published and only then test suite will
 discover a defect. It is advised that to keep an eye on both test and publishing workflows.
 
 #### Manual integration releases from this repository to npm

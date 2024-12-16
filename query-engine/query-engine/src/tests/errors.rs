@@ -1,8 +1,9 @@
-use crate::{context::PrismaContext, features::Feature};
+use crate::{context::PrismaContext, features::Feature, logger::Logger};
 use enumflags2::make_bitflags;
 use indoc::{formatdoc, indoc};
 use query_core::protocol::EngineProtocol;
 use serde_json::json;
+use telemetry::RequestId;
 
 #[tokio::test]
 async fn connection_string_problems_give_a_nice_error() {
@@ -35,9 +36,16 @@ async fn connection_string_problems_give_a_nice_error() {
 
         let features = make_bitflags!(Feature::{ RawQueries });
 
-        let error = PrismaContext::new(dml, EngineProtocol::Graphql, features, None)
-            .await
-            .unwrap_err();
+        let error = PrismaContext::new(
+            dml,
+            EngineProtocol::Graphql,
+            features,
+            None,
+            Logger::default(),
+            RequestId::next(),
+        )
+        .await
+        .unwrap_err();
 
         let error = user_facing_errors::Error::from(error);
         let json_error = serde_json::to_value(&error).unwrap();

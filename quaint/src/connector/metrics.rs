@@ -19,8 +19,10 @@ where
     let span = info_span!(
         "quaint:query",
         "db.system" = db_system_name,
-        "db.statement" = %QueryForTracing(query),
-        "otel.kind" = "client"
+        "db.query.text" = %QueryForTracing(query),
+        "otel.kind" = "client",
+        "otel.name" = "prisma:engine:db_query",
+        user_facing = true,
     );
     do_query(tag, query, params, f).instrument(span).await
 }
@@ -81,7 +83,6 @@ where
     tracing::trace!(
         message = "Fetched a connection from the pool",
         duration_ms = start.elapsed_time().as_millis() as u64,
-        item_type = "query",
         is_query = true,
         result,
     );

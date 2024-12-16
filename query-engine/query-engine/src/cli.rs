@@ -1,6 +1,7 @@
 use crate::{
     context::PrismaContext,
     features::{EnabledFeatures, Feature},
+    logger::Logger,
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
@@ -8,6 +9,7 @@ use psl::parser_database::Files;
 use query_core::{protocol::EngineProtocol, schema};
 use request_handlers::{dmmf, RequestBody, RequestHandler};
 use std::{env, sync::Arc};
+use telemetry::RequestId;
 
 pub struct ExecuteRequest {
     query: String,
@@ -129,7 +131,15 @@ impl CliCommand {
         if request.enable_raw_queries {
             features |= Feature::RawQueries
         }
-        let cx = PrismaContext::new(request.schema, request.engine_protocol, features, None).await?;
+        let cx = PrismaContext::new(
+            request.schema,
+            request.engine_protocol,
+            features,
+            None,
+            Logger::default().install().unwrap(),
+            RequestId::next(),
+        )
+        .await?;
 
         let cx = Arc::new(cx);
 

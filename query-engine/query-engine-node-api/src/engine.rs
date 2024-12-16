@@ -6,18 +6,19 @@ use prisma_metrics::{MetricFormat, WithMetricsInstrumentation};
 use psl::PreviewFeature;
 use quaint::connector::ExternalConnector;
 use query_core::{protocol::EngineProtocol, relation_load_strategy, schema, TransactionOptions, TxId};
-use query_engine_common::engine::{
-    map_known_error, stringify_env_values, ConnectedEngine, ConnectedEngineNative, ConstructorOptions,
-    ConstructorOptionsNative, EngineBuilder, EngineBuilderNative, Inner,
+use query_engine_common::{
+    engine::{
+        map_known_error, stringify_env_values, ConnectedEngine, ConnectedEngineNative, ConstructorOptions,
+        ConstructorOptionsNative, EngineBuilder, EngineBuilderNative, Inner,
+    },
+    tracer::start_trace,
 };
 use request_handlers::{load_executor, render_graphql_schema, ConnectorKind, RequestBody, RequestHandler};
 use serde::Deserialize;
 use serde_json::json;
 use std::{collections::HashMap, future::Future, marker::PhantomData, panic::AssertUnwindSafe, sync::Arc};
-use telemetry::helpers::TraceParent;
 use tokio::sync::RwLock;
-use tracing::{instrument::WithSubscriber, Instrument};
-use tracing_opentelemetry::OpenTelemetrySpanExt;
+use tracing_futures::{Instrument, WithSubscriber};
 use tracing_subscriber::filter::LevelFilter;
 use user_facing_errors::Error;
 
@@ -160,14 +161,18 @@ impl QueryEngine {
 
     /// Connect to the database, allow queries to be run.
     #[napi]
-    pub async fn connect(&self, trace: String) -> napi::Result<()> {
+    pub async fn connect(&self, trace: String, request_id: String) -> napi::Result<()> {
         let dispatcher = self.logger.dispatcher();
         let recorder = self.logger.recorder();
+        let exporter = self.logger.exporter();
 
         async_panic_to_js_error(async {
-            let span = tracing::info_span!("prisma:engine:connect", user_facing = true);
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            span.set_parent(parent_context);
+            let span = tracing::info_span!(
+                "prisma:engine:connect",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
+            start_trace(&request_id, &trace, &span, &exporter).await?;
 
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
@@ -265,14 +270,18 @@ impl QueryEngine {
 
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
     #[napi]
-    pub async fn disconnect(&self, trace: String) -> napi::Result<()> {
+    pub async fn disconnect(&self, trace: String, request_id: String) -> napi::Result<()> {
         let dispatcher = self.logger.dispatcher();
         let recorder = self.logger.recorder();
+        let exporter = self.logger.exporter();
 
         async_panic_to_js_error(async {
-            let span = tracing::info_span!("prisma:engine:disconnect", user_facing = true);
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            span.set_parent(parent_context);
+            let span = tracing::info_span!(
+                "prisma:engine:disconnect",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
+            start_trace(&request_id, &trace, &span, &exporter).await?;
 
             // TODO: when using Node Drivers, we need to call Driver::close() here.
 
@@ -303,9 +312,16 @@ impl QueryEngine {
 
     /// If connected, sends a query to the core and returns the response.
     #[napi]
-    pub async fn query(&self, body: String, trace: String, tx_id: Option<String>) -> napi::Result<String> {
+    pub async fn query(
+        &self,
+        body: String,
+        trace: String,
+        tx_id: Option<String>,
+        request_id: String,
+    ) -> napi::Result<String> {
         let dispatcher = self.logger.dispatcher();
         let recorder = self.logger.recorder();
+        let exporter = self.logger.exporter();
 
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
@@ -313,14 +329,16 @@ impl QueryEngine {
 
             let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
 
-            let span = tracing::info_span!("prisma:engine:query", user_facing = true);
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            let traceparent = TraceParent::from_remote_context(&parent_context);
-            span.set_parent(parent_context);
+            let span = tracing::info_span!(
+                "prisma:engine:query",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
+            let trace_parent = start_trace(&request_id, &trace, &span, &exporter).await?;
 
             async move {
                 let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
-                let response = handler.handle(query, tx_id.map(TxId::from), traceparent).await;
+                let response = handler.handle(query, tx_id.map(TxId::from), trace_parent).await;
 
                 let serde_span = tracing::info_span!("prisma:engine:response_json_serialization", user_facing = true);
                 Ok(serde_span.in_scope(|| serde_json::to_string(&response))?)
@@ -335,18 +353,22 @@ impl QueryEngine {
 
     /// If connected, attempts to start a transaction in the core and returns its ID.
     #[napi]
-    pub async fn start_transaction(&self, input: String, trace: String) -> napi::Result<String> {
+    pub async fn start_transaction(&self, input: String, trace: String, request_id: String) -> napi::Result<String> {
         let dispatcher = self.logger.dispatcher();
         let recorder = self.logger.recorder();
+        let exporter = self.logger.exporter();
 
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
             let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
 
-            let span = tracing::info_span!("prisma:engine:start_transaction", user_facing = true);
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            span.set_parent(parent_context);
+            let span = tracing::info_span!(
+                "prisma:engine:start_transaction",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
+            start_trace(&request_id, &trace, &span, &exporter).await?;
 
             async move {
                 match engine
@@ -368,18 +390,22 @@ impl QueryEngine {
 
     /// If connected, attempts to commit a transaction with id `tx_id` in the core.
     #[napi]
-    pub async fn commit_transaction(&self, tx_id: String, trace: String) -> napi::Result<String> {
+    pub async fn commit_transaction(&self, tx_id: String, trace: String, request_id: String) -> napi::Result<String> {
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
 
             let dispatcher = self.logger.dispatcher();
             let recorder = self.logger.recorder();
+            let exporter = self.logger.exporter();
 
             async move {
-                let span = tracing::info_span!("prisma:engine:commit_transaction", user_facing = true);
-                let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-                span.set_parent(parent_context);
+                let span = tracing::info_span!(
+                    "prisma:engine:commit_transaction",
+                    user_facing = true,
+                    request_id = tracing::field::Empty,
+                );
+                start_trace(&request_id, &trace, &span, &exporter).await?;
 
                 match engine.executor().commit_tx(TxId::from(tx_id)).instrument(span).await {
                     Ok(_) => Ok("{}".to_string()),
@@ -395,18 +421,22 @@ impl QueryEngine {
 
     /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
     #[napi]
-    pub async fn rollback_transaction(&self, tx_id: String, trace: String) -> napi::Result<String> {
+    pub async fn rollback_transaction(&self, tx_id: String, trace: String, request_id: String) -> napi::Result<String> {
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
 
             let dispatcher = self.logger.dispatcher();
             let recorder = self.logger.recorder();
+            let exporter = self.logger.exporter();
 
             async move {
-                let span = tracing::info_span!("prisma:engine:rollback_transaction", user_facing = true);
-                let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-                span.set_parent(parent_context);
+                let span = tracing::info_span!(
+                    "prisma:engine:rollback_transaction",
+                    user_facing = true,
+                    request_id = tracing::field::Empty,
+                );
+                start_trace(&request_id, &trace, &span, &exporter).await?;
 
                 match engine.executor().rollback_tx(TxId::from(tx_id)).instrument(span).await {
                     Ok(_) => Ok("{}".to_string()),
@@ -464,6 +494,28 @@ impl QueryEngine {
         })
         .with_subscriber(dispatcher)
         .with_optional_recorder(recorder)
+        .await
+    }
+
+    /// Fetch the spans associated with a [`RequestId`]
+    #[napi]
+    pub async fn trace(&self, request_id: String) -> napi::Result<Option<String>> {
+        async_panic_to_js_error(async {
+            let request_id = request_id
+                .parse()
+                .map_err(|_| ApiError::Decode("invalid request id".into()))?;
+
+            let exporter = self.logger.exporter();
+
+            Ok(exporter
+                .stop_capturing(request_id)
+                .await
+                .as_ref()
+                .map(serde_json::to_string)
+                .transpose()?)
+        })
+        .with_subscriber(self.logger.dispatcher())
+        .with_optional_recorder(self.logger.recorder())
         .await
     }
 }

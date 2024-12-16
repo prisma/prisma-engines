@@ -10,7 +10,7 @@ use prisma_value::PrismaValue;
 use quaint::prelude::ConnectionInfo;
 use query_structure::{prelude::*, Filter, QueryArguments, RelationLoadStrategy, SelectionResult};
 use std::collections::HashMap;
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 
 pub struct SqlConnectorTransaction<'tx> {
     inner: Box<dyn quaint::connector::Transaction + 'tx>,

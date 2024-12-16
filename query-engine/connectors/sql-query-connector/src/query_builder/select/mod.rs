@@ -3,7 +3,6 @@ mod subquery;
 
 use itertools::{Either, Itertools};
 use std::borrow::Cow;
-use tracing::Span;
 
 use psl::{
     datamodel_connector::{ConnectorCapability, Flavour},
@@ -271,7 +270,7 @@ pub(crate) trait JoinSelectBuilder {
             .with_ordering(args, Some(table_alias.to_table_string()), ctx)
             .with_filters(args.filter.clone(), Some(table_alias), ctx)
             .with_pagination(args, None)
-            .append_trace(&Span::current());
+            .add_traceparent(ctx.traceparent);
 
         (select, table_alias)
     }

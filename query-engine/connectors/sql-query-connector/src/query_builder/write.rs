@@ -3,7 +3,6 @@ use connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
 use quaint::ast::*;
 use query_structure::*;
 use std::{collections::HashSet, convert::TryInto};
-use tracing::Span;
 
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
@@ -33,7 +32,6 @@ pub(crate) fn create_record(
 
     Insert::from(insert)
         .returning(selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true)))
-        .append_trace(&Span::current())
         .add_traceparent(ctx.traceparent)
 }
 
@@ -84,7 +82,7 @@ pub(crate) fn create_records_nonempty(
     let insert = Insert::multi_into(model.as_table(ctx), columns);
     let insert = values.into_iter().fold(insert, |stmt, values| stmt.values(values));
     let insert: Insert = insert.into();
-    let mut insert = insert.append_trace(&Span::current()).add_traceparent(ctx.traceparent);
+    let mut insert = insert.add_traceparent(ctx.traceparent);
 
     if let Some(selected_fields) = selected_fields {
         insert = insert.returning(projection_into_columns(selected_fields, ctx));
@@ -105,7 +103,7 @@ pub(crate) fn create_records_empty(
     ctx: &Context<'_>,
 ) -> Insert<'static> {
     let insert: Insert<'static> = Insert::single_into(model.as_table(ctx)).into();
-    let mut insert = insert.append_trace(&Span::current()).add_traceparent(ctx.traceparent);
+    let mut insert = insert.add_traceparent(ctx.traceparent);
 
     if let Some(selected_fields) = selected_fields {
         insert = insert.returning(projection_into_columns(selected_fields, ctx));
@@ -175,7 +173,7 @@ pub(crate) fn build_update_and_set_query(
             acc.set(name, value)
         });
 
-    let query = query.append_trace(&Span::current()).add_traceparent(ctx.traceparent);
+    let query = query.add_traceparent(ctx.traceparent);
 
     let query = if let Some(selected_fields) = selected_fields {
         query.returning(selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true)))
@@ -221,7 +219,6 @@ pub(crate) fn delete_returning(
     Delete::from_table(model.as_table(ctx))
         .so_that(filter)
         .returning(projection_into_columns(selected_fields, ctx))
-        .append_trace(&Span::current())
         .add_traceparent(ctx.traceparent)
         .into()
 }
@@ -233,7 +230,6 @@ pub(crate) fn delete_many_from_filter(
 ) -> Query<'static> {
     Delete::from_table(model.as_table(ctx))
         .so_that(filter_condition)
-        .append_trace(&Span::current())
         .add_traceparent(ctx.traceparent)
         .into()
 }
@@ -300,6 +296,5 @@ pub(crate) fn delete_relation_table_records(
 
     Delete::from_table(relation.as_table(ctx))
         .so_that(parent_id_criteria.and(child_id_criteria))
-        .append_trace(&Span::current())
         .add_traceparent(ctx.traceparent)
 }

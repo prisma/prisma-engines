@@ -1,10 +1,9 @@
-#![allow(dead_code)]
-
 use core::fmt;
 use js_sys::Function as JsFunction;
 use query_engine_common::logger::StringCallback;
 use serde_json::Value;
 use std::collections::BTreeMap;
+use telemetry::Exporter;
 use tracing::{
     field::{Field, Visit},
     level_filters::LevelFilter,
@@ -25,11 +24,12 @@ unsafe impl Sync for LogCallback {}
 
 pub(crate) struct Logger {
     dispatcher: Dispatch,
+    exporter: Exporter,
 }
 
 impl Logger {
     /// Creates a new logger using a call layer
-    pub fn new(log_queries: bool, log_level: LevelFilter, log_callback: LogCallback) -> Self {
+    pub fn new(log_queries: bool, log_level: LevelFilter, log_callback: LogCallback, enable_tracing: bool) -> Self {
         let is_sql_query = filter_fn(|meta| {
             meta.target() == "quaint::connector::metrics" && meta.fields().iter().any(|f| f.name() == "query")
         });
@@ -43,16 +43,25 @@ impl Logger {
             FilterExt::boxed(log_level)
         };
 
-        let log_callback = CallbackLayer::new(log_callback);
-        let layer = log_callback.with_filter(filters);
+        let log_layer = CallbackLayer::new(log_callback).with_filter(filters);
+
+        let exporter = Exporter::new();
+
+        let tracing_layer = enable_tracing
+            .then(|| telemetry::layer(exporter.clone()).with_filter(telemetry::filter::user_facing_spans()));
 
         Self {
-            dispatcher: Dispatch::new(Registry::default().with(layer)),
+            dispatcher: Dispatch::new(Registry::default().with(tracing_layer).with(log_layer)),
+            exporter,
         }
     }
 
     pub fn dispatcher(&self) -> Dispatch {
         self.dispatcher.clone()
+    }
+
+    pub fn exporter(&self) -> Exporter {
+        self.exporter.clone()
     }
 }
 

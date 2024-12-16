@@ -175,12 +175,12 @@ mod logs {
         let query_logs = logs
             .iter()
             .filter(|log| {
-                log.split_once("db.statement=").is_some_and(|(_, q)| {
+                log.split_once("db.query.text=").is_some_and(|(_, q)| {
                     !q.starts_with("BEGIN") && !q.starts_with("COMMIT") && !q.starts_with("SET TRANSACTION")
                 })
             })
             .collect::<Vec<_>>();
-        assert!(!query_logs.is_empty(), "expected db.statement logs in {logs:?}");
+        assert!(!query_logs.is_empty(), "expected db.query.text logs in {logs:?}");
 
         let expected_traceparent = format!("/* traceparent='{}' */", traceparent);
         let matching = query_logs

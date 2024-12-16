@@ -3,7 +3,7 @@ use crate::{interpreter::InterpretationResult, query_ast::*};
 use connector::ConnectionLike;
 use query_structure::*;
 use std::collections::HashMap;
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 
 pub(crate) async fn m2m(
     tx: &mut dyn ConnectionLike,
