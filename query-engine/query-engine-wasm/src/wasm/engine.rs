@@ -207,24 +207,22 @@ impl QueryEngine {
 
             let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
 
+            let span = tracing::info_span!(
+                "prisma:engine:query",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
+
+            let traceparent = start_trace(&request_id, &trace, &span, &exporter).await?;
+
             async move {
-                let span = tracing::info_span!(
-                    "prisma:engine:query",
-                    user_facing = true,
-                    request_id = tracing::field::Empty,
-                );
-
-                let traceparent = start_trace(&request_id, &trace, &span, &exporter).await?;
-
                 let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
-                let response = handler
-                    .handle(query, tx_id.map(TxId::from), traceparent)
-                    .instrument(span)
-                    .await;
+                let response = handler.handle(query, tx_id.map(TxId::from), traceparent).await;
 
                 let serde_span = tracing::info_span!("prisma:engine:response_json_serialization", user_facing = true);
                 Ok(serde_span.in_scope(|| serde_json::to_string(&response))?)
             }
+            .instrument(span)
             .await
         }
         .with_subscriber(dispatcher)
