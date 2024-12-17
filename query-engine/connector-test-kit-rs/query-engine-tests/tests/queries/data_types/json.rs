@@ -116,7 +116,7 @@ mod json {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findUniqueTestModel":{"json":{"json":{"$type":"Json","value":"1.5"}}}}"###
+                  @r###"{"data":{"findUniqueTestModel":{"json":{"$type":"Json","value":"1.5"}}}}"###
                 );
             }
         }
@@ -157,7 +157,7 @@ mod json {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findUniqueTestModel":{"json":{"json":{"$type":"Json","value":"1"}}}}"###
+                  @r###"{"data":{"findUniqueTestModel":{"json":{"$type":"Json","value":"1"}}}}"###
                 );
             }
         }
@@ -198,7 +198,7 @@ mod json {
 
                 insta::assert_snapshot!(
                   res.to_string(),
-                  @r###"{"data":{"findUniqueTestModel":{"json":{"json":{"$type":"Json","value":"true"}}}}"###
+                  @r###"{"data":{"findUniqueTestModel":{"json":{"$type":"Json","value":"true"}}}}"###
                 );
             }
         }
