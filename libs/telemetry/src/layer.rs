@@ -72,7 +72,7 @@ where
 {
     fn on_new_span(&self, attrs: &Attributes<'_>, id: &Id, ctx: Context<'_, S>) {
         let span = Self::require_span(id, &ctx);
-        let mut span_builder = SpanBuilder::new(span.name(), id, attrs.fields().len());
+        let mut span_builder = SpanBuilder::new(span.name(), attrs.fields().len());
 
         if let Some(request_id) = span
             .parent()
@@ -98,11 +98,16 @@ where
     }
 
     fn on_follows_from(&self, span: &Id, follows: &Id, ctx: Context<'_, S>) {
+        let followed_span = Self::require_span(follows, &ctx);
+        let Some(followed_id) = followed_span.extensions().get::<SpanBuilder>().map(|sb| sb.span_id()) else {
+            return;
+        };
+
         let span = Self::require_span(span, &ctx);
         let mut extensions = span.extensions_mut();
 
         if let Some(span_builder) = extensions.get_mut::<SpanBuilder>() {
-            span_builder.add_link(follows.into());
+            span_builder.add_link(followed_id);
         }
     }
 
@@ -116,12 +121,18 @@ where
             return;
         };
 
-        let Some(request_id) = parent.extensions().get::<SpanBuilder>().and_then(|sb| sb.request_id()) else {
+        let extensions = parent.extensions();
+
+        let Some(span_builder) = extensions.get::<SpanBuilder>() else {
+            return;
+        };
+
+        let Some(request_id) = span_builder.request_id() else {
             return;
         };
 
         let mut event_builder = EventBuilder::new(
-            parent.id().into(),
+            span_builder.span_id(),
             event.metadata().target(),
             event.metadata().level().into(),
             event.metadata().fields().len(),
@@ -145,7 +156,10 @@ where
             return;
         };
 
-        let parent_id = span.parent().map(|parent| parent.id());
+        let parent_id = span
+            .parent()
+            .and_then(|parent| parent.extensions().get::<SpanBuilder>().map(|sb| sb.span_id()));
+
         let collected_span = span_builder.end(parent_id);
 
         self.collector.add_span(request_id, collected_span);
@@ -280,6 +294,7 @@ impl<Filter: AllowAttribute> field::Visit for EventAttributeVisitor<'_, Filter> 
 mod tests {
     use crate::collector::{AllowAttribute, CollectedEvent, CollectedSpan};
     use crate::id::RequestId;
+    use crate::NextId;
 
     use super::*;
 

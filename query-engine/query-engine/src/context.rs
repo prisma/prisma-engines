@@ -12,7 +12,7 @@ use query_core::{
 use request_handlers::{load_executor, ConnectorKind};
 use std::{env, fmt, sync::Arc};
 use telemetry::exporter::{CaptureSettings, CaptureTarget};
-use telemetry::RequestId;
+use telemetry::{NextId, RequestId};
 use tracing::Instrument;
 
 /// Prisma request context containing all immutable state of the process.

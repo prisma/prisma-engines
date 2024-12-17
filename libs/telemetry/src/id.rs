@@ -66,23 +66,33 @@ impl<'de> Deserialize<'de> for SerializableNonZeroU64 {
     }
 }
 
-/// A unique identifier for a span. It maps directly to [`tracing::span::Id`] assigned by
-/// [`tracing_subscriber::registry::Registry`].
+/// A unique identifier for a span.
+///
+/// We don't use the original span IDs assigned by the `tracing` `Subscriber`
+/// because they are are only guaranteed to be unique among the spans active at
+/// the same time. They may be reused after a span is closed (even for
+/// successive sibling spans in the same trace as long as they don't overlap in
+/// time), so they are ephemeral and cannot be stored. Since we do need to store
+/// them and can only tolerate reuse across different traces but not in a single
+/// trace, we generate our own IDs.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
 #[repr(transparent)]
 pub struct SpanId(SerializableNonZeroU64);
 
-impl From<&tracing::span::Id> for SpanId {
-    fn from(id: &tracing::span::Id) -> Self {
-        Self(SerializableNonZeroU64(id.into_non_zero_u64()))
+impl SpanId {
+    #[cfg(test)]
+    pub(crate) fn from_u64(value: u64) -> Option<Self> {
+        SerializableNonZeroU64::from_u64(value).map(Self)
     }
 }
 
-impl From<tracing::span::Id> for SpanId {
-    fn from(id: tracing::span::Id) -> Self {
-        Self::from(&id)
+impl From<NonZeroU64> for SpanId {
+    fn from(value: NonZeroU64) -> Self {
+        Self(SerializableNonZeroU64(value))
     }
 }
+
+impl NextId for SpanId {}
 
 /// A unique identifier for an engine trace, representing a tree of spans. These
 /// internal traces *do not* correspond to OpenTelemetry trace IDs. One
@@ -91,30 +101,21 @@ impl From<tracing::span::Id> for SpanId {
 /// requests to the engine, we call these trace IDs "request IDs" to
 /// disambiguate and avoid confusion.
 ///
-/// We don't use IDs of the root spans themselves for this purpose because span
-/// IDs are only guaranteed to be unique among the spans active at the same
-/// time. They may be reused after a span is closed, so they are not
-/// historically unique. We store the collected spans and events for some short
-/// time after the spans are closed until the client requests them, so we need
-/// request IDs that are guaranteed to be unique for a very long period of time
-/// (although they still don't necessarily have to be unique for the whole
-/// lifetime of the process).
+/// We store the collected spans and events for some short time after the spans
+/// are closed until the client requests them, so we need request IDs that are
+/// guaranteed to be unique for a very long period of time (although they still
+/// don't necessarily have to be unique for the whole lifetime of the process).
+///
+/// We don't use the root span IDs as the request IDs to have more flexibility
+/// and allow clients to generate the request IDs on the client side, rather
+/// than having us send the generated request ID back to the client. This
+/// guarantees we can still fetch the traces from the engine even in a case of
+/// an error and no response sent back to the client.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
 #[repr(transparent)]
 pub struct RequestId(SerializableNonZeroU64);
 
 impl RequestId {
-    pub fn next() -> Self {
-        static NEXT_ID: AtomicU64 = AtomicU64::new(1);
-
-        let mut id = 0;
-        while id == 0 {
-            id = NEXT_ID.fetch_add(1, Ordering::Relaxed);
-        }
-
-        Self(SerializableNonZeroU64(NonZeroU64::new(id).unwrap()))
-    }
-
     pub fn into_u64(self) -> u64 {
         self.0.into_u64()
     }
@@ -123,6 +124,14 @@ impl RequestId {
         SerializableNonZeroU64::from_u64(value).map(Self)
     }
 }
+
+impl From<NonZeroU64> for RequestId {
+    fn from(value: NonZeroU64) -> Self {
+        Self(SerializableNonZeroU64(value))
+    }
+}
+
+impl NextId for RequestId {}
 
 impl Default for RequestId {
     fn default() -> Self {
@@ -135,5 +144,20 @@ impl FromStr for RequestId {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         SerializableNonZeroU64::from_str(s).map(Self)
+    }
+}
+
+/// A trait for types that represent sequential IDs and can be losslessly
+/// converted from [`NonZeroU64`].
+pub trait NextId: Sized + From<NonZeroU64> {
+    fn next() -> Self {
+        static NEXT_ID: AtomicU64 = AtomicU64::new(1);
+
+        let mut id = 0;
+        while id == 0 {
+            id = NEXT_ID.fetch_add(1, Ordering::Relaxed);
+        }
+
+        Self::from(NonZeroU64::new(id).unwrap())
     }
 }

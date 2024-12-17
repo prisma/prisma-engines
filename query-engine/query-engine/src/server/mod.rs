@@ -13,7 +13,7 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use telemetry::exporter::{CaptureSettings, CaptureTarget, TraceData};
-use telemetry::{RequestId, TraceParent};
+use telemetry::{NextId, RequestId, TraceParent};
 use tracing::{Instrument, Span};
 
 /// Starts up the graphql query engine server
