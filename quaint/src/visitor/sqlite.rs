@@ -333,7 +333,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             JsonType::Number => {
                 self.visit_expression(Expression::from(Value::text("integer")))?;
                 self.write(" OR JSON_TYPE")?;
-                self.surround_with("(", ")", |s| s.visit_expression(left.clone()))?;
+                self.surround_with("(", ")", |s| s.visit_expression(left))?;
                 self.write(" = ")?;
                 self.visit_expression(Expression::from(Value::text("real")))?;
             }
