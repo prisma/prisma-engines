@@ -293,8 +293,7 @@ impl<Filter: AllowAttribute> field::Visit for EventAttributeVisitor<'_, Filter> 
 #[cfg(test)]
 mod tests {
     use crate::collector::{AllowAttribute, CollectedEvent, CollectedSpan};
-    use crate::id::RequestId;
-    use crate::NextId;
+    use crate::id::{NextId, RequestId};
 
     use super::*;
 
