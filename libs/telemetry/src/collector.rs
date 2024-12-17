@@ -7,6 +7,7 @@ use serde::Serialize;
 
 use crate::id::{RequestId, SpanId};
 use crate::models::{LogLevel, SpanKind};
+use crate::NextId;
 
 #[derive(Debug, Clone)]
 #[cfg_attr(test, derive(Serialize))]
@@ -37,10 +38,10 @@ pub(crate) struct SpanBuilder {
 }
 
 impl SpanBuilder {
-    pub fn new(name: &'static str, id: impl Into<SpanId>, attrs_size_hint: usize) -> Self {
+    pub fn new(name: &'static str, attrs_size_hint: usize) -> Self {
         Self {
             request_id: None,
-            id: id.into(),
+            id: SpanId::next(),
             name: name.into(),
             start_time: SystemTime::now(),
             elapsed: ElapsedTimeCounter::start(),
@@ -52,6 +53,10 @@ impl SpanBuilder {
 
     pub fn request_id(&self) -> Option<RequestId> {
         self.request_id
+    }
+
+    pub fn span_id(&self) -> SpanId {
+        self.id
     }
 
     pub fn set_request_id(&mut self, request_id: RequestId) {
@@ -74,10 +79,10 @@ impl SpanBuilder {
         self.links.push(link);
     }
 
-    pub fn end(self, parent_id: Option<impl Into<SpanId>>) -> CollectedSpan {
+    pub fn end(self, parent_id: Option<SpanId>) -> CollectedSpan {
         CollectedSpan {
             id: self.id,
-            parent_id: parent_id.map(Into::into),
+            parent_id,
             name: self.name,
             start_time: self.start_time,
             duration: self.elapsed.elapsed_time(),

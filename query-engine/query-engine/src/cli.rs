@@ -9,7 +9,7 @@ use psl::parser_database::Files;
 use query_core::{protocol::EngineProtocol, schema};
 use request_handlers::{dmmf, RequestBody, RequestHandler};
 use std::{env, sync::Arc};
-use telemetry::RequestId;
+use telemetry::{NextId, RequestId};
 
 pub struct ExecuteRequest {
     query: String,

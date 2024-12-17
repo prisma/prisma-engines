@@ -71,6 +71,7 @@ fmt-sql = ["sqlformat"]
 [dependencies]
 connection-string = "0.2"
 percent-encoding = "2"
+telemetry.path = "../libs/telemetry"
 tracing.workspace = true
 tracing-futures.workspace = true
 async-trait.workspace = true

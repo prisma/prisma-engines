@@ -3,7 +3,7 @@ use enumflags2::make_bitflags;
 use indoc::{formatdoc, indoc};
 use query_core::protocol::EngineProtocol;
 use serde_json::json;
-use telemetry::RequestId;
+use telemetry::{NextId, RequestId};
 
 #[tokio::test]
 async fn connection_string_problems_give_a_nice_error() {
