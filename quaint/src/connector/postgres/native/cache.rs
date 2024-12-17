@@ -6,10 +6,9 @@ use std::{
 use async_trait::async_trait;
 use lru_cache::LruCache;
 use postgres_types::Type;
+use telemetry::formatting::strip_query_traceparent;
 use tokio::sync::Mutex;
 use tokio_postgres::{Client, Error, Statement};
-
-use crate::connector::metrics::strip_query_traceparent;
 
 use super::query::{PreparedQuery, QueryMetadata, TypedQuery};
 

@@ -13,6 +13,7 @@ use quaint::{
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
 };
+use telemetry::formatting::QueryForTracing;
 use tracing::{info_span, Instrument};
 
 /// A JsQueryable adapts a Proxy to implement quaint's Queryable interface. It has the
@@ -188,7 +189,7 @@ impl JsBaseQueryable {
             "prisma:engine:js:query:sql",
             "otel.kind" = "client",
             "db.system" = %self.db_system_name,
-            "db.query.text" = %sql,
+            "db.query.text" = %QueryForTracing(sql),
             user_facing = true,
         );
         let result_set = self.proxy.query_raw(query).instrument(sql_span).await?;
@@ -225,7 +226,7 @@ impl JsBaseQueryable {
             "prisma:engine:js:query:sql",
             "otel.kind" = "client",
             "db.system" = %self.db_system_name,
-            "db.query.text" = %sql,
+            "db.query.text" = %QueryForTracing(sql),
             user_facing = true,
         );
         let affected_rows = self.proxy.execute_raw(query).instrument(sql_span).await?;

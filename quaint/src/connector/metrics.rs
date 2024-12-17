@@ -1,9 +1,11 @@
+use std::future::Future;
+
+use crosstarget_utils::time::ElapsedTimeCounter;
 use prisma_metrics::{counter, histogram};
+use telemetry::formatting::QueryForTracing;
 use tracing::{info_span, Instrument};
 
 use crate::ast::{Params, Value};
-use crosstarget_utils::time::ElapsedTimeCounter;
-use std::{fmt, future::Future};
 
 pub async fn query<'a, F, T, U>(
     tag: &'static str,
@@ -101,25 +103,4 @@ fn trace_query<'a>(query: &'a str, params: &'a [Value<'_>], result: &str, start:
         is_query = true,
         duration_ms = start.elapsed_time().as_millis() as u64,
     );
-}
-
-struct QueryForTracing<'a>(&'a str);
-
-impl fmt::Display for QueryForTracing<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", strip_query_traceparent(self.0))
-    }
-}
-
-pub(super) fn strip_query_traceparent(query: &str) -> &str {
-    query.rsplit_once("/* traceparent=").map_or(query, |(str, remainder)| {
-        if remainder
-            .split_once("*/")
-            .is_some_and(|(_, suffix)| suffix.trim_end().is_empty())
-        {
-            str.trim_end()
-        } else {
-            query
-        }
-    })
 }
