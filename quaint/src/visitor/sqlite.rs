@@ -291,7 +291,8 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         } else {
             self.write("->")?;
         }
-        match json_extract.path.clone() {
+
+        match json_extract.path {
             JsonPath::Array(_) => panic!("JSON path array notation is not supported for SQlite"),
             JsonPath::String(path) => self.visit_parameterized(Value::text(path))?,
         }
