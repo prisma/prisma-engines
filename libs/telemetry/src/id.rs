@@ -16,9 +16,13 @@ impl SerializableNonZeroU64 {
     pub fn into_u64(self) -> u64 {
         self.0.get()
     }
+}
 
-    pub fn from_u64(value: u64) -> Option<Self> {
-        NonZeroU64::new(value).map(Self)
+impl TryFrom<u64> for SerializableNonZeroU64 {
+    type Error = u64;
+
+    fn try_from(value: u64) -> Result<Self, Self::Error> {
+        NonZeroU64::new(value).map(Self).ok_or(value)
     }
 }
 
@@ -79,16 +83,17 @@ impl<'de> Deserialize<'de> for SerializableNonZeroU64 {
 #[repr(transparent)]
 pub struct SpanId(SerializableNonZeroU64);
 
-impl SpanId {
-    #[cfg(test)]
-    pub(crate) fn from_u64(value: u64) -> Option<Self> {
-        SerializableNonZeroU64::from_u64(value).map(Self)
-    }
-}
-
 impl From<NonZeroU64> for SpanId {
     fn from(value: NonZeroU64) -> Self {
         Self(SerializableNonZeroU64(value))
+    }
+}
+
+impl TryFrom<u64> for SpanId {
+    type Error = u64;
+
+    fn try_from(value: u64) -> Result<Self, Self::Error> {
+        SerializableNonZeroU64::try_from(value).map(Self)
     }
 }
 
@@ -119,15 +124,19 @@ impl RequestId {
     pub fn into_u64(self) -> u64 {
         self.0.into_u64()
     }
-
-    pub fn from_u64(value: u64) -> Option<Self> {
-        SerializableNonZeroU64::from_u64(value).map(Self)
-    }
 }
 
 impl From<NonZeroU64> for RequestId {
     fn from(value: NonZeroU64) -> Self {
         Self(SerializableNonZeroU64(value))
+    }
+}
+
+impl TryFrom<u64> for RequestId {
+    type Error = u64;
+
+    fn try_from(value: u64) -> Result<Self, Self::Error> {
+        SerializableNonZeroU64::try_from(value).map(Self)
     }
 }
 

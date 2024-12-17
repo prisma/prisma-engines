@@ -329,7 +329,7 @@ mod tests {
         let request_id = exporter.start_capturing(RequestId::next(), capture_all()).await;
 
         let span = CollectedSpan {
-            id: SpanId::from_u64(1).unwrap(),
+            id: SpanId::try_from(1).unwrap(),
             parent_id: None,
             name: "test_span".into(),
             start_time: SystemTime::UNIX_EPOCH,
@@ -383,7 +383,7 @@ mod tests {
         let request_id = exporter.start_capturing(RequestId::next(), capture_spans()).await;
 
         let span = CollectedSpan {
-            id: SpanId::from_u64(1).unwrap(),
+            id: SpanId::try_from(1).unwrap(),
             parent_id: None,
             name: "test_span".into(),
             start_time: SystemTime::UNIX_EPOCH,

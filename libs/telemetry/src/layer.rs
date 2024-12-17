@@ -196,7 +196,7 @@ impl<Filter: AllowAttribute> field::Visit for SpanAttributeVisitor<'_, Filter> {
     fn record_u64(&mut self, field: &field::Field, value: u64) {
         match field.name() {
             REQUEST_ID_FIELD => {
-                if let Some(request_id) = RequestId::from_u64(value) {
+                if let Ok(request_id) = RequestId::try_from(value) {
                     self.span_builder.set_request_id(request_id);
                 }
             }
