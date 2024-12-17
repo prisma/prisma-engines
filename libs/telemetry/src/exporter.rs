@@ -272,6 +272,8 @@ impl AllowAttribute for InternalAttributesFilter {
 mod tests {
     use std::time::{Duration, SystemTime};
 
+    use crate::NextId;
+
     use super::*;
 
     use CaptureTarget::*;
@@ -327,7 +329,7 @@ mod tests {
         let request_id = exporter.start_capturing(RequestId::next(), capture_all()).await;
 
         let span = CollectedSpan {
-            id: tracing::span::Id::from_u64(1).into(),
+            id: SpanId::try_from(1).unwrap(),
             parent_id: None,
             name: "test_span".into(),
             start_time: SystemTime::UNIX_EPOCH,
@@ -381,7 +383,7 @@ mod tests {
         let request_id = exporter.start_capturing(RequestId::next(), capture_spans()).await;
 
         let span = CollectedSpan {
-            id: tracing::span::Id::from_u64(1).into(),
+            id: SpanId::try_from(1).unwrap(),
             parent_id: None,
             name: "test_span".into(),
             start_time: SystemTime::UNIX_EPOCH,
