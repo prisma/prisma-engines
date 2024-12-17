@@ -304,9 +304,7 @@ pub enum Flavour {
 
 impl Flavour {
     pub fn is_sql(&self) -> bool {
-        pub fn is_sql(&self) -> bool {
-            !self.is_mongo()
-        }
+        !self.is_mongo()
     }
 
     pub fn is_mongo(&self) -> bool {
