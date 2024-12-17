@@ -263,6 +263,7 @@ pub fn js_value_to_quaint(
                 .ok_or(conversion_error!(
                     "number must be an i64 or f64 in column '{column_name}', got {n}"
                 )),
+            serde_json::Value::Null => Ok(QuaintValue::null_int32()),
             mismatch => Err(conversion_error!(
                 "expected a either an i64 or a f64 in column '{column_name}', found {mismatch}",
             )),
