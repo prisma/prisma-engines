@@ -37,6 +37,22 @@ fn enum_support() {
 }
 
 #[test]
+fn json_support() {
+    let dml = indoc! {r#"
+        datasource db {
+          provider = "sqlite"
+          url = "file:test.db"
+        }
+        model User {
+          id   Int @id
+          data Json
+        }
+    "#};
+
+    assert_valid(dml);
+}
+
+#[test]
 fn scalar_list_support() {
     let dml = indoc! {r#"
         datasource db {
