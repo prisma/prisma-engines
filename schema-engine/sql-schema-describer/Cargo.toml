@@ -3,9 +3,38 @@ edition = "2021"
 name = "sql-schema-describer"
 version = "0.1.0"
 
+[features]
+postgresql = ["relation_joins", "quaint/postgresql", "psl/postgresql"]
+postgresql-native = ["postgresql", "quaint/postgresql-native", "quaint/pooled"]
+mysql = ["relation_joins", "quaint/mysql", "psl/mysql"]
+mysql-native = ["mysql", "quaint/mysql-native", "quaint/pooled"]
+sqlite = ["quaint/sqlite", "psl/sqlite"]
+sqlite-native = ["sqlite", "quaint/sqlite-native", "quaint/pooled"]
+mssql = ["quaint/mssql"]
+mssql-native = ["mssql", "quaint/mssql-native", "quaint/pooled"]
+cockroachdb = ["relation_joins", "quaint/postgresql", "psl/cockroachdb"]
+cockroachdb-native = [
+    "cockroachdb",
+    "quaint/postgresql-native",
+    "quaint/pooled",
+]
+vendored-openssl = ["quaint/vendored-openssl"]
+all-native = [
+    "sqlite-native",
+    "mysql-native",
+    "postgresql-native",
+    "mssql-native",
+    "cockroachdb-native",
+]
+# TODO: At the moment of writing (rustc 1.77.0), can_have_capability from psl does not eliminate joins
+# code from bundle for some reason, so we are doing it explicitly. Check with a newer version of compiler - if elimination
+# happens successfully, we don't need this feature anymore
+relation_joins = []
+
 [dependencies]
 prisma-value = { path = "../../libs/prisma-value" }
-psl = { workspace = true, features = ["all"] }
+psl.workspace = true
+quaint.workspace = true
 
 either = "1.8.0"
 async-trait.workspace = true
@@ -19,12 +48,6 @@ serde.workspace = true
 tracing.workspace = true
 tracing-error = "0.2"
 tracing-futures.workspace = true
-quaint = { workspace = true, features = [
-    "all-native",
-    "pooled",
-    "expose-drivers",
-    "fmt-sql",
-] }
 
 [dev-dependencies]
 expect-test = "1.2.2"
