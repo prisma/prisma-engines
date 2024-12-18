@@ -280,7 +280,7 @@ mod json_filters {
         Ok(())
     }
 
-    #[connector_test(exclude(MySQL(5.6)))]
+    #[connector_test(exclude(MySQL(5.6), Sqlite))]
     async fn array_contains(runner: Runner) -> TestResult<()> {
         array_contains_runner(runner).await?;
 
@@ -941,7 +941,9 @@ mod json_filters {
     fn json_path(runner: &Runner) -> &'static str {
         match runner.connector_version() {
             ConnectorVersion::Postgres(_) | ConnectorVersion::CockroachDb(_) => r#"path: ["a", "b"]"#,
-            ConnectorVersion::MySql(_) | ConnectorVersion::Vitess(_) => r#"path: "$.a.b""#,
+            ConnectorVersion::Sqlite(_) | ConnectorVersion::MySql(_) | ConnectorVersion::Vitess(_) => {
+                r#"path: "$.a.b""#
+            }
             x => unreachable!("JSON filtering is not supported on {:?}", x),
         }
     }

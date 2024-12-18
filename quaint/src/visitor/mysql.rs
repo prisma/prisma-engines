@@ -407,7 +407,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         }
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> visitor::Result {
         if json_extract.extract_as_string {
             self.write("JSON_UNQUOTE(")?;
@@ -431,7 +431,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_array_contains(&mut self, left: Expression<'a>, right: Expression<'a>, not: bool) -> visitor::Result {
         self.write("JSON_CONTAINS(")?;
         self.visit_expression(left)?;
@@ -446,7 +446,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType<'a>, not: bool) -> visitor::Result {
         self.write("(")?;
         self.write("JSON_TYPE")?;
@@ -558,7 +558,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
         self.write("JSON_EXTRACT(")?;
         self.visit_expression(*extract.expr.clone())?;
@@ -571,7 +571,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_extract_first_array_item(&mut self, extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
         self.write("JSON_EXTRACT(")?;
         self.visit_expression(*extract.expr)?;
@@ -582,7 +582,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> visitor::Result {
         self.write("JSON_UNQUOTE(")?;
         self.visit_expression(*json_unquote.expr)?;

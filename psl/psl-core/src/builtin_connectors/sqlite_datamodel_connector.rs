@@ -14,7 +14,6 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     AnyId |
     AutoIncrement |
     CompoundIds |
-    SqlQueryRaw |
     RelationFieldsInArbitraryOrder |
     UpdateableId |
     ImplicitManyToManyRelation |
@@ -30,7 +29,11 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     UpdateReturning |
     SupportsFiltersOnRelationsWithoutJoins |
     CreateMany |
-    CreateManyWriteableAutoIncId
+    CreateManyWriteableAutoIncId |
+    Json |
+    JsonFiltering |
+    JsonFilteringJsonPath |
+    AdvancedJsonNullability
 });
 
 pub struct SqliteDatamodelConnector;

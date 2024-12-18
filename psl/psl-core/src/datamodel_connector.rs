@@ -302,6 +302,16 @@ pub enum Flavour {
     Sqlite,
 }
 
+impl Flavour {
+    pub fn is_sql(&self) -> bool {
+        !self.is_mongo()
+    }
+
+    pub fn is_mongo(&self) -> bool {
+        matches!(self, Flavour::Mongo)
+    }
+}
+
 impl FromStr for Flavour {
     type Err = String;
     fn from_str(s: &str) -> Result<Self, Self::Err> {

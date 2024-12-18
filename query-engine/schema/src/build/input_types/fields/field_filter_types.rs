@@ -444,22 +444,28 @@ fn json_filters(ctx: &'_ QuerySchema) -> impl Iterator<Item = InputField<'_>> {
     let string_with_field_ref_input = InputType::string().with_field_ref_input();
     let json_with_field_ref_input = InputType::json().with_field_ref_input();
 
-    vec![
+    let mut base = vec![
         simple_input_field(filters::PATH, path_type, None).optional(),
         input_field(filters::STRING_CONTAINS, string_with_field_ref_input.clone(), None).optional(),
         input_field(filters::STRING_STARTS_WITH, string_with_field_ref_input.clone(), None).optional(),
         input_field(filters::STRING_ENDS_WITH, string_with_field_ref_input, None).optional(),
-        input_field(filters::ARRAY_CONTAINS, json_with_field_ref_input.clone(), None)
-            .optional()
-            .nullable(),
         input_field(filters::ARRAY_STARTS_WITH, json_with_field_ref_input.clone(), None)
             .optional()
             .nullable(),
-        input_field(filters::ARRAY_ENDS_WITH, json_with_field_ref_input, None)
+        input_field(filters::ARRAY_ENDS_WITH, json_with_field_ref_input.clone(), None)
             .optional()
             .nullable(),
-    ]
-    .into_iter()
+    ];
+
+    if ctx.has_capability(ConnectorCapability::JsonArrayContains) {
+        base.push(
+            input_field(filters::ARRAY_CONTAINS, json_with_field_ref_input.clone(), None)
+                .optional()
+                .nullable(),
+        )
+    }
+
+    base.into_iter()
 }
 
 fn query_mode_field(ctx: &'_ QuerySchema, nested: bool) -> impl Iterator<Item = InputField<'_>> {

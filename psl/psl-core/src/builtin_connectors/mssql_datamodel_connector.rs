@@ -37,7 +37,6 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     NamedDefaultValues |
     NamedForeignKeys |
     NamedPrimaryKeys |
-    SqlQueryRaw |
     ReferenceCycleDetection |
     UpdateableId |
     PrimaryKeySortOrderDefinition |

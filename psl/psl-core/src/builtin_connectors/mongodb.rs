@@ -27,7 +27,6 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     CompositeTypes |
     FullTextIndex |
     SortOrderInFullTextIndex |
-    MongoDbQueryRaw |
     DefaultValueAuto |
     TwoWayEmbeddedManyToManyRelation |
     UndefinedType |

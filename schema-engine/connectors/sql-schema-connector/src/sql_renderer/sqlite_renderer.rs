@@ -263,7 +263,7 @@ fn render_column_type(t: &ColumnType) -> &str {
         ColumnTypeFamily::BigInt => "BIGINT",
         ColumnTypeFamily::String => "TEXT",
         ColumnTypeFamily::Binary => "BLOB",
-        ColumnTypeFamily::Json => unreachable!("ColumnTypeFamily::Json on SQLite"),
+        ColumnTypeFamily::Json => "JSONB",
         ColumnTypeFamily::Enum(_) => unreachable!("ColumnTypeFamily::Enum on SQLite"),
         ColumnTypeFamily::Uuid => unimplemented!("ColumnTypeFamily::Uuid on SQLite"),
         ColumnTypeFamily::Unsupported(x) => x.as_ref(),
