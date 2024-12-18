@@ -382,11 +382,12 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 
     #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> visitor::Result {
-        self.write("JSONB_EXTRACT(")?;
-        self.visit_expression(*json_unquote.expr)?;
-        self.write(", ")?;
-        self.visit_parameterized(Value::text("$"))?;
-        self.write(")")
+        self.write("JSONB_EXTRACT")?;
+        self.surround_with("(", ")", |s| {
+            s.visit_expression(*json_unquote.expr)?;
+            s.write(", ")?;
+            s.visit_parameterized(Value::text("$"))
+        })
     }
 
     #[cfg(feature = "sqlite")]

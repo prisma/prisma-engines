@@ -124,7 +124,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
         let message = match meta.name() {
             Some(name) => {
                 format!(
-                    "Could not convert value {:?} of the field `{}` to type `{:?}`.",
+                    "Could not convert value {} of the field `{}` to type `{:?}`.",
                     value,
                     name,
                     meta.identifier()
