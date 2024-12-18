@@ -214,7 +214,7 @@ mod json {
         exclude(
             Vitess("planetscale.js", "planetscale.js.wasm"),
             Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"),
-            Sqlite("libsql.js"),
+            Sqlite("libsql.js", "libsql.js.wasm", "cfd1"),
             MySQL(5.6)
         )
     )]

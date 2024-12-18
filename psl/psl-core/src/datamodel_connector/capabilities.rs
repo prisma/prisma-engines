@@ -83,10 +83,9 @@ capabilities!(
     JsonFilteringArrayPath, // Connector supports filtering json fields using array path (eg: postgres).
     JsonFilteringAlphanumeric, // Connector supports alphanumeric json filters (gt, gte, lt, lte...).
     JsonFilteringAlphanumericFieldRef, // Connector supports alphanumeric json filters against a json field reference.
+    JsonArrayContains, // Connector supports the contains operator for json fields.
     CompoundIds,
     AnyId, // Any (or combination of) uniques and not only id fields can constitute an id for a model.
-    SqlQueryRaw,
-    MongoDbQueryRaw,
     NativeFullTextSearch,
     NativeFullTextSearchWithoutIndex,
     NativeFullTextSearchWithIndex,

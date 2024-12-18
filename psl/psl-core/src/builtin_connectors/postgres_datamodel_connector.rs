@@ -47,10 +47,10 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     JsonFilteringArrayPath |
     JsonFilteringAlphanumeric |
     JsonFilteringAlphanumericFieldRef |
+    JsonArrayContains |
     MultiSchema |
     NamedForeignKeys |
     NamedPrimaryKeys |
-    SqlQueryRaw |
     RelationFieldsInArbitraryOrder |
     ScalarLists |
     JsonLists |

@@ -65,13 +65,6 @@ pub(crate) fn assert_valid(schema: &str) {
     }
 }
 
-pub(crate) const SQLITE_SOURCE: &str = r#"
-    datasource db {
-        provider = "sqlite"
-        url      = "file:dev.db"
-    }
-"#;
-
 pub(crate) const POSTGRES_SOURCE: &str = r#"
     datasource db {
         provider = "postgres"
@@ -83,5 +76,12 @@ pub(crate) const MYSQL_SOURCE: &str = r#"
     datasource db {
         provider = "mysql"
         url      = "mysql://localhost:3306"
+    }
+"#;
+
+pub(crate) const MSSQL_SOURCE: &str = r#"
+    datasource db {
+        provider = "sqlserver"
+        url      = "jdbc:sqlserver://localhost:3306"
     }
 "#;
