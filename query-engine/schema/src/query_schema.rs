@@ -1,9 +1,7 @@
 use crate::{IdentifierType, ObjectType, OutputField};
 use psl::{
     can_support_relation_load_strategy,
-    datamodel_connector::{
-        Connector, ConnectorCapabilities, ConnectorCapability, Flavour, JoinStrategySupport, RelationMode,
-    },
+    datamodel_connector::{Connector, ConnectorCapabilities, ConnectorCapability, JoinStrategySupport, RelationMode},
     has_capability, parser_database as db, PreviewFeature, PreviewFeatures,
 };
 use query_structure::InternalDataModel;
@@ -220,8 +218,12 @@ impl QuerySchema {
             .contains(ConnectorCapability::NativeUpsert)
     }
 
-    pub fn connector_favlour(&self) -> Flavour {
-        self.connector.flavour()
+    pub fn is_sql(&self) -> bool {
+        self.connector.is_sql()
+    }
+
+    pub fn is_mongo(&self) -> bool {
+        self.connector.is_mongo()
     }
 }
 

@@ -290,6 +290,14 @@ pub trait Connector: Send + Sync {
     ) -> prisma_value::PrismaValueResult<Vec<u8>> {
         unreachable!("This method is only implemented on connectors with lateral join support.")
     }
+
+    fn is_sql(&self) -> bool {
+        self.flavour().is_sql()
+    }
+
+    fn is_mongo(&self) -> bool {
+        self.flavour().is_mongo()
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
