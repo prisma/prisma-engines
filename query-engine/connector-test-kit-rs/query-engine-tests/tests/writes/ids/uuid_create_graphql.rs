@@ -262,6 +262,10 @@ mod uuid_create_graphql {
 
         // Validate that this is a valid ULID value
         assert!(ulid::Ulid::from_string(ulid).is_ok());
+        // Should be a 26 character Crockford base32 encoded string.
+        const CROCKFORD_ALPHABET: &str = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+        assert!(ulid.chars().all(|c| CROCKFORD_ALPHABET.contains(c)));
+        assert!(ulid.len() == 26);
 
         // Test findMany
         let res = run_query_json!(
