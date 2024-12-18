@@ -1,0 +1,35 @@
+[package]
+name = "schema-engine-wasm"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+doc = false
+crate-type = ["cdylib"]
+name = "schema_engine_wasm"
+
+[features]
+sqlite = ["driver-adapters/sqlite", "psl/sqlite"]
+postgresql = ["driver-adapters/postgresql", "psl/postgresql"]
+mysql = ["driver-adapters/mysql", "psl/mysql"]
+
+[dependencies]
+psl.workspace = true
+quaint.workspace = true
+tracing.workspace = true
+
+js-sys.workspace = true
+tsify.workspace = true
+wasm-bindgen.workspace = true
+wasm-bindgen-futures.workspace = true
+wasm-rs-dbg.workspace = true
+driver-adapters = { path = "../../query-engine/driver-adapters" }
+
+[build-dependencies]
+build-utils.path = "../../libs/build-utils"
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false # use wasm-opt explicitly in `./build.sh`
+
+[package.metadata.wasm-pack.profile.profiling]
+wasm-opt = false # use wasm-opt explicitly in `./build.sh`
