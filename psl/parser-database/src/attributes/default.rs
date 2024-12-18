@@ -541,6 +541,7 @@ const FN_AUTO: &str = "auto";
 
 const KNOWN_FUNCTIONS: &[&str] = &[
     FN_AUTOINCREMENT,
+    FN_ULID,
     FN_CUID,
     FN_DBGENERATED,
     FN_NANOID,
