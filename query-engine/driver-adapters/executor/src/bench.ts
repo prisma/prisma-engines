@@ -7,7 +7,7 @@ import * as fs from "node:fs/promises";
 import path from "node:path";
 import { __dirname } from './utils'
 
-import * as qe from "./qe";
+import * as qe from "./query-engine";
 
 import { pg } from "@prisma/bundled-js-drivers";
 import * as prismaPg from "@prisma/adapter-pg";

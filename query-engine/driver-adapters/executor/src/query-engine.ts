@@ -33,7 +33,7 @@ export async function initQueryEngine(
   const options = queryEngineOptions(datamodel);
 
   if (engineType === "Wasm") {
-    const { getEngineForProvider } = await import("./wasm");
+    const { getQueryEngineForProvider: getEngineForProvider } = await import("./query-engine-wasm");
     const WasmQueryEngine = await getEngineForProvider(adapter.provider)
     return new WasmQueryEngine(options, logCallback, adapter);
   } else {
