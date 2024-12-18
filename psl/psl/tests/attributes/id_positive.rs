@@ -163,7 +163,7 @@ fn should_allow_string_ids_with_ulid() {
         .assert_has_scalar_field("id")
         .assert_scalar_type(ScalarType::String)
         .assert_default_value()
-        .assert_cuid();
+        .assert_ulid();
 
     model.assert_id_on_fields(&["id"]);
 }
