@@ -55,6 +55,7 @@ derive_more = "0.99.17"
 user-facing-errors = { path = "./libs/user-facing-errors" }
 uuid = { version = "1", features = ["serde", "v4", "v7", "js"] }
 cuid = { git = "https://github.com/prisma/cuid-rust", branch = "v1.3.3-wasm32-unknown-unknown" }
+ulid = { version = "1", features = ["serde"] }
 getrandom = { version = "0.2" }
 
 indoc = "2.0.1"
@@ -78,7 +79,7 @@ tsify = { version = "0.4.5" }
 
 # version for `wasm-bindgen@0.2.93`, see:
 # https://github.com/rustwasm/wasm-bindgen/pull/4072/
-js-sys = { version = "0.3.70" } 
+js-sys = { version = "0.3.70" }
 
 wasm-bindgen = { version = "0.2.93" }
 wasm-bindgen-futures = { version = "0.4" }

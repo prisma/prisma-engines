@@ -1,12 +1,13 @@
 model User {
   id             Int      @id
   createdAt      DateTime @default(now())
-  someCuid       String   @default(cuid())    @unique
-  someCuid1      String   @default(cuid(1))   @unique
-  someCuid2      String   @default(cuid(2))   @unique
-  someUuid       String   @default(uuid())    @unique
-  someUuid4      String   @default(uuid(4))   @unique
-  someUuid7      String   @default(uuid(7))   @unique
-  someNanoid     String   @default(nanoid())  @unique
-  someNanoidLen6 String   @default(nanoid(6)) @unique
+  someUlid       String   @unique @default(ulid())
+  someCuid       String   @unique @default(cuid())
+  someCuid1      String   @unique @default(cuid(1))
+  someCuid2      String   @unique @default(cuid(2))
+  someUuid       String   @unique @default(uuid())
+  someUuid4      String   @unique @default(uuid(4))
+  someUuid7      String   @unique @default(uuid(7))
+  someNanoid     String   @unique @default(nanoid())
+  someNanoidLen6 String   @unique @default(nanoid(6))
 }

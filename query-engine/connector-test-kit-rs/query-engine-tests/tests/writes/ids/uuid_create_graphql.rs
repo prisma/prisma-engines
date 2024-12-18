@@ -232,4 +232,57 @@ mod uuid_create_graphql {
 
         Ok(())
     }
+
+    fn schema_ulid() -> String {
+        let schema = indoc! {
+            r#"model Todo {
+                    #id(id, String, @id, @default(ulid()))
+                    title String
+                }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // "Creating an item with an id field of model ULID and retrieving it" should "work"
+    #[connector_test(schema(schema_ulid))]
+    async fn create_ulid_and_retrieve_it_should_work(runner: Runner) -> TestResult<()> {
+        let res = run_query_json!(
+            &runner,
+            r#"mutation {
+                    createOneTodo(data: { title: "the title" }){
+                        id
+                    }
+                }"#
+        );
+
+        let ulid = res["data"]["createOneTodo"]["id"]
+            .as_str()
+            .expect("Expected string ID but got something else.");
+
+        // Validate that this is a valid ULID value
+        assert!(ulid::Ulid::from_string(ulid).is_ok());
+
+        // Test findMany
+        let res = run_query_json!(
+            &runner,
+            r#"query { findManyTodo(where: { title: "the title" }) { id }}"#
+        );
+        let ulid_find_many = res["data"]["findManyTodo"][0]["id"]
+            .as_str()
+            .expect("Expected string ID but got something else.");
+        assert_eq!(ulid_find_many, ulid);
+
+        // Test findUnique
+        let res = run_query_json!(
+            &runner,
+            format!(r#"query {{ findUniqueTodo(where: {{ id: "{}" }}) {{ id }} }}"#, ulid)
+        );
+        let ulid_find_unique = res["data"]["findUniqueTodo"]["id"]
+            .as_str()
+            .expect("Expected string ID but got something else.");
+        assert_eq!(ulid_find_unique, ulid);
+
+        Ok(())
+    }
 }

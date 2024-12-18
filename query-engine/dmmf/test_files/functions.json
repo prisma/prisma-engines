@@ -39,6 +39,24 @@
           "isUpdatedAt": false
         },
         {
+          "name": "someUlid",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": true,
+          "isId": false,
+          "isReadOnly": false,
+          "hasDefaultValue": true,
+          "type": "String",
+          "nativeType": null,
+          "default": {
+            "name": "ulid",
+            "args": []
+          },
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
           "name": "someCuid",
           "kind": "scalar",
           "isList": false,
@@ -51,9 +69,7 @@
           "nativeType": null,
           "default": {
             "name": "cuid",
-            "args": [
-              1
-            ]
+            "args": [1]
           },
           "isGenerated": false,
           "isUpdatedAt": false
@@ -71,9 +87,7 @@
           "nativeType": null,
           "default": {
             "name": "cuid",
-            "args": [
-              1
-            ]
+            "args": [1]
           },
           "isGenerated": false,
           "isUpdatedAt": false
@@ -91,9 +105,7 @@
           "nativeType": null,
           "default": {
             "name": "cuid",
-            "args": [
-              2
-            ]
+            "args": [2]
           },
           "isGenerated": false,
           "isUpdatedAt": false
@@ -111,9 +123,7 @@
           "nativeType": null,
           "default": {
             "name": "uuid",
-            "args": [
-              4
-            ]
+            "args": [4]
           },
           "isGenerated": false,
           "isUpdatedAt": false
@@ -131,9 +141,7 @@
           "nativeType": null,
           "default": {
             "name": "uuid",
-            "args": [
-              4
-            ]
+            "args": [4]
           },
           "isGenerated": false,
           "isUpdatedAt": false
@@ -151,9 +159,7 @@
           "nativeType": null,
           "default": {
             "name": "uuid",
-            "args": [
-              7
-            ]
+            "args": [7]
           },
           "isGenerated": false,
           "isUpdatedAt": false
@@ -189,9 +195,7 @@
           "nativeType": null,
           "default": {
             "name": "nanoid",
-            "args": [
-              6
-            ]
+            "args": [6]
           },
           "isGenerated": false,
           "isUpdatedAt": false
@@ -212,6 +216,16 @@
       "fields": [
         {
           "name": "id"
+        }
+      ]
+    },
+    {
+      "model": "User",
+      "type": "unique",
+      "isDefinedOnField": true,
+      "fields": [
+        {
+          "name": "someUlid"
         }
       ]
     },

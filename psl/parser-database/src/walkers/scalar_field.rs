@@ -201,6 +201,11 @@ impl<'db> DefaultValueWalker<'db> {
     }
 
     /// Is this an `@default(cuid())`?
+    pub fn is_ulid(self) -> bool {
+        matches!(self.value(), ast::Expression::Function(name, _, _) if name == "ulid")
+    }
+
+    /// Is this an `@default(cuid())`?
     pub fn is_cuid(self) -> bool {
         matches!(self.value(), ast::Expression::Function(name, _, _) if name == "cuid")
     }

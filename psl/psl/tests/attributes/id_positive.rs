@@ -149,6 +149,26 @@ fn should_allow_string_ids_with_uuid_version_specified() {
 }
 
 #[test]
+fn should_allow_string_ids_with_ulid() {
+    let dml = indoc! {r#"
+        model Model {
+          id String @id @default(ulid())
+        }
+    "#};
+
+    let schema = psl::parse_schema(dml).unwrap();
+    let model = schema.assert_has_model("Model");
+
+    model
+        .assert_has_scalar_field("id")
+        .assert_scalar_type(ScalarType::String)
+        .assert_default_value()
+        .assert_cuid();
+
+    model.assert_id_on_fields(&["id"]);
+}
+
+#[test]
 fn should_allow_string_ids_without_default() {
     let dml = indoc! {r#"
         model Model {
@@ -317,10 +337,10 @@ fn id_accepts_length_arg_on_mysql() {
           firstName  String
           middleName String
           lastName   String
-         
+
           @@id([firstName, middleName(length: 1), lastName])
          }
-     
+
          model Blog {
           title  String @id(length:5)
          }
@@ -348,10 +368,10 @@ fn id_accepts_sort_arg_on_sqlserver() {
           firstName  String
           middleName String
           lastName   String
-         
+
           @@id([firstName, middleName(sort: Desc), lastName])
         }
-     
+
         model Blog {
           title  String @id(sort: Desc)
         }

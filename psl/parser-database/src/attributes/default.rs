@@ -197,6 +197,9 @@ fn validate_model_builtin_scalar_type_default(
         {
             validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
         }
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_ULID => {
+            validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
+        }
         (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_CUID => {
             validate_uid_int_args(funcname, &funcargs.arguments, &CUID_SUPPORTED_VERSIONS, accept, ctx)
         }
@@ -244,6 +247,9 @@ fn validate_composite_builtin_scalar_type_default(
 ) {
     match (scalar_type, value) {
         // Functions
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_ULID => {
+            validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
+        }
         (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_CUID => {
             validate_uid_int_args(funcname, &funcargs.arguments, &CUID_SUPPORTED_VERSIONS, accept, ctx)
         }
@@ -526,6 +532,7 @@ fn validate_builtin_scalar_list_default(
 
 const FN_AUTOINCREMENT: &str = "autoincrement";
 const FN_CUID: &str = "cuid";
+const FN_ULID: &str = "ulid";
 const FN_DBGENERATED: &str = "dbgenerated";
 const FN_NANOID: &str = "nanoid";
 const FN_NOW: &str = "now";

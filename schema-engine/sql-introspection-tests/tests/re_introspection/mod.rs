@@ -988,6 +988,10 @@ async fn virtual_uid_default(api: &mut TestApi) {
                 t.add_column("id", types::varchar(21).primary(true));
             });
 
+            migration.create_table("User4", |t| {
+                t.add_column("id", types::varchar(26).primary(true));
+            });
+
             migration.create_table("Unrelated", |t| {
                 t.add_column("id", types::primary());
             });
@@ -1011,6 +1015,10 @@ async fn virtual_uid_default(api: &mut TestApi) {
         model User3 {
             id        String    @id @default(nanoid(7)) @db.VarChar(21)
         }
+
+        model User4 {
+            id        String    @id @default(ulid()) @db.VarChar(26)
+        }
         "#;
 
     let final_dm = indoc! {r#"
@@ -1028,6 +1036,10 @@ async fn virtual_uid_default(api: &mut TestApi) {
 
         model User3 {
             id        String    @id @default(nanoid(7)) @db.VarChar(21)
+        }
+
+        model User4 {
+            id        String    @id @default(ulid()) @db.VarChar(26)
         }
 
         model Unrelated {
@@ -1052,6 +1064,10 @@ async fn virtual_cuid_default_cockroach(api: &mut TestApi) {
                 t.add_column("id", types::varchar(36).primary(true));
             });
 
+            migration.create_table("User3", |t| {
+                t.add_column("id", types::varchar(26).primary(true));
+            });
+
             migration.create_table("Unrelated", |t| {
                 t.add_column("id", types::primary());
             });
@@ -1068,6 +1084,10 @@ async fn virtual_cuid_default_cockroach(api: &mut TestApi) {
         model User2 {
             id        String    @id @default(uuid()) @db.String(36)
         }
+
+        model User3 {
+            id        String    @id @default(ulid()) @db.String(26)
+        }
         "#;
 
     let final_dm = indoc! {r#"
@@ -1078,6 +1098,10 @@ async fn virtual_cuid_default_cockroach(api: &mut TestApi) {
 
         model User2 {
             id        String    @id @default(uuid()) @db.String(36)
+        }
+
+        model User3 {
+            id        String    @id @default(ulid()) @db.String(26)
         }
 
         model Unrelated {

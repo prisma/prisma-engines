@@ -13,6 +13,7 @@ thiserror = "1.0"
 getrandom = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
 cuid = { workspace = true, optional = true }
+ulid = { workspace = true, optional = true }
 nanoid = { version = "0.4.0", optional = true }
 chrono.workspace = true
 
@@ -20,5 +21,5 @@ chrono.workspace = true
 getrandom = { workspace = true, features = ["js"] }
 
 [features]
-# Support for generating default UUID, CUID, nanoid and datetime values.
-default_generators = ["uuid/v4", "uuid/v7", "cuid", "nanoid"]
+# Support for generating default UUID, CUID, ULID, nanoid and datetime values.
+default_generators = ["uuid/v4", "uuid/v7", "cuid", "ulid", "nanoid"]
