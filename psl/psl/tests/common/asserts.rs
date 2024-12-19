@@ -82,6 +82,7 @@ pub(crate) trait DefaultValueAssert {
     fn assert_constant(&self, val: &str) -> &Self;
     fn assert_bytes(&self, val: &[u8]) -> &Self;
     fn assert_now(&self) -> &Self;
+    fn assert_ulid(&self) -> &Self;
     fn assert_cuid(&self) -> &Self;
     fn assert_cuid_version(&self, version: u8) -> &Self;
     fn assert_uuid(&self) -> &Self;
@@ -430,6 +431,12 @@ impl DefaultValueAssert for walkers::DefaultValueWalker<'_> {
     }
 
     #[track_caller]
+    fn assert_ulid(&self) -> &Self {
+        self.value().assert_ulid();
+        self
+    }
+
+    #[track_caller]
     fn assert_cuid(&self) -> &Self {
         self.value().assert_cuid();
         self
@@ -630,6 +637,13 @@ impl DefaultValueAssert for ast::Expression {
     #[track_caller]
     fn assert_now(&self) -> &Self {
         assert!(matches!(self, ast::Expression::Function(name, args, _) if name == "now" && args.arguments.is_empty()));
+
+        self
+    }
+
+    #[track_caller]
+    fn assert_ulid(&self) -> &Self {
+        assert!(matches!(self, ast::Expression::Function(name, _, _) if name == "ulid"));
 
         self
     }

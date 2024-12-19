@@ -49,6 +49,7 @@ tracing = { workspace = true, features = ["log"] }
 tracing-futures.workspace = true
 uuid.workspace = true
 cuid.workspace = true
+ulid.workspace = true
 quaint.workspace = true
 
 [dev-dependencies]

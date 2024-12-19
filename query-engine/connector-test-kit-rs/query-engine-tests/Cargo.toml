@@ -18,6 +18,7 @@ psl.workspace = true
 base64 = "0.13"
 uuid.workspace = true
 cuid.workspace = true
+ulid.workspace = true
 tokio.workspace = true
 user-facing-errors.workspace = true
 prisma-value = { path = "../../../libs/prisma-value" }
