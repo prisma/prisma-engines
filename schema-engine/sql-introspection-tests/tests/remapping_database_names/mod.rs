@@ -360,6 +360,8 @@ async fn remapping_enum_default_values(api: &mut TestApi) -> TestResult {
 
 #[test_connector]
 async fn remapping_compound_primary_keys(api: &mut TestApi) -> TestResult {
+    api.normalise_int_type().await?;
+
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -420,6 +422,8 @@ async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &mut
 
 #[test_connector]
 async fn not_automatically_remapping_invalid_compound_primary_key_names(api: &mut TestApi) -> TestResult {
+    api.normalise_int_type().await?;
+
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
