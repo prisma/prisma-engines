@@ -6,7 +6,7 @@ use std::{collections::HashSet, convert::TryInto};
 
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
-pub(crate) fn create_record(
+pub fn create_record(
     model: &Model,
     mut args: WriteArgs,
     selected_fields: &ModelProjection,
