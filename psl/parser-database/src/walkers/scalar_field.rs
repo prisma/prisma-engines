@@ -200,7 +200,7 @@ impl<'db> DefaultValueWalker<'db> {
         matches!(self.value(), ast::Expression::Function(name, _, _) if name == "autoincrement")
     }
 
-    /// Is this an `@default(cuid())`?
+    /// Is this an `@default(ulid())`?
     pub fn is_ulid(self) -> bool {
         matches!(self.value(), ast::Expression::Function(name, _, _) if name == "ulid")
     }
