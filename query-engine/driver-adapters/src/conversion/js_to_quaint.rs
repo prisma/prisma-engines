@@ -258,7 +258,11 @@ pub fn js_value_to_quaint(
         ColumnType::UnknownNumber => match json_value {
             serde_json::Value::Number(n) => n
                 .as_i64()
-                .map(QuaintValue::int64)
+                .map(|i| {
+                    i32::try_from(i)
+                        .map(QuaintValue::int32)
+                        .unwrap_or_else(|_| QuaintValue::int64(i))
+                })
                 .or(n.as_f64().map(QuaintValue::double))
                 .ok_or(conversion_error!(
                     "number must be an i64 or f64 in column '{column_name}', got {n}"
