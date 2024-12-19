@@ -89,7 +89,7 @@ To run tests through a driver adapters, you should also configure the following 
 Example:
 
 ```shell
-export EXTERNAL_TEST_EXECUTOR="$WORKSPACE_ROOT/query-engine/driver-adapters/executor/script/testd.sh"
+export EXTERNAL_TEST_EXECUTOR="$WORKSPACE_ROOT/query-engine/driver-adapters/executor/script/testd-qe.sh"
 export DRIVER_ADAPTER=neon
 export ENGINE=wasm
 export DRIVER_ADAPTER_CONFIG ='{ "proxyUrl": "127.0.0.1:5488/v1" }'

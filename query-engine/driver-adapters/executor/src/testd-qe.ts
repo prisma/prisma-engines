@@ -1,65 +1,17 @@
 import * as readline from "node:readline";
-import { match } from "ts-pattern";
 import * as S from "@effect/schema/Schema";
 import {
   bindAdapter,
   ErrorCapturingDriverAdapter,
 } from "@prisma/driver-adapter-utils";
-import { webcrypto } from "node:crypto";
 
 import type { DriverAdaptersManager } from "./driver-adapters-manager";
 import { jsonRpc, Env } from "./types";
-import * as qe from "./qe";
-import { PgManager } from "./driver-adapters-manager/pg";
-import { NeonWsManager } from "./driver-adapters-manager/neon.ws";
-import { LibSQLManager } from "./driver-adapters-manager/libsql";
-import { PlanetScaleManager } from "./driver-adapters-manager/planetscale";
-import { D1Manager } from "./driver-adapters-manager/d1";
+import * as qe from "./query-engine";
 import { nextRequestId } from "./requestId";
 import { createRNEngineConnector } from "./rn";
-
-if (!global.crypto) {
-  global.crypto = webcrypto as Crypto;
-}
-
-async function initialiseDriverAdapterManager(
-  env: Env,
-  migrationScript?: string
-): Promise<DriverAdaptersManager> {
-  return match(env)
-    .with({ DRIVER_ADAPTER: "pg" }, async (env) => await PgManager.setup(env))
-    .with(
-      { DRIVER_ADAPTER: "neon:ws" },
-      async (env) => await NeonWsManager.setup(env)
-    )
-    .with(
-      { DRIVER_ADAPTER: "libsql" },
-      async (env) => await LibSQLManager.setup(env)
-    )
-    .with(
-      { DRIVER_ADAPTER: "planetscale" },
-      async (env) => await PlanetScaleManager.setup(env)
-    )
-    .with(
-      { DRIVER_ADAPTER: "d1" },
-      async (env) => await D1Manager.setup(env, migrationScript)
-    )
-    .exhaustive();
-}
-
-// conditional debug logging based on LOG_LEVEL env var
-const debug = (() => {
-  if ((process.env.LOG_LEVEL ?? "").toLowerCase() != "debug") {
-    return (...args: any[]) => {};
-  }
-
-  return (...args: any[]) => {
-    console.error("[nodejs] DEBUG:", ...args);
-  };
-})();
-
-// error logger
-const err = (...args: any[]) => console.error("[nodejs] ERROR:", ...args);
+import { debug, err } from "./utils"; 
+import { setupDriverAdaptersManager } from "./setup";
 
 async function main(): Promise<void> {
   const env = S.decodeUnknownSync(Env)(process.env);
@@ -116,7 +68,7 @@ async function handleRequest(
         logs.push(log);
       };
 
-      const driverAdapterManager = await initialiseDriverAdapterManager(
+      const driverAdapterManager = await setupDriverAdaptersManager(
         env,
         migrationScript
       );
