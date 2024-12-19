@@ -32,6 +32,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, ctx: &Context<'_>) -> Trans
         ReadQuery::ManyRecordsQuery(mrq) => {
             let selected_fields = mrq.selected_fields.without_relations().into_virtuals_last();
             let needs_reversed_order = mrq.args.needs_reversed_order();
+            dbg!(mrq.nested);
 
             // TODO: we ignore chunking for now
             let query = query_builder::read::get_records(
