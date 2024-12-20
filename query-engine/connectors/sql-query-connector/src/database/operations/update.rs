@@ -79,7 +79,11 @@ pub(crate) async fn update_one_without_selection(
     let id_args = pick_args(&model.primary_identifier().into(), &args);
     // Perform the update and return the ids on which we've applied the update.
     // Note: We are _not_ getting back the ids from the update. Either we got some ids passed from the parent operation or we perform a read _before_ doing the update.
-    let (_, ids) = update_many_from_ids_and_filter(conn, model, record_filter, args, None, ctx).await?;
+    let (updates, ids) = update_many_from_ids_and_filter(conn, model, record_filter, args, None, ctx).await?;
+    for update in updates {
+        conn.execute(update).await?;
+    }
+
     // Since we could not get the ids back from the update, we need to apply in-memory transformation to the ids in case they were part of the update.
     // This is critical to ensure the following operations can operate on the updated ids.
     let merged_ids = merge_write_args(ids, id_args);

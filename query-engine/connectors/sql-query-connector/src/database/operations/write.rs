@@ -426,9 +426,7 @@ pub(crate) async fn update_records_returning(
     let meta = column_metadata::create(&field_names, &idents);
     let mut records = ManyRecords::new(field_names.clone());
 
-    let updates = generate_updates(conn, model, record_filter, args, Some(&selected_fields.into()), ctx).await?;
-
-    for update in updates {
+    for update in generate_updates(conn, model, record_filter, args, Some(&selected_fields.into()), ctx).await? {
         let result_set = conn.query(update).await?;
 
         for result_row in result_set {
