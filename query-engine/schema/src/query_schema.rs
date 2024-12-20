@@ -304,6 +304,7 @@ impl From<&str> for QueryTag {
             "createManyAndReturn" => Self::CreateManyAndReturn,
             "updateOne" => Self::UpdateOne,
             "updateMany" => Self::UpdateMany,
+            "updateManyAndReturn" => Self::UpdateManyAndReturn,
             "deleteOne" => Self::DeleteOne,
             "deleteMany" => Self::DeleteMany,
             "upsertOne" => Self::UpsertOne,
