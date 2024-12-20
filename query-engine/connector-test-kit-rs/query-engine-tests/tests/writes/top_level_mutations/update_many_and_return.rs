@@ -266,11 +266,11 @@ mod update_many_and_return {
     }
 }
 
-#[test_suite(schema(json_opt), exclude(MySql(5.6)), capabilities(Json, UpdateReturning))]
+#[test_suite(schema(json_opt), capabilities(AdvancedJsonNullability, UpdateReturning))]
 mod json_update_many_and_return {
     use query_engine_tests::{assert_error, run_query};
 
-    #[connector_test(capabilities(AdvancedJsonNullability))]
+    #[connector_test]
     async fn update_json_adv(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { json }}"#),
@@ -295,7 +295,7 @@ mod json_update_many_and_return {
         Ok(())
     }
 
-    #[connector_test(capabilities(AdvancedJsonNullability))]
+    #[connector_test]
     async fn update_json_errors(runner: Runner) -> TestResult<()> {
         assert_error!(
             &runner,
