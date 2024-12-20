@@ -266,7 +266,7 @@ mod update_many_and_return {
     }
 }
 
-#[test_suite(schema(json_opt), exclude(MySql(5.6)), capabilities(Json))]
+#[test_suite(schema(json_opt), exclude(MySql(5.6)), capabilities(Json, UpdateReturning))]
 mod json_update_many_and_return {
     use query_engine_tests::{assert_error, run_query};
 
