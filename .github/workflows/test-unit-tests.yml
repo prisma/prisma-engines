@@ -26,6 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: ./.github/workflows/include/kerberos-setup
 
       - run: |
           cargo test --workspace --all-features \

@@ -37,6 +37,8 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ matrix.features }}
 
+      - uses: ./.github/workflows/include/kerberos-setup
+
       - name: Start Databases
         run: docker compose -f docker-compose.yml up -d
         working-directory: ./quaint

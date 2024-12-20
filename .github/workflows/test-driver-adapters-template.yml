@@ -67,6 +67,7 @@ jobs:
           fi
 
       - uses: ./.github/workflows/include/rust-wasm-setup
+      - uses: ./.github/workflows/include/kerberos-setup
       - uses: taiki-e/install-action@nextest
 
       - name: Setup

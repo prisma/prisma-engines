@@ -32,6 +32,8 @@ jobs:
 
       - uses: ./.github/workflows/include/rust-wasm-setup
 
+      - uses: ./.github/workflows/include/kerberos-setup
+
       - name: Build @prisma/query-engine-wasm
         run: make build-qe-wasm
         env:
