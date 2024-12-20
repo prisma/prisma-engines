@@ -1,7 +1,7 @@
 mod decimal;
 
 use crate::{
-    ast::{Value, ValueType},
+    ast::{Value, ValueType, VarType},
     connector::queryable::{GetRow, ToColumnNames},
     error::{Error, ErrorKind},
     prelude::EnumVariant,
@@ -40,23 +40,27 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
             }
 
             match &p.typed {
-                ValueType::Int32(_) => PostgresType::INT4,
-                ValueType::Int64(_) => PostgresType::INT8,
-                ValueType::Float(_) => PostgresType::FLOAT4,
-                ValueType::Double(_) => PostgresType::FLOAT8,
-                ValueType::Text(_) => PostgresType::TEXT,
+                ValueType::Int32(_) | ValueType::Var(_, VarType::Int32) => PostgresType::INT4,
+                ValueType::Int64(_) | ValueType::Var(_, VarType::Int64) => PostgresType::INT8,
+                ValueType::Float(_) | ValueType::Var(_, VarType::Float) => PostgresType::FLOAT4,
+                ValueType::Double(_) | ValueType::Var(_, VarType::Double) => PostgresType::FLOAT8,
+                ValueType::Text(_) | ValueType::Var(_, VarType::Text) => PostgresType::TEXT,
                 // Enums are user-defined types, we can't statically infer them, so we let PG infer it
-                ValueType::Enum(_, _) | ValueType::EnumArray(_, _) => PostgresType::UNKNOWN,
-                ValueType::Bytes(_) => PostgresType::BYTEA,
-                ValueType::Boolean(_) => PostgresType::BOOL,
-                ValueType::Char(_) => PostgresType::CHAR,
-                ValueType::Numeric(_) => PostgresType::NUMERIC,
-                ValueType::Json(_) => PostgresType::JSONB,
-                ValueType::Xml(_) => PostgresType::XML,
-                ValueType::Uuid(_) => PostgresType::UUID,
-                ValueType::DateTime(_) => PostgresType::TIMESTAMPTZ,
-                ValueType::Date(_) => PostgresType::TIMESTAMP,
-                ValueType::Time(_) => PostgresType::TIME,
+                ValueType::Enum(_, _) | ValueType::EnumArray(_, _) | ValueType::Var(_, VarType::Enum) => {
+                    PostgresType::UNKNOWN
+                }
+                ValueType::Bytes(_) | ValueType::Var(_, VarType::Bytes) => PostgresType::BYTEA,
+                ValueType::Boolean(_) | ValueType::Var(_, VarType::Boolean) => PostgresType::BOOL,
+                ValueType::Char(_) | ValueType::Var(_, VarType::Char) => PostgresType::CHAR,
+                ValueType::Numeric(_) | ValueType::Var(_, VarType::Numeric) => PostgresType::NUMERIC,
+                ValueType::Json(_) | ValueType::Var(_, VarType::Json) => PostgresType::JSONB,
+                ValueType::Xml(_) | ValueType::Var(_, VarType::Xml) => PostgresType::XML,
+                ValueType::Uuid(_) | ValueType::Var(_, VarType::Uuid) => PostgresType::UUID,
+                ValueType::DateTime(_) | ValueType::Var(_, VarType::DateTime) => PostgresType::TIMESTAMPTZ,
+                ValueType::Date(_) | ValueType::Var(_, VarType::Date) => PostgresType::TIMESTAMP,
+                ValueType::Time(_) | ValueType::Var(_, VarType::Time) => PostgresType::TIME,
+                ValueType::Var(_, VarType::Unknown) => PostgresType::UNKNOWN,
+
                 ValueType::Array(ref arr) => {
                     let arr = arr.as_ref().unwrap();
 
@@ -76,27 +80,53 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                     }
 
                     match first.typed {
-                        ValueType::Int32(_) => PostgresType::INT4_ARRAY,
-                        ValueType::Int64(_) => PostgresType::INT8_ARRAY,
-                        ValueType::Float(_) => PostgresType::FLOAT4_ARRAY,
-                        ValueType::Double(_) => PostgresType::FLOAT8_ARRAY,
-                        ValueType::Text(_) => PostgresType::TEXT_ARRAY,
+                        ValueType::Int32(_) | ValueType::Var(_, VarType::Int32) => PostgresType::INT4_ARRAY,
+                        ValueType::Int64(_) | ValueType::Var(_, VarType::Int64) => PostgresType::INT8_ARRAY,
+                        ValueType::Float(_) | ValueType::Var(_, VarType::Float) => PostgresType::FLOAT4_ARRAY,
+                        ValueType::Double(_) | ValueType::Var(_, VarType::Double) => PostgresType::FLOAT8_ARRAY,
+                        ValueType::Text(_) | ValueType::Var(_, VarType::Text) => PostgresType::TEXT_ARRAY,
                         // Enums are special types, we can't statically infer them, so we let PG infer it
-                        ValueType::Enum(_, _) | ValueType::EnumArray(_, _) => PostgresType::UNKNOWN,
-                        ValueType::Bytes(_) => PostgresType::BYTEA_ARRAY,
-                        ValueType::Boolean(_) => PostgresType::BOOL_ARRAY,
-                        ValueType::Char(_) => PostgresType::CHAR_ARRAY,
-                        ValueType::Numeric(_) => PostgresType::NUMERIC_ARRAY,
-                        ValueType::Json(_) => PostgresType::JSONB_ARRAY,
-                        ValueType::Xml(_) => PostgresType::XML_ARRAY,
-                        ValueType::Uuid(_) => PostgresType::UUID_ARRAY,
-                        ValueType::DateTime(_) => PostgresType::TIMESTAMPTZ_ARRAY,
-                        ValueType::Date(_) => PostgresType::TIMESTAMP_ARRAY,
-                        ValueType::Time(_) => PostgresType::TIME_ARRAY,
+                        ValueType::Enum(_, _) | ValueType::EnumArray(_, _) | ValueType::Var(_, VarType::Enum) => {
+                            PostgresType::UNKNOWN
+                        }
+                        ValueType::Bytes(_) | ValueType::Var(_, VarType::Bytes) => PostgresType::BYTEA_ARRAY,
+                        ValueType::Boolean(_) | ValueType::Var(_, VarType::Boolean) => PostgresType::BOOL_ARRAY,
+                        ValueType::Char(_) | ValueType::Var(_, VarType::Char) => PostgresType::CHAR_ARRAY,
+                        ValueType::Numeric(_) | ValueType::Var(_, VarType::Numeric) => PostgresType::NUMERIC_ARRAY,
+                        ValueType::Json(_) | ValueType::Var(_, VarType::Json) => PostgresType::JSONB_ARRAY,
+                        ValueType::Xml(_) | ValueType::Var(_, VarType::Xml) => PostgresType::XML_ARRAY,
+                        ValueType::Uuid(_) | ValueType::Var(_, VarType::Uuid) => PostgresType::UUID_ARRAY,
+                        ValueType::DateTime(_) | ValueType::Var(_, VarType::DateTime) => {
+                            PostgresType::TIMESTAMPTZ_ARRAY
+                        }
+                        ValueType::Date(_) | ValueType::Var(_, VarType::Date) => PostgresType::TIMESTAMP_ARRAY,
+                        ValueType::Time(_) | ValueType::Var(_, VarType::Time) => PostgresType::TIME_ARRAY,
                         // In the case of nested arrays, we let PG infer the type
-                        ValueType::Array(_) => PostgresType::UNKNOWN,
+                        ValueType::Array(_) | ValueType::Var(_, VarType::Array(_)) => PostgresType::UNKNOWN,
+                        ValueType::Var(_, VarType::Unknown) => PostgresType::UNKNOWN,
                     }
                 }
+
+                ValueType::Var(_, VarType::Array(t)) => match &**t {
+                    VarType::Unknown => PostgresType::UNKNOWN,
+                    VarType::Int32 => PostgresType::INT4_ARRAY,
+                    VarType::Int64 => PostgresType::INT8_ARRAY,
+                    VarType::Float => PostgresType::FLOAT4_ARRAY,
+                    VarType::Double => PostgresType::FLOAT8_ARRAY,
+                    VarType::Text => PostgresType::TEXT_ARRAY,
+                    VarType::Enum => PostgresType::UNKNOWN,
+                    VarType::Bytes => PostgresType::BYTEA_ARRAY,
+                    VarType::Boolean => PostgresType::BOOL_ARRAY,
+                    VarType::Char => PostgresType::CHAR_ARRAY,
+                    VarType::Array(_) => PostgresType::UNKNOWN,
+                    VarType::Numeric => PostgresType::NUMERIC_ARRAY,
+                    VarType::Json => PostgresType::JSONB_ARRAY,
+                    VarType::Xml => PostgresType::XML_ARRAY,
+                    VarType::Uuid => PostgresType::UUID_ARRAY,
+                    VarType::DateTime => PostgresType::TIMESTAMPTZ_ARRAY,
+                    VarType::Date => PostgresType::TIMESTAMP_ARRAY,
+                    VarType::Time => PostgresType::TIME_ARRAY,
+                },
             }
         })
         .collect()
@@ -975,6 +1005,11 @@ impl ToSql for Value<'_> {
                 Ok(result)
             }),
             (ValueType::DateTime(value), _) => value.map(|value| value.naive_utc().to_sql(ty, out)),
+            (ValueType::Var(name, _), _) => {
+                let error: Box<dyn std::error::Error + Send + Sync> =
+                    Box::new(Error::builder(ErrorKind::RanQueryWithVarParam(name.clone().into_owned())).build());
+                Some(Err(error))
+            }
         };
 
         match res {

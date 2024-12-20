@@ -354,6 +354,35 @@ impl QueryEngine {
         .await
     }
 
+    #[napi]
+    pub async fn compile(&self, request: String, human_readable: bool) -> napi::Result<String> {
+        let dispatcher = self.logger.dispatcher();
+        let recorder = self.logger.recorder();
+
+        async_panic_to_js_error(async {
+            let inner = self.inner.read().await;
+            let engine = inner.as_engine()?;
+
+            let request = RequestBody::try_from_str(&request, engine.engine_protocol())?;
+            let query_doc = request
+                .into_doc(engine.query_schema())
+                .map_err(|err| napi::Error::from_reason(err.to_string()))?;
+
+            let plan = query_core::compiler::compile(engine.query_schema(), query_doc).map_err(ApiError::from)?;
+
+            let response = if human_readable {
+                plan.to_string()
+            } else {
+                serde_json::to_string(&plan)?
+            };
+
+            Ok(response)
+        })
+        .with_subscriber(dispatcher)
+        .with_optional_recorder(recorder)
+        .await
+    }
+
     /// If connected, attempts to start a transaction in the core and returns its ID.
     #[napi]
     pub async fn start_transaction(&self, input: String, trace: String, request_id: String) -> napi::Result<String> {
