@@ -1,5 +1,6 @@
 use super::*;
 use crate::query_graph_builder::write::write_args_parser::*;
+use crate::ParsedObject;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
@@ -124,6 +125,7 @@ pub fn update_many_records(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
     model: Model,
+    with_field_selection: bool,
     mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
@@ -139,14 +141,30 @@ pub fn update_many_records(
     let data_map: ParsedInputMap<'_> = data_argument.value.try_into()?;
 
     if query_schema.relation_mode().uses_foreign_keys() {
-        update_many_record_node(graph, query_schema, filter, model, data_map)?;
+        update_many_record_node(
+            graph,
+            query_schema,
+            filter,
+            model,
+            Some(field.name),
+            field.nested_fields.filter(|_| with_field_selection),
+            data_map,
+        )?;
     } else {
         let pre_read_node = graph.create_node(utils::read_ids_infallible(
             model.clone(),
             model.primary_identifier(),
             filter,
         ));
-        let update_many_node = update_many_record_node(graph, query_schema, Filter::empty(), model.clone(), data_map)?;
+        let update_many_node = update_many_record_node(
+            graph,
+            query_schema,
+            Filter::empty(),
+            model.clone(),
+            Some(field.name),
+            field.nested_fields.filter(|_| with_field_selection),
+            data_map,
+        )?;
 
         utils::insert_emulated_on_update(graph, query_schema, &model, &pre_read_node, &update_many_node)?;
 
@@ -249,6 +267,8 @@ pub fn update_many_record_node<T>(
     query_schema: &QuerySchema,
     filter: T,
     model: Model,
+    name: Option<String>,
+    nested_field_selection: Option<ParsedObject<'_>>,
     data_map: ParsedInputMap<'_>,
 ) -> QueryGraphBuilderResult<NodeRef>
 where
@@ -263,10 +283,25 @@ where
 
     args.update_datetimes(&model);
 
+    let selected_fields = if let Some(nested_fields) = nested_field_selection {
+        let (selected_fields, selection_order, nested_read) =
+            super::read::utils::extract_selected_fields(nested_fields.fields, &model, query_schema)?;
+
+        Some(UpdateManyRecordsFields {
+            fields: selected_fields,
+            order: selection_order,
+            nested: nested_read,
+        })
+    } else {
+        None
+    };
+
     let update_many = UpdateManyRecords {
+        name: name.unwrap_or_default(),
         model,
         record_filter,
         args,
+        selected_fields,
     };
 
     let update_many_node = graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(update_many)));

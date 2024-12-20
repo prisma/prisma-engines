@@ -2,12 +2,14 @@ use super::read::get_single_record;
 
 use crate::column_metadata::{self, ColumnMetadata};
 use crate::filter::FilterBuilder;
+use crate::model_extensions::AsColumns;
 use crate::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
 use crate::row::ToSqlRow;
 use crate::{Context, QueryExt, Queryable};
 
 use connector_interface::*;
 use itertools::Itertools;
+use quaint::ast::Query;
 use query_structure::*;
 
 /// Performs an update with an explicit selection set.
@@ -77,7 +79,11 @@ pub(crate) async fn update_one_without_selection(
     let id_args = pick_args(&model.primary_identifier().into(), &args);
     // Perform the update and return the ids on which we've applied the update.
     // Note: We are _not_ getting back the ids from the update. Either we got some ids passed from the parent operation or we perform a read _before_ doing the update.
-    let (_, ids) = update_many_from_ids_and_filter(conn, model, record_filter, args, ctx).await?;
+    let (updates, ids) = update_many_from_ids_and_filter(conn, model, record_filter, args, None, ctx).await?;
+    for update in updates {
+        conn.execute(update).await?;
+    }
+
     // Since we could not get the ids back from the update, we need to apply in-memory transformation to the ids in case they were part of the update.
     // This is critical to ensure the following operations can operate on the updated ids.
     let merged_ids = merge_write_args(ids, id_args);
@@ -92,53 +98,50 @@ pub(crate) async fn update_one_without_selection(
 
 // Generates a query like this:
 //  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."age" > $1
-pub(crate) async fn update_many_from_filter(
-    conn: &dyn Queryable,
+pub(super) async fn update_many_from_filter(
     model: &Model,
     record_filter: RecordFilter,
     args: WriteArgs,
+    selected_fields: Option<&ModelProjection>,
     ctx: &Context<'_>,
-) -> crate::Result<usize> {
+) -> crate::Result<Query<'static>> {
     let update = build_update_and_set_query(model, args, None, ctx);
     let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter, ctx);
     let update = update.so_that(filter_condition);
-    let count = conn.execute(update.into()).await?;
-
-    Ok(count as usize)
+    if let Some(selected_fields) = selected_fields {
+        Ok(update
+            .returning(selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true)))
+            .into())
+    } else {
+        Ok(update.into())
+    }
 }
 
 // Generates a query like this:
 //  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."id" IN ($2,$3,$4,$5,$6,$7,$8,$9,$10,$11) AND "public"."User"."age" > $1
-pub(crate) async fn update_many_from_ids_and_filter(
+pub(super) async fn update_many_from_ids_and_filter(
     conn: &dyn Queryable,
     model: &Model,
     record_filter: RecordFilter,
     args: WriteArgs,
+    selected_fields: Option<&ModelProjection>,
     ctx: &Context<'_>,
-) -> crate::Result<(usize, Vec<SelectionResult>)> {
+) -> crate::Result<(Vec<Query<'static>>, Vec<SelectionResult>)> {
     let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter.clone(), ctx);
     let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter, ctx).await?;
 
     if ids.is_empty() {
-        return Ok((0, Vec::new()));
+        return Ok((vec![], Vec::new()));
     }
 
     let updates = {
-        let update = build_update_and_set_query(model, args, None, ctx);
+        let update = build_update_and_set_query(model, args, selected_fields, ctx);
         let ids: Vec<&SelectionResult> = ids.iter().collect();
 
         chunk_update_with_ids(update, model, &ids, filter_condition, ctx)?
     };
 
-    let mut count = 0;
-
-    for update in updates {
-        let update_count = conn.execute(update).await?;
-
-        count += update_count;
-    }
-
-    Ok((count as usize, ids))
+    Ok((updates, ids))
 }
 
 fn process_result_row(

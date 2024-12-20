@@ -230,6 +230,29 @@ impl WriteOperations for SqlConnectorTransaction<'_> {
         .await
     }
 
+    async fn update_records_returning(
+        &mut self,
+        model: &Model,
+        record_filter: RecordFilter,
+        args: WriteArgs,
+        selected_fields: FieldSelection,
+        traceparent: Option<TraceParent>,
+    ) -> connector::Result<ManyRecords> {
+        let ctx = Context::new(&self.connection_info, traceparent);
+        catch(
+            &self.connection_info,
+            write::update_records_returning(
+                self.inner.as_queryable(),
+                model,
+                record_filter,
+                args,
+                selected_fields,
+                &ctx,
+            ),
+        )
+        .await
+    }
+
     async fn update_record(
         &mut self,
         model: &Model,

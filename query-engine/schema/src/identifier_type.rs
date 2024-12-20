@@ -51,6 +51,7 @@ pub enum IdentifierType {
     UpdateManyWhereCombinationInput(RelationField),
     UpdateOneWhereCombinationInput(RelationField),
     UpdateToOneRelWhereCombinationInput(RelationField),
+    UpdateManyAndReturnOutput(Model),
     WhereInput(ParentContainer),
     WhereUniqueInput(Model),
     Raw(String),
@@ -315,6 +316,9 @@ impl std::fmt::Display for IdentifierType {
                 _ => write!(f, "{}UncheckedUpdateManyInput", model.name()),
             },
             IdentifierType::RelationLoadStrategy => write!(f, "RelationLoadStrategy"),
+            IdentifierType::UpdateManyAndReturnOutput(model) => {
+                write!(f, "UpdateMany{}AndReturnOutputType", model.name())
+            }
         }
     }
 }

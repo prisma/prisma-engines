@@ -5534,6 +5534,50 @@ mod tests {
                           }
                         },
                         {
+                          "name": "updateManyAAndReturn",
+                          "args": [
+                            {
+                              "name": "data",
+                              "isRequired": true,
+                              "isNullable": false,
+                              "inputTypes": [
+                                {
+                                  "type": "AUpdateManyMutationInput",
+                                  "namespace": "prisma",
+                                  "location": "inputObjectTypes",
+                                  "isList": false
+                                },
+                                {
+                                  "type": "AUncheckedUpdateManyInput",
+                                  "namespace": "prisma",
+                                  "location": "inputObjectTypes",
+                                  "isList": false
+                                }
+                              ]
+                            },
+                            {
+                              "name": "where",
+                              "isRequired": false,
+                              "isNullable": false,
+                              "inputTypes": [
+                                {
+                                  "type": "AWhereInput",
+                                  "namespace": "prisma",
+                                  "location": "inputObjectTypes",
+                                  "isList": false
+                                }
+                              ]
+                            }
+                          ],
+                          "isNullable": false,
+                          "outputType": {
+                            "type": "UpdateManyAAndReturnOutputType",
+                            "namespace": "model",
+                            "location": "outputObjectTypes",
+                            "isList": true
+                          }
+                        },
+                        {
                           "name": "deleteManyA",
                           "args": [
                             {
@@ -5849,6 +5893,50 @@ mod tests {
                             "namespace": "prisma",
                             "location": "outputObjectTypes",
                             "isList": false
+                          }
+                        },
+                        {
+                          "name": "updateManyBAndReturn",
+                          "args": [
+                            {
+                              "name": "data",
+                              "isRequired": true,
+                              "isNullable": false,
+                              "inputTypes": [
+                                {
+                                  "type": "BUpdateManyMutationInput",
+                                  "namespace": "prisma",
+                                  "location": "inputObjectTypes",
+                                  "isList": false
+                                },
+                                {
+                                  "type": "BUncheckedUpdateManyInput",
+                                  "namespace": "prisma",
+                                  "location": "inputObjectTypes",
+                                  "isList": false
+                                }
+                              ]
+                            },
+                            {
+                              "name": "where",
+                              "isRequired": false,
+                              "isNullable": false,
+                              "inputTypes": [
+                                {
+                                  "type": "BWhereInput",
+                                  "namespace": "prisma",
+                                  "location": "inputObjectTypes",
+                                  "isList": false
+                                }
+                              ]
+                            }
+                          ],
+                          "isNullable": false,
+                          "outputType": {
+                            "type": "UpdateManyBAndReturnOutputType",
+                            "namespace": "model",
+                            "location": "outputObjectTypes",
+                            "isList": true
                           }
                         },
                         {
@@ -6400,7 +6488,58 @@ mod tests {
                       ]
                     },
                     {
+                      "name": "UpdateManyAAndReturnOutputType",
+                      "fields": [
+                        {
+                          "name": "id",
+                          "args": [],
+                          "isNullable": false,
+                          "outputType": {
+                            "type": "String",
+                            "location": "scalar",
+                            "isList": false
+                          }
+                        },
+                        {
+                          "name": "b_id",
+                          "args": [],
+                          "isNullable": false,
+                          "outputType": {
+                            "type": "String",
+                            "location": "scalar",
+                            "isList": false
+                          }
+                        },
+                        {
+                          "name": "b",
+                          "args": [],
+                          "isNullable": false,
+                          "outputType": {
+                            "type": "B",
+                            "namespace": "model",
+                            "location": "outputObjectTypes",
+                            "isList": false
+                          }
+                        }
+                      ]
+                    },
+                    {
                       "name": "CreateManyBAndReturnOutputType",
+                      "fields": [
+                        {
+                          "name": "id",
+                          "args": [],
+                          "isNullable": false,
+                          "outputType": {
+                            "type": "String",
+                            "location": "scalar",
+                            "isList": false
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "UpdateManyBAndReturnOutputType",
                       "fields": [
                         {
                           "name": "id",
@@ -6622,6 +6761,7 @@ mod tests {
                     "findUniqueOrThrow": "findUniqueAOrThrow",
                     "groupBy": "groupByA",
                     "updateMany": "updateManyA",
+                    "updateManyAndReturn": "updateManyAAndReturn",
                     "updateOne": "updateOneA",
                     "upsertOne": "upsertOneA"
                   },
@@ -6640,6 +6780,7 @@ mod tests {
                     "findUniqueOrThrow": "findUniqueBOrThrow",
                     "groupBy": "groupByB",
                     "updateMany": "updateManyB",
+                    "updateManyAndReturn": "updateManyBAndReturn",
                     "updateOne": "updateOneB",
                     "upsertOne": "upsertOneB"
                   }

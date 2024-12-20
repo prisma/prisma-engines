@@ -224,9 +224,11 @@ where
     let record_filter = filter.into();
 
     let ur = UpdateManyRecords {
+        name: String::new(),
         model,
         record_filter,
         args,
+        selected_fields: None,
     };
 
     graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(ur)))
@@ -610,9 +612,11 @@ pub fn emulate_on_delete_set_null(
         insert_find_children_by_parent_node(graph, node_providing_ids, &parent_relation_field, Filter::empty())?;
 
     let set_null_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
+        name: String::new(),
         model: dependent_model.clone(),
         record_filter: RecordFilter::empty(),
         args: WriteArgs::new(child_update_args, crate::executor::get_request_now()),
+        selected_fields: None,
     });
 
     let set_null_dependents_node = graph.create_node(Query::Write(set_null_query));
@@ -760,9 +764,11 @@ pub fn emulate_on_update_set_null(
         insert_find_children_by_parent_node(graph, parent_node, &parent_relation_field, Filter::empty())?;
 
     let set_null_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
+        name: String::new(),
         model: dependent_model.clone(),
         record_filter: RecordFilter::empty(),
         args: WriteArgs::new(child_update_args, crate::executor::get_request_now()),
+        selected_fields: None,
     });
 
     let set_null_dependents_node = graph.create_node(Query::Write(set_null_query));
@@ -1080,12 +1086,14 @@ pub fn emulate_on_update_cascade(
         insert_find_children_by_parent_node(graph, parent_node, &parent_relation_field, Filter::empty())?;
 
     let update_query = WriteQuery::UpdateManyRecords(UpdateManyRecords {
+        name: String::new(),
         model: dependent_model.clone(),
         record_filter: RecordFilter::empty(),
         args: WriteArgs::new(
             child_update_args.into_iter().collect(),
             crate::executor::get_request_now(),
         ),
+        selected_fields: None,
     });
 
     let update_dependents_node = graph.create_node(Query::Write(update_query));

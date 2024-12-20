@@ -142,8 +142,15 @@ pub fn nested_update_many(
         let find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter)?;
 
-        let update_many_node =
-            update::update_many_record_node(graph, query_schema, Filter::empty(), child_model.clone(), data_map)?;
+        let update_many_node = update::update_many_record_node(
+            graph,
+            query_schema,
+            Filter::empty(),
+            child_model.clone(),
+            None,
+            None,
+            data_map,
+        )?;
 
         graph.create_edge(
             &find_child_records_node,
