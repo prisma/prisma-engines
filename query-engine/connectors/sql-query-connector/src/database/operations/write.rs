@@ -8,7 +8,7 @@ use crate::{
 };
 use connector_interface::*;
 use itertools::Itertools;
-use quaint::ast::Insert;
+use quaint::ast::{Insert, Query};
 use quaint::{
     error::ErrorKind,
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
@@ -370,6 +370,25 @@ pub(crate) async fn update_record(
     }
 }
 
+async fn generate_updates(
+    conn: &dyn Queryable,
+    model: &Model,
+    record_filter: RecordFilter,
+    args: WriteArgs,
+    selected_fields: Option<&ModelProjection>,
+    ctx: &Context<'_>,
+) -> crate::Result<Vec<Query<'static>>> {
+    if record_filter.has_selectors() {
+        let (updates, _) =
+            update_many_from_ids_and_filter(conn, model, record_filter, args, selected_fields, ctx).await?;
+        Ok(updates)
+    } else {
+        Ok(vec![
+            update_many_from_filter(model, record_filter, args, selected_fields, ctx).await?,
+        ])
+    }
+}
+
 /// Update multiple records in a database defined in `conn` and the records
 /// defined in `args`, and returning the number of updates
 /// This works via two ways, when there are ids in record_filter.selectors, it uses that to update
@@ -385,15 +404,42 @@ pub(crate) async fn update_records(
         return Ok(0);
     }
 
-    if record_filter.has_selectors() {
-        let (count, _) = update_many_from_ids_and_filter(conn, model, record_filter, args, ctx).await?;
-
-        Ok(count)
-    } else {
-        let count = update_many_from_filter(conn, model, record_filter, args, ctx).await?;
-
-        Ok(count)
+    let mut count = 0;
+    for update in generate_updates(conn, model, record_filter, args, None, ctx).await? {
+        count += conn.execute(update).await?;
     }
+    Ok(count as usize)
+}
+
+/// Update records according to `WriteArgs`. Returns values of fields specified in
+/// `selected_fields` for all updated rows.
+pub(crate) async fn update_records_returning(
+    conn: &dyn Queryable,
+    model: &Model,
+    record_filter: RecordFilter,
+    args: WriteArgs,
+    selected_fields: FieldSelection,
+    ctx: &Context<'_>,
+) -> crate::Result<ManyRecords> {
+    let field_names: Vec<String> = selected_fields.db_names().collect();
+    let idents = selected_fields.type_identifiers_with_arities();
+    let meta = column_metadata::create(&field_names, &idents);
+    let mut records = ManyRecords::new(field_names.clone());
+
+    let updates = generate_updates(conn, model, record_filter, args, Some(&selected_fields.into()), ctx).await?;
+
+    for update in updates {
+        let result_set = conn.query(update).await?;
+
+        for result_row in result_set {
+            let sql_row = result_row.to_sql_row(&meta)?;
+            let record = Record::from(sql_row);
+
+            records.push(record);
+        }
+    }
+
+    Ok(records)
 }
 
 /// Delete multiple records in `conn`, defined in the `Filter`. Result is the number of items deleted.
