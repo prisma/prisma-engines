@@ -238,6 +238,229 @@ mod update_many_and_return {
         Ok(())
     }
 
+    fn schema_11_child() -> String {
+        let schema = indoc! {
+            r#"model Test {
+                  #id(id, Int, @id)
+
+                  child Child?
+                }
+
+                model Child {
+                  #id(id, Int, @id)
+
+                  testId Int? @unique
+                  test Test? @relation(fields: [testId], references: [id])
+
+                }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_1m_child))]
+    async fn update_many_11_inline_rel_read_works(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+            run_query!(&runner,r#"mutation { createManyTest(data: [{ id: 1 }, { id: 2 }]) { count } }"#),
+            @r###"{"data":{"createManyTest":{"count":2}}}"###
+        );
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"mutation { createManyChild(data: [{ id: 1, testId: 1 }, { id: 2, testId: 2 }]) { count } }"#),
+            @r###"{"data":{"createManyChild":{"count":2}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+                updateManyChildAndReturn(
+                    where: {}
+                    data: { testId: 1 }
+                ) { id test { id } }
+              }"#),
+          @r###"{"data":{"updateManyChildAndReturn":[{"id":1,"test":{"id":1}},{"id":2,"test":{"id":1}}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(schema_11_child))]
+    async fn update_many_11_non_inline_rel_read_fails(runner: Runner) -> TestResult<()> {
+        runner
+            .query_json(serde_json::json!({
+              "modelName": "Test",
+              "action": "updateManyAndReturn",
+              "query": {
+                "arguments": { "data": { "id": 1 } },
+                "selection": {
+                  "id": true,
+                  "child": true
+                }
+              }
+            }))
+            .await?
+            .assert_failure(2009, Some("Field 'child' not found in enclosing type".to_string()));
+
+        Ok(())
+    }
+
+    fn schema_1m_child() -> String {
+        let schema = indoc! {
+            r#"model Test {
+                  #id(id, Int, @id)
+                  str1 String?
+                  str2 String?
+                  str3 String? @default("SOME_DEFAULT")
+
+                  children Child[]
+                }
+
+                model Child {
+                  #id(id, Int, @id)
+                  str1 String?
+                  str2 String?
+                  str3 String? @default("SOME_DEFAULT")
+
+                  testId Int?
+                  test Test? @relation(fields: [testId], references: [id])
+
+                }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_1m_child))]
+    async fn update_many_1m_inline_rel_read_works(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createManyTest(data: [{ id: 1, str1: "1" }, { id: 2, str1: "2" }]) { count } }"#),
+          @r###"{"data":{"createManyTest":{"count":2}}}"###
+        );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createManyChild(data: [{ id: 1, str1: "1", testId: 1 }, { id: 2, str1: "2", testId: 2 }]) { count } }"#),
+          @r###"{"data":{"createManyChild":{"count":2}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateManyChildAndReturn(
+              where: {}
+              data: { str1: "updated" }
+            ) { id str1 }
+          }"#),
+          @r###"{"data":{"updateManyChildAndReturn":[{"id":1,"str1":"updated"},{"id":2,"str1":"updated"}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(schema_1m_child))]
+    async fn update_many_1m_non_inline_rel_read_fails(runner: Runner) -> TestResult<()> {
+        runner
+            .query_json(serde_json::json!({
+              "modelName": "Test",
+              "action": "updateManyAndReturn",
+              "query": {
+                "arguments": { "data": { "id": 1 } },
+                "selection": {
+                  "id": true,
+                  "children": true
+                }
+              }
+            }))
+            .await?
+            .assert_failure(2009, Some("Field 'children' not found in enclosing type".to_string()));
+
+        Ok(())
+    }
+
+    fn schema_m2m_child() -> String {
+        let schema = indoc! {
+            r#"model Test {
+                #id(id, Int, @id)
+                str1 String?
+
+                #m2m(children, Child[], id, Int)
+              }
+
+              model Child {
+                #id(id, Int, @id)
+
+                #m2m(tests, Test[], id, Int)
+
+              }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_m2m_child))]
+    async fn update_many_m2m_rel_read_fails(runner: Runner) -> TestResult<()> {
+        runner
+            .query_json(serde_json::json!({
+              "modelName": "Test",
+              "action": "updateManyAndReturn",
+              "query": {
+                "arguments": { "data": { "id": 1 } },
+                "selection": {
+                  "id": true,
+                  "children": true
+                }
+              }
+            }))
+            .await?
+            .assert_failure(2009, Some("Field 'children' not found in enclosing type".to_string()));
+
+        runner
+            .query_json(serde_json::json!({
+              "modelName": "Child",
+              "action": "updateManyAndReturn",
+              "query": {
+                "arguments": { "data": { "id": 1 } },
+                "selection": {
+                  "id": true,
+                  "tests": true
+                }
+              }
+            }))
+            .await?
+            .assert_failure(2009, Some("Field 'tests' not found in enclosing type".to_string()));
+
+        Ok(())
+    }
+
+    fn schema_self_rel_child() -> String {
+        let schema = indoc! {
+            r#"model Child {
+                  #id(id, Int, @id)
+
+                  teacherId Int?
+                  teacher   Child?  @relation("TeacherStudents", fields: [teacherId], references: [id])
+                  students  Child[] @relation("TeacherStudents")
+                }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(schema_self_rel_child))]
+    async fn update_many_self_rel_read_fails(runner: Runner) -> TestResult<()> {
+        runner
+            .query_json(serde_json::json!({
+              "modelName": "Child",
+              "action": "updateManyAndReturn",
+              "query": {
+                "arguments": { "data": { "id": 1 } },
+                "selection": {
+                  "id": true,
+                  "students": true
+                }
+              }
+            }))
+            .await?
+            .assert_failure(2009, Some("Field 'students' not found in enclosing type".to_string()));
+
+        Ok(())
+    }
+
     async fn query_number_operation(runner: &Runner, field: &str, op: &str, value: &str) -> TestResult<String> {
         let res = run_query_json!(
             runner,
