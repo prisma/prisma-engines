@@ -156,7 +156,6 @@ impl<'a> FeatureMapWithProvider<'a> {
                  | Metrics
                  | MultiSchema
                  | NativeDistinct
-                 | OmitApi
                  | PostgresqlExtensions
                  | PrismaSchemaFolder
                  | RelationJoins
@@ -211,6 +210,7 @@ impl<'a> FeatureMapWithProvider<'a> {
                 | NamedConstraints
                 | NApi
                 | NativeTypes
+                | OmitApi
                 | OrderByAggregateGroup
                 | OrderByNulls
                 | OrderByRelation
