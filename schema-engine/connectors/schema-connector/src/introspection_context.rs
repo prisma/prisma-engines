@@ -109,10 +109,15 @@ impl IntrospectionContext {
     /// The SQL family we're using currently.
     pub fn sql_family(&self) -> SqlFamily {
         match self.datasource().active_provider {
+            #[cfg(feature = "postgresql")]
             "postgresql" => SqlFamily::Postgres,
+            #[cfg(feature = "cockroachdb")]
             "cockroachdb" => SqlFamily::Postgres,
+            #[cfg(feature = "sqlite")]
             "sqlite" => SqlFamily::Sqlite,
+            #[cfg(feature = "mssql")]
             "sqlserver" => SqlFamily::Mssql,
+            #[cfg(feature = "mysql")]
             "mysql" => SqlFamily::Mysql,
             name => unreachable!("The name `{}` for the datamodel connector is not known", name),
         }

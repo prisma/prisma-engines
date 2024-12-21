@@ -25,7 +25,7 @@ export function postgres_options(url: string): PostgresOptions {
   const schemaName = postgresSchemaName(url)
   
   if (schemaName != null) {
-      args.options = `--search_path="${schemaName}"`
+      args.options = `--search_path='${schemaName}'`
   }
 
   return args
@@ -40,3 +40,17 @@ export async function runBatch<T = unknown>(D1_DATABASE: D1Database, statements:
 
   return D1_DATABASE.batch(statements)
 }
+
+// conditional debug logging based on LOG_LEVEL env var
+export const debug = (() => {
+  if ((process.env.LOG_LEVEL ?? '').toLowerCase() != 'debug') {
+    return (...args: any[]) => {}
+  }
+
+  return (...args: any[]) => {
+    console.error('[nodejs] DEBUG:', ...args)
+  }
+})()
+
+// error logger
+export const err = (...args: any[]) => console.error("[nodejs] ERROR:", ...args);

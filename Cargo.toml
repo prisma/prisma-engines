@@ -31,7 +31,7 @@ members = [
   "prisma-fmt",
   "prisma-schema-wasm",
   "psl/*",
-  "quaint",
+  "quaint", "schema-engine/schema-engine-wasm",
 ]
 
 [workspace.dependencies]
