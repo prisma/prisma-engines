@@ -45,7 +45,9 @@ pkgs.mkShell {
       useLld = "-C link-arg=-fuse-ld=lld";
     in
     pkgs.lib.optionalString pkgs.stdenv.isLinux ''
-      export CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS="${useLld}"
-      export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_RUSTFLAGS="${useLld}"
+      if [ ! -f .cargo/config.toml ]; then
+        export CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS="${useLld}"
+        export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_RUSTFLAGS="${useLld}"
+      fi
     '';
 }
