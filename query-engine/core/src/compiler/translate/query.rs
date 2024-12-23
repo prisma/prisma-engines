@@ -18,8 +18,11 @@ use crate::{
 use super::TranslateResult;
 
 pub(crate) fn translate_query(query: Query) -> TranslateResult<Expression> {
-    let connection_info =
-        ConnectionInfo::External(ExternalConnectionInfo::new(SqlFamily::Sqlite, "main".to_owned(), None));
+    let connection_info = ConnectionInfo::External(ExternalConnectionInfo::new(
+        SqlFamily::Postgres,
+        "public".to_owned(),
+        None,
+    ));
 
     let ctx = Context::new(&connection_info, None);
 
@@ -30,7 +33,7 @@ pub(crate) fn translate_query(query: Query) -> TranslateResult<Expression> {
 }
 
 fn build_db_query<'a>(query: impl Into<quaint::ast::Query<'a>>) -> TranslateResult<DbQuery> {
-    let (sql, params) = quaint::visitor::Sqlite::build(query)?;
+    let (sql, params) = quaint::visitor::Postgres::build(query)?;
     let params = params
         .into_iter()
         .map(convert::quaint_value_to_prisma_value)
