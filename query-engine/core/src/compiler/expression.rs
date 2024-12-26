@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use query_structure::PrismaValue;
 use serde::Serialize;
 
@@ -32,7 +33,13 @@ impl DbQuery {
 }
 
 #[derive(Debug, Serialize)]
-#[serde(tag = "type", content = "args")]
+pub struct JoinExpression {
+    pub child: Expression,
+    pub on: Vec<(String, String)>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(tag = "type", content = "args", rename_all = "camelCase")]
 pub enum Expression {
     /// Sequence of statements. The whole sequence evaluates to the result of the last expression.
     Seq(Vec<Expression>),
@@ -63,6 +70,22 @@ pub enum Expression {
 
     /// Concatenates a list of lists.
     Concat(Vec<Expression>),
+
+    /// Asserts that the result of the expression is at most one record.
+    Unique(Box<Expression>),
+
+    /// Asserts that the result of the expression is at least one record.
+    Required(Box<Expression>),
+
+    /// Application-level join.
+    Join {
+        parent: Box<Expression>,
+        children: Vec<JoinExpression>,
+    },
+
+    /// Get a field from a record or records. If the argument is a list of records,
+    /// returns a list of values of this field.
+    MapField { field: String, records: Box<Expression> },
 }
 
 impl Expression {
@@ -114,6 +137,37 @@ impl Expression {
             Self::Sum(exprs) => self.display_function("sum", exprs, f, level)?,
 
             Self::Concat(exprs) => self.display_function("concat", exprs, f, level)?,
+
+            Self::Unique(expr) => {
+                writeln!(f, "{indent}unique (")?;
+                expr.display(f, level + 1)?;
+                write!(f, "{indent})")?;
+            }
+
+            Self::Required(expr) => {
+                writeln!(f, "{indent}required (")?;
+                expr.display(f, level + 1)?;
+                write!(f, "{indent})")?;
+            }
+
+            Self::Join { parent, children } => {
+                writeln!(f, "{indent}join (")?;
+                parent.display(f, level + 1)?;
+                for nested in children {
+                    let left = nested.on.iter().map(|(l, _)| l).cloned().join(", ");
+                    let right = nested.on.iter().map(|(_, r)| r).cloned().join(", ");
+                    writeln!(f, "\n{indent}  with (")?;
+                    nested.child.display(f, level + 2)?;
+                    writeln!(f, "\n{indent}  ) on left.{left} = right.{right},")?;
+                }
+                write!(f, "{indent})")?;
+            }
+
+            Self::MapField { field, records } => {
+                writeln!(f, "{indent}mapField {field} (")?;
+                records.display(f, level + 1)?;
+                write!(f, "\n{indent})")?;
+            }
         }
 
         Ok(())
@@ -128,7 +182,7 @@ impl Expression {
     ) -> std::fmt::Result {
         let indent = "  ".repeat(level);
         let DbQuery { query, params } = db_query;
-        write!(f, "{indent}{op} {{\n{indent}  {query}\n{indent}}} with {params:?}")
+        write!(f, "{indent}{op} (\n{indent}  {query}\n{indent}) with {params:?}")
     }
 
     fn display_function(

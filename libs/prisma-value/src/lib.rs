@@ -381,6 +381,10 @@ impl PrismaValue {
         PrismaValue::DateTime(parse_datetime(datetime).unwrap())
     }
 
+    pub fn placeholder(name: String, r#type: PlaceholderType) -> PrismaValue {
+        PrismaValue::Placeholder { name, r#type }
+    }
+
     pub fn as_boolean(&self) -> Option<&bool> {
         match self {
             PrismaValue::Boolean(bool) => Some(bool),

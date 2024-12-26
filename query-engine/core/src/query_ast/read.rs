@@ -64,6 +64,22 @@ impl ReadQuery {
             ReadQuery::AggregateRecordsQuery(_) => false,
         }
     }
+
+    fn nested(&self) -> &[ReadQuery] {
+        match self {
+            ReadQuery::RecordQuery(x) => &x.nested,
+            ReadQuery::ManyRecordsQuery(x) => &x.nested,
+            ReadQuery::RelatedRecordsQuery(x) => &x.nested,
+            ReadQuery::AggregateRecordsQuery(_) => &[],
+        }
+    }
+
+    pub fn nested_related_records_queries(&self) -> impl Iterator<Item = &RelatedRecordsQuery> + '_ {
+        self.nested().iter().filter_map(|q| match q {
+            ReadQuery::RelatedRecordsQuery(rrq) => Some(rrq),
+            _ => None,
+        })
+    }
 }
 
 impl FilteredQuery for ReadQuery {
