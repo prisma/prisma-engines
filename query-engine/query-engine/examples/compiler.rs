@@ -15,14 +15,18 @@ pub fn main() -> anyhow::Result<()> {
     let schema = Arc::new(schema);
     let query_schema = Arc::new(query_core::schema::build(schema, true));
 
-    // prisma.user.findMany({
+    // prisma.user.findUnique({
     //     where: {
     //         email: Prisma.Param("userEmail")
+    //     },
+    //     select: {
+    //         val: true,
+    //         posts: true,
     //     }
     // })
     let query: JsonSingleQuery = serde_json::from_value(json!({
         "modelName": "User",
-        "action": "findMany",
+        "action": "findUnique",
         "query": {
             "arguments": {
                 "where": {
@@ -33,7 +37,7 @@ pub fn main() -> anyhow::Result<()> {
                 }
             },
             "selection": {
-                "$scalars": true,
+                "val": true,
                 "posts": {
                     "arguments": {},
                     "selection": {
