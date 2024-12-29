@@ -23,7 +23,7 @@ export type QueryEngineInstance = {
 }
 
 export interface QueryEngineConstructor {
-  new(config: QueryEngineConfig, logger: (log: string) => void, nodejsFnCtx?: DriverAdapter): QueryEngineInstance
+  new (config: QueryEngineConfig, logger: (log: string) => void, nodejsFnCtx?: DriverAdapter): QueryEngineInstance
 }
 
 export interface LibraryLoader {
