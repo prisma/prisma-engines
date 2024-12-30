@@ -20,13 +20,13 @@ type PostgresOptions = {
   options?: string
 }
 
-export function postgres_options(url: string): PostgresOptions {
-  let args: PostgresOptions = { connectionString: url }
+export function postgresOptions(url: string): PostgresOptions {
+  const args: PostgresOptions = { connectionString: url }
 
   const schemaName = postgresSchemaName(url)
 
   if (schemaName != null) {
-    args.options = `--search_path='${schemaName}'`
+    args.options = `--search_path="${schemaName}"`
   }
 
   return args
