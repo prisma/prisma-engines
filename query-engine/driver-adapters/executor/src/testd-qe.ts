@@ -9,6 +9,7 @@ import { nextRequestId } from './requestId'
 import { createRNEngineConnector } from './rn'
 import { debug, err } from './utils'
 import { setupDriverAdaptersManager } from './setup'
+import { SchemaId } from './types/jsonRpc'
 
 async function main(): Promise<void> {
   const env = S.decodeUnknownSync(Env)(process.env)
@@ -43,7 +44,7 @@ async function main(): Promise<void> {
 }
 
 const state: Record<
-  number,
+  SchemaId,
   {
     engine: qe.QueryEngine
     driverAdapterManager: DriverAdaptersManager
@@ -56,8 +57,16 @@ async function handleRequest(
   { method, params }: jsonRpc.Request,
   env: Env,
 ): Promise<unknown> {
+  if (method !== 'initializeSchema') {
+    if (state[params.schemaId] === undefined) {
+      throw new Error(`Schema with id ${params.schemaId} is not initialized. Please call 'initializeSchema' first.`)
+    }
+  }
+
   switch (method) {
     case 'initializeSchema': {
+      debug('Got `initializeSchema', params)
+
       const { url, schema, schemaId, migrationScript } = params
       const logs = [] as string[]
 
