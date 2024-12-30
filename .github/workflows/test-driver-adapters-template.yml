@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node_version: ["18"]
+        node_version: ["20"]
         partition: ["1/4", "2/4", "3/4", "4/4"]
     env:
       LOG_LEVEL: "info" # Set to "debug" to trace the query engine and node process running the driver adapter
