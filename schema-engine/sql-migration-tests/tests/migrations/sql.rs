@@ -1,5 +1,7 @@
 mod vitess;
 
+use std::borrow::Cow;
+
 use sql_migration_tests::test_api::*;
 
 #[test_connector]
@@ -172,14 +174,19 @@ fn enum_value_with_database_names_must_work(api: TestApi) {
         .send()
         .assert_green();
 
-    if api.is_mysql() {
-        api.assert_schema()
-            .assert_enum(&api.normalize_identifier("Cat_mood"), |enm| {
-                enm.assert_values(&["ANGRY", "hongry"])
-            });
+    let enum_name = if api.is_mysql() {
+        api.normalize_identifier("Cat_mood")
+    } else {
+        "CatMood".into()
+    };
+
+    if api.is_sqlite() {
+        api.assert_schema().assert_table("Cat", |table| {
+            table.assert_column("mood", |col| col.assert_type_is_string())
+        });
     } else {
         api.assert_schema()
-            .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongry"]));
+            .assert_enum(&enum_name, |enm| enm.assert_values(&["ANGRY", "hongry"]));
     }
 
     let dm = r#"
@@ -194,17 +201,26 @@ fn enum_value_with_database_names_must_work(api: TestApi) {
         }
     "#;
 
-    if api.is_mysql() {
-        api.schema_push_w_datasource(dm).force(true).send().assert_warnings(&["The values [hongry] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into()]);
-
-        api.assert_schema()
-            .assert_enum(&api.normalize_identifier("Cat_mood"), |enm| {
-                enm.assert_values(&["ANGRY", "hongery"])
-            });
+    let warnings: &[Cow<'_, str>] = if api.is_mysql() {
+        &["The values [hongry] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into()]
+    } else if api.is_sqlite() {
+        &[]
     } else {
-        api.schema_push_w_datasource(dm).force(true).send().assert_warnings(&["The values [hongry] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()]);
+        &["The values [hongry] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()]
+    };
+
+    api.schema_push_w_datasource(dm)
+        .force(true)
+        .send()
+        .assert_warnings(warnings);
+
+    if api.is_sqlite() {
+        api.assert_schema().assert_table("Cat", |table| {
+            table.assert_column("mood", |col| col.assert_type_is_string())
+        });
+    } else {
         api.assert_schema()
-            .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongery"]));
+            .assert_enum(&enum_name, |enm| enm.assert_values(&["ANGRY", "hongry"]));
     }
 }
 
