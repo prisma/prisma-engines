@@ -81,6 +81,12 @@ fn defaults_match(cols: MigrationPair<TableColumnWalker<'_>>, flavour: &dyn SqlF
 
         (Some(DefaultKind::Value(PrismaValue::Int(i))), Some(DefaultKind::Value(PrismaValue::BigInt(j))))
         | (Some(DefaultKind::Value(PrismaValue::BigInt(i))), Some(DefaultKind::Value(PrismaValue::Int(j)))) => i == j,
+
+        (
+            Some(DefaultKind::Value(PrismaValue::Enum(prev) | PrismaValue::String(prev))),
+            Some(DefaultKind::Value(PrismaValue::String(next) | PrismaValue::Enum(next))),
+        ) => prev == next && names_match,
+
         (Some(DefaultKind::Value(prev)), Some(DefaultKind::Value(next))) => (prev == next) && names_match,
         (Some(DefaultKind::Value(_)), Some(DefaultKind::Now)) => false,
         (Some(DefaultKind::Value(_)), None) => false,

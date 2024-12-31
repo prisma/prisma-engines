@@ -27,8 +27,13 @@ fn an_enum_can_be_turned_into_a_model(api: TestApi) {
         "CatMood"
     };
 
-    #[allow(clippy::redundant_closure)]
-    api.assert_schema().assert_enum(enum_name, |enm| enm);
+    if api.is_sqlite() {
+        api.assert_schema().assert_table("Cat", |table| {
+            table.assert_column("mood", |col| col.assert_type_is_string())
+        });
+    } else {
+        api.assert_schema().assert_enum(enum_name, |enm| enm);
+    }
 
     let dm2 = r#"
         model Cat {
@@ -76,8 +81,14 @@ fn variants_can_be_added_to_an_existing_enum(api: TestApi) {
         "CatMood"
     };
 
-    api.assert_schema()
-        .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY"]));
+    if api.is_sqlite() {
+        api.assert_schema().assert_table("Cat", |table| {
+            table.assert_column("mood", |col| col.assert_type_is_string())
+        });
+    } else {
+        api.assert_schema()
+            .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY"]));
+    }
 
     let dm2 = r#"
         model Cat {
@@ -94,8 +105,14 @@ fn variants_can_be_added_to_an_existing_enum(api: TestApi) {
 
     api.schema_push_w_datasource(dm2).send().assert_green();
 
-    api.assert_schema()
-        .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY", "HAPPY", "JOYJOY"]));
+    if api.is_sqlite() {
+        api.assert_schema().assert_table("Cat", |table| {
+            table.assert_column("mood", |col| col.assert_type_is_string())
+        });
+    } else {
+        api.assert_schema()
+            .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY", "HAPPY", "JOYJOY"]));
+    }
 }
 
 #[test_connector(capabilities(Enums))]
@@ -122,8 +139,14 @@ fn variants_can_be_removed_from_an_existing_enum(api: TestApi) {
         "CatMood"
     };
 
-    api.assert_schema()
-        .assert_enum(enum_name, |enm| enm.assert_values(&["HAPPY", "HUNGRY"]));
+    if api.is_sqlite() {
+        api.assert_schema().assert_table("Cat", |table| {
+            table.assert_column("mood", |col| col.assert_type_is_string())
+        });
+    } else {
+        api.assert_schema()
+            .assert_enum(enum_name, |enm| enm.assert_values(&["HAPPY", "HUNGRY"]));
+    }
 
     let dm2 = r#"
         model Cat {
@@ -136,20 +159,28 @@ fn variants_can_be_removed_from_an_existing_enum(api: TestApi) {
         }
     "#;
 
-    let warning = if api.is_mysql() {
-        "The values [HAPPY] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail."
+    let warnings: &[Cow<'_, str>] = if api.is_mysql() {
+        &["The values [HAPPY] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into()]
+    } else if api.is_sqlite() {
+        &[]
     } else {
-        "The values [HAPPY] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail."
+        &["The values [HAPPY] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()]
     };
 
     api.schema_push_w_datasource(dm2)
         .force(true)
         .send()
-        .assert_warnings(&[warning.into()])
+        .assert_warnings(warnings)
         .assert_executable();
 
-    api.assert_schema()
-        .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY"]));
+    if api.is_sqlite() {
+        api.assert_schema().assert_table("Cat", |table| {
+            table.assert_column("mood", |col| col.assert_type_is_string())
+        });
+    } else {
+        api.assert_schema()
+            .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY"]));
+    }
 }
 
 #[test_connector(capabilities(Enums))]
@@ -192,7 +223,13 @@ fn enum_field_to_string_field_works(api: TestApi) {
     api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("Cat", |table| {
-        table.assert_column("mood", |col| col.assert_type_is_enum())
+        table.assert_column("mood", |col| {
+            if api.is_sqlite() {
+                col.assert_type_is_string()
+            } else {
+                col.assert_type_is_enum()
+            }
+        })
     });
 
     api.insert("Cat").value("id", 1).value("mood", "HAPPY").result_raw();
@@ -240,22 +277,30 @@ fn string_field_to_enum_field_works(api: TestApi) {
         }
     "#;
 
-    let warn = if api.is_postgres() {
-        "The `mood` column on the `Cat` table would be dropped and recreated. This will lead to data loss."
+    let warnings: &[Cow<'_, str>] = if api.is_postgres() {
+        &["The `mood` column on the `Cat` table would be dropped and recreated. This will lead to data loss.".into()]
+    } else if api.is_sqlite() {
+        &[]
     } else if api.lower_cases_table_names() {
-        "You are about to alter the column `mood` on the `cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Enum(EnumId(0))`."
+        &["You are about to alter the column `mood` on the `cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Enum(EnumId(0))`.".into()]
     } else {
-        "You are about to alter the column `mood` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Enum(EnumId(0))`."
+        &["You are about to alter the column `mood` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Enum(EnumId(0))`.".into()]
     };
 
     api.schema_push_w_datasource(dm2)
         .force(true)
         .send()
         .assert_executable()
-        .assert_warnings(&[warn.into()]);
+        .assert_warnings(warnings);
 
     api.assert_schema().assert_table("Cat", |table| {
-        table.assert_column("mood", |col| col.assert_type_is_enum())
+        table.assert_column("mood", |col| {
+            if api.is_sqlite() {
+                col.assert_type_is_string()
+            } else {
+                col.assert_type_is_enum()
+            }
+        })
     });
 }
 
@@ -340,20 +385,19 @@ fn enums_used_in_default_can_be_changed(api: TestApi) {
         }
     "#;
 
-    if api.is_postgres() {
-        api.schema_push_w_datasource(dm2)
-            .force(true)
-            .send()
-            .assert_executable()
-            .assert_warnings(&["The values [HUNGRY] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()]
-            );
+    let warnings: &[Cow<'_, str>] = if api.is_postgres() {
+        &["The values [HUNGRY] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()]
+    } else if api.is_sqlite() {
+        &[]
     } else {
-        api.schema_push_w_datasource(dm2)
-            .force(true)
-            .send()
-            .assert_executable()
-            .assert_warnings(&["The values [HUNGRY] on the enum `Lion_mood` will be removed. If these variants are still used in the database, this will fail.".into(), "The values [HUNGRY] on the enum `Lion_mood` will be removed. If these variants are still used in the database, this will fail.".into()]);
+        &["The values [HUNGRY] on the enum `Lion_mood` will be removed. If these variants are still used in the database, this will fail.".into(), "The values [HUNGRY] on the enum `Lion_mood` will be removed. If these variants are still used in the database, this will fail.".into()]
     };
+
+    api.schema_push_w_datasource(dm2)
+        .force(true)
+        .send()
+        .assert_executable()
+        .assert_warnings(warnings);
 
     api.assert_schema().assert_tables_count(5);
 }
@@ -399,7 +443,13 @@ fn changing_all_values_of_enums_used_in_defaults_works(api: TestApi) {
     api.schema_push_w_datasource(dm2).force(true).send();
 
     api.assert_schema().assert_table("Cat", |table| {
-        table.assert_column("eveningMood", |col| col.assert_enum_default("MEOWMEOW"))
+        table.assert_column("eveningMood", |col| {
+            if api.is_sqlite() {
+                col.assert_default_value(&PrismaValue::String("MEOWMEOW".to_string()))
+            } else {
+                col.assert_enum_default("MEOWMEOW")
+            }
+        })
     });
 
     // Check that the migration is idempotent.
