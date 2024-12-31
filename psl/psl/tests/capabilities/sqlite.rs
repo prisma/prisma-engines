@@ -19,21 +19,7 @@ fn enum_support() {
         }
     "#};
 
-    let error = parse_unwrap_err(dml);
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating: You defined the enum `Status`. But the current connector does not support enums.[0m
-          [1;94m-->[0m  [4mschema.prisma:11[0m
-        [1;94m   | [0m
-        [1;94m10 | [0m
-        [1;94m11 | [0m[1;91menum Status {[0m
-        [1;94m12 | [0m  DONE
-        [1;94m13 | [0m  NOT_DONE
-        [1;94m14 | [0m}
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error);
+    assert_valid(dml);
 }
 
 #[test]

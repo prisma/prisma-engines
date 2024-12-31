@@ -407,7 +407,7 @@ fn changing_all_values_of_enums_used_in_defaults_works(api: TestApi) {
 }
 
 #[test_connector(tags(Sqlite))]
-fn sqlite_enums_are_picked_up(api: TestApi) {
+fn sqlite_text_is_picked_up_as_enum(api: TestApi) {
     let sql = r#"
         CREATE TABLE "Band" (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
