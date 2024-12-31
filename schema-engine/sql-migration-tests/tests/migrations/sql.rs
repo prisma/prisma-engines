@@ -220,7 +220,7 @@ fn enum_value_with_database_names_must_work(api: TestApi) {
         });
     } else {
         api.assert_schema()
-            .assert_enum(&enum_name, |enm| enm.assert_values(&["ANGRY", "hongry"]));
+            .assert_enum(&enum_name, |enm| enm.assert_values(&["ANGRY", "hongery"]));
     }
 }
 
