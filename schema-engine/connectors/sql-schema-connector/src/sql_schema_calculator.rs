@@ -411,7 +411,9 @@ fn push_column_for_model_enum_scalar_field(
     let column = sql::Column {
         name: field.database_name().to_owned(),
         tpe: sql::ColumnType::pure(
-            sql::ColumnTypeFamily::Enum(ctx.enum_ids[&r#enum.id]),
+            ctx.flavour
+                .column_type_for_enum(r#enum, ctx)
+                .expect("should have a column type for enum"),
             column_arity(field.ast_field().arity),
         ),
         auto_increment: false,
