@@ -331,7 +331,7 @@ async fn mapped_field_name(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(capabilities(Enums), exclude(CockroachDb))]
+#[test_connector(capabilities(Enums), exclude(CockroachDb, Sqlite))]
 async fn mapped_enum_name(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
