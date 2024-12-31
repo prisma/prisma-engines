@@ -654,7 +654,7 @@ pub enum ColumnTypeFamily {
     Json,
     /// UUID types.
     Uuid,
-    ///Enum
+    /// Enum
     Enum(EnumId),
     /// Unsupported
     Unsupported(String),

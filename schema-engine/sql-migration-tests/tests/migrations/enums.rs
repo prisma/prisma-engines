@@ -406,6 +406,34 @@ fn changing_all_values_of_enums_used_in_defaults_works(api: TestApi) {
     api.schema_push_w_datasource(dm2).force(true).send().assert_no_steps();
 }
 
+#[test_connector(tags(Sqlite))]
+fn sqlite_text_is_picked_up_as_enum(api: TestApi) {
+    let sql = r#"
+        CREATE TABLE "Band" (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            genre TEXT NOT NULL
+        );
+    "#;
+
+    api.raw_cmd(sql);
+
+    let dm = r#"
+        enum Genre {
+            SKA
+            PUNK
+        }
+
+        model Band {
+            id Int @id @default(autoincrement())
+            name String
+            genre Genre
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
+}
+
 #[test_connector(tags(Postgres))]
 fn existing_enums_are_picked_up(api: TestApi) {
     let sql = r#"
