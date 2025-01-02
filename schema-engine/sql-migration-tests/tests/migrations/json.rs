@@ -52,6 +52,10 @@ fn database_level_json_defaults_can_be_defined(api: TestApi) {
                     )))
                 } else if api.is_mysql() {
                     None
+                } else if api.is_sqlite() {
+                    Some(DefaultValue::value(PrismaValue::String(
+                        "[\"sticks\",\"chimken\",100,  \"dog park\"]".into(),
+                    )))
                 } else {
                     unreachable!()
                 })

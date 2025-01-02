@@ -42,7 +42,7 @@ static DB_UNDER_TEST: Lazy<Result<DbUnderTest, String>> = Lazy::new(|| {
         "file" | "sqlite" => Ok(DbUnderTest {
             database_url,
             tags: Tags::Sqlite.into(),
-            capabilities: Capabilities::CreateDatabase.into(),
+            capabilities: Capabilities::CreateDatabase | Capabilities::Json,
             provider: "sqlite",
             shadow_database_url,
             max_ddl_refresh_delay: None,
