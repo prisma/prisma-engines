@@ -361,9 +361,20 @@ pub struct UpdateRecordWithoutSelection {
 
 #[derive(Debug, Clone)]
 pub struct UpdateManyRecords {
+    pub name: String,
     pub model: Model,
     pub record_filter: RecordFilter,
     pub args: WriteArgs,
+    /// Fields of updated records that client has requested to return.
+    /// `None` if the connector does not support returning the updated rows.
+    pub selected_fields: Option<UpdateManyRecordsFields>,
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateManyRecordsFields {
+    pub fields: FieldSelection,
+    pub order: Vec<String>,
+    pub nested: Vec<ReadQuery>,
 }
 
 #[derive(Debug, Clone)]
