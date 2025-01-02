@@ -149,6 +149,8 @@ async fn default_values(api: &mut TestApi) -> TestResult {
 
 #[test_connector(tags(CockroachDb))]
 async fn a_simple_table_with_gql_types(api: &mut TestApi) -> TestResult {
+    api.normalise_int_type().await?;
+
     api.barrel()
         .execute(|migration| {
             migration.create_table("Blog", move |t| {
@@ -232,7 +234,7 @@ async fn a_table_with_non_id_autoincrement_cockroach(api: &mut TestApi) -> TestR
 
     let dm = indoc! {r#"
         model Test {
-            id       Int @id
+            id       BigInt @id
             authorId BigInt @default(autoincrement()) @unique
         }
     "#};
@@ -259,11 +261,11 @@ async fn introspecting_json_defaults_on_cockroach(api: &mut TestApi) -> TestResu
 
     let expectation = expect![[r#"
         model A {
-          id           Int   @id
-          json         Json? @default("[]")
-          jsonb        Json? @default("{}")
-          jsonb_string Json? @default("\"ab'c\"")
-          jsonb_object Json? @default("{\"a\": [\"b'\"], \"c\": true, \"d\": null}")
+          id           BigInt @id
+          json         Json?  @default("[]")
+          jsonb        Json?  @default("{}")
+          jsonb_string Json?  @default("\"ab'c\"")
+          jsonb_object Json?  @default("{\"a\": [\"b'\"], \"c\": true, \"d\": null}")
         }
     "#]];
 
@@ -300,7 +302,7 @@ $$
         }
 
         model stringstest {
-          id             Int    @id
+          id             BigInt @id
           needs_escaping String @default("\nabc def\nbackspaces: \\abcd\\\n\t(tab character)\nand \"quotes\" and a vertical tabulation here ->x16<-\n\n")
         }
     "#]];
@@ -334,7 +336,7 @@ async fn datetime_default_expressions_are_not_truncated(api: &mut TestApi) -> Te
         }
 
         model Foo {
-          id            Int      @id
+          id            BigInt   @id
           trial_expires DateTime @default(dbgenerated("now() + '14 days'::INTERVAL")) @db.Timestamptz(6)
         }
     "#]];
@@ -473,7 +475,7 @@ async fn northwind(api: TestApi) {
           units_in_stock    Int?            @db.Int2
           units_on_order    Int?            @db.Int2
           reorder_level     Int?            @db.Int2
-          discontinued      Int
+          discontinued      BigInt
           order_details     order_details[]
           categories        categories?     @relation(fields: [category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_products_categories")
           suppliers         suppliers?      @relation(fields: [supplier_id], references: [supplier_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_products_suppliers")
