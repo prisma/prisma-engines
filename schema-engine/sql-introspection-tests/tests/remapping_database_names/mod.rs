@@ -262,7 +262,7 @@ async fn remapping_fields_in_compound_relations(api: &mut TestApi) -> TestResult
     Ok(())
 }
 
-#[test_connector(capabilities(Enums), exclude(CockroachDb))]
+#[test_connector(capabilities(Enums), exclude(CockroachDb, Sqlite))]
 async fn remapping_enum_values(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -310,7 +310,7 @@ async fn remapping_enum_values(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(capabilities(Enums), exclude(CockroachDb))]
+#[test_connector(capabilities(Enums), exclude(CockroachDb, Sqlite))]
 async fn remapping_enum_default_values(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -404,7 +404,7 @@ async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &mut
 
     let dm = indoc! {r#"
          model User {
-             id     Int @id @default(autoincrement()) 
+             id     Int @id @default(autoincrement())
              first  Int
              last   Int
 

@@ -4,7 +4,7 @@ use either::Either;
 use psl::{
     builtin_connectors::{cockroach_datamodel_connector::SequenceFunction, PostgresDatasourceProperties},
     datamodel_connector::walker_ext_traits::IndexWalkerExt,
-    parser_database::{IndexAlgorithm, OperatorClass},
+    parser_database::{walkers::EnumWalker, IndexAlgorithm, OperatorClass},
 };
 use sql::postgres::DatabaseExtension;
 use sql_schema_describer::{self as sql, postgres::PostgresSchemaExt};
@@ -27,6 +27,10 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
                 ctx.schema.describer_schema.push_enum_variant(sql_enum_id, value_name);
             }
         }
+    }
+
+    fn column_type_for_enum(&self, enm: EnumWalker<'_>, ctx: &Context<'_>) -> Option<sql::ColumnTypeFamily> {
+        ctx.enum_ids.get(&enm.id).map(|id| sql::ColumnTypeFamily::Enum(*id))
     }
 
     fn column_default_value_for_autoincrement(&self) -> Option<sql::DefaultValue> {

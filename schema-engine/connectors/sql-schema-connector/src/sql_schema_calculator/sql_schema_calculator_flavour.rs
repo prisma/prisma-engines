@@ -9,6 +9,10 @@ use sql_schema_describer::{self as sql, ColumnArity, ColumnType, ColumnTypeFamil
 pub(crate) trait SqlSchemaCalculatorFlavour {
     fn calculate_enums(&self, _ctx: &mut super::Context<'_>) {}
 
+    fn column_type_for_enum(&self, _enm: EnumWalker<'_>, _ctx: &super::Context<'_>) -> Option<sql::ColumnTypeFamily> {
+        None
+    }
+
     fn column_default_value_for_autoincrement(&self) -> Option<sql::DefaultValue> {
         None
     }

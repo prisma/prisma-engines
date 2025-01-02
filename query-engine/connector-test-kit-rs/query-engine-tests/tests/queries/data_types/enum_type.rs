@@ -101,6 +101,84 @@ mod enum_type {
         Ok(())
     }
 
+    #[connector_test(only(Sqlite))]
+    async fn read_one_invalid_sqlite(runner: Runner) -> TestResult<()> {
+        runner
+            .query(r#"mutation { executeRaw(query: "INSERT INTO \"TestModel\" (id, my_enum) VALUES(1, 'D')", parameters: "[]") }"#)
+            .await?
+            .assert_success();
+
+        match runner.protocol() {
+            EngineProtocol::Graphql => {
+                let res = runner
+                    .query(r#"{ findUniqueTestModel(where: { id: 1 }) { my_enum } }"#)
+                    .await?;
+                res.assert_failure(None, Some("Value 'D' not found in enum 'MyEnum'".to_owned()));
+            }
+            EngineProtocol::Json => {
+                let res = runner
+                    .query_json(
+                        r#"{
+                            "modelName": "TestModel",
+                            "action": "findUnique",
+                            "query": {
+                                "arguments": {
+                                    "where": { "id": 1 }
+                                },
+                                "selection": {
+                                    "my_enum": true
+                                }
+                            }
+                        }"#,
+                    )
+                    .await?;
+
+                res.assert_failure(None, Some("Value 'D' not found in enum 'MyEnum'".to_owned()));
+            }
+        }
+
+        Ok(())
+    }
+
+    #[connector_test(only(MongoDB))]
+    async fn read_one_invalid_mongo(runner: Runner) -> TestResult<()> {
+        runner
+            .query(r#"mutation { runCommandRaw(command: "{\"insert\": \"TestModel\", \"documents\": [{ \"_id\": 1, \"my_enum\": \"D\"}]}") }"#)
+            .await?
+            .assert_success();
+
+        match runner.protocol() {
+            EngineProtocol::Graphql => {
+                let res = runner
+                    .query(r#"{ findUniqueTestModel(where: { id: 1 }) { my_enum } }"#)
+                    .await?;
+                res.assert_failure(None, Some("Value 'D' not found in enum 'MyEnum'".to_owned()));
+            }
+            EngineProtocol::Json => {
+                let res = runner
+                    .query_json(
+                        r#"{
+                            "modelName": "TestModel",
+                            "action": "findUnique",
+                            "query": {
+                                "arguments": {
+                                    "where": { "id": 1 }
+                                },
+                                "selection": {
+                                    "my_enum": true
+                                }
+                            }
+                        }"#,
+                    )
+                    .await?;
+
+                res.assert_failure(None, Some("Value 'D' not found in enum 'MyEnum'".to_owned()));
+            }
+        }
+
+        Ok(())
+    }
+
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_row(runner, r#"{ id: 1, my_enum: A }"#).await?;
         create_row(runner, r#"{ id: 2, my_enum: B }"#).await?;

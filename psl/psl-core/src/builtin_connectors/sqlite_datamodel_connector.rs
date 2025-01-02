@@ -33,7 +33,8 @@ pub const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Conne
     Json |
     JsonFiltering |
     JsonFilteringJsonPath |
-    AdvancedJsonNullability
+    AdvancedJsonNullability |
+    Enums
 });
 
 pub struct SqliteDatamodelConnector;
