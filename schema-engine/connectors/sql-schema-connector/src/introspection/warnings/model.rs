@@ -64,6 +64,13 @@ pub(super) fn generate_warnings(model: ModelPair<'_>, warnings: &mut Warnings) {
         })
     }
 
+    for include_indx in model.include_indexes() {
+        warnings.include_indexes.push(generators::ModelAndConstraint {
+            model: model.name().to_string(),
+            constraint: include_indx.to_string(),
+        })
+    }
+
     for expr_indx in model.expression_indexes() {
         warnings.expression_indexes.push(generators::ModelAndConstraint {
             model: model.name().to_string(),
