@@ -289,6 +289,19 @@ pub trait WriteOperations {
         traceparent: Option<TraceParent>,
     ) -> crate::Result<usize>;
 
+    /// Updates many records at once into the database and returns their
+    /// selected fields.
+    /// This method should not be used if the connector does not support
+    /// returning updated rows.
+    async fn update_records_returning(
+        &mut self,
+        model: &Model,
+        record_filter: RecordFilter,
+        args: WriteArgs,
+        selected_fields: FieldSelection,
+        traceparent: Option<TraceParent>,
+    ) -> crate::Result<ManyRecords>;
+
     /// Update record in the `Model` with the given `WriteArgs` filtered by the
     /// `Filter`.
     async fn update_record(
