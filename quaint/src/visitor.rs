@@ -68,6 +68,11 @@ pub trait Visitor<'a> {
     /// Write to the query.
     fn write<D: fmt::Display>(&mut self, s: D) -> Result;
 
+    /// Name of the function used to view the version of the database.
+    fn version_fn(&self) -> &'static str {
+        "version"
+    }
+
     /// A point to modify an incoming query to make it compatible with the
     /// underlying database.
     fn compatibility_modifications(&self, query: Query<'a>) -> Query<'a> {

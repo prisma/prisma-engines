@@ -95,6 +95,10 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         Ok(())
     }
 
+    fn version_fn(&self) -> &'static str {
+        "sqlite_version"
+    }
+
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
         let res = match &value.typed {
             ValueType::Int32(i) => i.map(|i| self.write(i)),
