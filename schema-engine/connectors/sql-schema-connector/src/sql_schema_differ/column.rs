@@ -82,6 +82,10 @@ fn defaults_match(cols: MigrationPair<TableColumnWalker<'_>>, flavour: &dyn SqlF
         (Some(DefaultKind::Value(PrismaValue::Int(i))), Some(DefaultKind::Value(PrismaValue::BigInt(j))))
         | (Some(DefaultKind::Value(PrismaValue::BigInt(i))), Some(DefaultKind::Value(PrismaValue::Int(j)))) => i == j,
 
+        // SQLite introspection recognizes enum defaults as PrismaValue::Enum since SQLite does
+        // not support enums natively, while the Prisma schema recognizes them as
+        // PrismaValue::Enum. In order to avoid generating a diff we need to consider them equal
+        // if the underlying string values are equal.
         (
             Some(DefaultKind::Value(PrismaValue::Enum(prev) | PrismaValue::String(prev))),
             Some(DefaultKind::Value(PrismaValue::String(next) | PrismaValue::Enum(next))),
