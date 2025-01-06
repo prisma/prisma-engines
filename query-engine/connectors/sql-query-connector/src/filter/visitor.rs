@@ -117,11 +117,7 @@ impl FilterVisitor {
         res
     }
 
-    fn visit_relation_filter_select(
-        &mut self,
-        filter: RelationFilter,
-        ctx: &Context<'_>,
-    ) -> (ModelProjection, Select<'static>) {
+    fn visit_relation_filter_select(&mut self, filter: RelationFilter, ctx: &Context<'_>) -> Select<'static> {
         let is_many_to_many = filter.field.relation().is_many_to_many();
         // HACK: This is temporary. A fix should be done in Quaint instead of branching out here.
         // See https://www.notion.so/prismaio/Spec-Faulty-Tuple-Join-on-SQL-Server-55b8232fb44f4a6cb4d3f36428f17bac
@@ -157,11 +153,7 @@ impl FilterVisitor {
     /// We need this in two cases:
     /// - For M2M relations, as we need to traverse the join table so the join is not superfluous
     /// - SQL Server because it does not support (a, b) IN (subselect)
-    fn visit_relation_filter_select_no_row(
-        &mut self,
-        filter: RelationFilter,
-        ctx: &Context<'_>,
-    ) -> (ModelProjection, Select<'static>) {
+    fn visit_relation_filter_select_no_row(&mut self, filter: RelationFilter, ctx: &Context<'_>) -> Select<'static> {
         let alias = self.next_alias(AliasMode::Table);
         let condition = filter.condition;
         let table = filter.field.as_table(ctx);
@@ -190,7 +182,15 @@ impl FilterVisitor {
                 nested_visitor.visit_filter(*filter.nested_filter, ctx)
             });
 
-        let nested_conditions = nested_conditions.invert_if(condition.invert_of_subselect());
+        let parent_columns: Vec<_> = ids
+            .as_columns(ctx)
+            .map(|col| col.aliased_col(self.parent_alias(), ctx))
+            .collect();
+
+        let nested_conditions = nested_conditions
+            .and(Row::from(parent_columns).equals(Row::from(selected_identifier.clone())))
+            .invert_if(condition.invert_of_subselect());
+
         let nested_conditons = selected_identifier
             .clone()
             .into_iter()
@@ -205,13 +205,11 @@ impl FilterVisitor {
             .inner_join(join)
             .so_that(nested_conditons);
 
-        let select = if let Some(nested_joins) = nested_joins {
+        if let Some(nested_joins) = nested_joins {
             nested_joins.into_iter().fold(select, |acc, join| acc.join(join.data))
         } else {
             select
-        };
-
-        (ids, select)
+        }
     }
 
     /// Traverses a relation filter using this rough SQL structure:
@@ -222,11 +220,7 @@ impl FilterVisitor {
     ///   WHERE <filter>
     /// )
     /// ```
-    fn visit_relation_filter_select_with_row(
-        &mut self,
-        filter: RelationFilter,
-        ctx: &Context<'_>,
-    ) -> (ModelProjection, Select<'static>) {
+    fn visit_relation_filter_select_with_row(&mut self, filter: RelationFilter, ctx: &Context<'_>) -> Select<'static> {
         let alias = self.next_alias(AliasMode::Table);
         let condition = filter.condition;
         let linking_fields = ModelProjection::from(filter.field.linking_fields());
@@ -242,7 +236,15 @@ impl FilterVisitor {
 
         let (nested_conditions, nested_joins) =
             self.visit_nested_filter(alias, |this| this.visit_filter(*filter.nested_filter, ctx));
-        let nested_conditions = nested_conditions.invert_if(condition.invert_of_subselect());
+
+        let parent_columns: Vec<_> = linking_fields
+            .as_columns(ctx)
+            .map(|col| col.aliased_col(self.parent_alias(), ctx))
+            .collect();
+
+        let nested_conditions = nested_conditions
+            .and(Row::from(parent_columns).equals(Row::from(related_columns.clone())))
+            .invert_if(condition.invert_of_subselect());
 
         let conditions = related_columns
             .clone()
@@ -253,13 +255,11 @@ impl FilterVisitor {
             .columns(related_columns)
             .so_that(conditions);
 
-        let select = if let Some(nested_joins) = nested_joins {
+        if let Some(nested_joins) = nested_joins {
             nested_joins.into_iter().fold(select, |acc, join| acc.join(join.data))
         } else {
             select
-        };
-
-        (linking_fields, select)
+        }
     }
 }
 
@@ -466,17 +466,15 @@ impl FilterVisitorExt for FilterVisitor {
 
             _ => {
                 let condition = filter.condition;
-                let (ids, sub_select) = self.visit_relation_filter_select(filter, ctx);
-                let columns: Vec<Column<'static>> = ids
-                    .as_columns(ctx)
-                    .map(|col| col.aliased_col(self.parent_alias(), ctx))
-                    .collect();
+                let sub_select = self.visit_relation_filter_select(filter, ctx);
 
                 let comparison = match condition {
-                    RelationCondition::AtLeastOneRelatedRecord => Row::from(columns).in_selection(sub_select),
-                    RelationCondition::EveryRelatedRecord => Row::from(columns).not_in_selection(sub_select),
-                    RelationCondition::NoRelatedRecord => Row::from(columns).not_in_selection(sub_select),
-                    RelationCondition::ToOneRelatedRecord => Row::from(columns).in_selection(sub_select),
+                    RelationCondition::AtLeastOneRelatedRecord | RelationCondition::ToOneRelatedRecord => {
+                        Compare::Exists(Box::new(sub_select.into()))
+                    }
+                    RelationCondition::EveryRelatedRecord | RelationCondition::NoRelatedRecord => {
+                        Compare::NotExists(Box::new(sub_select.into()))
+                    }
                 };
 
                 (comparison.into(), None)
