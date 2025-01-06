@@ -142,7 +142,7 @@ impl QuaintQueryable for JsBaseQueryable {
         };
 
         let query = format!(r#"SELECT {}() AS version"#, version_fn);
-        let rows = self.query_raw(query, &[]).await?;
+        let rows = self.query_raw(query.as_str(), &[]).await?;
 
         let version_string = rows
             .first()
