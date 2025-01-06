@@ -16,6 +16,11 @@ pub struct Mysql<'a> {
 }
 
 impl<'a> Mysql<'a> {
+    /// Name of the function used to view the version of the database.
+    pub const fn version_fn() -> &'static str {
+        "version"
+    }
+
     fn visit_regular_equality_comparison(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         self.visit_expression(left)?;
         self.write(" = ")?;

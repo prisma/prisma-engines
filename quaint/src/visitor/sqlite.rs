@@ -16,6 +16,11 @@ pub struct Sqlite<'a> {
 }
 
 impl<'a> Sqlite<'a> {
+    /// Name of the function used to view the version of the database.
+    pub const fn version_fn() -> &'static str {
+        "sqlite_version"
+    }
+
     fn returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
         if let Some(returning) = returning {
             if !returning.is_empty() {
@@ -93,10 +98,6 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     fn write<D: fmt::Display>(&mut self, s: D) -> visitor::Result {
         write!(&mut self.query, "{s}")?;
         Ok(())
-    }
-
-    fn version_fn(&self) -> &'static str {
-        "sqlite_version"
     }
 
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
