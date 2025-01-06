@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use sql_migration_tests::test_api::*;
 
 #[test_connector]
@@ -137,15 +139,16 @@ fn evaluate_data_loss_with_past_unapplied_migrations_with_destructive_changes_do
     "#,
     );
 
-    let is_mysql = api.is_mysql();
+    let var_name: &[Cow<'_, str>] = if api.is_mysql() {
+        &["The values [PLAYFUL] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into()]
+    } else if api.is_sqlite() {
+        &[]
+    } else {
+        &["The values [PLAYFUL] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()]
+    };
     api.evaluate_data_loss(&directory, dm2.clone())
         .send()
-        .assert_warnings(&[if is_mysql {
-        "The values [PLAYFUL] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail."
-    } else {
-        "The values [PLAYFUL] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail."
-    }
-    .into()]);
+        .assert_warnings(var_name);
 
     api.create_migration("2-remove-value", &dm2, &directory).send_sync();
 
@@ -274,14 +277,17 @@ fn evaluate_data_loss_maps_warnings_to_the_right_steps(api: TestApi) {
         api.normalize_identifier("Cat")
     );
 
-    let is_postgres = api.is_postgres();
+    let expected_warnings = if api.is_postgres() || api.is_sqlite() { 1 } else { 0 };
+    let expected_unexecutables = if api.is_postgres() { 2 } else { 1 };
 
     #[allow(clippy::bool_to_int_with_if)]
     api.evaluate_data_loss(&directory, dm2)
         .send()
-        .assert_warnings_with_indices(&[(warn.into(), if is_postgres { 1 } else { 0 })])
+        .assert_warnings_with_indices(&[(warn.into(), expected_warnings)])
         .assert_unexecutables_with_indices(&[
-            ("Added the required column `isGoodDog` to the `Dog` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".into(), if is_postgres { 2 } else { 1 }),
+            ("Added the required column `isGoodDog` to the `Dog` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".into(),
+             expected_unexecutables
+            ),
         ]);
 }
 
@@ -338,13 +344,15 @@ fn evaluate_data_loss_multi_file_maps_warnings_to_the_right_steps(api: TestApi) 
         api.normalize_identifier("Cat")
     );
 
-    let is_postgres = api.is_postgres();
-
+    let expected_warnings = if api.is_postgres() || api.is_sqlite() { 1 } else { 0 };
+    let expected_unexecutables = if api.is_postgres() { 2 } else { 1 };
     #[allow(clippy::bool_to_int_with_if)]
     api.evaluate_data_loss_multi_file(&directory, &[("schema_a", &schema_a), ("schema_b", schema_b)])
         .send()
-        .assert_warnings_with_indices(&[(warn.into(), if is_postgres { 1 } else { 0 })])
+        .assert_warnings_with_indices(&[(warn.into(), expected_warnings)])
         .assert_unexecutables_with_indices(&[
-            ("Added the required column `isGoodDog` to the `Dog` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".into(), if is_postgres { 2 } else { 1 }),
+            ("Added the required column `isGoodDog` to the `Dog` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".into(),
+             expected_unexecutables
+            ),
         ]);
 }
