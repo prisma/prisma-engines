@@ -188,8 +188,8 @@ impl FilterVisitor {
             .collect();
 
         let nested_conditions = nested_conditions
-            .and(Row::from(parent_columns).equals(Row::from(selected_identifier.clone())))
-            .invert_if(condition.invert_of_subselect());
+            .invert_if(condition.invert_of_subselect())
+            .and(Row::from(parent_columns).equals(Row::from(selected_identifier.clone())));
 
         let nested_conditons = selected_identifier
             .clone()
@@ -236,15 +236,14 @@ impl FilterVisitor {
 
         let (nested_conditions, nested_joins) =
             self.visit_nested_filter(alias, |this| this.visit_filter(*filter.nested_filter, ctx));
-
         let parent_columns: Vec<_> = linking_fields
             .as_columns(ctx)
             .map(|col| col.aliased_col(self.parent_alias(), ctx))
             .collect();
 
         let nested_conditions = nested_conditions
-            .and(Row::from(parent_columns).equals(Row::from(related_columns.clone())))
-            .invert_if(condition.invert_of_subselect());
+            .invert_if(condition.invert_of_subselect())
+            .and(Row::from(parent_columns).equals(Row::from(related_columns.clone())));
 
         let conditions = related_columns
             .clone()
