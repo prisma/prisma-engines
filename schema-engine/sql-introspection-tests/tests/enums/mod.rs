@@ -7,7 +7,7 @@ use quaint::prelude::Queryable;
 use sql_introspection_tests::{test_api::*, TestResult};
 use test_macros::test_connector;
 
-#[test_connector(exclude(CockroachDb), capabilities(Enums))]
+#[test_connector(exclude(CockroachDb, Sqlite), capabilities(Enums))]
 async fn a_table_with_enums(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -67,7 +67,7 @@ async fn a_table_with_enums(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(CockroachDb), capabilities(Enums))]
+#[test_connector(exclude(CockroachDb, Sqlite), capabilities(Enums))]
 async fn a_table_enums_should_return_alphabetically_even_when_in_different_order(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
@@ -129,7 +129,7 @@ async fn a_table_enums_should_return_alphabetically_even_when_in_different_order
     Ok(())
 }
 
-#[test_connector(exclude(CockroachDb), capabilities(Enums))]
+#[test_connector(exclude(CockroachDb, Sqlite), capabilities(Enums))]
 async fn a_table_with_enum_default_values(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
