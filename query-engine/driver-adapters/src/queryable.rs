@@ -130,9 +130,25 @@ impl QuaintQueryable for JsBaseQueryable {
         .await
     }
 
+    // Note: Needed by the Wasm Schema Engine only.
     async fn version(&self) -> quaint::Result<Option<String>> {
-        // Note: JS Connectors don't use this method.
-        Ok(None)
+        let version_fn: &'static str = match self.provider {
+            #[cfg(feature = "mysql")]
+            AdapterFlavour::Mysql => visitor::Mysql::version_fn(),
+            #[cfg(feature = "postgresql")]
+            AdapterFlavour::Postgres => visitor::Postgres::version_fn(),
+            #[cfg(feature = "sqlite")]
+            AdapterFlavour::Sqlite => visitor::Sqlite::version_fn(),
+        };
+
+        let query = format!(r#"SELECT {}() AS version"#, version_fn);
+        let rows = self.query_raw(query.as_str(), &[]).await?;
+
+        let version_string = rows
+            .first()
+            .and_then(|row| row.get("version").and_then(|version| version.to_string()));
+
+        Ok(version_string)
     }
 
     fn is_healthy(&self) -> bool {

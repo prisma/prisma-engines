@@ -16,6 +16,11 @@ pub struct Sqlite<'a> {
 }
 
 impl<'a> Sqlite<'a> {
+    /// Name of the function used to view the version of the database.
+    pub const fn version_fn() -> &'static str {
+        "sqlite_version"
+    }
+
     fn returning(&mut self, returning: Option<Vec<Column<'a>>>) -> visitor::Result {
         if let Some(returning) = returning {
             if !returning.is_empty() {
