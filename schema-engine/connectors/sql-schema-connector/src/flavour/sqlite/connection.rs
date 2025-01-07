@@ -24,6 +24,7 @@ impl Connection {
     }
 
     pub(super) async fn describe_schema(&mut self) -> ConnectorResult<SqlSchema> {
+        // Note: this relies on quaint::connector::rusqlite::Connection, which is exposed by `quaint/expose-drivers`, and is not Wasm-compatible.
         describer::SqlSchemaDescriber::new(&self.0)
             .describe_impl()
             .await
