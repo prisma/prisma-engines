@@ -1,4 +1,4 @@
-use super::ExpressionKind;
+use super::{ExpressionKind, SelectQuery};
 use crate::ast::{Column, ConditionTree, Expression};
 use std::borrow::Cow;
 
@@ -46,6 +46,10 @@ pub enum Compare<'a> {
     Any(Box<Expression<'a>>),
     /// ALL (`left`)
     All(Box<Expression<'a>>),
+    /// EXISTS (`query`)
+    Exists(Box<SelectQuery<'a>>),
+    /// NOT EXISTS (`query`)
+    NotExists(Box<SelectQuery<'a>>),
 }
 
 #[derive(Debug, Clone, PartialEq)]

@@ -1,58 +1,39 @@
+use std::fmt;
+
 use crate::{model_extensions::AsColumn, *};
 
 use quaint::prelude::Column;
 use query_structure::ScalarField;
 
-#[derive(Clone, Copy, Debug)]
-/// A distinction in aliasing to separate the parent table and the joined data
-/// in the statement.
-#[derive(Default)]
-pub enum AliasMode {
-    #[default]
-    Table,
-    Join,
-}
-
-#[derive(Clone, Copy, Debug, Default)]
-/// Aliasing tool to count the nesting level to help with heavily nested
-/// self-related queries.
-pub struct Alias {
-    counter: usize,
-    mode: AliasMode,
+/// An alias referring to a table or a join on a table.
+#[derive(Debug, Clone, Copy)]
+pub enum Alias {
+    Table(usize),
+    Join(usize),
 }
 
 impl Alias {
-    /// Increment the alias as a new copy.
-    ///
-    /// Use when nesting one level down to a new subquery. `AliasMode` is
-    /// required due to the fact the current mode can be in `AliasMode::Join`.
-    pub fn inc(&self, mode: AliasMode) -> Self {
-        Self {
-            counter: self.counter + 1,
-            mode,
+    /// Converts the alias to one that refers to a join on the table.
+    pub fn to_join_alias(self) -> Self {
+        match self {
+            Self::Table(index) | Self::Join(index) => Self::Join(index),
         }
     }
 
-    /// Flip the alias to a different mode keeping the same nesting count.
-    pub fn flip(&self, mode: AliasMode) -> Self {
-        Self {
-            counter: self.counter,
-            mode,
+    /// Converts the alias to one that refers to the table.
+    pub fn to_table_alias(self) -> Self {
+        match self {
+            Self::Table(index) | Self::Join(index) => Self::Table(index),
         }
     }
+}
 
-    /// A string representation of the current alias. The current mode can be
-    /// overridden by defining the `mode_override`.
-    pub fn to_string(&self, mode_override: Option<AliasMode>) -> String {
-        match mode_override.unwrap_or(self.mode) {
-            AliasMode::Table => format!("t{}", self.counter),
-            AliasMode::Join => format!("j{}", self.counter),
+impl fmt::Display for Alias {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Table(index) => write!(f, "t{}", index),
+            Self::Join(index) => write!(f, "j{}", index),
         }
-    }
-
-    #[cfg(feature = "relation_joins")]
-    pub fn to_table_string(&self) -> String {
-        self.to_string(Some(AliasMode::Table))
     }
 }
 
@@ -73,7 +54,7 @@ impl AliasedColumn for &ScalarField {
 impl AliasedColumn for Column<'static> {
     fn aliased_col(self, alias: Option<Alias>, _ctx: &Context<'_>) -> Column<'static> {
         match alias {
-            Some(alias) => self.table(alias.to_string(None)),
+            Some(alias) => self.table(alias.to_string()),
             None => self,
         }
     }

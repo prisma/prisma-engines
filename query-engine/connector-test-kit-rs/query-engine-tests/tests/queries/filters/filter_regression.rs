@@ -202,7 +202,13 @@ mod fr_m_to_n {
         .await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyCompany(where: { locations: { none: { name: { equals: "D" }}}}){ id }}"#),
+          run_query!(&runner, r#"
+              query {
+                findManyCompany(
+                  where: { locations: { none: { name: { equals: "D" }}}}
+                  orderBy: { id: asc }
+                ) { id }
+              }"#),
           @r###"{"data":{"findManyCompany":[{"id":134},{"id":135},{"id":136}]}}"###
         );
 
