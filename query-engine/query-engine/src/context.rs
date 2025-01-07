@@ -11,8 +11,9 @@ use query_core::{
 };
 use request_handlers::{load_executor, ConnectorKind};
 use std::{env, fmt, sync::Arc};
+use telemetry::exporter::{CaptureSettings, CaptureTarget};
+use telemetry::{NextId, RequestId};
 use tracing::Instrument;
-use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// Prisma request context containing all immutable state of the process.
 /// There is usually only one context initialized per process.
@@ -27,6 +28,10 @@ pub struct PrismaContext {
     pub(crate) engine_protocol: EngineProtocol,
     /// Enabled features
     pub(crate) enabled_features: EnabledFeatures,
+    /// Logging and tracing facility
+    pub(crate) logger: Logger,
+    /// Artificial request ID used for capturing the spans during startup.
+    pub(crate) boot_request_id: RequestId,
 }
 
 impl fmt::Debug for PrismaContext {
@@ -41,6 +46,8 @@ impl PrismaContext {
         protocol: EngineProtocol,
         enabled_features: EnabledFeatures,
         metrics: Option<MetricRegistry>,
+        logger: Logger,
+        boot_request_id: RequestId,
     ) -> PrismaResult<PrismaContext> {
         let arced_schema = Arc::new(schema);
         let arced_schema_2 = Arc::clone(&arced_schema);
@@ -49,6 +56,8 @@ impl PrismaContext {
             // Construct query schema
             schema::build(arced_schema, enabled_features.contains(Feature::RawQueries))
         });
+
+        let enable_tracing = logger.tracing_config().should_capture();
 
         let executor_fut = async move {
             let config = &arced_schema_2.configuration;
@@ -61,8 +70,15 @@ impl PrismaContext {
                 .ok_or_else(|| PrismaError::ConfigurationError("No valid data source found".into()))?;
 
             let url = datasource.load_url(|key| env::var(key).ok())?;
+
             // Load executor
-            let executor = load_executor(ConnectorKind::Rust { url, datasource }, preview_features).await?;
+            let executor = load_executor(
+                ConnectorKind::Rust { url, datasource },
+                preview_features,
+                enable_tracing,
+            )
+            .await?;
+
             let connector = executor.primary_connector();
 
             let conn_span = tracing::info_span!(
@@ -90,6 +106,8 @@ impl PrismaContext {
             metrics: metrics.unwrap_or_default(),
             engine_protocol: protocol,
             enabled_features,
+            logger,
+            boot_request_id,
         };
 
         Ok(context)
@@ -113,7 +131,7 @@ impl PrismaContext {
 }
 
 pub async fn setup(opts: &PrismaOpt) -> PrismaResult<Arc<PrismaContext>> {
-    Logger::new("prisma-engine-http", opts).install().unwrap();
+    let logger = Logger::new(opts).install().expect("failed to install the logger");
 
     let metrics = if opts.enable_metrics || opts.dataproxy_metric_override {
         let metrics = MetricRegistry::new();
@@ -130,11 +148,20 @@ pub async fn setup(opts: &PrismaOpt) -> PrismaResult<Arc<PrismaContext>> {
     let protocol = opts.engine_protocol();
     config.validate_that_one_datasource_is_provided()?;
 
-    let span = tracing::info_span!("prisma:engine:connect", user_facing = true);
-    if let Some(trace_context) = opts.trace_context.as_ref() {
-        let parent_context = telemetry::helpers::restore_remote_context_from_json_str(trace_context);
-        span.set_parent(parent_context);
+    let initial_request_id = RequestId::next();
+
+    if logger.tracing_config().should_capture() {
+        logger
+            .exporter()
+            .start_capturing(initial_request_id, CaptureSettings::new(CaptureTarget::Spans))
+            .await;
     }
+
+    let span = tracing::info_span!(
+        "prisma:engine:connect",
+        user_facing = true,
+        request_id = initial_request_id.into_u64(),
+    );
 
     let mut features = EnabledFeatures::from(opts);
 
@@ -142,7 +169,7 @@ pub async fn setup(opts: &PrismaOpt) -> PrismaResult<Arc<PrismaContext>> {
         features |= Feature::Metrics
     }
 
-    let cx = PrismaContext::new(datamodel, protocol, features, metrics)
+    let cx = PrismaContext::new(datamodel, protocol, features, metrics, logger, initial_request_id)
         .instrument(span)
         .await?;
 

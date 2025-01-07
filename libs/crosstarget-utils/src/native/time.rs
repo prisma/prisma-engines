@@ -5,6 +5,8 @@ use std::{
 
 use crate::common::timeout::TimeoutError;
 
+pub use std::time::{SystemTime, SystemTimeError};
+
 #[derive(Clone, Copy)]
 pub struct ElapsedTimeCounter {
     instant: Instant,

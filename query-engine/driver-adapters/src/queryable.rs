@@ -13,6 +13,7 @@ use quaint::{
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
 };
+use telemetry::formatting::QueryForTracing;
 use tracing::{info_span, Instrument};
 
 /// A JsQueryable adapts a Proxy to implement quaint's Queryable interface. It has the
@@ -176,15 +177,30 @@ impl JsBaseQueryable {
     }
 
     async fn do_query_raw_inner(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<ResultSet> {
-        let len = params.len();
-        let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
+        let serialization_span = info_span!(
+            "prisma:engine:js:query:args",
+            "otel.kind" = "client",
+            "prisma.db_query.params.count" = params.len(),
+            user_facing = true,
+        );
         let query = self.build_query(sql, params).instrument(serialization_span).await?;
 
-        let sql_span = info_span!("js:query:sql", user_facing = true, "db.system" = %self.db_system_name, "db.statement" = %sql, "otel.kind" = "client");
+        let sql_span = info_span!(
+            "prisma:engine:js:query:sql",
+            "otel.kind" = "client",
+            "db.system" = %self.db_system_name,
+            "db.query.text" = %QueryForTracing(sql),
+            user_facing = true,
+        );
         let result_set = self.proxy.query_raw(query).instrument(sql_span).await?;
 
-        let len = result_set.len();
-        let _deserialization_span = info_span!("js:query:result", user_facing = true, "length" = %len).entered();
+        let _deserialization_span = info_span!(
+            "prisma:engine:js:query:result",
+            "otel.kind" = "client",
+            "db.response.returned_rows" = result_set.len(),
+            user_facing = true,
+        )
+        .entered();
 
         result_set.try_into()
     }
@@ -198,11 +214,21 @@ impl JsBaseQueryable {
     }
 
     async fn do_execute_raw_inner(&self, sql: &str, params: &[quaint::Value<'_>]) -> quaint::Result<u64> {
-        let len = params.len();
-        let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
+        let serialization_span = info_span!(
+            "prisma:engine:js:query:args",
+            "otel.kind" = "client",
+            "prisma.db_query.params.count" = params.len(),
+            user_facing = true,
+        );
         let query = self.build_query(sql, params).instrument(serialization_span).await?;
 
-        let sql_span = info_span!("js:query:sql", user_facing = true, "db.system" = %self.db_system_name, "db.statement" = %sql, "otel.kind" = "client");
+        let sql_span = info_span!(
+            "prisma:engine:js:query:sql",
+            "otel.kind" = "client",
+            "db.system" = %self.db_system_name,
+            "db.query.text" = %QueryForTracing(sql),
+            user_facing = true,
+        );
         let affected_rows = self.proxy.execute_raw(query).instrument(sql_span).await?;
 
         Ok(affected_rows as u64)

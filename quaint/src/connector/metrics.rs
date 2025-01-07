@@ -1,9 +1,11 @@
+use std::future::Future;
+
+use crosstarget_utils::time::ElapsedTimeCounter;
 use prisma_metrics::{counter, histogram};
+use telemetry::formatting::QueryForTracing;
 use tracing::{info_span, Instrument};
 
 use crate::ast::{Params, Value};
-use crosstarget_utils::time::ElapsedTimeCounter;
-use std::future::Future;
 
 pub async fn query<'a, F, T, U>(
     tag: &'static str,
@@ -16,8 +18,14 @@ where
     F: FnOnce() -> U + 'a,
     U: Future<Output = crate::Result<T>>,
 {
-    let span =
-        info_span!("quaint:query", "db.system" = db_system_name, "db.statement" = %query, "otel.kind" = "client");
+    let span = info_span!(
+        "quaint:query",
+        "db.system" = db_system_name,
+        "db.query.text" = %QueryForTracing(query),
+        "otel.kind" = "client",
+        "otel.name" = "prisma:engine:db_query",
+        user_facing = true,
+    );
     do_query(tag, query, params, f).instrument(span).await
 }
 
@@ -77,7 +85,6 @@ where
     tracing::trace!(
         message = "Fetched a connection from the pool",
         duration_ms = start.elapsed_time().as_millis() as u64,
-        item_type = "query",
         is_query = true,
         result,
     );

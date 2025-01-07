@@ -48,9 +48,8 @@ tokio = { version = "1", features = ["macros", "time"] }
 tracing = { workspace = true, features = ["log"] }
 tracing-futures.workspace = true
 uuid.workspace = true
-opentelemetry = { version = "0.17", features = ["tokio"] }
-tracing-opentelemetry = "0.17.3"
 cuid.workspace = true
+ulid.workspace = true
 quaint.workspace = true
 
 [dev-dependencies]

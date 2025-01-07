@@ -184,7 +184,7 @@ fn json_type_must_work_for_some_connectors() {
         .assert_has_scalar_field("json")
         .assert_scalar_type(ScalarType::Json);
 
-    let error = parse_unwrap_err(&format!("{SQLITE_SOURCE}\n{dml}"));
+    let error = parse_unwrap_err(&format!("{MSSQL_SOURCE}\n{dml}"));
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating field `json` in model `User`: Field `json` in model `User` can't be of type Json. The current connector does not support the Json type.[0m

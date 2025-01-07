@@ -290,6 +290,14 @@ pub trait Connector: Send + Sync {
     ) -> prisma_value::PrismaValueResult<Vec<u8>> {
         unreachable!("This method is only implemented on connectors with lateral join support.")
     }
+
+    fn is_sql(&self) -> bool {
+        self.flavour().is_sql()
+    }
+
+    fn is_mongo(&self) -> bool {
+        self.flavour().is_mongo()
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -300,6 +308,16 @@ pub enum Flavour {
     Mysql,
     Postgres,
     Sqlite,
+}
+
+impl Flavour {
+    pub fn is_sql(&self) -> bool {
+        !self.is_mongo()
+    }
+
+    pub fn is_mongo(&self) -> bool {
+        matches!(self, Flavour::Mongo)
+    }
 }
 
 impl FromStr for Flavour {

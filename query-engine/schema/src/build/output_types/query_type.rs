@@ -21,7 +21,7 @@ pub(crate) fn query_fields(ctx: &QuerySchema) -> Vec<FieldFn> {
         field!(find_unique_field, model);
         field!(find_unique_or_throw_field, model);
 
-        if ctx.enable_raw_queries && ctx.has_capability(ConnectorCapability::MongoDbQueryRaw) {
+        if ctx.enable_raw_queries && ctx.is_mongo() {
             let model_cloned = model.clone();
             fields.push(Box::new(move |_ctx| mongo_find_raw_field(&model_cloned)));
             fields.push(Box::new(move |_ctx| mongo_aggregate_raw_field(&model)));

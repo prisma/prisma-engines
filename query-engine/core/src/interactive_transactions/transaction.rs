@@ -8,7 +8,7 @@ use crate::{
 use connector::{Connection, Transaction};
 use crosstarget_utils::time::ElapsedTimeCounter;
 use schema::QuerySchemaRef;
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 use tokio::time::Duration;
 use tracing::Span;
 use tracing_futures::Instrument;
@@ -174,7 +174,7 @@ impl InteractiveTransaction {
                 operation,
                 traceparent,
             )
-            .instrument(info_span!("prisma:engine:itx_execute_single", user_facing = true))
+            .instrument(info_span!("prisma:engine:itx_execute_single"))
             .await
         })
     }
@@ -192,7 +192,7 @@ impl InteractiveTransaction {
                 operations,
                 traceparent,
             )
-            .instrument(info_span!("prisma:engine:itx_execute_batch", user_facing = true))
+            .instrument(info_span!("prisma:engine:itx_execute_batch"))
             .await
         })
     }
@@ -201,7 +201,7 @@ impl InteractiveTransaction {
         tx_timeout!(self, "commit", async {
             let name = self.name();
             let conn = self.state.as_open("commit")?;
-            let span = info_span!("prisma:engine:itx_commit", user_facing = true);
+            let span = info_span!("prisma:engine:itx_commit");
 
             if let Err(err) = conn.commit().instrument(span).await {
                 error!(?err, ?name, "transaction failed to commit");
@@ -221,7 +221,7 @@ impl InteractiveTransaction {
     pub async fn rollback(&mut self, was_timeout: bool) -> crate::Result<()> {
         let name = self.name();
         let conn = self.state.as_open("rollback")?;
-        let span = info_span!("prisma:engine:itx_rollback", user_facing = true);
+        let span = info_span!("prisma:engine:itx_rollback");
 
         let result = conn.rollback().instrument(span).await;
         if let Err(err) = &result {

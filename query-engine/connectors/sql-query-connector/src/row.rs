@@ -2,6 +2,7 @@ use crate::{column_metadata::ColumnMetadata, error::SqlError, value::to_prisma_v
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
+use core::{f32, f64};
 use quaint::{connector::ResultRow, Value, ValueType};
 use query_structure::{ConversionFailure, FieldArity, PrismaValue, Record, TypeIdentifier};
 use std::{io, str::FromStr};
@@ -161,6 +162,16 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             value if value.is_null() => PrismaValue::Null,
             ValueType::Text(Some(json)) => PrismaValue::Json(json.into()),
             ValueType::Json(Some(json)) => PrismaValue::Json(json.to_string()),
+            ValueType::Boolean(Some(bool)) => PrismaValue::Json(bool.to_string()),
+            ValueType::Int32(Some(i)) => PrismaValue::Json(i.to_string()),
+            ValueType::Int64(Some(i)) => PrismaValue::Json(i.to_string()),
+            // we use serde_json::Number to ensure JSON-compliant float formatting
+            ValueType::Float(Some(f)) => serde_json::Number::from_f64(f.into())
+                .map(|num| PrismaValue::Json(num.to_string()))
+                .ok_or_else(|| create_error(&p_value))?,
+            ValueType::Double(Some(f)) => serde_json::Number::from_f64(f)
+                .map(|num| PrismaValue::Json(num.to_string()))
+                .ok_or_else(|| create_error(&p_value))?,
             _ => return Err(create_error(&p_value)),
         },
         TypeIdentifier::UUID => match p_value.typed {

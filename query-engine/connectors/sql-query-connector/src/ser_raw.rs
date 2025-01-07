@@ -32,7 +32,7 @@ impl serde::Serialize for SerializedResultSet {
 #[derive(Debug)]
 struct SerializedColumns<'a>(&'a ResultSet);
 
-impl<'a> Serialize for SerializedColumns<'a> {
+impl Serialize for SerializedColumns<'_> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -46,7 +46,7 @@ impl<'a> Serialize for SerializedColumns<'a> {
 #[derive(Debug)]
 struct SerializedTypes<'a>(&'a ResultSet);
 
-impl<'a> SerializedTypes<'a> {
+impl SerializedTypes<'_> {
     fn infer_unknown_column_types(&self) -> Vec<ColumnType> {
         let rows = self.0;
 
@@ -104,7 +104,7 @@ impl Serialize for SerializedTypes<'_> {
 #[derive(Debug)]
 struct SerializedRows<'a>(&'a ResultSet);
 
-impl<'a> Serialize for SerializedRows<'a> {
+impl Serialize for SerializedRows<'_> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -140,7 +140,7 @@ impl Serialize for SerializedRow<'_> {
 
 struct SerializedValue<'a>(&'a Value<'a>);
 
-impl<'a> Serialize for SerializedValue<'a> {
+impl Serialize for SerializedValue<'_> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,

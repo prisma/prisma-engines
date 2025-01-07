@@ -1,7 +1,7 @@
 import { PrismaPg } from '@prisma/adapter-pg'
 import { pg } from '@prisma/bundled-js-drivers'
 import { DriverAdapter } from '@prisma/driver-adapter-utils'
-import { postgresSchemaName, postgres_options } from '../utils'
+import { postgresSchemaName, postgresOptions } from '../utils'
 import type { ConnectParams, DriverAdaptersManager } from './index'
 import type { DriverAdapterTag, EnvForAdapter } from '../types'
 
@@ -21,7 +21,7 @@ export class PgManager implements DriverAdaptersManager {
   async connect({ url }: ConnectParams) {
     const schemaName = postgresSchemaName(url)
 
-    this.#driver = new pg.Pool(postgres_options(url))
+    this.#driver = new pg.Pool(postgresOptions(url))
     this.#adapter = new PrismaPg(this.#driver, { schema: schemaName }) as DriverAdapter
 
     return this.#adapter

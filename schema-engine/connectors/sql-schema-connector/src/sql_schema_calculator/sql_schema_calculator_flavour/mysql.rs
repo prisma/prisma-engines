@@ -1,5 +1,8 @@
+use psl::parser_database::walkers::EnumWalker;
+
 use super::{super::Context, SqlSchemaCalculatorFlavour};
 use crate::flavour::MysqlFlavour;
+use sql_schema_describer as sql;
 
 impl SqlSchemaCalculatorFlavour for MysqlFlavour {
     fn calculate_enums(&self, ctx: &mut Context<'_>) {
@@ -22,5 +25,9 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
                 ctx.schema.describer_schema.push_enum_variant(sql_enum_id, variant);
             }
         }
+    }
+
+    fn column_type_for_enum(&self, enm: EnumWalker<'_>, ctx: &Context<'_>) -> Option<sql::ColumnTypeFamily> {
+        ctx.enum_ids.get(&enm.id).map(|id| sql::ColumnTypeFamily::Enum(*id))
     }
 }

@@ -63,6 +63,7 @@ pub(crate) fn render(default: DefaultValuePair<'_>) -> Option<renderer::DefaultV
 
                 Some(renderer::DefaultValue::function(fun))
             }
+            DefaultKind::Ulid => Some(renderer::DefaultValue::function(Function::new("ulid"))),
             DefaultKind::Nanoid(length) => {
                 let mut fun = Function::new("nanoid");
 

@@ -1,5 +1,5 @@
 use derive_more::Display;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 mod error;
 mod manager;
@@ -10,7 +10,7 @@ pub use error::*;
 pub(crate) use manager::*;
 pub(crate) use transaction::*;
 
-#[derive(Debug, Clone, Hash, Eq, PartialEq, Deserialize, Display)]
+#[derive(Debug, Clone, Hash, Eq, PartialEq, Serialize, Deserialize, Display)]
 #[display(fmt = "{}", _0)]
 pub struct TxId(String);
 

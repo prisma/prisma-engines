@@ -4,7 +4,7 @@ use connector_interface::{ConnectionLike, ReadOperations, Transaction, UpdateTyp
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
 use prisma_metrics::{guards::GaugeGuard, PRISMA_CLIENT_QUERIES_ACTIVE};
 use query_structure::{RelationLoadStrategy, SelectionResult};
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 
 use super::*;
 use crate::{
@@ -17,7 +17,7 @@ pub struct MongoDbTransaction<'conn> {
     gauge: GaugeGuard,
 }
 
-impl<'conn> ConnectionLike for MongoDbTransaction<'conn> {}
+impl ConnectionLike for MongoDbTransaction<'_> {}
 
 impl<'conn> MongoDbTransaction<'conn> {
     pub(crate) async fn new(
@@ -43,7 +43,7 @@ impl<'conn> MongoDbTransaction<'conn> {
 }
 
 #[async_trait]
-impl<'conn> Transaction for MongoDbTransaction<'conn> {
+impl Transaction for MongoDbTransaction<'_> {
     async fn commit(&mut self) -> connector_interface::Result<()> {
         self.gauge.decrement();
 
@@ -76,7 +76,7 @@ impl<'conn> Transaction for MongoDbTransaction<'conn> {
 }
 
 #[async_trait]
-impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
+impl WriteOperations for MongoDbTransaction<'_> {
     async fn create_record(
         &mut self,
         model: &Model,
@@ -142,6 +142,17 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
             Ok(result.len())
         })
         .await
+    }
+
+    async fn update_records_returning(
+        &mut self,
+        _model: &Model,
+        _record_filter: connector_interface::RecordFilter,
+        _args: connector_interface::WriteArgs,
+        _selected_fields: FieldSelection,
+        _traceparent: Option<TraceParent>,
+    ) -> connector_interface::Result<ManyRecords> {
+        unimplemented!()
     }
 
     async fn update_record(
@@ -277,7 +288,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
 }
 
 #[async_trait]
-impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
+impl ReadOperations for MongoDbTransaction<'_> {
     async fn get_single_record(
         &mut self,
         model: &Model,

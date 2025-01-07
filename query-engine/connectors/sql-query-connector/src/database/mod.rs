@@ -56,6 +56,7 @@ pub trait FromSource {
         source: &psl::Datasource,
         url: &str,
         features: psl::PreviewFeatures,
+        tracing_enabled: bool,
     ) -> connector_interface::Result<Self>
     where
         Self: Connector + Sized;

@@ -4,6 +4,7 @@ use prisma_metrics::{MetricRecorder, MetricRegistry};
 use query_engine_common::logger::StringCallback;
 use serde_json::Value;
 use std::{collections::BTreeMap, fmt::Display};
+use telemetry::Exporter;
 use tracing::{
     field::{Field, Visit},
     level_filters::LevelFilter,
@@ -21,6 +22,7 @@ pub(crate) struct Logger {
     dispatcher: Dispatch,
     metrics: Option<MetricRegistry>,
     recorder: Option<MetricRecorder>,
+    exporter: Exporter,
 }
 
 impl Logger {
@@ -48,20 +50,12 @@ impl Logger {
             FilterExt::boxed(log_level)
         };
 
-        let log_callback = CallbackLayer::new(log_callback);
+        let log_layer = CallbackLayer::new(log_callback).with_filter(filters);
 
-        let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
-        let tracer = super::tracer::new_pipeline().install_simple(Box::new(log_callback.clone()));
-        let telemetry = if enable_tracing {
-            let telemetry = tracing_opentelemetry::layer()
-                .with_tracer(tracer)
-                .with_filter(is_user_trace);
-            Some(telemetry)
-        } else {
-            None
-        };
+        let exporter = Exporter::new();
 
-        let layer = log_callback.with_filter(filters);
+        let tracing_layer = enable_tracing
+            .then(|| telemetry::layer(exporter.clone()).with_filter(telemetry::filter::user_facing_spans()));
 
         let (metrics, recorder) = if enable_metrics {
             let registry = MetricRegistry::new();
@@ -72,9 +66,10 @@ impl Logger {
         };
 
         Self {
-            dispatcher: Dispatch::new(Registry::default().with(telemetry).with(layer)),
+            dispatcher: Dispatch::new(Registry::default().with(tracing_layer).with(log_layer)),
             metrics,
             recorder,
+            exporter,
         }
     }
 
@@ -89,13 +84,17 @@ impl Logger {
     pub fn recorder(&self) -> Option<MetricRecorder> {
         self.recorder.clone()
     }
+
+    pub fn exporter(&self) -> Exporter {
+        self.exporter.clone()
+    }
 }
 
 pub struct JsonVisitor<'a> {
     values: BTreeMap<&'a str, Value>,
 }
 
-impl<'a> JsonVisitor<'a> {
+impl JsonVisitor<'_> {
     pub fn new(level: &Level, target: &str) -> Self {
         let mut values = BTreeMap::new();
         values.insert("level", serde_json::Value::from(level.to_string()));
@@ -107,7 +106,7 @@ impl<'a> JsonVisitor<'a> {
     }
 }
 
-impl<'a> Visit for JsonVisitor<'a> {
+impl Visit for JsonVisitor<'_> {
     fn record_debug(&mut self, field: &Field, value: &dyn fmt::Debug) {
         match field.name() {
             name if name.starts_with("r#") => {
@@ -137,7 +136,7 @@ impl<'a> Visit for JsonVisitor<'a> {
     }
 }
 
-impl<'a> Display for JsonVisitor<'a> {
+impl Display for JsonVisitor<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(&serde_json::to_string(&self.values).unwrap())
     }

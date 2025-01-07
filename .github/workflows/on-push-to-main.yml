@@ -12,20 +12,68 @@ concurrency:
 jobs:
   publish-to-gh-pages:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
+
+    env:
+      CSV_PATH: engines-size/data.csv
 
     steps:
       - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v30
-        with:
-          # we need internet access for the moment
-          extra_nix_config: |
-            sandbox = false
 
-      - run: |
+      - uses: ./.github/workflows/include/rust-wasm-setup
+
+      - name: Build native engines
+        run: |
+          cargo build --release -p query-engine -p query-engine-node-api
+          mv target/release/libquery_engine.{so,node}
+
+      - name: Build WASM engines
+        env:
+          WASM_BUILD_PROFILE: release
+          PKG_DIR: query-engine/query-engine-wasm/pkg
+          TARGET_DIR: target/query-engine-wasm
+        run: |
+          make build-qe-wasm-gz
+          mkdir -p $TARGET_DIR
+
+          for provider in "postgresql" "mysql" "sqlite"; do
+            cp $PKG_DIR/$provider/query_engine_bg.wasm $TARGET_DIR/query-engine-$provider.wasm
+            cp $PKG_DIR/$provider.gz $TARGET_DIR/query-engine-$provider.wasm.gz
+          done
+
+      - name: Check out gh-pages branch
+        run: |
+          git fetch --depth=1 origin gh-pages
+          git checkout origin/gh-pages
+
+      - name: Update engines size
+        run: |
+          files=(
+            target/release/query-engine
+            target/release/libquery_engine.node
+            target/query-engine-wasm/query-engine-postgresql.wasm.gz
+            target/query-engine-wasm/query-engine-postgresql.wasm
+            target/query-engine-wasm/query-engine-mysql.wasm.gz
+            target/query-engine-wasm/query-engine-mysql.wasm
+            target/query-engine-wasm/query-engine-sqlite.wasm.gz
+            target/query-engine-wasm/query-engine-sqlite.wasm
+          )
+
+          DATE_TIME="$(date -u --iso-8601=seconds)"
+
+          if [[ ! -f $CSV_PATH ]]; then
+            echo "date_time,branch,commit,file,size_bytes" > "$CSV_PATH"
+          fi
+
+          for file in "${files[@]}"; do
+            file_name=$(basename "$file")
+            size=$(stat -c %s "$file")
+            echo "$DATE_TIME,$GITHUB_REF_NAME,$GITHUB_SHA,$file_name,$size" >> "$CSV_PATH"
+          done
+
+      - name: Commit the changes
+        run: |
           git config user.email "prismabots@gmail.com"
           git config user.name "prisma-bot"
-
-      - name: Publish engines size to gh-pages branch
-        run: nix run .#publish-engine-size
+          git add "$CSV_PATH"
+          git commit --quiet -m "update engines size for $GITHUB_SHA"
+          git push origin '+HEAD:gh-pages'

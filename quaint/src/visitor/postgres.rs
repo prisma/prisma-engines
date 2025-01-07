@@ -406,7 +406,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> visitor::Result {
         match json_extract.path {
             JsonPath::String(_) => panic!("JSON path string notation is not supported for Postgres"),
@@ -445,7 +445,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_unquote(&mut self, json_unquote: JsonUnquote<'a>) -> visitor::Result {
         self.write("(")?;
         self.visit_expression(*json_unquote.expr)?;
@@ -472,7 +472,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
         self.write("(")?;
         self.visit_expression(*extract.expr)?;
@@ -482,7 +482,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_extract_first_array_item(&mut self, extract: JsonExtractFirstArrayElem<'a>) -> visitor::Result {
         self.write("(")?;
         self.visit_expression(*extract.expr)?;
@@ -492,7 +492,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    #[cfg(any(feature = "postgresql", feature = "mysql", feature = "sqlite"))]
     fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType<'a>, not: bool) -> visitor::Result {
         self.write("JSONB_TYPEOF")?;
         self.write("(")?;

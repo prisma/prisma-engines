@@ -28,14 +28,11 @@ thiserror = "1.0"
 url.workspace = true
 hyper = { version = "0.14", features = ["server", "http1", "http2", "runtime"] }
 tracing.workspace = true
-tracing-opentelemetry = "0.17.3"
 tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
-opentelemetry = { version = "0.17.0", features = ["rt-tokio"] }
-opentelemetry-otlp = { version = "0.10", features = ["tls", "tls-roots"] }
 prisma-metrics.path = "../../libs/metrics"
 
 user-facing-errors = { path = "../../libs/user-facing-errors" }
-telemetry = { path = "../../libs/telemetry", features = ["metrics"] }
+telemetry = { path = "../../libs/telemetry" }
 
 jemallocator.workspace = true
 

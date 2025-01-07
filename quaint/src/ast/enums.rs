@@ -29,13 +29,13 @@ impl<'a> EnumVariant<'a> {
     }
 }
 
-impl<'a> AsRef<str> for EnumVariant<'a> {
+impl AsRef<str> for EnumVariant<'_> {
     fn as_ref(&self) -> &str {
         self.0.as_ref()
     }
 }
 
-impl<'a> std::ops::Deref for EnumVariant<'a> {
+impl std::ops::Deref for EnumVariant<'_> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
@@ -43,7 +43,7 @@ impl<'a> std::ops::Deref for EnumVariant<'a> {
     }
 }
 
-impl<'a> fmt::Display for EnumVariant<'a> {
+impl fmt::Display for EnumVariant<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(self.as_ref())
     }
@@ -55,7 +55,7 @@ impl<'a> From<Cow<'a, str>> for EnumVariant<'a> {
     }
 }
 
-impl<'a> From<String> for EnumVariant<'a> {
+impl From<String> for EnumVariant<'_> {
     fn from(value: String) -> Self {
         Self(value.into())
     }

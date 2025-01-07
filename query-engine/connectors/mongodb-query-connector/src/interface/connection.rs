@@ -11,7 +11,7 @@ use connector_interface::{
 use mongodb::{ClientSession, Database};
 use query_structure::{prelude::*, RelationLoadStrategy, SelectionResult};
 use std::collections::HashMap;
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 
 pub struct MongoDbConnection {
     /// The session to use for operations.
@@ -112,6 +112,17 @@ impl WriteOperations for MongoDbConnection {
             Ok(result.len())
         })
         .await
+    }
+
+    async fn update_records_returning(
+        &mut self,
+        _model: &Model,
+        _record_filter: connector_interface::RecordFilter,
+        _args: WriteArgs,
+        _selected_fields: FieldSelection,
+        _traceparent: Option<TraceParent>,
+    ) -> connector_interface::Result<ManyRecords> {
+        unimplemented!()
     }
 
     async fn update_record(

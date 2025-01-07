@@ -10,7 +10,7 @@ use prisma_value::PrismaValue;
 use quaint::prelude::ConnectionInfo;
 use query_structure::{prelude::*, Filter, QueryArguments, RelationLoadStrategy, SelectionResult};
 use std::collections::HashMap;
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 
 pub struct SqlConnectorTransaction<'tx> {
     inner: Box<dyn quaint::connector::Transaction + 'tx>,
@@ -34,10 +34,10 @@ impl<'tx> SqlConnectorTransaction<'tx> {
     }
 }
 
-impl<'tx> ConnectionLike for SqlConnectorTransaction<'tx> {}
+impl ConnectionLike for SqlConnectorTransaction<'_> {}
 
 #[async_trait]
-impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
+impl Transaction for SqlConnectorTransaction<'_> {
     async fn commit(&mut self) -> connector::Result<()> {
         catch(&self.connection_info, async {
             self.inner.commit().await.map_err(SqlError::from)
@@ -67,7 +67,7 @@ impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
 }
 
 #[async_trait]
-impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
+impl ReadOperations for SqlConnectorTransaction<'_> {
     async fn get_single_record(
         &mut self,
         model: &Model,
@@ -154,7 +154,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
 }
 
 #[async_trait]
-impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
+impl WriteOperations for SqlConnectorTransaction<'_> {
     async fn create_record(
         &mut self,
         model: &Model,
@@ -226,6 +226,29 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         catch(
             &self.connection_info,
             write::update_records(self.inner.as_queryable(), model, record_filter, args, &ctx),
+        )
+        .await
+    }
+
+    async fn update_records_returning(
+        &mut self,
+        model: &Model,
+        record_filter: RecordFilter,
+        args: WriteArgs,
+        selected_fields: FieldSelection,
+        traceparent: Option<TraceParent>,
+    ) -> connector::Result<ManyRecords> {
+        let ctx = Context::new(&self.connection_info, traceparent);
+        catch(
+            &self.connection_info,
+            write::update_records_returning(
+                self.inner.as_queryable(),
+                model,
+                record_filter,
+                args,
+                selected_fields,
+                &ctx,
+            ),
         )
         .await
     }

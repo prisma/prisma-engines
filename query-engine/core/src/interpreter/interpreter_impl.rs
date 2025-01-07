@@ -8,7 +8,7 @@ use connector::ConnectionLike;
 use futures::future::BoxFuture;
 use query_structure::prelude::*;
 use std::{collections::HashMap, fmt};
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 use tracing::Instrument;
 
 #[derive(Debug, Clone)]
@@ -153,7 +153,7 @@ pub(crate) struct QueryInterpreter<'conn> {
     log: Vec<String>,
 }
 
-impl<'conn> fmt::Debug for QueryInterpreter<'conn> {
+impl fmt::Debug for QueryInterpreter<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("QueryInterpreter").finish()
     }

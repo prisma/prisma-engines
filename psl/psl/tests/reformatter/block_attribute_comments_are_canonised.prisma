@@ -1,3 +1,10 @@
+/**
+ * Models
+   With
+   Several
+   Lines
+ */
+
 model MyModel {
   // Example Comment
   field1 Int // Comment Field 1
@@ -10,6 +17,8 @@ model MyModel {
   // This one must stay too.
   @@unique([field1, field3]) // there too
 }
+
+/* Types */
 
 type YourType {
   // Example Comment

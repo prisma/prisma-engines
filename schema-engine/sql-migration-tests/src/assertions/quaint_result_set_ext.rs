@@ -32,7 +32,7 @@ impl ResultSetExt for ResultSet {
 #[derive(Debug)]
 pub struct RowAssertion<'a>(ResultRowRef<'a>);
 
-impl<'a> RowAssertion<'a> {
+impl RowAssertion<'_> {
     pub fn assert_array_value(self, column_name: &str, expected_value: &[Value<'_>]) -> Self {
         let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| match &col.typed {
             ValueType::Array(x) => x.as_ref(),

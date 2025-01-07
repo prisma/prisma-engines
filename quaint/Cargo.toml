@@ -71,6 +71,7 @@ fmt-sql = ["sqlformat"]
 [dependencies]
 connection-string = "0.2"
 percent-encoding = "2"
+telemetry.path = "../libs/telemetry"
 tracing.workspace = true
 tracing-futures.workspace = true
 async-trait.workspace = true
@@ -110,6 +111,7 @@ quaint-test-macros = { path = "quaint-test-macros" }
 quaint-test-setup = { path = "quaint-test-setup" }
 tokio = { version = "1", features = ["macros", "time"] }
 expect-test = "1"
+tracing-test = "0.2"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { workspace = true, features = ["js"] }

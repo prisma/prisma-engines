@@ -217,6 +217,14 @@ impl QuerySchema {
             .capabilities()
             .contains(ConnectorCapability::NativeUpsert)
     }
+
+    pub fn is_sql(&self) -> bool {
+        self.connector.is_sql()
+    }
+
+    pub fn is_mongo(&self) -> bool {
+        self.connector.is_mongo()
+    }
 }
 
 /// Designates a specific top-level operation on a corresponding model.
@@ -239,6 +247,7 @@ pub enum QueryTag {
     CreateManyAndReturn,
     UpdateOne,
     UpdateMany,
+    UpdateManyAndReturn,
     DeleteOne,
     DeleteMany,
     UpsertOne,
@@ -265,6 +274,7 @@ impl fmt::Display for QueryTag {
             Self::CreateManyAndReturn => "createManyAndReturn",
             Self::UpdateOne => "updateOne",
             Self::UpdateMany => "updateMany",
+            Self::UpdateManyAndReturn => "updateManyAndReturn",
             Self::DeleteOne => "deleteOne",
             Self::DeleteMany => "deleteMany",
             Self::UpsertOne => "upsertOne",
@@ -294,6 +304,7 @@ impl From<&str> for QueryTag {
             "createManyAndReturn" => Self::CreateManyAndReturn,
             "updateOne" => Self::UpdateOne,
             "updateMany" => Self::UpdateMany,
+            "updateManyAndReturn" => Self::UpdateManyAndReturn,
             "deleteOne" => Self::DeleteOne,
             "deleteMany" => Self::DeleteMany,
             "upsertOne" => Self::UpsertOne,

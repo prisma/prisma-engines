@@ -408,6 +408,22 @@ fn cuid_fields_must_work() {
 }
 
 #[test]
+fn ulid_fields_must_work() {
+    let datamodel = convert(
+        r#"
+            model Test {
+                id String @id @default(ulid())
+            }
+        "#,
+    );
+
+    let model = datamodel.assert_model("Test");
+    model
+        .assert_scalar_field("id")
+        .assert_type_identifier(TypeIdentifier::String);
+}
+
+#[test]
 fn createdAt_works() {
     let datamodel = convert(
         r#"

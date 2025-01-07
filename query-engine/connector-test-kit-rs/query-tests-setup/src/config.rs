@@ -2,6 +2,7 @@ use crate::{
     CockroachDbConnectorTag, ConnectorTag, ConnectorVersion, MongoDbConnectorTag, MySqlConnectorTag,
     PostgresConnectorTag, SqlServerConnectorTag, SqliteConnectorTag, TestResult, VitessConnectorTag,
 };
+use log::warn;
 use qe_setup::driver_adapters::DriverAdapter;
 use serde::{Deserialize, Serialize};
 use std::{convert::TryFrom, env, fmt::Display, fs::File, io::Read, path::PathBuf};
@@ -258,6 +259,8 @@ fn exit_with_message(msg: &str) -> ! {
 impl TestConfig {
     /// Loads a configuration. File-based config has precedence over env config.
     pub(crate) fn load() -> Self {
+        // Use `RUST_LOG=warn` to see warnings about config loading.
+        env_logger::init();
         let config = match Self::from_file().or_else(Self::from_env) {
             Some(config) => config,
             None => exit_with_message(CONFIG_LOAD_FAILED),
@@ -326,21 +329,35 @@ impl TestConfig {
     }
 
     fn from_file() -> Option<Self> {
-        let current_dir = env::current_dir().ok();
-        current_dir
-            .and_then(|path| Self::try_path(config_path(path)))
-            .or_else(|| Self::workspace_root().and_then(|path| Self::try_path(config_path(path))))
+        Self::workspace_root().and_then(|path| Self::try_path(config_path(path)))
     }
 
     fn try_path(path: PathBuf) -> Option<Self> {
-        File::open(path).ok().and_then(|mut f| {
-            let mut config = String::new();
+        File::open(&path)
+            .map_err(move |err| {
+                warn!("Could not open file {}: {err}", path.display());
+                err
+            })
+            .ok()
+            .and_then(|mut f| {
+                let mut config = String::new();
 
-            f.read_to_string(&mut config)
-                .ok()
-                .and_then(|_| serde_json::from_str::<TestConfigFromSerde>(&config).ok())
-                .map(Self::from)
-        })
+                f.read_to_string(&mut config)
+                    .map_err(|err| {
+                        warn!("Could not read file into string: {err}");
+                        err
+                    })
+                    .ok()
+                    .and_then(|_| {
+                        serde_json::from_str::<TestConfigFromSerde>(&config)
+                            .map_err(|err| {
+                                warn!("Could not deserialize JSON via TestConfigFromSerde: {err}");
+                                err
+                            })
+                            .ok()
+                    })
+                    .map(Self::from)
+            })
     }
 
     fn workspace_root() -> Option<PathBuf> {
@@ -348,7 +365,7 @@ impl TestConfig {
     }
 
     pub fn external_test_executor_path(&self) -> Option<String> {
-        const DEFAULT_TEST_EXECUTOR: &str = "query-engine/driver-adapters/executor/script/testd.sh";
+        const DEFAULT_TEST_EXECUTOR: &str = "query-engine/driver-adapters/executor/script/testd-qe.sh";
         self.with_driver_adapter()
             .and_then(|_| {
                 Self::workspace_root().or_else(|| {

@@ -60,6 +60,15 @@ pub struct DefaultTransaction<'a> {
     gauge: GaugeGuard,
 }
 
+#[cfg_attr(
+    not(any(
+        feature = "sqlite-native",
+        feature = "mssql-native",
+        feature = "postgresql-native",
+        feature = "mysql-native"
+    )),
+    allow(clippy::needless_lifetimes)
+)]
 impl<'a> DefaultTransaction<'a> {
     #[cfg(any(
         feature = "sqlite-native",
@@ -98,7 +107,7 @@ impl<'a> DefaultTransaction<'a> {
 }
 
 #[async_trait]
-impl<'a> Transaction for DefaultTransaction<'a> {
+impl Transaction for DefaultTransaction<'_> {
     /// Commit the changes to the database and consume the transaction.
     async fn commit(&self) -> crate::Result<()> {
         self.gauge.decrement();
@@ -121,7 +130,7 @@ impl<'a> Transaction for DefaultTransaction<'a> {
 }
 
 #[async_trait]
-impl<'a> Queryable for DefaultTransaction<'a> {
+impl Queryable for DefaultTransaction<'_> {
     async fn query(&self, q: Query<'_>) -> crate::Result<ResultSet> {
         self.inner.query(q).await
     }

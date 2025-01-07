@@ -58,7 +58,7 @@ impl<'a> MySql<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> TestApi for MySql<'a> {
+impl TestApi for MySql<'_> {
     fn system(&self) -> &'static str {
         "mysql"
     }

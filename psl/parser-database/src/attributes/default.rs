@@ -197,6 +197,9 @@ fn validate_model_builtin_scalar_type_default(
         {
             validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
         }
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_ULID => {
+            validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
+        }
         (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_CUID => {
             validate_uid_int_args(funcname, &funcargs.arguments, &CUID_SUPPORTED_VERSIONS, accept, ctx)
         }
@@ -244,6 +247,9 @@ fn validate_composite_builtin_scalar_type_default(
 ) {
     match (scalar_type, value) {
         // Functions
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_ULID => {
+            validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
+        }
         (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_CUID => {
             validate_uid_int_args(funcname, &funcargs.arguments, &CUID_SUPPORTED_VERSIONS, accept, ctx)
         }
@@ -411,13 +417,16 @@ fn validate_uid_int_args<const N: usize>(
     }
 
     match args.first().map(|arg| &arg.value) {
-        Some(ast::Expression::NumericValue(val, _)) if !valid_values.contains(&val.parse::<u8>().unwrap()) => {
-            let valid_values_str = format_valid_values(valid_values);
-            ctx.push_attribute_validation_error(&format!(
-                "`{fn_name}()` takes either no argument, or a single integer argument which is either {valid_values_str}.",
-            ));
-        }
-        None | Some(ast::Expression::NumericValue(_, _)) => accept(ctx),
+        Some(ast::Expression::NumericValue(val, _)) => match val.parse::<u8>().ok() {
+            Some(val) if valid_values.contains(&val) => accept(ctx),
+            _ => {
+                let valid_values_str = format_valid_values(valid_values);
+                ctx.push_attribute_validation_error(&format!(
+                        "`{fn_name}()` takes either no argument, or a single integer argument which is either {valid_values_str}.",
+                    ));
+            }
+        },
+        None => accept(ctx),
         _ => bail(),
     }
 }
@@ -430,12 +439,15 @@ fn validate_nanoid_args(args: &[ast::Argument], accept: AcceptFn<'_>, ctx: &mut 
     }
 
     match args.first().map(|arg| &arg.value) {
-        Some(ast::Expression::NumericValue(val, _)) if val.parse::<u8>().unwrap() < 2 => {
-            ctx.push_attribute_validation_error(
-                "`nanoid()` takes either no argument, or a single integer argument >= 2.",
-            );
-        }
-        None | Some(ast::Expression::NumericValue(_, _)) => accept(ctx),
+        Some(ast::Expression::NumericValue(val, _)) => match val.parse::<u8>().ok() {
+            Some(val) if val >= 2 => accept(ctx),
+            _ => {
+                ctx.push_attribute_validation_error(
+                    "`nanoid()` takes either no argument, or a single integer argument between 2 and 255.",
+                );
+            }
+        },
+        None => accept(ctx),
         _ => bail(),
     }
 }
@@ -520,6 +532,7 @@ fn validate_builtin_scalar_list_default(
 
 const FN_AUTOINCREMENT: &str = "autoincrement";
 const FN_CUID: &str = "cuid";
+const FN_ULID: &str = "ulid";
 const FN_DBGENERATED: &str = "dbgenerated";
 const FN_NANOID: &str = "nanoid";
 const FN_NOW: &str = "now";
@@ -528,6 +541,7 @@ const FN_AUTO: &str = "auto";
 
 const KNOWN_FUNCTIONS: &[&str] = &[
     FN_AUTOINCREMENT,
+    FN_ULID,
     FN_CUID,
     FN_DBGENERATED,
     FN_NANOID,

@@ -2,6 +2,7 @@ mod json_adapter;
 
 pub use json_adapter::*;
 use serde::{Deserialize, Serialize};
+use telemetry::TraceParent;
 
 use crate::{
     executor_process_request, ConnectorTag, ConnectorVersion, QueryResult, TestError, TestLogCapture, TestResult,
@@ -264,6 +265,7 @@ impl Runner {
                         datasource,
                     },
                     schema.configuration.preview_features(),
+                    true,
                 )
                 .await?;
                 let connector = query_executor.primary_connector();
@@ -307,14 +309,27 @@ impl Runner {
     }
 
     pub async fn query(&self, query: impl Into<String>) -> TestResult<QueryResult> {
-        self.query_with_maybe_tx_id(self.current_tx_id.as_ref(), query).await
+        self.query_with_params(self.current_tx_id.as_ref(), None, query).await
     }
 
     pub async fn query_in_tx(&self, tx_id: &TxId, query: impl Into<String>) -> TestResult<QueryResult> {
-        self.query_with_maybe_tx_id(Some(tx_id), query).await
+        self.query_with_params(Some(tx_id), None, query).await
     }
 
-    async fn query_with_maybe_tx_id<T>(&self, tx_id: Option<&TxId>, query: T) -> TestResult<QueryResult>
+    pub async fn query_with_traceparent(
+        &self,
+        traceparent: TraceParent,
+        query: impl Into<String>,
+    ) -> TestResult<QueryResult> {
+        self.query_with_params(None, Some(traceparent), query).await
+    }
+
+    async fn query_with_params<T>(
+        &self,
+        tx_id: Option<&TxId>,
+        traceparent: Option<TraceParent>,
+        query: T,
+    ) -> TestResult<QueryResult>
     where
         T: Into<String>,
     {
@@ -361,7 +376,7 @@ impl Runner {
             }
         };
 
-        let response = handler.handle(request_body, tx_id.cloned(), None).await;
+        let response = handler.handle(request_body, tx_id.cloned(), traceparent).await;
 
         let result: QueryResult = match self.protocol {
             EngineProtocol::Json => JsonResponse::from_graphql(response).into(),

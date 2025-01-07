@@ -1,15 +1,15 @@
 {
   "engines": {
     "node": ">=18.18",
-    "pnpm": ">=8.6.6"
+    "pnpm": "^9.14.2"
   },
   "name": "executor",
   "version": "0.0.1",
   "description": "",
   "private": true,
   "scripts": {
-    "build": "tsup ./src/testd.ts ./src/bench.ts --format esm --dts",
-    "test": "node --import tsx ./src/testd.ts",
+    "build": "tsup ./src/testd-qe.ts ./src/bench.ts --format esm --dts",
+    "test:qe": "node --import tsx ./src/testd-qe.ts",
     "clean:d1": "rm -rf ../../connector-test-kit-rs/query-engine-tests/.wrangler"
   },
   "tsup": {

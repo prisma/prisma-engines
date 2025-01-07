@@ -7,7 +7,7 @@ use crate::{
 };
 use connector::{ConnectionLike, DatasourceFieldName, NativeUpsert, WriteArgs};
 use query_structure::{ManyRecords, Model, RawJson};
-use telemetry::helpers::TraceParent;
+use telemetry::TraceParent;
 
 pub(crate) async fn execute(
     tx: &mut dyn ConnectionLike,
@@ -77,7 +77,8 @@ async fn create_many(
             .create_records_returning(&q.model, q.args, q.skip_duplicates, selected_fields.fields, traceparent)
             .await?;
 
-        let nested: Vec<QueryResult> = super::read::process_nested(tx, selected_fields.nested, Some(&records)).await?;
+        let nested: Vec<QueryResult> =
+            super::read::process_nested(tx, selected_fields.nested, Some(&records), traceparent).await?;
 
         let selection = RecordSelection {
             name: q.name,
@@ -149,7 +150,7 @@ async fn create_many_split_by_shape(
         };
 
         let nested: Vec<QueryResult> =
-            super::read::process_nested(tx, selected_fields.nested.clone(), Some(&records)).await?;
+            super::read::process_nested(tx, selected_fields.nested.clone(), Some(&records), traceparent).await?;
 
         let selection = RecordSelection {
             name: q.name,
@@ -304,11 +305,31 @@ async fn update_many(
     q: UpdateManyRecords,
     traceparent: Option<TraceParent>,
 ) -> InterpretationResult<QueryResult> {
-    let res = tx
-        .update_records(&q.model, q.record_filter, q.args, traceparent)
-        .await?;
+    if let Some(selected_fields) = q.selected_fields {
+        let records = tx
+            .update_records_returning(&q.model, q.record_filter, q.args, selected_fields.fields, traceparent)
+            .await?;
 
-    Ok(QueryResult::Count(res))
+        let nested: Vec<QueryResult> =
+            super::read::process_nested(tx, selected_fields.nested, Some(&records), traceparent).await?;
+
+        let selection = RecordSelection {
+            name: q.name,
+            fields: selected_fields.order,
+            records,
+            nested,
+            model: q.model,
+            virtual_fields: vec![],
+        };
+
+        Ok(QueryResult::RecordSelection(Some(Box::new(selection))))
+    } else {
+        let affected_records = tx
+            .update_records(&q.model, q.record_filter, q.args, traceparent)
+            .await?;
+
+        Ok(QueryResult::Count(affected_records))
+    }
 }
 
 async fn delete_many(

@@ -10,6 +10,7 @@ pub(crate) fn parse_comment_block(token: Pair<'_>) -> Option<Comment> {
     for comment in token.clone().into_inner() {
         match comment.as_rule() {
             Rule::doc_comment => lines.push(parse_doc_comment(comment)),
+            Rule::multi_line_comment => lines.push(parse_multi_line_comment(comment)),
             Rule::comment | Rule::NEWLINE | Rule::WHITESPACE => {}
             _ => parsing_catch_all(&comment, "comment block"),
         }
@@ -28,6 +29,7 @@ pub(crate) fn parse_trailing_comment(pair: Pair<'_>) -> Option<Comment> {
     for current in pair.into_inner() {
         match current.as_rule() {
             Rule::doc_comment => lines.push(parse_doc_comment(current)),
+            Rule::multi_line_comment => lines.push(parse_multi_line_comment(current)),
             Rule::comment | Rule::NEWLINE | Rule::WHITESPACE => {}
             _ => parsing_catch_all(&current, "trailing comment"),
         }
@@ -51,4 +53,11 @@ pub(crate) fn parse_doc_comment(token: Pair<'_>) -> &str {
             child.tokens()
         ),
     }
+}
+
+fn parse_multi_line_comment(token: Pair<'_>) -> &str {
+    // The matched string includes `/*` and `*/`. Strip them off.
+    let text = token.as_str();
+    // Safety check: multi_line_comment matches `/* ... */`, so length is at least 4.
+    text[2..text.len() - 2].trim()
 }

@@ -119,7 +119,7 @@ impl TypeIdentifier for &Column<'_> {
     }
 
     fn is_json(&self) -> bool {
-        false
+        matches!(self.decl_type(), Some("JSONB") | Some("jsonb"))
     }
 
     fn is_enum(&self) -> bool {
@@ -130,7 +130,7 @@ impl TypeIdentifier for &Column<'_> {
     }
 }
 
-impl<'a> GetRow for SqliteRow<'a> {
+impl GetRow for SqliteRow<'_> {
     fn get_result_row(&self) -> crate::Result<Vec<Value<'static>>> {
         let statement = self.as_ref();
         let mut row = Vec::with_capacity(statement.columns().len());
@@ -148,6 +148,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                     c if c.is_datetime() => Value::null_datetime(),
                     c if c.is_date() => Value::null_date(),
                     c if c.is_bool() => Value::null_boolean(),
+                    c if c.is_json() => Value::null_json(),
                     c => match c.decl_type() {
                         Some(n) => {
                             let msg = format!("Value {n} not supported");
@@ -186,6 +187,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                                 return Err(Error::builder(kind).build());
                             }
                         }
+                        c if c.is_json() => Value::json(serde_json::Value::Number(serde_json::Number::from(i))),
                         // NOTE: When SQLite does not know what type the return is (for example at explicit values and RETURNING statements) we will 'assume' int64
                         _ => Value::int64(i),
                     }
@@ -196,6 +198,9 @@ impl<'a> GetRow for SqliteRow<'a> {
 
                     Value::numeric(BigDecimal::from_str(&f.to_string()).unwrap())
                 }
+                ValueRef::Real(f) if column.is_json() => Value::json(serde_json::Value::Number(
+                    serde_json::Number::from_f64(f).expect("JSON real should always be convertible to serde Number"),
+                )),
                 ValueRef::Real(f) => Value::double(f),
                 ValueRef::Text(bytes) if column.is_datetime() => {
                     let parse_res = std::str::from_utf8(bytes).map_err(|_| {
@@ -222,6 +227,20 @@ impl<'a> GetRow for SqliteRow<'a> {
                             })
                     })?
                 }
+                ValueRef::Text(bytes) if column.is_json() => {
+                    let json_str = std::str::from_utf8(bytes).map_err(|_| {
+                        Error::builder(ErrorKind::ConversionError(
+                            "Failed to read contents of SQLite JSON column as UTF-8".into(),
+                        ))
+                        .build()
+                    })?;
+
+                    let json_value: serde_json::Value = serde_json::from_str(json_str).map_err(|serde_error| {
+                        Error::builder(ErrorKind::ConversionError(serde_error.to_string().into())).build()
+                    })?;
+
+                    Value::json(json_value)
+                }
                 ValueRef::Text(bytes) => Value::text(String::from_utf8(bytes.to_vec())?),
                 ValueRef::Blob(bytes) => Value::bytes(bytes.to_owned()),
             };
@@ -233,7 +252,7 @@ impl<'a> GetRow for SqliteRow<'a> {
     }
 }
 
-impl<'a> ToColumnNames for SqliteRows<'a> {
+impl ToColumnNames for SqliteRows<'_> {
     fn to_column_names(&self) -> Vec<String> {
         match self.as_ref() {
             Some(statement) => statement.column_names().into_iter().map(|c| c.into()).collect(),
@@ -242,7 +261,7 @@ impl<'a> ToColumnNames for SqliteRows<'a> {
     }
 }
 
-impl<'a> ToSql for Value<'a> {
+impl ToSql for Value<'_> {
     fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
         let value = match &self.typed {
             ValueType::Int32(integer) => integer.map(ToSqlOutput::from),

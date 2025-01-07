@@ -109,20 +109,9 @@ pub struct PrismaOpt {
     /// Enable tracer to capture logs and traces and return in the response
     pub enable_telemetry_in_response: bool,
 
-    /// The url to the OpenTelemetry collector.
-    /// Enabling this will send the OpenTelemtry tracing to a collector
-    /// and not via our custom stdout tracer
-    #[structopt(long, default_value)]
-    pub open_telemetry_endpoint: String,
-
     /// The protocol the Query Engine will used. Affects mostly the request and response format.
     #[structopt(long, env = "PRISMA_ENGINE_PROTOCOL")]
     pub engine_protocol: Option<String>,
-
-    /// The trace context (https://www.w3.org/TR/trace-context) for the engine initialization
-    /// as a JSON object with properties corresponding to the headers (e.g. `traceparent`).
-    #[structopt(long, env)]
-    pub trace_context: Option<String>,
 
     #[structopt(subcommand)]
     pub subcommand: Option<Subcommand>,

@@ -50,6 +50,7 @@ pub struct EngineBuilderNative {
 pub struct EngineBuilder {
     pub schema: Arc<psl::ValidatedSchema>,
     pub engine_protocol: EngineProtocol,
+    pub enable_tracing: bool,
 
     #[cfg(not(target_arch = "wasm32"))]
     pub native: EngineBuilderNative,
@@ -68,6 +69,7 @@ pub struct ConnectedEngine {
     pub query_schema: Arc<QuerySchema>,
     pub executor: crate::Executor,
     pub engine_protocol: EngineProtocol,
+    pub tracing_enabled: bool,
 
     #[cfg(not(target_arch = "wasm32"))]
     pub native: ConnectedEngineNative,
@@ -86,6 +88,10 @@ impl ConnectedEngine {
 
     pub fn engine_protocol(&self) -> EngineProtocol {
         self.engine_protocol
+    }
+
+    pub fn tracing_enabled(&self) -> bool {
+        self.tracing_enabled
     }
 }
 
@@ -114,6 +120,7 @@ pub struct ConstructorOptions {
     pub log_level: String,
     #[serde(default)]
     pub log_queries: bool,
+    pub enable_tracing: bool,
 
     #[cfg(not(target_arch = "wasm32"))]
     #[serde(flatten)]
@@ -155,5 +162,5 @@ pub fn stringify_env_values(origin: serde_json::Value) -> crate::Result<HashMap<
         Value::Array(_) => "Expected an object for the env constructor parameter, got an array.",
     };
 
-    Err(ApiError::JsonDecode(msg.to_string()))
+    Err(ApiError::Decode(msg.to_string()))
 }

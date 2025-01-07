@@ -10,6 +10,7 @@ use crate::{
 };
 use quaint_test_macros::test_each_connector;
 use quaint_test_setup::Tags;
+use tracing_test::traced_test;
 
 #[test_each_connector]
 async fn single_value(api: &mut dyn TestApi) -> crate::Result<()> {
@@ -3633,6 +3634,32 @@ async fn overflowing_int_errors_out(api: &mut dyn TestApi) -> crate::Result<()> 
     assert!(err
         .to_string()
         .contains("Unable to fit integer value '-1' into an OID (32-bit unsigned integer)."));
+
+    Ok(())
+}
+
+#[test_each_connector]
+#[traced_test]
+async fn traceparent_is_stripped_from_the_log(api: &mut dyn TestApi) -> crate::Result<()> {
+    api.conn()
+        .query_raw("SELECT 1 /* traceparent=1 */", &[])
+        .await?
+        .into_single()?;
+    let expected = r#"db.query.text=SELECT 1 otel.kind="client""#.to_owned();
+    assert!(logs_contain(&expected), "expected logs to contain '{expected}'");
+
+    Ok(())
+}
+
+#[test_each_connector]
+#[traced_test]
+async fn traceparent_inside_of_query_isnt_stripped_from_log(api: &mut dyn TestApi) -> crate::Result<()> {
+    api.conn()
+        .query_raw("SELECT /* traceparent=1 */ 1", &[])
+        .await?
+        .into_single()?;
+    let expected = r#"db.query.text=SELECT /* traceparent=1 */ 1 otel.kind="client""#.to_owned();
+    assert!(logs_contain(&expected), "expected logs to contain '{expected}'");
 
     Ok(())
 }

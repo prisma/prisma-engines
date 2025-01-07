@@ -393,8 +393,8 @@ async fn push_columns(
                             }
                             _ => DefaultValue::db_generated(default_string),
                         },
+                        ColumnTypeFamily::Json => DefaultValue::value(default_string),
                         ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
-                        ColumnTypeFamily::Json => DefaultValue::db_generated(default_string),
                         ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
                         ColumnTypeFamily::Enum(_) => DefaultValue::value(PrismaValue::Enum(default_string)),
                         ColumnTypeFamily::Unsupported(_) => DefaultValue::db_generated(default_string),
@@ -581,6 +581,7 @@ fn get_column_type(mut tpe: String, arity: ColumnArity) -> ColumnType {
         "int[]" => ColumnTypeFamily::Int,
         "integer[]" => ColumnTypeFamily::Int,
         "text[]" => ColumnTypeFamily::String,
+        "jsonb" => ColumnTypeFamily::Json,
         // NUMERIC type affinity
         data_type if data_type.starts_with("decimal") => ColumnTypeFamily::Decimal,
         data_type => ColumnTypeFamily::Unsupported(data_type.into()),

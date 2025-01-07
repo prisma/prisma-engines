@@ -67,7 +67,7 @@ impl<'a> Deref for ParsedInputMap<'a> {
     }
 }
 
-impl<'a> DerefMut for ParsedInputMap<'a> {
+impl DerefMut for ParsedInputMap<'_> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.map
     }

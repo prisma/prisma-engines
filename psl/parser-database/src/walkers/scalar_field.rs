@@ -165,7 +165,7 @@ impl<'db> ScalarFieldWalker<'db> {
     }
 }
 
-impl<'db> fmt::Display for ScalarFieldWalker<'db> {
+impl fmt::Display for ScalarFieldWalker<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.name())
     }
@@ -198,6 +198,11 @@ impl<'db> DefaultValueWalker<'db> {
     /// Is this an `@default(autoincrement())`?
     pub fn is_autoincrement(self) -> bool {
         matches!(self.value(), ast::Expression::Function(name, _, _) if name == "autoincrement")
+    }
+
+    /// Is this an `@default(ulid())`?
+    pub fn is_ulid(self) -> bool {
+        matches!(self.value(), ast::Expression::Function(name, _, _) if name == "ulid")
     }
 
     /// Is this an `@default(cuid())`?

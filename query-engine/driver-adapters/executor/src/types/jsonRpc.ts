@@ -1,6 +1,6 @@
 import * as S from '@effect/schema/Schema'
 
-const SchemaId = S.number.pipe(S.int(), S.nonNegative())
+const SchemaId = S.number.pipe(S.int(), S.nonNegative()).pipe(S.brand('SchemaId'))
 export type SchemaId = S.Schema.Type<typeof SchemaId>
 
 const InitializeSchemaParams = S.struct({

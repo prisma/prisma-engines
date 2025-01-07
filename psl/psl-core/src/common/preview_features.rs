@@ -156,12 +156,10 @@ impl<'a> FeatureMapWithProvider<'a> {
                  | Metrics
                  | MultiSchema
                  | NativeDistinct
-                 | OmitApi
                  | PostgresqlExtensions
                  | PrismaSchemaFolder
                  | RelationJoins
                  | StrictUndefinedChecks
-                 | Tracing
                  | Views
             }),
             native: HashMap::from([
@@ -212,12 +210,14 @@ impl<'a> FeatureMapWithProvider<'a> {
                 | NamedConstraints
                 | NApi
                 | NativeTypes
+                | OmitApi
                 | OrderByAggregateGroup
                 | OrderByNulls
                 | OrderByRelation
                 | ReferentialActions
                 | ReferentialIntegrity
                 | SelectRelationCount
+                | Tracing
                 | TransactionApi
                 | UncheckedScalarInputs
             }),

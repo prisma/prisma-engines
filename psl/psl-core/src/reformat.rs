@@ -69,7 +69,7 @@ struct MagicReformatCtx<'a> {
     db: &'a ParserDatabase,
 }
 
-impl<'a> MagicReformatCtx<'a> {
+impl MagicReformatCtx<'_> {
     fn add_missing_bit(&mut self, file_id: FileId, bit: MissingBit) {
         self.missing_bits_map.entry(file_id).or_default().push(bit);
     }

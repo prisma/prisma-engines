@@ -17,7 +17,7 @@ use crate::{offsets::position_to_offset, LSPContext};
 
 pub(super) type HoverContext<'a> = LSPContext<'a, HoverParams>;
 
-impl<'a> HoverContext<'a> {
+impl HoverContext<'_> {
     pub(super) fn position(&self) -> Option<usize> {
         let pos = self.params.text_document_position_params.position;
         let initiating_doc = self.initiating_file_source();

@@ -15,15 +15,16 @@ use query_core::{
     schema::{self},
     TransactionOptions, TxId,
 };
-use query_engine_common::engine::{map_known_error, ConnectedEngine, ConstructorOptions, EngineBuilder, Inner};
+use query_engine_common::{
+    engine::{map_known_error, ConnectedEngine, ConstructorOptions, EngineBuilder, Inner},
+    tracer::start_trace,
+};
 use request_handlers::ConnectorKind;
 use request_handlers::{load_executor, RequestBody, RequestHandler};
 use serde_json::json;
 use std::{marker::PhantomData, sync::Arc};
-use telemetry::helpers::TraceParent;
 use tokio::sync::RwLock;
 use tracing::{instrument::WithSubscriber, Instrument, Level};
-use tracing_opentelemetry::OpenTelemetrySpanExt;
 use tracing_subscriber::filter::LevelFilter;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -59,6 +60,7 @@ impl QueryEngine {
             datamodel,
             log_level,
             log_queries,
+            enable_tracing,
         } = options;
 
         // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
@@ -66,16 +68,16 @@ impl QueryEngine {
 
         let js_queryable = Arc::new(driver_adapters::from_js(adapter));
 
-        // We skip telemetry to avoid runtime panics.
         let engine_protocol = EngineProtocol::Json;
 
         let builder = EngineBuilder {
             schema: Arc::new(schema),
             engine_protocol,
+            enable_tracing,
         };
 
         let log_level = log_level.parse::<LevelFilter>().unwrap_or(Level::INFO.into());
-        let logger = Logger::new(log_queries, log_level, log_callback);
+        let logger = Logger::new(log_queries, log_level, log_callback, enable_tracing);
 
         Ok(Self {
             inner: RwLock::new(Inner::Builder(builder)),
@@ -86,13 +88,17 @@ impl QueryEngine {
 
     /// Connect to the database, allow queries to be run.
     #[wasm_bindgen]
-    pub async fn connect(&self, trace: String) -> Result<(), wasm_bindgen::JsError> {
+    pub async fn connect(&self, trace: String, request_id: String) -> Result<(), wasm_bindgen::JsError> {
         let dispatcher = self.logger.dispatcher();
+        let exporter = self.logger.exporter();
 
         async {
-            let span = tracing::info_span!("prisma:engine:connect");
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            span.set_parent(parent_context);
+            let span = tracing::info_span!(
+                "prisma:engine:connect",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
+            start_trace(&request_id, &trace, &span, &exporter).await?;
 
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
@@ -107,6 +113,7 @@ impl QueryEngine {
                         _phantom: PhantomData,
                     },
                     preview_features,
+                    builder.enable_tracing,
                 )
                 .await?;
                 let connector = executor.primary_connector();
@@ -133,6 +140,7 @@ impl QueryEngine {
                     query_schema: Arc::new(query_schema),
                     executor,
                     engine_protocol: builder.engine_protocol,
+                    tracing_enabled: builder.enable_tracing,
                 }) as crate::Result<ConnectedEngine>
             }
             .instrument(span)
@@ -148,13 +156,17 @@ impl QueryEngine {
 
     /// Disconnect and drop the core. Can be reconnected later with `#connect`.
     #[wasm_bindgen]
-    pub async fn disconnect(&self, trace: String) -> Result<(), wasm_bindgen::JsError> {
+    pub async fn disconnect(&self, trace: String, request_id: String) -> Result<(), wasm_bindgen::JsError> {
         let dispatcher = self.logger.dispatcher();
+        let exporter = self.logger.exporter();
 
         async {
-            let span = tracing::info_span!("prisma:engine:disconnect", user_facing = true);
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            span.set_parent(parent_context);
+            let span = tracing::info_span!(
+                "prisma:engine:disconnect",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
+            start_trace(&request_id, &trace, &span, &exporter).await?;
 
             async {
                 let mut inner = self.inner.write().await;
@@ -163,6 +175,7 @@ impl QueryEngine {
                 let builder = EngineBuilder {
                     schema: engine.schema.clone(),
                     engine_protocol: engine.engine_protocol(),
+                    enable_tracing: engine.tracing_enabled(),
                 };
 
                 *inner = Inner::Builder(builder);
@@ -183,8 +196,10 @@ impl QueryEngine {
         body: String,
         trace: String,
         tx_id: Option<String>,
+        request_id: String,
     ) -> Result<String, wasm_bindgen::JsError> {
         let dispatcher = self.logger.dispatcher();
+        let exporter = self.logger.exporter();
 
         async {
             let inner = self.inner.read().await;
@@ -192,20 +207,22 @@ impl QueryEngine {
 
             let query = RequestBody::try_from_str(&body, engine.engine_protocol())?;
 
+            let span = tracing::info_span!(
+                "prisma:engine:query",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
+
+            let traceparent = start_trace(&request_id, &trace, &span, &exporter).await?;
+
             async move {
-                let span = tracing::info_span!("prisma:engine:query", user_facing = true);
-                let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-                let traceparent = TraceParent::from_remote_context(&parent_context);
-                span.set_parent(parent_context);
-
                 let handler = RequestHandler::new(engine.executor(), engine.query_schema(), engine.engine_protocol());
-                let response = handler
-                    .handle(query, tx_id.map(TxId::from), traceparent)
-                    .instrument(span)
-                    .await;
+                let response = handler.handle(query, tx_id.map(TxId::from), traceparent).await;
 
-                Ok(serde_json::to_string(&response)?)
+                let serde_span = tracing::info_span!("prisma:engine:response_json_serialization", user_facing = true);
+                Ok(serde_span.in_scope(|| serde_json::to_string(&response))?)
             }
+            .instrument(span)
             .await
         }
         .with_subscriber(dispatcher)
@@ -214,26 +231,39 @@ impl QueryEngine {
 
     /// If connected, attempts to start a transaction in the core and returns its ID.
     #[wasm_bindgen(js_name = startTransaction)]
-    pub async fn start_transaction(&self, input: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
+    pub async fn start_transaction(
+        &self,
+        input: String,
+        trace: String,
+        request_id: String,
+    ) -> Result<String, wasm_bindgen::JsError> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
         let dispatcher = self.logger.dispatcher();
+        let exporter = self.logger.exporter();
 
         async move {
-            let span = tracing::info_span!("prisma:engine:start_transaction", user_facing = true);
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            let traceparent = TraceParent::from_remote_context(&parent_context);
-            span.set_parent(parent_context);
+            let span = tracing::info_span!(
+                "prisma:engine:start_transaction",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
 
-            let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
-            match engine
-                .executor()
-                .start_tx(engine.query_schema().clone(), engine.engine_protocol(), tx_opts)
-                .await
-            {
-                Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
-                Err(err) => Ok(map_known_error(err)?),
+            start_trace(&request_id, &trace, &span, &exporter).await?;
+
+            async move {
+                let tx_opts: TransactionOptions = serde_json::from_str(&input)?;
+                match engine
+                    .executor()
+                    .start_tx(engine.query_schema().clone(), engine.engine_protocol(), tx_opts)
+                    .await
+                {
+                    Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
+                    Err(err) => Ok(map_known_error(err)?),
+                }
             }
+            .instrument(span)
+            .await
         }
         .with_subscriber(dispatcher)
         .await
@@ -241,19 +271,28 @@ impl QueryEngine {
 
     /// If connected, attempts to commit a transaction with id `tx_id` in the core.
     #[wasm_bindgen(js_name = commitTransaction)]
-    pub async fn commit_transaction(&self, tx_id: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
+    pub async fn commit_transaction(
+        &self,
+        tx_id: String,
+        trace: String,
+        request_id: String,
+    ) -> Result<String, wasm_bindgen::JsError> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
 
         let dispatcher = self.logger.dispatcher();
+        let exporter = self.logger.exporter();
 
         async move {
-            let span = tracing::info_span!("prisma:engine:commit_transaction", user_facing = true);
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            let traceparent = TraceParent::from_remote_context(&parent_context);
-            span.set_parent(parent_context);
+            let span = tracing::info_span!(
+                "prisma:engine:commit_transaction",
+                user_facing = true,
+                request_id = tracing::field::Empty
+            );
 
-            match engine.executor().commit_tx(TxId::from(tx_id)).await {
+            start_trace(&request_id, &trace, &span, &exporter).await?;
+
+            match engine.executor().commit_tx(TxId::from(tx_id)).instrument(span).await {
                 Ok(_) => Ok("{}".to_string()),
                 Err(err) => Ok(map_known_error(err)?),
             }
@@ -264,19 +303,28 @@ impl QueryEngine {
 
     /// If connected, attempts to roll back a transaction with id `tx_id` in the core.
     #[wasm_bindgen(js_name = rollbackTransaction)]
-    pub async fn rollback_transaction(&self, tx_id: String, trace: String) -> Result<String, wasm_bindgen::JsError> {
+    pub async fn rollback_transaction(
+        &self,
+        tx_id: String,
+        trace: String,
+        request_id: String,
+    ) -> Result<String, wasm_bindgen::JsError> {
         let inner = self.inner.read().await;
         let engine = inner.as_engine()?;
 
         let dispatcher = self.logger.dispatcher();
+        let exporter = self.logger.exporter();
 
         async move {
-            let span = tracing::info_span!("prisma:engine:rollback_transaction", user_facing = true);
-            let parent_context = telemetry::helpers::restore_remote_context_from_json_str(&trace);
-            let traceparent = TraceParent::from_remote_context(&parent_context);
-            span.set_parent(parent_context);
+            let span = tracing::info_span!(
+                "prisma:engine:rollback_transaction",
+                user_facing = true,
+                request_id = tracing::field::Empty,
+            );
 
-            match engine.executor().rollback_tx(TxId::from(tx_id)).await {
+            start_trace(&request_id, &trace, &span, &exporter).await?;
+
+            match engine.executor().rollback_tx(TxId::from(tx_id)).instrument(span).await {
                 Ok(_) => Ok("{}".to_string()),
                 Err(err) => Ok(map_known_error(err)?),
             }
@@ -288,5 +336,27 @@ impl QueryEngine {
     #[wasm_bindgen]
     pub async fn metrics(&self, json_options: String) -> Result<(), wasm_bindgen::JsError> {
         Err(ApiError::configuration("Metrics is not enabled in Wasm.").into())
+    }
+
+    /// Fetch the spans associated with a [`RequestId`]
+    #[wasm_bindgen]
+    pub async fn trace(&self, request_id: String) -> Result<Option<String>, wasm_bindgen::JsError> {
+        let dispatcher = self.logger.dispatcher();
+        let exporter = self.logger.exporter();
+
+        async {
+            let request_id = request_id
+                .parse()
+                .map_err(|_| ApiError::Decode("invalid request id".into()))?;
+
+            Ok(exporter
+                .stop_capturing(request_id)
+                .await
+                .as_ref()
+                .map(serde_json::to_string)
+                .transpose()?)
+        }
+        .with_subscriber(dispatcher)
+        .await
     }
 }

@@ -67,7 +67,7 @@ impl std::fmt::Debug for DiagnoseMigrationHistoryAssertions<'_> {
     }
 }
 
-impl<'a> DiagnoseMigrationHistoryAssertions<'a> {
+impl DiagnoseMigrationHistoryAssertions<'_> {
     pub fn into_output(self) -> DiagnoseMigrationHistoryOutput {
         self.output
     }

@@ -42,6 +42,7 @@ impl FromSource for Mysql {
         _: &psl::Datasource,
         url: &str,
         features: psl::PreviewFeatures,
+        _tracing_enabled: bool,
     ) -> connector_interface::Result<Mysql> {
         let connection_info = get_connection_info(url)?;
 

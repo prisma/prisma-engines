@@ -1,10 +1,6 @@
-use opentelemetry::{
-    sdk::{trace::Config, Resource},
-    KeyValue,
-};
-use opentelemetry_otlp::WithExportConfig;
+use telemetry::{filter, Exporter};
 use tracing::{dispatcher::SetGlobalDefaultError, subscriber};
-use tracing_subscriber::{filter::filter_fn, layer::SubscriberExt, Layer};
+use tracing_subscriber::{filter::FilterExt, layer::SubscriberExt, Layer};
 
 use crate::{opt::PrismaOpt, LogFormat};
 
@@ -13,58 +9,57 @@ type LoggerResult<T> = Result<T, SetGlobalDefaultError>;
 /// An installer for a global logger.
 #[derive(Debug, Clone)]
 pub(crate) struct Logger {
-    service_name: &'static str,
     log_format: LogFormat,
     log_queries: bool,
     tracing_config: TracingConfig,
+    exporter: Exporter,
 }
 
 // TracingConfig specifies how tracing will be exposed by the logger facility
-#[derive(Debug, Clone)]
-enum TracingConfig {
-    // exposed means tracing will be exposed through an HTTP endpoint in a jaeger-compatible format
-    Http(String),
-    // captured means that traces will be captured in memory and exposed in the graphql response
-    // logs will be also exposed in the response when capturing is enabled
-    Captured,
-    // stdout means that traces will be printed to standard output
-    Stdout,
-    // disabled means that tracing will be disabled
-    Disabled,
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum TracingConfig {
+    /// Logs and spans will be captured in memory and exposed in the response.
+    LogsAndTracesInResponse,
+    /// Logs will be printed to standard output, spans will be captured and
+    /// exposed in the response.
+    StdoutLogsAndTracesInResponse,
+    // Logs will be printed to standard output, tracing is disabled.
+    StdoutLogsOnly,
+}
+
+impl TracingConfig {
+    pub fn should_capture(&self) -> bool {
+        matches!(
+            self,
+            TracingConfig::LogsAndTracesInResponse | TracingConfig::StdoutLogsAndTracesInResponse
+        )
+    }
 }
 
 impl Logger {
     /// Initialize a new global logger installer.
-    pub fn new(service_name: &'static str, opts: &PrismaOpt) -> Self {
+    pub fn new(opts: &PrismaOpt) -> Self {
         let enable_telemetry = opts.enable_open_telemetry;
         let enable_capturing = opts.enable_telemetry_in_response;
-        let endpoint = if opts.open_telemetry_endpoint.is_empty() {
-            None
-        } else {
-            Some(opts.open_telemetry_endpoint.to_owned())
-        };
 
-        let tracing_config = match (enable_telemetry, enable_capturing, endpoint) {
-            (_, true, _) => TracingConfig::Captured,
-            (true, _, Some(endpoint)) => TracingConfig::Http(endpoint),
-            (true, _, None) => TracingConfig::Stdout,
-            _ => TracingConfig::Disabled,
+        let tracing_config = match (enable_telemetry, enable_capturing) {
+            (_, true) => TracingConfig::LogsAndTracesInResponse,
+            (true, false) => TracingConfig::StdoutLogsAndTracesInResponse,
+            (false, false) => TracingConfig::StdoutLogsOnly,
         };
 
         Self {
-            service_name,
             log_format: opts.log_format(),
             log_queries: opts.log_queries(),
             tracing_config,
+            exporter: Exporter::new(),
         }
     }
 
     /// Install logger as a global. Can be called only once per application
-    /// instance. The returned guard value needs to stay in scope for the whole
-    /// lifetime of the service.
-    pub fn install(&self) -> LoggerResult<()> {
-        let filter = telemetry::helpers::env_filter(self.log_queries, telemetry::helpers::QueryEngineLogLevel::FromEnv);
-        let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
+    /// instance.
+    pub fn install(self) -> LoggerResult<Self> {
+        let filter = filter::EnvFilterBuilder::new().log_queries(self.log_queries).build();
 
         let fmt_layer = match self.log_format {
             LogFormat::Text => {
@@ -80,40 +75,44 @@ impl Logger {
         let subscriber = tracing_subscriber::registry().with(fmt_layer);
 
         match self.tracing_config {
-            TracingConfig::Captured => {
-                let log_queries = self.log_queries;
-                telemetry::capturing::install_capturing_layer(subscriber, log_queries)
-            }
-            TracingConfig::Http(ref endpoint) => {
-                // Opentelemetry is enabled, but capturing is disabled, there's an endpoint to export
-                // the traces to.
-                let resource = Resource::new(vec![KeyValue::new("service.name", self.service_name)]);
-                let config = Config::default().with_resource(resource);
-                let builder = opentelemetry_otlp::new_pipeline().tracing().with_trace_config(config);
-                let exporter = opentelemetry_otlp::new_exporter().tonic().with_endpoint(endpoint);
-                let tracer = builder.with_exporter(exporter).install_simple().unwrap();
-                let telemetry_layer = tracing_opentelemetry::layer()
-                    .with_tracer(tracer)
-                    .with_filter(is_user_trace);
-                let subscriber = subscriber.with(telemetry_layer);
+            TracingConfig::LogsAndTracesInResponse => {
+                let subscriber = subscriber.with(
+                    telemetry::layer(self.exporter.clone()).with_filter(
+                        filter::user_facing_spans()
+                            .or(filter::events().and(filter::EnvFilterBuilder::new().log_queries(true).build())),
+                    ),
+                );
                 subscriber::set_global_default(subscriber)?;
             }
-            TracingConfig::Stdout => {
-                // Opentelemetry is enabled, but capturing is disabled, and there's no endpoint to
-                // export traces too. We export it to stdout
-                let exporter = crate::tracer::ClientSpanExporter::default();
-                let tracer = crate::tracer::install(Some(exporter), None);
-                let telemetry_layer = tracing_opentelemetry::layer()
-                    .with_tracer(tracer)
-                    .with_filter(is_user_trace);
-                let subscriber = subscriber.with(telemetry_layer);
+            TracingConfig::StdoutLogsAndTracesInResponse => {
+                let subscriber =
+                    subscriber.with(telemetry::layer(self.exporter.clone()).with_filter(filter::user_facing_spans()));
                 subscriber::set_global_default(subscriber)?;
             }
-            TracingConfig::Disabled => {
+            TracingConfig::StdoutLogsOnly => {
                 subscriber::set_global_default(subscriber)?;
             }
         }
 
-        Ok(())
+        Ok(self)
+    }
+
+    pub fn tracing_config(&self) -> TracingConfig {
+        self.tracing_config
+    }
+
+    pub fn exporter(&self) -> &Exporter {
+        &self.exporter
+    }
+}
+
+impl Default for Logger {
+    fn default() -> Self {
+        Self {
+            log_format: LogFormat::Text,
+            log_queries: false,
+            tracing_config: TracingConfig::StdoutLogsOnly,
+            exporter: Exporter::new(),
+        }
     }
 }
