@@ -373,8 +373,12 @@ mod ext_rel_filters {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findManyAlbum(where: { Tracks: { every: {OR:[{ MediaType: { is: { Name: { equals: "MediaType1"}}}},{Genre: { is: { Name: { equals: "Genre2"}}}}]}}}) { Title }}"#),
-          @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"TheAlbumWithoutTracks"},{"Title":"Album4"},{"Title":"Album5"}]}}"###
+          run_query!(&runner, r#"{
+              findManyAlbum(
+                where: { Tracks: { every: {OR:[{ MediaType: { is: { Name: { equals: "MediaType1"}}}},{Genre: { is: { Name: { equals: "Genre2"}}}}]}}}
+                orderBy: { Title: asc }
+              ) { Title }}"#),
+          @r###"{"data":{"findManyAlbum":[{"Title":"Album1"},{"Title":"Album4"},{"Title":"Album5"},{"Title":"TheAlbumWithoutTracks"}]}}"###
         );
 
         insta::assert_snapshot!(

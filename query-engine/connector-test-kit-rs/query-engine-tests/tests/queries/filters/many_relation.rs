@@ -381,7 +381,13 @@ mod many_relation {
 
         // none / is
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyBlog(where: { posts: { none: { comment: { is: { popularity: { lt: 1000 } } } } } }) { name }}"#),
+          run_query!(&runner, r#"
+            query {
+              findManyBlog(
+                where: { posts: { none: { comment: { is: { popularity: { lt: 1000 } } } } } }
+                orderBy: { name: asc }
+              ) { name }
+            }"#),
           @r###"{"data":{"findManyBlog":[{"name":"blog2"},{"name":"blog3"},{"name":"blog4"}]}}"###
         );
 
@@ -404,7 +410,13 @@ mod many_relation {
         // TODO: Investigate why MongoDB returns a different result
         match_connector_result!(
           &runner,
-          r#"query { findManyBlog(where: { posts: { every: { comment: { isNot: { popularity: { gte: 1000 } } } } } }) { name }}"#,
+          r#"
+          query {
+            findManyBlog(
+              where: { posts: { every: { comment: { isNot: { popularity: { gte: 1000 } } } } } }
+              orderBy: { name: asc }
+            ) { name }
+          }"#,
           MongoDb(_) => vec![r#"{"data":{"findManyBlog":[{"name":"blog1"},{"name":"blog4"}]}}"#],
           _ => vec![r#"{"data":{"findManyBlog":[{"name":"blog1"},{"name":"blog3"},{"name":"blog4"}]}}"#]
         );
