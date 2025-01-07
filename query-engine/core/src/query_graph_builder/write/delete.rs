@@ -111,7 +111,9 @@ pub fn delete_many_records(
         Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model)?,
         None => Filter::empty(),
     };
-    let limit = field.arguments.lookup(args::LIMIT)
+    let limit = field
+        .arguments
+        .lookup(args::LIMIT)
         .and_then(|limit_arg| match limit_arg.value {
             ParsedInputValue::Single(PrismaValue::Int(i)) => Some(i),
             _ => None,

@@ -236,7 +236,7 @@ pub async fn delete_records<'conn>(
     let ids = if let Some(selectors) = record_filter.selectors {
         selectors
             .into_iter()
-            .take(limit.unwrap_or(std::i64::MAX) as usize)
+            .take(limit.unwrap_or(i64::MAX) as usize)
             .map(|p| {
                 (&id_field, p.values().next().unwrap())
                     .into_bson()

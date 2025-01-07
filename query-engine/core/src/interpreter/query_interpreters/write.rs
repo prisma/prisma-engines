@@ -337,7 +337,9 @@ async fn delete_many(
     q: DeleteManyRecords,
     traceparent: Option<TraceParent>,
 ) -> InterpretationResult<QueryResult> {
-    let res = tx.delete_records(&q.model, q.record_filter, q.limit, traceparent).await?;
+    let res = tx
+        .delete_records(&q.model, q.record_filter, q.limit, traceparent)
+        .await?;
 
     Ok(QueryResult::Count(res))
 }
