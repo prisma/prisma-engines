@@ -4,9 +4,22 @@ name = "sql-schema-describer"
 version = "0.1.0"
 
 [features]
-sqlite-native = ["quaint/pooled", "quaint/sqlite-native", "quaint/expose-drivers"]
+postgresql = ["psl/postgresql", "quaint/postgresql"]
+postgresql-native = ["postgresql", "quaint/pooled"]
+sqlite = ["psl/sqlite", "quaint/sqlite"]
+sqlite-native = ["sqlite", "quaint/pooled", "quaint/sqlite-native", "quaint/expose-drivers"]
+mysql = ["psl/mysql", "quaint/mysql"]
+mysql-native = ["mysql", "quaint/pooled"]
+mssql = ["psl/mssql", "quaint/mssql"]
+mssql-native = ["mssql", "quaint/pooled"]
+cockroachdb = ["psl/cockroachdb", "quaint/postgresql"]
+cockroachdb-native = ["cockroachdb", "quaint/pooled"]
 all-native = [
+    "postgresql-native",
     "sqlite-native",
+    "mysql-native",
+    "mssql-native",
+    "cockroachdb-native",
 ]
 
 [dependencies]

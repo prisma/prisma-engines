@@ -2,8 +2,7 @@
 
 use crate::{
     getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
-    DescriberResult, ForeignKeyAction, Lazy, PrismaValue, Regex, SQLSortOrder, SqlMetadata, SqlSchema,
-    SqlSchemaDescriberBackend,
+    DescriberResult, ForeignKeyAction, Lazy, PrismaValue, Regex, SQLSortOrder, SqlSchema,
 };
 use either::Either;
 use indexmap::IndexMap;
@@ -44,32 +43,6 @@ pub struct SqlSchemaDescriber<'a> {
 impl Debug for SqlSchemaDescriber<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct(type_name::<SqlSchemaDescriber<'_>>()).finish()
-    }
-}
-
-#[async_trait::async_trait]
-impl SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
-    async fn list_databases(&self) -> DescriberResult<Vec<String>> {
-        Ok(self.get_databases().await?)
-    }
-
-    async fn get_metadata(&self, _schema: &str) -> DescriberResult<SqlMetadata> {
-        let mut sql_schema = SqlSchema::default();
-        let table_count = self.get_table_names(&mut sql_schema).await?.len();
-        let size_in_bytes = self.get_size().await?;
-
-        Ok(SqlMetadata {
-            table_count,
-            size_in_bytes,
-        })
-    }
-
-    async fn describe(&self, _schemas: &[&str]) -> DescriberResult<SqlSchema> {
-        self.describe_impl().await
-    }
-
-    async fn version(&self) -> DescriberResult<Option<String>> {
-        Ok(Some(quaint::connector::sqlite_version().to_owned()))
     }
 }
 
