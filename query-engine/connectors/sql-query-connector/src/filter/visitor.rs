@@ -92,9 +92,7 @@ impl FilterVisitor {
 
     fn visit_nested_filter<T>(&mut self, parent_alias: Alias, f: impl FnOnce(&mut Self) -> T) -> T {
         let mut nested_visitor = self.create_nested_visitor(parent_alias);
-        let res = f(&mut nested_visitor);
-
-        res
+        f(&mut nested_visitor)
     }
 
     fn visit_relation_filter_select(&mut self, filter: RelationFilter, ctx: &Context<'_>) -> Select<'static> {

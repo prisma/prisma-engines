@@ -30,7 +30,7 @@ impl SelectBuilder {
         if supports_lateral_join(&args) {
             LateralJoinSelectBuilder::default().build(args, selected_fields, ctx)
         } else {
-            SubqueriesSelectBuilder::default().build(args, selected_fields, ctx)
+            SubqueriesSelectBuilder.build(args, selected_fields, ctx)
         }
     }
 }
