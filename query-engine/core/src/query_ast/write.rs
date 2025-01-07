@@ -397,6 +397,7 @@ pub struct DeleteRecordFields {
 pub struct DeleteManyRecords {
     pub model: Model,
     pub record_filter: RecordFilter,
+    pub limit: Option<i64>,
 }
 
 #[derive(Debug, Clone)]

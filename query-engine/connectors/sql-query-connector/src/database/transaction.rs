@@ -280,11 +280,12 @@ impl WriteOperations for SqlConnectorTransaction<'_> {
         &mut self,
         model: &Model,
         record_filter: RecordFilter,
+        limit: Option<i64>,
         traceparent: Option<TraceParent>,
     ) -> connector::Result<usize> {
         catch(&self.connection_info, async {
             let ctx = Context::new(&self.connection_info, traceparent);
-            write::delete_records(self.inner.as_queryable(), model, record_filter, &ctx).await
+            write::delete_records(self.inner.as_queryable(), model, record_filter, limit, &ctx).await
         })
         .await
     }

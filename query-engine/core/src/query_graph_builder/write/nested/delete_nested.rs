@@ -44,6 +44,7 @@ pub fn nested_delete(
         let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
             model: child_model.clone(),
             record_filter: or_filter.clone().into(),
+            limit: None,
         });
 
         let delete_many_node = graph.create_node(Query::Write(delete_many));
@@ -157,6 +158,7 @@ pub fn nested_delete_many(
         let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
             model: child_model.clone(),
             record_filter: RecordFilter::empty(),
+            limit: None,
         });
 
         let delete_many_node = graph.create_node(Query::Write(delete_many));

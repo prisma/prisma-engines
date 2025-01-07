@@ -1,11 +1,12 @@
 use super::*;
+use crate::query_document::ParsedInputValue;
 use crate::{
     query_ast::*,
     query_graph::{Node, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, FilteredQuery, ParsedField,
 };
 use psl::datamodel_connector::ConnectorCapability;
-use query_structure::{Filter, Model};
+use query_structure::{Filter, Model, PrismaValue};
 use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 
@@ -110,12 +111,18 @@ pub fn delete_many_records(
         Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model)?,
         None => Filter::empty(),
     };
+    let limit = field.arguments.lookup(args::LIMIT)
+        .and_then(|limit_arg| match limit_arg.value {
+            ParsedInputValue::Single(PrismaValue::Int(i)) => Some(i),
+            _ => None,
+        });
 
     let model_id = model.primary_identifier();
     let record_filter = filter.clone().into();
     let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
         model: model.clone(),
         record_filter,
+        limit,
     });
 
     let delete_many_node = graph.create_node(Query::Write(delete_many));
