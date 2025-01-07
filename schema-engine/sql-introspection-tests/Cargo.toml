@@ -4,7 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-schema-connector = { path = "../connectors/schema-connector" }
+schema-connector = { path = "../connectors/schema-connector", features = [
+    "all-native",
+] }
 sql-schema-connector = { path = "../connectors/sql-schema-connector" }
 sql-schema-describer = { path = "../sql-schema-describer", features = [
     "all-native",
