@@ -1,10 +1,6 @@
 use super::*;
 
-use crate::{
-    context::Context,
-    filter::alias::{Alias, AliasMode},
-    model_extensions::AsColumn,
-};
+use crate::{context::Context, filter::alias::Alias, model_extensions::AsColumn};
 
 use std::collections::HashMap;
 
@@ -29,7 +25,6 @@ impl From<&VirtualSelection> for VirtualSelectionKey {
 /// Select builder for joined queries. Relations are resolved using LATERAL JOINs.
 #[derive(Debug, Default)]
 pub(crate) struct LateralJoinSelectBuilder {
-    alias: Alias,
     visited_virtuals: HashMap<VirtualSelectionKey, String>,
 }
 
@@ -146,11 +141,11 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        let alias = self.next_alias();
+        let alias = ctx.next_table_alias();
         let relation_count_select = self.build_virtual_select(vs, parent_alias, ctx);
-        let table = Table::from(relation_count_select).alias(alias.to_table_string());
+        let table = Table::from(relation_count_select).alias(alias.to_string());
 
-        self.visited_virtuals.insert(vs.into(), alias.to_table_string());
+        self.visited_virtuals.insert(vs.into(), alias.to_string());
 
         select.left_join_lateral(table.on(ConditionTree::single(true.raw())))
     }
@@ -165,7 +160,7 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
             .filter_map(|field| match field {
                 SelectedField::Scalar(sf) => Some((
                     Cow::from(sf.name().to_owned()),
-                    Expression::from(sf.as_column(ctx).table(parent_alias.to_table_string())),
+                    Expression::from(sf.as_column(ctx).table(parent_alias.to_table_alias().to_string())),
                 )),
                 SelectedField::Relation(rs) => {
                     let table_name = match rs.field.relation().is_many_to_many() {
@@ -204,11 +199,6 @@ impl JoinSelectBuilder for LateralJoinSelectBuilder {
         .into()
     }
 
-    fn next_alias(&mut self) -> Alias {
-        self.alias = self.alias.inc(AliasMode::Table);
-        self.alias
-    }
-
     fn was_virtual_processed_in_relation(&self, vs: &VirtualSelection) -> bool {
         self.visited_virtuals.contains_key(&vs.into())
     }
@@ -223,30 +213,30 @@ impl LateralJoinSelectBuilder {
         ctx: &Context<'_>,
     ) -> JoinData<'a> {
         let rf = rs.field.clone();
-        let m2m_table_alias = self.next_alias();
-        let m2m_join_alias = self.next_alias();
-        let outer_alias = self.next_alias();
+        let m2m_table_alias = ctx.next_table_alias();
+        let m2m_join_alias = ctx.next_table_alias();
+        let outer_alias = ctx.next_table_alias();
         let json_data_alias = m2m_join_alias_name(&rf);
 
         let m2m_join_data = Table::from(self.build_to_many_select(rs, m2m_table_alias, ctx))
-            .alias(m2m_join_alias.to_table_string())
+            .alias(m2m_join_alias.to_string())
             .on(ConditionTree::single(true.raw()))
             .lateral();
 
-        let child_table = rf.as_table(ctx).alias(m2m_table_alias.to_table_string());
+        let child_table = rf.as_table(ctx).alias(m2m_table_alias.to_string());
 
         let inner = Select::from_table(child_table)
-            .value(Column::from((m2m_join_alias.to_table_string(), JSON_AGG_IDENT)))
+            .value(Column::from((m2m_join_alias.to_string(), JSON_AGG_IDENT)))
             .left_join(m2m_join_data) // join m2m table
             .with_m2m_join_conditions(&rf.related_field(), m2m_table_alias, parent_alias, ctx) // adds join condition to the child table
             // TODO: avoid clone filter
             .with_filters(rs.args.filter.clone(), Some(m2m_join_alias), ctx) // adds query filters
             .with_distinct(&rs.args, m2m_join_alias)
-            .with_ordering(&rs.args, Some(m2m_join_alias.to_table_string()), ctx) // adds ordering stmts
+            .with_ordering(&rs.args, Some(m2m_join_alias.to_string()), ctx) // adds ordering stmts
             .with_pagination(&rs.args, None)
             .comment("inner"); // adds pagination
 
-        let mut outer = Select::from_table(Table::from(inner).alias(outer_alias.to_table_string()))
+        let mut outer = Select::from_table(Table::from(inner).alias(outer_alias.to_string()))
             .value(json_agg())
             .comment("outer");
 

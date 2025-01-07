@@ -92,8 +92,6 @@ pub(crate) trait JoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Expression<'static>;
-    /// Get the next alias for a table.
-    fn next_alias(&mut self) -> Alias;
     /// Checks if a virtual selection has already been added to the query at an earlier stage
     /// as a part of a relation query for a matching relation field.
     fn was_virtual_processed_in_relation(&self, vs: &VirtualSelection) -> bool;
@@ -124,12 +122,12 @@ pub(crate) trait JoinSelectBuilder {
         ctx: &Context<'_>,
     ) -> (Select<'static>, Alias) {
         let rf = &rs.field;
-        let child_table_alias = self.next_alias();
+        let child_table_alias = ctx.next_table_alias();
         let table = rs
             .field
             .related_field()
             .as_table(ctx)
-            .alias(child_table_alias.to_table_string());
+            .alias(child_table_alias.to_string());
 
         let select = Select::from_table(table)
             .with_join_conditions(rf, parent_alias, child_table_alias, ctx)
@@ -146,15 +144,15 @@ pub(crate) trait JoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'static> {
-        let inner_root_table_alias = self.next_alias();
-        let root_alias = self.next_alias();
-        let inner_alias = self.next_alias();
-        let middle_alias = self.next_alias();
+        let inner_root_table_alias = ctx.next_table_alias();
+        let root_alias = ctx.next_table_alias();
+        let inner_alias = ctx.next_table_alias();
+        let middle_alias = ctx.next_table_alias();
 
         let related_table = rs
             .related_model()
             .as_table(ctx)
-            .alias(inner_root_table_alias.to_table_string());
+            .alias(inner_root_table_alias.to_string());
 
         // SELECT * FROM "Table" as <table_alias> WHERE parent.id = child.parent_id
         let root = Select::from_table(related_table)
@@ -162,7 +160,7 @@ pub(crate) trait JoinSelectBuilder {
             .comment("root select");
 
         // SELECT JSON_BUILD_OBJECT() FROM ( <root> )
-        let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()));
+        let inner = Select::from_table(Table::from(root).alias(root_alias.to_string()));
         let inner = self.with_relations(inner, rs.relations(), rs.virtuals(), root_alias, ctx);
         let inner = self.with_virtual_selections(inner, rs.virtuals(), root_alias, ctx);
 
@@ -181,7 +179,7 @@ pub(crate) trait JoinSelectBuilder {
             ])
             .into_projection()
             .as_columns(ctx)
-            .map(|c| c.table(root_alias.to_table_string()))
+            .map(|c| c.table(root_alias.to_string()))
             .collect();
 
             // SELECT <foreign_keys>, <orderby columns>
@@ -197,7 +195,7 @@ pub(crate) trait JoinSelectBuilder {
             ])
             .into_projection()
             .as_columns(ctx)
-            .map(|c| c.table(root_alias.to_table_string()))
+            .map(|c| c.table(root_alias.to_string()))
             .collect();
 
             let inner = inner.with_columns(inner_selection.into()).comment("inner select");
@@ -210,13 +208,13 @@ pub(crate) trait JoinSelectBuilder {
                 _ => None,
             };
 
-            let middle = Select::from_table(Table::from(inner).alias(inner_alias.to_table_string()))
+            let middle = Select::from_table(Table::from(inner).alias(inner_alias.to_string()))
                 // SELECT <inner_alias>.<JSON_ADD_IDENT>
-                .column(Column::from((inner_alias.to_table_string(), JSON_AGG_IDENT)))
+                .column(Column::from((inner_alias.to_string(), JSON_AGG_IDENT)))
                 // DISTINCT ON
                 .with_distinct(&rs.args, inner_alias)
                 // ORDER BY ...
-                .with_ordering(&rs.args, Some(inner_alias.to_table_string()), ctx)
+                .with_ordering(&rs.args, Some(inner_alias.to_string()), ctx)
                 // WHERE ...
                 .with_filters(rs.args.filter.clone(), Some(inner_alias), ctx)
                 // LIMIT $1 OFFSET $2
@@ -224,7 +222,7 @@ pub(crate) trait JoinSelectBuilder {
                 .comment("middle select");
 
             // SELECT COALESCE(JSON_AGG(<inner_alias>), '[]') AS <inner_alias> FROM ( <middle> ) as <inner_alias_2>
-            Select::from_table(Table::from(middle).alias(middle_alias.to_table_string()))
+            Select::from_table(Table::from(middle).alias(middle_alias.to_string()))
                 .value(json_agg())
                 .comment("outer select")
         }
@@ -261,13 +259,13 @@ pub(crate) trait JoinSelectBuilder {
     }
 
     fn build_default_select(&mut self, args: &QueryArguments, ctx: &Context<'_>) -> (Select<'static>, Alias) {
-        let table_alias = self.next_alias();
-        let table = args.model().as_table(ctx).alias(table_alias.to_table_string());
+        let table_alias = ctx.next_table_alias();
+        let table = args.model().as_table(ctx).alias(table_alias.to_string());
 
         // SELECT ... FROM Table "t1"
         let select = Select::from_table(table)
             .with_distinct(args, table_alias)
-            .with_ordering(args, Some(table_alias.to_table_string()), ctx)
+            .with_ordering(args, Some(table_alias.to_string()), ctx)
             .with_filters(args.filter.clone(), Some(table_alias), ctx)
             .with_pagination(args, None)
             .add_traceparent(ctx.traceparent);
@@ -340,12 +338,9 @@ pub(crate) trait JoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        let related_table_alias = self.next_alias();
+        let related_table_alias = ctx.next_table_alias();
 
-        let related_table = rf
-            .related_model()
-            .as_table(ctx)
-            .alias(related_table_alias.to_table_string());
+        let related_table = rf.related_model().as_table(ctx).alias(related_table_alias.to_string());
 
         let select = Select::from_table(related_table)
             .value(count(asterisk()).alias(selection_name))
@@ -363,13 +358,10 @@ pub(crate) trait JoinSelectBuilder {
         parent_alias: Alias,
         ctx: &Context<'_>,
     ) -> Select<'a> {
-        let related_table_alias = self.next_alias();
-        let m2m_table_alias = self.next_alias();
+        let related_table_alias = ctx.next_table_alias();
+        let m2m_table_alias = ctx.next_table_alias();
 
-        let related_table = rf
-            .related_model()
-            .as_table(ctx)
-            .alias(related_table_alias.to_table_string());
+        let related_table = rf.related_model().as_table(ctx).alias(related_table_alias.to_string());
 
         let m2m_join_conditions = {
             let left_columns = rf.join_columns(ctx);
@@ -382,7 +374,7 @@ pub(crate) trait JoinSelectBuilder {
 
         let m2m_join_data = rf
             .as_table(ctx)
-            .alias(m2m_table_alias.to_table_string())
+            .alias(m2m_table_alias.to_string())
             .on(m2m_join_conditions);
 
         let aggregation_join_conditions = {
@@ -505,7 +497,12 @@ impl<'a> SelectBuilderExt<'a> for Select<'a> {
 
         let distinct_fields = distinct
             .scalars()
-            .map(|sf| Expression::from(Column::from((table_alias.to_table_string(), sf.db_name().to_owned()))))
+            .map(|sf| {
+                Expression::from(Column::from((
+                    table_alias.to_table_alias().to_string(),
+                    sf.db_name().to_owned(),
+                )))
+            })
             .collect();
 
         self.distinct_on(distinct_fields)
@@ -675,8 +672,8 @@ fn build_join_conditions(
         .into_iter()
         .zip(right_columns)
         .fold(None::<ConditionTree>, |acc, (a, b)| {
-            let a = a.opt_table(left_alias.map(|left| left.to_table_string()));
-            let b = b.opt_table(right_alias.map(|right| right.to_table_string()));
+            let a = a.opt_table(left_alias.map(|left| left.to_table_alias().to_string()));
+            let b = b.opt_table(right_alias.map(|right| right.to_table_alias().to_string()));
             let condition = a.equals(b);
 
             match acc {
@@ -698,7 +695,7 @@ fn json_agg() -> Function<'static> {
 pub(crate) fn aliased_scalar_column(sf: &ScalarField, parent_alias: Alias, ctx: &Context<'_>) -> Column<'static> {
     let col = sf
         .as_column(ctx)
-        .table(parent_alias.to_table_string())
+        .table(parent_alias.to_table_alias().to_string())
         .set_is_selected(true);
 
     if sf.name() != sf.db_name() {
