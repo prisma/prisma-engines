@@ -5,6 +5,7 @@ use crate::{model_extensions::AsColumn, *};
 use quaint::prelude::Column;
 use query_structure::ScalarField;
 
+/// An alias referring to a table or a join on a table.
 #[derive(Debug, Clone, Copy)]
 pub enum Alias {
     Table(usize),
@@ -12,12 +13,14 @@ pub enum Alias {
 }
 
 impl Alias {
+    /// Converts the alias to one that refers to a join on the table.
     pub fn to_join_alias(self) -> Self {
         match self {
             Self::Table(index) | Self::Join(index) => Self::Join(index),
         }
     }
 
+    /// Converts the alias to one that refers to the table.
     pub fn to_table_alias(self) -> Self {
         match self {
             Self::Table(index) | Self::Join(index) => Self::Table(index),

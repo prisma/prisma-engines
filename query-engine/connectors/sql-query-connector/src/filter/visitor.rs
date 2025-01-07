@@ -122,10 +122,10 @@ impl FilterVisitor {
     /// Traverses a relation filter using this rough SQL structure:
     ///
     /// ```sql
-    /// (parent.id) IN (
+    /// EXISTS (
     ///   SELECT id FROM parent
     ///   INNER JOIN child ON (child.parent_id = parent.id)
-    ///   WHERE <filter>
+    ///   WHERE <filter> AND outer.id = parent.id
     /// )
     /// ```
     /// We need this in two cases:
@@ -193,9 +193,9 @@ impl FilterVisitor {
     /// Traverses a relation filter using this rough SQL structure:
     ///
     /// ```sql
-    /// (parent.id1, parent.id2) IN (
+    /// EXISTS (
     ///   SELECT id1, id2 FROM child
-    ///   WHERE <filter>
+    ///   WHERE <filter> AND outer.id1 = child.id1 AND outer.id2 = child.id2
     /// )
     /// ```
     fn visit_relation_filter_select_with_row(&mut self, filter: RelationFilter, ctx: &Context<'_>) -> Select<'static> {
