@@ -154,8 +154,13 @@ mod ext_rel_filters {
         test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findManyArtist(where: { Albums: { every: { Title: { contains: "Album" }}}}) { Name }}"#),
-          @r###"{"data":{"findManyArtist":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}"###
+          run_query!(&runner, r#"{
+            findManyArtist(
+              where: { Albums: { every: { Title: { contains: "Album" }}}}
+              orderBy: { Name: asc }
+            ) { Name }
+          }"#),
+          @r###"{"data":{"findManyArtist":[{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"ArtistWithoutAlbums"},{"Name":"CompleteArtist"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}"###
         );
 
         insta::assert_snapshot!(
