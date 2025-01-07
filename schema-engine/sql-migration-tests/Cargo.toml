@@ -6,9 +6,7 @@ edition = "2021"
 [dependencies]
 psl = { workspace = true, features = ["all"] }
 schema-core = { path = "../core" }
-sql-schema-connector = { path = "../connectors/sql-schema-connector", features = [
-    "all-native",
-] }
+sql-schema-connector = { path = "../connectors/sql-schema-connector" }
 sql-schema-describer = { path = "../sql-schema-describer", features = [
     "all-native",
 ] }

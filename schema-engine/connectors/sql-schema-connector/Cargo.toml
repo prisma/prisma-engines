@@ -21,7 +21,9 @@ uuid.workspace = true
 indexmap.workspace = true
 
 prisma-value = { path = "../../../libs/prisma-value" }
-schema-connector = { path = "../schema-connector" }
+schema-connector = { path = "../schema-connector", features = [
+    "all-native",
+] }
 sql-schema-describer = { path = "../../sql-schema-describer", features = [
     "all-native",
 ] }
