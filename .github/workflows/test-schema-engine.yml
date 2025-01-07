@@ -179,7 +179,7 @@ jobs:
       #
       # Single threaded tests (excluding Vitess)
       #
-      - run: cargo nextest run -p sql-schema-describer --test-threads=1
+      - run: cargo nextest run -p sql-schema-describer --features all-native --test-threads=1
         if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
