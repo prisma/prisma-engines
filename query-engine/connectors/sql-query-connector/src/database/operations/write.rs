@@ -460,11 +460,12 @@ pub(crate) async fn delete_records(
             write::delete_many_from_ids_and_filter(model, ids.as_slice(), filter_condition, remaining_limit, ctx)
         {
             row_count += conn.execute(delete).await?;
-            if let Some(limit) = remaining_limit {
-                remaining_limit = Some(limit - row_count as i64);
-                if remaining_limit.unwrap() <= 0 {
+            if let Some(old_remaining_limit) = remaining_limit {
+                let new_remaining_limit = old_remaining_limit - row_count as i64;
+                if new_remaining_limit <= 0 {
                     break;
                 }
+                remaining_limit = Some(new_remaining_limit);
             }
         }
         row_count
