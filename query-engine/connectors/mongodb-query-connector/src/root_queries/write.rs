@@ -319,9 +319,10 @@ async fn find_ids(
         builder.query = Some(filter);
     };
 
+    let mut builder = builder.with_model_projection(id_field)?;
+
     builder.limit = limit;
 
-    let builder = builder.with_model_projection(id_field)?;
     let query = builder.build()?;
     let docs = query.execute(collection, session).await?;
     let ids = docs.into_iter().map(|mut doc| doc.remove("_id").unwrap()).collect();
