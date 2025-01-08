@@ -122,6 +122,40 @@ mod update_many {
         Ok(())
     }
 
+    // "An updateMany mutation" should "update max limit number of items"
+    #[connector_test]
+    async fn update_max_limit_items(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, optStr: "str2" }"#).await?;
+        create_row(&runner, r#"{ id: 3, optStr: "str3" }"#).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateManyTestModel(
+              where: { }
+              data: { optStr: { set: "updated" } }
+              limit: 2
+            ){
+              count
+            }
+          }"#),
+          @r###"{"data":{"updateManyTestModel":{"count":2}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(
+            &runner,
+            r#"{
+              findManyTestModel(orderBy: { id: asc }) {
+                optStr
+              }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"optStr":"updated"},{"optStr":"updated"},{"optStr":"str3"}]}}"###
+        );
+
+        Ok(())
+    }
+
     // "An updateMany mutation" should "correctly apply all number operations for Int"
     #[connector_test(exclude(CockroachDb))]
     async fn apply_number_ops_for_int(runner: Runner) -> TestResult<()> {
