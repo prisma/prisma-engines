@@ -23,6 +23,9 @@ pub mod args {
 
     // createMany-specific args
     pub const SKIP_DUPLICATES: &str = "skipDuplicates";
+
+    // deleteMany-specific args
+    pub const LIMIT: &str = "limit";
 }
 
 pub mod operations {

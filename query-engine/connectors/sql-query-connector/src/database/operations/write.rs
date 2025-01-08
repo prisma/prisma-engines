@@ -445,6 +445,7 @@ pub(crate) async fn delete_records(
     conn: &dyn Queryable,
     model: &Model,
     record_filter: RecordFilter,
+    limit: Option<i64>,
     ctx: &Context<'_>,
 ) -> crate::Result<usize> {
     let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.clone().filter, ctx);
@@ -453,14 +454,23 @@ pub(crate) async fn delete_records(
     let row_count = if record_filter.has_selectors() {
         let ids: Vec<_> = record_filter.selectors.as_ref().unwrap().iter().collect();
         let mut row_count = 0;
+        let mut remaining_limit = limit;
 
-        for delete in write::delete_many_from_ids_and_filter(model, ids.as_slice(), filter_condition, ctx) {
+        for delete in
+            write::delete_many_from_ids_and_filter(model, ids.as_slice(), filter_condition, remaining_limit, ctx)
+        {
             row_count += conn.execute(delete).await?;
+            if let Some(old_remaining_limit) = remaining_limit {
+                let new_remaining_limit = old_remaining_limit - row_count as i64;
+                if new_remaining_limit <= 0 {
+                    break;
+                }
+                remaining_limit = Some(new_remaining_limit);
+            }
         }
-
         row_count
     } else {
-        conn.execute(write::delete_many_from_filter(model, filter_condition, ctx))
+        conn.execute(write::delete_many_from_filter(model, filter_condition, limit, ctx))
             .await?
     };
 

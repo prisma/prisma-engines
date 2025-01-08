@@ -226,10 +226,32 @@ pub(crate) fn delete_returning(
 pub(crate) fn delete_many_from_filter(
     model: &Model,
     filter_condition: ConditionTree<'static>,
+    limit: Option<i64>,
     ctx: &Context<'_>,
 ) -> Query<'static> {
+    let condition = if let Some(limit) = limit {
+        let columns = model
+            .primary_identifier()
+            .as_scalar_fields()
+            .expect("primary identifier must contain scalar fields")
+            .into_iter()
+            .map(|f| f.as_column(ctx))
+            .collect::<Vec<_>>();
+
+        ConditionTree::from(
+            Row::from(columns.clone()).in_selection(
+                Select::from_table(model.as_table(ctx))
+                    .columns(columns)
+                    .so_that(filter_condition)
+                    .limit(limit as usize),
+            ),
+        )
+    } else {
+        filter_condition
+    };
+
     Delete::from_table(model.as_table(ctx))
-        .so_that(filter_condition)
+        .so_that(condition)
         .add_traceparent(ctx.traceparent)
         .into()
 }
@@ -238,6 +260,7 @@ pub(crate) fn delete_many_from_ids_and_filter(
     model: &Model,
     ids: &[&SelectionResult],
     filter_condition: ConditionTree<'static>,
+    limit: Option<i64>,
     ctx: &Context<'_>,
 ) -> Vec<Query<'static>> {
     let columns: Vec<_> = ModelProjection::from(model.primary_identifier())
@@ -245,7 +268,7 @@ pub(crate) fn delete_many_from_ids_and_filter(
         .collect();
 
     super::chunked_conditions(&columns, ids, ctx, |conditions| {
-        delete_many_from_filter(model, conditions.and(filter_condition.clone()), ctx)
+        delete_many_from_filter(model, conditions.and(filter_condition.clone()), limit, ctx)
     })
 }
 

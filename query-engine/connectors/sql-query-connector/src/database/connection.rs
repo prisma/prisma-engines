@@ -272,12 +272,13 @@ where
         &mut self,
         model: &Model,
         record_filter: RecordFilter,
+        limit: Option<i64>,
         traceparent: Option<TraceParent>,
     ) -> connector::Result<usize> {
         let ctx = Context::new(&self.connection_info, traceparent);
         catch(
             &self.connection_info,
-            write::delete_records(&self.inner, model, record_filter, &ctx),
+            write::delete_records(&self.inner, model, record_filter, limit, &ctx),
         )
         .await
     }

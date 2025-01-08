@@ -326,6 +326,7 @@ pub trait WriteOperations {
         &mut self,
         model: &Model,
         record_filter: RecordFilter,
+        limit: Option<i64>,
         traceparent: Option<TraceParent>,
     ) -> crate::Result<usize>;
 

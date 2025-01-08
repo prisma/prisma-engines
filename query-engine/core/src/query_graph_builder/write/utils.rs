@@ -521,6 +521,7 @@ pub fn emulate_on_delete_cascade(
     let delete_query = WriteQuery::DeleteManyRecords(DeleteManyRecords {
         model: dependent_model.clone(),
         record_filter: RecordFilter::empty(),
+        limit: None,
     });
 
     let delete_dependents_node = graph.create_node(Query::Write(delete_query));

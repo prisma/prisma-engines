@@ -295,7 +295,7 @@ async fn delete_one(
 
         Ok(QueryResult::RecordSelection(Some(Box::new(selection))))
     } else {
-        let result = tx.delete_records(&q.model, filter, traceparent).await?;
+        let result = tx.delete_records(&q.model, filter, None, traceparent).await?;
         Ok(QueryResult::Count(result))
     }
 }
@@ -337,7 +337,9 @@ async fn delete_many(
     q: DeleteManyRecords,
     traceparent: Option<TraceParent>,
 ) -> InterpretationResult<QueryResult> {
-    let res = tx.delete_records(&q.model, q.record_filter, traceparent).await?;
+    let res = tx
+        .delete_records(&q.model, q.record_filter, q.limit, traceparent)
+        .await?;
 
     Ok(QueryResult::Count(res))
 }

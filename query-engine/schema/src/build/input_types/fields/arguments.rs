@@ -85,7 +85,10 @@ pub(crate) fn update_many_arguments(ctx: &QuerySchema, model: Model) -> Vec<Inpu
 pub(crate) fn delete_many_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
     let where_arg = where_argument(ctx, &model);
 
-    vec![where_arg]
+    vec![
+        where_arg,
+        input_field(args::LIMIT, vec![InputType::int()], None).optional(),
+    ]
 }
 
 /// Builds "many records where" arguments based on the given model and field.

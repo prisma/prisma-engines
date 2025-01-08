@@ -191,6 +191,7 @@ impl WriteOperations for MongoDbTransaction<'_> {
         &mut self,
         model: &Model,
         record_filter: connector_interface::RecordFilter,
+        limit: Option<i64>,
         _traceparent: Option<TraceParent>,
     ) -> connector_interface::Result<usize> {
         catch(write::delete_records(
@@ -198,6 +199,7 @@ impl WriteOperations for MongoDbTransaction<'_> {
             &mut self.connection.session,
             model,
             record_filter,
+            limit,
         ))
         .await
     }
