@@ -469,7 +469,7 @@ mod interactive_tx {
         Ok(())
     }
 
-    #[connector_test(only(Postgres))]
+    #[connector_test(only(SqlServer))]
     async fn nested_commit_workflow(mut runner: Runner) -> TestResult<()> {
         // Start the outer transaction
         let outer_tx_id = runner.start_tx(5000, 5000, None, None).await?;
