@@ -3,13 +3,32 @@ name = "schema-connector"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+postgresql = ["psl/postgresql", "quaint/postgresql"]
+postgresql-native = ["postgresql", "quaint/postgresql-native", "quaint/pooled"]
+sqlite = ["psl/sqlite", "quaint/sqlite"]
+sqlite-native = ["sqlite", "quaint/sqlite-native", "quaint/pooled", "quaint/expose-drivers"]
+mysql = ["psl/mysql", "quaint/mysql"]
+mysql-native = ["mysql", "quaint/mysql-native", "quaint/pooled"]
+mssql = ["psl/mssql", "quaint/mssql"]
+mssql-native = ["mssql", "quaint/mssql-native", "quaint/pooled"]
+cockroachdb = ["psl/cockroachdb", "quaint/postgresql"]
+cockroachdb-native = ["cockroachdb", "quaint/postgresql-native", "quaint/pooled"]
+all-native = [
+    "postgresql-native",
+    "sqlite-native",
+    "mysql-native",
+    "mssql-native",
+    "cockroachdb-native",
+]
+
 [dependencies]
 psl.workspace = true
-quaint = { workspace = true, features = ["all-native", "pooled"] }
+quaint.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 user-facing-errors = { path = "../../../libs/user-facing-errors", features = [
-    "all-native",
+    "quaint",
 ] }
 
 chrono.workspace = true
