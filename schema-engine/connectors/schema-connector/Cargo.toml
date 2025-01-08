@@ -5,15 +5,15 @@ edition = "2021"
 
 [features]
 postgresql = ["psl/postgresql", "quaint/postgresql"]
-postgresql-native = ["postgresql", "quaint/pooled"]
+postgresql-native = ["postgresql", "quaint/postgresql-native", "quaint/pooled"]
 sqlite = ["psl/sqlite", "quaint/sqlite"]
-sqlite-native = ["sqlite", "quaint/pooled", "quaint/sqlite-native"]
+sqlite-native = ["sqlite", "quaint/sqlite-native", "quaint/pooled", "quaint/expose-drivers"]
 mysql = ["psl/mysql", "quaint/mysql"]
-mysql-native = ["mysql", "quaint/pooled"]
+mysql-native = ["mysql", "quaint/mysql-native", "quaint/pooled"]
 mssql = ["psl/mssql", "quaint/mssql"]
-mssql-native = ["mssql", "quaint/pooled"]
+mssql-native = ["mssql", "quaint/mssql-native", "quaint/pooled"]
 cockroachdb = ["psl/cockroachdb", "quaint/postgresql"]
-cockroachdb-native = ["cockroachdb", "quaint/pooled"]
+cockroachdb-native = ["cockroachdb", "quaint/postgresql-native", "quaint/pooled"]
 all-native = [
     "postgresql-native",
     "sqlite-native",
