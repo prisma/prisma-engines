@@ -106,8 +106,7 @@ impl WriteOperations for MongoDbConnection {
                 model,
                 record_filter,
                 args,
-                UpdateType::Many,
-                limit,
+                UpdateType::Many { limit },
             )
             .await?;
 
@@ -144,7 +143,6 @@ impl WriteOperations for MongoDbConnection {
                 record_filter,
                 args,
                 UpdateType::One,
-                None,
             )
             .await?;
 

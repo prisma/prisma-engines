@@ -137,8 +137,7 @@ impl WriteOperations for MongoDbTransaction<'_> {
                 model,
                 record_filter,
                 args,
-                UpdateType::Many,
-                limit,
+                UpdateType::Many { limit },
             )
             .await?;
             Ok(result.len())
@@ -174,7 +173,6 @@ impl WriteOperations for MongoDbTransaction<'_> {
                 record_filter,
                 args,
                 UpdateType::One,
-                None, // This is a single record update already => no need for additional limit
             )
             .await?;
             // NOTE: Atomic updates are not yet implemented for MongoDB, so we only return ids.

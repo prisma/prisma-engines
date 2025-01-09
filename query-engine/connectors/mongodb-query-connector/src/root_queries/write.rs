@@ -146,7 +146,6 @@ pub async fn update_records<'conn>(
     record_filter: RecordFilter,
     mut args: WriteArgs,
     update_type: UpdateType,
-    limit: Option<i64>,
 ) -> crate::Result<Vec<SelectionResult>> {
     let coll = database.collection::<Document>(model.db_name());
 
@@ -161,7 +160,10 @@ pub async fn update_records<'conn>(
     let ids: Vec<Bson> = if let Some(selectors) = record_filter.selectors {
         selectors
             .into_iter()
-            .take(limit.unwrap_or(i64::MAX) as usize)
+            .take(match update_type {
+                UpdateType::Many { limit } => limit.unwrap_or(i64::MAX),
+                UpdateType::One => 1,
+            } as usize)
             .map(|p| {
                 (&id_field, p.values().next().unwrap())
                     .into_bson()
@@ -207,7 +209,7 @@ pub async fn update_records<'conn>(
         // It's important we check the `matched_count` and not the `modified_count` here.
         // MongoDB returns `modified_count: 0` when performing a noop update, which breaks
         // nested connect mutations as it rely on the returned count to know whether the update happened.
-        if update_type == UpdateType::Many && res.matched_count == 0 {
+        if matches!(update_type, UpdateType::Many { limit: _ }) && res.matched_count == 0 {
             return Ok(Vec::new());
         }
     }
