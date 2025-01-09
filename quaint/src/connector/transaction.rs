@@ -143,7 +143,7 @@ impl Transaction for DefaultTransaction<'_> {
     async fn commit(&self) -> crate::Result<()> {
         self.inner.raw_cmd("COMMIT").await?;
 
-        self.depth.fetch_sub(1, Ordering::Relaxed);
+        self.depth.store(0, Ordering::Relaxed);
         self.gauge.decrement();
 
         Ok(())
