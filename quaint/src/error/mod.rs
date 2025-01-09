@@ -277,6 +277,15 @@ pub enum ErrorKind {
 
     #[error("Attempted to execute a query that contains an opaque parameter '{0}'.")]
     RanQueryWithOpaqueParam(String),
+
+    #[error("Attempted to execute a query that contains unbound variable '{0}' in parameters.")]
+    RanQueryWithVarParam(String),
+
+    #[error("No savepoint to release in transaction for depth '{}', make sure to call create_savepoint before release_savepoint", _0)]
+    NoSavepointToRelease(u32),
+
+    #[error("No savepoint to rollback to in transaction for depth '{}', make sure to call create_savepoint before rollback_to_savepoint", _0)]
+    NoSavepointToRollbackTo(u32),
 }
 
 #[cfg(not(target_arch = "wasm32"))]

@@ -174,9 +174,7 @@ impl Transaction for DefaultTransaction<'_> {
         let depth_val = self.depth.load(Ordering::Relaxed);
 
         if depth_val == 0 {
-            panic!(
-                "No savepoint to release in transaction, make sure to call create_savepoint before release_savepoint"
-            );
+            return Err(Error::builder(ErrorKind::NoSavepointToRelease(depth_val)).build());
         }
 
         let stmt = self.inner.release_savepoint_statement(depth_val);
@@ -192,9 +190,7 @@ impl Transaction for DefaultTransaction<'_> {
         let depth_val = self.depth.load(Ordering::Relaxed);
 
         if depth_val == 0 {
-            panic!(
-                "No savepoint to rollback to in transaction, make sure to call create_savepoint before rollback_to_savepoint"
-            );
+            return Err(Error::builder(ErrorKind::NoSavepointToRollbackTo(depth_val)).build());
         }
 
         let stmt = self.inner.rollback_to_savepoint_statement(depth_val);
