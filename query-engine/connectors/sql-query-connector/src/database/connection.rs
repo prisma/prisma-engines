@@ -226,12 +226,13 @@ where
         model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
+        limit: Option<i64>,
         traceparent: Option<TraceParent>,
     ) -> connector::Result<usize> {
         let ctx = Context::new(&self.connection_info, traceparent);
         catch(
             &self.connection_info,
-            write::update_records(&self.inner, model, record_filter, args, &ctx),
+            write::update_records(&self.inner, model, record_filter, args, limit, &ctx),
         )
         .await
     }
@@ -242,12 +243,13 @@ where
         record_filter: RecordFilter,
         args: WriteArgs,
         selected_fields: FieldSelection,
+        limit: Option<i64>,
         traceparent: Option<TraceParent>,
     ) -> connector::Result<ManyRecords> {
         let ctx = Context::new(&self.connection_info, traceparent);
         catch(
             &self.connection_info,
-            write::update_records_returning(&self.inner, model, record_filter, args, selected_fields, &ctx),
+            write::update_records_returning(&self.inner, model, record_filter, args, selected_fields, limit, &ctx),
         )
         .await
     }

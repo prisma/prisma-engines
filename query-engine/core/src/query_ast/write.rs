@@ -368,6 +368,7 @@ pub struct UpdateManyRecords {
     /// Fields of updated records that client has requested to return.
     /// `None` if the connector does not support returning the updated rows.
     pub selected_fields: Option<UpdateManyRecordsFields>,
+    pub limit: Option<i64>,
 }
 
 #[derive(Debug, Clone)]

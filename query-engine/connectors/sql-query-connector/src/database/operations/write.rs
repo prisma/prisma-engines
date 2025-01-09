@@ -376,15 +376,17 @@ async fn generate_updates(
     record_filter: RecordFilter,
     args: WriteArgs,
     selected_fields: Option<&ModelProjection>,
+    limit: Option<i64>,
     ctx: &Context<'_>,
 ) -> crate::Result<Vec<Query<'static>>> {
+    println!(">>>> DBFlo A {:?}", record_filter.selectors);
     if record_filter.has_selectors() {
         let (updates, _) =
-            update_many_from_ids_and_filter(conn, model, record_filter, args, selected_fields, ctx).await?;
+            update_many_from_ids_and_filter(conn, model, record_filter, args, selected_fields, limit, ctx).await?;
         Ok(updates)
     } else {
         Ok(vec![
-            update_many_from_filter(model, record_filter, args, selected_fields, ctx).await?,
+            update_many_from_filter(model, record_filter, args, selected_fields, limit, ctx).await?,
         ])
     }
 }
@@ -398,6 +400,7 @@ pub(crate) async fn update_records(
     model: &Model,
     record_filter: RecordFilter,
     args: WriteArgs,
+    limit: Option<i64>,
     ctx: &Context<'_>,
 ) -> crate::Result<usize> {
     if args.args.is_empty() {
@@ -405,7 +408,7 @@ pub(crate) async fn update_records(
     }
 
     let mut count = 0;
-    for update in generate_updates(conn, model, record_filter, args, None, ctx).await? {
+    for update in generate_updates(conn, model, record_filter, args, None, limit, ctx).await? {
         count += conn.execute(update).await?;
     }
     Ok(count as usize)
@@ -419,6 +422,7 @@ pub(crate) async fn update_records_returning(
     record_filter: RecordFilter,
     args: WriteArgs,
     selected_fields: FieldSelection,
+    limit: Option<i64>,
     ctx: &Context<'_>,
 ) -> crate::Result<ManyRecords> {
     let field_names: Vec<String> = selected_fields.db_names().collect();
@@ -426,7 +430,17 @@ pub(crate) async fn update_records_returning(
     let meta = column_metadata::create(&field_names, &idents);
     let mut records = ManyRecords::new(field_names.clone());
 
-    for update in generate_updates(conn, model, record_filter, args, Some(&selected_fields.into()), ctx).await? {
+    for update in generate_updates(
+        conn,
+        model,
+        record_filter,
+        args,
+        Some(&selected_fields.into()),
+        limit,
+        ctx,
+    )
+    .await?
+    {
         let result_set = conn.query(update).await?;
 
         for result_row in result_set {

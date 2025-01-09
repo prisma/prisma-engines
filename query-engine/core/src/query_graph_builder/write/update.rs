@@ -1,4 +1,5 @@
 use super::*;
+use crate::query_document::ParsedInputValue;
 use crate::query_graph_builder::write::write_args_parser::*;
 use crate::ParsedObject;
 use crate::{
@@ -7,7 +8,7 @@ use crate::{
     ArgumentListLookup, ParsedField, ParsedInputMap,
 };
 use psl::datamodel_connector::ConnectorCapability;
-use query_structure::{Filter, IntoFilter, Model};
+use query_structure::{Filter, IntoFilter, Model, PrismaValue};
 use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 
@@ -136,6 +137,15 @@ pub fn update_many_records(
         None => Filter::empty(),
     };
 
+    // "limit"
+    let limit = field
+        .arguments
+        .lookup(args::LIMIT)
+        .and_then(|limit_arg| match limit_arg.value {
+            ParsedInputValue::Single(PrismaValue::Int(i)) => Some(i),
+            _ => None,
+        });
+
     // "data"
     let data_argument = field.arguments.lookup(args::DATA).unwrap();
     let data_map: ParsedInputMap<'_> = data_argument.value.try_into()?;
@@ -149,6 +159,7 @@ pub fn update_many_records(
             Some(field.name),
             field.nested_fields.filter(|_| with_field_selection),
             data_map,
+            limit,
         )?;
     } else {
         let pre_read_node = graph.create_node(utils::read_ids_infallible(
@@ -164,6 +175,7 @@ pub fn update_many_records(
             Some(field.name),
             field.nested_fields.filter(|_| with_field_selection),
             data_map,
+            limit,
         )?;
 
         utils::insert_emulated_on_update(graph, query_schema, &model, &pre_read_node, &update_many_node)?;
@@ -270,6 +282,7 @@ pub fn update_many_record_node<T>(
     name: Option<String>,
     nested_field_selection: Option<ParsedObject<'_>>,
     data_map: ParsedInputMap<'_>,
+    limit: Option<i64>,
 ) -> QueryGraphBuilderResult<NodeRef>
 where
     T: Into<Filter>,
@@ -302,6 +315,7 @@ where
         record_filter,
         args,
         selected_fields,
+        limit,
     };
 
     let update_many_node = graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(update_many)));

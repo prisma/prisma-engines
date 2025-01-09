@@ -146,6 +146,7 @@ pub async fn update_records<'conn>(
     record_filter: RecordFilter,
     mut args: WriteArgs,
     update_type: UpdateType,
+    limit: Option<i64>,
 ) -> crate::Result<Vec<SelectionResult>> {
     let coll = database.collection::<Document>(model.db_name());
 
@@ -160,6 +161,7 @@ pub async fn update_records<'conn>(
     let ids: Vec<Bson> = if let Some(selectors) = record_filter.selectors {
         selectors
             .into_iter()
+            .take(limit.unwrap_or(i64::MAX) as usize)
             .map(|p| {
                 (&id_field, p.values().next().unwrap())
                     .into_bson()

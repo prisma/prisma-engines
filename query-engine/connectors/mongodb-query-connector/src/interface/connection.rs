@@ -96,6 +96,7 @@ impl WriteOperations for MongoDbConnection {
         model: &Model,
         record_filter: connector_interface::RecordFilter,
         args: WriteArgs,
+        limit: Option<i64>,
         _traceparent: Option<TraceParent>,
     ) -> connector_interface::Result<usize> {
         catch(async move {
@@ -106,6 +107,7 @@ impl WriteOperations for MongoDbConnection {
                 record_filter,
                 args,
                 UpdateType::Many,
+                limit,
             )
             .await?;
 
@@ -120,6 +122,7 @@ impl WriteOperations for MongoDbConnection {
         _record_filter: connector_interface::RecordFilter,
         _args: WriteArgs,
         _selected_fields: FieldSelection,
+        _limit: Option<i64>,
         _traceparent: Option<TraceParent>,
     ) -> connector_interface::Result<ManyRecords> {
         unimplemented!()
@@ -141,6 +144,7 @@ impl WriteOperations for MongoDbConnection {
                 record_filter,
                 args,
                 UpdateType::One,
+                None,
             )
             .await?;
 

@@ -2,14 +2,14 @@ use super::read::get_single_record;
 
 use crate::column_metadata::{self, ColumnMetadata};
 use crate::filter::FilterBuilder;
-use crate::model_extensions::AsColumns;
+use crate::model_extensions::{AsColumn, AsColumns, AsTable};
 use crate::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
 use crate::row::ToSqlRow;
 use crate::{Context, QueryExt, Queryable};
 
 use connector_interface::*;
 use itertools::Itertools;
-use quaint::ast::Query;
+use quaint::ast::*;
 use query_structure::*;
 
 /// Performs an update with an explicit selection set.
@@ -79,7 +79,7 @@ pub(crate) async fn update_one_without_selection(
     let id_args = pick_args(&model.primary_identifier().into(), &args);
     // Perform the update and return the ids on which we've applied the update.
     // Note: We are _not_ getting back the ids from the update. Either we got some ids passed from the parent operation or we perform a read _before_ doing the update.
-    let (updates, ids) = update_many_from_ids_and_filter(conn, model, record_filter, args, None, ctx).await?;
+    let (updates, ids) = update_many_from_ids_and_filter(conn, model, record_filter, args, None, None, ctx).await?;
     for update in updates {
         conn.execute(update).await?;
     }
@@ -103,11 +103,34 @@ pub(super) async fn update_many_from_filter(
     record_filter: RecordFilter,
     args: WriteArgs,
     selected_fields: Option<&ModelProjection>,
+    limit: Option<i64>,
     ctx: &Context<'_>,
 ) -> crate::Result<Query<'static>> {
     let update = build_update_and_set_query(model, args, None, ctx);
     let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter, ctx);
-    let update = update.so_that(filter_condition);
+
+    let condition = if let Some(limit) = limit {
+        let columns = model
+            .primary_identifier()
+            .as_scalar_fields()
+            .expect("primary identifier must contain scalar fields")
+            .into_iter()
+            .map(|f| f.as_column(ctx))
+            .collect::<Vec<_>>();
+
+        ConditionTree::from(
+            Row::from(columns.clone()).in_selection(
+                Select::from_table(model.as_table(ctx))
+                    .columns(columns)
+                    .so_that(filter_condition)
+                    .limit(limit as usize),
+            ),
+        )
+    } else {
+        filter_condition
+    };
+
+    let update = update.so_that(condition);
     if let Some(selected_fields) = selected_fields {
         Ok(update
             .returning(selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true)))
@@ -125,6 +148,7 @@ pub(super) async fn update_many_from_ids_and_filter(
     record_filter: RecordFilter,
     args: WriteArgs,
     selected_fields: Option<&ModelProjection>,
+    limit: Option<i64>,
     ctx: &Context<'_>,
 ) -> crate::Result<(Vec<Query<'static>>, Vec<SelectionResult>)> {
     let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter.clone(), ctx);
@@ -136,7 +160,7 @@ pub(super) async fn update_many_from_ids_and_filter(
 
     let updates = {
         let update = build_update_and_set_query(model, args, selected_fields, ctx);
-        let ids: Vec<&SelectionResult> = ids.iter().collect();
+        let ids: Vec<&SelectionResult> = ids.iter().take(limit.unwrap_or(i64::MAX) as usize).collect();
 
         chunk_update_with_ids(update, model, &ids, filter_condition, ctx)?
     };

@@ -127,6 +127,7 @@ impl WriteOperations for MongoDbTransaction<'_> {
         model: &Model,
         record_filter: connector_interface::RecordFilter,
         args: connector_interface::WriteArgs,
+        limit: Option<i64>,
         _traceparent: Option<TraceParent>,
     ) -> connector_interface::Result<usize> {
         catch(async move {
@@ -137,6 +138,7 @@ impl WriteOperations for MongoDbTransaction<'_> {
                 record_filter,
                 args,
                 UpdateType::Many,
+                limit,
             )
             .await?;
             Ok(result.len())
@@ -150,6 +152,7 @@ impl WriteOperations for MongoDbTransaction<'_> {
         _record_filter: connector_interface::RecordFilter,
         _args: connector_interface::WriteArgs,
         _selected_fields: FieldSelection,
+        _limit: Option<i64>,
         _traceparent: Option<TraceParent>,
     ) -> connector_interface::Result<ManyRecords> {
         unimplemented!()
@@ -171,6 +174,7 @@ impl WriteOperations for MongoDbTransaction<'_> {
                 record_filter,
                 args,
                 UpdateType::One,
+                None, // This is a single record update already => no need for additional limit
             )
             .await?;
             // NOTE: Atomic updates are not yet implemented for MongoDB, so we only return ids.
