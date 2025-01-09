@@ -1,11 +1,11 @@
 [package]
 authors = [
-  "Julius de Bruijn <bruijn@prisma.io>",
-  "Katharina Fey <kookie@spacekookie.de>",
-  "Tom Houlé <tom@tomhoule.com>",
-  "Emanuel Jöbstl <emanuel.joebstl@gmail.com>",
-  "Matthias Oertel <oertel@prisma.io>",
-  "Dominic Petrick <petrick@prisma.io>",
+    "Julius de Bruijn <bruijn@prisma.io>",
+    "Katharina Fey <kookie@spacekookie.de>",
+    "Tom Houlé <tom@tomhoule.com>",
+    "Emanuel Jöbstl <emanuel.joebstl@gmail.com>",
+    "Matthias Oertel <oertel@prisma.io>",
+    "Dominic Petrick <petrick@prisma.io>",
 ]
 description = "An abstraction layer for SQL databases."
 documentation = "https://docs.rs/quaint/"
@@ -29,30 +29,30 @@ docs = []
 expose-drivers = []
 
 all-native = [
-  "postgresql-native",
-  "mysql-native",
-  "mssql-native",
-  "sqlite-native",
+    "postgresql-native",
+    "mysql-native",
+    "mssql-native",
+    "sqlite-native",
 ]
 
 vendored-openssl = [
-  "postgres-native-tls/vendored-openssl",
-  "mysql_async/vendored-openssl",
+    "postgres-native-tls/vendored-openssl",
+    "mysql_async/vendored-openssl",
 ]
 
 postgresql-native = [
-  "postgresql",
-  "native-tls",
-  "tokio-postgres",
-  "postgres-types",
-  "postgres-native-tls",
-  "bytes",
-  "tokio",
-  "bit-vec",
-  "lru-cache",
-  "byteorder",
-  "dep:ws_stream_tungstenite",
-  "dep:async-tungstenite"
+    "postgresql",
+    "native-tls",
+    "tokio-postgres",
+    "postgres-types",
+    "postgres-native-tls",
+    "bytes",
+    "tokio",
+    "bit-vec",
+    "lru-cache",
+    "byteorder",
+    "dep:ws_stream_tungstenite",
+    "dep:async-tungstenite",
 ]
 postgresql = []
 
@@ -149,12 +149,12 @@ version = "0.11.8"
 optional = true
 default-features = false
 features = [
-  "sql-browser-tokio",
-  "vendored-openssl",
-  "chrono",
-  "bigdecimal",
-  "tds73",
-  "winauth",
+    "sql-browser-tokio",
+    "vendored-openssl",
+    "chrono",
+    "bigdecimal",
+    "tds73",
+    "winauth",
 ]
 
 [dependencies.bigdecimal]
@@ -162,29 +162,29 @@ version = "0.3"
 
 [dependencies.tokio-postgres]
 features = [
-  "with-uuid-1",
-  "with-chrono-0_4",
-  "with-serde_json-1",
-  "with-bit-vec-0_6",
+    "with-uuid-1",
+    "with-chrono-0_4",
+    "with-serde_json-1",
+    "with-bit-vec-0_6",
 ]
 git = "https://github.com/prisma/rust-postgres"
-branch = "pgbouncer-mode"
+branch = "test/get-type-panic"
 optional = true
 
 [dependencies.postgres-types]
 features = [
-  "with-uuid-1",
-  "with-chrono-0_4",
-  "with-serde_json-1",
-  "with-bit-vec-0_6",
+    "with-uuid-1",
+    "with-chrono-0_4",
+    "with-serde_json-1",
+    "with-bit-vec-0_6",
 ]
 git = "https://github.com/prisma/rust-postgres"
-branch = "pgbouncer-mode"
+branch = "test/get-type-panic"
 optional = true
 
 [dependencies.postgres-native-tls]
 git = "https://github.com/prisma/rust-postgres"
-branch = "pgbouncer-mode"
+branch = "test/get-type-panic"
 optional = true
 
 [dependencies.tokio]
