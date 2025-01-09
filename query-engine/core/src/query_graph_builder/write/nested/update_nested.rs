@@ -1,4 +1,5 @@
 use super::*;
+use crate::query_graph_builder::write::update::UpdateManyRecordNodeOptionals;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
@@ -147,10 +148,12 @@ pub fn nested_update_many(
             query_schema,
             Filter::empty(),
             child_model.clone(),
-            None,
-            None,
             data_map,
-            None,
+            UpdateManyRecordNodeOptionals {
+                name: None,
+                nested_field_selection: None,
+                limit: None,
+            },
         )?;
 
         graph.create_edge(
