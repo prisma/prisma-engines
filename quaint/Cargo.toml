@@ -170,7 +170,7 @@ features = [
     "with-bit-vec-0_6",
 ]
 git = "https://github.com/prisma/rust-postgres"
-branch = "test/get-type-panic"
+branch = "test/get-type-panic2"
 optional = true
 
 [dependencies.postgres-types]
@@ -181,12 +181,12 @@ features = [
     "with-bit-vec-0_6",
 ]
 git = "https://github.com/prisma/rust-postgres"
-branch = "test/get-type-panic"
+branch = "test/get-type-panic2"
 optional = true
 
 [dependencies.postgres-native-tls]
 git = "https://github.com/prisma/rust-postgres"
-branch = "test/get-type-panic"
+branch = "test/get-type-panic2"
 optional = true
 
 [dependencies.tokio]
