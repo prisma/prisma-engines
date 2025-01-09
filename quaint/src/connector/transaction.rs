@@ -165,9 +165,7 @@ impl Transaction for DefaultTransaction<'_> {
 
     /// Creates a savepoint in the transaction
     async fn create_savepoint(&self) -> crate::Result<()> {
-        let current_depth = self.depth.load(Ordering::SeqCst);
-        let new_depth = current_depth + 1;
-        self.depth.store(new_depth, Ordering::SeqCst);
+        let new_depth = self.depth.fetch_add(1, Ordering::SeqCst) + 1;
 
         let create_savepoint_statement = self.inner.create_savepoint_statement(new_depth);
         self.inner.raw_cmd(&create_savepoint_statement).await?;
