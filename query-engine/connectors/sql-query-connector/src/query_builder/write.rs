@@ -1,3 +1,4 @@
+use crate::limit::wrap_with_limit_subquery_if_needed;
 use crate::{model_extensions::*, sql_trace::SqlTraceComment, Context};
 use connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
 use quaint::ast::*;
@@ -229,29 +230,10 @@ pub(crate) fn delete_many_from_filter(
     limit: Option<i64>,
     ctx: &Context<'_>,
 ) -> Query<'static> {
-    let condition = if let Some(limit) = limit {
-        let columns = model
-            .primary_identifier()
-            .as_scalar_fields()
-            .expect("primary identifier must contain scalar fields")
-            .into_iter()
-            .map(|f| f.as_column(ctx))
-            .collect::<Vec<_>>();
-
-        ConditionTree::from(
-            Row::from(columns.clone()).in_selection(
-                Select::from_table(model.as_table(ctx))
-                    .columns(columns)
-                    .so_that(filter_condition)
-                    .limit(limit as usize),
-            ),
-        )
-    } else {
-        filter_condition
-    };
+    let filter_condition = wrap_with_limit_subquery_if_needed(model, filter_condition, limit, ctx);
 
     Delete::from_table(model.as_table(ctx))
-        .so_that(condition)
+        .so_that(filter_condition)
         .add_traceparent(ctx.traceparent)
         .into()
 }

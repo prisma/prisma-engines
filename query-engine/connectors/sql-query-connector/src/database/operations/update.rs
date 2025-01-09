@@ -2,11 +2,12 @@ use super::read::get_single_record;
 
 use crate::column_metadata::{self, ColumnMetadata};
 use crate::filter::FilterBuilder;
-use crate::model_extensions::{AsColumn, AsColumns, AsTable};
+use crate::model_extensions::AsColumns;
 use crate::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
 use crate::row::ToSqlRow;
 use crate::{Context, QueryExt, Queryable};
 
+use crate::limit::wrap_with_limit_subquery_if_needed;
 use connector_interface::*;
 use itertools::Itertools;
 use quaint::ast::*;
@@ -107,30 +108,14 @@ pub(super) async fn update_many_from_filter(
     ctx: &Context<'_>,
 ) -> crate::Result<Query<'static>> {
     let update = build_update_and_set_query(model, args, None, ctx);
-    let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter, ctx);
+    let filter_condition = wrap_with_limit_subquery_if_needed(
+        model,
+        FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter, ctx),
+        limit,
+        ctx,
+    );
 
-    let condition = if let Some(limit) = limit {
-        let columns = model
-            .primary_identifier()
-            .as_scalar_fields()
-            .expect("primary identifier must contain scalar fields")
-            .into_iter()
-            .map(|f| f.as_column(ctx))
-            .collect::<Vec<_>>();
-
-        ConditionTree::from(
-            Row::from(columns.clone()).in_selection(
-                Select::from_table(model.as_table(ctx))
-                    .columns(columns)
-                    .so_that(filter_condition)
-                    .limit(limit as usize),
-            ),
-        )
-    } else {
-        filter_condition
-    };
-
-    let update = update.so_that(condition);
+    let update = update.so_that(filter_condition);
     if let Some(selected_fields) = selected_fields {
         Ok(update
             .returning(selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true)))
