@@ -4,7 +4,9 @@
 use driver_adapters::JsObject;
 use psl::{ConnectorRegistry, ValidatedSchema};
 use quaint::connector::ExternalConnector;
+use serde::Deserialize;
 use std::sync::Arc;
+use tsify::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 const CONNECTOR_REGISTRY: ConnectorRegistry<'_> = &[
@@ -48,7 +50,8 @@ pub struct SchemaEngine {
     adapter: Arc<dyn ExternalConnector>,
 }
 
-#[wasm_bindgen]
+#[derive(Deserialize, Tsify)]
+#[tsify(from_wasm_abi)]
 pub struct SchemaEngineParams {
     // TODO: support multiple datamodels
     datamodel: String,
@@ -74,14 +77,14 @@ impl SchemaEngine {
     }
 
     /// Debugging method that only panics, for tests.
-    #[wasm_bindgen]
-    pub async fn debug_panic(&self) {
+    #[wasm_bindgen(js_name = "debugPanic")]
+    pub fn debug_panic(&self) {
         panic!("This is the debugPanic artificial panic")
     }
 
     /// Return the database version as a string.
     #[wasm_bindgen]
-    pub async fn version(&self) -> Result<String, wasm_bindgen::JsError> {
+    pub async fn version(&self) -> Result<Option<String>, wasm_bindgen::JsError> {
         Err(wasm_bindgen::JsError::new("Not yet available."))
     }
 

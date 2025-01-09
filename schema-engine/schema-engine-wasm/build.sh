@@ -123,7 +123,7 @@ echo "Building schema-engine-wasm using $WASM_BUILD_PROFILE profile"
 
 build "postgresql"
 build "sqlite"
- build "mysql"
+build "mysql"
 
 jq '.version=$version' --arg version "$OUT_VERSION" package.json > "$OUT_JSON"
 
