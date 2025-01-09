@@ -100,11 +100,7 @@ impl QuaintTransaction for JsTransaction {
     }
 
     async fn create_savepoint(&self) -> quaint::Result<()> {
-        let current_depth = self.depth.load(Ordering::SeqCst);
-        let new_depth = current_depth + 1;
-
-        // Increment the depth value
-        self.depth.fetch_add(1, Ordering::SeqCst);
+        let new_depth = self.depth.fetch_add(1, Ordering::SeqCst) + 1;
 
         let stmt = self.create_savepoint_statement(new_depth);
         if self.options().use_phantom_query {
