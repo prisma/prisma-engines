@@ -142,7 +142,6 @@ impl Transaction for DefaultTransaction<'_> {
 
     /// Commit the changes to the database and consume the transaction.
     async fn commit(&self) -> crate::Result<()> {
-        // Perform the asynchronous operation without holding the lock
         self.inner.raw_cmd("COMMIT").await?;
 
         self.depth.fetch_sub(1, Ordering::Relaxed);
