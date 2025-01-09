@@ -144,7 +144,8 @@ impl Transaction for DefaultTransaction<'_> {
     async fn commit(&self) -> crate::Result<()> {
         self.inner.raw_cmd("COMMIT").await?;
 
-        self.depth.fetch_sub(1, Ordering::Relaxed);
+        // Reset the depth to 0 on commit
+        self.depth.store(0, Ordering::Relaxed);
 
         self.gauge.decrement();
 
