@@ -4672,6 +4672,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "schema-engine-wasm"
+version = "0.1.0"
+dependencies = [
+ "build-utils",
+ "driver-adapters",
+ "js-sys",
+ "psl",
+ "quaint",
+ "tracing",
+ "tsify",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "wasm-rs-dbg",
+]
+
+[[package]]
 name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5147,6 +5163,34 @@ dependencies = [
  "tracing-futures",
  "url",
  "user-facing-errors",
+ "uuid",
+ "versions",
+]
+
+[[package]]
+name = "sql-schema-connector-wasm"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "connection-string",
+ "either",
+ "enumflags2",
+ "expect-test",
+ "indexmap 2.2.2",
+ "indoc 2.0.3",
+ "once_cell",
+ "prisma-value",
+ "psl",
+ "quaint",
+ "regex",
+ "serde",
+ "serde_json",
+ "sql-ddl",
+ "sqlformat",
+ "sqlparser",
+ "tracing",
+ "tracing-futures",
+ "url",
  "uuid",
  "versions",
 ]
