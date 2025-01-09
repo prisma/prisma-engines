@@ -161,8 +161,8 @@ impl QuaintTransaction for JsTransaction {
 
         let _ = UnsafeFuture(self.tx_proxy.commit()).await;
 
-        // Modify the depth value
-        self.depth.fetch_sub(1, Ordering::Relaxed);
+        // Reset the depth to 0 on commit
+        self.depth.store(0, Ordering::Relaxed);
 
         Ok(())
     }
