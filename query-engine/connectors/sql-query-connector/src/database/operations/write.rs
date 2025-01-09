@@ -379,7 +379,6 @@ async fn generate_updates(
     limit: Option<i64>,
     ctx: &Context<'_>,
 ) -> crate::Result<Vec<Query<'static>>> {
-    println!(">>>> DBFlo A {:?}", record_filter.selectors);
     if record_filter.has_selectors() {
         let (updates, _) =
             update_many_from_ids_and_filter(conn, model, record_filter, args, selected_fields, limit, ctx).await?;
