@@ -73,7 +73,7 @@ pub(crate) fn upsert_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputFiel
     args
 }
 
-/// Builds "where" and "data" arguments intended for the update many field.
+/// Builds "where", "data" and "limit" arguments intended for the update many field.
 pub(crate) fn update_many_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
     let update_many_types = update_many_objects::update_many_input_types(ctx, model.clone(), None);
     let where_arg = where_argument(ctx, &model);
@@ -86,7 +86,7 @@ pub(crate) fn update_many_arguments(ctx: &QuerySchema, model: Model) -> Vec<Inpu
     ]
 }
 
-/// Builds "where" argument intended for the delete many field.
+/// Builds "where" and "limit" argument intended for the delete many field.
 pub(crate) fn delete_many_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
     let where_arg = where_argument(ctx, &model);
 

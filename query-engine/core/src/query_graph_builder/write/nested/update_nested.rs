@@ -150,7 +150,7 @@ pub fn nested_update_many(
             None,
             None,
             data_map,
-            None, // TODO: would it make sense to support limit on nested updates?
+            None,
         )?;
 
         graph.create_edge(
