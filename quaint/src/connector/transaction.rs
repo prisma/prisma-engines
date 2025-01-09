@@ -127,11 +127,11 @@ impl<'a> DefaultTransaction<'a> {
 #[async_trait]
 impl Transaction for DefaultTransaction<'_> {
     fn depth(&self) -> u32 {
-        self.depth.load(Ordering::SeqCst)
+        self.depth.load(Ordering::Relaxed)
     }
 
     async fn begin(&self) -> crate::Result<()> {
-        self.depth.fetch_add(1, Ordering::SeqCst);
+        self.depth.fetch_add(1, Ordering::Relaxed);
 
         let begin_statement = self.inner.begin_statement();
         self.inner.raw_cmd(begin_statement).await?;
@@ -143,7 +143,7 @@ impl Transaction for DefaultTransaction<'_> {
     async fn commit(&self) -> crate::Result<()> {
         self.inner.raw_cmd("COMMIT").await?;
 
-        self.depth.fetch_sub(1, Ordering::SeqCst);
+        self.depth.fetch_sub(1, Ordering::Relaxed);
         self.gauge.decrement();
 
         Ok(())
@@ -153,7 +153,7 @@ impl Transaction for DefaultTransaction<'_> {
     async fn rollback(&self) -> crate::Result<()> {
         self.inner.raw_cmd("ROLLBACK").await?;
 
-        self.depth.fetch_sub(1, Ordering::SeqCst);
+        self.depth.fetch_sub(1, Ordering::Relaxed);
         self.gauge.decrement();
 
         Ok(())
@@ -161,7 +161,7 @@ impl Transaction for DefaultTransaction<'_> {
 
     /// Creates a savepoint in the transaction.
     async fn create_savepoint(&self) -> crate::Result<()> {
-        let new_depth = self.depth.fetch_add(1, Ordering::SeqCst) + 1;
+        let new_depth = self.depth.fetch_add(1, Ordering::Relaxed) + 1;
 
         let stmt = self.inner.create_savepoint_statement(new_depth);
         self.inner.raw_cmd(stmt.as_ref()).await?;
@@ -171,7 +171,7 @@ impl Transaction for DefaultTransaction<'_> {
 
     /// Releases a savepoint in the transaction.
     async fn release_savepoint(&self) -> crate::Result<()> {
-        let depth_val = self.depth.load(Ordering::SeqCst);
+        let depth_val = self.depth.load(Ordering::Relaxed);
 
         if depth_val == 0 {
             panic!(
@@ -182,14 +182,14 @@ impl Transaction for DefaultTransaction<'_> {
         let stmt = self.inner.release_savepoint_statement(depth_val);
         self.inner.raw_cmd(stmt.as_ref()).await?;
 
-        self.depth.fetch_sub(1, Ordering::SeqCst);
+        self.depth.fetch_sub(1, Ordering::Relaxed);
 
         Ok(())
     }
 
     /// Rolls back to a savepoint in the transaction.
     async fn rollback_to_savepoint(&self) -> crate::Result<()> {
-        let depth_val = self.depth.load(Ordering::SeqCst);
+        let depth_val = self.depth.load(Ordering::Relaxed);
 
         if depth_val == 0 {
             panic!(
@@ -200,7 +200,7 @@ impl Transaction for DefaultTransaction<'_> {
         let stmt = self.inner.rollback_to_savepoint_statement(depth_val);
         self.inner.raw_cmd(stmt.as_ref()).await?;
 
-        self.depth.fetch_sub(1, Ordering::SeqCst);
+        self.depth.fetch_sub(1, Ordering::Relaxed);
 
         Ok(())
     }
@@ -312,4 +312,3 @@ impl FromStr for IsolationLevel {
         }
     }
 }
-
