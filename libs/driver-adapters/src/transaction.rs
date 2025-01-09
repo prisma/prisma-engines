@@ -118,21 +118,21 @@ impl JsTransaction {
     }
 
     pub fn increment_depth(&self) {
-        self.depth.fetch_add(1, Ordering::SeqCst);
+        self.depth.fetch_add(1, Ordering::Relaxed);
     }
 }
 
 #[async_trait]
 impl QuaintTransaction for JsTransaction {
     fn depth(&self) -> u32 {
-        self.depth.load(Ordering::SeqCst)
+        self.depth.load(Ordering::Relaxed)
     }
 
     async fn begin(&self) -> quaint::Result<()> {
         // increment of this gauge is done in DriverProxy::startTransaction
         gauge!("prisma_client_queries_active").decrement(1.0);
 
-        self.depth.fetch_add(1, Ordering::SeqCst);
+        self.depth.fetch_add(1, Ordering::Relaxed);
 
         let begin_stmt = self.begin_statement();
 
@@ -162,7 +162,7 @@ impl QuaintTransaction for JsTransaction {
         let _ = UnsafeFuture(self.tx_proxy.commit()).await;
 
         // Modify the depth value
-        self.depth.fetch_sub(1, Ordering::SeqCst);
+        self.depth.fetch_sub(1, Ordering::Relaxed);
 
         Ok(())
     }
@@ -183,13 +183,13 @@ impl QuaintTransaction for JsTransaction {
         let _ = UnsafeFuture(self.tx_proxy.rollback()).await;
 
         // Modify the depth value
-        self.depth.fetch_sub(1, Ordering::SeqCst);
+        self.depth.fetch_sub(1, Ordering::Relaxed);
 
         Ok(())
     }
 
     async fn create_savepoint(&self) -> quaint::Result<()> {
-        let new_depth = self.depth.fetch_add(1, Ordering::SeqCst) + 1;
+        let new_depth = self.depth.fetch_add(1, Ordering::Relaxed) + 1;
 
         let create_savepoint_statement = self.create_savepoint_statement(new_depth);
         if self.options().use_phantom_query {
@@ -203,7 +203,7 @@ impl QuaintTransaction for JsTransaction {
     }
 
     async fn release_savepoint(&self) -> quaint::Result<()> {
-        let depth_val = self.depth.load(Ordering::SeqCst);
+        let depth_val = self.depth.load(Ordering::Relaxed);
         let release_savepoint_statement = self.release_savepoint_statement(depth_val);
         if self.options().use_phantom_query {
             let release_savepoint_statement = JsBaseQueryable::phantom_query_message(&release_savepoint_statement);
@@ -213,13 +213,13 @@ impl QuaintTransaction for JsTransaction {
         }
 
         // Modify the depth value
-        self.depth.fetch_sub(1, Ordering::SeqCst);
+        self.depth.fetch_sub(1, Ordering::Relaxed);
 
         Ok(())
     }
 
     async fn rollback_to_savepoint(&self) -> quaint::Result<()> {
-        let depth_val = self.depth.load(Ordering::SeqCst);
+        let depth_val = self.depth.load(Ordering::Relaxed);
         let rollback_to_savepoint_statement = self.rollback_to_savepoint_statement(depth_val);
         if self.options().use_phantom_query {
             let rollback_to_savepoint_statement =
@@ -230,7 +230,7 @@ impl QuaintTransaction for JsTransaction {
         }
 
         // Modify the depth value
-        self.depth.fetch_sub(1, Ordering::SeqCst);
+        self.depth.fetch_sub(1, Ordering::Relaxed);
 
         Ok(())
     }
