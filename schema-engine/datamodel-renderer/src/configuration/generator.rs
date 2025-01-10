@@ -224,10 +224,9 @@ mod tests {
 
         let expected = expect![[r#"
             generator client {
-              provider        = "prisma-client-js"
-              previewFeatures = ["multiSchema", "postgresqlExtensions"]
-              first           = "A"
-              second          = "B"
+              provider = "prisma-client-js"
+              first    = "A"
+              second   = "B"
             }
         "#]];
 
