@@ -13,7 +13,7 @@
     "build:prisma": "pnpm -r --parallel dev",
     "build:executor": "pnpm -r --filter executor build",
     "lint": "pnpm -r run lint",
-    "clean": "git clean -dXf -e !query-engine/driver-adapters"
+    "clean": "git clean -dXf -e !libs/driver-adapters"
   },
   "keywords": [],
   "author": "",
