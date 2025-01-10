@@ -164,7 +164,7 @@ pub async fn update_records<'conn>(
             .take(match update_type {
                 UpdateType::Many { limit } => limit.unwrap_or(usize::MAX),
                 UpdateType::One => 1,
-            } as usize)
+            })
             .map(|p| {
                 (&id_field, p.values().next().unwrap())
                     .into_bson()
