@@ -138,10 +138,7 @@ pub fn update_many_records(
     };
 
     // "limit"
-    let limit = match validate_limit(field.arguments.lookup(args::LIMIT)) {
-        Ok(limit) => limit,
-        Err(err) => return Err(err),
-    };
+    let limit = validate_limit(field.arguments.lookup(args::LIMIT))?;
 
     // "data"
     let data_argument = field.arguments.lookup(args::DATA).unwrap();

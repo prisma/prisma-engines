@@ -112,10 +112,7 @@ pub fn delete_many_records(
         None => Filter::empty(),
     };
 
-    let limit = match validate_limit(field.arguments.lookup(args::LIMIT)) {
-        Ok(limit) => limit,
-        Err(err) => return Err(err),
-    };
+    let limit = validate_limit(field.arguments.lookup(args::LIMIT))?;
 
     let model_id = model.primary_identifier();
     let record_filter = filter.clone().into();
