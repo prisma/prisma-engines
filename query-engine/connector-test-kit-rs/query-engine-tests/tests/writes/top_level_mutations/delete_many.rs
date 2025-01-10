@@ -202,6 +202,24 @@ mod delete_many {
         Ok(())
     }
 
+    // "The delete many Mutation" should "fail if limit param is negative"
+    #[connector_test]
+    async fn should_fail_with_negative_limit(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, title: "title1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, title: "title2" }"#).await?;
+        create_row(&runner, r#"{ id: 3, title: "title3" }"#).await?;
+        create_row(&runner, r#"{ id: 4, title: "title4" }"#).await?;
+
+        assert_error!(
+            &runner,
+            r#"mutation { deleteManyTodo(limit: -3){ count }}"#,
+            2019,
+            "Provided limit (-3) must be a positive integer."
+        );
+
+        Ok(())
+    }
+
     fn nested_del_many() -> String {
         let schema = indoc! {
             r#"model ZChild{

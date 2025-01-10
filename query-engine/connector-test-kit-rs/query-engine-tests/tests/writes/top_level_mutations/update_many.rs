@@ -156,6 +156,31 @@ mod update_many {
         Ok(())
     }
 
+    // "An updateMany mutation" should "fail if limit param is negative"
+    #[connector_test]
+    async fn should_fail_with_negative_limit(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
+        create_row(&runner, r#"{ id: 2, optStr: "str2" }"#).await?;
+        create_row(&runner, r#"{ id: 3, optStr: "str3" }"#).await?;
+
+        assert_error!(
+            &runner,
+            r#"mutation {
+              updateManyTestModel(
+                where: { }
+                data: { optStr: { set: "updated" } }
+                limit: -2
+              ){
+                count
+              }
+            }"#,
+            2019,
+            "Provided limit (-2) must be a positive integer."
+        );
+
+        Ok(())
+    }
+
     // "An updateMany mutation" should "correctly apply all number operations for Int"
     #[connector_test(exclude(CockroachDb))]
     async fn apply_number_ops_for_int(runner: Runner) -> TestResult<()> {
