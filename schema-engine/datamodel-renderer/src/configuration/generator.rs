@@ -1,4 +1,5 @@
 use crate::value::{Array, Documentation, Env, Text, Value};
+use itertools::Itertools;
 use psl::PreviewFeature;
 use std::{borrow::Cow, fmt};
 
@@ -143,7 +144,7 @@ impl fmt::Display for Generator<'_> {
             writeln!(f, "binaryTargets = {}", self.binary_targets)?;
         }
 
-        for (k, v) in self.config.iter() {
+        for (k, v) in self.config.iter().sorted_by_key(|(k, _)| k) {
             writeln!(f, "{k} = {v}")?;
         }
 
@@ -198,14 +199,39 @@ mod tests {
               output          = "/dev/null"
               previewFeatures = ["multiSchema", "postgresqlExtensions"]
               binaryTargets   = [env("BINARY TARGET")]
+              afterGenerate   = ["lambda", [], ["print", ["quote", "done!"]]]
+              customFeatures  = ["enums", "models"]
               customValue     = "meow"
               otherValue      = "purr"
-              customFeatures  = ["enums", "models"]
-              afterGenerate   = ["lambda", [], ["print", ["quote", "done!"]]]
             }
         "#]];
 
         let rendered = psl::reformat(&format!("{generator}"), 2).unwrap();
         expected.assert_eq(&rendered)
+    }
+
+    #[test]
+    fn creates_consistent_ordering() {
+        let mut generator1 = Generator::new("client", Env::value("prisma-client-js"));
+        generator1.push_config_value("first", "A");
+        generator1.push_config_value("second", "B");
+        let rendered1 = psl::reformat(&format!("{generator1}"), 2).unwrap();
+
+        let mut generator2 = Generator::new("client", Env::value("prisma-client-js"));
+        generator2.push_config_value("second", "B");
+        generator2.push_config_value("first", "A");
+        let rendered2 = psl::reformat(&format!("{generator2}"), 2).unwrap();
+
+        let expected = expect![[r#"
+            generator client {
+              provider        = "prisma-client-js"
+              previewFeatures = ["multiSchema", "postgresqlExtensions"]
+              first           = "A"
+              second          = "B"
+            }
+        "#]];
+
+        expected.assert_eq(&rendered1);
+        expected.assert_eq(&rendered2)
     }
 }
