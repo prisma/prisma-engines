@@ -476,7 +476,7 @@ pub(crate) async fn delete_records(
             if let Some(old_remaining_limit) = remaining_limit {
                 // u64 to usize cast here cannot 'overflow' as the number of rows was limited to MAX usize in the first place.
                 let new_remaining_limit = old_remaining_limit - row_count as usize;
-                if new_remaining_limit <= 0 {
+                if new_remaining_limit == 0 {
                     break;
                 }
                 remaining_limit = Some(new_remaining_limit);

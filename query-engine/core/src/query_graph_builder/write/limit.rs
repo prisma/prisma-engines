@@ -2,7 +2,7 @@ use crate::query_document::{ParsedArgument, ParsedInputValue};
 use crate::query_graph_builder::{QueryGraphBuilderError, QueryGraphBuilderResult};
 use query_structure::PrismaValue;
 
-pub(crate) fn validate_limit<'a>(limit_arg: Option<ParsedArgument<'a>>) -> QueryGraphBuilderResult<Option<usize>> {
+pub(crate) fn validate_limit(limit_arg: Option<ParsedArgument<'_>>) -> QueryGraphBuilderResult<Option<usize>> {
     let limit = limit_arg.and_then(|limit_arg| match limit_arg.value {
         ParsedInputValue::Single(PrismaValue::Int(i)) => Some(i),
         _ => None,
