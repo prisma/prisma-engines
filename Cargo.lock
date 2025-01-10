@@ -3411,7 +3411,7 @@ checksum = "cc9c68a3f6da06753e9335d63e27f6b9754dd1920d941135b7ea8224f141adb2"
 [[package]]
 name = "postgres-native-tls"
 version = "0.5.0"
-source = "git+https://github.com/prisma/rust-postgres?branch=perf/simplify-type-info#2df69c970f4b5e496898311e60e8f2c96915b2c9"
+source = "git+https://github.com/prisma/rust-postgres?branch=perf/simplify-type-info#1b645babb7fcf3e80437852d90ea223114f0395c"
 dependencies = [
  "native-tls",
  "tokio",
@@ -3422,7 +3422,7 @@ dependencies = [
 [[package]]
 name = "postgres-protocol"
 version = "0.6.7"
-source = "git+https://github.com/prisma/rust-postgres?branch=perf/simplify-type-info#2df69c970f4b5e496898311e60e8f2c96915b2c9"
+source = "git+https://github.com/prisma/rust-postgres?branch=perf/simplify-type-info#1b645babb7fcf3e80437852d90ea223114f0395c"
 dependencies = [
  "base64 0.22.1",
  "byteorder",
@@ -3439,7 +3439,7 @@ dependencies = [
 [[package]]
 name = "postgres-types"
 version = "0.2.8"
-source = "git+https://github.com/prisma/rust-postgres?branch=perf/simplify-type-info#2df69c970f4b5e496898311e60e8f2c96915b2c9"
+source = "git+https://github.com/prisma/rust-postgres?branch=perf/simplify-type-info#1b645babb7fcf3e80437852d90ea223114f0395c"
 dependencies = [
  "bit-vec",
  "bytes",
@@ -5798,7 +5798,7 @@ dependencies = [
 [[package]]
 name = "tokio-postgres"
 version = "0.7.12"
-source = "git+https://github.com/prisma/rust-postgres?branch=perf/simplify-type-info#2df69c970f4b5e496898311e60e8f2c96915b2c9"
+source = "git+https://github.com/prisma/rust-postgres?branch=perf/simplify-type-info#1b645babb7fcf3e80437852d90ea223114f0395c"
 dependencies = [
  "async-trait",
  "byteorder",
