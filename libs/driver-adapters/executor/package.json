@@ -15,12 +15,12 @@
   },
   "tsup": {
     "external": [
-      "../../../query-engine-wasm/pkg/postgresql/query_engine_bg.js",
-      "../../../query-engine-wasm/pkg/mysql/query_engine_bg.js",
-      "../../../query-engine-wasm/pkg/sqlite/query_engine_bg.js",
-      "../../../schema-engine-wasm/pkg/postgresql/schema_engine_bg.js",
-      "../../../schema-engine-wasm/pkg/mysql/schema_engine_bg.js",
-      "../../../schema-engine-wasm/pkg/sqlite/schema_engine_bg.js"
+      "../../query-engine/query-engine-wasm/pkg/postgresql/query_engine_bg.js",
+      "../../query-engine/query-engine-wasm/pkg/mysql/query_engine_bg.js",
+      "../../query-engine/query-engine-wasm/pkg/sqlite/query_engine_bg.js",
+      "../../query-engine/schema-engine-wasm/pkg/postgresql/schema_engine_bg.js",
+      "../../query-engine/schema-engine-wasm/pkg/mysql/schema_engine_bg.js",
+      "../../query-engine/schema-engine-wasm/pkg/sqlite/schema_engine_bg.js"
     ]
   },
   "keywords": [],
