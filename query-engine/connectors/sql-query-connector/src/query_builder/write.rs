@@ -227,7 +227,7 @@ pub(crate) fn delete_returning(
 pub(crate) fn delete_many_from_filter(
     model: &Model,
     filter_condition: ConditionTree<'static>,
-    limit: Option<i64>,
+    limit: Option<usize>,
     ctx: &Context<'_>,
 ) -> Query<'static> {
     let filter_condition = wrap_with_limit_subquery_if_needed(model, filter_condition, limit, ctx);
@@ -242,7 +242,7 @@ pub(crate) fn delete_many_from_ids_and_filter(
     model: &Model,
     ids: &[&SelectionResult],
     filter_condition: ConditionTree<'static>,
-    limit: Option<i64>,
+    limit: Option<usize>,
     ctx: &Context<'_>,
 ) -> Vec<Query<'static>> {
     let columns: Vec<_> = ModelProjection::from(model.primary_identifier())

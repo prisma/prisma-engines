@@ -1,4 +1,5 @@
 use super::*;
+use crate::error::MongoError::ConversionError;
 use crate::{
     error::{DecorateErrorWithFieldInformationExtension, MongoError},
     filter::{FilterPrefix, MongoFilter, MongoFilterVisitor},
@@ -161,7 +162,7 @@ pub async fn update_records<'conn>(
         selectors
             .into_iter()
             .take(match update_type {
-                UpdateType::Many { limit } => limit.unwrap_or(i64::MAX),
+                UpdateType::Many { limit } => limit.unwrap_or(usize::MAX),
                 UpdateType::One => 1,
             } as usize)
             .map(|p| {
@@ -232,7 +233,7 @@ pub async fn delete_records<'conn>(
     session: &mut ClientSession,
     model: &Model,
     record_filter: RecordFilter,
-    limit: Option<i64>,
+    limit: Option<usize>,
 ) -> crate::Result<usize> {
     let coll = database.collection::<Document>(model.db_name());
     let id_field = pick_singular_id(model);
@@ -240,7 +241,7 @@ pub async fn delete_records<'conn>(
     let ids = if let Some(selectors) = record_filter.selectors {
         selectors
             .into_iter()
-            .take(limit.unwrap_or(i64::MAX) as usize)
+            .take(limit.unwrap_or(usize::MAX))
             .map(|p| {
                 (&id_field, p.values().next().unwrap())
                     .into_bson()
@@ -309,7 +310,7 @@ async fn find_ids(
     session: &mut ClientSession,
     model: &Model,
     filter: MongoFilter,
-    limit: Option<i64>,
+    limit: Option<usize>,
 ) -> crate::Result<Vec<Bson>> {
     let id_field = model.primary_identifier();
     let mut builder = MongoReadQueryBuilder::new(model.clone());
@@ -325,7 +326,17 @@ async fn find_ids(
 
     let mut builder = builder.with_model_projection(id_field)?;
 
-    builder.limit = limit;
+    if let Some(limit) = limit {
+        builder.limit = match i64::try_from(limit) {
+            Ok(limit) => Some(limit),
+            Err(_) => {
+                return Err(ConversionError {
+                    from: "usize".to_owned(),
+                    to: "i64".to_owned(),
+                })
+            }
+        }
+    }
 
     let query = builder.build()?;
     let docs = query.execute(collection, session).await?;

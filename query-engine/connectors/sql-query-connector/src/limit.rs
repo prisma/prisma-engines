@@ -5,7 +5,7 @@ use query_structure::*;
 pub(crate) fn wrap_with_limit_subquery_if_needed<'a>(
     model: &Model,
     filter_condition: ConditionTree<'a>,
-    limit: Option<i64>,
+    limit: Option<usize>,
     ctx: &Context,
 ) -> ConditionTree<'a> {
     if let Some(limit) = limit {
@@ -22,7 +22,7 @@ pub(crate) fn wrap_with_limit_subquery_if_needed<'a>(
                 Select::from_table(model.as_table(ctx))
                     .columns(columns)
                     .so_that(filter_condition)
-                    .limit(limit as usize),
+                    .limit(limit),
             ),
         )
     } else {

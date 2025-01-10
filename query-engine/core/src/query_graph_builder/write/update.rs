@@ -1,5 +1,5 @@
 use super::*;
-use crate::query_document::ParsedInputValue;
+use crate::query_graph_builder::write::limit::validate_limit;
 use crate::query_graph_builder::write::write_args_parser::*;
 use crate::ParsedObject;
 use crate::{
@@ -8,7 +8,7 @@ use crate::{
     ArgumentListLookup, ParsedField, ParsedInputMap,
 };
 use psl::datamodel_connector::ConnectorCapability;
-use query_structure::{Filter, IntoFilter, Model, PrismaValue};
+use query_structure::{Filter, IntoFilter, Model};
 use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 
@@ -138,13 +138,10 @@ pub fn update_many_records(
     };
 
     // "limit"
-    let limit = field
-        .arguments
-        .lookup(args::LIMIT)
-        .and_then(|limit_arg| match limit_arg.value {
-            ParsedInputValue::Single(PrismaValue::Int(i)) => Some(i),
-            _ => None,
-        });
+    let limit = match validate_limit(field.arguments.lookup(args::LIMIT)) {
+        Ok(limit) => limit,
+        Err(err) => return Err(err),
+    };
 
     // "data"
     let data_argument = field.arguments.lookup(args::DATA).unwrap();
@@ -362,5 +359,5 @@ fn can_use_atomic_update(
 pub struct UpdateManyRecordNodeOptionals<'a> {
     pub name: Option<String>,
     pub nested_field_selection: Option<ParsedObject<'a>>,
-    pub limit: Option<i64>,
+    pub limit: Option<usize>,
 }

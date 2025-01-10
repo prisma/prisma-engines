@@ -104,7 +104,7 @@ pub(super) async fn update_many_from_filter(
     record_filter: RecordFilter,
     args: WriteArgs,
     selected_fields: Option<&ModelProjection>,
-    limit: Option<i64>,
+    limit: Option<usize>,
     ctx: &Context<'_>,
 ) -> crate::Result<Query<'static>> {
     let update = build_update_and_set_query(model, args, None, ctx);
@@ -133,7 +133,7 @@ pub(super) async fn update_many_from_ids_and_filter(
     record_filter: RecordFilter,
     args: WriteArgs,
     selected_fields: Option<&ModelProjection>,
-    limit: Option<i64>,
+    limit: Option<usize>,
     ctx: &Context<'_>,
 ) -> crate::Result<(Vec<Query<'static>>, Vec<SelectionResult>)> {
     let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter.clone(), ctx);
@@ -145,7 +145,7 @@ pub(super) async fn update_many_from_ids_and_filter(
 
     let updates = {
         let update = build_update_and_set_query(model, args, selected_fields, ctx);
-        let ids: Vec<&SelectionResult> = ids.iter().take(limit.unwrap_or(i64::MAX) as usize).collect();
+        let ids: Vec<&SelectionResult> = ids.iter().take(limit.unwrap_or(usize::MAX)).collect();
 
         chunk_update_with_ids(update, model, &ids, filter_condition, ctx)?
     };

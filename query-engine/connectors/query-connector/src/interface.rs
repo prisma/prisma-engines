@@ -286,7 +286,7 @@ pub trait WriteOperations {
         model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
-        limit: Option<i64>,
+        limit: Option<usize>,
         traceparent: Option<TraceParent>,
     ) -> crate::Result<usize>;
 
@@ -300,7 +300,7 @@ pub trait WriteOperations {
         record_filter: RecordFilter,
         args: WriteArgs,
         selected_fields: FieldSelection,
-        limit: Option<i64>,
+        limit: Option<usize>,
         traceparent: Option<TraceParent>,
     ) -> crate::Result<ManyRecords>;
 
@@ -328,7 +328,7 @@ pub trait WriteOperations {
         &mut self,
         model: &Model,
         record_filter: RecordFilter,
-        limit: Option<i64>,
+        limit: Option<usize>,
         traceparent: Option<TraceParent>,
     ) -> crate::Result<usize>;
 
