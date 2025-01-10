@@ -30,9 +30,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        engine_protocol: [graphql, json]
+        engine_protocol: [ graphql, json ]
         relation_load_strategy: ${{ fromJson(inputs.relation_load_strategy) }}
-        partition: ["1/4", "2/4", "3/4", "4/4"]
+        partition: [ "1/4", "2/4", "3/4", "4/4" ]
 
     env:
       LOG_LEVEL: "info"
@@ -67,6 +67,11 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Cache Docker images.
+        uses: ScribeMD/docker-cache@0.5.0
+        with:
+          key: docker-${{ inputs.name }}-${{hashFiles('docker-compose.yaml')}}
 
       - name: "Start ${{ inputs.name }} (${{ matrix.engine_protocol }})"
         run: make start-${{ inputs.name }}
