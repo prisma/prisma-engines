@@ -25,6 +25,8 @@ export async function getQueryEngineForProvider(provider: EngineName) {
         '..',
         '..',
         '..',
+        '..',
+        'query-engine',
         'query-engine-wasm',
         'pkg',
         subDir,
