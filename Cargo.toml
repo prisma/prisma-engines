@@ -20,7 +20,6 @@ members = [
   "query-engine/core-tests",
   "query-engine/black-box-tests",
   "query-engine/dmmf",
-  "query-engine/driver-adapters",
   "query-engine/query-structure",
   "query-engine/query-engine",
   "query-engine/query-engine-node-api",
