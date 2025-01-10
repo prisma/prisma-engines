@@ -69,7 +69,9 @@
           "nativeType": null,
           "default": {
             "name": "cuid",
-            "args": [1]
+            "args": [
+              1
+            ]
           },
           "isGenerated": false,
           "isUpdatedAt": false
@@ -87,7 +89,9 @@
           "nativeType": null,
           "default": {
             "name": "cuid",
-            "args": [1]
+            "args": [
+              1
+            ]
           },
           "isGenerated": false,
           "isUpdatedAt": false
@@ -105,7 +109,9 @@
           "nativeType": null,
           "default": {
             "name": "cuid",
-            "args": [2]
+            "args": [
+              2
+            ]
           },
           "isGenerated": false,
           "isUpdatedAt": false
@@ -123,7 +129,9 @@
           "nativeType": null,
           "default": {
             "name": "uuid",
-            "args": [4]
+            "args": [
+              4
+            ]
           },
           "isGenerated": false,
           "isUpdatedAt": false
@@ -141,7 +149,9 @@
           "nativeType": null,
           "default": {
             "name": "uuid",
-            "args": [4]
+            "args": [
+              4
+            ]
           },
           "isGenerated": false,
           "isUpdatedAt": false
@@ -159,7 +169,9 @@
           "nativeType": null,
           "default": {
             "name": "uuid",
-            "args": [7]
+            "args": [
+              7
+            ]
           },
           "isGenerated": false,
           "isUpdatedAt": false
@@ -195,7 +207,9 @@
           "nativeType": null,
           "default": {
             "name": "nanoid",
-            "args": [6]
+            "args": [
+              6
+            ]
           },
           "isGenerated": false,
           "isUpdatedAt": false
