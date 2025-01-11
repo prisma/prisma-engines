@@ -1,4 +1,7 @@
-use itertools::Itertools;
+use pretty::{
+    termcolor::{Color, ColorSpec},
+    DocAllocator, DocBuilder,
+};
 use query_structure::PrismaValue;
 use serde::Serialize;
 
@@ -88,122 +91,201 @@ pub enum Expression {
     MapField { field: String, records: Box<Expression> },
 }
 
+#[derive(thiserror::Error, Debug)]
+pub enum PrettyPrintError {
+    #[error("{0}")]
+    IoError(#[from] std::io::Error),
+    #[error("{0}")]
+    FromUtf8Error(#[from] std::string::FromUtf8Error),
+}
+
 impl Expression {
-    fn display(&self, f: &mut std::fmt::Formatter<'_>, level: usize) -> std::fmt::Result {
-        let indent = "  ".repeat(level);
+    pub fn pretty_print(&self, color: bool, width: usize) -> Result<String, PrettyPrintError> {
+        let arena = pretty::Arena::new();
+        let doc = self.to_doc(&arena);
+
+        let mut buf = if color {
+            pretty::termcolor::Buffer::ansi()
+        } else {
+            pretty::termcolor::Buffer::no_color()
+        };
+
+        doc.render_colored(width, &mut buf)?;
+        Ok(String::from_utf8(buf.into_inner())?)
+    }
+
+    fn to_doc<'a, D>(&'a self, d: &'a D) -> DocBuilder<'a, D, ColorSpec>
+    where
+        D: DocAllocator<'a, ColorSpec>,
+        D::Doc: Clone,
+    {
+        let color_kw = || ColorSpec::new().set_fg(Some(Color::Blue)).clone();
+        let color_fn = || ColorSpec::new().set_underline(true).clone();
+        let color_var = || ColorSpec::new().set_bold(true).clone();
+        let color_lit = || ColorSpec::new().set_italic(true).set_fg(Some(Color::Green)).clone();
+
+        let format_query = |tag: &'static str, db_query: &'a DbQuery| {
+            d.text(tag)
+                .annotate(color_kw())
+                .append(d.softline())
+                .append(
+                    d.reflow(&db_query.query)
+                        .align()
+                        .enclose("«", "»")
+                        .annotate(color_lit()),
+                )
+                .append(d.line())
+                .append(d.text("with params").annotate(color_kw()))
+                .append(d.space())
+                .append(
+                    d.intersperse(
+                        db_query.params.iter().map(|param| match param {
+                            PrismaValue::Placeholder { name, r#type } => d.text("var").annotate(color_kw()).append(
+                                d.text(name)
+                                    .annotate(color_var())
+                                    .append(d.space())
+                                    .append(d.text("as").annotate(color_kw()))
+                                    .append(d.space())
+                                    .append(match r#type {
+                                        query_structure::PlaceholderType::Array(inner) => format!("{inner:?}[]"),
+                                        _ => format!("{type:?}"),
+                                    })
+                                    .parens(),
+                            ),
+                            _ => d
+                                .text("const")
+                                .annotate(color_kw())
+                                .append(d.text(format!("{param:?}")).annotate(color_lit()).parens()),
+                        }),
+                        d.text(",").append(d.softline()),
+                    )
+                    .align()
+                    .brackets(),
+                )
+                .align()
+        };
+
+        let format_function = |name: &'static str, args: &'a [Expression]| {
+            d.text(name).annotate(color_fn()).append(d.space()).append(
+                d.intersperse(args.iter().map(|expr| expr.to_doc(d)), d.space())
+                    .parens(),
+            )
+        };
+
+        let format_unary_function = |name: &'static str, arg: &'a Expression| {
+            d.text(name)
+                .annotate(color_fn())
+                .append(d.space())
+                .append(arg.to_doc(d).parens())
+        };
 
         match self {
-            Self::Seq(exprs) => {
-                writeln!(f, "{indent}{{")?;
-                for expr in exprs {
-                    expr.display(f, level + 1)?;
-                    writeln!(f, ";")?;
-                }
-                write!(f, "{indent}}}")?;
-            }
+            Expression::Seq(vec) => d.intersperse(vec.iter().map(|expr| expr.to_doc(d)), d.text(";").append(d.line())),
 
-            Self::Get { name } => {
-                write!(f, "{indent}get {name}")?;
-            }
+            Expression::Get { name } => d
+                .text("get")
+                .annotate(color_kw())
+                .append(d.space())
+                .append(d.text(name).annotate(color_var())),
 
-            Self::Let { bindings, expr } => {
-                writeln!(f, "{indent}let")?;
-                for Binding { name, expr } in bindings {
-                    writeln!(f, "{indent}  {name} =")?;
-                    expr.display(f, level + 2)?;
-                    writeln!(f, ";")?;
-                }
-                writeln!(f, "{indent}in")?;
-                expr.display(f, level + 1)?;
-            }
+            Expression::Let { bindings, expr } => d
+                .text("let")
+                .annotate(color_kw())
+                .append(d.softline())
+                .append(
+                    d.intersperse(
+                        bindings.iter().map(|binding| {
+                            d.text(&binding.name)
+                                .annotate(color_var())
+                                .append(d.space())
+                                .append("=")
+                                .append(d.softline())
+                                .append(binding.expr.to_doc(d))
+                        }),
+                        d.text(";").append(d.line()),
+                    )
+                    .align(),
+                )
+                .append(d.line())
+                .append(d.text("in").annotate(color_kw()))
+                .append(d.softline())
+                .append(expr.to_doc(d).align()),
 
-            Self::GetFirstNonEmpty { names } => {
-                write!(f, "{indent}getFirstNonEmpty")?;
-                for name in names {
-                    write!(f, " {}", name)?;
-                }
-            }
+            Expression::GetFirstNonEmpty { names } => d
+                .text("getFirstNonEmpty")
+                .annotate(color_fn())
+                .append(d.intersperse(names.iter().map(|name| d.text(name).annotate(color_var())), d.space())),
 
-            Self::Query(query) => self.display_query("query", query, f, level)?,
+            Expression::Query(db_query) => format_query("query", db_query),
 
-            Self::Execute(query) => self.display_query("execute", query, f, level)?,
+            Expression::Execute(db_query) => format_query("execute", db_query),
 
-            Self::Reverse(expr) => {
-                writeln!(f, "{indent}reverse (")?;
-                expr.display(f, level + 1)?;
-                write!(f, "{indent})")?;
-            }
+            Expression::Reverse(expression) => format_unary_function("reverse", expression),
 
-            Self::Sum(exprs) => self.display_function("sum", exprs, f, level)?,
+            Expression::Sum(vec) => format_function("sum", vec),
 
-            Self::Concat(exprs) => self.display_function("concat", exprs, f, level)?,
+            Expression::Concat(vec) => format_function("concat", vec),
 
-            Self::Unique(expr) => {
-                writeln!(f, "{indent}unique (")?;
-                expr.display(f, level + 1)?;
-                write!(f, "{indent})")?;
-            }
+            Expression::Unique(expression) => format_unary_function("unique", expression),
 
-            Self::Required(expr) => {
-                writeln!(f, "{indent}required (")?;
-                expr.display(f, level + 1)?;
-                write!(f, "{indent})")?;
-            }
+            Expression::Required(expression) => format_unary_function("required", expression),
 
-            Self::Join { parent, children } => {
-                writeln!(f, "{indent}join (")?;
-                parent.display(f, level + 1)?;
-                for nested in children {
-                    let left = nested.on.iter().map(|(l, _)| l).cloned().join(", ");
-                    let right = nested.on.iter().map(|(_, r)| r).cloned().join(", ");
-                    writeln!(f, "\n{indent}  with (")?;
-                    nested.child.display(f, level + 2)?;
-                    writeln!(f, "\n{indent}  ) on left.{left} = right.{right},")?;
-                }
-                write!(f, "{indent})")?;
-            }
+            Expression::Join { parent, children } => d
+                .text("join")
+                .annotate(color_kw())
+                .append(d.space())
+                .append(parent.to_doc(d).parens())
+                .append(d.line())
+                .append(d.text("with").annotate(color_kw()))
+                .append(d.space())
+                .append(
+                    d.intersperse(
+                        children.iter().map(|join| {
+                            join.child
+                                .to_doc(d)
+                                .parens()
+                                .append(d.space())
+                                .append(d.text("on").annotate(color_kw()))
+                                .append(d.space())
+                                .append(d.intersperse(
+                                    join.on.iter().map(|(l, r)| {
+                                        d.text("left")
+                                            .annotate(color_kw())
+                                            .append(".")
+                                            .append(d.text(l).annotate(color_var()))
+                                            .parens()
+                                            .append(d.space())
+                                            .append("=")
+                                            .append(d.space())
+                                            .append(
+                                                d.text("right")
+                                                    .annotate(color_kw())
+                                                    .append(".")
+                                                    .append(d.text(r).annotate(color_var()))
+                                                    .parens(),
+                                            )
+                                    }),
+                                    d.text(", "),
+                                ))
+                        }),
+                        d.text(",").append(d.line()),
+                    )
+                    .align(),
+                ),
 
-            Self::MapField { field, records } => {
-                writeln!(f, "{indent}mapField {field} (")?;
-                records.display(f, level + 1)?;
-                write!(f, "\n{indent})")?;
-            }
+            Expression::MapField { field, records } => d
+                .text("mapField")
+                .annotate(color_fn())
+                .append(d.space())
+                .append(d.text(field).double_quotes().annotate(color_lit()))
+                .append(d.space())
+                .append(records.to_doc(d).parens()),
         }
-
-        Ok(())
-    }
-
-    fn display_query(
-        &self,
-        op: &str,
-        db_query: &DbQuery,
-        f: &mut std::fmt::Formatter<'_>,
-        level: usize,
-    ) -> std::fmt::Result {
-        let indent = "  ".repeat(level);
-        let DbQuery { query, params } = db_query;
-        write!(f, "{indent}{op} (\n{indent}  {query}\n{indent}) with {params:?}")
-    }
-
-    fn display_function(
-        &self,
-        name: &str,
-        args: &[Expression],
-        f: &mut std::fmt::Formatter<'_>,
-        level: usize,
-    ) -> std::fmt::Result {
-        let indent = "  ".repeat(level);
-        write!(f, "{indent}{name} (")?;
-        for arg in args {
-            arg.display(f, level + 1)?;
-            writeln!(f, ",")?;
-        }
-        write!(f, ")")
     }
 }
 
 impl std::fmt::Display for Expression {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.display(f, 0)
+        self.pretty_print(false, 80).map_err(|_| std::fmt::Error)?.fmt(f)
     }
 }

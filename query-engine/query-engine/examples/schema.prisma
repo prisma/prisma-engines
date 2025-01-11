@@ -8,11 +8,17 @@ datasource db {
 }
 
 model User {
-  id    String  @id @default(cuid())
-  email String  @unique
-  name  String?
-  posts Post[]
-  val   Int?
+  id      String   @id @default(cuid())
+  email   String   @unique
+  name    String?
+  posts   Post[]
+  val     Int?
+  profile Profile?
+}
+
+model Profile {
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id])
 }
 
 model Post {

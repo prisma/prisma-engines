@@ -22,6 +22,7 @@ pub fn main() -> anyhow::Result<()> {
     //     select: {
     //         val: true,
     //         posts: true,
+    //         profile: true,
     //     }
     // })
     let query: JsonSingleQuery = serde_json::from_value(json!({
@@ -39,6 +40,12 @@ pub fn main() -> anyhow::Result<()> {
             "selection": {
                 "val": true,
                 "posts": {
+                    "arguments": {},
+                    "selection": {
+                        "$scalars": true
+                    }
+                },
+                "profile": {
                     "arguments": {},
                     "selection": {
                         "$scalars": true
@@ -61,7 +68,7 @@ pub fn main() -> anyhow::Result<()> {
 
     let expr = query_core::compiler::translate(graph)?;
 
-    println!("{expr}");
+    println!("{}", expr.pretty_print(true, 80)?);
 
     Ok(())
 }
