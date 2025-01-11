@@ -20,11 +20,6 @@ use crate::{
 use super::build_db_query;
 
 pub(crate) fn translate_read_query(query: ReadQuery, ctx: &Context<'_>) -> TranslateResult<Expression> {
-    let all_linking_fields = query
-        .nested_related_records_queries()
-        .flat_map(|rrq| rrq.parent_field.linking_fields())
-        .collect::<HashSet<_>>();
-
     Ok(match query {
         ReadQuery::RecordQuery(rq) => {
             let selected_fields = rq.selected_fields.without_relations().into_virtuals_last();
@@ -41,64 +36,12 @@ pub(crate) fn translate_read_query(query: ReadQuery, ctx: &Context<'_>) -> Trans
             .limit(1);
 
             let expr = Expression::Query(build_db_query(query)?);
+            let expr = Expression::Unique(Box::new(expr));
 
             if rq.nested.is_empty() {
-                return Ok(expr);
-            }
-
-            Expression::Let {
-                bindings: vec![Binding {
-                    name: "@parent".into(),
-                    expr,
-                }],
-                expr: Box::new(Expression::Let {
-                    bindings: all_linking_fields
-                        .into_iter()
-                        .map(|sf| Binding {
-                            name: format!("@parent.{}", sf.prisma_name().into_owned()),
-                            expr: Expression::MapField {
-                                field: sf.prisma_name().into_owned(),
-                                records: Box::new(Expression::Get { name: "@parent".into() }),
-                            },
-                        })
-                        .collect(),
-                    expr: Box::new(Expression::Join {
-                        parent: Box::new(Expression::Get { name: "@parent".into() }),
-                        children: rq
-                            .nested
-                            .into_iter()
-                            .filter_map(|nested| match nested {
-                                ReadQuery::RelatedRecordsQuery(rrq) => Some(rrq),
-                                _ => None,
-                            })
-                            .map(|rrq| -> TranslateResult<JoinExpression> {
-                                let parent_fields = rrq.parent_field.linking_fields();
-                                let child_fields = rrq.parent_field.related_field().linking_fields();
-
-                                let join_expr = parent_fields
-                                    .scalars()
-                                    .zip(child_fields.scalars())
-                                    .map(|(left, right)| (left.name().to_owned(), right.name().to_owned()))
-                                    .collect_vec();
-
-                                // nested.add_filter(Filter::Scalar(ScalarFilter {
-                                //     mode: QueryMode::Default,
-                                //     condition: ScalarCondition::Equals(ConditionValue::value(PrismaValue::placeholder(
-                                //         "parent_id".into(),
-                                //         PlaceholderType::String,
-                                //     ))),
-                                //     projection: ScalarProjection::Compound(referenced_fields),
-                                // }));
-                                let child_query = translate_read_query(ReadQuery::RelatedRecordsQuery(rrq), ctx)?;
-
-                                Ok(JoinExpression {
-                                    child: child_query,
-                                    on: join_expr,
-                                })
-                            })
-                            .try_collect()?,
-                    }),
-                }),
+                expr
+            } else {
+                add_inmemory_join(expr, rq.nested, ctx)?
             }
         }
 
@@ -119,10 +62,16 @@ pub(crate) fn translate_read_query(query: ReadQuery, ctx: &Context<'_>) -> Trans
 
             let expr = Expression::Query(build_db_query(query)?);
 
-            if needs_reversed_order {
+            let expr = if needs_reversed_order {
                 Expression::Reverse(Box::new(expr))
             } else {
                 expr
+            };
+
+            if mrq.nested.is_empty() {
+                expr
+            } else {
+                add_inmemory_join(expr, mrq.nested, ctx)?
             }
         }
 
@@ -135,6 +84,76 @@ pub(crate) fn translate_read_query(query: ReadQuery, ctx: &Context<'_>) -> Trans
         }
 
         _ => todo!(),
+    })
+}
+
+fn add_inmemory_join(parent: Expression, nested: Vec<ReadQuery>, ctx: &Context<'_>) -> TranslateResult<Expression> {
+    let all_linking_fields = nested
+        .iter()
+        .flat_map(|nested| match nested {
+            ReadQuery::RelatedRecordsQuery(rrq) => rrq.parent_field.linking_fields(),
+            _ => unreachable!(),
+        })
+        .collect::<HashSet<_>>();
+
+    let linking_fields_bindings = all_linking_fields
+        .into_iter()
+        .map(|sf| Binding {
+            name: format!("@parent${}", sf.prisma_name().into_owned()),
+            expr: Expression::MapField {
+                field: sf.prisma_name().into_owned(),
+                records: Box::new(Expression::Get { name: "@parent".into() }),
+            },
+        })
+        .collect();
+
+    let join_expressions = nested
+        .into_iter()
+        .filter_map(|nested| match nested {
+            ReadQuery::RelatedRecordsQuery(rrq) => Some(rrq),
+            _ => None,
+        })
+        .map(|rrq| -> TranslateResult<JoinExpression> {
+            let parent_field_name = rrq.parent_field.name().to_owned();
+            let parent_fields = rrq.parent_field.linking_fields();
+            let child_fields = rrq.parent_field.related_field().linking_fields();
+
+            let join_expr = parent_fields
+                .scalars()
+                .zip(child_fields.scalars())
+                .map(|(left, right)| (left.name().to_owned(), right.name().to_owned()))
+                .collect_vec();
+
+            // nested.add_filter(Filter::Scalar(ScalarFilter {
+            //     mode: QueryMode::Default,
+            //     condition: ScalarCondition::Equals(ConditionValue::value(PrismaValue::placeholder(
+            //         "parent_id".into(),
+            //         PlaceholderType::String,
+            //     ))),
+            //     projection: ScalarProjection::Compound(referenced_fields),
+            // }));
+            let child_query = translate_read_query(ReadQuery::RelatedRecordsQuery(rrq), ctx)?;
+
+            Ok(JoinExpression {
+                child: child_query,
+                on: join_expr,
+                parent_field: parent_field_name,
+            })
+        })
+        .try_collect()?;
+
+    Ok(Expression::Let {
+        bindings: vec![Binding {
+            name: "@parent".into(),
+            expr: parent,
+        }],
+        expr: Box::new(Expression::Let {
+            bindings: linking_fields_bindings,
+            expr: Box::new(Expression::Join {
+                parent: Box::new(Expression::Get { name: "@parent".into() }),
+                children: join_expressions,
+            }),
+        }),
     })
 }
 
@@ -159,20 +178,15 @@ fn build_read_one2m_query(rrq: RelatedRecordsQuery, ctx: &Context<'_>) -> Transl
 
     let expr = Expression::Query(build_db_query(query)?);
 
-    if needs_reversed_order {
-        Ok(Expression::Reverse(Box::new(expr)))
+    let expr = if needs_reversed_order {
+        Expression::Reverse(Box::new(expr))
     } else {
-        Ok(expr)
-    }
-}
+        expr
+    };
 
-fn collect_referenced_fields(nested_queries: &[ReadQuery]) -> HashSet<ScalarField> {
-    nested_queries
-        .iter()
-        .filter_map(|rq| match rq {
-            ReadQuery::RelatedRecordsQuery(rrq) => Some(rrq),
-            _ => None,
-        })
-        .flat_map(|rrq| rrq.parent_field.referenced_fields())
-        .collect()
+    if rrq.nested.is_empty() {
+        Ok(expr)
+    } else {
+        add_inmemory_join(expr, rrq.nested, ctx)
+    }
 }

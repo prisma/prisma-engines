@@ -22,6 +22,10 @@ fn color_lit() -> ColorSpec {
     ColorSpec::new().set_italic(true).set_fg(Some(Color::Green)).clone()
 }
 
+fn color_field() -> ColorSpec {
+    ColorSpec::new().set_bold(true).set_fg(Some(Color::Yellow)).clone()
+}
+
 pub(super) struct PrettyPrinter<'a, D> {
     allocator: &'a D,
 }
@@ -59,6 +63,19 @@ where
 
     fn var_name(&'a self, name: &'a str) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
         self.text(name).annotate(color_var())
+    }
+
+    fn field_name(&'a self, name: &'a str) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        self.text(name).annotate(color_field())
+    }
+
+    fn tuple(
+        &'a self,
+        subtrees: impl IntoIterator<Item = DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec>>,
+    ) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        self.intersperse(subtrees, self.text(",").append(self.softline()))
+            .align()
+            .parens()
     }
 
     fn query(&'a self, tag: &'static str, db_query: &'a DbQuery) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
@@ -185,24 +202,31 @@ where
             .append(
                 self.intersperse(
                     children.iter().map(|join| {
+                        let (left_fields, right_fields): (Vec<_>, Vec<_>) = join
+                            .on
+                            .iter()
+                            .map(|(l, r)| (self.field_name(l), self.field_name(r)))
+                            .unzip();
                         self.expression(&join.child)
                             .parens()
                             .append(self.space())
                             .append(self.keyword("on"))
                             .append(self.space())
-                            .append(self.intersperse(
-                                join.on.iter().map(|(l, r)| {
-                                    self.keyword("left")
-                                        .append(".")
-                                        .append(self.text(l))
-                                        .parens()
-                                        .append(self.space())
-                                        .append("=")
-                                        .append(self.space())
-                                        .append(self.keyword("right").append(".").append(self.text(r)).parens())
-                                }),
-                                self.text(", "),
-                            ))
+                            .append(
+                                self.keyword("left")
+                                    .append(".")
+                                    .append(self.tuple(left_fields))
+                                    .append(self.space())
+                                    .append("=")
+                                    .append(self.space())
+                                    .append(self.keyword("right"))
+                                    .append(".")
+                                    .append(self.tuple(right_fields)),
+                            )
+                            .append(self.space())
+                            .append(self.keyword("as"))
+                            .append(self.space())
+                            .append(self.field_name(&join.parent_field))
                     }),
                     self.text(",").append(self.line()),
                 )
@@ -214,7 +238,7 @@ where
         self.text("mapField")
             .annotate(color_fn())
             .append(self.space())
-            .append(self.text(field).double_quotes().annotate(color_lit()))
+            .append(self.field_name(field))
             .append(self.space())
             .append(self.expression(records).parens())
     }

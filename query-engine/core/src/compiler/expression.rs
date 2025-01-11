@@ -34,9 +34,11 @@ impl DbQuery {
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct JoinExpression {
     pub child: Expression,
     pub on: Vec<(String, String)>,
+    pub parent_field: String,
 }
 
 #[derive(Debug, Serialize)]
