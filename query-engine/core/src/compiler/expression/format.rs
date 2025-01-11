@@ -88,7 +88,7 @@ where
                     .annotate(color_lit()),
             )
             .append(self.line())
-            .append(self.keyword("with params"))
+            .append(self.keyword("params"))
             .append(self.space())
             .append(self.list(&db_query.params))
             .align()
