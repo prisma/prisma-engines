@@ -106,6 +106,7 @@ fn composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker<'_>) ->
         relation_from_fields: None,
         relation_to_fields: None,
         relation_on_delete: None,
+        relation_on_update: None,
         field_type: match field.r#type() {
             ScalarFieldType::CompositeType(ct) => field.walk(ct).name().to_owned(),
             ScalarFieldType::Enum(enm) => field.walk(enm).name().to_owned(),
@@ -210,6 +211,7 @@ fn scalar_field_to_dmmf(field: walkers::ScalarFieldWalker<'_>) -> Field {
         relation_from_fields: None,
         relation_to_fields: None,
         relation_on_delete: None,
+        relation_on_update: None,
         is_generated: Some(false),
         is_updated_at: Some(field.is_updated_at()),
         documentation: ast_field.documentation().map(ToOwned::to_owned),
@@ -245,6 +247,7 @@ fn relation_field_to_dmmf(field: walkers::RelationFieldWalker<'_>) -> Field {
                 .unwrap_or_default(),
         ),
         relation_on_delete: field.explicit_on_delete().map(|od| od.to_string()),
+        relation_on_update: field.explicit_on_update().map(|ou| ou.to_string()),
         is_generated: Some(false),
         is_updated_at: Some(false),
         documentation: ast_field.documentation().map(ToOwned::to_owned),
