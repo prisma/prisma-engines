@@ -2,8 +2,8 @@ use std::collections::HashSet;
 
 use itertools::Itertools;
 use query_structure::{
-    ConditionValue, Filter, ModelProjection, PlaceholderType, PrismaValue, QueryMode, RelationField, ScalarCondition,
-    ScalarField, ScalarFilter, ScalarProjection,
+    ConditionListValue, ConditionValue, Filter, ModelProjection, PlaceholderType, PrismaValue, QueryMode,
+    RelationField, ScalarCondition, ScalarField, ScalarFilter, ScalarProjection, SelectedField, SelectionResult,
 };
 use sql_query_connector::{
     context::Context, model_extensions::AsColumns, query_arguments_ext::QueryArgumentsExt, query_builder,
@@ -113,7 +113,7 @@ fn add_inmemory_join(parent: Expression, nested: Vec<ReadQuery>, ctx: &Context<'
             ReadQuery::RelatedRecordsQuery(rrq) => Some(rrq),
             _ => None,
         })
-        .map(|rrq| -> TranslateResult<JoinExpression> {
+        .map(|mut rrq| -> TranslateResult<JoinExpression> {
             let parent_field_name = rrq.parent_field.name().to_owned();
             let parent_fields = rrq.parent_field.linking_fields();
             let child_fields = rrq.parent_field.related_field().linking_fields();
@@ -124,14 +124,53 @@ fn add_inmemory_join(parent: Expression, nested: Vec<ReadQuery>, ctx: &Context<'
                 .map(|(left, right)| (left.name().to_owned(), right.name().to_owned()))
                 .collect_vec();
 
-            // nested.add_filter(Filter::Scalar(ScalarFilter {
-            //     mode: QueryMode::Default,
-            //     condition: ScalarCondition::Equals(ConditionValue::value(PrismaValue::placeholder(
-            //         "parent_id".into(),
-            //         PlaceholderType::String,
-            //     ))),
-            //     projection: ScalarProjection::Compound(referenced_fields),
-            // }));
+            // let linking_placeholders = parent_fields
+            //     .scalars()
+            //     .map(|sf| {
+            //         (
+            //             sf.clone(),
+            //             PrismaValue::placeholder(
+            //                 format!("@parent${}", sf.name()),
+            //                 sf.type_identifier().to_placeholder_type(),
+            //             ),
+            //         )
+            //     })
+            //     .collect::<Vec<_>>();
+            //
+            // // If constant values were already provided for some of the fields, merge the
+            // // placeholders for the missing fields. Otherwise, assign new `parent_results`.
+            // if let Some(parent_results) = &mut rrq.parent_results {
+            //     for result in parent_results {
+            //         for (sf, value) in &linking_placeholders {
+            //             let field = SelectedField::from(sf.clone());
+            //             if result.get(&field).is_none() {
+            //                 result.add((field, value.clone()));
+            //             }
+            //         }
+            //     }
+            // } else {
+            //     rrq.parent_results = Some(vec![SelectionResult::new(linking_placeholders)]);
+            // }
+
+            for (parent_field, child_field) in parent_fields.scalars().zip(child_fields.scalars()) {
+                let placeholder = PrismaValue::placeholder(
+                    format!("@parent${}", parent_field.name()),
+                    parent_field.type_identifier().to_placeholder_type(),
+                );
+
+                let condition = if parent.r#type().is_list() {
+                    ScalarCondition::In(ConditionListValue::list(vec![placeholder]))
+                } else {
+                    ScalarCondition::Equals(ConditionValue::value(placeholder))
+                };
+
+                rrq.add_filter(Filter::Scalar(ScalarFilter {
+                    condition,
+                    projection: ScalarProjection::Single(child_field.clone()),
+                    mode: QueryMode::Default,
+                }));
+            }
+
             let child_query = translate_read_query(ReadQuery::RelatedRecordsQuery(rrq), ctx)?;
 
             Ok(JoinExpression {

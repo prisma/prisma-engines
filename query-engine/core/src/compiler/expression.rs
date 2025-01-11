@@ -91,6 +91,20 @@ pub enum Expression {
     MapField { field: String, records: Box<Expression> },
 }
 
+#[derive(Debug, Clone)]
+pub enum ExpressionType {
+    Scalar,
+    Record,
+    List(Box<ExpressionType>),
+    Dynamic,
+}
+
+impl ExpressionType {
+    pub fn is_list(&self) -> bool {
+        matches!(self, ExpressionType::List(_) | ExpressionType::Dynamic)
+    }
+}
+
 #[derive(thiserror::Error, Debug)]
 pub enum PrettyPrintError {
     #[error("{0}")]
@@ -113,6 +127,29 @@ impl Expression {
 
         doc.render_colored(width, &mut buf)?;
         Ok(String::from_utf8(buf.into_inner())?)
+    }
+
+    pub fn r#type(&self) -> ExpressionType {
+        match self {
+            Expression::Seq(vec) => vec.iter().last().map_or(ExpressionType::Scalar, Expression::r#type),
+            Expression::Get { .. } => ExpressionType::Dynamic,
+            Expression::Let { expr, .. } => expr.r#type(),
+            Expression::GetFirstNonEmpty { .. } => ExpressionType::Dynamic,
+            Expression::Query(_) => ExpressionType::List(Box::new(ExpressionType::Record)),
+            Expression::Execute(_) => ExpressionType::Scalar,
+            Expression::Reverse(expression) => expression.r#type(),
+            Expression::Sum(_) => ExpressionType::Scalar,
+            Expression::Concat(vec) => ExpressionType::List(Box::new(
+                vec.iter().last().map_or(ExpressionType::Scalar, Expression::r#type),
+            )),
+            Expression::Unique(expression) => match expression.r#type() {
+                ExpressionType::List(inner) => inner.as_ref().clone(),
+                _ => expression.r#type(),
+            },
+            Expression::Required(expression) => expression.r#type(),
+            Expression::Join { parent, .. } => parent.r#type(),
+            Expression::MapField { records, .. } => records.r#type(),
+        }
     }
 }
 
