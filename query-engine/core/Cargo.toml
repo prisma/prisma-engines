@@ -23,6 +23,7 @@ petgraph = "0.4"
 query-structure = { path = "../query-structure", features = [
     "default_generators",
 ] }
+pretty = { version = "0.12", features = ["termcolor"] }
 prisma-metrics = { path = "../../libs/metrics", optional = true }
 serde.workspace = true
 serde_json.workspace = true
