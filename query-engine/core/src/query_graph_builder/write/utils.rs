@@ -229,6 +229,7 @@ where
         record_filter,
         args,
         selected_fields: None,
+        limit: None,
     };
 
     graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(ur)))
@@ -618,6 +619,7 @@ pub fn emulate_on_delete_set_null(
         record_filter: RecordFilter::empty(),
         args: WriteArgs::new(child_update_args, crate::executor::get_request_now()),
         selected_fields: None,
+        limit: None,
     });
 
     let set_null_dependents_node = graph.create_node(Query::Write(set_null_query));
@@ -770,6 +772,7 @@ pub fn emulate_on_update_set_null(
         record_filter: RecordFilter::empty(),
         args: WriteArgs::new(child_update_args, crate::executor::get_request_now()),
         selected_fields: None,
+        limit: None,
     });
 
     let set_null_dependents_node = graph.create_node(Query::Write(set_null_query));
@@ -1095,6 +1098,7 @@ pub fn emulate_on_update_cascade(
             crate::executor::get_request_now(),
         ),
         selected_fields: None,
+        limit: None,
     });
 
     let update_dependents_node = graph.create_node(Query::Write(update_query));
