@@ -296,7 +296,7 @@ fn finalize_objects(
                         Ok((parent, Item::Ref(ItemRef::new(first))))
                     } else if items.is_empty() && opt {
                         Ok((parent, Item::Ref(ItemRef::new(Item::Value(PrismaValue::Null)))))
-                    } else if items.is_empty() && opt {
+                    } else if items.is_empty() && !opt {
                         Err(CoreError::null_serialization_error(&name))
                     } else {
                         Ok((parent, Item::Ref(ItemRef::new(items.pop().unwrap()))))
