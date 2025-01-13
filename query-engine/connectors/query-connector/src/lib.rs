@@ -20,6 +20,6 @@ pub type Result<T> = std::result::Result<T, error::ConnectorError>;
 /// However when we updating any records we want to return an empty array if zero items were updated
 #[derive(PartialEq)]
 pub enum UpdateType {
-    Many,
+    Many { limit: Option<usize> },
     One,
 }

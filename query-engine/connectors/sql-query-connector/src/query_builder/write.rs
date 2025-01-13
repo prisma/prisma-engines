@@ -1,3 +1,4 @@
+use crate::limit::wrap_with_limit_subquery_if_needed;
 use crate::{model_extensions::*, sql_trace::SqlTraceComment, Context};
 use connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
 use quaint::ast::*;
@@ -226,32 +227,13 @@ pub(crate) fn delete_returning(
 pub(crate) fn delete_many_from_filter(
     model: &Model,
     filter_condition: ConditionTree<'static>,
-    limit: Option<i64>,
+    limit: Option<usize>,
     ctx: &Context<'_>,
 ) -> Query<'static> {
-    let condition = if let Some(limit) = limit {
-        let columns = model
-            .primary_identifier()
-            .as_scalar_fields()
-            .expect("primary identifier must contain scalar fields")
-            .into_iter()
-            .map(|f| f.as_column(ctx))
-            .collect::<Vec<_>>();
-
-        ConditionTree::from(
-            Row::from(columns.clone()).in_selection(
-                Select::from_table(model.as_table(ctx))
-                    .columns(columns)
-                    .so_that(filter_condition)
-                    .limit(limit as usize),
-            ),
-        )
-    } else {
-        filter_condition
-    };
+    let filter_condition = wrap_with_limit_subquery_if_needed(model, filter_condition, limit, ctx);
 
     Delete::from_table(model.as_table(ctx))
-        .so_that(condition)
+        .so_that(filter_condition)
         .add_traceparent(ctx.traceparent)
         .into()
 }
@@ -260,7 +242,7 @@ pub(crate) fn delete_many_from_ids_and_filter(
     model: &Model,
     ids: &[&SelectionResult],
     filter_condition: ConditionTree<'static>,
-    limit: Option<i64>,
+    limit: Option<usize>,
     ctx: &Context<'_>,
 ) -> Vec<Query<'static>> {
     let columns: Vec<_> = ModelProjection::from(model.primary_identifier())

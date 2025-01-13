@@ -127,6 +127,7 @@ impl WriteOperations for MongoDbTransaction<'_> {
         model: &Model,
         record_filter: connector_interface::RecordFilter,
         args: connector_interface::WriteArgs,
+        limit: Option<usize>,
         _traceparent: Option<TraceParent>,
     ) -> connector_interface::Result<usize> {
         catch(async move {
@@ -136,7 +137,7 @@ impl WriteOperations for MongoDbTransaction<'_> {
                 model,
                 record_filter,
                 args,
-                UpdateType::Many,
+                UpdateType::Many { limit },
             )
             .await?;
             Ok(result.len())
@@ -150,6 +151,7 @@ impl WriteOperations for MongoDbTransaction<'_> {
         _record_filter: connector_interface::RecordFilter,
         _args: connector_interface::WriteArgs,
         _selected_fields: FieldSelection,
+        _limit: Option<usize>,
         _traceparent: Option<TraceParent>,
     ) -> connector_interface::Result<ManyRecords> {
         unimplemented!()
@@ -191,7 +193,7 @@ impl WriteOperations for MongoDbTransaction<'_> {
         &mut self,
         model: &Model,
         record_filter: connector_interface::RecordFilter,
-        limit: Option<i64>,
+        limit: Option<usize>,
         _traceparent: Option<TraceParent>,
     ) -> connector_interface::Result<usize> {
         catch(write::delete_records(

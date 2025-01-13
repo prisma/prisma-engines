@@ -307,7 +307,14 @@ async fn update_many(
 ) -> InterpretationResult<QueryResult> {
     if let Some(selected_fields) = q.selected_fields {
         let records = tx
-            .update_records_returning(&q.model, q.record_filter, q.args, selected_fields.fields, traceparent)
+            .update_records_returning(
+                &q.model,
+                q.record_filter,
+                q.args,
+                selected_fields.fields,
+                q.limit,
+                traceparent,
+            )
             .await?;
 
         let nested: Vec<QueryResult> =
@@ -325,7 +332,7 @@ async fn update_many(
         Ok(QueryResult::RecordSelection(Some(Box::new(selection))))
     } else {
         let affected_records = tx
-            .update_records(&q.model, q.record_filter, q.args, traceparent)
+            .update_records(&q.model, q.record_filter, q.args, q.limit, traceparent)
             .await?;
 
         Ok(QueryResult::Count(affected_records))
