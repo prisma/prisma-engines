@@ -10,13 +10,17 @@
   "scripts": {
     "build": "tsup ./src/testd-qe.ts ./src/bench.ts --format esm --dts",
     "test:qe": "node --import tsx ./src/testd-qe.ts",
+    "demo:se": "node --import tsx ./src/demo-se.ts",
     "clean:d1": "rm -rf ../../connector-test-kit-rs/query-engine-tests/.wrangler"
   },
   "tsup": {
     "external": [
       "../../../query-engine-wasm/pkg/postgresql/query_engine_bg.js",
       "../../../query-engine-wasm/pkg/mysql/query_engine_bg.js",
-      "../../../query-engine-wasm/pkg/sqlite/query_engine_bg.js"
+      "../../../query-engine-wasm/pkg/sqlite/query_engine_bg.js",
+      "../../../schema-engine-wasm/pkg/postgresql/schema_engine_bg.js",
+      "../../../schema-engine-wasm/pkg/mysql/schema_engine_bg.js",
+      "../../../schema-engine-wasm/pkg/sqlite/schema_engine_bg.js"
     ]
   },
   "keywords": [],
