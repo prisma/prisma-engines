@@ -58,6 +58,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Cache Docker images.
+        uses: ScribeMD/docker-cache@0.5.0
+        with:
+          key: docker-${{ matrix.database.name }}-${{hashFiles('docker-compose.yaml')}}
+
       - name: "Start ${{ matrix.database.name }} (${{ matrix.engine_protocol }})"
         run: make start-${{ matrix.database.name }}
 

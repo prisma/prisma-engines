@@ -47,6 +47,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Cache Docker images.
+        uses: ScribeMD/docker-cache@0.5.0
+        with:
+          key: docker-pg-bench-${{hashFiles('docker-compose.yaml')}}
+
       - name: Extract Branch Name
         run: |
           echo "Extracting branch name from: $(git show -s --format=%s)"
