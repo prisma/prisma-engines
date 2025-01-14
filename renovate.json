@@ -44,10 +44,8 @@
     {
       "groupName": "Prisma Driver Adapters",
       "matchPackageNames": [
-        "@prisma/driver-adapter-utils"
-      ],
-      "matchPackagePrefixes": [
-        "@prisma/adapter"
+        "@prisma/driver-adapter-utils",
+        "@prisma/adapter{/,}**"
       ],
       "schedule": [
         "at any time"
