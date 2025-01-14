@@ -41,19 +41,19 @@ where
 
     pub fn expression(&'a self, expression: &'a Expression) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
         match expression {
-            Expression::Seq(vec) => self.seq(&vec),
-            Expression::Get { name } => self.get(&name),
-            Expression::Let { bindings, expr } => self.r#let(&bindings, &expr),
-            Expression::GetFirstNonEmpty { names } => self.get_first_non_empty(&names),
-            Expression::Query(db_query) => self.query("query", &db_query),
-            Expression::Execute(db_query) => self.query("execute", &db_query),
-            Expression::Reverse(expression) => self.unary_function("reverse", &expression),
-            Expression::Sum(vec) => self.function("sum", &vec),
-            Expression::Concat(vec) => self.function("concat", &vec),
+            Expression::Seq(vec) => self.seq(vec),
+            Expression::Get { name } => self.get(name),
+            Expression::Let { bindings, expr } => self.r#let(bindings, expr),
+            Expression::GetFirstNonEmpty { names } => self.get_first_non_empty(names),
+            Expression::Query(db_query) => self.query("query", db_query),
+            Expression::Execute(db_query) => self.query("execute", db_query),
+            Expression::Reverse(expression) => self.unary_function("reverse", expression),
+            Expression::Sum(vec) => self.function("sum", vec),
+            Expression::Concat(vec) => self.function("concat", vec),
             Expression::Unique(expression) => self.unary_function("unique", expression),
             Expression::Required(expression) => self.unary_function("required", expression),
-            Expression::Join { parent, children } => self.join(&parent, &children),
-            Expression::MapField { field, records } => self.map_field(&field, &records),
+            Expression::Join { parent, children } => self.join(parent, children),
+            Expression::MapField { field, records } => self.map_field(field, records),
         }
     }
 
@@ -116,7 +116,7 @@ where
                     })
                     .parens(),
             ),
-            PrismaValue::List(values) => self.list(&values),
+            PrismaValue::List(values) => self.list(values),
             _ => self
                 .keyword("const")
                 .append(self.text(format!("{value:?}")).annotate(color_lit()).parens()),
