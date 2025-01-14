@@ -42,7 +42,7 @@ pub trait Transaction: ConnectionLike {
     async fn create_savepoint(&mut self) -> crate::Result<()>;
     async fn release_savepoint(&mut self) -> crate::Result<()>;
     async fn rollback_to_savepoint(&mut self) -> crate::Result<()>;
-    fn depth(&self) -> u32;
+    fn depth(&self) -> i32;
 
     async fn version(&self) -> Option<String>;
 

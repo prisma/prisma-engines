@@ -63,7 +63,7 @@ impl Transaction for MongoDbTransaction<'_> {
         Ok(())
     }
 
-    fn depth(&self) -> u32 {
+    fn depth(&self) -> i32 {
         0
     }
 

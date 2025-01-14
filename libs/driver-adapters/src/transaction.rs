@@ -1,6 +1,6 @@
 use std::{
     borrow::Cow,
-    sync::atomic::{AtomicU32, Ordering},
+    sync::atomic::{AtomicI32, Ordering},
 };
 
 use async_trait::async_trait;
@@ -19,7 +19,7 @@ use crate::{JsObject, JsResult};
 pub(crate) struct JsTransaction {
     tx_proxy: TransactionProxy,
     inner: JsBaseQueryable,
-    pub depth: AtomicU32,
+    pub depth: AtomicI32,
 }
 
 impl JsTransaction {
@@ -27,7 +27,7 @@ impl JsTransaction {
         Self {
             inner,
             tx_proxy,
-            depth: AtomicU32::new(0),
+            depth: AtomicI32::new(0),
         }
     }
 
@@ -47,11 +47,14 @@ impl JsTransaction {
 
 #[async_trait]
 impl QuaintTransaction for JsTransaction {
-    fn depth(&self) -> u32 {
+    fn depth(&self) -> i32 {
         self.depth.load(Ordering::Relaxed)
     }
 
     async fn begin(&self) -> quaint::Result<()> {
+        // increment of this gauge is done in DriverProxy::startTransaction
+        gauge!("prisma_client_queries_active").decrement(1.0);
+
         self.depth.fetch_add(1, Ordering::Relaxed);
 
         let begin_stmt = self.begin_statement();
@@ -63,11 +66,16 @@ impl QuaintTransaction for JsTransaction {
             self.inner.raw_cmd(begin_stmt).await?;
         }
 
-        UnsafeFuture(self.tx_proxy.begin()).await?;
-        Ok(())
+        UnsafeFuture(self.tx_proxy.begin()).await
     }
 
     async fn commit(&self) -> quaint::Result<()> {
+        // increment of this gauge is done in DriverProxy::startTransaction
+        gauge!("prisma_client_queries_active").decrement(1.0);
+
+        // Reset the depth to 0 on commit.
+        self.depth.store(0, Ordering::Relaxed);
+
         let commit_stmt = "COMMIT";
 
         if self.options().use_phantom_query {
@@ -77,13 +85,17 @@ impl QuaintTransaction for JsTransaction {
             self.inner.raw_cmd(commit_stmt).await?;
         }
 
-        UnsafeFuture(self.tx_proxy.commit()).await?;
+        let _ = UnsafeFuture(self.tx_proxy.commit()).await;
 
-        self.depth.store(0, Ordering::Relaxed);
         Ok(())
     }
 
     async fn rollback(&self) -> quaint::Result<()> {
+        // increment of this gauge is done in DriverProxy::startTransaction
+        gauge!("prisma_client_queries_active").decrement(1.0);
+
+        self.depth.fetch_sub(1, Ordering::Relaxed);
+
         let rollback_stmt = "ROLLBACK";
 
         if self.options().use_phantom_query {
@@ -93,51 +105,50 @@ impl QuaintTransaction for JsTransaction {
             self.inner.raw_cmd(rollback_stmt).await?;
         }
 
-        UnsafeFuture(self.tx_proxy.rollback()).await?;
+        let _ = UnsafeFuture(self.tx_proxy.rollback()).await;
 
-        self.depth.fetch_sub(1, Ordering::Relaxed);
         Ok(())
     }
 
     async fn create_savepoint(&self) -> quaint::Result<()> {
         let new_depth = self.depth.fetch_add(1, Ordering::Relaxed) + 1;
 
-        let stmt = self.create_savepoint_statement(new_depth);
+        let create_savepoint_statement = self.create_savepoint_statement(new_depth as u32);
         if self.options().use_phantom_query {
-            let phantom = JsBaseQueryable::phantom_query_message(stmt.as_ref());
+            let phantom = JsBaseQueryable::phantom_query_message(&create_savepoint_statement);
             self.raw_phantom_cmd(phantom.as_str()).await?;
         } else {
-            self.inner.raw_cmd(stmt.as_ref()).await?;
+            self.inner.raw_cmd(&create_savepoint_statement).await?;
         }
 
         Ok(())
     }
 
     async fn release_savepoint(&self) -> quaint::Result<()> {
-        let depth_val = self.depth.load(Ordering::Relaxed);
-        let stmt = self.release_savepoint_statement(depth_val);
+        let depth_val = self.depth.fetch_sub(1, Ordering::Relaxed);
+
+        let release_savepoint_statement = self.release_savepoint_statement(depth_val as u32);
         if self.options().use_phantom_query {
-            let phantom = JsBaseQueryable::phantom_query_message(stmt.as_ref());
+            let phantom = JsBaseQueryable::phantom_query_message(&release_savepoint_statement);
             self.raw_phantom_cmd(phantom.as_str()).await?;
         } else {
-            self.inner.raw_cmd(stmt.as_ref()).await?;
+            self.inner.raw_cmd(&release_savepoint_statement).await?;
         }
 
-        self.depth.fetch_sub(1, Ordering::Relaxed);
         Ok(())
     }
 
     async fn rollback_to_savepoint(&self) -> quaint::Result<()> {
-        let depth_val = self.depth.load(Ordering::Relaxed);
-        let stmt = self.rollback_to_savepoint_statement(depth_val);
+        let depth_val = self.depth.fetch_sub(1, Ordering::Relaxed);
+
+        let rollback_to_savepoint_statement = self.rollback_to_savepoint_statement(depth_val as u32);
         if self.options().use_phantom_query {
-            let phantom = JsBaseQueryable::phantom_query_message(stmt.as_ref());
+            let phantom = JsBaseQueryable::phantom_query_message(&rollback_to_savepoint_statement);
             self.raw_phantom_cmd(phantom.as_str()).await?;
         } else {
-            self.inner.raw_cmd(stmt.as_ref()).await?;
+            self.inner.raw_cmd(&rollback_to_savepoint_statement).await?;
         }
 
-        self.depth.fetch_sub(1, Ordering::Relaxed);
         Ok(())
     }
 
@@ -239,3 +250,4 @@ impl ::napi::bindgen_prelude::FromNapiValue for JsTransaction {
         Ok(Self::new(JsBaseQueryable::new(common_proxy), tx_proxy))
     }
 }
+
