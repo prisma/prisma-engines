@@ -2,8 +2,7 @@ use std::collections::HashSet;
 
 use itertools::Itertools;
 use query_structure::{
-    ConditionListValue, ConditionValue, Filter, ModelProjection, PlaceholderType, PrismaValue, QueryMode,
-    RelationField, ScalarCondition, ScalarField, ScalarFilter, ScalarProjection, SelectedField, SelectionResult,
+    ConditionValue, Filter, ModelProjection, PrismaValue, QueryMode, ScalarCondition, ScalarFilter, ScalarProjection,
 };
 use sql_query_connector::{
     context::Context, model_extensions::AsColumns, query_arguments_ext::QueryArgumentsExt, query_builder,
@@ -123,34 +122,6 @@ fn add_inmemory_join(parent: Expression, nested: Vec<ReadQuery>, ctx: &Context<'
                 .zip(child_fields.scalars())
                 .map(|(left, right)| (left.name().to_owned(), right.name().to_owned()))
                 .collect_vec();
-
-            // let linking_placeholders = parent_fields
-            //     .scalars()
-            //     .map(|sf| {
-            //         (
-            //             sf.clone(),
-            //             PrismaValue::placeholder(
-            //                 format!("@parent${}", sf.name()),
-            //                 sf.type_identifier().to_placeholder_type(),
-            //             ),
-            //         )
-            //     })
-            //     .collect::<Vec<_>>();
-            //
-            // // If constant values were already provided for some of the fields, merge the
-            // // placeholders for the missing fields. Otherwise, assign new `parent_results`.
-            // if let Some(parent_results) = &mut rrq.parent_results {
-            //     for result in parent_results {
-            //         for (sf, value) in &linking_placeholders {
-            //             let field = SelectedField::from(sf.clone());
-            //             if result.get(&field).is_none() {
-            //                 result.add((field, value.clone()));
-            //             }
-            //         }
-            //     }
-            // } else {
-            //     rrq.parent_results = Some(vec![SelectionResult::new(linking_placeholders)]);
-            // }
 
             for (parent_field, child_field) in parent_fields.scalars().zip(child_fields.scalars()) {
                 let placeholder = PrismaValue::placeholder(
