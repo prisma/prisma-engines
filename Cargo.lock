@@ -5134,7 +5134,6 @@ name = "sql-query-builder"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "indexmap 2.2.2",
  "itertools 0.12.0",
  "prisma-value",
  "psl",
