@@ -1,8 +1,7 @@
 use crate::constants::*;
 
 use bson::{doc, Bson, Document};
-use connector_interface::AggregationSelection;
-use query_structure::{AggregationFilter, Filter, ScalarFieldRef};
+use query_structure::{AggregationFilter, AggregationSelection, Filter, ScalarFieldRef};
 use std::collections::HashSet;
 
 /// Represents a `$group` aggregation stage.

@@ -1,17 +1,12 @@
 use super::read::get_single_record;
 
-use crate::column_metadata::{self, ColumnMetadata};
-use crate::filter::FilterBuilder;
-use crate::model_extensions::AsColumns;
-use crate::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
 use crate::row::ToSqlRow;
-use crate::{Context, QueryExt, Queryable};
+use crate::{QueryExt, Queryable};
 
-use crate::limit::wrap_with_limit_subquery_if_needed;
-use connector_interface::*;
 use itertools::Itertools;
 use quaint::ast::*;
 use query_structure::*;
+use sql_query_builder::{column_metadata, limit, write, AsColumns, ColumnMetadata, Context, FilterBuilder};
 
 /// Performs an update with an explicit selection set.
 /// This function is called for connectors that supports the `UpdateReturning` capability.
@@ -34,7 +29,7 @@ pub(crate) async fn update_one_with_selection(
 
     let cond = FilterBuilder::without_top_level_joins().visit_filter(build_update_one_filter(record_filter), ctx);
 
-    let update = build_update_and_set_query(model, args, Some(&selected_fields), ctx).so_that(cond);
+    let update = write::build_update_and_set_query(model, args, Some(&selected_fields), ctx).so_that(cond);
 
     let field_names: Vec<_> = selected_fields.db_names().collect();
     let idents = selected_fields.type_identifiers_with_arities();
@@ -107,8 +102,8 @@ pub(super) async fn update_many_from_filter(
     limit: Option<usize>,
     ctx: &Context<'_>,
 ) -> crate::Result<Query<'static>> {
-    let update = build_update_and_set_query(model, args, None, ctx);
-    let filter_condition = wrap_with_limit_subquery_if_needed(
+    let update = write::build_update_and_set_query(model, args, None, ctx);
+    let filter_condition = limit::wrap_with_limit_subquery_if_needed(
         model,
         FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter, ctx),
         limit,
@@ -144,10 +139,10 @@ pub(super) async fn update_many_from_ids_and_filter(
     }
 
     let updates = {
-        let update = build_update_and_set_query(model, args, selected_fields, ctx);
+        let update = write::build_update_and_set_query(model, args, selected_fields, ctx);
         let ids: Vec<&SelectionResult> = ids.iter().take(limit.unwrap_or(usize::MAX)).collect();
 
-        chunk_update_with_ids(update, model, &ids, filter_condition, ctx)?
+        write::chunk_update_with_ids(update, model, &ids, filter_condition, ctx)
     };
 
     Ok((updates, ids))

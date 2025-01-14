@@ -5,9 +5,7 @@ use crate::{
     MongoDbTransaction,
 };
 use async_trait::async_trait;
-use connector_interface::{
-    Connection, ConnectionLike, ReadOperations, Transaction, UpdateType, WriteArgs, WriteOperations,
-};
+use connector_interface::{Connection, ConnectionLike, ReadOperations, Transaction, UpdateType, WriteOperations};
 use mongodb::{ClientSession, Database};
 use query_structure::{prelude::*, RelationLoadStrategy, SelectionResult};
 use std::collections::HashMap;
@@ -55,7 +53,7 @@ impl WriteOperations for MongoDbConnection {
     async fn create_record(
         &mut self,
         model: &Model,
-        args: WriteArgs,
+        args: query_structure::WriteArgs,
         // The field selection on a create is never used on MongoDB as it cannot return more than the ID.
         _selected_fields: FieldSelection,
         _traceparent: Option<TraceParent>,
@@ -66,7 +64,7 @@ impl WriteOperations for MongoDbConnection {
     async fn create_records(
         &mut self,
         model: &Model,
-        args: Vec<WriteArgs>,
+        args: Vec<query_structure::WriteArgs>,
         skip_duplicates: bool,
         _traceparent: Option<TraceParent>,
     ) -> connector_interface::Result<usize> {
@@ -83,7 +81,7 @@ impl WriteOperations for MongoDbConnection {
     async fn create_records_returning(
         &mut self,
         _model: &Model,
-        _args: Vec<WriteArgs>,
+        _args: Vec<query_structure::WriteArgs>,
         _skip_duplicates: bool,
         _selected_fields: FieldSelection,
         _traceparent: Option<TraceParent>,
@@ -94,8 +92,8 @@ impl WriteOperations for MongoDbConnection {
     async fn update_records(
         &mut self,
         model: &Model,
-        record_filter: connector_interface::RecordFilter,
-        args: WriteArgs,
+        record_filter: query_structure::RecordFilter,
+        args: query_structure::WriteArgs,
         limit: Option<usize>,
         _traceparent: Option<TraceParent>,
     ) -> connector_interface::Result<usize> {
@@ -118,8 +116,8 @@ impl WriteOperations for MongoDbConnection {
     async fn update_records_returning(
         &mut self,
         _model: &Model,
-        _record_filter: connector_interface::RecordFilter,
-        _args: WriteArgs,
+        _record_filter: query_structure::RecordFilter,
+        _args: query_structure::WriteArgs,
         _selected_fields: FieldSelection,
         _limit: Option<usize>,
         _traceparent: Option<TraceParent>,
@@ -130,8 +128,8 @@ impl WriteOperations for MongoDbConnection {
     async fn update_record(
         &mut self,
         model: &Model,
-        record_filter: connector_interface::RecordFilter,
-        args: WriteArgs,
+        record_filter: query_structure::RecordFilter,
+        args: query_structure::WriteArgs,
         selected_fields: Option<FieldSelection>,
         _traceparent: Option<TraceParent>,
     ) -> connector_interface::Result<Option<SingleRecord>> {
@@ -163,7 +161,7 @@ impl WriteOperations for MongoDbConnection {
     async fn delete_records(
         &mut self,
         model: &Model,
-        record_filter: connector_interface::RecordFilter,
+        record_filter: query_structure::RecordFilter,
         limit: Option<usize>,
         _traceparent: Option<TraceParent>,
     ) -> connector_interface::Result<usize> {
@@ -180,7 +178,7 @@ impl WriteOperations for MongoDbConnection {
     async fn delete_record(
         &mut self,
         model: &Model,
-        record_filter: connector_interface::RecordFilter,
+        record_filter: query_structure::RecordFilter,
         selected_fields: FieldSelection,
         _traceparent: Option<TraceParent>,
     ) -> connector_interface::Result<SingleRecord> {
@@ -314,7 +312,7 @@ impl ReadOperations for MongoDbConnection {
         &mut self,
         model: &Model,
         query_arguments: query_structure::QueryArguments,
-        selections: Vec<connector_interface::AggregationSelection>,
+        selections: Vec<query_structure::AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
         having: Option<query_structure::Filter>,
         _traceparent: Option<TraceParent>,

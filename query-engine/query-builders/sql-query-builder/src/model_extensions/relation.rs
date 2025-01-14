@@ -5,7 +5,7 @@ use crate::{
 use quaint::{ast::Table, prelude::Column};
 use query_structure::{walkers, ModelProjection, Relation, RelationField};
 
-pub(crate) trait RelationFieldExt {
+pub trait RelationFieldExt {
     fn m2m_columns(&self, ctx: &Context<'_>) -> Vec<Column<'static>>;
     fn join_columns(&self, ctx: &Context<'_>) -> ColumnIterator;
     fn identifier_columns(&self, ctx: &Context<'_>) -> ColumnIterator;

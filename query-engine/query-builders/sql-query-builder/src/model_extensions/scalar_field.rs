@@ -109,26 +109,6 @@ impl ScalarFieldExt for ScalarField {
     }
 }
 
-/// Attempts to convert a PrismaValue to a database value without any additional type information.
-/// Can't reliably map Null values.
-pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
-    match pv {
-        PrismaValue::String(s) => s.into(),
-        PrismaValue::Float(f) => f.into(),
-        PrismaValue::Boolean(b) => b.into(),
-        PrismaValue::DateTime(d) => d.with_timezone(&Utc).into(),
-        PrismaValue::Enum(e) => e.into(),
-        PrismaValue::Int(i) => i.into(),
-        PrismaValue::BigInt(i) => i.into(),
-        PrismaValue::Uuid(u) => u.to_string().into(),
-        PrismaValue::List(l) => Value::array(l.into_iter().map(convert_lossy)),
-        PrismaValue::Json(s) => Value::json(serde_json::from_str(&s).unwrap()),
-        PrismaValue::Bytes(b) => Value::bytes(b),
-        PrismaValue::Null => Value::null_int32(), // Can't tell which type the null is supposed to be.
-        PrismaValue::Object(_) => unimplemented!(),
-    }
-}
-
 fn parse_scalar_length(sf: &ScalarField) -> Option<TypeDataLength> {
     sf.native_type()
         .and_then(|nt| nt.args().into_iter().next())

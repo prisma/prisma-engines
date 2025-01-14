@@ -7,16 +7,16 @@ pub use visitor::*;
 
 use crate::{context::Context, join_utils::AliasedJoin};
 
-pub(crate) struct FilterBuilder {}
+pub struct FilterBuilder {}
 pub(crate) struct FilterBuilderWithJoins {}
-pub(crate) struct FilterBuilderWithoutJoins {}
+pub struct FilterBuilderWithoutJoins {}
 
 impl FilterBuilder {
     pub(crate) fn with_top_level_joins() -> FilterBuilderWithJoins {
         FilterBuilderWithJoins {}
     }
 
-    pub(crate) fn without_top_level_joins() -> FilterBuilderWithoutJoins {
+    pub fn without_top_level_joins() -> FilterBuilderWithoutJoins {
         FilterBuilderWithoutJoins {}
     }
 }
@@ -34,7 +34,7 @@ impl FilterBuilderWithJoins {
 
 impl FilterBuilderWithoutJoins {
     /// Visits a filter without any top-level joins. Can be safely used in any context.
-    pub(crate) fn visit_filter(&self, filter: Filter, ctx: &Context) -> ConditionTree<'static> {
+    pub fn visit_filter(&self, filter: Filter, ctx: &Context) -> ConditionTree<'static> {
         let (cond, _) = FilterVisitor::without_top_level_joins().visit_filter(filter, ctx);
 
         cond

@@ -1,9 +1,8 @@
-use crate::error::{ConnectorError, ErrorKind};
-use indexmap::{map::Keys, IndexMap};
-use query_structure::{
+use crate::{
     CompositeFieldRef, Field, Filter, Model, ModelProjection, PrismaValue, ScalarFieldRef, SelectedField,
     SelectionResult,
 };
+use indexmap::{map::Keys, IndexMap};
 use std::{borrow::Borrow, convert::TryInto, ops::Deref};
 
 /// WriteArgs represent data to be written to an underlying data source.
@@ -334,18 +333,19 @@ impl From<(&SelectedField, PrismaValue)> for WriteOperation {
 }
 
 impl TryInto<PrismaValue> for WriteOperation {
-    type Error = ConnectorError;
+    type Error = UnexpectedWriteOperation;
 
     fn try_into(self) -> Result<PrismaValue, Self::Error> {
         match self {
             WriteOperation::Scalar(ScalarWriteOperation::Set(pv)) => Ok(pv),
             WriteOperation::Composite(CompositeWriteOperation::Set(pv)) => Ok(pv),
-            x => Err(ConnectorError::from_kind(ErrorKind::InternalConversionError(format!(
-                "Unable to convert write expression {x:?} into prisma value."
-            )))),
+            x => Err(UnexpectedWriteOperation(x)),
         }
     }
 }
+
+#[derive(Debug)]
+pub struct UnexpectedWriteOperation(pub WriteOperation);
 
 impl WriteArgs {
     pub fn new(args: IndexMap<DatasourceFieldName, WriteOperation>, request_now: PrismaValue) -> Self {

@@ -12,7 +12,7 @@ pub(crate) fn db_name_with_schema(model: &Model, ctx: &Context<'_>) -> Table<'st
     (schema_prefix, model_db_name).into()
 }
 
-pub(crate) trait AsTable {
+pub trait AsTable {
     fn as_table(&self, ctx: &Context<'_>) -> Table<'static>;
 }
 

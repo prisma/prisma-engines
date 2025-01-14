@@ -43,7 +43,7 @@ impl Alias {
 
     /// A string representation of the current alias. The current mode can be
     /// overridden by defining the `mode_override`.
-    pub fn to_string(&self, mode_override: Option<AliasMode>) -> String {
+    pub fn to_string(self, mode_override: Option<AliasMode>) -> String {
         match mode_override.unwrap_or(self.mode) {
             AliasMode::Table => format!("t{}", self.counter),
             AliasMode::Join => format!("j{}", self.counter),
@@ -51,7 +51,7 @@ impl Alias {
     }
 
     #[cfg(feature = "relation_joins")]
-    pub fn to_table_string(&self) -> String {
+    pub fn to_table_string(self) -> String {
         self.to_string(Some(AliasMode::Table))
     }
 }

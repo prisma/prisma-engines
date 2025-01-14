@@ -1,10 +1,11 @@
-use crate::{column_metadata::ColumnMetadata, error::SqlError, value::to_prisma_value};
+use crate::{error::SqlError, value::to_prisma_value};
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
-use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
+use connector_interface::{coerce_null_to_zero_value, AggregationResult};
 use core::{f32, f64};
 use quaint::{connector::ResultRow, Value, ValueType};
-use query_structure::{ConversionFailure, FieldArity, PrismaValue, Record, TypeIdentifier};
+use query_structure::{AggregationSelection, ConversionFailure, FieldArity, PrismaValue, Record, TypeIdentifier};
+use sql_query_builder::ColumnMetadata;
 use std::{io, str::FromStr};
 use uuid::Uuid;
 
