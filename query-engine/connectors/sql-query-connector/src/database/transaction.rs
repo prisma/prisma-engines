@@ -39,7 +39,7 @@ impl ConnectionLike for SqlConnectorTransaction<'_> {}
 
 #[async_trait]
 impl Transaction for SqlConnectorTransaction<'_> {
-    fn depth(&self) -> u32 {
+    fn depth(&self) -> i32 {
         self.inner.depth()
     }
 
