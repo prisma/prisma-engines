@@ -197,7 +197,7 @@ impl InteractiveTransaction {
         })
     }
 
-    pub fn depth(&mut self) -> u32 {
+    pub fn depth(&mut self) -> i32 {
         match self.state.as_open("depth") {
             Ok(state) => state.depth(),
             Err(_) => 0,

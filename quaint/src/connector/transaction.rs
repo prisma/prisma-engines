@@ -9,12 +9,12 @@ use crate::{
 use std::{
     fmt,
     str::FromStr,
-    sync::atomic::{AtomicU32, Ordering},
+    sync::atomic::{AtomicI32, Ordering},
 };
 
 #[async_trait]
 pub trait Transaction: Queryable {
-    fn depth(&self) -> u32;
+    fn depth(&self) -> i32;
 
     /// Start a new transaction or nested transaction via savepoint.
     async fn begin(&self) -> crate::Result<()>;
@@ -74,7 +74,7 @@ impl TransactionOptions {
 /// transaction object will panic.
 pub struct DefaultTransaction<'a> {
     pub inner: &'a dyn Queryable,
-    pub depth: AtomicU32,
+    pub depth: AtomicI32,
     gauge: GaugeGuard,
 }
 
@@ -101,7 +101,7 @@ impl<'a> DefaultTransaction<'a> {
         let this = Self {
             inner,
             gauge: GaugeGuard::increment("prisma_client_queries_active"),
-            depth: AtomicU32::new(0),
+            depth: AtomicI32::new(0),
         };
 
         if tx_opts.isolation_first {
@@ -126,7 +126,7 @@ impl<'a> DefaultTransaction<'a> {
 
 #[async_trait]
 impl Transaction for DefaultTransaction<'_> {
-    fn depth(&self) -> u32 {
+    fn depth(&self) -> i32 {
         self.depth.load(Ordering::Relaxed)
     }
 
@@ -142,10 +142,10 @@ impl Transaction for DefaultTransaction<'_> {
 
     /// Commit the changes to the database and consume the transaction.
     async fn commit(&self) -> crate::Result<()> {
-        self.inner.raw_cmd("COMMIT").await?;
-
         // Reset the depth to 0 on commit
         self.depth.store(0, Ordering::Relaxed);
+
+        self.inner.raw_cmd("COMMIT").await?;
 
         self.gauge.decrement();
 
@@ -154,9 +154,9 @@ impl Transaction for DefaultTransaction<'_> {
 
     /// Rolls back the changes to the database.
     async fn rollback(&self) -> crate::Result<()> {
-        self.inner.raw_cmd("ROLLBACK").await?;
-
         self.depth.fetch_sub(1, Ordering::Relaxed);
+
+        self.inner.raw_cmd("ROLLBACK").await?;
 
         self.gauge.decrement();
 
@@ -174,33 +174,28 @@ impl Transaction for DefaultTransaction<'_> {
 
     /// Releases a savepoint in the transaction
     async fn release_savepoint(&self) -> crate::Result<()> {
-        let depth_val = self.depth.load(Ordering::Relaxed);
+        let depth_val = self.depth.fetch_sub(1, Ordering::Relaxed);
 
-        if depth_val == 0 {
+        if depth_val <= 0 {
             return Err(Error::builder(ErrorKind::NoSavepointToRelease(depth_val)).build());
         }
 
-        // Perform the asynchronous operation without holding the lock
         let release_savepoint_statement = self.inner.release_savepoint_statement(depth_val);
         self.inner.raw_cmd(&release_savepoint_statement).await?;
-
-        self.depth.fetch_sub(1, Ordering::Relaxed);
 
         Ok(())
     }
 
     /// Rollback to savepoint in the transaction
     async fn rollback_to_savepoint(&self) -> crate::Result<()> {
-        let depth_val = self.depth.load(Ordering::Relaxed);
+        let depth_val = self.depth.fetch_sub(1, Ordering::Relaxed);
 
-        if depth_val == 0 {
+        if depth_val <= 0 {
             return Err(Error::builder(ErrorKind::NoSavepointToRollbackTo(depth_val)).build());
         }
 
         let rollback_to_savepoint_statement = self.inner.rollback_to_savepoint_statement(depth_val);
         self.inner.raw_cmd(&rollback_to_savepoint_statement).await?;
-
-        self.depth.fetch_sub(1, Ordering::Relaxed);
 
         Ok(())
     }

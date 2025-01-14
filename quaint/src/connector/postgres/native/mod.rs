@@ -758,17 +758,17 @@ impl<Cache: QueryCache> Queryable for PostgreSql<Cache> {
     }
 
     /// Statement to create a savepoint
-    fn create_savepoint_statement(&self, depth: u32) -> Cow<'static, str> {
+    fn create_savepoint_statement(&self, depth: i32) -> Cow<'static, str> {
         Cow::Owned(format!("SAVEPOINT savepoint{depth}"))
     }
 
     /// Statement to release a savepoint
-    fn release_savepoint_statement(&self, depth: u32) -> Cow<'static, str> {
+    fn release_savepoint_statement(&self, depth: i32) -> Cow<'static, str> {
         Cow::Owned(format!("RELEASE SAVEPOINT savepoint{depth}"))
     }
 
     /// Statement to rollback to a savepoint
-    fn rollback_to_savepoint_statement(&self, depth: u32) -> Cow<'static, str> {
+    fn rollback_to_savepoint_statement(&self, depth: i32) -> Cow<'static, str> {
         Cow::Owned(format!("ROLLBACK TO SAVEPOINT savepoint{depth}"))
     }
 }

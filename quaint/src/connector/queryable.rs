@@ -97,17 +97,17 @@ pub trait Queryable: Send + Sync {
     }
 
     /// Statement to create a savepoint in a transaction
-    fn create_savepoint_statement(&self, depth: u32) -> Cow<'static, str> {
+    fn create_savepoint_statement(&self, depth: i32) -> Cow<'static, str> {
         Cow::Owned(format!("SAVEPOINT savepoint{depth}"))
     }
 
     /// Statement to release a savepoint in a transaction
-    fn release_savepoint_statement(&self, depth: u32) -> Cow<'static, str> {
+    fn release_savepoint_statement(&self, depth: i32) -> Cow<'static, str> {
         Cow::Owned(format!("RELEASE SAVEPOINT savepoint{depth}"))
     }
 
     /// Statement to rollback to a savepoint in a transaction
-    fn rollback_to_savepoint_statement(&self, depth: u32) -> Cow<'static, str> {
+    fn rollback_to_savepoint_statement(&self, depth: i32) -> Cow<'static, str> {
         Cow::Owned(format!("ROLLBACK TO SAVEPOINT savepoint{depth}"))
     }
 
