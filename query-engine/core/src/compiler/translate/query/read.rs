@@ -203,6 +203,7 @@ fn build_read_m2m_query(_query: RelatedRecordsQuery, _ctx: &Context<'_>) -> Tran
 fn build_read_one2m_query(rrq: RelatedRecordsQuery, ctx: &Context<'_>) -> TranslateResult<Expression> {
     let selected_fields = rrq.selected_fields.without_relations().into_virtuals_last();
     let needs_reversed_order = rrq.args.needs_reversed_order();
+    let to_one_relation = !rrq.parent_field.arity().is_list();
 
     // TODO: we ignore chunking for now
     let query = query_builder::read::get_records(
@@ -215,19 +216,17 @@ fn build_read_one2m_query(rrq: RelatedRecordsQuery, ctx: &Context<'_>) -> Transl
         ctx,
     );
 
-    let expr = Expression::Query(build_db_query(query)?);
+    let query = if to_one_relation { query.limit(1) } else { query };
 
-    let expr = if !rrq.parent_field.arity().is_list() {
-        Expression::Unique(Box::new(expr))
-    } else {
-        expr
-    };
+    let mut expr = Expression::Query(build_db_query(query)?);
 
-    let expr = if needs_reversed_order {
-        Expression::Reverse(Box::new(expr))
-    } else {
-        expr
-    };
+    if to_one_relation {
+        expr = Expression::Unique(Box::new(expr));
+    }
+
+    if needs_reversed_order {
+        expr = Expression::Reverse(Box::new(expr));
+    }
 
     if rrq.nested.is_empty() {
         Ok(expr)
