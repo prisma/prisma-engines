@@ -27,7 +27,7 @@ pub fn main() -> anyhow::Result<()> {
     // })
     let query: JsonSingleQuery = serde_json::from_value(json!({
         "modelName": "User",
-        "action": "findUnique",
+        "action": "findMany",
         "query": {
             "arguments": {
                 "where": {

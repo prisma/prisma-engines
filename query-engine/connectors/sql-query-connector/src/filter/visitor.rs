@@ -957,6 +957,22 @@ fn default_scalar_filter(
             // This code path is only reachable for connectors with `ScalarLists` capability
             comparable.not_equals(Expression::from(field_ref.aliased_col(alias, ctx)).all())
         }
+        ScalarCondition::InTemplate(ConditionValue::Value(value)) => {
+            let sql_value = convert_first_value(fields, value, alias, ctx);
+            comparable.in_selection(sql_value.decorate(
+                Some("prisma-comma-repeatable-start"),
+                Some("prisma-comma-repeatable-end"),
+            ))
+        }
+        ScalarCondition::InTemplate(ConditionValue::FieldRef(_)) => todo!(),
+        ScalarCondition::NotInTemplate(ConditionValue::Value(value)) => {
+            let sql_value = convert_first_value(fields, value, alias, ctx);
+            comparable.not_in_selection(sql_value.decorate(
+                Some("prisma-comma-repeatable-start"),
+                Some("prisma-comma-repeatable-end"),
+            ))
+        }
+        ScalarCondition::NotInTemplate(ConditionValue::FieldRef(_)) => todo!(),
         ScalarCondition::Search(value, _) => {
             reachable_only_with_capability!(ConnectorCapability::NativeFullTextSearch);
             let query: String = value
@@ -1139,6 +1155,26 @@ fn insensitive_scalar_filter(
             // This code path is only reachable for connectors with `ScalarLists` capability
             comparable.compare_raw("NOT ILIKE", Expression::from(field_ref.aliased_col(alias, ctx)).all())
         }
+        ScalarCondition::InTemplate(ConditionValue::Value(value)) => {
+            let comparable = Expression::from(lower(comparable));
+            let sql_value = convert_first_value(fields, value, alias, ctx);
+
+            comparable.in_selection(sql_value.decorate(
+                Some("prisma-comma-repeatable-start"),
+                Some("prisma-comma-repeatable-end"),
+            ))
+        }
+        ScalarCondition::InTemplate(ConditionValue::FieldRef(_)) => todo!(),
+        ScalarCondition::NotInTemplate(ConditionValue::Value(value)) => {
+            let comparable = Expression::from(lower(comparable));
+            let sql_value = convert_first_value(fields, value, alias, ctx);
+
+            comparable.in_selection(sql_value.decorate(
+                Some("prisma-comma-repeatable-start"),
+                Some("prisma-comma-repeatable-end"),
+            ))
+        }
+        ScalarCondition::NotInTemplate(ConditionValue::FieldRef(_)) => todo!(),
         ScalarCondition::Search(value, _) => {
             reachable_only_with_capability!(ConnectorCapability::NativeFullTextSearch);
             let query: String = value

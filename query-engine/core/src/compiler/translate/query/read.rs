@@ -159,7 +159,7 @@ fn add_inmemory_join(parent: Expression, nested: Vec<ReadQuery>, ctx: &Context<'
                 );
 
                 let condition = if parent.r#type().is_list() {
-                    ScalarCondition::In(ConditionListValue::list(vec![placeholder]))
+                    ScalarCondition::InTemplate(ConditionValue::value(placeholder))
                 } else {
                     ScalarCondition::Equals(ConditionValue::value(placeholder))
                 };
