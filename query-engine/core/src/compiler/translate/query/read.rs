@@ -217,6 +217,12 @@ fn build_read_one2m_query(rrq: RelatedRecordsQuery, ctx: &Context<'_>) -> Transl
 
     let expr = Expression::Query(build_db_query(query)?);
 
+    let expr = if !rrq.parent_field.arity().is_list() {
+        Expression::Unique(Box::new(expr))
+    } else {
+        expr
+    };
+
     let expr = if needs_reversed_order {
         Expression::Reverse(Box::new(expr))
     } else {
