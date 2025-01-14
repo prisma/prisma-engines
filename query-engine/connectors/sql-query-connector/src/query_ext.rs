@@ -196,7 +196,7 @@ pub(crate) trait QueryExt {
 
 /// Attempts to convert a PrismaValue to a database value without any additional type information.
 /// Can't reliably map Null values.
-pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
+fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
     match pv {
         PrismaValue::String(s) => s.into(),
         PrismaValue::Float(f) => f.into(),
