@@ -1,15 +1,12 @@
-use crate::filter::FilterBuilder;
 use crate::ser_raw::SerializedResultSet;
-use crate::{
-    column_metadata, error::*, model_extensions::*, sql_trace::SqlTraceComment, ColumnMetadata, Context, SqlRow,
-    ToSqlRow,
-};
+use crate::{error::*, SqlRow, ToSqlRow};
 use async_trait::async_trait;
-use connector_interface::RecordFilter;
+use chrono::Utc;
 use futures::future::FutureExt;
 use itertools::Itertools;
 use quaint::{ast::*, connector::Queryable};
 use query_structure::*;
+use sql_query_builder::{column_metadata, AsColumns, AsTable, ColumnMetadata, Context, FilterBuilder, SqlTraceComment};
 use std::{collections::HashMap, panic::AssertUnwindSafe};
 use tracing::info_span;
 use tracing_futures::Instrument;
@@ -25,7 +22,7 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         let span = info_span!("prisma:engine:filter_read_query");
 
         let q = match q {
-            Query::Select(x) => Query::Select(Box::from(x.add_traceparent(ctx.traceparent))),
+            Query::Select(x) => Query::Select(Box::from(x.add_traceparent(ctx.traceparent()))),
             q => q,
         };
 
@@ -107,7 +104,7 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
 
         let select = Select::from_table(model.as_table(ctx))
             .columns(id_cols)
-            .add_traceparent(ctx.traceparent)
+            .add_traceparent(ctx.traceparent())
             .so_that(condition);
 
         self.select_ids(select, model_id, ctx).await
@@ -195,4 +192,41 @@ pub(crate) trait QueryExt {
         model_id: ModelProjection,
         ctx: &Context<'_>,
     ) -> crate::Result<Vec<SelectionResult>>;
+}
+
+/// Attempts to convert a PrismaValue to a database value without any additional type information.
+/// Can't reliably map Null values.
+pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
+    match pv {
+        PrismaValue::String(s) => s.into(),
+        PrismaValue::Float(f) => f.into(),
+        PrismaValue::Boolean(b) => b.into(),
+        PrismaValue::DateTime(d) => d.with_timezone(&Utc).into(),
+        PrismaValue::Enum(e) => e.into(),
+        PrismaValue::Int(i) => i.into(),
+        PrismaValue::BigInt(i) => i.into(),
+        PrismaValue::Uuid(u) => u.to_string().into(),
+        PrismaValue::List(l) => Value::array(l.into_iter().map(convert_lossy)),
+        PrismaValue::Json(s) => Value::json(serde_json::from_str(&s).unwrap()),
+        PrismaValue::Bytes(b) => Value::bytes(b),
+        PrismaValue::Null => Value::null_int32(), // Can't tell which type the null is supposed to be.
+        PrismaValue::Object(_) => unimplemented!(),
+        PrismaValue::Placeholder { name, r#type } => Value::var(name, convert_placeholder_type_to_var_type(&r#type)),
+    }
+}
+
+fn convert_placeholder_type_to_var_type(pt: &PlaceholderType) -> VarType {
+    match pt {
+        PlaceholderType::Any => VarType::Unknown,
+        PlaceholderType::String => VarType::Text,
+        PlaceholderType::Int => VarType::Int32,
+        PlaceholderType::BigInt => VarType::Int64,
+        PlaceholderType::Float => VarType::Numeric,
+        PlaceholderType::Boolean => VarType::Boolean,
+        PlaceholderType::Decimal => VarType::Numeric,
+        PlaceholderType::Date => VarType::DateTime,
+        PlaceholderType::Array(t) => VarType::Array(Box::new(convert_placeholder_type_to_var_type(t))),
+        PlaceholderType::Object => VarType::Json,
+        PlaceholderType::Bytes => VarType::Bytes,
+    }
 }

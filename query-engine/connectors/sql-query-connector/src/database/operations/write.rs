@@ -1,19 +1,16 @@
 use super::update::*;
-use crate::column_metadata;
-use crate::filter::FilterBuilder;
 use crate::row::ToSqlRow;
-use crate::{
-    error::SqlError, model_extensions::*, query_builder::write, sql_trace::SqlTraceComment, Context, QueryExt,
-    Queryable,
-};
-use connector_interface::*;
+use crate::value::to_prisma_value;
+use crate::{error::SqlError, QueryExt, Queryable};
 use itertools::Itertools;
 use quaint::ast::{Insert, Query};
+use quaint::prelude::ResultSet;
 use quaint::{
     error::ErrorKind,
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
 };
 use query_structure::*;
+use sql_query_builder::{column_metadata, write, Context, FilterBuilder, SelectionResultExt, SqlTraceComment};
 use std::borrow::Cow;
 use std::{
     collections::{HashMap, HashSet},
@@ -72,7 +69,7 @@ async fn generate_id(
 
     // db generate values only if needed
     if need_select {
-        let pk_select = id_select.add_traceparent(ctx.traceparent);
+        let pk_select = id_select.add_traceparent(ctx.traceparent());
         let pk_result = conn.query(pk_select.into()).await?;
         let result = try_convert(&(id_field.into()), pk_result)?;
 
@@ -287,7 +284,7 @@ pub(crate) async fn create_records_returning(
 /// Partitions data into batches, respecting `max_bind_values` and `max_insert_rows` settings from
 /// the `Context`.
 fn partition_into_batches(args: Vec<WriteArgs>, ctx: &Context<'_>) -> Vec<Vec<WriteArgs>> {
-    let batches = if let Some(max_params) = ctx.max_bind_values {
+    let batches = if let Some(max_params) = ctx.max_bind_values() {
         // We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.
         // -> Horizontal partitioning by row number, vertical by number of args.
         args.into_iter()
@@ -328,7 +325,7 @@ fn partition_into_batches(args: Vec<WriteArgs>, ctx: &Context<'_>) -> Vec<Vec<Wr
         vec![args]
     };
 
-    if let Some(max_rows) = ctx.max_insert_rows {
+    if let Some(max_rows) = ctx.max_insert_rows() {
         let capacity = batches.len();
         batches
             .into_iter()
@@ -573,4 +570,35 @@ pub(crate) async fn execute_raw(
 /// a JSON `Value`.
 pub(crate) async fn query_raw(conn: &dyn Queryable, inputs: HashMap<String, PrismaValue>) -> crate::Result<RawJson> {
     Ok(conn.raw_json(inputs).await?)
+}
+
+fn try_convert(model_projection: &ModelProjection, result_set: ResultSet) -> crate::Result<SelectionResult> {
+    let columns: Vec<String> = result_set.columns().iter().map(|c| c.to_string()).collect();
+    let mut record_projection = SelectionResult::default();
+
+    if let Some(row) = result_set.into_iter().next() {
+        for (i, val) in row.into_iter().enumerate() {
+            match model_projection.map_db_name(columns[i].as_str()) {
+                Some(field) => {
+                    record_projection.add((field, to_prisma_value(val)?));
+                }
+                None => {
+                    return Err(SqlError::DomainError(DomainError::ScalarFieldNotFound {
+                        name: columns[i].clone(),
+                        container_type: "model",
+                        container_name: String::from("unspecified"),
+                    }))
+                }
+            }
+        }
+    }
+
+    if model_projection.scalar_length() == record_projection.len() {
+        Ok(record_projection)
+    } else {
+        Err(SqlError::DomainError(DomainError::ConversionFailure(
+            "ResultSet".to_owned(),
+            "RecordProjection".to_owned(),
+        )))
+    }
 }

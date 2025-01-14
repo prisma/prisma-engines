@@ -1,8 +1,8 @@
 //! Write query AST
 use super::{FilteredNestedMutation, FilteredQuery};
 use crate::{ReadQuery, RecordQuery, ToGraphviz};
-use connector::{DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
-use query_structure::{prelude::*, Filter};
+use connector::NativeUpsert;
+use query_structure::{prelude::*, DatasourceFieldName, Filter, RecordFilter, WriteArgs};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]

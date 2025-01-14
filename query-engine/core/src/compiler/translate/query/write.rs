@@ -1,5 +1,6 @@
 use query_structure::ModelProjection;
-use sql_query_connector::{context::Context, generate_insert_statements, query_builder};
+use sql_query_builder::{write, Context};
+use sql_query_connector::generate_insert_statements;
 
 use crate::{
     compiler::{expression::Expression, translate::TranslateResult},
@@ -13,12 +14,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, ctx: &Context<'_>) -> Tra
         WriteQuery::CreateRecord(cr) => {
             // TODO: MySQL needs additional logic to generate IDs on our side.
             // See sql_query_connector::database::operations::write::create_record
-            let query = query_builder::write::create_record(
-                &cr.model,
-                cr.args,
-                &ModelProjection::from(&cr.selected_fields),
-                ctx,
-            );
+            let query = write::create_record(&cr.model, cr.args, &ModelProjection::from(&cr.selected_fields), ctx);
 
             // TODO: we probably need some additional node type or extra info in the WriteQuery node
             // to help the client executor figure out the returned ID in the case when it's inferred

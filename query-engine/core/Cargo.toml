@@ -20,6 +20,8 @@ indexmap.workspace = true
 itertools.workspace = true
 once_cell = "1"
 petgraph = "0.4"
+query-builder = { path = "../query-builders/query-builder" }
+sql-query-builder = { path = "../query-builders/sql-query-builder" }
 query-structure = { path = "../query-structure", features = [
     "default_generators",
 ] }

@@ -1,11 +1,16 @@
-use crate::{
-    cursor_condition, filter::FilterBuilder, model_extensions::*, nested_aggregations, ordering::OrderByBuilder,
-    sql_trace::SqlTraceComment, Context,
-};
-use connector_interface::AggregationSelection;
 use itertools::Itertools;
 use quaint::ast::*;
 use query_structure::*;
+
+use crate::{
+    context::Context,
+    cursor_condition,
+    filter::FilterBuilder,
+    model_extensions::{AsColumn, AsColumns, AsTable},
+    nested_aggregations,
+    ordering::OrderByBuilder,
+    sql_trace::SqlTraceComment,
+};
 
 pub trait SelectDefinition {
     fn into_select<'a>(
@@ -168,7 +173,7 @@ where
 /// ```
 /// Important note: Do not use the AsColumn trait here as we need to construct column references that are relative,
 /// not absolute - e.g. `SELECT "field" FROM (...)` NOT `SELECT "full"."path"."to"."field" FROM (...)`.
-pub(crate) fn aggregate(
+pub fn aggregate(
     model: &Model,
     selections: &[AggregationSelection],
     args: QueryArguments,
@@ -222,7 +227,7 @@ pub(crate) fn aggregate(
     )
 }
 
-pub(crate) fn group_by_aggregate(
+pub fn group_by_aggregate(
     model: &Model,
     args: QueryArguments,
     selections: &[AggregationSelection],

@@ -1,0 +1,9 @@
+[package]
+edition = "2021"
+name = "query-builder"
+version = "0.1.0"
+
+[dependencies]
+serde.workspace = true
+
+query-structure = { path = "../../query-structure" }

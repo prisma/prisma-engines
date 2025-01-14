@@ -4,8 +4,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue,
 };
-use connector::RecordFilter;
-use query_structure::{Filter, Model, PrismaValue, RelationFieldRef};
+use query_structure::{Filter, Model, PrismaValue, RecordFilter, RelationFieldRef};
 use std::convert::TryInto;
 
 /// Adds a delete (single) record node to the graph and connects it to the parent.

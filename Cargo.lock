@@ -3743,6 +3743,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "query-builder"
+version = "0.1.0"
+dependencies = [
+ "query-structure",
+ "serde",
+]
+
+[[package]]
 name = "query-connector"
 version = "0.1.0"
 dependencies = [
@@ -3785,11 +3793,13 @@ dependencies = [
  "prisma-metrics",
  "psl",
  "quaint",
+ "query-builder",
  "query-connector",
  "query-structure",
  "schema",
  "serde",
  "serde_json",
+ "sql-query-builder",
  "sql-query-connector",
  "telemetry",
  "thiserror",
@@ -4004,6 +4014,7 @@ dependencies = [
  "chrono",
  "cuid",
  "getrandom 0.2.11",
+ "indexmap 2.2.2",
  "itertools 0.12.0",
  "nanoid",
  "prisma-value",
@@ -5119,6 +5130,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "sql-query-builder"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "indexmap 2.2.2",
+ "itertools 0.12.0",
+ "prisma-value",
+ "psl",
+ "quaint",
+ "query-builder",
+ "query-structure",
+ "serde_json",
+ "telemetry",
+]
+
+[[package]]
 name = "sql-query-connector"
 version = "0.1.0"
 dependencies = [
@@ -5139,6 +5166,7 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "serde_json",
+ "sql-query-builder",
  "telemetry",
  "thiserror",
  "tokio",

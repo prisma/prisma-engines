@@ -2,8 +2,7 @@ use std::borrow::Cow;
 
 use itertools::{Either, Itertools};
 use query_structure::{QueryArguments, Record};
-
-use crate::query_arguments_ext::QueryArgumentsExt;
+use sql_query_builder::QueryArgumentsExt;
 
 macro_rules! processor_state {
     ($name:ident $(-> $transition:ident($bound:ident))?) => {

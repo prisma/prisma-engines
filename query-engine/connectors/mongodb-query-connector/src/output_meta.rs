@@ -1,7 +1,7 @@
-use connector_interface::AggregationSelection;
 use indexmap::IndexMap;
 use query_structure::{
-    ast::FieldArity, DefaultKind, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier,
+    ast::FieldArity, AggregationSelection, DefaultKind, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField,
+    TypeIdentifier,
 };
 
 /// Maps field db field names to their meta information.

@@ -1,6 +1,5 @@
 use crate::limit::wrap_with_limit_subquery_if_needed;
 use crate::{model_extensions::*, sql_trace::SqlTraceComment, Context};
-use connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
 use quaint::ast::*;
 use query_structure::*;
 use std::{collections::HashSet, convert::TryInto};
@@ -40,7 +39,7 @@ pub fn create_record(
 /// where each `WriteArg` in the Vec is one row.
 /// Requires `affected_fields` to be non-empty to produce valid SQL.
 #[allow(clippy::mutable_key_type)]
-pub(crate) fn create_records_nonempty(
+pub fn create_records_nonempty(
     model: &Model,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
@@ -97,7 +96,7 @@ pub(crate) fn create_records_nonempty(
 }
 
 /// `INSERT` empty records statement.
-pub(crate) fn create_records_empty(
+pub fn create_records_empty(
     model: &Model,
     skip_duplicates: bool,
     selected_fields: Option<&ModelProjection>,
@@ -117,7 +116,7 @@ pub(crate) fn create_records_empty(
     insert
 }
 
-pub(crate) fn build_update_and_set_query(
+pub fn build_update_and_set_query(
     model: &Model,
     args: WriteArgs,
     selected_fields: Option<&ModelProjection>,
@@ -185,22 +184,20 @@ pub(crate) fn build_update_and_set_query(
     query
 }
 
-pub(crate) fn chunk_update_with_ids(
+pub fn chunk_update_with_ids(
     update: Update<'static>,
     model: &Model,
     ids: &[&SelectionResult],
     filter_condition: ConditionTree<'static>,
     ctx: &Context<'_>,
-) -> crate::Result<Vec<Query<'static>>> {
+) -> Vec<Query<'static>> {
     let columns: Vec<_> = ModelProjection::from(model.primary_identifier())
         .as_columns(ctx)
         .collect();
 
-    let query = super::chunked_conditions(&columns, ids, ctx, |conditions| {
+    super::chunked_conditions(&columns, ids, ctx, |conditions| {
         update.clone().so_that(conditions.and(filter_condition.clone()))
-    });
-
-    Ok(query)
+    })
 }
 
 /// Converts a list of selected fields into an iterator of table columns.
@@ -211,7 +208,7 @@ fn projection_into_columns(
     selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true))
 }
 
-pub(crate) fn delete_returning(
+pub fn delete_returning(
     model: &Model,
     filter: ConditionTree<'static>,
     selected_fields: &ModelProjection,
@@ -224,7 +221,7 @@ pub(crate) fn delete_returning(
         .into()
 }
 
-pub(crate) fn delete_many_from_filter(
+pub fn delete_many_from_filter(
     model: &Model,
     filter_condition: ConditionTree<'static>,
     limit: Option<usize>,
@@ -238,7 +235,7 @@ pub(crate) fn delete_many_from_filter(
         .into()
 }
 
-pub(crate) fn delete_many_from_ids_and_filter(
+pub fn delete_many_from_ids_and_filter(
     model: &Model,
     ids: &[&SelectionResult],
     filter_condition: ConditionTree<'static>,
@@ -254,7 +251,7 @@ pub(crate) fn delete_many_from_ids_and_filter(
     })
 }
 
-pub(crate) fn create_relation_table_records(
+pub fn create_relation_table_records(
     field: &RelationFieldRef,
     parent_id: &SelectionResult,
     child_ids: &[SelectionResult],
@@ -279,7 +276,7 @@ pub(crate) fn create_relation_table_records(
     insert.build().on_conflict(OnConflict::DoNothing).into()
 }
 
-pub(crate) fn delete_relation_table_records(
+pub fn delete_relation_table_records(
     parent_field: &RelationFieldRef,
     parent_id: &SelectionResult,
     child_ids: &[SelectionResult],
