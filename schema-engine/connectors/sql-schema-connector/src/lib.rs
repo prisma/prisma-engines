@@ -37,6 +37,24 @@ pub struct SqlSchemaConnector {
 }
 
 impl SqlSchemaConnector {
+    /// Initialize an external PostgreSQL migration connector.
+    #[cfg(all(feature = "postgresql", not(feature = "postgresql-native")))]
+    pub fn new_postgres_external(adapter: Arc<dyn quaint::connector::ExternalConnector>) -> Self {
+        SqlSchemaConnector {
+            flavour: Box::new(flavour::PostgresFlavour::new_external(adapter)),
+            host: Arc::new(EmptyHost),
+        }
+    }
+
+    /// Initialize an external SQLite migration connector.
+    #[cfg(all(feature = "sqlite", not(feature = "sqlite-native")))]
+    pub fn new_sqlite_external(adapter: Arc<dyn quaint::connector::ExternalConnector>) -> Self {
+        SqlSchemaConnector {
+            flavour: Box::new(flavour::SqliteFlavour::new_external(adapter)),
+            host: Arc::new(EmptyHost),
+        }
+    }
+
     /// Initialize a PostgreSQL migration connector.
     #[cfg(feature = "postgresql-native")]
     pub fn new_postgres() -> Self {
@@ -168,6 +186,7 @@ impl SqlSchemaConnector {
 }
 
 impl SchemaConnector for SqlSchemaConnector {
+    // TODO: this only seems to be used in `sql-migration-tests`.
     fn set_host(&mut self, host: Arc<dyn schema_connector::ConnectorHost>) {
         self.host = host;
     }
@@ -221,6 +240,7 @@ impl SchemaConnector for SqlSchemaConnector {
         self.flavour.ensure_connection_validity()
     }
 
+    // TODO: this only seems to be used in `sql-migration-tests`.
     fn host(&self) -> &Arc<dyn ConnectorHost> {
         &self.host
     }

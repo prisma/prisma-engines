@@ -34,6 +34,13 @@ pub(crate) struct SqliteFlavour {
     state: State,
 }
 
+impl SqliteFlavour {
+    #[cfg(not(feature = "sqlite-native"))]
+    pub(crate) fn new_external(_adapter: std::sync::Arc<dyn quaint::connector::ExternalConnector>) -> Self {
+        SqliteFlavour { state: State::Initial }
+    }
+}
+
 impl Default for SqliteFlavour {
     fn default() -> Self {
         SqliteFlavour { state: State::Initial }

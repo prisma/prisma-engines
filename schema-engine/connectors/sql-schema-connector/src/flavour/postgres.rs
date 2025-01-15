@@ -136,6 +136,14 @@ impl std::fmt::Debug for PostgresFlavour {
 }
 
 impl PostgresFlavour {
+    #[cfg(not(feature = "postgresql-native"))]
+    pub(crate) fn new_external(_adapter: std::sync::Arc<dyn quaint::connector::ExternalConnector>) -> Self {
+        PostgresFlavour {
+            state: State::Initial,
+            provider: PostgresProvider::PostgreSql,
+        }
+    }
+
     pub(crate) fn new_postgres() -> Self {
         PostgresFlavour {
             state: State::Initial,
