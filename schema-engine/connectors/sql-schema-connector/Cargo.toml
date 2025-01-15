@@ -5,34 +5,44 @@ version = "0.1.0"
 
 [features]
 vendored-openssl = ["quaint/vendored-openssl"]
+postgresql = ["psl/postgresql", "quaint/postgresql", "schema-connector/postgresql", "sql-schema-describer/postgresql"]
+postgresql-native = ["postgresql", "quaint/postgresql-native", "quaint/pooled"]
+sqlite = ["psl/sqlite", "quaint/sqlite", "schema-connector/sqlite", "sql-schema-describer/sqlite"]
+sqlite-native = ["sqlite", "quaint/sqlite-native", "quaint/pooled", "quaint/expose-drivers", "sqlx-sqlite", "sqlx-core"]
+mysql = ["psl/mysql", "quaint/mysql", "schema-connector/mysql", "sql-schema-describer/mysql"]
+mysql-native = ["mysql", "quaint/mysql-native", "quaint/pooled"]
+mssql = ["psl/mssql", "quaint/mssql", "schema-connector/mssql", "sql-schema-describer/mssql"]
+mssql-native = ["mssql", "quaint/mssql-native", "quaint/pooled"]
+cockroachdb = ["psl/cockroachdb", "quaint/postgresql", "schema-connector/cockroachdb", "sql-schema-describer/cockroachdb"]
+cockroachdb-native = ["cockroachdb", "quaint/postgresql-native", "quaint/pooled"]
+all-native = [
+    "vendored-openssl",
+    "quaint/fmt-sql",
+    "postgresql-native",
+    "sqlite-native",
+    "mysql-native",
+    "mssql-native",
+    "cockroachdb-native",
+    "schema-connector/all-native",
+    "sql-schema-describer/all-native",
+    "user-facing-errors/all-native",
+]
 
 [dependencies]
 psl.workspace = true
-quaint = { workspace = true, features = [
-    "all-native",
-    "expose-drivers",
-    "pooled",
-    "fmt-sql",
-] }
-tokio.workspace = true
+quaint.workspace = true
+tokio = { version = "1", features = ["macros", "sync", "io-util", "time"] }
 serde.workspace = true
 indoc.workspace = true
 uuid.workspace = true
 indexmap.workspace = true
 
 prisma-value = { path = "../../../libs/prisma-value" }
-schema-connector = { path = "../schema-connector", features = [
-    "all-native",
-] }
-sql-schema-describer = { path = "../../sql-schema-describer", features = [
-    "all-native",
-] }
+schema-connector = { path = "../schema-connector" }
+sql-schema-describer = { path = "../../sql-schema-describer" }
 datamodel-renderer = { path = "../../datamodel-renderer" }
 sql-ddl = { path = "../../../libs/sql-ddl" }
-user-facing-errors = { path = "../../../libs/user-facing-errors", features = [
-    "sql",
-    "all-native",
-] }
+user-facing-errors = { path = "../../../libs/user-facing-errors", features = ["sql"] }
 
 chrono.workspace = true
 connection-string.workspace = true
@@ -47,7 +57,8 @@ either = "1.6"
 sqlformat = "0.2.1"
 sqlparser = "0.32.0"
 versions = "6.1.0"
-sqlx-sqlite = { version = "0.8.0" }
-sqlx-core = "0.8.0"
+sqlx-sqlite = { version = "0.8.0", optional = true }
+sqlx-core = { version = "0.8.0", optional = true }
+
 [dev-dependencies]
 expect-test = "1"

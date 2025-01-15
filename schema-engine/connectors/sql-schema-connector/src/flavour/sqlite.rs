@@ -1,13 +1,27 @@
-mod connection;
+#[cfg(feature = "sqlite-native")]
+mod native;
 
-use self::connection::*;
+#[cfg(not(feature = "sqlite-native"))]
+mod wasm;
+
+#[cfg(feature = "sqlite-native")]
+use native::{
+    create_database, drop_database, ensure_connection_validity, generic_apply_migration_script, introspect, reset,
+    version, Connection,
+};
+
+#[cfg(not(feature = "sqlite-native"))]
+use wasm::{
+    create_database, drop_database, ensure_connection_validity, generic_apply_migration_script, introspect, reset,
+    version, Connection,
+};
+
 use crate::flavour::SqlFlavour;
 use indoc::indoc;
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
 };
 use sql_schema_describer::SqlSchema;
-use std::path::Path;
 
 type State = super::State<Params, Connection>;
 
@@ -74,22 +88,7 @@ impl SqlFlavour for SqliteFlavour {
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
         Box::pin(async {
             let params = self.state.get_unwrapped_params();
-            let path = Path::new(&params.file_path);
-
-            if path.exists() {
-                return Ok(params.file_path.clone());
-            }
-
-            let dir = path.parent();
-
-            if let Some((dir, false)) = dir.map(|dir| (dir, dir.exists())) {
-                std::fs::create_dir_all(dir)
-                    .map_err(|err| ConnectorError::from_source(err, "Creating SQLite database parent directory."))?;
-            }
-
-            Connection::new(params)?;
-
-            Ok(params.file_path.clone())
+            create_database(params)
         })
     }
 
@@ -123,10 +122,7 @@ impl SqlFlavour for SqliteFlavour {
 
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         let params = self.state.get_unwrapped_params();
-        let file_path = &params.file_path;
-        let ret = std::fs::remove_file(file_path).map_err(|err| {
-            ConnectorError::from_msg(format!("Failed to delete SQLite database at `{file_path}`.\n{err}"))
-        });
+        let ret = drop_database(params);
         ready(ret)
     }
 
@@ -136,24 +132,7 @@ impl SqlFlavour for SqliteFlavour {
 
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         let params = self.state.get_unwrapped_params();
-        let path = std::path::Path::new(&params.file_path);
-        // we use metadata() here instead of Path::exists() because we want accurate diagnostics:
-        // if the file is not reachable because of missing permissions, we don't want to return
-        // that the file doesn't exist.
-        let result = match std::fs::metadata(path) {
-            Ok(_) => Ok(()),
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => Err(ConnectorError::user_facing(
-                user_facing_errors::common::DatabaseDoesNotExist::Sqlite {
-                    database_file_name: path
-                        .file_name()
-                        .map(|osstr| osstr.to_string_lossy().into_owned())
-                        .unwrap_or_else(|| params.file_path.clone()),
-                    database_file_path: params.file_path.clone(),
-                },
-            )),
-            Err(err) => Err(ConnectorError::from_source(err, "Failed to open SQLite database.")),
-        };
-
+        let result = ensure_connection_validity(params);
         ready(result)
     }
 
@@ -182,18 +161,18 @@ impl SqlFlavour for SqliteFlavour {
             let rows = match conn.query_raw(SQL, &[]) {
                 Ok(result) => result,
                 Err(err) => {
-                    if let Some(rusqlite::Error::SqliteFailure(
-                        rusqlite::ffi::Error {
+                    #[cfg(feature = "sqlite-native")]
+                    if let Some(native::rusqlite::Error::SqliteFailure(
+                        native::rusqlite::ffi::Error {
                             extended_code: 1, // table not found
                             ..
                         },
                         _,
-                    )) = err.source_as::<rusqlite::Error>()
+                    )) = err.source_as::<native::rusqlite::Error>()
                     {
                         return Ok(Err(schema_connector::PersistenceNotInitializedError));
-                    } else {
-                        return Err(err);
                     }
+                    return Err(err);
                 }
             };
 
@@ -268,26 +247,9 @@ impl SqlFlavour for SqliteFlavour {
     fn introspect(
         &mut self,
         namespaces: Option<Namespaces>,
-        _ctx: &schema_connector::IntrospectionContext,
+        ctx: &schema_connector::IntrospectionContext,
     ) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
-        Box::pin(async move {
-            if let Some(params) = self.state.params() {
-                let path = std::path::Path::new(&params.file_path);
-                if std::fs::metadata(path).is_err() {
-                    return Err(ConnectorError::user_facing(
-                        user_facing_errors::common::DatabaseDoesNotExist::Sqlite {
-                            database_file_name: path
-                                .file_name()
-                                .map(|name| name.to_string_lossy().into_owned())
-                                .unwrap_or_default(),
-                            database_file_path: params.file_path.clone(),
-                        },
-                    ));
-                }
-            }
-
-            self.describe_schema(namespaces).await
-        })
+        introspect(self, namespaces, ctx)
     }
 
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
@@ -296,23 +258,7 @@ impl SqlFlavour for SqliteFlavour {
 
     fn reset(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
         ready(with_connection(&mut self.state, move |params, connection| {
-            let file_path = &params.file_path;
-
-            connection.raw_cmd("PRAGMA main.locking_mode=NORMAL")?;
-            connection.raw_cmd("PRAGMA main.quick_check")?;
-
-            tracing::debug!("Truncating {:?}", file_path);
-
-            std::fs::File::create(file_path).map_err(|io_error| {
-                ConnectorError::from_source(
-                    io_error,
-                    "Failed to truncate sqlite file. Please check that you have write permissions on the directory.",
-                )
-            })?;
-
-            acquire_lock(connection)?;
-
-            Ok(())
+            reset(params, connection)
         }))
     }
 
@@ -369,7 +315,7 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
-        ready(Ok(Some(quaint::connector::sqlite_version().to_owned())))
+        version(self)
     }
 
     fn search_path(&self) -> &str {

@@ -1,0 +1,24 @@
+[package]
+edition = "2021"
+name = "schema-core-wasm"
+version = "0.1.0"
+
+[dependencies]
+psl = { workspace = true, features = ["all"] }
+schema-connector = { path = "../connectors/schema-connector" }
+
+async-trait.workspace = true
+chrono.workspace = true
+enumflags2.workspace = true
+jsonrpc-core = "17.0"
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber = "0.3"
+tracing-futures.workspace = true
+url.workspace = true
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen.workspace = true
+tsify.workspace = true

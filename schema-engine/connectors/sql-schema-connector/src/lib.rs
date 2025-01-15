@@ -18,7 +18,7 @@ mod sql_schema_differ;
 
 use database_schema::SqlDatabaseSchema;
 use enumflags2::BitFlags;
-use flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFlavour};
+use flavour::SqlFlavour;
 use migration_pair::MigrationPair;
 use psl::{datamodel_connector::NativeTypeInstance, parser_database::ScalarType, ValidatedSchema};
 use quaint::connector::DescribedQuery;
@@ -38,17 +38,19 @@ pub struct SqlSchemaConnector {
 
 impl SqlSchemaConnector {
     /// Initialize a PostgreSQL migration connector.
+    #[cfg(feature = "postgresql-native")]
     pub fn new_postgres() -> Self {
         SqlSchemaConnector {
-            flavour: Box::new(PostgresFlavour::new_postgres()),
+            flavour: Box::new(flavour::PostgresFlavour::new_postgres()),
             host: Arc::new(EmptyHost),
         }
     }
 
     /// Initialize a CockroachDb migration connector.
+    #[cfg(feature = "cockroachdb-native")]
     pub fn new_cockroach() -> Self {
         SqlSchemaConnector {
-            flavour: Box::new(PostgresFlavour::new_cockroach()),
+            flavour: Box::new(flavour::PostgresFlavour::new_cockroach()),
             host: Arc::new(EmptyHost),
         }
     }
@@ -57,33 +59,37 @@ impl SqlSchemaConnector {
     ///
     /// Use [`Self::new_postgres()`] or [`Self::new_cockroach()`] instead when the provider is
     /// explicitly specified by user or already known otherwise.
+    #[cfg(any(feature = "postgresql-native", feature = "cockroachdb-native"))]
     pub fn new_postgres_like() -> Self {
         SqlSchemaConnector {
-            flavour: Box::<PostgresFlavour>::default(),
+            flavour: Box::<flavour::PostgresFlavour>::default(),
             host: Arc::new(EmptyHost),
         }
     }
 
     /// Initialize a SQLite migration connector.
+    #[cfg(feature = "sqlite-native")]
     pub fn new_sqlite() -> Self {
         SqlSchemaConnector {
-            flavour: Box::<SqliteFlavour>::default(),
+            flavour: Box::<flavour::SqliteFlavour>::default(),
             host: Arc::new(EmptyHost),
         }
     }
 
     /// Initialize a MySQL migration connector.
+    #[cfg(feature = "mysql-native")]
     pub fn new_mysql() -> Self {
         SqlSchemaConnector {
-            flavour: Box::<MysqlFlavour>::default(),
+            flavour: Box::<flavour::MysqlFlavour>::default(),
             host: Arc::new(EmptyHost),
         }
     }
 
     /// Initialize a MSSQL migration connector.
+    #[cfg(feature = "mssql-native")]
     pub fn new_mssql() -> Self {
         SqlSchemaConnector {
-            flavour: Box::<MssqlFlavour>::default(),
+            flavour: Box::<flavour::MssqlFlavour>::default(),
             host: Arc::new(EmptyHost),
         }
     }
@@ -184,6 +190,7 @@ impl SchemaConnector for SqlSchemaConnector {
 
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         // If the env is set and non empty or set to `0`, we disable the lock.
+        // TODO: avoid using `std::env::var` in Wasm.
         let disable_lock: bool = std::env::var("PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK")
             .ok()
             .map(|value| !matches!(value.as_str(), "0" | ""))

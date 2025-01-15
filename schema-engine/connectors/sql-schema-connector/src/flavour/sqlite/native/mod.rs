@@ -2,8 +2,9 @@
 
 pub(crate) use quaint::connector::rusqlite;
 
+use crate::flavour::SqlFlavour;
 use quaint::connector::{ColumnType, DescribedColumn, DescribedParameter, GetRow, ToColumnNames};
-use schema_connector::{ConnectorError, ConnectorResult};
+use schema_connector::{BoxFuture, ConnectorError, ConnectorResult, Namespaces};
 use sql_schema_describer::{sqlite as describer, DescriberErrorKind, SqlSchema};
 use sqlx_core::{column::Column, type_info::TypeInfo};
 use sqlx_sqlite::SqliteColumn;
@@ -149,6 +150,100 @@ pub(super) fn generic_apply_migration_script(
             database_error: sqlite_error.to_string(),
         })
     })
+}
+
+pub(super) fn create_database(params: &super::Params) -> ConnectorResult<String> {
+    let path = std::path::Path::new(&params.file_path);
+
+    if path.exists() {
+        return Ok(params.file_path.clone());
+    }
+
+    let dir = path.parent();
+
+    if let Some((dir, false)) = dir.map(|dir| (dir, dir.exists())) {
+        std::fs::create_dir_all(dir)
+            .map_err(|err| ConnectorError::from_source(err, "Creating SQLite database parent directory."))?;
+    }
+
+    Connection::new(params)?;
+
+    Ok(params.file_path.clone())
+}
+
+pub(super) fn drop_database(params: &super::Params) -> ConnectorResult<()> {
+    let file_path = &params.file_path;
+    std::fs::remove_file(file_path)
+        .map_err(|err| ConnectorError::from_msg(format!("Failed to delete SQLite database at `{file_path}`.\n{err}")))
+}
+
+pub(super) fn ensure_connection_validity(params: &super::Params) -> ConnectorResult<()> {
+    rusqlite::Connection::open(&params.file_path).map_err(convert_error)?;
+    let path = std::path::Path::new(&params.file_path);
+    // we use metadata() here instead of Path::exists() because we want accurate diagnostics:
+    // if the file is not reachable because of missing permissions, we don't want to return
+    // that the file doesn't exist.
+    match std::fs::metadata(path) {
+        Ok(_) => Ok(()),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Err(ConnectorError::user_facing(
+            user_facing_errors::common::DatabaseDoesNotExist::Sqlite {
+                database_file_name: path
+                    .file_name()
+                    .map(|osstr| osstr.to_string_lossy().into_owned())
+                    .unwrap_or_else(|| params.file_path.clone()),
+                database_file_path: params.file_path.clone(),
+            },
+        )),
+        Err(err) => Err(ConnectorError::from_source(err, "Failed to open SQLite database.")),
+    }
+}
+
+pub(super) fn introspect<'a>(
+    instance: &'a mut super::SqliteFlavour,
+    namespaces: Option<Namespaces>,
+    _ctx: &schema_connector::IntrospectionContext,
+) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
+    // TODO: move to a separate function
+    Box::pin(async move {
+        if let Some(params) = instance.state.params() {
+            let path = std::path::Path::new(&params.file_path);
+            if std::fs::metadata(path).is_err() {
+                return Err(ConnectorError::user_facing(
+                    user_facing_errors::common::DatabaseDoesNotExist::Sqlite {
+                        database_file_name: path
+                            .file_name()
+                            .map(|name| name.to_string_lossy().into_owned())
+                            .unwrap_or_default(),
+                        database_file_path: params.file_path.clone(),
+                    },
+                ));
+            }
+        }
+
+        instance.describe_schema(namespaces).await
+    })
+}
+
+pub(super) fn version(_instance: &mut super::SqliteFlavour) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
+    super::ready(Ok(Some(quaint::connector::sqlite_version().to_owned())))
+}
+
+pub(super) fn reset(params: &super::Params, connection: &mut Connection) -> ConnectorResult<()> {
+    let file_path = &params.file_path;
+
+    connection.raw_cmd("PRAGMA main.locking_mode=NORMAL")?;
+    connection.raw_cmd("PRAGMA main.quick_check")?;
+
+    tracing::debug!("Truncating {:?}", file_path);
+
+    std::fs::File::create(file_path).map_err(|io_error| {
+        ConnectorError::from_source(
+            io_error,
+            "Failed to truncate sqlite file. Please check that you have write permissions on the directory.",
+        )
+    })?;
+
+    super::acquire_lock(connection)
 }
 
 fn convert_error(err: rusqlite::Error) -> ConnectorError {
