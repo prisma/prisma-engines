@@ -27,9 +27,11 @@ pub(crate) fn translate_query(query: Query, connection_info: &ConnectionInfo) ->
 fn build_db_query<'a>(query: impl Into<quaint::ast::Query<'a>>, ctx: &Context<'_>) -> TranslateResult<DbQuery> {
     let (sql, params) = match ctx.connection_info.sql_family() {
         SqlFamily::Postgres => quaint::visitor::Postgres::build(query)?,
-        SqlFamily::Mysql => quaint::visitor::Mysql::build(query)?,
-        SqlFamily::Sqlite => quaint::visitor::Sqlite::build(query)?,
-        SqlFamily::Mssql => quaint::visitor::Mssql::build(query)?,
+        // TODO: implement proper switch for other databases once proper feature flags are supported/logic is extracted
+        _ => unimplemented!(),
+        // SqlFamily::Mysql => quaint::visitor::Mysql::build(query)?,
+        // SqlFamily::Sqlite => quaint::visitor::Sqlite::build(query)?,
+        // SqlFamily::Mssql => quaint::visitor::Mssql::build(query)?,
     };
 
     let params = params
