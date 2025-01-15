@@ -178,7 +178,6 @@ pub(super) fn drop_database(params: &super::Params) -> ConnectorResult<()> {
 }
 
 pub(super) fn ensure_connection_validity(params: &super::Params) -> ConnectorResult<()> {
-    rusqlite::Connection::open(&params.file_path).map_err(convert_error)?;
     let path = std::path::Path::new(&params.file_path);
     // we use metadata() here instead of Path::exists() because we want accurate diagnostics:
     // if the file is not reachable because of missing permissions, we don't want to return
