@@ -89,6 +89,11 @@ impl QueryArguments {
         }
     }
 
+    pub fn with_take(mut self, take: Option<i64>) -> Self {
+        self.take = take;
+        self
+    }
+
     pub fn do_nothing(&self) -> bool {
         self.cursor.is_none()
             && self.take.is_none()

@@ -1,49 +1,43 @@
-use query_structure::ModelProjection;
-use sql_query_builder::{write, Context};
-use sql_query_connector::generate_insert_statements;
+use query_builder::QueryBuilder;
 
 use crate::{
-    compiler::{expression::Expression, translate::TranslateResult},
+    compiler::{expression::Expression, translate::TranslateResult, TranslateError},
     WriteQuery,
 };
 
-use super::build_db_query;
-
-pub(crate) fn translate_write_query(query: WriteQuery, ctx: &Context<'_>) -> TranslateResult<Expression> {
+pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
     Ok(match query {
         WriteQuery::CreateRecord(cr) => {
             // TODO: MySQL needs additional logic to generate IDs on our side.
             // See sql_query_connector::database::operations::write::create_record
-            let query = write::create_record(&cr.model, cr.args, &ModelProjection::from(&cr.selected_fields), ctx);
+            let query = builder
+                .build_create_record(&cr.model, cr.args, &cr.selected_fields)
+                .map_err(TranslateError::QueryBuildFailure)?;
 
             // TODO: we probably need some additional node type or extra info in the WriteQuery node
             // to help the client executor figure out the returned ID in the case when it's inferred
             // from the query arguments.
-            Expression::Query(build_db_query(query)?)
+            Expression::Query(query)
         }
 
         WriteQuery::CreateManyRecords(cmr) => {
             if let Some(selected_fields) = cmr.selected_fields {
                 Expression::Concat(
-                    generate_insert_statements(
-                        &cmr.model,
-                        cmr.args,
-                        cmr.skip_duplicates,
-                        Some(&selected_fields.fields.into()),
-                        ctx,
-                    )
-                    .into_iter()
-                    .map(build_db_query)
-                    .map(|maybe_db_query| maybe_db_query.map(Expression::Execute))
-                    .collect::<TranslateResult<Vec<_>>>()?,
+                    builder
+                        .build_inserts(&cmr.model, cmr.args, cmr.skip_duplicates, Some(&selected_fields.fields))
+                        .map_err(TranslateError::QueryBuildFailure)?
+                        .into_iter()
+                        .map(Expression::Execute)
+                        .collect::<Vec<_>>(),
                 )
             } else {
                 Expression::Sum(
-                    generate_insert_statements(&cmr.model, cmr.args, cmr.skip_duplicates, None, ctx)
+                    builder
+                        .build_inserts(&cmr.model, cmr.args, cmr.skip_duplicates, None)
+                        .map_err(TranslateError::QueryBuildFailure)?
                         .into_iter()
-                        .map(build_db_query)
-                        .map(|maybe_db_query| maybe_db_query.map(Expression::Execute))
-                        .collect::<TranslateResult<Vec<_>>>()?,
+                        .map(Expression::Execute)
+                        .collect::<Vec<_>>(),
                 )
             }
         }

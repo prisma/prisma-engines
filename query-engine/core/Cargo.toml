@@ -9,7 +9,7 @@ graphql-protocol = []
 
 [dependencies]
 async-trait.workspace = true
-bigdecimal = "0.3"
+bigdecimal.workspace = true
 chrono.workspace = true
 connection-string.workspace = true
 connector = { path = "../connectors/query-connector", package = "query-connector" }

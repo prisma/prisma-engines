@@ -11,8 +11,6 @@ mod value;
 use self::{query_ext::QueryExt, row::*};
 use quaint::prelude::Queryable;
 
-pub use database::operations::write::generate_insert_statements;
-
 pub use database::FromSource;
 #[cfg(feature = "driver-adapters")]
 pub use database::Js;

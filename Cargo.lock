@@ -5133,6 +5133,7 @@ dependencies = [
 name = "sql-query-builder"
 version = "0.1.0"
 dependencies = [
+ "bigdecimal",
  "chrono",
  "itertools 0.12.0",
  "prisma-value",
@@ -5160,6 +5161,7 @@ dependencies = [
  "prisma-value",
  "psl",
  "quaint",
+ "query-builder",
  "query-connector",
  "query-structure",
  "rand 0.8.5",
