@@ -1,20 +1,32 @@
-use std::str::FromStr;
+use std::{
+    io::{Error as IoError, ErrorKind as IoErrorKind},
+    pin::Pin,
+    str::FromStr,
+    task::{ready, Context, Poll},
+};
 
-use async_tungstenite::{
-    tokio::connect_async,
+use bytes::Bytes;
+use futures::{FutureExt, Sink, SinkExt, Stream, StreamExt};
+use pin_project::pin_project;
+use postgres_native_tls::TlsConnector;
+use prisma_metrics::WithMetricsInstrumentation;
+use tokio::{
+    io::{AsyncBufRead, AsyncRead, AsyncWrite, ReadBuf},
+    net::TcpStream,
+};
+use tokio_postgres::{Client, Config};
+use tokio_tungstenite::{
+    connect_async,
     tungstenite::{
         self,
         client::IntoClientRequest,
         http::{HeaderMap, HeaderValue, StatusCode},
-        Error as TungsteniteError,
+        Error as TungsteniteError, Message,
     },
+    MaybeTlsStream, WebSocketStream,
 };
-use futures::FutureExt;
-use postgres_native_tls::TlsConnector;
-use prisma_metrics::WithMetricsInstrumentation;
-use tokio_postgres::{Client, Config};
+use tokio_util::io::StreamReader;
 use tracing_futures::WithSubscriber;
-use ws_stream_tungstenite::WsStream;
 
 use crate::{
     connector::PostgresWebSocketUrl,
@@ -35,20 +47,22 @@ pub(crate) async fn connect_via_websocket(url: PostgresWebSocketUrl) -> crate::R
     if let Some(db_name) = db_name {
         config.dbname(&db_name);
     }
-    let ws_byte_stream = WsStream::new(ws_stream);
+    let ws_byte_stream = WsTunnel::new(ws_stream);
 
     let tls = TlsConnector::new(native_tls::TlsConnector::new()?, db_host);
     let (client, connection) = config.connect_raw(ws_byte_stream, tls).await?;
+
     tokio::spawn(
         connection
-            .map(|r| {
-                if let Err(e) = r {
-                    tracing::error!("Error in PostgreSQL WebSocket connection: {e:?}");
+            .map(move |result| {
+                if let Err(err) = result {
+                    tracing::error!("Error in PostgreSQL WebSocket connection: {err:?}");
                 }
             })
             .with_current_subscriber()
             .with_current_recorder(),
     );
+
     Ok(client)
 }
 
@@ -93,5 +107,146 @@ impl From<TungsteniteError> for error::Error {
         };
 
         builder.build()
+    }
+}
+
+#[pin_project]
+struct WsTunnel(#[pin] StreamReader<WsBytesStream, Bytes>);
+
+#[pin_project]
+struct WsBytesStream {
+    state: WsBytesStreamState,
+    #[pin]
+    inner: WebSocketStream<MaybeTlsStream<TcpStream>>,
+}
+
+enum WsBytesStreamState {
+    Reading,
+    SendingPong(Bytes),
+}
+
+impl WsTunnel {
+    fn new(stream: WebSocketStream<MaybeTlsStream<TcpStream>>) -> Self {
+        WsTunnel(StreamReader::new(WsBytesStream::new(stream)))
+    }
+}
+
+impl WsBytesStream {
+    fn new(inner: WebSocketStream<MaybeTlsStream<TcpStream>>) -> Self {
+        WsBytesStream {
+            state: WsBytesStreamState::Reading,
+            inner,
+        }
+    }
+
+    fn get_pin_mut(self: Pin<&mut Self>) -> Pin<&mut WebSocketStream<MaybeTlsStream<TcpStream>>> {
+        self.project().inner
+    }
+}
+
+impl AsyncRead for WsTunnel {
+    fn poll_read(self: Pin<&mut Self>, cx: &mut Context<'_>, buf: &mut ReadBuf<'_>) -> Poll<std::io::Result<()>> {
+        self.project().0.poll_read(cx, buf)
+    }
+}
+
+impl AsyncBufRead for WsTunnel {
+    fn poll_fill_buf(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<std::io::Result<&[u8]>> {
+        self.project().0.poll_fill_buf(cx)
+    }
+
+    fn consume(self: Pin<&mut Self>, amt: usize) {
+        self.project().0.consume(amt)
+    }
+}
+
+impl AsyncWrite for WsTunnel {
+    fn poll_write(self: Pin<&mut Self>, cx: &mut Context<'_>, buf: &[u8]) -> Poll<std::io::Result<usize>> {
+        let stream = &mut self.get_mut().0.get_mut().inner;
+        ready!(stream
+            .poll_ready_unpin(cx)
+            .map_err(|err| IoError::new(IoErrorKind::Other, err)))?;
+        match stream.start_send_unpin(Message::Binary(Bytes::copy_from_slice(buf))) {
+            Ok(()) => Poll::Ready(Ok(buf.len())),
+            Err(e) => Poll::Ready(Err(IoError::new(IoErrorKind::Other, e))),
+        }
+    }
+
+    fn poll_flush(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<std::io::Result<()>> {
+        self.project()
+            .0
+            .get_pin_mut()
+            .get_pin_mut()
+            .poll_flush(cx)
+            .map_err(|err| IoError::new(IoErrorKind::Other, err))
+    }
+
+    fn poll_shutdown(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<std::io::Result<()>> {
+        self.project()
+            .0
+            .get_pin_mut()
+            .get_pin_mut()
+            .poll_close(cx)
+            .map_err(|err| IoError::new(IoErrorKind::Other, err))
+    }
+}
+
+impl Stream for WsBytesStream {
+    type Item = Result<Bytes, IoError>;
+
+    fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
+        let this = self.get_mut();
+
+        match this.state {
+            WsBytesStreamState::Reading => match this.inner.poll_next_unpin(cx) {
+                Poll::Pending => Poll::Pending,
+                Poll::Ready(None) => Poll::Ready(None),
+                Poll::Ready(Some(Ok(msg))) => match msg {
+                    Message::Binary(b) => Poll::Ready(Some(Ok(b))),
+                    Message::Close(_) => Poll::Ready(None),
+                    Message::Text(_) => Poll::Ready(Some(Err(IoError::new(
+                        IoErrorKind::Other,
+                        "TCP tunneling requires binary frames, got text",
+                    )))),
+                    Message::Ping(b) => {
+                        this.state = WsBytesStreamState::SendingPong(b);
+                        cx.waker().wake_by_ref();
+                        Poll::Pending
+                    }
+                    Message::Pong(_) => {
+                        cx.waker().wake_by_ref();
+                        Poll::Pending
+                    }
+                    Message::Frame(_) => {
+                        Poll::Ready(Some(Err(IoError::new(IoErrorKind::Other, "unexpected raw frame"))))
+                    }
+                },
+                Poll::Ready(Some(Err(err))) => Poll::Ready(Some(Err(IoError::new(IoErrorKind::Other, err)))),
+            },
+
+            WsBytesStreamState::SendingPong(_) => {
+                if let Err(err) = ready!(this.inner.poll_ready_unpin(cx)) {
+                    return Poll::Ready(Some(Err(IoError::new(IoErrorKind::Other, err))));
+                }
+
+                let WsBytesStreamState::SendingPong(b) =
+                    std::mem::replace(&mut this.state, WsBytesStreamState::Reading)
+                else {
+                    unreachable!()
+                };
+
+                match this.inner.start_send_unpin(Message::Pong(b)) {
+                    Ok(()) => {
+                        cx.waker().wake_by_ref();
+                        Poll::Pending
+                    }
+                    Err(err) => Poll::Ready(Some(Err(IoError::new(IoErrorKind::Other, err)))),
+                }
+            }
+        }
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.inner.size_hint()
     }
 }
