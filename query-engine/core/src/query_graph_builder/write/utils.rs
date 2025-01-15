@@ -3,10 +3,12 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     Computation, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{DatasourceFieldName, RecordFilter, WriteArgs, WriteOperation};
 use indexmap::IndexMap;
 use psl::parser_database::ReferentialAction;
-use query_structure::{FieldSelection, Filter, Model, PrismaValue, RelationFieldRef, SelectionResult};
+use query_structure::{
+    DatasourceFieldName, FieldSelection, Filter, Model, PrismaValue, RecordFilter, RelationFieldRef, SelectionResult,
+    WriteArgs, WriteOperation,
+};
 use schema::QuerySchema;
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
@@ -229,6 +231,7 @@ where
         record_filter,
         args,
         selected_fields: None,
+        limit: None,
     };
 
     graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(ur)))
@@ -521,6 +524,7 @@ pub fn emulate_on_delete_cascade(
     let delete_query = WriteQuery::DeleteManyRecords(DeleteManyRecords {
         model: dependent_model.clone(),
         record_filter: RecordFilter::empty(),
+        limit: None,
     });
 
     let delete_dependents_node = graph.create_node(Query::Write(delete_query));
@@ -617,6 +621,7 @@ pub fn emulate_on_delete_set_null(
         record_filter: RecordFilter::empty(),
         args: WriteArgs::new(child_update_args, crate::executor::get_request_now()),
         selected_fields: None,
+        limit: None,
     });
 
     let set_null_dependents_node = graph.create_node(Query::Write(set_null_query));
@@ -769,6 +774,7 @@ pub fn emulate_on_update_set_null(
         record_filter: RecordFilter::empty(),
         args: WriteArgs::new(child_update_args, crate::executor::get_request_now()),
         selected_fields: None,
+        limit: None,
     });
 
     let set_null_dependents_node = graph.create_node(Query::Write(set_null_query));
@@ -1094,6 +1100,7 @@ pub fn emulate_on_update_cascade(
             crate::executor::get_request_now(),
         ),
         selected_fields: None,
+        limit: None,
     });
 
     let update_dependents_node = graph.create_node(Query::Write(update_query));

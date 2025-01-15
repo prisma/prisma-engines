@@ -80,6 +80,7 @@ impl TestApi {
 
     async fn describe_impl(&self, schemas: &[&str]) -> Result<SqlSchema, DescriberError> {
         match self.sql_family() {
+            #[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
             SqlFamily::Postgres => {
                 use postgres::Circumstances;
                 sql_schema_describer::postgres::SqlSchemaDescriber::new(
@@ -93,11 +94,13 @@ impl TestApi {
                 .describe(schemas)
                 .await
             }
+            #[cfg(feature = "sqlite")]
             SqlFamily::Sqlite => {
                 sql_schema_describer::sqlite::SqlSchemaDescriber::new(&self.database)
                     .describe_impl()
                     .await
             }
+            #[cfg(feature = "mysql")]
             SqlFamily::Mysql => {
                 use mysql::Circumstances;
                 sql_schema_describer::mysql::SqlSchemaDescriber::new(
@@ -115,6 +118,7 @@ impl TestApi {
                 .describe(schemas)
                 .await
             }
+            #[cfg(feature = "mssql")]
             SqlFamily::Mssql => {
                 sql_schema_describer::mssql::SqlSchemaDescriber::new(&self.database)
                     .describe(schemas)

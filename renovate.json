@@ -56,7 +56,7 @@
     {
       "groupName": "Driver Adapters directory",
       "matchFileNames": [
-        "query-engine/driver-adapters/**"
+        "libs/driver-adapters/**"
       ]
     },
     {

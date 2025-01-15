@@ -1,4 +1,5 @@
 use super::*;
+use crate::query_graph_builder::write::limit::validate_limit;
 use crate::{
     query_ast::*,
     query_graph::{Node, QueryGraph, QueryGraphDependency},
@@ -111,11 +112,14 @@ pub fn delete_many_records(
         None => Filter::empty(),
     };
 
+    let limit = validate_limit(field.arguments.lookup(args::LIMIT))?;
+
     let model_id = model.primary_identifier();
     let record_filter = filter.clone().into();
     let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
         model: model.clone(),
         record_filter,
+        limit,
     });
 
     let delete_many_node = graph.create_node(Query::Write(delete_many));

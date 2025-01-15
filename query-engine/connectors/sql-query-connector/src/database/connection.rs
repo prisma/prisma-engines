@@ -1,19 +1,22 @@
 #![cfg_attr(target_arch = "wasm32", allow(dead_code))]
 
 use super::{catch, transaction::SqlConnectorTransaction};
-use crate::{database::operations::*, Context, SqlError};
+use crate::{database::operations::*, SqlError};
 use async_trait::async_trait;
 use connector::ConnectionLike;
 use connector_interface::{
-    self as connector, AggregationRow, AggregationSelection, Connection, ReadOperations, RecordFilter, Transaction,
-    WriteArgs, WriteOperations,
+    self as connector, AggregationRow, Connection, ReadOperations, Transaction, WriteOperations,
 };
 use prisma_value::PrismaValue;
 use quaint::{
     connector::{IsolationLevel, TransactionCapable},
     prelude::{ConnectionInfo, Queryable},
 };
-use query_structure::{prelude::*, Filter, QueryArguments, RelationLoadStrategy, SelectionResult};
+use query_structure::{
+    prelude::*, AggregationSelection, Filter, QueryArguments, RecordFilter, RelationLoadStrategy, SelectionResult,
+    WriteArgs,
+};
+use sql_query_builder::Context;
 use std::{collections::HashMap, str::FromStr};
 use telemetry::TraceParent;
 
@@ -226,12 +229,13 @@ where
         model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
+        limit: Option<usize>,
         traceparent: Option<TraceParent>,
     ) -> connector::Result<usize> {
         let ctx = Context::new(&self.connection_info, traceparent);
         catch(
             &self.connection_info,
-            write::update_records(&self.inner, model, record_filter, args, &ctx),
+            write::update_records(&self.inner, model, record_filter, args, limit, &ctx),
         )
         .await
     }
@@ -242,12 +246,13 @@ where
         record_filter: RecordFilter,
         args: WriteArgs,
         selected_fields: FieldSelection,
+        limit: Option<usize>,
         traceparent: Option<TraceParent>,
     ) -> connector::Result<ManyRecords> {
         let ctx = Context::new(&self.connection_info, traceparent);
         catch(
             &self.connection_info,
-            write::update_records_returning(&self.inner, model, record_filter, args, selected_fields, &ctx),
+            write::update_records_returning(&self.inner, model, record_filter, args, selected_fields, limit, &ctx),
         )
         .await
     }
@@ -272,12 +277,13 @@ where
         &mut self,
         model: &Model,
         record_filter: RecordFilter,
+        limit: Option<usize>,
         traceparent: Option<TraceParent>,
     ) -> connector::Result<usize> {
         let ctx = Context::new(&self.connection_info, traceparent);
         catch(
             &self.connection_info,
-            write::delete_records(&self.inner, model, record_filter, &ctx),
+            write::delete_records(&self.inner, model, record_filter, limit, &ctx),
         )
         .await
     }

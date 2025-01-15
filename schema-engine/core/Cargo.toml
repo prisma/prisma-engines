@@ -5,11 +5,13 @@ version = "0.1.0"
 
 [dependencies]
 psl = { workspace = true, features = ["all"] }
-schema-connector = { path = "../connectors/schema-connector" }
+schema-connector = { path = "../connectors/schema-connector", features = [
+    "all-native",
+] }
 mongodb-schema-connector = { path = "../connectors/mongodb-schema-connector" }
 sql-schema-connector = { path = "../connectors/sql-schema-connector" }
 user-facing-errors = { path = "../../libs/user-facing-errors", features = [
-    "all-native",
+    "quaint",
 ] }
 
 async-trait.workspace = true

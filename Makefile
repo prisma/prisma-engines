@@ -28,6 +28,10 @@ clean-qe-wasm:
 	@echo "Cleaning query-engine/query-engine-wasm/pkg" && \
 	cd query-engine/query-engine-wasm/pkg && find . ! -name '.' ! -name '..' ! -name 'README.md' -exec rm -rf {} +
 
+clean-se-wasm:
+	@echo "Cleaning schema-engine/schema-engine-wasm/pkg" && \
+	cd schema-engine/schema-engine-wasm/pkg && find . ! -name '.' ! -name '..' ! -name 'README.md' -exec rm -rf {} +
+
 clean-cargo:
 	@echo "Cleaning cargo" && \
 	cargo clean
@@ -71,6 +75,10 @@ integrate-qe-wasm:
 	cd query-engine/query-engine-wasm && \
 	./build.sh $(QE_WASM_VERSION) ../prisma/packages/client/node_modules/@prisma/query-engine-wasm
 
+build-se-wasm:
+	cd schema-engine/schema-engine-wasm && \
+	./build.sh $(QE_WASM_VERSION) schema-engine/schema-engine-wasm/pkg
+
 build-schema-wasm:
 	@printf '%s\n' "🛠️  Building the Rust crate"
 	cargo build --profile $(PROFILE) --target=wasm32-unknown-unknown -p prisma-schema-build
@@ -85,7 +93,7 @@ build-schema-wasm:
 pedantic:
 	RUSTFLAGS="-D warnings" cargo fmt -- --check
 	RUSTFLAGS="-D warnings" cargo clippy --all-features --all-targets
-	RUSTFLAGS="-D warnings" cargo clippy --all-features --all-targets -p query-engine-wasm -p prisma-schema-build --target wasm32-unknown-unknown
+	RUSTFLAGS="-D warnings" cargo clippy --all-features --all-targets -p query-engine-wasm -p schema-engine-wasm -p prisma-schema-build --target wasm32-unknown-unknown
 
 release:
 	cargo build --release
@@ -210,13 +218,13 @@ test-driver-adapter-pg: test-pg-js
 test-driver-adapter-pg-wasm: test-pg-wasm
 
 start-pg-bench:
-	docker compose -f query-engine/driver-adapters/executor/bench/docker-compose.yml up --wait -d --remove-orphans postgres
+	docker compose -f libs/driver-adapters/executor/bench/docker-compose.yml up --wait -d --remove-orphans postgres
 
 setup-pg-bench: start-pg-bench build-qe-napi build-qe-wasm build-driver-adapters-kit
 
 run-bench:
 	DATABASE_URL="postgresql://postgres:postgres@localhost:5432/bench?schema=imdb_bench&sslmode=disable" \
-	node --experimental-wasm-modules query-engine/driver-adapters/executor/dist/bench.mjs
+	node --experimental-wasm-modules libs/driver-adapters/executor/dist/bench.mjs
 
 bench-pg-js: setup-pg-bench run-bench
 
@@ -401,7 +409,7 @@ measure-qe-wasm: build-qe-wasm-gz
 	done;
 
 build-driver-adapters-kit: build-driver-adapters
-	cd query-engine/driver-adapters && pnpm i && pnpm build
+	cd libs/driver-adapters && pnpm i && pnpm build
 
 build-driver-adapters: ensure-prisma-present
 	@echo "Building driver adapters..."

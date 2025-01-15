@@ -1,7 +1,6 @@
 use super::{expression, into_expression::IntoUpdateExpression};
 use bson::{doc, Document};
-use connector_interface::FieldPath;
-use query_structure::Filter;
+use query_structure::{FieldPath, Filter};
 
 /// `UpdateOperation` is an intermediary AST used to perform preliminary transformations from a `WriteOperation`.
 /// It is meant to be transformed into an `UpdateExpression`.

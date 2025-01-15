@@ -3367,7 +3367,7 @@ checksum = "cc9c68a3f6da06753e9335d63e27f6b9754dd1920d941135b7ea8224f141adb2"
 [[package]]
 name = "postgres-native-tls"
 version = "0.5.0"
-source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#c62b9928d402685e152161907e8480603c29ef65"
+source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#0db3436fc7d5c1848df5728407f342228a91f54d"
 dependencies = [
  "native-tls",
  "tokio",
@@ -3378,7 +3378,7 @@ dependencies = [
 [[package]]
 name = "postgres-protocol"
 version = "0.6.7"
-source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#c62b9928d402685e152161907e8480603c29ef65"
+source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#0db3436fc7d5c1848df5728407f342228a91f54d"
 dependencies = [
  "base64 0.22.1",
  "byteorder",
@@ -3395,7 +3395,7 @@ dependencies = [
 [[package]]
 name = "postgres-types"
 version = "0.2.8"
-source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#c62b9928d402685e152161907e8480603c29ef65"
+source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#0db3436fc7d5c1848df5728407f342228a91f54d"
 dependencies = [
  "bit-vec",
  "bytes",
@@ -3731,6 +3731,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "query-builder"
+version = "0.1.0"
+dependencies = [
+ "query-structure",
+ "serde",
+]
+
+[[package]]
 name = "query-connector"
 version = "0.1.0"
 dependencies = [
@@ -3771,11 +3779,13 @@ dependencies = [
  "petgraph",
  "prisma-metrics",
  "psl",
+ "query-builder",
  "query-connector",
  "query-structure",
  "schema",
  "serde",
  "serde_json",
+ "sql-query-builder",
  "telemetry",
  "thiserror",
  "tokio",
@@ -3988,6 +3998,7 @@ dependencies = [
  "chrono",
  "cuid",
  "getrandom 0.2.11",
+ "indexmap 2.2.2",
  "itertools 0.12.0",
  "nanoid",
  "prisma-value",
@@ -4672,6 +4683,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "schema-engine-wasm"
+version = "0.1.0"
+dependencies = [
+ "build-utils",
+ "driver-adapters",
+ "js-sys",
+ "psl",
+ "quaint",
+ "serde",
+ "tracing",
+ "tsify",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "wasm-rs-dbg",
+]
+
+[[package]]
 name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5086,6 +5114,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "sql-query-builder"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "indexmap 2.2.2",
+ "itertools 0.12.0",
+ "prisma-value",
+ "psl",
+ "quaint",
+ "query-builder",
+ "query-structure",
+ "serde_json",
+ "telemetry",
+]
+
+[[package]]
 name = "sql-query-connector"
 version = "0.1.0"
 dependencies = [
@@ -5106,6 +5150,7 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "serde_json",
+ "sql-query-builder",
  "telemetry",
  "thiserror",
  "tokio",
@@ -5648,7 +5693,7 @@ dependencies = [
 [[package]]
 name = "tokio-postgres"
 version = "0.7.12"
-source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#c62b9928d402685e152161907e8480603c29ef65"
+source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#0db3436fc7d5c1848df5728407f342228a91f54d"
 dependencies = [
  "async-trait",
  "byteorder",

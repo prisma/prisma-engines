@@ -1,4 +1,5 @@
 use super::*;
+use crate::query_graph_builder::write::limit::validate_limit;
 use crate::query_graph_builder::write::write_args_parser::*;
 use crate::ParsedObject;
 use crate::{
@@ -136,6 +137,9 @@ pub fn update_many_records(
         None => Filter::empty(),
     };
 
+    // "limit"
+    let limit = validate_limit(field.arguments.lookup(args::LIMIT))?;
+
     // "data"
     let data_argument = field.arguments.lookup(args::DATA).unwrap();
     let data_map: ParsedInputMap<'_> = data_argument.value.try_into()?;
@@ -146,9 +150,12 @@ pub fn update_many_records(
             query_schema,
             filter,
             model,
-            Some(field.name),
-            field.nested_fields.filter(|_| with_field_selection),
             data_map,
+            UpdateManyRecordNodeOptionals {
+                name: Some(field.name),
+                nested_field_selection: field.nested_fields.filter(|_| with_field_selection),
+                limit,
+            },
         )?;
     } else {
         let pre_read_node = graph.create_node(utils::read_ids_infallible(
@@ -161,9 +168,12 @@ pub fn update_many_records(
             query_schema,
             Filter::empty(),
             model.clone(),
-            Some(field.name),
-            field.nested_fields.filter(|_| with_field_selection),
             data_map,
+            UpdateManyRecordNodeOptionals {
+                name: Some(field.name),
+                nested_field_selection: field.nested_fields.filter(|_| with_field_selection),
+                limit,
+            },
         )?;
 
         utils::insert_emulated_on_update(graph, query_schema, &model, &pre_read_node, &update_many_node)?;
@@ -267,9 +277,8 @@ pub fn update_many_record_node<T>(
     query_schema: &QuerySchema,
     filter: T,
     model: Model,
-    name: Option<String>,
-    nested_field_selection: Option<ParsedObject<'_>>,
     data_map: ParsedInputMap<'_>,
+    additional_args: UpdateManyRecordNodeOptionals<'_>,
 ) -> QueryGraphBuilderResult<NodeRef>
 where
     T: Into<Filter>,
@@ -283,7 +292,7 @@ where
 
     args.update_datetimes(&model);
 
-    let selected_fields = if let Some(nested_fields) = nested_field_selection {
+    let selected_fields = if let Some(nested_fields) = additional_args.nested_field_selection {
         let (selected_fields, selection_order, nested_read) =
             super::read::utils::extract_selected_fields(nested_fields.fields, &model, query_schema)?;
 
@@ -297,11 +306,12 @@ where
     };
 
     let update_many = UpdateManyRecords {
-        name: name.unwrap_or_default(),
+        name: additional_args.name.unwrap_or_default(),
         model,
         record_filter,
         args,
         selected_fields,
+        limit: additional_args.limit,
     };
 
     let update_many_node = graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(update_many)));
@@ -341,4 +351,10 @@ fn can_use_atomic_update(
     }
 
     true
+}
+
+pub struct UpdateManyRecordNodeOptionals<'a> {
+    pub name: Option<String>,
+    pub nested_field_selection: Option<ParsedObject<'a>>,
+    pub limit: Option<usize>,
 }

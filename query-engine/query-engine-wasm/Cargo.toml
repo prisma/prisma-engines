@@ -43,7 +43,7 @@ request-handlers = { path = "../request-handlers", default-features = false, fea
     "driver-adapters",
 ] }
 query-core = { path = "../core" }
-driver-adapters = { path = "../driver-adapters" }
+driver-adapters = { path = "../../libs/driver-adapters" }
 telemetry = { path = "../../libs/telemetry" }
 quaint.workspace = true
 connection-string.workspace = true

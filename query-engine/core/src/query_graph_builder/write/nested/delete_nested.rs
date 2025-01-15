@@ -4,8 +4,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue,
 };
-use connector::RecordFilter;
-use query_structure::{Filter, Model, PrismaValue, RelationFieldRef};
+use query_structure::{Filter, Model, PrismaValue, RecordFilter, RelationFieldRef};
 use std::convert::TryInto;
 
 /// Adds a delete (single) record node to the graph and connects it to the parent.
@@ -44,6 +43,7 @@ pub fn nested_delete(
         let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
             model: child_model.clone(),
             record_filter: or_filter.clone().into(),
+            limit: None,
         });
 
         let delete_many_node = graph.create_node(Query::Write(delete_many));
@@ -157,6 +157,7 @@ pub fn nested_delete_many(
         let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
             model: child_model.clone(),
             record_filter: RecordFilter::empty(),
+            limit: None,
         });
 
         let delete_many_node = graph.create_node(Query::Write(delete_many));

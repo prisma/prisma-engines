@@ -5523,6 +5523,18 @@ mod tests {
                                   "isList": false
                                 }
                               ]
+                            },
+                            {
+                              "name": "limit",
+                              "isRequired": false,
+                              "isNullable": false,
+                              "inputTypes": [
+                                {
+                                  "type": "Int",
+                                  "location": "scalar",
+                                  "isList": false
+                                }
+                              ]
                             }
                           ],
                           "isNullable": false,
@@ -5567,6 +5579,18 @@ mod tests {
                                   "isList": false
                                 }
                               ]
+                            },
+                            {
+                              "name": "limit",
+                              "isRequired": false,
+                              "isNullable": false,
+                              "inputTypes": [
+                                {
+                                  "type": "Int",
+                                  "location": "scalar",
+                                  "isList": false
+                                }
+                              ]
                             }
                           ],
                           "isNullable": false,
@@ -5589,6 +5613,18 @@ mod tests {
                                   "type": "AWhereInput",
                                   "namespace": "prisma",
                                   "location": "inputObjectTypes",
+                                  "isList": false
+                                }
+                              ]
+                            },
+                            {
+                              "name": "limit",
+                              "isRequired": false,
+                              "isNullable": false,
+                              "inputTypes": [
+                                {
+                                  "type": "Int",
+                                  "location": "scalar",
                                   "isList": false
                                 }
                               ]
@@ -5885,6 +5921,18 @@ mod tests {
                                   "isList": false
                                 }
                               ]
+                            },
+                            {
+                              "name": "limit",
+                              "isRequired": false,
+                              "isNullable": false,
+                              "inputTypes": [
+                                {
+                                  "type": "Int",
+                                  "location": "scalar",
+                                  "isList": false
+                                }
+                              ]
                             }
                           ],
                           "isNullable": false,
@@ -5929,6 +5977,18 @@ mod tests {
                                   "isList": false
                                 }
                               ]
+                            },
+                            {
+                              "name": "limit",
+                              "isRequired": false,
+                              "isNullable": false,
+                              "inputTypes": [
+                                {
+                                  "type": "Int",
+                                  "location": "scalar",
+                                  "isList": false
+                                }
+                              ]
                             }
                           ],
                           "isNullable": false,
@@ -5951,6 +6011,18 @@ mod tests {
                                   "type": "BWhereInput",
                                   "namespace": "prisma",
                                   "location": "inputObjectTypes",
+                                  "isList": false
+                                }
+                              ]
+                            },
+                            {
+                              "name": "limit",
+                              "isRequired": false,
+                              "isNullable": false,
+                              "inputTypes": [
+                                {
+                                  "type": "Int",
+                                  "location": "scalar",
                                   "isList": false
                                 }
                               ]

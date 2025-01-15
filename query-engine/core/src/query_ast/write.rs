@@ -1,8 +1,8 @@
 //! Write query AST
 use super::{FilteredNestedMutation, FilteredQuery};
 use crate::{ReadQuery, RecordQuery, ToGraphviz};
-use connector::{DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
-use query_structure::{prelude::*, Filter};
+use connector::NativeUpsert;
+use query_structure::{prelude::*, DatasourceFieldName, Filter, RecordFilter, WriteArgs};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -368,6 +368,7 @@ pub struct UpdateManyRecords {
     /// Fields of updated records that client has requested to return.
     /// `None` if the connector does not support returning the updated rows.
     pub selected_fields: Option<UpdateManyRecordsFields>,
+    pub limit: Option<usize>,
 }
 
 #[derive(Debug, Clone)]
@@ -397,6 +398,7 @@ pub struct DeleteRecordFields {
 pub struct DeleteManyRecords {
     pub model: Model,
     pub record_filter: RecordFilter,
+    pub limit: Option<usize>,
 }
 
 #[derive(Debug, Clone)]

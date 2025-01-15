@@ -5,8 +5,8 @@ use crate::{
     query_ast::*,
     QueryResult, RecordSelection,
 };
-use connector::{ConnectionLike, DatasourceFieldName, NativeUpsert, WriteArgs};
-use query_structure::{ManyRecords, Model, RawJson};
+use connector::{ConnectionLike, NativeUpsert};
+use query_structure::{DatasourceFieldName, ManyRecords, Model, RawJson, WriteArgs};
 use telemetry::TraceParent;
 
 pub(crate) async fn execute(
@@ -295,7 +295,7 @@ async fn delete_one(
 
         Ok(QueryResult::RecordSelection(Some(Box::new(selection))))
     } else {
-        let result = tx.delete_records(&q.model, filter, traceparent).await?;
+        let result = tx.delete_records(&q.model, filter, None, traceparent).await?;
         Ok(QueryResult::Count(result))
     }
 }
@@ -307,7 +307,14 @@ async fn update_many(
 ) -> InterpretationResult<QueryResult> {
     if let Some(selected_fields) = q.selected_fields {
         let records = tx
-            .update_records_returning(&q.model, q.record_filter, q.args, selected_fields.fields, traceparent)
+            .update_records_returning(
+                &q.model,
+                q.record_filter,
+                q.args,
+                selected_fields.fields,
+                q.limit,
+                traceparent,
+            )
             .await?;
 
         let nested: Vec<QueryResult> =
@@ -325,7 +332,7 @@ async fn update_many(
         Ok(QueryResult::RecordSelection(Some(Box::new(selection))))
     } else {
         let affected_records = tx
-            .update_records(&q.model, q.record_filter, q.args, traceparent)
+            .update_records(&q.model, q.record_filter, q.args, q.limit, traceparent)
             .await?;
 
         Ok(QueryResult::Count(affected_records))
@@ -337,7 +344,9 @@ async fn delete_many(
     q: DeleteManyRecords,
     traceparent: Option<TraceParent>,
 ) -> InterpretationResult<QueryResult> {
-    let res = tx.delete_records(&q.model, q.record_filter, traceparent).await?;
+    let res = tx
+        .delete_records(&q.model, q.record_filter, q.limit, traceparent)
+        .await?;
 
     Ok(QueryResult::Count(res))
 }

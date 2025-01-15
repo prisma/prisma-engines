@@ -45,6 +45,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Cache Docker images.
+        uses: ScribeMD/docker-cache@0.5.0
+        with:
+          key: docker-${{ matrix.database.name }}-${{hashFiles('docker-compose.yaml')}}
+
       - name: "Start ${{ matrix.database.name }}"
         run: make start-${{ matrix.database.name }}-single
 
@@ -124,6 +129,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Cache Docker images.
+        uses: ScribeMD/docker-cache@0.5.0
+        with:
+          key: docker-${{ matrix.database.name }}-${{hashFiles('docker-compose.yaml')}}
+
       - name: "Start ${{ matrix.database.name }}"
         run: make start-${{ matrix.database.name }}
 
@@ -133,7 +143,7 @@ jobs:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
 
-      - run: cargo nextest run -p sql-schema-describer
+      - run: cargo nextest run -p sql-schema-describer --features all-native
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
@@ -179,7 +189,7 @@ jobs:
       #
       # Single threaded tests (excluding Vitess)
       #
-      - run: cargo nextest run -p sql-schema-describer --test-threads=1
+      - run: cargo nextest run -p sql-schema-describer --features all-native --test-threads=1
         if: ${{ !matrix.database.is_vitess && matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1

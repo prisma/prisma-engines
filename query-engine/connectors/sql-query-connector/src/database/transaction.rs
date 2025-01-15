@@ -1,14 +1,15 @@
 use super::catch;
-use crate::{database::operations::*, Context, SqlError};
+use crate::{database::operations::*, SqlError};
 use async_trait::async_trait;
 use connector::ConnectionLike;
-use connector_interface::{
-    self as connector, AggregationRow, AggregationSelection, ReadOperations, RecordFilter, Transaction, WriteArgs,
-    WriteOperations,
-};
+use connector_interface::{self as connector, AggregationRow, ReadOperations, Transaction, WriteOperations};
 use prisma_value::PrismaValue;
 use quaint::prelude::ConnectionInfo;
-use query_structure::{prelude::*, Filter, QueryArguments, RelationLoadStrategy, SelectionResult};
+use query_structure::{
+    prelude::*, AggregationSelection, Filter, QueryArguments, RecordFilter, RelationLoadStrategy, SelectionResult,
+    WriteArgs,
+};
+use sql_query_builder::Context;
 use std::collections::HashMap;
 use telemetry::TraceParent;
 
@@ -220,12 +221,13 @@ impl WriteOperations for SqlConnectorTransaction<'_> {
         model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
+        limit: Option<usize>,
         traceparent: Option<TraceParent>,
     ) -> connector::Result<usize> {
         let ctx = Context::new(&self.connection_info, traceparent);
         catch(
             &self.connection_info,
-            write::update_records(self.inner.as_queryable(), model, record_filter, args, &ctx),
+            write::update_records(self.inner.as_queryable(), model, record_filter, args, limit, &ctx),
         )
         .await
     }
@@ -236,6 +238,7 @@ impl WriteOperations for SqlConnectorTransaction<'_> {
         record_filter: RecordFilter,
         args: WriteArgs,
         selected_fields: FieldSelection,
+        limit: Option<usize>,
         traceparent: Option<TraceParent>,
     ) -> connector::Result<ManyRecords> {
         let ctx = Context::new(&self.connection_info, traceparent);
@@ -247,6 +250,7 @@ impl WriteOperations for SqlConnectorTransaction<'_> {
                 record_filter,
                 args,
                 selected_fields,
+                limit,
                 &ctx,
             ),
         )
@@ -280,11 +284,12 @@ impl WriteOperations for SqlConnectorTransaction<'_> {
         &mut self,
         model: &Model,
         record_filter: RecordFilter,
+        limit: Option<usize>,
         traceparent: Option<TraceParent>,
     ) -> connector::Result<usize> {
         catch(&self.connection_info, async {
             let ctx = Context::new(&self.connection_info, traceparent);
-            write::delete_records(self.inner.as_queryable(), model, record_filter, &ctx).await
+            write::delete_records(self.inner.as_queryable(), model, record_filter, limit, &ctx).await
         })
         .await
     }
