@@ -31,7 +31,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, ctx: &Context<'_>) -> Trans
             )
             .limit(1);
 
-            let expr = Expression::Query(build_db_query(query)?);
+            let expr = Expression::Query(build_db_query(query, ctx)?);
             let expr = Expression::Unique(Box::new(expr));
 
             if rq.nested.is_empty() {
@@ -56,7 +56,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, ctx: &Context<'_>) -> Trans
                 ctx,
             );
 
-            let expr = Expression::Query(build_db_query(query)?);
+            let expr = Expression::Query(build_db_query(query, ctx)?);
 
             let expr = if needs_reversed_order {
                 Expression::Reverse(Box::new(expr))
@@ -186,7 +186,7 @@ fn build_read_one2m_query(rrq: RelatedRecordsQuery, ctx: &Context<'_>) -> Transl
 
     let query = if to_one_relation { query.limit(1) } else { query };
 
-    let mut expr = Expression::Query(build_db_query(query)?);
+    let mut expr = Expression::Query(build_db_query(query, ctx)?);
 
     if to_one_relation {
         expr = Expression::Unique(Box::new(expr));

@@ -2,7 +2,7 @@ mod query;
 
 use query::translate_query;
 use thiserror::Error;
-
+use quaint::connector::ConnectionInfo;
 use crate::{EdgeRef, Node, NodeRef, Query, QueryGraph};
 
 use super::expression::{Binding, Expression};
@@ -18,28 +18,30 @@ pub enum TranslateError {
 
 pub type TranslateResult<T> = Result<T, TranslateError>;
 
-pub fn translate(mut graph: QueryGraph) -> TranslateResult<Expression> {
+pub fn translate(mut graph: QueryGraph, connection_info: &ConnectionInfo) -> TranslateResult<Expression> {
     graph
         .root_nodes()
         .into_iter()
-        .map(|node| NodeTranslator::new(&mut graph, node, &[]).translate())
+        .map(|node| NodeTranslator::new(&mut graph, node, &[], connection_info).translate())
         .collect::<TranslateResult<Vec<_>>>()
         .map(Expression::Seq)
 }
 
-struct NodeTranslator<'a, 'b> {
+struct NodeTranslator<'a, 'b, 'c> {
     graph: &'a mut QueryGraph,
     node: NodeRef,
     #[allow(dead_code)]
     parent_edges: &'b [EdgeRef],
+    connection_info: &'c ConnectionInfo,
 }
 
-impl<'a, 'b> NodeTranslator<'a, 'b> {
-    fn new(graph: &'a mut QueryGraph, node: NodeRef, parent_edges: &'b [EdgeRef]) -> Self {
+impl<'a, 'b, 'c> NodeTranslator<'a, 'b, 'c> {
+    fn new(graph: &'a mut QueryGraph, node: NodeRef, parent_edges: &'b [EdgeRef], connection_info: &'c ConnectionInfo) -> Self {
         Self {
             graph,
             node,
             parent_edges,
+            connection_info,
         }
     }
 
@@ -64,7 +66,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .try_into()
             .expect("current node must be query");
 
-        translate_query(query)
+        translate_query(query, self.connection_info)
     }
 
     #[allow(dead_code)]
@@ -99,7 +101,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .into_iter()
             .map(|(_, node)| {
                 let edges = self.graph.incoming_edges(&node);
-                NodeTranslator::new(self.graph, node, &edges).translate()
+                NodeTranslator::new(self.graph, node, &edges, self.connection_info).translate()
             })
             .collect::<Result<Vec<_>, _>>()?;
 
@@ -121,7 +123,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .map(|(_, node)| {
                 let name = node.id();
                 let edges = self.graph.incoming_edges(&node);
-                let expr = NodeTranslator::new(self.graph, node, &edges).translate()?;
+                let expr = NodeTranslator::new(self.graph, node, &edges, self.connection_info).translate()?;
                 Ok(Binding { name, expr })
             })
             .collect::<TranslateResult<Vec<_>>>()?;

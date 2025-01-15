@@ -25,7 +25,7 @@ pub struct QuerySchema {
     pub internal_data_model: InternalDataModel,
 
     pub(crate) enable_raw_queries: bool,
-    pub(crate) connector: &'static dyn Connector,
+    pub connector: &'static dyn Connector,
 
     /// Indexes query and mutation fields by their own query info for easier access.
     query_info_map: HashMap<(Operation, QueryInfo), usize>,
