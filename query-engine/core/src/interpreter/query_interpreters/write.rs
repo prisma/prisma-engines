@@ -5,8 +5,8 @@ use crate::{
     query_ast::*,
     QueryResult, RecordSelection,
 };
-use connector::{ConnectionLike, DatasourceFieldName, NativeUpsert, WriteArgs};
-use query_structure::{ManyRecords, Model, RawJson};
+use connector::{ConnectionLike, NativeUpsert};
+use query_structure::{DatasourceFieldName, ManyRecords, Model, RawJson, WriteArgs};
 use telemetry::TraceParent;
 
 pub(crate) async fn execute(

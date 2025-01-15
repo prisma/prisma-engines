@@ -3,10 +3,12 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     Computation, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{DatasourceFieldName, RecordFilter, WriteArgs, WriteOperation};
 use indexmap::IndexMap;
 use psl::parser_database::ReferentialAction;
-use query_structure::{FieldSelection, Filter, Model, PrismaValue, RelationFieldRef, SelectionResult};
+use query_structure::{
+    DatasourceFieldName, FieldSelection, Filter, Model, PrismaValue, RecordFilter, RelationFieldRef, SelectionResult,
+    WriteArgs, WriteOperation,
+};
 use schema::QuerySchema;
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.

@@ -1,14 +1,8 @@
-use crate::{
-    column_metadata,
-    filter::FilterBuilder,
-    model_extensions::AsColumns,
-    query_builder::write::{build_update_and_set_query, create_record},
-    row::ToSqlRow,
-    Context, Queryable,
-};
+use crate::{row::ToSqlRow, Queryable};
 use connector_interface::NativeUpsert;
 use quaint::prelude::{OnConflict, Query};
 use query_structure::{ModelProjection, Record, SingleRecord};
+use sql_query_builder::{column_metadata, write, AsColumns, Context, FilterBuilder};
 
 pub(crate) async fn native_upsert(
     conn: &dyn Queryable,
@@ -23,9 +17,9 @@ pub(crate) async fn native_upsert(
 
     let where_condition = FilterBuilder::without_top_level_joins().visit_filter(upsert.filter().clone(), ctx);
     let update =
-        build_update_and_set_query(upsert.model(), upsert.update().clone(), None, ctx).so_that(where_condition);
+        write::build_update_and_set_query(upsert.model(), upsert.update().clone(), None, ctx).so_that(where_condition);
 
-    let insert = create_record(upsert.model(), upsert.create().clone(), &selected_fields, ctx);
+    let insert = write::create_record(upsert.model(), upsert.create().clone(), &selected_fields, ctx);
 
     let constraints: Vec<_> = upsert.unique_constraints().as_columns(ctx).collect();
     let query: Query = insert.on_conflict(OnConflict::Update(update, constraints)).into();

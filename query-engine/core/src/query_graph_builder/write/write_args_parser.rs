@@ -1,7 +1,9 @@
 use super::*;
 use crate::query_document::{ParsedInputMap, ParsedInputValue};
-use connector::{DatasourceFieldName, WriteArgs, WriteOperation};
-use query_structure::{CompositeFieldRef, Field, Model, PrismaValue, RelationFieldRef, ScalarFieldRef, TypeIdentifier};
+use query_structure::{
+    CompositeFieldRef, DatasourceFieldName, Field, Model, PrismaValue, RelationFieldRef, ScalarFieldRef,
+    TypeIdentifier, WriteArgs, WriteOperation,
+};
 use schema::constants::{args, json_null, operations};
 use std::{borrow::Cow, convert::TryInto};
 

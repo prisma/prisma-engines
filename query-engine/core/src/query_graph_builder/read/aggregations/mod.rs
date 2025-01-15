@@ -6,9 +6,8 @@ pub(crate) use group_by::*;
 
 use super::*;
 use crate::FieldPair;
-use connector::AggregationSelection;
 use itertools::Itertools;
-use query_structure::{Model, ScalarFieldRef};
+use query_structure::{AggregationSelection, Model, ScalarFieldRef};
 use schema::constants::aggregations::*;
 
 /// Resolves the given field as a aggregation query.

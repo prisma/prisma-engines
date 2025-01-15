@@ -2,7 +2,7 @@ use query_structure::{FieldArity, TypeIdentifier};
 
 /// Helps dealing with column value conversion and possible error resolution.
 #[derive(Clone, Debug, Copy)]
-pub(crate) struct ColumnMetadata<'a> {
+pub struct ColumnMetadata<'a> {
     identifier: &'a TypeIdentifier,
     name: Option<&'a str>,
     arity: FieldArity,
@@ -41,7 +41,7 @@ impl<'a> ColumnMetadata<'a> {
 
 /// Create a set of metadata objects, combining column names and type
 /// information.
-pub(crate) fn create<'a, T>(field_names: &'a [T], idents: &'a [(TypeIdentifier, FieldArity)]) -> Vec<ColumnMetadata<'a>>
+pub fn create<'a, T>(field_names: &'a [T], idents: &'a [(TypeIdentifier, FieldArity)]) -> Vec<ColumnMetadata<'a>>
 where
     T: AsRef<str>,
 {
@@ -55,7 +55,7 @@ where
 }
 
 /// Create a set of metadata objects.
-pub(crate) fn create_anonymous(idents: &[(TypeIdentifier, FieldArity)]) -> Vec<ColumnMetadata<'_>> {
+pub fn create_anonymous(idents: &[(TypeIdentifier, FieldArity)]) -> Vec<ColumnMetadata<'_>> {
     idents
         .iter()
         .map(|(identifier, arity)| ColumnMetadata::new(identifier, *arity))

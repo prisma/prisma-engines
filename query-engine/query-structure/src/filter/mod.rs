@@ -10,6 +10,7 @@ mod composite;
 mod into_filter;
 mod json;
 mod list;
+mod record;
 mod relation;
 mod scalar;
 
@@ -18,6 +19,7 @@ pub use composite::*;
 pub use into_filter::*;
 pub use json::*;
 pub use list::*;
+pub use record::*;
 pub use relation::*;
 pub use scalar::*;
 

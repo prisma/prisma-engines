@@ -3,7 +3,7 @@ use crate::context::Context;
 use quaint::Value;
 use query_structure::{PrismaValue, SelectedField, SelectionResult};
 
-pub(crate) trait SelectionResultExt {
+pub trait SelectionResultExt {
     fn misses_autogen_value(&self) -> bool;
     fn db_values<'a>(&self, ctx: &Context<'_>) -> Vec<Value<'a>>;
 
