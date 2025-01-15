@@ -23,7 +23,7 @@ use self::{lateral::LateralJoinSelectBuilder, subquery::SubqueriesSelectBuilder}
 
 pub(crate) const JSON_AGG_IDENT: &str = "__prisma_data__";
 
-pub(crate) struct SelectBuilder;
+pub struct SelectBuilder;
 
 impl SelectBuilder {
     pub fn build(args: QueryArguments, selected_fields: &FieldSelection, ctx: &Context<'_>) -> Select<'static> {

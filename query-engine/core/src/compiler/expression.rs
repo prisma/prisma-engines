@@ -1,4 +1,4 @@
-use query_structure::PrismaValue;
+use query_builder::DbQuery;
 use serde::Serialize;
 
 mod format;
@@ -18,18 +18,6 @@ impl Binding {
 impl std::fmt::Display for Binding {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{} = {}", self.name, self.expr)
-    }
-}
-
-#[derive(Debug, Serialize)]
-pub struct DbQuery {
-    pub query: String,
-    pub params: Vec<PrismaValue>,
-}
-
-impl DbQuery {
-    pub fn new(query: String, params: Vec<PrismaValue>) -> Self {
-        Self { query, params }
     }
 }
 

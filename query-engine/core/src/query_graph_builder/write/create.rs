@@ -4,9 +4,8 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputList, ParsedInputMap,
 };
-use connector::WriteArgs;
 use psl::{datamodel_connector::ConnectorCapability, parser_database::RelationFieldId};
-use query_structure::{IntoFilter, Model, Zipper};
+use query_structure::{IntoFilter, Model, WriteArgs, Zipper};
 use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 use write_args_parser::*;

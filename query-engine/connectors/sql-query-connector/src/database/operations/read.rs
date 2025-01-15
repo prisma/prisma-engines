@@ -3,18 +3,13 @@ mod coerce;
 #[cfg(feature = "relation_joins")]
 mod process;
 
-use crate::{
-    column_metadata,
-    model_extensions::*,
-    query_arguments_ext::QueryArgumentsExt,
-    query_builder::{self, read},
-    Context, QueryExt, Queryable, SqlError,
-};
+use crate::{QueryExt, Queryable, SqlError};
 
 use connector_interface::*;
 use futures::stream::{FuturesUnordered, StreamExt};
 use quaint::ast::*;
 use query_structure::*;
+use sql_query_builder::{column_metadata, read, AsColumns, AsTable, Context, QueryArgumentsExt, RelationFieldExt};
 
 pub(crate) async fn get_single_record(
     conn: &dyn Queryable,
@@ -53,7 +48,7 @@ async fn get_single_record_joins(
         &field_names,
     );
 
-    let query = query_builder::select::SelectBuilder::build(
+    let query = sql_query_builder::select::SelectBuilder::build(
         QueryArguments::from((model.clone(), filter.clone())),
         &selected_fields,
         ctx,
@@ -165,7 +160,7 @@ async fn get_many_records_joins(
         return Ok(records);
     };
 
-    match ctx.max_bind_values {
+    match ctx.max_bind_values() {
         Some(chunk_size) if query_arguments.should_batch(chunk_size) => {
             return Err(SqlError::QueryParameterLimitExceeded(
                 "Joined queries cannot be split into multiple queries.".to_string(),
@@ -174,7 +169,7 @@ async fn get_many_records_joins(
         _ => (),
     };
 
-    let query = query_builder::select::SelectBuilder::build(query_arguments.clone(), &selected_fields, ctx);
+    let query = sql_query_builder::select::SelectBuilder::build(query_arguments.clone(), &selected_fields, ctx);
 
     for item in conn.filter(query.into(), meta.as_slice(), ctx).await?.into_iter() {
         let mut record = Record::from(item);
@@ -217,7 +212,7 @@ async fn get_many_records_wo_joins(
     // Todo: This can't work for all cases. Cursor-based pagination will not work, because it relies on the ordering
     // to determine the right queries to fire, and will default to incorrect orderings if no ordering is found.
     // The should_batch has been adjusted to reflect that as a band-aid, but deeper investigation is necessary.
-    match ctx.max_bind_values {
+    match ctx.max_bind_values() {
         Some(chunk_size) if query_arguments.should_batch(chunk_size) => {
             if query_arguments.has_unbatchable_ordering() {
                 return Err(SqlError::QueryParameterLimitExceeded(
@@ -312,7 +307,7 @@ pub(crate) async fn get_related_m2m_record_ids(
 
     // [DTODO] To verify: We might need chunked fetch here (too many parameters in the query).
     let select = Select::from_table(table)
-        .so_that(query_builder::in_conditions(&from_columns, from_record_ids, ctx))
+        .so_that(sql_query_builder::in_conditions(&from_columns, from_record_ids, ctx))
         .columns(from_columns.into_iter().chain(to_columns.into_iter()));
 
     let parent_model_id = from_field.model().primary_identifier();

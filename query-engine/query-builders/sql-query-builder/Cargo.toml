@@ -1,0 +1,19 @@
+[package]
+edition = "2021"
+name = "sql-query-builder"
+version = "0.1.0"
+
+[dependencies]
+quaint = { path = "../../../quaint" }
+query-structure = { path = "../../query-structure" }
+query-builder = { path = "../query-builder" }
+telemetry = { path = "../../../libs/telemetry" }
+prisma-value = { path = "../../../libs/prisma-value" }
+psl = { path = "../../../psl/psl" }
+
+itertools.workspace = true
+chrono.workspace = true
+serde_json.workspace = true
+
+[features]
+relation_joins = []

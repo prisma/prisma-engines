@@ -6,14 +6,12 @@ use quaint::{
     prelude::{ConnectionInfo, ExternalConnectionInfo, SqlFamily},
     visitor::Visitor,
 };
+use query_builder::DbQuery;
 use read::translate_read_query;
-use sql_query_connector::context::Context;
+use sql_query_builder::Context;
 use write::translate_write_query;
 
-use crate::{
-    compiler::expression::{DbQuery, Expression},
-    Query,
-};
+use crate::{compiler::expression::Expression, Query};
 
 use super::TranslateResult;
 

@@ -1,13 +1,5 @@
 use std::collections::HashSet;
 
-use itertools::Itertools;
-use query_structure::{
-    ConditionValue, Filter, ModelProjection, PrismaValue, QueryMode, ScalarCondition, ScalarFilter, ScalarProjection,
-};
-use sql_query_connector::{
-    context::Context, model_extensions::AsColumns, query_arguments_ext::QueryArgumentsExt, query_builder,
-};
-
 use crate::{
     compiler::{
         expression::{Binding, Expression, JoinExpression},
@@ -15,6 +7,11 @@ use crate::{
     },
     FilteredQuery, ReadQuery, RelatedRecordsQuery,
 };
+use itertools::Itertools;
+use query_structure::{
+    ConditionValue, Filter, ModelProjection, PrismaValue, QueryMode, ScalarCondition, ScalarFilter, ScalarProjection,
+};
+use sql_query_builder::{read, AsColumns, Context, QueryArgumentsExt};
 
 use super::build_db_query;
 
@@ -23,7 +20,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, ctx: &Context<'_>) -> Trans
         ReadQuery::RecordQuery(rq) => {
             let selected_fields = rq.selected_fields.without_relations().into_virtuals_last();
 
-            let query = query_builder::read::get_records(
+            let query = read::get_records(
                 &rq.model,
                 ModelProjection::from(&selected_fields)
                     .as_columns(ctx)
@@ -49,7 +46,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, ctx: &Context<'_>) -> Trans
             let needs_reversed_order = mrq.args.needs_reversed_order();
 
             // TODO: we ignore chunking for now
-            let query = query_builder::read::get_records(
+            let query = read::get_records(
                 &mrq.model,
                 ModelProjection::from(&selected_fields)
                     .as_columns(ctx)
@@ -177,7 +174,7 @@ fn build_read_one2m_query(rrq: RelatedRecordsQuery, ctx: &Context<'_>) -> Transl
     let to_one_relation = !rrq.parent_field.arity().is_list();
 
     // TODO: we ignore chunking for now
-    let query = query_builder::read::get_records(
+    let query = read::get_records(
         &rrq.parent_field.related_model(),
         ModelProjection::from(&selected_fields)
             .as_columns(ctx)

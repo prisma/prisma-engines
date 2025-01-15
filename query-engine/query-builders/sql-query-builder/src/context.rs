@@ -25,7 +25,19 @@ impl<'a> Context<'a> {
         }
     }
 
+    pub fn traceparent(&self) -> Option<TraceParent> {
+        self.traceparent
+    }
+
     pub(crate) fn schema_name(&self) -> &str {
         self.connection_info.schema_name()
+    }
+
+    pub fn max_insert_rows(&self) -> Option<usize> {
+        self.max_insert_rows
+    }
+
+    pub fn max_bind_values(&self) -> Option<usize> {
+        self.max_bind_values
     }
 }
