@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
+use quaint::connector::{ConnectionInfo, ExternalConnectionInfo, SqlFamily};
 use query_core::{query_graph_builder::QueryGraphBuilder, QueryDocument};
 use request_handlers::{JsonBody, JsonSingleQuery, RequestBody};
 use serde_json::json;
-use quaint::connector::{ConnectionInfo, ExternalConnectionInfo, SqlFamily};
 
 pub fn main() -> anyhow::Result<()> {
     let schema_string = include_str!("./schema.prisma");
