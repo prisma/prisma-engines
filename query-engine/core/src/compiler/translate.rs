@@ -1,9 +1,9 @@
 mod query;
 
+use crate::{EdgeRef, Node, NodeRef, Query, QueryGraph};
+use quaint::connector::ConnectionInfo;
 use query::translate_query;
 use thiserror::Error;
-use quaint::connector::ConnectionInfo;
-use crate::{EdgeRef, Node, NodeRef, Query, QueryGraph};
 
 use super::expression::{Binding, Expression};
 
@@ -36,7 +36,12 @@ struct NodeTranslator<'a, 'b, 'c> {
 }
 
 impl<'a, 'b, 'c> NodeTranslator<'a, 'b, 'c> {
-    fn new(graph: &'a mut QueryGraph, node: NodeRef, parent_edges: &'b [EdgeRef], connection_info: &'c ConnectionInfo) -> Self {
+    fn new(
+        graph: &'a mut QueryGraph,
+        node: NodeRef,
+        parent_edges: &'b [EdgeRef],
+        connection_info: &'c ConnectionInfo,
+    ) -> Self {
         Self {
             graph,
             node,

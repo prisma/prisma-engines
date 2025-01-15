@@ -369,11 +369,21 @@ impl QueryEngine {
                 .map_err(|err| napi::Error::from_reason(err.to_string()))?;
 
             let connection_info = match self.connector_mode {
-                ConnectorMode::Js { ref adapter } => ConnectionInfo::External(adapter.get_connection_info().await.map_err(|err| napi::Error::from_reason(err.to_string()))?),
-                ConnectorMode::Rust => return Err(napi::Error::from_reason("Query compiler requires JS driver adapter".to_string())),
+                ConnectorMode::Js { ref adapter } => ConnectionInfo::External(
+                    adapter
+                        .get_connection_info()
+                        .await
+                        .map_err(|err| napi::Error::from_reason(err.to_string()))?,
+                ),
+                ConnectorMode::Rust => {
+                    return Err(napi::Error::from_reason(
+                        "Query compiler requires JS driver adapter".to_string(),
+                    ))
+                }
             };
 
-            let plan = query_core::compiler::compile(engine.query_schema(), query_doc, &connection_info).map_err(ApiError::from)?;
+            let plan = query_core::compiler::compile(engine.query_schema(), query_doc, &connection_info)
+                .map_err(ApiError::from)?;
 
             let response = if human_readable {
                 plan.to_string()

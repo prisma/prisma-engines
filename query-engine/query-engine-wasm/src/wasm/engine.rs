@@ -377,7 +377,8 @@ impl QueryEngine {
 
             let connection_info = ConnectionInfo::External(self.adapter.get_connection_info().await?);
 
-            let plan = query_core::compiler::compile(engine.query_schema(), query_doc, &connection_info).map_err(ApiError::from)?;
+            let plan = query_core::compiler::compile(engine.query_schema(), query_doc, &connection_info)
+                .map_err(ApiError::from)?;
             Ok(serde_json::to_string(&plan)?)
         }
         .with_subscriber(dispatcher)
