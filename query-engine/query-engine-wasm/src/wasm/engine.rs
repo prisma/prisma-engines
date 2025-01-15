@@ -373,9 +373,7 @@ impl QueryEngine {
             let engine = inner.as_engine()?;
 
             let request = RequestBody::try_from_str(&request, engine.engine_protocol())?;
-            let query_doc = request
-                .into_doc(engine.query_schema())
-                .map_err(|err| napi::Error::from_reason(err.to_string()))?;
+            let query_doc = request.into_doc(engine.query_schema())?;
 
             let plan = query_core::compiler::compile(engine.query_schema(), query_doc).map_err(ApiError::from)?;
             Ok(serde_json::to_string(&plan)?)
