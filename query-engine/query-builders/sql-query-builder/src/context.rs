@@ -2,7 +2,7 @@ use quaint::prelude::ConnectionInfo;
 use telemetry::TraceParent;
 
 pub struct Context<'a> {
-    connection_info: &'a ConnectionInfo,
+    pub connection_info: &'a ConnectionInfo,
     pub(crate) traceparent: Option<TraceParent>,
     /// Maximum rows allowed at once for an insert query.
     /// None is unlimited.

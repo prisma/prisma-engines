@@ -19,7 +19,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, ctx: &Context<'_>) -> Tra
             // TODO: we probably need some additional node type or extra info in the WriteQuery node
             // to help the client executor figure out the returned ID in the case when it's inferred
             // from the query arguments.
-            Expression::Query(build_db_query(query)?)
+            Expression::Query(build_db_query(query, ctx)?)
         }
 
         WriteQuery::CreateManyRecords(cmr) => {
@@ -33,7 +33,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, ctx: &Context<'_>) -> Tra
                         ctx,
                     )
                     .into_iter()
-                    .map(build_db_query)
+                    .map(|query| build_db_query(query, ctx))
                     .map(|maybe_db_query| maybe_db_query.map(Expression::Execute))
                     .collect::<TranslateResult<Vec<_>>>()?,
                 )
@@ -41,7 +41,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, ctx: &Context<'_>) -> Tra
                 Expression::Sum(
                     generate_insert_statements(&cmr.model, cmr.args, cmr.skip_duplicates, None, ctx)
                         .into_iter()
-                        .map(build_db_query)
+                        .map(|query| build_db_query(query, ctx))
                         .map(|maybe_db_query| maybe_db_query.map(Expression::Execute))
                         .collect::<TranslateResult<Vec<_>>>()?,
                 )

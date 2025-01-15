@@ -4,6 +4,7 @@ pub mod translate;
 use std::sync::Arc;
 
 pub use expression::Expression;
+use quaint::connector::ConnectionInfo;
 use schema::QuerySchema;
 use thiserror::Error;
 pub use translate::{translate, TranslateError};
@@ -19,11 +20,15 @@ pub enum CompileError {
     TranslateError(#[from] TranslateError),
 }
 
-pub fn compile(query_schema: &Arc<QuerySchema>, query_doc: QueryDocument) -> crate::Result<Expression> {
+pub fn compile(
+    query_schema: &Arc<QuerySchema>,
+    query_doc: QueryDocument,
+    connection_info: &ConnectionInfo,
+) -> crate::Result<Expression> {
     let QueryDocument::Single(query) = query_doc else {
         return Err(CompileError::UnsupportedRequest.into());
     };
 
     let (graph, _serializer) = QueryGraphBuilder::new(query_schema).build(query)?;
-    Ok(translate(graph).map_err(CompileError::from)?)
+    Ok(translate(graph, connection_info).map_err(CompileError::from)?)
 }
