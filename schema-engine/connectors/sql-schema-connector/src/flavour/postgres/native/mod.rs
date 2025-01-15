@@ -1,5 +1,7 @@
 //! All the quaint-wrangling for the postgres connector should happen here.
 
+pub(super) mod shadow_db;
+
 use enumflags2::BitFlags;
 use indoc::indoc;
 use psl::PreviewFeature;

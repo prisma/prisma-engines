@@ -1,14 +1,21 @@
-mod connection;
-mod shadow_db;
+#[cfg(feature = "postgresql-native")]
+mod native;
 
-use self::connection::*;
+#[cfg(not(feature = "postgresql-native"))]
+mod wasm;
+
+#[cfg(feature = "postgresql-native")]
+use native::{shadow_db, Connection};
+
+#[cfg(not(feature = "postgresql-native"))]
+use wasm::{shadow_db, Connection};
+
 use crate::SqlFlavour;
 use enumflags2::BitFlags;
 use indoc::indoc;
 use once_cell::sync::Lazy;
 use quaint::{
     connector::{PostgresUrl, PostgresWebSocketUrl},
-    prelude::NativeConnectionInfo,
     Value,
 };
 use schema_connector::{
@@ -88,9 +95,10 @@ impl MigratePostgresUrl {
     }
 }
 
-impl From<MigratePostgresUrl> for NativeConnectionInfo {
+#[cfg(feature = "postgresql-native")]
+impl From<MigratePostgresUrl> for quaint::prelude::NativeConnectionInfo {
     fn from(value: MigratePostgresUrl) -> Self {
-        NativeConnectionInfo::Postgres(value.0)
+        quaint::prelude::NativeConnectionInfo::Postgres(value.0)
     }
 }
 
@@ -564,6 +572,7 @@ impl SqlFlavour for PostgresFlavour {
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
         with_connection(self, |params, _circumstances, connection| async move {
+            // TODO: the `url` used here isn't Wasm-compatible.
             connection.version(&params.url).await
         })
     }
