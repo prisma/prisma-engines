@@ -3836,6 +3836,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serial_test",
+ "sql-query-builder",
  "sql-query-connector",
  "structopt",
  "telemetry",
