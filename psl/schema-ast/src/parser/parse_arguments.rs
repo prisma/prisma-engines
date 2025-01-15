@@ -33,6 +33,7 @@ pub(crate) fn parse_arguments_list(
                     .unwrap();
                 arguments.empty_arguments.push(ast::EmptyArgument {
                     name: ast::Identifier::new(name, file_id),
+                    span: ast::Span::from((file_id, current_span)),
                 })
             }
             Rule::trailing_comma => {

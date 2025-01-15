@@ -1,3 +1,5 @@
+use diagnostics::Span;
+
 use crate::ast::{self};
 
 use super::{FieldPosition, WithName};
@@ -14,7 +16,7 @@ pub enum CompositeTypePosition<'ast> {
     ///     city   String
     /// }
     /// ```
-    Name(&'ast str),
+    Name(&'ast str, Span),
     /// In a field.
     /// ```prisma
     /// type Address {
@@ -29,7 +31,7 @@ pub enum CompositeTypePosition<'ast> {
 impl<'ast> CompositeTypePosition<'ast> {
     pub(crate) fn new(composite_type: &'ast ast::CompositeType, position: usize) -> Self {
         if composite_type.name.span.contains(position) {
-            return CompositeTypePosition::Name(composite_type.name());
+            return CompositeTypePosition::Name(composite_type.name(), composite_type.name.span);
         }
 
         for (field_id, field) in composite_type.iter_fields() {
