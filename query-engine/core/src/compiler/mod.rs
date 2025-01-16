@@ -6,7 +6,7 @@ use std::sync::Arc;
 pub use expression::Expression;
 use quaint::{
     prelude::{ConnectionInfo, SqlFamily},
-    visitor::{Mssql, Mysql, Postgres, Sqlite},
+    visitor,
 };
 use schema::QuerySchema;
 use sql_query_builder::{Context, SqlQueryBuilder};
@@ -36,11 +36,11 @@ pub fn compile(
     let ctx = Context::new(connection_info, None);
     let (graph, _serializer) = QueryGraphBuilder::new(query_schema).build(query)?;
     let res = match connection_info.sql_family() {
-        SqlFamily::Postgres => translate(graph, &SqlQueryBuilder::<Postgres<'_>>::new(ctx)),
-        // disabled feature flag for now
-        // SqlFamily::Mysql => translate(graph, &SqlQueryBuilder::<Mysql<'_>>::new(ctx)),
-        // SqlFamily::Sqlite => translate(graph, &SqlQueryBuilder::<Sqlite<'_>>::new(ctx)),
-        // SqlFamily::Mssql => translate(graph, &SqlQueryBuilder::<Mssql<'_>>::new(ctx)),
+        SqlFamily::Postgres => translate(graph, &SqlQueryBuilder::<visitor::Postgres<'_>>::new(ctx)),
+        // feature flags are disabled for now
+        // SqlFamily::Mysql => translate(graph, &SqlQueryBuilder::<visitor::Mysql<'_>>::new(ctx)),
+        // SqlFamily::Sqlite => translate(graph, &SqlQueryBuilder::<visitor::Sqlite<'_>>::new(ctx)),
+        // SqlFamily::Mssql => translate(graph, &SqlQueryBuilder::<visitor::Mssql<'_>>::new(ctx)),
         _ => unimplemented!(),
     };
 
