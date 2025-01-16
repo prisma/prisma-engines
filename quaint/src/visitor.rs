@@ -991,6 +991,14 @@ pub trait Visitor<'a> {
                 self.write("ALL")?;
                 self.surround_with("(", ")", |s| s.visit_expression(*left))
             }
+            Compare::Exists(query) => {
+                self.write("EXISTS")?;
+                self.surround_with("(", ")", |s| s.visit_sub_selection(*query))
+            }
+            Compare::NotExists(query) => {
+                self.write("NOT EXISTS")?;
+                self.surround_with("(", ")", |s| s.visit_sub_selection(*query))
+            }
         }
     }
 

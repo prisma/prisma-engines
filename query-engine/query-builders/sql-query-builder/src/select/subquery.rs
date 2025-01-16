@@ -1,19 +1,13 @@
 use super::*;
 
-use crate::{
-    context::Context,
-    filter::alias::{Alias, AliasMode},
-    model_extensions::*,
-};
+use crate::{context::Context, filter::alias::Alias, model_extensions::*};
 
 use quaint::ast::*;
 use query_structure::*;
 
 /// Select builder for joined queries. Relations are resolved using correlated sub-queries.
 #[derive(Debug, Default)]
-pub(crate) struct SubqueriesSelectBuilder {
-    alias: Alias,
-}
+pub(crate) struct SubqueriesSelectBuilder;
 
 impl JoinSelectBuilder for SubqueriesSelectBuilder {
     /// Builds a SELECT statement for the given query arguments and selected fields.
@@ -110,7 +104,7 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
             .filter_map(|field| match field {
                 SelectedField::Scalar(sf) => Some((
                     Cow::from(sf.name().to_owned()),
-                    Expression::from(sf.as_column(ctx).table(parent_alias.to_table_string())),
+                    Expression::from(sf.as_column(ctx).table(parent_alias.to_table_alias().to_string())),
                 )),
                 SelectedField::Relation(rs) => Some((
                     Cow::from(rs.field.name().to_owned()),
@@ -137,11 +131,6 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
         .into()
     }
 
-    fn next_alias(&mut self) -> Alias {
-        self.alias = self.alias.inc(AliasMode::Table);
-        self.alias
-    }
-
     fn was_virtual_processed_in_relation(&self, _vs: &VirtualSelection) -> bool {
         false
     }
@@ -150,16 +139,16 @@ impl JoinSelectBuilder for SubqueriesSelectBuilder {
 impl SubqueriesSelectBuilder {
     fn build_m2m_select<'a>(&mut self, rs: &RelationSelection, parent_alias: Alias, ctx: &Context<'_>) -> Select<'a> {
         let rf = rs.field.clone();
-        let m2m_table_alias = self.next_alias();
-        let root_alias = self.next_alias();
-        let outer_alias = self.next_alias();
+        let m2m_table_alias = ctx.next_table_alias();
+        let root_alias = ctx.next_table_alias();
+        let outer_alias = ctx.next_table_alias();
 
         let m2m_join_data =
             rf.related_model()
                 .as_table(ctx)
                 .on(rf.m2m_join_conditions(Some(m2m_table_alias), None, ctx));
 
-        let m2m_table = rf.as_table(ctx).alias(m2m_table_alias.to_table_string());
+        let m2m_table = rf.as_table(ctx).alias(m2m_table_alias.to_string());
 
         let root = Select::from_table(m2m_table)
             .inner_join(m2m_join_data)
@@ -176,12 +165,12 @@ impl SubqueriesSelectBuilder {
         // On MySQL, using LIMIT makes the ordering of the JSON_AGG working. Beware, this is undocumented behavior.
         let override_empty_take = (!rs.args.order_by.is_empty()).then_some(i64::MAX);
 
-        let inner = Select::from_table(Table::from(root).alias(root_alias.to_table_string()))
+        let inner = Select::from_table(Table::from(root).alias(root_alias.to_string()))
             .value(self.build_json_obj_fn(rs, root_alias, ctx).alias(JSON_AGG_IDENT))
             .with_pagination(&rs.args, override_empty_take)
             .comment("inner"); // adds pagination
 
-        Select::from_table(Table::from(inner).alias(outer_alias.to_table_string()))
+        Select::from_table(Table::from(inner).alias(outer_alias.to_string()))
             .value(json_agg())
             .comment("outer")
     }
