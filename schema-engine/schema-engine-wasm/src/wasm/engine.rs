@@ -89,6 +89,7 @@ impl SchemaEngine {
     }
 
     /// Reset a database to an empty state (no data, no schema).
+    #[wasm_bindgen]
     pub async fn reset(&self) -> Result<(), wasm_bindgen::JsError> {
         Err(wasm_bindgen::JsError::new("Not yet available."))
     }

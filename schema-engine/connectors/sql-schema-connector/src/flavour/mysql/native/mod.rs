@@ -1,5 +1,7 @@
 //! All the quaint-wrangling for the mysql connector should happen here.
 
+pub(super) mod shadow_db;
+
 use enumflags2::BitFlags;
 use quaint::{
     connector::{

@@ -2,14 +2,28 @@
 //! in order to avoid cluttering the connector with conditionals. This is a private implementation
 //! detail of the SQL connector.
 
+#[cfg(feature = "mssql")]
 mod mssql;
+
+#[cfg(feature = "mysql")]
 mod mysql;
+
+#[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
 mod postgres;
+
+#[cfg(feature = "sqlite")]
 mod sqlite;
 
+#[cfg(feature = "mssql")]
 pub(crate) use mssql::MssqlFlavour;
+
+#[cfg(feature = "mysql")]
 pub(crate) use mysql::MysqlFlavour;
+
+#[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
 pub(crate) use postgres::PostgresFlavour;
+
+#[cfg(feature = "sqlite")]
 pub(crate) use sqlite::SqliteFlavour;
 
 use crate::{

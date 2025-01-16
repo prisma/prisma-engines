@@ -1,7 +1,15 @@
-mod connection;
-mod shadow_db;
+#[cfg(feature = "mssql-native")]
+mod native;
 
-use self::connection::*;
+#[cfg(not(feature = "mssql-native"))]
+mod wasm;
+
+#[cfg(feature = "mssql-native")]
+use native::{generic_apply_migration_script, shadow_db, Connection};
+
+#[cfg(not(feature = "mssql-native"))]
+use wasm::{generic_apply_migration_script, shadow_db, Connection};
+
 use crate::SqlFlavour;
 use connection_string::JdbcString;
 use indoc::formatdoc;
