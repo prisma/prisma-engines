@@ -37,9 +37,11 @@ pub fn compile(
     let (graph, _serializer) = QueryGraphBuilder::new(query_schema).build(query)?;
     let res = match connection_info.sql_family() {
         SqlFamily::Postgres => translate(graph, &SqlQueryBuilder::<Postgres<'_>>::new(ctx)),
-        SqlFamily::Mysql => translate(graph, &SqlQueryBuilder::<Mysql<'_>>::new(ctx)),
-        SqlFamily::Sqlite => translate(graph, &SqlQueryBuilder::<Sqlite<'_>>::new(ctx)),
-        SqlFamily::Mssql => translate(graph, &SqlQueryBuilder::<Mssql<'_>>::new(ctx)),
+        // disabled feature flag for now
+        // SqlFamily::Mysql => translate(graph, &SqlQueryBuilder::<Mysql<'_>>::new(ctx)),
+        // SqlFamily::Sqlite => translate(graph, &SqlQueryBuilder::<Sqlite<'_>>::new(ctx)),
+        // SqlFamily::Mssql => translate(graph, &SqlQueryBuilder::<Mssql<'_>>::new(ctx)),
+        _ => unimplemented!(),
     };
 
     Ok(res.map_err(CompileError::TranslateError)?)
