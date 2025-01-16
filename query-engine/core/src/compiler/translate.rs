@@ -1,10 +1,9 @@
 mod query;
 
+use crate::{EdgeRef, Node, NodeRef, Query, QueryGraph};
 use query::translate_query;
 use query_builder::QueryBuilder;
 use thiserror::Error;
-
-use crate::{EdgeRef, Node, NodeRef, Query, QueryGraph};
 
 use super::expression::{Binding, Expression};
 

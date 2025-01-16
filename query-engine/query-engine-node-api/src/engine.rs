@@ -4,7 +4,7 @@ use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsObject
 use napi_derive::napi;
 use prisma_metrics::{MetricFormat, WithMetricsInstrumentation};
 use psl::PreviewFeature;
-use quaint::connector::ExternalConnector;
+use quaint::connector::{ConnectionInfo, ExternalConnector};
 use query_core::{protocol::EngineProtocol, relation_load_strategy, schema, TransactionOptions, TxId};
 use query_engine_common::{
     engine::{
@@ -368,7 +368,22 @@ impl QueryEngine {
                 .into_doc(engine.query_schema())
                 .map_err(|err| napi::Error::from_reason(err.to_string()))?;
 
-            let plan = query_core::compiler::compile(engine.query_schema(), query_doc).map_err(ApiError::from)?;
+            let connection_info = match self.connector_mode {
+                ConnectorMode::Js { ref adapter } => ConnectionInfo::External(
+                    adapter
+                        .get_connection_info()
+                        .await
+                        .map_err(|err| napi::Error::from_reason(err.to_string()))?,
+                ),
+                ConnectorMode::Rust => {
+                    return Err(napi::Error::from_reason(
+                        "Query compiler requires JS driver adapter".to_string(),
+                    ))
+                }
+            };
+
+            let plan = query_core::compiler::compile(engine.query_schema(), query_doc, &connection_info)
+                .map_err(ApiError::from)?;
 
             let response = if human_readable {
                 plan.to_string()

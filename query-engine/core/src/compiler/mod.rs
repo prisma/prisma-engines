@@ -5,8 +5,8 @@ use std::sync::Arc;
 
 pub use expression::Expression;
 use quaint::{
-    prelude::{ConnectionInfo, ExternalConnectionInfo, SqlFamily},
-    visitor::Postgres,
+    prelude::{ConnectionInfo, SqlFamily},
+    visitor::{Mssql, Mysql, Postgres, Sqlite},
 };
 use schema::QuerySchema;
 use sql_query_builder::{Context, SqlQueryBuilder};
@@ -24,18 +24,23 @@ pub enum CompileError {
     TranslateError(#[from] TranslateError),
 }
 
-pub fn compile(query_schema: &Arc<QuerySchema>, query_doc: QueryDocument) -> crate::Result<Expression> {
+pub fn compile(
+    query_schema: &Arc<QuerySchema>,
+    query_doc: QueryDocument,
+    connection_info: &ConnectionInfo,
+) -> crate::Result<Expression> {
     let QueryDocument::Single(query) = query_doc else {
         return Err(CompileError::UnsupportedRequest.into());
     };
-    let connection_info = ConnectionInfo::External(ExternalConnectionInfo::new(
-        SqlFamily::Postgres,
-        "public".to_owned(),
-        None,
-    ));
 
-    let ctx = Context::new(&connection_info, None);
-    let builder = SqlQueryBuilder::<Postgres<'_>>::new(ctx);
+    let ctx = Context::new(connection_info, None);
     let (graph, _serializer) = QueryGraphBuilder::new(query_schema).build(query)?;
-    Ok(translate(graph, &builder).map_err(CompileError::from)?)
+    let res = match connection_info.sql_family() {
+        SqlFamily::Postgres => translate(graph, &SqlQueryBuilder::<Postgres<'_>>::new(ctx)),
+        SqlFamily::Mysql => translate(graph, &SqlQueryBuilder::<Mysql<'_>>::new(ctx)),
+        SqlFamily::Sqlite => translate(graph, &SqlQueryBuilder::<Sqlite<'_>>::new(ctx)),
+        SqlFamily::Mssql => translate(graph, &SqlQueryBuilder::<Mssql<'_>>::new(ctx)),
+    };
+
+    Ok(res.map_err(CompileError::TranslateError)?)
 }

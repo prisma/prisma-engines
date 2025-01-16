@@ -3800,7 +3800,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sql-query-builder",
- "sql-query-connector",
  "telemetry",
  "thiserror",
  "tokio",

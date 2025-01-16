@@ -20,6 +20,12 @@ pub fn main() -> anyhow::Result<()> {
     let schema = Arc::new(schema);
     let query_schema = Arc::new(query_core::schema::build(schema, true));
 
+    let connection_info = ConnectionInfo::External(ExternalConnectionInfo::new(
+        SqlFamily::Postgres,
+        "public".to_owned(),
+        None,
+    ));
+
     // prisma.user.findUnique({
     //     where: {
     //         email: Prisma.Param("userEmail")
@@ -70,12 +76,6 @@ pub fn main() -> anyhow::Result<()> {
     let (graph, _serializer) = QueryGraphBuilder::new(&query_schema).build(query)?;
 
     println!("{graph}");
-
-    let connection_info = ConnectionInfo::External(ExternalConnectionInfo::new(
-        SqlFamily::Postgres,
-        "public".to_owned(),
-        None,
-    ));
 
     let ctx = Context::new(&connection_info, None);
     let builder = SqlQueryBuilder::<Postgres<'_>>::new(ctx);
