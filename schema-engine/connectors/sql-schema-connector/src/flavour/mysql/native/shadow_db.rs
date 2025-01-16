@@ -1,8 +1,8 @@
-use crate::flavour::*;
+use crate::flavour::{mysql, MysqlFlavour, SqlFlavour};
 use schema_connector::{migrations_directory::MigrationDirectory, ConnectorResult};
 use sql_schema_describer::SqlSchema;
 
-pub(super) async fn sql_schema_from_migrations_history(
+pub async fn sql_schema_from_migrations_history(
     migrations: &[MigrationDirectory],
     mut shadow_db: MysqlFlavour,
 ) -> ConnectorResult<SqlSchema> {
@@ -14,7 +14,7 @@ pub(super) async fn sql_schema_from_migrations_history(
             migration.migration_name()
         );
 
-        super::scan_migration_script_impl(&script);
+        mysql::scan_migration_script_impl(&script);
 
         shadow_db
             .apply_migration_script(migration.migration_name(), &script)
