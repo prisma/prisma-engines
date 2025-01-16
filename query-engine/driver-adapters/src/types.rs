@@ -18,10 +18,13 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub enum AdapterFlavour {
     #[cfg(feature = "mysql")]
+    #[cfg_attr(target_arch = "wasm32", serde(rename = "mysql"))]
     Mysql,
     #[cfg(feature = "postgresql")]
+    #[cfg_attr(target_arch = "wasm32", serde(rename = "postgres"))]
     Postgres,
     #[cfg(feature = "sqlite")]
+    #[cfg_attr(target_arch = "wasm32", serde(rename = "sqlite"))]
     Sqlite,
 }
 
@@ -71,7 +74,7 @@ impl From<&AdapterFlavour> for SqlFamily {
 #[cfg_attr(target_arch = "wasm32", derive(Deserialize))]
 #[cfg_attr(target_arch = "wasm32", serde(rename_all = "camelCase"))]
 #[derive(Default)]
-pub(crate) struct JsConnectionInfo {
+pub struct JsConnectionInfo {
     pub schema_name: Option<String>,
     pub max_bind_values: Option<u32>,
 }

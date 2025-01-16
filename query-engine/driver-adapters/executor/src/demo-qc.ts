@@ -1,5 +1,5 @@
 import * as S from "@effect/schema/Schema";
-import { bindAdapter } from "@prisma/driver-adapter-utils";
+import { bindAdapter, ConnectionInfo } from "@prisma/driver-adapter-utils";
 
 import type { DriverAdaptersManager } from "./driver-adapters-manager";
 import { Env } from "./types";
@@ -55,7 +55,7 @@ async function main(): Promise<void> {
     schema,
   });
 
-  const query = await compiler.compile(
+  const query = compiler.compile(
     JSON.stringify({
       modelName: "User",
       action: "createOne",
@@ -89,12 +89,21 @@ async function initQC({
 }: InitQueryCompilerParams) {
   const adapter = await driverAdapterManager.connect({ url });
   const errorCapturingAdapter = bindAdapter(adapter);
-  const compiler = await qc.initQueryCompiler(
-    {
-      datamodel: schema,
-    },
-    adapter,
-  );
+
+  let connectionInfo: ConnectionInfo = {};
+  if (errorCapturingAdapter.getConnectionInfo) {
+    const result = errorCapturingAdapter.getConnectionInfo();
+    if (!result.ok) {
+      throw result.error;
+    }
+    connectionInfo = result.value;
+  }
+
+  const compiler = await qc.initQueryCompiler({
+    datamodel: schema,
+    flavour: adapter.provider,
+    connectionInfo,
+  });
 
   return {
     compiler: compiler,

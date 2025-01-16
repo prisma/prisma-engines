@@ -1,24 +1,25 @@
-import type { DriverAdapter } from "@prisma/driver-adapter-utils";
+import { ConnectionInfo } from "@prisma/driver-adapter-utils";
 import { __dirname } from "./utils";
+import { AdapterFlavour } from "query-engine-wasm-baseline";
 
 export type QueryCompilerParams = {
   // TODO: support multiple datamodels
   datamodel: string;
+  flavour: AdapterFlavour;
+  connectionInfo: ConnectionInfo;
 };
 
 export interface QueryCompiler {
-  new (params: QueryCompilerParams, adapter: DriverAdapter): QueryCompiler;
+  new (params: QueryCompilerParams): QueryCompiler;
   compile(query: string): Promise<string>;
 }
 
 export async function initQueryCompiler(
   params: QueryCompilerParams,
-  adapter: DriverAdapter,
 ): Promise<QueryCompiler> {
   const { getQueryCompilerForProvider } = await import("./query-compiler-wasm");
-  console.log(getQueryCompilerForProvider);
   const WasmQueryCompiler = (await getQueryCompilerForProvider(
-    adapter.provider,
+    params.flavour,
   )) as QueryCompiler;
-  return new WasmQueryCompiler(params, adapter);
+  return new WasmQueryCompiler(params);
 }

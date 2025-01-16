@@ -1,9 +1,9 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-use driver_adapters::JsObject;
+use driver_adapters::{AdapterFlavour, JsConnectionInfo};
 use psl::ConnectorRegistry;
-use quaint::connector::{ConnectionInfo, ExternalConnector};
+use quaint::connector::ConnectionInfo;
 use query_core::protocol::EngineProtocol;
 use request_handlers::RequestBody;
 use serde::Deserialize;
@@ -45,54 +45,56 @@ fn register_panic_hook() {
     });
 }
 
-/// The main query engine used by JS
-#[wasm_bindgen]
-pub struct QueryCompiler {
-    schema: Arc<schema::QuerySchema>,
-    adapter: Arc<dyn ExternalConnector>,
-    protocol: EngineProtocol,
-}
-
 #[derive(Deserialize, Tsify)]
+#[serde(rename_all = "camelCase")]
 #[tsify(from_wasm_abi)]
 pub struct QueryCompilerParams {
     // TODO: support multiple datamodels
     datamodel: String,
+    flavour: AdapterFlavour,
+    connection_info: JsConnectionInfo,
+}
+
+#[wasm_bindgen]
+pub struct QueryCompiler {
+    schema: Arc<schema::QuerySchema>,
+    connection_info: ConnectionInfo,
+    protocol: EngineProtocol,
 }
 
 #[wasm_bindgen]
 impl QueryCompiler {
     #[wasm_bindgen(constructor)]
-    pub fn new(params: QueryCompilerParams, adapter: JsObject) -> Result<QueryCompiler, wasm_bindgen::JsError> {
-        let QueryCompilerParams { datamodel, .. } = params;
+    pub fn new(params: QueryCompilerParams) -> Result<QueryCompiler, wasm_bindgen::JsError> {
+        let QueryCompilerParams {
+            datamodel,
+            flavour,
+            connection_info,
+        } = params;
 
         // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
         let schema = Arc::new(psl::parse_without_validation(datamodel.into(), CONNECTOR_REGISTRY));
         let schema = Arc::new(schema::build(schema, true));
-        let adapter = Arc::new(driver_adapters::from_js(adapter));
 
         tracing::info!(git_hash = env!("GIT_HASH"), "Starting query-compiler-wasm");
         register_panic_hook();
 
         Ok(Self {
             schema,
-            adapter,
+            connection_info: ConnectionInfo::External(connection_info.into_external_connection_info(&flavour)),
             protocol: EngineProtocol::Json,
         })
     }
 
     #[wasm_bindgen]
-    pub async fn compile(
+    pub fn compile(
         &self,
         request: String,
         _human_readable: bool, // ignored on wasm to not compile it in
     ) -> Result<String, wasm_bindgen::JsError> {
         let request = RequestBody::try_from_str(&request, self.protocol)?;
         let query_doc = request.into_doc(&self.schema)?;
-
-        let connection_info = ConnectionInfo::External(self.adapter.get_connection_info().await?);
-
-        let plan = query_compiler::compile(&self.schema, query_doc, &connection_info)?;
+        let plan = query_compiler::compile(&self.schema, query_doc, &self.connection_info)?;
         Ok(serde_json::to_string(&plan)?)
     }
 }
