@@ -8,7 +8,7 @@ use crate::{
 use driver_adapters::JsObject;
 use js_sys::Function as JsFunction;
 use psl::ConnectorRegistry;
-use quaint::connector::{ConnectionInfo, ExternalConnector};
+use quaint::connector::ExternalConnector;
 use query_core::{
     protocol::EngineProtocol,
     relation_load_strategy,
@@ -355,31 +355,6 @@ impl QueryEngine {
                 .as_ref()
                 .map(serde_json::to_string)
                 .transpose()?)
-        }
-        .with_subscriber(dispatcher)
-        .await
-    }
-
-    #[wasm_bindgen]
-    pub async fn compile(
-        &self,
-        request: String,
-        _human_readable: bool, // ignored on wasm to not compile it in
-    ) -> Result<String, wasm_bindgen::JsError> {
-        let dispatcher = self.logger.dispatcher();
-
-        async {
-            let inner = self.inner.read().await;
-            let engine = inner.as_engine()?;
-
-            let request = RequestBody::try_from_str(&request, engine.engine_protocol())?;
-            let query_doc = request.into_doc(engine.query_schema())?;
-
-            let connection_info = ConnectionInfo::External(self.adapter.get_connection_info().await?);
-
-            let plan = query_core::compiler::compile(engine.query_schema(), query_doc, &connection_info)
-                .map_err(ApiError::from)?;
-            Ok(serde_json::to_string(&plan)?)
         }
         .with_subscriber(dispatcher)
         .await

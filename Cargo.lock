@@ -3766,6 +3766,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "query-compiler-wasm"
+version = "0.1.0"
+dependencies = [
+ "build-utils",
+ "driver-adapters",
+ "js-sys",
+ "psl",
+ "quaint",
+ "query-compiler",
+ "query-core",
+ "request-handlers",
+ "schema",
+ "serde",
+ "serde_json",
+ "tracing",
+ "tsify",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "wasm-rs-dbg",
+]
+
+[[package]]
 name = "query-connector"
 version = "0.1.0"
 dependencies = [
@@ -3936,7 +3958,6 @@ dependencies = [
  "prisma-metrics",
  "psl",
  "quaint",
- "query-compiler",
  "query-connector",
  "query-core",
  "query-engine-common",

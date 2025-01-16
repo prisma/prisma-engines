@@ -1,6 +1,6 @@
-import * as wasmPostgres from "../../../../schema-engine/schema-engine-wasm/pkg/postgresql/schema_engine_bg.js";
-import * as wasmMysql from "../../../../schema-engine/schema-engine-wasm/pkg/mysql/schema_engine_bg.js";
-import * as wasmSqlite from "../../../../schema-engine/schema-engine-wasm/pkg/sqlite/schema_engine_bg.js";
+import * as wasmPostgres from "../../../../query-compiler/query-compiler-wasm/pkg/postgresql/query_compiler_bg.js";
+import * as wasmMysql from "../../../../query-compiler/query-compiler-wasm/pkg/mysql/query_compiler_bg.js";
+import * as wasmSqlite from "../../../../query-compiler/query-compiler-wasm/pkg/sqlite/query_compiler_bg.js";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { __dirname } from "./utils.js";
@@ -15,7 +15,7 @@ type EngineName = keyof typeof wasm;
 
 const initializedModules = new Set<EngineName>();
 
-export async function getSchemaEngineForProvider(provider: EngineName) {
+export async function getQueryCompilerForProvider(provider: EngineName) {
   const engine = wasm[provider];
   if (!initializedModules.has(provider)) {
     const subDir = provider === "postgres" ? "postgresql" : provider;
@@ -26,20 +26,20 @@ export async function getSchemaEngineForProvider(provider: EngineName) {
         "..",
         "..",
         "..",
-        "schema-engine",
-        "schema-engine-wasm",
+        "query-compiler",
+        "query-compiler-wasm",
         "pkg",
         subDir,
-        "schema_engine_bg.wasm",
+        "query_compiler_bg.wasm",
       ),
     );
     const module = new WebAssembly.Module(bytes);
     const instance = new WebAssembly.Instance(module, {
-      "./schema_engine_bg.js": engine,
+      "./query_compiler_bg.js": engine,
     });
     engine.__wbg_set_wasm(instance.exports);
     initializedModules.add(provider);
   }
 
-  return engine.SchemaEngine;
+  return engine.QueryCompiler;
 }

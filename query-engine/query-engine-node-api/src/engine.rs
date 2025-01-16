@@ -4,7 +4,7 @@ use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsObject
 use napi_derive::napi;
 use prisma_metrics::{MetricFormat, WithMetricsInstrumentation};
 use psl::PreviewFeature;
-use quaint::connector::{ConnectionInfo, ExternalConnector};
+use quaint::connector::ExternalConnector;
 use query_core::{protocol::EngineProtocol, relation_load_strategy, schema, TransactionOptions, TxId};
 use query_engine_common::{
     engine::{
@@ -348,50 +348,6 @@ impl QueryEngine {
             }
             .instrument(span)
             .await
-        })
-        .with_subscriber(dispatcher)
-        .with_optional_recorder(recorder)
-        .await
-    }
-
-    #[napi]
-    pub async fn compile(&self, request: String, human_readable: bool) -> napi::Result<String> {
-        let dispatcher = self.logger.dispatcher();
-        let recorder = self.logger.recorder();
-
-        async_panic_to_js_error(async {
-            let inner = self.inner.read().await;
-            let engine = inner.as_engine()?;
-
-            let request = RequestBody::try_from_str(&request, engine.engine_protocol())?;
-            let query_doc = request
-                .into_doc(engine.query_schema())
-                .map_err(|err| napi::Error::from_reason(err.to_string()))?;
-
-            let connection_info = match self.connector_mode {
-                ConnectorMode::Js { ref adapter } => ConnectionInfo::External(
-                    adapter
-                        .get_connection_info()
-                        .await
-                        .map_err(|err| napi::Error::from_reason(err.to_string()))?,
-                ),
-                ConnectorMode::Rust => {
-                    return Err(napi::Error::from_reason(
-                        "Query compiler requires JS driver adapter".to_string(),
-                    ))
-                }
-            };
-
-            // TODO: dont unwrap
-            let plan = query_compiler::compile(engine.query_schema(), query_doc, &connection_info).unwrap();
-
-            let response = if human_readable {
-                plan.to_string()
-            } else {
-                serde_json::to_string(&plan)?
-            };
-
-            Ok(response)
         })
         .with_subscriber(dispatcher)
         .with_optional_recorder(recorder)

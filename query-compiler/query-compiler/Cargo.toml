@@ -1,0 +1,23 @@
+[package]
+edition = "2021"
+name = "query-compiler"
+version = "0.1.0"
+
+[dependencies]
+query-structure = { path = "../../query-engine/query-structure" }
+query-builder = { path = "../../query-engine/query-builders/query-builder" }
+query-core = { path = "../../query-engine/core" }
+sql-query-builder = { path = "../../query-engine/query-builders/sql-query-builder" }
+quaint = { path = "../../quaint" }
+
+thiserror.workspace = true
+serde.workspace = true
+itertools.workspace = true
+pretty.workspace = true
+
+[features]
+default = ["sqlite", "postgresql", "mysql", "mssql"]
+sqlite = ["quaint/sqlite"]
+postgresql = ["quaint/postgresql"]
+mysql = ["quaint/mysql"]
+mssql = ["quaint/mssql"]

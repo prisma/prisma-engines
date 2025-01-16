@@ -32,11 +32,15 @@ clean-se-wasm:
 	@echo "Cleaning schema-engine/schema-engine-wasm/pkg" && \
 	cd schema-engine/schema-engine-wasm/pkg && find . ! -name '.' ! -name '..' ! -name 'README.md' -exec rm -rf {} +
 
+clean-qc-wasm:
+	@echo "Cleaning query-compiler/query-compiler-wasm/pkg" && \
+	cd query-compiler/query-compiler-wasm/pkg && find . ! -name '.' ! -name '..' ! -name 'README.md' -exec rm -rf {} +
+
 clean-cargo:
 	@echo "Cleaning cargo" && \
 	cargo clean
 
-clean: clean-qe-wasm clean-cargo
+clean: clean-qe-wasm clean-se-wasm clean-qc-wasm clean-cargo
 
 ###################
 # script wrappers #
@@ -79,6 +83,10 @@ build-se-wasm:
 	cd schema-engine/schema-engine-wasm && \
 	./build.sh $(QE_WASM_VERSION) schema-engine/schema-engine-wasm/pkg
 
+build-qc-wasm:
+	cd query-compiler/query-compiler-wasm && \
+	./build.sh $(QE_WASM_VERSION) query-compiler/query-compiler-wasm/pkg
+
 build-schema-wasm:
 	@printf '%s\n' "🛠️  Building the Rust crate"
 	cargo build --profile $(PROFILE) --target=wasm32-unknown-unknown -p prisma-schema-build
@@ -93,7 +101,12 @@ build-schema-wasm:
 pedantic:
 	RUSTFLAGS="-D warnings" cargo fmt -- --check
 	RUSTFLAGS="-D warnings" cargo clippy --all-features --all-targets
-	RUSTFLAGS="-D warnings" cargo clippy --all-features --all-targets -p query-engine-wasm -p schema-engine-wasm -p prisma-schema-build --target wasm32-unknown-unknown
+	RUSTFLAGS="-D warnings" cargo clippy --all-features --all-targets \
+	    -p query-engine-wasm \
+		-p schema-engine-wasm \
+		-p query-compiler-wasm \
+		-p prisma-schema-build \
+		--target wasm32-unknown-unknown
 
 release:
 	cargo build --release

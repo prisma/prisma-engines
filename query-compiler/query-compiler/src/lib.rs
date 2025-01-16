@@ -33,19 +33,21 @@ pub fn compile(
     connection_info: &ConnectionInfo,
 ) -> Result<Expression, CompileError> {
     let QueryDocument::Single(query) = query_doc else {
-        return Err(CompileError::UnsupportedRequest.into());
+        return Err(CompileError::UnsupportedRequest);
     };
 
     let ctx = Context::new(connection_info, None);
     let (graph, _serializer) = QueryGraphBuilder::new(query_schema).build(query)?;
-    let res = match connection_info.sql_family() {
+    let res: Result<Expression, TranslateError> = match connection_info.sql_family() {
+        #[cfg(feature = "postgresql")]
         SqlFamily::Postgres => translate(graph, &SqlQueryBuilder::<visitor::Postgres<'_>>::new(ctx)),
-        // feature flags are disabled for now
-        // SqlFamily::Mysql => translate(graph, &SqlQueryBuilder::<visitor::Mysql<'_>>::new(ctx)),
-        // SqlFamily::Sqlite => translate(graph, &SqlQueryBuilder::<visitor::Sqlite<'_>>::new(ctx)),
-        // SqlFamily::Mssql => translate(graph, &SqlQueryBuilder::<visitor::Mssql<'_>>::new(ctx)),
-        _ => unimplemented!(),
+        #[cfg(feature = "mysql")]
+        SqlFamily::Mysql => translate(graph, &SqlQueryBuilder::<visitor::Mysql<'_>>::new(ctx)),
+        #[cfg(feature = "sqlite")]
+        SqlFamily::Sqlite => translate(graph, &SqlQueryBuilder::<visitor::Sqlite<'_>>::new(ctx)),
+        #[cfg(feature = "mssql")]
+        SqlFamily::Mssql => translate(graph, &SqlQueryBuilder::<visitor::Mssql<'_>>::new(ctx)),
     };
 
-    Ok(res.map_err(CompileError::TranslateError)?)
+    res.map_err(CompileError::TranslateError)
 }
