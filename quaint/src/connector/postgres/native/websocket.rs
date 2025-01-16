@@ -206,12 +206,13 @@ impl Stream for WsBytesStream {
             Poll::Pending => Poll::Pending,
             Poll::Ready(None) => Poll::Ready(None),
             Poll::Ready(Some(Ok(msg))) => match msg {
-                Message::Binary(b) => Poll::Ready(Some(Ok(b))),
+                Message::Binary(data) => Poll::Ready(Some(Ok(data))),
                 Message::Close(_) => Poll::Ready(None),
-                Message::Text(_) => Poll::Ready(Some(Err(IoError::new(
-                    IoErrorKind::Other,
-                    "TCP tunneling requires binary frames, got text",
-                )))),
+                Message::Text(data) => {
+                    tracing::warn!(%data, "unexpected text frame in a WebSocket tunnel");
+                    cx.waker().wake_by_ref();
+                    Poll::Pending
+                }
                 Message::Ping(_) | Message::Pong(_) => {
                     cx.waker().wake_by_ref();
                     Poll::Pending
