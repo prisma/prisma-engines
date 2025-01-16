@@ -1,0 +1,17 @@
+[package]
+edition = "2021"
+name = "query-compiler"
+version = "0.1.0"
+
+[dependencies]
+thiserror.workspace = true
+serde.workspace = true
+itertools.workspace = true
+pretty.workspace = true
+query-structure = { path = "../query-engine/query-structure", features = [
+    "default_generators",
+] }
+query-builder = { path = "../query-engine/query-builders/query-builder" }
+sql-query-builder = { path = "../query-engine/query-builders/sql-query-builder" }
+query-core = { path = "../query-engine/core" }
+quaint = { path = "../quaint" }

@@ -382,8 +382,8 @@ impl QueryEngine {
                 }
             };
 
-            let plan = query_core::compiler::compile(engine.query_schema(), query_doc, &connection_info)
-                .map_err(ApiError::from)?;
+            // TODO: dont unwrap
+            let plan = query_compiler::compile(engine.query_schema(), query_doc, &connection_info).unwrap();
 
             let response = if human_readable {
                 plan.to_string()

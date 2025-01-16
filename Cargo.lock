@@ -3751,6 +3751,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "query-compiler"
+version = "0.1.0"
+dependencies = [
+ "itertools 0.12.0",
+ "pretty",
+ "quaint",
+ "query-builder",
+ "query-core",
+ "query-structure",
+ "serde",
+ "sql-query-builder",
+ "thiserror",
+]
+
+[[package]]
 name = "query-connector"
 version = "0.1.0"
 dependencies = [
@@ -3789,7 +3804,6 @@ dependencies = [
  "lru 0.7.8",
  "once_cell",
  "petgraph",
- "pretty",
  "prisma-metrics",
  "psl",
  "quaint",
@@ -3922,6 +3936,7 @@ dependencies = [
  "prisma-metrics",
  "psl",
  "quaint",
+ "query-compiler",
  "query-connector",
  "query-core",
  "query-engine-common",

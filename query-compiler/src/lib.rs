@@ -8,17 +8,20 @@ use quaint::{
     prelude::{ConnectionInfo, SqlFamily},
     visitor,
 };
-use schema::QuerySchema;
+use query_core::{schema::QuerySchema, QueryGraphBuilderError};
 use sql_query_builder::{Context, SqlQueryBuilder};
 use thiserror::Error;
 pub use translate::{translate, TranslateError};
 
-use crate::{QueryDocument, QueryGraphBuilder};
+use query_core::{QueryDocument, QueryGraphBuilder};
 
 #[derive(Debug, Error)]
 pub enum CompileError {
     #[error("only a single query can be compiled at a time")]
     UnsupportedRequest,
+
+    #[error("failed to build query graph: {0}")]
+    GraphBuildError(#[from] QueryGraphBuilderError),
 
     #[error("{0}")]
     TranslateError(#[from] TranslateError),
@@ -28,7 +31,7 @@ pub fn compile(
     query_schema: &Arc<QuerySchema>,
     query_doc: QueryDocument,
     connection_info: &ConnectionInfo,
-) -> crate::Result<Expression> {
+) -> Result<Expression, CompileError> {
     let QueryDocument::Single(query) = query_doc else {
         return Err(CompileError::UnsupportedRequest.into());
     };

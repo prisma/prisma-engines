@@ -177,7 +177,7 @@ pub struct RecordQuery {
     pub filter: Option<Filter>,
     // TODO: split into `user_selection` and `full_selection` and get rid of `selection_order`
     pub selected_fields: FieldSelection,
-    pub(crate) nested: Vec<ReadQuery>,
+    pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub options: QueryOptions,
     pub relation_load_strategy: RelationLoadStrategy,
@@ -191,7 +191,7 @@ pub struct ManyRecordsQuery {
     pub args: QueryArguments,
     // TODO: split into `user_selection` and `full_selection` and get rid of `selection_order`
     pub selected_fields: FieldSelection,
-    pub(crate) nested: Vec<ReadQuery>,
+    pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub options: QueryOptions,
     pub relation_load_strategy: RelationLoadStrategy,

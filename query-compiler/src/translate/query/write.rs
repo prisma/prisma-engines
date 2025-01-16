@@ -1,9 +1,7 @@
 use query_builder::QueryBuilder;
+use query_core::WriteQuery;
 
-use crate::{
-    compiler::{expression::Expression, translate::TranslateResult, TranslateError},
-    WriteQuery,
-};
+use crate::{expression::Expression, translate::TranslateResult, TranslateError};
 
 pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
     Ok(match query {

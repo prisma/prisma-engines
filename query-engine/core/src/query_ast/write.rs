@@ -6,7 +6,7 @@ use query_structure::{prelude::*, DatasourceFieldName, Filter, RecordFilter, Wri
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
-pub(crate) enum WriteQuery {
+pub enum WriteQuery {
     CreateRecord(CreateRecord),
     CreateManyRecords(CreateManyRecords),
     UpdateRecord(UpdateRecord),
