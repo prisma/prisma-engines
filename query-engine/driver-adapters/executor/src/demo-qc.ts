@@ -48,14 +48,14 @@ async function main(): Promise<void> {
 
   const driverAdapterManager = await setupDriverAdaptersManager(env);
 
-  const { compiler: engine, adapter } = await initQC({
+  const { compiler: compiler, adapter } = await initQC({
     env,
     driverAdapterManager,
     url,
     schema,
   });
 
-  const query = await engine.compile(
+  const query = await compiler.compile(
     JSON.stringify({
       modelName: "User",
       action: "createOne",
