@@ -4,8 +4,12 @@ pub mod translate;
 use std::sync::Arc;
 
 pub use expression::Expression;
-use quaint::connector::ConnectionInfo;
+use quaint::{
+    prelude::{ConnectionInfo, SqlFamily},
+    visitor,
+};
 use schema::QuerySchema;
+use sql_query_builder::{Context, SqlQueryBuilder};
 use thiserror::Error;
 pub use translate::{translate, TranslateError};
 
@@ -29,6 +33,16 @@ pub fn compile(
         return Err(CompileError::UnsupportedRequest.into());
     };
 
+    let ctx = Context::new(connection_info, None);
     let (graph, _serializer) = QueryGraphBuilder::new(query_schema).build(query)?;
-    Ok(translate(graph, connection_info).map_err(CompileError::from)?)
+    let res = match connection_info.sql_family() {
+        SqlFamily::Postgres => translate(graph, &SqlQueryBuilder::<visitor::Postgres<'_>>::new(ctx)),
+        // feature flags are disabled for now
+        // SqlFamily::Mysql => translate(graph, &SqlQueryBuilder::<visitor::Mysql<'_>>::new(ctx)),
+        // SqlFamily::Sqlite => translate(graph, &SqlQueryBuilder::<visitor::Sqlite<'_>>::new(ctx)),
+        // SqlFamily::Mssql => translate(graph, &SqlQueryBuilder::<visitor::Mssql<'_>>::new(ctx)),
+        _ => unimplemented!(),
+    };
+
+    Ok(res.map_err(CompileError::TranslateError)?)
 }

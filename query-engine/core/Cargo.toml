@@ -9,7 +9,7 @@ graphql-protocol = []
 
 [dependencies]
 async-trait.workspace = true
-bigdecimal = "0.3"
+bigdecimal.workspace = true
 chrono.workspace = true
 connection-string.workspace = true
 connector = { path = "../connectors/query-connector", package = "query-connector" }
@@ -45,10 +45,5 @@ lru = "0.7.7"
 enumflags2.workspace = true
 derive_more.workspace = true
 
-# HACK: query builders need to be a separate crate, and maybe the compiler too
-# HACK: we hardcode PostgreSQL as the dialect for now
-sql-query-connector = { path = "../connectors/sql-query-connector", features = [
-    "postgresql",
-] }
 # HACK: this should not be in core either
-quaint.workspace = true
+quaint = { workspace = true, features = ["postgresql"] }

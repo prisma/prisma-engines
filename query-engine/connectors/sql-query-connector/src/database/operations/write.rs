@@ -2,8 +2,7 @@ use super::update::*;
 use crate::row::ToSqlRow;
 use crate::value::to_prisma_value;
 use crate::{error::SqlError, QueryExt, Queryable};
-use itertools::Itertools;
-use quaint::ast::{Insert, Query};
+use quaint::ast::Query;
 use quaint::prelude::ResultSet;
 use quaint::{
     error::ErrorKind,
@@ -12,31 +11,8 @@ use quaint::{
 use query_structure::*;
 use sql_query_builder::{column_metadata, write, Context, FilterBuilder, SelectionResultExt, SqlTraceComment};
 use std::borrow::Cow;
-use std::{
-    collections::{HashMap, HashSet},
-    ops::Deref,
-};
+use std::collections::HashMap;
 use user_facing_errors::query_engine::DatabaseConstraint;
-
-#[cfg(target_arch = "wasm32")]
-macro_rules! trace {
-    (target: $target:expr, $($arg:tt)+) => {{
-        // No-op in WebAssembly
-    }};
-    ($($arg:tt)+) => {{
-        // No-op in WebAssembly
-    }};
-}
-
-#[cfg(not(target_arch = "wasm32"))]
-macro_rules! trace {
-    (target: $target:expr, $($arg:tt)+) => {
-        tracing::log::trace!(target: $target, $($arg)+);
-    };
-    ($($arg:tt)+) => {
-        tracing::log::trace!($($arg)+);
-    };
-}
 
 async fn generate_id(
     conn: &dyn Queryable,
@@ -191,49 +167,6 @@ pub(crate) async fn create_record(
     }
 }
 
-/// Returns a set of fields that are used in the arguments for the create operation.
-fn collect_affected_fields(args: &[WriteArgs], model: &Model) -> HashSet<ScalarFieldRef> {
-    let mut fields = HashSet::new();
-    args.iter().for_each(|arg| fields.extend(arg.keys()));
-
-    fields
-        .into_iter()
-        .map(|dsfn| model.fields().scalar().find(|sf| sf.db_name() == dsfn.deref()).unwrap())
-        .collect()
-}
-
-/// Generates a list of insert statements to execute. If `selected_fields` is set, insert statements
-/// will return the specified columns of inserted rows.
-pub fn generate_insert_statements(
-    model: &Model,
-    args: Vec<WriteArgs>,
-    skip_duplicates: bool,
-    selected_fields: Option<&ModelProjection>,
-    ctx: &Context<'_>,
-) -> Vec<Insert<'static>> {
-    let affected_fields = collect_affected_fields(&args, model);
-
-    if affected_fields.is_empty() {
-        args.into_iter()
-            .map(|_| write::create_records_empty(model, skip_duplicates, selected_fields, ctx))
-            .collect()
-    } else {
-        let partitioned_batches = partition_into_batches(args, ctx);
-        trace!("Total of {} batches to be executed.", partitioned_batches.len());
-        trace!(
-            "Batch sizes: {:?}",
-            partitioned_batches.iter().map(|b| b.len()).collect_vec()
-        );
-
-        partitioned_batches
-            .into_iter()
-            .map(|batch| {
-                write::create_records_nonempty(model, batch, skip_duplicates, &affected_fields, selected_fields, ctx)
-            })
-            .collect()
-    }
-}
-
 /// Inserts records specified as a list of `WriteArgs`. Returns number of inserted records.
 pub(crate) async fn create_records_count(
     conn: &dyn Queryable,
@@ -242,7 +175,7 @@ pub(crate) async fn create_records_count(
     skip_duplicates: bool,
     ctx: &Context<'_>,
 ) -> crate::Result<usize> {
-    let inserts = generate_insert_statements(model, args, skip_duplicates, None, ctx);
+    let inserts = write::generate_insert_statements(model, args, skip_duplicates, None, ctx);
     let mut count = 0;
     for insert in inserts {
         count += conn.execute(insert.into()).await?;
@@ -265,7 +198,7 @@ pub(crate) async fn create_records_returning(
     let idents = selected_fields.type_identifiers_with_arities();
     let meta = column_metadata::create(&field_names, &idents);
     let mut records = ManyRecords::new(field_names.clone());
-    let inserts = generate_insert_statements(model, args, skip_duplicates, Some(&selected_fields.into()), ctx);
+    let inserts = write::generate_insert_statements(model, args, skip_duplicates, Some(&selected_fields.into()), ctx);
 
     for insert in inserts {
         let result_set = conn.query(insert.into()).await?;
@@ -279,74 +212,6 @@ pub(crate) async fn create_records_returning(
     }
 
     Ok(records)
-}
-
-/// Partitions data into batches, respecting `max_bind_values` and `max_insert_rows` settings from
-/// the `Context`.
-fn partition_into_batches(args: Vec<WriteArgs>, ctx: &Context<'_>) -> Vec<Vec<WriteArgs>> {
-    let batches = if let Some(max_params) = ctx.max_bind_values() {
-        // We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.
-        // -> Horizontal partitioning by row number, vertical by number of args.
-        args.into_iter()
-            .peekable()
-            .batching(|iter| {
-                let mut param_count: usize = 0;
-                let mut batch = vec![];
-
-                while param_count < max_params {
-                    // If the param count _including_ the next item doens't exceed the limit,
-                    // we continue filling up the current batch.
-                    let proceed = match iter.peek() {
-                        Some(next) => (param_count + next.len()) <= max_params,
-                        None => break,
-                    };
-
-                    if proceed {
-                        match iter.next() {
-                            Some(next) => {
-                                param_count += next.len();
-                                batch.push(next)
-                            }
-                            None => break,
-                        }
-                    } else {
-                        break;
-                    }
-                }
-
-                if batch.is_empty() {
-                    None
-                } else {
-                    Some(batch)
-                }
-            })
-            .collect_vec()
-    } else {
-        vec![args]
-    };
-
-    if let Some(max_rows) = ctx.max_insert_rows() {
-        let capacity = batches.len();
-        batches
-            .into_iter()
-            .fold(Vec::with_capacity(capacity), |mut batches, next_batch| {
-                if next_batch.len() > max_rows {
-                    batches.extend(
-                        next_batch
-                            .into_iter()
-                            .chunks(max_rows)
-                            .into_iter()
-                            .map(|chunk| chunk.into_iter().collect_vec()),
-                    );
-                } else {
-                    batches.push(next_batch);
-                }
-
-                batches
-            })
-    } else {
-        batches
-    }
 }
 
 /// Update one record in a database defined in `conn` and the records

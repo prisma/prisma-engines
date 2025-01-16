@@ -1,9 +1,13 @@
 use std::sync::Arc;
 
-use quaint::connector::{ConnectionInfo, ExternalConnectionInfo, SqlFamily};
+use quaint::{
+    prelude::{ConnectionInfo, ExternalConnectionInfo, SqlFamily},
+    visitor::Postgres,
+};
 use query_core::{query_graph_builder::QueryGraphBuilder, QueryDocument};
 use request_handlers::{JsonBody, JsonSingleQuery, RequestBody};
 use serde_json::json;
+use sql_query_builder::{Context, SqlQueryBuilder};
 
 pub fn main() -> anyhow::Result<()> {
     let schema_string = include_str!("./schema.prisma");
@@ -73,7 +77,10 @@ pub fn main() -> anyhow::Result<()> {
 
     println!("{graph}");
 
-    let expr = query_core::compiler::translate(graph, &connection_info)?;
+    let ctx = Context::new(&connection_info, None);
+    let builder = SqlQueryBuilder::<Postgres<'_>>::new(ctx);
+
+    let expr = query_core::compiler::translate(graph, &builder)?;
 
     println!("{}", expr.pretty_print(true, 80)?);
 

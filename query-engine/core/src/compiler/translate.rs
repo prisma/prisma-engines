@@ -1,8 +1,8 @@
 mod query;
 
 use crate::{EdgeRef, Node, NodeRef, Query, QueryGraph};
-use quaint::connector::ConnectionInfo;
 use query::translate_query;
+use query_builder::QueryBuilder;
 use thiserror::Error;
 
 use super::expression::{Binding, Expression};
@@ -12,41 +12,41 @@ pub enum TranslateError {
     #[error("node {0} has no content")]
     NodeContentEmpty(String),
 
-    #[error("{0}")]
-    QuaintError(#[from] quaint::error::Error),
+    #[error("query builder error: {0}")]
+    QueryBuildFailure(#[source] Box<dyn std::error::Error + Send + Sync>),
 }
 
 pub type TranslateResult<T> = Result<T, TranslateError>;
 
-pub fn translate(mut graph: QueryGraph, connection_info: &ConnectionInfo) -> TranslateResult<Expression> {
+pub fn translate(mut graph: QueryGraph, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
     graph
         .root_nodes()
         .into_iter()
-        .map(|node| NodeTranslator::new(&mut graph, node, &[], connection_info).translate())
+        .map(|node| NodeTranslator::new(&mut graph, node, &[], builder).translate())
         .collect::<TranslateResult<Vec<_>>>()
         .map(Expression::Seq)
 }
 
-struct NodeTranslator<'a, 'b, 'c> {
+struct NodeTranslator<'a, 'b> {
     graph: &'a mut QueryGraph,
     node: NodeRef,
     #[allow(dead_code)]
     parent_edges: &'b [EdgeRef],
-    connection_info: &'c ConnectionInfo,
+    query_builder: &'b dyn QueryBuilder,
 }
 
-impl<'a, 'b, 'c> NodeTranslator<'a, 'b, 'c> {
+impl<'a, 'b> NodeTranslator<'a, 'b> {
     fn new(
         graph: &'a mut QueryGraph,
         node: NodeRef,
         parent_edges: &'b [EdgeRef],
-        connection_info: &'c ConnectionInfo,
+        query_builder: &'b dyn QueryBuilder,
     ) -> Self {
         Self {
             graph,
             node,
             parent_edges,
-            connection_info,
+            query_builder,
         }
     }
 
@@ -71,7 +71,7 @@ impl<'a, 'b, 'c> NodeTranslator<'a, 'b, 'c> {
             .try_into()
             .expect("current node must be query");
 
-        translate_query(query, self.connection_info)
+        translate_query(query, self.query_builder)
     }
 
     #[allow(dead_code)]
@@ -106,7 +106,7 @@ impl<'a, 'b, 'c> NodeTranslator<'a, 'b, 'c> {
             .into_iter()
             .map(|(_, node)| {
                 let edges = self.graph.incoming_edges(&node);
-                NodeTranslator::new(self.graph, node, &edges, self.connection_info).translate()
+                NodeTranslator::new(self.graph, node, &edges, self.query_builder).translate()
             })
             .collect::<Result<Vec<_>, _>>()?;
 
@@ -128,7 +128,7 @@ impl<'a, 'b, 'c> NodeTranslator<'a, 'b, 'c> {
             .map(|(_, node)| {
                 let name = node.id();
                 let edges = self.graph.incoming_edges(&node);
-                let expr = NodeTranslator::new(self.graph, node, &edges, self.connection_info).translate()?;
+                let expr = NodeTranslator::new(self.graph, node, &edges, self.query_builder).translate()?;
                 Ok(Binding { name, expr })
             })
             .collect::<TranslateResult<Vec<_>>>()?;

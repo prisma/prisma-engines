@@ -1,7 +1,7 @@
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
+use prisma_value::{PlaceholderType, PrismaValue};
 use quaint::ast::VarType;
-use query_structure::{PlaceholderType, PrismaValue};
 
 pub(crate) fn quaint_value_to_prisma_value(value: quaint::Value<'_>) -> PrismaValue {
     match value.typed {

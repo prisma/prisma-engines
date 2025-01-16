@@ -39,6 +39,7 @@ serial_test = "*"
 quaint.workspace = true
 indoc.workspace = true
 indexmap.workspace = true
+sql-query-builder = { path = "../query-builders/sql-query-builder" }
 
 [build-dependencies]
 build-utils.path = "../../libs/build-utils"

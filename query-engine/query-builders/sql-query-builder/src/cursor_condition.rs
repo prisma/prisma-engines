@@ -2,11 +2,11 @@ use crate::{
     join_utils::AliasedJoin,
     model_extensions::{AsColumn, AsColumns, AsTable, SelectionResultExt},
     ordering::OrderByDefinition,
-    query_arguments_ext::QueryArgumentsExt,
     Context,
 };
 use itertools::Itertools;
 use quaint::ast::*;
+use query_builder::QueryArgumentsExt;
 use query_structure::*;
 
 #[derive(Debug)]

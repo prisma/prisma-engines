@@ -4,40 +4,37 @@ use crate::{
     compiler::{
         expression::{Binding, Expression, JoinExpression},
         translate::TranslateResult,
+        TranslateError,
     },
     FilteredQuery, ReadQuery, RelatedRecordsQuery,
 };
 use itertools::Itertools;
+use query_builder::{QueryArgumentsExt, QueryBuilder};
 use query_structure::{
-    ConditionValue, Filter, ModelProjection, PrismaValue, QueryMode, ScalarCondition, ScalarFilter, ScalarProjection,
+    ConditionValue, Filter, PrismaValue, QueryArguments, QueryMode, ScalarCondition, ScalarFilter, ScalarProjection,
 };
-use sql_query_builder::{read, AsColumns, Context, QueryArgumentsExt};
 
-use super::build_db_query;
-
-pub(crate) fn translate_read_query(query: ReadQuery, ctx: &Context<'_>) -> TranslateResult<Expression> {
+pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
     Ok(match query {
         ReadQuery::RecordQuery(rq) => {
             let selected_fields = rq.selected_fields.without_relations().into_virtuals_last();
 
-            let query = read::get_records(
-                &rq.model,
-                ModelProjection::from(&selected_fields)
-                    .as_columns(ctx)
-                    .mark_all_selected(),
-                selected_fields.virtuals(),
+            let args = QueryArguments::from((
+                rq.model.clone(),
                 rq.filter.expect("ReadOne query should always have filter set"),
-                ctx,
-            )
-            .limit(1);
+            ))
+            .with_take(Some(1));
+            let query = builder
+                .build_get_records(&rq.model, args, &selected_fields)
+                .map_err(TranslateError::QueryBuildFailure)?;
 
-            let expr = Expression::Query(build_db_query(query, ctx)?);
+            let expr = Expression::Query(query);
             let expr = Expression::Unique(Box::new(expr));
 
             if rq.nested.is_empty() {
                 expr
             } else {
-                add_inmemory_join(expr, rq.nested, ctx)?
+                add_inmemory_join(expr, rq.nested, builder)?
             }
         }
 
@@ -46,17 +43,11 @@ pub(crate) fn translate_read_query(query: ReadQuery, ctx: &Context<'_>) -> Trans
             let needs_reversed_order = mrq.args.needs_reversed_order();
 
             // TODO: we ignore chunking for now
-            let query = read::get_records(
-                &mrq.model,
-                ModelProjection::from(&selected_fields)
-                    .as_columns(ctx)
-                    .mark_all_selected(),
-                selected_fields.virtuals(),
-                mrq.args,
-                ctx,
-            );
+            let query = builder
+                .build_get_records(&mrq.model, mrq.args, &selected_fields)
+                .map_err(TranslateError::QueryBuildFailure)?;
 
-            let expr = Expression::Query(build_db_query(query, ctx)?);
+            let expr = Expression::Query(query);
 
             let expr = if needs_reversed_order {
                 Expression::Reverse(Box::new(expr))
@@ -67,15 +58,15 @@ pub(crate) fn translate_read_query(query: ReadQuery, ctx: &Context<'_>) -> Trans
             if mrq.nested.is_empty() {
                 expr
             } else {
-                add_inmemory_join(expr, mrq.nested, ctx)?
+                add_inmemory_join(expr, mrq.nested, builder)?
             }
         }
 
         ReadQuery::RelatedRecordsQuery(rrq) => {
             if rrq.parent_field.relation().is_many_to_many() {
-                build_read_m2m_query(rrq, ctx)?
+                build_read_m2m_query(rrq, builder)?
             } else {
-                build_read_one2m_query(rrq, ctx)?
+                build_read_one2m_query(rrq, builder)?
             }
         }
 
@@ -83,7 +74,11 @@ pub(crate) fn translate_read_query(query: ReadQuery, ctx: &Context<'_>) -> Trans
     })
 }
 
-fn add_inmemory_join(parent: Expression, nested: Vec<ReadQuery>, ctx: &Context<'_>) -> TranslateResult<Expression> {
+fn add_inmemory_join(
+    parent: Expression,
+    nested: Vec<ReadQuery>,
+    builder: &dyn QueryBuilder,
+) -> TranslateResult<Expression> {
     let all_linking_fields = nested
         .iter()
         .flat_map(|nested| match nested {
@@ -139,7 +134,7 @@ fn add_inmemory_join(parent: Expression, nested: Vec<ReadQuery>, ctx: &Context<'
                 }));
             }
 
-            let child_query = translate_read_query(ReadQuery::RelatedRecordsQuery(rrq), ctx)?;
+            let child_query = translate_read_query(ReadQuery::RelatedRecordsQuery(rrq), builder)?;
 
             Ok(JoinExpression {
                 child: child_query,
@@ -164,29 +159,27 @@ fn add_inmemory_join(parent: Expression, nested: Vec<ReadQuery>, ctx: &Context<'
     })
 }
 
-fn build_read_m2m_query(_query: RelatedRecordsQuery, _ctx: &Context<'_>) -> TranslateResult<Expression> {
+fn build_read_m2m_query(_query: RelatedRecordsQuery, _builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
     todo!()
 }
 
-fn build_read_one2m_query(rrq: RelatedRecordsQuery, ctx: &Context<'_>) -> TranslateResult<Expression> {
+fn build_read_one2m_query(rrq: RelatedRecordsQuery, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
     let selected_fields = rrq.selected_fields.without_relations().into_virtuals_last();
     let needs_reversed_order = rrq.args.needs_reversed_order();
     let to_one_relation = !rrq.parent_field.arity().is_list();
 
     // TODO: we ignore chunking for now
-    let query = read::get_records(
-        &rrq.parent_field.related_model(),
-        ModelProjection::from(&selected_fields)
-            .as_columns(ctx)
-            .mark_all_selected(),
-        selected_fields.virtuals(),
-        rrq.args,
-        ctx,
-    );
 
-    let query = if to_one_relation { query.limit(1) } else { query };
+    let args = if to_one_relation {
+        rrq.args.with_take(Some(1))
+    } else {
+        rrq.args
+    };
+    let query = builder
+        .build_get_records(&rrq.parent_field.related_model(), args, &selected_fields)
+        .map_err(TranslateError::QueryBuildFailure)?;
 
-    let mut expr = Expression::Query(build_db_query(query, ctx)?);
+    let mut expr = Expression::Query(query);
 
     if to_one_relation {
         expr = Expression::Unique(Box::new(expr));
@@ -199,6 +192,6 @@ fn build_read_one2m_query(rrq: RelatedRecordsQuery, ctx: &Context<'_>) -> Transl
     if rrq.nested.is_empty() {
         Ok(expr)
     } else {
-        add_inmemory_join(expr, rrq.nested, ctx)
+        add_inmemory_join(expr, rrq.nested, builder)
     }
 }
