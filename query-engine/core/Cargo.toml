@@ -46,4 +46,4 @@ enumflags2.workspace = true
 derive_more.workspace = true
 
 # HACK: this should not be in core either
-quaint.workspace = true
+quaint = { workspace = true, features = ["postgresql"] }
