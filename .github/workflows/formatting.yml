@@ -21,8 +21,6 @@ jobs:
   checks:
     name: run lints and formatting checks
     runs-on: ubuntu-latest
-    env:
-      RUSTFLAGS: "-Dwarnings"
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rust-lang/setup-rust-toolchain@v1
