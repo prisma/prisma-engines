@@ -1,11 +1,10 @@
 import { ConnectionInfo } from "@prisma/driver-adapter-utils";
 import { __dirname } from "./utils";
-import { AdapterFlavour } from "query-engine-wasm-baseline";
 
 export type QueryCompilerParams = {
   // TODO: support multiple datamodels
   datamodel: string;
-  flavour: AdapterFlavour;
+  flavour: 'postgres' | 'mysql' | 'sqlite';
   connectionInfo: ConnectionInfo;
 };
 
