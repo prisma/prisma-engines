@@ -61,7 +61,7 @@ impl<'a> TypedQuery<'a> {
 }
 
 #[async_trait]
-impl<'a> PreparedQuery for TypedQuery<'a> {
+impl PreparedQuery for TypedQuery<'_> {
     fn param_types(&self) -> impl ExactSizeIterator<Item = &Type> {
         self.metadata.param_types.iter()
     }

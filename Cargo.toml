@@ -35,6 +35,10 @@ members = [
   "quaint",
 ]
 
+[workspace.lints.rust.unexpected_cfgs]
+level = "warn"
+check-cfg = ['cfg(wasm_bindgen_unstable_test_coverage)', 'cfg(debug_assert)']
+
 [workspace.dependencies]
 async-trait = { version = "0.1.77" }
 enumflags2 = { version = "0.7", features = ["serde"] }

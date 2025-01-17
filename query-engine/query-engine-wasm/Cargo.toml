@@ -28,6 +28,9 @@ mysql = [
     "request-handlers/mysql",
 ]
 
+[lints]
+workspace = true
+
 [dependencies]
 
 query-connector = { path = "../connectors/query-connector" }
