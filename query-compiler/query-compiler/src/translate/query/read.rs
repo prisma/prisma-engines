@@ -1,15 +1,13 @@
 use std::collections::HashSet;
 
 use crate::{
-    compiler::{
-        expression::{Binding, Expression, JoinExpression},
-        translate::TranslateResult,
-        TranslateError,
-    },
-    FilteredQuery, ReadQuery, RelatedRecordsQuery,
+    expression::{Binding, Expression, JoinExpression},
+    translate::TranslateResult,
+    TranslateError,
 };
 use itertools::Itertools;
 use query_builder::{QueryArgumentsExt, QueryBuilder};
+use query_core::{FilteredQuery, ReadQuery, RelatedRecordsQuery};
 use query_structure::{
     ConditionValue, Filter, PrismaValue, QueryArguments, QueryMode, ScalarCondition, ScalarFilter, ScalarProjection,
 };

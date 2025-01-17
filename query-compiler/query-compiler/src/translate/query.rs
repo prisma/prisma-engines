@@ -2,10 +2,11 @@ mod read;
 mod write;
 
 use query_builder::QueryBuilder;
+use query_core::Query;
 use read::translate_read_query;
 use write::translate_write_query;
 
-use crate::{compiler::expression::Expression, Query};
+use crate::expression::Expression;
 
 use super::TranslateResult;
 

@@ -29,6 +29,8 @@ members = [
   "query-engine/request-handlers",
   "query-engine/schema",
   "query-engine/query-builders/*",
+  "query-compiler/query-compiler",
+  "query-compiler/query-compiler-wasm",
   "libs/*",
   "prisma-fmt",
   "prisma-schema-wasm",
@@ -72,6 +74,7 @@ napi = { version = "2.16.13", default-features = false, features = [
 ] }
 napi-derive = "2.16.12"
 pin-project = "1"
+pretty = { version = "0.12", features = ["termcolor"] }
 rand = { version = "0.8" }
 regex = { version = "1", features = ["std"] }
 serde_repr = { version = "0.1.17" }
@@ -79,6 +82,7 @@ serde-wasm-bindgen = { version = "0.5" }
 tracing = { version = "0.1" }
 tracing-futures = "0.2"
 tsify = { version = "0.4.5" }
+thiserror = "1.0"
 
 # version for `wasm-bindgen@0.2.93`, see:
 # https://github.com/rustwasm/wasm-bindgen/pull/4072/

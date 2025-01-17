@@ -4,7 +4,7 @@ use napi::{threadsafe_function::ThreadSafeCallContext, Env, JsFunction, JsObject
 use napi_derive::napi;
 use prisma_metrics::{MetricFormat, WithMetricsInstrumentation};
 use psl::PreviewFeature;
-use quaint::connector::{ConnectionInfo, ExternalConnector};
+use quaint::{connector::ExternalConnector, prelude::ConnectionInfo};
 use query_core::{protocol::EngineProtocol, relation_load_strategy, schema, TransactionOptions, TxId};
 use query_engine_common::{
     engine::{
@@ -382,8 +382,8 @@ impl QueryEngine {
                 }
             };
 
-            let plan = query_core::compiler::compile(engine.query_schema(), query_doc, &connection_info)
-                .map_err(ApiError::from)?;
+            let plan = query_compiler::compile(engine.query_schema(), query_doc, &connection_info)
+                .map_err(|err| napi::Error::from_reason(err.to_string()))?;
 
             let response = if human_readable {
                 plan.to_string()
