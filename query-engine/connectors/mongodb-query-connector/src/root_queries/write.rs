@@ -23,7 +23,7 @@ use update::IntoUpdateDocumentExtension;
 
 /// Create a single record to the database resulting in a
 /// `RecordProjection` as an identifier pointing to the just-created document.
-pub async fn create_record<'conn>(
+pub async fn create_record(
     database: &Database,
     session: &mut ClientSession,
     model: &Model,
@@ -69,7 +69,7 @@ pub async fn create_record<'conn>(
     })
 }
 
-pub async fn create_records<'conn>(
+pub async fn create_records(
     database: &Database,
     session: &mut ClientSession,
     model: &Model,
@@ -140,7 +140,7 @@ pub async fn create_records<'conn>(
     }
 }
 
-pub async fn update_records<'conn>(
+pub async fn update_records(
     database: &Database,
     session: &mut ClientSession,
     model: &Model,
@@ -228,7 +228,7 @@ pub async fn update_records<'conn>(
     Ok(ids)
 }
 
-pub async fn delete_records<'conn>(
+pub async fn delete_records(
     database: &Database,
     session: &mut ClientSession,
     model: &Model,
@@ -267,7 +267,7 @@ pub async fn delete_records<'conn>(
     Ok(delete_result.deleted_count as usize)
 }
 
-pub async fn delete_record<'conn>(
+pub async fn delete_record(
     database: &Database,
     session: &mut ClientSession,
     model: &Model,
@@ -347,7 +347,7 @@ async fn find_ids(
 
 /// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
-pub async fn m2m_connect<'conn>(
+pub async fn m2m_connect(
     database: &Database,
     session: &mut ClientSession,
     field: &RelationFieldRef,
@@ -419,7 +419,7 @@ pub async fn m2m_connect<'conn>(
     Ok(())
 }
 
-pub async fn m2m_disconnect<'conn>(
+pub async fn m2m_disconnect(
     database: &Database,
     session: &mut ClientSession,
     field: &RelationFieldRef,
@@ -493,7 +493,7 @@ pub async fn m2m_disconnect<'conn>(
 }
 
 /// Execute raw is not implemented on MongoDB
-pub async fn execute_raw<'conn>(
+pub async fn execute_raw(
     _database: &Database,
     _session: &mut ClientSession,
     _inputs: HashMap<String, PrismaValue>,
@@ -502,7 +502,7 @@ pub async fn execute_raw<'conn>(
 }
 
 /// Execute a plain MongoDB query, returning the answer as a JSON `Value`.
-pub async fn query_raw<'conn>(
+pub async fn query_raw(
     database: &Database,
     session: &mut ClientSession,
     model: Option<&Model>,

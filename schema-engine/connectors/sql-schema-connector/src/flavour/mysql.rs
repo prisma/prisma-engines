@@ -1,7 +1,15 @@
-mod connection;
-mod shadow_db;
+#[cfg(feature = "mysql-native")]
+mod native;
 
-use self::connection::*;
+#[cfg(not(feature = "mysql-native"))]
+mod wasm;
+
+#[cfg(feature = "mysql-native")]
+use native::{shadow_db, Connection};
+
+#[cfg(not(feature = "mysql-native"))]
+use wasm::{shadow_db, Connection};
+
 use crate::{error::SystemDatabase, flavour::SqlFlavour};
 use enumflags2::BitFlags;
 use indoc::indoc;

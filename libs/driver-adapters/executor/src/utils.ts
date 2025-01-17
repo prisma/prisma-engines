@@ -1,4 +1,5 @@
 import type { D1Database, D1PreparedStatement, D1Result } from '@cloudflare/workers-types'
+import type { Queryable } from '@prisma/driver-adapter-utils'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -9,6 +10,10 @@ export function copyPathName({ fromURL, toURL }: { fromURL: string; toURL: strin
   toObj.pathname = new URL(fromURL).pathname
 
   return toObj.toString()
+}
+
+export function normaliseProvider(provider: Queryable['provider']) {
+  return provider === 'postgres' ? 'postgresql' : provider
 }
 
 export function postgresSchemaName(url: string) {

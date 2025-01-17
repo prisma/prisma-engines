@@ -1,5 +1,4 @@
 use super::{NativeColumnType, Visitor};
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
 use crate::prelude::{JsonArrayAgg, JsonBuildObject, JsonExtract, JsonType, JsonUnquote};
 use crate::{
     ast::{
@@ -676,12 +675,10 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract(&mut self, _json_extract: JsonExtract<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on MSSQL")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_array_contains(
         &mut self,
         _left: Expression<'a>,
@@ -691,32 +688,26 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         unimplemented!("JSON filtering is not yet supported on MSSQL")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_type_equals(&mut self, _left: Expression<'a>, _json_type: JsonType, _not: bool) -> visitor::Result {
         unimplemented!("JSON_TYPE is not yet supported on MSSQL")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_unquote(&mut self, _json_unquote: JsonUnquote<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on MSSQL")
     }
 
-    #[cfg(feature = "postgresql")]
     fn visit_json_array_agg(&mut self, _array_agg: JsonArrayAgg<'a>) -> visitor::Result {
         unimplemented!("JSON_AGG is not yet supported on MSSQL")
     }
 
-    #[cfg(feature = "postgresql")]
     fn visit_json_build_object(&mut self, _build_obj: JsonBuildObject<'a>) -> visitor::Result {
         unimplemented!("JSON_BUILD_OBJECT is not yet supported on MSSQL")
     }
 
-    #[cfg(feature = "postgresql")]
     fn visit_text_search(&mut self, _text_search: crate::prelude::TextSearch<'a>) -> visitor::Result {
         unimplemented!("Full-text search is not yet supported on MSSQL")
     }
 
-    #[cfg(feature = "postgresql")]
     fn visit_matches(
         &mut self,
         _left: Expression<'a>,
@@ -726,7 +717,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         unimplemented!("Full-text search is not yet supported on MSSQL")
     }
 
-    #[cfg(feature = "postgresql")]
     fn visit_text_search_relevance(
         &mut self,
         _text_search_relevance: crate::prelude::TextSearchRelevance<'a>,
@@ -734,7 +724,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         unimplemented!("Full-text search is not yet supported on MSSQL")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_last_array_item(
         &mut self,
         _extract: crate::prelude::JsonExtractLastArrayElem<'a>,
@@ -742,7 +731,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         unimplemented!("JSON filtering is not yet supported on MSSQL")
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_json_extract_first_array_item(
         &mut self,
         _extract: crate::prelude::JsonExtractFirstArrayElem<'a>,

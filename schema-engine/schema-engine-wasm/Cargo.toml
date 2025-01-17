@@ -24,7 +24,7 @@ tsify.workspace = true
 wasm-bindgen.workspace = true
 wasm-bindgen-futures.workspace = true
 wasm-rs-dbg.workspace = true
-driver-adapters = { path = "../../query-engine/driver-adapters" }
+driver-adapters = { path = "../../libs/driver-adapters" }
 
 [build-dependencies]
 build-utils.path = "../../libs/build-utils"

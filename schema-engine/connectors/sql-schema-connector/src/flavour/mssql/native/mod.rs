@@ -1,5 +1,7 @@
 //! All the quaint-wrangling for the mssql connector should happen here.
 
+pub(super) mod shadow_db;
+
 use quaint::{
     connector::{self, MssqlUrl},
     prelude::{ConnectionInfo, NativeConnectionInfo, Queryable},

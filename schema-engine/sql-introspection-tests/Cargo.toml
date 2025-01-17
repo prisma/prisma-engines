@@ -7,7 +7,9 @@ edition = "2021"
 schema-connector = { path = "../connectors/schema-connector", features = [
     "all-native",
 ] }
-sql-schema-connector = { path = "../connectors/sql-schema-connector" }
+sql-schema-connector = { path = "../connectors/sql-schema-connector", features = [
+    "all-native",
+] }
 sql-schema-describer = { path = "../sql-schema-describer", features = [
     "all-native",
 ] }

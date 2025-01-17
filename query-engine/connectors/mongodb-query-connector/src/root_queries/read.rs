@@ -8,7 +8,7 @@ use query_structure::*;
 use std::future::IntoFuture;
 
 /// Finds a single record. Joins are not required at the moment because the selector is always a unique one.
-pub async fn get_single_record<'conn>(
+pub async fn get_single_record(
     database: &Database,
     session: &mut ClientSession,
     model: &Model,
@@ -44,7 +44,7 @@ pub async fn get_single_record<'conn>(
 // - [x] Cursor
 // - [x] Distinct select (inherently given from core).
 // - [x] Relation aggregation count
-pub async fn get_many_records<'conn>(
+pub async fn get_many_records(
     database: &Database,
     session: &mut ClientSession,
     model: &Model,
@@ -81,7 +81,7 @@ pub async fn get_many_records<'conn>(
     Ok(records)
 }
 
-pub async fn get_related_m2m_record_ids<'conn>(
+pub async fn get_related_m2m_record_ids(
     database: &Database,
     session: &mut ClientSession,
     from_field: &RelationFieldRef,

@@ -16,6 +16,14 @@ driver-adapters = [
     "sql-connector/driver-adapters",
 ]
 
+# napi-rs generated code has some cfg attributes that check for these features
+# so we declare them here to silence the warnings. They should not be enabled.
+noop = []
+used_linker = []
+
+[lints]
+workspace = true
+
 [dependencies]
 anyhow = "1"
 async-trait.workspace = true
@@ -31,7 +39,7 @@ sql-connector = { path = "../connectors/sql-query-connector", package = "sql-que
     "all-native",
 ] }
 query-structure = { path = "../query-structure" }
-driver-adapters = { path = "../driver-adapters", features = [
+driver-adapters = { path = "../../libs/driver-adapters", features = [
     "postgresql",
     "sqlite",
     "mysql",

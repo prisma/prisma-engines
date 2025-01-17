@@ -8,6 +8,14 @@ mysql = ["quaint/mysql"]
 sqlite = ["quaint/sqlite"]
 postgresql = ["quaint/postgresql"]
 
+# napi-rs generated code has some cfg attributes that check for these features
+# so we declare them here to silence the warnings. They should not be enabled.
+noop = []
+used_linker = []
+
+[lints]
+workspace = true
+
 [dependencies]
 async-trait.workspace = true
 futures.workspace = true

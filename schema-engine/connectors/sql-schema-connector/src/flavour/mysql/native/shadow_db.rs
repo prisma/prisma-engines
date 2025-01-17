@@ -1,11 +1,10 @@
-use crate::flavour::*;
+use crate::flavour::{mysql, MysqlFlavour, SqlFlavour};
 use schema_connector::{migrations_directory::MigrationDirectory, ConnectorResult};
 use sql_schema_describer::SqlSchema;
 
-pub(super) async fn sql_schema_from_migrations_history(
+pub async fn sql_schema_from_migrations_history(
     migrations: &[MigrationDirectory],
-    mut shadow_db: MssqlFlavour,
-    namespaces: Option<Namespaces>,
+    mut shadow_db: MysqlFlavour,
 ) -> ConnectorResult<SqlSchema> {
     for migration in migrations {
         let script = migration.read_migration_script()?;
@@ -15,14 +14,15 @@ pub(super) async fn sql_schema_from_migrations_history(
             migration.migration_name()
         );
 
+        mysql::scan_migration_script_impl(&script);
+
         shadow_db
-            .raw_cmd(&script)
+            .apply_migration_script(migration.migration_name(), &script)
             .await
-            .map_err(ConnectorError::from)
             .map_err(|connector_error| {
                 connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
             })?;
     }
 
-    shadow_db.describe_schema(namespaces).await
+    shadow_db.describe_schema(None).await
 }
