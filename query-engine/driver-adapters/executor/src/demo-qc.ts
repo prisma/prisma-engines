@@ -8,7 +8,7 @@ import { err } from "./utils";
 import { setupDriverAdaptersManager } from "./setup";
 
 /**
- * Example run: `DRIVER_ADAPTER="libsql" pnpm demo:se`
+ * Example run: `DRIVER_ADAPTER="libsql" pnpm demo:qc`
  */
 async function main(): Promise<void> {
   const env = S.decodeUnknownSync(Env)(process.env);

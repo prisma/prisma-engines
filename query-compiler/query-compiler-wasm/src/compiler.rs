@@ -85,11 +85,7 @@ impl QueryCompiler {
     }
 
     #[wasm_bindgen]
-    pub fn compile(
-        &self,
-        request: String,
-        _human_readable: bool, // ignored on wasm to not compile it in
-    ) -> Result<String, wasm_bindgen::JsError> {
+    pub fn compile(&self, request: String) -> Result<String, wasm_bindgen::JsError> {
         let request = RequestBody::try_from_str(&request, self.protocol)?;
         let query_doc = request.into_doc(&self.schema)?;
         let plan = query_compiler::compile(&self.schema, query_doc, &self.connection_info)?;

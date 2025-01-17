@@ -3955,6 +3955,7 @@ dependencies = [
  "prisma-metrics",
  "psl",
  "quaint",
+ "query-compiler",
  "query-connector",
  "query-core",
  "query-engine-common",
