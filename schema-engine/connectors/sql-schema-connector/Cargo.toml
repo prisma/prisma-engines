@@ -16,7 +16,6 @@ mssql-native = ["mssql", "quaint/mssql-native", "quaint/pooled"]
 cockroachdb = ["psl/cockroachdb", "quaint/postgresql", "schema-connector/cockroachdb", "sql-schema-describer/cockroachdb"]
 cockroachdb-native = ["cockroachdb", "quaint/postgresql-native", "quaint/pooled"]
 all-native = [
-    "vendored-openssl",
     "quaint/fmt-sql",
     "postgresql-native",
     "sqlite-native",
