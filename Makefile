@@ -99,14 +99,15 @@ build-schema-wasm:
 
 # Emulate pedantic CI compilation.
 pedantic:
-	RUSTFLAGS="-D warnings" cargo fmt -- --check
-	RUSTFLAGS="-D warnings" cargo clippy --all-features --all-targets
-	RUSTFLAGS="-D warnings" cargo clippy --all-features --all-targets \
+	cargo fmt -- --check
+	cargo clippy --all-features --all-targets -- -Dwarnings
+	cargo clippy --all-features --all-targets \
 	    -p query-engine-wasm \
 		-p schema-engine-wasm \
 		-p query-compiler-wasm \
 		-p prisma-schema-build \
-		--target wasm32-unknown-unknown
+		--target wasm32-unknown-unknown \
+		-- -Dwarnings
 
 release:
 	cargo build --release
