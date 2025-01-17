@@ -5,12 +5,10 @@ pub mod error;
 mod coerce;
 mod interface;
 mod upsert;
-mod write_args;
 
 pub use coerce::*;
 pub use interface::*;
 pub use upsert::*;
-pub use write_args::*;
 
 pub type Result<T> = std::result::Result<T, error::ConnectorError>;
 

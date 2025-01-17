@@ -16,6 +16,7 @@ cuid = { workspace = true, optional = true }
 ulid = { workspace = true, optional = true }
 nanoid = { version = "0.4.0", optional = true }
 chrono.workspace = true
+indexmap.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { workspace = true, features = ["js"] }

@@ -62,7 +62,9 @@ impl Function<'_> {
     }
 }
 
-/// A database function type
+/// A database function type.
+/// Not every function is supported by every database.
+/// TODO: Use `cfg` compilation flags to enable/disable functions based on the database family.
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) enum FunctionType<'a> {
     RowToJson(RowToJson<'a>),

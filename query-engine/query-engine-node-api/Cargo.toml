@@ -30,7 +30,7 @@ sql-connector = { path = "../connectors/sql-query-connector", package = "sql-que
     "all-native",
 ] }
 query-structure = { path = "../query-structure" }
-driver-adapters = { path = "../driver-adapters", features = [
+driver-adapters = { path = "../../libs/driver-adapters", features = [
     "postgresql",
     "sqlite",
     "mysql",

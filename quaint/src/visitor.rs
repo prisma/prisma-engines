@@ -121,6 +121,8 @@ pub trait Visitor<'a> {
     /// Visit a non-parameterized value.
     fn visit_raw_value(&mut self, value: Value<'a>) -> Result;
 
+    // TODO: JSON functions such as this one should only be required when
+    // `#[cfg(any(feature = "postgresql", feature = "mysql"))]` or similar filters apply.
     fn visit_json_extract(&mut self, json_extract: JsonExtract<'a>) -> Result;
 
     fn visit_json_extract_last_array_item(&mut self, extract: JsonExtractLastArrayElem<'a>) -> Result;
@@ -990,6 +992,14 @@ pub trait Visitor<'a> {
             Compare::All(left) => {
                 self.write("ALL")?;
                 self.surround_with("(", ")", |s| s.visit_expression(*left))
+            }
+            Compare::Exists(query) => {
+                self.write("EXISTS")?;
+                self.surround_with("(", ")", |s| s.visit_sub_selection(*query))
+            }
+            Compare::NotExists(query) => {
+                self.write("NOT EXISTS")?;
+                self.surround_with("(", ")", |s| s.visit_sub_selection(*query))
             }
         }
     }

@@ -9,7 +9,9 @@ schema-connector = { path = "../connectors/schema-connector", features = [
     "all-native",
 ] }
 mongodb-schema-connector = { path = "../connectors/mongodb-schema-connector" }
-sql-schema-connector = { path = "../connectors/sql-schema-connector" }
+sql-schema-connector = { path = "../connectors/sql-schema-connector", features = [
+    "all-native",
+] }
 user-facing-errors = { path = "../../libs/user-facing-errors", features = [
     "quaint",
 ] }

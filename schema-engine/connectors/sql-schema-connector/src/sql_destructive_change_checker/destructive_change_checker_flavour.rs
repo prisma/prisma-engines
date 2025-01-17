@@ -1,6 +1,13 @@
+#[cfg(feature = "mssql")]
 mod mssql;
+
+#[cfg(feature = "mysql")]
 mod mysql;
+
+#[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
 mod postgres;
+
+#[cfg(feature = "sqlite")]
 mod sqlite;
 
 use super::{

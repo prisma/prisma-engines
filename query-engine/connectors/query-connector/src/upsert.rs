@@ -1,5 +1,4 @@
-use crate::{RecordFilter, WriteArgs};
-use query_structure::{FieldSelection, Filter, Model, ScalarFieldRef};
+use query_structure::{FieldSelection, Filter, Model, RecordFilter, ScalarFieldRef, WriteArgs};
 
 #[derive(Debug, Clone)]
 pub struct NativeUpsert {

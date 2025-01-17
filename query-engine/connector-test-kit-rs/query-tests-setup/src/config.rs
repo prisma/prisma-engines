@@ -365,7 +365,7 @@ impl TestConfig {
     }
 
     pub fn external_test_executor_path(&self) -> Option<String> {
-        const DEFAULT_TEST_EXECUTOR: &str = "query-engine/driver-adapters/executor/script/testd-qe.sh";
+        const DEFAULT_TEST_EXECUTOR: &str = "libs/driver-adapters/executor/script/testd-qe.sh";
         self.with_driver_adapter()
             .and_then(|_| {
                 Self::workspace_root().or_else(|| {

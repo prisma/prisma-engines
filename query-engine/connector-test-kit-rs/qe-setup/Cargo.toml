@@ -8,7 +8,9 @@ psl.workspace = true
 quaint.workspace = true
 mongodb-client = { path = "../../../libs/mongodb-client" }
 schema-core = { path = "../../../schema-engine/core" }
-sql-schema-connector = { path = "../../../schema-engine/connectors/sql-schema-connector" }
+sql-schema-connector = { path = "../../../schema-engine/connectors/sql-schema-connector", features = [
+    "all-native",
+] }
 test-setup = { path = "../../../libs/test-setup" }
 enumflags2.workspace = true
 serde.workspace = true
