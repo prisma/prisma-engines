@@ -19,7 +19,6 @@ serde_json.workspace = true
 tsify.workspace = true
 wasm-bindgen.workspace = true
 wasm-rs-dbg.workspace = true
-driver-adapters = { path = "../../query-engine/driver-adapters" }
 query-core = { path = "../../query-engine/core" }
 query-compiler = { path = "../query-compiler", default-features = false }
 schema = { path = "../../query-engine/schema" }
@@ -29,9 +28,9 @@ request-handlers = { path = "../../query-engine/request-handlers", default-featu
 build-utils.path = "../../libs/build-utils"
 
 [features]
-sqlite = ["driver-adapters/sqlite", "psl/sqlite", "query-compiler/sqlite"]
-postgresql = ["driver-adapters/postgresql", "psl/postgresql", "query-compiler/postgresql"]
-mysql = ["driver-adapters/mysql", "psl/mysql", "query-compiler/mysql"]
+sqlite = ["psl/sqlite", "query-compiler/sqlite"]
+postgresql = ["psl/postgresql", "query-compiler/postgresql"]
+mysql = ["psl/mysql", "query-compiler/mysql"]
 
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = false # use wasm-opt explicitly in `./build.sh`

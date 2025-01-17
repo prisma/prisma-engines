@@ -3770,7 +3770,6 @@ name = "query-compiler-wasm"
 version = "0.1.0"
 dependencies = [
  "build-utils",
- "driver-adapters",
  "js-sys",
  "psl",
  "quaint",

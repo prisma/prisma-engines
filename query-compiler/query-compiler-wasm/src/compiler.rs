@@ -1,7 +1,3 @@
-#![allow(dead_code)]
-#![allow(unused_variables)]
-
-use driver_adapters::{AdapterFlavour, JsConnectionInfo};
 use psl::ConnectorRegistry;
 use quaint::connector::ConnectionInfo;
 use query_core::protocol::EngineProtocol;
@@ -10,6 +6,8 @@ use serde::Deserialize;
 use std::sync::Arc;
 use tsify::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
+
+use crate::params::{AdapterFlavour, JsConnectionInfo};
 
 const CONNECTOR_REGISTRY: ConnectorRegistry<'_> = &[
     #[cfg(feature = "postgresql")]
@@ -81,7 +79,7 @@ impl QueryCompiler {
 
         Ok(Self {
             schema,
-            connection_info: ConnectionInfo::External(connection_info.into_external_connection_info(&flavour)),
+            connection_info: ConnectionInfo::External(connection_info.into_external_connection_info(flavour)),
             protocol: EngineProtocol::Json,
         })
     }
