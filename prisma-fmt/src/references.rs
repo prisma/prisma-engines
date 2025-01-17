@@ -206,12 +206,12 @@ fn find_where_used_in_relation_attribute<'a>(
                 attr.arguments
                     .arguments
                     .iter()
-                    .find(|arg| arg.name().map_or(false, |name| name == "fields") && arg.value.is_array())
+                    .find(|arg| arg.name() == Some("fields") && arg.value.is_array())
                     .and_then(|arg| {
                         arg.value.as_array().and_then(|arr| {
                             arr.0
                                 .iter()
-                                .find(|expr| expr.as_constant_value().map_or(false, |cv| cv.0 == name))
+                                .find(|expr| expr.as_constant_value().is_some_and(|cv| cv.0 == name))
                         })
                     })
             })
@@ -235,7 +235,7 @@ fn find_where_used_in_block_attribute<'ast>(
                 arg.value.as_array().and_then(|arr| {
                     arr.0
                         .iter()
-                        .find(|expr| expr.as_constant_value().map_or(false, |cv| cv.0 == name))
+                        .find(|expr| expr.as_constant_value().is_some_and(|cv| cv.0 == name))
                 })
             })
             .map(|arg| arg.span())

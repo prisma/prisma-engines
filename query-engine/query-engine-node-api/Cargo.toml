@@ -16,6 +16,14 @@ driver-adapters = [
     "sql-connector/driver-adapters",
 ]
 
+# napi-rs generated code has some cfg attributes that check for these features
+# so we declare them here to silence the warnings. They should not be enabled.
+noop = []
+used_linker = []
+
+[lints]
+workspace = true
+
 [dependencies]
 anyhow = "1"
 async-trait.workspace = true

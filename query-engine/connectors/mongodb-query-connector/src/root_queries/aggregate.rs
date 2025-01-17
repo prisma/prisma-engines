@@ -4,7 +4,7 @@ use connector_interface::*;
 use mongodb::{bson::Document, ClientSession, Database};
 use query_structure::{prelude::*, AggregationSelection, Filter, QueryArguments};
 
-pub async fn aggregate<'conn>(
+pub async fn aggregate(
     database: &Database,
     session: &mut ClientSession,
     model: &Model,

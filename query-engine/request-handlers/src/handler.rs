@@ -244,7 +244,7 @@ impl<'a> RequestHandler<'a> {
         small.iter().all(|(key, small_value)| {
             large
                 .get(key)
-                .map_or(false, |large_value| Self::compare_values(small_value, large_value))
+                .is_some_and(|large_value| Self::compare_values(small_value, large_value))
         })
     }
 
