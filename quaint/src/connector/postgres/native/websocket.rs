@@ -119,7 +119,7 @@ struct WsTunnel {
 
 enum WriteState {
     Free,
-    Writing(usize),
+    Writing(usize, usize),
 }
 
 #[pin_project]
@@ -167,11 +167,18 @@ impl AsyncWrite for WsTunnel {
                 ready!(sink.poll_ready_unpin(cx)).map_err(to_io_err)?;
                 sink.start_send_unpin(Message::Binary(Bytes::copy_from_slice(buf)))
                     .map_err(to_io_err)?;
-                this.write_state = WriteState::Writing(buf.len());
+                this.write_state = WriteState::Writing(buf.as_ptr() as usize, buf.len());
                 cx.waker().wake_by_ref();
                 Poll::Pending
             }
-            WriteState::Writing(len) => {
+
+            WriteState::Writing(addr, len) => {
+                if (buf.as_ptr() as usize, buf.len()) != (addr, len) {
+                    return Poll::Ready(Err(IoError::new(
+                        IoErrorKind::ResourceBusy,
+                        "concurrent writes to the WebSocket tunnel are not allowed",
+                    )));
+                }
                 ready!(sink.poll_flush_unpin(cx)).map_err(to_io_err)?;
                 this.write_state = WriteState::Free;
                 Poll::Ready(Ok(len))
