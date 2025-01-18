@@ -116,6 +116,8 @@ pub struct Warnings {
     pub non_default_deferring: Vec<ModelAndConstraint>,
     /// Warning about Expression Indexes.
     pub expression_indexes: Vec<ModelAndConstraint>,
+    /// Warning about Include Indexes.
+    pub include_indexes: Vec<ModelAndConstraint>,
     /// Warn about comments
     pub objects_with_comments: Vec<Object>,
     /// Warn about fields which point to an empty type.
@@ -402,6 +404,12 @@ impl fmt::Display for Warnings {
         render_warnings(
             "The following models are capped collections, which are not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections",
             &self.capped_collection,
+            f
+        )?;
+
+        render_warnings(
+            "These indexes are not supported by Prisma Client, because Prisma currently does not fully support include indexes. Read more: https://pris.ly/d/include-indexes",
+            &self.include_indexes,
             f
         )?;
 
