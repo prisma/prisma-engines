@@ -14,7 +14,7 @@ services:
     tmpfs: /pgtmpfs12
 
   mysql57:
-    image: mysql:5.7
+    image: mysql:9.1
     command: mysqld
     restart: unless-stopped
     platform: linux/x86_64
@@ -28,7 +28,7 @@ services:
     tmpfs: /var/lib/mysql5.7
 
   mysql8:
-    image: mysql:8.0.22
+    image: mysql:9.1.0
     command: mysqld
     restart: unless-stopped
     platform: linux/x86_64
