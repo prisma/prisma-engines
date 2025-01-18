@@ -133,6 +133,11 @@ impl<'a> TableWalker<'a> {
         self.table().description.as_deref()
     }
 
+    /// Is the table a foreign data wrapper.
+    pub fn is_foreign_data_wrapper(self) -> bool {
+        self.table().properties.contains(TableProperties::IsForeignWrapper)
+    }
+
     /// Reference to the underlying `Table` struct.
     fn table(self) -> &'a Table {
         &self.schema.tables[self.id.0 as usize]
