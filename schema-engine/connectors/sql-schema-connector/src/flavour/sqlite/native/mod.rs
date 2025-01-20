@@ -143,9 +143,8 @@ pub(super) async fn ensure_connection_validity(state: &State) -> ConnectorResult
     }
 }
 
-pub(super) fn introspect(state: &mut State) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
-    Box::pin(async move {
-        let (conn, params) = get_connection_and_params(state)?;
+pub(super) async fn introspect(state: &mut State) -> ConnectorResult<SqlSchema> {
+    if let Some(params) = state.params() {
         let path = std::path::Path::new(&params.file_path);
         if std::fs::metadata(path).is_err() {
             return Err(ConnectorError::user_facing(
@@ -158,9 +157,9 @@ pub(super) fn introspect(state: &mut State) -> BoxFuture<'_, ConnectorResult<Sql
                 },
             ));
         }
+    }
 
-        super::describe_schema(conn).await
-    })
+    super::describe_schema(get_connection(state)?).await
 }
 
 pub(super) async fn reset(state: &mut State) -> ConnectorResult<()> {
