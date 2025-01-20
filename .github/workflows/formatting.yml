@@ -18,34 +18,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  clippy:
-    name: clippy linting
+  checks:
+    name: run lints and formatting checks
     runs-on: ubuntu-latest
-    env:
-      RUSTFLAGS: "-Dwarnings"
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           components: clippy
           targets: wasm32-unknown-unknown
-      # Check the whole workspace with clippy for the native compilation
-      # target, and query-engine-wasm and dependencies for wasm32-unknown-unknown.
-      # Note that `--all-targets` is unrelated to `--target` as in target platform,
-      # it is a shortcut for `--lib --bins --tests --benches --examples`.
-      - run: |
-          cargo clippy --workspace --all-features --all-targets
-          cargo clippy --all-features --all-targets -p query-engine-wasm -p prisma-schema-build --target wasm32-unknown-unknown
-
-  rustfmt:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          components: rustfmt
-      - name: Check formatting
-        run: cargo fmt -- --check
+      - run: make pedantic
 
   shellcheck:
     runs-on: ubuntu-latest

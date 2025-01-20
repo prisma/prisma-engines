@@ -3,6 +3,7 @@
 use psl::{builtin_connectors::*, Datasource, PreviewFeatures};
 use quaint::connector::ExternalConnector;
 use query_core::{executor::InterpretingExecutor, Connector, QueryExecutor};
+#[cfg(feature = "sql")]
 use sql_query_connector::*;
 use std::collections::HashMap;
 use std::env;
@@ -22,7 +23,7 @@ pub enum ConnectorKind<'a> {
 /// Loads a query executor based on the parsed Prisma schema (datasource).
 pub async fn load(
     connector_kind: ConnectorKind<'_>,
-    features: PreviewFeatures,
+    #[allow(unused_variables)] features: PreviewFeatures,
     #[allow(unused_variables)] tracing_enabled: bool,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync + 'static>> {
     match connector_kind {
@@ -159,6 +160,7 @@ mod native {
     }
 }
 
+#[cfg(any(feature = "sql", feature = "mongodb"))]
 fn executor_for<T>(connector: T, force_transactions: bool) -> Box<dyn QueryExecutor + Send + Sync>
 where
     T: Connector + Send + Sync + 'static,

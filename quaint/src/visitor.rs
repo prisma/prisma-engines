@@ -619,6 +619,7 @@ pub trait Visitor<'a> {
                 None => self.write("*")?,
             },
             ExpressionKind::Default => self.write("DEFAULT")?,
+            ExpressionKind::Decorated(decorated) => self.visit_decorated(decorated)?,
         }
 
         if let Some(alias) = value.alias {
@@ -1216,5 +1217,21 @@ pub trait Visitor<'a> {
 
     fn visit_comment(&mut self, comment: Cow<'a, str>) -> Result {
         self.surround_with("/* ", " */", |ref mut s| s.write(comment))
+    }
+
+    fn visit_decorated(&mut self, decorated: Decorated<'a>) -> Result {
+        let Decorated { prefix, suffix, expr } = decorated;
+
+        if let Some(prefix) = prefix {
+            self.visit_comment(prefix)?;
+        }
+
+        self.visit_expression(*expr)?;
+
+        if let Some(suffix) = suffix {
+            self.visit_comment(suffix)?;
+        }
+
+        Ok(())
     }
 }

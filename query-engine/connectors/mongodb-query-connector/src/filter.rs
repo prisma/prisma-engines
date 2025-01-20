@@ -246,6 +246,8 @@ impl MongoFilterVisitor {
                     doc! { "$not": { "$in": [&field_name, coerce_as_array(self.prefixed_field_ref(&field_ref)?)] } }
                 }
             },
+            ScalarCondition::InTemplate(_) => unimplemented!("query compiler not supported with mongodb yet"),
+            ScalarCondition::NotInTemplate(_) => unimplemented!("query compiler not supported with mongodb yet"),
             ScalarCondition::JsonCompare(jc) => match *jc.condition {
                 ScalarCondition::Equals(value) => {
                     let bson = match value {
@@ -400,6 +402,8 @@ impl MongoFilterVisitor {
                     true,
                 )),
             },
+            ScalarCondition::InTemplate(_) => unimplemented!("query compiler not supported with mongodb yet"),
+            ScalarCondition::NotInTemplate(_) => unimplemented!("query compiler not supported with mongodb yet"),
             ScalarCondition::IsSet(is_set) => Ok(render_is_set(&field_name, is_set)),
             ScalarCondition::JsonCompare(_) => Err(MongoError::Unsupported(
                 "JSON filtering is not yet supported on MongoDB".to_string(),

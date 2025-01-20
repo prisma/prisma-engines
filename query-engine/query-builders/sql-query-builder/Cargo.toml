@@ -13,8 +13,8 @@ psl = { path = "../../../psl/psl" }
 
 itertools.workspace = true
 chrono.workspace = true
+bigdecimal.workspace = true
 serde_json.workspace = true
-indexmap.workspace = true
 
 [features]
-relation_joins = []
+relation_joins = ["query-builder/relation_joins"]

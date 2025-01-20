@@ -1,8 +1,8 @@
 use std::borrow::Cow;
 
 use itertools::{Either, Itertools};
+use query_builder::QueryArgumentsExt;
 use query_structure::{QueryArguments, Record};
-use sql_query_builder::QueryArgumentsExt;
 
 macro_rules! processor_state {
     ($name:ident $(-> $transition:ident($bound:ident))?) => {

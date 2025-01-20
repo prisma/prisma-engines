@@ -23,7 +23,7 @@ use std::{collections::HashSet, fmt};
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
 
 #[allow(clippy::large_enum_variant)]
-pub(crate) enum Node {
+pub enum Node {
     /// Nodes representing actual queries to the underlying connector.
     Query(Query),
 
@@ -85,7 +85,7 @@ impl Flow {
 }
 
 // Current limitation: We need to narrow it down to ID diffs for Hash and EQ.
-pub(crate) enum Computation {
+pub enum Computation {
     Diff(DiffNode),
 }
 
@@ -339,7 +339,7 @@ impl QueryGraph {
     }
 
     /// Returns a reference to the content of `node`, if the content is still present.
-    pub(crate) fn node_content(&self, node: &NodeRef) -> Option<&Node> {
+    pub fn node_content(&self, node: &NodeRef) -> Option<&Node> {
         self.graph.node_weight(node.node_ix).unwrap().borrow()
     }
 
@@ -383,7 +383,7 @@ impl QueryGraph {
 
     /// Removes the node from the graph but leaves the graph intact by keeping the empty
     /// node in the graph by plucking the content of the node, but not the node itself.
-    pub(crate) fn pluck_node(&mut self, node: &NodeRef) -> Node {
+    pub fn pluck_node(&mut self, node: &NodeRef) -> Node {
         self.graph.node_weight_mut(node.node_ix).unwrap().unset()
     }
 

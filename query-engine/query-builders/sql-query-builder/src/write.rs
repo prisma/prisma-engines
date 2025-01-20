@@ -1,5 +1,6 @@
 use crate::limit::wrap_with_limit_subquery_if_needed;
 use crate::{model_extensions::*, sql_trace::SqlTraceComment, Context};
+use itertools::Itertools;
 use quaint::ast::*;
 use query_structure::*;
 use std::{collections::HashSet, convert::TryInto};
@@ -299,4 +300,108 @@ pub fn delete_relation_table_records(
     Delete::from_table(relation.as_table(ctx))
         .so_that(parent_id_criteria.and(child_id_criteria))
         .add_traceparent(ctx.traceparent)
+}
+
+/// Generates a list of insert statements to execute. If `selected_fields` is set, insert statements
+/// will return the specified columns of inserted rows.
+pub fn generate_insert_statements(
+    model: &Model,
+    args: Vec<WriteArgs>,
+    skip_duplicates: bool,
+    selected_fields: Option<&ModelProjection>,
+    ctx: &Context<'_>,
+) -> Vec<Insert<'static>> {
+    let affected_fields = collect_affected_fields(&args, model);
+
+    if affected_fields.is_empty() {
+        args.into_iter()
+            .map(|_| create_records_empty(model, skip_duplicates, selected_fields, ctx))
+            .collect()
+    } else {
+        let partitioned_batches = partition_into_batches(args, ctx);
+
+        partitioned_batches
+            .into_iter()
+            .map(|batch| create_records_nonempty(model, batch, skip_duplicates, &affected_fields, selected_fields, ctx))
+            .collect()
+    }
+}
+
+/// Returns a set of fields that are used in the arguments for the create operation.
+fn collect_affected_fields(args: &[WriteArgs], model: &Model) -> HashSet<ScalarFieldRef> {
+    let mut fields = HashSet::new();
+    args.iter().for_each(|arg| fields.extend(arg.keys()));
+
+    fields
+        .into_iter()
+        .map(|dsfn| model.fields().scalar().find(|sf| sf.db_name() == &**dsfn).unwrap())
+        .collect()
+}
+
+/// Partitions data into batches, respecting `max_bind_values` and `max_insert_rows` settings from
+/// the `Context`.
+fn partition_into_batches(args: Vec<WriteArgs>, ctx: &Context<'_>) -> Vec<Vec<WriteArgs>> {
+    let batches = if let Some(max_params) = ctx.max_bind_values() {
+        // We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.
+        // -> Horizontal partitioning by row number, vertical by number of args.
+        args.into_iter()
+            .peekable()
+            .batching(|iter| {
+                let mut param_count: usize = 0;
+                let mut batch = vec![];
+
+                while param_count < max_params {
+                    // If the param count _including_ the next item doens't exceed the limit,
+                    // we continue filling up the current batch.
+                    let proceed = match iter.peek() {
+                        Some(next) => (param_count + next.len()) <= max_params,
+                        None => break,
+                    };
+
+                    if proceed {
+                        match iter.next() {
+                            Some(next) => {
+                                param_count += next.len();
+                                batch.push(next)
+                            }
+                            None => break,
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                if batch.is_empty() {
+                    None
+                } else {
+                    Some(batch)
+                }
+            })
+            .collect_vec()
+    } else {
+        vec![args]
+    };
+
+    if let Some(max_rows) = ctx.max_insert_rows() {
+        let capacity = batches.len();
+        batches
+            .into_iter()
+            .fold(Vec::with_capacity(capacity), |mut batches, next_batch| {
+                if next_batch.len() > max_rows {
+                    batches.extend(
+                        next_batch
+                            .into_iter()
+                            .chunks(max_rows)
+                            .into_iter()
+                            .map(|chunk| chunk.into_iter().collect_vec()),
+                    );
+                } else {
+                    batches.push(next_batch);
+                }
+
+                batches
+            })
+    } else {
+        batches
+    }
 }

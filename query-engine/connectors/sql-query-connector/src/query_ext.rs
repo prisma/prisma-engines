@@ -196,7 +196,7 @@ pub(crate) trait QueryExt {
 
 /// Attempts to convert a PrismaValue to a database value without any additional type information.
 /// Can't reliably map Null values.
-pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
+fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
     match pv {
         PrismaValue::String(s) => s.into(),
         PrismaValue::Float(f) => f.into(),
@@ -211,5 +211,22 @@ pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
         PrismaValue::Bytes(b) => Value::bytes(b),
         PrismaValue::Null => Value::null_int32(), // Can't tell which type the null is supposed to be.
         PrismaValue::Object(_) => unimplemented!(),
+        PrismaValue::Placeholder { name, r#type } => Value::var(name, convert_placeholder_type_to_var_type(&r#type)),
+    }
+}
+
+fn convert_placeholder_type_to_var_type(pt: &PlaceholderType) -> VarType {
+    match pt {
+        PlaceholderType::Any => VarType::Unknown,
+        PlaceholderType::String => VarType::Text,
+        PlaceholderType::Int => VarType::Int32,
+        PlaceholderType::BigInt => VarType::Int64,
+        PlaceholderType::Float => VarType::Numeric,
+        PlaceholderType::Boolean => VarType::Boolean,
+        PlaceholderType::Decimal => VarType::Numeric,
+        PlaceholderType::Date => VarType::DateTime,
+        PlaceholderType::Array(t) => VarType::Array(Box::new(convert_placeholder_type_to_var_type(t))),
+        PlaceholderType::Object => VarType::Json,
+        PlaceholderType::Bytes => VarType::Bytes,
     }
 }

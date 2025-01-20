@@ -232,6 +232,12 @@ impl QueryDocumentParser {
         possible_input_types: &[InputType<'a>],
         query_schema: &'a QuerySchema,
     ) -> QueryParserResult<ParsedInputValue<'a>> {
+        // TODO: make query parsing aware of whether we are using the query compiler,
+        // and disallow placeholders in the query document if we are not.
+        if let ArgumentValue::Scalar(pv @ PrismaValue::Placeholder { .. }) = &value {
+            return Ok(ParsedInputValue::Single(pv.clone()));
+        }
+
         let mut failures = Vec::new();
 
         macro_rules! try_this {
@@ -410,6 +416,8 @@ impl QueryDocumentParser {
 
             // UUID coercion matchers
             (PrismaValue::Uuid(uuid), ScalarType::String) => Ok(PrismaValue::String(uuid.to_string())),
+
+            (pv @ PrismaValue::Placeholder { .. }, ScalarType::Param) => Ok(pv),
 
             // All other combinations are value type mismatches.
             (_, _) => Err(ValidationError::invalid_argument_type(
@@ -908,6 +916,7 @@ pub(crate) mod conversions {
             PrismaValue::Float(_) => "Float".to_string(),
             PrismaValue::BigInt(_) => "BigInt".to_string(),
             PrismaValue::Bytes(_) => "Bytes".to_string(),
+            PrismaValue::Placeholder { r#type, .. } => r#type.to_string(),
         }
     }
 

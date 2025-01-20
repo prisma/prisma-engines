@@ -1,7 +1,8 @@
-use crate::{join_utils::*, model_extensions::*, query_arguments_ext::QueryArgumentsExt, Context};
+use crate::{join_utils::*, model_extensions::*, Context};
 use itertools::Itertools;
 use psl::{datamodel_connector::ConnectorCapability, reachable_only_with_capability};
 use quaint::ast::*;
+use query_builder::QueryArgumentsExt;
 use query_structure::*;
 
 static ORDER_JOIN_PREFIX: &str = "orderby_";

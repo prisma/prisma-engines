@@ -3,6 +3,7 @@ mod relation;
 mod scalar;
 
 pub use composite::*;
+use prisma_value::PlaceholderType;
 pub use relation::*;
 pub use scalar::*;
 
@@ -176,6 +177,23 @@ impl TypeIdentifier {
             TypeIdentifier::DateTime => "DateTime".into(),
             TypeIdentifier::Bytes => "Bytes".into(),
             TypeIdentifier::Unsupported => "Unsupported".into(),
+        }
+    }
+
+    pub fn to_placeholder_type(&self) -> PlaceholderType {
+        match self {
+            TypeIdentifier::String => PlaceholderType::String,
+            TypeIdentifier::Int => PlaceholderType::Int,
+            TypeIdentifier::BigInt => PlaceholderType::BigInt,
+            TypeIdentifier::Float => PlaceholderType::Float,
+            TypeIdentifier::Decimal => PlaceholderType::Decimal,
+            TypeIdentifier::Boolean => PlaceholderType::Boolean,
+            TypeIdentifier::Enum(_) => PlaceholderType::String,
+            TypeIdentifier::UUID => PlaceholderType::String,
+            TypeIdentifier::Json => PlaceholderType::Object,
+            TypeIdentifier::DateTime => PlaceholderType::Date,
+            TypeIdentifier::Bytes => PlaceholderType::Bytes,
+            TypeIdentifier::Unsupported => PlaceholderType::Any,
         }
     }
 

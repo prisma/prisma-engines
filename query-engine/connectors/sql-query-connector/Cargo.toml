@@ -62,6 +62,9 @@ path = "../query-connector"
 [dependencies.query-structure]
 path = "../../query-structure"
 
+[dependencies.query-builder]
+path = "../../query-builders/query-builder"
+
 [dependencies.sql-query-builder]
 path = "../../query-builders/sql-query-builder"
 

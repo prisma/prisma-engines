@@ -61,7 +61,7 @@ mssql-native = [
     "sql-query-connector/mssql-native",
     "user-facing-errors/mssql-native",
 ]
-driver-adapters = ["sql-query-connector/driver-adapters"]
+driver-adapters = ["sql", "sql-query-connector/driver-adapters"]
 all = [
     "mongodb",
     "mysql-native",

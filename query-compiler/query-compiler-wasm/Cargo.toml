@@ -1,0 +1,42 @@
+[package]
+name = "query-compiler-wasm"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+doc = false
+crate-type = ["cdylib"]
+name = "query_compiler_wasm"
+
+[lints]
+workspace = true
+
+[dependencies]
+psl.workspace = true
+quaint.workspace = true
+tracing.workspace = true
+
+js-sys.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tsify.workspace = true
+wasm-bindgen.workspace = true
+wasm-rs-dbg.workspace = true
+query-core = { path = "../../query-engine/core" }
+query-compiler = { path = "../query-compiler", default-features = false }
+schema = { path = "../../query-engine/schema" }
+request-handlers = { path = "../../query-engine/request-handlers", default-features = false }
+
+[build-dependencies]
+build-utils.path = "../../libs/build-utils"
+
+[features]
+sqlite = ["psl/sqlite", "query-compiler/sqlite"]
+postgresql = ["psl/postgresql", "query-compiler/postgresql"]
+mysql = ["psl/mysql", "query-compiler/mysql"]
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false # use wasm-opt explicitly in `./build.sh`
+
+[package.metadata.wasm-pack.profile.profiling]
+wasm-opt = false # use wasm-opt explicitly in `./build.sh`

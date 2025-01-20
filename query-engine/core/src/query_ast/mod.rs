@@ -9,7 +9,7 @@ use query_structure::{FieldSelection, Filter, Model, SelectionResult};
 
 #[derive(Debug, Clone)]
 #[allow(clippy::large_enum_variant)]
-pub(crate) enum Query {
+pub enum Query {
     Read(ReadQuery),
     Write(WriteQuery),
 }

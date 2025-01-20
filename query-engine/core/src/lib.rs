@@ -15,7 +15,10 @@ pub use self::{
     error::{CoreError, ExtendedUserFacingError, FieldConversionError},
     executor::{QueryExecutor, TransactionOptions},
     interactive_transactions::{TransactionError, TxId},
+    query_ast::*,
     query_document::*,
+    query_graph::*,
+    query_graph_builder::*,
 };
 
 pub use connector::{
@@ -35,9 +38,6 @@ use self::{
     executor::*,
     interactive_transactions::*,
     interpreter::{Env, ExpressionResult, Expressionista, InterpreterError, QueryInterpreter},
-    query_ast::*,
-    query_graph::*,
-    query_graph_builder::*,
     response_ir::{IrSerializer, ResponseData},
     result_ast::*,
 };

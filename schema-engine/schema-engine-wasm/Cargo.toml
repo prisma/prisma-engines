@@ -8,6 +8,9 @@ doc = false
 crate-type = ["cdylib"]
 name = "schema_engine_wasm"
 
+[lints]
+workspace = true
+
 [features]
 sqlite = ["driver-adapters/sqlite", "psl/sqlite"]
 postgresql = ["driver-adapters/postgresql", "psl/postgresql"]
