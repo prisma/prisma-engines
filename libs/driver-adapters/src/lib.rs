@@ -47,7 +47,7 @@ impl From<DriverAdapterError> for QuaintError {
 
 pub use queryable::from_js;
 pub(crate) use transaction::JsTransaction;
-pub use types::{AdapterFlavour, JsConnectionInfo};
+pub use types::AdapterFlavour;
 
 #[cfg(target_arch = "wasm32")]
 pub use wasm::JsObjectExtern as JsObject;
