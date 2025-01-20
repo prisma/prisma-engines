@@ -8,9 +8,9 @@ use either::Either;
 use indexmap::IndexMap;
 use quaint::{
     ast::{Value, ValueType},
-    prelude::ResultRow,
+    prelude::{Queryable, ResultRow},
 };
-use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto, fmt::Debug, path::Path};
+use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto, fmt::Debug, path::Path, sync::Arc};
 use tracing::trace;
 
 #[cfg(feature = "sqlite-native")]
@@ -33,6 +33,17 @@ impl Connection for quaint::single::Quaint {
         params: &'a [quaint::prelude::Value<'a>],
     ) -> quaint::Result<quaint::prelude::ResultSet> {
         quaint::prelude::Queryable::query_raw(self, sql, params).await
+    }
+}
+
+#[async_trait::async_trait]
+impl<Q: Queryable + ?Sized> Connection for Arc<Q> {
+    async fn query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [quaint::prelude::Value<'a>],
+    ) -> quaint::Result<quaint::prelude::ResultSet> {
+        quaint::prelude::Queryable::query_raw(&**self, sql, params).await
     }
 }
 
