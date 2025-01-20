@@ -165,14 +165,14 @@ jobs:
     with:
       commit: ${{ github.sha }}
 
-  # build-react-native:
-  #   name: Build Engines for React native
-  #   needs:
-  #     - is-release-necessary
-  #   if: ${{ needs.is-release-necessary.outputs.release == 'true' }}
-  #   uses: ./.github/workflows/build-engines-react-native-template.yml
-  #   with:
-  #     commit: ${{ github.sha }}
+  build-react-native:
+    name: Build Engines for React native
+    needs:
+      - is-release-necessary
+    if: ${{ needs.is-release-necessary.outputs.release == 'true' }}
+    uses: ./.github/workflows/build-engines-react-native-template.yml
+    with:
+      commit: ${{ github.sha }}
 
   build-windows:
     name: Build Engines for Windows
@@ -192,7 +192,7 @@ jobs:
       - build-linux
       - build-macos-intel
       - build-macos-silicon
-      # - build-react-native
+      - build-react-native
       - build-windows
     env:
       BUCKET_NAME: "prisma-builds"
@@ -247,12 +247,12 @@ jobs:
           cp -r rhel-openssl-1.1.x debian-openssl-1.1.x
           cp -r rhel-openssl-3.0.x debian-openssl-3.0.x
 
-      # - name: Create .zip for react-native
-      #   working-directory: engines-artifacts
-      #   run: |
-      #     mkdir react-native
-      #     zip -r react-native/binaries.zip ios android
-      #     rm -rf ios android
+      - name: Create .zip for react-native
+        working-directory: engines-artifacts
+        run: |
+          mkdir react-native
+          zip -r react-native/binaries.zip ios android
+          rm -rf ios android
 
       - name: "Create compressed engine files (.gz)"
         working-directory: engines-artifacts
