@@ -9,7 +9,7 @@
   "description": "",
   "private": true,
   "scripts": {
-    "build": "tsup ./src/testd-qe.ts ./src/demo-se.ts ./src/demo-qc.ts ./src/bench.ts --format esm --dts",
+    "build": "tsup ./src/testd-qe.ts ./src/demo-se.ts ./src/bench.ts --format esm --dts",
     "test:qe": "node --import tsx ./src/testd-qe.ts",
     "demo:se": "node --import tsx ./src/demo-se.ts",
     "demo:qc": "node --import tsx ./src/demo-qc.ts",
