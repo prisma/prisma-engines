@@ -2,6 +2,14 @@
   pkgs ? import <nixpkgs> { },
 }:
 
+let
+  wasm-bindgen-cli = pkgs.wasm-bindgen-cli.override {
+    version = "0.2.93";
+    hash = "sha256-DDdu5mM3gneraM85pAepBXWn3TMofarVR4NbjMdz3r0=";
+    cargoHash = "sha256-birrg+XABBHHKJxfTKAMSlmTVYLmnmqMDfRnmG6g/YQ=";
+  };
+
+in
 pkgs.mkShell {
   packages = with pkgs; [
     binaryen
