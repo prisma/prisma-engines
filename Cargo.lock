@@ -3728,6 +3728,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "query-compiler-playground"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "psl",
+ "quaint",
+ "query-compiler",
+ "query-core",
+ "request-handlers",
+ "serde_json",
+ "sql-query-builder",
+]
+
+[[package]]
 name = "query-compiler-wasm"
 version = "0.1.0"
 dependencies = [

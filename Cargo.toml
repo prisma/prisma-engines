@@ -29,6 +29,7 @@ members = [
     "query-engine/schema",
     "query-engine/query-builders/*",
     "query-compiler/query-compiler",
+    "query-compiler/query-compiler-playground",
     "query-compiler/query-compiler-wasm",
     "libs/*",
     "prisma-fmt",
