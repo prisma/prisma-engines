@@ -8,6 +8,9 @@ doc = false
 crate-type = ["cdylib"]
 name = "query_compiler_wasm"
 
+[lints]
+workspace = true
+
 [dependencies]
 psl.workspace = true
 quaint.workspace = true
