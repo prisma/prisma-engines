@@ -232,7 +232,8 @@ impl QueryDocumentParser {
         possible_input_types: &[InputType<'a>],
         query_schema: &'a QuerySchema,
     ) -> QueryParserResult<ParsedInputValue<'a>> {
-        // TODO: we disabled generating Param explicitly in the query schema for now
+        // TODO: make query parsing aware of whether we are using the query compiler,
+        // and disallow placeholders in the query document if we are not.
         if let ArgumentValue::Scalar(pv @ PrismaValue::Placeholder { .. }) = &value {
             return Ok(ParsedInputValue::Single(pv.clone()));
         }

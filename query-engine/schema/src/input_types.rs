@@ -122,15 +122,10 @@ pub struct InputField<'a> {
 impl<'a> InputField<'a> {
     pub(crate) fn new(
         name: Cow<'a, str>,
-        mut field_types: Vec<InputType<'a>>,
+        field_types: Vec<InputType<'a>>,
         default_value: Option<DefaultKind>,
         is_required: bool,
     ) -> InputField<'a> {
-        // todo
-        #[allow(clippy::overly_complex_bool_expr)]
-        if false && field_types.iter().any(|t| t.is_scalar()) {
-            field_types.push(InputType::Scalar(ScalarType::Param));
-        }
         InputField {
             name,
             default_value,
@@ -282,10 +277,6 @@ impl<'a> InputType<'a> {
 
     pub(crate) fn enum_type(containing: EnumType) -> InputType<'a> {
         InputType::Enum(containing)
-    }
-
-    pub fn is_scalar(&self) -> bool {
-        matches!(self, Self::Scalar(_))
     }
 
     pub fn is_json(&self) -> bool {
