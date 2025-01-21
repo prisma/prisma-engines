@@ -204,23 +204,6 @@ impl InteractiveTransaction {
         }
     }
 
-    pub async fn begin(&mut self) -> crate::Result<()> {
-        tx_timeout!(self, "begin", async {
-            let name = self.name();
-            let conn = self.state.as_open("begin")?;
-            let span = info_span!("prisma:engine:itx_begin", user_facing = true);
-
-            if let Err(err) = conn.begin().instrument(span).await {
-                error!(?err, ?name, "transaction failed to begin");
-                let _ = self.rollback(false).await;
-                Err(err.into())
-            } else {
-                debug!(?name, "transaction started");
-                Ok(())
-            }
-        })
-    }
-
     pub async fn commit(&mut self) -> crate::Result<()> {
         tx_timeout!(self, "commit", async {
             let name = self.name();

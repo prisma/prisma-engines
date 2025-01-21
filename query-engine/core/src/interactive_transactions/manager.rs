@@ -114,12 +114,8 @@ impl ItxManager {
         if self.transactions.read().await.contains_key(&tx_id) {
             let transaction_entry = self.get_transaction(&tx_id, "begin").await?;
             let mut tx = transaction_entry.lock().await;
-            // If the transaction is already open, we need to create a savepoint.
-            if tx.depth() > 0 {
-                tx.create_savepoint().await?;
-            } else {
-                tx.begin().await?;
-            }
+            // The transaction is already open, so we need to create a savepoint.
+            tx.create_savepoint().await?;
         } else {
             // This task notifies the task spawned in `new()` method that the timeout for this
             // transaction has expired.
