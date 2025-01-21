@@ -219,6 +219,8 @@ pub enum ExpressionKind<'a> {
     Value(Box<Expression<'a>>),
     /// DEFAULT keyword, e.g. for `INSERT INTO ... VALUES (..., DEFAULT, ...)`
     Default,
+    /// An expression wrapped with comments on each side
+    Decorated(Decorated<'a>),
 }
 
 impl ExpressionKind<'_> {

@@ -21,6 +21,8 @@ pub enum ScalarCondition {
     GreaterThanOrEquals(ConditionValue),
     In(ConditionListValue),
     NotIn(ConditionListValue),
+    InTemplate(ConditionValue),
+    NotInTemplate(ConditionValue),
     JsonCompare(JsonCondition),
     Search(ConditionValue, Vec<ScalarProjection>),
     NotSearch(ConditionValue, Vec<ScalarProjection>),
@@ -52,6 +54,8 @@ impl ScalarCondition {
                 Self::GreaterThanOrEquals(v) => Self::LessThan(v),
                 Self::In(v) => Self::NotIn(v),
                 Self::NotIn(v) => Self::In(v),
+                Self::InTemplate(v) => Self::NotInTemplate(v),
+                Self::NotInTemplate(v) => Self::InTemplate(v),
                 Self::JsonCompare(json_compare) => {
                     let inverted_cond = json_compare.condition.invert(true);
 
@@ -86,6 +90,8 @@ impl ScalarCondition {
             ScalarCondition::GreaterThanOrEquals(v) => v.as_field_ref(),
             ScalarCondition::In(v) => v.as_field_ref(),
             ScalarCondition::NotIn(v) => v.as_field_ref(),
+            ScalarCondition::InTemplate(v) => v.as_field_ref(),
+            ScalarCondition::NotInTemplate(v) => v.as_field_ref(),
             ScalarCondition::JsonCompare(json_cond) => json_cond.condition.as_field_ref(),
             ScalarCondition::Search(v, _) => v.as_field_ref(),
             ScalarCondition::NotSearch(v, _) => v.as_field_ref(),

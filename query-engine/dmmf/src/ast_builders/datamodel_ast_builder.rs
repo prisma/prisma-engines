@@ -338,6 +338,7 @@ fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
 
             serde_json::Value::Object(map)
         }
+        PrismaValue::Placeholder { .. } => unreachable!(),
     }
 }
 

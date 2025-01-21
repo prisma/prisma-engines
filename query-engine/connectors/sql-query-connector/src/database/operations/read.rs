@@ -8,8 +8,9 @@ use crate::{QueryExt, Queryable, SqlError};
 use connector_interface::*;
 use futures::stream::{FuturesUnordered, StreamExt};
 use quaint::ast::*;
+use query_builder::QueryArgumentsExt;
 use query_structure::*;
-use sql_query_builder::{column_metadata, read, AsColumns, AsTable, Context, QueryArgumentsExt, RelationFieldExt};
+use sql_query_builder::{column_metadata, read, AsColumns, AsTable, Context, RelationFieldExt};
 
 pub(crate) async fn get_single_record(
     conn: &dyn Queryable,

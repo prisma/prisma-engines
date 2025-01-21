@@ -1,0 +1,65 @@
+name: Build and publish @prisma/query-compiler-wasm
+run-name: npm - release @prisma/query-compiler-wasm@${{ github.event.inputs.packageVersion }} from ${{ github.event.inputs.enginesHash }} on ${{ github.event.inputs.npmDistTag }}
+
+concurrency: publish-query-compiler-wasm
+
+on:
+  # usually triggered via GH Actions Workflow in prisma/engines-wrapper repo
+  workflow_dispatch:
+    inputs:
+      packageVersion:
+        required: true
+        description: "New @prisma/query-compiler-wasm package version"
+      enginesHash:
+        required: true
+        description: "query-compiler commit to build"
+      npmDistTag:
+        required: true
+        default: "latest"
+        description: "npm dist-tag (e.g. latest or integration)"
+
+jobs:
+  build:
+    name: Build and publish @prisma/query-compiler-wasm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print input
+        run: echo "${{ toJson(github.event.inputs) }}"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.enginesHash }}
+
+      - uses: ./.github/workflows/include/rust-wasm-setup
+
+      - name: Build @prisma/query-compiler-wasm
+        run: make build-qc-wasm
+        env:
+          QE_WASM_VERSION: ${{ github.event.inputs.packageVersion }}
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+
+      - name: Set up NPM token for publishing
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: Publish @prisma/query-compiler-wasm
+        run: npm publish --access public --tag ${{ github.event.inputs.npmDistTag }}
+        working-directory: query-compiler/query-compiler-wasm/pkg
+
+      #
+      # Failure handlers
+      #
+      - name: Set current job url in SLACK_FOOTER env var
+        if: ${{ failure() }}
+        run: echo "SLACK_FOOTER=<$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID|Click here to go to the job logs>" >> $GITHUB_ENV
+      - name: Slack Notification on Failure
+        if: ${{ failure() }}
+        uses: rtCamp/action-slack-notify@v2.3.2
+        env:
+          SLACK_TITLE: "Building and publishing @prisma/query-compiler-wasm failed :x:"
+          SLACK_COLOR: "#FF0000"
+          SLACK_CHANNEL: feed-prisma-query-compiler-wasm-publish-failures
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_WASM_FAILING }}

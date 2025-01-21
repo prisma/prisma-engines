@@ -198,6 +198,10 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             ValueType::Date(date) => date.map(|date| self.write(format!("'{date}'"))),
             ValueType::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
             ValueType::Xml(cow) => cow.as_ref().map(|cow| self.write(format!("'{cow}'"))),
+
+            ValueType::Var(name, _) => Some(Err(
+                Error::builder(ErrorKind::VarAsRawValue(name.clone().into_owned())).build()
+            )),
         };
 
         match res {

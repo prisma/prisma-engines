@@ -1,0 +1,15 @@
+[package]
+name = "query-compiler-playground"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1"
+serde_json.workspace = true
+
+psl.workspace = true
+query-compiler.path = "../query-compiler"
+request-handlers.path = "../../query-engine/request-handlers"
+query-core.path = "../../query-engine/core"
+quaint.workspace = true
+sql-query-builder.path = "../../query-engine/query-builders/sql-query-builder"

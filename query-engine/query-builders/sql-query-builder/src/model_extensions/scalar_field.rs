@@ -2,7 +2,7 @@ use crate::context::Context;
 use chrono::Utc;
 use prisma_value::PrismaValue;
 use quaint::{
-    ast::{EnumName, Value, ValueType},
+    ast::{EnumName, Value, ValueType, VarType},
     prelude::{EnumVariant, TypeDataLength, TypeFamily},
 };
 use query_structure::{ScalarField, TypeIdentifier};
@@ -74,7 +74,21 @@ impl ScalarFieldExt for ScalarField {
                 TypeIdentifier::Int => Value::null_int32(),
                 TypeIdentifier::BigInt => Value::null_int64(),
                 TypeIdentifier::Bytes => Value::null_bytes(),
-                TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
+                TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach this path"),
+            },
+            (PrismaValue::Placeholder { name, .. }, ident) => match ident {
+                TypeIdentifier::String => Value::var(name, VarType::Text),
+                TypeIdentifier::Int => Value::var(name, VarType::Int32),
+                TypeIdentifier::BigInt => Value::var(name, VarType::Int64),
+                TypeIdentifier::Float => Value::var(name, VarType::Numeric),
+                TypeIdentifier::Decimal => Value::var(name, VarType::Numeric),
+                TypeIdentifier::Boolean => Value::var(name, VarType::Boolean),
+                TypeIdentifier::Enum(_) => Value::var(name, VarType::Enum),
+                TypeIdentifier::UUID => Value::var(name, VarType::Uuid),
+                TypeIdentifier::Json => Value::var(name, VarType::Json),
+                TypeIdentifier::DateTime => Value::var(name, VarType::DateTime),
+                TypeIdentifier::Bytes => Value::var(name, VarType::Bytes),
+                TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach this path"),
             },
         };
 

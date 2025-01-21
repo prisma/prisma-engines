@@ -3382,6 +3382,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
 
 [[package]]
+name = "pretty"
+version = "0.12.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b55c4d17d994b637e2f4daf6e5dc5d660d209d5642377d675d7a1c3ab69fa579"
+dependencies = [
+ "arrayvec 0.5.2",
+ "termcolor",
+ "typed-arena",
+ "unicode-width",
+]
+
+[[package]]
 name = "pretty-hex"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3701,6 +3713,55 @@ dependencies = [
 ]
 
 [[package]]
+name = "query-compiler"
+version = "0.1.0"
+dependencies = [
+ "itertools 0.12.0",
+ "pretty",
+ "quaint",
+ "query-builder",
+ "query-core",
+ "query-structure",
+ "serde",
+ "sql-query-builder",
+ "thiserror 1.0.44",
+]
+
+[[package]]
+name = "query-compiler-playground"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "psl",
+ "quaint",
+ "query-compiler",
+ "query-core",
+ "request-handlers",
+ "serde_json",
+ "sql-query-builder",
+]
+
+[[package]]
+name = "query-compiler-wasm"
+version = "0.1.0"
+dependencies = [
+ "build-utils",
+ "js-sys",
+ "psl",
+ "quaint",
+ "query-compiler",
+ "query-core",
+ "request-handlers",
+ "schema",
+ "serde",
+ "serde_json",
+ "tracing",
+ "tsify",
+ "wasm-bindgen",
+ "wasm-rs-dbg",
+]
+
+[[package]]
 name = "query-connector"
 version = "0.1.0"
 dependencies = [
@@ -3771,6 +3832,7 @@ dependencies = [
  "enumflags2",
  "graphql-parser",
  "hyper",
+ "indexmap 2.2.2",
  "indoc 2.0.3",
  "mongodb-query-connector",
  "prisma-metrics",
@@ -3782,6 +3844,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serial_test",
+ "sql-query-builder",
  "sql-query-connector",
  "structopt",
  "telemetry",
@@ -3868,6 +3931,7 @@ dependencies = [
  "prisma-metrics",
  "psl",
  "quaint",
+ "query-compiler",
  "query-connector",
  "query-core",
  "query-engine-common",
@@ -5079,8 +5143,8 @@ dependencies = [
 name = "sql-query-builder"
 version = "0.1.0"
 dependencies = [
+ "bigdecimal",
  "chrono",
- "indexmap 2.2.2",
  "itertools 0.12.0",
  "prisma-value",
  "psl",
@@ -5107,6 +5171,7 @@ dependencies = [
  "prisma-value",
  "psl",
  "quaint",
+ "query-builder",
  "query-connector",
  "query-structure",
  "rand 0.8.5",
@@ -5928,6 +5993,12 @@ dependencies = [
  "rand 0.8.5",
  "static_assertions",
 ]
+
+[[package]]
+name = "typed-arena"
+version = "2.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6af6ae20167a9ece4bcb41af5b80f8a1f1df981f6391189ce00fd257af04126a"
 
 [[package]]
 name = "typed-builder"

@@ -7,3 +7,6 @@ version = "0.1.0"
 serde.workspace = true
 
 query-structure = { path = "../../query-structure" }
+
+[features]
+relation_joins = []
