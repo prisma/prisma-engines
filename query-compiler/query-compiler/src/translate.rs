@@ -62,7 +62,8 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
 
         match node {
             Node::Query(_) => self.translate_query(),
-            _ => unimplemented!(),
+            Node::Empty => Ok(Expression::Seq(vec![])),
+            n => unimplemented!("{:?}", std::mem::discriminant(n)),
         }
     }
 
@@ -90,6 +91,9 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                         })
                         .collect_vec();
 
+                    // TODO: there are cases where we look at the number of results in some
+                    // dependencies, these won't work with the current implementation and will
+                    // need to be re-implemented
                     node = f(node, vec![SelectionResult::new(fields)]).unwrap();
                 }
                 // TODO: implement data dependencies and if/else

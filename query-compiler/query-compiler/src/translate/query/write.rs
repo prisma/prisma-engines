@@ -40,6 +40,6 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
             }
         }
 
-        _ => todo!(),
+        other => todo!("{other:?}"),
     })
 }
