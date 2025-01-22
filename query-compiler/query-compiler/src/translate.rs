@@ -60,6 +60,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
 
         match node {
             Node::Query(_) => self.translate_query(),
+            // might be worth having Expression::Unit for this?
             Node::Empty => Ok(Expression::Seq(vec![])),
             n => unimplemented!("{:?}", std::mem::discriminant(n)),
         }
