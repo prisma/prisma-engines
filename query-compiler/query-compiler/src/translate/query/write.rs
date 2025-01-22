@@ -1,5 +1,6 @@
 use query_builder::QueryBuilder;
-use query_core::{UpdateManyRecords, WriteQuery};
+use query_core::{UpdateManyRecords, UpdateRecord, UpdateRecordWithSelection, WriteQuery};
+use query_structure::QueryArguments;
 
 use crate::{expression::Expression, translate::TranslateResult, TranslateError};
 
@@ -76,6 +77,28 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
             } else {
                 Expression::Sum(updates)
             }
+        }
+
+        WriteQuery::UpdateRecord(UpdateRecord::WithSelection(UpdateRecordWithSelection {
+            model,
+            record_filter,
+            args,
+            selected_fields,
+            // TODO: we're ignoring selection order
+            ..
+        })) => {
+            let query = if args.is_empty() {
+                // if there's no args we can just issue a read query
+                let args = QueryArguments::from((model.clone(), record_filter.filter)).with_take(Some(1));
+                builder
+                    .build_get_records(&model, args, &selected_fields)
+                    .map_err(TranslateError::QueryBuildFailure)?
+            } else {
+                builder
+                    .build_update(&model, record_filter, args, Some(&selected_fields))
+                    .map_err(TranslateError::QueryBuildFailure)?
+            };
+            Expression::Unique(Box::new(Expression::Query(query)))
         }
 
         other => todo!("{other:?}"),

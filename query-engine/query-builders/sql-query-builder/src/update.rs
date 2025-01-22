@@ -1,5 +1,5 @@
-use quaint::ast::Query;
-use query_structure::{Filter, Model, ModelProjection, SelectionResult, WriteArgs};
+use quaint::ast::{Query, Update};
+use query_structure::{Filter, IntoFilter, Model, ModelProjection, RecordFilter, SelectionResult, WriteArgs};
 
 use crate::{limit, write, AsColumns, Context, FilterBuilder};
 
@@ -49,4 +49,31 @@ pub fn update_many_from_ids_and_filter(
 
     let update = write::build_update_and_set_query(model, args, selected_fields, ctx);
     write::chunk_update_with_ids(update, model, selections, filter_condition, ctx)
+}
+
+/// Creates an update with an explicit selection set.
+pub fn update_one_with_selection(
+    model: &Model,
+    record_filter: RecordFilter,
+    args: WriteArgs,
+    selected_fields: &ModelProjection,
+    ctx: &Context<'_>,
+) -> Update<'static> {
+    let cond = FilterBuilder::without_top_level_joins().visit_filter(build_update_one_filter(record_filter), ctx);
+    write::build_update_and_set_query(model, args, Some(selected_fields), ctx).so_that(cond)
+}
+
+/// Given a record filter, builds a ConditionTree composed of:
+/// 1. The `RecordFilter.filter`
+/// 2. The `RecordFilter.selectors`, if any are present, transformed to an `In()` filter
+///
+/// Both filters are 'AND'ed.
+///
+/// Note: This function should only be called for update_one filters. It is not chunking the filters into multiple queries.
+/// Note: Using this function to render an update_many filter could exceed the maximum query parameters available for a connector.
+fn build_update_one_filter(record_filter: RecordFilter) -> Filter {
+    match record_filter.selectors {
+        Some(selectors) => Filter::and(vec![selectors.filter(), record_filter.filter]),
+        None => record_filter.filter,
+    }
 }

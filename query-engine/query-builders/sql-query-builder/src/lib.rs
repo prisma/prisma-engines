@@ -22,7 +22,9 @@ use quaint::{
     visitor::Visitor,
 };
 use query_builder::{DbQuery, QueryBuilder};
-use query_structure::{FieldSelection, Filter, Model, ModelProjection, QueryArguments, SelectionResult, WriteArgs};
+use query_structure::{
+    FieldSelection, Filter, Model, ModelProjection, QueryArguments, RecordFilter, SelectionResult, WriteArgs,
+};
 
 pub use column_metadata::ColumnMetadata;
 pub use context::Context;
@@ -97,6 +99,26 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         let projection = selected_fields.map(ModelProjection::from);
         let query = write::generate_insert_statements(model, args, skip_duplicates, projection.as_ref(), &self.context);
         query.into_iter().map(|q| self.convert_query(q)).collect()
+    }
+
+    fn build_update(
+        &self,
+        model: &Model,
+        record_filter: RecordFilter,
+        args: WriteArgs,
+        selected_fields: Option<&FieldSelection>,
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
+        match selected_fields {
+            Some(selected_fields) => {
+                let selected_fields = ModelProjection::from(selected_fields);
+                let query =
+                    update::update_one_with_selection(model, record_filter, args, &selected_fields, &self.context);
+                self.convert_query(query)
+            }
+            None => {
+                todo!()
+            }
+        }
     }
 
     fn build_updates_from_filter(

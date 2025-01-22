@@ -5,7 +5,7 @@ use crate::{QueryExt, Queryable};
 
 use itertools::Itertools;
 use query_structure::*;
-use sql_query_builder::{column_metadata, update, write, ColumnMetadata, Context, FilterBuilder};
+use sql_query_builder::{column_metadata, update, ColumnMetadata, Context};
 
 /// Performs an update with an explicit selection set.
 /// This function is called for connectors that supports the `UpdateReturning` capability.
@@ -25,15 +25,11 @@ pub(crate) async fn update_one_with_selection(
     }
 
     let selected_fields = ModelProjection::from(selected_fields);
-
-    let cond = FilterBuilder::without_top_level_joins().visit_filter(build_update_one_filter(record_filter), ctx);
-
-    let update = write::build_update_and_set_query(model, args, Some(&selected_fields), ctx).so_that(cond);
+    let update = update::update_one_with_selection(model, record_filter, args, &selected_fields, ctx);
 
     let field_names: Vec<_> = selected_fields.db_names().collect();
     let idents = selected_fields.type_identifiers_with_arities();
     let meta = column_metadata::create(&field_names, &idents);
-
     let result_row = conn.query(update.into()).await?.into_iter().next();
     let record = result_row
         .map(|row| process_result_row(row, &meta, &selected_fields))

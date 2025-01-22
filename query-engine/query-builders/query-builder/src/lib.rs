@@ -1,4 +1,4 @@
-use query_structure::{FieldSelection, Filter, Model, PrismaValue, QueryArguments, WriteArgs};
+use query_structure::{FieldSelection, Filter, Model, PrismaValue, QueryArguments, RecordFilter, WriteArgs};
 use serde::Serialize;
 mod query_arguments_ext;
 
@@ -26,6 +26,14 @@ pub trait QueryBuilder {
         skip_duplicates: bool,
         selected_fields: Option<&FieldSelection>,
     ) -> Result<Vec<DbQuery>, Box<dyn std::error::Error + Send + Sync>>;
+
+    fn build_update(
+        &self,
+        model: &Model,
+        record_filter: RecordFilter,
+        args: WriteArgs,
+        selected_fields: Option<&FieldSelection>,
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
 
     fn build_updates_from_filter(
         &self,
