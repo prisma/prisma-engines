@@ -15,7 +15,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
             // TODO: we probably need some additional node type or extra info in the WriteQuery node
             // to help the client executor figure out the returned ID in the case when it's inferred
             // from the query arguments.
-            Expression::Query(query)
+            Expression::Unique(Box::new(Expression::Query(query)))
         }
 
         WriteQuery::CreateManyRecords(cmr) => {

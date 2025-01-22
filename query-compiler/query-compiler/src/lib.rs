@@ -49,5 +49,8 @@ pub fn compile(
         SqlFamily::Mssql => translate(graph, &SqlQueryBuilder::<visitor::Mssql<'_>>::new(ctx)),
     };
 
-    res.map_err(CompileError::TranslateError)
+    let expr = res.map_err(CompileError::TranslateError)?;
+    println!("{}", expr.pretty_print(true, 80).unwrap());
+
+    Ok(expr)
 }
