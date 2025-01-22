@@ -248,7 +248,7 @@ async fn generate_updates(
         let queries = update::update_many_from_ids_and_filter(model, filter, slice, args, selected_fields, ctx);
         Ok(queries)
     } else {
-        let query = update::update_many_from_filter(model, record_filter, args, selected_fields, limit, ctx);
+        let query = update::update_many_from_filter(model, record_filter.filter, args, selected_fields, limit, ctx);
         Ok(vec![query])
     }
 }

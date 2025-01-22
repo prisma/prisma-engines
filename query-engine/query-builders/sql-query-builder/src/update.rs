@@ -1,5 +1,5 @@
 use quaint::ast::Query;
-use query_structure::{Filter, Model, ModelProjection, RecordFilter, SelectionResult, WriteArgs};
+use query_structure::{Filter, Model, ModelProjection, SelectionResult, WriteArgs};
 
 use crate::{limit, write, AsColumns, Context, FilterBuilder};
 
@@ -7,7 +7,7 @@ use crate::{limit, write, AsColumns, Context, FilterBuilder};
 //  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."age" > $1
 pub fn update_many_from_filter(
     model: &Model,
-    record_filter: RecordFilter,
+    filter: Filter,
     args: WriteArgs,
     selected_fields: Option<&ModelProjection>,
     limit: Option<usize>,
@@ -16,7 +16,7 @@ pub fn update_many_from_filter(
     let update = write::build_update_and_set_query(model, args, None, ctx);
     let filter_condition = limit::wrap_with_limit_subquery_if_needed(
         model,
-        FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter, ctx),
+        FilterBuilder::without_top_level_joins().visit_filter(filter, ctx),
         limit,
         ctx,
     );

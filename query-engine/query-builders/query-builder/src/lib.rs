@@ -1,4 +1,4 @@
-use query_structure::{FieldSelection, Model, PrismaValue, QueryArguments, RecordFilter, WriteArgs};
+use query_structure::{FieldSelection, Filter, Model, PrismaValue, QueryArguments, WriteArgs};
 use serde::Serialize;
 mod query_arguments_ext;
 
@@ -30,7 +30,7 @@ pub trait QueryBuilder {
     fn build_updates_from_filter(
         &self,
         model: &Model,
-        record_filter: RecordFilter,
+        filter: Filter,
         args: WriteArgs,
         selected_fields: Option<&FieldSelection>,
         limit: Option<usize>,

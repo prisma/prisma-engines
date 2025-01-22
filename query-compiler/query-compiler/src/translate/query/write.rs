@@ -61,7 +61,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                 todo!()
             } else {
                 builder
-                    .build_updates_from_filter(&model, record_filter, args, projection, limit)
+                    .build_updates_from_filter(&model, record_filter.filter, args, projection, limit)
                     .map_err(TranslateError::QueryBuildFailure)?
                     .into_iter()
                     .map(if projection.is_some() {
