@@ -107,6 +107,8 @@ url = { version = "2.5.0" }
 bson = { version = "2.11.0", features = ["chrono-0_4", "uuid-1"] }
 mongodb = { git = "https://github.com/prisma/mongo-rust-driver.git", branch = "RUST-1994/happy-eyeballs" }
 
+insta = "1"
+
 [workspace.dependencies.quaint]
 path = "quaint"
 

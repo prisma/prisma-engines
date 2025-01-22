@@ -20,4 +20,4 @@ derive_more.workspace = true
 rand.workspace = true
 
 [dev-dependencies]
-insta = { version = "1.41", features = ["redactions", "ron"] }
+insta = { workspace = true, features = ["redactions", "ron"] }

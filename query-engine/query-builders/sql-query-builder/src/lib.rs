@@ -116,6 +116,9 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
                 self.convert_query(query)
             }
             None => {
+                // this branch is for updates without selections, normally used for databases
+                // without RETURNING, the logic is slightly more complicated and will require
+                // translating update::update_one_without_selection from the sql-query-connector
                 todo!()
             }
         }

@@ -1,0 +1,33 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/create-nested-connect.json
+---
+let 0 = unique (query «INSERT INTO "public"."User" ("email") VALUES ($1)
+                       RETURNING "public"."User"."id"»
+                params [const(String("user.1737556028164@prisma.io"))])
+in let 0 = mapField id (get 0)
+   in let 1 = sum (execute «UPDATE "public"."Post" SET "userId" = $1 WHERE
+                            (("public"."Post"."id" = $2 AND 1=1) OR
+                            ("public"."Post"."id" = $3 AND 1=1) OR
+                            ("public"."Post"."id" = $4 AND 1=1))»
+                   params [var(0 as Int), const(BigInt(8)), const(BigInt(9)),
+                           const(BigInt(10))])
+      in ;
+   let 3 = let 0 = mapField id (get 0)
+       in let @parent = unique (query «SELECT "public"."User"."id",
+                                       "public"."User"."email" FROM
+                                       "public"."User" WHERE
+                                       "public"."User"."id" = $1 LIMIT $2 OFFSET
+                                       $3»
+                                params [var(0 as Int), const(BigInt(1)),
+                                        const(BigInt(0))])
+          in let @parent$id = mapField id (get @parent)
+             in join (get @parent)
+                with (query «SELECT "public"."Post"."id",
+                             "public"."Post"."title", "public"."Post"."userId"
+                             FROM "public"."Post" WHERE "public"."Post"."userId"
+                             = $1 OFFSET $2»
+                      params [var(@parent$id as Int),
+                              const(BigInt(0))]) on left.(id) = right.(userId) as posts
+   in get 3
