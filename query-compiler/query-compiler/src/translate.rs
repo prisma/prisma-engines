@@ -3,7 +3,7 @@ mod query;
 use itertools::Itertools;
 use query::translate_query;
 use query_builder::QueryBuilder;
-use query_core::{EdgeRef, Node, NodeRef, Query, QueryGraph, QueryGraphDependency};
+use query_core::{EdgeRef, Node, NodeRef, Query, QueryGraph, QueryGraphBuilderError, QueryGraphDependency};
 use query_structure::{PlaceholderType, PrismaValue, SelectionResult};
 use thiserror::Error;
 
@@ -16,6 +16,9 @@ pub enum TranslateError {
 
     #[error("query builder error: {0}")]
     QueryBuildFailure(#[source] Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("query graph build error: {0}")]
+    GraphBuildError(#[from] QueryGraphBuilderError),
 }
 
 pub type TranslateResult<T> = Result<T, TranslateError>;
@@ -93,7 +96,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                     // TODO: there are cases where we look at the number of results in some
                     // dependencies, these won't work with the current implementation and will
                     // need to be re-implemented
-                    node = f(node, vec![SelectionResult::new(fields)]).unwrap();
+                    node = f(node, vec![SelectionResult::new(fields)])?;
                 }
                 // TODO: implement data dependencies and if/else
                 QueryGraphDependency::DataDependency(_) => todo!(),
