@@ -4,9 +4,8 @@ use crate::row::ToSqlRow;
 use crate::{QueryExt, Queryable};
 
 use itertools::Itertools;
-use quaint::ast::*;
 use query_structure::*;
-use sql_query_builder::{column_metadata, limit, write, AsColumns, ColumnMetadata, Context, FilterBuilder};
+use sql_query_builder::{column_metadata, update, write, ColumnMetadata, Context, FilterBuilder};
 
 /// Performs an update with an explicit selection set.
 /// This function is called for connectors that supports the `UpdateReturning` capability.
@@ -75,7 +74,9 @@ pub(crate) async fn update_one_without_selection(
     let id_args = pick_args(&model.primary_identifier().into(), &args);
     // Perform the update and return the ids on which we've applied the update.
     // Note: We are _not_ getting back the ids from the update. Either we got some ids passed from the parent operation or we perform a read _before_ doing the update.
-    let (updates, ids) = update_many_from_ids_and_filter(conn, model, record_filter, args, None, None, ctx).await?;
+    let filter = record_filter.filter.clone();
+    let ids = conn.filter_selectors(model, record_filter, ctx).await?;
+    let updates = update::update_many_from_ids_and_filter(model, filter, &ids, args, None, ctx);
     for update in updates {
         conn.execute(update).await?;
     }
@@ -90,62 +91,6 @@ pub(crate) async fn update_one_without_selection(
     });
 
     Ok(record)
-}
-
-// Generates a query like this:
-//  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."age" > $1
-pub(super) async fn update_many_from_filter(
-    model: &Model,
-    record_filter: RecordFilter,
-    args: WriteArgs,
-    selected_fields: Option<&ModelProjection>,
-    limit: Option<usize>,
-    ctx: &Context<'_>,
-) -> crate::Result<Query<'static>> {
-    let update = write::build_update_and_set_query(model, args, None, ctx);
-    let filter_condition = limit::wrap_with_limit_subquery_if_needed(
-        model,
-        FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter, ctx),
-        limit,
-        ctx,
-    );
-
-    let update = update.so_that(filter_condition);
-    if let Some(selected_fields) = selected_fields {
-        Ok(update
-            .returning(selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true)))
-            .into())
-    } else {
-        Ok(update.into())
-    }
-}
-
-// Generates a query like this:
-//  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."id" IN ($2,$3,$4,$5,$6,$7,$8,$9,$10,$11) AND "public"."User"."age" > $1
-pub(super) async fn update_many_from_ids_and_filter(
-    conn: &dyn Queryable,
-    model: &Model,
-    record_filter: RecordFilter,
-    args: WriteArgs,
-    selected_fields: Option<&ModelProjection>,
-    limit: Option<usize>,
-    ctx: &Context<'_>,
-) -> crate::Result<(Vec<Query<'static>>, Vec<SelectionResult>)> {
-    let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter.clone(), ctx);
-    let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter, ctx).await?;
-
-    if ids.is_empty() {
-        return Ok((vec![], Vec::new()));
-    }
-
-    let updates = {
-        let update = write::build_update_and_set_query(model, args, selected_fields, ctx);
-        let ids: Vec<&SelectionResult> = ids.iter().take(limit.unwrap_or(usize::MAX)).collect();
-
-        write::chunk_update_with_ids(update, model, &ids, filter_condition, ctx)
-    };
-
-    Ok((updates, ids))
 }
 
 fn process_result_row(

@@ -1,7 +1,5 @@
 mod query;
 
-use std::iter;
-
 use itertools::Itertools;
 use query::translate_query;
 use query_builder::QueryBuilder;

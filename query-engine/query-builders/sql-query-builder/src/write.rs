@@ -188,7 +188,7 @@ pub fn build_update_and_set_query(
 pub fn chunk_update_with_ids(
     update: Update<'static>,
     model: &Model,
-    ids: &[&SelectionResult],
+    ids: &[SelectionResult],
     filter_condition: ConditionTree<'static>,
     ctx: &Context<'_>,
 ) -> Vec<Query<'static>> {
@@ -238,7 +238,7 @@ pub fn delete_many_from_filter(
 
 pub fn delete_many_from_ids_and_filter(
     model: &Model,
-    ids: &[&SelectionResult],
+    ids: &[SelectionResult],
     filter_condition: ConditionTree<'static>,
     limit: Option<usize>,
     ctx: &Context<'_>,

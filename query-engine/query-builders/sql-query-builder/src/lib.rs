@@ -12,6 +12,7 @@ pub mod read;
 #[cfg(feature = "relation_joins")]
 pub mod select;
 mod sql_trace;
+pub mod update;
 pub mod write;
 
 use std::marker::PhantomData;
@@ -21,7 +22,9 @@ use quaint::{
     visitor::Visitor,
 };
 use query_builder::{DbQuery, QueryBuilder};
-use query_structure::{FieldSelection, Model, ModelProjection, QueryArguments, SelectionResult, WriteArgs};
+use query_structure::{
+    FieldSelection, Model, ModelProjection, QueryArguments, RecordFilter, SelectionResult, WriteArgs,
+};
 
 pub use column_metadata::ColumnMetadata;
 pub use context::Context;
@@ -97,11 +100,29 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         let query = write::generate_insert_statements(model, args, skip_duplicates, projection.as_ref(), &self.context);
         query.into_iter().map(|q| self.convert_query(q)).collect()
     }
+
+    fn build_updates_from_filter(
+        &self,
+        model: &Model,
+        record_filter: RecordFilter,
+        args: WriteArgs,
+        selected_fields: Option<&FieldSelection>,
+        limit: Option<usize>,
+    ) -> Result<Vec<DbQuery>, Box<dyn std::error::Error + Send + Sync>> {
+        let projection = selected_fields.map(ModelProjection::from);
+        assert!(
+            !record_filter.has_selectors(),
+            "build_updates_from_filter cannot be called with selectors"
+        );
+        let query =
+            update::update_many_from_filter(model, record_filter, args, projection.as_ref(), limit, &self.context);
+        Ok(vec![self.convert_query(query)?])
+    }
 }
 
 pub fn chunked_conditions<F, Q>(
     columns: &[Column<'static>],
-    records: &[&SelectionResult],
+    records: &[SelectionResult],
     ctx: &Context<'_>,
     f: F,
 ) -> Vec<Query<'static>>
@@ -112,7 +133,7 @@ where
     records
         .chunks(PARAMETER_LIMIT)
         .map(|chunk| {
-            let tree = in_conditions(columns, chunk.iter().copied(), ctx);
+            let tree = in_conditions(columns, chunk, ctx);
             f(tree).into()
         })
         .collect()
