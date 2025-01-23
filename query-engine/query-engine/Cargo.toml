@@ -34,6 +34,8 @@ prisma-metrics.path = "../../libs/metrics"
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 telemetry = { path = "../../libs/telemetry" }
 
+jemallocator.workspace = true
+
 [dev-dependencies]
 serial_test = "*"
 quaint.workspace = true
