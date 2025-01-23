@@ -2,57 +2,49 @@
 
 pub(crate) use quaint::connector::rusqlite;
 
-use crate::flavour::SqlFlavour;
 use quaint::connector::{ColumnType, DescribedColumn, DescribedParameter, GetRow, ToColumnNames};
-use schema_connector::{BoxFuture, ConnectorError, ConnectorResult, Namespaces};
-use sql_schema_describer::{sqlite as describer, DescriberErrorKind, SqlSchema};
+use schema_connector::{BoxFuture, ConnectorError, ConnectorParams, ConnectorResult};
+use sql_schema_describer::SqlSchema;
 use sqlx_core::{column::Column, type_info::TypeInfo};
 use sqlx_sqlite::SqliteColumn;
 use std::sync::Mutex;
 use user_facing_errors::schema_engine::ApplyMigrationError;
 
+use super::Params;
+
+pub(super) type State = crate::flavour::State<Params, Connection>;
+
 pub(super) struct Connection(Mutex<rusqlite::Connection>);
 
 impl Connection {
-    pub(super) fn new(params: &super::Params) -> ConnectorResult<Self> {
+    pub fn new(params: &super::Params) -> ConnectorResult<Self> {
         Ok(Connection(Mutex::new(
             rusqlite::Connection::open(&params.file_path).map_err(convert_error)?,
         )))
     }
 
-    pub(super) fn new_in_memory() -> Self {
+    pub fn as_connector(&self) -> &Mutex<rusqlite::Connection> {
+        &self.0
+    }
+
+    pub fn new_in_memory() -> Self {
         Connection(Mutex::new(rusqlite::Connection::open_in_memory().unwrap()))
     }
 
-    pub(super) async fn describe_schema(&mut self) -> ConnectorResult<SqlSchema> {
-        // Note: this relies on quaint::connector::rusqlite::Connection, which is exposed by `quaint/expose-drivers`, and is not Wasm-compatible.
-        describer::SqlSchemaDescriber::new(&self.0)
-            .describe_impl()
-            .await
-            .map_err(|err| match err.into_kind() {
-                DescriberErrorKind::QuaintError(err) => {
-                    ConnectorError::from_source(err, "Error describing the database.")
-                }
-                DescriberErrorKind::CrossSchemaReference { .. } => {
-                    unreachable!("No schemas on SQLite")
-                }
-            })
-    }
-
-    pub(super) fn raw_cmd(&mut self, sql: &str) -> ConnectorResult<()> {
+    pub async fn raw_cmd(&self, sql: &str) -> ConnectorResult<()> {
         tracing::debug!(query_type = "raw_cmd", sql);
         let conn = self.0.lock().unwrap();
         conn.execute_batch(sql).map_err(convert_error)
     }
 
-    pub(super) fn query(&mut self, query: quaint::ast::Query<'_>) -> ConnectorResult<quaint::prelude::ResultSet> {
+    pub async fn query(&self, query: quaint::ast::Query<'_>) -> ConnectorResult<quaint::prelude::ResultSet> {
         use quaint::visitor::Visitor;
         let (sql, params) = quaint::visitor::Sqlite::build(query).unwrap();
-        self.query_raw(&sql, &params)
+        self.query_raw(&sql, &params).await
     }
 
-    pub(super) fn query_raw(
-        &mut self,
+    pub async fn query_raw(
+        &self,
         sql: &str,
         params: &[quaint::prelude::Value<'_>],
     ) -> ConnectorResult<quaint::prelude::ResultSet> {
@@ -77,82 +69,34 @@ impl Connection {
         ))
     }
 
-    pub(super) fn describe_query(
-        &mut self,
-        sql: &str,
-        params: &super::Params,
-    ) -> ConnectorResult<quaint::connector::DescribedQuery> {
-        tracing::debug!(query_type = "describe_query", sql);
-        // SQLite only provides type information for _declared_ column types. That means any expression will not contain type information.
-        // Sqlx works around this by running an `EXPLAIN` query and inferring types by interpreting sqlite bytecode.
-        // If you're curious, here's the code: https://github.com/launchbadge/sqlx/blob/16e3f1025ad1e106d1acff05f591b8db62d688e2/sqlx-sqlite/src/connection/explain.rs#L557
-        // We use SQLx's as a fallback for when quaint's infers Unknown.
-        let describe = sqlx_sqlite::describe_blocking(sql, &params.file_path)
-            .map_err(|err| ConnectorError::from_source(err, "Error describing the query."))?;
+    pub async fn apply_migration_script(&self, migration_name: &str, script: &str) -> ConnectorResult<()> {
+        tracing::debug!(query_type = "raw_cmd", sql = script);
         let conn = self.0.lock().unwrap();
-        let stmt = conn.prepare_cached(sql).map_err(convert_error)?;
+        conn.execute_batch(script).map_err(|sqlite_error: rusqlite::Error| {
+            let database_error_code = match sqlite_error {
+                rusqlite::Error::SqliteFailure(rusqlite::ffi::Error { extended_code, .. }, _)
+                | rusqlite::Error::SqlInputError {
+                    error: rusqlite::ffi::Error { extended_code, .. },
+                    ..
+                } => extended_code.to_string(),
+                _ => "none".to_owned(),
+            };
 
-        let parameters = (1..=stmt.parameter_count())
-            .map(|idx| match stmt.parameter_name(idx) {
-                Some(name) => {
-                    // SQLite parameter names are prefixed with a colon. We remove it here so that the js doc parser can match the names.
-                    let name = name.strip_prefix(':').unwrap_or(name);
-
-                    DescribedParameter::new_named(name, ColumnType::Unknown)
-                }
-                None => DescribedParameter::new_unnamed(idx, ColumnType::Unknown),
+            ConnectorError::user_facing(ApplyMigrationError {
+                migration_name: migration_name.to_owned(),
+                database_error_code,
+                database_error: sqlite_error.to_string(),
             })
-            .collect();
-        let columns = stmt
-            .columns()
-            .iter()
-            .zip(&describe.nullable)
-            .enumerate()
-            .map(|(idx, (col, nullable))| {
-                let typ = match ColumnType::from(col) {
-                    // If the column type is unknown, we try to infer it from the describe.
-                    ColumnType::Unknown => describe.column(idx).to_column_type(),
-                    typ => typ,
-                };
-
-                DescribedColumn::new_named(col.name(), typ).is_nullable(nullable.unwrap_or(true))
-            })
-            .collect();
-
-        Ok(quaint::connector::DescribedQuery {
-            columns,
-            parameters,
-            enum_names: None,
         })
+    }
+
+    pub(super) fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
+        super::ready(Ok(Some(quaint::connector::sqlite_version().to_owned())))
     }
 }
 
-pub(super) fn generic_apply_migration_script(
-    migration_name: &str,
-    script: &str,
-    conn: &Connection,
-) -> ConnectorResult<()> {
-    tracing::debug!(query_type = "raw_cmd", sql = script);
-    let conn = conn.0.lock().unwrap();
-    conn.execute_batch(script).map_err(|sqlite_error: rusqlite::Error| {
-        let database_error_code = match sqlite_error {
-            rusqlite::Error::SqliteFailure(rusqlite::ffi::Error { extended_code, .. }, _)
-            | rusqlite::Error::SqlInputError {
-                error: rusqlite::ffi::Error { extended_code, .. },
-                ..
-            } => extended_code.to_string(),
-            _ => "none".to_owned(),
-        };
-
-        ConnectorError::user_facing(ApplyMigrationError {
-            migration_name: migration_name.to_owned(),
-            database_error_code,
-            database_error: sqlite_error.to_string(),
-        })
-    })
-}
-
-pub(super) fn create_database(params: &super::Params) -> ConnectorResult<String> {
+pub(super) fn create_database(state: &State) -> ConnectorResult<String> {
+    let params = state.get_unwrapped_params();
     let path = std::path::Path::new(&params.file_path);
 
     if path.exists() {
@@ -171,13 +115,15 @@ pub(super) fn create_database(params: &super::Params) -> ConnectorResult<String>
     Ok(params.file_path.clone())
 }
 
-pub(super) fn drop_database(params: &super::Params) -> ConnectorResult<()> {
+pub(super) fn drop_database(state: &State) -> ConnectorResult<()> {
+    let params = state.get_unwrapped_params();
     let file_path = &params.file_path;
     std::fs::remove_file(file_path)
         .map_err(|err| ConnectorError::from_msg(format!("Failed to delete SQLite database at `{file_path}`.\n{err}")))
 }
 
-pub(super) fn ensure_connection_validity(params: &super::Params) -> ConnectorResult<()> {
+pub(super) async fn ensure_connection_validity(state: &State) -> ConnectorResult<()> {
+    let params = state.get_unwrapped_params();
     let path = std::path::Path::new(&params.file_path);
     // we use metadata() here instead of Path::exists() because we want accurate diagnostics:
     // if the file is not reachable because of missing permissions, we don't want to return
@@ -197,41 +143,31 @@ pub(super) fn ensure_connection_validity(params: &super::Params) -> ConnectorRes
     }
 }
 
-pub(super) fn introspect<'a>(
-    instance: &'a mut super::SqliteFlavour,
-    namespaces: Option<Namespaces>,
-    _ctx: &schema_connector::IntrospectionContext,
-) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
-    // TODO: move to a separate function
-    Box::pin(async move {
-        if let Some(params) = instance.state.params() {
-            let path = std::path::Path::new(&params.file_path);
-            if std::fs::metadata(path).is_err() {
-                return Err(ConnectorError::user_facing(
-                    user_facing_errors::common::DatabaseDoesNotExist::Sqlite {
-                        database_file_name: path
-                            .file_name()
-                            .map(|name| name.to_string_lossy().into_owned())
-                            .unwrap_or_default(),
-                        database_file_path: params.file_path.clone(),
-                    },
-                ));
-            }
+pub(super) async fn introspect(state: &mut State) -> ConnectorResult<SqlSchema> {
+    if let Some(params) = state.params() {
+        let path = std::path::Path::new(&params.file_path);
+        if std::fs::metadata(path).is_err() {
+            return Err(ConnectorError::user_facing(
+                user_facing_errors::common::DatabaseDoesNotExist::Sqlite {
+                    database_file_name: path
+                        .file_name()
+                        .map(|name| name.to_string_lossy().into_owned())
+                        .unwrap_or_default(),
+                    database_file_path: params.file_path.clone(),
+                },
+            ));
         }
+    }
 
-        instance.describe_schema(namespaces).await
-    })
+    super::describe_schema(get_connection(state)?).await
 }
 
-pub(super) fn version(_instance: &mut super::SqliteFlavour) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
-    super::ready(Ok(Some(quaint::connector::sqlite_version().to_owned())))
-}
-
-pub(super) fn reset(params: &super::Params, connection: &mut Connection) -> ConnectorResult<()> {
+pub(super) async fn reset(state: &mut State) -> ConnectorResult<()> {
+    let (connection, params) = get_connection_and_params(state)?;
     let file_path = &params.file_path;
 
-    connection.raw_cmd("PRAGMA main.locking_mode=NORMAL")?;
-    connection.raw_cmd("PRAGMA main.quick_check")?;
+    connection.raw_cmd("PRAGMA main.locking_mode=NORMAL").await?;
+    connection.raw_cmd("PRAGMA main.quick_check").await?;
 
     tracing::debug!("Truncating {:?}", file_path);
 
@@ -242,7 +178,105 @@ pub(super) fn reset(params: &super::Params, connection: &mut Connection) -> Conn
         )
     })?;
 
-    super::acquire_lock(connection)
+    super::acquire_lock(connection).await
+}
+
+pub(super) fn describe_query(state: &mut State, sql: &str) -> ConnectorResult<quaint::connector::DescribedQuery> {
+    let (conn, params) = get_connection_and_params(state)?;
+    tracing::debug!(query_type = "describe_query", sql);
+    // SQLite only provides type information for _declared_ column types. That means any expression will not contain type information.
+    // Sqlx works around this by running an `EXPLAIN` query and inferring types by interpreting sqlite bytecode.
+    // If you're curious, here's the code: https://github.com/launchbadge/sqlx/blob/16e3f1025ad1e106d1acff05f591b8db62d688e2/sqlx-sqlite/src/connection/explain.rs#L557
+    // We use SQLx's as a fallback for when quaint's infers Unknown.
+    let describe = sqlx_sqlite::describe_blocking(sql, &params.file_path)
+        .map_err(|err| ConnectorError::from_source(err, "Error describing the query."))?;
+    let conn = conn.0.lock().unwrap();
+    let stmt = conn.prepare_cached(sql).map_err(convert_error)?;
+
+    let parameters = (1..=stmt.parameter_count())
+        .map(|idx| match stmt.parameter_name(idx) {
+            Some(name) => {
+                // SQLite parameter names are prefixed with a colon. We remove it here so that the js doc parser can match the names.
+                let name = name.strip_prefix(':').unwrap_or(name);
+
+                DescribedParameter::new_named(name, ColumnType::Unknown)
+            }
+            None => DescribedParameter::new_unnamed(idx, ColumnType::Unknown),
+        })
+        .collect();
+    let columns = stmt
+        .columns()
+        .iter()
+        .zip(&describe.nullable)
+        .enumerate()
+        .map(|(idx, (col, nullable))| {
+            let typ = match ColumnType::from(col) {
+                // If the column type is unknown, we try to infer it from the describe.
+                ColumnType::Unknown => describe.column(idx).to_column_type(),
+                typ => typ,
+            };
+
+            DescribedColumn::new_named(col.name(), typ).is_nullable(nullable.unwrap_or(true))
+        })
+        .collect();
+
+    Ok(quaint::connector::DescribedQuery {
+        columns,
+        parameters,
+        enum_names: None,
+    })
+}
+
+pub(super) fn connection_string(state: &State) -> Option<&str> {
+    state
+        .params()
+        .map(|params| params.connector_params.connection_string.as_str())
+}
+
+pub(super) fn get_connection(state: &mut State) -> ConnectorResult<&mut Connection> {
+    let (conn, _) = get_connection_and_params(state)?;
+    Ok(conn)
+}
+
+fn get_connection_and_params(state: &mut State) -> ConnectorResult<(&mut Connection, &mut Params)> {
+    match state {
+        super::State::Initial => panic!("logic error: Initial"),
+        super::State::Connected(params, conn) => Ok((conn, params)),
+        super::State::WithParams(p) => {
+            let conn = Connection::new(p)?;
+            let params = match std::mem::replace(state, super::State::Initial) {
+                super::State::WithParams(p) => p,
+                _ => unreachable!(),
+            };
+            *state = super::State::Connected(params, conn);
+            get_connection_and_params(state)
+        }
+    }
+}
+
+pub(super) fn set_preview_features(state: &mut State, preview_features: enumflags2::BitFlags<psl::PreviewFeature>) {
+    match state {
+        super::State::Initial => {
+            if !preview_features.is_empty() {
+                tracing::warn!("set_preview_feature on Initial state has no effect ({preview_features}).");
+            }
+        }
+        super::State::WithParams(params) | super::State::Connected(params, _) => {
+            params.connector_params.preview_features = preview_features
+        }
+    }
+}
+
+pub(super) fn set_params(state: &mut State, params: ConnectorParams) -> ConnectorResult<()> {
+    let quaint::connector::SqliteParams { file_path, .. } =
+        quaint::connector::SqliteParams::try_from(params.connection_string.as_str())
+            .map_err(ConnectorError::url_parse_error)?;
+
+    state.set_params(Params {
+        connector_params: params,
+        file_path,
+    });
+    Ok(())
 }
 
 fn convert_error(err: rusqlite::Error) -> ConnectorError {
