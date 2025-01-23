@@ -454,6 +454,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "bstr"
+version = "1.11.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "531a9155a481e2ee699d4f98f43c0ca4ff8ee1bfd55c31e9e98fb29d2b176fe0"
+dependencies = [
+ "memchr",
+ "serde",
+]
+
+[[package]]
 name = "build-utils"
 version = "0.1.0"
 
@@ -1689,6 +1699,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
 
 [[package]]
+name = "globset"
+version = "0.4.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "759c97c1e17c55525b57192c06a267cda0ac5210b222d6b82189a2338fa1c13d"
+dependencies = [
+ "aho-corasick",
+ "bstr 1.11.3",
+ "fnv",
+ "log",
+ "regex",
+]
+
+[[package]]
 name = "gloo-utils"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2080,6 +2103,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7e9ffc4d4892617c50a928c52b2961cb5174b6fc6ebf252b2fac9d21955c48b8"
 dependencies = [
  "console",
+ "globset",
  "lazy_static",
  "linked-hash-map",
  "pest",
@@ -2087,6 +2111,7 @@ dependencies = [
  "ron",
  "serde",
  "similar",
+ "walkdir",
 ]
 
 [[package]]
@@ -3716,13 +3741,17 @@ dependencies = [
 name = "query-compiler"
 version = "0.1.0"
 dependencies = [
+ "insta",
  "itertools 0.12.0",
  "pretty",
+ "psl",
  "quaint",
  "query-builder",
  "query-core",
  "query-structure",
+ "request-handlers",
  "serde",
+ "serde_json",
  "sql-query-builder",
  "thiserror 1.0.44",
 ]
@@ -5009,7 +5038,7 @@ version = "2.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "420acb44afdae038210c99e69aae24109f32f15500aa708e81d46c9f29d55fcf"
 dependencies = [
- "bstr",
+ "bstr 0.2.17",
 ]
 
 [[package]]

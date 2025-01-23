@@ -1,6 +1,7 @@
 use super::{PrismaValue, TypeIdentifier};
 use crate::DomainError;
 use bigdecimal::ToPrimitive;
+use prisma_value::PlaceholderType;
 
 pub(crate) trait PrismaValueExtensions {
     fn coerce(self, to_type: TypeIdentifier) -> crate::Result<PrismaValue>;
@@ -50,6 +51,21 @@ impl PrismaValueExtensions for PrismaValue {
                     .map(|val| val.coerce(typ))
                     .collect::<crate::Result<Vec<_>>>()?,
             ),
+
+            (PrismaValue::Placeholder { name, r#type }, typ) if r#type == typ.to_placeholder_type() => {
+                PrismaValue::Placeholder { name, r#type }
+            }
+
+            (
+                PrismaValue::Placeholder {
+                    name,
+                    r#type: PlaceholderType::Any,
+                },
+                typ,
+            ) => PrismaValue::Placeholder {
+                name,
+                r#type: typ.to_placeholder_type(),
+            },
 
             // Invalid coercion
             (val, typ) => return Err(DomainError::ConversionFailure(format!("{val:?}"), format!("{typ:?}"))),

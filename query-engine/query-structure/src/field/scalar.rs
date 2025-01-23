@@ -10,7 +10,7 @@ use std::fmt::{Debug, Display};
 pub type ScalarField = crate::Zipper<ScalarFieldId>;
 pub type ScalarFieldRef = ScalarField;
 
-#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ScalarFieldId {
     InModel(psl::parser_database::ScalarFieldId),
     InCompositeType((db::CompositeTypeId, ast::FieldId)),

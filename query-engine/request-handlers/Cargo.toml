@@ -28,7 +28,7 @@ mongodb-query-connector = { path = "../connectors/mongodb-query-connector", opti
 sql-query-connector = { path = "../connectors/sql-query-connector", optional = true, default-features = false }
 
 [dev-dependencies]
-insta = "1.7.1"
+insta.workspace = true
 schema = { path = "../schema" }
 codspeed-criterion-compat = "1.1.0"
 

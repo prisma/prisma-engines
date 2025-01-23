@@ -135,7 +135,7 @@ pub(crate) type DataDependencyFn =
 
 /// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,
 /// expressing for example the need for additional information from the parent to be able to execute at runtime.
-pub(crate) enum QueryGraphDependency {
+pub enum QueryGraphDependency {
     /// Simple dependency indicating order of execution. Effectively an ordering and reachability tool for now.
     ExecutionOrder,
 
@@ -349,12 +349,12 @@ impl QueryGraph {
     }
 
     /// Returns a reference to the content of `edge`, if the content is still present.
-    pub(crate) fn edge_content(&self, edge: &EdgeRef) -> Option<&QueryGraphDependency> {
+    pub fn edge_content(&self, edge: &EdgeRef) -> Option<&QueryGraphDependency> {
         self.graph.edge_weight(edge.edge_ix).unwrap().borrow()
     }
 
     /// Returns the node from where `edge` originates (e.g. source).
-    pub(crate) fn edge_source(&self, edge: &EdgeRef) -> NodeRef {
+    pub fn edge_source(&self, edge: &EdgeRef) -> NodeRef {
         let (node_ix, _) = self.graph.edge_endpoints(edge.edge_ix).unwrap();
         NodeRef { node_ix }
     }
@@ -377,7 +377,7 @@ impl QueryGraph {
 
     /// Removes the edge from the graph but leaves the graph intact by keeping the empty
     /// edge in the graph by plucking the content of the edge, but not the edge itself.
-    pub(crate) fn pluck_edge(&mut self, edge: &EdgeRef) -> QueryGraphDependency {
+    pub fn pluck_edge(&mut self, edge: &EdgeRef) -> QueryGraphDependency {
         self.graph.edge_weight_mut(edge.edge_ix).unwrap().unset()
     }
 

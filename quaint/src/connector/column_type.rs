@@ -1,4 +1,9 @@
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(
+    feature = "sqlite-native",
+    feature = "mysql-native",
+    feature = "postgresql-native",
+    feature = "mssql-native"
+))]
 use super::TypeIdentifier;
 
 use crate::{ast::VarType, Value, ValueType};
@@ -165,7 +170,12 @@ impl From<&ValueType<'_>> for ColumnType {
 }
 
 impl ColumnType {
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(any(
+        feature = "sqlite-native",
+        feature = "mysql-native",
+        feature = "postgresql-native",
+        feature = "mssql-native"
+    ))]
     pub(crate) fn from_type_identifier<T>(value: T) -> Self
     where
         T: TypeIdentifier,

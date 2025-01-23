@@ -2,7 +2,7 @@ use connector::AggregationRow;
 use query_structure::{ManyRecords, Model, RawJson, SelectionResult, VirtualSelection};
 
 #[derive(Debug, Clone)]
-pub(crate) enum QueryResult {
+pub enum QueryResult {
     Id(Option<SelectionResult>),
     Count(usize),
     RecordSelection(Option<Box<RecordSelection>>),
@@ -85,7 +85,7 @@ impl From<RecordSelection> for QueryResult {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct RecordAggregations {
+pub struct RecordAggregations {
     /// Ordered list of selected fields as defined by the original incoming query.
     pub(crate) selection_order: Vec<(String, Option<Vec<String>>)>,
 
