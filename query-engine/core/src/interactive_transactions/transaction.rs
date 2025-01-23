@@ -99,6 +99,22 @@ impl TransactionState {
         }
     }
 
+    // Allow depth to be called on the transaction even if it's closed.
+    // This is usefule for the manger to handle nested transactions in a sane
+    // way, and allows useful error messages to propagate, since depth tracking
+    // is an internal detail of the engine.
+    // If the transaction is closed, we return 0, since the depth is not tracked
+    // anymore, and we allow the usual error message for rollback/commit/savepointX
+    // to be returned.
+    fn depth(&self) -> crate::Result<i32> {
+        match self {
+            Self::Open { tx, .. } => Ok(tx.depth()),
+            Self::Committed => Ok(0),
+            Self::RolledBack => Ok(0),
+            Self::Expired { .. } => Ok(0),
+        }
+    }
+
     fn as_closed(&self) -> Option<ClosedTransaction> {
         match self {
             Self::Open { .. } => None,
@@ -197,11 +213,8 @@ impl InteractiveTransaction {
         })
     }
 
-    pub fn depth(&mut self) -> i32 {
-        match self.state.as_open("depth") {
-            Ok(state) => state.depth(),
-            Err(_) => 0,
-        }
+    pub fn depth(&mut self) -> crate::Result<i32> {
+        self.state.depth()
     }
 
     pub async fn commit(&mut self) -> crate::Result<()> {
