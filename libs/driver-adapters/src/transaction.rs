@@ -1,7 +1,4 @@
-use std::{
-    future::Future,
-    sync::atomic::{AtomicI32, Ordering},
-};
+use std::sync::atomic::{AtomicI32, Ordering};
 
 use async_trait::async_trait;
 use prisma_metrics::gauge;

@@ -391,6 +391,7 @@ impl From<quaint::error::Error> for SqlError {
             e @ QuaintKind::SocketTimeout => SqlError::ConnectionError(e),
             e @ QuaintKind::OpaqueAsRawValue { .. } => SqlError::ConversionError(e.into()),
             e @ QuaintKind::RanQueryWithOpaqueParam { .. } => SqlError::ConversionError(e.into()),
+            e @ QuaintKind::RanQueryWithVarParam { .. } => SqlError::ConversionError(e.into()),
         }
     }
 }
