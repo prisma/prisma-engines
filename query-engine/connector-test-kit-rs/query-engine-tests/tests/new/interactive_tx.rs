@@ -556,6 +556,7 @@ mod interactive_tx {
         let known_err = error.as_known().unwrap();
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
+
         assert!(known_err
             .message
             .contains("A rollback cannot be executed on a transaction that was rolled back"));
@@ -593,9 +594,12 @@ mod interactive_tx {
         let known_err = error.as_known().unwrap();
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-        assert!(known_err
-            .message
-            .contains("A commit cannot be executed on a transaction that was rolled back"));
+        assert!(
+            known_err
+                .message
+                .contains("A commit cannot be executed on a transaction that was rolled back"),
+            "{known_err:?}"
+        );
 
         // Check that the commit didn't work
         insta::assert_snapshot!(
@@ -630,9 +634,13 @@ mod interactive_tx {
         let known_err = error.as_known().unwrap();
 
         assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-        assert!(known_err
-            .message
-            .contains("A rollback cannot be executed on a committed transaction"));
+
+        assert!(
+            known_err
+                .message
+                .contains("A rollback cannot be executed on a committed transaction"),
+            "{known_err:?}"
+        );
 
         // Check that the commit worked
         insta::assert_snapshot!(

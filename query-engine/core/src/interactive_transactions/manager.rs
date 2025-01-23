@@ -189,7 +189,8 @@ impl ItxManager {
     pub async fn commit_tx(&self, tx_id: &TxId) -> crate::Result<()> {
         let transaction_entry = self.get_transaction(tx_id, "commit").await?;
         let mut tx = transaction_entry.lock().await;
-        let depth = tx.depth();
+        let depth = tx.depth()?;
+
         if depth > 1 {
             tx.release_savepoint().await
         } else {
@@ -200,7 +201,7 @@ impl ItxManager {
     pub async fn rollback_tx(&self, tx_id: &TxId) -> crate::Result<()> {
         let transaction_entry = self.get_transaction(tx_id, "rollback").await?;
         let mut tx = transaction_entry.lock().await;
-        let depth = tx.depth();
+        let depth = tx.depth()?;
         if depth > 1 {
             tx.rollback_to_savepoint().await
         } else {
