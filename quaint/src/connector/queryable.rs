@@ -1,7 +1,6 @@
 use super::{DescribedQuery, ExternalConnector, IsolationLevel, ResultSet, Transaction};
 use std::borrow::Cow;
 
-use super::{DescribedQuery, IsolationLevel, ResultSet, Transaction};
 use crate::ast::*;
 use async_trait::async_trait;
 
