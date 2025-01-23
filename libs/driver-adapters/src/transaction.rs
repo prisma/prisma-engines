@@ -250,4 +250,3 @@ impl ::napi::bindgen_prelude::FromNapiValue for JsTransaction {
         Ok(Self::new(JsBaseQueryable::new(common_proxy), tx_proxy))
     }
 }
-
