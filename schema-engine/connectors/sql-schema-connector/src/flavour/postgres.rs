@@ -368,7 +368,7 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        Box::pin(self.raw_cmd("DROP TABLE _prisma_migrations"))
+        self.raw_cmd("DROP TABLE _prisma_migrations")
     }
 
     fn empty_database_schema(&self) -> SqlSchema {
