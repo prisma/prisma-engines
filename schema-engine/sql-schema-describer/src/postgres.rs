@@ -55,6 +55,21 @@ impl<C: quaint::connector::QueryCache> Connection for quaint::connector::Postgre
 }
 
 #[async_trait::async_trait]
+impl Connection for quaint::single::Quaint {
+    async fn query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [quaint::prelude::Value<'a>],
+    ) -> quaint::Result<quaint::prelude::ResultSet> {
+        quaint::prelude::Queryable::query_raw(self, sql, params).await
+    }
+
+    async fn version(&self) -> quaint::Result<Option<String>> {
+        quaint::prelude::Queryable::version(self).await
+    }
+}
+
+#[async_trait::async_trait]
 impl<Q: Queryable + ?Sized> Connection for Arc<Q> {
     async fn query_raw<'a>(
         &'a self,
