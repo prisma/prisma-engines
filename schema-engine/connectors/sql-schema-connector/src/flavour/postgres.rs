@@ -343,7 +343,11 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
-        self.with_connection(|conn, params| conn.create_database(params))
+        Box::pin(imp::create_database(&self.state))
+    }
+
+    fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(imp::drop_database(&self.state))
     }
 
     fn create_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -361,10 +365,6 @@ impl SqlFlavour for PostgresFlavour {
         "#};
 
         self.raw_cmd(sql)
-    }
-
-    fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        self.with_connection(|conn, params| conn.drop_database(params))
     }
 
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {

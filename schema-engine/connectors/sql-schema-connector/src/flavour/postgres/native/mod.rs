@@ -199,59 +199,61 @@ impl Connection {
             }
         }
     }
+}
 
-    pub async fn create_database(&self, params: &Params) -> ConnectorResult<String> {
-        let schema_name = params.url.schema();
-        let db_name = params.url.dbname();
+pub(super) async fn create_database(state: &State) -> ConnectorResult<String> {
+    let params = state.get_unwrapped_params();
+    let schema_name = params.url.schema();
+    let db_name = params.url.dbname();
 
-        let (admin_conn, admin_params) = create_postgres_admin_conn(params.clone()).await?;
+    let (admin_conn, admin_params) = create_postgres_admin_conn(params.clone()).await?;
 
-        let query = format!("CREATE DATABASE \"{db_name}\"");
+    let query = format!("CREATE DATABASE \"{db_name}\"");
 
-        let mut database_already_exists_error = None;
+    let mut database_already_exists_error = None;
 
-        match admin_conn
-            .raw_cmd(&query)
-            .await
-            .map_err(quaint_error_mapper(&admin_params))
-        {
-            Ok(_) => (),
-            Err(err) if err.is_user_facing_error::<user_facing_errors::common::DatabaseAlreadyExists>() => {
-                database_already_exists_error = Some(err)
-            }
-            Err(err) if err.is_user_facing_error::<user_facing_errors::query_engine::UniqueKeyViolation>() => {
-                database_already_exists_error = Some(err)
-            }
-            Err(err) => return Err(err),
-        };
-
-        // Now create the schema
-        let conn = Connection::new(params).await?;
-
-        let schema_sql = format!("CREATE SCHEMA IF NOT EXISTS \"{schema_name}\";");
-
-        conn.raw_cmd(&schema_sql).await.map_err(quaint_error_mapper(params))?;
-
-        if let Some(err) = database_already_exists_error {
-            return Err(err);
+    match admin_conn
+        .raw_cmd(&query)
+        .await
+        .map_err(quaint_error_mapper(&admin_params))
+    {
+        Ok(_) => (),
+        Err(err) if err.is_user_facing_error::<user_facing_errors::common::DatabaseAlreadyExists>() => {
+            database_already_exists_error = Some(err)
         }
+        Err(err) if err.is_user_facing_error::<user_facing_errors::query_engine::UniqueKeyViolation>() => {
+            database_already_exists_error = Some(err)
+        }
+        Err(err) => return Err(err),
+    };
 
-        Ok(db_name.to_owned())
+    // Now create the schema
+    let conn = Connection::new(params).await?;
+
+    let schema_sql = format!("CREATE SCHEMA IF NOT EXISTS \"{schema_name}\";");
+
+    conn.raw_cmd(&schema_sql).await.map_err(quaint_error_mapper(params))?;
+
+    if let Some(err) = database_already_exists_error {
+        return Err(err);
     }
 
-    pub async fn drop_database(&self, params: &Params) -> ConnectorResult<()> {
-        let db_name = params.url.dbname();
-        assert!(!db_name.is_empty(), "Database name should not be empty.");
+    Ok(db_name.to_owned())
+}
 
-        let (admin_conn, admin_params) = create_postgres_admin_conn(params.clone()).await?;
+pub(super) async fn drop_database(state: &State) -> ConnectorResult<()> {
+    let params = state.get_unwrapped_params();
+    let db_name = params.url.dbname();
+    assert!(!db_name.is_empty(), "Database name should not be empty.");
 
-        admin_conn
-            .raw_cmd(&format!("DROP DATABASE \"{db_name}\""))
-            .await
-            .map_err(quaint_error_mapper(&admin_params))?;
+    let (admin_conn, admin_params) = create_postgres_admin_conn(params.clone()).await?;
 
-        Ok(())
-    }
+    admin_conn
+        .raw_cmd(&format!("DROP DATABASE \"{db_name}\""))
+        .await
+        .map_err(quaint_error_mapper(&admin_params))?;
+
+    Ok(())
 }
 
 pub(super) fn get_connection_string(state: &State) -> Option<&str> {

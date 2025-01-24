@@ -78,14 +78,14 @@ impl Connection {
         tracing::debug!(query_type = "apply_migration_script", script);
         panic!("[sql-schema-connector::flavour::postgres::wasm] Not implemented");
     }
+}
 
-    pub async fn create_database(&self, _params: &Params) -> ConnectorResult<String> {
-        panic!("[sql-schema-connector::flavour::postgres::wasm] Not implemented");
-    }
+pub(super) async fn create_database(state: &State) -> ConnectorResult<String> {
+    panic!("[sql-schema-connector::flavour::postgres::wasm] Not implemented");
+}
 
-    pub async fn drop_database(&self, _params: &Params) -> ConnectorResult<()> {
-        panic!("[sql-schema-connector::flavour::postgres::wasm] Not implemented");
-    }
+pub(super) async fn drop_database(state: &State) -> ConnectorResult<()> {
+    panic!("[sql-schema-connector::flavour::postgres::wasm] Not implemented");
 }
 
 pub(super) fn get_connection_string(_state: &State) -> Option<&str> {
