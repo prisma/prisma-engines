@@ -102,7 +102,15 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
-        self.with_connection(|conn, params| conn.create_database(params))
+        Box::pin(imp::create_database(&self.state))
+    }
+
+    fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(imp::drop_database(&self.state))
+    }
+
+    fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(imp::ensure_connection_validity(&mut self.state))
     }
 
     fn create_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -130,16 +138,8 @@ impl SqlFlavour for SqliteFlavour {
         self.with_connection(|conn, _| describe_schema(conn))
     }
 
-    fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        self.with_connection(|conn, params| conn.drop_database(params))
-    }
-
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         self.raw_cmd("DROP TABLE _prisma_migrations")
-    }
-
-    fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        self.with_connection(|conn, params| conn.ensure_connection_validity(params))
     }
 
     fn load_migrations_table(

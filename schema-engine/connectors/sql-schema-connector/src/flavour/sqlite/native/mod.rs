@@ -142,32 +142,6 @@ impl Connection {
         })
     }
 
-    pub async fn create_database(&self, params: &Params) -> ConnectorResult<String> {
-        let path = std::path::Path::new(&params.file_path);
-
-        if path.exists() {
-            return Ok(params.file_path.clone());
-        }
-
-        let dir = path.parent();
-
-        if let Some((dir, false)) = dir.map(|dir| (dir, dir.exists())) {
-            std::fs::create_dir_all(dir)
-                .map_err(|err| ConnectorError::from_source(err, "Creating SQLite database parent directory."))?;
-        }
-
-        Connection::new(params)?;
-
-        Ok(params.file_path.clone())
-    }
-
-    pub async fn drop_database(&self, params: &Params) -> ConnectorResult<()> {
-        let file_path = &params.file_path;
-        std::fs::remove_file(file_path).map_err(|err| {
-            ConnectorError::from_msg(format!("Failed to delete SQLite database at `{file_path}`.\n{err}"))
-        })
-    }
-
     pub async fn reset(&self, params: &Params) -> ConnectorResult<()> {
         let file_path = &params.file_path;
 
@@ -185,25 +159,53 @@ impl Connection {
 
         super::acquire_lock(self).await
     }
+}
 
-    pub async fn ensure_connection_validity(&self, params: &Params) -> ConnectorResult<()> {
-        let path = std::path::Path::new(&params.file_path);
-        // we use metadata() here instead of Path::exists() because we want accurate diagnostics:
-        // if the file is not reachable because of missing permissions, we don't want to return
-        // that the file doesn't exist.
-        match std::fs::metadata(path) {
-            Ok(_) => Ok(()),
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => Err(ConnectorError::user_facing(
-                user_facing_errors::common::DatabaseDoesNotExist::Sqlite {
-                    database_file_name: path
-                        .file_name()
-                        .map(|osstr| osstr.to_string_lossy().into_owned())
-                        .unwrap_or_else(|| params.file_path.clone()),
-                    database_file_path: params.file_path.clone(),
-                },
-            )),
-            Err(err) => Err(ConnectorError::from_source(err, "Failed to open SQLite database.")),
-        }
+pub(super) async fn create_database(state: &State) -> ConnectorResult<String> {
+    let params = state.get_unwrapped_params();
+    let path = std::path::Path::new(&params.file_path);
+
+    if path.exists() {
+        return Ok(params.file_path.clone());
+    }
+
+    let dir = path.parent();
+
+    if let Some((dir, false)) = dir.map(|dir| (dir, dir.exists())) {
+        std::fs::create_dir_all(dir)
+            .map_err(|err| ConnectorError::from_source(err, "Creating SQLite database parent directory."))?;
+    }
+
+    Connection::new(params)?;
+
+    Ok(params.file_path.clone())
+}
+
+pub(super) async fn drop_database(state: &State) -> ConnectorResult<()> {
+    let params = state.get_unwrapped_params();
+    let file_path = &params.file_path;
+    std::fs::remove_file(file_path)
+        .map_err(|err| ConnectorError::from_msg(format!("Failed to delete SQLite database at `{file_path}`.\n{err}")))
+}
+
+pub(super) async fn ensure_connection_validity(state: &mut State) -> ConnectorResult<()> {
+    let params = state.get_unwrapped_params();
+    let path = std::path::Path::new(&params.file_path);
+    // we use metadata() here instead of Path::exists() because we want accurate diagnostics:
+    // if the file is not reachable because of missing permissions, we don't want to return
+    // that the file doesn't exist.
+    match std::fs::metadata(path) {
+        Ok(_) => Ok(()),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Err(ConnectorError::user_facing(
+            user_facing_errors::common::DatabaseDoesNotExist::Sqlite {
+                database_file_name: path
+                    .file_name()
+                    .map(|osstr| osstr.to_string_lossy().into_owned())
+                    .unwrap_or_else(|| params.file_path.clone()),
+                database_file_path: params.file_path.clone(),
+            },
+        )),
+        Err(err) => Err(ConnectorError::from_source(err, "Failed to open SQLite database.")),
     }
 }
 
