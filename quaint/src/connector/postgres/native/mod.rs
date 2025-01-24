@@ -26,7 +26,8 @@ use crate::{
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
-use cache::{CacheSettings, NoOpCache, PreparedStatementLruCache, QueryCache, TracingLruCache};
+pub use cache::QueryCache;
+use cache::{CacheSettings, NoOpCache, PreparedStatementLruCache, TracingLruCache};
 use column_type::PGColumnType;
 use futures::future::FutureExt;
 use futures::StreamExt;

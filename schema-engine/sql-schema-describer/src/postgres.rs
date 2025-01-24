@@ -23,8 +23,51 @@ use std::{
     collections::{BTreeMap, HashMap},
     convert::TryInto,
     iter::Peekable,
+    sync::Arc,
 };
 use tracing::trace;
+
+#[async_trait::async_trait]
+pub trait Connection: Sync {
+    async fn query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [quaint::prelude::Value<'a>],
+    ) -> quaint::Result<quaint::prelude::ResultSet>;
+
+    async fn version(&self) -> quaint::Result<Option<String>>;
+}
+
+#[cfg(feature = "postgresql-native")]
+#[async_trait::async_trait]
+impl<C: quaint::connector::QueryCache> Connection for quaint::connector::PostgreSql<C> {
+    async fn query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [quaint::prelude::Value<'a>],
+    ) -> quaint::Result<quaint::prelude::ResultSet> {
+        quaint::prelude::Queryable::query_raw(self, sql, params).await
+    }
+
+    async fn version(&self) -> quaint::Result<Option<String>> {
+        quaint::prelude::Queryable::version(self).await
+    }
+}
+
+#[async_trait::async_trait]
+impl<Q: Queryable + ?Sized> Connection for Arc<Q> {
+    async fn query_raw<'a>(
+        &'a self,
+        sql: &'a str,
+        params: &'a [quaint::prelude::Value<'a>],
+    ) -> quaint::Result<quaint::prelude::ResultSet> {
+        quaint::prelude::Queryable::query_raw(&**self, sql, params).await
+    }
+
+    async fn version(&self) -> quaint::Result<Option<String>> {
+        quaint::prelude::Queryable::version(&**self).await
+    }
+}
 
 /// A PostgreSQL sequence.
 /// <https://www.postgresql.org/docs/current/view-pg-sequences.html>
@@ -112,7 +155,7 @@ pub enum Circumstances {
 }
 
 pub struct SqlSchemaDescriber<'a> {
-    conn: &'a dyn Queryable,
+    conn: &'a dyn Connection,
     circumstances: BitFlags<Circumstances>,
 }
 
@@ -590,7 +633,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
 }
 
 impl<'a> SqlSchemaDescriber<'a> {
-    pub fn new(conn: &'a dyn Queryable, circumstances: BitFlags<Circumstances>) -> SqlSchemaDescriber<'a> {
+    pub fn new(conn: &'a dyn Connection, circumstances: BitFlags<Circumstances>) -> SqlSchemaDescriber<'a> {
         SqlSchemaDescriber { conn, circumstances }
     }
 
@@ -866,7 +909,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                  JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
                  AND pg_namespace.nspname = ANY ( $1 )
                  WHERE reltype > 0
-                ) as oid on oid.oid = att.attrelid 
+                ) as oid on oid.oid = att.attrelid
                   AND relname = info.table_name
                   AND namespace = info.table_schema
             LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum AND table_schema = namespace
@@ -1056,11 +1099,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                 conname         AS constraint_name,
                 child,
                 parent,
-                table_name, 
+                table_name,
                 namespace,
                 condeferrable,
                 condeferred
-            FROM (SELECT 
+            FROM (SELECT
                         ns.nspname AS "namespace",
                         unnest(con1.conkey)                AS "parent",
                         unnest(con1.confkey)                AS "child",

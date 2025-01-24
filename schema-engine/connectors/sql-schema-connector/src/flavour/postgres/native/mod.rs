@@ -2,6 +2,8 @@
 
 pub(super) mod shadow_db;
 
+use std::collections::HashMap;
+
 use enumflags2::BitFlags;
 use indoc::indoc;
 use psl::PreviewFeature;
@@ -9,30 +11,40 @@ use quaint::{
     connector::{self, tokio_postgres::error::ErrorPosition, MakeTlsConnectorManager, PostgresUrl},
     prelude::{ConnectionInfo, Queryable},
 };
-use schema_connector::{ConnectorError, ConnectorResult, Namespaces};
-use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
-use user_facing_errors::{schema_engine::ApplyMigrationError, schema_engine::DatabaseSchemaInconsistent};
+use schema_connector::{ConnectorError, ConnectorParams, ConnectorResult};
+use url::Url;
+use user_facing_errors::{
+    common::{DatabaseAccessDenied, DatabaseDoesNotExist},
+    schema_engine::{self, ApplyMigrationError},
+    UserFacingError,
+};
 
 use crate::sql_renderer::IteratorJoin;
 
-use super::MigratePostgresUrl;
+use super::{Circumstances, MigratePostgresUrl, PostgresProvider, ADVISORY_LOCK_TIMEOUT};
+
+pub(super) type State = crate::flavour::State<Params, (BitFlags<Circumstances>, Connection)>;
+
+#[derive(Debug, Clone)]
+pub struct Params {
+    connector_params: ConnectorParams,
+    url: MigratePostgresUrl,
+}
 
 pub(super) struct Connection(connector::PostgreSqlWithNoCache);
 
 impl Connection {
-    pub(super) async fn new(url: url::Url) -> ConnectorResult<Connection> {
-        let url = MigratePostgresUrl::new(url)?;
-
-        let quaint = match url.0 {
+    pub async fn new(params: &Params) -> ConnectorResult<Connection> {
+        let quaint = match &params.url.0 {
             PostgresUrl::Native(ref native_url) => {
                 let tls_manager = MakeTlsConnectorManager::new(native_url.as_ref().clone());
                 connector::PostgreSqlWithNoCache::new(native_url.as_ref().clone(), &tls_manager).await
             }
             PostgresUrl::WebSocket(ref ws_url) => connector::PostgreSql::new_with_websocket(ws_url.clone()).await,
         }
-        .map_err(quaint_err(&url))?;
+        .map_err(quaint_error_mapper(params))?;
 
-        let version = quaint.version().await.map_err(quaint_err(&url))?;
+        let version = quaint.version().await.map_err(quaint_error_mapper(params))?;
 
         if let Some(version) = version {
             let cockroach_version_prefix = "CockroachDB CCL v";
@@ -68,7 +80,7 @@ impl Connection {
                             SET use_declarative_schema_changer=off
                         "#})
                         .await
-                        .map_err(quaint_err(&url))?;
+                        .map_err(quaint_error_mapper(params))?;
                 }
                 None | Some(_) => (),
             };
@@ -77,90 +89,44 @@ impl Connection {
         Ok(Connection(quaint))
     }
 
-    #[tracing::instrument(skip(self, circumstances, params))]
-    pub(super) async fn describe_schema(
-        &mut self,
-        circumstances: BitFlags<super::Circumstances>,
-        params: &super::Params,
-        namespaces: Option<Namespaces>,
-    ) -> ConnectorResult<SqlSchema> {
-        use sql_schema_describer::{postgres as describer, DescriberErrorKind, SqlSchemaDescriberBackend};
-        let mut describer_circumstances: BitFlags<describer::Circumstances> = Default::default();
-
-        if circumstances.contains(super::Circumstances::IsCockroachDb) {
-            describer_circumstances |= describer::Circumstances::Cockroach;
-        }
-
-        if circumstances.contains(super::Circumstances::CockroachWithPostgresNativeTypes) {
-            describer_circumstances |= describer::Circumstances::CockroachWithPostgresNativeTypes;
-        }
-
-        if circumstances.contains(super::Circumstances::CanPartitionTables) {
-            describer_circumstances |= describer::Circumstances::CanPartitionTables;
-        }
-
-        let namespaces_vec = Namespaces::to_vec(namespaces, String::from(params.url.schema()));
-        let namespaces_str: Vec<&str> = namespaces_vec.iter().map(AsRef::as_ref).collect();
-
-        let mut schema = sql_schema_describer::postgres::SqlSchemaDescriber::new(&self.0, describer_circumstances)
-            .describe(namespaces_str.as_slice())
-            .await
-            .map_err(|err| match err.into_kind() {
-                DescriberErrorKind::QuaintError(err) => quaint_err(&params.url)(err),
-                e @ DescriberErrorKind::CrossSchemaReference { .. } => {
-                    let err = DatabaseSchemaInconsistent {
-                        explanation: e.to_string(),
-                    };
-                    ConnectorError::user_facing(err)
-                }
-            })?;
-
-        crate::flavour::normalize_sql_schema(&mut schema, params.connector_params.preview_features);
-        normalize_sql_schema(&mut schema, params.connector_params.preview_features);
-
-        Ok(schema)
+    pub fn as_connector(&self) -> &connector::PostgreSqlWithNoCache {
+        &self.0
     }
 
-    pub(super) async fn raw_cmd(&mut self, sql: &str, url: &MigratePostgresUrl) -> ConnectorResult<()> {
+    // Query methods return quaint::Result directly to let the caller decide how to convert
+    // the error. This is needed for errors that use information related to the connection.
+
+    pub async fn raw_cmd(&self, sql: &str) -> quaint::Result<()> {
         tracing::debug!(query_type = "raw_cmd", sql);
-        self.0.raw_cmd(sql).await.map_err(quaint_err(url))
+        self.0.raw_cmd(sql).await
     }
 
-    pub(super) async fn version(&mut self, url: &MigratePostgresUrl) -> ConnectorResult<Option<String>> {
-        tracing::debug!(query_type = "version");
-        self.0.version().await.map_err(quaint_err(url))
-    }
-
-    pub(super) async fn query(
-        &mut self,
-        query: quaint::ast::Query<'_>,
-        url: &MigratePostgresUrl,
-    ) -> ConnectorResult<quaint::prelude::ResultSet> {
+    pub async fn query(&self, query: quaint::ast::Query<'_>) -> quaint::Result<quaint::prelude::ResultSet> {
         use quaint::visitor::Visitor;
         let (sql, params) = quaint::visitor::Postgres::build(query).unwrap();
-        self.query_raw(&sql, &params, url).await
+        self.query_raw(&sql, &params).await
     }
 
-    pub(super) async fn query_raw(
+    pub async fn query_raw(
         &self,
         sql: &str,
         params: &[quaint::prelude::Value<'_>],
-        url: &MigratePostgresUrl,
-    ) -> ConnectorResult<quaint::prelude::ResultSet> {
+    ) -> quaint::Result<quaint::prelude::ResultSet> {
         tracing::debug!(query_type = "query_raw", sql, ?params);
-        self.0.query_raw(sql, params).await.map_err(quaint_err(url))
+        self.0.query_raw(sql, params).await
     }
 
-    pub(super) async fn describe_query(
-        &self,
-        sql: &str,
-        url: &MigratePostgresUrl,
-    ) -> ConnectorResult<quaint::connector::DescribedQuery> {
+    pub async fn version(&self) -> quaint::Result<Option<String>> {
+        tracing::debug!(query_type = "version");
+        self.0.version().await
+    }
+
+    pub async fn describe_query(&self, sql: &str) -> quaint::Result<quaint::connector::DescribedQuery> {
         tracing::debug!(query_type = "describe_query", sql);
-        self.0.describe_query(sql).await.map_err(quaint_err(url))
+        self.0.describe_query(sql).await
     }
 
-    pub(super) async fn apply_migration_script(&mut self, migration_name: &str, script: &str) -> ConnectorResult<()> {
+    pub async fn apply_migration_script(&self, migration_name: &str, script: &str) -> ConnectorResult<()> {
         tracing::debug!(query_type = "raw_cmd", script);
         let client = self.0.client();
 
@@ -233,15 +199,208 @@ impl Connection {
             }
         }
     }
-}
 
-fn normalize_sql_schema(schema: &mut SqlSchema, preview_features: BitFlags<PreviewFeature>) {
-    if !preview_features.contains(PreviewFeature::PostgresqlExtensions) {
-        let pg_ext: &mut PostgresSchemaExt = schema.downcast_connector_data_mut();
-        pg_ext.clear_extensions();
+    pub async fn create_database(&self, params: &Params) -> ConnectorResult<String> {
+        let schema_name = params.url.schema();
+        let db_name = params.url.dbname();
+
+        let (admin_conn, admin_params) = create_postgres_admin_conn(params.clone()).await?;
+
+        let query = format!("CREATE DATABASE \"{db_name}\"");
+
+        let mut database_already_exists_error = None;
+
+        match admin_conn
+            .raw_cmd(&query)
+            .await
+            .map_err(quaint_error_mapper(&admin_params))
+        {
+            Ok(_) => (),
+            Err(err) if err.is_user_facing_error::<user_facing_errors::common::DatabaseAlreadyExists>() => {
+                database_already_exists_error = Some(err)
+            }
+            Err(err) if err.is_user_facing_error::<user_facing_errors::query_engine::UniqueKeyViolation>() => {
+                database_already_exists_error = Some(err)
+            }
+            Err(err) => return Err(err),
+        };
+
+        // Now create the schema
+        let conn = Connection::new(params).await?;
+
+        let schema_sql = format!("CREATE SCHEMA IF NOT EXISTS \"{schema_name}\";");
+
+        conn.raw_cmd(&schema_sql).await.map_err(quaint_error_mapper(params))?;
+
+        if let Some(err) = database_already_exists_error {
+            return Err(err);
+        }
+
+        Ok(db_name.to_owned())
+    }
+
+    pub async fn drop_database(&self, params: &Params) -> ConnectorResult<()> {
+        let db_name = params.url.dbname();
+        assert!(!db_name.is_empty(), "Database name should not be empty.");
+
+        let (admin_conn, admin_params) = create_postgres_admin_conn(params.clone()).await?;
+
+        admin_conn
+            .raw_cmd(&format!("DROP DATABASE \"{db_name}\""))
+            .await
+            .map_err(quaint_error_mapper(&admin_params))?;
+
+        Ok(())
     }
 }
 
-fn quaint_err(url: &MigratePostgresUrl) -> impl (Fn(quaint::error::Error) -> ConnectorError) + '_ {
-    |err| crate::flavour::quaint_error_to_connector_error(err, &ConnectionInfo::Native(url.clone().into()))
+pub(super) fn get_connection_string(state: &State) -> Option<&str> {
+    state
+        .params()
+        .map(|params| params.connector_params.connection_string.as_str())
+}
+
+pub(super) fn get_circumstances(state: &State) -> Option<BitFlags<Circumstances>> {
+    match state {
+        State::Connected(_, (circumstances, _)) => Some(*circumstances),
+        _ => None,
+    }
+}
+
+pub(super) fn get_default_schema(state: &State) -> Option<&str> {
+    state.params().map(|params| params.url.schema())
+}
+
+pub(super) async fn get_connection_and_params(
+    state: &mut State,
+    provider: PostgresProvider,
+) -> ConnectorResult<(&mut Connection, &mut Params)> {
+    match state {
+        State::Initial => panic!("logic error: Initial"),
+        State::Connected(params, (_, conn)) => Ok((conn, params)),
+        State::WithParams(params) => {
+            let conn = Connection::new(params).await?;
+            let circumstances = super::setup_connection(&conn, params, provider, params.url.schema()).await?;
+            *state = State::Connected(params.clone(), (circumstances, conn));
+
+            let State::Connected(params, (_, conn)) = state else {
+                unreachable!();
+            };
+            Ok((conn, params))
+        }
+    }
+}
+
+pub(super) fn set_params(state: &mut State, mut connector_params: ConnectorParams) -> ConnectorResult<()> {
+    let mut url: Url = connector_params
+        .connection_string
+        .parse()
+        .map_err(ConnectorError::url_parse_error)?;
+    disable_postgres_statement_cache(&mut url)?;
+    let connection_string = url.to_string();
+    let url = MigratePostgresUrl::new(url)?;
+    connector_params.connection_string = connection_string;
+    let params = Params { connector_params, url };
+    state.set_params(params);
+    Ok(())
+}
+
+pub(super) fn get_preview_features(state: &State) -> BitFlags<PreviewFeature> {
+    state.get_unwrapped_params().connector_params.preview_features
+}
+
+pub(super) fn set_preview_features(state: &mut State, preview_features: BitFlags<PreviewFeature>) {
+    match state {
+        State::Initial => {
+            if !preview_features.is_empty() {
+                tracing::warn!("set_preview_feature on Initial state has no effect ({preview_features}).");
+            }
+        }
+        State::WithParams(params) | State::Connected(params, _) => {
+            params.connector_params.preview_features = preview_features
+        }
+    }
+}
+
+pub(super) fn quaint_error_mapper(params: &Params) -> impl Fn(quaint::error::Error) -> ConnectorError + use<'_> {
+    |err| crate::flavour::quaint_error_to_connector_error(err, &ConnectionInfo::Native(params.url.clone().into()))
+}
+
+pub(super) fn timeout_error(params: &Params) -> ConnectorError {
+    ConnectorError::user_facing(user_facing_errors::common::DatabaseTimeout {
+        database_host: params.url.host().to_owned(),
+        database_port: params.url.port().to_string(),
+        context: format!(
+            "Timed out trying to acquire a postgres advisory lock (SELECT pg_advisory_lock(72707369)). Elapsed: {}ms. See https://pris.ly/d/migrate-advisory-locking for details.", ADVISORY_LOCK_TIMEOUT.as_millis()
+        ),
+    })
+}
+
+/// Try to connect as an admin to a postgres database. We try to pick a default database from which
+/// we can create another database.
+async fn create_postgres_admin_conn(mut params: Params) -> ConnectorResult<(Connection, Params)> {
+    // "postgres" is the default database on most postgres installations,
+    // "template1" is guaranteed to exist, and "defaultdb" is the only working
+    // option on DigitalOcean managed postgres databases.
+    const CANDIDATE_DEFAULT_DATABASES: &[&str] = &["postgres", "template1", "defaultdb"];
+
+    let mut conn = None;
+
+    let mut url = Url::parse(&params.connector_params.connection_string).map_err(ConnectorError::url_parse_error)?;
+    strip_schema_param_from_url(&mut url);
+
+    for database_name in CANDIDATE_DEFAULT_DATABASES {
+        url.set_path(&format!("/{database_name}"));
+        params.url = MigratePostgresUrl::new(url.clone())?;
+
+        match Connection::new(&params).await {
+            // If the database does not exist, try the next one.
+            Err(err) => match &err.error_code() {
+                Some(DatabaseDoesNotExist::ERROR_CODE) => (),
+                Some(DatabaseAccessDenied::ERROR_CODE) => (),
+                _ => {
+                    conn = Some(Err(err));
+                    break;
+                }
+            },
+            // If the outcome is anything else, use this.
+            other_outcome => {
+                conn = Some(other_outcome.map(|conn| (conn, params)));
+                break;
+            }
+        }
+    }
+
+    let conn = conn.ok_or_else(|| {
+        ConnectorError::user_facing(schema_engine::DatabaseCreationFailed { database_error: "Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database.".to_owned() })
+    })??;
+
+    Ok(conn)
+}
+
+fn strip_schema_param_from_url(url: &mut Url) {
+    let mut params: HashMap<String, String> = url.query_pairs().into_owned().collect();
+    params.remove("schema");
+    let params: Vec<String> = params.into_iter().map(|(k, v)| format!("{k}={v}")).collect();
+    let params: String = params.join("&");
+    url.set_query(Some(&params));
+}
+
+fn disable_postgres_statement_cache(url: &mut Url) -> ConnectorResult<()> {
+    let params: Vec<(String, String)> = url.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();
+
+    url.query_pairs_mut().clear();
+
+    for (k, v) in params.into_iter() {
+        if k == "statement_cache_size" {
+            url.query_pairs_mut().append_pair("statement_cache_size", "0");
+        } else {
+            url.query_pairs_mut().append_pair(&k, &v);
+        }
+    }
+
+    if !url.query_pairs().any(|(k, _)| k == "statement_cache_size") {
+        url.query_pairs_mut().append_pair("statement_cache_size", "0");
+    }
+    Ok(())
 }

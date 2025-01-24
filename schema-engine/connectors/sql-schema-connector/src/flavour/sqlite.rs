@@ -34,10 +34,13 @@ impl SqliteFlavour {
     fn with_connection<'a, F, O, C>(&'a mut self, f: C) -> BoxFuture<'a, ConnectorResult<O>>
     where
         O: 'a + Send,
-        C: (FnOnce(&'a mut imp::Connection) -> F) + Send + Sync + 'a,
+        C: (FnOnce(&'a imp::Connection, &'a imp::Params) -> F) + Send + Sync + 'a,
         F: Future<Output = ConnectorResult<O>> + Send + 'a,
     {
-        Box::pin(async move { f(imp::get_connection(&mut self.state)?).await })
+        Box::pin(async move {
+            let (connection, params) = imp::get_connection_and_params(&mut self.state)?;
+            f(connection, params).await
+        })
     }
 }
 
@@ -77,11 +80,11 @@ impl SqlFlavour for SqliteFlavour {
         migration_name: &'a str,
         script: &'a str,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
-        self.with_connection(|conn| conn.apply_migration_script(migration_name, script))
+        self.with_connection(|conn, _| conn.apply_migration_script(migration_name, script))
     }
 
     fn connection_string(&self) -> Option<&str> {
-        imp::connection_string(&self.state)
+        imp::get_connection_string(&self.state)
     }
 
     fn table_names(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
@@ -99,7 +102,7 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
-        Box::pin(async { imp::create_database(&self.state) })
+        self.with_connection(|conn, params| conn.create_database(params))
     }
 
     fn create_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -124,11 +127,11 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     fn describe_schema(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
-        self.with_connection(|conn| describe_schema(conn))
+        self.with_connection(|conn, _| describe_schema(conn))
     }
 
     fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        ready(imp::drop_database(&self.state))
+        self.with_connection(|conn, params| conn.drop_database(params))
     }
 
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -136,7 +139,7 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        Box::pin(imp::ensure_connection_validity(&self.state))
+        self.with_connection(|conn, params| conn.ensure_connection_validity(params))
     }
 
     fn load_migrations_table(
@@ -160,7 +163,7 @@ impl SqlFlavour for SqliteFlavour {
             FROM `_prisma_migrations`
             ORDER BY `started_at` ASC
         "#};
-        self.with_connection(|conn| async {
+        self.with_connection(|conn, _| async {
             let rows = match conn.query_raw(SQL, &[]).await {
                 Ok(result) => result,
                 Err(err) => {
@@ -225,7 +228,7 @@ impl SqlFlavour for SqliteFlavour {
         &'a mut self,
         query: quaint::ast::Query<'a>,
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>> {
-        self.with_connection(|conn| conn.query(query))
+        self.with_connection(|conn, _| conn.query(query))
     }
 
     fn query_raw<'a>(
@@ -234,7 +237,7 @@ impl SqlFlavour for SqliteFlavour {
         params: &'a [quaint::Value<'a>],
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>> {
         tracing::debug!(sql, params = ?params, query_type = "query_raw");
-        self.with_connection(|conn| conn.query_raw(sql, params))
+        self.with_connection(|conn, _| conn.query_raw(sql, params))
     }
 
     fn describe_query<'a>(
@@ -242,7 +245,7 @@ impl SqlFlavour for SqliteFlavour {
         sql: &'a str,
     ) -> BoxFuture<'a, ConnectorResult<quaint::connector::DescribedQuery>> {
         tracing::debug!(sql, query_type = "describe_query");
-        ready(imp::describe_query(&mut self.state, sql))
+        self.with_connection(|conn, params| conn.describe_query(sql, params))
     }
 
     fn introspect(
@@ -254,11 +257,11 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
-        self.with_connection(|conn| conn.raw_cmd(sql))
+        self.with_connection(|conn, _| conn.raw_cmd(sql))
     }
 
     fn reset(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
-        Box::pin(imp::reset(&mut self.state))
+        self.with_connection(|conn, params| conn.reset(params))
     }
 
     fn set_preview_features(&mut self, preview_features: enumflags2::BitFlags<psl::PreviewFeature>) {
@@ -297,7 +300,7 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
-        self.with_connection(|conn| conn.version())
+        self.with_connection(|conn, _| conn.version())
     }
 
     fn search_path(&self) -> &str {
