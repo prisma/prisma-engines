@@ -271,24 +271,32 @@ pub(super) fn get_default_schema(state: &State) -> Option<&str> {
     state.params().map(|params| params.url.schema())
 }
 
-pub(super) async fn get_connection_and_params(
+pub(super) async fn get_connection_and_params_and_circumstances(
     state: &mut State,
     provider: PostgresProvider,
-) -> ConnectorResult<(&mut Connection, &mut Params)> {
+) -> ConnectorResult<(&Connection, &Params, BitFlags<Circumstances>)> {
     match state {
         State::Initial => panic!("logic error: Initial"),
-        State::Connected(params, (_, conn)) => Ok((conn, params)),
+        State::Connected(params, (circumstances, conn)) => Ok((conn, params, *circumstances)),
         State::WithParams(params) => {
             let conn = Connection::new(params).await?;
             let circumstances = super::setup_connection(&conn, params, provider, params.url.schema()).await?;
             *state = State::Connected(params.clone(), (circumstances, conn));
 
-            let State::Connected(params, (_, conn)) = state else {
+            let State::Connected(params, (circumstances, conn)) = state else {
                 unreachable!();
             };
-            Ok((conn, params))
+            Ok((conn, params, *circumstances))
         }
     }
+}
+
+pub(super) async fn get_connection_and_params(
+    state: &mut State,
+    provider: PostgresProvider,
+) -> ConnectorResult<(&Connection, &Params)> {
+    let (conn, params, _) = get_connection_and_params_and_circumstances(state, provider).await?;
+    Ok((conn, params))
 }
 
 pub(super) fn set_params(state: &mut State, mut connector_params: ConnectorParams) -> ConnectorResult<()> {

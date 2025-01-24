@@ -77,11 +77,11 @@ impl Connection {
     }
 }
 
-pub(super) async fn create_database(state: &State) -> ConnectorResult<String> {
+pub(super) async fn create_database(_state: &State) -> ConnectorResult<String> {
     panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
 }
 
-pub(super) async fn drop_database(state: &State) -> ConnectorResult<()> {
+pub(super) async fn drop_database(_state: &State) -> ConnectorResult<()> {
     panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
 }
 

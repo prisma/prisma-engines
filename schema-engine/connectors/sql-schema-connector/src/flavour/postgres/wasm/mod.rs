@@ -7,7 +7,6 @@ use crate::{BitFlags, ConnectorParams};
 use psl::PreviewFeature;
 use quaint::connector::ExternalConnector;
 use schema_connector::{ConnectorError, ConnectorResult};
-use sql_schema_describer::SqlSchema;
 use std::sync::Arc;
 
 pub(super) struct State {
@@ -99,6 +98,13 @@ pub(super) fn get_circumstances(state: &State) -> Option<BitFlags<Circumstances>
 
 pub(super) fn get_default_schema(_params: &State) -> Option<&'static str> {
     None
+}
+
+pub(super) async fn get_connection_and_params_and_circumstances(
+    state: &mut State,
+    _provider: PostgresProvider,
+) -> ConnectorResult<(&Connection, &Params, BitFlags<Circumstances>)> {
+    Ok((&state.connection, &Params, state.circumstances))
 }
 
 pub(super) async fn get_connection_and_params(

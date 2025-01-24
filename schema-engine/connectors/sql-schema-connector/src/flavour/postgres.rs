@@ -196,53 +196,6 @@ impl PostgresFlavour {
             f(conn, ctx).await
         })
     }
-
-    #[tracing::instrument]
-    async fn describe_schema_with(
-        &mut self,
-        circumstances: BitFlags<Circumstances>,
-        namespaces: Option<Namespaces>,
-    ) -> ConnectorResult<SqlSchema> {
-        use sql_schema_describer::{postgres as describer, DescriberErrorKind, SqlSchemaDescriberBackend};
-
-        let mut describer_circumstances: BitFlags<describer::Circumstances> = Default::default();
-
-        if circumstances.contains(Circumstances::IsCockroachDb) {
-            describer_circumstances |= describer::Circumstances::Cockroach;
-        }
-
-        if circumstances.contains(Circumstances::CockroachWithPostgresNativeTypes) {
-            describer_circumstances |= describer::Circumstances::CockroachWithPostgresNativeTypes;
-        }
-
-        if circumstances.contains(Circumstances::CanPartitionTables) {
-            describer_circumstances |= describer::Circumstances::CanPartitionTables;
-        }
-        let default_schema = self.schema_name().to_owned();
-        let (conn, params) = imp::get_connection_and_params(&mut self.state, self.provider).await?;
-        let namespaces_vec = Namespaces::to_vec(namespaces, default_schema);
-        let namespaces_str: Vec<&str> = namespaces_vec.iter().map(AsRef::as_ref).collect();
-
-        let mut schema =
-            sql_schema_describer::postgres::SqlSchemaDescriber::new(conn.as_connector(), describer_circumstances)
-                .describe(namespaces_str.as_slice())
-                .await
-                .map_err(|err| match err.into_kind() {
-                    DescriberErrorKind::QuaintError(err) => imp::quaint_error_mapper(params)(err),
-                    e @ DescriberErrorKind::CrossSchemaReference { .. } => {
-                        let err = DatabaseSchemaInconsistent {
-                            explanation: e.to_string(),
-                        };
-                        ConnectorError::user_facing(err)
-                    }
-                })?;
-
-        let preview_features = imp::get_preview_features(&self.state);
-        crate::flavour::normalize_sql_schema(&mut schema, preview_features);
-        normalize_sql_schema(&mut schema, preview_features);
-
-        Ok(schema)
-    }
 }
 
 impl SqlFlavour for PostgresFlavour {
@@ -314,8 +267,13 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     fn describe_schema(&mut self, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
-        let circumstances = self.circumstances().unwrap_or_default();
-        Box::pin(self.describe_schema_with(circumstances, namespaces))
+        Box::pin(async {
+            let schema = self.schema_name().to_owned();
+            let preview_features = imp::get_preview_features(&self.state);
+            let (conn, params, circumstances) =
+                imp::get_connection_and_params_and_circumstances(&mut self.state, self.provider).await?;
+            describe_schema_with(conn, params, circumstances, preview_features, namespaces, schema).await
+        })
     }
 
     fn introspect<'a>(
@@ -323,14 +281,27 @@ impl SqlFlavour for PostgresFlavour {
         namespaces: Option<Namespaces>,
         ctx: &'a schema_connector::IntrospectionContext,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
-        let circumstances = self.circumstances().unwrap_or_default();
-        let mut enriched_circumstances = circumstances;
-        if circumstances.contains(Circumstances::IsCockroachDb)
-            && ctx.previous_schema().connector.is_provider("postgresql")
-        {
-            enriched_circumstances |= Circumstances::CockroachWithPostgresNativeTypes;
-        }
-        Box::pin(self.describe_schema_with(enriched_circumstances, namespaces))
+        Box::pin(async {
+            let schema = self.schema_name().to_owned();
+            let preview_features = imp::get_preview_features(&self.state);
+            let (conn, params, circumstances) =
+                imp::get_connection_and_params_and_circumstances(&mut self.state, self.provider).await?;
+            let mut enriched_circumstances = circumstances;
+            if circumstances.contains(Circumstances::IsCockroachDb)
+                && ctx.previous_schema().connector.is_provider("postgresql")
+            {
+                enriched_circumstances |= Circumstances::CockroachWithPostgresNativeTypes;
+            }
+            describe_schema_with(
+                conn,
+                params,
+                enriched_circumstances,
+                preview_features,
+                namespaces,
+                schema,
+            )
+            .await
+        })
     }
 
     fn query<'a>(
@@ -477,6 +448,53 @@ impl SqlFlavour for PostgresFlavour {
     fn search_path(&self) -> &str {
         self.schema_name()
     }
+}
+
+#[tracing::instrument(skip(conn, params))]
+async fn describe_schema_with(
+    conn: &imp::Connection,
+    params: &imp::Params,
+    circumstances: BitFlags<Circumstances>,
+    preview_features: BitFlags<PreviewFeature>,
+    namespaces: Option<Namespaces>,
+    schema: String,
+) -> ConnectorResult<SqlSchema> {
+    use sql_schema_describer::{postgres as describer, DescriberErrorKind, SqlSchemaDescriberBackend};
+
+    let mut describer_circumstances: BitFlags<describer::Circumstances> = Default::default();
+
+    if circumstances.contains(Circumstances::IsCockroachDb) {
+        describer_circumstances |= describer::Circumstances::Cockroach;
+    }
+
+    if circumstances.contains(Circumstances::CockroachWithPostgresNativeTypes) {
+        describer_circumstances |= describer::Circumstances::CockroachWithPostgresNativeTypes;
+    }
+
+    if circumstances.contains(Circumstances::CanPartitionTables) {
+        describer_circumstances |= describer::Circumstances::CanPartitionTables;
+    }
+    let namespaces_vec = Namespaces::to_vec(namespaces, schema);
+    let namespaces_str: Vec<&str> = namespaces_vec.iter().map(AsRef::as_ref).collect();
+
+    let mut schema =
+        sql_schema_describer::postgres::SqlSchemaDescriber::new(conn.as_connector(), describer_circumstances)
+            .describe(namespaces_str.as_slice())
+            .await
+            .map_err(|err| match err.into_kind() {
+                DescriberErrorKind::QuaintError(err) => imp::quaint_error_mapper(params)(err),
+                e @ DescriberErrorKind::CrossSchemaReference { .. } => {
+                    let err = DatabaseSchemaInconsistent {
+                        explanation: e.to_string(),
+                    };
+                    ConnectorError::user_facing(err)
+                }
+            })?;
+
+    crate::flavour::normalize_sql_schema(&mut schema, preview_features);
+    normalize_sql_schema(&mut schema, preview_features);
+
+    Ok(schema)
 }
 
 #[enumflags2::bitflags]
