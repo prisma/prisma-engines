@@ -2,7 +2,6 @@ mod sql_schema_calculator_flavour;
 
 use sql_schema_calculator_flavour::JoinTableUniquenessConstraint;
 pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
-use std::any::Any;
 
 use crate::{flavour::SqlFlavour, SqlDatabaseSchema};
 use psl::{
