@@ -28,12 +28,12 @@ fn creates_no_m2m_relations_to_views(api: TestApi) {
         }
 
         model Organization {
-          id         Int        @id @default(autoincrement())
+          id        Int        @id
           viewUsers ViewUser[]
         }
 
         view ViewUser {
-          userId       Int            @id @unique
+          userId        Int            @id @unique
           organizations Organization[]
         }
     "#};
