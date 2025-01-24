@@ -34,7 +34,7 @@ indexmap.workspace = true
 prisma-metrics.path = "../../../libs/metrics"
 quaint.workspace = true
 jsonrpc-core = "17"
-insta = "1.7.1"
+insta.workspace = true
 
 # Only this version is vetted, upgrade only after going through the code,
 # as this is a small crate with little user base.

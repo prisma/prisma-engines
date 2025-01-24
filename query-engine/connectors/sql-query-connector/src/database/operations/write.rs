@@ -9,7 +9,7 @@ use quaint::{
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
 };
 use query_structure::*;
-use sql_query_builder::{column_metadata, write, Context, FilterBuilder, SelectionResultExt, SqlTraceComment};
+use sql_query_builder::{column_metadata, update, write, Context, FilterBuilder, SelectionResultExt, SqlTraceComment};
 use std::borrow::Cow;
 use std::collections::HashMap;
 use user_facing_errors::query_engine::DatabaseConstraint;
@@ -242,13 +242,14 @@ async fn generate_updates(
     ctx: &Context<'_>,
 ) -> crate::Result<Vec<Query<'static>>> {
     if record_filter.has_selectors() {
-        let (updates, _) =
-            update_many_from_ids_and_filter(conn, model, record_filter, args, selected_fields, limit, ctx).await?;
-        Ok(updates)
+        let filter = record_filter.filter.clone();
+        let ids = conn.filter_selectors(model, record_filter, ctx).await?;
+        let slice = &ids[..limit.unwrap_or(ids.len()).min(ids.len())];
+        let queries = update::update_many_from_ids_and_filter(model, filter, slice, args, selected_fields, ctx);
+        Ok(queries)
     } else {
-        Ok(vec![
-            update_many_from_filter(model, record_filter, args, selected_fields, limit, ctx).await?,
-        ])
+        let query = update::update_many_from_filter(model, record_filter.filter, args, selected_fields, limit, ctx);
+        Ok(vec![query])
     }
 }
 
@@ -326,14 +327,12 @@ pub(crate) async fn delete_records(
     let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.clone().filter, ctx);
 
     // If we have selectors, then we must chunk the mutation into multiple if necessary and add the ids to the filter.
-    let row_count = if record_filter.has_selectors() {
-        let ids: Vec<_> = record_filter.selectors.as_ref().unwrap().iter().collect();
+    let row_count = if let Some(selectors) = record_filter.selectors.as_deref() {
         let mut row_count = 0;
         let mut remaining_limit = limit;
+        let slice = &selectors[..remaining_limit.unwrap_or(selectors.len()).min(selectors.len())];
 
-        for delete in
-            write::delete_many_from_ids_and_filter(model, ids.as_slice(), filter_condition, remaining_limit, ctx)
-        {
+        for delete in write::delete_many_from_ids_and_filter(model, slice, filter_condition, remaining_limit, ctx) {
             row_count += conn.execute(delete).await?;
             if let Some(old_remaining_limit) = remaining_limit {
                 // u64 to usize cast here cannot 'overflow' as the number of rows was limited to MAX usize in the first place.

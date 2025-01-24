@@ -12,7 +12,7 @@ use telemetry::TraceParent;
 use tracing::Instrument;
 
 #[derive(Debug, Clone)]
-pub(crate) enum ExpressionResult {
+pub enum ExpressionResult {
     /// A result from a query execution.
     Query(QueryResult),
 

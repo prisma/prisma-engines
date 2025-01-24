@@ -1504,5 +1504,5 @@ impl ScalarType {
 pub struct RelationFieldId(u32);
 
 /// An opaque identifier for a model scalar field in a schema.
-#[derive(Copy, Clone, PartialEq, Debug, Eq, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ScalarFieldId(u32);

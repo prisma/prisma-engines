@@ -16,6 +16,14 @@ serde.workspace = true
 itertools.workspace = true
 pretty.workspace = true
 
+[dev-dependencies]
+insta = { workspace = true, features = ["glob"] }
+serde_json.workspace = true
+request-handlers.path = "../../query-engine/request-handlers"
+# pull all connectors for testing
+psl = { workspace = true, features = ["sqlite", "mysql", "postgresql", "mssql"] }
+quaint = { workspace = true, features = ["sqlite", "mysql", "postgresql", "mssql"] }
+
 [features]
 default = ["sqlite", "postgresql", "mysql", "mssql"]
 sqlite = ["quaint/sqlite"]
