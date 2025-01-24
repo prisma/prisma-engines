@@ -125,6 +125,11 @@ impl ConnectorError {
                     message: format!("{}", e),
                 },
             )),
+
+            ErrorKind::QueryError(e) => Some(KnownError::new(user_facing_errors::query_engine::QueryError {
+                message: format!("{}", e),
+            })),
+
             _ => None,
         };
 

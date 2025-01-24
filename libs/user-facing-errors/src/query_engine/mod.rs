@@ -336,3 +336,11 @@ pub struct ExternalError {
 pub struct TooManyConnections {
     pub message: String,
 }
+
+// Note: Error code "P2038" is reserved for ClientEngine specific errors.
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2039", message = "Query Error: {message}")]
+pub struct QueryError {
+    pub message: String,
+}
