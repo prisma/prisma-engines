@@ -30,7 +30,7 @@ on:
 jobs:
   is-release-necessary:
     name: "Decide if a release of the engines artifacts is necessary"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       release: ${{ steps.decision.outputs.release }}
     steps:
@@ -185,7 +185,7 @@ jobs:
 
   release-artifacts:
     name: "Release artifacts from branch ${{ github.head_ref || github.ref_name }} for commit ${{ github.sha }}"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     concurrency:
       group: ${{ github.sha }}
     needs:

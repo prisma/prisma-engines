@@ -110,7 +110,7 @@ jobs:
             is_vitess: true
             single_threaded: true
 
-    runs-on: "ubuntu-20.04"
+    runs-on: "ubuntu-24.04"
     # TODO: Replace with the following once `prisma@5.20.0` is released.
     # runs-on: "ubuntu-${{ matrix.database.ubuntu || 'latest' }}"
     steps:
