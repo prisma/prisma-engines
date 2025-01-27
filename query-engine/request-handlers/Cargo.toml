@@ -81,3 +81,7 @@ cfg_aliases = "0.2.1"
 [[bench]]
 name = "query_planning_bench"
 harness = false
+
+[[bench]]
+name = "query_batching"
+harness = false
