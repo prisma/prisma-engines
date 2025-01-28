@@ -215,6 +215,15 @@ jobs:
           # run-id: 9526334324
           # github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Setup AWS CLI
+        uses: sagarsthorat/aws-cli@v1
+        with:
+          region: 'auto'
+          aws-cli-version: '2.22.35'
+          aws-access-key-id: ${{ vars.R2_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          output-format: json
+
       - name: "R2: Check if artifacts were already built and uploaded before via `.finished` file"
         env:
           FILE_PATH: "all_commits/${{ github.sha }}/.finished"
