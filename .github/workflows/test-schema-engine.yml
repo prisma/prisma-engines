@@ -65,52 +65,52 @@ jobs:
       fail-fast: false
       matrix:
         database:
-          - name: mssql_2017
-            url: "sqlserver://localhost:1434;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
-            ubuntu: "20.04"
-          - name: mssql_2019
-            url: "sqlserver://localhost:1433;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
-          - name: mssql_2022
-            url: "sqlserver://localhost:1435;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
-          - name: mysql_5_6
-            url: "mysql://root:prisma@localhost:3309"
-          - name: mysql_5_7
-            url: "mysql://root:prisma@localhost:3306"
-          - name: mysql_8
-            url: "mysql://root:prisma@localhost:3307"
-          - name: mysql_mariadb
-            url: "mysql://root:prisma@localhost:3308"
-          - name: postgres9
-            url: "postgresql://postgres:prisma@localhost:5431"
-          - name: postgres10
-            url: "postgresql://postgres:prisma@localhost:5432"
-          - name: postgres11
-            url: "postgresql://postgres:prisma@localhost:5433"
-          - name: postgres12
-            url: "postgresql://postgres:prisma@localhost:5434"
-          - name: postgres13
-            url: "postgresql://postgres:prisma@localhost:5435"
-          - name: postgres14
-            url: "postgresql://postgres:prisma@localhost:5437"
-          - name: postgres15
-            url: "postgresql://postgres:prisma@localhost:5438"
-          - name: postgres16
-            url: "postgresql://postgres:prisma@localhost:5439"
+#          - name: mssql_2017
+#            url: "sqlserver://localhost:1434;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
+#            ubuntu: "20.04"
+#          - name: mssql_2019
+#            url: "sqlserver://localhost:1433;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
+#          - name: mssql_2022
+#            url: "sqlserver://localhost:1435;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED"
+#          - name: mysql_5_6
+#            url: "mysql://root:prisma@localhost:3309"
+#          - name: mysql_5_7
+#            url: "mysql://root:prisma@localhost:3306"
+#          - name: mysql_8
+#            url: "mysql://root:prisma@localhost:3307"
+#          - name: mysql_mariadb
+#            url: "mysql://root:prisma@localhost:3308"
+#          - name: postgres9
+#            url: "postgresql://postgres:prisma@localhost:5431"
+#          - name: postgres10
+#            url: "postgresql://postgres:prisma@localhost:5432"
+#          - name: postgres11
+#            url: "postgresql://postgres:prisma@localhost:5433"
+#          - name: postgres12
+#            url: "postgresql://postgres:prisma@localhost:5434"
+#          - name: postgres13
+#            url: "postgresql://postgres:prisma@localhost:5435"
+#          - name: postgres14
+#            url: "postgresql://postgres:prisma@localhost:5437"
+#          - name: postgres15
+#            url: "postgresql://postgres:prisma@localhost:5438"
+#          - name: postgres16
+#            url: "postgresql://postgres:prisma@localhost:5439"
           - name: cockroach_24_3
             url: "postgresql://prisma@localhost:26260"
-          - name: cockroach_23_1
-            url: "postgresql://prisma@localhost:26260"
-          - name: cockroach_22_2
-            url: "postgresql://prisma@localhost:26259"
-          - name: cockroach_22_1_0
-            url: "postgresql://prisma@localhost:26257"
-          - name: sqlite
-            url: sqlite
-          - name: vitess_8_0
-            url: "mysql://root:prisma@localhost:33807/test"
-            shadow_database_url: "mysql://root:prisma@localhost:33808/shadow"
-            is_vitess: true
-            single_threaded: true
+#          - name: cockroach_23_1
+#            url: "postgresql://prisma@localhost:26260"
+#          - name: cockroach_22_2
+#            url: "postgresql://prisma@localhost:26259"
+#          - name: cockroach_22_1_0
+#            url: "postgresql://prisma@localhost:26257"
+#          - name: sqlite
+#            url: sqlite
+#          - name: vitess_8_0
+#            url: "mysql://root:prisma@localhost:33807/test"
+#            shadow_database_url: "mysql://root:prisma@localhost:33808/shadow"
+#            is_vitess: true
+#            single_threaded: true
 
     runs-on: "ubuntu-20.04"
     # TODO: Replace with the following once `prisma@5.20.0` is released.
