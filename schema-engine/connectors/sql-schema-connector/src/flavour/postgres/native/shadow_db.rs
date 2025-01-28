@@ -1,3 +1,4 @@
+use crate::flavour::postgres::PostgresProvider::CockroachDb;
 use crate::flavour::{PostgresFlavour, SqlFlavour};
 use schema_connector::{migrations_directory::MigrationDirectory, ConnectorResult};
 use schema_connector::{ConnectorError, Namespaces};
@@ -8,6 +9,10 @@ pub async fn sql_schema_from_migrations_history(
     mut shadow_db: PostgresFlavour,
     namespaces: Option<Namespaces>,
 ) -> ConnectorResult<SqlSchema> {
+    if shadow_db.provider == CockroachDb {
+        shadow_db.raw_cmd("BEGIN;").await?;
+    }
+
     for migration in migrations {
         let script = migration.read_migration_script()?;
 
@@ -23,6 +28,10 @@ pub async fn sql_schema_from_migrations_history(
             .map_err(|connector_error| {
                 connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
             })?;
+    }
+
+    if shadow_db.provider == CockroachDb {
+        shadow_db.raw_cmd("COMMIT;").await?;
     }
 
     shadow_db.describe_schema(namespaces).await

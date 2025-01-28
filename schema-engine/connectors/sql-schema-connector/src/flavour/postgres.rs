@@ -492,7 +492,11 @@ impl SqlFlavour for PostgresFlavour {
                 .params()
                 .and_then(|p| p.connector_params.shadow_database_connection_string.clone())
         });
-        let mut shadow_database = PostgresFlavour::default();
+        let mut shadow_database = if self.is_cockroachdb() {
+            PostgresFlavour::new_cockroach()
+        } else {
+            PostgresFlavour::default()
+        };
 
         match shadow_database_connection_string {
             Some(shadow_database_connection_string) => Box::pin(async move {
