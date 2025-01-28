@@ -2,6 +2,12 @@
 
 set -eux;
 
+AWS_CLI_VERSION=1.36.40
+
+python -m venv .venv
+source .venv/bin/activate
+pip install awscli==$AWS_CLI_VERSION
+
 # engines-artifacts-for-r2
 # engines-artifacts-for-s3
 LOCAL_DIR_PATH=$1
@@ -48,7 +54,7 @@ if [ "$FILECOUNT_FOR_SIG" -eq 0 ]; then
 fi
 
 # Manual check
-# 
+#
 # Set PROD env vars
 # mkdir engines-artifacts-from-prod
 # Download the artifacts from the S3 bucket
@@ -56,9 +62,9 @@ fi
 # Print the files and save the output to a file
 # cd engines-artifacts-from-prod
 # find . | sort > ../expectedFiles.txt
-# 
+#
 # cd ..
-# 
+#
 # Set DEV env vars
 # mkdir engines-artifacts-from-dev
 # Download the artifacts from the S3 bucket
@@ -107,11 +113,11 @@ fi
 FILES_TO_VALIDATE_WITH_LDD=$(find . -type f | grep -E "./(rhel|debian)-openssl-(3.0|1.1).*(query-engine|schema-engine|libquery_engine.so.node)$")
 echo "FILES_TO_VALIDATE_WITH_LDD: $FILES_TO_VALIDATE_WITH_LDD"
 
-for filename in $FILES_TO_VALIDATE_WITH_LDD  
-do  
+for filename in $FILES_TO_VALIDATE_WITH_LDD
+do
     echo "Validating libssl linking for $filename."
     GREP_OUTPUT=$(ldd "$filename" | grep "libssl")
-    OUTPUT=$(echo "$GREP_OUTPUT" | cut -f2 | cut -d'.' -f1) 
+    OUTPUT=$(echo "$GREP_OUTPUT" | cut -f2 | cut -d'.' -f1)
 
     if [[ "$OUTPUT" == "libssl" ]]; then
         echo "Linux build linked correctly to libssl."
