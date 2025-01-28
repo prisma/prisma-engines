@@ -1,6 +1,9 @@
 name: Build Engines
 run-name: Build Engines for ${{ github.sha }}
 
+env:
+  AWS_CLI_VERSION: 1.36.40
+
 # Run on `push` only for main, if not it will trigger `push` & `pull_request` on PRs at the same time
 on:
   push:
@@ -216,13 +219,10 @@ jobs:
           # github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup AWS CLI
-        uses: sagarsthorat/aws-cli@v1
-        with:
-          region: 'auto'
-          aws-cli-version: '1.36.40'
-          aws-access-key-id: ${{ vars.R2_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          output-format: json
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install awscli==$AWS_CLI_VERSION
 
       - name: "R2: Check if artifacts were already built and uploaded before via `.finished` file"
         env:
