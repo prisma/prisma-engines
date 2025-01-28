@@ -1,9 +1,6 @@
 name: Build Engines
 run-name: Build Engines for ${{ github.sha }}
 
-env:
-  AWS_CLI_VERSION: 1.36.40
-
 # Run on `push` only for main, if not it will trigger `push` & `pull_request` on PRs at the same time
 on:
   push:
@@ -218,12 +215,6 @@ jobs:
           # run-id: 9526334324
           # github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup AWS CLI
-        run: |
-          python -m venv .venv
-          source .venv/bin/activate
-          pip install awscli==$AWS_CLI_VERSION
-
       - name: "R2: Check if artifacts were already built and uploaded before via `.finished` file"
         env:
           FILE_PATH: "all_commits/${{ github.sha }}/.finished"
@@ -319,18 +310,14 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ vars.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           AWS_ENDPOINT_URL_S3: ${{ vars.R2_ENDPOINT }}
-        run: |
-          source .venv/bin/activate
-          bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-r2
+        run: bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-r2
 
       - name: "AWS S3: Upload to bucket and verify uploaded files then create `.finished` file"
         env:
           AWS_DEFAULT_REGION: "eu-west-1"
           AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: |
-          source .venv/bin/activate
-          bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-s3
+        run: bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-s3
 
       - name: Repository dispatch to prisma/engines-wrapper
         uses: peter-evans/repository-dispatch@v3
