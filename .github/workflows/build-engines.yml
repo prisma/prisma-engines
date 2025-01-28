@@ -319,14 +319,18 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ vars.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           AWS_ENDPOINT_URL_S3: ${{ vars.R2_ENDPOINT }}
-        run: bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-r2
+        run: |
+          source .venv/bin/activate
+          bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-r2
 
       - name: "AWS S3: Upload to bucket and verify uploaded files then create `.finished` file"
         env:
           AWS_DEFAULT_REGION: "eu-west-1"
           AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-s3
+        run: |
+          source .venv/bin/activate
+          bash .github/workflows/utils/uploadAndVerify.sh engines-artifacts-for-s3
 
       - name: Repository dispatch to prisma/engines-wrapper
         uses: peter-evans/repository-dispatch@v3
