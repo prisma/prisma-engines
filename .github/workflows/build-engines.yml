@@ -219,7 +219,7 @@ jobs:
         uses: sagarsthorat/aws-cli@v1
         with:
           region: 'auto'
-          aws-cli-version: '2.22.35'
+          aws-cli-version: '1.36.40'
           aws-access-key-id: ${{ vars.R2_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           output-format: json
