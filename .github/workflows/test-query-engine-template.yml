@@ -49,7 +49,7 @@ jobs:
       PRISMA_ENGINE_PROTOCOL: ${{ matrix.engine_protocol }}
       PRISMA_RELATION_LOAD_STRATEGY: ${{ matrix.relation_load_strategy }}
 
-    runs-on: "ubuntu-20.04"
+    runs-on: "ubuntu-24.04"
     # TODO: Replace with the following once `prisma@5.20.0` is released.
     # runs-on: "ubuntu-${{ inputs.ubuntu }}"
     steps:
