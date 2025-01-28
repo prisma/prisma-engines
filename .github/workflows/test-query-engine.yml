@@ -80,6 +80,9 @@ jobs:
       fail-fast: false
       matrix:
         database:
+          - name: "cockroach_24_3"
+            connector: "cockroachdb"
+            version: "24.3"
           - name: "cockroach_23_1"
             connector: "cockroachdb"
             version: "23.1"

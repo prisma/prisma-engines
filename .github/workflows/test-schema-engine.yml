@@ -96,6 +96,8 @@ jobs:
             url: "postgresql://postgres:prisma@localhost:5438"
           - name: postgres16
             url: "postgresql://postgres:prisma@localhost:5439"
+          - name: cockroach_24_3
+            url: "postgresql://prisma@localhost:26260"
           - name: cockroach_23_1
             url: "postgresql://prisma@localhost:26260"
           - name: cockroach_22_2

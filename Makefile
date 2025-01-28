@@ -276,6 +276,12 @@ start-postgres16:
 dev-postgres16: start-postgres16
 	cp $(CONFIG_PATH)/postgres16 $(CONFIG_FILE)
 
+start-cockroach_24_3:
+	docker compose -f docker-compose.yml up --wait -d --remove-orphans cockroach_24_3
+
+dev-cockroach_24_3: start-cockroach_24_3
+	cp $(CONFIG_PATH)/cockroach_24_3 $(CONFIG_FILE)
+
 start-cockroach_23_1:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans cockroach_23_1
 
