@@ -10,6 +10,11 @@ pub async fn sql_schema_from_migrations_history(
     namespaces: Option<Namespaces>,
 ) -> ConnectorResult<SqlSchema> {
     if shadow_db.provider == CockroachDb {
+        // CockroachDB is very slow in applying DDL statements.
+        // A workaround to it is to run the statements in a transaction block. This comes with some
+        // drawbacks and limitations though, so we only apply this when creating a shadow db.
+        // See https://www.cockroachlabs.com/docs/stable/online-schema-changes#limitations
+        // Original GitHub issue with context: https://github.com/prisma/prisma/issues/12384#issuecomment-1152523689
         shadow_db.raw_cmd("BEGIN;").await?;
     }
 
