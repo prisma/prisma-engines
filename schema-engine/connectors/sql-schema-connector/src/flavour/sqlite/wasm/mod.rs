@@ -22,6 +22,8 @@ impl State {
     }
 }
 
+pub(super) struct Params;
+
 pub(super) struct Connection(Arc<dyn ExternalConnector>);
 
 impl Connection {
@@ -53,54 +55,60 @@ impl Connection {
         self.0.query_raw(sql, params).await.map_err(convert_error)
     }
 
+    pub async fn version(&self) -> ConnectorResult<Option<String>> {
+        self.0.version().await.map_err(convert_error)
+    }
+
+    pub async fn describe_query(
+        &self,
+        sql: &str,
+        _params: &Params,
+    ) -> ConnectorResult<quaint::connector::DescribedQuery> {
+        tracing::debug!(query_type = "describe_query", sql);
+        self.0.describe_query(sql).await.map_err(convert_error)
+    }
+
     pub async fn apply_migration_script(&self, _migration_name: &str, _script: &str) -> ConnectorResult<()> {
         panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
     }
 
-    pub async fn version(&self) -> ConnectorResult<Option<String>> {
-        self.0.version().await.map_err(convert_error)
+    pub async fn reset(&self, _params: &Params) -> ConnectorResult<()> {
+        panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
     }
 }
 
-pub(super) fn create_database(_params: &State) -> ConnectorResult<String> {
+pub(super) async fn create_database(_state: &State) -> ConnectorResult<String> {
     panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
 }
 
-pub(super) fn drop_database(_state: &State) -> ConnectorResult<()> {
+pub(super) async fn drop_database(_state: &State) -> ConnectorResult<()> {
     panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
 }
 
-pub(super) async fn reset(_state: &mut State) -> ConnectorResult<()> {
-    panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
-}
-
-pub(super) async fn ensure_connection_validity(state: &State) -> ConnectorResult<()> {
-    state.connection.version().await?;
+pub(super) async fn ensure_connection_validity(state: &mut State) -> ConnectorResult<()> {
+    let (connection, _) = get_connection_and_params(state)?;
+    connection.version().await?;
     Ok(())
 }
 
-pub(super) async fn introspect(instance: &mut State) -> ConnectorResult<SqlSchema> {
-    super::describe_schema(&instance.connection).await
+pub(super) async fn introspect(state: &mut State) -> ConnectorResult<SqlSchema> {
+    super::describe_schema(&state.connection).await
 }
 
-pub(super) fn describe_query(state: &mut State, sql: &str) -> ConnectorResult<quaint::connector::DescribedQuery> {
+pub(super) fn get_connection_string(_state: &State) -> Option<&str> {
     panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
 }
 
-pub(super) fn connection_string(_state: &State) -> Option<&str> {
-    panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
-}
-
-pub(super) fn get_connection(state: &mut State) -> ConnectorResult<&mut Connection> {
-    Ok(&mut state.connection)
-}
-
-pub(super) fn set_preview_features(state: &mut State, features: BitFlags<PreviewFeature>) {
-    state.preview_features = features;
+pub(super) fn get_connection_and_params(state: &mut State) -> ConnectorResult<(&Connection, &Params)> {
+    Ok((&state.connection, &Params))
 }
 
 pub(super) fn set_params(_state: &mut State, params: ConnectorParams) -> ConnectorResult<()> {
     panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
+}
+
+pub(super) fn set_preview_features(state: &mut State, features: BitFlags<PreviewFeature>) {
+    state.preview_features = features;
 }
 
 fn convert_error(err: quaint::error::Error) -> ConnectorError {
