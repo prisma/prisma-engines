@@ -88,12 +88,12 @@ impl Display for ReadQuery {
         match self {
             Self::RecordQuery(q) => write!(
                 f,
-                "RecordQuery(name: '{}', selection: {}, filter: {:?})",
+                "RecordQuery(name: '{}', selection: {}, filter: {:#?})",
                 q.name, q.selected_fields, q.filter
             ),
             Self::ManyRecordsQuery(q) => write!(
                 f,
-                r#"ManyRecordsQuery(name: '{}', model: '{}', selection: {}, args: {:?})"#,
+                r#"ManyRecordsQuery(name: '{}', model: '{}', selection: {}, args: {:#?})"#,
                 q.name,
                 q.model.name(),
                 q.selected_fields,

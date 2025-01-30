@@ -949,6 +949,8 @@ pub trait ToGraphviz {
 
 impl ToGraphviz for QueryGraph {
     fn to_graphviz(&self) -> String {
+        let label_from_node = |node: &Node| node.to_graphviz().replace('\"', "\\\"").replace('\n', "\\l") + "\\l";
+
         let nodes = self
             .graph
             .node_indices()
@@ -958,7 +960,7 @@ impl ToGraphviz for QueryGraph {
                     format!(
                         "    {} [label=\"{}\", fillcolor=blue, style=filled, shape=rectangle, fontcolor=white]",
                         idx.index(),
-                        node.to_graphviz().replace('\"', "\\\"")
+                        label_from_node(node)
                     )
                 } else if self
                     .root_nodes()
@@ -968,13 +970,13 @@ impl ToGraphviz for QueryGraph {
                     format!(
                         "    {} [label=\"{}\", fillcolor=red, style=filled, shape=rectangle, fontcolor=white]",
                         idx.index(),
-                        node.to_graphviz().replace('\"', "\\\"")
+                        label_from_node(node)
                     )
                 } else {
                     format!(
                         "    {} [label=\"{}\", shape=rectangle]",
                         idx.index(),
-                        node.to_graphviz().replace('\"', "\\\"")
+                        label_from_node(node)
                     )
                 }
             })

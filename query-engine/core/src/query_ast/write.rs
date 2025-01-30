@@ -226,29 +226,29 @@ impl std::fmt::Display for WriteQuery {
 impl ToGraphviz for WriteQuery {
     fn to_graphviz(&self) -> String {
         match self {
-            Self::CreateRecord(q) => format!("CreateRecord(model: {}, args: {:?})", q.model.name(), q.args),
+            Self::CreateRecord(q) => format!("CreateRecord(model: {}, args: {:#?})", q.model.name(), q.args),
             Self::CreateManyRecords(q) => format!(
-                "CreateManyRecord(model: {}, selected_fields: {:?})",
+                "CreateManyRecord(model: {}, selected_fields: {:#?})",
                 q.model.name(),
                 q.selected_fields
             ),
             Self::UpdateRecord(q) => format!(
-                "UpdateRecord(model: {}, selection: {:?})",
+                "UpdateRecord(model: {}, selection: {:#?})",
                 q.model().name(),
                 q.selected_fields()
             ),
             Self::DeleteRecord(q) => format!(
-                "DeleteRecord: {}, {:?}, {:?}",
+                "DeleteRecord: {}, {:#?}, {:#?}",
                 q.model.name(),
                 q.record_filter,
                 q.selected_fields
             ),
-            Self::UpdateManyRecords(q) => format!("UpdateManyRecords(model: {}, args: {:?})", q.model.name(), q.args),
+            Self::UpdateManyRecords(q) => format!("UpdateManyRecords(model: {}, args: {:#?})", q.model.name(), q.args),
             Self::DeleteManyRecords(q) => format!("DeleteManyRecords: {}", q.model.name()),
             Self::ConnectRecords(_) => "ConnectRecords".to_string(),
             Self::DisconnectRecords(_) => "DisconnectRecords".to_string(),
-            Self::ExecuteRaw(r) => format!("ExecuteRaw: {:?}", r.inputs),
-            Self::QueryRaw(r) => format!("QueryRaw: {:?}", r.inputs),
+            Self::ExecuteRaw(r) => format!("ExecuteRaw: {:#?}", r.inputs),
+            Self::QueryRaw(r) => format!("QueryRaw: {:#?}", r.inputs),
             Self::Upsert(q) => format!("Upsert(model: {}", q.model().name()),
         }
     }
