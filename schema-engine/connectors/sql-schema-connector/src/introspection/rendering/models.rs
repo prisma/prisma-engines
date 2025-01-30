@@ -138,6 +138,12 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
         rendered.documentation(docs);
     }
 
+    if model.include_indexes().next().is_some() {
+        let docs = "This model contains an include index which requires additional setup for migrations. Visit https://pris.ly/d/include-indexes for more info.";
+
+        rendered.documentation(docs);
+    }
+
     if model.expression_indexes().next().is_some() {
         let docs = "This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.";
 
