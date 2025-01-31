@@ -1,0 +1,10 @@
+{
+  "action": "queryRaw",
+  "query": {
+    "arguments": {
+      "query": "SELECT * FROM User WHERE id = $1",
+      "parameters": "[1]"
+    },
+    "selection": {}
+  }
+}

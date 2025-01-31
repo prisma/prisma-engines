@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use query_structure::{FieldSelection, Filter, Model, PrismaValue, QueryArguments, RecordFilter, WriteArgs};
 use serde::Serialize;
 mod query_arguments_ext;
@@ -43,6 +45,13 @@ pub trait QueryBuilder {
         selected_fields: Option<&FieldSelection>,
         limit: Option<usize>,
     ) -> Result<Vec<DbQuery>, Box<dyn std::error::Error + Send + Sync>>;
+
+    fn build_raw(
+        &self,
+        model: Option<&Model>,
+        inputs: HashMap<String, PrismaValue>,
+        query_type: Option<String>,
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
 }
 
 #[derive(Debug, Serialize)]
