@@ -16,7 +16,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 
 #[cfg_attr(target_arch = "wasm32", derive(Deserialize))]
 #[derive(Debug, Eq, PartialEq, Clone)]
-pub enum AdapterFlavour {
+pub enum AdapterProvider {
     #[cfg(feature = "mysql")]
     Mysql,
     #[cfg(feature = "postgresql")]
@@ -25,7 +25,7 @@ pub enum AdapterFlavour {
     Sqlite,
 }
 
-impl AdapterFlavour {
+impl AdapterProvider {
     pub fn db_system_name(&self) -> &'static str {
         match self {
             #[cfg(feature = "mysql")]
@@ -38,7 +38,7 @@ impl AdapterFlavour {
     }
 }
 
-impl FromStr for AdapterFlavour {
+impl FromStr for AdapterProvider {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -54,15 +54,15 @@ impl FromStr for AdapterFlavour {
     }
 }
 
-impl From<&AdapterFlavour> for SqlFamily {
-    fn from(value: &AdapterFlavour) -> Self {
+impl From<&AdapterProvider> for SqlFamily {
+    fn from(value: &AdapterProvider) -> Self {
         match value {
             #[cfg(feature = "mysql")]
-            AdapterFlavour::Mysql => SqlFamily::Mysql,
+            AdapterProvider::Mysql => SqlFamily::Mysql,
             #[cfg(feature = "postgresql")]
-            AdapterFlavour::Postgres => SqlFamily::Postgres,
+            AdapterProvider::Postgres => SqlFamily::Postgres,
             #[cfg(feature = "sqlite")]
-            AdapterFlavour::Sqlite => SqlFamily::Sqlite,
+            AdapterProvider::Sqlite => SqlFamily::Sqlite,
         }
     }
 }
@@ -77,7 +77,7 @@ pub(crate) struct JsConnectionInfo {
 }
 
 impl JsConnectionInfo {
-    pub fn into_external_connection_info(self, provider: &AdapterFlavour) -> ExternalConnectionInfo {
+    pub fn into_external_connection_info(self, provider: &AdapterProvider) -> ExternalConnectionInfo {
         let schema_name = self.get_schema_name(provider);
         let sql_family = SqlFamily::from(provider);
 
@@ -88,21 +88,21 @@ impl JsConnectionInfo {
         )
     }
 
-    fn get_schema_name(&self, provider: &AdapterFlavour) -> &str {
+    fn get_schema_name(&self, provider: &AdapterProvider) -> &str {
         match self.schema_name.as_ref() {
             Some(name) => name,
             None => self.default_schema_name(provider),
         }
     }
 
-    fn default_schema_name(&self, provider: &AdapterFlavour) -> &str {
+    fn default_schema_name(&self, provider: &AdapterProvider) -> &str {
         match provider {
             #[cfg(feature = "mysql")]
-            AdapterFlavour::Mysql => quaint::connector::DEFAULT_MYSQL_DB,
+            AdapterProvider::Mysql => quaint::connector::DEFAULT_MYSQL_DB,
             #[cfg(feature = "postgresql")]
-            AdapterFlavour::Postgres => quaint::connector::DEFAULT_POSTGRES_SCHEMA,
+            AdapterProvider::Postgres => quaint::connector::DEFAULT_POSTGRES_SCHEMA,
             #[cfg(feature = "sqlite")]
-            AdapterFlavour::Sqlite => quaint::connector::DEFAULT_SQLITE_DATABASE,
+            AdapterProvider::Sqlite => quaint::connector::DEFAULT_SQLITE_DATABASE,
         }
     }
 }

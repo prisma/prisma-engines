@@ -7,7 +7,7 @@ use std::sync::Arc;
 use tsify::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
 
-use crate::params::{AdapterFlavour, JsConnectionInfo};
+use crate::params::{AdapterProvider, JsConnectionInfo};
 
 const CONNECTOR_REGISTRY: ConnectorRegistry<'_> = &[
     #[cfg(feature = "postgresql")]
@@ -49,7 +49,7 @@ fn register_panic_hook() {
 pub struct QueryCompilerParams {
     // TODO: support multiple datamodels
     datamodel: String,
-    flavour: AdapterFlavour,
+    provider: AdapterProvider,
     connection_info: JsConnectionInfo,
 }
 
@@ -66,7 +66,7 @@ impl QueryCompiler {
     pub fn new(params: QueryCompilerParams) -> Result<QueryCompiler, wasm_bindgen::JsError> {
         let QueryCompilerParams {
             datamodel,
-            flavour,
+            provider,
             connection_info,
         } = params;
 
@@ -79,7 +79,7 @@ impl QueryCompiler {
 
         Ok(Self {
             schema,
-            connection_info: ConnectionInfo::External(connection_info.into_external_connection_info(flavour)),
+            connection_info: ConnectionInfo::External(connection_info.into_external_connection_info(provider)),
             protocol: EngineProtocol::Json,
         })
     }
