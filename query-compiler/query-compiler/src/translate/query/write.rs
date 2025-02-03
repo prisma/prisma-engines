@@ -1,5 +1,5 @@
 use query_builder::QueryBuilder;
-use query_core::{UpdateManyRecords, UpdateRecord, UpdateRecordWithSelection, WriteQuery};
+use query_core::{RawQuery, UpdateManyRecords, UpdateRecord, UpdateRecordWithSelection, WriteQuery};
 use query_structure::QueryArguments;
 
 use crate::{expression::Expression, translate::TranslateResult, TranslateError};
@@ -100,6 +100,26 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
             };
             Expression::Unique(Box::new(Expression::Query(query)))
         }
+
+        WriteQuery::QueryRaw(RawQuery {
+            model,
+            inputs,
+            query_type,
+        }) => Expression::Query(
+            builder
+                .build_raw(model.as_ref(), inputs, query_type)
+                .map_err(TranslateError::QueryBuildFailure)?,
+        ),
+
+        WriteQuery::ExecuteRaw(RawQuery {
+            model,
+            inputs,
+            query_type,
+        }) => Expression::Execute(
+            builder
+                .build_raw(model.as_ref(), inputs, query_type)
+                .map_err(TranslateError::QueryBuildFailure)?,
+        ),
 
         other => todo!("{other:?}"),
     })

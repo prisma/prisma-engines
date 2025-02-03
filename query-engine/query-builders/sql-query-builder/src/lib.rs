@@ -15,7 +15,7 @@ mod sql_trace;
 pub mod update;
 pub mod write;
 
-use std::marker::PhantomData;
+use std::{collections::HashMap, marker::PhantomData};
 
 use quaint::{
     ast::{Column, Comparable, ConditionTree, Query, Row, Values},
@@ -135,6 +135,18 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         let projection = selected_fields.map(ModelProjection::from);
         let query = update::update_many_from_filter(model, filter, args, projection.as_ref(), limit, &self.context);
         Ok(vec![self.convert_query(query)?])
+    }
+
+    fn build_raw(
+        &self,
+        _model: Option<&Model>,
+        mut inputs: HashMap<String, prisma_value::PrismaValue>,
+        _query_type: Option<String>,
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
+        // Unwrapping query & params is safe since it's already passed the query parsing stage
+        let query = inputs.remove("query").unwrap().into_string().unwrap();
+        let params = inputs.remove("parameters").unwrap().into_list().unwrap();
+        Ok(DbQuery::new(query, params))
     }
 }
 
