@@ -30,7 +30,7 @@ export const MobileAdapterConfig = S.struct({
   })),
 })
 
-export const ExternalTestExecutor = S.literal('Wasm', 'Napi')
+export const ExternalTestExecutor = S.literal('Wasm', 'Napi', 'QueryCompiler')
 
 export const Env = S.extend(
   S.union(
