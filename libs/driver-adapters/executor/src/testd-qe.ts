@@ -7,13 +7,16 @@ import { Env, jsonRpc } from './types'
 import * as qe from './query-engine'
 import { nextRequestId } from './requestId'
 import { createRNEngineConnector } from './rn'
-import { debug, err } from './utils'
+import { assertNever, debug, err } from './utils'
 import { setupDriverAdaptersManager } from './setup'
 import { SchemaId } from './types/jsonRpc'
+import { setupDefaultPanicHandler } from './panic'
 
 async function main(): Promise<void> {
   const env = S.decodeUnknownSync(Env)(process.env)
   console.log('[env]', env)
+
+  setupDefaultPanicHandler()
 
   const iface = readline.createInterface({
     input: process.stdin,
@@ -167,9 +170,12 @@ async function handleRequest(
     case 'teardown': {
       debug('Got `teardown', params)
       const { schemaId } = params
+      const { engine, driverAdapterManager } = state[schemaId]
 
-      await state[schemaId].engine.disconnect('', nextRequestId())
-      await state[schemaId].driverAdapterManager.teardown()
+      await engine.disconnect('', nextRequestId())
+
+      await driverAdapterManager.teardown()
+
       delete state[schemaId]
 
       return {}
@@ -179,7 +185,7 @@ async function handleRequest(
       return state[schemaId].logs
     }
     default: {
-      throw new Error(`Unknown method: \`${method}\``)
+      assertNever(method, `Unknown method: \`${method}\``)
     }
   }
 }
@@ -222,6 +228,10 @@ async function initQe({
 
     const engine = createRNEngineConnector(url, schema, logCallback)
     return { engine, adapter: null }
+  }
+
+  if (env.EXTERNAL_TEST_EXECUTOR === 'QueryCompiler') {
+    throw new Error('query compiler tests must be run using testd-qc.ts')
   }
 
   const adapter = await driverAdapterManager.connect({ url })

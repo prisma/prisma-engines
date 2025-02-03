@@ -35,6 +35,7 @@ prisma-metrics.path = "../../../libs/metrics"
 quaint.workspace = true
 jsonrpc-core = "17"
 insta.workspace = true
+futures.workspace = true
 panic-utils.path = "../../../libs/panic-utils"
 
 # Only this version is vetted, upgrade only after going through the code,
