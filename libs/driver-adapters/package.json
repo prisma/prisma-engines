@@ -10,8 +10,12 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "pnpm build:prisma && pnpm build:executor",
-    "build:prisma": "pnpm -r --parallel dev",
+    "build:qe": "pnpm build:prisma && pnpm build:executor-qe",
+    "build:qc": "pnpm build:prisma && pnpm build:executor-qc",
+    "build:prisma": "pnpm --filter @prisma/* --parallel dev",
     "build:executor": "pnpm -r --filter executor build",
+    "build:executor-qe": "pnpm -r --filter executor build:qe",
+    "build:executor-qc": "pnpm -r --filter executor build:qc",
     "lint": "pnpm -r run lint",
     "clean": "git clean -dXf -e !libs/driver-adapters"
   },

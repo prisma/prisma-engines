@@ -4087,6 +4087,7 @@ dependencies = [
  "colored",
  "enumflags2",
  "env_logger",
+ "futures",
  "hyper",
  "indexmap 2.2.2",
  "indoc 2.0.3",

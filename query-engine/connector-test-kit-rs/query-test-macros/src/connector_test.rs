@@ -43,6 +43,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
 
     // The shell function retains the name of the original test definition.
     let test_fn_ident = test_function.sig.ident;
+    let test_fn_ident_string = test_fn_ident.to_string();
 
     // Rename original test function to run_<orig_name>.
     let runner_fn_ident = Ident::new(&format!("run_{test_fn_ident}"), Span::call_site());
@@ -79,6 +80,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
                 &[#(#db_extensions),*],
                 #referential_override,
                 #runner_fn_ident,
+                #test_fn_ident_string
             );
         }
 

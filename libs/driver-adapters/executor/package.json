@@ -9,8 +9,11 @@
   "description": "",
   "private": true,
   "scripts": {
-    "build": "tsup ./src/testd-qe.ts ./src/demo-se.ts ./src/bench.ts --format esm --dts",
+    "build": "tsup ./src/testd-qe.ts ./src/qc-test-runner.ts ./src/qc-test-worker/worker.ts ./src/demo-se.ts ./src/bench.ts --format esm --dts",
+    "build:qe": "tsup ./src/testd-qe.ts ./src/bench.ts --format esm --dts",
+    "build:qc": "tsup ./src/qc-test-runner.ts ./src/qc-test-worker/worker.ts --format esm --dts",
     "test:qe": "node --import tsx ./src/testd-qe.ts",
+    "test:qc": "node --import tsx ./src/testd-qc.ts",
     "demo:se": "node --import tsx ./src/demo-se.ts",
     "demo:qc": "node --import tsx ./src/demo-qc.ts",
     "clean:d1": "rm -rf ../../connector-test-kit-rs/query-engine-tests/.wrangler"
@@ -27,6 +30,7 @@
     "@prisma/adapter-pg": "workspace:*",
     "@prisma/adapter-planetscale": "workspace:*",
     "@prisma/bundled-js-drivers": "workspace:*",
+    "@prisma/client-engine-runtime": "workspace:*",
     "@prisma/driver-adapter-utils": "workspace:*",
     "mitata": "0.1.11",
     "query-engine-wasm-baseline": "npm:@prisma/query-engine-wasm@0.0.19",

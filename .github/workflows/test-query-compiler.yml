@@ -1,0 +1,36 @@
+name: 'QC'
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths-ignore:
+      - '!.github/workflows/test-query-compiler.yml'
+      - '!.github/workflows/test-query-compiler-template.yml'
+      - '.github/**'
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+      - 'renovate.json'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qe-tests-with-qc:
+    strategy:
+      fail-fast: false
+      matrix:
+        adapter:
+          - name: pg
+            setup_task: dev-pg-qc
+            ignored_tests_list: query-compiler/query-engine-tests-todo/pg/skip
+            should_fail_tests_list: query-compiler/query-engine-tests-todo/pg/fail
+    name: ${{ matrix.adapter.name }}
+    uses: ./.github/workflows/test-query-compiler-template.yml
+    with:
+      setup_task: ${{ matrix.adapter.setup_task }}
+      ignored_tests_list: ${{ matrix.adapter.ignored_tests_list }}
+      should_fail_tests_list: ${{ matrix.adapter.should_fail_tests_list }}

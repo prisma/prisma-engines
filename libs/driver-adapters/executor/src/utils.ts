@@ -63,3 +63,7 @@ export const debug = (() => {
 
 // error logger
 export const err = (...args: any[]) => console.error('[nodejs] ERROR:', ...args)
+
+export function assertNever(_: never, message: string): never {
+  throw new Error(message)
+}
