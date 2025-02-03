@@ -132,7 +132,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
         }) => {
             let selected_fields = selected_fields.as_ref().map(|sf| &sf.fields);
             let query = builder
-                .build_delete(&model, record_filter.unwrap(), selected_fields)
+                .build_delete(&model, record_filter, selected_fields)
                 .map_err(TranslateError::QueryBuildFailure)?;
             if selected_fields.is_some() {
                 Expression::Unique(Box::new(Expression::Query(query)))
