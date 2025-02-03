@@ -3,8 +3,7 @@
   "action": "deleteMany",
   "query": {
     "arguments": {
-      "where": { "title": "whatever" },
-      "limit": 2
+      "where": { "title": "whatever" }
     },
     "selection": {
       "$scalars": true
