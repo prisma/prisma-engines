@@ -152,7 +152,7 @@ fn compute_aggr_join_m2m(
     // m2m join table (_ParentToChild)
     let m2m_table = rf.as_table(ctx);
     // Child colums on the m2m join table (_ParentToChild.ChildId)
-    let m2m_child_columns = rf.related_field().m2m_columns(ctx);
+    let m2m_child_column = rf.related_field().m2m_column(ctx);
     // Child table
     let child_model = rf.related_model();
     // Child primary identifiers
@@ -166,7 +166,7 @@ fn compute_aggr_join_m2m(
 
     // + SELECT _ParentToChild.ChildId FROM Child WHERE <FILTER>
     let query = Select::from_table(child_model.as_table(ctx))
-        .columns(m2m_child_columns.clone())
+        .columns([m2m_child_column.clone()])
         .so_that(conditions);
 
     let query = if let Some(joins) = joins {
@@ -176,7 +176,7 @@ fn compute_aggr_join_m2m(
     };
 
     let aggr_expr = match aggregation {
-        AggregationType::Count => count(m2m_child_columns.clone()),
+        AggregationType::Count => count(m2m_child_column.clone()),
     };
 
     // SELECT _ParentToChild.ChildId,
@@ -186,7 +186,7 @@ fn compute_aggr_join_m2m(
 
     let left_join_conditions: Vec<Expression> = child_ids
         .as_columns(ctx)
-        .map(|c| c.equals(rf.m2m_columns(ctx)).into())
+        .map(|c| c.equals(rf.m2m_column(ctx)).into())
         .collect();
 
     // SELECT _ParentToChild.ChildId, COUNT(_ParentToChild.ChildId) AS <AGGREGATOR_ALIAS> FROM Child WHERE <FILTER>
@@ -196,13 +196,9 @@ fn compute_aggr_join_m2m(
     // SELECT _ParentToChild.ChildId, COUNT(_ParentToChild.ChildId) AS <AGGREGATOR_ALIAS> FROM Child WHERE <FILTER>
     // LEFT JOIN _ParentToChild ON (Child.id = _ParentToChild.ChildId)
     // + GROUP BY _ParentToChild.ChildId
-    let query = rf
-        .related_field()
-        .m2m_columns(ctx)
-        .into_iter()
-        .fold(query, |acc, f| acc.group_by(f.clone()));
+    let query = query.group_by(rf.related_field().m2m_column(ctx));
 
-    let (left_fields, right_fields) = (parent_ids.scalar_fields(), m2m_child_columns);
+    let (left_fields, right_fields) = (parent_ids.scalar_fields(), [m2m_child_column]);
     let pairs = left_fields.zip(right_fields);
     let on_conditions: Vec<Expression> = pairs
         .map(|(a, b)| {

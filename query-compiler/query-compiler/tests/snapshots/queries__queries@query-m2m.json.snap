@@ -11,8 +11,9 @@ let @parent = unique (query «SELECT "public"."Post"."id",
                               const(BigInt(0))])
 in let @parent$id = mapField id (get @parent)
    in join (get @parent)
-      with (query «SELECT "public"."Category"."id", "public"."Category"."name"
-                   FROM "public"."_CategoryToPost" AS "t0" INNER JOIN
+      with (query «SELECT "public"."Category"."id", "public"."Category"."name",
+                   "t0"."B" AS "CategoryToPost@Post" FROM
+                   "public"."_CategoryToPost" AS "t0" INNER JOIN
                    "public"."Category" ON "t0"."A" = "public"."Category"."id"
                    WHERE "t0"."B" = $1»
-            params [var(@parent$id as Int)]) on left.(id) = right.(id) as categories
+            params [var(@parent$id as Int)]) on left.(id) = right.(CategoryToPost@Post) as categories

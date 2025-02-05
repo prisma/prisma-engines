@@ -22,16 +22,16 @@ use quaint::{
     ast::{Aliasable, Column, Comparable, ConditionTree, Joinable, Query, Row, Select, Values},
     visitor::Visitor,
 };
-use query_builder::{DbQuery, QueryBuilder};
+use query_builder::{DbQuery, QueryBuilder, RelationLink};
 use query_structure::{
-    FieldSelection, Filter, Model, ModelProjection, QueryArguments, RecordFilter, RelationField, ScalarCondition,
-    SelectionResult, WriteArgs,
+    FieldSelection, Filter, Model, ModelProjection, QueryArguments, RecordFilter, SelectionResult, WriteArgs,
 };
 
 pub use column_metadata::ColumnMetadata;
 pub use context::Context;
 pub use filter::FilterBuilder;
 pub use model_extensions::{AsColumn, AsColumns, AsTable, RelationFieldExt, SelectionResultExt};
+#[cfg(feature = "relation_joins")]
 use select::{JoinConditionExt, SelectBuilderExt};
 pub use sql_trace::SqlTraceComment;
 
@@ -82,29 +82,33 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         self.convert_query(query)
     }
 
+    #[cfg(feature = "relation_joins")]
     fn build_get_related_records(
         &self,
-        rf: RelationField,
-        link_conditions: Vec<ScalarCondition>,
+        link: RelationLink,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
+        let link_alias = link.to_string();
+        let (rf, cond) = link.into_field_and_condition();
+
         let table_alias = self.context.next_table_alias();
         let table = rf.as_table(&self.context).alias(table_alias.to_string());
 
-        let mut join_columns = rf.related_field().join_columns(&self.context);
-        let condition = join_columns
-            .by_ref()
-            .zip(rf.related_field().left_scalars())
-            .zip(link_conditions)
-            .map(|((col, link), cond)| {
-                let comparable = col.table(table_alias.to_string());
-                default_scalar_filter(comparable.into(), cond, &[link], None, &self.context)
-            })
-            .map(ConditionTree::from)
-            .reduce(|acc, next| acc.and(next))
-            .expect("should have at least one join column and condition");
-        assert_eq!(join_columns.next(), None, "should have consumed all join columns");
+        let m2m_col = rf
+            .related_field()
+            .m2m_column(&self.context)
+            .table(table_alias.to_string());
+        let mut left_scalars = rf.related_field().left_scalars();
+        let left_scalar = left_scalars
+            .pop()
+            .expect("should have at least one left scalar in m2m relation");
+        assert!(
+            left_scalars.is_empty(),
+            "should have at most one left scalar in m2m relation"
+        );
+
+        let cond = default_scalar_filter(m2m_col.clone().into(), cond, &[left_scalar], None, &self.context);
 
         let join_data = rf.related_model().as_table(&self.context).on(rf.m2m_join_conditions(
             Some(table_alias),
@@ -112,9 +116,15 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
             &self.context,
         ));
 
+        let columns = ModelProjection::from(selected_fields)
+            .as_columns(&self.context)
+            // Add an m2m column with an alias to make it possible to join it outside of this
+            // function.
+            .chain([m2m_col.alias(link_alias)]);
+
         let select = Select::from_table(table)
-            .columns(ModelProjection::from(selected_fields).as_columns(&self.context))
-            .so_that(condition)
+            .columns(columns)
+            .so_that(cond)
             .inner_join(join_data)
             .with_distinct(&query_arguments, table_alias)
             .with_ordering(&query_arguments, Some(table_alias.to_string()), &self.context)

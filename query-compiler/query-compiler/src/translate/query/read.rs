@@ -6,7 +6,7 @@ use crate::{
     TranslateError,
 };
 use itertools::Itertools;
-use query_builder::{QueryArgumentsExt, QueryBuilder};
+use query_builder::{QueryArgumentsExt, QueryBuilder, RelationLink};
 use query_core::{FilteredQuery, ReadQuery};
 use query_structure::{
     ConditionValue, FieldSelection, Filter, PrismaValue, QueryArguments, QueryMode, RelationField, ScalarCondition,
@@ -99,17 +99,11 @@ fn add_inmemory_join(
         })
         .map(|rrq| -> TranslateResult<JoinExpression> {
             let parent_field_name = rrq.parent_field.name().to_owned();
-            let parent_fields = rrq.parent_field.linking_fields();
-            let child_fields = rrq.parent_field.related_field().linking_fields();
 
-            let join_expr = parent_fields
-                .scalars()
-                .zip(child_fields.scalars())
-                .map(|(left, right)| (left.name().to_owned(), right.name().to_owned()))
-                .collect_vec();
-
-            let conditions = parent_fields
-                .scalars()
+            let conditions = rrq
+                .parent_field
+                .left_scalars()
+                .into_iter()
                 .map(|field| {
                     let placeholder = PrismaValue::placeholder(
                         format!("@parent${}", field.name()),
@@ -126,7 +120,7 @@ fn add_inmemory_join(
             let selected_fields = rrq.selected_fields.without_relations().into_virtuals_last();
             let needs_reversed_order = rrq.args.needs_reversed_order();
 
-            let mut child_query = if rrq.parent_field.relation().is_many_to_many() {
+            let (mut child_query, join_on) = if rrq.parent_field.relation().is_many_to_many() {
                 build_read_m2m_query(rrq.parent_field, conditions, rrq.args, &selected_fields, builder)?
             } else {
                 build_read_one2m_query(rrq.parent_field, conditions, rrq.args, &selected_fields, builder)?
@@ -142,7 +136,7 @@ fn add_inmemory_join(
 
             Ok(JoinExpression {
                 child: child_query,
-                on: join_expr,
+                on: join_on,
                 parent_field: parent_field_name,
             })
         })
@@ -165,15 +159,32 @@ fn add_inmemory_join(
 
 fn build_read_m2m_query(
     field: RelationField,
-    conditions: Vec<ScalarCondition>,
+    mut conditions: Vec<ScalarCondition>,
     args: QueryArguments,
     selected_fields: &FieldSelection,
     builder: &dyn QueryBuilder,
-) -> TranslateResult<Expression> {
+) -> TranslateResult<(Expression, Vec<(String, String)>)> {
+    let condition = conditions
+        .pop()
+        .expect("should have at least one condition in m2m relation");
+    assert!(
+        conditions.is_empty(),
+        "should have at most one condition in m2m relation"
+    );
+
+    let link = RelationLink::new(field, condition);
+    let join_expr = link
+        .field()
+        .linking_fields()
+        .scalars()
+        .map(|left| (left.name().to_owned(), link.to_string()))
+        .collect_vec();
+
     let query = builder
-        .build_get_related_records(field, conditions, args, selected_fields)
+        .build_get_related_records(link, args, selected_fields)
         .map_err(TranslateError::QueryBuildFailure)?;
-    Ok(Expression::Query(query))
+
+    Ok((Expression::Query(query), join_expr))
 }
 
 fn build_read_one2m_query(
@@ -182,7 +193,14 @@ fn build_read_one2m_query(
     mut args: QueryArguments,
     selected_fields: &FieldSelection,
     builder: &dyn QueryBuilder,
-) -> TranslateResult<Expression> {
+) -> TranslateResult<(Expression, Vec<(String, String)>)> {
+    let join_expr = field
+        .linking_fields()
+        .scalars()
+        .zip(field.related_field().left_scalars())
+        .map(|(left, right)| (left.name().to_owned(), right.name().to_owned()))
+        .collect_vec();
+
     // TODO: we ignore chunking for now
     let linking_scalars = field.related_field().left_scalars();
 
@@ -209,5 +227,5 @@ fn build_read_one2m_query(
     if to_one_relation {
         expr = Expression::Unique(Box::new(expr));
     }
-    Ok(expr)
+    Ok((expr, join_expr))
 }

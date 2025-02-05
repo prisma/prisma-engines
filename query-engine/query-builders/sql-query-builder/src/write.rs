@@ -284,11 +284,10 @@ pub fn create_relation_table_records(
 ) -> Query<'static> {
     let relation = field.relation();
 
-    let parent_columns: Vec<_> = field.related_field().m2m_columns(ctx);
-    let child_columns: Vec<_> = field.m2m_columns(ctx);
+    let parent_column = field.related_field().m2m_column(ctx);
+    let child_column = field.m2m_column(ctx);
 
-    let columns: Vec<_> = parent_columns.into_iter().chain(child_columns).collect();
-    let insert = Insert::multi_into(relation.as_table(ctx), columns);
+    let insert = Insert::multi_into(relation.as_table(ctx), vec![parent_column, child_column]);
 
     let insert: MultiRowInsert = child_ids.iter().fold(insert, |insert, child_id| {
         let mut values: Vec<_> = parent_id.db_values(ctx);
@@ -309,17 +308,13 @@ pub fn delete_relation_table_records(
 ) -> Delete<'static> {
     let relation = parent_field.relation();
 
-    let mut parent_columns: Vec<_> = parent_field.related_field().m2m_columns(ctx);
-    let child_columns: Vec<_> = parent_field.m2m_columns(ctx);
+    let parent_column = parent_field.related_field().m2m_column(ctx);
+    let child_column = parent_field.m2m_column(ctx);
 
     let parent_id_values = parent_id.db_values(ctx);
-    let parent_id_criteria = if parent_columns.len() > 1 {
-        Row::from(parent_columns).equals(parent_id_values)
-    } else {
-        parent_columns.pop().unwrap().equals(parent_id_values)
-    };
+    let parent_id_criteria = parent_column.equals(parent_id_values);
 
-    let child_id_criteria = super::in_conditions(&child_columns, child_ids, ctx);
+    let child_id_criteria = super::in_conditions(&[child_column], child_ids, ctx);
 
     Delete::from_table(relation.as_table(ctx))
         .so_that(parent_id_criteria.and(child_id_criteria))

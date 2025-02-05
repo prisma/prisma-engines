@@ -303,13 +303,17 @@ pub(crate) async fn get_related_m2m_record_ids(
     let relation = from_field.relation();
     let table = relation.as_table(ctx);
 
-    let from_columns: Vec<_> = from_field.related_field().m2m_columns(ctx);
-    let to_columns: Vec<_> = from_field.m2m_columns(ctx);
+    let from_column = from_field.related_field().m2m_column(ctx);
+    let to_column = from_field.m2m_column(ctx);
 
     // [DTODO] To verify: We might need chunked fetch here (too many parameters in the query).
     let select = Select::from_table(table)
-        .so_that(sql_query_builder::in_conditions(&from_columns, from_record_ids, ctx))
-        .columns(from_columns.into_iter().chain(to_columns.into_iter()));
+        .so_that(sql_query_builder::in_conditions(
+            &[from_column.clone()],
+            from_record_ids,
+            ctx,
+        ))
+        .columns([from_column, to_column]);
 
     let parent_model_id = from_field.model().primary_identifier();
     let child_model_id = from_field.related_model().primary_identifier();
