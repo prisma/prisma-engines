@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
-use query_structure::{FieldSelection, Filter, Model, PrismaValue, QueryArguments, RecordFilter, WriteArgs};
+use query_structure::{
+    FieldSelection, Filter, Model, PrismaValue, QueryArguments, RecordFilter, RelationField, ScalarCondition, WriteArgs,
+};
 use serde::Serialize;
 mod query_arguments_ext;
 
@@ -10,6 +12,15 @@ pub trait QueryBuilder {
     fn build_get_records(
         &self,
         model: &Model,
+        query_arguments: QueryArguments,
+        selected_fields: &FieldSelection,
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
+
+    /// Retrieve related records through an M2M relation.
+    fn build_get_related_records(
+        &self,
+        field: RelationField,
+        link_conditions: Vec<ScalarCondition>,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;

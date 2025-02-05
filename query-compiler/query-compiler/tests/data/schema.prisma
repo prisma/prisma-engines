@@ -14,8 +14,15 @@ model User {
 }
 
 model Post {
-  id     Int    @id @default(autoincrement())
-  title  String
-  userId Int
-  user   User   @relation(fields: [userId], references: [id])
+  id         Int        @id @default(autoincrement())
+  title      String
+  userId     Int
+  user       User       @relation(fields: [userId], references: [id])
+  categories Category[]
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String
+  posts Post[]
 }

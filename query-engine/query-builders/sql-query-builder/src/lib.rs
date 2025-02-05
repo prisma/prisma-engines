@@ -17,19 +17,22 @@ pub mod write;
 
 use std::{collections::HashMap, marker::PhantomData};
 
+use filter::default_scalar_filter;
 use quaint::{
-    ast::{Column, Comparable, ConditionTree, Query, Row, Values},
+    ast::{Aliasable, Column, Comparable, ConditionTree, Joinable, Query, Row, Select, Values},
     visitor::Visitor,
 };
 use query_builder::{DbQuery, QueryBuilder};
 use query_structure::{
-    FieldSelection, Filter, Model, ModelProjection, QueryArguments, RecordFilter, SelectionResult, WriteArgs,
+    FieldSelection, Filter, Model, ModelProjection, QueryArguments, RecordFilter, RelationField, ScalarCondition,
+    SelectionResult, WriteArgs,
 };
 
 pub use column_metadata::ColumnMetadata;
 pub use context::Context;
 pub use filter::FilterBuilder;
 pub use model_extensions::{AsColumn, AsColumns, AsTable, RelationFieldExt, SelectionResultExt};
+use select::{JoinConditionExt, SelectBuilderExt};
 pub use sql_trace::SqlTraceComment;
 
 const PARAMETER_LIMIT: usize = 2000;
@@ -77,6 +80,48 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
             &self.context,
         );
         self.convert_query(query)
+    }
+
+    fn build_get_related_records(
+        &self,
+        rf: RelationField,
+        link_conditions: Vec<ScalarCondition>,
+        query_arguments: QueryArguments,
+        selected_fields: &FieldSelection,
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
+        let table_alias = self.context.next_table_alias();
+        let table = rf.as_table(&self.context).alias(table_alias.to_string());
+
+        let mut join_columns = rf.related_field().join_columns(&self.context);
+        let condition = join_columns
+            .by_ref()
+            .zip(rf.related_field().left_scalars())
+            .zip(link_conditions)
+            .map(|((col, link), cond)| {
+                let comparable = col.table(table_alias.to_string());
+                default_scalar_filter(comparable.into(), cond, &[link], None, &self.context)
+            })
+            .map(ConditionTree::from)
+            .reduce(|acc, next| acc.and(next))
+            .expect("should have at least one join column and condition");
+        assert_eq!(join_columns.next(), None, "should have consumed all join columns");
+
+        let join_data = rf.related_model().as_table(&self.context).on(rf.m2m_join_conditions(
+            Some(table_alias),
+            None,
+            &self.context,
+        ));
+
+        let select = Select::from_table(table)
+            .columns(ModelProjection::from(selected_fields).as_columns(&self.context))
+            .so_that(condition)
+            .inner_join(join_data)
+            .with_distinct(&query_arguments, table_alias)
+            .with_ordering(&query_arguments, Some(table_alias.to_string()), &self.context)
+            .with_pagination(&query_arguments, None)
+            .with_filters(query_arguments.filter, Some(table_alias), &self.context);
+
+        self.convert_query(select)
     }
 
     fn build_create_record(

@@ -259,3 +259,13 @@ impl FilteredQuery for RelatedRecordsQuery {
         self.args.filter = Some(filter)
     }
 }
+
+impl FilteredQuery for QueryArguments {
+    fn get_filter(&mut self) -> Option<&mut Filter> {
+        self.filter.as_mut()
+    }
+
+    fn set_filter(&mut self, filter: Filter) {
+        self.filter = Some(filter)
+    }
+}
