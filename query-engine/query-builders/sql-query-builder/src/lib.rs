@@ -19,10 +19,10 @@ use std::{collections::HashMap, marker::PhantomData};
 
 use filter::default_scalar_filter;
 use quaint::{
-    ast::{Aliasable, Column, Comparable, ConditionTree, Joinable, Query, Row, Select, Values},
+    ast::{Column, Comparable, ConditionTree, Query, Row, Values},
     visitor::Visitor,
 };
-use query_builder::{DbQuery, QueryBuilder, RelationLink};
+use query_builder::{DbQuery, QueryBuilder};
 use query_structure::{
     FieldSelection, Filter, Model, ModelProjection, QueryArguments, RecordFilter, SelectionResult, WriteArgs,
 };
@@ -31,8 +31,6 @@ pub use column_metadata::ColumnMetadata;
 pub use context::Context;
 pub use filter::FilterBuilder;
 pub use model_extensions::{AsColumn, AsColumns, AsTable, RelationFieldExt, SelectionResultExt};
-#[cfg(feature = "relation_joins")]
-use select::{JoinConditionExt, SelectBuilderExt};
 pub use sql_trace::SqlTraceComment;
 
 const PARAMETER_LIMIT: usize = 2000;
@@ -85,10 +83,13 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
     #[cfg(feature = "relation_joins")]
     fn build_get_related_records(
         &self,
-        link: RelationLink,
+        link: query_builder::RelationLink,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
+        use quaint::ast::{Aliasable, Joinable, Select};
+        use select::{JoinConditionExt, SelectBuilderExt};
+
         let link_alias = link.to_string();
         let (rf, cond) = link.into_field_and_condition();
 
