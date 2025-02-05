@@ -72,7 +72,12 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
     fn translate_query(&mut self) -> TranslateResult<Expression> {
         self.graph.mark_visited(&self.node);
 
-        let children = self.process_children()?;
+        // Don't recurse into children if the current node is already a result node.
+        let children = if !self.graph.is_result_node(&self.node) {
+            self.process_children()?
+        } else {
+            Vec::new()
+        };
 
         let mut node = self.graph.pluck_node(&self.node);
 
