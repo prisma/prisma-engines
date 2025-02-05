@@ -17,7 +17,6 @@ pub mod write;
 
 use std::{collections::HashMap, marker::PhantomData};
 
-use filter::default_scalar_filter;
 use quaint::{
     ast::{Column, Comparable, ConditionTree, Query, Row, Values},
     visitor::Visitor,
@@ -87,6 +86,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
+        use filter::default_scalar_filter;
         use quaint::ast::{Aliasable, Joinable, Select};
         use select::{JoinConditionExt, SelectBuilderExt};
 
