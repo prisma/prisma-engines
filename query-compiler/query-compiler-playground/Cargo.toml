@@ -7,7 +7,7 @@ edition = "2021"
 anyhow = "1"
 serde_json.workspace = true
 
-psl.workspace = true
+psl = { workspace = true, features = ["all"]}
 query-compiler.path = "../query-compiler"
 request-handlers.path = "../../query-engine/request-handlers"
 query-core.path = "../../query-engine/core"
