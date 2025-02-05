@@ -46,6 +46,20 @@ pub trait QueryBuilder {
         limit: Option<usize>,
     ) -> Result<Vec<DbQuery>, Box<dyn std::error::Error + Send + Sync>>;
 
+    fn build_delete(
+        &self,
+        model: &Model,
+        filter: RecordFilter,
+        selected_fields: Option<&FieldSelection>,
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
+
+    fn build_deletes(
+        &self,
+        model: &Model,
+        filter: RecordFilter,
+        limit: Option<usize>,
+    ) -> Result<Vec<DbQuery>, Box<dyn std::error::Error + Send + Sync>>;
+
     fn build_raw(
         &self,
         model: Option<&Model>,

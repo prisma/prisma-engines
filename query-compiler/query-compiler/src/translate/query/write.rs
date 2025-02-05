@@ -1,5 +1,7 @@
 use query_builder::QueryBuilder;
-use query_core::{RawQuery, UpdateManyRecords, UpdateRecord, UpdateRecordWithSelection, WriteQuery};
+use query_core::{
+    DeleteManyRecords, DeleteRecord, RawQuery, UpdateManyRecords, UpdateRecord, UpdateRecordWithSelection, WriteQuery,
+};
 use query_structure::QueryArguments;
 
 use crate::{expression::Expression, translate::TranslateResult, TranslateError};
@@ -80,12 +82,13 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
         }
 
         WriteQuery::UpdateRecord(UpdateRecord::WithSelection(UpdateRecordWithSelection {
+            name: _,
             model,
             record_filter,
             args,
             selected_fields,
             // TODO: we're ignoring selection order
-            ..
+            selection_order: _,
         })) => {
             let query = if args.is_empty() {
                 // if there's no args we can just issue a read query
@@ -119,6 +122,36 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
             builder
                 .build_raw(model.as_ref(), inputs, query_type)
                 .map_err(TranslateError::QueryBuildFailure)?,
+        ),
+
+        WriteQuery::DeleteRecord(DeleteRecord {
+            name: _,
+            model,
+            record_filter,
+            selected_fields,
+        }) => {
+            let selected_fields = selected_fields.as_ref().map(|sf| &sf.fields);
+            let query = builder
+                .build_delete(&model, record_filter, selected_fields)
+                .map_err(TranslateError::QueryBuildFailure)?;
+            if selected_fields.is_some() {
+                Expression::Unique(Box::new(Expression::Query(query)))
+            } else {
+                Expression::Execute(query)
+            }
+        }
+
+        WriteQuery::DeleteManyRecords(DeleteManyRecords {
+            model,
+            record_filter,
+            limit,
+        }) => Expression::Sum(
+            builder
+                .build_deletes(&model, record_filter, limit)
+                .map_err(TranslateError::QueryBuildFailure)?
+                .into_iter()
+                .map(Expression::Execute)
+                .collect::<Vec<_>>(),
         ),
 
         other => todo!("{other:?}"),

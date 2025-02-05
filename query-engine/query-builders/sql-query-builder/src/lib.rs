@@ -110,9 +110,8 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
         match selected_fields {
             Some(selected_fields) => {
-                let selected_fields = ModelProjection::from(selected_fields);
-                let query =
-                    update::update_one_with_selection(model, record_filter, args, &selected_fields, &self.context);
+                let projection = ModelProjection::from(selected_fields);
+                let query = update::update_one_with_selection(model, record_filter, args, &projection, &self.context);
                 self.convert_query(query)
             }
             None => {
@@ -135,6 +134,36 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         let projection = selected_fields.map(ModelProjection::from);
         let query = update::update_many_from_filter(model, filter, args, projection.as_ref(), limit, &self.context);
         Ok(vec![self.convert_query(query)?])
+    }
+
+    fn build_delete(
+        &self,
+        model: &Model,
+        record_filter: RecordFilter,
+        selected_fields: Option<&FieldSelection>,
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
+        let query = if let Some(selected_fields) = selected_fields {
+            write::delete_returning(model, record_filter.filter, &selected_fields.into(), &self.context)
+        } else {
+            let mut queries = write::generate_delete_statements(model, record_filter, None, &self.context).into_iter();
+            let query = queries.next().expect("should generate at least one query");
+            assert_eq!(queries.next(), None, "should generat at most one query");
+            query
+        };
+        self.convert_query(query)
+    }
+
+    fn build_deletes(
+        &self,
+        model: &Model,
+        record_filter: RecordFilter,
+        limit: Option<usize>,
+    ) -> Result<Vec<DbQuery>, Box<dyn std::error::Error + Send + Sync>> {
+        let queries = write::generate_delete_statements(model, record_filter, limit, &self.context)
+            .into_iter()
+            .map(|q| self.convert_query(q))
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(queries)
     }
 
     fn build_raw(

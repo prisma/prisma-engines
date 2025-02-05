@@ -1,0 +1,13 @@
+{
+  "modelName": "Post",
+  "action": "deleteMany",
+  "query": {
+    "arguments": {
+      "where": { "title": "whatever" },
+      "limit": 2
+    },
+    "selection": {
+      "$scalars": true
+    }
+  }
+}

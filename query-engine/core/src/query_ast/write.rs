@@ -382,7 +382,7 @@ pub struct UpdateManyRecordsFields {
 pub struct DeleteRecord {
     pub name: String,
     pub model: Model,
-    pub record_filter: Option<RecordFilter>,
+    pub record_filter: RecordFilter,
     /// Fields of the deleted record that client has requested to return.
     /// `None` if the connector does not support returning the deleted row.
     pub selected_fields: Option<DeleteRecordFields>,
@@ -460,14 +460,11 @@ impl FilteredQuery for DeleteManyRecords {
 
 impl FilteredQuery for DeleteRecord {
     fn get_filter(&mut self) -> Option<&mut Filter> {
-        self.record_filter.as_mut().map(|f| &mut f.filter)
+        Some(&mut self.record_filter.filter)
     }
 
     fn set_filter(&mut self, filter: Filter) {
-        match self.record_filter {
-            Some(ref mut rf) => rf.filter = filter,
-            None => self.record_filter = Some(filter.into()),
-        }
+        self.record_filter.filter = filter
     }
 }
 
@@ -485,10 +482,6 @@ impl FilteredNestedMutation for UpdateManyRecords {
 
 impl FilteredNestedMutation for DeleteRecord {
     fn set_selectors(&mut self, selectors: Vec<SelectionResult>) {
-        if let Some(ref mut rf) = self.record_filter {
-            rf.selectors = Some(selectors);
-        } else {
-            self.record_filter = Some(selectors.into())
-        }
+        self.record_filter.selectors = Some(selectors);
     }
 }

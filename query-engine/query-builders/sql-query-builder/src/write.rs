@@ -1,4 +1,5 @@
 use crate::limit::wrap_with_limit_subquery_if_needed;
+use crate::FilterBuilder;
 use crate::{model_extensions::*, sql_trace::SqlTraceComment, Context};
 use itertools::Itertools;
 use quaint::ast::*;
@@ -212,12 +213,32 @@ fn projection_into_columns(
     selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true))
 }
 
+/// Generates deletes for multiple records, defined in the `RecordFilter`.
+pub fn generate_delete_statements(
+    model: &Model,
+    record_filter: RecordFilter,
+    limit: Option<usize>,
+    ctx: &Context<'_>,
+) -> Vec<Query<'static>> {
+    let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter.clone(), ctx);
+
+    // If we have selectors, then we must chunk the mutation into multiple if necessary and add the ids to the filter.
+    if let Some(selectors) = record_filter.selectors.as_deref() {
+        let slice = &selectors[..limit.unwrap_or(selectors.len()).min(selectors.len())];
+        delete_many_from_ids_and_filter(model, slice, filter_condition, limit, ctx)
+    } else {
+        vec![delete_many_from_filter(model, filter_condition, limit, ctx)]
+    }
+}
+
 pub fn delete_returning(
     model: &Model,
-    filter: ConditionTree<'static>,
+    filter: Filter,
     selected_fields: &ModelProjection,
     ctx: &Context<'_>,
 ) -> Query<'static> {
+    let filter = FilterBuilder::without_top_level_joins().visit_filter(filter, ctx);
+
     Delete::from_table(model.as_table(ctx))
         .so_that(filter)
         .returning(projection_into_columns(selected_fields, ctx))

@@ -1,0 +1,9 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/delete-one.json
+---
+unique (query «DELETE FROM "public"."Post" WHERE ("public"."Post"."id" = $1 AND
+               1=1) RETURNING "public"."Post"."id", "public"."Post"."title",
+               "public"."Post"."userId"»
+        params [const(BigInt(1))])
