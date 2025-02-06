@@ -192,6 +192,16 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         Ok(vec![self.convert_query(query)?])
     }
 
+    fn build_m2m_connect(
+        &self,
+        field: query_structure::RelationField,
+        parent_id: &SelectionResult,
+        child_ids: &[SelectionResult],
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
+        let query = write::create_relation_table_records(&field, parent_id, child_ids, &self.context);
+        self.convert_query(query)
+    }
+
     fn build_delete(
         &self,
         model: &Model,
