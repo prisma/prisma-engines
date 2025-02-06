@@ -97,11 +97,11 @@ pub trait QueryBuilder {
 #[derive(Debug)]
 pub struct RelationLink {
     field: RelationField,
-    condition: ScalarCondition,
+    condition: Option<ScalarCondition>,
 }
 
 impl RelationLink {
-    pub fn new(field: RelationField, condition: ScalarCondition) -> Self {
+    pub fn new(field: RelationField, condition: Option<ScalarCondition>) -> Self {
         Self { field, condition }
     }
 
@@ -109,7 +109,7 @@ impl RelationLink {
         &self.field
     }
 
-    pub fn into_field_and_condition(self) -> (RelationField, ScalarCondition) {
+    pub fn into_field_and_condition(self) -> (RelationField, Option<ScalarCondition>) {
         (self.field, self.condition)
     }
 }

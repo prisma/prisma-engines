@@ -18,8 +18,9 @@ pub mod write;
 use std::{collections::HashMap, marker::PhantomData};
 
 use quaint::{
-    ast::{Column, Comparable, ConditionTree, Query, Row, Values},
+    ast::{Column, Comparable, ConditionTree, Conjunctive, Decoratable, Delete, Query, Row, Values},
     visitor::Visitor,
+    Value, ValueType,
 };
 use query_builder::{DbQuery, QueryBuilder};
 use query_structure::{
@@ -92,15 +93,22 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         use select::{JoinConditionExt, SelectBuilderExt};
 
         let link_alias = link.to_string();
-        let (rf, cond) = link.into_field_and_condition();
+        let (rf, filter) = link.into_field_and_condition();
 
-        let table_alias = self.context.next_table_alias();
-        let table = rf.as_table(&self.context).alias(table_alias.to_string());
+        let m2m_alias = self.context.next_table_alias();
+        let m2m_table = rf.as_table(&self.context).alias(m2m_alias.to_string());
+
+        let related_alias = self.context.next_table_alias();
+        let related_table = rf
+            .related_model()
+            .as_table(&self.context)
+            .alias(related_alias.to_string());
 
         let m2m_col = rf
             .related_field()
             .m2m_column(&self.context)
-            .table(table_alias.to_string());
+            .table(m2m_alias.to_string());
+
         let mut left_scalars = rf.related_field().left_scalars();
         let left_scalar = left_scalars
             .pop()
@@ -109,29 +117,31 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
             left_scalars.is_empty(),
             "should have at most one left scalar in m2m relation"
         );
-
-        let cond = default_scalar_filter(m2m_col.clone().into(), cond, &[left_scalar], None, &self.context);
-
-        let join_data = rf.related_model().as_table(&self.context).on(rf.m2m_join_conditions(
-            Some(table_alias),
-            None,
-            &self.context,
-        ));
+        let filter =
+            filter.map(|cond| default_scalar_filter(m2m_col.clone().into(), cond, &[left_scalar], None, &self.context));
 
         let columns = ModelProjection::from(selected_fields)
             .as_columns(&self.context)
+            .map(|col| col.table(related_alias.to_string()))
             // Add an m2m column with an alias to make it possible to join it outside of this
             // function.
             .chain([m2m_col.alias(link_alias)]);
 
-        let select = Select::from_table(table)
+        let join_condition = rf.m2m_join_conditions(Some(m2m_alias), Some(related_alias), &self.context);
+
+        let select = Select::from_table(m2m_table)
             .columns(columns)
-            .so_that(cond)
-            .inner_join(join_data)
-            .with_distinct(&query_arguments, table_alias)
-            .with_ordering(&query_arguments, Some(table_alias.to_string()), &self.context)
+            .inner_join(related_table.on(join_condition))
+            .with_distinct(&query_arguments, related_alias)
+            .with_ordering(&query_arguments, Some(related_alias.to_string()), &self.context)
             .with_pagination(&query_arguments, None)
-            .with_filters(query_arguments.filter, Some(table_alias), &self.context);
+            .with_filters(query_arguments.filter, Some(related_alias), &self.context);
+
+        let select = if let Some(cond) = filter {
+            select.and_where(cond)
+        } else {
+            select
+        };
 
         self.convert_query(select)
     }
@@ -209,7 +219,37 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
-        let query = write::delete_relation_table_records(&field, parent_id, child_ids, &self.context);
+        let relation = field.relation();
+
+        let parent_column = field.related_field().m2m_column(&self.context);
+        let child_column = field.m2m_column(&self.context);
+
+        let parent_id_values = parent_id.db_values(&self.context);
+        let parent_id_criteria = parent_column.equals(parent_id_values);
+
+        let values = child_ids
+            .iter()
+            .map(|id| id.db_values(&self.context))
+            .collect::<Vec<_>>();
+
+        let child_id_criteria = match values.split_first().map(|(fst, rem)| (&fst[..], rem)) {
+            Some((
+                [val @ Value {
+                    typed: ValueType::Var(_, _),
+                    ..
+                }],
+                [],
+            )) => child_column.in_selection(val.clone().decorate(
+                Some("prisma-comma-repeatable-start"),
+                Some("prisma-comma-repeatable-end"),
+            )),
+            _ => child_column.in_selection(values),
+        };
+
+        let query = Delete::from_table(relation.as_table(&self.context))
+            .so_that(parent_id_criteria.and(child_id_criteria))
+            .add_traceparent(self.context.traceparent);
+
         self.convert_query(query)
     }
 
