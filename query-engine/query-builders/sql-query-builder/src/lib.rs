@@ -23,7 +23,8 @@ use quaint::{
 };
 use query_builder::{DbQuery, QueryBuilder};
 use query_structure::{
-    FieldSelection, Filter, Model, ModelProjection, QueryArguments, RecordFilter, SelectionResult, WriteArgs,
+    FieldSelection, Filter, Model, ModelProjection, QueryArguments, RecordFilter, RelationField, SelectionResult,
+    WriteArgs,
 };
 
 pub use column_metadata::ColumnMetadata;
@@ -194,11 +195,21 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
 
     fn build_m2m_connect(
         &self,
-        field: query_structure::RelationField,
+        field: RelationField,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
         let query = write::create_relation_table_records(&field, parent_id, child_ids, &self.context);
+        self.convert_query(query)
+    }
+
+    fn build_m2m_disconnect(
+        &self,
+        field: RelationField,
+        parent_id: &SelectionResult,
+        child_ids: &[SelectionResult],
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
+        let query = write::delete_relation_table_records(&field, parent_id, child_ids, &self.context);
         self.convert_query(query)
     }
 
