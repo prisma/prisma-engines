@@ -6,18 +6,18 @@ input_file: query-compiler/query-compiler/tests/data/create-nested-create.json
 let 0 = unique (query «INSERT INTO "public"."User" ("email") VALUES ($1)
                        RETURNING "public"."User"."id"»
                 params [const(String("user.1737556027349@prisma.io"))])
-in let 0 = mapField id (get 0)
+in let 0$id = mapField id (get 0)
    in sum (execute «INSERT INTO "public"."Post" ("title","userId") VALUES
                     ($1,$2), ($3,$4)»
-           params [const(String("How to make an omelette")), var(0 as Int),
-                   const(String("How to eat an omelette")), var(0 as Int)]);
-   let 2 = let 0 = mapField id (get 0)
+           params [const(String("How to make an omelette")), var(0$id as Int),
+                   const(String("How to eat an omelette")), var(0$id as Int)]);
+   let 2 = let 0$id = mapField id (get 0)
        in let @parent = unique (query «SELECT "public"."User"."id",
                                        "public"."User"."email" FROM
                                        "public"."User" WHERE
                                        "public"."User"."id" = $1 LIMIT $2 OFFSET
                                        $3»
-                                params [var(0 as Int), const(BigInt(1)),
+                                params [var(0$id as Int), const(BigInt(1)),
                                         const(BigInt(0))])
           in let @parent$id = mapField id (get @parent)
              in join (get @parent)
