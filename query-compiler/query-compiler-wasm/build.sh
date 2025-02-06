@@ -54,7 +54,7 @@ fi
 
 
 build() {
-    echo "ℹ️  Note that query-compiler compiled to WASM uses a different Rust toolchain"
+    echo "ℹ️  Current Rust toolchain version:"
     cargo --version
 
     local CONNECTOR="$1"
