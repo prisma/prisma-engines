@@ -1,6 +1,8 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt};
 
-use query_structure::{FieldSelection, Filter, Model, PrismaValue, QueryArguments, RecordFilter, WriteArgs};
+use query_structure::{
+    FieldSelection, Filter, Model, PrismaValue, QueryArguments, RecordFilter, RelationField, ScalarCondition, WriteArgs,
+};
 use serde::Serialize;
 mod query_arguments_ext;
 
@@ -10,6 +12,15 @@ pub trait QueryBuilder {
     fn build_get_records(
         &self,
         model: &Model,
+        query_arguments: QueryArguments,
+        selected_fields: &FieldSelection,
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
+
+    /// Retrieve related records through an M2M relation.
+    #[cfg(feature = "relation_joins")]
+    fn build_get_related_records(
+        &self,
+        link: RelationLink,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
@@ -66,6 +77,32 @@ pub trait QueryBuilder {
         inputs: HashMap<String, PrismaValue>,
         query_type: Option<String>,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
+}
+
+#[derive(Debug)]
+pub struct RelationLink {
+    field: RelationField,
+    condition: ScalarCondition,
+}
+
+impl RelationLink {
+    pub fn new(field: RelationField, condition: ScalarCondition) -> Self {
+        Self { field, condition }
+    }
+
+    pub fn field(&self) -> &RelationField {
+        &self.field
+    }
+
+    pub fn into_field_and_condition(self) -> (RelationField, ScalarCondition) {
+        (self.field, self.condition)
+    }
+}
+
+impl fmt::Display for RelationLink {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}@{}", self.field.relation().name(), self.field.model().name())
+    }
 }
 
 #[derive(Debug, Serialize)]

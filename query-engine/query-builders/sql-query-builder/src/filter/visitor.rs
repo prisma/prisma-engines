@@ -818,7 +818,7 @@ fn with_json_type_filter(
     }
 }
 
-fn default_scalar_filter(
+pub(crate) fn default_scalar_filter(
     comparable: Expression<'static>,
     cond: ScalarCondition,
     fields: &[ScalarFieldRef],

@@ -79,6 +79,62 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         self.convert_query(query)
     }
 
+    #[cfg(feature = "relation_joins")]
+    fn build_get_related_records(
+        &self,
+        link: query_builder::RelationLink,
+        query_arguments: QueryArguments,
+        selected_fields: &FieldSelection,
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
+        use filter::default_scalar_filter;
+        use quaint::ast::{Aliasable, Joinable, Select};
+        use select::{JoinConditionExt, SelectBuilderExt};
+
+        let link_alias = link.to_string();
+        let (rf, cond) = link.into_field_and_condition();
+
+        let table_alias = self.context.next_table_alias();
+        let table = rf.as_table(&self.context).alias(table_alias.to_string());
+
+        let m2m_col = rf
+            .related_field()
+            .m2m_column(&self.context)
+            .table(table_alias.to_string());
+        let mut left_scalars = rf.related_field().left_scalars();
+        let left_scalar = left_scalars
+            .pop()
+            .expect("should have at least one left scalar in m2m relation");
+        assert!(
+            left_scalars.is_empty(),
+            "should have at most one left scalar in m2m relation"
+        );
+
+        let cond = default_scalar_filter(m2m_col.clone().into(), cond, &[left_scalar], None, &self.context);
+
+        let join_data = rf.related_model().as_table(&self.context).on(rf.m2m_join_conditions(
+            Some(table_alias),
+            None,
+            &self.context,
+        ));
+
+        let columns = ModelProjection::from(selected_fields)
+            .as_columns(&self.context)
+            // Add an m2m column with an alias to make it possible to join it outside of this
+            // function.
+            .chain([m2m_col.alias(link_alias)]);
+
+        let select = Select::from_table(table)
+            .columns(columns)
+            .so_that(cond)
+            .inner_join(join_data)
+            .with_distinct(&query_arguments, table_alias)
+            .with_ordering(&query_arguments, Some(table_alias.to_string()), &self.context)
+            .with_pagination(&query_arguments, None)
+            .with_filters(query_arguments.filter, Some(table_alias), &self.context);
+
+        self.convert_query(select)
+    }
+
     fn build_create_record(
         &self,
         model: &Model,

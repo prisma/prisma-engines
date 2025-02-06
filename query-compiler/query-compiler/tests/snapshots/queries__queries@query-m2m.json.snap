@@ -1,0 +1,19 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/query-m2m.json
+---
+let @parent = unique (query «SELECT "public"."Post"."id",
+                             "public"."Post"."title", "public"."Post"."userId"
+                             FROM "public"."Post" WHERE ("public"."Post"."id" =
+                             $1 AND 1=1) LIMIT $2 OFFSET $3»
+                      params [const(BigInt(1)), const(BigInt(1)),
+                              const(BigInt(0))])
+in let @parent$id = mapField id (get @parent)
+   in join (get @parent)
+      with (query «SELECT "public"."Category"."id", "public"."Category"."name",
+                   "t0"."B" AS "CategoryToPost@Post" FROM
+                   "public"."_CategoryToPost" AS "t0" INNER JOIN
+                   "public"."Category" ON "t0"."A" = "public"."Category"."id"
+                   WHERE "t0"."B" = $1»
+            params [var(@parent$id as Int)]) on left.(id) = right.(CategoryToPost@Post) as categories

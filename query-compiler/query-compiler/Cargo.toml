@@ -8,7 +8,7 @@ query-structure = { path = "../../query-engine/query-structure" }
 query-builder = { path = "../../query-engine/query-builders/query-builder" }
 query-core = { path = "../../query-engine/core" }
 # we should drop sql-query-builder and quaint once we properly abstract over Mongo
-sql-query-builder = { path = "../../query-engine/query-builders/sql-query-builder" }
+sql-query-builder = { path = "../../query-engine/query-builders/sql-query-builder", features = ["relation_joins"]}
 quaint = { path = "../../quaint" }
 
 thiserror.workspace = true

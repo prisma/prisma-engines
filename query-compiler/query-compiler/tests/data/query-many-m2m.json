@@ -1,0 +1,17 @@
+{
+  "modelName": "Post",
+  "action": "findMany",
+  "query": {
+    "arguments": {
+      "where": {}
+    },
+    "selection": {
+      "$composites": true,
+      "$scalars": true,
+      "categories": {
+        "arguments": {},
+        "selection": { "$composites": true, "$scalars": true }
+      }
+    }
+  }
+}
