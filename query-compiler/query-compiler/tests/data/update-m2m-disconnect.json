@@ -4,7 +4,7 @@
   "query": {
     "arguments": {
       "where": { "id": 1 },
-      "data": { "categories": { "connect": [{ "id": 1 }] } }
+      "data": { "categories": { "disconnect": [{ "id": 1 }] } }
     },
     "selection": {
       "$composites": true,

@@ -1,9 +1,7 @@
 ---
 source: query-compiler/query-compiler/tests/queries.rs
-assertion_line: 46
 expression: pretty
-input_file: query-compiler/query-compiler/tests/data/update-m2m-disconnect.json
-snapshot_kind: text
+input_file: query-compiler/query-compiler/tests/data/update-m2m-connect.json
 ---
 let 0 = unique (query «SELECT "public"."Post"."id", "public"."Post"."title",
                        "public"."Post"."userId" FROM "public"."Post" WHERE
