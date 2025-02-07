@@ -20,7 +20,8 @@ pkgs.mkShell {
     graphviz
     jq
     llvmPackages_latest.bintools
-    nodejs_22
+    nodejs
+    nodePackages.prettier
     pnpm_9
     rustup
     wabt
