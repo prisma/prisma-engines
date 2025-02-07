@@ -207,23 +207,17 @@ fn build_read_one2m_query(
     selected_fields: &FieldSelection,
     builder: &dyn QueryBuilder,
 ) -> TranslateResult<(Expression, JoinFields)> {
-    let join_fields = field
-        .related_field()
-        .left_scalars()
-        .into_iter()
-        .map(|sf| sf.name().to_owned())
-        .collect();
+    let related_scalars = field.related_field().left_scalars();
+    let join_fields = related_scalars.iter().map(|sf| sf.name().to_owned()).collect();
 
     // TODO: we ignore chunking for now
-    let linking_scalars = field.related_field().left_scalars();
-
     if let Some(conditions) = conditions {
         assert_eq!(
-            linking_scalars.len(),
+            related_scalars.len(),
             conditions.len(),
             "linking fields should match conditions"
         );
-        for (condition, child_field) in conditions.into_iter().zip(linking_scalars) {
+        for (condition, child_field) in conditions.into_iter().zip(related_scalars) {
             args.add_filter(Filter::Scalar(ScalarFilter {
                 condition,
                 projection: ScalarProjection::Single(child_field.clone()),
