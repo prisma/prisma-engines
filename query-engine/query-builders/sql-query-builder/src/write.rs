@@ -100,6 +100,24 @@ pub fn create_records_nonempty(
     insert
 }
 
+/// `INSERT` with `ON CONFLICT DO UPDATE` statement.
+pub fn native_upsert(
+    model: &Model,
+    filter: Filter,
+    create_args: WriteArgs,
+    update_args: WriteArgs,
+    selected_fields: &ModelProjection,
+    unique_constraints: &[ScalarFieldRef],
+    ctx: &Context<'_>,
+) -> Insert<'static> {
+    let where_condition = FilterBuilder::without_top_level_joins().visit_filter(filter, ctx);
+    let update = build_update_and_set_query(model, update_args, None, ctx).so_that(where_condition);
+    let insert = create_record(model, create_args, selected_fields, ctx);
+
+    let constraints: Vec<_> = unique_constraints.as_columns(ctx).collect();
+    insert.on_conflict(OnConflict::Update(update, constraints))
+}
+
 /// `INSERT` empty records statement.
 pub fn create_records_empty(
     model: &Model,
