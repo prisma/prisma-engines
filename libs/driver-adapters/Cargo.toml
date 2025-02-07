@@ -20,6 +20,7 @@ workspace = true
 async-trait.workspace = true
 futures.workspace = true
 once_cell = "1.15"
+panic-utils.path = "../../libs/panic-utils"
 prisma-metrics.path = "../../libs/metrics"
 serde.workspace = true
 serde_json.workspace = true

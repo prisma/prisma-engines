@@ -46,12 +46,7 @@ async fn main() {
 
 fn set_panic_hook() {
     std::panic::set_hook(Box::new(move |panic_info| {
-        let message = panic_info
-            .payload()
-            .downcast_ref::<&str>()
-            .copied()
-            .or_else(|| panic_info.payload().downcast_ref::<String>().map(|s| s.as_str()))
-            .unwrap_or("<unknown panic>");
+        let message = panic_utils::downcast_ref_to_string(panic_info.payload()).unwrap_or("<unknown panic>");
 
         let location = panic_info
             .location()

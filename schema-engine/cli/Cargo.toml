@@ -11,6 +11,7 @@ schema-core = { path = "../core" }
 user-facing-errors = { path = "../../libs/user-facing-errors", features = [
     "all-native",
 ] }
+panic-utils = { path = "../../libs/panic-utils" }
 
 backtrace = "0.3.59"
 base64 = "0.13"

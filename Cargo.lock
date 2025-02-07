@@ -1240,6 +1240,7 @@ dependencies = [
  "napi",
  "napi-derive",
  "once_cell",
+ "panic-utils",
  "pin-project",
  "prisma-metrics",
  "quaint",
@@ -3117,6 +3118,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
 
 [[package]]
+name = "panic-utils"
+version = "0.1.0"
+
+[[package]]
 name = "parking"
 version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3864,6 +3869,7 @@ dependencies = [
  "indexmap 2.2.2",
  "indoc 2.0.3",
  "mongodb-query-connector",
+ "panic-utils",
  "prisma-metrics",
  "psl",
  "quaint",
@@ -4090,6 +4096,7 @@ dependencies = [
  "log",
  "nom",
  "once_cell",
+ "panic-utils",
  "parse-hyperlinks",
  "prisma-metrics",
  "psl",
@@ -4720,6 +4727,7 @@ dependencies = [
  "expect-test",
  "indoc 2.0.3",
  "jsonrpc-core",
+ "panic-utils",
  "quaint",
  "schema-connector",
  "schema-core",
@@ -5197,6 +5205,7 @@ dependencies = [
  "futures",
  "itertools 0.12.0",
  "once_cell",
+ "panic-utils",
  "prisma-value",
  "psl",
  "quaint",
@@ -6163,6 +6172,7 @@ dependencies = [
  "backtrace",
  "indoc 2.0.3",
  "itertools 0.12.0",
+ "panic-utils",
  "quaint",
  "serde",
  "serde_json",

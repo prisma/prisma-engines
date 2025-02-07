@@ -122,12 +122,7 @@ impl Error {
     /// Construct a new UnknownError from a [`PanicHookInfo`] in a panic hook. [`UnknownError`]s
     /// created with this constructor will have a proper, useful backtrace.
     pub fn new_in_panic_hook(panic_info: &std::panic::PanicHookInfo<'_>) -> Self {
-        let message = panic_info
-            .payload()
-            .downcast_ref::<&str>()
-            .map(|s| -> String { (*s).to_owned() })
-            .or_else(|| panic_info.payload().downcast_ref::<String>().map(|s| s.to_owned()))
-            .unwrap_or_else(|| "<unknown panic>".to_owned());
+        let message = panic_utils::downcast_ref_to_string(panic_info.payload()).unwrap_or("<unknown panic>");
 
         let backtrace = Some(format!("{:?}", backtrace::Backtrace::new()));
         let location = panic_info

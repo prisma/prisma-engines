@@ -28,7 +28,7 @@ impl ExecutorProcess {
             Ok(Ok(process)) => process,
             Ok(Err(err)) => exit_with_message(1, &format!("Failed to start node process. Details: {err}")),
             Err(err) => {
-                let err = err.downcast_ref::<String>().map(ToOwned::to_owned).unwrap_or_default();
+                let err = panic_utils::downcast_box_to_string(err).unwrap_or_default();
                 exit_with_message(1, &format!("Panic while trying to start node process.\nDetails: {err}"))
             }
         }
@@ -50,7 +50,7 @@ impl ExecutorProcess {
                     1,
                     &format!(
                         "rpc thread panicked with: {}",
-                        e.downcast::<String>().unwrap_or_default()
+                        panic_utils::downcast_box_to_string(e).unwrap_or_default()
                     ),
                 );
             }

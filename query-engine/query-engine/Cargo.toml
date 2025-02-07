@@ -30,6 +30,7 @@ hyper = { version = "0.14", features = ["server", "http1", "http2", "runtime"] }
 tracing.workspace = true
 tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
 prisma-metrics.path = "../../libs/metrics"
+panic-utils.path = "../../libs/panic-utils"
 
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 telemetry = { path = "../../libs/telemetry" }
