@@ -2,14 +2,6 @@
   pkgs ? import <nixpkgs> { },
 }:
 
-let
-  wasm-bindgen-cli = pkgs.wasm-bindgen-cli.override {
-    version = "0.2.93";
-    hash = "sha256-DDdu5mM3gneraM85pAepBXWn3TMofarVR4NbjMdz3r0=";
-    cargoHash = "sha256-birrg+XABBHHKJxfTKAMSlmTVYLmnmqMDfRnmG6g/YQ=";
-  };
-
-in
 pkgs.mkShell {
   packages = with pkgs; [
     binaryen
@@ -20,11 +12,12 @@ pkgs.mkShell {
     graphviz
     jq
     llvmPackages_latest.bintools
-    nodejs_22
+    nodejs
+    nodePackages.prettier
     pnpm_9
     rustup
     wabt
-    wasm-bindgen-cli
+    wasm-bindgen-cli_0_2_93
     wasm-pack
   ];
 
