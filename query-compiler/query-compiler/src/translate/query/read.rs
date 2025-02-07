@@ -7,7 +7,7 @@ use crate::{
 };
 use itertools::Itertools;
 use query_builder::{QueryArgumentsExt, QueryBuilder, RelationLink};
-use query_core::{FilteredQuery, ReadQuery};
+use query_core::{FilteredQuery, ReadQuery, RelatedRecordsQuery};
 use query_structure::{
     ConditionValue, FieldSelection, Filter, PrismaValue, QueryArguments, QueryMode, RelationField, ScalarCondition,
     ScalarFilter, ScalarProjection,
@@ -61,7 +61,10 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
             }
         }
 
-        ReadQuery::RelatedRecordsQuery(_) => unreachable!("related records query should not be at the top-level"),
+        ReadQuery::RelatedRecordsQuery(rrq) => {
+            let (expr, _) = build_read_related_records(rrq, None, builder)?;
+            expr
+        }
 
         _ => todo!(),
     })
@@ -99,7 +102,7 @@ fn add_inmemory_join(
         })
         .map(|rrq| -> TranslateResult<JoinExpression> {
             let parent_field_name = rrq.parent_field.name().to_owned();
-
+            let left_scalars = rrq.parent_field.left_scalars();
             let conditions = rrq
                 .parent_field
                 .left_scalars()
@@ -116,27 +119,15 @@ fn add_inmemory_join(
                     }
                 })
                 .collect();
-
-            let selected_fields = rrq.selected_fields.without_relations().into_virtuals_last();
-            let needs_reversed_order = rrq.args.needs_reversed_order();
-
-            let (mut child_query, join_on) = if rrq.parent_field.relation().is_many_to_many() {
-                build_read_m2m_query(rrq.parent_field, conditions, rrq.args, &selected_fields, builder)?
-            } else {
-                build_read_one2m_query(rrq.parent_field, conditions, rrq.args, &selected_fields, builder)?
-            };
-
-            if needs_reversed_order {
-                child_query = Expression::Reverse(Box::new(child_query));
-            }
-
-            if !rrq.nested.is_empty() {
-                child_query = add_inmemory_join(child_query, rrq.nested, builder)?;
-            };
+            let (child, join_fields) = build_read_related_records(rrq, Some(conditions), builder)?;
 
             Ok(JoinExpression {
-                child: child_query,
-                on: join_on,
+                child,
+                on: left_scalars
+                    .into_iter()
+                    .map(|sf| sf.name().to_owned())
+                    .zip(join_fields)
+                    .collect(),
                 parent_field: parent_field_name,
             })
         })
@@ -157,64 +148,82 @@ fn add_inmemory_join(
     })
 }
 
+fn build_read_related_records(
+    rrq: RelatedRecordsQuery,
+    conditions: Option<Vec<ScalarCondition>>,
+    builder: &dyn QueryBuilder,
+) -> TranslateResult<(Expression, JoinFields)> {
+    let selected_fields = rrq.selected_fields.without_relations().into_virtuals_last();
+    let needs_reversed_order = rrq.args.needs_reversed_order();
+
+    let (mut child_query, join_on) = if rrq.parent_field.relation().is_many_to_many() {
+        build_read_m2m_query(rrq.parent_field, conditions, rrq.args, &selected_fields, builder)?
+    } else {
+        build_read_one2m_query(rrq.parent_field, conditions, rrq.args, &selected_fields, builder)?
+    };
+
+    if needs_reversed_order {
+        child_query = Expression::Reverse(Box::new(child_query));
+    }
+
+    if !rrq.nested.is_empty() {
+        child_query = add_inmemory_join(child_query, rrq.nested, builder)?;
+    };
+    Ok((child_query, join_on))
+}
+
 fn build_read_m2m_query(
     field: RelationField,
-    mut conditions: Vec<ScalarCondition>,
+    conditions: Option<Vec<ScalarCondition>>,
     args: QueryArguments,
     selected_fields: &FieldSelection,
     builder: &dyn QueryBuilder,
-) -> TranslateResult<(Expression, Vec<(String, String)>)> {
-    let condition = conditions
-        .pop()
-        .expect("should have at least one condition in m2m relation");
-    assert!(
-        conditions.is_empty(),
-        "should have at most one condition in m2m relation"
-    );
+) -> TranslateResult<(Expression, JoinFields)> {
+    let condition = conditions.map(|mut conditions| {
+        let condition = conditions
+            .pop()
+            .expect("should have at least one condition in m2m relation");
+        assert!(
+            conditions.is_empty(),
+            "should have at most one condition in m2m relation"
+        );
+        condition
+    });
 
     let link = RelationLink::new(field, condition);
-    let join_expr = link
-        .field()
-        .linking_fields()
-        .scalars()
-        .map(|left| (left.name().to_owned(), link.to_string()))
-        .collect_vec();
+    let link_name = link.to_string();
 
     let query = builder
         .build_get_related_records(link, args, selected_fields)
         .map_err(TranslateError::QueryBuildFailure)?;
 
-    Ok((Expression::Query(query), join_expr))
+    Ok((Expression::Query(query), JoinFields(vec![link_name])))
 }
 
 fn build_read_one2m_query(
     field: RelationField,
-    conditions: Vec<ScalarCondition>,
+    conditions: Option<Vec<ScalarCondition>>,
     mut args: QueryArguments,
     selected_fields: &FieldSelection,
     builder: &dyn QueryBuilder,
-) -> TranslateResult<(Expression, Vec<(String, String)>)> {
-    let join_expr = field
-        .linking_fields()
-        .scalars()
-        .zip(field.related_field().left_scalars())
-        .map(|(left, right)| (left.name().to_owned(), right.name().to_owned()))
-        .collect_vec();
+) -> TranslateResult<(Expression, JoinFields)> {
+    let related_scalars = field.related_field().left_scalars();
+    let join_fields = related_scalars.iter().map(|sf| sf.name().to_owned()).collect();
 
     // TODO: we ignore chunking for now
-    let linking_scalars = field.related_field().left_scalars();
-
-    assert_eq!(
-        linking_scalars.len(),
-        conditions.len(),
-        "linking fields should match conditions"
-    );
-    for (condition, child_field) in conditions.into_iter().zip(linking_scalars) {
-        args.add_filter(Filter::Scalar(ScalarFilter {
-            condition,
-            projection: ScalarProjection::Single(child_field.clone()),
-            mode: QueryMode::Default,
-        }));
+    if let Some(conditions) = conditions {
+        assert_eq!(
+            related_scalars.len(),
+            conditions.len(),
+            "linking fields should match conditions"
+        );
+        for (condition, child_field) in conditions.into_iter().zip(related_scalars) {
+            args.add_filter(Filter::Scalar(ScalarFilter {
+                condition,
+                projection: ScalarProjection::Single(child_field.clone()),
+                mode: QueryMode::Default,
+            }));
+        }
     }
 
     let to_one_relation = !field.arity().is_list();
@@ -227,5 +236,16 @@ fn build_read_one2m_query(
     if to_one_relation {
         expr = Expression::Unique(Box::new(expr));
     }
-    Ok((expr, join_expr))
+    Ok((expr, JoinFields(join_fields)))
+}
+
+struct JoinFields(Vec<String>);
+
+impl IntoIterator for JoinFields {
+    type Item = String;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
 }

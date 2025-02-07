@@ -4,7 +4,7 @@ use itertools::Itertools;
 use query::translate_query;
 use query_builder::QueryBuilder;
 use query_core::{EdgeRef, Node, NodeRef, Query, QueryGraph, QueryGraphBuilderError, QueryGraphDependency};
-use query_structure::{PlaceholderType, PrismaValue, SelectionResult};
+use query_structure::{PlaceholderType, PrismaValue, SelectedField, SelectionResult};
 use thiserror::Error;
 
 use super::expression::{Binding, Expression};
@@ -91,7 +91,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
                             (
                                 field.clone(),
                                 PrismaValue::Placeholder {
-                                    name: self.graph.edge_source(edge).id(),
+                                    name: generate_projected_dependency_name(self.graph.edge_source(edge), field),
                                     r#type: PlaceholderType::Any,
                                 },
                             )
@@ -152,7 +152,7 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         // doesn't belong into results, and is executed before all result scopes.
         let mut expressions: Vec<Expression> = child_pairs
             .into_iter()
-            .map(|(edge, node)| self.process_child_with_dependency(edge, node))
+            .map(|(_, node)| self.process_child_with_dependencies(node))
             .collect::<Result<Vec<_>, _>>()?;
 
         // Fold result scopes into one expression.
@@ -169,9 +169,9 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         // if not, we can separate them with a getfirstnonempty
         let bindings = result_subgraphs
             .into_iter()
-            .map(|(edge, node)| {
+            .map(|(_, node)| {
                 let name = node.id();
-                let expr = self.process_child_with_dependency(edge, node)?;
+                let expr = self.process_child_with_dependencies(node)?;
                 Ok(Binding { name, expr })
             })
             .collect::<TranslateResult<Vec<_>>>()?;
@@ -199,39 +199,53 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
         }
     }
 
-    fn process_child_with_dependency(&mut self, edge: EdgeRef, node: NodeRef) -> TranslateResult<Expression> {
-        let edge_content = self.graph.edge_content(&edge);
-        let field = if let Some(QueryGraphDependency::ProjectedDataDependency(selection, _)) = edge_content {
-            let mut fields = selection.selections();
-            if let Some(first) = fields.next().filter(|_| fields.len() == 0) {
-                Some(first.db_name().to_string())
-            } else {
-                // we need to handle MapField with multiple fields?
-                todo!()
-            }
-        } else {
-            None
-        };
+    fn process_child_with_dependencies(&mut self, node: NodeRef) -> TranslateResult<Expression> {
+        let bindings = self
+            .graph
+            .incoming_edges(&node)
+            .into_iter()
+            .filter_map(|edge| {
+                let field = if let Some(QueryGraphDependency::ProjectedDataDependency(selection, _)) =
+                    self.graph.edge_content(&edge)
+                {
+                    let mut fields = selection.selections();
+                    if let Some(first) = fields.next().filter(|_| fields.len() == 0) {
+                        first
+                    } else {
+                        // we need to handle MapField with multiple fields?
+                        todo!()
+                    }
+                } else {
+                    return None;
+                };
+
+                let source = self.graph.edge_source(&edge);
+                Some(Binding::new(
+                    generate_projected_dependency_name(source, field),
+                    Expression::MapField {
+                        field: field.prisma_name().into_owned(),
+                        records: Box::new(Expression::Get { name: source.id() }),
+                    },
+                ))
+            })
+            .collect::<Vec<_>>();
 
         // translate plucks the edges coming into node, we need to avoid accessing it afterwards
         let edges = self.graph.incoming_edges(&node);
-        let source = self.graph.edge_source(&edge);
         let expr = NodeTranslator::new(self.graph, node, &edges, self.query_builder).translate()?;
 
         // we insert a MapField expression if the edge was a projected data dependency
-        if let Some(field) = field {
+        if !bindings.is_empty() {
             Ok(Expression::Let {
-                bindings: vec![Binding::new(
-                    source.id(),
-                    Expression::MapField {
-                        field,
-                        records: Box::new(Expression::Get { name: source.id() }),
-                    },
-                )],
+                bindings,
                 expr: Box::new(expr),
             })
         } else {
             Ok(expr)
         }
     }
+}
+
+fn generate_projected_dependency_name(source: NodeRef, field: &SelectedField) -> String {
+    format!("{}${}", source.id(), field.prisma_name())
 }

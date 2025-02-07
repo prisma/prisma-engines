@@ -1,7 +1,8 @@
 use std::{collections::HashMap, fmt};
 
 use query_structure::{
-    FieldSelection, Filter, Model, PrismaValue, QueryArguments, RecordFilter, RelationField, ScalarCondition, WriteArgs,
+    FieldSelection, Filter, Model, PrismaValue, QueryArguments, RecordFilter, RelationField, ScalarCondition,
+    SelectionResult, WriteArgs,
 };
 use serde::Serialize;
 mod query_arguments_ext;
@@ -57,6 +58,20 @@ pub trait QueryBuilder {
         limit: Option<usize>,
     ) -> Result<Vec<DbQuery>, Box<dyn std::error::Error + Send + Sync>>;
 
+    fn build_m2m_connect(
+        &self,
+        field: RelationField,
+        parent_id: &SelectionResult,
+        child_ids: &[SelectionResult],
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
+
+    fn build_m2m_disconnect(
+        &self,
+        field: RelationField,
+        parent_id: &SelectionResult,
+        child_ids: &[SelectionResult],
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
+
     fn build_delete(
         &self,
         model: &Model,
@@ -82,11 +97,11 @@ pub trait QueryBuilder {
 #[derive(Debug)]
 pub struct RelationLink {
     field: RelationField,
-    condition: ScalarCondition,
+    condition: Option<ScalarCondition>,
 }
 
 impl RelationLink {
-    pub fn new(field: RelationField, condition: ScalarCondition) -> Self {
+    pub fn new(field: RelationField, condition: Option<ScalarCondition>) -> Self {
         Self { field, condition }
     }
 
@@ -94,7 +109,7 @@ impl RelationLink {
         &self.field
     }
 
-    pub fn into_field_and_condition(self) -> (RelationField, ScalarCondition) {
+    pub fn into_field_and_condition(self) -> (RelationField, Option<ScalarCondition>) {
         (self.field, self.condition)
     }
 }

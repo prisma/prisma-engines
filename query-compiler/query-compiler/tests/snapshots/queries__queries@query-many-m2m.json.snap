@@ -9,10 +9,9 @@ let @parent = query «SELECT "public"."Post"."id", "public"."Post"."title",
               params [const(BigInt(0))]
 in let @parent$id = mapField id (get @parent)
    in join (get @parent)
-      with (query «SELECT "public"."Category"."id", "public"."Category"."name",
-                   "t0"."B" AS "CategoryToPost@Post" FROM
-                   "public"."_CategoryToPost" AS "t0" INNER JOIN
-                   "public"."Category" ON "t0"."A" = "public"."Category"."id"
-                   WHERE "t0"."B" IN /* prisma-comma-repeatable-start */$1/*
-                   prisma-comma-repeatable-end */»
+      with (query «SELECT "t1"."id", "t1"."name", "t0"."B" AS
+                   "CategoryToPost@Post" FROM "public"."_CategoryToPost" AS "t0"
+                   INNER JOIN "public"."Category" AS "t1" ON "t0"."A" =
+                   "t1"."id" WHERE "t0"."B" IN /* prisma-comma-repeatable-start
+                   */$1/* prisma-comma-repeatable-end */»
             params [var(@parent$id as Int)]) on left.(id) = right.(CategoryToPost@Post) as categories

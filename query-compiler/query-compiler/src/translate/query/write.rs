@@ -1,6 +1,7 @@
 use query_builder::QueryBuilder;
 use query_core::{
-    DeleteManyRecords, DeleteRecord, RawQuery, UpdateManyRecords, UpdateRecord, UpdateRecordWithSelection, WriteQuery,
+    ConnectRecords, DeleteManyRecords, DeleteRecord, DisconnectRecords, RawQuery, UpdateManyRecords, UpdateRecord,
+    UpdateRecordWithSelection, WriteQuery,
 };
 use query_structure::QueryArguments;
 
@@ -153,6 +154,30 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                 .map(Expression::Execute)
                 .collect::<Vec<_>>(),
         ),
+
+        WriteQuery::ConnectRecords(ConnectRecords {
+            parent_id,
+            child_ids,
+            relation_field,
+        }) => {
+            let parent_id = parent_id.as_ref().expect("should have parent ID for connect");
+            let query = builder
+                .build_m2m_connect(relation_field, parent_id, &child_ids)
+                .map_err(TranslateError::QueryBuildFailure)?;
+            Expression::Execute(query)
+        }
+
+        WriteQuery::DisconnectRecords(DisconnectRecords {
+            parent_id,
+            child_ids,
+            relation_field,
+        }) => {
+            let parent_id = parent_id.as_ref().expect("should have parent ID for disconnect");
+            let query = builder
+                .build_m2m_disconnect(relation_field, parent_id, &child_ids)
+                .map_err(TranslateError::QueryBuildFailure)?;
+            Expression::Execute(query)
+        }
 
         other => todo!("{other:?}"),
     })

@@ -314,7 +314,8 @@ pub fn delete_relation_table_records(
     let parent_id_values = parent_id.db_values(ctx);
     let parent_id_criteria = parent_column.equals(parent_id_values);
 
-    let child_id_criteria = super::in_conditions(&[child_column], child_ids, ctx);
+    let child_ids = child_ids.iter().flat_map(|id| id.db_values(ctx)).collect::<Row>();
+    let child_id_criteria = child_column.in_selection(child_ids);
 
     Delete::from_table(relation.as_table(ctx))
         .so_that(parent_id_criteria.and(child_id_criteria))
