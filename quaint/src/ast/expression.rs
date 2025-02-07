@@ -377,7 +377,8 @@ impl<'a> Comparable<'a> for Expression<'a> {
     where
         T: Into<Expression<'a>>,
     {
-        Compare::In(Box::new(self), Box::new(selection.into()))
+        let expr = extract_single_var_row(selection.into());
+        Compare::In(Box::new(self), Box::new(expr))
     }
 
     fn not_in_selection<T>(self, selection: T) -> Compare<'a>
@@ -520,4 +521,38 @@ impl<'a> Comparable<'a> for Expression<'a> {
     fn all(self) -> Compare<'a> {
         Compare::All(Box::new(self))
     }
+}
+
+/// Converts a row consisting of a single var into the var itself.
+/// Any other row is returned as is.
+fn extract_single_var_row(expr: Expression) -> Expression {
+    let Expression {
+        kind: ExpressionKind::Row(values),
+        ..
+    } = &expr
+    else {
+        return expr;
+    };
+
+    let Some((
+        val @ Expression {
+            kind:
+                ExpressionKind::Parameterized(Value {
+                    typed: ValueType::Var(_, _),
+                    ..
+                }),
+            ..
+        },
+        [],
+    )) = values.values.split_first()
+    else {
+        return expr;
+    };
+
+    val.clone()
+        .decorate(
+            Some("prisma-comma-repeatable-start"),
+            Some("prisma-comma-repeatable-end"),
+        )
+        .into()
 }

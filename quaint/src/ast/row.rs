@@ -162,6 +162,19 @@ where
     }
 }
 
+impl<'a, A> FromIterator<A> for Row<'a>
+where
+    A: Into<Expression<'a>>,
+{
+    fn from_iter<T>(iter: T) -> Self
+    where
+        T: IntoIterator<Item = A>,
+    {
+        let inner = iter.into_iter().map(Into::into).collect::<Vec<_>>();
+        Self { values: inner }
+    }
+}
+
 impl<'a> Comparable<'a> for Row<'a> {
     fn equals<T>(self, comparison: T) -> Compare<'a>
     where

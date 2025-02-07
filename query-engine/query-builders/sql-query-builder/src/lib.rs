@@ -18,9 +18,8 @@ pub mod write;
 use std::{collections::HashMap, marker::PhantomData};
 
 use quaint::{
-    ast::{Column, Comparable, ConditionTree, Conjunctive, Decoratable, Delete, Query, Row, Values},
+    ast::{Column, Comparable, ConditionTree, Query, Row, Values},
     visitor::Visitor,
-    Value, ValueType,
 };
 use query_builder::{DbQuery, QueryBuilder};
 use query_structure::{
@@ -219,37 +218,7 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
-        let relation = field.relation();
-
-        let parent_column = field.related_field().m2m_column(&self.context);
-        let child_column = field.m2m_column(&self.context);
-
-        let parent_id_values = parent_id.db_values(&self.context);
-        let parent_id_criteria = parent_column.equals(parent_id_values);
-
-        let values = child_ids
-            .iter()
-            .map(|id| id.db_values(&self.context))
-            .collect::<Vec<_>>();
-
-        let child_id_criteria = match values.split_first().map(|(fst, rem)| (&fst[..], rem)) {
-            Some((
-                [val @ Value {
-                    typed: ValueType::Var(_, _),
-                    ..
-                }],
-                [],
-            )) => child_column.in_selection(val.clone().decorate(
-                Some("prisma-comma-repeatable-start"),
-                Some("prisma-comma-repeatable-end"),
-            )),
-            _ => child_column.in_selection(values),
-        };
-
-        let query = Delete::from_table(relation.as_table(&self.context))
-            .so_that(parent_id_criteria.and(child_id_criteria))
-            .add_traceparent(self.context.traceparent);
-
+        let query = write::delete_relation_table_records(&field, parent_id, child_ids, &self.context);
         self.convert_query(query)
     }
 
