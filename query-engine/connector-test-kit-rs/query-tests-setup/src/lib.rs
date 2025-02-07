@@ -74,8 +74,12 @@ pub trait AsyncFn<'a, A: 'a, B: 'a, T>: Copy + 'static {
     fn call(self, a: &'a A, b: &'a B) -> Self::Fut;
 }
 
-impl<'a, A: 'a, B: 'a, Fut: Future + 'a, F: Fn(&'a A, &'a B) -> Fut + Copy + 'static> AsyncFn<'a, A, B, Fut::Output>
-    for F
+impl<'a, A, B, Fut, F> AsyncFn<'a, A, B, Fut::Output> for F
+where
+    A: 'a,
+    B: 'a,
+    Fut: Future + 'a,
+    F: Fn(&'a A, &'a B) -> Fut + Copy + 'static,
 {
     type Fut = Fut;
 
