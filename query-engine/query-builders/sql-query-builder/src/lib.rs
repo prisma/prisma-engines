@@ -145,6 +145,22 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         self.convert_query(select)
     }
 
+    fn build_aggregate(
+        &self,
+        model: &Model,
+        args: QueryArguments,
+        selections: &[query_structure::AggregationSelection],
+        group_by: Vec<query_structure::ScalarField>,
+        having: Option<Filter>,
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
+        let query = if group_by.is_empty() {
+            read::aggregate(model, selections, args, &self.context)
+        } else {
+            read::group_by_aggregate(model, args, selections, group_by, having, &self.context)
+        };
+        self.convert_query(query)
+    }
+
     fn build_create_record(
         &self,
         model: &Model,

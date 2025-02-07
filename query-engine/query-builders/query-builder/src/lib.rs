@@ -1,8 +1,8 @@
 use std::{collections::HashMap, fmt};
 
 use query_structure::{
-    FieldSelection, Filter, Model, PrismaValue, QueryArguments, RecordFilter, RelationField, ScalarCondition,
-    ScalarField, SelectionResult, WriteArgs,
+    AggregationSelection, FieldSelection, Filter, Model, PrismaValue, QueryArguments, RecordFilter, RelationField,
+    ScalarCondition, ScalarField, SelectionResult, WriteArgs,
 };
 use serde::Serialize;
 mod query_arguments_ext;
@@ -24,6 +24,15 @@ pub trait QueryBuilder {
         link: RelationLink,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
+
+    fn build_aggregate(
+        &self,
+        model: &Model,
+        args: QueryArguments,
+        selections: &[AggregationSelection],
+        group_by: Vec<ScalarField>,
+        having: Option<Filter>,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
 
     fn build_create_record(
