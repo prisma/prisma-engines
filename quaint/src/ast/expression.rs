@@ -524,7 +524,7 @@ impl<'a> Comparable<'a> for Expression<'a> {
 }
 
 /// Converts a row consisting of a single var into the var itself.
-/// Any other row is returned as is.
+/// Any other expression is returned as is.
 fn extract_single_var_row(expr: Expression) -> Expression {
     let Expression {
         kind: ExpressionKind::Row(values),
