@@ -3,8 +3,9 @@ source: query-compiler/query-compiler/tests/queries.rs
 expression: pretty
 input_file: query-compiler/query-compiler/tests/data/group-by.json
 ---
-query «SELECT COUNT("public"."Post"."id"), COUNT("public"."Post"."title"),
-       COUNT("public"."Post"."userId"), COUNT(*) FROM "public"."Post" WHERE
-       "public"."Post"."title"::text LIKE $1 GROUP BY "public"."Post"."title"
-       OFFSET $2»
-params [const(String("%something%")), const(BigInt(0))]
+unique (query «SELECT COUNT("public"."Post"."id") AS "id",
+               COUNT("public"."Post"."title") AS "title",
+               COUNT("public"."Post"."userId") AS "userId", COUNT(*) AS "_count"
+               FROM "public"."Post" WHERE "public"."Post"."title"::text LIKE $1
+               GROUP BY "public"."Post"."title" OFFSET $2»
+        params [const(String("%something%")), const(BigInt(0))])

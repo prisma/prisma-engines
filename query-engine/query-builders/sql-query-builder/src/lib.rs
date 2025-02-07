@@ -23,8 +23,8 @@ use quaint::{
 };
 use query_builder::{DbQuery, QueryBuilder};
 use query_structure::{
-    FieldSelection, Filter, Model, ModelProjection, QueryArguments, RecordFilter, RelationField, ScalarField,
-    SelectionResult, WriteArgs,
+    AggregationSelection, FieldSelection, Filter, Model, ModelProjection, QueryArguments, RecordFilter, RelationField,
+    ScalarField, SelectionResult, WriteArgs,
 };
 
 pub use column_metadata::ColumnMetadata;
@@ -149,8 +149,8 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         &self,
         model: &Model,
         args: QueryArguments,
-        selections: &[query_structure::AggregationSelection],
-        group_by: Vec<query_structure::ScalarField>,
+        selections: &[AggregationSelection],
+        group_by: Vec<ScalarField>,
         having: Option<Filter>,
     ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
         let query = if group_by.is_empty() {

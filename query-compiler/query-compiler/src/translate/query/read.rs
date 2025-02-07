@@ -69,7 +69,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
         ReadQuery::AggregateRecordsQuery(AggregateRecordsQuery {
             name: _,
             alias: _,
-            // TODO: use selection_order
+            // TODO: we're ignoring selection order
             selection_order: _,
             model,
             args,
@@ -80,7 +80,7 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
             let query = builder
                 .build_aggregate(&model, args, &selectors, group_by, having)
                 .map_err(TranslateError::QueryBuildFailure)?;
-            Expression::Query(query)
+            Expression::Unique(Box::new(Expression::Query(query)))
         }
     })
 }

@@ -188,40 +188,48 @@ pub fn aggregate(
         |select, next_op| match next_op {
             AggregationSelection::Field(field) => select.column(
                 Column::from(field.db_name().to_owned())
+                    .alias(field.name().to_owned())
                     .set_is_enum(field.type_identifier().is_enum())
                     .set_is_selected(true),
             ),
 
             AggregationSelection::Count { all, fields } => {
                 let select = fields.iter().fold(select, |select, next_field| {
-                    select.value(count(Column::from(next_field.db_name().to_owned())))
+                    select
+                        .value(count(Column::from(next_field.db_name().to_owned())).alias(next_field.name().to_owned()))
                 });
 
                 if *all {
-                    select.value(count(asterisk()))
+                    select.value(count(asterisk()).alias("_count"))
                 } else {
                     select
                 }
             }
 
             AggregationSelection::Average(fields) => fields.iter().fold(select, |select, next_field| {
-                select.value(avg(Column::from(next_field.db_name().to_owned())))
+                select.value(avg(Column::from(next_field.db_name().to_owned())).alias(next_field.name().to_owned()))
             }),
 
             AggregationSelection::Sum(fields) => fields.iter().fold(select, |select, next_field| {
-                select.value(sum(Column::from(next_field.db_name().to_owned())))
+                select.value(sum(Column::from(next_field.db_name().to_owned())).alias(next_field.name().to_owned()))
             }),
 
             AggregationSelection::Min(fields) => fields.iter().fold(select, |select, next_field| {
-                select.value(min(Column::from(next_field.db_name().to_owned())
-                    .set_is_enum(next_field.type_identifier().is_enum())
-                    .set_is_selected(true)))
+                select.value(
+                    min(Column::from(next_field.db_name().to_owned())
+                        .set_is_enum(next_field.type_identifier().is_enum())
+                        .set_is_selected(true))
+                    .alias(next_field.name().to_owned()),
+                )
             }),
 
             AggregationSelection::Max(fields) => fields.iter().fold(select, |select, next_field| {
-                select.value(max(Column::from(next_field.db_name().to_owned())
-                    .set_is_enum(next_field.type_identifier().is_enum())
-                    .set_is_selected(true)))
+                select.value(
+                    max(Column::from(next_field.db_name().to_owned())
+                        .set_is_enum(next_field.type_identifier().is_enum())
+                        .set_is_selected(true))
+                    .alias(next_field.name().to_owned()),
+                )
             }),
         },
     )
@@ -238,15 +246,20 @@ pub fn group_by_aggregate(
     let (base_query, _) = args.into_select(model, &[], ctx);
 
     let select_query = selections.iter().fold(base_query, |select, next_op| match next_op {
-        AggregationSelection::Field(field) => select.column(field.as_column(ctx).set_is_selected(true)),
+        AggregationSelection::Field(field) => select.column(
+            field
+                .as_column(ctx)
+                .alias(field.name().to_owned())
+                .set_is_selected(true),
+        ),
 
         AggregationSelection::Count { all, fields } => {
             let select = fields.iter().fold(select, |select, next_field| {
-                select.value(count(next_field.as_column(ctx)))
+                select.value(count(next_field.as_column(ctx)).alias(next_field.name().to_owned()))
             });
 
             if *all {
-                select.value(count(asterisk()))
+                select.value(count(asterisk()).alias("_count"))
             } else {
                 select
             }
