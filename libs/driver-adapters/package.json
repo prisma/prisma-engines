@@ -18,10 +18,10 @@
   "keywords": [],
   "author": "",
   "devDependencies": {
-    "@types/node": "20.12.7",
-    "esbuild": "0.20.2",
-    "tsup": "8.0.2",
-    "tsx": "4.7.2",
-    "typescript": "5.4.5"
+    "@types/node": "20.17.16",
+    "esbuild": "0.24.2",
+    "tsup": "8.3.6",
+    "tsx": "4.19.2",
+    "typescript": "5.7.3"
   }
 }
