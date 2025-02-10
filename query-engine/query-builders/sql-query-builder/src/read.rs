@@ -207,7 +207,7 @@ pub fn aggregate(
                 });
 
                 if *all {
-                    select.value(count(asterisk()).alias(UNDERSCORE_COUNT))
+                    select.value(count(asterisk()).alias(format!("{UNDERSCORE_COUNT}._all")))
                 } else {
                     select
                 }
@@ -279,7 +279,7 @@ pub fn group_by_aggregate(
             });
 
             if *all {
-                select.value(count(asterisk()).alias(UNDERSCORE_COUNT))
+                select.value(count(asterisk()).alias(format!("{UNDERSCORE_COUNT}._all")))
             } else {
                 select
             }
