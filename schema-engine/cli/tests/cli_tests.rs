@@ -45,13 +45,10 @@ where
     match res {
         Ok(_) => (),
         Err(panic_payload) => {
-            let res = panic_payload
-                .downcast_ref::<&str>()
-                .map(|s| -> String { (*s).to_owned() })
-                .or_else(|| panic_payload.downcast_ref::<String>().map(|s| s.to_owned()))
-                .unwrap_or_default();
-
-            panic!("Error: '{}'", res);
+            panic!(
+                "Error: '{}'",
+                panic_utils::downcast_box_to_string(panic_payload).unwrap_or_default()
+            );
         }
     }
 }

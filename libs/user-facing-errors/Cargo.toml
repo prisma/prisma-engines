@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+panic-utils.path = "../panic-utils"
 user-facing-error-macros = { path = "../user-facing-error-macros" }
 serde_json.workspace = true
 serde.workspace = true

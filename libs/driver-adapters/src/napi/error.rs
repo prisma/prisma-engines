@@ -25,10 +25,7 @@ where
 }
 
 fn panic_to_napi_err<R>(panic_payload: Box<dyn Any + Send>) -> napi::Result<R> {
-    panic_payload
-        .downcast_ref::<&str>()
-        .map(|s| -> String { (*s).to_owned() })
-        .or_else(|| panic_payload.downcast_ref::<String>().map(|s| s.to_owned()))
+    panic_utils::downcast_box_to_string(panic_payload)
         .map(|message| Err(napi::Error::from_reason(format!("PANIC: {message}"))))
         .ok_or(napi::Error::from_reason("PANIC: unknown panic".to_string()))
         .unwrap()

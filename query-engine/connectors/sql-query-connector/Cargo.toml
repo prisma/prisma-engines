@@ -85,3 +85,6 @@ version = "1.0"
 [dependencies.user-facing-errors]
 features = ["sql"]
 path = "../../../libs/user-facing-errors"
+
+[dependencies.panic-utils]
+path = "../../../libs/panic-utils"
