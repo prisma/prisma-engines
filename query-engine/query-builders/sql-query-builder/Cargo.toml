@@ -6,6 +6,7 @@ version = "0.1.0"
 [dependencies]
 quaint = { path = "../../../quaint" }
 query-structure = { path = "../../query-structure" }
+schema = { path = "../../schema" }
 query-builder = { path = "../query-builder" }
 telemetry = { path = "../../../libs/telemetry" }
 prisma-value = { path = "../../../libs/prisma-value" }
