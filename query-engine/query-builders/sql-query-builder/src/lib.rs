@@ -23,8 +23,8 @@ use quaint::{
 };
 use query_builder::{DbQuery, QueryBuilder};
 use query_structure::{
-    FieldSelection, Filter, Model, ModelProjection, QueryArguments, RecordFilter, RelationField, SelectionResult,
-    WriteArgs,
+    FieldSelection, Filter, Model, ModelProjection, QueryArguments, RecordFilter, RelationField, ScalarField,
+    SelectionResult, WriteArgs,
 };
 
 pub use column_metadata::ColumnMetadata;
@@ -200,6 +200,27 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         let projection = selected_fields.map(ModelProjection::from);
         let query = update::update_many_from_filter(model, filter, args, projection.as_ref(), limit, &self.context);
         Ok(vec![self.convert_query(query)?])
+    }
+
+    fn build_upsert(
+        &self,
+        model: &Model,
+        filter: Filter,
+        create_args: WriteArgs,
+        update_args: WriteArgs,
+        selected_fields: &FieldSelection,
+        unique_constraints: &[ScalarField],
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
+        let query = write::native_upsert(
+            model,
+            filter,
+            create_args,
+            update_args,
+            &selected_fields.into(),
+            unique_constraints,
+            &self.context,
+        );
+        self.convert_query(query)
     }
 
     fn build_m2m_connect(

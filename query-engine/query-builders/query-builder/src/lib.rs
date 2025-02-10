@@ -2,7 +2,7 @@ use std::{collections::HashMap, fmt};
 
 use query_structure::{
     FieldSelection, Filter, Model, PrismaValue, QueryArguments, RecordFilter, RelationField, ScalarCondition,
-    SelectionResult, WriteArgs,
+    ScalarField, SelectionResult, WriteArgs,
 };
 use serde::Serialize;
 mod query_arguments_ext;
@@ -57,6 +57,16 @@ pub trait QueryBuilder {
         selected_fields: Option<&FieldSelection>,
         limit: Option<usize>,
     ) -> Result<Vec<DbQuery>, Box<dyn std::error::Error + Send + Sync>>;
+
+    fn build_upsert(
+        &self,
+        model: &Model,
+        filter: Filter,
+        create_args: WriteArgs,
+        update_args: WriteArgs,
+        selected_fields: &FieldSelection,
+        unique_constraints: &[ScalarField],
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>>;
 
     fn build_m2m_connect(
         &self,

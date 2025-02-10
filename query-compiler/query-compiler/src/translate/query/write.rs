@@ -105,6 +105,20 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
             Expression::Unique(Box::new(Expression::Query(query)))
         }
 
+        WriteQuery::Upsert(upsert) => {
+            let query = builder
+                .build_upsert(
+                    upsert.model(),
+                    upsert.filter().clone(),
+                    upsert.create().clone(),
+                    upsert.update().clone(),
+                    upsert.selected_fields(),
+                    &upsert.unique_constraints(),
+                )
+                .map_err(TranslateError::QueryBuildFailure)?;
+            Expression::Unique(Box::new(Expression::Query(query)))
+        }
+
         WriteQuery::QueryRaw(RawQuery {
             model,
             inputs,
