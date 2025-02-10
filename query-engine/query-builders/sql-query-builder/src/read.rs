@@ -360,7 +360,7 @@ fn extract_columns(model: &Model, selections: &[AggregationSelection], ctx: &Con
     fields.as_columns(ctx).collect()
 }
 
-pub trait AliasGenerator: Copy {
+pub trait AliasGenerator {
     fn generate(&self, field: &ScalarField) -> Option<String>;
 
     /// Creates a new alias generator that prefixes all generated aliases with the given prefix.
