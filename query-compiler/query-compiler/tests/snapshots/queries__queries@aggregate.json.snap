@@ -1,0 +1,11 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/aggregate.json
+---
+unique (query «SELECT COUNT("id") AS "_count.id", COUNT("email") AS
+               "_count.email", COUNT(*) AS "_count._all" FROM (SELECT
+               "public"."User"."id", "public"."User"."email" FROM
+               "public"."User" WHERE "public"."User"."email"::text LIKE $1
+               OFFSET $2) AS "sub"»
+        params [const(String("%prisma.io%")), const(BigInt(0))])

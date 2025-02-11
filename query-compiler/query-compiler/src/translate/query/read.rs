@@ -7,7 +7,7 @@ use crate::{
 };
 use itertools::Itertools;
 use query_builder::{QueryArgumentsExt, QueryBuilder, RelationLink};
-use query_core::{FilteredQuery, ReadQuery, RelatedRecordsQuery};
+use query_core::{AggregateRecordsQuery, FilteredQuery, ReadQuery, RelatedRecordsQuery};
 use query_structure::{
     ConditionValue, FieldSelection, Filter, PrismaValue, QueryArguments, QueryMode, RelationField, ScalarCondition,
     ScalarFilter, ScalarProjection,
@@ -66,7 +66,22 @@ pub(crate) fn translate_read_query(query: ReadQuery, builder: &dyn QueryBuilder)
             expr
         }
 
-        _ => todo!(),
+        ReadQuery::AggregateRecordsQuery(AggregateRecordsQuery {
+            name: _,
+            alias: _,
+            // TODO: we're ignoring selection order
+            selection_order: _,
+            model,
+            args,
+            selectors,
+            group_by,
+            having,
+        }) => {
+            let query = builder
+                .build_aggregate(&model, args, &selectors, group_by, having)
+                .map_err(TranslateError::QueryBuildFailure)?;
+            Expression::Unique(Box::new(Expression::Query(query)))
+        }
     })
 }
 

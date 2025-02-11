@@ -5188,6 +5188,7 @@ dependencies = [
  "quaint",
  "query-builder",
  "query-structure",
+ "schema",
  "serde_json",
  "telemetry",
 ]

@@ -23,14 +23,15 @@ use quaint::{
 };
 use query_builder::{DbQuery, QueryBuilder};
 use query_structure::{
-    FieldSelection, Filter, Model, ModelProjection, QueryArguments, RecordFilter, RelationField, ScalarField,
-    SelectionResult, WriteArgs,
+    AggregationSelection, FieldSelection, Filter, Model, ModelProjection, QueryArguments, RecordFilter, RelationField,
+    ScalarField, SelectionResult, WriteArgs,
 };
 
 pub use column_metadata::ColumnMetadata;
 pub use context::Context;
 pub use filter::FilterBuilder;
 pub use model_extensions::{AsColumn, AsColumns, AsTable, RelationFieldExt, SelectionResultExt};
+use read::alias_with_prisma_name;
 pub use sql_trace::SqlTraceComment;
 
 const PARAMETER_LIMIT: usize = 2000;
@@ -143,6 +144,30 @@ impl<'a, V: Visitor<'a>> QueryBuilder for SqlQueryBuilder<'a, V> {
         };
 
         self.convert_query(select)
+    }
+
+    fn build_aggregate(
+        &self,
+        model: &Model,
+        args: QueryArguments,
+        selections: &[AggregationSelection],
+        group_by: Vec<ScalarField>,
+        having: Option<Filter>,
+    ) -> Result<DbQuery, Box<dyn std::error::Error + Send + Sync>> {
+        let query = if group_by.is_empty() {
+            read::aggregate(model, selections, args, alias_with_prisma_name(), &self.context)
+        } else {
+            read::group_by_aggregate(
+                model,
+                args,
+                selections,
+                group_by,
+                having,
+                alias_with_prisma_name(),
+                &self.context,
+            )
+        };
+        self.convert_query(query)
     }
 
     fn build_create_record(
