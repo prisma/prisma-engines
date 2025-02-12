@@ -12,7 +12,6 @@ on:
       - "*.md"
       - "LICENSE"
       - "CODEOWNERS"
-      - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -144,7 +143,7 @@ jobs:
       version: 3
       connector: "sqlite"
       relation_load_strategy: '["query"]'
-  
+
   driver_adapters:
     strategy:
       fail-fast: false

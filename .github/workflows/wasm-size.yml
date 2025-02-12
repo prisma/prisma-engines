@@ -8,7 +8,6 @@ on:
       - "*.md"
       - "LICENSE"
       - "CODEOWNERS"
-      - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
