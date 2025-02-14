@@ -7,6 +7,7 @@ on:
     paths-ignore:
       - "!.github/workflows/test-query-engine.yml"
       - "!.github/workflows/test-query-engine-template.yml"
+      - "!.github/workflows/include/rust-wasm-setup/action.yml"
       - ".github/**"
       - ".buildkite/**"
       - "*.md"

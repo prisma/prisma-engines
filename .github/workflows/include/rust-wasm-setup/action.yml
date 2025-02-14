@@ -13,12 +13,17 @@ runs:
 
     - uses: cargo-bins/cargo-binstall@main
 
-    - name: Install wasm-bindgen, wasm-opt
+    - name: Install wasm-bindgen
       shell: bash
-      run: |
-        cargo binstall -y \
-            wasm-bindgen-cli@0.2.93 \
-            wasm-opt@0.116.0
+      run: cargo binstall -y wasm-bindgen-cli@0.2.93
+
+    - name: Install Binaryen (includes wasm-opt)
+      uses: jaxxstorm/action-install-gh-release@v1.14.0
+      with:
+        repo: WebAssembly/binaryen
+        tag: version_122
+        binaries-location: binaryen-version_122/bin
+        cache: true
 
     - name: Install bc
       shell: bash
