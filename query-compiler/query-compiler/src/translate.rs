@@ -1,6 +1,6 @@
 mod query;
 
-use itertools::Itertools;
+use itertools::{Either, Itertools};
 use query::translate_query;
 use query_builder::QueryBuilder;
 use query_core::{EdgeRef, Node, NodeRef, Query, QueryGraph, QueryGraphBuilderError, QueryGraphDependency};
@@ -204,29 +204,23 @@ impl<'a, 'b> NodeTranslator<'a, 'b> {
             .graph
             .incoming_edges(&node)
             .into_iter()
-            .filter_map(|edge| {
-                let field = if let Some(QueryGraphDependency::ProjectedDataDependency(selection, _)) =
-                    self.graph.edge_content(&edge)
-                {
-                    let mut fields = selection.selections();
-                    if let Some(first) = fields.next().filter(|_| fields.len() == 0) {
-                        first
-                    } else {
-                        // we need to handle MapField with multiple fields?
-                        todo!()
-                    }
-                } else {
-                    return None;
+            .flat_map(|edge| {
+                let Some(QueryGraphDependency::ProjectedDataDependency(selection, _)) = self.graph.edge_content(&edge)
+                else {
+                    return Either::Left(std::iter::empty());
                 };
 
                 let source = self.graph.edge_source(&edge);
-                Some(Binding::new(
-                    generate_projected_dependency_name(source, field),
-                    Expression::MapField {
-                        field: field.prisma_name().into_owned(),
-                        records: Box::new(Expression::Get { name: source.id() }),
-                    },
-                ))
+
+                Either::Right(selection.selections().map(move |field| {
+                    Binding::new(
+                        generate_projected_dependency_name(source, field),
+                        Expression::MapField {
+                            field: field.prisma_name().into_owned(),
+                            records: Box::new(Expression::Get { name: source.id() }),
+                        },
+                    )
+                }))
             })
             .collect::<Vec<_>>();
 

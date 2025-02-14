@@ -1,0 +1,23 @@
+{
+  "modelName": "ParentModelWithCompositeId",
+  "action": "createOne",
+  "query": {
+    "arguments": {
+      "data": {
+        "a": 1,
+        "b": 1,
+        "children": {
+          "create": [{ "id": 1 }, { "id": 2 }]
+        }
+      }
+    },
+    "selection": {
+      "$composites": true,
+      "$scalars": true,
+      "children": {
+        "arguments": {},
+        "selection": { "$composites": true, "$scalars": true }
+      }
+    }
+  }
+}
