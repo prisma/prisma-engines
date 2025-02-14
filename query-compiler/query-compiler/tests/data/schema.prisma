@@ -26,3 +26,18 @@ model Category {
   name  String
   posts Post[]
 }
+
+model ParentModelWithCompositeId {
+  a        Int
+  b        Int
+  children ChildOfModelWithCompositeId[]
+
+  @@id([a, b])
+}
+
+model ChildOfModelWithCompositeId {
+  id      Int                        @id
+  parent  ParentModelWithCompositeId @relation(fields: [parentA, parentB], references: [a, b])
+  parentA Int
+  parentB Int
+}
