@@ -50,19 +50,15 @@ fi
 
 
 build() {
-    echo "ℹ️  Note that query-engine compiled to WASM uses a different Rust toolchain"
-    cargo --version
-
     local CONNECTOR="$1"
     local CARGO_TARGET_DIR
     CARGO_TARGET_DIR=$(cargo metadata --format-version 1 | jq -r .target_directory)
     echo "🔨 Building $CONNECTOR"
-    RUSTFLAGS="-Zlocation-detail=none" CARGO_PROFILE_RELEASE_OPT_LEVEL="z" cargo build \
+    CARGO_PROFILE_RELEASE_OPT_LEVEL="z" cargo build \
         -p query-engine-wasm \
         --profile "$WASM_BUILD_PROFILE" \
         --features "$CONNECTOR" \
-        --target wasm32-unknown-unknown \
-        -Zbuild-std=std,panic_abort -Zbuild-std-features=panic_immediate_abort
+        --target wasm32-unknown-unknown
 
     local IN_FILE="$CARGO_TARGET_DIR/wasm32-unknown-unknown/$WASM_TARGET_SUBDIR/query_engine_wasm.wasm"
     local OUT_FILE="$OUT_FOLDER/$CONNECTOR/query_engine_bg.wasm"
