@@ -148,11 +148,15 @@ impl PendingRequests {
     }
 
     fn respond(&mut self, id: &jsonrpc_core::Id, response: Result<serde_json::value::Value>) {
-        self.map
+        if self
+            .map
             .remove(id)
             .expect("no sender for response")
             .send(response)
-            .unwrap();
+            .is_err()
+        {
+            tracing::warn!("receiver was dropped before response was sent");
+        }
     }
 
     fn respond_to_last(&mut self, response: Result<serde_json::value::Value>) {

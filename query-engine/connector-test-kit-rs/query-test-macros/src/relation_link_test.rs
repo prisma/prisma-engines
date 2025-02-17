@@ -41,6 +41,7 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
 
     // The shell function retains the name of the original test definition.
     let test_fn_ident = test_function.sig.ident;
+    let test_fn_ident_string = test_fn_ident.to_string();
 
     // Rename original test function to run_<orig_name>.
     let runner_fn_ident = Ident::new(&format!("run_{test_fn_ident}"), Span::call_site());
@@ -63,7 +64,8 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
                 &[#exclude],
                 enumflags2::make_bitflags!(ConnectorCapability::{#(#required_capabilities)|*}),
                 (#suite_name, #test_name),
-                #runner_fn_ident
+                #runner_fn_ident,
+                #test_fn_ident_string
             )
         }
 

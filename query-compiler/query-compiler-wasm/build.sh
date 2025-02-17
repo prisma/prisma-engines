@@ -60,6 +60,7 @@ build() {
     local CONNECTOR="$1"
     local CARGO_TARGET_DIR
     CARGO_TARGET_DIR=$(cargo metadata --format-version 1 | jq -r .target_directory)
+
     echo "🔨 Building $CONNECTOR"
     CARGO_PROFILE_RELEASE_OPT_LEVEL="z" cargo build \
         -p query-compiler-wasm \
