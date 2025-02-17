@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use crate::{
     expression::{Binding, Expression, JoinExpression},
     translate::TranslateResult,
@@ -96,10 +94,10 @@ fn add_inmemory_join(
             ReadQuery::RelatedRecordsQuery(rrq) => rrq.parent_field.linking_fields(),
             _ => unreachable!(),
         })
-        .collect::<HashSet<_>>();
+        .unique()
+        .sorted_by(|a, b| a.prisma_name().cmp(&b.prisma_name()));
 
     let linking_fields_bindings = all_linking_fields
-        .into_iter()
         .map(|sf| Binding {
             name: format!("@parent${}", sf.prisma_name().into_owned()),
             expr: Expression::MapField {
