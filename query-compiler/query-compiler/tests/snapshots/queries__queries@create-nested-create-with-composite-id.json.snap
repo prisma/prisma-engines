@@ -28,8 +28,8 @@ in let 0$a = mapField a (get 0);
                                        = $2) LIMIT $3 OFFSET $4»
                                 params [var(0$a as Int), var(0$b as Int),
                                         const(BigInt(1)), const(BigInt(0))])
-          in let @parent$b = mapField b (get @parent);
-                 @parent$a = mapField a (get @parent)
+          in let @parent$a = mapField a (get @parent);
+                 @parent$b = mapField b (get @parent)
              in join (get @parent)
                 with (query «SELECT "public"."ChildOfModelWithCompositeId"."id",
                              "public"."ChildOfModelWithCompositeId"."parentA",
