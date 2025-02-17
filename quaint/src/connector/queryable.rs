@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use super::{DescribedQuery, IsolationLevel, ResultSet, Transaction};
 use crate::ast::*;
 use async_trait::async_trait;
@@ -94,6 +96,21 @@ pub trait Queryable: Send + Sync {
         "BEGIN"
     }
 
+    /// Statement to create a savepoint in a transaction
+    fn create_savepoint_statement(&self, depth: i32) -> Cow<'static, str> {
+        Cow::Owned(format!("SAVEPOINT savepoint{depth}"))
+    }
+
+    /// Statement to release a savepoint in a transaction
+    fn release_savepoint_statement(&self, depth: i32) -> Cow<'static, str> {
+        Cow::Owned(format!("RELEASE SAVEPOINT savepoint{depth}"))
+    }
+
+    /// Statement to rollback to a savepoint in a transaction
+    fn rollback_to_savepoint_statement(&self, depth: i32) -> Cow<'static, str> {
+        Cow::Owned(format!("ROLLBACK TO SAVEPOINT savepoint{depth}"))
+    }
+
     /// Sets the transaction isolation level to given value.
     /// Implementers have to make sure that the passed isolation level is valid for the underlying database.
     async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> crate::Result<()>;
@@ -129,7 +146,7 @@ macro_rules! impl_default_TransactionCapable {
                 let opts = crate::connector::TransactionOptions::new(isolation, self.requires_isolation_first());
 
                 Ok(Box::new(
-                    crate::connector::DefaultTransaction::new(self, self.begin_statement(), opts).await?,
+                    crate::connector::DefaultTransaction::new(self, opts).await?,
                 ))
             }
         }
