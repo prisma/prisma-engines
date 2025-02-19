@@ -4,6 +4,7 @@ use query_structure::PrismaValue;
 #[derive(Debug)]
 struct RequestContext {
     request_now: PrismaValue,
+    #[cfg(feature = "graphql-protocol")]
     engine_protocol: EngineProtocol,
 }
 
@@ -22,7 +23,7 @@ pub(crate) fn get_request_now() -> PrismaValue {
             // Task local might not be set in some cases.
             // At the moment of writing, this happens only in query validation test suite.
             // In that case, we want to fall back to realtime value. On the other hand, if task local is
-            // set, we want to use it, even if we are not running inside of tokio runtime (for example, 
+            // set, we want to use it, even if we are not running inside of tokio runtime (for example,
             // in WASM case)
             //
             // Eventually, this will go away when we have a plain query context reference we pass around.
@@ -35,13 +36,23 @@ pub(crate) fn get_request_now() -> PrismaValue {
 /// That panics if REQUEST_CONTEXT has not been set with with_request_context().
 ///
 /// If we had a query context we carry for the entire lifetime of the query, it would belong there.
+#[cfg(feature = "graphql-protocol")]
 pub(crate) fn get_engine_protocol() -> EngineProtocol {
     REQUEST_CONTEXT.with(|rc| rc.engine_protocol)
 }
 
+#[cfg(not(feature = "graphql-protocol"))]
+#[inline(always)]
+pub(crate) fn get_engine_protocol() -> EngineProtocol {
+    EngineProtocol::Json
+}
+
 /// Execute a future with the current "now" timestamp that can be retrieved through
 /// `get_request_now()`, initializing it if necessary.
-pub(crate) async fn with_request_context<F, R>(engine_protocol: EngineProtocol, fut: F) -> R
+pub(crate) async fn with_request_context<F, R>(
+    #[cfg_attr(not(feature = "graphql-protocol"), allow(unused_variables))] engine_protocol: EngineProtocol,
+    fut: F,
+) -> R
 where
     F: std::future::Future<Output = R>,
 {
@@ -59,6 +70,7 @@ where
         let dt = chrono::Utc::now().duration_round(timestamp_precision).unwrap();
         let ctx = RequestContext {
             request_now: PrismaValue::DateTime(dt.into()),
+            #[cfg(feature = "graphql-protocol")]
             engine_protocol,
         };
 
