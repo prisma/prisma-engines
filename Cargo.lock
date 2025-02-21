@@ -3415,7 +3415,6 @@ dependencies = [
  "base64 0.13.1",
  "bigdecimal",
  "chrono",
- "once_cell",
  "regex",
  "serde",
  "serde_json",
