@@ -127,6 +127,11 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
                     name: format!("prisma_sequence_{}_{}", model.database_name(), field.database_name()),
                     ..Default::default()
                 };
+
+                // if self.is_cockroachdb() && !field.scalar_field_type().is_bigint() {
+                //     sequence.max_value = i32::MAX.into();
+                // }
+
                 let sequence_fn = field_default.ast_attribute().arguments.arguments[0]
                     .value
                     .as_function()
