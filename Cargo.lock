@@ -3388,7 +3388,6 @@ dependencies = [
  "metrics",
  "metrics-exporter-prometheus",
  "metrics-util",
- "once_cell",
  "parking_lot",
  "pin-project",
  "serde",

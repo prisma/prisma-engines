@@ -30,9 +30,8 @@ mod registry;
 
 pub mod guards;
 
-use once_cell::sync::Lazy;
 use serde::Deserialize;
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::LazyLock};
 
 pub use metrics::{self, counter, describe_counter, describe_gauge, describe_histogram, gauge, histogram};
 
@@ -79,7 +78,7 @@ pub const ACCEPT_LIST: &[&str] = &[
 /// as displayed to users. This is used to rebrand the third-party metrics to accepted, prisma-specific
 /// ones.
 #[rustfmt::skip]
-static METRIC_RENAMES: Lazy<HashMap<&'static str, (&'static str, &'static str)>> = Lazy::new(|| {
+static METRIC_RENAMES: LazyLock<HashMap<&'static str, (&'static str, &'static str)>> = LazyLock::new(|| {
     HashMap::from([
         (MOBC_POOL_CONNECTIONS_OPENED_TOTAL, ("prisma_pool_connections_opened_total", "The total number of pool connections opened")),
         (MOBC_POOL_CONNECTIONS_CLOSED_TOTAL, ("prisma_pool_connections_closed_total", "The total number of pool connections closed")),
@@ -158,13 +157,13 @@ mod tests {
     use metrics::{describe_counter, describe_gauge, describe_histogram, gauge, histogram};
     use serde_json::json;
     use std::collections::HashMap;
+    use std::sync::LazyLock;
     use std::time::Duration;
     use tracing::trace;
 
-    use once_cell::sync::Lazy;
     use tokio::runtime::Runtime;
 
-    static RT: Lazy<Runtime> = Lazy::new(|| Runtime::new().unwrap());
+    static RT: LazyLock<Runtime> = LazyLock::new(|| Runtime::new().unwrap());
 
     const TESTING_ACCEPT_LIST: &[&str] = &[
         "test_counter",
@@ -498,7 +497,7 @@ mod tests {
 
                 let prometheus = metrics.to_prometheus(global_labels);
                 let snapshot = expect_test::expect![[r#"
-                    # HELP counter_1 
+                    # HELP counter_1
                     # TYPE counter_1 counter
                     counter_1{global_one="one",global_two="two",label="one"} 4
 
@@ -510,7 +509,7 @@ mod tests {
                     # TYPE gauge_1 gauge
                     gauge_1{global_one="one",global_two="two"} 7
 
-                    # HELP gauge_2 
+                    # HELP gauge_2
                     # TYPE gauge_2 gauge
                     gauge_2{global_one="one",global_two="two",label="three"} 3
 
@@ -530,7 +529,7 @@ mod tests {
                     histogram_1_sum{global_one="one",global_two="two",hist_two="two",label="one"} 9
                     histogram_1_count{global_one="one",global_two="two",hist_two="two",label="one"} 1
 
-                    # HELP histogram_2 
+                    # HELP histogram_2
                     # TYPE histogram_2 histogram
                     histogram_2_bucket{global_one="one",global_two="two",le="0"} 0
                     histogram_2_bucket{global_one="one",global_two="two",le="1"} 0
