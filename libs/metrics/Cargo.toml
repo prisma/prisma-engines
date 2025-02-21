@@ -18,5 +18,5 @@ parking_lot.workspace = true
 pin-project.workspace = true
 
 [dev-dependencies]
-expect-test = "1"
-tokio.workspace = true
+expect-test.workspace = true
+tokio = { workspace = true, features = ["rt-multi-thread"] }

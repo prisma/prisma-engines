@@ -496,8 +496,8 @@ mod tests {
                 global_labels.insert("global_one".to_string(), "one".to_string());
 
                 let prometheus = metrics.to_prometheus(global_labels);
-                let snapshot = expect_test::expect![[r#"
-                    # HELP counter_1
+                let snapshot = expect_test::expect![[r##"
+                    # HELP counter_1 
                     # TYPE counter_1 counter
                     counter_1{global_one="one",global_two="two",label="one"} 4
 
@@ -509,7 +509,7 @@ mod tests {
                     # TYPE gauge_1 gauge
                     gauge_1{global_one="one",global_two="two"} 7
 
-                    # HELP gauge_2
+                    # HELP gauge_2 
                     # TYPE gauge_2 gauge
                     gauge_2{global_one="one",global_two="two",label="three"} 3
 
@@ -529,7 +529,7 @@ mod tests {
                     histogram_1_sum{global_one="one",global_two="two",hist_two="two",label="one"} 9
                     histogram_1_count{global_one="one",global_two="two",hist_two="two",label="one"} 1
 
-                    # HELP histogram_2
+                    # HELP histogram_2 
                     # TYPE histogram_2 histogram
                     histogram_2_bucket{global_one="one",global_two="two",le="0"} 0
                     histogram_2_bucket{global_one="one",global_two="two",le="1"} 0
@@ -545,7 +545,7 @@ mod tests {
                     histogram_2_sum{global_one="one",global_two="two"} 1000
                     histogram_2_count{global_one="one",global_two="two"} 1
 
-                "#]];
+                "##]];
 
                 snapshot.assert_eq(&prometheus);
             }
