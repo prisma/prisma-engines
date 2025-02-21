@@ -137,7 +137,7 @@ optional = true
 [target.'cfg(not(any(target_os = "macos", target_os = "ios")))'.dependencies.tiberius]
 workspace = true
 optional = true
-features = ["sql-browser-tokio", "chrono", "bigdecimal"]
+features = ["sql-browser-tokio", "chrono", "tds73", "bigdecimal"]
 
 [target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies.tiberius]
 workspace = true
@@ -150,6 +150,7 @@ features = [
   "tds73",
   "winauth",
 ]
+
 [dependencies.tokio-postgres]
 workspace = true
 features = [
