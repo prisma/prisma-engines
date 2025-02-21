@@ -54,9 +54,6 @@ fi
 
 
 build() {
-    echo "ℹ️  Current Rust toolchain version:"
-    cargo --version
-
     local CONNECTOR="$1"
     local CARGO_TARGET_DIR
     CARGO_TARGET_DIR=$(cargo metadata --format-version 1 | jq -r .target_directory)
