@@ -3,13 +3,5 @@ updates:
   - package-ecosystem: 'cargo'
     directories:
       - '/'
-      - '/libs/*'
-      - '/prisma-fmt'
-      - '/prisma-schema-wasm'
-      - '/psl/*'
-      - '/quaint'
-      - '/query-compiler/*'
-      - '/query-engine/*'
-      - '/schema-engine/*'
     schedule:
       interval: 'daily'
