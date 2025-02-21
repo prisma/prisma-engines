@@ -45,8 +45,8 @@ impl TryFrom<ColumnData<'static>> for Value<'static> {
         let res = match cd {
             ColumnData::U8(num) => ValueType::Int32(num.map(i32::from)),
             ColumnData::I16(num) => ValueType::Int32(num.map(i32::from)),
-            ColumnData::I32(num) => ValueType::Int32(num.map(i32::from)),
-            ColumnData::I64(num) => ValueType::Int64(num.map(i64::from)),
+            ColumnData::I32(num) => ValueType::Int32(num),
+            ColumnData::I64(num) => ValueType::Int64(num),
             ColumnData::F32(num) => ValueType::Float(num),
             ColumnData::F64(num) => ValueType::Double(num),
             ColumnData::Bit(b) => ValueType::Boolean(b),
