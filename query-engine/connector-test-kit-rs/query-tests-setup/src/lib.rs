@@ -23,12 +23,12 @@ pub use templating::*;
 
 use colored::Colorize;
 use futures::{future::Either, FutureExt};
-use once_cell::sync::Lazy;
 use prisma_metrics::{MetricRecorder, MetricRegistry, WithMetricsInstrumentation};
 use psl::datamodel_connector::ConnectorCapabilities;
 use std::future::Future;
 use std::panic::AssertUnwindSafe;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::LazyLock;
 use tokio::runtime::Builder;
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 use tracing_futures::WithSubscriber;
@@ -36,14 +36,15 @@ use tracing_futures::WithSubscriber;
 pub type TestResult<T> = Result<T, TestError>;
 
 /// Test configuration, loaded once at runtime.
-pub static CONFIG: Lazy<TestConfig> = Lazy::new(TestConfig::load);
+pub static CONFIG: LazyLock<TestConfig> = LazyLock::new(TestConfig::load);
 
 /// The log level from the environment.
-pub static ENV_LOG_LEVEL: Lazy<String> = Lazy::new(|| std::env::var("LOG_LEVEL").unwrap_or_else(|_| "info".to_owned()));
+pub static ENV_LOG_LEVEL: LazyLock<String> =
+    LazyLock::new(|| std::env::var("LOG_LEVEL").unwrap_or_else(|_| "info".to_owned()));
 
 /// Engine protocol used to run tests. Either 'graphql' or 'json'.
-pub static ENGINE_PROTOCOL: Lazy<String> =
-    Lazy::new(|| std::env::var("PRISMA_ENGINE_PROTOCOL").unwrap_or_else(|_| "graphql".to_owned()));
+pub static ENGINE_PROTOCOL: LazyLock<String> =
+    LazyLock::new(|| std::env::var("PRISMA_ENGINE_PROTOCOL").unwrap_or_else(|_| "graphql".to_owned()));
 
 /// Teardown of a test setup.
 async fn teardown_project(datamodel: &str, db_schemas: &[&str], schema_id: Option<usize>) -> TestResult<()> {
@@ -156,8 +157,8 @@ fn run_relation_link_test_impl(
     let expected_to_fail = ignore_lists::is_expected_to_fail(&full_test_name);
     let failed = &AtomicBool::new(false);
 
-    static RELATION_TEST_IDX: Lazy<Option<usize>> =
-        Lazy::new(|| std::env::var("RELATION_TEST_IDX").ok().and_then(|s| s.parse().ok()));
+    static RELATION_TEST_IDX: LazyLock<Option<usize>> =
+        LazyLock::new(|| std::env::var("RELATION_TEST_IDX").ok().and_then(|s| s.parse().ok()));
 
     let (dms, capabilities) = schema_with_relation(on_parent, on_child, id_only);
 

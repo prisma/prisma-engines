@@ -1,11 +1,10 @@
 use bigdecimal::BigDecimal;
 use chrono::Utc;
-use once_cell::sync::Lazy;
 use quaint::{prelude::Insert, Value};
 use sql_migration_tests::test_api::*;
-use std::{collections::HashMap, str::FromStr};
+use std::{collections::HashMap, str::FromStr, sync::LazyLock};
 
-static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
+static SAFE_CASTS: LazyLock<Vec<(&str, Value, &[&str])>> = LazyLock::new(|| {
     vec![
         (
             "Bit",
@@ -419,7 +418,7 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     ]
 });
 
-static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
+static RISKY_CASTS: LazyLock<Vec<(&str, Value, &[&str])>> = LazyLock::new(|| {
     vec![
         (
             "TinyInt",
@@ -1384,7 +1383,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     ]
 });
 
-static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
+static NOT_CASTABLE: LazyLock<Vec<(&str, Value, &[&str])>> = LazyLock::new(|| {
     vec![
         (
             "Bit",
@@ -1844,7 +1843,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     ]
 });
 
-static TYPE_MAPS: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
+static TYPE_MAPS: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::new(|| {
     let mut maps = HashMap::new();
 
     maps.insert("TinyInt", "Int");

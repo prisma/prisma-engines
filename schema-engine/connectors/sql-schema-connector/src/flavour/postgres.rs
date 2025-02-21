@@ -15,7 +15,6 @@ use wasm as imp;
 use crate::SqlFlavour;
 use enumflags2::BitFlags;
 use indoc::indoc;
-use once_cell::sync::Lazy;
 use quaint::{
     connector::{PostgresUrl, PostgresWebSocketUrl},
     Value,
@@ -28,6 +27,7 @@ use std::{
     borrow::Cow,
     future::{self, Future},
     str::FromStr,
+    sync::LazyLock,
     time,
 };
 use url::Url;
@@ -46,7 +46,7 @@ type State = imp::State;
 #[derive(Debug, Clone)]
 struct MigratePostgresUrl(PostgresUrl);
 
-static MIGRATE_WS_BASE_URL: Lazy<Cow<'static, str>> = Lazy::new(|| {
+static MIGRATE_WS_BASE_URL: LazyLock<Cow<'static, str>> = LazyLock::new(|| {
     std::env::var("PRISMA_SCHEMA_ENGINE_WS_BASE_URL")
         .map(Cow::Owned)
         .unwrap_or_else(|_| Cow::Borrowed("wss://migrations.prisma-data.net/websocket"))

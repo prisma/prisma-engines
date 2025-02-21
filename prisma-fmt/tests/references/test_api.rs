@@ -1,10 +1,9 @@
 use crate::helpers::load_schema_files;
-use once_cell::sync::Lazy;
-use std::{fmt::Write as _, io::Write as _};
+use std::{fmt::Write as _, io::Write as _, sync::LazyLock};
 
 const CURSOR_MARKER: &str = "<|>";
 const SCENARIOS_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/references/scenarios");
-static UPDATE_EXPECT: Lazy<bool> = Lazy::new(|| std::env::var("UPDATE_EXPECT").is_ok());
+static UPDATE_EXPECT: LazyLock<bool> = LazyLock::new(|| std::env::var("UPDATE_EXPECT").is_ok());
 
 pub(crate) fn test_scenario(scenario_name: &str) {
     let mut path = String::with_capacity(SCENARIOS_PATH.len() + 12);

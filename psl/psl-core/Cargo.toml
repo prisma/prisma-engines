@@ -12,25 +12,24 @@ mssql = []
 mongodb = []
 
 [dependencies]
-diagnostics = { path = "../diagnostics" }
-parser-database = { path = "../parser-database" }
-prisma-value = { path = "../../libs/prisma-value" }
-schema-ast = { path = "../schema-ast" }
+diagnostics.workspace = true
+parser-database.workspace = true
+prisma-value.workspace = true
+schema-ast.workspace = true
 
-bigdecimal = "0.3"
-chrono = { workspace = true }
+bigdecimal.workspace = true
+chrono.workspace = true
 connection-string.workspace = true
 itertools.workspace = true
-once_cell = "1.3.1"
 regex.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 enumflags2.workspace = true
 indoc.workspace = true
-either = "1.8.1"
-hex = "0.4"
+either.workspace = true
+hex.workspace = true
 
 # For the connector API.
-lsp-types = "0.95.1"
+lsp-types.workspace = true
 url.workspace = true
-cfg-if = "1.0.0"
+cfg-if.workspace = true

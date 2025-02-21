@@ -10,7 +10,7 @@ pub mod query_engine;
 pub mod schema_engine;
 
 use serde::{Deserialize, Serialize};
-use std::borrow::Cow;
+use std::{backtrace::Backtrace, borrow::Cow};
 
 pub use panic_hook::set_panic_hook;
 
@@ -112,7 +112,7 @@ impl Error {
         Error {
             inner: ErrorType::Unknown(UnknownError {
                 message,
-                backtrace: Some(format!("{:?}", backtrace::Backtrace::new())),
+                backtrace: Some(format!("{:?}", Backtrace::force_capture())),
             }),
             is_panic: false,
             batch_request_idx: None,
@@ -124,7 +124,7 @@ impl Error {
     pub fn new_in_panic_hook(panic_info: &std::panic::PanicHookInfo<'_>) -> Self {
         let message = panic_utils::downcast_ref_to_string(panic_info.payload()).unwrap_or("<unknown panic>");
 
-        let backtrace = Some(format!("{:?}", backtrace::Backtrace::new()));
+        let backtrace = Some(format!("{:?}", Backtrace::force_capture()));
         let location = panic_info
             .location()
             .map(|loc| format!("{loc}"))
@@ -182,8 +182,8 @@ impl Error {
     }
 }
 
-pub fn new_backtrace() -> backtrace::Backtrace {
-    backtrace::Backtrace::new()
+pub fn new_backtrace() -> Backtrace {
+    Backtrace::force_capture()
 }
 
 impl<T: UserFacingError> From<T> for Error {

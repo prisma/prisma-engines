@@ -44,74 +44,182 @@ level = "warn"
 check-cfg = ['cfg(wasm_bindgen_unstable_test_coverage)', 'cfg(debug_assert)']
 
 [workspace.dependencies]
-async-trait = { version = "0.1.77" }
+ahash = "0.8"
+anyhow = "1"
+async-trait = "0.1"
+barrel = { git = "https://github.com/prisma/barrel.git", branch = "mssql-support" }
+base64 = "0.13"
 bigdecimal = "0.3"
-enumflags2 = { version = "0.7", features = ["serde"] }
+bitflags = "1"
+bit-vec = "0.6"
+bson = "2"
+bytes = "1"
+byteorder = { version = "1", default-features = false }
+cfg-if = "1"
+chrono = "0.4"
+colored = "2"
+concat-idents = "1"
+connection-string = "0.2"
+convert_case = "0.6"
+crossbeam-channel = "0.5"
+cuid = { git = "https://github.com/prisma/cuid-rust", branch = "v1.3.3-wasm32-unknown-unknown" }
+derive_more = "0.99"
+either = "1"
+enumflags2 = "0.7"
+env_logger = "0.11"
 futures = "0.3"
-psl = { path = "./psl/psl" }
+getrandom = "0.2"
+graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
+heck = "0.3"
+hex = "0.4"
+hyper = "0.14"
+indoc = "2"
+indexmap = "2"
+itertools = "0.12"
+jsonrpc-core = "17"
+log = "0.4"
+lru = "0.7"
+lru-cache = "0.1"
+lsp-types = "0.95"
+mobc = "0.8"
+mongodb = { git = "https://github.com/prisma/mongo-rust-driver.git", branch = "RUST-1994/happy-eyeballs" }
+mysql_async = { git = "https://github.com/prisma/mysql_async", branch = "vendored-openssl" }
+names = { version = "0.11", default-features = false }
+nanoid = "0.4"
+napi = { version = "2", default-features = false, features = [
+    "napi9",
+    "tokio_rt",
+    "serde-json",
+] }
+napi-derive = "2"
+native-tls = "0.2"
+nom = "7"
+num_cpus = "1"
+parse-hyperlinks = "0.23"
+paste = "1"
+percent-encoding = "2"
+pest = "2"
+pest_derive = "2"
+petgraph = "0.4"
+pin-project = "1"
+postgres-native-tls = { git = "https://github.com/prisma/rust-postgres", branch = "pgbouncer-mode" }
+postgres-types = { git = "https://github.com/prisma/rust-postgres", branch = "pgbouncer-mode" }
+pretty = "0.12"
+rustc-hash = "1"
+rand = "0.8"
+regex = "1"
+reqwest = "0.11"
+rusqlite = "0.31"
+sha2 = "0.9"
+serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = [
     "float_roundtrip",
     "preserve_order",
     "raw_value",
 ] }
-serde = { version = "1", features = ["derive"] }
-tokio = { version = "1", features = [
-    "rt-multi-thread",
-    "macros",
-    "sync",
-    "io-std",
-    "io-util",
-    "parking_lot",
-    "time",
-] }
-chrono = { version = "0.4.38", features = ["serde"] }
-derive_more = "0.99.17"
-user-facing-errors = { path = "./libs/user-facing-errors" }
-uuid = { version = "1", features = ["serde", "v4", "v7", "js"] }
-cuid = { git = "https://github.com/prisma/cuid-rust", branch = "v1.3.3-wasm32-unknown-unknown" }
-ulid = "1"
-getrandom = { version = "0.2" }
-
-indoc = "2.0.1"
-indexmap = { version = "2.2.2", features = ["serde"] }
-itertools = "0.12"
-connection-string = "0.2"
-napi = { version = "2.16.13", default-features = false, features = [
-    "napi9",
-    "tokio_rt",
-    "serde-json",
-] }
-napi-derive = "2.16.12"
-pin-project = "1"
-pretty = { version = "0.12", features = ["termcolor"] }
-rand = { version = "0.8" }
-regex = { version = "1", features = ["std"] }
-serde_repr = { version = "0.1.17" }
-serde-wasm-bindgen = { version = "0.5" }
-tracing = { version = "0.1" }
+serde_repr = "0.1"
+serde-wasm-bindgen = "0.5"
+strip-ansi-escapes = "0.1"
+structopt = "0.3"
+sqlformat = "0.2"
+sqlparser = "0.32"
+sqlx-core = "0.8"
+sqlx-sqlite = "0.8"
+tempfile = "3"
+tiberius = { version = "0.12", default-features = false }
+tokio = "1"
+tokio-postgres = { git = "https://github.com/prisma/rust-postgres", branch = "pgbouncer-mode" }
+tokio-tungstenite = "0.26"
+tokio-util = "0.7"
+toml = "0.5"
+tracing = "0.1"
+tracing-core = "0.1"
+tracing-error = "0.2"
+tracing-subscriber = "0.3"
 tracing-futures = "0.2"
-tsify = { version = "0.4.5" }
-thiserror = "1.0"
+tsify = "0.4"
+thiserror = "1"
+url = "2"
+ulid = "1"
+uuid = { version = "1", features = ["v4", "v7", "js"] }
+versions = "6"
 
 # version for `wasm-bindgen@0.2.93`, see:
-# https://github.com/rustwasm/wasm-bindgen/pull/4072/
-js-sys = { version = "0.3.70" }
+# https://github.com/rustwasm/wasm-bindgen/pull/4072/
+js-sys = "=0.3.70"
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+wasm-logger = "0.2"
 
-wasm-bindgen = { version = "0.2.93" }
-wasm-bindgen-futures = { version = "0.4" }
-wasm-rs-dbg = { version = "0.1.2", default-features = false, features = [
+# build dependencies
+cbindgen = "0.24"
+cfg_aliases = "0.2"
+darling = "0.13"
+napi-build = "1"
+proc-macro2 = "1"
+quote = "1"
+syn = "1"
+
+# dev dependencies
+codspeed-criterion-compat = "1"
+dissimilar = "1"
+expect-test = "1"
+flate2 = "1"
+insta = "1"
+pretty_assertions = "1"
+similar = "2"
+tracing-test = "0.2"
+wasm-bindgen-test = "0.3"
+wasm-rs-dbg = { version = "0.1", default-features = false, features = [
     "console-error",
 ] }
-wasm-bindgen-test = { version = "0.3.0" }
-url = { version = "2.5.0" }
 
-bson = { version = "2.11.0", features = ["chrono-0_4", "uuid-1"] }
-mongodb = { git = "https://github.com/prisma/mongo-rust-driver.git", branch = "RUST-1994/happy-eyeballs" }
+# workspace dependencies
+quaint = { path = "./quaint", default-features = false }
+prisma-fmt.path = "./prisma-fmt"
 
-insta = "1"
+build-utils.path = "./libs/build-utils"
+crosstarget-utils.path = "./libs/crosstarget-utils"
+panic-utils.path = "./libs/panic-utils"
+prisma-metrics.path = "./libs/metrics"
+prisma-value.path = "./libs/prisma-value"
+telemetry.path = "./libs/telemetry"
+user-facing-errors.path = "./libs/user-facing-errors"
+user-facing-error-macros.path = "./libs/user-facing-error-macros"
+mongodb-client.path = "./libs/mongodb-client"
+test-setup.path = "./libs/test-setup"
+test-macros.path = "./libs/test-macros"
+query-engine-common.path = "./libs/query-engine-common"
+driver-adapters.path = "./libs/driver-adapters"
+sql-ddl.path = "./libs/sql-ddl"
 
-[workspace.dependencies.quaint]
-path = "quaint"
+psl.path = "./psl/psl"
+psl-core.path = "./psl/psl-core"
+diagnostics.path = "./psl/diagnostics"
+schema-ast.path = "./psl/schema-ast"
+parser-database.path = "./psl/parser-database"
+
+query-engine.path = "./query-engine/query-engine"
+query-core.path = "./query-engine/core"
+schema.path = "./query-engine/schema"
+query-structure.path = "./query-engine/query-structure"
+query-connector.path = "./query-engine/connectors/query-connector"
+query-builder.path = "./query-engine/query-builders/query-builder"
+sql-query-builder.path = "./query-engine/query-builders/sql-query-builder"
+dmmf.path = "./query-engine/dmmf"
+request-handlers = { path = "./query-engine/request-handlers", default-features = false }
+sql-query-connector = { path = "./query-engine/connectors/sql-query-connector", default-features = false }
+mongodb-query-connector = { path = "./query-engine/connectors/mongodb-query-connector", default-features = false }
+
+schema-core.path = "./schema-engine/core"
+datamodel-renderer.path = "./schema-engine/datamodel-renderer"
+schema-connector.path = "./schema-engine/connectors/schema-connector"
+sql-schema-connector.path = "./schema-engine/connectors/sql-schema-connector"
+mongodb-schema-connector.path = "./schema-engine/connectors/mongodb-schema-connector"
+sql-schema-describer.path = "./schema-engine/sql-schema-describer"
+mongodb-schema-describer.path = "./schema-engine/mongodb-schema-describer"
+
+query-compiler = { path = "./query-compiler/query-compiler", default-features = false }
 
 [profile.dev.package.backtrace]
 opt-level = 3

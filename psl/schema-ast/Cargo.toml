@@ -4,9 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-diagnostics = { path = "../diagnostics" }
+diagnostics.workspace = true
 
-pest = "2.1.3"
-pest_derive = "2.1.0"
+pest.workspace = true
+pest_derive.workspace = true
 serde.workspace = true
 serde_json.workspace = true

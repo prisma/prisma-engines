@@ -1,3 +1,5 @@
+use std::sync::LazyLock;
+
 use super::SqlSchemaDifferFlavour;
 use crate::{
     database_schema::SqlDatabaseSchema,
@@ -10,7 +12,6 @@ use crate::{
     sql_schema_differ::{column::ColumnTypeChange, differ_database::DifferDatabase},
 };
 use enumflags2::BitFlags;
-use once_cell::sync::Lazy;
 use psl::builtin_connectors::{CockroachType, PostgresType};
 use regex::RegexSet;
 use sql_schema_describer::{
@@ -19,7 +20,7 @@ use sql_schema_describer::{
 };
 
 /// These can be tables or views, depending on the PostGIS version. In both cases, they should be ignored.
-static POSTGIS_TABLES_OR_VIEWS: Lazy<RegexSet> = Lazy::new(|| {
+static POSTGIS_TABLES_OR_VIEWS: LazyLock<RegexSet> = LazyLock::new(|| {
     RegexSet::new([
         // PostGIS. Reference: https://postgis.net/docs/manual-1.4/ch04.html#id418599
         "(?i)^spatial_ref_sys$",
@@ -33,7 +34,7 @@ static POSTGIS_TABLES_OR_VIEWS: Lazy<RegexSet> = Lazy::new(|| {
 });
 
 // https://www.postgresql.org/docs/12/pgbuffercache.html
-static EXTENSION_VIEWS: Lazy<RegexSet> = Lazy::new(|| RegexSet::new(["(?i)^pg_buffercache$"]).unwrap());
+static EXTENSION_VIEWS: LazyLock<RegexSet> = LazyLock::new(|| RegexSet::new(["(?i)^pg_buffercache$"]).unwrap());
 
 impl SqlSchemaDifferFlavour for PostgresFlavour {
     fn can_alter_primary_keys(&self) -> bool {

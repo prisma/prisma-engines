@@ -4,12 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = "1"
+anyhow.workspace = true
 serde_json.workspace = true
 
 psl = { workspace = true, features = ["all"]}
-query-compiler.path = "../query-compiler"
-request-handlers.path = "../../query-engine/request-handlers"
-query-core.path = "../../query-engine/core"
+query-compiler.workspace = true
+request-handlers.workspace = true
+query-core.workspace = true
 quaint.workspace = true
-sql-query-builder.path = "../../query-engine/query-builders/sql-query-builder"
+sql-query-builder.workspace = true

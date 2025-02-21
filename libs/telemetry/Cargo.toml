@@ -4,15 +4,15 @@ name = "telemetry"
 version = "0.1.0"
 
 [dependencies]
-ahash = "0.8.11"
+ahash.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-thiserror = "1.0"
-tokio = { version = "1.0", features = ["macros", "time"] }
+thiserror.workspace = true
+tokio = { workspace = true, features = ["macros", "time"] }
 tracing = { workspace = true, features = ["attributes"] }
 tracing-futures.workspace = true
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-crosstarget-utils = { path = "../crosstarget-utils" }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+crosstarget-utils.workspace = true
 enumflags2.workspace = true
 derive_more.workspace = true
 

@@ -4,13 +4,13 @@ name = "sql-query-builder"
 version = "0.1.0"
 
 [dependencies]
-quaint = { path = "../../../quaint" }
-query-structure = { path = "../../query-structure" }
-schema = { path = "../../schema" }
-query-builder = { path = "../query-builder" }
-telemetry = { path = "../../../libs/telemetry" }
-prisma-value = { path = "../../../libs/prisma-value" }
-psl = { path = "../../../psl/psl" }
+quaint.workspace = true
+query-structure.workspace = true
+schema.workspace = true
+query-builder.workspace = true
+telemetry.workspace = true
+prisma-value.workspace = true
+psl.workspace = true
 
 itertools.workspace = true
 chrono.workspace = true

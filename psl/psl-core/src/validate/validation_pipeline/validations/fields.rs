@@ -1,3 +1,5 @@
+use std::sync::LazyLock;
+
 use super::{
     constraint_namespace::ConstraintName,
     database_name::validate_db_name,
@@ -316,12 +318,11 @@ pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<
 }
 
 pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) {
-    use once_cell::sync::Lazy;
     use regex::Regex;
 
     let source = if let Some(s) = ctx.datasource { s } else { return };
 
-    static TYPE_REGEX: Lazy<Regex> = Lazy::new(|| {
+    static TYPE_REGEX: LazyLock<Regex> = LazyLock::new(|| {
         Regex::new(r"(?x)
     ^                           # beginning of the string
     (?P<prefix>[^(]+)           # a required prefix that is any character until the first opening brace

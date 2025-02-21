@@ -13,11 +13,11 @@ mongodb = ["psl-core/mongodb"]
 all = ["postgresql", "sqlite", "mysql", "cockroachdb", "mssql", "mongodb"]
 
 [dependencies]
-psl-core = { path = "../psl-core" }
+psl-core.workspace = true
 
 [dev-dependencies]
-base64 = "0.13.0"
-dissimilar = "1.0.4"
-expect-test = "1.1.0"
+base64.workspace = true
+dissimilar.workspace = true
+expect-test.workspace = true
 indoc.workspace = true
-either = "1.8.1"
+either.workspace = true

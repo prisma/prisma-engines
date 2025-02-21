@@ -1,6 +1,6 @@
 use super::*;
 use constants::aggregations::*;
-use std::convert::identity;
+use std::{convert::identity, sync::LazyLock};
 
 /// Builds group by aggregation object type for given model (e.g. GroupByUserOutputType).
 pub(crate) fn group_by_output_object_type(ctx: &'_ QuerySchema, model: Model) -> ObjectType<'_> {
@@ -24,7 +24,7 @@ pub(crate) fn group_by_output_object_type(ctx: &'_ QuerySchema, model: Model) ->
                 model.fields().scalar().collect(),
                 |_, _| OutputType::non_list(OutputType::int()),
                 |mut obj| {
-                    obj.fields = Arc::new(once_cell::sync::Lazy::new(Box::new(move || {
+                    obj.fields = Arc::new(LazyLock::new(Box::new(move || {
                         let mut fields = (*obj.fields).clone();
                         fields.push(field_no_arguments(
                             "_all",

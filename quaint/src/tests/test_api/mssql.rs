@@ -1,11 +1,10 @@
 use super::TestApi;
 use crate::{connector::Queryable, single::Quaint};
 use names::Generator;
-use once_cell::sync::Lazy;
 use quaint_test_setup::Tags;
-use std::env;
+use std::{env, sync::LazyLock};
 
-pub static CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_MSSQL").expect("TEST_MSSQL env var"));
+pub static CONN_STR: LazyLock<String> = LazyLock::new(|| env::var("TEST_MSSQL").expect("TEST_MSSQL env var"));
 
 pub(crate) async fn mssql_test_api<'a>() -> crate::Result<MsSql<'a>> {
     MsSql::new().await
