@@ -131,13 +131,9 @@ pub async fn sql_schema_from_migrations_and_db(
             migration.migration_name()
         );
 
-        shadow_db
-            .raw_cmd(&script)
-            .await
-            .map_err(ConnectorError::from)
-            .map_err(|connector_error| {
-                connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
-            })?;
+        shadow_db.raw_cmd(&script).await.map_err(|connector_error| {
+            connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
+        })?;
     }
 
     if shadow_db.provider == PostgresProvider::CockroachDb {
