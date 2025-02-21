@@ -31,7 +31,7 @@ query-core = { workspace = true, features = ["metrics"] }
 request-handlers = { workspace = true, features = ["all"] }
 query-connector.workspace = true
 query-engine-common.workspace = true
-query-compiler.workspace = true
+query-compiler = { workspace = true, features = ["all"] }
 user-facing-errors.workspace = true
 telemetry.workspace = true
 psl = { workspace = true, features = ["all"] }

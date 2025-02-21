@@ -25,8 +25,9 @@ psl = { workspace = true, features = ["sqlite", "mysql", "postgresql", "mssql"] 
 quaint = { workspace = true, features = ["sqlite", "mysql", "postgresql", "mssql"] }
 
 [features]
-default = ["sqlite", "postgresql", "mysql", "mssql"]
+default = ["all"]
 sqlite = ["quaint/sqlite"]
 postgresql = ["quaint/postgresql"]
 mysql = ["quaint/mysql"]
 mssql = ["quaint/mssql"]
+all = ["sqlite", "postgresql", "mysql", "mssql"]
