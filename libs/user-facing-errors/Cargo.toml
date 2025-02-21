@@ -4,15 +4,14 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-panic-utils.path = "../panic-utils"
-user-facing-error-macros = { path = "../user-facing-error-macros" }
+panic-utils.workspace = true
+user-facing-error-macros.workspace = true
 serde_json.workspace = true
 serde.workspace = true
-backtrace = "0.3.40"
 tracing.workspace = true
 indoc.workspace = true
 itertools.workspace = true
-quaint = { path = "../../quaint", default-features = false, optional = true }
+quaint = { workspace = true, optional = true }
 
 [features]
 default = []

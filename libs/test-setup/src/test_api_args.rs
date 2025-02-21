@@ -1,7 +1,7 @@
 use crate::{logging, mssql, mysql, postgres, Capabilities, Tags};
 use enumflags2::BitFlags;
-use once_cell::sync::Lazy;
 use quaint::single::Quaint;
+use std::sync::LazyLock;
 use std::time::Duration;
 use std::{fmt::Display, io::Write as _};
 
@@ -28,7 +28,7 @@ source .test_database_urls/mysql_5_6
 /// How long to wait for a schema change to propagate in Vitess.
 const VITESS_MAX_REFRESH_DELAY_MS: u64 = 1000;
 
-static DB_UNDER_TEST: Lazy<Result<DbUnderTest, String>> = Lazy::new(|| {
+static DB_UNDER_TEST: LazyLock<Result<DbUnderTest, String>> = LazyLock::new(|| {
     let database_url = std::env::var("TEST_DATABASE_URL").map_err(|_| MISSING_TEST_DATABASE_URL_MSG.to_owned())?;
     let shadow_database_url = std::env::var("TEST_SHADOW_DATABASE_URL").ok();
     let prefix = database_url

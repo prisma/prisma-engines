@@ -1,11 +1,10 @@
 use super::*;
-use once_cell::sync::Lazy;
 use serde::de::DeserializeOwned;
 use std::{
     error::Error as StdError,
     fmt::Display,
     io::Write as _,
-    sync::{atomic::Ordering, Arc},
+    sync::{atomic::Ordering, Arc, LazyLock},
 };
 use tokio::sync::{mpsc, oneshot, RwLock};
 
@@ -169,7 +168,8 @@ impl PendingRequests {
     }
 }
 
-pub(super) static EXTERNAL_PROCESS: Lazy<RestartableExecutorProcess> = Lazy::new(RestartableExecutorProcess::new);
+pub(super) static EXTERNAL_PROCESS: LazyLock<RestartableExecutorProcess> =
+    LazyLock::new(RestartableExecutorProcess::new);
 
 type ReqImpl = (
     jsonrpc_core::MethodCall,

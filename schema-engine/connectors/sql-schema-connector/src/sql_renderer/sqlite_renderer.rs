@@ -5,11 +5,10 @@ use crate::{
     sql_migration::{AlterEnum, AlterTable, RedefineTable, TableChange},
 };
 use indoc::formatdoc;
-use once_cell::sync::Lazy;
 use regex::Regex;
 use sql_ddl::sqlite as ddl;
 use sql_schema_describer::{walkers::*, *};
-use std::borrow::Cow;
+use std::{borrow::Cow, sync::LazyLock};
 
 impl SqlRenderer for SqliteFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
@@ -271,7 +270,7 @@ fn render_column_type(t: &ColumnType) -> &str {
 }
 
 fn escape_quotes(s: &str) -> Cow<'_, str> {
-    static STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'"#).unwrap());
+    static STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"'"#).unwrap());
 
     STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'$0")
 }

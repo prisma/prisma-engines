@@ -1,11 +1,10 @@
 use super::*;
 use fmt::Debug;
-use once_cell::sync::Lazy;
 use query_structure::{prelude::ParentContainer, DefaultKind};
-use std::{borrow::Cow, boxed::Box, fmt};
+use std::{borrow::Cow, boxed::Box, fmt, sync::LazyLock};
 
 type InputObjectFields<'a> =
-    Option<Arc<Lazy<Vec<InputField<'a>>, Box<dyn FnOnce() -> Vec<InputField<'a>> + Send + Sync + 'a>>>>;
+    Option<Arc<LazyLock<Vec<InputField<'a>>, Box<dyn FnOnce() -> Vec<InputField<'a>> + Send + Sync + 'a>>>>;
 
 #[derive(Clone)]
 pub struct InputObjectType<'a> {
@@ -63,7 +62,7 @@ impl<'a> InputObjectType<'a> {
     }
 
     pub(crate) fn set_fields(&mut self, f: impl FnOnce() -> Vec<InputField<'a>> + Send + Sync + 'a) {
-        self.fields = Some(Arc::new(Lazy::new(Box::new(f))));
+        self.fields = Some(Arc::new(LazyLock::new(Box::new(f))));
     }
 
     pub fn tag(&self) -> Option<&ObjectTag<'a>> {

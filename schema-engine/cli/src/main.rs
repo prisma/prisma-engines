@@ -6,7 +6,7 @@ mod logger;
 
 use schema_connector::{BoxFuture, ConnectorHost, ConnectorResult};
 use schema_core::rpc_api;
-use std::sync::Arc;
+use std::{backtrace::Backtrace, sync::Arc};
 use structopt::StructOpt;
 
 /// When no subcommand is specified, the schema engine will default to starting as a JSON-RPC
@@ -55,7 +55,7 @@ fn set_panic_hook() {
 
         tracing::error!(
             is_panic = true,
-            backtrace = ?backtrace::Backtrace::new(),
+            backtrace = ?Backtrace::force_capture(),
             location = %location,
             "[{}] {}",
             location,

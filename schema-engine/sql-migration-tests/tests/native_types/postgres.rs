@@ -1,11 +1,10 @@
 use bigdecimal::BigDecimal;
 use chrono::Utc;
-use once_cell::sync::Lazy;
 use quaint::{prelude::Insert, Value};
 use sql_migration_tests::test_api::*;
-use std::{collections::HashMap, fmt::Write as _, str::FromStr};
+use std::{collections::HashMap, fmt::Write as _, str::FromStr, sync::LazyLock};
 
-static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
+static SAFE_CASTS: LazyLock<Vec<(&str, Value, &[&str])>> = LazyLock::new(|| {
     vec![
         ("Oid", Value::int32(u8::MAX), &["VarChar(100)", "Integer", "BigInt"]),
         ("Money", Value::int64(u8::MAX), &["VarChar(100)"]),
@@ -152,7 +151,7 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     ]
 });
 
-static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
+static RISKY_CASTS: LazyLock<Vec<(&str, Value, &[&str])>> = LazyLock::new(|| {
     vec![
         ("Money", Value::int64(u8::MAX), &["Decimal"]),
         ("SmallInt", Value::int32(2), &["Decimal(2,1)", "VarChar(3)", "Char(1)"]),
@@ -219,7 +218,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     ]
 });
 
-static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
+static NOT_CASTABLE: LazyLock<Vec<(&str, Value, &[&str])>> = LazyLock::new(|| {
     vec![
         (
             "SmallInt",
@@ -728,7 +727,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     ]
 });
 
-static TYPE_MAPS: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
+static TYPE_MAPS: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::new(|| {
     let mut maps = HashMap::new();
 
     maps.insert("SmallInt", "Int");
@@ -1057,9 +1056,9 @@ fn not_castable_with_existing_data_should_warn(api: TestApi) {
 }
 
 /// A list of casts which can safely be performed.
-type CastList = Lazy<Vec<(&'static str, Vec<(&'static str, Value<'static>)>)>>;
+type CastList = LazyLock<Vec<(&'static str, Vec<(&'static str, Value<'static>)>)>>;
 
-static SAFE_CASTS_NON_LIST_TO_STRING: CastList = Lazy::new(|| {
+static SAFE_CASTS_NON_LIST_TO_STRING: CastList = LazyLock::new(|| {
     vec![
         (
             "Text",

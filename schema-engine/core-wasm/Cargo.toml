@@ -5,17 +5,17 @@ version = "0.1.0"
 
 [dependencies]
 psl = { workspace = true, features = ["all"] }
-schema-connector = { path = "../connectors/schema-connector" }
+schema-connector.workspace = true
 
 async-trait.workspace = true
 chrono.workspace = true
 enumflags2.workspace = true
-jsonrpc-core = "17.0"
+jsonrpc-core.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 tokio.workspace = true
 tracing.workspace = true
-tracing-subscriber = "0.3"
+tracing-subscriber.workspace = true
 tracing-futures.workspace = true
 url.workspace = true
 

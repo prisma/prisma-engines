@@ -1,10 +1,9 @@
 use enumflags2::BitFlags;
 use names::Generator;
-use once_cell::sync::Lazy;
 use psl::PreviewFeature;
-use std::io::Write as _;
+use std::{io::Write as _, sync::LazyLock};
 
-pub static CONN_STR: Lazy<String> = Lazy::new(|| match std::env::var("TEST_DATABASE_URL") {
+pub static CONN_STR: LazyLock<String> = LazyLock::new(|| match std::env::var("TEST_DATABASE_URL") {
     Ok(url) => url,
     Err(_) => {
         let stderr = std::io::stderr();

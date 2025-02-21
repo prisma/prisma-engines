@@ -5,7 +5,6 @@ use crate::{
         record_migration_started, MigrationDirectory,
     },
 };
-use once_cell::sync::Lazy;
 use query_core::{
     protocol::EngineProtocol,
     schema::{self},
@@ -19,7 +18,7 @@ use std::{
     mem::ManuallyDrop,
     path::{Path, PathBuf},
     ptr::null_mut,
-    sync::Arc,
+    sync::{Arc, LazyLock},
 };
 use tokio::{
     runtime::{self, Runtime},
@@ -36,7 +35,8 @@ use request_handlers::ConnectorKind;
 
 // The query engine code is async by nature, however the C API does not function with async functions
 // This runtime is here to allow the C API to block_on it and return the responses in a sync manner
-static RUNTIME: Lazy<Runtime> = Lazy::new(|| runtime::Builder::new_multi_thread().enable_all().build().unwrap());
+static RUNTIME: LazyLock<Runtime> =
+    LazyLock::new(|| runtime::Builder::new_multi_thread().enable_all().build().unwrap());
 
 // C-like return codes
 #[no_mangle]

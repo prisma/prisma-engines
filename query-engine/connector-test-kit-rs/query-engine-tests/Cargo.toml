@@ -5,27 +5,26 @@ version = "0.1.0"
 
 [dependencies]
 enumflags2.workspace = true
-anyhow = "1.0"
+anyhow.workspace = true
 serde_json.workspace = true
 query-test-macros = { path = "../query-test-macros" }
 query-tests-setup = { path = "../query-tests-setup" }
 indoc.workspace = true
 tracing.workspace = true
 tracing-futures.workspace = true
-colored = "2"
+colored.workspace = true
 chrono.workspace = true
 psl.workspace = true
-base64 = "0.13"
+base64.workspace = true
 uuid.workspace = true
 cuid.workspace = true
 ulid.workspace = true
 tokio.workspace = true
 user-facing-errors.workspace = true
-prisma-value = { path = "../../../libs/prisma-value" }
-prisma-metrics.path = "../../../libs/metrics"
-once_cell = "1.15.0"
+prisma-value.workspace = true
+prisma-metrics.workspace = true
 futures.workspace = true
-paste = "1.0.14"
+paste.workspace = true
 
 [dev-dependencies]
 insta = { workspace = true, features = ["json", "redactions"] }

@@ -9,6 +9,5 @@ edition = "2021"
 mongodb.workspace = true
 
 # Remove these when mongo opens up their connection string parsing
-percent-encoding = "2.0.0"
-thiserror = "1"
-once_cell = "1"
+percent-encoding.workspace = true
+thiserror.workspace = true

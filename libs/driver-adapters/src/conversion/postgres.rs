@@ -1,9 +1,10 @@
+use std::sync::LazyLock;
+
 use crate::conversion::JSArg;
-use once_cell::sync::Lazy;
 use quaint::chrono::format::StrftimeItems;
 use serde_json::value::Value as JsonValue;
 
-static TIME_FMT: Lazy<StrftimeItems> = Lazy::new(|| StrftimeItems::new("%H:%M:%S%.f"));
+static TIME_FMT: LazyLock<StrftimeItems> = LazyLock::new(|| StrftimeItems::new("%H:%M:%S%.f"));
 
 #[rustfmt::skip]
 pub fn value_to_js_arg(value: &quaint::Value) -> serde_json::Result<JSArg> {

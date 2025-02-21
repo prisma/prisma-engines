@@ -4,25 +4,24 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-schema-connector = { path = "../connectors/schema-connector", features = [
+schema-connector = { workspace = true, features = [
     "all-native",
 ] }
-schema-core = { path = "../core" }
-user-facing-errors = { path = "../../libs/user-facing-errors", features = [
+schema-core.workspace = true
+user-facing-errors = { workspace = true, features = [
     "all-native",
 ] }
-panic-utils = { path = "../../libs/panic-utils" }
+panic-utils.workspace = true
 
-backtrace = "0.3.59"
-base64 = "0.13"
-jsonrpc-core = "17"
-structopt = "0.3.8"
+base64.workspace = true
+jsonrpc-core.workspace = true
+structopt.workspace = true
 serde_json.workspace = true
 serde.workspace = true
-tokio.workspace = true
+tokio = { workspace = true, features = ["io-std"] }
 tracing.workspace = true
-tracing-error = "0.2"
-tracing-subscriber = { version = "0.3", features = [
+tracing-error.workspace = true
+tracing-subscriber = { workspace = true, features = [
     "fmt",
     "json",
     "time",
@@ -30,17 +29,17 @@ tracing-subscriber = { version = "0.3", features = [
 ] }
 
 [dev-dependencies]
-tempfile = "3.1.0"
-test-setup = { path = "../../libs/test-setup" }
-test-macros = { path = "../../libs/test-macros" }
+tempfile.workspace = true
+test-setup.workspace = true
+test-macros.workspace = true
 url.workspace = true
 indoc.workspace = true
 connection-string.workspace = true
-expect-test = "1.4.0"
+expect-test.workspace = true
 quaint = { workspace = true, features = ["all-native"] }
 
 [build-dependencies]
-build-utils.path = "../../libs/build-utils"
+build-utils.workspace = true
 
 [[bin]]
 name = "schema-engine"

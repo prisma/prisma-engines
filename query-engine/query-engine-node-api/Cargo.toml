@@ -25,21 +25,21 @@ used_linker = []
 workspace = true
 
 [dependencies]
-anyhow = "1"
+anyhow.workspace = true
 async-trait.workspace = true
-query-core = { path = "../core", features = ["metrics"] }
-request-handlers = { path = "../request-handlers", features = ["all"] }
-query-connector = { path = "../connectors/query-connector" }
-query-engine-common = { path = "../../libs/query-engine-common" }
-query-compiler = { path = "../../query-compiler/query-compiler" }
-user-facing-errors = { path = "../../libs/user-facing-errors" }
-telemetry = { path = "../../libs/telemetry" }
+query-core = { workspace = true, features = ["metrics"] }
+request-handlers = { workspace = true, features = ["all"] }
+query-connector.workspace = true
+query-engine-common.workspace = true
+query-compiler = { workspace = true, features = ["all"] }
+user-facing-errors.workspace = true
+telemetry.workspace = true
 psl = { workspace = true, features = ["all"] }
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector", features = [
     "all-native",
 ] }
-query-structure = { path = "../query-structure" }
-driver-adapters = { path = "../../libs/driver-adapters", features = [
+query-structure.workspace = true
+driver-adapters = { workspace = true, features = [
     "postgresql",
     "sqlite",
     "mysql",
@@ -47,21 +47,21 @@ driver-adapters = { path = "../../libs/driver-adapters", features = [
 napi.workspace = true
 napi-derive.workspace = true
 
-thiserror = "1"
+thiserror.workspace = true
 connection-string.workspace = true
 url.workspace = true
 serde_json.workspace = true
 serde.workspace = true
 
 tracing.workspace = true
-tracing-subscriber = { version = "0.3" }
+tracing-subscriber.workspace = true
 tracing-futures.workspace = true
 
 quaint.workspace = true
 tokio.workspace = true
 futures.workspace = true
-prisma-metrics.path = "../../libs/metrics"
+prisma-metrics.workspace = true
 
 [build-dependencies]
-napi-build = "1"
-build-utils.path = "../../libs/build-utils"
+napi-build.workspace = true
+build-utils.workspace = true

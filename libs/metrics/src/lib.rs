@@ -30,9 +30,8 @@ mod registry;
 
 pub mod guards;
 
-use once_cell::sync::Lazy;
 use serde::Deserialize;
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::LazyLock};
 
 pub use metrics::{self, counter, describe_counter, describe_gauge, describe_histogram, gauge, histogram};
 
@@ -79,7 +78,7 @@ pub const ACCEPT_LIST: &[&str] = &[
 /// as displayed to users. This is used to rebrand the third-party metrics to accepted, prisma-specific
 /// ones.
 #[rustfmt::skip]
-static METRIC_RENAMES: Lazy<HashMap<&'static str, (&'static str, &'static str)>> = Lazy::new(|| {
+static METRIC_RENAMES: LazyLock<HashMap<&'static str, (&'static str, &'static str)>> = LazyLock::new(|| {
     HashMap::from([
         (MOBC_POOL_CONNECTIONS_OPENED_TOTAL, ("prisma_pool_connections_opened_total", "The total number of pool connections opened")),
         (MOBC_POOL_CONNECTIONS_CLOSED_TOTAL, ("prisma_pool_connections_closed_total", "The total number of pool connections closed")),
@@ -158,13 +157,13 @@ mod tests {
     use metrics::{describe_counter, describe_gauge, describe_histogram, gauge, histogram};
     use serde_json::json;
     use std::collections::HashMap;
+    use std::sync::LazyLock;
     use std::time::Duration;
     use tracing::trace;
 
-    use once_cell::sync::Lazy;
     use tokio::runtime::Runtime;
 
-    static RT: Lazy<Runtime> = Lazy::new(|| Runtime::new().unwrap());
+    static RT: LazyLock<Runtime> = LazyLock::new(|| Runtime::new().unwrap());
 
     const TESTING_ACCEPT_LIST: &[&str] = &[
         "test_counter",
@@ -497,7 +496,7 @@ mod tests {
                 global_labels.insert("global_one".to_string(), "one".to_string());
 
                 let prometheus = metrics.to_prometheus(global_labels);
-                let snapshot = expect_test::expect![[r#"
+                let snapshot = expect_test::expect![[r##"
                     # HELP counter_1 
                     # TYPE counter_1 counter
                     counter_1{global_one="one",global_two="two",label="one"} 4
@@ -546,7 +545,7 @@ mod tests {
                     histogram_2_sum{global_one="one",global_two="two"} 1000
                     histogram_2_count{global_one="one",global_two="two"} 1
 
-                "#]];
+                "##]];
 
                 snapshot.assert_eq(&prometheus);
             }

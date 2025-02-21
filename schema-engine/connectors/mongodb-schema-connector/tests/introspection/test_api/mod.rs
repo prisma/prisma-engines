@@ -6,17 +6,16 @@ use expect_test::Expect;
 use itertools::Itertools;
 use mongodb::Database;
 use mongodb_schema_connector::MongoDbSchemaConnector;
-use once_cell::sync::Lazy;
 use psl::{FeatureMapWithProvider, PreviewFeature};
 use schema_connector::{
     CompositeTypeDepth, ConnectorParams, IntrospectionContext, IntrospectionResult, SchemaConnector,
 };
-use std::{future::Future, path::PathBuf};
+use std::{future::Future, path::PathBuf, sync::LazyLock};
 use tokio::runtime::Runtime;
 
 pub use utils::*;
 
-pub static RT: Lazy<Runtime> = Lazy::new(|| Runtime::new().unwrap());
+pub static RT: LazyLock<Runtime> = LazyLock::new(|| Runtime::new().unwrap());
 
 pub struct TestResult {
     datamodel: String,

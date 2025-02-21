@@ -27,10 +27,10 @@ tsify.workspace = true
 wasm-bindgen.workspace = true
 wasm-bindgen-futures.workspace = true
 wasm-rs-dbg.workspace = true
-driver-adapters = { path = "../../libs/driver-adapters" }
+driver-adapters.workspace = true
 
 [build-dependencies]
-build-utils.path = "../../libs/build-utils"
+build-utils.workspace = true
 
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = false # use wasm-opt explicitly in `./build.sh`

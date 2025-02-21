@@ -23,28 +23,27 @@ all-native = [
 ]
 
 [dependencies]
-prisma-value = { path = "../../libs/prisma-value" }
+prisma-value.workspace = true
 psl = { workspace = true, features = ["all"] }
 
-either = "1.8.0"
+either.workspace = true
 async-trait.workspace = true
-bigdecimal = "0.3"
-enumflags2.workspace = true
+bigdecimal.workspace = true
+enumflags2 = { workspace = true, features = ["serde"] }
 indexmap.workspace = true
 indoc.workspace = true
-once_cell = "1.3"
 regex.workspace = true
 serde.workspace = true
 tracing.workspace = true
-tracing-error = "0.2"
+tracing-error.workspace = true
 tracing-futures.workspace = true
 quaint = { workspace = true, features = [
     "fmt-sql",
 ] }
 
 [dev-dependencies]
-expect-test = "1.2.2"
-pretty_assertions = "1"
-test-macros = { path = "../../libs/test-macros" }
-test-setup = { path = "../../libs/test-setup" }
+expect-test.workspace = true
+pretty_assertions.workspace = true
+test-macros.workspace = true
+test-setup.workspace = true
 tokio.workspace = true

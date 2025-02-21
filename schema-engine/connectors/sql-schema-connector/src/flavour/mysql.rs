@@ -13,7 +13,6 @@ use wasm::{shadow_db, Connection};
 use crate::{error::SystemDatabase, flavour::SqlFlavour};
 use enumflags2::BitFlags;
 use indoc::indoc;
-use once_cell::sync::Lazy;
 use psl::{datamodel_connector, parser_database::ScalarType, ValidatedSchema};
 use quaint::connector::MysqlUrl;
 use regex::{Regex, RegexSet};
@@ -21,12 +20,12 @@ use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
 };
 use sql_schema_describer::SqlSchema;
-use std::future;
+use std::{future, sync::LazyLock};
 use url::Url;
 use versions::Versioning;
 
 const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
-static QUALIFIED_NAME_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"`[^ ]+`\.`[^ ]+`").unwrap());
+static QUALIFIED_NAME_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"`[^ ]+`\.`[^ ]+`").unwrap());
 
 type State = super::State<Params, (BitFlags<Circumstances>, Connection)>;
 
@@ -462,7 +461,7 @@ where
     F: future::Future<Output = ConnectorResult<O>> + Send + 'a,
     C: (FnOnce(&'a mut Params, BitFlags<Circumstances>, &'a mut Connection) -> F) + Send + 'a,
 {
-    static MYSQL_SYSTEM_DATABASES: Lazy<regex::RegexSet> = Lazy::new(|| {
+    static MYSQL_SYSTEM_DATABASES: LazyLock<regex::RegexSet> = LazyLock::new(|| {
         RegexSet::new([
             "(?i)^mysql$",
             "(?i)^information_schema$",

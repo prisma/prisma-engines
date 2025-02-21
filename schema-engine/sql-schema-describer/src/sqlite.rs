@@ -2,7 +2,7 @@
 
 use crate::{
     getters::Getter, ids::*, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue,
-    DescriberResult, ForeignKeyAction, Lazy, PrismaValue, Regex, SQLSortOrder, SqlSchema,
+    DescriberResult, ForeignKeyAction, PrismaValue, Regex, SQLSortOrder, SqlSchema,
 };
 use either::Either;
 use indexmap::IndexMap;
@@ -10,7 +10,15 @@ use quaint::{
     ast::{Value, ValueType},
     prelude::{Queryable, ResultRow},
 };
-use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto, fmt::Debug, path::Path, sync::Arc};
+use std::{
+    any::type_name,
+    borrow::Cow,
+    collections::BTreeMap,
+    convert::TryInto,
+    fmt::Debug,
+    path::Path,
+    sync::{Arc, LazyLock},
+};
 use tracing::trace;
 
 #[cfg(feature = "sqlite-native")]
@@ -561,8 +569,9 @@ fn get_column_type(mut tpe: String, arity: ColumnArity) -> ColumnType {
 //
 // - https://www.sqlite.org/lang_expr.html
 fn unquote_sqlite_string_default(s: &str) -> Cow<'_, str> {
-    static SQLITE_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^'(.*)'$|^"(.*)"$"#).unwrap());
-    static SQLITE_ESCAPED_CHARACTER_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"''"#).unwrap());
+    static SQLITE_STRING_DEFAULT_RE: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r#"(?ms)^'(.*)'$|^"(.*)"$"#).unwrap());
+    static SQLITE_ESCAPED_CHARACTER_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"''"#).unwrap());
 
     match SQLITE_STRING_DEFAULT_RE.replace(s, "$1$2") {
         Cow::Borrowed(s) => SQLITE_ESCAPED_CHARACTER_RE.replace_all(s, "'"),
