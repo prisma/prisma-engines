@@ -2109,7 +2109,7 @@ dependencies = [
 name = "json-rpc-api-build"
 version = "0.1.0"
 dependencies = [
- "heck 0.3.3",
+ "heck 0.4.1",
  "serde",
  "toml",
 ]
