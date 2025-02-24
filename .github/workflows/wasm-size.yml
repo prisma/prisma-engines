@@ -1,14 +1,14 @@
-name: "QE: WASM Query Engine size"
+name: 'QE: WASM Query Engine size'
 on:
   pull_request:
     paths-ignore:
-      - ".github/**"
-      - "!.github/workflows/wasm-size.yml"
-      - "!.github/workflows/include/rust-wasm-setup/action.yml"
-      - ".buildkite/**"
-      - "*.md"
-      - "LICENSE"
-      - "CODEOWNERS"
+      - '.github/**'
+      - '!.github/workflows/wasm-size.yml'
+      - '!.github/workflows/include/rust-wasm-setup/action.yml'
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -67,6 +67,8 @@ jobs:
     needs:
       - pr-wasm-size
       - base-wasm-size
+    permissions:
+      pull-requests: write
 
     steps:
       - name: Compute difference
@@ -102,7 +104,7 @@ jobs:
         id: findReportComment
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          body-includes: "<!-- wasm-size -->"
+          body-includes: '<!-- wasm-size -->'
 
       - name: Create or update report
         uses: peter-evans/create-or-update-comment@v4
