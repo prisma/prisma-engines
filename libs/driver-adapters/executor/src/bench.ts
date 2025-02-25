@@ -6,7 +6,11 @@ import * as qe from './query-engine'
 
 import { pg } from '@prisma/bundled-js-drivers'
 import * as prismaPg from '@prisma/adapter-pg'
-import { bindAdapter, DriverAdapter } from '@prisma/driver-adapter-utils'
+import {
+  bindAdapter,
+  DriverAdapter,
+  ErrorCapturingDriverAdapter,
+} from '@prisma/driver-adapter-utils'
 
 import { recording } from './recording'
 import { nextRequestId } from './requestId'
@@ -55,7 +59,7 @@ async function main(): Promise<void> {
 }
 
 async function recordQueries(
-  adapter: DriverAdapter,
+  adapter: ErrorCapturingDriverAdapter,
   datamodel: string,
   prismaQueries: any,
 ): Promise<void> {
@@ -99,7 +103,7 @@ async function recordQueries(
 }
 
 async function benchMarkQueries(
-  adapter: DriverAdapter,
+  adapter: ErrorCapturingDriverAdapter,
   datamodel: string,
   prismaQueries: any,
 ) {
@@ -132,11 +136,9 @@ async function benchMarkQueries(
       const errors = JSON.parse(res).errors
       if (errors != null && errors.length > 0) {
         throw new Error(
-          `${engineName} - Query failed for ${description}: ${
-            JSON.stringify(
-              res,
-            )
-          }`,
+          `${engineName} - Query failed for ${description}: ${JSON.stringify(
+            res,
+          )}`,
         )
       }
     }
@@ -230,14 +232,14 @@ async function pgAdapter(url: string): Promise<DriverAdapter> {
 }
 
 async function initQeNapiCurrent(
-  adapter: DriverAdapter,
+  adapter: ErrorCapturingDriverAdapter,
   datamodel: string,
 ): Promise<qe.QueryEngine> {
   return await qe.initQueryEngine('Napi', adapter, datamodel, debug, debug)
 }
 
 async function initQeWasmCurrent(
-  adapter: DriverAdapter,
+  adapter: ErrorCapturingDriverAdapter,
   datamodel: string,
 ): Promise<qe.QueryEngine> {
   return await qe.initQueryEngine(
@@ -250,14 +252,14 @@ async function initQeWasmCurrent(
 }
 
 async function initQeWasmLatest(
-  adapter: DriverAdapter,
+  adapter: ErrorCapturingDriverAdapter,
   datamodel: string,
 ): Promise<qe.QueryEngine> {
   return new WasmLatest(qe.queryEngineOptions(datamodel), debug, adapter)
 }
 
 function initQeWasmBaseLine(
-  adapter: DriverAdapter,
+  adapter: ErrorCapturingDriverAdapter,
   datamodel: string,
 ): qe.QueryEngine {
   return new WasmBaseline(qe.queryEngineOptions(datamodel), debug, adapter)
