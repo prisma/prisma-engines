@@ -1,15 +1,19 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { __dirname, normaliseProvider } from './utils'
-import type { Queryable } from '@prisma/driver-adapter-utils'
+import type { SqlQueryable } from '@prisma/driver-adapter-utils'
 
 const relativePath = '../../../../query-engine/query-engine-wasm/pkg'
 
-const initializedModules = new Set<Queryable['provider']>()
+const initializedModules = new Set<SqlQueryable['provider']>()
 
-export async function getQueryEngineForProvider(provider: Queryable['provider']) {
+export async function getQueryEngineForProvider(
+  provider: SqlQueryable['provider'],
+) {
   const normalisedProvider = normaliseProvider(provider)
-  const engine = await import(`${relativePath}/${normalisedProvider}/query_engine_bg.js`)
+  const engine = await import(
+    `${relativePath}/${normalisedProvider}/query_engine_bg.js`
+  )
 
   if (!initializedModules.has(provider)) {
     const bytes = await fs.readFile(

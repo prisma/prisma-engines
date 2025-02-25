@@ -1,5 +1,5 @@
 import * as util from 'node:util'
-import { Queryable } from '@prisma/driver-adapter-utils'
+import { ErrorCapturingSqlQueryable } from '@prisma/driver-adapter-utils'
 import { JsonProtocolQuery, QueryParams } from '../types/jsonRpc'
 import type { State } from './worker'
 import { debug } from '../utils'
@@ -23,7 +23,7 @@ export function query(
 
 class QueryPipeline {
   private compiler: QueryCompiler
-  private driverAdapter: Queryable
+  private driverAdapter: ErrorCapturingSqlQueryable
   private transactionManager: TransactionManager
 
   constructor(
@@ -75,7 +75,10 @@ class QueryPipeline {
     }
   }
 
-  private async executeQuery(queryable: Queryable, query: JsonProtocolQuery) {
+  private async executeQuery(
+    queryable: ErrorCapturingSqlQueryable,
+    query: JsonProtocolQuery,
+  ) {
     const queryPlanString = withLocalPanicHandler(() =>
       this.compiler.compile(JSON.stringify(query)),
     )

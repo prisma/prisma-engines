@@ -1,4 +1,4 @@
-import type { DriverAdapter } from '@prisma/driver-adapter-utils'
+import type { ErrorCapturingDriverAdapter } from '@prisma/driver-adapter-utils'
 import type { QueryEngineConfig } from './QueryEngine'
 
 export type QueryEngineInstance = {
@@ -16,14 +16,30 @@ export type QueryEngineInstance = {
   ): Promise<string>
   sdlSchema(): Promise<string>
   dmmf(traceparent: string): Promise<string>
-  startTransaction(options: string, traceHeaders: string, requestId: string): Promise<string>
-  commitTransaction(id: string, traceHeaders: string, requestId: string): Promise<string>
-  rollbackTransaction(id: string, traceHeaders: string, requestId: string): Promise<string>
+  startTransaction(
+    options: string,
+    traceHeaders: string,
+    requestId: string,
+  ): Promise<string>
+  commitTransaction(
+    id: string,
+    traceHeaders: string,
+    requestId: string,
+  ): Promise<string>
+  rollbackTransaction(
+    id: string,
+    traceHeaders: string,
+    requestId: string,
+  ): Promise<string>
   metrics(options: string): Promise<string>
 }
 
 export interface QueryEngineConstructor {
-  new (config: QueryEngineConfig, logger: (log: string) => void, nodejsFnCtx?: DriverAdapter): QueryEngineInstance
+  new (
+    config: QueryEngineConfig,
+    logger: (log: string) => void,
+    nodejsFnCtx?: ErrorCapturingDriverAdapter,
+  ): QueryEngineInstance
 }
 
 export interface LibraryLoader {
