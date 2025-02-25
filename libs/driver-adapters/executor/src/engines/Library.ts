@@ -1,7 +1,4 @@
-import type {
-  DriverAdapter,
-  ErrorCapturingDriverAdapter,
-} from '@prisma/driver-adapter-utils'
+import type { ErrorCapturingDriverAdapter } from '@prisma/driver-adapter-utils'
 import type { QueryEngineConfig } from './QueryEngine'
 
 export type QueryEngineInstance = {
