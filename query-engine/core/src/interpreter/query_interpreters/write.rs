@@ -272,13 +272,7 @@ async fn delete_one(
     traceparent: Option<TraceParent>,
 ) -> InterpretationResult<QueryResult> {
     // We need to ensure that we have a record finder, else we delete everything (conversion to empty filter).
-    let filter = match q.record_filter {
-        Some(f) => Ok(f),
-        None => Err(InterpreterError::InterpretationError(
-            "No record filter specified for delete record operation. Aborting.".to_owned(),
-            None,
-        )),
-    }?;
+    let filter = q.record_filter;
 
     if let Some(selected_fields) = q.selected_fields {
         let record = tx

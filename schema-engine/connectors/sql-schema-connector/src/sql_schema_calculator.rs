@@ -185,7 +185,8 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
     let m2m_relations = datamodel
         .db
         .walk_relations()
-        .filter_map(|relation| relation.refine().as_many_to_many());
+        .filter_map(|relation| relation.refine().as_many_to_many())
+        .filter(|m2m| !m2m.one_side_is_view());
 
     for m2m in m2m_relations {
         let table_name = m2m.table_name().to_string();

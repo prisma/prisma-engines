@@ -1,0 +1,17 @@
+{
+  "modelName": "Post",
+  "action": "groupBy",
+  "query": {
+    "arguments": {
+      "where": {
+        "title": {
+          "contains": "something"
+        }
+      },
+      "by": "title"
+    },
+    "selection": {
+      "_count": true
+    }
+  }
+}

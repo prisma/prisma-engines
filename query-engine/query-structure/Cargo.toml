@@ -6,15 +6,15 @@ version = "0.0.0"
 [dependencies]
 psl.workspace = true
 itertools.workspace = true
-prisma-value = { path = "../../libs/prisma-value" }
-bigdecimal = "0.3"
-thiserror = "1.0"
+prisma-value.workspace = true
+bigdecimal.workspace = true
+thiserror.workspace = true
 
 getrandom = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
 cuid = { workspace = true, optional = true }
 ulid = { workspace = true, optional = true }
-nanoid = { version = "0.4.0", optional = true }
+nanoid = { workspace = true, optional = true }
 chrono.workspace = true
 indexmap.workspace = true
 

@@ -6,11 +6,11 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.26"
 colored = "2"
-structopt = "0.3.8"
+structopt.workspace = true
 enumflags2.workspace = true
-dmmf = { path = "../../query-engine/dmmf" }
-schema-core = { path = "../../schema-engine/core" }
-schema-connector = { path = "../../schema-engine/connectors/schema-connector" }
+dmmf.workspace = true
+schema-core.workspace = true
+schema-connector.workspace = true
 psl.workspace = true
 tokio.workspace = true
 serde_json.workspace = true
@@ -20,4 +20,4 @@ tracing-error = "0.2"
 async-trait.workspace = true
 
 [build-dependencies]
-build-utils.path = "../build-utils"
+build-utils.workspace = true

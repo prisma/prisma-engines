@@ -1,5 +1,5 @@
 use crate::proxy::{CommonProxy, DriverProxy};
-use crate::types::{AdapterFlavour, Query};
+use crate::types::{AdapterProvider, Query};
 use crate::JsObject;
 
 use super::conversion;
@@ -30,13 +30,13 @@ use tracing::{info_span, Instrument};
 /// of `quaint::Value` but said type is a tagged enum, with non-unit variants that cannot be converted to javascript as is.
 pub(crate) struct JsBaseQueryable {
     pub(crate) proxy: CommonProxy,
-    pub provider: AdapterFlavour,
+    pub provider: AdapterProvider,
     pub(crate) db_system_name: &'static str,
 }
 
 impl JsBaseQueryable {
     pub(crate) fn new(proxy: CommonProxy) -> Self {
-        let provider: AdapterFlavour = proxy.provider.parse().unwrap();
+        let provider: AdapterProvider = proxy.provider.parse().unwrap();
         let db_system_name = provider.db_system_name();
         Self {
             proxy,
@@ -49,11 +49,11 @@ impl JsBaseQueryable {
     fn visit_quaint_query<'a>(&self, q: QuaintQuery<'a>) -> quaint::Result<(String, Vec<quaint::Value<'a>>)> {
         match self.provider {
             #[cfg(feature = "mysql")]
-            AdapterFlavour::Mysql => visitor::Mysql::build(q),
+            AdapterProvider::Mysql => visitor::Mysql::build(q),
             #[cfg(feature = "postgresql")]
-            AdapterFlavour::Postgres => visitor::Postgres::build(q),
+            AdapterProvider::Postgres => visitor::Postgres::build(q),
             #[cfg(feature = "sqlite")]
-            AdapterFlavour::Sqlite => visitor::Sqlite::build(q),
+            AdapterProvider::Sqlite => visitor::Sqlite::build(q),
         }
     }
 
@@ -62,11 +62,11 @@ impl JsBaseQueryable {
 
         let args_converter = match self.provider {
             #[cfg(feature = "postgresql")]
-            AdapterFlavour::Postgres => conversion::postgres::value_to_js_arg,
+            AdapterProvider::Postgres => conversion::postgres::value_to_js_arg,
             #[cfg(feature = "sqlite")]
-            AdapterFlavour::Sqlite => conversion::sqlite::value_to_js_arg,
+            AdapterProvider::Sqlite => conversion::sqlite::value_to_js_arg,
             #[cfg(feature = "mysql")]
-            AdapterFlavour::Mysql => conversion::mysql::value_to_js_arg,
+            AdapterProvider::Mysql => conversion::mysql::value_to_js_arg,
         };
 
         let args = values
@@ -134,11 +134,11 @@ impl QuaintQueryable for JsBaseQueryable {
     async fn version(&self) -> quaint::Result<Option<String>> {
         let version_fn: &'static str = match self.provider {
             #[cfg(feature = "mysql")]
-            AdapterFlavour::Mysql => visitor::Mysql::version_fn(),
+            AdapterProvider::Mysql => visitor::Mysql::version_fn(),
             #[cfg(feature = "postgresql")]
-            AdapterFlavour::Postgres => visitor::Postgres::version_fn(),
+            AdapterProvider::Postgres => visitor::Postgres::version_fn(),
             #[cfg(feature = "sqlite")]
-            AdapterFlavour::Sqlite => visitor::Sqlite::version_fn(),
+            AdapterProvider::Sqlite => visitor::Sqlite::version_fn(),
         };
 
         let query = format!(r#"SELECT {}() AS version"#, version_fn);
@@ -164,7 +164,7 @@ impl QuaintQueryable for JsBaseQueryable {
         }
 
         #[cfg(feature = "sqlite")]
-        if self.provider == AdapterFlavour::Sqlite {
+        if self.provider == AdapterProvider::Sqlite {
             return match isolation_level {
                 IsolationLevel::Serializable => Ok(()),
                 _ => Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build()),
@@ -178,11 +178,11 @@ impl QuaintQueryable for JsBaseQueryable {
     fn requires_isolation_first(&self) -> bool {
         match self.provider {
             #[cfg(feature = "mysql")]
-            AdapterFlavour::Mysql => true,
+            AdapterProvider::Mysql => true,
             #[cfg(feature = "postgresql")]
-            AdapterFlavour::Postgres => false,
+            AdapterProvider::Postgres => false,
             #[cfg(feature = "sqlite")]
-            AdapterFlavour::Sqlite => false,
+            AdapterProvider::Sqlite => false,
         }
     }
 }

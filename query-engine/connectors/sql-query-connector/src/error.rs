@@ -1,7 +1,7 @@
 use connector_interface::error::*;
 use quaint::error::ErrorKind as QuaintKind;
 use query_structure::{prelude::DomainError, Filter};
-use std::{any::Any, string::FromUtf8Error};
+use std::{any::Any, borrow::Cow, string::FromUtf8Error};
 use thiserror::Error;
 use user_facing_errors::query_engine::DatabaseConstraint;
 
@@ -100,7 +100,7 @@ impl From<Box<dyn Any + Send>> for RawError {
     fn from(e: Box<dyn Any + Send>) -> Self {
         Self::Database {
             code: None,
-            message: Some(*e.downcast::<String>().unwrap()),
+            message: panic_utils::downcast_box_to_string(e).map(Cow::into_owned),
         }
     }
 }

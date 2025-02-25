@@ -15,7 +15,6 @@ on:
       - "*.md"
       - "LICENSE"
       - "CODEOWNERS"
-      - "renovate.json"
   workflow_dispatch:
   pull_request:
     paths-ignore:
@@ -25,7 +24,6 @@ on:
       - "*.md"
       - "LICENSE"
       - "CODEOWNERS"
-      - "renovate.json"
 
 jobs:
   is-release-necessary:

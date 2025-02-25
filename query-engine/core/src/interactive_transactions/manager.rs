@@ -1,9 +1,11 @@
 use crate::{ClosedTransaction, InteractiveTransaction, Operation, ResponseData};
 use connector::Connection;
 use lru::LruCache;
-use once_cell::sync::Lazy;
 use schema::QuerySchemaRef;
-use std::{collections::HashMap, sync::Arc};
+use std::{
+    collections::HashMap,
+    sync::{Arc, LazyLock},
+};
 use telemetry::TraceParent;
 use tokio::{
     sync::{
@@ -21,7 +23,7 @@ use prisma_metrics::WithMetricsInstrumentation;
 
 use super::{TransactionError, TxId};
 
-pub static CLOSED_TX_CACHE_SIZE: Lazy<usize> = Lazy::new(|| match std::env::var("CLOSED_TX_CACHE_SIZE") {
+pub static CLOSED_TX_CACHE_SIZE: LazyLock<usize> = LazyLock::new(|| match std::env::var("CLOSED_TX_CACHE_SIZE") {
     Ok(size) => size.parse().unwrap_or(100),
     Err(_) => 100,
 });

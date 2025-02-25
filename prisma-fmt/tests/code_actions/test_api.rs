@@ -1,9 +1,8 @@
 use lsp_types::{Diagnostic, DiagnosticSeverity};
-use once_cell::sync::Lazy;
 
 use prisma_fmt::offsets::span_to_range;
 use psl::{diagnostics::Span, SourceFile};
-use std::{fmt::Write as _, io::Write as _, path::PathBuf};
+use std::{fmt::Write as _, io::Write as _, path::PathBuf, sync::LazyLock};
 
 use crate::helpers::load_schema_files;
 
@@ -13,7 +12,7 @@ const SCENARIOS_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/code_ac
  * we need a way to designate that file somehow.
  */
 const TARGET_SCHEMA_FILE: &str = "_target.prisma";
-static UPDATE_EXPECT: Lazy<bool> = Lazy::new(|| std::env::var("UPDATE_EXPECT").is_ok());
+static UPDATE_EXPECT: LazyLock<bool> = LazyLock::new(|| std::env::var("UPDATE_EXPECT").is_ok());
 
 fn parse_schema_diagnostics(files: &[(String, String)], initiating_file_name: &str) -> Option<Vec<Diagnostic>> {
     let sources: Vec<_> = files

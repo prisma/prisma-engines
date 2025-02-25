@@ -1,0 +1,17 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/query-many-one2m.json
+---
+let @parent = query «SELECT "public"."Post"."id", "public"."Post"."title",
+                     "public"."Post"."userId" FROM "public"."Post" WHERE 1=1
+                     OFFSET $1»
+              params [const(BigInt(0))]
+in let @parent$userId = mapField userId (get @parent)
+   in join (get @parent)
+      with (unique (query «SELECT "public"."User"."id", "public"."User"."email"
+                           FROM "public"."User" WHERE "public"."User"."id" IN /*
+                           prisma-comma-repeatable-start */$1/*
+                           prisma-comma-repeatable-end */ LIMIT $2 OFFSET $3»
+                    params [var(@parent$userId as Int), const(BigInt(1)),
+                            const(BigInt(0))])) on left.(userId) = right.(id) as user

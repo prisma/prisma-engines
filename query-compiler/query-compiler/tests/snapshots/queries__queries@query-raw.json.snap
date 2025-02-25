@@ -1,0 +1,7 @@
+---
+source: query-compiler/query-compiler/tests/queries.rs
+expression: pretty
+input_file: query-compiler/query-compiler/tests/data/query-raw.json
+---
+query «SELECT * FROM User WHERE id = $1»
+params [const(Int(1))]

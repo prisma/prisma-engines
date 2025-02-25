@@ -18,12 +18,12 @@ pub(crate) fn generate_rust_crate(out_dir: &Path, api: &Api) -> CrateResult {
         writeln!(
             librs,
             "//! ➡️  [{request_name}](./types/struct.{request_name}.html)\n//!",
-            request_name = method.request_shape.to_camel_case()
+            request_name = method.request_shape.to_upper_camel_case()
         )?;
         writeln!(
             librs,
             "//! ↩️  [{response_name}](./types/struct.{response_name}.html)\n//!",
-            response_name = method.response_shape.to_camel_case()
+            response_name = method.response_shape.to_upper_camel_case()
         )?;
 
         if let Some(description) = &method.description {
@@ -129,7 +129,7 @@ fn generate_types_rs(mut file: impl std::io::Write, api: &Api) -> CrateResult {
                 }
             }
 
-            let cc_variant_name = variant_name.to_camel_case();
+            let cc_variant_name = variant_name.to_upper_camel_case();
 
             if cc_variant_name.as_str() != variant_name {
                 writeln!(file, "///\n/// JSON name: {variant_name}")?;
@@ -158,6 +158,6 @@ fn rustify_type_name(name: &str) -> Cow<'static, str> {
         "isize" => Cow::Borrowed("isize"),
         "string" => Cow::Borrowed("String"),
         "serde_json::Value" => Cow::Borrowed("serde_json::Value"),
-        other => other.to_camel_case().into(),
+        other => other.to_upper_camel_case().into(),
     }
 }

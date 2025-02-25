@@ -1,4 +1,5 @@
 use crate::limit::wrap_with_limit_subquery_if_needed;
+use crate::FilterBuilder;
 use crate::{model_extensions::*, sql_trace::SqlTraceComment, Context};
 use itertools::Itertools;
 use quaint::ast::*;
@@ -48,15 +49,18 @@ pub fn create_records_nonempty(
     selected_fields: Option<&ModelProjection>,
     ctx: &Context<'_>,
 ) -> Insert<'static> {
+    let mut fields = affected_fields.iter().cloned().collect_vec();
+    fields.sort_by_key(|f| f.id);
+
     // We need to bring all write args into a uniform shape.
     // The easiest way to do this is to take go over all fields of the batch and apply the following:
     // All fields that have a default but are not explicitly provided are inserted with `DEFAULT`.
     let values: Vec<_> = args
         .into_iter()
         .map(|mut arg| {
-            let mut row: Vec<Expression> = Vec::with_capacity(affected_fields.len());
+            let mut row: Vec<Expression> = Vec::with_capacity(fields.len());
 
-            for field in affected_fields.iter() {
+            for field in fields.iter() {
                 let value = arg.take_field_value(field.db_name());
 
                 match value {
@@ -79,7 +83,7 @@ pub fn create_records_nonempty(
         })
         .collect();
 
-    let columns = affected_fields.iter().cloned().collect::<Vec<_>>().as_columns(ctx);
+    let columns = fields.as_columns(ctx);
     let insert = Insert::multi_into(model.as_table(ctx), columns);
     let insert = values.into_iter().fold(insert, |stmt, values| stmt.values(values));
     let insert: Insert = insert.into();
@@ -94,6 +98,24 @@ pub fn create_records_nonempty(
     }
 
     insert
+}
+
+/// `INSERT` with `ON CONFLICT DO UPDATE` statement.
+pub fn native_upsert(
+    model: &Model,
+    filter: Filter,
+    create_args: WriteArgs,
+    update_args: WriteArgs,
+    selected_fields: &ModelProjection,
+    unique_constraints: &[ScalarFieldRef],
+    ctx: &Context<'_>,
+) -> Insert<'static> {
+    let where_condition = FilterBuilder::without_top_level_joins().visit_filter(filter, ctx);
+    let update = build_update_and_set_query(model, update_args, None, ctx).so_that(where_condition);
+    let insert = create_record(model, create_args, selected_fields, ctx);
+
+    let constraints: Vec<_> = unique_constraints.as_columns(ctx).collect();
+    insert.on_conflict(OnConflict::Update(update, constraints))
 }
 
 /// `INSERT` empty records statement.
@@ -188,7 +210,7 @@ pub fn build_update_and_set_query(
 pub fn chunk_update_with_ids(
     update: Update<'static>,
     model: &Model,
-    ids: &[&SelectionResult],
+    ids: &[SelectionResult],
     filter_condition: ConditionTree<'static>,
     ctx: &Context<'_>,
 ) -> Vec<Query<'static>> {
@@ -209,12 +231,32 @@ fn projection_into_columns(
     selected_fields.as_columns(ctx).map(|c| c.set_is_selected(true))
 }
 
+/// Generates deletes for multiple records, defined in the `RecordFilter`.
+pub fn generate_delete_statements(
+    model: &Model,
+    record_filter: RecordFilter,
+    limit: Option<usize>,
+    ctx: &Context<'_>,
+) -> Vec<Query<'static>> {
+    let filter_condition = FilterBuilder::without_top_level_joins().visit_filter(record_filter.filter.clone(), ctx);
+
+    // If we have selectors, then we must chunk the mutation into multiple if necessary and add the ids to the filter.
+    if let Some(selectors) = record_filter.selectors.as_deref() {
+        let slice = &selectors[..limit.unwrap_or(selectors.len()).min(selectors.len())];
+        delete_many_from_ids_and_filter(model, slice, filter_condition, limit, ctx)
+    } else {
+        vec![delete_many_from_filter(model, filter_condition, limit, ctx)]
+    }
+}
+
 pub fn delete_returning(
     model: &Model,
-    filter: ConditionTree<'static>,
+    filter: Filter,
     selected_fields: &ModelProjection,
     ctx: &Context<'_>,
 ) -> Query<'static> {
+    let filter = FilterBuilder::without_top_level_joins().visit_filter(filter, ctx);
+
     Delete::from_table(model.as_table(ctx))
         .so_that(filter)
         .returning(projection_into_columns(selected_fields, ctx))
@@ -238,7 +280,7 @@ pub fn delete_many_from_filter(
 
 pub fn delete_many_from_ids_and_filter(
     model: &Model,
-    ids: &[&SelectionResult],
+    ids: &[SelectionResult],
     filter_condition: ConditionTree<'static>,
     limit: Option<usize>,
     ctx: &Context<'_>,
@@ -260,11 +302,10 @@ pub fn create_relation_table_records(
 ) -> Query<'static> {
     let relation = field.relation();
 
-    let parent_columns: Vec<_> = field.related_field().m2m_columns(ctx);
-    let child_columns: Vec<_> = field.m2m_columns(ctx);
+    let parent_column = field.related_field().m2m_column(ctx);
+    let child_column = field.m2m_column(ctx);
 
-    let columns: Vec<_> = parent_columns.into_iter().chain(child_columns).collect();
-    let insert = Insert::multi_into(relation.as_table(ctx), columns);
+    let insert = Insert::multi_into(relation.as_table(ctx), vec![parent_column, child_column]);
 
     let insert: MultiRowInsert = child_ids.iter().fold(insert, |insert, child_id| {
         let mut values: Vec<_> = parent_id.db_values(ctx);
@@ -285,17 +326,14 @@ pub fn delete_relation_table_records(
 ) -> Delete<'static> {
     let relation = parent_field.relation();
 
-    let mut parent_columns: Vec<_> = parent_field.related_field().m2m_columns(ctx);
-    let child_columns: Vec<_> = parent_field.m2m_columns(ctx);
+    let parent_column = parent_field.related_field().m2m_column(ctx);
+    let child_column = parent_field.m2m_column(ctx);
 
     let parent_id_values = parent_id.db_values(ctx);
-    let parent_id_criteria = if parent_columns.len() > 1 {
-        Row::from(parent_columns).equals(parent_id_values)
-    } else {
-        parent_columns.pop().unwrap().equals(parent_id_values)
-    };
+    let parent_id_criteria = parent_column.equals(parent_id_values);
 
-    let child_id_criteria = super::in_conditions(&child_columns, child_ids, ctx);
+    let child_ids = child_ids.iter().flat_map(|id| id.db_values(ctx)).collect::<Row>();
+    let child_id_criteria = child_column.in_selection(child_ids);
 
     Delete::from_table(relation.as_table(ctx))
         .so_that(parent_id_criteria.and(child_id_criteria))

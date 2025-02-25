@@ -1,12 +1,11 @@
 use super::TestApi;
 use crate::{connector::Queryable, single::Quaint};
 use names::Generator;
-use once_cell::sync::Lazy;
 use quaint_test_setup::Tags;
-use std::env;
+use std::{env, sync::LazyLock};
 
-pub static CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_PSQL").expect("TEST_PSQL env var"));
-pub static CRDB_CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_CRDB").expect("TEST_CRDB env var"));
+pub static CONN_STR: LazyLock<String> = LazyLock::new(|| env::var("TEST_PSQL").expect("TEST_PSQL env var"));
+pub static CRDB_CONN_STR: LazyLock<String> = LazyLock::new(|| env::var("TEST_CRDB").expect("TEST_CRDB env var"));
 
 pub(crate) async fn postgresql_test_api<'a>() -> crate::Result<PostgreSql<'a>> {
     PostgreSql::new().await

@@ -22,13 +22,13 @@ serde_json.workspace = true
 tsify.workspace = true
 wasm-bindgen.workspace = true
 wasm-rs-dbg.workspace = true
-query-core = { path = "../../query-engine/core" }
-query-compiler = { path = "../query-compiler", default-features = false }
-schema = { path = "../../query-engine/schema" }
-request-handlers = { path = "../../query-engine/request-handlers", default-features = false }
+query-core.workspace = true
+query-compiler.workspace = true
+schema.workspace = true
+request-handlers.workspace = true
 
 [build-dependencies]
-build-utils.path = "../../libs/build-utils"
+build-utils.workspace = true
 
 [features]
 sqlite = ["psl/sqlite", "query-compiler/sqlite"]

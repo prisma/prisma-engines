@@ -2,7 +2,7 @@ use enumflags2::BitFlags;
 use psl::PreviewFeature;
 
 /// Parameters passed from the core to connectors on initialization.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ConnectorParams {
     /// The raw connection string or `url` datasource property.
     pub connection_string: String,

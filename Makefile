@@ -167,20 +167,20 @@ dev-sqlite:
 dev-react-native:
 	cp $(CONFIG_PATH)/react-native $(CONFIG_FILE)
 
-dev-libsql-js: build-qe-napi build-driver-adapters-kit
+dev-libsql-js: build-qe-napi build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/libsql-js $(CONFIG_FILE)
 
 test-libsql-js: dev-libsql-js test-qe-st
 
 test-driver-adapter-libsql: test-libsql-js
 
-dev-libsql-wasm: build-qe-wasm build-driver-adapters-kit
+dev-libsql-wasm: build-qe-wasm build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/libsql-wasm $(CONFIG_FILE)
 
 test-libsql-wasm: dev-libsql-wasm test-qe-st
 test-driver-adapter-libsql-wasm: test-libsql-wasm
 
-dev-d1: build-qe-wasm build-driver-adapters-kit
+dev-d1: build-qe-wasm build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/cloudflare-d1 $(CONFIG_FILE)
 
 test-d1: dev-d1 test-qe-st
@@ -218,15 +218,20 @@ dev-postgres13: start-postgres13
 
 start-pg-js: start-postgres13
 
-dev-pg-js: start-pg-js build-qe-napi build-driver-adapters-kit
+dev-pg-js: start-pg-js build-qe-napi build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/pg-js $(CONFIG_FILE)
 
 test-pg-js: dev-pg-js test-qe-st
 
-dev-pg-wasm: start-pg-js build-qe-wasm build-driver-adapters-kit
+dev-pg-wasm: start-pg-js build-qe-wasm build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/pg-wasm $(CONFIG_FILE)
 
 test-pg-wasm: dev-pg-wasm test-qe-st
+
+dev-pg-qc: start-pg-js build-qc-wasm build-driver-adapters-kit-qc
+	cp $(CONFIG_PATH)/pg-qc $(CONFIG_FILE)
+
+test-pg-qc: dev-pg-qc test-qe
 
 test-driver-adapter-pg: test-pg-js
 test-driver-adapter-pg-wasm: test-pg-wasm
@@ -234,7 +239,7 @@ test-driver-adapter-pg-wasm: test-pg-wasm
 start-pg-bench:
 	docker compose -f libs/driver-adapters/executor/bench/docker-compose.yml up --wait -d --remove-orphans postgres
 
-setup-pg-bench: start-pg-bench build-qe-napi build-qe-wasm build-driver-adapters-kit
+setup-pg-bench: start-pg-bench build-qe-napi build-qe-wasm build-driver-adapters-kit-qe
 
 run-bench:
 	DATABASE_URL="postgresql://postgres:postgres@localhost:5432/bench?schema=imdb_bench&sslmode=disable" \
@@ -245,12 +250,12 @@ bench-pg-js: setup-pg-bench run-bench
 start-neon-js:
 	docker compose -f docker-compose.yml up --wait -d --remove-orphans neon-proxy
 
-dev-neon-js: start-neon-js build-qe-napi build-driver-adapters-kit
+dev-neon-js: start-neon-js build-qe-napi build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/neon-js $(CONFIG_FILE)
 
 test-neon-js: dev-neon-js test-qe-st
 
-dev-neon-wasm: start-neon-js build-qe-wasm build-driver-adapters-kit
+dev-neon-wasm: start-neon-js build-qe-wasm build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/neon-wasm $(CONFIG_FILE)
 
 test-neon-wasm: dev-neon-wasm test-qe-st
@@ -398,12 +403,12 @@ dev-vitess_8_0: start-vitess_8_0
 start-planetscale-js:
 	docker compose -f docker-compose.yml up -d --remove-orphans planetscale-proxy
 
-dev-planetscale-js: start-planetscale-js build-qe-napi build-driver-adapters-kit
+dev-planetscale-js: start-planetscale-js build-qe-napi build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/planetscale-js $(CONFIG_FILE)
 
 test-planetscale-js: dev-planetscale-js test-qe-st
 
-dev-planetscale-wasm: start-planetscale-js build-qe-wasm build-driver-adapters-kit
+dev-planetscale-wasm: start-planetscale-js build-qe-wasm build-driver-adapters-kit-qe
 	cp $(CONFIG_PATH)/planetscale-wasm $(CONFIG_FILE)
 
 test-planetscale-wasm: dev-planetscale-wasm test-qe-st
@@ -422,8 +427,17 @@ measure-qe-wasm: build-qe-wasm-gz
 		echo "$${provider}_size_gz=$$(cat $$provider.gz | wc -c | tr -d ' ')" >> $(ENGINE_SIZE_OUTPUT); \
 	done;
 
-build-driver-adapters-kit: build-driver-adapters
-	cd libs/driver-adapters && pnpm i && pnpm build
+install-driver-adapters-kit-deps: build-driver-adapters
+	cd libs/driver-adapters && pnpm i
+
+build-driver-adapters-kit: install-driver-adapters-kit-deps
+	cd libs/driver-adapters && pnpm build
+
+build-driver-adapters-kit-qe: install-driver-adapters-kit-deps
+	cd libs/driver-adapters && pnpm build:qe
+
+build-driver-adapters-kit-qc: install-driver-adapters-kit-deps
+	cd libs/driver-adapters && pnpm build:qc
 
 build-driver-adapters: ensure-prisma-present
 	@echo "Building driver adapters..."

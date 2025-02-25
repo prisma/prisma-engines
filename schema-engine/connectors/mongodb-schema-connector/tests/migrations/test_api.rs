@@ -2,18 +2,17 @@ use bson::{self, doc};
 use enumflags2::BitFlags;
 use futures::TryStreamExt;
 use mongodb_schema_connector::MongoDbSchemaConnector;
-use once_cell::sync::Lazy;
 use psl::{parser_database::SourceFile, PreviewFeature};
 use schema_connector::{ConnectorParams, DiffTarget, SchemaConnector};
 use std::{
     collections::BTreeMap,
     fmt::Write as _,
     io::Write as _,
-    sync::{atomic::AtomicUsize, Arc},
+    sync::{atomic::AtomicUsize, Arc, LazyLock},
 };
 use tokio::sync::OnceCell;
 
-static CONN_STR: Lazy<String> = Lazy::new(|| match std::env::var("TEST_DATABASE_URL") {
+static CONN_STR: LazyLock<String> = LazyLock::new(|| match std::env::var("TEST_DATABASE_URL") {
     Ok(url) => url,
     Err(_) => {
         let stderr = std::io::stderr();
@@ -27,7 +26,7 @@ static CONN_STR: Lazy<String> = Lazy::new(|| match std::env::var("TEST_DATABASE_
     }
 });
 
-static RT: Lazy<tokio::runtime::Runtime> = Lazy::new(|| {
+static RT: LazyLock<tokio::runtime::Runtime> = LazyLock::new(|| {
     tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
@@ -143,7 +142,7 @@ async fn apply_state(db: &mongodb::Database, state: State) {
 }
 
 const SCENARIOS_PATH: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/migrations/scenarios");
-static UPDATE_EXPECT: Lazy<bool> = Lazy::new(|| std::env::var("UPDATE_EXPECT").is_ok());
+static UPDATE_EXPECT: LazyLock<bool> = LazyLock::new(|| std::env::var("UPDATE_EXPECT").is_ok());
 
 pub(crate) fn test_scenario(scenario_name: &str) {
     let mut path = String::with_capacity(SCENARIOS_PATH.len() + 12);

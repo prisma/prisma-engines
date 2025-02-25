@@ -1,8 +1,7 @@
 use super::*;
 use fmt::Debug;
-use once_cell::sync::Lazy;
 use psl::parser_database as db;
-use std::{borrow::Cow, fmt};
+use std::{borrow::Cow, fmt, sync::LazyLock};
 
 #[derive(Debug, Clone)]
 pub struct OutputType<'a> {
@@ -112,7 +111,7 @@ impl<'a> OutputType<'a> {
 }
 
 type OutputObjectFields<'a> =
-    Arc<Lazy<Vec<OutputField<'a>>, Box<dyn FnOnce() -> Vec<OutputField<'a>> + Send + Sync + 'a>>>;
+    Arc<LazyLock<Vec<OutputField<'a>>, Box<dyn FnOnce() -> Vec<OutputField<'a>> + Send + Sync + 'a>>>;
 
 #[derive(Clone)]
 pub struct ObjectType<'a> {
@@ -137,7 +136,7 @@ impl<'a> ObjectType<'a> {
         identifier: Identifier,
         fields: impl FnOnce() -> Vec<OutputField<'a>> + Send + Sync + 'a,
     ) -> Self {
-        let lazy = Lazy::<Vec<OutputField<'_>>, _>::new(
+        let lazy = LazyLock::<Vec<OutputField<'_>>, _>::new(
             Box::new(fields) as Box<dyn FnOnce() -> Vec<OutputField<'a>> + Send + Sync + 'a>
         );
         ObjectType {
@@ -165,7 +164,7 @@ impl<'a> ObjectType<'a> {
 }
 
 type OutputFieldArguments<'a> =
-    Option<Arc<Lazy<Vec<InputField<'a>>, Box<dyn FnOnce() -> Vec<InputField<'a>> + Send + Sync + 'a>>>>;
+    Option<Arc<LazyLock<Vec<InputField<'a>>, Box<dyn FnOnce() -> Vec<InputField<'a>> + Send + Sync + 'a>>>>;
 
 #[derive(Clone)]
 pub struct OutputField<'a> {

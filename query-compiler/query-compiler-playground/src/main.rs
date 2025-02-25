@@ -1,10 +1,10 @@
-use std::sync::Arc;
+use std::{fs, path::PathBuf, process::Command, sync::Arc};
 
 use quaint::{
     prelude::{ConnectionInfo, ExternalConnectionInfo, SqlFamily},
     visitor::Postgres,
 };
-use query_core::{query_graph_builder::QueryGraphBuilder, QueryDocument};
+use query_core::{query_graph_builder::QueryGraphBuilder, QueryDocument, QueryGraph, ToGraphviz};
 use request_handlers::{JsonBody, JsonSingleQuery, RequestBody};
 use serde_json::json;
 use sql_query_builder::{Context, SqlQueryBuilder};
@@ -76,6 +76,7 @@ pub fn main() -> anyhow::Result<()> {
     let (graph, _serializer) = QueryGraphBuilder::new(&query_schema).build(query)?;
 
     println!("{graph}");
+    render_query_graph(&graph)?;
 
     let ctx = Context::new(&connection_info, None);
     let builder = SqlQueryBuilder::<Postgres<'_>>::new(ctx);
@@ -85,4 +86,32 @@ pub fn main() -> anyhow::Result<()> {
     println!("{}", expr.pretty_print(true, 80)?);
 
     Ok(())
+}
+
+fn render_query_graph(graph: &QueryGraph) -> anyhow::Result<()> {
+    let package_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let dot_path = package_root.join("graph.dot");
+    let png_path = package_root.join("graph.png");
+
+    fs::write(&dot_path, graph.to_graphviz())?;
+
+    match Command::new("dot")
+        .arg("-Tpng")
+        .arg(&dot_path)
+        .arg("-o")
+        .arg(&png_path)
+        .status()
+    {
+        Ok(status) if !status.success() => {
+            anyhow::bail!("graphviz exited with status {status}")
+        }
+        Ok(_) => Ok(()),
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+            eprintln!("`dot` command not found, please install graphviz to render query graphs");
+            Ok(())
+        }
+        Err(err) => {
+            anyhow::bail!("failed to execute graphviz: {err}")
+        }
+    }
 }

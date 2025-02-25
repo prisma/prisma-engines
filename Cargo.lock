@@ -160,18 +160,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eab1c04a571841102f5345a8fc0f6bb3d31c315dec879b5c6e42e40ce7ffa34e"
 
 [[package]]
-name = "async-native-tls"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d57d4cec3c647232e1094dc013546c0b33ce785d8aeb251e1f20dfaf8a9a13fe"
-dependencies = [
- "futures-util",
- "native-tls",
- "thiserror 1.0.44",
- "url",
-]
-
-[[package]]
 name = "async-trait"
 version = "0.1.77"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -259,12 +247,6 @@ dependencies = [
 
 [[package]]
 name = "base64"
-version = "0.12.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3441f0f7b02788e948e47f457ca01f1d7e6d92c693bc132c22b087d3141c03ff"
-
-[[package]]
-name = "base64"
 version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
@@ -347,7 +329,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "enumflags2",
- "indoc 2.0.3",
+ "indoc",
  "insta",
  "prisma-metrics",
  "query-engine-tests",
@@ -454,6 +436,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "bstr"
+version = "1.11.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "531a9155a481e2ee699d4f98f43c0ca4ff8ee1bfd55c31e9e98fb29d2b176fe0"
+dependencies = [
+ "memchr",
+ "serde",
+]
+
+[[package]]
 name = "build-utils"
 version = "0.1.0"
 
@@ -487,9 +479,9 @@ dependencies = [
 
 [[package]]
 name = "byteorder"
-version = "1.4.3"
+version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
+checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
 
 [[package]]
 name = "bytes"
@@ -933,9 +925,9 @@ dependencies = [
 
 [[package]]
 name = "ctor"
-version = "0.2.4"
+version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f34ba9a9bcb8645379e9de8cb3ecfcf4d1c85ba66d90deb3259206fa5aa193b"
+checksum = "32a2785755761f3ddc1492979ce1e48d2c00d09311c39e4466429188f3dd6501"
 dependencies = [
  "quote",
  "syn 2.0.96",
@@ -989,16 +981,6 @@ dependencies = [
 
 [[package]]
 name = "darling"
-version = "0.10.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0d706e75d87e35569db781a9b5e2416cff1236a47ed380831f959382ccd5f858"
-dependencies = [
- "darling_core 0.10.2",
- "darling_macro 0.10.2",
-]
-
-[[package]]
-name = "darling"
 version = "0.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a01d95850c592940db9b8194bc39f4bc0e89dee5c4265e4b1807c34a9aba453c"
@@ -1015,20 +997,6 @@ checksum = "6f63b86c8a8826a49b8c21f08a2d07338eec8d900540f8630dc76284be802989"
 dependencies = [
  "darling_core 0.20.10",
  "darling_macro 0.20.10",
-]
-
-[[package]]
-name = "darling_core"
-version = "0.10.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f0c960ae2da4de88a91b2d920c2a7233b400bc33cb28453a2987822d8392519b"
-dependencies = [
- "fnv",
- "ident_case",
- "proc-macro2",
- "quote",
- "strsim 0.9.3",
- "syn 1.0.109",
 ]
 
 [[package]]
@@ -1057,17 +1025,6 @@ dependencies = [
  "quote",
  "strsim 0.11.1",
  "syn 2.0.96",
-]
-
-[[package]]
-name = "darling_macro"
-version = "0.10.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9b5a2f4ac4969822c62224815d069952656cadc7084fdca9751e6d959189b72"
-dependencies = [
- "darling_core 0.10.2",
- "quote",
- "syn 1.0.109",
 ]
 
 [[package]]
@@ -1117,9 +1074,8 @@ version = "0.1.0"
 dependencies = [
  "base64 0.13.1",
  "expect-test",
- "indoc 2.0.3",
+ "indoc",
  "itertools 0.12.0",
- "once_cell",
  "psl",
  "regex",
 ]
@@ -1163,7 +1119,7 @@ name = "diagnostics"
 version = "0.1.0"
 dependencies = [
  "colored",
- "indoc 2.0.3",
+ "indoc",
  "pest",
 ]
 
@@ -1208,7 +1164,7 @@ dependencies = [
  "expect-test",
  "flate2",
  "indexmap 2.2.2",
- "indoc 2.0.3",
+ "indoc",
  "itertools 0.12.0",
  "pretty_assertions",
  "psl",
@@ -1229,7 +1185,7 @@ dependencies = [
  "js-sys",
  "napi",
  "napi-derive",
- "once_cell",
+ "panic-utils",
  "pin-project",
  "prisma-metrics",
  "quaint",
@@ -1250,9 +1206,9 @@ dependencies = [
 
 [[package]]
 name = "either"
-version = "1.9.0"
+version = "1.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a26ae43d7bcc3b814de94796a5e736d4029efb0ee900c12e2d54c993ad1a1e07"
+checksum = "60b1af1c220855b6ceac025d3f6ecdd2b7c4894bfe9cd9bda4fbb4bc7c0d4cf0"
 
 [[package]]
 name = "encode_unicode"
@@ -1689,6 +1645,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
 
 [[package]]
+name = "globset"
+version = "0.4.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "759c97c1e17c55525b57192c06a267cda0ac5210b222d6b82189a2338fa1c13d"
+dependencies = [
+ "aho-corasick",
+ "bstr 1.11.3",
+ "fnv",
+ "log",
+ "regex",
+]
+
+[[package]]
 name = "gloo-utils"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2046,32 +2015,9 @@ dependencies = [
 
 [[package]]
 name = "indoc"
-version = "0.3.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47741a8bc60fb26eb8d6e0238bbb26d8575ff623fdc97b1a2c00c050b9684ed8"
-dependencies = [
- "indoc-impl",
- "proc-macro-hack",
-]
-
-[[package]]
-name = "indoc"
 version = "2.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2c785eefb63ebd0e33416dfcb8d6da0bf27ce752843a45632a67bf10d4d4b5c4"
-
-[[package]]
-name = "indoc-impl"
-version = "0.3.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce046d161f000fffde5f432a0d034d0341dc152643b2598ed5bfce44c4f3a8f0"
-dependencies = [
- "proc-macro-hack",
- "proc-macro2",
- "quote",
- "syn 1.0.109",
- "unindent",
-]
 
 [[package]]
 name = "insta"
@@ -2080,6 +2026,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7e9ffc4d4892617c50a928c52b2961cb5174b6fc6ebf252b2fac9d21955c48b8"
 dependencies = [
  "console",
+ "globset",
  "lazy_static",
  "linked-hash-map",
  "pest",
@@ -2087,6 +2034,7 @@ dependencies = [
  "ron",
  "serde",
  "similar",
+ "walkdir",
 ]
 
 [[package]]
@@ -2161,8 +2109,7 @@ dependencies = [
 name = "json-rpc-api-build"
 version = "0.1.0"
 dependencies = [
- "backtrace",
- "heck 0.3.3",
+ "heck 0.4.1",
  "serde",
  "toml",
 ]
@@ -2584,7 +2531,6 @@ name = "mongodb-client"
 version = "0.1.0"
 dependencies = [
  "mongodb",
- "once_cell",
  "percent-encoding",
  "thiserror 1.0.44",
 ]
@@ -2644,13 +2590,12 @@ dependencies = [
  "enumflags2",
  "expect-test",
  "futures",
- "indoc 2.0.3",
+ "indoc",
  "itertools 0.12.0",
  "mongodb",
  "mongodb-client",
  "mongodb-schema-describer",
- "names 0.12.0",
- "once_cell",
+ "names",
  "psl",
  "regex",
  "schema-connector",
@@ -2753,15 +2698,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "names"
-version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "10a8690bf09abf659851e58cd666c3d37ac6af07c2bd7a9e332cfba471715775"
-dependencies = [
- "rand 0.8.5",
-]
-
-[[package]]
 name = "nanoid"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2794,9 +2730,9 @@ checksum = "ebd4419172727423cf30351406c54f6cc1b354a2cfb4f1dba3e6cd07f6d5522b"
 
 [[package]]
 name = "napi-derive"
-version = "2.16.12"
+version = "2.16.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17435f7a00bfdab20b0c27d9c56f58f6499e418252253081bfff448099da31d1"
+checksum = "7cbe2585d8ac223f7d34f13701434b9d5f4eb9c332cccce8dee57ea18ab8ab0c"
 dependencies = [
  "cfg-if",
  "convert_case 0.6.0",
@@ -2808,9 +2744,9 @@ dependencies = [
 
 [[package]]
 name = "napi-derive-backend"
-version = "1.0.74"
+version = "1.0.75"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "967c485e00f0bf3b1bdbe510a38a4606919cf1d34d9a37ad41f25a81aa077abe"
+checksum = "1639aaa9eeb76e91c6ae66da8ce3e89e921cd3885e99ec85f4abacae72fc91bf"
 dependencies = [
  "convert_case 0.6.0",
  "once_cell",
@@ -3090,6 +3026,10 @@ name = "overload"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
+
+[[package]]
+name = "panic-utils"
+version = "0.1.0"
 
 [[package]]
 name = "parking"
@@ -3401,9 +3341,9 @@ checksum = "c6fa0831dd7cc608c38a5e323422a0077678fa5744aa2be4ad91c4ece8eec8d5"
 
 [[package]]
 name = "pretty_assertions"
-version = "1.4.0"
+version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "af7cee1a6c8a5b9208b3cb1061f10c0cb689087b3d8ce85fb9d2dd7a29b6ba66"
+checksum = "3ae130e2f271fbc2ac3a40fb1d07180839cdbbe443c7a27e1e3c13c5cac0116d"
 dependencies = [
  "diff",
  "yansi",
@@ -3429,10 +3369,9 @@ dependencies = [
  "dmmf",
  "enumflags2",
  "expect-test",
- "indoc 2.0.3",
+ "indoc",
  "log",
  "lsp-types",
- "once_cell",
  "psl",
  "serde",
  "serde_json",
@@ -3449,7 +3388,6 @@ dependencies = [
  "metrics",
  "metrics-exporter-prometheus",
  "metrics-util",
- "once_cell",
  "parking_lot",
  "pin-project",
  "serde",
@@ -3476,7 +3414,6 @@ dependencies = [
  "base64 0.13.1",
  "bigdecimal",
  "chrono",
- "once_cell",
  "regex",
  "serde",
  "serde_json",
@@ -3517,12 +3454,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "proc-macro-hack"
-version = "0.5.20+deprecated"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc375e1527247fe1a97d8b7156678dfe7c1af2fc075c9a4db3690ecd2a148068"
-
-[[package]]
 name = "proc-macro2"
 version = "1.0.93"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3539,7 +3470,7 @@ dependencies = [
  "dissimilar",
  "either",
  "expect-test",
- "indoc 2.0.3",
+ "indoc",
  "psl-core",
 ]
 
@@ -3555,10 +3486,9 @@ dependencies = [
  "either",
  "enumflags2",
  "hex",
- "indoc 2.0.3",
+ "indoc",
  "itertools 0.12.0",
  "lsp-types",
- "once_cell",
  "parser-database",
  "prisma-value",
  "regex",
@@ -3596,7 +3526,6 @@ dependencies = [
  "enumflags2",
  "mongodb",
  "mongodb-client",
- "once_cell",
  "psl",
  "quaint",
  "schema-core",
@@ -3613,7 +3542,7 @@ name = "quaint"
 version = "0.2.0-alpha.13"
 dependencies = [
  "async-trait",
- "base64 0.12.3",
+ "base64 0.13.1",
  "bigdecimal",
  "bit-vec",
  "byteorder",
@@ -3629,15 +3558,14 @@ dependencies = [
  "futures",
  "getrandom 0.2.11",
  "hex",
- "indoc 0.3.6",
+ "indoc",
  "itertools 0.12.0",
  "lru-cache",
  "mobc",
  "mysql_async",
- "names 0.11.0",
+ "names",
  "native-tls",
  "num_cpus",
- "once_cell",
  "paste",
  "percent-encoding",
  "pin-project",
@@ -3669,8 +3597,7 @@ dependencies = [
 name = "quaint-test-macros"
 version = "0.1.0"
 dependencies = [
- "darling 0.10.2",
- "once_cell",
+ "darling 0.13.4",
  "proc-macro2",
  "quaint-test-setup",
  "quote",
@@ -3683,8 +3610,7 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "bitflags 1.3.2",
- "names 0.11.0",
- "once_cell",
+ "names",
  "quaint",
  "tokio",
 ]
@@ -3716,16 +3642,24 @@ dependencies = [
 name = "query-compiler"
 version = "0.1.0"
 dependencies = [
+ "insta",
  "itertools 0.12.0",
  "pretty",
+ "psl",
  "quaint",
  "query-builder",
  "query-core",
  "query-structure",
+ "request-handlers",
  "serde",
+ "serde_json",
  "sql-query-builder",
  "thiserror 1.0.44",
 ]
+
+[[package]]
+name = "query-compiler-engine-tests-todo"
+version = "0.1.0"
 
 [[package]]
 name = "query-compiler-playground"
@@ -3798,7 +3732,6 @@ dependencies = [
  "indexmap 2.2.2",
  "itertools 0.12.0",
  "lru 0.7.8",
- "once_cell",
  "petgraph",
  "prisma-metrics",
  "psl",
@@ -3833,8 +3766,9 @@ dependencies = [
  "graphql-parser",
  "hyper",
  "indexmap 2.2.2",
- "indoc 2.0.3",
+ "indoc",
  "mongodb-query-connector",
+ "panic-utils",
  "prisma-metrics",
  "psl",
  "quaint",
@@ -3867,8 +3801,7 @@ dependencies = [
  "chrono",
  "connection-string",
  "futures",
- "indoc 2.0.3",
- "once_cell",
+ "indoc",
  "psl",
  "quaint",
  "query-connector",
@@ -3961,10 +3894,9 @@ dependencies = [
  "cuid",
  "enumflags2",
  "futures",
- "indoc 2.0.3",
+ "indoc",
  "insta",
  "itertools 0.12.0",
- "once_cell",
  "paste",
  "prisma-metrics",
  "prisma-value",
@@ -4052,15 +3984,16 @@ dependencies = [
  "colored",
  "enumflags2",
  "env_logger",
+ "futures",
  "hyper",
  "indexmap 2.2.2",
- "indoc 2.0.3",
+ "indoc",
  "insta",
  "itertools 0.12.0",
  "jsonrpc-core",
  "log",
  "nom",
- "once_cell",
+ "panic-utils",
  "parse-hyperlinks",
  "prisma-metrics",
  "psl",
@@ -4351,7 +4284,7 @@ dependencies = [
  "insta",
  "itertools 0.12.0",
  "mongodb-query-connector",
- "once_cell",
+ "prisma-value",
  "psl",
  "quaint",
  "query-core",
@@ -4624,7 +4557,6 @@ name = "schema"
 version = "0.1.0"
 dependencies = [
  "codspeed-criterion-compat",
- "once_cell",
  "psl",
  "query-structure",
  "rustc-hash",
@@ -4684,13 +4616,13 @@ dependencies = [
 name = "schema-engine-cli"
 version = "0.1.0"
 dependencies = [
- "backtrace",
  "base64 0.13.1",
  "build-utils",
  "connection-string",
  "expect-test",
- "indoc 2.0.3",
+ "indoc",
  "jsonrpc-core",
+ "panic-utils",
  "quaint",
  "schema-connector",
  "schema-core",
@@ -5009,7 +4941,7 @@ version = "2.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "420acb44afdae038210c99e69aae24109f32f15500aa708e81d46c9f29d55fcf"
 dependencies = [
- "bstr",
+ "bstr 0.2.17",
 ]
 
 [[package]]
@@ -5078,7 +5010,7 @@ dependencies = [
 name = "sql-ddl"
 version = "0.1.0"
 dependencies = [
- "indoc 2.0.3",
+ "indoc",
 ]
 
 [[package]]
@@ -5089,7 +5021,7 @@ dependencies = [
  "connection-string",
  "enumflags2",
  "expect-test",
- "indoc 2.0.3",
+ "indoc",
  "itertools 0.12.0",
  "pretty_assertions",
  "psl",
@@ -5116,9 +5048,8 @@ dependencies = [
  "connection-string",
  "enumflags2",
  "expect-test",
- "indoc 2.0.3",
+ "indoc",
  "jsonrpc-core",
- "once_cell",
  "paste",
  "pretty_assertions",
  "prisma-value",
@@ -5151,6 +5082,7 @@ dependencies = [
  "quaint",
  "query-builder",
  "query-structure",
+ "schema",
  "serde_json",
  "telemetry",
 ]
@@ -5167,7 +5099,7 @@ dependencies = [
  "expect-test",
  "futures",
  "itertools 0.12.0",
- "once_cell",
+ "panic-utils",
  "prisma-value",
  "psl",
  "quaint",
@@ -5199,8 +5131,7 @@ dependencies = [
  "enumflags2",
  "expect-test",
  "indexmap 2.2.2",
- "indoc 2.0.3",
- "once_cell",
+ "indoc",
  "prisma-value",
  "psl",
  "quaint",
@@ -5233,8 +5164,7 @@ dependencies = [
  "enumflags2",
  "expect-test",
  "indexmap 2.2.2",
- "indoc 2.0.3",
- "once_cell",
+ "indoc",
  "pretty_assertions",
  "prisma-value",
  "psl",
@@ -5354,12 +5284,6 @@ name = "strsim"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8ea5119cdb4c55b55d432abb513a0429384878c15dde60cc77b1c99de1a95a6a"
-
-[[package]]
-name = "strsim"
-version = "0.9.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6446ced80d6c486436db5c078dde11a9f73d42b57fb273121e160b84f63d894c"
 
 [[package]]
 name = "strsim"
@@ -5537,7 +5461,6 @@ dependencies = [
  "connection-string",
  "dissimilar",
  "enumflags2",
- "once_cell",
  "quaint",
  "tokio",
  "tracing",
@@ -5617,7 +5540,6 @@ version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a1446cb4198848d1562301a3340424b4f425ef79f35ef9ee034769a9dd92c10d"
 dependencies = [
- "async-native-tls",
  "async-trait",
  "asynchronous-codec",
  "bigdecimal",
@@ -5708,7 +5630,6 @@ dependencies = [
  "libc",
  "mio",
  "num_cpus",
- "parking_lot",
  "pin-project-lite",
  "signal-hook-registry",
  "socket2 0.5.7",
@@ -6080,12 +6001,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39ec24b3121d976906ece63c9daad25b85969647682eee313cb5779fdd69e14e"
 
 [[package]]
-name = "unindent"
-version = "0.1.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1766d682d402817b5ac4490b3c3002d91dfa0d22812f341609f97b08757359c"
-
-[[package]]
 name = "unreachable"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6131,9 +6046,9 @@ dependencies = [
 name = "user-facing-errors"
 version = "0.1.0"
 dependencies = [
- "backtrace",
- "indoc 2.0.3",
+ "indoc",
  "itertools 0.12.0",
+ "panic-utils",
  "quaint",
  "serde",
  "serde_json",
@@ -6698,9 +6613,9 @@ dependencies = [
 
 [[package]]
 name = "yansi"
-version = "0.5.1"
+version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "09041cd90cf85f7f8b2df60c646f853b7f535ce68f85244eb6731cf89fa498ec"
+checksum = "cfe53a6657fd280eaa890a3bc59152892ffa3e30101319d168b781ed6529b049"
 
 [[package]]
 name = "zerocopy"

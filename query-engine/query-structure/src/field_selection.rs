@@ -39,7 +39,7 @@ impl FieldSelection {
         })
     }
 
-    pub fn selections(&self) -> impl Iterator<Item = &SelectedField> + '_ {
+    pub fn selections(&self) -> impl ExactSizeIterator<Item = &SelectedField> + '_ {
         self.selections.iter()
     }
 

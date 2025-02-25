@@ -10,7 +10,11 @@ use futures::stream::{FuturesUnordered, StreamExt};
 use quaint::ast::*;
 use query_builder::QueryArgumentsExt;
 use query_structure::*;
-use sql_query_builder::{column_metadata, read, AsColumns, AsTable, Context, RelationFieldExt};
+use sql_query_builder::{
+    column_metadata,
+    read::{self, no_alias},
+    AsColumns, AsTable, Context, RelationFieldExt,
+};
 
 pub(crate) async fn get_single_record(
     conn: &dyn Queryable,
@@ -303,13 +307,17 @@ pub(crate) async fn get_related_m2m_record_ids(
     let relation = from_field.relation();
     let table = relation.as_table(ctx);
 
-    let from_columns: Vec<_> = from_field.related_field().m2m_columns(ctx);
-    let to_columns: Vec<_> = from_field.m2m_columns(ctx);
+    let from_column = from_field.related_field().m2m_column(ctx);
+    let to_column = from_field.m2m_column(ctx);
 
     // [DTODO] To verify: We might need chunked fetch here (too many parameters in the query).
     let select = Select::from_table(table)
-        .so_that(sql_query_builder::in_conditions(&from_columns, from_record_ids, ctx))
-        .columns(from_columns.into_iter().chain(to_columns.into_iter()));
+        .so_that(sql_query_builder::in_conditions(
+            &[from_column.clone()],
+            from_record_ids,
+            ctx,
+        ))
+        .columns([from_column, to_column]);
 
     let parent_model_id = from_field.model().primary_identifier();
     let child_model_id = from_field.related_model().primary_identifier();
@@ -377,7 +385,7 @@ async fn plain_aggregate(
     selections: Vec<AggregationSelection>,
     ctx: &Context<'_>,
 ) -> crate::Result<Vec<AggregationResult>> {
-    let query = read::aggregate(model, &selections, query_arguments, ctx);
+    let query = read::aggregate(model, &selections, query_arguments, no_alias(), ctx);
 
     let idents: Vec<_> = selections
         .iter()
@@ -404,7 +412,7 @@ async fn group_by_aggregate(
     having: Option<Filter>,
     ctx: &Context<'_>,
 ) -> crate::Result<Vec<AggregationRow>> {
-    let query = read::group_by_aggregate(model, query_arguments, &selections, group_by, having, ctx);
+    let query = read::group_by_aggregate(model, query_arguments, &selections, group_by, having, no_alias(), ctx);
 
     let idents: Vec<_> = selections
         .iter()

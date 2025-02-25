@@ -1,5 +1,9 @@
 use query_builder::QueryBuilder;
-use query_core::WriteQuery;
+use query_core::{
+    ConnectRecords, DeleteManyRecords, DeleteRecord, DisconnectRecords, RawQuery, UpdateManyRecords, UpdateRecord,
+    UpdateRecordWithSelection, WriteQuery,
+};
+use query_structure::QueryArguments;
 
 use crate::{expression::Expression, translate::TranslateResult, TranslateError};
 
@@ -15,7 +19,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
             // TODO: we probably need some additional node type or extra info in the WriteQuery node
             // to help the client executor figure out the returned ID in the case when it's inferred
             // from the query arguments.
-            Expression::Query(query)
+            Expression::Unique(Box::new(Expression::Query(query)))
         }
 
         WriteQuery::CreateManyRecords(cmr) => {
@@ -25,7 +29,7 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
                         .build_inserts(&cmr.model, cmr.args, cmr.skip_duplicates, Some(&selected_fields.fields))
                         .map_err(TranslateError::QueryBuildFailure)?
                         .into_iter()
-                        .map(Expression::Execute)
+                        .map(Expression::Query)
                         .collect::<Vec<_>>(),
                 )
             } else {
@@ -40,6 +44,155 @@ pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilde
             }
         }
 
-        _ => todo!(),
+        WriteQuery::UpdateManyRecords(UpdateManyRecords {
+            model,
+            record_filter,
+            args,
+            selected_fields,
+            limit,
+            ..
+        }) => {
+            let projection = selected_fields.as_ref().map(|f| &f.fields);
+            let updates = if record_filter.has_selectors() {
+                // we'll need to implement the equivalent of:
+                // ```
+                // let filter = record_filter.filter.clone();
+                // let ids = conn.filter_selectors(model, record_filter, ctx).await?;
+                // let slice = &ids[..limit.unwrap_or(ids.len()).min(ids.len())];
+                // ```
+                //
+                // and pass it to a builder methods that takes the selectors
+                todo!()
+            } else {
+                builder
+                    .build_updates_from_filter(&model, record_filter.filter, args, projection, limit)
+                    .map_err(TranslateError::QueryBuildFailure)?
+                    .into_iter()
+                    .map(if projection.is_some() {
+                        Expression::Query
+                    } else {
+                        Expression::Execute
+                    })
+                    .collect::<Vec<_>>()
+            };
+            if projection.is_some() {
+                Expression::Concat(updates)
+            } else {
+                Expression::Sum(updates)
+            }
+        }
+
+        WriteQuery::UpdateRecord(UpdateRecord::WithSelection(UpdateRecordWithSelection {
+            name: _,
+            model,
+            record_filter,
+            args,
+            selected_fields,
+            // TODO: we're ignoring selection order
+            selection_order: _,
+        })) => {
+            let query = if args.is_empty() {
+                // if there's no args we can just issue a read query
+                let args = QueryArguments::from((model.clone(), record_filter.filter)).with_take(Some(1));
+                builder
+                    .build_get_records(&model, args, &selected_fields)
+                    .map_err(TranslateError::QueryBuildFailure)?
+            } else {
+                builder
+                    .build_update(&model, record_filter, args, Some(&selected_fields))
+                    .map_err(TranslateError::QueryBuildFailure)?
+            };
+            Expression::Unique(Box::new(Expression::Query(query)))
+        }
+
+        WriteQuery::Upsert(upsert) => {
+            let query = builder
+                .build_upsert(
+                    upsert.model(),
+                    upsert.filter().clone(),
+                    upsert.create().clone(),
+                    upsert.update().clone(),
+                    upsert.selected_fields(),
+                    &upsert.unique_constraints(),
+                )
+                .map_err(TranslateError::QueryBuildFailure)?;
+            Expression::Unique(Box::new(Expression::Query(query)))
+        }
+
+        WriteQuery::QueryRaw(RawQuery {
+            model,
+            inputs,
+            query_type,
+        }) => Expression::Query(
+            builder
+                .build_raw(model.as_ref(), inputs, query_type)
+                .map_err(TranslateError::QueryBuildFailure)?,
+        ),
+
+        WriteQuery::ExecuteRaw(RawQuery {
+            model,
+            inputs,
+            query_type,
+        }) => Expression::Execute(
+            builder
+                .build_raw(model.as_ref(), inputs, query_type)
+                .map_err(TranslateError::QueryBuildFailure)?,
+        ),
+
+        WriteQuery::DeleteRecord(DeleteRecord {
+            name: _,
+            model,
+            record_filter,
+            selected_fields,
+        }) => {
+            let selected_fields = selected_fields.as_ref().map(|sf| &sf.fields);
+            let query = builder
+                .build_delete(&model, record_filter, selected_fields)
+                .map_err(TranslateError::QueryBuildFailure)?;
+            if selected_fields.is_some() {
+                Expression::Unique(Box::new(Expression::Query(query)))
+            } else {
+                Expression::Execute(query)
+            }
+        }
+
+        WriteQuery::DeleteManyRecords(DeleteManyRecords {
+            model,
+            record_filter,
+            limit,
+        }) => Expression::Sum(
+            builder
+                .build_deletes(&model, record_filter, limit)
+                .map_err(TranslateError::QueryBuildFailure)?
+                .into_iter()
+                .map(Expression::Execute)
+                .collect::<Vec<_>>(),
+        ),
+
+        WriteQuery::ConnectRecords(ConnectRecords {
+            parent_id,
+            child_ids,
+            relation_field,
+        }) => {
+            let parent_id = parent_id.as_ref().expect("should have parent ID for connect");
+            let query = builder
+                .build_m2m_connect(relation_field, parent_id, &child_ids)
+                .map_err(TranslateError::QueryBuildFailure)?;
+            Expression::Execute(query)
+        }
+
+        WriteQuery::DisconnectRecords(DisconnectRecords {
+            parent_id,
+            child_ids,
+            relation_field,
+        }) => {
+            let parent_id = parent_id.as_ref().expect("should have parent ID for disconnect");
+            let query = builder
+                .build_m2m_disconnect(relation_field, parent_id, &child_ids)
+                .map_err(TranslateError::QueryBuildFailure)?;
+            Expression::Execute(query)
+        }
+
+        other => todo!("{other:?}"),
     })
 }

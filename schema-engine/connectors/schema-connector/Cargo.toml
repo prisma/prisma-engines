@@ -27,12 +27,12 @@ psl.workspace = true
 quaint.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-user-facing-errors = { path = "../../../libs/user-facing-errors", features = [
+user-facing-errors = { workspace = true, features = [
     "quaint",
 ] }
 
 chrono.workspace = true
 enumflags2.workspace = true
-sha2 = "0.9.1"
+sha2.workspace = true
 tracing.workspace = true
-tracing-error = "0.2"
+tracing-error.workspace = true

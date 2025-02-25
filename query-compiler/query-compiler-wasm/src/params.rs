@@ -13,7 +13,7 @@ pub struct JsConnectionInfo {
 }
 
 impl JsConnectionInfo {
-    pub fn into_external_connection_info(self, provider: AdapterFlavour) -> ExternalConnectionInfo {
+    pub fn into_external_connection_info(self, provider: AdapterProvider) -> ExternalConnectionInfo {
         let schema_name = self.get_schema_name(provider);
         let sql_family = SqlFamily::from(provider);
 
@@ -24,28 +24,28 @@ impl JsConnectionInfo {
         )
     }
 
-    fn get_schema_name(&self, provider: AdapterFlavour) -> &str {
+    fn get_schema_name(&self, provider: AdapterProvider) -> &str {
         match self.schema_name.as_ref() {
             Some(name) => name,
             None => self.default_schema_name(provider),
         }
     }
 
-    fn default_schema_name(&self, provider: AdapterFlavour) -> &str {
+    fn default_schema_name(&self, provider: AdapterProvider) -> &str {
         match provider {
             #[cfg(feature = "mysql")]
-            AdapterFlavour::Mysql => quaint::connector::DEFAULT_MYSQL_DB,
+            AdapterProvider::Mysql => quaint::connector::DEFAULT_MYSQL_DB,
             #[cfg(feature = "postgresql")]
-            AdapterFlavour::Postgres => quaint::connector::DEFAULT_POSTGRES_SCHEMA,
+            AdapterProvider::Postgres => quaint::connector::DEFAULT_POSTGRES_SCHEMA,
             #[cfg(feature = "sqlite")]
-            AdapterFlavour::Sqlite => quaint::connector::DEFAULT_SQLITE_DATABASE,
+            AdapterProvider::Sqlite => quaint::connector::DEFAULT_SQLITE_DATABASE,
         }
     }
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Copy, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub enum AdapterFlavour {
+pub enum AdapterProvider {
     #[cfg(feature = "mysql")]
     Mysql,
     #[cfg(feature = "postgresql")]
@@ -54,15 +54,15 @@ pub enum AdapterFlavour {
     Sqlite,
 }
 
-impl From<AdapterFlavour> for SqlFamily {
-    fn from(f: AdapterFlavour) -> Self {
+impl From<AdapterProvider> for SqlFamily {
+    fn from(f: AdapterProvider) -> Self {
         match f {
             #[cfg(feature = "mysql")]
-            AdapterFlavour::Mysql => SqlFamily::Mysql,
+            AdapterProvider::Mysql => SqlFamily::Mysql,
             #[cfg(feature = "postgresql")]
-            AdapterFlavour::Postgres => SqlFamily::Postgres,
+            AdapterProvider::Postgres => SqlFamily::Postgres,
             #[cfg(feature = "sqlite")]
-            AdapterFlavour::Sqlite => SqlFamily::Sqlite,
+            AdapterProvider::Sqlite => SqlFamily::Sqlite,
         }
     }
 }

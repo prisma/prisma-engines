@@ -1,88 +1,116 @@
 //! All the quaint-wrangling for the sqlite connector should happen here.
 
-use quaint::connector::{ColumnType, DescribedColumn, DescribedParameter, GetRow, ToColumnNames};
-use schema_connector::{BoxFuture, ConnectorError, ConnectorResult, Namespaces};
-use sql_schema_describer::{sqlite as describer, DescriberErrorKind, SqlSchema};
-use user_facing_errors::schema_engine::ApplyMigrationError;
+use crate::BitFlags;
+use crate::ConnectorParams;
+use psl::PreviewFeature;
+use quaint::connector::ExternalConnector;
+use schema_connector::{ConnectorError, ConnectorResult};
+use sql_schema_describer::SqlSchema;
+use std::sync::Arc;
 
-// TODO: use ExternalConnector here.
-pub(super) struct Connection();
+pub(super) struct State {
+    connection: Connection,
+    preview_features: BitFlags<PreviewFeature>,
+}
+
+impl State {
+    pub fn new(connection: Arc<dyn ExternalConnector>, preview_features: BitFlags<PreviewFeature>) -> Self {
+        Self {
+            preview_features,
+            connection: Connection(connection),
+        }
+    }
+}
+
+pub(super) struct Params;
+
+pub(super) struct Connection(Arc<dyn ExternalConnector>);
 
 impl Connection {
-    pub(super) fn new(params: &super::Params) -> ConnectorResult<Self> {
+    pub fn new_in_memory() -> Self {
         panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
     }
 
-    pub(super) fn new_in_memory() -> Self {
-        panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
+    pub fn as_connector(&self) -> &Arc<dyn ExternalConnector> {
+        &self.0
     }
 
-    pub(super) async fn describe_schema(&mut self) -> ConnectorResult<SqlSchema> {
-        panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
-    }
-
-    pub(super) fn raw_cmd(&mut self, sql: &str) -> ConnectorResult<()> {
+    pub async fn raw_cmd(&self, sql: &str) -> ConnectorResult<()> {
         tracing::debug!(query_type = "raw_cmd", sql);
-        panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
+        self.0.raw_cmd(sql).await.map_err(convert_error)
     }
 
-    pub(super) fn query(&mut self, query: quaint::ast::Query<'_>) -> ConnectorResult<quaint::prelude::ResultSet> {
+    pub async fn query(&self, query: quaint::ast::Query<'_>) -> ConnectorResult<quaint::prelude::ResultSet> {
         use quaint::visitor::Visitor;
         let (sql, params) = quaint::visitor::Sqlite::build(query).unwrap();
-        self.query_raw(&sql, &params)
+        self.query_raw(&sql, &params).await
     }
 
-    pub(super) fn query_raw(
-        &mut self,
+    pub async fn query_raw(
+        &self,
         sql: &str,
         params: &[quaint::prelude::Value<'_>],
     ) -> ConnectorResult<quaint::prelude::ResultSet> {
         tracing::debug!(query_type = "query_raw", sql);
-        panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
+        self.0.query_raw(sql, params).await.map_err(convert_error)
     }
 
-    pub(super) fn describe_query(
-        &mut self,
+    pub async fn version(&self) -> ConnectorResult<Option<String>> {
+        self.0.version().await.map_err(convert_error)
+    }
+
+    pub async fn describe_query(
+        &self,
         sql: &str,
-        params: &super::Params,
+        _params: &Params,
     ) -> ConnectorResult<quaint::connector::DescribedQuery> {
+        tracing::debug!(query_type = "describe_query", sql);
+        self.0.describe_query(sql).await.map_err(convert_error)
+    }
+
+    pub async fn apply_migration_script(&self, _migration_name: &str, _script: &str) -> ConnectorResult<()> {
+        panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
+    }
+
+    pub async fn reset(&self, _params: &Params) -> ConnectorResult<()> {
         panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
     }
 }
 
-pub(super) fn generic_apply_migration_script(
-    migration_name: &str,
-    script: &str,
-    conn: &Connection,
-) -> ConnectorResult<()> {
-    tracing::debug!(query_type = "raw_cmd", sql = script);
+pub(super) async fn create_database(_state: &State) -> ConnectorResult<String> {
     panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
 }
 
-pub(super) fn create_database(params: &super::Params) -> ConnectorResult<String> {
+pub(super) async fn drop_database(_state: &State) -> ConnectorResult<()> {
     panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
 }
 
-pub(super) fn drop_database(params: &super::Params) -> ConnectorResult<()> {
+pub(super) async fn ensure_connection_validity(state: &mut State) -> ConnectorResult<()> {
+    let (connection, _) = get_connection_and_params(state)?;
+    connection.version().await?;
+    Ok(())
+}
+
+pub(super) async fn introspect(state: &mut State) -> ConnectorResult<SqlSchema> {
+    super::describe_schema(&state.connection).await
+}
+
+pub(super) fn get_connection_string(_state: &State) -> Option<&str> {
     panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
 }
 
-pub(super) fn ensure_connection_validity(params: &super::Params) -> ConnectorResult<()> {
+pub(super) fn get_connection_and_params(state: &mut State) -> ConnectorResult<(&Connection, &Params)> {
+    Ok((&state.connection, &Params))
+}
+
+pub(super) fn set_params(_state: &mut State, params: ConnectorParams) -> ConnectorResult<()> {
     panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
 }
 
-pub(super) fn introspect<'a>(
-    instance: &'a mut super::SqliteFlavour,
-    namespaces: Option<Namespaces>,
-    _ctx: &schema_connector::IntrospectionContext,
-) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
-    panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
+pub(super) fn set_preview_features(state: &mut State, features: BitFlags<PreviewFeature>) {
+    state.preview_features = features;
 }
 
-pub(super) fn reset(params: &super::Params, connection: &mut Connection) -> ConnectorResult<()> {
-    panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
-}
-
-pub(super) fn version(instance: &mut super::SqliteFlavour) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
-    panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
+fn convert_error(err: quaint::error::Error) -> ConnectorError {
+    ConnectorError::from_source(err, "external connector error")
 }

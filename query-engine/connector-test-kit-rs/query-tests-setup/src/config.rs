@@ -15,6 +15,7 @@ pub enum TestExecutor {
     Napi,
     Wasm,
     Mobile,
+    QueryCompiler,
 }
 
 impl Display for TestExecutor {
@@ -23,6 +24,7 @@ impl Display for TestExecutor {
             TestExecutor::Napi => f.write_str("Napi"),
             TestExecutor::Wasm => f.write_str("Wasm"),
             TestExecutor::Mobile => f.write_str("Mobile"),
+            TestExecutor::QueryCompiler => f.write_str("QueryCompiler"),
         }
     }
 }
@@ -365,16 +367,27 @@ impl TestConfig {
     }
 
     pub fn external_test_executor_path(&self) -> Option<String> {
-        const DEFAULT_TEST_EXECUTOR: &str = "libs/driver-adapters/executor/script/testd-qe.sh";
+        const TEST_EXECUTOR_ROOT_PATH: &str = "libs/driver-adapters/executor/script";
+        const QUERY_ENGINE_TEST_EXECUTOR: &str = "testd-qe.sh";
+        const QUERY_COMPILER_TEST_EXECUTOR: &str = "testd-qc.sh";
+
         self.with_driver_adapter()
-            .and_then(|_| {
-                Self::workspace_root().or_else(|| {
-                    exit_with_message(
-                        "WORKSPACE_ROOT needs to be correctly set to the root of the prisma-engines repository",
-                    )
-                })
+            .and_then(|da| {
+                Self::workspace_root()
+                    .or_else(|| {
+                        exit_with_message(
+                            "WORKSPACE_ROOT needs to be correctly set to the root of the prisma-engines repository",
+                        )
+                    })
+                    .map(|path| path.join(TEST_EXECUTOR_ROOT_PATH))
+                    .map(|path| {
+                        path.join(if da.test_executor == TestExecutor::QueryCompiler {
+                            QUERY_COMPILER_TEST_EXECUTOR
+                        } else {
+                            QUERY_ENGINE_TEST_EXECUTOR
+                        })
+                    })
             })
-            .map(|path| path.join(DEFAULT_TEST_EXECUTOR))
             .and_then(|path| path.to_str().map(|s| s.to_owned()))
     }
 

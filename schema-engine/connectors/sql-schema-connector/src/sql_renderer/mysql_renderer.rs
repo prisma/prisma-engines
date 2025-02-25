@@ -5,7 +5,6 @@ use crate::{
     sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
     sql_schema_differ::ColumnChanges,
 };
-use once_cell::sync::Lazy;
 use psl::builtin_connectors::MySqlType;
 use regex::Regex;
 use sql_ddl::{mysql as ddl, IndexColumn, SortOrder};
@@ -15,7 +14,7 @@ use sql_schema_describer::{
     },
     ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, PrismaValue, SQLSortOrder, SqlSchema,
 };
-use std::{borrow::Cow, fmt::Write as _};
+use std::{borrow::Cow, fmt::Write as _, sync::LazyLock};
 
 impl MysqlFlavour {
     fn render_column<'a>(&self, col: TableColumnWalker<'a>) -> ddl::Column<'a> {
@@ -453,7 +452,7 @@ fn render_column_type(column: TableColumnWalker<'_>) -> Cow<'static, str> {
 }
 
 fn escape_string_literal(s: &str) -> Cow<'_, str> {
-    static STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'"#).unwrap());
+    static STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"'"#).unwrap());
 
     STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'$0")
 }

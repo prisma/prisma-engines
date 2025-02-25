@@ -4,13 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-query-structure = { path = "../query-structure" }
+query-structure.workspace = true
 psl.workspace = true
-rustc-hash = "1.1.0"
-once_cell = "1"
+rustc-hash.workspace = true
 
 [dev-dependencies]
-codspeed-criterion-compat = "1.1.0"
+codspeed-criterion-compat.workspace = true
 
 [[bench]]
 name = "schema_builder_bench"

@@ -1,0 +1,19 @@
+{
+  "modelName": "Post",
+  "action": "findUnique",
+  "query": {
+    "arguments": {
+      "where": {
+        "id": 1
+      }
+    },
+    "selection": {
+      "$composites": true,
+      "$scalars": true,
+      "categories": {
+        "arguments": {},
+        "selection": { "$composites": true, "$scalars": true }
+      }
+    }
+  }
+}

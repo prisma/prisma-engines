@@ -6,12 +6,12 @@ on:
   pull_request:
     paths-ignore:
       - "!.github/workflows/build-prisma-schema-wasm.yml"
+      - "!.github/workflows/include/rust-wasm-setup/action.yml"
       - ".github/**"
       - ".buildkite/**"
       - "*.md"
       - "LICENSE"
       - "CODEOWNERS"
-      - "renovate.json"
 
 jobs:
   build:

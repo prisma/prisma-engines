@@ -4,17 +4,17 @@ name = "query-connector"
 version = "0.1.0"
 
 [dependencies]
-anyhow = "1.0"
+anyhow.workspace = true
 async-trait.workspace = true
 chrono.workspace = true
 futures.workspace = true
 itertools.workspace = true
-query-structure = {path = "../../query-structure"}
-prisma-value = {path = "../../../libs/prisma-value"}
+query-structure.workspace = true
+prisma-value.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-thiserror = "1.0"
-user-facing-errors = {path = "../../../libs/user-facing-errors", features = ["sql"]}
+thiserror.workspace = true
+user-facing-errors = { workspace = true, features = ["sql"] }
 uuid.workspace = true
 indexmap.workspace = true
-telemetry = {path = "../../../libs/telemetry"}
+telemetry.workspace = true

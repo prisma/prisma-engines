@@ -1719,6 +1719,7 @@ fn array_column_defaults_with_array_constructor_syntax(api: TestApi) {
             text_empty TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
             text TEXT[] NOT NULL DEFAULT ARRAY['abc']::TEXT[],
             text_c_escape TEXT[] NOT NULL DEFAULT ARRAY[E'abc', E'def']::TEXT[],
+            varchar_empty VARCHAR(255)[] NOT NULL DEFAULT ARRAY[]::VARCHAR(255)[],
             colors COLOR[] NOT NULL DEFAULT ARRAY['RED', 'GREEN']::COLOR[],
             int_defaults INT4[] NOT NULL DEFAULT ARRAY[9, 12999, -4, 0, 1249849]::INT4[],
             float_defaults DOUBLE PRECISION[] NOT NULL DEFAULT ARRAY[0, 9.12, 3.14, 0.1242, 124949.124949]::DOUBLE PRECISION[],
@@ -1740,6 +1741,7 @@ fn array_column_defaults_with_array_constructor_syntax(api: TestApi) {
     assert_default("text_empty", vec![]);
     assert_default("text", vec!["abc".into()]);
     assert_default("text_c_escape", vec!["abc".into(), "def".into()]);
+    assert_default("varchar_empty", vec![]);
     assert_default(
         "colors",
         vec![

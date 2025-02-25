@@ -2,6 +2,7 @@ mod config;
 mod connector_tag;
 mod datamodel_rendering;
 mod error;
+mod ignore_lists;
 mod logging;
 mod query_result;
 mod runner;
@@ -21,10 +22,13 @@ pub use schema_gen::*;
 pub use templating::*;
 
 use colored::Colorize;
-use once_cell::sync::Lazy;
+use futures::{future::Either, FutureExt};
 use prisma_metrics::{MetricRecorder, MetricRegistry, WithMetricsInstrumentation};
 use psl::datamodel_connector::ConnectorCapabilities;
 use std::future::Future;
+use std::panic::AssertUnwindSafe;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::LazyLock;
 use tokio::runtime::Builder;
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 use tracing_futures::WithSubscriber;
@@ -32,14 +36,15 @@ use tracing_futures::WithSubscriber;
 pub type TestResult<T> = Result<T, TestError>;
 
 /// Test configuration, loaded once at runtime.
-pub static CONFIG: Lazy<TestConfig> = Lazy::new(TestConfig::load);
+pub static CONFIG: LazyLock<TestConfig> = LazyLock::new(TestConfig::load);
 
 /// The log level from the environment.
-pub static ENV_LOG_LEVEL: Lazy<String> = Lazy::new(|| std::env::var("LOG_LEVEL").unwrap_or_else(|_| "info".to_owned()));
+pub static ENV_LOG_LEVEL: LazyLock<String> =
+    LazyLock::new(|| std::env::var("LOG_LEVEL").unwrap_or_else(|_| "info".to_owned()));
 
 /// Engine protocol used to run tests. Either 'graphql' or 'json'.
-pub static ENGINE_PROTOCOL: Lazy<String> =
-    Lazy::new(|| std::env::var("PRISMA_ENGINE_PROTOCOL").unwrap_or_else(|_| "graphql".to_owned()));
+pub static ENGINE_PROTOCOL: LazyLock<String> =
+    LazyLock::new(|| std::env::var("PRISMA_ENGINE_PROTOCOL").unwrap_or_else(|_| "graphql".to_owned()));
 
 /// Teardown of a test setup.
 async fn teardown_project(datamodel: &str, db_schemas: &[&str], schema_id: Option<usize>) -> TestResult<()> {
@@ -74,8 +79,12 @@ pub trait AsyncFn<'a, A: 'a, B: 'a, T>: Copy + 'static {
     fn call(self, a: &'a A, b: &'a B) -> Self::Fut;
 }
 
-impl<'a, A: 'a, B: 'a, Fut: Future + 'a, F: Fn(&'a A, &'a B) -> Fut + Copy + 'static> AsyncFn<'a, A, B, Fut::Output>
-    for F
+impl<'a, A, B, Fut, F> AsyncFn<'a, A, B, Fut::Output> for F
+where
+    A: 'a,
+    B: 'a,
+    Fut: Future + 'a,
+    F: Fn(&'a A, &'a B) -> Fut + Copy + 'static,
 {
     type Fut = Fut;
 
@@ -96,6 +105,7 @@ pub fn run_relation_link_test<F>(
     required_capabilities: ConnectorCapabilities,
     (suite_name, test_name): (&str, &str),
     test_fn: F,
+    test_function_name: &'static str,
 ) where
     F: (for<'a> AsyncFn<'a, Runner, DatamodelWithParams, TestResult<()>>) + 'static,
 {
@@ -119,6 +129,8 @@ pub fn run_relation_link_test<F>(
         required_capabilities,
         (suite_name, test_name),
         &boxify(test_fn),
+        std::any::type_name::<F>(),
+        test_function_name,
     )
 }
 
@@ -133,9 +145,20 @@ fn run_relation_link_test_impl(
     required_capabilities: ConnectorCapabilities,
     (suite_name, test_name): (&str, &str),
     test_fn: &dyn for<'a> Fn(&'a Runner, &'a DatamodelWithParams) -> BoxFuture<'a, TestResult<()>>,
+    test_fn_full_name: &'static str,
+    original_test_function_name: &'static str,
 ) {
-    static RELATION_TEST_IDX: Lazy<Option<usize>> =
-        Lazy::new(|| std::env::var("RELATION_TEST_IDX").ok().and_then(|s| s.parse().ok()));
+    let full_test_name = build_full_test_name(test_fn_full_name, original_test_function_name);
+
+    if ignore_lists::is_ignored(&full_test_name) {
+        return;
+    }
+
+    let expected_to_fail = ignore_lists::is_expected_to_fail(&full_test_name);
+    let failed = &AtomicBool::new(false);
+
+    static RELATION_TEST_IDX: LazyLock<Option<usize>> =
+        LazyLock::new(|| std::env::var("RELATION_TEST_IDX").ok().and_then(|s| s.parse().ok()));
 
     let (dms, capabilities) = schema_with_relation(on_parent, on_child, id_only);
 
@@ -167,19 +190,53 @@ fn run_relation_link_test_impl(
                         .await
                         .unwrap();
 
+                    let test_future = if expected_to_fail {
+                        Either::Left(async {
+                            match AssertUnwindSafe(test_fn(&runner, &dm)).catch_unwind().await {
+                                Ok(Ok(_)) => {},
+                                Ok(Err(err)) => {
+                                    failed.store(true, Ordering::Relaxed);
+                                    eprintln!("test failed as expected: {err}");
+                                }
+                                Err(panic) => {
+                                    failed.store(true, Ordering::Relaxed);
+                                    eprintln!(
+                                        "test panicked as expected: {}",
+                                        panic_utils::downcast_box_to_string(panic).unwrap_or_default()
+                                    );
+                                }
+                            };
+                            Ok(())
+                        })
+                    } else {
+                        Either::Right(test_fn(&runner, &dm))
+                    };
 
-                    test_fn(&runner, &dm).with_subscriber(test_tracing_subscriber(
+                    test_future.with_subscriber(test_tracing_subscriber(
                         ENV_LOG_LEVEL.to_string(),
                         log_tx,
                     )).with_recorder(recorder)
                     .await.unwrap();
 
-                    teardown_project(&datamodel, Default::default(), runner.schema_id())
-                        .await
-                        .unwrap();
+                    if let Err(e) = teardown_project(&datamodel, Default::default(), runner.schema_id()).await {
+                        if expected_to_fail {
+                            eprintln!("Teardown failed: {e}");
+                        } else {
+                            panic!("Teardown failed: {e}");
+                        }
+                    }
+
                 }
             );
+
+            if failed.load(Ordering::Relaxed) {
+                break;
+            }
         }
+    }
+
+    if expected_to_fail && !failed.load(Ordering::Relaxed) {
+        panic!("expected at least one of the variants of the relation test to fail but they all succeeded");
     }
 }
 
@@ -213,6 +270,7 @@ pub fn run_connector_test<T>(
     db_extensions: &[&str],
     referential_override: Option<String>,
     test_fn: T,
+    test_function_name: &'static str,
 ) where
     T: ConnectorTestFn,
 {
@@ -234,6 +292,8 @@ pub fn run_connector_test<T>(
         db_extensions,
         referential_override,
         &boxify(test_fn),
+        std::any::type_name::<T>(),
+        test_function_name,
     )
 }
 
@@ -250,8 +310,16 @@ fn run_connector_test_impl(
     db_extensions: &[&str],
     referential_override: Option<String>,
     test_fn: &dyn Fn(Runner) -> BoxFuture<'static, TestResult<()>>,
+    test_fn_full_name: &'static str,
+    original_test_function_name: &'static str,
 ) {
     let (connector, version) = CONFIG.test_connector().unwrap();
+
+    let full_test_name = build_full_test_name(test_fn_full_name, original_test_function_name);
+
+    if ignore_lists::is_ignored(&full_test_name) {
+        return;
+    }
 
     if !should_run(&connector, &version, only, exclude, capabilities) {
         return;
@@ -288,7 +356,30 @@ fn run_connector_test_impl(
         .unwrap();
         let schema_id = runner.schema_id();
 
-        if let Err(err) = test_fn(runner)
+        let expected_to_fail = ignore_lists::is_expected_to_fail(&full_test_name);
+
+        let test_future = if expected_to_fail {
+            Either::Left(async {
+                match AssertUnwindSafe(test_fn(runner)).catch_unwind().await {
+                    Ok(Ok(_)) => panic!("expected this test to fail but it succeeded"),
+                    Ok(Err(err)) => {
+                        eprintln!("test failed as expected: {err}");
+                        Ok(())
+                    }
+                    Err(panic) => {
+                        eprintln!(
+                            "test panicked as expected: {}",
+                            panic_utils::downcast_box_to_string(panic).unwrap_or_default()
+                        );
+                        Ok(())
+                    }
+                }
+            })
+        } else {
+            Either::Right(test_fn(runner))
+        };
+
+        if let Err(err) = test_future
             .with_subscriber(test_tracing_subscriber(ENV_LOG_LEVEL.to_string(), log_tx))
             .with_recorder(recorder)
             .await
@@ -296,10 +387,21 @@ fn run_connector_test_impl(
             panic!("💥 Test failed due to an error: {err:?}");
         }
 
-        crate::teardown_project(&datamodel, db_schemas, schema_id)
-            .await
-            .unwrap();
+        if let Err(e) = crate::teardown_project(&datamodel, db_schemas, schema_id).await {
+            if expected_to_fail {
+                eprintln!("Teardown failed: {e}");
+            } else {
+                panic!("Teardown failed: {e}");
+            }
+        }
     });
+}
+
+fn build_full_test_name(test_fn_full_name: &'static str, original_test_function_name: &'static str) -> String {
+    let mut parts = test_fn_full_name.split("::").skip(1).collect::<Vec<_>>();
+    parts.pop();
+    parts.push(original_test_function_name);
+    parts.join("::")
 }
 
 pub type LogEmit = UnboundedSender<String>;

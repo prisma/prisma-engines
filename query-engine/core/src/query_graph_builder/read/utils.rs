@@ -1,6 +1,7 @@
+use std::sync::LazyLock;
+
 use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
-use once_cell::sync::Lazy;
 use psl::datamodel_connector::JoinStrategySupport;
 use query_structure::{prelude::*, RelationLoadStrategy};
 use schema::{
@@ -258,7 +259,7 @@ pub(crate) fn get_relation_load_strategy(
     nested_queries: &[ReadQuery],
     query_schema: &QuerySchema,
 ) -> QueryGraphBuilderResult<RelationLoadStrategy> {
-    static DEFAULT_RELATION_LOAD_STRATEGY: Lazy<Option<RelationLoadStrategy>> = Lazy::new(|| {
+    static DEFAULT_RELATION_LOAD_STRATEGY: LazyLock<Option<RelationLoadStrategy>> = LazyLock::new(|| {
         std::env::var("PRISMA_RELATION_LOAD_STRATEGY")
             .map(|e| e.as_str().try_into().unwrap())
             .ok()

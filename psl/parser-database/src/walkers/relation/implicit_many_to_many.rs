@@ -73,6 +73,11 @@ impl<'db> ImplicitManyToManyRelationWalker<'db> {
     pub fn table_name(self) -> ImplicitManyToManyRelationTableName<'db> {
         ImplicitManyToManyRelationTableName(self.relation_name())
     }
+
+    /// The relation starts or ends to a view.
+    pub fn one_side_is_view(self) -> bool {
+        self.model_a().ast_model().is_view() || self.model_b().ast_model().is_view()
+    }
 }
 
 /// A table name for an implicit relation's join table. Useful for its Display impl.

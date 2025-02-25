@@ -1,11 +1,10 @@
 use super::*;
-use once_cell::sync::Lazy;
 use serde::de::DeserializeOwned;
 use std::{
     error::Error as StdError,
     fmt::Display,
     io::Write as _,
-    sync::{atomic::Ordering, Arc},
+    sync::{atomic::Ordering, Arc, LazyLock},
 };
 use tokio::sync::{mpsc, oneshot, RwLock};
 
@@ -28,7 +27,7 @@ impl ExecutorProcess {
             Ok(Ok(process)) => process,
             Ok(Err(err)) => exit_with_message(1, &format!("Failed to start node process. Details: {err}")),
             Err(err) => {
-                let err = err.downcast_ref::<String>().map(ToOwned::to_owned).unwrap_or_default();
+                let err = panic_utils::downcast_box_to_string(err).unwrap_or_default();
                 exit_with_message(1, &format!("Panic while trying to start node process.\nDetails: {err}"))
             }
         }
@@ -50,7 +49,7 @@ impl ExecutorProcess {
                     1,
                     &format!(
                         "rpc thread panicked with: {}",
-                        e.downcast::<String>().unwrap_or_default()
+                        panic_utils::downcast_box_to_string(e).unwrap_or_default()
                     ),
                 );
             }
@@ -148,11 +147,15 @@ impl PendingRequests {
     }
 
     fn respond(&mut self, id: &jsonrpc_core::Id, response: Result<serde_json::value::Value>) {
-        self.map
+        if self
+            .map
             .remove(id)
             .expect("no sender for response")
             .send(response)
-            .unwrap();
+            .is_err()
+        {
+            tracing::warn!("receiver was dropped before response was sent");
+        }
     }
 
     fn respond_to_last(&mut self, response: Result<serde_json::value::Value>) {
@@ -165,7 +168,8 @@ impl PendingRequests {
     }
 }
 
-pub(super) static EXTERNAL_PROCESS: Lazy<RestartableExecutorProcess> = Lazy::new(RestartableExecutorProcess::new);
+pub(super) static EXTERNAL_PROCESS: LazyLock<RestartableExecutorProcess> =
+    LazyLock::new(RestartableExecutorProcess::new);
 
 type ReqImpl = (
     jsonrpc_core::MethodCall,

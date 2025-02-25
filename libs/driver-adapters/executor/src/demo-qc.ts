@@ -101,7 +101,7 @@ async function initQC({
 
   const compiler = await qc.initQueryCompiler({
     datamodel: schema,
-    flavour: adapter.provider,
+    provider: adapter.provider,
     connectionInfo,
   });
 

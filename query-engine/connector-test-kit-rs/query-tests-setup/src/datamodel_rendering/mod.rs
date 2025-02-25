@@ -2,6 +2,8 @@ mod datasource;
 mod mongodb_renderer;
 mod sql_renderer;
 
+use std::sync::LazyLock;
+
 pub use mongodb_renderer::*;
 pub use sql_renderer::*;
 
@@ -11,12 +13,11 @@ use crate::{
 };
 use indoc::indoc;
 use itertools::Itertools;
-use once_cell::sync::Lazy;
 use psl::FeatureMapWithProvider;
 use regex::Regex;
 
 /// Test configuration, loaded once at runtime.
-static FRAGMENT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"#.*").unwrap());
+static FRAGMENT_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"#.*").unwrap());
 
 /// The main trait a datamodel renderer for a connector has to implement.
 pub trait DatamodelRenderer {

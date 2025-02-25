@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-diagnostics = { path = "../diagnostics" }
-schema-ast = { path = "../schema-ast" }
+diagnostics.workspace = true
+schema-ast.workspace = true
 indexmap.workspace = true
 enumflags2.workspace = true
 itertools.workspace = true
-either = "1.6.1"
-rustc-hash = "1.1.0"
+either.workspace = true
+rustc-hash.workspace = true

@@ -378,7 +378,7 @@ pub(crate) trait JoinSelectBuilder {
             .on(m2m_join_conditions);
 
         let aggregation_join_conditions = {
-            let left_columns = rf.related_field().m2m_columns(ctx);
+            let left_columns = vec![rf.related_field().m2m_column(ctx)];
             let right_columns = ModelProjection::from(rf.model().primary_identifier()).as_columns(ctx);
             build_join_conditions(
                 (left_columns.into(), Some(m2m_table_alias)),
@@ -567,7 +567,7 @@ impl JoinConditionExt for RelationField {
         right_alias: Option<Alias>,
         ctx: &Context<'_>,
     ) -> ConditionTree<'static> {
-        let left_columns = self.m2m_columns(ctx);
+        let left_columns = vec![self.m2m_column(ctx)];
         let right_columns = ModelProjection::from(self.related_model().primary_identifier()).as_columns(ctx);
 
         build_join_conditions((left_columns.into(), left_alias), (right_columns, right_alias))

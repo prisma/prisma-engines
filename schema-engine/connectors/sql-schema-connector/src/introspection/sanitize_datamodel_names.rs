@@ -2,17 +2,16 @@
 //! of these strings happens in this module.
 
 use crate::introspection::{datamodel_calculator::DatamodelCalculatorContext, sanitize_datamodel_names};
-use once_cell::sync::Lazy;
 use regex::Regex;
-use std::borrow::Cow;
+use std::{borrow::Cow, sync::LazyLock};
 
 /// Regex to determine if an identifier starts with a character that
 /// is not supported.
-static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
+static RE_START: LazyLock<Regex> = LazyLock::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
 
 /// Regex to determine if an identifier contains a character that is not
 /// supported.
-static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
+static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
 
 /// If a string has to be sanitized to the PSL.
 pub(crate) fn needs_sanitation(s: &str) -> bool {

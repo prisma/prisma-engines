@@ -1,7 +1,6 @@
 use super::*;
-use once_cell::sync::Lazy;
 use query_structure::{walkers, DefaultKind};
-use std::borrow::Cow;
+use std::{borrow::Cow, sync::LazyLock};
 
 /// Input object type convenience wrapper function.
 pub(crate) fn input_object_type<'a>(
@@ -52,7 +51,7 @@ where
 {
     OutputField {
         name: name.into(),
-        arguments: Some(Arc::new(Lazy::new(
+        arguments: Some(Arc::new(LazyLock::new(
             Box::new(arguments) as Box<dyn FnOnce() -> Vec<InputField<'a>> + Send + Sync + 'a>
         ))),
         field_type,

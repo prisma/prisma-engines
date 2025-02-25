@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("TEST_POSTGRES_URI")
+}
+
+model User {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+  posts Post[]
+}
+
+model Post {
+  id         Int        @id @default(autoincrement())
+  title      String
+  userId     Int
+  user       User       @relation(fields: [userId], references: [id])
+  categories Category[]
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String
+  posts Post[]
+}
+
+model ParentModelWithCompositeId {
+  a        Int
+  b        Int
+  children ChildOfModelWithCompositeId[]
+
+  @@id([a, b])
+}
+
+model ChildOfModelWithCompositeId {
+  id      Int                        @id
+  parent  ParentModelWithCompositeId @relation(fields: [parentA, parentB], references: [a, b])
+  parentA Int
+  parentB Int
+}

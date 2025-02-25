@@ -1,0 +1,16 @@
+{
+  "modelName": "User",
+  "action": "aggregate",
+  "query": {
+    "arguments": {
+      "where": {
+        "email": {
+          "contains": "prisma.io"
+        }
+      }
+    },
+    "selection": {
+      "_count": true
+    }
+  }
+}

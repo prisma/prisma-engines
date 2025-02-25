@@ -16,7 +16,6 @@ use bson::{Bson, Document};
 use convert_case::{Case, Casing};
 use datamodel_renderer as renderer;
 use mongodb_schema_describer::{CollectionWalker, IndexWalker};
-use once_cell::sync::Lazy;
 use psl::datamodel_connector::constraint_names::ConstraintNames;
 use regex::Regex;
 use std::{
@@ -24,6 +23,7 @@ use std::{
     cmp::Ordering,
     collections::{BTreeMap, HashMap, HashSet},
     fmt,
+    sync::LazyLock,
 };
 
 pub(super) const SAMPLE_SIZE: i32 = 1000;
@@ -655,8 +655,8 @@ impl FieldPercentages {
 }
 
 fn sanitize_string(s: &str) -> Option<String> {
-    static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
-    static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
+    static RE_START: LazyLock<Regex> = LazyLock::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
+    static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
 
     let needs_sanitation = RE_START.is_match(s) || RE.is_match(s);
 

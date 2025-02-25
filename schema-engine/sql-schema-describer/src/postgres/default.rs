@@ -453,6 +453,8 @@ fn parse_array_constructor(parser: &mut Parser<'_>, tpe: &ColumnTypeFamily) -> O
     let mut values = Vec::new();
     let parse_fn = parser_for_family(tpe);
 
+    let _ = parser.expect(Token::OpeningBrace);
+
     let kw = parser.expect(Token::Identifier)?;
     if !kw.eq_ignore_ascii_case("array") {
         return None;
@@ -498,7 +500,7 @@ fn get_list_default_value(parser: &mut Parser<'_>, tpe: &ColumnType) -> DefaultV
         Some(Token::CStyleStringLiteral) | Some(Token::StringLiteral) => {
             parse_string_value(parser).and_then(|value| c_style_scalar_lists::parse_array_literal(&value, tpe))
         }
-        Some(Token::Identifier) => parse_array_constructor(parser, &tpe.family),
+        Some(Token::Identifier) | Some(Token::OpeningBrace) => parse_array_constructor(parser, &tpe.family),
         _ => None,
     };
 
@@ -691,6 +693,23 @@ mod tests {
                     BigDecimal("-68.0"),
                 ),
             ]
+        "#]];
+
+        expected.assert_debug_eq(&out);
+    }
+
+    #[test]
+    fn parse_empty_varchar_array_default() {
+        let input = "(ARRAY[]::character varying[])::character varying(10)[]";
+        let tokens = tokenize(input);
+        let mut parser = Parser::new(input, &tokens);
+
+        let out = parse_array_constructor(&mut parser, &ColumnTypeFamily::String);
+
+        let expected = expect![[r#"
+            Some(
+                [],
+            )
         "#]];
 
         expected.assert_debug_eq(&out);

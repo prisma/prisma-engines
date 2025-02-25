@@ -48,9 +48,12 @@ pub(crate) enum DriverAdapterError {
         native_type: String,
     },
     #[cfg(feature = "postgresql")]
+    #[serde(rename = "postgres")]
     Postgres(#[serde(with = "PostgresErrorDef")] PostgresError),
     #[cfg(feature = "mysql")]
+    #[serde(rename = "mysql")]
     Mysql(#[serde(with = "MysqlErrorDef")] MysqlError),
     #[cfg(feature = "sqlite")]
+    #[serde(rename = "sqlite")]
     Sqlite(#[serde(with = "SqliteErrorDef")] SqliteError),
 }

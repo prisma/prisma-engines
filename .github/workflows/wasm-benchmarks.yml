@@ -4,11 +4,11 @@ on:
     paths-ignore:
       - ".github/**"
       - "!.github/workflows/wasm-benchmarks.yml"
+      - "!.github/workflows/include/rust-wasm-setup/action.yml"
       - ".buildkite/**"
       - "*.md"
       - "LICENSE"
       - "CODEOWNERS"
-      - "renovate.json"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

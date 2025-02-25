@@ -4,26 +4,25 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-colored = "2"
-dmmf = { path = "../query-engine/dmmf" }
+colored.workspace = true
+dmmf.workspace = true
 psl = { workspace = true, features = ["all"] }
 serde_json.workspace = true
 serde.workspace = true
 indoc.workspace = true
-lsp-types = "0.95.1"
-log = "0.4.14"
+lsp-types.workspace = true
+log.workspace = true
 enumflags2.workspace = true
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-structopt = "0.3"
+structopt.workspace = true
 
 [dev-dependencies]
-dissimilar = "1.0.3"
-once_cell = "1.9.0"
-expect-test = "1"
+dissimilar.workspace = true
+expect-test.workspace = true
 
 [build-dependencies]
-build-utils.path = "../libs/build-utils"
+build-utils.workspace = true
 
 [features]
 # sigh please don't ask :(

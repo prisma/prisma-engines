@@ -7,23 +7,23 @@ edition = "2021"
 workspace = true
 
 [dependencies]
-thiserror = "1"
+thiserror.workspace = true
 url.workspace = true
-query-connector = { path = "../../query-engine/connectors/query-connector" }
-query-core = { path = "../../query-engine/core" }
-telemetry = { path = "../telemetry" }
-user-facing-errors = { path = "../user-facing-errors" }
+query-connector.workspace = true
+query-core.workspace = true
+telemetry.workspace = true
+user-facing-errors.workspace = true
 serde_json.workspace = true
 serde.workspace = true
 connection-string.workspace = true
 psl.workspace = true
 async-trait.workspace = true
 tracing.workspace = true
-tracing-subscriber = { version = "0.3" }
+tracing-subscriber.workspace = true
 tracing-futures.workspace = true
 
 [target.'cfg(all(not(target_arch = "wasm32")))'.dependencies]
-prisma-metrics.path = "../metrics"
+prisma-metrics.workspace = true
 napi.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]

@@ -1,0 +1,20 @@
+{
+  "modelName": "User",
+  "action": "createOne",
+  "query": {
+    "arguments": {
+      "data": {
+        "email": "user.1737556028164@prisma.io",
+        "posts": { "connect": [{ "id": 8 }, { "id": 9 }, { "id": 10 }] }
+      }
+    },
+    "selection": {
+      "$composites": true,
+      "$scalars": true,
+      "posts": {
+        "arguments": {},
+        "selection": { "$composites": true, "$scalars": true }
+      }
+    }
+  }
+}

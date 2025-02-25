@@ -1,0 +1,29 @@
+{
+  "modelName": "User",
+  "action": "createOne",
+  "query": {
+    "arguments": {
+      "data": {
+        "email": "user.1737556027349@prisma.io",
+        "posts": {
+          "create": [
+            {
+              "title": "How to make an omelette",
+              "categories": {
+                "create": [{ "name": "cooking" }]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "selection": {
+      "$composites": true,
+      "$scalars": true,
+      "posts": {
+        "arguments": {},
+        "selection": { "$composites": true, "$scalars": true }
+      }
+    }
+  }
+}

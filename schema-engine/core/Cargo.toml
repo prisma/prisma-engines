@@ -5,26 +5,26 @@ version = "0.1.0"
 
 [dependencies]
 psl = { workspace = true, features = ["all"] }
-schema-connector = { path = "../connectors/schema-connector", features = [
+schema-connector = { workspace = true, features = [
     "all-native",
 ] }
-mongodb-schema-connector = { path = "../connectors/mongodb-schema-connector" }
-sql-schema-connector = { path = "../connectors/sql-schema-connector", features = [
+mongodb-schema-connector = { workspace = true }
+sql-schema-connector = { workspace = true, features = [
     "all-native",
 ] }
-user-facing-errors = { path = "../../libs/user-facing-errors", features = [
+user-facing-errors = { workspace = true, features = [
     "quaint",
 ] }
 
 async-trait.workspace = true
 chrono.workspace = true
 enumflags2.workspace = true
-jsonrpc-core = "17.0"
+jsonrpc-core.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 tokio.workspace = true
 tracing.workspace = true
-tracing-subscriber = "0.3"
+tracing-subscriber.workspace = true
 tracing-futures.workspace = true
 url.workspace = true
 

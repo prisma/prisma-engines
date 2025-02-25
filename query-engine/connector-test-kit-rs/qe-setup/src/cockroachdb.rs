@@ -1,4 +1,5 @@
-use once_cell::sync::OnceCell;
+use std::sync::OnceLock;
+
 use quaint::{connector::PostgresFlavour, prelude::*, single::Quaint};
 use schema_core::schema_connector::{ConnectorError, ConnectorResult};
 use url::Url;
@@ -37,7 +38,7 @@ fn drop_db_when_thread_exits(admin_url: Url, db_name: &str) {
     // === Dramatis Personæ ===
 
     // DB_DROP_THREAD: A thread that drops databases.
-    static DB_DROP_THREAD: OnceCell<mpsc::SyncSender<String>> = OnceCell::new();
+    static DB_DROP_THREAD: OnceLock<mpsc::SyncSender<String>> = OnceLock::new();
 
     let sender = DB_DROP_THREAD.get_or_init(|| {
         let (sender, receiver) = mpsc::sync_channel::<String>(4096);

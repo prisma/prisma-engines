@@ -6,17 +6,17 @@ use quaint::{ast::Table, prelude::Column};
 use query_structure::{walkers, ModelProjection, Relation, RelationField};
 
 pub trait RelationFieldExt {
-    fn m2m_columns(&self, ctx: &Context<'_>) -> Vec<Column<'static>>;
+    fn m2m_column(&self, ctx: &Context<'_>) -> Column<'static>;
     fn join_columns(&self, ctx: &Context<'_>) -> ColumnIterator;
     fn identifier_columns(&self, ctx: &Context<'_>) -> ColumnIterator;
     fn as_table(&self, ctx: &Context<'_>) -> Table<'static>;
 }
 
 impl RelationFieldExt for RelationField {
-    fn m2m_columns(&self, ctx: &Context<'_>) -> Vec<Column<'static>> {
+    fn m2m_column(&self, ctx: &Context<'_>) -> Column<'static> {
         let is_side_a = self.walker().relation().relation_fields().next().map(|rf| rf.id) == Some(self.id);
         let prefix = if is_side_a { "B" } else { "A" };
-        vec![Column::from(prefix).table(self.as_table(ctx))]
+        Column::from(prefix).table(self.as_table(ctx))
     }
 
     fn join_columns(&self, ctx: &Context<'_>) -> ColumnIterator {

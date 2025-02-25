@@ -99,7 +99,7 @@ pub fn nested_delete(
             let delete_record_node = graph.create_node(Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
                 name: String::new(),
                 model: child_model.clone(),
-                record_filter: Some(filter.into()),
+                record_filter: filter.into(),
                 selected_fields: None,
             })));
 

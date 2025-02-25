@@ -54,12 +54,13 @@ fi
 
 
 build() {
-    echo "ℹ️  Note that query-compiler compiled to WASM uses a different Rust toolchain"
+    echo "ℹ️  Current Rust toolchain version:"
     cargo --version
 
     local CONNECTOR="$1"
     local CARGO_TARGET_DIR
     CARGO_TARGET_DIR=$(cargo metadata --format-version 1 | jq -r .target_directory)
+
     echo "🔨 Building $CONNECTOR"
     CARGO_PROFILE_RELEASE_OPT_LEVEL="z" cargo build \
         -p query-compiler-wasm \

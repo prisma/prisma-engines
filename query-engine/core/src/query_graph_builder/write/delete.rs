@@ -29,7 +29,7 @@ pub(crate) fn delete_record(
         let delete_query = Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
             name: field.name,
             model: model.clone(),
-            record_filter: Some(filter.into()),
+            record_filter: filter.into(),
             selected_fields: Some(DeleteRecordFields {
                 fields: selected_fields,
                 order: selection_order,
@@ -58,7 +58,7 @@ pub(crate) fn delete_record(
         let delete_query = Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
             name: String::new(), // This node will not be serialized so we don't need a name.
             model: model.clone(),
-            record_filter: Some(filter.into()),
+            record_filter: filter.into(),
             selected_fields: None,
         }));
         let delete_node = graph.create_node(delete_query);

@@ -1,5 +1,4 @@
-use backtrace::Backtrace;
-use std::{error::Error as StdError, fmt::Debug};
+use std::{backtrace::Backtrace, error::Error as StdError, fmt::Debug};
 
 pub type CrateResult = Result<(), Error>;
 
@@ -17,7 +16,7 @@ where
         Error {
             message: Some(src.to_string()),
             source: Some(Box::new(src)),
-            bt: Backtrace::new(),
+            bt: Backtrace::force_capture(),
         }
     }
 }
