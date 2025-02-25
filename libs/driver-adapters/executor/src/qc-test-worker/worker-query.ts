@@ -1,8 +1,5 @@
 import * as util from 'node:util'
-import {
-  ErrorCapturingSqlQueryable,
-  SqlQueryable,
-} from '@prisma/driver-adapter-utils'
+import { ErrorCapturingSqlQueryable } from '@prisma/driver-adapter-utils'
 import { JsonProtocolQuery, QueryParams } from '../types/jsonRpc'
 import type { State } from './worker'
 import { debug } from '../utils'
