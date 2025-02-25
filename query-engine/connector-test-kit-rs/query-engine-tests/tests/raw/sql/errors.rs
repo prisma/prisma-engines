@@ -1,7 +1,7 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), only(Postgres))]
+#[test_suite(schema(schema))]
 mod raw_errors {
     fn schema() -> String {
         let schema = indoc! {
@@ -14,7 +14,7 @@ mod raw_errors {
         schema.to_owned()
     }
 
-    #[connector_test]
+    #[connector_test(only(Postgres))]
     async fn unsupported_columns(runner: Runner) -> TestResult<()> {
         run_query!(
             &runner,
@@ -29,6 +29,24 @@ mod raw_errors {
             fmt_query_raw(r#"SELECT * FROM "TestModel";"#, vec![]),
             2010,
             "Failed to deserialize column of type 'point'. If you're using $queryRaw and this column is explicitly marked as `Unsupported` in your Prisma schema, try casting this column to any supported Prisma type such as `String`."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(
+        only(Postgres, Sqlite),
+        exclude(
+            Postgres("neon.js", "pg.js", "neon.js.wasm", "pg.js.wasm"),
+            Sqlite("libsql.js", "libsql.js.wasm", "cfd1")
+        )
+    )]
+    async fn invalid_parameter_count(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            runner,
+            fmt_execute_raw(r#"INSERT INTO "TestModel" ("id", "point") VALUES (1, $1);"#, vec![]),
+            1016,
+            "Your raw query had an incorrect number of parameters. Expected: `1`, actual: `0`."
         );
 
         Ok(())
