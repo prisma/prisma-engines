@@ -55,10 +55,7 @@ class QueryPipeline {
       })
     } else {
       const queryable = txId
-        ? this.transactionManager.getTransaction(
-            { id: txId, payload: undefined },
-            query.action,
-          )
+        ? this.transactionManager.getTransaction({ id: txId }, query.action)
         : this.driverAdapter
 
       if (!queryable) {
