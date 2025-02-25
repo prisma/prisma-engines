@@ -1,7 +1,7 @@
 name: Rust + WASM common deps
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Set default toolchain
       shell: bash
@@ -15,7 +15,7 @@ runs:
 
     - name: Install wasm-bindgen
       shell: bash
-      run: cargo binstall -y wasm-bindgen-cli@0.2.93
+      run: cargo binstall -y wasm-bindgen-cli@0.2.100
 
     - name: Install Binaryen (includes wasm-opt)
       uses: jaxxstorm/action-install-gh-release@v1.14.0
