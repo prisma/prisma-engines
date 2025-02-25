@@ -1,8 +1,14 @@
-import type { DriverAdapter, Query, Result, ResultSet } from '@prisma/driver-adapter-utils'
+import {
+  type SqlQuery,
+  type Result,
+  type SqlResultSet,
+  type ErrorCapturingDriverAdapter,
+  ok,
+} from '@prisma/driver-adapter-utils'
 
 type Recordings = ReturnType<typeof createInMemoryRecordings>
 
-export function recording(adapter: DriverAdapter) {
+export function recording(adapter: ErrorCapturingDriverAdapter) {
   const recordings = createInMemoryRecordings()
 
   return {
@@ -12,11 +18,17 @@ export function recording(adapter: DriverAdapter) {
   }
 }
 
-function recorder(adapter: DriverAdapter, recordings: Recordings) {
+function recorder(
+  adapter: ErrorCapturingDriverAdapter,
+  recordings: Recordings,
+) {
   return {
     provider: adapter.provider,
     adapterName: adapter.adapterName,
     transactionContext: () => {
+      throw new Error('Not implemented')
+    },
+    executeScript: async () => {
       throw new Error('Not implemented')
     },
     getConnectionInfo: () => {
@@ -30,15 +42,26 @@ function recorder(adapter: DriverAdapter, recordings: Recordings) {
     executeRaw: async (params) => {
       throw new Error('Not implemented')
     },
-  } satisfies DriverAdapter
+    dispose: async () => {
+      await adapter.dispose()
+      return ok(undefined)
+    },
+    errorRegistry: adapter.errorRegistry,
+  } satisfies ErrorCapturingDriverAdapter
 }
 
-function replayer(adapter: DriverAdapter, recordings: Recordings) {
+function replayer(
+  adapter: ErrorCapturingDriverAdapter,
+  recordings: Recordings,
+) {
   return {
     provider: adapter.provider,
     adapterName: adapter.adapterName,
     recordings: recordings,
     transactionContext: () => {
+      throw new Error('Not implemented')
+    },
+    executeScript: async () => {
       throw new Error('Not implemented')
     },
     getConnectionInfo: () => {
@@ -50,14 +73,19 @@ function replayer(adapter: DriverAdapter, recordings: Recordings) {
     executeRaw: async (params) => {
       return recordings.getCommandResults(params)
     },
-  } satisfies DriverAdapter & { recordings: Recordings }
+    dispose: async () => {
+      await adapter.dispose()
+      return ok(undefined)
+    },
+    errorRegistry: adapter.errorRegistry,
+  } satisfies ErrorCapturingDriverAdapter & { recordings: Recordings }
 }
 
 function createInMemoryRecordings() {
-  const queryResults: Map<string, Result<ResultSet>> = new Map()
+  const queryResults: Map<string, Result<SqlResultSet>> = new Map()
   const commandResults: Map<string, Result<number>> = new Map()
 
-  const queryToKey = (params: Query) => {
+  const queryToKey = (params: SqlQuery) => {
     var sql = params.sql
     params.args.forEach((arg: any, i) => {
       sql = sql.replace('$' + (i + 1), arg.toString())
@@ -66,7 +94,7 @@ function createInMemoryRecordings() {
   }
 
   return {
-    data: (): Map<string, ResultSet> => {
+    data: (): Map<string, SqlResultSet> => {
       const map = new Map()
       for (const [key, value] of queryResults.entries()) {
         value.map((resultSet) => {
@@ -76,27 +104,27 @@ function createInMemoryRecordings() {
       return map
     },
 
-    addQueryResults: (params: Query, result: Result<ResultSet>) => {
+    addQueryResults: (params: SqlQuery, result: Result<SqlResultSet>) => {
       const key = queryToKey(params)
       queryResults.set(key, result)
     },
 
-    getQueryResults: (params: Query) => {
+    getQueryResults: (params: SqlQuery) => {
       const key = queryToKey(params)
 
       if (!queryResults.has(key)) {
-        throw new Error(`Query not recorded: ${key}`)
+        throw new Error(`SqlQuery not recorded: ${key}`)
       }
 
       return queryResults.get(key)!
     },
 
-    addCommandResults: (params: Query, result: Result<number>) => {
+    addCommandResults: (params: SqlQuery, result: Result<number>) => {
       const key = queryToKey(params)
       commandResults.set(key, result)
     },
 
-    getCommandResults: (params: Query) => {
+    getCommandResults: (params: SqlQuery) => {
       const key = queryToKey(params)
 
       if (!commandResults.has(key)) {

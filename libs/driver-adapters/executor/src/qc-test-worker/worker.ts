@@ -1,5 +1,9 @@
 import { Schema as S } from '@effect/schema'
-import { ConnectionInfo, DriverAdapter } from '@prisma/driver-adapter-utils'
+import {
+  bindAdapter,
+  ConnectionInfo,
+  ErrorCapturingDriverAdapter,
+} from '@prisma/driver-adapter-utils'
 import { DriverAdaptersManager } from '../driver-adapters-manager'
 import * as qc from '../query-compiler'
 import { TransactionManager } from '@prisma/client-engine-runtime'
@@ -78,7 +82,7 @@ export type Message = S.Schema.Type<typeof Message>
 export type State = {
   compiler: qc.QueryCompiler
   driverAdapterManager: DriverAdaptersManager
-  driverAdapter: DriverAdapter
+  driverAdapter: ErrorCapturingDriverAdapter
   transactionManager: TransactionManager
 }
 
@@ -159,22 +163,21 @@ async function initializeSchema(
     schema,
   })
 
+  const errorCapturingAdapter = bindAdapter(adapter)
+
   const transactionManager = new TransactionManager({
-    driverAdapter: adapter,
+    driverAdapter: errorCapturingAdapter,
   })
 
   state = {
     compiler,
     driverAdapterManager,
-    driverAdapter: adapter,
+    driverAdapter: errorCapturingAdapter,
     transactionManager,
   }
 
   if (adapter.getConnectionInfo) {
-    const connectionInfoResult = adapter.getConnectionInfo()
-    if (connectionInfoResult.ok) {
-      return connectionInfoResult.value
-    }
+    return adapter.getConnectionInfo()
   }
 
   return { maxBindValues: undefined }
@@ -195,11 +198,7 @@ async function initQueryCompiler({
 
   let connectionInfo: ConnectionInfo = {}
   if (adapter.getConnectionInfo) {
-    const result = adapter.getConnectionInfo()
-    if (!result.ok) {
-      throw result.error
-    }
-    connectionInfo = result.value
+    connectionInfo = adapter.getConnectionInfo()
   }
 
   const compiler = await qc.initQueryCompiler({
