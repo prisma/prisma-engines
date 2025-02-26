@@ -492,6 +492,7 @@ impl SqlSchema {
 #[derive(Clone, Copy, Debug)]
 pub enum TableProperties {
     IsPartition,
+    IsForeignWrapper,
     HasSubclass,
     HasRowLevelSecurity,
 }
