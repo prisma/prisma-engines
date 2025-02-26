@@ -95,10 +95,22 @@ impl<'a> DifferDatabase<'a> {
             } else {
                 Cow::Borrowed(table.name())
             };
-            db.tables.insert(
-                (table.namespace().map(Cow::Borrowed), table_name),
-                MigrationPair::new(Some(table.id), None),
-            );
+
+            // Check if a table with similar attributes but different name exists in the next schema.
+            let similar_table_exists_in_next = schemas
+                .next
+                .describer_schema
+                .table_walkers()
+                .any(|t| !table_is_ignored(t.name()) && t.is_renamed_table(table));
+
+            // Prevent adding table renames in diff twice.
+            // Insert renames only when iterating the next schema, and only if database supports it
+            if !flavour.can_rename_tables() || (flavour.can_rename_tables() && !similar_table_exists_in_next) {
+                db.tables.insert(
+                    (table.namespace().map(Cow::Borrowed), table_name),
+                    MigrationPair::new(Some(table.id), None),
+                );
+            }
         }
 
         // Then insert all tables from the next schema. Since we have all the
@@ -118,6 +130,19 @@ impl<'a> DifferDatabase<'a> {
                 .tables
                 .entry((table.namespace().map(Cow::Borrowed), table_name))
                 .or_default();
+
+            // Check if a table with similar attributes but different name exists in the previous schema.
+            let similar_table_in_previous = schemas
+                .previous
+                .describer_schema
+                .table_walkers()
+                .find(|t| !table_is_ignored(t.name()) && t.is_renamed_table(table));
+
+            if let Some(previous_table) = similar_table_in_previous {
+                if flavour.can_rename_tables() {
+                    entry.previous = Some(previous_table.id);
+                }
+            };
             entry.next = Some(table.id);
 
             // Deal with tables that are both in the previous and the next
