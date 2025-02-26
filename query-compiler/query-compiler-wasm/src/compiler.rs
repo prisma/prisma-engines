@@ -4,7 +4,7 @@ use query_core::protocol::EngineProtocol;
 use request_handlers::RequestBody;
 use serde::Deserialize;
 use std::sync::Arc;
-use tsify::Tsify;
+use tsify_next::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::params::{AdapterProvider, JsConnectionInfo};

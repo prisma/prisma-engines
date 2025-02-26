@@ -2,7 +2,7 @@
 #![allow(clippy::empty_docs)]
 
 use serde::Serialize;
-use tsify::Tsify;
+use tsify_next::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 #[derive(Serialize, Tsify)]

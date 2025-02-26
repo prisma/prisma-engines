@@ -6,7 +6,7 @@ use psl::{ConnectorRegistry, ValidatedSchema};
 use quaint::connector::ExternalConnector;
 use serde::Deserialize;
 use std::sync::Arc;
-use tsify::Tsify;
+use tsify_next::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 const CONNECTOR_REGISTRY: ConnectorRegistry<'_> = &[
