@@ -2,6 +2,7 @@ use bitflags::bitflags;
 use std::{error::Error as StdError, str::FromStr};
 
 bitflags! {
+    #[derive(Debug, Clone, Copy)]
     pub struct Tags: u8 {
         const POSTGRES      = 0b00000001;
         const SQLITE        = 0b00000010;
