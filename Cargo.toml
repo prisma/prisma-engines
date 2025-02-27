@@ -160,7 +160,7 @@ darling = "0.13"
 napi-build = "1"
 proc-macro2 = "1"
 quote = "1"
-syn = "1"
+syn = "2"
 
 # dev dependencies
 codspeed-criterion-compat = "1"
