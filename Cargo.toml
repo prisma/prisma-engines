@@ -156,7 +156,7 @@ wasm-logger = "0.2"
 # build dependencies
 cbindgen = "0.24"
 cfg_aliases = "0.2"
-darling = "0.13"
+darling = "0.20"
 napi-build = "1"
 proc-macro2 = "1"
 quote = "1"
