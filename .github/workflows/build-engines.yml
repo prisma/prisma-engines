@@ -18,9 +18,8 @@ on:
   workflow_dispatch:
   pull_request:
     paths-ignore:
-      - "!.github/workflows/build-engines*"
       - ".github/**"
-      - ".buildkite/**"
+      - "!.github/workflows/build-engines*"
       - "*.md"
       - "LICENSE"
       - "CODEOWNERS"
