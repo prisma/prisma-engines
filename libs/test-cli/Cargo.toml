@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.96"
-colored = "2"
+colored = "3"
 structopt.workspace = true
 enumflags2.workspace = true
 dmmf.workspace = true
