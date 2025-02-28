@@ -9,8 +9,8 @@ on:
       - "*.*.x"
       - "integration/*"
     paths-ignore:
-      - "!.github/workflows/build-engines*"
       - ".github/**"
+      - "!.github/workflows/build-engines*"
       - ".buildkite/**"
       - "*.md"
       - "LICENSE"
@@ -32,6 +32,9 @@ jobs:
     outputs:
       release: ${{ steps.decision.outputs.release }}
     steps:
+      - name: Debug
+        run: nproc
+      
       - uses: actions/checkout@v4
         with:
           # using head ref rather than merge branch to get original commit message
