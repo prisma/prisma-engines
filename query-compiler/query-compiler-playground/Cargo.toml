@@ -7,9 +7,9 @@ edition = "2021"
 anyhow.workspace = true
 serde_json.workspace = true
 
-psl = { workspace = true, features = ["all"]}
-query-compiler.workspace = true
+psl = { workspace = true, features = ["all"] }
+query-compiler = { workspace = true, features = ["all"] }
 request-handlers.workspace = true
 query-core.workspace = true
-quaint.workspace = true
+quaint = { workspace = true, features = ["all-native"] }
 sql-query-builder.workspace = true
