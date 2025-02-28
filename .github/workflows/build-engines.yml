@@ -236,6 +236,12 @@ jobs:
 
       - name: Display structure of downloaded files
         run: ls -Rl engines-artifacts
+        
+      - name: Duplicate engines for vendored OpenSSL targets
+        working-directory: engines-artifacts
+        run: |
+          cp -r rhel-openssl-1.0.x rhel-openssl-1.1.x
+          cp -r linux-arm64-openssl-1.0.x linux-arm64-openssl-1.1.x
 
       # TODO in a next major version of Prisma: remove this, and replace both `Debian` and `Rhel` with a single `LinuxGlibc`/`LinuxGnu` option.
       - name: Duplicate engines for debian
