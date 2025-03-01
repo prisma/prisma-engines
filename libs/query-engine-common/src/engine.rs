@@ -11,7 +11,7 @@ use std::{
 };
 
 #[cfg(target_arch = "wasm32")]
-use tsify::Tsify;
+use tsify_next::Tsify;
 
 /// The state of the engine.
 pub enum Inner {

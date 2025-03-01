@@ -29,7 +29,9 @@ export async function getSchemaEngineForProvider(
     const instance = new WebAssembly.Instance(module, {
       './schema_engine_bg.js': engine,
     })
+    const wbindgen_start = instance.exports.__wbindgen_start as () => void
     engine.__wbg_set_wasm(instance.exports)
+    wbindgen_start()
     initializedModules.add(provider)
   }
 
