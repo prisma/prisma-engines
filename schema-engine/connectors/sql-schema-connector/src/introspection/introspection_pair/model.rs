@@ -101,6 +101,10 @@ impl<'a> ModelPair<'a> {
             .any(|f| f.adds_non_default_null_position())
     }
 
+    pub(crate) fn is_foreign_data_wrapper(self) -> bool {
+        self.next.is_foreign_data_wrapper()
+    }
+
     /// Name of the model in the PSL. The value can be sanitized if it
     /// contains characters that are not allowed in the PSL
     /// definition.
