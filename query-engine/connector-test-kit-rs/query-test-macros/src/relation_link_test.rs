@@ -1,14 +1,17 @@
 use super::*;
-use darling::FromMeta;
+use darling::{ast::NestedMeta, FromMeta};
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::quote;
-use syn::{parse_macro_input, AttributeArgs, ItemFn};
+use syn::{parse_macro_input, ItemFn};
 
 pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
-    let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
-    let args = RelationLinkTestArgs::from_list(&attributes_meta);
-    let args = match args {
+    let attributes_meta = match NestedMeta::parse_meta_list(attr.into()) {
+        Ok(meta) => meta,
+        Err(err) => return err.into_compile_error().into(),
+    };
+
+    let args = match RelationLinkTestArgs::from_list(&attributes_meta) {
         Ok(args) => args,
         Err(err) => return err.write_errors().into(),
     };

@@ -25,7 +25,7 @@ fn strip_test_attribute(function: &mut ItemFn) {
     let new_attrs = function
         .attrs
         .drain(..)
-        .filter(|attr| attr.path.segments.iter().last().unwrap().ident != "test")
+        .filter(|attr| attr.path().segments.iter().last().unwrap().ident != "test")
         .collect();
 
     function.attrs = new_attrs;

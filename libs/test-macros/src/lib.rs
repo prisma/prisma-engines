@@ -1,37 +1,22 @@
 extern crate proc_macro;
 
+use darling::{ast::NestedMeta, FromMeta};
 use proc_macro::TokenStream;
 use proc_macro2::{Delimiter, TokenTree};
 use quote::quote;
-use syn::{parse_macro_input, AttributeArgs, Lit, LitStr, Meta, MetaList, MetaNameValue, NestedMeta, Signature};
+use syn::{Lit, LitStr, Meta, Signature};
 
 #[proc_macro_attribute]
-pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
-    let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
+pub fn test_connector(args: TokenStream, input: TokenStream) -> TokenStream {
     let input = proc_macro2::TokenStream::from(input);
 
-    // First the attributes
-    let mut attrs = TestConnectorAttrs::default();
-
-    for meta in attributes_meta {
-        match meta {
-            NestedMeta::Meta(Meta::List(list)) => {
-                if let Err(err) = attrs.ingest_meta_list(list) {
-                    return err.to_compile_error().into();
-                }
-            }
-            NestedMeta::Meta(Meta::NameValue(MetaNameValue {
-                lit: Lit::Str(litstr),
-                eq_token: _,
-                path,
-            })) if path.is_ident("ignore") => attrs.ignore_reason = Some(litstr),
-            other => {
-                return syn::Error::new_spanned(other, "Unexpected argument")
-                    .into_compile_error()
-                    .into()
-            }
-        }
-    }
+    let attrs = match NestedMeta::parse_meta_list(args.into()) {
+        Ok(v) => match TestConnectorAttrs::from_list(&v) {
+            Ok(args) => args,
+            Err(e) => return e.write_errors().into(),
+        },
+        Err(e) => return e.into_compile_error().into(),
+    };
 
     // Then the function item
     // We take advantage of the function body being the last token tree (surrounded by braces).
@@ -51,11 +36,11 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
     };
 
     // Generate the final function
-    let include_tagged = &attrs.include_tagged;
-    let exclude_tagged = &attrs.exclude_tagged;
-    let capabilities = &attrs.capabilities;
-    let preview_features = &attrs.preview_features;
-    let namespaces = &attrs.namespaces;
+    let include_tagged = attrs.include_tagged.into_iter().flatten().collect::<Vec<_>>();
+    let exclude_tagged = attrs.exclude_tagged.into_iter().flatten().collect::<Vec<_>>();
+    let capabilities = &attrs.capabilities.0;
+    let preview_features = &attrs.preview_features.0;
+    let namespaces = &attrs.namespaces.0;
 
     let test_function_name = &sig.ident;
     let test_function_name_lit = sig.ident.to_string();
@@ -115,61 +100,71 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
     tokens.into()
 }
 
-#[derive(Default)]
+#[derive(FromMeta)]
 struct TestConnectorAttrs {
-    include_tagged: Vec<syn::Path>,
-    exclude_tagged: Vec<syn::Path>,
-    capabilities: Vec<syn::Path>,
-    preview_features: Vec<syn::LitStr>,
-    namespaces: Vec<syn::LitStr>,
+    #[darling(default, multiple, rename = "tags")]
+    include_tagged: Vec<PathList>,
+    #[darling(default, multiple, rename = "exclude")]
+    exclude_tagged: Vec<PathList>,
+    #[darling(default)]
+    capabilities: PathList,
+    #[darling(default)]
+    preview_features: LitStrList,
+    #[darling(default)]
+    namespaces: LitStrList,
+    #[darling(default, rename = "ignore")]
     ignore_reason: Option<LitStr>,
 }
 
-impl TestConnectorAttrs {
-    fn ingest_meta_list(&mut self, list: MetaList) -> Result<(), syn::Error> {
-        let target: &mut Vec<_> = match list.path {
-            p if p.is_ident("tags") => &mut self.include_tagged,
-            p if p.is_ident("exclude") => &mut self.exclude_tagged,
-            p if p.is_ident("capabilities") => &mut self.capabilities,
-            p if p.is_ident("preview_features") => {
-                self.preview_features.reserve(list.nested.len());
+#[derive(Default)]
+struct PathList(Vec<syn::Path>);
 
-                for item in list.nested {
-                    match item {
-                        NestedMeta::Lit(Lit::Str(s)) => self.preview_features.push(s),
-                        other => return Err(syn::Error::new_spanned(other, "Unexpected argument")),
-                    }
-                }
+impl IntoIterator for PathList {
+    type Item = syn::Path;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
 
-                return Ok(());
-            }
-            p if p.is_ident("namespaces") => {
-                self.namespaces.reserve(list.nested.len());
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
 
-                for item in list.nested {
-                    match item {
-                        NestedMeta::Lit(Lit::Str(s)) => self.namespaces.push(s),
-                        other => return Err(syn::Error::new_spanned(other, "Unexpected argument")),
-                    }
-                }
+impl FromMeta for PathList {
+    fn from_list(items: &[NestedMeta]) -> darling::Result<Self> {
+        Ok(Self(
+            items
+                .iter()
+                .map(|meta| match meta {
+                    NestedMeta::Meta(Meta::Path(path)) => Ok(path.clone()),
+                    _ => Err(darling::Error::custom("Unexpected argument").with_span(meta)),
+                })
+                .collect::<darling::Result<Vec<_>>>()?,
+        ))
+    }
+}
 
-                return Ok(());
-            }
-            other => return Err(syn::Error::new_spanned(other, "Unexpected argument")),
-        };
+#[derive(Default)]
+struct LitStrList(Vec<syn::LitStr>);
 
-        target.reserve(list.nested.len());
+impl IntoIterator for LitStrList {
+    type Item = syn::LitStr;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
 
-        for item in list.nested {
-            match item {
-                NestedMeta::Meta(Meta::Path(p)) if p.get_ident().is_some() => {
-                    target.push(p);
-                }
-                other => return Err(syn::Error::new_spanned(other, "Unexpected argument")),
-            }
-        }
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
 
-        Ok(())
+impl FromMeta for LitStrList {
+    fn from_list(items: &[NestedMeta]) -> darling::Result<Self> {
+        Ok(Self(
+            items
+                .iter()
+                .map(|meta| match meta {
+                    NestedMeta::Lit(Lit::Str(lit)) => Ok(lit.clone()),
+                    _ => Err(darling::Error::custom("Unexpected argument").with_span(meta)),
+                })
+                .collect::<darling::Result<Vec<_>>>()?,
+        ))
     }
 }
 
