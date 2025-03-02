@@ -331,6 +331,13 @@ impl SqlMigration {
                                 out.push_str(")\n");
                                 out.push_str(")\n");
                             }
+                            TableChange::RenameTo => {
+                                out.push_str("  [+] Renamed table `");
+                                out.push_str(tables.previous.name());
+                                out.push_str("` to `");
+                                out.push_str(tables.next.name());
+                                out.push_str("`\n")
+                            }
                         }
                     }
                 }
@@ -580,6 +587,7 @@ pub(crate) enum TableChange {
     DropPrimaryKey,
     AddPrimaryKey,
     RenamePrimaryKey,
+    RenameTo,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
