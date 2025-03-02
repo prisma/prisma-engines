@@ -39,7 +39,7 @@ async fn preview_feature_is_required(api: &mut TestApi) -> TestResult {
 }
 
 // See next test after this one for PostgreSQL 16
-#[test_connector(tags(Postgres), exclude(Postgres16), exclude(CockroachDb), preview_features("views"))]
+#[test_connector(tags(Postgres), exclude(Postgres16, CockroachDb), preview_features("views"))]
 async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE "User" (

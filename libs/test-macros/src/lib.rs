@@ -36,8 +36,8 @@ pub fn test_connector(args: TokenStream, input: TokenStream) -> TokenStream {
     };
 
     // Generate the final function
-    let include_tagged = attrs.include_tagged.into_iter().flatten().collect::<Vec<_>>();
-    let exclude_tagged = attrs.exclude_tagged.into_iter().flatten().collect::<Vec<_>>();
+    let include_tagged = &attrs.include_tagged.0;
+    let exclude_tagged = &attrs.exclude_tagged.0;
     let capabilities = &attrs.capabilities.0;
     let preview_features = &attrs.preview_features.0;
     let namespaces = &attrs.namespaces.0;
@@ -102,10 +102,10 @@ pub fn test_connector(args: TokenStream, input: TokenStream) -> TokenStream {
 
 #[derive(FromMeta)]
 struct TestConnectorAttrs {
-    #[darling(default, multiple, rename = "tags")]
-    include_tagged: Vec<PathList>,
-    #[darling(default, multiple, rename = "exclude")]
-    exclude_tagged: Vec<PathList>,
+    #[darling(default, rename = "tags")]
+    include_tagged: PathList,
+    #[darling(default, rename = "exclude")]
+    exclude_tagged: PathList,
     #[darling(default)]
     capabilities: PathList,
     #[darling(default)]
@@ -118,15 +118,6 @@ struct TestConnectorAttrs {
 
 #[derive(Default)]
 struct PathList(Vec<syn::Path>);
-
-impl IntoIterator for PathList {
-    type Item = syn::Path;
-    type IntoIter = std::vec::IntoIter<Self::Item>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.0.into_iter()
-    }
-}
 
 impl FromMeta for PathList {
     fn from_list(items: &[NestedMeta]) -> darling::Result<Self> {
@@ -144,15 +135,6 @@ impl FromMeta for PathList {
 
 #[derive(Default)]
 struct LitStrList(Vec<syn::LitStr>);
-
-impl IntoIterator for LitStrList {
-    type Item = syn::LitStr;
-    type IntoIter = std::vec::IntoIter<Self::Item>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.0.into_iter()
-    }
-}
 
 impl FromMeta for LitStrList {
     fn from_list(items: &[NestedMeta]) -> darling::Result<Self> {

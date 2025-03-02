@@ -486,7 +486,7 @@ async fn duplicate_fks_should_ignore_one_of_them(api: &mut TestApi) -> TestResul
     Ok(())
 }
 
-#[test_connector(exclude(Mssql), exclude(Vitess))]
+#[test_connector(exclude(Mssql, Vitess))]
 async fn prisma_1_0_relations(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
