@@ -1038,7 +1038,7 @@ checksum = "c2e66c9d817f1720209181c316d28635c050fa304f9c79e47a520882661b7308"
 name = "datamodel-renderer"
 version = "0.1.0"
 dependencies = [
- "base64 0.13.1",
+ "base64 0.22.1",
  "expect-test",
  "indoc",
  "itertools 0.12.0",
@@ -3542,7 +3542,7 @@ dependencies = [
 name = "prisma-value"
 version = "0.1.0"
 dependencies = [
- "base64 0.13.1",
+ "base64 0.22.1",
  "bigdecimal",
  "chrono",
  "regex",
@@ -3597,7 +3597,7 @@ dependencies = [
 name = "psl"
 version = "0.1.0"
 dependencies = [
- "base64 0.13.1",
+ "base64 0.22.1",
  "dissimilar",
  "either",
  "expect-test",
@@ -3673,7 +3673,7 @@ name = "quaint"
 version = "0.2.0-alpha.13"
 dependencies = [
  "async-trait",
- "base64 0.13.1",
+ "base64 0.22.1",
  "bigdecimal",
  "bit-vec",
  "byteorder",
@@ -3890,7 +3890,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "base64 0.13.1",
+ "base64 0.22.1",
  "build-utils",
  "connection-string",
  "enumflags2",
@@ -4019,7 +4019,7 @@ name = "query-engine-tests"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "base64 0.13.1",
+ "base64 0.22.1",
  "chrono",
  "colored 3.0.0",
  "cuid",
@@ -4753,7 +4753,7 @@ dependencies = [
 name = "schema-engine-cli"
 version = "0.1.0"
 dependencies = [
- "base64 0.13.1",
+ "base64 0.22.1",
  "build-utils",
  "connection-string",
  "expect-test",
