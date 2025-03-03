@@ -411,4 +411,20 @@ impl<'a> DatamodelCalculatorContext<'a> {
                 (*direction, next)
             })
     }
+
+    pub(crate) fn m2m_relations(
+        &'a self,
+    ) -> impl Iterator<Item = (RelationFieldDirection, sql::ForeignKeyWalker<'a>)> + 'a {
+        self.introspection_map
+            .m2m_relation_positions
+            .iter()
+            .map(|(_, fk_id, direction)| {
+                let next = sql::Walker {
+                    id: *fk_id,
+                    schema: self.sql_schema,
+                };
+
+                (*direction, next)
+            })
+    }
 }

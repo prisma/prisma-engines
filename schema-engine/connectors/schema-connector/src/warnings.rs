@@ -134,6 +134,8 @@ pub struct Warnings {
     pub json_schema_defined: Vec<Model>,
     /// Warning about JSONSchema on a model.
     pub capped_collection: Vec<Model>,
+    /// Warning about broken m2m relations.
+    pub broken_m2m_relations: Vec<Model>,
 }
 
 impl Warnings {
@@ -409,6 +411,12 @@ impl fmt::Display for Warnings {
             "These indexes are not supported by Prisma Client, because Prisma currently does not fully support expression indexes. Read more: https://pris.ly/d/expression-indexes",
             &self.expression_indexes,
             f
+        )?;
+
+        render_warnings(
+            "The following models have broken many-to-many relations, which can produce unexpected behavior. This can occur when the alphabetic ordering of tables in implicit many-to-many relations is violated. Prisma depends on the ordering to remain consistent.",
+            &self.broken_m2m_relations,
+            f,
         )?;
 
         Ok(())
