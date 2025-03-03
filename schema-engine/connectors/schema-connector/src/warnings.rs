@@ -414,7 +414,7 @@ impl fmt::Display for Warnings {
         )?;
 
         render_warnings(
-            "The following models have broken many-to-many relations, which can produce unexpected behavior. This can occur when the alphabetical ordering of tables used in relations is violated. You should ensure that the table names in the relation are ordered such that the first table (referred to as 'A') is alphabetically smaller than the second table (referred to as 'B').",
+            "The following models have broken many-to-many relations, which can produce unexpected behavior. This can occur when the alphabetical ordering of tables used in relations is violated. You should ensure that the table and model names in the relation are ordered such that the first table (referred to as 'A' in the relation) is alphabetically smaller than the second table (referred to as 'B').",
             &self.broken_m2m_relations,
             f,
         )?;
