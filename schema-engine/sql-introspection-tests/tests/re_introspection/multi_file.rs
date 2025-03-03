@@ -533,7 +533,7 @@ async fn introspect_multi_view_preview_feature_is_required(api: &mut TestApi) ->
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Postgres16), exclude(CockroachDb), preview_features("views"))]
+#[test_connector(tags(Postgres), exclude(Postgres16, CockroachDb), preview_features("views"))]
 // the expect_view_definition is slightly different than for Postgres16
 async fn reintrospect_new_view_single_file(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
@@ -600,7 +600,7 @@ async fn reintrospect_new_view_single_file(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Postgres16), exclude(CockroachDb), preview_features("views"))]
+#[test_connector(tags(Postgres), exclude(Postgres16, CockroachDb), preview_features("views"))]
 // the expect_view_definition is slightly different than for Postgres16
 async fn reintrospect_removed_view_single_file(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
@@ -648,7 +648,7 @@ async fn reintrospect_removed_view_single_file(api: &mut TestApi) -> TestResult 
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Postgres16), exclude(CockroachDb), preview_features("views"))]
+#[test_connector(tags(Postgres), exclude(Postgres16, CockroachDb), preview_features("views"))]
 // the expect_view_definition is slightly different than for Postgres16
 async fn reintrospect_new_view_multi_file(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
@@ -730,7 +730,7 @@ async fn reintrospect_new_view_multi_file(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Postgres16), exclude(CockroachDb), preview_features("views"))]
+#[test_connector(tags(Postgres), exclude(Postgres16, CockroachDb), preview_features("views"))]
 // the expect_view_definition is slightly different than for Postgres16
 async fn reintrospect_removed_view_multi_file(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"

@@ -231,7 +231,7 @@ async fn introspecting_default_index_names_works(api: &mut TestApi) -> TestResul
     Ok(())
 }
 
-#[test_connector(exclude(Mssql, Mysql), exclude(CockroachDb))]
+#[test_connector(exclude(Mssql, Mysql, CockroachDb))]
 async fn introspecting_default_fk_names_works(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {

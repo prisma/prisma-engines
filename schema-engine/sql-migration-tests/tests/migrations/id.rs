@@ -108,7 +108,7 @@ fn length_prefixed_compound_primary_key(api: TestApi) {
 }
 
 // TODO: ignore because not possible on cockroachdb. We would need a multi-step process there.
-#[test_connector(exclude(Vitess), exclude(CockroachDb))]
+#[test_connector(exclude(Vitess, CockroachDb))]
 fn changing_the_type_of_an_id_field_must_work(api: TestApi) {
     let dm1 = r#"
         model A {
