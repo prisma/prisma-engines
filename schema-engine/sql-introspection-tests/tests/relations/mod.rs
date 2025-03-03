@@ -367,11 +367,7 @@ async fn a_broken_prisma_many_to_many_relation(api: &mut TestApi) -> TestResult 
 
             These models were enriched with `@@map` information taken from the previous Prisma schema:
               - "Author"
-
-            The following models have broken many-to-many relations, which can produce unexpected behavior. This can occur when the alphabetical ordering of tables used in relations is violated. You should ensure that the table and model names in the relation are ordered such that the first table (referred to as 'A' in the relation) is alphabetically smaller than the second table (referred to as 'B').
-              - "Author"
-              - "Post"
-        "#]],
+            The many-to-many relation between "Post" and "Author" is broken due to the naming of the models. Prisma creates many-to-many relations based on the alphabetical ordering of the names of the models and these two models now produce the reverse of the expected ordering."#]],
     )
     .await;
 

@@ -36,9 +36,12 @@ pub(crate) fn generate(ctx: &DatamodelCalculatorContext<'_>) -> Warnings {
             RelationFieldDirection::Forward => rel.model_b(),
         };
         if model != expected_model {
-            warnings.broken_m2m_relations.push(Model {
-                model: model.name().to_string(),
-            });
+            let pair = if rel.model_a().id < rel.model_b().id {
+                (Model::new(rel.model_a().name()), Model::new(rel.model_b().name()))
+            } else {
+                (Model::new(rel.model_b().name()), Model::new(rel.model_a().name()))
+            };
+            warnings.broken_m2m_relations.insert(pair);
         }
     }
 
