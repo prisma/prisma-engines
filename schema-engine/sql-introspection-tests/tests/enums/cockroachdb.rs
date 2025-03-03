@@ -287,3 +287,47 @@ async fn an_enum_with_invalid_value_names_should_have_them_commented_out(api: &m
     api.expect_datamodel(&expected).await;
     Ok(())
 }
+
+// Regression: https://github.com/prisma/prisma/issues/22456
+#[test_connector(tags(CockroachDb))]
+async fn enum_array_type(api: &mut TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TYPE "_foo" AS ENUM ('FIRST', 'SECOND');
+
+        CREATE TABLE "Post" (
+            "id" TEXT NOT NULL,
+            "contentFilters" "_foo"[],
+            CONSTRAINT "Post_pkey" PRIMARY KEY ("id")
+        );
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "cockroachdb"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model Post {
+          id             String @id
+          contentFilters foo[]
+        }
+
+        enum foo {
+          FIRST
+          SECOND
+
+          @@map("_foo")
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+    api.expect_no_warnings().await;
+
+    Ok(())
+}

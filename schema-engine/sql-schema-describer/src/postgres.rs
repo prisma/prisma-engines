@@ -1615,7 +1615,7 @@ fn get_column_type_postgresql(row: &ResultRow, schema: &SqlSchema) -> ColumnType
     let enum_id: Option<_> = match data_type.as_str() {
         "ARRAY" if full_data_type.starts_with('_') => {
             let namespace = row.get_string("type_schema_name");
-            schema.find_enum(full_data_type.trim_start_matches('_'), namespace.as_deref())
+            schema.find_enum(&full_data_type[1..], namespace.as_deref())
         }
         _ => {
             let namespace = row.get_string("type_schema_name");
@@ -1709,7 +1709,7 @@ fn get_column_type_cockroachdb(row: &ResultRow, schema: &SqlSchema) -> ColumnTyp
     let enum_id: Option<_> = match data_type.as_str() {
         "ARRAY" if full_data_type.starts_with('_') => {
             let namespace = row.get_string("type_schema_name");
-            schema.find_enum(full_data_type.trim_start_matches('_'), namespace.as_deref())
+            schema.find_enum(&full_data_type[1..], namespace.as_deref())
         }
         _ => {
             let namespace = row.get_string("type_schema_name");
