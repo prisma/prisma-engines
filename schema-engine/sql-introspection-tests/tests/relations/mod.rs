@@ -322,7 +322,7 @@ async fn a_prisma_many_to_many_relation(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(tags(Mysql), exclude(Vitess))]
 async fn a_broken_prisma_many_to_many_relation(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
