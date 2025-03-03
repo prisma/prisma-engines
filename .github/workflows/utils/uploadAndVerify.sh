@@ -112,7 +112,7 @@ if [[ "$(uname)" == 'Darwin' ]]; then
     exit 1
 fi
 
-FILES_TO_VALIDATE_WITH_LDD=$(find . -type f | grep -E "./(rhel|debian)-openssl-(3.0|1.1).*(query-engine|schema-engine|libquery_engine.so.node)$")
+FILES_TO_VALIDATE_WITH_LDD=$(find . -type f | grep -E "./(rhel|debian)-openssl-3.0.*(query-engine|schema-engine|libquery_engine.so.node)$")
 echo "FILES_TO_VALIDATE_WITH_LDD: $FILES_TO_VALIDATE_WITH_LDD"
 
 for filename in $FILES_TO_VALIDATE_WITH_LDD
