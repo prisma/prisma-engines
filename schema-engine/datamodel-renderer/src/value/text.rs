@@ -25,7 +25,7 @@ impl fmt::Display for Text<Cow<'_, str>> {
     }
 }
 
-impl fmt::Display for Text<Base64Display<'_>> {
+impl<E: base64::Engine> fmt::Display for Text<Base64Display<'_, '_, E>> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("\"")?;
         self.0.fmt(f)?;

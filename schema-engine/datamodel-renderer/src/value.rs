@@ -24,7 +24,7 @@ pub enum Value<'a> {
     /// A string value, quoted and escaped accordingly.
     Text(Text<Cow<'a, str>>),
     /// A byte value, quoted and base64-encoded.
-    Bytes(Text<Base64Display<'a>>),
+    Bytes(Text<Base64Display<'a, 'static, base64::engine::GeneralPurpose>>),
     /// A constant value without quoting.
     Constant(Cow<'a, str>),
     /// An array of values.
@@ -70,14 +70,14 @@ where
 
 impl From<Vec<u8>> for Value<'_> {
     fn from(bytes: Vec<u8>) -> Self {
-        let display = Base64Display::with_config(&bytes, base64::STANDARD).to_string();
+        let display = Base64Display::new(&bytes, &base64::engine::general_purpose::STANDARD).to_string();
         Self::Text(Text::new(display))
     }
 }
 
 impl<'a> From<&'a [u8]> for Value<'a> {
     fn from(bytes: &'a [u8]) -> Self {
-        let display = Base64Display::with_config(bytes, base64::STANDARD);
+        let display = Base64Display::new(bytes, &base64::engine::general_purpose::STANDARD);
         Self::Bytes(Text(display))
     }
 }
