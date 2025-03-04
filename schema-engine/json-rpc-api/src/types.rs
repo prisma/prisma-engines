@@ -469,22 +469,22 @@ pub struct IntrospectParams {
 pub struct IntrospectResult {
     /// The introspected schema.
     pub schema: SchemasContainer,
-    /// Optional warnings.
-    pub warnings: Option<String>,
     /// Optional views.
     pub views: Option<Vec<IntrospectionView>>,
+    /// Optional warnings.
+    pub warnings: Option<String>,
 }
 
 /// Information about a database view.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
 pub struct IntrospectionView {
-    /// The schema name.
-    pub schema: String,
-    /// The view name.
-    pub name: String,
     /// The view definition.
     pub definition: String,
+    /// The view name.
+    pub name: String,
+    /// The schema name.
+    pub schema: String,
 }
 
 // Get Database Version
