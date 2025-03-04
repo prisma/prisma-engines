@@ -230,23 +230,24 @@ impl SqlRenderer for PostgresFlavour {
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: MigrationPair<&SqlSchema>) -> Vec<String> {
         let AlterTable { changes, table_ids } = alter_table;
-        let mut lines = Vec::new();
+        let mut actions = Vec::new();
+        let mut stats = Vec::new();
         let mut before_statements = Vec::new();
         let mut after_statements = Vec::new();
         let tables = schemas.walk(*table_ids);
 
         for change in changes {
             match change {
-                TableChange::DropPrimaryKey => lines.push(format!(
+                TableChange::DropPrimaryKey => actions.push(format!(
                     "DROP CONSTRAINT {}",
                     Quoted::postgres_ident(tables.previous.primary_key().unwrap().name())
                 )),
-                TableChange::RenamePrimaryKey => lines.push(format!(
+                TableChange::RenamePrimaryKey => stats.push(format!(
                     "RENAME CONSTRAINT {} TO {}",
                     Quoted::postgres_ident(tables.previous.primary_key().unwrap().name()),
                     Quoted::postgres_ident(tables.next.primary_key().unwrap().name())
                 )),
-                TableChange::AddPrimaryKey => lines.push({
+                TableChange::AddPrimaryKey => actions.push({
                     let named = match tables.next.primary_key().map(|pk| pk.name()) {
                         Some(name) => format!("CONSTRAINT {} ", self.quote(name)),
                         None => "".into(),
@@ -270,11 +271,11 @@ impl SqlRenderer for PostgresFlavour {
                     let column = schemas.next.walk(*column_id);
                     let col_sql = self.render_column(column);
 
-                    lines.push(format!("ADD COLUMN {col_sql}"));
+                    actions.push(format!("ADD COLUMN {col_sql}"));
                 }
                 TableChange::DropColumn { column_id } => {
                     let name = self.quote(schemas.previous.walk(*column_id).name());
-                    lines.push(format!("DROP COLUMN {name}"));
+                    actions.push(format!("DROP COLUMN {name}"));
                 }
                 TableChange::AlterColumn(AlterColumn {
                     column_id,
@@ -287,7 +288,7 @@ impl SqlRenderer for PostgresFlavour {
                         columns,
                         changes,
                         &mut before_statements,
-                        &mut lines,
+                        &mut actions,
                         &mut after_statements,
                         self,
                     );
@@ -296,22 +297,23 @@ impl SqlRenderer for PostgresFlavour {
                     let columns = schemas.walk(*column_id);
                     let name = self.quote(columns.previous.name());
 
-                    lines.push(format!("DROP COLUMN {name}"));
+                    actions.push(format!("DROP COLUMN {name}"));
 
                     let col_sql = self.render_column(columns.next);
-                    lines.push(format!("ADD COLUMN {col_sql}"));
+                    actions.push(format!("ADD COLUMN {col_sql}"));
                 }
             };
         }
 
-        if lines.is_empty() {
+        if actions.is_empty() && stats.is_empty() {
             return Vec::new();
         }
 
         if self.is_cockroachdb() {
-            let mut out = Vec::with_capacity(before_statements.len() + after_statements.len() + lines.len());
+            let mut out =
+                Vec::with_capacity(before_statements.len() + after_statements.len() + actions.len() + stats.len());
             out.extend(before_statements);
-            for line in lines {
+            for line in stats.into_iter().chain(actions) {
                 out.push(format!(
                     "ALTER TABLE {} {}",
                     QuotedWithPrefix::pg_from_table_walker(tables.previous),
@@ -321,15 +323,21 @@ impl SqlRenderer for PostgresFlavour {
             out.extend(after_statements);
             out
         } else {
-            let alter_table = format!(
-                "ALTER TABLE {} {}",
-                QuotedWithPrefix::pg_new(tables.previous.namespace(), tables.previous.name()),
-                lines.join(",\n")
-            );
-
+            let alter_tables = if actions.is_empty() {
+                either::Right(stats.into_iter())
+            } else {
+                either::Left(stats.into_iter().chain(std::iter::once(actions.join(",\n"))))
+            }
+            .map(|s| {
+                format!(
+                    "ALTER TABLE {} {}",
+                    QuotedWithPrefix::pg_new(tables.previous.namespace(), tables.previous.name()),
+                    s
+                )
+            });
             before_statements
                 .into_iter()
-                .chain(std::iter::once(alter_table))
+                .chain(alter_tables)
                 .chain(after_statements)
                 .collect()
         }
