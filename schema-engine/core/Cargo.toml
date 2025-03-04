@@ -16,7 +16,7 @@ user-facing-errors = { workspace = true, features = [
     "quaint",
 ] }
 
-json-rpc = { path = "../json-rpc-api-build", package = "json-rpc-api-build" }
+json-rpc = { path = "../json-rpc-api", package = "json-rpc-api" }
 async-trait.workspace = true
 chrono.workspace = true
 enumflags2.workspace = true
@@ -28,9 +28,6 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 tracing-futures.workspace = true
 url.workspace = true
-
-# [build-dependencies]
-# json-rpc-api-build = { path = "../json-rpc-api-build" }
 
 [features]
 vendored-openssl = ["sql-schema-connector/vendored-openssl"]
