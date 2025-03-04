@@ -2228,7 +2228,10 @@ version = "0.1.0"
 dependencies = [
  "heck 0.4.1",
  "serde",
+ "serde-wasm-bindgen",
  "toml",
+ "tsify-next",
+ "wasm-bindgen",
 ]
 
 [[package]]
