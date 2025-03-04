@@ -322,6 +322,58 @@ async fn a_prisma_many_to_many_relation(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
+#[test_connector(tags(Mysql), exclude(Vitess))]
+async fn a_broken_prisma_many_to_many_relation(api: &mut TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("User_pkey", types::primary_constraint(["id"]));
+            });
+
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Post_pkey", types::primary_constraint(["id"]));
+            });
+
+            migration.create_table("_PostToUser", |t| {
+                t.add_column("A", types::integer().nullable(false).unique(false));
+                t.add_column("B", types::integer().nullable(false).unique(false));
+
+                t.add_foreign_key(&["A"], "Post", &["id"]);
+                t.add_foreign_key(&["B"], "User", &["id"]);
+
+                t.add_index("test", types::index(vec!["A", "B"]).unique(true));
+            });
+        })
+        .await?;
+
+    api.expect_re_introspect_warnings(
+        indoc! {r##"
+        model Post {
+            id   Int    @id @default(autoincrement())
+            User Author[] @relation("PostToUser")
+        }
+
+        model Author {
+            id   Int    @id @default(autoincrement())
+            Post Post[] @relation("PostToUser")
+
+            @@map("User")
+        }
+    "##},
+        expect![[r#"
+            *** WARNING ***
+
+            These models were enriched with `@@map` information taken from the previous Prisma schema:
+              - "Author"
+            The many-to-many relation between "Post" and "Author" is broken due to the naming of the models. Prisma creates many-to-many relations based on the alphabetical ordering of the names of the models and these two models now produce the reverse of the expected ordering."#]],
+    )
+    .await;
+
+    Ok(())
+}
+
 #[test_connector(exclude(Mysql, Mssql, CockroachDb, Sqlite))]
 async fn a_many_to_many_relation_with_an_id(api: &mut TestApi) -> TestResult {
     api.barrel()

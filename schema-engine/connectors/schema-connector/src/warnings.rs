@@ -134,6 +134,8 @@ pub struct Warnings {
     pub json_schema_defined: Vec<Model>,
     /// Warning about JSONSchema on a model.
     pub capped_collection: Vec<Model>,
+    /// Warning about broken m2m relations.
+    pub broken_m2m_relations: BTreeSet<(Model, Model)>,
 }
 
 impl Warnings {
@@ -411,15 +413,31 @@ impl fmt::Display for Warnings {
             f
         )?;
 
+        if !self.broken_m2m_relations.is_empty() {
+            for (model_a, model_b) in self.broken_m2m_relations.iter() {
+                write!(
+                    f,
+                    "The many-to-many relation between {model_a} and {model_b} is broken due to the naming of the models. Prisma creates many-to-many relations based on the alphabetical ordering of the names of the models and these two models now produce the reverse of the expected ordering.",
+                )?;
+            }
+        }
+
         Ok(())
     }
 }
 
 /// A model that triggered a warning.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Model {
     /// The name of the model
     pub model: String,
+}
+
+impl Model {
+    /// Creates a new model with the given name.
+    pub fn new(model: impl Into<String>) -> Self {
+        Self { model: model.into() }
+    }
 }
 
 impl fmt::Display for Model {
