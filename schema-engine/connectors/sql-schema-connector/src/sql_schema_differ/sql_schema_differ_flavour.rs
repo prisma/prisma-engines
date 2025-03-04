@@ -27,6 +27,11 @@ pub(crate) trait SqlSchemaDifferFlavour {
         false
     }
 
+    // Returns `true` if the database supports names for primary key constraints
+    fn can_rename_tables(&self) -> bool {
+        false
+    }
+
     /// If this returns `true`, the differ will generate
     /// SqlMigrationStep::RedefineIndex steps instead of
     /// SqlMigrationStep::AlterIndex.
