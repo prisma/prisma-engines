@@ -1,7 +1,8 @@
 [package]
 name = "json-rpc-api-build"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
+description = "JSON-RPC API definitions for the Prisma Schema Engine"
 
 [dependencies]
 heck.workspace = true

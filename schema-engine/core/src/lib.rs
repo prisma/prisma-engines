@@ -4,7 +4,8 @@
 
 //! The top-level library crate for the schema engine.
 
-include!(concat!(env!("OUT_DIR"), "/methods.rs"));
+// include!(concat!(env!("OUT_DIR"), "/methods.rs"));
+pub use json_rpc;
 
 // exposed for tests
 #[doc(hidden)]

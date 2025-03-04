@@ -1,8 +1,0 @@
-[methods.debugPanic]
-description = "Make the schema engine panic. Only useful to test client error handling."
-requestShape = "debugPanicInput"
-responseShape = "debugPanicOutput"
-
-[recordShapes.debugPanicInput]
-
-[recordShapes.debugPanicOutput]
