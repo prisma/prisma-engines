@@ -59,7 +59,7 @@ pub struct PathContainer {
 /// connection string. See variants.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
-#[serde(tag = "tag", rename_all = "camelCase")]
+#[serde(tag = "tag")]
 pub enum DatasourceParam {
     /// Prisma schema as input
     Schema(SchemasContainer),
@@ -99,7 +99,7 @@ pub enum DiffTarget {
 /// database migration history in relation to the migrations directory.
 #[derive(Debug, Serialize, Deserialize)]
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
-#[serde(tag = "tag", rename_all = "camelCase")]
+#[serde(tag = "tag")]
 pub enum HistoryDiagnostic {
     /// Migrations directory is behind the database.
     MigrationsDirectoryIsBehind,
