@@ -73,17 +73,21 @@ pub struct TransactionOptions {
 
     /// An optional pre-defined transaction id. Some value might be provided in case we want to generate
     /// a new id at the beginning of the transaction
-    #[serde(skip)]
     pub new_tx_id: Option<TxId>,
 }
 
 impl TransactionOptions {
-    pub fn new(max_acquisition_millis: u64, valid_for_millis: u64, isolation_level: Option<String>) -> Self {
+    pub fn new(
+        max_acquisition_millis: u64,
+        valid_for_millis: u64,
+        isolation_level: Option<String>,
+        new_tx_id: Option<TxId>,
+    ) -> Self {
         Self {
             max_acquisition_millis,
             valid_for_millis,
             isolation_level,
-            new_tx_id: None,
+            new_tx_id,
         }
     }
 
