@@ -1,10 +1,11 @@
-use std::{collections::HashMap, fmt};
-
+use quaint::template::{Fragment, PlaceholderFormat};
 use query_structure::{
     AggregationSelection, FieldSelection, Filter, Model, PrismaValue, QueryArguments, RecordFilter, RelationField,
     ScalarCondition, ScalarField, SelectionResult, WriteArgs,
 };
 use serde::Serialize;
+use std::{collections::HashMap, fmt};
+
 mod query_arguments_ext;
 
 pub use query_arguments_ext::QueryArgumentsExt;
@@ -140,13 +141,54 @@ impl fmt::Display for RelationLink {
 }
 
 #[derive(Debug, Serialize)]
-pub struct DbQuery {
-    pub query: String,
-    pub params: Vec<PrismaValue>,
+#[serde(tag = "type", rename_all = "camelCase")]
+pub enum DbQuery {
+    RawSql {
+        sql: String,
+        params: Vec<PrismaValue>,
+    },
+    TemplateSql {
+        fragments: Vec<Fragment>,
+        placeholder: PlaceholderFormat,
+        params: Vec<PrismaValue>,
+    },
 }
 
 impl DbQuery {
-    pub fn new(query: String, params: Vec<PrismaValue>) -> Self {
-        Self { query, params }
+    pub fn get_params(&self) -> &Vec<PrismaValue> {
+        match self {
+            DbQuery::RawSql { params, .. } => params,
+            DbQuery::TemplateSql { params, .. } => params,
+        }
+    }
+
+    /// This should only be used for debug, test and playground CLI output.
+    /// The placeholder syntax does not attempt to match any actual SQL flavor.
+    pub fn to_debug_sql(&self) -> String {
+        match self {
+            DbQuery::RawSql { sql, .. } => sql.clone(),
+            DbQuery::TemplateSql { fragments, .. } => DbQuery::debug_format_template_sql(fragments),
+        }
+    }
+
+    fn debug_format_template_sql(fragments: &Vec<Fragment>) -> String {
+        let mut sql = String::with_capacity(4096);
+        let mut param_number = 1;
+        for fragment in fragments {
+            match fragment {
+                Fragment::StringChunk(chunk) => sql.push_str(chunk),
+                Fragment::Parameter => {
+                    sql.push_str(&format!("${}", param_number));
+                    param_number += 1;
+                }
+
+                // Code compatibility for parameter tuples (repeatable parameters)
+                Fragment::ParameterTuple => {
+                    sql.push_str(&format!("[${}]", param_number));
+                    param_number += 1;
+                }
+            };
+        }
+        sql
     }
 }

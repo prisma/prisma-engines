@@ -1,0 +1,63 @@
+{
+  "type": "templateSql",
+  "fragments": [
+    {
+      "type": "stringChunk",
+      "value": "INSERT INTO \"schema1\".\"TestModel\" (\"id\",\"field\") VALUES ("
+    },
+    {
+      "type": "parameter"
+    },
+    {
+      "type": "stringChunk",
+      "value": ","
+    },
+    {
+      "type": "parameter"
+    },
+    {
+      "type": "stringChunk",
+      "value": "), ("
+    },
+    {
+      "type": "parameter"
+    },
+    {
+      "type": "stringChunk",
+      "value": ","
+    },
+    {
+      "type": "parameter"
+    },
+    {
+      "type": "stringChunk",
+      "value": "), ("
+    },
+    {
+      "type": "parameter"
+    },
+    {
+      "type": "stringChunk",
+      "value": ","
+    },
+    {
+      "type": "parameter"
+    },
+    {
+      "type": "stringChunk",
+      "value": ")"
+    }
+  ],
+  "placeholder": {
+    "prefix": "$",
+    "hasNumbering": true
+  },
+  "params": [
+    "1",
+    "1",
+    "2",
+    "2",
+    "3",
+    "3"
+  ]
+}
