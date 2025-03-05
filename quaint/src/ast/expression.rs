@@ -12,6 +12,15 @@ pub struct Expression<'a> {
 }
 
 impl<'a> Expression<'a> {
+    pub fn as_parameter_tuple(self) -> Self {
+        match self.kind {
+            ExpressionKind::Parameterized(value) => Expression{kind:ExpressionKind::ParameterTuple(value), alias: self.alias},
+            _ => self
+        }
+    }
+}
+
+impl<'a> Expression<'a> {
     /// The type of the expression, dictates how it's implemented in the query.
     pub fn kind(&self) -> &ExpressionKind<'a> {
         &self.kind
@@ -50,6 +59,11 @@ impl<'a> Expression<'a> {
                 ..
             }) => true,
 
+            ExpressionKind::ParameterTuple(Value {
+                typed: ValueType::Json(_),
+                ..
+            }) => true,
+
             ExpressionKind::Value(expr) => expr.is_json_value(),
 
             ExpressionKind::Function(fun) => fun.returns_json(),
@@ -65,6 +79,11 @@ impl<'a> Expression<'a> {
                 ..
             }) => true,
 
+            ExpressionKind::ParameterTuple(Value {
+                typed: ValueType::Json(_),
+                ..
+            }) => true,
+
             ExpressionKind::Value(expr) => expr.is_json_value(),
             _ => false,
         }
@@ -74,6 +93,11 @@ impl<'a> Expression<'a> {
     pub(crate) fn into_json_value(self) -> Option<serde_json::Value> {
         match self.kind {
             ExpressionKind::Parameterized(Value {
+                typed: ValueType::Json(json_val),
+                ..
+            }) => json_val,
+
+            ExpressionKind::ParameterTuple(Value {
                 typed: ValueType::Json(json_val),
                 ..
             }) => json_val,
@@ -195,11 +219,13 @@ impl<'a> Expression<'a> {
 pub enum ExpressionKind<'a> {
     /// Anything that we must parameterize before querying
     Parameterized(Value<'a>),
+    /// List of parameters with an unknown length, e.g. `(?, ?, ..., ?)`
+    ParameterTuple(Value<'a>),
     /// A user-provided value we do not parameterize.
     RawValue(Raw<'a>),
     /// A database column
     Column(Box<Column<'a>>),
-    /// Data in a row form, e.g. (1, 2, 3)
+    /// Data in a row form, e.g. `(1, 2, 3)`
     Row(Row<'a>),
     /// A nested `SELECT` or `SELECT .. UNION` statement
     Selection(SelectQuery<'a>),
@@ -219,8 +245,6 @@ pub enum ExpressionKind<'a> {
     Value(Box<Expression<'a>>),
     /// DEFAULT keyword, e.g. for `INSERT INTO ... VALUES (..., DEFAULT, ...)`
     Default,
-    /// An expression wrapped with comments on each side
-    Decorated(Decorated<'a>),
 }
 
 impl ExpressionKind<'_> {
@@ -230,6 +254,12 @@ impl ExpressionKind<'_> {
                 typed: ValueType::Xml(_),
                 ..
             }) => true,
+
+            Self::ParameterTuple(Value {
+                typed: ValueType::Xml(_),
+                ..
+            }) => true,
+
             Self::Value(expr) => expr.is_xml_value(),
             _ => false,
         }
@@ -549,10 +579,5 @@ fn extract_single_var_row(expr: Expression) -> Expression {
         return expr;
     };
 
-    val.clone()
-        .decorate(
-            Some("prisma-comma-repeatable-start"),
-            Some("prisma-comma-repeatable-end"),
-        )
-        .into()
+    val.clone().into()
 }

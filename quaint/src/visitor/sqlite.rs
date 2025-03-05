@@ -4,15 +4,15 @@ use crate::{
     visitor::{self, Visitor},
 };
 
-use std::fmt::{self, Write};
+use std::fmt;
+use crate::template::{Placeholder, QueryTemplate, QueryWriter};
 
 /// A visitor to generate queries for the SQLite database.
 ///
 /// The returned parameter values implement the `ToSql` trait from rusqlite and
 /// can be used directly with the database.
 pub struct Sqlite<'a> {
-    query: String,
-    parameters: Vec<Value<'a>>,
+    query: QueryTemplate<'a>,
 }
 
 impl<'a> Sqlite<'a> {
@@ -85,18 +85,26 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     where
         Q: Into<Query<'a>>,
     {
-        let mut sqlite = Sqlite {
-            query: String::with_capacity(4096),
-            parameters: Vec::with_capacity(128),
-        };
-
-        Sqlite::visit_query(&mut sqlite, query.into())?;
-
-        Ok((sqlite.query, sqlite.parameters))
+        let template = <Sqlite<'a> as Visitor>::build_template(query)?;
+        let sql = template.to_sql();
+        Ok((sql, template.parameters))
     }
 
-    fn write<D: fmt::Display>(&mut self, s: D) -> visitor::Result {
-        write!(&mut self.query, "{s}")?;
+    fn build_template<Q>(query: Q) -> Result<QueryTemplate<'a>, Error>
+    where
+        Q: Into<Query<'a>>
+    {
+        let mut this = Sqlite {
+            query: QueryTemplate::new(Placeholder {prefix: "?", has_numbering: false}),
+        };
+
+        Sqlite::visit_query(&mut this, query.into())?;
+
+        Ok(this.query)
+    }
+
+    fn write<D: fmt::Display>(&mut self, value: D) -> visitor::Result {
+        self.query.write_string_chunk(value);
         Ok(())
     }
 
@@ -240,12 +248,19 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         Ok(())
     }
 
-    fn parameter_substitution(&mut self) -> visitor::Result {
-        self.write("?")
+    fn add_parameter(&mut self, value: Value<'a>) {
+        self.query.parameters.push(value);
     }
 
-    fn add_parameter(&mut self, value: Value<'a>) {
-        self.parameters.push(value);
+    fn parameter_substitution(&mut self) -> visitor::Result {
+        self.query.write_parameter();
+        Ok(())
+    }
+
+    fn visit_parameter_tuple(&mut self, value: Value<'a>) -> visitor::Result {
+        self.query.write_parameter_tuple();
+        self.query.parameters.push(value);
+        Ok(())
     }
 
     fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> visitor::Result {

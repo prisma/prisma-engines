@@ -126,6 +126,7 @@ pub mod single;
 #[cfg(test)]
 mod tests;
 pub mod visitor;
+pub mod template;
 
 pub use ast::{Value, ValueType};
 
