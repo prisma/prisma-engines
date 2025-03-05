@@ -131,7 +131,7 @@ sqlx-core = "0.8"
 sqlx-sqlite = "0.8"
 tempfile = "3"
 tiberius = { version = "0.12", default-features = false }
-tokio = "1"
+tokio = { version = "1", features = ["sync"] }
 tokio-postgres = { git = "https://github.com/prisma/rust-postgres", branch = "pgbouncer-mode" }
 tokio-tungstenite = "0.26"
 tokio-util = "0.7"
