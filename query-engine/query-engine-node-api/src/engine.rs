@@ -49,6 +49,8 @@ impl MetricOptions {
     }
 }
 
+// some code change to trigger the release
+
 #[napi]
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
