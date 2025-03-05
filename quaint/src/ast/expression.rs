@@ -11,6 +11,18 @@ pub struct Expression<'a> {
     pub(crate) alias: Option<Cow<'a, str>>,
 }
 
+impl Expression<'_> {
+    pub fn to_parameterized_row(self) -> Self {
+        match self.kind {
+            ExpressionKind::Parameterized(value) => Expression {
+                kind: ExpressionKind::ParameterizedRow(value.clone()),
+                alias: self.alias,
+            },
+            _ => self,
+        }
+    }
+}
+
 impl<'a> Expression<'a> {
     /// The type of the expression, dictates how it's implemented in the query.
     pub fn kind(&self) -> &ExpressionKind<'a> {
@@ -50,6 +62,11 @@ impl<'a> Expression<'a> {
                 ..
             }) => true,
 
+            ExpressionKind::ParameterizedRow(Value {
+                typed: ValueType::Json(_),
+                ..
+            }) => true,
+
             ExpressionKind::Value(expr) => expr.is_json_value(),
 
             ExpressionKind::Function(fun) => fun.returns_json(),
@@ -65,6 +82,11 @@ impl<'a> Expression<'a> {
                 ..
             }) => true,
 
+            ExpressionKind::ParameterizedRow(Value {
+                typed: ValueType::Json(_),
+                ..
+            }) => true,
+
             ExpressionKind::Value(expr) => expr.is_json_value(),
             _ => false,
         }
@@ -74,6 +96,11 @@ impl<'a> Expression<'a> {
     pub(crate) fn into_json_value(self) -> Option<serde_json::Value> {
         match self.kind {
             ExpressionKind::Parameterized(Value {
+                typed: ValueType::Json(json_val),
+                ..
+            }) => json_val,
+
+            ExpressionKind::ParameterizedRow(Value {
                 typed: ValueType::Json(json_val),
                 ..
             }) => json_val,
@@ -195,11 +222,13 @@ impl<'a> Expression<'a> {
 pub enum ExpressionKind<'a> {
     /// Anything that we must parameterize before querying
     Parameterized(Value<'a>),
+    /// List of parameters with an unknown length, e.g. `(?, ?, ..., ?)`
+    ParameterizedRow(Value<'a>),
     /// A user-provided value we do not parameterize.
     RawValue(Raw<'a>),
     /// A database column
     Column(Box<Column<'a>>),
-    /// Data in a row form, e.g. (1, 2, 3)
+    /// Data in a row form, e.g. `(1, 2, 3)`
     Row(Row<'a>),
     /// A nested `SELECT` or `SELECT .. UNION` statement
     Selection(SelectQuery<'a>),
@@ -219,8 +248,6 @@ pub enum ExpressionKind<'a> {
     Value(Box<Expression<'a>>),
     /// DEFAULT keyword, e.g. for `INSERT INTO ... VALUES (..., DEFAULT, ...)`
     Default,
-    /// An expression wrapped with comments on each side
-    Decorated(Decorated<'a>),
 }
 
 impl ExpressionKind<'_> {
@@ -230,6 +257,12 @@ impl ExpressionKind<'_> {
                 typed: ValueType::Xml(_),
                 ..
             }) => true,
+
+            Self::ParameterizedRow(Value {
+                typed: ValueType::Xml(_),
+                ..
+            }) => true,
+
             Self::Value(expr) => expr.is_xml_value(),
             _ => false,
         }
@@ -377,8 +410,7 @@ impl<'a> Comparable<'a> for Expression<'a> {
     where
         T: Into<Expression<'a>>,
     {
-        let expr = extract_single_var_row(selection.into());
-        Compare::In(Box::new(self), Box::new(expr))
+        Compare::In(Box::new(self), Box::new(selection.into()))
     }
 
     fn not_in_selection<T>(self, selection: T) -> Compare<'a>
@@ -521,38 +553,4 @@ impl<'a> Comparable<'a> for Expression<'a> {
     fn all(self) -> Compare<'a> {
         Compare::All(Box::new(self))
     }
-}
-
-/// Converts a row consisting of a single var into the var itself.
-/// Any other expression is returned as is.
-fn extract_single_var_row(expr: Expression) -> Expression {
-    let Expression {
-        kind: ExpressionKind::Row(values),
-        ..
-    } = &expr
-    else {
-        return expr;
-    };
-
-    let Some((
-        val @ Expression {
-            kind:
-                ExpressionKind::Parameterized(Value {
-                    typed: ValueType::Var(_, _),
-                    ..
-                }),
-            ..
-        },
-        [],
-    )) = values.values.split_first()
-    else {
-        return expr;
-    };
-
-    val.clone()
-        .decorate(
-            Some("prisma-comma-repeatable-start"),
-            Some("prisma-comma-repeatable-end"),
-        )
-        .into()
 }

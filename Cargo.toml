@@ -32,6 +32,7 @@ members = [
     "query-compiler/query-compiler-playground",
     "query-compiler/query-compiler-wasm",
     "query-compiler/query-engine-tests-todo",
+    "query-template",
     "libs/*",
     "prisma-fmt",
     "prisma-schema-wasm",
@@ -222,6 +223,8 @@ sql-schema-describer.path = "./schema-engine/sql-schema-describer"
 mongodb-schema-describer.path = "./schema-engine/mongodb-schema-describer"
 
 query-compiler = { path = "./query-compiler/query-compiler", default-features = false }
+
+query-template = { path = "./query-template", default-features = false }
 
 [profile.dev.package.backtrace]
 opt-level = 3
