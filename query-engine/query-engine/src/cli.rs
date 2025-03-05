@@ -5,6 +5,8 @@ use crate::{
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
+
+use base64::prelude::*;
 use psl::parser_database::Files;
 use query_core::{protocol::EngineProtocol, schema};
 use request_handlers::{dmmf, RequestBody, RequestHandler};
@@ -119,7 +121,7 @@ impl CliCommand {
     }
 
     async fn execute_request(request: ExecuteRequest) -> PrismaResult<()> {
-        let decoded = base64::decode(&request.query)?;
+        let decoded = BASE64_STANDARD.decode(&request.query)?;
         let decoded_request = String::from_utf8(decoded)?;
 
         request
@@ -150,7 +152,7 @@ impl CliCommand {
         let res = handler.handle(body, None, None).await;
         let res = serde_json::to_string(&res).unwrap();
 
-        let encoded_response = base64::encode(res);
+        let encoded_response = BASE64_STANDARD.encode(res);
         println!("Response: {encoded_response}"); // reason for prefix is explained in TestServer.scala
 
         Ok(())

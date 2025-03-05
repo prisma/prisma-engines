@@ -1,3 +1,4 @@
+use base64::prelude::*;
 use quaint::{
     connector::{ColumnType, ResultRowRef, ResultSet},
     Value, ValueType,
@@ -178,7 +179,10 @@ impl Serialize for SerializedValue<'_> {
                 seq.end()
             }
             ValueType::EnumArray(None, _) => serializer.serialize_none(),
-            ValueType::Bytes(value) => value.as_ref().map(prisma_value::encode_base64).serialize(serializer),
+            ValueType::Bytes(value) => value
+                .as_ref()
+                .map(|value| BASE64_STANDARD.encode(value))
+                .serialize(serializer),
             ValueType::Boolean(value) => value.serialize(serializer),
             ValueType::Char(value) => value.serialize(serializer),
             ValueType::Json(value) => value.serialize(serializer),

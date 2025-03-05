@@ -34,6 +34,7 @@ relation_joins = ["sql-query-builder/relation_joins"]
 driver-adapters = []
 
 [dependencies]
+base64.workspace = true
 psl.workspace = true
 anyhow.workspace = true
 async-trait.workspace = true
