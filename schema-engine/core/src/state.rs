@@ -3,10 +3,9 @@
 //! Why this rather than using connectors directly? We must be able to use the schema engine
 //! without a valid schema or database connection for commands like createDatabase and diff.
 
-use crate::{
-    api::GenericApi, commands, json_rpc::types::*, parse_configuration_multi, CoreError, CoreResult, SchemaContainerExt,
-};
+use crate::{api::GenericApi, commands, parse_configuration_multi, CoreError, CoreResult, SchemaContainerExt};
 use enumflags2::BitFlags;
+use json_rpc::types::*;
 use psl::{parser_database::SourceFile, PreviewFeature};
 use schema_connector::{ConnectorError, ConnectorHost, IntrospectionResult, Namespaces, SchemaConnector};
 use std::{

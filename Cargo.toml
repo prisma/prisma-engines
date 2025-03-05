@@ -5,7 +5,7 @@ members = [
     "schema-engine/core",
     "schema-engine/connectors/*",
     "schema-engine/datamodel-renderer",
-    "schema-engine/json-rpc-api-build",
+    "schema-engine/json-rpc-api",
     "schema-engine/mongodb-schema-describer",
     "schema-engine/sql-migration-tests",
     "schema-engine/sql-introspection-tests",

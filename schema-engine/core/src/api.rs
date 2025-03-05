@@ -1,6 +1,7 @@
 //! The external facing programmatic API to the schema engine.
 
-use crate::{commands, json_rpc::types::*, CoreResult};
+use crate::{commands, CoreResult};
+use json_rpc::types::*;
 
 /// The programmatic, generic, fantastic schema engine API.
 #[async_trait::async_trait]

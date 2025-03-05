@@ -2223,12 +2223,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "json-rpc-api-build"
+name = "json-rpc-api"
 version = "0.1.0"
 dependencies = [
  "heck 0.4.1",
  "serde",
  "toml",
+ "tsify-next",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -4733,7 +4735,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "enumflags2",
- "json-rpc-api-build",
+ "json-rpc-api",
  "jsonrpc-core",
  "mongodb-schema-connector",
  "psl",

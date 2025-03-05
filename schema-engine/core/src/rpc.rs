@@ -1,4 +1,5 @@
-use crate::{json_rpc::method_names::*, CoreError, CoreResult, GenericApi};
+use crate::{CoreError, CoreResult, GenericApi};
+use json_rpc::method_names::*;
 use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
 use psl::SourceFile;
 use std::sync::Arc;
