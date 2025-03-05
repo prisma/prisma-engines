@@ -1,21 +1,19 @@
+use crate::visitor::query_writer::QueryWriter;
 use crate::{
     ast::*,
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
 use itertools::Itertools;
-use std::{
-    fmt::{self, Write},
-    ops::Deref,
-};
+use query_template::{PlaceholderFormat, QueryTemplate};
+use std::{fmt, ops::Deref};
 
 /// A visitor to generate queries for the PostgreSQL database.
 ///
 /// The returned parameter values implement the `ToSql` trait from postgres and
 /// can be used directly with the database.
 pub struct Postgres<'a> {
-    query: String,
-    parameters: Vec<Value<'a>>,
+    query_template: QueryTemplate<Value<'a>>,
 }
 
 impl<'a> Postgres<'a> {
@@ -60,28 +58,45 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     where
         Q: Into<Query<'a>>,
     {
-        let mut postgres = Postgres {
-            query: String::with_capacity(4096),
-            parameters: Vec::with_capacity(128),
-        };
-
-        Postgres::visit_query(&mut postgres, query.into())?;
-
-        Ok((postgres.query, postgres.parameters))
+        let template = <Postgres<'a> as Visitor>::build_template(query)?;
+        let sql = template.to_sql()?;
+        Ok((sql, template.parameters))
     }
 
-    fn write<D: fmt::Display>(&mut self, s: D) -> visitor::Result {
-        write!(&mut self.query, "{s}")?;
+    fn build_template<Q>(query: Q) -> Result<QueryTemplate<Value<'a>>, Error>
+    where
+        Q: Into<Query<'a>>,
+    {
+        let mut this = Postgres {
+            query_template: QueryTemplate::new(PlaceholderFormat {
+                prefix: "$",
+                has_numbering: true,
+            }),
+        };
+
+        Postgres::visit_query(&mut this, query.into())?;
+
+        Ok(this.query_template)
+    }
+
+    fn write<D: fmt::Display>(&mut self, value: D) -> visitor::Result {
+        self.query_template.write_string_chunk(value);
         Ok(())
     }
 
     fn add_parameter(&mut self, value: Value<'a>) {
-        self.parameters.push(value);
+        self.query_template.parameters.push(value);
     }
 
     fn parameter_substitution(&mut self) -> visitor::Result {
-        self.write("$")?;
-        self.write(self.parameters.len())
+        self.query_template.write_parameter();
+        Ok(())
+    }
+
+    fn visit_parameterized_row(&mut self, value: Value<'a>) -> visitor::Result {
+        self.query_template.write_parameter_tuple();
+        self.query_template.parameters.push(value);
+        Ok(())
     }
 
     fn visit_parameterized_enum(&mut self, variant: EnumVariant<'a>, name: Option<EnumName<'a>>) -> visitor::Result {

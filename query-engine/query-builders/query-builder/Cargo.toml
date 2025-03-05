@@ -5,8 +5,8 @@ version = "0.1.0"
 
 [dependencies]
 serde.workspace = true
-
 query-structure.workspace = true
+query-template.workspace = true
 
 [features]
 relation_joins = []

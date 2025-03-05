@@ -1,5 +1,6 @@
 use super::{NativeColumnType, Visitor};
 use crate::prelude::{JsonArrayAgg, JsonBuildObject, JsonExtract, JsonType, JsonUnquote};
+use crate::visitor::query_writer::QueryWriter;
 use crate::{
     ast::{
         Column, Comparable, Expression, ExpressionKind, Insert, IntoRaw, Join, JoinData, Joinable, Merge, OnConflict,
@@ -9,7 +10,8 @@ use crate::{
     prelude::{Aliasable, Average, Query},
     visitor, Value, ValueType,
 };
-use std::{borrow::Cow, convert::TryFrom, fmt::Write, iter};
+use query_template::{PlaceholderFormat, QueryTemplate};
+use std::{borrow::Cow, convert::TryFrom, iter};
 
 static GENERATED_KEYS: &str = "@generated_keys";
 
@@ -17,8 +19,7 @@ static GENERATED_KEYS: &str = "@generated_keys";
 ///
 /// The returned parameter values can be used directly with the tiberius crate.
 pub struct Mssql<'a> {
-    query: String,
-    parameters: Vec<Value<'a>>,
+    query_template: QueryTemplate<Value<'a>>,
     order_by_set: bool,
 }
 
@@ -192,26 +193,48 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
     fn build<Q>(query: Q) -> crate::Result<(String, Vec<Value<'a>>)>
     where
-        Q: Into<crate::ast::Query<'a>>,
+        Q: Into<Query<'a>>,
+    {
+        let template = <Mssql<'a> as Visitor>::build_template(query)?;
+        let sql = template.to_sql()?;
+        Ok((sql, template.parameters))
+    }
+
+    fn build_template<Q>(query: Q) -> Result<QueryTemplate<Value<'a>>, Error>
+    where
+        Q: Into<Query<'a>>,
     {
         let mut this = Mssql {
-            query: String::with_capacity(4096),
-            parameters: Vec::with_capacity(128),
+            query_template: QueryTemplate::new(PlaceholderFormat {
+                prefix: "@P",
+                has_numbering: true,
+            }),
             order_by_set: false,
         };
 
         Mssql::visit_query(&mut this, query.into())?;
 
-        Ok((this.query, this.parameters))
+        Ok(this.query_template)
     }
 
-    fn write<D: std::fmt::Display>(&mut self, s: D) -> visitor::Result {
-        write!(&mut self.query, "{s}")?;
+    fn write<D: std::fmt::Display>(&mut self, value: D) -> visitor::Result {
+        self.query_template.write_string_chunk(value);
         Ok(())
     }
 
     fn add_parameter(&mut self, value: Value<'a>) {
-        self.parameters.push(value)
+        self.query_template.parameters.push(value)
+    }
+
+    fn parameter_substitution(&mut self) -> visitor::Result {
+        self.query_template.write_parameter();
+        Ok(())
+    }
+
+    fn visit_parameterized_row(&mut self, value: Value<'a>) -> visitor::Result {
+        self.query_template.write_parameter_tuple();
+        self.query_template.parameters.push(value);
+        Ok(())
     }
 
     fn visit_parameterized_text(
@@ -568,11 +591,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
     fn visit_upsert(&mut self, _update: crate::ast::Update<'a>) -> visitor::Result {
         unimplemented!("Upsert not supported for the underlying database.")
-    }
-
-    fn parameter_substitution(&mut self) -> visitor::Result {
-        self.write("@P")?;
-        self.write(self.parameters.len())
     }
 
     fn visit_aggregate_to_string(&mut self, value: crate::ast::Expression<'a>) -> visitor::Result {

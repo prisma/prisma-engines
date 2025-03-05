@@ -3,6 +3,7 @@ use pretty::{
     termcolor::{Color, ColorSpec},
 };
 use query_structure::PrismaValue;
+use std::borrow::Cow;
 
 use super::{Binding, DbQuery, Expression, JoinExpression};
 
@@ -79,18 +80,24 @@ where
     }
 
     fn query(&'a self, tag: &'static str, db_query: &'a DbQuery) -> DocBuilder<'a, PrettyPrinter<'a, D>, ColorSpec> {
+        let sql = db_query.to_string();
+
+        // Copied the implementation from reflow, because DocBuilder does not provide the API to avoid issues with lifetimes here
+        let fragments = sql.split_whitespace().map(|word| Cow::<'a, str>::from(word.to_owned()));
+
+        let doc_builder = self
+            .intersperse(fragments, self.softline()) // Replacement for: .reflow(&sql)
+            .align()
+            .enclose("«", "»")
+            .annotate(color_lit());
+
         self.keyword(tag)
             .append(self.softline())
-            .append(
-                self.reflow(&db_query.query)
-                    .align()
-                    .enclose("«", "»")
-                    .annotate(color_lit()),
-            )
+            .append(doc_builder)
             .append(self.line())
             .append(self.keyword("params"))
             .append(self.space())
-            .append(self.list(&db_query.params))
+            .append(self.list(db_query.params()))
             .align()
     }
 

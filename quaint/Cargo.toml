@@ -192,5 +192,8 @@ workspace = true
 features = ["compat"]
 optional = true
 
+[dependencies.query-template]
+workspace = true
+
 [build-dependencies]
 cfg_aliases.workspace = true

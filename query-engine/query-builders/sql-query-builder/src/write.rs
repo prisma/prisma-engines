@@ -332,8 +332,18 @@ pub fn delete_relation_table_records(
     let parent_id_values = parent_id.db_values(ctx);
     let parent_id_criteria = parent_column.equals(parent_id_values);
 
-    let child_ids = child_ids.iter().flat_map(|id| id.db_values(ctx)).collect::<Row>();
-    let child_id_criteria = child_column.in_selection(child_ids);
+    let child_ids_row = child_ids.iter().flat_map(|id| id.db_values(ctx)).collect::<Row>();
+
+    let child_id_criteria = if !child_ids.is_empty()
+        && child_ids[0]
+            .pairs
+            .iter()
+            .any(|(_, pv)| matches!(pv, PrismaValue::Placeholder { .. }))
+    {
+        child_column.in_selection(child_ids_row.to_parameterized_row())
+    } else {
+        child_column.in_selection(child_ids_row)
+    };
 
     Delete::from_table(relation.as_table(ctx))
         .so_that(parent_id_criteria.and(child_id_criteria))

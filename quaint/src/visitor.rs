@@ -15,6 +15,9 @@ mod postgres;
 #[cfg(feature = "sqlite")]
 mod sqlite;
 
+// Generic query writer, used for all SQL flavors
+mod query_writer;
+
 #[cfg(feature = "mssql")]
 pub use self::mssql::Mssql;
 #[cfg(feature = "mysql")]
@@ -25,6 +28,8 @@ pub use self::postgres::Postgres;
 pub use self::sqlite::Sqlite;
 
 use crate::ast::*;
+use crate::error::Error;
+use query_template::QueryTemplate;
 use std::{borrow::Cow, fmt};
 
 pub type Result = crate::Result<()>;
@@ -62,6 +67,10 @@ pub trait Visitor<'a> {
     /// # }
     /// ```
     fn build<Q>(query: Q) -> crate::Result<(String, Vec<Value<'a>>)>
+    where
+        Q: Into<Query<'a>>;
+
+    fn build_template<Q>(query: Q) -> std::result::Result<QueryTemplate<Value<'a>>, Error>
     where
         Q: Into<Query<'a>>;
 
@@ -115,7 +124,10 @@ pub trait Visitor<'a> {
     /// What to use to substitute a parameter in the query.
     fn parameter_substitution(&mut self) -> Result;
 
-    /// What to use to substitute a parameter in the query.
+    /// What to use to substitute a list of parameters of variable length
+    fn visit_parameterized_row(&mut self, value: Value<'a>) -> Result;
+
+    /// What to use to aggregate an array of values into a string
     fn visit_aggregate_to_string(&mut self, value: Expression<'a>) -> Result;
 
     /// Visit a non-parameterized value.
@@ -602,6 +614,7 @@ pub trait Visitor<'a> {
             ExpressionKind::ConditionTree(tree) => self.visit_conditions(tree)?,
             ExpressionKind::Compare(compare) => self.visit_compare(compare)?,
             ExpressionKind::Parameterized(val) => self.visit_parameterized(val)?,
+            ExpressionKind::ParameterizedRow(val) => self.visit_parameterized_row(val)?,
             ExpressionKind::RawValue(val) => self.visit_raw_value(val.0)?,
             ExpressionKind::Column(column) => self.visit_column(*column)?,
             ExpressionKind::Row(row) => self.visit_row(row)?,
@@ -619,7 +632,6 @@ pub trait Visitor<'a> {
                 None => self.write("*")?,
             },
             ExpressionKind::Default => self.write("DEFAULT")?,
-            ExpressionKind::Decorated(decorated) => self.visit_decorated(decorated)?,
         }
 
         if let Some(alias) = value.alias {
@@ -857,6 +869,19 @@ pub trait Visitor<'a> {
                     self.visit_parameterized(pv)
                 }
 
+                // expr IN (?, ?, ..., ?)
+                (
+                    left,
+                    Expression {
+                        kind: ExpressionKind::ParameterizedRow(value),
+                        ..
+                    },
+                ) => {
+                    self.visit_expression(left)?;
+                    self.write(" IN ")?;
+                    self.visit_parameterized_row(value)
+                }
+
                 (
                     Expression {
                         kind: ExpressionKind::Row(row),
@@ -927,6 +952,19 @@ pub trait Visitor<'a> {
                     self.visit_expression(left)?;
                     self.write(" <> ")?;
                     self.visit_parameterized(pv)
+                }
+
+                // expr NOT IN (?, ?, ..., ?)
+                (
+                    left,
+                    Expression {
+                        kind: ExpressionKind::ParameterizedRow(value),
+                        ..
+                    },
+                ) => {
+                    self.visit_expression(left)?;
+                    self.write(" NOT IN ")?;
+                    self.visit_parameterized_row(value)
                 }
 
                 (
@@ -1217,21 +1255,5 @@ pub trait Visitor<'a> {
 
     fn visit_comment(&mut self, comment: Cow<'a, str>) -> Result {
         self.surround_with("/* ", " */", |ref mut s| s.write(comment))
-    }
-
-    fn visit_decorated(&mut self, decorated: Decorated<'a>) -> Result {
-        let Decorated { prefix, suffix, expr } = decorated;
-
-        if let Some(prefix) = prefix {
-            self.visit_comment(prefix)?;
-        }
-
-        self.visit_expression(*expr)?;
-
-        if let Some(suffix) = suffix {
-            self.visit_comment(suffix)?;
-        }
-
-        Ok(())
     }
 }
