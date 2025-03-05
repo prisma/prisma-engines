@@ -95,8 +95,8 @@ impl ToSqlRow for ResultRow {
         for (i, p_value) in self.into_iter().enumerate().take(row_width) {
             let pv = match (meta[i].identifier(), meta[i].arity()) {
                 (type_identifier, FieldArity::List) => match p_value.typed {
-                    value if value.is_null() => Ok(PrismaValue::List(Vec::new())),
-                    ValueType::Array(None) => Ok(PrismaValue::List(Vec::new())),
+                    value if value.is_null() => Ok(PrismaValue::Null),
+                    ValueType::Array(None) => Ok(PrismaValue::Null),
                     ValueType::Array(Some(l)) => l
                         .into_iter()
                         .map(|val| row_value_to_prisma_value(val, meta[i]))
