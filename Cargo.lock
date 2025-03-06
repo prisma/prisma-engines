@@ -1647,7 +1647,7 @@ source = "git+https://github.com/prisma/graphql-parser#6a3f58bd879065588e710cb02
 dependencies = [
  "combine",
  "indexmap 1.9.3",
- "thiserror 1.0.44",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -1775,7 +1775,7 @@ dependencies = [
  "ipnet",
  "once_cell",
  "rand 0.8.5",
- "thiserror 1.0.44",
+ "thiserror 1.0.69",
  "tinyvec",
  "tokio",
  "tracing",
@@ -1798,7 +1798,7 @@ dependencies = [
  "rand 0.8.5",
  "resolv-conf",
  "smallvec",
- "thiserror 1.0.44",
+ "thiserror 1.0.69",
  "tokio",
  "tracing",
 ]
@@ -2530,7 +2530,7 @@ dependencies = [
  "metrics",
  "metrics-util",
  "quanta",
- "thiserror 1.0.44",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -2607,7 +2607,7 @@ dependencies = [
  "futures-util",
  "log",
  "metrics",
- "thiserror 1.0.44",
+ "thiserror 1.0.69",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -2651,7 +2651,7 @@ dependencies = [
  "stringprep",
  "strsim 0.11.1",
  "take_mut",
- "thiserror 1.0.44",
+ "thiserror 1.0.69",
  "tokio",
  "tokio-rustls",
  "tokio-util",
@@ -2666,7 +2666,7 @@ version = "0.1.0"
 dependencies = [
  "mongodb",
  "percent-encoding",
- "thiserror 1.0.44",
+ "thiserror 2.0.11",
 ]
 
 [[package]]
@@ -2705,7 +2705,7 @@ dependencies = [
  "serde",
  "serde_json",
  "telemetry",
- "thiserror 1.0.44",
+ "thiserror 2.0.11",
  "tokio",
  "tracing",
  "tracing-futures",
@@ -2777,7 +2777,7 @@ dependencies = [
  "serde",
  "serde_json",
  "socket2 0.4.9",
- "thiserror 1.0.44",
+ "thiserror 1.0.69",
  "tokio",
  "tokio-native-tls",
  "tokio-util",
@@ -2817,7 +2817,7 @@ dependencies = [
  "sha2 0.10.7",
  "smallvec",
  "subprocess",
- "thiserror 1.0.44",
+ "thiserror 1.0.69",
  "time",
  "uuid",
 ]
@@ -3202,7 +3202,7 @@ dependencies = [
  "html-escape",
  "nom",
  "percent-encoding",
- "thiserror 1.0.44",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -3713,7 +3713,7 @@ dependencies = [
  "serde_json",
  "sqlformat",
  "telemetry",
- "thiserror 1.0.44",
+ "thiserror 2.0.11",
  "tiberius",
  "tokio",
  "tokio-postgres",
@@ -3787,7 +3787,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sql-query-builder",
- "thiserror 1.0.44",
+ "thiserror 2.0.11",
 ]
 
 [[package]]
@@ -3843,7 +3843,7 @@ dependencies = [
  "serde",
  "serde_json",
  "telemetry",
- "thiserror 1.0.44",
+ "thiserror 2.0.11",
  "user-facing-errors",
  "uuid",
 ]
@@ -3876,7 +3876,7 @@ dependencies = [
  "serde_json",
  "sql-query-builder",
  "telemetry",
- "thiserror 1.0.44",
+ "thiserror 2.0.11",
  "tokio",
  "tracing",
  "tracing-futures",
@@ -3915,7 +3915,7 @@ dependencies = [
  "sql-query-connector",
  "structopt",
  "telemetry",
- "thiserror 1.0.44",
+ "thiserror 2.0.11",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -3947,7 +3947,7 @@ dependencies = [
  "serde_json",
  "sql-query-connector",
  "telemetry",
- "thiserror 1.0.44",
+ "thiserror 2.0.11",
  "tokio",
  "tracing",
  "tracing-futures",
@@ -3971,7 +3971,7 @@ dependencies = [
  "serde",
  "serde_json",
  "telemetry",
- "thiserror 1.0.44",
+ "thiserror 2.0.11",
  "tracing",
  "tracing-futures",
  "tracing-subscriber",
@@ -4007,7 +4007,7 @@ dependencies = [
  "serde_json",
  "sql-query-connector",
  "telemetry",
- "thiserror 1.0.44",
+ "thiserror 2.0.11",
  "tokio",
  "tracing",
  "tracing-futures",
@@ -4068,7 +4068,7 @@ dependencies = [
  "serde_json",
  "sql-query-connector",
  "telemetry",
- "thiserror 1.0.44",
+ "thiserror 2.0.11",
  "tokio",
  "tracing",
  "tracing-futures",
@@ -4094,7 +4094,7 @@ dependencies = [
  "nanoid",
  "prisma-value",
  "psl",
- "thiserror 1.0.44",
+ "thiserror 2.0.11",
  "ulid",
  "uuid",
 ]
@@ -4142,7 +4142,7 @@ dependencies = [
  "sql-query-connector",
  "strip-ansi-escapes",
  "telemetry",
- "thiserror 1.0.44",
+ "thiserror 2.0.11",
  "tokio",
  "tracing",
  "tracing-error",
@@ -4427,7 +4427,7 @@ dependencies = [
  "serde_json",
  "sql-query-connector",
  "telemetry",
- "thiserror 1.0.44",
+ "thiserror 2.0.11",
  "tracing",
  "url",
  "user-facing-errors",
@@ -5251,7 +5251,7 @@ dependencies = [
  "serde_json",
  "sql-query-builder",
  "telemetry",
- "thiserror 1.0.44",
+ "thiserror 2.0.11",
  "tokio",
  "tracing",
  "tracing-futures",
@@ -5546,7 +5546,7 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "serde_json",
- "thiserror 1.0.44",
+ "thiserror 2.0.11",
  "tokio",
  "tracing",
  "tracing-futures",
@@ -5638,11 +5638,11 @@ checksum = "222a222a5bfe1bba4a77b45ec488a741b3cb8872e5e499451fd7d0129c9c7c3d"
 
 [[package]]
 name = "thiserror"
-version = "1.0.44"
+version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "611040a08a0439f8248d1990b111c95baa9c704c805fa1f62104b39655fd7f90"
+checksum = "b6aaf5339b578ea85b50e080feb250a3e8ae8cfcdff9a461c9ec2904bc923f52"
 dependencies = [
- "thiserror-impl 1.0.44",
+ "thiserror-impl 1.0.69",
 ]
 
 [[package]]
@@ -5656,9 +5656,9 @@ dependencies = [
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.44"
+version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "090198534930841fab3a5d1bb637cde49e339654e606195f8d9c76eeb081dc96"
+checksum = "4fee6c4efc90059e10f81e6d42c60a18f76588c3d74cb83a0b242a2b6c7504c1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5707,7 +5707,7 @@ dependencies = [
  "opentls",
  "pin-project-lite",
  "pretty-hex",
- "thiserror 1.0.44",
+ "thiserror 1.0.69",
  "tokio",
  "tokio-util",
  "tracing",
