@@ -228,3 +228,14 @@ new::regressions::prisma_12572::prisma_12572::all_generated_timestamps_are_the_s
 writes::top_level_mutations::create_many_and_return::create_many::large_num_records_vertical
 writes::top_level_mutations::delete_many_relations::delete_many_rels::p1_c1
 writes::uniques_and_node_selectors::multi_field_uniq_mutation::multi_field_uniq_mut::nested_connect_one2m_rel
+
+### Tests failing while running in parallel, but succeed single-threaded (--test-threads=1)
+
+writes::top_level_mutations::create_many_and_return::create_many::basic_create_many_autoincrement
+writes::top_level_mutations::create_many_and_return::create_many::create_many_defaults_nulls
+writes::top_level_mutations::create_many_and_return::json_create_many::create_many_json_adv
+
+### Flaky tests while running in parallel
+
+writes::top_level_mutations::create_many::create_many::basic_create_many_shorthand
+writes::top_level_mutations::create_many::create_many::create_many_map_behavior

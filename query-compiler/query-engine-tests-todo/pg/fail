@@ -784,14 +784,12 @@ writes::top_level_mutations::create_list::create_list::create_not_accept_null_in
 writes::top_level_mutations::create_many::create_many::create_many_error_dups
 writes::top_level_mutations::create_many::json_create_many::create_many_json_errors
 writes::top_level_mutations::create_many_and_return::create_many::basic_create_many
-writes::top_level_mutations::create_many_and_return::create_many::basic_create_many_autoincrement
 writes::top_level_mutations::create_many_and_return::create_many::basic_create_many_shorthand
 writes::top_level_mutations::create_many_and_return::create_many::create_many_11_inline_rel_read_works
 writes::top_level_mutations::create_many_and_return::create_many::create_many_11_non_inline_rel_read_fails
 writes::top_level_mutations::create_many_and_return::create_many::create_many_1m_inline_rel_read_works
 writes::top_level_mutations::create_many_and_return::create_many::create_many_1m_non_inline_rel_read_fails
 writes::top_level_mutations::create_many_and_return::create_many::create_many_by_shape
-writes::top_level_mutations::create_many_and_return::create_many::create_many_defaults_nulls
 writes::top_level_mutations::create_many_and_return::create_many::create_many_error_dups
 writes::top_level_mutations::create_many_and_return::create_many::create_many_m2m_rel_read_fails
 writes::top_level_mutations::create_many_and_return::create_many::create_many_map_behavior
@@ -799,7 +797,6 @@ writes::top_level_mutations::create_many_and_return::create_many::create_many_no
 writes::top_level_mutations::create_many_and_return::create_many::create_many_self_rel_read_fails
 writes::top_level_mutations::create_many_and_return::create_many::large_num_records_horizontal
 writes::top_level_mutations::create_many_and_return::create_many::large_num_records_vertical
-writes::top_level_mutations::create_many_and_return::json_create_many::create_many_json_adv
 writes::top_level_mutations::create_many_and_return::json_create_many::create_many_json_errors
 writes::top_level_mutations::default_value::default_value::enum_field
 writes::top_level_mutations::default_value::default_value::int_field
