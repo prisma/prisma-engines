@@ -394,6 +394,23 @@ mod tests {
         .await;
     }
 
+    #[tokio::test]
+    async fn zero_sized_tracing_lru_cache_returns_new_metadata_every_time() {
+        run_with_client(|client| async move {
+            let cache = TracingLruCache::with_capacity(0);
+            let sql = "SELECT $1";
+            let types = [Type::INT4];
+
+            let q1 = cache.get_query(&client, sql, &types).await.unwrap();
+            let q2 = cache.get_query(&client, sql, &types).await.unwrap();
+            assert!(
+                !Arc::ptr_eq(&q1.metadata, &q2.metadata),
+                "q1 and q2 should not re-use the same metadata"
+            );
+        })
+        .await;
+    }
+
     #[test]
     fn noop_hasher_returns_the_same_hash_the_input() {
         assert_eq!(NoOpHasherBuilder.hash_one(0xdeadc0deu64), 0xdeadc0de);
