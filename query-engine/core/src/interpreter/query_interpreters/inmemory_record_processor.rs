@@ -98,7 +98,7 @@ impl InMemoryRecordProcessor {
             records
                 .records
                 .into_iter()
-                .group_by(|record| record.parent_id.clone())
+                .chunk_by(|record| record.parent_id.clone())
                 .into_iter()
                 .flat_map(|(_, group)| {
                     let filtered: Vec<_> = group
