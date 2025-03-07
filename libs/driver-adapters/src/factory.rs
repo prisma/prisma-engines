@@ -67,7 +67,7 @@ impl JsQueryableDropGuard {
 
 impl Drop for JsQueryableDropGuard {
     fn drop(&mut self) {
-        if !self.disposed.swap(true, Ordering::SeqCst) {
+        if !self.disposed.swap(true, Ordering::Relaxed) {
             self.inner.dispose_non_blocking();
         }
     }
@@ -84,7 +84,7 @@ impl ExternalConnector for JsQueryableDropGuard {
     }
 
     async fn dispose(&self) -> quaint::Result<()> {
-        if !self.disposed.swap(true, Ordering::SeqCst) {
+        if !self.disposed.swap(true, Ordering::Relaxed) {
             self.inner.dispose().await
         } else {
             Ok(())
