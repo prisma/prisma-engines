@@ -25,7 +25,7 @@ pub(crate) fn coerce_record_with_json_relation(
             IndexedSelection::Relation(rs) => {
                 match val {
                     PrismaValue::Null if rs.field.is_list() => {
-                        *val = PrismaValue::List(vec![]);
+                        *val = PrismaValue::Null;
                     }
                     PrismaValue::Null if rs.field.is_optional() => {
                         continue;
@@ -127,7 +127,7 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
 
     if sf.type_identifier().is_json() && sf.is_list() {
         return match value {
-            serde_json::Value::Null => Ok(PrismaValue::List(vec![])),
+            serde_json::Value::Null => Ok(PrismaValue::Null),
             serde_json::Value::Array(values) => Ok(PrismaValue::List(
                 values
                     .iter()
@@ -139,13 +139,7 @@ pub(crate) fn coerce_json_scalar_to_pv(value: serde_json::Value, sf: &ScalarFiel
     }
 
     match value {
-        serde_json::Value::Null => {
-            if sf.is_list() {
-                Ok(PrismaValue::List(vec![]))
-            } else {
-                Ok(PrismaValue::Null)
-            }
-        }
+        serde_json::Value::Null => Ok(PrismaValue::Null),
         serde_json::Value::Bool(b) => Ok(PrismaValue::Boolean(b)),
         serde_json::Value::Number(n) => match sf.type_identifier() {
             TypeIdentifier::Int => Ok(PrismaValue::Int(n.as_i64().ok_or_else(|| {

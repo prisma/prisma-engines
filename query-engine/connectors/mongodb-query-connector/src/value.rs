@@ -297,7 +297,7 @@ fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<Prism
     let val = match (&meta.ident, bson) {
         // We expect a list to be returned.
         (type_identifier, bson) if meta.list => match bson {
-            Bson::Null => PrismaValue::List(Vec::new()),
+            Bson::Null => PrismaValue::Null,
 
             Bson::Array(list) => PrismaValue::List(
                 list.into_iter()
@@ -392,7 +392,7 @@ fn read_composite_value(bson: Bson, meta: &CompositeOutputMeta) -> crate::Result
     let val = if meta.list {
         match bson {
             // Coerce null to empty list (Prisma doesn't have nullable lists)
-            Bson::Null => PrismaValue::List(Vec::new()),
+            Bson::Null => PrismaValue::Null,
 
             Bson::Array(list) => PrismaValue::List(
                 list.into_iter()
