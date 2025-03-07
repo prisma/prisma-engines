@@ -302,7 +302,7 @@ impl SqlFlavour for SqliteFlavour {
             tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
             let shadow_db_conn = imp::new_shadow_db(&self.state).await?;
             let result = apply_migrations_and_describe(&shadow_db_conn, migrations).await;
-            // dispose the shadow database connection regarless of the result
+            // dispose the shadow database connection regardless of the result
             shadow_db_conn.dispose().await?;
             result
         })

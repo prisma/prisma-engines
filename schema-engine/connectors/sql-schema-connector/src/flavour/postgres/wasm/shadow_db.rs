@@ -13,7 +13,7 @@ pub async fn sql_schema_from_migration_history(
     let conn = state.new_shadow_db().await?;
 
     let schema = super::get_default_schema(state).to_owned();
-    let ret = sql_schema_from_migrations_and_db(
+    let result = sql_schema_from_migrations_and_db(
         &conn,
         &super::Params,
         schema,
@@ -23,9 +23,10 @@ pub async fn sql_schema_from_migration_history(
         state.preview_features,
     )
     .await;
+    // dispose the shadow database connection regardless of the result
     conn.dispose()
         .await
         .map_err(super::quaint_error_mapper(&super::Params))?;
 
-    ret
+    result
 }
