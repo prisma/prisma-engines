@@ -53,9 +53,12 @@ impl Default for SqliteFlavour {
 
 impl SqliteFlavour {
     #[cfg(not(feature = "sqlite-native"))]
-    pub(crate) fn new_external(adapter: std::sync::Arc<dyn quaint::connector::ExternalConnector>) -> Self {
+    pub(crate) fn new_external(
+        adapter: std::sync::Arc<dyn quaint::connector::ExternalConnector>,
+        factory: std::sync::Arc<dyn quaint::connector::ExternalConnectorFactory>,
+    ) -> Self {
         SqliteFlavour {
-            state: State::new(adapter, Default::default()),
+            state: State::new(adapter, factory, Default::default()),
         }
     }
 }
@@ -275,9 +278,10 @@ impl SqlFlavour for SqliteFlavour {
         _shadow_database_connection_string: Option<String>,
         _namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
-        Box::pin(async move {
-            tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
-            let shadow_db_conn = imp::Connection::new_in_memory();
+        async fn apply_migrations_and_describe(
+            connection: &imp::Connection,
+            migrations: &[MigrationDirectory],
+        ) -> ConnectorResult<SqlSchema> {
             for migration in migrations {
                 let script = migration.read_migration_script()?;
 
@@ -286,12 +290,21 @@ impl SqlFlavour for SqliteFlavour {
                     migration.migration_name()
                 );
 
-                shadow_db_conn.raw_cmd(&script).await.map_err(|connector_error| {
+                connection.raw_cmd(&script).await.map_err(|connector_error| {
                     connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
                 })?;
             }
 
-            describe_schema(&shadow_db_conn).await
+            describe_schema(connection).await
+        }
+
+        Box::pin(async move {
+            tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
+            let shadow_db_conn = imp::new_shadow_db(&self.state).await?;
+            let result = apply_migrations_and_describe(&shadow_db_conn, migrations).await;
+            // dispose the shadow database connection regarless of the result
+            shadow_db_conn.dispose().await?;
+            result
         })
     }
 

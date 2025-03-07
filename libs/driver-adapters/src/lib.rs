@@ -9,6 +9,7 @@
 
 pub(crate) mod conversion;
 pub(crate) mod error;
+pub(crate) mod factory;
 pub(crate) mod proxy;
 pub(crate) mod queryable;
 pub(crate) mod send_future;
@@ -45,7 +46,8 @@ impl From<DriverAdapterError> for QuaintError {
     }
 }
 
-pub use queryable::from_js;
+pub use factory::JsAdapterFactory;
+pub use queryable::{queryable_from_js, JsQueryable};
 pub(crate) use transaction::JsTransaction;
 pub use types::AdapterProvider;
 

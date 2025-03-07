@@ -1,5 +1,6 @@
+use crate::queryable::JsQueryable;
 use crate::types::JsConnectionInfo;
-pub use crate::types::{JSResultSet, Query, TransactionOptions};
+pub use crate::types::{JsResultSet, Query, TransactionOptions};
 use crate::{
     from_js_value, get_named_property, get_optional_named_property, to_rust_str, AdapterMethod, JsObject, JsResult,
     JsString, JsTransaction,
@@ -15,7 +16,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 /// to invoke the code within the node runtime that implements the client connector.
 pub(crate) struct CommonProxy {
     /// Execute a query given as SQL, interpolating the given parameters.
-    query_raw: AdapterMethod<Query, JSResultSet>,
+    query_raw: AdapterMethod<Query, JsResultSet>,
 
     /// Execute a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
@@ -25,9 +26,21 @@ pub(crate) struct CommonProxy {
     pub(crate) provider: String,
 }
 
+/// This is a JS proxy for accessing methods on the adapter factory.
+pub(crate) struct AdapterFactoryProxy {
+    /// Retrieve a queryable instance.
+    connect: AdapterMethod<(), JsQueryable>,
+
+    /// Retrieve a queryable instance for a shadow database.
+    connect_to_shadow_db: Option<AdapterMethod<(), JsQueryable>>,
+}
+
 /// This is a JS proxy for accessing the methods specific to top level
 /// JS driver objects
 pub(crate) struct DriverProxy {
+    /// Execute a script composed of multiple statements.
+    execute_script: AdapterMethod<String, ()>,
+
     /// Retrieve driver-specific info, such as the maximum number of query parameters
     get_connection_info: Option<AdapterMethod<(), JsConnectionInfo>>,
 
@@ -36,6 +49,9 @@ pub(crate) struct DriverProxy {
     /// [`driver_adapters::transaction::JsTransactionContext::start_transaction`].
     /// This was first introduced for supporting Isolation Levels in PlanetScale.
     transaction_context: AdapterMethod<(), JsTransactionContext>,
+
+    /// Dispose of the underlying driver.
+    dispose: AdapterMethod<(), ()>,
 }
 
 /// This is a JS proxy for accessing the methods specific to JS transaction contexts.
@@ -71,7 +87,7 @@ impl CommonProxy {
         })
     }
 
-    pub async fn query_raw(&self, params: Query) -> quaint::Result<JSResultSet> {
+    pub async fn query_raw(&self, params: Query) -> quaint::Result<JsResultSet> {
         self.query_raw.call_as_async(params).await
     }
 
@@ -80,13 +96,43 @@ impl CommonProxy {
     }
 }
 
+impl AdapterFactoryProxy {
+    pub fn new(object: &JsObject) -> JsResult<Self> {
+        let connect: AdapterMethod<(), JsQueryable> = get_named_property(object, "connect")?;
+        let connect_to_shadow_db: Option<AdapterMethod<(), JsQueryable>> =
+            get_optional_named_property(object, "connectToShadowDb")?;
+
+        Ok(Self {
+            connect,
+            connect_to_shadow_db,
+        })
+    }
+
+    pub async fn connect(&self) -> quaint::Result<JsQueryable> {
+        UnsafeFuture(self.connect.call_as_async(())).await
+    }
+
+    pub async fn connect_to_shadow_db(&self) -> Option<quaint::Result<JsQueryable>> {
+        match &self.connect_to_shadow_db {
+            Some(method) => Some(UnsafeFuture(method.call_as_async(())).await),
+            None => None,
+        }
+    }
+}
+
 // TypeScript: DriverAdapter
 impl DriverProxy {
     pub fn new(object: &JsObject) -> JsResult<Self> {
         Ok(Self {
+            execute_script: get_named_property(object, "executeScript")?,
             get_connection_info: get_optional_named_property(object, "getConnectionInfo")?,
             transaction_context: get_named_property(object, "transactionContext")?,
+            dispose: get_named_property(object, "dispose")?,
         })
+    }
+
+    pub async fn execute_script(&self, script: String) -> quaint::Result<()> {
+        UnsafeFuture(self.execute_script.call_as_async(script)).await
     }
 
     pub async fn get_connection_info(&self) -> quaint::Result<JsConnectionInfo> {
@@ -104,6 +150,19 @@ impl DriverProxy {
         let ctx = self.transaction_context.call_as_async(()).await?;
 
         Ok(ctx)
+    }
+
+    pub async fn dispose(&self) -> quaint::Result<()> {
+        UnsafeFuture(self.dispose.call_as_async(())).await
+    }
+}
+
+impl Drop for DriverProxy {
+    fn drop(&mut self) {
+        // Dispose is expected to be indempotent, the consumer of the interface can call it
+        // and await the result to cleanly release resources. If that does not happen, we
+        // trigger a non-blocking dispose call.
+        self.dispose.call_non_blocking(());
     }
 }
 
@@ -216,3 +275,4 @@ impl_send_sync_on_wasm!(TransactionContextProxy);
 impl_send_sync_on_wasm!(JsTransactionContext);
 impl_send_sync_on_wasm!(DriverProxy);
 impl_send_sync_on_wasm!(CommonProxy);
+impl_send_sync_on_wasm!(AdapterFactoryProxy);

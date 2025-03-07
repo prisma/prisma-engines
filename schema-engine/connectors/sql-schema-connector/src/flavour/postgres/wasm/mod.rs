@@ -5,12 +5,17 @@ pub(super) mod shadow_db;
 use crate::flavour::postgres::{Circumstances, PostgresProvider, ADVISORY_LOCK_TIMEOUT};
 use crate::{BitFlags, ConnectorParams};
 use psl::PreviewFeature;
-use quaint::connector::ExternalConnector;
+use quaint::connector::{ExternalConnector, ExternalConnectorFactory};
 use schema_connector::{ConnectorError, ConnectorResult};
 use std::sync::Arc;
 
+// TODO: we don't have a URL for the adapter, this defaults schema to "public", we might
+// want to do something more sophisticated here.
+const DEFAULT_SCHEMA: &str = "public";
+
 pub(super) struct State {
     connection: Connection,
+    factory: Arc<dyn ExternalConnectorFactory>,
     circumstances: BitFlags<Circumstances>,
     preview_features: BitFlags<PreviewFeature>,
 }
@@ -19,27 +24,40 @@ pub(super) struct Params;
 
 impl State {
     pub async fn new(
-        connection: Arc<dyn ExternalConnector>,
+        adapter: Arc<dyn ExternalConnector>,
+        factory: Arc<dyn ExternalConnectorFactory>,
         provider: PostgresProvider,
         preview_features: BitFlags<PreviewFeature>,
     ) -> ConnectorResult<Self> {
-        let connection = Connection(connection);
-        // TODO: we don't have a URL for the adapter, this defaults schema to "public", we might
-        // want to do something more sophisticated here.
-        let circumstances = super::setup_connection(&connection, &Params, provider, "public").await?;
+        let connection = Connection { adapter };
+
+        let circumstances = super::setup_connection(&connection, &Params, provider, DEFAULT_SCHEMA).await?;
         Ok(Self {
             connection,
+            factory,
             circumstances,
             preview_features,
         })
     }
+
+    pub async fn new_shadow_db(&self) -> ConnectorResult<Connection> {
+        let adapter = self
+            .factory
+            .connect_to_shadow_db()
+            .await
+            .ok_or_else(|| ConnectorError::from_msg("Invalid Postgres adapter: missing connectToShadowDb".to_owned()))?
+            .map_err(|err| quaint_error_mapper(&Params)(err).into_shadow_db_creation_error())?;
+        Ok(Connection { adapter })
+    }
 }
 
-pub(super) struct Connection(Arc<dyn ExternalConnector>);
+pub(super) struct Connection {
+    adapter: Arc<dyn ExternalConnector>,
+}
 
 impl Connection {
     pub fn as_connector(&self) -> &Arc<dyn ExternalConnector> {
-        &self.0
+        &self.adapter
     }
 
     // Query methods return quaint::Result directly to let the caller decide how to convert
@@ -47,7 +65,7 @@ impl Connection {
 
     pub async fn raw_cmd(&self, sql: &str) -> quaint::Result<()> {
         tracing::debug!(query_type = "raw_cmd", sql);
-        self.0.raw_cmd(sql).await
+        self.adapter.raw_cmd(sql).await
     }
 
     pub async fn query(&self, query: quaint::ast::Query<'_>) -> quaint::Result<quaint::prelude::ResultSet> {
@@ -62,29 +80,36 @@ impl Connection {
         params: &[quaint::prelude::Value<'_>],
     ) -> quaint::Result<quaint::prelude::ResultSet> {
         tracing::debug!(query_type = "query_raw", sql);
-        self.0.query_raw(sql, params).await
+        self.adapter.query_raw(sql, params).await
     }
 
     pub async fn version(&self) -> quaint::Result<Option<String>> {
-        self.0.version().await
+        self.adapter.version().await
     }
 
     pub async fn describe_query(&self, sql: &str) -> quaint::Result<quaint::connector::DescribedQuery> {
         tracing::debug!(query_type = "describe_query", sql);
-        self.0.describe_query(sql).await
+        self.adapter.describe_query(sql).await
     }
 
     pub async fn apply_migration_script(&self, _migration_name: &str, script: &str) -> ConnectorResult<()> {
         tracing::debug!(query_type = "apply_migration_script", script);
-        panic!("[sql-schema-connector::flavour::postgres::wasm] Not implemented");
+        self.adapter
+            .execute_script(script)
+            .await
+            .map_err(|err| ConnectorError::from_source(err, "external connector error"))
+    }
+
+    pub async fn dispose(&self) -> quaint::Result<()> {
+        self.adapter.dispose().await
     }
 }
 
-pub(super) async fn create_database(state: &State) -> ConnectorResult<String> {
+pub(super) async fn create_database(_state: &State) -> ConnectorResult<String> {
     panic!("[sql-schema-connector::flavour::postgres::wasm] Not implemented");
 }
 
-pub(super) async fn drop_database(state: &State) -> ConnectorResult<()> {
+pub(super) async fn drop_database(_state: &State) -> ConnectorResult<()> {
     panic!("[sql-schema-connector::flavour::postgres::wasm] Not implemented");
 }
 
@@ -96,8 +121,8 @@ pub(super) fn get_circumstances(state: &State) -> Option<BitFlags<Circumstances>
     Some(state.circumstances)
 }
 
-pub(super) fn get_default_schema(_params: &State) -> Option<&'static str> {
-    None
+pub(super) fn get_default_schema(_params: &State) -> &'static str {
+    DEFAULT_SCHEMA
 }
 
 pub(super) async fn get_connection_and_params_and_circumstances(

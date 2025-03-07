@@ -1,6 +1,6 @@
 use crate::proxy::{CommonProxy, DriverProxy};
 use crate::types::{AdapterProvider, Query};
-use crate::JsObject;
+use crate::{JsObject, JsResult};
 
 use super::conversion;
 use crate::send_future::UnsafeFuture;
@@ -291,10 +291,18 @@ impl std::fmt::Debug for JsQueryable {
 
 #[async_trait]
 impl ExternalConnector for JsQueryable {
+    async fn execute_script(&self, script: &str) -> quaint::Result<()> {
+        self.driver_proxy.execute_script(script.to_owned()).await
+    }
+
     async fn get_connection_info(&self) -> quaint::Result<ExternalConnectionInfo> {
         let conn_info = self.driver_proxy.get_connection_info().await?;
 
         Ok(conn_info.into_external_connection_info(&self.inner.provider))
+    }
+
+    async fn dispose(&self) -> quaint::Result<()> {
+        self.driver_proxy.dispose().await
     }
 }
 
@@ -405,12 +413,61 @@ impl TransactionCapable for JsQueryable {
     }
 }
 
-pub fn from_js(driver: JsObject) -> JsQueryable {
+pub fn queryable_from_js(driver: JsObject) -> JsQueryable {
     let common = CommonProxy::new(&driver).unwrap();
     let driver_proxy = DriverProxy::new(&driver).unwrap();
 
     JsQueryable {
         inner: JsBaseQueryable::new(common),
         driver_proxy,
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl super::wasm::FromJsValue for JsBaseQueryable {
+    fn from_js_value(value: wasm_bindgen::prelude::JsValue) -> JsResult<Self> {
+        use wasm_bindgen::JsCast;
+
+        let object = value.dyn_into::<JsObject>()?;
+        let common_proxy = CommonProxy::new(&object)?;
+        Ok(Self::new(common_proxy))
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl ::napi::bindgen_prelude::FromNapiValue for JsBaseQueryable {
+    unsafe fn from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> JsResult<Self> {
+        let object = JsObject::from_napi_value(env, napi_val)?;
+        let common_proxy = CommonProxy::new(&object)?;
+        Ok(Self::new(common_proxy))
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl super::wasm::FromJsValue for JsQueryable {
+    fn from_js_value(value: wasm_bindgen::prelude::JsValue) -> JsResult<Self> {
+        use wasm_bindgen::JsCast;
+
+        let object = value.dyn_into::<JsObject>()?;
+        let common_proxy = CommonProxy::new(&object)?;
+        let driver_proxy = DriverProxy::new(&object)?;
+        Ok(Self {
+            inner: JsBaseQueryable::new(common_proxy),
+            driver_proxy,
+        })
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl ::napi::bindgen_prelude::FromNapiValue for JsQueryable {
+    unsafe fn from_napi_value(env: napi::sys::napi_env, napi_val: napi::sys::napi_value) -> JsResult<Self> {
+        let object = JsObject::from_napi_value(env, napi_val)?;
+        let common_proxy = CommonProxy::new(&object)?;
+        let driver_proxy = DriverProxy::new(&object)?;
+
+        Ok(Self {
+            inner: JsBaseQueryable::new(common_proxy),
+            driver_proxy,
+        })
     }
 }
