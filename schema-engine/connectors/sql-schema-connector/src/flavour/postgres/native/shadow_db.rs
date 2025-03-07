@@ -117,6 +117,8 @@ pub async fn sql_schema_from_migration_history(
                     )
                 })
                 .await;
+            // if we don't drop the database, subsequent DROP DATABASE commands will fail
+            drop(shadow_database);
 
             if is_vanilla_postgres {
                 drop_db_try_force(main_connection, &shadow_database_name)

@@ -401,6 +401,10 @@ impl JsQueryable {
 
         Ok(tx)
     }
+
+    pub fn dispose_non_blocking(&self) {
+        self.driver_proxy.dispose_non_blocking();
+    }
 }
 
 #[async_trait]

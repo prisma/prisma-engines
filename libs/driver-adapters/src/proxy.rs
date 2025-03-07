@@ -155,13 +155,8 @@ impl DriverProxy {
     pub async fn dispose(&self) -> quaint::Result<()> {
         UnsafeFuture(self.dispose.call_as_async(())).await
     }
-}
 
-impl Drop for DriverProxy {
-    fn drop(&mut self) {
-        // Dispose is expected to be indempotent, the consumer of the interface can call it
-        // and await the result to cleanly release resources. If that does not happen, we
-        // trigger a non-blocking dispose call.
+    pub fn dispose_non_blocking(&self) {
         self.dispose.call_non_blocking(());
     }
 }
