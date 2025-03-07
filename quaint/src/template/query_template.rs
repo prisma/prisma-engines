@@ -1,4 +1,5 @@
 use std::fmt::Debug;
+use serde::Serialize;
 use crate::ast::Value;
 
 #[derive(Debug)]
@@ -8,7 +9,7 @@ pub struct QueryTemplate<'a> {
     pub placeholder: Placeholder,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum Fragment {
     StringChunk(String),
     Parameter,

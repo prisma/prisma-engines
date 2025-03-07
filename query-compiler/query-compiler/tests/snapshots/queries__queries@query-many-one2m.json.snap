@@ -12,8 +12,7 @@ let @parent = query «SELECT "public"."Post"."id", "public"."Post"."title",
 in let @parent$userId = mapField userId (get @parent)
    in join (get @parent)
       with (unique (query «SELECT "public"."User"."id", "public"."User"."email"
-                           FROM "public"."User" WHERE "public"."User"."id" IN /*
-                           prisma-comma-repeatable-start */$1/*
-                           prisma-comma-repeatable-end */ LIMIT $2 OFFSET $3»
+                           FROM "public"."User" WHERE "public"."User"."id" IN
+                           [$1] LIMIT $2 OFFSET $3»
                     params [var(@parent$userId as Int), const(BigInt(1)),
                             const(BigInt(0))])) on left.(userId) = right.(id) as user

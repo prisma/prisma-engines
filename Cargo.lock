@@ -3767,6 +3767,7 @@ dependencies = [
 name = "query-builder"
 version = "0.1.0"
 dependencies = [
+ "quaint",
  "query-structure",
  "serde",
 ]
