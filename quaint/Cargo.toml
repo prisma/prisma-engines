@@ -137,7 +137,14 @@ optional = true
 [target.'cfg(not(any(target_os = "macos", target_os = "ios")))'.dependencies.tiberius]
 workspace = true
 optional = true
-features = ["sql-browser-tokio", "chrono", "tds73", "bigdecimal"]
+features = [
+  "sql-browser-tokio",
+  "chrono",
+  "tds73",
+  "bigdecimal",
+  "native-tls",
+  "winauth",
+]
 
 [target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies.tiberius]
 workspace = true
