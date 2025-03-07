@@ -1041,7 +1041,7 @@ dependencies = [
  "base64 0.22.1",
  "expect-test",
  "indoc",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "psl",
  "regex",
 ]
@@ -1142,7 +1142,7 @@ dependencies = [
  "flate2",
  "indexmap 2.2.2",
  "indoc",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "pretty_assertions",
  "psl",
  "query-structure",
@@ -2190,9 +2190,9 @@ dependencies = [
 
 [[package]]
 name = "itertools"
-version = "0.12.0"
+version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "25db6b064527c5d482d0423354fcd07a89a2dfe07b67892e62411946db7f07b0"
+checksum = "ba291022dbbd398a455acf126c1e341954079855bc60dfdda641363bd6922569"
 dependencies = [
  "either",
 ]
@@ -2691,7 +2691,7 @@ dependencies = [
  "derive_more",
  "futures",
  "indexmap 2.2.2",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "mongodb",
  "mongodb-client",
  "pretty_assertions",
@@ -2725,7 +2725,7 @@ dependencies = [
  "expect-test",
  "futures",
  "indoc",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "mongodb",
  "mongodb-client",
  "mongodb-schema-describer",
@@ -3213,7 +3213,7 @@ dependencies = [
  "either",
  "enumflags2",
  "indexmap 2.2.2",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "rustc-hash",
  "schema-ast",
 ]
@@ -3620,7 +3620,7 @@ dependencies = [
  "enumflags2",
  "hex",
  "indoc",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "lsp-types",
  "parser-database",
  "prisma-value",
@@ -3692,7 +3692,7 @@ dependencies = [
  "getrandom 0.2.11",
  "hex",
  "indoc",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "lru-cache",
  "mobc",
  "mysql_async",
@@ -3776,7 +3776,7 @@ name = "query-compiler"
 version = "0.1.0"
 dependencies = [
  "insta",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "pretty",
  "psl",
  "quaint",
@@ -3837,7 +3837,7 @@ dependencies = [
  "chrono",
  "futures",
  "indexmap 2.2.2",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "prisma-value",
  "query-structure",
  "serde",
@@ -3863,7 +3863,7 @@ dependencies = [
  "enumflags2",
  "futures",
  "indexmap 2.2.2",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "lru 0.7.8",
  "petgraph",
  "prisma-metrics",
@@ -4029,7 +4029,7 @@ dependencies = [
  "futures",
  "indoc",
  "insta",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "paste",
  "prisma-metrics",
  "prisma-value",
@@ -4090,7 +4090,7 @@ dependencies = [
  "cuid",
  "getrandom 0.2.11",
  "indexmap 2.2.2",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "nanoid",
  "prisma-value",
  "psl",
@@ -4122,7 +4122,7 @@ dependencies = [
  "indexmap 2.2.2",
  "indoc",
  "insta",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "jsonrpc-core",
  "log",
  "nom",
@@ -4424,7 +4424,7 @@ dependencies = [
  "graphql-parser",
  "indexmap 2.2.2",
  "insta",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "mongodb-query-connector",
  "prisma-value",
  "psl",
@@ -5170,7 +5170,7 @@ dependencies = [
  "enumflags2",
  "expect-test",
  "indoc",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "pretty_assertions",
  "psl",
  "quaint",
@@ -5224,7 +5224,7 @@ version = "0.1.0"
 dependencies = [
  "bigdecimal",
  "chrono",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "prisma-value",
  "psl",
  "quaint",
@@ -5247,7 +5247,7 @@ dependencies = [
  "cuid",
  "expect-test",
  "futures",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "panic-utils",
  "prisma-value",
  "psl",
@@ -5334,7 +5334,7 @@ version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ce81b7bd7c4493975347ef60d8c7e8b742d4694f4c49f93e0a12ea263938176c"
 dependencies = [
- "itertools 0.12.0",
+ "itertools 0.12.1",
  "nom",
  "unicode_categories",
 ]
@@ -6217,7 +6217,7 @@ name = "user-facing-errors"
 version = "0.1.0"
 dependencies = [
  "indoc",
- "itertools 0.12.0",
+ "itertools 0.13.0",
  "panic-utils",
  "quaint",
  "serde",
