@@ -590,6 +590,8 @@ async fn prisma_1_0_relations(api: &mut TestApi) -> TestResult {
 
 #[test_connector(exclude(Mysql, Sqlite, Mssql))]
 async fn relations_should_avoid_name_clashes(api: &mut TestApi) -> TestResult {
+    api.normalise_int_type().await?;
+
     api.barrel()
         .execute(|migration| {
             migration.create_table("y", |t| {
