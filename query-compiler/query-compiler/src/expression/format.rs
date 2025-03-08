@@ -1,6 +1,6 @@
 use pretty::{
-    termcolor::{Color, ColorSpec},
     DocAllocator, DocBuilder,
+    termcolor::{Color, ColorSpec},
 };
 use query_structure::PrismaValue;
 
