@@ -271,7 +271,13 @@ async fn transaction_start_handler(cx: Arc<PrismaContext>, req: Request<Body>) -
     let full_body = hyper::body::to_bytes(body_start).await?;
 
     let tx_opts = match serde_json::from_slice::<TransactionOptions>(full_body.as_ref()) {
-        Ok(opts) => opts.with_new_transaction_id(),
+        Ok(opts) => {
+            if opts.new_tx_id.is_none() {
+                opts.with_new_transaction_id()
+            } else {
+                opts
+            }
+        }
         Err(_) => {
             return Ok(Response::builder()
                 .status(StatusCode::BAD_REQUEST)
