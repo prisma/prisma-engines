@@ -1,7 +1,7 @@
 use crate::{
+    TranslateError,
     expression::{Binding, Expression, JoinExpression},
     translate::TranslateResult,
-    TranslateError,
 };
 use itertools::Itertools;
 use query_builder::{QueryArgumentsExt, QueryBuilder, RelationLink};

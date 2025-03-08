@@ -4,7 +4,7 @@ use quaint::{
     prelude::{ConnectionInfo, ExternalConnectionInfo, SqlFamily},
     visitor::Postgres,
 };
-use query_core::{query_graph_builder::QueryGraphBuilder, QueryDocument, QueryGraph, ToGraphviz};
+use query_core::{QueryDocument, QueryGraph, ToGraphviz, query_graph_builder::QueryGraphBuilder};
 use request_handlers::{JsonBody, JsonSingleQuery, RequestBody};
 use serde_json::json;
 use sql_query_builder::{Context, SqlQueryBuilder};

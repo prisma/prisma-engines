@@ -8,10 +8,10 @@ use quaint::{
     prelude::{ConnectionInfo, SqlFamily},
     visitor,
 };
-use query_core::{schema::QuerySchema, QueryGraphBuilderError};
+use query_core::{QueryGraphBuilderError, schema::QuerySchema};
 use sql_query_builder::{Context, SqlQueryBuilder};
 use thiserror::Error;
-pub use translate::{translate, TranslateError};
+pub use translate::{TranslateError, translate};
 
 use query_core::{QueryDocument, QueryGraphBuilder};
 
