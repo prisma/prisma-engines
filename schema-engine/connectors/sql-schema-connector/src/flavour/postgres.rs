@@ -138,10 +138,11 @@ impl PostgresFlavour {
     #[cfg(not(feature = "postgresql-native"))]
     pub(crate) async fn new_external(
         adapter: std::sync::Arc<dyn quaint::connector::ExternalConnector>,
+        factory: std::sync::Arc<dyn quaint::connector::ExternalConnectorFactory>,
     ) -> ConnectorResult<Self> {
-        let provider = PostgresProvider::PostgreSql;
+        let provider = PostgresProvider::Unspecified;
         Ok(PostgresFlavour {
-            state: State::new(adapter, provider, Default::default()).await?,
+            state: State::new(adapter, factory, provider, Default::default()).await?,
             provider,
         })
     }
@@ -182,7 +183,7 @@ impl PostgresFlavour {
     }
 
     fn schema_name(&self) -> &str {
-        imp::get_default_schema(&self.state).unwrap_or("public")
+        imp::get_default_schema(&self.state)
     }
 
     fn with_connection<'a, F, O, C>(&'a mut self, f: C) -> BoxFuture<'a, ConnectorResult<O>>
@@ -495,6 +496,49 @@ async fn describe_schema_with(
     normalize_sql_schema(&mut schema, preview_features);
 
     Ok(schema)
+}
+
+async fn sql_schema_from_migrations_and_db(
+    conn: &imp::Connection,
+    params: &imp::Params,
+    schema: String,
+    migrations: &[MigrationDirectory],
+    namespaces: Option<Namespaces>,
+    circumstances: BitFlags<Circumstances>,
+    preview_features: BitFlags<PreviewFeature>,
+) -> ConnectorResult<SqlSchema> {
+    if circumstances.contains(Circumstances::IsCockroachDb) {
+        // CockroachDB is very slow in applying DDL statements.
+        // A workaround to it is to run the statements in a transaction block. This comes with some
+        // drawbacks and limitations though, so we only apply this when creating a shadow db.
+        // See https://www.cockroachlabs.com/docs/stable/online-schema-changes#limitations
+        // Original GitHub issue with context: https://github.com/prisma/prisma/issues/12384#issuecomment-1152523689
+        conn.raw_cmd("BEGIN;").await.map_err(imp::quaint_error_mapper(params))?;
+    }
+
+    for migration in migrations {
+        let script = migration.read_migration_script()?;
+
+        tracing::debug!(
+            "Applying migration `{}` to shadow database.",
+            migration.migration_name()
+        );
+
+        conn.raw_cmd(&script)
+            .await
+            .map_err(imp::quaint_error_mapper(params))
+            .map_err(|connector_error| {
+                connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
+            })?;
+    }
+
+    if circumstances.contains(Circumstances::IsCockroachDb) {
+        conn.raw_cmd("COMMIT;")
+            .await
+            .map_err(imp::quaint_error_mapper(params))?;
+    }
+
+    describe_schema_with(conn, params, circumstances, preview_features, namespaces, schema).await
 }
 
 #[enumflags2::bitflags]

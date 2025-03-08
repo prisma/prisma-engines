@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 use std::str::FromStr;
 
-pub use crate::types::{ColumnType, JSResultSet};
+pub use crate::types::{ColumnType, JsResultSet};
 use quaint::bigdecimal::BigDecimal;
 use quaint::chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 use quaint::{
@@ -10,11 +10,11 @@ use quaint::{
     Value as QuaintValue,
 };
 
-impl TryFrom<JSResultSet> for QuaintResultSet {
+impl TryFrom<JsResultSet> for QuaintResultSet {
     type Error = quaint::error::Error;
 
-    fn try_from(js_result_set: JSResultSet) -> Result<Self, Self::Error> {
-        let JSResultSet {
+    fn try_from(js_result_set: JsResultSet) -> Result<Self, Self::Error> {
+        let JsResultSet {
             rows,
             column_names,
             column_types,

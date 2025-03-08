@@ -269,8 +269,8 @@ pub(super) fn get_circumstances(state: &State) -> Option<BitFlags<Circumstances>
     }
 }
 
-pub(super) fn get_default_schema(state: &State) -> Option<&str> {
-    state.params().map(|params| params.url.schema())
+pub(super) fn get_default_schema(state: &State) -> &str {
+    state.get_unwrapped_params().url.schema()
 }
 
 pub(super) async fn get_connection_and_params_and_circumstances(
