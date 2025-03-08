@@ -34,6 +34,7 @@ pub(crate) fn create_statements(
         add_columns: Vec::new(),
         drop_columns: Vec::new(),
         column_mods: Vec::new(),
+        rename_table: false,
     };
 
     constructor.into_statements()
@@ -49,12 +50,16 @@ struct AlterTableConstructor<'a> {
     add_columns: Vec<String>,
     drop_columns: Vec<String>,
     column_mods: Vec<String>,
+    rename_table: bool,
 }
 
 impl AlterTableConstructor<'_> {
     fn into_statements(mut self) -> Vec<String> {
         for change in self.changes {
             match change {
+                TableChange::RenameTo => {
+                    self.rename_table = true;
+                }
                 TableChange::DropPrimaryKey => {
                     self.drop_primary_key();
                 }
@@ -139,6 +144,23 @@ impl AlterTableConstructor<'_> {
                 "ALTER TABLE {} ADD {}",
                 self.renderer.table_name(self.tables.previous),
                 self.add_columns.join(",\n"),
+            ));
+        }
+
+        if self.rename_table {
+            let with_schema = format!(
+                "{}.{}",
+                self.tables
+                    .previous
+                    .namespace()
+                    .unwrap_or_else(|| self.renderer.schema_name()),
+                self.tables.previous.name()
+            );
+
+            statements.push(format!(
+                "EXEC SP_RENAME N{}, N{}",
+                Quoted::mssql_string(with_schema),
+                Quoted::mssql_string(self.tables.next.name()),
             ));
         }
 
