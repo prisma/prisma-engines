@@ -1,4 +1,5 @@
 use crate::{error::PrismaError, PrismaResult};
+use base64::prelude::*;
 use psl::{parser_database::Files, SourceFile};
 use query_core::protocol::EngineProtocol;
 use serde::Deserialize;
@@ -235,7 +236,7 @@ impl PrismaOpt {
 }
 
 fn parse_base64_string(s: &str) -> PrismaResult<String> {
-    match base64::decode(s) {
+    match BASE64_STANDARD.decode(s) {
         Ok(bytes) => String::from_utf8(bytes).map_err(|e| {
             trace!("Error decoding {} from Base64 (invalid UTF-8): {:?}", s, e);
 

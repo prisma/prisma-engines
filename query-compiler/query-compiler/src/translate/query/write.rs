@@ -5,7 +5,7 @@ use query_core::{
 };
 use query_structure::QueryArguments;
 
-use crate::{expression::Expression, translate::TranslateResult, TranslateError};
+use crate::{TranslateError, expression::Expression, translate::TranslateResult};
 
 pub(crate) fn translate_write_query(query: WriteQuery, builder: &dyn QueryBuilder) -> TranslateResult<Expression> {
     Ok(match query {

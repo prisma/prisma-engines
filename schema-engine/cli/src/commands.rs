@@ -1,4 +1,5 @@
 use crate::logger::log_error_and_exit;
+use base64::prelude::*;
 use schema_connector::ConnectorError;
 use schema_core::json_rpc::types::{DatasourceParam, UrlContainer};
 use structopt::StructOpt;
@@ -65,7 +66,7 @@ enum CliCommand {
 }
 
 fn parse_base64_string(s: &str) -> Result<String, ConnectorError> {
-    match base64::decode(s) {
+    match BASE64_STANDARD.decode(s) {
         Ok(bytes) => match String::from_utf8(bytes) {
             Ok(s) => Ok(s),
             Err(e) => Err(ConnectorError::user_facing(SchemaParserError {

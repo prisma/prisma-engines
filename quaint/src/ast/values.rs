@@ -1,6 +1,7 @@
 use crate::ast::*;
 use crate::error::{Error, ErrorKind};
 
+use base64::prelude::*;
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 
@@ -707,7 +708,7 @@ impl<'a> From<ValueType<'a>> for serde_json::Value {
                 None => serde_json::Value::Null,
             }),
             ValueType::Text(cow) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
-            ValueType::Bytes(bytes) => bytes.map(|bytes| serde_json::Value::String(base64::encode(bytes))),
+            ValueType::Bytes(bytes) => bytes.map(|bytes| serde_json::Value::String(BASE64_STANDARD.encode(bytes))),
             ValueType::Enum(cow, _) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
             ValueType::EnumArray(values, _) => values.map(|values| {
                 serde_json::Value::Array(
