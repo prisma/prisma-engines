@@ -171,9 +171,7 @@ When trying to debug code, here's a few things that might be useful:
     can make things a lot easier,
 - add `dbg!()` statements to validate code paths, inspect variables, etc.,
 - you can control the amount of logs you see, and where they come from using the
-    `RUST_LOG` environment variable; see [the documentation](https://docs.rs/env_logger/0.9.1/env_logger/#enabling-logging),
-- you can use the `test-cli` to test migration and introspection without having
-    to go through the `prisma` npm package.
+    `RUST_LOG` environment variable; see [the documentation](https://docs.rs/env_logger/0.9.1/env_logger/#enabling-logging)
 
 ## Testing
 
