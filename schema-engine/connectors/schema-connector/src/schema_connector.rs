@@ -4,8 +4,8 @@ use enumflags2::BitFlags;
 use psl::ValidatedSchema;
 
 use crate::{
-    migrations_directory::MigrationDirectory, BoxFuture, ConnectorHost, ConnectorParams, ConnectorResult,
-    DatabaseSchema, DestructiveChangeChecker, DestructiveChangeDiagnostics, DiffTarget, IntrospectSqlQueryInput,
+    migrations_directory::MigrationDirectory, BoxFuture, ConnectorHost, ConnectorResult, DatabaseSchema,
+    DestructiveChangeChecker, DestructiveChangeDiagnostics, DiffTarget, IntrospectSqlQueryInput,
     IntrospectSqlQueryOutput, IntrospectionContext, IntrospectionResult, Migration, MigrationPersistence, Namespaces,
 };
 
@@ -16,10 +16,6 @@ pub trait SchemaConnector: Send + Sync + 'static {
 
     /// Accept a new ConnectorHost.
     fn set_host(&mut self, host: Arc<dyn ConnectorHost>);
-
-    /// Accept and validate new ConnectorParams. This should fail if it is called twice on the same
-    /// connector.
-    fn set_params(&mut self, params: ConnectorParams) -> ConnectorResult<()>;
 
     /// Accept a new set of enabled preview features.
     fn set_preview_features(&mut self, preview_features: BitFlags<psl::PreviewFeature>);
@@ -39,9 +35,6 @@ pub trait SchemaConnector: Send + Sync + 'static {
     /// A string that should identify what database backend is being used. Note that this is not necessarily
     /// the connector name. The SQL connector for example can return "postgresql", "mysql" or "sqlite".
     fn connector_type(&self) -> &'static str;
-
-    /// Return the connection string that was used to initialize this connector in set_params().
-    fn connection_string(&self) -> Option<&str>;
 
     /// Create the database referenced by Prisma schema that was used to initialize the connector.
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>>;

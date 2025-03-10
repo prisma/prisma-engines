@@ -88,10 +88,6 @@ pub(super) async fn drop_database(state: &State) -> ConnectorResult<()> {
     panic!("[sql-schema-connector::flavour::postgres::wasm] Not implemented");
 }
 
-pub(super) fn get_connection_string(_state: &State) -> Option<&str> {
-    panic!("[sql-schema-connector::flavour::postgres::wasm] Not implemented");
-}
-
 pub(super) fn get_circumstances(state: &State) -> Option<BitFlags<Circumstances>> {
     Some(state.circumstances)
 }
@@ -112,10 +108,6 @@ pub(super) async fn get_connection_and_params(
     _provider: PostgresProvider,
 ) -> ConnectorResult<(&Connection, &Params)> {
     Ok((&state.connection, &Params))
-}
-
-pub(super) fn set_params(_state: &mut State, _params: ConnectorParams) -> ConnectorResult<()> {
-    panic!("[sql-schema-connector::flavour::postgres::wasm] Not implemented");
 }
 
 pub(super) fn get_preview_features(state: &State) -> BitFlags<PreviewFeature> {

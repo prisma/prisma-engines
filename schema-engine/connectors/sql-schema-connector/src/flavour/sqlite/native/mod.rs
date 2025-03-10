@@ -11,13 +11,30 @@ use std::sync::Mutex;
 use user_facing_errors::schema_engine::ApplyMigrationError;
 
 pub(super) type State = crate::flavour::State<Params, Connection>;
-pub(super) type Params = super::Params;
+
+pub(super) struct Params {
+    connector_params: ConnectorParams,
+    file_path: String,
+}
+
+impl Params {
+    pub fn new(connector_params: ConnectorParams) -> ConnectorResult<Self> {
+        let quaint::connector::SqliteParams { file_path, .. } =
+            quaint::connector::SqliteParams::try_from(connector_params.connection_string.as_str())
+                .map_err(ConnectorError::url_parse_error)?;
+
+        Ok(Self {
+            connector_params,
+            file_path,
+        })
+    }
+}
 
 pub(super) struct Connection(Mutex<rusqlite::Connection>);
 
 impl Connection {
-    pub fn new(params: &super::Params) -> ConnectorResult<Self> {
-        Ok(Connection(Mutex::new(
+    pub fn new(params: &Params) -> ConnectorResult<Self> {
+        Ok(Self(Mutex::new(
             rusqlite::Connection::open(&params.file_path).map_err(convert_error)?,
         )))
     }
@@ -27,7 +44,7 @@ impl Connection {
     }
 
     pub fn new_in_memory() -> Self {
-        Connection(Mutex::new(rusqlite::Connection::open_in_memory().unwrap()))
+        Self(Mutex::new(rusqlite::Connection::open_in_memory().unwrap()))
     }
 
     pub async fn raw_cmd(&self, sql: &str) -> ConnectorResult<()> {
@@ -228,12 +245,6 @@ pub(super) async fn introspect(state: &mut State) -> ConnectorResult<SqlSchema> 
     super::describe_schema(get_connection_and_params(state)?.0).await
 }
 
-pub(super) fn get_connection_string(state: &State) -> Option<&str> {
-    state
-        .params()
-        .map(|params| params.connector_params.connection_string.as_str())
-}
-
 pub(super) fn get_connection_and_params(state: &mut State) -> ConnectorResult<(&mut Connection, &mut Params)> {
     match state {
         super::State::Initial => panic!("logic error: Initial"),
@@ -248,18 +259,6 @@ pub(super) fn get_connection_and_params(state: &mut State) -> ConnectorResult<(&
             get_connection_and_params(state)
         }
     }
-}
-
-pub(super) fn set_params(state: &mut State, params: ConnectorParams) -> ConnectorResult<()> {
-    let quaint::connector::SqliteParams { file_path, .. } =
-        quaint::connector::SqliteParams::try_from(params.connection_string.as_str())
-            .map_err(ConnectorError::url_parse_error)?;
-
-    state.set_params(Params {
-        connector_params: params,
-        file_path,
-    });
-    Ok(())
 }
 
 pub(super) fn set_preview_features(state: &mut State, preview_features: enumflags2::BitFlags<psl::PreviewFeature>) {

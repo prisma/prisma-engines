@@ -1,7 +1,7 @@
 use std::sync::OnceLock;
 
 use quaint::{connector::PostgresFlavour, prelude::*, single::Quaint};
-use schema_core::schema_connector::{ConnectorError, ConnectorResult};
+use schema_core::schema_connector::{ConnectorError, ConnectorParams, ConnectorResult};
 use url::Url;
 
 pub(crate) async fn cockroach_setup(url: String, prisma_schema: &str) -> ConnectorResult<()> {
@@ -22,8 +22,9 @@ pub(crate) async fn cockroach_setup(url: String, prisma_schema: &str) -> Connect
     conn.raw_cmd(&query).await.unwrap();
 
     drop_db_when_thread_exits(parsed_url, db_name);
-    let mut connector = sql_schema_connector::SqlSchemaConnector::new_cockroach();
-    crate::diff_and_apply(prisma_schema, url, &mut connector).await
+    let params = ConnectorParams::new(url, Default::default(), None);
+    let mut connector = sql_schema_connector::SqlSchemaConnector::new_cockroach(params)?;
+    crate::diff_and_apply(prisma_schema, &mut connector).await
 }
 
 async fn create_admin_conn(url: &mut Url) -> ConnectorResult<Quaint> {
