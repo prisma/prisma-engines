@@ -5617,27 +5617,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "test-cli"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "build-utils",
- "colored 3.0.0",
- "dmmf",
- "enumflags2",
- "psl",
- "schema-connector",
- "schema-core",
- "serde_json",
- "structopt",
- "tokio",
- "tracing",
- "tracing-error",
- "tracing-subscriber",
-]
-
-[[package]]
 name = "test-macros"
 version = "0.1.0"
 dependencies = [

@@ -456,10 +456,6 @@ ensure-prisma-present:
 		git clone --depth=1 https://github.com/prisma/prisma.git --branch=$(DRIVER_ADAPTERS_BRANCH) "../prisma" && echo "Prisma repository has been cloned to ../prisma"; \
 	fi;
 
-# Quick schema validation of whatever you have in the dev_datamodel.prisma file.
-validate:
-	cargo run --bin test-cli -- validate-datamodel dev_datamodel.prisma
-
 qe:
 	cargo run --bin query-engine -- --engine-protocol json --enable-raw-queries --enable-metrics --enable-open-telemetry --enable-telemetry-in-response
 
@@ -468,17 +464,6 @@ qe-graphql:
 
 qe-dmmf:
 	cargo run --bin query-engine -- cli dmmf > dmmf.json
-
-push-schema:
-	cargo run --bin test-cli -- schema-push $(DEV_SCHEMA_FILE) --force
-
-qe-dev-chinook-sqlite:
-	cp $(SCHEMA_EXAMPLES_PATH)/chinook_sqlite.prisma $(DEV_SCHEMA_FILE)
-
-qe-dev-chinook-postgres10: start-postgres10
-	cp $(SCHEMA_EXAMPLES_PATH)/chinook_postgres10.prisma $(DEV_SCHEMA_FILE)
-	sleep 5
-	make push-schema
 
 qe-dev-mongo_4_4: start-mongodb_4_4
 	cp $(SCHEMA_EXAMPLES_PATH)/generic_mongo4.prisma $(DEV_SCHEMA_FILE)
