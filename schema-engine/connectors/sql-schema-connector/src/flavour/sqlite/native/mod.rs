@@ -12,7 +12,7 @@ use user_facing_errors::schema_engine::ApplyMigrationError;
 
 pub(super) type State = crate::flavour::State<Params, Connection>;
 
-pub struct Params {
+pub(super) struct Params {
     connector_params: ConnectorParams,
     file_path: String,
 }
@@ -33,8 +33,8 @@ impl Params {
 pub(super) struct Connection(Mutex<rusqlite::Connection>);
 
 impl Connection {
-    pub fn new(params: &super::Params) -> ConnectorResult<Self> {
-        Ok(Connection(Mutex::new(
+    pub fn new(params: &Params) -> ConnectorResult<Self> {
+        Ok(Self(Mutex::new(
             rusqlite::Connection::open(&params.file_path).map_err(convert_error)?,
         )))
     }
@@ -44,7 +44,7 @@ impl Connection {
     }
 
     pub fn new_in_memory() -> Self {
-        Connection(Mutex::new(rusqlite::Connection::open_in_memory().unwrap()))
+        Self(Mutex::new(rusqlite::Connection::open_in_memory().unwrap()))
     }
 
     pub async fn raw_cmd(&self, sql: &str) -> ConnectorResult<()> {

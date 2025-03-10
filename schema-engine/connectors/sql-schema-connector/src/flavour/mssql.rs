@@ -22,14 +22,13 @@ use std::{future, str::FromStr};
 
 type State = super::State<Params, Connection>;
 
-#[derive(Clone)]
-pub(crate) struct Params {
-    pub(crate) connector_params: ConnectorParams,
-    pub(crate) url: MssqlUrl,
+struct Params {
+    connector_params: ConnectorParams,
+    url: MssqlUrl,
 }
 
 impl Params {
-    pub(crate) fn new(connector_params: ConnectorParams) -> ConnectorResult<Self> {
+    fn new(connector_params: ConnectorParams) -> ConnectorResult<Self> {
         let url = MssqlUrl::new(&connector_params.connection_string).map_err(ConnectorError::url_parse_error)?;
         Ok(Self { connector_params, url })
     }
@@ -45,7 +44,7 @@ pub(crate) struct MssqlFlavour {
 
 impl Default for MssqlFlavour {
     fn default() -> Self {
-        MssqlFlavour { state: State::Initial }
+        Self { state: State::Initial }
     }
 }
 
@@ -57,7 +56,7 @@ impl std::fmt::Debug for MssqlFlavour {
 
 impl MssqlFlavour {
     pub fn new_with_params(params: ConnectorParams) -> ConnectorResult<Self> {
-        Ok(MssqlFlavour {
+        Ok(Self {
             state: State::WithParams(Params::new(params)?),
         })
     }

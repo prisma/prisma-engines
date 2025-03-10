@@ -15,7 +15,6 @@ pub(super) struct State {
     preview_features: BitFlags<PreviewFeature>,
 }
 
-#[derive(Default)]
 pub(super) struct Params;
 
 impl State {

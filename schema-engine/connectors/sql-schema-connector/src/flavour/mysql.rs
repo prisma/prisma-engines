@@ -29,14 +29,13 @@ static QUALIFIED_NAME_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"`[^ ]+
 
 type State = super::State<Params, (BitFlags<Circumstances>, Connection)>;
 
-#[derive(Clone)]
-pub struct Params {
+struct Params {
     connector_params: ConnectorParams,
     url: MysqlUrl,
 }
 
 impl Params {
-    pub(crate) fn new(connector_params: ConnectorParams) -> ConnectorResult<Self> {
+    fn new(connector_params: ConnectorParams) -> ConnectorResult<Self> {
         let url = connector_params
             .connection_string
             .parse()
@@ -52,7 +51,7 @@ pub(crate) struct MysqlFlavour {
 
 impl Default for MysqlFlavour {
     fn default() -> Self {
-        MysqlFlavour { state: State::Initial }
+        Self { state: State::Initial }
     }
 }
 

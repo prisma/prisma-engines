@@ -42,7 +42,6 @@ SET enable_experimental_alter_column_type_general = true;
 "#;
 
 type State = imp::State;
-pub type Params = imp::Params;
 
 #[derive(Debug, Clone)]
 struct MigratePostgresUrl(PostgresUrl);
@@ -160,24 +159,24 @@ impl PostgresFlavour {
 
     #[cfg(feature = "postgresql-native")]
     pub(crate) fn new_postgres(params: schema_connector::ConnectorParams) -> ConnectorResult<Self> {
-        Ok(PostgresFlavour {
-            state: State::WithParams(Params::new(params)?),
+        Ok(Self {
+            state: State::WithParams(imp::Params::new(params)?),
             provider: PostgresProvider::PostgreSql,
         })
     }
 
     #[cfg(feature = "postgresql-native")]
     pub(crate) fn new_cockroach(params: schema_connector::ConnectorParams) -> ConnectorResult<Self> {
-        Ok(PostgresFlavour {
-            state: State::WithParams(Params::new(params)?),
+        Ok(Self {
+            state: State::WithParams(imp::Params::new(params)?),
             provider: PostgresProvider::CockroachDb,
         })
     }
 
     #[cfg(feature = "postgresql-native")]
     pub(crate) fn new_with_params(params: schema_connector::ConnectorParams) -> ConnectorResult<Self> {
-        Ok(PostgresFlavour {
-            state: State::WithParams(Params::new(params)?),
+        Ok(Self {
+            state: State::WithParams(imp::Params::new(params)?),
             provider: PostgresProvider::Unspecified,
         })
     }

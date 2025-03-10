@@ -20,7 +20,6 @@ use schema_connector::{
 use sql_schema_describer::{sqlite::SqlSchemaDescriber, DescriberErrorKind, SqlSchema};
 
 type State = imp::State;
-pub type Params = imp::Params;
 
 pub(crate) struct SqliteFlavour {
     state: State,
@@ -43,22 +42,22 @@ impl SqliteFlavour {
 #[cfg(feature = "sqlite-native")]
 impl Default for SqliteFlavour {
     fn default() -> Self {
-        SqliteFlavour { state: State::Initial }
+        Self { state: State::Initial }
     }
 }
 
 impl SqliteFlavour {
     #[cfg(not(feature = "sqlite-native"))]
     pub(crate) fn new_external(adapter: std::sync::Arc<dyn quaint::connector::ExternalConnector>) -> Self {
-        SqliteFlavour {
+        Self {
             state: State::new(adapter, Default::default()),
         }
     }
 
     #[cfg(feature = "sqlite-native")]
     pub fn new_with_params(params: schema_connector::ConnectorParams) -> ConnectorResult<Self> {
-        Ok(SqliteFlavour {
-            state: State::WithParams(Params::new(params)?),
+        Ok(Self {
+            state: State::WithParams(imp::Params::new(params)?),
         })
     }
 }

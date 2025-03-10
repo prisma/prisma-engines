@@ -26,13 +26,13 @@ use super::{Circumstances, MigratePostgresUrl, PostgresProvider, ADVISORY_LOCK_T
 pub(super) type State = crate::flavour::State<Params, (BitFlags<Circumstances>, Connection)>;
 
 #[derive(Debug, Clone)]
-pub struct Params {
+pub(super) struct Params {
     connector_params: ConnectorParams,
     url: MigratePostgresUrl,
 }
 
 impl Params {
-    pub(crate) fn new(connector_params: ConnectorParams) -> ConnectorResult<Self> {
+    pub fn new(connector_params: ConnectorParams) -> ConnectorResult<Self> {
         let mut url: Url = connector_params
             .connection_string
             .parse()
@@ -99,7 +99,7 @@ impl Connection {
             };
         }
 
-        Ok(Connection(quaint))
+        Ok(Self(quaint))
     }
 
     pub fn as_connector(&self) -> &connector::PostgreSqlWithNoCache {
