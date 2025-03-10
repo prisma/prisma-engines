@@ -50,8 +50,7 @@ impl TestApi {
                 preview_features,
                 shadow_database_connection_string: args.shadow_database_url().map(String::from),
             };
-            let mut conn = SqlSchemaConnector::new_mysql();
-            conn.set_params(params).unwrap();
+            let mut conn = SqlSchemaConnector::new_mysql(params).unwrap();
             tok(conn.reset(false, None)).unwrap();
 
             (
@@ -195,22 +194,23 @@ impl TestApi {
             shadow_database_connection_string,
         };
 
-        let mut connector = match &connection_info {
+        let connector = match &connection_info {
             ConnectionInfo::Native(NativeConnectionInfo::Postgres(_)) => {
                 if self.args.provider() == "cockroachdb" {
-                    SqlSchemaConnector::new_cockroach()
+                    SqlSchemaConnector::new_cockroach(params).unwrap()
                 } else {
-                    SqlSchemaConnector::new_postgres()
+                    SqlSchemaConnector::new_postgres(params).unwrap()
                 }
             }
-            ConnectionInfo::Native(NativeConnectionInfo::Mysql(_)) => SqlSchemaConnector::new_mysql(),
-            ConnectionInfo::Native(NativeConnectionInfo::Mssql(_)) => SqlSchemaConnector::new_mssql(),
-            ConnectionInfo::Native(NativeConnectionInfo::Sqlite { .. }) => SqlSchemaConnector::new_sqlite(),
+            ConnectionInfo::Native(NativeConnectionInfo::Mysql(_)) => SqlSchemaConnector::new_mysql(params).unwrap(),
+            ConnectionInfo::Native(NativeConnectionInfo::Mssql(_)) => SqlSchemaConnector::new_mssql(params).unwrap(),
+            ConnectionInfo::Native(NativeConnectionInfo::Sqlite { .. }) => {
+                SqlSchemaConnector::new_sqlite(params).unwrap()
+            }
             ConnectionInfo::Native(NativeConnectionInfo::InMemorySqlite { .. }) | ConnectionInfo::External(_) => {
                 unreachable!()
             }
         };
-        connector.set_params(params).unwrap();
 
         EngineTestApi {
             connector,

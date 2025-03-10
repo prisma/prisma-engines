@@ -34,8 +34,8 @@ use enumflags2::BitFlags;
 use psl::{PreviewFeature, ValidatedSchema};
 use quaint::prelude::{ConnectionInfo, Table};
 use schema_connector::{
-    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult,
-    IntrospectionContext, MigrationRecord, Namespaces, PersistenceNotInitializedError,
+    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, IntrospectionContext,
+    MigrationRecord, Namespaces, PersistenceNotInitializedError,
 };
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
@@ -80,14 +80,6 @@ where
             State::Initial => panic!("Internal logic error: get_unwrapped_params() on State::Initial"),
             State::WithParams(p) => p,
             State::Connected(p, _) => p,
-        }
-    }
-
-    #[track_caller]
-    fn set_params(&mut self, params: P) {
-        match self {
-            State::WithParams(_) | State::Connected(_, _) => panic!("state error"),
-            State::Initial => *self = State::WithParams(params),
         }
     }
 
@@ -141,9 +133,6 @@ pub(crate) trait SqlFlavour:
     fn check_schema_features(&self, _schema: &psl::ValidatedSchema) -> ConnectorResult<()> {
         Ok(())
     }
-
-    /// The connection string received in set_params().
-    fn connection_string(&self) -> Option<&str>;
 
     /// See MigrationConnector::connector_type()
     fn connector_type(&self) -> &'static str;
@@ -291,9 +280,6 @@ pub(crate) trait SqlFlavour:
         shadow_database_url: Option<String>,
         namespaces: Option<Namespaces>,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>>;
-
-    /// Receive and validate connector params.
-    fn set_params(&mut self, connector_params: ConnectorParams) -> ConnectorResult<()>;
 
     /// Sets the preview features. This is currently useful for MultiSchema, as we want to
     /// grab the namespaces we're expected to diff/work on, which are generally set in

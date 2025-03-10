@@ -22,12 +22,18 @@ use std::{future, str::FromStr};
 
 type State = super::State<Params, Connection>;
 
+#[derive(Clone)]
 pub(crate) struct Params {
     pub(crate) connector_params: ConnectorParams,
     pub(crate) url: MssqlUrl,
 }
 
 impl Params {
+    pub(crate) fn new(connector_params: ConnectorParams) -> ConnectorResult<Self> {
+        let url = MssqlUrl::new(&connector_params.connection_string).map_err(ConnectorError::url_parse_error)?;
+        Ok(Self { connector_params, url })
+    }
+
     fn is_running_on_azure_sql(&self) -> bool {
         self.url.host().contains(".database.windows.net")
     }
@@ -50,6 +56,12 @@ impl std::fmt::Debug for MssqlFlavour {
 }
 
 impl MssqlFlavour {
+    pub fn new_with_params(params: ConnectorParams) -> ConnectorResult<Self> {
+        Ok(MssqlFlavour {
+            state: State::WithParams(Params::new(params)?),
+        })
+    }
+
     pub(crate) fn schema_name(&self) -> &str {
         self.state.params().map(|p| p.url.schema()).unwrap_or("dbo")
     }
@@ -98,12 +110,6 @@ impl SqlFlavour for MssqlFlavour {
 
     fn migrations_table(&self) -> Table<'static> {
         (self.schema_name().to_owned(), crate::MIGRATIONS_TABLE_NAME.to_owned()).into()
-    }
-
-    fn connection_string(&self) -> Option<&str> {
-        self.state
-            .params()
-            .map(|p| p.connector_params.connection_string.as_str())
     }
 
     fn connector_type(&self) -> &'static str {
@@ -392,13 +398,6 @@ impl SqlFlavour for MssqlFlavour {
         with_connection(&mut self.state, move |params, conn| conn.raw_cmd(sql, params))
     }
 
-    fn set_params(&mut self, connector_params: ConnectorParams) -> ConnectorResult<()> {
-        let url = MssqlUrl::new(&connector_params.connection_string).map_err(ConnectorError::url_parse_error)?;
-        let params = Params { connector_params, url };
-        self.state.set_params(params);
-        Ok(())
-    }
-
     fn set_preview_features(&mut self, preview_features: enumflags2::BitFlags<psl::PreviewFeature>) {
         match &mut self.state {
             super::State::Initial => {
@@ -423,7 +422,6 @@ impl SqlFlavour for MssqlFlavour {
                 .params()
                 .and_then(|p| p.connector_params.shadow_database_connection_string.clone())
         });
-        let mut shadow_database = MssqlFlavour::default();
 
         if let Some(shadow_database_connection_string) = shadow_database_connection_string {
             Box::pin(async move {
@@ -434,16 +432,14 @@ impl SqlFlavour for MssqlFlavour {
                     )?;
                 }
 
-                let shadow_db_params = ConnectorParams {
-                    connection_string: shadow_database_connection_string,
-                    preview_features: self
-                        .state
-                        .params()
-                        .map(|cp| cp.connector_params.preview_features)
-                        .unwrap_or_default(),
-                    shadow_database_connection_string: None,
-                };
-                shadow_database.set_params(shadow_db_params)?;
+                let preview_features = self
+                    .state
+                    .params()
+                    .map(|cp| cp.connector_params.preview_features)
+                    .unwrap_or_default();
+                let connector_params = ConnectorParams::new(shadow_database_connection_string, preview_features, None);
+                let mut shadow_database = MssqlFlavour::new_with_params(connector_params)?;
+
                 shadow_database.ensure_connection_validity().await?;
 
                 if shadow_database.reset(namespaces.clone()).await.is_err() {
@@ -481,12 +477,9 @@ impl SqlFlavour for MssqlFlavour {
 
                 tracing::debug!("Connecting to shadow database at {}", host.unwrap_or("localhost"));
 
-                let shadow_db_params = ConnectorParams {
-                    connection_string: jdbc_string,
-                    preview_features: params.connector_params.preview_features,
-                    shadow_database_connection_string: None,
-                };
-                shadow_database.set_params(shadow_db_params)?;
+                let connector_params =
+                    ConnectorParams::new(jdbc_string, params.connector_params.preview_features, None);
+                let shadow_database = MssqlFlavour::new_with_params(connector_params.clone())?;
 
                 // We go through the whole process without early return, then clean up
                 // the shadow database, and only then return the result. This avoids
@@ -554,14 +547,8 @@ mod tests {
     fn debug_impl_does_not_leak_connection_info() {
         let url = "sqlserver://myserver:8765;database=master;schema=mydbname;user=SA;password=<mypassword>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED";
 
-        let params = ConnectorParams {
-            connection_string: url.to_owned(),
-            preview_features: Default::default(),
-            shadow_database_connection_string: None,
-        };
-
-        let mut flavour = MssqlFlavour::default();
-        flavour.set_params(params).unwrap();
+        let params = ConnectorParams::new(url.to_owned(), Default::default(), None);
+        let flavour = MssqlFlavour::new_with_params(params).unwrap();
         let debugged = format!("{flavour:?}");
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];

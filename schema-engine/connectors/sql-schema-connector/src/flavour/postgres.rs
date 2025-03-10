@@ -20,7 +20,7 @@ use quaint::{
     Value,
 };
 use schema_connector::{
-    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
+    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces,
 };
 use sql_schema_describer::{postgres::PostgresSchemaExt, SqlSchema};
 use std::{
@@ -42,6 +42,7 @@ SET enable_experimental_alter_column_type_general = true;
 "#;
 
 type State = imp::State;
+pub type Params = imp::Params;
 
 #[derive(Debug, Clone)]
 struct MigratePostgresUrl(PostgresUrl);
@@ -124,7 +125,10 @@ pub(crate) struct PostgresFlavour {
 #[cfg(feature = "postgresql-native")]
 impl Default for PostgresFlavour {
     fn default() -> Self {
-        PostgresFlavour::new_unspecified()
+        Self {
+            state: State::Initial,
+            provider: PostgresProvider::Unspecified,
+        }
     }
 }
 
@@ -146,28 +150,36 @@ impl PostgresFlavour {
         })
     }
 
-    #[cfg(feature = "postgresql-native")]
-    pub(crate) fn new_postgres() -> Self {
-        PostgresFlavour {
-            state: State::Initial,
-            provider: PostgresProvider::PostgreSql,
-        }
-    }
-
-    #[cfg(feature = "postgresql-native")]
-    pub(crate) fn new_cockroach() -> Self {
-        PostgresFlavour {
+    #[cfg(feature = "cockroachdb-native")]
+    pub(crate) fn new_uninitialized_cockroach() -> Self {
+        Self {
             state: State::Initial,
             provider: PostgresProvider::CockroachDb,
         }
     }
 
     #[cfg(feature = "postgresql-native")]
-    pub(crate) fn new_unspecified() -> Self {
-        PostgresFlavour {
-            state: State::Initial,
+    pub(crate) fn new_postgres(params: schema_connector::ConnectorParams) -> ConnectorResult<Self> {
+        Ok(PostgresFlavour {
+            state: State::WithParams(Params::new(params)?),
+            provider: PostgresProvider::PostgreSql,
+        })
+    }
+
+    #[cfg(feature = "postgresql-native")]
+    pub(crate) fn new_cockroach(params: schema_connector::ConnectorParams) -> ConnectorResult<Self> {
+        Ok(PostgresFlavour {
+            state: State::WithParams(Params::new(params)?),
+            provider: PostgresProvider::CockroachDb,
+        })
+    }
+
+    #[cfg(feature = "postgresql-native")]
+    pub(crate) fn new_with_params(params: schema_connector::ConnectorParams) -> ConnectorResult<Self> {
+        Ok(PostgresFlavour {
+            state: State::WithParams(Params::new(params)?),
             provider: PostgresProvider::Unspecified,
-        }
+        })
     }
 
     fn circumstances(&self) -> Option<BitFlags<Circumstances>> {
@@ -338,10 +350,6 @@ impl SqlFlavour for PostgresFlavour {
         self.with_connection(|conn, _| async { conn.apply_migration_script(migration_name, script).await })
     }
 
-    fn connection_string(&self) -> Option<&str> {
-        imp::get_connection_string(&self.state)
-    }
-
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
         Box::pin(imp::create_database(&self.state))
     }
@@ -413,10 +421,6 @@ impl SqlFlavour for PostgresFlavour {
 
             Ok(())
         })
-    }
-
-    fn set_params(&mut self, connector_params: ConnectorParams) -> ConnectorResult<()> {
-        imp::set_params(&mut self.state, connector_params)
     }
 
     fn set_preview_features(&mut self, preview_features: enumflags2::BitFlags<psl::PreviewFeature>) {
@@ -596,19 +600,17 @@ fn normalize_sql_schema(schema: &mut SqlSchema, preview_features: BitFlags<Previ
 
 #[cfg(test)]
 mod tests {
+    use schema_connector::ConnectorParams;
+
     use super::*;
 
+    #[cfg(feature = "postgresql-native")]
     #[test]
     fn debug_impl_does_not_leak_connection_info() {
         let url = "postgresql://myname:mypassword@myserver:8765/mydbname";
 
-        let mut flavour = PostgresFlavour::default();
-        let params = ConnectorParams {
-            connection_string: url.to_owned(),
-            preview_features: Default::default(),
-            shadow_database_connection_string: None,
-        };
-        flavour.set_params(params).unwrap();
+        let params = ConnectorParams::new(url.to_owned(), Default::default(), None);
+        let flavour = PostgresFlavour::new_with_params(params).unwrap();
         let debugged = format!("{flavour:?}");
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];

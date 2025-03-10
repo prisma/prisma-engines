@@ -30,6 +30,15 @@ pub struct MongoDbSchemaConnector {
 }
 
 impl MongoDbSchemaConnector {
+    pub fn new_uninitialized() -> Self {
+        Self {
+            connection_string: String::new(),
+            preview_features: BitFlags::empty(),
+            client: OnceCell::new(),
+            host: Arc::new(EmptyHost),
+        }
+    }
+
     pub fn new(params: ConnectorParams) -> Self {
         Self {
             connection_string: params.connection_string,
@@ -66,10 +75,6 @@ impl MongoDbSchemaConnector {
 }
 
 impl SchemaConnector for MongoDbSchemaConnector {
-    fn connection_string(&self) -> Option<&str> {
-        Some(&self.connection_string)
-    }
-
     fn database_schema_from_diff_target<'a>(
         &'a mut self,
         diff_target: DiffTarget<'a>,
@@ -188,12 +193,6 @@ impl SchemaConnector for MongoDbSchemaConnector {
         Err(ConnectorError::from_msg(
             "Rendering to a script is not supported on MongoDB.".to_owned(),
         ))
-    }
-
-    fn set_params(&mut self, params: ConnectorParams) -> ConnectorResult<()> {
-        self.connection_string = params.connection_string;
-        self.preview_features = params.preview_features;
-        Ok(())
     }
 
     fn set_preview_features(&mut self, preview_features: BitFlags<psl::PreviewFeature>) {

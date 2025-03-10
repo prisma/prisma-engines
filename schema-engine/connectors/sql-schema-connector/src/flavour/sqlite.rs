@@ -15,16 +15,12 @@ use wasm as imp;
 use crate::flavour::SqlFlavour;
 use indoc::indoc;
 use schema_connector::{
-    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
+    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces,
 };
 use sql_schema_describer::{sqlite::SqlSchemaDescriber, DescriberErrorKind, SqlSchema};
 
 type State = imp::State;
-
-struct Params {
-    connector_params: ConnectorParams,
-    file_path: String,
-}
+pub type Params = imp::Params;
 
 pub(crate) struct SqliteFlavour {
     state: State,
@@ -58,6 +54,13 @@ impl SqliteFlavour {
             state: State::new(adapter, Default::default()),
         }
     }
+
+    #[cfg(feature = "sqlite-native")]
+    pub fn new_with_params(params: schema_connector::ConnectorParams) -> ConnectorResult<Self> {
+        Ok(SqliteFlavour {
+            state: State::WithParams(Params::new(params)?),
+        })
+    }
 }
 
 impl std::fmt::Debug for SqliteFlavour {
@@ -81,10 +84,6 @@ impl SqlFlavour for SqliteFlavour {
         script: &'a str,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
         self.with_connection(|conn, _| conn.apply_migration_script(migration_name, script))
-    }
-
-    fn connection_string(&self) -> Option<&str> {
-        imp::get_connection_string(&self.state)
     }
 
     fn table_names(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
@@ -293,10 +292,6 @@ impl SqlFlavour for SqliteFlavour {
 
             describe_schema(&shadow_db_conn).await
         })
-    }
-
-    fn set_params(&mut self, connector_params: ConnectorParams) -> ConnectorResult<()> {
-        imp::set_params(&mut self.state, connector_params)
     }
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {

@@ -146,31 +146,11 @@ source .test_database_urls/mysql_5_6
     };
 
     let mut api = match provider {
-        "cockroachdb" => {
-            let mut api = SqlSchemaConnector::new_cockroach();
-            api.set_params(params).unwrap();
-            api
-        }
-        "postgres" | "postgresql" => {
-            let mut api = SqlSchemaConnector::new_postgres();
-            api.set_params(params).unwrap();
-            api
-        }
-        "mysql" => {
-            let mut api = SqlSchemaConnector::new_mysql();
-            api.set_params(params).unwrap();
-            api
-        }
-        "sqlserver" => {
-            let mut api = SqlSchemaConnector::new_mssql();
-            api.set_params(params).unwrap();
-            api
-        }
-        "sqlite" => {
-            let mut api = SqlSchemaConnector::new_sqlite();
-            api.set_params(params).unwrap();
-            api
-        }
+        "cockroachdb" => SqlSchemaConnector::new_cockroach(params).unwrap(),
+        "postgres" | "postgresql" => SqlSchemaConnector::new_postgres(params).unwrap(),
+        "mysql" => SqlSchemaConnector::new_mysql(params).unwrap(),
+        "sqlserver" => SqlSchemaConnector::new_mssql(params).unwrap(),
+        "sqlite" => SqlSchemaConnector::new_sqlite(params).unwrap(),
         _ => unreachable!(),
     };
 
