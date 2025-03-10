@@ -15,6 +15,8 @@ use crate::proxy::AdapterFactoryProxy;
 use crate::queryable::JsQueryable;
 use crate::{JsObject, JsResult};
 
+/// A factory for creating instances of JavaScript driver adapters with optional support
+/// for working with shadow databases.
 pub struct JsAdapterFactory {
     inner: AdapterFactoryProxy,
 }

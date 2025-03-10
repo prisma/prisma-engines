@@ -9,13 +9,10 @@ use quaint::connector::{ExternalConnector, ExternalConnectorFactory};
 use schema_connector::{ConnectorError, ConnectorResult};
 use std::sync::Arc;
 
-// TODO: we don't have a URL for the adapter, this defaults schema to "public", we might
-// want to do something more sophisticated here.
-const DEFAULT_SCHEMA: &str = "public";
-
 pub(super) struct State {
     connection: Connection,
     factory: Arc<dyn ExternalConnectorFactory>,
+    schema_name: String,
     circumstances: BitFlags<Circumstances>,
     preview_features: BitFlags<PreviewFeature>,
 }
@@ -29,12 +26,18 @@ impl State {
         provider: PostgresProvider,
         preview_features: BitFlags<PreviewFeature>,
     ) -> ConnectorResult<Self> {
-        let connection = Connection { adapter };
+        let info = adapter
+            .get_connection_info()
+            .await
+            .map_err(|err| ConnectorError::from_source(err, "failed to get connection info"))?;
+        let schema_name = info.schema_name.to_owned();
 
-        let circumstances = super::setup_connection(&connection, &Params, provider, DEFAULT_SCHEMA).await?;
+        let connection = Connection { adapter };
+        let circumstances = super::setup_connection(&connection, &Params, provider, &schema_name).await?;
         Ok(Self {
             connection,
             factory,
+            schema_name,
             circumstances,
             preview_features,
         })
@@ -121,8 +124,8 @@ pub(super) fn get_circumstances(state: &State) -> Option<BitFlags<Circumstances>
     Some(state.circumstances)
 }
 
-pub(super) fn get_default_schema(_params: &State) -> &'static str {
-    DEFAULT_SCHEMA
+pub(super) fn get_default_schema(state: &State) -> &str {
+    &state.schema_name
 }
 
 pub(super) async fn get_connection_and_params_and_circumstances(
