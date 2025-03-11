@@ -2,6 +2,8 @@ use schema_core::{commands::evaluate_data_loss, json_rpc::types::*, schema_conne
 use std::borrow::Cow;
 use tempfile::TempDir;
 
+use crate::utils;
+
 #[must_use = "This struct does nothing on its own. See EvaluateDataLoss::send()"]
 pub struct EvaluateDataLoss<'a> {
     api: &'a mut dyn SchemaConnector,
@@ -29,9 +31,10 @@ impl<'a> EvaluateDataLoss<'a> {
     }
 
     fn send_impl(self) -> CoreResult<EvaluateDataLossAssertion<'a>> {
+        let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
         let fut = evaluate_data_loss(
             EvaluateDataLossInput {
-                migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
+                migrations_list,
                 schema: SchemasContainer { files: self.files },
             },
             self.api,

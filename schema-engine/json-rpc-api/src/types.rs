@@ -1,11 +1,43 @@
 //! API type definitions used by the JSON-RPC methods.
 
+pub use crate::{
+    js_result::JSResult,
+    migration_directory::{MigrationDirectory, MigrationFile},
+};
 use serde::{Deserialize, Serialize};
 
 #[cfg(target_arch = "wasm32")]
 use tsify_next::Tsify;
 
 // ---- Common type definitions ----
+
+/// Information about a migration lockfile.
+#[derive(Debug, Serialize, Deserialize)]
+#[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+pub struct MigrationLockfile {
+    /// Relative path to the lockfile from base directory.
+    /// E.g., `./migration_lock.toml`.
+    pub path: String,
+
+    /// Content of the lockfile, if it exists.
+    pub content: Option<String>,
+}
+
+/// A list of migration directories with related information.
+#[derive(Debug, Serialize, Deserialize)]
+#[cfg_attr(target_arch = "wasm32", derive(Tsify))]
+#[serde(rename_all = "camelCase")]
+pub struct MigrationList {
+    /// Absolute path to the base directory of Prisma migrations.
+    /// E.g., `/usr/src/app/prisma/migrations`.
+    pub base_dir: String,
+
+    /// Description of the lockfile, which may or may not exist.
+    pub lockfile: MigrationLockfile,
+
+    /// List of migration directories.
+    pub migration_directories: Vec<MigrationDirectory>,
+}
 
 /// An object with a `url` field.
 #[derive(Debug, Serialize, Deserialize)]
@@ -46,15 +78,6 @@ pub struct SchemasWithConfigDir {
     pub config_dir: String,
 }
 
-/// The path to a migrations directory of the shape expected by Prisma Migrate. The
-/// migrations will be applied to a **shadow database**, and the resulting schema
-/// considered for diffing.
-#[derive(Debug, Serialize, Deserialize)]
-#[cfg_attr(target_arch = "wasm32", derive(Tsify))]
-pub struct PathContainer {
-    pub path: String,
-}
-
 /// The path to a live database taken as input. For flexibility, this can be Prisma schemas as strings, or only the
 /// connection string. See variants.
 #[derive(Debug, Serialize, Deserialize)]
@@ -92,7 +115,7 @@ pub enum DiffTarget {
 
     /// The Prisma schema content for migrations. The migrations will be applied to a **shadow database**, and the resulting schema
     /// considered for diffing.
-    Migrations(PathContainer),
+    Migrations(MigrationList),
 }
 
 /// A diagnostic returned by `diagnoseMigrationHistory` when looking at the
@@ -158,8 +181,8 @@ pub struct DevActionReset {
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
 #[serde(rename_all = "camelCase")]
 pub struct ApplyMigrationsInput {
-    /// The location of the migrations directory.
-    pub migrations_directory_path: String,
+    /// The list of migrations, already loaded from disk.
+    pub migrations_list: MigrationList,
 }
 
 /// The output of the `applyMigrations` command.
@@ -203,8 +226,8 @@ pub struct CreateMigrationInput {
     /// The user-given name for the migration. This will be used for the migration directory.
     pub migration_name: String,
 
-    /// The filesystem path of the migrations directory to use.
-    pub migrations_directory_path: String,
+    /// The list of migrations, already loaded from disk.
+    pub migrations_list: MigrationList,
 
     /// The Prisma schema content to use as a target for the generated migration.
     pub schema: SchemasContainer,
@@ -215,14 +238,21 @@ pub struct CreateMigrationInput {
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
 #[serde(rename_all = "camelCase")]
 pub struct CreateMigrationOutput {
-    /// The name of the newly generated migration directory, if any.
-    ///
-    /// generatedMigrationName will be null if:
-    ///
+    /// The active connector type used.
+    pub connector_type: String,
+
+    /// The generated name of migration directory, which the caller must use to create the new directory.
+    pub generated_migration_name: String,
+
+    /// The migration script that was generated, if any.
+    /// It will be null if:
     /// 1. The migration we generate would be empty, **AND**
     /// 2. the `draft` param was not true, because in that case the engine would still generate an empty
-    ///    migration script.
-    pub generated_migration_name: Option<String>,
+    ///     migration script.
+    pub migration_script: Option<String>,
+
+    /// The file extension for generated migration files.
+    pub extension: String,
 }
 
 // DB Execute
@@ -263,8 +293,8 @@ pub struct DebugPanicOutput {}
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
 #[serde(rename_all = "camelCase")]
 pub struct DevDiagnosticInput {
-    /// The location of the migrations directory.
-    pub migrations_directory_path: String,
+    /// The list of migrations, already loaded from disk.
+    pub migrations_list: MigrationList,
 }
 
 /// The response type for `devDiagnostic`.
@@ -282,8 +312,8 @@ pub struct DevDiagnosticOutput {
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
 #[serde(rename_all = "camelCase")]
 pub struct DiagnoseMigrationHistoryInput {
-    /// The path to the root of the migrations directory.
-    pub migrations_directory_path: String,
+    /// The list of migrations, already loaded from disk.
+    pub migrations_list: MigrationList,
 
     /// Whether creating a shadow database is allowed.
     pub opt_in_to_shadow_database: bool,
@@ -350,25 +380,6 @@ pub struct DiffParams {
 pub struct DiffResult {
     /// The exit code that the CLI should return.
     pub exit_code: u32,
-}
-
-// List Migration Directories
-
-/// The input to the `listMigrationDirectories` command.
-#[derive(Debug, Serialize, Deserialize)]
-#[cfg_attr(target_arch = "wasm32", derive(Tsify))]
-#[serde(rename_all = "camelCase")]
-pub struct ListMigrationDirectoriesInput {
-    /// The location of the migrations directory.
-    pub migrations_directory_path: String,
-}
-
-/// The output of the `listMigrationDirectories` command.
-#[derive(Debug, Serialize, Deserialize)]
-#[cfg_attr(target_arch = "wasm32", derive(Tsify))]
-pub struct ListMigrationDirectoriesOutput {
-    /// The names of the migrations in the migration directory. Empty if no migrations are found.
-    pub migrations: Vec<String>,
 }
 
 // Introspect SQL
@@ -521,8 +532,8 @@ pub struct GetDatabaseVersionOutput {
 #[cfg_attr(target_arch = "wasm32", derive(Tsify))]
 #[serde(rename_all = "camelCase")]
 pub struct EvaluateDataLossInput {
-    /// The location of the migrations directory.
-    pub migrations_directory_path: String,
+    /// The list of migrations, already loaded from disk.
+    pub migrations_list: MigrationList,
     /// The prisma schema files to migrate to.
     pub schema: SchemasContainer,
 }
@@ -589,8 +600,8 @@ pub struct MarkMigrationAppliedInput {
     /// The name of the migration to mark applied.
     pub migration_name: String,
 
-    /// The path to the root of the migrations directory.
-    pub migrations_directory_path: String,
+    /// The list of migrations, already loaded from disk.
+    pub migrations_list: MigrationList,
 }
 
 /// The output of the `markMigrationApplied` command.

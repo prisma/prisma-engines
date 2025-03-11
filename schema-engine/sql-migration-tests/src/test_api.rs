@@ -92,7 +92,8 @@ impl TestApi {
         self.connection_info().schema_name().to_owned()
     }
 
-    /// Plan a `createMigration` command
+    /// Plan a `createMigration` command.
+    /// TODO: this is currently not working properly.
     pub fn create_migration<'a>(
         &'a mut self,
         name: &'a str,
@@ -285,13 +286,6 @@ impl TestApi {
             insert: quaint::ast::Insert::single_into(self.render_table_name(table_name)),
             api: self,
         }
-    }
-
-    pub fn list_migration_directories<'a>(
-        &'a mut self,
-        migrations_directory: &'a TempDir,
-    ) -> ListMigrationDirectories<'a> {
-        ListMigrationDirectories::new(migrations_directory)
     }
 
     pub fn lower_cases_table_names(&self) -> bool {

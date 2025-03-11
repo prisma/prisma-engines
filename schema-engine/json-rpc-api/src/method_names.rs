@@ -13,7 +13,6 @@ pub const EVALUATE_DATA_LOSS: &str = "evaluateDataLoss";
 pub const GET_DATABASE_VERSION: &str = "getDatabaseVersion";
 pub const INTROSPECT: &str = "introspect";
 pub const INTROSPECT_SQL: &str = "introspectSql";
-pub const LIST_MIGRATION_DIRECTORIES: &str = "listMigrationDirectories";
 pub const MARK_MIGRATION_APPLIED: &str = "markMigrationApplied";
 pub const MARK_MIGRATION_ROLLED_BACK: &str = "markMigrationRolledBack";
 pub const RESET: &str = "reset";
@@ -34,7 +33,6 @@ pub const METHOD_NAMES: &[&str] = &[
     GET_DATABASE_VERSION,
     INTROSPECT,
     INTROSPECT_SQL,
-    LIST_MIGRATION_DIRECTORIES,
     MARK_MIGRATION_APPLIED,
     MARK_MIGRATION_ROLLED_BACK,
     RESET,

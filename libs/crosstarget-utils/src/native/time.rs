@@ -3,6 +3,7 @@ use std::{
     time::{Duration, Instant},
 };
 
+use crate::common::datetime::UtcDateTime;
 use crate::common::timeout::TimeoutError;
 
 pub use std::time::{SystemTime, SystemTimeError};
@@ -35,4 +36,23 @@ where
     let result = tokio::time::timeout(duration, future).await;
 
     result.map_err(|_| TimeoutError)
+}
+
+/// Native UTC DateTime implementation using chrono crate
+#[derive(Clone, Debug)]
+pub struct DateTime(chrono::DateTime<chrono::Utc>);
+
+impl UtcDateTime for DateTime {
+    fn now() -> Self {
+        Self(chrono::Utc::now())
+    }
+
+    fn format(&self, format_str: &str) -> String {
+        self.0.format(format_str).to_string()
+    }
+}
+
+// Convenience function to get current timestamp formatted
+pub fn format_utc_now(format_str: &str) -> String {
+    DateTime::now().format(format_str)
 }
