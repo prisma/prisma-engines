@@ -451,21 +451,6 @@ impl GenericApi for EngineState {
         .await
     }
 
-    async fn list_migration_directories(
-        &self,
-        input: ListMigrationDirectoriesInput,
-    ) -> CoreResult<ListMigrationDirectoriesOutput> {
-        let migrations_from_filesystem =
-            schema_connector::migrations_directory::list_migrations(Path::new(&input.migrations_directory_path))?;
-
-        let migrations = migrations_from_filesystem
-            .iter()
-            .map(|migration| migration.migration_name().to_string())
-            .collect();
-
-        Ok(ListMigrationDirectoriesOutput { migrations })
-    }
-
     async fn mark_migration_applied(&self, input: MarkMigrationAppliedInput) -> CoreResult<MarkMigrationAppliedOutput> {
         self.with_default_connector(Box::new(move |connector| {
             let span = tracing::info_span!("MarkMigrationApplied", migration_name = input.migration_name.as_str());

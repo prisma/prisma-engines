@@ -7,7 +7,7 @@ use schema_core::{
     json_rpc::types::{ApplyMigrationsInput, CreateMigrationInput, SchemasContainer},
     schema_connector::{ConnectorParams, SchemaConnector},
 };
-use sql_migration_tests::test_api::*;
+use sql_migration_tests::{test_api::*, utils::list_migrations};
 use sql_schema_connector::SqlSchemaConnector;
 use sql_schema_describer::DefaultValue;
 
@@ -1215,8 +1215,11 @@ async fn migration_with_shadow_database() {
 
     let migrations_directory = tempfile::tempdir().unwrap();
 
+    let migrations_directory_path = migrations_directory.path();
+    let migrations_list = list_migrations(migrations_directory_path).unwrap();
+
     let migration = CreateMigrationInput {
-        migrations_directory_path: migrations_directory.path().to_str().unwrap().to_owned(),
+        migrations_list,
         schema: SchemasContainer {
             files: vec![SchemaContainer {
                 path: "schema.prisma".to_string(),
@@ -1294,9 +1297,10 @@ async fn migration_with_shadow_database() {
 
     expected.assert_eq(&sql);
 
-    let input = ApplyMigrationsInput {
-        migrations_directory_path: migrations_directory.path().to_str().unwrap().to_owned(),
-    };
+    let migrations_directory_path = migrations_directory.path();
+    let migrations_list = list_migrations(migrations_directory_path).unwrap();
+
+    let input = ApplyMigrationsInput { migrations_list };
 
     apply_migrations(input, &mut conn, namespaces).await.unwrap();
 }
