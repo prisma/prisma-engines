@@ -20,9 +20,9 @@ async fn a_table_without_uniques_should_ignore(api: &mut TestApi) -> TestResult 
     let expected = expect![[r#"
         /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model Post {
-          id      Int
-          user_id Int
-          User    User @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+          id      BigInt
+          user_id BigInt
+          User    User   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
           @@index([user_id])
           @@ignore
@@ -58,16 +58,16 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &mut Te
     let expected = expect![[r#"
         /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model Post {
-          id      Int
-          user_ip Int
-          User    User @relation(fields: [user_ip], references: [ip], onDelete: NoAction, onUpdate: NoAction)
+          id      BigInt
+          user_ip BigInt
+          User    User   @relation(fields: [user_ip], references: [ip], onDelete: NoAction, onUpdate: NoAction)
 
           @@ignore
         }
 
         model User {
           id   BigInt @id @default(autoincrement())
-          ip   Int    @unique
+          ip   BigInt @unique
           Post Post[] @ignore
         }
     "#]];

@@ -47,6 +47,8 @@ async fn a_table_without_uniques_should_ignore(api: &mut TestApi) -> TestResult 
 
 #[test_connector(exclude(Sqlite, Mysql))]
 async fn a_table_without_required_uniques(api: &mut TestApi) -> TestResult {
+    api.normalise_int_type().await?;
+
     api.barrel()
         .execute(|migration| {
             migration.create_table("Post", |t| {

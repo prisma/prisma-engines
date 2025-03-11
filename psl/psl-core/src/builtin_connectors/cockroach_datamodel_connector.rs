@@ -370,6 +370,8 @@ impl SequenceFunction {
         let mut this = SequenceFunction::default();
 
         for arg in &args.arguments {
+            println!("arg.value: {:?}", &arg.value);
+
             match arg.name.as_ref().map(|arg| arg.name.as_str()) {
                 Some("virtual") => this.r#virtual = coerce::boolean(&arg.value, diagnostics),
                 Some("cache") => this.cache = coerce::integer(&arg.value, diagnostics),

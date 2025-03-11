@@ -235,6 +235,13 @@ impl PostgresSchemaExt {
     }
 
     pub fn get_sequence(&self, name: &str) -> Option<(usize, &Sequence)> {
+        // Debug `migrations::cockroachdb::sequence_int4_works`:
+        // We're receiving requests for sequences:
+        // - "TestModelSeqInt4_id_seq" (min_value: 1, max_value: 2147483647)
+        // - "prisma_sequence_TestModelSeqInt4_id" (min_value: 1, max_value: 9223372036854775807)
+        println!("getting sequence \"{}\"", &name);
+        println!("sequences:\n{:?}", &self.sequences);
+
         self.sequences
             .binary_search_by_key(&name, |s| &s.name)
             .map(|idx| (idx, &self.sequences[idx]))

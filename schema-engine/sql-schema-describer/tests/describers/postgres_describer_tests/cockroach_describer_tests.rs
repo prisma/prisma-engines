@@ -499,7 +499,7 @@ fn cockroachdb_22_1_sequences_must_work(api: TestApi) {
     expected_ext.assert_debug_eq(&ext);
 }
 
-#[test_connector(tags(CockroachDb222))]
+#[test_connector(tags(CockroachDb))]
 fn cockroachdb_22_2_sequences_must_work(api: TestApi) {
     // https://www.cockroachlabs.com/docs/v21.2/create-sequence.html
     let sql = r#"

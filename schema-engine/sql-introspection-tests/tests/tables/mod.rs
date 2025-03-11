@@ -146,6 +146,8 @@ async fn should_ignore_prisma_helper_tables(api: &mut TestApi) -> TestResult {
 
 #[test_connector]
 async fn a_table_with_compound_primary_keys(api: &mut TestApi) -> TestResult {
+    api.normalise_int_type().await?;
+
     api.barrel()
         .execute(|migration| {
             migration.create_table("Blog", |t| {

@@ -1,23 +1,31 @@
 //! The `@default` attribute rendering.
 
-use crate::introspection::introspection_pair::{DefaultKind, DefaultValuePair};
+use crate::introspection::introspection_pair::{DefaultKind, DefaultValuePair, ScalarFieldPair};
 use datamodel_renderer::{
     datamodel as renderer,
     value::{Constant, Function, Text, Value},
 };
 
 /// Render a default value for the given scalar field.
-pub(crate) fn render(default: DefaultValuePair<'_>) -> Option<renderer::DefaultValue<'_>> {
+pub(crate) fn render<'a>(field: &ScalarFieldPair<'a>) -> Option<renderer::DefaultValue<'a>> {
+    let default: DefaultValuePair<'a> = field.default();
+    let field_family_type = field.column_type_family();
+
     let mut rendered = match default.kind() {
         Some(kind) => match kind {
             DefaultKind::Sequence(sequence) => {
                 let mut fun = Function::new("sequence");
 
+                // 1 is the default value for the "minValue" attribute
                 if sequence.min_value != 1 {
                     fun.push_param(("minValue", Constant::from(sequence.min_value)));
                 }
 
-                if sequence.max_value != i64::MAX {
+                // `i64::MAX` is the default value for the "maxValue" attribute for INT8 sequences;
+                // `i32::MAX` is the default value for the "maxValue" attribute for INT4 sequences
+                if (field_family_type.is_bigint() && sequence.max_value != i64::MAX)
+                    || (field_family_type.is_int() && sequence.max_value != i32::MAX as i64)
+                {
                     fun.push_param(("maxValue", Constant::from(sequence.max_value)));
                 }
 

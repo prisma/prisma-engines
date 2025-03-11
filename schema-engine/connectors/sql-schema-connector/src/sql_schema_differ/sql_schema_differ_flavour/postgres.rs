@@ -107,6 +107,12 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             .schemas
             .map(|schema| (schema, schema.describer_schema.downcast_connector_data()));
 
+        let sequences = &schemas.previous.1.sequences;
+        println!("sequences (prev) = {:?}", &sequences);
+
+        let sequences = &schemas.next.1.sequences;
+        println!("sequences (next) = {:?}", &sequences);
+
         let sequence_pairs = db
             .all_column_pairs()
             .map(|cols| {
@@ -128,6 +134,10 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             let prev = pair.previous.1;
             let next = pair.next.1;
             let mut changes: BitFlags<SequenceChange> = BitFlags::default();
+
+            // With CockroachDB 23.1, `migrations::cockroachdb::sequence_int4_works` yields:
+            println!("prev.max_value = {}", &prev.max_value); // 2147483647
+            println!("next.max_value = {}", &next.max_value); // 9223372036854775807
 
             if prev.min_value != next.min_value {
                 changes |= SequenceChange::MinValue;
