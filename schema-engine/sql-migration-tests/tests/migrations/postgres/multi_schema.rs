@@ -9,7 +9,7 @@ use sql_schema_connector::SqlSchemaConnector;
 use url::Url;
 
 use crate::migrations::multi_schema::*;
-use sql_migration_tests::test_api::*;
+use sql_migration_tests::{test_api::*, utils::list_migrations};
 use sql_schema_describer::DefaultValue;
 
 #[test_connector(tags(Postgres), preview_features("multiSchema"), namespaces("one", "prisma-tests"))]
@@ -1450,8 +1450,10 @@ async fn migration_with_shadow_database() {
 
     let migrations_directory = tempfile::tempdir().unwrap();
 
+    let migrations_list = list_migrations(&migrations_directory.path()).unwrap();
+
     let migration = CreateMigrationInput {
-        migrations_directory_path: migrations_directory.path().to_str().unwrap().to_owned(),
+        migrations_list,
         schema: SchemasContainer {
             files: vec![SchemaContainer {
                 path: "schema.prisma".to_string(),
@@ -1464,7 +1466,7 @@ async fn migration_with_shadow_database() {
 
     create_migration(migration, &mut conn).await.unwrap();
 
-    let path = std::fs::read_dir(migrations_directory.path())
+    let path = std::fs::read_dir(&migrations_directory.path())
         .expect("Reading migrations directory for named migration.")
         .find_map(|entry| {
             let entry = entry.unwrap();
@@ -1514,9 +1516,9 @@ async fn migration_with_shadow_database() {
 
     expected.assert_eq(&sql);
 
-    let input = ApplyMigrationsInput {
-        migrations_directory_path: migrations_directory.path().to_str().unwrap().to_owned(),
-    };
+    let migrations_list = list_migrations(&migrations_directory.path()).unwrap();
+
+    let input = ApplyMigrationsInput { migrations_list };
 
     apply_migrations(input, &mut conn, namespaces).await.unwrap();
 }

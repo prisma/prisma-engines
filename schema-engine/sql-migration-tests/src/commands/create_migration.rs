@@ -6,6 +6,8 @@ use std::path::{Path, PathBuf};
 use tempfile::TempDir;
 use test_setup::runtime::run_with_thread_local_runtime;
 
+use crate::utils;
+
 pub struct CreateMigration<'a> {
     api: &'a mut dyn SchemaConnector,
     files: Vec<SchemaContainer>,
@@ -43,20 +45,27 @@ impl<'a> CreateMigration<'a> {
     }
 
     pub async fn send(self) -> CoreResult<CreateMigrationAssertion<'a>> {
+        // TODO: fix this
+        let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
+        let migration_name = self.name.to_owned();
         let output = create_migration(
             CreateMigrationInput {
-                migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
+                migrations_list,
                 schema: SchemasContainer { files: self.files },
                 draft: self.draft,
-                migration_name: self.name.to_owned(),
+                migration_name: migration_name.clone(),
             },
             self.api,
         )
         .await?;
 
+        let timestamp = chrono::Utc::now().format("%Y%m%d%H%M%S");
+        let directory_name = format!("{timestamp}_{migration_name}");
+
         Ok(CreateMigrationAssertion {
             output,
             migrations_directory: self.migrations_directory,
+            generated_migration_name: directory_name,
         })
     }
 
@@ -74,6 +83,7 @@ impl<'a> CreateMigration<'a> {
 pub struct CreateMigrationAssertion<'a> {
     pub output: CreateMigrationOutput,
     migrations_directory: &'a TempDir,
+    generated_migration_name: String,
 }
 
 impl std::fmt::Debug for CreateMigrationAssertion<'_> {
@@ -84,6 +94,7 @@ impl std::fmt::Debug for CreateMigrationAssertion<'_> {
 
 impl CreateMigrationAssertion<'_> {
     /// Assert that there are `expected_count` migrations in the migrations directory.
+    /// TODO: this is currently failing.
     #[tracing::instrument(skip(self))]
     #[track_caller]
     pub fn assert_migration_directories_count(self, expected_count: usize) -> Self {
@@ -146,9 +157,13 @@ impl CreateMigrationAssertion<'_> {
     }
 
     pub fn migration_script_path(&self) -> PathBuf {
+        let timestamp = chrono::Utc::now().format("%Y%m%d%H%M%S");
+        let migration_name = &self.generated_migration_name;
+        let directory_name = format!("{timestamp}_{migration_name}");
+
         self.migrations_directory
             .path()
-            .join(self.output.generated_migration_name.as_ref().unwrap())
+            .join(directory_name)
             .join("migration.sql")
     }
 

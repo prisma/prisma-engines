@@ -1,6 +1,6 @@
 use pretty_assertions::assert_eq;
 use schema_core::{json_rpc::types::*, schema_api};
-use sql_migration_tests::test_api::*;
+use sql_migration_tests::{test_api::*, utils::list_migrations};
 use std::io::Write;
 use user_facing_errors::{schema_engine::MigrationDoesNotApplyCleanly, UserFacingError};
 
@@ -140,7 +140,7 @@ fn dev_diagnostic_calculates_drift_in_presence_of_failed_migrations(api: TestApi
                 migration.push_str("\nSELECT YOLO;");
             });
         let path = out.migration_script_path();
-        (out.into_output().generated_migration_name.unwrap(), path)
+        (out.into_output().generated_migration_name, path)
     };
 
     let err = api.apply_migrations(&directory).send_unwrap_err().to_string();
@@ -222,8 +222,7 @@ fn dev_diagnostic_can_detect_when_the_migrations_directory_is_behind(api: TestAp
         .create_migration("second-migration", &dm2, &directory)
         .send_sync()
         .into_output()
-        .generated_migration_name
-        .unwrap();
+        .generated_migration_name;
 
     api.apply_migrations(&directory)
         .send_sync()
@@ -258,8 +257,7 @@ fn dev_diagnostic_can_detect_when_history_diverges(api: TestApi) {
         .create_migration("1-initial", &dm1, &directory)
         .send_sync()
         .into_output()
-        .generated_migration_name
-        .unwrap();
+        .generated_migration_name;
 
     let dm2 = api.datamodel_with_provider(
         r#"
@@ -275,8 +273,7 @@ fn dev_diagnostic_can_detect_when_history_diverges(api: TestApi) {
         .create_migration("2-second-migration", &dm2, &directory)
         .send_sync()
         .into_output()
-        .generated_migration_name
-        .unwrap();
+        .generated_migration_name;
 
     api.apply_migrations(&directory)
         .send_sync()
@@ -324,7 +321,7 @@ fn dev_diagnostic_can_detect_edited_migrations(api: TestApi) {
     let (initial_migration_name, initial_path) = {
         let out = api.create_migration("initial", &dm1, &directory).send_sync();
         let path = out.migration_script_path();
-        (out.into_output().generated_migration_name.unwrap(), path)
+        (out.into_output().generated_migration_name, path)
     };
 
     let dm2 = api.datamodel_with_provider(
@@ -369,7 +366,7 @@ fn dev_diagnostic_reports_migrations_failing_to_apply_cleanly(api: TestApi) {
     let (initial_migration_name, initial_path) = {
         let out = api.create_migration("initial", &dm1, &directory).send_sync();
         let path = out.migration_script_path();
-        (out.into_output().generated_migration_name.unwrap(), path)
+        (out.into_output().generated_migration_name, path)
     };
 
     let dm2 = api.datamodel_with_provider(
@@ -423,6 +420,7 @@ fn with_a_failed_migration(api: TestApi) {
 
     let CreateMigrationOutput {
         generated_migration_name,
+        ..
     } = api
         .create_migration("01-init", &dm, &migrations_directory)
         .send_sync()
@@ -444,19 +442,14 @@ fn with_a_failed_migration(api: TestApi) {
         assert!(&err.contains("syntax"), "{}", err)
     }
 
-    std::fs::remove_dir_all(
-        migrations_directory
-            .path()
-            .join(generated_migration_name.as_ref().unwrap()),
-    )
-    .unwrap();
+    std::fs::remove_dir_all(migrations_directory.path().join(&generated_migration_name)).unwrap();
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&migrations_directory).send().into_output();
 
-    assert!(action.as_reset().unwrap().contains(&format!(
-        "The migration `{}` failed.",
-        generated_migration_name.unwrap()
-    )));
+    assert!(action
+        .as_reset()
+        .unwrap()
+        .contains(&format!("The migration `{}` failed.", generated_migration_name)));
 }
 
 #[test_connector]
@@ -490,6 +483,7 @@ fn with_an_invalid_unapplied_migration_should_report_it(api: TestApi) {
 
     let CreateMigrationOutput {
         generated_migration_name,
+        ..
     } = api
         .create_migration("second-migration", &dm2, &directory)
         .send_sync()
@@ -506,7 +500,7 @@ fn with_an_invalid_unapplied_migration_should_report_it(api: TestApi) {
 
     let expected_msg = format!(
         "Migration `{}` failed to apply cleanly to the shadow database. \nError",
-        generated_migration_name.unwrap()
+        generated_migration_name
     );
 
     assert_eq!(err.error_code, MigrationDoesNotApplyCleanly::ERROR_CODE);
@@ -618,12 +612,12 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(api: Tes
         dbport = db_url.port().unwrap_or(3306),
     );
 
+    let migrations_list = list_migrations(&directory.into_path()).unwrap();
+
     let err = tok(async {
         let migration_api = schema_api(Some(datamodel), None).unwrap();
         migration_api
-            .dev_diagnostic(DevDiagnosticInput {
-                migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
-            })
+            .dev_diagnostic(DevDiagnosticInput { migrations_list })
             .await
     })
     .unwrap_err()
@@ -666,12 +660,12 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: 
         dbport = db_url.port().unwrap(),
     );
 
+    let migrations_list = list_migrations(&directory.into_path()).unwrap();
+
     let err = tok(async move {
         let migration_api = schema_api(Some(datamodel), None).unwrap();
         migration_api
-            .dev_diagnostic(DevDiagnosticInput {
-                migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
-            })
+            .dev_diagnostic(DevDiagnosticInput { migrations_list })
             .await
     })
     .unwrap_err()
@@ -828,8 +822,7 @@ ALTER TABLE "prisma-tests".profiles ADD CONSTRAINT profiles_id_fkey FOREIGN KEY 
     }))
     .unwrap();
 
-    tok(api.dev_diagnostic(DevDiagnosticInput {
-        migrations_directory_path: tempdir.path().join("migrations").to_string_lossy().into_owned(),
-    }))
-    .unwrap();
+    let migrations_list = list_migrations(&tempdir.into_path()).unwrap();
+
+    tok(api.dev_diagnostic(DevDiagnosticInput { migrations_list })).unwrap();
 }

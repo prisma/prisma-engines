@@ -9,6 +9,7 @@ use js_sys::{Date, Function, Promise, Reflect};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 
+use crate::common::datetime::UtcDateTime;
 use crate::common::timeout::TimeoutError;
 
 #[wasm_bindgen]
@@ -45,7 +46,7 @@ impl SystemTime {
     pub const UNIX_EPOCH: Self = Self(Duration::ZERO);
 
     pub fn now() -> Self {
-        let ms = Date::now() as i64;
+        let ms = js_sys::Date::now() as i64;
         let ms = ms.try_into().expect("negative timestamps are not supported");
         Self(Duration::from_millis(ms))
     }
@@ -107,4 +108,40 @@ fn now() -> f64 {
         })
         .map(|p| p.now())
         .unwrap_or_else(Date::now)
+}
+
+#[derive(Clone, Debug)]
+pub struct DateTime(js_sys::Date);
+
+impl UtcDateTime for DateTime {
+    fn now() -> Self {
+        Self(js_sys::new_0())
+    }
+
+    fn format(&self, format_str: &str) -> String {
+        while let Some(c) = chars.next() {
+            if c == '%' {
+                if let Some(specifier) = chars.next() {
+                    match specifier {
+                        'Y' => result.push_str(&self.0.get_utc_full_year().to_string()),
+                        'm' => result.push_str(&format!("{:02}", self.0.get_utc_month() + 1)), // JS months are 0-based
+                        'd' => result.push_str(&format!("{:02}", self.0.get_utc_date())),
+                        'H' => result.push_str(&format!("{:02}", self.0.get_utc_hours())),
+                        'M' => result.push_str(&format!("{:02}", self.0.get_utc_minutes())),
+                        'S' => result.push_str(&format!("{:02}", self.0.get_utc_seconds())),
+                        _ => result.push_str(&format!("%{}", specifier)),
+                    }
+                }
+            } else {
+                result.push(c);
+            }
+        }
+
+        result
+    }
+}
+
+// Convenience function to get current timestamp formatted
+pub fn format_utc_now(format_str: &str) -> String {
+    DateTime::now().format(format_str)
 }
