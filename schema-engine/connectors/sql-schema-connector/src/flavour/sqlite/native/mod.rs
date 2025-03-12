@@ -43,10 +43,6 @@ impl Connection {
         &self.0
     }
 
-    pub fn new_in_memory() -> Self {
-        Self(Mutex::new(rusqlite::Connection::open_in_memory().unwrap()))
-    }
-
     pub async fn raw_cmd(&self, sql: &str) -> ConnectorResult<()> {
         tracing::debug!(query_type = "raw_cmd", sql);
         let conn = self.0.lock().unwrap();
