@@ -125,7 +125,7 @@ impl JsConnectionInfo {
 #[cfg_attr(target_arch = "wasm32", derive(Deserialize))]
 #[cfg_attr(target_arch = "wasm32", serde(rename_all = "camelCase"))]
 #[derive(Debug)]
-pub struct JSResultSet {
+pub struct JsResultSet {
     pub column_types: Vec<ColumnType>,
     pub column_names: Vec<String>,
     // Note this might be encoded differently for performance reasons
@@ -133,7 +133,7 @@ pub struct JSResultSet {
     pub last_insert_id: Option<String>,
 }
 
-impl JSResultSet {
+impl JsResultSet {
     pub fn len(&self) -> usize {
         self.rows.len()
     }

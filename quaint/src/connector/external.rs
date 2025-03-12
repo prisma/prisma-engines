@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use async_trait::async_trait;
 
 use super::{SqlFamily, TransactionCapable};
@@ -22,4 +24,12 @@ impl ExternalConnectionInfo {
 #[async_trait]
 pub trait ExternalConnector: TransactionCapable {
     async fn get_connection_info(&self) -> crate::Result<ExternalConnectionInfo>;
+    async fn execute_script(&self, script: &str) -> crate::Result<()>;
+    async fn dispose(&self) -> crate::Result<()>;
+}
+
+#[async_trait]
+pub trait ExternalConnectorFactory: Send + Sync {
+    async fn connect(&self) -> crate::Result<Arc<dyn ExternalConnector>>;
+    async fn connect_to_shadow_db(&self) -> Option<crate::Result<Arc<dyn ExternalConnector>>>;
 }

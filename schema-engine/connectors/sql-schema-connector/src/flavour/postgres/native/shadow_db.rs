@@ -1,4 +1,4 @@
-use crate::flavour::postgres::{Circumstances, MigratePostgresUrl};
+use crate::flavour::postgres::{sql_schema_from_migrations_and_db, Circumstances, MigratePostgresUrl};
 use crate::flavour::{validate_connection_infos_do_not_match, PostgresFlavour, SqlFlavour};
 use schema_connector::{migrations_directory::MigrationDirectory, ConnectorResult};
 use schema_connector::{ConnectorError, ConnectorParams, Namespaces};
@@ -20,7 +20,7 @@ pub async fn sql_schema_from_migration_history(
             .and_then(|p| p.connector_params.shadow_database_connection_string.clone())
     });
 
-    let is_postgres = provider == PostgresProvider::PostgreSql
+    let is_vanilla_postgres = provider == PostgresProvider::PostgreSql
         && super::get_circumstances(state).is_none_or(|c| !c.contains(Circumstances::IsCockroachDb));
 
     match shadow_database_connection_string {
@@ -46,7 +46,20 @@ pub async fn sql_schema_from_migration_history(
                 crate::best_effort_reset(&mut shadow_database, namespaces.clone()).await?;
             }
 
-            sql_schema_from_migrations_and_db(migrations, shadow_database, namespaces).await
+            let circumstances = shadow_database.circumstances().unwrap_or_default();
+            shadow_database
+                .with_connection(|conn, params| {
+                    sql_schema_from_migrations_and_db(
+                        conn,
+                        params,
+                        params.url.schema().to_owned(),
+                        migrations,
+                        namespaces,
+                        circumstances,
+                        params.connector_params.preview_features,
+                    )
+                })
+                .await
         }
         None => {
             let (main_connection, params) = super::get_connection_and_params(state, provider).await?;
@@ -83,9 +96,24 @@ pub async fn sql_schema_from_migration_history(
             // We go through the whole process without early return, then clean up
             // the shadow database, and only then return the result. This avoids
             // leaving shadow databases behind in case of e.g. faulty migrations.
-            let ret = sql_schema_from_migrations_and_db(migrations, shadow_database, namespaces).await;
+            let circumstances = shadow_database.circumstances().unwrap_or_default();
+            let ret = shadow_database
+                .with_connection(|conn, params| {
+                    sql_schema_from_migrations_and_db(
+                        conn,
+                        params,
+                        params.url.schema().to_owned(),
+                        migrations,
+                        namespaces,
+                        circumstances,
+                        params.connector_params.preview_features,
+                    )
+                })
+                .await;
+            // if we don't drop the database, subsequent DROP DATABASE commands will fail
+            drop(shadow_database);
 
-            if is_postgres {
+            if is_vanilla_postgres {
                 drop_db_try_force(main_connection, &shadow_database_name)
                     .await
                     .map_err(super::quaint_error_mapper(params))?;
@@ -100,40 +128,6 @@ pub async fn sql_schema_from_migration_history(
             ret
         }
     }
-}
-
-pub async fn sql_schema_from_migrations_and_db(
-    migrations: &[MigrationDirectory],
-    mut shadow_db: PostgresFlavour,
-    namespaces: Option<Namespaces>,
-) -> ConnectorResult<SqlSchema> {
-    if shadow_db.provider == PostgresProvider::CockroachDb {
-        // CockroachDB is very slow in applying DDL statements.
-        // A workaround to it is to run the statements in a transaction block. This comes with some
-        // drawbacks and limitations though, so we only apply this when creating a shadow db.
-        // See https://www.cockroachlabs.com/docs/stable/online-schema-changes#limitations
-        // Original GitHub issue with context: https://github.com/prisma/prisma/issues/12384#issuecomment-1152523689
-        shadow_db.raw_cmd("BEGIN;").await?;
-    }
-
-    for migration in migrations {
-        let script = migration.read_migration_script()?;
-
-        tracing::debug!(
-            "Applying migration `{}` to shadow database.",
-            migration.migration_name()
-        );
-
-        shadow_db.raw_cmd(&script).await.map_err(|connector_error| {
-            connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
-        })?;
-    }
-
-    if shadow_db.provider == PostgresProvider::CockroachDb {
-        shadow_db.raw_cmd("COMMIT;").await?;
-    }
-
-    shadow_db.describe_schema(namespaces).await
 }
 
 /// Drop a database using `WITH (FORCE)` syntax.
