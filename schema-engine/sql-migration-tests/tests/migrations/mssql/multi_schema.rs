@@ -1177,9 +1177,8 @@ async fn migration_with_shadow_database() {
     let namespaces = Namespaces::from_vec(&mut vec![String::from("dbo"), String::from("one"), String::from("two")]);
 
     let mut conn = {
-        let mut conn = SqlSchemaConnector::new_mssql();
+        let mut conn = SqlSchemaConnector::new_mssql(params).unwrap();
 
-        conn.set_params(params).unwrap();
         let _ = conn.raw_cmd("DROP DATABASE shadow").await;
 
         conn.raw_cmd("CREATE DATABASE shadow").await.unwrap();

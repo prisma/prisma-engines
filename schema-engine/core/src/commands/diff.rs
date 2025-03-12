@@ -176,7 +176,7 @@ async fn json_rpc_diff_target_to_connector(
             let provider = schema_connector::migrations_directory::read_provider_from_lock_file(path);
             match (provider.as_deref(), shadow_database_url) {
                 (Some(provider), Some(shadow_database_url)) => {
-                    let mut connector = crate::connector_for_provider(provider)?;
+                    let mut connector = crate::uninitialized_connector_for_provider(provider)?;
                     connector.set_preview_features(preview_features);
                     let directories = schema_connector::migrations_directory::list_migrations(Path::new(path))?;
                     let schema = connector
@@ -189,7 +189,7 @@ async fn json_rpc_diff_target_to_connector(
                     Ok(Some((connector, schema)))
                 }
                 (Some("sqlite"), None) => {
-                    let mut connector = crate::connector_for_provider("sqlite")?;
+                    let mut connector = crate::uninitialized_connector_for_provider("sqlite")?;
                     connector.set_preview_features(preview_features);
                     let directories = schema_connector::migrations_directory::list_migrations(Path::new(path))?;
                     let schema = connector

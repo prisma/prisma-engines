@@ -26,9 +26,22 @@ use super::{Circumstances, MigratePostgresUrl, PostgresProvider, ADVISORY_LOCK_T
 pub(super) type State = crate::flavour::State<Params, (BitFlags<Circumstances>, Connection)>;
 
 #[derive(Debug, Clone)]
-pub struct Params {
+pub(super) struct Params {
     connector_params: ConnectorParams,
     url: MigratePostgresUrl,
+}
+
+impl Params {
+    pub fn new(connector_params: ConnectorParams) -> ConnectorResult<Self> {
+        let mut url: Url = connector_params
+            .connection_string
+            .parse()
+            .map_err(ConnectorError::url_parse_error)?;
+        disable_postgres_statement_cache(&mut url)?;
+
+        let url = MigratePostgresUrl::new(url)?;
+        Ok(Self { connector_params, url })
+    }
 }
 
 pub(super) struct Connection(connector::PostgreSqlWithNoCache);
@@ -86,7 +99,7 @@ impl Connection {
             };
         }
 
-        Ok(Connection(quaint))
+        Ok(Self(quaint))
     }
 
     pub fn as_connector(&self) -> &connector::PostgreSqlWithNoCache {
@@ -256,12 +269,6 @@ pub(super) async fn drop_database(state: &State) -> ConnectorResult<()> {
     Ok(())
 }
 
-pub(super) fn get_connection_string(state: &State) -> Option<&str> {
-    state
-        .params()
-        .map(|params| params.connector_params.connection_string.as_str())
-}
-
 pub(super) fn get_circumstances(state: &State) -> Option<BitFlags<Circumstances>> {
     match state {
         State::Connected(_, (circumstances, _)) => Some(*circumstances),
@@ -299,20 +306,6 @@ pub(super) async fn get_connection_and_params(
 ) -> ConnectorResult<(&Connection, &Params)> {
     let (conn, params, _) = get_connection_and_params_and_circumstances(state, provider).await?;
     Ok((conn, params))
-}
-
-pub(super) fn set_params(state: &mut State, mut connector_params: ConnectorParams) -> ConnectorResult<()> {
-    let mut url: Url = connector_params
-        .connection_string
-        .parse()
-        .map_err(ConnectorError::url_parse_error)?;
-    disable_postgres_statement_cache(&mut url)?;
-    let connection_string = url.to_string();
-    let url = MigratePostgresUrl::new(url)?;
-    connector_params.connection_string = connection_string;
-    let params = Params { connector_params, url };
-    state.set_params(params);
-    Ok(())
 }
 
 pub(super) fn get_preview_features(state: &State) -> BitFlags<PreviewFeature> {

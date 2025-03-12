@@ -18,7 +18,7 @@ use driver_adapters::DriverAdapter;
 use enumflags2::BitFlags;
 use providers::Provider;
 use psl::{builtin_connectors::*, Datasource};
-use schema_core::schema_connector::{ConnectorResult, DiffTarget, SchemaConnector};
+use schema_core::schema_connector::{ConnectorParams, ConnectorResult, DiffTarget, SchemaConnector};
 use std::env;
 
 #[derive(Debug, serde::Deserialize, PartialEq)]
@@ -77,8 +77,9 @@ pub async fn setup_external<'a>(
         DriverAdapter::D1 => {
             // 1. Compute the diff migration script.
             std::fs::remove_file(source.url.as_literal().unwrap().trim_start_matches("file:")).ok();
-            let mut connector = sql_schema_connector::SqlSchemaConnector::new_sqlite();
-            let migration_script = crate::diff(prisma_schema, url, &mut connector).await?;
+            let params = ConnectorParams::new(url, Default::default(), None);
+            let mut connector = sql_schema_connector::SqlSchemaConnector::new_sqlite(params)?;
+            let migration_script = crate::diff(prisma_schema, &mut connector).await?;
 
             // 2. Tell JavaScript to take care of the schema migration.
             //    This results in a JSON-RPC call to the JS runtime.
@@ -147,12 +148,7 @@ pub async fn teardown(prisma_schema: &str, db_schemas: &[&str]) -> ConnectorResu
 
 /// Compute an initialisation migration script via
 /// `prisma migrate diff --from-empty --to-schema-datamodel $SCHEMA_PATH --script`.
-pub(crate) async fn diff(schema: &str, url: String, connector: &mut dyn SchemaConnector) -> ConnectorResult<String> {
-    connector.set_params(schema_core::schema_connector::ConnectorParams {
-        connection_string: url,
-        preview_features: Default::default(),
-        shadow_database_connection_string: None,
-    })?;
+pub(crate) async fn diff(schema: &str, connector: &mut dyn SchemaConnector) -> ConnectorResult<String> {
     let from = connector
         .database_schema_from_diff_target(DiffTarget::Empty, None, None)
         .await?;
@@ -168,11 +164,7 @@ pub(crate) async fn diff(schema: &str, url: String, connector: &mut dyn SchemaCo
 }
 
 /// Apply the script returned by [`diff`] against the database.
-pub(crate) async fn diff_and_apply(
-    schema: &str,
-    url: String,
-    connector: &mut dyn SchemaConnector,
-) -> ConnectorResult<()> {
-    let script = diff(schema, url, connector).await.unwrap();
+pub(crate) async fn diff_and_apply(schema: &str, connector: &mut dyn SchemaConnector) -> ConnectorResult<()> {
+    let script = diff(schema, connector).await.unwrap();
     connector.db_execute(script).await
 }

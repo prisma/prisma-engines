@@ -36,13 +36,12 @@ async fn introspecting_cockroach_db_with_postgres_provider_fails(api: TestApi) {
     // Instantiate the schema connector manually for this test because `TestApi`
     // chooses the provider type based on the current database under test and
     // not on the `provider` field in the schema.
-    let mut engine = SqlSchemaConnector::new_postgres();
     let params = ConnectorParams {
         connection_string: api.connection_string().to_owned(),
         preview_features: api.preview_features(),
         shadow_database_connection_string: None,
     };
-    engine.set_params(params).unwrap();
+    let mut engine = SqlSchemaConnector::new_postgres(params).unwrap();
 
     let err = engine.introspect(&ctx).await.unwrap_err().to_string();
 

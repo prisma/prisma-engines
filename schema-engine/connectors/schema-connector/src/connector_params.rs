@@ -11,3 +11,18 @@ pub struct ConnectorParams {
     /// The shadow database connection string.
     pub shadow_database_connection_string: Option<String>,
 }
+
+impl ConnectorParams {
+    /// Creates new [`ConnectorParams`].
+    pub fn new(
+        connection_string: String,
+        preview_features: BitFlags<PreviewFeature>,
+        shadow_database_connection_string: Option<String>,
+    ) -> Self {
+        Self {
+            connection_string,
+            preview_features,
+            shadow_database_connection_string,
+        }
+    }
+}
