@@ -18,8 +18,18 @@ const OUTPUT_KEY: &str = "output";
 const BINARY_TARGETS_KEY: &str = "binaryTargets";
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 const ENGINE_TYPE_KEY: &str = "engineType";
+const FORMAT_KEY: &str = "format";
+const RUNTIME_KEY: &str = "runtime";
 
-const FIRST_CLASS_PROPERTIES: &[&str] = &[PROVIDER_KEY, OUTPUT_KEY, BINARY_TARGETS_KEY, PREVIEW_FEATURES_KEY];
+// TODO(aqrln): why isn't `ENGINE_TYPE_KEY` a first class property?
+const FIRST_CLASS_PROPERTIES: &[&str] = &[
+    PROVIDER_KEY,
+    OUTPUT_KEY,
+    BINARY_TARGETS_KEY,
+    PREVIEW_FEATURES_KEY,
+    FORMAT_KEY,
+    RUNTIME_KEY,
+];
 
 /// Load and validate Generators defined in an AST.
 pub(crate) fn load_generators_from_ast(
@@ -103,6 +113,14 @@ fn lift_generator(
         .and_then(|v| coerce_array(v, &coerce::string, diagnostics).map(|arr| (arr, v.span())))
         .map(|(arr, span)| parse_and_validate_preview_features(arr, feature_map_with_provider, span, diagnostics));
 
+    let format = args
+        .get(FORMAT_KEY)
+        .and_then(|arg| StringFromEnvVar::coerce(arg, diagnostics));
+
+    let runtime = args
+        .get(RUNTIME_KEY)
+        .and_then(|arg| StringFromEnvVar::coerce(arg, diagnostics));
+
     for prop in &ast_generator.properties {
         let is_first_class_prop = FIRST_CLASS_PROPERTIES.iter().any(|k| *k == prop.name());
         if is_first_class_prop {
@@ -131,6 +149,8 @@ fn lift_generator(
         output,
         binary_targets,
         preview_features,
+        format,
+        runtime,
         config: properties,
         documentation: ast_generator.documentation().map(String::from),
         span: ast_generator.span,
