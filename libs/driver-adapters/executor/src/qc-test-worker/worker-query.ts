@@ -1,6 +1,6 @@
 import * as util from 'node:util'
 import {
-  ErrorCapturingSqlQueryable,
+  SqlQueryable,
   IsolationLevel,
 } from '@prisma/driver-adapter-utils'
 import { JsonProtocolQuery, QueryParams } from '../types/jsonRpc'
@@ -25,7 +25,7 @@ export function query(
 
 class QueryPipeline {
   private compiler: QueryCompiler
-  private driverAdapter: ErrorCapturingSqlQueryable
+  private driverAdapter: SqlQueryable
   private transactionManager: TransactionManager
 
   constructor(
@@ -75,7 +75,7 @@ class QueryPipeline {
   }
 
   private async executeQuery(
-    queryable: ErrorCapturingSqlQueryable,
+    queryable: SqlQueryable,
     query: JsonProtocolQuery,
   ) {
     const queryPlanString = withLocalPanicHandler(() =>
