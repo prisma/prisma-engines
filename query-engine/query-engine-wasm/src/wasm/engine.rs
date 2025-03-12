@@ -66,7 +66,7 @@ impl QueryEngine {
         // Note: if we used `psl::validate`, we'd add ~1MB to the Wasm artifact (before gzip).
         let schema = psl::parse_without_validation(datamodel.into(), CONNECTOR_REGISTRY);
 
-        let js_queryable = Arc::new(driver_adapters::from_js(adapter));
+        let js_queryable = Arc::new(driver_adapters::queryable_from_js(adapter));
 
         let engine_protocol = EngineProtocol::Json;
 

@@ -41,18 +41,22 @@ impl SqlSchemaConnector {
     #[cfg(all(feature = "postgresql", not(feature = "postgresql-native")))]
     pub async fn new_postgres_external(
         adapter: Arc<dyn quaint::connector::ExternalConnector>,
+        factory: Arc<dyn quaint::connector::ExternalConnectorFactory>,
     ) -> ConnectorResult<Self> {
         Ok(SqlSchemaConnector {
-            flavour: Box::new(flavour::PostgresFlavour::new_external(adapter).await?),
+            flavour: Box::new(flavour::PostgresFlavour::new_external(adapter, factory).await?),
             host: Arc::new(EmptyHost),
         })
     }
 
     /// Initialize an external SQLite migration connector.
     #[cfg(all(feature = "sqlite", not(feature = "sqlite-native")))]
-    pub fn new_sqlite_external(adapter: Arc<dyn quaint::connector::ExternalConnector>) -> Self {
+    pub fn new_sqlite_external(
+        adapter: Arc<dyn quaint::connector::ExternalConnector>,
+        factory: Arc<dyn quaint::connector::ExternalConnectorFactory>,
+    ) -> Self {
         SqlSchemaConnector {
-            flavour: Box::new(flavour::SqliteFlavour::new_external(adapter)),
+            flavour: Box::new(flavour::SqliteFlavour::new_external(adapter, factory)),
             host: Arc::new(EmptyHost),
         }
     }

@@ -43,10 +43,6 @@ impl Connection {
         &self.0
     }
 
-    pub fn new_in_memory() -> Self {
-        Self(Mutex::new(rusqlite::Connection::open_in_memory().unwrap()))
-    }
-
     pub async fn raw_cmd(&self, sql: &str) -> ConnectorResult<()> {
         tracing::debug!(query_type = "raw_cmd", sql);
         let conn = self.0.lock().unwrap();
@@ -176,6 +172,15 @@ impl Connection {
 
         super::acquire_lock(self).await
     }
+
+    pub async fn dispose(&self) -> ConnectorResult<()> {
+        // nothing to do, the `drop` will handle cleanup
+        Ok(())
+    }
+}
+
+pub async fn new_shadow_db(_state: &State) -> ConnectorResult<Connection> {
+    Ok(Connection(Mutex::new(rusqlite::Connection::open_in_memory().unwrap())))
 }
 
 pub(super) async fn create_database(state: &State) -> ConnectorResult<String> {

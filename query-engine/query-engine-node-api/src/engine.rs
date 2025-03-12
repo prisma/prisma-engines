@@ -110,7 +110,7 @@ impl QueryEngine {
         } else {
             #[cfg(feature = "driver-adapters")]
             if let Some(adapter) = maybe_adapter {
-                let js_queryable = driver_adapters::from_js(adapter);
+                let js_queryable = driver_adapters::queryable_from_js(adapter);
 
                 connector_mode = ConnectorMode::Js {
                     adapter: Arc::new(js_queryable),
