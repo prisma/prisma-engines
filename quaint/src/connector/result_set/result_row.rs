@@ -28,10 +28,12 @@ impl IntoIterator for ResultRow {
 ///
 /// ```
 /// # use quaint::connector::*;
-/// let names = vec!["id".to_string(), "name".to_string()];
+/// let names = vec!["id".to_string(), "name".to_string()];    /// # let column_types = vec![ColumnType::Text, ColumnType::Text];
+/// let column_types = vec![ColumnType::Text, ColumnType::Text];
 /// let rows = vec![vec!["1234".into(), "Musti".into()]];
 ///
-/// let result_set = ResultSet::new(names, rows);
+/// let result_set = ResultSet::new(names, column_types, rows);
+///
 /// let row = result_set.first().unwrap();
 ///
 /// assert_eq!(row[0], row["id"]);
@@ -100,8 +102,9 @@ impl<'a> ResultRowRef<'a> {
     /// ```
     /// # use quaint::connector::*;
     /// # let names = vec!["id".to_string(), "name".to_string()];
+    /// # let column_types = vec![ColumnType::Text, ColumnType::Text];
     /// # let rows = vec![vec!["1234".into(), "Musti".into()]];
-    /// # let result_set = ResultSet::new(names, rows);
+    /// # let result_set = ResultSet::new(names, column_types, rows);
     /// # let row = result_set.first().unwrap();
     /// assert_eq!(Some(&row[0]), row.at(0));
     /// ```
@@ -118,8 +121,9 @@ impl<'a> ResultRowRef<'a> {
     /// ```
     /// # use quaint::connector::*;
     /// # let names = vec!["id".to_string(), "name".to_string()];
+    /// # let column_types = vec![ColumnType::Text, ColumnType::Text];
     /// # let rows = vec![vec!["1234".into(), "Musti".into()]];
-    /// # let result_set = ResultSet::new(names, rows);
+    /// # let result_set = ResultSet::new(names, column_types, rows);
     /// # let row = result_set.first().unwrap();
     /// assert_eq!(Some(&row["id"]), row.get("id"));
     /// ```

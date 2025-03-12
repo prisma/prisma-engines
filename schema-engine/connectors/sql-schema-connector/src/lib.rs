@@ -63,20 +63,20 @@ impl SqlSchemaConnector {
 
     /// Initialize a PostgreSQL migration connector.
     #[cfg(feature = "postgresql-native")]
-    pub fn new_postgres() -> Self {
-        SqlSchemaConnector {
-            flavour: Box::new(flavour::PostgresFlavour::new_postgres()),
+    pub fn new_postgres(params: ConnectorParams) -> ConnectorResult<Self> {
+        Ok(SqlSchemaConnector {
+            flavour: Box::new(flavour::PostgresFlavour::new_postgres(params)?),
             host: Arc::new(EmptyHost),
-        }
+        })
     }
 
     /// Initialize a CockroachDb migration connector.
     #[cfg(feature = "cockroachdb-native")]
-    pub fn new_cockroach() -> Self {
-        SqlSchemaConnector {
-            flavour: Box::new(flavour::PostgresFlavour::new_cockroach()),
+    pub fn new_cockroach(params: ConnectorParams) -> ConnectorResult<Self> {
+        Ok(SqlSchemaConnector {
+            flavour: Box::new(flavour::PostgresFlavour::new_cockroach(params)?),
             host: Arc::new(EmptyHost),
-        }
+        })
     }
 
     /// Initialize a PostgreSQL-like schema connector.
@@ -84,36 +84,76 @@ impl SqlSchemaConnector {
     /// Use [`Self::new_postgres()`] or [`Self::new_cockroach()`] instead when the provider is
     /// explicitly specified by user or already known otherwise.
     #[cfg(any(feature = "postgresql-native", feature = "cockroachdb-native"))]
-    pub fn new_postgres_like() -> Self {
-        SqlSchemaConnector {
-            flavour: Box::<flavour::PostgresFlavour>::default(),
+    pub fn new_postgres_like(params: ConnectorParams) -> ConnectorResult<Self> {
+        Ok(SqlSchemaConnector {
+            flavour: Box::new(flavour::PostgresFlavour::new_with_params(params)?),
             host: Arc::new(EmptyHost),
-        }
+        })
     }
 
     /// Initialize a SQLite migration connector.
     #[cfg(feature = "sqlite-native")]
-    pub fn new_sqlite() -> Self {
-        SqlSchemaConnector {
-            flavour: Box::<flavour::SqliteFlavour>::default(),
+    pub fn new_sqlite(params: ConnectorParams) -> ConnectorResult<Self> {
+        Ok(SqlSchemaConnector {
+            flavour: Box::new(flavour::SqliteFlavour::new_with_params(params)?),
             host: Arc::new(EmptyHost),
-        }
+        })
     }
 
     /// Initialize a MySQL migration connector.
     #[cfg(feature = "mysql-native")]
-    pub fn new_mysql() -> Self {
-        SqlSchemaConnector {
-            flavour: Box::<flavour::MysqlFlavour>::default(),
+    pub fn new_mysql(params: ConnectorParams) -> ConnectorResult<Self> {
+        Ok(SqlSchemaConnector {
+            flavour: Box::new(flavour::MysqlFlavour::new_with_params(params)?),
             host: Arc::new(EmptyHost),
-        }
+        })
     }
 
     /// Initialize a MSSQL migration connector.
     #[cfg(feature = "mssql-native")]
-    pub fn new_mssql() -> Self {
-        SqlSchemaConnector {
-            flavour: Box::<flavour::MssqlFlavour>::default(),
+    pub fn new_mssql(params: ConnectorParams) -> ConnectorResult<Self> {
+        Ok(SqlSchemaConnector {
+            flavour: Box::new(flavour::MssqlFlavour::new_with_params(params)?),
+            host: Arc::new(EmptyHost),
+        })
+    }
+
+    /// Create a new uninitialized MySQL migration connector.
+    #[cfg(feature = "mysql-native")]
+    pub fn new_uninitialized_mysql() -> Self {
+        Self::new_uninitialized_flavour::<flavour::MysqlFlavour>()
+    }
+
+    /// Create a new uninitialized MSSQL migration connector.
+    #[cfg(feature = "mssql-native")]
+    pub fn new_uninitialized_mssql() -> Self {
+        Self::new_uninitialized_flavour::<flavour::MssqlFlavour>()
+    }
+
+    /// Create a new uninitialized SQLite migration connector.
+    #[cfg(feature = "sqlite-native")]
+    pub fn new_uninitialized_sqlite() -> Self {
+        Self::new_uninitialized_flavour::<flavour::SqliteFlavour>()
+    }
+
+    /// Create a new uninitialized PostgreSQL migration connector.
+    #[cfg(feature = "postgresql-native")]
+    pub fn new_uninitialized_postgres() -> Self {
+        Self::new_uninitialized_flavour::<flavour::PostgresFlavour>()
+    }
+
+    /// Create a new uninitialized CockroachDB migration connector.
+    #[cfg(feature = "cockroachdb-native")]
+    pub fn new_uninitialized_cockroachdb() -> Self {
+        Self {
+            flavour: Box::new(flavour::PostgresFlavour::new_uninitialized_cockroach()),
+            host: Arc::new(EmptyHost),
+        }
+    }
+
+    fn new_uninitialized_flavour<Flavour: SqlFlavour + Default + 'static>() -> Self {
+        Self {
+            flavour: Box::new(Flavour::default()),
             host: Arc::new(EmptyHost),
         }
     }
@@ -150,11 +190,6 @@ impl SqlSchemaConnector {
     /// For tests
     pub async fn raw_cmd(&mut self, sql: &str) -> ConnectorResult<()> {
         self.flavour.raw_cmd(sql).await
-    }
-
-    /// Prepare the connector to connect.
-    pub fn set_params(&mut self, params: ConnectorParams) -> ConnectorResult<()> {
-        self.flavour.set_params(params)
     }
 
     async fn db_schema_from_diff_target(
@@ -197,16 +232,8 @@ impl SchemaConnector for SqlSchemaConnector {
         self.host = host;
     }
 
-    fn set_params(&mut self, params: ConnectorParams) -> ConnectorResult<()> {
-        self.flavour.set_params(params)
-    }
-
     fn set_preview_features(&mut self, preview_features: BitFlags<psl::PreviewFeature>) {
         self.flavour.set_preview_features(preview_features)
-    }
-
-    fn connection_string(&self) -> Option<&str> {
-        self.flavour.connection_string()
     }
 
     fn connector_type(&self) -> &'static str {

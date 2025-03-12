@@ -19,7 +19,6 @@ pub async fn sql_schema_from_migration_history(
             .params()
             .and_then(|p| p.connector_params.shadow_database_connection_string.clone())
     });
-    let mut shadow_database = PostgresFlavour::default();
 
     let is_vanilla_postgres = provider == PostgresProvider::PostgreSql
         && super::get_circumstances(state).is_none_or(|c| !c.contains(Circumstances::IsCockroachDb));
@@ -33,19 +32,15 @@ pub async fn sql_schema_from_migration_history(
                 )?;
             }
 
-            let shadow_db_params = ConnectorParams {
-                connection_string: shadow_database_connection_string,
-                preview_features: state
-                    .params()
-                    .map(|p| p.connector_params.preview_features)
-                    .unwrap_or_default(),
-                shadow_database_connection_string: None,
-            };
-
-            shadow_database.set_params(shadow_db_params)?;
-            shadow_database.ensure_connection_validity().await?;
+            let preview_features = state
+                .params()
+                .map(|p| p.connector_params.preview_features)
+                .unwrap_or_default();
+            let connector_params = ConnectorParams::new(shadow_database_connection_string, preview_features, None);
+            let mut shadow_database = PostgresFlavour::new_with_params(connector_params)?;
 
             tracing::info!("Connecting to user-provided shadow database.");
+            shadow_database.ensure_connection_validity().await?;
 
             if shadow_database.reset(namespaces.clone()).await.is_err() {
                 crate::best_effort_reset(&mut shadow_database, namespaces.clone()).await?;
@@ -91,12 +86,10 @@ pub async fn sql_schema_from_migration_history(
             } else {
                 shadow_database_url.set_path(&format!("/{shadow_database_name}"));
             }
-            let shadow_db_params = ConnectorParams {
-                connection_string: shadow_database_url.to_string(),
-                preview_features: params.connector_params.preview_features,
-                shadow_database_connection_string: None,
-            };
-            shadow_database.set_params(shadow_db_params)?;
+
+            let preview_features = params.connector_params.preview_features;
+            let connector_params = ConnectorParams::new(shadow_database_url.to_string(), preview_features, None);
+            let mut shadow_database = PostgresFlavour::new_with_params(connector_params)?;
             tracing::debug!("Connecting to shadow database `{}`", shadow_database_name);
             shadow_database.ensure_connection_validity().await?;
 

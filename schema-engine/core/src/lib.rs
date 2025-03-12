@@ -47,9 +47,7 @@ fn connector_for_connection_string(
                 preview_features,
                 shadow_database_connection_string,
             };
-            let mut connector = SqlSchemaConnector::new_postgres_like();
-            connector.set_params(params)?;
-            Ok(Box::new(connector))
+            Ok(Box::new(SqlSchemaConnector::new_postgres_like(params)?))
         }
         Some("file") => {
             let params = ConnectorParams {
@@ -57,9 +55,7 @@ fn connector_for_connection_string(
                 preview_features,
                 shadow_database_connection_string,
             };
-            let mut connector = SqlSchemaConnector::new_sqlite();
-            connector.set_params(params)?;
-            Ok(Box::new(connector))
+            Ok(Box::new(SqlSchemaConnector::new_sqlite(params)?))
         }
         Some("mysql") => {
             let params = ConnectorParams {
@@ -67,9 +63,7 @@ fn connector_for_connection_string(
                 preview_features,
                 shadow_database_connection_string,
             };
-            let mut connector = SqlSchemaConnector::new_mysql();
-            connector.set_params(params)?;
-            Ok(Box::new(connector))
+            Ok(Box::new(SqlSchemaConnector::new_mysql(params)?))
         }
         Some("sqlserver") => {
             let params = ConnectorParams {
@@ -77,9 +71,7 @@ fn connector_for_connection_string(
                 preview_features,
                 shadow_database_connection_string,
             };
-            let mut connector = SqlSchemaConnector::new_mssql();
-            connector.set_params(params)?;
-            Ok(Box::new(connector))
+            Ok(Box::new(SqlSchemaConnector::new_mssql(params)?))
         }
         Some("mongodb+srv") | Some("mongodb") => {
             let params = ConnectorParams {
@@ -111,17 +103,16 @@ fn schema_to_connector_unchecked(
         .next()
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
-    let mut connector = connector_for_provider(source.active_provider)?;
-
     if let Ok(connection_string) = source.load_direct_url(|key| env::var(key).ok()) {
-        connector.set_params(ConnectorParams {
+        let connector_params = ConnectorParams {
             connection_string,
             preview_features,
             shadow_database_connection_string: source.load_shadow_database_url().ok().flatten(),
-        })?;
+        };
+        connector_for_provider(source.active_provider, connector_params)
+    } else {
+        uninitialized_connector_for_provider(source.active_provider)
     }
-
-    Ok(connector)
 }
 
 /// Go from a schema to a connector
@@ -141,25 +132,38 @@ fn schema_to_connector(
         shadow_database_connection_string: shadow_database_url,
     };
 
-    let mut connector = connector_for_provider(source.active_provider)?;
-    connector.set_params(params)?;
-
-    Ok(connector)
+    connector_for_provider(source.active_provider, params)
 }
 
-fn connector_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
+fn connector_for_provider(
+    provider: &str,
+    params: ConnectorParams,
+) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
     if let Some(connector) = BUILTIN_CONNECTORS.iter().find(|c| c.is_provider(provider)) {
         match connector.flavour() {
-            Flavour::Cockroach => Ok(Box::new(SqlSchemaConnector::new_cockroach())),
-            Flavour::Mongo => Ok(Box::new(MongoDbSchemaConnector::new(ConnectorParams {
-                connection_string: String::new(),
-                preview_features: Default::default(),
-                shadow_database_connection_string: None,
-            }))),
-            Flavour::Sqlserver => Ok(Box::new(SqlSchemaConnector::new_mssql())),
-            Flavour::Mysql => Ok(Box::new(SqlSchemaConnector::new_mysql())),
-            Flavour::Postgres => Ok(Box::new(SqlSchemaConnector::new_postgres())),
-            Flavour::Sqlite => Ok(Box::new(SqlSchemaConnector::new_sqlite())),
+            Flavour::Cockroach => Ok(Box::new(SqlSchemaConnector::new_cockroach(params)?)),
+            Flavour::Mongo => Ok(Box::new(MongoDbSchemaConnector::new(params))),
+            Flavour::Sqlserver => Ok(Box::new(SqlSchemaConnector::new_mssql(params)?)),
+            Flavour::Mysql => Ok(Box::new(SqlSchemaConnector::new_mysql(params)?)),
+            Flavour::Postgres => Ok(Box::new(SqlSchemaConnector::new_postgres(params)?)),
+            Flavour::Sqlite => Ok(Box::new(SqlSchemaConnector::new_sqlite(params)?)),
+        }
+    } else {
+        Err(CoreError::from_msg(format!(
+            "`{provider}` is not a supported connector."
+        )))
+    }
+}
+
+fn uninitialized_connector_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector::SchemaConnector>> {
+    if let Some(connector) = BUILTIN_CONNECTORS.iter().find(|c| c.is_provider(provider)) {
+        match connector.flavour() {
+            Flavour::Cockroach => Ok(Box::new(SqlSchemaConnector::new_uninitialized_cockroachdb())),
+            Flavour::Mongo => Ok(Box::new(MongoDbSchemaConnector::new_uninitialized())),
+            Flavour::Sqlserver => Ok(Box::new(SqlSchemaConnector::new_uninitialized_mssql())),
+            Flavour::Mysql => Ok(Box::new(SqlSchemaConnector::new_uninitialized_mysql())),
+            Flavour::Postgres => Ok(Box::new(SqlSchemaConnector::new_uninitialized_postgres())),
+            Flavour::Sqlite => Ok(Box::new(SqlSchemaConnector::new_uninitialized_sqlite())),
         }
     } else {
         Err(CoreError::from_msg(format!(

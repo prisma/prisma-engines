@@ -45,14 +45,12 @@ impl TestApi {
         let namespaces: Vec<String> = args.namespaces().iter().map(|ns| ns.to_string()).collect();
         let (database, connection_string, api): (Quaint, String, SqlSchemaConnector) = if tags.intersects(Tags::Vitess)
         {
-            let mut me = SqlSchemaConnector::new_mysql();
-
             let params = ConnectorParams {
                 connection_string: connection_string.to_owned(),
                 preview_features,
                 shadow_database_connection_string: None,
             };
-            me.set_params(params).unwrap();
+            let mut me = SqlSchemaConnector::new_mysql(params).unwrap();
 
             me.reset(true, schema_connector::Namespaces::from_vec(&mut namespaces.clone()))
                 .await
@@ -65,26 +63,22 @@ impl TestApi {
             )
         } else if tags.contains(Tags::Mysql) {
             let (_, cs) = args.create_mysql_database().await;
-            let mut me = SqlSchemaConnector::new_mysql();
-
             let params = ConnectorParams {
                 connection_string: cs.to_owned(),
                 preview_features,
                 shadow_database_connection_string: None,
             };
-            me.set_params(params).unwrap();
+            let me = SqlSchemaConnector::new_mysql(params).unwrap();
 
             (Quaint::new(&cs).await.unwrap(), cs, me)
         } else if tags.contains(Tags::Postgres) && !tags.contains(Tags::CockroachDb) {
             let (_, q, cs) = args.create_postgres_database().await;
-            let mut me = SqlSchemaConnector::new_postgres();
-
             let params = ConnectorParams {
                 connection_string: cs.to_owned(),
                 preview_features,
                 shadow_database_connection_string: None,
             };
-            me.set_params(params).unwrap();
+            let me = SqlSchemaConnector::new_postgres(params).unwrap();
 
             (q, cs, me)
         } else if tags.contains(Tags::CockroachDb) {
@@ -98,40 +92,34 @@ impl TestApi {
             .await
             .unwrap();
 
-            let mut me = SqlSchemaConnector::new_cockroach();
-
             let params = ConnectorParams {
                 connection_string: cs.to_owned(),
                 preview_features,
                 shadow_database_connection_string: None,
             };
-            me.set_params(params).unwrap();
+            let me = SqlSchemaConnector::new_cockroach(params).unwrap();
 
             (q, cs, me)
         } else if tags.contains(Tags::Mssql) {
             let (q, cs) = args.create_mssql_database().await;
 
-            let mut me = SqlSchemaConnector::new_mssql();
-
             let params = ConnectorParams {
                 connection_string: cs.to_owned(),
                 preview_features,
                 shadow_database_connection_string: None,
             };
-            me.set_params(params).unwrap();
+            let me = SqlSchemaConnector::new_mssql(params).unwrap();
 
             (q, cs, me)
         } else if tags.contains(Tags::Sqlite) {
             let url = sqlite_test_url(args.test_function_name());
-
-            let mut me = SqlSchemaConnector::new_sqlite();
 
             let params = ConnectorParams {
                 connection_string: url.to_owned(),
                 preview_features,
                 shadow_database_connection_string: None,
             };
-            me.set_params(params).unwrap();
+            let me = SqlSchemaConnector::new_sqlite(params).unwrap();
 
             (Quaint::new(&url).await.unwrap(), url, me)
         } else {

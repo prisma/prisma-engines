@@ -125,16 +125,8 @@ pub(super) async fn introspect(state: &mut State) -> ConnectorResult<SqlSchema> 
     super::describe_schema(&state.connection).await
 }
 
-pub(super) fn get_connection_string(_state: &State) -> Option<&str> {
-    panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
-}
-
 pub(super) fn get_connection_and_params(state: &mut State) -> ConnectorResult<(&Connection, &Params)> {
     Ok((&state.connection, &Params))
-}
-
-pub(super) fn set_params(_state: &mut State, _params: ConnectorParams) -> ConnectorResult<()> {
-    panic!("[sql-schema-connector::flavour::sqlite::wasm] Not implemented");
 }
 
 pub(super) fn set_preview_features(state: &mut State, features: BitFlags<PreviewFeature>) {
