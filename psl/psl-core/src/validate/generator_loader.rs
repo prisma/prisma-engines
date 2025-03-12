@@ -98,7 +98,6 @@ fn lift_generator(
         .and_then(|arg| coerce_array(arg, &StringFromEnvVar::coerce, diagnostics))
         .unwrap_or_default();
 
-    // for compatibility reasons we still accept the old experimental key
     let preview_features = args
         .get(PREVIEW_FEATURES_KEY)
         .and_then(|v| coerce_array(v, &coerce::string, diagnostics).map(|arr| (arr, v.span())))
