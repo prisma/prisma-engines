@@ -38,7 +38,8 @@ pub(crate) struct AdapterFactoryProxy {
 /// This is a JS proxy for accessing the methods specific to top level
 /// JS driver objects
 pub(crate) struct DriverProxy {
-    /// Execute a script composed of multiple statements.
+    /// Execute a script composed of multiple statements. This is usually analogous to the output
+    /// of `prisma migrate diff --script`.
     execute_script: AdapterMethod<String, ()>,
 
     /// Retrieve driver-specific info, such as the maximum number of query parameters
