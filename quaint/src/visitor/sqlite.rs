@@ -86,7 +86,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         Q: Into<Query<'a>>,
     {
         let template = <Sqlite<'a> as Visitor>::build_template(query)?;
-        let sql = template.to_sql();
+        let sql = template.to_string();
         Ok((sql, template.parameters))
     }
 

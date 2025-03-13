@@ -1,5 +1,6 @@
 use crate::ast::Value;
 use serde::Serialize;
+use std::fmt;
 use std::fmt::Debug;
 
 #[derive(Debug)]
@@ -40,31 +41,39 @@ const END_REPEAT: &str = "/* prisma-comma-repeatable-end */";
 impl QueryTemplate<'_> {
     pub fn new(placeholder: PlaceholderFormat) -> Self {
         QueryTemplate {
-            fragments: Vec::with_capacity(64),
-            parameters: Vec::with_capacity(64),
+            fragments: Vec::new(),
+            parameters: Vec::new(),
             placeholder_format: placeholder,
         }
     }
+}
 
-    /// Used only for testing and for compatibility with the old Query Engine code
-    pub fn to_sql(&self) -> String {
-        let mut sql = String::with_capacity(4096);
+/// Used only for testing and for compatibility with the old Query Engine code
+impl fmt::Display for QueryTemplate<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fn fmt_param(f: &mut fmt::Formatter<'_>, format: &PlaceholderFormat, number: &mut i32) -> fmt::Result {
+            if format.has_numbering {
+                write!(f, "{}{}", format.prefix, number)?;
+                *number += 1;
+                Ok(())
+            } else {
+                write!(f, "{}", format.prefix)
+            }
+        }
+
         let mut placeholder_number = 1;
         for fragment in &self.fragments {
             match fragment {
-                Fragment::StringChunk(chunk) => sql.push_str(chunk),
-                Fragment::Parameter => {
-                    self.placeholder_format.write(&mut sql, &mut placeholder_number);
-                }
-
-                // Code compatibility for parameter tuples (repeatable parameters)
+                Fragment::StringChunk(chunk) => write!(f, "{chunk}"),
+                Fragment::Parameter => fmt_param(f, &self.placeholder_format, &mut placeholder_number),
                 Fragment::ParameterTuple => {
-                    sql.push_str(BEGIN_REPEAT);
-                    self.placeholder_format.write(&mut sql, &mut placeholder_number);
-                    sql.push_str(END_REPEAT);
+                    write!(f, "{BEGIN_REPEAT}")?;
+                    fmt_param(f, &self.placeholder_format, &mut placeholder_number)?;
+                    write!(f, "{END_REPEAT}")
                 }
-            };
+            }?
         }
-        sql
+
+        Ok(())
     }
 }

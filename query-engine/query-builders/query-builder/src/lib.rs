@@ -4,6 +4,7 @@ use query_structure::{
     ScalarCondition, ScalarField, SelectionResult, WriteArgs,
 };
 use serde::Serialize;
+use std::fmt::Formatter;
 use std::{collections::HashMap, fmt};
 
 mod query_arguments_ext;
@@ -155,40 +156,41 @@ pub enum DbQuery {
 }
 
 impl DbQuery {
-    pub fn get_params(&self) -> &Vec<PrismaValue> {
+    pub fn params(&self) -> &Vec<PrismaValue> {
         match self {
             DbQuery::RawSql { params, .. } => params,
             DbQuery::TemplateSql { params, .. } => params,
         }
     }
+}
 
-    /// This should only be used for debug, test and playground CLI output.
-    /// The placeholder syntax does not attempt to match any actual SQL flavor.
-    pub fn to_debug_sql(&self) -> String {
+/// This should only be used for debug, test and playground CLI output.
+/// The placeholder syntax does not attempt to match any actual SQL flavor.
+impl fmt::Display for DbQuery {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        fn format_fragments(f: &mut Formatter<'_>, fragments: &Vec<Fragment>) -> fmt::Result {
+            let mut number = 1;
+            for fragment in fragments {
+                match fragment {
+                    Fragment::StringChunk(s) => {
+                        write!(f, "{}", s)?;
+                    }
+                    Fragment::Parameter => {
+                        write!(f, "${number}")?;
+                        number += 1;
+                    }
+                    Fragment::ParameterTuple => {
+                        write!(f, "[${number}]")?;
+                        number += 1;
+                    }
+                };
+            }
+            Ok(())
+        }
+
         match self {
-            DbQuery::RawSql { sql, .. } => sql.clone(),
-            DbQuery::TemplateSql { fragments, .. } => DbQuery::debug_format_template_sql(fragments),
+            DbQuery::RawSql { sql, .. } => write!(f, "{}", sql),
+            DbQuery::TemplateSql { fragments, .. } => format_fragments(f, fragments),
         }
-    }
-
-    fn debug_format_template_sql(fragments: &Vec<Fragment>) -> String {
-        let mut sql = String::with_capacity(4096);
-        let mut param_number = 1;
-        for fragment in fragments {
-            match fragment {
-                Fragment::StringChunk(chunk) => sql.push_str(chunk),
-                Fragment::Parameter => {
-                    sql.push_str(&format!("${}", param_number));
-                    param_number += 1;
-                }
-
-                // Code compatibility for parameter tuples (repeatable parameters)
-                Fragment::ParameterTuple => {
-                    sql.push_str(&format!("[${}]", param_number));
-                    param_number += 1;
-                }
-            };
-        }
-        sql
     }
 }

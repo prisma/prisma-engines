@@ -195,7 +195,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         Q: Into<Query<'a>>,
     {
         let template = <Mssql<'a> as Visitor>::build_template(query)?;
-        let sql = template.to_sql();
+        let sql = template.to_string();
         Ok((sql, template.parameters))
     }
 

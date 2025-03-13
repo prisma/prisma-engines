@@ -611,7 +611,7 @@ pub trait Visitor<'a> {
             ExpressionKind::ConditionTree(tree) => self.visit_conditions(tree)?,
             ExpressionKind::Compare(compare) => self.visit_compare(compare)?,
             ExpressionKind::Parameterized(val) => self.visit_parameterized(val)?,
-            ExpressionKind::ParameterTuple(val) => self.visit_parameter_tuple(val)?,
+            ExpressionKind::ParameterizedRow(val) => self.visit_parameter_tuple(val)?,
             ExpressionKind::RawValue(val) => self.visit_raw_value(val.0)?,
             ExpressionKind::Column(column) => self.visit_column(*column)?,
             ExpressionKind::Row(row) => self.visit_row(row)?,
@@ -870,7 +870,7 @@ pub trait Visitor<'a> {
                 (
                     left,
                     Expression {
-                        kind: ExpressionKind::ParameterTuple(value),
+                        kind: ExpressionKind::ParameterizedRow(value),
                         ..
                     },
                 ) => {
@@ -955,7 +955,7 @@ pub trait Visitor<'a> {
                 (
                     left,
                     Expression {
-                        kind: ExpressionKind::ParameterTuple(value),
+                        kind: ExpressionKind::ParameterizedRow(value),
                         ..
                     },
                 ) => {

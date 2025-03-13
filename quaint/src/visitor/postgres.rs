@@ -58,7 +58,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Q: Into<Query<'a>>,
     {
         let template = <Postgres<'a> as Visitor>::build_template(query)?;
-        let sql = template.to_sql();
+        let sql = template.to_string();
         Ok((sql, template.parameters))
     }
 

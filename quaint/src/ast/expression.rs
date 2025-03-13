@@ -15,7 +15,7 @@ impl Expression<'_> {
     pub fn as_parameter_tuple(self) -> Self {
         match self.kind {
             ExpressionKind::Parameterized(value) => Expression {
-                kind: ExpressionKind::ParameterTuple(value),
+                kind: ExpressionKind::ParameterizedRow(value),
                 alias: self.alias,
             },
             _ => self,
@@ -62,7 +62,7 @@ impl<'a> Expression<'a> {
                 ..
             }) => true,
 
-            ExpressionKind::ParameterTuple(Value {
+            ExpressionKind::ParameterizedRow(Value {
                 typed: ValueType::Json(_),
                 ..
             }) => true,
@@ -82,7 +82,7 @@ impl<'a> Expression<'a> {
                 ..
             }) => true,
 
-            ExpressionKind::ParameterTuple(Value {
+            ExpressionKind::ParameterizedRow(Value {
                 typed: ValueType::Json(_),
                 ..
             }) => true,
@@ -100,7 +100,7 @@ impl<'a> Expression<'a> {
                 ..
             }) => json_val,
 
-            ExpressionKind::ParameterTuple(Value {
+            ExpressionKind::ParameterizedRow(Value {
                 typed: ValueType::Json(json_val),
                 ..
             }) => json_val,
@@ -223,7 +223,7 @@ pub enum ExpressionKind<'a> {
     /// Anything that we must parameterize before querying
     Parameterized(Value<'a>),
     /// List of parameters with an unknown length, e.g. `(?, ?, ..., ?)`
-    ParameterTuple(Value<'a>),
+    ParameterizedRow(Value<'a>),
     /// A user-provided value we do not parameterize.
     RawValue(Raw<'a>),
     /// A database column
@@ -258,7 +258,7 @@ impl ExpressionKind<'_> {
                 ..
             }) => true,
 
-            Self::ParameterTuple(Value {
+            Self::ParameterizedRow(Value {
                 typed: ValueType::Xml(_),
                 ..
             }) => true,
