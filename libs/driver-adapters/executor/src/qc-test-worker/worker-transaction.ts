@@ -1,4 +1,4 @@
-import { IsolationLevel } from '@prisma/client-engine-runtime'
+import { IsolationLevel } from '@prisma/driver-adapter-utils'
 import type { State } from './worker'
 import { TxOptions } from '../types/jsonRpc'
 
