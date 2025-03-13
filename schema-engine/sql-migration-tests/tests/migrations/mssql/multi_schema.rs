@@ -1,14 +1,7 @@
 use crate::migrations::multi_schema::*;
 use connection_string::JdbcString;
 use indoc::{formatdoc, indoc};
-use psl::PreviewFeature;
-use schema_core::{
-    commands::{apply_migrations, create_migration},
-    json_rpc::types::{ApplyMigrationsInput, CreateMigrationInput, SchemasContainer},
-    schema_connector::{ConnectorParams, SchemaConnector},
-};
-use sql_migration_tests::{test_api::*, utils::list_migrations};
-use sql_schema_connector::SqlSchemaConnector;
+use sql_migration_tests::test_api::*;
 use sql_schema_describer::DefaultValue;
 
 // This is the only "top" level test in this module. It defines a list of tests and executes them.
@@ -1134,62 +1127,37 @@ fn multi_schema_migration(api: TestApi) {
     api.apply_migrations(&dir).send_sync().assert_applied_migrations(&[]);
 }
 
-#[tokio::test]
-async fn migration_with_shadow_database() {
+#[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("one", "two"))]
+fn migration_with_shadow_database(api: TestApi) {
     let conn_str = std::env::var("TEST_DATABASE_URL").unwrap();
 
-    if !conn_str.starts_with("sqlserver") {
-        return;
-    }
+    let mut shadow_str: JdbcString = format!("jdbc:{conn_str}").parse().unwrap();
 
-    let (params, datasource) = {
-        let mut shadow_str: JdbcString = format!("jdbc:{conn_str}").parse().unwrap();
+    shadow_str
+        .properties_mut()
+        .insert("database".to_string(), "shadow".to_string());
 
-        shadow_str
-            .properties_mut()
-            .insert("database".to_string(), "shadow".to_string());
+    let shadow_str = shadow_str.to_string().replace("jdbc:", "");
 
-        let shadow_str = shadow_str.to_string().replace("jdbc:", "");
+    let datasource = formatdoc! {r#"
+        datasource db {{
+          provider          = "sqlserver"
+          url               = "{conn_str}"
+          shadowDatabaseUrl = "{shadow_str}"
+          schemas           = ["one", "two"]
+        }}
 
-        let datasource = formatdoc! {r#"
-            datasource db {{
-              provider          = "sqlserver"
-              url               = "{conn_str}"
-              shadowDatabaseUrl = "{shadow_str}"
-              schemas           = ["one", "two"]
-            }}
-
-            generator js {{
-              provider        = "prisma-client-javascript"
-              previewFeatures = ["multiSchema"]
-            }}
-        "#};
-
-        let params = ConnectorParams {
-            connection_string: conn_str,
-            preview_features: PreviewFeature::MultiSchema.into(),
-            shadow_database_connection_string: Some(shadow_str),
-        };
-
-        (params, datasource)
-    };
+        generator js {{
+          provider        = "prisma-client-javascript"
+          previewFeatures = ["multiSchema"]
+        }}
+    "#};
 
     let namespaces = Namespaces::from_vec(&mut vec![String::from("dbo"), String::from("one"), String::from("two")]);
 
-    let mut conn = {
-        let mut conn = SqlSchemaConnector::new_mssql(params).unwrap();
-
-        let _ = conn.raw_cmd("DROP DATABASE shadow").await;
-
-        conn.raw_cmd("CREATE DATABASE shadow").await.unwrap();
-        conn.reset(true, namespaces.clone()).await.unwrap();
-
-        let _ = conn.raw_cmd("DROP SCHEMA one").await;
-        let _ = conn.raw_cmd("DROP SCHEMA two").await;
-        let _ = conn.raw_cmd("DROP SCHEMA dbo").await;
-
-        conn
-    };
+    api.raw_cmd("DROP DATABASE shadow");
+    api.raw_cmd("CREATE DATABASE shadow");
+    api.reset().send_sync(namespaces.clone());
 
     let dm = formatdoc! {r#"
         {datasource}
@@ -1213,94 +1181,61 @@ async fn migration_with_shadow_database() {
         }}
     "#};
 
-    let migrations_directory = tempfile::tempdir().unwrap();
+    let dir = api.create_migrations_directory();
 
-    let migrations_directory_path = migrations_directory.path();
-    let migrations_list = list_migrations(migrations_directory_path).unwrap();
+    api.create_migration("init", &dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(1)
+        .assert_migration("init", move |migration| {
+            let expected_script = expect![[r#"
+                BEGIN TRY
 
-    let migration = CreateMigrationInput {
-        migrations_list,
-        schema: SchemasContainer {
-            files: vec![SchemaContainer {
-                path: "schema.prisma".to_string(),
-                content: dm.clone(),
-            }],
-        },
-        draft: false,
-        migration_name: "init".to_string(),
-    };
+                BEGIN TRAN;
 
-    create_migration(migration, &mut conn).await.unwrap();
+                -- CreateSchema
+                EXEC sp_executesql N'CREATE SCHEMA [one];';;
 
-    let path = std::fs::read_dir(migrations_directory.path())
-        .expect("Reading migrations directory for named migration.")
-        .find_map(|entry| {
-            let entry = entry.unwrap();
-            let name = entry.file_name();
+                -- CreateSchema
+                EXEC sp_executesql N'CREATE SCHEMA [two];';;
 
-            if name.to_str().unwrap().contains("init") {
-                Some(entry)
-            } else {
-                None
-            }
-        })
-        .unwrap()
-        .path()
-        .join("migration.sql");
+                -- CreateTable
+                CREATE TABLE [one].[A] (
+                    [id] INT NOT NULL,
+                    [bId] INT NOT NULL,
+                    CONSTRAINT [A_pkey] PRIMARY KEY CLUSTERED ([id])
+                );
 
-    let sql = std::fs::read_to_string(path).unwrap();
+                -- CreateTable
+                CREATE TABLE [two].[B] (
+                    [id] INT NOT NULL,
+                    [aId] INT NOT NULL,
+                    CONSTRAINT [B_pkey] PRIMARY KEY CLUSTERED ([id])
+                );
 
-    let expected = expect![[r#"
-        BEGIN TRY
+                -- AddForeignKey
+                ALTER TABLE [one].[A] ADD CONSTRAINT [A_bId_fkey] FOREIGN KEY ([bId]) REFERENCES [two].[B]([id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
-        BEGIN TRAN;
+                -- AddForeignKey
+                ALTER TABLE [two].[B] ADD CONSTRAINT [B_aId_fkey] FOREIGN KEY ([aId]) REFERENCES [one].[A]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
-        -- CreateSchema
-        EXEC sp_executesql N'CREATE SCHEMA [one];';;
+                COMMIT TRAN;
 
-        -- CreateSchema
-        EXEC sp_executesql N'CREATE SCHEMA [two];';;
+                END TRY
+                BEGIN CATCH
 
-        -- CreateTable
-        CREATE TABLE [one].[A] (
-            [id] INT NOT NULL,
-            [bId] INT NOT NULL,
-            CONSTRAINT [A_pkey] PRIMARY KEY CLUSTERED ([id])
-        );
+                IF @@TRANCOUNT > 0
+                BEGIN
+                    ROLLBACK TRAN;
+                END;
+                THROW
 
-        -- CreateTable
-        CREATE TABLE [two].[B] (
-            [id] INT NOT NULL,
-            [aId] INT NOT NULL,
-            CONSTRAINT [B_pkey] PRIMARY KEY CLUSTERED ([id])
-        );
+                END CATCH
+            "#]];
 
-        -- AddForeignKey
-        ALTER TABLE [one].[A] ADD CONSTRAINT [A_bId_fkey] FOREIGN KEY ([bId]) REFERENCES [two].[B]([id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
+            migration.expect_contents(expected_script)
+        });
 
-        -- AddForeignKey
-        ALTER TABLE [two].[B] ADD CONSTRAINT [B_aId_fkey] FOREIGN KEY ([aId]) REFERENCES [one].[A]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
-
-        COMMIT TRAN;
-
-        END TRY
-        BEGIN CATCH
-
-        IF @@TRANCOUNT > 0
-        BEGIN
-            ROLLBACK TRAN;
-        END;
-        THROW
-
-        END CATCH
-    "#]];
-
-    expected.assert_eq(&sql);
-
-    let migrations_directory_path = migrations_directory.path();
-    let migrations_list = list_migrations(migrations_directory_path).unwrap();
-
-    let input = ApplyMigrationsInput { migrations_list };
-
-    apply_migrations(input, &mut conn, namespaces).await.unwrap();
+    api.apply_migrations(&dir)
+        .send_sync()
+        .assert_applied_migrations(&["init"]);
 }

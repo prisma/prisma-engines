@@ -52,6 +52,11 @@ pub struct TestApi {
 }
 
 impl TestApi {
+    pub fn from_connector(connector: SqlSchemaConnector, args: TestApiArgs) -> Self {
+        let root = RootTestApi::new(args);
+        TestApi { root, connector }
+    }
+
     /// Initializer, called by the test macros.
     pub fn new(args: TestApiArgs) -> Self {
         let root = RootTestApi::new(args);

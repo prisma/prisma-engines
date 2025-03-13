@@ -1,15 +1,8 @@
 use indoc::{formatdoc, indoc};
-use psl::PreviewFeature;
-use schema_core::{
-    commands::{apply_migrations, create_migration},
-    json_rpc::types::{ApplyMigrationsInput, CreateMigrationInput, SchemasContainer},
-    schema_connector::{ConnectorParams, SchemaConnector},
-};
-use sql_schema_connector::SqlSchemaConnector;
 use url::Url;
 
 use crate::migrations::multi_schema::*;
-use sql_migration_tests::{test_api::*, utils::list_migrations};
+use sql_migration_tests::test_api::*;
 use sql_schema_describer::DefaultValue;
 
 #[test_connector(tags(Postgres), preview_features("multiSchema"), namespaces("one", "prisma-tests"))]
@@ -1369,23 +1362,21 @@ fn multi_schema_tests(_api: TestApi) {
     });
 }
 
-// TODO: fix
-#[tokio::test]
-async fn migration_with_shadow_database() {
+#[test_connector(
+    tags(Postgres),
+    exclude(CockroachDb),
+    preview_features("multiSchema"),
+    namespaces("one", "two")
+)]
+fn migration_with_shadow_database(api: TestApi) {
     let conn_str = std::env::var("TEST_DATABASE_URL").unwrap();
 
-    let is_cockroach = conn_str.contains("localhost:2625") || conn_str.contains("localhost:26260");
-    if !conn_str.starts_with("postgres") || is_cockroach {
-        return;
-    }
+    let mut shadow_str: Url = conn_str.parse().unwrap();
+    shadow_str.set_path("shadow");
 
-    let (params, datasource) = {
-        let mut shadow_str: Url = conn_str.parse().unwrap();
-        shadow_str.set_path("shadow");
+    let shadow_str = shadow_str.to_string();
 
-        let shadow_str = shadow_str.to_string();
-
-        let datasource = formatdoc! {r#"
+    let datasource = formatdoc! {r#"
             datasource db {{
               provider          = "postgresql"
               url               = "{conn_str}"
@@ -1399,32 +1390,13 @@ async fn migration_with_shadow_database() {
             }}
         "#};
 
-        let params = ConnectorParams {
-            connection_string: dbg!(conn_str),
-            preview_features: PreviewFeature::MultiSchema.into(),
-            shadow_database_connection_string: dbg!(Some(shadow_str)),
-        };
+    let namespaces = Namespaces::from_vec(&mut vec![String::from("one"), String::from("two")]);
 
-        (params, datasource)
-    };
-
-    let namespaces = Namespaces::from_vec(&mut vec![String::from("dbo"), String::from("one"), String::from("two")]);
-
-    let mut conn = {
-        let mut conn = SqlSchemaConnector::new_postgres(params).unwrap();
-
-        let _ = conn.raw_cmd("DROP DATABASE shadow").await;
-
-        conn.raw_cmd("CREATE DATABASE shadow").await.unwrap();
-        conn.reset(false, namespaces.clone()).await.unwrap();
-
-        let _ = conn.raw_cmd("DROP SCHEMA one CASCADE").await;
-        let _ = conn.raw_cmd("DROP SCHEMA two CASCADE").await;
-        let _ = conn.raw_cmd("DROP SCHEMA public CASCADE").await;
-        let _ = conn.raw_cmd("CREATE SCHEMA public").await;
-
-        conn
-    };
+    api.raw_cmd("DROP DATABASE shadow");
+    api.raw_cmd("CREATE DATABASE shadow");
+    api.reset().send_sync(namespaces.clone());
+    api.raw_cmd("DROP SCHEMA public CASCADE");
+    api.raw_cmd("CREATE SCHEMA public");
 
     let dm = formatdoc! {r#"
         {datasource}
@@ -1448,77 +1420,46 @@ async fn migration_with_shadow_database() {
         }}
     "#};
 
-    let migrations_directory = tempfile::tempdir().unwrap();
+    let dir = api.create_migrations_directory();
 
-    let migrations_list = list_migrations(migrations_directory.path()).unwrap();
+    api.create_migration("init", &dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(1)
+        .assert_migration("init", move |migration| {
+            let expected_script = expect![[r#"
+                -- CreateSchema
+                CREATE SCHEMA IF NOT EXISTS "one";
 
-    let migration = CreateMigrationInput {
-        migrations_list,
-        schema: SchemasContainer {
-            files: vec![SchemaContainer {
-                path: "schema.prisma".to_string(),
-                content: dm.clone(),
-            }],
-        },
-        draft: false,
-        migration_name: "init".to_string(),
-    };
+                -- CreateSchema
+                CREATE SCHEMA IF NOT EXISTS "two";
 
-    create_migration(migration, &mut conn).await.unwrap();
+                -- CreateTable
+                CREATE TABLE "one"."A" (
+                    "id" INTEGER NOT NULL,
+                    "bId" INTEGER NOT NULL,
 
-    let path = std::fs::read_dir(migrations_directory.path())
-        .expect("Reading migrations directory for named migration.")
-        .find_map(|entry| {
-            let entry = entry.unwrap();
-            let name = entry.file_name();
+                    CONSTRAINT "A_pkey" PRIMARY KEY ("id")
+                );
 
-            if name.to_str().unwrap().contains("init") {
-                Some(entry)
-            } else {
-                None
-            }
-        })
-        .unwrap()
-        .path()
-        .join("migration.sql");
+                -- CreateTable
+                CREATE TABLE "two"."B" (
+                    "id" INTEGER NOT NULL,
+                    "aId" INTEGER NOT NULL,
 
-    let sql = std::fs::read_to_string(path).unwrap();
+                    CONSTRAINT "B_pkey" PRIMARY KEY ("id")
+                );
 
-    let expected = expect![[r#"
-        -- CreateSchema
-        CREATE SCHEMA IF NOT EXISTS "one";
+                -- AddForeignKey
+                ALTER TABLE "one"."A" ADD CONSTRAINT "A_bId_fkey" FOREIGN KEY ("bId") REFERENCES "two"."B"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
-        -- CreateSchema
-        CREATE SCHEMA IF NOT EXISTS "two";
+                -- AddForeignKey
+                ALTER TABLE "two"."B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "one"."A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+            "#]];
 
-        -- CreateTable
-        CREATE TABLE "one"."A" (
-            "id" INTEGER NOT NULL,
-            "bId" INTEGER NOT NULL,
+            migration.expect_contents(expected_script)
+        });
 
-            CONSTRAINT "A_pkey" PRIMARY KEY ("id")
-        );
-
-        -- CreateTable
-        CREATE TABLE "two"."B" (
-            "id" INTEGER NOT NULL,
-            "aId" INTEGER NOT NULL,
-
-            CONSTRAINT "B_pkey" PRIMARY KEY ("id")
-        );
-
-        -- AddForeignKey
-        ALTER TABLE "one"."A" ADD CONSTRAINT "A_bId_fkey" FOREIGN KEY ("bId") REFERENCES "two"."B"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-
-        -- AddForeignKey
-        ALTER TABLE "two"."B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "one"."A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-    "#]];
-
-    expected.assert_eq(&sql);
-
-    let migrations_list = list_migrations(migrations_directory.path()).unwrap();
-
-    let input = ApplyMigrationsInput { migrations_list };
-
-    apply_migrations(input, &mut conn, namespaces).await.unwrap();
+    api.apply_migrations(&dir)
+        .send_sync()
+        .assert_applied_migrations(&["init"]);
 }
