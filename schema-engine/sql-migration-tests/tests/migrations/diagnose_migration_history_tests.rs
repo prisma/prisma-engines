@@ -990,7 +990,7 @@ fn empty_migration_directories_should_cause_known_errors(api: TestApi) {
 
     assert_eq!(
         err.meta,
-        serde_json::json!({ "migration_file_path": filepath.to_string_lossy(), })
+        serde_json::json!({ "migration_file_path": filepath.strip_prefix(&dirpath).unwrap().to_string_lossy(), })
     );
 }
 
