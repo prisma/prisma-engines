@@ -2,7 +2,7 @@ import { Schema as S } from '@effect/schema'
 import {
   bindAdapter,
   ConnectionInfo,
-  ErrorCapturingDriverAdapter,
+  ErrorCapturingSqlDriverAdapter,
 } from '@prisma/driver-adapter-utils'
 import { DriverAdaptersManager } from '../driver-adapters-manager'
 import * as qc from '../query-compiler'
@@ -82,7 +82,7 @@ export type Message = S.Schema.Type<typeof Message>
 export type State = {
   compiler: qc.QueryCompiler
   driverAdapterManager: DriverAdaptersManager
-  driverAdapter: ErrorCapturingDriverAdapter
+  driverAdapter: ErrorCapturingSqlDriverAdapter
   transactionManager: TransactionManager
 }
 

@@ -1,7 +1,7 @@
 import path from 'node:path'
 import * as S from '@effect/schema/Schema'
 import { PrismaD1 } from '@prisma/adapter-d1'
-import { DriverAdapter } from '@prisma/driver-adapter-utils'
+import { SqlDriverAdapter } from '@prisma/driver-adapter-utils'
 import { getPlatformProxy } from 'wrangler'
 import type { D1Database, D1Result } from '@cloudflare/workers-types'
 
@@ -16,16 +16,22 @@ type TAG = typeof TAG
 export class D1Manager implements DriverAdaptersManager {
   #driver: D1Database
   #dispose: () => Promise<void>
-  #adapter?: DriverAdapter
+  #adapter?: SqlDriverAdapter
 
-  private constructor(private env: EnvForAdapter<TAG>, driver: D1Database, dispose: () => Promise<void>) {
+  private constructor(
+    private env: EnvForAdapter<TAG>,
+    driver: D1Database,
+    dispose: () => Promise<void>,
+  ) {
     this.#driver = driver
     this.#dispose = dispose
   }
 
   static async setup(env: EnvForAdapter<TAG>, migrationScript?: string) {
-    const { env: cfBindings, dispose } = await getPlatformProxy<{ D1_DATABASE: D1Database }>({
-      configPath: path.join(__dirname, "../wrangler.toml"),
+    const { env: cfBindings, dispose } = await getPlatformProxy<{
+      D1_DATABASE: D1Database
+    }>({
+      configPath: path.join(__dirname, '../wrangler.toml'),
     })
 
     const { D1_DATABASE } = cfBindings
@@ -58,15 +64,22 @@ async function migrateDiff(D1_DATABASE: D1Database, migrationScript: string) {
   // `D1_ERROR: A prepared SQL statement must contain only one statement.`
   // We thus need to run each statement separately, splitting the script by `;`.
   const sqlStatements = migrationScript.split(';')
-  const preparedStatements = sqlStatements.map((sqlStatement) => D1_DATABASE.prepare(sqlStatement))
+  const preparedStatements = sqlStatements.map((sqlStatement) =>
+    D1_DATABASE.prepare(sqlStatement),
+  )
   await runBatch(D1_DATABASE, preparedStatements)
 }
 
 async function migrateReset(D1_DATABASE: D1Database) {
-  let { results: rawTables } = ((await D1_DATABASE.prepare(`PRAGMA main.table_list;`).run()) as D1Result)
-  let tables = S
-    .decodeUnknownSync(D1Tables, { onExcessProperty: 'preserve' })(rawTables)
-    .filter((item) => !['_cf_KV', 'sqlite_schema', 'sqlite_sequence'].includes(item.name))
+  let { results: rawTables } = (await D1_DATABASE.prepare(
+    `PRAGMA main.table_list;`,
+  ).run()) as D1Result
+  let tables = S.decodeUnknownSync(D1Tables, { onExcessProperty: 'preserve' })(
+    rawTables,
+  ).filter(
+    (item) =>
+      !['_cf_KV', 'sqlite_schema', 'sqlite_sequence'].includes(item.name),
+  )
 
   // This may sometimes fail with `D1_ERROR: no such table: sqlite_sequence`,
   // so it needs to be outside of the batch transaction.
@@ -77,7 +90,9 @@ async function migrateReset(D1_DATABASE: D1Database) {
     await D1_DATABASE.prepare(`DELETE FROM "sqlite_sequence";`).run()
   } catch (_) {
     // Ignore the error, as the table may not exist.
-    console.warn('Failed to reset sqlite_sequence table, but continuing with the reset.')
+    console.warn(
+      'Failed to reset sqlite_sequence table, but continuing with the reset.',
+    )
   }
 
   const batch = [] as string[]
@@ -96,7 +111,7 @@ async function migrateReset(D1_DATABASE: D1Database) {
 
   const statements = batch.map((sql) => D1_DATABASE.prepare(sql))
   const batchResult = await runBatch(D1_DATABASE, statements)
-  
+
   for (const { error } of batchResult) {
     if (error) {
       console.error('Error in batch: %O', error)
