@@ -157,6 +157,7 @@ fn dev_diagnostic_calculates_drift_in_presence_of_failed_migrations(api: TestApi
     assert!(action.as_reset().unwrap().starts_with(&expected_message));
 }
 
+// TODO: fix
 #[test_connector]
 fn dev_diagnostic_returns_create_migration_when_the_database_is_behind(api: TestApi) {
     let directory = api.create_migrations_directory();
@@ -305,6 +306,7 @@ fn dev_diagnostic_can_detect_when_history_diverges(api: TestApi) {
     assert!(message.contains(&format!("- The migrations recorded in the database diverge from the local migrations directory. Last common migration: `{first_migration_name}`. Migrations applied to the database but absent from the migrations directory are: {deleted_migration_name}")));
 }
 
+// TODO: fix
 #[test_connector]
 fn dev_diagnostic_can_detect_edited_migrations(api: TestApi) {
     let directory = api.create_migrations_directory();

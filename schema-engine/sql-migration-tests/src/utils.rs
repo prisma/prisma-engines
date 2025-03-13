@@ -76,13 +76,18 @@ pub fn list_migrations(migrations_directory_path: &Path) -> Result<MigrationList
         let entry = entry?;
 
         if entry.file_type()?.is_dir() {
+            let entry = entry.path();
+
             // Relative path to a migration directory from `baseDir`.
             // E.g., `20201117144659_test`.
-            let path = entry.path().to_string_lossy().into_owned();
+            // This will return a &Path that is the relative path
+            let entry_relative = entry.strip_prefix(&base_dir).expect("entry is not inside base_dir");
+
+            let path = entry_relative.to_string_lossy().into_owned();
 
             let migration_file = MigrationFile {
                 path: "migration.sql".to_string(),
-                content: std::fs::read_to_string(entry.path().join("migration.sql"))
+                content: std::fs::read_to_string(entry.join("migration.sql"))
                     .map_err(|_err| "Could not read migration file.".to_owned())
                     .into(),
             };
