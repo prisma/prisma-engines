@@ -141,7 +141,7 @@ impl<'a> CreateMigration<'a> {
 
             // Write the migration script to a file.
             directory
-                .write_migration_script(&migration_script, "sql")
+                .write_migration_script(migration_script, "sql")
                 .map_err(|err| {
                     CoreError::from_msg(format!(
                         "Failed to write the migration script to `{:?}`\n{}",

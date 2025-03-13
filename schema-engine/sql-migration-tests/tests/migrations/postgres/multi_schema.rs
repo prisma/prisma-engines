@@ -1451,7 +1451,7 @@ async fn migration_with_shadow_database() {
 
     let migrations_directory = tempfile::tempdir().unwrap();
 
-    let migrations_list = list_migrations(&migrations_directory.path()).unwrap();
+    let migrations_list = list_migrations(migrations_directory.path()).unwrap();
 
     let migration = CreateMigrationInput {
         migrations_list,
@@ -1467,7 +1467,7 @@ async fn migration_with_shadow_database() {
 
     create_migration(migration, &mut conn).await.unwrap();
 
-    let path = std::fs::read_dir(&migrations_directory.path())
+    let path = std::fs::read_dir(migrations_directory.path())
         .expect("Reading migrations directory for named migration.")
         .find_map(|entry| {
             let entry = entry.unwrap();
@@ -1517,7 +1517,7 @@ async fn migration_with_shadow_database() {
 
     expected.assert_eq(&sql);
 
-    let migrations_list = list_migrations(&migrations_directory.path()).unwrap();
+    let migrations_list = list_migrations(migrations_directory.path()).unwrap();
 
     let input = ApplyMigrationsInput { migrations_list };
 

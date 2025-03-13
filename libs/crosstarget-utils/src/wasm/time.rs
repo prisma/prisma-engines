@@ -115,10 +115,13 @@ pub struct DateTime(js_sys::Date);
 
 impl UtcDateTime for DateTime {
     fn now() -> Self {
-        Self(js_sys::new_0())
+        Self(js_sys::Date::new_0())
     }
 
     fn format(&self, format_str: &str) -> String {
+        let mut chars = format_str.chars();
+        let mut result = String::new();
+
         while let Some(c) = chars.next() {
             if c == '%' {
                 if let Some(specifier) = chars.next() {
