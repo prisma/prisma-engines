@@ -10,10 +10,7 @@ use crate::{
 use futures::Future;
 use prisma_metrics::gauge;
 use quaint::connector::IsolationLevel;
-use std::{
-    fmt,
-    sync::atomic::{AtomicBool, Ordering},
-};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
 /// querying and executing SQL (i.e. a client connector). The Proxy uses Napi/Wasm's JsFunction
