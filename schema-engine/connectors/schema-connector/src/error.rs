@@ -1,6 +1,6 @@
 //! The migration connector ConnectorError type.
 
-use crate::migrations_directory::{ListMigrationsError, ReadMigrationScriptError};
+use crate::migrations_directory::ReadMigrationScriptError;
 use std::{
     error::Error as StdError,
     fmt::{Debug, Display, Write},
@@ -239,12 +239,6 @@ impl From<ReadMigrationScriptError> for ConnectorError {
             message: None,
             source: Some(Arc::new(err)),
         }))
-    }
-}
-
-impl From<ListMigrationsError> for ConnectorError {
-    fn from(err: ListMigrationsError) -> Self {
-        ConnectorError::from_msg(err.to_string())
     }
 }
 

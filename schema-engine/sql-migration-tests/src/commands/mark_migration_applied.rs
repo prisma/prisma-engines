@@ -3,6 +3,8 @@ use schema_core::{
 };
 use tempfile::TempDir;
 
+use crate::utils;
+
 #[must_use = "This struct does nothing on its own. See MarkMigrationApplied::send()"]
 pub struct MarkMigrationApplied<'a> {
     api: &'a mut dyn SchemaConnector,
@@ -24,9 +26,10 @@ impl<'a> MarkMigrationApplied<'a> {
     }
 
     pub fn send_impl(self) -> CoreResult<MarkMigrationAppliedAssertion<'a>> {
+        let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
         let output = test_setup::runtime::run_with_thread_local_runtime(mark_migration_applied(
             MarkMigrationAppliedInput {
-                migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
+                migrations_list,
                 migration_name: self.migration_name,
             },
             self.api,
