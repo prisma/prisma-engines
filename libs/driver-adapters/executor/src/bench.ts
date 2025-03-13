@@ -8,8 +8,8 @@ import { pg } from '@prisma/bundled-js-drivers'
 import * as prismaPg from '@prisma/adapter-pg'
 import {
   bindAdapter,
-  DriverAdapter,
-  ErrorCapturingDriverAdapter,
+  SqlDriverAdapter,
+  ErrorCapturingSqlDriverAdapter,
 } from '@prisma/driver-adapter-utils'
 
 import { recording } from './recording'
@@ -59,7 +59,7 @@ async function main(): Promise<void> {
 }
 
 async function recordQueries(
-  adapter: ErrorCapturingDriverAdapter,
+  adapter: ErrorCapturingSqlDriverAdapter,
   datamodel: string,
   prismaQueries: any,
 ): Promise<void> {
@@ -103,7 +103,7 @@ async function recordQueries(
 }
 
 async function benchMarkQueries(
-  adapter: ErrorCapturingDriverAdapter,
+  adapter: ErrorCapturingSqlDriverAdapter,
   datamodel: string,
   prismaQueries: any,
 ) {
@@ -218,7 +218,7 @@ const debug = (() => {
   }
 })()
 
-async function pgAdapter(url: string): Promise<DriverAdapter> {
+async function pgAdapter(url: string): Promise<SqlDriverAdapter> {
   const schemaName = new URL(url).searchParams.get('schema') ?? undefined
   let args: any = { connectionString: url }
   if (schemaName != null) {
@@ -232,14 +232,14 @@ async function pgAdapter(url: string): Promise<DriverAdapter> {
 }
 
 async function initQeNapiCurrent(
-  adapter: ErrorCapturingDriverAdapter,
+  adapter: ErrorCapturingSqlDriverAdapter,
   datamodel: string,
 ): Promise<qe.QueryEngine> {
   return await qe.initQueryEngine('Napi', adapter, datamodel, debug, debug)
 }
 
 async function initQeWasmCurrent(
-  adapter: ErrorCapturingDriverAdapter,
+  adapter: ErrorCapturingSqlDriverAdapter,
   datamodel: string,
 ): Promise<qe.QueryEngine> {
   return await qe.initQueryEngine(
@@ -252,14 +252,14 @@ async function initQeWasmCurrent(
 }
 
 async function initQeWasmLatest(
-  adapter: ErrorCapturingDriverAdapter,
+  adapter: ErrorCapturingSqlDriverAdapter,
   datamodel: string,
 ): Promise<qe.QueryEngine> {
   return new WasmLatest(qe.queryEngineOptions(datamodel), debug, adapter)
 }
 
 function initQeWasmBaseLine(
-  adapter: ErrorCapturingDriverAdapter,
+  adapter: ErrorCapturingSqlDriverAdapter,
   datamodel: string,
 ): qe.QueryEngine {
   return new WasmBaseline(qe.queryEngineOptions(datamodel), debug, adapter)
