@@ -18,7 +18,7 @@ pub async fn mark_migration_applied(
         .migrations_list
         .migration_directories
         .into_iter()
-        .map(|dir| MigrationDirectory::new(dir))
+        .map(MigrationDirectory::new)
         .find(|dir| input.migration_name == dir.migration_name())
         .ok_or_else(|| {
             CoreError::user_facing(MigrationToMarkAppliedNotFound {

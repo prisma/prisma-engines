@@ -22,9 +22,9 @@ impl<R, E> From<Result<R, E>> for JSResult<R, E> {
     }
 }
 
-impl<R, E> Into<Result<R, E>> for JSResult<R, E> {
-    fn into(self) -> Result<R, E> {
-        match self {
+impl<R, E> From<JSResult<R, E>> for Result<R, E> {
+    fn from(val: JSResult<R, E>) -> Self {
+        match val {
             JSResult::Ok(r) => Ok(r),
             JSResult::Err(e) => Err(e),
         }
