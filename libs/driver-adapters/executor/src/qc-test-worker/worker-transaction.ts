@@ -1,4 +1,4 @@
-import { IsolationLevel } from '@prisma/driver-adapter-utils'
+import type { IsolationLevel } from '@prisma/driver-adapter-utils'
 import type { State } from './worker'
 import { TxOptions } from '../types/jsonRpc'
 
@@ -12,21 +12,21 @@ export function parseIsolationLevel(
   switch (level.toLowerCase()) {
     case 'readcommitted':
     case 'read committed':
-      return IsolationLevel.ReadCommitted
+      return 'READ COMMITTED'
 
     case 'readuncommitted':
     case 'read uncommitted':
-      return IsolationLevel.ReadUncommitted
+      return 'READ UNCOMMITTED'
 
     case 'repeatableread':
     case 'repeatable read':
-      return IsolationLevel.RepeatableRead
+      return 'REPEATABLE READ'
 
     case 'serializable':
-      return IsolationLevel.Serializable
+      return 'SERIALIZABLE'
 
     case 'snapshot':
-      return IsolationLevel.Snapshot
+      return 'SNAPSHOT'
 
     default:
       // We don't validate the isolation level on the RPC schema level because some tests
