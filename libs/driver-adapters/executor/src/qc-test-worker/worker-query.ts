@@ -1,10 +1,12 @@
 import * as util from 'node:util'
-import { ErrorCapturingSqlQueryable } from '@prisma/driver-adapter-utils'
+import {
+  ErrorCapturingSqlQueryable,
+  IsolationLevel,
+} from '@prisma/driver-adapter-utils'
 import { JsonProtocolQuery, QueryParams } from '../types/jsonRpc'
 import type { State } from './worker'
 import { debug } from '../utils'
 import {
-  IsolationLevel,
   QueryInterpreter,
   TransactionManager,
 } from '@prisma/client-engine-runtime'
