@@ -1,4 +1,4 @@
-import type { ErrorCapturingDriverAdapter } from '@prisma/driver-adapter-utils'
+import type { ErrorCapturingSqlDriverAdapter } from '@prisma/driver-adapter-utils'
 import type { QueryEngineConfig } from './QueryEngine'
 
 export type QueryEngineInstance = {
@@ -38,7 +38,7 @@ export interface QueryEngineConstructor {
   new (
     config: QueryEngineConfig,
     logger: (log: string) => void,
-    nodejsFnCtx?: ErrorCapturingDriverAdapter,
+    nodejsFnCtx?: ErrorCapturingSqlDriverAdapter,
   ): QueryEngineInstance
 }
 

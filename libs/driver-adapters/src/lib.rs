@@ -34,6 +34,9 @@ impl From<DriverAdapterError> for QuaintError {
                 })
                 .build()
             }
+            DriverAdapterError::InvalidIsolationLevel { level } => {
+                QuaintError::builder(ErrorKind::InvalidIsolationLevel(level)).build()
+            }
             DriverAdapterError::GenericJs { id } => QuaintError::external_error(id),
             #[cfg(feature = "postgresql")]
             DriverAdapterError::Postgres(e) => e.into(),

@@ -362,43 +362,8 @@ impl JsQueryable {
         &'a self,
         isolation: Option<IsolationLevel>,
     ) -> quaint::Result<Box<dyn Transaction + 'a>> {
-        // 1. Obtain a transaction context from the driver.
-        //    Any command run on this context is guaranteed to be part of the same session
-        //    as the transaction spawned from it.
-        let tx_ctx = self.driver_proxy.transaction_context().await?;
-
-        let requires_isolation_first = tx_ctx.requires_isolation_first();
-
-        // 2. Set the isolation level (if specified) if the provider requires it to be set before
-        //    creating the transaction.
-        if requires_isolation_first {
-            if let Some(isolation) = isolation {
-                tx_ctx.set_tx_isolation_level(isolation).await?;
-            }
-        }
-
-        // 3. Spawn a transaction from the context.
-        let tx = tx_ctx.start_transaction().await?;
-
-        let begin_stmt = tx.begin_statement();
-        let tx_opts = tx.options();
-
-        if tx_opts.use_phantom_query {
-            let begin_stmt = JsBaseQueryable::phantom_query_message(begin_stmt);
-            tx.raw_phantom_cmd(begin_stmt.as_str()).await?;
-        } else {
-            tx.raw_cmd(begin_stmt).await?;
-        }
-
-        // 4. Set the isolation level (if specified) if we didn't do it before.
-        if !requires_isolation_first {
-            if let Some(isolation) = isolation {
-                tx.set_tx_isolation_level(isolation).await?;
-            }
-        }
-
+        let tx = self.driver_proxy.start_transaction(isolation).await?;
         self.server_reset_query(tx.as_ref()).await?;
-
         Ok(tx)
     }
 
