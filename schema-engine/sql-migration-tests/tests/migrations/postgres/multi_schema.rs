@@ -1369,6 +1369,7 @@ fn multi_schema_tests(_api: TestApi) {
     });
 }
 
+// TODO: fix
 #[tokio::test]
 async fn migration_with_shadow_database() {
     let conn_str = std::env::var("TEST_DATABASE_URL").unwrap();
