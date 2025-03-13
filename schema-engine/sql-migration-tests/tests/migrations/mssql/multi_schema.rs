@@ -1155,7 +1155,6 @@ fn migration_with_shadow_database(api: TestApi) {
 
     let namespaces = Namespaces::from_vec(&mut vec![String::from("dbo"), String::from("one"), String::from("two")]);
 
-    api.raw_cmd("DROP DATABASE shadow");
     api.raw_cmd("CREATE DATABASE shadow");
     api.reset().send_sync(namespaces.clone());
 
