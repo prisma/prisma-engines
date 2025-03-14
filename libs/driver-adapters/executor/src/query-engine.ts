@@ -1,7 +1,4 @@
-import type {
-  DriverAdapter,
-  ErrorCapturingDriverAdapter,
-} from '@prisma/driver-adapter-utils'
+import type { ErrorCapturingSqlDriverAdapter } from '@prisma/driver-adapter-utils'
 import * as napi from './engines/Library'
 import * as os from 'node:os'
 import * as path from 'node:path'
@@ -37,7 +34,7 @@ export type QueryLogCallback = (log: string) => void
 
 export async function initQueryEngine(
   engineType: 'Napi' | 'Wasm',
-  adapter: ErrorCapturingDriverAdapter,
+  adapter: ErrorCapturingSqlDriverAdapter,
   datamodel: string,
   queryLogCallback: QueryLogCallback,
   debug: (...args: any[]) => void,

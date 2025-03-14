@@ -1,10 +1,10 @@
-import type { DriverAdapter } from '@prisma/driver-adapter-utils'
+import type { SqlDriverAdapter } from '@prisma/driver-adapter-utils'
 
 export type ConnectParams = {
   url: string
 }
 
 export interface DriverAdaptersManager {
-  connect: (params: ConnectParams) => Promise<DriverAdapter>
+  connect: (params: ConnectParams) => Promise<SqlDriverAdapter>
   teardown: () => Promise<void>
 }

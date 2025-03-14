@@ -1,6 +1,6 @@
 import { PrismaNeon } from '@prisma/adapter-neon'
 import { neon } from '@prisma/bundled-js-drivers'
-import { DriverAdapter } from '@prisma/driver-adapter-utils'
+import { SqlDriverAdapter } from '@prisma/driver-adapter-utils'
 import { WebSocket } from 'ws'
 import { postgresSchemaName, postgresOptions } from '../utils'
 import type { DriverAdaptersManager } from './index'
@@ -14,8 +14,7 @@ type ConnectParams = {
 }
 
 export class NeonWsManager implements DriverAdaptersManager {
-  #driver?: neon.Pool
-  #adapter?: DriverAdapter
+  #adapter?: SqlDriverAdapter
 
   private constructor(private env: EnvForAdapter<TAG>) {}
 
@@ -26,7 +25,7 @@ export class NeonWsManager implements DriverAdaptersManager {
   async connect({ url }: ConnectParams) {
     const { proxy_url: proxyUrl } = this.env.DRIVER_ADAPTER_CONFIG
     const { neonConfig, Pool } = neon
-    
+
     neonConfig.wsProxy = () => proxyUrl
     neonConfig.webSocketConstructor = WebSocket
     neonConfig.useSecureWebSocket = false
@@ -34,13 +33,15 @@ export class NeonWsManager implements DriverAdaptersManager {
 
     const schemaName = postgresSchemaName(url)
 
-    this.#driver = new Pool(postgresOptions(url))
-    this.#adapter = new PrismaNeon(this.#driver, { schema: schemaName }) as DriverAdapter
+    const factory = new PrismaNeon(postgresOptions(url), {
+      schema: schemaName,
+    })
+    this.#adapter = await factory.connect()
 
     return this.#adapter
   }
 
   async teardown() {
-    await this.#driver?.end()
+    await this.#adapter?.dispose()
   }
 }

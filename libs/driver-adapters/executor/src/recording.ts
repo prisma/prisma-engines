@@ -2,13 +2,13 @@ import {
   type SqlQuery,
   type Result,
   type SqlResultSet,
-  type ErrorCapturingDriverAdapter,
+  type ErrorCapturingSqlDriverAdapter,
   ok,
 } from '@prisma/driver-adapter-utils'
 
 type Recordings = ReturnType<typeof createInMemoryRecordings>
 
-export function recording(adapter: ErrorCapturingDriverAdapter) {
+export function recording(adapter: ErrorCapturingSqlDriverAdapter) {
   const recordings = createInMemoryRecordings()
 
   return {
@@ -19,16 +19,16 @@ export function recording(adapter: ErrorCapturingDriverAdapter) {
 }
 
 function recorder(
-  adapter: ErrorCapturingDriverAdapter,
+  adapter: ErrorCapturingSqlDriverAdapter,
   recordings: Recordings,
 ) {
   return {
     provider: adapter.provider,
     adapterName: adapter.adapterName,
-    transactionContext: () => {
+    executeScript: async () => {
       throw new Error('Not implemented')
     },
-    executeScript: async () => {
+    startTransaction: async () => {
       throw new Error('Not implemented')
     },
     getConnectionInfo: () => {
@@ -47,21 +47,21 @@ function recorder(
       return ok(undefined)
     },
     errorRegistry: adapter.errorRegistry,
-  } satisfies ErrorCapturingDriverAdapter
+  } satisfies ErrorCapturingSqlDriverAdapter
 }
 
 function replayer(
-  adapter: ErrorCapturingDriverAdapter,
+  adapter: ErrorCapturingSqlDriverAdapter,
   recordings: Recordings,
 ) {
   return {
     provider: adapter.provider,
     adapterName: adapter.adapterName,
     recordings: recordings,
-    transactionContext: () => {
+    executeScript: async () => {
       throw new Error('Not implemented')
     },
-    executeScript: async () => {
+    startTransaction: async () => {
       throw new Error('Not implemented')
     },
     getConnectionInfo: () => {
@@ -78,7 +78,7 @@ function replayer(
       return ok(undefined)
     },
     errorRegistry: adapter.errorRegistry,
-  } satisfies ErrorCapturingDriverAdapter & { recordings: Recordings }
+  } satisfies ErrorCapturingSqlDriverAdapter & { recordings: Recordings }
 }
 
 function createInMemoryRecordings() {
