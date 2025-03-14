@@ -380,6 +380,8 @@ impl JsQueryable {
         // 3. Spawn a transaction from the context.
         let tx = tx_ctx.start_transaction().await?;
 
+        tx.increment_depth();
+
         let begin_stmt = tx.begin_statement();
         let tx_opts = tx.options();
 
