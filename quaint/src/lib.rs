@@ -123,6 +123,7 @@ pub mod error;
 pub mod pooled;
 pub mod prelude;
 pub mod single;
+pub mod template;
 #[cfg(test)]
 mod tests;
 pub mod visitor;
