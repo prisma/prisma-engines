@@ -37,6 +37,8 @@ pub struct Generator {
     pub name: String,
     pub provider: StringFromEnvVar,
     pub output: Option<StringFromEnvVar>,
+    pub format: Option<StringFromEnvVar>,
+    pub runtime: Option<StringFromEnvVar>,
     pub config: HashMap<String, GeneratorConfigValue>,
 
     #[serde(default)]
