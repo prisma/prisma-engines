@@ -48,6 +48,7 @@ features!(
     Deno,
     Distinct,
     DriverAdapters,
+    Esm,
     ExtendedIndexes,
     ExtendedWhereUnique,
     FieldReference,
@@ -153,6 +154,7 @@ impl<'a> FeatureMapWithProvider<'a> {
             active: enumflags2::make_bitflags!(PreviewFeature::{
                 Deno
                  | DriverAdapters
+                 | Esm
                  | Metrics
                  | MultiSchema
                  | NativeDistinct
