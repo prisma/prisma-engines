@@ -1,17 +1,17 @@
 use crate::CoreResult;
+use json_rpc::types::MigrationList;
 use schema_connector::{
-    migrations_directory::*, ConnectorError, DiffTarget, MigrationRecord, Namespaces, PersistenceNotInitializedError,
-    SchemaConnector,
+    migrations_directory::{error_on_changed_provider, list_migrations, MigrationDirectory},
+    ConnectorError, DiffTarget, MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaConnector,
 };
 use serde::{Deserialize, Serialize};
-use std::path::Path;
 
 /// The input to the `DiagnoseMigrationHistory` command.
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DiagnoseMigrationHistoryInput {
-    /// The location of the migrations directory.
-    pub migrations_directory_path: String,
+    /// The list of migrations, already loaded from disk.
+    pub migrations_list: MigrationList,
     /// Whether creating shadow/temporary databases is allowed.
     pub opt_in_to_shadow_database: bool,
 }
@@ -70,10 +70,8 @@ pub async fn diagnose_migration_history(
 ) -> CoreResult<DiagnoseMigrationHistoryOutput> {
     tracing::debug!("Diagnosing migration history");
 
-    error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
-
-    // Load the migrations.
-    let migrations_from_filesystem = list_migrations(Path::new(&input.migrations_directory_path))?;
+    error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
+    let migrations_from_filesystem = list_migrations(input.migrations_list.migration_directories);
 
     let (migrations_from_database, has_migrations_table) =
         match connector.migration_persistence().list_migrations().await? {

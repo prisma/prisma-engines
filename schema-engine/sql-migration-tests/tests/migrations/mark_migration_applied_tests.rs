@@ -17,7 +17,7 @@ fn mark_migration_applied_on_an_empty_database_works(api: TestApi) {
         .send_sync()
         .into_output();
 
-    let migration_name = output.generated_migration_name.unwrap();
+    let migration_name = output.generated_migration_name;
 
     api.assert_schema().assert_tables_count(0);
 
@@ -57,7 +57,7 @@ fn mark_migration_applied_on_a_non_empty_database_works(api: TestApi) {
 
         api.apply_migrations(&migrations_directory).send_sync();
 
-        output_initial_migration.generated_migration_name.unwrap()
+        output_initial_migration.generated_migration_name
     };
 
     // Create a second migration
@@ -80,7 +80,7 @@ fn mark_migration_applied_on_a_non_empty_database_works(api: TestApi) {
             .send_sync()
             .into_output();
 
-        output_second_migration.generated_migration_name.unwrap()
+        output_second_migration.generated_migration_name
     };
 
     // Mark the second migration as applied
@@ -117,7 +117,7 @@ fn mark_migration_applied_when_the_migration_is_already_applied_errors(api: Test
             .send_sync()
             .into_output();
 
-        output_initial_migration.generated_migration_name.unwrap()
+        output_initial_migration.generated_migration_name
     };
 
     // Create a second migration
@@ -140,7 +140,7 @@ fn mark_migration_applied_when_the_migration_is_already_applied_errors(api: Test
             .send_sync()
             .into_output();
 
-        output_second_migration.generated_migration_name.unwrap()
+        output_second_migration.generated_migration_name
     };
 
     api.apply_migrations(&migrations_directory).send_sync();
@@ -181,7 +181,7 @@ fn mark_migration_applied_when_the_migration_is_failed(api: TestApi) {
             .send_sync()
             .into_output();
 
-        output_initial_migration.generated_migration_name.unwrap()
+        output_initial_migration.generated_migration_name
     };
 
     // Create a second migration
@@ -207,7 +207,7 @@ fn mark_migration_applied_when_the_migration_is_failed(api: TestApi) {
             })
             .into_output();
 
-        output_second_migration.generated_migration_name.unwrap()
+        output_second_migration.generated_migration_name
     };
 
     api.apply_migrations(&migrations_directory).send_unwrap_err();
@@ -269,7 +269,7 @@ fn baselining_should_work(api: TestApi) {
             .send_sync()
             .into_output();
 
-        output_baseline_migration.generated_migration_name.unwrap()
+        output_baseline_migration.generated_migration_name
     };
 
     // Mark the baseline migration as applied
@@ -298,7 +298,7 @@ fn must_return_helpful_error_on_migration_not_found(api: TestApi) {
         .assert_migration_directories_count(1)
         .into_output();
 
-    let migration_name = output.generated_migration_name.unwrap();
+    let migration_name = output.generated_migration_name;
 
     let err = api
         .mark_migration_applied("01init", &migrations_directory)

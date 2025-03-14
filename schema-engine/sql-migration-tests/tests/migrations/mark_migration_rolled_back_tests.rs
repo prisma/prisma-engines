@@ -51,7 +51,7 @@ fn mark_migration_rolled_back_with_a_failed_migration_works(api: TestApi) {
             .send_sync()
             .into_output();
 
-        output_initial_migration.generated_migration_name.unwrap()
+        output_initial_migration.generated_migration_name
     };
 
     // Create a second migration
@@ -78,7 +78,7 @@ fn mark_migration_rolled_back_with_a_failed_migration_works(api: TestApi) {
             })
             .into_output();
 
-        output_second_migration.generated_migration_name.unwrap()
+        output_second_migration.generated_migration_name
     };
 
     api.apply_migrations(&migrations_directory).send_unwrap_err();
@@ -132,7 +132,7 @@ fn mark_migration_rolled_back_with_a_successful_migration_errors(api: TestApi) {
             .send_sync()
             .into_output();
 
-        output_initial_migration.generated_migration_name.unwrap()
+        output_initial_migration.generated_migration_name
     };
 
     // Create a second migration
@@ -155,7 +155,7 @@ fn mark_migration_rolled_back_with_a_successful_migration_errors(api: TestApi) {
             .send_sync()
             .into_output();
 
-        output_second_migration.generated_migration_name.unwrap()
+        output_second_migration.generated_migration_name
     };
 
     api.apply_migrations(&migrations_directory).send_sync();
@@ -207,7 +207,7 @@ fn rolling_back_applying_again_then_rolling_back_again_should_error(api: TestApi
             .send_sync()
             .into_output();
 
-        output_initial_migration.generated_migration_name.unwrap()
+        output_initial_migration.generated_migration_name
     };
 
     // Create a second migration
@@ -234,11 +234,7 @@ fn rolling_back_applying_again_then_rolling_back_again_should_error(api: TestApi
             });
 
         (
-            output_second_migration
-                .output()
-                .generated_migration_name
-                .clone()
-                .unwrap(),
+            output_second_migration.output().generated_migration_name.clone(),
             output_second_migration.migration_script_path(),
         )
     };

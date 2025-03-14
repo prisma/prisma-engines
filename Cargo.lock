@@ -908,6 +908,7 @@ checksum = "d0a5c400df2834b80a4c3327b3aad3a4c4cd4de0629063962b03235697506a28"
 name = "crosstarget-utils"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "derive_more",
  "enumflags2",
  "futures",
@@ -2224,7 +2225,6 @@ version = "0.1.0"
 dependencies = [
  "heck 0.4.1",
  "serde",
- "toml",
  "tsify-next",
  "wasm-bindgen",
 ]
@@ -4720,6 +4720,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "enumflags2",
+ "json-rpc-api",
  "psl",
  "quaint",
  "serde",
@@ -4736,6 +4737,7 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "chrono",
+ "crosstarget-utils",
  "enumflags2",
  "json-rpc-api",
  "jsonrpc-core",

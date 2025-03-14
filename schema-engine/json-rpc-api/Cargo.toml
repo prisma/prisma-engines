@@ -7,7 +7,6 @@ description = "JSON-RPC API definitions for the Prisma Schema Engine"
 [dependencies]
 heck.workspace = true
 serde.workspace = true
-toml.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen.workspace = true

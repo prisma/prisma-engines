@@ -33,6 +33,7 @@ user-facing-errors = { workspace = true, features = [
 
 chrono.workspace = true
 enumflags2.workspace = true
+json-rpc = { path = "../../json-rpc-api", package = "json-rpc-api" }
 sha2.workspace = true
 tracing.workspace = true
 tracing-error.workspace = true

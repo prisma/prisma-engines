@@ -1,3 +1,4 @@
+use crate::utils;
 use schema_core::{
     commands::apply_migrations,
     json_rpc::types::*,
@@ -29,14 +30,8 @@ impl<'a> ApplyMigrations<'a> {
     }
 
     pub async fn send(self) -> CoreResult<ApplyMigrationsAssertion<'a>> {
-        let output = apply_migrations(
-            ApplyMigrationsInput {
-                migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
-            },
-            self.api,
-            self.namespaces,
-        )
-        .await?;
+        let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
+        let output = apply_migrations(ApplyMigrationsInput { migrations_list }, self.api, self.namespaces).await?;
 
         Ok(ApplyMigrationsAssertion {
             output,

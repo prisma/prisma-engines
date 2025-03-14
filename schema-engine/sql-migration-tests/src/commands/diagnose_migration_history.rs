@@ -6,6 +6,8 @@ use schema_core::{
 };
 use tempfile::TempDir;
 
+use crate::utils;
+
 #[must_use = "This struct does nothing on its own. See DiagnoseMigrationHistory::send()"]
 pub struct DiagnoseMigrationHistory<'a> {
     api: &'a mut dyn SchemaConnector,
@@ -29,9 +31,10 @@ impl<'a> DiagnoseMigrationHistory<'a> {
     }
 
     pub async fn send(self) -> CoreResult<DiagnoseMigrationHistoryAssertions<'a>> {
+        let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
         let output = diagnose_migration_history(
             DiagnoseMigrationHistoryInput {
-                migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
+                migrations_list,
                 opt_in_to_shadow_database: self.opt_in_to_shadow_database,
             },
             None,

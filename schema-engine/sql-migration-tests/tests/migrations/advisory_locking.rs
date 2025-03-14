@@ -21,7 +21,7 @@ fn advisory_locking_works(mut api: TestApi) {
         .draft(true)
         .send_sync();
 
-    let migration_name = output.output.generated_migration_name.expect("generated no migration");
+    let migration_name = output.output.generated_migration_name;
 
     let mut second_me = api.new_engine();
     let mut third_me = api.new_engine();

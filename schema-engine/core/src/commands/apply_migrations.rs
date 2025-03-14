@@ -3,7 +3,7 @@ use schema_connector::{
     migrations_directory::{error_on_changed_provider, list_migrations, MigrationDirectory},
     ConnectorError, MigrationRecord, Namespaces, PersistenceNotInitializedError, SchemaConnector,
 };
-use std::{path::Path, time::Instant};
+use std::time::Instant;
 use tracing::Instrument;
 use user_facing_errors::schema_engine::FoundFailedMigrations;
 
@@ -14,12 +14,12 @@ pub async fn apply_migrations(
 ) -> CoreResult<ApplyMigrationsOutput> {
     let start = Instant::now();
 
-    error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
+    error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
+    let migrations_from_filesystem = list_migrations(input.migrations_list.migration_directories);
 
     connector.acquire_lock().await?;
     connector.migration_persistence().initialize(namespaces).await?;
 
-    let migrations_from_filesystem = list_migrations(Path::new(&input.migrations_directory_path))?;
     let migrations_from_database = connector
         .migration_persistence()
         .list_migrations()
@@ -36,7 +36,7 @@ pub async fn apply_migrations(
             !migrations_from_database
                 .iter()
                 .filter(|db_migration| db_migration.rolled_back_at.is_none())
-                .any(|db_migration| fs_migration.migration_name() == db_migration.migration_name)
+                .any(|db_migration| db_migration.migration_name == fs_migration.migration_name())
         })
         .collect();
 

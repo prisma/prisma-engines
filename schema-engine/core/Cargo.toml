@@ -4,6 +4,7 @@ name = "schema-core"
 version = "0.1.0"
 
 [dependencies]
+crosstarget-utils.workspace = true
 psl = { workspace = true, features = ["all"] }
 schema-connector = { workspace = true, features = [
     "all-native",

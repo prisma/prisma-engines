@@ -310,8 +310,7 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
         .send_sync()
         .modify_migration(|contents| contents.push_str("\nSELECT (^.^)_n;\n"))
         .into_output()
-        .generated_migration_name
-        .unwrap();
+        .generated_migration_name;
 
     let error = api
         .apply_migrations(&migrations_directory)

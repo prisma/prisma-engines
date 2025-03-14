@@ -1,13 +1,14 @@
 use crate::{
     core_error::CoreResult,
-    json_rpc::types::{DiffParams, DiffResult, DiffTarget, PathContainer, UrlContainer},
+    json_rpc::types::{DiffParams, DiffResult, DiffTarget, UrlContainer},
     SchemaContainerExt,
 };
 use enumflags2::BitFlags;
+use json_rpc::types::MigrationList;
 use schema_connector::{
     ConnectorError, ConnectorHost, DatabaseSchema, DiffTarget as McDiff, Namespaces, SchemaConnector,
 };
-use std::{path::Path, sync::Arc};
+use std::sync::Arc;
 
 pub async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreResult<DiffResult> {
     // In order to properly handle MultiSchema, we need to make sure the preview feature is
@@ -172,13 +173,18 @@ async fn json_rpc_diff_target_to_connector(
                 .await?;
             Ok(Some((connector, schema)))
         }
-        DiffTarget::Migrations(PathContainer { path }) => {
-            let provider = schema_connector::migrations_directory::read_provider_from_lock_file(path);
+        DiffTarget::Migrations(MigrationList {
+            lockfile,
+            migration_directories,
+            ..
+        }) => {
+            let provider = schema_connector::migrations_directory::read_provider_from_lock_file(lockfile);
             match (provider.as_deref(), shadow_database_url) {
                 (Some(provider), Some(shadow_database_url)) => {
                     let mut connector = crate::uninitialized_connector_for_provider(provider)?;
                     connector.set_preview_features(preview_features);
-                    let directories = schema_connector::migrations_directory::list_migrations(Path::new(path))?;
+                    let directories =
+                        schema_connector::migrations_directory::list_migrations(migration_directories.clone());
                     let schema = connector
                         .database_schema_from_diff_target(
                             McDiff::Migrations(&directories),
@@ -191,7 +197,8 @@ async fn json_rpc_diff_target_to_connector(
                 (Some("sqlite"), None) => {
                     let mut connector = crate::uninitialized_connector_for_provider("sqlite")?;
                     connector.set_preview_features(preview_features);
-                    let directories = schema_connector::migrations_directory::list_migrations(Path::new(path))?;
+                    let directories =
+                        schema_connector::migrations_directory::list_migrations(migration_directories.clone());
                     let schema = connector
                         .database_schema_from_diff_target(McDiff::Migrations(&directories), None, namespaces)
                         .await?;

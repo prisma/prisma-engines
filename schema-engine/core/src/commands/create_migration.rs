@@ -1,7 +1,14 @@
 use crate::{json_rpc::types::*, CoreError, CoreResult, SchemaContainerExt};
+use crosstarget_utils::time::format_utc_now;
 use schema_connector::{migrations_directory::*, DiffTarget, SchemaConnector};
-use std::path::Path;
 use user_facing_errors::schema_engine::MigrationNameTooLong;
+
+/// Create a directory name for a new migration.
+pub fn generate_migration_directory_name(migration_name: &str) -> String {
+    let timestamp = format_utc_now("%Y%m%d%H%M%S");
+    let directory_name = format!("{}_{}", timestamp, migration_name);
+    directory_name
+}
 
 /// Create a new migration.
 pub async fn create_migration(
@@ -15,10 +22,12 @@ pub async fn create_migration(
     }
 
     // Check for provider switch
-    error_on_changed_provider(&input.migrations_directory_path, connector_type)?;
+    error_on_changed_provider(&input.migrations_list.lockfile, connector_type)?;
+
+    let generated_migration_name = generate_migration_directory_name(&input.migration_name);
 
     // Infer the migration.
-    let previous_migrations = list_migrations(Path::new(&input.migrations_directory_path))?;
+    let previous_migrations = list_migrations(input.migrations_list.migration_directories);
     let sources: Vec<_> = input.schema.to_psl_input();
     // We need to start with the 'to', which is the Schema, in order to grab the
     // namespaces, in case we've got MultiSchema enabled.
@@ -33,11 +42,16 @@ pub async fn create_migration(
         .await?;
     let migration = connector.diff(from, to);
 
+    let extension = connector.migration_file_extension().to_owned();
+
     if connector.migration_is_empty(&migration) && !input.draft {
         tracing::info!("Database is up-to-date, returning without creating new migration.");
 
         return Ok(CreateMigrationOutput {
-            generated_migration_name: None,
+            connector_type: connector_type.to_owned(),
+            generated_migration_name,
+            migration_script: None,
+            extension,
         });
     }
 
@@ -45,28 +59,10 @@ pub async fn create_migration(
 
     let migration_script = connector.render_script(&migration, &destructive_change_diagnostics)?;
 
-    // Write the migration script to a file.
-    let directory = create_migration_directory(Path::new(&input.migrations_directory_path), &input.migration_name)
-        .map_err(|_| CoreError::from_msg("Failed to create a new migration directory.".into()))?;
-
-    directory
-        .write_migration_script(&migration_script, connector.migration_file_extension())
-        .map_err(|err| {
-            CoreError::from_msg(format!(
-                "Failed to write the migration script to `{:?}`\n{}",
-                directory.path(),
-                err,
-            ))
-        })?;
-
-    write_migration_lock_file(&input.migrations_directory_path, connector_type).map_err(|err| {
-        CoreError::from_msg(format!(
-            "Failed to write the migration lock file to `{:?}`\n{}",
-            &input.migrations_directory_path, err
-        ))
-    })?;
-
     Ok(CreateMigrationOutput {
-        generated_migration_name: Some(directory.migration_name().to_owned()),
+        connector_type: connector_type.to_owned(),
+        generated_migration_name,
+        migration_script: Some(migration_script),
+        extension,
     })
 }
