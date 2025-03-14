@@ -56,12 +56,12 @@ impl StringFromEnvVar {
     }
 }
 
-struct EnvFunction {
+pub(crate) struct EnvFunction {
     var_name: String,
 }
 
 impl EnvFunction {
-    fn from_ast(expr: &ast::Expression, diagnostics: &mut Diagnostics) -> Option<EnvFunction> {
+    pub(crate) fn from_ast(expr: &ast::Expression, diagnostics: &mut Diagnostics) -> Option<EnvFunction> {
         let args = if let ast::Expression::Function(name, args, _) = &expr {
             if name == "env" {
                 args.arguments
@@ -112,7 +112,7 @@ impl EnvFunction {
         Some(Self { var_name })
     }
 
-    fn var_name(&self) -> &str {
+    pub(crate) fn var_name(&self) -> &str {
         &self.var_name
     }
 }

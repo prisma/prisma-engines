@@ -123,6 +123,7 @@ impl<'a> From<&'a GeneratorConfigValue> for Value<'a> {
         match value {
             GeneratorConfigValue::String(s) => s.as_str().into(),
             GeneratorConfigValue::Array(elements) => elements.iter().map(From::from).collect(),
+            GeneratorConfigValue::Env(var_name) => Env::variable(var_name).into(),
         }
     }
 }

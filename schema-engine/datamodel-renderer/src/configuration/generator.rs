@@ -189,6 +189,8 @@ mod tests {
             ],
         );
 
+        generator.push_config_value("customEnvValue", Env::variable("var"));
+
         let expected = expect![[r#"
             /// Here comes the sun.
             ///
@@ -200,6 +202,7 @@ mod tests {
               previewFeatures = ["multiSchema", "postgresqlExtensions"]
               binaryTargets   = [env("BINARY TARGET")]
               afterGenerate   = ["lambda", [], ["print", ["quote", "done!"]]]
+              customEnvValue  = env("var")
               customFeatures  = ["enums", "models"]
               customValue     = "meow"
               otherValue      = "purr"

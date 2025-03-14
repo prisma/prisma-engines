@@ -1,0 +1,4 @@
+generator gen {
+  provider    = "fancy-generator"
+  configValue = env("SOME_VAR")
+}
