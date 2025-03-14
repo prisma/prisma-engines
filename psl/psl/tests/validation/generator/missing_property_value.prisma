@@ -1,0 +1,13 @@
+generator gen {
+  provider = "fancy-generator"
+  configValue =
+}
+// [1;91merror[0m: [1mProperty configValue in generator gen needs to be assigned a value[0m
+//   [1;94m-->[0m  [4mschema.prisma:1[0m
+// [1;94m   | [0m
+// [1;94m   | [0m
+// [1;94m 1 | [0m[1;91mgenerator gen {[0m
+// [1;94m 2 | [0m  provider = "fancy-generator"
+// [1;94m 3 | [0m  configValue =
+// [1;94m 4 | [0m}
+// [1;94m   | [0m
