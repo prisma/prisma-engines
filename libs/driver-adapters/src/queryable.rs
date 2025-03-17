@@ -159,18 +159,6 @@ impl QuaintQueryable for JsBaseQueryable {
     /// Sets the transaction isolation level to given value.
     /// Implementers have to make sure that the passed isolation level is valid for the underlying database.
     async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> quaint::Result<()> {
-        if matches!(isolation_level, IsolationLevel::Snapshot) {
-            return Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build());
-        }
-
-        #[cfg(feature = "sqlite")]
-        if self.provider == AdapterProvider::Sqlite {
-            return match isolation_level {
-                IsolationLevel::Serializable => Ok(()),
-                _ => Err(Error::builder(ErrorKind::invalid_isolation_level(&isolation_level)).build()),
-            };
-        }
-
         self.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {isolation_level}"))
             .await
     }
