@@ -4,12 +4,13 @@
 use std::future::Future;
 use std::time::Duration;
 
+pub use crate::common::datetime::*;
 use derive_more::Display;
 use js_sys::{Date, Function, Promise, Reflect};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 
-use crate::common::datetime::UtcDateTime;
+pub use crate::common::datetime::*;
 use crate::common::timeout::TimeoutError;
 
 #[wasm_bindgen]
@@ -108,43 +109,4 @@ fn now() -> f64 {
         })
         .map(|p| p.now())
         .unwrap_or_else(Date::now)
-}
-
-#[derive(Clone, Debug)]
-pub struct DateTime(js_sys::Date);
-
-impl UtcDateTime for DateTime {
-    fn now() -> Self {
-        Self(js_sys::Date::new_0())
-    }
-
-    fn format(&self, format_str: &str) -> String {
-        let mut chars = format_str.chars();
-        let mut result = String::new();
-
-        while let Some(c) = chars.next() {
-            if c == '%' {
-                if let Some(specifier) = chars.next() {
-                    match specifier {
-                        'Y' => result.push_str(&self.0.get_utc_full_year().to_string()),
-                        'm' => result.push_str(&format!("{:02}", self.0.get_utc_month() + 1)), // JS months are 0-based
-                        'd' => result.push_str(&format!("{:02}", self.0.get_utc_date())),
-                        'H' => result.push_str(&format!("{:02}", self.0.get_utc_hours())),
-                        'M' => result.push_str(&format!("{:02}", self.0.get_utc_minutes())),
-                        'S' => result.push_str(&format!("{:02}", self.0.get_utc_seconds())),
-                        _ => result.push_str(&format!("%{}", specifier)),
-                    }
-                }
-            } else {
-                result.push(c);
-            }
-        }
-
-        result
-    }
-}
-
-// Convenience function to get current timestamp formatted
-pub fn format_utc_now(format_str: &str) -> String {
-    DateTime::now().format(format_str)
 }

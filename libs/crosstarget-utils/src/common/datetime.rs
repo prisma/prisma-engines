@@ -1,18 +1,18 @@
-/// A DateTime representation in UTC timezone.
-pub trait UtcDateTime {
-    /// Get current UTC time.
-    fn now() -> Self
-    where
-        Self: Sized;
+/// Native UTC DateTime implementation using chrono crate
+#[derive(Clone, Debug)]
+pub struct DateTime(chrono::DateTime<chrono::Utc>);
 
-    /// Format datetime using a format string following strftime patterns.
-    ///
-    /// Common patterns:
-    /// - %Y: Year with century (e.g., 2023)
-    /// - %m: Month (01-12)
-    /// - %d: Day of month (01-31)
-    /// - %H: Hour (00-23)
-    /// - %M: Minute (00-59)
-    /// - %S: Second (00-59)
-    fn format(&self, format_str: &str) -> String;
+impl DateTime {
+    fn now() -> Self {
+        Self(chrono::Utc::now())
+    }
+
+    fn format(&self, format_str: &str) -> String {
+        self.0.format(format_str).to_string()
+    }
+}
+
+// Convenience functibon to get current timestamp formatted
+pub fn format_utc_now(format_str: &str) -> String {
+    DateTime::now().format(format_str)
 }
