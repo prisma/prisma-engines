@@ -101,8 +101,13 @@ fn lift_generator(
 
     let config = args
         .into_iter()
-        .map(|(key, value)| (key.to_owned(), GeneratorConfigValue::from(value)))
-        .collect();
+        .map(|(key, value)| -> Option<_> {
+            Some((
+                key.to_owned(),
+                GeneratorConfigValue::try_from_expression(value, diagnostics)?,
+            ))
+        })
+        .collect::<Option<_>>()?;
 
     Some(Generator {
         name: ast_generator.name.name.clone(),
