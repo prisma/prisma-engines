@@ -98,7 +98,6 @@ impl TestApi {
     }
 
     /// Plan a `createMigration` command.
-    /// TODO: this is currently not working properly.
     pub fn create_migration<'a>(
         &'a mut self,
         name: &'a str,

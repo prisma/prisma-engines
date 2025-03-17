@@ -54,7 +54,6 @@ pub fn read_provider_from_lock_file(lockfile: &MigrationLockfile) -> Option<Stri
 }
 
 /// Returns a list of migration directories from the filesystem, with extra functionality.
-/// TODO: avoid cloning as much.
 pub fn list_migrations(
     migrations_from_filesystem: Vec<json_rpc::types::MigrationDirectory>,
 ) -> Vec<MigrationDirectory> {
