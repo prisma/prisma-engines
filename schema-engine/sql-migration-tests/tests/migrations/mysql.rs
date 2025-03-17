@@ -361,8 +361,7 @@ fn mysql_apply_migrations_errors_gives_the_failed_sql(api: TestApi) {
             contents.push_str(migration);
         })
         .into_output()
-        .generated_migration_name
-        .unwrap();
+        .generated_migration_name;
 
     let err = api
         .apply_migrations(&migrations_directory)

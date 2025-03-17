@@ -52,6 +52,11 @@ pub struct TestApi {
 }
 
 impl TestApi {
+    pub fn from_connector(connector: SqlSchemaConnector, args: TestApiArgs) -> Self {
+        let root = RootTestApi::new(args);
+        TestApi { root, connector }
+    }
+
     /// Initializer, called by the test macros.
     pub fn new(args: TestApiArgs) -> Self {
         let root = RootTestApi::new(args);
@@ -92,7 +97,7 @@ impl TestApi {
         self.connection_info().schema_name().to_owned()
     }
 
-    /// Plan a `createMigration` command
+    /// Plan a `createMigration` command.
     pub fn create_migration<'a>(
         &'a mut self,
         name: &'a str,
@@ -285,13 +290,6 @@ impl TestApi {
             insert: quaint::ast::Insert::single_into(self.render_table_name(table_name)),
             api: self,
         }
-    }
-
-    pub fn list_migration_directories<'a>(
-        &'a mut self,
-        migrations_directory: &'a TempDir,
-    ) -> ListMigrationDirectories<'a> {
-        ListMigrationDirectories::new(migrations_directory)
     }
 
     pub fn lower_cases_table_names(&self) -> bool {

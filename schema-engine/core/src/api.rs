@@ -56,12 +56,6 @@ pub trait GenericApi: Send + Sync + 'static {
     /// Introspects a SQL query and returns types information
     async fn introspect_sql(&self, input: IntrospectSqlParams) -> CoreResult<IntrospectSqlResult>;
 
-    /// List the migration directories.
-    async fn list_migration_directories(
-        &self,
-        input: ListMigrationDirectoriesInput,
-    ) -> CoreResult<ListMigrationDirectoriesOutput>;
-
     /// Mark a migration from the migrations folder as applied, without actually applying it.
     async fn mark_migration_applied(&self, input: MarkMigrationAppliedInput) -> CoreResult<MarkMigrationAppliedOutput>;
 

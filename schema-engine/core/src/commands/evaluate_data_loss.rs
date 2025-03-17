@@ -10,10 +10,10 @@ pub async fn evaluate_data_loss(
     input: EvaluateDataLossInput,
     connector: &mut dyn SchemaConnector,
 ) -> CoreResult<EvaluateDataLossOutput> {
-    error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
+    error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
     let sources: Vec<_> = input.schema.to_psl_input();
 
-    let migrations_from_directory = list_migrations(input.migrations_directory_path.as_ref())?;
+    let migrations_from_directory = list_migrations(input.migrations_list.migration_directories);
 
     let to = connector
         .database_schema_from_diff_target(DiffTarget::Datamodel(sources), None, None)

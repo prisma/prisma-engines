@@ -3,6 +3,8 @@ use schema_core::{
 };
 use tempfile::TempDir;
 
+use crate::utils;
+
 #[must_use = "This struct does nothing on its own. See DevDiagnostic::send()"]
 pub struct DevDiagnostic<'a> {
     api: &'a mut dyn SchemaConnector,
@@ -18,13 +20,8 @@ impl<'a> DevDiagnostic<'a> {
     }
 
     fn send_impl(self) -> CoreResult<DevDiagnosticAssertions<'a>> {
-        let fut = dev_diagnostic(
-            DevDiagnosticInput {
-                migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
-            },
-            None,
-            self.api,
-        );
+        let migrations_list = utils::list_migrations(self.migrations_directory.path()).unwrap();
+        let fut = dev_diagnostic(DevDiagnosticInput { migrations_list }, None, self.api);
         let output = test_setup::runtime::run_with_thread_local_runtime(fut)?;
         Ok(DevDiagnosticAssertions {
             output,

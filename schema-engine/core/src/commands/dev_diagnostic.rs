@@ -12,10 +12,10 @@ pub async fn dev_diagnostic(
     namespaces: Option<Namespaces>,
     connector: &mut dyn SchemaConnector,
 ) -> ConnectorResult<DevDiagnosticOutput> {
-    migrations_directory::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
+    migrations_directory::error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
 
     let diagnose_input = DiagnoseMigrationHistoryInput {
-        migrations_directory_path: input.migrations_directory_path.clone(),
+        migrations_list: input.migrations_list,
         opt_in_to_shadow_database: true,
     };
 

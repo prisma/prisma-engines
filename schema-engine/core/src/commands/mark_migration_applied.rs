@@ -3,7 +3,6 @@ use schema_connector::{
     migrations_directory::{error_on_changed_provider, MigrationDirectory},
     SchemaConnector,
 };
-use std::path::Path;
 use user_facing_errors::schema_engine::{MigrationAlreadyApplied, MigrationToMarkAppliedNotFound};
 
 /// Mark a migration as applied.
@@ -11,12 +10,21 @@ pub async fn mark_migration_applied(
     input: MarkMigrationAppliedInput,
     connector: &mut dyn SchemaConnector,
 ) -> CoreResult<MarkMigrationAppliedOutput> {
-    error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
+    error_on_changed_provider(&input.migrations_list.lockfile, connector.connector_type())?;
 
     connector.acquire_lock().await?;
 
-    let migration_directory =
-        MigrationDirectory::new(Path::new(&input.migrations_directory_path).join(&input.migration_name));
+    let migration_directory = input
+        .migrations_list
+        .migration_directories
+        .into_iter()
+        .map(MigrationDirectory::new)
+        .find(|dir| input.migration_name == dir.migration_name())
+        .ok_or_else(|| {
+            CoreError::user_facing(MigrationToMarkAppliedNotFound {
+                migration_name: input.migration_name.clone(),
+            })
+        })?;
 
     let script = migration_directory.read_migration_script().map_err(|_err| {
         CoreError::user_facing(MigrationToMarkAppliedNotFound {

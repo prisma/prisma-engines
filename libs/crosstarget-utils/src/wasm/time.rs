@@ -4,6 +4,7 @@
 use std::future::Future;
 use std::time::Duration;
 
+pub use crate::common::datetime::*;
 use derive_more::Display;
 use js_sys::{Date, Function, Promise, Reflect};
 use wasm_bindgen::prelude::*;
@@ -45,7 +46,7 @@ impl SystemTime {
     pub const UNIX_EPOCH: Self = Self(Duration::ZERO);
 
     pub fn now() -> Self {
-        let ms = Date::now() as i64;
+        let ms = js_sys::Date::now() as i64;
         let ms = ms.try_into().expect("negative timestamps are not supported");
         Self(Duration::from_millis(ms))
     }
