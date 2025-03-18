@@ -384,7 +384,12 @@ fn run_connector_test_impl(
             .with_recorder(recorder)
             .await
         {
-            panic!("💥 Test failed due to an error: {err:?}");
+            // Print any traceback directly to stdout, so it remains readable
+            eprintln!("Test failed due to an error:");
+            eprintln!("=====");
+            eprintln!("{err}");
+            eprintln!("=====");
+            panic!("💥 Test failed due to an error (see above)");
         }
 
         if let Err(e) = crate::teardown_project(&datamodel, db_schemas, schema_id).await {
