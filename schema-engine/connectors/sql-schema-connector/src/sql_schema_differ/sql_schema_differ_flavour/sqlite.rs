@@ -1,11 +1,14 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
-    flavour::SqliteFlavour, migration_pair::MigrationPair, sql_schema_differ::column::ColumnTypeChange,
+    migration_pair::MigrationPair, sql_schema_differ::column::ColumnTypeChange,
     sql_schema_differ::differ_database::DifferDatabase,
 };
 use sql_schema_describer::{walkers::TableColumnWalker, ColumnTypeFamily};
 
-impl SqlSchemaDifferFlavour for SqliteFlavour {
+#[derive(Debug, Default)]
+pub struct SqliteSchemaDifferFlavour;
+
+impl SqlSchemaDifferFlavour for SqliteSchemaDifferFlavour {
     fn can_rename_foreign_key(&self) -> bool {
         false
     }

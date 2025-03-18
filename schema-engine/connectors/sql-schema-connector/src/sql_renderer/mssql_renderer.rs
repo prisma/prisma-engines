@@ -2,7 +2,6 @@ mod alter_table;
 
 use super::{common::*, IteratorJoin, Quoted, SqlRenderer};
 use crate::{
-    flavour::MssqlFlavour,
     migration_pair::MigrationPair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable},
 };
@@ -11,7 +10,20 @@ use psl::builtin_connectors::{MsSqlType, MsSqlTypeParameter};
 use sql_schema_describer::{self as sql, mssql::MssqlSchemaExt, PrismaValue};
 use std::{borrow::Cow, fmt::Write};
 
-impl MssqlFlavour {
+#[derive(Debug)]
+pub struct MssqlRenderer {
+    schema_name: String,
+}
+
+impl MssqlRenderer {
+    pub fn new(schema_name: String) -> Self {
+        Self { schema_name }
+    }
+
+    fn schema_name(&self) -> &str {
+        &self.schema_name
+    }
+
     fn table_name<'a>(&'a self, table: sql::TableWalker<'a>) -> QuotedWithPrefix<&'a str> {
         QuotedWithPrefix(
             Some(Quoted::mssql_ident(
@@ -74,7 +86,7 @@ impl MssqlFlavour {
     }
 }
 
-impl SqlRenderer for MssqlFlavour {
+impl SqlRenderer for MssqlRenderer {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
         Quoted::mssql_ident(name)
     }
@@ -96,7 +108,7 @@ impl SqlRenderer for MssqlFlavour {
                 .previous
                 .table()
                 .namespace()
-                .unwrap_or_else(|| self.schema_name()),
+                .unwrap_or_else(|| &self.schema_name),
             indexes.previous.table().name(),
             indexes.previous.name()
         );

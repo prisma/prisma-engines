@@ -1,4 +1,4 @@
-use crate::flavour::{MssqlFlavour, SqlFlavour};
+use crate::flavour::{MssqlFlavour, SqlConnectorFlavour};
 use schema_connector::{migrations_directory::MigrationDirectory, ConnectorResult, Namespaces};
 use sql_schema_describer::SqlSchema;
 

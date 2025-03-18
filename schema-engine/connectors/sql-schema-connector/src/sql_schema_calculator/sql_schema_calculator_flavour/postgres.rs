@@ -1,6 +1,7 @@
 use super::{super::Context, JoinTableUniquenessConstraint, SqlSchemaCalculatorFlavour};
-use crate::flavour::{PostgresFlavour, SqlFlavour};
+use crate::flavour::postgres::Circumstances;
 use either::Either;
+use enumflags2::BitFlags;
 use psl::{
     builtin_connectors::{cockroach_datamodel_connector::SequenceFunction, PostgresDatasourceProperties},
     datamodel_connector::walker_ext_traits::IndexWalkerExt,
@@ -9,7 +10,30 @@ use psl::{
 use sql::postgres::DatabaseExtension;
 use sql_schema_describer::{self as sql, postgres::PostgresSchemaExt};
 
-impl SqlSchemaCalculatorFlavour for PostgresFlavour {
+#[derive(Debug, Default)]
+pub struct PostgresSchemaCalculatorFlavour {
+    circumstances: BitFlags<Circumstances>,
+}
+
+impl PostgresSchemaCalculatorFlavour {
+    pub fn new(circumstances: BitFlags<Circumstances>) -> Self {
+        Self { circumstances }
+    }
+
+    fn is_cockroachdb(&self) -> bool {
+        self.circumstances.contains(Circumstances::IsCockroachDb)
+    }
+}
+
+impl SqlSchemaCalculatorFlavour for PostgresSchemaCalculatorFlavour {
+    fn datamodel_connector(&self) -> &dyn psl::datamodel_connector::Connector {
+        if self.is_cockroachdb() {
+            psl::builtin_connectors::COCKROACH
+        } else {
+            psl::builtin_connectors::POSTGRES
+        }
+    }
+
     fn calculate_enums(&self, ctx: &mut Context<'_>) {
         for prisma_enum in ctx.datamodel.db.walk_enums() {
             let sql_namespace_id: sql::NamespaceId = prisma_enum

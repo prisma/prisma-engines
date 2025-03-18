@@ -1,5 +1,4 @@
 use super::SqlSchemaCalculatorFlavour;
-use crate::flavour::{MssqlFlavour, SqlFlavour};
 use psl::{
     datamodel_connector::walker_ext_traits::{DefaultValueExt, IndexWalkerExt},
     parser_database::walkers::*,
@@ -9,7 +8,14 @@ use sql_schema_describer::{
     ForeignKeyAction,
 };
 
-impl SqlSchemaCalculatorFlavour for MssqlFlavour {
+#[derive(Debug, Default)]
+pub struct MssqlSchemaCalculatorFlavour;
+
+impl SqlSchemaCalculatorFlavour for MssqlSchemaCalculatorFlavour {
+    fn datamodel_connector(&self) -> &dyn psl::datamodel_connector::Connector {
+        psl::builtin_connectors::MSSQL
+    }
+
     fn default_constraint_name(&self, default_value: DefaultValueWalker<'_>) -> Option<String> {
         Some(default_value.constraint_name(self.datamodel_connector()).into_owned())
     }

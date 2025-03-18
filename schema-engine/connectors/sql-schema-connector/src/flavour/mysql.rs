@@ -10,7 +10,13 @@ use native::{shadow_db, Connection};
 #[cfg(not(feature = "mysql-native"))]
 use wasm::{shadow_db, Connection};
 
-use crate::{error::SystemDatabase, flavour::SqlFlavour};
+use crate::{
+    error::SystemDatabase, flavour::SqlConnectorFlavour,
+    sql_destructive_change_checker::destructive_change_checker_flavour::mysql::MysqlDestructiveChangeCheckerFlavour,
+    sql_renderer::mysql_renderer::MysqlRenderer,
+    sql_schema_calculator::sql_schema_calculator_flavour::mysql::MysqlSchemaCalculatorFlavour,
+    sql_schema_differ::sql_schema_differ_flavour::mysql::MysqlSchemaDifferFlavour,
+};
 use enumflags2::BitFlags;
 use indoc::indoc;
 use psl::{datamodel_connector, parser_database::ScalarType, ValidatedSchema};
@@ -68,16 +74,8 @@ impl MysqlFlavour {
         })
     }
 
-    pub(crate) fn is_mariadb(&self) -> bool {
-        self.circumstances().contains(Circumstances::IsMariadb)
-    }
-
     pub(crate) fn is_mysql_5_6(&self) -> bool {
         self.circumstances().contains(Circumstances::IsMysql56)
-    }
-
-    pub(crate) fn lower_cases_table_names(&self) -> bool {
-        self.circumstances().contains(Circumstances::LowerCasesTableNames)
     }
 
     pub(crate) fn database_name(&self) -> &str {
@@ -92,7 +90,25 @@ impl MysqlFlavour {
     }
 }
 
-impl SqlFlavour for MysqlFlavour {
+impl SqlConnectorFlavour for MysqlFlavour {
+    fn renderer(&self) -> Box<dyn crate::sql_renderer::SqlRenderer> {
+        Box::new(MysqlRenderer)
+    }
+
+    fn schema_differ(&self) -> Box<dyn crate::sql_schema_differ::SqlSchemaDifferFlavour> {
+        Box::new(MysqlSchemaDifferFlavour::new(self.circumstances()))
+    }
+
+    fn schema_calculator(&self) -> Box<dyn crate::sql_schema_calculator::SqlSchemaCalculatorFlavour> {
+        Box::new(MysqlSchemaCalculatorFlavour)
+    }
+
+    fn destructive_change_checker(
+        &self,
+    ) -> Box<dyn crate::sql_destructive_change_checker::DestructiveChangeCheckerFlavour> {
+        Box::new(MysqlDestructiveChangeCheckerFlavour)
+    }
+
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         with_connection(&mut self.state, |params, _, connection| async move {
             // We do not acquire advisory locks on PlanetScale instances.

@@ -1,6 +1,6 @@
 use super::DestructiveChangeCheckerFlavour;
 use crate::{
-    flavour::{MssqlFlavour, SqlFlavour},
+    flavour::SqlConnectorFlavour,
     migration_pair::MigrationPair,
     sql_destructive_change_checker::{
         check::{Column, Table},
@@ -14,7 +14,26 @@ use crate::{
 use schema_connector::{BoxFuture, ConnectorResult};
 use sql_schema_describer::walkers::TableColumnWalker;
 
-impl DestructiveChangeCheckerFlavour for MssqlFlavour {
+#[derive(Debug, Default)]
+pub struct MssqlDestructiveChangeCheckerFlavour {
+    schema_name: String,
+}
+
+impl MssqlDestructiveChangeCheckerFlavour {
+    pub fn new(schema_name: String) -> Self {
+        Self { schema_name }
+    }
+
+    fn schema_name(&self) -> &str {
+        &self.schema_name
+    }
+
+    fn datamodel_connector(&self) -> &dyn psl::datamodel_connector::Connector {
+        psl::builtin_connectors::MSSQL
+    }
+}
+
+impl DestructiveChangeCheckerFlavour for MssqlDestructiveChangeCheckerFlavour {
     fn check_alter_column(
         &self,
         alter_column: &AlterColumn,
@@ -119,18 +138,26 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
         }
     }
 
-    fn count_rows_in_table<'a>(&'a mut self, table: &'a Table) -> BoxFuture<'a, ConnectorResult<i64>> {
+    fn count_rows_in_table<'a>(
+        &'a mut self,
+        connector: &'a mut dyn SqlConnectorFlavour,
+        table: &'a Table,
+    ) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
             let query = {
                 let schema_name = table.namespace.as_deref().unwrap_or_else(|| self.schema_name());
                 format!("SELECT COUNT(*) FROM [{}].[{}]", schema_name, table.table)
             };
-            let result_set = self.query_raw(&query, &[]).await?;
+            let result_set = connector.query_raw(&query, &[]).await?;
             super::extract_table_rows_count(table, result_set)
         })
     }
 
-    fn count_values_in_column<'a>(&'a mut self, column: &'a Column) -> BoxFuture<'a, ConnectorResult<i64>> {
+    fn count_values_in_column<'a>(
+        &'a mut self,
+        connector: &'a mut dyn SqlConnectorFlavour,
+        column: &'a Column,
+    ) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
             let query = {
                 let schema_name = column.namespace.as_deref().unwrap_or_else(|| self.schema_name());
@@ -139,7 +166,7 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
                     schema_name, column.table, column.column
                 )
             };
-            let result_set = self.query_raw(&query, &[]).await?;
+            let result_set = connector.query_raw(&query, &[]).await?;
             super::extract_column_values_count(result_set)
         })
     }

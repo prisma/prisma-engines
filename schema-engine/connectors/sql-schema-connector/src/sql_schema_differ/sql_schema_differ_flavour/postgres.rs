@@ -3,7 +3,7 @@ use std::sync::LazyLock;
 use super::SqlSchemaDifferFlavour;
 use crate::{
     database_schema::SqlDatabaseSchema,
-    flavour::PostgresFlavour,
+    flavour::postgres::Circumstances,
     migration_pair::MigrationPair,
     sql_migration::{
         AlterEnum, AlterExtension, CreateExtension, DropExtension, ExtensionChange, SequenceChange, SequenceChanges,
@@ -36,7 +36,22 @@ static POSTGIS_TABLES_OR_VIEWS: LazyLock<RegexSet> = LazyLock::new(|| {
 // https://www.postgresql.org/docs/12/pgbuffercache.html
 static EXTENSION_VIEWS: LazyLock<RegexSet> = LazyLock::new(|| RegexSet::new(["(?i)^pg_buffercache$"]).unwrap());
 
-impl SqlSchemaDifferFlavour for PostgresFlavour {
+#[derive(Debug)]
+pub struct PostgresSchemaDifferFlavour {
+    circumstances: BitFlags<Circumstances>,
+}
+
+impl PostgresSchemaDifferFlavour {
+    pub fn new(circumstances: BitFlags<Circumstances>) -> Self {
+        Self { circumstances }
+    }
+
+    fn is_cockroachdb(&self) -> bool {
+        self.circumstances.contains(Circumstances::IsCockroachDb)
+    }
+}
+
+impl SqlSchemaDifferFlavour for PostgresSchemaDifferFlavour {
     fn can_alter_primary_keys(&self) -> bool {
         self.is_cockroachdb()
     }

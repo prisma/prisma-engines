@@ -1,9 +1,16 @@
 use super::SqlSchemaCalculatorFlavour;
-use crate::{flavour::SqliteFlavour, sql_schema_calculator::Context};
+use crate::sql_schema_calculator::Context;
 use psl::parser_database::{walkers::*, ScalarType};
 use sql_schema_describer::ColumnTypeFamily;
 
-impl SqlSchemaCalculatorFlavour for SqliteFlavour {
+#[derive(Debug, Default)]
+pub struct SqliteSchemaCalculatorFlavour;
+
+impl SqlSchemaCalculatorFlavour for SqliteSchemaCalculatorFlavour {
+    fn datamodel_connector(&self) -> &dyn psl::datamodel_connector::Connector {
+        psl::builtin_connectors::SQLITE
+    }
+
     // Integer primary keys on SQLite are automatically assigned the rowid, which means they are automatically autoincrementing.
     fn field_is_implicit_autoincrement_primary_key(&self, field: ScalarFieldWalker<'_>) -> bool {
         field

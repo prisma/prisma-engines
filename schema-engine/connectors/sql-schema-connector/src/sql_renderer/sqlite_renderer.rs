@@ -1,6 +1,5 @@
 use super::{common::*, SqlRenderer};
 use crate::{
-    flavour::SqliteFlavour,
     migration_pair::MigrationPair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable, TableChange},
 };
@@ -10,7 +9,10 @@ use sql_ddl::sqlite as ddl;
 use sql_schema_describer::{walkers::*, *};
 use std::{borrow::Cow, sync::LazyLock};
 
-impl SqlRenderer for SqliteFlavour {
+#[derive(Debug)]
+pub struct SqliteRenderer;
+
+impl SqlRenderer for SqliteRenderer {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
         Quoted::Double(name)
     }

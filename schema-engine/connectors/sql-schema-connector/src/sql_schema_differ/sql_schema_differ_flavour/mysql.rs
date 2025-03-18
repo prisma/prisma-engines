@@ -1,22 +1,34 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
-    flavour::MysqlFlavour,
+    flavour::mysql::Circumstances,
     migration_pair::MigrationPair,
     sql_schema_differ::{all_match, ColumnTypeChange},
 };
+use enumflags2::BitFlags;
 use psl::builtin_connectors::MySqlType;
 use sql_schema_describer::{
     walkers::{IndexWalker, TableColumnWalker},
     ColumnTypeFamily,
 };
 
-impl SqlSchemaDifferFlavour for MysqlFlavour {
+#[derive(Debug)]
+pub struct MysqlSchemaDifferFlavour {
+    circumstances: BitFlags<Circumstances>,
+}
+
+impl MysqlSchemaDifferFlavour {
+    pub fn new(circumstances: BitFlags<Circumstances>) -> Self {
+        Self { circumstances }
+    }
+}
+
+impl SqlSchemaDifferFlavour for MysqlSchemaDifferFlavour {
     fn can_rename_foreign_key(&self) -> bool {
         false
     }
 
     fn can_rename_index(&self) -> bool {
-        !self.is_mariadb() && !self.is_mysql_5_6()
+        !self.circumstances.contains(Circumstances::IsMariadb) && !self.circumstances.contains(Circumstances::IsMysql56)
     }
 
     fn can_cope_with_foreign_key_column_becoming_non_nullable(&self) -> bool {
@@ -25,7 +37,7 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
 
     fn column_type_change(&self, differ: MigrationPair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         // On MariaDB, JSON is an alias for LONGTEXT. https://mariadb.com/kb/en/json-data-type/
-        if self.is_mariadb() {
+        if self.circumstances.contains(Circumstances::IsMariadb) {
             match (
                 differ.previous.column_native_type(),
                 differ.next.column_native_type(),
@@ -80,7 +92,7 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
     }
 
     fn lower_cases_table_names(&self) -> bool {
-        self.lower_cases_table_names()
+        self.circumstances.contains(Circumstances::LowerCasesTableNames)
     }
 
     fn should_create_indexes_from_created_tables(&self) -> bool {

@@ -1,6 +1,5 @@
-use super::render_default;
+use super::{render_default, MssqlRenderer};
 use crate::{
-    flavour::MssqlFlavour,
     migration_pair::MigrationPair,
     sql_migration::AlterColumn,
     sql_migration::TableChange,
@@ -20,7 +19,7 @@ use std::collections::BTreeSet;
 
 /// Creates a set of `ALTER TABLE` statements in a correct execution order.
 pub(crate) fn create_statements(
-    renderer: &MssqlFlavour,
+    renderer: &MssqlRenderer,
     tables: MigrationPair<TableWalker<'_>>,
     changes: &[TableChange],
 ) -> Vec<String> {
@@ -40,7 +39,7 @@ pub(crate) fn create_statements(
 }
 
 struct AlterTableConstructor<'a> {
-    renderer: &'a MssqlFlavour,
+    renderer: &'a MssqlRenderer,
     tables: MigrationPair<TableWalker<'a>>,
     changes: &'a [TableChange],
     drop_constraints: BTreeSet<String>,

@@ -6,16 +6,16 @@ use sql_schema_describer::{
 };
 
 #[cfg(feature = "mssql")]
-mod mssql;
+pub mod mssql;
 
 #[cfg(feature = "mysql")]
-mod mysql;
+pub mod mysql;
 
 #[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
-mod postgres;
+pub mod postgres;
 
 #[cfg(feature = "sqlite")]
-mod sqlite;
+pub mod sqlite;
 
 /// Trait to specialize SQL schema diffing (resulting in migration steps) by SQL backend.
 pub(crate) trait SqlSchemaDifferFlavour {

@@ -1,6 +1,6 @@
 use super::DestructiveChangeCheckerFlavour;
 use crate::{
-    flavour::{MysqlFlavour, SqlFlavour},
+    flavour::SqlConnectorFlavour,
     migration_pair::MigrationPair,
     sql_destructive_change_checker::{
         check::{Column, Table},
@@ -14,7 +14,16 @@ use crate::{
 use schema_connector::{BoxFuture, ConnectorResult};
 use sql_schema_describer::walkers::TableColumnWalker;
 
-impl DestructiveChangeCheckerFlavour for MysqlFlavour {
+#[derive(Debug, Default)]
+pub struct MysqlDestructiveChangeCheckerFlavour;
+
+impl MysqlDestructiveChangeCheckerFlavour {
+    fn datamodel_connector(&self) -> &dyn psl::datamodel_connector::Connector {
+        psl::builtin_connectors::MYSQL
+    }
+}
+
+impl DestructiveChangeCheckerFlavour for MysqlDestructiveChangeCheckerFlavour {
     fn check_alter_column(
         &self,
         alter_column: &AlterColumn,
@@ -128,18 +137,26 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
         }
     }
 
-    fn count_rows_in_table<'a>(&'a mut self, table: &'a Table) -> BoxFuture<'a, ConnectorResult<i64>> {
+    fn count_rows_in_table<'a>(
+        &'a mut self,
+        connector: &'a mut dyn SqlConnectorFlavour,
+        table: &'a Table,
+    ) -> BoxFuture<'a, ConnectorResult<i64>> {
         // TODO(MultiSchema): replace this when implementing MySQL.
         let query = format!("SELECT COUNT(*) FROM `{}`", table.table);
 
         Box::pin(async move {
-            query_with_backoff(self, &query)
+            query_with_backoff(connector, &query)
                 .await
                 .and_then(|result_set| super::extract_table_rows_count(table, result_set))
         })
     }
 
-    fn count_values_in_column<'a>(&'a mut self, column: &'a Column) -> BoxFuture<'a, ConnectorResult<i64>> {
+    fn count_values_in_column<'a>(
+        &'a mut self,
+        connector: &'a mut dyn SqlConnectorFlavour,
+        column: &'a Column,
+    ) -> BoxFuture<'a, ConnectorResult<i64>> {
         // TODO(MultiSchema): replace this when implementing MySQL.
         let query = format!(
             "SELECT COUNT(*) FROM `{}` WHERE `{}` IS NOT NULL",
@@ -147,7 +164,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
         );
 
         Box::pin(async move {
-            query_with_backoff(self, &query)
+            query_with_backoff(connector, &query)
                 .await
                 .and_then(super::extract_column_values_count)
         })
@@ -159,7 +176,10 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
 /// This is necessary because destructive change checks can come after a migration, and _on
 /// Vitess_, schema changes are asynchronous, they can take time to take effect. That causes
 /// failures in destructive change checks. Trying again later, in this case, works.
-async fn query_with_backoff(flavour: &mut MysqlFlavour, query: &str) -> ConnectorResult<quaint::prelude::ResultSet> {
+async fn query_with_backoff(
+    flavour: &mut dyn SqlConnectorFlavour,
+    query: &str,
+) -> ConnectorResult<quaint::prelude::ResultSet> {
     let delay = std::time::Duration::from_millis(400);
     let mut result = flavour.query_raw(query, &[]).await;
 

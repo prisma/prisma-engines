@@ -1,6 +1,5 @@
 use super::{common::*, IteratorJoin, SqlRenderer};
 use crate::{
-    flavour::MysqlFlavour,
     migration_pair::MigrationPair,
     sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
     sql_schema_differ::ColumnChanges,
@@ -16,7 +15,10 @@ use sql_schema_describer::{
 };
 use std::{borrow::Cow, fmt::Write as _, sync::LazyLock};
 
-impl MysqlFlavour {
+#[derive(Debug)]
+pub struct MysqlRenderer;
+
+impl MysqlRenderer {
     fn render_column<'a>(&self, col: TableColumnWalker<'a>) -> ddl::Column<'a> {
         let default = col
             .default()
@@ -42,7 +44,7 @@ impl MysqlFlavour {
     }
 }
 
-impl SqlRenderer for MysqlFlavour {
+impl SqlRenderer for MysqlRenderer {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
         Quoted::Backticks(name)
     }

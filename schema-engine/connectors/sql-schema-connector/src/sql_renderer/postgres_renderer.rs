@@ -1,6 +1,5 @@
 use super::{common::*, SqlRenderer};
 use crate::{
-    flavour::PostgresFlavour,
     migration_pair::MigrationPair,
     sql_migration::{
         AlterColumn, AlterEnum, AlterExtension, AlterTable, CreateExtension, DropExtension, ExtensionChange,
@@ -20,7 +19,16 @@ use sql_schema_describer::{
 };
 use std::borrow::Cow;
 
-impl PostgresFlavour {
+#[derive(Debug)]
+pub struct PostgresRenderer {
+    is_cockroach: bool,
+}
+
+impl PostgresRenderer {
+    pub fn new(is_cockroach: bool) -> Self {
+        Self { is_cockroach }
+    }
+
     fn render_column(&self, column: TableColumnWalker<'_>) -> String {
         let column_name = Quoted::postgres_ident(column.name());
         let tpe_str = render_column_type(column, self);
@@ -38,7 +46,7 @@ impl PostgresFlavour {
     }
 }
 
-impl SqlRenderer for PostgresFlavour {
+impl SqlRenderer for PostgresRenderer {
     // TODO(MultiSchema): We only do alter_sequence on CockroachDB.
     fn render_alter_sequence(
         &self,
@@ -185,13 +193,13 @@ impl SqlRenderer for PostgresFlavour {
         // On Postgres:
         // - Values cannot be removed.
         // - Only one value can be added in a single transaction until postgres 11.
-        if self.is_cockroachdb() {
+        if self.is_cockroach {
             render_step(&mut |step| {
                 render_cockroach_alter_enum(alter_enum, schemas, step);
             })
         } else {
-            let flavour = self;
-            render_postgres_alter_enum(alter_enum, schemas, flavour)
+            let renderer = self;
+            render_postgres_alter_enum(alter_enum, schemas, renderer)
         }
     }
 
@@ -308,7 +316,7 @@ impl SqlRenderer for PostgresFlavour {
             return Vec::new();
         }
 
-        if self.is_cockroachdb() {
+        if self.is_cockroach {
             let mut out = Vec::with_capacity(before_statements.len() + after_statements.len() + lines.len());
             out.extend(before_statements);
             for line in lines {
@@ -530,7 +538,7 @@ impl SqlRenderer for PostgresFlavour {
     }
 }
 
-fn render_column_type(col: TableColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<'static, str> {
+fn render_column_type(col: TableColumnWalker<'_>, renderer: &PostgresRenderer) -> Cow<'static, str> {
     let t = col.column_type();
     if let Some(enm) = col.column_type_family_as_enum() {
         let name = QuotedWithPrefix::pg_new(enm.namespace(), enm.name());
@@ -542,7 +550,7 @@ fn render_column_type(col: TableColumnWalker<'_>, flavour: &PostgresFlavour) -> 
         return format!("{}{}", description, if t.arity.is_list() { "[]" } else { "" }).into();
     }
 
-    if flavour.is_cockroachdb() {
+    if renderer.is_cockroach {
         render_column_type_cockroachdb(col)
     } else {
         render_column_type_postgres(col)
@@ -684,7 +692,7 @@ fn render_alter_column(
     before_statements: &mut Vec<String>,
     clauses: &mut Vec<String>,
     after_statements: &mut Vec<String>,
-    flavour: &PostgresFlavour,
+    renderer: &PostgresRenderer,
 ) {
     let steps = expand_alter_column(columns, column_changes);
     let table_name = QuotedWithPrefix::pg_from_table_walker(columns.previous.table());
@@ -709,14 +717,14 @@ fn render_alter_column(
             PostgresAlterColumn::SetDefault(new_default) => clauses.push(format!(
                 "{} SET DEFAULT {}",
                 &alter_column_prefix,
-                render_default(&new_default, &render_column_type(columns.next, flavour))
+                render_default(&new_default, &render_column_type(columns.next, renderer))
             )),
             PostgresAlterColumn::DropNotNull => clauses.push(format!("{} DROP NOT NULL", &alter_column_prefix)),
             PostgresAlterColumn::SetNotNull => clauses.push(format!("{} SET NOT NULL", &alter_column_prefix)),
             PostgresAlterColumn::SetType => clauses.push(format!(
                 "{} SET DATA TYPE {}",
                 &alter_column_prefix,
-                render_column_type(columns.next, flavour)
+                render_column_type(columns.next, renderer)
             )),
             PostgresAlterColumn::AddSequence => {
                 // We imitate the sequence that would be automatically created on a `SERIAL` column.
@@ -873,7 +881,7 @@ fn render_default<'a>(default: &'a DefaultValue, full_data_type: &str) -> Cow<'a
 fn render_postgres_alter_enum(
     alter_enum: &AlterEnum,
     schemas: MigrationPair<&SqlSchema>,
-    flavour: &PostgresFlavour,
+    renderer: &PostgresRenderer,
 ) -> Vec<String> {
     if alter_enum.dropped_variants.is_empty() {
         let mut stmts: Vec<String> = alter_enum
@@ -1007,7 +1015,7 @@ fn render_postgres_alter_enum(
         {
             let table_name = columns.previous.table().name();
             let column_name = columns.previous.name();
-            let data_type = render_column_type(columns.next, flavour);
+            let data_type = render_column_type(columns.next, renderer);
             let default_str = render_default(next_default.inner(), &data_type);
 
             let set_default = format!(
@@ -1082,8 +1090,8 @@ fn render_cockroach_alter_enum(
     }
 }
 
-fn render_column_identity_str(column: TableColumnWalker<'_>, flavour: &PostgresFlavour) -> String {
-    if !flavour.is_cockroachdb() {
+fn render_column_identity_str(column: TableColumnWalker<'_>, renderer: &PostgresRenderer) -> String {
+    if !renderer.is_cockroach {
         return String::new();
     }
 

@@ -1,9 +1,9 @@
-mod sql_schema_calculator_flavour;
+pub mod sql_schema_calculator_flavour;
 
 use sql_schema_calculator_flavour::JoinTableUniquenessConstraint;
 pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 
-use crate::{flavour::SqlFlavour, SqlDatabaseSchema};
+use crate::SqlDatabaseSchema;
 use psl::{
     datamodel_connector::walker_ext_traits::*,
     parser_database::{
@@ -16,7 +16,10 @@ use psl::{
 use sql_schema_describer::{self as sql, PrismaValue, SqlSchema};
 use std::collections::HashMap;
 
-pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn SqlFlavour) -> SqlDatabaseSchema {
+pub(crate) fn calculate_sql_schema(
+    datamodel: &ValidatedSchema,
+    flavour: &dyn SqlSchemaCalculatorFlavour,
+) -> SqlDatabaseSchema {
     let mut schema = SqlDatabaseSchema::default();
 
     let mut context = Context {
@@ -589,7 +592,7 @@ fn column_arity(arity: ast::FieldArity) -> sql::ColumnArity {
 pub(crate) struct Context<'a> {
     datamodel: &'a ValidatedSchema,
     schema: &'a mut SqlDatabaseSchema,
-    flavour: &'a dyn SqlFlavour,
+    flavour: &'a dyn SqlSchemaCalculatorFlavour,
     schemas: HashMap<&'a str, sql::NamespaceId>,
     model_id_to_table_id: HashMap<db::ModelId, sql::TableId>,
     enum_ids: HashMap<db::EnumId, sql::EnumId>,

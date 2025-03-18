@@ -2,7 +2,7 @@ use super::{
     check::Check, database_inspection_results::DatabaseInspectionResults,
     unexecutable_step_check::UnexecutableStepCheck, warning_check::SqlMigrationWarningCheck,
 };
-use crate::flavour::SqlFlavour;
+use crate::flavour::SqlConnectorFlavour;
 use schema_connector::{
     ConnectorError, ConnectorResult, DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration,
 };
@@ -43,7 +43,7 @@ impl DestructiveCheckPlan {
     #[tracing::instrument(skip(flavour), level = "debug")]
     pub(super) async fn execute(
         &self,
-        flavour: &mut (dyn SqlFlavour + Send + Sync),
+        flavour: &mut (dyn SqlConnectorFlavour + Send + Sync),
     ) -> ConnectorResult<DestructiveChangeDiagnostics> {
         let mut results = DatabaseInspectionResults::default();
 
@@ -92,19 +92,20 @@ impl DestructiveCheckPlan {
     pub(super) async fn inspect_for_check(
         &self,
         check: &(dyn Check + Send + Sync + 'static),
-        flavour: &mut (dyn SqlFlavour + Send + Sync),
+        flavour: &mut (dyn SqlConnectorFlavour + Send + Sync),
         results: &mut DatabaseInspectionResults,
     ) -> ConnectorResult<()> {
+        let mut checker = flavour.destructive_change_checker();
         if let Some(table) = check.needed_table_row_count() {
             if results.get_row_count(&table).is_none() {
-                let count = flavour.count_rows_in_table(&table).await?;
+                let count = checker.count_rows_in_table(flavour, &table).await?;
                 results.set_row_count(table.to_owned(), count)
             }
         }
 
         if let Some(column) = check.needed_column_value_count() {
             if let (_, None) = results.get_row_and_non_null_value_count(&column) {
-                let count = flavour.count_values_in_column(&column).await?;
+                let count = checker.count_values_in_column(flavour, &column).await?;
                 results.set_value_count(column, count);
             }
         }

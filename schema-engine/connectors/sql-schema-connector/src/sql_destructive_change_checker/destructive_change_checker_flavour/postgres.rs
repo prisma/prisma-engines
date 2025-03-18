@@ -1,6 +1,6 @@
 use super::DestructiveChangeCheckerFlavour;
 use crate::{
-    flavour::{PostgresFlavour, SqlFlavour},
+    flavour::{postgres::Circumstances, SqlConnectorFlavour},
     migration_pair::MigrationPair,
     sql_destructive_change_checker::{
         check::{Column, Table},
@@ -11,10 +11,30 @@ use crate::{
     sql_migration::{AlterColumn, ColumnTypeChange},
     sql_schema_differ::ColumnChanges,
 };
+use enumflags2::BitFlags;
 use schema_connector::{BoxFuture, ConnectorResult};
 use sql_schema_describer::walkers::TableColumnWalker;
 
-impl DestructiveChangeCheckerFlavour for PostgresFlavour {
+#[derive(Debug)]
+pub struct PostgresDestructiveChangeCheckerFlavour {
+    circumstances: BitFlags<Circumstances>,
+}
+
+impl PostgresDestructiveChangeCheckerFlavour {
+    pub fn new(circumstances: BitFlags<Circumstances>) -> Self {
+        Self { circumstances }
+    }
+
+    fn datamodel_connector(&self) -> &dyn psl::datamodel_connector::Connector {
+        if self.circumstances.contains(Circumstances::IsCockroachDb) {
+            psl::builtin_connectors::COCKROACH
+        } else {
+            psl::builtin_connectors::POSTGRES
+        }
+    }
+}
+
+impl DestructiveChangeCheckerFlavour for PostgresDestructiveChangeCheckerFlavour {
     fn check_alter_column(
         &self,
         alter_column: &AlterColumn,
@@ -125,26 +145,34 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
         }
     }
 
-    fn count_rows_in_table<'a>(&'a mut self, table: &'a Table) -> BoxFuture<'a, ConnectorResult<i64>> {
+    fn count_rows_in_table<'a>(
+        &'a mut self,
+        connector: &'a mut dyn SqlConnectorFlavour,
+        table: &'a Table,
+    ) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
             let from = match &table.namespace {
                 Some(namespace) => format!("\"{}\".\"{}\"", namespace, table.table),
                 None => format!("\"{}\"", table.table),
             };
             let query = format!("SELECT COUNT(*) FROM {from}");
-            let result_set = self.query_raw(&query, &[]).await?;
+            let result_set = connector.query_raw(&query, &[]).await?;
             super::extract_table_rows_count(table, result_set)
         })
     }
 
-    fn count_values_in_column<'a>(&'a mut self, column: &'a Column) -> BoxFuture<'a, ConnectorResult<i64>> {
+    fn count_values_in_column<'a>(
+        &'a mut self,
+        connector: &'a mut dyn SqlConnectorFlavour,
+        column: &'a Column,
+    ) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
             let from = match &column.namespace {
                 Some(namespace) => format!("\"{}\".\"{}\"", namespace, column.table),
                 None => format!("\"{}\"", column.table),
             };
             let query = format!("SELECT COUNT(*) FROM {} WHERE \"{}\" IS NOT NULL", from, column.column);
-            let result_set = self.query_raw(&query, &[]).await?;
+            let result_set = connector.query_raw(&query, &[]).await?;
             super::extract_column_values_count(result_set)
         })
     }

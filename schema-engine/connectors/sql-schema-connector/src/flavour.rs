@@ -3,16 +3,16 @@
 //! detail of the SQL connector.
 
 #[cfg(feature = "mssql")]
-mod mssql;
+pub mod mssql;
 
 #[cfg(feature = "mysql")]
-mod mysql;
+pub mod mysql;
 
 #[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
-mod postgres;
+pub mod postgres;
 
 #[cfg(feature = "sqlite")]
-mod sqlite;
+pub mod sqlite;
 
 #[cfg(feature = "mssql")]
 pub(crate) use mssql::MssqlFlavour;
@@ -105,15 +105,12 @@ where
     }
 }
 
-pub(crate) trait SqlFlavour:
-    DestructiveChangeCheckerFlavour
-    + SqlRenderer
-    + SqlSchemaDifferFlavour
-    + SqlSchemaCalculatorFlavour
-    + Send
-    + Sync
-    + Debug
-{
+pub(crate) trait SqlConnectorFlavour: Send + Sync + Debug {
+    fn renderer(&self) -> Box<dyn SqlRenderer>;
+    fn schema_differ(&self) -> Box<dyn SqlSchemaDifferFlavour>;
+    fn schema_calculator(&self) -> Box<dyn SqlSchemaCalculatorFlavour>;
+    fn destructive_change_checker(&self) -> Box<dyn DestructiveChangeCheckerFlavour>;
+
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 
     fn apply_migration_script<'a>(

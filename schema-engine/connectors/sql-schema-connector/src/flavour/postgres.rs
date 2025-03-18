@@ -12,7 +12,12 @@ use user_facing_errors::schema_engine::DatabaseSchemaInconsistent;
 #[cfg(not(feature = "postgresql-native"))]
 use wasm as imp;
 
-use crate::SqlFlavour;
+use crate::{
+    sql_destructive_change_checker::destructive_change_checker_flavour::postgres::PostgresDestructiveChangeCheckerFlavour,
+    sql_renderer::postgres_renderer::PostgresRenderer,
+    sql_schema_calculator::sql_schema_calculator_flavour::postgres::PostgresSchemaCalculatorFlavour,
+    sql_schema_differ::sql_schema_differ_flavour::postgres::PostgresSchemaDifferFlavour, SqlConnectorFlavour,
+};
 use enumflags2::BitFlags;
 use indoc::indoc;
 use quaint::{
@@ -210,7 +215,31 @@ impl PostgresFlavour {
     }
 }
 
-impl SqlFlavour for PostgresFlavour {
+impl SqlConnectorFlavour for PostgresFlavour {
+    fn renderer(&self) -> Box<dyn crate::sql_renderer::SqlRenderer> {
+        Box::new(PostgresRenderer::new(self.is_cockroachdb()))
+    }
+
+    fn schema_differ(&self) -> Box<dyn crate::sql_schema_differ::SqlSchemaDifferFlavour> {
+        Box::new(PostgresSchemaDifferFlavour::new(
+            self.circumstances().unwrap_or_default(),
+        ))
+    }
+
+    fn schema_calculator(&self) -> Box<dyn crate::sql_schema_calculator::SqlSchemaCalculatorFlavour> {
+        Box::new(PostgresSchemaCalculatorFlavour::new(
+            self.circumstances().unwrap_or_default(),
+        ))
+    }
+
+    fn destructive_change_checker(
+        &self,
+    ) -> Box<dyn crate::sql_destructive_change_checker::DestructiveChangeCheckerFlavour> {
+        Box::new(PostgresDestructiveChangeCheckerFlavour::new(
+            self.circumstances().unwrap_or_default(),
+        ))
+    }
+
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         // They do not support advisory locking:
         // https://github.com/cockroachdb/cockroach/issues/13546

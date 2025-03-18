@@ -1,25 +1,27 @@
 #[cfg(feature = "mssql")]
-mod mssql;
+pub mod mssql;
 
 #[cfg(feature = "mysql")]
-mod mysql;
+pub mod mysql;
 
 #[cfg(any(feature = "postgresql", feature = "cockroachdb"))]
-mod postgres;
+pub mod postgres;
 
 #[cfg(feature = "sqlite")]
-mod sqlite;
+pub mod sqlite;
 
 use super::{
     check::{Column, Table},
     DestructiveCheckPlan,
 };
-use crate::{migration_pair::MigrationPair, sql_migration::AlterColumn, sql_schema_differ::ColumnChanges};
+use crate::{
+    migration_pair::MigrationPair, sql_migration::AlterColumn, sql_schema_differ::ColumnChanges, SqlConnectorFlavour,
+};
 use schema_connector::{BoxFuture, ConnectorError, ConnectorResult};
 use sql_schema_describer::walkers::TableColumnWalker;
 
 /// Flavour-specific destructive change checks and queries.
-pub(crate) trait DestructiveChangeCheckerFlavour {
+pub(crate) trait DestructiveChangeCheckerFlavour: Send + Sync {
     /// Check for potential destructive or unexecutable alter column steps.
     fn check_alter_column(
         &self,
@@ -38,9 +40,17 @@ pub(crate) trait DestructiveChangeCheckerFlavour {
         step_index: usize,
     );
 
-    fn count_rows_in_table<'a>(&'a mut self, table: &'a Table) -> BoxFuture<'a, ConnectorResult<i64>>;
+    fn count_rows_in_table<'a>(
+        &'a mut self,
+        connector: &'a mut dyn SqlConnectorFlavour,
+        table: &'a Table,
+    ) -> BoxFuture<'a, ConnectorResult<i64>>;
 
-    fn count_values_in_column<'a>(&'a mut self, column: &'a Column) -> BoxFuture<'a, ConnectorResult<i64>>;
+    fn count_values_in_column<'a>(
+        &'a mut self,
+        connector: &'a mut dyn SqlConnectorFlavour,
+        column: &'a Column,
+    ) -> BoxFuture<'a, ConnectorResult<i64>>;
 }
 
 /// Display a column type for warnings/errors.

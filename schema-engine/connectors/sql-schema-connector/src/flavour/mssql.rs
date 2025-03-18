@@ -10,7 +10,15 @@ use native::{generic_apply_migration_script, shadow_db, Connection};
 #[cfg(not(feature = "mssql-native"))]
 use wasm::{generic_apply_migration_script, shadow_db, Connection};
 
-use crate::SqlFlavour;
+use crate::{
+    sql_destructive_change_checker::{
+        self, destructive_change_checker_flavour::mssql::MssqlDestructiveChangeCheckerFlavour,
+    },
+    sql_renderer::{mssql_renderer::MssqlRenderer, SqlRenderer},
+    sql_schema_calculator::sql_schema_calculator_flavour::mssql::MssqlSchemaCalculatorFlavour,
+    sql_schema_differ::sql_schema_differ_flavour::mssql::MssqlSchemaDifferFlavour,
+    SqlConnectorFlavour,
+};
 use connection_string::JdbcString;
 use indoc::formatdoc;
 use quaint::{connector::MssqlUrl, prelude::Table};
@@ -76,7 +84,23 @@ impl MssqlFlavour {
     }
 }
 
-impl SqlFlavour for MssqlFlavour {
+impl SqlConnectorFlavour for MssqlFlavour {
+    fn renderer(&self) -> Box<dyn SqlRenderer> {
+        Box::new(MssqlRenderer::new(self.schema_name().to_owned()))
+    }
+
+    fn schema_differ(&self) -> Box<dyn crate::sql_schema_differ::SqlSchemaDifferFlavour> {
+        Box::new(MssqlSchemaDifferFlavour)
+    }
+
+    fn schema_calculator(&self) -> Box<dyn crate::sql_schema_calculator::SqlSchemaCalculatorFlavour> {
+        Box::new(MssqlSchemaCalculatorFlavour)
+    }
+
+    fn destructive_change_checker(&self) -> Box<dyn sql_destructive_change_checker::DestructiveChangeCheckerFlavour> {
+        Box::new(MssqlDestructiveChangeCheckerFlavour::new(self.schema_name().to_owned()))
+    }
+
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         // see
         // https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-getapplock-transact-sql?view=sql-server-ver15

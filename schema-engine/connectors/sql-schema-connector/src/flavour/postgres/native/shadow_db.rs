@@ -1,5 +1,5 @@
 use crate::flavour::postgres::{sql_schema_from_migrations_and_db, Circumstances, MigratePostgresUrl};
-use crate::flavour::{validate_connection_infos_do_not_match, PostgresFlavour, SqlFlavour};
+use crate::flavour::{validate_connection_infos_do_not_match, PostgresFlavour, SqlConnectorFlavour};
 use schema_connector::{migrations_directory::MigrationDirectory, ConnectorResult};
 use schema_connector::{ConnectorError, ConnectorParams, Namespaces};
 use sql_schema_describer::SqlSchema;

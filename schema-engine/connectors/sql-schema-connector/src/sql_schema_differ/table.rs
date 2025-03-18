@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
-use super::{differ_database::DifferDatabase, foreign_keys_match};
-use crate::{flavour::SqlFlavour, migration_pair::MigrationPair};
+use super::{differ_database::DifferDatabase, foreign_keys_match, SqlSchemaDifferFlavour};
+use crate::migration_pair::MigrationPair;
 use sql_schema_describer::{
     walkers::{ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker},
     ForeignKeyId, TableId,
@@ -188,7 +188,7 @@ impl<'schema> TableDiffer<'schema, '_> {
 }
 
 /// Compare two SQL indexes and return whether they only differ by name.
-fn indexes_match(first: IndexWalker<'_>, second: IndexWalker<'_>, flavour: &dyn SqlFlavour) -> bool {
+fn indexes_match(first: IndexWalker<'_>, second: IndexWalker<'_>, flavour: &dyn SqlSchemaDifferFlavour) -> bool {
     let left_cols = first.columns();
     let right_cols = second.columns();
 

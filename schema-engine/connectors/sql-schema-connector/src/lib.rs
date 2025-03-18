@@ -18,7 +18,7 @@ mod sql_schema_differ;
 
 use database_schema::SqlDatabaseSchema;
 use enumflags2::BitFlags;
-use flavour::SqlFlavour;
+use flavour::SqlConnectorFlavour;
 use migration_pair::MigrationPair;
 use psl::{datamodel_connector::NativeTypeInstance, parser_database::ScalarType, ValidatedSchema};
 use quaint::connector::DescribedQuery;
@@ -32,7 +32,7 @@ const MIGRATIONS_TABLE_NAME: &str = "_prisma_migrations";
 
 /// The top-level SQL migration connector.
 pub struct SqlSchemaConnector {
-    flavour: Box<dyn SqlFlavour + Send + Sync + 'static>,
+    flavour: Box<dyn SqlConnectorFlavour + Send + Sync + 'static>,
     host: Arc<dyn ConnectorHost>,
 }
 
@@ -151,14 +151,14 @@ impl SqlSchemaConnector {
         }
     }
 
-    fn new_uninitialized_flavour<Flavour: SqlFlavour + Default + 'static>() -> Self {
+    fn new_uninitialized_flavour<Flavour: SqlConnectorFlavour + Default + 'static>() -> Self {
         Self {
             flavour: Box::new(Flavour::default()),
             host: Arc::new(EmptyHost),
         }
     }
 
-    fn flavour(&self) -> &(dyn SqlFlavour + Send + Sync) {
+    fn flavour(&self) -> &(dyn SqlConnectorFlavour + Send + Sync) {
         self.flavour.as_ref()
     }
 
@@ -205,7 +205,7 @@ impl SqlSchemaConnector {
                 self.flavour.check_schema_features(&schema)?;
                 Ok(sql_schema_calculator::calculate_sql_schema(
                     &schema,
-                    self.flavour.as_ref(),
+                    &*self.flavour.schema_calculator(),
                 ))
             }
             DiffTarget::Migrations(migrations) => self
@@ -312,7 +312,8 @@ impl SchemaConnector for SqlSchemaConnector {
     fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration {
         let previous = SqlDatabaseSchema::from_erased(from);
         let next = SqlDatabaseSchema::from_erased(to);
-        let steps = sql_schema_differ::calculate_steps(MigrationPair::new(&previous, &next), self.flavour.as_ref());
+        let steps =
+            sql_schema_differ::calculate_steps(MigrationPair::new(&previous, &next), &*self.flavour.schema_differ());
         tracing::debug!(?steps, "Inferred migration steps.");
 
         Migration::new(SqlMigration {
@@ -358,7 +359,7 @@ impl SchemaConnector for SqlSchemaConnector {
         migration: &Migration,
         diagnostics: &DestructiveChangeDiagnostics,
     ) -> ConnectorResult<String> {
-        apply_migration::render_script(migration, diagnostics, self.flavour())
+        apply_migration::render_script(migration, diagnostics, &*self.flavour().renderer())
     }
 
     fn reset(&mut self, soft: bool, namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<()>> {
@@ -475,7 +476,7 @@ fn new_shadow_database_name() -> String {
 /// when we don't have the permissions to do a full reset.
 #[tracing::instrument(skip(flavour))]
 async fn best_effort_reset(
-    flavour: &mut (dyn SqlFlavour + Send + Sync),
+    flavour: &mut (dyn SqlConnectorFlavour + Send + Sync),
     namespaces: Option<Namespaces>,
 ) -> ConnectorResult<()> {
     best_effort_reset_impl(flavour, namespaces)
@@ -484,7 +485,7 @@ async fn best_effort_reset(
 }
 
 async fn best_effort_reset_impl(
-    flavour: &mut (dyn SqlFlavour + Send + Sync),
+    flavour: &mut (dyn SqlConnectorFlavour + Send + Sync),
     namespaces: Option<Namespaces>,
 ) -> ConnectorResult<()> {
     tracing::info!("Attempting best_effort_reset");
@@ -497,14 +498,17 @@ async fn best_effort_reset_impl(
     // accidentally drop something we can't describe in the data model.
     let drop_views = source_schema
         .view_walkers()
-        .filter(|view| !flavour.view_should_be_ignored(view.name()))
+        .filter(|view| !flavour.schema_differ().view_should_be_ignored(view.name()))
         .map(|vw| DropView::new(vw.id))
         .map(SqlMigrationStep::DropView);
 
     steps.extend(drop_views);
 
     let diffables: MigrationPair<SqlDatabaseSchema> = MigrationPair::new(source_schema, target_schema).map(From::from);
-    steps.extend(sql_schema_differ::calculate_steps(diffables.as_ref(), flavour));
+    steps.extend(sql_schema_differ::calculate_steps(
+        diffables.as_ref(),
+        &*flavour.schema_differ(),
+    ));
     let (source_schema, target_schema) = diffables.map(|s| s.describer_schema).into_tuple();
 
     let drop_udts = source_schema
@@ -532,7 +536,7 @@ async fn best_effort_reset_impl(
     let migration = apply_migration::render_script(
         &Migration::new(migration),
         &DestructiveChangeDiagnostics::default(),
-        flavour,
+        &*flavour.renderer(),
     )?;
 
     flavour.raw_cmd(&migration).await?;

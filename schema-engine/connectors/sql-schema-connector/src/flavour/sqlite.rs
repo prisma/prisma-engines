@@ -12,7 +12,13 @@ use native as imp;
 #[cfg(not(feature = "sqlite-native"))]
 use wasm as imp;
 
-use crate::flavour::SqlFlavour;
+use crate::{
+    flavour::SqlConnectorFlavour,
+    sql_destructive_change_checker::destructive_change_checker_flavour::sqlite::SqliteDestructiveChangeCheckerFlavour,
+    sql_renderer::{sqlite_renderer::SqliteRenderer, SqlRenderer},
+    sql_schema_calculator::sql_schema_calculator_flavour::sqlite::SqliteSchemaCalculatorFlavour,
+    sql_schema_differ::sql_schema_differ_flavour::sqlite::SqliteSchemaDifferFlavour,
+};
 use indoc::indoc;
 use schema_connector::{
     migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorResult, Namespaces,
@@ -71,7 +77,25 @@ impl std::fmt::Debug for SqliteFlavour {
     }
 }
 
-impl SqlFlavour for SqliteFlavour {
+impl SqlConnectorFlavour for SqliteFlavour {
+    fn renderer(&self) -> Box<dyn SqlRenderer> {
+        Box::new(SqliteRenderer)
+    }
+
+    fn schema_differ(&self) -> Box<dyn crate::sql_schema_differ::SqlSchemaDifferFlavour> {
+        Box::new(SqliteSchemaDifferFlavour)
+    }
+
+    fn schema_calculator(&self) -> Box<dyn crate::sql_schema_calculator::SqlSchemaCalculatorFlavour> {
+        Box::new(SqliteSchemaCalculatorFlavour)
+    }
+
+    fn destructive_change_checker(
+        &self,
+    ) -> Box<dyn crate::sql_destructive_change_checker::DestructiveChangeCheckerFlavour> {
+        Box::new(SqliteDestructiveChangeCheckerFlavour)
+    }
+
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
         self.raw_cmd("PRAGMA main.locking_mode=EXCLUSIVE")
     }

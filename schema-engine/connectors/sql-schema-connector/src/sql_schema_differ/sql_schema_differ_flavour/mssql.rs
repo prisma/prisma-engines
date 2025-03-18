@@ -1,6 +1,5 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
-    flavour::MssqlFlavour,
     migration_pair::MigrationPair,
     sql_migration::SqlMigrationStep,
     sql_schema_differ::{column::ColumnTypeChange, differ_database::DifferDatabase, table::TableDiffer, ColumnChanges},
@@ -8,7 +7,10 @@ use crate::{
 use psl::builtin_connectors::{MsSqlType, MsSqlTypeParameter};
 use sql_schema_describer::{self as sql, mssql::MssqlSchemaExt, ColumnTypeFamily, TableColumnId};
 
-impl SqlSchemaDifferFlavour for MssqlFlavour {
+#[derive(Debug, Default)]
+pub struct MssqlSchemaDifferFlavour;
+
+impl SqlSchemaDifferFlavour for MssqlSchemaDifferFlavour {
     fn can_rename_foreign_key(&self) -> bool {
         true
     }

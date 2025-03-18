@@ -20,7 +20,10 @@ impl MigrationPersistence for SqlSchemaConnector {
                 return Ok(());
             }
 
-            if table_names.iter().any(|t| !self.flavour().table_should_be_ignored(t)) {
+            if table_names
+                .iter()
+                .any(|t| !self.flavour().schema_differ().table_should_be_ignored(t))
+            {
                 return Err(ConnectorError::user_facing(
                     user_facing_errors::schema_engine::DatabaseSchemaNotEmpty,
                 ));

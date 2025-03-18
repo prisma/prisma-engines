@@ -1,6 +1,6 @@
 use super::DestructiveChangeCheckerFlavour;
 use crate::{
-    flavour::{SqlFlavour, SqliteFlavour},
+    flavour::SqlConnectorFlavour,
     migration_pair::MigrationPair,
     sql_destructive_change_checker::{
         check::{Column, Table},
@@ -14,7 +14,10 @@ use crate::{
 use schema_connector::{BoxFuture, ConnectorResult};
 use sql_schema_describer::{walkers::TableColumnWalker, ColumnArity};
 
-impl DestructiveChangeCheckerFlavour for SqliteFlavour {
+#[derive(Debug, Default)]
+pub struct SqliteDestructiveChangeCheckerFlavour;
+
+impl DestructiveChangeCheckerFlavour for SqliteDestructiveChangeCheckerFlavour {
     fn check_alter_column(
         &self,
         alter_column: &AlterColumn,
@@ -79,21 +82,29 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
         unreachable!("check_drop_and_recreate_column on SQLite");
     }
 
-    fn count_rows_in_table<'a>(&'a mut self, table: &'a Table) -> BoxFuture<'a, ConnectorResult<i64>> {
+    fn count_rows_in_table<'a>(
+        &'a mut self,
+        connector: &'a mut dyn SqlConnectorFlavour,
+        table: &'a Table,
+    ) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
             let query = format!("SELECT COUNT(*) FROM \"{}\"", table.table);
-            let result_set = self.query_raw(&query, &[]).await?;
+            let result_set = connector.query_raw(&query, &[]).await?;
             super::extract_table_rows_count(table, result_set)
         })
     }
 
-    fn count_values_in_column<'a>(&'a mut self, column: &'a Column) -> BoxFuture<'a, ConnectorResult<i64>> {
+    fn count_values_in_column<'a>(
+        &'a mut self,
+        connector: &'a mut dyn SqlConnectorFlavour,
+        column: &'a Column,
+    ) -> BoxFuture<'a, ConnectorResult<i64>> {
         Box::pin(async move {
             let query = format!(
                 "SELECT COUNT(*) FROM \"{}\" WHERE \"{}\" IS NOT NULL",
                 column.table, column.column
             );
-            let result_set = self.query_raw(&query, &[]).await?;
+            let result_set = connector.query_raw(&query, &[]).await?;
             super::extract_column_values_count(result_set)
         })
     }

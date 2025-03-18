@@ -1,10 +1,16 @@
 use psl::parser_database::walkers::EnumWalker;
 
 use super::{super::Context, SqlSchemaCalculatorFlavour};
-use crate::flavour::MysqlFlavour;
 use sql_schema_describer as sql;
 
-impl SqlSchemaCalculatorFlavour for MysqlFlavour {
+#[derive(Debug, Default)]
+pub struct MysqlSchemaCalculatorFlavour;
+
+impl SqlSchemaCalculatorFlavour for MysqlSchemaCalculatorFlavour {
+    fn datamodel_connector(&self) -> &dyn psl::datamodel_connector::Connector {
+        psl::builtin_connectors::MYSQL
+    }
+
     fn calculate_enums(&self, ctx: &mut Context<'_>) {
         let enum_fields = ctx
             .datamodel
