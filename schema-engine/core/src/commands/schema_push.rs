@@ -12,8 +12,9 @@ pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConne
         return Err(ConnectorError::user_facing(err));
     };
 
-    let to = connector.schema_dialect().schema_from_datamodel(sources)?;
-    let namespaces = connector.schema_dialect().extract_namespaces(&to);
+    let dialect = connector.schema_dialect();
+    let to = dialect.schema_from_datamodel(sources)?;
+    let namespaces = dialect.extract_namespaces(&to);
 
     // TODO(MultiSchema): we may need to do something similar to
     // namespaces_and_preview_features_from_diff_targets here as well,
@@ -22,14 +23,9 @@ pub async fn schema_push(input: SchemaPushInput, connector: &mut dyn SchemaConne
         .schema_from_database(namespaces)
         .instrument(tracing::info_span!("Calculate from database"))
         .await?;
-    let database_migration = connector.schema_dialect().diff(from, to);
+    let database_migration = dialect.diff(from, to);
 
-    tracing::debug!(
-        migration = connector
-            .schema_dialect()
-            .migration_summary(&database_migration)
-            .as_str()
-    );
+    tracing::debug!(migration = dialect.migration_summary(&database_migration).as_str());
 
     let checks = connector
         .destructive_change_checker()

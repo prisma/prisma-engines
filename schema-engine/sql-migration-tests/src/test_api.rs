@@ -345,11 +345,9 @@ impl TestApi {
     ) -> String {
         let from = tok(self.connector.schema_from_diff_target(from, namespaces.clone())).unwrap();
         let to = tok(self.connector.schema_from_diff_target(to, namespaces)).unwrap();
-        let migration = self.connector.schema_dialect().diff(from, to);
-        self.connector
-            .schema_dialect()
-            .render_script(&migration, &Default::default())
-            .unwrap()
+        let dialect = self.connector.schema_dialect();
+        let migration = dialect.diff(from, to);
+        dialect.render_script(&migration, &Default::default()).unwrap()
     }
 
     pub fn normalize_identifier<'a>(&self, identifier: &'a str) -> Cow<'a, str> {

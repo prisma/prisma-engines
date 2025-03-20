@@ -589,15 +589,16 @@ async fn best_effort_reset_impl(
 ) -> ConnectorResult<()> {
     tracing::info!("Attempting best_effort_reset");
 
+    let dialect = connector.dialect();
     let source_schema = connector.describe_schema(namespaces).await?;
-    let target_schema = connector.dialect().empty_database_schema();
+    let target_schema = dialect.empty_database_schema();
     let mut steps = Vec::new();
 
     // We drop views here, not in the normal migration process to not
     // accidentally drop something we can't describe in the data model.
     let drop_views = source_schema
         .view_walkers()
-        .filter(|view| !connector.dialect().schema_differ().view_should_be_ignored(view.name()))
+        .filter(|view| !dialect.schema_differ().view_should_be_ignored(view.name()))
         .map(|vw| DropView::new(vw.id))
         .map(SqlMigrationStep::DropView);
 
@@ -606,7 +607,7 @@ async fn best_effort_reset_impl(
     let diffables: MigrationPair<SqlDatabaseSchema> = MigrationPair::new(source_schema, target_schema).map(From::from);
     steps.extend(sql_schema_differ::calculate_steps(
         diffables.as_ref(),
-        &*connector.dialect().schema_differ(),
+        &*dialect.schema_differ(),
     ));
     let (source_schema, target_schema) = diffables.map(|s| s.describer_schema).into_tuple();
 
@@ -635,7 +636,7 @@ async fn best_effort_reset_impl(
     let migration = apply_migration::render_script(
         &Migration::new(migration),
         &DestructiveChangeDiagnostics::default(),
-        &*connector.dialect().renderer(),
+        &*dialect.renderer(),
     )?;
 
     connector.raw_cmd(&migration).await?;

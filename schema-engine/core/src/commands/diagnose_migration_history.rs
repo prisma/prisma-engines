@@ -128,23 +128,22 @@ pub async fn diagnose_migration_history(
 
     let (drift, error_in_unapplied_migration) = {
         if input.opt_in_to_shadow_database {
+            let dialect = connector.schema_dialect();
             // TODO(MultiSchema): this should probably fill the following namespaces from the CLI since there is
             // no schema to grab the namespaces off, in the case of MultiSchema.
             let from = connector
                 .schema_from_migrations(&applied_migrations, namespaces.clone())
                 .await;
             let to = connector.schema_from_database(namespaces.clone()).await;
-            let drift = match from
-                .and_then(|from| to.map(|to| connector.schema_dialect().diff(from, to)))
-                .map(|mig| {
-                    if connector.schema_dialect().migration_is_empty(&mig) {
-                        None
-                    } else {
-                        Some(mig)
-                    }
-                }) {
+            let drift = match from.and_then(|from| to.map(|to| dialect.diff(from, to))).map(|mig| {
+                if dialect.migration_is_empty(&mig) {
+                    None
+                } else {
+                    Some(mig)
+                }
+            }) {
                 Ok(Some(drift)) => Some(DriftDiagnostic::DriftDetected {
-                    summary: connector.schema_dialect().migration_summary(&drift),
+                    summary: dialect.migration_summary(&drift),
                 }),
                 Err(error) => Some(DriftDiagnostic::MigrationFailedToApply { error }),
                 _ => None,

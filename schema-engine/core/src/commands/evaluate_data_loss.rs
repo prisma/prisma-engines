@@ -15,9 +15,9 @@ pub async fn evaluate_data_loss(
 
     let migrations_from_directory = list_migrations(input.migrations_list.migration_directories);
 
-    let to = connector.schema_dialect().schema_from_datamodel(sources)?;
-
-    let namespaces = connector.schema_dialect().extract_namespaces(&to);
+    let dialect = connector.schema_dialect();
+    let to = dialect.schema_from_datamodel(sources)?;
+    let namespaces = dialect.extract_namespaces(&to);
 
     // TODO(MultiSchema): we may need to do something similar to
     // namespaces_and_preview_features_from_diff_targets here as well,
@@ -25,9 +25,9 @@ pub async fn evaluate_data_loss(
     let from = connector
         .schema_from_migrations(&migrations_from_directory, namespaces)
         .await?;
-    let migration = connector.schema_dialect().diff(from, to);
+    let migration = dialect.diff(from, to);
 
-    let migration_steps = connector.schema_dialect().migration_len(&migration) as u32;
+    let migration_steps = dialect.migration_len(&migration) as u32;
     let diagnostics = connector.destructive_change_checker().check(&migration).await?;
 
     let warnings = diagnostics

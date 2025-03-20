@@ -179,18 +179,18 @@ pub(crate) fn test_scenario(scenario_name: &str) {
         db.drop().await.unwrap();
         apply_state(&db, state).await;
 
+        let dialect = connector.schema_dialect();
         let from = connector.schema_from_database(None).await.unwrap();
-        let to = connector
-            .schema_dialect()
+        let to = dialect
             .schema_from_datamodel(vec![("schema.prisma".to_string(), schema.clone())])
             .unwrap();
-        let migration = connector.schema_dialect().diff(from, to);
+        let migration = dialect.diff(from, to);
 
         connector.apply_migration(&migration).await.unwrap();
 
         let state = get_state(&db).await;
 
-        let mut rendered_migration = connector.schema_dialect().migration_summary(&migration);
+        let mut rendered_migration = dialect.migration_summary(&migration);
         rendered_migration.push_str("\n------\n\n");
         rendered_migration.push_str(&serde_json::to_string_pretty(&state).unwrap());
         rendered_migration.push('\n');
@@ -219,16 +219,15 @@ Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the envir
 
         // Check that the migration is idempotent.
         let from = connector.schema_from_database(None).await.unwrap();
-        let to = connector
-            .schema_dialect()
+        let to = dialect
             .schema_from_datamodel(vec![("schema.prisma".to_string(), schema.clone())])
             .unwrap();
-        let migration = connector.schema_dialect().diff(from, to);
+        let migration = dialect.diff(from, to);
 
         assert!(
-            connector.schema_dialect().migration_is_empty(&migration),
+            dialect.migration_is_empty(&migration),
             "Expected an empty migration when applying the same schema, got:\n{}",
-            connector.schema_dialect().migration_summary(&migration)
+            dialect.migration_summary(&migration)
         );
     })
 }
