@@ -32,15 +32,6 @@ pub struct MongoDbSchemaConnector {
 }
 
 impl MongoDbSchemaConnector {
-    pub fn new_uninitialized() -> Self {
-        Self {
-            connection_string: String::new(),
-            preview_features: BitFlags::empty(),
-            client: OnceCell::new(),
-            host: Arc::new(EmptyHost),
-        }
-    }
-
     pub fn new(params: ConnectorParams) -> Self {
         Self {
             connection_string: params.connection_string,

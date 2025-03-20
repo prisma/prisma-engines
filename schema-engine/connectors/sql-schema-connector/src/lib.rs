@@ -263,46 +263,6 @@ impl SqlSchemaConnector {
         })
     }
 
-    /// Create a new uninitialized MySQL migration connector.
-    #[cfg(feature = "mysql-native")]
-    pub fn new_uninitialized_mysql() -> Self {
-        Self::new_uninitialized_connector::<flavour::MysqlConnector>()
-    }
-
-    /// Create a new uninitialized MSSQL migration connector.
-    #[cfg(feature = "mssql-native")]
-    pub fn new_uninitialized_mssql() -> Self {
-        Self::new_uninitialized_connector::<flavour::MssqlConnector>()
-    }
-
-    /// Create a new uninitialized SQLite migration connector.
-    #[cfg(feature = "sqlite-native")]
-    pub fn new_uninitialized_sqlite() -> Self {
-        Self::new_uninitialized_connector::<flavour::SqliteConnector>()
-    }
-
-    /// Create a new uninitialized PostgreSQL migration connector.
-    #[cfg(feature = "postgresql-native")]
-    pub fn new_uninitialized_postgres() -> Self {
-        Self::new_uninitialized_connector::<flavour::PostgresConnector>()
-    }
-
-    /// Create a new uninitialized CockroachDB migration connector.
-    #[cfg(feature = "cockroachdb-native")]
-    pub fn new_uninitialized_cockroachdb() -> Self {
-        Self {
-            inner: Box::new(flavour::PostgresConnector::new_uninitialized_cockroach()),
-            host: Arc::new(EmptyHost),
-        }
-    }
-
-    fn new_uninitialized_connector<Connector: SqlConnector + Default + 'static>() -> Self {
-        Self {
-            inner: Box::new(Connector::default()),
-            host: Arc::new(EmptyHost),
-        }
-    }
-
     /// Returns the SQL dialect used by the connector.
     fn sql_dialect(&self) -> Box<dyn SqlDialect> {
         self.inner.dialect()

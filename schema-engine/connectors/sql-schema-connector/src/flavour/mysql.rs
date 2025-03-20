@@ -115,12 +115,6 @@ pub(crate) struct MysqlConnector {
     state: State,
 }
 
-impl Default for MysqlConnector {
-    fn default() -> Self {
-        Self { state: State::Initial }
-    }
-}
-
 impl std::fmt::Debug for MysqlConnector {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("MysqlFlavour").finish()

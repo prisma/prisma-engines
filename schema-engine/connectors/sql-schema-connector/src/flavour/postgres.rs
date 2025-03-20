@@ -202,16 +202,6 @@ pub(crate) struct PostgresConnector {
     provider: PostgresProvider,
 }
 
-#[cfg(feature = "postgresql-native")]
-impl Default for PostgresConnector {
-    fn default() -> Self {
-        Self {
-            state: State::Initial,
-            provider: PostgresProvider::Unspecified,
-        }
-    }
-}
-
 impl std::fmt::Debug for PostgresConnector {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("<PostgreSQL connector>")
@@ -228,14 +218,6 @@ impl PostgresConnector {
             state: State::new(adapter, provider, Default::default()).await?,
             provider,
         })
-    }
-
-    #[cfg(feature = "cockroachdb-native")]
-    pub(crate) fn new_uninitialized_cockroach() -> Self {
-        Self {
-            state: State::Initial,
-            provider: PostgresProvider::CockroachDb,
-        }
     }
 
     #[cfg(feature = "postgresql-native")]

@@ -124,12 +124,6 @@ pub(crate) struct MssqlConnector {
     state: State,
 }
 
-impl Default for MssqlConnector {
-    fn default() -> Self {
-        Self { state: State::Initial }
-    }
-}
-
 impl std::fmt::Debug for MssqlConnector {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("MssqlFlavour").field("url", &"<REDACTED>").finish()
