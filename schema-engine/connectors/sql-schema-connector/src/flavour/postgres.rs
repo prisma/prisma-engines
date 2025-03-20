@@ -253,7 +253,7 @@ impl PostgresConnector {
     }
 
     pub(crate) fn is_cockroachdb(&self) -> bool {
-        self.provider == PostgresProvider::CockroachDb || self.circumstances().contains(Circumstances::IsCockroachDb)
+        self.circumstances().contains(Circumstances::IsCockroachDb)
     }
 
     fn schema_name(&self) -> &str {

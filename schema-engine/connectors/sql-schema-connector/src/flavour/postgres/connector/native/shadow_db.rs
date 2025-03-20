@@ -14,7 +14,7 @@ pub async fn sql_schema_from_migration_history(
     namespaces: Option<Namespaces>,
     external_shadow_db: UsingExternalShadowDb,
 ) -> ConnectorResult<SqlSchema> {
-    let is_vanilla_postgres = provider == PostgresProvider::PostgreSql && !connector.is_cockroachdb();
+    let is_vanilla_postgres = !connector.is_cockroachdb();
 
     match external_shadow_db {
         UsingExternalShadowDb::Yes => {
